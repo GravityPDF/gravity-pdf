@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Filename\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Filename (required)').exists).ok()
-    .expect(fieldDescription('Set the filename for the generated PDF (excluding the .pdf extension). Mergetags are supported, and invalid characters / \\ " * ? | : < > are automatically converted to an underscore.', 'label').exists).ok()
     .expect(run.filenameInputBox.exists).ok()
     .expect(run.filenameMergeTagsOptionList.exists).ok()
 })

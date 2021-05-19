@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -13,7 +13,6 @@ test('should display \'Password\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Password').exists).ok()
-    .expect(fieldDescription('Password protect the PDF, or leave blank to disable. Mergetags are supported.', 'label').exists).ok()
     .expect(run.passwordInputBox.exists).ok()
     .expect(run.passwordMergeTagsOptionList.exists).ok()
 })

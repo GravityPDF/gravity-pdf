@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import General from '../../utilities/page-model/tabs/general-settings'
 
 const run = new General()
@@ -17,7 +17,6 @@ test('should display \'Default Font Color\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Default Font Color').exists).ok()
-    .expect(fieldDescription('Set the default font color used in PDFs.', 'label').exists).ok()
     .expect(run.defaultFontColorSelectButton.exists).ok()
     .expect(run.defaultFontColorInputBox.exists).ok()
     .expect(defaultFontColorWpColorPickerBox.exists).ok()

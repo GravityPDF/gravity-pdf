@@ -1,5 +1,4 @@
 import {
-  fieldDescription,
   fieldLabel,
   mediaManagerTitle,
   addMediaButton
@@ -21,8 +20,6 @@ test('should display \'First Page Footer\' field', async t => {
   await t
     .expect(fieldLabel('First Page Footer').exists).ok()
     .expect(run.firstPageFooterCheckbox.exists).ok()
-    .expect(fieldDescription('Use different footer on first page of PDF?', 'label').exists).ok()
-    .expect(fieldDescription('Override the footer on the first page of the PDF.', 'label').exists).ok()
     .expect(addMediaButton('gfpdf-settings-field-wrapper-first_footer', 'Add Media').exists).ok()
     .expect(run.firstPageFooterWpEditorBox.exists).ok()
 })

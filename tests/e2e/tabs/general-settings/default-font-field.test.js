@@ -1,6 +1,5 @@
 import {
   fieldLabel,
-  fieldDescription,
   dropdownOptionGroup,
   dropdownOption
 } from '../../utilities/page-model/helpers/field'
@@ -19,7 +18,6 @@ test('should display \'Default Font\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Default Font').exists).ok()
-    .expect(fieldDescription('Set the default font type used in PDFs. Choose an existing font or install your own.', 'label').exists).ok()
     .expect(run.defaultFontSelectBox.exists).ok()
     .expect(fontManager.advancedButton.exists).ok()
 })

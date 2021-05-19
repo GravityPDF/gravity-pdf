@@ -1,5 +1,4 @@
 import {
-  fieldDescription,
   fieldLabel,
   mediaManagerTitle,
   addMediaButton
@@ -19,7 +18,6 @@ test('should display \'Header\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Header').exists).ok()
-    .expect(fieldDescription('The header is included at the top of each page. For simple columns try this HTML table snippet.', 'label').exists).ok()
     .expect(addMediaButton('gfpdf-settings-field-wrapper-header', 'Add Media').exists).ok()
     .expect(run.headerWpEditorBox.exists).ok()
 })

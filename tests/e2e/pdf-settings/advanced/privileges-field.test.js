@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -13,7 +13,6 @@ test('should display \'Privileges\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Privileges').exists).ok()
-    .expect(fieldDescription('Deselect privileges to restrict end user capabilities in the PDF. Privileges are trivial to bypass and are only suitable to specify your intentions to the user (and not as a means of access control or security).', 'label').exists).ok()
     .expect(run.copyCheckbox.checked).ok()
     .expect(run.printLowResolutionCheckbox.checked).ok()
     .expect(run.printHighResolutionCheckbox.checked).ok()

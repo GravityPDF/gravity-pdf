@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -17,7 +17,6 @@ test('should display \'Notifications\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Notifications').exists).ok()
-    .expect(fieldDescription('Send the PDF as an email attachment for the selected notification(s). Password protect the PDF if security is a concern. Alternatively, use the [gravitypdf] shortcode directly in your Notification message.', 'label').exists).ok()
     .expect(checkbox.exists).ok()
     .expect(checkboxLabel.exists).ok()
 })

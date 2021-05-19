@@ -1,4 +1,4 @@
-import { fieldHeaderTitle, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldHeaderTitle } from '../../utilities/page-model/helpers/field'
 import General from '../../utilities/page-model/tabs/general-settings'
 
 const run = new General()
@@ -12,7 +12,6 @@ test('should display \'Debug Mode\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Debug Mode').exists).ok()
-    .expect(fieldDescription('When enabled, debug information will be displayed on-screen for core features.').exists).ok()
     .expect(run.debugModeCheckbox.exists).ok()
 })
 

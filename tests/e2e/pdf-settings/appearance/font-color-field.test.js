@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription, button } from '../../utilities/page-model/helpers/field'
+import { fieldLabel, button } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -14,7 +14,6 @@ test('should display \'Font Color\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Font Color').exists).ok()
-    .expect(fieldDescription('Set the font color to use in the PDF.', 'label').exists).ok()
     .expect(run.fontColorSelectButton.exists).ok()
     .expect(run.fontColorInputBox.exists).ok()
     .expect(run.fontColorWpPickerContainerActive.exists).ok()

@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Font Size\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Font Size').exists).ok()
-    .expect(fieldDescription('Set the font size to use in the PDF.', 'label').exists).ok()
     .expect(run.fontSizeInputBox.exists).ok()
 })
 

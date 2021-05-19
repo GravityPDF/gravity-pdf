@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import General from '../../utilities/page-model/tabs/general-settings'
 
 const run = new General()
@@ -12,7 +12,6 @@ test('should display \'Default Font Size\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Default Font Size').exists).ok()
-    .expect(fieldDescription('Set the default font size used in PDFs.', 'label').exists).ok()
     .expect(run.defaultFontSizeInputBox.exists).ok()
 })
 

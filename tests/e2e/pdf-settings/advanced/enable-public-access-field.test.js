@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -13,7 +13,6 @@ test('should display \'Enable Public Access\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Enable Public Access').exists).ok()
-    .expect(fieldDescription('When public access is on all security protocols are disabled and anyone can view the PDF document for ALL your form\'s entries. For better security, use the signed PDF urls feature instead.').exists).ok()
     .expect(run.enablePublicAccessCheckbox.exists).ok()
 })
 

@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription, mediaManagerTitle } from '../../utilities/page-model/helpers/field'
+import { fieldLabel, mediaManagerTitle } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 import MediaManager from '../../utilities/page-model/helpers/media-manager'
 
@@ -14,7 +14,6 @@ test('should display \'Background Image\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Background Image').exists).ok()
-    .expect(fieldDescription('The background image is included on all pages. For optimal results, use an image the same dimensions as the paper size and run it through an image optimization tool before upload.', 'label').exists).ok()
     .expect(run.backgroundImageUploadBox.exists).ok()
     .expect(run.backgroundImageUploadFileButton.exists).ok()
 })

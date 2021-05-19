@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldHeaderTitle, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldHeaderTitle } from '../../utilities/page-model/helpers/field'
 import General from '../../utilities/page-model/tabs/general-settings'
 
 const run = new General()
@@ -13,7 +13,6 @@ test('should display \'Entry View\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Entry View').exists).ok()
-    .expect(fieldDescription('Select the default action used when accessing a PDF from the Gravity Forms entries list page.', 'label').exists).ok()
     .expect(run.entryViewViewOption.exists).ok()
     .expect(run.entryViewDownlaodOption.exists).ok()
 })

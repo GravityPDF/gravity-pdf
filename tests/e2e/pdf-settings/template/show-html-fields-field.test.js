@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Show HTML Fields\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Show HTML Fields').exists).ok()
-    .expect(fieldDescription('Display form page names on the PDF. Requires the use of the Page Break field.').exists).ok()
     .expect(run.showHtmlFieldsCheckbox.exists).ok()
 })
 

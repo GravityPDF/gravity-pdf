@@ -10,11 +10,6 @@ export function fieldLabel (text, style = 'div') {
   return Selector(style).withText(text)
 }
 
-// Field description
-export function fieldDescription (text, style = 'div') {
-  return Selector(style).withText(text)
-}
-
 // Select box
 export function selectBox (style, id) {
   return Selector('div').find(`[class^="${style}"][id="${id}"]`)

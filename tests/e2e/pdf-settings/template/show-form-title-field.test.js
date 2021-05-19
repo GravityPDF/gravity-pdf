@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Show Form Title\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Show Form Title').exists).ok()
-    .expect(fieldDescription('Display the form title at the beginning of the PDF.').exists).ok()
     .expect(run.showFormTitleCheckbox.exists).ok()
 })
 

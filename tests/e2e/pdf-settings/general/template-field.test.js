@@ -1,7 +1,6 @@
 import { Selector } from 'testcafe'
 import {
   fieldLabel,
-  fieldDescription,
   dropdownOptionGroup,
   dropdownOption,
   button,
@@ -22,7 +21,6 @@ test('should display \'Template\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Template').exists).ok()
-    .expect(fieldDescription('Templates control the overall look and feel of the PDFs, and additional templates can be purchased from the online store. If you want to digitize and automate your existing documents, use our Bespoke PDF service. Developers can also build their own templates.', 'label').exists).ok()
     .expect(run.templateSelectBox.exists).ok()
     .expect(templateManager.advancedButton.exists).ok()
 })

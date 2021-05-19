@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -18,7 +18,6 @@ test('should display \'Format\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Format').exists).ok()
-    .expect(fieldDescription('Generate a document adhering to the selected PDF format. Watermarks, alpha-transparency, and PDF Security are automatically disabled when using PDF/A-1b or PDF/X-1a formats.').exists).ok()
     .expect(run.formatStandardCheckbox.exists).ok()
     .expect(standardLabel.exists).ok()
     .expect(run.formatPdfA1bCheckbox.exists).ok()

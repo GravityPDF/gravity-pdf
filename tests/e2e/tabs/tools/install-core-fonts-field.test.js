@@ -1,6 +1,6 @@
 import { RequestMock } from 'testcafe'
 import { baseURL } from '../../auth'
-import { fieldHeaderTitle, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldHeaderTitle } from '../../utilities/page-model/helpers/field'
 import Tools from '../../utilities/page-model/tabs/tools'
 
 const run = new Tools()
@@ -18,7 +18,6 @@ test('should display \'Install Core Fonts\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Install Core Fonts').exists).ok()
-    .expect(fieldDescription('Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.').exists).ok()
     .expect(run.downloadCoreFontsButton.exists).ok()
 })
 

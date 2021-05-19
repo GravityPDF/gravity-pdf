@@ -1,6 +1,5 @@
 import {
   fieldLabel,
-  fieldDescription,
   selectBox,
   dropdownOptionGroup,
   dropdownOption
@@ -18,7 +17,6 @@ test('should display \'Paper Size\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Paper Size').exists).ok()
-    .expect(fieldDescription('Set the paper size used when generating PDFs.', 'label').exists).ok()
     .expect(run.paperSizeSelectBox.exists).ok()
 })
 
@@ -85,7 +83,6 @@ test('should save selected custom paper size', async t => {
   await t
     .expect(run.paperSizeSelectBox.value).eql('CUSTOM')
     .expect(run.customPaperSizeLabel.exists).ok()
-    .expect(fieldDescription('Control the exact paper size. Can be set in millimeters or inches.', 'label').exists).ok()
     .expect(widthInputBox.value).eql('2')
     .expect(heightInputBox.value).eql('5')
     .expect(measurementInputBox.value).eql('inches')
