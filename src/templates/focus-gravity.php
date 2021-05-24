@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Focus Gravity
- * Version: 2.0.0
+ * Version: 2.0.1
  * Description: Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -53,55 +53,55 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 		padding: 1.25mm 0;
 	}
 
-	/* Handle GF2.5+ Columns */
-	.grid {
-		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
-	}
+    /* Handle GF2.5+ Columns */
+    .grid {
+        float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+    }
 
-	.grid .inner-container {
-		width: 95%;
-	}
+    .grid .inner-container {
+        width: 95%;
+    }
 
-	.grid-3 {
-		width: 25%;
-	}
+    .grid-3 {
+        width: 24.5%;
+    }
 
-	.grid-4 {
-		width: 33.33%;
-	}
+    .grid-4 {
+        width: 33%;
+    }
 
-	.grid-5 {
-		width: 41.66%;
-	}
+    .grid-5 {
+        width: 41%;
+    }
 
-	.grid-6 {
-		width: 50%;
-	}
+    .grid-6 {
+        width: 49.5%;
+    }
 
-	.grid-7 {
-		width: 58.33%;
-	}
+    .grid-7 {
+        width: 58%;
+    }
 
-	.grid-8 {
-		width: 66.66%;
-	}
+    .grid-8 {
+        width: 66%;
+    }
 
-	.grid-9 {
-		width: 75%
-	}
+    .grid-9 {
+        width: 74.5%
+    }
 
-	.grid-10 {
-		width: 83.33%;
-	}
+    .grid-10 {
+        width: 83%;
+    }
 
-	.grid-11 {
-		width: 91.66%;
-	}
+    .grid-11 {
+        width: 91%;
+    }
 
-	.grid-12,
-	.grid-12 .inner-container {
-		width: 100%;
-	}
+    .grid-12,
+    .grid-12 .inner-container {
+        width: 100%;
+    }
 
 	/* Handle Legacy Columns */
 	.gf_left_half,
