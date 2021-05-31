@@ -56,6 +56,7 @@ export const FontVariant = ({
           key={key}
           accept='.ttf'
           onDrop={acceptedFiles => onHandleUpload(key, acceptedFiles[0], state)}
+          multiple={false}
         >
           {({ getRootProps, getInputProps }) => (
             <a
