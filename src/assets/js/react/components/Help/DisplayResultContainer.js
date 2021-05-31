@@ -54,7 +54,7 @@ const DisplayResultContainer = ({ groups }) => {
                           </svg>
                         </div>
                         <div className='hit-content-wrapper'>
-                          <span className='hit-title'>{item[0].lvl1}</span>
+                          <span className='hit-title' dangerouslySetInnerHTML={{ __html: item[0].lvl1 }} />
                           <span className='hit-path' dangerouslySetInnerHTML={{ __html: additionalInfo }} />
                         </div>
                         <div className='hit-action'>
