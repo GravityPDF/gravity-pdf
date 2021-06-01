@@ -16,7 +16,7 @@ class Pdf {
     await t
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .click(link('#tab_pdf', 'Add New'))
+      .click(link('#tab_PDF', 'Add New'))
       .typeText(this.pdfname, 'Test PDF Template', { paste: true })
       .typeText(this.fileName, 'testpdftemplate', { paste: true })
       .click(this.addPdfButton)

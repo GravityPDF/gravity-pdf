@@ -19,17 +19,17 @@ fixture`PDF shortcode - Confirmation Type TEXT, PAGE, and REDIRECT Test`
 test('should check if the shortcode confirmation type TEXT is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
-  shorcodeHolder = await run.shortcodeField.value
-  await run.navigateConfirmationsSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
+  shorcodeHolder = await run.shortcodeInputBox.value
+  await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
-    .click(run.confirmationText)
-    .click(button('Text'))
-    .click(run.wsiwigEditor)
+    .click(run.confirmationTextCheckbox)
+    .click(run.wysiwgEditorTextTab)
+    .click(run.wysiwgEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-    .typeText(run.wsiwigEditor, shorcodeHolder, { paste: true })
-    .click(run.saveButton)
-    .click(link('#gf_form_toolbar', 'Preview'))
+    .typeText(run.wysiwgEditor, shorcodeHolder, { paste: true })
+    .click(run.saveConfirmationButton)
+    .click(run.previewLink)
     .typeText(run.formInputField, 'test', { paste: true })
     .click(run.submitButton)
   downloadUrl = await Selector('.gravitypdf-download-link').getAttribute('href')
@@ -49,28 +49,33 @@ test('should check if the shortcode confirmation type TEXT is working correctly'
 test('should check if the shortcode confirmation type PAGE is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
-  shorcodeHolder = await run.shortcodeField.value
-  await page.addNewPage()
-  await page.navigatePage()
+  shorcodeHolder = await run.shortcodeInputBox.value
   await t
+    .setNativeDialogHandler(() => true)
+    .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
+  await page.addNewPage()
+  await t
+    .setNativeDialogHandler(() => true)
+    .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
     .click(link('#the-list', 'Test page'))
+
   await page.closePopupButton.exists && await t.click(page.closePopupButton)
   await t
     .click(page.addBlockIcon)
     .typeText(page.searchBlock, 'shortcode', { paste: true })
     .click(page.shortcodeLink)
     .typeText(page.shortcodeTextarea, shorcodeHolder, { paste: true })
-    .click(button('Update'))
-  await run.navigateConfirmationsSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
+    .click(page.updateButton)
+  await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
-    .click(run.confirmationPage)
-    .click(run.pageSelect)
+    .click(run.confirmationPageCheckbox)
+    .click(run.confirmationPageSelectBox)
     .click(dropdownOption('Test page'))
   await t
-    .click(run.queryStringBox)
-    .typeText(run.textAreaBox, 'entry={entry_id}', { paste: true })
-    .click(run.saveButton)
-    .click(link('#gf_form_toolbar', 'Preview'))
+    .click(run.queryStringInputBox)
+    .typeText(run.queryStringInputBox, 'entry={entry_id}', { paste: true })
+    .click(run.saveConfirmationButton)
+    .click(run.previewLink)
     .typeText(run.formInputField, 'test', { paste: true })
     .click(run.submitButton)
   downloadUrl = await Selector('.gravitypdf-download-link').getAttribute('href')
@@ -90,8 +95,8 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
 test('should check if the shortcode confirmation type REDIRECT download is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
-  shorcodeHolder = await run.shortcodeField.value
-  await run.navigateConfirmationsSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
+  shorcodeHolder = await run.shortcodeInputBox.value
+  await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
     .click(run.confirmationRedirect)
     .click(run.redirectUrlInputField)

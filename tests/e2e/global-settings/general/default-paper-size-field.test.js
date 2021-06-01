@@ -8,7 +8,7 @@ fixture`General Tab -  Default Paper Size Field Test`
 
 test('should display \'Default Paper Size\' field', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
 
   // Assertions
   await t
@@ -23,7 +23,7 @@ test('should search and display existing result', async t => {
   const result = Selector('div').find('[class^="active-result group-option highlighted"]')
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t
     .click(selectBox('chosen-container chosen-container-single', 'gfpdf_settings_default_pdf_size__chosen'))
     .typeText(searchBox, 'letter', { paste: true })
@@ -35,7 +35,7 @@ test('should display a dropdown of paper sizes option', async t => {
   const dropDownList = Selector('.chosen-results')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
 
   // Assertions
   await t

@@ -12,7 +12,7 @@ test('should display Background Processing field', async t => {
   const no = Selector('div').find('[class^="gfpdf_settings_background_processing"][value="Disable"]')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
 
   // Assertions
   await t

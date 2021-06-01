@@ -17,7 +17,7 @@ fixture`General Tab - Default Template Field Test`
 
 test('should display \'Default Template Field\'', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
 
   // Assertions
   await t
@@ -29,7 +29,7 @@ test('should display \'Default Template Field\'', async t => {
 
 test('should display the Core Templates dropdown option', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
 
   // Assertions
   await t
@@ -52,7 +52,7 @@ test('should display Popup Template Selector', async t => {
   const themeDetailsLink = Selector('span').withText('Template Details')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t.click(button('Advanced'))
 
   // Assertions
@@ -76,7 +76,7 @@ test('should display \'Add New Template Dropzone\'', async t => {
   const installationMessage = Selector('div')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t.click(button('Advanced'))
 
   // Assertions
@@ -88,7 +88,7 @@ test('should display \'Add New Template Dropzone\'', async t => {
 
 test('should display individual specific Template details', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t
     .click(button('Advanced'))
     .click(run.focusGravity)
@@ -111,7 +111,7 @@ test('should navigate to next and previous Template', async t => {
   const focusGravityTemplate = Selector('div').find('[class^="theme-name"]').withText('Focus Gravity')
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t
     .click(button('Advanced'))
     .click(run.focusGravity)
@@ -127,7 +127,7 @@ test('should navigate to next and previous Template', async t => {
 
 test('should display Popup Template Selector that can be close', async t => {
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t
     .click(button('Advanced'))
     .click(button('Close dialog'))
@@ -142,7 +142,7 @@ test('should display Template filter search bar', async t => {
   const searchResult = Selector('.theme-author')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t
     .click(button('Advanced'))
     .typeText(templateSearchbar, 'rubix', { paste: true })
@@ -159,7 +159,7 @@ test('should successfully upload a new Template', async t => {
   const imageScreenshot = Selector('.theme-screenshot').find('img').withAttribute('src', `${baseURL}/wp-content/uploads/PDF_EXTENDED_TEMPLATES/images/test-template.png`)
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t
     .click(button('Advanced'))
     .setFilesToUpload(run.addNewTemplate, testTemplate)
@@ -179,7 +179,7 @@ test('should successfully delete the new added template', async t => {
   const imageScreenshot = Selector('.theme-screenshot').find('img').withAttribute('src', `${baseURL}/wp-content/uploads/PDF_EXTENDED_TEMPLATES/images/test-template.png`)
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
   await t
     .setNativeDialogHandler(() => true)
     .click(button('Advanced'))

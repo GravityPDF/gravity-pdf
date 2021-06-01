@@ -12,7 +12,7 @@ test('should display Reverse Text (RTL) field', async t => {
   const no = Selector('div').find('[class^="gfpdf_settings_default_rtl"][value="No"]')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
 
   // Assertions
   await t

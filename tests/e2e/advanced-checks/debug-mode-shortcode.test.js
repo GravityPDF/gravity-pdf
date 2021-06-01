@@ -14,7 +14,7 @@ fixture`Debug Mode - PDF Shortcode Test`
 
 test('should enable debug mode and throw error when PDF is inactive', async t => {
   // Actions & Assertions
-  await pdf.navigatePdfSection('gf_settings&subview=PDF&tab=general#')
+  await pdf.navigatePdfSection('gf_settings&subview=pdf&tab=general#')
   await t
     .click(radioItem('gfpdf_settings', 'debug_mode', 'Yes'))
     .click(run.saveButton)
@@ -42,7 +42,7 @@ test('should reset/clean PDF back to active and debug mode back to disabled for 
   await t
     .click(pte.toggleSwitch)
     .expect(run.activePDF.exists).ok()
-  await run.navigateLink('gf_settings&subview=PDF&tab=general#')
+  await run.navigateLink('gf_settings&subview=pdf&tab=general#')
   await t
     .click(radioItem('gfpdf_settings', 'debug_mode', 'No'))
     .click(run.saveButton)
