@@ -53,55 +53,55 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 		padding: 1.25mm 0;
 	}
 
-    /* Handle GF2.5+ Columns */
-    .grid {
-        float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
-    }
+	/* Handle GF2.5+ Columns */
+	.grid {
+		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+	}
 
-    .grid .inner-container {
-        width: 95%;
-    }
+	.grid .inner-container {
+		width: 95%;
+	}
 
-    .grid-3 {
-        width: 24.5%;
-    }
+	.grid-3 {
+		width: 24.5%;
+	}
 
-    .grid-4 {
-        width: 33%;
-    }
+	.grid-4 {
+		width: 33%;
+	}
 
-    .grid-5 {
-        width: 41%;
-    }
+	.grid-5 {
+		width: 41%;
+	}
 
-    .grid-6 {
-        width: 49.5%;
-    }
+	.grid-6 {
+		width: 49.5%;
+	}
 
-    .grid-7 {
-        width: 58%;
-    }
+	.grid-7 {
+		width: 58%;
+	}
 
-    .grid-8 {
-        width: 66%;
-    }
+	.grid-8 {
+		width: 66%;
+	}
 
-    .grid-9 {
-        width: 74.5%
-    }
+	.grid-9 {
+		width: 74.5%
+	}
 
-    .grid-10 {
-        width: 83%;
-    }
+	.grid-10 {
+		width: 83%;
+	}
 
-    .grid-11 {
-        width: 91%;
-    }
+	.grid-11 {
+		width: 91%;
+	}
 
-    .grid-12,
-    .grid-12 .inner-container {
-        width: 100%;
-    }
+	.grid-12,
+	.grid-12 .inner-container {
+		width: 100%;
+	}
 
 	/* Handle Legacy Columns */
 	.gf_left_half,
