@@ -99,6 +99,12 @@
           "value": "Option 3 Value",
           "isSelected": false,
           "price": ""
+        },
+        {
+          "text": "Option 4",
+          "value": "",
+          "isSelected": false,
+          "price": ""
         }
       ],
       "formId": 58,
@@ -279,6 +285,13 @@
         {
           "text": "Radio Third Choice",
           "value": "Radio Third Choice",
+          "isSelected": false,
+          "price": ""
+        },
+
+        {
+          "text": "Radio Fourth Choice Label",
+          "value": "",
           "isSelected": false,
           "price": ""
         }

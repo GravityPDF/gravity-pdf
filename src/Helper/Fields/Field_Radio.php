@@ -95,6 +95,23 @@ class Field_Radio extends Helper_Abstract_Fields {
 	}
 
 	/**
+	 * Check if the value is empty. Optional filter to check both the value and the label
+	 *
+	 * @return bool
+	 *
+	 * @since 6.1
+	 */
+	public function is_empty() {
+		$value = $this->value();
+
+		if ( apply_filters( 'gfpdf_field_is_empty_value_instead_of_label', true, $value, $this->field, $this->entry, $this->form, $this ) ) {
+			return empty( $value['value'] );
+		}
+
+		return parent::is_empty();
+	}
+
+	/**
 	 * Return the HTML form data
 	 *
 	 * @return array
