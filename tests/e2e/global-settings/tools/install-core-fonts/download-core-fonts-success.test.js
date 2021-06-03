@@ -12,7 +12,7 @@ fixture`Tools Tab - Download Core Fonts Test`
 
 test('should return download core fonts successfully', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#')
 
   // Assertions
   await t

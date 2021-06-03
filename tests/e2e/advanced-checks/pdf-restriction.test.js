@@ -13,14 +13,16 @@ test('should throw an error when a non-administrator user try to access a PDF', 
   // Actions & Assertions
   await run.login(t, 'admin')
   await t
+    .setNativeDialogHandler(() => true)
     .navigateTo(`${baseURL}/wp-admin/admin.php?page=gf_edit_forms&view=settings&subview=pdf&id=4`)
-  pdfId = await cs.shortcodeField.value
+  pdfId = await cs.shortcodeInputBox.value
   pdfId = pdfId.substring(30, 43)
   await t
     .hover(run.wpAdminBar)
     .click(run.logout)
   await run.login(t, 'editor')
   await t
+    .setNativeDialogHandler(() => true)
     .navigateTo(`${baseURL}/pdf/${pdfId}/4`)
     .expect(run.errorMessage.exists).ok()
 })
@@ -28,6 +30,7 @@ test('should throw an error when a non-administrator user try to access a PDF', 
 test('should throw an error when a logout user try to access a PDF', async t => {
   // Actions & Assertions
   await t
+    .setNativeDialogHandler(() => true)
     .navigateTo(`${baseURL}/pdf/${pdfId}/4`)
     .expect(run.errorMessage.exists).ok()
 })

@@ -8,7 +8,7 @@ fixture`General Tab - Advanced Options Field Test`
 
 test('should display Show Advanced Options field link', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t.click(fieldLabel('Show Advanced Options...', 'a'))
 
   // Assertions
@@ -24,7 +24,7 @@ test('should display Show Advanced Options field', async t => {
   const inputBox = Selector('#gfpdf_settings\\[logged_out_timeout\\]')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t.click(fieldLabel('Show Advanced Options...', 'a'))
 
   // Assertions
@@ -51,7 +51,7 @@ test('should display Show Advanced Options field', async t => {
 
 test('should hide Show Advanced Options field', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t
     .click(fieldLabel('Show Advanced Options...', 'a'))
     .click(fieldLabel('Hide Advanced Options...', 'a'))

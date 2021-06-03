@@ -11,7 +11,7 @@ test('should display Default Font Size field', async t => {
   const fontSizeInputBox = Selector('#gfpdf_settings\\[default_font_size\\]')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
 
   // Assertions
   await t

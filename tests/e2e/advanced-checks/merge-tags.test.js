@@ -9,11 +9,11 @@ fixture`Form Merge Tags Test`
 
 test('should check if form merge tags is working properly', async t => {
   // Actions
-  await cs.navigateConfirmationsSection('gf_edit_forms&view=settings&subview=confirmation&id=4')
+  await cs.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=4')
   await t
-    .click(cs.confirmationText)
-    .click(button('Text'))
-    .click(cs.wsiwigEditor)
+    .click(cs.confirmationTextCheckbox)
+    .click(cs.wysiwgEditorTextTab)
+    .click(cs.wysiwgEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
   await run.pickMergeTag('Text')
@@ -21,8 +21,8 @@ test('should check if form merge tags is working properly', async t => {
   await run.pickMergeTag('Name (Last)')
   await run.pickMergeTag('Email')
   await t
-    .click(cs.saveButton)
-    .click(link('#gf_form_toolbar', 'Preview'))
+    .click(cs.saveConfirmationButton)
+    .click(cs.previewLink)
     .typeText(run.textInputField, 'texttest', { paste: true })
     .typeText(run.fNameInputField, 'firstnametest', { paste: true })
     .typeText(run.lNameInputField, 'lastnametest', { paste: true })

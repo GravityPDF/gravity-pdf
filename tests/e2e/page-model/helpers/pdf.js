@@ -14,9 +14,10 @@ class Pdf {
 
   async navigateAddPdf (text) {
     await t
+      .setNativeDialogHandler(() => true)
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .click(link('#tab_PDF', 'Add New'))
+      .click(link('#tab_pdf', 'Add New'))
       .typeText(this.pdfname, 'Test PDF Template', { paste: true })
       .typeText(this.fileName, 'testpdftemplate', { paste: true })
       .click(this.addPdfButton)
@@ -24,12 +25,14 @@ class Pdf {
 
   async navigatePdfSection (text) {
     await t
+      .setNativeDialogHandler(() => true)
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
   }
 
   async navigateDeletePdfEntries (text) {
     await t
+      .setNativeDialogHandler(() => true)
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
     let tempalte = await this.template.count

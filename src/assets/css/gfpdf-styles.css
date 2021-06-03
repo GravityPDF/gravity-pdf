@@ -312,11 +312,11 @@ input#submit {
 /*
  * License page
  */
-#pdf-license .fa-exclamation-circle {
+#pdf-license .dashicons-no {
  color: red;
 }
 
-#pdf-license .fa-check {
+#pdf-license .dashicons-yes {
  color: green;
 }
 

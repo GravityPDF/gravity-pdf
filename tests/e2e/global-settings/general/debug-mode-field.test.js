@@ -12,7 +12,7 @@ test('should display Debug Mode field', async t => {
   const no = Selector('div').find('[class^="gfpdf_settings_debug_mode"][value="No"]')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
 
   // Assertions
   await t

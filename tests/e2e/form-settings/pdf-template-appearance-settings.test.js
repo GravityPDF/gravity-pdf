@@ -116,7 +116,7 @@ test('should display Orientation field', async t => {
 test('should display Font field', async t => {
   // Actions
   await pdf.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=1')
-  await t.click(link('#tab_PDF', 'Add New'))
+  await t.click(link('#tab_pdf', 'Add New'))
 
   // Assertions
   await t

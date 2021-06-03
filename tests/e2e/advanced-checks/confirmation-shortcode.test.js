@@ -6,7 +6,7 @@ import Page from '../page-model/helpers/page'
 
 const run = new ConfirmationShortcodes()
 const page = new Page()
-let shorcodeHolder
+let shortcodeHolder
 let downloadUrl
 
 const downloadLogger = RequestLogger(downloadUrl, {
@@ -19,7 +19,7 @@ fixture`PDF shortcode - Confirmation Type TEXT, PAGE, and REDIRECT Test`
 test('should check if the shortcode confirmation type TEXT is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
-  shorcodeHolder = await run.shortcodeInputBox.value
+  shortcodeHolder = await run.shortcodeInputBox.value
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
     .click(run.confirmationTextCheckbox)
@@ -27,7 +27,7 @@ test('should check if the shortcode confirmation type TEXT is working correctly'
     .click(run.wysiwgEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-    .typeText(run.wysiwgEditor, shorcodeHolder, { paste: true })
+    .typeText(run.wysiwgEditor, shortcodeHolder, { paste: true })
     .click(run.saveConfirmationButton)
     .click(run.previewLink)
     .typeText(run.formInputField, 'test', { paste: true })
@@ -49,7 +49,7 @@ test('should check if the shortcode confirmation type TEXT is working correctly'
 test('should check if the shortcode confirmation type PAGE is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
-  shorcodeHolder = await run.shortcodeInputBox.value
+  shortcodeHolder = await run.shortcodeInputBox.value
   await t
     .setNativeDialogHandler(() => true)
     .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
@@ -64,7 +64,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
     .click(page.addBlockIcon)
     .typeText(page.searchBlock, 'shortcode', { paste: true })
     .click(page.shortcodeLink)
-    .typeText(page.shortcodeTextarea, shorcodeHolder, { paste: true })
+    .typeText(page.shortcodeTextarea, shortcodeHolder, { paste: true })
     .click(page.updateButton)
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
@@ -95,16 +95,16 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
 test('should check if the shortcode confirmation type REDIRECT download is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
-  shorcodeHolder = await run.shortcodeInputBox.value
+  shortcodeHolder = await run.shortcodeInputBox.value
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
-    .click(run.confirmationRedirect)
-    .click(run.redirectUrlInputField)
+    .click(run.confirmationRedirectCheckbox)
+    .click(run.redirectInputBox)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-    .typeText(run.redirectUrlInputField, shorcodeHolder, { paste: true })
-    .click(run.saveButton)
-    .click(link('#gf_form_toolbar', 'Preview'))
+    .typeText(run.redirectInputBox, shortcodeHolder, { paste: true })
+    .click(run.saveConfirmationButton)
+    .click(run.previewLink)
   downloadUrl = `${baseURL}/?gf_page=preview&id=3`
   await t
     .typeText(run.formInputField, 'test', { paste: true })

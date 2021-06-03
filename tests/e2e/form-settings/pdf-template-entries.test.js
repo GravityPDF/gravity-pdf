@@ -11,7 +11,7 @@ test('should successfully add new PDF template into form entries', async t => {
   // Actions & Assertions
   await pdf.navigateAddPdf('gf_edit_forms&view=settings&subview=pdf&id=1')
   await t
-    .click(link('#gform_tabs', 'PDF'))
+    .click(link('.gform-settings__navigation', 'PDF'))
     .expect(pdf.template.count).eql(1)
 })
 

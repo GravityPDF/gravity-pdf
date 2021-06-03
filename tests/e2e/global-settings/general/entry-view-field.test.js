@@ -8,7 +8,7 @@ fixture`General Tab - Entry View Field Test`
 
 test('should display Entry View field', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
 
   // Assertions
   await t
@@ -23,7 +23,7 @@ test('should display "Download PDF" as an option on the Entry List page instead 
   const downloadPdfLink = Selector('a').withText('Download PDF')
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t
     .click(run.downlaodOption)
     .click(run.saveButton)
@@ -39,7 +39,7 @@ test('should display "View PDF" as an option on the Entry List page instead of "
   const viewPdfLink = Selector('a').withText('View PDF')
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t
     .click(run.viewOption)
     .click(run.saveButton)

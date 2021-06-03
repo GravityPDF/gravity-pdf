@@ -13,7 +13,7 @@ test('should open Manage Fonts Popup Box', async t => {
   const addFontText = Selector('span').withText('ADD FONT')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
 
   // Assertions
   await t
@@ -30,7 +30,7 @@ test('should open Manage Fonts Popup Box that can be close', async t => {
   const hidePopupBox = run.manageFontsPopupBox.filterHidden()
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(closeButton)
     .expect(hidePopupBox.count).eql(1)
@@ -49,7 +49,7 @@ test('should open Add Font Dialog Box Settings', async t => {
   const showWPmediaModal = wpMediaModal.filterVisible()
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .click(selectFontButton)
@@ -74,7 +74,7 @@ test('should open Add Font Dialog Box Settings', async t => {
 
 test('should display multiple Add Font Dialog Box Settings', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .click(run.addFontIcon)
@@ -91,7 +91,7 @@ test('should display Add Font Dialog Box Settings Font Name Field RED Box Error 
   const redInputBox = Selector('div').find('[class^="regular-text font-name-field"][style="border-color: red;"]')
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .typeText(fontInputField, 's$$$', { paste: true })
@@ -104,7 +104,7 @@ test('should display Add Font Dialog Box Settings error message when font file i
   const errorMessage = Selector('label').withText('Only TTF font files are supported.')
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .typeText(regularFontField, 'https://gravitypdf.com/Gotham-Black-Regular.otf', { paste: true })
@@ -114,11 +114,11 @@ test('should display Add Font Dialog Box Settings error message when font file i
 
 test('should open Add Font Dialog Box Settings that can be minimize', async t => {
   // Get selectors
-  const minimizeIcon = Selector('div').find('[class^="fa fa-angle-right"]')
-  const addFontDialogBox = Selector('div').find('[class^="font-settings"]').filterHidden()
+  const minimizeIcon = Selector('div').find('[class*="dashicons-arrow-right-alt2"]')
+  const addFontDialogBox = Selector('div').find('[class*="font-settings"]').filterHidden()
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .click(minimizeIcon)
@@ -132,7 +132,7 @@ test('should open Add Font Dialog Box Settings with a confirmation Popup to dele
   const contentText = Selector('div').withText('Warning! You are about to delete this Font. Select \'Delete\' to delete, \'Cancel\' to stop.')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .click(run.deleteIcon)
@@ -148,7 +148,7 @@ test('should open Add Font Dialog Box Settings with a confirmation Popup to dele
 
 test('should open Add Font Dialog Box Settings delete popup box that can be close', async t => {
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .click(run.deleteIcon)
@@ -158,7 +158,7 @@ test('should open Add Font Dialog Box Settings delete popup box that can be clos
 
 test('should open Add Font Dialog Box Settings that can be deleted', async t => {
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=tools#/')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#/')
   await t
     .click(run.addFontIcon)
     .click(run.deleteIcon)

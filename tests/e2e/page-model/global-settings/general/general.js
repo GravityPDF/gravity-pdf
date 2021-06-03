@@ -29,12 +29,14 @@ class General {
 
   async navigateSettingsTab (text) {
     await t
+      .setNativeDialogHandler(() => true)
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
   }
 
   async navigatePdfEntries (text) {
     await t
+      .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
   }
 }

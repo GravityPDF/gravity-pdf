@@ -6,7 +6,7 @@ fixture`License Tab - Core Booster Activate Invalid License Test`
 
 test('should display error icon and error message for invalid license key', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=license')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=license')
   await t
     .typeText(run.licenseInputField, run.invalidLicenseKey, { paste: true })
     .click(run.saveButton)

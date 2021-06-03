@@ -20,7 +20,7 @@ fixture`Help Tab - Help Search Bar Test with Result`
 
 test('should search and display existing results', async t => {
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=help')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=help')
   await t
     .typeText(run.searchBar, 'form', { paste: true })
     .expect(run.resultExist.exists).ok()

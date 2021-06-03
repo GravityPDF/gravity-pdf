@@ -12,6 +12,7 @@ class DebugModeShortcode {
 
   async navigateLink (text) {
     await t
+      .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
   }
 }

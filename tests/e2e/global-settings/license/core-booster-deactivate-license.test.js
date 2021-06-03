@@ -6,7 +6,7 @@ fixture`License Tab - Core Booster Deactivate License Test`
 
 test('should deactivate license and display deactivated message', async t => {
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=license')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=license')
   await t
     .typeText(run.licenseInputField, run.validLicenseKey, { paste: true })
     .click(run.saveButton)

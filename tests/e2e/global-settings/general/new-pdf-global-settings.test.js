@@ -17,7 +17,7 @@ test('should check that a new added PDF has the updated global settings set', as
   const updatedFontColorGreen = Selector('button').withAttribute('style', 'background-color: rgb(129, 215, 66);')
 
   // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t
     .click(run.paperSizeField)
     .click(newPaperSize)
@@ -60,7 +60,7 @@ test('should reset the new set global settings back to the default global settin
   // Actions & Assertions
   await pdf.navigateDeletePdfEntries('gf_edit_forms&view=settings&subview=pdf&id=2')
   await t.expect(pdf.template.count).eql(0)
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t
     .click(run.paperSizeField)
     .click(listItem('A4 (210 x 297mm)'))

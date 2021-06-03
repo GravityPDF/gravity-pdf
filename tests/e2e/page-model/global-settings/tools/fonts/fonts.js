@@ -5,8 +5,8 @@ import { button } from '../../../helpers/field'
 class Fonts {
   constructor () {
     this.manageFontsPopupBox = Selector('div').withAttribute('aria-describedby', 'manage-font-files')
-    this.addFontIcon = Selector('.fa-plus')
-    this.deleteIcon = Selector('.fa-trash-o')
+    this.addFontIcon = Selector('.dashicons-plus')
+    this.deleteIcon = Selector('.dashicons-trash')
     this.confirmDeletePopupBox = Selector('div').withAttribute('aria-describedby', 'delete-confirm')
     this.fontList = Selector('#font-list')
     this.cancelButton = Selector('div').withAttribute('aria-describedby', 'delete-confirm').find('button').withText('Cancel')
@@ -15,6 +15,7 @@ class Fonts {
 
   async navigateSettingsTab (text) {
     await t
+      .setNativeDialogHandler(() => true)
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
       .click(button('Manage Fonts'))

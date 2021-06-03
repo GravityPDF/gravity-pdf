@@ -12,7 +12,7 @@ test('should display Default Font Color field', async t => {
   const showPopupPickerBox = Selector('.wp-picker-active')
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t.click(button('Select Color'))
 
   // Assertions

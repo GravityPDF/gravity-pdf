@@ -11,19 +11,19 @@ class FormSettings {
 
   async navigateAdvancedLink () {
     await t
-      .click(link('#tab_PDF', 'Add New'))
+      .click(link('#tab_pdf', 'Add New'))
       .click(this.advancedLink)
   }
 
   async navigateAppearanceLink () {
     await t
-      .click(link('#tab_PDF', 'Add New'))
+      .click(link('#tab_pdf', 'Add New'))
       .click(this.appearanceLink)
   }
 
   async navigateTemplateLink () {
     await t
-      .click(link('#tab_PDF', 'Add New'))
+      .click(link('#tab_pdf', 'Add New'))
       .click(this.templateLink)
   }
 }

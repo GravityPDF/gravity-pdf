@@ -16,7 +16,7 @@ test('should display Installation Status Field', async t => {
   const installationFifthLabelResult = Selector('#pdf-system-status').find('td').nth(4)
 
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=general#')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
 
   // Assertions
   await t

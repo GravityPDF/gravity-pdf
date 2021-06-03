@@ -12,7 +12,7 @@ fixture`Help Tab - Help Search Bar Test with Result`
 
 test('should search and display a message for no found results', async t => {
   // Actions
-  await run.navigateSettingsTab('gf_settings&subview=pdf&tab=help')
+  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=help')
   await t.typeText(run.searchBar, 'bbbb', { paste: true })
 
   // Assertions
