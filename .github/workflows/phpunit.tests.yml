@@ -144,9 +144,6 @@ jobs:
       - name: Run PHPUnit tests
         run: yarn test:${{ env.PHPUNIT_SCRIPT }} --verbose
 
-      - name: Run AJAX tests
-        run: yarn test:${{ env.PHPUNIT_SCRIPT }} --verbose --group ajax
-
       - name: Run (xDebug) tests
         if: ${{ matrix.report }}
         run: |
