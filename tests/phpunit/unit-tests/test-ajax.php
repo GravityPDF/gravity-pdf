@@ -25,8 +25,6 @@ use WPAjaxDieStopException;
  * disabled. But, this makes tests slow so non ajax calls are kept separate
  *
  * @group ajax
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
  */
 class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
