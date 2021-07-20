@@ -83,6 +83,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityformssurvey/survey.php';
 
 		/* set up Gravity Forms database */
+		add_filter( 'get_available_languages', function( $language ) {
+			return [];
+		} );
+
 		remove_filter( 'query', [ 'GFForms', 'filter_query' ] );
 		update_option( 'gf_db_version', GFForms::$version );
 		GFFormsModel::drop_tables();

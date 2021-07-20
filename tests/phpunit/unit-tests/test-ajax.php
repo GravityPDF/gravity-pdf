@@ -516,6 +516,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		/* Setup a bad request */
 		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+		$_POST['font_name'] = 'nothing';
 
 		try {
 			$this->_handleAjax( 'gfpdf_save_core_font' );
