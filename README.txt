@@ -54,7 +54,7 @@ Pay for additional PDF designs and functionality [from our online store](https:/
 * **On-screen Preview** – allow users to preview the PDF before form submission (and optionally payment) so they can see what the end result will be. This is a great feature for capturing e-signatures, selling PDF reports /  certificates / gift cards, or providing an on-screen proof before the PDF is sent to the printers (perfect for business cards).
 * **Bulk Download** - search, filter, and select entries and then zip up all your PDFs and download all together in a convenient zip file
 * **GFChart** - create PDF reports that display pie, bar, or column charts with aggregate Gravity Forms data [using GFChart](https://gfchart.com).
-* 30-day refund guarantee – Purchase with confidence knowing when you buy a product from our store that you can get a refund within 30 days, for any reason.
+* **30-Day Refund Guarantee** – Purchase with confidence knowing when you buy a product from our store that you can get a refund within 30 days, for any reason.
 
 = Hire the Experts =
 
@@ -78,7 +78,7 @@ _Note: When Gravity Forms isn't installed and you activate Gravity PDF we displa
 
 == Installation ==
 
-Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 7.3+** and at least 128MB of WP Memory. You'll also need to be running WordPress 5.3+ and have [Gravity Forms 2.5+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
+Gravity PDF can be run on most modern shared web hosting without any issues. It requires **PHP 7.3+** and at least 128MB of WP Memory. You'll also need to be running WordPress 5.3+ and have [Gravity Forms 2.5+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
 
 [You'll find detailed installation instructions at docs.gravitypdf.com](https://docs.gravitypdf.com/v6/users/five-minute-install).
 
