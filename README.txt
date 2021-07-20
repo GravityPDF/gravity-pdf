@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
-Tested up to: 5.7
-Stable tag: 6.0.2
+Tested up to: 5.8
+Stable tag: 6.0.3
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -104,6 +104,12 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.0.3 =
+* Bug: Reduce the Focus Gravity template column widths by a fraction to prevent edge-case display issues (props Hiwire Creative)
+* Bug: Fix Help page results text encoding problems
+* Bug: Prevent multiple font files being uploaded to a single dropzone
+* Bug: When checking if a Radio/Select field is empty in the PDF context, only look at the value property.
 
 = 6.0.2 =
 * Bug: Fix up 404 link for Outdated Templates in System Status
