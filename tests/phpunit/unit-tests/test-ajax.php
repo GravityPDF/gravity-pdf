@@ -515,7 +515,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertEquals( '401', $e->getMessage() );
 
 		/* Setup a bad request */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+		$_POST['nonce']     = wp_create_nonce( 'gfpdf_ajax_nonce' );
 		$_POST['font_name'] = 'nothing';
 
 		try {
