@@ -51,7 +51,6 @@ rm -f -R "${PACKAGE_DIR}/src/assets/js"
 rm -f -R "${PACKAGE_DIR}/bin"
 rm -f -R "${PACKAGE_DIR}/.php-scoper"
 rm -f -R "${PACKAGE_DIR}/webpack-configs"
-rm -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
 
 cd ${PACKAGE_DIR}
 npm install --global wp-pot-cli

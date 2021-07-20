@@ -50,4 +50,4 @@ eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/mpdf"
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/setasign"
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/myclabs"
 
-eval "$COMPOSER dump-autoload --working-dir ${PLUGIN_DIR}"
+eval "$COMPOSER dump-autoload --optimize --working-dir ${PLUGIN_DIR}"
