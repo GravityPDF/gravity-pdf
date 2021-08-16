@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 5.8
-Stable tag: 6.0.3
+Stable tag: 6.1.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -105,7 +105,8 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 
 == Changelog ==
 
-= 6.0.4 =
+= 6.1.0 =
+* Feature: Add Copy to Clipboard feature for PDF Shortcode on the PDF List page
 * Bug: Fix empty check on the Radio field so a zero (0) value is not considered empty
 
 = 6.0.3 =
