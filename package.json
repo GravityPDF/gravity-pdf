@@ -71,7 +71,7 @@
     "lint:php": "npm run env docker-run -- php composer lint:errors",
     "lint:php:format": "npm run env docker-run -- php composer format",
 
-    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows",
+    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",

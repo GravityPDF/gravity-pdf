@@ -15,7 +15,7 @@ test('should enable debug mode and throw error when PDF is inactive', async t =>
     .click(advancedCheck.debugModeCheckbox)
     .click(general.saveSettings)
   await advancedCheck.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
-  shortcodeHolder = await advancedCheck.shortcodeInputBox.value
+  shortcodeHolder = await advancedCheck.shortcodeBox.getAttribute('data-clipboard-text')
   await t.click(advancedCheck.toggleSwitch)
   await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t

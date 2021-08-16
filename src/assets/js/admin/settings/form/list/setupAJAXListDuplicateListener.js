@@ -56,7 +56,7 @@ export function setupAJAXListDuplicateListener () {
           const $duplicate = $newRow.find('.duplicate a')
           const $delete = $newRow.find('.delete a')
           const $state = $newRow.find('.check-column button')
-          const $shortcode = $newRow.find('.column-shortcode input')
+          const $shortcode = $newRow.find('.column-shortcode')
 
           /* Update duplicate ID and nonce pointers so the actions are valid */
           $duplicate.data('id', response.pid)
@@ -74,9 +74,12 @@ export function setupAJAXListDuplicateListener () {
           $state[0].setAttribute('data-status', 'inactive')
 
           /* Update our shortcode ID */
-          let shortcodeValue = $shortcode.val()
+          let shortcodeValue = $shortcode.find('button').attr('data-clipboard-text')
           shortcodeValue = shortcodeValue.replace(id, response.pid)
-          $shortcode.val(shortcodeValue)
+          $shortcode.find('button').attr('data-clipboard-text', shortcodeValue)
+          $shortcode.find('input')
+            .attr('id', response.pid)
+            .attr('value', shortcodeValue)
 
           $state.removeClass('gform-status--active')
             .addClass('gform-status--inactive')

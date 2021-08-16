@@ -7,7 +7,7 @@ import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
 /* Utilities */
 import { addEditButton } from './utilities/PdfSettings/addEditButton'
-import { autoSelectShortcode } from './utilities/PdfList/autoSelectShortcode'
+import shortcodeButton from './utilities/PdfList/shortcodeButton'
 /* Sass Styling */
 import '../../scss/gfpdf-styles.scss'
 
@@ -89,6 +89,6 @@ $(function () {
 
   /* Enable shortcode field click and auto select feature */
   if (gfPdfListForm !== null) {
-    autoSelectShortcode(gfPdfListForm)
+    shortcodeButton()
   }
 })
