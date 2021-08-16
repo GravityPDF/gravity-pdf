@@ -105,6 +105,9 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 
 == Changelog ==
 
+= 6.0.4 =
+* Bug: Fix empty check on the Radio field so a zero (0) value is not considered empty
+
 = 6.0.3 =
 * Bug: Reduce the Focus Gravity template column widths by a fraction to prevent edge-case display issues (props Hiwire Creative)
 * Bug: Fix Help page results text encoding problems
