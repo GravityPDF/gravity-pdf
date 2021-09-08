@@ -357,6 +357,8 @@ class Helper_Misc {
 	 */
 	public function rmdir( $dir ) {
 
+		$this->log->notice( sprintf( 'Begin deleting directory recursively: %s', $dir ) );
+
 		try {
 			$files = new RecursiveIteratorIterator(
 				new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
@@ -368,6 +370,8 @@ class Helper_Misc {
 				if ( ! $function( $fileinfo->getRealPath() ) ) {
 					throw new Exception( 'Could not run ' . $function . ' on  ' . $fileinfo->getRealPath() );
 				}
+
+				$this->log->notice( sprintf( 'Successfully ran `%s` on %s', $function, $fileinfo->getRealPath() ) );
 			}
 		} catch ( Exception $e ) {
 			$this->log->error(
@@ -381,7 +385,14 @@ class Helper_Misc {
 			return new WP_Error( 'recursion_delete_problem', $e );
 		}
 
-		return rmdir( $dir );
+		$results = rmdir( $dir );
+		if ( ! $results ) {
+			$this->log->error( sprintf( 'Could not delete the top-level directory: %s', $dir ) );
+		}
+
+		$this->log->notice( sprintf( 'End deleting directory recursively: %s', $dir ) );
+
+		return $results;
 	}
 
 	/**
