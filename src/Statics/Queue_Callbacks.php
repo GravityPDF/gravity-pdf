@@ -53,6 +53,8 @@ class Queue_Callbacks {
 
 			throw new Exception();
 		}
+
+		$log->notice( sprintf( 'PDF successfully generated and saved to %s', $results ) );
 	}
 
 	/**
