@@ -85,6 +85,12 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	public function task( $callbacks ) {
 		$callback = array_shift( $callbacks );
 
+		/* Something went wrong so cancel queue */
+		if ( ! isset( $callback['id'], $callback['func'] ) ) {
+			$this->log->critical( 'PDF queue ran with invalid queue item', [ 'callbacks' => $callbacks ] );
+			return false;
+		}
+
 		$this->log->notice(
 			sprintf(
 				'Begin async PDF task for %s',
@@ -92,47 +98,51 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 			)
 		);
 
-		if ( is_callable( $callback['func'] ) ) {
-			try {
-				/* Call our use function and pass in any arguments */
-				$args = ( isset( $callback['args'] ) && is_array( $callback['args'] ) ) ? $callback['args'] : [];
-				call_user_func_array( $callback['func'], $args );
-			} catch ( Exception $e ) {
+		/* Something went wrong so cancel queue */
+		if ( ! is_callable( $callback['func'] ) ) {
+			$this->log->critical( 'PDF queue ran with invalid callback', [ 'callback' => $callback, 'callbacks' => $callbacks ] );
+			return false;
+		}
 
-				/* Log Error */
+		try {
+			/* Call our use function and pass in any arguments */
+			$args = ( isset( $callback['args'] ) && is_array( $callback['args'] ) ) ? $callback['args'] : [];
+			call_user_func_array( $callback['func'], $args );
+		} catch ( Exception $e ) {
+
+			/* Log Error */
+			$this->log->error(
+				sprintf(
+					'Async PDF task error for %s',
+					$callback['id']
+				),
+				[
+					'args'      => ( isset( $callback['args'] ) ) ? $callback['args'] : [],
+					'exception' => $e->getMessage(),
+				]
+			);
+
+			/* Add back to our queue to retry (up to a grand total of three times) */
+			if ( empty( $callback['retry'] ) || $callback['retry'] < 2 ) {
+				$callback['retry'] = isset( $callback['retry'] ) ? $callback['retry'] + 1 : 1;
+				array_unshift( $callbacks, $callback );
+			} else {
 				$this->log->error(
 					sprintf(
-						'Async PDF task error for %s',
+						'Async PDF task retry limit reached for %s.',
 						$callback['id']
-					),
-					[
-						'args'      => ( isset( $callback['args'] ) ) ? $callback['args'] : [],
-						'exception' => $e->getMessage(),
-					]
+					)
 				);
 
-				/* Add back to our queue to retry (up to a grand total of three times) */
-				if ( empty( $callback['retry'] ) || $callback['retry'] < 2 ) {
-					$callback['retry'] = isset( $callback['retry'] ) ? $callback['retry'] + 1 : 1;
-					array_unshift( $callbacks, $callback );
-				} else {
-					$this->log->error(
-						sprintf(
-							'Async PDF task retry limit reached for %s.',
-							$callback['id']
-						)
+				if ( $callback['unrecoverable'] ?? false ) {
+					$this->log->critical(
+						'Cancel async queue due to retry limit reached on unrecoverable callback.',
+						[
+							'callbacks' => $callbacks,
+						]
 					);
 
-					if ( $callback['unrecoverable'] ?? false ) {
-						$this->log->critical(
-							'Cancel async queue due to retry limit reached on unrecoverable callback.',
-							[
-								'callbacks' => $callbacks,
-							]
-						);
-
-						$callbacks = [];
-					}
+					$callbacks = [];
 				}
 			}
 		}
