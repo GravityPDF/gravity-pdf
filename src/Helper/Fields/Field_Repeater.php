@@ -102,7 +102,10 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 				$class     = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products );
 				$form_data = $class->form_data();
-				$data      = array_replace_recursive( $data, [ $id => $form_data['field'] ] );
+
+				if ( isset( $form_data['field'] ) ) {
+					$data = array_replace_recursive( $data, [ $id => $form_data['field'] ] );
+				}
 			}
 		}
 
