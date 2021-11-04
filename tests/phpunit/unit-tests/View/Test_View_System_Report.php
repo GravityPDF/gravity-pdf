@@ -25,8 +25,8 @@ class Test_View_System_Report extends WP_UnitTestCase {
 	 */
 	protected $view;
 
-	public function setUp(): void {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->view = new View_System_Report();
 	}

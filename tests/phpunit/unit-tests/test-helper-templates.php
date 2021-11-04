@@ -38,11 +38,11 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 *
 	 * @since 4.1
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup out loader class */
 		$this->templates = new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform );

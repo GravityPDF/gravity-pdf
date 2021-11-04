@@ -12,19 +12,30 @@ fi
 bash ./bin/download-wordpress.sh
 bash ./bin/install-wordpress.sh
 
-# Connect Gravity PDF to WordPress.
+# Connect Plugin to WordPress.
 npm run env connect
+
+# Install fresh dependancies
+rm composer.lock
 npm run env docker-run -- php composer install
 bash ./bin/vendor-prefix.sh
 
-bash ./bin/install-gravityforms.sh
-npm run env cli plugin activate gravity-forms-pdf-extended
-
-# Misc
-bash ./bin/db.sh
-
-# Output Connection Details
+# Get Connection Details
 CURRENTURL=$(npm run --silent env cli option get siteurl)
+
+echo "Install Gravity Forms..."
+bash ./bin/install-gravityforms.sh
+
+echo "Run Database changes"
+bash ./bin/install-database.sh
+
+echo "Install Gravity PDF Testing Suite..."
+bash ./bin/install-testing-suite.sh
+
+if [[ -f "./bin/install-post-actions.sh" ]]; then
+  echo "Running Post Install Actions..."
+  bash ./bin/install-post-actions.sh
+fi
 
 echo "Welcome to..."
 echo "_____             _ _          _____ ____  _____  "

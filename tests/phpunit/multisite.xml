@@ -1,7 +1,7 @@
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.2/phpunit.xsd"
-        bootstrap="tests/phpunit/bootstrap.php"
+        bootstrap="bootstrap.php"
         backupGlobals="false"
         colors="true"
         beStrictAboutTestsThatDoNotTestAnything="true"
@@ -12,15 +12,19 @@
         convertDeprecationsToExceptions="true"
         verbose="true"
 >
+    <php>
+        <const name="WP_TESTS_MULTISITE" value="1"/>
+    </php>
+
     <testsuites>
         <testsuite name="Test Suite">
-            <directory suffix=".php">./tests/phpunit/unit-tests</directory>
+            <directory suffix=".php">./unit-tests</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory suffix=".php">./src/</directory>
+            <directory suffix=".php">../../src/</directory>
         </whitelist>
     </filter>
 </phpunit>

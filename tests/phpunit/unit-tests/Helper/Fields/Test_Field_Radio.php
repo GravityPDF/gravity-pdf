@@ -28,8 +28,8 @@ class Test_Field_Radio extends WP_UnitTestCase {
 
 	public $pdf_field;
 
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 

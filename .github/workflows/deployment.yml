@@ -13,6 +13,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Docs: https://github.com/shivammathur/setup-php
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.3
+
       - name: Get tag
         id: tag
         uses: dawidd6/action-get-tag@v1
@@ -52,6 +58,7 @@ jobs:
           curl --version
           git --version
           svn --version
+          php --version
           composer --version
 
       - name: Build

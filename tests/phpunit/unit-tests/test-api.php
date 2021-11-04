@@ -298,7 +298,7 @@ class Test_API extends WP_UnitTestCase {
 		$results = GPDFAPI::delete_pdf_font( 'test' );
 
 		$this->assertTrue( $results );
-		$this->assertFileNotExists( PDF_FONT_LOCATION . 'Chewy.ttf' );
+		$this->assertFileDoesNotExist( PDF_FONT_LOCATION . 'Chewy.ttf' );
 	}
 
 	/**

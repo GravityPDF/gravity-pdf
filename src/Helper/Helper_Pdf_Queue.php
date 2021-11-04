@@ -100,7 +100,13 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 
 		/* Something went wrong so cancel queue */
 		if ( ! is_callable( $callback['func'] ) ) {
-			$this->log->critical( 'PDF queue ran with invalid callback', [ 'callback' => $callback, 'callbacks' => $callbacks ] );
+			$this->log->critical(
+				'PDF queue ran with invalid callback',
+				[
+					'callback'  => $callback,
+					'callbacks' => $callbacks,
+				]
+			);
 			return false;
 		}
 

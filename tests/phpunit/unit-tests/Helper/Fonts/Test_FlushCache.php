@@ -31,6 +31,6 @@ class Test_FlushCache extends WP_UnitTestCase {
 
 		FlushCache::flush();
 
-		$this->assertFileNotExists( $file );
+		$this->assertFileDoesNotExist( $file );
 	}
 }

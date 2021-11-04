@@ -25,8 +25,8 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 	 */
 	protected $options;
 
-	public function setUp(): void {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->options = \GPDFAPI::get_options_class();
 	}

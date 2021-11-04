@@ -46,11 +46,11 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	 *
 	 * @since 5.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->queue = new Helper_Pdf_Queue( $gfpdf->log );
@@ -259,18 +259,16 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 		$spy = $this->any();
 		$this->queue_mock->expects( $spy )
 						 ->method( 'dispatch' )
-						 ->will( $this->returnValue( $this->queue_mock ) );
+						 ->willReturn( $this->queue_mock );
 
 		$this->controller->queue_dispatch_resend_notification_tasks();
 
-		$invocations = $spy->getInvocations();
-		$this->assertEquals( 0, count( $invocations ) );
+		$this->assertSame( 0, $spy->getInvocationCount() );
 
 		$this->queue_mock->push_to_queue( 'item' );
 		$this->controller->queue_dispatch_resend_notification_tasks();
 
-		$invocations = $spy->getInvocations();
-		$this->assertEquals( 1, count( $invocations ) );
+		$this->assertSame( 1, $spy->getInvocationCount() );
 	}
 
 	/**
@@ -293,7 +291,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 
 		Queue_Callbacks::cleanup_pdfs( $form['id'], $entry['id'] );
 
-		$this->assertFileNotExists( $test_file );
-		$this->assertFileNotExists( $path );
+		$this->assertFileDoesNotExist( $test_file );
+		$this->assertFileDoesNotExist( $path );
 	}
 }

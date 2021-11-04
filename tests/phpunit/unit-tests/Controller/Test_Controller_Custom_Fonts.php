@@ -47,10 +47,10 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 
 	protected $editor_user;
 
-	public function setUp(): void {
+	public function set_up() {
 		global $gfpdf;
 
-		parent::setUp();
+		parent::set_up();
 
 		$this->tmp_font_location = $gfpdf->data->template_font_location;
 		wp_mkdir_p( $this->tmp_font_location );
@@ -94,7 +94,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		error_reporting( E_ALL & ~E_NOTICE );
 	}
 
-	public function tearDown(): void {
+	public function tear_down() {
 		global $gfpdf;
 
 		$_FILES = [];
@@ -109,7 +109,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 
 		$gfpdf->options->update_option( 'custom_fonts', [] );
 
-		parent::tearDown();
+		parent::tear_down();
 
 		error_reporting( E_ALL );
 	}
@@ -258,7 +258,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertSame( 'lato', $font['id'] );
 		$this->assertSame( 255, $font['useOTL'] );
 		$this->assertSame( 75, $font['useKashida'] );
-		$this->assertRegExp( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
+		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
 		$this->assertStringEndsWith( 'DejaVuSans-Bold.ttf', $font['bold'] );
 		$this->assertStringEndsWith( 'DejaVuSansCondensed.ttf', $font['italics'] );
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
@@ -275,7 +275,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertSame( 'lato', $font['id'] );
 		$this->assertSame( 255, $font['useOTL'] );
 		$this->assertSame( 75, $font['useKashida'] );
-		$this->assertRegExp( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
+		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
 		$this->assertStringEndsWith( 'DejaVuSans-Bold.ttf', $font['bold'] );
 		$this->assertStringEndsWith( 'DejaVuSansCondensed.ttf', $font['italics'] );
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
@@ -291,7 +291,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertSame( 'lato', $font['id'] );
 		$this->assertSame( 255, $font['useOTL'] );
 		$this->assertSame( 75, $font['useKashida'] );
-		$this->assertRegExp( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
+		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
 		$this->assertSame( '', $font['bold'] );
 		$this->assertSame( '', $font['italics'] );
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );

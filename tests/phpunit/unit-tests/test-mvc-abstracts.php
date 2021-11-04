@@ -59,11 +59,11 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup out loader class */
 		$this->model      = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
@@ -125,6 +125,6 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		$results = $this->view->get_view_dir_path();
 
 		$this->assertFileExists( $results . 'general.php' );
-		$this->assertFileNotExists( $results . 'generic-file-that-isnt-included.php' );
+		$this->assertFileDoesNotExist( $results . 'generic-file-that-isnt-included.php' );
 	}
 }

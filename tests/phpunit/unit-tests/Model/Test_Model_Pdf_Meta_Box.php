@@ -41,10 +41,10 @@ class Test_Model_Pdf_Meta_Box extends WP_UnitTestCase {
 	/**
 	 * The WP Unit Test Set up function
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->model      = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer() );
