@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
-Tested up to: 5.8
-Stable tag: 6.1.0
+Tested up to: 5.9
+Stable tag: 6.1.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -104,6 +104,12 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.1.1 =
+* Bug: Allow number field to show a thousand separator by using the 'gform_include_thousands_sep_pre_format_number' filter.
+* Bug: Fix PHP Notice when displaying Repeater field caused by processing field's not present in `$form_data['field']` array key
+* Housekeeping: Add logging to file/directory cleanup method
+* Housekeeping: Add additional checks and logging when processing background tasks
 
 = 6.1.0 =
 * Feature: Add Copy to Clipboard feature for PDF Shortcode on the PDF List page
