@@ -13,9 +13,9 @@ if [[ ! -f "${PLUGIN_DIR}php-scoper.phar" ]]; then
 fi
 
 if exists sudo; then
-  sudo chmod -R 777 vendor
+  sudo chmod -R 777 "${PLUGIN_DIR}vendor"
 else
-  chmod -R 777 vendor
+  chmod -R 777 "${PLUGIN_DIR}vendor"
 fi
 
 PHP_DOCKER=""
