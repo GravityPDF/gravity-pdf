@@ -57,11 +57,11 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->model = new Model_Shortcodes( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->misc, new Helper_Url_Signer() );

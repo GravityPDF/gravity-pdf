@@ -51,9 +51,9 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 
-		parent::setUp();
+		parent::set_up();
 
 		$this->import_form();
 	}
@@ -64,13 +64,13 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 *
 	 * @since 4.1
 	 */
-	public static function setUpBeforeClass() {
+	public static function set_upBeforeClass() {
 		global $wpdb;
 		$wpdb->suppress_errors = false;
 		$wpdb->show_errors     = true;
 		$wpdb->db_connect();
 
-		parent::setUpBeforeClass();
+		parent::set_upBeforeClass();
 	}
 
 	/**
@@ -444,7 +444,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		unset( $this->_last_response );
 
 		$this->assertTrue( $response );
-		$this->assertFileNotExists( $file );
+		$this->assertFileDoesNotExist( $file );
 	}
 
 	/**

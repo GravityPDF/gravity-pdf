@@ -68,10 +68,10 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
-		parent::setUp();
+		parent::set_up();
 
 		/* Remove temporary tables which causes problems with GF */
 		remove_all_filters( 'query', 10 );

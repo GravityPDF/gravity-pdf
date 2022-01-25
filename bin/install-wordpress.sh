@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
 # Install WordPress
-cd wordpress || exit
-npm install dotenv wait-on
-npm run env:start
+npm run --prefix wordpress env:start
 sleep 10
-npm run env:install
-cd ..
+npm run --prefix wordpress env:install

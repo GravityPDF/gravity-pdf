@@ -50,8 +50,8 @@ class Test_Uninstaller extends WP_UnitTestCase {
 	 *
 	 * @since 6.0
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->controller = Controller_Uninstaller::get_instance();
 		$this->model      = $this->controller->model;

@@ -35,9 +35,9 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup out loader class */
 		$this->loader = new Router();

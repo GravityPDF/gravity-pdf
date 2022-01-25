@@ -29,18 +29,18 @@ class Test_Model_Custom_Fonts extends WP_UnitTestCase {
 	 */
 	public $model;
 
-	public function setUp(): void {
+	public function set_up() {
 
-		parent::setUp();
+		parent::set_up();
 
 		$this->model = new Model_Custom_Fonts( GPDFAPI::get_options_class() );
 	}
 
-	public function tearDown(): void {
+	public function tear_down() {
 		$options = GPDFAPI::get_options_class();
 		$options->update_option( 'custom_fonts', [] );
 
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	/**
@@ -159,9 +159,9 @@ class Test_Model_Custom_Fonts extends WP_UnitTestCase {
 
 	public function test_get_unique_id() {
 		$this->assertSame( 'myuniqueid', $this->model->get_unique_id( 'myuniqueid' ) );
-		$this->assertRegExp( sprintf( '/%s([0-9]{5})/', 'arial' ), $this->model->get_unique_id( 'arial' ) );
-		$this->assertRegExp( sprintf( '/%s([0-9]{5})/', 'symbol' ), $this->model->get_unique_id( 'symbol' ) );
-		$this->assertRegExp( sprintf( '/%s([0-9]{5})/', 'dejavusans' ), $this->model->get_unique_id( 'dejavusans' ) );
+		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'arial' ), $this->model->get_unique_id( 'arial' ) );
+		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'symbol' ), $this->model->get_unique_id( 'symbol' ) );
+		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'dejavusans' ), $this->model->get_unique_id( 'dejavusans' ) );
 
 		$this->assertSame( 'font1', $this->model->get_unique_id( 'font1' ) );
 		$this->model->add_font(
@@ -170,7 +170,7 @@ class Test_Model_Custom_Fonts extends WP_UnitTestCase {
 				'font_name' => 'Font Name',
 			]
 		);
-		$this->assertRegExp( sprintf( '/%s([0-9]{5})/', 'font1' ), $this->model->get_unique_id( 'font1' ) );
+		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'font1' ), $this->model->get_unique_id( 'font1' ) );
 	}
 
 	/**

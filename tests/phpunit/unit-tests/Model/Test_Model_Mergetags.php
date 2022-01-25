@@ -34,10 +34,10 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 	 */
 	public $model;
 
-	public function setUp(): void {
+	public function set_up() {
 		global $gfpdf;
 
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->model      = new Model_Mergetags( $gfpdf->options, GPDFAPI::get_mvc_class( 'Model_PDF' ), $gfpdf->log, $gfpdf->misc, new Helper_Url_Signer() );

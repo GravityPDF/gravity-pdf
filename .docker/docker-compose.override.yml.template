@@ -2,25 +2,15 @@ services:
   wordpress-develop:
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
-      - %PLUGIN_MOUNT_DIR%/.docker/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
   php:
     environment:
       PHP_IDE_CONFIG: serverName=localhost
       XDEBUG_CONFIG: remote_enable=1 remote_host=${XDEBUG_HOST_IP-host.docker.internal}
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
-      - %PLUGIN_MOUNT_DIR%/.docker/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
       - %PLUGIN_MOUNT_DIR%/.docker/php-config.ini:/usr/local/etc/php/conf.d/php-config.ini
 
   cli:
-    environment:
-      PHP_IDE_CONFIG: serverName=localhost
-      XDEBUG_CONFIG: remote_enable=1 remote_host=${XDEBUG_HOST_IP-host.docker.internal}
-    volumes:
-      - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
-      - %PLUGIN_MOUNT_DIR%/.docker/php-config.ini:/usr/local/etc/php/conf.d/php-config.ini
-
-  phpunit:
     environment:
       PHP_IDE_CONFIG: serverName=localhost
       XDEBUG_CONFIG: remote_enable=1 remote_host=${XDEBUG_HOST_IP-host.docker.internal}

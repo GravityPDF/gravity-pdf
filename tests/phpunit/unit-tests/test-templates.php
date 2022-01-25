@@ -49,11 +49,11 @@ class Test_Templates extends WP_UnitTestCase {
 	 *
 	 * @since 4.1
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->model      = new Model_Templates( $gfpdf->templates, $gfpdf->log, $gfpdf->data, $gfpdf->misc );
@@ -329,7 +329,7 @@ class Test_Templates extends WP_UnitTestCase {
 		/* Run our method being tested and check it correctly cleaned up files */
 		$this->cleanup_template_files();
 
-		$this->assertFileNotExists( $test_dir . 'test.txt' );
-		$this->assertFileNotExists( $test_dir );
+		$this->assertFileDoesNotExist( $test_dir . 'test.txt' );
+		$this->assertFileDoesNotExist( $test_dir );
 	}
 }

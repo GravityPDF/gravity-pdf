@@ -35,11 +35,11 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->misc = new Helper_Misc( $gfpdf->log, $gfpdf->gform, $gfpdf->data );
@@ -619,7 +619,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->misc->cleanup_dir( $path );
 
 		/* Check the file was deleted but the directory still exists */
-		$this->assertFileNotExists( $path . 'test' );
+		$this->assertFileDoesNotExist( $path . 'test' );
 		$this->assertTrue( is_dir( $path ) );
 
 	}

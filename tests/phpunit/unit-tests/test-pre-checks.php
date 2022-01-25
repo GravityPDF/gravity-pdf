@@ -37,9 +37,9 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup out loader class */
 		$this->gravitypdf = new GFPDF_Major_Compatibility_Checks(

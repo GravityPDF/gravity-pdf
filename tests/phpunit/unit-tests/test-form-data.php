@@ -53,8 +53,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->setup_stubs();
 	}

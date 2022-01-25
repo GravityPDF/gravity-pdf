@@ -44,9 +44,9 @@ class Test_Addon extends WP_UnitTestCase {
 	 *
 	 * @since 4.2
 	 */
-	public function setUp() {
+	public function set_up() {
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->addon = new Addon(

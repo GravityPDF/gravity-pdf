@@ -62,11 +62,11 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer() );
@@ -90,7 +90,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	/**
 	 * @since 5.0
 	 */
-	public function tearDown() {
+	public function tear_down() {
 		global $gfpdf;
 
 		$fonts = glob( $gfpdf->data->template_font_location . '*.[tT][tT][fF]' );
@@ -100,7 +100,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 			@unlink( $font );
 		}
 
-		parent::tearDown();
+		parent::tear_down();
 
 		error_reporting( E_ALL );
 	}
@@ -219,7 +219,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$gfpdf->options->update_option( 'background_processing', 'Yes' );
 
 		$this->model->maybe_save_pdf( $entry, $form );
-		$this->assertFileNotExists( $file );
+		$this->assertFileDoesNotExist( $file );
 	}
 
 	/**

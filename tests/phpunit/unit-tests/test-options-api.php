@@ -46,11 +46,11 @@ class Test_Options_API extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		/* setup our object */
 		$this->options = \GPDFAPI::get_options_class();

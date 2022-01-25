@@ -20,7 +20,8 @@
     "redux-watch": "^1.1.1",
     "reselect": "^4.0.0",
     "sprintf-js": "^1.1.2",
-    "superagent": "3.8.3"
+    "superagent": "3.8.3",
+    "wait-on": "^6.0.0"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
@@ -38,7 +39,7 @@
     "babel-plugin-react-remove-properties": "^0.3.0",
     "cross-env": "7.0.0",
     "css-loader": "3.4.2",
-    "dotenv": "^8.0.0",
+    "dotenv": "^8.6.0",
     "dotenv-expand": "5.1.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
@@ -76,18 +77,14 @@
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
     "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
-
-    "test:php": "wp-scripts env test-php",
-    "test:php-composer": "npm run env docker-run -- phpunit php ./vendor/bin/phpunit",
-
-    "test:php:multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
+    "test:php": "npm run env docker-run -- php ./vendor/bin/phpunit",
+    "test:php:multisite": "npm run env docker-run -- php ./vendor/bin/phpunit -c tests/phpunit/multisite.xml",
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
 
     "prebuild": "yarn && yarn prebuild:core-fonts",
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
-
     "build:dev": "cross-env NODE_ENV=development webpack --progress --colors --watch --mode development",
     "build:production": "cross-env NODE_ENV=production webpack --mode production",
 

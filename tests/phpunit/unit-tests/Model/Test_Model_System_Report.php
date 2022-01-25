@@ -31,10 +31,10 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 	/**
 	 * The WP Unit Test Set up function
 	 */
-	public function setUp(): void {
+	public function set_up() {
 		global $gfpdf;
 
-		parent::setUp();
+		parent::set_up();
 
 		/* Setup our test classes */
 		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks, new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ) );

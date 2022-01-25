@@ -39,8 +39,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->setup_form();
 	}
@@ -507,6 +507,6 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		 * Do a final test to match the version number according to a set standard
 		 * This will validate up to a four digit version x.x.x.x
 		 */
-		$this->assertRegExp( '/^(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/', $version );
+		$this->assertMatchesRegularExpression( '/^(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/', $version );
 	}
 }

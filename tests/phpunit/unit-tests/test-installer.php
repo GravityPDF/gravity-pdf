@@ -48,11 +48,11 @@ class Test_Installer extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $gfpdf;
 
 		/* run parent method */
-		parent::setUp();
+		parent::set_up();
 
 		$uninstaller = Controller_Uninstaller::get_instance();
 
@@ -165,7 +165,7 @@ class Test_Installer extends WP_UnitTestCase {
 		$gfpdf->misc->rmdir( $gfpdf->data->template_location );
 
 		/* Verify folder structure is nonexistent and then create */
-		$this->assertFileNotExists( $gfpdf->data->template_location );
+		$this->assertFileDoesNotExist( $gfpdf->data->template_location );
 		$this->model->create_folder_structures();
 
 		/* Test the results */

@@ -13,11 +13,11 @@ unzip -q ./tmp/latest.zip -d ./tmp
 mkdir -p wordpress/src
 mv ./tmp/wordpress/* wordpress/src
 
-# Create the upload/wp-config.php directory with permissions that Travis can handle.
+# Create the upload directory
 mkdir -p wordpress/src/wp-content/uploads
-chmod -R 767 wordpress
 
 # Grab the tools we need for WordPress' local-env.
+
 curl -L "https://github.com/WordPress/wordpress-develop/archive/$LATEST_VERSION.zip" -o ./tmp/wordpress-develop.zip
 unzip -q ./tmp/wordpress-develop.zip -d ./tmp
 mv \
@@ -27,5 +27,5 @@ mv \
 ./tmp/wordpress-develop-$LATEST_VERSION/docker-compose.yml \
 ./tmp/wordpress-develop-$LATEST_VERSION/wp-cli.yml \
 ./tmp/wordpress-develop-$LATEST_VERSION/*config-sample.php \
-./tmp/wordpress-develop-$LATEST_VERSION/package.json wordpress \
+./tmp/wordpress-develop-$LATEST_VERSION/package.json \
 ./tmp/wordpress-develop-$LATEST_VERSION/package-lock.json wordpress
