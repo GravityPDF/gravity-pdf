@@ -9,7 +9,6 @@
         convertErrorsToExceptions="true"
         convertWarningsToExceptions="true"
         convertNoticesToExceptions="true"
-        convertDeprecationsToExceptions="true"
         verbose="true"
 >
     <testsuites>

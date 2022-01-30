@@ -16,7 +16,7 @@ class AdvancedCheck {
     this.queryStringInputBox = Selector('#gform_setting_queryString').find('[id="queryString"]')
     this.confirmationRedirect = Selector('#form_confirmation_redirect')
     this.wysiwgEditorTextTab = Selector('.wp-editor-tabs').find('button').withText('Text')
-    this.wysiwgEditor = Selector('div').find('[class^="merge-tag-support mt-wp_editor mt-manual_position mt-position-right wp-editor-area ui-autocomplete-input"]')
+    this.wysiwgEditor = Selector('div').find('textarea[class^="merge-tag-support"]')
     this.redirectInputBox = Selector('#gform_setting_url').find('[id="url"]')
     this.previewLink = Selector('.gform-form-toolbar__container').find('a').withText('Preview')
     this.saveConfirmationButton = Selector('.gform-settings-save-container').find('button').withText('Save Confirmation')
@@ -31,7 +31,7 @@ class AdvancedCheck {
     this.debugModeErrorMessage = Selector('div').withText('PDF link not displayed because PDF is inactive.')
 
     // Merge tags section
-    this.mergeTagsButton = Selector('#gform_setting_message').find('[class^="open-list tooltip-merge-tag"]')
+    this.mergeTagsButton = Selector('#gform_setting_message').find('button.gform-dropdown__control')
     this.textInputField = Selector('input').withAttribute('name', 'input_1')
     this.fNameInputField = Selector('input').withAttribute('aria-label', 'First name')
     this.lNameInputField = Selector('input').withAttribute('aria-label', 'Last name')
