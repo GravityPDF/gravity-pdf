@@ -6,7 +6,7 @@ class Page {
   constructor () {
     this.testPageLink = link('#the-list', 'Test page')
     this.closePopupButton = Selector('button').withAttribute('aria-label', 'Close dialog')
-    this.titleField = Selector('.editor-post-title').find('textarea').withAttribute('placeholder', 'Add title')
+    this.titleField = Selector('.editor-post-title__input')
     this.addBlockIcon = Selector('button').withAttribute('aria-label', 'Add block')
     this.searchBlock = Selector('.block-editor-inserter__search').find('input').withAttribute('type', 'search')
     this.shortcodeLink = Selector('button.editor-block-list-item-shortcode')

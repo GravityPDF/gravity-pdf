@@ -1239,7 +1239,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
-			@unlink( $tmp . $file, $modified );
+			@unlink( $tmp . $file );
 		}
 
 		$gfpdf->data->template_tmp_location = $tmp_save;

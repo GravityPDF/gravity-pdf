@@ -7,6 +7,9 @@
     "autoloader-suffix": "GravityPDFPlugin",
     "platform": {
       "php": "7.3.0"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   },
   "require": {

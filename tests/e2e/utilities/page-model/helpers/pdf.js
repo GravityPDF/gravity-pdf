@@ -13,7 +13,7 @@ class Pdf {
 
     // General - Filename field
     this.filenameInputBox = Selector('#gfpdf-settings-field-wrapper-filename').find('[id="gfpdf_settings[filename]"]')
-    this.filenameMergeTagsOptionList = Selector('#gfpdf-settings-field-wrapper-filename').find('[class^="all-merge-tags  input"]')
+    this.filenameMergeTagsOptionList = Selector('#gfpdf-settings-field-wrapper-filename').find('button.gform-dropdown__control')
 
     // General - Conditional Logic field
     this.conditionalLogicCheckbox = Selector('#gfpdf-settings-field-wrapper-conditional').find('[id="gfpdf_conditional_logic"]')
@@ -73,24 +73,24 @@ class Pdf {
     // Template - Header field
     this.headerWpEditorBox = Selector('#gfpdf-settings-field-wrapper-header').find('[id="wp-gfpdf_settings_header-editor-container"]')
     this.headerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-header').find('button').withText('Text')
-    this.headerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-header').find('[class^="gfpdf_settings_header merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields wp-editor-area ui-autocomplete-input"]')
+    this.headerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-header').find('[class^="gfpdf_settings_header"]')
 
     // Template - First Page Header field
     this.firstPageHeaderCheckbox = Selector('#gfpdf-settings-field-wrapper-first_header').find('[class^="gfpdf-input-toggle"]')
     this.firstPageHeaderWpEditorBox = Selector('#gfpdf-settings-field-wrapper-first_header').find('[id="wp-gfpdf_settings_first_header-editor-container"]')
     this.firstPageHeaderWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_header').find('button').withText('Text')
-    this.firstPageHeaderWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_header').find('[class^="gfpdf_settings_first_header merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields wp-editor-area ui-autocomplete-input"]')
+    this.firstPageHeaderWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_header').find('[class^="gfpdf_settings_first_header"]')
 
     // Template - Footer field
     this.footerWpEditorBox = Selector('#gfpdf-settings-field-wrapper-footer').find('[id="wp-gfpdf_settings_footer-editor-container"]')
     this.footerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-footer').find('button').withText('Text')
-    this.footerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-footer').find('[class^="gfpdf_settings_footer merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields wp-editor-area ui-autocomplete-input"]')
+    this.footerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-footer').find('[class^="gfpdf_settings_footer"]')
 
     // Template - First Page Footer field
     this.firstPageFooterCheckbox = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[class^="gfpdf-input-toggle"]')
     this.firstPageFooterWpEditorBox = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[id="wp-gfpdf_settings_first_footer-editor-container"]')
     this.firstPageFooterWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_footer').find('button').withText('Text')
-    this.firstPageFooterWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[class^="gfpdf_settings_first_footer merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields wp-editor-area ui-autocomplete-input"]')
+    this.firstPageFooterWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[class^="gfpdf_settings_first_footer"]')
 
     // Advanced - Format field
     this.formatStandardCheckbox = Selector('#gfpdf-settings-field-wrapper-format').find('[id="gfpdf_settings[format][Standard]"]')
@@ -106,7 +106,7 @@ class Pdf {
 
     // Advanced - Password field
     this.passwordInputBox = Selector('#gfpdf-settings-field-wrapper-password').find('[id="gfpdf_settings[password]"]')
-    this.passwordMergeTagsOptionList = Selector('#gfpdf-settings-field-wrapper-password').find('[class^="open-list tooltip-merge-tag"]')
+    this.passwordMergeTagsOptionList = Selector('#gfpdf-settings-field-wrapper-password').find('button.gform-dropdown__control')
 
     // Advanced - Privileges field
     this.copyCheckbox = Selector('#gfpdf-settings-field-wrapper-privileges').find('[id="gfpdf_settings[privileges][copy]"]')

@@ -72,6 +72,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Docs: https://github.com/shivammathur/setup-php
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.3
+
       - name: Log debug information
         run: |
           yarn --version
@@ -122,20 +128,20 @@ jobs:
       - name: Build Gravity PDF
         run: yarn build:production
 
-      - name: Install Composer dependencies
-        run: |
-          docker-compose run --rm php composer --version
-          # Install using `composer update` as there is no `composer.lock` file.
-          if [ ${{ env.LOCAL_PHP }} == '8.1-fpm' ]; then
-            docker-compose run --rm php composer update --ignore-platform-reqs
-          else
-            docker-compose run --rm php composer update
-          fi
-
       - name: Install / Setup Gravity PDF + WordPress
         run: |
           yarn env:install
           yarn env:install:phpunit
+
+      - name: Install Composer dependencies
+        run: |
+          npm run env docker-run -- php composer --version
+          # Install using `composer update` as there is no `composer.lock` file.
+          if [ ${{ env.LOCAL_PHP }} == '8.1-fpm' ]; then
+            npm run env docker-run -- php composer update --ignore-platform-reqs
+          else
+            npm run env docker-run -- php composer update
+          fi
 
       - name: General debug information
         run: |

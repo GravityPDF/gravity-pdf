@@ -37,11 +37,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Set up PHP
+      # Docs: https://github.com/shivammathur/setup-php
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
-          coverage: none
+          php-version: 7.3
           tools: composer, cs2pr
 
       - name: Log debug information
