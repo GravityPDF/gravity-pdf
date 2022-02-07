@@ -292,14 +292,32 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$aria_label = sprintf( __( 'Copy the %s PDF shortcode to the clipboard', 'gravity-forms-pdf-extended' ), $item['name'] );
 
 		ob_start();
-		?>
-
-		<button data-selected-text="<?= esc_attr__( 'Shortcode copied!', 'gravity-forms-pdf-extended' ) ?>" type="button" class="gform-status-indicator btn-shortcode" data-clipboard-text="<?= esc_attr( $shortcode ) ?>" aria-label="<?= esc_attr( $aria_label ) ?>" role="status" aria-live="polite">
-			<?= esc_html__( 'Copy Shortcode', 'gravity-forms-pdf-extended' ) ?>
-		</button>
-
+		/* If the current GF version is 2.6 or higher, use the new updated UI for the shortcode button or else use the pre GF 2.5 version. */
+		if ( version_compare( '2.6-rc-1', \GFCommon::$version, '<=' ) ):
+			?>
+			<button type="button"
+					class="gform-button gform-button--size-r gform-button--white gform-button--icon-leading gform-embed-form__shortcode-trigger btn-shortcode"
+					data-clipboard-text="<?= esc_attr( $shortcode ) ?>" aria-label="<?= esc_attr( $aria_label ) ?>"
+					role="dialog" aria-live="polite">
+				<i class="gform-button__icon gform-icon gform-icon--copy"></i>
+				<span class="gform-embed-form__shortcode-copy-label"
+					  aria-hidden="false"><?= esc_attr__( 'Copy', 'gravity-forms-pdf-extended' ) ?></span>
+				<span class="gform-embed-form__shortcode-copy-copied" aria-hidden="true">
+				<i class="gform-embed-form__shortcode-copy-icon gform-icon gform-icon--circle-check-alt"></i>
+				<?= esc_attr__( 'Copied', 'gravity-forms-pdf-extended' ) ?>
+			</span>
+			</button>
+		<?php else : ?>
+			<button data-selected-text="<?= esc_attr__( 'Shortcode copied!', 'gravity-forms-pdf-extended' ) ?>"
+					type="button" class="gform-status-indicator btn-shortcode gf_2_5 "
+					data-clipboard-text="<?= esc_attr( $shortcode ) ?>" aria-label="<?= esc_attr( $aria_label ) ?>"
+					role="status" aria-live="polite">
+				<?= esc_html__( 'Copy Shortcode', 'gravity-forms-pdf-extended' ) ?>
+			</button>
+		<?php endif; ?>
 		<div class="gpdf-fallback-input">
-			<input type="text" id="<?= $pdf_id ?>" value="<?= esc_attr( $shortcode ) ?>" aria-label="<?= esc_attr( $aria_label ) ?>" />
+			<input type="text" id="<?= $pdf_id ?>" value="<?= esc_attr( $shortcode ) ?>"
+				   aria-label="<?= esc_attr( $aria_label ) ?>" />
 		</div>
 
 		<?php
