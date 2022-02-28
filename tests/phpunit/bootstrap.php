@@ -69,6 +69,18 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
+
+		/* Load Mocks */
+		$this->mocks();
+	}
+
+	/**
+	 * Load Addon Mocks
+	 *
+	 * @since 6.3
+	 */
+	public function mocks(){
+		require_once 'unit-tests/Mocks/zapier-mock.php';
 	}
 
 	/**
