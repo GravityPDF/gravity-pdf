@@ -35,7 +35,7 @@ export function doFormSettingsEditPage () {
   }
 
   /* Move alert inline */
-  $('.gform-settings__wrapper > .alert').detach().prependTo('#tab_pdf')
+  $('.gform-settings__wrapper > .alert').detach().prependTo('#tab_PDF')
 
   /*
    * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
