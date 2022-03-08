@@ -17,7 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /** @var $args array */
 
 global $wp_settings_fields;
-
 ?>
 
 <!-- Merge tag functionality requires a global form object -->
@@ -34,7 +33,8 @@ global $wp_settings_fields;
 <?php GFFormSettings::page_header( $args['title'] ); ?>
 
 <!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
-<form name="gfpdf-settings-form-<?= rand() ?>" method="post" id="gfpdf_pdf_form" class="gform_settings_form">
+<form name="gfpdf-settings-form-<?= rand() ?>" method="post" id="gfpdf_pdf_form"
+	  class="gform_settings_form <?= $args['form_classes'] ?>">
 
 	<?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ); ?>
 

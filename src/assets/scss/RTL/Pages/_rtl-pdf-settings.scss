@@ -73,4 +73,14 @@ html[dir="rtl"] {
       }
     }
   }
+
+  /* GF 2.6 UI updates */
+  .gfpdf-gf-2-6 {
+    .gfpdf-settings-field-wrapper {
+      .wp-editor-wrap {
+        margin-left: 0rem;
+      }
+    }
+  }
+
 }

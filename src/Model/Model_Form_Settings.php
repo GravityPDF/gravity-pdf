@@ -3,6 +3,7 @@
 namespace GFPDF\Model;
 
 use GFFormsModel;
+use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
@@ -222,6 +223,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
+		/* add custom classes to form */
+		$form_classes = '';
+		if ( version_compare( '2.6-rc-1', GFCommon::$version, '>=' ) ) {
+			$form_classes .= 'gfpdf-gf-2-6';
+		}
+
 		$entry_meta = GFFormsModel::get_entry_meta( $form_id );
 		$entry_meta = apply_filters( 'gform_entry_meta_conditional_logic_confirmations', $entry_meta, $form, '' );
 
@@ -253,6 +260,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				'form'         => $form,
 				'entry_meta'   => $entry_meta,
 				'pdf'          => $pdf,
+				'form_classes' => $form_classes,
 			]
 		);
 	}
