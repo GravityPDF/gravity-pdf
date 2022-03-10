@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
  * Display the Template Screenshot for the List Items
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2021, Blue Liquid Designs
+ * @copyright   Copyright (c) 2022, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */

@@ -11,7 +11,7 @@ import { selectTemplate } from '../../actions/templates'
  * On click it triggers our Redux action.
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2021, Blue Liquid Designs
+ * @copyright   Copyright (c) 2022, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
