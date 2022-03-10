@@ -11,7 +11,6 @@ class AdvancedCheck {
     this.confirmationTextCheckbox = Selector('#gform-settings-radio-choice-type0').find('input').withAttribute('id', 'type0')
     this.confirmationPageCheckbox = Selector('#gform-settings-radio-choice-type1').find('input').withAttribute('id', 'type1')
     this.confirmationRedirectCheckbox = Selector('#gform-settings-radio-choice-type2').find('input').withAttribute('id', 'type2')
-    this.shortcodeBox = Selector('button').withAttribute('data-selected-text', 'Shortcode copied!')
     this.confirmationPageSelectBox = Selector('#gform_setting_page').find('select').withAttribute('name', '_gform_setting_page')
     this.queryStringInputBox = Selector('#gform_setting_queryString').find('[id="queryString"]')
     this.confirmationRedirect = Selector('#form_confirmation_redirect')

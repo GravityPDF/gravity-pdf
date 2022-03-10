@@ -35,17 +35,25 @@ export default function shortcodeButton () {
   class GPDFShortcodeButton {
     constructor (element) {
       this.element = jQuery(element)
-      this.defaultText = this.element.text()
+
     }
 
     buttonDefault () {
-      this.element.removeClass('btn-success')
-      this.element.text(this.defaultText)
+      if (this.element.hasClass('gf_2_5')) {
+        this.element.removeClass('btn-success')
+        this.element.text(this.element.text())
+      } else {
+        this.element.removeClass('gform-embed-form__shortcode-trigger--copied')
+      }
     }
 
     buttonActive () {
-      this.element.addClass('btn-success')
-      this.element.text(this.element.data('selectedText'))
+      if (this.element.hasClass('gf_2_5')) {
+        this.element.addClass('btn-success')
+        this.element.text(this.element.data('selectedText'))
+      } else {
+        this.element.addClass('gform-embed-form__shortcode-trigger--copied')
+      }
       setTimeout(() => this.buttonDefault(), 3000)
     }
   }
