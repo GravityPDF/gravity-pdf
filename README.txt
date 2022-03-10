@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 5.9
-Stable tag: 6.1.1
+Stable tag: 6.2.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -104,6 +104,15 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.2.0 =
+* Feature: Add support for Gravity Forms 2.6 (see Housekeeping below)
+* Housekeeping: Add alternate background color on PDF List page
+* Housekeeping: Add styles/support for new merge tag selector
+* Housekeeping: Add styles for Copy to Clipboard shortcode button on PDF List page
+* Housekeeping: Update help search API to query v6 documentation
+* Bug: Fix error message display issue on Form PDF add/edit page
+* Bug: Fix missing styles on multi-PDF view/download menu on Entry List page
 
 = 6.1.1 =
 * Bug: Allow number field to show a thousand separator by using the 'gform_include_thousands_sep_pre_format_number' filter.
