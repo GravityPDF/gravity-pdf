@@ -18,5 +18,5 @@ import request from 'superagent'
  * @since 5.2
  */
 export const apiGetSearchResult = searchQuery => {
-  return request.get(`https://gravitypdf.com/wp-json/wp/v2/v5_docs/?search=${searchQuery}`)
+  return request.get(`https://gravitypdf.com/wp-json/wp/v2/v6_docs/?search=${searchQuery}`)
 }
