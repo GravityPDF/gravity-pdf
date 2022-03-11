@@ -171,12 +171,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function single_row( $item ) {
-		static $row_class = '';
-		$class            = version_compare( '2.6-rc-1', \GFCommon::$version, '>=' ) ? 'gf-locking' : 'alternate';
-
-		$row_class = ( $row_class === '' ? "class='$class'" : $row_class );
-
-		echo '<tr id="gfpdf-' . $item['id'] . '" ' . $row_class . '>';
+		echo '<tr id="gfpdf-' . $item['id'] . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
 	}

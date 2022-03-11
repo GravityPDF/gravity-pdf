@@ -17,51 +17,58 @@
 }
 
 #tab_PDF {
-
   #gfpdf_list_form {
 
     .gfpdf-spinner {
       width: 20px;
     }
 
-    /* Modify the Gravity Forms 2.6 shortcode button version to fit in our PDF list table. */
-    td.column-shortcode {
-      .gform-button {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-      }
-    }
-
-    .btn-shortcode + .gpdf-fallback-input {
-      display: none;
-    }
-
-    /* This supports Gravity Form version 2.5 or lower */
-    .btn-shortcode {
-      &.gf_2_5 {
-        margin-left: 0;
-        border-radius: 1px;
-        padding: 0.3rem 0.5rem;
-        white-space: normal;
-
-        &:before {
-          font-family: dashicons;
-          content: "\f150";
-          font-size: 1rem;
-          vertical-align: middle;
-          font-weight: 400;
-          padding-right: 0.2rem;
-          padding-bottom: 0.1rem;
+    table {
+      tbody {
+        & > :nth-child(odd) {
+          background-color: #f6f7f7;
         }
 
-        &.btn-success,
-        &.toggle {
-          color: #080;
-          border-color: #080;
+        /* Modify the Gravity Forms 2.6 shortcode button version to fit in our PDF list table. */
+        td.column-shortcode {
+          .gform-button {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+          }
+        }
 
-          &:hover {
-            border-color: #080;
+        .btn-shortcode + .gpdf-fallback-input {
+          display: none;
+        }
+
+        /* This supports Gravity Form version 2.5 or lower */
+        .btn-shortcode {
+          &.gf_2_5 {
+            margin-left: 0;
+            border-radius: 1px;
+            padding: 0.3rem 0.5rem;
+            white-space: normal;
+
+            &:before {
+              font-family: dashicons;
+              content: "\f150";
+              font-size: 1rem;
+              vertical-align: middle;
+              font-weight: 400;
+              padding-right: 0.2rem;
+              padding-bottom: 0.1rem;
+            }
+
+            &.btn-success,
+            &.toggle {
+              color: #080;
+              border-color: #080;
+
+              &:hover {
+                border-color: #080;
+              }
+            }
           }
         }
       }
