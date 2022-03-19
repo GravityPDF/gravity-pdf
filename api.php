@@ -481,9 +481,11 @@ final class GPDFAPI {
 		$pdf  = static::get_mvc_class( 'Model_PDF' );
 		$form = $form_class->get_form( $entry['form_id'] );
 
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
 		do_action( 'gfpdf_pre_generate_and_save_pdf', $form, $entry, $setting );
 		$filename = $pdf->generate_and_save_pdf( $entry, $setting );
 		do_action( 'gfpdf_post_generate_and_save_pdf', $form, $entry, $setting );
+		remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
 
 		return $filename;
 	}
