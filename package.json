@@ -67,8 +67,8 @@
     "webpack-merge": "4.2.2"
   },
   "scripts": {
-    "lint:js": "eslint src/assets/js/**/*.js",
-    "lint:js:fix": "eslint src/assets/js/**/*.js --fix",
+    "lint:js": "eslint 'src/assets/js/**/*.js'",
+    "lint:js:fix": "eslint 'src/assets/js/**/*.js' --fix",
     "lint:php": "npm run env docker-run -- php composer lint:errors",
     "lint:php:format": "npm run env docker-run -- php composer format",
 
