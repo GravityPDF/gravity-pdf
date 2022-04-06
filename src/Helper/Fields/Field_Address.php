@@ -64,7 +64,7 @@ class Field_Address extends Helper_Abstract_Fields {
 		$address = [];
 
 		/* check if we should display the zip before the city */
-		$address_display_format = apply_filters( 'gform_address_display_format', 'default' );
+		$address_display_format = apply_filters( 'gform_address_display_format', 'default', $this->field );
 
 		/* Start putting our address together */
 		if ( ! empty( $data['street'] ) ) {
