@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 5.9
-Stable tag: 6.2.0
+Stable tag: 6.2.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -104,6 +104,10 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.2.1 =
+* Bug: Always generate a new PDF when using the GPDFAPI::create_pdf() method
+* Bug: Fix fatal error during PDF generation when using the `gform_address_display_format` filter
 
 = 6.2.0 =
 * Feature: Add support for Gravity Forms 2.6 (see Housekeeping below)
