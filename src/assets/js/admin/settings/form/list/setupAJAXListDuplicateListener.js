@@ -40,7 +40,7 @@ export function setupAJAXListDuplicateListener () {
 
           /* Clone the row to be duplicated */
           const $row = $(that).parents('tr')
-          const $newRow = $row.clone().css('background', '#baffb8')
+          const $newRow = $row.clone()
 
           /* Update the edit links to point to the new location */
           $newRow.find('.column-name > a, .edit a').each(function () {
@@ -87,7 +87,7 @@ export function setupAJAXListDuplicateListener () {
             .html(response.status)
 
           /* Add row to node and fade in */
-          $newRow.hide().insertAfter($row).fadeIn().animate({ backgroundColor: '#F6F9FC' })
+          $newRow.hide().insertAfter($row).fadeIn()
         }
       })
     }
