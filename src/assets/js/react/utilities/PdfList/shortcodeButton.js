@@ -35,7 +35,6 @@ export default function shortcodeButton () {
   class GPDFShortcodeButton {
     constructor (element) {
       this.element = jQuery(element)
-
     }
 
     buttonDefault () {
