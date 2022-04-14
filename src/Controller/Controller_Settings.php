@@ -130,7 +130,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		GFForms::add_settings_page(
 			[
 				'name'    => $this->data->short_title,
-				'icon'    => 'dashicons-media-document',
+				'icon'    => 'gform-icon--gravity-pdf',
 				'handler' => [ $this, 'display_page' ],
 			],
 			''

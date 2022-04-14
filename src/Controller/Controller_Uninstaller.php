@@ -92,7 +92,7 @@ class Controller_Uninstaller extends Helper_Abstract_Controller {
 	 * @since 6.0
 	 */
 	public function get_menu_icon(): string {
-		return 'dashicons-media-document';
+		return 'gform-icon--gravity-pdf';
 	}
 
 	/**

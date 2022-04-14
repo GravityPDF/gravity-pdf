@@ -147,7 +147,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'name'         => $this->data->slug,
 			'label'        => $this->data->short_title,
 			'query'        => [ 'pid' => null ],
-			'icon'         => 'dashicons-media-document',
+			'icon'         => 'gform-icon--gravity-pdf',
 			'capabilities' => [ 'gravityforms_edit_settings' ],
 		];
 
