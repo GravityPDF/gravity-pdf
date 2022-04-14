@@ -154,6 +154,25 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Auto-inject the entry ID into the [gravitypdf] shortcode when merge tags are processed
+	 *
+	 * @param string $html  The text to be processed
+	 * @param array  $form  The Gravity Form array
+	 * @param array  $entry The Gravity Form entry information
+	 *
+	 * @return string
+	 *
+	 * @since 6.3
+	 */
+	public function gravitypdf_process_during_merge_tag_replacement( $html, $form, $entry ) {
+		if ( empty( $entry['id'] ) || ! is_string( $html ) ) {
+			return $html;
+		}
+
+		return $this->add_entry_id_to_shortcode( $html, $entry['id'] );
+	}
+
+	/**
 	 * Update our Gravity Forms "Text" Confirmation Shortcode to include the current entry ID
 	 *
 	 * @param string|array $confirmation The confirmation text
@@ -163,24 +182,11 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @return string|array               The confirmation text
 	 *
 	 * @since 4.0
+	 *
+	 * @depecated 6.3. Processing handled automatically when merge tags processed
+	 * @see Helper_Abstract_Pdf_Shortcode::gravitypdf_process_during_merge_tag_replacement()
 	 */
 	public function gravitypdf_confirmation( $confirmation, $form, $entry ) {
-
-		/**
-		 * Do nothing if WP_Error is passed
-		 *
-		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
-		 *
-		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
-		 */
-		if ( is_wp_error( $confirmation ) || is_wp_error( $form ) || is_wp_error( $entry ) ) {
-			return $confirmation;
-		}
-
-		if ( isset( $form['confirmation']['type'] ) && $form['confirmation']['type'] === 'message' ) {
-			$confirmation = $this->add_entry_id_to_shortcode( $confirmation, $entry['id'] );
-		}
-
 		return $confirmation;
 	}
 
@@ -194,24 +200,11 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @return array               The notification
 	 *
 	 * @since 4.0
+	 *
+	 * @depecated 6.3. Processing handled automatically when merge tags processed
+	 * @see Helper_Abstract_Pdf_Shortcode::gravitypdf_process_during_merge_tag_replacement()
 	 */
 	public function gravitypdf_notification( $notification, $form, $entry ) {
-
-		/**
-		 * Do nothing if WP_Error is passed
-		 *
-		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
-		 *
-		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
-		 */
-		if ( is_wp_error( $notification ) || is_wp_error( $entry ) || empty( $entry['id'] ) ) {
-			return $notification;
-		}
-
-		if ( isset( $notification['message'] ) ) {
-			$notification['message'] = $this->add_entry_id_to_shortcode( $notification['message'], $entry['id'] );
-		}
-
 		return $notification;
 	}
 

@@ -82,8 +82,6 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_filters() {
-		$this->assertEquals( 100, has_filter( 'gform_confirmation', [ $this->model, 'gravitypdf_confirmation' ] ) );
-		$this->assertEquals( 100, has_filter( 'gform_notification', [ $this->model, 'gravitypdf_notification' ] ) );
 		$this->assertEquals(
 			10,
 			has_filter(
