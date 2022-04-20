@@ -256,7 +256,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function apply_backwards_compatibility_filters( $settings, $entry ) {
 
-		$form = $this->gform->get_form( $entry['form_id'] );
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
 		$settings['filename'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_pdf_name', $settings['filename'], $form, $entry ) );
 		$settings['template'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_template', $settings['template'], $form, $entry ), '.php' );
@@ -664,7 +664,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$args = [];
 
 		/* Check if we have any PDFs */
-		$form = $this->gform->get_form( $entry['form_id'] );
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
 		if ( ! empty( $pdfs ) ) {
@@ -703,7 +703,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_active_pdfs( $pdfs, $entry ) {
 
 		$filtered = [];
-		$form     = $this->gform->get_form( $entry['form_id'] );
+		$form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
 		foreach ( $pdfs as $pdf ) {
 			if ( $pdf['active'] && ( empty( $pdf['conditionalLogic'] ) || $this->misc->evaluate_conditional_logic( $pdf['conditionalLogic'], $entry ) ) ) {
@@ -731,7 +731,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function get_pdf_name( $settings, $entry ) {
 
-		$form = $this->gform->get_form( $entry['form_id'] );
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 		$name = $this->gform->process_tags( $settings['filename'], $form, $entry );
 
 		/* Decode HTML entities */
@@ -1034,7 +1034,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* Get required parameters */
 			$entry    = $pdf->get_entry();
 			$settings = $pdf->get_settings();
-			$form     = $this->gform->get_form( $entry['form_id'] );
+			$form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
 			do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
 
@@ -1135,7 +1135,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			return [];
 		}
 
-		$form = $this->gform->get_form( $entry['form_id'] );
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
 		if ( ! is_array( $form ) ) {
 			return [];
@@ -1259,7 +1259,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function handle_legacy_tier_2_processing( Helper_PDF $pdf, $entry, $settings, $args ) {
 
-		$form = $this->gform->get_form( $entry['form_id'] );
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
 		$prevent_main_pdf_loader = apply_filters(
 			'gfpdfe_pre_load_template',
@@ -1770,7 +1770,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( is_file( $pdf_path ) ) {
 			/* Add appropriate filters so developers can access the PDF when it is generated */
-			$form     = $this->gform->get_form( $entry['form_id'] );
+			$form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 			$filename = basename( $pdf_path );
 
 			do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
