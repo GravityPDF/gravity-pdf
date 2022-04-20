@@ -150,7 +150,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		$controller = $this->getController();
 		$model      = $controller->model;
-		$form       = $this->gform->get_form( $entry['form_id'] );
+		$form       = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 		$form       = $this->add_gravity_perk_conditional_logic_date_support( $form );
 
 		/**
@@ -369,7 +369,7 @@ class View_PDF extends Helper_Abstract_View {
 	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = [] ) {
 
 		/* Set up required variables */
-		$form        = $this->gform->get_form( $entry['form_id'] );
+		$form        = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 		$products    = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 		$page_number = 0;
 
@@ -613,7 +613,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function get_core_template_styles( $settings, $entry ) {
-		$form = $this->gform->get_form( $entry['form_id'] );
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
 		$html = $this->load_core_template_styles( $settings );
 
