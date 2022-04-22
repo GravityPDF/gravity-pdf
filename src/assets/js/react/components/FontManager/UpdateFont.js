@@ -31,9 +31,6 @@ import AddUpdateFontFooter from './AddUpdateFontFooter'
  * @param disableUpdateButton
  * @param msg
  * @param loading
- * @param tabIndexFontName
- * @param tabIndexFontFiles
- * @param tabIndexFooterButtons
  *
  * @since 6.0
  */
@@ -52,10 +49,7 @@ export const UpdateFont = (
     validateRegular,
     disableUpdateButton,
     msg,
-    loading,
-    tabIndexFontName,
-    tabIndexFontFiles,
-    tabIndexFooterButtons
+    loading
   }
 ) => {
   const fontNameLabel = sprintf(GFPDF.fontManagerFontNameLabel, '<span class=\'required\'>', '</span>')
@@ -80,7 +74,6 @@ export const UpdateFont = (
           value={label}
           maxLength='60'
           onChange={e => onHandleInputChange(e, 'updateFont')}
-          tabIndex={tabIndexFontName}
         />
 
         <div aria-live='polite'>
@@ -102,7 +95,6 @@ export const UpdateFont = (
           onHandleUpload={onHandleUpload}
           onHandleDeleteFontStyle={onHandleDeleteFontStyle}
           msg={msg}
-          tabIndex={tabIndexFontFiles}
         />
 
         <AddUpdateFontFooter
@@ -113,7 +105,6 @@ export const UpdateFont = (
           onHandleCancelEditFontKeypress={onHandleCancelEditFontKeypress}
           msg={msg}
           loading={loading}
-          tabIndex={tabIndexFooterButtons}
         />
       </form>
     </div>
@@ -139,10 +130,7 @@ UpdateFont.propTypes = {
   disableUpdateButton: PropTypes.bool.isRequired,
   fontStyles: PropTypes.object.isRequired,
   msg: PropTypes.object.isRequired,
-  loading: PropTypes.bool.isRequired,
-  tabIndexFontName: PropTypes.string.isRequired,
-  tabIndexFontFiles: PropTypes.string.isRequired,
-  tabIndexFooterButtons: PropTypes.string.isRequired
+  loading: PropTypes.bool.isRequired
 }
 
 export default UpdateFont

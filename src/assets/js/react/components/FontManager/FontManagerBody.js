@@ -540,7 +540,6 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   render () {
-    const updateFontVisible = document.querySelector('.update-font.show')
     const { id, fontList, msg, loading, history } = this.props
 
     return (
@@ -565,9 +564,6 @@ export class FontManagerBody extends Component {
             onHandleSubmit={this.handleSubmit}
             msg={msg}
             loading={loading}
-            tabIndexFontName={updateFontVisible && '-1'}
-            tabIndexFontFiles={!updateFontVisible ? '0' : '-1'}
-            tabIndexFooterButtons={updateFontVisible && '-1'}
             {...this.state.addFont}
           />
 
@@ -581,9 +577,6 @@ export class FontManagerBody extends Component {
             fontList={fontList}
             msg={msg}
             loading={loading}
-            tabIndexFontName={!updateFontVisible && '-1'}
-            tabIndexFontFiles={updateFontVisible ? '0' : '-1'}
-            tabIndexFooterButtons={!updateFontVisible && '-1'}
             {...this.state.updateFont}
           />
         </div>

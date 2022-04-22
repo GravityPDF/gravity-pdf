@@ -21,7 +21,6 @@ import FontVariantLabel from './FontVariantLabel'
  * @param onHandleUpload
  * @param onHandleDeleteFontStyle
  * @param error
- * @param tabIndex
  *
  * @since 6.0
  */
@@ -31,8 +30,7 @@ export const FontVariant = ({
   validateRegular,
   onHandleUpload,
   onHandleDeleteFontStyle,
-  msg: { error },
-  tabIndex
+  msg: { error }
 }) => (
   <div data-test='component-FontVariant' id='gfpdf-font-files-setting'>
     {Object.entries(fontStyles).map(([key, font]) => {
@@ -62,7 +60,6 @@ export const FontVariant = ({
             <a
               className={'drop-zone' + dropZoneClassEnhancement}
               {...getRootProps()}
-              tabIndex={tabIndex}
             >
               {font ? (
                 <input
@@ -111,8 +108,7 @@ FontVariant.propTypes = {
   validateRegular: PropTypes.bool.isRequired,
   onHandleUpload: PropTypes.func.isRequired,
   onHandleDeleteFontStyle: PropTypes.func.isRequired,
-  msg: PropTypes.object.isRequired,
-  tabIndex: PropTypes.string.isRequired
+  msg: PropTypes.object.isRequired
 }
 
 export default FontVariant
