@@ -26,6 +26,7 @@ import AddUpdateFontFooter from './AddUpdateFontFooter'
  * @param validateRegular
  * @param msg
  * @param loading
+ * @param isUpdating
  *
  * @since 6.0
  */
@@ -40,60 +41,65 @@ export const AddFont = (
     validateLabel,
     validateRegular,
     msg,
-    loading
+    loading,
+    isUpdating
   }
 ) => {
   const fontNameLabel = sprintf(GFPDF.fontManagerFontNameLabel, "<span class='required'>", '</span>')
 
   return (
     <div data-test='component-AddFont' className='add-font'>
-      <form onSubmit={onHandleSubmit}>
-        <h2>{GFPDF.fontManagerAddTitle}</h2>
+      {!isUpdating && (
+        <>
+          <form onSubmit={onHandleSubmit}>
+            <h2>{GFPDF.fontManagerAddTitle}</h2>
 
-        <p>{GFPDF.fontManagerAddDesc}</p>
+            <p>{GFPDF.fontManagerAddDesc}</p>
 
-        <label htmlFor='gfpdf-font-name-input' dangerouslySetInnerHTML={{ __html: fontNameLabel }} />
+            <label htmlFor='gfpdf-font-name-input' dangerouslySetInnerHTML={{ __html: fontNameLabel }} />
 
-        <p id='gfpdf-font-name-desc-add'>{GFPDF.fontManagerFontNameDesc}</p>
+            <p id='gfpdf-font-name-desc-add'>{GFPDF.fontManagerFontNameDesc}</p>
 
-        <input
-          type='text'
-          id='gfpdf-add-font-name-input'
-          className={!validateLabel ? 'input-label-validation-error' : ''}
-          aria-describedby='gfpdf-font-name-desc-add'
-          name='label'
-          value={label}
-          maxLength='60'
-          onChange={e => onHandleInputChange(e, 'addFont')}
-        />
+            <input
+              type='text'
+              id='gfpdf-add-font-name-input'
+              className={!validateLabel ? 'input-label-validation-error' : ''}
+              aria-describedby='gfpdf-font-name-desc-add'
+              name='label'
+              value={label}
+              maxLength='60'
+              onChange={e => onHandleInputChange(e, 'addFont')}
+            />
 
-        <div aria-live='polite'>
-          {!validateLabel && (
-            <span className='required' role='alert'>
-              <em>{GFPDF.fontManagerFontNameValidationError}</em>
-            </span>
-          )}
-        </div>
+            <div aria-live='polite'>
+              {!validateLabel && (
+                <span className='required' role='alert'>
+                  <em>{GFPDF.fontManagerFontNameValidationError}</em>
+                </span>
+              )}
+            </div>
 
-        <label id='gfpdf-font-files-label-add' aria-labelledby='gfpdf-font-files-description-add'>{GFPDF.fontManagerFontFilesLabel}</label>
+            <label id='gfpdf-font-files-label-add' aria-labelledby='gfpdf-font-files-description-add'>{GFPDF.fontManagerFontFilesLabel}</label>
 
-        <p id='gfpdf-font-files-description-add'>{GFPDF.fontManagerFontFilesDesc}</p>
+            <p id='gfpdf-font-files-description-add'>{GFPDF.fontManagerFontFilesDesc}</p>
 
-        <FontVariant
-          state='addFont'
-          fontStyles={fontStyles}
-          validateRegular={validateRegular}
-          onHandleUpload={onHandleUpload}
-          onHandleDeleteFontStyle={onHandleDeleteFontStyle}
-          msg={msg}
-        />
+            <FontVariant
+              state='addFont'
+              fontStyles={fontStyles}
+              validateRegular={validateRegular}
+              onHandleUpload={onHandleUpload}
+              onHandleDeleteFontStyle={onHandleDeleteFontStyle}
+              msg={msg}
+            />
 
-        <AddUpdateFontFooter
-          state='addFont'
-          msg={msg}
-          loading={loading}
-        />
-      </form>
+            <AddUpdateFontFooter
+              state='addFont'
+              msg={msg}
+              loading={loading}
+            />
+          </form>
+        </>
+      )}
     </div>
   )
 }
@@ -113,7 +119,8 @@ AddFont.propTypes = {
   validateRegular: PropTypes.bool.isRequired,
   fontStyles: PropTypes.object.isRequired,
   msg: PropTypes.object.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  isUpdating: PropTypes.bool.isRequired
 }
 
 export default AddFont

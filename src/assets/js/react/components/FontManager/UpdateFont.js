@@ -31,6 +31,7 @@ import AddUpdateFontFooter from './AddUpdateFontFooter'
  * @param disableUpdateButton
  * @param msg
  * @param loading
+ * @param isUpdating
  *
  * @since 6.0
  */
@@ -49,64 +50,69 @@ export const UpdateFont = (
     validateRegular,
     disableUpdateButton,
     msg,
-    loading
+    loading,
+    isUpdating
   }
 ) => {
   const fontNameLabel = sprintf(GFPDF.fontManagerFontNameLabel, '<span class=\'required\'>', '</span>')
 
   return (
     <div data-test='component-UpdateFont' className='update-font'>
-      <form onSubmit={onHandleSubmit}>
-        <h2>{GFPDF.fontManagerUpdateTitle}</h2>
+      {isUpdating && (
+        <>
+          <form onSubmit={onHandleSubmit}>
+            <h2>{GFPDF.fontManagerUpdateTitle}</h2>
 
-        <p>{GFPDF.fontManagerUpdateDesc}</p>
+            <p>{GFPDF.fontManagerUpdateDesc}</p>
 
-        <label htmlFor='gfpdf-font-name-input' dangerouslySetInnerHTML={{ __html: fontNameLabel }} />
+            <label htmlFor='gfpdf-font-name-input' dangerouslySetInnerHTML={{ __html: fontNameLabel }} />
 
-        <p id='gfpdf-font-name-desc-update'>{GFPDF.fontManagerFontNameDesc}</p>
+            <p id='gfpdf-font-name-desc-update'>{GFPDF.fontManagerFontNameDesc}</p>
 
-        <input
-          type='text'
-          id='gfpdf-update-font-name-input'
-          className={!validateLabel ? 'input-label-validation-error' : ''}
-          aria-describedby='gfpdf-font-name-desc-update'
-          name='label'
-          value={label}
-          maxLength='60'
-          onChange={e => onHandleInputChange(e, 'updateFont')}
-        />
+            <input
+              type='text'
+              id='gfpdf-update-font-name-input'
+              className={!validateLabel ? 'input-label-validation-error' : ''}
+              aria-describedby='gfpdf-font-name-desc-update'
+              name='label'
+              value={label}
+              maxLength='60'
+              onChange={e => onHandleInputChange(e, 'updateFont')}
+            />
 
-        <div aria-live='polite'>
-          {!validateLabel && (
-            <span className='required' role='alert'>
-              <em>{GFPDF.fontManagerFontNameValidationError}</em>
-            </span>
-          )}
-        </div>
+            <div aria-live='polite'>
+              {!validateLabel && (
+                <span className='required' role='alert'>
+                  <em>{GFPDF.fontManagerFontNameValidationError}</em>
+                </span>
+              )}
+            </div>
 
-        <label id='gfpdf-font-files-label-update' aria-labelledby='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesLabel}</label>
+            <label id='gfpdf-font-files-label-update' aria-labelledby='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesLabel}</label>
 
-        <p id='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesDesc}</p>
+            <p id='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesDesc}</p>
 
-        <FontVariant
-          state='updateFont'
-          fontStyles={fontStyles}
-          validateRegular={validateRegular}
-          onHandleUpload={onHandleUpload}
-          onHandleDeleteFontStyle={onHandleDeleteFontStyle}
-          msg={msg}
-        />
+            <FontVariant
+              state='updateFont'
+              fontStyles={fontStyles}
+              validateRegular={validateRegular}
+              onHandleUpload={onHandleUpload}
+              onHandleDeleteFontStyle={onHandleDeleteFontStyle}
+              msg={msg}
+            />
 
-        <AddUpdateFontFooter
-          id={id}
-          label={label}
-          disabled={disableUpdateButton}
-          onHandleCancelEditFont={onHandleCancelEditFont}
-          onHandleCancelEditFontKeypress={onHandleCancelEditFontKeypress}
-          msg={msg}
-          loading={loading}
-        />
-      </form>
+            <AddUpdateFontFooter
+              id={id}
+              label={label}
+              disabled={disableUpdateButton}
+              onHandleCancelEditFont={onHandleCancelEditFont}
+              onHandleCancelEditFontKeypress={onHandleCancelEditFontKeypress}
+              msg={msg}
+              loading={loading}
+            />
+          </form>
+        </>
+      )}
     </div>
   )
 }
@@ -130,7 +136,8 @@ UpdateFont.propTypes = {
   disableUpdateButton: PropTypes.bool.isRequired,
   fontStyles: PropTypes.object.isRequired,
   msg: PropTypes.object.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  isUpdating: PropTypes.bool.isRequired
 }
 
 export default UpdateFont
