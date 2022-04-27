@@ -27,7 +27,6 @@ import TemplateTooltip from './TemplateTooltip'
  * @param success
  * @param error
  * @param loading
- * @param tabIndex
  *
  * @since 6.0
  */

@@ -21,6 +21,7 @@ import FontVariantLabel from './FontVariantLabel'
  * @param onHandleUpload
  * @param onHandleDeleteFontStyle
  * @param error
+ * @param disabled
  *
  * @since 6.0
  */
@@ -30,7 +31,8 @@ export const FontVariant = ({
   validateRegular,
   onHandleUpload,
   onHandleDeleteFontStyle,
-  msg: { error }
+  msg: { error },
+  disabled
 }) => (
   <div data-test='component-FontVariant' id='gfpdf-font-files-setting'>
     {Object.entries(fontStyles).map(([key, font]) => {
@@ -55,6 +57,7 @@ export const FontVariant = ({
           accept='.ttf'
           onDrop={acceptedFiles => onHandleUpload(key, acceptedFiles[0], state)}
           multiple={false}
+          disabled={disabled}
         >
           {({ getRootProps, getInputProps }) => (
             <a
@@ -108,7 +111,8 @@ FontVariant.propTypes = {
   validateRegular: PropTypes.bool.isRequired,
   onHandleUpload: PropTypes.func.isRequired,
   onHandleDeleteFontStyle: PropTypes.func.isRequired,
-  msg: PropTypes.object.isRequired
+  msg: PropTypes.object.isRequired,
+  disabled: PropTypes.bool
 }
 
 export default FontVariant

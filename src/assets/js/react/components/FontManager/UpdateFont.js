@@ -58,61 +58,59 @@ export const UpdateFont = (
 
   return (
     <div data-test='component-UpdateFont' className='update-font'>
-      {isUpdating && (
-        <>
-          <form onSubmit={onHandleSubmit}>
-            <h2>{GFPDF.fontManagerUpdateTitle}</h2>
+      <form onSubmit={onHandleSubmit}>
+        <h2>{GFPDF.fontManagerUpdateTitle}</h2>
 
-            <p>{GFPDF.fontManagerUpdateDesc}</p>
+        <p>{GFPDF.fontManagerUpdateDesc}</p>
 
-            <label htmlFor='gfpdf-font-name-input' dangerouslySetInnerHTML={{ __html: fontNameLabel }} />
+        <label htmlFor='gfpdf-font-name-input' dangerouslySetInnerHTML={{ __html: fontNameLabel }} />
 
-            <p id='gfpdf-font-name-desc-update'>{GFPDF.fontManagerFontNameDesc}</p>
+        <p id='gfpdf-font-name-desc-update'>{GFPDF.fontManagerFontNameDesc}</p>
 
-            <input
-              type='text'
-              id='gfpdf-update-font-name-input'
-              className={!validateLabel ? 'input-label-validation-error' : ''}
-              aria-describedby='gfpdf-font-name-desc-update'
-              name='label'
-              value={label}
-              maxLength='60'
-              onChange={e => onHandleInputChange(e, 'updateFont')}
-            />
+        <input
+          type='text'
+          id='gfpdf-update-font-name-input'
+          className={!validateLabel ? 'input-label-validation-error' : ''}
+          aria-describedby='gfpdf-font-name-desc-update'
+          name='label'
+          value={label}
+          maxLength='60'
+          onChange={e => onHandleInputChange(e, 'updateFont')}
+          disabled={!isUpdating}
+        />
 
-            <div aria-live='polite'>
-              {!validateLabel && (
-                <span className='required' role='alert'>
-                  <em>{GFPDF.fontManagerFontNameValidationError}</em>
-                </span>
-              )}
-            </div>
+        <div aria-live='polite'>
+          {!validateLabel && (
+            <span className='required' role='alert'>
+              <em>{GFPDF.fontManagerFontNameValidationError}</em>
+            </span>
+          )}
+        </div>
 
-            <label id='gfpdf-font-files-label-update' aria-labelledby='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesLabel}</label>
+        <label id='gfpdf-font-files-label-update' aria-labelledby='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesLabel}</label>
 
-            <p id='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesDesc}</p>
+        <p id='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesDesc}</p>
 
-            <FontVariant
-              state='updateFont'
-              fontStyles={fontStyles}
-              validateRegular={validateRegular}
-              onHandleUpload={onHandleUpload}
-              onHandleDeleteFontStyle={onHandleDeleteFontStyle}
-              msg={msg}
-            />
+        <FontVariant
+          state='updateFont'
+          fontStyles={fontStyles}
+          validateRegular={validateRegular}
+          onHandleUpload={onHandleUpload}
+          onHandleDeleteFontStyle={onHandleDeleteFontStyle}
+          msg={msg}
+          disabled={!isUpdating}
+        />
 
-            <AddUpdateFontFooter
-              id={id}
-              label={label}
-              disabled={disableUpdateButton}
-              onHandleCancelEditFont={onHandleCancelEditFont}
-              onHandleCancelEditFontKeypress={onHandleCancelEditFontKeypress}
-              msg={msg}
-              loading={loading}
-            />
-          </form>
-        </>
-      )}
+        <AddUpdateFontFooter
+          id={id}
+          label={label}
+          disabled={disableUpdateButton || !isUpdating}
+          onHandleCancelEditFont={onHandleCancelEditFont}
+          onHandleCancelEditFontKeypress={onHandleCancelEditFontKeypress}
+          msg={msg}
+          loading={loading}
+        />
+      </form>
     </div>
   )
 }
