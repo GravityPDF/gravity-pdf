@@ -1615,7 +1615,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$size  = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<input type="text" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
+		$html .= '<input type="text" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required;
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
@@ -1657,7 +1657,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		$html .= '<label for="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="screen-reader-text"> ' . esc_html( $args['name'] ) . ' ' . esc_html__( 'license key', 'gravity-forms-pdf-extended' ) . '</label>';
-		$html .= '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="gfpdf_settings_' . esc_attr( $args['id'] ) . '" name="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
+		$html .= '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="gfpdf_settings_' . esc_attr( $args['id'] ) . '" name="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" value="' . esc_attr( $value['key'] ) . '" />';
 
 		/* Add renewal info */
 		if ( $is_active ) {
@@ -1708,7 +1708,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$size  = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
+		$html .= '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required;
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
@@ -1748,7 +1748,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
-		$html .= '>' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+		$html .= '>' . esc_textarea( $value ) . '</textarea>';
 
 		/* Check if the field should include a toggle option */
 		$toggle = ( ! empty( $args['toggle'] ) ) ? $args['toggle'] : false;
@@ -1925,7 +1925,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			ob_start();
 			echo '<span class="mt-gfpdf_settings_' . $args['id'] . ' mt-gfpdf-merge-tag-selector-container"></span>';
 			wp_editor(
-				stripslashes( $value ),
+				$value,
 				'gfpdf_settings_' . $args['id'],
 				apply_filters(
 					'gfpdf_rich_editor_settings',
@@ -1940,7 +1940,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			);
 			$html .= ob_get_clean();
 		} else {
-			$html .= '<textarea class="large-text" rows="' . $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+			$html .= '<textarea class="large-text" rows="' . $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( $value ) . '</textarea>';
 		}
 
 		/* Check if the field should include a toggle option */
@@ -1979,7 +1979,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$size                 = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 
 		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<div class="gfpdf-upload-setting-container"><input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required . ' />';
+		$html .= '<div class="gfpdf-upload-setting-container"><input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
 		$html .= '<input type="button" class="gfpdf_settings_upload_button button-secondary" data-uploader-title="' . $uploader_title . '" data-uploader-button-text="' . $uploader_button_text . '" value="' . $button_text . '" /></div>';
 		$html .= wp_kses_post( $args['desc2'] );
 
@@ -2123,7 +2123,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$args['id'] = esc_attr( $args['id'] );
 
-		$html = '<input type="hidden" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"';
+		$html = '<input type="hidden" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '"';
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
@@ -2157,8 +2157,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$size        = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 
 		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . esc_attr( $args['id'] ) . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= esc_html__( 'Width', 'gravity-forms-pdf-extended' ) . ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" style="width: 6rem" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" /> &nbsp;';
-		$html .= esc_html__( 'Height', 'gravity-forms-pdf-extended' ) . ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="0" style="width: 6rem" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" /> &nbsp;';
+		$html .= esc_html__( 'Width', 'gravity-forms-pdf-extended' ) . ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" style="width: 6rem" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( $value[0] ) . '" /> &nbsp;';
+		$html .= esc_html__( 'Height', 'gravity-forms-pdf-extended' ) . ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="0" style="width: 6rem" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( $value[1] ) . '" /> &nbsp;';
 
 		$measurement = apply_filters(
 			'gfpdf_paper_size_dimensions',
@@ -2170,7 +2170,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$html .= ' <select id="gfpdf_settings[' . $args['id'] . ']_measurement" style="width: 6rem" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . '][]" data-placeholder="' . $placeholder . '">';
 
-		$measure_value = esc_attr( stripslashes( $value[2] ) );
+		$measure_value = esc_attr( $value[2] );
 		foreach ( $measurement as $key => $val ) {
 			$selected = ( $measure_value === $key ) ? 'selected="selected"' : '';
 			$html    .= '<option value="' . $key . '" ' . $selected . '>' . $val . '</option>';
