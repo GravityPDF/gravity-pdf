@@ -187,7 +187,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @see Helper_Abstract_Pdf_Shortcode::gravitypdf_process_during_merge_tag_replacement()
 	 */
 	public function gravitypdf_confirmation( $confirmation, $form, $entry ) {
-		return $confirmation;
+		return $this->gravitypdf_process_during_merge_tag_replacement( $confirmation, $form, $entry );
 	}
 
 	/**
@@ -205,6 +205,10 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @see Helper_Abstract_Pdf_Shortcode::gravitypdf_process_during_merge_tag_replacement()
 	 */
 	public function gravitypdf_notification( $notification, $form, $entry ) {
+		if ( is_array( $notification ) && isset( $notification['message'] ) ) {
+			$notification['message'] = $this->gravitypdf_process_during_merge_tag_replacement( $notification['message'], $form, $entry );
+		}
+
 		return $notification;
 	}
 
