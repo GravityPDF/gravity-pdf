@@ -1,4 +1,9 @@
-import { fieldLabel } from '../../utilities/page-model/helpers/field'
+import {
+  fieldLabel,
+  mergeTagsWrapper,
+  filenameGroupOption,
+  filenameOptionItem
+} from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -23,15 +28,15 @@ test('should check that merge tags list option exist', async t => {
 
   // Assertions
   await t
-    .expect(run.listItems.count).eql(26)
-    .expect(run.groupHeader1.exists).ok()
-    .expect(run.optionA.exists).ok()
-    .expect(run.optionB.exists).ok()
-    .expect(run.groupHeader2.exists).ok()
-    .expect(run.optionC.exists).ok()
-    .expect(run.optionD.exists).ok()
-    .expect(run.groupHeader3.exists).ok()
-    .expect(run.optionE.exists).ok()
+    .expect(mergeTagsWrapper('gfpdf-settings-field-wrapper-filename').find('li').count).gt(0)
+    .expect(filenameGroupOption('Optional form fields').exists).ok()
+    .expect(filenameOptionItem('Text').exists).ok()
+    .expect(filenameOptionItem('Name (Prefix)').exists).ok()
+    .expect(filenameGroupOption('Other').exists).ok()
+    .expect(filenameOptionItem('User IP Address').exists).ok()
+    .expect(filenameOptionItem('Date (mm/dd/yyyy)').exists).ok()
+    .expect(filenameGroupOption('Custom').exists).ok()
+    .expect(filenameOptionItem('PDF: Sample').exists).ok()
 })
 
 test('should save selected merge tags', async t => {
@@ -42,9 +47,9 @@ test('should save selected merge tags', async t => {
     .pressKey('ctrl+a')
     .pressKey('backspace')
     .click(run.filenameMergeTagsOptionList)
-    .click(run.optionA)
+    .click(filenameOptionItem('Text'))
     .click(run.filenameMergeTagsOptionList)
-    .click(run.optionB)
+    .click(filenameOptionItem('Name (Prefix)'))
     .click(run.saveSettings)
     .expect(run.filenameInputBox.value).eql('{Text:1}{Name (Prefix):2.2}')
     .click(run.filenameInputBox)

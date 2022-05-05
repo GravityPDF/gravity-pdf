@@ -1,4 +1,9 @@
-import { fieldLabel } from '../../utilities/page-model/helpers/field'
+import {
+  fieldLabel,
+  mergeTagsWrapper,
+  passwordGroupOption,
+  passwordOptionItem
+} from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -27,15 +32,15 @@ test('should check that merge tags list option exist', async t => {
 
   // Assertions
   await t
-    .expect(run.listItems.count).eql(26)
-    .expect(run.groupHeader1.exists).ok()
-    .expect(run.optionA.exists).ok()
-    .expect(run.optionB.exists).ok()
-    .expect(run.groupHeader2.exists).ok()
-    .expect(run.optionC.exists).ok()
-    .expect(run.optionD.exists).ok()
-    .expect(run.groupHeader3.exists).ok()
-    .expect(run.optionE.exists).ok()
+    .expect(mergeTagsWrapper('gfpdf-settings-field-wrapper-password').find('li').count).gt(0)
+    .expect(passwordGroupOption('Optional form fields').exists).ok()
+    .expect(passwordOptionItem('Text').exists).ok()
+    .expect(passwordOptionItem('Name (Prefix)').exists).ok()
+    .expect(passwordGroupOption('Other').exists).ok()
+    .expect(passwordOptionItem('User IP Address').exists).ok()
+    .expect(passwordOptionItem('Date (mm/dd/yyyy)').exists).ok()
+    .expect(passwordGroupOption('Custom').exists).ok()
+    .expect(passwordOptionItem('PDF: Sample').exists).ok()
 })
 
 test('should save selected merge tags', async t => {
@@ -45,11 +50,11 @@ test('should save selected merge tags', async t => {
     .click(run.formatStandardCheckbox)
     .click(run.enablePdfSecurityCheckbox)
     .click(run.passwordMergeTagsOptionList)
-    .click(run.optionA)
+    .click(passwordOptionItem('Text'))
     .click(run.passwordMergeTagsOptionList)
-    .click(run.optionB)
+    .click(passwordOptionItem('Name (Prefix)'))
     .click(run.saveSettings)
-    .expect(run.passwordInputBox.value).eql('{Text:1}{Name (Prefix):2.2}')
+    .expect(run.passwordInputBox.value).contains('{Text:1}{Name (Prefix):2.2}')
     .click(run.passwordInputBox)
     .pressKey('ctrl+a')
     .pressKey('backspace')

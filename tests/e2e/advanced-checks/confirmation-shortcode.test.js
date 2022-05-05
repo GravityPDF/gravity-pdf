@@ -1,6 +1,6 @@
 import { Selector, RequestLogger } from 'testcafe'
 import { baseURL } from '../auth'
-import { dropdownOption, link } from '../utilities/page-model/helpers/field'
+import { button, link } from '../utilities/page-model/helpers/field'
 import AdvancedCheck from '../utilities/page-model/helpers/advanced-check'
 import Page from '../utilities/page-model/helpers/page'
 
@@ -65,9 +65,11 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
   await t
     .click(run.confirmationPageCheckbox)
     .click(run.confirmationPageSelectBox)
-    .click(dropdownOption('Test page'))
+    .click(button('Test page'))
   await t
     .click(run.queryStringInputBox)
+    .pressKey('ctrl+a')
+    .pressKey('backspace')
     .typeText(run.queryStringInputBox, 'entry={entry_id}', { paste: true })
     .click(run.saveConfirmationButton)
     .click(run.previewLink)
@@ -104,7 +106,6 @@ test('should check if the shortcode confirmation type REDIRECT download is worki
   await t
     .typeText(run.formInputField, 'test', { paste: true })
     .click(run.submitButton)
-    .wait(2000)
     .addRequestHooks(downloadLogger)
   await run.responseStatus(downloadLogger._internalRequests, 1)
 

@@ -72,24 +72,24 @@ class Pdf {
 
     // Template - Header field
     this.headerWpEditorBox = Selector('#gfpdf-settings-field-wrapper-header').find('[id="wp-gfpdf_settings_header-editor-container"]')
-    this.headerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-header').find('button').withText('Text')
+    this.headerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-header').find('.wp-editor-tabs').find('button').withText('Text')
     this.headerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-header').find('[class^="gfpdf_settings_header"]')
 
     // Template - First Page Header field
     this.firstPageHeaderCheckbox = Selector('#gfpdf-settings-field-wrapper-first_header').find('[class^="gfpdf-input-toggle"]')
     this.firstPageHeaderWpEditorBox = Selector('#gfpdf-settings-field-wrapper-first_header').find('[id="wp-gfpdf_settings_first_header-editor-container"]')
-    this.firstPageHeaderWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_header').find('button').withText('Text')
+    this.firstPageHeaderWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_header').find('.wp-editor-tabs').find('button').withText('Text')
     this.firstPageHeaderWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_header').find('[class^="gfpdf_settings_first_header"]')
 
     // Template - Footer field
     this.footerWpEditorBox = Selector('#gfpdf-settings-field-wrapper-footer').find('[id="wp-gfpdf_settings_footer-editor-container"]')
-    this.footerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-footer').find('button').withText('Text')
+    this.footerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-footer').find('.wp-editor-tabs').find('button').withText('Text')
     this.footerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-footer').find('[class^="gfpdf_settings_footer"]')
 
     // Template - First Page Footer field
     this.firstPageFooterCheckbox = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[class^="gfpdf-input-toggle"]')
     this.firstPageFooterWpEditorBox = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[id="wp-gfpdf_settings_first_footer-editor-container"]')
-    this.firstPageFooterWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_footer').find('button').withText('Text')
+    this.firstPageFooterWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_footer').find('.wp-editor-tabs').find('button').withText('Text')
     this.firstPageFooterWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[class^="gfpdf_settings_first_footer"]')
 
     // Advanced - Format field
@@ -129,17 +129,6 @@ class Pdf {
 
     // Advanced - Restrict Owner field
     this.restrictOwnerCheckbox = Selector('#gfpdf-settings-field-wrapper-restrict_owner').find('[id="gfpdf_settings[restrict_owner]"]')
-
-    // Merge Tags
-    this.listItems = Selector('#gf_merge_tag_list').find('li')
-    this.groupHeader1 = Selector('.group-header').withText('Optional form fields')
-    this.optionA = Selector('li').withText('Text')
-    this.optionB = Selector('li').withText('Name (Prefix)')
-    this.groupHeader2 = Selector('.group-header').withText('Other')
-    this.optionC = Selector('li').withText('User IP Address')
-    this.optionD = Selector('li').withText('Date (mm/dd/yyyy)')
-    this.groupHeader3 = Selector('.group-header').withText('Custom')
-    this.optionE = Selector('li').withText('PDF: Sample')
   }
 
   async navigatePdfSection (text) {

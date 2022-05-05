@@ -8,7 +8,9 @@ fixture`PDF advanced settings - Privileges field test`
 test('should display \'Privileges\' field', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t.click(run.formatStandardCheckbox)
+  await t
+    .click(run.formatStandardCheckbox)
+    .click(run.enablePdfSecurityCheckbox)
 
   // Assertions
   await t

@@ -28,7 +28,7 @@ class Page {
     await t
       .click(link('.wrap', 'Add New'))
       .click(this.closePopupButton)
-      .typeText(this.titleField, 'Test page', { paste: true })
+      .typeText(this.titleField, 'Test page')
       .click(this.publishButton)
       .click(this.confirmPublishButton)
   }
