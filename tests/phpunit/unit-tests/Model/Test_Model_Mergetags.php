@@ -69,25 +69,6 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 		$this->assertEquals( '{My First PDF Template (copy):pdf:556690c67856b}', $tags[1]['tag'] );
 	}
 
-	/**
-	 * Check we correctly convert our PDF mergetag with permalinks disabled
-	 *
-	 * @param string $expected
-	 * @param string $text
-	 * @param bool   $encode
-	 *
-	 * @dataProvider provider_standard_pdf_mergetags_no_permalinks
-	 * @dataProvider provider_modifier_pdf_mergetags_no_permalinks
-	 */
-	public function test_process_pdf_mergetags( $expected, $text, $encode = true ) {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
-
-		$results = $this->model->process_pdf_mergetags( $text, $form, $entry, $encode );
-
-		$this->assertEquals( $expected, $results );
-	}
-
 	public function provider_standard_pdf_mergetags_no_permalinks(): array {
 		return [
 
@@ -223,6 +204,25 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
+	}
+
+	/**
+	 * Check we correctly convert our PDF mergetag with permalinks disabled
+	 *
+	 * @param string $expected
+	 * @param string $text
+	 * @param bool   $encode
+	 *
+	 * @dataProvider provider_standard_pdf_mergetags_no_permalinks
+	 * @dataProvider provider_modifier_pdf_mergetags_no_permalinks
+	 */
+	public function test_process_pdf_mergetags( $expected, $text, $encode = true ) {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$results = $this->model->process_pdf_mergetags( $text, $form, $entry, $encode );
+
+		$this->assertEquals( $expected, $results );
 	}
 
 	public function provider_standard_pdf_mergetags_permalinks(): array {
@@ -419,4 +419,70 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 			[ '{Label:pdf:556690c67856b:signed,5 months:download:print}' ],
 		];
 	}
+
+	public function test_add_field_map_choices() {
+		$form          = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$test_fields[] = [
+			'label'   => 'Entry Properties',
+			'choices' => [],
+		];
+		$fields        = $this->model->add_field_map_choices( $test_fields, $form['id'], [], [] );
+		$pdfs          = $fields[1]['choices'];
+
+		$this->assertCount( 12, $pdfs );
+
+		$this->assertContainsEquals( 'My First PDF Template', $pdfs[0] );
+		$this->assertContainsEquals( '{My First PDF Template:pdf:555ad84787d7e}', $pdfs[0] );
+
+		$this->assertContainsEquals( 'My First PDF Template Signed (+1 week)', $pdfs[1] );
+		$this->assertContainsEquals( '{My First PDF Template:pdf:555ad84787d7e:signed,1 week}', $pdfs[1] );
+
+		$this->assertContainsEquals( 'My First PDF Template Signed (+1 month)', $pdfs[2] );
+		$this->assertContainsEquals( '{My First PDF Template:pdf:555ad84787d7e:signed,1 month}', $pdfs[2] );
+
+		$this->assertContainsEquals( 'My First PDF Template Signed (+1 year)', $pdfs[3] );
+		$this->assertContainsEquals( '{My First PDF Template:pdf:555ad84787d7e:signed,12 months}', $pdfs[3] );
+	}
+
+	public function test_process_field_value() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$this->assertEmpty( $this->model->process_field_value( '', $form, $entry, '{My First PDF Template:pdf:555ad84787d7e}' ) );
+
+		$this->assertNotFalse( filter_var( $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b}', FILTER_VALIDATE_URL ) ) );
+		$this->assertNotFalse( filter_var( $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b:signed,1 week}', FILTER_VALIDATE_URL ) ) );
+		$this->assertNotFalse( filter_var( $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b:signed,1 month}', FILTER_VALIDATE_URL ) ) );
+		$this->assertNotFalse( filter_var( $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b:signed,12 months}', FILTER_VALIDATE_URL ) ) );
+
+		$this->assertStringNotContainsString( 'signature=', $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b}' ) );
+		$this->assertStringContainsString( 'signature=', $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b:signed,1 week}' ) );
+		$this->assertStringContainsString( 'signature=', $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b:signed,1 month}' ) );
+		$this->assertStringContainsString( 'signature=', $this->model->process_field_value( '', $form, $entry, '{My First PDF Template (copy):pdf:556690c67856b:signed,12 months}' ) );
+
+	}
+
+	/* Test if fields does not contain Entry Properties label. */
+	public function test_empty_field_map_choices() {
+		$form   = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$fields = $this->model->add_field_map_choices( [], $form['id'], [], [] );
+		$this->assertEmpty( $fields );
+	}
+
+	/* Test if there are no pdf template included on the form . */
+	public function test_no_pdf_template() {
+		$form          = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$test_fields[] = [
+			'label'   => 'Entry Properties',
+			'choices' => [],
+		];
+
+		foreach ( \GPDFAPI::get_form_pdfs( $form['id'] ) as $pdf ) {
+			\GPDFAPI::delete_pdf( $form['id'], $pdf['id'] );
+		}
+
+		$fields = $this->model->add_field_map_choices( $test_fields, $form['id'], [], [] );
+		$this->assertCount( 1, $fields );
+	}
+
 }
