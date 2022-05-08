@@ -462,11 +462,27 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 
 	}
 
-	/* Test of fields does not contain Entry Properties label. */
+	/* Test if fields does not contain Entry Properties label. */
 	public function test_empty_field_map_choices() {
 		$form   = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$fields = $this->model->add_field_map_choices( [], $form['id'], [], [] );
 		$this->assertEmpty( $fields );
+	}
+
+	/* Test if there are no pdf template included on the form . */
+	public function test_no_pdf_template() {
+		$form          = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$test_fields[] = [
+			'label'   => 'Entry Properties',
+			'choices' => [],
+		];
+
+		foreach ( \GPDFAPI::get_form_pdfs( $form['id'] ) as $pdf ) {
+			\GPDFAPI::delete_pdf( $form['id'], $pdf['id'] );
+		}
+
+		$fields = $this->model->add_field_map_choices( $test_fields, $form['id'], [], [] );
+		$this->assertCount( 1, $fields );
 	}
 
 }
