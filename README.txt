@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
-Tested up to: 5.9
-Stable tag: 6.2.1
+Tested up to: 6.0
+Stable tag: 6.3.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -104,6 +104,17 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.3.0 =
+* Feature: Support for mapping PDF URLs to your favorite services using Gravity Forms feeds. This includes (but is not limited to): PayPal, MailChimp, HubSpot, Stripe, Square, ActiveCampaign, Agile CRM, Capsule, CleverReach, Constant Contact, EmailOctopus, Zoho CRM
+* Feature: Support for the Zapier add-on: PDF URLs can now be passed to your zaps
+* Feature: Add [gravitypdf] shortcode rendering support to Gravity Wiz's Entry Block perk
+* Housekeeping: Change "document" icon used for settings menus to the "Gravity PDF" icon
+* Housekeeping: duplicating PDFs on a form will now have the correct alternating background color in the table
+* Housekeeping: Process the [gravitypdf] shortcode when merge tags get processed so that it can be used where ever merge tags are supported
+* Developer: Add new `gfpdf_current_form_object` filter to manipulate the $form array when processing PDFs
+* Bug: Fix a race condition when using Background Processing that could see the PDF deleted before being attached to notifications
+* Bug: Do not strip the backslash character when used in PDF settings
 
 = 6.2.1 =
 * Bug: Always generate a new PDF when using the GPDFAPI::create_pdf() method
