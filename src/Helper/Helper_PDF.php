@@ -197,7 +197,7 @@ class Helper_PDF {
 		$this->misc      = $misc;
 		$this->templates = $templates;
 		$this->log       = $log;
-		$this->form      = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __METHOD__ );
+		$this->form      = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
 
 		$this->set_path();
 	}
