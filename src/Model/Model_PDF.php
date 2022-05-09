@@ -1843,10 +1843,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @internal  In future we may give the option to cache PDFs to save on processing power
 	 *
 	 * @since     4.0
-	 *
-	 * @todo      Add PDF caching support to make software more performant. Need to review correct triggers for a cleanup (API-based, UI actions, 3rd-party add-on compatibility)
 	 */
 	public function cleanup_pdf( $entry, $form ) {
+
+		/* Exit early if background processing is enabled */
+		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
+			return;
+		}
 
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
