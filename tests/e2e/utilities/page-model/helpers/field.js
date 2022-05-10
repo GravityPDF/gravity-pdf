@@ -31,7 +31,7 @@ export function dropdownOption (text) {
 
 // Item in the list
 export function listItem (text) {
-  return Selector('li').withText(text)
+  return Selector('li.gform-dropdown__item').find('span').withText(text)
 }
 
 // Info text
@@ -61,4 +61,27 @@ export function mediaManagerTitle (text) {
 // Add media button
 export function addMediaButton (id, text) {
   return Selector(`#${id}`).find('button').withText(`${text}`)
+}
+
+// Merge tags
+export function mergeTagsWrapper (id) {
+  return Selector(`div#${id}`).find('ul.gform-dropdown__list')
+}
+
+// Merge tags for password
+export function passwordGroupOption (text) {
+  return mergeTagsWrapper('gfpdf-settings-field-wrapper-password').find('li.gform-dropdown__group').withText(`${text}`)
+}
+
+export function passwordOptionItem (text) {
+  return mergeTagsWrapper('gfpdf-settings-field-wrapper-password').find('li').find('button').withText(`${text}`)
+}
+
+// Merge tags for filename
+export function filenameGroupOption (text) {
+  return mergeTagsWrapper('gfpdf-settings-field-wrapper-filename').find('li.gform-dropdown__group').withText(`${text}`)
+}
+
+export function filenameOptionItem (text) {
+  return mergeTagsWrapper('gfpdf-settings-field-wrapper-filename').find('li').find('button').withText(`${text}`)
 }

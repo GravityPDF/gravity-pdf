@@ -4,7 +4,7 @@ import { baseURL } from '../../../auth'
 class License {
   constructor () {
     // Core Booster field
-    this.coreBoosterInputBox = Selector('#gfpdf-fieldset-license_gravity-pdf-core-booster').find('[id="gfpdf_settings[license_gravity-pdf-core-booster]"]')
+    this.samplePluginInputBox = Selector('#gfpdf-fieldset-license_gravity-pdf-example-plugin').find('[id="gfpdf_settings[license_gravity-pdf-example-plugin]"]')
     this.validLicenseKey = '987654321'
     this.invalidLicenseKey = '12345678934535435334'
     this.invalidLicenseKeyMessage = Selector('.gforms_note_error').withText('Invalid license key provided')
@@ -32,8 +32,8 @@ class License {
       .typeText('#user_login', 'admin', { paste: true })
       .typeText('#user_pass', 'password', { paste: true })
       .click('#wp-submit')
-      .click(this.coreBoosterInputBox)
-      .selectText(this.coreBoosterInputBox, 32, 0)
+      .click(this.samplePluginInputBox)
+      .selectText(this.samplePluginInputBox, 32, 0)
       .pressKey('backspace')
   }
 }

@@ -7,7 +7,7 @@ fixture`Form merge tags test`
 
 test('should check if form merge tags is working properly', async t => {
   // Actions
-  await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=4')
+  await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
     .click(advancedCheck.confirmationTextCheckbox)
     .click(advancedCheck.wysiwgEditorTextTab)

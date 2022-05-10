@@ -99,5 +99,5 @@ test('reset/clean PDF templates from the list for the next test', async t => {
   await advanceCheck.navigateDeletePdfEntries('gf_edit_forms&view=settings&subview=PDF&id=1')
 
   // Assertions
-  await t.expect(advanceCheck.templateItem.count).eql(0)
+  await t.expect(advanceCheck.templateItem.innerText).contains('This form doesn\'t have any PDFs.')
 })
