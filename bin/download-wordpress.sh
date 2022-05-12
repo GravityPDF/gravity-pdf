@@ -19,7 +19,7 @@ mkdir -p wordpress/src/wp-content/uploads
 
 # Grab the tools we need for WordPress' local-env.
 
-curl -L "https://github.com/WordPress/wordpress-develop/archive/$LATEST_VERSION.zip" -o ./tmp/wordpress-develop.zip
+curl -L "https://github.com/WordPress/wordpress-develop/archive/refs/heads/6.0.zip" -o ./tmp/wordpress-develop.zip
 unzip -q ./tmp/wordpress-develop.zip -d ./tmp
 mv \
 ./tmp/wordpress-develop-$LATEST_VERSION/tools \
