@@ -14,7 +14,7 @@
   },
   "require": {
     "php": ">=7.3",
-    "mpdf/mpdf": "^8.0.0",
+    "mpdf/mpdf": "8.0.*",
     "querypath/querypath": ">=3.0.0",
     "monolog/monolog": "^2.1.0",
     "codeguy/upload": "^1.3",
