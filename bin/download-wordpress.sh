@@ -22,11 +22,11 @@ mkdir -p wordpress/src/wp-content/uploads
 curl -L "https://github.com/WordPress/wordpress-develop/archive/refs/heads/6.0.zip" -o ./tmp/wordpress-develop.zip
 unzip -q ./tmp/wordpress-develop.zip -d ./tmp
 mv \
-./tmp/wordpress-develop-$LATEST_VERSION/tools \
-./tmp/wordpress-develop-$LATEST_VERSION/tests \
-./tmp/wordpress-develop-$LATEST_VERSION/.env \
-./tmp/wordpress-develop-$LATEST_VERSION/docker-compose.yml \
-./tmp/wordpress-develop-$LATEST_VERSION/wp-cli.yml \
-./tmp/wordpress-develop-$LATEST_VERSION/*config-sample.php \
-./tmp/wordpress-develop-$LATEST_VERSION/package.json \
-./tmp/wordpress-develop-$LATEST_VERSION/package-lock.json wordpress
+./tmp/wordpress-develop-6.0/tools \
+./tmp/wordpress-develop-6.0/tests \
+./tmp/wordpress-develop-6.0/.env \
+./tmp/wordpress-develop-6.0/docker-compose.yml \
+./tmp/wordpress-develop-6.0/wp-cli.yml \
+./tmp/wordpress-develop-6.0/*config-sample.php \
+./tmp/wordpress-develop-6.0/package.json \
+./tmp/wordpress-develop-6.0/package-lock.json wordpress
