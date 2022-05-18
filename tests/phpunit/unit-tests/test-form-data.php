@@ -3,6 +3,7 @@
 namespace GFPDF\Tests;
 
 use GFAPI;
+use GFPDF\Helper\Fields\Field_Repeater;
 use GFPDFEntryDetail;
 use GPDFAPI;
 use WP_UnitTestCase;
@@ -1608,5 +1609,42 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		$this->assertEquals( 'www.test.com', $form_data['repeater'][999][1][99][0][88][0][202] );
 		$this->assertEquals( 'www.test2.com', $form_data['repeater'][999][1][99][0][88][1][202] );
+	}
+
+
+	/**
+	 * Test the Gravity Forms Repeater field form data
+	 *
+	 * @throws \Exception
+	 */
+	public function test_repeater_maybe_show_section_title() {
+		$form             = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-empty-form.json' ) ), true );
+		$entry            = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-empty-entry.json' ) ), true );
+		$form_id          = GFAPI::add_form( $form );
+		$entry['form_id'] = $form_id;
+		$entry_id         = GFAPI::add_entry( $entry );
+		GFAPI::add_entry( $entry );
+		/* Test URL field */
+		$repeater_field = new \GF_Field_Repeater( $form["fields"][1]["fields"][2]["fields"][2]["fields"][0] );
+
+		$repeater = new Field_Repeater( $repeater_field, GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+		/* Overide $values to customize tests. */
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, [ '', null ], $repeater->field ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, [ '', '', null ], $repeater->field ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, null, $repeater->field ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, null, $repeater->field ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, [ false, null ], $repeater->field ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, false, $repeater->field ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, false, $repeater->field ) );
+
+
+		$repeater = new Field_Repeater( $repeater_field, GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, [ 'test.url', 'test2.url', '' ], $repeater->field ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, [ 'test.url', '' ], $repeater->field ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, [ 'test.url', '', 'test2.url' ], $repeater->field ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, [ null, null, '', false, 'test.url' ], $repeater->field ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, true, $repeater->field ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, [ 'test.url', 'test2.url' ], $repeater->field ) );
+
 	}
 }

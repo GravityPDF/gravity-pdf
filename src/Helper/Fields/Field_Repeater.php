@@ -168,7 +168,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		/* Output the Repeater Label if a sub Repeater */
-		if ( ! $is_top_level ) {
+		if ( $this->maybe_show_section_title( $is_top_level, $value, $field ) ) {
 			echo sprintf( '<div class="gfpdf-section-title"><h3>%s</h3></div>', esc_html( $field->label ) );
 		}
 
@@ -187,7 +187,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 				if ( $sub_field instanceof GF_Field_Repeater ) {
 
 					/* Only recursively output if a value exists */
-					if ( isset( $item[ $sub_field->id ] ) ) {
+					if ( ! empty( $item[ $sub_field->id ] ) ) {
 						echo '<div class="repeater-container">';
 						$this->get_repeater_html( $item[ $sub_field->id ], $sub_field );
 						echo '</div>';
@@ -248,5 +248,13 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$this->cache( $this->get_value() );
 
 		return $this->cache();
+
+	}
+
+	public function maybe_show_section_title( $is_top_level, $value, $field ) {
+		if ( ! $is_top_level && ! $field->empty_deep( $value ) ) {
+			return true;
+		}
+		return false;
 	}
 }
