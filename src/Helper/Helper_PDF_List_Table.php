@@ -360,7 +360,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
 		$actions = [
-			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
+			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
 			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . esc_attr( $item['id'] ) . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '" href="#">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
 			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . esc_attr( $item['id'] ) . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '" href="#">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 		];
@@ -370,7 +370,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		?>
 
-		<a href="<?= $edit_url; ?>" aria-label="<?= esc_attr( sprintf( __( '%s PDF', 'gravity-forms-pdf-extended' ), $pdf_name ) ) ?>"><strong><?= esc_html( $pdf_name ) ?></strong></a>
+		<a href="<?= esc_url( $edit_url ); ?>" aria-label="<?= esc_attr( sprintf( __( '%s PDF', 'gravity-forms-pdf-extended' ), $pdf_name ) ) ?>"><strong><?= esc_html( $pdf_name ) ?></strong></a>
 		<div class="row-actions">
 
 			<?php
@@ -400,7 +400,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function no_items() {
 		echo '<label>';
-		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( [ 'pid' => 0 ] ) . "'>", '</a>' );
+		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-forms-pdf-extended' ), "<a href='" . esc_url( add_query_arg( [ 'pid' => 0 ] ) ) . "'>", '</a>' );
 		echo '</label>';
 
 	}
