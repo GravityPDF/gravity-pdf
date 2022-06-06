@@ -127,7 +127,7 @@ abstract class Helper_Abstract_Fields {
 
 		$this->field = $field;
 		$this->entry = $entry;
-		$this->form  = $gform->get_form( $entry['form_id'] );
+		$this->form  = apply_filters( 'gfpdf_current_form_object', $gform->get_form( $entry['form_id'] ), $entry, 'helper_abstract_fields' );
 		$this->gform = $gform;
 
 	}
