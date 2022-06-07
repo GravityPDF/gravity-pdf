@@ -29,7 +29,7 @@ npm run env cli plugin activate gravityforms gravity-forms-pdf-extended
 npm run env cli option add rg_gforms_key $GF_LICENSE
 
 # Misc
-bash ./bin/db.sh
+bash ./bin/install-database.sh
 
 # Output Connection Details
 CURRENTURL=$(npm run --silent env cli option get siteurl)
