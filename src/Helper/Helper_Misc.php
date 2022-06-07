@@ -350,12 +350,13 @@ class Helper_Misc {
 	 * equivalent to Bash: rm -r $dir
 	 *
 	 * @param string $dir The path to be deleted
+	 * @param bool   $delete_top_level_dir Add ability to leave the top-level directory as-is. Added in 6.3.1
 	 *
 	 * @return bool|WP_Error
 	 *
 	 * @since 4.0
 	 */
-	public function rmdir( $dir ) {
+	public function rmdir( $dir, bool $delete_top_level_dir = true ) {
 
 		$this->log->notice( sprintf( 'Begin deleting directory recursively: %s', $dir ) );
 
@@ -367,11 +368,12 @@ class Helper_Misc {
 
 			foreach ( $files as $fileinfo ) {
 				$function = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
-				if ( ! $function( $fileinfo->getRealPath() ) ) {
-					throw new Exception( 'Could not run ' . $function . ' on  ' . $fileinfo->getRealPath() );
+				$real_path = $fileinfo->getRealPath();
+				if ( ! $function( $real_path ) ) {
+					throw new Exception( 'Could not run ' . $function . ' on  ' . $real_path );
 				}
 
-				$this->log->notice( sprintf( 'Successfully ran `%s` on %s', $function, $fileinfo->getRealPath() ) );
+				$this->log->notice( sprintf( 'Successfully ran `%s` on %s', $function, $real_path ) );
 			}
 		} catch ( Exception $e ) {
 			$this->log->error(
@@ -385,9 +387,12 @@ class Helper_Misc {
 			return new WP_Error( 'recursion_delete_problem', $e );
 		}
 
-		$results = rmdir( $dir );
-		if ( ! $results ) {
-			$this->log->error( sprintf( 'Could not delete the top-level directory: %s', $dir ) );
+		$results = true;
+		if ( $delete_top_level_dir ) {
+			$results = rmdir( $dir );
+			if ( ! $results ) {
+				$this->log->error( sprintf( 'Could not delete the top-level directory: %s', $dir ) );
+			}
 		}
 
 		$this->log->notice( sprintf( 'End deleting directory recursively: %s', $dir ) );
@@ -396,15 +401,16 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Wrapper function for rmdir() which ensures the directory gets automatically recreated after being deleted
+	 * Wrapper function for rmdir() which ensures the top-level directory is not deleted
 	 *
 	 * @param string $path
 	 *
 	 * @since 4.0
+	 *
+	 * @internal Changed behaviour in 6.3.1 so the top-level directory is never deleted
 	 */
 	public function cleanup_dir( $path ) {
-		$this->rmdir( $path );
-		wp_mkdir_p( $path );
+		$this->rmdir( $path, false );
 	}
 
 	/**

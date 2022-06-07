@@ -620,7 +620,36 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 
 		/* Check the file was deleted but the directory still exists */
 		$this->assertFileDoesNotExist( $path . 'test' );
-		$this->assertTrue( is_dir( $path ) );
+		$this->assertDirectoryExists( $path );
 
+		rmdir( $path );
+	}
+
+	public function test_rmdir() {
+		/* Create test data */
+		$path = ABSPATH . 'test/';
+		wp_mkdir_p( $path );
+		touch( $path . 'test' );
+
+		/* Ensure it created correctly */
+		$this->assertFileExists( $path . 'test' );
+
+		/* Run our test but don't delete the top-level folder */
+		$this->misc->rmdir( $path, false );
+
+		$this->assertFileDoesNotExist( $path . 'test' );
+		$this->assertDirectoryExists( $path );
+
+		/* Setup and run out test again, but delete the top-level directory as well */
+		touch( $path . 'test' );
+
+		/* Ensure it created correctly */
+		$this->assertFileExists( $path . 'test' );
+
+		/* Run our test and delete the top-level folder */
+		$this->misc->rmdir( $path );
+
+		$this->assertFileDoesNotExist( $path . 'test' );
+		$this->assertDirectoryDoesNotExist( $path );
 	}
 }
