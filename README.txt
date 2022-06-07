@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.0
-Stable tag: 6.3.0
+Stable tag: 6.3.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -49,7 +49,7 @@ Gravity PDF generates PDFs on your web server, so no third-party service receive
 
 Pay for additional PDF designs and functionality [from our online store](https://gravitypdf.com/store/).
 
-* **New Designs** – get access to 9 additional universal designs, 4 invoices, and 3 letter styles
+* **New Designs** – get access to 9 additional universal designs, 6 certificates, 4 invoices, and 3 letter styles
 * **Additional customizations** – watermark PDFs with your own logo or text, control fields that should be displayed per PDF, add field descriptions, display all checkbox or radio field options, add notes, show field values instead of labels, and hide the product table
 * **On-screen Preview** – allow users to preview the PDF before form submission (and optionally payment) so they can see what the end result will be. This is a great feature for capturing e-signatures, selling PDF reports /  certificates / gift cards, or providing an on-screen proof before the PDF is sent to the printers (perfect for business cards).
 * **Bulk Download** - search, filter, and select entries and then zip up all your PDFs and download all together in a convenient zip file
@@ -67,8 +67,6 @@ Need a tailor-made solution for Gravity PDF that solves complex business problem
 = Contribute =
 
 All development for Gravity PDF [is handled via GitHub](https://github.com/GravityPDF/gravity-pdf/). Opening new issues or submitting a pull request is welcome.
-
-[The public roadmap is available on Trello](https://trello.com/b/60YGv1J3/roadmap). We'd love it if you vote and comment on your favorite ideas.
 
 Keep up to date with Gravity PDF by [subscribing to the newsletter](https://gravitypdf.com/signup/), [following us on Twitter](https://twitter.com/gravitypdf) and [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
@@ -104,6 +102,12 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.3.1 =
+* Security: Prevent potential XSS attack by escaping URL returned from add_query_args() on the PDF List or PDF Form Settings pages
+* Developer: Apply `gfpdf_current_form_object` filter added in 6.3.0 to the form object in Helper_Abstract_Fields.php using the $type `helper_abstract_fields`.
+* Bug: Correctly display the file path in the logs when cleaning up PDFs from disk or flushing the mPDF cache
+* Performance: reduce I/O operations when flushing the mPDF cache by excluding the top-level directory
 
 = 6.3.0 =
 * Feature: Support for mapping PDF URLs to your favorite services using Gravity Forms feeds. This includes (but is not limited to): PayPal, MailChimp, HubSpot, Stripe, Square, ActiveCampaign, Agile CRM, Capsule, CleverReach, Constant Contact, EmailOctopus, Zoho CRM
