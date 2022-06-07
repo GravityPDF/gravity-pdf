@@ -368,11 +368,12 @@ class Helper_Misc {
 
 			foreach ( $files as $fileinfo ) {
 				$function = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
-				if ( ! $function( $fileinfo->getRealPath() ) ) {
-					throw new Exception( 'Could not run ' . $function . ' on  ' . $fileinfo->getRealPath() );
+				$real_path = $fileinfo->getRealPath();
+				if ( ! $function( $real_path ) ) {
+					throw new Exception( 'Could not run ' . $function . ' on  ' . $real_path );
 				}
 
-				$this->log->notice( sprintf( 'Successfully ran `%s` on %s', $function, $fileinfo->getRealPath() ) );
+				$this->log->notice( sprintf( 'Successfully ran `%s` on %s', $function, $real_path ) );
 			}
 		} catch ( Exception $e ) {
 			$this->log->error(
