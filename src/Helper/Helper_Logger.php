@@ -116,8 +116,8 @@ class Helper_Logger {
 
 			/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
 			if ( count( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
-				$this->log->pushProcessor( new IntrospectionProcessor );
-				$this->log->pushProcessor( new MemoryPeakUsageProcessor );
+				$this->log->pushProcessor( new IntrospectionProcessor() );
+				$this->log->pushProcessor( new MemoryPeakUsageProcessor() );
 
 				$this->log->notice( 'Log initialized' );
 

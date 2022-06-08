@@ -21,12 +21,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="pdfextended-settings">
 
 	<!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
-	<form name="gfpdf-settings-form-<?= rand() ?>" method="post" class="gform_settings_form">
+	<form name="gfpdf-settings-form-<?php echo esc_attr( wp_rand() ); ?>" method="post" class="gform_settings_form">
 
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<?= $args['menu'] ?>
-		<?= $args['content'] ?>
+		<?php do_action( 'gfpdf_settings_sub_menu' ); ?>
+
+		<?php
+		/** @since 6.4.0 */
+		if ( isset( $args['callback'] ) ) {
+			call_user_func_array( $args['callback'], $args['callback_args'] ?? [] );
+		}
+
+		/** @deprecated 6.4.0 */
+		if ( isset( $args['content'] ) ) {
+			echo wp_kses_post( $args['content'] );
+		}
+		?>
 	</form>
 
 	<?php

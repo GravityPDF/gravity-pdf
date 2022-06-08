@@ -328,7 +328,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'body'      => [
 					'edd_action' => 'activate_license',
 					'license'    => $license_key,
-					'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'item_name'  => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
 					'url'        => home_url(),
 				],
 			]
@@ -398,16 +398,17 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* User / CORS validation */
 		$this->misc->handle_ajax_authentication( 'Deactivate License', 'gravityforms_edit_settings', 'gfpdf_deactivate_license' );
 
-		/* Get the required details */
-		$addon_slug = ( isset( $_POST['addon_name'] ) ) ? $_POST['addon_name'] : '';
-		$license    = ( isset( $_POST['license'] ) ) ? $_POST['license'] : '';
-		$addon      = ( isset( $this->data->addon[ $addon_slug ] ) ) ? $this->data->addon[ $addon_slug ] : false;
+		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
+		$addon_slug = $_POST['addon_name'] ?? '';
+		$license    = $_POST['license'] ?? '';
+		/* phpcs:enable */
+		$addon = $this->data->addon[ $addon_slug ] ?? false;
 
 		/* Check add-on currently installed */
 		if ( ! empty( $addon ) ) {
 			if ( $this->deactivate_license_key( $addon, $license ) ) {
 				$this->log->notice( 'AJAX – Successfully Deactivated License' );
-				echo json_encode(
+				echo wp_json_encode(
 					[
 						'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ),
 					]
@@ -417,7 +418,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			} elseif ( $addon->schedule_license_check() ) {
 				$license_info = $addon->get_license_info();
 
-				echo json_encode(
+				echo wp_json_encode(
 					[
 						'error' => $license_info['message'],
 					]
@@ -429,7 +430,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		$this->log->error( 'AJAX Endpoint Error' );
 
-		echo json_encode(
+		echo wp_json_encode(
 			[
 				'error' => esc_html__( 'An error occurred during deactivation, please try again', 'gravity-forms-pdf-extended' ),
 			]
@@ -458,7 +459,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'body'      => [
 					'edd_action' => 'deactivate_license',
 					'license'    => $license_key,
-					'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'item_name'  => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
 					'url'        => home_url(),
 				],
 			]

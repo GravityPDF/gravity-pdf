@@ -325,6 +325,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function middle_signed_url_access( $action, $entry, $settings ) {
 
+		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 		if ( isset( $_GET['expires'] ) && isset( $_GET['signature'] ) && isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
 			try {
 				$protocol = isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
@@ -1483,7 +1484,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param array          $entry    The Gravity Form Entry
 	 * @param Field_Products $products A Field_Products Object
 	 *
-	 * @return object        Gravity PDF Field Object
+	 * @return Helper_Abstract_Fields
 	 *
 	 * @throws Exception
 	 * @since 4.0
@@ -1648,7 +1649,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* If the results class isn't loaded, load it */
 		if ( ! class_exists( 'GFResults' ) ) {
-			require_once( GFCommon::get_base_path() . '/includes/addon/class-gf-results.php' );
+			require_once GFCommon::get_base_path() . '/includes/addon/class-gf-results.php';
 		}
 
 		$form_id = $form['id'];

@@ -28,8 +28,8 @@
     <!-- Add generic PHP Linting Rule -->
     <rule ref="Generic.PHP.Syntax"/>
 
-    <!-- Include the WordPress Core standard. -->
-    <rule ref="WordPress-Core">
+    <!-- Include the WordPress Extra ruleset for best practice -->
+    <rule ref="WordPress-Extra">
         <exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
         <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
         <exclude name="WordPress.PHP.YodaConditions"/>
@@ -38,7 +38,12 @@
         <exclude name="WordPress.NamingConventions.ValidVariableName"/>
         <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
         <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+        <exclude name="WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents"/>
+        <exclude name="WordPress.WP.AlternativeFunctions.file_system_read_fopen"/>
+        <exclude name="WordPress.WP.AlternativeFunctions.file_system_read_fread"/>
+        <exclude name="WordPress.WP.AlternativeFunctions.file_system_read_fclose"/>
         <exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
+        <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
     </rule>
 
     <!-- Include the best parts of PSR-1 -->
@@ -97,5 +102,6 @@
     <exclude-pattern>/vendor_prefixed/*</exclude-pattern>
     <exclude-pattern>/node_modules/*</exclude-pattern>
     <exclude-pattern>/src/helper/licensing/EDD_SL_Plugin_Updater.php</exclude-pattern>
-    <exclude-pattern>/tests/phpunit/bootstrap.php</exclude-pattern>
+    <exclude-pattern>/.php-scoper/*</exclude-pattern>
+    <exclude-pattern>/tests/*</exclude-pattern>
 </ruleset>

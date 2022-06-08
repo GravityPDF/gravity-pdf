@@ -133,18 +133,29 @@ class View_Settings extends Helper_Abstract_View {
 	 * @return string
 	 * @since 4.0
 	 *
+	 * @deprecated 6.4
 	 */
 	public function tabs() {
+		ob_start();
+		$this->sub_menu();
 
-		/* Set up any variables we need for the view and display */
+		return ob_get_clean();
+	}
+
+	/**
+	 * Display the sub menu for the global settings
+	 *
+	 * @since 6.4
+	 */
+	public function sub_menu() {
 		$vars = [
-			'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
+			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
+			'selected' => $_GET['tab'] ?? 'general',
 			'tabs'     => $this->get_available_tabs(),
 			'data'     => $this->data,
 		];
 
-		/* load the tabs view */
-		return $this->load( 'tabs', $vars, false );
+		$this->load( 'tabs', $vars );
 	}
 
 	/**
@@ -221,7 +232,9 @@ class View_Settings extends Helper_Abstract_View {
 				'width'         => 'full',
 				'title'         => __( 'Default PDF Options', 'gravity-forms-pdf-extended' ),
 				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
-				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_defaults', $markup::ENABLE_PANEL_TITLE ),
+				'callback'      => static function() use ( $markup ) {
+					$markup->output_settings_fields( 'gfpdf_settings_general_defaults', $markup::ENABLE_PANEL_TITLE );
+				},
 				'content_class' => 'gform_settings_form',
 			],
 		];
@@ -243,14 +256,17 @@ class View_Settings extends Helper_Abstract_View {
 			'width'         => 'full',
 			'collapsible'   => true,
 			'title'         => __( 'Security', 'gravity-forms-pdf-extended' ),
-			'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE ),
+			'callback'      => static function() use ( $markup ) {
+				$markup->output_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE );
+			},
 			'content_class' => 'gform_settings_form',
 		];
 
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
-			'content'  => $markup->do_settings_sections( $sections ),
-			'menu'     => $this->tabs(),
+			'callback' => static function() use ( $markup, $sections ) {
+				$markup->do_settings_sections( $sections, true );
+			},
 		];
 
 		/* load the system status view */
@@ -270,11 +286,12 @@ class View_Settings extends Helper_Abstract_View {
 
 		$sections = [
 			[
-				'id'      => 'gfpdf_settings_general_view',
-				'width'   => 'full',
-				'title'   => __( 'Licensing', 'gravity-forms-pdf-extended' ),
-				'content' => $this->load( 'licence-info', [], false ),
-				'menu'    => $this->tabs(),
+				'id'       => 'gfpdf_settings_general_view',
+				'width'    => 'full',
+				'title'    => __( 'Licensing', 'gravity-forms-pdf-extended' ),
+				'callback' => function() {
+					$this->load( 'licence-info', [] );
+				},
 			],
 		];
 
@@ -284,13 +301,19 @@ class View_Settings extends Helper_Abstract_View {
 
 			if ( empty( $args ) ) {
 				$args = [
-					'id'      => $field['args']['id'],
-					'width'   => 'half',
-					'title'   => $field['title'],
-					'content' => $markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE ),
+					'id'       => $field['args']['id'],
+					'width'    => 'half',
+					'title'    => $field['title'],
+					'callback' => [
+						static function() use ( $markup, $field ) {
+							$markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE, true );
+						},
+					],
 				];
 			} else {
-				$args['content'] .= $markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE );
+				$args['callback'][] = static function() use ( $markup, $field ) {
+					$markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE, true );
+				};
 			}
 
 			if ( $i % 3 === 0 ) {
@@ -303,8 +326,9 @@ class View_Settings extends Helper_Abstract_View {
 
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
-			'content'  => $markup->do_settings_sections( $sections ),
-			'menu'     => $this->tabs(),
+			'callback' => static function() use ( $markup, $sections ) {
+				$markup->do_settings_sections( $sections, true );
+			},
 		];
 
 		/* load the system status view */
@@ -321,7 +345,6 @@ class View_Settings extends Helper_Abstract_View {
 	public function extensions() {
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
-			'menu'     => $this->tabs(),
 		];
 
 		/* load the system status view */
@@ -338,7 +361,6 @@ class View_Settings extends Helper_Abstract_View {
 	public function help() {
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
-			'menu'     => $this->tabs(),
 		];
 
 		/* load the system status view */
@@ -369,15 +391,14 @@ class View_Settings extends Helper_Abstract_View {
 			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),
 			'template_files'                => $this->templates->get_core_pdf_templates(),
 			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
-			'content'                       => $markup->do_settings_sections( $sections ),
-			'menu'                          => $this->tabs(),
+			'callback'                      => static function() use ( $markup, $sections ) {
+				$markup->do_settings_sections( $sections, true );
+			},
 		];
 
 		/* load the system status view */
 		$this->load( 'tools', $vars );
 	}
-
-
 
 	/**
 	 * Add Gravity Forms Tooltips

@@ -62,7 +62,7 @@ class Field_Email extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
-		$output = ( is_email( $value ) ) ? '<a href="mailto:' . $value . '">' . $value . '</a>' : $value;
+		$output = is_email( $value ) ? '<a href="mailto:' . esc_attr( $value ) . '">' . esc_html( $value ) . '</a>' : esc_html( $value );
 
 		return parent::html( $output );
 	}

@@ -376,7 +376,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 				}
 			}
 
-			/* Cleanup our test file */
+			/* phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged */
 			@unlink( $tmp_dir . $tmp_test_file );
 		}
 

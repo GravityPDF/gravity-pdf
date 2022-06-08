@@ -3,6 +3,7 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_QueryPath;
+use GFPDF\Statics\Kses;
 use GFPDF_Vendor\QueryPath\Exception;
 
 /**
@@ -42,7 +43,7 @@ class Field_V3_Products extends Field_Products {
 		$label = apply_filters( 'gform_order_label', esc_html__( 'Order', 'gravityforms' ), $this->form->id );
 		$label = apply_filters( 'gform_order_label_' . $this->form->id, $label, $this->form->id );
 
-		$heading = '<h2 class="default entry-view-section-break">' . $label . '</h2>';
+		$heading = '<h2 class="default entry-view-section-break">' . esc_html( $label ) . '</h2>';
 
 		/* Pull out the .entry-products table from the HTML using querypath */
 		$qp    = new Helper_QueryPath();
@@ -51,7 +52,11 @@ class Field_V3_Products extends Field_Products {
 		$html  = $heading;
 		$html .= $table;
 
-		return $html;
+		if ( $this->get_output() ) {
+			Kses::output( $html );
+		}
+
+		return Kses::parse( $html );
 	}
 
 }

@@ -241,8 +241,8 @@ class Test_Shortcode extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertStringContainsString( '&signature=', $url1 );
-		$this->assertStringContainsString( '&expires=', $url1 );
+		$this->assertStringContainsString( '&#038;signature=', $url1 );
+		$this->assertStringContainsString( '&#038;expires=', $url1 );
 
 		/* Test signed URL expiry */
 		parse_str(

@@ -97,7 +97,6 @@ jobs:
       - name: Install Dependencies
         run: |
           yarn install
-          yarn prebuild:core-fonts
 
       - name: Build Gravity PDF
         run: yarn build:production

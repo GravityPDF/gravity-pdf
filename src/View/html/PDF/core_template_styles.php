@@ -10,6 +10,9 @@
  */
 
 /* Exit if accessed directly */
+
+use GFPDF\Statics\Kses;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -64,11 +67,11 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	<?php endif; ?>
 
 	<?php if ( ! empty( $background_color ) ) : ?>
-		background-color: <?= $background_color; ?>;
+		background-color: <?php echo esc_html( $background_color ); ?>;
 	<?php endif; ?>
 
 	<?php if ( ! empty( $background_image ) ) : ?>
-		background-image: url(<?= $background_image; ?>) no-repeat 0 0;
+		background-image: url(<?php echo esc_url_raw( $background_image ); ?>) no-repeat 0 0;
 		background-image-resize: 4;
 	<?php endif; ?>
 	}
@@ -86,9 +89,9 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	}
 
 	body, th, td, li, a {
-		color: <?= $font_colour; ?>;
-		font-size: <?= $font_size; ?>pt;
-		font-family: <?= $font; ?>, sans-serif;
+		color: <?php echo esc_html( $font_colour ); ?>;
+		font-size: <?php echo esc_html( $font_size ); ?>pt;
+		font-family: <?php echo esc_html( $font ); ?>, sans-serif;
 	}
 
 	.header-footer-img {
@@ -101,7 +104,7 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	.gfield_list {
 		border-collapse: collapse;
 		border: 1px solid #000;
-		border-color: <?= $contrast_border_color; ?>;
+		border-color: <?php echo esc_html( $contrast_border_color ); ?>;
 		margin: 2px 0 6px;
 		padding: 0;
 		width: 100%;
@@ -109,9 +112,9 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 
 	.gfield_list th {
 		text-align: left;
-		background-color: <?= $contrast_background_color; ?>;
+		background-color: <?php echo esc_html( $contrast_background_color ); ?>;
 		border: 1px solid #000;
-		border-color: <?= $contrast_border_color; ?>;
+		border-color: <?php echo esc_html( $contrast_border_color ); ?>;
 		font-weight: bold;
 		padding: 6px 10px;
 	}
@@ -119,7 +122,7 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	.gfield_list td {
 		padding: 6px 10px;
 		border: 1px solid #000;
-		border-color: <?= $contrast_border_color; ?>;
+		border-color: <?php echo esc_html( $contrast_border_color ); ?>;
 	}
 
 	<?php endif; ?>
@@ -127,11 +130,11 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	/* Product Field Styles */
 	<?php if ( $include_product_styles ) : ?>
 	table.entry-products th {
-		background-color: <?= $contrast_background_color; ?>;
+		background-color: <?php echo esc_html( $contrast_background_color ); ?>;
 		border-bottom: 1px solid #000;
 		border-right: 1px solid #000;
-		border-bottom-color: <?= $contrast_border_color; ?>;
-		border-right-color: <?= $contrast_border_color; ?>;
+		border-bottom-color: <?php echo esc_html( $contrast_border_color ); ?>;
+		border-right-color: <?php echo esc_html( $contrast_border_color ); ?>;
 	}
 
 	table.entry-products td.textcenter, table.entry-products th.textcenter {
@@ -152,21 +155,21 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 
 	table.entry-products {
 		border: 1px solid #000;
-		border-color: <?= $contrast_border_color; ?>;
+		border-color: <?php echo esc_html( $contrast_border_color ); ?>;
 		margin: 5px 0 3px;
 	}
 
 	table.entry-products td {
 		border-bottom: 1px solid #000;
 		border-right: 1px solid #000;
-		border-bottom-color: <?= $contrast_border_color; ?>;
-		border-right-color: <?= $contrast_border_color; ?>;
+		border-bottom-color: <?php echo esc_html( $contrast_border_color ); ?>;
+		border-right-color: <?php echo esc_html( $contrast_border_color ); ?>;
 		padding: 7px 7px 8px;
 		vertical-align: top;
 	}
 
 	table.entry-products td.emptycell {
-		background-color: <?= $contrast_background_color; ?>;
+		background-color: <?php echo esc_html( $contrast_background_color ); ?>;
 	}
 
 	table.entry-products td.totals {
@@ -235,7 +238,7 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 <?php if ( ! empty( $first_header ) ) : ?>
 	<htmlpageheader name="TemplateFirstHeader">
 		<div id="first_header">
-			<?= $first_header; ?>
+			<?php Kses::output( $first_header ); ?>
 		</div>
 	</htmlpageheader>
 <?php endif; ?>
@@ -243,7 +246,7 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 <?php if ( ! empty( $header ) ) : ?>
 	<htmlpageheader name="TemplateHeader">
 		<div id="header">
-			<?= $header; ?>
+			<?php Kses::output( $header ); ?>
 		</div>
 	</htmlpageheader>
 <?php endif; ?>
@@ -251,7 +254,7 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 <?php if ( ! empty( $first_footer ) ) : ?>
 	<htmlpagefooter name="TemplateFirstFooter">
 		<div id="first_footer">
-			<?= $first_footer; ?>
+			<?php Kses::output( $first_footer ); ?>
 		</div>
 	</htmlpagefooter>
 <?php endif; ?>
@@ -259,7 +262,7 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 <?php if ( ! empty( $footer ) ) : ?>
 	<htmlpagefooter name="TemplateFooter">
 		<div class="footer">
-			<?= $footer; ?>
+			<?php Kses::output( $footer ); ?>
 		</div>
 	</htmlpagefooter>
 <?php endif; ?>

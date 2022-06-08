@@ -80,13 +80,13 @@ class Helper_Misc {
 	 *
 	 */
 	public function is_gfpdf_page() {
-		if ( is_admin() ) {
-			if ( isset( $_GET['page'] ) && 'gfpdf-' === ( substr( $_GET['page'], 0, 6 ) ) ||
-				 ( isset( $_GET['subview'] ) && 'PDF' === strtoupper( $_GET['subview'] ) )
-			) {
+		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
+		if ( is_admin() && ( ! empty( $_GET['page'] ) || ! empty( $_GET['subview'] ) ) ) {
+			if ( strpos( $_GET['page'] ?? '', 'gfpdf-' ) === 0 || strtoupper( $_GET['subview'] ?? '' ) === 'PDF' ) {
 				return true;
 			}
 		}
+		/* phpcs:enable */
 
 		return false;
 	}
@@ -101,13 +101,11 @@ class Helper_Misc {
 	 *
 	 */
 	public function is_gfpdf_settings_tab( $name ) {
-		if ( is_admin() ) {
-			if ( $this->is_gfpdf_page() ) {
-				$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'general';
-
-				if ( $name === $tab ) {
-					return true;
-				}
+		if ( is_admin() && $this->is_gfpdf_page() ) {
+			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
+			$tab = $_GET['tab'] ?? 'general';
+			if ( $name === $tab ) {
+				return true;
 			}
 		}
 
@@ -163,7 +161,7 @@ class Helper_Misc {
 	 */
 	public function fix_header_footer( $html ) {
 
-		$html = wp_kses_post( $html );
+		$html = \GFPDF\Statics\Kses::parse( $html );
 		$html = trim( wpautop( $html ) );
 		$html = $this->fix_header_footer_images( $html );
 
@@ -367,7 +365,7 @@ class Helper_Misc {
 			);
 
 			foreach ( $files as $fileinfo ) {
-				$function = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
+				$function  = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
 				$real_path = $fileinfo->getRealPath();
 				if ( ! $function( $real_path ) ) {
 					throw new Exception( 'Could not run ' . $function . ' on  ' . $real_path );
@@ -447,6 +445,7 @@ class Helper_Misc {
 
 			foreach ( $files as $fileinfo ) {
 				if ( $fileinfo->isDir() && ! file_exists( $destination . $files->getSubPathName() ) ) {
+					/* phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged */
 					if ( ! @mkdir( $destination . $files->getSubPathName() ) ) {
 						$this->log->error(
 							'Failed Creating Folder',
@@ -594,14 +593,14 @@ class Helper_Misc {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		/* If that didn't work let's try use home_url() and get_home_path() */
+		/* If that didn't work let's try the home url instead */
 		$try_path = str_replace( home_url(), get_home_path(), $url );
 
 		if ( is_file( $try_path ) ) {
 			return $try_path;
 		}
 
-		/* If that didn't work let's try use site_url() and ABSPATH */
+		/* If that didn't work let's try the site url instead */
 		$try_path = str_replace( site_url(), ABSPATH, $url );
 
 		if ( is_file( $try_path ) ) {
@@ -652,14 +651,14 @@ class Helper_Misc {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		/* If that didn't work let's try use home_url() and get_home_path() */
+		/* If that didn't work let's try the home path instead */
 		$try_url = str_replace( get_home_path(), home_url(), $path );
 
 		if ( $try_url !== $path ) {
 			return $try_url;
 		}
 
-		/* If that didn't work let's try use site_url() and ABSPATH */
+		/* If that didn't work let's try the ABSPATH instead */
 		$try_url = str_replace( ABSPATH, site_url(), $path );
 
 		if ( $try_url !== $path ) {
@@ -890,7 +889,7 @@ class Helper_Misc {
 			$entry_details_file = GFCommon::get_base_path() . '/entry_detail.php';
 
 			if ( is_file( $entry_details_file ) ) {
-				require_once( $entry_details_file );
+				require_once $entry_details_file;
 			}
 		}
 	}
@@ -906,9 +905,9 @@ class Helper_Misc {
 	 */
 	public function in_array( $needle, $haystack, $strict = true ) {
 		foreach ( $haystack as $item ) {
-			/* phpcs:disable */
+			/* phpcs:ignore */
 			if ( ( $strict ? $item === $needle : $item == $needle ) ||
-			     ( is_array( $item ) && $this->in_array( $needle, $item, $strict ) )
+				 ( is_array( $item ) && $this->in_array( $needle, $item, $strict ) )
 			) {
 				return true;
 			}
@@ -953,15 +952,14 @@ class Helper_Misc {
 			'Running AJAX Endpoint',
 			[
 				'type' => $endpoint_desc,
+				/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 				'post' => $_POST,
 			]
 		);
 
-		/*
-		 * Validate Endpoint
-		 */
-		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
-		if ( ! wp_verify_nonce( $nonce, $nonce_name ) ) {
+		/* Validate Endpoint */
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
+		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', $nonce_name ) ) {
 
 			$this->log->warning( 'Nonce Verification Failed' );
 

@@ -280,6 +280,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* Check if our setting exists */
 		if ( isset( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) ) {
+			/* phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited */
 			$wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] = $option_value;
 
 			return true;
@@ -334,9 +335,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_form_settings() {
 
-		/* get GF settings */
-		$form_id = ( ! empty( $_GET['id'] ) ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
-		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
+		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
+		$form_id = ! empty( $_GET['id'] ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
+		$pid     = ! empty( $_GET['pid'] ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
+		/* phpcs:enable */
 
 		/* return early if no ID set */
 		if ( ! $form_id || ! $pid ) {
@@ -592,8 +594,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$this->data->form_settings[ $form_id ] = $options;
 			}
 
-			/* true if successful, false if failed */
-
 			return $did_update;
 		}
 
@@ -656,8 +656,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 				$this->data->form_settings[ $form_id ] = $options;
 			}
-
-			/* true if successful, false if failed */
 
 			return $did_update;
 		}
@@ -1095,10 +1093,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$gfpdf_options = $this->settings;
 
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		if ( empty( $_POST['_wp_http_referer'] ) || empty( $_POST['option_page'] ) || $_POST['option_page'] !== 'gfpdf_settings' ) {
 			return $input;
 		}
 
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		parse_str( $_POST['_wp_http_referer'], $referrer );
 
 		$all_settings = $this->get_registered_fields();
@@ -1193,7 +1193,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	/**
 	 * Sanitize text / textarea fields
 	 *
-	 * @param array $input The field value
+	 * @param string $input The field value
 	 *
 	 * @return string $input Sanitized value
 	 * @since 4.0
@@ -1206,7 +1206,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	/**
 	 * Sanitize number fields
 	 *
-	 * @param array $input The field value
+	 * @param string $input The field value
 	 *
 	 * @return string $input Sanitized value
 	 * @since 4.0
@@ -1277,7 +1277,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				 * Don't do any sanitization on input, which was causing problems with merge tags in HTML attributes.
 				 * See https://github.com/GravityPDF/gravity-pdf/issues/492 for more details.
 				 *
-				 * @internal Devs should run the field through wp_kses_post() on output to correctly sanitize
+				 * @internal Devs should run the field through \GFPDF\Statics\Kses::output() or wp_kses_post() on output to correctly sanitize
 				 * @since    4.0.6
 				 */
 				return $value;
@@ -1296,9 +1296,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					);
 
 					return $value;
-				} else {
-					return wp_strip_all_tags( $value );
 				}
+
+				return wp_strip_all_tags( $value );
 		}
 	}
 
@@ -1377,7 +1377,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* Fix up our conditional logic array so it returns a string value */
 		if ( $args['id'] === 'conditionalLogic' && isset( $pdf_form_settings['conditionalLogic'] ) ) {
-			$pdf_form_settings['conditionalLogic'] = json_encode( $pdf_form_settings['conditionalLogic'] );
+			$pdf_form_settings['conditionalLogic'] = wp_json_encode( $pdf_form_settings['conditionalLogic'] );
 		}
 
 		switch ( $args['type'] ) {
@@ -1509,15 +1509,31 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* get our selected value */
 		$checked  = $this->get_form_value( $args );
-		$class    = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$required = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$id       = ( isset( $args['idOverride'] ) ) ? esc_attr( $args['idOverride'] ) : 'gfpdf_settings[' . esc_attr( $args['id'] ) . ']';
+		$id       = ( isset( $args['idOverride'] ) ) ? $args['idOverride'] : 'gfpdf_settings[' . $args['id'] . ']';
 
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc2'] ) . '</label></div>';
-		$html .= '<input type="checkbox" id="' . $id . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
-		$html .= '<label for="' . $id . '"> ' . wp_kses_post( $args['desc'] ) . '</label>';
+		?>
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc2'] ); ?>
+			</label>
+		</div>
 
-		echo $html;
+		<input type="checkbox"
+			   id="<?php echo esc_attr( $id ); ?>"
+			   class="gfpdf_settings_<?php echo esc_attr( $args['id'] ); ?> <?php echo esc_attr( $args['inputClass'] ?? '' ); ?>"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   value="1"
+			   <?php if ( strpos( $checked, 'checked' ) !== false ): ?>
+					 checked="checked"
+			   <?php endif ?>
+			   <?php echo esc_html( $required ); ?>
+		/>
+
+		<label for="<?php echo esc_attr( $id ); ?>">
+			<?php echo wp_kses_post( $args['desc'] ); ?>
+		</label>
+		<?php
 	}
 
 	/**
@@ -1533,29 +1549,50 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function multicheck_callback( $args ) {
 
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$args['id'] = esc_attr( $args['id'] );
+		$class    = $args['inputClass'] ?? '';
+		$required = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 
-		if ( ! empty( $args['options'] ) ) {
-			echo '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-
-			foreach ( $args['options'] as $key => $option ) {
-
-				/* Set up multi-select option to pass to our form value getter */
-				$args['multi-key']    = esc_attr( $key );
-				$args['multi-option'] = $key;
-
-				$enabled = $this->get_form_value( $args );
-
-				echo '<div class="gfpdf-settings-multicheck-wrapper">';
-				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" id="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $args['multi-key'] . '" ' . checked( $key, $enabled, false ) . ' ' . $required . ' />&nbsp;';
-				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']">' . esc_html( $option ) . '</label>';
-				echo '</div>';
-			}
-
-			echo wp_kses_post( $args['desc2'] );
+		if ( empty( $args['options'] ) ) {
+			return;
 		}
+
+		?>
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
+
+		<?php
+		foreach ( $args['options'] as $key => $option ):
+			/* Set up multi-select option to pass to our form value getter */
+			$args['multi-key']    = $key;
+			$args['multi-option'] = $key;
+
+			$enabled = $this->get_form_value( $args );
+
+			?>
+
+			<div class="gfpdf-settings-multicheck-wrapper">
+				<input name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][<?php echo esc_attr( $args['multi-key'] ); ?>]"
+					   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][<?php echo esc_attr( $args['multi-key'] ); ?>]"
+					   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+					   type="checkbox"
+					   value="<?php echo esc_attr( $args['multi-key'] ); ?>"
+				<?php checked( $key, $enabled ); ?>
+				<?php echo esc_attr( $required ); ?>
+				/>
+				&nbsp;
+
+				<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][<?php echo esc_attr( $args['multi-key'] ); ?>]">
+					<?php echo esc_html( $option ); ?>
+				</label>
+			</div>
+		<?php endforeach; ?>
+
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
+
+		<?php
 	}
 
 	/**
@@ -1572,25 +1609,44 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function radio_callback( $args ) {
 
 		/* get selected value (if any) */
-		$selected   = $this->get_form_value( $args );
-		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$args['id'] = esc_attr( $args['id'] );
-		$html       = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
+		$selected = $this->get_form_value( $args );
+		$required = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 
-		foreach ( $args['options'] as $key => $option ) {
+		?>
 
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
+
+		<?php
+		foreach ( $args['options'] as $key => $option ):
 			$checked = false;
 			if ( $selected === $key ) {
 				$checked = true;
 			}
+			?>
 
-			$html .= '<span class="entry-view"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']" type="radio" value="' . esc_attr( $key ) . '" ' . checked( true, $checked, false ) . ' ' . $required . ' />';
-			$html .= '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']">' . $option . '</label></span>';
-		}
+			<span class="entry-view">
+				<input name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+					   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
+					   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][<?php echo esc_attr( $key ); ?>]"
+					   type="radio"
+					   value="<?php echo esc_attr( $key ); ?>"
+					   <?php checked( true, $checked ); ?>
+					   <?php echo esc_attr( $required ); ?>
+				/>
 
-		$html .= wp_kses_post( $args['desc2'] );
+				<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][<?php echo esc_attr( $key ); ?>]">
+					<?php echo esc_html( $option ); ?>
+				</label>
+			</span>
+		<?php endforeach; ?>
 
-		echo $html;
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
+
+		<?php
 	}
 
 	/**
@@ -1608,24 +1664,34 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* get selected value (if any) */
 		$value      = $this->get_form_value( $args );
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$class      = $args['inputClass'] ?? '';
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$args['id'] = esc_attr( $args['id'] );
+		$size       = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 
-		$size  = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<input type="text" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required;
+		?>
 
-		foreach ( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
-		}
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
 
-		$html .= ' />';
+		<input type="text"
+			   class="<?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( $class ); ?>"
+			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   value="<?php echo esc_attr( $value ); ?>"
+			   <?php echo esc_attr( $required ); ?>
+				<?php foreach ( $input_data as $data_id => $data_value ): ?>
+					<?php echo esc_html( 'data-' . $data_id ); ?>="<?php echo esc_attr( $data_value ); ?>"
+				<?php endforeach; ?>
+		/>
 
-		$html .= wp_kses_post( $args['desc2'] );
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
 
-		echo $html;
+		<?php
 	}
 
 	/**
@@ -1642,37 +1708,51 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function license_callback( $args ) {
 
 		/* get selected value (if any) */
-		$value      = $this->get_form_value( $args );
-		$args['id'] = esc_attr( $args['id'] );
+		$value = $this->get_form_value( $args );
 
-		$html = '';
+		$error_statuses = [ '', 'active' ];
+		$is_error       = ! in_array( $value['status'], $error_statuses, true );
+		$is_active      = $value['status'] === 'active';
+		?>
 
-		$is_error  = ! in_array( $value['status'], [ '', 'active' ], true );
-		$is_active = $value['status'] === 'active';
+		<?php if ( ! empty( $value['msg'] ) ): ?>
+			<?php if ( $is_error ): ?>
+				<div class="alert gforms_note_error">
+					<?php echo esc_html( $value['msg'] ); ?>
+				</div>
+			<?php else : ?>
+				<div id="message" class="alert gforms_note_success">
+					<?php echo esc_html( $value['msg'] ); ?>
+				</div>
+			<?php endif; ?>
+		<?php endif; ?>
 
-		/* Show status info */
-		if ( ! empty( $value['msg'] ) ) {
-			$alert = $is_error ? '<div class="alert gforms_note_error">%s</div>' : '<div id="message" class="alert gforms_note_success">%s</div>';
-			$html .= sprintf( $alert, wp_kses_post( $value['msg'] ) );
-		}
+		<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" class="screen-reader-text">
+			<?php echo esc_html( sprintf( __( '%s license key', 'gravity-forms-pdf-extended' ), $args['name'] ) ); ?>
+		</label>
 
-		$html .= '<label for="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="screen-reader-text"> ' . esc_html( $args['name'] ) . ' ' . esc_html__( 'license key', 'gravity-forms-pdf-extended' ) . '</label>';
-		$html .= '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="gfpdf_settings_' . esc_attr( $args['id'] ) . '" name="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" value="' . esc_attr( $value['key'] ) . '" />';
+		<input autocomplete="off"
+			   type="text"
+			   class="regular-text"
+			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   value="<?php echo esc_attr( $value['key'] ); ?>"
+		/>
 
-		/* Add renewal info */
-		if ( $is_active ) {
-			$html .= ' <button 
-				class="button primary white gfpdf-deactivate-license" 
-				data-addon-name="' . esc_attr( substr( $args['id'], 8 ) ) . '" 
-				data-license="' . esc_attr( $value['key'] ) . '" 
-				data-nonce="' . wp_create_nonce( 'gfpdf_deactivate_license' ) . '">' .
-					 esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
-					 '</button>';
-		}
+		<?php if ( $is_active ): ?>
+			<button class="button primary white gfpdf-deactivate-license"
+					data-addon-name="<?php echo esc_attr( substr( $args['id'], 8 ) ); ?>"
+					data-license="<?php echo esc_attr( $value['key'] ); ?>"
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'gfpdf_deactivate_license' ) ); ?>"
+			>
+				<?php echo esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ); ?>
+			</button>
+		<?php endif; ?>
 
-		$html .= wp_kses_post( $args['desc2'] );
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
 
-		echo $html;
+		<?php
 	}
 
 	/**
@@ -1697,28 +1777,41 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* check if required */
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$class      = $args['inputClass'] ?? '';
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
-		$args['id'] = esc_attr( $args['id'] );
 
 		$max  = isset( $args['max'] ) ? (int) $args['max'] : 999999;
 		$min  = isset( $args['min'] ) ? (int) $args['min'] : 0;
 		$step = isset( $args['step'] ) ? (int) $args['step'] : 1;
 
-		$size  = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required;
+		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 
-		foreach ( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
-		}
+		?>
 
-		$html .= ' /> ';
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
 
-		$html .= wp_kses_post( $args['desc2'] );
+		<input type="number"
+			   step="<?php echo esc_attr( $step ); ?>"
+			   max="<?php echo esc_attr( $max ); ?>"
+			   min="<?php echo esc_attr( $min ); ?>"
+			   class="<?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   value="<?php echo esc_attr( $value ); ?>"
+		<?php echo esc_attr( $required ); ?>
+		<?php foreach ( $input_data as $data_id => $data_value ): ?>
+			<?php echo esc_html( 'data-' . $data_id ); ?>="<?php echo esc_attr( $data_value ); ?>"
+		<?php endforeach; ?>
+		/>
 
-		echo $html;
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
+
+		<?php
 	}
 
 	/**
@@ -1736,30 +1829,43 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* get selected value (if any) */
 		$value      = $this->get_form_value( $args );
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$class      = $args['inputClass'] ?? '';
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
-		$args['id'] = esc_attr( $args['id'] );
+		$toggle     = ( ! empty( $args['toggle'] ) ) ? $args['toggle'] : false;
 
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<textarea cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="large-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" ' . $required;
+		?>
 
-		foreach ( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
-		}
+		<?php if ( $toggle !== false ): ?>
+			<?php $this->start_toggle_input( $toggle, $value ); ?>
+		<?php endif; ?>
 
-		$html .= '>' . esc_textarea( $value ) . '</textarea>';
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
 
-		/* Check if the field should include a toggle option */
-		$toggle = ( ! empty( $args['toggle'] ) ) ? $args['toggle'] : false;
+		<textarea cols="50"
+				  rows="5"
+				  id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+				  class="large-text <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+				  name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+				<?php echo esc_attr( $required ); ?>
+				<?php foreach ( $input_data as $data_id => $data_value ): ?>
+					<?php echo esc_html( 'data-' . $data_id ); ?>="<?php echo esc_attr( $data_value ); ?>"
+				<?php endforeach; ?>
+		>
+			<?php echo esc_textarea( $value ); ?>
+		</textarea>
 
-		if ( $toggle !== false ) {
-			$html = $this->create_toggle_input( $toggle, $html, $value );
-		}
+		<?php if ( $toggle !== false ): ?>
+			<?php $this->end_toggle_input(); ?>
+		<?php endif; ?>
 
-		$html .= wp_kses_post( $args['desc2'] );
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
 
-		echo $html;
+		<?php
 	}
 
 	/**
@@ -1776,17 +1882,30 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function password_callback( $args ) {
 
 		/* get selected value (if any) */
-		$value      = $this->get_form_value( $args );
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$args['id'] = esc_attr( $args['id'] );
+		$value    = $this->get_form_value( $args );
+		$class    = $args['inputClass'] ?? '';
+		$required = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
+		$size     = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 
-		$size  = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<input type="password" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
-		$html .= wp_kses_post( $args['desc2'] );
+		?>
 
-		echo $html;
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
+
+		<input type="password"
+			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( $class ); ?>"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   value="<?php echo esc_attr( $value ); ?>"
+				<?php echo esc_attr( $required ); ?>
+		/>
+
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
+
+			<?php
 	}
 
 	/**
@@ -1804,11 +1923,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* get selected value (if any) */
 		$value       = $this->get_form_value( $args );
-		$placeholder = ( isset( $args['placeholder'] ) ) ? esc_attr( $args['placeholder'] ) : '';
-		$class       = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$placeholder = $args['placeholder'] ?? '';
+		$class       = $args['inputClass'] ?? '';
 		$required    = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$input_data  = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
-		$args['id']  = esc_attr( $args['id'] );
 
 		$multiple     = '';
 		$multiple_ext = '';
@@ -1817,36 +1935,52 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$multiple_ext = '[]';
 		}
 
-		$html = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
+		?>
 
-		$select = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']' . $multiple_ext . '" data-placeholder="' . $placeholder . '" ' . $multiple . ' ' . $required;
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
 
-		foreach ( $input_data as $data_id => $data_value ) {
-			$select .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
-		}
+		<?php if ( ! empty( $args['chosen'] ) ): ?>
+			<span class="gform-settings-input__container">
+				<span class="gform-settings-field__select--enhanced">
+		<?php endif; ?>
 
-		$select .= '>';
-		$select .= $this->build_options_for_select( $args['options'], $value );
-		$select .= '</select>';
+		<select id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+				class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+				name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]<?php echo esc_attr( $multiple_ext ); ?>"
+				data-placeholder="<?php echo esc_attr( $placeholder ); ?>"
+				<?php echo esc_attr( $multiple ); ?>
+				<?php echo esc_attr( $required ); ?>
+				<?php foreach ( $input_data as $data_id => $data_value ): ?>
+					<?php echo esc_html( 'data-' . $data_id ); ?>="<?php echo esc_attr( $data_value ); ?>"
+				<?php endforeach; ?>
+		>
 
-		if ( ! empty( $args['chosen'] ) ) {
-			$select = sprintf( '<span class="gform-settings-input__container"><span class="gform-settings-field__select--enhanced">%s</span></span>', $select );
+		<?php $this->build_options_for_select( $args['options'], $value, true ); ?>
 
-			$select .= '<script type="text/javascript">
-					jQuery( document ).ready( function () {
-						jQuery( "#gfpdf_settings\\\\[' . esc_attr( $args['id'] ) . '\\\\]" ).select2( {
-							minimumResultsForSearch: Infinity,
-							dropdownCssClass: "gform-settings-field__select-enhanced-container",
-							dropdownParent: jQuery( "#gfpdf_settings\\\\[' . esc_attr( $args['id'] ) . '\\\\]" ).parent(),
-						} );
-					} );
-				</script>';
-		}
+		</select>
 
-		$html .= $select;
-		$html .= wp_kses_post( $args['desc2'] );
+		<?php if ( ! empty( $args['chosen'] ) ): //@TODO - check chosen ?>
+				</span>
+			</span>
 
-		echo $html;
+			<script type="text/javascript">
+			  jQuery( document ).ready( function () {
+				jQuery( "#gfpdf_settings\[<?php echo esc_attr( $args['id'] ); ?>\]" ).select2( {
+				  minimumResultsForSearch: Infinity,
+				  dropdownCssClass: "gform-settings-field__select-enhanced-container",
+				  dropdownParent: jQuery( "#gfpdf_settings\[<?php echo esc_attr( $args['id'] ); ?>\]" ).parent(),
+				} );
+			  } );
+			</script>
+		<?php endif; ?>
+
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
+
+		<?php
 	}
 
 	/**
@@ -1854,13 +1988,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param array        $options The list of options that should be displayed
 	 * @param array|string $value   The selected option
+	 * @param bool         $echo    To output or echo the content
 	 *
-	 * @return string
+	 * @return string|void
 	 *
 	 * @since 4.1
 	 */
-	public function build_options_for_select( $options, $value ) {
-		$html = '';
+	public function build_options_for_select( $options, $value, $echo = false ) {
+		if ( ! $echo ) {
+			ob_start();
+		}
+
 		foreach ( $options as $option => $name ) {
 			if ( ! is_array( $name ) ) {
 				$selected = '';
@@ -1875,9 +2013,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					$selected = selected( $option, $value, false );
 				}
 
-				$html .= '<option value="' . esc_attr( $option ) . '" ' . $selected . '>' . esc_html( $name ) . '</option>';
+				echo '<option value="' . esc_attr( $option ) . '" ' . ( strpos( $selected, 'selected' ) !== false ? 'selected="selected"' : '' ) . '>' . esc_html( $name ) . '</option>';
 			} else {
-				$html .= '<optgroup label="' . esc_attr( $option ) . '">';
+				echo '<optgroup label="' . esc_attr( $option ) . '">';
 				foreach ( $name as $op_value => $op_label ) {
 					$selected = '';
 					if ( is_array( $value ) ) {
@@ -1891,13 +2029,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						$selected = selected( $op_value, $value, false );
 					}
 
-					$html .= '<option value="' . esc_attr( $op_value ) . '" ' . $selected . '>' . esc_html( $op_label ) . '</option>';
+					echo '<option value="' . esc_attr( $op_value ) . '" ' . ( strpos( $selected, 'selected' ) !== false ? 'selected="selected"' : '' ) . '>' . esc_html( $op_label ) . '</option>';
 				}
-				$html .= '</optgroup>';
+				echo '</optgroup>';
 			}
 		}
 
-		return $html;
+		if ( ! $echo ) {
+			ob_get_clean();
+		}
 	}
 
 	/**
@@ -1915,15 +2055,25 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* get selected value (if any) */
 		$value = $this->get_form_value( $args );
 
-		$rows       = isset( $args['size'] ) ? esc_attr( $args['size'] ) : 20;
-		$args['id'] = esc_attr( $args['id'] );
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$rows   = $args['size'] ?? 20;
+		$class  = $args['inputClass'] ?? '';
+		$toggle = ( ! empty( $args['toggle'] ) ) ? $args['toggle'] : false;
 
-		$html = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
+		?>
 
-		if ( function_exists( 'wp_editor' ) ) {
-			ob_start();
-			echo '<span class="mt-gfpdf_settings_' . $args['id'] . ' mt-gfpdf-merge-tag-selector-container"></span>';
+		<?php if ( $toggle !== false ): ?>
+			<?php $this->start_toggle_input( $toggle, $value ); ?>
+		<?php endif; ?>
+
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
+
+		<?php if ( function_exists( 'wp_editor' ) ): ?>
+			<span class="<?php echo esc_attr( 'mt-gfpdf_settings_' . $args['id'] ); ?> mt-gfpdf-merge-tag-selector-container"></span>
+			<?php
 			wp_editor(
 				$value,
 				'gfpdf_settings_' . $args['id'],
@@ -1938,21 +2088,24 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					]
 				)
 			);
-			$html .= ob_get_clean();
-		} else {
-			$html .= '<textarea class="large-text" rows="' . $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( $value ) . '</textarea>';
-		}
+			?>
+		<?php else : ?>
+			<textarea rows="<?php echo esc_attr( $rows ); ?>"
+					  class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> large-text <?php echo esc_attr( $class ); ?>"
+					  id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+					  name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			>
+				<?php echo esc_textarea( $value ); ?>
+			</textarea>
+		<?php endif; ?>
 
-		/* Check if the field should include a toggle option */
-		$toggle = ( ! empty( $args['toggle'] ) ) ? $args['toggle'] : false;
+		<?php if ( $toggle !== false ): ?>
+			<?php $this->end_toggle_input(); ?>
+		<?php endif; ?>
 
-		if ( $toggle !== false ) {
-			$html = $this->create_toggle_input( $toggle, $html, $value );
-		}
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
 
-		$html .= wp_kses_post( $args['desc2'] );
-
-		echo $html;
+		<?php
 	}
 
 	/**
@@ -1970,20 +2123,41 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* get selected value (if any) */
 		$value                = $this->get_form_value( $args );
-		$uploader_title       = ( isset( $args['uploaderTitle'] ) ) ? esc_attr( $args['uploaderTitle'] ) : esc_attr__( 'Select Media', 'gravity-forms-pdf-extended' );
-		$uploader_button_text = ( isset( $args['uploaderButtonText'] ) ) ? esc_attr( $args['uploaderButtonText'] ) : esc_attr__( 'Select Media', 'gravity-forms-pdf-extended' );
-		$button_text          = ( isset( $args['buttonText'] ) ) ? esc_attr( $args['buttonText'] ) : esc_attr__( 'Upload File', 'gravity-forms-pdf-extended' );
-		$class                = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$uploader_title       = $args['uploaderTitle'] ?? __( 'Select Media', 'gravity-forms-pdf-extended' );
+		$uploader_button_text = $args['uploaderButtonText'] ?? __( 'Select Media', 'gravity-forms-pdf-extended' );
+		$button_text          = $args['buttonText'] ?? __( 'Upload File', 'gravity-forms-pdf-extended' );
+		$class                = $args['inputClass'] ?? '';
 		$required             = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$args['id']           = esc_attr( $args['id'] );
-		$size                 = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
+		$size                 = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= '<div class="gfpdf-upload-setting-container"><input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
-		$html .= '<input type="button" class="gfpdf_settings_upload_button button-secondary" data-uploader-title="' . $uploader_title . '" data-uploader-button-text="' . $uploader_button_text . '" value="' . $button_text . '" /></div>';
-		$html .= wp_kses_post( $args['desc2'] );
+		?>
 
-		echo $html;
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
+
+		<div class="gfpdf-upload-setting-container">
+			<input type="text"
+				   class="<?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+				   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+				   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+				   value="<?php echo esc_attr( $value ); ?>"
+			<?php echo esc_attr( $required ); ?>
+			/>
+
+			<input type="button"
+				   class="gfpdf_settings_upload_button button-secondary"
+				   data-uploader-title="<?php echo esc_attr( $uploader_title ); ?>"
+				   data-uploader-button-text="<?php echo esc_attr( $uploader_button_text ); ?>"
+				   value="<?php echo esc_attr( $button_text ); ?>"
+			/>
+		</div>
+
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
+
+		<?php
 	}
 
 
@@ -2001,16 +2175,31 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function color_callback( $args ) {
 
 		/* get selected value (if any) */
-		$value      = $this->get_form_value( $args );
-		$default    = isset( $args['std'] ) ? esc_attr( $args['std'] ) : '';
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$args['id'] = esc_attr( $args['id'] );
+		$value    = $this->get_form_value( $args );
+		$default  = $args['std'] ?? '';
+		$class    = $args['inputClass'] ?? '';
+		$required = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div><div>';
-		$html .= '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" ' . $required . ' /></div>';
+		?>
 
-		echo $html;
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
+
+		<div>
+			<input type="text"
+				   class="gfpdf-color-picker <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+				   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+				   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+				   value="<?php echo esc_attr( $value ); ?>"
+				   data-default-color="<?php echo esc_attr( $default ); ?>"
+					<?php echo esc_attr( $required ); ?>
+			/>
+		</div>
+
+		<?php
 	}
 
 	/**
@@ -2026,23 +2215,35 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function button_callback( $args ) {
 
-		$nonce      = wp_create_nonce( 'gfpdf_settings[' . $args['id'] . ']' );
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$class      = $args['inputClass'] ?? '';
 
-		$html = '<div class="gform-settings-description gform-kitchen-sink">' . wp_kses_post( $args['desc'] ) . '</div>';
+		?>
 
-		$html .= '<div id="gfpdf-button-wrapper-' . esc_attr( $args['id'] ) . '">';
-		$html .= '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="' . $args['id'] . '" class="button gfpdf-button ' . $class . '" type="submit"';
+		<div class="gform-settings-description gform-kitchen-sink">
+			<?php echo wp_kses_post( $args['desc'] ); ?>
+		</div>
 
-		foreach ( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
-		}
+		<div id="gfpdf-button-wrapper-<?php echo esc_attr( $args['id'] ); ?>">
+			<button id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+					name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][name]"
+					value="<?php echo esc_attr( $args['id'] ); ?>"
+					class="button gfpdf-button <?php echo esc_attr( $class ); ?>"
+					type="submit"
+					<?php foreach ( $input_data as $data_id => $data_value ): ?>
+						<?php echo esc_html( 'data-' . $data_id ); ?>="<?php echo esc_attr( $data_value ); ?>";
+					<?php endforeach; ?>
+			>
+			<?php echo esc_html( $args['std'] ); ?>
+			</button>
+		</div>
 
-		$html .= '>' . esc_html( $args['std'] ) . '</button></div>';
-		$html .= '<input type="hidden" name="gfpdf_settings[' . $args['id'] . '][nonce]" value="' . $nonce . '" />';
+		<input type="hidden"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][nonce]"
+			   value="<?php echo esc_attr( wp_create_nonce( 'gfpdf_settings[' . $args['id'] . ']' ) ); ?>"
+		/>
 
-		echo $html;
+		<?php
 	}
 
 	/**
@@ -2058,26 +2259,25 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$value = 'Yes';
 		}
 
-		$class      = isset( $args['inputClass'] ) ? esc_attr( $args['inputClass'] ) : '';
-		$args['id'] = esc_attr( $args['id'] );
-		$name       = isset( $args['name'] ) ? $args['name'] : '';
+		$class = $args['inputClass'] ?? '';
+		$name  = $args['name'] ?? '';
 
 		?>
-		<div class="gform-settings-field gform-settings-field__toggle <?= $class ?>">
-			<div class="gform-settings-description gform-kitchen-sink"><?= wp_kses_post( $args['desc'] ) ?></div>
+		<div class="gform-settings-field gform-settings-field__toggle <?php echo esc_attr( $class ); ?>">
+			<div class="gform-settings-description gform-kitchen-sink"><?php echo wp_kses_post( $args['desc'] ); ?></div>
 
 			<span class="gform-settings-input__container">
-				<input type="checkbox" id="gfpdf_settings[<?= $args['id'] ?>]" name="gfpdf_settings[<?= $args['id'] ?>]" value="Yes" <?= checked( $value, 'Yes', false ) ?> />
-				<label class="gform-field__toggle-container" for="gfpdf_settings[<?= $args['id'] ?>]">
-					<?php if ( strlen( $name ) > 0 ): ?>
-						<span class="screen-reader-text"><?= $name ?></span>
+				<input type="checkbox" id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" value="Yes" <?php echo checked( $value, 'Yes', false ); ?> />
+				<label class="gform-field__toggle-container" for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+					<?php if ( ! empty( $name ) ): ?>
+						<span class="screen-reader-text"><?php echo esc_html( $name ); ?></span>
 					<?php endif; ?>
 
 					<span class="gform-field__toggle-switch"></span>
 				</label>
 			</span>
 
-			<?= wp_kses_post( $args['desc2'] ) ?>
+			<?php echo wp_kses_post( $args['desc2'] ); ?>
 		</div>
 		<?php
 	}
@@ -2099,11 +2299,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$this->checkbox_callback( $args );
 
-		$html = '<div id="gfpdf_conditional_logic_container" class="gform-settings-field__conditional-logic" style="display: none">
-			<!-- content dynamically created from form_admin.js -->
-		</div>';
+		?>
 
-		echo $html;
+		<div id="gfpdf_conditional_logic_container" class="gform-settings-field__conditional-logic" style="display: none">
+			<!-- content dynamically created from form_admin.js -->
+		</div>
+
+		<?php
 	}
 
 	/**
@@ -2119,19 +2321,22 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* get selected value (if any) */
 		$value      = $this->get_form_value( $args );
-		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$class      = $args['inputClass'] ?? '';
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
-		$args['id'] = esc_attr( $args['id'] );
 
-		$html = '<input type="hidden" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '"';
+		?>
 
-		foreach ( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
-		}
+		<input type="hidden"
+			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+			   value="<?php echo esc_attr( $value ); ?>"
+			   <?php foreach ( $input_data as $data_id => $data_value ): ?>
+					<?php echo esc_html( 'data-' . $data_id ); ?>="<?php echo esc_attr( $data_value ); ?>";
+			   <?php endforeach; ?>
+		/>
 
-		$html .= '/>';
-
-		echo $html;
+		<?php
 	}
 
 	/**
@@ -2152,15 +2357,45 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$value = [ '', '', 'mm' ];
 		}
 
-		$placeholder = ( isset( $args['placeholder'] ) ) ? esc_attr( $args['placeholder'] ) : '';
-		$class       = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$size        = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
+		$placeholder = $args['placeholder'] ?? '';
+		$class       = $args['inputClass'] ?? '';
+		$size        = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 
-		$html  = '<div class="gform-settings-description gform-kitchen-sink"><label for="gfpdf_settings[' . esc_attr( $args['id'] ) . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></div>';
-		$html .= esc_html__( 'Width', 'gravity-forms-pdf-extended' ) . ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" style="width: 6rem" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( $value[0] ) . '" /> &nbsp;';
-		$html .= esc_html__( 'Height', 'gravity-forms-pdf-extended' ) . ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="0" style="width: 6rem" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( $value[1] ) . '" /> &nbsp;';
+		?>
 
-		$measurement = apply_filters(
+		<div class="gform-settings-description gform-kitchen-sink">
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</label>
+		</div>
+
+		<?php esc_html_e( 'Width', 'gravity-forms-pdf-extended' ); ?>
+		<input type="number"
+			   class="<?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
+			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]_width"
+			   min="0"
+			   style="width: 6rem"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][]"
+			   value="<?php echo esc_attr( $value[0] ); ?>"
+		/>
+
+		&nbsp;
+
+		<?php esc_html_e( 'Height', 'gravity-forms-pdf-extended' ); ?>
+		<input type="number"
+			   class="<?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
+			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]_height"
+			   min="0"
+			   style="width: 6rem"
+			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][]"
+			   value="<?php echo esc_attr( $value[1] ); ?>"
+		/>
+
+		&nbsp;
+
+		<?php
+		$measure_value = $value[2] ?? '';
+		$measurement   = apply_filters(
 			'gfpdf_paper_size_dimensions',
 			[
 				'millimeters' => esc_html__( 'mm', 'gravity-forms-pdf-extended' ),
@@ -2168,18 +2403,26 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			]
 		);
 
-		$html .= ' <select id="gfpdf_settings[' . $args['id'] . ']_measurement" style="width: 6rem" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . '][]" data-placeholder="' . $placeholder . '">';
+		?>
 
-		$measure_value = esc_attr( $value[2] );
-		foreach ( $measurement as $key => $val ) {
-			$selected = ( $measure_value === $key ) ? 'selected="selected"' : '';
-			$html    .= '<option value="' . $key . '" ' . $selected . '>' . $val . '</option>';
-		}
+		<select id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]_measurement"
+				style="width: 6rem"
+				class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?> <?php echo esc_attr( $class ); ?>"
+				name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][]"
+				data-placeholder="<?php echo esc_attr( $placeholder ); ?>"
+		>
 
-		$html .= '</select> ';
-		$html .= wp_kses_post( $args['desc2'] );
+		<?php foreach ( $measurement as $key => $val ): ?>
+			<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $measure_value, $key ); ?>>
+				<?php echo esc_html( $val ); ?>
+			</option>
+		<?php endforeach; ?>
 
-		echo $html;
+		</select>
+
+		<?php echo wp_kses_post( $args['desc2'] ); ?>
+
+		<?php
 	}
 
 	/**
@@ -2224,7 +2467,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 */
 	public function missing_callback( $args ) {
-		printf( esc_html__( 'The callback used for the %s setting is missing.', 'gravity-forms-pdf-extended' ), "<strong>{$args['id']}</strong>" );
+		echo wp_kses_post( sprintf( __( 'The callback used for the %s setting is missing.', 'gravity-forms-pdf-extended' ), "<strong>{$args['id']}</strong>" ) );
 	}
 
 	/**
@@ -2238,17 +2481,59 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function create_toggle_input( $toggle, $html, $value ) {
 
-		$has_value       = ( strlen( $value ) > 0 ) ? 1 : 0;
-		$current_display = ( ! $has_value ) ? 'style="display: none;"' : '';
+		$has_value = ( $value !== '' ) ? 1 : 0;
 
 		$toggle_elm = '<label><input class="gfpdf-input-toggle" type="checkbox" value="1" ' . checked( $has_value, 1, false ) . ' /> ' . esc_attr( $toggle ) . '</label>';
 
-		$html = '<div class="gfpdf-toggle-wrapper" ' . $current_display . '>' .
+		$html = '<div class="gfpdf-toggle-wrapper" ' . ( ( ! $has_value ) ? 'style="display: none;"' : '' ) . '>' .
 				$html .
 				'</div>';
 
 		$html = $toggle_elm . $html;
 
 		return $html;
+	}
+
+	/**
+	 * Creates jQuery toggle functionality for the current field
+	 *
+	 * @param string $toggle The text to be used in the toggle
+	 * @param string $value  Whether the field currently has a value
+	 *
+	 * @return void
+	 *
+	 * @since 6.4
+	 */
+	public function start_toggle_input( $toggle, $value ) {
+		$has_value = ! empty( $value ) ? 1 : 0;
+
+		?>
+
+		<label>
+			<input class="gfpdf-input-toggle"
+				   type="checkbox"
+				   value="1"
+				   <?php checked( $has_value, 1 ); ?>
+			/>
+
+			<?php echo esc_html( $toggle ); ?>
+		</label>
+
+		<div class="gfpdf-toggle-wrapper" style="<?php echo esc_attr( $has_value === 0 ? 'display: none;' : '' ); ?>">
+
+		<?php
+	}
+
+	/**
+	 * Close the toggle input container
+	 *
+	 * @return void
+	 *
+	 * @since 6.4
+	 */
+	public function end_toggle_input() {
+		?>
+		</div>
+		<?php
 	}
 }

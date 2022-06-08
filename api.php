@@ -510,11 +510,17 @@ final class GPDFAPI {
 		if ( ! $products->is_empty() ) {
 
 			if ( $return ) {
-				return $products->html();
+				$html = $products->html();
+				unset( $products );
+
+				return $html;
 			}
 
-			echo $products->html();
+			$products->enable_output();
+			$products->html();
 		}
+
+		unset( $products );
 
 		return null;
 	}
@@ -546,18 +552,22 @@ final class GPDFAPI {
 		/* Find our field ID, if any */
 		foreach ( $form['fields'] as $field ) {
 
-			/* phpcs:disable */
-			if ( $field->id == $field_id && $field->inputType == 'likert' ) {
-				/* phpcs:enable */
+			if ( (int) $field->id === (int) $field_id && $field->inputType === 'likert' ) {
 
 				/* Output our likert */
 				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->gform, $gfpdf->misc );
 
 				if ( $return ) {
-					return $likert->html();
+					$html = $likert->html();
+					unset( $likert );
+
+					return $html;
 				}
 
-				echo $likert->html();
+				$likert->enable_output();
+				$likert->html();
+				unset( $likert );
+
 				break;
 			}
 		}
@@ -607,7 +617,12 @@ final class GPDFAPI {
 	public static function add_pdf_font( $font ) {
 
 		$installed_fonts = static::get_pdf_fonts();
-		if ( array_search( $font['font_name'] ?? '', $installed_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] ?? [], true ) !== false ) {
+
+		$font_name              = $font['font_name'] ?? '';
+		$user_defined_font_list = $installed_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] ?? [];
+
+		/* Font with same name already exists */
+		if ( in_array( $font_name, $user_defined_font_list, true ) ) {
 			return true;
 		}
 
@@ -623,6 +638,7 @@ final class GPDFAPI {
 
 		foreach ( $controller->get_font_keys() as $id ) {
 			if ( isset( $font[ $id ] ) && is_file( $font[ $id ] ) ) {
+				/* phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
 				$_FILES[ $id ] = [
 					'file'     => file_get_contents( $font[ $id ] ),
 					'name'     => basename( $font[ $id ] ),
@@ -684,7 +700,9 @@ final class GPDFAPI {
 	 * @since 4.4
 	 */
 	public static function get_form_data( $entry_id ) {
-		$gform     = self::get_form_class();
+		$gform = self::get_form_class();
+
+		/** @var \GFPDF\Model\Model_PDF $pdf_model */
 		$pdf_model = self::get_mvc_class( 'Model_PDF' );
 		$entry     = $gform->get_entry( $entry_id );
 

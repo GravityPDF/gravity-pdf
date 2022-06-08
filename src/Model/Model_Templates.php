@@ -137,7 +137,7 @@ class Model_Templates extends Helper_Abstract_Model {
 			);
 
 			header( 'Content-Type: application/json' );
-			echo json_encode(
+			echo wp_json_encode(
 				[
 					'error' => $e->getMessage(),
 				]
@@ -180,7 +180,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Return newly-installed template headers */
 		header( 'Content-Type: application/json' );
-		echo json_encode(
+		echo wp_json_encode(
 			[
 				'templates' => $headers,
 			]
@@ -220,7 +220,8 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		$this->misc->handle_ajax_authentication( 'Delete PDF Template' );
 
-		$template_id = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
+		$template_id = $_POST['id'] ?? '';
 
 		/* Get all the necessary PDF template files to delete */
 		try {
@@ -233,7 +234,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$this->templates->flush_template_transient_cache();
 
 		header( 'Content-Type: application/json' );
-		echo json_encode( true );
+		echo wp_json_encode( true );
 
 		/* Okay Response */
 		wp_die( '', 200 );
@@ -286,7 +287,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$value     = $options_class->get_form_value( $template_settings );
 
 		header( 'Content-Type: application/text' );
-		echo $options_class->build_options_for_select( $templates, $value );
+		$options_class->build_options_for_select( $templates, $value, true );
 
 		/* Okay Response */
 		wp_die( '', 200 );
@@ -386,7 +387,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 			if ( ! isset( $info['template'] ) || strlen( $info['template'] ) === 0 ) {
 				/* Check if it's a v3 template */
-				$fp        = fopen( $file, 'r' );
+				$fp        = fopen( $file, 'rb' );
 				$file_data = fread( $fp, 8192 );
 				fclose( $fp );
 

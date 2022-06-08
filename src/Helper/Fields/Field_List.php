@@ -58,9 +58,16 @@ class Field_List extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
+		if ( $this->get_output() ) {
+			$this->disable_output();
+			$html = $this->html();
+			$this->enable_output();
+		} else {
+			$html = $this->html();
+		}
+
 		$data  = [];
 		$label = $this->get_label();
-		$html  = $this->html();
 
 		/* Add our List array */
 		$list_array = $this->value();
@@ -112,7 +119,7 @@ class Field_List extends Helper_Abstract_Fields {
 				<tr>
 					<?php foreach ( $columns as $column ) : ?>
 						<th>
-							<?= esc_html( $column ); ?>
+							<?php echo esc_html( $column ); ?>
 						</th>
 					<?php endforeach; ?>
 				</tr>
@@ -125,14 +132,14 @@ class Field_List extends Helper_Abstract_Fields {
 				<tr>
 					<!-- handle the basic list -->
 					<?php if ( ! $columns ) : ?>
-						<td><?= esc_html( $item ); ?></td>
+						<td><?php echo esc_html( $item ); ?></td>
 						<?php
 					else :
 						?>
 						<!-- handle the advanced list -->
 						<?php foreach ( $columns as $column ) : ?>
 						<td>
-							<?= esc_html( rgar( $item, $column ) ); ?>
+							<?php echo esc_html( rgar( $item, $column ) ); ?>
 						</td>
 					<?php endforeach; ?>
 					<?php endif; ?>

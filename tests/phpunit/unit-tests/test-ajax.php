@@ -527,6 +527,9 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertFalse( json_decode( $this->_last_response ) );
 		$this->_last_response = '';
 
+		/* Test that a core font API download request gets made */
+		$_POST['font_name'] = 'Aegean.otf';
+
 		$api_response = function() {
 			return [
 				'response' => [ 'code' => 200 ],

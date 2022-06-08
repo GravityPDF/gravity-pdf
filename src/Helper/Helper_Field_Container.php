@@ -227,7 +227,7 @@ class Helper_Field_Container {
 
 		/* Check if we should create a placeholder column */
 		if ( $this->faux_column && $this->does_fit_in_row( $field ) ) {
-			echo '<div id="field-' . $field->id . '" class="gfpdf-column-placeholder gfpdf-field ' . $field->cssClass . '"></div>';
+			echo '<div id="' . esc_html( 'field-' . $field->id ) . '" class="gfpdf-column-placeholder gfpdf-field ' . esc_html( $field->cssClass ) . '"></div>';
 
 			/* Increase column width */
 			$this->increment_width( $field->cssClass );
@@ -312,6 +312,7 @@ class Helper_Field_Container {
 	protected function open_container() {
 
 		$class = $this->is_row_odd_or_even();
+		/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
 		echo str_replace( 'row-separator', 'row-separator ' . $class, $this->open_tag );
 
 		$this->increment_row_counter();
@@ -325,6 +326,7 @@ class Helper_Field_Container {
 	 * @since 4.0
 	 */
 	protected function close_container() {
+		/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
 		echo $this->close_tag;
 	}
 

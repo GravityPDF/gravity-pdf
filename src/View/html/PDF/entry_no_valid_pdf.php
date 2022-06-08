@@ -17,5 +17,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="gfpdf_detailed_pdf_container">
-	<?= esc_html__( 'No PDFs available for this entry.', 'gravity-forms-pdf-extended' ); ?>
+	<?php echo esc_html__( 'No PDFs available for this entry.', 'gravity-forms-pdf-extended' ); ?>
 </div>

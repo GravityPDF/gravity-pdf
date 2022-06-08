@@ -19,11 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WP_Async_Request' ) ) {
-	require_once( GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php' );
+	require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
 }
 
 if ( ! class_exists( 'GF_Background_Process' ) ) {
-	require_once( GFCommon::get_base_path() . '/includes/libraries/gf-background-process.php' );
+	require_once GFCommon::get_base_path() . '/includes/libraries/gf-background-process.php';
 }
 
 /**

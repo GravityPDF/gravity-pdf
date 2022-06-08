@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Load dependencies
  */
-require_once( PDF_PLUGIN_DIR . 'src/autoload.php' );
+require_once PDF_PLUGIN_DIR . 'src/autoload.php';
 
 /**
  * @since 4.0
@@ -131,7 +131,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function __call( $name, $arguments ) {
-		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ) ), '4.0' );
 	}
 
 	/**
@@ -143,7 +143,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since  4.0
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ) ), '4.0' );
 	}
 
 	/**
@@ -400,10 +400,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependencies, $version );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependencies, $version, true );
 
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version );
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version, true );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version, true );
 
 		/* Localise admin script */
 		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
@@ -871,7 +871,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
-		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks, $this->templates );
+		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates );
 		$class = new Controller\Controller_System_Report( $model, $view );
 		$class->init();
 

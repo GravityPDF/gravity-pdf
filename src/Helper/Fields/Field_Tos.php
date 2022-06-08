@@ -7,6 +7,7 @@ use GF_Field_Checkbox;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -83,7 +84,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 
-		$terms = wp_kses_post(
+		$terms = Kses::parse(
 			wpautop(
 				$this->gform->process_tags( $this->field->gwtermsofservice_terms, $this->form, $this->entry )
 			)

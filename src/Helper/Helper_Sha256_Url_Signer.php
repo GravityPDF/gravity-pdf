@@ -36,7 +36,8 @@ class Helper_Sha256_Url_Signer extends BaseUrlSigner {
 			'url'     => (string) $url,
 		];
 
-		$token = rawurlencode( base64_encode( json_encode( $token_data ) ) );
+		/* phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode */
+		$token = rawurlencode( base64_encode( wp_json_encode( $token_data ) ) );
 
 		return hash_hmac( 'sha256', $token, $this->signatureKey );
 	}

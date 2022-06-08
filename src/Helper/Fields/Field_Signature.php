@@ -98,7 +98,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 		/* Get some sane signature defaults */
 		$width  = 75;
 		$height = 45;
-		$html   = '<img src="' . $signature . '" alt="Signature" width="' . $width . '" />';
+		$html   = '<img src="' . esc_url( $signature ) . '" alt="Signature" width="' . esc_attr( $width ) . '" />';
 
 		/* If we can load in the signature let's optimise the signature size for PDF display */
 		if ( is_file( $signature ) ) {
@@ -123,7 +123,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 			$optimised_width = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );
 
 			$optimised_height = $signature_details[1] / 3;
-			$html             = str_replace( 'width="' . $width . '"', 'width="' . $optimised_width . '"', $html );
+			$html             = str_replace( 'width="' . esc_attr( $width ) . '"', 'width="' . esc_attr( $optimised_width ) . '"', $html );
 
 			/* override the default width */
 			$width  = $optimised_width;

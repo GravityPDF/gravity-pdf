@@ -222,7 +222,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			/* Ensure the regular font file has been uploaded (required field) */
 			if ( ! isset( $files['regular'] ) ) {
-				throw new UploadException( json_encode( [ 'regular' => __( 'The Regular font is required', 'gravity-forms-pdf-extended' ) ] ) );
+				throw new UploadException( wp_json_encode( [ 'regular' => __( 'The Regular font is required', 'gravity-forms-pdf-extended' ) ] ) );
 			}
 
 			$files = $this->move_fonts_to_font_dir( $files );
@@ -482,7 +482,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		}
 
 		if ( count( $errors ) > 0 ) {
-			throw new UploadException( json_encode( $errors ) );
+			throw new UploadException( wp_json_encode( $errors ) );
 		}
 
 		return $files;
@@ -551,7 +551,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		}
 
 		if ( count( $errors ) > 0 ) {
-			throw new GravityPdfFontNotFoundException( json_encode( $errors ) );
+			throw new GravityPdfFontNotFoundException( wp_json_encode( $errors ) );
 		}
 
 		return $supports_otl;

@@ -6,6 +6,7 @@ use Exception;
 use GF_Field;
 use GFCommon;
 use GFPDF\Helper\Fields\Field_Products;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
@@ -18,6 +19,7 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Statics\Kses;
 use GFPDFEntryDetail;
 use GWConditionalLogicDateFields;
 use Psr\Log\LoggerInterface;
@@ -178,15 +180,8 @@ class View_PDF extends Helper_Abstract_View {
 			$this->misc->get_legacy_ids( $entry['id'], $settings )
 		);
 
-		/**
-		 * Show $form_data array if requested
-		 */
-		if ( isset( $_GET['data'] ) && $this->gform->has_capability( 'gravityforms_view_settings' ) && isset( $args['form_data'] ) ) {
-			echo '<pre>';
-			print_r( $args['form_data'] );
-			echo '</pre>';
-			exit;
-		}
+		/* Show $form_data array if requested */
+		$this->maybe_view_form_data( $args['form_data'] ?? [] );
 
 		/* Enable Multicurrency support */
 		$this->misc->maybe_add_multicurrency_support();
@@ -213,8 +208,9 @@ class View_PDF extends Helper_Abstract_View {
 			}
 
 			/* Determine if we should show the print dialog box */
+			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 			if ( isset( $_GET['print'] ) ) {
-				$pdf->set_print_dialog( true );
+				$pdf->set_print_dialog();
 			}
 
 			/* Render the PDF template HTML */
@@ -242,7 +238,7 @@ class View_PDF extends Helper_Abstract_View {
 					$e->getLine()
 				);
 
-				wp_die( $message );
+				wp_die( esc_html( $message ) );
 			}
 
 			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
@@ -450,7 +446,8 @@ class View_PDF extends Helper_Abstract_View {
 		 */
 		$should_disable_product_table = apply_filters( 'gfpdf_disable_product_table', false, $entry, $form, $config, $products );
 		if ( ! $should_disable_product_table && $show_individual_product_fields === false && ! $products->is_empty() ) {
-			echo $products->html();
+			$products->enable_output();
+			$products->html();
 		}
 	}
 
@@ -472,18 +469,19 @@ class View_PDF extends Helper_Abstract_View {
 		/*
 		* Set up our configuration variables
 		*/
-		$config['meta']           = ( isset( $config['meta'] ) ) ? $config['meta'] : []; /* ensure we have a meta key */
-		$show_empty_fields        = ( isset( $config['meta']['empty'] ) ) ? $config['meta']['empty'] : false; /* whether to show empty fields or not. Default is false */
-		$load_legacy_css          = ( isset( $config['meta']['legacy_css'] ) ) ? $config['meta']['legacy_css'] : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
-		$show_section_description = ( isset( $config['meta']['section_content'] ) ) ? $config['meta']['section_content'] : false; /* whether we should include a section breaks content. Default to false */
+		$config['meta']           = $config['meta'] ?? []; /* ensure we have a meta key */
+		$show_empty_fields        = $config['meta']['empty'] ?? false; /* whether to show empty fields or not. Default is false */
+		$load_legacy_css          = $config['meta']['legacy_css'] ?? false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
+		$show_section_description = $config['meta']['section_content'] ?? false; /* whether we should include a section breaks content. Default to false */
 
+		/** @var \GFPDF\Helper\Helper_Abstract_Fields $class */
 		$class = $model->get_field_class( $field, $form, $entry, $products );
 
 		/* Try and display our HTML */
 		try {
 
 			/* Only load our HTML if the field is NOT empty, or the $empty config option is true */
-			if ( ! $class->is_empty() || $show_empty_fields === true ) {
+			if ( $show_empty_fields === true || ! $class->is_empty() ) {
 				/* Load our legacy CSS class names */
 				if ( $load_legacy_css === true ) {
 					GFPDFEntryDetail::load_legacy_css( $field );
@@ -495,7 +493,8 @@ class View_PDF extends Helper_Abstract_View {
 				 */
 				$container->generate( $field );
 
-				echo ( $field->type !== 'section' ) ? $class->html() : $class->html( $show_section_description );
+				$class->enable_output();
+				$field->type !== 'section' ? $class->html() : $class->html( $show_section_description );
 			} else {
 				/* To prevent display issues we will output the column markup needed */
 				$container->maybe_display_faux_column( $field );
@@ -532,7 +531,7 @@ class View_PDF extends Helper_Abstract_View {
 			$html = $this->load( 'form_title', [ 'form' => $form ], false );
 
 			/* Run it through a filter and output */
-			echo apply_filters( 'gfpdf_pdf_form_title_html', $html, $form );
+			Kses::output( apply_filters( 'gfpdf_pdf_form_title_html', $html, $form ) );
 		}
 	}
 
@@ -574,7 +573,7 @@ class View_PDF extends Helper_Abstract_View {
 			);
 
 			/* Run it through a filter and output */
-			echo apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form );
+			Kses::output( apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form ) );
 		}
 	}
 
@@ -637,60 +636,60 @@ class View_PDF extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Allow PDF HTML Mark-up when using wp_kses_post()
+	 * Allow PDF HTML Mark-up when using wp_kses_post() during PDF generation
 	 *
-	 * @param array $context
+	 * @param array $tags
 	 *
 	 * @return array
 	 *
 	 * @since 5.1.1
 	 */
-	public function allow_pdf_html( $context ) {
-		/* Add Table autosize support */
-		$context['table']['autosize'] = true;
-
-		/* Add <pagebreak /> support */
-		$context['pagebreak'] = [
-			'orientation'   => true,
-			'type'          => true,
-			'resetpagenum'  => true,
-			'pagenumstyle'  => true,
-			'suppress'      => true,
-			'sheet-size'    => true,
-			'page-selector' => true,
-			'margin-left'   => true,
-			'margin-right'  => true,
-			'margin-top'    => true,
-			'margin-bottom' => true,
-		];
-
-		/* Add <barcode /> support */
-		$context['barcode'] = [
-			'code'   => true,
-			'type'   => true,
-			'text'   => true,
-			'size'   => true,
-			'height' => true,
-			'pr'     => true,
-		];
-
-		return $context;
+	public function allow_pdf_html( $tags ) {
+		return Kses::get_allowed_pdf_tags( $tags );
 	}
 
 	/**
-	 * Allow PDF CSS Mark-up when using wp_kses()
+	 * Allow PDF CSS Mark-up when using wp_kses_post() during PDF generation
 	 *
-	 * @param array $context
+	 * @param array $styles
 	 *
 	 * @return array
 	 *
 	 * @since 5.1.1
 	 */
-	public function allow_pdf_css( $context ) {
-		$context[] = 'page-break-inside';
-		$context[] = 'page-break-before';
-		$context[] = 'page-break-after';
+	public function allow_pdf_css( $styles ) {
+		return Kses::get_allowed_pdf_styles( $styles );
+	}
 
-		return $context;
+	/**
+	 * @param array $form_data
+	 *
+	 * @return void
+	 *
+	 * @since 6.4.0
+	 */
+	public function maybe_view_form_data( $form_data ) {
+
+		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
+		if ( ! isset( $_GET['data'] ) ) {
+			return;
+		}
+
+		/* Disable if PDF Debug Mode off AND the environment is production */
+		if ( $this->options->get_option( 'debug_mode', 'No' ) === 'No' && ( ! function_exists( 'wp_get_environment_type' ) || wp_get_environment_type() === 'production' ) ) {
+			return;
+		}
+
+		/* Check if user has permission to view info */
+		if ( ! $this->gform->has_capability( 'gravityforms_view_settings' ) ) {
+			return;
+		}
+
+		print '<pre>';
+		/* phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r */
+		print_r( $form_data );
+		print '</pre>';
+
+		exit;
 	}
 }

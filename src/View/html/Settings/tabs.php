@@ -19,14 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <nav class="gform-settings-tabs__navigation" role="tablist">
-	<?php foreach ( $args['tabs'] as $tab ): ?>
+	<?php foreach ( $args['tabs'] as $tab_nav_item ): ?>
 		<a
 				role="tab"
-				aria-selected="<?= $args['selected'] === $tab['id'] ? 'true' : 'false' ?>"
-				data-id="<?= esc_attr( $tab['id'] ); ?>"
-				class="<?= $args['selected'] === $tab['id'] ? 'active' : ''; ?>"
-				href="<?= $args['data']->settings_url . '&amp;tab=' . esc_attr( $tab['id'] ); ?>">
-			<?= esc_html( $tab['name'] ); ?>
+				aria-selected="<?php echo $args['selected'] === $tab_nav_item['id'] ? 'true' : 'false'; ?>"
+				data-id="<?php echo esc_attr( $tab_nav_item['id'] ); ?>"
+				class="<?php echo $args['selected'] === $tab_nav_item['id'] ? 'active' : ''; ?>"
+				href="<?php echo esc_url( add_query_arg( [ 'tab' => $tab_nav_item['id'] ], $args['data']->settings_url ) ); ?>">
+			<?php echo esc_html( $tab_nav_item['name'] ); ?>
 		</a>
 	<?php endforeach; ?>
 </nav>
