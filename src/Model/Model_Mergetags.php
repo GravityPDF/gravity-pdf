@@ -342,4 +342,21 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		return $gform->process_tags( $field_id, $gform->get_form( $form['id'] ), $gform->get_entry( $entry['id'] ) );
 	}
 
+	/**
+	 * Convert gform_mailchimp_field_value parameter to be compatible with gform_addon_field_value.
+	 *
+	 * @param string $field_value
+	 * @param int    $form_id
+	 * @param int    $field_id
+	 * @param array $entry
+	 *
+	 * @return string
+	 *
+	 * @since 6.3.2
+	 */
+	public function process_field_value_mailchimp( $field_value, $form_id, $field_id, $entry ) {
+		$gform = \GPDFAPI::get_form_class();
+		return $this->process_field_value( $field_value, $gform->get_form( $form_id ), $entry, $field_id );
+	}
+
 }
