@@ -911,7 +911,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Detect any Gravity PDF messages and convert to Gravity Forms message system
+	 * Detect any Gravity PDF messages and add to our notice system
 	 *
 	 * @since 6.0
 	 */
@@ -919,7 +919,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$messages = get_settings_errors( 'gfpdf-notices' );
 
 		foreach ( $messages as $message ) {
-			GFCommon::add_message( $message['message'], $message['type'] !== 'updated' );
+			if ( $message['type'] !== 'updated' ) {
+				$this->notices->add_error( $message['message'] );
+			} else {
+				$this->notices->add_notice( $message['message'] );
+			}
 		}
 	}
 

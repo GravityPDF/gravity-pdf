@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /** @var $args array */
 
+GFCommon::display_admin_message();
+
 ?>
 
 <div id="pdfextended-settings">
