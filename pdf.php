@@ -437,12 +437,12 @@ class GFPDF_Major_Compatibility_Checks {
 		<p><?php esc_html_e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to use the plugin:', 'gravity-forms-pdf-extended' ); ?></p>
 		<ul style="padding-bottom: 0">
 			<?php foreach ( $this->notices as $notice ): ?>
-				<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
+				<li style="padding-left: 20px;list-style: inside"><?php echo wp_kses_post( $notice ); ?></li>
 			<?php endforeach; ?>
 		</ul>
 
 		<?php if ( $this->offer_downgrade && PDF_PLUGIN_BASENAME === 'gravity-forms-pdf-extended/pdf.php' ): ?>
-			<form method="post" action="<?= admin_url( 'index.php?page=gpdf-downgrade' ) ?>">
+			<form method="post" action="<?php echo esc_url( admin_url( 'index.php?page=gpdf-downgrade' ) ); ?>">
 				<?php wp_nonce_field( 'gpdf-downgrade' ); ?>
 				<p>
 					<?php esc_html_e( 'Not ready to upgrade? Try an earlier version of Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
@@ -475,18 +475,18 @@ class GFPDF_Major_Compatibility_Checks {
 	 */
 	public function rollback() {
 		if ( ! check_admin_referer( 'gpdf-downgrade' ) || ! current_user_can( 'update_plugins' ) ) {
-			die( __( 'The link you followed has expired.', 'default' ) );
+			die( esc_html__( 'The link you followed has expired.', 'default' ) );
 		}
 
 		$plugin   = 'gravity-forms-pdf-extended';
 		$response = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/' . $plugin . '.json' );
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			die( __( 'Plugin downgrade failed.', 'default' ) );
+			die( esc_html__( 'Plugin downgrade failed.', 'default' ) );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( empty( $body['versions'] ) ) {
-			die( __( 'Plugin downgrade failed.', 'default' ) );
+			die( esc_html__( 'Plugin downgrade failed.', 'default' ) );
 		}
 
 		/* Get the first matching v5 tag and url (the latest) */

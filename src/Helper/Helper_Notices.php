@@ -207,8 +207,8 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	private function html( $text, $class = 'updated' ) {
 		?>
-		<div class="<?= $class; ?> notice">
-			<p><?= $text; ?></p>
+		<div class="<?php echo esc_attr( $class ); ?> notice">
+			<p><?php echo wp_kses_post( $text ); ?></p>
 		</div>
 		<?php
 	}

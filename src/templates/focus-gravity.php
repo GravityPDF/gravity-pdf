@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Focus Gravity
- * Version: 2.0.1
+ * Version: 2.0.2
  * Description: Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -55,7 +55,7 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+		float: <?php echo $settings['rtl'] === 'Yes' ? 'right' : 'left'; ?>;
 	}
 
 	.grid .inner-container {
@@ -256,7 +256,7 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 	#container {
 		border-radius: 5px;
 		border: 1px solid #000;
-		border-color: <?= $accent_colour; ?>;
+		border-color: <?php echo esc_html( $accent_colour ); ?>;
 	}
 
 	#form_title {
@@ -265,8 +265,8 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 	}
 
 	h3 {
-		background: <?= $accent_colour; ?>;
-		color: <?= $accent_contrast_colour; ?>;
+		background: <?php echo esc_html( $accent_colour ); ?>;
+		color: <?php echo esc_html( $accent_contrast_colour ); ?>;
 		margin: 0;
 	}
 
@@ -277,9 +277,9 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 	.gfpdf-field .label {
 		font-weight: bold;
 		border-bottom: 1px solid #000;
-		border-bottom-color: <?= $accent_colour; ?>;
-		background: <?= $secondary_colour; ?>;
-		color: <?= $secondary_contrast_colour; ?>;
+		border-bottom-color: <?php echo esc_html( $accent_colour ); ?>;
+		background: <?php echo esc_html( $secondary_colour ); ?>;
+		color: <?php echo esc_html( $secondary_contrast_colour ); ?>;
 	}
 
 	.value, .gfpdf-section-description, .gfpdf-field .label, h3, .gfpdf-html .value {
@@ -288,12 +288,12 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 
 	.gfpdf-html {
 		border-top: 5px solid #000;
-		border-top-color: <?= $secondary_colour; ?>;
+		border-top-color: <?php echo esc_html( $secondary_colour ); ?>;
 	}
 
 	table.gfield_list th {
-		background: <?= $accent_colour; ?>;
-		color: <?= $accent_contrast_colour; ?>;
+		background: <?php echo esc_html( $accent_colour ); ?>;
+		color: <?php echo esc_html( $accent_contrast_colour ); ?>;
 	}
 
 	table.entry-products th, table.entry-products td.emptycell {
@@ -312,13 +312,13 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 	}
 
 	.even {
-		background: <?= $secondary_colour; ?>;
+		background: <?php echo esc_html( $secondary_colour ); ?>;
 	}
 
 	<?php else : ?>
 	.gfpdf-html .value {
 		border-top: 1px solid #000;
-		border-top-color: <?= $accent_colour; ?>;
+		border-top-color: <?php echo esc_html( $accent_colour ); ?>;
 	}
 
 	<?php endif; ?>

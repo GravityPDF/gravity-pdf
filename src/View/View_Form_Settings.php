@@ -18,8 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * View_Form_Settings
  *
- * A general class for About / Intro Screen
- *
  * @since 4.0
  */
 class View_Form_Settings extends Helper_Abstract_View {
@@ -43,7 +41,9 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'width'            => 'full',
 				'title'            => __( 'General', 'gravity-forms-pdf-extended' ),
 				'desc'             => '',
-				'content'          => $markup->do_settings_fields( 'gfpdf_settings_form_settings', $markup::ENABLE_PANEL_TITLE ),
+				'callback'         => static function() use ( $markup ) {
+					$markup->output_settings_fields( 'gfpdf_settings_form_settings', $markup::ENABLE_PANEL_TITLE );
+				},
 				'collapsible'      => true,
 				'collapsible-open' => true,
 			],
@@ -53,7 +53,9 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'width'            => 'full',
 				'title'            => __( 'Appearance', 'gravity-forms-pdf-extended' ),
 				'desc'             => '',
-				'content'          => $markup->do_settings_fields( 'gfpdf_settings_form_settings_appearance', $markup::ENABLE_PANEL_TITLE ),
+				'callback'         => static function() use ( $markup ) {
+					$markup->output_settings_fields( 'gfpdf_settings_form_settings_appearance', $markup::ENABLE_PANEL_TITLE );
+				},
 				'collapsible'      => true,
 				'collapsible-open' => true,
 			],
@@ -63,7 +65,9 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'width'            => 'full',
 				'title'            => __( 'Template', 'gravity-forms-pdf-extended' ),
 				'desc'             => '',
-				'content'          => $markup->do_settings_fields( 'gfpdf_settings_form_settings_custom_appearance', $markup::ENABLE_PANEL_TITLE ),
+				'callback'         => static function() use ( $markup ) {
+					$markup->output_settings_fields( 'gfpdf_settings_form_settings_custom_appearance', $markup::ENABLE_PANEL_TITLE );
+				},
 				'collapsible'      => true,
 				'collapsible-open' => true,
 			],
@@ -73,7 +77,9 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'width'            => 'full',
 				'title'            => __( 'Advanced', 'gravity-forms-pdf-extended' ),
 				'desc'             => '',
-				'content'          => $markup->do_settings_fields( 'gfpdf_settings_form_settings_advanced', $markup::ENABLE_PANEL_TITLE ),
+				'callback'         => static function() use ( $markup ) {
+					$markup->output_settings_fields( 'gfpdf_settings_form_settings_advanced', $markup::ENABLE_PANEL_TITLE );
+				},
 				'collapsible'      => true,
 				'collapsible-open' => true,
 			],
@@ -82,7 +88,9 @@ class View_Form_Settings extends Helper_Abstract_View {
 		$vars = array_merge(
 			$vars,
 			[
-				'content' => $markup->do_settings_sections( $sections ),
+				'callback' => static function() use ( $markup, $sections ) {
+					$markup->do_settings_sections( $sections, true );
+				},
 			]
 		);
 

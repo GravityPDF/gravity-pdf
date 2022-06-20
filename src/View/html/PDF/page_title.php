@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="row-separator">
-	<h3 class="gfpdf-page gfpdf-field <?= $classes; ?>">
-		<?= $form['pagination']['pages'][ $page ]; ?>
+	<h3 class="gfpdf-page gfpdf-field <?php echo esc_attr( $classes ); ?>">
+		<?php echo esc_html( $form['pagination']['pages'][ $page ] ); ?>
 	</h3>
 </div>

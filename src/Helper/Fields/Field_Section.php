@@ -9,6 +9,7 @@ use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Statics\Kses;
 use GPDFAPI;
 
 /**
@@ -119,11 +120,11 @@ class Field_Section extends Helper_Abstract_Fields {
 		/* sanitize the HTML */
 		$section = $this->value(); /* allow the same HTML as per the post editor */
 
-		$html  = '<div id="field-' . $this->field->id . '" class="gfpdf-section-title gfpdf-field ' . $this->field->cssClass . '">';
-		$html .= '<h3>' . $section['title'] . '</h3>';
+		$html  = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="gfpdf-section-title gfpdf-field ' . esc_attr( $this->field->cssClass ) . '">';
+		$html .= '<h3>' . esc_html( $section['title'] ) . '</h3>';
 
 		if ( ! empty( $value ) ) {
-			$html .= '<div id="field-' . $this->field->id . '-desc" class="gfpdf-section-description gfpdf-field">' . $section['description'] . '</div>';
+			$html .= '<div id="' . esc_html( 'field-' . $this->field->id . '-desc' ) . '" class="gfpdf-section-description gfpdf-field">' . Kses::parse( $section['description'] ) . '</div>';
 		}
 
 		$html .= '</div>';
@@ -133,7 +134,7 @@ class Field_Section extends Helper_Abstract_Fields {
 		 *
 		 * @since 4.1
 		 */
-		return apply_filters(
+		$html = apply_filters(
 			'gfpdf_field_section_break_html',
 			$html,
 			$section['title'],
@@ -144,6 +145,13 @@ class Field_Section extends Helper_Abstract_Fields {
 			$this->entry,
 			$this
 		);
+
+		if ( $this->get_output() ) {
+			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+			echo $html;
+		}
+
+		return $html;
 	}
 
 	/**
@@ -161,7 +169,7 @@ class Field_Section extends Helper_Abstract_Fields {
 		$this->cache(
 			[
 				'title'       => esc_html( $this->field->label ),
-				'description' => wp_kses_post(
+				'description' => Kses::parse(
 					$this->gform->process_tags( $this->field->description, $this->form, $this->entry )
 				),
 			]

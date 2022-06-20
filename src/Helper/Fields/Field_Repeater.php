@@ -126,17 +126,34 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
+		/* Ensure the field outputs the HTML and can be reset to the original value */
+		$output_already_enabled = $this->get_output();
+		if ( ! $output_already_enabled ) {
+			$this->enable_output();
+		}
+
 		ob_start();
 		$this->get_repeater_html( $value, $this->field );
+		$html = ob_get_clean();
 
-		return ob_get_clean();
+		/* If output wasn't enabled by default, disable again */
+		if ( ! $output_already_enabled ) {
+			$this->disable_output();
+		}
+
+		if ( $this->get_output() ) {
+			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+			echo $html;
+		}
+
+		return $html;
 	}
 
 	/**
 	 * Output the Repeater HTML
 	 *
 	 * @param array $value The current Repeater entry data
-	 * @param array $field The current Repeater Field
+	 * @param GF_Field_Repeater $field The current Repeater Field
 	 *
 	 * @throws Exception
 	 * @since 5.1
@@ -152,7 +169,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 		/* Output the Repeater Label if a sub Repeater */
 		if ( ! $is_top_level ) {
-			echo sprintf( '<div class="gfpdf-section-title"><h3>%s</h3></div>', $field->label );
+			echo sprintf( '<div class="gfpdf-section-title"><h3>%s</h3></div>', esc_html( $field->label ) );
 		}
 
 		/* Loop through the entry data for the current repeater */
@@ -180,17 +197,22 @@ class Field_Repeater extends Helper_Abstract_Fields {
 				}
 
 				/* Output a field using the standard method if not empty */
+				/** @var Helper_Abstract_Fields $class */
 				$class = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products );
+
 				if ( ! $class->is_empty() ) {
 					$field->cssClass = '';
 					$container->generate( $sub_field );
-					echo $class->html();
+					$class->enable_output();
+					$class->html();
 					$container->close( $sub_field );
 				}
+
+				unset( $class );
 			}
 
 			if ( $is_top_level ) {
-				echo parent::html( ob_get_clean() );
+				parent::html( ob_get_clean() );
 			}
 		}
 	}

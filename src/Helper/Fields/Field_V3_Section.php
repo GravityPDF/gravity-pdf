@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
+use GFPDF\Statics\Kses;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2022, Blue Liquid Designs
@@ -34,10 +36,15 @@ class Field_V3_Section extends Field_Section {
 		/* sanitize the HTML */
 		$section = $this->value(); /* allow the same HTML as per the post editor */
 
-		$html = '<h2 class="default entry-view-section-break" id="field-' . $this->field->id . '">' . $section['title'] . '</h2>';
+		$html = '<h2 class="default entry-view-section-break" id="' . esc_attr( 'field-' . $this->field->id ) . '">' . esc_html( $section['title'] ) . '</h2>';
 
 		if ( ! empty( $value ) ) {
-			$html .= '<div class="default entry-view-section-break entry-view-section-break-content">' . $section['description'] . '</div>';
+			$html .= '<div class="default entry-view-section-break entry-view-section-break-content">' . Kses::parse( $section['description'] ) . '</div>';
+		}
+
+		if ( $this->get_output() ) {
+			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+			echo $html;
 		}
 
 		return $html;

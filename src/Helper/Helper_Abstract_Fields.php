@@ -7,6 +7,7 @@ use GF_Field;
 use GFCache;
 use GFCommon;
 use GFFormsModel;
+use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -73,6 +74,15 @@ abstract class Helper_Abstract_Fields {
 	protected $cached_results;
 
 	/**
+	 * Backwards-compatible way to echo the HTML content
+	 *
+	 * @var bool
+	 *
+	 * @since 6.4.0
+	 */
+	private $output = false;
+
+	/**
 	 * As come fields can have multiple field types we'll use $fieldObject to store the object
 	 *
 	 * @var object
@@ -129,7 +139,39 @@ abstract class Helper_Abstract_Fields {
 		$this->entry = $entry;
 		$this->form  = apply_filters( 'gfpdf_current_form_object', $gform->get_form( $entry['form_id'] ), $entry, 'helper_abstract_fields' );
 		$this->gform = $gform;
+	}
 
+	/**
+	 * Echo the HTML content when calling self::html()
+	 *
+	 * @return void
+	 *
+	 * @since 6.4.0
+	 */
+	final public function enable_output(): void {
+		$this->output = true;
+	}
+
+	/**
+	 * Do not echo the HTML content when calling self::html()
+	 *
+	 * @return void
+	 *
+	 * @since 6.4.0
+	 */
+	final public function disable_output(): void {
+		$this->output = false;
+	}
+
+	/**
+	 * Checks if the output should be echoed or not
+	 *
+	 * @return bool
+	 *
+	 * @since 6.4.0
+	 */
+	final public function get_output(): bool {
+		return $this->output;
 	}
 
 	/**
@@ -303,11 +345,11 @@ abstract class Helper_Abstract_Fields {
 		$label = esc_html( $this->get_label() );
 		$type  = $this->field->get_input_type();
 
-		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-' . $type . ' gfpdf-field ' . $this->field->cssClass . '">
+		$html = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="gfpdf-field ' . esc_attr( 'gfpdf-' . $type ) . ' ' . esc_attr( $this->field->cssClass ) . '">
 					<div class="inner-container">';
 
 		if ( $show_label ) {
-			$html .= '<div class="label"><strong>' . $label . '</strong></div>';
+			$html .= '<div class="label"><strong>' . Kses::parse( $label ) . '</strong></div>';
 		}
 
 		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
@@ -315,13 +357,19 @@ abstract class Helper_Abstract_Fields {
 			$value = '&nbsp;';
 		}
 
-		$html .= '<div class="value">' . $value . '</div>'
+		$html .= '<div class="value">' . Kses::parse( $value ) . '</div>'
 				 . '</div>'
 				 . '</div>';
 
 		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_html_value for more details about this filter */
+		$html = apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry, $this );
 
-		return apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry, $this );
+		if ( $this->get_output() ) {
+			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+			echo $html;
+		}
+
+		return $html;
 	}
 
 	/**

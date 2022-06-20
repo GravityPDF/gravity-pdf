@@ -7,6 +7,7 @@ use GF_Field_Post_Content;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -80,7 +81,7 @@ class Field_Post_Content extends Helper_Abstract_Fields {
 		$value = $this->get_value();
 
 		if ( isset( $this->field->useRichTextEditor ) && true === $this->field->useRichTextEditor ) {
-			$html = wp_kses_post(
+			$html = Kses::parse(
 				$this->gform->process_tags( $value, $this->form, $this->entry )
 			);
 		} else {

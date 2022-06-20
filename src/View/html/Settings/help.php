@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="pdfextended-settings" class="gpdf-help">
 
-	<?= $args['menu'] ?>
+	<?php do_action( 'gfpdf_settings_sub_menu' ); ?>
 
 	<h2><?php esc_html_e( 'Get help with Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h2>
 

@@ -31,14 +31,15 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 	protected $view_type = 'GravityForms';
 
 	/**
-	 * @param $sections
+	 * @param array $sections
+	 * @param bool $echo
 	 *
 	 * @return string
 	 */
-	public function do_settings_sections( $sections ) {
+	public function do_settings_sections( $sections, $echo = false ) {
 		$markup = '';
 		foreach ( $sections as $section ) {
-			$markup .= $this->fieldset( $section );
+			$markup .= $this->fieldset( $section, $echo );
 		}
 
 		return $markup;
@@ -46,11 +47,12 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 
 	/**
 	 * @param array $args
+	 * @param bool $echo
 	 *
 	 * @return string
 	 */
-	public function fieldset( $args ) {
-		return $this->load( 'fieldset', $args, false );
+	public function fieldset( $args, $echo = false ) {
+		return $this->load( 'fieldset', $args, $echo );
 	}
 
 	/**
@@ -62,10 +64,22 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 	public function do_settings_fields( $id, $output_title = self::DISABLE_PANEL_TITLE ) {
 		ob_start();
 		foreach ( (array) $this->get_section_fields( $id ) as $field ) {
-			echo $this->get_field_content( $field, $output_title );
+			$this->get_field_content( $field, $output_title, true );
 		}
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * @param string $id
+	 * @param int    $output_title
+	 *
+	 * @since 6.4.0
+	 */
+	public function output_settings_fields( string $id, int $output_title = self::DISABLE_PANEL_TITLE ): void {
+		foreach ( (array) $this->get_section_fields( $id ) as $field ) {
+			$this->get_field_content( $field, $output_title, true );
+		}
 	}
 
 	/**
@@ -93,16 +107,17 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 
 		$section = [];
 		foreach ( $this->get_section_fields( $section_id ) as $field ) {
-			$id      = $field['args']['id'];
-			$content = $this->get_field_content( $field );
+			$id = $field['args']['id'];
 
 			$section[] = [
 				'id'            => $id,
-				'width'         => isset( $overrides[ $id ]['width'] ) ? $overrides[ $id ]['width'] : 'half',
+				'width'         => $overrides[ $id ]['width'] ?? 'half',
 				'title'         => $field['title'],
-				'desc'          => isset( $overrides[ $id ]['desc'] ) ? $overrides[ $id ]['desc'] : '',
-				'content'       => $content,
-				'content_class' => isset( $overrides[ $id ]['content_class'] ) ? $overrides[ $id ]['content_class'] : '',
+				'desc'          => $overrides[ $id ]['desc'] ?? '',
+				'callback'      => function() use ( $field ) {
+					$this->get_field_content( $field, self::DISABLE_PANEL_TITLE, true );
+				},
+				'content_class' => $overrides[ $id ]['content_class'] ?? '',
 				'tooltip'       => ! empty( $field['args']['tooltip'] ) ? $this->get_tooltip_markup( $field['args']['tooltip'] ) : '',
 				'collapsible'   => isset( $overrides[ $id ]['collapsible'] ) ? (bool) $overrides[ $id ]['collapsible'] : false,
 			];
@@ -114,10 +129,11 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 	/**
 	 * @param     $field
 	 * @param int $output_title
+	 * @param bool $echo
 	 *
 	 * @return bool|string|WP_Error
 	 */
-	public function get_field_content( $field, $output_title = self::DISABLE_PANEL_TITLE ) {
+	public function get_field_content( $field, int $output_title = self::DISABLE_PANEL_TITLE, bool $echo = false ) {
 
 		$class = 'gform-settings-field gfpdf-settings-field-wrapper';
 
@@ -136,7 +152,7 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 			}
 		}
 
-		return $this->load( 'settings_field', $args, false );
+		return $this->load( 'settings_field', $args, $echo );
 	}
 
 	/**

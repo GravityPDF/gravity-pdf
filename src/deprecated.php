@@ -4,11 +4,14 @@
 
 use GFPDF\Helper\Fields\Field_V3_Products;
 use GFPDF\Helper\Helper_Mpdf;
+use GFPDF\Statics\Kses;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Mpdf\MpdfException;
 
 /*
  * Deprecated Functionality / Classes
+ *
+ * @phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
  */
 
 /**
@@ -39,7 +42,7 @@ abstract class GFPDF_Deprecated_Abstract {
 	 *
 	 */
 	public function __call( $name, $arguments ) {
-		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ) ), '4.0' );
 	}
 
 	/**
@@ -52,7 +55,7 @@ abstract class GFPDF_Deprecated_Abstract {
 	 *
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ) ), '4.0' );
 	}
 }
 
@@ -236,14 +239,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 4.0
 	 */
 	public static function view_data( $form_data ) {
-		$gform = GPDFAPI::get_form_class();
-
-		if ( isset( $_GET['data'] ) && $gform->has_capability( 'gravityforms_view_settings' ) ) {
-			print '<pre>';
-			print_r( $form_data );
-			print '</pre>';
-			exit;
-		}
+		$pdf_view = \GPDFAPI::get_pdf_class();
+		$pdf_view->maybe_view_form_data( $form_data );
 	}
 
 	/**
@@ -256,7 +253,9 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function post( $name ) {
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		if ( isset( $_POST[ $name ] ) ) {
+			/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 			return $_POST[ $name ];
 		}
 
@@ -273,7 +272,9 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function get( $name ) {
+		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 		if ( isset( $_GET[ $name ] ) ) {
+			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 			return $_GET[ $name ];
 		}
 
@@ -407,11 +408,11 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 
 		/* Output the form title */
 		if ( isset( $config['return'] ) && $config['return'] ) {
-			$results['title'] = '<h2 id="details" class="default">' . $form['title'] . '</h2>';
+			$results['title'] = '<h2 id="details" class="default">' . esc_html( $form['title'] ) . '</h2>';
 		} else {
 			?>
 			<div id='container'>
-			<h2 id='details' class='default'><?= $form['title']; ?></h2>
+			<h2 id='details' class='default'><?php echo esc_html( $form['title'] ); ?></h2>
 			<?php
 		}
 
@@ -432,11 +433,11 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			/* Check if we should display the page names */
 			if ( $config['page_names'] === true && (int) $field->pageNumber !== $page_number && isset( $form['pagination']['pages'][ $page_number ] ) ) {
 				if ( isset( $config['return'] ) && $config['return'] ) {
-					$results['field'][] = '<h2 id="field-' . $field->id . '" class="default entry-view-page-break">' . $form['pagination']['pages'][ $page_number ] . '</h2>';
+					$results['field'][] = '<h2 id="field-' . esc_attr( $field->id ) . '" class="default entry-view-page-break">' . esc_html( $form['pagination']['pages'][ $page_number ] ) . '</h2>';
 				} else {
 					?>
-					<h2 id="field-<?= $field->id; ?>"
-						class="default entry-view-page-break"><?= $form['pagination']['pages'][ $page_number ]; ?></h2>
+					<h2 id="field-<?php echo esc_attr( $field->id ); ?>"
+						class="default entry-view-page-break"><?php echo esc_attr( $form['pagination']['pages'][ $page_number ] ); ?></h2>
 					<?php
 				}
 				$page_number++;
@@ -451,7 +452,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 				continue;
 			}
 
-			/* Load our class */
+			/** @var \GFPDF\Helper\Helper_Abstract_Fields $class */
 			$class = $model->get_field_class( $field, $form, $lead, $products );
 
 			self::load_legacy_css( $field );
@@ -460,12 +461,12 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			if ( $input === 'html' ) {
 
 				if ( $config['html_field'] === true ) {
-					$html = $class->html();
 
 					if ( isset( $config['return'] ) && $config['return'] ) {
-						$results['field'][] = $html;
+						$results['field'][] = $class->html();
 					} else {
-						echo $html;
+						$class->enable_output();
+						$class->html();
 					}
 				}
 
@@ -474,25 +475,22 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 
 			/* Only load our HTML if the field is NOT empty, or the 'empty_field' config option is true */
 			if ( $config['empty_field'] === true || ! $class->is_empty() ) {
-
-				$html = ( $field->type !== 'section' ) ? $class->html() : $class->html( $config['section_content'] );
-
 				if ( isset( $config['return'] ) && $config['return'] ) {
-					$results['field'][] = $html;
+					$results['field'][] = $field->type !== 'section' ? $class->html() : $class->html( $config['section_content'] );
 				} else {
-					echo $html;
+					$class->enable_output();
+					$field->type !== 'section' ? $class->html() : $class->html( $config['section_content'] );
 				}
 			}
 		}
 
 		/* Output product table, if needed */
 		if ( $has_products && ! $products->is_empty() ) {
-			$products = $products->html();
-
 			if ( $config['return'] ) {
-				$results['field'][] = $products;
+				$results['field'][] = $products->html();
 			} else {
-				echo $products;
+				$products->enable_output();
+				$products->html();
 			}
 		}
 
@@ -521,10 +519,10 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 */
 	public static function legacy_html_format( $html, $value, $show_label, $label, $field ) {
 
-		$html = '<div id="field-' . $field->id . '" class="' . $field->cssClass . '">';
+		$html = '<div id="' . esc_attr( 'field-' . $field->id ) . '" class="' . esc_attr( $field->cssClass ) . '">';
 
 		if ( $show_label ) {
-			$html .= '<div class="strong">' . $label . '</div>';
+			$html .= '<div class="strong">' . Kses::parse( $label ) . '</div>';
 		}
 
 		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
@@ -532,7 +530,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			$value = '&nbsp;';
 		}
 
-		$html .= '<div class="value">' . $value . '</div>'
+		$html .= '<div class="value">' . Kses::parse( $value ) . '</div>'
 				 . '</div>';
 
 		return $html;
@@ -584,7 +582,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 		}
 
 		/* Add odd / even rows */
-		$field->cssClass = ( $counter++ % 2 ) ? $field->cssClass . ' odd' : ' even';
+		$field->cssClass = ( $counter % 2 ) ? $field->cssClass . ' odd' : ' even';
 
 		switch ( $field->type ) {
 			case 'html':
@@ -601,6 +599,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 		}
 
 		$field->cssClass .= ' gfpdf-field-processed';
+
+		$counter++;
 	}
 
 	/**

@@ -353,7 +353,7 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.2
 	 *
 	 */
-	public abstract function plugin_updater();
+	abstract public function plugin_updater();
 
 	/**
 	 * Register the add-on with Gravity PDF
@@ -531,7 +531,7 @@ abstract class Helper_Abstract_Addon {
 				'body'      => [
 					'edd_action' => 'check_license',
 					'license'    => $license_info['license'],
-					'item_name'  => urlencode( $this->get_short_name() ),
+					'item_name'  => rawurlencode( $this->get_short_name() ),
 					'url'        => home_url(),
 				],
 			]
@@ -607,8 +607,8 @@ abstract class Helper_Abstract_Addon {
 							'%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades and support. Need a license key? %4$sPurchase one now%5$s.',
 							'gravity-forms-pdf-extended'
 						),
-						'<a href="' . admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=license' ) . '">',
-						$this->get_name(),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=license' ) ) . '">',
+						esc_html( $this->get_name() ),
 						'</a>',
 						'<a href="' . esc_url( 'https://gravitypdf.com/checkout/?edd_action=add_to_cart&download_id=' . $edd_id ) . '">',
 						'</a>'

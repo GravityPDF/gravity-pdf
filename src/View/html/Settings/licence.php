@@ -22,12 +22,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<form method="post" class="gform_settings_form" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<?= $args['menu'] ?>
-		<?= $args['content'] ?>
+		<?php do_action( 'gfpdf_settings_sub_menu' ); ?>
+
+		<?php
+		/** @since 6.4.0 */
+		if ( isset( $args['callback'] ) ) {
+			call_user_func_array( $args['callback'], $args['callback_args'] ?? [] );
+		}
+
+		/** @deprecated 6.4.0 */
+		if ( isset( $args['content'] ) ) {
+			echo wp_kses_post( $args['content'] );
+		}
+		?>
 
 		<?php if ( $args['edit_cap'] ): ?>
 			<div id="submit-and-promo-container">
-				<input type="submit" name="submit" id="submit" value="<?= esc_html__( 'Save Settings  →', 'gravityforms' ) ?>" class="button primary large">
+				<input type="submit" name="submit" id="submit" value="<?php echo esc_html__( 'Save Settings  →', 'gravityforms' ); ?>" class="button primary large">
 			</div>
 		<?php endif; ?>
 	</form>

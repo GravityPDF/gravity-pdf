@@ -43,7 +43,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+		float: <?php echo $settings['rtl'] === 'Yes' ? 'right' : 'left'; ?>;
 	}
 
 	.grid .inner-container {

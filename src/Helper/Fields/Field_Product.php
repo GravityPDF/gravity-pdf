@@ -3,6 +3,7 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Abstract_Field_Products;
+use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -34,7 +35,7 @@ class Field_Product extends Helper_Abstract_Field_Products {
 			$name = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
 			$name = esc_html( $name );
 
-			$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
+			$price = $value['price_unformatted'] ?? '';
 			$price = esc_html( $price );
 
 			return $this->set_form_data( $name, $price );
@@ -59,13 +60,13 @@ class Field_Product extends Helper_Abstract_Field_Products {
 
 		if ( isset( $value['price'] ) ) {
 			if ( in_array( $this->field->get_input_type(), [ 'radio', 'select' ], true ) ) {
-				$html .= $value['name'] . ' - ' . $value['price'];
+				$html .= Kses::parse( $value['name'] . ' - ' . $value['price'] );
 			} else {
-				$html .= $value['price'];
+				$html .= esc_html( $value['price'] );
 			}
 		}
 
-		return parent::html( esc_html( $html ) );
+		return parent::html( $html );
 	}
 
 	/**

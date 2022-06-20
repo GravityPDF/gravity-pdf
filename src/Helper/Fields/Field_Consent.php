@@ -7,6 +7,7 @@ use GF_Field_Consent;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -93,8 +94,8 @@ class Field_Consent extends Helper_Abstract_Fields {
 
 		$consent = [
 			'value'       => $value[0],
-			'label'       => wp_kses_post( $this->gform->process_tags( $value[1], $this->form, $this->entry ) ),
-			'description' => wp_kses_post(
+			'label'       => Kses::parse( $this->gform->process_tags( $value[1], $this->form, $this->entry ) ),
+			'description' => Kses::parse(
 				wpautop(
 					$this->gform->process_tags( $this->field->get_field_description_from_revision( $value[2] ), $this->form, $this->entry )
 				)

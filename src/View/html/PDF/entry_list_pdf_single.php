@@ -16,9 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /** @var $args array */
 
+$is_download = $args['view'] === 'download';
+
 ?>
 
 |
-<a href="<?= ( $args['view'] === 'download' ) ? esc_url( $args['pdf']['download'] ) : esc_url( $args['pdf']['view'] ); ?>" <?= ( $args['view'] !== 'download' ) ? 'target="_blank"' : ''; ?>>
-	<?= ( $args['view'] === 'download' ) ? esc_html__( 'Download PDF', 'gravity-forms-pdf-extended' ) : esc_html__( 'View PDF', 'gravity-forms-pdf-extended' ); ?>
+<a href="<?php echo $is_download ? esc_url( $args['pdf']['download'] ) : esc_url( $args['pdf']['view'] ); ?>" <?php echo $is_download ? 'target="_blank"' : ''; ?>>
+	<?php echo $is_download ? esc_html__( 'Download PDF', 'gravity-forms-pdf-extended' ) : esc_html__( 'View PDF', 'gravity-forms-pdf-extended' ); ?>
 </a>

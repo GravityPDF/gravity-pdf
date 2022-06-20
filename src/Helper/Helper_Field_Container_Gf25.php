@@ -113,7 +113,7 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 
 			$row_html = ob_get_clean();
 
-			/* Set the last grid item inner container width to 100% (if exists) */
+			/* phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped */
 			try {
 				$qp = new Helper_QueryPath();
 				echo $qp->html5( $row_html, '.grid:last-of-type .inner-container' )
@@ -122,6 +122,7 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 			} catch ( \Exception $e ) {
 				echo $row_html;
 			}
+			/* phpcs:enable */
 		}
 	}
 

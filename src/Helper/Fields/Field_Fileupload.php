@@ -107,7 +107,7 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 
 			foreach ( $files as $file ) {
 				$file_info = pathinfo( $file );
-				$html     .= '<li id="field-' . $this->field->id . '-option-' . $i . '"><a href="' . esc_url( $file ) . '">' . esc_html( $file_info['basename'] ) . '</a></li>';
+				$html     .= '<li id="' . esc_attr( 'field-' . $this->field->id . '-option-' . $i ) . '"><a href="' . esc_url( $file ) . '">' . esc_html( $file_info['basename'] ) . '</a></li>';
 				$i++;
 			}
 

@@ -114,13 +114,13 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 		/* User / CORS validation */
 		$this->misc->handle_ajax_authentication( 'Save Core Font', 'gravityforms_edit_settings' );
 
-		/* Download and save our font */
-		$fontname = isset( $_POST['font_name'] ) ? $_POST['font_name'] : '';
+		/* phpcs:ignore WordPress.Security.NonceVerification */
+		$fontname = $_POST['font_name'] ?? '';
 		$results  = $this->download_and_save_font( $fontname );
 
 		/* Return results */
 		header( 'Content-Type: application/json' );
-		echo json_encode( $results );
+		echo wp_json_encode( $results );
 		wp_die();
 	}
 
@@ -135,13 +135,48 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	 */
 	protected function download_and_save_font( $fontname ) {
 
-		/* Only the font name is passed via AJAX. The Repo we download from is fixed (prevent security issues) */
+		/* Verify the font name provided is approved */
+		$core_font_list = wp_json_file_decode( __DIR__ . '/../../dist/payload/core-fonts.json', [ 'associative' => true ] );
+		if ( $core_font_list === null ) {
+			$this->log->error( 'Core font list could not be loaded' );
+
+			return false;
+		}
+
+		/* Look for a file in the font list with a matching name */
+		$matching_fonts = array_filter(
+			$core_font_list,
+			function( $item ) use ( $fontname ) {
+				return $item['name'] === $fontname;
+			}
+		);
+
+		$matching_fonts = array_values( $matching_fonts );
+
+		if ( ! isset( $matching_fonts[0] ) ) {
+			$this->log->error(
+				'Core Font not on the approved list',
+				[
+					'name' => $fontname,
+				]
+			);
+
+			return false;
+		}
+
+		/* Extra check to verify the download URL points to the correct repo */
+		if ( strpos( $matching_fonts[0]['download_url'], $this->github_repo ) !== 0 ) {
+			$this->log->error( 'Core font list is corrupted' );
+
+			return false;
+		}
+
 		$res = wp_remote_get(
-			$this->github_repo . $fontname,
+			$matching_fonts[0]['download_url'],
 			[
 				'timeout'  => 60,
 				'stream'   => true,
-				'filename' => $this->data->template_font_location . $fontname,
+				'filename' => $this->data->template_font_location . $matching_fonts[0]['name'],
 			]
 		);
 

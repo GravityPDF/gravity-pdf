@@ -150,6 +150,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 */
 	public function add_actions() {
 
+		/* Add submenu via a hook */
+		add_action( 'gfpdf_settings_sub_menu', [ $this->view, 'sub_menu' ] );
+
 		/**
 		 * Display the uninstaller if use has the correct permissions
 		 *
@@ -208,7 +211,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 */
 	public function display_page() {
 
-		$page = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'general';
+		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
+		$page = $_GET['tab'] ?? 'general';
 
 		switch ( $page ) {
 			case 'general':

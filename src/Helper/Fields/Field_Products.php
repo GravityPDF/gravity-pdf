@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /* Include any dependencies */
-require_once( GFCommon::get_base_path() . '/currency.php' );
+require_once GFCommon::get_base_path() . '/currency.php';
 
 /**
  * Controls the display and output of a Gravity Form field
@@ -89,10 +89,10 @@ class Field_Products extends Helper_Abstract_Fields {
 		<div class="row-separator products-title-container">
 			<h3 class="product-field-title gfpdf-field">
 				<?php
-				$label = apply_filters( 'gform_order_label', esc_html__( 'Order', 'gravityforms' ), $form_id );
+				$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $form_id );
 				$label = apply_filters( 'gform_order_label_' . $form_id, $label, $form_id );
 
-				echo $label;
+				echo esc_html( $label );
 				?>
 			</h3>
 		</div>
@@ -105,35 +105,35 @@ class Field_Products extends Helper_Abstract_Fields {
 						<tr>
 							<th class="entry-products-col1">
 								<?php
-								$label = apply_filters( 'gform_product', esc_html__( 'Product', 'gravityforms' ), $form_id );
+								$label = apply_filters( 'gform_product', __( 'Product', 'gravityforms' ), $form_id );
 								$label = apply_filters( 'gform_product_' . $form_id, $label, $form_id );
 
-								echo $label;
+								echo esc_html( $label );
 								?>
 							</th>
 
 							<th class="textcenter entry-products-col2">
 								<?php
-								$label = apply_filters( 'gform_product_qty', esc_html__( 'Qty', 'gravityforms' ), $form_id );
+								$label = apply_filters( 'gform_product_qty', __( 'Qty', 'gravityforms' ), $form_id );
 								$label = apply_filters( 'gform_product_qty_' . $form_id, $label, $form_id );
 
-								echo $label;
+								echo esc_html( $label );
 								?>
 							</th>
 							<th class="entry-products-col3">
 								<?php
-								$label = apply_filters( 'gform_product_unitprice', esc_html__( 'Unit Price', 'gravityforms' ), $form_id );
+								$label = apply_filters( 'gform_product_unitprice', __( 'Unit Price', 'gravityforms' ), $form_id );
 								$label = apply_filters( 'gform_product_unitprice_' . $form_id, $label, $form_id );
 
-								echo $label;
+								echo esc_html( $label );
 								?>
 							</th>
 							<th class="entry-products-col4">
 								<?php
-								$label = apply_filters( 'gform_product_price', esc_html__( 'Price', 'gravityforms' ), $form_id );
+								$label = apply_filters( 'gform_product_price', __( 'Price', 'gravityforms' ), $form_id );
 								$label = apply_filters( 'gform_product_price_' . $form_id, $label, $form_id );
 
-								echo $label;
+								echo esc_html( $label );
 								?>
 							</th>
 						</tr>
@@ -151,7 +151,7 @@ class Field_Products extends Helper_Abstract_Fields {
 							<tr>
 								<td>
 									<div class="product_name">
-										<?= $product['name']; ?>
+										<?php echo esc_html( $product['name'] ); ?>
 									</div>
 
 									<?php
@@ -164,14 +164,14 @@ class Field_Products extends Helper_Abstract_Fields {
 											foreach ( $product['options'] as $option ) :
 												$price += $option['price'];
 												?>
-												<li><?= $option['option_label']; ?></li>
+												<li><?php echo esc_html( $option['option_label'] ); ?></li>
 											<?php endforeach; ?>
 										</ul>
 									<?php endif; ?>
 								</td>
-								<td class="textcenter"><?= $product['quantity']; ?></td>
-								<td class="textright"><?= GFCommon::format_number( $price, 'currency', rgar( $this->entry, 'currency' ) ); ?></td>
-								<td class="textright"><?= $product['subtotal_formatted']; ?></td>
+								<td class="textcenter"><?php echo esc_html( $product['quantity'] ); ?></td>
+								<td class="textright"><?php echo esc_html( GFCommon::format_number( $price, 'currency', rgar( $this->entry, 'currency' ) ) ); ?></td>
+								<td class="textright"><?php echo esc_html( $product['subtotal_formatted'] ); ?></td>
 							</tr>
 						<?php endforeach; ?>
 
@@ -192,14 +192,14 @@ class Field_Products extends Helper_Abstract_Fields {
 									<?php if ( $index === 0 ): ?>
 										<td class="emptycell"
 											colspan="2"
-											rowspan="<?= $gpecommerce->get_order_summary_item_count( $order_summary ); ?>"></td>
+											rowspan="<?php echo esc_attr( $gpecommerce->get_order_summary_item_count( $order_summary ) ); ?>"></td>
 									<?php endif; ?>
-									<td class="totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ); ?>">
-										<?= $item['name']; ?>
+									<td class="totals" style="<?php esc_attr( $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ) ); ?>">
+										<?php echo esc_html( $item['name'] ); ?>
 									</td>
 
-									<td class="totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-4" ); ?>">
-										<?= GFCommon::to_money( $item['price'], $this->entry['currency'] ); ?>
+									<td class="totals" style="<?php esc_attr( $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-4" ) ); ?>">
+										<?php echo esc_html( GFCommon::to_money( $item['price'], $this->entry['currency'] ) ); ?>
 									</td>
 								</tr>
 								<?php endforeach; ?>
@@ -210,12 +210,12 @@ class Field_Products extends Helper_Abstract_Fields {
 									<td rowspan="3" class="emptycell"></td>
 									<td colspan="2"
 										class="subtotal totals"><?php esc_html_e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
-									<td class="subtotal_amount totals"><?= $products['products_totals']['subtotal_formatted']; ?></td>
+									<td class="subtotal_amount totals"><?php echo esc_html( $products['products_totals']['subtotal_formatted'] ); ?></td>
 								</tr>
 								<tr>
 									<td colspan="2"
-										class="shipping totals"><?= sprintf( esc_html__( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
-									<td class="shipping_amount totals"><?= $products['products_totals']['shipping_formatted']; ?></td>
+										class="shipping totals"><?php echo esc_html( sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ) ); ?></td>
+									<td class="shipping_amount totals"><?php echo esc_html( $products['products_totals']['shipping_formatted'] ); ?></td>
 								</tr>
 							<?php endif; ?>
 
@@ -226,7 +226,7 @@ class Field_Products extends Helper_Abstract_Fields {
 
 								<td colspan="2"
 									class="grandtotal totals"><?php esc_html_e( 'Total', 'gravityforms' ); ?></td>
-								<td class="grandtotal_amount totals"><?= $products['products_totals']['total_formatted']; ?></td>
+								<td class="grandtotal_amount totals"><?php echo esc_html( $products['products_totals']['total_formatted'] ); ?></td>
 							</tr>
 
 						<?php endif; ?>
@@ -238,7 +238,14 @@ class Field_Products extends Helper_Abstract_Fields {
 
 		<?php
 
-		return apply_filters( 'gfpdf_field_product_value', ob_get_clean(), $products, $this->field, $this->form, $this->entry, $this );
+		$html = apply_filters( 'gfpdf_field_product_value', ob_get_clean(), $products, $this->field, $this->form, $this->entry, $this );
+
+		if ( $this->get_output() ) {
+			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+			echo $html;
+		}
+
+		return $html;
 	}
 
 	/**
@@ -303,7 +310,7 @@ class Field_Products extends Helper_Abstract_Fields {
 				}
 
 				/* calculate subtotal */
-				$product_subtotal = floatval( $product['quantity'] ) * $product_unit_price;
+				$product_subtotal = ( (float) $product['quantity'] ) * $product_unit_price;
 
 				/* increment the total */
 				$order_total += $product_subtotal;
@@ -321,7 +328,7 @@ class Field_Products extends Helper_Abstract_Fields {
 			}
 
 			/* Increment total */
-			$shipping_price = ( isset( $products['shipping']['price'] ) ) ? floatval( $products['shipping']['price'] ) : 0;
+			$shipping_price = isset( $products['shipping']['price'] ) ? (float) $products['shipping']['price'] : 0;
 			$order_total   += $shipping_price;
 			$order_subtotal = $order_total - $shipping_price;
 

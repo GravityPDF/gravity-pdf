@@ -68,7 +68,7 @@ class Field_Form extends Helper_Abstract_Fields {
 		/* Get the Nested Form */
 		$form = $this->gform->get_form( $this->field->gpnfForm );
 		if ( is_wp_error( $form ) ) {
-			return parent::html( '' );
+			return parent::html();
 		}
 
 		$html = '';
@@ -108,14 +108,25 @@ class Field_Form extends Helper_Abstract_Fields {
 		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 
+		/* Ensure the field outputs the HTML and can be reset to the original value */
+		$output_already_enabled = $this->get_output();
+		if ( ! $output_already_enabled ) {
+			$this->enable_output();
+		}
+
 		/* Loop through the Repeater fields */
 		foreach ( $form['fields'] as $field ) {
 			/* Output a field using the standard method if not empty */
 			$class = $pdf_model->get_field_class( $field, $form, $entry, $products );
 			if ( ! $class->is_empty() && strpos( $field->cssClass, 'exclude' ) === false ) {
 				$container->generate( $field );
-				echo $class->html();
+				$class->html();
 			}
+		}
+
+		/* If output wasn't enabled by default, disable again */
+		if ( ! $output_already_enabled ) {
+			$this->disable_output();
 		}
 
 		$container->close( $field );

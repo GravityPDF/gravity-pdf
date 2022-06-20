@@ -8,6 +8,7 @@ use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -112,10 +113,9 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 			$html = '<ul class="bulleted multiselect">';
 
 			foreach ( $items as $item ) {
-				$sanitized_value  = $item['value'];
-				$sanitized_option = ( $value ) ? $sanitized_value : $item['label'];
+				$option = $value ? $item['value'] : $item['label'];
 
-				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
+				$html .= '<li id="' . esc_attr( 'field-' . $this->field->id . '-option-' . $i ) . '">' . Kses::parse( $option ) . '</li>';
 				$i++;
 			}
 

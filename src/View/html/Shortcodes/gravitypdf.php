@@ -19,12 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <a
-		href="<?= $args['url']; ?>"
-		class="<?= $args['class']; ?> <?= $args['classes']; ?>"
-		<?php
-		if ( 'view' === $args['type'] ):
-			?>
-			target="_blank"<?php endif; ?>
+		href="<?php echo esc_url( $args['url'] ); ?>"
+		class="<?php echo esc_attr( $args['class'] ); ?> <?php echo esc_attr( $args['classes'] ); ?>"
+		<?php if ( 'view' === $args['type'] ): ?>
+			target="_blank"
+		<?php endif; ?>
 		rel="nofollow">
-	<?= $args['text']; ?>
+	<?php echo esc_html( $args['text'] ); ?>
 </a>

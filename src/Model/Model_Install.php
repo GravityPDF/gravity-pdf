@@ -350,7 +350,7 @@ class Model_Install extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Register our PDF custom rewrite rules
+	 * Conditionally register the PDF custom rewrite rules
 	 *
 	 * @param array $tags
 	 *
@@ -361,7 +361,7 @@ class Model_Install extends Helper_Abstract_Model {
 	public function register_rewrite_tags( $tags ) {
 		global $wp;
 
-		/* Conditionally register rewrite tags to prevent conflict with other plugins */
+		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 		if ( ! empty( $_GET['gpdf'] ) || ! empty( $_GET['gf_pdf'] ) || strpos( $wp->matched_query, 'gpdf=1' ) === 0 ) {
 			$tags[] = 'gpdf';
 			$tags[] = 'pid';

@@ -64,21 +64,21 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 
 		$html = '';
 		if ( ! empty( $value['url'] ) ) {
-			$html  = '<a href="' . $value['url'] . '" target="_blank">';
-			$html .= '<img width="150" src="' . $value['url'] . '" />';
+			$html  = '<a href="' . esc_url( $value['url'] ) . '" target="_blank">';
+			$html .= '<img width="150" src="' . esc_url( $value['url'] ) . '" />';
 		}
 
 		/* Include title / caption / description if needed */
 		if ( ! empty( $value['title'] ) ) {
-			$html .= '<div class="gfpdf-post-image-title">' . $value['title'] . '</div>';
+			$html .= '<div class="gfpdf-post-image-title">' . esc_html( $value['title'] ) . '</div>';
 		}
 
 		if ( ! empty( $value['caption'] ) ) {
-			$html .= '<div class="gfpdf-post-image-caption">' . $value['caption'] . '</div>';
+			$html .= '<div class="gfpdf-post-image-caption">' . esc_html( $value['caption'] ) . '</div>';
 		}
 
 		if ( ! empty( $value['description'] ) ) {
-			$html .= '<div class="gfpdf-post-image-description">' . $value['description'] . '</div>';
+			$html .= '<div class="gfpdf-post-image-description">' . esc_html( $value['description'] ) . '</div>';
 		}
 
 		$html .= '</a>';

@@ -73,7 +73,7 @@ class Controller_Uninstaller extends Helper_Abstract_Controller {
 	 */
 	public function init() {
 		if ( is_admin() && rgget( 'page' ) === 'gf_settings' && rgget( 'subview' ) === 'uninstall' ) {
-			\GFAddOn::register( Controller_Uninstaller::class );
+			\GFAddOn::register( __CLASS__ );
 		}
 	}
 

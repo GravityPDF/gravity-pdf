@@ -40,6 +40,7 @@ dist/*
 /tmp
 /tests/bin/
 /wordpress/
+.phpunit.result.cache
 
 # Coverage report
 /coverage

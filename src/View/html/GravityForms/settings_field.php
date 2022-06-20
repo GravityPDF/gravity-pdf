@@ -16,13 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<div id="<?= esc_attr( $args['id'] ) ?>" class="<?= esc_attr( $args['class'] ) ?>">
+<div id="<?php echo esc_attr( $args['id'] ); ?>" class="<?php echo esc_attr( $args['class'] ); ?>">
 	<?php if ( ! empty( $args['title'] ) ): ?>
 		<div class='gform-settings-panel__title'>
-			<?= esc_html( $args['title'] ) ?>
+			<?php echo esc_html( $args['title'] ); ?>
 
 			<?php if ( ! empty( $args['tooltip'] ) ): ?>
-				<?= $args['tooltip'] ?>
+				<?php echo wp_kses_post( $args['tooltip'] ); ?>
 			<?php endif; ?>
 		</div>
 	<?php endif; ?>

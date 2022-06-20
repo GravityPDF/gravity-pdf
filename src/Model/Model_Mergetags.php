@@ -258,7 +258,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	public function add_field_map_choices( $fields, $form_id, $field_type, $exclude_field_types ) {
 
 		/* Only add PDFs to choices if $fields contains the Entry Properties information */
-		if ( ! in_array( esc_html__( 'Entry Properties', 'gravityforms' ), array_column( $fields, 'label' ) ) ) {
+		if ( ! in_array( esc_html__( 'Entry Properties', 'gravityforms' ), array_column( $fields, 'label' ), true ) ) {
 			return $fields;
 		}
 

@@ -258,7 +258,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function process_legacy_pdf_endpoint() {
 
-		/* exit early if all our required parameters aren't met */
+		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
 		if ( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
 			return null;
 		}
@@ -272,6 +272,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			'template' => substr( $_GET['template'], 0, -4 ), /* strip .php from the template name */
 			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
 		];
+		/* phpcs:enable */
 
 		$this->log->notice(
 			'Processing Legacy PDF endpoint.',
@@ -369,7 +370,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* only display detailed error to admins */
 		$whitelist_errors = [ 'timeout_expired', 'access_denied' ];
 		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors, true ) ) {
-			wp_die( $error->get_error_message() );
+			wp_die( esc_html( $error->get_error_message() ) );
 		} else {
 			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
 		}

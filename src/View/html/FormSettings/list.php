@@ -26,7 +26,7 @@ $list_items = $args['list_items'];
 <div class="gform-settings__content">
 	<div class="gform-settings-panel">
 		<header class="gform-settings-panel__header">
-			<h4 class="gform-settings-panel__title"><?= esc_html( $args['title'] ); ?></h4>
+			<h4 class="gform-settings-panel__title"><?php echo esc_html( $args['title'] ); ?></h4>
 		</header>
 
 		<div class="gform-settings-panel__content">
@@ -34,7 +34,7 @@ $list_items = $args['list_items'];
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions"></div>
 					<div class="alignright">
-						<a class="button" href="<?= esc_url( $args['add_new_url'] ) ?>" aria-label="<?= esc_attr__( 'Add new PDF', 'gravity-forms-pdf-extended' ) ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a>
+						<a class="button" href="<?php echo esc_url( $args['add_new_url'] ); ?>" aria-label="<?php echo esc_attr__( 'Add new PDF', 'gravity-forms-pdf-extended' ); ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a>
 					</div>
 					<br class="clear">
 				</div>

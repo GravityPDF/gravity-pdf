@@ -522,6 +522,7 @@ class Helper_Templates {
 			$template_id = rgget( 'template' );
 
 			/* Handle legacy v3 URL structure and strip .php from the end of the template */
+			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
 				$template_id = substr( $template_id, 0, -4 );
 			}
@@ -586,7 +587,7 @@ class Helper_Templates {
 
 		/* Try and load the file if the class doesn't exist */
 		if ( ! class_exists( $fqcn ) && is_file( $file ) && is_readable( $file ) ) {
-			require_once( $file );
+			require_once $file;
 		}
 
 		/* Insure the class we are trying to load exists */

@@ -34,7 +34,7 @@ class Field_Shipping extends Helper_Abstract_Field_Products {
 			$name = ( isset( $value['shipping_name'] ) ) ? $value['shipping_name'] . " ({$value['shipping_formatted']})" : '';
 			$name = esc_html( $name );
 
-			$price = ( isset( $value['shipping'] ) ) ? $value['shipping'] : '';
+			$price = $value['shipping'] ?? '';
 			$price = esc_html( $price );
 
 			return $this->set_form_data( $name, $price );
@@ -58,7 +58,7 @@ class Field_Shipping extends Helper_Abstract_Field_Products {
 		$html  = '';
 
 		if ( isset( $value['shipping_formatted'] ) ) {
-			$html .= $value['shipping_name'] . ' - ' . $value['shipping_formatted'];
+			$html .= esc_html( $value['shipping_name'] . ' - ' . $value['shipping_formatted'] );
 		}
 
 		return parent::html( $html );

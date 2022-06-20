@@ -36,8 +36,8 @@ class Field_Slim extends Helper_Abstract_Fields {
 		$value = $this->value();
 		$url   = $value['url'];
 
-		$image = ( isset( $value['path'] ) ) ? $value['path'] : $value['url'];
-		$html  = '<a href="' . esc_url( $url ) . '"><img src="' . $image . '" /></a>';
+		$image = $value['path'] ?? $value['url'];
+		$html  = '<a href="' . esc_url( $url ) . '"><img src="' . esc_url( $image ) . '" /></a>';
 
 		return parent::html( $html );
 	}

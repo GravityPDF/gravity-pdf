@@ -95,7 +95,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public abstract function process( $attributes );
+	abstract public function process( $attributes );
 
 	/**
 	 * Try get the Entry ID from specific $_GET keys
@@ -113,9 +113,11 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			return $entry_id;
 		}
 
+		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
 		if ( isset( $_GET['lid'] ) || isset( $_GET['entry'] ) ) {
 			return isset( $_GET['lid'] ) ? (int) $_GET['lid'] : (int) $_GET['entry'];
 		}
+		/* phpcs:enable */
 
 		throw new GravityPdfShortcodeEntryIdException();
 	}
@@ -314,17 +316,20 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_redirect_confirmation( $form ) {
 
-		/* check if the confirmation is currently being saved */
+		/* Check if the confirmation is currently being saved */
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		if ( isset( $_POST['confirmation_id'] ) ) {
 
 			$this->log->notice(
 				'Begin Converting Shortcode to URL for Redirect Confirmation',
 				[
 					'form_id' => $form['id'],
+					/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 					'post'    => $_POST,
 				]
 			);
 
+			/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 			$url = stripslashes_deep( $_POST['_gform_setting_url'] );
 
 			/* check if our shortcode exists and convert it to a URL */
