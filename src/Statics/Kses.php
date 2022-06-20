@@ -86,10 +86,11 @@ class Kses {
 			'low'     => true,
 			'high'    => true,
 			'optimum' => true,
-			'type'    => true,
 			'id'      => true,
 			'class'   => true,
 			'style'   => true,
+			'width'   => true,
+			'height'  => true,
 		];
 
 		/* Add <progress /> support */
@@ -99,7 +100,6 @@ class Kses {
 			'max'    => true,
 			'width'  => true,
 			'height' => true,
-			'type'   => true,
 			'id'     => true,
 			'class'  => true,
 			'style'  => true,
