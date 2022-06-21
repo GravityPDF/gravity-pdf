@@ -517,9 +517,9 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 * @since 6.0
 	 */
 	protected function check_permissions(): bool {
-		$capabilities = $this->gform->has_capability( 'gravityforms_view_entries' );
+		$capabilities = $this->gform->has_capability( 'gravityforms_edit_forms' );
 		if ( ! $capabilities ) {
-			$this->log->warning( 'Permission denied: user does not have "gravityforms_view_entries" capabilities' );
+			$this->log->warning( 'Permission denied: user does not have "gravityforms_edit_forms" capabilities' );
 		}
 
 		return $capabilities;

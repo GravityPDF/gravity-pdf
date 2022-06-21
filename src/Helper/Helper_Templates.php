@@ -518,7 +518,7 @@ class Helper_Templates {
 	public function get_config_class( $template_id ) {
 
 		/* Allow a user to change the current template configuration file if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$template_id = rgget( 'template' );
 
 			/* Handle legacy v3 URL structure and strip .php from the end of the template */

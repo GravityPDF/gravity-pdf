@@ -114,6 +114,8 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 * Security (Hardening): Escape any and all strings from the Gravity Forms form object, in any context (including PDFs)
 * Security (Hardening): The ?html=1 and ?data=1 developer helper parameters now only work in non-production environments, or when Gravity PDF Debug Mode is explicitly enabled
 * Security (Hardening): Prevent directory traversal when loading the various Gravity PDF UI components
+* Security (Hardening): Change PDF Form Settings capability check from `gravityforms_edit_settings` to `gravityforms_edit_forms`
+* Security (Hardening): Change Font Manager CRUD capability check from `gravityforms_view_entries` to `gravityforms_edit_forms`
 * Developers: Added \GFPDF\Statics\Kses::output( $html ) and \GFPDF\Statics\Kses::parse( $html ) methods for use with sanitizing HTML in PDFs (as an alternative to wp_kses_post()).
 * Performance: Register JavaScript in the footer on Gravity PDF admin pages
 * Bug: Fix issue passing PDF URL to Gravity Forms Mailchimp add-on

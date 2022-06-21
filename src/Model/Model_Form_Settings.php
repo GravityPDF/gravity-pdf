@@ -148,7 +148,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'label'        => $this->data->short_title,
 			'query'        => [ 'pid' => null ],
 			'icon'         => 'gform-icon--gravity-pdf',
-			'capabilities' => [ 'gravityforms_edit_settings' ],
+			'capabilities' => [ 'gravityforms_edit_forms' ],
 		];
 
 		return $tabs;
@@ -166,7 +166,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function process_list_view( $form_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->warning( 'Lack of User Capabilities.' );
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
@@ -203,7 +203,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function show_edit_view( $form_id, $pdf_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->warning( 'Lack of User Capabilities.' );
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
@@ -310,7 +310,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function process_submission( $form_id, $pdf_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->critical(
 				'Lack of User Capabilities.',
 				[
@@ -791,7 +791,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
 
 		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Delete PDF Settings', 'gravityforms_edit_settings', $nonce_id );
+		$this->misc->handle_ajax_authentication( 'Delete PDF Settings', 'gravityforms_edit_forms', $nonce_id );
 
 		/* Delete PDF settings */
 		$results = $this->options->delete_pdf( $fid, $pid );
@@ -843,7 +843,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
 
 		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Duplicate PDF Settings', 'gravityforms_edit_settings', $nonce_id );
+		$this->misc->handle_ajax_authentication( 'Duplicate PDF Settings', 'gravityforms_edit_forms', $nonce_id );
 
 		/* Duplicate PDF config */
 		$config = $this->options->get_pdf( $fid, $pid );
@@ -911,7 +911,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$nonce_id = "gfpdf_state_nonce_{$fid}_{$pid}";
 
 		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Change PDF Settings State', 'gravityforms_edit_settings', $nonce_id );
+		$this->misc->handle_ajax_authentication( 'Change PDF Settings State', 'gravityforms_edit_forms', $nonce_id );
 
 		/* Change the PDF state */
 		$config = $this->options->get_pdf( $fid, $pid );
@@ -962,7 +962,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function render_template_fields() {
 
 		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Render Template Custom Fields', 'gravityforms_edit_settings' );
+		$this->misc->handle_ajax_authentication( 'Render Template Custom Fields', 'gravityforms_edit_forms' );
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
 		$template = $_POST['template'] ?? '';
