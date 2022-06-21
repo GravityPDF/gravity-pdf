@@ -365,7 +365,7 @@ class Helper_PDF {
 		$template = ( isset( $this->settings['template'] ) ) ? $this->settings['template'] : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$template = rgget( 'template' );
 
 			/*
@@ -889,7 +889,7 @@ class Helper_PDF {
 		}
 
 		/* Check if user has permission to view info */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			return;
 		}
 
