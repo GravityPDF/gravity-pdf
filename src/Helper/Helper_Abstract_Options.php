@@ -1963,16 +1963,16 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		</select>
 
-		<?php if ( ! empty( $args['chosen'] ) ): //@TODO - check chosen ?>
+		<?php if ( ! empty( $args['chosen'] ) ): ?>
 				</span>
 			</span>
 
 			<script type="text/javascript">
 			  jQuery( document ).ready( function () {
-				jQuery( "#gfpdf_settings\[<?php echo esc_attr( $args['id'] ); ?>\]" ).select2( {
+				jQuery( "#gfpdf_settings\\[<?php echo esc_attr( $args['id'] ); ?>\\]" ).select2( {
 				  minimumResultsForSearch: Infinity,
 				  dropdownCssClass: "gform-settings-field__select-enhanced-container",
-				  dropdownParent: jQuery( "#gfpdf_settings\[<?php echo esc_attr( $args['id'] ); ?>\]" ).parent(),
+				  dropdownParent: jQuery( "#gfpdf_settings\\[<?php echo esc_attr( $args['id'] ); ?>\\]" ).parent(),
 				} );
 			  } );
 			</script>
