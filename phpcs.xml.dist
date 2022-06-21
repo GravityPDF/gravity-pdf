@@ -44,6 +44,8 @@
         <exclude name="WordPress.WP.AlternativeFunctions.file_system_read_fclose"/>
         <exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
         <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
+
+        <exclude-pattern>/tests/*</exclude-pattern>
     </rule>
 
     <!-- Include the best parts of PSR-1 -->
@@ -52,10 +54,7 @@
         <exclude-pattern>/api.php</exclude-pattern>
         <exclude-pattern>/src/deprecated.php</exclude-pattern>
         <exclude-pattern>/src/controller/Controller_Activation.php</exclude-pattern>
-    </rule>
-
-    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
-        <exclude-pattern>/tests/*</exclude-pattern>
+         <exclude-pattern>/tests/*</exclude-pattern>
     </rule>
 
     <rule ref="Generic.PHP.DisallowShortOpenTag.EchoFound">
@@ -103,5 +102,4 @@
     <exclude-pattern>/node_modules/*</exclude-pattern>
     <exclude-pattern>/src/helper/licensing/EDD_SL_Plugin_Updater.php</exclude-pattern>
     <exclude-pattern>/.php-scoper/*</exclude-pattern>
-    <exclude-pattern>/tests/*</exclude-pattern>
 </ruleset>
