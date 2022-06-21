@@ -44,7 +44,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</form>
 
 	<?php
-	/* @TODO */
 	do_action( 'gfpdf_post_license_settings_page' );
 	?>
 </div>

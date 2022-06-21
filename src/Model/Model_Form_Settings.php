@@ -858,7 +858,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			if ( $results ) {
 				$this->log->notice( 'AJAX – Successfully Duplicated PDF Setting' );
 
-				/* @todo just use the same nonce for all requests since WP nonces aren't one-time user (time based) */
+				/* @todo just use the same nonce for all requests since WP nonces aren't one-time use (time based) */
 				$dup_nonce   = wp_create_nonce( "gfpdf_duplicate_nonce_{$fid}_{$config['id']}" );
 				$del_nonce   = wp_create_nonce( "gfpdf_delete_nonce_{$fid}_{$config['id']}" );
 				$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$fid}_{$config['id']}" );

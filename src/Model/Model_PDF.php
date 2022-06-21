@@ -1941,8 +1941,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return array
 	 * @since 4.0
-	 *
-	 * @TODO Work out how to handle this for 6.0
 	 */
 	public function add_unregistered_fonts_to_mPDF( $fonts ) {
 
