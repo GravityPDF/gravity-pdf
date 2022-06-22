@@ -107,7 +107,7 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 
 == Changelog ==
 
-= 6.4.0-RC1 =
+= 6.4.0-RC2 =
 * Security (Hardening): Move from early escaping to late escaping variables on output (where appropriate)
 * Security (Hardening): Add additional validation checks to the Core Font installer
 * Security (Hardening): Escape text returned from WordPress l10n functions
