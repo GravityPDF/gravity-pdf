@@ -143,7 +143,6 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		}
 
 		if ( $this->get_output() ) {
-			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
 			Kses::output( $html );
 		}
 
