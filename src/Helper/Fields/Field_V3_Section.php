@@ -44,7 +44,7 @@ class Field_V3_Section extends Field_Section {
 
 		if ( $this->get_output() ) {
 			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
-			echo $html;
+			Kses::output( $html );
 		}
 
 		return $html;

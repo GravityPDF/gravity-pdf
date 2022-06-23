@@ -114,9 +114,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 		/* User / CORS validation */
 		$this->misc->handle_ajax_authentication( 'Save Core Font', 'gravityforms_edit_settings' );
 
-		/* phpcs:ignore WordPress.Security.NonceVerification */
-		$fontname = $_POST['font_name'] ?? '';
-		$results  = $this->download_and_save_font( $fontname );
+		$results = $this->download_and_save_font();
 
 		/* Return results */
 		header( 'Content-Type: application/json' );
@@ -127,13 +125,11 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * Stream files from remote server and save them locally
 	 *
-	 * @param $fontname
-	 *
 	 * @return bool
 	 * @since 5.0
 	 *
 	 */
-	protected function download_and_save_font( $fontname ) {
+	protected function download_and_save_font() {
 
 		/* Verify the font name provided is approved */
 		$core_font_list = wp_json_file_decode( __DIR__ . '/../../dist/payload/core-fonts.json', [ 'associative' => true ] );
@@ -146,8 +142,9 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 		/* Look for a file in the font list with a matching name */
 		$matching_fonts = array_filter(
 			$core_font_list,
-			function( $item ) use ( $fontname ) {
-				return $item['name'] === $fontname;
+			function( $item ) {
+				/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
+				return $item['name'] === ( $_POST['font_name'] ?? '' );
 			}
 		);
 
@@ -157,7 +154,8 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			$this->log->error(
 				'Core Font not on the approved list',
 				[
-					'name' => $fontname,
+					/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
+					'name' => ( $_POST['font_name'] ?? '' ),
 				]
 			);
 

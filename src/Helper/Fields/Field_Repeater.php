@@ -10,6 +10,7 @@ use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Statics\Kses;
 use GPDFAPI;
 
 /**
@@ -143,7 +144,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 		if ( $this->get_output() ) {
 			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
-			echo $html;
+			Kses::output( $html );
 		}
 
 		return $html;

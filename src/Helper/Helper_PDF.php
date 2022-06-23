@@ -376,6 +376,8 @@ class Helper_PDF {
 			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
 				$template = substr( $template, 0, -4 );
 			}
+
+			$template = sanitize_html_class( $template );
 		}
 
 		$this->template_path = $this->templates->get_template_path_by_id( $template );

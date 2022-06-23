@@ -148,7 +148,7 @@ class Field_Section extends Helper_Abstract_Fields {
 
 		if ( $this->get_output() ) {
 			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
-			echo $html;
+			Kses::output( $html );
 		}
 
 		return $html;

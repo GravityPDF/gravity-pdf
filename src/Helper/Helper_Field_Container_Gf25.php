@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use GF_Field;
+use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -113,16 +114,16 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 
 			$row_html = ob_get_clean();
 
-			/* phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped */
 			try {
-				$qp = new Helper_QueryPath();
-				echo $qp->html5( $row_html, '.grid:last-of-type .inner-container' )
+				$qp       = new Helper_QueryPath();
+				$row_html = $qp->html5( $row_html, '.grid:last-of-type .inner-container' )
 						->css( 'width', '100%' )
 						->top( 'html' )->innerHTML5();
 			} catch ( \Exception $e ) {
-				echo $row_html;
+
 			}
-			/* phpcs:enable */
+
+			Kses::output( $row_html );
 		}
 	}
 

@@ -217,7 +217,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* parse input and get required information */
 		if ( ! $pdf_id ) {
 			if ( rgpost( 'gform_pdf_id' ) ) {
-				$pdf_id = rgpost( 'gform_pdf_id' );
+				$pdf_id = sanitize_html_class( rgpost( 'gform_pdf_id' ) );
 			} else {
 				$pdf_id = uniqid();
 			}
@@ -301,7 +301,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * Validate, Sanitize and Update PDF settings
 	 *
 	 * @param integer $form_id The Gravity Form ID
-	 * @param string $pdf_id  The PDF configuration ID
+	 * @param string|bool $pdf_id  The PDF configuration ID
 	 *
 	 * @return boolean
 	 *
@@ -332,7 +332,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Check if we have a new PDF ID */
 		if ( empty( $pdf_id ) ) {
-			$pdf_id = ( rgpost( 'gform_pdf_id' ) ) ? rgpost( 'gform_pdf_id' ) : false;
+			$pdf_id = rgpost( 'gform_pdf_id' ) ? sanitize_html_class( rgpost( 'gform_pdf_id' ) ) : false;
 		}
 
 		$input = rgpost( 'gfpdf_settings' );
@@ -614,8 +614,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function get_template_name_from_current_page() {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
-		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
-		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : 0;
+		$pid     = ! empty( $_GET['pid'] ) ? sanitize_html_class( rgget( 'pid' ) ) : sanitize_html_class( rgpost( 'gform_pdf_id' ) );
+		$form_id = isset( $_GET['id'] ) ? (int) $_GET['id'] : 0;
 		/* phpcs:enable */
 
 		/* If we don't have a specific PDF we'll use the defaults */
@@ -785,7 +785,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
 		$fid = isset( $_POST['fid'] ) ? (int) $_POST['fid'] : 0;
-		$pid = isset( $_POST['pid'] ) ? $_POST['pid'] : '';
+		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( $_POST['pid'] ) : '';
 		/* phpcs:enable */
 
 		$nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
@@ -836,8 +836,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function duplicate_gf_pdf_setting() {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
-		$fid = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
-		$pid = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
+		$fid = isset( $_POST['fid'] ) ? (int) $_POST['fid'] : 0;
+		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( $_POST['pid'] ) : '';
 		/* phpcs:enable */
 
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
@@ -904,8 +904,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function change_state_pdf_setting() {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
-		$fid = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
-		$pid = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
+		$fid = isset( $_POST['fid'] ) ? (int) $_POST['fid'] : 0;
+		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( $_POST['pid'] ) : '';
 		/* phpcs:enable */
 
 		$nonce_id = "gfpdf_state_nonce_{$fid}_{$pid}";
@@ -965,8 +965,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->misc->handle_ajax_authentication( 'Render Template Custom Fields', 'gravityforms_edit_forms' );
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
-		$template = $_POST['template'] ?? '';
-		$type     = $_POST['type'] ?? '';
+		$template = sanitize_html_class( $_POST['template'] ?? '' );
+		$type     = sanitize_html_class( $_POST['type'] ?? '' );
 		/* phpcs:enable */
 
 		$class    = $this->templates->get_config_class( $template );

@@ -221,7 +221,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$this->misc->handle_ajax_authentication( 'Delete PDF Template' );
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		$template_id = $_POST['id'] ?? '';
+		$template_id = sanitize_html_class( $_POST['id'] ?? '' );
 
 		/* Get all the necessary PDF template files to delete */
 		try {

@@ -526,6 +526,8 @@ class Helper_Templates {
 			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
 				$template_id = substr( $template_id, 0, -4 );
 			}
+
+			$template_id = sanitize_html_class( $template_id );
 		}
 
 		try {

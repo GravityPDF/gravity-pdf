@@ -179,7 +179,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	public function maybe_save_pdf_settings() {
 		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
 		$form_id = isset( $_GET['id'] ) ? (int) $_GET['id'] : 0;
-		$pdf_id  = isset( $_GET['pid'] ) ? $_GET['pid'] : false;
+		$pdf_id  = isset( $_GET['pid'] ) ? sanitize_html_class( $_GET['pid'] ) : false;
 		/* phpcs:enable */
 
 		/* Load the add/edit page */
@@ -199,7 +199,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
 		$form_id = isset( $_GET['id'] ) ? (int) $_GET['id'] : false;
-		$pdf_id  = isset( $_GET['pid'] ) ? $_GET['pid'] : false;
+		$pdf_id  = isset( $_GET['pid'] ) ? sanitize_html_class( $_GET['pid'] ) : false;
 		/* phpcs:enable */
 
 		/* Load the add/edit page */
