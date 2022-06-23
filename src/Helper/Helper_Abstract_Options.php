@@ -337,7 +337,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
 		$form_id = ! empty( $_GET['id'] ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
-		$pid     = ! empty( $_GET['pid'] ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
+		$pid     = ! empty( $_GET['pid'] ) ? sanitize_html_class( rgget( 'pid' ) ) : sanitize_html_class( rgpost( 'gform_pdf_id' ) );
 		/* phpcs:enable */
 
 		/* return early if no ID set */
@@ -1102,7 +1102,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		parse_str( $_POST['_wp_http_referer'], $referrer );
 
 		$all_settings = $this->get_registered_fields();
-		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
+		$tab          = sanitize_key( $referrer['tab'] ?? 'general' );
 		$settings     = ( ! empty( $all_settings[ $tab ] ) && $tab !== 'tools' ) ? $all_settings[ $tab ] : [];
 
 		/*

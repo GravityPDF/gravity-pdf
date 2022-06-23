@@ -150,7 +150,7 @@ class View_Settings extends Helper_Abstract_View {
 	public function sub_menu() {
 		$vars = [
 			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-			'selected' => $_GET['tab'] ?? 'general',
+			'selected' => sanitize_key( $_GET['tab'] ?? 'general' ),
 			'tabs'     => $this->get_available_tabs(),
 			'data'     => $this->data,
 		];

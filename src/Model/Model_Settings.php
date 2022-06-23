@@ -213,12 +213,12 @@ class Model_Settings extends Helper_Abstract_Model {
 		$strings['templateList']          = $this->templates->get_all_template_info();
 		$strings['activeDefaultTemplate'] = $this->options->get_option( 'default_template' );
 
-		$form_id = rgget( 'id' );
+		$form_id = (int) rgget( 'id' );
 
 		if ( $form_id ) {
-			$pid = ( rgget( 'pid' ) ) ? rgget( 'pid' ) : false;
+			$pid = ( rgget( 'pid' ) ) ? sanitize_html_class( rgget( 'pid' ) ) : false;
 			if ( $pid === false ) {
-				$pid = ( rgpost( 'gform_pdf_id' ) ) ? rgpost( 'gform_pdf_id' ) : false;
+				$pid = rgpost( 'gform_pdf_id' ) ? sanitize_html_class( rgpost( 'gform_pdf_id' ) ) : false;
 			}
 
 			$pdf = $this->options->get_pdf( $form_id, $pid );
@@ -399,10 +399,11 @@ class Model_Settings extends Helper_Abstract_Model {
 		$this->misc->handle_ajax_authentication( 'Deactivate License', 'gravityforms_edit_settings', 'gfpdf_deactivate_license' );
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
-		$addon_slug = $_POST['addon_name'] ?? '';
-		$license    = $_POST['license'] ?? '';
+		$license = sanitize_html_class( $_POST['license'] ?? '' );
+
+		/* Check for pre-registered add-on */
+		$addon = $this->data->addon[ ( $_POST['addon_name'] ?? '' ) ] ?? false;
 		/* phpcs:enable */
-		$addon = $this->data->addon[ $addon_slug ] ?? false;
 
 		/* Check add-on currently installed */
 		if ( ! empty( $addon ) ) {

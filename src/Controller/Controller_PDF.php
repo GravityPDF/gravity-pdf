@@ -268,9 +268,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$config = [
 			'lid'      => (int) explode( ',', $_GET['lid'] )[0],
 			'fid'      => (int) $_GET['fid'],
-			'aid'      => ( isset( $_GET['aid'] ) ) ? (int) $_GET['aid'] : false,
-			'template' => substr( $_GET['template'], 0, -4 ), /* strip .php from the template name */
-			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
+			'aid'      => isset( $_GET['aid'] ) ? (int) $_GET['aid'] : false,
+			'template' => sanitize_html_class( substr( $_GET['template'], 0, -4 ) ), /* strip .php from the template name */
+			'action'   => isset( $_GET['download'] ) ? 'download' : 'view',
 		];
 		/* phpcs:enable */
 

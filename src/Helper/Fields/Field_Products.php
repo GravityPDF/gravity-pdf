@@ -4,6 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Statics\Kses;
 use GP_Ecommerce_Fields;
 
 /**
@@ -241,8 +242,7 @@ class Field_Products extends Helper_Abstract_Fields {
 		$html = apply_filters( 'gfpdf_field_product_value', ob_get_clean(), $products, $this->field, $this->form, $this->entry, $this );
 
 		if ( $this->get_output() ) {
-			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
-			echo $html;
+			Kses::output( $html );
 		}
 
 		return $html;

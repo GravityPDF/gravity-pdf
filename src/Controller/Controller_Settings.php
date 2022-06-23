@@ -212,7 +212,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	public function display_page() {
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-		$page = $_GET['tab'] ?? 'general';
+		$page = sanitize_key( $_GET['tab'] ?? 'general' );
 
 		switch ( $page ) {
 			case 'general':

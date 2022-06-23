@@ -365,8 +365,7 @@ abstract class Helper_Abstract_Fields {
 		$html = apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry, $this );
 
 		if ( $this->get_output() ) {
-			/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
-			echo $html;
+			Kses::output( $html );
 		}
 
 		return $html;

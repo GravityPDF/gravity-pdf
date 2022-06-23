@@ -107,17 +107,20 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 
 == Changelog ==
 
-= 6.4.0-RC2 =
-* Security (Hardening): Move from early escaping to late escaping variables on output (where appropriate)
+= 6.4.0-RC3 =
+* Security (Hardening): Move from early escaping to late escaping variables on output
 * Security (Hardening): Add additional validation checks to the Core Font installer
 * Security (Hardening): Escape text returned from WordPress l10n functions
 * Security (Hardening): Escape any and all strings from the Gravity Forms form object, in any context (including PDFs)
+* Security (Hardening): Move to earlier sanitizing of user input
+* Security (Hardening): Custom PDF template filenames are now limited to the following characters: A-Za-z0-9_-
 * Security (Hardening): The ?html=1 and ?data=1 developer helper parameters now only work in non-production environments, or when Gravity PDF Debug Mode is explicitly enabled
 * Security (Hardening): Prevent directory traversal when loading the various Gravity PDF UI components
 * Security (Hardening): Change PDF Form Settings capability check from `gravityforms_edit_settings` to `gravityforms_edit_forms`
 * Security (Hardening): Change Font Manager CRUD capability check from `gravityforms_view_entries` to `gravityforms_edit_forms`
-* Developers: Added \GFPDF\Statics\Kses::output( $html ) and \GFPDF\Statics\Kses::parse( $html ) methods for use with sanitizing HTML in PDFs (as an alternative to wp_kses_post()).
+* Developer: Added \GFPDF\Statics\Kses::output( $html ) and \GFPDF\Statics\Kses::parse( $html ) methods for use with escaping/sanitizing HTML in PDFs (as an alternative to wp_kses_post()).
 * Performance: Register JavaScript in the footer on Gravity PDF admin pages
+* Privacy: Added "Get more info" link in the Core Font Installer instructions, and disclaimer to plugin's README.txt installation section
 * Bug: Fix issue passing PDF URL to Gravity Forms Mailchimp add-on
 
 = 6.3.1 =

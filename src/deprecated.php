@@ -190,8 +190,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	public static function get_ids() {
 		global $form_id, $lead_id, $lead_ids;
 
-		$form_id  = ( $form_id ) ? $form_id : absint( rgget( 'fid' ) );
-		$lead_ids = ( $lead_id ) ? [ $lead_id ] : explode( ',', rgget( 'lid' ) );
+		$form_id  = (int) $form_id ?: (int) rgget( 'fid' );
+		$lead_ids = ( $lead_id ) ? [ (int) $lead_id ] : array_filter( array_map( 'intval', explode( ',', rgget( 'lid' ) ) ) );
 
 		/* If form ID and lead ID hasn't been set stop the PDF from attempting to generate */
 		if ( empty( $form_id ) || empty( $lead_ids ) ) {
@@ -709,7 +709,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 	 * Allow our legacy software to still function even though the \mPDF class no longer exists (see \GFPDF_Vendor\Mpdf\Mpdf)
 	 *
 	 * @since 5.0
-	 * phpcs:disable
+	 * phpcs:disable PEAR.NamingConventions.ValidClassName.StartWithCapital
 	 */
 	class mPDF {
 		/* phpcs:enable */

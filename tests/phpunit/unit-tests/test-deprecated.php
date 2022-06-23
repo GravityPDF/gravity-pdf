@@ -121,8 +121,8 @@ class Test_Deprecated extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_common_get_ids() {
-		$GLOBALS['form_id']  = '20';
-		$GLOBALS['lead_ids'] = '20,21,23';
+		$GLOBALS['form_id'] = '20';
+		$_GET['lid']        = '20,21,23';
 
 		$this->assertTrue( PDF_Common::get_ids() );
 

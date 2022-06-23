@@ -103,7 +103,7 @@ class Helper_Misc {
 	public function is_gfpdf_settings_tab( $name ) {
 		if ( is_admin() && $this->is_gfpdf_page() ) {
 			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-			$tab = $_GET['tab'] ?? 'general';
+			$tab = sanitize_key( $_GET['tab'] ?? 'general' );
 			if ( $name === $tab ) {
 				return true;
 			}
@@ -702,18 +702,7 @@ class Helper_Misc {
 		$override = ( $settings['public_access'] ?? '' ) === 'Yes';
 
 		if ( $leads && ( $override === true || $this->gform->has_capability( 'gravityforms_view_entries' ) ) ) {
-			$ids = explode( ',', $leads );
-
-			/* ensure all passed ids are integers */
-			array_walk(
-				$ids,
-				function( &$id ) {
-					$id = (int) $id;
-				}
-			);
-
-			/* filter our any zero-value ids */
-			$ids = array_filter( $ids );
+			$ids = array_filter( array_map( 'intval', explode( ',', $leads ) ) );
 
 			if ( count( $ids ) > 0 ) {
 				return $ids;
