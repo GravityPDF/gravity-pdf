@@ -1,73 +1,75 @@
-{
-  "999": [
-    {
-      "16": "simon@test.com",
-      "99": [
-        {
-          "88": [
-            {
-              "202": "www.test.com"
-            },
-            {
-              "202": "www.test1.com"
-            },
-            {
-              "202": "www.test2.com"
-            }
-          ],
-          "200": "Builder",
-          "201": "5"
-        },
-        {
-          "88": [],
-          "200": "Painter",
-          "201": "3"
-        }
-      ],
-      "15.3": "Simon",
-      "15.6": "Wiseman"
-    },
-    {
-      "16": "geoff@test.com",
-      "99": [
-        {
-          "88": [
-            {
-              "202": "www.test.com"
-            },
-            {
-              "202": "www.test2.com"
-            }
-          ],
-          "200": "Bricklayer",
-          "201": "10"
-        }
-      ],
-      "15.3": "Geoff",
-      "15.6": "Simpson"
-    }
-  ],
-  "id": "265",
-  "form_id": "194",
-  "post_id": null,
-  "date_created": "2018-10-19 04:08:02",
-  "date_updated": "2018-11-05 02:43:46",
-  "is_starred": "0",
-  "is_read": "1",
-  "ip": "172.17.0.1",
-  "source_url": "https://pdf44.local/?gf_page=preview&id=194",
-  "user_agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
-  "currency": "USD",
-  "payment_status": null,
-  "payment_date": null,
-  "payment_amount": null,
-  "payment_method": null,
-  "transaction_id": null,
-  "is_fulfilled": null,
-  "created_by": "1",
-  "transaction_type": null,
-  "status": "active",
-  "19.1": "1",
-  "19.2": "I agree to the privacy policy.",
-  "19.3": "6"
-}
+[
+  {
+    "id": "265",
+    "form_id": "194",
+    "post_id": null,
+    "date_created": "2018-10-19 04:08:02",
+    "date_updated": "2018-11-05 02:43:46",
+    "is_starred": "0",
+    "is_read": "1",
+    "ip": "172.17.0.1",
+    "source_url": "https://pdf44.local/?gf_page=preview&id=194",
+    "user_agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
+    "currency": "USD",
+    "payment_status": null,
+    "payment_date": null,
+    "payment_amount": null,
+    "payment_method": null,
+    "transaction_id": null,
+    "is_fulfilled": null,
+    "created_by": "1",
+    "transaction_type": null,
+    "status": "active",
+    "19.1": "1",
+    "19.2": "I agree to the privacy policy.",
+    "19.3": "6",
+    "999": [
+      {
+        "16": "simon@test.com",
+        "99": [
+          {
+            "88": [
+              {
+                "202": "www.test.com"
+              },
+              {
+                "202": "www.test1.com"
+              },
+              {
+                "202": "www.test2.com"
+              }
+            ],
+            "200": "Builder",
+            "201": "5"
+          },
+          {
+            "88": [],
+            "200": "Painter",
+            "201": "3"
+          }
+        ],
+        "15.3": "Simon",
+        "15.6": "Wiseman"
+      },
+      {
+        "16": "geoff@test.com",
+        "99": [
+          {
+            "88": [
+              {
+                "202": "www.test.com"
+              },
+              {
+                "202": "www.test2.com"
+              }
+            ],
+            "200": "Bricklayer",
+            "201": "10"
+          }
+        ],
+        "15.3": "Geoff",
+        "15.6": "Simpson"
+      }
+    ]
+  }
+]

@@ -90,7 +90,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		foreach ( $value as $id => $item ) {
-			$item = $this->add_form_entry_ids( $item );
+			$item = $this->add_entry_meta( $item );
 
 			/* Loop through the Repeater fields */
 			foreach ( $field->fields as $sub_field ) {
@@ -178,7 +178,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 				ob_start();
 			}
 
-			$item = $this->add_form_entry_ids( $item );
+			$item = $this->add_entry_meta( $item );
 
 			/* Loop through the Repeater fields */
 			foreach ( $field->fields as $sub_field ) {
@@ -218,19 +218,39 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	}
 
 	/**
-	 * Allow the Repeater fields to act as an entry by padding the entry ID and form ID
+	 * Allow the Repeater fields to act as an entry by padding the needed values for entry.
 	 *
 	 * @param array $item
 	 *
 	 * @return array
 	 *
-	 * @since 5.1
+	 * @since 6.4
 	 */
-	protected function add_form_entry_ids( $item ) {
-		$item['id']      = $this->entry['id'];
-		$item['form_id'] = $this->entry['form_id'];
+	public function add_entry_meta( $item ) {
+		$entry_keys = [
+			'id',
+			'form_id',
+			'post_id',
+			'date_created',
+			'date_updated',
+			'is_starred',
+			'is_read',
+			'ip',
+			'source_url',
+			'user_agent',
+			'currency',
+			'payment_status',
+			'payment_date',
+			'payment_amount',
+			'payment_method',
+			'transaction_id',
+			'is_fulfilled',
+			'created_by',
+			'transaction_type',
+			'status',
+		];
 
-		return $item;
+		return array_replace( array_intersect_key( $this->entry, array_flip( $entry_keys ) ), $item );
 	}
 
 	/**

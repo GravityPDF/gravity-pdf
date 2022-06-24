@@ -128,6 +128,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			'gravityform-1.json',
 			'gravityform-2.json',
 			'repeater-empty-form.json',
+			'repeater-consent-form.json'
 		];
 
 		foreach ( $forms as $json ) {
@@ -141,6 +142,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			'all-form-fields'     => 'all-form-fields-entries.json',
 			'gravityform-1'       => 'gravityform-1-entries.json',
 			'repeater-empty-form' => 'repeater-empty-entry.json',
+			'repeater-consent-form' => 'repeater-consent-entry.json',
 		];
 
 		foreach ( $entries as $id => $json ) {

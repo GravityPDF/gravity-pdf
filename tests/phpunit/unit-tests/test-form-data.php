@@ -1559,8 +1559,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 * Test the Gravity Forms Consent field form data
 	 */
 	public function test_consent_field_data() {
-		$form  = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-form.json' ) ), true );
-		$entry = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-entry.json' ) ), true );
+		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
+		$entry =  $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
 
 		$form_id          = GFAPI::add_form( $form );
 		$entry['form_id'] = $form_id;
@@ -1577,8 +1577,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 * Test the Gravity Forms Repeater field form data
 	 */
 	public function test_repeater_field_data() {
-		$form  = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-form.json' ) ), true );
-		$entry = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-entry.json' ) ), true );
+		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
+		$entry =  $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
 
 		$form_id          = GFAPI::add_form( $form );
 		$entry['form_id'] = $form_id;
