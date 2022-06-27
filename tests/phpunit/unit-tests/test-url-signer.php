@@ -33,4 +33,18 @@ class Test_Url_Signer extends WP_UnitTestCase {
 		$this->assertTrue( $signer->verify( $signer->sign( $url, '+ 1 day' ) ) );
 		$this->assertFalse( $signer->verify( $url ) );
 	}
+
+	public function test_random_password_filter_disabled() {
+		/* Delete the existing token (if any) */
+		\GPDFAPI::delete_plugin_option( 'signed_secret_token' );
+
+		/* Sign the URL */
+		$signer = new Helper_Url_Signer();
+		$url    = 'https://test.com';
+		$signer->sign( $url, '+ 1 day' );
+
+		/* Verify the token generated is 64 characters */
+		$secret_token = \GPDFAPI::get_plugin_option( 'signed_secret_token' );
+		$this->assertSame( 64, strlen( $secret_token ) );
+	}
 }
