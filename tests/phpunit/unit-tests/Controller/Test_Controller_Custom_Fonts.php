@@ -119,7 +119,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$routes = $rest->get_routes( Helper_Data::REST_API_BASENAME . 'v1' );
 
 		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts', $routes );
-		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/(?P<id>[a-z0-9]+)', $routes );
+		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/(?P<id>[a-z0-9\-]+)', $routes );
 	}
 
 	public function test_get_all_items() {
