@@ -130,7 +130,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 		register_rest_route(
 			Helper_Data::REST_API_BASENAME . 'v1',
-			'/fonts/(?P<id>[a-z0-9]+)',
+			'/fonts/(?P<id>[a-z0-9\-]+)',
 			[
 				'args' => [
 					'id' => [
