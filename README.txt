@@ -118,6 +118,7 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 * Security (Hardening): Prevent directory traversal when loading the various Gravity PDF UI components
 * Security (Hardening): Change PDF Form Settings capability check from `gravityforms_edit_settings` to `gravityforms_edit_forms`
 * Security (Hardening): Change Font Manager CRUD capability check from `gravityforms_view_entries` to `gravityforms_edit_forms`
+* Security (Hardening): Switch to sodium_crypto_secretbox_keygen() function with modified fallback to wp_generate_password() when generating new PDF URL signing secret key
 * Developer: Added \GFPDF\Statics\Kses::output( $html ) and \GFPDF\Statics\Kses::parse( $html ) methods for use with escaping/sanitizing HTML in PDFs (as an alternative to wp_kses_post()).
 * Performance: Register JavaScript in the footer on Gravity PDF admin pages
 * Privacy: Added "Get more info" link in the Core Font Installer instructions, and disclaimer to plugin's README.txt installation section
