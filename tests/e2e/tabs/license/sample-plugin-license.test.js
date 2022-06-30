@@ -8,7 +8,7 @@ test('should display error message for invalid license key', async t => {
   // Actions
   await run.navigateCoreBooster('gf_settings&subview=PDF&tab=license')
   await t
-    .typeText(run.samplePluginInputBox, run.invalidLicenseKey, { paste: true })
+    .typeText(run.samplePluginInputBox, run.invalidLicenseKey, { paste: true, replace: true })
     .click(run.saveSettings)
 
   // Assertions
@@ -21,7 +21,7 @@ test('should display success message and deactivation option for active license 
   // Actions
   await run.navigateCoreBooster('gf_settings&subview=PDF&tab=license')
   await t
-    .typeText(run.samplePluginInputBox, run.validLicenseKey, { paste: true })
+    .typeText(run.samplePluginInputBox, run.validLicenseKey, { paste: true, replace: true })
     .click(run.saveSettings)
 
   // Assertions

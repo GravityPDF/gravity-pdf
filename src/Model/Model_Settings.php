@@ -243,20 +243,22 @@ class Model_Settings extends Helper_Abstract_Model {
 	public function register_addons_for_licensing( $fields ) {
 
 		foreach ( $this->data->addon as $addon ) {
-			$fields[ 'license_' . $addon->get_slug() ] = [
-				'id'   => 'license_' . $addon->get_slug(),
+			$slug = $addon->get_slug();
+
+			$fields[ 'license_' . $slug ] = [
+				'id'   => 'license_' . $slug,
 				'name' => $addon->get_short_name(),
 				'type' => 'license',
 			];
 
-			$fields[ 'license_' . $addon->get_slug() . '_message' ] = [
-				'id'    => 'license_' . $addon->get_slug() . '_message',
+			$fields[ 'license_' . $slug . '_message' ] = [
+				'id'    => 'license_' . $slug . '_message',
 				'type'  => 'hidden',
 				'class' => 'gfpdf-hidden',
 			];
 
-			$fields[ 'license_' . $addon->get_slug() . '_status' ] = [
-				'id'    => 'license_' . $addon->get_slug() . '_status',
+			$fields[ 'license_' . $slug . '_status' ] = [
+				'id'    => 'license_' . $slug . '_status',
 				'type'  => 'hidden',
 				'class' => 'gfpdf-hidden',
 			];
@@ -282,21 +284,27 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Check if we are submitting our settings and there's an active key */
 		foreach ( $this->data->addon as $addon ) {
 			$option_key = 'license_' . $addon->get_slug();
+			if ( ! isset( $input[ $option_key ] ) ) {
+				continue;
+			}
 
 			/* Check if the license key is now empty */
-			if ( isset( $input[ $option_key ] ) && strlen( trim( $input[ $option_key ] ) ) === 0 ) {
+			if ( trim( $input[ $option_key ] ) === '' ) {
 				$input[ $option_key . '_message' ] = '';
 				$input[ $option_key . '_status' ]  = '';
 
 				continue;
 			}
 
+			/* Ensure the un-hashed license key saved in the database is not overridden by the hashed license when resbumitting form */
+			if ( isset( $settings[ $option_key ] ) && sha1( $settings[ $option_key ] ) === $input[ $option_key ] ) {
+				$input[ $option_key ] = $settings[ $option_key ];
+			}
+
 			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
-			if ( isset( $input[ $option_key ] )
-				 && (
-					 ( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] ) ||
-					 $input[ $option_key . '_status' ] !== 'active'
-				 )
+			if (
+				$input[ $option_key . '_status' ] !== 'active' ||
+				( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] )
 			) {
 				$results = $this->activate_license( $addon, $input[ $option_key ] );
 
@@ -355,7 +363,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				$message = $possible_responses['generic'];
 				$status  = 'error';
 
-				if ( isset( $license_data->error ) && isset( $possible_responses[ $license_data->error ] ) ) {
+				if ( isset( $license_data->error, $possible_responses[ $license_data->error ] ) ) {
 					$message = $possible_responses[ $license_data->error ];
 					$status  = $license_data->error;
 
@@ -398,16 +406,13 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* User / CORS validation */
 		$this->misc->handle_ajax_authentication( 'Deactivate License', 'gravityforms_edit_settings', 'gfpdf_deactivate_license' );
 
-		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
-		$license = sanitize_html_class( $_POST['license'] ?? '' );
-
-		/* Check for pre-registered add-on */
+		/** @var Helper_Abstract_Addon $addon */
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		$addon = $this->data->addon[ ( $_POST['addon_name'] ?? '' ) ] ?? false;
-		/* phpcs:enable */
 
 		/* Check add-on currently installed */
 		if ( ! empty( $addon ) ) {
-			if ( $this->deactivate_license_key( $addon, $license ) ) {
+			if ( $this->deactivate_license_key( $addon, $addon->get_license_key() ) ) {
 				$this->log->notice( 'AJAX – Successfully Deactivated License' );
 				echo wp_json_encode(
 					[
