@@ -100,7 +100,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			$download          = $attributes['type'] === 'download';
 			$print             = ! empty( $attributes['print'] );
 			$raw               = ! empty( $attributes['raw'] );
-			$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print, ! $raw );
+			$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 			/* Sign the URL to allow direct access to the PDF until it expires */
 			if ( ! empty( $attributes['signed'] ) ) {

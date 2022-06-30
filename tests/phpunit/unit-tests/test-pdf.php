@@ -328,8 +328,12 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_middle_public_access() {
 
 		/* Check if error correctly triggered */
-		$settings['public_access'] = 'No';
-		$this->model->middle_public_access( '', [], $settings );
+		$settings = [
+			'id'            => 0,
+			'public_access' => 'No',
+		];
+
+		$this->model->middle_public_access( '', [ 'id' => 0 ], $settings );
 
 		/* Run our Tests */
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
@@ -341,7 +345,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check if setting passes */
 		$settings['public_access'] = 'Yes';
-		$this->model->middle_public_access( '', [], $settings );
+		$this->model->middle_public_access( '', [ 'id' => 0 ], $settings );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -365,7 +369,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$options          = GPDFAPI::get_options_class();
 
 		/* Test it does nothing by default */
-		$this->model->middle_signed_url_access( '', [], [] );
+		$this->model->middle_signed_url_access( '', [ 'id' => 0 ], [ 'id' => '' ] );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -381,7 +385,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$_GET['signature']      = '';
 		$_SERVER['REQUEST_URI'] = str_replace( home_url(), '', $url );
 
-		$this->model->middle_signed_url_access( '', [], [] );
+		$this->model->middle_signed_url_access( '', [ 'id' => 0 ], [ 'id' => '' ] );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -424,7 +428,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$_SERVER['REQUEST_URI'] = str_replace( $protocol . $domain, '', $url );
 
-		$this->model->middle_signed_url_access( '', [], [] );
+		$this->model->middle_signed_url_access( '', [ 'id' => 0 ], [ 'id' => '' ] );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -442,12 +446,16 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_middle_active() {
 
 		/* Check if error correctly triggered */
+		$settings = [
+			'id' => '',
+			'active' => false,
+		];
 		$settings['active'] = false;
-		$this->assertTrue( is_wp_error( $this->model->middle_active( '', [], $settings ) ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_active( '', [ 'id' => 0 ], $settings ) ) );
 
 		/* Check if setting passes */
 		$settings['active'] = true;
-		$this->assertTrue( $this->model->middle_active( true, [], $settings ) );
+		$this->assertTrue( $this->model->middle_active( true, [ 'id' => 0 ], $settings ) );
 	}
 
 	/**
@@ -496,6 +504,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Set up a blank entry array */
 		$entry = [
+			'id' =>         0,
 			'created_by' => '',
 			'ip'         => '',
 		];
@@ -538,13 +547,13 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_middle_owner_restriction() {
-		$this->assertTrue( $this->model->middle_owner_restriction( true, [], [ 'restrict_owner' => 'No' ] ) );
-		$this->assertTrue( is_wp_error( $this->model->middle_owner_restriction( new WP_Error( '' ), [], [ 'restrict_owner' => 'No' ] ) ) );
+		$this->assertTrue( $this->model->middle_owner_restriction( true, [ 'id' => 0 ], [ 'id' => '', 'restrict_owner' => 'No' ] ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_owner_restriction( new WP_Error( '' ), [ 'id' => 0 ], [  'id' => '', 'restrict_owner' => 'No' ] ) ) );
 
 		/* test if we are redirecting */
 		try {
 			wp_set_current_user( 0 );
-			$this->model->middle_owner_restriction( true, [], [ 'restrict_owner' => 'Yes' ] );
+			$this->model->middle_owner_restriction( true, [ 'id' => 0 ], [  'id' => '', 'restrict_owner' => 'Yes' ] );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'Redirecting', $e->getMessage() );
 		}
@@ -553,7 +562,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$user_id = $this->factory->user->create();
 		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
-		$this->assertTrue( $this->model->middle_owner_restriction( true, [], [ 'restrict_owner' => 'Yes' ] ) );
+		$this->assertTrue( $this->model->middle_owner_restriction( true, [ 'id' => 0 ], [  'id' => '', 'restrict_owner' => 'Yes' ] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -568,6 +577,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Set up our testing data */
 		$entry = [
+			'id' => 0,
 			'date_created' => gmdate( 'Y-m-d H:i:s', strtotime( '-32 minutes' ) ),
 			'ip'           => '197.64.12.40',
 		];
@@ -575,7 +585,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
 
 		/* Test we get a timeout error */
-		$results = $this->model->middle_logged_out_timeout( true, $entry, [] );
+		$results = $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] );
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'timeout_expired', $results->get_error_code() );
 
@@ -583,24 +593,24 @@ class Test_PDF extends WP_UnitTestCase {
 		$entry['created_by'] = 5;
 
 		try {
-			$this->model->middle_logged_out_timeout( true, $entry, [] );
+			$this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'Redirecting', $e->getMessage() );
 		}
 
 		/* Update timeout settings and check again */
 		$gfpdf->options->update_option( 'logged_out_timeout', '33' );
-		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [] ) );
+		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] ) );
 
 		/* Check if the test should be skipped */
 		$_SERVER['REMOTE_ADDR'] = '12.123.123.124';
-		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [] ) );
-		$this->assertTrue( is_wp_error( $this->model->middle_logged_out_timeout( new WP_Error(), $entry, [] ) ) );
+		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_logged_out_timeout( new WP_Error(), $entry, [ 'id' => '', ] ) ) );
 
 		$user_id = $this->factory->user->create();
 		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
-		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [] ) );
+		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -614,30 +624,31 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Set up our testing data */
 		$entry = [
+			'id' => 0,
 			'ip' => '197.64.12.40',
 		];
 
 		/* Check for WP Error */
-		$this->assertTrue( is_wp_error( $this->model->middle_auth_logged_out_user( true, $entry, [] ) ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_auth_logged_out_user( true, $entry, [ 'id' => '', ] ) ) );
 
 		/* Check for redirect */
 		$entry['created_by'] = 5;
 
 		try {
-			$this->model->middle_auth_logged_out_user( true, $entry, [] );
+			$this->model->middle_auth_logged_out_user( true, $entry, [ 'id' => '', ] );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'Redirecting', $e->getMessage() );
 		}
 
 		/* Test that the middleware is skipped */
 		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
-		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, [] ) );
+		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, [ 'id' => '', ] ) );
 
 		unset( $_SERVER['REMOTE_ADDR'] );
 		$user_id = $this->factory->user->create();
 		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
-		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, [] ) );
+		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, [ 'id' => '', ] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -649,7 +660,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function test_middle_user_capability() {
 		/* Check for WP Error */
-		$this->assertTrue( is_wp_error( $this->model->middle_user_capability( new WP_Error(), [], [] ) ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_user_capability( new WP_Error(), [ 'id' => 0, ], [ 'id' => '', ] ) ) );
 
 		/* create subscriber and test access */
 		$user_id = $this->factory->user->create();
@@ -657,7 +668,7 @@ class Test_PDF extends WP_UnitTestCase {
 		wp_set_current_user( $user_id );
 
 		/* get the results */
-		$results = $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] );
+		$results = $this->model->middle_user_capability( true, [ 'id' => 0,  'created_by' => 0 ], [ 'id' => '', ] );
 
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'access_denied', $results->get_error_code() );
@@ -667,14 +678,14 @@ class Test_PDF extends WP_UnitTestCase {
 		$user->remove_role( 'subscriber' );
 		$user->add_role( 'administrator' );
 
-		$this->assertTrue( $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] ) );
+		$this->assertTrue( $this->model->middle_user_capability( true, [ 'id' => 0, 'created_by' => 0 ], [ 'id' => '', ] ) );
 
 		/* Remove elevated user privilages and set the default capability 'gravityforms_view_entries' */
 		$user->remove_role( 'administrator' );
 		$user->add_role( 'subscriber' );
 
 		/* Double check they have been removed */
-		$results = $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] );
+		$results = $this->model->middle_user_capability( true, [ 'id' => 0, 'created_by' => 0 ], [ 'id' => '', ] );
 
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'access_denied', $results->get_error_code() );
@@ -683,7 +694,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$user->add_cap( 'gravityforms_view_entries' );
 		$user->get_role_caps();
 		$user->update_user_level_from_caps();
-		$this->assertTrue( $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] ) );
+		$this->assertTrue( $this->model->middle_user_capability( true, [ 'id' => 0, 'created_by' => 0 ], [ 'id' => '', ] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -728,8 +739,8 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'download', $pdfs[0] );
 
 		$this->assertNotFalse( strpos( $pdfs[0]['name'], 'test-' ) );
-		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/?gpdf=1&#038;pid=556690c67856b&#038;lid=1' ) );
-		$this->assertNotFalse( strpos( $pdfs[0]['download'], 'http://example.org/?gpdf=1&#038;pid=556690c67856b&#038;lid=1&#038;action=download' ) );
+		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1' ) );
+		$this->assertNotFalse( strpos( $pdfs[0]['download'], 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
 
 		/* Process fancy permalinks */
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
@@ -863,44 +874,44 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function provider_get_pdf_url_no_perma() {
 		return [
-			[ '240arkj92kda', '50', false, false, 'http://example.org/?gpdf=1&#038;pid=240arkj92kda&#038;lid=50' ],
-			[ 'kjoai2', '25', false, false, 'http://example.org/?gpdf=1&#038;pid=kjoai2&#038;lid=25' ],
+			[ '240arkj92kda', '50', false, false, 'http://example.org/?gpdf=1&pid=240arkj92kda&lid=50' ],
+			[ 'kjoai2', '25', false, false, 'http://example.org/?gpdf=1&pid=kjoai2&lid=25' ],
 			[
 				'AIfawjoi24012',
 				'9992',
 				false,
 				false,
-				'http://example.org/?gpdf=1&#038;pid=AIfawjoi24012&#038;lid=9992',
+				'http://example.org/?gpdf=1&pid=AIfawjoi24012&lid=9992',
 			],
-			[ 'JJiawfafwwaa', '5020', false, false, 'http://example.org/?gpdf=1&#038;pid=JJiawfafwwaa&#038;lid=5020' ],
-			[ 'fa2a20koawas', '2', false, false, 'http://example.org/?gpdf=1&#038;pid=fa2a20koawas&#038;lid=2' ],
+			[ 'JJiawfafwwaa', '5020', false, false, 'http://example.org/?gpdf=1&pid=JJiawfafwwaa&lid=5020' ],
+			[ 'fa2a20koawas', '2', false, false, 'http://example.org/?gpdf=1&pid=fa2a20koawas&lid=2' ],
 			[
 				'JJiawfafwwaa',
 				'5020',
 				true,
 				false,
-				'http://example.org/?gpdf=1&#038;pid=JJiawfafwwaa&#038;lid=5020&#038;action=download',
+				'http://example.org/?gpdf=1&pid=JJiawfafwwaa&lid=5020&action=download',
 			],
 			[
 				'fa2a20koawas',
 				'2',
 				false,
 				true,
-				'http://example.org/?gpdf=1&#038;pid=fa2a20koawas&#038;lid=2&#038;print=1',
+				'http://example.org/?gpdf=1&pid=fa2a20koawas&lid=2&print=1',
 			],
 			[
 				'kjoai2',
 				'25',
 				true,
 				true,
-				'http://example.org/?gpdf=1&#038;pid=kjoai2&#038;lid=25&#038;action=download&#038;print=1',
+				'http://example.org/?gpdf=1&pid=kjoai2&lid=25&action=download&print=1',
 			],
 			[
 				'AIfawjoi24012',
 				'9992',
 				true,
 				true,
-				'http://example.org/?gpdf=1&#038;pid=AIfawjoi24012&#038;lid=9992&#038;action=download&#038;print=1',
+				'http://example.org/?gpdf=1&pid=AIfawjoi24012&lid=9992&action=download&print=1',
 			],
 		];
 	}
