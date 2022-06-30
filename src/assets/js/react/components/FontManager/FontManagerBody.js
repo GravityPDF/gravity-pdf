@@ -307,8 +307,10 @@ export class FontManagerBody extends Component {
     fontFileMissing && Object.entries(fontFileMissing).map(([key]) => {
       if (fontVariant === key) {
         /* Call redux action deleteVariantError() */
-        this.props.deleteVariantError(fontVariant)
+        return this.props.deleteVariantError(fontVariant)
       }
+
+      return false
     })
 
     /* Safeguard file */

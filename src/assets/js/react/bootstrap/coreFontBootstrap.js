@@ -1,6 +1,6 @@
 /* Dependencies */
 import React, { lazy, Suspense } from 'react'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 /* Redux store */
 import { getStore } from '../store'
@@ -25,13 +25,13 @@ export default function coreFontBootstrap () {
   const container = document.getElementById('gfpdf-button-wrapper-install_core_fonts')
   const button = container.getElementsByTagName('button')[0]
   const store = getStore()
+  const root = createRoot(container)
 
-  render(
+  root.render(
     <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Provider store={store}>
         <Routes button={button} />
       </Provider>
-    </Suspense>,
-    container
+    </Suspense>
   )
 }

@@ -1,6 +1,6 @@
 /* Dependencies */
 import React, { lazy, Suspense } from 'react'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 /* Components */
@@ -33,9 +33,9 @@ const TemplateSingle = lazy(() => import('../components/Template/TemplateSingle'
  * @since 4.1
  */
 export const Routes = () => (
-  <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
-    <Router>
-      <Switch>
+  <Router>
+    <Switch>
+      <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
         <Route
           path='/template'
           exact
@@ -80,9 +80,10 @@ export const Routes = () => (
           )}
         />
         <Route component={Empty} />
-      </Switch>
-    </Router>
-  </Suspense>)
+      </Suspense>
+    </Switch>
+  </Router>
+)
 
 /**
  * Setup React Router with our Redux Store
@@ -92,8 +93,12 @@ export const Routes = () => (
  * @since 4.1
  */
 export default function TemplatesRouter (store) {
-  render((
+  const container = document.getElementById('gfpdf-overlay')
+  const root = createRoot(container)
+
+  root.render(
     <Provider store={store}>
       <Routes />
-    </Provider>), document.getElementById('gfpdf-overlay'))
+    </Provider>
+  )
 }

@@ -1,6 +1,6 @@
 /* Dependencies */
 import React, { lazy, Suspense } from 'react'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 /* Redux store */
 import { getStore } from '../store'
@@ -21,13 +21,14 @@ const HelpContainer = lazy(() => import('../components/Help/HelpContainer'))
  */
 export default function helpBootstrap () {
   const store = getStore()
+  const container = document.getElementById('gpdf-search')
+  const root = createRoot(container)
 
-  render(
+  root.render(
     <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Provider store={store}>
         <HelpContainer />
       </Provider>
-    </Suspense>,
-    document.getElementById('gpdf-search')
+    </Suspense>
   )
 }

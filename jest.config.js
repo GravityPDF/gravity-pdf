@@ -22,5 +22,6 @@ module.exports = {
   },
   setupFiles: [
     './tests/js-unit/setupTests.js'
-  ]
+  ],
+  testEnvironment: './tests/js-unit/custom-test-env.js'
 }
