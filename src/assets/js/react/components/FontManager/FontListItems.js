@@ -370,14 +370,16 @@ export class FontListItems extends Component {
               <FontListIcon font={font.bold} />
               <FontListIcon font={font.bolditalics} />
 
-              {loading && (deleteId === font.id) ? <Spinner style='delete-font' /> : (
-                <span
-                  className='dashicons dashicons-trash'
-                  onClick={e => this.handleDeleteFont(e, font.id)}
-                  onKeyDown={e => this.handleDeleteFontKeypress(e, font.id)}
-                  tabIndex={tabIndex}
-                />
-              )}
+              {loading && (deleteId === font.id)
+                ? <Spinner style='delete-font' />
+                : (
+                  <span
+                    className='dashicons dashicons-trash'
+                    onClick={e => this.handleDeleteFont(e, font.id)}
+                    onKeyDown={e => this.handleDeleteFontKeypress(e, font.id)}
+                    tabIndex={tabIndex}
+                  />
+                  )}
             </div>
           )
         })}

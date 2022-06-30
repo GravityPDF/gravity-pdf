@@ -38,26 +38,28 @@ export class CoreFontListResults extends Component {
     const lines = Object.keys(console).reverse()
     const retry = this.props.retry.length > 0
 
-    return (!lines.length) ? null : (
-      <ul
-        data-test='component-coreFont-container'
-        className='gfpdf-core-font-list-results-container'
-        aria-label={GFPDF.coreFontAriaLabel}
-      >
-        {lines.map((key) =>
-          <li
-            data-test={console[key].status}
-            key={key}
-            className={'gfpdf-core-font-status-' + console[key].status}
-          >
-            {console[key].message}
-            {' '}
-            {key === 'completed' && retry && <Retry history={this.props.history} retryText={this.props.retryText} />}
-            {key === 'completed' && <ListSpacer />}
-          </li>
-        )}
-      </ul>
-    )
+    return (!lines.length)
+      ? null
+      : (
+        <ul
+          data-test='component-coreFont-container'
+          className='gfpdf-core-font-list-results-container'
+          aria-label={GFPDF.coreFontAriaLabel}
+        >
+          {lines.map((key) =>
+            <li
+              data-test={console[key].status}
+              key={key}
+              className={'gfpdf-core-font-status-' + console[key].status}
+            >
+              {console[key].message}
+              {' '}
+              {key === 'completed' && retry && <Retry history={this.props.history} retryText={this.props.retryText} />}
+              {key === 'completed' && <ListSpacer />}
+            </li>
+          )}
+        </ul>
+        )
   }
 }
 

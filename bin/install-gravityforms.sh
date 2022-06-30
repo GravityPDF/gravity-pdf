@@ -9,5 +9,11 @@ if [ -f ".env" ]; then
     set +a
 fi
 
-npm run env cli --quiet plugin install https://github.com/gravityforms/gravityformscli/archive/master.zip -- --activate --force --quiet
-npm run env cli --quiet gf install -- --key=$GF_LICENSE --activate --force
+# Install in both development + test environments
+npm run wp-env run cli --quiet gf install -- --key=$GF_LICENSE --activate --force
+npm run wp-env run tests-cli --quiet gf install -- --key=$GF_LICENSE --activate --force
+
+# Install add-ons in the test environment
+npm run wp-env run tests-cli --quiet gf install gravityformspolls -- --key=$GF_LICENSE --activate --force
+npm run wp-env run tests-cli --quiet gf install gravityformsquiz -- --key=$GF_LICENSE --activate --force
+npm run wp-env run tests-cli --quiet gf install gravityformssurvey -- --key=$GF_LICENSE --activate --force

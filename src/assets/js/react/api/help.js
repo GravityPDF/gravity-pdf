@@ -1,5 +1,5 @@
 /* Dependencies */
-import request from 'superagent'
+import request from 'superagent/dist/superagent.min'
 
 /**
  * @package     Gravity PDF

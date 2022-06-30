@@ -253,21 +253,25 @@ export class TemplateUploader extends Component {
 
                   <div className='theme-screenshot'><span /></div>
 
-                  {this.state.error !== '' ? (
-                    <ShowMessage
-                      data-test='component-stateError-showMessage'
-                      text={this.state.error}
-                      error
-                    />
-                  ) : null}
-                  {this.state.message !== '' ? (
-                    <ShowMessage
-                      data-test='component-stateMessage-showMessage'
-                      text={this.state.message}
-                      dismissable
-                      dismissableCallback={this.removeMessage}
-                    />
-                  ) : null}
+                  {this.state.error !== ''
+                    ? (
+                      <ShowMessage
+                        data-test='component-stateError-showMessage'
+                        text={this.state.error}
+                        error
+                      />
+                      )
+                    : null}
+                  {this.state.message !== ''
+                    ? (
+                      <ShowMessage
+                        data-test='component-stateMessage-showMessage'
+                        text={this.state.message}
+                        dismissable
+                        dismissableCallback={this.removeMessage}
+                      />
+                      )
+                    : null}
 
                   <h2 className='theme-name'>{this.props.addTemplateText}</h2>
                 </a>

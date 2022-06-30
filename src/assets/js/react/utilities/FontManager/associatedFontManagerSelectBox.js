@@ -27,7 +27,7 @@ export function associatedFontManagerSelectBox (fontList, id) {
     option.text = font.font_name
     option.value = font.id
 
-    optgroup.appendChild(option)
+    return optgroup.appendChild(option)
   })
 
   let updateSelectBoxValue

@@ -1,6 +1,6 @@
 {
-  "parser": "babel-eslint",
-  "extends": ["standard", "standard-react"],
+  "parser": "@babel/eslint-parser",
+  "extends": ["standard", "standard-jsx", "standard-react"],
   "globals": {
     "GFPDF": false,
     "Backbone": false,
@@ -20,5 +20,6 @@
     "gform_initialize_tooltips": false,
     "_": false,
     "ClipboardJS": false
-  }
+  },
+  "ignorePatterns": ["versionCompare.js"]
 }

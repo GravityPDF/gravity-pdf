@@ -8,12 +8,12 @@ export function addEditButton (pdfSettingFieldSets, form) {
     if (fieldset.style.display !== 'none') {
       const collapsibleToggleIcon = fieldset.querySelector('.gform-settings-panel__collapsible-toggle-checkbox')
 
-      collapsibleToggleIcon.addEventListener('click', function () {
-        insertAfter(fieldset, form, index)
-      })
+      collapsibleToggleIcon.addEventListener('click', () => insertAfter(fieldset, form, index))
 
-      insertAfter(fieldset, form, index, 'firstLoad')
+      return insertAfter(fieldset, form, index, 'firstLoad')
     }
+
+    return false
   })
 }
 

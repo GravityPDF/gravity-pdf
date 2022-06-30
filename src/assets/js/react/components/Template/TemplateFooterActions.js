@@ -61,23 +61,27 @@ export class TemplateFooterActions extends Component {
         data-test='component-templateFooterActions'
         className='theme-actions'
       >
-        {!this.props.isActiveTemplate && isCompatible ? (
-          <TemplateActivateButton
-            template={template}
-            buttonText={this.props.activateText}
-          />
-        ) : null}
+        {!this.props.isActiveTemplate && isCompatible
+          ? (
+            <TemplateActivateButton
+              template={template}
+              buttonText={this.props.activateText}
+            />
+            )
+          : null}
 
-        {!this.props.isActiveTemplate && this.notCoreTemplate(template) ? (
-          <TemplateDeleteButton
-            template={template}
-            ajaxUrl={this.props.ajaxUrl}
-            ajaxNonce={this.props.ajaxNonce}
-            buttonText={this.props.templateDeleteText}
-            templateConfirmDeleteText={this.props.templateConfirmDeleteText}
-            templateDeleteErrorText={this.props.templateDeleteErrorText}
-          />
-        ) : null}
+        {!this.props.isActiveTemplate && this.notCoreTemplate(template)
+          ? (
+            <TemplateDeleteButton
+              template={template}
+              ajaxUrl={this.props.ajaxUrl}
+              ajaxNonce={this.props.ajaxNonce}
+              buttonText={this.props.templateDeleteText}
+              templateConfirmDeleteText={this.props.templateConfirmDeleteText}
+              templateDeleteErrorText={this.props.templateDeleteErrorText}
+            />
+            )
+          : null}
       </div>
     )
   }

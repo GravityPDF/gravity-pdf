@@ -16,6 +16,12 @@ function auth_redirect() {
 	throw new Exception( 'Redirecting' );
 }
 
+/* Define custom config to override the URL used for the test site */
+define( 'WP_TESTS_CONFIG_FILE_PATH', '/var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/wp-tests-config.php' );
+
+putenv( 'WORDPRESS_TABLE_PREFIX=phpunit_' );
+putenv( 'WORDPRESS_URL=http://example.org/' );
+
 /**
  * Gravity PDF Unit Tests Bootstrap
  *
@@ -55,8 +61,8 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	public function __construct() {
 
 		$this->tests_dir    = dirname( __FILE__ );
-		$this->plugin_dir   = dirname( $this->tests_dir ) . '/..';
-		$this->wp_tests_dir = $this->plugin_dir . '/wordpress/tests/phpunit';
+		$this->plugin_dir   = dirname( $this->tests_dir, 2 );
+		$this->wp_tests_dir = getenv( 'WP_TESTS_DIR' ) ?: getenv( 'WP_PHPUNIT__DIR' );
 
 		/* load test function so tests_add_filter() is available */
 		require_once $this->wp_tests_dir . '/includes/functions.php';
@@ -79,7 +85,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 *
 	 * @since 6.3
 	 */
-	public function mocks(){
+	public function mocks() {
 		require_once 'unit-tests/Mocks/zapier-mock.php';
 	}
 
@@ -89,10 +95,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * @since 4.0
 	 */
 	public function load() {
-		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityforms/gravityforms.php';
-		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityformspolls/polls.php';
-		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityformsquiz/quiz.php';
-		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityformssurvey/survey.php';
+		require_once $this->plugin_dir . '/../gravityforms/gravityforms.php';
+		require_once $this->plugin_dir . '/../gravityformspolls/polls.php';
+		require_once $this->plugin_dir . '/../gravityformsquiz/quiz.php';
+		require_once $this->plugin_dir . '/../gravityformssurvey/survey.php';
 
 		/* set up Gravity Forms database */
 		add_filter( 'get_available_languages', function( $language ) {

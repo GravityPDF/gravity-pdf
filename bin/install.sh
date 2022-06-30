@@ -9,42 +9,30 @@ if [[ -f ".env" ]]; then
     set +a
 fi
 
-bash ./bin/download-wordpress.sh
-bash ./bin/install-wordpress.sh
-
-# Connect Plugin to WordPress.
-npm run env connect
-
-# Install fresh dependancies
+# Install Gravity PDF Dependencies
 rm composer.lock
-npm run env docker-run -- php composer install
-bash ./bin/vendor-prefix.sh
+composer install
+composer run prefix
 
-# Get Connection Details
-CURRENTURL=$(npm run --silent env cli option get siteurl)
+# Start local environment
+npm run wp-env start -- --xdebug
 
 echo "Install Gravity Forms..."
 bash ./bin/install-gravityforms.sh
 
+npm run wp-env run cli plugin activate gravityforms gravityformscli gravity-pdf
+npm run wp-env run tests-cli plugin activate gravityforms gravityformscli gravityformspolls gravityformssurvey gravityformsquiz gravity-pdf gravity-pdf-test-suite
+
+# Fix permissions issues on test container
+npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/gravity-pdf/
+npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/
+npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/plugins/gravity-pdf-test-suite/src/fonts/
+npm run wp-env run tests-wordpress chmod -R 777 /var/www/html/wp-content/uploads/
+
 echo "Run Database changes"
 bash ./bin/install-database.sh
-
-echo "Install Gravity PDF Testing Suite..."
-bash ./bin/install-testing-suite.sh
 
 if [[ -f "./bin/install-post-actions.sh" ]]; then
   echo "Running Post Install Actions..."
   bash ./bin/install-post-actions.sh
 fi
-
-echo "Welcome to..."
-echo "_____             _ _          _____ ____  _____  "
-echo "|   __|___ ___ _ _|_| |_ _ _   |  _  |    \\|   __|"
-echo "|  |  |  _| .'| | | |  _| | |  |   __|  |  |   __| "
-echo "|_____|_| |__,|\\_/|_|_| |_  |  |__|  |____/|__|    "
-echo ""
-echo "Run yarn run build to build the latest version of Gravity PDF, then open $CURRENTURL/wp-login.php to get started."
-echo ""
-echo "Access the WP install using the following credentials:"
-echo "Username: admin"
-echo "Password: password"

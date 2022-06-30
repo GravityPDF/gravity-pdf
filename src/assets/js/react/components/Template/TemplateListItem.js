@@ -97,22 +97,26 @@ export class TemplateListItem extends Component {
           data-test='component-templateScreenshot'
           image={item.screenshot}
         />
-        {item.error ? (
-          <ShowMessage
-            data-test='component-showMessage'
-            text={item.error}
-            error
-          />
-        ) : null}
-        {item.message ? (
-          <ShowMessage
-            data-test='component-showMessage'
-            text={item.message}
-            dismissableCallback={this.removeMessage}
-            dismissable
-            delay={12000}
-          />
-        ) : null}
+        {item.error
+          ? (
+            <ShowMessage
+              data-test='component-showMessage'
+              text={item.error}
+              error
+            />
+            )
+          : null}
+        {item.message
+          ? (
+            <ShowMessage
+              data-test='component-showMessage'
+              text={item.message}
+              dismissableCallback={this.removeMessage}
+              dismissable
+              delay={12000}
+            />
+            )
+          : null}
 
         <TemplateDetails
           data-test='component-templateDetails'
@@ -122,13 +126,15 @@ export class TemplateListItem extends Component {
         <Name data-test='component-name' name={item.template} />
 
         <div className='theme-actions'>
-          {!isActiveTemplate && isCompatible ? (
-            <TemplateActivateButton
-              data-test='component-templateActivateButton'
-              template={this.props.template}
-              buttonText={this.props.activateText}
-            />
-          ) : null}
+          {!isActiveTemplate && isCompatible
+            ? (
+              <TemplateActivateButton
+                data-test='component-templateActivateButton'
+                template={this.props.template}
+                buttonText={this.props.activateText}
+              />
+              )
+            : null}
         </div>
       </div>
     )

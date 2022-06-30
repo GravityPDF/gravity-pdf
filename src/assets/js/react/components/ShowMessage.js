@@ -147,15 +147,17 @@ export class ShowMessage extends Component {
       classes = classes + ' error'
     }
 
-    return this.state.visible ? (
-      <div
-        data-test='component-showMessage'
-        ref={message => (this._message = message)}
-        className={classes}
-      >
-        <p>{text}</p>
-      </div>
-    ) : <div />
+    return this.state.visible
+      ? (
+        <div
+          data-test='component-showMessage'
+          ref={message => (this._message = message)}
+          className={classes}
+        >
+          <p>{text}</p>
+        </div>
+        )
+      : <div />
   }
 }
 

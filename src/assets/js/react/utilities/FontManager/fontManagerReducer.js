@@ -28,6 +28,8 @@ export function findAndUpdate (data, payload) {
       font.bold = payload.font.bold
       font.bolditalics = payload.font.bolditalics
     }
+
+    return font
   })
 
   return list
