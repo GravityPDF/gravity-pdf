@@ -307,6 +307,14 @@ class Model_PDF extends Helper_Abstract_Model {
 			remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_logged_out_timeout' ], 50 );
 			remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_auth_logged_out_user' ], 60 );
 			remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_user_capability' ], 70 );
+
+			$this->log->notice(
+				'Public access enabled for current PDF',
+				[
+					'entry_id' => $entry['id'],
+					'pdf_id'   => $settings['id'],
+				]
+			);
 		}
 
 		return $action;
@@ -332,13 +340,24 @@ class Model_PDF extends Helper_Abstract_Model {
 				$domain   = $_SERVER['HTTP_HOST'];
 				$request  = $_SERVER['REQUEST_URI'];
 
-				$url = $protocol . $domain . $request;
+				$url = filter_var( $protocol . $domain . $request, FILTER_SANITIZE_URL );
 
 				if ( $this->url_signer->verify( $url ) ) {
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_owner_restriction' ], 40 );
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_logged_out_timeout' ], 50 );
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_auth_logged_out_user' ], 60 );
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_user_capability' ], 70 );
+
+					$this->log->notice(
+						'Valid PDF Signing Request',
+						[
+							'entry_id'    => $entry['id'],
+							'pdf_id'      => $settings['id'],
+							'url'         => $url,
+							'domain'      => $domain, /* Logged to a plain text file */
+							'request_uri' => $request, /* Logged to a plain text file */
+						]
+					);
 				}
 			} catch ( InvalidSignatureKey $e ) {
 
@@ -414,10 +433,10 @@ class Model_PDF extends Helper_Abstract_Model {
 			if ( $owner_restriction === 'Yes' && ! is_user_logged_in() ) {
 
 				$this->log->notice(
-					'Security – Owner Restrictions: Redirecting to Login.',
+					'Restrict Owner Global Setting Enabled. Prompting logged-out user to login.',
 					[
-						'entry'    => $entry,
-						'settings' => $settings,
+						'entry_id'    => $entry['id'],
+						'settings_id' => $settings['id'],
 					]
 				);
 
@@ -457,20 +476,33 @@ class Model_PDF extends Helper_Abstract_Model {
 					$timeout_stamp   = 60 * $timeout; /* 60 seconds multiplied by number of minutes */
 					$entry_created   = strtotime( $entry['date_created'] ); /* get entry timestamp */
 					$timeout_expires = $entry_created + $timeout_stamp; /* get the timeout expiry based on the entry created time */
+					$current_time    = time();
 
 					/* compare our two timestamps and throw error if outside the timeout */
-					if ( time() > $timeout_expires ) {
+					if ( $current_time > $timeout_expires ) {
 
 						/* if there is no user account assigned to this entry throw error */
 						if ( empty( $entry['created_by'] ) ) {
+							$this->log->notice(
+								'Logged Out Timeout Expired. Showing Error Message.',
+								[
+									'entry_id'        => $entry['id'],
+									'settings_id'     => $settings['id'],
+									'current_time'    => $current_time,
+									'timeout_expires' => $timeout_expires,
+								]
+							);
+
 							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
 						} else {
 
 							$this->log->notice(
-								'Security – Logged Out Timeout: Redirecting to Login.',
+								'Logged Out Timeout Expired but user assigned to the entry. Redirecting to Login.',
 								[
-									'entry'    => $entry,
-									'settings' => $settings,
+									'entry_id'        => $entry['id'],
+									'settings_id'     => $settings['id'],
+									'current_time'    => $current_time,
+									'timeout_expires' => $timeout_expires,
 								]
 							);
 
@@ -501,20 +533,37 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( $type === 'all' || $type === 'logged_in' ) {
 			if ( is_user_logged_in() && (int) $entry['created_by'] === get_current_user_id() ) {
 				$owner = true;
+				$this->log->notice(
+					'Current logged-in user is the owner of the entry',
+					[
+						'entry_id'   => $entry['id'],
+						'created_by' => $entry['created_by'],
+					]
+				);
 			}
 		}
 
 		if ( $type === 'all' || $type === 'logged_out' ) {
-			$user_ip   = trim( GFFormsModel::get_ip() );
-			$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1';
+			$user_ip   = filter_var( GFFormsModel::get_ip(), FILTER_VALIDATE_IP );
+			$server_ip = filter_var( $_SERVER['SERVER_ADDR'] ?? '127.0.0.1', FILTER_VALIDATE_IP );
+			$entry_ip  = filter_var( $entry['ip'], FILTER_VALIDATE_IP );
 
 			/* check if the user IP matches the entry IP */
 			if (
-				$entry['ip'] === $user_ip &&
-				$entry['ip'] !== $server_ip &&
-				strlen( $user_ip ) !== 0
+				! empty( $entry_ip ) &&
+				$entry_ip === $user_ip &&
+				$entry_ip !== $server_ip
 			) {
+
 				$owner = true;
+				$this->log->notice(
+					'Current logged-out user matches the entry IP address',
+					[
+						'entry_id'  => $entry['id'],
+						'user_ip'   => $user_ip,
+						'server_ip' => $server_ip,
+					]
+				);
 			}
 		}
 
@@ -543,10 +592,10 @@ class Model_PDF extends Helper_Abstract_Model {
 				if ( ! empty( $entry['created_by'] ) ) {
 
 					$this->log->notice(
-						'Security – Auth Logged Out User: Redirecting to Login.',
+						'The logged out security checks failed, but there is a logged-in user assigned to the entry. Prompting user to login.',
 						[
-							'entry'    => $entry,
-							'settings' => $settings,
+							'entry_id'    => $entry['id'],
+							'settings_id' => $settings['id'],
 						]
 					);
 
@@ -554,11 +603,10 @@ class Model_PDF extends Helper_Abstract_Model {
 					auth_redirect();
 				} else {
 					$this->log->warning(
-						'Access denied.',
+						'The logged out security checks failed and there is no logged-in user assigned to the entry.',
 						[
-							'entry'    => $entry,
-							'settings' => $settings,
-							'SERVER'   => $_SERVER,
+							'entry_id'    => $entry['id'],
+							'settings_id' => $settings['id'],
 						]
 					);
 
@@ -599,6 +647,15 @@ class Model_PDF extends Helper_Abstract_Model {
 				foreach ( $admin_permissions as $permission ) {
 					if ( $this->gform->has_capability( $permission ) ) {
 						$access = true;
+
+						$this->log->notice(
+							'Current logged-in user has appropriate WordPress capability to view PDF',
+							[
+								'permission' => $permission,
+							]
+						);
+
+						break;
 					}
 				}
 
@@ -770,6 +827,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_pdf_url( $pid, $id, $download = false, $print = false, $esc = true ) {
 		global $wp_rewrite;
 
+		if ( $esc !== true ) {
+			_doing_it_wrong( __METHOD__, '$esc has been deprecated. Late-escape the returned value where appropriate.', '6.4.0' );
+		}
+
 		/*
 		 * Patch for WPML which can include the default language as a GET parameter
 		 * See https://github.com/GravityPDF/gravity-pdf/issues/550
@@ -800,14 +861,12 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		if ( $esc ) {
-			$url = esc_url( $url );
-		}
-
-		/**
+		/*
 		 * @since 4.2
 		 */
-		return apply_filters( 'gfpdf_get_pdf_url', $url, $pid, $id, $download, $print, $esc );
+		$url = apply_filters( 'gfpdf_get_pdf_url', $url, $pid, $id, $download, $print, $esc );
+
+		return esc_url_raw( $url );
 	}
 
 	/**

@@ -210,7 +210,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 				/* Everything is valid so get the URL and display */
 				$modifiers = explode( ':', $tag[2] ?? '' );
-				$url       = $this->pdf->get_pdf_url( $tag[1], $entry['id'], (bool) in_array( 'download', $modifiers, true ), (bool) in_array( 'print', $modifiers, true ), $url_encode );
+				$url       = $this->pdf->get_pdf_url( $tag[1], $entry['id'], (bool) in_array( 'download', $modifiers, true ), (bool) in_array( 'print', $modifiers, true ) );
 
 				/*
 				 * A URL cannot be modified after signing (becomes invalid), so move the signing option to the bottom
@@ -235,6 +235,10 @@ class Model_Mergetags extends Helper_Abstract_Model {
 						default:
 							$url = apply_filters( 'gfpdf_mergetag_modifiers_url', $url, $modifier, $tag, $form, $entry, $config );
 					}
+				}
+
+				if ( $url_encode ) {
+					$url = esc_url( $url );
 				}
 
 				/* replace the merge tag */
