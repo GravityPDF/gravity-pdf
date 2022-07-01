@@ -9,11 +9,11 @@ fixture`Debug mode - PDF shortcode test`
 
 test('should enable debug mode and throw error when PDF is inactive', async t => {
   // Actions & Assertions
-  await t.setTestSpeed(0.4)
   await advancedCheck.navigateSection('gf_settings&subview=PDF&tab=general#')
   await t
     .click(advancedCheck.debugModeCheckbox)
     .click(general.saveSettings)
+    .wait(2000)
   await advancedCheck.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
   shortcodeHolder = await advancedCheck.shortcodeBox.getAttribute('data-clipboard-text')
   await t.click(advancedCheck.toggleSwitch)
