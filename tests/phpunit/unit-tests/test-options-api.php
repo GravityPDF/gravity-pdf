@@ -969,15 +969,56 @@ class Test_Options_API extends WP_UnitTestCase {
 			[
 				'rich_editor',
 				'<strong>Test</strong> <script>console.log("test");</script>',
-				'<strong>Test</strong> <script>console.log("test");</script>',
+				'<strong>Test</strong> console.log("test");',
 			],
+
+			[
+				'rich_editor',
+				'<a href="{Field:1}">Link</a> and this {Business Name::2} is another <a class="{Field:3}" href="{pdf:12345789:signed,download}">link</a>',
+				'<a href="{Field:1}">Link</a> and this {Business Name::2} is another <a class="{Field:3}" href="{pdf:12345789:signed,download}">link</a>',
+			],
+
+			[
+				'rich_editor',
+				'<a href="telnet://{Field:1}">Link</a>',
+				'<a href="telnet://{Field:1}">Link</a>',
+			],
+
 			[
 				'textarea',
 				'<em>Test</em> <script>console.log("test");</script>',
-				'<em>Test</em> console.log("test");',
+				'Test',
 			],
-			[ 'text', '<b><em>Test</em></b>', 'Test' ],
-			[ 'checkbox', [ '<b>Item 1</b>', '<em>Item 2</em>' ], [ 'Item 1', 'Item 2' ] ],
+
+			[
+				'text',
+				'<b><em>Test</em></b>',
+				'Test'
+			],
+
+			[
+				'checkbox',
+				[ '<b>Item 1</b>', '<em>Item 2</em>' ],
+				[ 'Item 1', 'Item 2' ]
+			],
+
+			[
+				'conditional_logic',
+				'',
+				''
+			],
+
+			[
+				'conditional_logic',
+				wp_json_encode( [
+					'actionType' => 'see',
+					'logicType'  => 'boat',
+					'rules'      => [
+						[ 'fieldId' => '<b>2</b>', 'operator' => 'sun', 'value' => '<strong>Test</strong> <script>console.log("test");</script>' ],
+					],
+				] ),
+				'{"actionType":"show","logicType":"all","rules":[{"fieldId":"2","operator":"is","value":"<strong>Test<\/strong> console.log(\"test\");"}]}',
+			],
 		];
 	}
 
