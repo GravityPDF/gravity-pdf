@@ -1,6 +1,6 @@
 import { Selector, RequestLogger } from 'testcafe'
 import { baseURL } from '../auth'
-import { button, link } from '../utilities/page-model/helpers/field'
+import { link } from '../utilities/page-model/helpers/field'
 import AdvancedCheck from '../utilities/page-model/helpers/advanced-check'
 import Page from '../utilities/page-model/helpers/page'
 
@@ -43,6 +43,12 @@ test('should check shortcode confirmation type TEXT is working correctly', async
 })
 
 test('should check if the shortcode confirmation type PAGE is working correctly', async t => {
+  // Selectors
+  const testPageListItem =
+    Selector('#gform_setting_page')
+      .find('.gform-dropdown__container')
+      .find('button').withText('Test page')
+
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
   shortcodeHolder = await run.shortcodeBox.getAttribute('data-clipboard-text')
@@ -65,8 +71,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
   await t
     .click(run.confirmationPageCheckbox)
     .click(run.confirmationPageSelectBox)
-    .click(button('Test page'))
-  await t
+    .click(testPageListItem)
     .click(run.queryStringInputBox)
     .pressKey('ctrl+a')
     .pressKey('backspace')

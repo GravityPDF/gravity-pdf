@@ -14,7 +14,6 @@ class AdvancedCheck {
     this.shortcodeBox = Selector('button').withAttribute('aria-label', 'Copy the Sample PDF shortcode to the clipboard')
     this.confirmationPageSelectBox = Selector('#gform_setting_page').find('button#gform-page-control')
     this.queryStringInputBox = Selector('#gform_setting_queryString').find('[id="queryString"]')
-    this.confirmationRedirect = Selector('#form_confirmation_redirect')
     this.wysiwgEditorTextTab = Selector('#gform-settings-section-confirmations').find('.wp-editor-tabs').find('button').withText('Text')
     this.wysiwgEditor = Selector('div').find('textarea[class^="merge-tag-support"]')
     this.redirectInputBox = Selector('#gform_setting_url').find('[id="url"]')
@@ -27,7 +26,7 @@ class AdvancedCheck {
     this.getContentType = null
 
     // General Settings - Debug Mode field
-    this.debugModeCheckbox = Selector('#gfpdf-fieldset-debug_mode').find('[class^="gform-field__toggle-container"]')
+    this.debugModeCheckbox = Selector('#gfpdf-fieldset-debug_mode').find('[id="gfpdf_settings[debug_mode]"]')
     this.debugModeErrorMessage = Selector('div').withText('PDF link not displayed because PDF is inactive.')
 
     // Merge tags section
@@ -41,7 +40,6 @@ class AdvancedCheck {
     this.wpAdminBar = Selector('ul').withAttribute('id', 'wp-admin-bar-top-secondary').withAttribute('class', 'ab-top-secondary ab-top-menu')
     this.logout = Selector('a').withText('Log Out')
     this.pdfRestrictionErrorMessage = Selector('div').withAttribute('class', 'wp-die-message').withText('You do not have access to view this PDF.')
-    this.entriesListFirstItem = Selector('tbody#the-list').find('tr').nth(0)
     this.viewEntryLink = Selector('.entry_unread').find('a').nth(5)
     this.wpLoginForm = Selector('#login').find('form').withAttribute('name', 'loginform')
 
@@ -103,6 +101,7 @@ class AdvancedCheck {
       .typeText('#user_login', 'admin', { paste: true })
       .typeText('#user_pass', 'password', { paste: true })
       .click('#wp-submit')
+      .wait(4000)
   }
 
   async pickMergeTag (text) {
