@@ -15,4 +15,5 @@ require_once PDF_PLUGIN_DIR . 'vendor/autoload.php';
 require_once PDF_PLUGIN_DIR . 'src/deprecated.php';
 require_once PDF_PLUGIN_DIR . 'api.php';
 
-require_once PDF_PLUGIN_DIR . 'vendor_prefixed/querypath/querypath/src/qp_functions.php';
+class_alias( '\GFPDF_Vendor\QueryPath\QueryPath', '\GFPDF_Vendor\QueryPath' ); /* Backwards compatibility support */
+require_once PDF_PLUGIN_DIR . 'vendor_prefixed/arthurkushman/query-path/src/qp_functions.php';
