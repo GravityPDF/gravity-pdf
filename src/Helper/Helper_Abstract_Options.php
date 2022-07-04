@@ -4,6 +4,7 @@ namespace GFPDF\Helper;
 
 use GFPDF\Controller\Controller_Custom_Fonts;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Statics\Kses;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -1252,53 +1253,40 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$settings['type'] = '';
 		}
 
-		/*
-		 * Skip over any fields that shouldn't have sanitization
-		 * By default, that's the JSON-encoded conditionalLogic field
-		 *
-		 * @since 4.2.2
-		 */
-		$ignored_fields = apply_filters(
-			'gfpdf_sanitize_ignored_fields',
-			[ 'conditionalLogic' ],
-			$value,
-			$key,
-			$input,
-			$settings
-		);
-
-		if ( in_array( $key, $ignored_fields, true ) ) {
-			return $value;
-		}
-
 		switch ( $settings['type'] ) {
+			case 'conditional_logic':
+				return ! empty( $value ) ? wp_json_encode( \GFFormsModel::sanitize_conditional_logic( json_decode( $value, true ) ) ) : '';
+
 			case 'rich_editor':
-				/**
-				 * Don't do any sanitization on input, which was causing problems with merge tags in HTML attributes.
-				 * See https://github.com/GravityPDF/gravity-pdf/issues/492 for more details.
-				 *
-				 * @internal Devs should run the field through \GFPDF\Statics\Kses::output() or wp_kses_post() on output to correctly sanitize
-				 * @since    4.0.6
-				 */
+				if ( strpos( $value, 'telnet://{' ) === false ) {
+					/*
+					 * So merge tags can be used inside HTML attributes (like src="{tag:20}"), but the rich editor content
+					 * can still be sanitized, we'll replace the opening { tag with a valid protocol that isn't very common.
+					 * Doing this ensures the merge tag does not get malformed during sanitizing.
+					 * When outputting rich text, it is important that the merge tags get processed first and then the output
+					 * run through Kses::parse() or Kses::output() to ensure the HTML safe.
+					 */
+					$pattern = '{[^{]*?:(\d+(\.\d+)?)(:(.*?))?}';
+					$value   = preg_replace( "/$pattern/mi", 'telnet://$0', $value );
+					$value   = Kses::parse( $value );
+					$value   = preg_replace( "/telnet:\/\/($pattern)/mi", '$1', $value );
+				} else {
+					/* Don't encode/decode merge tag before sanitizing */
+					$value = Kses::parse( $value );
+				}
+
 				return $value;
 
 			case 'textarea':
-				return wp_kses_post( $value );
+				return sanitize_textarea_field( $value );
 
 			/* treat as plain text */
 			default:
 				if ( is_array( $value ) ) {
-					array_walk_recursive(
-						$value,
-						function( &$item ) {
-							$item = wp_strip_all_tags( $item );
-						}
-					);
-
-					return $value;
+					return array_map( 'sanitize_text_field', $value );
 				}
 
-				return wp_strip_all_tags( $value );
+				return sanitize_text_field( $value );
 		}
 	}
 
