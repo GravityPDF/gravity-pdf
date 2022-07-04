@@ -340,7 +340,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$domain   = $_SERVER['HTTP_HOST'];
 				$request  = $_SERVER['REQUEST_URI'];
 
-				$url = filter_var( $protocol . $domain . $request, FILTER_SANITIZE_URL );
+				$url = esc_url_raw( $protocol . $domain . $request );
 
 				if ( $this->url_signer->verify( $url ) ) {
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_owner_restriction' ], 40 );
