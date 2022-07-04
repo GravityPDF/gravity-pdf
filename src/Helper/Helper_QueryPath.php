@@ -3,7 +3,7 @@
 namespace GFPDF\Helper;
 
 use GFPDF_Vendor\Masterminds\HTML5;
-use GFPDF_Vendor\QueryPath;
+use GFPDF_Vendor\QueryPath\QueryPath;
 use GFPDF_Vendor\QueryPath\DOMQuery;
 
 /**
