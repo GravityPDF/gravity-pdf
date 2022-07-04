@@ -6,7 +6,7 @@ class License {
     // Core Booster field
     this.samplePluginInputBox = Selector('#gfpdf-fieldset-license_gravity-pdf-example-plugin').find('[id="gfpdf_settings[license_gravity-pdf-example-plugin]"]')
     this.validLicenseKey = '987654321'
-    this.invalidLicenseKey = '12345678934535435334'
+    this.invalidLicenseKey = '123456789'
     this.invalidLicenseKeyMessage = Selector('.gforms_note_error').withText('Invalid license key provided')
     this.deactivateLinkMessage = Selector('button').withText('Deactivate License')
     this.successMessage = Selector('.gforms_note_success').withText('Your support license key has been successfully validated.')

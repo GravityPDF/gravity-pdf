@@ -436,6 +436,17 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertEquals( 'Invalid license key provided', $results['license_other-plugin_message'] );
 		$this->assertEquals( 'missing', $results['license_other-plugin_status'] );
 
+		/* Check that the hashed license reverts back to the unhashed version before saving */
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_other-plugin'         => sha1( 'license key' ),
+				'license_other-plugin_message' => 'message',
+				'license_other-plugin_status'  => 'active',
+			]
+		);
+
+		$this->assertEquals( 'license key', $results['license_other-plugin'] );
+
 		/* Reset our work */
 		remove_filter( 'pre_http_request', $api_response );
 		$gfpdf->data->addon = [];

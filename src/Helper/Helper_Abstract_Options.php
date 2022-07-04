@@ -1720,18 +1720,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		</label>
 
 		<input autocomplete="off"
-			   type="text"
-			   class="regular-text"
+			   type="password"
 			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
 			   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
 			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
-			   value="<?php echo esc_attr( $value['key'] ); ?>"
+			   value="<?php echo esc_attr( ! empty( $value['key'] ) ? sha1( $value['key'] ) : '' ); ?>"
 		/>
 
 		<?php if ( $is_active ): ?>
-			<button class="button primary white gfpdf-deactivate-license"
+			<button type="button"
+					class="button primary white gfpdf-deactivate-license"
 					data-addon-name="<?php echo esc_attr( substr( $args['id'], 8 ) ); ?>"
-					data-license="<?php echo esc_attr( $value['key'] ); ?>"
 					data-nonce="<?php echo esc_attr( wp_create_nonce( 'gfpdf_deactivate_license' ) ); ?>"
 			>
 				<?php echo esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ); ?>

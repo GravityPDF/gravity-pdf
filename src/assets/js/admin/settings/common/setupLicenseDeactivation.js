@@ -23,7 +23,6 @@ export function setupLicenseDeactivation () {
     const data = {
       action: 'gfpdf_deactivate_license',
       addon_name: slug,
-      license: $(this).data('license'),
       nonce: $(this).data('nonce')
     }
 

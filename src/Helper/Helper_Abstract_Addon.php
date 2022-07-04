@@ -523,6 +523,11 @@ abstract class Helper_Abstract_Addon {
 
 		$license_info = $this->get_license_info();
 
+		/* If the license info is empty disable check */
+		if ( empty( array_filter( $license_info ) ) ) {
+			return false;
+		}
+
 		$response = wp_remote_post(
 			$this->data->store_url,
 			[
