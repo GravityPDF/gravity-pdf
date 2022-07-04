@@ -380,10 +380,16 @@ class Helper_Templates {
 	public function get_template_info_by_path( $template_path, $cache_name = '', $cache_time = 604800 ) {
 		$options = GPDFAPI::get_options_class();
 		$debug   = $options->get_option( 'debug_mode', 'No' );
+		$cache   = [];
 
 		if ( $debug === 'No' ) {
 			$cache_name = ! empty( $cache_name ) ? $cache_name : $this->data->template_transient_cache;
 			$cache      = get_transient( $cache_name );
+
+			/* There may be no transient and we got a non-array. If that occurs reset $cache */
+			if ( ! is_array( $cache ) ) {
+				$cache = [];
+			}
 
 			if ( isset( $cache[ $template_path ] ) ) {
 				return $cache[ $template_path ];
@@ -406,7 +412,6 @@ class Helper_Templates {
 
 		/* Save the results to a transient so we don't hit the disk every page load */
 		if ( $debug === 'No' ) {
-			$cache                   = $cache ?? [];
 			$cache[ $template_path ] = $info;
 
 			set_transient( $cache_name, $cache, $cache_time );
