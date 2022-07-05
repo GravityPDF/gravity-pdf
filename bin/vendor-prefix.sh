@@ -37,7 +37,7 @@ eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/league"
 
 # Querypath
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/querypath.php --quiet"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/querypath"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/arthurkushman"
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/masterminds"
 
 # Codeguy
