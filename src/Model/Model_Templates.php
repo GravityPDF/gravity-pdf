@@ -7,11 +7,11 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF_Vendor\Upload\File;
-use GFPDF_Vendor\Upload\Storage\FileSystem;
-use GFPDF_Vendor\Upload\Validation\Extension;
-use GFPDF_Vendor\Upload\Validation\Mimetype;
-use GFPDF_Vendor\Upload\Validation\Size;
+use GFPDF_Vendor\GravityPdf\Upload\File;
+use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
+use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
+use GFPDF_Vendor\GravityPdf\Upload\Validation\Mimetype;
+use GFPDF_Vendor\GravityPdf\Upload\Validation\Size;
 use GPDFAPI;
 use Psr\Log\LoggerInterface;
 

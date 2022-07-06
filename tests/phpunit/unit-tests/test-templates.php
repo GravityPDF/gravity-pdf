@@ -4,10 +4,10 @@ namespace GFPDF\Tests;
 
 use Exception;
 use GFPDF\Controller\Controller_Templates;
+use GFPDF\Helper\Fonts\LocalFile;
+use GFPDF\Helper\Fonts\LocalFilesystem;
 use GFPDF\Model\Model_Templates;
-use GFPDF_Vendor\Upload\Exception\UploadException;
-use GFPDF_Vendor\Upload\Storage\FileSystem;
-use PHPUnit\Framework\MockObject\MockObject;
+use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use WP_UnitTestCase;
 use ZipArchive;
 
@@ -64,27 +64,16 @@ class Test_Templates extends WP_UnitTestCase {
 	/**
 	 * Get a stub we can use for testing
 	 *
-	 * @return MockObject
+	 * @return LocalFile
 	 *
 	 * @since 4.1
 	 */
-	private function getFileStub() {
+	private function getFileStub(): LocalFile {
 		global $gfpdf;
 
-		$storage = new FileSystem( $gfpdf->data->template_tmp_location );
+		$storage = new LocalFilesystem( $gfpdf->data->template_tmp_location );
 
-		/* Mock our \Upload\File\isUploadedFile() method */
-		$file = $this->getMockBuilder( '\GFPDF_Vendor\Upload\File' )
-					 ->setConstructorArgs( [ 'template', $storage ] )
-					 ->setMethods( [ 'isUploadedFile' ] )
-					 ->getMock();
-
-		$file
-			->expects( $this->any() )
-			->method( 'isUploadedFile' )
-			->will( $this->returnValue( true ) );
-
-		return $file;
+		return new LocalFile( 'template', $storage );
 	}
 
 	/**

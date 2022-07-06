@@ -18,8 +18,8 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
-use GFPDF_Vendor\Upload\Exception\UploadException;
-use GFPDF_Vendor\Upload\Validation\Extension;
+use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
+use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 use WP_REST_Request;
@@ -79,7 +79,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 */
 	protected $font_keys = [ 'regular', 'italics', 'bold', 'bolditalics' ];
 
-	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\Upload\\File' ) {
+	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
 		$this->model         = $model;
 		$this->log           = $log;
 		$this->gform         = $gform;

@@ -136,7 +136,7 @@ class Test_Autoloader extends WP_UnitTestCase {
 			[ 'GFPDF_Vendor\Monolog\Logger' ],
 			[ 'GFPDF_Vendor\QueryPath' ],
 			[ 'GFPDF_Vendor\QueryPath' ],
-			[ 'GFPDF_Vendor\Upload\File' ],
+			[ 'GFPDF_Vendor\GravityPdf\Upload\File' ],
 		];
 	}
 }
