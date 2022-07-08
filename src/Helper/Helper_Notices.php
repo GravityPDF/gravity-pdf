@@ -204,10 +204,25 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @since 4.0
 	 */
 	private function html( $text, $class = 'updated' ) {
+		$allow_form_elements = static function( $tags ) {
+			$tags['input'] = [
+				'type'  => true,
+				'name'  => true,
+				'value' => true,
+				'class' => true,
+			];
+
+			return $tags;
+		};
+
+		add_filter( 'wp_kses_allowed_html', $allow_form_elements );
+
 		?>
 		<div class="<?php echo esc_attr( $class ); ?> notice">
 			<p><?php echo wp_kses_post( $text ); ?></p>
 		</div>
 		<?php
+
+		remove_filter( 'wp_kses_allowed_html', $allow_form_elements );
 	}
 }
