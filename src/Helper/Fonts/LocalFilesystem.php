@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Fonts;
 
-use GFPDF_Vendor\Upload\Storage\FileSystem;
+use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
 
 /**
  * @package     Gravity PDF
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class LocalFilesystem extends FileSystem {
-	protected function moveUploadedFile( $source, $destination ) {
+	protected function moveUploadedFile( string $source, string $destination ): bool {
 		return copy( $source, $destination );
 	}
 }

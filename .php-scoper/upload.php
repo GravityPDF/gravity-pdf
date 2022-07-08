@@ -21,8 +21,8 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/codeguy/upload/src' )->name( [ '*.php' ] ),
-		Finder::create()->files()->in( $path . 'vendor/codeguy/upload' )->depth( '==0' )->name( [ 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/gravitypdf/upload/src' )->name( [ '*.php' ] ),
+		Finder::create()->files()->in( $path . 'vendor/gravitypdf/upload' )->depth( '==0' )->name( [ 'LICENSE' ] ),
 	],
 
 	/*

@@ -4,7 +4,8 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Fonts;
 
-use GFPDF_Vendor\Upload\File;
+use GFPDF_Vendor\GravityPdf\Upload\Exception;
+use GFPDF_Vendor\GravityPdf\Upload\File;
 
 /**
  * @package     Gravity PDF
@@ -18,7 +19,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class LocalFile extends File {
-	public function isUploadedFile(): bool {
-		return true;
+	/**
+	 * @return bool
+	 * @throws \Exception
+	 *
+	 * @since 6.4
+	 */
+	public function isValid() : bool {
+		foreach ( $this->objects as $fileInfo ) {
+			$this->applyCallback( 'beforeValidationCallback', $fileInfo );
+			foreach ( $this->validations as $validation ) {
+				try {
+					$validation->validate( $fileInfo );
+				} catch ( Exception $e ) {
+					$this->errors[] = \sprintf( '%s: %s', $fileInfo->getNameWithExtension(), $e->getMessage() );
+				}
+			}
+			$this->applyCallback( 'afterValidationCallback', $fileInfo );
+		}
+		return empty( $this->errors );
 	}
 }

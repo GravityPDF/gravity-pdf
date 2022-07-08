@@ -41,8 +41,8 @@ eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/arthurkushman"
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/masterminds"
 
 # Codeguy
-eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/upload --config=${PLUGIN_DIR}.php-scoper/upload.php --quiet"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/codeguy"
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/gravitypdf/upload --config=${PLUGIN_DIR}.php-scoper/upload.php --quiet"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/gravitypdf"
 
 # Mpdf
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/mpdf.php" --quiet

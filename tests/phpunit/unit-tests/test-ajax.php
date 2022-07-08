@@ -365,7 +365,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 * Testing Model_Templates.php wp_ajax_gfpdf_upload_template
 	 *
 	 * Because this AJAX endpoint is suppose to have a zip file POSTed,
-	 * and because we cannot mock \Upload\File directly (see test-templates.php for specific tests)
+	 * and because we cannot mock \GravityPdf\Upload\File directly (see test-templates.php for specific tests)
 	 * we're just testing this endpoint requires authentication AND throws an error when
 	 * no file is posted.
 	 *
