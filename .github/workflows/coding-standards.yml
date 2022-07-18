@@ -89,7 +89,7 @@ jobs:
           locale -a
 
       - name: Install Dependencies
-        run: yarn
+        run: yarn install --update-checksums
 
       - name: Run ESLint
         run: yarn lint:js
