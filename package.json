@@ -74,8 +74,8 @@
     "lint:js": "eslint \"src/assets/js/**/*.js\"",
     "lint:js:fix": "eslint \"src/assets/js/**/*.js\" --fix",
 
-    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
-    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
+    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors",
+    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors --stop-on-first-fail",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -L",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
     "test:php": "npm run wp-env run phpunit /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
