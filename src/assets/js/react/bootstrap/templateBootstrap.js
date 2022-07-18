@@ -1,6 +1,6 @@
 /* Dependencies */
 import React, { lazy, Suspense } from 'react'
-import { createRoot } from 'react-dom/client'
+import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
 import watch from 'redux-watch'
 /* Redux store */
@@ -29,22 +29,19 @@ const TemplateButton = lazy(() => import('../components/Template/TemplateButton'
  * @since 4.1
  */
 export function templateBootstrap ($templateField) {
+  const store = getStore()
+
   /* Create our button container and render our component in it */
   createTemplateMarkup($templateField)
 
-  const store = getStore()
-  const container = document.getElementById('gpdf-advance-template-selector')
-  const root = createRoot(container)
-
   /* Render our React Component in the DOM */
-  root.render(
+  render(
     <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Router>
-        <Route
-          render={(props) => <TemplateButton {...props} store={store} />}
-        />
+        <Route render={(props) => <TemplateButton {...props} store={store} />} />
       </Router>
-    </Suspense>
+    </Suspense>,
+    document.getElementById('gpdf-advance-template-selector')
   )
 
   /* Mount our router */

@@ -1,7 +1,7 @@
 /* Dependencies */
 import React from 'react'
 import PropTypes from 'prop-types'
-import { createRoot } from 'react-dom/client'
+import { render } from 'react-dom'
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 import { Provider } from 'react-redux'
 /* Components */
@@ -64,12 +64,9 @@ Routes.propTypes = {
  * @since 6.0
  */
 export function fontManagerRouter (store) {
-  const container = document.querySelector('#font-manager-overlay')
-  const root = createRoot(container)
-
-  root.render(
+  render((
     <Provider store={store}>
       <Routes />
     </Provider>
-  )
+  ), document.querySelector('#font-manager-overlay'))
 }

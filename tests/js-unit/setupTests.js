@@ -7,7 +7,7 @@ Enzyme.configure({
 })
 
 // setup global defaults that our tests/legacy code expect is present
-global.GFPDF = {
+window.GFPDF = {
   templateList: [{ id: 'zadani' }, { id: 'rubix' }, { id: 'focus-gravity' }],
   activeTemplate: '',
   coreFontItemPendingMessage: '%s',
@@ -36,6 +36,4 @@ global.GFPDF = {
   manage: 'Advanced'
 }
 
-global.window = {
-  gfpdf_migration_multisite_ids: []
-}
+window.gfpdf_migration_multisite_ids = []

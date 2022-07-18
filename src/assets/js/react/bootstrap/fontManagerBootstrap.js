@@ -1,6 +1,6 @@
 /* Dependencies */
 import React, { lazy, Suspense } from 'react'
-import { createRoot } from 'react-dom/client'
+import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
 /* Routes */
 import { fontManagerRouter } from '../router/fontManagerRouter'
@@ -25,24 +25,22 @@ const AdvancedButton = lazy(() => import('../components/FontManager/AdvancedButt
  * @since 6.0
  */
 export function fontManagerBootstrap (defaultFontField, buttonStyle) {
+  const store = getStore()
   /* Prevent button reset styling on tools tab */
   const preventButtonReset = !buttonStyle ? '' : buttonStyle
 
   createAdvancedButtonWrapper(defaultFontField, preventButtonReset)
 
-  const store = getStore()
-  const container = document.querySelector('#gpdf-advance-font-manager-selector' + preventButtonReset)
-  const root = createRoot(container)
-
-  fontManagerRouter(store)
-
-  root.render(
+  render(
     <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Router>
         <Route render={props => <AdvancedButton {...props} store={store} />} />
       </Router>
-    </Suspense>
+    </Suspense>,
+    document.querySelector('#gpdf-advance-font-manager-selector' + preventButtonReset)
   )
+
+  fontManagerRouter(store)
 }
 
 /**

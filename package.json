@@ -8,8 +8,8 @@
     "lodash.debounce": "^4.0.8",
     "object-to-formdata": "^4.4.2",
     "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-dropzone": "^14.2.2",
     "react-instantsearch-dom": "^6.29.0",
     "react-redux": "^8.0.2",
@@ -53,7 +53,6 @@
     "file-loader": "^6.2.0",
     "jest": "^28.1.2",
     "jest-environment-jsdom": "^28.1.2",
-    "jest-environment-jsdom-global": "^3.1.2",
     "jest-enzyme": "^7.1.2",
     "jquery": "^3.6.0",
     "json-loader": "^0.5.7",
@@ -73,6 +72,7 @@
   "scripts": {
     "lint:js": "eslint \"src/assets/js/**/*.js\"",
     "lint:js:fix": "eslint \"src/assets/js/**/*.js\" --fix",
+
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -L",
@@ -82,9 +82,11 @@
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
+
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
     "build:dev": "cross-env NODE_ENV=development webpack --watch",
     "build:production": "cross-env NODE_ENV=production webpack",
+
     "wp-env": "wp-env",
     "env:install": "bash bin/install.sh"
   }
