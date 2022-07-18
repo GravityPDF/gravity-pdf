@@ -21,7 +21,7 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 
 ## Setup for Docker 
 
-The Docker setup will create a fully functionality development environment preconfigured for Gravity PDF. 
+The Docker setup will create a fully functional development environment preconfigured for Gravity PDF. 
 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/` from the terminal
 2. Copy and rename `.env.example` to `.env`, then replace `00000000000000000000000000000000` with a valid Gravity Forms license key 
@@ -29,13 +29,15 @@ The Docker setup will create a fully functionality development environment preco
 4. Start Docker and then run `yarn env:install` to setup the local development environment
 5. Access a local development site at `http://localhost:8888` with the login `admin` and `password`.
 
-If you shutdown Docker and want to fire up the environment later, use `yarn wp-env start`. You can reset the database back to its original state with `yarn wp-env clean all`. When all else fails, delete everything and start again with `yarn wp-env destroy`.
+If you shut down Docker and want to fire up the environment later, use `yarn wp-env start`. You can reset the database back to its original state with `yarn wp-env clean all`. When all else fails, delete everything and start again with `yarn wp-env destroy`.
 
 [See the WordPress Developer Handbook for more details about managing the docker environment](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-run-container-command).
 
 ### Enable X-Debug
 
 X-Debug is enabled by default for step debugging. If you need to [use other X-Debug modes](https://xdebug.org/docs/all_settings#mode) you can manually start the environment and pass the appropriate modes in: `yarn wp-env start --xdebug=profile,trace,debug`.
+
+**Note: [there is currently an issue that prevents running X-Debug for the PHPUnit/CLI](https://github.com/WordPress/gutenberg/issues/42286).
 
 ### Switch PHP Versions
 

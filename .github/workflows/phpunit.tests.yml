@@ -116,13 +116,13 @@ jobs:
           yarn env:install
 
       - name: Run PHPUnit tests
-        run: yarn test:php --verbose
+        run: yarn test:php --do-not-cache-result --verbose
         continue-on-error: ${{ matrix.php == '8.1' }}
 
       # TODO: XDEBUG isnt working for unit tests https://github.com/WordPress/gutenberg/issues/42286
       - name: Run (xDebug) tests
         if: ${{ matrix.report }}
         run: |
-          yarn run test:php --verbose --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml
+          yarn run test:php --do-not-cache-result --verbose --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml
           yarn test:js:coverage
           bash <(curl -s https://codecov.io/bash);
