@@ -38,7 +38,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-modules-
 
@@ -48,7 +48,7 @@ jobs:
           yarn --version
 
       - name: Install Dependencies
-        run: yarn
+        run: npm install
 
       - name: Run Jest tests
         run: yarn test:js

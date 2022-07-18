@@ -67,12 +67,13 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-modules-
 
       - name: Log debug information
         run: |
+          npm --version
           yarn --version
           node --version
           curl --version
@@ -84,7 +85,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          yarn
+          npm install
 
       - name: Build Gravity PDF
         run: yarn build:production
@@ -92,14 +93,6 @@ jobs:
       - name: Install / Setup Gravity PDF + WordPress
         run: |
           yarn env:install
-
-      - name: General debug information
-        run: |
-          npm --version
-          node --version
-          curl --version
-          git --version
-          svn --version
 
       - name: Run E2E tests
         run: yarn test:e2e:headless
