@@ -40,13 +40,13 @@ jobs:
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
 
       - name: Log PHPCS debug information
-        run: composer run lint -i
+        run: composer run lint -- -i
 
       - name: Run PHP compatibility tests
-        run: composer run lint --standard=phpcompat.xml.dist -q --report=checkstyle | cs2pr
+        run: composer run lint -- --standard=phpcompat.xml.dist -q --report=checkstyle | cs2pr
 
       - name: Run PHPCS on all plugin files
-        run: composer run lint -q -n --report=checkstyle | cs2pr
+        run: composer run lint -- -q -n --report=checkstyle | cs2pr
 
   # Runs the JavaScript coding standards checks.
   #
@@ -79,6 +79,9 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-modules-
+
+      - name: Update checksum
+        run: yarn --update-checksums
 
       - name: Log debug information
         run: |
