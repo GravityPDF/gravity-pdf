@@ -56,21 +56,10 @@ jobs:
         with:
           php-version: 7.3
 
-      - name: Log debug information
-        run: |
-          yarn --version
-          node --version
-          curl --version
-          git --version
-          svn --version
-          php --version
-          php -i
-          locale -a
-
-      - name: Install NodeJS
-        uses: actions/setup-node@v1
+      - name: Setup Node JS
+        uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version-file: '.nvmrc'
 
       - name: Cache NodeJS modules
         uses: actions/cache@v2
@@ -82,21 +71,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-modules-
 
-      - name: Get Composer Cache Directory
-        id: composer-cache
+      - name: Log debug information
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+          yarn --version
+          node --version
+          curl --version
+          git --version
+          svn --version
+          php --version
+          php -i
+          locale -a
 
       - name: Install Dependencies
         run: |
-          yarn install
+          yarn
 
       - name: Build Gravity PDF
         run: yarn build:production
@@ -104,7 +92,6 @@ jobs:
       - name: Install / Setup Gravity PDF + WordPress
         run: |
           yarn env:install
-          yarn env:install:phpunit
 
       - name: General debug information
         run: |
@@ -114,27 +101,14 @@ jobs:
           git --version
           svn --version
 
-      - name: Log running Docker containers
-        run: docker ps -a
-
-      - name: Docker debug information
-        run: |
-          docker -v
-          docker-compose -v
-          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm mysql mysql --version
-          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php php --version
-          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php php -m
-          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php php -i
-          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php locale -a
-
       - name: Run E2E tests
         run: yarn test:e2e:headless
 
       - name: Dump log files on failure
         if: failure()
         run: |
-          cp ./wordpress/src/wp-content/debug.log screenshots/debug.log
-          cp -R ./wordpress/src/wp-content/uploads/gravity_forms/logs/ screenshots/logs/
+          cp ./var/www/html/wp-content/debug.log screenshots/debug.log
+          cp -R ./var/www/html/wp-content/uploads/gravity_forms/logs/ screenshots/logs/
 
       - name: Upload artifacts on failure
         uses: actions/upload-artifact@v2

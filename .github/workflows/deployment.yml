@@ -13,7 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Docs: https://github.com/shivammathur/setup-php
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -23,10 +22,10 @@ jobs:
         id: tag
         uses: dawidd6/action-get-tag@v1
 
-      - name: Install NodeJS
-        uses: actions/setup-node@v1
+      - name: Setup Node JS
+        uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version-file: '.nvmrc'
 
       - name: Cache NodeJS modules
         uses: actions/cache@v2
@@ -37,18 +36,6 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-modules-
-
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
 
       - name: General debug information
         run: |
