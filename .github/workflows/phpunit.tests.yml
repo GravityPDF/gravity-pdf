@@ -95,6 +95,7 @@ jobs:
 
       - name: Log debug information
         run: |
+          npm --version
           yarn --version
           node --version
           curl --version
@@ -104,24 +105,24 @@ jobs:
           php -i
           locale -a
 
-        - name: Install Dependencies
-          run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-        - name: Build Gravity PDF
-          run: yarn build:production
+      - name: Build Gravity PDF
+        run: yarn build:production
 
-        - name: Install / Setup Gravity PDF + WordPress
-          run: |
-            yarn env:install
+      - name: Install / Setup Gravity PDF + WordPress
+        run: |
+          yarn env:install
 
-        - name: Run PHPUnit tests
-          run: yarn test:php --verbose
-          continue-on-error: ${{ matrix.php == '8.1' }}
+      - name: Run PHPUnit tests
+        run: yarn test:php --verbose
+        continue-on-error: ${{ matrix.php == '8.1' }}
 
-        # TODO: XDEBUG isnt working for unit tests https://github.com/WordPress/gutenberg/issues/42286
-        - name: Run (xDebug) tests
-          if: ${{ matrix.report }}
-          run: |
-            yarn run test:php --verbose --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml
-            yarn test:js:coverage
-            bash <(curl -s https://codecov.io/bash);
+      # TODO: XDEBUG isnt working for unit tests https://github.com/WordPress/gutenberg/issues/42286
+      - name: Run (xDebug) tests
+        if: ${{ matrix.report }}
+        run: |
+          yarn run test:php --verbose --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml
+          yarn test:js:coverage
+          bash <(curl -s https://codecov.io/bash);
