@@ -9,13 +9,13 @@ if [[ -f ".env" ]]; then
     set +a
 fi
 
-# Start local environment
-npm run wp-env start --xdebug
-
 # Install Gravity PDF Dependencies
 rm composer.lock
-npm run wp-env run composer install -- --ignore-platform-req=ext-gd
+composer install
 composer run prefix
+
+# Start local environment
+npm run wp-env start --xdebug
 
 echo "Install Gravity Forms..."
 bash ./bin/install-gravityforms.sh

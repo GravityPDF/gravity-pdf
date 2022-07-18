@@ -2166,7 +2166,7 @@
 
 "@wordpress/env-trunk@https://gitpkg.now.sh/WordPress/gutenberg/packages/env?trunk":
   version "4.9.0"
-  resolved "https://gitpkg.now.sh/WordPress/gutenberg/packages/env?trunk#8535ae6690d5c69fefd94c1044b04404e41da9bc"
+  resolved "https://gitpkg.now.sh/WordPress/gutenberg/packages/env?trunk#c59c363a00a1a86d020543e403fd129d8a0ce267"
   dependencies:
     chalk "^4.0.0"
     copy-dir "^1.3.0"
@@ -3860,6 +3860,11 @@ domutils@^3.0.1:
     dom-serializer "^2.0.0"
     domelementtype "^2.3.0"
     domhandler "^5.0.1"
+
+dotenv@^16.0.1:
+  version "16.0.1"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.1.tgz#8f8f9d94876c35dac989876a5d3a82a267fdce1d"
+  integrity sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ==
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
