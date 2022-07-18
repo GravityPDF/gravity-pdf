@@ -64,7 +64,7 @@
     "sass-loader": "^13.0.2",
     "standard": "^17.0.0",
     "terser-webpack-plugin": "^5.3.3",
-    "testcafe": "^1.19.0",
+    "testcafe": "^1.20.0-rc.1",
     "url-loader": "^4.1.1",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
@@ -73,6 +73,7 @@
   "scripts": {
     "lint:js": "eslint \"src/assets/js/**/*.js\"",
     "lint:js:fix": "eslint \"src/assets/js/**/*.js\" --fix",
+
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -L",
@@ -82,9 +83,11 @@
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
+
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
     "build:dev": "cross-env NODE_ENV=development webpack --watch",
     "build:production": "cross-env NODE_ENV=production webpack",
+
     "wp-env": "wp-env",
     "env:install": "bash bin/install.sh"
   }
