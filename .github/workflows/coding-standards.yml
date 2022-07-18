@@ -82,6 +82,7 @@ jobs:
 
       - name: Log debug information
         run: |
+          npm --version
           yarn --version
           node --version
           curl --version
@@ -89,7 +90,7 @@ jobs:
           locale -a
 
       - name: Install Dependencies
-        run: yarn cache clean && yarn install
+        run: npm install
 
       - name: Run ESLint
         run: yarn lint:js
