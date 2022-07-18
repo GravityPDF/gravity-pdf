@@ -80,9 +80,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-modules-
 
-      - name: Update checksum
-        run: yarn --update-checksums
-
       - name: Log debug information
         run: |
           yarn --version
