@@ -5,8 +5,6 @@
     "algoliasearch": "^4.13.1",
     "classnames": "^2.3.1",
     "core-js": "^3.23.4",
-    "dotenv": "^16.0.1",
-    "dotenv-expand": "^8.0.3",
     "lodash.debounce": "^4.0.8",
     "object-to-formdata": "^4.4.2",
     "prop-types": "^15.8.1",
@@ -35,7 +33,7 @@
     "@babel/preset-env": "^7.18.6",
     "@babel/preset-react": "^7.18.6",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.7",
-    "@wordpress/scripts": "^5.1.0",
+    "@wordpress/env": "https://gitpkg.now.sh/WordPress/gutenberg/packages/env?trunk",
     "babel-jest": "^28.1.2",
     "babel-loader": "^8.2.5",
     "babel-plugin-istanbul": "^6.1.1",
@@ -75,31 +73,19 @@
   "scripts": {
     "lint:js": "eslint \"src/assets/js/**/*.js\"",
     "lint:js:fix": "eslint \"src/assets/js/**/*.js\" --fix",
-    "lint:php": "npm run env docker-run -- php composer lint:errors",
-    "lint:php:fix": "npm run env docker-run -- php composer format",
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -L",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
-    "test:php": "npm run env docker-run -- php ./vendor/bin/phpunit",
-    "test:php:multisite": "npm run env docker-run -- php ./vendor/bin/phpunit -c tests/phpunit/multisite.xml",
+    "test:php": "npm run wp-env run phpunit /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
+    "test:php:multisite": "npm run wp-env run phpunit /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
-    "prebuild": "yarn",
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
     "build:dev": "cross-env NODE_ENV=development webpack --watch",
     "build:production": "cross-env NODE_ENV=production webpack",
-    "check-licenses": "wp-scripts check-licenses --prod --gpl2",
-    "env": "wp-scripts env",
-    "env:install": "bash bin/install.sh",
-    "env:install:gf": "bash bin/install-gravityforms.sh",
-    "env:install:phpunit": "bash bin/install-phpunit.sh",
-    "env:reset": "bash bin/reset.sh"
-  },
-  "wp-env": {
-    "plugin-dir": "gravity-forms-pdf-extended",
-    "plugin-name": "Gravity PDF",
-    "docker-template": "./.docker/docker-compose.override.yml.template"
+    "wp-env": "wp-env",
+    "env:install": "bash bin/install.sh"
   }
 }

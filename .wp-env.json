@@ -1,0 +1,18 @@
+{
+  "core": null,
+  "phpVersion": "8.0",
+  "plugins": [
+    "gravityforms/gravityformscli"
+  ],
+  "mappings": {
+    "wp-content/plugins/gravity-pdf": "."
+  },
+  "env":{
+    "tests": {
+      "plugins": [
+        "gravityforms/gravityformscli",
+        "GravityPDF/gravity-pdf-test-suite"
+      ]
+    }
+  }
+}

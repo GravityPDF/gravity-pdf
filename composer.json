@@ -42,6 +42,7 @@
     "compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
     "format": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
     "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
-    "lint:errors": "@lint -n"
+    "lint:errors": "@lint -n",
+    "prefix": "bash ./bin/vendor-prefix.sh"
   }
 }
