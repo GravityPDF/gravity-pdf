@@ -21,7 +21,7 @@ git archive HEAD ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
 tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm -f ${PACKAGE_DIR}/package.tar.gz
 
 # Run Composer
-yarn --cwd ${PACKAGE_DIR} prebuild
+npm install --prefix ${PACKAGE_DIR} --save false
 yarn --cwd ${PACKAGE_DIR} build:production
 composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
 
@@ -39,6 +39,9 @@ FILES=(
 "${PACKAGE_DIR}/.babelrc"
 "${PACKAGE_DIR}/webpack.config.js"
 "${PACKAGE_DIR}/php-scoper.phar"
+"${PACKAGE_DIR}/vendor_prefixed/.gitkeep"
+"${PACKAGE_DIR}/.nvmrc"
+"${PACKAGE_DIR}/.wp-env.json"
 )
 
 for i in "${FILES[@]}"
