@@ -57,6 +57,27 @@ class Test_Field_Select extends WP_UnitTestCase {
 		remove_filter( 'gfpdf_field_is_empty_value_instead_of_label', '__return_false' );
 	}
 
+	public function test_is_empty_true() {
+
+		$pdf_field = new Field_Select( $this->gf_field, [ 'form_id' => $this->form['id'], 3 => '', ], \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$this->assertTrue( $pdf_field->is_empty() );
+
+		$pdf_field = new Field_Select( $this->gf_field, [ 'form_id' => $this->form['id'], 3 => null, ], \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$this->assertTrue( $pdf_field->is_empty() );
+	}
+
+	public function test_is_empty_false() {
+
+		$pdf_field = new Field_Select( $this->gf_field, [ 'form_id' => $this->form['id'], 3 => true, ], \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$this->assertFalse( $pdf_field->is_empty() );
+
+		$pdf_field = new Field_Select( $this->gf_field, [ 'form_id' => $this->form['id'], 3 => 'Jane', ], \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$this->assertFalse( $pdf_field->is_empty() );
+
+		$pdf_field = new Field_Select( $this->gf_field, [ 'form_id' => $this->form['id'], 3 => 0, ], \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$this->assertFalse( $pdf_field->is_empty() );
+	}
+
 	public function test_value_with_empty_value() {
 		$value = $this->pdf_field->value();
 
