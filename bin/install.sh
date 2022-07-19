@@ -24,6 +24,7 @@ npm run wp-env run cli plugin activate gravityforms gravityformscli gravity-pdf
 npm run wp-env run tests-cli plugin activate gravityforms gravityformscli gravityformspolls gravityformssurvey gravityformsquiz gravity-pdf gravity-pdf-test-suite
 
 # Fix permissions issues on test container
+npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/gravity-pdf/
 npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/
 npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/plugins/gravity-pdf-test-suite/src/fonts/
 npm run wp-env run tests-wordpress chmod -R 777 /var/www/html/wp-content/uploads/

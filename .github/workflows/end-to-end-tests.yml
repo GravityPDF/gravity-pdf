@@ -100,8 +100,8 @@ jobs:
       - name: Dump log files on failure
         if: failure()
         run: |
-          cp /var/www/html/wp-content/debug.log screenshots/debug.log || :
-          cp -R /var/www/html/wp-content/uploads/gravity_forms/logs/ screenshots/logs/ || :
+          npm run wp-env run tests-wordpress cp /var/www/html/wp-content/debug.log cp /var/www/html/wp-content/plugins/gravity-pdf/screenshots/debug.log
+          npm run wp-env run tests-wordpress cp -R /var/www/html/wp-content/uploads/gravity_forms/logs/ /var/www/html/wp-content/plugins/gravity-pdf/screenshots/debug.log
 
       - name: Upload artifacts on failure
         uses: actions/upload-artifact@v2
