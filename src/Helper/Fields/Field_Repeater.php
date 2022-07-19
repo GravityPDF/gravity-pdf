@@ -168,7 +168,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		/* Output the Repeater Label if a sub Repeater */
-		if ( $this->maybe_show_section_title( $is_top_level, $value, $field ) ) {
+		if ( $this->maybe_show_section_title( $is_top_level, $field, $value ) ) {
 			echo sprintf( '<div class="gfpdf-section-title"><h3>%s</h3></div>', esc_html( $field->label ) );
 		}
 
@@ -251,10 +251,18 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 	}
 
-	public function maybe_show_section_title( $is_top_level, $value, $field ) {
-		if ( ! $is_top_level && ! $field->empty_deep( $value ) ) {
-			return true;
-		}
-		return false;
+	/**
+	 * Check if the section title should show based on if the repeater field was filled out
+	 *
+	 * @param bool              $is_top_level
+	 * @param GF_Field_Repeater $field
+	 * @param mixed             $value
+	 *
+	 * @return bool
+	 *
+	 * @since 6.4
+	 */
+	public function maybe_show_section_title( bool $is_top_level, GF_Field_Repeater $field, $value ): bool {
+		return ! $is_top_level && ! $field->empty_deep( $value );
 	}
 }

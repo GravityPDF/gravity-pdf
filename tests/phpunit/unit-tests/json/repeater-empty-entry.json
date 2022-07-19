@@ -1,35 +1,37 @@
-{
-  "id": "41",
-  "form_id": "8",
-  "post_id": null,
-  "date_created": "2022-07-01 01:01:27",
-  "date_updated": "2022-07-01 01:01:27",
-  "is_starred": "0",
-  "is_read": "0",
-  "ip": "172.18.0.1",
-  "source_url": "http:\/\/test.gravitypdf.local:8889\/?gf_page=preview&id=8",
-  "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko\/20100101 Firefox\/102.0",
-  "currency": "USD",
-  "payment_status": null,
-  "payment_date": null,
-  "payment_amount": null,
-  "payment_method": null,
-  "transaction_id": null,
-  "is_fulfilled": null,
-  "created_by": "1",
-  "transaction_type": null,
-  "status": "active",
-  "1000": "Simon",
-  "999": [
-    {
-      "15.3": "Ben",
-      "15.6": "Wilson",
-      "16": "ben@gmail.com",
-      "99": [
-        {
-          "88": []
-        }
-      ]
-    }
-  ]
-}
+[
+  {
+    "id": "41",
+    "form_id": "8",
+    "post_id": null,
+    "date_created": "2022-07-01 01:01:27",
+    "date_updated": "2022-07-01 01:01:27",
+    "is_starred": "0",
+    "is_read": "0",
+    "ip": "172.18.0.1",
+    "source_url": "http:\/\/test.gravitypdf.local:8889\/?gf_page=preview&id=8",
+    "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko\/20100101 Firefox\/102.0",
+    "currency": "USD",
+    "payment_status": null,
+    "payment_date": null,
+    "payment_amount": null,
+    "payment_method": null,
+    "transaction_id": null,
+    "is_fulfilled": null,
+    "created_by": "1",
+    "transaction_type": null,
+    "status": "active",
+    "1000": "Simon",
+    "999": [
+      {
+        "15.3": "Ben",
+        "15.6": "Wilson",
+        "16": "ben@gmail.com",
+        "99": [
+          {
+            "88": []
+          }
+        ]
+      }
+    ]
+  }
+]
