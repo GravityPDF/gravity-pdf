@@ -35,7 +35,7 @@ test('should return download core fonts successful response ', async t => {
 
 const mockFailure = RequestMock()
   .onRequestTo(`${baseURL}/wp-admin/admin-ajax.php`)
-  .respond({}, 500, { 'access-Control-Allow-Origin': '*' })
+  .respond({}, 400, { 'access-Control-Allow-Origin': '*' })
 
 fixture``
   .requestHooks(mockFailure)
