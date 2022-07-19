@@ -147,4 +147,16 @@ class Test_Notices extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $html, '<p>My First Notice</p>' ) );
 		$this->assertNotFalse( strpos( $html, '<p>My First Error</p>' ) );
 	}
+
+	public function test_html_notice() {
+		$form = 'Message <form method="post"><p><button class="button">Action</button><input class="button primary" type="submit" value="Dismiss" /></p></form>';
+
+		$this->notices->add_notice( $form );
+
+		ob_start();
+		$this->notices->process();
+		$html = ob_get_clean();
+
+		$this->assertNotFalse( strpos( $html, $form ) );
+	}
 }
