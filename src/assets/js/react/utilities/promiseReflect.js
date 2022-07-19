@@ -14,9 +14,9 @@
 export default (promise) => {
   return promise
     .then(data => {
-      return { data: data, status: 'resolved' }
+      return { data, status: 'resolved' }
     })
     .catch(error => {
-      return { error: error, status: 'rejected' }
+      return { error, status: 'rejected' }
     })
 }

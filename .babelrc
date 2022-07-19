@@ -10,9 +10,9 @@
     [
       "@babel/preset-env",
       {
-        "targets": "> 0.25%, not dead",
+        "targets": { "esmodules": true },
         "useBuiltIns": "usage",
-        "corejs": "3.6.5"
+        "corejs": "3.23.4"
       }
     ],
     "@babel/preset-react"

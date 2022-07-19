@@ -54,7 +54,7 @@ export const FontVariant = ({
         <Dropzone
           data-test='component-Dropzone'
           key={key}
-          accept='.ttf'
+          accept={{ 'font/ttf': ['.ttf'] }}
           onDrop={acceptedFiles => onHandleUpload(key, acceptedFiles[0], state)}
           multiple={false}
         >
@@ -64,23 +64,25 @@ export const FontVariant = ({
               {...getRootProps()}
               tabIndex={tabIndex}
             >
-              {font ? (
-                <input
-                  data-test='input-delete'
-                  id={id}
-                  aria-labelledby={ariaLabelledby}
-                  aria-describedby={ariaDescribedby}
-                  {...getInputProps({ onClick: e => onHandleDeleteFontStyle(e, key, state) })}
-                />
-              ) : (
-                <input
-                  data-test='input-add'
-                  id={id}
-                  aria-labelledby={ariaLabelledby}
-                  aria-describedby={ariaDescribedby}
-                  {...getInputProps()}
-                />
-              )}
+              {font
+                ? (
+                  <input
+                    data-test='input-delete'
+                    id={id}
+                    aria-labelledby={ariaLabelledby}
+                    aria-describedby={ariaDescribedby}
+                    {...getInputProps({ onClick: e => onHandleDeleteFontStyle(e, key, state) })}
+                  />
+                  )
+                : (
+                  <input
+                    data-test='input-add'
+                    id={id}
+                    aria-labelledby={ariaLabelledby}
+                    aria-describedby={ariaDescribedby}
+                    {...getInputProps()}
+                  />
+                  )}
 
               <span className='gfpdf-font-filename'>
                 {regularFieldValidation && (

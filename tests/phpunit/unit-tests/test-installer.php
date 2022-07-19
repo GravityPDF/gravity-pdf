@@ -2,7 +2,6 @@
 
 namespace GFPDF\Tests;
 
-use Exception;
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Controller\Controller_Uninstaller;
 use GFPDF\Helper\Helper_Pdf_Queue;
@@ -150,7 +149,7 @@ class Test_Installer extends WP_UnitTestCase {
 			);
 		}
 
-		$this->assertTrue( is_dir( $gfpdf->data->multisite_template_location ) );
+		$this->assertDirectoryExists( $gfpdf->data->multisite_template_location );
 	}
 
 	/**
@@ -169,22 +168,22 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->model->create_folder_structures();
 
 		/* Test the results */
-		$this->assertTrue( is_dir( $gfpdf->data->template_location ) );
-		$this->assertTrue( is_dir( $gfpdf->data->template_font_location ) );
-		$this->assertTrue( is_dir( $gfpdf->data->template_tmp_location ) );
-		$this->assertTrue( is_dir( $gfpdf->data->mpdf_tmp_location ) );
-		$this->assertTrue( is_dir( $gfpdf->data->mpdf_tmp_location . '/ttfontdata' ) );
+		$this->assertDirectoryExists( $gfpdf->data->template_location );
+		$this->assertDirectoryExists( $gfpdf->data->template_font_location );
+		$this->assertDirectoryExists( $gfpdf->data->template_tmp_location );
+		$this->assertDirectoryExists( $gfpdf->data->mpdf_tmp_location );
+		$this->assertDirectoryExists( $gfpdf->data->mpdf_tmp_location . '/ttfontdata' );
 
-		$this->assertTrue( is_file( $gfpdf->data->template_tmp_location . '.htaccess' ) );
-		$this->assertTrue( is_file( $gfpdf->data->template_tmp_location . 'index.html' ) );
-		$this->assertTrue( is_file( $gfpdf->data->template_font_location . 'index.html' ) );
-		$this->assertTrue( is_file( $gfpdf->data->template_location . 'index.html' ) );
+		$this->assertFileExists( $gfpdf->data->template_tmp_location . '.htaccess' );
+		$this->assertFileExists( $gfpdf->data->template_tmp_location . 'index.html' );
+		$this->assertFileExists( $gfpdf->data->template_font_location . 'index.html' );
+		$this->assertFileExists( $gfpdf->data->template_location . 'index.html' );
 
 		/* Test our directory filters */
 		add_filter(
 			'gfpdf_template_location',
 			function( $path, $folder ) {
-				return ABSPATH . $folder;
+				return '/tmp/' . $folder;
 			},
 			10,
 			2
@@ -202,14 +201,14 @@ class Test_Installer extends WP_UnitTestCase {
 		add_filter(
 			'gfpdf_tmp_location',
 			function( $path ) {
-				return ABSPATH . 'wp-content/tmp/';
+				return '/tmp/wp-content/tmp/';
 			}
 		);
 
 		add_filter(
 			'gfpdf_font_location',
 			function( $path ) {
-				return ABSPATH . 'wp-content/pdf-fonts/';
+				return '/tmp/wp-content/pdf-fonts/';
 			}
 		);
 
@@ -223,9 +222,9 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->model->create_folder_structures();
 
 		/* Test the results */
-		$this->assertTrue( is_dir( ABSPATH . 'PDF_EXTENDED_TEMPLATES' ) );
-		$this->assertTrue( is_dir( ABSPATH . 'wp-content/pdf-fonts' ) );
-		$this->assertTrue( is_dir( ABSPATH . 'wp-content/tmp' ) );
+		$this->assertDirectoryExists( '/tmp/PDF_EXTENDED_TEMPLATES' );
+		$this->assertDirectoryExists( '/tmp/wp-content/pdf-fonts' );
+		$this->assertDirectoryExists( '/tmp/wp-content/tmp' );
 
 		/* Cleanup folder structure and reset the template location */
 		$gfpdf->misc->rmdir( $gfpdf->data->template_location );

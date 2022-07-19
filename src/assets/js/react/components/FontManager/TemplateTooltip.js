@@ -78,9 +78,11 @@ export class TemplateTooltip extends Component {
 
     return (
       <div data-test='component-TemplateTooltip' className='msg template-usage-link'>
-        {tooltip ? (
-          <span className='dashicons dashicons-arrow-down-alt2' />
-        ) : <span className='dashicons dashicons-arrow-right-alt2' />}
+        {tooltip
+          ? (
+            <span className='dashicons dashicons-arrow-down-alt2' />
+            )
+          : <span className='dashicons dashicons-arrow-right-alt2' />}
         <a onClick={this.handleDisplayInfo}>
           {GFPDF.fontManagerTemplateTooltipLabel}
         </a>

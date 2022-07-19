@@ -22,5 +22,6 @@ module.exports = {
   },
   setupFiles: [
     './tests/js-unit/setupTests.js'
-  ]
+  ],
+  testEnvironment: 'jsdom'
 }

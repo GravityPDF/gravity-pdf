@@ -126,19 +126,23 @@ export class TemplateSingle extends Component {
             />
             <Author author={item.author} uri={item['author uri']} />
             <Group group={item.group} label={this.props.groupText} />
-            {item.long_message ? (
-              <ShowMessage
-                data-test='component-showMessageLong_message'
-                text={item.long_message}
-              />
-            ) : null}
-            {item.long_error ? (
-              <ShowMessage
-                data-test='component-showMessageLong_error'
-                text={item.long_error}
-                error
-              />
-            ) : null}
+            {item.long_message
+              ? (
+                <ShowMessage
+                  data-test='component-showMessageLong_message'
+                  text={item.long_message}
+                />
+                )
+              : null}
+            {item.long_error
+              ? (
+                <ShowMessage
+                  data-test='component-showMessageLong_error'
+                  text={item.long_error}
+                  error
+                />
+                )
+              : null}
             <Description desc={item.description} />
             <Tags tags={item.tags} label={this.props.tagsText} />
           </div>
@@ -169,7 +173,7 @@ const MapStateToProps = (state, props) => {
   return {
     template: templates.find(findCurrentTemplate),
     templateIndex: templates.findIndex(findCurrentTemplate),
-    templates: templates,
+    templates,
     activeTemplate: state.template.activeTemplate
   }
 }

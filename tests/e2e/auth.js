@@ -1,9 +1,11 @@
 import { Role } from 'testcafe'
 const path = require('path')
 
-require('dotenv').config({ path: path.resolve(process.cwd(), 'wordpress/.env') })
+require('dotenv').config({ path: path.resolve(process.cwd(), '.env') })
 
-export const baseURL = process.env.WP_BASE_URL.replace('${LOCAL_PORT}', process.env.LOCAL_PORT)
+const url = process.env.WP_BASE_URL || 'http://localhost'
+const port = process.env.WP_ENV_TESTS_PORT || '8889'
+export const baseURL = url + ':' + port
 
 export const admin = Role(`${baseURL}/wp-login.php`, async t => {
   await t

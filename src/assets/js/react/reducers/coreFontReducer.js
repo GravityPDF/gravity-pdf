@@ -122,9 +122,7 @@ export default function (state = initialState, action) {
       const files = []
 
       /* Push font names into array */
-      action.payload.map((item) => {
-        files.push(item.name)
-      })
+      action.payload.map((item) => files.push(item.name))
 
       return {
         ...state,
@@ -160,8 +158,8 @@ export default function (state = initialState, action) {
             console: {
               ...state.console,
               completed: {
-                status: status,
-                message: message
+                status,
+                message
               }
             },
             downloadCounter: state.retry.length,
@@ -175,8 +173,8 @@ export default function (state = initialState, action) {
               console: {
                 ...state.console,
                 completed: {
-                  status: status,
-                  message: message
+                  status,
+                  message
                 }
               },
               downloadCounter: state.fontList.length,

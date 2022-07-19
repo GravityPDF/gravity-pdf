@@ -10,7 +10,7 @@ export function cleanupGFNavigation () {
 
   $nav.each(function () {
     const href = $(this).attr('href')
-    const regex = new RegExp('&tab=[^&;]*', 'g')
+    const regex = new RegExp('&tab=[^&;]*', 'g') // eslint-disable-line
 
     $(this).attr('href', href.replace(regex, ''))
   })

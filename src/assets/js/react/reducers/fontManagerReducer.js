@@ -415,8 +415,10 @@ export default function (state = initialState, action) {
           checkFontListIncludes(font.bold, keyword) ||
           checkFontListIncludes(font.bolditalics, keyword)
         ) {
-          searchResult.push(font)
+          return searchResult.push(font)
         }
+
+        return false
       })
 
       const relevant = []
@@ -428,7 +430,7 @@ export default function (state = initialState, action) {
           return relevant.push(item)
         }
 
-        related.push(item)
+        return related.push(item)
       })
 
       /* Sort and combine mostRelevant and related array into 1 array */

@@ -225,8 +225,8 @@ export const postTemplateUploadProcessing = (file, filename) => {
   return {
     type: POST_TEMPLATE_UPLOAD_PROCESSING,
     payload: {
-      file: file,
-      filename: filename
+      file,
+      filename
     }
   }
 }

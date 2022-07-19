@@ -19,16 +19,18 @@ import PropTypes from 'prop-types'
  * @since 4.1
  */
 export const CurrentTemplate = ({ isCurrentTemplate, label }) => {
-  return (isCurrentTemplate) ? (
-    <span
-      data-test='component-currentTemplate'
-      className='current-label'
-    >
-      {label}
-    </span>
-  ) : (
-    <span />
-  )
+  return (isCurrentTemplate)
+    ? (
+      <span
+        data-test='component-currentTemplate'
+        className='current-label'
+      >
+        {label}
+      </span>
+      )
+    : (
+      <span />
+      )
 }
 
 CurrentTemplate.propTypes = {
@@ -68,11 +70,13 @@ Name.propTypes = {
  * @since 4.1
  */
 export const Version = ({ label, version }) => {
-  return (version) ? (
-    <span data-test='component-version' className='theme-version'>{label}: {version}</span>
-  ) : (
-    <span />
-  )
+  return (version)
+    ? (
+      <span data-test='component-version' className='theme-version'>{label}: {version}</span>
+      )
+    : (
+      <span />
+      )
 }
 
 Version.propTypes = {
@@ -153,13 +157,15 @@ Description.propTypes = {
  * @since 4.1
  */
 export const Tags = ({ label, tags }) => {
-  return (tags) ? (
-    <p data-test='component-tags' className='theme-tags'>
-      <span>{label}:</span> {tags}
-    </p>
-  ) : (
-    <span />
-  )
+  return (tags)
+    ? (
+      <p data-test='component-tags' className='theme-tags'>
+        <span>{label}:</span> {tags}
+      </p>
+      )
+    : (
+      <span />
+      )
 }
 
 Tags.propTypes = {

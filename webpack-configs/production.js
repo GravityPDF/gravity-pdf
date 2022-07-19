@@ -1,6 +1,5 @@
-const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
@@ -9,7 +8,7 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: 'assets/css/gfpdf-styles.min.css',
-      chunkFilename: '[id].css'
+      chunkFilename: '[id].min.css'
     }),
     new TerserPlugin({
       extractComments: false,
@@ -17,16 +16,12 @@ module.exports = {
       terserOptions: {
         ecma: 6
       }
-    }),
-    new webpack.SourceMapDevToolPlugin({
-      filename: '[name].js.map',
-      exclude: ['gfpdf-entries.min.js']
     })
   ],
   optimization: {
     minimize: true,
     minimizer: [
-      new OptimizeCssAssetsPlugin({})
+      new CssMinimizerPlugin()
     ]
   }
 }

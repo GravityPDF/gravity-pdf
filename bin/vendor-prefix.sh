@@ -12,13 +12,8 @@ if [[ ! -f "${PLUGIN_DIR}php-scoper.phar" ]]; then
   curl -L https://github.com/humbug/php-scoper/releases/download/0.14.1/php-scoper.phar -o  ${PLUGIN_DIR}php-scoper.phar
 fi
 
-if exists sudo; then
-  sudo chmod -R 777 "${PLUGIN_DIR}vendor"
-else
-  chmod -R 777 "${PLUGIN_DIR}vendor"
-fi
+chmod -R 777 "${PLUGIN_DIR}vendor"
 
-PHP_DOCKER=""
 PHP="php"
 COMPOSER="composer"
 
@@ -28,26 +23,26 @@ touch "${PLUGIN_DIR}vendor_prefixed/.gitkeep"
 
 # Monolog
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --quiet"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/monolog"
+eval "rm -Rf ${PLUGIN_DIR}vendor/monolog"
 
 # URL Signer
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/url-signer.php --quiet"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/spatie"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/league"
+eval "rm -Rf ${PLUGIN_DIR}vendor/spatie"
+eval "rm -Rf ${PLUGIN_DIR}vendor/league"
 
 # Querypath
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/querypath.php --quiet"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/arthurkushman"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/masterminds"
+eval "rm -Rf ${PLUGIN_DIR}vendor/arthurkushman"
+eval "rm -Rf ${PLUGIN_DIR}vendor/masterminds"
 
 # Codeguy
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/gravitypdf/upload --config=${PLUGIN_DIR}.php-scoper/upload.php --quiet"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/gravitypdf"
+eval "rm -Rf ${PLUGIN_DIR}vendor/gravitypdf"
 
 # Mpdf
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/mpdf.php" --quiet
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/mpdf"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/setasign"
-eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/myclabs"
+eval "rm -Rf ${PLUGIN_DIR}vendor/mpdf"
+eval "rm -Rf ${PLUGIN_DIR}vendor/setasign"
+eval "rm -Rf ${PLUGIN_DIR}vendor/myclabs"
 
 eval "$COMPOSER dump-autoload --optimize --working-dir ${PLUGIN_DIR}"
