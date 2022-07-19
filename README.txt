@@ -127,6 +127,7 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 * Bug: Fix issue passing PDF URL to Gravity Forms Mailchimp add-on
 * Bug: Allow hyphen in custom font key when updating or deleting to remain backwards compatible
 * Bug: Fix PHP8.1 type conversion warning in the template cache when transient's are flushed
+* Bug: Remove empty repeater sections from Core PDFs when not filled in by the user
 
 = 6.3.1 =
 * Security: Prevent potential XSS attack by escaping URL returned from add_query_args() on the PDF List or PDF Form Settings pages

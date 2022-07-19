@@ -3,6 +3,7 @@
 namespace GFPDF\Tests;
 
 use GFAPI;
+use GFPDF\Helper\Fields\Field_Repeater;
 use GFPDFEntryDetail;
 use GPDFAPI;
 use WP_UnitTestCase;
@@ -1608,5 +1609,38 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		$this->assertEquals( 'www.test.com', $form_data['repeater'][999][1][99][0][88][0][202] );
 		$this->assertEquals( 'www.test2.com', $form_data['repeater'][999][1][99][0][88][1][202] );
+	}
+
+	/**
+	 * Test if the section title shows correctly for a repeater field
+	 *
+	 * @since 6.4
+	 */
+	public function test_repeater_maybe_show_section_title() {
+		$form  = $GLOBALS['GFPDF_Test']->form['repeater-empty-form'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['repeater-empty-form'][0];
+
+		/** @var \GF_Field_Repeater $repeater_field */
+		$repeater_field = new \GF_Field_Repeater( $form['fields'][1]['fields'][2]['fields'][2]['fields'][0] );
+		$repeater       = new Field_Repeater( $repeater_field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+
+		/* Overide $values to customize tests. */
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, $repeater->field, [ '', null ] ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, [ '', '', null ] ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, null ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, $repeater->field, null ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, $repeater->field, [ false, null ] ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( false, $repeater->field, false ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, false ) );
+
+
+		$repeater = new Field_Repeater( $repeater_field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, $repeater->field, [ 'test.url', 'test2.url', '' ] ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, $repeater->field, [ 'test.url', '' ] ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, $repeater->field, [ 'test.url', '', 'test2.url' ] ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, $repeater->field, [ null, null, '', false, 'test.url' ] ) );
+		$this->assertTrue( $repeater->maybe_show_section_title( false, $repeater->field, true ) );
+		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, [ 'test.url', 'test2.url' ] ) );
+
 	}
 }
