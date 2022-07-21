@@ -109,12 +109,11 @@ jobs:
           php -i
           locale -a
 
+      # Force a latest version of @wordpress/env until a new version is tagged
       - name: Install Dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm install
-
-      - name: Build Gravity PDF
-        run: yarn build:production
+        run: |
+          yarn add -D 'https://gitpkg.now.sh/WordPress/gutenberg/packages/env?trunk'
+          yarn install
 
       - name: Install / Setup Gravity PDF + WordPress
         run: |
@@ -125,9 +124,8 @@ jobs:
         continue-on-error: ${{ matrix.php == '8.1' }}
 
       # TODO: XDEBUG isnt working for unit tests https://github.com/WordPress/gutenberg/issues/42286
-      - name: Run (xDebug) tests
+      - name: Code Coverage
         if: ${{ matrix.report }}
         run: |
           yarn run test:php --do-not-cache-result --verbose --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml
-          yarn test:js:coverage
           bash <(curl -s https://codecov.io/bash);

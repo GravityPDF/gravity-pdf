@@ -53,7 +53,11 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm install
+        run: yarn install
 
       - name: Run Jest tests
-        run: yarn test:js
+        run: yarn test:js:coverage
+
+      - name: Code Coverage
+        run: |
+          bash <(curl -s https://codecov.io/bash);

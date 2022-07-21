@@ -95,7 +95,7 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm install
+        run: yarn install
 
       - name: Run ESLint
         run: yarn lint:js
