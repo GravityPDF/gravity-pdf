@@ -1,15 +1,17 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 6.4.0-RC6
+Version: 6.4.0
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
-Author: Gravity PDF
-Author URI: https://gravitypdf.com
-Plugin URI: https://wordpress.org/plugins/gravity-forms-pdf-extended/
+Author: Blue Liquid Designs
+Author URI: https://blueliquiddesigns.com.au
+Plugin URI: https://gravitypdf.com
 Text Domain: gravity-forms-pdf-extended
 Domain Path: /src/assets/languages
 Requires at least: 5.3
 Requires PHP: 7.3
+License: GPL-2.0
+License URI: https://opensource.org/licenses/gpl-2.0.php
 */
 
 /**
@@ -26,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '6.4.0-RC6' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '6.4.0' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
