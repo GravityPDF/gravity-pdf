@@ -89,8 +89,7 @@ jobs:
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: |
-          npm install
+        run: yarn install
 
       - name: Build Gravity PDF
         run: yarn build:production
