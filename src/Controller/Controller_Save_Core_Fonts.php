@@ -185,7 +185,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			$this->log->error(
 				'Core Font Download Failed',
 				[
-					'name'             => $fontname,
+					'name'             => $matching_fonts[0],
 					'WP_Error_Message' => $res->get_error_message(),
 					'WP_Error_Code'    => $res->get_error_code(),
 				]
