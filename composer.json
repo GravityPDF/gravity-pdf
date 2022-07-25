@@ -7,6 +7,9 @@
     "autoloader-suffix": "GravityPDFPlugin",
     "platform": {
       "php": "5.6.39"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   },
   "require": {
@@ -22,7 +25,8 @@
     "dealerdirect/phpcodesniffer-composer-installer": "~0.7.0",
     "wp-coding-standards/wpcs": "~2.1.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1.0",
-    "roave/security-advisories": "dev-master"
+    "roave/security-advisories": "dev-master",
+    "yoast/phpunit-polyfills": "^1.0"
   },
   "autoload": {
     "psr-4": {
@@ -33,6 +37,7 @@
     "compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
     "format": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
     "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
-    "lint:errors": "@lint -n"
+    "lint:errors": "@lint -n",
+    "prefix": "bash ./bin/vendor-prefix.sh"
   }
 }
