@@ -609,7 +609,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	public function test_cleanup_dir() {
 
 		/* Create our test data */
-		$path = ABSPATH . 'test/';
+		$path = '/tmp/test/';
 		wp_mkdir_p( $path );
 		touch( $path . 'test' );
 

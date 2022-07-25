@@ -473,11 +473,11 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertEquals( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', $response['error'] );
 
 		/* Test a valid installation */
-		touch( ABSPATH . 'myajaxfont.ttf' );
+		touch( '/tmp/myajaxfont.ttf' );
 
 		$_POST['payload'] = [
 			'font_name' => 'My AJAX Font',
-			'regular'   => ABSPATH . 'myajaxfont.ttf',
+			'regular'   => '/tmp/myajaxfont.ttf',
 		];
 
 		try {
@@ -738,7 +738,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertEquals( '401', $e->getMessage() );
 
 		/* Setup a bad request */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+		$_POST['nonce']     = wp_create_nonce( 'gfpdf_ajax_nonce' );
+		$_POST['font_name'] = 'nothing';
 
 		try {
 			$this->_handleAjax( 'gfpdf_save_core_font' );
@@ -748,6 +749,9 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		$this->assertFalse( json_decode( $this->_last_response ) );
 		$this->_last_response = '';
+
+		/* Test that a core font API download request gets made */
+		$_POST['font_name'] = 'Aegean.otf';
 
 		$api_response = function() {
 			return [

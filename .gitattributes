@@ -12,5 +12,6 @@
 /phpunit.xml.dist export-ignore
 /.env.example export-ignore
 /tests export-ignore
+/tmp export-ignore
 
 *.sh eol=lf

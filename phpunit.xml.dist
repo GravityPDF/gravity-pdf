@@ -14,12 +14,6 @@
         </testsuite>
     </testsuites>
 
-    <groups>
-        <exclude>
-            <group>ajax</group>
-        </exclude>
-    </groups>
-
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">.</directory>

@@ -35,4 +35,5 @@
 	<exclude-pattern>/.php-scoper/*</exclude-pattern>
 	<exclude-pattern>/src/Vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/tests/phpunit/wp-tests-config.php</exclude-pattern>
 </ruleset>
