@@ -114,7 +114,9 @@ define( 'WP_TESTS_TITLE', 'Test Blog' );
 define( 'WP_TESTS_DOMAIN', getenv_docker( 'WORDPRESS_URL', 'http://localhost:8889/' ) );
 define( 'WP_SITEURL', getenv_docker( 'WORDPRESS_URL', 'http://localhost:8889/' ) );
 define( 'WP_HOME', getenv_docker( 'WORDPRESS_URL', 'http://localhost:8889/' ) );
-define( 'WP_DEBUG', false );
+define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_DISPLAY', true );
+define( 'WP_DEBUG_LOG', '/var/www/html/wp-content/plugins/gravity-pdf/tmp/debug.log' );
 
 /* Add any custom values between this line and the "stop editing" line. */
 

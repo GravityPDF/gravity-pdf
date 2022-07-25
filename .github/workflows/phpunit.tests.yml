@@ -17,7 +17,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  WP_DEVELOP_DIR: ./wordpress
   GF_LICENSE: ${{ secrets.GF_LICENSE }}
 
 jobs:
@@ -113,7 +112,6 @@ jobs:
       - name: Install Dependencies
         run: |
           yarn add -D 'https://gitpkg.now.sh/WordPress/gutenberg/packages/env?trunk'
-          yarn install
 
       - name: Install / Setup Gravity PDF + WordPress
         run: |

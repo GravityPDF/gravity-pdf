@@ -10,9 +10,7 @@ on:
     - cron: '0 0 * * 0'
 
 env:
-  WP_DEVELOP_DIR: ./wordpress
   GF_LICENSE: ${{ secrets.GF_LICENSE }}
-  GH_CREDENTIALS: ${{ secrets.GH_CREDENTIALS }}
 
 jobs:
   # Runs the end-to-end test suite.
@@ -99,13 +97,14 @@ jobs:
           yarn env:install
 
       - name: Run E2E tests
-        run: yarn test:e2e:headless
+        run: yarn test:e2e:headless --stop-on-first-fail
 
       - name: Dump log files on failure
         if: failure()
         run: |
-          npm run wp-env run tests-wordpress cp /var/www/html/wp-content/debug.log cp /var/www/html/wp-content/plugins/gravity-pdf/screenshots/debug.log
-          npm run wp-env run tests-wordpress cp -R /var/www/html/wp-content/uploads/gravity_forms/logs/ /var/www/html/wp-content/plugins/gravity-pdf/screenshots/debug.log
+          npm run wp-env run tests-wordpress mkdir /var/www/html/wp-content/plugins/gravity-pdf/tmp
+          npm run wp-env run tests-wordpress cp -R /var/www/html/wp-content/uploads/gravity_forms/logs/ /var/www/html/wp-content/plugins/gravity-pdf/tmp/
+          mv tmp screenshots/tmp
 
       - name: Upload artifacts on failure
         uses: actions/upload-artifact@v2
