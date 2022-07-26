@@ -88,6 +88,10 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
+		if ( $this->get_output() ) {
+			$this->fieldObject->enable_output();
+		}
+
 		return $this->fieldObject->html();
 	}
 
