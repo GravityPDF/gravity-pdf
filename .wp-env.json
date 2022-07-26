@@ -1,5 +1,5 @@
 {
-  "core": null,
+  "core": "https://wordpress.org/wordpress-6.0.1.zip",
   "phpVersion": "8.0",
   "plugins": [
     "gravityforms/gravityformscli"
@@ -15,7 +15,8 @@
       ],
       "config": {
         "WP_DEBUG": true,
-        "WP_DEBUG_LOG": true
+        "WP_DEBUG_DISPLAY": true,
+        "WP_DEBUG_LOG": "/var/www/html/wp-content/plugins/gravity-pdf/tmp/debug.log"
       }
     }
   }
