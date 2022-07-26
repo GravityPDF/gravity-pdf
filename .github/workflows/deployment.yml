@@ -5,7 +5,6 @@ on:
     tags:
       - '*'
 
-
 jobs:
   build-and-deploy:
     name: Build and Deploy Plugin
@@ -14,38 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Branch name
-        id: branch_name
-        run: |
-          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
-
-      - name: Install NodeJS
-        uses: actions/setup-node@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          node-version: 12
+          php-version: 7.4
 
-      - name: Cache NodeJS modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v2
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-modules-
-
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+          node-version-file: '.nvmrc'
 
       - name: General debug information
         run: |
@@ -55,18 +35,19 @@ jobs:
           curl --version
           git --version
           svn --version
+          php --version
+          composer --version
 
       - name: Build
-        run: bash ./bin/package.sh $SOURCE_TAG $SOURCE_BRANCH
+        run: bash ./bin/package.sh $SOURCE_TAG
         env:
-          SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
-          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          SOURCE_TAG: ${{steps.tag.outputs.tag}}
           GH_CREDENTIALS: ${{ secrets.GH_CREDENTIALS }}
 
       - name: Deploy
         run: bash ./bin/deploy.sh
         env:
           PLUGIN: "gravity-forms-pdf-extended"
-          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          SOURCE_TAG: ${{steps.tag.outputs.tag}}
           WP_ORG_USERNAME: ${{ secrets.WP_ORG_USERNAME }}
           WP_ORG_PASSWORD: ${{ secrets.WP_ORG_PASSWORD }}

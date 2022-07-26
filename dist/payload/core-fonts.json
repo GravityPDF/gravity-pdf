@@ -1,0 +1,1314 @@
+[
+  {
+    "name": "AboriginalSansREGULAR.ttf",
+    "path": "AboriginalSansREGULAR.ttf",
+    "sha": "3f88df0bd636816c78f361dec7b3566f953401b7",
+    "size": 800480,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/AboriginalSansREGULAR.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/AboriginalSansREGULAR.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3f88df0bd636816c78f361dec7b3566f953401b7",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/AboriginalSansREGULAR.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/AboriginalSansREGULAR.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3f88df0bd636816c78f361dec7b3566f953401b7",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/AboriginalSansREGULAR.ttf"
+    }
+  },
+  {
+    "name": "Abyssinica_SIL.ttf",
+    "path": "Abyssinica_SIL.ttf",
+    "sha": "f2215e9362fc21d2315f9057025e49bee743d84b",
+    "size": 619012,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Abyssinica_SIL.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Abyssinica_SIL.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/f2215e9362fc21d2315f9057025e49bee743d84b",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Abyssinica_SIL.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Abyssinica_SIL.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/f2215e9362fc21d2315f9057025e49bee743d84b",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Abyssinica_SIL.ttf"
+    }
+  },
+  {
+    "name": "Aegean.otf",
+    "path": "Aegean.otf",
+    "sha": "a799f5de9ab068090eed0985c469723ab283a515",
+    "size": 1747560,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Aegean.otf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Aegean.otf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/a799f5de9ab068090eed0985c469723ab283a515",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Aegean.otf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Aegean.otf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/a799f5de9ab068090eed0985c469723ab283a515",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Aegean.otf"
+    }
+  },
+  {
+    "name": "Aegyptus.otf",
+    "path": "Aegyptus.otf",
+    "sha": "193a88ab20eecb6914af8b1154d23eb9e88bc1d3",
+    "size": 5841368,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Aegyptus.otf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Aegyptus.otf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/193a88ab20eecb6914af8b1154d23eb9e88bc1d3",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Aegyptus.otf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Aegyptus.otf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/193a88ab20eecb6914af8b1154d23eb9e88bc1d3",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Aegyptus.otf"
+    }
+  },
+  {
+    "name": "Akkadian.otf",
+    "path": "Akkadian.otf",
+    "sha": "5dfb7adc44e97938883857dae84dc02b94c6e2c4",
+    "size": 1501384,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Akkadian.otf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Akkadian.otf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/5dfb7adc44e97938883857dae84dc02b94c6e2c4",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Akkadian.otf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Akkadian.otf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/5dfb7adc44e97938883857dae84dc02b94c6e2c4",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Akkadian.otf"
+    }
+  },
+  {
+    "name": "DBSILBR.ttf",
+    "path": "DBSILBR.ttf",
+    "sha": "658fc362fd9e4d7b454e243ff82aa51e451f4f4e",
+    "size": 83524,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DBSILBR.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DBSILBR.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/658fc362fd9e4d7b454e243ff82aa51e451f4f4e",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DBSILBR.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DBSILBR.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/658fc362fd9e4d7b454e243ff82aa51e451f4f4e",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DBSILBR.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSans-Bold.ttf",
+    "path": "DejaVuSans-Bold.ttf",
+    "sha": "08695f23a96350b49a69e270bcf3b9c5f37bd88b",
+    "size": 693876,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans-Bold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans-Bold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/08695f23a96350b49a69e270bcf3b9c5f37bd88b",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSans-Bold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans-Bold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/08695f23a96350b49a69e270bcf3b9c5f37bd88b",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans-Bold.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSans-BoldOblique.ttf",
+    "path": "DejaVuSans-BoldOblique.ttf",
+    "sha": "7e3bcc10571bd0d7444238543726835f31e8da87",
+    "size": 632168,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans-BoldOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans-BoldOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7e3bcc10571bd0d7444238543726835f31e8da87",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSans-BoldOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans-BoldOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7e3bcc10571bd0d7444238543726835f31e8da87",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans-BoldOblique.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSans-Oblique.ttf",
+    "path": "DejaVuSans-Oblique.ttf",
+    "sha": "e33ab144d7a2380b8f8db2d964ad16c243edc30f",
+    "size": 632416,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans-Oblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans-Oblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e33ab144d7a2380b8f8db2d964ad16c243edc30f",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSans-Oblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans-Oblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e33ab144d7a2380b8f8db2d964ad16c243edc30f",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans-Oblique.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSans.ttf",
+    "path": "DejaVuSans.ttf",
+    "sha": "9d40c325694b3bfb8cdd4c0146ad44379d5c4ade",
+    "size": 741536,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9d40c325694b3bfb8cdd4c0146ad44379d5c4ade",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSans.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSans.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9d40c325694b3bfb8cdd4c0146ad44379d5c4ade",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSans.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansCondensed-Bold.ttf",
+    "path": "DejaVuSansCondensed-Bold.ttf",
+    "sha": "753432b5b6edf35b1d9e1847cfd31a75690c08f9",
+    "size": 676456,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed-Bold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed-Bold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/753432b5b6edf35b1d9e1847cfd31a75690c08f9",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansCondensed-Bold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed-Bold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/753432b5b6edf35b1d9e1847cfd31a75690c08f9",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed-Bold.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansCondensed-BoldOblique.ttf",
+    "path": "DejaVuSansCondensed-BoldOblique.ttf",
+    "sha": "e39efeb24b572b905b86fdfdbea3b803dc474df8",
+    "size": 621680,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed-BoldOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed-BoldOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e39efeb24b572b905b86fdfdbea3b803dc474df8",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansCondensed-BoldOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed-BoldOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e39efeb24b572b905b86fdfdbea3b803dc474df8",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed-BoldOblique.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansCondensed-Oblique.ttf",
+    "path": "DejaVuSansCondensed-Oblique.ttf",
+    "sha": "619b9df55315c36857b2a63865c107437465eaa3",
+    "size": 609268,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed-Oblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed-Oblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/619b9df55315c36857b2a63865c107437465eaa3",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansCondensed-Oblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed-Oblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/619b9df55315c36857b2a63865c107437465eaa3",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed-Oblique.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansCondensed.ttf",
+    "path": "DejaVuSansCondensed.ttf",
+    "sha": "6065234560f179d8ff547d75b67959822891dd7c",
+    "size": 690388,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6065234560f179d8ff547d75b67959822891dd7c",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansCondensed.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansCondensed.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6065234560f179d8ff547d75b67959822891dd7c",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansCondensed.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansMono-Bold.ttf",
+    "path": "DejaVuSansMono-Bold.ttf",
+    "sha": "9c716794f70b10900beded00f5422deb832f01b1",
+    "size": 318392,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono-Bold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono-Bold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9c716794f70b10900beded00f5422deb832f01b1",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansMono-Bold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono-Bold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9c716794f70b10900beded00f5422deb832f01b1",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono-Bold.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansMono-BoldOblique.ttf",
+    "path": "DejaVuSansMono-BoldOblique.ttf",
+    "sha": "d6536a5cc256583c156c6e284348ef066c740f13",
+    "size": 239876,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono-BoldOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono-BoldOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/d6536a5cc256583c156c6e284348ef066c740f13",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansMono-BoldOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono-BoldOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/d6536a5cc256583c156c6e284348ef066c740f13",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono-BoldOblique.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansMono-Oblique.ttf",
+    "path": "DejaVuSansMono-Oblique.ttf",
+    "sha": "e1af3413048d379311a219af07deedd47ad329d9",
+    "size": 245948,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono-Oblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono-Oblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e1af3413048d379311a219af07deedd47ad329d9",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansMono-Oblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono-Oblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e1af3413048d379311a219af07deedd47ad329d9",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono-Oblique.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSansMono.ttf",
+    "path": "DejaVuSansMono.ttf",
+    "sha": "8b7bb2a4e1b2c27786398c320e9020bcc24c3af3",
+    "size": 335068,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/8b7bb2a4e1b2c27786398c320e9020bcc24c3af3",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSansMono.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSansMono.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/8b7bb2a4e1b2c27786398c320e9020bcc24c3af3",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSansMono.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerif-Bold.ttf",
+    "path": "DejaVuSerif-Bold.ttf",
+    "sha": "3fffea617d04853ed65d7db37aecf781c9bace45",
+    "size": 345364,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif-Bold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif-Bold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3fffea617d04853ed65d7db37aecf781c9bace45",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerif-Bold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif-Bold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3fffea617d04853ed65d7db37aecf781c9bace45",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif-Bold.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerif-BoldItalic.ttf",
+    "path": "DejaVuSerif-BoldItalic.ttf",
+    "sha": "3a3a9dfe61f0d0d599156badc3624bf66f04d321",
+    "size": 336884,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif-BoldItalic.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif-BoldItalic.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3a3a9dfe61f0d0d599156badc3624bf66f04d321",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerif-BoldItalic.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif-BoldItalic.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3a3a9dfe61f0d0d599156badc3624bf66f04d321",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif-BoldItalic.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerif-Italic.ttf",
+    "path": "DejaVuSerif-Italic.ttf",
+    "sha": "46a718e32a8e3cad5929b5afbf30f405abb7e17f",
+    "size": 343388,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif-Italic.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif-Italic.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/46a718e32a8e3cad5929b5afbf30f405abb7e17f",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerif-Italic.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif-Italic.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/46a718e32a8e3cad5929b5afbf30f405abb7e17f",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif-Italic.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerif.ttf",
+    "path": "DejaVuSerif.ttf",
+    "sha": "712a59b02d0eb9a1efede635cea8147fb12dab29",
+    "size": 367260,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/712a59b02d0eb9a1efede635cea8147fb12dab29",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerif.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerif.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/712a59b02d0eb9a1efede635cea8147fb12dab29",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerif.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerifCondensed-Bold.ttf",
+    "path": "DejaVuSerifCondensed-Bold.ttf",
+    "sha": "673c66f0cb7639d8496f528b5586fd0d564486ce",
+    "size": 320720,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed-Bold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed-Bold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/673c66f0cb7639d8496f528b5586fd0d564486ce",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerifCondensed-Bold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed-Bold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/673c66f0cb7639d8496f528b5586fd0d564486ce",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed-Bold.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerifCondensed-BoldItalic.ttf",
+    "path": "DejaVuSerifCondensed-BoldItalic.ttf",
+    "sha": "5a3ba1ab7766d0c2b0964e8ea59d376628399c20",
+    "size": 335940,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed-BoldItalic.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed-BoldItalic.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/5a3ba1ab7766d0c2b0964e8ea59d376628399c20",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerifCondensed-BoldItalic.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed-BoldItalic.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/5a3ba1ab7766d0c2b0964e8ea59d376628399c20",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed-BoldItalic.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerifCondensed-Italic.ttf",
+    "path": "DejaVuSerifCondensed-Italic.ttf",
+    "sha": "6f8d4e4052f1d7c5ede390a76fb9615aa02d4f87",
+    "size": 342736,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed-Italic.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed-Italic.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6f8d4e4052f1d7c5ede390a76fb9615aa02d4f87",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerifCondensed-Italic.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed-Italic.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6f8d4e4052f1d7c5ede390a76fb9615aa02d4f87",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed-Italic.ttf"
+    }
+  },
+  {
+    "name": "DejaVuSerifCondensed.ttf",
+    "path": "DejaVuSerifCondensed.ttf",
+    "sha": "3291fc506c9622ed3ebe5f17bffc6e31524e9593",
+    "size": 334040,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3291fc506c9622ed3ebe5f17bffc6e31524e9593",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuSerifCondensed.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuSerifCondensed.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/3291fc506c9622ed3ebe5f17bffc6e31524e9593",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuSerifCondensed.ttf"
+    }
+  },
+  {
+    "name": "DejaVuinfo.txt",
+    "path": "DejaVuinfo.txt",
+    "sha": "050adc2fc1c2433b196993a6696406dc49f638a8",
+    "size": 4817,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuinfo.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuinfo.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/050adc2fc1c2433b196993a6696406dc49f638a8",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DejaVuinfo.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DejaVuinfo.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/050adc2fc1c2433b196993a6696406dc49f638a8",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DejaVuinfo.txt"
+    }
+  },
+  {
+    "name": "Dhyana-Bold.ttf",
+    "path": "Dhyana-Bold.ttf",
+    "sha": "b439bdc4ab897ab1a39f4e1989d897b7c0a9ae46",
+    "size": 61304,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Dhyana-Bold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Dhyana-Bold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/b439bdc4ab897ab1a39f4e1989d897b7c0a9ae46",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Dhyana-Bold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Dhyana-Bold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/b439bdc4ab897ab1a39f4e1989d897b7c0a9ae46",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Dhyana-Bold.ttf"
+    }
+  },
+  {
+    "name": "Dhyana-Regular.ttf",
+    "path": "Dhyana-Regular.ttf",
+    "sha": "9c5dcb4b048823497917a3e80e15929ec5e10f54",
+    "size": 72348,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Dhyana-Regular.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Dhyana-Regular.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9c5dcb4b048823497917a3e80e15929ec5e10f54",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Dhyana-Regular.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Dhyana-Regular.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9c5dcb4b048823497917a3e80e15929ec5e10f54",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Dhyana-Regular.ttf"
+    }
+  },
+  {
+    "name": "DhyanaOFL.txt",
+    "path": "DhyanaOFL.txt",
+    "sha": "95af61b57bda967422035271a9efa6591946ff60",
+    "size": 4398,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DhyanaOFL.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DhyanaOFL.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/95af61b57bda967422035271a9efa6591946ff60",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/DhyanaOFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/DhyanaOFL.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/95af61b57bda967422035271a9efa6591946ff60",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/DhyanaOFL.txt"
+    }
+  },
+  {
+    "name": "FreeMono.ttf",
+    "path": "FreeMono.ttf",
+    "sha": "ff5cc0e9bc663a3080aaf645c5b4245b42811753",
+    "size": 584424,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMono.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMono.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/ff5cc0e9bc663a3080aaf645c5b4245b42811753",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeMono.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMono.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/ff5cc0e9bc663a3080aaf645c5b4245b42811753",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMono.ttf"
+    }
+  },
+  {
+    "name": "FreeMonoBold.ttf",
+    "path": "FreeMonoBold.ttf",
+    "sha": "48154499cd8f61bb5eca4953da4633e8fc891561",
+    "size": 296284,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMonoBold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMonoBold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/48154499cd8f61bb5eca4953da4633e8fc891561",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeMonoBold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMonoBold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/48154499cd8f61bb5eca4953da4633e8fc891561",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMonoBold.ttf"
+    }
+  },
+  {
+    "name": "FreeMonoBoldOblique.ttf",
+    "path": "FreeMonoBoldOblique.ttf",
+    "sha": "02692e1a38f7032a3396e3a37c78864c9e04eb4a",
+    "size": 295360,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMonoBoldOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMonoBoldOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/02692e1a38f7032a3396e3a37c78864c9e04eb4a",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeMonoBoldOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMonoBoldOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/02692e1a38f7032a3396e3a37c78864c9e04eb4a",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMonoBoldOblique.ttf"
+    }
+  },
+  {
+    "name": "FreeMonoOblique.ttf",
+    "path": "FreeMonoOblique.ttf",
+    "sha": "87caa0ff1d26d243eebf647b4c3c15da8ed5c7b8",
+    "size": 390692,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMonoOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMonoOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/87caa0ff1d26d243eebf647b4c3c15da8ed5c7b8",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeMonoOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeMonoOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/87caa0ff1d26d243eebf647b4c3c15da8ed5c7b8",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeMonoOblique.ttf"
+    }
+  },
+  {
+    "name": "FreeSans.ttf",
+    "path": "FreeSans.ttf",
+    "sha": "2072cdaf48552429234e030dc7a03511d369faca",
+    "size": 1563256,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSans.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSans.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2072cdaf48552429234e030dc7a03511d369faca",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSans.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSans.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2072cdaf48552429234e030dc7a03511d369faca",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSans.ttf"
+    }
+  },
+  {
+    "name": "FreeSansBold.ttf",
+    "path": "FreeSansBold.ttf",
+    "sha": "6f36dc5feb459ac8778caad176f0e96a0f900608",
+    "size": 416128,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSansBold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSansBold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6f36dc5feb459ac8778caad176f0e96a0f900608",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSansBold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSansBold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6f36dc5feb459ac8778caad176f0e96a0f900608",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSansBold.ttf"
+    }
+  },
+  {
+    "name": "FreeSansBoldOblique.ttf",
+    "path": "FreeSansBoldOblique.ttf",
+    "sha": "c5440c483225ee32d285fae3994c04849919192e",
+    "size": 342488,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSansBoldOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSansBoldOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c5440c483225ee32d285fae3994c04849919192e",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSansBoldOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSansBoldOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c5440c483225ee32d285fae3994c04849919192e",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSansBoldOblique.ttf"
+    }
+  },
+  {
+    "name": "FreeSansOblique.ttf",
+    "path": "FreeSansOblique.ttf",
+    "sha": "6de107c5940bcc93e3ed1cadc884999246764e9c",
+    "size": 763696,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSansOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSansOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6de107c5940bcc93e3ed1cadc884999246764e9c",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSansOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSansOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/6de107c5940bcc93e3ed1cadc884999246764e9c",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSansOblique.ttf"
+    }
+  },
+  {
+    "name": "FreeSerif.ttf",
+    "path": "FreeSerif.ttf",
+    "sha": "889c594f6674ead9a3d5fd2f762e12925cfa73f9",
+    "size": 3303588,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerif.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerif.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/889c594f6674ead9a3d5fd2f762e12925cfa73f9",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSerif.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerif.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/889c594f6674ead9a3d5fd2f762e12925cfa73f9",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerif.ttf"
+    }
+  },
+  {
+    "name": "FreeSerifBold.ttf",
+    "path": "FreeSerifBold.ttf",
+    "sha": "49112d3a92c96f744c4107a278584bfbbb15f215",
+    "size": 1310828,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerifBold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerifBold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/49112d3a92c96f744c4107a278584bfbbb15f215",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSerifBold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerifBold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/49112d3a92c96f744c4107a278584bfbbb15f215",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerifBold.ttf"
+    }
+  },
+  {
+    "name": "FreeSerifBoldItalic.ttf",
+    "path": "FreeSerifBoldItalic.ttf",
+    "sha": "c41a9651aa8af58ca60eca67081328c648e6312e",
+    "size": 608708,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerifBoldItalic.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerifBoldItalic.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c41a9651aa8af58ca60eca67081328c648e6312e",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSerifBoldItalic.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerifBoldItalic.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c41a9651aa8af58ca60eca67081328c648e6312e",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerifBoldItalic.ttf"
+    }
+  },
+  {
+    "name": "FreeSerifItalic.ttf",
+    "path": "FreeSerifItalic.ttf",
+    "sha": "4ea68896dc3d3c047df07948a905d8f9ea5e426e",
+    "size": 922088,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerifItalic.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerifItalic.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/4ea68896dc3d3c047df07948a905d8f9ea5e426e",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/FreeSerifItalic.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/FreeSerifItalic.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/4ea68896dc3d3c047df07948a905d8f9ea5e426e",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/FreeSerifItalic.ttf"
+    }
+  },
+  {
+    "name": "GNUFreeFontinfo.txt",
+    "path": "GNUFreeFontinfo.txt",
+    "sha": "c9511a6a3e7eea41a03d904f03243ada529331cb",
+    "size": 4314,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/GNUFreeFontinfo.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/GNUFreeFontinfo.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c9511a6a3e7eea41a03d904f03243ada529331cb",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/GNUFreeFontinfo.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/GNUFreeFontinfo.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c9511a6a3e7eea41a03d904f03243ada529331cb",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/GNUFreeFontinfo.txt"
+    }
+  },
+  {
+    "name": "Garuda-Bold.ttf",
+    "path": "Garuda-Bold.ttf",
+    "sha": "c2aa87edbfcf7e8373718260bf83e2ea4edb29e4",
+    "size": 57796,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda-Bold.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda-Bold.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c2aa87edbfcf7e8373718260bf83e2ea4edb29e4",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Garuda-Bold.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda-Bold.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c2aa87edbfcf7e8373718260bf83e2ea4edb29e4",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda-Bold.ttf"
+    }
+  },
+  {
+    "name": "Garuda-BoldOblique.ttf",
+    "path": "Garuda-BoldOblique.ttf",
+    "sha": "889be702af7776785ac730ce1bd2d3854474ac85",
+    "size": 57460,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda-BoldOblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda-BoldOblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/889be702af7776785ac730ce1bd2d3854474ac85",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Garuda-BoldOblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda-BoldOblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/889be702af7776785ac730ce1bd2d3854474ac85",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda-BoldOblique.ttf"
+    }
+  },
+  {
+    "name": "Garuda-Oblique.ttf",
+    "path": "Garuda-Oblique.ttf",
+    "sha": "7d1219907a318a97faabac93a02389600bb02d0e",
+    "size": 57412,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda-Oblique.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda-Oblique.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7d1219907a318a97faabac93a02389600bb02d0e",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Garuda-Oblique.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda-Oblique.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7d1219907a318a97faabac93a02389600bb02d0e",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda-Oblique.ttf"
+    }
+  },
+  {
+    "name": "Garuda.ttf",
+    "path": "Garuda.ttf",
+    "sha": "b9fcdfd90e111c6d09bd19bb11d5c283c3ff14e3",
+    "size": 57324,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/b9fcdfd90e111c6d09bd19bb11d5c283c3ff14e3",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Garuda.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Garuda.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/b9fcdfd90e111c6d09bd19bb11d5c283c3ff14e3",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Garuda.ttf"
+    }
+  },
+  {
+    "name": "Jomolhari-OFL.txt",
+    "path": "Jomolhari-OFL.txt",
+    "sha": "b723c35f657836b2417c2ab69c7eda89b8053b2b",
+    "size": 4345,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Jomolhari-OFL.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Jomolhari-OFL.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/b723c35f657836b2417c2ab69c7eda89b8053b2b",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Jomolhari-OFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Jomolhari-OFL.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/b723c35f657836b2417c2ab69c7eda89b8053b2b",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Jomolhari-OFL.txt"
+    }
+  },
+  {
+    "name": "Jomolhari.ttf",
+    "path": "Jomolhari.ttf",
+    "sha": "ca695b61dd49aecf40dc13a4977da76241e68fca",
+    "size": 2269108,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Jomolhari.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Jomolhari.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/ca695b61dd49aecf40dc13a4977da76241e68fca",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Jomolhari.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Jomolhari.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/ca695b61dd49aecf40dc13a4977da76241e68fca",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Jomolhari.ttf"
+    }
+  },
+  {
+    "name": "KhmerOFL.txt",
+    "path": "KhmerOFL.txt",
+    "sha": "bfa6ae45c6e539a5028296899df58fd6cf817a09",
+    "size": 4389,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/KhmerOFL.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/KhmerOFL.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/bfa6ae45c6e539a5028296899df58fd6cf817a09",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/KhmerOFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/KhmerOFL.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/bfa6ae45c6e539a5028296899df58fd6cf817a09",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/KhmerOFL.txt"
+    }
+  },
+  {
+    "name": "KhmerOS.ttf",
+    "path": "KhmerOS.ttf",
+    "sha": "7aa5bdcd5b743ac61dc407bc5f4b2fdf91a3d26a",
+    "size": 265988,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/KhmerOS.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/KhmerOS.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7aa5bdcd5b743ac61dc407bc5f4b2fdf91a3d26a",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/KhmerOS.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/KhmerOS.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7aa5bdcd5b743ac61dc407bc5f4b2fdf91a3d26a",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/KhmerOS.ttf"
+    }
+  },
+  {
+    "name": "Lateef font OFL.txt",
+    "path": "Lateef font OFL.txt",
+    "sha": "7a1b1c7e4fe2a447d47df683bb0a358d59393bb3",
+    "size": 4419,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Lateef%20font%20OFL.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Lateef%20font%20OFL.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7a1b1c7e4fe2a447d47df683bb0a358d59393bb3",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Lateef%20font%20OFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Lateef%20font%20OFL.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7a1b1c7e4fe2a447d47df683bb0a358d59393bb3",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Lateef%20font%20OFL.txt"
+    }
+  },
+  {
+    "name": "LateefRegOT.ttf",
+    "path": "LateefRegOT.ttf",
+    "sha": "f89d32be304d945a1bc3bad37b56f8b659e2f6d4",
+    "size": 246224,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/LateefRegOT.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/LateefRegOT.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/f89d32be304d945a1bc3bad37b56f8b659e2f6d4",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/LateefRegOT.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/LateefRegOT.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/f89d32be304d945a1bc3bad37b56f8b659e2f6d4",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/LateefRegOT.ttf"
+    }
+  },
+  {
+    "name": "Lohit-Kannada.ttf",
+    "path": "Lohit-Kannada.ttf",
+    "sha": "2911ce7b67cc5511ff6997ea010b800f4c173e5c",
+    "size": 197872,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Lohit-Kannada.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Lohit-Kannada.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2911ce7b67cc5511ff6997ea010b800f4c173e5c",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Lohit-Kannada.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Lohit-Kannada.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2911ce7b67cc5511ff6997ea010b800f4c173e5c",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Lohit-Kannada.ttf"
+    }
+  },
+  {
+    "name": "LohitKannadaOFL.txt",
+    "path": "LohitKannadaOFL.txt",
+    "sha": "01b8307820fbf33df70a1b3497c712021279e6c5",
+    "size": 4388,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/LohitKannadaOFL.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/LohitKannadaOFL.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/01b8307820fbf33df70a1b3497c712021279e6c5",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/LohitKannadaOFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/LohitKannadaOFL.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/01b8307820fbf33df70a1b3497c712021279e6c5",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/LohitKannadaOFL.txt"
+    }
+  },
+  {
+    "name": "Padauk-book.ttf",
+    "path": "Padauk-book.ttf",
+    "sha": "590cdadd40a3832e5769398ac3e5d1831d972ddd",
+    "size": 476528,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Padauk-book.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Padauk-book.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/590cdadd40a3832e5769398ac3e5d1831d972ddd",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Padauk-book.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Padauk-book.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/590cdadd40a3832e5769398ac3e5d1831d972ddd",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Padauk-book.ttf"
+    }
+  },
+  {
+    "name": "Pothana2000.ttf",
+    "path": "Pothana2000.ttf",
+    "sha": "296d7d665c77d2e8a2c7c48a5b42b029c3bbb8bf",
+    "size": 194268,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Pothana2000.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Pothana2000.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/296d7d665c77d2e8a2c7c48a5b42b029c3bbb8bf",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Pothana2000.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Pothana2000.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/296d7d665c77d2e8a2c7c48a5b42b029c3bbb8bf",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Pothana2000.ttf"
+    }
+  },
+  {
+    "name": "Quivira.otf",
+    "path": "Quivira.otf",
+    "sha": "531edf16cbad57f67d9033ea9d112110c21bfce8",
+    "size": 1475236,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Quivira.otf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Quivira.otf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/531edf16cbad57f67d9033ea9d112110c21bfce8",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Quivira.otf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Quivira.otf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/531edf16cbad57f67d9033ea9d112110c21bfce8",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Quivira.otf"
+    }
+  },
+  {
+    "name": "Sun-ExtA.ttf",
+    "path": "Sun-ExtA.ttf",
+    "sha": "1c9c2cfa56b0c03ec1c95becb55a0986d5f974a6",
+    "size": 22993540,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Sun-ExtA.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Sun-ExtA.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/1c9c2cfa56b0c03ec1c95becb55a0986d5f974a6",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Sun-ExtA.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Sun-ExtA.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/1c9c2cfa56b0c03ec1c95becb55a0986d5f974a6",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Sun-ExtA.ttf"
+    }
+  },
+  {
+    "name": "Sun-ExtB.ttf",
+    "path": "Sun-ExtB.ttf",
+    "sha": "8a53b20c5f7af2650e17f39c343fa80bf813fc24",
+    "size": 17632200,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Sun-ExtB.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Sun-ExtB.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/8a53b20c5f7af2650e17f39c343fa80bf813fc24",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Sun-ExtB.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Sun-ExtB.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/8a53b20c5f7af2650e17f39c343fa80bf813fc24",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Sun-ExtB.ttf"
+    }
+  },
+  {
+    "name": "SundaneseUnicode-1.0.5.ttf",
+    "path": "SundaneseUnicode-1.0.5.ttf",
+    "sha": "a86b47578909b716a381553cda3e764138834151",
+    "size": 54000,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/SundaneseUnicode-1.0.5.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/SundaneseUnicode-1.0.5.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/a86b47578909b716a381553cda3e764138834151",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/SundaneseUnicode-1.0.5.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/SundaneseUnicode-1.0.5.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/a86b47578909b716a381553cda3e764138834151",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/SundaneseUnicode-1.0.5.ttf"
+    }
+  },
+  {
+    "name": "SyrCOMEdessa.otf",
+    "path": "SyrCOMEdessa.otf",
+    "sha": "9e1fbda08ea3aec65eb2d0603ba321b77c629dab",
+    "size": 79668,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/SyrCOMEdessa.otf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/SyrCOMEdessa.otf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9e1fbda08ea3aec65eb2d0603ba321b77c629dab",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/SyrCOMEdessa.otf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/SyrCOMEdessa.otf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/9e1fbda08ea3aec65eb2d0603ba321b77c629dab",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/SyrCOMEdessa.otf"
+    }
+  },
+  {
+    "name": "SyrCOMEdessa_license.txt",
+    "path": "SyrCOMEdessa_license.txt",
+    "sha": "35c74dddc0ed5e24f16f7b038e69d9307bcb0885",
+    "size": 2658,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/SyrCOMEdessa_license.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/SyrCOMEdessa_license.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/35c74dddc0ed5e24f16f7b038e69d9307bcb0885",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/SyrCOMEdessa_license.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/SyrCOMEdessa_license.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/35c74dddc0ed5e24f16f7b038e69d9307bcb0885",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/SyrCOMEdessa_license.txt"
+    }
+  },
+  {
+    "name": "TaameyDavidCLM-LICENSE.txt",
+    "path": "TaameyDavidCLM-LICENSE.txt",
+    "sha": "de1ef632031b90483277409395e860b4db22cd98",
+    "size": 877,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TaameyDavidCLM-LICENSE.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TaameyDavidCLM-LICENSE.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/de1ef632031b90483277409395e860b4db22cd98",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/TaameyDavidCLM-LICENSE.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TaameyDavidCLM-LICENSE.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/de1ef632031b90483277409395e860b4db22cd98",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TaameyDavidCLM-LICENSE.txt"
+    }
+  },
+  {
+    "name": "TaameyDavidCLM-Medium.ttf",
+    "path": "TaameyDavidCLM-Medium.ttf",
+    "sha": "2aed6f85e2395c837ab20a4768fb1e2f6d8f2b51",
+    "size": 96284,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TaameyDavidCLM-Medium.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TaameyDavidCLM-Medium.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2aed6f85e2395c837ab20a4768fb1e2f6d8f2b51",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/TaameyDavidCLM-Medium.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TaameyDavidCLM-Medium.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2aed6f85e2395c837ab20a4768fb1e2f6d8f2b51",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TaameyDavidCLM-Medium.ttf"
+    }
+  },
+  {
+    "name": "TaiHeritagePro.ttf",
+    "path": "TaiHeritagePro.ttf",
+    "sha": "d4ed9538bb43da0acc23cb2f753cd587ba9b0f57",
+    "size": 210336,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TaiHeritagePro.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TaiHeritagePro.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/d4ed9538bb43da0acc23cb2f753cd587ba9b0f57",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/TaiHeritagePro.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TaiHeritagePro.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/d4ed9538bb43da0acc23cb2f753cd587ba9b0f57",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TaiHeritagePro.ttf"
+    }
+  },
+  {
+    "name": "Tharlon-Regular.ttf",
+    "path": "Tharlon-Regular.ttf",
+    "sha": "4717d70cdc77d666b31a75474a9bf61598fa1c75",
+    "size": 353228,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Tharlon-Regular.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Tharlon-Regular.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/4717d70cdc77d666b31a75474a9bf61598fa1c75",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Tharlon-Regular.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Tharlon-Regular.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/4717d70cdc77d666b31a75474a9bf61598fa1c75",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Tharlon-Regular.ttf"
+    }
+  },
+  {
+    "name": "TharlonOFL.txt",
+    "path": "TharlonOFL.txt",
+    "sha": "2973d5df3830a59d54d7aa6f874b27fcbf3327dc",
+    "size": 4697,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TharlonOFL.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TharlonOFL.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2973d5df3830a59d54d7aa6f874b27fcbf3327dc",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/TharlonOFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/TharlonOFL.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2973d5df3830a59d54d7aa6f874b27fcbf3327dc",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/TharlonOFL.txt"
+    }
+  },
+  {
+    "name": "UnBatang_0613.ttf",
+    "path": "UnBatang_0613.ttf",
+    "sha": "2e93d5f86b360e013588bcb8a5df1a72614aa2d6",
+    "size": 6937228,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/UnBatang_0613.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/UnBatang_0613.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2e93d5f86b360e013588bcb8a5df1a72614aa2d6",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/UnBatang_0613.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/UnBatang_0613.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/2e93d5f86b360e013588bcb8a5df1a72614aa2d6",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/UnBatang_0613.ttf"
+    }
+  },
+  {
+    "name": "Uthman.otf",
+    "path": "Uthman.otf",
+    "sha": "bb650a24edd6aded9dc9b6c6fc7191f5d7875f67",
+    "size": 172980,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Uthman.otf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Uthman.otf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/bb650a24edd6aded9dc9b6c6fc7191f5d7875f67",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/Uthman.otf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/Uthman.otf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/bb650a24edd6aded9dc9b6c6fc7191f5d7875f67",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/Uthman.otf"
+    }
+  },
+  {
+    "name": "XB Riyaz.ttf",
+    "path": "XB Riyaz.ttf",
+    "sha": "80e15803dc0aa7b0d8758e0e26793d10fa484ef1",
+    "size": 1144764,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20Riyaz.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20Riyaz.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/80e15803dc0aa7b0d8758e0e26793d10fa484ef1",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/XB%20Riyaz.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20Riyaz.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/80e15803dc0aa7b0d8758e0e26793d10fa484ef1",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20Riyaz.ttf"
+    }
+  },
+  {
+    "name": "XB RiyazBd.ttf",
+    "path": "XB RiyazBd.ttf",
+    "sha": "e6cf58f93bb2d2093a9b858ab74393416537c46b",
+    "size": 1159192,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20RiyazBd.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20RiyazBd.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e6cf58f93bb2d2093a9b858ab74393416537c46b",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/XB%20RiyazBd.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20RiyazBd.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e6cf58f93bb2d2093a9b858ab74393416537c46b",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20RiyazBd.ttf"
+    }
+  },
+  {
+    "name": "XB RiyazBdIt.ttf",
+    "path": "XB RiyazBdIt.ttf",
+    "sha": "19fba7887e965c9f331479862c53ec97f4caf22e",
+    "size": 1159500,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20RiyazBdIt.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20RiyazBdIt.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/19fba7887e965c9f331479862c53ec97f4caf22e",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/XB%20RiyazBdIt.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20RiyazBdIt.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/19fba7887e965c9f331479862c53ec97f4caf22e",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20RiyazBdIt.ttf"
+    }
+  },
+  {
+    "name": "XB RiyazIt.ttf",
+    "path": "XB RiyazIt.ttf",
+    "sha": "cc9cc3ab2a7da6ee26b3d78b18f2c18de42474a4",
+    "size": 1131668,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20RiyazIt.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20RiyazIt.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/cc9cc3ab2a7da6ee26b3d78b18f2c18de42474a4",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/XB%20RiyazIt.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XB%20RiyazIt.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/cc9cc3ab2a7da6ee26b3d78b18f2c18de42474a4",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XB%20RiyazIt.ttf"
+    }
+  },
+  {
+    "name": "XW Zar Font Info.txt",
+    "path": "XW Zar Font Info.txt",
+    "sha": "d42e4544bd41feac2d07242a97c9abc621f6f6d0",
+    "size": 4303,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XW%20Zar%20Font%20Info.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XW%20Zar%20Font%20Info.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/d42e4544bd41feac2d07242a97c9abc621f6f6d0",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/XW%20Zar%20Font%20Info.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/XW%20Zar%20Font%20Info.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/d42e4544bd41feac2d07242a97c9abc621f6f6d0",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/XW%20Zar%20Font%20Info.txt"
+    }
+  },
+  {
+    "name": "ZawgyiOne.ttf",
+    "path": "ZawgyiOne.ttf",
+    "sha": "5731471586f70ec4e2182d5fd24a2058741b96a4",
+    "size": 341264,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ZawgyiOne.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ZawgyiOne.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/5731471586f70ec4e2182d5fd24a2058741b96a4",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/ZawgyiOne.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ZawgyiOne.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/5731471586f70ec4e2182d5fd24a2058741b96a4",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ZawgyiOne.ttf"
+    }
+  },
+  {
+    "name": "ayar.ttf",
+    "path": "ayar.ttf",
+    "sha": "e74c612047afaff876066184220a0353e98ff4f4",
+    "size": 282664,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ayar.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ayar.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e74c612047afaff876066184220a0353e98ff4f4",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/ayar.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ayar.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/e74c612047afaff876066184220a0353e98ff4f4",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ayar.ttf"
+    }
+  },
+  {
+    "name": "damase_v.2.ttf",
+    "path": "damase_v.2.ttf",
+    "sha": "a60240babc5d01151f46706b01afe5ad933ec772",
+    "size": 900260,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/damase_v.2.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/damase_v.2.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/a60240babc5d01151f46706b01afe5ad933ec772",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/damase_v.2.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/damase_v.2.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/a60240babc5d01151f46706b01afe5ad933ec772",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/damase_v.2.ttf"
+    }
+  },
+  {
+    "name": "kaputaunicode.ttf",
+    "path": "kaputaunicode.ttf",
+    "sha": "fe0269726810dd7dc32844f16c10ffcee58a7af3",
+    "size": 159696,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/kaputaunicode.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/kaputaunicode.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/fe0269726810dd7dc32844f16c10ffcee58a7af3",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/kaputaunicode.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/kaputaunicode.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/fe0269726810dd7dc32844f16c10ffcee58a7af3",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/kaputaunicode.ttf"
+    }
+  },
+  {
+    "name": "lannaalif-v1-03.ttf",
+    "path": "lannaalif-v1-03.ttf",
+    "sha": "7c20d97910fc8867e48dcebdc8abbc10ebb91913",
+    "size": 136648,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/lannaalif-v1-03.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/lannaalif-v1-03.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7c20d97910fc8867e48dcebdc8abbc10ebb91913",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/lannaalif-v1-03.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/lannaalif-v1-03.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/7c20d97910fc8867e48dcebdc8abbc10ebb91913",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/lannaalif-v1-03.ttf"
+    }
+  },
+  {
+    "name": "ocrb10.ttf",
+    "path": "ocrb10.ttf",
+    "sha": "34980b80c2b23bd2afdfe3c74cd40e1f933d523c",
+    "size": 23112,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ocrb10.ttf?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ocrb10.ttf",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/34980b80c2b23bd2afdfe3c74cd40e1f933d523c",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/ocrb10.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ocrb10.ttf?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/34980b80c2b23bd2afdfe3c74cd40e1f933d523c",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ocrb10.ttf"
+    }
+  },
+  {
+    "name": "ocrbinfo.txt",
+    "path": "ocrbinfo.txt",
+    "sha": "c2dd9954c52e3be57b350e7eaf43fb75fc98335d",
+    "size": 3361,
+    "url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ocrbinfo.txt?ref=master",
+    "html_url": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ocrbinfo.txt",
+    "git_url": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c2dd9954c52e3be57b350e7eaf43fb75fc98335d",
+    "download_url": "https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/ocrbinfo.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ocrbinfo.txt?ref=master",
+      "git": "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/git/blobs/c2dd9954c52e3be57b350e7eaf43fb75fc98335d",
+      "html": "https://github.com/GravityPDF/mpdf-core-fonts/blob/master/ocrbinfo.txt"
+    }
+  }
+]

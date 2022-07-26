@@ -27,20 +27,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install NodeJS
-        uses: actions/setup-node@v1
+      - name: Setup Node JS
+        uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version-file: '.nvmrc'
 
-      - name: Cache NodeJS modules
+      - name: Cache node modules
+        id: cache-nodemodules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          # caching node_modules
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-modules-
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
 
       - name: Log debug information
         run: |
@@ -48,7 +52,12 @@ jobs:
           yarn --version
 
       - name: Install Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: yarn install
 
-      - name: Run Karma tests
-        run: yarn test:js
+      - name: Run Jest tests
+        run: yarn test:js:coverage
+
+      - name: Code Coverage
+        run: |
+          bash <(curl -s https://codecov.io/bash);

@@ -358,10 +358,11 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function test_middle_signed_url_access() {
 		/* Setup some test data */
-		$results          = $this->create_form_and_entries();
-		$entry            = $results['entry'];
-		$entry['form_id'] = $results['form']['id'];
-		$options          = \GPDFAPI::get_options_class();
+		$results              = $this->create_form_and_entries();
+		$entry                = $results['entry'];
+		$entry['form_id']     = $results['form']['id'];
+		$options              = \GPDFAPI::get_options_class();
+		$_SERVER['HTTP_HOST'] = str_replace( [ 'http://', 'http://' ], '', home_url() );
 
 		/* Test it does nothing by default */
 		$this->model->middle_signed_url_access( '', '', '' );
@@ -401,6 +402,8 @@ class Test_PDF extends WP_UnitTestCase {
 		gf_upgrade()->install();
 
 		/* Setup some test data */
+		$_SERVER['HTTP_HOST'] = str_replace( [ 'http://', 'http://' ], '', home_url() );
+
 		$results          = $this->create_form_and_entries();
 		$entry            = $results['entry'];
 		$entry['form_id'] = $results['form']['id'];
@@ -1064,15 +1067,15 @@ class Test_PDF extends WP_UnitTestCase {
 			$gfpdf->templates,
 			$gfpdf->log
 		);
-		$pdf->set_path( ABSPATH );
+		$pdf->set_path( '/tmp/' );
 		$pdf->set_filename( 'unittest' );
 
 		/* Check that PDF exists */
-		touch( ABSPATH . 'unittest.pdf' );
+		touch( '/tmp/unittest.pdf' );
 		$this->assertTrue( $this->model->does_pdf_exist( $pdf ) );
 
 		/* Check that PDF does not exist */
-		unlink( ABSPATH . 'unittest.pdf' );
+		unlink( '/tmp/unittest.pdf' );
 		$this->assertFalse( $this->model->does_pdf_exist( $pdf ) );
 	}
 
@@ -1218,12 +1221,9 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_cleanup_tmp_dir() {
 		global $gfpdf;
 
-		$tmp_save                           = $gfpdf->data->template_tmp_location;
-		$gfpdf->data->template_tmp_location = $gfpdf->data->template_location . 'tmp/';
-		$tmp                                = $gfpdf->data->template_tmp_location;
-		$gfpdf->data->mpdf_tmp_location     = $tmp . 'mpdf';
+		$tmp = $gfpdf->data->template_tmp_location;
 
-		wp_mkdir_p( $tmp );
+		wp_mkdir_p( $gfpdf->data->template_location );
 		wp_mkdir_p( $gfpdf->data->mpdf_tmp_location );
 
 		/* Create our files to test */
@@ -1258,8 +1258,6 @@ class Test_PDF extends WP_UnitTestCase {
 		foreach ( $files as $file => $modified ) {
 			@unlink( $tmp . $file, $modified );
 		}
-
-		$gfpdf->data->template_tmp_location = $tmp_save;
 	}
 
 	/**
