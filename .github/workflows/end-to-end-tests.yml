@@ -102,7 +102,6 @@ jobs:
       - name: Dump log files on failure
         if: failure()
         run: |
-          npm run wp-env run tests-wordpress mkdir /var/www/html/wp-content/plugins/gravity-pdf/tmp
           npm run wp-env run tests-wordpress cp -R /var/www/html/wp-content/uploads/gravity_forms/logs/ /var/www/html/wp-content/plugins/gravity-pdf/tmp/
           mv tmp screenshots/tmp
 
