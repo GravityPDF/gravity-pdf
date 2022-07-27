@@ -101,7 +101,21 @@ _Note: When Gravity Forms isn't installed and you activate Gravity PDF we displa
 
 == Changelog ==
 
-= 5.4.0=
+= 5.4.1 =
+* Security: Backport additional validation checks to the Core Font installer
+* Security: Backport fix for potential XSS attack by escaping URL returned from add_query_args() on the PDF List or PDF Form Settings pages
+* Security (Hardening): Backport late-escaping from Gravity PDF 6.4
+* Security (Hardening): Backport earlier sanitizing of user input
+* Security (Hardening): Backport custom PDF template filenames are now limited to the following characters: A-Za-z0-9_-
+* Security (Hardening): Backport ?html=1 and ?data=1 developer helper parameters now only work in non-production environments (WP_ENVIRONMENT_TYPE !== 'production'), or when Gravity PDF Debug Mode is explicitly enabled
+* Security (Hardening): Backport prevent directory traversal when loading the various Gravity PDF UI components
+* Security (Hardening): Backport PDF Form Settings capability check from `gravityforms_edit_settings` to `gravityforms_edit_forms`
+* Bug: Backport PHP8.1 type conversion warning in the template cache when transient’s are flushed
+* Bug: Backport background queue from continuing if retry limit reached on unrecoverable task (like generating the PDF)
+* Bug: Backport a race condition fix when using Background Processing that could see the PDF deleted before being attached to notifications
+* Bug: Adjust all links to point to https://docs.gravitypdf.com
+
+= 5.4.0 =
 * Feature: Prevent update to 6.0 if minimum requirements are not met (including when automatic updates enabled)
 * Feature: Show/allow any new updates for 5.x if minimum requirements are not met for 6.0
 
