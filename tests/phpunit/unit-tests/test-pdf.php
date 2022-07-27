@@ -407,6 +407,8 @@ class Test_PDF extends WP_UnitTestCase {
 		gf_upgrade()->install();
 
 		/* Setup some test data */
+		$_SERVER['HTTP_HOST'] = str_replace( [ 'http://', 'http://' ], '', home_url() );
+		
 		$results          = $this->create_form_and_entries();
 		$entry            = $results['entry'];
 		$entry['form_id'] = $results['form']['id'];

@@ -118,7 +118,13 @@ jobs:
           yarn env:install
 
       - name: Run PHPUnit tests
+        if: ${{ ! matrix.multisite }}
         run: yarn test:php --do-not-cache-result --verbose
+        continue-on-error: ${{ matrix.php == '8.1' }}
+
+      - name: Run Multisite PHPUnit tests
+        if: ${{ matrix.multisite }}
+        run: yarn test:php:multisite --verbose
         continue-on-error: ${{ matrix.php == '8.1' }}
 
       # TODO: XDEBUG isnt working for unit tests https://github.com/WordPress/gutenberg/issues/42286
