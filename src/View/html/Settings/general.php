@@ -56,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 
 		<div class="extensions-upsell">
-			<a href="https://gravitypdf.com/extension-shop/">
+			<a href="https://gravitypdf.com/store/">
 				<?php esc_html_e( 'Want more features? Take a look at our Extension Shop.', 'gravity-forms-pdf-extended' ); ?>
 			</a>
 		</div>

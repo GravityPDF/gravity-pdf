@@ -361,20 +361,18 @@ class Helper_PDF {
 		$template = ( isset( $this->settings['template'] ) ) ? $this->settings['template'] : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$template = rgget( 'template' );
 
 			/* Handle legacy v3 URL structure and strip .php from the end of the template */
 			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
 				$template = substr( $template, 0, -4 );
 			}
+
+			$template = sanitize_html_class( $template );
 		}
 
-		try {
-			$this->template_path = $this->templates->get_template_path_by_id( $template );
-		} catch ( Exception $e ) {
-			throw $e;
-		}
+		$this->template_path = $this->templates->get_template_path_by_id( $template );
 
 		/* Check if there are version requirements */
 		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
@@ -432,8 +430,8 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_metadata() {
-		$this->mpdf->SetTitle( UtfString::strcode2utf( strip_tags( $this->get_filename() ) ) );
-		$this->mpdf->SetAuthor( UtfString::strcode2utf( strip_tags( get_bloginfo( 'name' ) ) ) );
+		$this->mpdf->SetTitle( UtfString::strcode2utf( wp_strip_all_tags( $this->get_filename() ) ) );
+		$this->mpdf->SetAuthor( UtfString::strcode2utf( wp_strip_all_tags( get_bloginfo( 'name' ) ) ) );
 	}
 
 	/**
@@ -869,11 +867,31 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function maybe_display_raw_html( $html ) {
+		$options = \GPDFAPI::get_options_class();
 
-		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this->entry, $this->gform, $this );
-			exit;
+		/* Disregard if PDF is being saved */
+		if ( $this->output === 'SAVE' ) {
+			return;
 		}
+
+		/* Disregard if `?html` URL parameter doesn't exist */
+		if ( ! rgget( 'html' ) ) {
+			return;
+		}
+
+		/* Disregard if PDF Debug Mode off AND the environment is production */
+		if ( $options->get_option( 'debug_mode', 'No' ) === 'No' && ( ! function_exists( 'wp_get_environment_type' ) || wp_get_environment_type() === 'production' ) ) {
+			return;
+		}
+
+		/* Check if user has permission to view info */
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
+			return;
+		}
+
+		/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+		echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this->entry, $this->gform, $this );
+		exit;
 	}
 
 	/**
@@ -897,7 +915,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_image_dpi() {
-		_doing_it_wrong( __METHOD__, __( 'This method has been removed because mPDF no longer supports setting the image DPI after the class is initialised.', 'gravity-forms-pdf-extended' ), '5.2' );
+		_doing_it_wrong( __METHOD__, esc_html__( 'This method has been removed because mPDF no longer supports setting the image DPI after the class is initialised.', 'gravity-forms-pdf-extended' ), '5.2' );
 	}
 
 	/**

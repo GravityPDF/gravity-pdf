@@ -160,7 +160,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function process_list_view( $form_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->warning( 'Lack of User Capabilities.' );
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
@@ -178,7 +178,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$controller->view->list(
 			[
 				'title'       => $this->data->title,
-				'add_new_url' => $add_new_url = add_query_arg( [ 'pid' => 0 ] ),
+				'add_new_url' => add_query_arg( [ 'pid' => 0 ] ),
 				'list_items'  => $pdf_table,
 			]
 		);
@@ -197,7 +197,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function show_edit_view( $form_id, $pdf_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->warning( 'Lack of User Capabilities.' );
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
@@ -211,7 +211,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* parse input and get required information */
 		if ( ! $pdf_id ) {
 			if ( rgpost( 'gform_pdf_id' ) ) {
-				$pdf_id = rgpost( 'gform_pdf_id' );
+				$pdf_id = sanitize_html_class( rgpost( 'gform_pdf_id' ) );
 			} else {
 				$pdf_id = uniqid();
 			}
@@ -260,7 +260,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function process_submission( $form_id, $pdf_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->critical(
 				'Lack of User Capabilities.',
 				[
@@ -282,7 +282,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Check if we have a new PDF ID */
 		if ( empty( $pdf_id ) ) {
-			$pdf_id = ( rgpost( 'gform_pdf_id' ) ) ? rgpost( 'gform_pdf_id' ) : false;
+			$pdf_id = ( rgpost( 'gform_pdf_id' ) ) ? sanitize_html_class( rgpost( 'gform_pdf_id' ) ) : false;
 		}
 
 		$input = rgpost( 'gfpdf_settings' );
@@ -316,7 +316,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Do validation */
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
-			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
+			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (float) $sanitized['custom_pdf_size'][0] === 0.0 || (float) $sanitized['custom_pdf_size'][1] === 0.0 ) )
 		) {
 			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
@@ -515,7 +515,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function get_template_name_from_current_page() {
 
-		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
+		$pid     = ( ! empty( $_GET['pid'] ) ) ? sanitize_html_class( rgget( 'pid' ) ) : sanitize_html_class( rgpost( 'gform_pdf_id' ) );
 		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : 0;
 
 		/* If we don't have a specific PDF we'll use the defaults */
@@ -744,11 +744,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function delete_gf_pdf_setting() {
 
 		$fid      = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
-		$pid      = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
+		$pid      = ( isset( $_POST['pid'] ) ) ? sanitize_html_class( $_POST['pid'] ) : '';
 		$nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
 
 		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Delete PDF Settings', 'gravityforms_edit_settings', $nonce_id );
+		$this->misc->handle_ajax_authentication( 'Delete PDF Settings', 'gravityforms_edit_forms', $nonce_id );
 
 		/* Delete PDF settings */
 		$results = $this->options->delete_pdf( $fid, $pid );
@@ -761,7 +761,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				'msg' => esc_html__( 'PDF successfully deleted.', 'gravity-forms-pdf-extended' ),
 			];
 
-			echo json_encode( $return );
+			echo wp_json_encode( $return );
 			wp_die();
 		}
 
@@ -793,12 +793,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function duplicate_gf_pdf_setting() {
 
 		$fid = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
-		$pid = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
+		$pid = ( isset( $_POST['pid'] ) ) ? sanitize_html_class( $_POST['pid'] ) : '';
 
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
 
 		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Duplicate PDF Settings', 'gravityforms_edit_settings', $nonce_id );
+		$this->misc->handle_ajax_authentication( 'Duplicate PDF Settings', 'gravityforms_edit_forms', $nonce_id );
 
 		/* Duplicate PDF config */
 		$config = $this->options->get_pdf( $fid, $pid );
@@ -827,7 +827,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 					'state_nonce' => $state_nonce,
 				];
 
-				echo json_encode( $return );
+				echo wp_json_encode( $return );
 				wp_die();
 			}
 		}
@@ -858,11 +858,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function change_state_pdf_setting() {
 
 		$fid      = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
-		$pid      = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
+		$pid      = ( isset( $_POST['pid'] ) ) ? sanitize_html_class( $_POST['pid'] ) : '';
 		$nonce_id = "gfpdf_state_nonce_{$fid}_{$pid}";
 
 		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Change PDF Settings State', 'gravityforms_edit_settings', $nonce_id );
+		$this->misc->handle_ajax_authentication( 'Change PDF Settings State', 'gravityforms_edit_forms', $nonce_id );
 
 		/* Change the PDF state */
 		$config = $this->options->get_pdf( $fid, $pid );
@@ -886,7 +886,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 					'pid'   => $config['id'],
 				];
 
-				echo json_encode( $return );
+				echo wp_json_encode( $return );
 				wp_die();
 			}
 		}

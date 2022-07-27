@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <script type="text/javascript">
-	var gfpdf_migration_multisite_ids = <?php echo json_encode( $args['multisite_ids'] ); ?>;
+	var gfpdf_migration_multisite_ids = <?php echo wp_json_encode( $args['multisite_ids'] ); ?>;
 </script>
 
 <div class="wrap">
@@ -26,12 +26,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<p><?php esc_html_e( 'Beginning Migration...', 'gravity-forms-pdf-extended' ); ?></p>
 
-	<div id="gfpdf-multisite-migration-copy" data-nonce="<?php echo wp_create_nonce( 'gfpdf_multisite_migration' ); ?>">
+	<div id="gfpdf-multisite-migration-copy" data-nonce="<?php echo esc_attr( wp_create_nonce( 'gfpdf_multisite_migration' ) ); ?>">
 		<!-- Container for our AJAX endpoint -->
 	</div>
 
 	<div id="gfpdf-multisite-migration-complete" style="display: none">
 		<p><?php esc_html_e( 'Migration Complete.', 'gravity-forms-pdf-extended' ); ?></p>
 
-		<p><a href="<?php echo $args['current_page_url']; ?>">Return to current page</a> | <a href="<?php echo $args['gf_forms_url']; ?>">View Gravity Forms</a></p>
+		<p><a href="<?php echo esc_url( $args['current_page_url'] ); ?>">Return to current page</a> | <a href="<?php echo esc_url( $args['gf_forms_url'] ); ?>">View Gravity Forms</a></p>
 	</div>

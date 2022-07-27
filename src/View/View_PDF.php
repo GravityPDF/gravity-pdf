@@ -172,15 +172,8 @@ class View_PDF extends Helper_Abstract_View {
 			$this->misc->get_legacy_ids( $entry['id'], $settings )
 		);
 
-		/**
-		 * Show $form_data array if requested
-		 */
-		if ( isset( $_GET['data'] ) && $this->gform->has_capability( 'gravityforms_view_settings' ) && isset( $args['form_data'] ) ) {
-			echo '<pre>';
-			print_r( $args['form_data'] );
-			echo '</pre>';
-			exit;
-		}
+		/* Show $form_data array if requested */
+		$this->maybe_view_form_data( isset( $args['form_data'] ) ? $args['form_data'] : [] );
 
 		/* Enable Multicurrency support */
 		$this->misc->maybe_add_multicurrency_support();
@@ -208,7 +201,7 @@ class View_PDF extends Helper_Abstract_View {
 
 			/* Determine if we should show the print dialog box */
 			if ( isset( $_GET['print'] ) ) {
-				$pdf->set_print_dialog( true );
+				$pdf->set_print_dialog();
 			}
 
 			/* Render the PDF template HTML */
@@ -236,7 +229,7 @@ class View_PDF extends Helper_Abstract_View {
 					$e->getLine()
 				);
 
-				wp_die( $message );
+				wp_die( esc_html( $message ) );
 			}
 
 			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
@@ -681,5 +674,37 @@ class View_PDF extends Helper_Abstract_View {
 		$context[] = 'page-break-after';
 
 		return $context;
+	}
+
+	/**
+	 * @param array $form_data
+	 *
+	 * @return void
+	 *
+	 * @since 6.4.0
+	 */
+	public function maybe_view_form_data( $form_data ) {
+
+		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
+		if ( ! isset( $_GET['data'] ) ) {
+			return;
+		}
+
+		/* Disable if PDF Debug Mode off AND the environment is production */
+		if ( $this->options->get_option( 'debug_mode', 'No' ) === 'No' && ( ! function_exists( 'wp_get_environment_type' ) || wp_get_environment_type() === 'production' ) ) {
+			return;
+		}
+
+		/* Check if user has permission to view info */
+		if ( ! $this->gform->has_capability( 'gravityforms_view_settings' ) ) {
+			return;
+		}
+
+		print '<pre>';
+		/* phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r */
+		print_r( $form_data );
+		print '</pre>';
+
+		exit;
 	}
 }

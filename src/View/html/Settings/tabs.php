@@ -18,6 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <h2 class="nav-tab-wrapper">
 	<?php foreach ( $args['tabs'] as $tab ): ?>
-		<a data-id="<?php echo esc_attr( $tab['id'] ); ?>" class="nav-tab <?php echo ( $args['selected'] === $tab['id'] ) ? 'nav-tab-active' : ''; ?>" href="<?php echo $args['data']->settings_url . '&amp;tab=' . $tab['id']; ?>"><?php echo $tab['name']; ?></a>
+		<a data-id="<?php echo esc_attr( $tab['id'] ); ?>" class="nav-tab <?php echo ( $args['selected'] === $tab['id'] ) ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $args['data']->settings_url . '&tab=' . $tab['id'] ); ?>"><?php echo esc_html( $tab['name'] ); ?></a>
 	<?php endforeach; ?>
 </h2>

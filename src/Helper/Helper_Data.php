@@ -72,6 +72,8 @@ class Helper_Data {
 	 *
 	 * @return mixed        The data assigned to the $name property is returned
 	 *
+	 * @throws \Exception
+	 *
 	 * @since 4.0
 	 */
 	public function &__get( $name ) {
@@ -82,20 +84,7 @@ class Helper_Data {
 			return $this->data[ $name ];
 		}
 
-		/* phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection */
-		$trace = debug_backtrace();
-		/* phpcs:enable */
-		trigger_error(
-			'Undefined property via __get(): ' . $name .
-			' in ' . $trace[0]['file'] .
-			' on line ' . $trace[0]['line'],
-			E_USER_NOTICE
-		);
-
-		/* because we are returning by reference we need return something that can be referenced */
-		$value = null;
-
-		return $value;
+		throw new \Exception( 'Could not find stored Gravity PDF data with matching name: ' . $name );
 	}
 
 	/**
@@ -214,7 +203,7 @@ class Helper_Data {
 				'pdfWorkingDir'                        => PDF_TEMPLATE_LOCATION,
 				'pluginUrl'                            => PDF_PLUGIN_URL,
 				'pluginPath'                           => PDF_PLUGIN_DIR,
-				'customFontData'                       => json_encode( $custom_fonts ),
+				'customFontData'                       => wp_json_encode( $custom_fonts ),
 				'userCapabilities'                     => $user_capabilities,
 
 				'spinnerUrl'                           => admin_url( 'images/spinner-2x.gif' ),

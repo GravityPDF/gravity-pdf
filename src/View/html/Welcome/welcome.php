@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<!-- Output a quick Gravity Forms selector so we can let users get redirected to a PDF form of their choice -->
 			<?php if ( sizeof( $args['forms'] ) > 0 ): ?>
-				<form action="<?php echo admin_url( 'admin.php' ); ?>">
+				<form action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
 					<input type="hidden" name="page" value="gf_edit_forms"/>
 					<input type="hidden" name="view" value="settings"/>
 					<input type="hidden" name="subview" value="pdf"/>
@@ -76,7 +76,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<strong><?php esc_html_e( 'Select which Form you want to setup first:', 'gravity-forms-pdf-extended' ); ?></strong><br>
 						<select name="id" class="">
 							<?php foreach ( $args['forms'] as $form ): ?>
-								<option value="<?php echo $form['id']; ?>"><?php echo $form['title']; ?></option>
+								<option value="<?php echo esc_attr( $form['id'] ); ?>"><?php echo esc_html( $form['title'] ); ?></option>
 							<?php endforeach; ?>
 						</select>
 
@@ -93,7 +93,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h3><?php esc_html_e( 'Simple PDF Download Links', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( esc_html__( 'The %1$s[gravitypdf]%2$s shortcode allows you to %3$seasily place a PDF download link%4$s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">', '</a>' ); ?></p>
+			<p><?php printf( esc_html__( 'The %1$s[gravitypdf]%2$s shortcode allows you to %3$seasily place a PDF download link%4$s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://docs.gravitypdf.com/v5/user-shortcodes">', '</a>' ); ?></p>
 		</div>
 		<div class="col">
 			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/pdf-notifications-v5.png">
@@ -107,7 +107,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h3><?php esc_html_e( 'Custom Fonts', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( esc_html__( 'Make your documents stand out by including your favorite fonts with our %1$ssimple font manager%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-custom-fonts/">', '</a>' ); ?></p>
+			<p><?php printf( esc_html__( 'Make your documents stand out by including your favorite fonts with our %1$ssimple font manager%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v5/user-custom-fonts">', '</a>' ); ?></p>
 		</div>
 	</div>
 

@@ -100,6 +100,12 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 		$path = $this->get_view_dir_path() . $filename . '.php';
 		$args = array_merge( $this->data_cache, $args );
 
+		/* Additional validation on the path to ensure $filename stays in the $this->get_view_dir_path() directory and doesn't traverse it */
+		$path_to_test = realpath( $path );
+		if ( $path_to_test === false || strpos( $path_to_test, realpath( $this->get_view_dir_path() ) ) !== 0 ) {
+			return new WP_Error( 'invalid_path', sprintf( esc_html__( '%s is an invalid filename', 'gravity-forms-pdf-extended' ), $filename ) );
+		}
+
 		if ( is_readable( $path ) ) {
 
 			if ( $output ) {
@@ -136,15 +142,15 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	private function buffer( $path, $args = [] ) {
+		/* Include our $gfpdf object automatically */
+		global $gfpdf;
+
 		/*
 		 * for backwards compatibility extract the $args variable
 		 * phpcs:disable -- disable warning about `extract`
 		 */
 		extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
 		/* phpcs:enable */
-
-		/* Include our $gfpdf object automatically */
-		global $gfpdf;
 
 		ob_start();
 		include $path;

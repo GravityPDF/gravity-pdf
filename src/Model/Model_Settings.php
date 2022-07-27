@@ -408,7 +408,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			]
 		);
 
-		echo json_encode( $results );
+		echo wp_json_encode( $results );
 		wp_die();
 	}
 
@@ -653,12 +653,12 @@ class Model_Settings extends Helper_Abstract_Model {
 		$strings['templateList']          = $this->templates->get_all_template_info();
 		$strings['activeDefaultTemplate'] = $this->options->get_option( 'default_template' );
 
-		$form_id = rgget( 'id' );
+		$form_id = (int) rgget( 'id' );
 
 		if ( $form_id ) {
-			$pid = ( rgget( 'pid' ) ) ? rgget( 'pid' ) : false;
+			$pid = ( rgget( 'pid' ) ) ? sanitize_html_class( rgget( 'pid' ) ) : false;
 			if ( $pid === false ) {
-				$pid = ( rgpost( 'gform_pdf_id' ) ) ? rgpost( 'gform_pdf_id' ) : false;
+				$pid = ( rgpost( 'gform_pdf_id' ) ) ? sanitize_html_class( rgpost( 'gform_pdf_id' ) ) : false;
 			}
 
 			$pdf = $this->options->get_pdf( $form_id, $pid );
@@ -722,24 +722,27 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Check if we are submitting our settings and there's an active key */
 		foreach ( $this->data->addon as $addon ) {
 			$option_key = 'license_' . $addon->get_slug();
+			if ( ! isset( $input[ $option_key ] ) ) {
+				continue;
+			}
+
+			/* Check if the license key is now empty */
+			if ( trim( $input[ $option_key ] ) === '' ) {
+				$input[ $option_key . '_message' ] = '';
+				$input[ $option_key . '_status' ]  = '';
+
+				continue;
+			}
 
 			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
-			if ( isset( $input[ $option_key ] )
-				 && (
-					 ( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] ) ||
-					 $input[ $option_key . '_status' ] !== 'active'
-				 )
+			if (
+				$input[ $option_key . '_status' ] !== 'active' ||
+				( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] )
 			) {
 				$results = $this->activate_license( $addon, $input[ $option_key ] );
 
 				$input[ $option_key . '_message' ] = $results['message'];
 				$input[ $option_key . '_status' ]  = $results['status'];
-			}
-
-			/* Check if the license key is now empty */
-			if ( isset( $input[ $option_key ] ) && strlen( trim( $input[ $option_key ] ) ) === 0 ) {
-				$input[ $option_key . '_message' ] = '';
-				$input[ $option_key . '_status' ]  = '';
 			}
 		}
 
@@ -766,7 +769,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'body'      => [
 					'edd_action' => 'activate_license',
 					'license'    => $license_key,
-					'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'item_name'  => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
 					'url'        => home_url(),
 				],
 			]
@@ -793,7 +796,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				$message = $possible_responses['generic'];
 				$status  = 'error';
 
-				if ( isset( $license_data->error ) && isset( $possible_responses[ $license_data->error ] ) ) {
+				if ( isset( $license_data->error, $possible_responses[ $license_data->error ] ) ) {
 					$message = $possible_responses[ $license_data->error ];
 					$status  = $license_data->error;
 
@@ -834,14 +837,13 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* Get the required details */
 		$addon_slug = ( isset( $_POST['addon_name'] ) ) ? $_POST['addon_name'] : '';
-		$license    = ( isset( $_POST['license'] ) ) ? $_POST['license'] : '';
 		$addon      = ( isset( $this->data->addon[ $addon_slug ] ) ) ? $this->data->addon[ $addon_slug ] : false;
 
 		/* Check add-on currently installed */
 		if ( ! empty( $addon ) ) {
-			if ( $this->deactivate_license_key( $addon, $license ) ) {
+			if ( $this->deactivate_license_key( $addon, $addon->get_license_key() ) ) {
 				$this->log->notice( 'AJAX – Successfully Deactivated License' );
-				echo json_encode(
+				echo wp_json_encode(
 					[
 						'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ),
 					]
@@ -851,7 +853,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			} elseif ( $addon->schedule_license_check() ) {
 				$license_info = $addon->get_license_info();
 
-				echo json_encode(
+				echo wp_json_encode(
 					[
 						'error' => $license_info['message'],
 					]
@@ -863,7 +865,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		$this->log->error( 'AJAX Endpoint Error' );
 
-		echo json_encode(
+		echo wp_json_encode(
 			[
 				'error' => esc_html__( 'An error occurred during deactivation, please try again', 'gravity-forms-pdf-extended' ),
 			]
@@ -892,7 +894,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'body'      => [
 					'edd_action' => 'deactivate_license',
 					'license'    => $license_key,
-					'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'item_name'  => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
 					'url'        => home_url(),
 				],
 			]

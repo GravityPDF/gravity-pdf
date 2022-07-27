@@ -135,7 +135,7 @@ class Queue_Callbacks {
 
 		foreach ( $pdfs as $pdf ) {
 			$notification = ( isset( $pdf['notification'] ) && is_array( $pdf['notification'] ) ) ? $pdf['notification'] : [];
-			if ( count( $notification ) > 0 || $pdf['save'] === 'Yes' ) {
+			if ( count( $notification ) > 0 || $model_pdf->maybe_always_save_pdf( $pdf ) ) {
 				$pdf_generator = new Helper_PDF( $entry, $pdf, $gform, $data, $misc, $templates, $log );
 				$misc->rmdir( $pdf_generator->get_path() );
 				break;
