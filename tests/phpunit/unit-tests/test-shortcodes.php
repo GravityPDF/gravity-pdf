@@ -248,9 +248,9 @@ class Test_Shortcode extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertNotFalse( strpos( $url, '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
-		$this->assertNotTrue( strpos( $url, '<a href=' ) );
-		$this->assertNotTrue( strpos( $url, 'Download PDF' ) );
+		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $url );
+		$this->assertStringNotContainsString( '<a href=', $url );
+		$this->assertStringNotContainsString( 'Download PDF', $url );
 
 		/* Test for signed URL */
 		$url1 = $this->model->process(
@@ -261,8 +261,8 @@ class Test_Shortcode extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertNotFalse( strpos( $url1, '&signature=' ) );
-		$this->assertNotFalse( strpos( $url1, '&expires=' ) );
+		$this->assertStringContainsString( '&#038;signature=', $url1 );
+		$this->assertStringContainsString( '&#038;expires=', $url1 );
 
 		/* Test signed URL expiry */
 		parse_str(
@@ -304,10 +304,10 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Test for entry URL loading */
 		$_GET['lid'] = $entry['id'];
-		$this->assertNotFalse( strpos( $this->model->process( [ 'id' => '556690c67856b' ] ), 'Download PDF' ) );
+		$this->assertStringContainsString( 'Download PDF', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 
 		$_GET['lid'] = '5000';
-		$this->assertNotFalse( strpos( $this->model->process( [ 'id' => '556690c67856b' ] ), '<pre class="gravitypdf-error">' ) );
+		$this->assertStringContainsString( '<pre class="gravitypdf-error">', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 
 		/* Test we get no error when they are disabled globally */
 		global $gfpdf;
@@ -316,7 +316,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$settings['debug_mode'] = 'No';
 		$options->update_settings( $settings );
 
-		$this->assertFalse( strpos( $this->model->process( [ 'id' => '556690c67856b' ] ), '<pre class="gravitypdf-error">' ) );
+		$this->assertStringNotContainsString( '<pre class="gravitypdf-error">', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 
 		wp_set_current_user( 0 );
 	}

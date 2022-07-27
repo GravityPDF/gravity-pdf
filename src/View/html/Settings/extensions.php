@@ -42,7 +42,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</form>
 
 	<?php
-	/* @TODO */
 	do_action( 'gfpdf_post_extensions_settings_page' );
 	?>
 </div>

@@ -239,6 +239,14 @@ class Test_Addon extends WP_UnitTestCase {
 
 		add_filter( 'pre_http_request', $api_response );
 
+		$this->addon->update_license_info(
+			[
+				'license' => '12345',
+				'status'  => 'active',
+				'message' => '',
+			]
+		);
+
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_' . $this->addon->get_slug() . '_license_check' ) );
 		$this->assertFalse( $this->addon->schedule_license_check() );
 		$this->assertNotFalse( wp_next_scheduled( 'gfpdf_' . $this->addon->get_slug() . '_license_check' ) );

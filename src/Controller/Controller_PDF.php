@@ -263,7 +263,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			'lid'      => (int) explode( ',', $_GET['lid'] )[0],
 			'fid'      => (int) $_GET['fid'],
 			'aid'      => ( isset( $_GET['aid'] ) ) ? (int) $_GET['aid'] : false,
-			'template' => substr( $_GET['template'], 0, -4 ), /* strip .php from the template name */
+			'template' => sanitize_html_class( substr( $_GET['template'], 0, -4 ) ), /* strip .php from the template name */
 			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
 		];
 
@@ -365,7 +365,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* only display detailed error to admins */
 		$whitelist_errors = [ 'timeout_expired', 'access_denied' ];
 		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors, true ) ) {
-			wp_die( $error->get_error_message() );
+			wp_die( esc_html( $error->get_error_message() ) );
 		} else {
 			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
 		}

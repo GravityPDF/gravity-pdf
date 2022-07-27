@@ -379,10 +379,16 @@ class Helper_Templates {
 	public function get_template_info_by_path( $template_path, $cache_name = '', $cache_time = 604800 ) {
 		$options = \GPDFAPI::get_options_class();
 		$debug   = $options->get_option( 'debug_mode', 'No' );
+		$cache   = [];
 
 		if ( $debug === 'No' ) {
 			$cache_name = ! empty( $cache_name ) ? $cache_name : $this->data->template_transient_cache;
 			$cache      = get_transient( $cache_name );
+
+			/* There may be no transient and we got a non-array. If that occurs reset $cache */
+			if ( ! is_array( $cache ) ) {
+				$cache = [];
+			}
 
 			if ( isset( $cache[ $template_path ] ) ) {
 				return $cache[ $template_path ];
@@ -405,7 +411,6 @@ class Helper_Templates {
 
 		/* Save the results to a transient so we don't hit the disk every page load */
 		if ( $debug === 'No' ) {
-			$cache                   = is_array( $cache ) ? $cache : [];
 			$cache[ $template_path ] = $info;
 
 			set_transient( $cache_name, $cache, $cache_time );
@@ -517,13 +522,15 @@ class Helper_Templates {
 	public function get_config_class( $template_id ) {
 
 		/* Allow a user to change the current tempalte configuration file if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_form' ) ) {
 			$template_id = rgget( 'template' );
 
 			/* Handle legacy v3 URL structure and strip .php from the end of the template */
 			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
 				$template_id = substr( $template_id, 0, -4 );
 			}
+
+			$template_id = sanitize_html_class( $template_id );
 		}
 
 		try {
@@ -585,7 +592,7 @@ class Helper_Templates {
 
 		/* Try and load the file if the class doesn't exist */
 		if ( ! class_exists( $fqcn ) && is_file( $file ) && is_readable( $file ) ) {
-			require_once( $file );
+			require_once $file;
 		}
 
 		/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */

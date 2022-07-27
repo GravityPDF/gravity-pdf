@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php if ( sizeof( $args['template_files'] ) > 0 ): ?>
 				<ul>
 					<?php foreach ( $args['template_files'] as $file ): ?>
-						<li><?php echo basename( $file ); ?></li>
+						<li><?php echo esc_html( basename( $file ) ); ?></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
@@ -90,7 +90,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="font-settings" style="display: none">
 
 		<form method="post">
-			<input type="hidden" name="wpnonce" value="<?php echo wp_create_nonce( 'gfpdf_font_nonce' ); ?>"/>
+			<input type="hidden" name="wpnonce" value="<?php echo esc_attr( wp_create_nonce( 'gfpdf_font_nonce' ) ); ?>"/>
 
 			<div class="font-selector">
 				<label><?php esc_html_e( 'Font Name', 'gravity-forms-pdf-extended' ); ?> <span class="gfield_required">*</span></label>

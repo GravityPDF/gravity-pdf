@@ -102,7 +102,7 @@ class Helper_Misc {
 	public function is_gfpdf_settings_tab( $name ) {
 		if ( is_admin() ) {
 			if ( $this->is_gfpdf_page() ) {
-				$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'general';
+				$tab = ( isset( $_GET['tab'] ) ) ? sanitize_key( $_GET['tab'] ) : 'general';
 
 				if ( $name === $tab ) {
 					return true;
@@ -686,20 +686,9 @@ class Helper_Misc {
 		$override = ( isset( $settings['public_access'] ) && $settings['public_access'] === 'Yes' ) ? true : false;
 
 		if ( $leads && ( $override === true || $this->gform->has_capability( 'gravityforms_view_entries' ) ) ) {
-			$ids = explode( ',', $leads );
+			$ids = array_filter( array_map( 'intval', explode( ',', $leads ) ) );
 
-			/* ensure all passed ids are integers */
-			array_walk(
-				$ids,
-				function( &$id ) {
-					$id = (int) $id;
-				}
-			);
-
-			/* filter our any zero-value ids */
-			$ids = array_filter( $ids );
-
-			if ( sizeof( $ids ) > 0 ) {
+			if ( count( $ids ) > 0 ) {
 				return $ids;
 			}
 		}
@@ -875,7 +864,7 @@ class Helper_Misc {
 			$entry_details_file = GFCommon::get_base_path() . '/entry_detail.php';
 
 			if ( is_file( $entry_details_file ) ) {
-				require_once( $entry_details_file );
+				require_once $entry_details_file;
 			}
 		}
 	}

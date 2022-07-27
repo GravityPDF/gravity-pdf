@@ -270,6 +270,10 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		$settings['save'] = 'No';
 		$this->assertSame( false, $this->model->maybe_always_save_pdf( $settings ) );
+
+		add_filter( 'gfpdf_post_save_pdf', '__return_true' );
+		$this->assertSame( true, $this->model->maybe_always_save_pdf( $settings ) );
+		remove_filter( 'gfpdf_post_save_pdf', '__return_true' );
 	}
 
 	/**

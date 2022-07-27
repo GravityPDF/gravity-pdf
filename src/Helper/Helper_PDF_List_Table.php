@@ -135,7 +135,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$singular = rgar( $this->_args, 'singular' );
 		?>
 
-		<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0">
+		<table class="wp-list-table <?php echo esc_attr( implode( ' ', $this->get_table_classes() ) ); ?>" cellspacing="0">
 			<thead>
 			<tr>
 				<?php $this->print_column_headers(); ?>
@@ -145,7 +145,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			<tbody id="the-list" 
 			<?php
 			if ( $singular ) {
-				echo " class='list:$singular'";
+				echo ' class="list:' . esc_attr( $singular ) . '"';
 			}
 			?>
 			>
@@ -171,11 +171,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function single_row( $item ) {
-		static $row_class = '';
-
-		$row_class = ( $row_class === '' ? 'class="alternate"' : $row_class );
-
-		echo '<tr id="gfpdf-' . $item['id'] . '" ' . $row_class . '>';
+		echo '<tr id="gfpdf-' . esc_attr( $item['id'] ) . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
 	}
@@ -201,7 +197,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_list_column_id/ for more details about this action */
 			do_action( $action, $item );
 		} else {
-			echo rgar( $item, $column );
+			echo wp_kses_post( rgar( $item, $column ) );
 		}
 	}
 
@@ -222,7 +218,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		<img data-id="<?php echo esc_attr( $item['id'] ); ?>" data-nonce="<?php echo esc_attr( $state_nonce ); ?>"
 			 data-fid="<?php echo esc_attr( $form_id ); ?>"
-			 src="<?php echo $this->gform->get_plugin_url(); ?>/images/active<?php echo (int) $is_active; ?>.png"
+			 src="<?php echo $this->gform->get_plugin_url(); ?>/images/active<?php echo esc_attr( (int) $is_active ); ?>.png"
 			 style="cursor: pointer;margin:-1px 0 0 8px;"
 			 alt="<?php $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
 			 title="<?php echo $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
@@ -253,7 +249,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			}
 		}
 
-		echo implode( ', ', $notification_names );
+		echo esc_html( implode( ', ', $notification_names ) );
 	}
 
 	/**
@@ -297,7 +293,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			$template_name  = $this->templates->maybe_add_template_compatibility_notice( $template['template'], $template['required_pdf_version'] );
 
 			?>
-			<strong><?php echo $template_group; ?></strong> <?php echo $template_name; ?>
+			<strong><?php echo esc_html( $template_group ); ?></strong> <?php echo esc_html( $template_name ); ?>
 			<?php
 		}
 	}
@@ -316,9 +312,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
 		$actions = [
-			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
-			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
-			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
+			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
+			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . esc_attr( $item['id'] ) . '" class="submitduplicate" data-nonce="' . esc_attr( $duplicate_nonce ) . '"  data-fid="' . esc_attr( $form_id ) . '">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
+			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . esc_attr( $item['id'] ) . '" data-nonce="' . esc_attr( $delete_nonce ) . '" data-fid="' . esc_attr( $form_id ) . '">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 		];
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_actions/ for more details about this filter */
@@ -326,7 +322,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		?>
 
-		<a href="<?php echo $edit_url; ?>"><strong><?php echo rgar( $item, 'name' ); ?></strong></a>
+		<a href="<?php echo esc_url( $edit_url ); ?>"><strong><?php echo esc_html( rgar( $item, 'name' ) ); ?></strong></a>
 		<div class="row-actions">
 
 			<?php
@@ -336,8 +332,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 				foreach ( $actions as $key => $html ) {
 					$divider = $key === $last_key ? '' : ' | ';
 					?>
-					<span class="<?php echo $key; ?>">
-						<?php echo $html . $divider; ?>
+					<span class="<?php echo esc_attr( $key ); ?>">
+						<?php echo wp_kses_post( $html . $divider ); ?>
 					</span>
 					<?php
 				}
@@ -355,6 +351,6 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function no_items() {
-		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( [ 'pid' => 0 ] ) . "'>", '</a>' );
+		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-forms-pdf-extended' ), "<a href='" . esc_url( add_query_arg( [ 'pid' => 0 ] ) ) . "'>", '</a>' );
 	}
 }

@@ -176,8 +176,8 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @since 4.0
 	 */
 	public function maybe_save_pdf_settings() {
-		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : false;
-		$pdf_id  = ( isset( $_GET['pid'] ) ) ? $_GET['pid'] : false;
+		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : 0;
+		$pdf_id  = ( isset( $_GET['pid'] ) ) ? sanitize_html_class( $_GET['pid'] ) : false;
 
 		/* Load the add/edit page */
 		if ( $pdf_id !== false && rgpost( 'gfpdf_save_pdf' ) ) {
@@ -196,7 +196,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Determine whether to load the add/edit page, or the list view */
 		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : false;
-		$pdf_id  = ( isset( $_GET['pid'] ) ) ? $_GET['pid'] : false;
+		$pdf_id  = ( isset( $_GET['pid'] ) ) ? sanitize_html_class( $_GET['pid'] ) : false;
 
 		/* Load the add/edit page */
 		if ( $pdf_id !== false ) {
