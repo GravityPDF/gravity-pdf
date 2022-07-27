@@ -77,6 +77,7 @@ class Test_Kses extends WP_UnitTestCase {
 			['<tocpagebreak toc-odd-header-name="A" toc-odd-footer-name="B" toc-odd-header-value="C" toc-odd-footer-value="D" />'],
 			[ '<tocpagebreak toc-bookmarkText="A" toc-resetpagenum="1" toc-resetpagestyle="A" toc-suppress="1" />' ],
 			[ '<tocentry content="A" level="B" name="C" />' ],
+			[ '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII" alt="Icon" width="200mm" />']
 		];
 	}
 

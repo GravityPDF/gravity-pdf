@@ -43,7 +43,9 @@ class Kses {
 	 */
 	public static function parse( string $html ): string {
 		add_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
-		$html = wp_kses( $html, self::get_allowed_pdf_tags() );
+
+		$html = wp_kses( $html, self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
+
 		remove_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
 		return $html;
@@ -290,7 +292,7 @@ class Kses {
 			'name'    => true,
 		];
 
-		return $tags;
+		return apply_filters( 'gfpdf_wp_kses_allowed_html', $tags );
 	}
 
 	/**
@@ -307,7 +309,7 @@ class Kses {
 			return $styles;
 		}
 
-		return array_merge(
+		$styles = array_merge(
 			$styles,
 			[
 				'background-image-opacity',
@@ -322,5 +324,26 @@ class Kses {
 				'z-index',
 			]
 		);
+
+		return apply_filters( 'gfpdf_wp_kses_allowed_pdf_styles', $styles );
+	}
+
+	/**
+	 * A custom list of allowed protocols in the PDF
+	 *
+	 * @param array|null $protocols
+	 *
+	 * @return array
+	 *
+	 * @since 6.4.2
+	 */
+	public static function get_allowed_pdf_protocols( $protocols = null ): array {
+		if ( ! is_array( $protocols ) ) {
+			$protocols = wp_allowed_protocols();
+		}
+
+		$protocols[] = 'data';
+
+		return apply_filters( 'gfpdf_wp_kses_allowed_pdf_protocols', $protocols );
 	}
 }
