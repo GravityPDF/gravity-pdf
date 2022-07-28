@@ -222,7 +222,7 @@ class Helper_Misc {
 					}
 				}
 
-				$html = $wrapper->top( 'html' )->innerHTML5();
+				$html = $wrapper->top( 'html' )->innerHTML();
 
 				/* Remove empty <p></p> tags */
 				$html = str_replace( '<p></p>', '', $html );

@@ -47,7 +47,7 @@ class Field_V3_Products extends Field_Products {
 
 		/* Pull out the .entry-products table from the HTML using querypath */
 		$qp    = new Helper_QueryPath();
-		$table = $qp->html5( $html, 'div.inner-container' )->innerHTML5();
+		$table = $qp->html5( $html, 'div.inner-container' )->innerHTML();
 
 		$html  = $heading;
 		$html .= $table;
