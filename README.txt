@@ -110,6 +110,7 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 = 6.4.2 =
 * Bug: Allow `data` protocol so Base 64-encoded images can be correctly displayed in Core/Universal templates
 * Bug: Fix Core Font Installer problem when running older versions of WordPress (5.3 to 5.8)
+* Bug: Fix fatal return type mismatch error if `safe_style_css` filter has been implemented incorrectly
 
 = 6.4.1 =
 * Bug: Fix PDF display issues with the Survey, Poll, Post Category, and Post Custom Fields

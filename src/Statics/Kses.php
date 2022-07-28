@@ -41,7 +41,7 @@ class Kses {
 	 *
 	 * @since 6.4.0
 	 */
-	public static function parse( string $html ): string {
+	public static function parse( string $html ) {
 		add_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
 		$html = wp_kses( $html, self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
@@ -60,7 +60,7 @@ class Kses {
 	 *
 	 * @since 6.4.0
 	 */
-	public static function get_allowed_pdf_tags( $tags = null ): array {
+	public static function get_allowed_pdf_tags( $tags = null ) {
 		$tags = is_array( $tags ) ? $tags : wp_kses_allowed_html( 'post' );
 
 		/* Form fields */
@@ -304,7 +304,7 @@ class Kses {
 	 *
 	 * @since 6.4.0
 	 */
-	public static function get_allowed_pdf_styles( $styles ): array {
+	public static function get_allowed_pdf_styles( $styles ) {
 		if ( ! is_array( $styles ) ) {
 			return $styles;
 		}
@@ -337,7 +337,7 @@ class Kses {
 	 *
 	 * @since 6.4.2
 	 */
-	public static function get_allowed_pdf_protocols( $protocols = null ): array {
+	public static function get_allowed_pdf_protocols( $protocols = null ) {
 		if ( ! is_array( $protocols ) ) {
 			$protocols = wp_allowed_protocols();
 		}
