@@ -101,6 +101,9 @@ _Note: When Gravity Forms isn't installed and you activate Gravity PDF we displa
 
 == Changelog ==
 
+= 5.4.2 =
+* Bug: Remove wp_json_file_decode() function to fix Core Font Installer issue on pre-WordPress 5.9 versions
+
 = 5.4.1 =
 * Security: Backport additional validation checks to the Core Font installer
 * Security: Backport fix for potential XSS attack by escaping URL returned from add_query_args() on the PDF List or PDF Form Settings pages
