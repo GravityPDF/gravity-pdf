@@ -1,12 +1,16 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 5.3.4
+Version: 5.3.5
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
 Text Domain: gravity-forms-pdf-extended
 Domain Path: /src/assets/languages
+Requires at least: 4.8
+Requires PHP: 5.6
+License: GPL-2.0
+License URI: https://opensource.org/licenses/gpl-2.0.php
 */
 
 /**
@@ -23,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '5.3.4' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '5.3.5' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -390,7 +394,7 @@ class GFPDF_Major_Compatibility_Checks {
 			<p><?php esc_html_e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravity-forms-pdf-extended' ); ?></p>
 			<ul style="padding-bottom: 0.5em">
 				<?php foreach ( $this->notices as $notice ): ?>
-					<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
+					<li style="padding-left: 20px;list-style: inside"><?php echo wp_kses_post( $notice ); ?></li>
 				<?php endforeach; ?>
 			</ul>
 		</div>

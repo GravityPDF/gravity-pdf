@@ -94,33 +94,67 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 		$this->misc->handle_ajax_authentication( 'Save Core Font', 'gravityforms_edit_settings' );
 
 		/* Download and save our font */
-		$fontname = isset( $_POST['font_name'] ) ? $_POST['font_name'] : '';
-		$results  = $this->download_and_save_font( $fontname );
+		$results = $this->download_and_save_font();
 
 		/* Return results */
 		header( 'Content-Type: application/json' );
-		echo json_encode( $results );
+		echo wp_json_encode( $results );
 		wp_die();
 	}
 
 	/**
 	 * Stream files from remote server and save them locally
 	 *
-	 * @param $fontname
-	 *
 	 * @since 5.0
 	 *
 	 * @return bool
 	 */
-	protected function download_and_save_font( $fontname ) {
+	protected function download_and_save_font() {
 
-		/* Only the font name is passed via AJAX. The Repo we download from is fixed (prevent security issues) */
+		/* Verify the font name provided is approved */
+		$core_font_list = wp_json_file_decode( __DIR__ . '/../../dist/payload/core-fonts.json', [ 'associative' => true ] );
+		if ( $core_font_list === null ) {
+			$this->log->error( 'Core font list could not be loaded' );
+
+			return false;
+		}
+
+		/* Look for a file in the font list with a matching name */
+		$matching_fonts = array_filter(
+			$core_font_list,
+			function( $item ) {
+				/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
+				return $item['name'] === ( isset( $_POST['font_name'] ) ? $_POST['font_name'] : '' );
+			}
+		);
+
+		$matching_fonts = array_values( $matching_fonts );
+
+		if ( ! isset( $matching_fonts[0] ) ) {
+			$this->log->error(
+				'Core Font not on the approved list',
+				[
+					/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
+					'name' => ( isset( $_POST['font_name'] ) ? $_POST['font_name'] : '' ),
+				]
+			);
+
+			return false;
+		}
+
+		/* Extra check to verify the download URL points to the correct repo */
+		if ( strpos( $matching_fonts[0]['download_url'], $this->github_repo ) !== 0 ) {
+			$this->log->error( 'Core font list is corrupted' );
+
+			return false;
+		}
+
 		$res = wp_remote_get(
-			$this->github_repo . $fontname,
+			$matching_fonts[0]['download_url'],
 			[
 				'timeout'  => 60,
 				'stream'   => true,
-				'filename' => $this->data->template_font_location . $fontname,
+				'filename' => $this->data->template_font_location . $matching_fonts[0]['name'],
 			]
 		);
 
@@ -131,7 +165,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			$this->log->error(
 				'Core Font Download Failed',
 				[
-					'name'             => $fontname,
+					'name'             => $matching_fonts[0],
 					'WP_Error_Message' => $res->get_error_message(),
 					'WP_Error_Code'    => $res->get_error_code(),
 				]
@@ -151,7 +185,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
-		/* If we got here, the call was successfull */
+		/* If we got here, the call was successful */
 
 		return true;
 	}

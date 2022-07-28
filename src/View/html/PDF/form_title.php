@@ -17,5 +17,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="row-separator">
-	<h3 id="form_title"><?php echo $form['title']; ?></h3>
+	<h3 id="form_title"><?php echo esc_html( $form['title'] ); ?></h3>
 </div>

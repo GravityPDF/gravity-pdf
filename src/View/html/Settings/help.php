@@ -53,21 +53,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div id="dashboard-widgets" class="columns-2">
 			<div class="postbox-container">
-				<a href="https://gravitypdf.com/documentation/v5/five-minute-install/">
+				<a href="https://docs.gravitypdf.com/v5/five-minute-install/">
 					<span><?php esc_html_e( 'Getting Started', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php esc_html_e( 'Take a look at our quick-start guide and get Gravity PDF up and running in 5 minutes flat!', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
-				<a href="https://gravitypdf.com/documentation/v5/user-installation/">
+				<a href="https://docs.gravitypdf.com/v5/user-installation">
 					<span><?php esc_html_e( 'Comprehensive Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php esc_html_e( 'We’ve got in-depth articles to help you learn the ins and outs of Gravity PDF. From the basic setup to PDF security.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
-				<a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">
+				<a href="https://docs.gravitypdf.com/v5/developer-start-customising">
 					<span><?php esc_html_e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php esc_html_e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
@@ -76,17 +76,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="postbox-container">
 				<strong><?php esc_html_e( 'Common Questions', 'gravity-forms-pdf-extended' ); ?></strong><br>
 				<ul>
-					<li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/">How do I setup a PDF on my form?</a></li>
-					<li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/#notifications">How do you attach the PDF to a notification email?</a></li>
-					<li><a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">How do you add a PDF download link to the form's confirmation page?</a></li>
-					<li><a href="https://gravitypdf.com/documentation/v5/user-managing-pdfs/">How can I add two or more PDFs to a single form?</a></li>
-					<li><a href="https://gravitypdf.com/documentation/v5/gravityview-support/">How can I allow logged in users to download their past PDFs?</a></li>
+					<li><a href="https://docs.gravitypdf.com/v5/user-setup-pdf">How do I setup a PDF on my form?</a></li>
+					<li><a href="https://docs.gravitypdf.com/v5/user-setup-pdf#notifications">How do you attach the PDF to a notification email?</a></li>
+					<li><a href="https://docs.gravitypdf.com/v5/user-shortcodes">How do you add a PDF download link to the form's confirmation page?</a></li>
+					<li><a href="https://docs.gravitypdf.com/v5/user-managing-pdfs">How can I add two or more PDFs to a single form?</a></li>
+					<li><a href="https://docs.gravitypdf.com/v5/gravityview-support">How can I allow logged in users to download their past PDFs?</a></li>
 				</ul>
 			</div>
 		</div>
 
 		<div class="center">
-			<a href="https://gravitypdf.com/documentation/v5/" class="button button-primary button-large"><?php esc_html_e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="https://docs.gravitypdf.com/v5/five-minute-install" class="button button-primary button-large"><?php esc_html_e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
 			<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
 
 			<p>

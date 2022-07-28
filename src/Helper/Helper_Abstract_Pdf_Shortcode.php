@@ -92,7 +92,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public abstract function process( $attributes );
+	abstract public function process( $attributes );
 
 	/**
 	 * Try get the Entry ID from specific $_GET keys

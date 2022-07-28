@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Statics\Kses;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -331,9 +332,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_form_settings() {
 
-		/* get GF settings */
-		$form_id = ( ! empty( $_GET['id'] ) ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
-		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
+		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
+		$form_id = ! empty( $_GET['id'] ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
+		$pid     = ! empty( $_GET['pid'] ) ? sanitize_html_class( rgget( 'pid' ) ) : sanitize_html_class( rgpost( 'gform_pdf_id' ) );
+		/* phpcs:enable */
 
 		/* return early if no ID set */
 		if ( ! $form_id || ! $pid ) {
@@ -591,7 +593,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$this->data->form_settings[ $form_id ] = $options;
 			}
 
-			/* true if successful, false if failed */
 			return $did_update;
 		}
 
@@ -654,8 +655,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 				$this->data->form_settings[ $form_id ] = $options;
 			}
-
-			/* true if successful, false if failed */
 
 			return $did_update;
 		}
@@ -1109,7 +1108,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		parse_str( $_POST['_wp_http_referer'], $referrer );
 
 		$all_settings = $this->get_registered_fields();
-		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
+		$tab          = isset( $referrer['tab'] ) ? sanitize_key( $referrer['tab'] ) : 'general';
 		$settings     = ( ! empty( $all_settings[ $tab ] ) && $tab !== 'tools' ) ? $all_settings[ $tab ] : [];
 
 		/*
@@ -1203,7 +1202,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 *
-	 * @param array $input The field value
+	 * @param string $input The field value
 	 *
 	 * @return string $input Sanitizied value
 	 */
@@ -1216,7 +1215,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 *
-	 * @param array $input The field value
+	 * @param string $input The field value
 	 *
 	 * @return string $input Sanitizied value
 	 */
@@ -1252,7 +1251,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param array  $input    All user fields
 	 * @param array  $settings The field settings
 	 *
-	 * @return string $input Sanitizied value
+	 * @return mixed $input Sanitizied value
 	 */
 	public function sanitize_all_fields( $value, $key, $input, $settings ) {
 
@@ -1260,57 +1259,40 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$settings['type'] = '';
 		}
 
-		/*
-		 * Skip over any fields that shouldn't have sanitisation
-		 * By default, that's the JSON-encoded conditionalLogic field
-		 *
-		 * @since 4.2.2
-		 */
-		$ignored_fields = apply_filters(
-			'gfpdf_sanitize_ignored_fields',
-			[ 'conditionalLogic' ],
-			$value,
-			$key,
-			$input,
-			$settings
-		);
-
-		if ( in_array( $key, $ignored_fields, true ) ) {
-			return $value;
-		}
-
 		switch ( $settings['type'] ) {
+			case 'conditional_logic':
+				return ! empty( $value ) ? wp_json_encode( \GFFormsModel::sanitize_conditional_logic( json_decode( $value, true ) ) ) : '';
+
 			case 'rich_editor':
-				/**
-				 * Don't do any sanitization on input, which was causing problems with merge tags in HTML attributes.
-				 * See https://github.com/GravityPDF/gravity-pdf/issues/492 for more details.
-				 *
-				 * @internal Devs should run the field through wp_kses_post() on output to correctly sanitize
-				 * @since 4.0.6
-				 */
+				if ( strpos( $value, 'telnet://{' ) === false ) {
+					/*
+					 * So merge tags can be used inside HTML attributes (like src="{tag:20}"), but the rich editor content
+					 * can still be sanitized, we'll replace the opening { tag with a valid protocol that isn't very common.
+					 * Doing this ensures the merge tag does not get malformed during sanitizing.
+					 * When outputting rich text, it is important that the merge tags get processed first and then the output
+					 * run through Kses::parse() or Kses::output() to ensure the HTML safe.
+					 */
+					$pattern = '{[^{]*?:(\d+(\.\d+)?)(:(.*?))?}';
+					$value   = preg_replace( "/$pattern/mi", 'telnet://$0', $value );
+					$value   = Kses::parse( $value );
+					$value   = preg_replace( "/telnet:\/\/($pattern)/mi", '$1', $value );
+				} else {
+					/* Don't encode/decode merge tag before sanitizing */
+					$value = Kses::parse( $value );
+				}
+
 				return $value;
-			break;
 
 			case 'textarea':
-				return wp_kses_post( $value );
-			break;
+				return sanitize_textarea_field( $value );
 
 			/* treat as plain text */
 			default:
 				if ( is_array( $value ) ) {
-					array_walk_recursive(
-						$value,
-						function( &$item ) {
-							$item = wp_strip_all_tags( $item );
-						}
-					);
-
-					return $value;
-				} else {
-					return wp_strip_all_tags( $value );
+					return array_map( 'sanitize_text_field', $value );
 				}
 
-				break;
+				return sanitize_text_field( $value );
 		}
 	}
 
@@ -1389,7 +1371,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* Fix up our conditional logic array so it returns a string value */
 		if ( $args['id'] === 'conditionalLogic' && isset( $pdf_form_settings['conditionalLogic'] ) ) {
-			$pdf_form_settings['conditionalLogic'] = json_encode( $pdf_form_settings['conditionalLogic'] );
+			$pdf_form_settings['conditionalLogic'] = wp_json_encode( $pdf_form_settings['conditionalLogic'] );
 		}
 
 		switch ( $args['type'] ) {

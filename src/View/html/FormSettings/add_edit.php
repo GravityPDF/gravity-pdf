@@ -22,9 +22,9 @@ global $wp_settings_fields;
 <script type="text/javascript">
 	<?php GFCommon::gf_global(); ?>
 	<?php GFCommon::gf_vars(); ?>
-	var form = <?php echo json_encode( $args['form'] ); ?>;
-	var gfpdf_current_pdf = <?php echo json_encode( $args['pdf'] ); ?>;
-	var entry_meta = <?php echo json_encode( $args['entry_meta'] ); ?>;
+	var form = <?php echo wp_json_encode( $args['form'] ); ?>;
+	var gfpdf_current_pdf = <?php echo wp_json_encode( $args['pdf'] ); ?>;
+	var entry_meta = <?php echo wp_json_encode( $args['entry_meta'] ); ?>;
 
 	<?php GFFormSettings::output_field_scripts(); ?>
 </script>
@@ -69,8 +69,8 @@ global $wp_settings_fields;
 
 	<?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ); ?>
 
-	<input type="hidden" id="gform_pdf_id" name="gform_pdf_id" value="<?php echo $args['pdf_id']; ?>"/>
-	<input type="hidden" id="gform_id" name="gform_id" value="<?php echo $args['form']['id']; ?>"/>
+	<input type="hidden" id="gform_pdf_id" name="gform_pdf_id" value="<?php echo esc_attr( $args['pdf_id'] ); ?>"/>
+	<input type="hidden" id="gform_id" name="gform_id" value="<?php echo esc_attr( $args['form']['id'] ); ?>"/>
 
 
 	<div id="gfpdf-general-options" class="gfpdf-tab-container">
@@ -112,7 +112,7 @@ global $wp_settings_fields;
 	</div>
 
 	<p class="submit">
-		<input class="button-primary" type="submit" value="<?php echo $args['button_label']; ?>" name="save"/>
+		<input class="button-primary" type="submit" value="<?php echo esc_attr( $args['button_label'] ); ?>" name="save"/>
 	</p>
 </form>
 

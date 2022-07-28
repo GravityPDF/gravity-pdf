@@ -318,7 +318,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$domain   = $_SERVER['HTTP_HOST'];
 				$request  = $_SERVER['REQUEST_URI'];
 
-				$url = $protocol . $domain . $request;
+				$url = esc_url_raw( $protocol . $domain . $request );
 
 				if ( $this->url_signer->verify( $url ) ) {
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_owner_restriction' ], 40 );
@@ -398,14 +398,15 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		if ( $type === 'all' || $type === 'logged_out' ) {
-			$user_ip   = trim( GFFormsModel::get_ip() );
-			$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1';
+			$user_ip   = filter_var( GFFormsModel::get_ip(), FILTER_VALIDATE_IP );
+			$server_ip = filter_var( isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1', FILTER_VALIDATE_IP );
+			$entry_ip  = filter_var( $entry['ip'], FILTER_VALIDATE_IP );
 
 			/* check if the user IP matches the entry IP */
 			if (
-				$entry['ip'] === $user_ip &&
-				$entry['ip'] !== $server_ip &&
-				strlen( $user_ip ) !== 0
+				! empty( $entry_ip ) &&
+				$entry_ip === $user_ip &&
+				$entry_ip !== $server_ip
 			) {
 				$owner = true;
 			}
@@ -782,7 +783,9 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * @since 4.2
 		 */
-		return apply_filters( 'gfpdf_get_pdf_url', $url, $pid, $id, $download, $print, $esc );
+		$url = apply_filters( 'gfpdf_get_pdf_url', $url, $pid, $id, $download, $print, $esc );
+
+		return esc_url_raw( $url );
 	}
 
 	/**
@@ -1062,14 +1065,17 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Determine if the PDF should be saved to disk
 	 *
 	 * @param  array $settings The current Gravity PDF Settings
+	 * @param int   $form_id  The current Form ID
 	 *
 	 * @return boolean
 	 *
 	 * @since 4.0
 	 */
-	public function maybe_always_save_pdf( $settings ) {
+	public function maybe_always_save_pdf( $settings, $form_id = 0 ) {
 
-		$save = false;
+		$save = has_filter( 'gfpdf_post_save_pdf' ) || has_filter( 'gfpdf_post_save_pdf_' . $form_id );
+
+		/* Legacy / Backwards compatible */
 		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) === 'yes' ) {
 			$save = true;
 		}
@@ -1077,7 +1083,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * @since 4.2
 		 */
-		return apply_filters( 'gfpdf_maybe_always_save_pdf', $save, $settings );
+		return apply_filters( 'gfpdf_maybe_always_save_pdf', $save, $settings, $form_id );
 	}
 
 	/**
@@ -1106,7 +1112,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
 
 				/* Only generate if the PDF wasn't created during the notification process */
-				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings ) ) {
+				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings, $entry['form_id'] ) ) {
 					$this->generate_and_save_pdf( $entry, $settings );
 				}
 			}
@@ -1213,9 +1219,14 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function cleanup_pdf( $entry, $form ) {
 
+		/* Exit early if background processing is enabled */
+		if ( $this->options->get_option( 'background_processing', 'Disable' ) === 'Enable' ) {
+			return;
+		}
+
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
-		if ( sizeof( $pdfs ) > 0 ) {
+		if ( count( $pdfs ) > 0 ) {
 
 			/* loop through each PDF config */
 			foreach ( $pdfs as $pdf ) {

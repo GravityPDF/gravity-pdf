@@ -136,7 +136,7 @@ class View_Settings extends Helper_Abstract_View {
 
 		/* Set up any variables we need for the view and display */
 		$vars = [
-			'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
+			'selected' => isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general',
 			'tabs'     => $this->get_avaliable_tabs(),
 			'data'     => $this->data,
 		];

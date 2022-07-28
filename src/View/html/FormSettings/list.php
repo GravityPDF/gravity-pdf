@@ -24,7 +24,7 @@ $list_items = $args['list_items'];
 <h3>
 	<span>
 		<i class="fa fa-file-o"></i>
-		<?php echo $args['title']; ?>
+		<?php echo esc_html( $args['title'] ); ?>
 		<a id="add-new-pdf" class="add-new-h2" href="<?php echo esc_url( $args['add_new_url'] ); ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a>
 	</span>
 </h3>

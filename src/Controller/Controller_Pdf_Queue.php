@@ -341,14 +341,22 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 		$queue_data = apply_filters( 'gfpdf_queue_pre_pdf_creation', [], $entry, $form );
 
 		foreach ( $pdfs as $pdf ) {
+			$pdf_queue_data = [
+				'id'            => $this->get_queue_id( $form, $entry, $pdf ),
+				'func'          => '\GFPDF\Statics\Queue_Callbacks::create_pdf',
+				'args'          => [ $entry['id'], $pdf['id'] ],
+				'unrecoverable' => true,
+			];
+
+			/* Check if we need to save the PDF due to a filter */
+			if ( $this->model_pdf->maybe_always_save_pdf( $pdf, $form['id'] ) ) {
+				$queue_data[] = $pdf_queue_data;
+				continue;
+			}
+
 			foreach ( $notifications as $notification ) {
-				if ( $this->model_pdf->maybe_always_save_pdf( $pdf ) || $this->model_pdf->maybe_attach_to_notification( $notification, $pdf, $entry, $form ) ) {
-					$queue_data[] = [
-						'id'            => $this->get_queue_id( $form, $entry, $pdf ),
-						'func'          => '\GFPDF\Statics\Queue_Callbacks::create_pdf',
-						'args'          => [ $entry['id'], $pdf['id'] ],
-						'unrecoverable' => true,
-					];
+				if ( $this->model_pdf->maybe_attach_to_notification( $notification, $pdf, $entry, $form ) ) {
+					$queue_data[] = $pdf_queue_data;
 
 					/* Only queue each PDF once (even if attached to multiple notifications) */
 					break;
