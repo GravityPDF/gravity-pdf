@@ -90,6 +90,20 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 5.3.5 =
+* Security: Backport additional validation checks to the Core Font installer
+* Security: Backport fix for potential XSS attack by escaping URL returned from add_query_args() on the PDF List or PDF Form Settings pages
+* Security (Hardening): Backport late-escaping from Gravity PDF 6.4
+* Security (Hardening): Backport earlier sanitizing of user input
+* Security (Hardening): Backport custom PDF template filenames are now limited to the following characters: A-Za-z0-9_-
+* Security (Hardening): Backport ?html=1 and ?data=1 developer helper parameters now only work in non-production environments (WP_ENVIRONMENT_TYPE !== 'production'), or when Gravity PDF Debug Mode is explicitly enabled
+* Security (Hardening): Backport prevent directory traversal when loading the various Gravity PDF UI components
+* Security (Hardening): Backport PDF Form Settings capability check from `gravityforms_edit_settings` to `gravityforms_edit_forms`
+* Bug: Backport PHP8.1 type conversion warning in the template cache when transient’s are flushed
+* Bug: Backport background queue from continuing if retry limit reached on unrecoverable task (like generating the PDF)
+* Bug: Backport a race condition fix when using Background Processing that could see the PDF deleted before being attached to notifications
+* Bug: Adjust all links to point to https://docs.gravitypdf.com
+
 = 5.3.4 =
 * Security: Resolve XSS issue on PDF List page
 * Security: Resolve authenticated arbitrary PHP file Deletion when using the PDF Template Manager (by default, this affects Administrator accounts only)
