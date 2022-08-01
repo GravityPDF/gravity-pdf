@@ -21,6 +21,6 @@ $is_download = $args['view'] === 'download';
 ?>
 
 |
-<a href="<?php echo $is_download ? esc_url( $args['pdf']['download'] ) : esc_url( $args['pdf']['view'] ); ?>" <?php echo $is_download ? 'target="_blank"' : ''; ?>>
+<a href="<?php echo $is_download ? esc_url( $args['pdf']['download'] ) : esc_url( $args['pdf']['view'] ); ?>" <?php echo $is_download ? '' : 'target="_blank"'; ?>>
 	<?php echo $is_download ? esc_html__( 'Download PDF', 'gravity-forms-pdf-extended' ) : esc_html__( 'View PDF', 'gravity-forms-pdf-extended' ); ?>
 </a>
