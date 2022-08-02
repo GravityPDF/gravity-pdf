@@ -120,7 +120,20 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @dataProvider provider_test_fix_header_footer
 	 */
 	public function test_fix_header_footer( $expected, $html ) {
-		$this->assertEquals( $expected, $this->misc->fix_header_footer( $html ) );
+		$test_html     = $this->misc->fix_header_footer( $html );
+		$minified_html = $this->minify( $test_html );
+
+		$this->assertEquals( $expected, $minified_html );
+	}
+
+	protected function minify($html) {
+		$html = preg_replace(
+			[ '/\n/', '/\t/', '/\>\s+\</' ],
+			[ '', '', '><' ],
+			$html
+		);
+
+		return $html;
 	}
 
 	/**
@@ -131,27 +144,27 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	public function provider_test_fix_header_footer() {
 		return [
 			[
-				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"></p>',
+				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"/></p>',
 				'<img src="my-image.jpg" alt="My Image" />',
 			],
 			[
-				'<div id="header"><img src="my-image.jpg" alt="My Image" class="header-footer-img"></div>',
+				'<div id="header"><img src="my-image.jpg" alt="My Image" class="header-footer-img"/></div>',
 				'<div id="header"><img src="my-image.jpg" alt="My Image" /></div>',
 			],
 			[
-				'<p><span>Intro</span> <img src="my-image.jpg" alt="My Image" class="header-footer-img"> <span>Outro</span></p>',
+				'<p><span>Intro</span><img src="my-image.jpg" alt="My Image" class="header-footer-img"/><span>Outro</span></p>',
 				'<span>Intro</span> <img src="my-image.jpg" alt="My Image" /> <span>Outro</span>',
 			],
 			[
-				'<p><b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" class="header-footer-img"></p>',
+				'<p><b>This is bold</b>. <i>This is italics</i><img src="image.jpg" class="header-footer-img"/></p>',
 				'<b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" />',
 			],
 			[
-				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"></p>',
+				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"/></p>',
 				'<img src="my-image.jpg" alt="My Image">',
 			],
 			[
-				'<p><div class="alternate"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"></div></p>',
+				'<p><div class="alternate"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"/></div></p>',
 				'<img src="my-image.jpg" alt="My Image" class="alternate" />',
 			],
 			[
@@ -163,11 +176,11 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 				'',
 			],
 			[
-				'<p><a href="#"><img src="my-image.jpg" alt="My Image" class="header-footer-img"></a></p>',
+				'<p><a href="#"><img src="my-image.jpg" alt="My Image" class="header-footer-img"/></a></p>',
 				'<a href="#"><img src="my-image.jpg" alt="My Image" /></a>',
 			],
 			[
-				'<p><div class="alternate"><a href="#"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"></a></div></p>',
+				'<p><div class="alternate"><a href="#"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"/></a></div></p>',
 				'<a href="#"><img src="my-image.jpg" alt="My Image" class="alternate" /></a>',
 			],
 		];
@@ -184,7 +197,8 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertFalse( strpos( PDF_PLUGIN_URL, $html ) );
 
 		$html = $this->misc->fix_header_footer( '<img src="http://test.com/image.png" alt="My Image" />' );
-		$this->assertEquals( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"></p>', $html );
+		$minified_html = $this->minify( $html );
+		$this->assertEquals( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"/></p>', $minified_html );
 	}
 
 	/**

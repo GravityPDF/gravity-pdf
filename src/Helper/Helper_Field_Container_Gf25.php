@@ -118,7 +118,7 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 				$qp       = new Helper_QueryPath();
 				$row_html = $qp->html5( $row_html, '.grid:last-of-type .inner-container' )
 						->css( 'width', '100%' )
-						->top( 'html' )->innerHTML5();
+						->top( 'html' )->innerHTML();
 			} catch ( \Exception $e ) {
 
 			}

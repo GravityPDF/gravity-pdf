@@ -73,7 +73,7 @@ class Field_Quiz extends Helper_Abstract_Fields {
 		 */
 		try {
 			$qp    = new Helper_QueryPath();
-			$value = $qp->html5( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'html' )->innerHTML5();
+			$value = $qp->html5( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'html' )->innerHTML();
 		} catch ( Exception $e ) {
 			$value = str_replace( '<img ', '<img class="gf-quiz-img" ', $value );
 		}
