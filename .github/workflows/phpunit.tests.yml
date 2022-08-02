@@ -126,8 +126,13 @@ jobs:
         run: yarn test:php:multisite --verbose
         continue-on-error: ${{ matrix.php == '8.1' }}
 
-      - name: Code Coverage
+      - name: Generate Code Coverage Report for PHP
         if: ${{ matrix.report }}
         run: |
-          yarn run test:php --do-not-cache-result --verbose --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml
-          bash <(curl -s https://codecov.io/bash);
+          yarn run test:php --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml
+
+      - name: Code Coverage Upload
+        uses: codecov/codecov-action@v3
+        if: ${{ matrix.report }}
+        with:
+          files: tmp/coverage/report-xml/php-coverage1.xml
