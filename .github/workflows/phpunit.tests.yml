@@ -108,10 +108,9 @@ jobs:
           php -i
           locale -a
 
-      # Force a latest version of @wordpress/env until a new version is tagged
       - name: Install Dependencies
         run: |
-          yarn add -D 'https://gitpkg.now.sh/WordPress/gutenberg/packages/env?trunk'
+          yarn
 
       - name: Install / Setup Gravity PDF + WordPress
         run: |
@@ -127,7 +126,6 @@ jobs:
         run: yarn test:php:multisite --verbose
         continue-on-error: ${{ matrix.php == '8.1' }}
 
-      # TODO: XDEBUG isnt working for unit tests https://github.com/WordPress/gutenberg/issues/42286
       - name: Code Coverage
         if: ${{ matrix.report }}
         run: |
