@@ -15,7 +15,7 @@ composer install
 composer run prefix
 
 # Start local environment
-npm run wp-env start -- --xdebug
+npm run wp-env start -- --xdebug=debug,coverage
 
 # Place CLI config file
 npm run wp-env run tests-wordpress cp /var/www/html/wp-content/plugins/gravity-pdf/bin/htaccess-sample /var/www/html/.htaccess
