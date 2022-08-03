@@ -65,7 +65,8 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 		$html = '';
 		if ( ! empty( $value['url'] ) ) {
 			$html  = '<a href="' . esc_url( $value['url'] ) . '" target="_blank">';
-			$html .= '<img width="150" src="' . esc_url( $value['url'] ) . '" />';
+			$html .= '<img width="150" src="' . ( $value['path'] !== $value['url'] ? esc_attr( $value['path'] ) : esc_url( $value['url'] ) ) . '" />';
+			$html .= '</a>';
 		}
 
 		/* Include title / caption / description if needed */
@@ -80,8 +81,6 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 		if ( ! empty( $value['description'] ) ) {
 			$html .= '<div class="gfpdf-post-image-description">' . esc_html( $value['description'] ) . '</div>';
 		}
-
-		$html .= '</a>';
 
 		return parent::html( $html );
 	}
@@ -131,13 +130,13 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 			$value = explode( '|:|', $this->get_value() );
 
 			$img['url']         = ( isset( $value[0] ) ) ? esc_url( $value[0] ) : '';
-			$img['path']        = ( isset( $value[0] ) ) ? esc_url( $value[0] ) : '';
+			$img['path']        = $img['url'];
 			$img['title']       = ( isset( $value[1] ) ) ? esc_html( $value[1] ) : '';
 			$img['caption']     = ( isset( $value[2] ) ) ? esc_html( $value[2] ) : '';
 			$img['description'] = ( isset( $value[3] ) ) ? esc_html( $value[3] ) : '';
 
 			$path = ( isset( $value[0] ) ) ? $this->misc->convert_url_to_path( $value[0] ) : '';
-			if ( $path !== $img['url'] ) {
+			if ( $path !== false && $path !== $img['url'] ) {
 				$img['path'] = $path;
 			}
 		}
