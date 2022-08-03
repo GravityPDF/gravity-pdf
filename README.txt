@@ -107,6 +107,12 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 
 == Changelog ==
 
+= 6.4.3 =
+* Bug: Open PDF "view" link in a new browser tab on Entry List page
+* Bug: Hide Select field in Core/Universal templates if the saved value is an empty string, not a falsey value
+* Bug: Prevent PHP notice when displaying Repeater field in PDFs with a Number sub-field
+* Bug: Prevent HTML attribute content from having their entities decoded if they were previously encoded
+
 = 6.4.2 =
 * Bug: Allow `data` protocol so Base 64-encoded images can be correctly displayed in Core/Universal templates
 * Bug: Fix Core Font Installer problem when running older versions of WordPress (5.3 to 5.8)
