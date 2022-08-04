@@ -35,7 +35,7 @@ If you shut down Docker and want to fire up the environment later, use `yarn wp-
 
 ### Enable X-Debug
 
-X-Debug is enabled by default for step debugging. If you need to [use other X-Debug modes](https://xdebug.org/docs/all_settings#mode) you can manually start the environment and pass the appropriate modes in: `yarn wp-env start --xdebug=profile,trace,debug`.
+X-Debug is enabled by default for step debugging and profiling. If you need to [use other X-Debug modes](https://xdebug.org/docs/all_settings#mode) you can manually start the environment and pass the appropriate modes in: `yarn wp-env start --xdebug=profile,trace,debug`.
 
 **Note: [there is currently an issue that prevents running X-Debug for the PHPUnit/CLI](https://github.com/WordPress/gutenberg/issues/42286).
 
@@ -52,6 +52,10 @@ If you would rather use your own development environment, you can build Gravity 
 1. Run `composer install`
 1. Run `composer run prefix`
 
+## Building JavaScript
+
+If you are making changes to any of the JavaScript or CSS, run `yarn build:dev` to ensure the files automatically gets built when you make changes on the file system.
+
 ## Linting
 
 To lint your JS code use `yarn lint:js`, and to try automatically fix it use `yarn lint:js:fix`.
@@ -62,7 +66,7 @@ To lint your PHP code, use `composer lint`, and to try automatically fix it use 
 
 The automated test suite can only be run using Docker. 
 
-## E2E
+### E2E
 
 Useful commands include:
 
@@ -71,32 +75,14 @@ yarn test:e2e
 yarn test:e2e:headless
 ```
 
-## PHPUnit
+### PHPUnit
 
 Run full suite of tests using `yarn test:php` or `yarn test:php:multisite`.
 
-## JavaScript
+### JavaScript
 
 The JavaScript unit tests can be run with `yarn test:js`
-
-## Building JS
-
-If you are making changes to any of the JavaScript or CSS, run `yarn build:watch:js` or `yarn build:watch:css` respectively to ensure the files automatically gets built when you make changes on the file system. 
 
 # Documentation
 
 All documentation can be found at [https://docs.gravitypdf.com](https://docs.gravitypdf.com).
-
-# Contributions
-
-You are more than welcome to contribute to Gravity PDF but we recommend you [open a new issue on GitHub](https://github.com/GravityPDF/gravity-pdf/issues) and discuss your use-case before creating a pull request.
-
-There are a few guidelines that need to be followed to ensure a smooth pull request. These include:
-
-1. Adhere to the existing code standard which follows [WordPress standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/), with the exception of Yoda conditionals.
-1. All PRs must be to the `development` branch.
-1. Modifications of the existing codebase must pass unit tests.
-1. Additions to the plugin must have appropriate E2E/unit tests written.
-1. PRs that don't pass existing unit testing or do not have the proper tests to accompany the changes will not be merged.
-
-If you are uncertain whether your PR meets all these requirements, don't worry! If there are problems our friendly team will guide you in the right direction.
