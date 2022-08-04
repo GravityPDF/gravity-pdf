@@ -1,5 +1,5 @@
 {
-  "core": "https://wordpress.org/wordpress-6.0.1.zip",
+  "core": "https://wordpress.org/latest.zip",
   "phpVersion": "8.0",
   "plugins": [
     "gravityforms/gravityformscli"
