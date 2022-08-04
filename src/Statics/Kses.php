@@ -344,6 +344,9 @@ class Kses {
 
 		$protocols[] = 'data';
 
+		/* allow Windows drive letters */
+		$protocols = array_merge( $protocols, range( 'a', 'z' ) );
+
 		return apply_filters( 'gfpdf_wp_kses_allowed_pdf_protocols', $protocols );
 	}
 }
