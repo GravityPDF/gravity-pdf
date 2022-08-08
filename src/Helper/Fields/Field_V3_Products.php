@@ -37,11 +37,21 @@ class Field_V3_Products extends Field_Products {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
+		$output_enabled = false;
+		if ( $this->get_output() ) {
+			$this->disable_output();
+			$output_enabled = true;
+		}
+
 		$html = parent::html( $value, $label );
 
+		if ( $output_enabled ) {
+			$this->enable_output();
+		}
+
 		/* Format the order label correctly */
-		$label = apply_filters( 'gform_order_label', esc_html__( 'Order', 'gravityforms' ), $this->form->id );
-		$label = apply_filters( 'gform_order_label_' . $this->form->id, $label, $this->form->id );
+		$label = apply_filters( 'gform_order_label', esc_html__( 'Order', 'gravityforms' ), $this->form['id'] );
+		$label = apply_filters( 'gform_order_label_' . $this->form['id'], $label, $this->form['id'] );
 
 		$heading = '<h2 class="default entry-view-section-break">' . esc_html( $label ) . '</h2>';
 

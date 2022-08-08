@@ -479,7 +479,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 					$results['field'][] = $field->type !== 'section' ? $class->html() : $class->html( $config['section_content'] );
 				} else {
 					$class->enable_output();
-					$field->type !== 'section' ? $class->html() : $class->html( $config['section_content'] );
+					$field->type !== 'section' ? $class->html() : $class->html( $config['section_content'] ?? false );
 				}
 			}
 		}
