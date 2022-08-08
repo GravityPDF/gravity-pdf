@@ -142,10 +142,11 @@ class Field_Products extends Helper_Abstract_Fields {
 
 						<tbody class="contents">
 						<?php
-						foreach ( $products['products'] as $field_id => $product ) :
+						foreach ( $products['products'] as $field_id => $product ):
+							$field_id = explode( '|', $field_id )[0];
 
 							/* Skip over Gravity Perks Ecommerce Fields */
-							if ( class_exists( 'GP_Ecommerce_Fields' ) && in_array( $fields[ $field_id ]->type, [ 'tax', 'discount' ], true ) ) {
+							if ( class_exists( 'GP_Ecommerce_Fields' ) && in_array( $fields[ $field_id ]->type, [ 'tax', 'discount', 'coupon' ], true ) ) {
 								continue;
 							}
 							?>
@@ -196,7 +197,7 @@ class Field_Products extends Helper_Abstract_Fields {
 											rowspan="<?php echo esc_attr( $gpecommerce->get_order_summary_item_count( $order_summary ) ); ?>"></td>
 									<?php endif; ?>
 									<td class="totals" style="<?php esc_attr( $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ) ); ?>">
-										<?php echo esc_html( $item['name'] ); ?>
+										<?php Kses::output( $item['name'] ); ?>
 									</td>
 
 									<td class="totals" style="<?php esc_attr( $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-4" ) ); ?>">
