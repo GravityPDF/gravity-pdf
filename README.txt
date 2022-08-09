@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.0
-Stable tag: 6.4.3
+Stable tag: 6.4.4
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,13 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+∂
+= 6.4.4 =
+* Bug: Resolve HTML encoding issue in PDF when displaying Coupon field in Gravity Wiz eCommerce Perk's Product Table
+* Bug: Remove coupon line item in PDF when Gravity Wiz eCommerce Perk's Product Table in use
+* Bug: Resolve duplicate product table displayed in a legacy v3 template
+* Bug: Resolve PHP notice when displaying product table in legacy v3 template
+* Bug: Resolve PHP notice when displaying Section Break field in legacy v3 template
 
 = 6.4.3 =
 * Bug: Open PDF "view" link in a new browser tab on Entry List page
