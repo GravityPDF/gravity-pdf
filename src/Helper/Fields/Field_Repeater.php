@@ -107,6 +107,20 @@ class Field_Repeater extends Helper_Abstract_Fields {
 				if ( isset( $form_data['field'] ) ) {
 					$data = array_replace_recursive( $data, [ $id => $form_data['field'] ] );
 				}
+
+				/* Allow HTML to be included in $form_data */
+				if ( isset( $form_data['html_id'] ) ) {
+					$html = [];
+					/* Extract field id and html content */
+					foreach ( $form_data['html_id'] as $field_id => $content ) {
+						/* Format data, with the exact same order ( label.id,id,label ) with the other fields */
+						$html[ $class->field->label . '.' . $field_id ] = $content;
+						$html[ $field_id ]                              = $content;
+						$html[ $class->field->label ]                   = $content;
+					}
+
+					$data = array_replace_recursive( $data, [ $id => $html ] );
+				}
 			}
 		}
 

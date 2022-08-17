@@ -80,4 +80,21 @@ class Test_Field_Repeater extends WP_UnitTestCase {
 		$this->assertSame( '172.17.0.1', $values[7] ); // These test expects integer results.
 		$this->assertSame( 'USD', $values[10] );
 	}
+
+	public function test_get_repeater_form_data() {
+		/* This method expects the third parameter as an GF_Field_Repeater Instance. */
+		$data          = $this->pdf_field->get_repeater_form_data( $this->pdf_field->form_data(), $this->pdf_field->value(), new \GF_Field_Repeater( $this->form['fields'][1] ) );
+		$repeater_data = $data['repeater']['999.Team'][0];
+
+		/* Verify that method correctly adds the HTML field with each corresponding indexes. */
+		$this->assertArrayHasKey( 17, $repeater_data );
+		$this->assertArrayHasKey( 'HTML', $repeater_data );
+		$this->assertArrayHasKey( 'HTML.17', $repeater_data );
+
+		/* Check if the content is what we expected. */
+
+		$this->assertSame(  'This a sample HTML' , $repeater_data[17] );
+		$this->assertSame(  'This a sample HTML' , $repeater_data['HTML.17'] );
+		$this->assertSame(  'This a sample HTML' , $repeater_data['HTML'] );
+	}
 }

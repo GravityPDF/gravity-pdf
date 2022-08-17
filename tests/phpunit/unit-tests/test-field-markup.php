@@ -44,7 +44,7 @@ class Test_Field_Markup extends WP_UnitTestCase {
 
 		$this->assertSame( 2, $html->find( '.gfpdf-repeater' )->count() );
 		$this->assertSame( 4, $html->find( '.repeater-container' )->count() );
-		$this->assertSame( 17, $html->find( '.gfpdf-field' )->count() );
+		$this->assertSame( 19, $html->find( '.gfpdf-field' )->count() );
 
 		$this->assertEquals( 'Simon Wiseman', $html->find( '.gfpdf-name .value' )->get( 0 )->nodeValue );
 		$this->assertEquals( 'Geoff Simpson', $html->find( '.gfpdf-name .value' )->get( 1 )->nodeValue );
