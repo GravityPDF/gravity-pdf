@@ -764,4 +764,15 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$results = $this->model->register_template_group( $test );
 		$this->assertTrue( isset( $results['template']['data']['template_group'] ) );
 	}
+
+	/**
+	 * Check if the structure of conditional logic meta is correct.
+	 *
+	 * @since 6.4
+	 */
+	public function test_set_conditional_logic_meta() {
+		$entry_meta =  \GFFormsModel::get_entry_meta( $this->form_id ) ;
+		$this->assertCount( 5, $entry_meta );
+		$this->assertCount( 9, $entry_meta['payment_status']['filter']['choices'] );
+	}
 }

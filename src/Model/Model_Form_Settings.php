@@ -229,8 +229,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$form_classes .= 'gfpdf-gf-2-6';
 		}
 
+		/* Add additional entry meta to automatically include in PDF Conditional Logic */
 		$entry_meta = GFFormsModel::get_entry_meta( $form_id );
-		$entry_meta = apply_filters( 'gform_entry_meta_conditional_logic_confirmations', $entry_meta, $form, '' );
 
 		/* re-register all our settings to show form-specific options */
 		$this->options->register_settings( $this->options->get_registered_fields() );

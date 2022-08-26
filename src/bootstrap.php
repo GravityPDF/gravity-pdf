@@ -282,6 +282,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Add class when on Gravity PDF pages */
 		add_filter( 'admin_body_class', [ $this, 'add_body_class' ] );
+		/* Add additional meta fields in GF conditional logic */
+		add_filter( 'gform_entry_meta', array( $this, 'set_conditional_logic_meta' ) );
 	}
 
 
@@ -354,6 +356,81 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $classes;
+	}
+
+	/**
+	 * Add payment details and miscellaneous fields in our PDF conditional logic conditions.
+	 * This is roughly based on Gravity Form Populate Anything add-on.
+	 *
+	 * @param array $entry_meta
+	 *
+	 * @return array
+	 * @since 6.5
+	 *
+	 */
+	public function set_conditional_logic_meta( $entry_meta ) {
+
+		$entry_meta['payment_status'] = [
+			'label'  => esc_html__( 'Payment Status', 'gravityforms' ),
+			'filter' => [
+				'operators' => [ 'is', 'isnot' ],
+				'choices'   => \GFCommon::get_entry_payment_statuses_as_choices(),
+			],
+		];
+
+		$entry_meta['payment_amount'] = [
+			'label'  => esc_html__( 'Payment Amount', 'gravityforms' ),
+			'filter' => [
+				'operators' => [ 'is', 'isnot', '>', '<', 'contains', 'starts_with', 'ends_with', 'text_box' ],
+			],
+		];
+
+		$entry_meta['id'] = [
+			'label'  => esc_html__( 'Entry ID', 'gravityforms' ),
+			'filter' => [
+				'operators' => [ 'is', 'isnot', '>', '<' ],
+			],
+		];
+
+		$entry_meta['is_starred'] = [
+			'label'  => esc_html__( 'Starred', 'gravityforms' ),
+			'filter' => [
+				'operators' => [ 'is', 'isnot' ],
+				'choices'   => [
+					[
+						'text'  => 'Yes',
+						'value' => 1,
+					],
+					[
+						'text'  => 'No',
+						'value' => 0,
+					],
+				],
+			],
+		];
+
+		$entry_meta['ip'] = [
+			'label'  => esc_html__( 'IP / Source URL', 'gravityforms' ),
+			'filter' => [
+				'operators' => [ 'is', 'isnot', '>', '<', 'contains' ],
+			],
+		];
+		/* @TODO : Payment date doesn't register as datefield.
+		 * WIP - Add a datepicker class on this field.
+		 * Unable to find related resources on how to accomplish this.
+		$entry_meta['payment_date'] = [
+			'label'  => esc_html__( 'Payment Date', 'gravityforms' ),
+			'filter' => [
+				'operators'       => [ 'is', 'isnot', '>', '<' ],
+				'placeholder'     => __( 'yyyy-mm-dd', 'gravityforms' ),
+				'cssClass'        => 'hasDatepicker ymd_dash',
+				'key'             => 'payment_date',
+				'preventMultiple' => false,
+			],
+
+		];
+		 * */
+		return $entry_meta;
 	}
 
 	/**
