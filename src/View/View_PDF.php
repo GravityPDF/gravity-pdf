@@ -614,7 +614,7 @@ class View_PDF extends Helper_Abstract_View {
 	public function get_core_template_styles( $settings, $entry ) {
 		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
-		$html = $this->load_core_template_styles( $settings );
+		$html = $this->load_core_template_styles( $settings, $form, $entry );
 
 		$html = apply_filters( 'gfpdf_pdf_core_template_html_output', $html, $form, $entry, $settings );
 		$html = apply_filters( 'gfpdf_pdf_core_template_html_output_' . $form['id'], $html, $form, $entry, $settings );
@@ -625,14 +625,24 @@ class View_PDF extends Helper_Abstract_View {
 	/**
 	 * Load our core PDF template settings
 	 *
-	 * @param $settings
+	 * @param array $settings Current PDF Settings being processed
+	 * @param array $form Current form being processed (added in 6.5)
+	 * @param array $entry Current form being processed (added in 6.5)
 	 *
 	 * @return string|WP_Error
 	 *
 	 * @since 4.0
 	 */
-	public function load_core_template_styles( $settings ) {
-		return $this->load( 'core_template_styles', [ 'settings' => $settings ], false );
+	public function load_core_template_styles( $settings, $form = [], $entry = [] ) {
+		return $this->load(
+			'core_template_styles',
+			[
+				'settings' => $settings,
+				'form'     => $form,
+				'entry'    => $entry,
+			],
+			false
+		);
 	}
 
 	/**
