@@ -97,4 +97,16 @@ class Test_Field_Repeater extends WP_UnitTestCase {
 		$this->assertSame(  'This a sample HTML' , $repeater_data['HTML.17'] );
 		$this->assertSame(  'This a sample HTML' , $repeater_data['HTML'] );
 	}
+
+	public function test_unique_ids() {
+		$html = $this->pdf_field->html();
+
+		$this->assertStringNotContainsString( 'id="field-999"', $html );
+		$this->assertStringContainsString( 'id="repeater-999-field-999-0"', $html );
+		$this->assertStringContainsString( 'id="repeater-999-field-999-11"', $html );
+
+		$this->assertStringNotContainsString( 'id="field-15"', $html );
+		$this->assertStringContainsString( 'id="repeater-999-field-15-1"', $html );
+		$this->assertStringContainsString( 'id="repeater-999-field-15-12"', $html );
+	}
 }

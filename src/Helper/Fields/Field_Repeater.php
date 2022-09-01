@@ -151,6 +151,21 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$this->get_repeater_html( $value, $this->field );
 		$html = ob_get_clean();
 
+		/* Ensure a unique ID for all elements in the Repeater field */
+		$i    = 0;
+		$html = preg_replace_callback(
+			'/id="(.+?)"/',
+			function( $matches ) use ( &$i ) {
+				return sprintf(
+					'id="repeater-%s-%s-%s"',
+					$this->field->id,
+					$matches[1],
+					$i++
+				);
+			},
+			$html
+		);
+
 		/* If output wasn't enabled by default, disable again */
 		if ( ! $output_already_enabled ) {
 			$this->disable_output();
