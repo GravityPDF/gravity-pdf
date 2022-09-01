@@ -60,7 +60,7 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 
 		parent::generate( $field );
 
-		if ( $this->get_field_width( $field ) < 100 ) {
+		if ( $this->get_field_width( $field ) < 100 && strpos( $field->cssClass, 'grid grid-' ) === false ) {
 			$field->cssClass .= ' grid grid-' . $field->layoutGridColumnSpan;
 		}
 

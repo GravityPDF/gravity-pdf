@@ -60,4 +60,19 @@ class Test_Helper_Field_Container_Gf25 extends WP_UnitTestCase {
 
 		return $html;
 	}
+
+	public function test_css_grid_insertion() {
+		$field = new \GF_Field();
+		$field->cssClass = '';
+		$field->layoutGridColumnSpan = 6;
+
+		$this->class->generate( $field );
+
+		$this->assertSame(' grid grid-6', $field->cssClass );
+
+		$this->class->generate( $field );
+		$this->assertSame(' grid grid-6', $field->cssClass );
+
+		ob_end_clean();
+	}
 }
