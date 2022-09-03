@@ -74,16 +74,27 @@ class Field_Form extends Helper_Abstract_Fields {
 		$html = '';
 
 		/* Get the Nested Form Entries */
-		$value = explode( ',', $this->value() );
-		foreach ( $value as $id ) {
+		$value    = explode( ',', $this->value() );
+		$field_id = $this->field->id;
+		foreach ( $value as $key => $id ) {
 			$entry = $this->gform->get_entry( (int) trim( $id ) );
 			if ( is_wp_error( $entry ) ) {
 				continue;
 			}
 
 			/* Output the entry HTML mark-up */
-			$html .= parent::html( $this->get_repeater_html( $form, $entry ) );
+			$markup = $this->get_repeater_html( $form, $entry );
+
+			/* Ensure the IDs are all unique by suffixing with the key */
+			$markup = preg_replace( '/id="(.+?)"/', 'id="nested-$1-' . esc_attr( $key ) . '"', $markup );
+
+			$this->field->id = "$field_id-$key";
+
+			$html .= parent::html( $markup );
 		}
+
+		/* Reset the ID back to the original value */
+		$this->field->id = $field_id;
 
 		return $html;
 	}
