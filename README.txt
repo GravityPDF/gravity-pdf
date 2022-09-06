@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.0
-Stable tag: 6.4.5
+Stable tag: 6.4.6
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,12 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.4.6 =
+* Bug: Adjust Nested Forms and Repeater field PDF markup to ensure a unique ID attribute for any HTML tags
+* Bug: Prevent duplicate grid css classes being added to Nested Forms HTML tags
+* Bug: Process merge tags in Background Image PDF setting before late escaping in the PDF HTML markup
+* Housekeeping: Remove initialized message from Gravity PDF logs
 
 = 6.4.5 =
 * Bug: Fix image display problem if filename had a space in it
