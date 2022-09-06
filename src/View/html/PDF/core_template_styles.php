@@ -266,5 +266,6 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 
 <?php
 /* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_core_template for more details about this hook */
-do_action( 'gfpdf_core_template' );
+do_action( 'gfpdf_core_template', $form, $entry, $settings );
+do_action( 'gfpdf_core_template_' . $form['id'], $form, $entry, $settings );
 ?>
