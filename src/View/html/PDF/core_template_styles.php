@@ -19,6 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * @var    $settings array
+ * @var    $form     array
+ * @var    $entry    array
  * @global $gfpdf
  */
 
@@ -32,7 +34,7 @@ $first_header = $settings['first_header'] ?? '';
 $first_footer = $settings['first_footer'] ?? '';
 
 $background_color      = $settings['background_color'] ?? '#FFF';
-$background_image      = $settings['background_image'] ?? '';
+$background_image      = $gfpdf->gform->process_tags( $settings['background_image'] ?? '', $form, $entry );
 $background_image_path = ! empty( $background_image ) ? $gfpdf->misc->convert_url_to_path( $background_image ) : false;
 
 $contrast                  = $gfpdf->misc->get_background_and_border_contrast( $background_color );

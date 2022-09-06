@@ -408,7 +408,6 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Setup some test data */
 		$_SERVER['HTTP_HOST'] = str_replace( [ 'http://', 'http://' ], '', home_url() );
-		
 		$results          = $this->create_form_and_entries();
 		$entry            = $results['entry'];
 		$entry['form_id'] = $results['form']['id'];
@@ -1866,7 +1865,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_core_template_options() {
-
+		$data  = $this->create_form_and_entries();
 		/* Setup the test data */
 		$settings = [
 			'font'             => 'Arial',
@@ -1879,12 +1878,12 @@ class Test_PDF extends WP_UnitTestCase {
 			'footer'           => 'This is the footer',
 			'first_footer'     => 'This is the first footer',
 
-			'background_image' => '/path/image.png',
+			'background_image' => '/path/image.png?{:16}',
 			'background_color' => '#FF2222',
 		];
 
 		ob_start();
-		$this->view->core_template_styles( [ 'settings' => $settings ] );
+		$this->view->core_template_styles( [ 'settings' => $settings, 'form' => $data['form'] , 'entry' =>  $data['entry'] ] );
 		$results = ob_get_clean();
 
 		/* Test the results */
@@ -1903,7 +1902,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $results, 'This is the footer' ) );
 		$this->assertNotFalse( strpos( $results, 'This is the first footer' ) );
 
-		$this->assertNotFalse( strpos( $results, 'background-image: url(/path/image.png) no-repeat 0 0;' ) );
+		$this->assertNotFalse( strpos( $results, 'background-image: url(/path/image.png?https://gravitypdf.com) no-repeat 0 0;' ) );
 		$this->assertNotFalse( strpos( $results, 'background-image-resize: 4;' ) );
 
 		$this->assertNotFalse( strpos( $results, 'background-color: #FF2222;' ) );
