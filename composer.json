@@ -2,6 +2,13 @@
   "name": "gravitypdf/gravitypdf",
   "license": "GPL-2.0-or-later",
   "homepage": "https://gravitypdf.com",
+  "scripts": {
+    "compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
+    "format": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
+    "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
+    "lint:errors": "@lint -n",
+    "prefix": "bash ./bin/vendor-prefix.sh"
+  },
   "config": {
     "preferred-install": "dist",
     "autoloader-suffix": "GravityPDFPlugin",
@@ -12,9 +19,15 @@
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/GravityPDF/url-signer"
+    }
+  ],
   "require": {
     "php": ">=7.3",
-    "mpdf/mpdf": "^8.1",
+    "mpdf/mpdf": "dev-master#0db129a868557016614132e2adc67f9e4c048d5e",
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
@@ -37,12 +50,5 @@
     "classmap": [
       "vendor_prefixed/"
     ]
-  },
-  "scripts": {
-    "compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
-    "format": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
-    "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
-    "lint:errors": "@lint -n",
-    "prefix": "bash ./bin/vendor-prefix.sh"
   }
 }
