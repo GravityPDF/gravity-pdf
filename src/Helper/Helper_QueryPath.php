@@ -31,7 +31,7 @@ class Helper_QueryPath extends QueryPath {
 	 *
 	 * @param mixed       $html     A document as a HTML string.
 	 *
-	 * @param string|null $selector A CSS3 selector.
+	 * @param string      $selector A CSS3 selector.
 	 *
 	 * @param array       $options
 	 *                              An associative array of options, which is passed on into HTML5-PHP. Note
@@ -43,7 +43,7 @@ class Helper_QueryPath extends QueryPath {
 	 * @throws QueryPath\Exception
 	 * @since 4.0.3
 	 */
-	public function html5( $html = '', $selector = null, $options = [] ) {
+	public function html5( $html = '', $selector = '', $options = [] ) {
 		$html5  = new HTML5();
 		$source = $html5->loadHTML( $html );
 
