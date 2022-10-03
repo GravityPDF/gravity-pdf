@@ -274,6 +274,19 @@ class Test_Templates extends WP_UnitTestCase {
 
 		$this->assertFalse( isset( $e ) );
 
+		/* Add an invalid filename to the zip and verify an error occurs */
+		$zip->open( $test_file );
+		$zip->addFile( PDF_PLUGIN_DIR . 'src/templates/zadani.php', 'zad@!@#$%^&*().php' );
+		$zip->close();
+
+		try {
+			$this->model->unzip_and_verify_templates( $test_file );
+		} catch ( Exception $e ) {
+			//do nothing
+		}
+
+		$this->assertStringContainsString( 'contains invalid characters.', $e->getMessage() );
+
 		/* Cleanup */
 		unlink( $test_file );
 		$gfpdf->misc->rmdir( $test_dir );
@@ -293,7 +306,7 @@ class Test_Templates extends WP_UnitTestCase {
 
 		$info = $this->model->get_template_info( $files );
 
-		$this->assertSame( 2, count( $info ) );
+		$this->assertCount( 2, $info );
 		$this->assertArrayHasKey( 'version', $info[0] );
 		$this->assertArrayHasKey( 'version', $info[1] );
 		$this->assertEquals( 'Zadani', $info[0]['template'] );
