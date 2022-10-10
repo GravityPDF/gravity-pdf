@@ -16,28 +16,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /** @var $args array */
 
+GFCommon::display_admin_message();
+
 ?>
 
 <div id="pdfextended-settings">
-	<h3>
-		<span>
-			<i class="fa fa-cogs"></i>
-			<?php esc_html_e( 'Extensions Settings', 'gravity-forms-pdf-extended' ); ?>
-		</span>
-	</h3>
 
-	<form method="post" action="options.php">
+	<!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
+	<form name="gfpdf-settings-form-<?php echo esc_attr( wp_rand() ); ?>" class="gform_settings_form" method="post" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<table id="pdf-extensions" class="form-table">
-			<?php do_settings_fields( 'gfpdf_settings_extensions', 'gfpdf_settings_extensions' ); ?>
-		</table>
+		<?php do_action( 'gfpdf_settings_sub_menu' ); ?>
 
 		<?php
-		if ( $args['edit_cap'] ) {
-			submit_button();
+		/** @since 6.5.0 */
+		if ( isset( $args['callback'] ) ) {
+			call_user_func_array( $args['callback'], $args['callback_args'] ?? [] );
+		}
+
+		/** @deprecated 6.5.0 */
+		if ( isset( $args['content'] ) ) {
+			echo wp_kses_post( $args['content'] );
 		}
 		?>
+
+		<div id="submit-and-promo-container">
+			<?php if ( $args['edit_cap'] ): ?>
+				<input type="submit" name="submit" id="submit" value="<?php echo esc_attr__( 'Save Settings  →', 'gravityforms' ); ?>" class="button primary large">
+			<?php endif; ?>
+		</div>
 	</form>
 
 	<?php

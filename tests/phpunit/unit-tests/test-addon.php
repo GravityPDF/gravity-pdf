@@ -40,6 +40,15 @@ class Test_Addon extends WP_UnitTestCase {
 	public $addon;
 
 	/**
+	 * Our 2nd test class
+	 *
+	 * @var Helper_Abstract_Addon
+	 *
+	 * @since 6.5
+	 */
+	public $addon2;
+
+	/**
 	 * The WP Unit Test Set up function
 	 *
 	 * @since 4.2
@@ -59,6 +68,19 @@ class Test_Addon extends WP_UnitTestCase {
 			GPDFAPI::get_options_class(),
 			new Helper_Singleton(),
 			new Helper_Logger( 'my-custom-plugin', 'My Custom Plugin' ),
+			new Helper_Notices()
+		);
+
+		$this->addon2 = new Addon_Fields(
+			'my-custom-plugin2',
+			'My Custom Plugin2',
+			'Gravity PDF',
+			'1.0',
+			'/path/to/plugin2/file.php',
+			GPDFAPI::get_data_class(),
+			GPDFAPI::get_options_class(),
+			new Helper_Singleton(),
+			new Helper_Logger( 'my-custom-plugin2', 'My Custom Plugin2' ),
 			new Helper_Notices()
 		);
 	}
@@ -266,31 +288,92 @@ class Test_Addon extends WP_UnitTestCase {
 	/**
 	 * @since 4.2
 	 */
-	public function test_auto_register_global_fields() {
+	public function test_auto_register_global_fields_fallback() {
 		global $gfpdf;
 
-		/* Setup our test classes */
-		$addon = new Addon_Fields(
-			'my-custom-plugin2',
-			'My Custom Plugin2',
-			'Gravity PDF',
-			'1.0',
-			'/path/to/plugin2/file.php',
-			GPDFAPI::get_data_class(),
-			GPDFAPI::get_options_class(),
-			new Helper_Singleton(),
-			new Helper_Logger( 'my-custom-plugin2', 'My Custom Plugin2' ),
-			new Helper_Notices()
-		);
+		$this->assertEmpty( $this->addon2->get_addon_settings_key() );
+		$this->addon2->init();
 
-		$addon->init();
-
-		$this->assertEquals( 10, has_filter( 'gfpdf_settings_extensions', [ $addon, 'register_addon_fields' ] ) );
+		$this->assertEquals( 10, has_filter( 'gfpdf_settings_extensions', [ $this->addon2, 'register_addon_fields' ] ) );
 
 		$settings = $gfpdf->options->get_registered_fields();
 		$this->assertArrayHasKey( 'addon_field', $settings['extensions'] );
 
 		$gfpdf->data->addon = [];
+	}
+
+	/**
+	 * @since 6.5
+	 */
+	public function test_auto_register_global_fields_with_prefix() {
+		global $gfpdf;
+
+		$this->addon2->enable_settings_prefix();
+		$this->assertNotEmpty( $this->addon2->get_addon_settings_key() );
+		$this->addon2->init();
+
+		$this->assertEquals( 10, has_filter( 'gfpdf_settings_extensions', [ $this->addon2, 'register_addon_fields' ] ) );
+
+		$settings = $gfpdf->options->get_registered_fields();
+		$this->assertArrayHasKey( $this->addon2->get_addon_settings_key() . 'addon_field', $settings['extensions'] );
+
+		$gfpdf->data->addon = [];
+	}
+
+	/**
+	 * @since 6.5
+	 */
+	public function test_get_addon_settings_defaults() {
+		$this->addon2->enable_settings_prefix();
+
+		$defaults = $this->addon2->get_addon_settings_defaults();
+		$this->assertArrayNotHasKey('addon_field', $defaults );
+		$this->assertSame( 'Generating PDF...', $defaults['string_loading_title'] );
+		$this->assertSame( 'close', $defaults['string_close'] );
+	}
+
+	/**
+	 * @since 6.5
+	 */
+	public function test_get_addon_settings_values() {
+
+		$this->addon2->enable_settings_prefix();
+
+		/* Save some test data to the global settings */
+		$options      = \GPDFAPI::get_options_class();
+		$all_settings = $options->get_settings();
+
+		$all_settings[ $this->addon2->get_addon_settings_key() . 'addon_field' ]          = 'Generic Value';
+		$all_settings[ $this->addon2->get_addon_settings_key() . 'string_loading_title' ] = 'Loading';
+		$all_settings[ $this->addon2->get_addon_settings_key() . 'string_close' ]         = 'Remove';
+
+		$options->update_settings( $all_settings );
+
+		/* Check we can access the saved settings without using the prefix */
+		$settings = $this->addon2->get_addon_settings_values();
+		$this->assertSame( 'Generic Value', $settings['addon_field'] );
+		$this->assertSame( 'Loading', $settings['string_loading_title'] );
+		$this->assertSame( 'Remove', $settings['string_close'] );
+	}
+
+	/**
+	 * @since 6.5
+	 */
+	public function test_get_addon_setting_value() {
+
+		$this->addon2->enable_settings_prefix();
+
+		/* Save some test data to the global settings */
+		$options      = \GPDFAPI::get_options_class();
+		$all_settings = $options->get_settings();
+
+		$all_settings[ $this->addon2->get_addon_settings_key() . 'string_loading_title' ] = 'Loading1';
+
+		$options->update_settings( $all_settings );
+
+		/* Check we can access the saved settings without using the prefix */
+		$this->assertSame( 'Use Fallback', $this->addon2->get_addon_setting_value( 'addon_field', 'Use Fallback' ) );
+		$this->assertSame( 'Loading1', $this->addon2->get_addon_setting_value( 'string_loading_title' ) );
 	}
 }
 
@@ -313,6 +396,20 @@ class Addon_Fields extends Helper_Abstract_Addon implements Helper_Interface_Ext
 				'id'   => 'addon_field',
 				'name' => 'Addon Field',
 				'type' => 'text',
+			],
+
+			'string_loading_title'     => [
+				'id'   => 'string_loading_title',
+				'name' => 'Loading Title',
+				'desc' => 'Announced to screen readers when the PDF starts generating',
+				'type' => 'text',
+				'std'  => 'Generating PDF...',
+			],
+
+			'string_close'     => [
+				'id'   => 'string_close',
+				'type' => 'text',
+				'std'  => 'close',
 			],
 		];
 	}
