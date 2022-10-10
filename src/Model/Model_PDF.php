@@ -736,6 +736,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					'settings' => $settings,
 					'entry_id' => $entry['id'],
 					'form_id'  => $form['id'],
+					'class'    => 'gravitypdf-download-link',
 				];
 			}
 		}
