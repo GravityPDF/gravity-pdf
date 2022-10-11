@@ -42,7 +42,7 @@ class Field_Coupon extends Helper_Abstract_Fields {
 	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
 
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Coupon ) {
-			throw new Exception( '$field needs to be in instance of GF_Field_Text' );
+			throw new Exception( '$field needs to be in instance of GF_Field_Coupon' );
 		}
 
 		/* call our parent method */
@@ -60,7 +60,7 @@ class Field_Coupon extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$value = $this->value();
+		$value = $this->field->get_value_export( $this->entry );
 
 		return parent::html( $value );
 	}

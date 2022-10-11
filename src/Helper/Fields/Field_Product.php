@@ -57,12 +57,15 @@ class Field_Product extends Helper_Abstract_Field_Products {
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 		$html  = '';
-
-		if ( isset( $value['price'] ) ) {
+		if ( isset( $value['subtotal_formatted'] ) ) {
 			if ( in_array( $this->field->get_input_type(), [ 'radio', 'select' ], true ) ) {
-				$html .= Kses::parse( $value['name'] . ' - ' . $value['price'] );
+				$html .= Kses::parse( $value['name'] . ': ' );
+			}
+
+			if ( $value['quantity'] > 1 ) {
+				$html .= esc_html( sprintf( '%s x %s = %s', $value['unit_price_formatted'], $value['quantity'], $value['subtotal_formatted'] ) );
 			} else {
-				$html .= esc_html( $value['price'] );
+				$html .= esc_html( sprintf( '%s x %s', $value['subtotal_formatted'], $value['quantity'] ) );
 			}
 		}
 

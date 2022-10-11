@@ -34,10 +34,7 @@ class Test_Field_Repeater extends WP_UnitTestCase {
 		$this->form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
 		$this->entry = $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
 
-		$form_id                = GFAPI::add_form( $this->form );
-		$this->entry['form_id'] = $form_id;
-		$entry_id               = GFAPI::add_entry( $this->entry );
-		$this->pdf_field        = new Field_Repeater( new \GF_Field_Repeater( $this->form['fields'][1] ), GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+		$this->pdf_field        = new Field_Repeater( new \GF_Field_Repeater( $this->form['fields'][1] ), $this->entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 
 	}
 
@@ -57,14 +54,14 @@ class Test_Field_Repeater extends WP_UnitTestCase {
 
 		$values = array_values( $items );
 
-		$this->assertSame( '7', $values[1] ); // Should be 7 and a string.
+		$this->assertSame( $this->entry['form_id'], $values[1] );
 		$this->assertSame( 1, $values[20] ); // These test expects integer results.
 		$this->assertSame( 2, $values[21] );
 
 		/* Load items directly from a sample repeater field*/
 		$items = $this->pdf_field->add_entry_meta( $this->entry[999][0] ); // This should return an valid entry array.
-		$this->assertSame( '13', $items['id'] );
-		$this->assertSame( '7', $items['form_id'] );
+		$this->assertSame( $this->entry['id'], $items['id'] );
+		$this->assertSame( $this->entry['form_id'], $items['form_id'] );
 		$this->assertSame( '1', $items['created_by'] );
 		$this->assertSame( 'USD', $items['currency'] );
 
@@ -75,8 +72,8 @@ class Test_Field_Repeater extends WP_UnitTestCase {
 
 		$values = array_values( $items );
 
-		$this->assertSame( '13', $values[0] ); // Should be 14 and a string.
-		$this->assertSame( '7', $values[1] ); // Should be 8 and a string.
+		$this->assertSame( $this->entry['id'], $values[0] );
+		$this->assertSame( $this->entry['form_id'], $values[1] );
 		$this->assertSame( '172.17.0.1', $values[7] ); // These test expects integer results.
 		$this->assertSame( 'USD', $values[10] );
 	}

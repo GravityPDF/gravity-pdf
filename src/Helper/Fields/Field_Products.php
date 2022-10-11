@@ -318,13 +318,15 @@ class Field_Products extends Helper_Abstract_Fields {
 
 				/* Store product in $form_array array */
 				$form_array['products'][ $id ] = [
-					'name'               => esc_html( $product['name'] ),
-					'price'              => GFCommon::to_money( $product_raw_price, $lead['currency'] ),
-					'price_unformatted'  => $product_raw_price,
-					'options'            => $options,
-					'quantity'           => $product['quantity'],
-					'subtotal'           => $product_subtotal,
-					'subtotal_formatted' => GFCommon::to_money( $product_subtotal, $lead['currency'] ),
+					'name'                 => esc_html( $product['name'] ),
+					'price'                => GFCommon::to_money( $product_raw_price, $lead['currency'] ),
+					'price_unformatted'    => $product_raw_price,
+					'unit_price'           => $product_unit_price,
+					'unit_price_formatted' => GFCommon::to_money( $product_unit_price, $lead['currency'] ),
+					'options'              => $options,
+					'quantity'             => $product['quantity'],
+					'subtotal'             => $product_subtotal,
+					'subtotal_formatted'   => GFCommon::to_money( $product_subtotal, $lead['currency'] ),
 				];
 			}
 
