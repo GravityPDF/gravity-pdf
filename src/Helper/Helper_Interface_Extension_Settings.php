@@ -28,7 +28,7 @@ interface Helper_Interface_Extension_Settings {
 	 *
 	 * @return array
 	 * @since    4.2
-	 *
+	 * @internal From 6.5 all settings keys / IDs should be prefixed with Helper_Abstract_Addon::get_addon_settings_key()
 	 */
 	public function get_global_addon_fields();
 }

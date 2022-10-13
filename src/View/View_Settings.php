@@ -7,6 +7,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Form;
+use GFPDF\Helper\Helper_Interface_Extension_Settings;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
@@ -194,8 +195,15 @@ class View_Settings extends Helper_Abstract_View {
 		}
 
 		/* Add Extensions tab if necessary */
-		$settings = $this->options->get_registered_fields();
-		if ( count( $settings['extensions'] ) > 0 ) {
+		$enable_extensions = false;
+		foreach ( $this->data->addon as $addon ) {
+			if ( $addon instanceof Helper_Interface_Extension_Settings ) {
+				$enable_extensions = true;
+				break;
+			}
+		}
+
+		if ( $enable_extensions ) {
 			$navigation[20] = [
 				'name' => esc_html__( 'Extensions', 'gravity-forms-pdf-extended' ),
 				'id'   => 'extensions',
@@ -343,8 +351,44 @@ class View_Settings extends Helper_Abstract_View {
 	 * @since 4.2
 	 */
 	public function extensions() {
+		$markup = new View_GravityForm_Settings_Markup();
+
+		/* Loop through registered add-ons and group settings together */
+		$sections = [];
+		foreach ( $this->data->addon as $addon ) {
+			if ( ! $addon instanceof Helper_Interface_Extension_Settings ) {
+				continue;
+			}
+
+			$id = $addon->get_addon_settings_key();
+
+			$sections[] = [
+				'id'               => $id,
+				'width'            => 'full',
+				'title'            => $addon->get_name(),
+				'callback'         => static function() use ( $markup, $id ) {
+					$fields = array_filter(
+						(array) $markup->get_section_fields( 'gfpdf_settings_extensions' ),
+						function( $field ) use ( $id ) {
+							return strpos( $field['args']['id'], $id ) === 0;
+						}
+					);
+
+					foreach ( $fields as $field ) {
+						$markup->get_field_content( $field, $markup::ENABLE_PANEL_TITLE, true );
+					}
+				},
+				'content_class'    => '',
+				'collapsible'      => true,
+				'collapsible-open' => true,
+			];
+		}
+
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+			'callback' => static function() use ( $markup, $sections ) {
+				$markup->do_settings_sections( $sections, true );
+			},
 		];
 
 		/* load the system status view */

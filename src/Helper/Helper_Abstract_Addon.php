@@ -117,6 +117,14 @@ abstract class Helper_Abstract_Addon {
 	protected $addon_documentation_slug = '';
 
 	/**
+	 * Determine whether we should use a prefix for this add-ons global settings
+	 *
+	 * @since 6.5
+	 * @internal This has been added for backwards compatibility. Use self::enable_settings_prefix() after initialization to opt in
+	 */
+	protected $use_settings_prefix = false;
+
+	/**
 	 * Helper_Abstract_Addon constructor.
 	 *
 	 * @param string                $addon_slug
@@ -316,8 +324,6 @@ abstract class Helper_Abstract_Addon {
 				$this->singleton->add_class( $class );
 			}
 		);
-
-		$this->log->notice( sprintf( '%s plugin fully loaded', $this->get_name() ) );
 	}
 
 	/**
@@ -386,22 +392,133 @@ abstract class Helper_Abstract_Addon {
 			return $settings;
 		}
 
-		$registered_fields = $this->get_global_addon_fields();
+		/* Add our settings prefix automatically */
+		$fields = [];
+		foreach ( $this->get_global_addon_fields() as $field ) {
+			$field['id']            = $this->get_addon_settings_key() . $field['id'];
+			$fields[ $field['id'] ] = $field;
+		}
 
-		/* Add plugin heading before fields are included */
+		return array_merge( $settings, $fields );
+	}
 
-		return array_merge(
-			$settings,
-			[
-				$this->get_slug() . '_heading' => [
-					'id'    => $this->get_slug() . '_heading',
-					'type'  => 'descriptive_text',
-					'desc'  => '<h4 class="section-title">' . $this->get_name() . '</h4>',
-					'class' => 'gfpdf-no-padding',
-				],
-			],
-			$registered_fields
+	/**
+	 * Allows add-ons to opt into using a prefix on the settings.
+	 *
+	 * @return void
+	 *
+	 * @since 6.5
+	 * @internal This was added for backwards compatibility in case user-land implemented global add-on settings
+	 */
+	public function enable_settings_prefix(): void {
+		$this->use_settings_prefix = true;
+	}
+
+	/**
+	 * Return the prefix to use for all add-on global settings
+	 *
+	 * @return string
+	 * @since 6.5
+	 */
+	public function get_addon_settings_key(): string {
+		return $this->use_settings_prefix ? 'addon_' . $this->get_slug() . '_' : '';
+	}
+
+	/**
+	 * Get all the global setting default values which is useful as a fallback if the setting doesn't yet exist in the DB
+	 *
+	 * @return array
+	 * @since 6.5
+	 */
+	public function get_addon_settings_defaults(): array {
+		if ( ! $this instanceof Helper_Interface_Extension_Settings ) {
+			return [];
+		}
+
+		$defaults = [];
+		foreach ( $this->get_global_addon_fields() as $field ) {
+			if ( ! isset( $field['std'] ) ) {
+				continue;
+			}
+
+			$defaults[ $field['id'] ] = $field['std'];
+		}
+
+		return $defaults;
+	}
+
+	/**
+	 * Return all registered settings IDs, with or without the prefix string included
+	 *
+	 * @param bool $include_prefix
+	 *
+	 * @return array
+	 * @since 6.5
+	 */
+	final protected function get_addon_settings_ids( bool $include_prefix = true ): array {
+		if ( ! $this instanceof Helper_Interface_Extension_Settings ) {
+			return [];
+		}
+
+		$ids = array_keys( $this->get_global_addon_fields() );
+		if ( $include_prefix ) {
+			$ids = array_map(
+				function( $id ) {
+					return $this->get_addon_settings_key() . $id;
+				},
+				$ids
+			);
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get all available settings for this add-on that are stored in the DB
+	 *
+	 * @return array an ID => Value paid, where ID does NOT include the setting prefix
+	 * @since 6.5
+	 */
+	final public function get_addon_settings_values(): array {
+		if ( ! $this instanceof Helper_Interface_Extension_Settings ) {
+			return [];
+		}
+
+		$setting_ids   = $this->get_addon_settings_ids();
+		$prefix_length = strlen( $this->get_addon_settings_key() );
+
+		/* Get only settings that apply to this add-on */
+		$filters_settings = array_filter(
+			$this->options->get_settings(),
+			function( $key ) use ( $setting_ids ) {
+				return in_array( $key, $setting_ids, true );
+			},
+			ARRAY_FILTER_USE_KEY
 		);
+
+		$processed_settings = [];
+		foreach ( $filters_settings as $key => $value ) {
+			$processed_settings[ substr( $key, $prefix_length ) ] = $value;
+		}
+
+		return $processed_settings;
+	}
+
+	/**
+	 * Get the add-on global setting from the DB, or return the fallback if it doesn't exist
+	 *
+	 * @param string $name The settings key name without the prefix
+	 * @param mixed $fallback A fallback value if the setting doesn't exist
+	 *
+	 * @return mixed
+	 * @since 6.5
+	 */
+	final public function get_addon_setting_value( string $name, $fallback = '' ) {
+		if ( ! $this instanceof Helper_Interface_Extension_Settings ) {
+			return $fallback;
+		}
+
+		return $this->options->get_settings()[ $this->get_addon_settings_key() . $name ] ?? $fallback;
 	}
 
 	/**
@@ -519,8 +636,6 @@ abstract class Helper_Abstract_Addon {
 	 * @since    4.2
 	 */
 	public function schedule_license_check() {
-		$this->log->notice( 'Check status of plugin license details' );
-
 		$license_info = $this->get_license_info();
 
 		/* If the license info is empty disable check */
