@@ -29,8 +29,10 @@ $parent_link_text = $download ? __( 'Download PDFs', 'gravity-forms-pdf-extended
 				<?php foreach ( $args['pdfs'] as $pdf ): ?>
 					<li>
 						<a href="<?php echo $download ? esc_url( $pdf['download'] ) : esc_url( $pdf['view'] ); ?>"
+						   class="<?php echo esc_attr( $pdf['class'] ); ?>"
 							<?php echo $download ? '' : 'target="_blank"'; ?>
 						   data-label="<?php echo esc_attr( $pdf['name'] ); ?>"
+						   data-type="<?php echo esc_attr( $args['view'] ); ?>"
 						>
 							<?php echo esc_html( $pdf['name'] ); ?>
 						</a>
