@@ -20,7 +20,7 @@
     "redux-watch": "^1.2.0",
     "reselect": "^4.1.6",
     "sprintf-js": "^1.1.2",
-    "superagent": "^8.0.0",
+    "superagent": "8.0.0",
     "wait-on": "^6.0.1"
   },
   "devDependencies": {
