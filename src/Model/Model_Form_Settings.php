@@ -763,7 +763,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function decode_json( $value, $key ) {
 
-		if ( $key === 'conditionalLogic' ) {
+		if ( $key === 'conditionalLogic' && is_string( $value ) ) {
 			return json_decode( $value, true );
 		}
 
