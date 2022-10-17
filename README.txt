@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.0
-Stable tag: 6.4.7
+Stable tag: 6.5.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,17 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.5.0 =
+* Housekeeping: Update Global Extension Settings UI to be Gravity Forms 2.5 compatible
+* Housekeeping: Adjust how admin Notices are handled on Gravity PDF pages
+* Housekeeping: Update JavaScript package bundle
+* Dev: Validate template filename when uploading via the PDF Template Manager (A-Za-z0-9_-)
+* Dev: Add filterable CSS class names to the PDF links in the admin area
+* Dev: Pass context to the `gfpdf_core_template` hook
+* Dev: Add `gfpdf_core_template_{form_id}` hook to target specific forms
+* Bug: Fix undefined `rtl` notice in Core PDF templates
+* Bug: Fix PHP8.1 notice when saving PDF settings
 
 = 6.4.7 =
 * Bug: Resolve blank PDF problem when a large HTML block is processed by mPDF
