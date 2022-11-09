@@ -107,6 +107,10 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 
 == Changelog ==
 
+= 6.5.1 =
+* Housekeeping: Update mPDF to the latest version
+* Bug: Resolve custom font installation issue for some .ttf files
+
 = 6.5.0 =
 * Housekeeping: Update Global Extension Settings UI to be Gravity Forms 2.5 compatible
 * Housekeeping: Adjust how admin Notices are handled on Gravity PDF pages
