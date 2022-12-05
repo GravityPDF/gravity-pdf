@@ -47,7 +47,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
   const testPageListItem =
     Selector('#gform_setting_page')
       .find('.gform-dropdown__container')
-      .find('button').withText('Test page')
+      .find('button').withText('Test-page')
 
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
@@ -59,7 +59,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
   await t
     .setNativeDialogHandler(() => true)
     .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
-    .click(link('#the-list', 'Test page'))
+    .click(link('#the-list', 'Test-page'))
   await page.closePopupButton.exists && await t.click(page.closePopupButton)
   await t
     .click(page.addBlockIcon)
@@ -125,7 +125,7 @@ test('reset/clean Page entry for the next test', async t => {
   // Actions & Assertions
   await page.navigatePage()
   await t
-    .hover(link('#the-list', 'Test page'))
+    .hover(link('#the-list', 'Test-page'))
     .click(page.trashLink)
-    .expect(link('#the-list', 'Test page').exists).notOk()
+    .expect(link('#the-list', 'Test-page').exists).notOk()
 })

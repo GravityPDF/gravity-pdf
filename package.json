@@ -76,8 +76,7 @@
 
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors",
-    "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -L",
-    "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
+    "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L fullPage=true --disable-multiple-windows --skip-js-errors",
     "test:php": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
     "test:php:multisite": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",
     "test:js": "jest --verbose",
