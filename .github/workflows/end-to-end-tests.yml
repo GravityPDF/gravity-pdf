@@ -36,9 +36,7 @@ jobs:
     steps:
       - name: Cancel previous runs of this workflow (pull requests only)
         if: ${{ github.event_name == 'pull_request' }}
-        uses: styfle/cancel-workflow-action@0.5.0
-        with:
-          access_token: ${{ github.token }}
+        uses: styfle/cancel-workflow-action@0.11.0
 
       - name: Configure environment variables
         run: |
@@ -46,7 +44,7 @@ jobs:
           echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Docs: https://github.com/shivammathur/setup-php
       - name: Setup PHP
@@ -55,23 +53,22 @@ jobs:
           php-version: 7.4
 
       - name: Setup Node JS
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
 
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
       - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
+        uses: actions/cache@v3
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
-          # caching node_modules
-          path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            ${{ runner.os }}-yarn-
 
       - name: Log debug information
         run: |
@@ -86,7 +83,7 @@ jobs:
           locale -a
 
       - name: Install Dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Build Gravity PDF
@@ -102,11 +99,11 @@ jobs:
       - name: Dump log files on failure
         if: failure()
         run: |
-          npm run wp-env run tests-wordpress cp -r /var/www/html/wp-content/uploads/gravity_forms/logs/ /var/www/html/wp-content/plugins/gravity-pdf/tmp/
+          npm run wp-env run tests-wordpress "cp -r /var/www/html/wp-content/uploads/gravity_forms/logs/ /var/www/html/wp-content/plugins/gravity-pdf/tmp/"
           mv tmp screenshots/tmp
 
       - name: Upload artifacts on failure
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: my-artifact
