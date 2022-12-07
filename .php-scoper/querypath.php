@@ -21,8 +21,8 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/arthurkushman/query-path/' )->depth( '== 0' )->name( [ 'CREDITS', 'COPYING-MIT.txt' ] ),
-		Finder::create()->files()->in( $path . 'vendor/arthurkushman/query-path/src/' )->name( [ '*.php' ] ),
+		Finder::create()->files()->in( $path . 'vendor/gravitypdf/querypath/' )->depth( '== 0' )->name( [ 'CREDITS', 'COPYING-MIT.txt' ] ),
+		Finder::create()->files()->in( $path . 'vendor/gravitypdf/querypath/src/' )->name( [ '*.php' ] ),
 		Finder::create()->files()->in( $path . 'vendor/masterminds/html5/' )->depth( '== 0' )->name( [ 'LICENSE.txt', 'CREDITS' ] ),
 		Finder::create()->files()->in( $path . 'vendor/masterminds/html5/src/' )->name( [ '*.php' ] ),
 	],
