@@ -32,17 +32,18 @@ eval "rm -Rf ${PLUGIN_DIR}vendor/league"
 
 # Querypath
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/querypath.php --quiet"
-eval "rm -Rf ${PLUGIN_DIR}vendor/arthurkushman"
 eval "rm -Rf ${PLUGIN_DIR}vendor/masterminds"
 
 # Codeguy
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/gravitypdf/upload --config=${PLUGIN_DIR}.php-scoper/upload.php --quiet"
-eval "rm -Rf ${PLUGIN_DIR}vendor/gravitypdf"
 
 # Mpdf
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/mpdf.php" --quiet
 eval "rm -Rf ${PLUGIN_DIR}vendor/mpdf"
 eval "rm -Rf ${PLUGIN_DIR}vendor/setasign"
 eval "rm -Rf ${PLUGIN_DIR}vendor/myclabs"
+
+# Do this at the end as we have multiple vendor packages used
+eval "rm -Rf ${PLUGIN_DIR}vendor/gravitypdf"
 
 eval "$COMPOSER dump-autoload --optimize --working-dir ${PLUGIN_DIR}"

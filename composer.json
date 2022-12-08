@@ -31,7 +31,7 @@
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
-    "arthurkushman/query-path": "^3.1",
+    "gravitypdf/querypath": "^3.2",
     "gravitypdf/upload": "^3.0"
   },
   "require-dev": {
