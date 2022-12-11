@@ -52,10 +52,10 @@ jobs:
         os: [ ubuntu-latest ]
         multisite: [ false ]
         include:
-          - php: '7.4'
+          - php: '8.1'
             os: ubuntu-latest
             multisite: true
-          - php: '7.4'
+          - php: '8.1'
             os: ubuntu-latest
             multisite: false
             report: true
@@ -113,18 +113,22 @@ jobs:
           yarn
 
       - name: Install / Setup Gravity PDF + WordPress
+        if: ${{ ! matrix.report }}
         run: |
           yarn env:install
+
+      - name: Install / Setup Gravity PDF + WordPress
+        if: ${{ matrix.report }}
+        run: |
+          PHP_ENABLE_XDEBUG=true yarn env:install          
 
       - name: Run PHPUnit tests
         if: ${{ ! matrix.multisite }}
         run: yarn test:php --do-not-cache-result --verbose
-        continue-on-error: ${{ matrix.php == '8.1' }}
 
       - name: Run Multisite PHPUnit tests
         if: ${{ matrix.multisite }}
         run: yarn test:php:multisite --verbose
-        continue-on-error: ${{ matrix.php == '8.1' }}
 
       - name: Generate Code Coverage Report for PHP
         if: ${{ matrix.report }}
