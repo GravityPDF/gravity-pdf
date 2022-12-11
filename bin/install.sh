@@ -15,7 +15,11 @@ composer install
 composer run prefix
 
 # Start local environment
-npm run wp-env start -- --xdebug=debug,coverage
+if [[ $PHP_ENABLE_XDEBUG ]]; then
+  npm run wp-env start -- --xdebug=debug,coverage
+else
+    npm run wp-env start
+fi
 
 # Fix permissions issues on test container
 npm run wp-env run wordpress chmod 777 /var/www/html/wp-content/{plugins,themes,}
