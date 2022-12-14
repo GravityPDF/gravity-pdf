@@ -64,13 +64,13 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 *
 	 * @since 4.1
 	 */
-	public static function set_upBeforeClass() {
+	public static function set_up_before_class() {
 		global $wpdb;
 		$wpdb->suppress_errors = false;
 		$wpdb->show_errors     = true;
 		$wpdb->db_connect();
 
-		parent::set_upBeforeClass();
+		parent::set_up_before_class();
 	}
 
 	/**

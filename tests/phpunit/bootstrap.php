@@ -99,6 +99,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once $this->plugin_dir . '/../gravityformspolls/polls.php';
 		require_once $this->plugin_dir . '/../gravityformsquiz/quiz.php';
 		require_once $this->plugin_dir . '/../gravityformssurvey/survey.php';
+		require_once( GFCommon::get_base_path() . '/tooltips.php' );
 
 		/* set up Gravity Forms database */
 		add_filter( 'get_available_languages', function( $language ) {
