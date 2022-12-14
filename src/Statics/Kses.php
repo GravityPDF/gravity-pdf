@@ -27,7 +27,7 @@ class Kses {
 	 *
 	 * @since 6.4.0
 	 */
-	public static function output( string $html ): void {
+	public static function output( $html ): void {
 		/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
 		echo self::parse( $html );
 	}
@@ -41,10 +41,10 @@ class Kses {
 	 *
 	 * @since 6.4.0
 	 */
-	public static function parse( string $html ) {
+	public static function parse( $html ) {
 		add_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
-		$html = wp_kses( $html, self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
+		$html = wp_kses( (string) $html, self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
 
 		remove_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 

@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Statics;
 
+use GFPDF\Exceptions\GravityPdfException;
 use WP_UnitTestCase;
 
 /**
@@ -24,6 +25,14 @@ class Test_Kses extends WP_UnitTestCase {
 	 */
 	public function test_parse_pdf_tags_and_attributes( $html ) {
 		$this->assertSame( $html, Kses::parse( $html ) );
+	}
+
+	public function test_numeric_output() {
+		$this->assertSame( '1234567890', Kses::parse( 1234567890 ) );
+	}
+
+	public function test_null_output() {
+		$this->assertSame( '', Kses::parse( null ) );
 	}
 
 	/**
