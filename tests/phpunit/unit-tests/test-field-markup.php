@@ -4,9 +4,13 @@ namespace GFPDF\Tests;
 
 use GF_Field_Consent;
 use GF_Field_Repeater;
+use GF_Field_Text;
+use GF_Field_Textarea;
 use GFAPI;
 use GFPDF\Helper\Fields\Field_Consent;
 use GFPDF\Helper\Fields\Field_Repeater;
+use GFPDF\Helper\Fields\Field_Text;
+use GFPDF\Helper\Fields\Field_Textarea;
 use GFPDF\Helper\Helper_QueryPath;
 use GPDFAPI;
 use WP_UnitTestCase;
@@ -68,5 +72,37 @@ class Test_Field_Markup extends WP_UnitTestCase {
 		$this->assertSame( 1, $html->find( '.consent-accepted' )->count() );
 		$this->assertSame( 1, $html->find( '.consent-accepted-label' )->count() );
 		$this->assertSame( 1, $html->find( '.consent-text' )->count() );
+	}
+
+	public function test_maximum_allowed_css_each_field(){
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$form_id          = GFAPI::add_form( $form );
+		$entry['form_id'] = $form_id;
+		$entry_id         = GFAPI::add_entry( $entry );
+
+		/* Verify classes are truncated at 8 */
+		$text_field = new GF_Field_Text( $form['fields'][0] );
+
+		$field = new Field_Text( $text_field, GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+		$array_css = explode( ' ', $field->get_field_classes() );
+
+		$this->assertCount( 8, $array_css );
+
+		$this->assertContains( 'exclude', $array_css );
+		$this->assertContains( 'class7', $array_css );
+		$this->assertContains( 'class4', $array_css );
+		$this->assertNotContains( 'class8', $array_css );
+
+		/* Verify nothing is truncated */
+		$text_field = new GF_Field_Textarea( $form['fields'][1] );
+
+		$field = new Field_Textarea( $text_field, GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+		$array_css = explode( ' ', $field->get_field_classes() );
+
+		$this->assertCount( 2, $array_css );
+
+		$this->assertCount( 2, $array_css );
 	}
 }

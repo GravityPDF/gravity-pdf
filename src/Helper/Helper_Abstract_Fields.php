@@ -345,7 +345,7 @@ abstract class Helper_Abstract_Fields {
 		$label = esc_html( $this->get_label() );
 		$type  = $this->field->get_input_type();
 
-		$html = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="gfpdf-field ' . esc_attr( 'gfpdf-' . $type ) . ' ' . esc_attr( $this->field->cssClass ) . '">
+		$html = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="gfpdf-field ' . esc_attr( 'gfpdf-' . $type ) . ' ' . esc_attr( $this->get_field_classes() ) . '">
 					<div class="inner-container">';
 
 		if ( $show_label ) {
@@ -392,5 +392,21 @@ abstract class Helper_Abstract_Fields {
 		$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
 
 		return str_replace( $find, $converted, $value );
+	}
+
+	/**
+	 * To avoid mPDF memory errors trying to determine the CSS specificity we will limit the field to 8 user classes
+	 *
+	 * @see https://github.com/mpdf/mpdf/issues/1753
+	 *
+	 * @return string
+	 *
+	 * @since 6.5
+	 */
+	public function get_field_classes(): string {
+		return implode(
+			' ',
+			array_slice( explode( ' ', $this->field->cssClass ), 0, 8 )
+		);
 	}
 }

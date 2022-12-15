@@ -38,7 +38,7 @@
       "inputMaskValue": "",
       "allowsPrepopulate": false,
       "description": "This is the single line text description",
-      "cssClass": "exclude",
+      "cssClass": "exclude class1 class2 class3 class4 class5 class6 class7 class8 class9 class10",
       "inputType": ""
     },
     {
@@ -70,6 +70,7 @@
       "inputMaskValue": "",
       "allowsPrepopulate": false,
       "description": "This is the paragraph text description",
+      "cssClass": "class1 class2",
       "inputType": ""
     },
     {
