@@ -27,7 +27,7 @@
   ],
   "require": {
     "php": ">=7.3",
-    "mpdf/mpdf": "dev-master#3819711a98b062ddcd2c12f6334335d8c6ae3da1",
+    "mpdf/mpdf": "^8.1",
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
