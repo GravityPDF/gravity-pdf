@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.1
-Stable tag: 6.5.1
+Stable tag: 6.5.2
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,13 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.5.2 =
+* Bug: Fix PHP error when a non-string is passed to the Kses sanitizing class
+* Bug: Resolve memory problem generating Core PDFs if an HTML element contains more than 10+ classes (field CSS Classes are now truncated to 8 user-defined classes)
+* Bug: Fix Slim Image Cropper display problems in Core PDFs
+* Housekeeping: Update mPDF to the latest version
+* Housekeeping: Update QueryPath to the latest version
 
 = 6.5.1 =
 * Housekeeping: Update mPDF to the latest version
