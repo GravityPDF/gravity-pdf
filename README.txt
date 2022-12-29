@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.1
-Stable tag: 6.5.2
+Stable tag: 6.5.3
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,9 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.5.3 =
+* Bug: Fix image/asset loading issue due to a cURL error
 
 = 6.5.2 =
 * Bug: Fix PHP error when a non-string is passed to the Kses sanitizing class
