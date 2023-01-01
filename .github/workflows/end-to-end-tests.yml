@@ -51,6 +51,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node JS
         uses: actions/setup-node@v3
@@ -92,6 +94,8 @@ jobs:
       - name: Install / Setup Gravity PDF + WordPress
         run: |
           yarn env:install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run E2E tests
         run: yarn test:e2e:headless --stop-on-first-fail
