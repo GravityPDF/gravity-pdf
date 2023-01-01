@@ -4,6 +4,7 @@ namespace GFPDF\Helper;
 
 use Exception;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
+use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
@@ -619,9 +620,17 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function begin_pdf() {
+		$options = \GPDFAPI::get_options_class();
+
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
-		$this->mpdf = new Helper_Mpdf(
+		$http_client = new Helper_Mpdf_Http_Client( $this->log, $options->get_option( 'debug_mode', 'No' ) === 'Yes' );
+		$container   = new SimpleContainer(
+			[
+				'httpClient' => $http_client,
+			]
+		);
+		$this->mpdf  = new Helper_Mpdf(
 			apply_filters(
 				'gfpdf_mpdf_class_config',
 				[
@@ -658,7 +667,8 @@ class Helper_PDF {
 				$this->entry,
 				$this->settings,
 				$this
-			)
+			),
+			$container
 		);
 
 		$this->mpdf->setLogger( $this->log );
