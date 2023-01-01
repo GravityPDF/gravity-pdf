@@ -635,6 +635,7 @@ class Helper_PDF {
 
 					'curlCaCertificate'      => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
 					'curlFollowLocation'     => true,
+					'curlUserAgent'          => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0',
 
 					'allow_output_buffering' => true,
 					'autoLangToFont'         => true,
