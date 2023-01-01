@@ -28,6 +28,8 @@ jobs:
         with:
           php-version: 7.4
           tools: composer, cs2pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log debug information
         run: |
@@ -38,6 +40,8 @@ jobs:
         run: |
           composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log PHPCS debug information
         run: composer run lint -- -i

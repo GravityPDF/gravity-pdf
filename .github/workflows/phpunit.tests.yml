@@ -76,6 +76,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node JS
         uses: actions/setup-node@v2
@@ -116,11 +118,15 @@ jobs:
         if: ${{ ! matrix.report }}
         run: |
           yarn env:install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ matrix.report }}
         run: |
-          PHP_ENABLE_XDEBUG=true yarn env:install          
+          PHP_ENABLE_XDEBUG=true yarn env:install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run PHPUnit tests
         if: ${{ ! matrix.multisite }}
@@ -136,7 +142,7 @@ jobs:
 
       - name: Generate Code Coverage Report for PHP
         if: ${{ matrix.report }}
-        run: |
+        run: |  
           yarn run test:php --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml
           yarn run test:php --group ajax --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage2.xml
 
