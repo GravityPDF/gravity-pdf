@@ -138,6 +138,8 @@ class Test_Actions extends WP_UnitTestCase {
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
+		/* Check if Helper_Notice class will trigger on GravityPDF page */
+		$_GET['subview'] = 'PDF';
 
 		/* Verify notice now present */
 		$this->controller->route_notices();
@@ -147,6 +149,16 @@ class Test_Actions extends WP_UnitTestCase {
 
 		/* Cleanup notices */
 		$gfpdf->notices->clear();
+		unset( $_GET['subview'] );
+
+		/* Check if GFCommon class will trigger on Gravity page */
+		$_GET['page'] = 'gf_edit_forms';
+
+		/* Verify notice now present */
+		$this->controller->route_notices();
+
+		/* Verify GravityForm's default error messages now exists */
+		$this->assertNotEmpty( \GFCommon::$errors );
 
 		/* Check routes aren't handled when not in admin area */
 		set_current_screen( 'front' );
