@@ -53,7 +53,7 @@ class Test_Field_Survey extends WP_UnitTestCase {
 	public function test_html() {
 		$html = $this->pdf_field->html();
 
-		$this->assertStringContainsString( "<table class='gsurvey-likert' id='input_1_26'>", $html );
+		$this->assertStringContainsString( "<table aria-label='Likert Survey Field' class='gsurvey-likert' id='input_1_26'>", $html );
 		$this->assertStringContainsString( "<input name='input_26' type='radio' value='glikertcol2636762f85' checked='checked' id='choice_1_26_1' />", $html );
 	}
 }
