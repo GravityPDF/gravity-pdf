@@ -216,6 +216,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 				->push_to_queue( $this->get_queue_tasks( $entry, $form ) )
 				->save()
 				->dispatch();
+
+			/* Create a fresh queue in case the queue needs to be used again */
+			$this->queue = new Helper_Pdf_Queue( $this->log );
 		}
 
 		$this->disable_queue = false;
@@ -249,6 +252,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 			$this->queue
 				->save()
 				->dispatch();
+
+			/* Create a fresh queue in case the queue needs to be used again */
+			$this->queue = new Helper_Pdf_Queue( $this->log );
 		}
 	}
 
