@@ -210,6 +210,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
+
 		if ( ! $this->disable_queue ) {
 			/* Push and trigger async queue */
 			$this->queue
@@ -277,6 +278,27 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
 		$queue_data = apply_filters( 'gfpdf_queue_initialise', [], $entry, $form );
+
+		/**
+		 * Check if Asynchronous notification is enabled for this form.
+		 * https://docs.gravityforms.com/gform_is_asynchronous_notifications_enabled/
+		 */
+		$is_asynchronous = gf_apply_filters(
+			[
+				'gform_is_asynchronous_notifications_enabled',
+				$form['id'],
+			],
+			false,
+			$notifications['event'],
+			$notifications['id'],
+			$form,
+			$entry,
+			[]
+		);
+
+		if ( $is_asynchronous ) {
+			return $queue_data;
+		}
 
 		/* Queue up the PDF generation callback */
 		if ( count( $pdfs ) > 0 ) {
