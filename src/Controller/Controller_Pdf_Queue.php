@@ -29,16 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since   5.0
  */
-class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
-
-	/**
-	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
-	 *
-	 * @var Helper_Form
-	 *
-	 * @since 5.0
-	 */
-	protected $gform;
+class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 
 	/**
 	 * Holds our log class
@@ -64,13 +55,11 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	protected $queue;
 
 	/**
-	 * Determines if our PDF queue should execute
+	 * @var array An array containing the notification objects to be sent using background processing during a request
 	 *
-	 * @var bool
-	 *
-	 * @since 5.0
+	 * @since 6.11.0
 	 */
-	protected $disable_queue = false;
+	protected $form_async_notifications = [];
 
 	/**
 	 * Set up our dependencies
@@ -96,64 +85,48 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 */
 	public function init() {
-		$this->add_actions();
-		$this->add_filters();
-	}
-
-	/**
-	 * Apply any actions needed for the welcome page
-	 *
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function add_actions() {
+		add_filter( 'gform_disable_notification', [ $this, 'maybe_disable_submission_notifications' ], 9999, 5 );
 		add_action( 'gform_after_submission', [ $this, 'queue_async_form_submission_tasks' ], 5, 2 );
 
-		add_action( 'gform_post_resend_notification', [ $this, 'queue_async_resend_notification_tasks' ], 10, 3 );
-		add_action( 'gform_post_resend_all_notifications', [ $this, 'queue_dispatch_resend_notification_tasks' ] );
-	}
-
-	/**
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function add_filters() {
-		add_filter( 'gform_disable_notification', [ $this, 'maybe_disable_submission_notifications' ], 9999, 4 );
 		add_filter( 'gform_disable_resend_notification', [ $this, 'maybe_disable_resend_notifications' ], 10, 4 );
+		add_action( 'gform_post_resend_all_notifications', [ $this, 'queue_dispatch_resend_notification_tasks' ], 10, 2 );
 	}
 
 	/**
-	 * Only process notifications that occur on form submission
+	 * Disable the form submission notifications if PDF attached and GF async notifications not enabled
 	 *
 	 * @param bool  $is_disabled
 	 * @param array $notification
 	 * @param array $form
 	 * @param array $entry
+	 * @param array $data
 	 *
 	 * @return bool
 	 *
 	 * @since 5.0
 	 */
-	public function maybe_disable_submission_notifications( $is_disabled, $notification, $form, $entry ) {
-
-		/* If a plugin has already disabled notifications we won't queue up the notifications/PDFs as a background process */
+	public function maybe_disable_submission_notifications( $is_disabled, $notification, $form, $entry, $data = [] ) {
+		/* Notification already disabled via some other method */
 		if ( $is_disabled ) {
-			$this->disable_queue = true;
-
 			return $is_disabled;
 		}
 
+		/* Not form submission event */
 		if ( empty( $notification['event'] ) || $notification['event'] !== 'form_submission' ) {
 			return $is_disabled;
 		}
 
-		return $this->do_we_disable_notification( $is_disabled, $notification, $form, $entry );
+		/* If Gravity Forms async notification feature is enabled, let it handle the sending process  */
+		if ( $this->model_pdf->is_gform_asynchronous_notifications_enabled( [ $notification['id'] ?? '' ], $form, $entry, $data ) ) {
+			return $is_disabled;
+		}
+
+		/* Check if a PDF should be attached to this notification */
+		return $this->should_send_async_notification( $is_disabled, $notification, $form, $entry );
 	}
 
 	/**
-	 * Only process notifications that occur when resending notifications
+	 * Disable resend notification if PDF attached
 	 *
 	 * @param bool  $is_disabled
 	 * @param array $notification
@@ -165,11 +138,32 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	public function maybe_disable_resend_notifications( $is_disabled, $notification, $form, $entry ) {
-		return $this->do_we_disable_notification( $is_disabled, $notification, $form, $entry );
+		return $this->should_send_async_notification( $is_disabled, $notification, $form, $entry );
 	}
 
 	/**
-	 * Check if there are any PDFs that need to be sent with the notifications and disable so we can process in the background
+	 * Track the notifications to send asynchronous via Gravity PDF
+	 *
+	 * @param $is_disabled
+	 * @param $notification
+	 * @param $form
+	 * @param $entry
+	 *
+	 * @return bool
+	 *
+	 * @since 6.11.0
+	 */
+	protected function should_send_async_notification( $is_disabled, $notification, $form, $entry ) {
+		$send_async_notification = $this->do_we_disable_notification( $is_disabled, $notification, $form, $entry );
+		if ( $send_async_notification ) {
+			$this->form_async_notifications[] = $notification;
+		}
+
+		return $send_async_notification;
+	}
+
+	/**
+	 * Determine if a PDF should be included as an email attachment in the current notification
 	 *
 	 * @param bool  $default
 	 * @param array $notification
@@ -181,7 +175,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	public function do_we_disable_notification( $default, $notification, $form, $entry ) {
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
+		$pdfs = $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'] ?? [], $entry );
 
 		/* Disable notification if PDF needs to be attached to it */
 		foreach ( $pdfs as $pdf ) {
@@ -202,60 +196,87 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	}
 
 	/**
-	 * Queue all PDFs/Notifications during form submission and dispatch
+	 * Queue and send the notifications after the form submission process has completed
 	 *
-	 * @param $entry
-	 * @param $form
+	 * @param array $entry
+	 * @param array $form
 	 *
 	 * @since 5.0
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
-		if ( ! $this->disable_queue ) {
-			/* Push and trigger async queue */
-			$this->queue
-				->push_to_queue( $this->get_queue_tasks( $entry, $form ) )
-				->save()
-				->dispatch();
+		$this->queue_async_tasks( $form, $entry );
 
-			/* Create a fresh queue in case the queue needs to be used again */
-			$this->queue = new Helper_Pdf_Queue( $this->log );
-		}
-
-		$this->disable_queue = false;
-	}
-
-	/**
-	 * Push jobs to our background process queue when resending notifications
-	 *
-	 * @param $notification
-	 * @param $form
-	 * @param $entry
-	 *
-	 * @since 5.0
-	 */
-	public function queue_async_resend_notification_tasks( $notification, $form, $entry ) {
-		add_filter( 'gfpdf_maybe_always_save_pdf', '__return_false' );
-
-		/* Push to async queue */
-		$this->queue->push_to_queue( $this->get_queue_tasks( $entry, $form, [ $notification ] ) );
-
-		remove_filter( 'gfpdf_maybe_always_save_pdf', '__return_false' );
-	}
-
-	/**
-	 * If we have any jobs in our background process queue after resending the notifications, dispatch them
-	 *
-	 * @since 5.0
-	 */
-	public function queue_dispatch_resend_notification_tasks() {
 		if ( count( $this->queue->get_data() ) > 0 ) {
-			$this->queue
-				->save()
-				->dispatch();
-
-			/* Create a fresh queue in case the queue needs to be used again */
-			$this->queue = new Helper_Pdf_Queue( $this->log );
+			$this->queue_cleanup_task( $form, $entry );
 		}
+
+		$this->dispatch_queue();
+	}
+
+	/**
+	 * Queue and send the notifications after the resend notification process has completed
+	 *
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @since 5.0
+	 */
+	public function queue_dispatch_resend_notification_tasks( $form, $entry ) {
+		$this->queue_async_form_submission_tasks( $entry, $form );
+	}
+
+	/**
+	 * Push tasks to the queue for requested notifications
+	 *
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return void
+	 *
+	 * @since 6.11.0
+	 */
+	public function queue_async_tasks( $form, $entry ) {
+		foreach ( $this->form_async_notifications as $notification ) {
+			$this->queue->push_to_queue( $this->get_queue_tasks( $entry, $form, [ $notification ] ) );
+		}
+	}
+
+	/**
+	 * Delete PDFs from disk once all tasks are processed
+	 *
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return void
+	 *
+	 * @since 6.11.0
+	 */
+	public function queue_cleanup_task( $form, $entry ) {
+		$this->queue->push_to_queue(
+			[
+				[
+					'id'   => sprintf( 'cleanup-pdf-%d-%d', $form['id'], $entry['id'] ),
+					'func' => '\GFPDF\Statics\Queue_Callbacks::cleanup_pdfs',
+					'args' => [ $form['id'], $entry['id'] ],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Dispatch the queue if it has any tasks
+	 *
+	 * @return void
+	 *
+	 * @since 6.11.0
+	 */
+	public function dispatch_queue() {
+		if ( count( $this->queue->get_data() ) === 0 ) {
+			return;
+		}
+
+		$this->queue->save()->dispatch();
+		$this->reset_queue();
 	}
 
 	/**
@@ -264,9 +285,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * We use static callbacks to keep the queue database size small (queues are stored in the options table)
 	 *
-	 * @param $entry
-	 * @param $form
-	 * @param $notifications
+	 * @param array $entry
+	 * @param array $form
+	 * @param array $notifications
 	 *
 	 * @return array
 	 * @since 5.0
@@ -274,27 +295,15 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 */
 	protected function get_queue_tasks( $entry, $form, $notifications = [] ) {
 		/* Check if the PDF should be generated  */
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
+		$pdfs = $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'] ?? [], $entry );
 
 		$queue_data = apply_filters( 'gfpdf_queue_initialise', [], $entry, $form );
 
-		/* Queue up the PDF generation callback */
 		if ( count( $pdfs ) > 0 ) {
-			$notifications = ( count( $notifications ) > 0 ) ? $notifications : $this->get_active_notifications( $form, $entry );
-
 			$pdf_queue_data          = $this->queue_pdfs( $notifications, $pdfs, $form, $entry );
 			$notification_queue_data = $this->queue_notifications( $notifications, $pdfs, $form, $entry );
 
 			$queue_data = array_merge( $queue_data, $pdf_queue_data, $notification_queue_data );
-
-			/* Queue up a cleanup callback */
-			if ( count( $pdf_queue_data ) > 0 ) {
-				$queue_data[] = [
-					'id'   => 'cleanup-pdf-' . $form['id'] . '-' . $entry['id'],
-					'func' => '\GFPDF\Statics\Queue_Callbacks::cleanup_pdfs',
-					'args' => [ $form['id'], $entry['id'] ],
-				];
-			}
 		}
 
 		$queue_data = apply_filters( 'gfpdf_queue_pre_dispatch', $queue_data, $entry, $form );
@@ -365,7 +374,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 				if ( $this->model_pdf->maybe_attach_to_notification( $notification, $pdf, $entry, $form ) ) {
 					$queue_data[] = $pdf_queue_data;
 
-					/* Only queue each PDF once (even if attached to multiple notifications) */
+					/* Only queue each PDF once */
 					break;
 				}
 			}
@@ -401,7 +410,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 						'args' => [ $form['id'], $entry['id'], $notification ],
 					];
 
-					/* Only queue each notification once (even if there are multiple PDFs) */
+					/* Only queue each notification once */
 					break;
 				}
 			}
@@ -424,6 +433,39 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	protected function get_queue_id( $form, $entry, $pdf ) {
-		return $form['id'] . '-' . $entry['id'] . '-' . $pdf['id'];
+		return sprintf(
+			'%d-%d-%s',
+			$form['id'] ?? 0,
+			$entry['id'] ?? 0,
+			sanitize_html_class( $pdf['id'] )
+		);
+	}
+
+	/**
+	 * Create a fresh queue in case it needs to be used again this request
+	 *
+	 * @return void
+	 *
+	 * @since 6.11.0
+	 */
+	public function reset_queue() {
+		/* Create a fresh queue in case the queue needs to be used again */
+		$this->queue                    = new Helper_Pdf_Queue( $this->log );
+		$this->form_async_notifications = [];
+	}
+
+	/**
+	 * Push jobs to our background process queue when resending notifications
+	 *
+	 * @param $notification
+	 * @param $form
+	 * @param $entry
+	 *
+	 * @since 5.0
+	 *
+	 * @deprecated 6.11
+	 */
+	public function queue_async_resend_notification_tasks( $notification, $form, $entry ) {
+		_doing_it_wrong( esc_html( 'queue_async_resend_notification_tasks() was removed in Gravity PDF 6.11' ) );
 	}
 }

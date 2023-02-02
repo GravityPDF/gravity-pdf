@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class _Queue_Callbacks
+ * Class Queue_Callbacks
  *
  * @package GFPDF\Helper
  *
@@ -39,22 +39,26 @@ class Queue_Callbacks {
 	 * @since 5.0
 	 */
 	public static function create_pdf( $entry_id, $pdf_id ) {
-		$log     = GPDFAPI::get_log_class();
-		$results = GPDFAPI::create_pdf( $entry_id, $pdf_id );
+		$log = GPDFAPI::get_log_class();
 
-		if ( is_wp_error( $results ) ) {
+		/* For performance, only generate the PDF if it does not currently exist on disk */
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
+		$pdf = GPDFAPI::create_pdf( $entry_id, $pdf_id );
+		remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
+
+		if ( is_wp_error( $pdf ) ) {
 			$log->error(
 				'PDF Generation Error',
 				[
-					'code'    => $results->get_error_code(),
-					'message' => $results->get_error_message(),
+					'code'    => $pdf->get_error_code(),
+					'message' => $pdf->get_error_message(),
 				]
 			);
 
 			throw new Exception();
 		}
 
-		$log->notice( sprintf( 'PDF successfully generated and saved to %s', $results ) );
+		$log->notice( sprintf( 'PDF successfully generated and saved to %s', $pdf ) );
 	}
 
 	/**
@@ -136,15 +140,6 @@ class Queue_Callbacks {
 			throw new Exception();
 		}
 
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
-
-		foreach ( $pdfs as $pdf ) {
-			$notification = ( isset( $pdf['notification'] ) && is_array( $pdf['notification'] ) ) ? $pdf['notification'] : [];
-			if ( count( $notification ) > 0 || $model_pdf->maybe_always_save_pdf( $pdf ) ) {
-				$pdf_generator = new Helper_PDF( $entry, $pdf, $gform, $data, $misc, $templates, $log );
-				$misc->rmdir( $pdf_generator->get_path() );
-				break;
-			}
-		}
+		$model_pdf->cleanup_pdf( $entry, $form );
 	}
 }
