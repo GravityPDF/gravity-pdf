@@ -210,7 +210,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
-
 		if ( ! $this->disable_queue ) {
 			/* Push and trigger async queue */
 			$this->queue
@@ -278,30 +277,8 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
 		$queue_data = apply_filters( 'gfpdf_queue_initialise', [], $entry, $form );
-
-		/**
-		 * Check if Asynchronous notification is enabled for this form.
-		 * https://docs.gravityforms.com/gform_is_asynchronous_notifications_enabled/
-		 */
-		$is_asynchronous = gf_apply_filters(
-			[
-				'gform_is_asynchronous_notifications_enabled',
-				$form['id'],
-			],
-			false,
-			$notifications['event'],
-			$notifications['id'],
-			$form,
-			$entry,
-			[]
-		);
-
-		if ( $is_asynchronous ) {
-			return $queue_data;
-		}
-
-		/* Queue up the PDF generation callback */
-		if ( count( $pdfs ) > 0 ) {
+		/* Queue up the PDF generation callback and check if the current form is disabled asynchronous notification.*/
+		if ( count( $pdfs ) > 0 && ! $this->maybe_form_notification_is_asynchronous( $form, $entry ) ) {
 			$notifications = ( count( $notifications ) > 0 ) ? $notifications : $this->get_active_notifications( $form, $entry );
 
 			$pdf_queue_data          = $this->queue_pdfs( $notifications, $pdfs, $form, $entry );
@@ -447,5 +424,40 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 */
 	protected function get_queue_id( $form, $entry, $pdf ) {
 		return $form['id'] . '-' . $entry['id'] . '-' . $pdf['id'];
+	}
+
+	/**
+	 * Check if any of the form's notification is set to asynchronous
+	 *
+	 * @param $notifications
+	 * @param $form
+	 * @param $entry
+	 *
+	 * @return string
+	 *
+	 * @since 6.5.4
+	 */
+	public function maybe_form_notification_is_asynchronous( $form, $entry ) {
+		$notification_ids = [];
+
+		foreach ( $form['notifications'] as $notification ) {
+			$notification_ids[] = $notification['id'];
+		}
+		/**
+		 * Check if Asynchronous notification is enabled for this form.
+		 * https://docs.gravityforms.com/gform_is_asynchronous_notifications_enabled/
+		 */
+		return gf_apply_filters(
+			[
+				'gform_is_asynchronous_notifications_enabled',
+				$form['id'],
+			],
+			false,
+			'form_submission', /* @Todo: is there way to make this dynamic? */
+			$notification_ids,
+			$form,
+			$entry,
+			[]
+		);
 	}
 }
