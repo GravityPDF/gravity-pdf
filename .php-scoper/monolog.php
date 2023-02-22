@@ -32,7 +32,16 @@ return [
 	 *
 	 * For more see: https://github.com/humbug/php-scoper#patchers
 	 */
-	'patchers'  => [],
+	'patchers'  => [
+		function( string $filePath, string $prefix, string $content ): string {
+
+			if ( basename( $filePath ) === 'Logger.php' ) {
+				$content = str_replace( "\\$prefix\\Fiber", '\Fiber', $content );
+			}
+
+			return $content;
+		},
+	],
 
 	'whitelist' => [
 		'Psr\*',
