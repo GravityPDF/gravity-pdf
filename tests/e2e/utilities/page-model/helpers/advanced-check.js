@@ -40,7 +40,7 @@ class AdvancedCheck {
     this.wpAdminBar = Selector('ul').withAttribute('id', 'wp-admin-bar-top-secondary').withAttribute('class', 'ab-top-secondary ab-top-menu')
     this.logout = Selector('a').withText('Log Out')
     this.pdfRestrictionErrorMessage = Selector('div').withAttribute('class', 'wp-die-message').withText('You do not have access to view this PDF.')
-    this.viewEntryLink = Selector('.entry_unread').find('a').nth(5)
+    this.viewEntryLink = Selector('.entry_unread').find('a.gravitypdf-download-link').nth(1)
     this.wpLoginForm = Selector('#login').find('form').withAttribute('name', 'loginform')
 
     // Pdf template section
