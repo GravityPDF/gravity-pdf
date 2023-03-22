@@ -61,12 +61,17 @@ class Field_Consent extends Helper_Abstract_Fields {
 	 * @since 5.1
 	 */
 	public function html( $value = '', $label = true ) {
-		$value = $this->value();
+		$value       = $this->value();
+		$has_consent = $value['value'];
 
-		$has_consent = ! empty( $value['value'] );
+		/* Allow people to remove the consent field if a user didn't consent */
+		if ( ! $has_consent && apply_filters( 'gfpdf_hide_consent_field_if_empty', false, $this->field, $this->entry, $this->form ) ) {
+			return '';
+		}
 
-		$markup      = $has_consent ? $this->get_consented_markup( $value['label'] ) : $this->get_non_consent_markup();
-		$description = strlen( $value['description'] ) > 0 ? sprintf( '<div class="consent-text">%s</div>', $value['description'] ) : '';
+		$markup = $has_consent ? $this->get_consented_markup( $value['label'] ) : $this->get_non_consent_markup();
+
+		$description = ! empty( $value['description'] ) ? sprintf( '<div class="consent-text">%s</div>', $value['description'] ) : '';
 
 		/* consent has been given, determine order of description */
 		if ( empty( $value['placement'] ) || $value['placement'] === 'below' ) {
