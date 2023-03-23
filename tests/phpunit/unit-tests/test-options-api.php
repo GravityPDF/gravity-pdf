@@ -954,7 +954,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @dataProvider provider_sanitize_all_fields
 	 */
 	public function test_sanitize_all_fields( $type, $value, $expected ) {
-		$this->assertEquals( $expected, $this->options->sanitize_all_fields( $value, '', [], [ 'type' => $type ] ) );
+		$this->assertEquals( $expected, $this->options->sanitize_all_fields( $value, '', [], [ 'id' => $type, 'type' => $type ] ) );
 	}
 
 	/**
@@ -1003,13 +1003,13 @@ class Test_Options_API extends WP_UnitTestCase {
 			],
 
 			[
-				'conditional_logic',
+				'conditionalLogic',
 				'',
 				''
 			],
 
 			[
-				'conditional_logic',
+				'conditionalLogic',
 				wp_json_encode( [
 					'actionType' => 'see',
 					'logicType'  => 'boat',

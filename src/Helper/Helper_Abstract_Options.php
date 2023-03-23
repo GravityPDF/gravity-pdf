@@ -1253,10 +1253,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$settings['type'] = '';
 		}
 
-		switch ( $settings['type'] ) {
-			case 'conditional_logic':
-				return ! empty( $value ) ? wp_json_encode( \GFFormsModel::sanitize_conditional_logic( json_decode( $value, true ) ) ) : '';
+		if ( ( $settings['id'] ?? '' ) === 'conditionalLogic' ) {
+			return ! empty( $value ) ? wp_json_encode( \GFFormsModel::sanitize_conditional_logic( json_decode( $value, true ) ) ) : '';
+		}
 
+		switch ( $settings['type'] ) {
 			case 'rich_editor':
 				if ( strpos( $value, 'telnet://{' ) === false ) {
 					/*
