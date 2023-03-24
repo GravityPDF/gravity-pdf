@@ -138,7 +138,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Add Gravity Perk Population Anything Support */
 		if ( class_exists( '\GP_Populate_Anything_Live_Merge_Tags' ) ) {
-			add_action( 'gfpdf_pre_pdf_generation_initilise', [ $this->model, 'enable_gp_populate_anything' ] );
+			add_action( 'gfpdf_pre_pdf_generation', [ $this->model, 'enable_gp_populate_anything' ] );
 			add_action( 'gfpdf_pre_pdf_generation_output', [ $this->model, 'disable_gp_populate_anything' ] );
 		}
 	}
