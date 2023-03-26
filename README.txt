@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
-Tested up to: 6.1
-Stable tag: 6.5.4
+Tested up to: 6.2
+Stable tag: 6.5.5
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,11 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.5.5 =
+* Bug: Ensure PDF conditional logic is run through the correct sanitization function upon save
+* Bug: Ensure Gravity Wiz Populate Anything live merge tags are correctly processed in the $form_data array
+* Bug: Fix Monolog error when running PHP8.1
 
 = 6.5.4 =
 * Bug: Fix duplicate notifications when using PDF Background Processing while looping over GFAPI::submit_form()
