@@ -123,8 +123,8 @@ class Field_Section extends Helper_Abstract_Fields {
 		$html  = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="gfpdf-section-title gfpdf-field ' . esc_attr( $this->field->cssClass ) . '">';
 		$html .= '<h3>' . esc_html( $section['title'] ) . '</h3>';
 
-		if ( ! empty( $value ) ) {
-			$html .= '<div id="' . esc_html( 'field-' . $this->field->id . '-desc' ) . '" class="gfpdf-section-description gfpdf-field">' . Kses::parse( $section['description'] ) . '</div>';
+		if ( ! empty( $value ) && ! empty( $section['description'] ) ) {
+			$html .= '<div id="' . esc_attr( 'field-' . $this->field->id . '-desc' ) . '" class="gfpdf-section-description gfpdf-field">' . Kses::parse( $section['description'] ) . '</div>';
 		}
 
 		$html .= '</div>';
