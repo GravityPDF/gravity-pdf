@@ -21,11 +21,6 @@ else
     npm run wp-env start
 fi
 
-# Fix permissions issues on test container
-npm run wp-env run wordpress chmod 777 /var/www/html/wp-content/{plugins,themes,}
-npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/{plugins,themes,uploads,}
-npm run wp-env run tests-wordpress chmod 777 /var/www/html/ /var/www/html/wp-content/plugins/gravity-pdf /var/www/html/wp-content/plugins/gravity-pdf-test-suite/src/fonts/
-
 echo "Install Gravity Forms..."
 bash ./bin/install-gravityforms.sh
 

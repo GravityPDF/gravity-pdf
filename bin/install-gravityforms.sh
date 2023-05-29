@@ -10,10 +10,10 @@ if [ -f ".env" ]; then
 fi
 
 # Install in both development + test environments
-npm run wp-env run cli "wp gf install --key=$GF_LICENSE --version=beta --activate --force"
-npm run wp-env run tests-cli "wp gf install --key=$GF_LICENSE --activate --force"
+npm run wp-env run cli wp gf install -- --key=$GF_LICENSE --version=beta --activate --force
+npm run wp-env run tests-cli wp gf install -- --key=$GF_LICENSE --activate --force
 
 # Install add-ons in the test environment
-npm run wp-env run tests-cli "wp gf install gravityformspolls --key=$GF_LICENSE --activate --force"
-npm run wp-env run tests-cli "wp gf install gravityformsquiz --key=$GF_LICENSE --activate --force"
-npm run wp-env run tests-cli "wp gf install gravityformssurvey --key=$GF_LICENSE --activate --force"
+npm run wp-env run tests-cli wp gf install gravityformspolls -- --key=$GF_LICENSE --activate --force
+npm run wp-env run tests-cli wp gf install gravityformsquiz -- --key=$GF_LICENSE --activate --force
+npm run wp-env run tests-cli wp gf install gravityformssurvey -- --key=$GF_LICENSE --activate --force
