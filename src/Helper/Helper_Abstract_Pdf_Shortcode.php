@@ -233,7 +233,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		$gravityview_view = GravityView_View::getInstance();
 		$entry            = $gravityview_view->getCurrentEntry();
 
-		return $this->add_entry_id_to_shortcode( $html, $entry['id'] );
+		return ! empty( $entry['id'] ) ? $this->add_entry_id_to_shortcode( $html, $entry['id'] ) : $html;
 	}
 
 	/**
