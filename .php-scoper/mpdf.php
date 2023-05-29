@@ -25,6 +25,7 @@ return [
 		Finder::create()->files()->in( $path . 'vendor/mpdf/mpdf/' )->depth( '==0' )->name( [ 'LICENSE.txt' ] ),
 		Finder::create()->files()->in( $path . 'vendor/mpdf/mpdf/data' )->name( [ '*' ] ),
 		Finder::create()->files()->in( $path . 'vendor/mpdf/qrcode/' )->exclude( 'tests' )->name( [ '*.php', 'LICENSE', '*.dat' ] ),
+		Finder::create()->files()->in( $path . 'vendor/mpdf/psr-log-aware-trait' )->name( [ '*.php' ] ),
 		Finder::create()->files()->in( $path . 'vendor/setasign/fpdi' )->name( [ '*.php', 'LICENSE.txt' ] ),
 		Finder::create()->files()->in( $path . 'vendor/myclabs/deep-copy' )->name( [ '*.php', 'LICENSE' ] ),
 	],
