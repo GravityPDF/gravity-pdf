@@ -16,21 +16,16 @@ composer run prefix
 
 # Start local environment
 if [[ $PHP_ENABLE_XDEBUG ]]; then
-  npm run wp-env start -- --xdebug=debug,coverage
+  npm run wp-env start -- --upgrade --xdebug=debug,coverage
 else
-    npm run wp-env start
+    npm run wp-env start -- --upgrade
 fi
-
-# Fix permissions issues on test container
-npm run wp-env run wordpress chmod 777 /var/www/html/wp-content/{plugins,themes,}
-npm run wp-env run tests-wordpress chmod 777 /var/www/html/wp-content/{plugins,themes,uploads,}
-npm run wp-env run tests-wordpress chmod 777 /var/www/html/ /var/www/html/wp-content/plugins/gravity-pdf /var/www/html/wp-content/plugins/gravity-pdf-test-suite/src/fonts/
 
 echo "Install Gravity Forms..."
 bash ./bin/install-gravityforms.sh
 
-npm run wp-env run cli plugin activate gravityforms gravityformscli gravity-pdf
-npm run wp-env run tests-cli plugin activate gravityforms gravityformscli gravityformspolls gravityformssurvey gravityformsquiz gravity-pdf gravity-pdf-test-suite
+npm run wp-env run cli wp plugin activate gravityforms gravityformscli gravity-pdf
+npm run wp-env run tests-cli wp plugin activate gravityforms gravityformscli gravityformspolls gravityformssurvey gravityformsquiz gravity-pdf gravity-pdf-test-suite
 
 # Place CLI config file
 npm run wp-env run tests-wordpress cp /var/www/html/wp-content/plugins/gravity-pdf/bin/htaccess-sample /var/www/html/.htaccess
