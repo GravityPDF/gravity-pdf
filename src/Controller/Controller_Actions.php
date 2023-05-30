@@ -151,10 +151,17 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function route_notices() {
 
+		global $pagenow;
 		/* Prevent actions being displayed on our welcome pages */
-		if ( ! is_admin() ||
-			 ( rgget( 'page' ) === 'gfpdf-getting-started' ) || ( rgget( 'page' ) === 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX )
-		) {
+		$register_routes = false;
+		$is_gfpdf_page   = \GPDFAPI::get_misc_class()->is_gfpdf_page();
+		$is_gf_page      = \GFForms::is_gravity_page();
+
+		if ( ! wp_doing_ajax() && is_admin() && ( $pagenow === 'plugins.php' || $is_gfpdf_page || $is_gf_page ) ) {
+			$register_routes = true;
+		}
+
+		if ( ! $register_routes ) {
 			return null;
 		}
 
@@ -173,8 +180,20 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 					]
 				);
 
-				$class = ( isset( $route['view_class'] ) ) ? $route['view_class'] : '';
-				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ), $class );
+				$message = call_user_func( $route['view'], $route['action'], $route['action_text'] );
+				/* Lets load the Install Core font message to Helper_Notice if the current page belongs to Gravity PDF or the plugin directory. */
+				if ( $is_gfpdf_page || $pagenow === 'plugins.php' ) {
+					$class = ( isset( $route['view_class'] ) ) ? $route['view_class'] : '';
+					$this->notices->add_notice( $message, $class );
+
+				} else {
+					/* Add  Install Core font message GFCommon if it doesn't. Remove the font styling to match with the generic add-on error message. */
+					if ( ! empty( \GFCommon::$errors ) ) {
+						$message = sprintf( '<div>%s</div>', $message );
+					}
+					\GFCommon::add_error_message( $message );
+
+				}
 			}
 		}
 	}
