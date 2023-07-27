@@ -168,7 +168,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'tiny_mce_before_init', [ $this, 'store_tinymce_settings' ] );
 
 		/* Update our PDF settings before the form gets updated */
-		add_filter( 'gform_form_update_meta', [ $this, 'clear_cached_pdf_settings' ], 10, 2 );
+		add_filter( 'gform_form_update_meta', [ $this, 'clear_cached_pdf_settings' ], 10, 3 );
 	}
 
 	/**
@@ -233,23 +233,39 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 	/**
 	 * Updating the form can sometimes remove the PDF configuration if the original editor begins work after the PDF is saved.
-	 * This usually occurs in a multi-user environment with multiple devs. To fix this, before the form is updated via the
-	 * form editor we will pull the latest PDF settings.
+	 * This usually occurs when multiple browser windows are open, and we'll fetch the current PDF settings before saving the form data.
 	 *
-	 * @Internal https://github.com/GravityPDF/gravity-pdf/issues/640
+	 * @internal https://github.com/GravityPDF/gravity-pdf/issues/640
+	 * @internal https://github.com/GravityPDF/gravity-pdf/issues/1464
 	 *
-	 * @param array $form
-	 * @param int   $form_id
+	 * @param array  $form
+	 * @param int    $form_id
+	 * @param string $meta_name
 	 *
 	 * @return array
 	 *
 	 * @since 4.2
 	 */
-	public function clear_cached_pdf_settings( $form, $form_id ) {
-		if ( is_admin() && ! rgempty( 'gform_meta' ) && isset( $form['gfpdf_form_settings'] ) ) {
-			$updated_form                = $this->gform->get_form( $form_id );
-			$form['gfpdf_form_settings'] = ( isset( $updated_form['gfpdf_form_settings'] ) ) ? $updated_form['gfpdf_form_settings'] : [];
+	public function clear_cached_pdf_settings( $form, $form_id, $meta_name ) {
+		if ( $meta_name !== 'display_meta' ) {
+			return $form;
 		}
+
+		if ( ! isset( $form['gfpdf_form_settings'] ) ) {
+			return $form;
+		}
+
+		if ( ! is_admin() ) {
+			return $form;
+		}
+
+		if ( empty( rgpost( 'gforms_update_form' ) ) && rgpost( 'action' ) !== 'form_editor_save_form' ) {
+			return $form;
+		}
+
+		\GFFormsModel::flush_current_form( \GFFormsModel::get_form_cache_key( $form_id ) );
+		$updated_form                = $this->gform->get_form( $form_id );
+		$form['gfpdf_form_settings'] = $updated_form['gfpdf_form_settings'] ?? [];
 
 		return $form;
 	}
