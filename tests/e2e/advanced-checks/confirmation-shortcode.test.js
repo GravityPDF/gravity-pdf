@@ -25,21 +25,25 @@ test('should check shortcode confirmation type TEXT is working correctly', async
     .pressKey('backspace')
     .typeText(run.wysiwgEditor, shortcodeHolder, { paste: true })
     .click(run.saveConfirmationButton)
-    .click(run.previewLink)
+
+  const url = await run.previewLink.href
+  await t.navigateTo(url)
     .typeText(run.formInputField, 'test', { paste: true })
     .click(run.submitButton)
   downloadUrl = await Selector('.gravitypdf-download-link').getAttribute('href')
+
+  downloadLogger.clear()
   await t
+    .addRequestHooks(downloadLogger)
     .click(link('.gform_confirmation_wrapper ', 'Download PDF'))
     .wait(2000)
-    .addRequestHooks(downloadLogger)
-  await run.responseStatus(downloadLogger._internalRequests, 0)
+    .removeRequestHooks(downloadLogger)
 
   // Assertions
   await t
-    .expect(run.getStatusCode === 200).ok()
-    .expect(run.getContentDisposition === 'attachment; filename="Sample.pdf"').ok()
-    .expect(run.getContentType === 'application/pdf').ok()
+    .expect(downloadLogger.contains(r => r.response.statusCode === 200)).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"')).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })
 
 test('should check if the shortcode confirmation type PAGE is working correctly', async t => {
@@ -77,21 +81,25 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
     .pressKey('backspace')
     .typeText(run.queryStringInputBox, 'entry={entry_id}', { paste: true })
     .click(run.saveConfirmationButton)
-    .click(run.previewLink)
+
+    const url = await run.previewLink.href
+    await t.navigateTo(url)
     .typeText(run.formInputField, 'test', { paste: true })
     .click(run.submitButton)
   downloadUrl = await Selector('.gravitypdf-download-link').getAttribute('href')
+
+  downloadLogger.clear()
   await t
+    .addRequestHooks(downloadLogger)
     .click(link('.entry-content', 'Download PDF'))
     .wait(2000)
-    .addRequestHooks(downloadLogger)
-  await run.responseStatus(downloadLogger._internalRequests, 0)
+    .removeRequestHooks(downloadLogger)
 
   // Assertions
   await t
-    .expect(run.getStatusCode === 200).ok()
-    .expect(run.getContentDisposition === 'attachment; filename="Sample.pdf"').ok()
-    .expect(run.getContentType === 'application/pdf').ok()
+    .expect(downloadLogger.contains(r => r.response.statusCode === 200)).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"')).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })
 
 test('should check if the shortcode confirmation type REDIRECT download is working correctly', async t => {
@@ -106,19 +114,22 @@ test('should check if the shortcode confirmation type REDIRECT download is worki
     .pressKey('backspace')
     .typeText(run.redirectInputBox, shortcodeHolder, { paste: true })
     .click(run.saveConfirmationButton)
-    .click(run.previewLink)
+
+  const url = await run.previewLink.href
+  await t.navigateTo(url)
+
+  downloadLogger.clear()
   downloadUrl = `${baseURL}/?gf_page=preview&id=3`
   await t
+    .addRequestHooks(downloadLogger)
     .typeText(run.formInputField, 'test', { paste: true })
     .click(run.submitButton)
-    .addRequestHooks(downloadLogger)
-  await run.responseStatus(downloadLogger._internalRequests, 1)
 
   // Assertions
   await t
-    .expect(run.getStatusCode === 200).ok()
-    .expect(run.getContentDisposition === 'attachment; filename="Sample.pdf"').ok()
-    .expect(run.getContentType === 'application/pdf').ok()
+    .expect(downloadLogger.contains(r => r.response.statusCode === 200)).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"')).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })
 
 test('reset/clean Page entry for the next test', async t => {

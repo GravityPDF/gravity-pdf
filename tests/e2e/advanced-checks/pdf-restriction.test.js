@@ -69,12 +69,16 @@ test('reset/clean previous tests saved data and ensure PDF can be viewed by defa
   await t
     .hover(advancedCheck.wpAdminBar)
     .click(advancedCheck.logout)
-    .wait(1000)
+
+  downloadLogger.clear()
   await t
-    .navigateTo(downloadUrl)
     .addRequestHooks(downloadLogger)
-  await advancedCheck.responseStatus(downloadLogger._internalRequests, 0)
+    .navigateTo(downloadUrl)
+    .wait(1000)
+    .removeRequestHooks(downloadLogger)
+
+  // Assertions
   await t
-    .expect(advancedCheck.getStatusCode === 200).ok()
-    .expect(advancedCheck.getContentType === 'application/pdf').ok()
+    .expect(downloadLogger.contains(r => r.response.statusCode === 200)).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })
