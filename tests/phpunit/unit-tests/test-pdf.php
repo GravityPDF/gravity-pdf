@@ -1748,27 +1748,91 @@ class Test_PDF extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function test_display_page_name() {
+	public function test_legacy_display_page_name() {
 		$form = [
 			'pagination' => [
 				'pages' => [
-					1 => 'My Test Page',
+					0 => 'My Test Page',
+					1 => '',
+					2 => 'Other Test Page',
 				],
 			],
-			'fields'     => [],
+			'fields'     => [
+				new \GF_Field_Page( [ 'pageNumber' => 1, 'cssClass' => 'my-test-class' ] ),
+				new \GF_Field_Page( [ 'pageNumber' => 2 ] ),
+				new \GF_Field_Page( [ 'pageNumber' => 3, 'label' => 'Other Test Page' ] ),
+			],
 		];
+
+		ob_start();
+		$this->view->display_page_name( 0, $form, new Helper_Field_Container() );
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( '<h3 class="gfpdf-page gfpdf-field my-test-class', $html );
+		$this->assertStringContainsString( 'My Test Page', $html );
 
 		ob_start();
 		$this->view->display_page_name( 1, $form, new Helper_Field_Container() );
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, '<h3 class="gfpdf-page' ) );
+		$this->assertStringNotContainsString( '<h3 class="gfpdf-page', $html );
+		$this->assertStringNotContainsString( 'My Test Page', $html );
 
+		/* test new signature */
 		ob_start();
-		$this->view->display_page_name( 2, $form, new Helper_Field_Container() );
+		$this->view->display_page_name( 2, $form, new Helper_Field_Container(), $form['fields'][2] );
 		$html = ob_get_clean();
 
-		$this->assertFalse( strpos( $html, '<h3 class="gfpdf-page' ) );
+		$this->assertStringContainsString( '<h3 class="gfpdf-page', $html );
+		$this->assertStringContainsString( 'Other Test Page', $html );
+	}
+
+	public function test_page_break_field() {
+		global $gfpdf;
+
+		$form = [
+			'id' => 1,
+			'fields'     => [
+				new \GF_Field_Page( [ 'pageNumber' => 1, 'cssClass' => 'my-test-class', 'content' => 'First Page' ] ),
+				new \GF_Field_Page( [ 'pageNumber' => 2, 'content' => 'Second Page' ] ),
+				new \GF_Field_Page( [ 'pageNumber' => 3, 'content' => 'Third Page' ] ),
+			],
+		];
+
+		$config = [
+			'meta' => [
+				'empty' => true,
+			]
+		];
+
+		$products = new Field_Products( new GF_Field(), [ 'form_id' => 1 ], $gfpdf->gform, $gfpdf->misc );
+
+		ob_start();
+		$this->view->process_field( $form['fields'][0], [ 'form_id' => 1 ], $form, $config, $products, new Helper_Field_Container(), $this->model );
+
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString('First Page', $html );
+		$this->assertStringContainsString('<h3 id="page-no-1"', $html );
+		$this->assertStringContainsString('class="gfpdf-page gfpdf-field my-test-class"', $html );
+		$this->assertStringContainsString('<div class="row-separator odd">', $html );
+
+		ob_start();
+		$this->view->process_field( $form['fields'][1], [ 'form_id' => 1 ], $form, $config, $products, new Helper_Field_Container(), $this->model );
+
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString('Second Page', $html );
+
+		/* Ensure it disables */
+		$config['meta']['empty'] = false;
+
+		ob_start();
+		$this->view->process_field( $form['fields'][1], [ 'form_id' => 1 ], $form, $config, $products, new Helper_Field_Container(), $this->model );
+
+		$html = ob_get_clean();
+
+		$this->assertSame( '', $html );
 	}
 
 	/**

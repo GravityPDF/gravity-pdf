@@ -66,7 +66,7 @@ class Field_Form extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 		/* Get the Nested Form */
-		$form = $this->gform->get_form( $this->field->gpnfForm );
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $this->field->gpnfForm ), $this->entry, __FUNCTION__ );
 		if ( is_wp_error( $form ) ) {
 			return parent::html();
 		}
@@ -135,7 +135,7 @@ class Field_Form extends Helper_Abstract_Fields {
 		}
 
 		/* Skip over any of the following blacklisted fields */
-		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password', 'page' ] );
+		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password' ] );
 
 		/* Loop through the Repeater fields */
 		foreach ( $form['fields'] as $field ) {
