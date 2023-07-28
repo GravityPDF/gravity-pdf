@@ -1701,23 +1701,39 @@ class Test_PDF extends WP_UnitTestCase {
 		$form = [
 			'pagination' => [
 				'pages' => [
-					1 => 'My Test Page',
+					0 => 'My Test Page',
+					1 => '',
+					2 => 'Other Test Page',
 				],
 			],
-			'fields'     => [],
+			'fields'     => [
+				new \GF_Field_Page( [ 'pageNumber' => 1, 'cssClass' => 'my-test-class' ] ),
+				new \GF_Field_Page( [ 'pageNumber' => 2 ] ),
+				new \GF_Field_Page( [ 'pageNumber' => 3, 'label' => 'Other Test Page' ] ),
+			],
 		];
+
+		ob_start();
+		$this->view->display_page_name( 0, $form, new Helper_Field_Container() );
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( '<h3 class="gfpdf-page gfpdf-field my-test-class', $html );
+		$this->assertStringContainsString( 'My Test Page', $html );
 
 		ob_start();
 		$this->view->display_page_name( 1, $form, new Helper_Field_Container() );
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, '<h3 class="gfpdf-page' ) );
+		$this->assertStringNotContainsString( '<h3 class="gfpdf-page', $html );
+		$this->assertStringNotContainsString( 'My Test Page', $html );
 
+		/* test new signature */
 		ob_start();
-		$this->view->display_page_name( 2, $form, new Helper_Field_Container() );
+		$this->view->display_page_name( 2, $form, new Helper_Field_Container(), $form['fields'][2] );
 		$html = ob_get_clean();
 
-		$this->assertFalse( strpos( $html, '<h3 class="gfpdf-page' ) );
+		$this->assertStringContainsString( '<h3 class="gfpdf-page', $html );
+		$this->assertStringContainsString( 'Other Test Page', $html );
 	}
 
 	/**

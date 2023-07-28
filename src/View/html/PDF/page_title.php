@@ -18,12 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @var $form    array
  * @var $classes string
  * @var $page    string
+ * @var $title   string
  */
 
 ?>
 
 <div class="row-separator">
 	<h3 class="gfpdf-page gfpdf-field <?php echo esc_attr( $classes ); ?>">
-		<?php echo esc_html( $form['pagination']['pages'][ $page ] ); ?>
+		<?php echo esc_html( $title ); ?>
 	</h3>
 </div>
