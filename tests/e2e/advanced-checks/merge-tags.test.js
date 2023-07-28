@@ -20,7 +20,9 @@ test('should check if form merge tags is working properly', async t => {
   await advancedCheck.pickMergeTag('Email')
   await t
     .click(advancedCheck.saveConfirmationButton)
-    .click(advancedCheck.previewLink)
+
+  const url = await advancedCheck.previewLink.href
+  await t.navigateTo(url)
     .typeText(advancedCheck.textInputField, 'texttest', { paste: true })
     .typeText(advancedCheck.fNameInputField, 'firstnametest', { paste: true })
     .typeText(advancedCheck.lNameInputField, 'lastnametest', { paste: true })

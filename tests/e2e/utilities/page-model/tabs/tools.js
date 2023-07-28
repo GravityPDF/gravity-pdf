@@ -7,7 +7,7 @@ class Tools {
     this.downloadCoreFontsButton = Selector('#gfpdf-fieldset-install_core_fonts').find('button').withText('Download Core Fonts')
     this.pendingResult = Selector('.gfpdf-core-font-status-pending')
     this.downloadSuccess = Selector('.gfpdf-core-font-status-success')
-    this.allSuccessfullyIntalled = Selector('.gfpdf-core-font-status-success').withText('ALL CORE FONTS SUCCESSFULLY INSTALLED')
+    this.allSuccessfullyInstalled = Selector('.gfpdf-core-font-status-success').withText('ALL CORE FONTS SUCCESSFULLY INSTALLED')
     this.downloadFailed = Selector('.gfpdf-core-font-status-error')
     this.retryDownload = Selector('a').withText('Retry Failed Downloads?')
 

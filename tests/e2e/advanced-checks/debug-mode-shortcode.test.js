@@ -26,7 +26,9 @@ test('should enable debug mode and throw error when PDF is inactive', async t =>
     .pressKey('backspace')
     .typeText(advancedCheck.wysiwgEditor, shortcodeHolder, { paste: true })
     .click(advancedCheck.saveConfirmationButton)
-    .click(advancedCheck.previewLink)
+
+  const url = await advancedCheck.previewLink.href
+  await t.navigateTo(url)
     .typeText(advancedCheck.formInputField, 'test', { paste: true })
     .click(advancedCheck.submitButton)
     .expect(advancedCheck.debugModeErrorMessage.exists).ok()

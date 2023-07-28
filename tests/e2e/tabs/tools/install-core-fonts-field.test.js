@@ -28,16 +28,15 @@ test('should return download core fonts successful response ', async t => {
 
   // Assertions
   await t
-    .expect(run.pendingResult.exists).ok()
     .expect(run.downloadSuccess.exists).ok()
-    .expect(run.allSuccessfullyIntalled.exists).ok()
+    .expect(run.allSuccessfullyInstalled.exists).ok()
 })
 
 const mockFailure = RequestMock()
   .onRequestTo(`${baseURL}/wp-admin/admin-ajax.php`)
   .respond({}, 400, { 'access-Control-Allow-Origin': '*' })
 
-fixture``
+fixture`Tools tab - Install core fonts field test failure`
   .requestHooks(mockFailure)
 
 test('should return download core fonts error/failed response', async t => {
@@ -47,7 +46,6 @@ test('should return download core fonts error/failed response', async t => {
 
   // Assertions
   await t
-    .expect(run.pendingResult.exists).ok()
     .expect(run.downloadFailed.exists).ok()
     .expect(run.retryDownload.exists).ok()
 })

@@ -17,13 +17,12 @@ class AdvancedCheck {
     this.wysiwgEditorTextTab = Selector('#gform-settings-section-confirmations').find('.wp-editor-tabs').find('button').withText('Text')
     this.wysiwgEditor = Selector('div').find('textarea[class^="merge-tag-support"]')
     this.redirectInputBox = Selector('#gform_setting_url').find('[id="url"]')
-    this.previewLink = Selector('.gform-form-toolbar__container').find('a').withText('Preview')
+    this.previewLink = Selector('#gf_toolbar_buttons_container a').addCustomDOMProperties({
+      href: el => el.href
+    })
     this.saveConfirmationButton = Selector('.gform-settings-save-container').find('button').withText('Save Confirmation')
     this.formInputField = Selector('input').withAttribute('name', 'input_1')
     this.submitButton = Selector('input').withAttribute('value', 'Submit')
-    this.getStatusCode = null
-    this.getContentDisposition = null
-    this.getContentType = null
 
     // General Settings - Debug Mode field
     this.debugModeCheckbox = Selector('#gfpdf-fieldset-debug_mode').find('[id="gfpdf_settings[debug_mode]"]')
@@ -75,18 +74,6 @@ class AdvancedCheck {
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
       .click(link('#the-list', 'Default Confirmation'))
-  }
-
-  async responseStatus (data, id) {
-    let objectHolder
-
-    objectHolder = data
-    const requestId = Object.keys(objectHolder)[id]
-    objectHolder = data[requestId].response.headers
-
-    this.getStatusCode = data[requestId].response.statusCode
-    this.getContentDisposition = objectHolder['content-disposition']
-    this.getContentType = objectHolder['content-type']
   }
 
   async navigateLink (text) {
