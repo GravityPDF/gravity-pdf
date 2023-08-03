@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.3
-Stable tag: 6.6.0
+Stable tag: 6.6.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,11 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.6.1 =
+* Bug: Prevent PDF settings being override if multiple browser windows are open, and both are updating different settings of the same form concurrently
+* Bug: Gracefully handle license key deactivation if an error occurs
+* Housekeeping: Bump WordPress Tested Up To v6.3
 
 = 6.6.0 =
 * Feature: Improve display of ungrouped product fields in Core and Universal templates
