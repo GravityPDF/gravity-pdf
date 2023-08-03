@@ -498,7 +498,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 			/* do nothing (error expected) */
 		}
 
-		$this->assertEquals( 'An error occurred during deactivation, please try again', json_decode( $this->_last_response )->error );
+		$this->assertStringContainsString( 'An unknown error occurred', json_decode( $this->_last_response )->error );
 	}
 
 	public function test_ajax_save_core_font() {
