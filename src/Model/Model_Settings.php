@@ -438,7 +438,14 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		echo wp_json_encode(
 			[
-				'error' => esc_html__( 'An error occurred during deactivation, please try again', 'gravity-forms-pdf-extended' ),
+				'error' => wp_kses(
+					sprintf(
+						__( 'An unknown error occurred and your license may not have been correct deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the license.', 'gravity-forms-pdf-extended' ),
+						'<a href="https://gravitypdf.com/account/licenses/">',
+						'</a>'
+					),
+					[ 'a' => [ 'href' => [] ] ]
+				),
 			]
 		);
 
@@ -456,6 +463,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since 4.2
 	 */
 	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key ) {
+
+		/* Remove license data from database, no matter if the API request fails */
+		$addon->delete_license_info();
 
 		$response = wp_remote_post(
 			$this->data->store_url,
@@ -481,9 +491,6 @@ class Model_Settings extends Helper_Abstract_Model {
 		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
 			return false;
 		}
-
-		/* Remove license data from database */
-		$addon->delete_license_info();
 
 		$this->log->notice(
 			'License successfully deactivated',

@@ -31,13 +31,13 @@ export function setupLicenseDeactivation () {
       /* Remove our loading spinner */
       $spinner.remove()
 
-      if (response.success) {
-        /* cleanup inputs */
-        $('#gfpdf_settings\\[license_' + slug + '\\]').val('')
-        $('#gfpdf_settings\\[license_' + slug + '_message\\]').val('')
-        $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
-        $container.find('button').remove()
+      /* cleanup inputs */
+      $('#gfpdf_settings\\[license_' + slug + '\\]').val('')
+      $('#gfpdf_settings\\[license_' + slug + '_message\\]').val('')
+      $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
+      $container.find('button').remove()
 
+      if (response.success) {
         $container
           .find('#message')
           .removeClass('error')
