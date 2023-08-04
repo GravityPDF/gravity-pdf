@@ -440,7 +440,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			[
 				'error' => wp_kses(
 					sprintf(
-						__( 'An unknown error occurred and your license may not have been correct deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the license.', 'gravity-forms-pdf-extended' ),
+						__( 'An unknown error occurred, and your license may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the license.', 'gravity-forms-pdf-extended' ),
 						'<a href="https://gravitypdf.com/account/licenses/">',
 						'</a>'
 					),
