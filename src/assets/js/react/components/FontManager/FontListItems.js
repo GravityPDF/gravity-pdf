@@ -333,7 +333,7 @@ export class FontListItems extends Component {
     const { disableSelectFontName, deleteId } = this.state
     const { id, loading, fontList, searchResult, selectedFont } = this.props
     const list = !searchResult ? fontList : searchResult
-    const tabIndex = updateFontVisible ? '-1' : '144'
+    const tabIndex = updateFontVisible ? '-1' : '0'
 
     return (
       <div data-test='component-FontListItems' className='font-list-items' role='listbox' aria-label={GFPDF.fontListInstalledFonts} aria-live='polite'>
@@ -359,7 +359,7 @@ export class FontListItems extends Component {
                     onKeyDown={e => this.handleSelectFontKeypress(e)}
                     checked={font.id === selectedFont}
                     aria-label={GFPDF.fontManagerSelectFontAriaLabel + ': ' + font.font_name}
-                    tabIndex={tabIndex}
+                    tabIndex={updateFontVisible && '-1'}
                   />
                 )}
                 {font.font_name}

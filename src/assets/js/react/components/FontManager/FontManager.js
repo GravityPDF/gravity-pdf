@@ -89,7 +89,7 @@ export class FontManager extends Component {
       <div
         data-test='component-FontManager'
         ref={node => (this.container = node)}
-        tabIndex='140'
+        tabIndex='0'
       >
         <div className='backdrop theme-backdrop' />
         <div className='container theme-wrap font-manager'>

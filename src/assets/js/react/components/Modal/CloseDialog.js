@@ -128,7 +128,6 @@ export class CloseDialog extends Component {
       <button
         data-test='component-CloseDialog'
         className='close dashicons dashicons-no'
-        tabIndex='142'
         onClick={this.handleCloseDialog}
         aria-label='close'
       >
