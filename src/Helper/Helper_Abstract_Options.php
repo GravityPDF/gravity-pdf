@@ -1516,7 +1516,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			   <?php if ( strpos( $checked, 'checked' ) !== false ): ?>
 					 checked="checked"
 			   <?php endif ?>
-			   <?php echo esc_html( $required ); ?>
+			   <?php echo esc_attr( $required ); ?>
 		/>
 
 		<label for="<?php echo esc_attr( $id ); ?>">
@@ -1574,7 +1574,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				&nbsp;
 
 				<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][<?php echo esc_attr( $args['multi-key'] ); ?>]">
-					<?php echo esc_html( $option ); ?>
+					<?php echo wp_kses_post( $option ); ?>
 				</label>
 			</div>
 		<?php endforeach; ?>
@@ -1628,7 +1628,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				/>
 
 				<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>][<?php echo esc_attr( $key ); ?>]">
-					<?php echo esc_html( $option ); ?>
+					<?php echo wp_kses_post( $option ); ?>
 				</label>
 			</span>
 		<?php endforeach; ?>
