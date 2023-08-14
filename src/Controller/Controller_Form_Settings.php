@@ -263,7 +263,12 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 			return $form;
 		}
 
-		\GFFormsModel::flush_current_form( \GFFormsModel::get_form_cache_key( $form_id ) );
+		if ( method_exists( '\GFFormsModel', 'flush_current_form' ) ) {
+			\GFFormsModel::flush_current_form( \GFFormsModel::get_form_cache_key( $form_id ) );
+		} else {
+			\GFFormsModel::flush_current_forms();
+		}
+
 		$updated_form                = $this->gform->get_form( $form_id );
 		$form['gfpdf_form_settings'] = $updated_form['gfpdf_form_settings'] ?? [];
 
