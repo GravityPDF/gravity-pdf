@@ -61,7 +61,6 @@ class General {
 
   async navigateSettingsTab (text) {
     await t
-      .useRole(admin)
       .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
   }

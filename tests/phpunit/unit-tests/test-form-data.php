@@ -537,22 +537,30 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
 		 * Run our tests...
 		 */
-		$this->assertEquals( 1, count( $field[18] ) );
-		$this->assertEquals( 1, count( $field['18.File'] ) );
-		$this->assertEquals( 1, count( $field['18.File_path'] ) );
-		$this->assertEquals( 1, count( $field['18_path'] ) );
+		$this->assertCount( 1, $field[18] );
+		$this->assertCount( 1, $field['18.File'] );
+		$this->assertCount( 1, $field['18.File_path'] );
+		$this->assertCount( 1, $field['18_path'] );
+		$this->assertCount( 1, $field['18.File_secure'] );
+		$this->assertCount( 1, $field['18_secure'] );
 
-		$this->assertEquals( 2, count( $field[19] ) );
-		$this->assertEquals( 2, count( $field['19.File'] ) );
-		$this->assertEquals( 2, count( $field['19.File_path'] ) );
-		$this->assertEquals( 2, count( $field['19_path'] ) );
+		$this->assertCount( 2, $field[19] );
+		$this->assertCount( 2, $field['19.File'] );
+		$this->assertCount( 2, $field['19.File_path'] );
+		$this->assertCount( 2, $field['19_path'] );
+		$this->assertCount( 2, $field['19.File_secure'] );
+		$this->assertCount( 2, $field['19_secure'] );
 
-		$this->assertEquals( 'http://', substr( $field[18][0], 0, 7 ) );
-		$this->assertEquals( 'http://', substr( $field['18.File'][0], 0, 7 ) );
-		$this->assertEquals( 'http://', substr( $field[19][0], 0, 7 ) );
-		$this->assertEquals( 'http://', substr( $field[19][1], 0, 7 ) );
-		$this->assertEquals( 'http://', substr( $field['19.File'][0], 0, 7 ) );
-		$this->assertEquals( 'http://', substr( $field['19.File'][1], 0, 7 ) );
+		$this->assertStringStartsWith( 'http://', $field[18][0] );
+		$this->assertStringStartsWith( 'http://', $field['18.File'][0] );
+		$this->assertStringStartsWith( 'http://', $field[19][0] );
+		$this->assertStringStartsWith( 'http://', $field[19][1] );
+		$this->assertStringStartsWith( 'http://', $field['19.File'][0] );
+		$this->assertStringStartsWith( 'http://', $field['19.File'][1] );
+		$this->assertStringStartsWith( 'http://', $field['19.File_secure'][0] );
+		$this->assertStringStartsWith( 'http://', $field['19.File_secure'][1] );
+		$this->assertStringContainsString( '?gf-download=', $field['19.File_secure'][0] );
+		$this->assertStringContainsString( '?gf-download=', $field['19.File_secure'][1] );
 	}
 
 	/**
@@ -737,9 +745,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
 		 * Post Image
 		 */
-		$this->assertEquals( 5, count( $field[32] ) );
-		$this->assertEquals( 5, count( $field['32.Post Image'] ) );
-		$this->assertEquals( 5, count( $field['Post Image'] ) );
+		$this->assertCount( 6, $field[32] );
+		$this->assertCount( 6, $field['32.Post Image'] );
+		$this->assertCount( 6, $field['Post Image'] );
 
 		$title   = 'Post Image Title';
 		$caption = 'Post Image caption';
@@ -748,7 +756,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$keys = [ '32', '32.Post Image', 'Post Image' ];
 
 		foreach ( $keys as $key ) {
-			$this->assertEquals( 'http://', substr( $field[ $key ]['url'], 0, 7 ) );
+			$this->assertStringStartsWith( 'http://',$field[ $key ]['url'] );
+			$this->assertStringStartsWith( 'http://', $field[ $key ]['secure_url'] );
+			$this->assertStringContainsString( '?gf-download=', $field[ $key ]['secure_url'] );
 			$this->assertArrayHasKey( 'path', $field[ $key ] );
 			$this->assertEquals( $title, $field[ $key ]['title'] );
 			$this->assertEquals( $caption, $field[ $key ]['caption'] );

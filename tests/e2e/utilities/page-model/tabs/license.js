@@ -1,5 +1,7 @@
 import { Selector, t } from 'testcafe'
-import { baseURL } from '../../../auth'
+import Pdf from '../helpers/pdf'
+
+const pdf = new Pdf()
 
 class License {
   constructor () {
@@ -16,22 +18,9 @@ class License {
     this.saveSettings = Selector('#submit-and-promo-container').find('input')
   }
 
-  async navigateSettingsTab (text) {
+  async navigateCoreBooster (uri) {
+    await pdf.navigate(uri)
     await t
-      .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-  }
-
-  async navigateCoreBooster (text) {
-    await t
-      .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
       .click(this.samplePluginInputBox)
       .selectText(this.samplePluginInputBox, 32, 0)
       .pressKey('backspace')

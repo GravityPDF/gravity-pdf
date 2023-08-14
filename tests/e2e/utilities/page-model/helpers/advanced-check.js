@@ -36,8 +36,6 @@ class AdvancedCheck {
     this.emailInputField = Selector('input').withAttribute('name', 'input_3')
 
     // PDF restriction section
-    this.wpAdminBar = Selector('ul').withAttribute('id', 'wp-admin-bar-top-secondary').withAttribute('class', 'ab-top-secondary ab-top-menu')
-    this.logout = Selector('a').withText('Log Out')
     this.pdfRestrictionErrorMessage = Selector('div').withAttribute('class', 'wp-die-message').withText('You do not have access to view this PDF.')
     this.viewEntryLink = Selector('.entry_unread').find('a.gravitypdf-download-link').nth(1)
     this.wpLoginForm = Selector('#login').find('form').withAttribute('name', 'loginform')
@@ -61,34 +59,25 @@ class AdvancedCheck {
     this.deletePDF = Selector('.submitdelete')
   }
 
-  async copyDownloadShortcode (text) {
+  async copyDownloadShortcode (uri) {
+    await pdf.navigate(uri)
     await t
-      .useRole(admin)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
       .click(this.shortcodeBox)
   }
 
-  async navigateConfirmationSection (text) {
+  async navigateConfirmationSection (uri) {
+    await pdf.navigate(uri)
+
     await t
-      .setNativeDialogHandler(() => true)
-      .useRole(admin)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
       .click(link('#the-list', 'Default Confirmation'))
   }
 
-  async navigateLink (text) {
-    await t
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
+  async navigateLink (uri) {
+    await pdf.navigate(uri)
   }
 
-  async navigateSection (text) {
-    await t
-      .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-      .wait(4000)
+  async navigateSection (uri) {
+    await pdf.navigate(uri)
   }
 
   async pickMergeTag (text) {
@@ -98,27 +87,10 @@ class AdvancedCheck {
       .pressKey('enter')
   }
 
-  async pdfRestrictionLogin (role) {
-    await t
-      .typeText('#user_login', role, { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-  }
+  async toggleRestrictOwnerCheckbox (uri) {
+    await pdf.navigate(uri)
 
-  async WpLogout () {
     await t
-      .hover(this.wpAdminBar)
-      .click(this.logout)
-  }
-
-  async toggleRestrictOwnerCheckbox (text) {
-    await t
-      .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-      .wait(500)
       .click(Selector('td.name').find('a').withText('Sample'))
       .click(pdf.restrictOwnerCheckbox)
       .click(pdf.saveSettings)
@@ -131,34 +103,27 @@ class AdvancedCheck {
       .wait(500)
   }
 
-  async navigateAddPdf (text) {
+  async navigateAddPdf (uri) {
+    await pdf.navigate(uri)
+
     await t
-      .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-      .wait(500)
       .click(this.addNewButton)
       .typeText(this.pdfLabelNameInputBox, 'Test PDF Template', { paste: true })
       .typeText(this.pdfFilenameInputBox, 'testpdftemplate', { paste: true })
       .click(this.addUpdatePdfButton)
-      .wait(500)
       .click(this.pdfListSection)
   }
 
-  async navigateDeletePdfEntries (text) {
-    await t
-      .setNativeDialogHandler(() => true)
-      .useRole(admin)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
+  async navigateDeletePdfEntries (uri) {
+    await pdf.navigate(uri)
+
     const template = await this.templateItem.count
     if (template > 0) {
       for (let i = 0; i < template; i++) {
         await t
           .hover(this.templateItem)
           .click(this.deletePDF)
-          .wait(2000)
+          .wait(500)
       }
     }
   }
