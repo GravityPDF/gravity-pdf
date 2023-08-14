@@ -247,6 +247,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		if ( ( $_POST['submit'] ?? '' ) === $update_pdf_text || ( ! is_wp_error( $pdf ) && ! isset( $pdf['status'] ) ) ) {
+			/* Redirect to update PDF URL if new PDF has been successfully saved */
+			if ( rgget( 'pid' ) !== $pdf_id ) {
+				wp_safe_redirect( esc_url_raw( add_query_arg( [ 'pid' => $pdf_id ] ) ) );
+				exit;
+			}
+
 			$label = $update_pdf_text;
 		}
 
