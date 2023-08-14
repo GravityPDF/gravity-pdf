@@ -73,16 +73,24 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 			$data[ $field_id . '.' . $label . '_path' ] = [];
 		}
 
-		foreach ( $value as $image ) {
+		foreach ( $value as $file ) {
 
-			$data[ $field_id . '.' . $label ][] = $image;
-			$data[ $field_id ][]                = $image;
-			$data[ $label ][]                   = $image;
+			$data[ $field_id . '.' . $label ][] = $file;
+			$data[ $field_id ][]                = $file;
+			$data[ $label ][]                   = $file;
 
-			$path = $this->misc->convert_url_to_path( $image );
+			$path = $this->misc->convert_url_to_path( $file );
 
 			$data[ $field_id . '_path' ][]                = $path;
 			$data[ $field_id . '.' . $label . '_path' ][] = $path;
+
+			/* Include secure URL in $form_data array, if possible */
+			$secure_file = $this->field->get_download_url( $file );
+
+			if ( $file !== $secure_file ) {
+				$data[ $field_id . '_secure' ][]                = $secure_file;
+				$data[ $field_id . '.' . $label . '_secure' ][] = $secure_file;
+			}
 		}
 
 		return [ 'field' => $data ];
@@ -106,8 +114,9 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 			$i    = 1;
 
 			foreach ( $files as $file ) {
-				$file_info = pathinfo( $file );
-				$html     .= '<li id="' . esc_attr( 'field-' . $this->field->id . '-option-' . $i ) . '"><a href="' . esc_url( $file ) . '">' . esc_html( $file_info['basename'] ) . '</a></li>';
+				$file_info   = pathinfo( $file );
+				$secure_file = $this->field->get_download_url( $file );
+				$html       .= '<li id="' . esc_attr( 'field-' . $this->field->id . '-option-' . $i ) . '"><a href="' . esc_url( $secure_file ) . '">' . esc_html( $file_info['basename'] ) . '</a></li>';
 				$i++;
 			}
 

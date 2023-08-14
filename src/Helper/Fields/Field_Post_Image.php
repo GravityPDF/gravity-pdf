@@ -64,7 +64,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 
 		$html = '';
 		if ( ! empty( $value['url'] ) ) {
-			$html  = '<a href="' . esc_url( $value['url'] ) . '" target="_blank">';
+			$html  = '<a href="' . esc_url( $value['secure_url'] ?? $value['url'] ) . '" target="_blank">';
 			$html .= '<img width="150" src="' . ( $value['path'] !== $value['url'] ? esc_attr( $value['path'] ) : esc_url( $value['url'] ) ) . '" />';
 			$html .= '</a>';
 		}
@@ -113,7 +113,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 	/**
 	 * Get the standard GF value of this field
 	 *
-	 * @return string|array
+	 * @return array
 	 *
 	 * @since 4.0
 	 */
@@ -139,6 +139,14 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 			if ( $path !== false && $path !== $img['url'] ) {
 				$img['path'] = $path;
 			}
+
+			$file              = new \GF_Field_FileUpload(
+				[
+					'formId' => $this->form['id'],
+					'id'     => $this->field->id,
+				]
+			);
+			$img['secure_url'] = $file->get_download_url( $img['url'] );
 		}
 
 		$this->cache( $img );
