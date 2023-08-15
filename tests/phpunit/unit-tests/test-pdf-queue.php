@@ -283,7 +283,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 		$entry   = $results['entry'];
 		$form    = $results['form'];
 
-		$path = $gfpdf->data->template_tmp_location . $entry['form_id'] . $entry['id'] . '/';
+		$path = $gfpdf->data->template_tmp_location . $entry['form_id'] . $entry['id'] . '556690c67856b/';
 		wp_mkdir_p( $path );
 		$test_file = $path . 'file';
 		touch( $test_file );

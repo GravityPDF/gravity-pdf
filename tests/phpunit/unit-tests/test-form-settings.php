@@ -355,6 +355,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		wp_set_current_user( $user_id );
 
 		ob_start();
+		$_GET['pid'] = $pid;
 		$this->model->show_edit_view( $form_id, $pid );
 		$html = ob_get_clean();
 

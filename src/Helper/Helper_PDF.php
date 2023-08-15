@@ -585,7 +585,7 @@ class Helper_PDF {
 
 		if ( empty( $path ) ) {
 			/* build our PDF path location */
-			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . '/';
+			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . $this->settings['id'] . '/';
 		} else {
 			/* ensure the path ends with a forward slash */
 			if ( substr( $path, -1 ) !== '/' ) {

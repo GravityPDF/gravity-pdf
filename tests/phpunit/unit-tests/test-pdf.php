@@ -1015,9 +1015,10 @@ class Test_PDF extends WP_UnitTestCase {
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
 		$form    = $results['form'];
+		$form['gfpdf_form_settings'] = [ $form['gfpdf_form_settings']['556690c67856b'] ];
 
 		/* Create PDF file so it isn't recreated */
-		$folder = $form['id'] . $entry['id'];
+		$folder = $form['id'] . $entry['id'] . '556690c67856b';
 		$path   = $gfpdf->data->template_tmp_location . "$folder/";
 		$file   = "test-{$form['id']}.pdf";
 
@@ -1027,7 +1028,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		/* Check the results are successful */
-		$this->assertNotFalse( strpos( $notifications['attachments'][0], "PDF_EXTENDED_TEMPLATES/tmp/$folder/$file" ) );
+		$this->assertStringContainsString( "PDF_EXTENDED_TEMPLATES/tmp/$folder/$file", $notifications['attachments'][0] );
 
 		/* Clean up */
 		unlink( $notifications['attachments'][0] );
@@ -1053,7 +1054,7 @@ class Test_PDF extends WP_UnitTestCase {
 				'id'      => 1,
 				'form_id' => 1,
 			],
-			[],
+			[ 'id' => '556690c67856b' ],
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
@@ -1085,7 +1086,7 @@ class Test_PDF extends WP_UnitTestCase {
 				'id'      => 1,
 				'form_id' => 1,
 			],
-			[],
+			[ 'id' => '556690c67856b' ],
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
@@ -1116,7 +1117,7 @@ class Test_PDF extends WP_UnitTestCase {
 				'id'      => 1,
 				'form_id' => 1,
 			],
-			[ 'template' => 'zadani' ],
+			[ 'id' => '556690c67856b', 'template' => 'zadani' ],
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
@@ -1163,6 +1164,7 @@ class Test_PDF extends WP_UnitTestCase {
 				'form_id' => 1,
 			],
 			[
+				'id' => '556690c67856b',
 				'template' => 'non-existant',
 			],
 			$gfpdf->gform,
@@ -1189,7 +1191,7 @@ class Test_PDF extends WP_UnitTestCase {
 				'id'      => 1,
 				'form_id' => 1,
 			],
-			[ 'template' => 'zadani' ],
+			[ 'id' => '556690c67856b', 'template' => 'zadani' ],
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
@@ -1265,7 +1267,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
 		$form    = $results['form'];
-		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
+		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/test-{$form['id']}.pdf";
 
 		wp_mkdir_p( dirname( $file ) );
 		touch( $file );
@@ -1916,7 +1918,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_handle_legacy_tier_2_processing() {
 		global $gfpdf;
 
-		$settings  = [ 'template' => 'zadani' ];
+		$settings  = [ 'id' => '556690c67856b', 'template' => 'zadani' ];
 		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$form      = $gfpdf->gform->get_form( $entry['form_id'] );
 		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
@@ -1988,7 +1990,7 @@ class Test_PDF extends WP_UnitTestCase {
 					'id'      => 1,
 					'form_id' => 1,
 				],
-				[],
+				[ 'id' => '556690c67856b' ],
 				GPDFAPI::get_form_class(),
 				GPDFAPI::get_data_class(),
 				GPDFAPI::get_misc_class(),

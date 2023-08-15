@@ -205,7 +205,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
 		$form    = $results['form'];
-		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
+		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/test-{$form['id']}.pdf";
 
 		$this->model->maybe_save_pdf( $entry, $form );
 
