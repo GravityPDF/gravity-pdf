@@ -413,7 +413,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$entry   = $results['entry'];
 		$form    = $results['form'];
 
-		$filename = $gfpdf->data->template_tmp_location . "11/test-{$form['id']}.pdf";
+		$filename = $gfpdf->data->template_tmp_location . "11556690c67856b/test-{$form['id']}.pdf";
 
 		if ( is_file( $filename ) ) {
 			unlink( $filename );
