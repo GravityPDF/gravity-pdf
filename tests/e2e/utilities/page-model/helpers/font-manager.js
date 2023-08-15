@@ -52,7 +52,6 @@ class FontManager {
 
   async navigateFontManager (address) {
     await t
-      .useRole(admin)
       .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${address}`)
       .click(button('Manage'))

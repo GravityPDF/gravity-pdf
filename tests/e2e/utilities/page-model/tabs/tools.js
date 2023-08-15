@@ -19,7 +19,6 @@ class Tools {
 
   async navigateSettingsTab (address) {
     await t
-      .useRole(admin)
       .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${address}`)
   }

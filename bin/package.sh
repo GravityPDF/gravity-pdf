@@ -42,6 +42,7 @@ FILES=(
 "${PACKAGE_DIR}/vendor_prefixed/.gitkeep"
 "${PACKAGE_DIR}/.nvmrc"
 "${PACKAGE_DIR}/.wp-env.json"
+"${PACKAGE_DIR}/.testcaferc.js"
 )
 
 for i in "${FILES[@]}"

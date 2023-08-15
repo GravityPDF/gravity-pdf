@@ -1,5 +1,5 @@
-import { RequestLogger } from 'testcafe'
-import { baseURL } from '../auth'
+import { RequestLogger, Role } from 'testcafe'
+import { admin, baseURL, editor } from '../auth'
 import AdvancedCheck from '../utilities/page-model/helpers/advanced-check'
 import Page from '../utilities/page-model/helpers/page'
 import Pdf from '../utilities/page-model/helpers/pdf'
@@ -18,9 +18,8 @@ test('should throw an error when a non-administrator user try to access a PDF ge
   await advancedCheck.navigateSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   pdfId = await advancedCheck.shortcodeBox.getAttribute('data-clipboard-text')
   pdfId = pdfId.substring(30, 43)
-  await advancedCheck.WpLogout()
-  await advancedCheck.pdfRestrictionLogin('editor')
   await t
+    .useRole(editor)
     .navigateTo(`${baseURL}/pdf/${pdfId}/4`)
     .expect(advancedCheck.pdfRestrictionErrorMessage.exists).ok()
 })
@@ -28,9 +27,9 @@ test('should throw an error when a non-administrator user try to access a PDF ge
 test('should redirect to WP login page if \'Restrict Owner\' is enabled', async t => {
   // Actions & Assertions
   await advancedCheck.toggleRestrictOwnerCheckbox('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t.navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
+  await page.navigatePage()
   await page.addNewPage()
-  await t.navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
+  await page.navigatePage()
   await t
     .click(page.testPageLink)
     .click(page.addBlockIcon)
@@ -38,21 +37,25 @@ test('should redirect to WP login page if \'Restrict Owner\' is enabled', async 
     .click(page.shortcodeLink)
     .typeText(page.shortcodeTextarea, '[gravityform id=4 title=false description=false ajax=true tabindex=49]', { paste: true })
     .click(page.updateButton)
-  await t.navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
-  await advancedCheck.WpLogout()
-  await t.navigateTo(`${baseURL}/test-page/`)
-  await t
+    .useRole(Role.anonymous())
+    .navigateTo(`${baseURL}/test-page/`)
     .typeText(advancedCheck.textInputField, 'texttest', { paste: true })
     .click(advancedCheck.submitButton)
-    .navigateTo(`${baseURL}/wp-admin/admin.php?page=gf_entries&id=4`)
-    .typeText('#user_login', 'admin', { paste: true })
-    .typeText('#user_pass', 'password', { paste: true })
-    .click('#wp-submit')
-  const url = await advancedCheck.viewEntryLink.getAttribute('href')
+    .useRole(admin)
+
+  await pdf.navigate('gf_entries&id=4')
+  const downloadUrl = await advancedCheck.viewEntryLink.getAttribute('href')
+
+  downloadLogger.clear()
+
   await t
-    .hover(advancedCheck.wpAdminBar)
-    .click(advancedCheck.logout)
-    .navigateTo(url)
+    .addRequestHooks(downloadLogger)
+    .useRole(Role.anonymous())
+    .navigateTo(downloadUrl)
+    .removeRequestHooks(downloadLogger)
+
+  await t
+    .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).notOk()
     .expect(advancedCheck.pdfRestrictionErrorMessage.exists).notOk()
     .expect(advancedCheck.wpLoginForm.exists).ok()
 })
@@ -60,25 +63,26 @@ test('should redirect to WP login page if \'Restrict Owner\' is enabled', async 
 test('reset/clean previous tests saved data and ensure PDF can be viewed by default', async t => {
   // Actions & Assertions
   await advancedCheck.toggleRestrictOwnerCheckbox('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await advancedCheck.WpLogout()
-  await t.navigateTo(`${baseURL}/test-page/`)
+  await t.useRole(Role.anonymous())
+    .navigateTo(`${baseURL}/test-page/`)
   await advancedCheck.submitNewPdfEntry()
-  await pdf.navigatePdfEntries('gf_entries&id=4')
+
+  await t.useRole(admin)
+  await pdf.navigate('gf_entries&id=4')
+
   downloadUrl = await advancedCheck.viewEntryLink.getAttribute('href')
   await page.deleteTestPage()
-  await t
-    .hover(advancedCheck.wpAdminBar)
-    .click(advancedCheck.logout)
+  await t.useRole(Role.anonymous())
 
   downloadLogger.clear()
+
   await t
     .addRequestHooks(downloadLogger)
     .navigateTo(downloadUrl)
-    .wait(1000)
+    .wait(500)
     .removeRequestHooks(downloadLogger)
 
   // Assertions
   await t
-    .expect(downloadLogger.contains(r => r.response.statusCode === 200)).ok()
     .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })

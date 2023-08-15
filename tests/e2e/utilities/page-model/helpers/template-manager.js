@@ -1,6 +1,9 @@
 import { Selector, t } from 'testcafe'
 import { baseURL } from '../../../auth'
 import { button } from './field'
+import Pdf from './pdf'
+
+const pdf = new Pdf()
 
 class TemplateManager {
   constructor () {
@@ -30,14 +33,8 @@ class TemplateManager {
   }
 
   async navigateTemplateManager (address) {
-    await t
-      .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${address}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-      .click(Selector('#the-list').find('a').nth(0).withText('Sample'))
-      .click(this.advancedButton)
+    await pdf.navigatePdfSection(address)
+    await t.click(this.advancedButton)
   }
 }
 

@@ -1,10 +1,9 @@
 import { Selector, t } from 'testcafe'
-import { baseURL } from '../../../auth'
+import { admin, baseURL } from '../../../auth'
 import { selectBox } from './field'
 
 class Pdf {
   constructor () {
-    this.fileName = Selector('#gfpdf_settings\\[filename\\]')
     this.template = Selector('.alternate')
     this.saveSettings = Selector('#submit-and-promo-container').find('input')
 
@@ -121,9 +120,6 @@ class Pdf {
     // Advanced - Image DPI field
     this.imageDpiInputBox = Selector('#gfpdf-settings-field-wrapper-image_dpi').find('[id="gfpdf_settings[image_dpi]"]')
 
-    // Advanced - Always Save PDF field
-    this.alwaysSavePdfCheckbox = Selector('#gfpdf-settings-field-wrapper-save').find('[id="gfpdf_settings[save]"]')
-
     // Advanced - Enable Public Access field
     this.enablePublicAccessCheckbox = Selector('#gfpdf-settings-field-wrapper-public_access').find('[id="gfpdf_settings[public_access]"]')
 
@@ -131,23 +127,18 @@ class Pdf {
     this.restrictOwnerCheckbox = Selector('#gfpdf-settings-field-wrapper-restrict_owner').find('[id="gfpdf_settings[restrict_owner]"]')
   }
 
-  async navigatePdfSection (text) {
-    await t
-      .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-      .click(Selector('#the-list').find('a').nth(0).withText('Sample'))
+  async navigatePdfSection (uri) {
+    await this.navigate(uri)
+    await t.click(Selector('#the-list')
+      .find('a')
+      .nth(0)
+      .withText('Sample'))
   }
 
-  async navigatePdfEntries (text) {
+  async navigate (uri) {
     await t
       .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
+      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${uri}`)
   }
 }
 

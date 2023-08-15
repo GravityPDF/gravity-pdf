@@ -51,7 +51,7 @@ test('should save selected merge tags', async t => {
     .click(run.filenameMergeTagsOptionList)
     .click(filenameOptionItem('Name (Prefix)'))
     .click(run.saveSettings)
-    .expect(run.filenameInputBox.value).eql('{Name (Prefix):2.2}{Text:1}')
+    .expect(run.filenameInputBox.value).eql('{Text:1}{Name (Prefix):2.2}')
     .click(run.filenameInputBox)
     .pressKey('ctrl+a')
     .pressKey('backspace')

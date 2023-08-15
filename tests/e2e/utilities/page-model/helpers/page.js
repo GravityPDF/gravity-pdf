@@ -20,7 +20,6 @@ class Page {
   async navigatePage () {
     await t
       .setNativeDialogHandler(() => true)
-      .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
   }
 
