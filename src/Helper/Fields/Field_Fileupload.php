@@ -88,8 +88,8 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 			$secure_file = $this->field->get_download_url( $file );
 
 			if ( $file !== $secure_file ) {
-				$data[ $field_id . '_secure' ][]                = $secure_file;
-				$data[ $field_id . '.' . $label . '_secure' ][] = $secure_file;
+				$data[ $field_id . '_secured' ][]                = $secure_file;
+				$data[ $field_id . '.' . $label . '_secured' ][] = $secure_file;
 			}
 		}
 

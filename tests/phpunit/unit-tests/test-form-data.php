@@ -541,15 +541,15 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertCount( 1, $field['18.File'] );
 		$this->assertCount( 1, $field['18.File_path'] );
 		$this->assertCount( 1, $field['18_path'] );
-		$this->assertCount( 1, $field['18.File_secure'] );
-		$this->assertCount( 1, $field['18_secure'] );
+		$this->assertCount( 1, $field['18.File_secured'] );
+		$this->assertCount( 1, $field['18_secured'] );
 
 		$this->assertCount( 2, $field[19] );
 		$this->assertCount( 2, $field['19.File'] );
 		$this->assertCount( 2, $field['19.File_path'] );
 		$this->assertCount( 2, $field['19_path'] );
-		$this->assertCount( 2, $field['19.File_secure'] );
-		$this->assertCount( 2, $field['19_secure'] );
+		$this->assertCount( 2, $field['19.File_secured'] );
+		$this->assertCount( 2, $field['19_secured'] );
 
 		$this->assertStringStartsWith( 'http://', $field[18][0] );
 		$this->assertStringStartsWith( 'http://', $field['18.File'][0] );
@@ -557,10 +557,10 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertStringStartsWith( 'http://', $field[19][1] );
 		$this->assertStringStartsWith( 'http://', $field['19.File'][0] );
 		$this->assertStringStartsWith( 'http://', $field['19.File'][1] );
-		$this->assertStringStartsWith( 'http://', $field['19.File_secure'][0] );
-		$this->assertStringStartsWith( 'http://', $field['19.File_secure'][1] );
-		$this->assertStringContainsString( '?gf-download=', $field['19.File_secure'][0] );
-		$this->assertStringContainsString( '?gf-download=', $field['19.File_secure'][1] );
+		$this->assertStringStartsWith( 'http://', $field['19.File_secured'][0] );
+		$this->assertStringStartsWith( 'http://', $field['19.File_secured'][1] );
+		$this->assertStringContainsString( '?gf-download=', $field['19.File_secured'][0] );
+		$this->assertStringContainsString( '?gf-download=', $field['19.File_secured'][1] );
 	}
 
 	/**
