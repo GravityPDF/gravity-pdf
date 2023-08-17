@@ -64,7 +64,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 
 		$html = '';
 		if ( ! empty( $value['url'] ) ) {
-			$html  = '<a href="' . esc_url( $value['secure_url'] ?? $value['url'] ) . '" target="_blank">';
+			$html  = '<a href="' . esc_url( $value['secured_url'] ?? $value['url'] ) . '" target="_blank">';
 			$html .= '<img width="150" src="' . ( $value['path'] !== $value['url'] ? esc_attr( $value['path'] ) : esc_url( $value['url'] ) ) . '" />';
 			$html .= '</a>';
 		}
@@ -146,7 +146,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 					'id'     => $this->field->id,
 				]
 			);
-			$img['secure_url'] = $file->get_download_url( $img['url'] );
+			$img['secured_url'] = $file->get_download_url( $img['url'] );
 		}
 
 		$this->cache( $img );

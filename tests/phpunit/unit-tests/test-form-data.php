@@ -757,8 +757,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		foreach ( $keys as $key ) {
 			$this->assertStringStartsWith( 'http://',$field[ $key ]['url'] );
-			$this->assertStringStartsWith( 'http://', $field[ $key ]['secure_url'] );
-			$this->assertStringContainsString( '?gf-download=', $field[ $key ]['secure_url'] );
+			$this->assertStringStartsWith( 'http://', $field[ $key ]['secured_url'] );
+			$this->assertStringContainsString( '?gf-download=', $field[ $key ]['secured_url'] );
 			$this->assertArrayHasKey( 'path', $field[ $key ] );
 			$this->assertEquals( $title, $field[ $key ]['title'] );
 			$this->assertEquals( $caption, $field[ $key ]['caption'] );
