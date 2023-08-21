@@ -34,8 +34,4 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#patchers
 	 */
 	'patchers'  => [],
-
-	'whitelist' => [
-		'Psr\*',
-	],
 ];

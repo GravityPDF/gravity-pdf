@@ -16,7 +16,7 @@ use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\View\View_GravityForm_Settings_Markup;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

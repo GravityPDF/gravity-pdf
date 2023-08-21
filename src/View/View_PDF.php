@@ -22,7 +22,7 @@ use GFPDF\Helper\Helper_Templates;
 use GFPDF\Statics\Kses;
 use GFPDFEntryDetail;
 use GWConditionalLogicDateFields;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
 
 /**
