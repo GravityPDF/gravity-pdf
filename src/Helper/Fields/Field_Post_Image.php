@@ -140,7 +140,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 				$img['path'] = $path;
 			}
 
-			$file              = new \GF_Field_FileUpload(
+			$file               = new \GF_Field_FileUpload(
 				[
 					'formId' => $this->form['id'],
 					'id'     => $this->field->id,
