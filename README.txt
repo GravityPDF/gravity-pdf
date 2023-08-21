@@ -107,6 +107,9 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 
 == Changelog ==
 
+= 6.7.1 =
+* Bug: Prefix PHP PSR Log and HTTP Message namespace to reduce likelihood of third party plugin conflicts. For backwards compatibility, the we will continue including the unprefixed PSR Log v2 library in v6.x releases.
+
 = 6.7.0 =
 * Feature: Add support for multiple PDFs with the same Filename on a single form
 * Feature: Use secure links for File Upload and Post Image fields in Core and Universal PDFs
