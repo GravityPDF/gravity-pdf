@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper;
 
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

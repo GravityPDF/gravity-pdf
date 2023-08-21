@@ -26,7 +26,7 @@ use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GFQuiz;
 use GFResults;
 use GP_Populate_Anything_Live_Merge_Tags;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use WP_Error;

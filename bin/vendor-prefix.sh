@@ -22,7 +22,7 @@ mkdir "${PLUGIN_DIR}vendor_prefixed"
 touch "${PLUGIN_DIR}vendor_prefixed/.gitkeep"
 
 # Monolog
-eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --quiet"
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/monolog.php --quiet"
 eval "rm -Rf ${PLUGIN_DIR}vendor/monolog"
 
 # URL Signer
@@ -45,5 +45,6 @@ eval "rm -Rf ${PLUGIN_DIR}vendor/myclabs"
 
 # Do this at the end as we have multiple vendor packages used
 eval "rm -Rf ${PLUGIN_DIR}vendor/gravitypdf"
+eval "rm -Rf ${PLUGIN_DIR}vendor/psr/http-message"
 
 eval "$COMPOSER dump-autoload --optimize --working-dir ${PLUGIN_DIR}"

@@ -16,7 +16,6 @@ use GFPDF\Model;
 use GFPDF\View;
 use GFPDF_Core;
 use GFPDF_Major_Compatibility_Checks;
-use Psr\Log\LoggerInterface;
 
 /*
  * Bootstrap / Router Class
@@ -47,9 +46,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Holds our log class
 	 *
-	 * @var LoggerInterface
+	 * @var \GFPDF_Vendor\Psr\Log\LoggerInterface
 	 *
 	 * @since 4.0
+	 * @internal Prefixed namespace in 6.7.1 to resolve 3rd party plugin conflict with PSR Log v3
 	 */
 	public $log;
 

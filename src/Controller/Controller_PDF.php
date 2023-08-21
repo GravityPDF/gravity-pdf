@@ -12,7 +12,7 @@ use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Model\Model_PDF;
 use GFPDF\View\View_PDF;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use SiteGround_Optimizer\Minifier\Minifier;
 
 /**
