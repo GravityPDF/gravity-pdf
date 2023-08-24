@@ -26,6 +26,8 @@ return [
 		Finder::create()->files()->in( $path . 'vendor/mpdf/mpdf/data' )->name( [ '*' ] ),
 		Finder::create()->files()->in( $path . 'vendor/mpdf/qrcode/' )->exclude( 'tests' )->name( [ '*.php', 'LICENSE', '*.dat' ] ),
 		Finder::create()->files()->in( $path . 'vendor/mpdf/psr-log-aware-trait' )->name( [ '*.php' ] ),
+		Finder::create()->files()->in( $path . 'vendor/psr/log' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/psr/http-message' )->name( [ '*.php', 'LICENSE' ] ),
 		Finder::create()->files()->in( $path . 'vendor/setasign/fpdi' )->name( [ '*.php', 'LICENSE.txt' ] ),
 		Finder::create()->files()->in( $path . 'vendor/myclabs/deep-copy' )->name( [ '*.php', 'LICENSE' ] ),
 	],
@@ -41,6 +43,7 @@ return [
 	'patchers'  => [
 		function( string $filePath, string $prefix, string $content ): string {
 
+			/* Mpdf fixes */
 			if ( basename( $filePath ) === 'Tag.php' ) {
 				$content = str_replace( "'Mpdf\\\\Tag\\\\'", "'$prefix\\\\Mpdf\\\\Tag\\\\'", $content );
 			}
@@ -58,11 +61,19 @@ return [
 				$content = str_replace( "$prefix\\\\</t\\\\1", '</t\\\\1', $content );
 			}
 
+			/* Remove type hinting from prefixed logger */
+			$files = [
+				'LoggerAwareInterface.php',
+				'LoggerAwareTrait.php',
+				'MpdfPsrLogAwareTrait.php',
+				'PsrLogAwareTrait.php'
+			];
+
+			if ( in_array( basename( $filePath ), $files, true ) ) {
+				$content = str_replace( "\\$prefix\\Psr\\Log\\LoggerInterface", '', $content );
+			}
+
 			return $content;
 		},
-	],
-
-	'whitelist' => [
-		'Psr\*',
 	],
 ];
