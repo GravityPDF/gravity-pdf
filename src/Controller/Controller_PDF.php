@@ -367,12 +367,32 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			]
 		);
 
+		switch ( $error->get_error_code() ) {
+			case 'timeout_expired':
+			case 'access_denied':
+				$status_code = 401;
+				break;
+
+			case 'not_found':
+			case 'inactive':
+			case 'conditional_logic':
+				$status_code = 404;
+				break;
+
+			case 'invalid_pdf_id':
+				$status_code = 400;
+				break;
+
+			default:
+				$status_code = 500;
+		}
+
 		/* only display detailed error to admins */
 		$whitelist_errors = [ 'timeout_expired', 'access_denied' ];
 		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors, true ) ) {
-			wp_die( esc_html( $error->get_error_message() ) );
+			wp_die( esc_html( $error->get_error_message() ), $status_code ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		} else {
-			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
+			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ), $status_code ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 }
