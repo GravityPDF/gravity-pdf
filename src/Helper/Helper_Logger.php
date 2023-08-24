@@ -11,7 +11,7 @@ use GFPDF_Vendor\Monolog\Handler\StreamHandler;
 use GFPDF_Vendor\Monolog\Logger;
 use GFPDF_Vendor\Monolog\Processor\IntrospectionProcessor;
 use GFPDF_Vendor\Monolog\Processor\MemoryPeakUsageProcessor;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

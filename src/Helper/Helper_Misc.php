@@ -6,7 +6,7 @@ use DOMElement;
 use Exception;
 use GFCommon;
 use GFMultiCurrency;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use WP_Error;

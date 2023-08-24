@@ -9,7 +9,7 @@ use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_PDF;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

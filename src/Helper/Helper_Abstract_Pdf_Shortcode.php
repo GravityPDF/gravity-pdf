@@ -8,7 +8,7 @@ use GFPDF\Exceptions\GravityPdfShortcodePdfConfigNotFoundException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfInactiveException;
 use GPDFAPI;
 use GravityView_View;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

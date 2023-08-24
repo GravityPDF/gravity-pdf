@@ -41,7 +41,7 @@ class Test_Logger extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_logger() {
-		$this->assertInstanceOf( '\GFPDF_Vendor\Psr\Log\LoggerInterface', $this->logger->get_logger() );
+		$this->assertInstanceOf( '\Psr\Log\LoggerInterface', $this->logger->get_logger() );
 		$this->assertEquals(
 			10,
 			has_filter(

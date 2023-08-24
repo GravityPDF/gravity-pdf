@@ -7,7 +7,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Interface_Url_Signer;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Options_Fields;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

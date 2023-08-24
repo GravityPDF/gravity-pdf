@@ -10,7 +10,7 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF_Major_Compatibility_Checks;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

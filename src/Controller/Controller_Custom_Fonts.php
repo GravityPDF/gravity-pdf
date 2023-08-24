@@ -20,7 +20,7 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;

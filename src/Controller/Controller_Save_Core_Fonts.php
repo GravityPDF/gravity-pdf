@@ -6,7 +6,7 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

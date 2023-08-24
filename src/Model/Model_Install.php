@@ -10,7 +10,7 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Pdf_Queue;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

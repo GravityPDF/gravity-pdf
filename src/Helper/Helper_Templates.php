@@ -4,7 +4,7 @@ namespace GFPDF\Helper;
 
 use Exception;
 use GPDFAPI;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use stdClass;
 
 /**

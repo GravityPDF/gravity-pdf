@@ -44,8 +44,7 @@ final class GPDFAPI {
 	 *
 	 * See https://docs.gravitypdf.com/v6/developers/api/get_log_class/ for more information about this method
 	 *
-	 * @return \GFPDF_Vendor\Psr\Log\LoggerInterface
-	 * @internal Prefixed namespace in 6.7.1 to resolve 3rd party plugin conflict with PSR Log v3
+	 * @return \Psr\Log\LoggerInterface
 	 *
 	 * @since 4.0
 	 */

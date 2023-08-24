@@ -7,7 +7,7 @@ use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
