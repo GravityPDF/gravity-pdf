@@ -108,7 +108,8 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 == Changelog ==
 
 = 6.7.1 =
-* Bug: Prefix PHP PSR Log and HTTP Message namespace to reduce likelihood of third party plugin conflicts. For backwards compatibility, the we will continue including the unprefixed PSR Log v2 library in v6.x releases.
+* Bug: Resolve dependency conflict with third party plugins who include the PSR Log v3 package
+* Housekeeping: Use 4xx HTTP Status Codes for non-server related errors when generating PDFs
 
 = 6.7.0 =
 * Feature: Add support for multiple PDFs with the same Filename on a single form
