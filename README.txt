@@ -108,7 +108,7 @@ If you aren't able to meet the v6 minimum requirements [you can download v5 whic
 == Changelog ==
 
 = 6.7.1 =
-* Bug: Resolve dependency conflict with third party plugins who include the PSR Log v3 package
+* Bug: Improve dependency conflicts with third party plugins who bundle PSR Log v2 or v3
 * Housekeeping: Use 4xx HTTP Status Codes for non-server related errors when generating PDFs
 
 = 6.7.0 =
