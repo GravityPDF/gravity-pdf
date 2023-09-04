@@ -78,13 +78,17 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 [You'll find detailed installation instructions at docs.gravitypdf.com](https://docs.gravitypdf.com/v6/users/five-minute-install).
 
-If you aren't able to meet the v6 minimum requirements [you can download v5 which we still provide support for](https://wordpress.org/plugins/gravity-forms-pdf-extended/advanced/#download-previous-link).
-
 **Disclaimers**
 
 * When you activate Gravity PDF on your website and Gravity Forms isn't installed a notice will be displayed in the admin area that includes an affiliate link to the Gravity Forms website.
 * After activating the plugin you will be prompted to [run the Core Font Installation tool](https://docs.gravitypdf.com/v6/users/core-pdf-fonts) so Gravity PDF can function correctly. This tool will download the fonts [from a public _GitHub_ repository (maintained by Gravity PDF)](https://github.com/gravityPDF/mpdf-core-fonts). For further information about _GitHub_ you can refer to their [Terms of Service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) and/or [Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement#the-short-version).
 * [A Help page is provided in the plugin's settings](https://docs.gravitypdf.com/v6/users/global-settings#help-tab) with an instant search feature [of the Gravity PDF documentation](https://docs.gravitypdf.com/v6/users/five-minute-install/), and the search is powered by _Algolia_. For further information about _Algolia_ you can refer to their [Terms of Service](https://www.algolia.com/policies/terms/) and/or [Privacy Statement](https://www.algolia.com/policies/privacy/).
+
+== Frequently Asked Questions ==
+
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/gravity-forms-pdf-extended)
 
 == Screenshots ==
 
