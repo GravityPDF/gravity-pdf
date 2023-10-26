@@ -64,6 +64,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
     .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
     .click(link('#the-list', 'Test-page'))
   await page.closePopupButton.exists && await t.click(page.closePopupButton)
+  await page.closePopupPattern.exists && await t.click(page.closePopupPattern)
   await t
     .click(page.addBlockIcon)
     .typeText(page.searchBlock, 'shortcode', { paste: true })
