@@ -28,6 +28,7 @@ class Page {
     await t.click(link('.wrap', 'Add New'))
 
     if (await this.closePopupButton.exists) await t.click(this.closePopupButton)
+    if (await this.closePopupPattern.exists) await t.click(this.closePopupPattern)
 
     await t
       .typeText(this.titleField, 'Test-page', { paste: true })
