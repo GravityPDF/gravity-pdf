@@ -6,6 +6,7 @@ class Page {
   constructor () {
     this.testPageLink = link('#the-list', 'Test-page')
     this.closePopupButton = Selector('button').withAttribute('aria-label', 'Close dialog')
+    this.closePopupPattern = Selector('button').withAttribute('aria-label', 'Close')
     this.titleField = Selector('.editor-post-title__input')
     this.addBlockIcon = Selector('button').withAttribute('aria-label', 'Add block')
     this.searchBlock = Selector('.block-editor-inserter__search').find('input').withAttribute('type', 'search')
@@ -27,6 +28,7 @@ class Page {
     await t.click(link('.wrap', 'Add New'))
 
     if (await this.closePopupButton.exists) await t.click(this.closePopupButton)
+    if (await this.closePopupPattern.exists) await t.click(this.closePopupPattern)
 
     await t
       .typeText(this.titleField, 'Test-page', { paste: true })
