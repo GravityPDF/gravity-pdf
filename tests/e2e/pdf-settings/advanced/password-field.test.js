@@ -54,7 +54,7 @@ test('should save selected merge tags', async t => {
     .click(run.passwordMergeTagsOptionList)
     .click(passwordOptionItem('Name (Prefix)'))
     .click(run.saveSettings)
-    .expect(run.passwordInputBox.value).contains('{Name (Prefix):2.2}{Text:1}')
+    .expect(run.passwordInputBox.value).contains('{Text:1}{Name (Prefix):2.2}')
     .click(run.passwordInputBox)
     .pressKey('ctrl+a')
     .pressKey('backspace')
