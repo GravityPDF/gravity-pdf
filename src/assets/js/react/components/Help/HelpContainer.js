@@ -41,7 +41,7 @@ export class HelpContainer extends Component {
    * @since 5.2
    */
   render () {
-    const algoliaClient = algoliasearch('BH4D9OD16A', '3f8f81a078907e98ed8d3a5bedc3c61c')
+    const algoliaClient = algoliasearch('NKKEAC9I6I', '8c7d9c872c821829fac8251da2c9151c')
     /* Prevent search for initial load */
     const searchClient = {
       search (requests) {
