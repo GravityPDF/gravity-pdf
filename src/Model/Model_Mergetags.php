@@ -343,7 +343,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		$gform = \GPDFAPI::get_form_class();
-		return $gform->process_tags( $field_id, $gform->get_form( $form['id'] ), $gform->get_entry( $entry['id'] ) );
+		return $gform->process_tags( $field_id, $form, $entry );
 	}
 
 	/**
