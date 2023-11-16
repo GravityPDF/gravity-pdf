@@ -11,7 +11,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-dropzone": "^14.2.2",
-    "react-instantsearch-dom": "^6.29.0",
+    "react-instantsearch": "^7.0.0",
     "react-redux": "^8.0.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
@@ -20,8 +20,7 @@
     "redux-watch": "^1.2.0",
     "reselect": "^4.1.6",
     "sprintf-js": "^1.1.2",
-    "superagent": "^8.0.0",
-    "wait-on": "^7.0.1"
+    "superagent": "^8.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.18.6",
@@ -72,7 +71,6 @@
   "scripts": {
     "lint:js": "eslint \"src/assets/js/**/*.js\"",
     "lint:js:fix": "eslint \"src/assets/js/**/*.js\" --fix",
-
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L fullPage=true --disable-multiple-windows --skip-js-errors",
@@ -81,11 +79,9 @@
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
-
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
     "build:dev": "cross-env NODE_ENV=development webpack --watch",
     "build:production": "cross-env NODE_ENV=production webpack",
-
     "wp-env": "wp-env",
     "env:install": "bash bin/install.sh"
   }

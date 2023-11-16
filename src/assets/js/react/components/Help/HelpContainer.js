@@ -1,7 +1,7 @@
 /* Dependencies */
-import React, { Component } from 'react'
+import React from 'react'
 import algoliasearch from 'algoliasearch/lite'
-import { InstantSearch, SearchBox, Configure, connectHits } from 'react-instantsearch-dom'
+import { Configure, InstantSearch, SearchBox, useHits, useInstantSearch } from 'react-instantsearch'
 /* Components */
 import DisplayResultContainer from './DisplayResultContainer'
 
@@ -17,67 +17,63 @@ import DisplayResultContainer from './DisplayResultContainer'
  *
  * @since 5.2
  */
-export class HelpContainer extends Component {
-  /**
-   * Render and group search result and then call the <DisplayResultContainer /> component
-   *
-   * @param hierarchy (object)
-   *
-   * @since 5.2
-   */
-  onHandleHit = ({ hits }) => {
-    /* Group into categories */
-    const groups = hits.reduce((groups, item) => ({
-      ...groups,
-      [item.hierarchy.lvl0]: [...(groups[item.hierarchy.lvl0] || []), [item.hierarchy, item.url, item.content]]
-    }), {})
+export const HelpContainer = () => {
+  const algoliaClient = algoliasearch('NKKEAC9I6I', '8c7d9c872c821829fac8251da2c9151c')
 
-    return <DisplayResultContainer groups={groups} />
+  return (
+    <InstantSearch
+      searchClient={algoliaClient}
+      indexName='gravitypdf'
+      future={{
+        preserveSharedStateOnUnmount: true
+      }}
+    >
+      <Configure
+        facetFilters={['version:v6']}
+        highlightPreTag='<mark>'
+        highlightPostTag='</mark>'
+        attributesToRetrieve={['hierarchy.lvl0', 'hierarchy.lvl1', 'hierarchy.lvl2', 'hierarchy.lvl3', 'hierarchy.lvl4', 'hierarchy.lvl5', 'hierarchy.lvl6', 'content', 'type', 'url']}
+        attributesToSnippet={['hierarchy.lvl1:5', 'hierarchy.lvl2:5', 'hierarchy.lvl3:5', 'hierarchy.lvl4:5', 'hierarchy.lvl5:5', 'hierarchy.lvl6:5', 'content:5']}
+        snippetEllipsisText='…'
+        distinct={1}
+      />
+
+      <SearchBox
+        placeholder={GFPDF.searchBoxPlaceHolderText}
+        translations={{
+          submitButtonTitle: GFPDF.searchBoxSubmitTitle,
+          resetButtonTitle: GFPDF.searchBoxResetTitle
+        }}
+        autoFocus
+      />
+
+      <EmptyQueryBoundary fallback={null}>
+        <Hits />
+      </EmptyQueryBoundary>
+    </InstantSearch>
+  )
+}
+
+function EmptyQueryBoundary ({ children, fallback }) {
+  const { indexUiState } = useInstantSearch()
+
+  if (!indexUiState.query) {
+    return fallback
   }
 
-  /**
-   * Renders search box component UI
-   *
-   * @since 5.2
-   */
-  render () {
-    const algoliaClient = algoliasearch('NKKEAC9I6I', '8c7d9c872c821829fac8251da2c9151c')
-    /* Prevent search for initial load */
-    const searchClient = {
-      search (requests) {
-        /* Don't display any results if the query is empty */
-        if (requests[0].params.query === '') {
-          return
-        }
-        return algoliaClient.search(requests)
-      }
-    }
-    const CustomHits = connectHits(this.onHandleHit)
+  return children
+}
 
-    return (
-      <InstantSearch searchClient={searchClient} indexName='gravitypdf'>
-        <Configure
-          facetFilters={['version:v6']}
-          highlightPreTag='<mark>'
-          highlightPostTag='</mark>'
-          attributesToRetrieve={['hierarchy.lvl0', 'hierarchy.lvl1', 'hierarchy.lvl2', 'hierarchy.lvl3', 'hierarchy.lvl4', 'hierarchy.lvl5', 'hierarchy.lvl6', 'content', 'type', 'url']}
-          attributesToSnippet={['hierarchy.lvl1:5', 'hierarchy.lvl2:5', 'hierarchy.lvl3:5', 'hierarchy.lvl4:5', 'hierarchy.lvl5:5', 'hierarchy.lvl6:5', 'content:5']}
-          snippetEllipsisText='…'
-        />
+function Hits (props) {
+  const { hits } = useHits(props)
 
-        <SearchBox
-          translations={{
-            submitTitle: GFPDF.searchBoxSubmitTitle,
-            resetTitle: GFPDF.searchBoxResetTitle,
-            placeholder: GFPDF.searchBoxPlaceHolderText
-          }}
-          autofocus
-        />
+  /* Group into categories */
+  const groups = hits.reduce((groups, item) => ({
+    ...groups,
+    [item.hierarchy.lvl0]: [...(groups[item.hierarchy.lvl0] || []), [item.hierarchy, item.url, item.content]]
+  }), {})
 
-        <CustomHits />
-      </InstantSearch>
-    )
-  }
+  return <DisplayResultContainer groups={groups} />
 }
 
 export default HelpContainer
