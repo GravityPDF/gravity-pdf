@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
-Tested up to: 6.3
-Stable tag: 6.7.1
+Tested up to: 6.4
+Stable tag: 6.7.2
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -49,10 +49,12 @@ Gravity PDF generates PDFs on your web server, so no third-party service receive
 
 Pay for additional PDF designs and functionality [from our online store](https://gravitypdf.com/store/).
 
-* **New Designs** – get access to 9 additional universal designs, 6 certificates, 4 invoices, and 3 letter styles
+* **New Designs** – get access to 9 additional universal designs, 6 certificates, 6 invoices, and 3 letter styles
 * **Additional customizations** – watermark PDFs with your own logo or text, control fields that should be displayed per PDF, add field descriptions, display all checkbox or radio field options, add notes, show field values instead of labels, and hide the product table
 * **On-screen Preview** – allow users to preview the PDF before form submission (and optionally payment) so they can see what the end result will be. This is a great feature for capturing e-signatures, selling PDF reports /  certificates / gift cards, or providing an on-screen proof before the PDF is sent to the printers (perfect for business cards).
 * **Bulk Download** - search, filter, and select entries and then zip up all your PDFs and download all together in a convenient zip file
+* **Smart Loading Indicator** - improve the UX for your users when generating complex PDFs that take time to create.
+* **GravityView** - turn [GravityView](https://www.gravitykit.com/products/gravityview/) into a drag-and-drop PDF builder for your Single Entry View Layouts.
 * **GFChart** - create PDF reports that display pie, bar, or column charts with aggregate Gravity Forms data [using GFChart](https://gfchart.com).
 * **30-Day Refund Guarantee** – Purchase with confidence knowing when you buy a product from our store that you can get a refund within 30 days, for any reason.
 
@@ -68,7 +70,7 @@ Need a tailor-made solution for Gravity PDF that solves complex business problem
 
 All development for Gravity PDF [is handled via GitHub](https://github.com/GravityPDF/gravity-pdf/). Opening new issues or submitting a pull request is welcome.
 
-Keep up to date with Gravity PDF by [subscribing to the newsletter](https://gravitypdf.com/signup/), [following us on Twitter](https://twitter.com/gravitypdf) and [liking us on Facebook](https://www.facebook.com/gravitypdf).
+Keep up to date with Gravity PDF by [subscribing to the newsletter](https://gravitypdf.com/signup/), [following us on Twitter/X](https://twitter.com/gravitypdf) and [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
 If you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
 
@@ -104,6 +106,11 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.7.2 =
+* Bug: Resolve fatal error when using Gravity Forms Google Analytics Pagination feature with the PDF URL included in the parameters.
+* Housekeeping: Update PDF library to latest version
+* Housekeeping: Update help search API details
 
 = 6.7.1 =
 * Bug: Improve dependency conflicts with third party plugins who bundle PSR Log v2 or v3
