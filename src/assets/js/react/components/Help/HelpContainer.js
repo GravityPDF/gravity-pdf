@@ -54,7 +54,7 @@ export const HelpContainer = () => {
   )
 }
 
-function EmptyQueryBoundary({ children, fallback }) {
+function EmptyQueryBoundary ({ children, fallback }) {
   const { indexUiState } = useInstantSearch()
 
   if (!indexUiState.query) {
