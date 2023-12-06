@@ -28,6 +28,7 @@ return [
 		Finder::create()->files()->in( $path . 'vendor/mpdf/psr-log-aware-trait' )->name( [ '*.php' ] ),
 		Finder::create()->files()->in( $path . 'vendor/mpdf/psr-http-message-shim' )->name( [ '*.php' ] ),
 		Finder::create()->files()->in( $path . 'vendor/psr/log' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/psr/http-message' )->name( [ '*.php', 'LICENSE' ] ),
 		Finder::create()->files()->in( $path . 'vendor/setasign/fpdi' )->name( [ '*.php', 'LICENSE.txt' ] ),
 		Finder::create()->files()->in( $path . 'vendor/myclabs/deep-copy' )->name( [ '*.php', 'LICENSE' ] ),
 	],
@@ -75,9 +76,5 @@ return [
 
 			return $content;
 		},
-	],
-
-	'whitelist' => [
-		'Psr\Http\*',
 	],
 ];
