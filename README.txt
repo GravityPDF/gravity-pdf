@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.7.3 =
+* Bug: Fix 3rd party conflict when different version of PSR-7 library is loaded
+
 = 6.7.2 =
 * Bug: Resolve fatal error when using Gravity Forms Google Analytics Pagination feature with the PDF URL included in the parameters.
 * Housekeeping: Update PDF library to latest version
