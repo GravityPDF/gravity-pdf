@@ -153,7 +153,7 @@ class Field_Products extends Helper_Abstract_Fields {
 							<tr>
 								<td>
 									<div class="product_name">
-										<?php echo esc_html( $product['name'] ); ?>
+										<?php Kses::output( wp_specialchars_decode( $product['name'], ENT_QUOTES ) ); ?>
 									</div>
 
 									<?php
@@ -166,7 +166,7 @@ class Field_Products extends Helper_Abstract_Fields {
 											foreach ( $product['options'] as $option ) :
 												$price += $option['price'];
 												?>
-												<li><?php echo esc_html( $option['option_label'] ); ?></li>
+												<li><?php Kses::output( wp_specialchars_decode( $option['option_label'], ENT_QUOTES ) ); ?></li>
 											<?php endforeach; ?>
 										</ul>
 									<?php endif; ?>
@@ -197,7 +197,7 @@ class Field_Products extends Helper_Abstract_Fields {
 											rowspan="<?php echo esc_attr( $gpecommerce->get_order_summary_item_count( $order_summary ) ); ?>"></td>
 									<?php endif; ?>
 									<td class="totals" style="<?php esc_attr( $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ) ); ?>">
-										<?php Kses::output( $item['name'] ); ?>
+										<?php Kses::output( wp_specialchars_decode( $item['name'], ENT_QUOTES ) ); ?>
 									</td>
 
 									<td class="totals" style="<?php esc_attr( $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-4" ) ); ?>">
@@ -216,7 +216,7 @@ class Field_Products extends Helper_Abstract_Fields {
 								</tr>
 								<tr>
 									<td colspan="2"
-										class="shipping totals"><?php echo esc_html( sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ) ); ?></td>
+										class="shipping totals"><?php Kses::output( sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), wp_specialchars_decode( $products['products_totals']['shipping_name'], ENT_QUOTES ) ) ); ?></td>
 									<td class="shipping_amount totals"><?php echo esc_html( $products['products_totals']['shipping_formatted'] ); ?></td>
 								</tr>
 							<?php endif; ?>

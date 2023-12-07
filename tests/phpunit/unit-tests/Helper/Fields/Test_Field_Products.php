@@ -60,5 +60,31 @@ class Test_Field_Products extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'subtotal_formatted', $value['products'][34] );
 	}
 
+	public function test_html() {
+		$html = $this->pdf_field->html();
+
+		$this->assertStringContainsString( '<li>Product Options for Basic Product: Option 2</li>', $html );
+		$this->assertStringContainsString( 'Calculation Price', $html );
+		$this->assertStringContainsString( '<li>Option for Calculation Price: Cal - Option 1</li>', $html );
+		$this->assertStringContainsString( '<td class="grandtotal_amount totals">$860.25</td>', $html );
+	}
+
+	public function test_labels_in_html() {
+		$products = \GFCommon::get_product_fields( $this->form, $this->entry );
+		$products['products'][34]['name'] = '<em>Product Basic</em>';
+		$products['products'][34]['options'][0]['option_label'] = '<img src="#"> Option 2';
+
+		$use_choice_text = true;
+		$use_admin_label = false;
+		gform_update_meta( $this->pdf_field->entry['id'], "gform_product_info_{$use_choice_text}_{$use_admin_label}", $products, $this->form['id'] );
+
+		$html = $this->pdf_field->html();
+
+		$this->assertStringContainsString( '<em>Product Basic</em>', $html );
+		$this->assertStringContainsString( '<li><img src="#"> Option 2</li>', $html );
+		$this->assertStringContainsString( 'Calculation Price', $html );
+		$this->assertStringContainsString( '<li>Option for Calculation Price: Cal - Option 1</li>', $html );
+		$this->assertStringContainsString( '<td class="grandtotal_amount totals">$860.25</td>', $html );
+	}
 
 }
