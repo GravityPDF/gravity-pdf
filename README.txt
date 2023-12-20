@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.4
-Stable tag: 6.7.3
+Stable tag: 6.7.4
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,11 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.7.4 =
+* Bug: Resolve PHP error for specific GravityView / GravityChart combo
+* Bug: Render supported HTML in labels/choices for the PDF Pricing table
+* Bug: Fix PHP error while viewing a PDF when running an older version of WordPress (< 5.9) and PHP (< 8.0)
 
 = 6.7.3 =
 * Bug: Fix 3rd party conflict when different version of PSR-7 library is loaded
