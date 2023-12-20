@@ -57,6 +57,7 @@ class Test_Controller_Export_Entries extends WP_UnitTestCase {
 	public function test_get_export_field_empty_value() {
 		$form_id  = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
 		$field_id = 'gpdf_555ad84787d7e';
-		$this->assertEmpty( apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, [] ) );
+		$value    = 'item';
+		$this->assertSame( $value, apply_filters( 'gform_export_field_value', $value, $form_id, $field_id, [] ) );
 	}
 }
