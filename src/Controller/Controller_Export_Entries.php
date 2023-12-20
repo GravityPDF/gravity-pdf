@@ -33,7 +33,11 @@ class Controller_Export_Entries {
 	 *
 	 * @since 6.0
 	 */
-	public function add_pdfs_to_export_fields( array $form ): array {
+	public function add_pdfs_to_export_fields( $form ) {
+		if ( empty( $form['id'] ) ) {
+			return $form;
+		}
+
 		$pdfs = \GPDFAPI::get_form_pdfs( $form['id'] );
 
 		if ( is_wp_error( $pdfs ) ) {
@@ -60,13 +64,14 @@ class Controller_Export_Entries {
 	 * @param string           $value
 	 * @param int              $form_id
 	 * @param string|int|float $field_id
+	 * @param array            $entry
 	 *
 	 * @return string The URL, or an empty string
 	 *
 	 * @since 6.0
 	 */
-	public function get_export_field_value( $value, int $form_id, $field_id, array $entry ) {
-		if ( substr( $field_id, 0, 5 ) !== 'gpdf_' ) {
+	public function get_export_field_value( $value, $form_id, $field_id, $entry ) {
+		if ( ! isset( $entry['id'] ) || substr( $field_id, 0, 5 ) !== 'gpdf_' ) {
 			return $value;
 		}
 
