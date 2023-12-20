@@ -74,6 +74,11 @@ return [
 				$content = str_replace( "\\$prefix\\Psr\\Log\\LoggerInterface", '', $content );
 			}
 
+			/* Global polyfills */
+			if ( basename( $filePath ) === 'functions.php' ) {
+				$content = str_replace( "namespace $prefix;", '', $content );
+			}
+
 			return $content;
 		},
 	],
