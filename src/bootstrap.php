@@ -406,8 +406,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version, true );
 
 		/* Localise admin script */
-		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
-		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
+		$data = $this->data->get_localised_script_data( $this->options, $this->gform );
+
+		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
+		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
 	}
 
 	/**

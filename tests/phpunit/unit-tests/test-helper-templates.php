@@ -105,39 +105,51 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		$templates = $this->templates->get_all_templates();
 
 		/* Test the standard templates */
-		$this->assertEquals( 4, count( $templates ) );
+		$this->assertCount( 4, $templates );
 
 		/* Test for additional templates in PDF working directory */
 		touch( $gfpdf->data->template_location . 'test.php' );
 		touch( $gfpdf->data->template_location . 'test2.php' );
 
+		delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+
 		$templates = $this->templates->get_all_templates();
-		$this->assertEquals( 6, count( $templates ) );
+		$this->assertCount( 6, $templates );
 
 		/* Test for override */
-		$templates = $this->templates->get_all_templates();
 		touch( $gfpdf->data->template_location . 'zadani.php' );
 
-		$this->assertEquals( 6, count( $templates ) );
+		delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+
+		$templates = $this->templates->get_all_templates();
+
+		$this->assertCount( 6, $templates );
 
 		/* Check that a configuration.php or configuration.archive.php file don't count */
 		touch( $gfpdf->data->template_location . 'configuration.php' );
 		touch( $gfpdf->data->template_location . 'configuration.archive.php' );
 
+		delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+
 		$templates = $this->templates->get_all_templates();
-		$this->assertEquals( 6, count( $templates ) );
+		$this->assertCount( 6, $templates );
 
 		/* Test for multisite templates */
 		if ( is_multisite() ) {
 			touch( $gfpdf->data->multisite_template_location . 'test3.php' );
+
+			delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+
 			$templates = $this->templates->get_all_templates();
-			$this->assertEquals( 7, count( $templates ) );
+			$this->assertCount( 7, $templates );
 
 			/* Check for override */
 			touch( $gfpdf->data->multisite_template_location . 'zadani.php' );
 
+			delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+
 			$templates = $this->templates->get_all_templates();
-			$this->assertEquals( 7, count( $templates ) );
+			$this->assertCount( 7, $templates );
 		}
 	}
 
