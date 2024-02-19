@@ -17,10 +17,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <p>
-	<?php esc_html_e( 'To take advantage of automatic updates for your Gravity PDF add-ons, enter your license key(s) below.', 'gravity-forms-pdf-extended' ); ?>
-	<?php esc_html_e( 'Your license key is located in your Purchase Confirmation email you received after you bought the add-on.', 'gravity-forms-pdf-extended' ); ?>
+	<?php
+	printf(
+		esc_html__( 'To take advantage of automatic updates for your Gravity PDF extension(s), enter and save your license key(s) below. %1$sYou can find your purchased licenses in your GravityPDF.com account%2$s.', 'gravity-forms-pdf-extended' ),
+		'<a href="https://gravitypdf.com/account/licenses/">',
+		'</a>'
+	);
+	?>
 </p>
 
 <p>
-	<?php esc_html_e( 'By installing a Gravity PDF extension you are automatically giving permission for us to periodically poll GravityPDF.com via HTTPS for your current license status and any new plugin updates. The only personal data sent is your website domain name and license key. To opt-out you will need to deactivate all Gravity PDF extensions.', 'gravity-forms-pdf-extended' ); ?>
+	<?php esc_html_e( 'When a Gravity PDF extension is enabled, the plugin periodically polls GravityPDF.com over HTTPS for your license status and plugin updates. The only data sent is your website domain name and license key (if provided). To opt-out you need to deactivate all Gravity PDF extensions.', 'gravity-forms-pdf-extended' ); ?>
 </p>
