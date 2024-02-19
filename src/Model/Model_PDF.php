@@ -858,6 +858,8 @@ class Model_PDF extends Helper_Abstract_Model {
 				$url .= 'download/';
 			}
 
+			$url = user_trailingslashit( $url );
+
 			if ( $print ) {
 				$url .= '?print=1';
 			}
