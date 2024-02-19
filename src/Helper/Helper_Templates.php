@@ -110,6 +110,18 @@ class Helper_Templates {
 	 * @since 4.1
 	 */
 	public function get_all_templates() {
+		$options = GPDFAPI::get_options_class();
+		$debug   = $options->get_option( 'debug_mode', 'No' );
+
+		if ( $debug === 'No' ) {
+			$cache_name = $this->data->template_transient_cache . '-template-list';
+			$cache      = get_transient( $cache_name );
+
+			/* There may be no transient and we got a non-array. If that occurs reset $cache */
+			if ( is_array( $cache ) && ! empty( $cache ) ) {
+				return $cache;
+			}
+		}
 
 		$template_list                   = [];
 		$matched_templates_basename_list = [];
@@ -130,6 +142,12 @@ class Helper_Templates {
 					$unique_templates
 				)
 			);
+		}
+
+		if ( $debug === 'No' ) {
+			$cache = $template_list;
+
+			set_transient( $cache_name, $cache, 604800 );
 		}
 
 		return $template_list;
@@ -427,6 +445,7 @@ class Helper_Templates {
 	 */
 	public function flush_template_transient_cache() {
 		delete_transient( $this->data->template_transient_cache );
+		delete_transient( $this->data->template_transient_cache . '-template-list' );
 	}
 
 	/**

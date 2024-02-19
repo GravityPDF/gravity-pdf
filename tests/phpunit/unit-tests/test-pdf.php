@@ -708,6 +708,10 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function test_view_pdf_entry_list() {
 
+		$user = $this::factory()->user->create_and_get();
+		$user->add_role( 'administrator' );
+		wp_set_current_user( $user->ID );
+
 		$results = $this->create_form_and_entries();
 		$form_id = $results['form']['id'];
 		$entry   = $results['entry'];
@@ -717,6 +721,8 @@ class Test_PDF extends WP_UnitTestCase {
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, 'View PDFs</a>' ) );
+
+		wp_set_current_user( 0 );
 	}
 
 	/**
@@ -736,13 +742,9 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
-		$this->assertArrayHasKey( 'name', $pdfs[0] );
-		$this->assertArrayHasKey( 'view', $pdfs[0] );
-		$this->assertArrayHasKey( 'download', $pdfs[0] );
-
-		$this->assertNotFalse( strpos( $pdfs[0]['name'], 'test-' ) );
-		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1' ) );
-		$this->assertNotFalse( strpos( $pdfs[0]['download'], 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
+		$this->assertStringContainsString( 'test-', $pdfs[0]['name'] );
+		$this->assertStringContainsString( 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1', $pdfs[0]['view'] );
+		$this->assertStringContainsString( 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1&action=download', $pdfs[0]['download'] );
 
 		/* Process fancy permalinks */
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
@@ -750,11 +752,51 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
-		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/pdf/556690c67856b/' ) );
-		$this->assertNotFalse( strpos( $pdfs[0]['download'], '/download/' ) );
+		$this->assertStringContainsString( 'http://example.org/pdf/556690c67856b/', $pdfs[0]['view'] );
+		$this->assertStringContainsString( '/download/', $pdfs[0]['download'] );
 
 		$wp_rewrite->set_permalink_structure( '' );
 		flush_rewrite_rules();
+	}
+
+	public function test_view_pdf_gravityflow_inbox() {
+		global $wp_rewrite;
+
+		$user = $this::factory()->user->create_and_get();
+		$user->add_role( 'administrator' );
+		wp_set_current_user( $user->ID );
+
+		/* Setup some test data */
+		$results = $this->create_form_and_entries();
+		$form    = $results['form'];
+		$entry   = $results['entry'];
+
+		$wp_rewrite->set_permalink_structure( '' );
+		flush_rewrite_rules();
+
+		ob_start();
+		$this->model->view_pdf_gravityflow_inbox( $form, $entry, [], [] );
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( 'http://example.org/?gpdf=1&#038;pid=fawf90c678523b&#038;lid=1', $html );
+		$this->assertStringContainsString( 'http://example.org/?gpdf=1&#038;pid=fawf90c678523b&#038;lid=1&#038;action=download', $html );
+
+		/* Process fancy permalinks */
+		$wp_rewrite->set_permalink_structure( '/%postname%/' );
+		flush_rewrite_rules();
+
+		ob_start();
+		$this->model->view_pdf_gravityflow_inbox( $form, $entry, [], [] );
+		$html = ob_get_clean();
+
+		$id = $entry['id'];
+		$this->assertStringContainsString( 'http://example.org/pdf/556690c67856b/' . $id . '/', $html );
+		$this->assertStringContainsString( 'http://example.org/pdf/556690c67856b/' . $id . '/download/', $html );
+
+		$wp_rewrite->set_permalink_structure( '' );
+		flush_rewrite_rules();
+
+		wp_set_current_user( 0 );
 	}
 
 	/**
