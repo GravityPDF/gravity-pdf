@@ -638,26 +638,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			if ( is_user_logged_in() &&
 				 ( ( $this->options->get_option( 'limit_to_admin', 'No' ) === 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) )
 			) {
-
-				/* Handle permissions checks */
-				$admin_permissions = $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] );
-
-				/* loop through permissions and check if the current user has any of those capabilities */
-				$access = false;
-				foreach ( $admin_permissions as $permission ) {
-					if ( $this->gform->has_capability( $permission ) ) {
-						$access = true;
-
-						$this->log->notice(
-							'Current logged-in user has appropriate WordPress capability to view PDF',
-							[
-								'permission' => $permission,
-							]
-						);
-
-						break;
-					}
-				}
+				$access = $this->can_user_view_pdf_with_capabilities();
 
 				/* throw error if no access granted */
 				if ( ! $access ) {
@@ -667,6 +648,30 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return $action;
+	}
+
+	/**
+	 * Check if the logged in user has permission to view the PDF
+	 *
+	 * @param int|null $user_id
+	 *
+	 * @return bool
+	 *
+	 * @since 6.8
+	 */
+	public function can_user_view_pdf_with_capabilities( $user_id = null ) {
+		$admin_permissions = $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] );
+
+		/* loop through permissions and check if the current user has any of those capabilities */
+		$can_user_view_pdf = false;
+		foreach ( $admin_permissions as $permission ) {
+			if ( $this->gform->has_capability( $permission, $user_id ) ) {
+				$can_user_view_pdf = true;
+				break;
+			}
+		}
+
+		return $can_user_view_pdf;
 	}
 
 	/**
@@ -683,27 +688,33 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function view_pdf_entry_list( $form_id, $field_id, $value, $entry ) {
 
+		/* Only show the PDF metabox if a user has permission to view the documents */
+		if ( ! $this->can_user_view_pdf_with_capabilities() ) {
+			return;
+		}
+
 		$controller = $this->getController();
 		$pdf_list   = $this->get_pdf_display_list( $entry );
 
-		if ( ! empty( $pdf_list ) ) {
+		if ( empty( $pdf_list ) ) {
+			return;
+		}
 
-			if ( count( $pdf_list ) > 1 ) {
-				$args = [
-					'pdfs' => $pdf_list,
-					'view' => strtolower( $this->options->get_option( 'default_action' ) ),
-				];
+		if ( count( $pdf_list ) > 1 ) {
+			$args = [
+				'pdfs' => $pdf_list,
+				'view' => strtolower( $this->options->get_option( 'default_action' ) ),
+			];
 
-				$controller->view->entry_list_pdf_multiple( $args );
-			} else {
-				/* Only one PDF for this form so display a simple 'View PDF' link */
-				$args = [
-					'pdf'  => array_shift( $pdf_list ),
-					'view' => strtolower( $this->options->get_option( 'default_action' ) ),
-				];
+			$controller->view->entry_list_pdf_multiple( $args );
+		} else {
+			/* Only one PDF for this form so display a simple 'View PDF' link */
+			$args = [
+				'pdf'  => array_shift( $pdf_list ),
+				'view' => strtolower( $this->options->get_option( 'default_action' ) ),
+			];
 
-				$controller->view->entry_list_pdf_single( $args );
-			}
+			$controller->view->entry_list_pdf_single( $args );
 		}
 	}
 
@@ -897,6 +908,77 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Display the PDF metabox in the Gravity Flow inbox
+	 *
+	 * @param array $form
+	 * @param array $entry
+	 * @param $current_step
+	 * @param $args
+	 *
+	 * @return void
+	 *
+	 * @since 6.8
+	 */
+	public function view_pdf_gravityflow_inbox( $form, $entry, $current_step, $args ) {
+		/* Only show the PDF metabox if a user has permission to view the documents */
+		if ( ! $this->can_user_view_pdf_with_capabilities() ) {
+			return;
+		}
+
+		$active_pdfs = array_filter(
+			$form['gfpdf_form_settings'] ?? [],
+			function( $pdf ) {
+				return $pdf['active'] === true;
+			}
+		);
+
+		/* Only show the metabox if there's an active PDF */
+		if ( count( $active_pdfs ) === 0 ) {
+			return;
+		}
+
+		?>
+		<style type="text/css">
+		  div.gf_entry_wrap #poststuff #gravitypdf-pdf-box-container .inside {
+			margin: 0;
+			padding: 0;
+			max-height: 18rem;
+			overflow-y: auto;
+			line-height: 1.4;
+			font-size: 13px;
+		  }
+
+		  #gravitypdf-pdf-box-container ul {
+			margin: 0;
+			padding: 0;
+		  }
+
+		  #gravitypdf-pdf-box-container li {
+			margin-bottom: 0.25rem;
+			border-bottom: 1px solid #EBEBF2;
+			padding: 0.5rem 0.75rem;
+		  }
+
+		  #gravitypdf-pdf-box-container li:last-of-type {
+			border-bottom: none;
+			margin-bottom: 0;
+		  }
+		</style>
+		
+		<div id="gravitypdf-pdf-box-container" class="postbox">
+
+			<h3 class="hndle" style="cursor:default;">
+				<span><?php esc_html_e( 'Gravity PDF', 'gravity-forms-pdf-extended' ); ?></span>
+			</h3>
+
+			<div class="inside">
+				<?php $this->view_pdf_entry_detail( [ 'entry' => $entry ] ); ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Add the pdf meta box to the entry detail page.
 	 *
 	 * @param array $meta_boxes The properties for the meta boxes.
@@ -924,7 +1006,13 @@ class Model_PDF extends Helper_Abstract_Model {
 		$meta = [
 			'gfpdf-entry-details-list' => [
 				'title'         => esc_html__( 'PDFs', 'gravity-forms-pdf-extended' ),
-				'callback'      => [ $this, 'view_pdf_entry_detail' ],
+				'callback'      => function( $args ) {
+					/* Only show the PDF metabox if a user has permission to view the documents */
+					if ( ! $this->can_user_view_pdf_with_capabilities() ) {
+						return;
+					}
+					$this->view_pdf_entry_detail( $args );
+				},
 				'context'       => 'side',
 				'callback_args' => [
 					'form'  => $form,
