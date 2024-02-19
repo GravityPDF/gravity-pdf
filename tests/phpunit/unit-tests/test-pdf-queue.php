@@ -203,6 +203,37 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_maybe_enabled_asynchronous_notification(){
+		$results                             = $this->create_form_and_entries();
+		$entry                               = $results['entry'];
+		$form                                = $results['form'];
+
+		add_filter('gform_is_asynchronous_notifications_enabled_'. $form['id'],function( $is_asynchronous ){
+			return false;
+		});
+
+		$form['notifications']['1254123223'] = $form['notifications']['54bca349732b8'];
+		$form['notifications']['54bca349732b8']['isActive'] = true;
+
+		$this->controller->queue_async_form_submission_tasks( $entry, $form );
+
+		$queue = $this->queue_mock->get_data();
+
+		$this->assertSame( 4, count( $queue[0] ) );
+/*      @todo: create case where form has enabled asynchronous notification.
+		add_filter('gform_is_asynchronous_notifications_enabled_'. $form['id'],function( $is_asynchronous ){
+			return true;
+		});
+		$queue = $this->queue_mock->method('dispatch');
+
+		$this->controller->queue_async_form_submission_tasks( $entry, $form );
+
+		$queue = $this->queue_mock->get_data();
+
+		$this->assertSame( 0, count( $queue[0] ) );*/
+	}
+
+
 	/**
 	 * Test the form submission queue works as expected
 	 *
