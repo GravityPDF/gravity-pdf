@@ -52,6 +52,7 @@ _notes/*
 Thumbs.db
 *.pot
 *.phar
+.php-version
 
 # Environment File
 .env
