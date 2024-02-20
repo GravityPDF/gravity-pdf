@@ -14,18 +14,18 @@ Automatically generate, email and download PDF documents with Gravity Forms and 
 
 == Description ==
 
-**Gravity PDF is the ultimate self-hosted solution for dynamically creating digital PDF documents using Gravity Forms and WordPress.**
+**Gravity PDF is the ultimate self-hosted solution for dynamically creating PDF documents using Gravity Forms and WordPress.**
 
-= Highly Customisable PDFs =
+= Highly Customizable PDFs =
 
-Out of the box you receive four highly-customisable PDF designs. Within minutes, you can personalise the look and feel by adding your company logo, header, footer, paper size / orientation, font, color and size. If these designs don't suit, select a new one from the [Template Shop](https://gravitypdf.com/store/#templates), [go Bespoke](https://gravitypdf.com/bespoke/), or [build your own using HTML/CSS/PHP](https://docs.gravitypdf.com/v6/developers/start-customising).
+Out of the box you get four highly-customizable PDF designs. Within minutes, you can personalize the look and feel by adding your company logo, header, footer, paper size / orientation, font, color and size. If the free designs don't suit, select from our range of templates in the [Template Shop](https://gravitypdf.com/store/#templates), [go bespoke and have a template build by our team](https://gravitypdf.com/bespoke/), or [build your own using HTML/CSS/PHP](https://docs.gravitypdf.com/v6/developers/start-customising).
 
 = Send as Email Attachment =
 
-Gravity PDF can automatically email the PDF to both the admin and the user as soon as the form is completed. Try combining this feature with one of Gravity Forms payment add-ons (like [Stripe](https://www.gravityforms.com/add-ons/stripe/), [Square](https://www.gravityforms.com/add-ons/square/), or [PayPal](https://www.gravityforms.com/add-ons/paypal-checkout/)) to delay the email until the payment is complete.
+Gravity PDF can automatically email the PDF to both the admin and the user as soon as the form is completed. You can combine this feature with a Gravity Forms payment add-on [to sell personalized reports, gift certificates, or generate PDF invoices](https://gravitypdf.com/news/sell-personalized-pdf-documents-using-gravity-forms/).
 
 = Privacy, Security, and GDPR =
-Gravity PDF generates PDFs on your web server, so no third-party service receives your data. [Robust security protects your documents](https://docs.gravitypdf.com/v6/users/pdf-security), and [the plugin is GDPR-compliant](https://docs.gravitypdf.com/v6/users/gdpr-and-gravity-pdf) for our European friends.
+Gravity PDF generates PDFs on your web server, and no third-party service receives your sensitive Gravity Forms entry data. [Robust security protects your documents](https://docs.gravitypdf.com/v6/users/pdf-security), and [the plugin is GDPR-compliant](https://docs.gravitypdf.com/v6/users/gdpr-and-gravity-pdf) for our European friends.
 
 > Digital document management with WordPress and Gravity Forms just became simple with Gravity PDF!
 
@@ -70,7 +70,7 @@ Need a tailor-made solution for Gravity PDF that solves complex business problem
 
 All development for Gravity PDF [is handled via GitHub](https://github.com/GravityPDF/gravity-pdf/). Opening new issues or submitting a pull request is welcome.
 
-Keep up to date with Gravity PDF by [subscribing to the newsletter](https://gravitypdf.com/signup/), [following us on Twitter/X](https://twitter.com/gravitypdf) and [liking us on Facebook](https://www.facebook.com/gravitypdf).
+Keep up to date with Gravity PDF by [subscribing to the newsletter](https://gravitypdf.com/signup/), [following us on Twitter/X](https://twitter.com/gravitypdf), [subscribing to our YouTube channel](https://www.youtube.com/gravitypdf), and [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
 If you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
 
