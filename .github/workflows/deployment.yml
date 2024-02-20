@@ -22,7 +22,7 @@ jobs:
 
       - name: Get tag
         id: tag
-        uses: devops-actions/action-get-tag@v1
+        uses: devops-actions/action-get-tag@v1.0.2
 
       - name: Setup Node JS
         uses: actions/setup-node@v4
