@@ -22,7 +22,7 @@ jobs:
 
       - name: Get tag
         id: tag
-        uses: dawidd6/action-get-tag@v1
+        uses: devops-actions/action-get-tag@v1
 
       - name: Setup Node JS
         uses: actions/setup-node@v4
@@ -44,7 +44,7 @@ jobs:
         run: bash ./bin/build.sh $SOURCE_TAG
         env:
           SOURCE_TAG: ${{steps.tag.outputs.tag}}
-          GH_CREDENTIALS: ${{ secrets.GH_CREDENTIALS }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy
         run: bash ./bin/deploy.sh
