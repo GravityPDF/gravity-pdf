@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 6.4
-Stable tag: 6.7.4
+Stable tag: 6.8.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -60,7 +60,7 @@ Pay for additional PDF designs and functionality [from our online store](https:/
 
 = Hire the Experts =
 
-Need a tailor-made solution for Gravity PDF that solves complex business problems? Our team of experienced developers have helped thousands of businesses like yours to accomplish these goals. We can even automatically fill out existing PDFs like government forms! [Find out more](https://gravitypdf.com/bespoke/).
+Need a tailor-made solution for Gravity PDF that solves complex business problems? Our team of experienced developers have helped thousands of businesses like yours to accomplish these goals. We can even fill existing PDFs like government forms, without sending your sensitive entry data to a third-party server! [Find out more](https://gravitypdf.com/bespoke/).
 
 = Documentation & Support =
 
@@ -106,6 +106,13 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.8.0 =
+* Feature: Add PDF Download metabox to Gravity Flow Inbox for logged-in users with appropriate capability
+* Security: Only show PDF view/download links on entry list and details page if logged-in user has appropriate capability
+* Housekeeping: Improve performance on admin pages by caching the list of available templates
+* Housekeeping: When permalinks are enabled, generate the PDF URL with/without a trailing slash
+* Bug: Remove whitespace from textarea fields in the PDF settings
 
 = 6.7.4 =
 * Bug: Resolve PHP error for specific GravityView / GravityChart combo
