@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
  * Render the button used to option our Fancy PDF template selector
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2023, Blue Liquid Designs
+ * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */

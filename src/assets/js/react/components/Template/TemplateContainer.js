@@ -8,7 +8,7 @@ import CloseDialog from '../Modal/CloseDialog'
  * Renders our Advanced Template Selector container which is shared amongst the components
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2023, Blue Liquid Designs
+ * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
