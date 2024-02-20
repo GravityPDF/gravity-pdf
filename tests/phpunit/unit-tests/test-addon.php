@@ -272,14 +272,14 @@ class Test_Addon extends WP_UnitTestCase {
 		$api_response = function() {
 			return [
 				'response' => [ 'code' => 200 ],
-				'body'     => json_encode( [ 'license' => 'revoked' ] ),
+				'body'     => json_encode( [ 'license' => 'revoked', 'price_id' => 1 ] ),
 			];
 		};
 
 		add_filter( 'pre_http_request', $api_response );
 
 		$this->assertTrue( $this->addon->schedule_license_check() );
-		$this->assertEquals( 'Your license key has been disabled', $this->addon->get_license_message() );
+		$this->assertStringContainsString( 'This license key has been cancelled', $this->addon->get_license_message() );
 
 		remove_filter( 'pre_http_request', $api_response );
 		$this->addon->delete_license_info();

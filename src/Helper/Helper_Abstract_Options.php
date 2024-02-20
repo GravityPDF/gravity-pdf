@@ -1707,11 +1707,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php if ( ! empty( $value['msg'] ) ): ?>
 			<?php if ( $is_error ): ?>
 				<div class="alert gforms_note_error">
-					<?php echo esc_html( $value['msg'] ); ?>
+					<?php echo wp_kses_post( $value['msg'] ); ?>
 				</div>
 			<?php else : ?>
 				<div id="message" class="alert gforms_note_success">
-					<?php echo esc_html( $value['msg'] ); ?>
+					<?php echo wp_kses_post( $value['msg'] ); ?>
 				</div>
 			<?php endif; ?>
 		<?php endif; ?>

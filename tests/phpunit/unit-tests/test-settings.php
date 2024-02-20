@@ -392,7 +392,7 @@ class Test_Settings extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertEquals( 'Invalid license key provided', $results['license_other-plugin_message'] );
+		$this->assertStringContainsString( 'This license key is invalid.', $results['license_other-plugin_message'] );
 		$this->assertEquals( 'missing', $results['license_other-plugin_status'] );
 
 		/* Ensure add-on message and status are reset when license key is empty */
@@ -404,8 +404,8 @@ class Test_Settings extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertEquals( '', $results['license_other-plugin_message'] );
-		$this->assertEquals( '', $results['license_other-plugin_status'] );
+		$this->assertEmpty( $results['license_other-plugin_message'] );
+		$this->assertEmpty($results['license_other-plugin_status'] );
 
 		/* Check we don't do anything when the license is active */
 		$results = $this->model->maybe_active_licenses(
@@ -433,7 +433,7 @@ class Test_Settings extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertEquals( 'Invalid license key provided', $results['license_other-plugin_message'] );
+		$this->assertStringContainsString( 'This license key is invalid.', $results['license_other-plugin_message'] );
 		$this->assertEquals( 'missing', $results['license_other-plugin_status'] );
 
 		/* Check that the hashed license reverts back to the unhashed version before saving */
@@ -482,7 +482,7 @@ class Test_Settings extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertEquals( $expected, $results['license_my-custom-plugin_message'] );
+		$this->assertStringContainsString( $expected, $results['license_my-custom-plugin_message'] );
 
 		remove_filter( 'pre_http_request', $api_response );
 		$gfpdf->data->addon = [];
@@ -491,65 +491,61 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * @return array
 	 *
-	 * @throws Exception
 	 * @since 4.2
 	 */
 	public function providerActivateLicense() {
-		$date_format = get_option( 'date_format' );
-		$dt          = new DateTimeImmutable( '', wp_timezone() );
-		$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
-
 		return [
 			[
-				'Your license key expired on ' . $date . '.',
+				'This license key expired on',
 				[
-					'error'   => 'expired',
-					'expires' => '',
+					'error'    => 'expired',
+					'expires'  => '',
+					'price_id' => 1,
 				],
 			],
 
 			[
-				'Your license key has been disabled',
-				[ 'error' => 'revoked' ],
+				'This license key has been cancelled',
+				[ 'error' => 'revoked', 'price_id' => 1 ],
 			],
 
 			[
-				'Invalid license key provided',
-				[ 'error' => 'missing' ],
+				'This license key is invalid',
+				[ 'error' => 'missing', 'price_id' => 1 ],
 			],
 
 			[
-				'Your license is not active for this URL',
-				[ 'error' => 'invalid' ],
+				'The license key is invalid',
+				[ 'error' => 'invalid', 'price_id' => 1 ],
 			],
 
 			[
-				'Your license is not active for this URL',
-				[ 'error' => 'site_inactive' ],
+				'Your license key is valid but does not match your current domain',
+				[ 'error' => 'site_inactive', 'price_id' => 1 ],
 			],
 
 			[
-				'This appears to be an invalid license key for My Custom Plugin',
-				[ 'error' => 'item_name_mismatch' ],
+				'This license key is not valid for My Custom Plugin',
+				[ 'error' => 'item_name_mismatch', 'price_id' => 1 ],
 			],
 
 			[
-				'Your license key has reached its activation limit',
-				[ 'error' => 'no_activations_left' ],
+				'This license key has reached its activation limit',
+				[ 'error' => 'no_activations_left', 'license_id' => '', 'payment_id' => '' ],
 			],
 
 			[
 				'An error occurred, please try again',
-				[ 'error' => 'default' ],
+				[ 'error' => 'default', 'price_id' => 1 ],
 			],
 
 			[
-				'An error occurred during activation, please try again',
-				[ 'error' => 'generic' ],
+				'An error occurred, please try again',
+				[ 'error' => 'generic', 'price_id' => 1 ],
 			],
 
 			[
-				'Your support license key has been successfully validated.',
+				'Your support license key has been activated for this domain',
 				[ 'success' => 'true' ],
 			],
 		];
