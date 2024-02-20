@@ -41,7 +41,7 @@ jobs:
           composer --version
 
       - name: Build
-        run: bash ./bin/package.sh $SOURCE_TAG
+        run: bash ./bin/build.sh $SOURCE_TAG
         env:
           SOURCE_TAG: ${{steps.tag.outputs.tag}}
           GH_CREDENTIALS: ${{ secrets.GH_CREDENTIALS }}
