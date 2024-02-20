@@ -107,7 +107,7 @@ jobs:
           mv tmp screenshots/tmp
 
       - name: Upload artifacts on failure
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: my-artifact
