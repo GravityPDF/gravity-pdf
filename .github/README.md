@@ -37,8 +37,6 @@ If you shut down Docker and want to fire up the environment later, use `yarn wp-
 
 X-Debug is enabled by default for step debugging and profiling. If you need to [use other X-Debug modes](https://xdebug.org/docs/all_settings#mode) you can manually start the environment and pass the appropriate modes in: `yarn wp-env start --xdebug=profile,trace,debug`.
 
-**Note: [there is currently an issue that prevents running X-Debug for the PHPUnit/CLI](https://github.com/WordPress/gutenberg/issues/42286).
-
 ### Switch PHP Versions
 
 The default version that will be configured is PHP8.0. If you want to change this you can adjust the `phpVersion` value in the `.wp-env.json` file and then stop and start the environment with `yarn wp-env start`.
@@ -60,7 +58,7 @@ If you are making changes to any of the JavaScript or CSS, run `yarn build:dev` 
 
 To lint your JS code use `yarn lint:js`, and to try automatically fix it use `yarn lint:js:fix`.
 
-To lint your PHP code, use `composer lint`, and to try automatically fix it use `composer format`.
+To lint your PHP code, use `composer lint`, and to try automatically fix it use `composer lint:fix`.
 
 ## Automated Tests
 
