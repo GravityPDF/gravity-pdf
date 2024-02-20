@@ -109,6 +109,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 = 6.8.0 =
 * Feature: Add PDF Download metabox to Gravity Flow Inbox for logged-in users with appropriate capability
+* Feature: Add AI-generated translations for French, Spanish, Italian, German, Dutch, Russian, and Chinese
 * Security: Only show PDF view/download links on entry list and details page if logged-in user has appropriate capability
 * Housekeeping: Improve performance on admin pages by caching the list of available templates
 * Housekeeping: When permalinks are enabled, generate the PDF URL with/without a trailing slash
