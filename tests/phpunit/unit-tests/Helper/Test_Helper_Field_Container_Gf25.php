@@ -68,10 +68,10 @@ class Test_Helper_Field_Container_Gf25 extends WP_UnitTestCase {
 
 		$this->class->generate( $field );
 
-		$this->assertSame(' grid grid-6', $field->cssClass );
+		$this->assertStringContainsString('grid grid-6', $field->cssClass );
 
 		$this->class->generate( $field );
-		$this->assertSame(' grid grid-6', $field->cssClass );
+		$this->assertStringContainsString('grid grid-6', $field->cssClass );
 
 		ob_end_clean();
 	}

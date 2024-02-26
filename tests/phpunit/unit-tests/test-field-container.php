@@ -254,7 +254,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$this->generate( $field );
 
 		/* If the field was skipped we remove any of our column class fields (gf_left_third ect) */
-		$this->assertEquals( ' ', $field->cssClass );
+		$this->assertEmpty( $field->cssClass );
 	}
 
 	/**
