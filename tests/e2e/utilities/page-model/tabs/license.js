@@ -9,9 +9,9 @@ class License {
     this.samplePluginInputBox = Selector('#gfpdf-fieldset-license_gravity-pdf-example-plugin').find('[id="gfpdf_settings[license_gravity-pdf-example-plugin]"]')
     this.validLicenseKey = '987654321'
     this.invalidLicenseKey = '123456789'
-    this.invalidLicenseKeyMessage = Selector('.gforms_note_error').withText('Invalid license key provided')
+    this.invalidLicenseKeyMessage = Selector('.gforms_note_error').withText('This license key is invalid. Please check your key has been entered correctly.')
     this.deactivateLinkMessage = Selector('button').withText('Deactivate License')
-    this.successMessage = Selector('.gforms_note_success').withText('Your support license key has been successfully validated.')
+    this.successMessage = Selector('.gforms_note_success').withText('Your support license key has been activated for this domain.')
     this.deactivateLink = Selector('.gfpdf-deactivate-license')
     this.deactivatedMessage = Selector('.success').withText('License deactivated.')
 

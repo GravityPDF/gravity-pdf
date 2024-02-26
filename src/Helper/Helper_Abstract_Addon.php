@@ -649,10 +649,12 @@ abstract class Helper_Abstract_Addon {
 				'timeout'   => 15,
 				'sslverify' => false,
 				'body'      => [
-					'edd_action' => 'check_license',
-					'license'    => $license_info['license'],
-					'item_name'  => rawurlencode( $this->get_short_name() ),
-					'url'        => home_url(),
+					'edd_action'  => 'check_license',
+					'license'     => $license_info['license'],
+					'item_id'     => $this->get_edd_download_id(),
+					'item_name'   => rawurlencode( $this->get_short_name() ),
+					'url'         => home_url(),
+					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
 				],
 			]
 		);
@@ -687,13 +689,50 @@ abstract class Helper_Abstract_Addon {
 		$license_info['status']  = $license_check->license;
 		$license_info['message'] = $possible_responses[ $license_check->license ];
 
-		/* Include the expiry date if license expired */
-		if ( $license_check->license === 'expired' ) {
-			$date_format = get_option( 'date_format' );
-			$dt          = new \DateTimeImmutable( $license_check->expires, wp_timezone() );
-			$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
+		switch ( $license_check->license ) {
+			case 'expired':
+				$date_format = get_option( 'date_format' );
+				$dt          = new \DateTimeImmutable( $license_check->expires, wp_timezone() );
+				$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
 
-			$license_info['message'] = sprintf( $license_info['message'], $date );
+				$url = add_query_arg(
+					[
+						'edd_license_key' => $license_info['license'],
+						'download_id'     => $this->get_edd_download_id(),
+					],
+					'https://gravitypdf.com/checkout/'
+				);
+
+				$license_info['message'] = sprintf( $license_info['message'], $date, $url );
+				break;
+
+			case 'revoked':
+			case 'disabled':
+				$url = add_query_arg(
+					[
+						'edd_action'            => 'add_to_cart',
+						'download_id'           => $this->get_edd_download_id(),
+						'edd_options[price_id]' => $license_check->price_id,
+					],
+					'https://gravitypdf.com/checkout/'
+				);
+
+				$license_info['message'] = sprintf( $license_info['message'], $url );
+				break;
+
+			case 'no_activations_left':
+				$url = add_query_arg(
+					[
+						'view'       => 'upgrades',
+						'action'     => 'manage_licenses',
+						'license_id' => $license_check->license_id,
+						'payment_id' => $license_check->payment_id,
+					],
+					'https://gravitypdf.com/account/'
+				);
+
+				$license_info['message'] = sprintf( $license_info['message'], $url );
+				break;
 		}
 
 		$this->log->notice( 'License key no longer valid', $license_info );

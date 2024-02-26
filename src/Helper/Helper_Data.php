@@ -166,17 +166,26 @@ class Helper_Data {
 		$this->addon[ $class->get_slug() ] = $class;
 	}
 
+	/**
+	 * Get the various responses for license key activations
+	 *
+	 * @param string $addon_name
+	 *
+	 * @return array
+	 */
 	public function addon_license_responses( $addon_name ) {
 		return [
-			'expired'             => __( 'Your license key expired on %s.', 'gravity-forms-pdf-extended' ),
-			'revoked'             => __( 'Your license key has been disabled', 'gravity-forms-pdf-extended' ),
-			'missing'             => __( 'Invalid license key provided', 'gravity-forms-pdf-extended' ),
-			'invalid'             => __( 'Your license is not active for this URL', 'gravity-forms-pdf-extended' ),
-			'site_inactive'       => __( 'Your license is not active for this URL', 'gravity-forms-pdf-extended' ),
-			'item_name_mismatch'  => sprintf( __( 'This appears to be an invalid license key for %s', 'gravity-forms-pdf-extended' ), $addon_name ),
-			'no_activations_left' => __( 'Your license key has reached its activation limit', 'gravity-forms-pdf-extended' ),
-			'default'             => __( 'An error occurred, please try again', 'gravity-forms-pdf-extended' ),
-			'generic'             => __( 'An error occurred during activation, please try again', 'gravity-forms-pdf-extended' ),
+			'expired'             => sprintf( __( 'This license key expired on %%s. %1$sPlease renew your license to continue receiving updates and support%2$s.', 'gravity-forms-pdf-extended' ), '<a href="%s">', '</a>' ),
+			'revoked'             => sprintf( __( 'This license key has been cancelled (most likely due to a refund request). %1$sPlease consider purchasing a new license%2$s.', 'gravity-forms-pdf-extended' ), '<a href="%s">', '</a>' ),
+			'disabled'            => sprintf( __( 'This license key has been cancelled (most likely due to a refund request). %1$sPlease consider purchasing a new license%2$s.', 'gravity-forms-pdf-extended' ), '<a href="%s">', '</a>' ),
+			'missing'             => __( 'This license key is invalid. Please check your key has been entered correctly.', 'gravity-forms-pdf-extended' ),
+			'invalid'             => __( 'The license key is invalid. Please check your key has been entered correctly.', 'gravity-forms-pdf-extended' ),
+			'site_inactive'       => __( 'Your license key is valid but does not match your current domain. This usually occurs if your domain URL changes. Please resave the settings to activate the license for this website.', 'gravity-forms-pdf-extended' ),
+			'item_name_mismatch'  => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-forms-pdf-extended' ), $addon_name ),
+			'invalid_item_id'     => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-forms-pdf-extended' ), $addon_name ),
+			'no_activations_left' => sprintf( __( 'This license key has reached its activation limit. %1$sPlease upgrade your license to increase the site limit (you only pay the difference)%2$s.', 'gravity-forms-pdf-extended' ), '<a href="%s">', '</a>' ),
+			'default'             => __( 'An error occurred, please try again.', 'gravity-forms-pdf-extended' ),
+			'generic'             => __( 'An error occurred, please try again.', 'gravity-forms-pdf-extended' ),
 		];
 	}
 

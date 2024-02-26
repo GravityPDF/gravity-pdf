@@ -334,10 +334,12 @@ class Model_Settings extends Helper_Abstract_Model {
 				'timeout'   => 15,
 				'sslverify' => false,
 				'body'      => [
-					'edd_action' => 'activate_license',
-					'license'    => $license_key,
-					'item_name'  => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
-					'url'        => home_url(),
+					'edd_action'  => 'activate_license',
+					'license'     => $license_key,
+					'item_id'     => $addon->get_edd_download_id(),
+					'item_name'   => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'url'         => home_url(),
+					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
 				],
 			]
 		);
@@ -356,7 +358,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			);
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-			$message      = __( 'Your support license key has been successfully validated.', 'gravityforms' );
+			$message      = __( 'Your support license key has been activated for this domain.', 'gravity-forms-pdf-extended' );
 			$status       = 'active';
 
 			if ( ! isset( $license_data->success ) || false === $license_data->success ) {
@@ -367,13 +369,50 @@ class Model_Settings extends Helper_Abstract_Model {
 					$message = $possible_responses[ $license_data->error ];
 					$status  = $license_data->error;
 
-					/* Include the expiry date if license expired */
-					if ( $license_data->error === 'expired' ) {
-						$date_format = get_option( 'date_format' );
-						$dt          = new \DateTimeImmutable( $license_data->expires, wp_timezone() );
-						$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
+					switch ( $license_data->error ) {
+						case 'expired':
+							$date_format = get_option( 'date_format' );
+							$dt          = new \DateTimeImmutable( $license_data->expires, wp_timezone() );
+							$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
 
-						$message = sprintf( $message, $date );
+							$url = add_query_arg(
+								[
+									'edd_license_key' => $license_key,
+									'download_id'     => $addon->get_edd_download_id(),
+								],
+								'https://gravitypdf.com/checkout/'
+							);
+
+							$message = sprintf( $message, $date, $url );
+							break;
+
+						case 'revoked':
+						case 'disabled':
+							$url = add_query_arg(
+								[
+									'edd_action'  => 'add_to_cart',
+									'download_id' => $addon->get_edd_download_id(),
+									'edd_options[price_id]' => $license_data->price_id,
+								],
+								'https://gravitypdf.com/checkout/'
+							);
+
+							$message = sprintf( $message, $url );
+							break;
+
+						case 'no_activations_left':
+							$url = add_query_arg(
+								[
+									'view'       => 'upgrades',
+									'action'     => 'manage_licenses',
+									'license_id' => $license_data->license_id,
+									'payment_id' => $license_data->payment_id,
+								],
+								'https://gravitypdf.com/account/'
+							);
+
+							$message = sprintf( $message, $url );
+							break;
 					}
 				}
 
@@ -473,10 +512,12 @@ class Model_Settings extends Helper_Abstract_Model {
 				'timeout'   => 15,
 				'sslverify' => false,
 				'body'      => [
-					'edd_action' => 'deactivate_license',
-					'license'    => $license_key,
-					'item_name'  => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
-					'url'        => home_url(),
+					'edd_action'  => 'deactivate_license',
+					'license'     => $license_key,
+					'item_id'     => $addon->get_edd_download_id(),
+					'item_name'   => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'url'         => home_url(),
+					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
 				],
 			]
 		);
