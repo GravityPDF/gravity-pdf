@@ -363,4 +363,21 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		return $this->process_field_value( $field_value, $gform->get_form( $form_id ), $entry, $field_id );
 	}
 
+	/**
+	 * Process Gravity Wiz Google Sheets data
+	 *
+	 * @param string $field_value
+	 * @param int $form_id
+	 * @param int $field_id
+	 * @param array $entry
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.8.1
+	 */
+	public function process_field_value_gp_google_sheets( $field_value, $form_id, $field_id, $entry ) {
+		$gform = \GPDFAPI::get_form_class();
+		return $this->process_field_value( $field_value, $gform->get_form( $form_id ), $entry, $field_id );
+	}
+
 }

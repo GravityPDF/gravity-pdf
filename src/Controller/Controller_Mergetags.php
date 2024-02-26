@@ -65,5 +65,6 @@ class Controller_Mergetags extends Helper_Abstract_Controller implements Helper_
 		add_filter( 'gform_field_map_choices', [ $this->model, 'add_field_map_choices' ], 10, 4 );
 		add_filter( 'gform_addon_field_value', [ $this->model, 'process_field_value' ], 10, 4 );
 		add_filter( 'gform_mailchimp_field_value', [ $this->model, 'process_field_value_mailchimp' ], 10, 4 );
+		add_filter( 'gpgs_row_value', [ $this->model, 'process_field_value_gp_google_sheets' ], 10, 4 );
 	}
 }
