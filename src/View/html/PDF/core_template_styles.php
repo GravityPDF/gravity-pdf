@@ -230,6 +230,11 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	.gfpdf-chainedselect td:nth-child(1) {
 		width: 30%;
 	}
+
+	/* Rich Text Paragraph */
+	.gfpdf-textarea .value p {
+	  margin-top: 0;
+	}
 </style>
 
 <?php if ( ! empty( $first_header ) ) : ?>

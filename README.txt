@@ -111,6 +111,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 * Bug: Fix Form Editor saving problem for Gravity Forms v2.6.*
 * Bug: Fix Drag and Drop Column layout issue when the GF Styles Pro plugin is enabled
 * Bug: Fix issue sending PDF URLs with Gravity Wiz Google Sheets
+* Bug: Improve display of Rich Text Textarea fields by removing top margin on individual paragraphs
 * Housekeeping: Exclude popular WordPress staging environments from site count when activating Gravity PDF licenses
 * Housekeeping: Improve Gravity PDF license activation success and error messages
 
