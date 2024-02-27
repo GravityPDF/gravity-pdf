@@ -647,7 +647,6 @@ abstract class Helper_Abstract_Addon {
 			$this->data->store_url,
 			[
 				'timeout'   => 15,
-				'sslverify' => false,
 				'body'      => [
 					'edd_action'  => 'check_license',
 					'license'     => $license_info['license'],

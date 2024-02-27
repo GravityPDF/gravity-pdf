@@ -115,6 +115,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 * Bug: Improve display of Rich Text Textarea fields by removing top margin on individual paragraphs
 * Housekeeping: Exclude popular WordPress staging environments from site count when activating Gravity PDF licenses
 * Housekeeping: Improve Gravity PDF license activation success and error messages
+* Security: Improve security of network requests to Gravity PDF licensing server
 
 = 6.8.0 =
 * Feature: Add PDF Download metabox to Gravity Flow Inbox for logged-in users with appropriate capability

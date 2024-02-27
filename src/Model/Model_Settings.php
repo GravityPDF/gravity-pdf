@@ -332,7 +332,6 @@ class Model_Settings extends Helper_Abstract_Model {
 			$this->data->store_url,
 			[
 				'timeout'   => 15,
-				'sslverify' => false,
 				'body'      => [
 					'edd_action'  => 'activate_license',
 					'license'     => $license_key,
@@ -510,7 +509,6 @@ class Model_Settings extends Helper_Abstract_Model {
 			$this->data->store_url,
 			[
 				'timeout'   => 15,
-				'sslverify' => false,
 				'body'      => [
 					'edd_action'  => 'deactivate_license',
 					'license'     => $license_key,
