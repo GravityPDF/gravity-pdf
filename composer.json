@@ -38,7 +38,8 @@
     "wp-coding-standards/wpcs": "~2.3.0",
     "phpcompatibility/phpcompatibility-wp": "*",
     "roave/security-advisories": "dev-master",
-    "yoast/phpunit-polyfills": "^1.0"
+    "yoast/phpunit-polyfills": "^2.0",
+    "wp-phpunit/wp-phpunit": "^6.4"
   },
   "autoload": {
     "psr-4": {

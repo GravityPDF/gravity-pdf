@@ -13,6 +13,44 @@ export function handlePDFConditionalLogic () {
     return object
   })
 
+  /* Add support for entry meta */
+  const entryOptions = window.gfpdf_extra_conditional_logic_options
+  gform.addFilter('gform_conditional_logic_fields', function (options, form, selectedFieldId) {
+    for (const property in entryOptions) {
+      // Entry meta are already added in Notifications and Confirmations conditional logic but not in feeds.
+      // Let's just make sure that none of our entry meta options have been previously added.
+      if (Object.hasOwn(entryOptions, property) && !options.find(opt => opt.value === entryOptions[property].value)) {
+        options.push({
+          label: entryOptions[property].label,
+          value: entryOptions[property].value
+        })
+      }
+    }
+    return options
+  })
+
+  gform.addFilter('gform_conditional_logic_operators', function (operators, objectType, fieldId) {
+    if (Object.hasOwn(entryOptions, fieldId)) {
+      operators = entryOptions[fieldId].operators
+    }
+    return operators
+  })
+
+  gform.addFilter('gform_conditional_logic_values_input', function (str, objectType, ruleIndex, selectedFieldId, selectedValue) {
+    if (Object.hasOwn(entryOptions, selectedFieldId)) {
+      if (entryOptions[selectedFieldId].choices) {
+        const inputName = objectType + '_rule_value_' + ruleIndex
+        str = GetRuleValuesDropDown(entryOptions[selectedFieldId].choices, objectType, ruleIndex, selectedValue, inputName)
+      }
+
+      if (entryOptions[selectedFieldId].placeholder) {
+        str = $(str).attr('placeholder', entryOptions[selectedFieldId].placeholder)[0].outerHTML
+      }
+    }
+
+    return str
+  })
+
   /* Add change event to conditional logic field */
   $('#gfpdf_conditional_logic').on('change', function () {
     /* Only set up a .conditionalLogic object if it doesn't exist */

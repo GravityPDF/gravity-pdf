@@ -765,4 +765,77 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$results = $this->model->register_template_group( $test );
 		$this->assertTrue( isset( $results['template']['data']['template_group'] ) );
 	}
+
+	public function test_conditional_logic_set_rule_source_value() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		/* Do basic test */
+		$rule  = [ 'fieldId' => 'status' ];
+		$value = $this->controller->conditional_logic_set_rule_source_value( '', $rule, $form, $rule, $entry );
+		$this->assertSame( 'active', $value );
+
+		/* Do date-specific test */
+		$rule  = [ 'fieldId' => 'date_created' ];
+		$value = $this->controller->conditional_logic_set_rule_source_value( '', $rule, $form, $rule, $entry );
+		$this->assertMatchesRegularExpression( '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $value );
+
+		/* Ignore if not an extra */
+		$rule  = [ 'fieldId' => 1 ];
+		$value = $this->controller->conditional_logic_set_rule_source_value( 'input value', $rule, $form, $rule, $entry );
+		$this->assertEquals( 'input value', $value );
+
+		/* Ignore if no entry provided */
+		$rule  = [ 'fieldId' => 'status' ];
+		$value = $this->controller->conditional_logic_set_rule_source_value( 'input value', $rule, $form, $rule, null );
+		$this->assertSame( 'input value', $value );
+	}
+
+	public function test_conditional_logic_is_value_match() {
+		$field_value  = 'active';
+		$target_value = 'trash';
+		$operation    = 'is';
+		$rule         = [ 'fieldId' => 'status' ];
+
+		/* Check we ignore rules that don't meet the criteria for custom processing */
+		$match = $this->controller->conditional_logic_is_value_match( false, $field_value, $target_value, $operation, '', $rule );
+		$this->assertFalse( $match );
+
+		$match = $this->controller->conditional_logic_is_value_match( true, $field_value, $target_value, $operation, '', $rule );
+		$this->assertTrue( $match );
+
+		$rule         = [ 'fieldId' => 'date_created' ];
+		$field_value  = '2024-02-15';
+		$target_value = '2024-02-16';
+
+		$match = $this->controller->conditional_logic_is_value_match( false, $field_value, $target_value, $operation, '', $rule );
+		$this->assertFalse( $match );
+
+		$match = $this->controller->conditional_logic_is_value_match( true, $field_value, $target_value, $operation, '', $rule );
+		$this->assertTrue( $match );
+
+		/* Check we process date comparisons */
+		$operation = '>';
+		$match     = $this->controller->conditional_logic_is_value_match( false, $field_value, $target_value, $operation, '', $rule );
+		$this->assertFalse( $match );
+
+		$operation = '<';
+
+		$match = $this->controller->conditional_logic_is_value_match( true, $field_value, $target_value, $operation, '', $rule );
+		$this->assertTrue( $match );
+
+		$field_value  = '2024-02-16';
+		$target_value = '2024-02-15';
+
+		$operation = '<';
+		$match     = $this->controller->conditional_logic_is_value_match( false, $field_value, $target_value, $operation, '', $rule );
+		$this->assertFalse( $match );
+
+		$operation = '>';
+
+		$match = $this->controller->conditional_logic_is_value_match( true, $field_value, $target_value, $operation, '', $rule );
+		$this->assertTrue( $match );
+
+	}
+
 }

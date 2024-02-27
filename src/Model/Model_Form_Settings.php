@@ -261,13 +261,15 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* pass to view */
 		$controller->view->add_edit(
 			[
-				'pdf_id'       => $pdf_id,
-				'title'        => $label,
-				'button_label' => $label,
-				'form'         => $form,
-				'entry_meta'   => $entry_meta,
-				'pdf'          => $pdf,
-				'form_classes' => $form_classes,
+				'pdf_id'                          => $pdf_id,
+				'title'                           => $label,
+				'button_label'                    => $label,
+				'form'                            => $form,
+				'entry_meta'                      => $entry_meta,
+				'pdf'                             => $pdf,
+				'form_classes'                    => $form_classes,
+
+				'extra_conditional_logic_options' => $this->data->get_conditional_logic_options( $form ),
 			]
 		);
 	}
