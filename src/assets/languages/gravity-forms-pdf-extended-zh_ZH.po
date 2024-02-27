@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity PDF\n"
-"POT-Creation-Date: 2024-02-20 03:04+0000\n"
+"POT-Creation-Date: 2024-02-27 04:32+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -151,15 +151,15 @@ msgstr "设置"
 msgid "View Gravity PDF Documentation"
 msgstr "查看Gravity PDF文档"
 
-#: ../../bootstrap.php:329, ../../Helper/Helper_Abstract_Addon.php:761
+#: ../../bootstrap.php:329, ../../Helper/Helper_Abstract_Addon.php:800
 msgid "Docs"
 msgstr "文档"
 
-#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:764
+#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:803
 msgid "Get Help and Support"
 msgstr "获取帮助和支持"
 
-#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:764
+#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:803
 msgid "Support"
 msgstr "支持"
 
@@ -187,7 +187,7 @@ msgstr "安装核心字体"
 #: ../../Controller/Controller_Actions.php:207,
 #: ../../Model/Model_Form_Settings.php:171,
 #: ../../Model/Model_Form_Settings.php:208,
-#: ../../Model/Model_Form_Settings.php:328, ../../View/View_Settings.php:427
+#: ../../Model/Model_Form_Settings.php:330, ../../View/View_Settings.php:427
 msgid "You do not have permission to access this page"
 msgstr "您没有访问此页面的权限"
 
@@ -245,7 +245,7 @@ msgstr "PDF：%s"
 msgid "There was a problem generating your PDF"
 msgstr "生成 PDF 时出现问题"
 
-#: ../../Helper/Helper_Abstract_Addon.php:726
+#: ../../Helper/Helper_Abstract_Addon.php:765
 msgid ""
 "%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades "
 "and support. Need a license key? %4$sPurchase one now%5$s."
@@ -253,7 +253,7 @@ msgstr ""
 "%1$s注册您的 %2$s%3$s 版本，即可获得自动升级和支持。需要许可证密钥？%4$s立即"
 "购买%5$s。"
 
-#: ../../Helper/Helper_Abstract_Addon.php:761
+#: ../../Helper/Helper_Abstract_Addon.php:800
 msgid "View plugin Documentation"
 msgstr "查看插件文档"
 
@@ -605,240 +605,259 @@ msgstr "PDF"
 msgid "Gravity PDF"
 msgstr "Gravity PDF"
 
-#: ../../Helper/Helper_Data.php:171
-msgid "Your license key expired on %s."
-msgstr "你的许可码将过期于 %s。"
-
-#: ../../Helper/Helper_Data.php:172
-msgid "Your license key has been disabled"
-msgstr "您的许可证密钥已被禁用"
-
-#: ../../Helper/Helper_Data.php:173
-msgid "Invalid license key provided"
-msgstr "提供的许可证密钥无效"
-
-#: ../../Helper/Helper_Data.php:174, ../../Helper/Helper_Data.php:175
-msgid "Your license is not active for this URL"
-msgstr "您的许可证对此URL无效"
-
-#: ../../Helper/Helper_Data.php:176
-msgid "This appears to be an invalid license key for %s"
-msgstr "这似乎是%s.的无效许可证密钥。"
-
-#: ../../Helper/Helper_Data.php:177
-msgid "Your license key has reached its activation limit"
-msgstr "您的许可证密钥已达到其激活限制"
-
 #: ../../Helper/Helper_Data.php:178
-msgid "An error occurred, please try again"
-msgstr "发生错误，请重试"
+msgid ""
+"This license key expired on %%s. %1$sPlease renew your license to continue "
+"receiving updates and support%2$s."
+msgstr "此许可证密钥已于 %%s 到期。%1$s请更新许可证以继续接收更新和支持%2$s。"
 
-#: ../../Helper/Helper_Data.php:179
-msgid "An error occurred during activation, please try again"
-msgstr "激活过程中出现错误，请重试"
+#: ../../Helper/Helper_Data.php:179, ../../Helper/Helper_Data.php:180
+msgid ""
+"This license key has been cancelled (most likely due to a refund request). "
+"%1$sPlease consider purchasing a new license%2$s."
+msgstr ""
+"该许可证密钥已被取消（很可能是由于退款请求）。%1$s请考虑购买新的许可证%2$s。"
 
-#: ../../Helper/Helper_Data.php:217
+#: ../../Helper/Helper_Data.php:181
+msgid ""
+"This license key is invalid. Please check your key has been entered "
+"correctly."
+msgstr "此许可证密钥无效。请检查您输入的密钥是否正确。"
+
+#: ../../Helper/Helper_Data.php:182
+msgid ""
+"The license key is invalid. Please check your key has been entered correctly."
+msgstr "许可证密钥无效。请检查您输入的密钥是否正确。"
+
+#: ../../Helper/Helper_Data.php:183
+msgid ""
+"Your license key is valid but does not match your current domain. This "
+"usually occurs if your domain URL changes. Please resave the settings to "
+"activate the license for this website."
+msgstr ""
+"您的许可证密钥有效，但与您当前的域名不匹配。如果您的域名 URL 发生变化，通常会"
+"出现这种情况。请重新保存设置，以激活该网站的许可证。"
+
+#: ../../Helper/Helper_Data.php:184, ../../Helper/Helper_Data.php:185
+msgid ""
+"This license key is not valid for %s. Please check your key is for this "
+"product."
+msgstr "此许可证密钥对 %s 无效。请检查您的密钥是否适用于该产品。"
+
+#: ../../Helper/Helper_Data.php:186
+msgid ""
+"This license key has reached its activation limit. %1$sPlease upgrade your "
+"license to increase the site limit (you only pay the difference)%2$s."
+msgstr ""
+"此许可证密钥已达到激活上限。%1$s请升级您的许可证以增加站点限制（您只需支付差"
+"额）%2$s。"
+
+#: ../../Helper/Helper_Data.php:187, ../../Helper/Helper_Data.php:188
+msgid "An error occurred, please try again."
+msgstr "发生错误，请重试。"
+
+#: ../../Helper/Helper_Data.php:226
 msgid "Loading..."
 msgstr "加载中…"
 
-#: ../../Helper/Helper_Data.php:218
+#: ../../Helper/Helper_Data.php:227
 msgid "Continue"
 msgstr "继续"
 
-#: ../../Helper/Helper_Data.php:219
+#: ../../Helper/Helper_Data.php:228
 msgid "Uninstall"
 msgstr "卸载"
 
-#: ../../Helper/Helper_Data.php:220
+#: ../../Helper/Helper_Data.php:229
 msgid "Cancel"
 msgstr "取消"
 
-#: ../../Helper/Helper_Data.php:221, ../../Helper/Helper_PDF_List_Table.php:361
+#: ../../Helper/Helper_Data.php:230, ../../Helper/Helper_PDF_List_Table.php:361
 msgid "Delete"
 msgstr "删除"
 
-#: ../../Helper/Helper_Data.php:222,
+#: ../../Helper/Helper_Data.php:231,
 #: ../../Helper/Helper_PDF_List_Table.php:220,
-#: ../../Model/Model_Form_Settings.php:929
+#: ../../Model/Model_Form_Settings.php:931
 msgid "Active"
 msgstr "活性"
 
-#: ../../Helper/Helper_Data.php:223,
+#: ../../Helper/Helper_Data.php:232,
 #: ../../Helper/Helper_PDF_List_Table.php:223,
-#: ../../Model/Model_Form_Settings.php:879,
-#: ../../Model/Model_Form_Settings.php:929
+#: ../../Model/Model_Form_Settings.php:881,
+#: ../../Model/Model_Form_Settings.php:931
 msgid "Inactive"
 msgstr "未激活"
 
-#: ../../Helper/Helper_Data.php:224
+#: ../../Helper/Helper_Data.php:233
 msgid "this PDF if"
 msgstr "这个PDF如果"
 
-#: ../../Helper/Helper_Data.php:225
+#: ../../Helper/Helper_Data.php:234
 msgid "Enable"
 msgstr "启用"
 
-#: ../../Helper/Helper_Data.php:226
+#: ../../Helper/Helper_Data.php:235
 msgid "Disable"
 msgstr "禁用"
 
-#: ../../Helper/Helper_Data.php:227
+#: ../../Helper/Helper_Data.php:236
 msgid "Successfully Updated"
 msgstr "更新成功"
 
-#: ../../Helper/Helper_Data.php:228
+#: ../../Helper/Helper_Data.php:237
 msgid "Successfully Deleted"
 msgstr "成功删除了！"
 
-#: ../../Helper/Helper_Data.php:229
+#: ../../Helper/Helper_Data.php:238
 msgid "No"
 msgstr "否"
 
-#: ../../Helper/Helper_Data.php:230
+#: ../../Helper/Helper_Data.php:239
 msgid "Yes"
 msgstr "是"
 
-#: ../../Helper/Helper_Data.php:231
+#: ../../Helper/Helper_Data.php:240
 msgid "Standard"
 msgstr "标准"
 
-#: ../../Helper/Helper_Data.php:232, ../../View/View_Form_Settings.php:78
+#: ../../Helper/Helper_Data.php:241, ../../View/View_Form_Settings.php:78
 msgid "Advanced"
 msgstr "高级"
 
-#: ../../Helper/Helper_Data.php:233
+#: ../../Helper/Helper_Data.php:242
 msgid "Manage"
 msgstr "管理"
 
-#: ../../Helper/Helper_Data.php:234
+#: ../../Helper/Helper_Data.php:243
 msgid "Details"
 msgstr "详情"
 
-#: ../../Helper/Helper_Data.php:235
+#: ../../Helper/Helper_Data.php:244
 msgid "Select"
 msgstr "选择"
 
-#: ../../Helper/Helper_Data.php:236
+#: ../../Helper/Helper_Data.php:245
 msgid "Version"
 msgstr "版本"
 
-#: ../../Helper/Helper_Data.php:237
+#: ../../Helper/Helper_Data.php:246
 msgid "Group"
 msgstr "组"
 
-#: ../../Helper/Helper_Data.php:238
+#: ../../Helper/Helper_Data.php:247
 msgid "Tags"
 msgstr "标签"
 
-#: ../../Helper/Helper_Data.php:240,
+#: ../../Helper/Helper_Data.php:249,
 #: ../../Helper/Helper_Options_Fields.php:254,
 #: ../../Helper/Helper_PDF_List_Table.php:97,
 #: ../../View/View_Form_Settings.php:66
 msgid "Template"
 msgstr "模板"
 
-#: ../../Helper/Helper_Data.php:241
+#: ../../Helper/Helper_Data.php:250
 msgid "Manage PDF Templates"
 msgstr "管理 PDF 模板"
 
-#: ../../Helper/Helper_Data.php:242
+#: ../../Helper/Helper_Data.php:251
 msgid "Add New Template"
 msgstr "添加新模板"
 
-#: ../../Helper/Helper_Data.php:243
+#: ../../Helper/Helper_Data.php:252
 msgid "This form doesn't have any PDFs."
 msgstr "此表格没有任何 PDF 文件。"
 
-#: ../../Helper/Helper_Data.php:244
+#: ../../Helper/Helper_Data.php:253
 msgid "Let's go create one"
 msgstr "让我们创建一个"
 
-#: ../../Helper/Helper_Data.php:245
+#: ../../Helper/Helper_Data.php:254
 msgid "Installed PDFs"
 msgstr "已安装的 PDF"
 
-#: ../../Helper/Helper_Data.php:246
+#: ../../Helper/Helper_Data.php:255
 msgid "Search Installed Templates"
 msgstr "搜索已安装的模板"
 
-#: ../../Helper/Helper_Data.php:248
+#: ../../Helper/Helper_Data.php:257
 msgid "Search the Gravity PDF Knowledgebase..."
 msgstr "搜索 Gravity PDF 知识库..."
 
-#: ../../Helper/Helper_Data.php:249
+#: ../../Helper/Helper_Data.php:258
 msgid "Gravity PDF Documentation"
 msgstr "重力 PDF 文档"
 
-#: ../../Helper/Helper_Data.php:250
+#: ../../Helper/Helper_Data.php:259
 msgid "It doesn't look like there are any topics related to your issue."
 msgstr "看起来没有与您的问题相关的主题。"
 
-#: ../../Helper/Helper_Data.php:251
+#: ../../Helper/Helper_Data.php:260
 msgid "An error occurred. Please try again"
 msgstr "发生错误. 请重试"
 
-#: ../../Helper/Helper_Data.php:253
+#: ../../Helper/Helper_Data.php:262
 msgid "Requires Gravity PDF v%s"
 msgstr "需要重力 PDF v[0］"
 
-#: ../../Helper/Helper_Data.php:254
+#: ../../Helper/Helper_Data.php:263
 msgid ""
 "This PDF template is not compatible with your version of Gravity PDF. This "
 "template required Gravity PDF v%s."
 msgstr "此 PDF 模板与您的 Gravity PDF 版本不兼容。此模板需要 Gravity PDF v%s。"
 
-#: ../../Helper/Helper_Data.php:255
+#: ../../Helper/Helper_Data.php:264
 msgid "Template Details"
 msgstr "模板详情"
 
-#: ../../Helper/Helper_Data.php:256
+#: ../../Helper/Helper_Data.php:265
 msgid "Current Template"
 msgstr "当前模板"
 
-#: ../../Helper/Helper_Data.php:257
+#: ../../Helper/Helper_Data.php:266
 msgid "Show previous template"
 msgstr "显示以前的模板"
 
-#: ../../Helper/Helper_Data.php:258
+#: ../../Helper/Helper_Data.php:267
 msgid "Show next template"
 msgstr "显示下一个模板"
 
-#: ../../Helper/Helper_Data.php:259
+#: ../../Helper/Helper_Data.php:268
 msgid "Upload is not a valid template. Upload a .zip file."
 msgstr "上传的模板无效。上传 .zip 文件。"
 
-#: ../../Helper/Helper_Data.php:260
+#: ../../Helper/Helper_Data.php:269
 msgid "Upload exceeds the 10MB limit."
 msgstr "上传超过 10MB 限制。"
 
-#: ../../Helper/Helper_Data.php:261
+#: ../../Helper/Helper_Data.php:270
 msgid "Template successfully installed"
 msgstr "模板已成功安装"
 
-#: ../../Helper/Helper_Data.php:262
+#: ../../Helper/Helper_Data.php:271
 msgid "Template successfully updated"
 msgstr "模板成功更新"
 
-#: ../../Helper/Helper_Data.php:263
+#: ../../Helper/Helper_Data.php:272
 msgid "PDF Template(s) Successfully Installed / Updated"
 msgstr "PDF 模板已成功安装/更新"
 
-#: ../../Helper/Helper_Data.php:264
+#: ../../Helper/Helper_Data.php:273
 msgid "There was a problem with the upload. Reload the page and try again."
 msgstr "上传过程中出现问题。请重新载入页面并再试一次。"
 
-#: ../../Helper/Helper_Data.php:265
+#: ../../Helper/Helper_Data.php:274
 msgid ""
 "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, "
 "'OK' to confirm the delete."
 msgstr ""
 "您真的要删除此 PDF 模板吗？%s单击 \"取消 \"返回，单击 \"确定 \"确认删除。"
 
-#: ../../Helper/Helper_Data.php:266
+#: ../../Helper/Helper_Data.php:275
 msgid "Could not delete template."
 msgstr "无法删除模板。"
 
-#: ../../Helper/Helper_Data.php:267
+#: ../../Helper/Helper_Data.php:276
 msgid ""
 "If you have a PDF template in .zip format you may install it here. You can "
 "also update an existing PDF template (this will override any changes you "
@@ -847,129 +866,129 @@ msgstr ""
 "如果您有 .zip 格式的 PDF 模板，可以在此安装。您也可以更新现有的 PDF 模板（这"
 "将覆盖您所做的任何更改）。"
 
-#: ../../Helper/Helper_Data.php:269
+#: ../../Helper/Helper_Data.php:278
 msgid "ALL CORE FONTS SUCCESSFULLY INSTALLED"
 msgstr "成功安装所有核心字体"
 
-#: ../../Helper/Helper_Data.php:270
+#: ../../Helper/Helper_Data.php:279
 msgid "%s CORE FONT(S) DID NOT INSTALL CORRECTLY"
 msgstr "%s 核心字体未正确安装"
 
-#: ../../Helper/Helper_Data.php:271
+#: ../../Helper/Helper_Data.php:280
 msgid "Could not download Core Font list. Try again."
 msgstr "无法下载核心字体列表。请再试一次。"
 
-#: ../../Helper/Helper_Data.php:272
+#: ../../Helper/Helper_Data.php:281
 msgid "Downloading %s..."
 msgstr "下载 %s..."
 
-#: ../../Helper/Helper_Data.php:273
+#: ../../Helper/Helper_Data.php:282
 msgid "Completed installation of %s"
 msgstr "完成安装 %s"
 
-#: ../../Helper/Helper_Data.php:274
+#: ../../Helper/Helper_Data.php:283
 msgid "Failed installation of %s"
 msgstr "安装 %s 失败"
 
-#: ../../Helper/Helper_Data.php:275
+#: ../../Helper/Helper_Data.php:284
 msgid "Fonts remaining:"
 msgstr "剩余字体"
 
-#: ../../Helper/Helper_Data.php:276
+#: ../../Helper/Helper_Data.php:285
 msgid "Retry Failed Downloads?"
 msgstr "重试失败的下载？"
 
-#: ../../Helper/Helper_Data.php:277
+#: ../../Helper/Helper_Data.php:286
 msgid "Core font installation"
 msgstr "核心字体安装"
 
-#: ../../Helper/Helper_Data.php:280
+#: ../../Helper/Helper_Data.php:289
 msgid "Search installed fonts"
 msgstr "搜索已安装的字体"
 
-#: ../../Helper/Helper_Data.php:281
+#: ../../Helper/Helper_Data.php:290
 msgid "Installed Fonts"
 msgstr "已安装的字体"
 
-#: ../../Helper/Helper_Data.php:282
+#: ../../Helper/Helper_Data.php:291
 msgid "Regular"
 msgstr "常规"
 
-#: ../../Helper/Helper_Data.php:283
+#: ../../Helper/Helper_Data.php:292
 msgid "Regular %1$s(required)%2$s"
 msgstr "常规 %1$s（必填）[1］"
 
-#: ../../Helper/Helper_Data.php:284
+#: ../../Helper/Helper_Data.php:293
 msgid "Italics"
 msgstr "斜体字"
 
-#: ../../Helper/Helper_Data.php:285
+#: ../../Helper/Helper_Data.php:294
 msgid "Bold"
 msgstr "黑体"
 
-#: ../../Helper/Helper_Data.php:286
+#: ../../Helper/Helper_Data.php:295
 msgid "Bold Italics"
 msgstr "粗斜体"
 
-#: ../../Helper/Helper_Data.php:287
+#: ../../Helper/Helper_Data.php:296
 msgid "Add Font"
 msgstr "添加字体"
 
-#: ../../Helper/Helper_Data.php:288
+#: ../../Helper/Helper_Data.php:297
 msgid "Update Font"
 msgstr "更新字体"
 
-#: ../../Helper/Helper_Data.php:289
+#: ../../Helper/Helper_Data.php:298
 msgid "Install new fonts for use in your PDF documents."
 msgstr "在 PDF 文档中安装新字体。"
 
-#: ../../Helper/Helper_Data.php:290
+#: ../../Helper/Helper_Data.php:299
 msgid ""
 "Once saved, PDFs configured to use this font will have your changes applied "
 "automatically for newly-generated documents."
 msgstr "保存后，配置为使用此字体的 PDF 将在新生成的文档中自动应用您的更改。"
 
-#: ../../Helper/Helper_Data.php:291
+#: ../../Helper/Helper_Data.php:300
 msgid "Font Name %1$s(required)%2$s"
 msgstr "字体名称 %1$s（必填）[1］"
 
-#: ../../Helper/Helper_Data.php:292
+#: ../../Helper/Helper_Data.php:301
 msgid "The font name can only contain letters, numbers and spaces."
 msgstr "字体名称只能包含字母、数字和空格。"
 
-#: ../../Helper/Helper_Data.php:293
+#: ../../Helper/Helper_Data.php:302
 msgid ""
 "Please choose a name contains letters and/or numbers (and a space if you "
 "want it)."
 msgstr "请选择一个包含字母和/或数字的名称（如果需要，还可以加上空格）。"
 
-#: ../../Helper/Helper_Data.php:294
+#: ../../Helper/Helper_Data.php:303
 msgid "Font Files"
 msgstr "字体文件"
 
-#: ../../Helper/Helper_Data.php:295
+#: ../../Helper/Helper_Data.php:304
 msgid ""
 "Select or drag and drop your .ttf font file for the variants below. Only the "
 "Regular type is required."
 msgstr "为下面的变体选择或拖放 .ttf 字体文件。只需要常规类型。"
 
-#: ../../Helper/Helper_Data.php:296
+#: ../../Helper/Helper_Data.php:305
 msgid "Add a .ttf font file."
 msgstr "添加 .ttf 字体文件。"
 
-#: ../../Helper/Helper_Data.php:297
+#: ../../Helper/Helper_Data.php:306
 msgid "View template usage"
 msgstr "查看模板使用情况"
 
-#: ../../Helper/Helper_Data.php:298
+#: ../../Helper/Helper_Data.php:307
 msgid "← Cancel"
 msgstr "取消"
 
-#: ../../Helper/Helper_Data.php:299
+#: ../../Helper/Helper_Data.php:308
 msgid "Are you sure you want to delete this font?"
 msgstr "您确定要删除这个吗？"
 
-#: ../../Helper/Helper_Data.php:300
+#: ../../Helper/Helper_Data.php:309
 msgid ""
 "Add this snippet %1$sin a custom template%3$s to selectively set the font on "
 "blocks of text. If you want to apply the font to the entire PDF, %2$suse the "
@@ -978,55 +997,55 @@ msgstr ""
 "在自定义模板%3$s中添加此片段%1$s，以选择性地设置文本块的字体。如果要将字体应"
 "用到整个 PDF，%2$s请在表单上配置 PDF 时使用字体设置%3$s。"
 
-#: ../../Helper/Helper_Data.php:301
+#: ../../Helper/Helper_Data.php:310
 msgid "Update font"
 msgstr "更新字体"
 
-#: ../../Helper/Helper_Data.php:302
+#: ../../Helper/Helper_Data.php:311
 msgid "Select font"
 msgstr "选择字体"
 
-#: ../../Helper/Helper_Data.php:303
+#: ../../Helper/Helper_Data.php:312
 msgid "Delete font"
 msgstr "删除字体"
 
-#: ../../Helper/Helper_Data.php:306
+#: ../../Helper/Helper_Data.php:315
 msgid "Font list empty."
 msgstr "字体列表为空。"
 
-#: ../../Helper/Helper_Data.php:307
+#: ../../Helper/Helper_Data.php:316
 msgid "No fonts matching your search found."
 msgstr "未找到与您的搜索匹配的字体。"
 
-#: ../../Helper/Helper_Data.php:308
+#: ../../Helper/Helper_Data.php:317
 msgid "Clear Search."
 msgstr "清除搜索。"
 
-#: ../../Helper/Helper_Data.php:309
+#: ../../Helper/Helper_Data.php:318
 msgid "Your font has been saved."
 msgstr "您的字体已保存。"
 
-#: ../../Helper/Helper_Data.php:310
+#: ../../Helper/Helper_Data.php:319
 msgid ""
 "%1$sThe action could not be completed.%2$s Resolve the highlighted issues "
 "above and then try again."
 msgstr "%1$s操作无法完成。%2$s 解决上述突出显示的问题，然后再试一次。"
 
-#: ../../Helper/Helper_Data.php:311
+#: ../../Helper/Helper_Data.php:320
 msgid "A problem occurred. Reload the page and try again."
 msgstr "出现问题。重新载入页面，再试一次。"
 
-#: ../../Helper/Helper_Data.php:312
+#: ../../Helper/Helper_Data.php:321
 msgid ""
 "%1$sFont file(s) missing from the server.%2$s Please upload the font(s) "
 "again and then save."
 msgstr "%1$s服务器上缺少字体文件。%2$s请重新上传字体，然后保存。"
 
-#: ../../Helper/Helper_Data.php:313
+#: ../../Helper/Helper_Data.php:322
 msgid "%1$sFont file(s) are malformed%2$s and cannot be used with Gravity PDF."
 msgstr "%1$s字体文件畸形%2$s，不能与 Gravity PDF 一起使用。"
 
-#: ../../Helper/Helper_Data.php:315
+#: ../../Helper/Helper_Data.php:324
 msgid ""
 "Warning! ALL Gravity PDF data, including templates, will be deleted. This "
 "cannot be undone. 'OK' to delete, 'Cancel' to stop."
@@ -1034,22 +1053,34 @@ msgstr ""
 "警告！所有 Gravity PDF 数据（包括模板）都将被删除。无法撤销。确定 \"删"
 "除，\"取消 \"停止。"
 
-#: ../../Helper/Helper_Data.php:316
+#: ../../Helper/Helper_Data.php:325
 msgid ""
 "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete."
 msgstr "警告：您即将删除此 PDF。取消 \"可停止，\"确定 \"可删除。"
 
-#: ../../Helper/Helper_Data.php:319
+#: ../../Helper/Helper_Data.php:328
 msgid "Search the Gravity PDF Documentation..."
 msgstr "搜索重力 PDF 文档..."
 
-#: ../../Helper/Helper_Data.php:320
+#: ../../Helper/Helper_Data.php:329
 msgid "Submit your search query."
 msgstr "提交您的搜索查询。"
 
-#: ../../Helper/Helper_Data.php:321
+#: ../../Helper/Helper_Data.php:330
 msgid "Clear your search query."
 msgstr "清除搜索查询。"
+
+#: ../../Helper/Helper_Data.php:488
+msgid "Approved"
+msgstr "批准"
+
+#: ../../Helper/Helper_Data.php:489
+msgid "Disapproved"
+msgstr "未获批准"
+
+#: ../../Helper/Helper_Data.php:490
+msgid "Unapproved"
+msgstr "未核准"
 
 #: ../../Helper/Helper_Options_Fields.php:65
 msgid "Default Template"
@@ -1698,26 +1729,26 @@ msgstr "更新 PDF"
 msgid "Add PDF"
 msgstr "添加PDF"
 
-#: ../../Model/Model_Form_Settings.php:334,
-#: ../../Model/Model_Form_Settings.php:356,
-#: ../../Model/Model_Form_Settings.php:405,
-#: ../../Model/Model_Form_Settings.php:513
+#: ../../Model/Model_Form_Settings.php:336,
+#: ../../Model/Model_Form_Settings.php:358,
+#: ../../Model/Model_Form_Settings.php:407,
+#: ../../Model/Model_Form_Settings.php:515
 msgid "There was a problem saving your PDF settings. Please try again."
 msgstr "保存 PDF 设置时出现问题。请重试。"
 
-#: ../../Model/Model_Form_Settings.php:377
+#: ../../Model/Model_Form_Settings.php:379
 msgid "PDF could not be saved. Please enter all required information below."
 msgstr "无法保存 PDF。请在下面输入所有必要信息。"
 
-#: ../../Model/Model_Form_Settings.php:399
+#: ../../Model/Model_Form_Settings.php:401
 msgid "PDF saved successfully. %1$sBack to PDF list.%2$s"
 msgstr "PDF 已成功保存。%1$s返回 PDF 列表。"
 
-#: ../../Model/Model_Form_Settings.php:810
+#: ../../Model/Model_Form_Settings.php:812
 msgid "PDF successfully deleted."
 msgstr "PDF 已成功删除。"
 
-#: ../../Model/Model_Form_Settings.php:873
+#: ../../Model/Model_Form_Settings.php:875
 msgid "PDF successfully duplicated."
 msgstr "PDF 复制成功。"
 
@@ -1778,11 +1809,15 @@ msgstr "无法保存 PDF。"
 msgid "Could not find PDF configuration requested"
 msgstr "无法找到所需的 PDF 配置"
 
-#: ../../Model/Model_Settings.php:419
+#: ../../Model/Model_Settings.php:361
+msgid "Your support license key has been activated for this domain."
+msgstr "您的支持许可密钥已在此域激活。"
+
+#: ../../Model/Model_Settings.php:458
 msgid "License deactivated."
 msgstr "许可证已注销。"
 
-#: ../../Model/Model_Settings.php:443
+#: ../../Model/Model_Settings.php:482
 msgid ""
 "An unknown error occurred, and your license key may not have been correctly "
 "deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your "
@@ -2123,7 +2158,7 @@ msgstr ""
 "在使用 Gravity Forms 生成 PDF 之前，需要将核心字体保存到服务器上。这只需完成"
 "一次。"
 
-#: ../../View/html/FormSettings/add_edit.php:61,
+#: ../../View/html/FormSettings/add_edit.php:62,
 #: ../../View/html/Settings/general.php:50
 msgid "Want more features? Take a look at our addons."
 msgstr "想要更多功能？看看我们的附加组件。"
@@ -2245,3 +2280,21 @@ msgid ""
 msgstr ""
 "此操作将删除所有 Gravity PDF 设置并停用插件。如果继续，所有设置、配置、自定义"
 "模板和字体都将被删除。"
+
+#~ msgid "Your license key expired on %s."
+#~ msgstr "你的许可码将过期于 %s。"
+
+#~ msgid "Your license key has been disabled"
+#~ msgstr "您的许可证密钥已被禁用"
+
+#~ msgid "Invalid license key provided"
+#~ msgstr "提供的许可证密钥无效"
+
+#~ msgid "This appears to be an invalid license key for %s"
+#~ msgstr "这似乎是%s.的无效许可证密钥。"
+
+#~ msgid "Your license key has reached its activation limit"
+#~ msgstr "您的许可证密钥已达到其激活限制"
+
+#~ msgid "An error occurred during activation, please try again"
+#~ msgstr "激活过程中出现错误，请重试"

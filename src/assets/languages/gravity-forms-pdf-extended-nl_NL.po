@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity PDF\n"
-"POT-Creation-Date: 2024-02-20 03:04+0000\n"
+"POT-Creation-Date: 2024-02-27 04:32+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -169,15 +169,15 @@ msgstr "Instellingen"
 msgid "View Gravity PDF Documentation"
 msgstr "Bekijk PDF-documentatie over zwaartekracht"
 
-#: ../../bootstrap.php:329, ../../Helper/Helper_Abstract_Addon.php:761
+#: ../../bootstrap.php:329, ../../Helper/Helper_Abstract_Addon.php:800
 msgid "Docs"
 msgstr "Documentatie"
 
-#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:764
+#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:803
 msgid "Get Help and Support"
 msgstr "Krijg Hulp en Ondersteuning"
 
-#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:764
+#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:803
 msgid "Support"
 msgstr "Ondersteuning"
 
@@ -205,7 +205,7 @@ msgstr "Kernlettertypen installeren"
 #: ../../Controller/Controller_Actions.php:207,
 #: ../../Model/Model_Form_Settings.php:171,
 #: ../../Model/Model_Form_Settings.php:208,
-#: ../../Model/Model_Form_Settings.php:328, ../../View/View_Settings.php:427
+#: ../../Model/Model_Form_Settings.php:330, ../../View/View_Settings.php:427
 msgid "You do not have permission to access this page"
 msgstr "Je hebt geen toestemming om deze pagina te bekijken"
 
@@ -273,7 +273,7 @@ msgstr "PDF: %s"
 msgid "There was a problem generating your PDF"
 msgstr "Er is een probleem opgetreden bij het genereren van uw PDF"
 
-#: ../../Helper/Helper_Abstract_Addon.php:726
+#: ../../Helper/Helper_Abstract_Addon.php:765
 msgid ""
 "%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades "
 "and support. Need a license key? %4$sPurchase one now%5$s."
@@ -282,7 +282,7 @@ msgstr ""
 "automatische upgrades en ondersteuning. Licentiesleutel nodig? %4$sKoop er "
 "nu een%5$s."
 
-#: ../../Helper/Helper_Abstract_Addon.php:761
+#: ../../Helper/Helper_Abstract_Addon.php:800
 msgid "View plugin Documentation"
 msgstr "Bekijk plugin documentatie"
 
@@ -636,185 +636,214 @@ msgstr "PDF"
 msgid "Gravity PDF"
 msgstr "Gravity PDF"
 
-#: ../../Helper/Helper_Data.php:171
-msgid "Your license key expired on %s."
-msgstr "Je licentiesleutel vervalt op %s."
-
-#: ../../Helper/Helper_Data.php:172
-msgid "Your license key has been disabled"
-msgstr "Uw licentiesleutel is uitgeschakeld"
-
-#: ../../Helper/Helper_Data.php:173
-msgid "Invalid license key provided"
-msgstr "Ongeldige licentiesleutel verstrekt"
-
-#: ../../Helper/Helper_Data.php:174, ../../Helper/Helper_Data.php:175
-msgid "Your license is not active for this URL"
-msgstr "De licentie is niet actief voor deze URL"
-
-#: ../../Helper/Helper_Data.php:176
-msgid "This appears to be an invalid license key for %s"
-msgstr "Dit lijkt een ongeldige licentiesleutel te zijn voor %s"
-
-#: ../../Helper/Helper_Data.php:177
-msgid "Your license key has reached its activation limit"
-msgstr "Je licentiesleutel heeft zijn activeringslimiet bereikt"
-
 #: ../../Helper/Helper_Data.php:178
-msgid "An error occurred, please try again"
-msgstr "Er is een fout opgetreden. Gelieve het opnieuw te proberen"
+msgid ""
+"This license key expired on %%s. %1$sPlease renew your license to continue "
+"receiving updates and support%2$s."
+msgstr ""
+"Deze licentiesleutel is verlopen op %%s. %1$sVerleng uw licentie om updates "
+"en ondersteuning te blijven ontvangen%2$s."
 
-#: ../../Helper/Helper_Data.php:179
-msgid "An error occurred during activation, please try again"
-msgstr "Er is een fout opgetreden tijdens de activering, probeer het opnieuw"
+#: ../../Helper/Helper_Data.php:179, ../../Helper/Helper_Data.php:180
+msgid ""
+"This license key has been cancelled (most likely due to a refund request). "
+"%1$sPlease consider purchasing a new license%2$s."
+msgstr ""
+"Deze licentiesleutel is geannuleerd (waarschijnlijk als gevolg van een "
+"restitutieverzoek). %1$sOverweeg de aanschaf van een nieuwe licentie%2$s."
 
-#: ../../Helper/Helper_Data.php:217
+#: ../../Helper/Helper_Data.php:181
+msgid ""
+"This license key is invalid. Please check your key has been entered "
+"correctly."
+msgstr ""
+"Deze licentiesleutel is ongeldig. Controleer of de sleutel correct is "
+"ingevoerd."
+
+#: ../../Helper/Helper_Data.php:182
+msgid ""
+"The license key is invalid. Please check your key has been entered correctly."
+msgstr ""
+"De licentiesleutel is ongeldig. Controleer of de sleutel correct is "
+"ingevoerd."
+
+#: ../../Helper/Helper_Data.php:183
+msgid ""
+"Your license key is valid but does not match your current domain. This "
+"usually occurs if your domain URL changes. Please resave the settings to "
+"activate the license for this website."
+msgstr ""
+"Je licentiesleutel is geldig, maar komt niet overeen met je huidige domein. "
+"Dit gebeurt meestal als je domein URL verandert. Sla de instellingen opnieuw "
+"op om de licentie voor deze website te activeren."
+
+#: ../../Helper/Helper_Data.php:184, ../../Helper/Helper_Data.php:185
+msgid ""
+"This license key is not valid for %s. Please check your key is for this "
+"product."
+msgstr ""
+"Deze licentiesleutel is niet geldig voor %s. Controleer of uw sleutel voor "
+"dit product is."
+
+#: ../../Helper/Helper_Data.php:186
+msgid ""
+"This license key has reached its activation limit. %1$sPlease upgrade your "
+"license to increase the site limit (you only pay the difference)%2$s."
+msgstr ""
+"Deze licentiesleutel heeft zijn activeringslimiet bereikt. %1$sUpgrade je "
+"licentie om de sitelimiet te verhogen (je betaalt alleen het verschil)%2$s."
+
+#: ../../Helper/Helper_Data.php:187, ../../Helper/Helper_Data.php:188
+msgid "An error occurred, please try again."
+msgstr "Er is een fout opgetreden, probeer het opnieuw."
+
+#: ../../Helper/Helper_Data.php:226
 msgid "Loading..."
 msgstr "Laden…"
 
-#: ../../Helper/Helper_Data.php:218
+#: ../../Helper/Helper_Data.php:227
 msgid "Continue"
 msgstr "Doorgaan"
 
-#: ../../Helper/Helper_Data.php:219
+#: ../../Helper/Helper_Data.php:228
 msgid "Uninstall"
 msgstr "Deinstallatie"
 
-#: ../../Helper/Helper_Data.php:220
+#: ../../Helper/Helper_Data.php:229
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: ../../Helper/Helper_Data.php:221, ../../Helper/Helper_PDF_List_Table.php:361
+#: ../../Helper/Helper_Data.php:230, ../../Helper/Helper_PDF_List_Table.php:361
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: ../../Helper/Helper_Data.php:222,
+#: ../../Helper/Helper_Data.php:231,
 #: ../../Helper/Helper_PDF_List_Table.php:220,
-#: ../../Model/Model_Form_Settings.php:929
+#: ../../Model/Model_Form_Settings.php:931
 msgid "Active"
 msgstr "Actief"
 
-#: ../../Helper/Helper_Data.php:223,
+#: ../../Helper/Helper_Data.php:232,
 #: ../../Helper/Helper_PDF_List_Table.php:223,
-#: ../../Model/Model_Form_Settings.php:879,
-#: ../../Model/Model_Form_Settings.php:929
+#: ../../Model/Model_Form_Settings.php:881,
+#: ../../Model/Model_Form_Settings.php:931
 msgid "Inactive"
 msgstr "Inactief"
 
-#: ../../Helper/Helper_Data.php:224
+#: ../../Helper/Helper_Data.php:233
 msgid "this PDF if"
 msgstr "dieses PDF wenn"
 
-#: ../../Helper/Helper_Data.php:225
+#: ../../Helper/Helper_Data.php:234
 msgid "Enable"
 msgstr "Inschakelen"
 
-#: ../../Helper/Helper_Data.php:226
+#: ../../Helper/Helper_Data.php:235
 msgid "Disable"
 msgstr "Uitschakelen"
 
-#: ../../Helper/Helper_Data.php:227
+#: ../../Helper/Helper_Data.php:236
 msgid "Successfully Updated"
 msgstr "Succesvol bijgewerkt"
 
-#: ../../Helper/Helper_Data.php:228
+#: ../../Helper/Helper_Data.php:237
 msgid "Successfully Deleted"
 msgstr "Succesvol verwijderd"
 
-#: ../../Helper/Helper_Data.php:229
+#: ../../Helper/Helper_Data.php:238
 msgid "No"
 msgstr "Nee"
 
-#: ../../Helper/Helper_Data.php:230
+#: ../../Helper/Helper_Data.php:239
 msgid "Yes"
 msgstr "Ja"
 
-#: ../../Helper/Helper_Data.php:231
+#: ../../Helper/Helper_Data.php:240
 msgid "Standard"
 msgstr "Standaard"
 
-#: ../../Helper/Helper_Data.php:232, ../../View/View_Form_Settings.php:78
+#: ../../Helper/Helper_Data.php:241, ../../View/View_Form_Settings.php:78
 msgid "Advanced"
 msgstr "Geavanceerd"
 
-#: ../../Helper/Helper_Data.php:233
+#: ../../Helper/Helper_Data.php:242
 msgid "Manage"
 msgstr "Beheren"
 
-#: ../../Helper/Helper_Data.php:234
+#: ../../Helper/Helper_Data.php:243
 msgid "Details"
 msgstr "Details"
 
-#: ../../Helper/Helper_Data.php:235
+#: ../../Helper/Helper_Data.php:244
 msgid "Select"
 msgstr "Selecteer"
 
-#: ../../Helper/Helper_Data.php:236
+#: ../../Helper/Helper_Data.php:245
 msgid "Version"
 msgstr "Versie"
 
-#: ../../Helper/Helper_Data.php:237
+#: ../../Helper/Helper_Data.php:246
 msgid "Group"
 msgstr "Groep"
 
-#: ../../Helper/Helper_Data.php:238
+#: ../../Helper/Helper_Data.php:247
 msgid "Tags"
 msgstr "Tags"
 
-#: ../../Helper/Helper_Data.php:240,
+#: ../../Helper/Helper_Data.php:249,
 #: ../../Helper/Helper_Options_Fields.php:254,
 #: ../../Helper/Helper_PDF_List_Table.php:97,
 #: ../../View/View_Form_Settings.php:66
 msgid "Template"
 msgstr "Sjabloon"
 
-#: ../../Helper/Helper_Data.php:241
+#: ../../Helper/Helper_Data.php:250
 msgid "Manage PDF Templates"
 msgstr "PDF-sjablonen beheren"
 
-#: ../../Helper/Helper_Data.php:242
+#: ../../Helper/Helper_Data.php:251
 msgid "Add New Template"
 msgstr "Nieuw sjabloon toevoegen"
 
-#: ../../Helper/Helper_Data.php:243
+#: ../../Helper/Helper_Data.php:252
 msgid "This form doesn't have any PDFs."
 msgstr "Dit formulier heeft geen PDF's."
 
-#: ../../Helper/Helper_Data.php:244
+#: ../../Helper/Helper_Data.php:253
 msgid "Let's go create one"
 msgstr "Laten we er een maken"
 
-#: ../../Helper/Helper_Data.php:245
+#: ../../Helper/Helper_Data.php:254
 msgid "Installed PDFs"
 msgstr "Geïnstalleerde PDF's"
 
-#: ../../Helper/Helper_Data.php:246
+#: ../../Helper/Helper_Data.php:255
 msgid "Search Installed Templates"
 msgstr "Geïnstalleerde sjablonen zoeken"
 
-#: ../../Helper/Helper_Data.php:248
+#: ../../Helper/Helper_Data.php:257
 msgid "Search the Gravity PDF Knowledgebase..."
 msgstr "Doorzoek de Gravity PDF-kennisbank..."
 
-#: ../../Helper/Helper_Data.php:249
+#: ../../Helper/Helper_Data.php:258
 msgid "Gravity PDF Documentation"
 msgstr "PDF-documentatie voor zwaartekracht"
 
-#: ../../Helper/Helper_Data.php:250
+#: ../../Helper/Helper_Data.php:259
 msgid "It doesn't look like there are any topics related to your issue."
 msgstr ""
 "Het ziet er niet naar uit dat er onderwerpen zijn met betrekking tot jouw "
 "probleem."
 
-#: ../../Helper/Helper_Data.php:251
+#: ../../Helper/Helper_Data.php:260
 msgid "An error occurred. Please try again"
 msgstr "Er is een fout opgetreden. Probeer het opnieuw"
 
-#: ../../Helper/Helper_Data.php:253
+#: ../../Helper/Helper_Data.php:262
 msgid "Requires Gravity PDF v%s"
 msgstr "Vereist zwaartekracht-PDF v%s"
 
-#: ../../Helper/Helper_Data.php:254
+#: ../../Helper/Helper_Data.php:263
 msgid ""
 "This PDF template is not compatible with your version of Gravity PDF. This "
 "template required Gravity PDF v%s."
@@ -822,49 +851,49 @@ msgstr ""
 "Deze PDF-sjabloon is niet compatibel met uw versie van Gravity PDF. Deze "
 "sjabloon vereist Gravity PDF v%s."
 
-#: ../../Helper/Helper_Data.php:255
+#: ../../Helper/Helper_Data.php:264
 msgid "Template Details"
 msgstr "Template Details"
 
-#: ../../Helper/Helper_Data.php:256
+#: ../../Helper/Helper_Data.php:265
 msgid "Current Template"
 msgstr "Huidige sjabloon"
 
-#: ../../Helper/Helper_Data.php:257
+#: ../../Helper/Helper_Data.php:266
 msgid "Show previous template"
 msgstr "Toon vorige sjabloon"
 
-#: ../../Helper/Helper_Data.php:258
+#: ../../Helper/Helper_Data.php:267
 msgid "Show next template"
 msgstr "Volgende sjabloon weergeven"
 
-#: ../../Helper/Helper_Data.php:259
+#: ../../Helper/Helper_Data.php:268
 msgid "Upload is not a valid template. Upload a .zip file."
 msgstr "Upload is geen geldige sjabloon. Upload een .zip-bestand."
 
-#: ../../Helper/Helper_Data.php:260
+#: ../../Helper/Helper_Data.php:269
 msgid "Upload exceeds the 10MB limit."
 msgstr "Uploaden overschrijdt de limiet van 10 MB."
 
-#: ../../Helper/Helper_Data.php:261
+#: ../../Helper/Helper_Data.php:270
 msgid "Template successfully installed"
 msgstr "Sjabloon succesvol geïnstalleerd"
 
-#: ../../Helper/Helper_Data.php:262
+#: ../../Helper/Helper_Data.php:271
 msgid "Template successfully updated"
 msgstr "Sjabloon succesvol bijgewerkt"
 
-#: ../../Helper/Helper_Data.php:263
+#: ../../Helper/Helper_Data.php:272
 msgid "PDF Template(s) Successfully Installed / Updated"
 msgstr "PDF-sjabloon(s) succesvol geïnstalleerd / bijgewerkt"
 
-#: ../../Helper/Helper_Data.php:264
+#: ../../Helper/Helper_Data.php:273
 msgid "There was a problem with the upload. Reload the page and try again."
 msgstr ""
 "Er is een probleem opgetreden bij het uploaden. Herlaad de pagina en probeer "
 "het opnieuw."
 
-#: ../../Helper/Helper_Data.php:265
+#: ../../Helper/Helper_Data.php:274
 msgid ""
 "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, "
 "'OK' to confirm the delete."
@@ -872,11 +901,11 @@ msgstr ""
 "Wilt u deze PDF-sjabloon echt verwijderen?%sKlik op 'Annuleren' om terug te "
 "gaan, op 'OK' om het verwijderen te bevestigen."
 
-#: ../../Helper/Helper_Data.php:266
+#: ../../Helper/Helper_Data.php:275
 msgid "Could not delete template."
 msgstr "Kan sjabloon niet verwijderen."
 
-#: ../../Helper/Helper_Data.php:267
+#: ../../Helper/Helper_Data.php:276
 msgid ""
 "If you have a PDF template in .zip format you may install it here. You can "
 "also update an existing PDF template (this will override any changes you "
@@ -886,83 +915,83 @@ msgstr ""
 "kunt ook een bestaande PDF-sjabloon bijwerken (wijzigingen die u hebt "
 "aangebracht worden dan overschreven)."
 
-#: ../../Helper/Helper_Data.php:269
+#: ../../Helper/Helper_Data.php:278
 msgid "ALL CORE FONTS SUCCESSFULLY INSTALLED"
 msgstr "ALLE KERNLETTERTYPEN MET SUCCES GEÏNSTALLEERD"
 
-#: ../../Helper/Helper_Data.php:270
+#: ../../Helper/Helper_Data.php:279
 msgid "%s CORE FONT(S) DID NOT INSTALL CORRECTLY"
 msgstr "%s KERNLETTERTYPE(S) NIET GOED GEÏNSTALLEERD"
 
-#: ../../Helper/Helper_Data.php:271
+#: ../../Helper/Helper_Data.php:280
 msgid "Could not download Core Font list. Try again."
 msgstr "Core Font-lijst kon niet worden gedownload. Probeer het opnieuw."
 
-#: ../../Helper/Helper_Data.php:272
+#: ../../Helper/Helper_Data.php:281
 msgid "Downloading %s..."
 msgstr "Downloaden %s..."
 
-#: ../../Helper/Helper_Data.php:273
+#: ../../Helper/Helper_Data.php:282
 msgid "Completed installation of %s"
 msgstr "Installatie voltooid van %s"
 
-#: ../../Helper/Helper_Data.php:274
+#: ../../Helper/Helper_Data.php:283
 msgid "Failed installation of %s"
 msgstr "Mislukte installatie van %s"
 
-#: ../../Helper/Helper_Data.php:275
+#: ../../Helper/Helper_Data.php:284
 msgid "Fonts remaining:"
 msgstr "Resterende lettertypen:"
 
-#: ../../Helper/Helper_Data.php:276
+#: ../../Helper/Helper_Data.php:285
 msgid "Retry Failed Downloads?"
 msgstr "Mislukte downloads opnieuw proberen?"
 
-#: ../../Helper/Helper_Data.php:277
+#: ../../Helper/Helper_Data.php:286
 msgid "Core font installation"
 msgstr "Installatie kernlettertype"
 
-#: ../../Helper/Helper_Data.php:280
+#: ../../Helper/Helper_Data.php:289
 msgid "Search installed fonts"
 msgstr "Geïnstalleerde lettertypen zoeken"
 
-#: ../../Helper/Helper_Data.php:281
+#: ../../Helper/Helper_Data.php:290
 msgid "Installed Fonts"
 msgstr "Geïnstalleerde lettertypen"
 
-#: ../../Helper/Helper_Data.php:282
+#: ../../Helper/Helper_Data.php:291
 msgid "Regular"
 msgstr "Standaard"
 
-#: ../../Helper/Helper_Data.php:283
+#: ../../Helper/Helper_Data.php:292
 msgid "Regular %1$s(required)%2$s"
 msgstr "Regelmatig %1$s(verplicht)%2$s"
 
-#: ../../Helper/Helper_Data.php:284
+#: ../../Helper/Helper_Data.php:293
 msgid "Italics"
 msgstr "Cursief"
 
-#: ../../Helper/Helper_Data.php:285
+#: ../../Helper/Helper_Data.php:294
 msgid "Bold"
 msgstr "Vet"
 
-#: ../../Helper/Helper_Data.php:286
+#: ../../Helper/Helper_Data.php:295
 msgid "Bold Italics"
 msgstr "Vetgedrukt Cursief"
 
-#: ../../Helper/Helper_Data.php:287
+#: ../../Helper/Helper_Data.php:296
 msgid "Add Font"
 msgstr "Lettertype toevoegen"
 
-#: ../../Helper/Helper_Data.php:288
+#: ../../Helper/Helper_Data.php:297
 msgid "Update Font"
 msgstr "Update het lettertype"
 
-#: ../../Helper/Helper_Data.php:289
+#: ../../Helper/Helper_Data.php:298
 msgid "Install new fonts for use in your PDF documents."
 msgstr "Installeer nieuwe lettertypes voor gebruik in uw PDF-documenten."
 
-#: ../../Helper/Helper_Data.php:290
+#: ../../Helper/Helper_Data.php:299
 msgid ""
 "Once saved, PDFs configured to use this font will have your changes applied "
 "automatically for newly-generated documents."
@@ -971,27 +1000,27 @@ msgstr ""
 "nieuw gegenereerde documenten in PDF's die zijn geconfigureerd om dit "
 "lettertype te gebruiken."
 
-#: ../../Helper/Helper_Data.php:291
+#: ../../Helper/Helper_Data.php:300
 msgid "Font Name %1$s(required)%2$s"
 msgstr "Lettertype naam %1$s(verplicht)%2$s"
 
-#: ../../Helper/Helper_Data.php:292
+#: ../../Helper/Helper_Data.php:301
 msgid "The font name can only contain letters, numbers and spaces."
 msgstr ""
 "De naam van het lettertype kan alleen letters, cijfers en spaties bevatten."
 
-#: ../../Helper/Helper_Data.php:293
+#: ../../Helper/Helper_Data.php:302
 msgid ""
 "Please choose a name contains letters and/or numbers (and a space if you "
 "want it)."
 msgstr ""
 "Kies een naam met letters en/of cijfers (en een spatie als je dat wilt)."
 
-#: ../../Helper/Helper_Data.php:294
+#: ../../Helper/Helper_Data.php:303
 msgid "Font Files"
 msgstr "Lettertype Bestanden"
 
-#: ../../Helper/Helper_Data.php:295
+#: ../../Helper/Helper_Data.php:304
 msgid ""
 "Select or drag and drop your .ttf font file for the variants below. Only the "
 "Regular type is required."
@@ -999,23 +1028,23 @@ msgstr ""
 "Selecteer of sleep je .ttf lettertypebestand voor de onderstaande varianten. "
 "Alleen het type Regular is vereist."
 
-#: ../../Helper/Helper_Data.php:296
+#: ../../Helper/Helper_Data.php:305
 msgid "Add a .ttf font file."
 msgstr "Voeg een .ttf lettertypebestand toe."
 
-#: ../../Helper/Helper_Data.php:297
+#: ../../Helper/Helper_Data.php:306
 msgid "View template usage"
 msgstr "Sjabloongebruik bekijken"
 
-#: ../../Helper/Helper_Data.php:298
+#: ../../Helper/Helper_Data.php:307
 msgid "← Cancel"
 msgstr "← Annuleren"
 
-#: ../../Helper/Helper_Data.php:299
+#: ../../Helper/Helper_Data.php:308
 msgid "Are you sure you want to delete this font?"
 msgstr "Weet je zeker dat je dit lettertype wilt verwijderen?"
 
-#: ../../Helper/Helper_Data.php:300
+#: ../../Helper/Helper_Data.php:309
 msgid ""
 "Add this snippet %1$sin a custom template%3$s to selectively set the font on "
 "blocks of text. If you want to apply the font to the entire PDF, %2$suse the "
@@ -1026,35 +1055,35 @@ msgstr ""
 "toepassen op de hele PDF, %2$sgebruik dan de Font instelling%3$s bij het "
 "configureren van de PDF op het formulier."
 
-#: ../../Helper/Helper_Data.php:301
+#: ../../Helper/Helper_Data.php:310
 msgid "Update font"
 msgstr "Lettertype bijwerken"
 
-#: ../../Helper/Helper_Data.php:302
+#: ../../Helper/Helper_Data.php:311
 msgid "Select font"
 msgstr "Slecteer lettertype"
 
-#: ../../Helper/Helper_Data.php:303
+#: ../../Helper/Helper_Data.php:312
 msgid "Delete font"
 msgstr "Lettertype verwijderen"
 
-#: ../../Helper/Helper_Data.php:306
+#: ../../Helper/Helper_Data.php:315
 msgid "Font list empty."
 msgstr "Lijst met lettertypen is leeg."
 
-#: ../../Helper/Helper_Data.php:307
+#: ../../Helper/Helper_Data.php:316
 msgid "No fonts matching your search found."
 msgstr "Geen lettertypen gevonden die aan je zoekopdracht voldoen."
 
-#: ../../Helper/Helper_Data.php:308
+#: ../../Helper/Helper_Data.php:317
 msgid "Clear Search."
 msgstr "Duidelijk zoeken."
 
-#: ../../Helper/Helper_Data.php:309
+#: ../../Helper/Helper_Data.php:318
 msgid "Your font has been saved."
 msgstr "Je lettertype is opgeslagen."
 
-#: ../../Helper/Helper_Data.php:310
+#: ../../Helper/Helper_Data.php:319
 msgid ""
 "%1$sThe action could not be completed.%2$s Resolve the highlighted issues "
 "above and then try again."
@@ -1062,13 +1091,13 @@ msgstr ""
 "%1$sDe actie kon niet worden voltooid.%2$s Los de gemarkeerde problemen "
 "hierboven op en probeer het opnieuw."
 
-#: ../../Helper/Helper_Data.php:311
+#: ../../Helper/Helper_Data.php:320
 msgid "A problem occurred. Reload the page and try again."
 msgstr ""
 "Er heeft zich een probleem voorgedaan. Laad de pagina opnieuw en probeer het "
 "opnieuw."
 
-#: ../../Helper/Helper_Data.php:312
+#: ../../Helper/Helper_Data.php:321
 msgid ""
 "%1$sFont file(s) missing from the server.%2$s Please upload the font(s) "
 "again and then save."
@@ -1076,13 +1105,13 @@ msgstr ""
 "%1$sFont bestand(en) ontbreekt (ontbreken) op de server.%2$s Upload de "
 "font(s) opnieuw en sla dan op."
 
-#: ../../Helper/Helper_Data.php:313
+#: ../../Helper/Helper_Data.php:322
 msgid "%1$sFont file(s) are malformed%2$s and cannot be used with Gravity PDF."
 msgstr ""
 "%1$sFont bestand(en) zijn misvormd%2$s en kunnen niet gebruikt worden met "
 "Gravity PDF."
 
-#: ../../Helper/Helper_Data.php:315
+#: ../../Helper/Helper_Data.php:324
 msgid ""
 "Warning! ALL Gravity PDF data, including templates, will be deleted. This "
 "cannot be undone. 'OK' to delete, 'Cancel' to stop."
@@ -1091,24 +1120,36 @@ msgstr ""
 "verwijderd. Dit kan niet ongedaan worden gemaakt. oK' om te verwijderen, "
 "'Annuleren' om te stoppen."
 
-#: ../../Helper/Helper_Data.php:316
+#: ../../Helper/Helper_Data.php:325
 msgid ""
 "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete."
 msgstr ""
 "WAARSCHUWING: U staat op het punt deze PDF te verwijderen. 'Annuleren' om te "
 "stoppen, 'OK' om te verwijderen."
 
-#: ../../Helper/Helper_Data.php:319
+#: ../../Helper/Helper_Data.php:328
 msgid "Search the Gravity PDF Documentation..."
 msgstr "Doorzoek de PDF-documentatie van Gravity..."
 
-#: ../../Helper/Helper_Data.php:320
+#: ../../Helper/Helper_Data.php:329
 msgid "Submit your search query."
 msgstr "Geef uw zoekopdracht op."
 
-#: ../../Helper/Helper_Data.php:321
+#: ../../Helper/Helper_Data.php:330
 msgid "Clear your search query."
 msgstr "Wis je zoekopdracht."
+
+#: ../../Helper/Helper_Data.php:488
+msgid "Approved"
+msgstr "Goedgekeurd"
+
+#: ../../Helper/Helper_Data.php:489
+msgid "Disapproved"
+msgstr "Niet goedgekeurd"
+
+#: ../../Helper/Helper_Data.php:490
+msgid "Unapproved"
+msgstr "Afgekeurd"
 
 #: ../../Helper/Helper_Options_Fields.php:65
 msgid "Default Template"
@@ -1819,29 +1860,29 @@ msgstr "PDF bijwerken"
 msgid "Add PDF"
 msgstr "PDF toevoegen"
 
-#: ../../Model/Model_Form_Settings.php:334,
-#: ../../Model/Model_Form_Settings.php:356,
-#: ../../Model/Model_Form_Settings.php:405,
-#: ../../Model/Model_Form_Settings.php:513
+#: ../../Model/Model_Form_Settings.php:336,
+#: ../../Model/Model_Form_Settings.php:358,
+#: ../../Model/Model_Form_Settings.php:407,
+#: ../../Model/Model_Form_Settings.php:515
 msgid "There was a problem saving your PDF settings. Please try again."
 msgstr ""
 "Er is een probleem opgetreden bij het opslaan van uw PDF-instellingen. "
 "Probeer het opnieuw."
 
-#: ../../Model/Model_Form_Settings.php:377
+#: ../../Model/Model_Form_Settings.php:379
 msgid "PDF could not be saved. Please enter all required information below."
 msgstr ""
 "PDF kon niet worden opgeslagen. Voer hieronder alle vereiste informatie in."
 
-#: ../../Model/Model_Form_Settings.php:399
+#: ../../Model/Model_Form_Settings.php:401
 msgid "PDF saved successfully. %1$sBack to PDF list.%2$s"
 msgstr "PDF succesvol opgeslagen. %1$sTerug naar PDF-lijst.%2$s"
 
-#: ../../Model/Model_Form_Settings.php:810
+#: ../../Model/Model_Form_Settings.php:812
 msgid "PDF successfully deleted."
 msgstr "PDF succesvol verwijderd."
 
-#: ../../Model/Model_Form_Settings.php:873
+#: ../../Model/Model_Form_Settings.php:875
 msgid "PDF successfully duplicated."
 msgstr "PDF succesvol gedupliceerd."
 
@@ -1905,11 +1946,15 @@ msgstr "De PDF kon niet worden opgeslagen."
 msgid "Could not find PDF configuration requested"
 msgstr "De gevraagde PDF-configuratie kon niet worden gevonden"
 
-#: ../../Model/Model_Settings.php:419
+#: ../../Model/Model_Settings.php:361
+msgid "Your support license key has been activated for this domain."
+msgstr "Uw supportlicentiesleutel is geactiveerd voor dit domein."
+
+#: ../../Model/Model_Settings.php:458
 msgid "License deactivated."
 msgstr "Licentie gedeactiveerd."
 
-#: ../../Model/Model_Settings.php:443
+#: ../../Model/Model_Settings.php:482
 msgid ""
 "An unknown error occurred, and your license key may not have been correctly "
 "deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your "
@@ -2270,7 +2315,7 @@ msgstr ""
 "Voordat je een PDF kunt genereren met Gravity Forms, moeten de core fonts "
 "opgeslagen worden op je server. Dit hoeft maar één keer gedaan te worden."
 
-#: ../../View/html/FormSettings/add_edit.php:61,
+#: ../../View/html/FormSettings/add_edit.php:62,
 #: ../../View/html/Settings/general.php:50
 msgid "Want more features? Take a look at our addons."
 msgstr "Wil je meer functies? Bekijk onze addons."
@@ -2402,3 +2447,22 @@ msgstr ""
 "Deze operatie verwijdert ALLE Gravity PDF instellingen en deactiveert de "
 "plugin. Als je doorgaat, worden alle instellingen, configuratie, aangepaste "
 "sjablonen en lettertypen verwijderd."
+
+#~ msgid "Your license key expired on %s."
+#~ msgstr "Je licentiesleutel vervalt op %s."
+
+#~ msgid "Your license key has been disabled"
+#~ msgstr "Uw licentiesleutel is uitgeschakeld"
+
+#~ msgid "Invalid license key provided"
+#~ msgstr "Ongeldige licentiesleutel verstrekt"
+
+#~ msgid "This appears to be an invalid license key for %s"
+#~ msgstr "Dit lijkt een ongeldige licentiesleutel te zijn voor %s"
+
+#~ msgid "Your license key has reached its activation limit"
+#~ msgstr "Je licentiesleutel heeft zijn activeringslimiet bereikt"
+
+#~ msgid "An error occurred during activation, please try again"
+#~ msgstr ""
+#~ "Er is een fout opgetreden tijdens de activering, probeer het opnieuw"
