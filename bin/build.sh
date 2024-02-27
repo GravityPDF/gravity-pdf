@@ -59,3 +59,11 @@ rm -f -R "${PACKAGE_DIR}/webpack-configs"
 cd ${PACKAGE_DIR}
 npm install --global wp-pot-cli
 wp-pot --domain gravity-forms-pdf-extended --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-forms-pdf-extended.pot > /dev/null
+
+# Create zip package
+cd ../
+
+rm -r -f "${PACKAGE_NAME}"
+mv ${VERSION} "${PACKAGE_NAME}"
+zip -r -q "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}"
+mv "${PACKAGE_NAME}" ${VERSION}
