@@ -283,7 +283,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @param array      $rule         The GF current rule object https://docs.gravityforms.com/conditional-logic-object/#rule
 	 * @param array      $form
 	 * @param array      $logic        The GF conditional logic object https://docs.gravityforms.com/conditional-logic-object/
-	 * @param array      $entry        The entry currently being processed, if available.
+	 * @param array|null $entry        The entry currently being processed, if available.
 	 *
 	 * @return int|string
 	 *

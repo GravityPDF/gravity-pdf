@@ -19,9 +19,9 @@ use WP_UnitTestCase;
  * Test the PSR-4 Autoloader Implementation
  *
  * @since 4.0
- * @group data-helper
+ * @group data
  */
-class Test_Data_Helper extends WP_UnitTestCase {
+class Test_Helper_Data extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF Data object
 	 *
@@ -162,5 +162,18 @@ class Test_Data_Helper extends WP_UnitTestCase {
 		foreach ( $required_keys as $key ) {
 			$this->assertArrayHasKey( $key, $localised_data );
 		}
+	}
+
+	public function test_get_conditional_logic_options() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+
+		$conditional_logic_options = $this->data->get_conditional_logic_options( $form );
+
+		$this->assertArrayHasKey('id', $conditional_logic_options);
+		$this->assertArrayHasKey('status', $conditional_logic_options);
+		$this->assertArrayHasKey('date_created', $conditional_logic_options);
+		$this->assertArrayHasKey('payment_status', $conditional_logic_options);
+		$this->assertArrayHasKey('gquiz_percent', $conditional_logic_options);
+		$this->assertArrayHasKey('gquiz_is_pass', $conditional_logic_options);
 	}
 }
