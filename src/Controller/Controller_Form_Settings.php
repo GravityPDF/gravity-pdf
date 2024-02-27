@@ -169,6 +169,10 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Update our PDF settings before the form gets updated */
 		add_filter( 'gform_form_update_meta', [ $this, 'clear_cached_pdf_settings' ], 10, 3 );
+
+		/* Conditional logic */
+		add_filter( 'gform_rule_source_value', [ $this, 'conditional_logic_set_rule_source_value' ], 10, 5 );
+		add_filter( 'gform_is_value_match', [ $this, 'conditional_logic_is_value_match' ], 10, 6 );
 	}
 
 	/**
@@ -270,5 +274,90 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		$form['gfpdf_form_settings'] = $updated_form['gfpdf_form_settings'] ?? [];
 
 		return $form;
+	}
+
+	/**
+	 * Process entry meta conditional logic rules
+	 *
+	 * @param int|string $source_value The value of the rule’s configured field ID, entry meta, or custom property.
+	 * @param array      $rule         The GF current rule object https://docs.gravityforms.com/conditional-logic-object/#rule
+	 * @param array      $form
+	 * @param array      $logic        The GF conditional logic object https://docs.gravityforms.com/conditional-logic-object/
+	 * @param array      $entry        The entry currently being processed, if available.
+	 *
+	 * @return int|string
+	 *
+	 * @since 6.9.0
+	 */
+	public function conditional_logic_set_rule_source_value( $source_value, $rule, $form, $logic, $entry ) {
+
+		$keys   = array_keys( $this->data->get_conditional_logic_options( $form ) );
+		$target = $rule['fieldId'];
+
+		if ( ! $entry || ! in_array( $target, $keys, true ) ) {
+			return $source_value;
+		}
+
+		/* Use Gravity Wiz filter to enable automatic compatibility with any other plugins that use this snippet */
+		$runtime_entry_meta_keys = apply_filters( 'gwclem_runtime_entry_meta_keys', [ 'payment_status' ] );
+
+		/* Refresh the entry object, if required */
+		if ( in_array( $target, $runtime_entry_meta_keys, true ) ) {
+			$entry = \GFAPI::get_entry( $entry['id'] );
+		}
+
+		switch ( $rule['fieldId'] ) {
+			case 'date_created':
+			case 'payment_date':
+				/* Convert to local date without time */
+				$value = $entry[ $rule['fieldId'] ];
+				if ( ! $value ) {
+					return $value;
+				}
+
+				$lead_gmt_time   = mysql2date( 'G', $value );
+				$lead_local_time = \GFCommon::get_local_timestamp( $lead_gmt_time );
+
+				return date_i18n( 'Y-m-d', $lead_local_time, true );
+
+			default:
+				return rgar( $entry, $rule['fieldId'] );
+		}
+	}
+
+	/**
+	 * Add extra date comparison checks to Gravity Forms conditional logic
+	 *
+	 * @param bool $is_match
+	 * @param string $field_value
+	 * @param string $target_value
+	 * @param string $operation
+	 * @param string $source_field
+	 * @param array $rule
+	 *
+	 * @return bool
+	 *
+	 * @since 6.9.0
+	 */
+	public function conditional_logic_is_value_match( $is_match, $field_value, $target_value, $operation, $source_field, $rule ) {
+
+		/* Only deal with less/more than date rules */
+		if (
+			! in_array( $rule['fieldId'], [ 'date_created', 'payment_date' ], true ) ||
+			! in_array( $operation, [ '>', '<' ], true ) ||
+			empty( $field_value ) ||
+			empty( $target_value )
+		) {
+			return $is_match;
+		}
+
+		$date1 = strtotime( $field_value );
+		$date2 = strtotime( $target_value );
+
+		if ( $operation === '>' ) {
+			return $date1 > $date2;
+		}
+
+		return $date1 < $date2;
 	}
 }

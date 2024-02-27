@@ -11,6 +11,7 @@
     "gform": false,
     "ConditionalLogic": false,
     "ToggleConditionalLogic": false,
+    "GetRuleValuesDropDown": false,
     "QTags": false,
     "switchEditors": false,
     "getUserSetting": false,

@@ -26,6 +26,7 @@ global $wp_settings_fields;
 	var form = <?php echo wp_json_encode( $args['form'] ); ?>;
 	var gfpdf_current_pdf = <?php echo wp_json_encode( $args['pdf'] ); ?>;
 	var entry_meta = <?php echo wp_json_encode( $args['entry_meta'] ); ?>;
+	var gfpdf_extra_conditional_logic_options = <?php echo wp_json_encode( $args['extra_conditional_logic_options'] ); ?>;
 
 	<?php GFFormSettings::output_field_scripts(); ?>
 </script>

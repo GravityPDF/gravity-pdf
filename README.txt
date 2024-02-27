@@ -107,7 +107,8 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
-= 6.8.1 =
+= 6.9.0 =
+* Feature: Add new conditional logic options to PDFs eg. Payment Status, Date Created, Starred (props: Gravity Wiz)
 * Bug: Fix Form Editor saving problem for Gravity Forms v2.6.*
 * Bug: Fix Drag and Drop Column layout issue when the GF Styles Pro plugin is enabled
 * Bug: Fix issue sending PDF URLs with Gravity Wiz Google Sheets
