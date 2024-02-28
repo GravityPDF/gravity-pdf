@@ -15,6 +15,7 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Form;
+use GFPDF\Helper\Helper_Interface_Field_Pdf_Config;
 use GFPDF\Helper\Helper_Interface_Url_Signer;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
@@ -1629,17 +1630,18 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Pass in a Gravity Form Field Object and get back a Gravity PDF Field Object
 	 *
-	 * @param GF_Field         $field    Gravity Form Field Object
+	 * @param GF_Field       $field    Gravity Form Field Object
 	 * @param array          $form     The Gravity Form Array
 	 * @param array          $entry    The Gravity Form Entry
 	 * @param Field_Products $products A Field_Products Object
+	 * @param array          $config   Should contain the keys 'meta' and 'settings'. Added in v6.9
 	 *
 	 * @return Helper_Abstract_Fields
 	 *
 	 * @throws Exception
 	 * @since 4.0
 	 */
-	public function get_field_class( $field, $form, $entry, Field_Products $products ) {
+	public function get_field_class( $field, $form, $entry, Field_Products $products, $config = [] ) {
 
 		$class_name = $this->misc->get_field_class( $field->type );
 
@@ -1691,6 +1693,10 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* Exception thrown. Load generic field loader */
 			$class = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $this->gform, $this->misc ), $field, $entry, $form );
+		}
+
+		if ( $class instanceof Helper_Interface_Field_Pdf_Config ) {
+			$class->set_pdf_config( $config );
 		}
 
 		return $class;

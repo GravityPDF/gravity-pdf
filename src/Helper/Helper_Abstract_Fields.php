@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-abstract class Helper_Abstract_Fields {
+abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Config {
 
 	/**
 	 * Contains the field array
@@ -100,6 +100,15 @@ abstract class Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public $misc;
+
+	/**
+	 * Holds the current PDF settings and metadata
+	 *
+	 * @var array Contains the keys 'meta' and 'settings'
+	 *
+	 * @since 6.9
+	 */
+	protected $pdf_config;
 
 	/**
 	 * Set up the object
@@ -408,5 +417,29 @@ abstract class Helper_Abstract_Fields {
 			' ',
 			array_slice( explode( ' ', $this->field->cssClass ), 0, 8 )
 		);
+	}
+
+	/**
+	 * Set the current PDF configuration
+	 *
+	 * @param array $config
+	 *
+	 * @return void
+	 *
+	 * @since 6.9
+	 */
+	public function set_pdf_config( $config ) {
+		$this->pdf_config = $config;
+	}
+
+	/**
+	 * Get the current PDF configuration
+	 *
+	 * @return array
+	 *
+	 * @since 6.9
+	 */
+	public function get_pdf_config() {
+		return $this->pdf_config;
 	}
 }

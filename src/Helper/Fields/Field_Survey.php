@@ -65,6 +65,10 @@ class Field_Survey extends Helper_Abstract_Fields {
 			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
 		}
 
+		if ( $this->fieldObject instanceof \GFPDF\Helper\Helper_Interface_Field_Pdf_Config ) {
+			$this->fieldObject->set_pdf_config( $this->get_pdf_config() );
+		}
+
 		/* force the fieldObject value cache */
 		$this->value();
 	}

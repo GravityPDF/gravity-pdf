@@ -475,7 +475,7 @@ class View_PDF extends Helper_Abstract_View {
 		$show_section_description = $config['meta']['section_content'] ?? false; /* whether we should include a section breaks content. Default to false */
 
 		/** @var \GFPDF\Helper\Helper_Abstract_Fields $class */
-		$class = $model->get_field_class( $field, $form, $entry, $products );
+		$class = $model->get_field_class( $field, $form, $entry, $products, $config );
 
 		/* Try and display our HTML */
 		try {

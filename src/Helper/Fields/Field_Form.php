@@ -128,7 +128,8 @@ class Field_Form extends Helper_Abstract_Fields {
 		/* Loop through the Repeater fields */
 		foreach ( $form['fields'] as $field ) {
 			/* Output a field using the standard method if not empty */
-			$class = $pdf_model->get_field_class( $field, $form, $entry, $products );
+			$class = $pdf_model->get_field_class( $field, $form, $entry, $products, $this->get_pdf_config() );
+
 			$class->enable_output();
 			if ( ! $class->is_empty() && strpos( $field->cssClass, 'exclude' ) === false ) {
 				$container->generate( $field );
