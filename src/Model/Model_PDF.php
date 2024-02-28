@@ -2319,7 +2319,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function field_middle_blacklist( $action, $field, $entry, $form, $config, $products, $blacklisted ) {
 		if ( $action === false ) {
-			if ( in_array( $field->get_input_type(), $blacklisted, true ) ) {
+			if ( in_array( $field->type, $blacklisted, true ) ) {
 				return true;
 			}
 		}
