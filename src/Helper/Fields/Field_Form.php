@@ -119,21 +119,45 @@ class Field_Form extends Helper_Abstract_Fields {
 		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 
+		$config = $this->get_pdf_config();
+		$show_empty_fields        = $config['meta']['empty'] ?? false;
+		$show_section_description = $config['meta']['section_content'] ?? false;
+
+		/* Always display nested form products individually */
+		if ( isset( $config['meta'] ) ) {
+			$config['meta']['individual_products'] = true;
+		}
+
 		/* Ensure the field outputs the HTML and can be reset to the original value */
 		$output_already_enabled = $this->get_output();
 		if ( ! $output_already_enabled ) {
 			$this->enable_output();
 		}
 
+		/* Skip over any of the following blacklisted fields */
+		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password', 'page' ] );
+
 		/* Loop through the Repeater fields */
 		foreach ( $form['fields'] as $field ) {
 			/* Output a field using the standard method if not empty */
-			$class = $pdf_model->get_field_class( $field, $form, $entry, $products, $this->get_pdf_config() );
-
+			$class = $pdf_model->get_field_class( $field, $form, $entry, $products, $config );
 			$class->enable_output();
-			if ( ! $class->is_empty() && strpos( $field->cssClass, 'exclude' ) === false ) {
+
+			$middleware = apply_filters( 'gfpdf_field_middleware', false, $field, $entry, $form, $config, $products, $blacklisted );
+
+			if ( $middleware ) {
+				$container->maybe_display_faux_column( $field );
+				continue;
+			}
+
+			if ( $show_empty_fields === true || ! $class->is_empty() ) {
 				$container->generate( $field );
-				$class->html();
+
+				$class->enable_output();
+				$field->type !== 'section' ? $class->html() : $class->html( $show_section_description );
+			} else {
+				/* To prevent display issues we will output the column markup needed */
+				$container->maybe_display_faux_column( $field );
 			}
 		}
 
@@ -142,7 +166,7 @@ class Field_Form extends Helper_Abstract_Fields {
 			$this->disable_output();
 		}
 
-		$container->close( $field );
+		$container->close();
 
 		return $this->gform->process_tags( ob_get_clean(), $form, $entry );
 	}
