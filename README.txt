@@ -118,6 +118,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 * Housekeeping: Improve Gravity PDF license activation success and error messages
 * Security: Improve security of network requests to Gravity PDF licensing server
 * Developer: Add `set_pdf_config( $config )` and `get_pdf_config()` methods to PDF Field classes
+* Developer: In the PDF field blacklist, check using the original type and not with `$field->get_input_type()`
 
 = 6.8.0 =
 * Feature: Add PDF Download metabox to Gravity Flow Inbox for logged-in users with appropriate capability
