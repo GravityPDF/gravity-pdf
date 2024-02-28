@@ -1500,9 +1500,16 @@ class Test_PDF extends WP_UnitTestCase {
 			$this->assertEquals( $expected[ $field->id ], get_class( $this->model->get_field_class( $field, $form, $entry, $products ) ) );
 		}
 
+		/* Check config setting/getter */
+		$class = $this->model->get_field_class( $field, $form, $entry, $products, [ 'settings' => true ] );
+		$this->assertArrayHasKey( 'settings', $class->get_pdf_config() );
+
 		/* Check our fallback class */
 		$this->assertEquals( $namespace . 'Field_Default', get_class( $this->model->get_field_class( new GF_Field(), $form, $entry, $products ) ) );
 
+		/* Check config setting/getter */
+		$class = $this->model->get_field_class( new GF_Field(), $form, $entry, $products, [ 'settings' => true ] );
+		$this->assertArrayHasKey( 'settings', $class->get_pdf_config() );
 	}
 
 	/**

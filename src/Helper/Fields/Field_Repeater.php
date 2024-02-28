@@ -101,7 +101,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 					continue;
 				}
 
-				$class     = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products );
+				$class     = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products, $this->get_pdf_config() );
 				$form_data = $class->form_data();
 
 				if ( isset( $form_data['field'] ) ) {
@@ -227,7 +227,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 				/* Output a field using the standard method if not empty */
 				/** @var Helper_Abstract_Fields $class */
-				$class = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products );
+				$class = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products, $this->get_pdf_config() );
 
 				if ( ! $class->is_empty() ) {
 					$field->cssClass = '';

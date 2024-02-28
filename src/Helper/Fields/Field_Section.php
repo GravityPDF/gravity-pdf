@@ -74,7 +74,8 @@ class Field_Section extends Helper_Abstract_Fields {
 		$empty = true;
 		foreach ( $fields as $field ) {
 			if ( 'section' !== $field->type ) {
-				$class = $pdf_model->get_field_class( $field, $this->form, $this->entry, $products );
+				$class = $pdf_model->get_field_class( $field, $this->form, $this->entry, $products, $this->get_pdf_config() );
+
 				if ( ! $class->is_empty() ) {
 					$empty = false;
 					break;
