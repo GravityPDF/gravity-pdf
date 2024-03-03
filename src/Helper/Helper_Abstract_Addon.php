@@ -646,8 +646,8 @@ abstract class Helper_Abstract_Addon {
 		$response = wp_remote_post(
 			$this->data->store_url,
 			[
-				'timeout'   => 15,
-				'body'      => [
+				'timeout' => 15,
+				'body'    => [
 					'edd_action'  => 'check_license',
 					'license'     => $license_info['license'],
 					'item_id'     => $this->get_edd_download_id(),

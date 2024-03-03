@@ -331,8 +331,8 @@ class Model_Settings extends Helper_Abstract_Model {
 		$response = wp_remote_post(
 			$this->data->store_url,
 			[
-				'timeout'   => 15,
-				'body'      => [
+				'timeout' => 15,
+				'body'    => [
 					'edd_action'  => 'activate_license',
 					'license'     => $license_key,
 					'item_id'     => $addon->get_edd_download_id(),
@@ -508,8 +508,8 @@ class Model_Settings extends Helper_Abstract_Model {
 		$response = wp_remote_post(
 			$this->data->store_url,
 			[
-				'timeout'   => 15,
-				'body'      => [
+				'timeout' => 15,
+				'body'    => [
 					'edd_action'  => 'deactivate_license',
 					'license'     => $license_key,
 					'item_id'     => $addon->get_edd_download_id(),

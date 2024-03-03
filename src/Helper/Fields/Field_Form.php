@@ -119,7 +119,7 @@ class Field_Form extends Helper_Abstract_Fields {
 		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 
-		$config = $this->get_pdf_config();
+		$config                   = $this->get_pdf_config();
 		$show_empty_fields        = $config['meta']['empty'] ?? false;
 		$show_section_description = $config['meta']['section_content'] ?? false;
 
