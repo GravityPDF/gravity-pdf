@@ -110,14 +110,12 @@ class Helper_Templates {
 	 * @since 4.1
 	 */
 	public function get_all_templates() {
-		$options = GPDFAPI::get_options_class();
-		$debug   = $options->get_option( 'debug_mode', 'No' );
+		$options    = GPDFAPI::get_options_class();
+		$debug      = $options->get_option( 'debug_mode', 'No' );
+		$cache_name = $this->data->template_transient_cache . '-template-list';
 
 		if ( $debug === 'No' ) {
-			$cache_name = $this->data->template_transient_cache . '-template-list';
-			$cache      = get_transient( $cache_name );
-
-			/* There may be no transient and we got a non-array. If that occurs reset $cache */
+			$cache = get_transient( $cache_name );
 			if ( is_array( $cache ) && ! empty( $cache ) ) {
 				return $cache;
 			}
@@ -144,11 +142,7 @@ class Helper_Templates {
 			);
 		}
 
-		if ( $debug === 'No' ) {
-			$cache = $template_list;
-
-			set_transient( $cache_name, $cache, 604800 );
-		}
+		set_transient( $cache_name, $template_list, 604800 );
 
 		return $template_list;
 	}
@@ -165,11 +159,11 @@ class Helper_Templates {
 
 		/* Get current multisite templates, if any */
 		if ( is_multisite() ) {
-			$raw_templates[] = glob( $this->data->multisite_template_location . '*.php' );
+			$raw_templates[] = glob( $this->data->multisite_template_location . '*.php', GLOB_NOSORT );
 		}
 
 		/* Get the current user-templates and the core templates */
-		$raw_templates[] = glob( $this->data->template_location . '*.php' );
+		$raw_templates[] = glob( $this->data->template_location . '*.php', GLOB_NOSORT );
 		$raw_templates[] = $this->get_core_pdf_templates();
 
 		return apply_filters( 'gfpdf_unfiltered_template_list', $raw_templates );
@@ -398,11 +392,12 @@ class Helper_Templates {
 	public function get_template_info_by_path( $template_path, $cache_name = '', $cache_time = 604800 ) {
 		$options = GPDFAPI::get_options_class();
 		$debug   = $options->get_option( 'debug_mode', 'No' );
-		$cache   = [];
+
+		$cache      = [];
+		$cache_name = ! empty( $cache_name ) ? $cache_name : $this->data->template_transient_cache;
 
 		if ( $debug === 'No' ) {
-			$cache_name = ! empty( $cache_name ) ? $cache_name : $this->data->template_transient_cache;
-			$cache      = get_transient( $cache_name );
+			$cache = get_transient( $cache_name );
 
 			/* There may be no transient and we got a non-array. If that occurs reset $cache */
 			if ( ! is_array( $cache ) ) {
@@ -429,11 +424,9 @@ class Helper_Templates {
 		$info['required_pdf_version'] = ( strlen( 'required_pdf_version' ) > 0 ) ? $info['required_pdf_version'] : '4.0';
 
 		/* Save the results to a transient so we don't hit the disk every page load */
-		if ( $debug === 'No' ) {
-			$cache[ $template_path ] = $info;
+		$cache[ $template_path ] = $info;
 
-			set_transient( $cache_name, $cache, $cache_time );
-		}
+		set_transient( $cache_name, $cache, $cache_time );
 
 		return $info;
 	}
