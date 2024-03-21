@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.9.1 =
+* Security: Disable the Signed URL feature in the [gravitypdf] shortcode when a URL parameter provides the entry ID (e.g. Page Confirmations)
+
 = 6.9.0 =
 * Feature: Add new conditional logic options to PDFs eg. Payment Status, Date Created, Starred (props: Gravity Wiz)
 * Feature: Add support for Show HTML Fields, Show Empty Fields, Show Section Break Description, and Enable Conditional Logic PDF settings when displaying Gravity Wiz Nested Forms field

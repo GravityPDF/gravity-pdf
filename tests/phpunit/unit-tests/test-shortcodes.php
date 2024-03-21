@@ -229,7 +229,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 		);
 
 		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $url );
-		$this->assertStringNotContainsString( '<a href=', $url );
+		$this->assertStringNotContainsString( 'href=', $url );
 		$this->assertStringNotContainsString( 'Download PDF', $url );
 
 		/* Test for signed URL */
@@ -286,6 +286,24 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$_GET['lid'] = $entry['id'];
 		$this->assertStringContainsString( 'Download PDF', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 
+		unset( $_GET['lid'] );
+		$_GET['entry'] = $entry['id'];
+		$this->assertStringContainsString( 'Download PDF', $this->model->process( [ 'id' => '556690c67856b' ] ) );
+
+		/* Test we ignore the signed feature if the entry ID is taken from a URL parameter */
+		$url2 = $this->model->process(
+			[
+				'id'     => '556690c67856b',
+				'signed' => '1',
+			]
+		);
+
+		$this->assertStringContainsString( 'Download PDF', $url2 );
+		$this->assertStringContainsString( 'href=', $url2 );
+		$this->assertStringNotContainsString( '&#038;signature=', $url2 );
+		$this->assertStringNotContainsString( '&#038;expires=', $url2 );
+
+		/* Test for errors */
 		$_GET['lid'] = '5000';
 		$this->assertStringContainsString( '<pre class="gravitypdf-error">', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 

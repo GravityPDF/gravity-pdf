@@ -91,7 +91,8 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
 
 		try {
-			$attributes['entry'] = $this->get_entry_id_if_empty( $attributes['entry'] );
+			$original_entry_id   = $attributes['entry'];
+			$attributes['entry'] = $this->get_entry_id_if_empty( $original_entry_id );
 
 			/* Do PDF validation */
 			$this->get_pdf_config( $attributes['entry'], $attributes['id'] );
@@ -103,7 +104,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 			/* Sign the URL to allow direct access to the PDF until it expires */
-			if ( ! empty( $attributes['signed'] ) ) {
+			if ( ! empty( $attributes['signed'] ) && ! empty( $original_entry_id ) ) {
 				$attributes['url'] = $this->url_signer->sign( $attributes['url'], $attributes['expires'] );
 			}
 
