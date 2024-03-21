@@ -1326,14 +1326,9 @@ class Model_PDF extends Helper_Abstract_Model {
 			foreach ( $form['fields'] as $field ) {
 
 				/* Skip over captcha, password and page fields */
-				$fields_to_skip = apply_filters(
-					'gfpdf_form_data_skip_fields',
-					[
-						'captcha',
-						'password',
-						'page',
-					]
-				);
+				$fields_to_skip = [ 'captcha', 'password', 'page' ];
+				$fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', $fields_to_skip );
+				$fields_to_skip = apply_filters( 'gfpdf_blacklisted_fields', $fields_to_skip );
 
 				if ( in_array( $field->type, $fields_to_skip, true ) ) {
 					continue;
