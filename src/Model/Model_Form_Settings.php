@@ -657,15 +657,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* If class isn't an instance of our interface return $settings */
 		if ( ! ( $class instanceof Helper_Interface_Config ) ) {
-
-			$this->log->warning(
-				'Instanceof Failed.',
-				[
-					'object' => get_class( $class ),
-					'type'   => 'Helper_Interface_Config',
-				]
-			);
-
 			return $settings;
 		}
 
