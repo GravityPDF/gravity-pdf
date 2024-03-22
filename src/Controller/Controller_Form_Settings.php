@@ -292,7 +292,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	public function conditional_logic_set_rule_source_value( $source_value, $rule, $form, $logic, $entry ) {
 
 		$keys   = array_keys( $this->data->get_conditional_logic_options( $form ) );
-		$target = $rule['fieldId'];
+		$target = $rule['fieldId'] ?? null;
 
 		if ( ! $entry || ! in_array( $target, $keys, true ) ) {
 			return $source_value;
@@ -306,11 +306,11 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 			$entry = \GFAPI::get_entry( $entry['id'] );
 		}
 
-		switch ( $rule['fieldId'] ) {
+		switch ( $target ) {
 			case 'date_created':
 			case 'payment_date':
 				/* Convert to local date without time */
-				$value = $entry[ $rule['fieldId'] ];
+				$value = $entry[ $target ];
 				if ( ! $value ) {
 					return $value;
 				}
@@ -321,7 +321,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 				return date_i18n( 'Y-m-d', $lead_local_time, true );
 
 			default:
-				return rgar( $entry, $rule['fieldId'] );
+				return rgar( $entry, $target );
 		}
 	}
 
@@ -343,10 +343,11 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Only deal with less/more than date rules */
 		if (
-			! in_array( $rule['fieldId'], [ 'date_created', 'payment_date' ], true ) ||
-			! in_array( $operation, [ '>', '<' ], true ) ||
 			empty( $field_value ) ||
-			empty( $target_value )
+			empty( $target_value ) ||
+			! is_array( $rule ) ||
+			! in_array( $rule['fieldId'] ?? 0, [ 'date_created', 'payment_date' ], true ) ||
+			! in_array( $operation, [ '>', '<' ], true )
 		) {
 			return $is_match;
 		}
