@@ -6,11 +6,20 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function handlePDFConditionalLogic () {
-  gform.addFilter('gform_conditional_object', function (object, objectType) {
+  gform.addFilter('gform_conditional_object', function (obj, objectType) {
     if (objectType === 'gfpdf') {
-      return window.gfpdf_current_pdf
+      obj = window.gfpdf_current_pdf
+
+      /* Manually setup new conditional logic object, with fallback to entry metadata if no available fields present */
+      if (!obj.conditionalLogic || obj.conditionalLogic.length === 0) {
+        obj.conditionalLogic = new ConditionalLogic()
+        obj.conditionalLogic.rules[0].fieldId = GetFirstRuleField()
+        if (obj.conditionalLogic.rules[0].fieldId === 0) {
+          obj.conditionalLogic.rules[0].fieldId = 'id'
+        }
+      }
     }
-    return object
+    return obj
   })
 
   /* Add support for entry meta */
