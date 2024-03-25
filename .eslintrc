@@ -10,6 +10,7 @@
     "tinyMCE": false,
     "gform": false,
     "ConditionalLogic": false,
+    "GetFirstRuleField": false,
     "ToggleConditionalLogic": false,
     "GetRuleValuesDropDown": false,
     "QTags": false,
