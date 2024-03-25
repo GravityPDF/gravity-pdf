@@ -394,7 +394,29 @@ class View_PDF extends Helper_Abstract_View {
 		$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products'] : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
 		/* Skip over any of the following blacklisted fields */
-		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password', 'page' ] );
+		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password' ] );
+
+		/* Add missing first Page field, and add the page labels to individual fields */
+		if ( isset( $form['pagination']['pages'][0] ) ) {
+			array_unshift(
+				$form['fields'],
+				new \GF_Field_Page(
+					[
+						'id'         => 0,
+						'formId'     => $form['id'],
+						'pageNumber' => 1,
+						'cssClass'   => $form['firstPageCssClass'] ?? '',
+					]
+				)
+			);
+
+			array_map(
+				function( $item ) use ( $form ) {
+					$item->label = $form['pagination']['pages'][ $item->pageNumber - 1 ] ?? '';
+				},
+				\GFAPI::get_fields_by_type( $form, 'page' )
+			);
+		}
 
 		/*
 		 * Display the form title, if needed
@@ -405,13 +427,15 @@ class View_PDF extends Helper_Abstract_View {
 		/* Loop through the fields and output or skip if needed */
 		foreach ( $form['fields'] as $key => $field ) {
 
-			/*
-			 * Load our page name, if needed
-			 * Use the filter 'gfpdf_current_pdf_configuration' to programmatically disable this functionality
-			 */
-			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
-				$this->display_page_name( $page_number, $form, $container );
+			/* Output Page fields, if needed (conditional logic and exclude CSS class taking into account) */
+			if ( $field instanceof \GF_Field_Page ) {
+				if ( $show_page_names && ! apply_filters( 'gfpdf_field_middleware', false, $field, $entry, $form, $config, $products, [] ) ) {
+					$this->display_page_name( $page_number, $form, $container, $field );
+				}
+
 				$page_number++;
+
+				continue;
 			}
 
 			/*
@@ -541,16 +565,19 @@ class View_PDF extends Helper_Abstract_View {
 	 * @param integer                $page The current page number
 	 * @param array                  $form The form array
 	 * @param Helper_Field_Container $container
+	 * @param GF_Field|null          $page_field A Gravity Forms Page field object
 	 *
 	 * @since    4.0
+	 *
+	 * @internal method signature updated with fourth, optional $page_field parameter in 6.6.1
 	 */
-	public function display_page_name( $page, $form, Helper_Field_Container $container ) {
+	public function display_page_name( $page, $form, Helper_Field_Container $container, $page_field = null ) {
+		if ( is_null( $page_field ) ) {
+			if ( ! isset( $form['pagination']['pages'][ $page ] ) || empty( trim( $form['pagination']['pages'][ $page ] ) ) ) {
+				return;
+			}
 
-		/* Only display the current page name if it exists */
-		if ( isset( $form['pagination']['pages'][ $page ] ) && strlen( trim( $form['pagination']['pages'][ $page ] ) ) > 0 ) {
-
-			/* correctly close / cleanup the HTML container if needed */
-			$container->close();
+			$title = $form['pagination']['pages'][ $page ];
 
 			/* Find any CSS assigned to the page */
 			$classes = '';
@@ -560,21 +587,32 @@ class View_PDF extends Helper_Abstract_View {
 					break;
 				}
 			}
+		} else {
+			if ( empty( $page_field->label ) ) {
+				return;
+			}
 
-			/* Load our HTML */
-			$html = $this->load(
-				'page_title',
-				[
-					'form'    => $form,
-					'page'    => $page,
-					'classes' => $classes,
-				],
-				false
-			);
-
-			/* Run it through a filter and output */
-			Kses::output( apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form ) );
+			$title   = $page_field->label;
+			$classes = $page_field->cssClass;
 		}
+
+		/* correctly close / cleanup the HTML container if needed */
+		$container->close();
+
+		/* Load our HTML */
+		$html = $this->load(
+			'page_title',
+			[
+				'form'    => $form,
+				'page'    => $page,
+				'classes' => $classes,
+				'title'   => $title,
+			],
+			false
+		);
+
+		/* Run it through a filter and output */
+		Kses::output( apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form ) );
 	}
 
 	/**
