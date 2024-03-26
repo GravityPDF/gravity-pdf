@@ -70,5 +70,9 @@ class Controller_Activation {
 
 		/* Remove our scheduled tasks */
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+
+		/* Flush caches */
+		$templates = \GPDFAPI::get_templates_class();
+		$templates->flush_template_transient_cache();
 	}
 }

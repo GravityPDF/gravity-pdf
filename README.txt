@@ -110,6 +110,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 = 6.9.1 =
 * Security: Disable the Signed URL feature in the [gravitypdf] shortcode when a URL parameter provides the entry ID (e.g. Page Confirmations)
 * Bug: Gracefully handle invalid conditional logic rules when adding date entry meta support
+* Bug: Clear template cache when plugin deactivated
 * Bug: Display field for entry metadata PDF conditional rule when there are no form fields compatible with conditional logic
 
 = 6.9.0 =
