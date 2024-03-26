@@ -155,7 +155,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Get the template headers now all the files are in the right location */
 		$this->templates->flush_template_transient_cache();
-		$headers = $this->get_template_info( glob( $unzipped_dir_name . '*.php' ) );
+		$headers = $this->get_template_info( glob( $unzipped_dir_name . '*.php', GLOB_NOSORT ) );
 
 		/* Fix template path */
 		$headers = array_map(
@@ -361,7 +361,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		}
 
 		/* Check unzipped templates for a valid v4 header, or v3 string pattern */
-		$files = glob( $dir . '*.php' );
+		$files = glob( $dir . '*.php', GLOB_NOSORT );
 
 		if ( ! is_array( $files ) || count( $files ) === 0 ) {
 			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-forms-pdf-extended' ) );

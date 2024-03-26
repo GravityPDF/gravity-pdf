@@ -2095,7 +2095,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function add_unregistered_fonts_to_mPDF( $fonts ) {
 
-		$user_fonts = glob( $this->data->template_font_location . '*.[tT][tT][fF]' );
+		$user_fonts = glob( $this->data->template_font_location . '*.[tT][tT][fF]', GLOB_NOSORT );
 		$user_fonts = ( is_array( $user_fonts ) ) ? $user_fonts : [];
 
 		$flattened_fonts_array = [];

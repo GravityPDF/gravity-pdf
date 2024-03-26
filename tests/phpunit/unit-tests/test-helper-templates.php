@@ -387,7 +387,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		$this->assertFalse( get_transient( $gfpdf->data->template_transient_cache ) );
 		$gfpdf->options->update_option( 'debug_mode', 'Yes' );
 		$this->templates->get_template_info_by_path( PDF_PLUGIN_DIR . 'src/templates/zadani.php' );
-		$this->assertFalse( get_transient( $gfpdf->data->template_transient_cache ) );
+		$this->assertCount( 1, get_transient( $gfpdf->data->template_transient_cache ) );
 	}
 
 	/**
