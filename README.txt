@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.10.0 =
+* Feature: Add native support for the Legal Signature and Legal Consent form fields added by the Legal Signing for Gravity Forms plugin
+
 = 6.9.1 =
 * Security: Disable the Signed URL feature in the [gravitypdf] shortcode when a URL parameter provides the entry ID (e.g. Page Confirmations)
 * Bug: Gracefully handle invalid conditional logic rules when adding date entry meta support

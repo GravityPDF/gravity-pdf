@@ -142,6 +142,13 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			add_action( 'gfpdf_pre_pdf_generation', [ $this->model, 'enable_gp_populate_anything' ] );
 			add_action( 'gfpdf_pre_pdf_generation_output', [ $this->model, 'disable_gp_populate_anything' ] );
 		}
+
+		/* Add Legal Signature support */
+		if ( defined( 'FG_LEGALSIGNING_VERSION' ) ) {
+			add_filter( 'gfpdf_mpdf_class_config', [ $this->model, 'register_legal_signing_font_path_with_mpdf' ] );
+			add_filter( 'mpdf_font_data', [ $this->model, 'register_legal_signing_fonts_with_mpdf' ] );
+			add_action( 'gfpdf_core_template', [ $this->view, 'add_legalsigning_styles' ], 10, 3 );
+		}
 	}
 
 	/**

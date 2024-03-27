@@ -2381,4 +2381,51 @@ class Model_PDF extends Helper_Abstract_Model {
 		remove_filter( 'gppa_allow_all_lmts', '__return_true' );
 		add_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ], 10, 3 );
 	}
+
+	/**
+	 * Register Legal Signing path of additional font directory with mPDF
+	 *
+	 * @param array $config
+	 *
+	 * @return array
+	 *
+	 * @since
+	 */
+	public function register_legal_signing_font_path_with_mpdf( $config ) {
+		if ( ! isset( $config['fontDir'] ) || ! is_array( $config['fontDir'] ) ) {
+			$config['fontDir'] = [];
+		}
+
+		$config['fontDir'][] = WP_PLUGIN_DIR . '/' . dirname( FG_LEGALSIGNING_PLUGIN_BASENAME ) . '/dist/fonts/';
+
+		return $config;
+	}
+
+	/**
+	 * Register Legal Signing font files in mPDF
+	 *
+	 * @param array $fonts
+	 *
+	 * @return array
+	 *
+	 * @since 6.10
+	 */
+	public function register_legal_signing_fonts_with_mpdf( $fonts ) {
+		$signature_fonts = glob( WP_PLUGIN_DIR . '/' . dirname( FG_LEGALSIGNING_PLUGIN_BASENAME ) . '/dist/fonts/*.[tT][tT][fF]', GLOB_NOSORT );
+		$signature_fonts = is_array( $signature_fonts ) ? $signature_fonts : [];
+
+		foreach ( $signature_fonts as $font ) {
+			$font_id = basename( strtolower( $font ), '.ttf' );
+			/* Skip if font ID already exists */
+			if ( isset( $fonts[ $font_id ] ) ) {
+				continue;
+			}
+
+			$fonts[ $font_id ] = [
+				'R' => basename( $font ),
+			];
+		}
+
+		return $fonts;
+	}
 }
