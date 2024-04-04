@@ -81,8 +81,8 @@ class Field_Fg_Ls_Signature extends Helper_Abstract_Fields {
 				</div>
 			</div>',
 			$html,
-			( $this->field['nameType'] ?? '' ) === 'initials' ? esc_html__( 'Initialed By', 'forgravity_legalsigning' ) : esc_html__( 'Signed By', 'forgravity_legalsigning' ),
-			esc_html__( 'Signed using Legal Signing', 'forgravity_legalsigning' )
+			( $this->field['nameType'] ?? '' ) === 'initials' ? esc_html__( 'Initialed By', 'forgravity_legalsigning' ) : esc_html__( 'Signed By', 'forgravity_legalsigning' ), /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
+			esc_html__( 'Signed using Legal Signing', 'forgravity_legalsigning' ) /* phpcs:ignore WordPress.WP.I18n.TextDomainMismatch */
 		);
 
 		return parent::html( $html );
