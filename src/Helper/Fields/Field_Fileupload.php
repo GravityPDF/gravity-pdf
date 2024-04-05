@@ -145,6 +145,11 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 
 			if ( is_array( $paths ) && count( $paths ) > 0 ) {
 				foreach ( $paths as $path ) {
+					/* skip over any invalid files */
+					if ( ! is_string( $path ) ) {
+						continue;
+					}
+
 					$files[] = esc_url( $path );
 				}
 			}
