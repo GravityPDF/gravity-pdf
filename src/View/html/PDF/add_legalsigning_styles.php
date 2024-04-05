@@ -35,6 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	font-size: 38px;
 	line-height: 55px;
 	text-align: center;
+	vertical-align: middle;
   }
 
   .legalsigning-field-signature__signed-by,

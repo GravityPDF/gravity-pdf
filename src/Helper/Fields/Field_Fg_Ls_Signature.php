@@ -43,13 +43,15 @@ class Field_Fg_Ls_Signature extends Helper_Abstract_Fields {
 				esc_attr( rgar( $data, 'image' ) )
 			);
 		} else {
-			$height = $this->field['canvasHeight'] ?? '150';
+			$width  = $this->field['canvasWidth'] ?? 400;
+			$height = $this->field['canvasHeight'] ?? 150;
 
 			$styles = [
 				'background-color' => $this->field['backgroundColor'] ?? '#FFF',
 				'color'            => $this->field['penColor'] ?? '#000',
 				'font-family'      => ( $data['font'] ?? 'caveat' ) . ', cursive',
 				'height'           => (int) $height,
+				'width'            => $width < 400 ? (int) $width : 400,
 			];
 
 			$css = '';
@@ -58,7 +60,7 @@ class Field_Fg_Ls_Signature extends Helper_Abstract_Fields {
 			}
 
 			$html = sprintf(
-				'<table>
+				'<table style="%2$s">
 					<tr>
 						<td class="legalsigning-field-signature__signed-signature" style="%2$s">%1$s</td>
 					</tr>
