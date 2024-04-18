@@ -394,26 +394,13 @@ class View_PDF extends Helper_Abstract_View {
 		$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products'] : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
 		/* Skip over any of the following blacklisted fields */
-		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password', 'page' ] );
+		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password' ] );
 
-		/*
-		 * Display the form title, if needed
-		 *  Use the filter 'gfpdf_current_pdf_configuration' to programmatically disable this functionality
-		 */
+		/* Display the form title, if needed */
 		$this->show_form_title( $show_title, $form );
 
 		/* Loop through the fields and output or skip if needed */
 		foreach ( $form['fields'] as $key => $field ) {
-
-			/*
-			 * Load our page name, if needed
-			 * Use the filter 'gfpdf_current_pdf_configuration' to programmatically disable this functionality
-			 */
-			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
-				$this->display_page_name( $page_number, $form, $container );
-				$page_number++;
-			}
-
 			/*
 			 * Middleware filter to check if the field should be skipped.
 			 *
@@ -543,6 +530,8 @@ class View_PDF extends Helper_Abstract_View {
 	 * @param Helper_Field_Container $container
 	 *
 	 * @since    4.0
+	 *
+	 * @deprecated 6.10.1 Page fields are handled like all other fields, with markup generated using a dedicated Field_Page class
 	 */
 	public function display_page_name( $page, $form, Helper_Field_Container $container ) {
 

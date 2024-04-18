@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.10.1 =
+* Bug: Adhere to conditional logic and exclude CSS class for Page Break fields
+
 = 6.10.0 =
 * Feature: Add native support for the Legal Signature and Legal Consent form fields added by the Legal Signing for Gravity Forms plugin
 

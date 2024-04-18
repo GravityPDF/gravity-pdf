@@ -174,6 +174,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_conditional_fields' ], 10, 5 );
 		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_product_fields' ], 10, 5 );
 		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_html_fields' ], 10, 5 );
+		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_page' ], 10, 5 );
 		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_blacklist' ], 10, 7 );
 
 		/* Tap into GF notifications */
@@ -220,6 +221,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Meta boxes */
 		add_filter( 'gform_entry_detail_meta_boxes', [ $this->model, 'register_pdf_meta_box' ], 10, 3 );
+
+		/* Page field support */
+		add_filter( 'gfpdf_current_form_object', [ $this->model, 'register_page_fields' ] );
 	}
 
 	/**
