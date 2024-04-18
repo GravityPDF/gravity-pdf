@@ -351,7 +351,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		$value = apply_filters( 'gfpdf_pdf_field_content', $value, $this->field, $this->entry, $this->form, $this );
 		$value = apply_filters( 'gfpdf_pdf_field_content_' . $this->field->get_input_type(), $value, $this->field, $this->entry, $this->form, $this );
 
-		$label = esc_html( $this->get_label() );
+		$label = $this->get_label();
 		$type  = $this->field->get_input_type();
 
 		$html = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="gfpdf-field ' . esc_attr( 'gfpdf-' . $type ) . ' ' . esc_attr( $this->get_field_classes() ) . '">
