@@ -167,7 +167,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @since 6.3
 	 */
 	public function gravitypdf_process_during_merge_tag_replacement( $html, $form, $entry ) {
-		if ( empty( $entry['id'] ) || ! is_string( $html ) ) {
+		if ( ! is_array( $entry ) || empty( $entry['id'] ) || ! is_string( $html ) ) {
 			return $html;
 		}
 
