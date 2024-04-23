@@ -1934,14 +1934,14 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Clean-up our tmp directory every 24 hours
+	 * Clean-up our tmp directory every 12 hours
 	 *
 	 * @return void
 	 *
 	 * @since 4.0
 	 */
 	public function cleanup_tmp_dir() {
-		$max_file_age  = time() - 24 * 3600; /* Max age is 24 hours old */
+		$max_file_age  = time() - 12 * 3600; /* Max age is 12 hours old */
 		$tmp_directory = $this->data->template_tmp_location;
 
 		if ( is_dir( $tmp_directory ) ) {

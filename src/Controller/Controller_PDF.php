@@ -104,7 +104,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Add scheduled tasks */
 		if ( ! wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) ) {
-			wp_schedule_event( time(), 'daily', 'gfpdf_cleanup_tmp_dir' );
+			wp_schedule_event( time(), 'twicedaily', 'gfpdf_cleanup_tmp_dir' );
 		}
 	}
 
