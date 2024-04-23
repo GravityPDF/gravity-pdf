@@ -281,7 +281,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 			],
 		];
 
-		return $items;
+		return apply_filters( 'gfpdf_system_status_report_items', $items );
 	}
 
 	/**
