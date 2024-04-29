@@ -1266,8 +1266,9 @@ class Test_PDF extends WP_UnitTestCase {
 		/* Create our files to test */
 		$files = [
 			'test'      => time(),
-			'test1'     => time() - ( 23 * 3600 ),
-			'test3'     => time() - ( 24.5 * 3600 ),
+			'test1'     => time() - ( 11.5 * 3600 ),
+			'test2'     => time() - ( 12.01 * 3600 ),
+			'test3'     => time() - ( 12.5 * 3600 ),
 			'test4'     => time() - ( 25 * 3600 ),
 			'test5'     => time() - ( 15 * 3600 ),
 			'test6'     => time() - ( 5 * 3600 ),
@@ -1282,14 +1283,15 @@ class Test_PDF extends WP_UnitTestCase {
 		/* Run our cleanup function and test the out put */
 		$this->model->cleanup_tmp_dir();
 
-		$this->assertTrue( is_file( $tmp . 'test' ) );
-		$this->assertTrue( is_file( $tmp . 'test1' ) );
-		$this->assertFalse( is_file( $tmp . 'test3' ) );
-		$this->assertFalse( is_file( $tmp . 'test4' ) );
-		$this->assertTrue( is_file( $tmp . 'test5' ) );
-		$this->assertTrue( is_file( $tmp . 'test6' ) );
-		$this->assertTrue( is_file( $tmp . '.htaccess' ) );
-		$this->assertTrue( is_file( $tmp . 'mpdf/test' ) );
+		$this->assertFileExists( $tmp . 'test' );
+		$this->assertFileExists( $tmp . 'test1' );
+		$this->assertFileDoesNotExist( $tmp . 'test2' );
+		$this->assertFileDoesNotExist( $tmp . 'test3' );
+		$this->assertFileDoesNotExist( $tmp . 'test4' );
+		$this->assertFileDoesNotExist( $tmp . 'test5' );
+		$this->assertFileExists( $tmp . 'test6' );
+		$this->assertFileExists( $tmp . '.htaccess' );
+		$this->assertFileExists( $tmp . 'mpdf/test' );
 
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
