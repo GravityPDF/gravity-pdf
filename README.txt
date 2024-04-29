@@ -2,7 +2,7 @@
 Contributors: blue-liquid-designs
 Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
-Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
+Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
 Tested up to: 6.5
 Stable tag: 6.10.0
