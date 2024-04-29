@@ -345,6 +345,12 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$form['confirmation']['type'] = 'redirect';
 		$results                      = $this->model->gravitypdf_confirmation( [ 'data' ], $form, $lead );
 		$this->assertEquals( 'data', $results[0] );
+
+		/* Check there are no errors when passing a WP_Error instead of an entry */
+		$confirmation = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
+		$results      = $this->model->gravitypdf_confirmation( $confirmation, $form, new \WP_Error() );
+		$this->assertSame( $confirmation, $results );
+
 	}
 
 	/**
