@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
 Tested up to: 6.5
-Stable tag: 6.10.0
+Stable tag: 6.10.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
