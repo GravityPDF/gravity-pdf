@@ -16,11 +16,9 @@ test('should successfully saved toggled switch value for active and inactive tem
   await advanceCheck.navigateSection('gf_edit_forms&view=settings&subview=PDF&id=1')
   await t
     .click(advanceCheck.toggleSwitch)
-    .expect(advanceCheck.activePdfTemplate.exists).notOk()
-    .expect(advanceCheck.inactivePdfTemplate.exists).ok()
+    .expect(advanceCheck.toggleSwitch.getAttribute('data-status')).eql('inactive')
     .click(advanceCheck.toggleSwitch)
-    .expect(advanceCheck.activePdfTemplate.exists).ok()
-    .expect(advanceCheck.inactivePdfTemplate.exists).notOk()
+    .expect(advanceCheck.toggleSwitch.getAttribute('data-status')).eql('active')
 })
 
 test('should check that the option \'View PDF\' link is disabled when template is inactive', async t => {
@@ -28,7 +26,7 @@ test('should check that the option \'View PDF\' link is disabled when template i
   await advanceCheck.navigateSection('gf_edit_forms&view=settings&subview=PDF&id=1')
   await t
     .click(advanceCheck.toggleSwitch)
-    .expect(advanceCheck.inactivePdfTemplate.exists).ok()
+    .expect(advanceCheck.toggleSwitch.getAttribute('data-status')).eql('inactive')
   await t.navigateTo(`${baseURL}/wp-admin/admin.php?page=gf_entries&id=1`)
   await t
     .hover(advanceCheck.entryItemSection)
@@ -39,7 +37,7 @@ test('should successfully switch from inactive template to active', async t => {
   await advanceCheck.navigateSection('gf_edit_forms&view=settings&subview=PDF&id=1')
   await t
     .click(advanceCheck.toggleSwitch)
-    .expect(advanceCheck.activePdfTemplate.exists).ok()
+    .expect(advanceCheck.toggleSwitch.getAttribute('data-status')).eql('active')
 })
 
 test('should check that the option \'View PDF\' link is enabled when template is active', async t => {

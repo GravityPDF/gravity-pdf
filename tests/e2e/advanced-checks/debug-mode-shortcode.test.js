@@ -39,7 +39,7 @@ test('should reset/clean PDF back to active and debug mode back to disabled for 
   await advancedCheck.navigateSection('gf_edit_forms&view=settings&subview=PDF&id=3')
   await t
     .click(advancedCheck.toggleSwitch)
-    .expect(advancedCheck.activePdfTemplate.exists).ok()
+    .expect(advancedCheck.toggleSwitch.getAttribute('data-status')).eql('active')
   await advancedCheck.navigateLink('gf_settings&subview=PDF&tab=general#')
   await t
     .click(advancedCheck.debugModeCheckbox)
