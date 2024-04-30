@@ -222,13 +222,18 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			$class = 'gform-status--inactive';
 			$text  = __( 'Inactive', 'gravity-forms-pdf-extended' );
 		}
+
+		$gf_less_than_288 = version_compare( \GFCommon::$version, '2.8.8', '<' );
+
 		?>
 
-		<button type="button" class="gform-status-indicator <?php echo esc_attr( $class ); ?>" data-id="<?php echo esc_attr( $item['id'] ); ?>" data-nonce="<?php echo esc_attr( $state_nonce ); ?>" data-fid="<?php echo esc_attr( $form_id ); ?>" data-status="<?php echo $is_active ? 'active' : 'inactive'; ?>">
-			<svg viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="2" r="1" stroke-width="2"/></svg>
-			<span class="gform-status-indicator-status"><?php echo esc_html( $text ); ?></span>
-		</button>
+		<button type="button" class="gform-status-indicator <?php echo ! $gf_less_than_288 ? 'gform-status-indicator--size-sm gform-status-indicator--theme-cosmos' : ''; ?> <?php echo esc_attr( $class ); ?>" data-id="<?php echo esc_attr( $item['id'] ); ?>" data-nonce="<?php echo esc_attr( $state_nonce ); ?>" data-fid="<?php echo esc_attr( $form_id ); ?>" data-status="<?php echo $is_active ? 'active' : 'inactive'; ?>">
+			<?php if ( $gf_less_than_288 ): ?>
+				<svg viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="2" r="1" stroke-width="2"/></svg>
+			<?php endif; ?>
 
+			<span class="gform-status-indicator-status <?php echo ! $gf_less_than_288 ? 'gform-typography--weight-medium gform-typography--size-text-xs' : ''; ?>"><?php echo esc_html( $text ); ?></span>
+		</button>
 		<?php
 	}
 
