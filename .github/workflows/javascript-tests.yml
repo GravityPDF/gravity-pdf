@@ -1,6 +1,14 @@
 name: JavaScript Tests
 
-on: [push, pull_request]
+on:
+  pull_request:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+  # The concurrency group contains the workflow name and the branch name for pull requests
+  # or the commit hash for any other events.
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
 
 jobs:
   # Runs the QUnit tests for WordPress.
@@ -51,6 +59,7 @@ jobs:
       - name: Run Jest tests
         run: yarn test:js:coverage
 
-      - name: Code Coverage
-        run: |
-          bash <(curl -s https://codecov.io/bash);
+      - name: Code Coverage Upload
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

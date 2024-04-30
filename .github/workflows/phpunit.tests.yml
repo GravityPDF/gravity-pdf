@@ -1,13 +1,7 @@
 name: PHPUnit Tests
 
 on:
-  push:
-    branches:
-      - development
   pull_request:
-  # Once weekly On Sundays at 00:00 UTC.
-  schedule:
-    - cron: '0 0 * * 0'
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
