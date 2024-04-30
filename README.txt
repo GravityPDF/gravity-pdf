@@ -113,6 +113,8 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 * Bug: In more situations the Gravity PDF settings will be refreshed before the form meta is saved to the database
 * Housekeeping: Run temporary directory cleanup routine twice daily and delete files older than 12 hours
 * Housekeeping: Add gfpdf_system_status_report_items filter for Gravity PDF System Status report details
+* Housekeeping: Update mPDF to latest version
+* Housekeeping: Allow supported HTML in field labels when displayed in PDF
 
 = 6.10.0 =
 * Feature: Add native support for the Legal Signature and Legal Consent form fields added by the Legal Signing for Gravity Forms plugin
