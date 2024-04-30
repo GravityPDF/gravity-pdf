@@ -251,27 +251,29 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @since 4.2
 	 */
 	public function clear_cached_pdf_settings( $form, $form_id, $meta_name ) {
-		if ( $meta_name !== 'display_meta' ) {
+		if ( $meta_name !== 'display_meta' || ! is_admin() ) {
 			return $form;
 		}
 
-		if ( ! isset( $form['gfpdf_form_settings'] ) ) {
-			return $form;
+		/* Only flush the form cache if on the form editor, or making changes to specific form settings pages */
+		if (
+			rgpost( 'action' ) === 'form_editor_save_form' /* ajax form editor save */
+			|| ! empty( rgpost( 'gforms_update_form' ) ) /* non-ajax form editor save */
+			|| ! empty( rgpost( 'gform-settings-save' ) ) /* ajax form settings save */
+			|| rgpost( 'action' ) === 'rg_update_notification_active' /* ajax notification state */
+			|| ! empty( rgpost( 'gform_notification_list_action' ) ) /* ajax notification duplicate/delete */
+			|| rgpost( 'action' ) === 'gwcp_save_condtional_logic' /* GWiz Conditional Pricing feed */
+		) {
+			/* In the unlikely event the PDFs have been updated since the execution cycle begun, clear the form cache */
+			\GFFormsModel::flush_current_forms();
+
+			$updated_form = $this->gform->get_form( $form_id );
+
+			/* If for whatever reason the form cannot be found, return the original */
+			if ( $updated_form !== null ) {
+				$form['gfpdf_form_settings'] = $updated_form['gfpdf_form_settings'] ?? [];
+			}
 		}
-
-		if ( ! is_admin() ) {
-			return $form;
-		}
-
-		if ( empty( rgpost( 'gforms_update_form' ) ) && rgpost( 'action' ) !== 'form_editor_save_form' ) {
-			return $form;
-		}
-
-		/* In the unlikely event the PDFs have been updated since the execution cycle begun, clear the form cache */
-		\GFFormsModel::flush_current_forms();
-
-		$updated_form                = $this->gform->get_form( $form_id );
-		$form['gfpdf_form_settings'] = $updated_form['gfpdf_form_settings'] ?? [];
 
 		return $form;
 	}

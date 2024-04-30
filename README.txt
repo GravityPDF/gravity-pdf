@@ -110,6 +110,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 = 6.10.1 =
 * Bug: Resolve PHP error when processing shortcode with invalid entry object
 * Bug: Adhere to conditional logic and exclude CSS class for Page Break fields
+* Bug: In more situations the Gravity PDF settings will be refreshed before the form meta is saved to the database
 * Housekeeping: Run temporary directory cleanup routine twice daily and delete files older than 12 hours
 * Housekeeping: Add gfpdf_system_status_report_items filter for Gravity PDF System Status report details
 
