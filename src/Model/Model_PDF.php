@@ -2489,4 +2489,29 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		return $form;
 	}
+
+	/**
+	 * Hydrate the form with Populate Anything data
+	 * For performance, the results are cached by the form/entry ID combo
+	 *
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return array
+	 *
+	 * @since 6.10.2
+	 */
+	public function gp_populate_anything_hydrate_form( $form, $entry ) {
+		static $cache = [];
+		$key          = $form['id'] . $entry['id'];
+
+		if ( isset( $cache[ $key ] ) ) {
+			return $cache[ $key ];
+		}
+
+		$hydrated_form = gp_populate_anything()->populate_form( $form, false, [], $entry );
+		$cache[ $key ] = $hydrated_form;
+
+		return $hydrated_form;
+	}
 }
