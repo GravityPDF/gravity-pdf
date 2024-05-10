@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.10.2 =
+* Bug: Hydrate Nested Forms with Gravity Wiz Populate Anything data
+
 = 6.10.1 =
 * Bug: Resolve PHP error when processing shortcode with invalid entry object
 * Bug: Adhere to conditional logic and exclude CSS class for Page Break fields

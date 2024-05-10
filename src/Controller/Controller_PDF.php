@@ -138,9 +138,20 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
 
 		/* Add Gravity Perk Population Anything Support */
-		if ( class_exists( '\GP_Populate_Anything_Live_Merge_Tags' ) ) {
+		if ( function_exists( 'gp_populate_anything' ) ) {
 			add_action( 'gfpdf_pre_pdf_generation', [ $this->model, 'enable_gp_populate_anything' ] );
 			add_action( 'gfpdf_pre_pdf_generation_output', [ $this->model, 'disable_gp_populate_anything' ] );
+
+			/* register preferred hydration method */
+			add_filter( 'gfpdf_current_form_object', [ $this->model, 'gp_populate_anything_hydrate_form' ], 10, 2 );
+
+			/* remove legacy filters */
+			if ( class_exists( '\GPPA_Compatibility_GravityPDF' ) ) {
+				$gp_pdf_compat = \GPPA_Compatibility_GravityPDF::get_instance();
+				remove_action( 'gfpdf_pre_view_or_download_pdf', [ $gp_pdf_compat, 'hydrate_form_hook_for_pdf_view_or_download' ] );
+				remove_action( 'gfpdf_pre_generate_and_save_pdf_notification', [ $gp_pdf_compat, 'hydrate_form_hook' ] );
+				remove_action( 'gfpdf_pre_generate_and_save_pdf', [ $gp_pdf_compat, 'hydrate_form_hook' ] );
+			}
 		}
 
 		/* Add Legal Signature support */
