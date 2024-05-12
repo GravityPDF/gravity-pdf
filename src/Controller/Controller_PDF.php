@@ -143,7 +143,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			add_action( 'gfpdf_pre_pdf_generation_output', [ $this->model, 'disable_gp_populate_anything' ] );
 
 			/* register preferred hydration method */
-			add_filter( 'gfpdf_current_form_object', [ $this->model, 'gp_populate_anything_hydrate_form' ], 10, 2 );
+			add_filter( 'gfpdf_current_form_object', [ $this->model, 'gp_populate_anything_hydrate_form' ], 5, 2 );
 
 			/* remove legacy filters */
 			if ( class_exists( '\GPPA_Compatibility_GravityPDF' ) ) {
