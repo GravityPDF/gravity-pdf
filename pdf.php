@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 6.10.1
+Version: 6.10.2
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Blue Liquid Designs
 Author URI: https://blueliquiddesigns.com.au
