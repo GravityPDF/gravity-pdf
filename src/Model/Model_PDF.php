@@ -2503,7 +2503,11 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function gp_populate_anything_hydrate_form( $form, $entry ) {
 		static $cache = [];
-		$key          = $form['id'] . $entry['id'];
+
+		$form_id  = $form['id'] ?? '';
+		$entry_id = $entry['id'] ?? '';
+
+		$key = $form_id . $entry_id;
 
 		if ( isset( $cache[ $key ] ) ) {
 			return $cache[ $key ];
