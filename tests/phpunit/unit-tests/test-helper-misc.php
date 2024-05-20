@@ -666,4 +666,45 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertFileDoesNotExist( $path . 'test' );
 		$this->assertDirectoryDoesNotExist( $path );
 	}
+
+	/**
+	 * @since 6.12
+	 */
+	public function test_flatten_array() {
+		/* Check a single dimensional array */
+		$test_array = [
+			'one' => 'first',
+			'two' => 'second',
+		];
+
+		$this->assertSame( [ 'one', 'two' ], $this->misc->flatten_array( $test_array ) );
+		$this->assertSame( [ 'first', 'second' ], $this->misc->flatten_array( $test_array, 'values' ) );
+
+		/* Check a multi dimensional array */
+		$test_array = [
+			'top-one' => [
+				'one' => 'first',
+			],
+			'top-two' => [
+				'two' => 'second',
+			],
+		];
+
+		$this->assertSame( [ 'one', 'two' ], $this->misc->flatten_array( $test_array ) );
+		$this->assertSame( [ 'first', 'second' ], $this->misc->flatten_array( $test_array, 'values' ) );
+
+		/* Check a multi-multi dimensional array */
+		$test_array = [
+			[
+				'top-one' => [
+					'one' => 'first',
+				],
+				'top-two' => [
+					'two' => 'second',
+				],
+			],
+		];
+
+		$this->assertSame( [ 'top-one', 'top-two' ], $this->misc->flatten_array( $test_array ) );
+	}
 }

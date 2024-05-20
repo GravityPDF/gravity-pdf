@@ -215,6 +215,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->upgrade_routine();
 		$this->gf_settings();
 		$this->gf_form_settings();
+		$this->gf_form_settings_rest_api();
 		$this->pdf();
 		$this->shortcodes();
 		$this->mergetags();
@@ -687,6 +688,19 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $view );
+	}
+
+	/**
+	 * Register Form PDF Rest API (CRUD)
+	 *
+	 * @since 6.12.0
+	 */
+	public function gf_form_settings_rest_api() {
+		$controller = new Controller\Controller_Form_Settings_Rest_Api( $this->options, $this->gform, $this->misc, $this->templates );
+		$controller->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $controller );
 	}
 
 	/**

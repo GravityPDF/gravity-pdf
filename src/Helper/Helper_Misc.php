@@ -906,6 +906,45 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Flatten an array by its keys or value
+	 *
+	 * @param array $array A single or one-level-deep multidimensional array
+	 * @param string $type 'keys' or 'values'
+	 *
+	 * @return array
+	 *
+	 * @since 6.12.0
+	 */
+	public function flatten_array( array $array, $type = 'keys' ) {
+		if ( ! in_array( $type, [ 'keys', 'values' ], true ) ) {
+			_doing_it_wrong( __METHOD__, '$type can only be "keys" or "values"', '6.12' );
+
+			return [];
+		}
+
+		/* exit early if empty array */
+		if ( empty( $array ) ) {
+			return $array;
+		}
+
+		$array = array_map(
+			function( $value, $key ) use ( $type ) {
+				/* handle multi-dimensional array */
+				if ( is_array( $value ) ) {
+					  return call_user_func( 'array_' . $type, $value );
+				}
+
+				/* handle single-dimensional array */
+				return $type === 'keys' ? [ $key ] : [ $value ];
+			},
+			$array,
+			array_keys( $array )
+		);
+
+		return array_merge( ...array_values( $array ) );
+	}
+
+	/**
 	 * Ensure an extension is added to the end of the name
 	 *
 	 * @param string $name      The PHP template

@@ -802,8 +802,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_capabilities() {
 
-		/* sort through all roles and fetch unique capabilities */
-		$roles        = get_editable_roles();
+		/* function only exists on admin requests */
+		$roles        = function_exists( 'get_editable_roles' ) ? get_editable_roles() : [];
 		$capabilities = [];
 
 		/* Add Gravity Forms Capabilities */
