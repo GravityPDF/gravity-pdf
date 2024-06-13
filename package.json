@@ -20,7 +20,7 @@
     "redux-watch": "^1.2.0",
     "reselect": "^4.1.6",
     "sprintf-js": "^1.1.2",
-    "superagent": "^8.0.0"
+    "superagent": "^9.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.18.6",
@@ -29,7 +29,7 @@
     "@babel/preset-env": "^7.18.6",
     "@babel/preset-react": "^7.18.6",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
-    "@wordpress/env": "^8.0.0",
+    "@wordpress/env": "^9.0.0",
     "babel-jest": "^29.7.0",
     "babel-loader": "^9.1.3",
     "babel-plugin-istanbul": "^6.1.1",
@@ -71,9 +71,9 @@
   "scripts": {
     "lint:js": "eslint \"src/assets/js/**/*.js\"",
     "lint:js:fix": "eslint \"src/assets/js/**/*.js\" --fix",
-    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors",
-    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e --screenshots takeOnFails=true,fullPage=true --disable-multiple-windows --skip-js-errors",
-    "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L fullPage=true --disable-multiple-windows --skip-js-errors",
+    "test:e2e": "cross-env NODE_ENV=test testcafe chrome",
+    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless",
+    "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome -L",
     "test:php": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
     "test:php:multisite": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",
     "test:js": "jest --verbose",
