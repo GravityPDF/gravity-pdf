@@ -352,6 +352,48 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Retrieve the filename of the PDF document
+	 * The .pdf extension is not returned by default (pass true to the 3rd param)
+	 *
+	 * See https://docs.gravitypdf.com/v6/developers/api/get_pdf_filename/ for more information about this method
+	 *
+	 * @param int    $entry_id          The Gravity Form entry ID
+	 * @param string $pdf_id            The Gravity PDF ID number (the pid number in the URL when viewing a setting in the admin area)
+	 * @param bool   $include_extension Whether to include the .pdf extension in the filename
+	 *
+	 * @return string|WP_Error   Return the filename of the PDF, or a WP_Error on failure
+	 *
+	 * @return string|WP_Error
+	 *
+	 * @since 6.12
+	 */
+	public static function get_pdf_filename( $entry_id, $pdf_id, bool $include_extension ) {
+		$form_class = static::get_form_class();
+
+		/* Get our entry */
+		$entry = $form_class->get_entry( $entry_id );
+		if ( is_wp_error( $entry ) ) {
+			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-forms-pdf-extended' ) );
+		}
+
+		/* Get our settings */
+		$setting = static::get_pdf( $entry['form_id'], $pdf_id );
+		if ( is_wp_error( $setting ) ) {
+			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-forms-pdf-extended' ) );
+		}
+
+		/** @var \GFPDF\Model\Model_PDF $pdf */
+		$pdf = static::get_mvc_class( 'Model_PDF' );
+
+		$filename = $pdf->get_pdf_name( $setting, $entry );
+		if ( $include_extension ) {
+			$filename .= '.pdf';
+		}
+
+		return $filename;
+	}
+
+	/**
 	 * Retrieve an array of the global Gravity PDF settings (this doesn't include individual form configuration details - see GPDFAPI::get_form_pdfs)
 	 *
 	 * See https://docs.gravitypdf.com/v6/developers/api/get_plugin_settings/ for more information about this method
@@ -448,19 +490,21 @@ final class GPDFAPI {
 	}
 
 	/**
-	 * When provided the Gravity Form entry ID and PDF ID, this method will correctly generate the PDF, save it to disk,
-	 * trigger appropriate actions and return the absolute path to the PDF.
+	 * Generate a PDF, save it to disk, and return the absolute path to the document
 	 *
 	 * See https://docs.gravitypdf.com/v6/developers/api/create_pdf/ for more information about this method
 	 *
-	 * @param  integer $entry_id The Gravity Form entry ID
-	 * @param  string  $pdf_id   The Gravity PDF ID number (the pid number in the URL when viewing a setting in the admin area)
+	 * @param int    $entry_id     The Gravity Form entry ID
+	 * @param string $pdf_id       The Gravity PDF ID number (the pid number in the URL when viewing a setting in the admin area)
+	 * @param bool   $bypass_cache Force a new PDF to be generated
 	 *
-	 * @return mixed            Return the full path to the PDF, or a WP_Error on failure
+	 * @return string|WP_Error   Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
+	 * @since 6.12 All PDFs are cached on disk for ~1 hour, but are auto-purged if the form, entry, or PDF settings change
+	 *        Re-running the method will return the cached PDF if it exists, unless $bypass_cache = true
 	 */
-	public static function create_pdf( $entry_id, $pdf_id ) {
+	public static function create_pdf( $entry_id, $pdf_id, $bypass_cache = false ) {
 
 		$form_class = static::get_form_class();
 
@@ -478,16 +522,17 @@ final class GPDFAPI {
 			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-forms-pdf-extended' ) );
 		}
 
-		$pdf  = static::get_mvc_class( 'Model_PDF' );
-		$form = $form_class->get_form( $entry['form_id'] );
+		if ( $bypass_cache ) {
+			add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		}
 
-		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
-		do_action( 'gfpdf_pre_generate_and_save_pdf', $form, $entry, $setting );
-		$filename = $pdf->generate_and_save_pdf( $entry, $setting );
-		do_action( 'gfpdf_post_generate_and_save_pdf', $form, $entry, $setting );
+		/** @var \GFPDF\Model\Model_PDF $pdf */
+		$pdf         = static::get_mvc_class( 'Model_PDF' );
+		$path_to_pdf = $pdf->generate_and_save_pdf( $entry, $setting );
+
 		remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
 
-		return $filename;
+		return $path_to_pdf;
 	}
 
 	/**

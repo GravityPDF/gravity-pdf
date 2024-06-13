@@ -108,6 +108,7 @@ class Queue_Callbacks {
 	 * @throws Exception
 	 *
 	 * @since 5.0
+	 * @deprecated 6.12 Caching layer + auto-purge added
 	 */
 	public static function cleanup_pdfs( $form_id, $entry_id ) {
 		$gform     = GPDFAPI::get_form_class();

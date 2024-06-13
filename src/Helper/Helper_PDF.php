@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Statics\Cache;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
@@ -178,7 +179,6 @@ class Helper_PDF {
 	 *
 	 * @param array                $entry    The Gravity Form Entry to be processed
 	 * @param array                $settings The Gravity PDF Settings Array
-	 *
 	 * @param Helper_Abstract_Form $gform
 	 * @param Helper_Data          $data
 	 * @param Helper_Misc          $misc
@@ -200,6 +200,7 @@ class Helper_PDF {
 		$this->form      = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
 
 		$this->set_path();
+		$this->set_print_dialog( ! empty( $settings['print'] ) );
 	}
 
 	/**
@@ -284,6 +285,7 @@ class Helper_PDF {
 	 *
 	 * @throws MpdfException
 	 * @since 4.0
+	 * @since 6.12 All PDF requests have been standardized to use the functions/methods in \GPDFAPI::create_pdf(), and the DISPLAY/DOWNLOAD options are no longer used by core
 	 */
 	public function generate() {
 
@@ -519,7 +521,7 @@ class Helper_PDF {
 
 	/**
 	 *
-	 * Get the current Gravity Form Entry
+	 * Get the current Gravity Forms Entry
 	 *
 	 * @return array
 	 * @since 4.0
@@ -537,6 +539,16 @@ class Helper_PDF {
 	 */
 	public function get_settings() {
 		return $this->settings;
+	}
+
+	/**
+	 * Get the current Gravity Forms form object
+	 *
+	 * @return array
+	 * @since 6.12
+	 */
+	public function get_form() {
+		return $this->form;
 	}
 
 	/**
@@ -584,16 +596,10 @@ class Helper_PDF {
 	public function set_path( $path = '' ) {
 
 		if ( empty( $path ) ) {
-			/* build our PDF path location */
-			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . $this->settings['id'] . '/';
-		} else {
-			/* ensure the path ends with a forward slash */
-			if ( substr( $path, -1 ) !== '/' ) {
-				$path .= '/';
-			}
+			$path = Cache::get_path( $this->form, $this->entry, $this->settings );
 		}
 
-		$this->path = $path;
+		$this->path = trailingslashit( $path );
 	}
 
 	/**
@@ -874,12 +880,8 @@ class Helper_PDF {
 	 */
 	protected function maybe_display_raw_html( $html ) {
 
+		/* @TODO - move to shared file */
 		$options = \GPDFAPI::get_options_class();
-
-		/* Disregard if PDF is being saved */
-		if ( $this->output === 'SAVE' ) {
-			return;
-		}
 
 		/* Disregard if `?html` URL parameter doesn't exist */
 		if ( ! rgget( 'html' ) ) {

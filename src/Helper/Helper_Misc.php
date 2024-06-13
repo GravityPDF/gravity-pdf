@@ -353,9 +353,61 @@ class Helper_Misc {
 	 * @return bool|WP_Error
 	 *
 	 * @since 4.0
+	 * @since 6.12.0 Directories not managed by Gravity PDF will throw an error if tried to be deleted
 	 */
 	public function rmdir( $dir, bool $delete_top_level_dir = true ) {
 
+		/*
+		 * Do not allow directories outside the folders managed by Gravity PDF to be deleted
+		 */
+		$folders = [
+			$this->data->template_location,
+			$this->data->template_font_location,
+			$this->data->template_tmp_location,
+			$this->data->mpdf_tmp_location,
+		];
+
+		if ( is_multisite() ) {
+			$folders[] = $this->data->multisite_template_location;
+		}
+
+		/* Verify $dir is a real path on the current file system */
+		$path_to_test = realpath( $dir );
+		if ( $path_to_test === false ) {
+			$this->log->error(
+				'Filesystem Delete Error',
+				[
+					'dir'       => $dir,
+					'exception' => 'Not a real path on the file system',
+				]
+			);
+
+			return new WP_Error( 'rmdir_not_a_real_path', '' );
+		}
+
+		/* Check if $dir to delete falls inside one of the Gravity PDF directories */
+		$allowed_to_delete = false;
+		foreach ( $folders as $folder ) {
+
+			if ( strpos( $path_to_test, realpath( $folder ) ) === 0 ) {
+				$allowed_to_delete = true;
+				break;
+			}
+		}
+
+		if ( ! $allowed_to_delete ) {
+			$this->log->error(
+				'Filesystem Delete Error',
+				[
+					'dir'       => $dir,
+					'exception' => 'Directory falls outside of approved paths',
+				]
+			);
+
+			return new WP_Error( 'rmdir_directory_not_approved', esc_html( 'Cannot delete path. Directory falls outside of approved paths: ' . $dir ) );
+		}
+
+		/* Path is managed by Gravity PDF and can be deleted */
 		$this->log->notice( sprintf( 'Begin deleting directory recursively: %s', $dir ) );
 
 		try {
@@ -368,7 +420,7 @@ class Helper_Misc {
 				$function  = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
 				$real_path = $fileinfo->getRealPath();
 				if ( ! $function( $real_path ) ) {
-					throw new Exception( 'Could not run ' . $function . ' on  ' . $real_path );
+					throw new Exception( esc_html( 'Could not run ' . $function . ' on  ' . $real_path ) );
 				}
 
 				$this->log->notice( sprintf( 'Successfully ran `%s` on %s', $function, $real_path ) );
@@ -721,13 +773,10 @@ class Helper_Misc {
 	 * @return void
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated 6.12 compatibility code no longer required
 	 */
-	public function maybe_add_multicurrency_support() {
-		if ( class_exists( 'GFMultiCurrency' ) && method_exists( 'GFMultiCurrency', 'admin_pre_render' ) ) {
-			$currency = GFMultiCurrency::init();
-			add_filter( 'gform_form_post_get_meta', [ $currency, 'admin_pre_render' ] );
-		}
-	}
+	public function maybe_add_multicurrency_support() {}
 
 	/**
 	 * Remove an extension from the end of a string

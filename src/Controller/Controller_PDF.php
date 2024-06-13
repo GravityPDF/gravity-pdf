@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Statics\Debug;
 use GFPDF\View\View_PDF;
 use Psr\Log\LoggerInterface;
 use SiteGround_Optimizer\Minifier\Minifier;
@@ -30,9 +31,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Controller_PDF
  * Handles the PDF display and authentication
  *
+ * @property View_PDF $view
+ * @property Model_PDF $model
+ *
  * @since 4.0
  */
-class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+class Controller_PDF extends Helper_Abstract_Controller {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -89,69 +93,56 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	}
 
 	/**
-	 * Initialise our class defaults
-	 *
 	 * @return void
 	 * @since 4.0
-	 *
 	 */
 	public function init() {
-		/*
-		 * Tell Gravity Forms to add our form PDF settings pages
-		 */
 		$this->add_actions();
 		$this->add_filters();
 
 		/* Add scheduled tasks */
 		if ( ! wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) ) {
-			wp_schedule_event( time(), 'twicedaily', 'gfpdf_cleanup_tmp_dir' );
+			wp_schedule_event( time(), 'hourly', 'gfpdf_cleanup_tmp_dir' );
 		}
 	}
 
 	/**
-	 * Apply any actions needed for the settings page
-	 *
 	 * @return void
 	 * @since 4.0
-	 *
 	 */
 	public function add_actions() {
 		/* Process PDF if needed */
 		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ] ); /* legacy PDF endpoint */
 		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ] ); /* new PDF endpoint */
 
-		/* Allow custom PDF tags / CSS */
+		/* Set up pre- and post-generation PDF hooks */
 		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ] );
 		add_action( 'gfpdf_post_pdf_generation', [ $this, 'remove_pre_pdf_hooks' ] );
+
+		/* Setup pre generation hooks when streaming PDF to the browser */
+		$add_pre_view_or_download_pdf_hooks = function( $form, $entry, $settings ) {
+			$this->add_pre_view_or_download_pdf_hooks( $form, $entry, $settings );
+		};
+
+		add_action( 'gfpdf_view_or_download_pdf', $add_pre_view_or_download_pdf_hooks, 10, 3 );
 
 		/* Display PDF links in Gravity Forms Admin Area */
 		add_action( 'gform_entries_first_column_actions', [ $this->model, 'view_pdf_entry_list' ], 10, 4 );
 		add_action( 'gravityflow_workflow_detail_sidebar', [ $this->model, 'view_pdf_gravityflow_inbox' ], 10, 4 );
 
-		/* Add save PDF actions */
+		/* Add hooks to save PDF to disk, or run right after a PDF is saved to disk */
 		add_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ], 10, 2 );
 		add_action( 'gfpdf_post_pdf_generation', [ $this->model, 'trigger_post_save_pdf' ], 10, 4 );
 
-		/* Clean-up actions */
-		add_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ], 9999, 2 );
-		add_action( 'gform_after_update_entry', [ $this->model, 'cleanup_pdf_after_submission' ], 9999, 2 );
+		/* Scheduled clean-up actions */
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
 
-		/* Add Gravity Perk Population Anything Support */
-		if ( function_exists( 'gp_populate_anything' ) ) {
-			add_action( 'gfpdf_pre_pdf_generation', [ $this->model, 'enable_gp_populate_anything' ] );
-			add_action( 'gfpdf_pre_pdf_generation_output', [ $this->model, 'disable_gp_populate_anything' ] );
-
-			/* register preferred hydration method */
-			add_filter( 'gfpdf_current_form_object', [ $this->model, 'gp_populate_anything_hydrate_form' ], 5, 2 );
-
-			/* remove legacy filters */
-			if ( class_exists( '\GPPA_Compatibility_GravityPDF' ) ) {
-				$gp_pdf_compat = \GPPA_Compatibility_GravityPDF::get_instance();
-				remove_action( 'gfpdf_pre_view_or_download_pdf', [ $gp_pdf_compat, 'hydrate_form_hook_for_pdf_view_or_download' ] );
-				remove_action( 'gfpdf_pre_generate_and_save_pdf_notification', [ $gp_pdf_compat, 'hydrate_form_hook' ] );
-				remove_action( 'gfpdf_pre_generate_and_save_pdf', [ $gp_pdf_compat, 'hydrate_form_hook' ] );
-			}
+		/* Remove legacy Gravity Perk Population Anything Support */
+		if ( class_exists( '\GPPA_Compatibility_GravityPDF' ) ) {
+			$gp_pdf_compat = \GPPA_Compatibility_GravityPDF::get_instance();
+			remove_action( 'gfpdf_pre_view_or_download_pdf', [ $gp_pdf_compat, 'hydrate_form_hook_for_pdf_view_or_download' ] );
+			remove_action( 'gfpdf_pre_generate_and_save_pdf_notification', [ $gp_pdf_compat, 'hydrate_form_hook' ] );
+			remove_action( 'gfpdf_pre_generate_and_save_pdf', [ $gp_pdf_compat, 'hydrate_form_hook' ] );
 		}
 
 		/* Add Legal Signature support */
@@ -163,11 +154,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	}
 
 	/**
-	 * Apply any filters needed for the settings page
-	 *
 	 * @return void
 	 * @since 4.0
-	 *
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
@@ -188,16 +176,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_page' ], 10, 5 );
 		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_blacklist' ], 10, 7 );
 
-		/* Tap into GF notifications */
-		add_filter(
-			'gform_notification',
-			[
-				$this->model,
-				'notifications',
-			],
-			9999,
-			3
-		); /* ensure Gravity PDF is one of the last filters to be applied */
+		/* Gravity Forms PDF Attachments */
+		add_filter( 'gform_notification', [ $this->model, 'notifications' ], 9999, 3 );
 
 		/* Change mPDF settings */
 		add_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] );
@@ -205,10 +185,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_mpdf_init_class', [ $this->model, 'set_watermark_font' ], 10, 4 );
 
 		/* Process mergetags and shortcodes in PDF */
+		add_filter( 'gfpdf_pdf_core_template_html_output', [ $this->gform, 'process_tags' ], 10, 3 );
 		add_filter( 'gfpdf_pdf_html_output', [ $this->gform, 'process_tags' ], 10, 3 );
 		add_filter( 'gfpdf_pdf_html_output', 'do_shortcode' );
-
-		add_filter( 'gfpdf_pdf_core_template_html_output', [ $this->gform, 'process_tags' ], 10, 3 );
 
 		/* Backwards compatibility for our Tier 2 plugin */
 		add_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ], 1, 8 );
@@ -217,33 +196,42 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_template_args', [ $this->model, 'preprocess_template_arguments' ] );
 		add_filter( 'gfpdf_pdf_html_output', [ $this->view, 'autoprocess_core_template_options' ], 5, 4 );
 
-		/* Cleanup filters */
-		add_filter( 'gform_before_resend_notifications', [ $this->model, 'resend_notification_pdf_cleanup' ], 10, 2 );
-
-		/* Third Party Conflict Fixes */
-		add_filter( 'gfpdf_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
-		add_filter( 'gfpdf_legacy_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
-		add_filter(
-			'gfpdf_pre_pdf_generation_output',
-			function() {
-				add_filter( 'weglot_active_translation', '__return_false' );
-			}
-		);
-
 		/* Meta boxes */
 		add_filter( 'gform_entry_detail_meta_boxes', [ $this->model, 'register_pdf_meta_box' ], 10, 3 );
 
-		/* Page field support */
-		add_filter( 'gfpdf_current_form_object', [ $this->model, 'register_page_fields' ] );
+		/* Manipulate the form object (array) when generating PDFs */
+		$add_current_form_object_hooks = function( $form, $entry, $source ) {
+			return $this->add_current_form_object_hooks( $form, $entry, $source );
+		};
+
+		add_filter( 'gfpdf_current_form_object', $add_current_form_object_hooks, 10, 3 );
+
+		/* Manipulate the PDF settings object (array) when generating PDFs */
+		$add_current_pdf_settings_object_hooks = function( $pdf_settings, $form, $entry ) {
+			return $this->add_current_pdf_settings_object_hooks( $pdf_settings, $form, $entry );
+		};
+
+		add_filter( 'gfpdf_current_pdf_settings_object', $add_current_pdf_settings_object_hooks, 10, 3 );
 	}
 
 	/**
-	 * Determines if we should process the PDF at this stage
-	 * Fires just before the main WP_Query is executed (we don't need it)
+	 * Processes the View/Download PDF Endpoint
+	 *
+	 * Endpoint URLs:
+	 *
+	 * example format -> https://example.com/pdf/{pdfId}/{entryId}/
+	 *
+	 * view -> https://example.com/pdf/66307560bcdf4/2403/
+	 * download -> https://example.com/pdf/66307560bcdf4/2403/download/
+	 * add print dialog -> https://example.com/pdf/66307560bcdf4/2403/?print=1
+	 *
+	 * Recommend you generate the URL with a shortcode or merge tag
+	 * See https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags
+	 *
+	 * This method runs just before the main WP_Query class is executed
 	 *
 	 * @return void
 	 * @since 4.0
-	 *
 	 */
 	public function process_pdf_endpoint() {
 
@@ -251,8 +239,6 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( empty( $GLOBALS['wp']->query_vars['gpdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
 			return null;
 		}
-
-		$this->prevent_index();
 
 		$pid    = $GLOBALS['wp']->query_vars['pid'];
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
@@ -283,7 +269,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 *
 	 * @return void
 	 * @since 4.0
-	 *
+	 * @deprecated 4.0 Added for backwards compatibility with v3 PDF links, but ideally should not be used
 	 */
 	public function process_legacy_pdf_endpoint() {
 
@@ -291,8 +277,6 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
 			return null;
 		}
-
-		$this->prevent_index();
 
 		$config = [
 			'lid'      => (int) explode( ',', $_GET['lid'] )[0],
@@ -338,6 +322,13 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function add_pre_pdf_hooks() {
 		add_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		add_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+
+		$this->misc->maybe_load_gf_entry_detail_class(); /* Backwards compatible for legacy templates */
+
+		/* Gravity Wiz Populate Anything support */
+		if ( function_exists( 'gp_populate_anything' ) ) {
+			$this->model->enable_gp_populate_anything();
+		}
 	}
 
 	/**
@@ -346,47 +337,122 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function remove_pre_pdf_hooks() {
 		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+
+		/* Gravity Wiz Populate Anything support */
+		if ( function_exists( 'gp_populate_anything' ) ) {
+			$this->model->disable_gp_populate_anything();
+		}
 	}
 
 	/**
-	 * Prevent the PDF Endpoints being indexed
+	 * Actions / hooks to run prior to streaming PDF to the browser
+	 * These hooks will not be run when sending notifications, using GPDFAPI::create_pdf(),
+	 *
+	 * @return void
+	 *
+	 * @since 6.12
+	 */
+	protected function add_pre_view_or_download_pdf_hooks( $form, $entry, $settings ) {
+		$this->prevent_index();
+
+		/*
+		 * Stop Weglot trying to transform the binary PDF
+		 * See https://github.com/GravityPDF/gravity-pdf/pull/1505
+		 */
+		add_filter( 'weglot_active_translation', '__return_false' );
+
+		/*
+		 * Stop WP External Links plugin trying to transform the binary PDF
+		 * See https://github.com/GravityPDF/gravity-pdf/issues/386
+		 */
+		add_filter( 'wpel_apply_settings', '__return_false' );
+
+		/*
+		 * Support ?data=1 helper parameter
+		 * See https://docs.gravitypdf.com/v6/developers/helper-parameters#data1
+		 */
+		if ( $this->view->maybe_view_form_data() ) {
+			$this->view->view_form_data( \GPDFAPI::get_form_data( $entry['id'] ) );
+		}
+
+		/*
+		 * Support ?html=1 helper parameter
+		 * See https://docs.gravitypdf.com/v6/developers/helper-parameters#html1
+		 */
+		if ( rgget( 'html' ) && Debug::is_enabled_and_can_view() ) {
+			add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		}
+	}
+
+	/**
+	 * Modify the form object specifically for the PDF request
+	 *
+	 * @param array $form
+	 * @param array $entry
+	 * @param string $source
+	 *
+	 * @return array
+	 *
+	 * @since 6.12
+	 */
+	protected function add_current_form_object_hooks( $form, $entry, $source ) {
+		/* Make Page fields first class citizens in the form object */
+		$form = $this->model->register_page_fields( $form );
+
+		/* Gravity Perks Conditional Logic Date Fields support */
+		if ( method_exists( 'GWConditionalLogicDateFields', 'convert_conditional_logic_date_field_values' ) ) {
+			$form = \GWConditionalLogicDateFields::convert_conditional_logic_date_field_values( $form );
+		}
+
+		/* Gravity Perks Populate Anything support */
+		if ( function_exists( 'gp_populate_anything' ) ) {
+			$form = $this->model->gp_populate_anything_hydrate_form( $form, $entry );
+		}
+
+		return $form;
+	}
+
+	/**
+	 * Modify the PDF settings specifically for the PDF request
+	 *
+	 * @param array $pdf_settings
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return array
+	 *
+	 * @since 6.12
+	 */
+	protected function add_current_pdf_settings_object_hooks( $pdf_settings, $form, $entry ) {
+		$pdf_settings = $this->model->apply_backwards_compatibility_filters( $pdf_settings, $entry );
+
+		return $pdf_settings;
+	}
+
+	/**
+	 * Try to prevent the PDF being indexed/cached
 	 *
 	 * @since 5.2
+	 * @since 6.12 Set DONOTCACHEPAGE constant (brought forward in the request cycle)
 	 */
 	public function prevent_index() {
 		if ( ! headers_sent() ) {
 			header( 'X-Robots-Tag: noindex, nofollow', true );
 		}
-	}
 
-	/**
-	 * Disables the Siteground HTML Minifier when generating PDFs for the browser
-	 *
-	 * @since 5.1.5
-	 *
-	 * @see   https://github.com/GravityPDF/gravity-pdf/issues/863
-	 */
-	public function sgoptimizer_html_minification_fix() {
-		if ( class_exists( '\SiteGround_Optimizer\Minifier\Minifier' ) ) {
-
-			/* Remove the shutdown buffer and manually close an open buffers */
-			$minifier = Minifier::get_instance();
-			remove_action( 'shutdown', [ $minifier, 'end_html_minifier_buffer' ] );
-
-			while ( ob_get_level() > 0 ) {
-				ob_end_clean();
-			}
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
 		}
 	}
 
 	/**
-	 * Output PDF error to user
+	 * Display appropriate error to user when PDF cannot be display
 	 *
-	 * @param Object $error The WP_Error object
+	 * @param \WP_Error $error The WP_Error object
 	 *
 	 * @since 4.0
 	 */
-	private function pdf_error( $error ) {
+	protected function pdf_error( $error ) {
 
 		$this->log->error(
 			'PDF Generation Error.',
@@ -421,7 +487,16 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors, true ) ) {
 			wp_die( esc_html( $error->get_error_message() ), $status_code ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		} else {
-			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ), $status_code ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			wp_die( esc_html__( 'There was a problem creating the PDF', 'gravity-forms-pdf-extended' ), $status_code ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
+
+	/**
+	 * Disables the Siteground HTML Minifier when generating PDFs for the browser
+	 *
+	 * @since 5.1.5
+	 * @see https://github.com/GravityPDF/gravity-pdf/issues/863
+	 * @deprecated 6.12 All buffers are auto-closed before a PDF is sent to the browser
+	 */
+	public function sgoptimizer_html_minification_fix() {}
 }

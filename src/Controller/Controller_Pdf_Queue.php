@@ -210,11 +210,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
 		$this->queue_async_tasks( $form, $entry );
-
-		if ( count( $this->queue->get_data() ) > 0 ) {
-			$this->queue_cleanup_task( $form, $entry );
-		}
-
 		$this->dispatch_queue();
 	}
 
@@ -244,28 +239,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 		foreach ( $this->form_async_notifications as $notification ) {
 			$this->queue->push_to_queue( $this->get_queue_tasks( $entry, $form, [ $notification ] ) );
 		}
-	}
-
-	/**
-	 * Delete PDFs from disk once all tasks are processed
-	 *
-	 * @param array $form
-	 * @param array $entry
-	 *
-	 * @return void
-	 *
-	 * @since 6.11.0
-	 */
-	public function queue_cleanup_task( $form, $entry ) {
-		$this->queue->push_to_queue(
-			[
-				[
-					'id'   => sprintf( 'cleanup-pdf-%d-%d', $form['id'], $entry['id'] ),
-					'func' => '\GFPDF\Statics\Queue_Callbacks::cleanup_pdfs',
-					'args' => [ $form['id'], $entry['id'] ],
-				],
-			]
-		);
 	}
 
 	/**
