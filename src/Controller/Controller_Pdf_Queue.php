@@ -210,11 +210,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
 		$this->queue_async_tasks( $form, $entry );
-
-		if ( count( $this->queue->get_data() ) > 0 ) {
-			$this->queue_cleanup_task( $form, $entry );
-		}
-
 		$this->dispatch_queue();
 	}
 
@@ -255,17 +250,10 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @return void
 	 *
 	 * @since 6.11.0
+	 * @deprecated 6.12.0 Caching layer + auto-purge added
 	 */
 	public function queue_cleanup_task( $form, $entry ) {
-		$this->queue->push_to_queue(
-			[
-				[
-					'id'   => sprintf( 'cleanup-pdf-%d-%d', $form['id'], $entry['id'] ),
-					'func' => '\GFPDF\Statics\Queue_Callbacks::cleanup_pdfs',
-					'args' => [ $form['id'], $entry['id'] ],
-				],
-			]
-		);
+		_doing_it_wrong( __METHOD__, 'This method is deprecated and no alternative is available. The temporary cache is automatically cleaned every hour using the WP Cron.', '6.12' );
 	}
 
 	/**
@@ -477,6 +465,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @deprecated 6.11
 	 */
 	public function queue_async_resend_notification_tasks( $notification, $form, $entry ) {
-		_doing_it_wrong( esc_html( 'queue_async_resend_notification_tasks() was removed in Gravity PDF 6.11' ) );
+		_doing_it_wrong( __METHOD__, 'This method has been removed and no alternative is available.', '6.11' );
 	}
 }

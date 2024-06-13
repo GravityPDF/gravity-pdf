@@ -721,12 +721,11 @@ class Helper_Misc {
 	 * @return void
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated 6.12 compatibility code no longer required
 	 */
 	public function maybe_add_multicurrency_support() {
-		if ( class_exists( 'GFMultiCurrency' ) && method_exists( 'GFMultiCurrency', 'admin_pre_render' ) ) {
-			$currency = GFMultiCurrency::init();
-			add_filter( 'gform_form_post_get_meta', [ $currency, 'admin_pre_render' ] );
-		}
+		_doing_it_wrong( __METHOD__, 'This method has been removed and no alternative is available.', '6.12' );
 	}
 
 	/**

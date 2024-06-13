@@ -680,7 +680,7 @@ class GFPDF_Core_Model extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function gfpdfe_save_pdf( $entry, $form ) {
-		$pdfs = GPDFAPI::get_form_pdfs( $form['id'] );
+		$pdfs = GPDFAPI::get_entry_pdfs( $entry['id'] );
 
 		if ( ! is_wp_error( $pdfs ) ) {
 			foreach ( $pdfs as $pdf ) {

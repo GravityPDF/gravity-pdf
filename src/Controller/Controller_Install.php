@@ -202,6 +202,8 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * Determine if we should be saving the PDF settings
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated 6.0
 	 */
 	public function maybe_uninstall() {
 		_doing_it_wrong( __METHOD__, 'This method has been moved to Controller_Uninstall::uninstall_addon()', '6.0' );

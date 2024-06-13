@@ -54,6 +54,11 @@ class Controller_Upgrade_Routines {
 			$this->update_background_processing_values();
 			$this->upgrade_custom_fonts();
 		}
+
+		/* Remove scheduled event(s) so the event can be reregistered with a new frequency */
+		if ( version_compare( $current_version, '6.12.0', '>=' ) && version_compare( $old_version, '6.12.0', '<' ) ) {
+			wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+		}
 	}
 
 	/**
