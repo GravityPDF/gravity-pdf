@@ -5,6 +5,7 @@ namespace GFPDF\Tests;
 use Exception;
 use GFPDF\Controller\Controller_Pdf_Queue;
 use GFPDF\Helper\Helper_Pdf_Queue;
+use GFPDF\Statics\Cache;
 use GFPDF\Statics\Queue_Callbacks;
 use WP_UnitTestCase;
 
@@ -278,28 +279,26 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 		$results                             = $this->create_form_and_entries();
 		$entry                               = $results['entry'];
 		$form                                = $results['form'];
-		$form['notifications']['1254123223'] = $form['notifications']['54bca349732b8'];
+
+		/* Set up active and inactive notification */
+		$form['notifications']['1254123223'] = [ 'id' => '1254123223', 'isActive' => true, 'event' => 'form_submission' ];
+		$form['notifications']['2222222222'] = [ 'id' => '2222222222', 'isActive' => false, 'event' => 'form_submission' ];
+		$form['gfpdf_form_settings']['556690c67856b']['notification'][] = '1254123223';
+
 		$form['notifications']['54bca349732b8']['isActive'] = true;
 
-		foreach( $form['notifications'] as $notification ) {
+		foreach ( $form['notifications'] as $notification ) {
 			$this->controller->maybe_disable_submission_notifications( false, $notification, $form, $entry );
 		}
-		
+
 		$this->controller->queue_async_form_submission_tasks( $entry, $form );
 
 		$queue = $this->queue_mock->get_data();
 
-		$this->assertCount( 3, $queue[0] );
-		$this->assertCount( 3, $queue[1] );
-		$this->assertCount( 1, $queue[2] );
-
-		$actions = [ 'create_pdf', 'create_pdf', 'send_notification' ];
-		for ( $i = 0; $i < 3; $i++ ) {
-			$this->assertStringContainsString( $actions[ $i ], $queue[0][ $i ]['func'] );
-			$this->assertStringContainsString( $actions[ $i ], $queue[1][ $i ]['func'] );
-		}
-
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[2][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[0][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[0][1]['func'] );
+		$this->assertStringContainsString( 'send_notification', $queue[0][2]['func'] );
+		$this->assertStringContainsString( 'send_notification', $queue[0][3]['func'] );
 	}
 
 	/**
@@ -322,14 +321,11 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 		$queue = $this->queue_mock->get_data();
 
 		$this->assertCount( 3, $queue[0] );
-		$this->assertCount( 1, $queue[1] );
 
 		$actions = [ 'create_pdf', 'create_pdf', 'send_notification' ];
 		for ( $i = 0; $i < 3; $i++ ) {
 			$this->assertStringContainsString( $actions[ $i ], $queue[0][ $i ]['func'] );
 		}
-
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[1][0]['func'] );
 	}
 
 	/**
@@ -343,12 +339,13 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 						 ->method( 'dispatch' )
 						 ->willReturn( $this->queue_mock );
 
-		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0 ] );
+
+		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0, 'form_id' => 0 ] );
 
 		$this->assertSame( 0, $spy->getInvocationCount() );
 
 		$this->queue_mock->push_to_queue( 'item' );
-		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0 ]);
+		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0, 'form_id' => 0 ]);
 
 		$this->assertSame( 1, $spy->getInvocationCount() );
 	}
@@ -359,21 +356,26 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	 * @since 5.0
 	 */
 	public function test_cleanup_pdfs() {
-		global $gfpdf;
+		$this->setExpectedIncorrectUsage( 'GFPDF\Statics\Queue_Callbacks::cleanup_pdfs');
+		$this->setExpectedIncorrectUsage( 'GFPDF\Model\Model_PDF::cleanup_pdf');
+
+		$form_class = \GPDFAPI::get_form_class();
 
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $results['form'];
+		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
 
-		$path = $gfpdf->data->template_tmp_location . $entry['form_id'] . $entry['id'] . '556690c67856b/';
+		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
+		$file   = "test-{$form['id']}.pdf";
+
 		wp_mkdir_p( $path );
-		$test_file = $path . 'file';
-		touch( $test_file );
-		$this->assertFileExists( $test_file );
+		touch( $path . $file );
+
+		$this->assertFileExists( $path . $file );
 
 		Queue_Callbacks::cleanup_pdfs( $form['id'], $entry['id'] );
 
-		$this->assertFileDoesNotExist( $test_file );
+		$this->assertFileDoesNotExist( $path . $file );
 		$this->assertFileDoesNotExist( $path );
 	}
 }

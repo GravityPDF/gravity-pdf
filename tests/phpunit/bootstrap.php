@@ -7,6 +7,9 @@ if ( function_exists( 'xdebug_disable' ) ) {
 	xdebug_disable();
 }
 
+/* Use different DB tables for unit tests, so we don't mess with the E2E environment */
+putenv( 'WORDPRESS_TABLE_PREFIX=phpunit_' );
+
 /**
  * Override certain pluggable functions so we can unit test them correctly
  *

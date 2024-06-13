@@ -6,6 +6,7 @@ use Exception;
 use GF_Field;
 use GFCommon;
 use GFFormsModel;
+use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Fields\Field_Default;
 use GFPDF\Helper\Fields\Field_Products;
 use GFPDF\Helper\Helper_Abstract_Field_Products;
@@ -49,6 +50,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles all the PDF display logic
  *
  * @since 4.0
+ *
+ * @method Controller_PDF getController
  */
 class Model_PDF extends Helper_Abstract_Model {
 
@@ -155,7 +158,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Our Middleware used to handle the authentication process
+	 * Authentication request then generate and display PDF
 	 *
 	 * @param string  $pid    The Gravity Form PDF Settings ID
 	 * @param integer $lid    The Gravity Form Entry ID
@@ -163,34 +166,30 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return WP_Error
 	 * @since 4.0
-	 *
+	 * @since 6.12 View/Download PDF creation workflow standardized with Save PDF workflow
 	 */
 	public function process_pdf( $pid, $lid, $action = 'view' ) {
 
-		/**
-		 * Check if we have a valid Gravity Form Entry and PDF Settings ID
-		 */
+		/* Get entry */
 		$entry = $this->gform->get_entry( $lid );
-
-		/* not a valid entry */
 		if ( is_wp_error( $entry ) ) {
 			$this->log->error(
-				'Invalid Entry.',
+				'Invalid Entry',
 				[
-					'entry' => $entry,
+					'entry_id'         => $lid,
+					'WP_Error_Message' => $entry->get_error_message(),
+					'WP_Error_Code'    => $entry->get_error_code(),
 				]
 			);
 
 			return $entry; /* return error */
 		}
 
+		/* Get PDF setting */
 		$settings = $this->options->get_pdf( $entry['form_id'], $pid );
-
-		/* Not valid settings */
 		if ( is_wp_error( $settings ) ) {
-
 			$this->log->error(
-				'Invalid PDF Settings.',
+				'Invalid PDF Settings',
 				[
 					'entry'            => $entry,
 					'WP_Error_Message' => $settings->get_error_message(),
@@ -201,23 +200,33 @@ class Model_PDF extends Helper_Abstract_Model {
 			return $settings; /* return error */
 		}
 
-		/* Add our download setting */
+		/*
+		 * Prior to 6.12 this action was saved to the PDF settings, passed to Helper_PDF, and used to
+		 * stream the document to the client correctly. Since 6.12, we no longer need to pass this value
+		 * to the underlying PDF generator. For backwards compatibility we've included this in case any
+		 * user-land code makes use of it in their custom middleware.
+		 */
 		$settings['pdf_action'] = $action;
 
-		/**
-		 * Our middleware authenticator
-		 * Allow users to tap into our middleware and add or remove additional authentication layers
+		/*
+		 * Authenticate the request to prevent unauthorized access to the PDF
 		 *
-		 * Default middleware includes 'middle_public_access', 'middle_active', 'middle_conditional', 'middle_owner_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
-		 * If WP_Error is returned the PDF won't be parsed
+		 * Default middleware filters include:
+		 * - middle_public_access
+		 * - middle_signed_url_access
+		 * - middle_active
+		 * - middle_conditional
+		 * - middle_owner_restriction
+		 * - middle_logged_out_timeout
+		 * - middle_auth_logged_out_user
+		 * - middle_user_capability
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_middleware/ for more details about this filter
+		 * If any of the filters return a WP_Error object the request will not be fulfilled
+		 *
+		 * Refer to https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_middleware/
 		 */
 		$middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings );
-
-		/* Throw error */
 		if ( is_wp_error( $middleware ) ) {
-
 			$this->log->error(
 				'PDF Authentication Failure.',
 				[
@@ -231,17 +240,101 @@ class Model_PDF extends Helper_Abstract_Model {
 			return $middleware;
 		}
 
-		/* Add backwards compatibility support for certain settings */
-		$settings = $this->apply_backwards_compatibility_filters( $settings, $entry );
+		/*
+		 * Normalize the PDF action
+		 * The PDF cache introduced in 6.12 relies on a hash generated from the form, entry, and pdf settings
+		 * To prevent cache misses we need to ensure we don't unnecessarily modify the settings array
+		 */
+		unset( $settings['pdf_action'] );
+		$action = apply_filters( 'gfpdfe_pdf_output_type', $action ); /* Backwards compat */
+		$action = in_array( $action, [ 'view', 'download' ], true ) ? $action : 'view';
 
-		/* Ensure Gravity Forms dependency loaded */
-		$this->misc->maybe_load_gf_entry_detail_class();
+		/* Get the PDF document for the request */
+		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
-		/* If we are here we can generate our PDF */
-		$controller = $this->getController();
-		$controller->view->generate_pdf( $entry, $settings );
+		do_action( 'gfpdf_view_or_download_pdf', $form, $entry, $settings );
 
-		return null;
+		/*
+		 * Support the print dialog option
+		 * The PDF document embeds this preference directly in the source code so we need to
+		 * force the cache to be bypassed.
+		 */
+		if ( rgget( 'print' ) === '1' ) {
+			$settings['print'] = true;
+		}
+
+		$path_to_pdf = $this->generate_and_save_pdf( $entry, $settings );
+
+		/* Send error upstream for logging and output */
+		if ( is_wp_error( $path_to_pdf ) ) {
+			return $path_to_pdf;
+		}
+
+		/* Verify the PDF can be sent to the client */
+		if ( headers_sent( $filename, $linenumber ) ) {
+			$this->log->error(
+				'Server headers already sent',
+				[
+					'filename'   => $filename,
+					'linenumber' => $linenumber,
+				]
+			);
+
+			return new WP_Error( 'headers_sent', __( 'The PDF cannot be displayed because the server headers have already been sent.', 'gravity-forms-pdf-extended' ) );
+		}
+
+		/* Force any active buffers to close and delete its content */
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
+
+		do_action( 'gfpdf_post_view_or_download_pdf', $path_to_pdf, $form, $entry, $settings, $action );
+
+		/* Send the PDF to the client */
+		header( 'Content-Type: application/pdf' );
+
+		/*
+		 * Set the filename, supporting the new utf-8 syntax + backwards compatibility
+		 * Refer to RFC 8187 https://www.rfc-editor.org/rfc/rfc8187.html
+		 */
+		header(
+			sprintf(
+				'Content-Disposition: %1$s; filename="%2$s"; filename*=utf-8\'\'%2$s',
+				$action === 'view' ? 'inline' : 'attachment',
+				rawurlencode( basename( $path_to_pdf ) ),
+			)
+		);
+
+		/* only add the length if the server is not using compression */
+		if ( empty( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ) {
+			header( sprintf( 'Content-Length: %d', filesize( $path_to_pdf ) ) );
+		}
+
+		/* Tell client to download the file */
+		if ( $action === 'download' ) {
+			header( 'Content-Description: File Transfer' );
+			header( 'Content-Transfer-Encoding: binary' );
+		}
+
+		/* Set appropriate headers for local browser caching */
+		$last_modified_time = filemtime( $path_to_pdf );
+		$etag               = md5( $path_to_pdf ); /* the file path includes a unique hash that automatically changes when a PDF does */
+
+		header( sprintf( 'Last-Modified: %s GMT', gmdate( 'D, d M Y H:i:s', $last_modified_time ) ) );
+		header( sprintf( 'Etag: %s', $etag ) );
+		header( 'Cache-Control: no-cache, private' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		/* Tell client they can display the PDF from the local cache if it is still current */
+		if ( ! empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag ) {
+			header( 'HTTP/1.1 304 Not Modified' );
+			exit;
+		}
+
+		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile */
+
+		exit;
 	}
 
 	/**
@@ -1143,139 +1236,136 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Generate and save the PDF to disk
 	 *
-	 * @param array $entry    The Gravity Form entry array (usually passed in as a filter or pulled using GFAPI::get_entry( $id ) )
-	 * @param array $settings The PDF configuration settings for the particular entry / form being processed
+	 * @param array $entry        The Gravity Forms entry (from \GFAPI::get_entry)
+	 * @param array $pdf_settings The Gravity PDF settings (from GPDFAPI::get_pdf())
 	 *
-	 * @return string|WP_Error           Return the full path to the PDF, or a WP_Error on failure
+	 * @return string|WP_Error  Return the full path to the PDF, or a WP_Error on failure
 	 *
-	 * @throws Exception
 	 * @since 4.0
+	 * @since 6.12 The view/download endpoints route through this method
+	 *
+	 * @see \GPDFAPI::create_pdf() We recommend third-party developers use the API to generate PDFs
 	 */
-	public function generate_and_save_pdf( $entry, $settings ) {
+	public function generate_and_save_pdf( $entry, $pdf_settings ) {
 
-		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
-		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+		$form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
+		$entry        = apply_filters( 'gfpdf_current_entry_object', $entry, $form, $pdf_settings, __FUNCTION__ );
+		$pdf_settings = apply_filters( 'gfpdf_current_pdf_settings_object', $pdf_settings, $form, $entry, __FUNCTION__ );
+		$filename     = $this->get_pdf_name( $pdf_settings, $entry );
+
+		do_action( 'gfpdf_pre_generate_and_save_pdf', $form, $entry, $pdf_settings );
+
+		$pdf_generator = new Helper_PDF( $entry, $pdf_settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
+		$pdf_generator->set_filename( $filename );
 		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
 
-		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
-			$pdf_path = $pdf_generator->get_full_pdf_path();
-			if ( is_file( $pdf_path ) ) {
-				return $pdf_path;
-			}
+		if ( ! $this->process_and_save_pdf( $pdf_generator ) ) {
+			return new WP_Error( 'pdf_generation_failure', esc_html__( 'There was a problem creating the PDF', 'gravity-forms-pdf-extended' ) );
 		}
 
-		return new WP_Error( 'pdf_generation_failure', esc_html__( 'The PDF could not be saved.', 'gravity-forms-pdf-extended' ) );
+		do_action( 'gfpdf_post_generate_and_save_pdf', $form, $entry, $pdf_settings );
 
+		return $pdf_generator->get_full_pdf_path();
 	}
 
 	/**
 	 * Generate and save PDF to disk
 	 *
-	 * @param Helper_PDF $pdf The Helper_PDF object
+	 * @param Helper_PDF $pdf_generator The Helper_PDF object
 	 *
-	 * @return boolean
+	 * @return bool
 	 *
-	 * @throws Exception
 	 * @since 4.0
 	 */
-	public function process_and_save_pdf( Helper_PDF $pdf ) {
+	public function process_and_save_pdf( Helper_PDF $pdf_generator ) {
 
 		/**
 		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_override_pdf_bypass/ for usage
 		 *
 		 * @since 4.2
 		 */
-		$pdf_override = apply_filters( 'gfpdf_override_pdf_bypass', false, $pdf );
+		$pdf_override = apply_filters( 'gfpdf_override_pdf_bypass', false, $pdf_generator );
 
-		/* Check that the PDF hasn't already been created this session */
-		if ( $pdf_override || ! $this->does_pdf_exist( $pdf ) ) {
-
-			/* Ensure Gravity Forms dependency loaded */
-			$this->misc->maybe_load_gf_entry_detail_class();
-
-			/* Enable Multicurrency support */
-			$this->misc->maybe_add_multicurrency_support();
-
-			/* Get required parameters */
-			$entry    = $pdf->get_entry();
-			$settings = $pdf->get_settings();
-			$form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
-
-			do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
-
-			/**
-			 * Load our arguments that should be accessed by our PDF template
-			 *
-			 * @var array
-			 */
-			$args = $this->templates->get_template_arguments(
-				$form,
-				$this->misc->get_fields_sorted_by_id( $form['id'] ),
-				$entry,
-				$this->get_form_data( $entry ),
-				$settings,
-				$this->templates->get_config_class( $settings['template'] ),
-				$this->misc->get_legacy_ids( $entry['id'], $settings )
-			);
-
-			/* Add backwards compatibility support */
-			$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
-			$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
-
-			try {
-
-				/* Initialise our PDF helper class */
-				$pdf->init();
-				$pdf->set_template();
-				$pdf->set_output_type( 'save' );
-
-				/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-				if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
-
-					/* Check if we should process this document using our legacy system */
-					if ( $this->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
-						return true;
-					}
-				}
-
-				/* Render the PDF template HTML */
-				$pdf->render_html( $args );
-
-				/* Generate and save the PDF */
-				$pdf->save_pdf( $pdf->generate() );
-
-				do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf );
-
-				return true;
-			} catch ( Exception $e ) {
-
-				$this->log->error(
-					'PDF Generation Error',
-					[
-						'pdf'       => $pdf,
-						'exception' => $e->getMessage(),
-					]
-				);
-
-				return false;
-			}
+		/* If cached PDF already exists then return early */
+		if ( ! $pdf_override && $this->does_pdf_exist( $pdf_generator ) ) {
+			return true;
 		}
 
-		return true;
+		/* Get required parameters */
+		$entry    = $pdf_generator->get_entry();
+		$settings = $pdf_generator->get_settings();
+		$form     = $pdf_generator->get_form();
+
+		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf_generator );
+
+		/*
+		 * Load our arguments that should be accessed by our PDF template
+		 */
+		$args = $this->templates->get_template_arguments(
+			$form,
+			$this->misc->get_fields_sorted_by_id( $form['id'] ),
+			$entry,
+			$this->get_form_data( $entry ),
+			$settings,
+			$this->templates->get_config_class( $settings['template'] ),
+			$this->misc->get_legacy_ids( $entry['id'], $settings )
+		);
+
+		/* Add backwards compatibility support */
+		$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
+		$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
+
+		try {
+
+			/* Initialise our PDF helper class */
+			$pdf_generator->init();
+			$pdf_generator->set_template();
+			$pdf_generator->set_output_type( 'save' );
+
+			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
+			if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
+
+				/* Check if we should process this document using our legacy system */
+				if ( $this->handle_legacy_tier_2_processing( $pdf_generator, $entry, $settings, $args ) ) {
+					return true;
+				}
+			}
+
+			/* Render the PDF template HTML */
+			$pdf_generator->render_html( $args );
+
+			/* Generate and save the PDF */
+			$pdf_generator->save_pdf( $pdf_generator->generate() );
+
+			do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf_generator );
+
+			return true;
+		} catch ( Exception $e ) {
+
+			$this->log->error(
+				'PDF Generation Error',
+				[
+					'pdf'       => $pdf_generator,
+					'exception' => $e->getMessage(),
+				]
+			);
+
+			return false;
+		}
 	}
 
 	/**
 	 * Check if the current PDF to be processed already exists on disk
 	 *
-	 * @param Helper_PDF $pdf The Helper_PDF Object
+	 * @param Helper_PDF $pdf_generator The Helper_PDF Object
 	 *
 	 * @return boolean
 	 *
 	 * @since  4.0
 	 */
-	public function does_pdf_exist( Helper_PDF $pdf ) {
+	public function does_pdf_exist( Helper_PDF $pdf_generator ) {
 
-		if ( is_file( $pdf->get_full_pdf_path() ) ) {
+		if ( is_file( $pdf_generator->get_full_pdf_path() ) ) {
 			return true;
 		}
 
@@ -1408,16 +1498,16 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Handles the loading and running of our legacy Tier 2 PDF templates
 	 *
-	 * @param Helper_PDF $pdf      The Helper_PDF object
-	 * @param array      $entry    The Gravity Forms raw entry data
-	 * @param array      $settings The Gravity PDF settings
-	 * @param array      $args     The data that should be passed directly to a PDF template
+	 * @param Helper_PDF $pdf_generator The Helper_PDF object
+	 * @param array      $entry         The Gravity Forms raw entry data
+	 * @param array      $settings      The Gravity PDF settings
+	 * @param array      $args          The data that should be passed directly to a PDF template
 	 *
 	 * @return bool
 	 *
 	 * @since 4.0
 	 */
-	public function handle_legacy_tier_2_processing( Helper_PDF $pdf, $entry, $settings, $args ) {
+	public function handle_legacy_tier_2_processing( Helper_PDF $pdf_generator, $entry, $settings, $args ) {
 
 		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
@@ -1425,10 +1515,10 @@ class Model_PDF extends Helper_Abstract_Model {
 			'gfpdfe_pre_load_template',
 			$form['id'],
 			$entry['id'],
-			basename( $pdf->get_template_path() ),
+			basename( $pdf_generator->get_template_path() ),
 			$form['id'] . $entry['id'],
-			$this->misc->backwards_compat_output( $pdf->get_output_type() ),
-			$pdf->get_filename(),
+			$this->misc->backwards_compat_output( $pdf_generator->get_output_type() ),
+			$pdf_generator->get_filename(),
 			$this->misc->backwards_compat_conversion( $settings, $form, $entry ),
 			$args
 		); /* Backwards Compatibility */
@@ -1954,35 +2044,36 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function cleanup_tmp_dir() {
-		$max_file_age  = time() - 12 * 3600; /* Max age is 12 hours old */
+		$max_file_age  = time() - 3600; /* Max age is 1 hour old */
 		$tmp_directory = $this->data->template_tmp_location;
 
-		if ( is_dir( $tmp_directory ) ) {
+		if ( ! is_dir( $tmp_directory ) ) {
+			return;
+		}
 
-			try {
-				$directory_list = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator( $tmp_directory, RecursiveDirectoryIterator::SKIP_DOTS ),
-					RecursiveIteratorIterator::CHILD_FIRST
-				);
+		try {
+			$directory_list = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator( $tmp_directory, RecursiveDirectoryIterator::SKIP_DOTS ),
+				RecursiveIteratorIterator::CHILD_FIRST
+			);
 
-				foreach ( $directory_list as $file ) {
-					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
-						continue;
-					}
-
-					if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
-						( $file->isDir() ) ? $this->misc->rmdir( $file->getPathName() ) : unlink( $file->getPathName() );
-					}
+			foreach ( $directory_list as $file ) {
+				if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
+					continue;
 				}
-			} catch ( Exception $e ) {
-				$this->log->error(
-					'Filesystem Delete Error',
-					[
-						'dir'       => $tmp_directory,
-						'exception' => $e->getMessage(),
-					]
-				);
+
+				if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
+					( $file->isDir() ) ? $this->misc->rmdir( $file->getPathName() ) : unlink( $file->getPathName() );
+				}
 			}
+		} catch ( Exception $e ) {
+			$this->log->error(
+				'Filesystem Delete Error',
+				[
+					'dir'       => $tmp_directory,
+					'exception' => $e->getMessage(),
+				]
+			);
 		}
 	}
 
@@ -1991,8 +2082,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @param array $form
 	 * @param int   $entry_id
+	 *
+	 * @deprecated 6.12 Caching layer + auto-purge added
 	 */
 	public function cleanup_pdf_after_submission( $form, $entry_id ) {
+		_doing_it_wrong( __METHOD__, 'This method is deprecated and no alternative is available. The temporary cache is automatically cleaned every hour using the WP Cron.', '6.12' );
+
 		/* Exit if background processing is enabled */
 		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
 			return;
@@ -2017,11 +2112,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 *
-	 * @internal  In future we may give the option to cache PDFs to save on processing power
+	 * @since 4.0
 	 *
-	 * @since     4.0
+	 * @deprecated 6.12 Caching layer + auto-purge added
 	 */
 	public function cleanup_pdf( $entry, $form ) {
+		_doing_it_wrong( __METHOD__, 'This method is deprecated and no alternative is available. The temporary cache is automatically cleaned every hour using the WP Cron.', '6.12' );
+
 		$pdfs = $this->get_active_pdfs( $form['gfpdf_form_settings'] ?? [], $entry );
 
 		if ( count( $pdfs ) === 0 ) {
@@ -2053,9 +2150,11 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return array We tapped into a filter so we need to return the form object
 	 * @since 4.0
-	 *
+	 * @deprecated 6.12 Caching layer + auto-purge added
 	 */
 	public function resend_notification_pdf_cleanup( $form, $entries ) {
+		_doing_it_wrong( __METHOD__, 'This method is deprecated and no alternative is available. The temporary cache is automatically cleaned every hour using the WP Cron.', '6.12' );
+
 		foreach ( $entries as $entry_id ) {
 			$entry = $this->gform->get_entry( $entry_id );
 			$this->cleanup_pdf( $entry, $form );
@@ -2166,8 +2265,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return mixed
 	 *
 	 * @since  4.0
+	 * @deprecated 4.0 Added for backwards compatibility, but ideally should not be used
 	 */
 	public function get_legacy_config( $config ) {
+		_doing_it_wrong( __METHOD__, 'Legacy PDF URLs are deprecated. Replace with the [gravitypdf] shortcode or PDF merge tags. See https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags for usage instructions.', '4.0' );
 
 		/* Get the form settings */
 		$pdfs = $this->options->get_form_pdfs( $config['fid'] );
@@ -2412,6 +2513,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 5.3
 	 */
 	public function process_gp_populate_anything( $text, $form, $entry ) {
+		if ( ! class_exists( 'GP_Populate_Anything_Live_Merge_Tags' ) ) {
+			return $text;
+		}
+
 		$gp = GP_Populate_Anything_Live_Merge_Tags::get_instance();
 
 		$this->disable_gp_populate_anything();

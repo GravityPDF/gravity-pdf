@@ -13,6 +13,7 @@ use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
+use GFPDF\Statics\Cache;
 use GFPDF\View\View_PDF;
 use GPDFAPI;
 use ReflectionMethod;
@@ -121,17 +122,6 @@ class Test_PDF extends WP_UnitTestCase {
 			)
 		);
 		$this->assertSame( 10, has_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ] ) );
-		$this->assertSame( 9999, has_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ] ) );
-		$this->assertSame(
-			9999,
-			has_action(
-				'gform_after_update_entry',
-				[
-					$this->model,
-					'cleanup_pdf_after_submission',
-				]
-			)
-		);
 		$this->assertSame( 10, has_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] ) );
 	}
 
@@ -183,16 +173,6 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Backwards compatibility */
 		$this->assertSame( 1, has_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ] ) );
-		$this->assertSame(
-			10,
-			has_filter(
-				'gform_before_resend_notifications',
-				[
-					$this->model,
-					'resend_notification_pdf_cleanup',
-				]
-			)
-		);
 	}
 
 	/**
@@ -222,7 +202,7 @@ class Test_PDF extends WP_UnitTestCase {
 		try {
 			$this->controller->process_pdf_endpoint();
 		} catch ( Exception $e ) {
-			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+			$this->assertEquals( 'There was a problem creating the PDF', $e->getMessage() );
 
 			return;
 		}
@@ -236,6 +216,8 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_process_legacy_pdf_endpoint() {
+		$this->setExpectedIncorrectUsage( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint');
+		$this->setExpectedIncorrectUsage( 'GFPDF\Model\Model_PDF::get_legacy_config');
 
 		/* Force a failure */
 		$this->assertNull( $this->controller->process_legacy_pdf_endpoint() );
@@ -249,7 +231,7 @@ class Test_PDF extends WP_UnitTestCase {
 		try {
 			$results = $this->controller->process_legacy_pdf_endpoint();
 		} catch ( Exception $e ) {
-			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+			$this->assertEquals( 'There was a problem creating the PDF', $e->getMessage() );
 
 			return;
 		}
@@ -300,7 +282,7 @@ class Test_PDF extends WP_UnitTestCase {
 			/* Do nothing here */
 		}
 
-		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+		$this->assertEquals( 'There was a problem creating the PDF', $e->getMessage() );
 
 		/* Authorise the current user and check the message is displayed correctly */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
@@ -1051,17 +1033,15 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_notifications() {
-		global $gfpdf;
+		$form_class = \GPDFAPI::get_form_class();
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $results['form'];
-		$form['gfpdf_form_settings'] = [ $form['gfpdf_form_settings']['556690c67856b'] ];
+		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
 
 		/* Create PDF file so it isn't recreated */
-		$folder = $form['id'] . $entry['id'] . '556690c67856b';
-		$path   = $gfpdf->data->template_tmp_location . "$folder/";
+		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
 		$file   = "test-{$form['id']}.pdf";
 
 		wp_mkdir_p( $path );
@@ -1070,7 +1050,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		/* Check the results are successful */
-		$this->assertStringContainsString( "PDF_EXTENDED_TEMPLATES/tmp/$folder/$file", $notifications['attachments'][0] );
+		$this->assertEquals( $path . $file, $notifications['attachments'][0] );
 
 		/* Clean up */
 		unlink( $notifications['attachments'][0] );
@@ -1266,12 +1246,12 @@ class Test_PDF extends WP_UnitTestCase {
 		/* Create our files to test */
 		$files = [
 			'test'      => time(),
-			'test1'     => time() - ( 11.5 * 3600 ),
-			'test2'     => time() - ( 12.01 * 3600 ),
-			'test3'     => time() - ( 12.5 * 3600 ),
+			'test1'     => time() - ( 1 * 3600 ),
+			'test2'     => time() - ( 1.01 * 3600 ),
+			'test3'     => time() - ( 1.1 * 3600 ),
 			'test4'     => time() - ( 25 * 3600 ),
 			'test5'     => time() - ( 15 * 3600 ),
-			'test6'     => time() - ( 5 * 3600 ),
+			'test6'     => time() - ( 0.25 * 3600 ),
 			'.htaccess' => time() - ( 48 * 3600 ),
 			'mpdf/test' => time() - ( 25 * 3600 ), /* normally deleted, but excluded */
 		];
@@ -1280,7 +1260,7 @@ class Test_PDF extends WP_UnitTestCase {
 			touch( $tmp . $file, $modified );
 		}
 
-		/* Run our cleanup function and test the out put */
+		/* Run our cleanup function and test the output */
 		$this->model->cleanup_tmp_dir();
 
 		$this->assertFileExists( $tmp . 'test' );
@@ -1305,22 +1285,26 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_cleanup_pdf() {
-		global $gfpdf;
+		$this->setExpectedIncorrectUsage('GFPDF\Model\Model_PDF::cleanup_pdf');
+
+		$form_class = \GPDFAPI::get_form_class();
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $results['form'];
-		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/test-{$form['id']}.pdf";
+		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
 
-		wp_mkdir_p( dirname( $file ) );
-		touch( $file );
+		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
+		$file   = "test-{$form['id']}.pdf";
 
-		$this->assertFileExists( $file );
+		wp_mkdir_p( $path );
+		touch( $path . $file );
+
+		$this->assertFileExists( $path . $file );
 
 		$this->model->cleanup_pdf( $entry, $form );
 
-		$this->assertFileDoesNotExist( $file );
+		$this->assertFileDoesNotExist( $path . $file );
 	}
 
 	/**
@@ -1520,6 +1504,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_get_legacy_config() {
+		$this->setExpectedIncorrectUsage('GFPDF\Model\Model_PDF::get_legacy_config');
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
@@ -1550,6 +1535,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @dataProvider provider_get_template_filename
 	 */
 	public function test_get_template_filename( $expected, $template ) {
+		$this->setExpectedIncorrectUsage('GFPDF\View\View_PDF::get_template_filename');
 		$this->assertEquals( $expected, $this->view->get_template_filename( $template ) );
 	}
 
