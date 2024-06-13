@@ -1980,7 +1980,19 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param int   $entry_id
 	 */
 	public function cleanup_pdf_after_submission( $form, $entry_id ) {
+		/* Exit if background processing is enabled */
+		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
+			return;
+		}
+
 		$entry = $this->gform->get_entry( $entry_id );
+
+		/* Exit if GF async notifications is enabled */
+		$notifications = array_column( $form['notifications'] ?? [], 'id' );
+		if ( $this->is_gform_asynchronous_notifications_enabled( $notifications, $form, $entry ) ) {
+			return;
+		}
+
 		$this->cleanup_pdf( $entry, $form );
 	}
 
@@ -1997,42 +2009,26 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since     4.0
 	 */
 	public function cleanup_pdf( $entry, $form ) {
+		$pdfs = $this->get_active_pdfs( $form['gfpdf_form_settings'] ?? [], $entry );
 
-		/* Exit early if background processing is enabled */
-		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
+		if ( count( $pdfs ) === 0 ) {
 			return;
 		}
 
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
+		$tmp_path_directory = realpath( $this->data->template_tmp_location );
 
-		if ( count( $pdfs ) > 0 ) {
+		/* loop through each PDF config */
+		foreach ( $pdfs as $pdf ) {
+			$pdf_generator = new Helper_PDF( $entry, $pdf, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
+			$path          = $pdf_generator->get_path();
 
-			/* loop through each PDF config */
-			foreach ( $pdfs as $pdf ) {
-				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
-
-				/* Only generate if the PDF wasn't during the notification process */
-				if ( ! is_wp_error( $settings ) ) {
-
-					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
-					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
-
-					if ( $this->does_pdf_exist( $pdf_generator ) ) {
-						try {
-							$this->misc->rmdir( $pdf_generator->get_path() );
-						} catch ( Exception $e ) {
-
-							$this->log->error(
-								'Cleanup PDF Error',
-								[
-									'pdf'       => $pdf,
-									'exception' => $e->getMessage(),
-								]
-							);
-						}
-					}
-				}
+			/* Verify we are only deleting files in the designated tmp directory */
+			$path_to_test = realpath( $path );
+			if ( $path_to_test === false || strpos( $path_to_test, $tmp_path_directory ) !== 0 || ! is_dir( $path ) ) {
+				continue;
 			}
+
+			$this->misc->rmdir( $path );
 		}
 	}
 
@@ -2053,6 +2049,32 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return $form;
+	}
+
+	/**
+	 * Check if any of the form's notification is set to asynchronous
+	 *
+	 * @param array $notifications An array containing the IDs of the notifications to be sent.
+	 * @param array $form          The form being processed.
+	 * @param array $entry         The entry being processed.
+	 * @param array $data          An array of data which can be used in the notifications via the generic {object:property} merge tag. Defaults to empty array.
+	 *
+	 * @return string
+	 *
+	 * @since 6.11.0
+	 *
+	 * @see   https://docs.gravityforms.com/gform_is_asynchronous_notifications_enabled/
+	 */
+	public function is_gform_asynchronous_notifications_enabled( $notifications, $form, $entry, $data = [] ) {
+		return gf_apply_filters(
+			[ 'gform_is_asynchronous_notifications_enabled', $form['id'] ],
+			false,
+			'form_submission',
+			$notifications,
+			$form,
+			$entry,
+			$data
+		);
 	}
 
 	/**
