@@ -43,7 +43,6 @@ class FontManager {
     this.successMessage = Selector('.success').withText('Your font has been saved.')
 
     // Resources
-    this.gothamFontRegular = '../../utilities/resources/Gotham-Black-Regular.ttf'
     this.robotoFontRegular = '../../utilities/resources/Roboto-Regular.ttf'
     this.robotoFontItalics = '../../utilities/resources/Roboto-RegularItalic.ttf'
     this.robotoFontBold = '../../utilities/resources/Roboto-Bold.ttf'

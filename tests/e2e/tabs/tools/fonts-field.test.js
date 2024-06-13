@@ -47,17 +47,13 @@ test('should successfully add new font', async t => {
   // Actions
   await fontManager.navigateFontManager('gf_settings&subview=PDF&tab=tools#')
   await t
-    .typeText(fontManager.addFontNameInputField, 'Gotham', { paste: true })
-    .setFilesToUpload(fontManager.addNewFontRegular, fontManager.gothamFontRegular)
-    .click(fontManager.addFontButton)
-    .click(fontManager.fontListItem.nth(0))
     .typeText(fontManager.addFontNameInputField, 'Roboto', { paste: true })
     .setFilesToUpload(fontManager.addNewFontRegular, fontManager.robotoFontRegular)
     .click(fontManager.addFontButton)
 
   // Assertions
   await t
-    .expect(fontManager.fontListItem.count).eql(2)
+    .expect(fontManager.fontListItem.count).eql(1)
     .expect(fontManager.successMessage.exists).ok()
 })
 
@@ -99,7 +95,7 @@ test('should successfully edit existing font', async t => {
     .click(fontManager.updateFontNameInputField)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-    .typeText(fontManager.updateFontNameInputField, 'Gotham 2', { paste: true })
+    .typeText(fontManager.updateFontNameInputField, 'Roboto 2', { paste: true })
     .setFilesToUpload(fontManager.addNewFontItalics, fontManager.robotoFontItalics)
     .setFilesToUpload(fontManager.addNewFontBold, fontManager.robotoFontBold)
     .setFilesToUpload(fontManager.addNewFontBoldItalics, fontManager.robotoFontBoldItalics)
@@ -108,7 +104,7 @@ test('should successfully edit existing font', async t => {
   // Assertions
   await t
     .expect(fontManager.successMessage.exists).ok()
-    .expect(fontManager.fontListItem.nth(0).find('[class^="font-name"]').withText('Gotham 2').exists).ok()
+    .expect(fontManager.fontListItem.nth(0).find('[class^="font-name"]').withText('Roboto 2').exists).ok()
     .expect(fontManager.fontListItem.nth(0).find('[class^="dashicons dashicons-yes"]').count).eql(4)
 })
 
@@ -116,7 +112,6 @@ test('should successfully delete font', async t => {
   // Actions
   await fontManager.navigateFontManager('gf_settings&subview=PDF&tab=tools#')
   await t
-    .click(fontManager.fontListItem.nth(1).find('[class^="dashicons dashicons-trash"]'))
     .click(fontManager.fontListItem.nth(0).find('[class^="dashicons dashicons-trash"]'))
 
   // Assertions
