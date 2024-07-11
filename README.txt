@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.11.0 =
+* Housekeeping: Remove downgrade notice to unsupported Gravity PDF v5.0 if minimum system requirements are not met for v6.0
+
 = 6.10.2 =
 * Bug: Hydrate Nested Forms with Gravity Wiz Populate Anything data
 
