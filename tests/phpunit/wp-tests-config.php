@@ -1,10 +1,9 @@
 <?php
-
 /**
  * The base configuration for WordPress
  *
  * The wp-config.php creation script uses this file during the installation.
- * You don't have to use the web site, you can copy this file to "wp-config.php"
+ * You don't have to use the website, you can copy this file to "wp-config.php"
  * and fill in the values.
  *
  * This file contains the following configurations:
@@ -16,7 +15,7 @@
  *
  * This has been slightly modified (to read environment variables) for use in Docker.
  *
- * @link    https://wordpress.org/support/article/editing-wp-config-php/
+ * @link    https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
  *
  * @package WordPress
  */
@@ -50,7 +49,7 @@ define( 'DB_PASSWORD', getenv_docker( 'WORDPRESS_DB_PASSWORD', 'example password
 
 /**
  * Docker image fallback values above are sourced from the official WordPress installation wizard:
- * https://github.com/WordPress/WordPress/blob/f9cc35ebad82753e9c86de322ea5c76a9001c7e2/wp-admin/setup-config.php#L216-L230
+ * https://github.com/WordPress/WordPress/blob/1356f6537220ffdc32b9dad2a6cdbe2d010b7a88/wp-admin/setup-config.php#L224-L238
  * (However, using "example username" and "example password" in your database is strongly discouraged.  Please use strong, random credentials!)
  */
 
@@ -104,19 +103,20 @@ $table_prefix = getenv_docker( 'WORDPRESS_TABLE_PREFIX', 'wp_' );
  * For information on other constants that can be used for debugging,
  * visit the documentation.
  *
- * @link https://wordpress.org/support/article/debugging-in-wordpress/
+ * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
  */
+define( 'FS_METHOD', 'direct' );
 define( 'SCRIPT_DEBUG', false );
 define( 'WP_ENVIRONMENT_TYPE', 'local' );
 define( 'WP_PHP_BINARY', 'php' );
 define( 'WP_TESTS_EMAIL', 'admin@example.org' );
 define( 'WP_TESTS_TITLE', 'Test Blog' );
-define( 'WP_TESTS_DOMAIN', getenv_docker( 'WORDPRESS_URL', 'http://localhost:8889/' ) );
-define( 'WP_SITEURL', getenv_docker( 'WORDPRESS_URL', 'http://localhost:8889/' ) );
-define( 'WP_HOME', getenv_docker( 'WORDPRESS_URL', 'http://localhost:8889/' ) );
-define( 'WP_DEBUG', true );
-define( 'WP_DEBUG_DISPLAY', true );
+define( 'WP_TESTS_DOMAIN', 'example.org' );
+define( 'WP_SITEURL', 'http://example.org' );
+define( 'WP_HOME', 'http://example.org' );
+define( 'WP_DEBUG_DISPLAY', false );
 define( 'WP_DEBUG_LOG', '/var/www/html/wp-content/plugins/gravity-pdf/tmp/debug.log' );
+define( 'WP_DEBUG', true );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
@@ -138,5 +138,3 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', '/var/www/html/' );
 	define( 'WP_DEFAULT_THEME', 'default' );
 }
-
-/** Sets up WordPress vars and included files. */
