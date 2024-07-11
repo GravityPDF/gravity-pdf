@@ -26,6 +26,10 @@ class InitialiseSettings {
     if (pages.isFormSettings()) {
       this.processFormSettings()
     }
+
+    /* Prevent submission when selecting a setting tooltip button */
+    $('.gfpdf-tooltip').on('click', () => false)
+      .on('keypress', () => false)
   }
 
   /**
