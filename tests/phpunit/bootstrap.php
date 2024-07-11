@@ -19,9 +19,6 @@ function auth_redirect() {
 /* Define custom config to override the URL used for the test site */
 define( 'WP_TESTS_CONFIG_FILE_PATH', '/var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/wp-tests-config.php' );
 
-putenv( 'WORDPRESS_TABLE_PREFIX=phpunit_' );
-putenv( 'WORDPRESS_URL=http://example.org/' );
-
 /**
  * Gravity PDF Unit Tests Bootstrap
  *
