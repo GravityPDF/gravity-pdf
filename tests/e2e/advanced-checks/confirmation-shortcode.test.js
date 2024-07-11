@@ -68,7 +68,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
     .click(page.addBlockIcon)
     .typeText(page.searchBlock, 'shortcode', { paste: true })
     .click(page.shortcodeLink)
-    .typeText(page.shortcodeTextarea, shortcodeHolder, { paste: true })
+    .typeText(page.shortcodeTextarea, shortcodeHolder)
     .click(page.updateButton)
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
