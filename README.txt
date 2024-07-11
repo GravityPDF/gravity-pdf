@@ -4,7 +4,7 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
-Tested up to: 6.5
+Tested up to: 6.6
 Stable tag: 6.10.2
 Requires PHP: 7.3
 License: GPLv2 or later
