@@ -109,6 +109,8 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 = 6.11.0 =
 * Housekeeping: Remove downgrade notice to unsupported Gravity PDF v5.0 if minimum system requirements are not met for v6.0
+* Housekeeping: Improve log messages when creating and validating a Signed PDF URL
+* Bug: Self-heal the PDF signing secret key if it becomes invalid
 * Bug: Prevent the page reloading when selecting a tooltip on PDF settings pages
 
 = 6.10.2 =

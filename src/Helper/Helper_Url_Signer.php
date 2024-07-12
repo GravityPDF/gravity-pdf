@@ -3,7 +3,6 @@
 namespace GFPDF\Helper;
 
 use DateTime;
-use GFPDF\Exceptions\GravityPdfException;
 use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidExpiration;
 use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GPDFAPI;
@@ -39,6 +38,16 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 	 * @since 5.2
 	 */
 	public function sign( $url, $expiration ) {
+		$log = GPDFAPI::get_log_class();
+
+		$log->notice(
+			'Begin PDF URL signing process',
+			[
+				'url'        => $url,
+				'expiration' => $expiration,
+			]
+		);
+
 		$secret_key = GPDFAPI::get_plugin_option( 'signed_secret_token', '' );
 
 		/* If no secret key exists, generate it */
@@ -47,8 +56,10 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 			GPDFAPI::update_plugin_option( 'signed_secret_token', $secret_key );
 		}
 
-		if ( strlen( $secret_key ) !== 64 ) {
-			throw new GravityPdfException( 'Invalid secret key provided' );
+		/* If the secret key is ever corrupted, create a new one */
+		if ( ! is_string( $secret_key ) || strlen( $secret_key ) !== 64 ) {
+			$secret_key = $this->generate_secret_key();
+			GPDFAPI::update_plugin_option( 'signed_secret_token', $secret_key );
 		}
 
 		$url_signer = new Helper_Sha256_Url_Signer( $secret_key );
@@ -58,10 +69,26 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 			$expiration = ( (int) GPDFAPI::get_plugin_option( 'logged_out_timeout', '20' ) ) . ' minutes';
 		}
 
-		$date    = new DateTime();
-		$timeout = $date->modify( $expiration );
+		$log->notice( 'PDF URL signing period: ' . $expiration, [ 'url' => $url ] );
 
-		return $url_signer->sign( $url, $timeout );
+		$date = new DateTime();
+		$log->notice( 'PDF URL signing date: ' . $date->format( DateTime::W3C ), [ 'url' => $url ] );
+
+		$timeout = $date->modify( $expiration );
+		$log->notice( 'PDF URL signing expiration date: ' . $timeout->format( DateTime::W3C ), [ 'url' => $url ] );
+
+		$signed_url = $url_signer->sign( $url, $timeout );
+
+		$log->notice(
+			'End PDF URL signing process',
+			[
+				'signed_url' => $signed_url,
+				'url'        => $url,
+				'expiration' => $expiration,
+			]
+		);
+
+		return $signed_url;
 	}
 
 	/**
