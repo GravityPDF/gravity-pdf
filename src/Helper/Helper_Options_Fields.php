@@ -114,6 +114,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'  => 'number',
 						'size'  => 'small',
 						'std'   => 10,
+						'min'   => 1,
 					],
 
 					'default_font_colour'     => [
@@ -352,6 +353,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc2' => 'pt',
 						'type'  => 'number',
 						'size'  => 'small',
+						'min'   => 1,
 						'std'   => $this->get_option( 'default_font_size', 10 ),
 						'class' => 'gfpdf_font_size',
 					],

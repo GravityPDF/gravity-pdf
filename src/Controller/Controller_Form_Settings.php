@@ -160,6 +160,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'gfpdf_form_settings_sanitize', [ $this->options, 'sanitize_all_fields' ], 10, 4 );
 		add_filter( 'gfpdf_form_settings_sanitize_text', [ $this->model, 'parse_filename_extension' ], 15, 2 );
 		add_filter( 'gfpdf_form_settings_sanitize_text', [ $this->options, 'sanitize_trim_field' ], 15, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_textarea', [ $this->options, 'sanitize_trim_field' ] );
+		add_filter( 'gfpdf_form_settings_sanitize_number', [ $this->options, 'sanitize_number_field' ], 10, 4 );
+		add_filter( 'gfpdf_form_settings_sanitize_paper_size', [ $this->options, 'sanitize_paper_size' ] );
 		add_filter( 'gfpdf_form_settings_sanitize_hidden', [ $this->model, 'decode_json' ], 10, 2 );
 
 		add_filter( 'gfpdf_skip_highlight_errors', [ $this->model, 'check_custom_size_error_highlighting' ], 10, 3 );

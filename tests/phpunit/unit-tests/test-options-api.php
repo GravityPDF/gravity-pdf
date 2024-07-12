@@ -909,6 +909,30 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check the min/max number setting is respected
+	 *
+	 * @return void
+	 *
+	 * @since 6.11
+	 */
+	public function test_sanitize_number_field_min_max() {
+		$this->assertSame( 5, $this->options->sanitize_number_field( 0, '', [], [ 'min' => 5 ] ) );
+		$this->assertSame( 5, $this->options->sanitize_number_field( 4, '', [], [ 'min' => 5 ] ) );
+		$this->assertSame( 5, $this->options->sanitize_number_field( -6, '', [], [ 'min' => 5 ] ) );
+		$this->assertSame( 5, $this->options->sanitize_number_field( 5, '', [], [ 'min' => 5 ] ) );
+		$this->assertSame( 6, $this->options->sanitize_number_field( 6, '', [], [ 'min' => 5 ] ) );
+		$this->assertSame( 120, $this->options->sanitize_number_field( 120, '', [], [ 'min' => 5 ] ) );
+
+		$this->assertSame( -6, $this->options->sanitize_number_field( -6, '', [], [ 'max' => 5 ] ) );
+		$this->assertSame( 0, $this->options->sanitize_number_field( 0, '', [], [ 'max' => 5 ] ) );
+		$this->assertSame( 4, $this->options->sanitize_number_field( 4, '', [], [ 'max' => 5 ] ) );
+		$this->assertSame( 5, $this->options->sanitize_number_field( 5, '', [], [ 'max' => 5 ] ) );
+		$this->assertSame( 5, $this->options->sanitize_number_field( 6, '', [], [ 'max' => 5 ] ) );
+		$this->assertSame( 5, $this->options->sanitize_number_field( 10, '', [], [ 'max' => 5 ] ) );
+		$this->assertSame( 5, $this->options->sanitize_number_field( 120, '', [], [ 'max' => 5 ] ) );
+	}
+
+	/**
 	 * Test the paper size sanitization function
 	 *
 	 * @param array $expected
