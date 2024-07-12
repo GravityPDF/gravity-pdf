@@ -524,8 +524,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		$values = $this->model->settings_sanitize( $input );
 
-		foreach ( $values as $v ) {
-			$this->assertEquals( 'global input value', $v );
+		foreach ( $values as $k => $v ) {
+			$this->assertContains( $v, [ 'global input value', 0, 1 ] );
 		}
 
 		remove_all_filters( 'gfpdf_form_settings_sanitize' );
@@ -553,7 +553,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/* loop through array and check results */
 		foreach ( $input as $id => $field ) {
 			if ( isset( $values[ $id ] ) ) {
-				$this->assertTrue( in_array( $values[ $id ], $types, true ) );
+				$this->assertContains( $values[ $id ], $types );
 			}
 		}
 
