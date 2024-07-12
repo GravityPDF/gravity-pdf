@@ -44,6 +44,11 @@ class Test_Notices extends WP_UnitTestCase {
 		/* Setup our test classes */
 		$this->notices = new Helper_Notices();
 		$this->notices->init();
+
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $user_id );
+
+		set_current_screen( 'dashboard' );
 	}
 
 	/**
@@ -145,8 +150,8 @@ class Test_Notices extends WP_UnitTestCase {
 		$this->notices->process();
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, '<p>My First Notice</p>' ) );
-		$this->assertNotFalse( strpos( $html, '<p>My First Error</p>' ) );
+		$this->assertStringContainsString( '<p>My First Notice</p>', $html );
+		$this->assertStringContainsString( '<p>My First Error</p>', $html );
 	}
 
 	public function test_html_notice() {
@@ -158,85 +163,6 @@ class Test_Notices extends WP_UnitTestCase {
 		$this->notices->process();
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, $form ) );
-	}
-
-	/**
-	 * Testing hooks form gform_admin_messages and gform_admin_error_messages
-	 **/
-	public function test_gform_admin_messages_hooks() {
-		/* Set up PDF page */
-		remove_all_actions( 'init' );
-		$_GET['page']    = 'gf_entries';
-		$_GET['subview'] = 'PDF';
-		set_current_screen( 'dashboard-user' );
-		$notice = new Helper_Notices();
-		$notice->init();
-		do_action( 'init' );
-
-		$notice->add_notice( 'My First Notice.' );
-		$notice->add_error( 'My First Error.' );
-
-		/* Run this method to initialize the hooks overrides. */
-		$this->assertSame( 'My First Notice.', apply_filters( 'gform_admin_messages', [ 'Global Notice Message.' ] )[0] );
-		$this->assertSame( 'My First Error.', apply_filters( 'gform_admin_error_messages', [ 'Global Error Message.' ] )[0] );
-
-		/* Reset actions and $_GET parameters. */
-		remove_all_actions( 'gform_admin_messages' );
-		remove_all_actions( 'gform_admin_error_messages' );
-		unset( $_GET['page'], $_GET['subview'] );
-
-		/* Re-run this method to make sure that the hooks is skipped. */
-		$notice->maybe_remove_non_pdf_messages();
-		$this->assertSame( 'Global Notice Message.', apply_filters( 'gform_admin_messages', [ 'Global Notice Message.' ] )[0] );
-		$this->assertSame( 'Global Error Message.', apply_filters( 'gform_admin_error_messages', [ 'Global Error Message.' ] )[0] );
-	}
-
-	public function test_empty_set_gravitypdf_errors() {
-		$this->notices->clear( 'errors' );
-		$this->assertCount( 0, $this->notices->set_gravitypdf_errors( [] ) );
-	}
-
-	public function test_empty_set_gravitypdf_notices() {
-		$this->notices->clear( 'notices' );
-		$this->assertCount( 0, $this->notices->set_gravitypdf_notices( [] ) );
-	}
-
-	/* Test if reset_gravityforms_messages always return empty. */
-	public function test_reset_gravityforms_messages() {
-		$this->assertCount( 0, $this->notices->reset_gravityforms_messages( [ 'test' ] ) );
-	}
-
-	/* Non Filter tests, make sure that errors and messages were properly merged and return. */
-	public function test_set_gravitypdf_notices() {
-		$this->notices->add_notice( 'My Third Notice.' );
-		$this->notices->add_notice( 'My Fourth Notice.' );
-
-		$messages = $this->notices->set_gravitypdf_notices( [ 'My First Notice.', 'My Second Notice.' ] );
-
-		$this->assertCount( 4, $messages );
-		/* Test merge positions. */
-		$this->assertSame( 'My First Notice.', $messages[0] );
-		$this->assertSame( 'My Third Notice.', $messages[2] );
-
-		$this->notices->clear( 'notices' );
-		$this->assertCount( 2, $this->notices->set_gravitypdf_notices( [ 'My First Error.', 'My Second Error.' ] ) );
-		$this->assertEmpty( $this->notices->set_gravitypdf_notices( [] ) );
-	}
-
-	public function test_set_gravitypdf_error() {
-		$this->notices->add_error( 'My Third Error.' );
-		$this->notices->add_error( 'My Fourth Error.' );
-
-		$messages = $this->notices->set_gravitypdf_errors( [ 'My First Error.', 'My Second Error.' ] );
-
-		$this->assertCount( 4, $messages );
-		/* Test merge positions. */
-		$this->assertSame( 'My First Error.', $messages[0] );
-		$this->assertSame( 'My Third Error.', $messages[2] );
-
-		$this->notices->clear( 'errors' );
-		$this->assertCount( 2, $this->notices->set_gravitypdf_errors( [ 'My First Error.', 'My Second Error.' ] ) );
-		$this->assertEmpty( $this->notices->set_gravitypdf_errors( [] ) );
+		$this->assertStringContainsString( $form, $html );
 	}
 }

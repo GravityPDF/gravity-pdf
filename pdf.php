@@ -40,9 +40,8 @@ require_once PDF_PLUGIN_DIR . 'src/Controller/Controller_Activation.php';
 register_deactivation_hook( __FILE__, array( 'Controller_Activation', 'deactivation' ) );
 
 /**
- *
- * Our initialisation class
- * Check all the dependancy requirements are met, otherwise fallback and show appropriate user error
+ * Plugin initialization class
+ * Check dependency requirements are met before loading. If not, inform user of the problem
  *
  * @since 4.0
  */
@@ -143,17 +142,17 @@ class GFPDF_Major_Compatibility_Checks {
 		$this->check_dom();
 		$this->check_ram( ini_get( 'memory_limit' ) );
 
-		/* Check if any errors were thrown, enqueue them and exit early */
+		/* Check if any errors were thrown, enqueue them to display on specific admin pages and exit early */
 		if ( count( $this->notices ) > 0 ) {
-			if ( class_exists( 'GFForms' ) && GFForms::is_gravity_page() ) {
-				ob_start();
-				$this->notice_body_content();
-				GFCommon::add_error_message( ob_get_clean() );
+			global $pagenow;
 
-				return;
+			$is_admin_area       = is_admin();
+			$is_specific_wp_page = in_array( $pagenow, [ 'index.php', 'plugins.php', 'options-general.php' ], true );
+			$is_specific_gf_page = $pagenow === 'admin.php' && in_array( $_GET['page'] ?? '', [ 'gf_edit_forms', 'gf_entries', 'gf_settings' ], true ); /* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
+
+			if ( $is_admin_area && ( $is_specific_wp_page || $is_specific_gf_page ) ) {
+				add_action( 'admin_notices', [ $this, 'display_notices' ] );
 			}
-
-			add_action( 'admin_notices', array( $this, 'display_notices' ) );
 
 			return;
 		}
@@ -389,26 +388,35 @@ class GFPDF_Major_Compatibility_Checks {
 	 * @since 4.0
 	 */
 	public function display_notices() {
+		$classes = class_exists( 'GFForms' ) && GFForms::is_gravity_page() ?
+			'notice gf-notice notice-error' :
+			'notice error';
 		?>
-		<div class="error">
+		<div class="<?php echo esc_attr( $classes ); ?>">
 			<?php $this->notice_body_content(); ?>
 		</div>
 		<?php
 	}
 
 	/**
+	 * Detail detailed error message if user can activate plugins, otherwise show generic message
+	 *
 	 * @since 6.0
 	 */
 	public function notice_body_content() {
 		?>
-		<p><strong><?php esc_html_e( 'Gravity PDF Installation Problem', 'gravity-forms-pdf-extended' ); ?></strong></p>
+		<?php if ( current_user_can( 'activate_plugins' ) ): ?>
+			<p><strong><?php esc_html_e( 'Gravity PDF Installation Problem', 'gravity-forms-pdf-extended' ); ?></strong></p>
 
-		<p><?php esc_html_e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to use the plugin:', 'gravity-forms-pdf-extended' ); ?></p>
-		<ul style="padding-bottom: 0">
-			<?php foreach ( $this->notices as $notice ): ?>
-				<li style="padding-left: 20px;list-style: inside"><?php echo wp_kses_post( $notice ); ?></li>
-			<?php endforeach; ?>
-		</ul>
+			<p><?php esc_html_e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to use the plugin:', 'gravity-forms-pdf-extended' ); ?></p>
+			<ul style="padding-bottom: 0">
+				<?php foreach ( $this->notices as $notice ): ?>
+					<li style="padding-left: 20px;list-style: inside"><?php echo wp_kses_post( $notice ); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		<?php else: ?>
+			<p><?php esc_html_e( 'The minimum requirements for the Gravity PDF plugin have not been met. Please contact the site administrator for assistance.', 'gravity-forms-pdf-extended' ); ?></p>
+		<?php endif; ?>
 		<?php
 	}
 }
