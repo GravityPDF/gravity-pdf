@@ -355,6 +355,19 @@ class Model_PDF extends Helper_Abstract_Model {
 							'entry_id'    => $entry['id'],
 							'pdf_id'      => $settings['id'],
 							'url'         => $url,
+							'protocol'    => $protocol, /* Logged to a plain text file */
+							'domain'      => $domain, /* Logged to a plain text file */
+							'request_uri' => $request, /* Logged to a plain text file */
+						]
+					);
+				} else {
+					$this->log->warning(
+						'Invalid PDF Signing Request',
+						[
+							'entry_id'    => $entry['id'],
+							'pdf_id'      => $settings['id'],
+							'url'         => $url,
+							'protocol'    => $protocol, /* Logged to a plain text file */
 							'domain'      => $domain, /* Logged to a plain text file */
 							'request_uri' => $request, /* Logged to a plain text file */
 						]
