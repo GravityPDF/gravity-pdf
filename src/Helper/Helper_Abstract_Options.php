@@ -322,8 +322,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$settings = $is_temp ? (array) $tmp_settings : get_option( 'gfpdf_settings', [] );
 
 		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_settings/ for more details about this filter */
+		$settings = apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
 
-		return apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
+		/* Ensure $settings is an array and has not been corrupted somehow */
+		$settings = is_array( $settings ) ? $settings : [];
+
+		return $settings;
 	}
 
 	/**
