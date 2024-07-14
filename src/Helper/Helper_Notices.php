@@ -53,30 +53,15 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	public function add_actions(): void {
 		add_action( $this->get_notice_type(), [ $this, 'process' ] );
-		add_action( 'init', [ $this, 'maybe_remove_non_pdf_messages' ] );
 	}
 
 	/**
 	 * Override GF notices on Gravity PDF pages
 	 *
 	 * @since 6.5
+	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
-	public function maybe_remove_non_pdf_messages(): void {
-		if ( ! \GPDFAPI::get_misc_class()->is_gfpdf_page() ) {
-			return;
-		}
-
-		/* Remove existing notice */
-		remove_action( $this->get_notice_type(), [ $this, 'process' ] );
-
-		/* Delete Gravity Forms notices */
-		add_action( 'gform_admin_messages', [ $this, 'reset_gravityforms_messages' ], 999 );
-		add_action( 'gform_admin_error_messages', [ $this, 'reset_gravityforms_messages' ], 999 );
-
-		/* Show Gravity PDF Notices */
-		add_action( 'gform_admin_messages', [ $this, 'set_gravitypdf_notices' ], 1000 );
-		add_action( 'gform_admin_error_messages', [ $this, 'set_gravitypdf_errors' ], 1000 );
-	}
+	public function maybe_remove_non_pdf_messages(): void {}
 
 	/**
 	 * Determine which notice should be triggered
@@ -162,8 +147,13 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * Process our admin notice and error messages
 	 *
 	 * @since 4.0
+	 * @since 6.11 Restrict admin pages the notices can be displayed on
 	 */
 	public function process(): void {
+		if ( ! $this->can_display_notice_on_this_page() ) {
+			return;
+		}
+
 		foreach ( $this->notices as $class => $notice ) {
 			$include_class = ( ! is_int( $class ) ) ? $class : '';
 			$this->html( $notice, 'updated ' . $include_class );
@@ -197,13 +187,57 @@ class Helper_Notices implements Helper_Interface_Actions {
 
 		add_filter( 'wp_kses_allowed_html', $allow_form_elements );
 
+		/* Add specific classes on Gravity Forms page so the notice displays correctly */
+		if ( class_exists( 'GFForms' ) && \GFForms::is_gravity_page() ) {
+			$classes  = 'notice gf-notice gform-settings__wrapper ' . $class;
+			$classes .= strpos( $class, 'updated' ) !== false ? ' notice-success' : '';
+		} else {
+			$classes = 'notice ' . $class;
+		}
+
 		?>
-		<div class="<?php echo esc_attr( $class ); ?> notice">
+		<div class="<?php echo esc_attr( $classes ); ?>">
 			<p><?php echo wp_kses_post( $text ); ?></p>
 		</div>
 		<?php
 
 		remove_filter( 'wp_kses_allowed_html', $allow_form_elements );
+	}
+
+	/**
+	 * Restrict notices to:
+	 *
+	 * 1. Any Gravity PDF admin pages
+	 * 2. GF Forms, Entry, and Settings pages
+	 * 3. WP Dashboard, Plugins List, and General Settings pages
+	 *
+	 * @return bool
+	 *
+	 * @since 6.11
+	 */
+	protected function can_display_notice_on_this_page() {
+		global $pagenow;
+
+		$misc = \GPDFAPI::get_misc_class();
+
+		$is_admin_area       = is_admin();
+		$is_specific_wp_page = in_array( $pagenow, [ 'index.php', 'plugins.php', 'options-general.php' ], true );
+		$is_specific_gf_page = $pagenow === 'admin.php' && in_array( rgget( 'page' ), [ 'gf_edit_forms', 'gf_entries', 'gf_settings' ], true );
+		$is_gpdf_page        = $misc->is_gfpdf_page();
+
+		if ( $is_gpdf_page ) {
+			return true;
+		}
+
+		if ( $is_admin_area && $is_specific_gf_page ) {
+			return true;
+		}
+
+		if ( $is_admin_area && $is_specific_wp_page ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -214,9 +248,10 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @return array $this->errors
 	 *
 	 * @since 6.5
+	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
-	public function reset_gravityforms_messages( $messages ): array {
-		return [];
+	public function reset_gravityforms_messages( $messages ) {
+		return $messages;
 	}
 
 	/**
@@ -227,14 +262,10 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @return array
 	 *
 	 * @since 6.5
+	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
-	public function set_gravitypdf_notices( $messages ): array {
-		/* Error handling if we don't get the correct input type */
-		if ( ! is_array( $messages ) ) {
-			return $messages;
-		}
-
-		return array_merge( $messages, $this->notices );
+	public function set_gravitypdf_notices( $messages ) {
+		return $messages;
 	}
 
 	/**
@@ -245,13 +276,9 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @return array
 	 *
 	 * @since 6.5
+	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
-	public function set_gravitypdf_errors( $errors ): array {
-		/* Error handling if we don't get the correct input type */
-		if ( ! is_array( $errors ) ) {
-			return $errors;
-		}
-
-		return array_merge( $errors, $this->errors );
+	public function set_gravitypdf_errors( $errors ) {
+		return $errors;
 	}
 }

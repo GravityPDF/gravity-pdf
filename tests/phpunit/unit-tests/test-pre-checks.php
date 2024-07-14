@@ -162,6 +162,10 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_loader_notice() {
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $user_id );
+		set_current_screen( 'dashboard' );
+
 		/* trigger a notice (it's a private variable) */
 		$this->test_check_ram( '40M', false );
 

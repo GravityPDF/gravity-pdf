@@ -46,6 +46,11 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	public $entry = [];
 
 	/**
+	 * @var array Array of GF Entries
+	 */
+	public $entries = [];
+
+	/**
 	 * @var  array $form_data
 	 */
 	public $form_data = [];
