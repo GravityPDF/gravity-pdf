@@ -132,6 +132,9 @@ class GFPDF_Major_Compatibility_Checks {
 	 */
 	public function plugins_loaded() {
 
+		/* Register language files early so startup errors can be translated */
+		load_plugin_textdomain( 'gravity-forms-pdf-extended', false, dirname( plugin_basename( __FILE__ ) ) . '/src/assets/languages/' );
+
 		/* Check minimum requirements are met */
 		$this->is_compatible_wordpress_version();
 		$this->check_gravity_forms();
@@ -220,7 +223,7 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Check PHP version is compatible */
 		if ( ! version_compare( phpversion(), $this->required_php_version, '>=' ) ) {
-			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag */
+			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. HTML Anchor Open Tag 4. HTML Anchor Close Tag */
 			$this->notices[] = sprintf( esc_html__( 'You are running an %1$soutdated version of PHP%2$s. Contact your web hosting provider to update. %3$sGet more information%4$s.', 'gravity-forms-pdf-extended' ), '<a href="https://wordpress.org/support/update-php/">', '</a>', '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#you-are-running-an-outdated-version-of-php">', '</a>' );
 
 			return false;
@@ -240,8 +243,8 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Check MB String is installed */
 		if ( ! extension_loaded( 'mbstring' ) ) {
-			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag */
-			$this->notices[] = sprintf( esc_html__( 'The PHP extension MB String could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-mb-string-could-not-be-detected">', '</a>' );
+			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name */
+			$this->notices[] = sprintf( esc_html__( 'The PHP extension %3$s could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-mb-string-could-not-be-detected">', '</a>', 'MB String' );
 
 			return false;
 		}
@@ -278,8 +281,8 @@ class GFPDF_Major_Compatibility_Checks {
 	 */
 	public function check_ctype() {
 		if ( ! extension_loaded( 'ctype' ) ) {
-			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag */
-			$this->notices[] = sprintf( esc_html__( 'The PHP extension Ctype could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-ctype-could-not-be-detected">', '</a>' );
+			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name */
+			$this->notices[] = sprintf( esc_html__( 'The PHP extension %3$s could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-ctype-could-not-be-detected">', '</a>', 'Ctype' );
 
 			return false;
 		}
@@ -298,8 +301,8 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Check GD Image Library is installed */
 		if ( ! extension_loaded( 'gd' ) ) {
-			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag */
-			$this->notices[] = sprintf( esc_html__( 'The PHP extension GD Image Library could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-gd-image-library-could-not-be-detected">', '</a>' );
+			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name */
+			$this->notices[] = sprintf( esc_html__( 'The PHP extension %3$s could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-gd-image-library-could-not-be-detected">', '</a>', 'GD Image Library' );
 
 			return false;
 		}
@@ -318,16 +321,16 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Check DOM Class is installed */
 		if ( ! extension_loaded( 'dom' ) || ! class_exists( 'DOMDocument' ) ) {
-			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag */
-			$this->notices[] = sprintf( esc_html__( 'The PHP extension DOM could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-dom-extension-was-not-found">', '</a>' );
+			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name */
+			$this->notices[] = sprintf( esc_html__( 'The PHP extension %3$s could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-dom-extension-was-not-found">', '</a>', 'DOM' );
 
 			return false;
 		}
 
 		/* Check libxml is loaded */
 		if ( ! extension_loaded( 'libxml' ) ) {
-			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag */
-			$this->notices[] = sprintf( esc_html__( 'The PHP extension libxml could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-libxml-could-not-be-detected">', '</a>' );
+			/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name */
+			$this->notices[] = sprintf( esc_html__( 'The PHP extension %3$s could not be detected. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-libxml-could-not-be-detected">', '</a>', 'libxml' );
 
 			return false;
 		}

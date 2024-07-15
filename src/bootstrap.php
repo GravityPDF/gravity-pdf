@@ -228,9 +228,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->webhooks();
 		$this->zapier();
 
-		/* Add localisation support */
-		$this->add_localization_support();
-
 		/*
 		 * Run generic actions and filters needed to get the plugin functional
 		 * The controllers will set more specific actions / filters as needed
@@ -282,16 +279,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Add class when on Gravity PDF pages */
 		add_filter( 'admin_body_class', [ $this, 'add_body_class' ] );
-	}
-
-
-	/**
-	 * Setup WordPress localization support
-	 *
-	 * @since 4.0
-	 */
-	private function add_localization_support() {
-		load_plugin_textdomain( 'gravity-forms-pdf-extended', false, dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
 	}
 
 	/**
