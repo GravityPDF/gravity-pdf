@@ -118,6 +118,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 * Bug: Self-heal the PDF signing secret key if it becomes invalid
 * Bug: Self-heal the Global PDF Settings if it becomes invalid
 * Bug: Prevent the page reloading when selecting a tooltip on PDF settings pages
+* Bug: Register language files early so startup errors can be translated
 
 = 6.10.2 =
 * Bug: Hydrate Nested Forms with Gravity Wiz Populate Anything data
