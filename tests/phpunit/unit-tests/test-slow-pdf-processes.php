@@ -7,6 +7,7 @@ use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Statics\Cache;
 use GFPDF\View\View_PDF;
 use GFPDF_Core_Model;
 use GPDFAPI;
@@ -407,21 +408,27 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * works as expected.
 	 */
 	public function test_deprecated_save_pdf() {
-		global $gfpdf;
+		$form_class = \GPDFAPI::get_form_class();
 
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $results['form'];
+		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
 
-		$filename = $gfpdf->data->template_tmp_location . "11556690c67856b/test-{$form['id']}.pdf";
-
-		if ( is_file( $filename ) ) {
-			unlink( $filename );
-		}
+		$filename = "test-{$form['id']}.pdf";
 
 		GFPDF_Core_Model::gfpdfe_save_pdf( $entry, $form );
-		$this->assertTrue( is_file( $filename ) );
 
-		unlink( $filename );
+		$pdfs = GPDFAPI::get_entry_pdfs( $entry['id'] );
+		foreach ( $pdfs as $pdf ) {
+			/* Skip non-core PDFs */
+			if ( ! in_array( $pdf['template'], [ 'zadani', 'focus-gravity', 'rubix', 'blank-slate' ], true ) ) {
+				continue;
+			}
+
+			/* Get PDF directory path from cache */
+			$path = Cache::get_path( $form, $entry, $pdf );
+			$this->assertFileExists( $path . $filename );
+			unlink( $path . $filename );
+		}
 	}
 }

@@ -77,6 +77,22 @@ class Cache {
 	 * @since    6.12.0
 	 */
 	public static function get_hash( $form, $entry, $pdf_settings ) {
+		/*
+		 * Remove invalid field property which Gravity Forms can unintentionally add to fields when outputting field values.
+		 *
+		 * The issue was identified when generating a PDF and checking if a Section Break was empty.
+		 * This eventually calls GF_Field::get_allowable_tags(), which accesses `$this->form_id` instead of `$this->formId`.
+		 * As all form fields are PHP objects, the new property is added to the object when accessed and eventually gets hashed below.
+		 * This becomes a problem when generating the same PDF repeatedly during a single request, as the cache is bypassed every call.
+		 * Until the issue is fixed upstream, we'll force-remove the invalid property.
+		 */
+		array_map(
+			function( $field ) {
+				unset( $field['form_id'] );
+			},
+			$form['fields']
+		);
+
 		return sprintf(
 			'%1$d-%2$d-%3$s',
 			$form['id'] ?? 0,
