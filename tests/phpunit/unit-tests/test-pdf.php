@@ -222,7 +222,7 @@ class Test_PDF extends WP_UnitTestCase {
 		try {
 			$this->controller->process_pdf_endpoint();
 		} catch ( Exception $e ) {
-			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+			$this->assertEquals( 'There was a problem creating the PDF', $e->getMessage() );
 
 			return;
 		}
@@ -249,7 +249,7 @@ class Test_PDF extends WP_UnitTestCase {
 		try {
 			$results = $this->controller->process_legacy_pdf_endpoint();
 		} catch ( Exception $e ) {
-			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+			$this->assertEquals( 'There was a problem creating the PDF', $e->getMessage() );
 
 			return;
 		}
@@ -300,7 +300,7 @@ class Test_PDF extends WP_UnitTestCase {
 			/* Do nothing here */
 		}
 
-		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+		$this->assertEquals( 'There was a problem creating the PDF', $e->getMessage() );
 
 		/* Authorise the current user and check the message is displayed correctly */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );

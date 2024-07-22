@@ -162,7 +162,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		do_action( 'gfpdf_view_or_download_pdf', $form, $entry, $settings );
 
-		$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ); /* Backwards compat */
+		$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ?? 'download' ); /* Backwards compat */
 
 		/* Setup the PDF that will be generated */
 		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
