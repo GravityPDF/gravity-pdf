@@ -14,25 +14,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Manages the directory structure for the temporary PDF cache
+ *
  * @since 6.12.0
  */
 class Cache {
 
+	/**
+	 * @var string|null Holds the cache directory path
+	 * @since 6.12.0
+	 */
 	protected static $template_tmp_location = null;
 
+	/**
+	 * Get the unique directory path for the current PDF
+	 *
+	 * @param array $form         The form object
+	 * @param array $entry        The entry object
+	 * @param array $pdf_settings The PDF object/settings
+	 *
+	 * @return string
+	 *
+	 * @since 6.12.0
+	 */
 	public static function get_path( $form, $entry, $pdf_settings ) {
 		return self::get_basepath() . self::get_hash( $form, $entry, $pdf_settings ) . '/';
 	}
 
-	public static function get_hash( $form, $entry, $pdf_settings ) {
-		return sprintf(
-			'%1$d-%2$d-%3$s',
-			$form['id'] ?? 0,
-			$entry['id'] ?? 0,
-			wp_hash( wp_json_encode( [ $form, $entry, $pdf_settings ] ) )
-		);
-	}
-
+	/**
+	 * Get and set the cache directory basepath
+	 *
+	 * @return string
+	 * @since 6.12.0
+	 */
 	protected static function get_basepath() {
 		if ( self::$template_tmp_location !== null ) {
 			return self::$template_tmp_location;
@@ -47,5 +61,27 @@ class Cache {
 		self::$template_tmp_location = trailingslashit( $base_path ) . 'cache/';
 
 		return self::$template_tmp_location;
+	}
+
+	/**
+	 * Calculate a unique hash based on the form/entry/pdf objects
+	 *
+	 * @param array $form         The form object
+	 * @param array $entry        The entry object
+	 * @param array $pdf_settings The PDF object/settings
+	 *
+	 * @return string
+	 *
+	 * @internal if $form, $entry, or $pdf_settings are modified a new hash and PDF will be generated
+	 *
+	 * @since    6.12.0
+	 */
+	public static function get_hash( $form, $entry, $pdf_settings ) {
+		return sprintf(
+			'%1$d-%2$d-%3$s',
+			$form['id'] ?? 0,
+			$entry['id'] ?? 0,
+			wp_hash( wp_json_encode( [ $form, $entry, $pdf_settings ] ) )
+		);
 	}
 }
