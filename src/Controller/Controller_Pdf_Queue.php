@@ -93,7 +93,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Disable the form submission notifications if PDF attached and GF async notifications not enabled
+	 * Disable the form submission notifications if PDF attached and GF async notifications not enabled/notification is enabled
 	 *
 	 * @param bool  $is_disabled
 	 * @param array $notification
@@ -113,6 +113,11 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 
 		/* Not form submission event */
 		if ( empty( $notification['event'] ) || $notification['event'] !== 'form_submission' ) {
+			return $is_disabled;
+		}
+
+		/* Skip if the notification is not enabled or conditional logic doesn't pass */
+		if ( ! $this->is_notification_enabled( $notification['id'] ?? '', $form, $entry ) ) {
 			return $is_disabled;
 		}
 
@@ -319,28 +324,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Get all active notifications who's conditional logic has been met
-	 *
-	 * @param $form
-	 * @param $entry
-	 *
-	 * @return array
-	 *
-	 * @since 5.0
-	 */
-	protected function get_active_notifications( $form, $entry ) {
-		$notifications = GFCommon::get_notifications_to_send( 'form_submission', $form, $entry );
-		$notifications = array_filter(
-			$notifications,
-			function( $notification ) {
-				return ( ! isset( $notification['isActive'] ) || $notification['isActive'] );
-			}
-		);
-
-		return $notifications;
-	}
-
-	/**
 	 * Queue up the PDFs that should always be saved to disk, or should be attached to one of the notifications
 	 *
 	 * @param array $notifications
@@ -419,6 +402,34 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 		$queue_data = apply_filters( 'gfpdf_queue_post_notifications', $queue_data, $entry, $form );
 
 		return $queue_data;
+	}
+
+	/**
+	 * Verify the notification is still enabled for the current form/entry when sending
+	 *
+	 * @param string $notification_id
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return bool
+	 *
+	 * @since 6.11.1
+	 */
+	protected function is_notification_enabled( $notification_id, $form, $entry ) {
+		if ( ! isset( $form['notifications'][ $notification_id ] ) ) {
+			return false;
+		}
+
+		$notification = $form['notifications'][ $notification_id ];
+		if ( empty( $notification['isActive'] ) ) {
+			return false;
+		}
+
+		if ( ! \GFCommon::evaluate_conditional_logic( rgar( $notification, 'conditionalLogic' ), $form, $entry ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

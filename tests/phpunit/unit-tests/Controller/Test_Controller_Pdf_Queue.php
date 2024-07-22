@@ -190,13 +190,55 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 				$entry
 			)
 		);
+
+		/* Test we skip inactive notifications */
+		$this->assertFalse(
+			$this->controller->maybe_disable_submission_notifications(
+				false,
+				$form['notifications']['54bca349732b8'],
+				$form,
+				$entry
+			)
+		);
+
+		$form['notifications']['54bca349732b8']['isActive'] = true;
+
 		$this->assertTrue(
 			$this->controller->maybe_disable_submission_notifications(
 				false,
+				$form['notifications']['54bca349732b8'],
+				$form,
+				$entry
+			)
+		);
+
+		/* Test we skip notifications that do not pass conditional logic */
+		$form['notifications']['54bca349732b8']['conditionalLogic'] = [
+			'logicType' => 'any',
+			'rules'     => [
 				[
-					'id'    => '54bca349732b8',
-					'event' => 'form_submission',
+					'fieldId'  => 1,
+					'operator' => 'isnot',
+					'value'    => 'My Single Line Response',
 				],
+			],
+		];
+
+		$this->assertFalse(
+			$this->controller->maybe_disable_submission_notifications(
+				false,
+				$form['notifications']['54bca349732b8'],
+				$form,
+				$entry
+			)
+		);
+
+		$form['notifications']['54bca349732b8']['conditionalLogic']['rules'][0]['operator'] = 'is';
+
+		$this->assertTrue(
+			$this->controller->maybe_disable_submission_notifications(
+				false,
+				$form['notifications']['54bca349732b8'],
 				$form,
 				$entry
 			)
@@ -219,10 +261,7 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 		$this->assertFalse(
 			$this->controller->maybe_disable_submission_notifications(
 				false,
-				[
-					'id'    => '54bca349732b8',
-					'event' => 'form_submission',
-				],
+				$form['notifications']['54bca349732b8'],
 				$form,
 				$entry
 			)
