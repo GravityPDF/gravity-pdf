@@ -293,7 +293,10 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Send the PDF to the client */
 		header( 'Content-Type: application/pdf' );
 
-		/* Set the filename, supporting the new utf-8 syntax + backwards compatibility */
+		/*
+		 * Set the filename, supporting the new utf-8 syntax + backwards compatibility
+		 * Refer to RFC 8187 https://www.rfc-editor.org/rfc/rfc8187.html
+		 */
 		header(
 			sprintf(
 				'Content-disposition: %1$s; filename="%2$s"; filename*=utf-8\'\'%2$s',
