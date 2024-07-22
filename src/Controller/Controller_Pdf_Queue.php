@@ -242,6 +242,21 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	}
 
 	/**
+	 * Delete PDFs from disk once all tasks are processed
+	 *
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return void
+	 *
+	 * @since 6.11.0
+	 * @deprecated 6.12.0 Caching layer + auto-purge added
+	 */
+	public function queue_cleanup_task( $form, $entry ) {
+		_doing_it_wrong( esc_html( 'queue_cleanup_task() was removed in Gravity PDF 6.12' ) );
+	}
+
+	/**
 	 * Dispatch the queue if it has any tasks
 	 *
 	 * @return void
