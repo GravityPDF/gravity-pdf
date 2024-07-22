@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.11.1 =
+* Bug: Only process enabled notifications during form submission when using PDF Background Processing. Notifications are enabled if they are active and have conditional logic that passes.
+
 = 6.11.0 =
 * Housekeeping: Limit pages admin notices are displayed on to reduce notice fatigue
 * Housekeeping: Add specific check for the PHP extension `Ctype` when the plugin loads
