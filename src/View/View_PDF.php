@@ -259,7 +259,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * @deprecated 4.1
 	 */
 	public function get_template_filename( $name ) {
-		$this->misc->get_file_with_extension( $name, '.php' );
+		return $this->misc->get_file_with_extension( $name, '.php' );
 	}
 
 	/**
