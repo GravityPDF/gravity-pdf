@@ -156,15 +156,20 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		/* Disable all middleware and check if PDF generation begins */
 		remove_all_filters( 'gfpdf_pdf_middleware' );
 
-		try {
-			$this->model->process_pdf( $pid, $lid );
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
-
-			return;
+		/* Verify the PDF generation begins and then fails as expected */
+		$results = $this->model->process_pdf( $pid, $lid );
+		if ( ! is_wp_error( $results ) ) {
+			$this->fail( 'This test did not fail as expected' );
 		}
 
-		$this->fail( 'This test did not fail as expected' );
+		/*
+		 * Prior to 6.12 $this->model->process_pdf() would call $this->view->generate_pdf()
+		 * and any errors would be output via wp_die(), which could be caught as an exception
+		 * in PHPUnit. Now that process_pdf() runs through $this->model->generate_and_save_pdf()
+		 * any errors are returned back up the chain for $this->controller->process_pdf_endpoint() to handle.
+		 * This is the reason this unit test was modified to explicitly check is_wp_error().
+		 */
+		$this->assertEquals( 'pdf_generation_failure', $results->get_error_code() );
 	}
 
 	/**
