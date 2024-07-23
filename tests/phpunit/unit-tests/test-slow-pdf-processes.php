@@ -207,25 +207,29 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	public function test_maybe_save_pdf() {
 		global $gfpdf;
 
+		$form_class = \GPDFAPI::get_form_class();
+
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $results['form'];
-		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/test-{$form['id']}.pdf";
+		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
+
+		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
+		$file = "test-{$form['id']}.pdf";
 
 		$this->model->maybe_save_pdf( $entry, $form );
 
 		/* Check the results are successful */
-		$this->assertFileExists( $file );
+		$this->assertFileExists( $path . $file );
 
 		/* Clean up */
-		unlink( $file );
+		unlink( $path . $file );
 
 		/* Ensure function doesn't run when background processing enabled */
 		$gfpdf->options->update_option( 'background_processing', 'Yes' );
 
 		$this->model->maybe_save_pdf( $entry, $form );
-		$this->assertFileDoesNotExist( $file );
+		$this->assertFileDoesNotExist( $path . $file );
 	}
 
 	/**

@@ -5,6 +5,7 @@ namespace GFPDF\Tests;
 use Exception;
 use GFPDF\Controller\Controller_Pdf_Queue;
 use GFPDF\Helper\Helper_Pdf_Queue;
+use GFPDF\Statics\Cache;
 use GFPDF\Statics\Queue_Callbacks;
 use WP_UnitTestCase;
 
@@ -291,15 +292,12 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 
 		$this->assertCount( 3, $queue[0] );
 		$this->assertCount( 3, $queue[1] );
-		$this->assertCount( 1, $queue[2] );
 
 		$actions = [ 'create_pdf', 'create_pdf', 'send_notification' ];
 		for ( $i = 0; $i < 3; $i++ ) {
 			$this->assertStringContainsString( $actions[ $i ], $queue[0][ $i ]['func'] );
 			$this->assertStringContainsString( $actions[ $i ], $queue[1][ $i ]['func'] );
 		}
-
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[2][0]['func'] );
 	}
 
 	/**
@@ -322,14 +320,11 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 		$queue = $this->queue_mock->get_data();
 
 		$this->assertCount( 3, $queue[0] );
-		$this->assertCount( 1, $queue[1] );
 
 		$actions = [ 'create_pdf', 'create_pdf', 'send_notification' ];
 		for ( $i = 0; $i < 3; $i++ ) {
 			$this->assertStringContainsString( $actions[ $i ], $queue[0][ $i ]['func'] );
 		}
-
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[1][0]['func'] );
 	}
 
 	/**
@@ -359,21 +354,23 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	 * @since 5.0
 	 */
 	public function test_cleanup_pdfs() {
-		global $gfpdf;
+		$form_class = \GPDFAPI::get_form_class();
 
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $results['form'];
+		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
 
-		$path = $gfpdf->data->template_tmp_location . $entry['form_id'] . $entry['id'] . '556690c67856b/';
+		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
+		$file   = "test-{$form['id']}.pdf";
+
 		wp_mkdir_p( $path );
-		$test_file = $path . 'file';
-		touch( $test_file );
-		$this->assertFileExists( $test_file );
+		touch( $path . $file );
+
+		$this->assertFileExists( $path . $file );
 
 		Queue_Callbacks::cleanup_pdfs( $form['id'], $entry['id'] );
 
-		$this->assertFileDoesNotExist( $test_file );
+		$this->assertFileDoesNotExist( $path . $file );
 		$this->assertFileDoesNotExist( $path );
 	}
 }
