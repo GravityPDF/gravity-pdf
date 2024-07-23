@@ -231,6 +231,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_generate_pdf() {
+		$this->setExpectedIncorrectUsage( 'GFPDF\View\View_PDF::generate_pdf');
+
 		global $gfpdf;
 
 		/* Setup our form and entries */
