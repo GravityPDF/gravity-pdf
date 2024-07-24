@@ -650,10 +650,10 @@ class View_PDF extends Helper_Abstract_View {
 	 * @link https://docs.gravitypdf.com/v6/developers/helper-parameters#data1
 	 */
 	public function view_form_data( $form_data ) {
-		print '<pre>';
+		echo '<pre>';
 		/* phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r */
 		print_r( $form_data );
-		print '</pre>';
+		echo '</pre>';
 
 		exit;
 	}

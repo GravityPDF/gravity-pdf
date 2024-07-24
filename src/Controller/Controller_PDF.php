@@ -457,7 +457,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 * A debugging tool that will output the HTML mark-up for the PDF to the browser
 	 *
 	 * Use ?html=1 to active when the website is in development/staging mode and the current logged-in
-	 * user has appropriate capabilities
+	 * user has appropriate capabilities. To easily see the raw source code on screen use ?html=1&raw=1
 	 *
 	 * @param string     $html
 	 * @param array      $form
@@ -485,8 +485,16 @@ class Controller_PDF extends Helper_Abstract_Controller {
 			return $html;
 		}
 
-		/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
-		echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $pdf_settings, $entry, $form, $helper_pdf );
+		$html = apply_filters( 'gfpdf_pre_html_browser_output', $html, $pdf_settings, $entry, $form, $helper_pdf );
+
+		if ( rgget( 'raw' ) ) {
+			echo '<pre><code>';
+			echo htmlspecialchars( $html );
+			echo '</code></pre>';
+		} else {
+			echo $html; /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
+		}
+
 		exit;
 	}
 
