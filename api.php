@@ -481,14 +481,16 @@ final class GPDFAPI {
 		}
 
 		if ( $bypass_cache ) {
-			add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+			add_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
 		}
 
 		/** @var \GFPDF\Model\Model_PDF $pdf */
 		$pdf         = static::get_mvc_class( 'Model_PDF' );
 		$path_to_pdf = $pdf->generate_and_save_pdf( $entry, $setting );
 
-		remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		if ( $bypass_cache ) {
+			remove_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
+		}
 
 		return $path_to_pdf;
 	}
