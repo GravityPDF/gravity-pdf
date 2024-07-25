@@ -330,7 +330,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 			$pdf_queue_data = [
 				'id'            => $this->get_queue_id( $form, $entry, $pdf ),
 				'func'          => '\GFPDF\Statics\Queue_Callbacks::create_pdf',
-				'args'          => [ $entry['id'], $pdf['id'] ],
+				'args'          => [ $entry['id'], $pdf['id'], get_current_user_id() ],
 				'unrecoverable' => true,
 			];
 
@@ -378,7 +378,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 					$queue_data[] = [
 						'id'   => $this->get_queue_id( $form, $entry, $pdf ) . '-' . $notification['id'],
 						'func' => '\GFPDF\Statics\Queue_Callbacks::send_notification',
-						'args' => [ $form['id'], $entry['id'], $notification ],
+						'args' => [ $form['id'], $entry['id'], $notification, get_current_user_id() ],
 					];
 
 					/* Only queue each notification once */
