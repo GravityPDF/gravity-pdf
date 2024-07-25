@@ -72,32 +72,74 @@ class Cache {
 	 *
 	 * @return string
 	 *
-	 * @internal if $form, $entry, or $pdf_settings are modified a new hash and PDF will be generated
+	 * @internal if $form, $entry, $pdf_settings, user ID, site ID, or template files are changed a new hash and PDF will be generated
 	 *
 	 * @since    6.12.0
 	 */
 	public static function get_hash( $form, $entry, $pdf_settings ) {
+
 		/*
-		 * Remove invalid field property which Gravity Forms can unintentionally add to fields when outputting field values.
-		 *
-		 * The issue was identified when generating a PDF and checking if a Section Break was empty.
-		 * This eventually calls GF_Field::get_allowable_tags(), which accesses `$this->form_id` instead of `$this->formId`.
-		 * As all form fields are PHP objects, the new property is added to the object when accessed and eventually gets hashed below.
-		 * This becomes a problem when generating the same PDF repeatedly during a single request, as the cache is bypassed every call.
-		 * Until the issue is fixed upstream, we'll force-remove the invalid property.
+		 * Standardize field properties that may be added dynamically when fields are processed
+		 * for the first run of a PDF. When Gravity Forms accesses properties that don't exist
+		 * in a GF_Field object, it adds the value automatically and sets it to an empty string.
 		 */
 		array_map(
 			function( $field ) {
-				unset( $field['form_id'] );
+				/* Set when accessing \GFCommon::selection_display() */
+				if ( in_array( $field->get_input_type(), [ 'checkbox', 'radio', 'select' ], true ) ) {
+					$field->enablePrice;
+				}
+
+				/* Set when accessing \GF_Fields::get_allowable_tags() */
+				if ( $field->get_input_type() === 'section' ) {
+					$field->form_id;
+				}
 			},
 			$form['fields']
 		);
 
+		/* Add last modified date of template files to hash */
+		$template    = \GPDFAPI::get_templates_class();
+		$template_id = $pdf_settings['template'] ?? '';
+
+		try {
+			$template_path       = $template->get_template_path_by_id( $template_id );
+			$template_timestamps = filemtime( $template_path );
+		} catch ( \Exception $e ) {
+			$template_timestamps = 0;
+		}
+
+		/* Include config template timestamp if it exists */
+		try {
+			$template_config_path = $template->get_config_path_by_id( $template_id );
+			$template_timestamps .= filemtime( $template_config_path );
+		} catch ( \Exception $e ) {
+			/* do nothing */
+		}
+
+		/* Build an array of unique data relevant to the current PDF */
+		$unique_array = apply_filters(
+			'gfpdf_cache_hash_array',
+			[
+				get_current_blog_id(),
+				get_current_user_id(),
+				$form['fields'],
+				$entry,
+				$pdf_settings,
+				$template_timestamps,
+			],
+			$form,
+			$entry,
+			$pdf_settings
+		);
+
+		/* Generate the hash based on that unique data */
 		return sprintf(
-			'%1$d-%2$d-%3$s',
+			's%1$d-f%2$d-e%3$d-%4$s',
+			get_current_blog_id(),
 			$form['id'] ?? 0,
 			$entry['id'] ?? 0,
-			wp_hash( wp_json_encode( [ $form, $entry, $pdf_settings ] ) )
+			wp_hash( wp_json_encode( $unique_array ) )
 		);
 	}
 }
