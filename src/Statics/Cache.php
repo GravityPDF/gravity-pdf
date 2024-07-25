@@ -38,7 +38,7 @@ class Cache {
 	 * @since 6.12.0
 	 */
 	public static function get_path( $form, $entry, $pdf_settings ) {
-		return self::get_basepath() . self::get_hash( $form, $entry, $pdf_settings ) . '/';
+		return static::get_basepath() . static::get_hash( $form, $entry, $pdf_settings ) . '/';
 	}
 
 	/**
@@ -48,8 +48,8 @@ class Cache {
 	 * @since 6.12.0
 	 */
 	protected static function get_basepath() {
-		if ( self::$template_tmp_location !== null ) {
-			return self::$template_tmp_location;
+		if ( static::$template_tmp_location !== null ) {
+			return static::$template_tmp_location;
 		}
 
 		$data      = \GPDFAPI::get_data_class();
@@ -58,9 +58,9 @@ class Cache {
 			$base_path .= get_current_blog_id();
 		}
 
-		self::$template_tmp_location = trailingslashit( $base_path ) . 'cache/';
+		static::$template_tmp_location = trailingslashit( $base_path ) . 'cache/';
 
-		return self::$template_tmp_location;
+		return static::$template_tmp_location;
 	}
 
 	/**
@@ -85,6 +85,7 @@ class Cache {
 		 */
 		array_map(
 			function( $field ) {
+				/** @var \GF_Field $field */
 				/* Set when accessing \GFCommon::selection_display() */
 				if ( in_array( $field->get_input_type(), [ 'checkbox', 'radio', 'select' ], true ) ) {
 					$field->enablePrice;
@@ -94,9 +95,20 @@ class Cache {
 				if ( $field->get_input_type() === 'section' ) {
 					$field->form_id;
 				}
+
+				/* Set the `use_admin_label` context for all fields */
+				$field->set_context_property( 'use_admin_label', $field->get_context_property( 'use_admin_label' ) );
 			},
 			$form['fields']
 		);
+
+		/*
+		 * Ignore specific entry meta that is considered unimportant to PDFs
+		 */
+		$ignored_entry_meta = apply_filters( 'gfpdf_cache_hash_ignored_entry_meta', [ 'is_read', 'is_starred', 'is_approved', 'status', 'source_url', 'user_agent' ], $form, $entry, $pdf_settings );
+		foreach ( $ignored_entry_meta as $meta ) {
+			unset( $entry[ $meta ] );
+		}
 
 		/* Add last modified date of template files to hash */
 		$template    = \GPDFAPI::get_templates_class();
@@ -134,12 +146,35 @@ class Cache {
 		);
 
 		/* Generate the hash based on that unique data */
+		$hash_prefix = static::get_hash_prefix( $form, $entry, $pdf_settings );
+		$hash        = wp_hash( wp_json_encode( $unique_array ) );
+
+		/* @TODO - debugging, remove later */
+		$path = static::get_basepath() . $hash_prefix . '-' . $hash;
+		wp_mkdir_p( $path );
+		file_put_contents( $path . '/debug.log', print_r( $unique_array, true ) );
+
+		return $hash_prefix . '-' . $hash;
+	}
+
+	/**
+	 * Gets the easily-identifiable prefix to add before the hash
+	 *
+	 * @param array $form         The form object
+	 * @param array $entry        The entry object
+	 * @param array $pdf_settings The PDF object/settings
+	 *
+	 * @return string
+	 *
+	 * @since 6.12
+	 */
+	public static function get_hash_prefix( $form, $entry, $pdf_settings ) {
 		return sprintf(
-			's%1$d-f%2$d-e%3$d-%4$s',
+			's%1$d-f%2$d-e%3$d-p%4$s',
 			get_current_blog_id(),
 			$form['id'] ?? 0,
 			$entry['id'] ?? 0,
-			wp_hash( wp_json_encode( $unique_array ) )
+			$pdf_settings['id'] ?? '',
 		);
 	}
 }
