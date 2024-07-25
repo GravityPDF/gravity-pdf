@@ -1296,6 +1296,8 @@ class Model_PDF extends Helper_Abstract_Model {
 		$settings = $pdf_generator->get_settings();
 		$form     = $pdf_generator->get_form();
 
+		/* @TODO auto-clean cache based on Cache::get_prefix() */
+
 		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf_generator );
 
 		/*
