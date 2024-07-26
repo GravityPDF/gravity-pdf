@@ -154,7 +154,7 @@ class Cache {
 		wp_mkdir_p( $path );
 		file_put_contents( $path . '/debug.log', print_r( $unique_array, true ) );
 
-		return $hash_prefix . '-' . $hash;
+		return sprintf( '%s-%s', $hash_prefix, $hash );
 	}
 
 	/**
@@ -168,7 +168,7 @@ class Cache {
 	 *
 	 * @since 6.12
 	 */
-	public static function get_hash_prefix( $form, $entry, $pdf_settings ) {
+	protected static function get_hash_prefix( $form, $entry, $pdf_settings ) {
 		return sprintf(
 			's%1$d-f%2$d-e%3$d-p%4$s',
 			get_current_blog_id(),
