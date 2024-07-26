@@ -369,18 +369,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		$this->prevent_index();
 
 		/*
-		 * Stop Weglot trying to transform the binary PDF
-		 * See https://github.com/GravityPDF/gravity-pdf/pull/1505
-		 */
-		add_filter( 'weglot_active_translation', '__return_false' );
-
-		/*
-		 * Stop WP External Links plugin trying to transform the binary PDF
-		 * See https://github.com/GravityPDF/gravity-pdf/issues/386
-		 */
-		add_filter( 'wpel_apply_settings', '__return_false' );
-
-		/*
 		 * Support ?data=1 helper parameter
 		 * See https://docs.gravitypdf.com/v6/developers/helper-parameters#data1
 		 */
