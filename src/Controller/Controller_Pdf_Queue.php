@@ -226,7 +226,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Push tasks to the queue for requested notifications
+	 * Push tasks to the queue for requested PDFs/Notifications
+	 *
+	 * Even if a PDF isn't attached to a notification, it may still need to be generated and saved to disk
 	 *
 	 * @param array $form
 	 * @param array $entry
@@ -236,9 +238,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @since 6.11.0
 	 */
 	public function queue_async_tasks( $form, $entry ) {
-		foreach ( $this->form_async_notifications as $notification ) {
-			$this->queue->push_to_queue( $this->get_queue_tasks( $entry, $form, [ $notification ] ) );
-		}
+		$this->queue->push_to_queue( $this->get_queue_tasks( $entry, $form, $this->form_async_notifications ) );
 	}
 
 	/**
