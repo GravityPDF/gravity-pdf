@@ -146,6 +146,15 @@ class Controller_PDF extends Helper_Abstract_Controller {
 			remove_action( 'gfpdf_pre_generate_and_save_pdf', [ $gp_pdf_compat, 'hydrate_form_hook' ] );
 		}
 
+		/* Gravity Wiz Nested Forms support */
+		if ( function_exists( 'gp_nested_forms' ) ) {
+			$included_nested_forms_in_cache_hash = function ( $data, $form, $entry, $pdf_settings ) {
+				return $this->included_nested_forms_in_cache_hash( $data, $form, $entry, $pdf_settings );
+			};
+
+			add_filter( 'gfpdf_cache_hash_array', $included_nested_forms_in_cache_hash, 10, 4 );
+		}
+
 		/* Add Legal Signature support */
 		if ( defined( 'FG_LEGALSIGNING_VERSION' ) ) {
 			add_filter( 'gfpdf_mpdf_class_config', [ $this->model, 'register_legal_signing_font_path_with_mpdf' ] );
@@ -550,5 +559,39 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		} else {
 			wp_die( esc_html__( 'There was a problem creating the PDF', 'gravity-forms-pdf-extended' ), $status_code ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
+	}
+
+	/**
+	 * If Nested Form fields are included in the form, include the child entries in the cache hash.
+	 * This will auto-invalidate the parent PDF when the child entry is modified
+	 *
+	 * @param array $data Data to hash
+	 * @param array $form Form object
+	 * @param array $entry Entry object
+	 * @param array $pdf_settings PDF object
+	 *
+	 * @return array
+	 *
+	 * @since 6.12
+	 */
+	protected function included_nested_forms_in_cache_hash( $data, $form, $entry, $pdf_settings ) {
+		if ( empty( $entry['id'] ) ) {
+			return $data;
+		}
+
+		if ( ! class_exists( '\GPNF_Entry' ) ) {
+			return $data;
+		}
+
+		$parent_entry  = new \GPNF_Entry( $entry );
+		$child_entries = $parent_entry->get_child_entries();
+
+		if ( empty( $child_entries ) ) {
+			return $data;
+		}
+
+		$data['nested_form_entries'] = $child_entries;
+
+		return $data;
 	}
 }
