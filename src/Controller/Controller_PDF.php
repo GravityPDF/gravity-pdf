@@ -408,6 +408,10 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 * @since 6.12
 	 */
 	protected function add_current_form_object_hooks( $form, $entry, $source ) {
+		if ( ! isset( $form['id'] ) ) {
+			return $form;
+		}
+
 		/* Make Page fields first class citizens in the form object */
 		$form = $this->model->register_page_fields( $form );
 
