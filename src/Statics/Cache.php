@@ -149,11 +149,6 @@ class Cache {
 		$hash_prefix = static::get_hash_prefix( $form, $entry, $pdf_settings );
 		$hash        = wp_hash( wp_json_encode( $unique_array ) );
 
-		/* @TODO - debugging, remove later */
-		$path = static::get_basepath() . $hash_prefix . '-' . $hash;
-		wp_mkdir_p( $path );
-		file_put_contents( $path . '/debug.log', print_r( $unique_array, true ) );
-
 		return sprintf( '%s-%s', $hash_prefix, $hash );
 	}
 
