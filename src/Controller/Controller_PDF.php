@@ -148,7 +148,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		/* Gravity Wiz Nested Forms support */
 		if ( function_exists( 'gp_nested_forms' ) ) {
-			$included_nested_forms_in_cache_hash = function ( $data, $form, $entry, $pdf_settings ) {
+			$included_nested_forms_in_cache_hash = function( $data, $form, $entry, $pdf_settings ) {
 				return $this->included_nested_forms_in_cache_hash( $data, $form, $entry, $pdf_settings );
 			};
 
@@ -490,7 +490,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		if ( rgget( 'raw' ) ) {
 			echo '<pre><code>';
-			echo htmlspecialchars( $html );
+			echo htmlspecialchars( $html ); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
 			echo '</code></pre>';
 		} else {
 			echo $html; /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
