@@ -288,7 +288,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			ob_end_clean();
 		}
 
-		do_action( 'gfpdf_post_view_or_download_pdf', $path_to_pdf, $form, $entry, $settings );
+		do_action( 'gfpdf_post_view_or_download_pdf', $path_to_pdf, $form, $entry, $settings, $action );
 
 		/* Send the PDF to the client */
 		header( 'Content-Type: application/pdf' );
