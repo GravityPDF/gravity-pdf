@@ -133,12 +133,12 @@ class Cache {
 		$unique_array = apply_filters(
 			'gfpdf_cache_hash_array',
 			[
-				get_current_blog_id(),
-				get_current_user_id(),
-				$form['fields'],
-				$entry,
-				$pdf_settings,
-				$template_timestamps,
+				'site_id'               => get_current_blog_id(),
+				'user_id'               => get_current_user_id(),
+				'fields'                => $form['fields'],
+				'entry'                 => $entry,
+				'pdf_settings'          => $pdf_settings,
+				'template_last_updated' => $template_timestamps,
 			],
 			$form,
 			$entry,
