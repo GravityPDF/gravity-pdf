@@ -238,7 +238,11 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @since 6.11.0
 	 */
 	public function queue_async_tasks( $form, $entry ) {
-		$this->queue->push_to_queue( $this->get_queue_tasks( $entry, $form, $this->form_async_notifications ) );
+		$tasks = $this->get_queue_tasks( $entry, $form, $this->form_async_notifications );
+
+		if ( count( $tasks ) > 0 ) {
+			$this->queue->push_to_queue( $tasks );
+		}
 	}
 
 	/**

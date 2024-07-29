@@ -338,12 +338,13 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 						 ->method( 'dispatch' )
 						 ->willReturn( $this->queue_mock );
 
-		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0 ] );
+
+		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0, 'form_id' => 0 ] );
 
 		$this->assertSame( 0, $spy->getInvocationCount() );
 
 		$this->queue_mock->push_to_queue( 'item' );
-		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0 ]);
+		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0, 'form_id' => 0 ]);
 
 		$this->assertSame( 1, $spy->getInvocationCount() );
 	}
