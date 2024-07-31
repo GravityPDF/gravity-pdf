@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Statics\Cache;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
@@ -178,7 +179,6 @@ class Helper_PDF {
 	 *
 	 * @param array                $entry    The Gravity Form Entry to be processed
 	 * @param array                $settings The Gravity PDF Settings Array
-	 *
 	 * @param Helper_Abstract_Form $gform
 	 * @param Helper_Data          $data
 	 * @param Helper_Misc          $misc
@@ -200,6 +200,7 @@ class Helper_PDF {
 		$this->form      = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
 
 		$this->set_path();
+		$this->set_print_dialog( ! empty( $settings['print'] ) );
 	}
 
 	/**
@@ -250,7 +251,7 @@ class Helper_PDF {
 
 		$form = $this->form;
 
-		/* Allow this method to be short circuited */
+		/* Allow this method to be short-circuited */
 		if ( apply_filters( 'gfpdf_skip_pdf_html_render', false, $args, $this ) ) {
 			do_action( 'gfpdf_skipped_html_render', $args, $this );
 
@@ -270,9 +271,6 @@ class Helper_PDF {
 		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
 		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
 
-		/* Check if we should output the HTML to the browser, for debugging */
-		$this->maybe_display_raw_html( $html );
-
 		/* Write the HTML to mPDF */
 		$this->mpdf->WriteHTML( $html );
 	}
@@ -284,6 +282,7 @@ class Helper_PDF {
 	 *
 	 * @throws MpdfException
 	 * @since 4.0
+	 * @since 6.12 All PDF requests have been standardized to use the functions/methods in \GPDFAPI::create_pdf(), and the DISPLAY/DOWNLOAD options are no longer used by core
 	 */
 	public function generate() {
 
@@ -343,6 +342,8 @@ class Helper_PDF {
 			if ( ! wp_mkdir_p( $this->path ) ) {
 				throw new Exception( sprintf( 'Could not create directory: %s', esc_html( $this->path ) ) );
 			}
+
+			file_put_contents( $this->path . 'index.html', '' );
 		}
 
 		/* save our PDF */
@@ -519,7 +520,7 @@ class Helper_PDF {
 
 	/**
 	 *
-	 * Get the current Gravity Form Entry
+	 * Get the current Gravity Forms Entry
 	 *
 	 * @return array
 	 * @since 4.0
@@ -537,6 +538,16 @@ class Helper_PDF {
 	 */
 	public function get_settings() {
 		return $this->settings;
+	}
+
+	/**
+	 * Get the current Gravity Forms form object
+	 *
+	 * @return array
+	 * @since 6.12
+	 */
+	public function get_form() {
+		return $this->form;
 	}
 
 	/**
@@ -584,16 +595,10 @@ class Helper_PDF {
 	public function set_path( $path = '' ) {
 
 		if ( empty( $path ) ) {
-			/* build our PDF path location */
-			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . $this->settings['id'] . '/';
-		} else {
-			/* ensure the path ends with a forward slash */
-			if ( substr( $path, -1 ) !== '/' ) {
-				$path .= '/';
-			}
+			$path = Cache::get_path( $this->form, $this->entry, $this->settings );
 		}
 
-		$this->path = $path;
+		$this->path = trailingslashit( $path );
 	}
 
 	/**
@@ -862,45 +867,6 @@ class Helper_PDF {
 		return ob_get_clean();
 	}
 
-
-	/**
-	 * Allow site admins to view the RAW HTML if needed
-	 *
-	 * @param string $html The HTML that should be output to the browser
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	protected function maybe_display_raw_html( $html ) {
-
-		$options = \GPDFAPI::get_options_class();
-
-		/* Disregard if PDF is being saved */
-		if ( $this->output === 'SAVE' ) {
-			return;
-		}
-
-		/* Disregard if `?html` URL parameter doesn't exist */
-		if ( ! rgget( 'html' ) ) {
-			return;
-		}
-
-		/* Disregard if PDF Debug Mode off AND the environment is production */
-		if ( $options->get_option( 'debug_mode', 'No' ) === 'No' && ( ! function_exists( 'wp_get_environment_type' ) || wp_get_environment_type() === 'production' ) ) {
-			return;
-		}
-
-		/* Check if user has permission to view info */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
-			return;
-		}
-
-		/* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */
-		echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this->entry, $this->gform, $this );
-		exit;
-	}
-
 	/**
 	 * Prompt the print dialog box
 	 *
@@ -912,17 +878,6 @@ class Helper_PDF {
 		if ( $this->print ) {
 			$this->mpdf->setJS( 'this.print();' );
 		}
-	}
-
-	/**
-	 * Sets the image DPI in the PDF
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	protected function set_image_dpi() {
-		_doing_it_wrong( __METHOD__, esc_html__( 'This method has been removed because mPDF no longer supports setting the image DPI after the class is initialised.', 'gravity-forms-pdf-extended' ), '5.2' );
 	}
 
 	/**

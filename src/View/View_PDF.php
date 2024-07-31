@@ -5,8 +5,8 @@ namespace GFPDF\View;
 use Exception;
 use GF_Field;
 use GFCommon;
+use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Fields\Field_Products;
-use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
@@ -19,9 +19,9 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Statics\Debug;
 use GFPDF\Statics\Kses;
 use GFPDFEntryDetail;
-use GWConditionalLogicDateFields;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -42,6 +42,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * A general class for PDF display
  *
  * @since 4.0
+ *
+ * @method Controller_PDF getController
  */
 class View_PDF extends Helper_Abstract_View {
 
@@ -139,31 +141,32 @@ class View_PDF extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Our PDF Generator
+	 * Legacy view/download PDF generator
 	 *
 	 * @param array $entry    The Gravity Forms Entry to process
 	 * @param array $settings The Gravity Form PDF Settings
 	 *
 	 * @return void
-	 *
-	 * @since 4.0
+	 * @since      4.0
+	 * @deprecated 6.12.0 Use \GPDFAPI::create_pdf() to generate PDFs
 	 */
 	public function generate_pdf( $entry, $settings ) {
+		_doing_it_wrong( __METHOD__, 'Use \GPDFAPI::create_pdf() to generate PDFs', '6.12' );
 
 		$controller = $this->getController();
 		$model      = $controller->model;
 		$form       = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
-		$form       = $this->add_gravity_perk_conditional_logic_date_support( $form );
 
-		/**
-		 * Set out our PDF abstraction class
-		 */
-		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
-		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
+		do_action( 'gfpdf_view_or_download_pdf', $form, $entry, $settings );
 
-		$this->fix_wp_external_links_plugin_conflict();
+		$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ?? 'download' ); /* Backwards compat */
 
-		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
+		/* Setup the PDF that will be generated */
+		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
+		$pdf_generator->set_filename( $model->get_pdf_name( $settings, $entry ) );
+		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
+
+		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf_generator );
 
 		/**
 		 * Load our arguments that should be accessed by our PDF template
@@ -181,43 +184,40 @@ class View_PDF extends Helper_Abstract_View {
 		);
 
 		/* Show $form_data array if requested */
-		$this->maybe_view_form_data( $args['form_data'] ?? [] );
-
-		/* Enable Multicurrency support */
-		$this->misc->maybe_add_multicurrency_support();
+		if ( $this->maybe_view_form_data() ) {
+			$this->view_form_data( $args['form_data'] ?? [] );
+		}
 
 		try {
 
 			/* Initialise our PDF helper class */
-			$pdf->init();
-			$pdf->set_template();
+			$pdf_generator->init();
+			$pdf_generator->set_template();
 
 			/* Set display type and allow user to override the behaviour */
-			$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ); /* Backwards compat */
 			if ( $settings['pdf_action'] === 'download' ) {
-				$pdf->set_output_type( 'download' );
+				$pdf_generator->set_output_type( 'download' );
 			}
 
 			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
 			if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
 
 				/* Check if we should process this document using our legacy system */
-				if ( $model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
+				if ( $model->handle_legacy_tier_2_processing( $pdf_generator, $entry, $settings, $args ) ) {
 					return;
 				}
 			}
 
 			/* Determine if we should show the print dialog box */
-			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-			if ( isset( $_GET['print'] ) ) {
-				$pdf->set_print_dialog();
+			if ( rgget( 'print' ) ) {
+				$pdf_generator->set_print_dialog();
 			}
 
 			/* Render the PDF template HTML */
-			$pdf->render_html( $args );
+			$pdf_generator->render_html( $args );
 
 			/* Generate PDF */
-			$pdf->generate();
+			$pdf_generator->generate();
 
 		} catch ( Exception $e ) {
 
@@ -246,43 +246,6 @@ class View_PDF extends Helper_Abstract_View {
 	}
 
 	/**
-	 * The WP External Links plugin conflicts with Gravity PDF when trying to display the PDF
-	 * This method disables the \WPEL_Front::scan() method which was causes the problem
-	 *
-	 * See https://github.com/GravityPDF/gravity-pdf/issues/386
-	 *
-	 * @since 4.1
-	 */
-	private function fix_wp_external_links_plugin_conflict() {
-		if ( function_exists( 'wpel_init' ) ) {
-			add_filter(
-				'wpel_apply_settings',
-				function() {
-					return false;
-				}
-			);
-		}
-	}
-
-	/**
-	 * Add Gravity Perk Conditional Logic Date Field support, if required
-	 *
-	 * @Internal Fixed an intermittent issue with the Product table not functioning correctly
-	 *
-	 * @param array $form
-	 *
-	 * @return array
-	 * @since    4.5
-	 */
-	private function add_gravity_perk_conditional_logic_date_support( $form ) {
-		if ( method_exists( 'GWConditionalLogicDateFields', 'convert_conditional_logic_date_field_values' ) ) {
-			$form = GWConditionalLogicDateFields::convert_conditional_logic_date_field_values( $form );
-		}
-
-		return $form;
-	}
-
-	/**
 	 * Ensure a PHP extension is added to the end of the template name
 	 *
 	 * @param string $name The PHP template
@@ -290,13 +253,12 @@ class View_PDF extends Helper_Abstract_View {
 	 * @return string
 	 *
 	 * @since  4.0
+	 * @deprecated 4.1
 	 */
 	public function get_template_filename( $name ) {
-		if ( substr( $name, -4 ) !== '.php' ) {
-			$name = $name . '.php';
-		}
+		_doing_it_wrong( __METHOD__, 'This method has been replaced by Helper_Misc::get_file_with_extension().', '4.1' );
 
-		return $name;
+		return $this->misc->get_file_with_extension( $name, '.php' );
 	}
 
 	/**
@@ -661,33 +623,35 @@ class View_PDF extends Helper_Abstract_View {
 	}
 
 	/**
+	 * Check if the form data should be viewed during this request
+	 *
 	 * @param array $form_data
 	 *
-	 * @return void
+	 * @return bool
 	 *
 	 * @since 6.4.0
 	 */
-	public function maybe_view_form_data( $form_data ) {
+	public function maybe_view_form_data( $form_data = [] ) {
+		return rgget( 'data' ) && Debug::is_enabled_and_can_view();
+	}
 
-		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-		if ( ! isset( $_GET['data'] ) ) {
-			return;
-		}
-
-		/* Disable if PDF Debug Mode off AND the environment is production */
-		if ( $this->options->get_option( 'debug_mode', 'No' ) === 'No' && ( ! function_exists( 'wp_get_environment_type' ) || wp_get_environment_type() === 'production' ) ) {
-			return;
-		}
-
-		/* Check if user has permission to view info */
-		if ( ! $this->gform->has_capability( 'gravityforms_view_settings' ) ) {
-			return;
-		}
-
-		print '<pre>';
+	/**
+	 * A debugging tool that will display the processed Gravity Forms entry array (aka $form_data) in the browser
+	 *
+	 * Use ?data=1 to active when the website is in development/staging mode and the current logged-in
+	 * user has appropriate capabilities
+	 *
+	 * @param array $form_data
+	 *
+	 * @since 6.11.0
+	 *
+	 * @link https://docs.gravitypdf.com/v6/developers/helper-parameters#data1
+	 */
+	public function view_form_data( $form_data ) {
+		echo '<pre>';
 		/* phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r */
 		print_r( $form_data );
-		print '</pre>';
+		echo '</pre>';
 
 		exit;
 	}

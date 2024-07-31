@@ -36,7 +36,7 @@ class Page {
       .click(this.addBlockIcon)
       .typeText(this.searchBlock, 'paragraph', { paste: true })
       .click(this.paragraphButton)
-      .typeText(Selector('p.is-selected'), 'Content', { paste: true })
+      .typeText(Selector('.is-root-container p:last-of-type'), 'Content', { paste: true })
       .click(this.publishButton)
       .click(this.confirmPublishButton)
   }

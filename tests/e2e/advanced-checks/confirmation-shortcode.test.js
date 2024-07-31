@@ -41,7 +41,7 @@ test('should check shortcode confirmation type TEXT is working correctly', async
 
   // Assertions
   await t
-    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"')).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"; filename*=utf-8\'\'Sample.pdf')).ok()
     .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })
 
@@ -96,7 +96,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
 
   // Assertions
   await t
-    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"')).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"; filename*=utf-8\'\'Sample.pdf')).ok()
     .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })
 
@@ -125,7 +125,7 @@ test('should check if the shortcode confirmation type REDIRECT download is worki
 
   // Assertions
   await t
-    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"')).ok()
+    .expect(downloadLogger.contains(r => r.response.headers['content-disposition'] === 'attachment; filename="Sample.pdf"; filename*=utf-8\'\'Sample.pdf')).ok()
     .expect(downloadLogger.contains(r => r.response.headers['content-type'] === 'application/pdf')).ok()
 })
 

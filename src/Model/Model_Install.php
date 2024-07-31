@@ -303,23 +303,20 @@ class Model_Install extends Helper_Abstract_Model {
 					$this->notices->add_error( sprintf( esc_html__( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
-		}
 
-		/* create blank index file in all folders to prevent web servers listing the entire directory */
-		if ( is_dir( $this->data->template_location ) && ! is_file( $this->data->template_location . 'index.html' ) ) {
-			GFCommon::recursive_add_index_file( $this->data->template_location );
+			/* create blank index file in all folders to prevent web servers listing the entire directory */
+			if ( ! is_file( trailingslashit( $dir ) . 'index.html' ) ) {
+				file_put_contents( trailingslashit( $dir ) . 'index.html', '' );
+			}
 		}
 
 		/* create deny htaccess file to prevent direct access to files */
-		if ( is_dir( $this->data->template_tmp_location ) ) {
-			if ( ! is_file( $this->data->template_tmp_location . 'index.html' ) ) {
-				GFCommon::recursive_add_index_file( $this->data->template_tmp_location );
-			}
-
-			if ( ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
-				$this->log->notice( 'Create Apache .htaccess Security file' );
-				file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
-			}
+		if (
+			is_dir( $this->data->template_tmp_location ) &&
+			! is_file( $this->data->template_tmp_location . '.htaccess' )
+		) {
+			$this->log->notice( 'Create Apache .htaccess Security file' );
+			file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
 		}
 	}
 

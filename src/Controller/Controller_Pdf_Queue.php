@@ -210,11 +210,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
 		$this->queue_async_tasks( $form, $entry );
-
-		if ( count( $this->queue->get_data() ) > 0 ) {
-			$this->queue_cleanup_task( $form, $entry );
-		}
-
 		$this->dispatch_queue();
 	}
 
@@ -231,7 +226,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Push tasks to the queue for requested notifications
+	 * Push tasks to the queue for requested PDFs/Notifications
+	 *
+	 * Even if a PDF isn't attached to a notification, it may still need to be generated and saved to disk
 	 *
 	 * @param array $form
 	 * @param array $entry
@@ -241,8 +238,10 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @since 6.11.0
 	 */
 	public function queue_async_tasks( $form, $entry ) {
-		foreach ( $this->form_async_notifications as $notification ) {
-			$this->queue->push_to_queue( $this->get_queue_tasks( $entry, $form, [ $notification ] ) );
+		$tasks = $this->get_queue_tasks( $entry, $form, $this->form_async_notifications );
+
+		if ( count( $tasks ) > 0 ) {
+			$this->queue->push_to_queue( $tasks );
 		}
 	}
 
@@ -255,17 +254,10 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @return void
 	 *
 	 * @since 6.11.0
+	 * @deprecated 6.12.0 Caching layer + auto-purge added
 	 */
 	public function queue_cleanup_task( $form, $entry ) {
-		$this->queue->push_to_queue(
-			[
-				[
-					'id'   => sprintf( 'cleanup-pdf-%d-%d', $form['id'], $entry['id'] ),
-					'func' => '\GFPDF\Statics\Queue_Callbacks::cleanup_pdfs',
-					'args' => [ $form['id'], $entry['id'] ],
-				],
-			]
-		);
+		_doing_it_wrong( __METHOD__, 'This method is deprecated and no alternative is available. The temporary cache is automatically cleaned every hour using the WP Cron.', '6.12' );
 	}
 
 	/**
@@ -342,7 +334,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 			$pdf_queue_data = [
 				'id'            => $this->get_queue_id( $form, $entry, $pdf ),
 				'func'          => '\GFPDF\Statics\Queue_Callbacks::create_pdf',
-				'args'          => [ $entry['id'], $pdf['id'] ],
+				'args'          => [ $entry['id'], $pdf['id'], get_current_user_id() ],
 				'unrecoverable' => true,
 			];
 
@@ -390,7 +382,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 					$queue_data[] = [
 						'id'   => $this->get_queue_id( $form, $entry, $pdf ) . '-' . $notification['id'],
 						'func' => '\GFPDF\Statics\Queue_Callbacks::send_notification',
-						'args' => [ $form['id'], $entry['id'], $notification ],
+						'args' => [ $form['id'], $entry['id'], $notification, get_current_user_id() ],
 					];
 
 					/* Only queue each notification once */
@@ -421,7 +413,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 		}
 
 		$notification = $form['notifications'][ $notification_id ];
-		if ( empty( $notification['isActive'] ) ) {
+		if ( isset( $notification['isActive'] ) && ! $notification['isActive'] ) {
 			return false;
 		}
 
@@ -477,6 +469,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @deprecated 6.11
 	 */
 	public function queue_async_resend_notification_tasks( $notification, $form, $entry ) {
-		_doing_it_wrong( esc_html( 'queue_async_resend_notification_tasks() was removed in Gravity PDF 6.11' ) );
+		_doing_it_wrong( __METHOD__, 'This method has been removed and no alternative is available.', '6.11' );
 	}
 }
