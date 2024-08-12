@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.11.2 =
+* Bug: Fix race condition by skipping PDF cleanup at the end of form submission process if PDF Background Processing enabled
+
 = 6.11.1 =
 * Bug: Only process enabled notifications during form submission when using PDF Background Processing. Notifications are enabled if they are active and have conditional logic that passes.
 

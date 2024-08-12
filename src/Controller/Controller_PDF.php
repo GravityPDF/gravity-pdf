@@ -133,7 +133,17 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'gfpdf_post_pdf_generation', [ $this->model, 'trigger_post_save_pdf' ], 10, 4 );
 
 		/* Clean-up actions */
-		add_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ], 9999, 2 );
+		$maybe_cleanup_after_form_submission = function( $entry, $form ) {
+			$options = \GPDFAPI::get_options_class();
+			/* Exit if background processing is enabled */
+			if ( $options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
+				return;
+			}
+
+			$this->model->cleanup_pdf( $entry, $form );
+		};
+
+		add_action( 'gform_after_submission', $maybe_cleanup_after_form_submission, 9999, 2 );
 		add_action( 'gform_after_update_entry', [ $this->model, 'cleanup_pdf_after_submission' ], 9999, 2 );
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
 
