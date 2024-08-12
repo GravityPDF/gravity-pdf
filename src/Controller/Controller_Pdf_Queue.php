@@ -421,7 +421,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 		}
 
 		$notification = $form['notifications'][ $notification_id ];
-		if ( empty( $notification['isActive'] ) ) {
+		if ( isset( $notification['isActive'] ) && ! $notification['isActive'] ) {
 			return false;
 		}
 
