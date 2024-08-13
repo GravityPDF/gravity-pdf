@@ -56,7 +56,7 @@ class General {
     this.saveSettings = Selector('#submit-and-promo-container').find('input')
 
     // PDF entries section
-    this.viewEntryItem = Selector('a').withAttribute('aria-label', 'View this entry')
+    this.viewEntryItem = Selector('#the-list').find('td.column-primary')
   }
 
   async navigateSettingsTab (text) {
