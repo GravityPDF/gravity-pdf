@@ -48,7 +48,7 @@ class AdvancedCheck {
     this.templateItem = Selector('#the-list').find('tr')
     this.pdfListSection = Selector('.gform-settings__navigation').find('a').withText('PDF')
     this.toggleSwitch = Selector('#the-list').find('.check-column button')
-    this.entryItemSection = Selector('#the-list').find('a').withAttribute('aria-label', 'View this entry')
+    this.entryItemSection = Selector('#the-list').find('td.column-primary')
     this.viewPdfLink = Selector('#the-list').find('a').withText('View PDF')
     this.editLink = Selector('#the-list').find('span').withText('Edit')
     this.conditionalLogicCheckbox = Selector('#gfpdf-fieldset-gfpdf_form_settings_general').find('[id="gfpdf_conditional_logic"]')
