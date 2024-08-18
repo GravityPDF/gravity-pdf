@@ -1286,10 +1286,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					 * When outputting rich text, it is important that the merge tags get processed first and then the output
 					 * run through Kses::parse() or Kses::output() to ensure the HTML safe.
 					 */
-					$pattern = '{[^{]*?:(\d+(\.\d+)?)(:(.*?))?}';
-					$value   = preg_replace( "/$pattern/mi", 'telnet://$0', $value );
+					$pattern = '([^{]*?})';
+					$value   = preg_replace( "/=\"\{$pattern\"/mi", '="telnet://$1"', $value );
 					$value   = Kses::parse( $value );
-					$value   = preg_replace( "/telnet:\/\/($pattern)/mi", '$1', $value );
+					$value   = preg_replace( "/=\"telnet:\/\/$pattern\"/mi", '="{$1"', $value );
 				} else {
 					/* Don't encode/decode merge tag before sanitizing */
 					$value = Kses::parse( $value );
