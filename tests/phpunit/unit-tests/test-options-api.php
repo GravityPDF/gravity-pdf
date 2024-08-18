@@ -998,14 +998,26 @@ class Test_Options_API extends WP_UnitTestCase {
 
 			[
 				'rich_editor',
-				'<a href="{Field:1}">Link</a> and this {Business Name::2} is another <a class="{Field:3}" href="{pdf:12345789:signed,download}">link</a>',
-				'<a href="{Field:1}">Link</a> and this {Business Name::2} is another <a class="{Field:3}" href="{pdf:12345789:signed,download}">link</a>',
+				'<a href="{Field:1}">Link</a> and this {Business Name::2} is another <a class="{Field:3}" href="{pdf:12345789ABC:signed,download}">link</a>',
+				'<a href="{Field:1}">Link</a> and this {Business Name::2} is another <a class="{Field:3}" href="{pdf:12345789ABC:signed,download}">link</a>',
 			],
 
 			[
 				'rich_editor',
 				'<a href="telnet://{Field:1}">Link</a>',
 				'<a href="telnet://{Field:1}">Link</a>',
+			],
+
+			[
+				'rich_editor',
+				'<a href="{user:user_meta}">Link</a> and this {Business Name::2}',
+				'<a href="{user:user_meta}">Link</a> and this {Business Name::2}',
+			],
+
+			[
+				'rich_editor',
+				'<a href="{embed_url}">Link</a> and this {Business Name::2}',
+				'<a href="{embed_url}">Link</a> and this {Business Name::2}',
 			],
 
 			[

@@ -1087,10 +1087,10 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 			return Kses::parse( $html );
 		}
 
-		$pattern = '{[^{]*?:(\d+(\.\d+)?)(:(.*?))?}';
-		$html    = preg_replace( "/$pattern/mi", 'telnet://$0', $html );
-		$html    = Kses::parse( $html );
-		$html    = preg_replace( "/telnet:\/\/($pattern)/mi", '$1', $html );
+		$pattern = '([^{]*?})';
+		$html   = preg_replace( "/=\"\{$pattern\"/mi", '="telnet://$1"', $html );
+		$html   = Kses::parse( $html );
+		$html   = preg_replace( "/=\"telnet:\/\/$pattern\"/mi", '="{$1"', $html );
 
 		return $html;
 	}
