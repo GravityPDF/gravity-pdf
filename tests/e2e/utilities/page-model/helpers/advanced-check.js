@@ -44,7 +44,7 @@ class AdvancedCheck {
     this.addNewButton = Selector('.tablenav').find('a').withText('Add New')
     this.pdfLabelNameInputBox = Selector('#gfpdf-fieldset-gfpdf_form_settings_general').find('[id="gfpdf_settings[name]"]')
     this.pdfFilenameInputBox = Selector('#gfpdf-fieldset-gfpdf_form_settings_general').find('[id="gfpdf_settings[filename]"]')
-    this.addUpdatePdfButton = Selector('#submit-and-promo-container').find('[id="submit"]')
+    this.addUpdatePdfButton = Selector('[name="submit"]')
     this.templateItem = Selector('#the-list').find('tr')
     this.pdfListSection = Selector('.gform-settings__navigation').find('a').withText('PDF')
     this.toggleSwitch = Selector('#the-list').find('.check-column button')

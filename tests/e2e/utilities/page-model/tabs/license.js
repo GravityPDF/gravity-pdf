@@ -15,7 +15,7 @@ class License {
     this.deactivateLink = Selector('.gfpdf-deactivate-license')
     this.deactivatedMessage = Selector('.success').withText('License deactivated.')
 
-    this.saveSettings = Selector('#submit-and-promo-container').find('input')
+    this.saveSettings = Selector('[name="submit"]')
   }
 
   async navigateCoreBooster (uri) {

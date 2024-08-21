@@ -118,7 +118,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		GFFormsModel::drop_tables();
 		gf_upgrade()->maybe_upgrade();
 
-		// Enabling GF Rest API v2.
+		/* Enabling GF Rest API v2. */
 		global $gf_webapi;
 		$gf_webapi = GFWebAPI::get_instance();
 		$gf_webapi->update_plugin_settings( [ 'enabled' => '1', 'version' => 'v2' ] );
@@ -146,8 +146,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		];
 
+		$json_basepath = __DIR__ . '/data/json/';
+
 		foreach ( $forms as $json ) {
-			$form                                 = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
+			$form                                 = json_decode( trim( file_get_contents( $json_basepath . $json ) ), true );
 			$form_id                              = GFAPI::add_form( $form );
 			$this->form[ substr( $json, 0, -5 ) ] = GFAPI::get_form( $form_id );
 		}
@@ -162,7 +164,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		];
 
 		foreach ( $entries as $id => $json ) {
-			$entries   = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
+			$entries   = json_decode( trim( file_get_contents( $json_basepath . $json ) ), true );
 			$entry_ids = GFAPI::add_entries( $entries, $this->form[ $id ]['id'] );
 
 			/* Loop through our new entry IDs and get the actual entries */

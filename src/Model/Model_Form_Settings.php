@@ -640,7 +640,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		return $template;
+		return apply_filters( 'gfpdf_template_for_current_page', $template );
 	}
 
 	/**

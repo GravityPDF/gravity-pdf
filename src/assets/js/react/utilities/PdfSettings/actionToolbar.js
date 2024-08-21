@@ -1,4 +1,16 @@
-export function addEditButton (pdfSettingFieldSets, form) {
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
+/**
+ * Clone action toolbar below each fieldset if it is enabled
+ *
+ * @param {Element} pdfSettingFieldSets
+ * @param {Element} form
+ */
+export function actionToolbar (pdfSettingFieldSets, form) {
   const items = Array.from(pdfSettingFieldSets)
   /* Remove last element of the array */
   items.pop()
@@ -18,18 +30,16 @@ export function addEditButton (pdfSettingFieldSets, form) {
 }
 
 export function insertAfter (fieldset, form, index, firstLoad) {
-  const wrapperClass = 'submit-container-' + index
+  const wrapperClass = 'form-action-toolbar-' + index
 
   if (!fieldset.classList.contains('gform-settings-panel--collapsed')) {
-    const submitButton = form.querySelector('#submit')
-    const submitButtonClone = submitButton.cloneNode(true)
-    submitButtonClone.setAttribute('id', ('submit_' + index))
+    // get the original toolbar
+    const actionToolbar = form.querySelector('.form-action-toolbar:last-of-type')
+    const actionToolbarClone = actionToolbar.cloneNode(true)
 
-    const wrapper = document.createElement('div')
-    wrapper.setAttribute('class', wrapperClass)
-    wrapper.innerHTML = submitButtonClone.outerHTML
+    actionToolbarClone.classList.add(wrapperClass)
 
-    return fieldset.parentNode.insertBefore(wrapper, fieldset.nextSibling)
+    return fieldset.parentNode.insertBefore(actionToolbarClone, fieldset.nextSibling)
   }
 
   if (firstLoad) {

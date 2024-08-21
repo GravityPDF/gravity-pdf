@@ -1,9 +1,14 @@
 #tab_PDF {
 
-  /* Fieldsets (General, Appearance, Template, Advanced) */
+  // Large buttons
+  .button.large {
+    height: initial;
+  }
+
+  // Fieldsets (General, Appearance, Template, Advanced)
   .gform_settings_form {
 
-    /* Conditional Logic */
+    // Conditional Logic
     button {
       &.add_field_choice, &.delete_field_choice {
         max-width: 18px;
@@ -11,7 +16,7 @@
       }
     }
 
-    /* Merge tag box */
+    // Merge tag box
     .all-merge-tags {
       &.textarea {
         .tooltip-merge-tag {
@@ -41,7 +46,7 @@
     }
   }
 
-  /* GF 2.6 UI updates */
+  // GF 2.6 UI updates
   .gfpdf-gf-2-6 {
     .gfpdf-settings-field-wrapper {
       .wp-editor-wrap {

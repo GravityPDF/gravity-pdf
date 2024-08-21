@@ -2272,7 +2272,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			<div class="gform-settings-description gform-kitchen-sink"><?php echo wp_kses_post( $args['desc'] ); ?></div>
 
 			<span class="gform-settings-input__container">
-				<input type="checkbox" id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" value="Yes" <?php echo checked( $value, 'Yes', false ); ?> />
+				<input type="checkbox"
+					   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+					   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
+					   class="gfpdf-input-toggle"
+					   value="Yes"
+					   <?php checked( $value, 'Yes' ); ?> />
 				<label class="gform-field__toggle-container" for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
 					<?php if ( ! empty( $name ) ): ?>
 						<span class="screen-reader-text"><?php echo esc_html( $name ); ?></span>

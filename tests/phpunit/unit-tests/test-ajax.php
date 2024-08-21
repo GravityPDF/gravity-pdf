@@ -79,7 +79,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 * @since 4.0
 	 */
 	private function import_form() {
-		$json          = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/form-settings.json' ) ), true );
+		$json          = json_decode( trim( file_get_contents( __DIR__ . '/../data/json/form-settings.json' ) ), true );
 		$this->form_id = GFAPI::add_form( $json );
 	}
 

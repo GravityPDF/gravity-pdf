@@ -75,7 +75,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 
-		$fonts = glob( dirname( __FILE__ ) . '/fonts/' . '*.[tT][tT][fF]' );
+		$fonts = glob( __DIR__ . '/../data/fonts/' . '*.[tT][tT][fF]' );
 		$fonts = ( is_array( $fonts ) ) ? $fonts : [];
 
 		foreach ( $fonts as $font ) {
@@ -153,9 +153,14 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		try {
 			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 			wp_set_current_user( $user_id );
+
+			add_action( 'gfpdf_post_view_or_download_pdf', function () {
+				wp_die( 'PDF generated successfully' );
+			} );
+
 			$this->controller->process_legacy_pdf_endpoint();
 		} catch ( Exception $e ) {
-			$this->assertEquals( 'The PDF cannot be displayed because the server headers have already been sent.', $e->getMessage() );
+			$this->assertEquals( 'PDF generated successfully', $e->getMessage() );
 
 			return;
 		}
@@ -164,7 +169,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the DF endpoint is secured and will generate a PDF successfully
+	 * Test the PDF endpoint is secured and will generate a PDF successfully
 	 */
 	public function test_process_pdf_endpoint() {
 
@@ -187,9 +192,14 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		try {
 			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 			wp_set_current_user( $user_id );
+
+			add_action( 'gfpdf_post_view_or_download_pdf', function () {
+				wp_die( 'PDF generated successfully' );
+			} );
+
 			$this->controller->process_pdf_endpoint();
 		} catch ( Exception $e ) {
-			$this->assertEquals( 'The PDF cannot be displayed because the server headers have already been sent.', $e->getMessage() );
+			$this->assertEquals( 'PDF generated successfully', $e->getMessage() );
 
 			return;
 		}

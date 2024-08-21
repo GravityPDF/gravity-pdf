@@ -251,19 +251,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'required' => true,
 						'desc'     => __( 'Add a descriptive label to help you  differentiate between multiple PDF settings.', 'gravity-forms-pdf-extended' ),
 						'schema'   => [
-							'arg_options' => [
-								'validate_callback' => function( $param, $request, $key ) {
-									if ( ! empty( $param ) ) {
-										return true;
-									}
-
-									return new WP_Error(
-										'rest_invalid_param',
-										__( 'PDF name must be a non-empty string.', 'gravity-forms-pdf-extended' ),
-										[ 'status' => 400 ]
-									);
-								},
-							],
+							'default'   => __( 'PDF', 'gravity-forms-pdf-extended' ),
+							'minLength' => 1,
 						],
 					],
 
@@ -327,6 +316,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'schema'     => [
 							'default'     => __( 'document', 'gravity-forms-pdf-extended' ),
 							'description' => sprintf( __( 'Set the filename for the generated PDF (excluding the .pdf extension). Mergetags are supported, and invalid characters %s are automatically converted to an underscore.', 'gravity-forms-pdf-extended' ), '/ \ " * ? | : < >' ),
+							'minLength'   => 1,
 							'arg_options' => [
 								'sanitize_callback' => function( $param, $request, $key ) {
 									$param = $this->misc->remove_extension_from_string( $param, '.pdf' );

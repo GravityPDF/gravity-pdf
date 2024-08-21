@@ -1,14 +1,12 @@
-/* Dependencies */
 import $ from 'jquery'
-/* Bootstrap */
 import { templateBootstrap } from './bootstrap/templateBootstrap'
 import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap'
 import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
-/* Utilities */
-import { addEditButton } from './utilities/PdfSettings/addEditButton'
+import { actionToolbar } from './utilities/PdfSettings/actionToolbar'
 import shortcodeButton from './utilities/PdfList/shortcodeButton'
-/* Sass Styling */
+import previewButton from './utilities/PdfSettings/previewButton'
+import unsavedChangesWarning from './utilities/PdfSettings/unsavedChangesWarning'
 import '../../scss/gfpdf-styles.scss'
 
 /**
@@ -61,11 +59,11 @@ $(function () {
   }
 
   const fmGeneralSettingsTab = document.querySelector('#gfpdf-settings-field-wrapper-default_font select')
-  const fmToolsTab = document.querySelector('#gfpdf-settings-field-wrapper-manage_fonts')
+  const fmToolsTab = document.getElementById('gfpdf-settings-field-wrapper-manage_fonts')
   const fmPdfSettings = document.querySelector('#gfpdf-settings-field-wrapper-font select')
-  const pdfSettingsForm = document.querySelector('#gfpdf_pdf_form')
+  const pdfSettingsForm = document.getElementById('gfpdf_pdf_form')
   const pdfSettingFieldSets = document.querySelectorAll('fieldset.gform-settings-panel--full')
-  const gfPdfListForm = document.querySelector('form#gfpdf_list_form')
+  const gfPdfListForm = document.getElementById('gfpdf_list_form')
 
   /* Initialize font manager under general settings tab */
   if (fmGeneralSettingsTab !== null) {
@@ -82,9 +80,16 @@ $(function () {
     fontManagerBootstrap(fmPdfSettings)
   }
 
-  /* Initialize additional add/update buttons on PDF setting panels */
-  if (pdfSettingsForm && pdfSettingFieldSets.length === 4) {
-    addEditButton(pdfSettingFieldSets, pdfSettingsForm)
+  /* Adding / Updating form PDF settings */
+  if (pdfSettingsForm) {
+    /* Initialize the PDF Preview button */
+    previewButton()
+
+    /* Initialize additional add/update/preview buttons on PDF setting panels */
+    actionToolbar(pdfSettingFieldSets, pdfSettingsForm)
+
+    /* Watch for unsaved changes */
+    unsavedChangesWarning(pdfSettingsForm)
   }
 
   /* Enable shortcode field click and auto select feature */

@@ -236,7 +236,7 @@ class Test_API extends WP_UnitTestCase {
 		$this->assertEquals( 'font_validation_error', $results->get_error_code() );
 
 		/* Test we correctly install the font */
-		$ttf_file = __DIR__ . '/fonts/Chewy.ttf';
+		$ttf_file = __DIR__ . '/../data/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',
@@ -254,7 +254,7 @@ class Test_API extends WP_UnitTestCase {
 	}
 
 	public function test_add_pdf_font_duplicate() {
-		$ttf_file = __DIR__ . '/fonts/Chewy.ttf';
+		$ttf_file = __DIR__ . '/../data/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',
@@ -284,7 +284,7 @@ class Test_API extends WP_UnitTestCase {
 		$this->assertEquals( 'invalid_font_id', $results->get_error_code() );
 
 		/* Add a font and then see if we can remove it */
-		$ttf_file = __DIR__ . '/fonts/Chewy.ttf';
+		$ttf_file = __DIR__ . '/../data/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',

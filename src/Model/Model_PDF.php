@@ -270,71 +270,9 @@ class Model_PDF extends Helper_Abstract_Model {
 			return $path_to_pdf;
 		}
 
-		/* Verify the PDF can be sent to the client */
-		if ( headers_sent( $filename, $linenumber ) ) {
-			$this->log->error(
-				'Server headers already sent',
-				[
-					'filename'   => $filename,
-					'linenumber' => $linenumber,
-				]
-			);
-
-			return new WP_Error( 'headers_sent', __( 'The PDF cannot be displayed because the server headers have already been sent.', 'gravity-forms-pdf-extended' ) );
-		}
-
-		/* Force any active buffers to close and delete its content */
-		while ( ob_get_level() > 0 ) {
-			ob_end_clean();
-		}
-
 		do_action( 'gfpdf_post_view_or_download_pdf', $path_to_pdf, $form, $entry, $settings, $action );
 
-		/* Send the PDF to the client */
-		header( 'Content-Type: application/pdf' );
-
-		/*
-		 * Set the filename, supporting the new utf-8 syntax + backwards compatibility
-		 * Refer to RFC 8187 https://www.rfc-editor.org/rfc/rfc8187.html
-		 */
-		header(
-			sprintf(
-				'Content-Disposition: %1$s; filename="%2$s"; filename*=utf-8\'\'%2$s',
-				$action === 'view' ? 'inline' : 'attachment',
-				rawurlencode( basename( $path_to_pdf ) ),
-			)
-		);
-
-		/* only add the length if the server is not using compression */
-		if ( empty( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ) {
-			header( sprintf( 'Content-Length: %d', filesize( $path_to_pdf ) ) );
-		}
-
-		/* Tell client to download the file */
-		if ( $action === 'download' ) {
-			header( 'Content-Description: File Transfer' );
-			header( 'Content-Transfer-Encoding: binary' );
-		}
-
-		/* Set appropriate headers for local browser caching */
-		$last_modified_time = filemtime( $path_to_pdf );
-		$etag               = md5( $path_to_pdf ); /* the file path includes a unique hash that automatically changes when a PDF does */
-
-		header( sprintf( 'Last-Modified: %s GMT', gmdate( 'D, d M Y H:i:s', $last_modified_time ) ) );
-		header( sprintf( 'Etag: %s', $etag ) );
-		header( 'Cache-Control: no-cache, private' );
-		header( 'Pragma: no-cache' );
-		header( 'Expires: 0' );
-
-		/* Tell client they can display the PDF from the local cache if it is still current */
-		if ( ! empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag ) {
-			header( 'HTTP/1.1 304 Not Modified' );
-			exit;
-		}
-
-		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile */
-
-		exit;
+		$this->send_pdf_to_browser( $path_to_pdf, $action );
 	}
 
 	/**
@@ -2657,5 +2595,79 @@ class Model_PDF extends Helper_Abstract_Model {
 		$cache[ $key ] = $hydrated_form;
 
 		return $hydrated_form;
+	}
+
+	/**
+	 * Send a PDF file to the browser
+	 *
+	 * @param string $path_to_pdf Absolute path to PDF on disk
+	 * @param string $action Either "view" or "download"
+	 *
+	 * @since 6.12
+	 */
+	public function send_pdf_to_browser( $path_to_pdf, $action = 'view' ) {
+		/* Verify the PDF can be sent to the client */
+		if ( headers_sent( $filename, $linenumber ) ) {
+			$this->log->error(
+				'Server headers already sent',
+				[
+					'filename'   => $filename,
+					'linenumber' => $linenumber,
+				]
+			);
+
+			return new WP_Error( 'headers_sent', __( 'The PDF cannot be displayed because the server headers have already been sent.', 'gravity-forms-pdf-extended' ) );
+		}
+
+		/* Force any active buffers to close and delete its content */
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
+
+		/* Send the PDF to the client */
+		header( 'Content-Type: application/pdf' );
+
+		/*
+		 * Set the filename, supporting the new utf-8 syntax + backwards compatibility
+		 * Refer to RFC 8187 https://www.rfc-editor.org/rfc/rfc8187.html
+		 */
+		header(
+			sprintf(
+				'Content-Disposition: %1$s; filename="%2$s"; filename*=utf-8\'\'%2$s',
+				$action === 'view' ? 'inline' : 'attachment',
+				rawurlencode( basename( $path_to_pdf ) ),
+			)
+		);
+
+		/* only add the length if the server is not using compression */
+		if ( empty( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ) {
+			header( sprintf( 'Content-Length: %d', filesize( $path_to_pdf ) ) );
+		}
+
+		/* Tell client to download the file */
+		if ( $action !== 'view' ) {
+			header( 'Content-Description: File Transfer' );
+			header( 'Content-Transfer-Encoding: binary' );
+		}
+
+		/* Set appropriate headers for local browser caching */
+		$last_modified_time = filemtime( $path_to_pdf );
+		$etag               = md5( $path_to_pdf ); /* the file path includes a unique hash that automatically changes when a PDF does */
+
+		header( sprintf( 'Last-Modified: %s GMT', gmdate( 'D, d M Y H:i:s', $last_modified_time ) ) );
+		header( sprintf( 'Etag: %s', $etag ) );
+		header( 'Cache-Control: no-cache, private' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		/* Tell client they can display the PDF from the local cache if it is still current */
+		if ( ! empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag ) {
+			header( 'HTTP/1.1 304 Not Modified' );
+			exit;
+		}
+
+		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile */
+
+		exit;
 	}
 }

@@ -267,7 +267,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 * Test that number fields will use the local currency set in the entry
 	 */
 	public function test_field_number_currency() {
-		$form_json = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/number-fields.json' ) ), true );
+		$form_json = json_decode( trim( file_get_contents( __DIR__ . '/../data/json/number-fields.json' ) ), true );
 		$form_id   = GFAPI::add_form( $form_json );
 
 		$entry_id = GFAPI::add_entry(
@@ -1536,7 +1536,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 * Ensure the Product data calculations are correct when using Euros (or similar comma/decimal switched currency)
 	 */
 	public function test_euro_product_data() {
-		$json            = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/all-form-euro-product-entry.json' ) ), true );
+		$json            = json_decode( trim( file_get_contents( __DIR__ . '/../data/json/all-form-euro-product-entry.json' ) ), true );
 		$json['form_id'] = $this->form['id'];
 		$entry_id        = GFAPI::add_entry( $json );
 		$entry           = GFAPI::get_entry( $entry_id );
