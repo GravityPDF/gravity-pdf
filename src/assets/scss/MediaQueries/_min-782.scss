@@ -1,0 +1,24 @@
+/* 782px and below */
+@media only screen and (max-width: 782px) {
+  .gfpdf-page {
+    /* Hide navigation label for small screens, but not from screen readers */
+    .gform-settings__wrapper {
+      grid-template-columns: 3.175rem auto;
+    }
+
+    .gform-settings__navigation {
+      .label {
+        border: 0;
+        clip: rect(1px, 1px, 1px, 1px);
+        clip-path: inset(50%);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+        word-wrap: normal !important;
+      }
+    }
+  }
+}

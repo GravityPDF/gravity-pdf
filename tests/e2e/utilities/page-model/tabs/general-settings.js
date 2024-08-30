@@ -53,7 +53,7 @@ class General {
     this.testTemplateDetailsLink = Selector('.theme[data-slug="test-template"]').find('span').withText('Template Details')
 
     this.addNewTemplate = Selector('input').withAttribute('type', 'file')
-    this.saveSettings = Selector('#submit-and-promo-container').find('input')
+    this.saveSettings = Selector('[name="submit"]')
 
     // PDF entries section
     this.viewEntryItem = Selector('#the-list').find('td.column-primary')

@@ -54,15 +54,25 @@ global $wp_settings_fields;
 	}
 	?>
 
-	<div id="submit-and-promo-container">
-		<input type="submit" name="submit" id="submit" value="<?php echo esc_attr( $args['button_label'] ); ?>" class="button primary large">
+	<footer class="form-action-toolbar">
+		<div>
+			<input type="submit"
+				   name="submit"
+				   value="<?php echo esc_attr( $args['button_label'] ); ?>"
+				   class="button primary large" />
+
+			<input type="button"
+				   name="gpdf-preview-pdf-settings"
+				   value="<?php echo esc_attr__( 'Preview PDF', 'gravity-forms-pdf-extended' ); ?>"
+				   class="button large" />
+		</div>
 
 		<div class="extensions-upsell">
 			<a href="https://gravitypdf.com/store/">
 				<?php esc_html_e( 'Want more features? Take a look at our addons.', 'gravity-forms-pdf-extended' ); ?>
 			</a>
 		</div>
-	</div>
+	</footer>
 </form>
 
 <?php GFFormSettings::page_footer(); ?>

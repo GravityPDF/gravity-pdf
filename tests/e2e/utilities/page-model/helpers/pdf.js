@@ -5,7 +5,9 @@ import { selectBox } from './field'
 class Pdf {
   constructor () {
     this.template = Selector('.alternate')
-    this.saveSettings = Selector('#submit-and-promo-container').find('input')
+    this.saveSettings = Selector('[name="submit"]')
+    this.previewSettings = Selector('[name="gpdf-preview-pdf-settings"]')
+    this.addNewButton = Selector('#tab_PDF a').withText('Add New')
 
     // General - Template field
     this.templateSelectBox = selectBox('gfpdf_settings_template large', 'gfpdf_settings[template]')
@@ -139,6 +141,11 @@ class Pdf {
     await t
       .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${uri}`)
+  }
+
+  async addNewPdf (formId) {
+    await this.navigate('gf_edit_forms&view=settings&subview=PDF&id=' + formId)
+    await t.click(this.addNewButton)
   }
 }
 

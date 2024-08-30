@@ -132,7 +132,6 @@ export function templateChangeStoreListener (store, $templateField) {
         $templateField
           .html(updateSelectBoxText)
           .val(store.getState().template.activeTemplate)
-          .trigger('chosen:updated')
       }))
     }
   }))

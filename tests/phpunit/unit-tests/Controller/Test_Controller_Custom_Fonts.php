@@ -87,7 +87,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 
 		foreach ( $fonts as $font ) {
 			$tmp_font = get_temp_dir() . $font;
-			copy( __DIR__ . '/../fonts/' . $font, $tmp_font );
+			copy( __DIR__ . '/../../data/fonts/' . $font, $tmp_font );
 			$this->test_fonts[] = $tmp_font;
 		}
 
@@ -196,7 +196,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$request->set_param( 'label', 'Font' );
 
 		/* JSON file masquerading as a ttf file */
-		$test_file = __DIR__ . '/../json/all-form-fields.json';
+		$test_file = __DIR__ . '/../../data/json/all-form-fields.json';
 
 		$_FILES = [
 			'regular' => [
@@ -215,7 +215,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertSame( 400, $response->get_status() );
 
 		/* TTF file masquerading as a JSON file */
-		$test_file = __DIR__ . '/../fonts/DejaVuSans.ttf';
+		$test_file = __DIR__ . '/../../data/fonts/DejaVuSans.ttf';
 
 		$_FILES = [
 			'regular' => [
@@ -301,7 +301,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		GPDFAPI::add_pdf_font(
 			[
 				'font_name' => 'Lato',
-				'regular'   => __DIR__ . '/../fonts/DejaVuSans.ttf',
+				'regular'   => __DIR__ . '/../../data/fonts/DejaVuSans.ttf',
 			]
 		);
 
@@ -318,7 +318,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		GPDFAPI::add_pdf_font(
 			[
 				'font_name' => 'Lato',
-				'regular'   => __DIR__ . '/../fonts/DejaVuSans.ttf',
+				'regular'   => __DIR__ . '/../../data/fonts/DejaVuSans.ttf',
 			]
 		);
 
@@ -349,7 +349,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		GPDFAPI::add_pdf_font(
 			[
 				'font_name' => 'Lato',
-				'regular'   => __DIR__ . '/../fonts/DejaVuSans.ttf',
+				'regular'   => __DIR__ . '/../../data/fonts/DejaVuSans.ttf',
 			]
 		);
 
@@ -358,7 +358,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
 
 		/* JSON file masquerading as a ttf file */
-		$test_file = __DIR__ . '/../json/all-form-fields.json';
+		$test_file = __DIR__ . '/../../data/json/all-form-fields.json';
 
 		$_FILES = [
 			'regular' => [
@@ -377,7 +377,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertSame( 400, $response->get_status() );
 
 		/* TTF file masquerading as a JSON file */
-		$test_file = __DIR__ . '/../fonts/DejaVuSans.ttf';
+		$test_file = __DIR__ . '/../../data/fonts/DejaVuSans.ttf';
 
 		$_FILES = [
 			'regular' => [

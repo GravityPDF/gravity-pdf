@@ -1,13 +1,12 @@
 <?php
 
-namespace GFPDF\Controller;
+namespace GFPDF\Rest;
 
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Statics\Kses;
 use GPDFAPI;
 use WP_Error;
@@ -30,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @since 6.12
  */
-class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
+class Rest_Form_Settings extends WP_REST_Controller {
 
 	/**
 	 * @var string
@@ -45,22 +44,14 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	public const API_BASE = '/form';
 
 	/**
-	 * @var string The current template being processed for this request
+	 * @var string[]
 	 * @since 6.12
 	 */
-	protected $current_template = '';
-
-	/**
-	 * @var string A backup of the original PDF template for this request (if any)
-	 * @since 6.12
-	 */
-	protected $original_request_template = '';
-
-	/**
-	 * @var string A backup of the original schema for this request (if any)
-	 * @since 6.12
-	 */
-	protected $original_schema;
+	public static $endpoints = [
+		'pdf-settings'      => self::API_BASE . '/(?P<form>[\d]+)',
+		'pdf-settings-item' => self::API_BASE . '/(?P<form>[\d]+)/(?P<pdf>[a-fA-F0-9]{13})',
+		'template-schema'   => self::API_BASE . '/(?P<form>[\d]+)/schema',
+	];
 
 	/**
 	 * @var Helper_Options_Fields
@@ -107,6 +98,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 */
 	public function init() {
 		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+		add_filter( 'rest_pre_dispatch', [ $this, 'maybe_set_template_schema' ], 10, 3 );
 	}
 
 	/**
@@ -117,19 +109,16 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 */
 	public function register_routes() {
 
-		/* To make full use of schema validation, we need to correctly parse and save the template for the request */
-		$this->maybe_assign_template_for_schema();
-
 		/*
 		 * Routes to list all form PDF settings, or create a new one
 		 */
 		register_rest_route(
 			static::NAMESPACE,
-			static::API_BASE . '/(?P<form>[\d]+)',
+			static::$endpoints['pdf-settings'],
 			[
 				'args'   => [
 					'form' => [
-						'description'       => __( 'The unique identifier for the Gravity Form.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-forms-pdf-extended' ),
 						'type'              => 'integer',
 						'required'          => true,
 						'validate_callback' => [ $this, 'check_form_is_valid' ],
@@ -140,7 +129,17 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_items' ],
 					'permission_callback' => [ $this, 'get_items_permissions_check' ],
-					'args'                => $this->get_collection_params(),
+					'args'                => array_merge(
+						$this->get_collection_params(),
+						[
+							'entry' => [
+								'description'       => __( 'The unique identifier for the Gravity Forms entry. Include to filter out PDFs that are not active for the entry.', 'gravity-forms-pdf-extended' ),
+								'type'              => 'integer',
+								'required'          => false,
+								'validate_callback' => [ $this, 'check_entry_is_valid' ],
+							],
+						]
+					),
 				],
 
 				[
@@ -160,11 +159,11 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		 */
 		register_rest_route(
 			static::NAMESPACE,
-			static::API_BASE . '/(?P<form>[\d]+)/(?P<pdf>[a-fA-F0-9]{13})',
+			static::$endpoints['pdf-settings-item'],
 			[
 				'args'   => [
 					'form' => [
-						'description'       => __( 'The unique identifier for the Gravity Form.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-forms-pdf-extended' ),
 						'type'              => 'integer',
 						'required'          => true,
 						'validate_callback' => [ $this, 'check_form_is_valid' ],
@@ -184,6 +183,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 							$pdfs = GPDFAPI::get_form_pdfs( $request->get_param( 'form' ) );
 
 							/* translators: 1: Parameter, 2: List of valid values. */
+
 							return new WP_Error( 'rest_not_in_enum', wp_sprintf( __( '%1$s is not one of %2$l.', 'default' ), $param, ! is_wp_error( $pdfs ) ? array_keys( $pdfs ) : '' ) );
 						},
 					],
@@ -215,6 +215,128 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 			],
 			true
 		);
+
+		/* Get the template schema */
+		register_rest_route(
+			static::NAMESPACE,
+			static::$endpoints['template-schema'],
+			[
+				'args' => [
+					'form'     => [
+						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-forms-pdf-extended' ),
+						'type'              => 'integer',
+						'required'          => true,
+						'validate_callback' => [ $this, 'check_form_is_valid' ],
+					],
+
+					'template' => [
+						'description' => __( 'A PDF template installed on the website.', 'gravity-forms-pdf-extended' ),
+						'type'        => 'string',
+						'required'    => true,
+						'enum'        => $this->misc->flatten_array( $this->templates->get_all_templates_by_group() ),
+					],
+
+					'context'  => $this->get_context_param( [ 'default' => 'edit' ] ),
+				],
+
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_schema_for_template' ],
+					'permission_callback' => [ $this, 'get_item_permissions_check' ],
+				],
+			],
+			true
+		);
+	}
+
+	/**
+	 * Each template has different schema. For requests to this namespace automatically set the template schema before the API call is processed
+	 *
+	 * @param mixed $results
+	 * @param WP_REST_Server $server
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.12
+	 */
+	public function maybe_set_template_schema( $results, $server, $request ) {
+		/* Look for current endpoints */
+		if ( strpos( $request->get_route(), '/' . static::get_route_basepath() ) !== 0 ) {
+			return $results;
+		}
+
+		/* Match request to handler and set the URL params (which is normally done after this hook) */
+		$path = $request->get_route();
+		foreach ( static::$endpoints as $route ) {
+			$match = preg_match( '@^/' . static::NAMESPACE . $route . '$@i', $path, $matches );
+
+			if ( ! $match ) {
+				continue;
+			}
+
+			$args = [];
+			foreach ( $matches as $param => $value ) {
+				if ( ! is_int( $param ) ) {
+					$args[ $param ] = $value;
+				}
+			}
+
+			$request->set_url_params( $args );
+
+			break;
+		}
+
+		/*
+		 * Make data available in appropriate superglobals
+		 * This allows code to register template settings which rely on knowing the form
+		 */
+		$data = [
+			'form' => (int) $request->get_param( 'form' ),
+		];
+
+		switch ( $request->get_method() ) {
+			case 'GET':
+				foreach ( $data as $key => $value ) {
+					if ( ! empty( $value ) ) {
+						$_GET[ $key ]     = $value;
+						$_REQUEST[ $key ] = $value;
+					}
+				}
+				break;
+
+			case 'POST':
+			case 'PATCH':
+			case 'PUT':
+				foreach ( $data as $key => $value ) {
+					if ( ! empty( $value ) ) {
+						$_POST[ $key ]    = $value;
+						$_REQUEST[ $key ] = $value;
+					}
+				}
+				break;
+		}
+
+		$this->schema = null;
+
+		/* If template is known reregister the schema */
+		$template = $request->get_param( 'template' );
+		if ( ! empty( $template ) ) {
+			$this->get_template_schema( sanitize_html_class( $template ) );
+		}
+
+		$this->register_routes();
+
+		return $results;
+	}
+
+	/**
+	 * @return string
+	 *
+	 * @since 6.12
+	 */
+	public static function get_route_basepath() {
+		return static::NAMESPACE . static::API_BASE;
 	}
 
 	/**
@@ -239,23 +361,35 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	}
 
 	/**
-	 * A helper to re-register the endpoints with a new template schema
-	 * This allows for correct validation of requests, and default values
+	 * Check if the entry is valid
 	 *
-	 * @param string $template The name of the template
+	 * @param int $entry_id
+	 * @param WP_REST_Request $request
 	 *
-	 * @return void
+	 * @return true|WP_Error
 	 *
-	 * @internal Only use this if manually running REST API requests `new WP_REST_Request()` with a different template each time.
-	 * External API requests automatically detect the correct template each request
-	 *
-	 * @since    6.12.0
+	 * @since 6.12.0
 	 */
-	public function reregister_routes( $template ) {
-		$this->set_template( $template );
-		$this->register_routes();
-	}
+	public function check_entry_is_valid( $entry_id, $request ) {
+		$entry = \GFAPI::get_entry( $entry_id );
+		if ( is_wp_error( $entry ) ) {
+			return new WP_Error(
+				'rest_invalid_param',
+				sprintf( __( 'Invalid entry ID %d provided.', 'gravity-forms-pdf-extended' ), $entry_id ),
+				[ 'status' => 400 ]
+			);
+		}
 
+		if ( (int) ( $entry['form_id'] ?? 0 ) !== (int) $request->get_param( 'form' ) ) {
+			return new WP_Error(
+				'rest_invalid_param',
+				sprintf( __( 'Entry ID %d is not associated with the current form.', 'gravity-forms-pdf-extended' ), $entry_id ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		return true;
+	}
 	/**
 	 * Permissions check for getting all form PDFs
 	 *
@@ -279,24 +413,25 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 * @since 6.12.0
 	 */
 	public function get_items( $request ) {
-		$pdfs = \GPDFAPI::get_form_pdfs( $request->get_param( 'form' ) );
+		$entry_id = $request->get_param( 'entry' );
+		if ( ! empty( $entry_id ) ) {
+			$pdfs = \GPDFAPI::get_entry_pdfs( $entry_id );
+		} else {
+			$pdfs = \GPDFAPI::get_form_pdfs( $request->get_param( 'form' ) );
+		}
 
 		if ( is_wp_error( $pdfs ) ) {
-			return new WP_Error(
-				'rest_invalid_param',
-				__( 'Form does not exist.', 'gravity-forms-pdf-extended' ),
-				[ 'status' => 400 ]
-			);
+			$pdfs->add_data( [ 'status' => 400 ] );
+
+			return $pdfs;
 		}
 
 		$output = [];
 		foreach ( $pdfs as $pdf ) {
-			$this->set_template( $pdf['template'] );
+			$this->get_template_schema( $pdf['template'] );
 			$request->set_param( 'pdf', $pdf['id'] );
 
 			$output[] = $this->prepare_response_for_collection( $this->prepare_item_for_response( $pdf, $request ) );
-
-			$this->restore_template_to_original();
 		}
 
 		return rest_ensure_response( $output );
@@ -338,11 +473,9 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 			return $pdf;
 		}
 
-		$this->set_template( $pdf['template'] );
+		$this->get_template_schema( $pdf['template'] );
 
 		$response = rest_ensure_response( $this->prepare_item_for_response( $pdf, $request ) );
-
-		$this->restore_template_to_original();
 
 		return $response;
 	}
@@ -378,7 +511,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 * @since 6.12.0
 	 */
 	public function create_item( $request ) {
-		if ( ! empty( $request['pdf'] ) ) {
+		if ( ! empty( $request->get_param( 'pdf' ) ) ) {
 			return new WP_Error(
 				'rest_invalid_param',
 				__( 'Cannot create existing PDF.', 'gravity-forms-pdf-extended' ),
@@ -386,9 +519,9 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 			);
 		}
 
-		$form_id = $request['form'];
+		$form_id = $request->get_param( 'form' );
 
-		$this->set_template( $request['template'] ?? '' );
+		$this->get_template_schema( $request->get_param( 'template' ) );
 
 		$pdf_id = \GPDFAPI::add_pdf( $form_id, $this->prepare_item_for_database( $request ) );
 		if ( $pdf_id === false ) {
@@ -422,9 +555,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		$response = rest_ensure_response( $response );
 
 		$response->set_status( 201 );
-		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d/%s', static::NAMESPACE, static::API_BASE, $form_id, $pdf_id ) ) );
-
-		$this->restore_template_to_original();
+		$response->header( 'Location', rest_url( sprintf( '%s/%d/%s', static::get_route_basepath(), $form_id, $pdf_id ) ) );
 
 		return $response;
 	}
@@ -452,8 +583,8 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 * @since 6.12.0
 	 */
 	public function update_item( $request ) {
-		$form_id = $request['form'];
-		$pdf_id  = $request['pdf'];
+		$form_id = $request->get_param( 'form' );
+		$pdf_id  = $request->get_param( 'pdf' );
 		$pdf     = \GPDFAPI::get_pdf( $form_id, $pdf_id );
 		if ( is_wp_error( $pdf ) ) {
 			$pdf->add_data( [ 'status' => 410 ] );
@@ -463,7 +594,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 
 		$id = $pdf['id'];
 
-		$this->set_template( $pdf['template'] );
+		$this->get_template_schema( $request->get_param( 'template' ) ?? $pdf['template'] );
 
 		$database_pdf = $this->prepare_item_for_database( $request );
 
@@ -491,8 +622,6 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		$response = $this->prepare_item_for_response( $pdf, $request );
 		$response = rest_ensure_response( $response );
 
-		$this->restore_template_to_original();
-
 		return $response;
 	}
 
@@ -519,7 +648,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 * @since 6.12.0
 	 */
 	public function delete_item( $request ) {
-		$pdf = \GPDFAPI::get_pdf( $request['form'], $request['pdf'] );
+		$pdf = \GPDFAPI::get_pdf( $request->get_param( 'form' ), $request->get_param( 'pdf' ) );
 		if ( is_wp_error( $pdf ) ) {
 			$pdf->add_data( [ 'status' => 410 ] );
 
@@ -527,13 +656,11 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		}
 
 		$request->set_param( 'context', 'edit' );
-		$this->set_template( $pdf['template'] );
+		$this->get_template_schema( $pdf['template'] );
 
 		$previous = $this->prepare_item_for_response( $pdf, $request );
 
-		$this->restore_template_to_original();
-
-		$result = \GPDFAPI::delete_pdf( $request['form'], $request['pdf'] );
+		$result = \GPDFAPI::delete_pdf( $request->get_param( 'form' ), $request->get_param( 'pdf' ) );
 		if ( ! $result ) {
 			return new \WP_Error(
 				'gfpdf_form_settings_rest_cannot_delete_pdf',
@@ -639,18 +766,19 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 
 		$data = $reordered;
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'edit';
+		$context = ! empty( $request->get_param( 'context' ) ) ? $request->get_param( 'context' ) : 'edit';
 
 		$data = $this->add_additional_fields_to_object( $data, $request );
-		$data = $this->filter_response_by_context( $data, $context );
 
-		$data = apply_filters( 'gfpdf_form_settings_rest_prepared_response', $data, $request );
+		/* Get the links before the data is filtered */
+		$links = $this->prepare_links( $data, $request );
 
-		/* Wrap the data in a response object. */
+		$data     = $this->filter_response_by_context( $data, $context );
+		$data     = apply_filters( 'gfpdf_form_settings_rest_prepared_response', $data, $request );
 		$response = rest_ensure_response( $data );
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
-			$response->add_links( $this->prepare_links( $request, $data ) );
+			$response->add_links( $links );
 		}
 
 		return $response;
@@ -669,10 +797,10 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		$prepared_pdf = [];
 
 		/* Updating an existing PDF, save to $prepared_pdf */
-		if ( isset( $request['pdf'] ) ) {
-			$existing_pdf = \GPDFAPI::get_pdf( $request['form'], $request['pdf'] );
+		if ( $request->get_param( 'pdf' ) ) {
+			$existing_pdf = \GPDFAPI::get_pdf( $request->get_param( 'form' ), $request->get_param( 'pdf' ) );
 			if ( is_wp_error( $existing_pdf ) ) {
-				$existing_pdf->add_data( [ 'status' => '410' ] );
+				$existing_pdf->add_data( [ 'status' => 410 ] );
 
 				return $existing_pdf;
 			}
@@ -689,11 +817,11 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 			}
 
 			/* skip over if updating a PDF and no data is being set */
-			if ( isset( $request['pdf'] ) && ! array_key_exists( $id, $request->get_params() ) ) {
+			if ( $request->get_param( 'pdf' ) && ! array_key_exists( $id, $request->get_params() ) ) {
 				continue;
 			}
 
-			$value = $request[ $id ] ?? '';
+			$value = $request->get_param( $id ) ?? '';
 
 			/* Handle arrays */
 			if ( $this->has_property_type( 'array', $property['type'] ) ) {
@@ -710,7 +838,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 
 			/* Handle Toggle values */
 			if ( $this->has_property_type( 'boolean', $property['type'] ) && ( $property['format'] ?? '' ) === 'yes_no' ) {
-				$value = $value === true ? 'Yes' : '';
+				$value = $value === true ? 'Yes' : 'No';
 			}
 
 			$prepared_pdf[ $id ] = $value;
@@ -788,13 +916,13 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		$schema['properties'] = array_merge(
 			$schema['properties'],
 			/* General-specific fields */
-			$this->get_section_schema( $all_gravitypdf_settings['form_settings'] ?? [] ),
+			$this->get_section_schema( $all_gravitypdf_settings['form_settings'] ?? [], 'general' ),
 			/* Appearance-specific fields */
-			$this->get_section_schema( $all_gravitypdf_settings['form_settings_appearance'] ?? [] ),
+			$this->get_section_schema( $all_gravitypdf_settings['form_settings_appearance'] ?? [], 'appearance' ),
 			/* Template-specific fields */
-			$this->get_section_schema( $this->get_template_settings( $this->current_template ) ),
+			$this->get_section_schema( $all_gravitypdf_settings['form_settings_custom_appearance'] ?? [], 'template' ),
 			/* Advanced/Security fields */
-			$this->get_section_schema( $all_gravitypdf_settings['form_settings_advanced'] ?? [] ),
+			$this->get_section_schema( $all_gravitypdf_settings['form_settings_advanced'] ?? [], 'advanced' ),
 		);
 
 		$this->schema = apply_filters( 'gfpdf_form_settings_rest_schema', $schema );
@@ -803,110 +931,69 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	}
 
 	/**
-	 * Backup the current request's template/schema and set a new legacy template
+	 * Get Rest API schema for specific form/template
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return WP_REST_Response
+	 *
+	 * @since 6.12
+	 */
+	public function get_schema_for_template( $request ) {
+		$context  = $request->get_param( 'context' );
+		$template = $request->get_param( 'template' );
+
+		$schema = $this->get_template_schema( $template );
+
+		if ( empty( $context ) ) {
+			return rest_ensure_response( $schema );
+		}
+
+		/* filter out properties that don't match the context */
+		foreach ( $schema['properties'] as $id => $property ) {
+			if ( empty( $property['context'] ) || ! in_array( $context, $property['context'], true ) ) {
+				unset( $schema['properties'][ $id ] );
+			}
+		}
+
+		return rest_ensure_response( $schema );
+	}
+
+	/**
+	 * Get specific template schema
 	 *
 	 * @param string $template
 	 *
-	 * @return void
+	 * @return array
 	 *
-	 * @since 6.12.0
+	 * @since 6.12
 	 */
-	protected function set_template( string $template ) {
-		if ( $template === $this->current_template ) {
-			return;
-		}
+	public function get_template_schema( $template ) {
+		$current_template = function( $item ) use ( $template ) {
+			return $template;
+		};
 
-		$this->original_request_template = $this->current_template;
-		$this->original_schema           = $this->schema;
+		add_filter( 'gfpdf_template_for_current_page', $current_template );
 
-		$this->current_template = $template;
-		$this->schema           = null;
-	}
+		$this->schema = null;
+		$schema       = $this->get_item_schema();
 
-	/**
-	 * Restore the original template/schema for the current request
-	 *
-	 * @return void
-	 *
-	 * @since 6.12.0
-	 */
-	protected function restore_template_to_original() {
-		if ( empty( $this->original_request_template ) && empty( $this->original_schema ) ) {
-			return;
-		}
+		remove_filter( 'gfpdf_template_for_current_page', $current_template );
 
-		$this->current_template = $this->original_request_template;
-		$this->schema           = $this->original_schema;
-	}
-
-	/**
-	 * Set the requested template
-	 *
-	 * Generating the correct schema relies on knowing ahead of time what template (if any) is required.
-	 * The template information could come in the form of a URL parameter, posted data, or JSON, which is
-	 * why we need to create a new REST Request to correctly parse all the information.
-	 *
-	 * @return void
-	 *
-	 * @since 6.12.0
-	 */
-	protected function maybe_assign_template_for_schema() {
-		if ( ! isset( $GLOBALS['wp']->query_vars['rest_route'] ) ) {
-			return;
-		}
-
-		$route = untrailingslashit( $GLOBALS['wp']->query_vars['rest_route'] );
-		if ( strpos( $route, sprintf( '/%s', static::NAMESPACE . static::API_BASE ) ) !== 0 ) {
-			return;
-		}
-
-		$this->assign_template_for_schema();
-	}
-
-	/**
-	 * Save requested PDF template for use in schema validation
-	 *
-	 * @return Controller_Form_Settings_Rest_Api
-	 *
-	 * @since 6.12.0
-	 */
-	protected function assign_template_for_schema() {
-		$server  = rest_get_server();
-		$request = new \WP_REST_Request( 'POST', '', [ 'template' => [ 'type' => 'string' ] ] );
-		$request->set_query_params( wp_unslash( $_GET ) ); /* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-		$request->set_body_params( wp_unslash( $_POST ) ); /* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		$request->set_headers( $server->get_headers( wp_unslash( $_SERVER ) ) );
-		$request->set_body( \WP_REST_Server::get_raw_data() );
-		$request->get_json_params();
-
-		/* Get template from request */
-		$template = $request->get_param( 'template' );
-
-		/* Check if template is valid */
-		$is_valid = rest_validate_value_from_schema( $template, $this->get_item_schema()['properties']['template'] );
-		if ( is_wp_error( $is_valid ) ) {
-			unset( $request );
-
-			return $this;
-		}
-
-		$this->set_template( $template );
-
-		unset( $request );
-
-		return $this;
+		return $schema;
 	}
 
 	/**
 	 * Get the schema for a specific Template PDF
 	 *
 	 * @param array $settings
+	 * @param string $group
 	 *
 	 * @return array
 	 *
 	 * @since 6.12.0
 	 */
-	protected function get_section_schema( $settings ) {
+	protected function get_section_schema( $settings, $group ) {
 		$generic_description = __( 'Content for the specific property.', 'gravity-forms-pdf-extended' );
 
 		$schema = [];
@@ -927,11 +1014,13 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 				'description' => ! empty( $value['desc'] ) ? wp_strip_all_tags( $value['desc'] ) : $generic_description,
 				'type'        => 'string',
 				'default'     => $default,
-				'context'     => [ 'edit' ],
+				'context'     => [ 'edit', $group ],
 				'arg_options' => [
 					'sanitize_callback' => function( $param, $request, $key ) {
 						return is_array( $param ) ? array_map( 'sanitize_text_field', $param ) : sanitize_text_field( $param );
 					},
+
+					'validate_callback' => 'rest_validate_request_arg',
 				],
 			];
 
@@ -961,8 +1050,18 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 
 				case 'radio':
 				case 'select':
-					$schema[ $id ]['enum']                             = $this->misc->flatten_array( $value['options'] ?? [] );
 					$schema[ $id ]['arg_options']['sanitize_callback'] = 'rest_sanitize_request_arg';
+
+					if ( ! empty( $value['multiple'] ) ) {
+						/* multiselect field */
+						$schema[ $id ]['type']  = 'array';
+						$schema[ $id ]['items'] = [
+							'type' => 'string',
+							'enum' => $this->misc->flatten_array( $value['options'] ?? [] ),
+						];
+					} else {
+						$schema[ $id ]['enum'] = $this->misc->flatten_array( $value['options'] ?? [] );
+					}
 					break;
 
 				case 'textarea':
@@ -1011,43 +1110,34 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get the current template's settings (if any)
+	 * Add links for PDF setting
 	 *
-	 * @param string $template
-	 *
-	 * @return array
-	 *
-	 * @since 6.12.0
-	 */
-	protected function get_template_settings( string $template ): array {
-		$config = $this->templates->get_config_class( $template );
-
-		/** @var Model_Form_Settings $model */
-		$model = \GPDFAPI::get_mvc_class( 'Model_Form_Settings' );
-
-		$settings = $model->setup_custom_appearance_settings( $config );
-
-		return $settings;
-	}
-
-	/**
-	 * @param \WP_REST_Request $request
-	 * @param array            $data
+	 * @param array $data
+	 * @param WP_REST_Request $request
 	 *
 	 * @return array[]
 	 *
 	 * @since 6.12.0
 	 */
-	protected function prepare_links( $request, $data ) {
+	protected function prepare_links( $data, $request ) {
+
+		$form_id  = $data['form'] ?? $request->get_param( 'form' );
+		$pdf_id   = $data['id'] ?? $request->get_param( 'pdf' );
+		$entry_id = $data['entry'] ?? $request->get_param( 'entry' );
+
+		if ( empty( $form_id ) || empty( $pdf_id ) ) {
+			return [];
+		}
+
 		$links = [
 			'self'       => [
-				'href' => rest_url( sprintf( '%s/%d/%s', static::NAMESPACE . static::API_BASE, $data['form'], $data['id'] ) ),
+				'href' => rest_url( sprintf( '%s/%d/%s', static::get_route_basepath(), $form_id, $pdf_id ) ),
 			],
 			'admin'      => [
-				'href' => admin_url( sprintf( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=%d&pid=%s', $data['form'], $data['id'] ) ),
+				'href' => admin_url( sprintf( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=%d&pid=%s', $form_id, $pdf_id ) ),
 			],
 			'collection' => [
-				'href' => rest_url( sprintf( '%s/%d', static::NAMESPACE . static::API_BASE, $data['form'] ) ),
+				'href' => rest_url( sprintf( '%s/%d', static::get_route_basepath(), $form_id ) ),
 			],
 		];
 
@@ -1062,9 +1152,16 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		}
 
 		$links['form'] = [
-			'href'       => rest_url( sprintf( 'gf/v2/forms/%d', $data['form'] ) ),
+			'href'       => rest_url( sprintf( 'gf/v2/forms/%d', $form_id ) ),
 			'embeddable' => true,
 		];
+
+		if ( ! empty( $entry_id ) ) {
+			$links['entry'] = [
+				'href'       => rest_url( sprintf( 'gf/v2/entries/%d', $entry_id ) ),
+				'embeddable' => true,
+			];
+		}
 
 		return $links;
 	}
@@ -1074,7 +1171,8 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 *
 	 * So merge tags can be used inside HTML attributes (like src="{tag:20}"), but the rich editor content
 	 * can still be sanitized, we'll replace the opening { tag with a valid protocol that isn't very common.
-	 * Doing this ensures the merge tag does not get malformed during sanitizing.
+	 * Doing this ensures the merge tag does not get malformed during initial sanitizing. Once the merge tags
+	 * are replaced, the values will be sanitized again before display.
 	 *
 	 * @param string $html
 	 *
@@ -1088,9 +1186,9 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 		}
 
 		$pattern = '([^{]*?})';
-		$html   = preg_replace( "/=\"\{$pattern\"/mi", '="telnet://$1"', $html );
-		$html   = Kses::parse( $html );
-		$html   = preg_replace( "/=\"telnet:\/\/$pattern\"/mi", '="{$1"', $html );
+		$html    = preg_replace( "/=\"\{$pattern\"/mi", '="telnet://$1"', $html );
+		$html    = Kses::parse( $html );
+		$html    = preg_replace( "/=\"telnet:\/\/$pattern\"/mi", '="{$1"', $html );
 
 		return $html;
 	}
@@ -1099,7 +1197,7 @@ class Controller_Form_Settings_Rest_Api extends WP_REST_Controller {
 	 * Check if the schema item is of a specific type
 	 *
 	 * @param string|array $type
-	 * @param string|array  $property
+	 * @param string|array $property
 	 *
 	 * @return bool
 	 */
