@@ -155,6 +155,8 @@ class Rest_Download_Pdf {
 			return $path_to_pdf;
 		}
 
+		/* @TODO - add "type" with enum "url" or "base64". If "url" generate standard signed PDF URL with 1 hour expiration and return as "url" */
+
 		$response = new WP_REST_Response(
 			[
 				'filename' => wp_basename( $path_to_pdf ),
