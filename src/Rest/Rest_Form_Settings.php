@@ -176,15 +176,17 @@ class Rest_Form_Settings extends WP_REST_Controller {
 						'validate_callback' => function( $param, $request ) {
 							$pdf = GPDFAPI::get_pdf( $request->get_param( 'form' ), $param );
 
+							/* PDF found, PDF ID is valid */
 							if ( ! is_wp_error( $pdf ) ) {
 								return true;
 							}
 
+							/* Get list of valid IDs and include in error */
 							$pdfs = GPDFAPI::get_form_pdfs( $request->get_param( 'form' ) );
 
 							/* translators: 1: Parameter, 2: List of valid values. */
 
-							return new WP_Error( 'rest_not_in_enum', wp_sprintf( __( '%1$s is not one of %2$l.', 'default' ), $param, ! is_wp_error( $pdfs ) ? array_keys( $pdfs ) : '' ) );
+							return new WP_Error( 'rest_not_in_enum', wp_sprintf( __( '%1$s is not one of %2$l.', 'default' ), $param, ! is_wp_error( $pdfs ) ? array_keys( $pdfs ) : '""' ) );
 						},
 					],
 				],
@@ -371,7 +373,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @since 6.12.0
 	 */
 	public function check_entry_is_valid( $entry_id, $request ) {
-		$entry = \GFAPI::get_entry( $entry_id );
+		$entry = $this->gform->get_entry( $entry_id );
 		if ( is_wp_error( $entry ) ) {
 			return new WP_Error(
 				'rest_invalid_param',
@@ -890,7 +892,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				'id'     => [
 					'description' => __( 'Unique identifier for the PDF.', 'gravity-forms-pdf-extended' ),
 					'type'        => 'string',
-					'context'     => [ 'edit' ],
+					'context'     => [ 'edit', 'embed' ],
 					'readonly'    => true,
 					'pattern'     => '[a-fA-F0-9]{13}',
 				],
@@ -898,7 +900,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				'form'   => [
 					'description' => __( 'The Gravity Forms ID the PDF is configured on.', 'gravity-forms-pdf-extended' ),
 					'type'        => 'integer',
-					'context'     => [ 'edit' ],
+					'context'     => [ 'edit', 'embed' ],
 					'readonly'    => true,
 				],
 
@@ -906,7 +908,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 					'description' => __( 'The current state of the PDF.', 'gravity-forms-pdf-extended' ),
 					'type'        => 'boolean',
 					'default'     => true,
-					'context'     => [ 'edit' ],
+					'context'     => [ 'edit', 'embed' ],
 				],
 			],
 		];
@@ -1014,7 +1016,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				'description' => ! empty( $value['desc'] ) ? wp_strip_all_tags( $value['desc'] ) : $generic_description,
 				'type'        => 'string',
 				'default'     => $default,
-				'context'     => [ 'edit', $group ],
+				'context'     => [ 'edit', 'embed', $group ],
 				'arg_options' => [
 					'sanitize_callback' => function( $param, $request, $key ) {
 						return is_array( $param ) ? array_map( 'sanitize_text_field', $param ) : sanitize_text_field( $param );

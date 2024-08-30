@@ -80,7 +80,7 @@ class Rest_Pdf_Preview extends Rest_Form_Settings {
 	 * @since 6.12
 	 */
 	public function create_item( $request ) {
-		$form  = \GFAPI::get_form( $request->get_param( 'form' ) );
+		$form  = $this->gform->get_form( $request->get_param( 'form' ) );
 		$entry = $this->get_entry( $request, $form );
 
 		/* Prepare request for previewing */
@@ -114,7 +114,7 @@ class Rest_Pdf_Preview extends Rest_Form_Settings {
 	protected function get_entry( $request, $form ) {
 		/* user requested a specific entry to preview */
 		if ( $request->get_param( 'entry' ) ) {
-			return \GFAPI::get_entry( $request->get_param( 'entry' ) );
+			return $this->gform->get_entry( $request->get_param( 'entry' ) );
 		}
 
 		/* try to get the last form submission */
