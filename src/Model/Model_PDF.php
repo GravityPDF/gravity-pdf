@@ -457,7 +457,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check the "Restrict Logged Out User" global setting and validate it against the current user
+	 * If the owner is restricted and the user is not logged in, prompt to log in
 	 *
 	 * @param boolean|object $action
 	 * @param array          $entry    The Gravity Forms Entry
@@ -473,7 +473,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* ensure another middleware filter hasn't already done validation */
 		if ( ! is_wp_error( $action ) ) {
 			/* get the setting */
-			$owner_restriction = ( isset( $settings['restrict_owner'] ) ) ? $settings['restrict_owner'] : 'No';
+			$owner_restriction = $settings['restrict_owner'] ?? 'No';
 
 			if ( $owner_restriction === 'Yes' && ! is_user_logged_in() ) {
 
@@ -666,7 +666,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check the "User Restriction" global setting and validate it against the current user
+	 * Verify the logged-in user can view the PDF
+	 *
+	 * If owner restrictions are enabled, check if the user as correct capability to view
+	 * If owner restrictions are disabled, check if the user is the entry owner
 	 *
 	 * @param boolean|object $action
 	 * @param array          $entry    The Gravity Forms Entry
@@ -680,15 +683,18 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! is_wp_error( $action ) ) {
 			/* check if the user is logged in but is not the current owner */
-			if ( is_user_logged_in() &&
-				 ( ( $this->options->get_option( 'limit_to_admin', 'No' ) === 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) )
-			) {
-				$access = $this->can_user_view_pdf_with_capabilities();
+			$owner_restriction = $settings['restrict_owner'] ?? 'No';
 
-				/* throw error if no access granted */
-				if ( ! $access ) {
-					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
-				}
+			if (
+				is_user_logged_in() &&
+				! $this->can_user_view_pdf_with_capabilities() &&
+				(
+					$owner_restriction === 'Yes' ||
+					$this->is_current_pdf_owner( $entry, 'logged_in' ) === false
+				)
+			) {
+
+				return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
 			}
 		}
 
