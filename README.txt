@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
 Tested up to: 6.6
-Stable tag: 6.11.3
+Stable tag: 6.11.4
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -106,6 +106,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.11.4 =
+* Bug: Allow numbers with decimals when saving number fields in the PDF Settings
 
 = 6.11.3 =
 * Bug: Fix truncated merge tags in HTML attribute when included in PDF setting Rich Text fields
