@@ -899,12 +899,15 @@ class Test_Options_API extends WP_UnitTestCase {
 	 */
 	public function dataprovider_sanitize_number() {
 		return [
-			[ 122, '122.34343The' ],
-			[ 0, 'The122.34343' ],
+			[ 0, '122.34343The' ], /* not a number */
+			[ 0, 'The122.34343' ], /* not a number */
 			[ 20, '20' ],
+			[ 20, 20 ],
+			[ 30.261, 30.261 ],
+			[ 30.261, '30.261' ],
 			[ 2000, '2000' ],
-			[ 20, '20.50' ],
-			[ 50, '50,20' ],
+			[ 20.5, '20.50' ],
+			[ 0, '50,20' ], /* not a number */
 		];
 	}
 
