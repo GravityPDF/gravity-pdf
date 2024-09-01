@@ -1221,7 +1221,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 6.11 Force minimum and maximum values
 	 */
 	public function sanitize_number_field( $value, $key = '', $input = [], $settings = [] ) {
-		$value = (int) $value;
+		if ( ! is_numeric( $value ) ) {
+			return 0;
+		}
+
+		/* force PHP to convert string to int or float, depending on input */
+		$value += 0;
 
 		/* If number less than the minimum, set to the minimum */
 		if ( ! empty( $settings['min'] ) && $value < $settings['min'] ) {
