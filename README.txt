@@ -107,6 +107,16 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.11.4 =
+* Bug: Allow numbers with decimals when saving number fields in the PDF Settings
+
+= 6.11.3 =
+* Bug: Fix truncated merge tags in HTML attribute when included in PDF setting Rich Text fields
+
+= 6.11.2 =
+* Bug: Resolve race condition by skipping PDF cleanup at the end of form submission process if PDF Background Processing is enabled
+* Bug: Fix issue where some Notifications with PDFs attached were not being handled in a background task when PDF Background Processing is enabled
+
 = 6.11.1 =
 * Bug: Only process enabled notifications during form submission when using PDF Background Processing. Notifications are enabled if they are active and have conditional logic that passes.
 
