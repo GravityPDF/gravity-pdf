@@ -50,11 +50,21 @@ export function getCurrentPdfSettingsForApi (schema) {
           }
           break
 
-        case 'string':
         case 'number':
         case 'integer':
+          formData.set(key, input.value)
+
+          break
+
+        case 'string':
+
           // skip checkbox or radio fields that are not checked
           if (['checkbox', 'radio'].includes(input.type) && !input.checked) {
+            continue
+          }
+
+          // if field should be a hex color and is empty
+          if (property.format === 'hex-color' && input.value.length === 0) {
             continue
           }
 
