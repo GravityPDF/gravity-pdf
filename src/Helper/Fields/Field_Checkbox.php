@@ -104,17 +104,17 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 
-		$items = $this->value();
-		$value = apply_filters( 'gfpdf_show_field_value', false, $this->field, $items ); /* Set to `true` to show a field's value instead of the label */
-		$html  = '';
+		$items      = $this->value();
+		$show_value = apply_filters( 'gfpdf_show_field_value', false, $this->field, $items ); /* Set to `true` to show a field's value instead of the label */
+		$html       = '';
 
-		/* Generate our drop down list */
+		/* Generate our dropdown list */
 		if ( count( $items ) > 0 ) {
 			$html = '<ul class="bulleted checkbox">';
 			$i    = 1;
 			foreach ( $items as $item ) {
-				$sanitized_option = ( $value ) ? $item['value'] : $item['label'];
-				$html            .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
+				$sanitized_option = $show_value ? $item['value'] : $item['label'];
+				$html            .= '<li id="' . esc_attr( 'field-' . $this->field->id . '-option-' . $i ) . '">' . $sanitized_option . '</li>';
 				$i++;
 			}
 

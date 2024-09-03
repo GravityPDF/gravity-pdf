@@ -2,10 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use Exception;
-use GFPDF\Helper\Helper_Abstract_Fields;
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Abstract_Fields_Input_Type;
 
 /**
  * @package     Gravity PDF
@@ -23,66 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Post_Category extends Helper_Abstract_Fields {
+class Field_Post_Category extends Helper_Abstract_Fields_Input_Type {
 
 	/**
-	 * Check the appropriate variables are parsed in send to the parent construct
-	 *
-	 * @param object               $field The GF_Field_* Object
-	 * @param array                $entry The Gravity Forms Entry
-	 *
-	 * @param Helper_Abstract_Form $gform
-	 * @param Helper_Misc          $misc
-	 *
-	 * @throws Exception
-	 *
-	 * @since 4.0
-	 */
-	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
-
-		/* call our parent method */
-		parent::__construct( $field, $entry, $gform, $misc );
-
-		/*
-		 * Category can be multiple field types
-		 * eg. Select, MultiSelect, Radio, Dropdown
-		 */
-		$class = $this->misc->get_field_class( $field->inputType );
-
-		try {
-			/* check load our class */
-			if ( class_exists( $class ) ) {
-
-				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_class/ for more details about these filters */
-				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType, $this->fieldObject, $field, $entry, $this->form );
-			} else {
-				throw new Exception( 'Class not found' );
-			}
-		} catch ( Exception $e ) {
-			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
-		}
-
-		if ( $this->fieldObject instanceof \GFPDF\Helper\Helper_Interface_Field_Pdf_Config ) {
-			$this->fieldObject->set_pdf_config( $this->get_pdf_config() );
-		}
-
-		/* force the fieldObject value cache */
-		$this->value();
-	}
-
-	/**
-	 * Used to check if the current field has a value
-	 *
-	 * @since    4.0
-	 */
-	public function is_empty() {
-		return $this->fieldObject->is_empty();
-	}
-
-	/**
-	 * Return the HTML form data
+	 * Return the form data
 	 *
 	 * @return array
 	 *
@@ -130,24 +71,6 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 	}
 
 	/**
-	 * Display the HTML version of this field
-	 *
-	 * @param string $value
-	 * @param bool   $label
-	 *
-	 * @return string
-	 *
-	 * @since 4.0
-	 */
-	public function html( $value = '', $label = true ) {
-		if ( $this->get_output() ) {
-			$this->fieldObject->enable_output();
-		}
-
-		return $this->fieldObject->html();
-	}
-
-	/**
 	 * Get the standard GF value of this field
 	 *
 	 * @return string|array
@@ -162,13 +85,13 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 		/* get the value from the correct field object */
 		$items = $this->fieldObject->value();
 
-		/**
+		/*
 		 * Standardise the $items format
 		 * The Radio / Select box will return a single-dimensional array,
 		 * while checkbox and multiselect will not.
 		 */
 		$single_dimension = false;
-		if ( isset( $items['label'] ) ) { /* convert single-dimensional array to multi-dimensional */
+		if ( isset( $items['label'] ) ) {
 			$items            = [ $items ];
 			$single_dimension = true;
 		}
@@ -181,10 +104,9 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 			$val['value'] = count( $cat ) > 1 ? $cat[1] : $cat[0];
 		}
 
-		/**
-		 * Return in the appropriate format.
-		 * Select / Radio Buttons will not have a multidimensional array
-		 */
+		unset( $val );
+
+		/* Select / Radio Buttons will not have a multidimensional array  */
 		if ( $single_dimension ) {
 			$items = $items[0];
 		}

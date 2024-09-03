@@ -33,7 +33,7 @@ test('should redirect to WP login page if \'Restrict Owner\' is enabled', async 
   await t
     .click(page.testPageLink)
     .click(page.addBlockIcon)
-    .typeText(page.searchBlock, 'shortcode', { paste: true })
+    .typeText(page.searchBlock.filterVisible(), 'shortcode', { paste: true })
     .click(page.shortcodeLink)
     .typeText(page.shortcodeTextarea, '[gravityform id=4 title=false description=false ajax=true tabindex=49]', { paste: true })
     .click(page.updateButton)

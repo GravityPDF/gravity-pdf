@@ -66,7 +66,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
 
   await t
     .click(page.addBlockIcon)
-    .typeText(page.searchBlock, 'shortcode', { paste: true })
+    .typeText(page.searchBlock.filterVisible(), 'shortcode', { paste: true })
     .click(page.shortcodeLink)
     .typeText(page.shortcodeTextarea, shortcodeHolder)
     .click(page.updateButton)
@@ -81,8 +81,8 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
     .typeText(run.queryStringInputBox, 'entry={entry_id}', { paste: true })
     .click(run.saveConfirmationButton)
 
-    const url = await run.previewLink.href
-    await t.navigateTo(url)
+  const url = await run.previewLink.href
+  await t.navigateTo(url)
     .typeText(run.formInputField, 'test', { paste: true })
     .click(run.submitButton)
   downloadUrl = await Selector('.gravitypdf-download-link').getAttribute('href')
