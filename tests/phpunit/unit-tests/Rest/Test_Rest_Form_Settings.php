@@ -327,7 +327,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		$this->assertFalse( $data['show_section_content'] );
 		$this->assertFalse( $data['show_empty'] );
 		$this->assertTrue( $data['enable_conditional'] );
-		$this->assertSame( '#FFF', $data['background_color'] );
+		$this->assertSame( '#ffffff', $data['background_color'] );
 		$this->assertSame( $template_pdf_config['background_image'], $data['background_image'] );
 		$this->assertSame( $template_pdf_config['header'], $data['header'] );
 		$this->assertSame( $template_pdf_config['first_header'], $data['first_header'] );
