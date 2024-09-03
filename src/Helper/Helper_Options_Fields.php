@@ -679,11 +679,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 */
 	public function get_advanced_template_field( $settings ) {
 
-		_doing_it_wrong( __METHOD__, 'Legacy templates are deprecated and no longer supported. Contact GravityPDF.com to discuss upgrade options.', '6.12' );
-
 		if ( ! class_exists( 'gfpdfe_business_plus' ) ) {
 			return $settings;
 		}
+
+		_doing_it_wrong( __METHOD__, 'Legacy templates are deprecated and no longer supported. Contact GravityPDF.com to discuss upgrade options.', '6.12' );
 
 		$settings['advanced_template'] = [
 			'id'   => 'advanced_template',
