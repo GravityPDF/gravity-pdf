@@ -669,18 +669,17 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	/**
 	 * Enable advanced templating field if the user has our legacy premium plugin installed
 	 *
-	 * Dev notice: We're going to rewrite and rename the Tier 2 premium add-on and utilise template headers to automatically handle
-	 * advanced templates without the need for user intervention, which is why this method doesn't have a filter to manually
-	 * enable it.
-	 *
 	 * @param array $settings The 'form_settings_advanced' array
 	 *
 	 * @return array
 	 *
 	 * @since 4.0
 	 *
+	 * @depreacted 6.12 The 'gfpdfe_business_plus' class/plugin is no longer supported and the custom template should be upgraded
 	 */
 	public function get_advanced_template_field( $settings ) {
+
+		_doing_it_wrong( __METHOD__, 'Legacy templates are deprecated and no longer supported. Contact GravityPDF.com to discuss upgrade options.', '6.12' );
 
 		if ( ! class_exists( 'gfpdfe_business_plus' ) ) {
 			return $settings;
@@ -689,7 +688,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		$settings['advanced_template'] = [
 			'id'   => 'advanced_template',
 			'name' => esc_html__( 'Enable Advanced Templating', 'gravity-forms-pdf-extended' ),
-			'desc' => __( 'A legacy setting used that enables a template to be treated as PHP, with direct access to the PDF engine.', 'gravity-forms-pdf-extended' ),
+			'desc' => __( 'A legacy setting that enables a template to be treated as PHP, with direct access to the PDF engine.', 'gravity-forms-pdf-extended' ),
 			'type' => 'toggle',
 		];
 
