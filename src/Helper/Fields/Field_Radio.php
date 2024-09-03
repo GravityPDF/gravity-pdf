@@ -61,9 +61,9 @@ class Field_Radio extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$items  = $this->value();
-		$value  = apply_filters( 'gfpdf_show_field_value', false, $this->field, $items ); /* Set to `true` to show a field's value instead of the label */
-		$output = ( $value ) ? $items['value'] : $items['label'];
+		$items      = $this->value();
+		$show_value = apply_filters( 'gfpdf_show_field_value', false, $this->field, $items ); /* Set to `true` to show a field's value instead of the label */
+		$output     = $show_value ? $items['value'] : $items['label'];
 
 		return parent::html( $output );
 	}
