@@ -945,7 +945,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'id'   => 'background_color',
 				'name' => esc_html__( 'Background Color', 'gravity-forms-pdf-extended' ),
 				'type' => 'color',
-				'std'  => '#FFF',
+				'std'  => '#ffffff',
 				'desc' => __( 'Set the background color for all pages.', 'gravity-forms-pdf-extended' ),
 			]
 		);
