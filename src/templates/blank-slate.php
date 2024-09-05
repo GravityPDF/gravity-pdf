@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Blank Slate
- * Version: 2.0.1
+ * Version: 2.0.2
  * Description: A print-friendly template focusing solely on the user-submitted data. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -43,7 +43,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: <?php echo ( $settings['rtl'] ?? 'No' ) ? 'right' : 'left'; ?>;
+		float: <?php echo ( $settings['rtl'] ?? 'No' ) === 'Yes' ? 'right' : 'left'; ?>;
 	}
 
 	.grid .inner-container {
