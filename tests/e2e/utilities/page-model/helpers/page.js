@@ -34,7 +34,7 @@ class Page {
     await t
       .typeText(this.titleField, 'Test-page', { paste: true })
       .click(this.addBlockIcon)
-      .typeText(this.searchBlock, 'paragraph', { paste: true })
+      .typeText(this.searchBlock.filterVisible(), 'paragraph', { paste: true })
       .click(this.paragraphButton)
       .typeText(Selector('.is-root-container p:last-of-type'), 'Content', { paste: true })
       .click(this.publishButton)
