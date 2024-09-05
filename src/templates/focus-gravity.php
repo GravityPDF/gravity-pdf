@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Focus Gravity
- * Version: 2.0.3
+ * Version: 2.0.4
  * Description: Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -55,7 +55,7 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: <?php echo ( $settings['rtl'] ?? 'No' ) ? 'right' : 'left'; ?>;
+		float: <?php echo ( $settings['rtl'] ?? 'No' ) === 'Yes' ? 'right' : 'left'; ?>;
 	}
 
 	.grid .inner-container {

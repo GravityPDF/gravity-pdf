@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Rubix
- * Version: 2.0.2
+ * Version: 2.0.3
  * Description: Rubix uses stylish containers to create an aesthetically pleasing design. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -35,7 +35,7 @@ if ( ! class_exists( 'GFForms' ) ) {
  */
 $container_background_color = $settings['rubix_container_background_colour'] ?? '#eeeeee';
 
-/* Create a constrasting border colour for our tables */
+/* Create a contrasting border colour for our tables */
 $misc     = GPDFAPI::get_misc_class();
 $contrast = $misc->get_background_and_border_contrast( $container_background_color );
 
@@ -52,7 +52,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: <?php echo ( $settings['rtl'] ?? 'No' ) ? 'right' : 'left'; ?>;
+		float: <?php echo ( $settings['rtl'] ?? 'No' ) === 'Yes' ? 'right' : 'left'; ?>;
 	}
 
 	.grid .inner-container {
