@@ -1037,13 +1037,21 @@ class Rest_Form_Settings extends WP_REST_Controller {
 					}
 
 					$schema[ $id ]['arg_options']['sanitize_callback'] = 'rest_sanitize_request_arg';
+
+					/* If there's a default number value cast to int/float */
+					if ( ! is_null( $default ) ) {
+						$schema[ $id ]['default'] = is_numeric( $default ) ? $default + 0 : null;
+					}
+
 					break;
 
 				case 'multicheck':
 					$schema[ $id ]['type']                             = 'array';
 					$schema[ $id ]['items']                            = [
 						'type' => 'string',
-						'enum' => $this->misc->flatten_array( $value['options'] ?? [] ),
+
+						/* cast all values to a string to prevent a type validation error */
+						'enum' => array_map( 'strval', $this->misc->flatten_array( $value['options'] ?? [] ) ),
 					];
 					$schema[ $id ]['arg_options']['sanitize_callback'] = 'rest_sanitize_request_arg';
 					break;
@@ -1052,15 +1060,18 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				case 'select':
 					$schema[ $id ]['arg_options']['sanitize_callback'] = 'rest_sanitize_request_arg';
 
+					/* cast all values to a string to prevent a type validation error */
+					$enum = array_map( 'strval', $this->misc->flatten_array( $value['options'] ?? [] ) );
+
 					if ( ! empty( $value['multiple'] ) ) {
 						/* multiselect field */
 						$schema[ $id ]['type']  = 'array';
 						$schema[ $id ]['items'] = [
 							'type' => 'string',
-							'enum' => $this->misc->flatten_array( $value['options'] ?? [] ),
+							'enum' => $enum,
 						];
 					} else {
-						$schema[ $id ]['enum'] = $this->misc->flatten_array( $value['options'] ?? [] );
+						$schema[ $id ]['enum'] = $enum;
 					}
 					break;
 
