@@ -338,7 +338,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc2'      => esc_html__( 'Add rules to dynamically enable or disable the PDF. When disabled, PDFs do not show up in the admin area, cannot be viewed, and will not be attached to notifications.', 'gravity-forms-pdf-extended' ),
 						'schema'     => [
 							'type'   => 'boolean',
-							'format' => 'yes_no',
+							'format' => 'yes-no',
 						],
 					],
 
@@ -636,7 +636,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'description' => __( 'Force the PDF to be temporarily saved to the filesystem during form submission (deprecated). Use the gfpdf_post_save_pdf hook instead.', 'gravity-forms-pdf-extended' ),
 							'default'     => false,
 							'required'    => false,
-							'format'      => 'yes_no',
+							'format'      => 'yes-no',
 							'arg_options' => [
 								'sanitize_callback' => 'rest_sanitize_request_arg',
 							],
