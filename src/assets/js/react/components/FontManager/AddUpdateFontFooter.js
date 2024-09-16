@@ -27,7 +27,6 @@ import TemplateTooltip from './TemplateTooltip'
  * @param success
  * @param error
  * @param loading
- * @param tabIndex
  *
  * @since 6.0
  */
@@ -47,8 +46,7 @@ export class AddUpdateFontFooter extends Component {
     selectFont: PropTypes.func.isRequired,
     deleteFont: PropTypes.func,
     msg: PropTypes.object.isRequired,
-    loading: PropTypes.bool.isRequired,
-    tabIndex: PropTypes.string.isRequired
+    loading: PropTypes.bool.isRequired
   }
 
   /**
@@ -139,8 +137,7 @@ export class AddUpdateFontFooter extends Component {
       onHandleCancelEditFontKeypress,
       selectedFont,
       msg: { success, error },
-      loading,
-      tabIndex
+      loading
     } = this.props
     const cancelButton = document.querySelector('.footer button.cancel')
     const errorFontList = error && error.fontList
@@ -168,7 +165,6 @@ export class AddUpdateFontFooter extends Component {
                 onClick={onHandleCancelEditFont}
                 onKeyDown={onHandleCancelEditFontKeypress}
                 type='button'
-                tabIndex={tabIndex}
                 aria-label={GFPDF.cancel}
               >
                 {GFPDF.fontManagerCancelButtonText}
@@ -177,7 +173,6 @@ export class AddUpdateFontFooter extends Component {
 
             <button
               className='button gfpdf-button primary'
-              tabIndex={tabIndex}
               disabled={disabled}
               aria-label={GFPDF.fontManagerUpdateFontAriaLabel}
             >
@@ -194,7 +189,6 @@ export class AddUpdateFontFooter extends Component {
                 onClick={() => this.handleSelectFont(id, selectedFont)}
                 onKeyDown={e => this.handleSelectFontKeypress(e, id, selectedFont)}
                 type='button'
-                tabIndex={tabIndex}
                 aria-label={GFPDF.fontManagerSelectFontAriaLabel}
               />
             )}
@@ -205,7 +199,6 @@ export class AddUpdateFontFooter extends Component {
                 onClick={() => this.handleDeleteFont(id)}
                 onKeyDown={e => this.handleDeleteFontKeypress(e, id)}
                 type='button'
-                tabIndex={tabIndex}
                 aria-label={GFPDF.fontManagerDeleteFontAriaLabel}
               />
             )}

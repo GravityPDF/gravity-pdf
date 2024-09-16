@@ -83,7 +83,8 @@ export class FontManagerBody extends Component {
    */
   state = {
     addFont: initialState,
-    updateFont: initialState
+    updateFont: initialState,
+    isUpdating: false
   }
 
   /**
@@ -143,6 +144,11 @@ export class FontManagerBody extends Component {
       /* Auto select new added font after a successful submission */
       this.handleAutoSelectNewAddedFont(history, fontList)
     }
+
+    /* If font name has been clicked and the update form is displayed */
+    if (!history.location.pathname.split('/')[2] && this.state.isUpdating) {
+      return this.handleSetDefaultState()
+    }
   }
 
   /**
@@ -186,7 +192,8 @@ export class FontManagerBody extends Component {
         validateLabel: true,
         validateRegular: true,
         disableUpdateButton: true
-      }
+      },
+      isUpdating: true
     })
 
     setTimeout(() => adjustFontListHeight(), 100)
@@ -198,10 +205,11 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   handleSetDefaultState = () => {
-    this.setState({
+    setTimeout(() => this.setState({
       addFont: initialState,
-      updateFont: initialState
-    })
+      updateFont: initialState,
+      isUpdating: false
+    }), 350)
   }
 
   /**
@@ -494,6 +502,7 @@ export class FontManagerBody extends Component {
     toggleUpdateFont(history)
     /* Call redux action clearAddFontMsg() */
     clearAddFontMsg()
+    return this.handleSetDefaultState()
   }
 
   /**
@@ -513,6 +522,7 @@ export class FontManagerBody extends Component {
       toggleUpdateFont(history)
       /* Call redux action clearAddFontMsg() */
       clearAddFontMsg()
+      return this.handleSetDefaultState()
     }
   }
 
@@ -542,7 +552,6 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   render () {
-    const updateFontVisible = document.querySelector('.update-font.show')
     const { id, fontList, msg, loading, history } = this.props
 
     return (
@@ -567,10 +576,8 @@ export class FontManagerBody extends Component {
             onHandleSubmit={this.handleSubmit}
             msg={msg}
             loading={loading}
-            tabIndexFontName={!updateFontVisible ? '145' : '-1'}
-            tabIndexFontFiles={!updateFontVisible ? '146' : '-1'}
-            tabIndexFooterButtons={!updateFontVisible ? '147' : '-1'}
             {...this.state.addFont}
+            isUpdating={this.state.isUpdating}
           />
 
           <UpdateFont
@@ -583,10 +590,8 @@ export class FontManagerBody extends Component {
             fontList={fontList}
             msg={msg}
             loading={loading}
-            tabIndexFontName={updateFontVisible ? '145' : '-1'}
-            tabIndexFontFiles={updateFontVisible ? '146' : '-1'}
-            tabIndexFooterButtons={updateFontVisible ? '147' : '-1'}
             {...this.state.updateFont}
+            isUpdating={this.state.isUpdating}
           />
         </div>
       </div>
