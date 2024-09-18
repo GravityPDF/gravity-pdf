@@ -235,6 +235,11 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	.gfpdf-textarea .value p {
 	  margin-top: 0;
 	}
+
+	/* Quiz image */
+	.gf-quiz-img {
+	  width: 20px;
+	}
 </style>
 
 <?php if ( ! empty( $first_header ) ) : ?>

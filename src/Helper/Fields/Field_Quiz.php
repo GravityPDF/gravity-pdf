@@ -67,15 +67,21 @@ class Field_Quiz extends Helper_Abstract_Fields {
 			return parent::html( '' );
 		}
 
-		/**
-		 * Add class to the quiz images so mPDF can style them (limited cascade support)
-		 * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace
-		 */
+		/* Add a class to the quiz images */
 		try {
-			$qp    = new Helper_QueryPath();
-			$value = $qp->html5( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'html' )->innerHTML();
+			$qp     = new Helper_QueryPath();
+			$images = $qp->html5( $value, 'img' );
+
+			/* Only target images found in the quiz plugin */
+			foreach ( $images as $image ) {
+				if ( strpos( $image->attr( 'src' ), 'gravityformsquiz' ) !== false ) {
+					$image->addClass( 'gf-quiz-img' );
+				}
+			}
+
+			$value = $images->top( 'html' )->innerHTML();
 		} catch ( Exception $e ) {
-			$value = str_replace( '<img ', '<img class="gf-quiz-img" ', $value );
+			/* do nothing */
 		}
 
 		return parent::html( $value );
