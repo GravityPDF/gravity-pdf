@@ -371,14 +371,17 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 										'additionalProperties' => false,
 										'properties' => [
 											'fieldId'  => [
-												'type' => 'string',
+												'type'     => 'string',
+												'required' => true,
 											],
 											'operator' => [
-												'type' => 'string',
-												'enum' => [ 'is', 'isnot', '<>', 'not in', 'in', '>', '<', 'contains', 'starts_with', 'ends_with', 'like', '>=', '<=' ],
+												'type' =>     'string',
+												'enum' =>     [ 'is', 'isnot', '<>', 'not in', 'in', '>', '<', 'contains', 'starts_with', 'ends_with', 'like', '>=', '<=' ],
+												'required' => true,
 											],
 											'value'    => [
-												'type' => 'string',
+												'type'     => 'string',
+												'required' => true,
 											],
 										],
 									],
