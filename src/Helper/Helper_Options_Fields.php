@@ -133,7 +133,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'default_action'        => [
 						'id'      => 'default_action',
 						'name'    => esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-forms-pdf-extended' ), '<a href="' . admin_url( 'admin.php?page=gf_entries' ) . '">', '</a>' ),
+						'desc'    => sprintf( esc_html__( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( admin_url( 'admin.php?page=gf_entries' ) ) . '">', '</a>' ),
 						'type'    => 'radio',
 						'options' => [
 							'View'     => esc_html__( 'View', 'gravity-forms-pdf-extended' ),
@@ -222,7 +222,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name' => esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ),
 						'desc' => esc_html__( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-forms-pdf-extended' ) . ' <a href="https://docs.gravitypdf.com/v6/users/core-pdf-fonts">' . esc_html__( 'Get more info.', 'gravity-forms-pdf-extended' ) . '</a>',
 						'type' => 'button',
-						'std'  => __( 'Download Core Fonts', 'gravity-forms-pdf-extended' ),
+						'std'  => esc_html__( 'Download Core Fonts', 'gravity-forms-pdf-extended' ),
 					],
 
 					'manage_fonts'       => [
@@ -422,14 +422,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'         => 'password',
 						'name'       => esc_html__( 'Password', 'gravity-forms-pdf-extended' ),
 						'type'       => 'text',
-						'desc'       => 'Password protect the PDF, or leave blank to disable. Mergetags are supported.',
+						'desc'       => esc_html__( 'Password protect the PDF, or leave blank to disable. Mergetags are supported.', 'gravity-forms-pdf-extended' ),
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 					],
 
 					'privileges'      => [
 						'id'          => 'privileges',
 						'name'        => esc_html__( 'Privileges', 'gravity-forms-pdf-extended' ),
-						'desc'        => 'Deselect privileges to restrict end user capabilities in the PDF. Privileges are trivial to bypass and are only suitable to specify your intentions to the user (and not as a means of access control or security).',
+						'desc'        => esc_html__( 'Deselect privileges to restrict end user capabilities in the PDF. Privileges are trivial to bypass and are only suitable to specify your intentions to the user (and not as a means of access control or security).', 'gravity-forms-pdf-extended' ),
 						'type'        => 'multicheck',
 						'options'     => $this->get_privilages(),
 						'std'         => [
@@ -546,7 +546,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'id'         => 'master_password',
 			'name'       => esc_html__( 'Master Password', 'gravity-forms-pdf-extended' ),
 			'type'       => 'text',
-			'desc'       => 'Set the PDF Owner Password which is used to prevent the PDF privileges being changed.',
+			'desc'       => esc_html__( 'Set the PDF Owner Password which is used to prevent the PDF privileges being changed.', 'gravity-forms-pdf-extended' ),
 			'inputClass' => 'merge-tag-support mt-hide_all_fields',
 		];
 
