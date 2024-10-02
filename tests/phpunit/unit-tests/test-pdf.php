@@ -638,7 +638,7 @@ class Test_PDF extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check if our logged in user has access to our PDF
+	 * Check if our logged-in user has access to our PDF
 	 *
 	 * @since 4.0
 	 */
@@ -648,11 +648,19 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* create subscriber and test access */
 		$user_id = $this->factory->user->create();
-		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* get the results */
 		$results = $this->model->middle_user_capability( true, [ 'id' => 0,  'created_by' => 0 ], [ 'id' => '', ] );
+
+		$this->assertTrue( is_wp_error( $results ) );
+		$this->assertEquals( 'access_denied', $results->get_error_code() );
+
+		/* make subscriber owner of the entry and test access */
+		$this->assertTrue( $this->model->middle_user_capability( true, [ 'id' => 0,  'created_by' => $user_id ], [ 'id' => '', ] ) );
+
+		/* make subscriber owner, but turn on the owner restrict setting and test access */
+		$results = $this->model->middle_user_capability( true, [ 'id' => 0,  'created_by' => $user_id ], [ 'id' => '', 'restrict_owner' => 'Yes' ] );
 
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'access_denied', $results->get_error_code() );
@@ -662,9 +670,9 @@ class Test_PDF extends WP_UnitTestCase {
 		$user->remove_role( 'subscriber' );
 		$user->add_role( 'administrator' );
 
-		$this->assertTrue( $this->model->middle_user_capability( true, [ 'id' => 0, 'created_by' => 0 ], [ 'id' => '', ] ) );
+		$this->assertTrue( $this->model->middle_user_capability( true, [ 'id' => 0, 'created_by' => 0 ], [ 'id' => '', 'restrict_owner' => 'Yes'  ] ) );
 
-		/* Remove elevated user privilages and set the default capability 'gravityforms_view_entries' */
+		/* Remove elevated user privileges and set the default capability 'gravityforms_view_entries' */
 		$user->remove_role( 'administrator' );
 		$user->add_role( 'subscriber' );
 
