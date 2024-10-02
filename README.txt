@@ -107,6 +107,13 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
+= 6.12.0 =
+* Feature: Add basic support for Gravity Forms 2.9 Image Choice and Multiple Choice fields (Gravity PDF Core Booster v2.2 can show the images)
+* Housekeeping: Allow approved HTML to be displayed in the PDF for Product and Option field choices
+* Housekeeping: Add `gfpdf_form_data_products` filter to allow entry pricing information to be modified for the PDF
+* Bug: Fix column ordering issue in Blank Slate, Focus Gravity, and Rubix when the RTL setting is enabled
+* Bug: Allow Password and Privileges PDF setting description to be translated
+
 = 6.11.4 =
 * Bug: Allow numbers with decimals when saving number fields in the PDF Settings
 
