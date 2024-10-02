@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * @since 6.12.0
+ * @since 7.0.0
  */
 class Debug {
 
@@ -26,7 +26,7 @@ class Debug {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public static function is_enabled(): bool {
 		$options = \GPDFAPI::get_options_class();
@@ -42,7 +42,7 @@ class Debug {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public static function can_view(): bool {
 		$gform = \GPDFAPI::get_form_class();
@@ -56,7 +56,7 @@ class Debug {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public static function is_enabled_and_can_view(): bool {
 		return static::is_enabled() && static::can_view();

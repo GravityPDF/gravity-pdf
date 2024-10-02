@@ -166,7 +166,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return WP_Error
 	 * @since 4.0
-	 * @since 6.12 View/Download PDF creation workflow standardized with Save PDF workflow
+	 * @since 7.0 View/Download PDF creation workflow standardized with Save PDF workflow
 	 */
 	public function process_pdf( $pid, $lid, $action = 'view' ) {
 
@@ -1180,7 +1180,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return string|WP_Error  Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
-	 * @since 6.12 The view/download endpoints route through this method
+	 * @since 7.0 The view/download endpoints route through this method
 	 *
 	 * @see \GPDFAPI::create_pdf() We recommend third-party developers use the API to generate PDFs
 	 */
@@ -2603,7 +2603,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param string $path_to_pdf Absolute path to PDF on disk
 	 * @param string $action Either "view" or "download"
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public function send_pdf_to_browser( $path_to_pdf, $action = 'view' ) {
 		/* Verify the PDF can be sent to the client */

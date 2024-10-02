@@ -913,7 +913,7 @@ class Helper_Misc {
 	 *
 	 * @return array
 	 *
-	 * @since 6.12.0
+	 * @since 7.0.0
 	 */
 	public function flatten_array( array $array, $type = 'keys' ) {
 		if ( ! in_array( $type, [ 'keys', 'values' ], true ) ) {

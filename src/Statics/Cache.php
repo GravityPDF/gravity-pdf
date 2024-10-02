@@ -16,13 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Manages the directory structure for the temporary PDF cache
  *
- * @since 6.12.0
+ * @since 7.0.0
  */
 class Cache {
 
 	/**
 	 * @var string|null Holds the cache directory path
-	 * @since 6.12.0
+	 * @since 7.0.0
 	 */
 	protected static $template_tmp_location = null;
 
@@ -35,7 +35,7 @@ class Cache {
 	 *
 	 * @return string
 	 *
-	 * @since 6.12.0
+	 * @since 7.0.0
 	 */
 	public static function get_path( $form, $entry, $pdf_settings ) {
 		return static::get_basepath() . static::get_hash( $form, $entry, $pdf_settings ) . '/';
@@ -45,7 +45,7 @@ class Cache {
 	 * Get and set the cache directory basepath
 	 *
 	 * @return string
-	 * @since 6.12.0
+	 * @since 7.0.0
 	 */
 	protected static function get_basepath() {
 		if ( static::$template_tmp_location !== null ) {
@@ -168,7 +168,7 @@ class Cache {
 	 *
 	 * @return string
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected static function get_hash_prefix( $form, $entry, $pdf_settings ) {
 		return sprintf(

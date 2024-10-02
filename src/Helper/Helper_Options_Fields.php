@@ -974,7 +974,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 * Format the default value of the custom PDF size setting for the REST API
 	 *
 	 * @return array|null
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected function get_default_rest_value_for_custom_pdf_size() {
 		if ( $this->get_option( 'default_pdf_size' ) !== 'CUSTOM' ) {

@@ -459,7 +459,7 @@ final class GPDFAPI {
 	 * @return string|WP_Error   Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
-	 * @since 6.12 All PDFs are cached on disk for ~1 hour, but are auto-purged if the form, entry, or PDF settings change
+	 * @since 7.0 All PDFs are cached on disk for ~1 hour, but are auto-purged if the form, entry, or PDF settings change
 	 *        Re-running the method will return the cached PDF if it exists, unless $bypass_cache = true
 	 */
 	public static function create_pdf( $entry_id, $pdf_id, $bypass_cache = false ) {

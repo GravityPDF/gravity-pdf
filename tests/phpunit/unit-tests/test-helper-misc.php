@@ -668,7 +668,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public function test_flatten_array() {
 		/* Check a single dimensional array */

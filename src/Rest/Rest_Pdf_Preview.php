@@ -17,13 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * @since 6.12
+ * @since 7.0
  */
 class Rest_Pdf_Preview extends Rest_Form_Settings {
 
 	/**
 	 * @var string[]
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public static $endpoints = [
 		'pdf-settings-preview' => self::API_BASE . '/(?P<form>[\d]+)/preview',
@@ -33,7 +33,7 @@ class Rest_Pdf_Preview extends Rest_Form_Settings {
 	 * Registers the routes for this endpoint
 	 *
 	 * @return void
-	 * @since 6.12.0
+	 * @since 7.0.0
 	 */
 	public function register_routes() {
 
@@ -77,7 +77,7 @@ class Rest_Pdf_Preview extends Rest_Form_Settings {
 	 *
 	 * @return \WP_Error|null
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public function create_item( $request ) {
 		$form  = \GFAPI::get_form( $request->get_param( 'form' ) );

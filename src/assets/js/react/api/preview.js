@@ -19,7 +19,7 @@ const templateSchema = {}
  * @param {string} template
  * @returns {object} Template Schema data
  *
- * @since 6.12
+ * @since 7.0
  */
 export async function getTemplateSchema (formId, template) {
   // add formId key to cache
@@ -59,7 +59,7 @@ export async function getTemplateSchema (formId, template) {
  * @param {FormData} formData
  * @returns {Blob|null}
  *
- * @since 6.12
+ * @since 7.0
  */
 export async function getPdfPreview (formData) {
   const url = GFPDF.restUrl + 'form/' + encodeURIComponent(formData.get('form')) + '/preview'

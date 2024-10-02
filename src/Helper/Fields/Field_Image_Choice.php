@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Controls the display and output of a Gravity Form field
  *
- * @since 6.12
+ * @since 7.0
  *
  * @property \GF_Field_Image_Choice $field
  */
@@ -27,7 +27,7 @@ class Field_Image_Choice extends Field_Multi_Choice {
 	 *
 	 * @return array
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public function form_data() {
 		if ( method_exists( $this->fieldObject, 'form_data' ) ) {
@@ -62,7 +62,7 @@ class Field_Image_Choice extends Field_Multi_Choice {
 	 *
 	 * @return int The attachment ID or 0 if not found
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected function get_attachment_id_from_value( $value ) {
 		$choices = $this->field->choices;
@@ -87,7 +87,7 @@ class Field_Image_Choice extends Field_Multi_Choice {
 	 *
 	 * @return array
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected function get_attachment_information( $attachment_id ) {
 		$image_url = wp_get_attachment_image_url( $attachment_id, 'full' );

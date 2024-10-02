@@ -693,7 +693,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Register Rest API
 	 *
-	 * @since 6.12.0
+	 * @since 7.0.0
 	 */
 	public function rest_api() {
 		$form_setting_controller = new Rest\Rest_Form_Settings( $this->options, $this->gform, $this->misc, $this->templates );

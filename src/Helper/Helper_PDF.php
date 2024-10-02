@@ -282,7 +282,7 @@ class Helper_PDF {
 	 *
 	 * @throws MpdfException
 	 * @since 4.0
-	 * @since 6.12 All PDF requests have been standardized to use the functions/methods in \GPDFAPI::create_pdf(), and the DISPLAY/DOWNLOAD options are no longer used by core
+	 * @since 7.0 All PDF requests have been standardized to use the functions/methods in \GPDFAPI::create_pdf(), and the DISPLAY/DOWNLOAD options are no longer used by core
 	 */
 	public function generate() {
 
@@ -544,7 +544,7 @@ class Helper_PDF {
 	 * Get the current Gravity Forms form object
 	 *
 	 * @return array
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	public function get_form() {
 		return $this->form;

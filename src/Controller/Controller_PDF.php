@@ -369,7 +369,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 *
 	 * @return void
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected function add_pre_view_or_download_pdf_hooks( $form, $entry, $settings ) {
 		$this->prevent_index();
@@ -411,7 +411,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 *
 	 * @return array
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected function add_current_form_object_hooks( $form, $entry, $source ) {
 		if ( ! isset( $form['id'] ) ) {
@@ -443,7 +443,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 *
 	 * @return array
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected function add_current_pdf_settings_object_hooks( $pdf_settings, $form, $entry ) {
 		$pdf_settings = $this->model->apply_backwards_compatibility_filters( $pdf_settings, $entry );
@@ -500,7 +500,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 * Try to prevent the PDF being indexed or cached by the web server
 	 *
 	 * @since 5.2
-	 * @since 6.12 Set DONOTCACHEPAGE constant (brought forward in the request cycle)
+	 * @since 7.0 Set DONOTCACHEPAGE constant (brought forward in the request cycle)
 	 */
 	public function prevent_index() {
 		if ( ! headers_sent() ) {
@@ -569,7 +569,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 *
 	 * @return array
 	 *
-	 * @since 6.12
+	 * @since 7.0
 	 */
 	protected function included_nested_forms_in_cache_hash( $data, $form, $entry, $pdf_settings ) {
 		if ( empty( $entry['id'] ) ) {

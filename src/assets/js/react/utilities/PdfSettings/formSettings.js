@@ -10,7 +10,7 @@ import $ from 'jquery'
  * Prepare form inputs for use with Gravity PDF Form Settings API
  * @returns {FormData}
  *
- * @since 6.12
+ * @since 7.0
  */
 export function getCurrentPdfSettingsForApi (schema) {
   let formData = new FormData()
@@ -81,7 +81,7 @@ export function getCurrentPdfSettingsForApi (schema) {
    * @param {FormData} formData The constructed Previewer API PDF settings
    * @param {object} schema Valid Preview API schema for the current template
    *
-   * @since 6.12
+   * @since 7.0
    */
   formData = gform.applyFilters('gfpdf_preview_settings', formData, schema)
 
@@ -139,7 +139,7 @@ gform.addFilter('gfpdf_preview_settings', (formData, schema) => {
  *
  * @param formId
  *
- * @since 6.12
+ * @since 7.0
  */
 export function triggerFakeFormSubmit (formId) {
   const form = document.getElementById(formId)

@@ -13,7 +13,7 @@ import $ from 'jquery'
 /**
  * Setup PDF Preview functionality in PDF settings
  *
- * @since 6.12
+ * @since 7.0
  */
 export default function () {
   // capture bubbled click event for the Preview buttons on the form
