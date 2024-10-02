@@ -265,89 +265,95 @@ class Field_Products extends Helper_Abstract_Fields {
 		}
 
 		/* Set up the form / lead information */
-		$form = $this->form;
-		$lead = $this->entry;
+		$form  = $this->form;
+		$entry = $this->entry;
 
 		/* Get all products for this field */
 		$use_value       = (bool) apply_filters( 'gfpdf_show_field_value', false, $this->field, '' ); /* Set to `true` to show a field's value instead of the label */
 		$use_admin_label = (bool) apply_filters( 'gfpdf_use_admin_label', false, $this->field, '' ); /* Set to `true` to use the admin label */
-		$products        = GFCommon::get_product_fields( $form, $lead, ! $use_value, $use_admin_label );
+		$products        = GFCommon::get_product_fields( $form, $entry, ! $use_value, $use_admin_label );
 
 		/* Set up the appropriate variables needed for our product processing */
 		$form_array  = []; /* holds the actual product data */
 		$order_total = 0; /* holds the total cost of the order */
 
 		/* check that there are actual product fields to process */
-		if ( count( $products['products'] ) > 0 ) {
+		if ( count( $products['products'] ) === 0 ) {
+			return $form_array;
+		}
 
-			foreach ( $products['products'] as $id => $product ) {
+		foreach ( $products['products'] as $id => $product ) {
 
-				if ( class_exists( 'GP_Ecommerce_Fields' ) && empty( $product['name'] ) ) {
-					continue;
-				}
-
-				/* Get the raw pricing data */
-				$product_raw_price  = GFCommon::to_number( $product['price'] );
-				$product_unit_price = $product_raw_price;
-
-				/* Check if we should include options */
-				$options = isset( $product['options'] ) ? $product['options'] : [];
-
-				/* Process our options array */
-				foreach ( $options as &$option ) {
-					/* Get the options raw price */
-					$option_raw_price = GFCommon::to_number( $option['price'] );
-
-					/* Add the options price to the products price */
-					$product_unit_price += $option_raw_price;
-
-					/* add our formatted options price to the array */
-					$option['price_formatted'] = GFCommon::to_money( $option_raw_price, $lead['currency'] );
-
-					/* Format our option strings correctly */
-					$option['field_label']  = ( isset( $option['field_label'] ) ) ? esc_html( $option['field_label'] ) : '';
-					$option['option_name']  = ( isset( $option['option_name'] ) ) ? esc_html( $option['option_name'] ) : '';
-					$option['option_label'] = ( isset( $option['option_label'] ) ) ? esc_html( $option['option_label'] ) : '';
-				}
-
-				/* calculate subtotal */
-				$product_subtotal = ( (float) $product['quantity'] ) * $product_unit_price;
-
-				/* increment the total */
-				$order_total += $product_subtotal;
-
-				/* Store product in $form_array array */
-				$form_array['products'][ $id ] = [
-					'name'                 => esc_html( $product['name'] ),
-					'price'                => GFCommon::to_money( $product_raw_price, $lead['currency'] ),
-					'price_unformatted'    => $product_raw_price,
-					'unit_price'           => $product_unit_price,
-					'unit_price_formatted' => GFCommon::to_money( $product_unit_price, $lead['currency'] ),
-					'options'              => $options,
-					'quantity'             => $product['quantity'],
-					'subtotal'             => $product_subtotal,
-					'subtotal_formatted'   => GFCommon::to_money( $product_subtotal, $lead['currency'] ),
-				];
+			if ( class_exists( 'GP_Ecommerce_Fields' ) && empty( $product['name'] ) ) {
+				continue;
 			}
 
-			/* Increment total */
-			$shipping_price = isset( $products['shipping']['price'] ) ? (float) $products['shipping']['price'] : 0;
-			$order_total   += $shipping_price;
-			$order_subtotal = $order_total - $shipping_price;
+			/* Get the raw pricing data */
+			$product_raw_price  = GFCommon::to_number( $product['price'] );
+			$product_unit_price = $product_raw_price;
 
-			/* add totals to form data */
-			$form_array['products_totals'] = [
-				'subtotal'           => $order_subtotal,
-				'subtotal_formatted' => GFCommon::to_money( $order_subtotal, $lead['currency'] ),
-				'shipping'           => $shipping_price,
-				'shipping_formatted' => GFCommon::to_money( $shipping_price, $lead['currency'] ),
-				'shipping_name'      => ( isset( $products['shipping']['name'] ) ) ? preg_replace( '/(.+?) \((.+?)\)/', '$2', $products['shipping']['name'] ) : '',
-				'total'              => $order_total,
-				'total_formatted'    => GFCommon::to_money( $order_total, $lead['currency'] ),
+			/* Check if we should include options */
+			$options = isset( $product['options'] ) ? $product['options'] : [];
+
+			/* Process our options array */
+			foreach ( $options as &$option ) {
+				/* Get the options raw price */
+				$option_raw_price = GFCommon::to_number( $option['price'] );
+
+				/* Add the options price to the products price */
+				$product_unit_price += $option_raw_price;
+
+				/* add our formatted options price to the array */
+				$option['price_formatted'] = GFCommon::to_money( $option_raw_price, $entry['currency'] );
+
+				/* Format our option strings correctly */
+				$option['field_label']  = isset( $option['field_label'] ) ? wp_kses_post( $option['field_label'] ) : '';
+				$option['option_name']  = isset( $option['option_name'] ) ? wp_kses_post( $option['option_name'] ) : '';
+				$option['option_label'] = isset( $option['option_label'] ) ? wp_kses_post( $option['option_label'] ) : '';
+			}
+
+			unset( $option );
+
+			/* calculate subtotal */
+			$product_subtotal = ( (float) $product['quantity'] ) * $product_unit_price;
+
+			/* increment the total */
+			$order_total += $product_subtotal;
+
+			/* Store product in $form_array array */
+			$form_array['products'][ $id ] = [
+				'id'                   => $id,
+				'name'                 => wp_kses_post( $product['name'] ),
+				'price'                => GFCommon::to_money( $product_raw_price, $entry['currency'] ),
+				'price_unformatted'    => $product_raw_price,
+				'unit_price'           => $product_unit_price,
+				'unit_price_formatted' => GFCommon::to_money( $product_unit_price, $entry['currency'] ),
+				'options'              => $options,
+				'quantity'             => $product['quantity'],
+				'subtotal'             => $product_subtotal,
+				'subtotal_formatted'   => GFCommon::to_money( $product_subtotal, $entry['currency'] ),
 			];
-
-			$form_array['products_totals'] = array_map( 'esc_html', $form_array['products_totals'] );
 		}
+
+		/* Increment total */
+		$shipping_price = isset( $products['shipping']['price'] ) ? (float) $products['shipping']['price'] : 0;
+		$order_total   += $shipping_price;
+		$order_subtotal = $order_total - $shipping_price;
+
+		/* add totals to form data */
+		$form_array['products_totals'] = [
+			'subtotal'           => $order_subtotal,
+			'subtotal_formatted' => GFCommon::to_money( $order_subtotal, $entry['currency'] ),
+			'shipping'           => $shipping_price,
+			'shipping_formatted' => GFCommon::to_money( $shipping_price, $entry['currency'] ),
+			'shipping_name'      => ( isset( $products['shipping']['name'] ) ) ? preg_replace( '/(.+?) \((.+?)\)/', '$2', $products['shipping']['name'] ) : '',
+			'total'              => $order_total,
+			'total_formatted'    => GFCommon::to_money( $order_total, $entry['currency'] ),
+		];
+
+		$form_array['products_totals'] = array_map( 'esc_html', $form_array['products_totals'] );
+
+		$form_array = apply_filters( 'gfpdf_form_data_products', $form_array, $form, $entry, $this );
 
 		/* Save the array into the cache */
 		$this->cache( $form_array );

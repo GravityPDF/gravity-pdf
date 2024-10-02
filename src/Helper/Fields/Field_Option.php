@@ -119,7 +119,7 @@ class Field_Option extends Helper_Abstract_Field_Products {
 			$html .= '<ul class="product_options">';
 
 			foreach ( $options as $option ) {
-				$html .= '<li>' . esc_html( $option['option_name'] ) . '</li>';
+				$html .= '<li>' . wp_kses_post( $option['option_name'] ) . '</li>';
 			}
 
 			$html .= '</ul>';
