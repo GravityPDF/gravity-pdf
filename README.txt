@@ -109,6 +109,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 = 6.12.0 =
 * Feature: Add basic support for Gravity Forms 2.9 Image Choice and Multiple Choice fields (Gravity PDF Core Booster v2.2 can show the images)
+* Feature: Add support for Digital Signature for Gravity Forms plugin (https://wordpress.org/plugins/digital-signature-for-gravity-forms/)
 * Housekeeping: Allow approved HTML to be displayed in the PDF for Product and Option field choices
 * Housekeeping: Add `gfpdf_form_data_products` filter to allow entry pricing information to be modified for the PDF
 * Bug: Fix column ordering issue in Blank Slate, Focus Gravity, and Rubix when the RTL setting is enabled

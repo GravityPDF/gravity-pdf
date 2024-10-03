@@ -906,7 +906,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	public function test_signature_blocks() {
 		$data = $this->form_data;
 
-		$response = '<img src="' . ABSPATH . 'wp-content/uploads/gravity_forms/signatures/54bdac4ed24af5.01502579.png" alt="Signature" width="75" />';
+		$response = '<img src="http://example.org/wp-content/uploads/gravity_forms/signatures/54bdac4ed24af5.01502579.png" alt="Signature" width="75" />';
 
 		/*
 		 * Standard Signature Array
