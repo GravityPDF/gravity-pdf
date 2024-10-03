@@ -97,6 +97,8 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * @since 4.0
 	 */
 	public function load() {
+		require_once( __DIR__ . '/gravityforms-factory.php' );
+
 		require_once $this->plugin_dir . '/../gravityforms/gravityforms.php';
 		require_once $this->plugin_dir . '/../gravityformspolls/polls.php';
 		require_once $this->plugin_dir . '/../gravityformsquiz/quiz.php';
@@ -112,6 +114,11 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		update_option( 'gf_db_version', GFForms::$version );
 		GFFormsModel::drop_tables();
 		gf_upgrade()->maybe_upgrade();
+
+		// Enabling GF Rest API v2.
+		global $gf_webapi;
+		$gf_webapi = GFWebAPI::get_instance();
+		$gf_webapi->update_plugin_settings( [ 'enabled' => '1', 'version' => 'v2' ] );
 
 		require_once $this->plugin_dir . '/pdf.php';
 	}
