@@ -18,13 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div style="font-size:15px; line-height: 25px" role="alert" aria-live="polite">
 
-	<strong><?php esc_html_e( 'Gravity PDF needs to download the Core PDF fonts.', 'gravity-forms-pdf-extended' ); ?></strong>
+	<strong><?php esc_html_e( 'Gravity PDF needs to download the Core PDF fonts.', 'gravity-pdf' ); ?></strong>
 
 	<br>
 
-	<?php esc_html_e( 'Before you can generate a PDF using Gravity Forms, the core fonts need to be saved to your server. This only needs to be done once.', 'gravity-forms-pdf-extended' ); ?>
+	<?php esc_html_e( 'Before you can generate a PDF using Gravity Forms, the core fonts need to be saved to your server. This only needs to be done once.', 'gravity-pdf' ); ?>
 
 	<br>
 
-	<a href="https://docs.gravitypdf.com/v6/users/core-pdf-fonts"><?php esc_html_e( 'Get more info.', 'gravity-forms-pdf-extended' ); ?></a>
+	<a href="https://docs.gravitypdf.com/v6/users/core-pdf-fonts"><?php esc_html_e( 'Get more info.', 'gravity-pdf' ); ?></a>
 </div>

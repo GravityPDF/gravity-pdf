@@ -221,7 +221,7 @@ class Helper_Templates {
 	 */
 	public function maybe_add_template_compatibility_notice( $template_name, $required_version ) {
 		if ( ! $this->is_template_compatible( $required_version ) ) {
-			return $template_name . ' (' . esc_html__( 'Requires Gravity PDF', 'gravity-forms-pdf-extended' ) . ' v' . $required_version . ')';
+			return $template_name . ' (' . esc_html__( 'Requires Gravity PDF', 'gravity-pdf' ) . ' v' . $required_version . ')';
 		}
 
 		return $template_name;
@@ -332,7 +332,7 @@ class Helper_Templates {
 			$this->log->warning( $e->getMessage() );
 
 			return [
-				'group' => esc_html__( 'Legacy', 'gravity-forms-pdf-extended' ),
+				'group' => esc_html__( 'Legacy', 'gravity-pdf' ),
 			];
 		}
 	}
@@ -413,7 +413,7 @@ class Helper_Templates {
 
 		$info['id']                   = basename( $template_path, '.php' );
 		$info['template']             = ( strlen( $info['template'] ) > 0 ) ? $info['template'] : $this->human_readable_template_name( $info['id'] );
-		$info['group']                = ( strlen( $info['group'] ) > 0 ) ? $info['group'] : esc_html__( 'Legacy', 'gravity-forms-pdf-extended' );
+		$info['group']                = ( strlen( $info['group'] ) > 0 ) ? $info['group'] : esc_html__( 'Legacy', 'gravity-pdf' );
 		$info['description']          = ( strlen( $info['description'] ) > 0 ) ? $info['description'] : '';
 		$info['author']               = ( strlen( $info['author'] ) > 0 ) ? $info['author'] : '';
 		$info['author uri']           = ( strlen( $info['author uri'] ) > 0 ) ? $info['author uri'] : '';

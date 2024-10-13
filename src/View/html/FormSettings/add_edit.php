@@ -59,7 +59,7 @@ global $wp_settings_fields;
 
 		<div class="extensions-upsell">
 			<a href="https://gravitypdf.com/store/">
-				<?php esc_html_e( 'Want more features? Take a look at our addons.', 'gravity-forms-pdf-extended' ); ?>
+				<?php esc_html_e( 'Want more features? Take a look at our addons.', 'gravity-pdf' ); ?>
 			</a>
 		</div>
 	</div>

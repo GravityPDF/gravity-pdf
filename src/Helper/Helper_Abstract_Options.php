@@ -393,7 +393,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		if ( 0 === $form_id ) {
 
-			$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
+			$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-pdf' ) );
 			$this->log->error(
 				'Error Getting Settings.',
 				[
@@ -412,7 +412,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			if ( empty( $form ) ) {
 
-				$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
+				$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-pdf' ) );
 				$this->log->error(
 					'Error Getting Settings.',
 					[
@@ -454,7 +454,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( ! is_wp_error( $gfpdf_options ) ) {
 
 			/* Get our PDF array if it exists */
-			$pdf = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', esc_html__( 'You must pass in a valid PDF ID', 'gravity-forms-pdf-extended' ) );
+			$pdf = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', esc_html__( 'You must pass in a valid PDF ID', 'gravity-pdf' ) );
 
 			if ( ! is_wp_error( $pdf ) ) {
 				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_config/ for more details about these filters */
@@ -839,67 +839,67 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		return apply_filters(
 			'gfpdf_get_paper_size',
 			[
-				esc_html__( 'Common Sizes', 'gravity-forms-pdf-extended' ) => [
-					'A4'        => esc_html__( 'A4 (210 x 297mm)', 'gravity-forms-pdf-extended' ),
-					'LETTER'    => esc_html__( 'Letter (8.5 x 11in)', 'gravity-forms-pdf-extended' ),
-					'LEGAL'     => esc_html__( 'Legal (8.5 x 14in)', 'gravity-forms-pdf-extended' ),
-					'LEDGER'    => esc_html__( 'Ledger / Tabloid (11 x 17in)', 'gravity-forms-pdf-extended' ),
-					'EXECUTIVE' => esc_html__( 'Executive (7 x 10in)', 'gravity-forms-pdf-extended' ),
-					'CUSTOM'    => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
+				esc_html__( 'Common Sizes', 'gravity-pdf' ) => [
+					'A4'        => esc_html__( 'A4 (210 x 297mm)', 'gravity-pdf' ),
+					'LETTER'    => esc_html__( 'Letter (8.5 x 11in)', 'gravity-pdf' ),
+					'LEGAL'     => esc_html__( 'Legal (8.5 x 14in)', 'gravity-pdf' ),
+					'LEDGER'    => esc_html__( 'Ledger / Tabloid (11 x 17in)', 'gravity-pdf' ),
+					'EXECUTIVE' => esc_html__( 'Executive (7 x 10in)', 'gravity-pdf' ),
+					'CUSTOM'    => esc_html__( 'Custom Paper Size', 'gravity-pdf' ),
 				],
 
-				esc_html__( '"A" Sizes', 'gravity-forms-pdf-extended' ) => [
-					'A0'  => esc_html__( 'A0 (841 x 1189mm)', 'gravity-forms-pdf-extended' ),
-					'A1'  => esc_html__( 'A1 (594 x 841mm)', 'gravity-forms-pdf-extended' ),
-					'A2'  => esc_html__( 'A2 (420 x 594mm)', 'gravity-forms-pdf-extended' ),
-					'A3'  => esc_html__( 'A3 (297 x 420mm)', 'gravity-forms-pdf-extended' ),
-					'A5'  => esc_html__( 'A5 (148 x 210mm)', 'gravity-forms-pdf-extended' ),
-					'A6'  => esc_html__( 'A6 (105 x 148mm)', 'gravity-forms-pdf-extended' ),
-					'A7'  => esc_html__( 'A7 (74 x 105mm)', 'gravity-forms-pdf-extended' ),
-					'A8'  => esc_html__( 'A8 (52 x 74mm)', 'gravity-forms-pdf-extended' ),
-					'A9'  => esc_html__( 'A9 (37 x 52mm)', 'gravity-forms-pdf-extended' ),
-					'A10' => esc_html__( 'A10 (26 x 37mm)', 'gravity-forms-pdf-extended' ),
+				esc_html__( '"A" Sizes', 'gravity-pdf' ) => [
+					'A0'  => esc_html__( 'A0 (841 x 1189mm)', 'gravity-pdf' ),
+					'A1'  => esc_html__( 'A1 (594 x 841mm)', 'gravity-pdf' ),
+					'A2'  => esc_html__( 'A2 (420 x 594mm)', 'gravity-pdf' ),
+					'A3'  => esc_html__( 'A3 (297 x 420mm)', 'gravity-pdf' ),
+					'A5'  => esc_html__( 'A5 (148 x 210mm)', 'gravity-pdf' ),
+					'A6'  => esc_html__( 'A6 (105 x 148mm)', 'gravity-pdf' ),
+					'A7'  => esc_html__( 'A7 (74 x 105mm)', 'gravity-pdf' ),
+					'A8'  => esc_html__( 'A8 (52 x 74mm)', 'gravity-pdf' ),
+					'A9'  => esc_html__( 'A9 (37 x 52mm)', 'gravity-pdf' ),
+					'A10' => esc_html__( 'A10 (26 x 37mm)', 'gravity-pdf' ),
 				],
 
-				esc_html__( '"B" Sizes', 'gravity-forms-pdf-extended' ) => [
-					'B0'  => esc_html__( 'B0 (1414 x 1000mm)', 'gravity-forms-pdf-extended' ),
-					'B1'  => esc_html__( 'B1 (1000 x 707mm)', 'gravity-forms-pdf-extended' ),
-					'B2'  => esc_html__( 'B2 (707 x 500mm)', 'gravity-forms-pdf-extended' ),
-					'B3'  => esc_html__( 'B3 (500 x 353mm)', 'gravity-forms-pdf-extended' ),
-					'B4'  => esc_html__( 'B4 (353 x 250mm)', 'gravity-forms-pdf-extended' ),
-					'B5'  => esc_html__( 'B5 (250 x 176mm)', 'gravity-forms-pdf-extended' ),
-					'B6'  => esc_html__( 'B6 (176 x 125mm)', 'gravity-forms-pdf-extended' ),
-					'B7'  => esc_html__( 'B7 (125 x 88mm)', 'gravity-forms-pdf-extended' ),
-					'B8'  => esc_html__( 'B8 (88 x 62mm)', 'gravity-forms-pdf-extended' ),
-					'B9'  => esc_html__( 'B9 (62 x 44mm)', 'gravity-forms-pdf-extended' ),
-					'B10' => esc_html__( 'B10 (44 x 31mm)', 'gravity-forms-pdf-extended' ),
+				esc_html__( '"B" Sizes', 'gravity-pdf' ) => [
+					'B0'  => esc_html__( 'B0 (1414 x 1000mm)', 'gravity-pdf' ),
+					'B1'  => esc_html__( 'B1 (1000 x 707mm)', 'gravity-pdf' ),
+					'B2'  => esc_html__( 'B2 (707 x 500mm)', 'gravity-pdf' ),
+					'B3'  => esc_html__( 'B3 (500 x 353mm)', 'gravity-pdf' ),
+					'B4'  => esc_html__( 'B4 (353 x 250mm)', 'gravity-pdf' ),
+					'B5'  => esc_html__( 'B5 (250 x 176mm)', 'gravity-pdf' ),
+					'B6'  => esc_html__( 'B6 (176 x 125mm)', 'gravity-pdf' ),
+					'B7'  => esc_html__( 'B7 (125 x 88mm)', 'gravity-pdf' ),
+					'B8'  => esc_html__( 'B8 (88 x 62mm)', 'gravity-pdf' ),
+					'B9'  => esc_html__( 'B9 (62 x 44mm)', 'gravity-pdf' ),
+					'B10' => esc_html__( 'B10 (44 x 31mm)', 'gravity-pdf' ),
 				],
 
-				esc_html__( '"C" Sizes', 'gravity-forms-pdf-extended' ) => [
-					'C0'  => esc_html__( 'C0 (1297 x 917mm)', 'gravity-forms-pdf-extended' ),
-					'C1'  => esc_html__( 'C1 (917 x 648mm)', 'gravity-forms-pdf-extended' ),
-					'C2'  => esc_html__( 'C2 (648 x 458mm)', 'gravity-forms-pdf-extended' ),
-					'C3'  => esc_html__( 'C3 (458 x 324mm)', 'gravity-forms-pdf-extended' ),
-					'C4'  => esc_html__( 'C4 (324 x 229mm)', 'gravity-forms-pdf-extended' ),
-					'C5'  => esc_html__( 'C5 (229 x 162mm)', 'gravity-forms-pdf-extended' ),
-					'C6'  => esc_html__( 'C6 (162 x 114mm)', 'gravity-forms-pdf-extended' ),
-					'C7'  => esc_html__( 'C7 (114 x 81mm)', 'gravity-forms-pdf-extended' ),
-					'C8'  => esc_html__( 'C8 (81 x 57mm)', 'gravity-forms-pdf-extended' ),
-					'C9'  => esc_html__( 'C9 (57 x 40mm)', 'gravity-forms-pdf-extended' ),
-					'C10' => esc_html__( 'C10 (40 x 28mm)', 'gravity-forms-pdf-extended' ),
+				esc_html__( '"C" Sizes', 'gravity-pdf' ) => [
+					'C0'  => esc_html__( 'C0 (1297 x 917mm)', 'gravity-pdf' ),
+					'C1'  => esc_html__( 'C1 (917 x 648mm)', 'gravity-pdf' ),
+					'C2'  => esc_html__( 'C2 (648 x 458mm)', 'gravity-pdf' ),
+					'C3'  => esc_html__( 'C3 (458 x 324mm)', 'gravity-pdf' ),
+					'C4'  => esc_html__( 'C4 (324 x 229mm)', 'gravity-pdf' ),
+					'C5'  => esc_html__( 'C5 (229 x 162mm)', 'gravity-pdf' ),
+					'C6'  => esc_html__( 'C6 (162 x 114mm)', 'gravity-pdf' ),
+					'C7'  => esc_html__( 'C7 (114 x 81mm)', 'gravity-pdf' ),
+					'C8'  => esc_html__( 'C8 (81 x 57mm)', 'gravity-pdf' ),
+					'C9'  => esc_html__( 'C9 (57 x 40mm)', 'gravity-pdf' ),
+					'C10' => esc_html__( 'C10 (40 x 28mm)', 'gravity-pdf' ),
 				],
 
-				esc_html__( '"RA" and "SRA" Sizes', 'gravity-forms-pdf-extended' ) => [
-					'RA0'  => esc_html__( 'RA0 (860 x 1220mm)', 'gravity-forms-pdf-extended' ),
-					'RA1'  => esc_html__( 'RA1 (610 x 860mm)', 'gravity-forms-pdf-extended' ),
-					'RA2'  => esc_html__( 'RA2 (430 x 610mm)', 'gravity-forms-pdf-extended' ),
-					'RA3'  => esc_html__( 'RA3 (305 x 430mm)', 'gravity-forms-pdf-extended' ),
-					'RA4'  => esc_html__( 'RA4 (215 x 305mm)', 'gravity-forms-pdf-extended' ),
-					'SRA0' => esc_html__( 'SRA0 (900 x 1280mm)', 'gravity-forms-pdf-extended' ),
-					'SRA1' => esc_html__( 'SRA1 (640 x 900mm)', 'gravity-forms-pdf-extended' ),
-					'SRA2' => esc_html__( 'SRA2 (450 x 640mm)', 'gravity-forms-pdf-extended' ),
-					'SRA3' => esc_html__( 'SRA3 (320 x 450mm)', 'gravity-forms-pdf-extended' ),
-					'SRA4' => esc_html__( 'SRA4 (225 x 320mm)', 'gravity-forms-pdf-extended' ),
+				esc_html__( '"RA" and "SRA" Sizes', 'gravity-pdf' ) => [
+					'RA0'  => esc_html__( 'RA0 (860 x 1220mm)', 'gravity-pdf' ),
+					'RA1'  => esc_html__( 'RA1 (610 x 860mm)', 'gravity-pdf' ),
+					'RA2'  => esc_html__( 'RA2 (430 x 610mm)', 'gravity-pdf' ),
+					'RA3'  => esc_html__( 'RA3 (305 x 430mm)', 'gravity-pdf' ),
+					'RA4'  => esc_html__( 'RA4 (215 x 305mm)', 'gravity-pdf' ),
+					'SRA0' => esc_html__( 'SRA0 (900 x 1280mm)', 'gravity-pdf' ),
+					'SRA1' => esc_html__( 'SRA1 (640 x 900mm)', 'gravity-pdf' ),
+					'SRA2' => esc_html__( 'SRA2 (450 x 640mm)', 'gravity-pdf' ),
+					'SRA3' => esc_html__( 'SRA3 (320 x 450mm)', 'gravity-pdf' ),
+					'SRA4' => esc_html__( 'SRA4 (225 x 320mm)', 'gravity-pdf' ),
 				],
 			]
 		);
@@ -915,7 +915,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_installed_fonts() {
 		$fonts = [
-			esc_html__( 'Unicode', 'gravity-forms-pdf-extended' ) => [
+			esc_html__( 'Unicode', 'gravity-pdf' ) => [
 				'dejavusanscondensed'  => 'Dejavu Sans Condensed',
 				'dejavusans'           => 'Dejavu Sans',
 				'dejavuserifcondensed' => 'Dejavu Serif Condensed',
@@ -929,23 +929,23 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'mph2bdamase'          => 'MPH 2B Damase',
 			],
 
-			esc_html__( 'Indic', 'gravity-forms-pdf-extended' ) => [
+			esc_html__( 'Indic', 'gravity-pdf' )   => [
 				'lohitkannada' => 'Lohit Kannada',
 				'pothana2000'  => 'Pothana2000',
 			],
 
-			esc_html__( 'Arabic', 'gravity-forms-pdf-extended' ) => [
+			esc_html__( 'Arabic', 'gravity-pdf' )  => [
 				'xbriyaz'               => 'XB Riyaz',
 				'lateef'                => 'Lateef',
 				'kfgqpcuthmantahanaskh' => 'Bahif Uthman Taha',
 			],
 
-			esc_html__( 'Chinese, Japanese, Korean', 'gravity-forms-pdf-extended' ) => [
+			esc_html__( 'Chinese, Japanese, Korean', 'gravity-pdf' ) => [
 				'sun-exta' => 'Sun Ext',
 				'unbatang' => 'Un Batang (Korean)',
 			],
 
-			esc_html__( 'Other', 'gravity-forms-pdf-extended' ) => [
+			esc_html__( 'Other', 'gravity-pdf' )   => [
 				'estrangeloedessa' => 'Estrangelo Edessa (Syriac)',
 				'kaputaunicode'    => 'Kaputa (Sinhala)',
 				'abyssinicasil'    => 'Abyssinica SIL (Ethiopic)',
@@ -999,7 +999,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 
 			/* Merge the new fonts at the beginning of the $fonts array */
-			$fonts = $this->misc->array_unshift_assoc( $fonts, esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ), $user_defined_fonts );
+			$fonts = $this->misc->array_unshift_assoc( $fonts, esc_html__( 'User-Defined Fonts', 'gravity-pdf' ), $user_defined_fonts );
 		}
 
 		return $fonts;
@@ -1056,7 +1056,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 		}
 
-		return new WP_Error( 'font_not_found', esc_html__( 'Could not find Gravity PDF Font', 'gravity-forms-pdf-extended' ) );
+		return new WP_Error( 'font_not_found', esc_html__( 'Could not find Gravity PDF Font', 'gravity-pdf' ) );
 	}
 
 	/**
@@ -1068,14 +1068,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_privilages() {
 		$privileges = [
-			'copy'          => esc_html__( 'Copy', 'gravity-forms-pdf-extended' ),
-			'print'         => esc_html__( 'Print - Low Resolution', 'gravity-forms-pdf-extended' ),
-			'print-highres' => esc_html__( 'Print - High Resolution', 'gravity-forms-pdf-extended' ),
-			'modify'        => esc_html__( 'Modify', 'gravity-forms-pdf-extended' ),
-			'annot-forms'   => esc_html__( 'Annotate', 'gravity-forms-pdf-extended' ),
-			'fill-forms'    => esc_html__( 'Fill Forms', 'gravity-forms-pdf-extended' ),
-			'extract'       => esc_html__( 'Extract', 'gravity-forms-pdf-extended' ),
-			'assemble'      => esc_html__( 'Assemble', 'gravity-forms-pdf-extended' ),
+			'copy'          => esc_html__( 'Copy', 'gravity-pdf' ),
+			'print'         => esc_html__( 'Print - Low Resolution', 'gravity-pdf' ),
+			'print-highres' => esc_html__( 'Print - High Resolution', 'gravity-pdf' ),
+			'modify'        => esc_html__( 'Modify', 'gravity-pdf' ),
+			'annot-forms'   => esc_html__( 'Annotate', 'gravity-pdf' ),
+			'fill-forms'    => esc_html__( 'Fill Forms', 'gravity-pdf' ),
+			'extract'       => esc_html__( 'Extract', 'gravity-pdf' ),
+			'assemble'      => esc_html__( 'Assemble', 'gravity-pdf' ),
 		];
 
 		return apply_filters( 'gfpdf_privilages_list', $privileges );
@@ -1181,7 +1181,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( count( $settings_errors ) === 0 ) {
 			/* Merge our new settings with the existing */
 			$output = array_merge( $gfpdf_options, $input );
-			add_settings_error( 'gfpdf-notices', '', esc_html__( 'Settings updated.', 'gravity-forms-pdf-extended' ), 'updated' );
+			add_settings_error( 'gfpdf-notices', '', esc_html__( 'Settings updated.', 'gravity-pdf' ), 'updated' );
 		} elseif ( count( $settings_errors ) === 1 && $settings_errors[0]['setting'] === 'gfpdf-notices' && $settings_errors[0]['type'] === 'updated' ) {
 			/* Merge our new settings with the existing, but without the update message (prevents saving issue) */
 			$output = array_merge( $gfpdf_options, $input );
@@ -1337,7 +1337,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					$size = count( $value );
 					if ( empty( $value ) || count( array_filter( $value ) ) !== $size ) {
 						/* throw error */
-						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-pdf' ) );
 					}
 					break;
 
@@ -1345,7 +1345,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					if ( isset( $input['default_pdf_size'] ) && $input['default_pdf_size'] === 'CUSTOM' ) {
 						if ( count( array_filter( $value ) ) !== 3 ) {
 							/* throw error */
-							add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+							add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-pdf' ) );
 						}
 					}
 					break;
@@ -1353,7 +1353,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				default:
 					if ( strlen( trim( $value ) ) === 0 ) {
 						/* throw error */
-						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-pdf' ) );
 					}
 					break;
 			}
@@ -1741,7 +1741,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" class="screen-reader-text">
-			<?php echo esc_html( sprintf( __( '%s license key', 'gravity-forms-pdf-extended' ), $args['name'] ) ); ?>
+			<?php echo esc_html( sprintf( __( '%s license key', 'gravity-pdf' ), $args['name'] ) ); ?>
 		</label>
 
 		<input autocomplete="off"
@@ -1758,7 +1758,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					data-addon-name="<?php echo esc_attr( substr( $args['id'], 8 ) ); ?>"
 					data-nonce="<?php echo esc_attr( wp_create_nonce( 'gfpdf_deactivate_license' ) ); ?>"
 			>
-				<?php echo esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ); ?>
+				<?php echo esc_attr__( 'Deactivate License', 'gravity-pdf' ); ?>
 			</button>
 		<?php endif; ?>
 
@@ -2133,9 +2133,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* get selected value (if any) */
 		$value                = $this->get_form_value( $args );
-		$uploader_title       = $args['uploaderTitle'] ?? __( 'Select Media', 'gravity-forms-pdf-extended' );
-		$uploader_button_text = $args['uploaderButtonText'] ?? __( 'Select Media', 'gravity-forms-pdf-extended' );
-		$button_text          = $args['buttonText'] ?? __( 'Upload File', 'gravity-forms-pdf-extended' );
+		$uploader_title       = $args['uploaderTitle'] ?? __( 'Select Media', 'gravity-pdf' );
+		$uploader_button_text = $args['uploaderButtonText'] ?? __( 'Select Media', 'gravity-pdf' );
+		$button_text          = $args['buttonText'] ?? __( 'Upload File', 'gravity-pdf' );
 		$class                = $args['inputClass'] ?? '';
 		$required             = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$size                 = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
@@ -2379,7 +2379,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			</label>
 		</div>
 
-		<?php esc_html_e( 'Width', 'gravity-forms-pdf-extended' ); ?>
+		<?php esc_html_e( 'Width', 'gravity-pdf' ); ?>
 		<input type="number"
 			   class="<?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
 			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]_width"
@@ -2391,7 +2391,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		&nbsp;
 
-		<?php esc_html_e( 'Height', 'gravity-forms-pdf-extended' ); ?>
+		<?php esc_html_e( 'Height', 'gravity-pdf' ); ?>
 		<input type="number"
 			   class="<?php echo esc_attr( $size . '-text' ); ?> <?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
 			   id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]_height"
@@ -2408,8 +2408,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$measurement   = apply_filters(
 			'gfpdf_paper_size_dimensions',
 			[
-				'millimeters' => esc_html__( 'mm', 'gravity-forms-pdf-extended' ),
-				'inches'      => esc_html__( 'inches', 'gravity-forms-pdf-extended' ),
+				'millimeters' => esc_html__( 'mm', 'gravity-pdf' ),
+				'inches'      => esc_html__( 'inches', 'gravity-pdf' ),
 			]
 		);
 
@@ -2477,7 +2477,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 */
 	public function missing_callback( $args ) {
-		echo wp_kses_post( sprintf( __( 'The callback used for the %s setting is missing.', 'gravity-forms-pdf-extended' ), "<strong>{$args['id']}</strong>" ) );
+		echo wp_kses_post( sprintf( __( 'The callback used for the %s setting is missing.', 'gravity-pdf' ), "<strong>{$args['id']}</strong>" ) );
 	}
 
 	/**

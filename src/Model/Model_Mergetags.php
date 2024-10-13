@@ -122,7 +122,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 				$tags[] = [
 					'tag'   => sprintf( '{%s:pdf:%s}', $pdf['name'], $id ),
 					/* Format "PDF: %s" - we split it up like this so we didn't have to add another translation */
-					'label' => esc_html__( 'PDF', 'gravity-forms-pdf-extended' ) .
+					'label' => esc_html__( 'PDF', 'gravity-pdf' ) .
 							   ': ' .
 							   esc_html( $pdf['name'] ),
 				];
@@ -289,7 +289,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 			];
 
 			$combined_choices[] = [
-				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 week)', 'gravity-forms-pdf-extended' ),
+				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 week)', 'gravity-pdf' ),
 				'value' => sprintf(
 					'{%s:pdf:%s:signed,1 week}',
 					$pdf['name'],
@@ -298,7 +298,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 			];
 
 			$combined_choices[] = [
-				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 month)', 'gravity-forms-pdf-extended' ),
+				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 month)', 'gravity-pdf' ),
 				'value' => sprintf(
 					'{%s:pdf:%s:signed,1 month}',
 					$pdf['name'],
@@ -307,7 +307,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 			];
 
 			$combined_choices[] = [
-				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 year)', 'gravity-forms-pdf-extended' ),
+				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 year)', 'gravity-pdf' ),
 				'value' => sprintf(
 					'{%s:pdf:%s:signed,12 months}',
 					$pdf['name'],
@@ -318,7 +318,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 		if ( count( $combined_choices ) > 0 ) {
 			$fields[] = [
-				'label'   => __( 'PDF URLs', 'gravity-forms-pdf-extended' ),
+				'label'   => __( 'PDF URLs', 'gravity-pdf' ),
 				'choices' => $combined_choices,
 			];
 		}

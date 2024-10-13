@@ -66,9 +66,9 @@ class Zadani extends Helper_Abstract_Config_Settings implements Helper_Interface
 			'fields' => [
 				'zadani_border_colour' => [
 					'id'   => 'zadani_border_colour',
-					'name' => esc_html__( 'Field Border Color', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Field Border Color', 'gravity-pdf' ),
 					'type' => 'color',
-					'desc' => esc_html__( 'Control the color of the field border.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'Control the color of the field border.', 'gravity-pdf' ),
 					'std'  => '#CCCCCC',
 				],
 			],

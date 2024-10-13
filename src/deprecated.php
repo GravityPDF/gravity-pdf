@@ -42,7 +42,7 @@ abstract class GFPDF_Deprecated_Abstract {
 	 *
 	 */
 	public function __call( $name, $arguments ) {
-		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ) ), '4.0' );
+		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
 	}
 
 	/**
@@ -55,7 +55,7 @@ abstract class GFPDF_Deprecated_Abstract {
 	 *
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ) ), '4.0' );
+		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
 	}
 }
 

@@ -229,7 +229,7 @@ final class GPDFAPI {
 			return static::get_mvc_class( 'Model_PDF' );
 		}
 
-		return new WP_Error( 'invalid_type', esc_html__( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-forms-pdf-extended' ) );
+		return new WP_Error( 'invalid_type', esc_html__( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-pdf' ) );
 	}
 
 	/**
@@ -269,7 +269,7 @@ final class GPDFAPI {
 		$entry = $form_class->get_entry( $entry_id );
 
 		if ( is_wp_error( $entry ) ) {
-			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-forms-pdf-extended' ) );
+			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-pdf' ) );
 		}
 
 		/** @var \GFPDF\Model\Model_PDF $model_pdf */
@@ -404,7 +404,7 @@ final class GPDFAPI {
 
 		/* Check the option doesn't already exist */
 		if ( null !== $options->get_option( $key, null ) ) {
-			return new WP_Error( 'option_exists', esc_html__( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-forms-pdf-extended' ) );
+			return new WP_Error( 'option_exists', esc_html__( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-pdf' ) );
 		}
 
 		return static::update_plugin_option( $key, $value );
@@ -468,14 +468,14 @@ final class GPDFAPI {
 		$entry = $form_class->get_entry( $entry_id );
 
 		if ( is_wp_error( $entry ) ) {
-			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-forms-pdf-extended' ) );
+			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-pdf' ) );
 		}
 
 		/* Get our settings */
 		$setting = static::get_pdf( $entry['form_id'], $pdf_id );
 
 		if ( is_wp_error( $setting ) ) {
-			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-forms-pdf-extended' ) );
+			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-pdf' ) );
 		}
 
 		$pdf  = static::get_mvc_class( 'Model_PDF' );
@@ -619,7 +619,7 @@ final class GPDFAPI {
 		$installed_fonts = static::get_pdf_fonts();
 
 		$font_name              = $font['font_name'] ?? '';
-		$user_defined_font_list = $installed_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] ?? [];
+		$user_defined_font_list = $installed_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] ?? [];
 
 		/* Font with same name already exists */
 		if ( in_array( $font_name, $user_defined_font_list, true ) ) {

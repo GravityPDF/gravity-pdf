@@ -118,7 +118,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
 					'args'                => [
 						'label' => [
-							'description'       => __( 'The font label used for the object', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The font label used for the object', 'gravity-pdf' ),
 							'type'              => 'string',
 							'required'          => true,
 							'validate_callback' => [ $this->model, 'check_font_name_valid' ],
@@ -147,31 +147,31 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
 					'args'                => [
 						'label'       => [
-							'description'       => __( 'The font label used for the object', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The font label used for the object', 'gravity-pdf' ),
 							'type'              => 'string',
 							'validate_callback' => [ $this->model, 'check_font_name_valid' ],
 						],
 
 						'regular'     => [
-							'description'       => __( 'The path to the `regular` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `regular` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
 							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
 						'italics'     => [
-							'description'       => __( 'The path to the `italics` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `italics` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
 							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
 						'bold'        => [
-							'description'       => __( 'The path to the `bold` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `bold` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
 							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
 						'bolditalics' => [
-							'description'       => __( 'The path to the `bolditalics` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `bolditalics` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
 							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
@@ -222,7 +222,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			/* Ensure the regular font file has been uploaded (required field) */
 			if ( ! isset( $files['regular'] ) ) {
-				throw new UploadException( wp_json_encode( [ 'regular' => __( 'The Regular font is required', 'gravity-forms-pdf-extended' ) ] ) );
+				throw new UploadException( wp_json_encode( [ 'regular' => __( 'The Regular font is required', 'gravity-pdf' ) ] ) );
 			}
 
 			$files = $this->move_fonts_to_font_dir( $files );
@@ -335,7 +335,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				if ( $useKashida !== null ) {
 					$useKashida = (int) $useKashida;
 					if ( $useKashida < 0 || $useKashida > 100 ) {
-						throw new \InvalidArgumentException( __( 'Kashida needs to be a value between 0-100', 'gravity-forms-pdf-extended' ) );
+						throw new \InvalidArgumentException( __( 'Kashida needs to be a value between 0-100', 'gravity-pdf' ) );
 					}
 				}
 
@@ -477,7 +477,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			try {
 				$file->upload();
 			} catch ( UploadException $e ) {
-				$errors[ $id ] = __( 'The upload is not a valid TTF file', 'gravity-forms-pdf-extended' );
+				$errors[ $id ] = __( 'The upload is not a valid TTF file', 'gravity-pdf' );
 			}
 		}
 
@@ -540,7 +540,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 		foreach ( $files as $id => $file ) {
 			if ( ! isset( $file['name'] ) || ! is_file( $this->font_dir_path . $file['name'] ) ) {
-				$errors[ $id ] = sprintf( __( 'Cannot find %s.', 'gravity-forms-pdf-extended' ), $file['name'] );
+				$errors[ $id ] = sprintf( __( 'Cannot find %s.', 'gravity-pdf' ), $file['name'] );
 				continue;
 			}
 

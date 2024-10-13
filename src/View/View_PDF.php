@@ -241,7 +241,7 @@ class View_PDF extends Helper_Abstract_View {
 				wp_die( esc_html( $message ) );
 			}
 
-			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
+			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-pdf' ) );
 		}
 	}
 
@@ -581,7 +581,7 @@ class View_PDF extends Helper_Abstract_View {
 		/* Prevent core styles loading if a v3 template or using our legacy Tier 2 add-on */
 		$template_info = $this->templates->get_template_info_by_id( $settings['template'] );
 		if (
-			( esc_html__( 'Legacy', 'gravity-forms-pdf-extended' ) !== $template_info['group'] ) &&
+			( esc_html__( 'Legacy', 'gravity-pdf' ) !== $template_info['group'] ) &&
 			( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] )
 		) {
 			$html = $this->get_core_template_styles( $settings, $entry ) . $html;

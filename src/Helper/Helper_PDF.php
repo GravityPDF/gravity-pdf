@@ -385,7 +385,7 @@ class Helper_PDF {
 		/* Check if there are version requirements */
 		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
 		if ( ! $this->templates->is_template_compatible( $template_info['required_pdf_version'] ) ) {
-			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$template_info['required_pdf_version']}</em>" ) );
+			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-pdf' ), "<em>$template</em>", "<em>{$template_info['required_pdf_version']}</em>" ) );
 		}
 	}
 
@@ -922,7 +922,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_image_dpi() {
-		_doing_it_wrong( __METHOD__, esc_html__( 'This method has been removed because mPDF no longer supports setting the image DPI after the class is initialised.', 'gravity-forms-pdf-extended' ), '5.2' );
+		_doing_it_wrong( __METHOD__, esc_html__( 'This method has been removed because mPDF no longer supports setting the image DPI after the class is initialised.', 'gravity-pdf' ), '5.2' );
 	}
 
 	/**
