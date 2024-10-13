@@ -17,6 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <pre class="gravitypdf-error">
-	<?php esc_html_e( 'Could not get Gravity PDF configuration using the PDF and Entry IDs passed.', 'gravity-forms-pdf-extended' ); ?>
-	<small><?php esc_html_e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small>
+	<?php esc_html_e( 'Could not get Gravity PDF configuration using the PDF and Entry IDs passed.', 'gravity-pdf' ); ?>
+	<small><?php esc_html_e( '(Admin Only Message)', 'gravity-pdf' ); ?></small>
 </pre>

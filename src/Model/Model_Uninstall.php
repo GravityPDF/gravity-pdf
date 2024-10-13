@@ -155,7 +155,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 					]
 				);
 
-				$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
+				$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-pdf' ), $form['id'] . ': ' . $form['title'] ) );
 			}
 		}
 	}
@@ -190,7 +190,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 						]
 					);
 
-					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
+					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
 		}

@@ -171,17 +171,17 @@ class View_Settings extends Helper_Abstract_View {
 		/* The array key is the settings order */
 		$navigation = [
 			5   => [
-				'name' => esc_html__( 'Settings', 'gravity-forms-pdf-extended' ),
+				'name' => esc_html__( 'Settings', 'gravity-pdf' ),
 				'id'   => 'general',
 			],
 
 			100 => [
-				'name' => esc_html__( 'Tools', 'gravity-forms-pdf-extended' ),
+				'name' => esc_html__( 'Tools', 'gravity-pdf' ),
 				'id'   => 'tools',
 			],
 
 			120 => [
-				'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
+				'name' => esc_html__( 'Help', 'gravity-pdf' ),
 				'id'   => 'help',
 			],
 		];
@@ -189,7 +189,7 @@ class View_Settings extends Helper_Abstract_View {
 		/* Add License tab if necessary */
 		if ( count( $this->data->addon ) > 0 ) {
 			$navigation[10] = [
-				'name' => esc_html__( 'License', 'gravity-forms-pdf-extended' ),
+				'name' => esc_html__( 'License', 'gravity-pdf' ),
 				'id'   => 'license',
 			];
 		}
@@ -205,7 +205,7 @@ class View_Settings extends Helper_Abstract_View {
 
 		if ( $enable_extensions ) {
 			$navigation[20] = [
-				'name' => esc_html__( 'Extensions', 'gravity-forms-pdf-extended' ),
+				'name' => esc_html__( 'Extensions', 'gravity-pdf' ),
 				'id'   => 'extensions',
 			];
 		}
@@ -238,8 +238,8 @@ class View_Settings extends Helper_Abstract_View {
 			[
 				'id'            => 'gfpdf_settings_general',
 				'width'         => 'full',
-				'title'         => __( 'Default PDF Options', 'gravity-forms-pdf-extended' ),
-				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
+				'title'         => __( 'Default PDF Options', 'gravity-pdf' ),
+				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-pdf' ),
 				'callback'      => static function() use ( $markup ) {
 					$markup->output_settings_fields( 'gfpdf_settings_general_defaults', $markup::ENABLE_PANEL_TITLE );
 				},
@@ -263,7 +263,7 @@ class View_Settings extends Helper_Abstract_View {
 			'id'            => 'gfpdf_settings_general_security',
 			'width'         => 'full',
 			'collapsible'   => true,
-			'title'         => __( 'Security', 'gravity-forms-pdf-extended' ),
+			'title'         => __( 'Security', 'gravity-pdf' ),
 			'callback'      => static function() use ( $markup ) {
 				$markup->output_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE );
 			},
@@ -296,7 +296,7 @@ class View_Settings extends Helper_Abstract_View {
 			[
 				'id'       => 'gfpdf_settings_general_view',
 				'width'    => 'full',
-				'title'    => __( 'Licensing', 'gravity-forms-pdf-extended' ),
+				'title'    => __( 'Licensing', 'gravity-pdf' ),
 				'callback' => function() {
 					$this->load( 'licence-info', [] );
 				},
@@ -424,7 +424,7 @@ class View_Settings extends Helper_Abstract_View {
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->warning( 'Lack of User Capabilities.' );
 
-			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
+			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-pdf' ) );
 		}
 
 		$markup             = new View_GravityForm_Settings_Markup();
@@ -455,7 +455,7 @@ class View_Settings extends Helper_Abstract_View {
 	 */
 	public function add_tooltips( $tooltips ) {
 
-		$tooltips['pdf_shortcode'] = '<h6>' . esc_html__( 'PDF Download Link', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( "Include the [gravitypdf] shortcode in the form's Confirmation or Notification settings to display a PDF download link. %1\$sGet more info%2\$s.", 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags">', '</a>' );
+		$tooltips['pdf_shortcode'] = '<h6>' . esc_html__( 'PDF Download Link', 'gravity-pdf' ) . '</h6>' . sprintf( esc_html__( "Include the [gravitypdf] shortcode in the form's Confirmation or Notification settings to display a PDF download link. %1\$sGet more info%2\$s.", 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags">', '</a>' );
 		return apply_filters( 'gravitypdf_registered_tooltips', $tooltips );
 	}
 }

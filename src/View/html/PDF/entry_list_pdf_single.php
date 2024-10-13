@@ -26,5 +26,5 @@ $is_download = $args['view'] === 'download';
 	data-type="<?php echo esc_attr( $args['view'] ); ?>"
 	<?php echo $is_download ? '' : 'target="_blank"'; ?>
 >
-	<?php echo $is_download ? esc_html__( 'Download PDF', 'gravity-forms-pdf-extended' ) : esc_html__( 'View PDF', 'gravity-forms-pdf-extended' ); ?>
+	<?php echo $is_download ? esc_html__( 'Download PDF', 'gravity-pdf' ) : esc_html__( 'View PDF', 'gravity-pdf' ); ?>
 </a>

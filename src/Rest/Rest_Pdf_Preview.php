@@ -43,14 +43,14 @@ class Rest_Pdf_Preview extends Rest_Form_Settings {
 			[
 				'args'   => [
 					'form'  => [
-						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-pdf' ),
 						'type'              => 'integer',
 						'required'          => true,
 						'validate_callback' => [ $this, 'check_form_is_valid' ],
 					],
 
 					'entry' => [
-						'description'       => __( 'The unique identifier for the Gravity Forms entry.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms entry.', 'gravity-pdf' ),
 						'type'              => 'integer',
 						'required'          => false,
 						'validate_callback' => [ $this, 'check_entry_is_valid' ],

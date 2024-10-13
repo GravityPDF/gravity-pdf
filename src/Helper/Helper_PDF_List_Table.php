@@ -93,10 +93,10 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		$columns = [
 			'cb'            => '',
-			'name'          => esc_html__( 'Label', 'gravity-forms-pdf-extended' ),
-			'template'      => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
-			'notifications' => esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ),
-			'shortcode'     => esc_html__( 'Shortcode', 'gravity-forms-pdf-extended' ) . gform_tooltip( 'pdf_shortcode', 'gfpdf-tooltip', true ),
+			'name'          => esc_html__( 'Label', 'gravity-pdf' ),
+			'template'      => esc_html__( 'Template', 'gravity-pdf' ),
+			'notifications' => esc_html__( 'Notifications', 'gravity-pdf' ),
+			'shortcode'     => esc_html__( 'Shortcode', 'gravity-pdf' ) . gform_tooltip( 'pdf_shortcode', 'gfpdf-tooltip', true ),
 		];
 
 		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_list_columns/ for more details about this filter */
@@ -135,7 +135,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$singular = rgar( $this->_args, 'singular' );
 		?>
 
-		<table class="wp-list-table <?php echo esc_attr( implode( ' ', $this->get_table_classes() ) ); ?>" cellspacing="0" aria-label="<?php echo esc_attr__( 'PDF List', 'gravity-forms-pdf-extended' ); ?>">
+		<table class="wp-list-table <?php echo esc_attr( implode( ' ', $this->get_table_classes() ) ); ?>" cellspacing="0" aria-label="<?php echo esc_attr__( 'PDF List', 'gravity-pdf' ); ?>">
 			<thead>
 			<tr>
 				<?php $this->print_column_headers(); ?>
@@ -217,10 +217,10 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		if ( $is_active ) {
 			$class = 'gform-status--active';
-			$text  = __( 'Active', 'gravity-forms-pdf-extended' );
+			$text  = __( 'Active', 'gravity-pdf' );
 		} else {
 			$class = 'gform-status--inactive';
-			$text  = __( 'Inactive', 'gravity-forms-pdf-extended' );
+			$text  = __( 'Inactive', 'gravity-pdf' );
 		}
 
 		$gf_less_than_288 = version_compare( \GFCommon::$version, '2.8.8', '<' );
@@ -247,7 +247,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_notifications( $item ) {
 		if ( ! isset( $item['notification'] ) || count( $item['notification'] ) === 0 ) {
-			printf( '<span>%s</span>', esc_html__( 'None', 'gravity-forms-pdf-extended' ) );
+			printf( '<span>%s</span>', esc_html__( 'None', 'gravity-pdf' ) );
 
 			return;
 		}
@@ -282,10 +282,10 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'[gravitypdf name="%1$s" id="%2$s" text="%3$s"]',
 			$name,
 			esc_attr( $pdf_id ),
-			__( 'Download PDF', 'gravity-forms-pdf-extended' )
+			__( 'Download PDF', 'gravity-pdf' )
 		);
 
-		$aria_label = sprintf( __( 'Copy the %s PDF shortcode to the clipboard', 'gravity-forms-pdf-extended' ), $item['name'] );
+		$aria_label = sprintf( __( 'Copy the %s PDF shortcode to the clipboard', 'gravity-pdf' ), $item['name'] );
 
 		ob_start();
 		/* If the current GF version is 2.6 or higher, use the new updated UI for the shortcode button or else use the pre GF 2.5 version. */
@@ -297,18 +297,18 @@ class Helper_PDF_List_Table extends WP_List_Table {
 					role="dialog" aria-live="polite">
 				<i class="gform-button__icon gform-icon gform-icon--copy"></i>
 				<span class="gform-embed-form__shortcode-copy-label"
-					  aria-hidden="false"><?php echo esc_attr__( 'Copy', 'gravity-forms-pdf-extended' ); ?></span>
+					  aria-hidden="false"><?php echo esc_attr__( 'Copy', 'gravity-pdf' ); ?></span>
 				<span class="gform-embed-form__shortcode-copy-copied" aria-hidden="true">
 				<i class="gform-embed-form__shortcode-copy-icon gform-icon gform-icon--circle-check-alt"></i>
-				<?php echo esc_attr__( 'Copied', 'gravity-forms-pdf-extended' ); ?>
+				<?php echo esc_attr__( 'Copied', 'gravity-pdf' ); ?>
 			</span>
 			</button>
 		<?php else : ?>
-			<button data-selected-text="<?php echo esc_attr__( 'Shortcode copied!', 'gravity-forms-pdf-extended' ); ?>"
+			<button data-selected-text="<?php echo esc_attr__( 'Shortcode copied!', 'gravity-pdf' ); ?>"
 					type="button" class="gform-status-indicator btn-shortcode gf_2_5 "
 					data-clipboard-text="<?php echo esc_attr( $shortcode ); ?>" aria-label="<?php echo esc_attr( $aria_label ); ?>"
 					role="status" aria-live="polite">
-				<?php echo esc_html__( 'Copy Shortcode', 'gravity-forms-pdf-extended' ); ?>
+				<?php echo esc_html__( 'Copy Shortcode', 'gravity-pdf' ); ?>
 			</button>
 		<?php endif; ?>
 		<div class="gpdf-fallback-input">
@@ -361,9 +361,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
 		$actions = [
-			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
-			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . esc_attr( $item['id'] ) . '" class="submitduplicate" data-nonce="' . esc_attr( $duplicate_nonce ) . '"  data-fid="' . esc_attr( $form_id ) . '" href="#">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
-			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . esc_attr( $item['id'] ) . '" data-nonce="' . esc_attr( $delete_nonce ) . '" data-fid="' . esc_attr( $form_id ) . '" href="#">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
+			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-pdf' ) . '" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'gravity-pdf' ) . '</a>',
+			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-pdf' ) . '" data-id="' . esc_attr( $item['id'] ) . '" class="submitduplicate" data-nonce="' . esc_attr( $duplicate_nonce ) . '"  data-fid="' . esc_attr( $form_id ) . '" href="#">' . esc_html__( 'Duplicate', 'gravity-pdf' ) . '</a>',
+			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-pdf' ) . '" class="submitdelete" data-id="' . esc_attr( $item['id'] ) . '" data-nonce="' . esc_attr( $delete_nonce ) . '" data-fid="' . esc_attr( $form_id ) . '" href="#">' . esc_html__( 'Delete', 'gravity-pdf' ) . '</a>',
 		];
 
 		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_actions/ for more details about this filter */
@@ -371,7 +371,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		?>
 
-		<a href="<?php echo esc_url( $edit_url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( '%s PDF', 'gravity-forms-pdf-extended' ), $pdf_name ) ); ?>"><strong><?php echo esc_html( $pdf_name ); ?></strong></a>
+		<a href="<?php echo esc_url( $edit_url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( '%s PDF', 'gravity-pdf' ), $pdf_name ) ); ?>"><strong><?php echo esc_html( $pdf_name ); ?></strong></a>
 		<div class="row-actions">
 
 			<?php
@@ -401,7 +401,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function no_items() {
 		echo '<label>';
-		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-forms-pdf-extended' ), "<a href='" . esc_url( add_query_arg( [ 'pid' => 0 ] ) ) . "'>", '</a>' );
+		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-pdf' ), "<a href='" . esc_url( add_query_arg( [ 'pid' => 0 ] ) ) . "'>", '</a>' );
 		echo '</label>';
 
 	}

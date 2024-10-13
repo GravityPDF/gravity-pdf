@@ -11,7 +11,7 @@ if [[ -z "$WP_ORG_PASSWORD" ]]; then
 fi
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-PLUGIN_BUILDS_PATH="$PROJECT_ROOT/tmp/package"
+PLUGIN_BUILDS_PATH="$PROJECT_ROOT/tmp/package/wporg"
 
 # Ensure the current build directory exists
 if [ ! -d "$PLUGIN_BUILDS_PATH/$SOURCE_TAG" ]; then

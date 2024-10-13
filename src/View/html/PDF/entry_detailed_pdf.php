@@ -29,11 +29,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php do_action( 'gfpdf_entry_detail_post_pdf_name_markup', $pdf, $args['pdfs'] ); ?>
 
-			<div class="gfpdf_detailed_pdf_cta" aria-label="<?php echo esc_attr( sprintf( __( 'View or download %s.pdf', 'gravity-forms-pdf-extended' ), $pdf['name'] ) ); ?>">
+			<div class="gfpdf_detailed_pdf_cta" aria-label="<?php echo esc_attr( sprintf( __( 'View or download %s.pdf', 'gravity-pdf' ), $pdf['name'] ) ); ?>">
 				<?php do_action( 'gfpdf_entry_detail_pre_pdf_links_markup', $pdf, $args['pdfs'] ); ?>
 
-				<a href="<?php echo esc_url( $pdf['view'] ); ?>" class="<?php echo esc_attr( $pdf['class'] ); ?>" target="_blank" data-type="view"><?php echo esc_html__( 'View', 'gravity-forms-pdf-extended' ); ?></a> |
-				<a href="<?php echo esc_url( $pdf['download'] ); ?>" class="<?php echo esc_attr( $pdf['class'] ); ?>" data-type="download"><?php echo esc_html__( 'Download', 'gravity-forms-pdf-extended' ); ?></a>
+				<a href="<?php echo esc_url( $pdf['view'] ); ?>" class="<?php echo esc_attr( $pdf['class'] ); ?>" target="_blank" data-type="view"><?php echo esc_html__( 'View', 'gravity-pdf' ); ?></a> |
+				<a href="<?php echo esc_url( $pdf['download'] ); ?>" class="<?php echo esc_attr( $pdf['class'] ); ?>" data-type="download"><?php echo esc_html__( 'Download', 'gravity-pdf' ); ?></a>
 
 				<?php do_action( 'gfpdf_entry_detail_post_pdf_links_markup', $pdf, $args['pdfs'] ); ?>
 			</div>

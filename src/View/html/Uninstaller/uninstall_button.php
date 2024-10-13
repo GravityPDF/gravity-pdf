@@ -36,8 +36,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					name="uninstall_addon"
 					value="uninstall"
 					class="button uninstall-addon red"
-					onclick="return confirm('<?php echo esc_js( __( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ) ); ?>');"
-					onkeypress="return confirm('<?php echo esc_js( __( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ) ); ?>');">
+					onclick="return confirm('<?php echo esc_js( __( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-pdf' ) ); ?>');"
+					onkeypress="return confirm('<?php echo esc_js( __( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-pdf' ) ); ?>');">
 				<i class="dashicons dashicons-trash"></i>
 				<?php esc_html_e( 'Uninstall', 'gravityforms' ); ?>
 			</button>

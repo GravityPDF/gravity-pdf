@@ -427,7 +427,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! is_wp_error( $action ) ) {
 			if ( $settings['active'] !== true ) {
-				return new WP_Error( 'inactive', esc_html__( 'The PDF configuration is not currently active.', 'gravity-forms-pdf-extended' ) );
+				return new WP_Error( 'inactive', esc_html__( 'The PDF configuration is not currently active.', 'gravity-pdf' ) );
 			}
 		}
 
@@ -449,7 +449,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! is_wp_error( $action ) ) {
 			if ( isset( $settings['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $settings['conditionalLogic'], $entry ) ) {
-				return new WP_Error( 'conditional_logic', esc_html__( 'PDF conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ) );
+				return new WP_Error( 'conditional_logic', esc_html__( 'PDF conditional logic requirements have not been met.', 'gravity-pdf' ) );
 			}
 		}
 
@@ -538,7 +538,7 @@ class Model_PDF extends Helper_Abstract_Model {
 								]
 							);
 
-							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
+							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-pdf' ) );
 						} else {
 
 							$this->log->notice(
@@ -657,7 +657,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 					/* there's no returning, throw generic error */
 
-					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
+					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-pdf' ) );
 				}
 			}
 		}
@@ -687,7 +687,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* throw error if no access granted */
 				if ( ! $access ) {
-					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
+					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-pdf' ) );
 				}
 			}
 		}
@@ -1015,7 +1015,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		<div id="gravitypdf-pdf-box-container" class="postbox">
 
 			<h3 class="hndle" style="cursor:default;">
-				<span><?php esc_html_e( 'Gravity PDF', 'gravity-forms-pdf-extended' ); ?></span>
+				<span><?php esc_html_e( 'Gravity PDF', 'gravity-pdf' ); ?></span>
 			</h3>
 
 			<div class="inside">
@@ -1052,7 +1052,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$meta = [
 			'gfpdf-entry-details-list' => [
-				'title'         => esc_html__( 'PDFs', 'gravity-forms-pdf-extended' ),
+				'title'         => esc_html__( 'PDFs', 'gravity-pdf' ),
 				'callback'      => function( $args ) {
 					/* Only show the PDF metabox if a user has permission to view the documents */
 					if ( ! $this->can_user_view_pdf_with_capabilities() ) {
@@ -1198,7 +1198,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
 
 		if ( ! $this->process_and_save_pdf( $pdf_generator ) ) {
-			return new WP_Error( 'pdf_generation_failure', esc_html__( 'There was a problem creating the PDF', 'gravity-forms-pdf-extended' ) );
+			return new WP_Error( 'pdf_generation_failure', esc_html__( 'There was a problem creating the PDF', 'gravity-pdf' ) );
 		}
 
 		do_action( 'gfpdf_post_generate_and_save_pdf', $form, $entry, $pdf_settings );
@@ -2234,7 +2234,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		return new WP_Error( 'pdf_configuration_error', esc_html__( 'Could not find PDF configuration requested', 'gravity-forms-pdf-extended' ) );
+		return new WP_Error( 'pdf_configuration_error', esc_html__( 'Could not find PDF configuration requested', 'gravity-pdf' ) );
 	}
 
 	/**
@@ -2559,7 +2559,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		array_map(
 			function( $item ) use ( $form ) {
-				$item->label   = sprintf( esc_html__( 'Page %d', 'gravity-forms-pdf-extended' ), $item->pageNumber );
+				$item->label   = sprintf( esc_html__( 'Page %d', 'gravity-pdf' ), $item->pageNumber );
 				$item->content = $form['pagination']['pages'][ $item->pageNumber - 1 ] ?? '';
 			},
 			\GFAPI::get_fields_by_type( $form, 'page', true )
@@ -2616,7 +2616,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				]
 			);
 
-			return new WP_Error( 'headers_sent', __( 'The PDF cannot be displayed because the server headers have already been sent.', 'gravity-forms-pdf-extended' ) );
+			return new WP_Error( 'headers_sent', __( 'The PDF cannot be displayed because the server headers have already been sent.', 'gravity-pdf' ) );
 		}
 
 		/* Force any active buffers to close and delete its content */

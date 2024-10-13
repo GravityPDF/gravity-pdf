@@ -1,4 +1,4 @@
-This file contains the changelog history for previous major versions of Gravity PDF. See https://wordpress.org/plugins/gravity-forms-pdf-extended/#developers for the current major version changelog.
+This file contains the changelog history for previous major versions of Gravity PDF. See the README.txt file for the current major version changelog.
 
 = 5.4.0 =
 * Feature: Prevent update to 6.0 if minimum requirements are not met (including when automatic updates enabled)

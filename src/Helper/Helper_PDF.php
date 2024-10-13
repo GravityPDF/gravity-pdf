@@ -386,7 +386,7 @@ class Helper_PDF {
 		/* Check if there are version requirements */
 		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
 		if ( ! $this->templates->is_template_compatible( $template_info['required_pdf_version'] ) ) {
-			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$template_info['required_pdf_version']}</em>" ) );
+			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-pdf' ), "<em>$template</em>", "<em>{$template_info['required_pdf_version']}</em>" ) );
 		}
 	}
 

@@ -25,6 +25,7 @@ Out of the box you get four highly-customizable PDF designs. Within minutes, you
 Gravity PDF can automatically email the PDF to both the admin and the user as soon as the form is completed. You can combine this feature with a Gravity Forms payment add-on [to sell personalized reports, gift certificates, or generate PDF invoices](https://gravitypdf.com/news/sell-personalized-pdf-documents-using-gravity-forms/).
 
 = Privacy, Security, and GDPR =
+
 Gravity PDF generates PDFs on your web server, and no third-party service receives your sensitive Gravity Forms entry data. [Robust security protects your documents](https://docs.gravitypdf.com/v6/users/pdf-security), and [the plugin is GDPR-compliant](https://docs.gravitypdf.com/v6/users/gdpr-and-gravity-pdf) for our European friends.
 
 > Digital document management with WordPress and Gravity Forms just became simple with Gravity PDF!
@@ -64,7 +65,7 @@ Need a tailor-made solution for Gravity PDF that solves complex business problem
 
 = Documentation & Support =
 
-[We have extensive documentation on using Gravity PDF](https://docs.gravitypdf.com/v6/users/five-minute-install/), and our friendly support team provides [FREE basic support via GravityPDF.com](https://gravitypdf.com/support/#contact-support) (we do respond [to questions in forums](https://wordpress.org/support/plugin/gravity-forms-pdf-extended/), but give priority to our support portal).
+[We have extensive documentation on using Gravity PDF](https://docs.gravitypdf.com/v6/users/five-minute-install/), and our friendly support team provides [FREE basic support via GravityPDF.com](https://gravitypdf.com/support/#contact-support).
 
 = Contribute =
 
@@ -72,7 +73,7 @@ All development for Gravity PDF [is handled via GitHub](https://github.com/Gravi
 
 Keep up to date with Gravity PDF by [subscribing to the newsletter](https://gravitypdf.com/signup/), [following us on Twitter/X](https://twitter.com/gravitypdf), [subscribing to our YouTube channel](https://www.youtube.com/gravitypdf), and [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
-If you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
+If you enjoy using the software [we'd love it if you could give us a review!](https://www.g2.com/products/gravity-pdf/reviews)
 
 == Installation ==
 

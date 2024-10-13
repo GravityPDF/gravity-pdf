@@ -72,28 +72,28 @@ class Focus_Gravity extends Helper_Abstract_Config_Settings implements Helper_In
 			'fields' => [
 				'focusgravity_accent_colour'    => [
 					'id'   => 'focusgravity_accent_colour',
-					'name' => esc_html__( 'Accent Color', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Accent Color', 'gravity-pdf' ),
 					'type' => 'color',
-					'desc' => esc_html__( 'The accent color is used for the page and section titles, as well as the border.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'The accent color is used for the page and section titles, as well as the border.', 'gravity-pdf' ),
 					'std'  => '#e3e3e3',
 				],
 
 				'focusgravity_secondary_colour' => [
 					'id'   => 'focusgravity_secondary_colour',
-					'name' => esc_html__( 'Secondary Color', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Secondary Color', 'gravity-pdf' ),
 					'type' => 'color',
-					'desc' => esc_html__( 'The secondary color is used with the field labels and for alternate rows.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'The secondary color is used with the field labels and for alternate rows.', 'gravity-pdf' ),
 					'std'  => '#eaf2fa',
 				],
 
 				'focusgravity_label_format'     => [
 					'id'      => 'focusgravity_label_format',
-					'name'    => esc_html__( 'Format', 'gravity-forms-pdf-extended' ),
+					'name'    => esc_html__( 'Format', 'gravity-pdf' ),
 					'type'    => 'radio',
-					'desc'    => esc_html__( 'Combine the field label and value or have a distinct label/value.', 'gravity-forms-pdf-extended' ),
+					'desc'    => esc_html__( 'Combine the field label and value or have a distinct label/value.', 'gravity-pdf' ),
 					'options' => [
-						'combined_label' => esc_html__( 'Combined Label', 'gravity-forms-pdf-extended' ),
-						'split_label'    => esc_html__( 'Split Label', 'gravity-forms-pdf-extended' ),
+						'combined_label' => esc_html__( 'Combined Label', 'gravity-pdf' ),
+						'split_label'    => esc_html__( 'Split Label', 'gravity-pdf' ),
 					],
 					'std'     => 'combined_label',
 				],

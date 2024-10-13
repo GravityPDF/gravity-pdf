@@ -211,12 +211,12 @@ class Field_Products extends Helper_Abstract_Fields {
 								<tr>
 									<td rowspan="3" class="emptycell"></td>
 									<td colspan="2"
-										class="subtotal totals"><?php esc_html_e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
+										class="subtotal totals"><?php esc_html_e( 'Subtotal', 'gravity-pdf' ); ?></td>
 									<td class="subtotal_amount totals"><?php echo esc_html( $products['products_totals']['subtotal_formatted'] ); ?></td>
 								</tr>
 								<tr>
 									<td colspan="2"
-										class="shipping totals"><?php Kses::output( sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), wp_specialchars_decode( $products['products_totals']['shipping_name'], ENT_QUOTES ) ) ); ?></td>
+										class="shipping totals"><?php Kses::output( sprintf( __( 'Shipping (%s)', 'gravity-pdf' ), wp_specialchars_decode( $products['products_totals']['shipping_name'], ENT_QUOTES ) ) ); ?></td>
 									<td class="shipping_amount totals"><?php echo esc_html( $products['products_totals']['shipping_formatted'] ); ?></td>
 								</tr>
 							<?php endif; ?>

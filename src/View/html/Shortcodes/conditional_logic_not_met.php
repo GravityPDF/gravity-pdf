@@ -17,6 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <pre class="gravitypdf-error">
-	<?php esc_html_e( 'PDF link not displayed because conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ); ?>
-	<small><?php esc_html_e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small>
+	<?php esc_html_e( 'PDF link not displayed because conditional logic requirements have not been met.', 'gravity-pdf' ); ?>
+	<small><?php esc_html_e( '(Admin Only Message)', 'gravity-pdf' ); ?></small>
 </pre>

@@ -357,7 +357,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			);
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-			$message      = __( 'Your support license key has been activated for this domain.', 'gravity-forms-pdf-extended' );
+			$message      = __( 'Your support license key has been activated for this domain.', 'gravity-pdf' );
 			$status       = 'active';
 
 			if ( ! isset( $license_data->success ) || false === $license_data->success ) {
@@ -454,7 +454,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				$this->log->notice( 'AJAX – Successfully Deactivated License' );
 				echo wp_json_encode(
 					[
-						'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ),
+						'success' => esc_html__( 'License deactivated.', 'gravity-pdf' ),
 					]
 				);
 
@@ -478,7 +478,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			[
 				'error' => wp_kses(
 					sprintf(
-						__( 'An unknown error occurred, and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-forms-pdf-extended' ),
+						__( 'An unknown error occurred, and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
 						'<a href="https://gravitypdf.com/account/licenses/">',
 						'</a>'
 					),
