@@ -39,7 +39,7 @@ class View_Form_Settings extends Helper_Abstract_View {
 			[
 				'id'               => 'gfpdf_form_settings_general',
 				'width'            => 'full',
-				'title'            => __( 'General', 'gravity-forms-pdf-extended' ),
+				'title'            => __( 'General', 'gravity-pdf' ),
 				'desc'             => '',
 				'callback'         => static function() use ( $markup ) {
 					$markup->output_settings_fields( 'gfpdf_settings_form_settings', $markup::ENABLE_PANEL_TITLE );
@@ -51,7 +51,7 @@ class View_Form_Settings extends Helper_Abstract_View {
 			[
 				'id'               => 'gfpdf_form_settings_appearance',
 				'width'            => 'full',
-				'title'            => __( 'Appearance', 'gravity-forms-pdf-extended' ),
+				'title'            => __( 'Appearance', 'gravity-pdf' ),
 				'desc'             => '',
 				'callback'         => static function() use ( $markup ) {
 					$markup->output_settings_fields( 'gfpdf_settings_form_settings_appearance', $markup::ENABLE_PANEL_TITLE );
@@ -63,7 +63,7 @@ class View_Form_Settings extends Helper_Abstract_View {
 			[
 				'id'               => 'gfpdf_form_settings_template',
 				'width'            => 'full',
-				'title'            => __( 'Template', 'gravity-forms-pdf-extended' ),
+				'title'            => __( 'Template', 'gravity-pdf' ),
 				'desc'             => '',
 				'callback'         => static function() use ( $markup ) {
 					$markup->output_settings_fields( 'gfpdf_settings_form_settings_custom_appearance', $markup::ENABLE_PANEL_TITLE );
@@ -75,7 +75,7 @@ class View_Form_Settings extends Helper_Abstract_View {
 			[
 				'id'               => 'gfpdf_form_settings_advanced',
 				'width'            => 'full',
-				'title'            => __( 'Advanced', 'gravity-forms-pdf-extended' ),
+				'title'            => __( 'Advanced', 'gravity-pdf' ),
 				'desc'             => '',
 				'callback'         => static function() use ( $markup ) {
 					$markup->output_settings_fields( 'gfpdf_settings_form_settings_advanced', $markup::ENABLE_PANEL_TITLE );

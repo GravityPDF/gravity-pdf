@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /** @var $args array */
 
 $download         = $args['view'] === 'download';
-$parent_link_text = $download ? __( 'Download PDFs', 'gravity-forms-pdf-extended' ) : __( 'View PDFs', 'gravity-forms-pdf-extended' );
+$parent_link_text = $download ? __( 'Download PDFs', 'gravity-pdf' ) : __( 'View PDFs', 'gravity-pdf' );
 
 ?>
 

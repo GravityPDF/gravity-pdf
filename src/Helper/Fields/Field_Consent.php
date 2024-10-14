@@ -139,7 +139,7 @@ class Field_Consent extends Helper_Abstract_Fields {
 	protected function get_non_consent_markup() {
 		return sprintf(
 			'<span class="consent-tick consent-not-accepted" style="font-family:dejavusans,sans-serif;">&#10006;</span> <span class="consent-label consent-not-accepted-label">%s</span>',
-			__( 'Consent not given.', 'gravity-forms-pdf-extended' )
+			__( 'Consent not given.', 'gravity-pdf' )
 		);
 	}
 }

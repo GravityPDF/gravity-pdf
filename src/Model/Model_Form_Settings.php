@@ -168,7 +168,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->warning( 'Lack of User Capabilities.' );
-			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
+			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-pdf' ) );
 		}
 
 		$controller = $this->getController();
@@ -205,7 +205,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
 			$this->log->warning( 'Lack of User Capabilities.' );
-			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
+			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-pdf' ) );
 		}
 
 		$controller = $this->getController();
@@ -242,8 +242,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$pdf = $this->options->get_pdf( $form_id, $pdf_id );
 
 		/* prepare our data */
-		$update_pdf_text = esc_html__( 'Update PDF', 'gravity-forms-pdf-extended' );
-		$label           = esc_html__( 'Add PDF', 'gravity-forms-pdf-extended' );
+		$update_pdf_text = esc_html__( 'Update PDF', 'gravity-pdf' );
+		$label           = esc_html__( 'Add PDF', 'gravity-pdf' );
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		if ( ( $_POST['submit'] ?? '' ) === $update_pdf_text || ( ! is_wp_error( $pdf ) && ! isset( $pdf['status'] ) ) ) {
@@ -327,13 +327,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
+			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-pdf' ) );
 		}
 
 		/* Check Nonce is valid */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
 			$this->log->warning( 'Nonce Verification Failed.' );
-			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-pdf' ) );
 
 			return false;
 		}
@@ -355,7 +355,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-pdf' ) );
 
 			return false;
 		}
@@ -376,7 +376,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
 			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (float) $sanitized['custom_pdf_size'][0] === 0.0 || (float) $sanitized['custom_pdf_size'][1] === 0.0 ) )
 		) {
-			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-pdf' ) );
 
 			return false;
 		}
@@ -398,13 +398,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( remove_query_arg( 'pid' ) ) . '">', '</a>' ) );
+			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-pdf' ), '<a href="' . esc_url( remove_query_arg( 'pid' ) ) . '">', '</a>' ) );
 
 			return true;
 		}
 
 		$this->log->error( 'Failed to Save Form PDF Settings.' );
-		$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+		$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-pdf' ) );
 
 		return false;
 	}
@@ -512,7 +512,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Check we have a valid nonce, or throw an error */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
 			$this->log->warning( 'Nonce Verification Failed.' );
-			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-pdf' ) );
 
 			return false;
 		}
@@ -800,7 +800,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$this->log->notice( 'AJAX – Successfully Deleted PDF Settings' );
 
 			$return = [
-				'msg' => esc_html__( 'PDF successfully deleted.', 'gravity-forms-pdf-extended' ),
+				'msg' => esc_html__( 'PDF successfully deleted.', 'gravity-pdf' ),
 			];
 
 			echo wp_json_encode( $return );
@@ -863,13 +863,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$fid}_{$config['id']}" );
 
 				$return = [
-					'msg'         => esc_html__( 'PDF successfully duplicated.', 'gravity-forms-pdf-extended' ),
+					'msg'         => esc_html__( 'PDF successfully duplicated.', 'gravity-pdf' ),
 					'pid'         => $config['id'],
 					'name'        => $config['name'],
 					'dup_nonce'   => $dup_nonce,
 					'del_nonce'   => $del_nonce,
 					'state_nonce' => $state_nonce,
-					'status'      => esc_html__( 'Inactive', 'gravity-forms-pdf-extended' ),
+					'status'      => esc_html__( 'Inactive', 'gravity-pdf' ),
 				];
 
 				echo wp_json_encode( $return );
@@ -919,7 +919,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			/* toggle state */
 			$config['active'] = ( $config['active'] === true ) ? false : true;
-			$state            = ( $config['active'] ) ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' );
+			$state            = ( $config['active'] ) ? esc_attr__( 'Active', 'gravity-pdf' ) : esc_attr__( 'Inactive', 'gravity-pdf' );
 
 			$results = $this->options->update_pdf( $fid, $config['id'], $config );
 

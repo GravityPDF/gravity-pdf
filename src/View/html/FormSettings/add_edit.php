@@ -63,13 +63,13 @@ global $wp_settings_fields;
 
 			<input type="button"
 				   name="gpdf-preview-pdf-settings"
-				   value="<?php echo esc_attr__( 'Preview PDF', 'gravity-forms-pdf-extended' ); ?>"
+				   value="<?php echo esc_attr__( 'Preview PDF', 'gravity-pdf' ); ?>"
 				   class="button large" />
 		</div>
 
 		<div class="extensions-upsell">
 			<a href="https://gravitypdf.com/store/">
-				<?php esc_html_e( 'Want more features? Take a look at our addons.', 'gravity-forms-pdf-extended' ); ?>
+				<?php esc_html_e( 'Want more features? Take a look at our addons.', 'gravity-pdf' ); ?>
 			</a>
 		</div>
 	</footer>

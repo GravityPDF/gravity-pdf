@@ -1,4 +1,4 @@
-name: Deploy to WordPress.org
+name: Build and Package for Release
 
 on:
   push:
@@ -6,7 +6,46 @@ on:
       - '*'
 
 jobs:
-  build-and-deploy:
+  pdf-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.2
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: General debug information
+        run: |
+          npm --version
+          node --version
+          yarn --version
+          curl --version
+          git --version
+          svn --version
+          php --version
+          composer --version        
+
+      - name: Gravity PDF Build
+        run: bash ./bin/build.sh $SOURCE_TAG
+        env:
+          SOURCE_TAG: ${{steps.tag.outputs.tag}}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./tmp/package/gravity-pdf-*.zip
+          generate_release_notes: true
+          append_body: true
+          prerelease: true
+
+  wp-build-and-deploy:
     name: Build and Deploy Plugin
     runs-on: ubuntu-latest
     steps:
@@ -41,7 +80,7 @@ jobs:
           composer --version
 
       - name: Build
-        run: bash ./bin/build.sh $SOURCE_TAG
+        run: bash ./bin/build-wp.sh $SOURCE_TAG
         env:
           SOURCE_TAG: ${{steps.tag.outputs.tag}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

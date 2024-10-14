@@ -364,7 +364,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$files = glob( $dir . '*.php', GLOB_NOSORT );
 
 		if ( ! is_array( $files ) || count( $files ) === 0 ) {
-			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-forms-pdf-extended' ) );
+			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );
 		}
 
 		$this->check_for_valid_pdf_templates( $files );
@@ -385,13 +385,13 @@ class Model_Templates extends Helper_Abstract_Model {
 			$basename = wp_basename( $file );
 
 			if ( ! preg_match( '/^[a-zA-Z0-9-_]+.php$/', $basename ) ) {
-				throw new Exception( sprintf( esc_html__( 'The filename %s contains invalid characters. Only alphanumeric, hyphen, and underscore allowed.', 'gravity-forms-pdf-extended' ), $basename ) );
+				throw new Exception( sprintf( esc_html__( 'The filename %s contains invalid characters. Only alphanumeric, hyphen, and underscore allowed.', 'gravity-pdf' ), $basename ) );
 			}
 
 			/* Check if we have a valid v4 template header in the file */
 			$info = $this->templates->get_template_info_by_path( $file );
 
-			if ( $info['group'] === esc_html__( 'Legacy', 'gravity-forms-pdf-extended' ) ) {
+			if ( $info['group'] === esc_html__( 'Legacy', 'gravity-pdf' ) ) {
 				/* Check if it's a v3 template */
 				$fp        = fopen( $file, 'rb' );
 				$file_data = fread( $fp, 8192 );
@@ -399,7 +399,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 				/* Check the first 8kiB contains the string RGForms or GFForms, which signifies our v3 templates */
 				if ( strpos( $file_data, 'RGForms' ) === false && strpos( $file_data, 'GFForms' ) === false ) {
-					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-forms-pdf-extended' ), $basename ) );
+					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-pdf' ), $basename ) );
 				}
 			}
 		}

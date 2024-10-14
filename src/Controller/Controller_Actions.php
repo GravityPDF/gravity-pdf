@@ -129,7 +129,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		$routes = [
 			[
 				'action'      => 'install_core_fonts',
-				'action_text' => esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ),
+				'action_text' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
 				'condition'   => [ $this->model, 'core_font_condition' ],
 				'process'     => [ $this->model, 'core_font_redirect' ],
 				'view'        => [ $this->view, 'core_font' ],
@@ -204,14 +204,14 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 						]
 					);
 
-					wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
+					wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-pdf' ) );
 				}
 
 				/* Check nonce is valid */
 				if ( ! wp_verify_nonce( rgpost( 'gfpdf_action_' . $route['action'] ), 'gfpdf_action_' . $route['action'] ) ) {
 
 					$this->log->warning( 'Nonce Verification Failed.' );
-					$this->notices->add_error( esc_html__( 'There was a problem processing the action. Please try again.', 'gravity-forms-pdf-extended' ) );
+					$this->notices->add_error( esc_html__( 'There was a problem processing the action. Please try again.', 'gravity-pdf' ) );
 
 					continue;
 				}

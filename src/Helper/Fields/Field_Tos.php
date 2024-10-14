@@ -98,7 +98,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 		if ( ! $this->is_field_empty() ) {
 			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10004;</span> $value</div>";
 		} else {
-			$not_accepted_text = __( 'Not accepted', 'gravity-forms-pdf-extended' );
+			$not_accepted_text = __( 'Not accepted', 'gravity-pdf' );
 			$html             .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10006;</span> $not_accepted_text</div>";
 		}
 

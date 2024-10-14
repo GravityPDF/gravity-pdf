@@ -118,7 +118,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 			[
 				'args'   => [
 					'form' => [
-						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-pdf' ),
 						'type'              => 'integer',
 						'required'          => true,
 						'validate_callback' => [ $this, 'check_form_is_valid' ],
@@ -133,7 +133,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 						$this->get_collection_params(),
 						[
 							'entry' => [
-								'description'       => __( 'The unique identifier for the Gravity Forms entry. Include to filter out PDFs that are not active for the entry.', 'gravity-forms-pdf-extended' ),
+								'description'       => __( 'The unique identifier for the Gravity Forms entry. Include to filter out PDFs that are not active for the entry.', 'gravity-pdf' ),
 								'type'              => 'integer',
 								'required'          => false,
 								'validate_callback' => [ $this, 'check_entry_is_valid' ],
@@ -163,14 +163,14 @@ class Rest_Form_Settings extends WP_REST_Controller {
 			[
 				'args'   => [
 					'form' => [
-						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-pdf' ),
 						'type'              => 'integer',
 						'required'          => true,
 						'validate_callback' => [ $this, 'check_form_is_valid' ],
 					],
 
 					'pdf'  => [
-						'description'       => __( 'The identifier for the PDF', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The identifier for the PDF', 'gravity-pdf' ),
 						'type'              => 'string',
 						'required'          => true,
 						'validate_callback' => function( $param, $request ) {
@@ -223,14 +223,14 @@ class Rest_Form_Settings extends WP_REST_Controller {
 			[
 				'args' => [
 					'form'     => [
-						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms form.', 'gravity-pdf' ),
 						'type'              => 'integer',
 						'required'          => true,
 						'validate_callback' => [ $this, 'check_form_is_valid' ],
 					],
 
 					'template' => [
-						'description' => __( 'A PDF template installed on the website.', 'gravity-forms-pdf-extended' ),
+						'description' => __( 'A PDF template installed on the website.', 'gravity-pdf' ),
 						'type'        => 'string',
 						'required'    => true,
 						'enum'        => $this->misc->flatten_array( $this->templates->get_all_templates_by_group() ),
@@ -355,7 +355,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 
 		return new WP_Error(
 			'rest_invalid_param',
-			sprintf( __( 'Invalid form ID %d provided.', 'gravity-forms-pdf-extended' ), $form_id ),
+			sprintf( __( 'Invalid form ID %d provided.', 'gravity-pdf' ), $form_id ),
 			[ 'status' => 400 ]
 		);
 	}
@@ -375,7 +375,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		if ( is_wp_error( $entry ) ) {
 			return new WP_Error(
 				'rest_invalid_param',
-				sprintf( __( 'Invalid entry ID %d provided.', 'gravity-forms-pdf-extended' ), $entry_id ),
+				sprintf( __( 'Invalid entry ID %d provided.', 'gravity-pdf' ), $entry_id ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -383,7 +383,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		if ( (int) ( $entry['form_id'] ?? 0 ) !== (int) $request->get_param( 'form' ) ) {
 			return new WP_Error(
 				'rest_invalid_param',
-				sprintf( __( 'Entry ID %d is not associated with the current form.', 'gravity-forms-pdf-extended' ), $entry_id ),
+				sprintf( __( 'Entry ID %d is not associated with the current form.', 'gravity-pdf' ), $entry_id ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -453,7 +453,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 
 		return new WP_Error(
 			'rest_cannot_view',
-			__( 'Sorry, you do not have access to this endpoint.', 'gravity-forms-pdf-extended' ),
+			__( 'Sorry, you do not have access to this endpoint.', 'gravity-pdf' ),
 			[ 'status' => rest_authorization_required_code() ]
 		);
 	}
@@ -496,7 +496,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 
 		return new WP_Error(
 			'rest_forbidden_context',
-			__( 'Sorry, you do not have access to this endpoint.', 'gravity-forms-pdf-extended' ),
+			__( 'Sorry, you do not have access to this endpoint.', 'gravity-pdf' ),
 			[ 'status' => rest_authorization_required_code() ]
 		);
 	}
@@ -514,7 +514,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		if ( ! empty( $request->get_param( 'pdf' ) ) ) {
 			return new WP_Error(
 				'rest_invalid_param',
-				__( 'Cannot create existing PDF.', 'gravity-forms-pdf-extended' ),
+				__( 'Cannot create existing PDF.', 'gravity-pdf' ),
 				[ 'status' => 400 ]
 			);
 		}
@@ -527,7 +527,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		if ( $pdf_id === false ) {
 			return new WP_Error(
 				'gfpdf_form_settings_rest_pdf_creation_error',
-				__( 'Cannot create PDF.', 'gravity-forms-pdf-extended' ),
+				__( 'Cannot create PDF.', 'gravity-pdf' ),
 				[ 'status' => 500 ]
 			);
 		}
@@ -605,7 +605,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		if ( ! $results ) {
 			return new \WP_Error(
 				'gfpdf_form_settings_rest_cannot_update_pdf',
-				__( 'The PDF cannot be updated.', 'gravity-forms-pdf-extended' ),
+				__( 'The PDF cannot be updated.', 'gravity-pdf' ),
 				[ 'status' => 500 ]
 			);
 		}
@@ -664,7 +664,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		if ( ! $result ) {
 			return new \WP_Error(
 				'gfpdf_form_settings_rest_cannot_delete_pdf',
-				__( 'The PDF cannot be deleted.', 'gravity-forms-pdf-extended' ),
+				__( 'The PDF cannot be deleted.', 'gravity-pdf' ),
 				[ 'status' => 500 ]
 			);
 		}
@@ -883,12 +883,12 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		$schema = [
 			'$schema'              => 'http://json-schema.org/draft-04/schema#',
 			'title'                => 'gravity-pdf',
-			'description'          => __( 'Individual Form PDF Settings for Gravity PDF.', 'gravity-forms-pdf-extended' ),
+			'description'          => __( 'Individual Form PDF Settings for Gravity PDF.', 'gravity-pdf' ),
 			'type'                 => 'object',
 			'additionalProperties' => false,
 			'properties'           => [
 				'id'     => [
-					'description' => __( 'Unique identifier for the PDF.', 'gravity-forms-pdf-extended' ),
+					'description' => __( 'Unique identifier for the PDF.', 'gravity-pdf' ),
 					'type'        => 'string',
 					'context'     => [ 'edit' ],
 					'readonly'    => true,
@@ -896,14 +896,14 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				],
 
 				'form'   => [
-					'description' => __( 'The Gravity Forms ID the PDF is configured on.', 'gravity-forms-pdf-extended' ),
+					'description' => __( 'The Gravity Forms ID the PDF is configured on.', 'gravity-pdf' ),
 					'type'        => 'integer',
 					'context'     => [ 'edit' ],
 					'readonly'    => true,
 				],
 
 				'active' => [
-					'description' => __( 'The current state of the PDF.', 'gravity-forms-pdf-extended' ),
+					'description' => __( 'The current state of the PDF.', 'gravity-pdf' ),
 					'type'        => 'boolean',
 					'default'     => true,
 					'context'     => [ 'edit' ],
@@ -994,7 +994,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @since 7.0.0
 	 */
 	protected function get_section_schema( $settings, $group ) {
-		$generic_description = __( 'Content for the specific property.', 'gravity-forms-pdf-extended' );
+		$generic_description = __( 'Content for the specific property.', 'gravity-pdf' );
 
 		$schema = [];
 		foreach ( $settings as $id => $value ) {

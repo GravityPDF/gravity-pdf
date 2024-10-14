@@ -66,9 +66,9 @@ class Rubix extends Helper_Abstract_Config_Settings implements Helper_Interface_
 			'fields' => [
 				'rubix_container_background_colour' => [
 					'id'   => 'rubix_container_background_colour',
-					'name' => esc_html__( 'Container Background Color', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Container Background Color', 'gravity-pdf' ),
 					'type' => 'color',
-					'desc' => esc_html__( 'Control the color of the field background.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'Control the color of the field background.', 'gravity-pdf' ),
 					'std'  => '#EEEEEE',
 				],
 			],

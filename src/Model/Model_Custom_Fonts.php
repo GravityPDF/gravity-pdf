@@ -235,7 +235,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	public function matches_core_font_id( string $id ): bool {
 		$default_fonts = $this->options->get_installed_fonts();
 
-		unset( $default_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
+		unset( $default_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] );
 
 		/* check for exact match */
 		foreach ( $default_fonts as $group ) {

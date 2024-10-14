@@ -51,7 +51,7 @@ class Controller_Export_Entries {
 
 			$form['fields'][] = [
 				'id'    => 'gpdf_' . $pdf['id'],
-				'label' => sprintf( __( 'PDF: %s', 'gravity-forms-pdf-extended' ), $pdf['name'] ),
+				'label' => sprintf( __( 'PDF: %s', 'gravity-pdf' ), $pdf['name'] ),
 			];
 		}
 

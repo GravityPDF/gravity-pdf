@@ -102,7 +102,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 		/* Additional validation on the path to ensure $filename stays in the $this->get_view_dir_path() directory and doesn't traverse it */
 		$path_to_test = realpath( $path );
 		if ( $path_to_test === false || strpos( $path_to_test, realpath( $this->get_view_dir_path() ) ) !== 0 ) {
-			return new WP_Error( 'invalid_path', sprintf( esc_html__( '%s is an invalid filename', 'gravity-forms-pdf-extended' ), $filename ) );
+			return new WP_Error( 'invalid_path', sprintf( esc_html__( '%s is an invalid filename', 'gravity-pdf' ), $filename ) );
 		}
 
 		$args = array_merge( $this->data_cache, $args );
@@ -126,7 +126,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 			}
 		}
 
-		return new WP_Error( 'invalid_path', sprintf( esc_html__( 'Cannot find file %s', 'gravity-forms-pdf-extended' ), $filename ) );
+		return new WP_Error( 'invalid_path', sprintf( esc_html__( 'Cannot find file %s', 'gravity-pdf' ), $filename ) );
 	}
 
 	/**
