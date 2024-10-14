@@ -29,11 +29,11 @@ add_action(
 			GPDF_API_URL,
 			GPDF_PLUGIN_FILE,
 			[
-				'version'     => PDF_EXTENDED_VERSION,
-				'item_id'     => 137043,
-				'license'     => md5( site_url() ),
-				'author'      => 'Blue Liquid Designs',
-				'beta'        => false,
+				'version' => PDF_EXTENDED_VERSION,
+				'item_id' => 137043,
+				'license' => md5( site_url() ),
+				'author'  => 'Blue Liquid Designs',
+				'beta'    => false,
 			]
 		);
 	}
