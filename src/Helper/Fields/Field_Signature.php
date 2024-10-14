@@ -121,7 +121,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 			 * [0] Is the original width
 			 * [1] Is the original height
 			 */
-			$signature_details = @getimagesize( $signature_upload_path . $signature_name );
+			$signature_details = @getimagesize( $signature_upload_path . $signature_name ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 
 			/**
 			 * For optimal image resolution at 96dpi we'll divide the original width by 3
