@@ -97,11 +97,14 @@ class Field_Signature extends Helper_Abstract_Fields {
 		/*
 		 * Add support for https://wordpress.org/plugins/digital-signature-for-gravity-forms/
 		 * If uses the same $field->type as Gravity Forms official signature add-on
-		 * so we cannot create a new PDF field class to process it
+		 * so we cannot create a new PDF field class to process it.
+		 *
+		 * Note: if the user does not sign the plugin currently generates an empty file,
+		 * so the additional filesize() check has been added
 		 */
 		if ( is_a( $this->field, '\GFDS_Digital_Signature' ) ) {
 			$path                  = $this->misc->convert_url_to_path( $signature_name );
-			$signature_upload_path = $path !== false ? trailingslashit( dirname( $path ) ) : $signature_upload_path;
+			$signature_upload_path = $path !== false && filesize( $path ) ? trailingslashit( dirname( $path ) ) : $signature_upload_path;
 			$signature_upload_url  = trailingslashit( dirname( $signature_name ) );
 			$signature_name        = wp_basename( $signature_name );
 		}
@@ -118,7 +121,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 			 * [0] Is the original width
 			 * [1] Is the original height
 			 */
-			$signature_details = getimagesize( $signature_upload_path . $signature_name );
+			$signature_details = @getimagesize( $signature_upload_path . $signature_name );
 
 			/**
 			 * For optimal image resolution at 96dpi we'll divide the original width by 3
@@ -128,17 +131,19 @@ class Field_Signature extends Helper_Abstract_Fields {
 			 * @param integer The original image width divided by 3
 			 * @param integer The original image width
 			 */
-			$optimised_width = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
+			if ( $signature_details !== false ) {
+				$optimised_width = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
 
-			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_signature_width/ for more details about this filter */
-			$optimised_width = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );
+				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_signature_width/ for more details about this filter */
+				$optimised_width = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );
 
-			$optimised_height = $signature_details[1] / 3;
-			$html             = '<img src="' . esc_attr( $signature_upload_path . $signature_name ) . '" alt="Signature" width="' . esc_attr( $optimised_width ) . '" />';
+				$optimised_height = $signature_details[1] / 3;
+				$html             = '<img src="' . esc_attr( $signature_upload_path . $signature_name ) . '" alt="Signature" width="' . esc_attr( $optimised_width ) . '" />';
 
-			/* override the default width */
-			$width  = $optimised_width;
-			$height = $optimised_height;
+				/* override the default width */
+				$width  = $optimised_width;
+				$height = $optimised_height;
+			}
 		}
 
 		/*
