@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity PDF\n"
-"POT-Creation-Date: 2024-10-14 22:40+0000\n"
+"POT-Creation-Date: 2024-10-15 02:27+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -43,6 +43,10 @@ msgid "Could not located the PDF Settings. Ensure you pass in a valid PDF ID."
 msgstr ""
 "Impossible de localiser les paramètres du PDF. Veillez à saisir un "
 "identifiant PDF valide."
+
+#: ../../../gravity-pdf-updater.php:78
+msgid "This is the non-canonical version of Gravity PDF."
+msgstr "Il s'agit de la version non canonique de Gravity PDF."
 
 #. translators: 1. WordPress version number 2. HTML Anchor Open Tag 3. Html Anchor Close Tag
 #: ../../../pdf.php:202

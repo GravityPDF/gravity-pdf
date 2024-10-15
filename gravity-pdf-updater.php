@@ -54,3 +54,33 @@ add_action(
 		\GFCommon::remove_dismissible_message( 'gravity-pdf-canonical-plugin-notice' );
 	}
 );
+
+/*
+ * Add notice below the non-canonical plugin, if it exists
+ */
+add_action(
+	'after_plugin_row',
+	function( $plugin_file, $plugin_data ) {
+		if ( ! isset( $plugin_data['TextDomain'] ) || $plugin_data['TextDomain'] !== 'gravity-forms-pdf-extended' ) {
+			return;
+		}
+
+		printf(
+			'<tr class="plugin-update-tr %3$s" id="%1$s-update" data-slug="%1$s" data-plugin="%2$s">',
+			esc_attr( $plugin_data['slug'] ),
+			esc_attr( $plugin_data['plugin'] ),
+			'inactive'
+		);
+
+		echo '<td colspan="4" class="plugin-update colspanchange">';
+		echo '<div class="notice inline notice-warning notice-alt"><p>';
+
+		echo esc_html__( 'This is the non-canonical version of Gravity PDF.', 'gravity-pdf' );
+
+		echo '</p></div>';
+		echo '</td>';
+		echo '</tr>';
+	},
+	10,
+	2
+);
