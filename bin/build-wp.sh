@@ -62,30 +62,29 @@ npm install --global wp-pot-cli
 wp-pot --domain gravity-pdf --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --src 'gravity-pdf-updater.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-pdf.pot > /dev/null
 
 # Replace text domain
-cd "${WORKING_DIR}"
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # OSX support
-  find "${PACKAGE_DIR}" -type f -name '*.php' -print0 | LC_ALL=C xargs -0 sed -i '' -e "s/'gravity-pdf'/'gravity-forms-pdf-extended'/g"
-  find "${PACKAGE_DIR}/src/assets/languages" -name 'gravity-pdf*' -type f -exec bash -c 'mv "$1" "${1/\/gravity-pdf//gravity-forms-pdf-extended}"' -- {} \;
-  sed -i '' -e "s/gravity-pdf/gravity-forms-pdf-extended/g" "${PACKAGE_DIR}/src/assets/languages/README.MD"
-  sed -i '' -e "s/Text Domain: gravity-pdf/Text Domain: gravity-forms-pdf-extended/g" "${PACKAGE_DIR}/pdf.php"
-  sed -i '' -E "s/Description: (.+) \(canonical\)/Description: \1/g" "${PACKAGE_DIR}/pdf.php"
-  sed -i '' -e "s|Update URI: https://gravitypdf.com||g" "${PACKAGE_DIR}/pdf.php"
+  find . -type f -name '*.php' -print0 | LC_ALL=C xargs -0 sed -i '' -e "s/'gravity-pdf'/'gravity-forms-pdf-extended'/g"
+  find "./src/assets/languages" -name 'gravity-pdf*' -type f -exec bash -c 'mv "$1" "${1/\/gravity-pdf//gravity-forms-pdf-extended}"' -- {} \;
+  sed -i '' -e "s/gravity-pdf/gravity-forms-pdf-extended/g" "./src/assets/languages/README.MD"
+  sed -i '' -e "s/Text Domain: gravity-pdf/Text Domain: gravity-forms-pdf-extended/g" "./pdf.php"
+  sed -i '' -E "s/Description: (.+) \(canonical\)/Description: \1/g" "./pdf.php"
+  sed -i '' -e "s|Update URI: https://gravitypdf.com||g" "./pdf.php"
 else
   # unix support
-  find "${PACKAGE_DIR}" -type f -name '*.php' -print0 | LC_ALL=C xargs -0 sed -i -e "s/'gravity-pdf'/'gravity-forms-pdf-extended'/g"
-  find "${PACKAGE_DIR}/src/assets/languages" -name 'gravity-pdf*' -type f -exec bash -c 'mv "$1" "${1/\/gravity-pdf//gravity-forms-pdf-extended}"' -- {} \;
-  sed -i -e "s/gravity-pdf/gravity-forms-pdf-extended/g" "${PACKAGE_DIR}/src/assets/languages/README.MD"
-  sed -i -e "s/Text Domain: gravity-pdf/Text Domain: gravity-forms-pdf-extended/g" "${PACKAGE_DIR}/pdf.php"
-  sed -i -E "s/Description: (.+) \(canonical\)/Description: \1/g" "${PACKAGE_DIR}/pdf.php"
-  sed -i -e "s|Update URI: https://gravitypdf.com||g" "${PACKAGE_DIR}/pdf.php"
+  find "." -type f -name '*.php' -print0 | LC_ALL=C xargs -0 sed -i -e "s/'gravity-pdf'/'gravity-forms-pdf-extended'/g"
+  find "./src/assets/languages" -name 'gravity-pdf*' -type f -exec bash -c 'mv "$1" "${1/\/gravity-pdf//gravity-forms-pdf-extended}"' -- {} \;
+  sed -i -e "s/gravity-pdf/gravity-forms-pdf-extended/g" "./src/assets/languages/README.MD"
+  sed -i -e "s/Text Domain: gravity-pdf/Text Domain: gravity-forms-pdf-extended/g" "./pdf.php"
+  sed -i -E "s/Description: (.+) \(canonical\)/Description: \1/g" "./pdf.php"
+  sed -i -e "s|Update URI: https://gravitypdf.com||g" "./pdf.php"
 fi;
 
 # Remove updater
-rm -f "${PACKAGE_DIR}/gravity-pdf-updater.php"
+rm -f "./gravity-pdf-updater.php"
 
 # Create zip package
-cd "${PACKAGE_DIR}/../"
+cd "../"
 
 rm -r -f "${PACKAGE_NAME}"
 mv ${VERSION} "${PACKAGE_NAME}"
