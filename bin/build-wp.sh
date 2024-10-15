@@ -43,7 +43,6 @@ FILES=(
 "${PACKAGE_DIR}/.nvmrc"
 "${PACKAGE_DIR}/.wp-env.json"
 "${PACKAGE_DIR}/.testcaferc.js"
-"${PACKAGE_DIR}/gravity-pdf-updater.php"
 )
 
 for i in "${FILES[@]}"
@@ -57,7 +56,13 @@ rm -f -R "${PACKAGE_DIR}/bin"
 rm -f -R "${PACKAGE_DIR}/.php-scoper"
 rm -f -R "${PACKAGE_DIR}/webpack-configs"
 
+# Generate language files
+cd "${PACKAGE_DIR}"
+npm install --global wp-pot-cli
+wp-pot --domain gravity-pdf --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --src 'gravity-pdf-updater.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-pdf.pot > /dev/null
+
 # Replace text domain
+cd "${WORKING_DIR}"
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # OSX support
   find "${PACKAGE_DIR}" -type f -name '*.php' -print0 | LC_ALL=C xargs -0 sed -i '' -e "s/'gravity-pdf'/'gravity-forms-pdf-extended'/g"
@@ -76,13 +81,11 @@ else
   sed -i -e "s|Update URI: https://gravitypdf.com||g" "${PACKAGE_DIR}/pdf.php"
 fi;
 
-# Generate language files
-cd ${PACKAGE_DIR}
-npm install --global wp-pot-cli
-wp-pot --domain gravity-forms-pdf-extended --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-forms-pdf-extended.pot > /dev/null
+# Remove updater
+rm -f "${PACKAGE_DIR}/gravity-pdf-updater.php"
 
 # Create zip package
-cd ../
+cd "${PACKAGE_DIR}/../"
 
 rm -r -f "${PACKAGE_NAME}"
 mv ${VERSION} "${PACKAGE_NAME}"
