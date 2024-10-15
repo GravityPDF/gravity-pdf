@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity PDF\n"
-"POT-Creation-Date: 2024-07-15 00:49+0000\n"
+"POT-Creation-Date: 2024-10-15 02:27+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,7 +17,7 @@ msgstr ""
 "_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;"
 "esc_html_e;esc_html_x:1,2c\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.5\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
@@ -45,11 +45,12 @@ msgstr ""
 "De PDF-instellingen konden niet worden gevonden. Zorg ervoor dat u een "
 "geldige PDF-ID opgeeft."
 
+#: ../../../gravity-pdf-updater.php:78
+msgid "This is the non-canonical version of Gravity PDF."
+msgstr "Dit is de niet-canonieke versie van Gravity PDF."
+
 #. translators: 1. WordPress version number 2. HTML Anchor Open Tag 3. Html Anchor Close Tag
-#: ../../../pdf.php:177
-#| msgid ""
-#| "WordPress version %1$s is required: upgrade to the latest version. "
-#| "%2$sGet more info%3$s."
+#: ../../../pdf.php:202
 msgid ""
 "WordPress version %1$s is required: upgrade to the latest version. %2$sGet "
 "more information%3$s."
@@ -58,10 +59,7 @@ msgstr ""
 "informatie%3$s."
 
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Open Tag 3. Html Anchor Close Tag
-#: ../../../pdf.php:197
-#| msgid ""
-#| "%1$sGravity Forms%2$s is required to use Gravity PDF. %4$sGet more "
-#| "info%5$s."
+#: ../../../pdf.php:222
 msgid ""
 "%1$sGravity Forms%3$s is required to use Gravity PDF. %2$sGet more "
 "information%3$s."
@@ -70,10 +68,7 @@ msgstr ""
 "informatie%3$s."
 
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. Plugin version number 4. Html Anchor Open Tag
-#: ../../../pdf.php:204
-#| msgid ""
-#| "%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more "
-#| "info%5$s."
+#: ../../../pdf.php:229
 msgid ""
 "%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more "
 "information%2$s."
@@ -82,10 +77,7 @@ msgstr ""
 "informatie%2$s."
 
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. HTML Anchor Open Tag 4. HTML Anchor Close Tag
-#: ../../../pdf.php:224
-#| msgid ""
-#| "You are running an %1$soutdated version of PHP%2$s. Contact your web "
-#| "hosting provider to update. %3$sGet more info%4$s."
+#: ../../../pdf.php:249
 msgid ""
 "You are running an %1$soutdated version of PHP%2$s. Contact your web hosting "
 "provider to update. %3$sGet more information%4$s."
@@ -94,11 +86,8 @@ msgstr ""
 "webhostingprovider voor een update. %3$sMeer informatie%4$s."
 
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name
-#: ../../../pdf.php:244, ../../../pdf.php:282, ../../../pdf.php:302,
-#: ../../../pdf.php:322, ../../../pdf.php:330
-#| msgid ""
-#| "The PHP Extension libxml could not be detected. Contact your web hosting "
-#| "provider to fix. %1$sGet more info%2$s."
+#: ../../../pdf.php:269, ../../../pdf.php:307, ../../../pdf.php:327,
+#: ../../../pdf.php:347, ../../../pdf.php:355
 msgid ""
 "The PHP extension %3$s could not be detected. Contact your web hosting "
 "provider to fix. %1$sGet more information%2$s."
@@ -107,10 +96,7 @@ msgstr ""
 "webhostingprovider om dit op te lossen. %1$sMeer informatie%2$s."
 
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag
-#: ../../../pdf.php:264
-#| msgid ""
-#| "The PHP Extension MB String does not have MB Regex enabled. Contact your "
-#| "web hosting provider to fix. %1$sGet more info%2$s."
+#: ../../../pdf.php:289
 msgid ""
 "The PHP extension MB String does not have MB Regex enabled. Contact your web "
 "hosting provider to fix. %1$sGet more information%2$s."
@@ -119,11 +105,7 @@ msgstr ""
 "met uw webhostingprovider om dit op te lossen. %1$sMeer informatie%2$s."
 
 #. translators: 1. RAM value in MB 2. HTML Anchor Open Tag 3. HTML Anchor Close Tag
-#: ../../../pdf.php:354
-#| msgid ""
-#| "You need %1$s128MB%2$s of WP Memory (RAM) but we only found %3$s "
-#| "available. %4$sTry these methods to increase your memory limit%5$s, "
-#| "otherwise contact your web hosting provider to fix."
+#: ../../../pdf.php:379
 msgid ""
 "You need 128MB of WP Memory (RAM) but we only found %1$s available. %2$sTry "
 "these methods to increase your memory limit%3$s, otherwise contact your web "
@@ -134,10 +116,7 @@ msgstr ""
 "verhogen%3$s, neem anders contact op met uw webhostingprovider om dit op te "
 "lossen."
 
-#: ../../../pdf.php:447
-#| msgid ""
-#| "The minimum requirements for Gravity PDF have not been met. Please fix "
-#| "the issue(s) below to use the plugin:"
+#: ../../../pdf.php:472
 msgid ""
 "The minimum requirements for the Gravity PDF plugin have not been met. "
 "Please contact the site administrator for assistance."
@@ -145,11 +124,11 @@ msgstr ""
 "Er is niet voldaan aan de minimale vereisten voor de Gravity PDF plugin. "
 "Neem contact op met de sitebeheerder voor assistentie."
 
-#: ../../../pdf.php:438
+#: ../../../pdf.php:463
 msgid "Gravity PDF Installation Problem"
 msgstr "Installatieprobleem met zwaartekracht-PDF"
 
-#: ../../../pdf.php:440
+#: ../../../pdf.php:465
 msgid ""
 "The minimum requirements for Gravity PDF have not been met. Please fix the "
 "issue(s) below to use the plugin:"
@@ -157,48 +136,69 @@ msgstr ""
 "Er is niet voldaan aan de minimale vereisten voor Gravity PDF. Los de "
 "onderstaande problemen op om de plugin te kunnen gebruiken:"
 
+#: ../../../pdf.php:491
+msgid ""
+"For security, Gravity PDF has moved the canonical plugin off WordPress.org. "
+"In order to get updates directly from GravityPDF.com %1$syou must perform a "
+"one-time download of the plugin to remain safe in the future%2$s."
+msgstr ""
+"Voor de veiligheid heeft Gravity PDF de canonieke plugin van WordPress.org "
+"gehaald. Om updates rechtstreeks van GravityPDF.com te krijgen %1$smoet je "
+"een eenmalige download van de plugin uitvoeren om in de toekomst veilig te "
+"blijven%2$s."
+
+#: ../../../pdf.php:531
+msgid ""
+"For security, the canonical plugin has moved off WordPress.org. In order to "
+"get safe updates directly from GravityPDF.com %1$syou must perform a one-"
+"time download of the plugin%2$s."
+msgstr ""
+"Voor de veiligheid is de canonical plugin verhuisd van WordPress.org. Om "
+"veilige updates rechtstreeks van GravityPDF.com te krijgen %1$smoet je de "
+"plugin eenmalig downloaden%2$s."
+
 #: ../../bootstrap.php:134, ../../bootstrap.php:146, ../../deprecated.php:45,
 #: ../../deprecated.php:58
 msgid "\"%s\" has been deprecated as of Gravity PDF 4.0"
 msgstr "\"%s\" is vanaf Gravity PDF 4.0 verouderd"
 
-#: ../../bootstrap.php:309
+#: ../../bootstrap.php:296
 msgid "View Gravity PDF Settings"
 msgstr "Zwaartekracht PDF-instellingen weergeven"
 
-#: ../../bootstrap.php:309, ../../View/View_Settings.php:174
+#: ../../bootstrap.php:296, ../../View/View_Settings.php:174
 msgid "Settings"
 msgstr "Instellingen"
 
-#: ../../bootstrap.php:329
+#: ../../bootstrap.php:316
 msgid "View Gravity PDF Documentation"
 msgstr "Bekijk PDF-documentatie over zwaartekracht"
 
-#: ../../bootstrap.php:329, ../../Helper/Helper_Abstract_Addon.php:799
+#: ../../bootstrap.php:316, ../../Helper/Helper_Abstract_Addon.php:799
 msgid "Docs"
 msgstr "Documentatie"
 
-#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:802
+#: ../../bootstrap.php:317, ../../Helper/Helper_Abstract_Addon.php:802
 msgid "Get Help and Support"
 msgstr "Krijg Hulp en Ondersteuning"
 
-#: ../../bootstrap.php:330, ../../Helper/Helper_Abstract_Addon.php:802
+#: ../../bootstrap.php:317, ../../Helper/Helper_Abstract_Addon.php:802
 msgid "Support"
 msgstr "Ondersteuning"
 
-#: ../../bootstrap.php:331
+#: ../../bootstrap.php:318
 msgid "View Gravity PDF Extensions Shop"
 msgstr "Bekijk zwaartekracht PDF-uitbreidingen Shop"
 
-#: ../../bootstrap.php:331, ../../View/View_Settings.php:208
+#: ../../bootstrap.php:318, ../../View/View_Settings.php:208
 msgid "Extensions"
 msgstr "Extensies"
 
-#: ../../bootstrap.php:332
+#: ../../bootstrap.php:319
 msgid "View Gravity PDF Template Shop"
 msgstr "Bekijk zwaartekracht PDF sjablonen winkel"
 
-#: ../../bootstrap.php:332, ../../Helper/Helper_Options_Fields.php:70
+#: ../../bootstrap.php:319, ../../Helper/Helper_Options_Fields.php:70
 msgid "Templates"
 msgstr "Templates"
 
@@ -274,7 +274,7 @@ msgstr "Kan %s niet vinden."
 msgid "PDF: %s"
 msgstr "PDF: %s"
 
-#: ../../Controller/Controller_PDF.php:424, ../../View/View_PDF.php:244
+#: ../../Controller/Controller_PDF.php:434, ../../View/View_PDF.php:244
 msgid "There was a problem generating your PDF"
 msgstr "Er is een probleem opgetreden bij het genereren van uw PDF"
 
@@ -579,49 +579,49 @@ msgstr "Zet  in elkaar"
 msgid "Settings updated."
 msgstr "Instellingen bijgewerkt."
 
-#: ../../Helper/Helper_Abstract_Options.php:1335,
-#: ../../Helper/Helper_Abstract_Options.php:1343,
-#: ../../Helper/Helper_Abstract_Options.php:1351
+#: ../../Helper/Helper_Abstract_Options.php:1340,
+#: ../../Helper/Helper_Abstract_Options.php:1348,
+#: ../../Helper/Helper_Abstract_Options.php:1356
 msgid ""
 "PDF Settings could not be saved. Please enter all required information below."
 msgstr ""
 "PDF-instellingen konden niet worden opgeslagen. Voer hieronder alle vereiste "
 "informatie in."
 
-#: ../../Helper/Helper_Abstract_Options.php:1739
+#: ../../Helper/Helper_Abstract_Options.php:1744
 msgid "%s license key"
 msgstr "%s licentiesleutel"
 
-#: ../../Helper/Helper_Abstract_Options.php:1756
+#: ../../Helper/Helper_Abstract_Options.php:1761
 msgid "Deactivate License"
 msgstr "Deactiveer licentie"
 
-#: ../../Helper/Helper_Abstract_Options.php:2131,
-#: ../../Helper/Helper_Abstract_Options.php:2132
+#: ../../Helper/Helper_Abstract_Options.php:2136,
+#: ../../Helper/Helper_Abstract_Options.php:2137
 msgid "Select Media"
 msgstr "Selecteer afbeeldingen"
 
-#: ../../Helper/Helper_Abstract_Options.php:2133
+#: ../../Helper/Helper_Abstract_Options.php:2138
 msgid "Upload File"
 msgstr "Bestand uploaden"
 
-#: ../../Helper/Helper_Abstract_Options.php:2377
+#: ../../Helper/Helper_Abstract_Options.php:2382
 msgid "Width"
 msgstr "Breedte"
 
-#: ../../Helper/Helper_Abstract_Options.php:2389
+#: ../../Helper/Helper_Abstract_Options.php:2394
 msgid "Height"
 msgstr "Hoogte"
 
-#: ../../Helper/Helper_Abstract_Options.php:2406
+#: ../../Helper/Helper_Abstract_Options.php:2411
 msgid "mm"
 msgstr "mm"
 
-#: ../../Helper/Helper_Abstract_Options.php:2407
+#: ../../Helper/Helper_Abstract_Options.php:2412
 msgid "inches"
 msgstr "inches"
 
-#: ../../Helper/Helper_Abstract_Options.php:2475
+#: ../../Helper/Helper_Abstract_Options.php:2480
 msgid "The callback used for the %s setting is missing."
 msgstr "De callback gebruikt voor de %s instelling ontbreekt."
 
@@ -1581,9 +1581,27 @@ msgstr ""
 msgid "Password"
 msgstr "Wachtwoord"
 
+#: ../../Helper/Helper_Options_Fields.php:425
+msgid ""
+"Password protect the PDF, or leave blank to disable. Mergetags are supported."
+msgstr ""
+"Bescherm de PDF met een wachtwoord of laat leeg om uit te schakelen. "
+"Mergetags worden ondersteund."
+
 #: ../../Helper/Helper_Options_Fields.php:431
 msgid "Privileges"
 msgstr "Rechten"
+
+#: ../../Helper/Helper_Options_Fields.php:432
+msgid ""
+"Deselect privileges to restrict end user capabilities in the PDF. Privileges "
+"are trivial to bypass and are only suitable to specify your intentions to "
+"the user (and not as a means of access control or security)."
+msgstr ""
+"Deselecteer privileges om de mogelijkheden van de eindgebruiker in de PDF te "
+"beperken. Privileges zijn triviaal te omzeilen en zijn alleen geschikt om je "
+"intenties aan de gebruiker te specificeren (en niet als toegangscontrole of "
+"beveiliging)."
 
 #: ../../Helper/Helper_Options_Fields.php:445
 msgid "Select End User PDF Privileges"
@@ -1640,6 +1658,14 @@ msgstr ""
 #: ../../Helper/Helper_Options_Fields.php:547
 msgid "Master Password"
 msgstr "Hoofdwachtwoord"
+
+#: ../../Helper/Helper_Options_Fields.php:549
+msgid ""
+"Set the PDF Owner Password which is used to prevent the PDF privileges being "
+"changed."
+msgstr ""
+"Stel het PDF Owner Password in om te voorkomen dat de PDF-rechten worden "
+"gewijzigd."
 
 #: ../../Helper/Helper_Options_Fields.php:568
 msgid "Show Form Title"
@@ -1953,7 +1979,7 @@ msgstr "De gevraagde PDF-configuratie kon niet worden gevonden"
 
 #: ../../Model/Model_PDF.php:2519
 msgid "Page %d"
-msgstr ""
+msgstr "Pagina %d"
 
 #: ../../Model/Model_Settings.php:360
 msgid "Your support license key has been activated for this domain."
@@ -2228,31 +2254,31 @@ msgid "Not accepted"
 msgstr "Not accepted"
 
 #. translators: the plugin name.
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:272
+#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:299
 msgid "There is a new version of %1$s available."
 msgstr "De installatie van %1$s is mislukt."
 
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:307
+#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:329
 msgid "Update now."
 msgstr "Nu bijwerken."
 
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:294
+#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:318
 msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
 msgstr "%1$sBekijk de details van %3$sversie%2$s of %4$supdate nu%5$s."
 
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:284
+#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:310
 msgid "%1$sView version %2$s details%3$s."
 msgstr "%1$sBekijk de details van %3$sversie%2$s."
 
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:278
+#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:305
 msgid "Contact your network administrator to install the update."
 msgstr "Neem contact op met de netwerkbeheerder om de update te installeren."
 
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:544
+#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:564
 msgid "You do not have permission to install plugin updates"
 msgstr "U heeft onvoldoende rechten om deze plug-in te installeren"
 
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:544
+#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:564
 msgid "Error"
 msgstr "Fout"
 

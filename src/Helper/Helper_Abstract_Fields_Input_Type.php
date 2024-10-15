@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * A helper class to display Gravity Forms fields that can masquerade as different field types
  *
- * @since 7.0
+ * @since 6.12
  */
 abstract class Helper_Abstract_Fields_Input_Type extends Helper_Abstract_Fields {
 
@@ -32,7 +32,7 @@ abstract class Helper_Abstract_Fields_Input_Type extends Helper_Abstract_Fields 
 	 *
 	 * @throws Exception
 	 *
-	 * @since 7.0
+	 * @since 6.12
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
 		parent::__construct( $field, $entry, $gform, $misc );
@@ -66,7 +66,7 @@ abstract class Helper_Abstract_Fields_Input_Type extends Helper_Abstract_Fields 
 	/**
 	 * Used to check if the current field has a value
 	 *
-	 * @since 7.0
+	 * @since 6.12
 	 */
 	public function is_empty() {
 		return $this->fieldObject->is_empty();
@@ -79,7 +79,7 @@ abstract class Helper_Abstract_Fields_Input_Type extends Helper_Abstract_Fields 
 	 * @param bool   $label
 	 *
 	 * @return string
-	 * @since 7.0
+	 * @since 6.12
 	 */
 	public function html( $value = '', $label = true ) {
 		if ( $this->get_output() ) {
@@ -94,7 +94,7 @@ abstract class Helper_Abstract_Fields_Input_Type extends Helper_Abstract_Fields 
 	 *
 	 * @return array
 	 *
-	 * @since 7.0
+	 * @since 6.12
 	 */
 	public function form_data() {
 		if ( method_exists( $this->fieldObject, 'form_data' ) ) {
@@ -109,7 +109,7 @@ abstract class Helper_Abstract_Fields_Input_Type extends Helper_Abstract_Fields 
 	 *
 	 * @return string|array
 	 *
-	 * @since 7.0
+	 * @since 6.12
 	 */
 	public function value() {
 		if ( $this->fieldObject->has_cache() ) {

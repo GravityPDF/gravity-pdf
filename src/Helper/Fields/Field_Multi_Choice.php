@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Controls the display and output of a Gravity Form field
  *
- * @since 7.0
+ * @since 6.12
  */
 class Field_Multi_Choice extends Helper_Abstract_Fields_Input_Type {
 

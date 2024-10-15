@@ -63,8 +63,8 @@ mv svn svn-trunk
 # Copy our new version of the plugin into trunk
 rsync -r -p $SOURCE_TAG/* svn
 
-# Remove the README.txt file from the plugin, and back in the copied version
-cp svn-trunk/README.txt svn
+# Remove the readme.txt file from the plugin, and back in the copied version
+cp svn-trunk/readme.txt svn
 
 # Copy all the .svn folders from the checked out copy of trunk to the new trunk.
 # This is necessary as the Travis container runs Subversion 1.6 which has .svn dirs in every sub dir

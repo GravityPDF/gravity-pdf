@@ -57,12 +57,12 @@ rm -f -R "${PACKAGE_DIR}/.php-scoper"
 rm -f -R "${PACKAGE_DIR}/webpack-configs"
 
 # Generate language files
-cd ${PACKAGE_DIR}
+cd "${PACKAGE_DIR}"
 npm install --global wp-pot-cli
-wp-pot --domain gravity-pdf --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-pdf.pot > /dev/null
+wp-pot --domain gravity-pdf --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --src 'gravity-pdf-updater.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-pdf.pot > /dev/null
 
 # Create zip package
-cd ../
+cd "../"
 
 rm -r -f "${PACKAGE_NAME}"
 mv ${VERSION} "${PACKAGE_NAME}"
