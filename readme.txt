@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
 Tested up to: 6.6
-Stable tag: 6.12.0
+Stable tag: 6.12.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -107,6 +107,9 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
+
+= 6.12.1=
+* Housekeeping: Update translations
 
 = 6.12.0 =
 * Feature: Add basic support for Gravity Forms 2.9 Image Choice and Multiple Choice fields (Gravity PDF Core Booster v2.2 can show the images)
