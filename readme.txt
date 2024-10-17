@@ -108,7 +108,7 @@ Gravity PDF can be run on most modern shared web hosting without any issues. It 
 
 == Changelog ==
 
-= 6.12.1=
+= 6.12.1 =
 * Housekeeping: Update translations
 
 = 6.12.0 =
