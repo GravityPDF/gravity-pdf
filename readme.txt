@@ -10,11 +10,11 @@ Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
-Automatically generate, email and download PDF documents with Gravity Forms and Gravity PDF.
+Automatically generate, email and download PDF documents from Gravity Forms entries
 
 == Description ==
 
-**Gravity PDF is the ultimate self-hosted solution for dynamically creating PDF documents using Gravity Forms and WordPress.**
+**Gravity PDF is the ultimate third-party PDF automation tool for generating digital PDFs using the popular form-builder plugin Gravity Forms.**
 
 = Highly Customizable PDFs =
 
