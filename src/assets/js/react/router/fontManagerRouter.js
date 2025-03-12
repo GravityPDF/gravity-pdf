@@ -1,15 +1,16 @@
 /* Dependencies */
-import React from 'react'
-import PropTypes from 'prop-types'
-import { render } from 'react-dom'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
-import { Provider } from 'react-redux'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { Routes as Switch, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
 /* Components */
-import FontManager from '../components/FontManager/FontManager'
-import Empty from '../components/Empty'
+import FontManager from '../components/FontManager/FontManager';
+import Empty from '../components/Empty';
+import withRouterHooks from '../utilities/withRouterHooks.js';
+import CustomHashRouter from '../components/CustomHashRouter';
 
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -29,44 +30,40 @@ import Empty from '../components/Empty'
  * @since 6.0
  */
 export const Routes = () => (
-  <Router>
-    <Switch>
-      <Route
-        exact
-        path='/fontmanager/'
-        render={props => <FontManager id={props.match.params.id} history={props.history} />}
-      />
-      <Route
-        exact
-        path='/fontmanager/:id'
-        render={props => <FontManager id={props.match.params.id} history={props.history} />}
-      />
-      <Route component={Empty} />
-    </Switch>
-  </Router>
-)
+	<CustomHashRouter>
+		<Switch>
+			<Route
+				exact
+				path="/fontmanager/"
+				element={<FontManagerWithRouter />}
+			/>
+			<Route
+				exact
+				path="/fontmanager/:id"
+				element={<FontManagerWithRouter />}
+			/>
+			<Route path="*" element={<Empty />} />
+		</Switch>
+	</CustomHashRouter>
+);
 
-/**
- * PropTypes
- *
- * @since 6.0
- */
-Routes.propTypes = {
-  match: PropTypes.object,
-  history: PropTypes.object
-}
+const FontManagerWithRouter = withRouterHooks(FontManager);
 
 /**
  * Setup react router with our redux store
  *
- * @param store: object
+ * @param { Object } store
  *
  * @since 6.0
  */
-export function fontManagerRouter (store) {
-  render((
-    <Provider store={store}>
-      <Routes />
-    </Provider>
-  ), document.querySelector('#font-manager-overlay'))
+export function fontManagerRouter(store) {
+	const container = document.querySelector('#font-manager-overlay');
+
+	const root = createRoot(container);
+
+	root.render(
+		<Provider store={store}>
+			<Routes />
+		</Provider>
+	);
 }

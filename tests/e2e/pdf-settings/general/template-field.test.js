@@ -16,7 +16,7 @@ fixture`PDF general settings - Template field test`
 
 test('should display \'Template\' field', async t => {
   // Actions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4&tab=general', false)
 
   // Assertions
   await t

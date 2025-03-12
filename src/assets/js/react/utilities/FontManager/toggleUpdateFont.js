@@ -1,5 +1,5 @@
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -8,40 +8,61 @@
 /**
  * Toggle show or hide update font panel
  *
- * @param history: object
- * @param fontId: string
+ * @param { Function } navigate
+ * @param { string }   fontId
+ * @param { string }   pathname
+ *
+ * @return { Function } removeClass
  *
  * @since 6.0
  */
-export function toggleUpdateFont (history, fontId) {
-  const editFontColumn = document.querySelector('.update-font')
+export function toggleUpdateFont(navigate, fontId, pathname) {
+	const editFontColumn = document.querySelector('.update-font');
 
-  if (fontId) {
-    const pathname = history.location.pathname
+	if (fontId) {
+		if (pathname?.substr(pathname.lastIndexOf('/') + 1) === fontId) {
+			return removeClass(editFontColumn, navigate, pathname);
+		}
 
-    if (pathname.substr(pathname.lastIndexOf('/') + 1) === fontId) {
-      return removeClass(editFontColumn, history)
-    }
+		return addClass(editFontColumn, navigate, fontId);
+	}
 
-    return addClass(editFontColumn, history, fontId)
-  }
-
-  return removeClass(editFontColumn, history)
+	return removeClass(editFontColumn, navigate, pathname);
 }
 
-export function removeClass (editFontColumn, history) {
-  editFontColumn.classList.remove('show')
+/**
+ * Removes show class and navigates to /fontmanager/
+ *
+ * @param { HTMLElement } editFontColumn
+ * @param { Function }    navigate
+ * @param { string }      pathname
+ *
+ * @return { * } navigate or do nothing
+ */
+export function removeClass(editFontColumn, navigate, pathname) {
+	editFontColumn.classList.remove('show');
 
-  /* Avoid Warning: Hash history cannot PUSH the same path */
-  if (history.location.pathname === '/fontmanager/') {
-    return
-  }
+	/* Avoid Warning: Hash history cannot PUSH the same path */
+	if (pathname === '/fontmanager/') {
+		return;
+	}
 
-  return history.push('/fontmanager/')
+	return navigate('/fontmanager/');
 }
 
-export function addClass (editFontColumn, history, fontId) {
-  editFontColumn.classList.add('show')
+/**
+ * Adds show class and navigates to /fontmanager/<id>
+ *
+ * @param { HTMLElement } editFontColumn
+ * @param { Function }    navigate
+ * @param { string }      fontId
+ *
+ * @return { Function } navigate
+ *
+ * @since 6.0
+ */
+export function addClass(editFontColumn, navigate, fontId) {
+	editFontColumn.classList.add('show');
 
-  return history.push('/fontmanager/' + fontId)
+	return navigate('/fontmanager/' + fontId);
 }

@@ -1,11 +1,11 @@
 /* Dependencies */
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Contains stateless React components for our Template List Items
  *
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
@@ -16,33 +16,41 @@ import PropTypes from 'prop-types'
  *
  * Display the Template Details hover
  *
- * @param label (string)
- * @returns {*}
+ * @param { Object } props
+ * @param { string } props.label
+ *
+ * @return { JSX.Element } TemplateDetails Component
  *
  * @since 4.1
  */
 export const TemplateDetails = ({ label }) => (
-  <span data-test='component-templateDetails' className='more-details'>{label}</span>
-)
+	<span data-test="component-templateDetails" className="more-details">
+		{label}
+	</span>
+);
 
 TemplateDetails.propTypes = {
-  label: PropTypes.string
-}
+	label: PropTypes.string,
+};
 
 /**
  * React Stateless Component
  *
  * Display the template group
  *
- * @param group (string)
- * @returns {*}
+ * @param { Object } props
+ * @param { string } props.group
+ *
+ * @return { JSX.Element } GroupComponent
  *
  * @since 4.1
  */
 export const Group = ({ group }) => (
-  <p data-test='component-group' className='theme-author'>{group}</p>
-)
+	<p data-test="component-group" className="theme-author">
+		{group}
+	</p>
+);
 
 Group.propTypes = {
-  group: PropTypes.string
-}
+	group: PropTypes.string,
+};

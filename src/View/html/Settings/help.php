@@ -31,11 +31,11 @@ GFCommon::display_admin_message();
 	<div id="gpdf-search"><!-- Placeholder --></div>
 
 	<div id="gpdf-action-links">
-		<a href="https://docs.gravitypdf.com/v6/users/five-minute-install/" class="button button-primary button-large"><?php esc_html_e( 'View Documentation', 'gravity-pdf' ); ?></a>
-		<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-pdf' ); ?></a>
+		<a href="https://docs.gravitypdf.com/v6/users/five-minute-install/" class="button button-primary button-large" target="_blank" rel="noopener"><?php esc_html_e( 'View Documentation', 'gravity-pdf' ); ?></a>
+		<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large" target="_blank" rel="noopener"><?php esc_html_e( 'Contact Support', 'gravity-pdf' ); ?></a>
 
 		<p>
-			<?php printf( esc_html__( 'Support hours are 9:00am-5:00pm Monday to Friday, %1$sSydney Australia time%2$s (public holidays excluded).', 'gravity-pdf' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
+			<?php printf( esc_html__( 'Support hours are 9:00am-5:00pm Monday to Friday, %1$sSydney Australia time%2$s (public holidays excluded).', 'gravity-pdf' ), '<br><a href="https://www.timeanddate.com/worldclock/australia/sydney" target="_blank" rel="noopener noreferrer">', '</a>' ); ?>
 		</p>
 	</div>
 

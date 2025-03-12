@@ -133,7 +133,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 
 		/* Verify the font name provided is approved */
 		/* phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
-		$core_font_list = json_decode( file_get_contents( __DIR__ . '/../../dist/payload/core-fonts.json' ), true );
+		$core_font_list = json_decode( file_get_contents( __DIR__ . '/../../build/payload/core-fonts.json' ), true );
 		if ( $core_font_list === null ) {
 			$this->log->error( 'Core font list could not be loaded' );
 

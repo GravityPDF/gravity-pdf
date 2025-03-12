@@ -81,16 +81,23 @@ jobs:
           php -i
           locale -a
 
-      - name: Install Dependencies
+      - name: Install Composer dependencies
+        run: |
+          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
+          echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install JS Dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Build Gravity PDF
-        run: yarn build:production
+        run: yarn build
 
       - name: Install / Setup Gravity PDF + WordPress
         run: |
-          yarn env:install
+          yarn wp-env start
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -1,47 +1,50 @@
-import $ from 'jquery'
+import $ from 'jquery';
 
 /**
  * Rich Media Uploader
  * JS Pulled straight from Easy Digital Download's admin-scripts.js
- * @return void
+ *
  * @since 4.0
  */
-export function doUploadListener () {
-  // WP 3.5+ uploader
-  let fileFrame
-  window.formfield = ''
+export function doUploadListener() {
+	// WP 3.5+ uploader
+	let fileFrame;
+	window.formfield = '';
 
-  $('body').off('click', '.gfpdf_settings_upload_button').on('click', '.gfpdf_settings_upload_button', function (e) {
-    e.preventDefault()
+	$('body')
+		.off('click', '.gfpdf_settings_upload_button')
+		.on('click', '.gfpdf_settings_upload_button', function (e) {
+			e.preventDefault();
 
-    const $button = $(this)
-    window.formfield = $(this).prev()
+			window.formfield = $(this).prev();
 
-    /* If the media frame already exists, reopen it. */
-    if (fileFrame) {
-      fileFrame.open()
-      return
-    }
+			/* If the media frame already exists, reopen it. */
+			if (fileFrame) {
+				fileFrame.open();
+				return;
+			}
 
-    /* Create the media frame. */
-    fileFrame = wp.media.frames.file_frame = wp.media({
-      title: $button.data('uploader-title'),
-      button: {
-        text: $button.data('uploader-button-text')
-      },
-      multiple: false
-    })
+			const $button = $(this);
 
-    /* When a file is selected, run a callback. */
-    fileFrame.on('select', function () {
-      const selection = fileFrame.state().get('selection')
-      selection.each(function (attachment) {
-        attachment = attachment.toJSON()
-        window.formfield.val(attachment.url).trigger('change')
-      })
-    })
+			/* Create the media frame. */
+			fileFrame = wp.media.frames.file_frame = wp.media({
+				title: $button.data('uploader-title'),
+				button: {
+					text: $button.data('uploader-button-text'),
+				},
+				multiple: false,
+			});
 
-    /* Finally, open the modal */
-    fileFrame.open()
-  })
+			/* When a file is selected, run a callback. */
+			fileFrame.on('select', function () {
+				const selection = fileFrame.state().get('selection');
+				selection.each(function (attachment) {
+					attachment = attachment.toJSON();
+					window.formfield.val(attachment.url).trigger('change');
+				});
+			});
+
+			/* Finally, open the modal */
+			fileFrame.open();
+		});
 }

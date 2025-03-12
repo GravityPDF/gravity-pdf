@@ -29,11 +29,7 @@ node_modules/*
 *.iws
 
 ## Plugin-specific files:
-*.min.css
-*.min.js
-chunk-*.js
-*.map
-dist/*
+build/assets/*
 
 # Unit tests
 /tmp
@@ -44,6 +40,7 @@ dist/*
 # Coverage report
 /coverage
 /screenshots
+/artifacts
 
 # Others
 _notes

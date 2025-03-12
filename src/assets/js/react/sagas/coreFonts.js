@@ -1,21 +1,21 @@
 /* Dependencies */
-import { channel } from 'redux-saga'
-import { call, fork, take, takeLatest, put } from 'redux-saga/effects'
+import { channel } from 'redux-saga';
+import { call, fork, take, takeLatest, put } from 'redux-saga/effects';
 /* Redux action types & actions */
 import {
-  getFilesFromGitHubSuccess,
-  getFilesFromGitHubFailed,
-  addToConsole,
-  addToRetryList,
-  currentDownload,
-  GET_FILES_FROM_GITHUB,
-  DOWNLOAD_FONTS_API_CALL
-} from '../actions/coreFonts'
+	getFilesFromGitHubSuccess,
+	getFilesFromGitHubFailed,
+	addToConsole,
+	addToRetryList,
+	currentDownload,
+	GET_FILES_FROM_GITHUB,
+	DOWNLOAD_FONTS_API_CALL,
+} from '../actions/coreFonts';
 /* APIs */
-import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts'
+import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts';
 
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.2
@@ -26,69 +26,87 @@ import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts'
  *
  * @since 5.2
  */
-export function * getFilesFromGitHub () {
-  try {
-    const response = yield call(apiGetFilesFromGitHub)
-    yield put(getFilesFromGitHubSuccess(response.body))
-  } catch (error) {
-    yield put(getFilesFromGitHubFailed(GFPDF.coreFontGithubError))
-  }
+export function* getFilesFromGitHub() {
+	try {
+		const response = yield call(apiGetFilesFromGitHub);
+		yield put(getFilesFromGitHubSuccess(response));
+	} catch (error) {
+		yield put(getFilesFromGitHubFailed(GFPDF.coreFontGithubError));
+	}
 }
 
 /**
  * Worker Saga getDownloadFonts - Success and error handling of AJAX call
  *
- * @param chan
+ * @param { * } chan
  *
  * @since 5.2
  */
-export function * getDownloadFonts (chan) {
-  while (true) {
-    const payload = yield take(chan)
+export function* getDownloadFonts(chan) {
+	while (true) {
+		const payload = yield take(chan);
 
-    /**
-     * Add pending message to console
-     *
-     * @param string name The Font Name
-     *
-     * @since 5.0
-     */
-    yield put(addToConsole(payload, 'pending', GFPDF.coreFontItemPendingMessage.replace('%s', payload)))
+		/**
+		 * Add pending message to console
+		 *
+		 * @param string name The Font Name
+		 *
+		 * @since 5.0
+		 */
+		yield put(
+			addToConsole(
+				payload,
+				'pending',
+				GFPDF.coreFontItemPendingMessage.replace('%s', payload)
+			)
+		);
 
-    /**
-     * Add success message to console
-     *
-     * @param string name The Font Name
-     *
-     * @since 5.2
-     */
-    try {
-      const response = yield call(apiPostDownloadFonts, payload)
+		/**
+		 * Add success message to console
+		 *
+		 * @param string name The Font Name
+		 *
+		 * @since 5.2
+		 */
+		try {
+			const response = yield call(apiPostDownloadFonts, payload);
 
-      if (!response.body) {
-        throw response
-      }
+			if (Object.hasOwn(response, 'ok') && !response.ok) {
+				throw response;
+			}
 
-      yield put(addToConsole(payload, 'success', GFPDF.coreFontItemSuccessMessage.replace('%s', payload)))
-    } catch (error) {
-      /**
-       * Add error message to console
-       *
-       * @param string name The Font Name
-       *
-       * @since 5.2
-       */
-      yield put(addToConsole(payload, 'error', GFPDF.coreFontItemErrorMessage.replace('%s', payload)))
-      yield put(addToRetryList(payload))
-    } finally {
-      /**
-       * Finally request data into our Redux store for showing the download completed status
-       *
-       * @since 5.2
-       */
-      yield put(currentDownload())
-    }
-  }
+			yield put(
+				addToConsole(
+					payload,
+					'success',
+					GFPDF.coreFontItemSuccessMessage.replace('%s', payload)
+				)
+			);
+		} catch (error) {
+			/**
+			 * Add error message to console
+			 *
+			 * @param string name The Font Name
+			 *
+			 * @since 5.2
+			 */
+			yield put(
+				addToConsole(
+					payload,
+					'error',
+					GFPDF.coreFontItemErrorMessage.replace('%s', payload)
+				)
+			);
+			yield put(addToRetryList(payload));
+		} finally {
+			/**
+			 * Finally request data into our Redux store for showing the download completed status
+			 *
+			 * @since 5.2
+			 */
+			yield put(currentDownload());
+		}
+	}
 }
 
 /**
@@ -96,8 +114,8 @@ export function * getDownloadFonts (chan) {
  *
  * @since 5.2
  */
-export function * watchGetFilesFromGitHub () {
-  yield takeLatest(GET_FILES_FROM_GITHUB, getFilesFromGitHub)
+export function* watchGetFilesFromGitHub() {
+	yield takeLatest(GET_FILES_FROM_GITHUB, getFilesFromGitHub);
 }
 
 /**
@@ -105,15 +123,15 @@ export function * watchGetFilesFromGitHub () {
  *
  * @since 5.2
  */
-export function * watchDownloadFonts () {
-  const chan = yield call(channel)
+export function* watchDownloadFonts() {
+	const chan = yield call(channel);
 
-  for (let i = 0; i < 5; i++) {
-    yield fork(getDownloadFonts, chan)
-  }
+	for (let i = 0; i < 5; i++) {
+		yield fork(getDownloadFonts, chan);
+	}
 
-  while (true) {
-    const { payload } = yield take(DOWNLOAD_FONTS_API_CALL)
-    yield put(chan, payload)
-  }
+	while (true) {
+		const { payload } = yield take(DOWNLOAD_FONTS_API_CALL);
+		yield put(chan, payload);
+	}
 }

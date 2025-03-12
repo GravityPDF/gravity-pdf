@@ -365,7 +365,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	private function register_styles() {
 		$version = PDF_EXTENDED_VERSION;
 
-		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-styles.min.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'build/assets/app.bundle.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
 	}
 
 	/**
@@ -376,7 +376,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_scripts() {
-		$version = PDF_EXTENDED_VERSION;
+		global $wp_version;
+
+		$version = defined( 'WP_DEBUG' ) && WP_DEBUG === true ? time() : PDF_EXTENDED_VERSION;
+		$args    = version_compare( $wp_version, '6.3.0', '>=' ) ? [ 'strategy' => 'defer' ] : true;
 
 		$pdf_settings_dependencies = [
 			'jquery-ui-tooltip',
@@ -387,10 +390,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependencies, $version, true );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'build/assets/admin.min.js', $pdf_settings_dependencies, $version, $args );
 
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version, true );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version, true );
+		/* add hot reloading in development */
+		$asset               = file_exists( PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php' )
+			? require PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php'
+			: [ 'dependencies' => [ 'jquery' ] ];
+		$bundle_dependencies = $asset['dependencies'] ?? [];
+
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
 
 		/* Localise admin script */
 		$data = $this->data->get_localised_script_data( $this->options, $this->gform );

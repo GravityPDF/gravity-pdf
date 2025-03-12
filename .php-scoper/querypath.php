@@ -5,9 +5,6 @@ declare( strict_types=1 );
 use Isolated\Symfony\Component\Finder\Finder;
 
 $path = './';
-if ( isset( $_SERVER['argv'][0] ) ) {
-	$path = dirname( $_SERVER['argv'][0] ) . '/';
-}
 
 return [
 
@@ -37,11 +34,6 @@ return [
 	 */
 	'patchers'  => [
 		function( string $filePath, string $prefix, string $content ): string {
-
-			if ( basename( $filePath ) === 'DOMTraverser.php' ) {
-				$content = str_replace( "\\$prefix\SPLObjectStorage", '\SPLObjectStorage', $content );
-			}
-
 			return str_replace(
 				"'\\\\QueryPath\\\\",
 				"'\\\\$prefix\\\\QueryPath\\\\",

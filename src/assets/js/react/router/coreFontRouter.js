@@ -1,12 +1,16 @@
 /* Dependencies */
-import React from 'react'
-import PropTypes from 'prop-types'
-import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Routes as Switch, Route } from 'react-router-dom';
 /* Components */
-import CoreFontContainer from '../components/CoreFonts/CoreFontContainer'
+import CoreFontContainer from '../components/CoreFonts/CoreFontContainer';
+import Empty from '../components/Empty';
+/* Helpers */
+import withRouterHooks from '../utilities/withRouterHooks.js';
+import CustomHashRouter from '../components/CustomHashRouter';
 
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.0
@@ -21,68 +25,70 @@ import CoreFontContainer from '../components/CoreFonts/CoreFontContainer'
  * /downloadCoreFonts
  * /retryDownloadCoreFonts
  *
- * @param button DOM Node containing the original static <button> markup (gets replaced by React)
+ * @param { HTMLButtonElement } button DOM Node containing the original static <button> markup (gets replaced by React)
  *
  * @since 5.0
  */
-const Routes = ({ button }) => (
-  <Router>
-    <Switch>
-      <Route render={(props) => <CoreFont history={props.history} button={button} />} />
+const Routes = ({ button }) => {
+	return (
+		<CustomHashRouter>
+			<Switch>
+				<Route path="/" element={<CoreFont button={button} />} />
 
-      <Route
-        path='/downloadCoreFonts'
-        exact
-        render={(props) => <CoreFont history={props.history} button={button} />}
-      />
+				<Route
+					path="/downloadCoreFonts"
+					exact
+					element={<CoreFont button={button} />}
+				/>
 
-      <Route
-        path='/retryDownloadCoreFonts'
-        exact
-        render={(props) => <CoreFont history={props.history} button={button} />}
-      />
-    </Switch>
-  </Router>
-)
+				<Route
+					path="/retryDownloadCoreFonts"
+					exact
+					element={<CoreFont button={button} />}
+				/>
+				<Route path="*" element={<Empty />} />
+			</Switch>
+		</CustomHashRouter>
+	);
+};
 
 /**
  * @since 5.0
  */
 Routes.propTypes = {
-  history: PropTypes.object,
-  button: PropTypes.object
-}
+	button: PropTypes.object,
+};
 
 /**
  * Because we used the same component multiple times above, the real component was abstracted
  *
- * @param history HashHistory object
- * @param button DOM Node
+ * @param { HTMLButtonElement } button DOM Node
  *
  * @since 5.0
  */
-const CoreFont = ({ history, button }) => (
-  <CoreFontContainer
-    history={history}
-    location={history.location}
-    buttonClassName={button.className}
-    buttonText={button.innerText}
-    success={GFPDF.coreFontSuccess}
-    error={GFPDF.coreFontError}
-    itemPending={GFPDF.coreFontItemPendingMessage}
-    itemSuccess={GFPDF.coreFontItemSuccessMessage}
-    itemError={GFPDF.coreFontItemErrorMessage}
-    counterText={GFPDF.coreFontCounter}
-    retryText={GFPDF.coreFontRetry}
-  />
-)
+const CoreFont = ({ button }) => {
+	return (
+		<CoreFontContainerWithRouter
+			buttonClassName={button.className}
+			buttonText={button.innerText}
+			success={GFPDF.coreFontSuccess}
+			error={GFPDF.coreFontError}
+			itemPending={GFPDF.coreFontItemPendingMessage}
+			itemSuccess={GFPDF.coreFontItemSuccessMessage}
+			itemError={GFPDF.coreFontItemErrorMessage}
+			counterText={GFPDF.coreFontCounter}
+			retryText={GFPDF.coreFontRetry}
+		/>
+	);
+};
+
+const CoreFontContainerWithRouter = withRouterHooks(CoreFontContainer);
 
 /**
  * @since 5.0
  */
 CoreFont.propTypes = {
-  history: PropTypes.object,
-  button: PropTypes.object
-}
+	button: PropTypes.object,
+};
 
-export default Routes
+export default Routes;

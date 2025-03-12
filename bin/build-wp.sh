@@ -22,10 +22,14 @@ tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm -f ${PAC
 
 # Run Composer
 yarn install --cwd ${PACKAGE_DIR}
-yarn --cwd ${PACKAGE_DIR} build:production
-composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
+yarn --cwd ${PACKAGE_DIR} build
 
-PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
+# Install all dependencies (including dev)
+# Prefix will run as post-install command script - Requires php-scoper from dev dependencies
+composer install --prefer-dist --working-dir ${PACKAGE_DIR}
+
+# Run vendor cleanup - Ensures that there's no dev dependencies on production
+PLUGIN_DIR="$PACKAGE_DIR" bash ./bin/vendor-cleanup.sh
 
 # Cleanup Node JS
 rm -f -R ${PACKAGE_DIR}/node_modules

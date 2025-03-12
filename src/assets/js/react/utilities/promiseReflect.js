@@ -1,5 +1,5 @@
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.0
@@ -12,11 +12,11 @@
  * See https://www.npmjs.com/package/promise-reflect for usage
  */
 export default (promise) => {
-  return promise
-    .then(data => {
-      return { data, status: 'resolved' }
-    })
-    .catch(error => {
-      return { error, status: 'rejected' }
-    })
-}
+	return promise
+		.then((data) => {
+			return { data, status: 'resolved' };
+		})
+		.catch((error) => {
+			return { error, status: 'rejected' };
+		});
+};

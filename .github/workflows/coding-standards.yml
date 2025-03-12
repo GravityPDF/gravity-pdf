@@ -47,7 +47,7 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction
+          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

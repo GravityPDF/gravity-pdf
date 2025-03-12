@@ -136,15 +136,16 @@ class Model_Templates extends Helper_Abstract_Model {
 				]
 			);
 
-			header( 'Content-Type: application/json' );
-			echo wp_json_encode(
-				[
-					'error' => $e->getMessage(),
-				]
-			);
-
 			/* Bad Response */
-			wp_die( '', 400 );
+			header( 'Content-Type: application/json' );
+			wp_die(
+				wp_json_encode(
+					[
+						'error' => $e->getMessage(),
+					]
+				),
+				400
+			);
 		}
 
 		/* Copy all the files to the active PDF working directory */
@@ -180,14 +181,14 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Return newly-installed template headers */
 		header( 'Content-Type: application/json' );
-		echo wp_json_encode(
-			[
-				'templates' => $headers,
-			]
+		wp_die(
+			wp_json_encode(
+				[
+					'templates' => $headers,
+				]
+			),
+			200
 		);
-
-		/* Okay Response */
-		wp_die( '', 200 );
 	}
 
 	/**

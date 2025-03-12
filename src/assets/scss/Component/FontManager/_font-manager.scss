@@ -57,6 +57,19 @@
                 cursor: pointer;
                 text-decoration: underline;
               }
+
+              button.link {
+                background-color: unset;
+                border: unset;
+                box-shadow: unset;
+                text-decoration: underline;
+                color: base.$link-color;
+                padding: 0;
+
+                &:hover {
+                  cursor: pointer;
+                }
+              }
             }
 
             .font-list-header,

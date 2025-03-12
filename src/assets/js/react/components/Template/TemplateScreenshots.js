@@ -1,11 +1,11 @@
 /* Dependencies */
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Display the Template Screenshot for the individual templates (uses different markup - out of our control)
  *
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
@@ -14,22 +14,30 @@ import PropTypes from 'prop-types'
 /**
  * React Stateless Component
  *
+ * @param { Object } props
+ * @param { string } props.image
+ *
+ * @return { JSX.Element } TemplateScreenshot Component
+ *
  * @since 4.1
  */
 const TemplateScreenshots = ({ image }) => {
-  const className = (image) ? 'screenshot' : 'screenshot blank'
+	const className = image ? 'screenshot' : 'screenshot blank';
 
-  return (
-    <div data-test='component-templateScreenshots' className='theme-screenshots'>
-      <div className={className}>
-        {image ? <img src={image} alt='' /> : null}
-      </div>
-    </div>
-  )
-}
+	return (
+		<div
+			data-test="component-templateScreenshots"
+			className="theme-screenshots"
+		>
+			<div className={className}>
+				{image ? <img src={image} alt="" /> : null}
+			</div>
+		</div>
+	);
+};
 
 TemplateScreenshots.propTypes = {
-  image: PropTypes.string
-}
+	image: PropTypes.string,
+};
 
-export default TemplateScreenshots
+export default TemplateScreenshots;

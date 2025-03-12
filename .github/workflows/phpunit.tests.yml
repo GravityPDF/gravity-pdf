@@ -89,7 +89,7 @@ jobs:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-      
 
       - name: Log debug information
         run: |
@@ -103,21 +103,28 @@ jobs:
           php -i
           locale -a
 
-      - name: Install Dependencies
+      - name: Install Composer dependencies
         run: |
-          yarn
+          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
+          echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install JS Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: yarn install
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ ! matrix.report }}
         run: |
-          yarn env:install
+          yarn wp-env start
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ matrix.report }}
         run: |
-          PHP_ENABLE_XDEBUG=true yarn env:install
+          PHP_ENABLE_XDEBUG=true yarn wp-env start
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

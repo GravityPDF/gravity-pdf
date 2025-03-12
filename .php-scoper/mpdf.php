@@ -5,9 +5,6 @@ declare( strict_types=1 );
 use Isolated\Symfony\Component\Finder\Finder;
 
 $path = './';
-if ( isset( $_SERVER['argv'][0] ) ) {
-	$path = dirname( $_SERVER['argv'][0] ) . '/';
-}
 
 return [
 
@@ -71,7 +68,7 @@ return [
 			];
 
 			if ( in_array( basename( $filePath ), $files, true ) ) {
-				$content = str_replace( "\\$prefix\\Psr\\Log\\LoggerInterface", '', $content );
+				$content = str_replace( '(LoggerInterface ', '(', $content );
 			}
 
 			/* Global polyfills */

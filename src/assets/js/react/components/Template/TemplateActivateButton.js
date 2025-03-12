@@ -1,16 +1,15 @@
 /* Dependencies */
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 /* Redux actions */
-import { selectTemplate } from '../../actions/templates'
+import { selectTemplate } from '../../actions/templates';
 
 /**
  * Renders the button used to trigger the current active PDF template
  * On click it triggers our Redux action.
  *
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
@@ -22,69 +21,68 @@ import { selectTemplate } from '../../actions/templates'
  * @since 4.1
  */
 export class TemplateActivateButton extends Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    history: PropTypes.object,
-    onTemplateSelect: PropTypes.func,
-    template: PropTypes.object,
-    buttonText: PropTypes.string
-  }
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		navigate: PropTypes.func,
+		onTemplateSelect: PropTypes.func,
+		template: PropTypes.object,
+		buttonText: PropTypes.string,
+	};
 
-  /**
-   * Update our route and trigger a Redux action to select the current template
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  handleSelectTemplate = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+	/**
+	 * Update our route and trigger a Redux action to select the current template
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	handleSelectTemplate = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
 
-    this.props.history.push('')
-    this.props.onTemplateSelect(this.props.template.id)
-  }
+		this.props.navigate('/');
+		this.props.onTemplateSelect(this.props.template.id);
+	};
 
-  /**
-   * @since 4.1
-   */
-  render () {
-    return (
-      <a
-        data-test='component-templateActivateButton'
-        onClick={this.handleSelectTemplate}
-        href='#'
-        tabIndex='150'
-        className='button activate'
-        aria-label={this.props.buttonText + ' ' + GFPDF.template}
-      >
-        {this.props.buttonText}
-      </a>
-    )
-  }
+	/**
+	 * @since 4.1
+	 */
+	render() {
+		return (
+			<button
+				data-test="component-templateActivateButton"
+				type="button"
+				onClick={this.handleSelectTemplate}
+				className="button activate"
+				aria-label={this.props.buttonText + ' ' + GFPDF.template}
+			>
+				{this.props.buttonText}
+			</button>
+		);
+	}
 }
 
 /**
  * TemplateActivateButton
  * Map actions to props
  *
- * @param {func} dispatch Redux dispatcher
+ * @param { Function } dispatch Redux dispatcher
  *
- * @returns {{onTemplateSelect: (function(id=string))}}
+ * @return {{ onTemplateSelect: Function }} mapped dispatch
  *
  * @since 4.1
  */
-export const mapDispatchToProps = dispatch => {
-  return {
-    onTemplateSelect: id => dispatch(selectTemplate(id))
-  }
-}
+export const mapDispatchToProps = (dispatch) => {
+	return {
+		onTemplateSelect: (id) => dispatch(selectTemplate(id)),
+	};
+};
 
 /**
  * Maps our Redux store to our React component
  *
  * @since 4.1
  */
-export default withRouter(connect(null, mapDispatchToProps)(TemplateActivateButton))
+export default connect(null, mapDispatchToProps)(TemplateActivateButton);

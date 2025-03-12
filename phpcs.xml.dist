@@ -99,4 +99,6 @@
     <exclude-pattern>/node_modules/*</exclude-pattern>
     <exclude-pattern>/src/helper/licensing/EDD_SL_Plugin_Updater.php</exclude-pattern>
     <exclude-pattern>/.php-scoper/*</exclude-pattern>
+    <exclude-pattern>/build/*</exclude-pattern>
+    <exclude-pattern>/tools/*</exclude-pattern>
 </ruleset>

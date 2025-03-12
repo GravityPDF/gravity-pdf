@@ -6,7 +6,8 @@
     "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
     "lint:fix": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
     "lint:compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
-    "prefix": "bash ./bin/vendor-prefix.sh"
+    "prefix": "bash ./bin/vendor-prefix.sh",
+    "post-install-cmd": "@composer prefix"
   },
   "config": {
     "preferred-install": "dist",
@@ -39,7 +40,8 @@
     "phpcompatibility/phpcompatibility-wp": "*",
     "roave/security-advisories": "dev-master",
     "yoast/phpunit-polyfills": "^3.0",
-    "wp-phpunit/wp-phpunit": "^6.4"
+    "wp-phpunit/wp-phpunit": "^6.4",
+    "humbug/php-scoper": "^0.15.0"
   },
   "autoload": {
     "psr-4": {

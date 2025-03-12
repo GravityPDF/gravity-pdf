@@ -2,16 +2,22 @@
   "core": "https://wordpress.org/latest.zip",
   "phpVersion": "8.3",
   "plugins": [
-    "gravityforms/gravityformscli"
+    "gravityforms/gravityformscli",
+    "."
   ],
+  "lifecycleScripts": {
+    "afterStart": "bash bin/install.sh"
+  },
   "mappings": {
-    "wp-content/plugins/gravity-pdf": "."
+    "wp-cli.yml": "./tools/wp-env/wp-cli.yml",
+    "wp-content/mu-plugins": "./tools/mu-plugins"
   },
   "env": {
     "tests": {
       "plugins": [
         "gravityforms/gravityformscli",
-        "GravityPDF/gravity-pdf-test-suite"
+        "GravityPDF/gravity-pdf-test-suite",
+        "."
       ],
       "config": {
         "WP_DEBUG": true,

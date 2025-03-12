@@ -36,6 +36,7 @@ class Page {
       .click(this.addBlockIcon)
       .typeText(this.searchBlock.filterVisible(), 'paragraph', { paste: true })
       .click(this.paragraphButton)
+      .wait(500)
       .typeText(Selector('p.is-selected'), 'Content', { paste: true })
       .click(this.publishButton)
       .click(this.confirmPublishButton)

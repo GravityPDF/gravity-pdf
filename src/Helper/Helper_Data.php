@@ -253,10 +253,11 @@ class Helper_Data {
 				'letsGoCreateOne'                      => esc_html__( "Let's go create one", 'gravity-pdf' ),
 				'installedPdfs'                        => esc_html__( 'Installed PDFs', 'gravity-pdf' ),
 				'searchTemplatePlaceholder'            => esc_html__( 'Search Installed Templates', 'gravity-pdf' ),
+				'closeDialog'                          => esc_html__( 'Close dialog', 'gravity-pdf' ),
 
 				'searchPlaceholder'                    => esc_html__( 'Search the Gravity PDF Knowledgebase...', 'gravity-pdf' ),
 				'searchResultHeadingText'              => esc_html__( 'Gravity PDF Documentation', 'gravity-pdf' ),
-				'noResultText'                         => esc_html__( 'It doesn\'t look like there are any topics related to your issue.', 'gravity-pdf' ),
+				'noResultText'                         => esc_html__( "It doesn't look like there are any topics related to your issue.", 'gravity-pdf' ),
 				'getSearchResultError'                 => esc_html__( 'An error occurred. Please try again', 'gravity-pdf' ),
 
 				'requiresGravityPdfVersion'            => esc_html__( 'Requires Gravity PDF v%s', 'gravity-pdf' ),

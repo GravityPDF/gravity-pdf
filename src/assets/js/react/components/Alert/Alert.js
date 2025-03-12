@@ -1,9 +1,9 @@
 /* Dependencies */
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -12,18 +12,21 @@ import PropTypes from 'prop-types'
 /**
  * Display alert box UI
  *
- * @param msg: string
+ * @param { Object } props
+ * @param { string } props.msg
+ *
+ * @return { JSX.Element } Alert Component
  *
  * @since 6.0
  */
 export const Alert = ({ msg }) => (
-  <div data-test='component-Alert' id='gf-admin-notices-wrapper'>
-    <div
-      className='notice notice-error gf-notice'
-      dangerouslySetInnerHTML={{ __html: msg }}
-    />
-  </div>
-)
+	<div data-test="component-Alert" id="gf-admin-notices-wrapper">
+		<div
+			className="notice notice-error gf-notice"
+			dangerouslySetInnerHTML={{ __html: msg }}
+		/>
+	</div>
+);
 
 /**
  * PropTypes
@@ -31,7 +34,7 @@ export const Alert = ({ msg }) => (
  * @since 6.0
  */
 Alert.propTypes = {
-  msg: PropTypes.string.isRequired
-}
+	msg: PropTypes.string.isRequired,
+};
 
-export default Alert
+export default Alert;

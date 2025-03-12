@@ -1,10 +1,10 @@
 /* Dependencies */
-import { serialize } from 'object-to-formdata'
+import { serialize } from 'object-to-formdata';
 /* APIs */
-import { api } from './api'
+import { api } from './api';
 
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -13,83 +13,111 @@ import { api } from './api'
 /**
  * Fetch API request to obtain custom font list (GET)
  *
- * @returns Promise response
+ * @return { Promise<*> } response
  *
  * @since 6.0
  */
-export const apiGetCustomFontList = () => {
-  const url = GFPDF.restUrl + 'fonts/'
+export const apiGetCustomFontList = async () => {
+	const url = GFPDF.restUrl + 'fonts/';
 
-  return api(url, {
-    method: 'GET',
-    headers: {
-      'X-WP-Nonce': GFPDF.restNonce
-    }
-  })
-}
+	return await api(
+		url,
+		{
+			method: 'GET',
+			headers: {
+				'X-WP-Nonce': GFPDF.restNonce,
+			},
+		},
+		{
+			useNativeErrorResponse: true,
+		}
+	);
+};
 
 /**
  * Fetch API request to add new font (POST)
  *
- * @param font: object
+ * @param { Object } font
  *
- * @returns Promise response
+ * @return { Promise<Object> } response
  *
  * @since 6.0
  */
-export const apiAddFont = font => {
-  const url = GFPDF.restUrl + 'fonts/'
-  const formData = serialize(font)
+export const apiAddFont = async (font) => {
+	const url = GFPDF.restUrl + 'fonts/';
+	const formData = serialize(font);
 
-  return api(url, {
-    method: 'POST',
-    headers: {
-      'X-WP-Nonce': GFPDF.restNonce
-    },
-    body: formData
-  })
-}
+	return await api(
+		url,
+		{
+			method: 'POST',
+			headers: {
+				'X-WP-Nonce': GFPDF.restNonce,
+			},
+			body: formData,
+		},
+		{
+			useNativeErrorResponse: true,
+		}
+	);
+};
 
 /**
  * Fetch API request to edit font details (POST)
  *
- * @param id: string
- * @param font: object
+ * @param { Object } args
+ * @param { string } args.id
+ * @param { Object } args.font
  *
- * @returns Promise response
+ * @return { Promise<Object> } response
  *
  * @since 6.0
  */
-export const apiEditFont = ({ id, font }) => {
-  const url = GFPDF.restUrl + 'fonts/' + id
-  const data = { ...font }
-  const formData = serialize(data)
+export const apiEditFont = async ({ id, font }) => {
+	const url = GFPDF.restUrl + 'fonts/' + id;
+	const data = { ...font };
+	const formData = serialize(data);
 
-  return api(url, {
-    method: 'POST',
-    headers: {
-      'X-WP-Nonce': GFPDF.restNonce
-    },
-    body: formData
-  })
-}
+	return await api(
+		url,
+		{
+			method: 'POST',
+			headers: {
+				'X-WP-Nonce': GFPDF.restNonce,
+			},
+			body: formData,
+		},
+		{
+			useNativeErrorResponse: true,
+		}
+	);
+};
 
 /**
  * Fetch API request to delete existing font (DELETE)
  *
- * @param id: string
+ * @param { string } id
  *
- * @returns Promise response
+ * @return { Promise<Object>} response
  *
  * @since 6.0
  */
-export const apiDeleteFont = id => {
-  const url = GFPDF.restUrl + 'fonts/' + id
+export const apiDeleteFont = async (id) => {
+	const url = GFPDF.restUrl + 'fonts/' + id;
 
-  return api(url, {
-    method: 'DELETE',
-    headers: {
-      'X-WP-Nonce': GFPDF.restNonce
-    }
-  })
-}
+	const res = await api(
+		url,
+		{
+			method: 'DELETE',
+			headers: {
+				'X-WP-Nonce': GFPDF.restNonce,
+			},
+		},
+		{
+			useNativeErrorResponse: true,
+			useNativeResponse: true,
+		}
+	);
+
+	return res;
+};

@@ -219,25 +219,22 @@
 
     /* Search result */
     .search-result:not(:empty) {
-      padding: 1rem 1rem 0.8rem 1rem;
+      padding-block: 1rem;
 
       .group-name {
-        color: #3E7DA6;
+        color: #2a31a3;
         font-size: 0.85rem;
         font-weight: 600;
         line-height: 32px;
-        margin: 0 -4px;
-        padding: 8px 4px 0;
-        top: 0;
-        z-index: 10;
       }
 
-      ul {
+      ol {
+        margin: 0;
+        list-style: none;
+
         li {
           border-radius: 4px;
-          display: flex;
           padding-bottom: 4px;
-          position: relative;
 
           a {
             background-color: #fff;
@@ -247,8 +244,18 @@
             width: 100%;
             text-decoration: none;
 
+            mark {
+              color: #2a31a3;
+              background: none;
+            }
+
             &:hover {
-              background-color: #3e7da6;
+              background-color: #2a31a3;
+
+              mark {
+                color: #fff;
+                text-decoration: underline;
+              }
 
               .hit-container {
                 .hit-icon {

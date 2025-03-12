@@ -1,21 +1,27 @@
 /* Dependencies */
-import React, { lazy, Suspense } from 'react'
-import { render } from 'react-dom'
-import { HashRouter as Router, Route } from 'react-router-dom'
-import watch from 'redux-watch'
+import React, { lazy, Suspense } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Routes as Switch, Route } from 'react-router-dom';
+import watch from 'redux-watch';
 /* Redux store */
-import { getStore } from '../store'
+import { getStore } from '../store';
 /* Redux actions */
-import { selectTemplate, updateSelectBox } from '../actions/templates'
+import { selectTemplate, updateSelectBox } from '../actions/templates';
 /* Routes */
-import templateRouter from '../router/templateRouter'
+import templateRouter from '../router/templateRouter';
+/* Helpers */
+import withRouterHooks from '../utilities/withRouterHooks.js';
 /* Components */
-const TemplateButton = lazy(() => import('../components/Template/TemplateButton'))
+import CustomHashRouter from '../components/CustomHashRouter';
+import Empty from '../components/Empty';
+const TemplateButton = lazy(
+	() => import('../components/Template/TemplateButton')
+);
 
 /**
  * Advanced Template Selector Bootstrap
  *
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
@@ -28,31 +34,42 @@ const TemplateButton = lazy(() => import('../components/Template/TemplateButton'
  *
  * @since 4.1
  */
-export function templateBootstrap ($templateField) {
-  const store = getStore()
+export function templateBootstrap($templateField) {
+	const store = getStore();
 
-  /* Create our button container and render our component in it */
-  createTemplateMarkup($templateField)
+	/* Create our button container and render our component in it */
+	createTemplateMarkup($templateField);
 
-  /* Render our React Component in the DOM */
-  render(
-    <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
-      <Router>
-        <Route render={(props) => <TemplateButton {...props} store={store} />} />
-      </Router>
-    </Suspense>,
-    document.getElementById('gpdf-advance-template-selector')
-  )
+	const container = document.getElementById('gpdf-advance-template-selector');
 
-  /* Mount our router */
-  templateRouter(store)
+	const root = createRoot(container);
 
-  /*
-   * Listen for Redux store updates and do DOM updates
-   */
-  activeTemplateStoreListener(store, $templateField)
-  templateChangeStoreListener(store, $templateField)
+	/* Render our React Component in the DOM */
+	root.render(
+		<Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
+			<CustomHashRouter>
+				<Switch>
+					<Route
+						path="/"
+						element={<TemplateButtonWithRouter store={store} />}
+					/>
+					<Route path="*" element={<Empty />} />
+				</Switch>
+			</CustomHashRouter>
+		</Suspense>
+	);
+
+	/* Mount our router */
+	templateRouter(store);
+
+	/*
+	 * Listen for Redux store updates and do DOM updates
+	 */
+	activeTemplateStoreListener(store, $templateField);
+	templateChangeStoreListener(store, $templateField);
 }
+
+const TemplateButtonWithRouter = withRouterHooks(TemplateButton);
 
 /**
  * Dynamically add the required markup to attach our React components to.
@@ -61,12 +78,12 @@ export function templateBootstrap ($templateField) {
  *
  * @since 4.1
  */
-export function createTemplateMarkup ($templateField) {
-  $templateField
-    .wrap('<div id="gfpdf-settings-field-wrapper-template-container" />')
-    .parent()
-    .append('<span id="gpdf-advance-template-selector">')
-    .append('<div id="gfpdf-overlay" class="theme-overlay">')
+export function createTemplateMarkup($templateField) {
+	$templateField
+		.wrap('<div id="gfpdf-settings-field-wrapper-template-container" />')
+		.parent()
+		.append('<span id="gpdf-advance-template-selector">')
+		.append('<div id="gfpdf-overlay" class="theme-overlay">');
 }
 
 /**
@@ -74,30 +91,30 @@ export function createTemplateMarkup ($templateField) {
  * and update the select box value based on this change. Also, listen for changes
  * to our select box and update the store when needed.
  *
- * @param {Object} store The Redux store returned from createStore()
+ * @param {Object} store          The Redux store returned from createStore()
  * @param {Object} $templateField The jQuery select box we should attach the fancy template selector to
  *
  * @since 4.1
  */
-export function activeTemplateStoreListener (store, $templateField) {
-  /* Watch our store for changes */
-  const w = watch(store.getState, 'template.activeTemplate')
-  store.subscribe(w((template) => {
-    /* Check store and DOM are different to prevent any update recursions */
-    if ($templateField.val() !== template) {
-      $templateField
-        .val(template)
-        .trigger('change')
-    }
-  }))
+export function activeTemplateStoreListener(store, $templateField) {
+	/* Watch our store for changes */
+	const w = watch(store.getState, 'template.activeTemplate');
+	store.subscribe(
+		w((template) => {
+			/* Check store and DOM are different to prevent any update recursions */
+			if ($templateField.val() !== template) {
+				$templateField.val(template).trigger('change');
+			}
+		})
+	);
 
-  /* Watch our DOM for changes */
-  $templateField[0].addEventListener('change', () => {
-    /* Check store and DOM are different to prevent any update recursions */
-    if ($templateField.val() !== store.getState().template.activeTemplate) {
-      store.dispatch(selectTemplate($templateField.val()))
-    }
-  })
+	/* Watch our DOM for changes */
+	$templateField[0].addEventListener('change', () => {
+		/* Check store and DOM are different to prevent any update recursions */
+		if ($templateField.val() !== store.getState().template.activeTemplate) {
+			store.dispatch(selectTemplate($templateField.val()));
+		}
+	});
 }
 
 /**
@@ -105,35 +122,42 @@ export function activeTemplateStoreListener (store, $templateField) {
  * rebuild this. Instead of duplicating the code on both server and client side we do an AJAX call to
  * get the new select box HTML when the template.list length changes and update the DOM accordingly.
  *
- * @param {Object} store The Redux store returned from createStore()
+ * @param {Object} store          The Redux store returned from createStore()
  * @param {Object} $templateField The jQuery select box we should attach the fancy template selector to
  *
  * @since 4.1
  */
-export function templateChangeStoreListener (store, $templateField) {
-  /* Track the initial list size */
-  let listCount = store.getState().template.list.length
+export function templateChangeStoreListener(store, $templateField) {
+	/* Track the initial list size */
+	let listCount = store.getState().template.list.length;
 
-  /* Watch our store for changes */
-  const w = watch(store.getState, 'template.list')
-  store.subscribe(w((list) => {
-    /* Only update if the list size differs from what we expect */
-    if (listCount !== list.length) {
-      /* update the list size so we don't run it twice */
-      listCount = list.length
+	/* Watch our store for changes */
+	const w = watch(store.getState, 'template.list');
+	store.subscribe(
+		w((list) => {
+			/* Only update if the list size differs from what we expect */
+			if (listCount !== list.length) {
+				/* update the list size so we don't run it twice */
+				listCount = list.length;
 
-      /* Dispatch Redux Action for an AJAX call to get the new Select Box DOM */
-      store.dispatch(updateSelectBox())
+				/* Dispatch Redux Action for an AJAX call to get the new Select Box DOM */
+				store.dispatch(updateSelectBox());
 
-      /* Watch our store for changes */
-      const watchSelectBoxText = watch(store.getState, 'template.updateSelectBoxText')
-      store.subscribe(watchSelectBoxText((updateSelectBoxText) => {
-        /* Update $templateField */
-        $templateField
-          .html(updateSelectBoxText)
-          .val(store.getState().template.activeTemplate)
-          .trigger('chosen:updated')
-      }))
-    }
-  }))
+				/* Watch our store for changes */
+				const watchSelectBoxText = watch(
+					store.getState,
+					'template.updateSelectBoxText'
+				);
+				store.subscribe(
+					watchSelectBoxText((updateSelectBoxText) => {
+						/* Update $templateField */
+						$templateField
+							.html(updateSelectBoxText)
+							.val(store.getState().template.activeTemplate)
+							.trigger('chosen:updated');
+					})
+				);
+			}
+		})
+	);
 }

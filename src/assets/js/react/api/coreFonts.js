@@ -1,40 +1,53 @@
-/* Dependencies */
-import request from 'superagent/dist/superagent.min'
-
 /**
- * @package     Gravity PDF
+ * @package			Gravity PDF
  * @copyright   Copyright (c) 2024, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.2
  */
 
+import { api } from './api';
+
 /**
  * Do AJAX call
  *
- * @returns {{method.get}}
+ * @return { Object } response
  *
  * @since 5.2
  */
-export function apiGetFilesFromGitHub () {
-  return request
-    .get(GFPDF.pluginUrl + 'dist/payload/core-fonts.json')
-    .accept('application/json')
-    .type('json')
-    .parse(response => JSON.parse(response.text))
+export async function apiGetFilesFromGitHub() {
+	const res = await api(GFPDF.pluginUrl + 'build/payload/core-fonts.json', {
+		method: 'GET',
+		headers: {
+			Accept: 'application/json',
+		},
+	});
+
+	return res;
 }
 
 /**
  * Do AJAX call
  *
- * @param file
- * @returns {{method.post}}
+ * @param { string } file
+ *
+ * @return { Promise<*> } response
  *
  * @since 5.2
  */
-export function apiPostDownloadFonts (file) {
-  return request
-    .post(GFPDF.ajaxUrl)
-    .field('action', 'gfpdf_save_core_font')
-    .field('nonce', GFPDF.ajaxNonce)
-    .field('font_name', file)
+export function apiPostDownloadFonts(file) {
+	const formData = new FormData();
+	formData.append('action', 'gfpdf_save_core_font');
+	formData.append('nonce', GFPDF.ajaxNonce);
+	formData.append('font_name', file);
+
+	return api(
+		GFPDF.ajaxUrl,
+		{
+			method: 'POST',
+			body: formData,
+		},
+		{
+			useNativeErrorResponse: true,
+		}
+	);
 }

@@ -7,13 +7,13 @@ module.exports = {
   skipJsErrors: true,
   screenshots: {
     takeOnFails: true,
-    fullPage: true,
+    fullPage: true
   },
   hooks: {
     test: {
       before: async t => {
         await t.useRole(admin)
       }
-    },
-  },
+    }
+  }
 }
