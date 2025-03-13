@@ -83,6 +83,7 @@
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome -L",
+    "reset:e2e": "yarn wp-env clean && yarn wp-env run tests-cli wp plugin activate gravityforms gravityformspolls gravityformsquiz gravityformssurvey && bash bin/install-database.sh",
     "test:php": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
     "test:php:multisite": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",
     "test:js": "jest --verbose",
