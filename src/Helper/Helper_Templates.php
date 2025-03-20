@@ -110,11 +110,13 @@ class Helper_Templates {
 	 * @since 4.1
 	 */
 	public function get_all_templates() {
-		$cache_name    = $this->data->template_transient_cache . '-template-list';
-		$found         = false;
-		$template_list = \GFCache::get( $cache_name, $found, false );
-		if ( ! empty( $template_list ) ) {
-			return $template_list;
+		if ( class_exists( 'GFCache' ) ) {
+			$cache_name    = $this->data->template_transient_cache . '-template-list';
+			$found         = false;
+			$template_list = \GFCache::get( $cache_name, $found, false );
+			if ( ! empty( $template_list ) ) {
+				return $template_list;
+			}
 		}
 
 		$template_list                   = [];
@@ -138,7 +140,9 @@ class Helper_Templates {
 			);
 		}
 
-		\GFCache::set( $cache_name, $template_list );
+		if ( class_exists( 'GFCache' ) ) {
+			\GFCache::set( $cache_name, $template_list );
+		}
 
 		return $template_list;
 	}
