@@ -1,44 +1,37 @@
-const { test, expect } = require("@wordpress/e2e-test-utils-playwright");
-import GravityForms from "../../utils/gravityforms";
+import Assertions from '../../utils/assertions'
 
-test.describe("Text Confirmation", () => {
-  test("[gravitypdf] shortcode renders PDF link", async ({
-    requestUtils,
-    page,
-    admin,
-    editor
-  }) => {
-    const gf = new GravityForms(requestUtils, admin, page);
+const { test } = require('@wordpress/e2e-test-utils-playwright');
+import GravityForms from '../../utils/gravityforms';
 
-    const form = await gf.createForm("Text Confirmation");
-    await gf.createPdf(form.id, "Text Confirmation 1");
-    await gf.navigateToFormPdfList(form.id);
+test.describe('[gravitypdf] Shortcode', () => {
+	test('Text confirmation', async ({ requestUtils, page, admin }) => {
+		const gf = new GravityForms(requestUtils, admin, page);
 
-    // copy shortcode to clipboard
-    await page
-      .getByRole("dialog", { name: "Copy the Text Confirmation 1" })
-      .click();
+		// setup form and PDF
+		const form = await gf.createForm('Text Confirmation');
+		await gf.navigateToFormPreview(form.id);
+		await gf.saveForm();
+		const pdfId = await gf.createPdf(form.id, 'Text Confirmation Document');
 
-    // paste shortcode to main confirmation message and save
-    await gf.navigateToFormSettingsById(form.id, 'confirmation')
-    await page.getByRole('link', { name: "Default Confirmation (Edit)" }).click();
-    await page.getByRole('button', { name: 'Code'}).first().click()
-    const textarea = await page.locator('#_gform_setting_message')
-    await textarea.press('ControlOrMeta+a')
-    await textarea.press('Backspace')
-    await textarea.press('ControlOrMeta+v')
-    await page.getByRole('button', { name: 'save'}).click()
+		// setup default confirmation
+		await gf.navigateToFormConfirmation(form.id);
+		await gf.setRichTextContent(
+			'#gform_setting_message',
+			`[gravitypdf id="${pdfId}"]`
+		);
+		await gf.saveForm();
 
-    // embed form on page (abstract)
-    await admin.createNewPost({
-      postType: "page",
-      title: "Gravity PDF Text Confirmation Form",
-      content: `[gravityform id="${form.id}" ajax="true"]` // TODO <- add to shortcode block
-    })
+		// preview and submit form
+		await gf.navigateToFormPreview(form.id);
+		await gf.saveForm();
 
-    const postId = await editor.publishPost();
-    await page.goto(`/?page_id=${postId}`);
+		// verify the results
+		const pdfLink = await page.getByRole('link', { name: 'Download PDF' });
 
-    // Submit the form
-  });
+		const assertions = new Assertions(page)
+		await assertions.downloadAndVerifyPdf(
+			pdfLink,
+			'Text Confirmation Document.pdf'
+		);
+	});
 });
