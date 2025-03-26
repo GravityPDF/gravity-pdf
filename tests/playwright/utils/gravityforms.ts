@@ -124,16 +124,30 @@ export default class GravityForms {
 	/*
 	 * Settings management
 	 */
-	async setRichTextContent(containerSelector: string, content: string) {
+	async setRichTextContent(
+		containerSelector: string,
+		content: string,
+		append = false
+	) {
 		const container = await this.page.locator(containerSelector);
 
 		// swap to code view
-		container.getByRole('button', { name: 'Code' }).first().click();
+		container
+			.getByRole('button', { name: /^Code$/ })
+			.first()
+			.click();
 
-		await container.getByRole('textbox').fill(content);
+		const textbox = await container.getByRole('textbox').last();
+
+		await (!append
+			? textbox.fill(content)
+			: textbox.pressSequentially(content));
 	}
 
 	async saveForm() {
-		await this.page.getByRole('button', { name: /(save|submit)/i }).click();
+		await this.page
+			.getByRole('button', { name: /(save|submit)/i })
+			.last()
+			.click();
 	}
 }

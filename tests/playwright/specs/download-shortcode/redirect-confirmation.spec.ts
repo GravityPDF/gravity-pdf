@@ -14,7 +14,6 @@ test.describe('[gravitypdf] Shortcode', () => {
 		requestUtils,
 		page,
 		admin,
-		editor,
 	}: {
 		requestUtils: RequestUtils;
 		page: Page;
@@ -27,12 +26,17 @@ test.describe('[gravitypdf] Shortcode', () => {
 		const form = await gf.createForm('Redirect Confirmation');
 		await gf.navigateToFormPreview(form.id);
 		await gf.saveForm();
-		const pdfId = await gf.createPdf(form.id, 'Redirect Confirmation Document');
+		const pdfId = await gf.createPdf(
+			form.id,
+			'Redirect Confirmation Document'
+		);
 
 		// setup default confirmation
 		await gf.navigateToFormConfirmation(form.id);
 		await page.getByRole('radio', { name: 'Redirect' }).check();
-		await page.getByRole('textbox', { name: 'Redirect URL' }).fill('[gravitypdf id="' + pdfId + '"]');
+		await page
+			.getByRole('textbox', { name: 'Redirect URL' })
+			.fill('[gravitypdf id="' + pdfId + '"]');
 		await gf.saveForm();
 
 		// preview and submit form
