@@ -1,8 +1,19 @@
 const { test, expect } = require('@wordpress/e2e-test-utils-playwright');
 import GravityForms from '../../utils/gravityforms';
 
+import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import type { Page } from '@playwright/test';
+
 test.describe('[gravitypdf] Shortcode', () => {
-	test('Copy to Clipboard', async ({ requestUtils, page, admin }) => {
+	test('Copy to Clipboard', async ({
+		requestUtils,
+		page,
+		admin,
+	}: {
+		requestUtils: RequestUtils;
+		page: Page;
+		admin: Admin;
+	}) => {
 		const pdfLabel = 'PDF Clipboard';
 
 		const gf = new GravityForms(requestUtils, admin, page);

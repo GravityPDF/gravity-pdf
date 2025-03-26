@@ -27,7 +27,9 @@ class FlakyTestsReporter implements Reporter {
 
 	onBegin() {
 		try {
-			fs.mkdirSync('flaky-tests');
+			fs.mkdirSync('artifacts/test-results/flaky-tests', {
+				recursive: true,
+			});
 		} catch (err) {
 			if (
 				err instanceof Error &&
@@ -56,7 +58,7 @@ class FlakyTestsReporter implements Reporter {
 			}
 			case 'flaky': {
 				fs.writeFileSync(
-					`flaky-tests/${filenamify(testTitle)}.json`,
+					`"artifacts/test-results/flaky-tests/${filenamify(testTitle)}.json`,
 					JSON.stringify({
 						version: 1,
 						runner: '@playwright/test',

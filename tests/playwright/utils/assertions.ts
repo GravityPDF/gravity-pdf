@@ -1,7 +1,6 @@
-import {
-	expect,
-} from '@wordpress/e2e-test-utils-playwright';
-import type { Page } from '@playwright/test';
+import { expect } from '@wordpress/e2e-test-utils-playwright';
+import type { Page, Locator } from '@playwright/test';
+import type { Readable } from 'stream';
 
 export default class Assertions {
 	private page: Page;
@@ -10,7 +9,7 @@ export default class Assertions {
 		this.page = page;
 	}
 
-	async downloadAndVerifyPdf(pdfLink, expectedFilename: string) {
+	async downloadAndVerifyPdf(pdfLink: Locator, expectedFilename: string) {
 		await expect(pdfLink).toBeAttached();
 
 		const downloadPromise = this.page.waitForEvent('download');
@@ -21,8 +20,7 @@ export default class Assertions {
 		expect(download.suggestedFilename()).toBe(expectedFilename);
 		const pdfStream = await download.createReadStream();
 
-		async function readPdf(readable) {
-			readable.setEncoding('utf8');
+		async function readPdf(readable: Readable) {
 			let data = '';
 			for await (const chunk of readable) {
 				data += chunk;

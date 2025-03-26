@@ -7092,10 +7092,14 @@ filename-reserved-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/filename-reserved-regex/-/filename-reserved-regex-2.0.0.tgz#abf73dfab735d045440abfea2d91f389ebbfa229"
   integrity sha512-lc1bnsSr4L4Bdif8Xb/qrtokGbq5zlsms/CYH8PP+WtCkGNF65DPiQY8vG3SakEdRn8Dlnm+gW/qWKKjS5sZzQ==
 
-filename-reserved-regex@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/filename-reserved-regex/-/filename-reserved-regex-3.0.0.tgz#3d5dd6d4e2d73a3fed2ebc4cd0b3448869a081f7"
-  integrity sha512-hn4cQfU6GOT/7cFHXBqeBg2TbrMBgdD0kcjLhvSQYYwm3s4B6cjvBfb7nBALJLAXqmU5xajSa7X2NnUud/VCdw==
+filenamify@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/filenamify/-/filenamify-4.2.0.tgz#c99716d676869585b3b5d328b3f06590d032e89f"
+  integrity sha512-pkgE+4p7N1n7QieOopmn3TqJaefjdWXwEkj2XLZJLKfOgcQKkn11ahvGNgTD8mLggexLiDFQxeTs14xVU22XPA==
+  dependencies:
+    filename-reserved-regex "^2.0.0"
+    strip-outer "^1.0.1"
+    trim-repeated "^1.0.0"
 
 filenamify@^4.2.0:
   version "4.3.0"
@@ -7105,13 +7109,6 @@ filenamify@^4.2.0:
     filename-reserved-regex "^2.0.0"
     strip-outer "^1.0.1"
     trim-repeated "^1.0.0"
-
-filenamify@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/filenamify/-/filenamify-6.0.0.tgz#38def94098c62154c42a41d822650f5f55bcbac2"
-  integrity sha512-vqIlNogKeyD3yzrm0yhRMQg8hOVwYcYRfjEoODd49iCprMn4HL85gK3HcykQE53EPIpX3HcAbGA5ELQv216dAQ==
-  dependencies:
-    filename-reserved-regex "^3.0.0"
 
 fill-range@^4.0.0:
   version "4.0.0"
