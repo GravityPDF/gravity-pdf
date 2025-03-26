@@ -41,6 +41,7 @@ build/assets/*
 /coverage
 /screenshots
 /artifacts
+/tests/playwright/artifacts
 
 # Others
 _notes
