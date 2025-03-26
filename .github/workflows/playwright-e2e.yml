@@ -1,0 +1,94 @@
+name: Playwright End-to-End Tests
+
+on:
+  pull_request:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+  # The concurrency group contains the workflow name and the branch name for pull requests
+  # or the commit hash for any other events.
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-playwright:
+    name: Playwright E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure environment variables
+        run: |
+          echo "PHP_FPM_UID=$(id -u)" >> $GITHUB_ENV
+          echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Docs: https://github.com/shivammathur/setup-php
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Log debug information
+        run: |
+          npm --version
+          yarn --version
+          node --version
+          curl --version
+          git --version
+          php --version
+          php -i
+          locale -a
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
+          echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install JS Dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Build Gravity PDF
+        run: yarn build
+
+      - name: Install / Setup Gravity PDF + WordPress
+        run: |
+          yarn wp-env start
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run the tests
+        run: |
+          yarn test:e2e:playwright:headless
+
+      - name: Archive debug artifacts (screenshots, traces)
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-artifacts
+          path: artifacts/test-results
+          if-no-files-found: ignore

@@ -1,10 +1,6 @@
 import { readFile } from 'fs/promises';
 import { URL } from 'node:url';
-import {
-	Admin,
-	expect,
-	RequestUtils,
-} from '@wordpress/e2e-test-utils-playwright';
+import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 
 type Form = {

@@ -11,16 +11,6 @@ fi
 
 # Install Gravity PDF Dependencies
 composer install
-# this is triggers as post install script
-# composer run prefix
-
-# disable for now as it loops the installation
-# Start local environment
-#if [[ $PHP_ENABLE_XDEBUG ]]; then
-#  npm run wp-env start -- --upgrade --xdebug=debug,coverage
-#else
-#    npm run wp-env start -- --upgrade
-#fi
 
 echo "Install Gravity Forms..."
 bash ./bin/install-gravityforms.sh

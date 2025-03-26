@@ -1,10 +1,19 @@
-import Assertions from '../../utils/assertions'
-
-const { test } = require('@wordpress/e2e-test-utils-playwright');
+import { test } from '@wordpress/e2e-test-utils-playwright';
+import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import type { Page } from '@playwright/test';
 import GravityForms from '../../utils/gravityforms';
+import Assertions from '../../utils/assertions';
 
 test.describe('[gravitypdf] Shortcode', () => {
-	test('Text confirmation', async ({ requestUtils, page, admin }) => {
+	test('Text confirmation', async ({
+		requestUtils,
+		page,
+		admin,
+	}: {
+		requestUtils: RequestUtils;
+		page: Page;
+		admin: Admin;
+	}) => {
 		const gf = new GravityForms(requestUtils, admin, page);
 
 		// setup form and PDF
@@ -28,7 +37,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		// verify the results
 		const pdfLink = await page.getByRole('link', { name: 'Download PDF' });
 
-		const assertions = new Assertions(page)
+		const assertions = new Assertions(page);
 		await assertions.downloadAndVerifyPdf(
 			pdfLink,
 			'Text Confirmation Document.pdf'
