@@ -18,8 +18,6 @@ test.describe('[gravitypdf] Shortcode', () => {
 
 		// setup form and PDF
 		const form = await gf.createForm('Text Confirmation');
-		await gf.navigateToFormPreview(form.id);
-		await gf.saveForm();
 		const pdfId = await gf.createPdf(form.id, 'Text Confirmation Document');
 
 		// setup default confirmation
