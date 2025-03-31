@@ -1,4 +1,5 @@
-import {expect, test} from '@wordpress/e2e-test-utils-playwright';
+import {test} from '../../fixtures/test'
+import {expect} from '@wordpress/e2e-test-utils-playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import GravityForms from '../../utils/gravityforms';
@@ -6,6 +7,10 @@ import GravityForms from '../../utils/gravityforms';
 test.describe('[gravitypdf] Shortcode', () => {
     let gf = null;
     let form = null;
+
+    // @TODO - create Fixture https://playwright.dev/docs/test-fixtures
+    // Extend WP's test function and define all our Gravity Forms and Gravity PDF helpers
+
     test.beforeEach(
       async ({
         requestUtils,

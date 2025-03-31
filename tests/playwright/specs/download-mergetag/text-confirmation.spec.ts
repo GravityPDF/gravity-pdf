@@ -1,4 +1,4 @@
-import { test } from '@wordpress/e2e-test-utils-playwright';
+import {test} from '../../fixtures/test'
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import GravityForms from '../../utils/gravityforms';
