@@ -24,8 +24,6 @@ test.describe('[gravitypdf] Shortcode', () => {
 
 		// setup form and PDF
 		const form = await gf.createForm('Redirect Confirmation');
-		await gf.navigateToFormPreview(form.id);
-		await gf.saveForm();
 		const pdfId = await gf.createPdf(
 			form.id,
 			'Redirect Confirmation Document'
