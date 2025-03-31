@@ -1,4 +1,5 @@
-const { test, expect } = require('@wordpress/e2e-test-utils-playwright');
+import {test} from '../../fixtures/test'
+import {expect} from '@wordpress/e2e-test-utils-playwright';
 import GravityForms from '../../utils/gravityforms';
 
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';

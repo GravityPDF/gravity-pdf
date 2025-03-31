@@ -1,4 +1,4 @@
-import { test } from '@wordpress/e2e-test-utils-playwright';
+import {test} from '../../fixtures/test'
 import GravityForms from '../../utils/gravityforms';
 import Assertions from '../../utils/assertions';
 
