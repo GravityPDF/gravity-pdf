@@ -13,6 +13,12 @@ use GFPDF\Helper\Helper_Interface_Config;
  * If running a multisite that would be the PDF_EXTENDED_TEMPLATES/:id/config/ folder, where :id is the subsite ID number
  */
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
 /* Exit if accessed directly */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
