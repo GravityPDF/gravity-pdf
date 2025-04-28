@@ -18,14 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'WP_Async_Request' ) ) {
-	require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
-}
-
-if ( ! class_exists( 'GF_Background_Process' ) ) {
-	require_once GFCommon::get_base_path() . '/includes/libraries/gf-background-process.php';
-}
-
 /**
  * Class Helper_Pdf_Queue
  *
@@ -59,7 +51,8 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	public function __construct( LoggerInterface $log ) {
 		parent::__construct();
 
-		$this->log = $log;
+		$this->log                        = $log;
+		$this->allowed_batch_data_classes = false;
 	}
 
 	/**
@@ -88,6 +81,9 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 		/* Something went wrong so cancel queue */
 		if ( ! isset( $callback['id'], $callback['func'] ) ) {
 			$this->log->critical( 'PDF queue ran with invalid queue item', [ 'callbacks' => $callbacks ] );
+
+			$this->cancel_process();
+
 			return false;
 		}
 
@@ -107,6 +103,9 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 					'callbacks' => $callbacks,
 				]
 			);
+
+			$this->cancel_process();
+
 			return false;
 		}
 
@@ -147,6 +146,8 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 							'callbacks' => $callbacks,
 						]
 					);
+
+					$this->cancel_process();
 
 					$callbacks = [];
 				}
