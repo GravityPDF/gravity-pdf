@@ -289,17 +289,15 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 
 		$queue = $this->queue_mock->get_data();
 
-		$this->assertCount( 3, $queue[0] );
-		$this->assertCount( 3, $queue[1] );
-		$this->assertCount( 1, $queue[2] );
+		$this->assertCount( 7, $queue );
 
-		$actions = [ 'create_pdf', 'create_pdf', 'send_notification' ];
-		for ( $i = 0; $i < 3; $i++ ) {
-			$this->assertStringContainsString( $actions[ $i ], $queue[0][ $i ]['func'] );
-			$this->assertStringContainsString( $actions[ $i ], $queue[1][ $i ]['func'] );
-		}
-
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[2][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[0][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[1][0]['func'] );
+		$this->assertStringContainsString( 'send_notification', $queue[2][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[3][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[4][0]['func'] );
+		$this->assertStringContainsString( 'send_notification', $queue[5][0]['func'] );
+		$this->assertStringContainsString( 'cleanup_pdfs', $queue[6][0]['func'] );
 	}
 
 	/**
@@ -321,15 +319,10 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 
 		$queue = $this->queue_mock->get_data();
 
-		$this->assertCount( 3, $queue[0] );
-		$this->assertCount( 1, $queue[1] );
-
-		$actions = [ 'create_pdf', 'create_pdf', 'send_notification' ];
-		for ( $i = 0; $i < 3; $i++ ) {
-			$this->assertStringContainsString( $actions[ $i ], $queue[0][ $i ]['func'] );
-		}
-
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[1][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[0][0]['func'] );
+		$this->assertStringContainsString( 'create_pdf', $queue[1][0]['func'] );
+		$this->assertStringContainsString( 'send_notification', $queue[2][0]['func'] );
+		$this->assertStringContainsString( 'cleanup_pdfs', $queue[3][0]['func'] );
 	}
 
 	/**

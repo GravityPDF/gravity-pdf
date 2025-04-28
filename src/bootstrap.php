@@ -207,6 +207,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->templates
 		);
 
+		/* Load Background Queue classes */
+		if ( version_compare( \GFCommon::$version, '2.9.7.2', '>=' ) ) {
+			if ( ! class_exists( '\Gravity_Forms\Gravity_Forms\Async\GF_Background_Process' ) ) {
+				require_once GFCommon::get_base_path() . '/includes/async/class-gf-background-process.php';
+			}
+
+			class_alias( \Gravity_Forms\Gravity_Forms\Async\GF_Background_Process::class, 'GF_Background_Process', false );
+		} elseif ( ! class_exists( 'WP_Async_Request' ) ) {
+				require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
+		}
+
 		/* Setup our Singleton object */
 		$this->singleton = new Helper_Singleton();
 
