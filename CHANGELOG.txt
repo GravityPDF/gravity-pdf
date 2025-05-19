@@ -1,4 +1,375 @@
-This file contains the changelog history for previous major versions of Gravity PDF. See the README.txt file for the current major version changelog.
+= 6.12.5 =
+* 🐞Bug: Fix slow PDF Background Processing queue after a retry delay was added to the background processing library in Gravity Forms 2.9.7+
+* 🧹 Housekeeping: Update PDF Background Processing queue to be compatible with Gravity Forms 2.9.7+ background processing library update
+* 🧹 Housekeeping: Fix Background Processing deprecation notice when running Gravity Forms 2.9.7+
+
+= 6.12.4 =
+* Security: Escape variables in PHP Exceptions
+* Bug: Improve PDF column support when Gravity Forms includes a spacer
+* Bug: Fix display of Website field when it isn't filled in and *Show Empty Fields* is enabled
+* Housekeeping: Mark as compatible with WP 6.7
+* Housekeeping: Update PHP dependencies
+
+= 6.12.3 =
+* Bug: Resolve PHP error when a license has not been activated for a Gravity PDF extension
+* Bug: Resolve PHP error when all plugin dependencies are not met
+* Housekeeping: Open canonical plugin upgrade link in new window
+
+= 6.12.2 =
+* Security: Fix bug that caused the 'Restrict Owner' PDF setting to be ignored when it was enabled
+* Housekeeping: Adjust canonical plugin notice
+* Housekeeping: Add canonical plugin check on system report
+* Housekeeping: Log license check API calls (canonical only)
+* Bug: Fix PHP Notices in admin area
+
+= 6.12.1 =
+* Housekeeping: Update translations
+
+= 6.12.0 =
+* Feature: Add basic support for Gravity Forms 2.9 Image Choice and Multiple Choice fields (Gravity PDF Core Booster v2.2 can show the images)
+* Feature: Add support for Digital Signature for Gravity Forms plugin (https://wordpress.org/plugins/digital-signature-for-gravity-forms/)
+* Housekeeping: Allow approved HTML to be displayed in the PDF for Product and Option field choices
+* Housekeeping: Add `gfpdf_form_data_products` filter to allow entry pricing information to be modified for the PDF
+* Bug: Fix column ordering issue in Blank Slate, Focus Gravity, and Rubix when the RTL setting is enabled
+* Bug: Allow Password and Privileges PDF setting description to be translated
+
+= 6.11.4 =
+* Bug: Allow numbers with decimals when saving number fields in the PDF Settings
+
+= 6.11.3 =
+* Bug: Fix truncated merge tags in HTML attribute when included in PDF setting Rich Text fields
+
+= 6.11.2 =
+* Bug: Resolve race condition by skipping PDF cleanup at the end of form submission process if PDF Background Processing is enabled
+* Bug: Fix issue where some Notifications with PDFs attached were not being handled in a background task when PDF Background Processing is enabled
+
+= 6.11.1 =
+* Bug: Only process enabled notifications during form submission when using PDF Background Processing. Notifications are enabled if they are active and have conditional logic that passes.
+
+= 6.11.0 =
+* Housekeeping: Limit pages admin notices are displayed on to reduce notice fatigue
+* Housekeeping: Add specific check for the PHP extension `Ctype` when the plugin loads
+* Housekeeping: Tweak admin notice text to make error messages more clear
+* Housekeeping: Remove downgrade notice to unsupported Gravity PDF v5.0 if minimum system requirements are not met for v6.0
+* Housekeeping: Improve log messages when creating and validating a Signed PDF URL
+* Housekeeping: Improve input sanitation for textarea, number, and custom paper size fields when saving the PDF Form Settings
+* Housekeeping: Improve PDF Background Processing so its compatible with Gravity Forms native async notification feature
+* Housekeeping: Correctly cleanup PDFs after a PDF Background Processing queue runs
+* Bug: Enforce a 1pt minimum value for the Default Font Size and Font Size settings
+* Bug: Self-heal the PDF signing secret key if it becomes invalid
+* Bug: Self-heal the Global PDF Settings if it becomes invalid
+* Bug: Prevent the page reloading when selecting a tooltip on PDF settings pages
+* Bug: Register language files early so startup errors can be translated
+
+= 6.10.2 =
+* Bug: Hydrate Nested Forms with Gravity Wiz Populate Anything data
+
+= 6.10.1 =
+* Bug: Resolve PHP error when processing shortcode with invalid entry object
+* Bug: Adhere to conditional logic and exclude CSS class for Page Break fields
+* Bug: In more situations the Gravity PDF settings will be refreshed before the form meta is saved to the database
+* Housekeeping: Run temporary directory cleanup routine twice daily and delete files older than 12 hours
+* Housekeeping: Add gfpdf_system_status_report_items filter for Gravity PDF System Status report details
+* Housekeeping: Update mPDF to latest version
+* Housekeeping: Allow supported HTML in field labels when displayed in PDF
+
+= 6.10.0 =
+* Feature: Add native support for the Legal Signature and Legal Consent form fields added by the Legal Signing for Gravity Forms plugin
+
+= 6.9.1 =
+* Security: Disable the Signed URL feature in the [gravitypdf] shortcode when a URL parameter provides the entry ID (e.g. Page Confirmations)
+* Bug: Gracefully handle invalid conditional logic rules when adding date entry meta support
+* Bug: Display field for entry metadata PDF conditional rule when there are no form fields compatible with conditional logic
+* Bug: Ensure the template cache is correctly cleared when PDF Debug Mode is enabled
+* Bug: Flush the template cache after installing new templates via the PDF Template Manager
+* Bug: Clear template cache when plugin deactivated
+* Housekeeping: Small improvement to performance when reading template and font files from disk
+
+= 6.9.0 =
+* Feature: Add new conditional logic options to PDFs eg. Payment Status, Date Created, Starred (props: Gravity Wiz)
+* Feature: Add support for Show HTML Fields, Show Empty Fields, Show Section Break Description, and Enable Conditional Logic PDF settings when displaying Gravity Wiz Nested Forms field
+* Bug: Fix Form Editor saving problem for Gravity Forms v2.6.*
+* Bug: Fix Drag and Drop Column layout issue when the GF Styles Pro plugin is enabled
+* Bug: Fix issue sending PDF URLs with Gravity Wiz Google Sheets
+* Bug: Improve display of Rich Text Textarea fields by removing top margin on individual paragraphs
+* Bug: Resolve compatibility issue that corrupted PDFs when using Weglot
+* Housekeeping: Exclude popular WordPress staging environments from site count when activating Gravity PDF licenses
+* Housekeeping: Improve Gravity PDF license activation success and error messages
+* Security: Improve security of network requests to Gravity PDF licensing server
+* Developer: Add `set_pdf_config( $config )` and `get_pdf_config()` methods to PDF Field classes
+* Developer: In the PDF field blacklist, check using the original type and not with `$field->get_input_type()`
+
+= 6.8.0 =
+* Feature: Add PDF Download metabox to Gravity Flow Inbox for logged-in users with appropriate capability
+* Feature: Add AI-generated translations for French, Spanish, Italian, German, Dutch, Russian, and Chinese
+* Security: Only show PDF view/download links on entry list and details page if logged-in user has appropriate capability
+* Housekeeping: Improve performance on admin pages by caching the list of available templates
+* Housekeeping: When permalinks are enabled, generate the PDF URL with/without a trailing slash
+* Bug: Remove whitespace from textarea fields in the PDF settings
+
+= 6.7.4 =
+* Bug: Resolve PHP error for specific GravityView / GravityChart combo
+* Bug: Render supported HTML in labels/choices for the PDF Pricing table
+* Bug: Fix PHP error while viewing a PDF when running an older version of WordPress (< 5.9) and PHP (< 8.0)
+
+= 6.7.3 =
+* Bug: Fix 3rd party conflict when different version of PSR-7 library is loaded
+
+= 6.7.2 =
+* Bug: Resolve fatal error when using Gravity Forms Google Analytics Pagination feature with the PDF URL included in the parameters.
+* Housekeeping: Update PDF library to latest version
+* Housekeeping: Update help search API details
+
+= 6.7.1 =
+* Bug: Improve dependency conflicts with third party plugins who bundle PSR Log v2 or v3
+* Housekeeping: Use 4xx HTTP Status Codes for non-server related errors when generating PDFs
+
+= 6.7.0 =
+* Feature: Add support for multiple PDFs with the same Filename on a single form
+* Feature: Use secure links for File Upload and Post Image fields in Core and Universal PDFs
+* Dev Feature: Include secure links in $form_data array for File Upload and Post Image fields
+* Bug: Fix backwards compatibility error when running a version of Gravity Forms less that 2.6
+* Bug: Allow sanitized HTML in the labels of Radio and Checkbox admin settings
+* Bug: Remain editing current PDF if a hard refresh occurs after adding a new PDF to the form
+
+= 6.6.1 =
+* Bug: Prevent PDF settings being override if multiple browser windows are open, and both are updating different settings of the same form concurrently
+* Bug: Gracefully handle license key deactivation if an error occurs
+* Housekeeping: Bump WordPress Tested Up To v6.3
+
+= 6.6.0 =
+* Feature: Improve display of ungrouped product fields in Core and Universal templates
+* Dev Feature: Add `gfpdf_hide_consent_field_if_empty` filter, to remove the Consent field from Core and Universal templates if a user hasn't consented.
+* Bug: Remove Section Break description container is there is not a description included
+* Bug: Fix potential PHP error when using GravityView and PDF for GravityView
+* Housekeeping: Update PHP and JS dependencies
+
+= 6.5.5 =
+* Bug: Ensure PDF conditional logic is run through the correct sanitization function upon save
+* Bug: Ensure Gravity Wiz Populate Anything live merge tags are correctly processed in the $form_data array
+* Bug: Fix Monolog error when running PHP8.1
+
+= 6.5.4 =
+* Bug: Fix duplicate notifications when using PDF Background Processing while looping over GFAPI::submit_form()
+
+= 6.5.3 =
+* Bug: Fix HTTP(S) image/stylesheet loading problem in PDFs for SiteGround customers
+
+= 6.5.2 =
+* Bug: Fix PHP error when a non-string is passed to the Kses sanitizing class
+* Bug: Resolve memory problem generating Core PDFs if an HTML element contains more than 10+ classes (field CSS Classes are now truncated to 8 user-defined classes)
+* Bug: Fix Slim Image Cropper display problems in Core PDFs
+* Housekeeping: Update mPDF to the latest version
+* Housekeeping: Update QueryPath to the latest version
+
+= 6.5.1 =
+* Housekeeping: Update mPDF to the latest version
+* Bug: Resolve custom font installation issue for some .ttf files
+
+= 6.5.0 =
+* Housekeeping: Update Global Extension Settings UI to be Gravity Forms 2.5 compatible
+* Housekeeping: Adjust how admin Notices are handled on Gravity PDF pages
+* Housekeeping: Update JavaScript package bundle
+* Dev: Validate template filename when uploading via the PDF Template Manager (A-Za-z0-9_-)
+* Dev: Add filterable CSS class names to the PDF links in the admin area
+* Dev: Pass context to the `gfpdf_core_template` hook
+* Dev: Add `gfpdf_core_template_{form_id}` hook to target specific forms
+* Bug: Fix undefined `rtl` notice in Core PDF templates
+* Bug: Fix PHP8.1 notice when saving PDF settings
+
+= 6.4.7 =
+* Bug: Resolve blank PDF problem when a large HTML block is processed by mPDF
+* Bug: Resolve QueryPath deprecation notice about passing null to trim()
+* Housekeeping: Update mPDF and URL Signer library to latest version
+
+= 6.4.6 =
+* Bug: Adjust Nested Forms and Repeater field PDF markup to ensure a unique ID attribute for any HTML tags
+* Bug: Prevent duplicate grid css classes being added to Nested Forms HTML tags
+* Bug: Process merge tags in Background Image PDF setting before late escaping in the PDF HTML markup
+* Housekeeping: Remove initialized message from Gravity PDF logs
+
+= 6.4.5 =
+* Bug: Fix image display problem if filename had a space in it
+* Bug: Fix Background Image display problem on Windows OS
+* Developer: Added HTML field content to Repeater Field $form_data array
+
+= 6.4.4 =
+* Bug: Resolve HTML encoding issue in PDF when displaying Coupon field in Gravity Wiz eCommerce Perk's Product Table
+* Bug: Remove coupon line item in PDF when Gravity Wiz eCommerce Perk's Product Table in use
+* Bug: Resolve duplicate product table displayed in a legacy v3 template
+* Bug: Resolve PHP notice when displaying product table in legacy v3 template
+* Bug: Resolve PHP notice when displaying Section Break field in legacy v3 template
+
+= 6.4.3 =
+* Bug: Open PDF "view" link in a new browser tab on Entry List page
+* Bug: Only hide Select field in Core/Universal templates if the saved value is an empty string, not a falsey value
+* Bug: Prevent PHP notice when displaying Repeater field in PDFs with a Number sub-field
+* Bug: Prevent HTML attribute content from having their entities decoded if they were previously encoded
+* Bug: Fix Core/Universal template image display issues on servers running Windows
+
+= 6.4.2 =
+* Bug: Allow `data` protocol so Base 64-encoded images can be correctly displayed in Core/Universal templates
+* Bug: Fix Core Font Installer problem when running older versions of WordPress (5.3 to 5.8)
+* Bug: Fix fatal return type mismatch error if `safe_style_css` filter has been implemented incorrectly
+
+= 6.4.1 =
+* Bug: Fix PDF display issues with the Survey, Poll, Post Category, and Post Custom Fields
+
+= 6.4.0 =
+* Security (Hardening): Move from early escaping to late escaping variables on output
+* Security (Hardening): Add additional validation checks to the Core Font installer
+* Security (Hardening): Escape text returned from WordPress l10n functions
+* Security (Hardening): Escape any and all strings from the Gravity Forms form object, in any context (including PDFs)
+* Security (Hardening): Move to earlier sanitizing of user input
+* Security (Hardening): Custom PDF template filenames are now limited to the following characters: `A-Za-z0-9_-`
+* Security (Hardening): The `?html=1` and `?data=1` developer helper parameters now only work in non-production environments (`WP_ENVIRONMENT_TYPE !== 'production'`), or when Gravity PDF Debug Mode is explicitly enabled
+* Security (Hardening): Prevent directory traversal when loading the various Gravity PDF UI components
+* Security (Hardening): Change PDF Form Settings capability check from `gravityforms_edit_settings` to `gravityforms_edit_forms`
+* Security (Hardening): Change Font Manager CRUD capability check from `gravityforms_view_entries` to `gravityforms_edit_forms`
+* Security (Hardening): Switch to `sodium_crypto_secretbox_keygen()` function with modified fallback to `wp_generate_password()` when generating new PDF URL signing secret key
+* Security (Hardening): Switch from a Text to Password field for the Gravity PDF License Keys
+* Security (Hardening): Update PHP and JavaScript dependencies
+* Developer: Added `\GFPDF\Statics\Kses::output($html)` and `\GFPDF\Statics\Kses::parse($html)` methods for use with escaping/sanitizing HTML in PDFs (as an alternative to wp_kses_post()).
+* Performance: Register JavaScript in the footer on Gravity PDF admin pages
+* Privacy: Added "Get more info" link in the Core Font Installer instructions, and disclaimer to plugin's README.txt installation section
+* Bug: Fix issue passing PDF URL to Gravity Forms Mailchimp add-on
+* Bug: Allow hyphen in custom font key when updating or deleting to remain backwards compatible
+* Bug: Fix PHP8.1 type conversion warning in the template cache when transient's are flushed
+* Bug: Remove empty repeater sections from Core PDFs when not filled in by the user
+
+= 6.3.1 =
+* Security: Prevent potential XSS attack by escaping URL returned from add_query_args() on the PDF List or PDF Form Settings pages
+* Developer: Apply `gfpdf_current_form_object` filter added in 6.3.0 to the form object in Helper_Abstract_Fields.php using the $type `helper_abstract_fields`.
+* Bug: Correctly display the file path in the logs when cleaning up PDFs from disk or flushing the mPDF cache
+* Performance: reduce I/O operations when flushing the mPDF cache by excluding the top-level directory
+
+= 6.3.0 =
+* Feature: Support for mapping PDF URLs to your favorite services using Gravity Forms feeds. This includes (but is not limited to): PayPal, MailChimp, HubSpot, Stripe, Square, ActiveCampaign, Agile CRM, Capsule, CleverReach, Constant Contact, EmailOctopus, Zoho CRM
+* Feature: Support for the Zapier add-on: PDF URLs can now be passed to your zaps
+* Feature: Add [gravitypdf] shortcode rendering support to Gravity Wiz's Entry Block perk
+* Housekeeping: Change "document" icon used for settings menus to the "Gravity PDF" icon
+* Housekeeping: duplicating PDFs on a form will now have the correct alternating background color in the table
+* Housekeeping: Process the [gravitypdf] shortcode when merge tags get processed so that it can be used where ever merge tags are supported
+* Developer: Add new `gfpdf_current_form_object` filter to manipulate the $form array when processing PDFs
+* Bug: Fix a race condition when using Background Processing that could see the PDF deleted before being attached to notifications
+* Bug: Do not strip the backslash character when used in PDF settings
+
+= 6.2.1 =
+* Bug: Always generate a new PDF when using the GPDFAPI::create_pdf() method
+* Bug: Fix fatal error during PDF generation when using the `gform_address_display_format` filter
+
+= 6.2.0 =
+* Feature: Add support for Gravity Forms 2.6 (see Housekeeping below)
+* Housekeeping: Add alternate background color on PDF List page
+* Housekeeping: Add styles/support for new merge tag selector
+* Housekeeping: Add styles for Copy to Clipboard shortcode button on PDF List page
+* Housekeeping: Update help search API to query v6 documentation
+* Bug: Fix error message display issue on Form PDF add/edit page
+* Bug: Fix missing styles on multi-PDF view/download menu on Entry List page
+
+= 6.1.1 =
+* Bug: Allow number field to show a thousand separator by using the 'gform_include_thousands_sep_pre_format_number' filter.
+* Bug: Fix PHP Notice when displaying Repeater field caused by processing field's not present in `$form_data['field']` array key
+* Housekeeping: Add logging to file/directory cleanup method
+* Housekeeping: Add additional checks and logging when processing background tasks
+
+= 6.1.0 =
+* Feature: Add Copy to Clipboard feature for PDF Shortcode on the PDF List page
+* Bug: Fix empty check on the Radio field so a zero (0) value is not considered empty
+
+= 6.0.3 =
+* Bug: Reduce the Focus Gravity template column widths by a fraction to prevent edge-case display issues (props Hiwire Creative)
+* Bug: Fix Help page results text encoding problems
+* Bug: Prevent multiple font files being uploaded to a single dropzone
+* Bug: When checking if a Radio/Select field is empty in the PDF context, only look at the value property.
+
+= 6.0.2 =
+* Bug: Fix up 404 link for Outdated Templates in System Status
+* Bug: Revert vendor aliasing for mPDF and querypath (back to the original namespace) as it caused more problems than is solved. Developers: see https://docs.gravitypdf.com/v6/users/v5-to-v6-migration#changed-namespace-for-composer-packages
+
+= 6.0.1 =
+* Bug: When displaying the minimum Gravity Forms version not met error, remove `beta-1` as the minimum to prevent confusion.
+
+= 6.0.0 =
+This major release is designed specifically for Gravity Forms 2.5+ and includes breaking pages that may affect you. You are strongly encouraged to [review the upgrade guide before attempting to update to v6](https://docs.gravitypdf.com/v6/users/v5-to-v6-migration).
+
+= BREAKING CHANGES =
+* New minimum requirements PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+
+* Removed Gravity PDF v3 template stylesheet (swap legacy PDF template to Focus Gravity template)
+* Removed Gravity PDF v3 to v4 migration code (upgrade to v4/v5 before attempting v6 upgrade)
+* (Dev) Moved all vendor (Packagist) packages to new `GFPDF_Vendor/` namespace (BC aliasing for common classes included). Prevents all vendor conflicts with other plugins.
+* (Dev) Removed "Setup Custom Templates" tool (manually copy over template files to PDF Working Directory)
+* (Dev) Removed `shortname` property from `custom_fonts` global PDF options, and removed the requirement for the `font_name` to be unique (use `id` instead of `shortname`).
+* (Dev) Changed the first parameter $font_name in `GPDFAPI::delete_pdf_font()` to $font_id instead. You can no longer delete the font by
+ its name, as it is no longer a unique identifier.
+* (Dev) Majority of admin user interface markup (UI) changed to suit new GF2.5 UI ()
+* (Dev) Renamed `\GFPDF\Helper\Fields\Field_CreditCard` class to `Field_Creditcard`
+* (Dev) Change `\GFPDF\Model\Model_Install` __construct signature by removing `Helper_Abstract_Forms` dependancy from the start and adding `Model_Uninstall` at the end
+* (Dev) Change `\GFPDF\Model\Model_System_Report` __construct signature by adding new `Helper_Templates` dependancy at the end
+* (Dev) Removed `\GFPDF\View\View_Settings::system_status` method. Replaced by `Controller_|Model_|View_System_Report` classes for direct integration with Gravity Forms System Status page
+* (Dev) Removed undocumented `gfpdf_entry_detail_pre_container_markup` and `gfpdf_entry_detail_post_container_markup` actions
+* (Dev) Adjusted ID from `#tab_pdf` to `#tab_PDF` for container on Global PDF settings page. This ensures both the Global and Form PDF settings use a consistent ID.
+* (Dev) Change `\GFPDF\Model\Model_Install` __construct signature by removing `Helper_Abstract_Forms` dependancy from the start and adding `Model_Uninstall` at the end
+* (Dev) Change `\GFPDF\Model\Model_System_Report` __construct signature by adding new `Helper_Templates` dependancy at the end
+* (Dev) Removed `\GFPDF\View\View_Settings::system_status` method. Replaced by `Controller_|Model_|View_System_Report` classes for direct integration with Gravity Forms System Status page
+* (Dev) Removed undocumented `gfpdf_entry_detail_pre_container_markup` and `gfpdf_entry_detail_post_container_markup` actions
+* (Dev) Adjusted ID from `#tab_pdf` to `#tab_PDF` for container on Global PDF settings page. This ensures both the Global and Form PDF settings use a consistent ID.
+* (Dev) Deprecate Helper_Abstract_Options::get_font_short_name(). No direct replacement as the font 'shortname' has been phased out (using unique ID now).
+* (Dev) Updated field description markup to use DIVs instead of SPANs. Matches Gravity Forms RC1
+* (Dev) Deprecate these methods from `\GFPDF\Model\Model_Install`: `uninstall_plugin`, `remove_plugin_options`, `remove_plugin_form_settings`, `remove_folder_structure`, `deactivate_plugin`. All moved to `Model_Uninstall`.
+
+= NEW FEATURES =
+* Brand new admin user interface (UI) to seamlessly match the Gravity Forms (GF) 2.5 UI.
+* Added support for new GF columns feature in Core PDFs
+* Add PDF column support for Gravity Perks Nested Forms
+* Added RTL support for new GF columns feature in Core PDFs
+* Refreshed Font Manager with better validation, error handling, and automatic support for fonts that include Open Type Layout features.
+* Added new PDF metabox on Entry Details page. Includes a better user experience for forms with a lot of PDFs configured.
+* Added new merge tag modifiers :download, :print, :signed, :signed:expiry to enhance existing PDF mergetag (modifiers can all be used in conjunction)
+* Add PDF URL to Webhook add-on "All Fields" request body
+* Add ability to include PDF URLs in Entry exports
+* Add Gravity PDF info to Gravity Forms System Status page
+* Show plugin downgrade prompt when minimum WordPress, Gravity Forms, or PHP requirements aren't met so users can easily roll back to the latest supported v5.x version.
+* Add support for WordPress' native Background Updates
+* Add accessibility improvements for keyboard users and screen readers on all Gravity PDF UIs
+* Display warning on System Status page when Core template overrides are out of date
+* Include Add/Update PDF button below each section on PDF creation page to make it easy to save
+* Improve RTL support on admin pages
+
+= UX IMPROVEMENTS =
+* Remove the Always Save PDF setting from the UI.
+* Switch all Radio PDF settings to new Toggle setting
+* Switch all Multiselect PDF settings to Checkbox field (better accessibility)
+* Rename PDF setting "Name" to "Label"
+* Replace asterisk `*` to text `(required)` to signify required fields (better accessibility)
+* Rename PDF setting "Orientation" to "Paper Orientation"
+* Refine PDF settings descriptions.
+* Removed Welcome Page
+* Move Paper Size global settings below the Template / Font settings
+* Removed rich Select functionality (using Chosen) in UI for greater accessibility
+* Remove WP Dialog prompts in UI for greater accessibility
+* Move Gravity PDF uninstaller from Tools tab to Gravity Forms Uninstall settings page
+
+= BUG FIXES =
+* Ignore `content-type` header API response when running the Core Font installer
+* Make all `GFPDFAPI` API class error responses translatable
+* Fix PHP8 notice
+* Prevent background queue from continuing if retry limit reached on unrecoverable task (like generating the PDF)
+* Adjust custom paper size sanitize logic to fix PHP error
+* Check for invalid relative date when using Signed PDF URLs and fallback to default timeout
+* Fix border display issue in Core Product table
+* Show error message in Template Manager when maximum file size limit is reached
+
+= DEVELOPER IMPROVEMENTS =
+* Rewritten all CSS in SASS
+* Add `GPDFAPI::get_entry_pdfs( $entry_id )` method to API. Acts like `GPDFAPI::get_form_pdfs( $form_id )` but filters out any PDFs that don't pass conditional logic checks for the current entry.
+* Added `Helper_Abstract_Config_Settings` class which template config files can extend to automatically have the current PDF settings injected into the class.
+* Adjusted some logged items to use less severe alerts (when template config file doesn't exist, and when native PDF support for a field doesn't exist)
+* Upgrade vendor packages to latest versions
+* Remove all backbone.js and underscore.js Font Manager code from Gravity PDF admin pages
+* Remove gulp as dependency (build is done using only webpack now)
+* Add better error log messages for PDF Merge tag processing
+* Pass additional information to the `gfpdf_field_container_class` filter
 
 = 5.4.0 =
 * Feature: Prevent update to 6.0 if minimum requirements are not met (including when automatic updates enabled)
