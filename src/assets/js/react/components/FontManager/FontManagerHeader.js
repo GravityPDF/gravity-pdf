@@ -25,7 +25,7 @@ const CloseDialogWithRouter = withRouterHooks(CloseDialog);
  */
 const FontManagerHeader = ({ id }) => (
 	<div data-test="component-FontManagerHeader" className="theme-header">
-		<h1>Font Manager</h1>
+		<h1>{GFPDF.fontManagerTitle}</h1>
 
 		<CloseDialogWithRouter id={id} />
 	</div>

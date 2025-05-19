@@ -287,8 +287,10 @@ class Helper_Data {
 				'coreFontAriaLabel'                    => esc_html__( 'Core font installation', 'gravity-pdf' ),
 
 				/* Font Manager */
+				'fontManagerTitle'                     => esc_html__( 'Font Manager', 'gravity-pdf' ),
 				'fontManagerSearchPlaceHolder'         => esc_html__( 'Search installed fonts', 'gravity-pdf' ),
 				'fontListInstalledFonts'               => esc_html__( 'Installed Fonts', 'gravity-pdf' ),
+				'fontUserDefinedGroup'                 => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
 				'fontListRegular'                      => esc_html__( 'Regular', 'gravity-pdf' ),
 				'fontListRegularRequired'              => esc_html__( 'Regular %1$s(required)%2$s', 'gravity-pdf' ),
 				'fontListItalics'                      => esc_html__( 'Italics', 'gravity-pdf' ),

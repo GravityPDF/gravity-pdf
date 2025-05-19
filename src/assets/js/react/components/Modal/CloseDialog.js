@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 /* Redux actions */
 import { getCustomFontList, clearAddFontMsg } from '../../actions/fontManager';
 /* Utilities */
-import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox';
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
 /**
@@ -32,8 +31,6 @@ export class CloseDialog extends Component {
 		getCustomFontList: PropTypes.func.isRequired,
 		clearAddFontMsg: PropTypes.func.isRequired,
 		templateList: PropTypes.arrayOf(PropTypes.object).isRequired,
-		fontList: PropTypes.arrayOf(PropTypes.object).isRequired,
-		selectedFont: PropTypes.string.isRequired,
 		msg: PropTypes.object.isRequired,
 		navigate: PropTypes.func.isRequired,
 		pathname: PropTypes.string.isRequired,
@@ -71,16 +68,6 @@ export class CloseDialog extends Component {
 	 */
 	componentWillUnmount() {
 		document.removeEventListener('keydown', this.handleKeyPress, false);
-
-		const { fontList, selectedFont } = this.props;
-		const tabLocation = window.location.search.substring(
-			window.location.search.lastIndexOf('=') + 1
-		);
-
-		/* Ensure associated font manager select box has the latest data */
-		if (tabLocation !== 'tools') {
-			return associatedFontManagerSelectBox(fontList, selectedFont);
-		}
 	}
 
 	/**
@@ -158,8 +145,6 @@ export class CloseDialog extends Component {
  *
  * @return {{
  *  templateList: Array<Object>,
- *  fontList: Array<Object>,
- *  selectedFont: string,
  *  msg: Object
  * }} mappedState
  *
@@ -167,8 +152,6 @@ export class CloseDialog extends Component {
  */
 const mapStateToProps = (state) => ({
 	templateList: state.template.list,
-	fontList: state.fontManager.fontList,
-	selectedFont: state.fontManager.selectedFont,
 	msg: state.fontManager.msg,
 });
 
