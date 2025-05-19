@@ -42,6 +42,15 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	protected $action = 'gravitypdf';
 
 	/**
+	 * Restrict object instantiation when using unserialize.
+	 *
+	 * @since 2.9.7
+	 *
+	 * @var bool|array
+	 */
+	protected $allowed_batch_data_classes = false;
+
+	/**
 	 * Helper_Pdf_Queue constructor.
 	 *
 	 * @param LoggerInterface $log
@@ -51,8 +60,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	public function __construct( LoggerInterface $log ) {
 		parent::__construct();
 
-		$this->log                        = $log;
-		$this->allowed_batch_data_classes = false;
+		$this->log = $log;
 	}
 
 	/**
@@ -82,8 +90,6 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 		if ( ! isset( $callback['id'], $callback['func'] ) ) {
 			$this->log->critical( 'PDF queue ran with invalid queue item', [ 'callbacks' => $callbacks ] );
 
-			$this->cancel_process();
-
 			return false;
 		}
 
@@ -103,8 +109,6 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 					'callbacks' => $callbacks,
 				]
 			);
-
-			$this->cancel_process();
 
 			return false;
 		}
@@ -127,9 +131,9 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 				]
 			);
 
-			/* Add back to our queue to retry (up to a grand total of three times) */
-			if ( empty( $callback['retry'] ) || $callback['retry'] < 2 ) {
-				$callback['retry'] = isset( $callback['retry'] ) ? $callback['retry'] + 1 : 1;
+			/* Add back to our queue to retry once */
+			if ( empty( $callback['retry'] ) ) {
+				$callback['retry'] = 1;
 				array_unshift( $callbacks, $callback );
 			} else {
 				$this->log->error(
@@ -138,19 +142,6 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 						$callback['id']
 					)
 				);
-
-				if ( $callback['unrecoverable'] ?? false ) {
-					$this->log->critical(
-						'Cancel async queue due to retry limit reached on unrecoverable callback.',
-						[
-							'callbacks' => $callbacks,
-						]
-					);
-
-					$this->cancel_process();
-
-					$callbacks = [];
-				}
 			}
 		}
 
