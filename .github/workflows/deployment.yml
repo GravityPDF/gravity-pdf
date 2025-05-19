@@ -9,9 +9,6 @@ jobs:
   pdf-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Subversion
-        run: sudo apt-get update && sudo apt-get install -y subversion
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -38,7 +35,6 @@ jobs:
           yarn --version
           curl --version
           git --version
-          svn --version
           php --version
           composer --version        
 
@@ -59,6 +55,9 @@ jobs:
     name: Build and Deploy Plugin
     runs-on: ubuntu-latest
     steps:
+      - name: Install Subversion
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
