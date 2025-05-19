@@ -244,14 +244,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 		foreach ( $this->form_async_notifications as $notification ) {
 			$tasks = $this->get_queue_tasks( $entry, $form, [ $notification ] );
 
-			/* if older version of Gravity Forms group tasks together */
-			if ( version_compare( \GFCommon::$version, '2.9.7', '<' ) ) {
-				$this->queue->push_to_queue( $tasks );
-			} else {
-				/* if newer version of Gravity Forms, push each task individually */
-				foreach ( $tasks as $task ) {
-					$this->queue->push_to_queue( [ $task ] );
-				}
+			/* Push each task individually for forwards compatibility with new Background Processing update */
+			foreach ( $tasks as $task ) {
+				$this->queue->push_to_queue( [ $task ] );
 			}
 		}
 	}
@@ -350,10 +345,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 
 		foreach ( $pdfs as $pdf ) {
 			$pdf_queue_data = [
-				'id'            => 'create-pdf-' . $this->get_queue_id( $form, $entry, $pdf ),
-				'func'          => '\GFPDF\Statics\Queue_Callbacks::create_pdf',
-				'args'          => [ $entry['id'], $pdf['id'] ],
-				'unrecoverable' => true,
+				'id'   => 'create-pdf-' . $this->get_queue_id( $form, $entry, $pdf ),
+				'func' => '\GFPDF\Statics\Queue_Callbacks::create_pdf',
+				'args' => [ $entry['id'], $pdf['id'] ],
 			];
 
 			/* Check if we need to save the PDF due to a filter */

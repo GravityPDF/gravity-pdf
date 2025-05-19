@@ -115,16 +115,16 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test our queue attempts to run up to three times when a function throws an exception
+	 * Test our queue attempts to run up to two times when a function throws an exception
 	 *
 	 * @since 5.0
 	 */
 	public function test_failed_queue_tasks() {
 		$mock = $this->getMockBuilder( 'stdClass' )
-					 ->setMethods( [ 'callback' ] )
+					 ->addMethods( [ 'callback' ] )
 					 ->getMock();
 
-		$mock->expects( $this->exactly( 3 ) )
+		$mock->expects( $this->exactly( 2 ) )
 			 ->method( 'callback' )
 			 ->will( $this->throwException( new Exception ) );
 

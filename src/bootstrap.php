@@ -213,7 +213,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				require_once GFCommon::get_base_path() . '/includes/async/class-gf-background-process.php';
 			}
 
-			class_alias( \Gravity_Forms\Gravity_Forms\Async\GF_Background_Process::class, 'GF_Background_Process', false );
+			if ( ! class_exists( 'GF_Background_Process' ) ) {
+				class_alias( \Gravity_Forms\Gravity_Forms\Async\GF_Background_Process::class, 'GF_Background_Process', false );
+			}
 		} elseif ( ! class_exists( 'WP_Async_Request' ) ) {
 				require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
 		}
