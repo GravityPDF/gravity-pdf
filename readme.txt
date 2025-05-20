@@ -123,7 +123,7 @@ No. Gravity PDF can only be used with Gravity Forms. It cannot generate PDFs for
 == Changelog ==
 
 = 6.12.5.1 =
-* 🧹 Update version number in readme.txt file
+* 🧹 Housekeeping: Update version number in readme.txt file
 
 = 6.12.5 =
 * 🐞 Bug: Fix slow PDF Background Processing queue after a retry delay was added to the background processing library in Gravity Forms 2.9.7+
