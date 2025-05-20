@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 6.12.4
+Stable tag: 6.12.5.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -122,8 +122,11 @@ No. Gravity PDF can only be used with Gravity Forms. It cannot generate PDFs for
 
 == Changelog ==
 
+= 6.12.5.1 =
+* 🧹 Update version number in readme.txt file
+
 = 6.12.5 =
-* 🐞Bug: Fix slow PDF Background Processing queue after a retry delay was added to the background processing library in Gravity Forms 2.9.7+
+* 🐞 Bug: Fix slow PDF Background Processing queue after a retry delay was added to the background processing library in Gravity Forms 2.9.7+
 * 🧹 Housekeeping: Update PDF Background Processing queue to be compatible with Gravity Forms 2.9.7+ background processing library update
 * 🧹 Housekeeping: Fix Background Processing deprecation notice when running Gravity Forms 2.9.7+
 
