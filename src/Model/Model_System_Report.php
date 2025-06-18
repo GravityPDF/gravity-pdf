@@ -175,6 +175,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$items[0] = [
 			'memory'            => [
 				'label'        => esc_html__( 'WP Memory', 'gravity-pdf' ),
+				'label_export' => 'WP Memory',
 				'value'        => $memory['value'],
 				'value_export' => $memory['value_export'],
 			],
@@ -186,53 +187,62 @@ class Model_System_Report extends Helper_Abstract_Model {
 			],
 
 			'default_charset'   => [
-				'label' => esc_html__( 'Default Charset', 'gravity-pdf' ),
-				'value' => ini_get( 'default_charset' ),
+				'label'        => esc_html__( 'Default Charset', 'gravity-pdf' ),
+				'label_export' => 'Default Charset',
+				'value'        => ini_get( 'default_charset' ),
 			],
 
 			'internal_encoding' => [
-				'label' => esc_html__( 'Internal Encoding', 'gravity-pdf' ),
-				'value' => ini_get( 'internal_encoding' ) ?: ini_get( 'default_charset' ), //phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+				'label'        => esc_html__( 'Internal Encoding', 'gravity-pdf' ),
+				'label_export' => 'Internal Encoding',
+				'value'        => ini_get( 'internal_encoding' ) ?: ini_get( 'default_charset' ), //phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 			],
 		];
 
 		/* Directory and Permissions */
 		$items[1] = [
 			'pdf_working_directory'     => [
-				'label' => esc_html__( 'PDF Working Directory', 'gravity-pdf' ),
-				'value' => $this->templates->get_template_path(),
+				'label'        => esc_html__( 'PDF Working Directory', 'gravity-pdf' ),
+				'label_export' => 'PDF Working Directory',
+				'value'        => $this->templates->get_template_path(),
 			],
 
 			'pdf_working_directory_url' => [
-				'label' => esc_html__( 'PDF Working Directory URL', 'gravity-pdf' ),
-				'value' => $this->templates->get_template_url(),
+				'label'        => esc_html__( 'PDF Working Directory URL', 'gravity-pdf' ),
+				'label_export' => 'PDF Working Directory URL',
+				'value'        => $this->templates->get_template_url(),
 			],
 
 			'font_folder_location'      => [
-				'label' => esc_html__( 'Font Folder location', 'gravity-pdf' ),
-				'value' => $this->data->template_font_location,
+				'label'        => esc_html__( 'Font Folder location', 'gravity-pdf' ),
+				'label_export' => 'Font Folder location',
+				'value'        => $this->data->template_font_location,
 			],
 
 			'temp_folder_location'      => [
-				'label' => esc_html__( 'Temporary Folder location', 'gravity-pdf' ),
-				'value' => $this->data->template_tmp_location,
+				'label'        => esc_html__( 'Temporary Folder location', 'gravity-pdf' ),
+				'label_export' => 'Temporary Folder location',
+				'value'        => $this->data->template_tmp_location,
 			],
 
 			'temp_folder_permission'    => [
 				'label'        => esc_html__( 'Temporary Folder permissions', 'gravity-pdf' ),
+				'label_export' => 'Temporary Folder permissions',
 				'value'        => $temp_folder_permission['value'],
 				'value_export' => $temp_folder_permission['value_export'],
 			],
 
 			'temp_folder_protected'     => [
 				'label'        => esc_html__( 'Temporary Folder protected', 'gravity-pdf' ),
+				'label_export' => 'Temporary Folder protected',
 				'value'        => $temp_folder_protected['value'],
 				'value_export' => $temp_folder_protected['value_export'],
 			],
 
 			'mpdf_temp_folder_location' => [
-				'label' => esc_html__( 'mPDF Temporary location', 'gravity-pdf' ),
-				'value' => $this->data->mpdf_tmp_location,
+				'label'        => esc_html__( 'mPDF Temporary location', 'gravity-pdf' ),
+				'label_export' => 'mPDF Temporary location',
+				'value'        => $this->data->mpdf_tmp_location,
 			],
 		];
 
@@ -241,6 +251,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		if ( ! empty( $template_status ) ) {
 			$items[1]['outdated_templates'] = [
 				'label'        => esc_html__( 'Outdated Templates', 'gravity-pdf' ),
+				'label_export' => 'Outdated Templates',
 				'value'        => $template_status['value'],
 				'value_export' => $template_status['value_export'],
 			];
@@ -260,24 +271,28 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$items[2] = [
 			'canonical_release'             => [
 				'label'        => esc_html__( 'Canonical Release', 'gravity-pdf' ),
+				'label_export' => 'Canonical Release',
 				'value'        => $is_canonical_release ? $this->getController()->view->get_icon( true ) : $this->getController()->view->get_icon( false ) . $is_not_canonical_release_message,
-				'value_export' => $is_canonical_release ? esc_html__( 'Yes', 'gravity-pdf' ) : esc_html__( 'No', 'gravity-pdf' ),
+				'value_export' => $is_canonical_release ? 'Yes' : 'No',
 			],
 
 			'pdf_entry_list_action'         => [
 				'label'        => esc_html__( 'PDF Entry List Action', 'gravity-pdf' ),
+				'label_export' => 'PDF Entry List Action',
 				'value'        => $this->options->get_option( 'default_action', 'View' ) === 'View' ? esc_html__( 'View', 'gravity-pdf' ) : esc_html__( 'Download', 'gravity-pdf' ),
 				'value_export' => $this->options->get_option( 'default_action', 'View' ),
 			],
 
 			'background_processing_enabled' => [
 				'label'        => esc_html__( 'Background Processing', 'gravity-pdf' ),
+				'label_export' => 'Background Processing',
 				'value'        => $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-pdf' ),
 				'value_export' => $this->options->get_option( 'background_processing', 'No' ),
 			],
 
 			'debug_mode_enabled'            => [
 				'label'        => esc_html__( 'Debug Mode', 'gravity-pdf' ),
+				'label_export' => 'Debug Mode',
 				'value'        => $this->options->get_option( 'debug_mode', 'No' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-pdf' ),
 				'value_export' => $this->options->get_option( 'debug_mode', 'No' ),
 			],
@@ -286,12 +301,14 @@ class Model_System_Report extends Helper_Abstract_Model {
 		/* Security Settings */
 		$items[3] = [
 			'user_restrictions'  => [
-				'label' => esc_html__( 'User Restrictions', 'gravity-pdf' ),
-				'value' => implode( ', ', $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] ) ),
+				'label'        => esc_html__( 'User Restrictions', 'gravity-pdf' ),
+				'label_export' => 'User Restrictions',
+				'value'        => implode( ', ', $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] ) ),
 			],
 
 			'logged_out_timeout' => [
 				'label'        => esc_html__( 'Logged Out Timeout', 'gravity-pdf' ),
+				'label_export' => 'Logged Out Timeout',
 				'value'        => $this->options->get_option( 'logged_out_timeout', '20' ) . ' ' . esc_html__( 'minute(s)', 'gravity-pdf' ),
 				'value_export' => $this->options->get_option( 'logged_out_timeout', '20' ) . ' minutes(s)',
 			],
@@ -310,7 +327,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 		return [
 			'value'        => $this->getController()->view->memory_limit_markup( $memory ),
-			'value_export' => $memory . 'MB',
+			'value_export' => $memory === -1 ? 'Unlimited' : $memory . 'MB',
 		];
 	}
 

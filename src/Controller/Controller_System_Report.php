@@ -65,12 +65,13 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Include the add-on table in the PHP Server Environment system status.
+	 * Add the Gravity PDF system report to the Gravity Forms report
 	 *
 	 * @param array $system_report
 	 *
 	 * @return array
 	 * @since 5.3
+	 * @since 6.12.6 Moved data to the end of the report
 	 */
 	public function system_report( $system_report ) {
 
@@ -78,7 +79,10 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 			$gravitypdf_report = $this->model->build_gravitypdf_report();
 			$system_report     = $this->model->move_gravitypdf_active_plugins_to_gf_addons( $system_report );
 
-			array_splice( $system_report, 1, 0, $gravitypdf_report );
+			$system_report = array_merge(
+				$system_report,
+				$gravitypdf_report
+			);
 		}
 
 		return $system_report;

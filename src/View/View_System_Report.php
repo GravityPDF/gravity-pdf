@@ -126,9 +126,11 @@ class View_System_Report extends Helper_Abstract_View {
 	public function get_template_check_message( string $path, string $template_version, string $core_version ): array {
 		$message = sprintf( esc_html__( '%1$s version %2$s is out of date. The core version is %3$s', 'gravity-pdf' ), $path, '<span style="color: #ff0000;font-weight:bold">' . $template_version . '</span>', $core_version );
 
+		$export_message = sprintf( '%1$s version %2$s is out of date. The core version is %3$s', $path, $template_version, $core_version );
+
 		return [
 			'value'        => $message . $this->get_icon( false ) . '<hr>',
-			'value_export' => wp_strip_all_tags( $message ) . "   &#10008;\n",
+			'value_export' => $export_message . "   &#10008;\n",
 		];
 	}
 
