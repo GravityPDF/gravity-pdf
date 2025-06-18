@@ -2418,6 +2418,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 5.3
 	 */
 	public function process_gp_populate_anything( $text, $form, $entry ) {
+		if ( ! method_exists( '\GP_Populate_Anything_Live_Merge_Tags', 'replace_live_merge_tags_static' ) ) {
+			return $text;
+		}
+
 		$gp = GP_Populate_Anything_Live_Merge_Tags::get_instance();
 
 		$this->disable_gp_populate_anything();
@@ -2543,6 +2547,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 6.10.2
 	 */
 	public function gp_populate_anything_hydrate_form( $form, $entry ) {
+		if ( ! method_exists( '\GP_Populate_Anything', 'populate_form' ) ) {
+			return $form;
+		}
+
 		static $cache = [];
 
 		$form_id  = $form['id'] ?? '';
