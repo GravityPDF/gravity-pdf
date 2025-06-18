@@ -341,7 +341,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		}
 
 		/* Backwards compat */
-		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] );
+		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'] ?? 0, $this->form['id'] ?? 0 );
 
 		/**
 		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_field_content for usage
