@@ -4,6 +4,7 @@ namespace GFPDF\Tests;
 
 use Exception;
 use GFPDF\Controller\Controller_Pdf_Queue;
+use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Statics\Queue_Callbacks;
 use WP_UnitTestCase;
@@ -368,5 +369,44 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 
 		$this->assertFileDoesNotExist( $test_file );
 		$this->assertFileDoesNotExist( $path );
+	}
+
+	/**
+	 * Verify any scheduled queues are cleaned up when the queue setting is toggled
+	 *
+	 * @since 6.12.6
+	 */
+	public function test_queue_cleanup() {
+		global $gfpdf;
+
+		/* setup page */
+		$_POST['option_page'] = 'gfpdf_settings';
+		$_POST['_wp_http_referer'] = '/';
+
+		$queue = new Helper_Pdf_Queue( $gfpdf->log );
+
+		/* Create queue and verify  */
+		$queue->push_to_queue( 'item1' )->save();
+		$queue->push_to_queue( 'item2' )->save();
+
+		$this->assertCount( 2, $queue->get_batches() );
+
+		/* Toggle the settings and verify */
+		/** @var Helper_Abstract_Options $options */
+		$options = $gfpdf->options;
+
+		$options->update_option( 'background_processing', 'Yes' );
+		$options->update_settings( [ 'background_processing' => 'No' ] );
+
+		$this->assertCount( 0, $queue->get_batches() );
+
+		/* Add new queue items, update the settings without toggling and verify the queue remains */
+		$queue->push_to_queue( 'item1' )->save();
+		$queue->push_to_queue( 'item2' )->save();
+
+		$this->assertCount( 2, $queue->get_batches() );
+
+		$options->update_settings( [ 'background_processing' => 'No' ] );
+		$this->assertCount( 2, $queue->get_batches() );
 	}
 }

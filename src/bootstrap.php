@@ -947,6 +947,28 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$this->singleton->add_class( $queue );
 		$this->singleton->add_class( $class );
+
+		/**
+		 * Clear our any items in the queue when the feature is toggled on/off
+		 *
+		 * Needs to be outside the controller class so it works when the feature is toggled on and off.
+		 *
+		 * @param string $new_value The value being saved for the Background Processing setting
+		 *
+		 * @since 6.12.6
+		 */
+		$gfpdf_settings_sanitize = function ( $new_value, $key ) use ( $queue ) {
+			if ( $key === 'background_processing' ) {
+				$current_value = \GPDFAPI::get_plugin_option( 'background_processing' );
+				if ( $current_value !== $new_value ) {
+					$queue->clear_queue();
+				}
+			}
+
+			return $new_value;
+		};
+
+		add_filter( 'gfpdf_settings_sanitize', $gfpdf_settings_sanitize, 10, 2 );
 	}
 
 	/**
