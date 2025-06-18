@@ -164,6 +164,16 @@ class Helper_Logger {
 			/* Enable logging if not equivalent to 0 or non-existent and not level 6 ("off" in GF world) */
 			if ( ! empty( $log_level ) && $log_level !== 6 ) {
 
+				/* Check log file can be created */
+				$log_path = dirname( $log_filename );
+				if ( ! wp_mkdir_p( $log_path ) ) {
+					return;
+				}
+
+				if ( ! @touch( $log_filename ) ) { // phpcs:ignore
+					return;
+				}
+
 				/* Convert Gravity Forms log levels to the appropriate Monolog level */
 				$monolog_level = ( $log_level === 4 ) ? Logger::ERROR : Logger::DEBUG;
 
