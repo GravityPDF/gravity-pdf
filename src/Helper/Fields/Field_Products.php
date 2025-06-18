@@ -37,12 +37,14 @@ class Field_Products extends Helper_Abstract_Fields {
 	 */
 	public function is_empty() {
 
-		/* Set up the form / lead information */
-		$form = $this->form;
-		$lead = $this->entry;
+		$form  = $this->form;
+		$entry = $this->entry;
 
 		/* Get all products for this field */
-		$products = GFCommon::get_product_fields( $form, $lead, true );
+		$use_value       = (bool) apply_filters( 'gfpdf_show_field_value', false, $this->field, '' ); /* Set to `true` to show a field's value instead of the label */
+		$use_admin_label = (bool) apply_filters( 'gfpdf_use_admin_label', false, $this->field, '' ); /* Set to `true` to use the admin label */
+
+		$products = GFCommon::get_product_fields( $form, $entry, ! $use_value, $use_admin_label );
 
 		if ( count( $products['products'] ) > 0 ) {
 			return false; /* not empty */
