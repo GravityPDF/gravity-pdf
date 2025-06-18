@@ -102,7 +102,7 @@ class Field_List extends Helper_Abstract_Fields {
 
 		/* get out field value */
 		$value   = $this->value();
-		$columns = is_array( $value[0] );
+		$columns = is_array( $value[0] ?? '' );
 
 		/* Start buffer and generate a list table */
 		ob_start();
@@ -191,7 +191,7 @@ class Field_List extends Helper_Abstract_Fields {
 	 *
 	 * @since 4.0
 	 */
-	private function remove_empty_list_rows( $list_array ) {
+	protected function remove_empty_list_rows( $list_array ) {
 
 		/* if list field empty return early */
 		if ( ! is_array( $list_array ) || count( $list_array ) === 0 ) {
@@ -218,12 +218,19 @@ class Field_List extends Helper_Abstract_Fields {
 					}
 				}
 
+				unset( $col );
+
 				/* Remove row from list */
 				if ( $empty ) {
 					unset( $list_array[ $id ] );
 				}
 			}
+
+			unset( $row );
 		}
+
+		/* Reset the array structure */
+		$list_array = array_values( $list_array );
 
 		return $list_array;
 	}
