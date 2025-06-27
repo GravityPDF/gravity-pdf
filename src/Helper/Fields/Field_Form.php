@@ -91,10 +91,10 @@ class Field_Form extends Helper_Abstract_Fields {
 			$this->field->id = "$field_id-$key";
 
 			$html .= parent::html( $markup );
-		}
 
-		/* Reset the ID back to the original value */
-		$this->field->id = $field_id;
+			/* Reset the ID back to the original value */
+			$this->field->id = $field_id;
+		}
 
 		return $html;
 	}
