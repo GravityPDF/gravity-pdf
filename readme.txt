@@ -122,8 +122,11 @@ No. Gravity PDF can only be used with Gravity Forms. It cannot generate PDFs for
 
 == Changelog ==
 
-= 6.12.6.1 =
+= 6.12.6.2 =
 * 🧹 Housekeeping: Remove plugin update code
+
+= 6.12.6.1 =
+* 🧹 Housekeeping: Update version number in readme.txt file
 
 = 6.12.6 =
 * 🐞 Bug: Add additional guards for expected value when displaying File Upload field in PDFs (prevents PHP notice)
