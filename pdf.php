@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 6.12.6
+Version: 6.12.6.1
 Description: Automatically generate highly-customizable PDF documents using Gravity Forms and WordPress (canonical)
 Author: Blue Liquid Designs
 Author URI: https://blueliquiddesigns.com.au
@@ -36,7 +36,7 @@ if ( defined( 'PDF_PLUGIN_BASENAME' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '6.12.6' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '6.12.6.1' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -535,7 +535,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 			\GFCommon::add_dismissible_message(
 				$message,
 				'gravity-pdf-canonical-plugin-notice',
-				'warning',
+				'error',
 				'install_plugins',
 				true
 			);
@@ -555,13 +555,13 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 
 			printf(
 				'<tr class="plugin-update-tr %3$s" id="%1$s-update" data-slug="%1$s" data-plugin="%2$s">',
-				esc_attr( $plugin_data['slug'] ),
-				esc_attr( $plugin_data['plugin'] ),
+				esc_attr( $plugin_data['slug'] ?? '' ),
+				esc_attr( $plugin_data['plugin'] ?? '' ),
 				'active'
 			);
 
 			echo '<td colspan="4" class="plugin-update colspanchange">';
-			echo '<div class="notice inline notice-warning notice-alt"><p>';
+			echo '<div class="notice inline notice-error notice-alt"><p>';
 
 			echo wp_kses(
 				sprintf(
