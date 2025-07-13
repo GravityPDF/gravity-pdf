@@ -47,6 +47,9 @@ FILES=(
 "${PACKAGE_DIR}/.nvmrc"
 "${PACKAGE_DIR}/.wp-env.json"
 "${PACKAGE_DIR}/.testcaferc.js"
+"${PACKAGE_DIR}/.eslintignore"
+"${PACKAGE_DIR}/.eslintrc.js"
+"${PACKAGE_DIR}/babel.config.js"
 )
 
 for i in "${FILES[@]}"
@@ -59,6 +62,7 @@ rm -f -R "${PACKAGE_DIR}/src/assets/js"
 rm -f -R "${PACKAGE_DIR}/bin"
 rm -f -R "${PACKAGE_DIR}/.php-scoper"
 rm -f -R "${PACKAGE_DIR}/webpack-configs"
+rm -f -R "${PACKAGE_DIR}/tools"
 
 # Generate language files
 cd "${PACKAGE_DIR}"
