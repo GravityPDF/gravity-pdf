@@ -4,7 +4,7 @@ namespace GFPDF\Helper;
 
 use Exception;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
-use GFPDF_Vendor\Mpdf\Mpdf;
+use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use Psr\Log\LoggerInterface;
@@ -619,7 +619,7 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
-		$this->mpdf = new Helper_Mpdf(
+		$this->mpdf = new Mpdf(
 			apply_filters(
 				'gfpdf_mpdf_class_config',
 				[

@@ -59,6 +59,10 @@ return [
 				$content = str_replace( "$prefix\\\\</t\\\\1", '</t\\\\1', $content );
 			}
 
+			if ( basename( $filePath ) === 'ServiceFactory.php' ) {
+				$content = str_replace( 'new Cache(', 'new \GFPDF\Helper\Mpdf\Cache(', $content );
+			}
+
 			/* Remove type hinting from prefixed logger */
 			$files = [
 				'LoggerAwareInterface.php',
