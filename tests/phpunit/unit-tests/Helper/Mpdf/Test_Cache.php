@@ -1,4 +1,3 @@
-
 <?php
 
 declare( strict_types=1 );
@@ -24,8 +23,6 @@ class Test_Cache extends WP_UnitTestCase {
 	 * @dataProvider provider_createDirectory
 	 */
 	public function test_createDirectory( $permission ) {
-		clearstatcache();
-
 		$basepath     = sys_get_temp_dir() . '/mpdf-cache/';
 		$tmp_basepath = $basepath . 'tmp/';
 
