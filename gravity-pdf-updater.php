@@ -121,8 +121,8 @@ add_action(
 
 		printf(
 			'<tr class="plugin-update-tr %3$s" id="%1$s-update" data-slug="%1$s" data-plugin="%2$s">',
-			esc_attr( $plugin_data['slug'] ),
-			esc_attr( $plugin_data['plugin'] ),
+			esc_attr( $plugin_data['slug'] ?? '' ),
+			esc_attr( $plugin_data['plugin'] ?? '' ),
 			'inactive'
 		);
 
