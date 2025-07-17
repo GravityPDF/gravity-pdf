@@ -985,7 +985,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			margin-bottom: 0;
 		  }
 		</style>
-		
+
 		<div id="gravitypdf-pdf-box-container" class="postbox">
 
 			<h3 class="hndle" style="cursor:default;">
@@ -1951,30 +1951,44 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Clean-up our tmp directory every 12 hours
+	 * Clean-up the tmp directory/ies
 	 *
 	 * @return void
 	 *
 	 * @since 4.0
 	 */
 	public function cleanup_tmp_dir() {
-		$max_file_age  = time() - 12 * 3600; /* Max age is 12 hours old */
-		$tmp_directory = $this->data->template_tmp_location;
 
-		if ( is_dir( $tmp_directory ) ) {
+		$config = [
+			/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
+			[
+				'dir' => $this->data->mpdf_tmp_location,
+				'age' => time() - 3600, // 1 hour
+			],
+
+			[
+				'dir' => $this->data->template_tmp_location,
+				'age' => time() - 12 * 3600, // 12 hour
+			],
+		];
+
+		foreach ( $config as $item ) {
+			if ( ! is_dir( $item['dir'] ) ) {
+				continue;
+			}
 
 			try {
 				$directory_list = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator( $tmp_directory, RecursiveDirectoryIterator::SKIP_DOTS ),
+					new RecursiveDirectoryIterator( $item['dir'], RecursiveDirectoryIterator::SKIP_DOTS ),
 					RecursiveIteratorIterator::CHILD_FIRST
 				);
 
 				foreach ( $directory_list as $file ) {
-					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
+					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) ) {
 						continue;
 					}
 
-					if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
+					if ( $file->isReadable() && $file->getMTime() < $item['age'] ) {
 						( $file->isDir() ) ?
 							$this->misc->rmdir( $file->getPathName() ) :
 							@unlink( $file->getPathName() ); //phpcs:ignore
@@ -1984,7 +1998,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$this->log->error(
 					'Filesystem Delete Error',
 					[
-						'dir'       => $tmp_directory,
+						'dir'       => $item['dir'],
 						'exception' => $e->getMessage(),
 					]
 				);
