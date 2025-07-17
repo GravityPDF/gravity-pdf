@@ -25,4 +25,13 @@ class Cache extends MpdfCache {
 
 		return true;
 	}
+
+	/**
+	 * Do nothing here. Let Gravity PDF's cron cleanup handle old temp files.
+	 *
+	 * @return void
+	 *
+	 * @since 6.13.0
+	 */
+	public function clearOld() {}
 }
