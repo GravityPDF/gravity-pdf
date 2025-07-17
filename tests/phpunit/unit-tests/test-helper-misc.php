@@ -622,7 +622,8 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	public function test_cleanup_dir() {
 
 		/* Create our test data */
-		$path = '/tmp/test/';
+		$data = \GPDFAPI::get_data_class();
+		$path = $data->template_location .'folder/';
 		wp_mkdir_p( $path );
 		touch( $path . 'test' );
 
@@ -637,11 +638,24 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertDirectoryExists( $path );
 
 		rmdir( $path );
+
+		/* Verify we cannot delete folders outside those the plugin manages */
+		$path = sys_get_temp_dir() . '/folder/';
+		wp_mkdir_p( $path );
+		touch( $path . 'test' );
+		$this->assertFileExists( $path . 'test' );
+
+		$this->misc->cleanup_dir( $path );
+
+		$this->assertFileExists( $path . 'test' );
+		unlink( $path . 'test' );
+		rmdir( $path );
 	}
 
 	public function test_rmdir() {
-		/* Create test data */
-		$path = '/tmp/test/';
+		/* Create our test data */
+		$data = \GPDFAPI::get_data_class();
+		$path = $data->template_location .'folder/';
 		wp_mkdir_p( $path );
 		touch( $path . 'test' );
 
@@ -665,5 +679,16 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 
 		$this->assertFileDoesNotExist( $path . 'test' );
 		$this->assertDirectoryDoesNotExist( $path );
+
+		/* Verify we cannot delete folders outside those the plugin manages */
+		$path = sys_get_temp_dir() . '/folder/';
+		wp_mkdir_p( $path );
+		$this->assertDirectoryExists( $path );
+
+		$results = $this->misc->rmdir( $path );
+		$this->assertSame( 'gfpdf_rmdir_directory_not_approved', $results->get_error_code() );
+
+		$this->assertDirectoryExists( $path );
+		rmdir( $path );
 	}
 }
