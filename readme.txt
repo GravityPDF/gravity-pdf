@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 6.12.6
+Stable tag: 6.13.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -122,15 +122,15 @@ No. Gravity PDF can only be used with Gravity Forms. It cannot generate PDFs for
 
 == Changelog ==
 
-= 6.12.6 =
-* 🐞 Bug: Add additional guards for expected value when displaying File Upload field in PDFs (prevents PHP notice)
-* 🐞 Bug: Cleanup Background Processing queue when setting is toggled on/off
-* 🐞 Bug: Add additional guards for expected value when displaying List field in PDFs (prevents PHP notice if the first row in a list is empty)
-* 🐞 Bug: Ensure Gravity PDF system status information is in English when copied to clipboard
-* 🐞 Bug: Fix fatal error when Gravity Forms logging is turned on, but the directory where log files are saved is not writable by the web server
-* 🐞 Bug: Resolve memory problem generating Core PDFs if a Rich Text Paragraph field contains more than 10+ classes (elements with more than 8 classes will have extras removed)
-* 🐞 Bug: Fix 'translations loaded too early' PHP notice if any plugin requirements aren't met
-* 🐞 Bug: Pass the filtered 'use_value' and 'use_admin_label' arguments when determining if the product table is empty
-* 🧹 Housekeeping: Move Gravity PDF system status information to the bottom of the report
+= 6.13.0 =
+* 🔒 Security: Switch from cURL to wp_safe_remote_get() when getting remote assets for PDFs (eg. images, CSS)
+* 🔒 Security: Cleanup routine will only allow directories created and managed by Gravity PDF to be deleted
+* 🐞 Bug: Ensure mPDF cache honors filesystem permissions when creating new folders
+* 🐞 Bug: Don't create unnecessary ttfontdata directory in mPDF temporary directory
+* 🐞 Bug: Fix PHP notices when displaying a message identifying which plugin is the non-canonical version
+* 🐞 Bug: Prevent fatal error when a really old versions of GP Populate Anything is installed
+* 🧹 Housekeeping: Remove mPDF temporary directory cleanup routine. Now handled directly by Gravity PDF Cron task.
+* 🧹 Housekeeping: Add `gfpdf_remote_request_args` filter to let developers modify the PDF remote request configuration
+* 🧹 Housekeeping: Add `gfpdf_mpdf_class_container` filter to let developers replace the `httpClient` class used by mPDF
 
 See CHANGELOG.txt in the plugin zip for the full changelog.

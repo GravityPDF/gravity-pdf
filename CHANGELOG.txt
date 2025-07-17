@@ -1,3 +1,15 @@
+= 6.13.0 =
+* 🔒 Security: Switch from cURL to wp_safe_remote_get() when getting remote assets for PDFs (eg. images, CSS)
+* 🔒 Security: Cleanup routine will only allow directories created and managed by Gravity PDF to be deleted
+* 🐞 Bug: Ensure mPDF cache honors filesystem permissions when creating new folders
+* 🐞 Bug: Don't create unnecessary ttfontdata directory in mPDF temporary directory
+* 🐞 Bug: Fix PHP notices when displaying a message identifying which plugin is the non-canonical version
+* 🐞 Bug: Prevent fatal error when a really old versions of GP Populate Anything is installed
+* 🧹 Housekeeping: Remove mPDF temporary directory cleanup routine. Now handled directly by Gravity PDF Cron task.
+* 🧹 Housekeeping: Add `gfpdf_remote_request_args` filter to let developers modify the PDF remote request configuration
+* 🧹 Housekeeping: Add `gfpdf_mpdf_class_container` filter to let developers replace the `httpClient` class used by mPDF
+
+
 = 6.12.6 =
 * 🐞 Bug: Add additional guards for expected value when displaying File Upload field in PDFs (prevents PHP notice)
 * 🐞 Bug: Cleanup Background Processing queue when setting is toggled on/off
