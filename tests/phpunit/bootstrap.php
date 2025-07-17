@@ -97,6 +97,8 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * @since 4.0
 	 */
 	public function load() {
+		error_reporting( E_ALL & ~E_DEPRECATED );
+
 		require_once( __DIR__ . '/gravityforms-factory.php' );
 
 		require_once $this->plugin_dir . '/../gravityforms/gravityforms.php';
