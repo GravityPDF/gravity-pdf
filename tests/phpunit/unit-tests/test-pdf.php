@@ -1280,7 +1280,11 @@ class Test_PDF extends WP_UnitTestCase {
 			'test5'     => time() - ( 15 * 3600 ),
 			'test6'     => time() - ( 5 * 3600 ),
 			'.htaccess' => time() - ( 48 * 3600 ),
-			'mpdf/test' => time() - ( 25 * 3600 ), /* normally deleted, but excluded */
+			'mpdf/test' => time() - ( 0.5 * 3600 ),
+			'mpdf/test1' => time() - 3601,
+			'mpdf/test2' => time() - 3600,
+			'mpdf/test3' => time() - ( 25 * 3600 ),
+
 		];
 
 		foreach ( $files as $file => $modified ) {
@@ -1299,6 +1303,9 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertFileExists( $tmp . 'test6' );
 		$this->assertFileExists( $tmp . '.htaccess' );
 		$this->assertFileExists( $tmp . 'mpdf/test' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/test1' );
+		$this->assertFileExists( $tmp . 'mpdf/test2' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/test3' );
 
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {

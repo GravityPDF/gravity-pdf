@@ -3,10 +3,12 @@
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Helper\Mpdf\Request;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
-use GFPDF_Vendor\Mpdf\Mpdf;
+use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
+use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -619,21 +621,13 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
-		$this->mpdf = new Helper_Mpdf(
+		$this->mpdf = new Mpdf(
 			apply_filters(
 				'gfpdf_mpdf_class_config',
 				[
-					'fontDir'                => [
-						$this->data->template_font_location,
-					],
-
+					'fontDir'                => [ $this->data->template_font_location ],
 					'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
-
 					'tempDir'                => $this->data->mpdf_tmp_location,
-
-					'curlCaCertificate'      => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
-					'curlFollowLocation'     => true,
-					'curlUserAgent'          => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0',
 
 					'allow_output_buffering' => true,
 					'autoLangToFont'         => true,
@@ -657,6 +651,18 @@ class Helper_PDF {
 				$this->entry,
 				$this->settings,
 				$this
+			),
+			new SimpleContainer(
+				apply_filters(
+					'gfpdf_mpdf_class_container',
+					[
+						'httpClient' => new Request( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ),
+					],
+					$this->form,
+					$this->entry,
+					$this->settings,
+					$this
+				)
 			)
 		);
 
