@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity forms, form, contact form, pdf, email
 Requires at least: 5.3
 Tested up to: 6.8
-Stable tag: 6.13.0
+Stable tag: 6.14.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -122,15 +122,7 @@ No. Gravity PDF can only be used with Gravity Forms. It cannot generate PDFs for
 
 == Changelog ==
 
-= 6.13.0 =
-* 🔒 Security: Switch from cURL to wp_safe_remote_get() when getting remote assets for PDFs (eg. images, CSS)
-* 🔒 Security: Cleanup routine will only allow directories created and managed by Gravity PDF to be deleted
-* 🐞 Bug: Ensure mPDF cache honors filesystem permissions when creating new folders
-* 🐞 Bug: Don't create unnecessary ttfontdata directory in mPDF temporary directory
-* 🐞 Bug: Fix PHP notices when displaying a message identifying which plugin is the non-canonical version
-* 🐞 Bug: Prevent fatal error when a really old versions of GP Populate Anything is installed
-* 🧹 Housekeeping: Remove mPDF temporary directory cleanup routine. Now handled directly by Gravity PDF Cron task.
-* 🧹 Housekeeping: Add `gfpdf_remote_request_args` filter to let developers modify the PDF remote request configuration
-* 🧹 Housekeeping: Add `gfpdf_mpdf_class_container` filter to let developers replace the `httpClient` class used by mPDF
+= 6.14.0 =
+* 🧹 Housekeeping: Update licensing server domain name
 
 See CHANGELOG.txt in the plugin zip for the full changelog.
