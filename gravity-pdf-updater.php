@@ -30,6 +30,7 @@ add_action(
 			GPDF_PLUGIN_FILE,
 			[
 				'version' => PDF_EXTENDED_VERSION,
+				'item_name' => 'Gravity PDF',
 				'item_id' => 137043,
 				'license' => md5( site_url() ),
 				'author'  => 'Blue Liquid Designs',
