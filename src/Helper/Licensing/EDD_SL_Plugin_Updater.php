@@ -121,25 +121,7 @@ class EDD_SL_Plugin_Updater {
 			return $version_info;
 		}
 
-		$version_info = $this->get_version_info();
-		if ( ! $version_info ) {
-			return false;
-		}
-
-		// This is required for your plugin to support auto-updates in WordPress 5.5.
-		$version_info->plugin = $this->name;
-		$version_info->id     = $this->name;
-		$version_info->tested = $this->get_tested_version( $version_info );
-		if ( ! isset( $version_info->requires ) ) {
-			$version_info->requires = '';
-		}
-		if ( ! isset( $version_info->requires_php ) ) {
-			$version_info->requires_php = '';
-		}
-
-		$this->set_version_info_cache( $version_info );
-
-		return $version_info;
+		return $this->get_version_info();
 	}
 
 	/**
@@ -169,7 +151,7 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		// Strip off extra version data so the result is x.y or x.y.z.
-		list( $current_wp_version ) = explode( '-', get_bloginfo( 'version' ) );
+		[ $current_wp_version ] = explode( '-', get_bloginfo( 'version' ) );
 
 		// The tested version is greater than or equal to the current WP version, no need to do anything.
 		if ( version_compare( $version_info->tested, $current_wp_version, '>=' ) ) {
@@ -518,13 +500,13 @@ class EDD_SL_Plugin_Updater {
 	}
 
 	/**
-	 * Gets the current version information from the remote site.
+	 * Get the arguments required for the version API check
 	 *
-	 * @return \stdClass|false
+	 * @return array
+	 * @since 6.14.0
 	 */
-	public function get_version_from_remote() {
-		$api_params = array(
-			'edd_action'  => 'get_version',
+	public function get_version_api_params() {
+		return [
 			'license'     => $this->api_data['license'] ?? '',
 			'item_name'   => $this->api_data['item_name'] ?? false,
 			'item_id'     => $this->api_data['item_id'] ?? false,
@@ -535,6 +517,18 @@ class EDD_SL_Plugin_Updater {
 			'beta'        => $this->beta,
 			'php_version' => phpversion(),
 			'wp_version'  => get_bloginfo( 'version' ),
+		];
+	}
+
+	/**
+	 * Gets the current version information from the remote site.
+	 *
+	 * @return \stdClass|false
+	 */
+	public function get_version_from_remote() {
+		$api_params = array_merge(
+			[ 'edd_action' => 'get_version' ],
+			$this->get_version_api_params(),
 		);
 
 		/**
@@ -561,29 +555,12 @@ class EDD_SL_Plugin_Updater {
 			return false;
 		}
 
-		$request = json_decode( wp_remote_retrieve_body( $request ) );
+		$response = json_decode( wp_remote_retrieve_body( $request ) );
+		$response = apply_filters( 'gpdf_sl_plugin_updater_api_response', $response, $this->api_data, $this->plugin_file );
 
-		if ( $request && isset( $request->sections ) ) {
-			$request->sections = maybe_unserialize( $request->sections );
-		} else {
-			$request = false;
-		}
+		$response = $this->standardize_api_response( $response );
 
-		if ( $request && isset( $request->banners ) ) {
-			$request->banners = maybe_unserialize( $request->banners );
-		}
-
-		if ( $request && isset( $request->icons ) ) {
-			$request->icons = maybe_unserialize( $request->icons );
-		}
-
-		if ( ! empty( $request->sections ) ) {
-			foreach ( $request->sections as $key => $section ) {
-				$request->$key = (array) $section;
-			}
-		}
-
-		return $request;
+		return $response;
 	}
 
 	/**
@@ -725,5 +702,59 @@ class EDD_SL_Plugin_Updater {
 	 */
 	public function set_license_key( $license_key ) {
 		$this->api_data['license'] = $license_key;
+	}
+
+	/**
+	 * @param \StdClass|false|null $response
+	 *
+	 * @return false|\StdClass
+	 */
+	public function standardize_api_response( $response ) {
+		if ( empty( $response ) ) {
+			return false;
+		}
+
+		if ( isset( $response->sections ) ) {
+			$response->sections = maybe_unserialize( $response->sections );
+		}
+
+		if ( isset( $response->banners ) ) {
+			$response->banners = maybe_unserialize( $response->banners );
+		}
+
+		if ( isset( $response->icons ) ) {
+			$response->icons = maybe_unserialize( $response->icons );
+		}
+
+		if ( ! empty( $response->sections ) ) {
+			foreach ( $response->sections as $key => $section ) {
+				$response->$key = (array) $section;
+			}
+		}
+
+		// This is required for your plugin to support auto-updates in WordPress 5.5.
+		$response->plugin = $this->name;
+		$response->id     = $this->name;
+		$response->tested = $this->get_tested_version( $response );
+
+		if ( ! isset( $response->requires ) ) {
+			$response->requires = '';
+		}
+
+		if ( ! isset( $response->requires_php ) ) {
+			$response->requires_php = '';
+		}
+
+		$this->set_version_info_cache( $response );
+
+		return $response;
+	}
+
+	/**
+	 * @return string
+	 * @since 6.14.0
+	 */
+	public function get_plugin_file() {
+		return $this->plugin_file;
 	}
 }

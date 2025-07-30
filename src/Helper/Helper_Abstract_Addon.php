@@ -278,6 +278,14 @@ abstract class Helper_Abstract_Addon {
 	}
 
 	/**
+	 * @return EDD_SL_Plugin_Updater|null
+	 * @since 6.14.0
+	 */
+	public function get_plugin_updater() {
+		return $this->plugin_updater;
+	}
+
+	/**
 	 * Setup the add-on licensing and initialise any classes
 	 *
 	 * @param array $classes

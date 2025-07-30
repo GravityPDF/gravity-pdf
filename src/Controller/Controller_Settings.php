@@ -200,6 +200,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* Register add-ons for licensing page */
 		add_filter( 'gfpdf_settings_licenses', [ $this->model, 'register_addons_for_licensing' ] );
 		add_filter( 'gfpdf_settings_license_sanitize', [ $this->model, 'maybe_active_licenses' ] );
+		add_filter( 'gpdf_sl_plugin_updater_api_params', [ $this->model, 'licensing_bulk_api_params' ] );
+		add_filter( 'gpdf_sl_plugin_updater_api_response', [ $this->model, 'licensing_bulk_api_response' ], 10, 3 );
 	}
 
 	/**

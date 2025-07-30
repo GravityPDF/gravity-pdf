@@ -283,8 +283,6 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* Check if we are submitting our settings and there's an active key */
 		foreach ( $this->data->addon as $addon ) {
-			/** @var Helper_Abstract_Addon $addon */
-
 			$option_key = 'license_' . $addon->get_slug();
 			if ( ! isset( $input[ $option_key ] ) ) {
 				continue;
@@ -374,6 +372,75 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			wp_die();
 		}
+	}
+
+	/**
+	 * Optimize plugin version checks by combining them into a single request
+	 *
+	 * @param array $api_params
+	 *
+	 * @return array
+	 *
+	 * @since 6.14.0
+	 */
+	public function licensing_bulk_api_params( $api_params ) {
+		/* Skip if the core updater isn't initialized or there are no addons */
+		if ( empty( $this->data->updater ) || empty( $this->data->addon ) ) {
+			return $api_params;
+		}
+
+		/* Build new parameters */
+		$products = array_merge(
+			[ 'gravity-pdf' => $this->data->updater ],
+			array_map(
+				function ( $addon ) {
+					return $addon->get_plugin_updater();
+				},
+				$this->data->addon
+			)
+		);
+
+		$bulk_api_params = [];
+		foreach ( $products as $product ) {
+			$bulk_api_params[] = $product->get_version_api_params();
+		}
+
+		return [
+			'edd_action' => 'get_version',
+			'products'   => $bulk_api_params,
+		];
+	}
+
+	/**
+	 * @param \StdClass $response
+	 *
+	 * @return \StdClass
+	 */
+	public function licensing_bulk_api_response( $response, $api_data, $plugin_file ) {
+		if ( ! is_array( $response ) ) {
+			return $response;
+		}
+
+		$initial_request_data = null;
+
+		foreach ( $response as $product ) {
+			if ( isset( $this->data->addon[ $product->slug ] ) ) {
+				$updater = $this->data->addon[ $product->slug ]->get_plugin_updater();
+			} elseif ( $product->slug === 'gravity-pdf' ) {
+				$updater = $this->data->updater;
+			} else {
+				continue;
+			}
+
+			/* skip the product that initialized the request, as it'll be handled in the return method */
+			if ( $updater->get_plugin_file() !== $plugin_file ) {
+				$updater->standardize_api_response( $product );
+			} else {
+				$initial_request_data = $product;
+			}
+		}
+
+		return $initial_request_data;
 	}
 
 	/**

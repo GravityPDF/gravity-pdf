@@ -39,6 +39,14 @@ add_action(
 		);
 
 		$plugin_updater->init();
+
+		/* Only make plugin updater available when fully initialized */
+		if ( ! class_exists( 'GPDFAPI' ) ) {
+			return;
+		}
+
+		$data          = \GPDFAPI::get_data_class();
+		$data->updater = $plugin_updater;
 	}
 );
 
@@ -124,15 +132,15 @@ add_action(
 
 		printf(
 			'<tr class="plugin-update-tr %3$s" id="%1$s-update" data-slug="%1$s" data-plugin="%2$s">',
-			esc_attr( $plugin_data['slug'] ?? '' ),
-			esc_attr( $plugin_data['plugin'] ?? '' ),
+			esc_attr( 'gravity-forms-pdf-extended' ),
+			esc_attr( 'gravity-forms-pdf-extended/pdf.php' ),
 			'inactive'
 		);
 
 		echo '<td colspan="4" class="plugin-update colspanchange">';
 		echo '<div class="notice inline notice-warning notice-alt"><p>';
 
-		echo esc_html__( 'This is the non-canonical release of Gravity PDF.', 'gravity-pdf' );
+		echo esc_html__( 'This is the non-canonical release of Gravity PDF which should be deleted.', 'gravity-pdf' );
 
 		echo '</p></div>';
 		echo '</td>';

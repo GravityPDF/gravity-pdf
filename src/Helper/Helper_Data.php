@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2025, Blue Liquid Designs
@@ -28,7 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string  $upload_dir_url                  The current URL to the WP upload directory
  * @property string  $store_url                       The URL of our online store
  * @property array   $form_settings                   A cache of the current form's PDF settings
- * @property array   $addon                           An array of current active / registered add-ons
+ * @property EDD_SL_Plugin_Updater $updater           The core plugin update class
+ * @property array<Helper_Abstract_Addon> $addon      An array of current active / registered add-ons
  * @property string  $template_location               The current path to the PDF working directory
  * @property string  $template_location_url           The current URL to the PDF working directory
  * @property string  $template_font_location          The current path to the PDF font directory
