@@ -429,7 +429,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			} elseif ( $product->slug === 'gravity-pdf' ) {
 				$updater = $this->data->updater;
 			} else {
-				continue;
+				continue; // couldn't link response to a product, skip.
 			}
 
 			/* skip the product that initialized the request, as it'll be handled in the return method */
