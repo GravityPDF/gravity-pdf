@@ -25,18 +25,20 @@ if ( ! class_exists( '\GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater' ) ) {
 add_action(
 	'init',
 	function () {
-		new EDD_SL_Plugin_Updater(
+		$plugin_updater = new EDD_SL_Plugin_Updater(
 			GPDF_API_URL,
 			GPDF_PLUGIN_FILE,
 			[
-				'version' => PDF_EXTENDED_VERSION,
+				'version'   => PDF_EXTENDED_VERSION,
 				'item_name' => 'Gravity PDF',
-				'item_id' => 137043,
-				'license' => md5( site_url() ),
-				'author'  => 'Blue Liquid Designs',
-				'beta'    => false,
+				'item_id'   => 137043,
+				'license'   => md5( site_url() ),
+				'author'    => 'Blue Liquid Designs',
+				'beta'      => false,
 			]
 		);
+
+		$plugin_updater->init();
 	}
 );
 
