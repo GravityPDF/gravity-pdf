@@ -283,6 +283,8 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* Check if we are submitting our settings and there's an active key */
 		foreach ( $this->data->addon as $addon ) {
+			/** @var Helper_Abstract_Addon $addon */
+
 			$option_key = 'license_' . $addon->get_slug();
 			if ( ! isset( $input[ $option_key ] ) ) {
 				continue;
@@ -306,7 +308,6 @@ class Model_Settings extends Helper_Abstract_Model {
 				$input[ $option_key . '_status' ] !== 'active' ||
 				( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] )
 			) {
-				/** @var Helper_Abstract_Addon $addon */
 				$results = $addon->activate_license( $input[ $option_key ] );
 
 				$input[ $option_key . '_message' ] = $results['message'];

@@ -1065,24 +1065,11 @@ abstract class Helper_Abstract_Addon {
 	 * @return void
 	 */
 	public function flush_update_cache() {
-		if ( $this->plugin_updater ) {
-			/* Delete the cached API request from the origin server */
-			delete_option( $this->plugin_updater->get_cache_key() );
-		}
-
-		/* Remove the plugin from the update_plugins transient */
-		$plugin_update = get_site_transient( 'update_plugins' );
-
-		if ( ! isset( $plugin_update->response[ plugin_basename( $this->get_main_plugin_file() ) ] ) ) {
+		if ( ! $this->plugin_updater ) {
 			return;
 		}
 
-		unset(
-			$plugin_update->response[ plugin_basename( $this->get_main_plugin_file() ) ],
-			$plugin_update->no_update[ plugin_basename( $this->get_main_plugin_file() ) ],
-			$plugin_update->checked[ plugin_basename( $this->get_main_plugin_file() ) ],
-		);
-
-		set_site_transient( 'update_plugins', $plugin_update );
+		$this->plugin_updater->delete_version_info_cache();
+		$this->plugin_updater->delete_transient_plugin_info();
 	}
 }

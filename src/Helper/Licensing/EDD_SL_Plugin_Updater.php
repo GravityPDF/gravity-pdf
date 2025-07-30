@@ -646,6 +646,53 @@ class EDD_SL_Plugin_Updater {
 	}
 
 	/**
+	 * Delete the cached version info
+	 *
+	 * @param string $cache_key
+	 *
+	 * @return bool
+	 *
+	 * @since 6.14.0
+	 */
+	public function delete_version_info_cache( $cache_key = '' ) {
+		if ( empty( $cache_key ) ) {
+			$cache_key = $this->get_cache_key();
+		}
+
+		return delete_option( $cache_key );
+	}
+
+	/**
+	 * Delete the cached update info without removing the entire update plugin data
+	 *
+	 * @return bool
+	 *
+	 * @since 6.14.0
+	 */
+	public function delete_transient_plugin_info() {
+		$plugin_update = get_site_transient( 'update_plugins' );
+
+		if ( ! isset( $plugin_update->response[ $this->name ] ) ) {
+			return true;
+		}
+
+		unset(
+			$plugin_update->response[ $this->name ],
+			$plugin_update->no_update[ $this->name ],
+			$plugin_update->checked[ $this->name ],
+		);
+
+		/* Prevent a version check API call right after the plugin data is removed */
+		remove_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+
+		$results = set_site_transient( 'update_plugins', $plugin_update );
+
+		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+
+		return $results;
+	}
+
+	/**
 	 * Returns if the SSL of the store should be verified.
 	 *
 	 * @since  1.6.13
