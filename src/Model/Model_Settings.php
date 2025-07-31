@@ -424,7 +424,9 @@ class Model_Settings extends Helper_Abstract_Model {
 		$initial_request_data = null;
 
 		foreach ( $response as $product ) {
-			if ( isset( $this->data->addon[ $product->slug ] ) ) {
+			if ( ! isset( $product->slug ) ) {
+				continue;
+			} elseif ( isset( $this->data->addon[ $product->slug ] ) ) {
 				$updater = $this->data->addon[ $product->slug ]->get_plugin_updater();
 			} elseif ( $product->slug === 'gravity-pdf' ) {
 				$updater = $this->data->updater;
