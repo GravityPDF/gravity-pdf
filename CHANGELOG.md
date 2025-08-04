@@ -5,6 +5,9 @@
 ### 6.14.0
 * 🧹 Housekeeping: Update licensing server domain name
 
+### 6.13.1
+* 🐞 Bug: Only enable image PDF debugging when both `WP_DEBUG` and `WP_DEBUG_DISPLAY` constants are set to true
+
 ### 6.13.0
 * 🔒 Security: Switch from cURL to wp_safe_remote_get() when getting remote assets for PDFs (eg. images, CSS)
 * 🔒 Security: Cleanup routine will only allow directories created and managed by Gravity PDF to be deleted
