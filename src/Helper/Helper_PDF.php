@@ -656,7 +656,7 @@ class Helper_PDF {
 				apply_filters(
 					'gfpdf_mpdf_class_container',
 					[
-						'httpClient' => new Request( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ),
+						'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
 					],
 					$this->form,
 					$this->entry,
