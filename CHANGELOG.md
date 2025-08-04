@@ -3,7 +3,7 @@
 ## Gravity PDF
 
 ### 6.14.0
-* 🧹 Housekeeping: Update licensing server domain name
+* 🧹 Housekeeping: Update licensing server domain name from gravitypdf.com to api.gravitypdf.com
 
 ### 6.13.1
 * 🐞 Bug: Only enable image PDF debugging when both `WP_DEBUG` and `WP_DEBUG_DISPLAY` constants are set to true
