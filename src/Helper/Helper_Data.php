@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2025, Blue Liquid Designs
@@ -28,7 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string  $upload_dir_url                  The current URL to the WP upload directory
  * @property string  $store_url                       The URL of our online store
  * @property array   $form_settings                   A cache of the current form's PDF settings
- * @property array   $addon                           An array of current active / registered add-ons
+ * @property EDD_SL_Plugin_Updater $updater           The core plugin update class
+ * @property array<Helper_Abstract_Addon> $addon      An array of current active / registered add-ons
  * @property string  $template_location               The current path to the PDF working directory
  * @property string  $template_location_url           The current URL to the PDF working directory
  * @property string  $template_font_location          The current path to the PDF font directory
@@ -175,6 +178,8 @@ class Helper_Data {
 	 */
 	public function addon_license_responses( $addon_name ) {
 		return [
+			'active'              => __( 'Your support license key has been activated for this domain.', 'gravity-pdf' ),
+			'valid'               => __( 'Your support license key has been activated for this domain.', 'gravity-pdf' ),
 			'expired'             => sprintf( __( 'This license key expired on %%s. %1$sPlease renew your license to continue receiving updates and support%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
 			'revoked'             => sprintf( __( 'This license key has been cancelled (most likely due to a refund request). %1$sPlease consider purchasing a new license%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
 			'disabled'            => sprintf( __( 'This license key has been cancelled (most likely due to a refund request). %1$sPlease consider purchasing a new license%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
@@ -184,8 +189,10 @@ class Helper_Data {
 			'item_name_mismatch'  => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-pdf' ), $addon_name ),
 			'invalid_item_id'     => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-pdf' ), $addon_name ),
 			'no_activations_left' => sprintf( __( 'This license key has reached its activation limit. %1$sPlease upgrade your license to increase the site limit (you only pay the difference)%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
-			'default'             => __( 'An error occurred, please try again.', 'gravity-pdf' ),
-			'generic'             => __( 'An error occurred, please try again.', 'gravity-pdf' ),
+			'default'             => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
+			'generic'             => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
+			'error'               => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
+			'rate_limit'          => __( 'The licensing server is temporarily unavailable.', 'gravity-pdf' ),
 		];
 	}
 

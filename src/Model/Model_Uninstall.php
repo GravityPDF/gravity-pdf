@@ -130,6 +130,10 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
+
+		/* Remove license API data */
+		global $wpdb;
+		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gpdf_sl_%'" );
 	}
 
 	/**
