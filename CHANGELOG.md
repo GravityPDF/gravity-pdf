@@ -6,7 +6,7 @@
 * 🧹 Housekeeping: Update licensing server domain name from gravitypdf.com to api.gravitypdf.com
 
 ### 6.13.1
-* 🐞 Bug: Only enable image PDF debugging when both `WP_DEBUG` and `WP_DEBUG_DISPLAY` constants are set to true
+* 🐞 Bug: Only enable remote asset debugging in PDFs when both `WP_DEBUG` and `WP_DEBUG_DISPLAY` constants are set to true
 
 ### 6.13.0
 * 🔒 Security: Switch from cURL to wp_safe_remote_get() when getting remote assets for PDFs (eg. images, CSS)
