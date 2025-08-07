@@ -372,7 +372,7 @@ abstract class Helper_Abstract_Addon {
 	 * using the following:
 	 *
 	 * $license_info = $this->get_license_info();
-	 * if ( $license_info['status'] !== 'active' ) {
+	 * if ( in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) ) {
 	 *    return;
 	 * }
 	 *
@@ -863,7 +863,7 @@ abstract class Helper_Abstract_Addon {
 		$this->update_license_info( $license_info, $use_database );
 		$this->flush_update_cache();
 
-		return in_array( $license_info['status'], [ 'valid', 'active' ], true );
+		return in_array( $license_info['status'], [ 'active', 'valid' ], true );
 	}
 
 	/**
@@ -873,7 +873,7 @@ abstract class Helper_Abstract_Addon {
 	 */
 	public function license_registration() {
 		$edd_id = $this->get_edd_download_id();
-		if ( $this->get_license_status() === 'active' || empty( $edd_id ) ) {
+		if ( in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) || empty( $edd_id ) ) {
 			return;
 		}
 

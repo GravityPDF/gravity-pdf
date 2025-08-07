@@ -1723,9 +1723,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* get selected value (if any) */
 		$value = $this->get_form_value( $args );
 
-		$error_statuses = [ '', 'active' ];
-		$is_error       = ! in_array( $value['status'], $error_statuses, true );
-		$is_active      = $value['status'] === 'active';
+		$is_error  = ! in_array( $value['status'], [ '', 'active', 'valid' ], true );
+		$is_active = in_array( $value['status'], [ 'active', 'valid' ], true );
 		?>
 
 		<?php if ( ! empty( $value['msg'] ) ): ?>
