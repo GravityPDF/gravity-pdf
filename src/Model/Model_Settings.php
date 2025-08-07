@@ -445,6 +445,72 @@ class Model_Settings extends Helper_Abstract_Model {
 		return $initial_request_data;
 	}
 
+
+	public function licensing_bulk_license_check() {
+		$addons = $this->data->addon;
+		if ( empty( $addons ) ) {
+			return;
+		}
+
+		$bulk_api_params = [];
+		foreach ( $addons as $addon ) {
+			$updater = $addon->get_plugin_updater();
+			if ( ! $updater ) {
+				continue;
+			}
+
+			$bulk_api_params[] = $addon->get_plugin_updater()->get_version_api_params();
+		}
+
+		// @todo add support for this endpoint
+		$response = wp_remote_post(
+			$this->data->store_url,
+			[
+				'timeout' => 15,
+				'body'    => [
+					'edd_action' => 'check_license',
+					'products'   => $bulk_api_params,
+				],
+			]
+		);
+
+		/* Check for problems contacting the licensing server */
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			$this->log->error(
+				'Failed to contact remote API for bulk license status check.',
+				[
+					'error' => is_wp_error( $response ) ? $response->get_error_message() : wp_remote_retrieve_response_code( $response ),
+				]
+			);
+
+			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+
+			return false;
+		}
+
+		/* Check for a malformed response */
+		$license_check = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( ! is_array( $license_check ) ) {
+			$this->log->error( 'Invalid response returned from bulk license status check.', [ 'response' => wp_remote_retrieve_body( $response ) ] );
+
+			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+
+			return false;
+		}
+
+		foreach ( $license_check as $response ) {
+			if ( isset( $response->license ) && $response->license === 'valid' ) {
+				/* License is still valid, do nothing */
+
+				return true;
+			}
+
+			/* License status has changed. Update database */
+			// @TODO - get the right $this->data->addon to call
+			//$this->update_license_status_from_response( $response, true );
+		}
+	}
+
 	/**
 	 * Do API call to GravityPDF.com to deactivate add-on license
 	 *

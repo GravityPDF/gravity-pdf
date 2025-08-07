@@ -202,6 +202,21 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		add_filter( 'gfpdf_settings_license_sanitize', [ $this->model, 'maybe_active_licenses' ] );
 		add_filter( 'gpdf_sl_plugin_updater_api_params', [ $this->model, 'licensing_bulk_api_params' ] );
 		add_filter( 'gpdf_sl_plugin_updater_api_response', [ $this->model, 'licensing_bulk_api_response' ], 10, 3 );
+
+		/* Schedule License Check for all add-ons */
+		add_action(
+			'admin_init',
+			function () {
+				if ( empty( $this->data->addon ) ) {
+					return;
+				}
+
+				add_action( 'gfpdf_bulk_license_check', [ $this->model, 'licensing_bulk_license_check' ] );
+				if ( ! wp_next_scheduled( 'gfpdf_bulk_license_check' ) ) {
+					wp_schedule_single_event( strtotime( '+1 week' ), 'gfpdf_bulk_license_check' );
+				}
+			}
+		);
 	}
 
 	/**
