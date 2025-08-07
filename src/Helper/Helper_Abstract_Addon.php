@@ -319,10 +319,7 @@ abstract class Helper_Abstract_Addon {
 			add_filter( 'gfpdf_settings_extensions', [ $this, 'register_addon_fields' ] );
 		}
 
-		/*
-		 * Automatically schedule license checks weekly
-		 */
-		add_action( 'admin_init', [ $this, 'maybe_schedule_license_check' ] );
+		/* Check the license is valid */
 		add_action( 'gfpdf_' . $this->get_slug() . '_license_check', [ $this, 'schedule_license_check' ] );
 
 		/*
@@ -397,6 +394,21 @@ abstract class Helper_Abstract_Addon {
 	public function plugin_updater() {}
 
 	/**
+	 * @return array
+	 * @since 6.14.0
+	 */
+	public function get_default_api_params() {
+		return [
+			'version'   => $this->get_version(),
+			'license'   => $this->get_license_key(),
+			'item_name' => $this->get_short_name(),
+			'item_id'   => $this->get_edd_download_id(),
+			'author'    => $this->get_author(),
+			'beta'      => false,
+		];
+	}
+
+	/**
 	 * The central add-on update initializer
 	 *
 	 * @return void
@@ -406,14 +418,7 @@ abstract class Helper_Abstract_Addon {
 		$this->plugin_updater = new EDD_SL_Plugin_Updater(
 			$this->data->store_url,
 			$this->get_main_plugin_file(),
-			[
-				'version'   => $this->get_version(),
-				'license'   => $this->get_license_key(),
-				'item_name' => $this->get_short_name(),
-				'item_id'   => $this->get_edd_download_id(),
-				'author'    => $this->get_author(),
-				'beta'      => false,
-			]
+			$this->get_default_api_params()
 		);
 
 		$this->plugin_updater->init();
@@ -702,6 +707,8 @@ abstract class Helper_Abstract_Addon {
 	 *           and 2. Need to clear the scheduled hook when the plugin is deactivated
 	 *
 	 * @since    4.2
+	 *
+	 * @depreacted 6.14.0 Handled in bulk via Model_Settings::licensing_bulk_license_check()
 	 */
 	final public function maybe_schedule_license_check() {
 		if ( ! wp_next_scheduled( 'gfpdf_' . $this->get_slug() . '_license_check' ) ) {
@@ -715,10 +722,8 @@ abstract class Helper_Abstract_Addon {
 	 * @since    4.2
 	 */
 	public function schedule_license_check() {
-		$license_info = $this->get_license_info();
-
-		/* If the license info is empty disable check */
-		if ( empty( array_filter( $license_info ) ) ) {
+		/* If there's no license key disable the check */
+		if ( empty( $this->get_license_key() ) ) {
 			return false;
 		}
 
@@ -726,14 +731,10 @@ abstract class Helper_Abstract_Addon {
 			$this->data->store_url,
 			[
 				'timeout' => 15,
-				'body'    => [
-					'edd_action'  => 'check_license',
-					'license'     => $license_info['license'],
-					'item_id'     => $this->get_edd_download_id(),
-					'item_name'   => rawurlencode( $this->get_short_name() ),
-					'url'         => home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
-				],
+				'body'    => array_merge(
+					[ 'edd_action' => 'check_license' ],
+					$this->get_default_api_params()
+				),
 			]
 		);
 
@@ -948,14 +949,13 @@ abstract class Helper_Abstract_Addon {
 			$this->data->store_url,
 			[
 				'timeout' => 15,
-				'body'    => [
-					'edd_action'  => 'activate_license',
-					'license'     => $license_key,
-					'item_id'     => $this->get_edd_download_id(),
-					'item_name'   => rawurlencode( $this->get_short_name() ), // the name of our product in EDD
-					'url'         => home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
-				],
+				'body'    => array_merge(
+					$this->get_default_api_params(),
+					[
+						'edd_action' => 'activate_license',
+						'license'    => $license_key,
+					],
+				),
 			]
 		);
 
@@ -972,20 +972,14 @@ abstract class Helper_Abstract_Addon {
 	 * @since 6.14.0
 	 */
 	public function deactivate_license() {
-		$license_key = $this->get_license_key();
-
 		$response = wp_remote_post(
 			$this->data->store_url,
 			[
 				'timeout' => 15,
-				'body'    => [
-					'edd_action'  => 'deactivate_license',
-					'license'     => $license_key,
-					'item_id'     => $this->get_edd_download_id(),
-					'item_name'   => rawurlencode( $this->get_short_name() ), // the name of our product in EDD
-					'url'         => home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
-				],
+				'body'    => array_merge(
+					[ 'edd_action' => 'deactivate_license' ],
+					$this->get_default_api_params()
+				),
 			]
 		);
 
@@ -1003,13 +997,7 @@ abstract class Helper_Abstract_Addon {
 			return false;
 		}
 
-		$this->log->notice(
-			'License successfully deactivated',
-			[
-				'slug'    => $this->get_slug(),
-				'license' => $license_key,
-			]
-		);
+		$this->log->notice( 'License successfully deactivated', [ 'slug' => $this->get_slug() ] );
 
 		$this->flush_update_cache();
 
