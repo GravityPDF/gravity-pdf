@@ -301,9 +301,9 @@ class Model_Settings extends Helper_Abstract_Model {
 				$input[ $option_key ] = $settings[ $option_key ];
 			}
 
-			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
+			/* Run license activation if a new key was submitted, or the existing key isn't valid */
 			if (
-				$input[ $option_key . '_status' ] !== 'active' ||
+				! in_array( $input[ $option_key . '_status' ], [ 'active', 'valid' ], true ) ||
 				( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] )
 			) {
 				$results = $addon->activate_license( $input[ $option_key ] );
