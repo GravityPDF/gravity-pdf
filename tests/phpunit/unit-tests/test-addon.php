@@ -85,6 +85,13 @@ class Test_Addon extends WP_UnitTestCase {
 		);
 	}
 
+	public function tear_down() {
+		parent::tear_down();
+
+		$data = \GPDFAPI::get_data_class();
+		$data->addon = [];
+	}
+
 	/**
 	 * @since 4.2
 	 */
@@ -389,6 +396,15 @@ class Test_Addon extends WP_UnitTestCase {
 		/* Check we can access the saved settings without using the prefix */
 		$this->assertSame( 'Use Fallback', $this->addon2->get_addon_setting_value( 'addon_field', 'Use Fallback' ) );
 		$this->assertSame( 'Loading1', $this->addon2->get_addon_setting_value( 'string_loading_title' ) );
+	}
+
+	public function test_central_plugin_updater() {
+		$this->setExpectedIncorrectUsage( 'GFPDF\Helper\Helper_Abstract_Addon::get_plugin_updater' );
+		$this->assertNull( $this->addon->get_plugin_updater() );
+
+		$this->addon->init();
+		do_action( 'init' );
+		$this->assertNotNull( $this->addon->get_plugin_updater() );
 	}
 }
 

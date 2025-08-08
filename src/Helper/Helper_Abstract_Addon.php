@@ -282,7 +282,12 @@ abstract class Helper_Abstract_Addon {
 	 * @since 6.14.0
 	 */
 	public function get_plugin_updater() {
-		return $this->plugin_updater;
+		$updater = $this->plugin_updater;
+		if ( ! $updater ) {
+			_doing_it_wrong( __METHOD__, 'This method should not be called before the "init" hook (priority 1)', '6.14.0' );
+		}
+
+		return $updater;
 	}
 
 	/**
@@ -304,7 +309,8 @@ abstract class Helper_Abstract_Addon {
 			'init',
 			function () {
 				$this->central_plugin_updater();
-			}
+			},
+			1
 		);
 
 		/*
@@ -319,7 +325,7 @@ abstract class Helper_Abstract_Addon {
 			add_filter( 'gfpdf_settings_extensions', [ $this, 'register_addon_fields' ] );
 		}
 
-		/* Check the license is valid */
+		/* Add listener for now-deprecated individual licence check (handled in bulk in Controller_Settings) */
 		add_action( 'gfpdf_' . $this->get_slug() . '_license_check', [ $this, 'schedule_license_check' ] );
 
 		/*
@@ -789,7 +795,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @since 6.14.0
 	 */
-	protected function update_license_status_from_response( $response, $use_database = false ) {
+	public function update_license_status_from_response( $response, $use_database = false ) {
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			$license_data = new \stdClass();
 		} else {

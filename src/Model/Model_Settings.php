@@ -383,9 +383,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @since 6.14.0
 	 */
-	public function licensing_bulk_api_params( $api_params ) {
+	public function licensing_bulk_get_version_api_params( $api_params ) {
 		/* Skip if the core updater isn't initialized or there are no addons */
-		if ( empty( $this->data->updater ) || empty( $this->data->addon ) ) {
+		if ( empty( $this->data->updater ) && empty( $this->data->addon ) ) {
 			return $api_params;
 		}
 
@@ -412,11 +412,11 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @param \StdClass $response
+	 * @param mixed $response
 	 *
 	 * @return \StdClass
 	 */
-	public function licensing_bulk_api_response( $response, $api_data, $plugin_file ) {
+	public function licensing_bulk_get_version_api_response( $response, $api_data, $plugin_file ) {
 		if ( ! is_array( $response ) ) {
 			return $response;
 		}
@@ -445,24 +445,41 @@ class Model_Settings extends Helper_Abstract_Model {
 		return $initial_request_data;
 	}
 
-
+	/**
+	 * Check the status of licenses from the API in bulk
+	 *
+	 * @return bool
+	 *
+	 * @since 6.14.0
+	 */
 	public function licensing_bulk_license_check() {
 		$addons = $this->data->addon;
 		if ( empty( $addons ) ) {
-			return;
+			return false;
 		}
 
 		$bulk_api_params = [];
+		$grouped_addons  = [];
+
 		foreach ( $addons as $addon ) {
+			/* Skip if no license key has been saved */
+			if ( empty( $addon->get_license_key() ) ) {
+				continue;
+			}
+
 			$updater = $addon->get_plugin_updater();
 			if ( ! $updater ) {
 				continue;
 			}
 
-			$bulk_api_params[] = $addon->get_plugin_updater()->get_version_api_params();
+			$bulk_api_params[]                               = $addon->get_plugin_updater()->get_version_api_params();
+			$grouped_addons[ $addon->get_edd_download_id() ] = $addon;
 		}
 
-		// @todo add support for this endpoint
+		if ( empty( $bulk_api_params ) ) {
+			return false;
+		}
+
 		$response = wp_remote_post(
 			$this->data->store_url,
 			[
@@ -498,17 +515,38 @@ class Model_Settings extends Helper_Abstract_Model {
 			return false;
 		}
 
-		foreach ( $license_check as $response ) {
-			if ( isset( $response->license ) && $response->license === 'valid' ) {
-				/* License is still valid, do nothing */
+		/* Loop over the response and update any licenses that have changed */
+		foreach ( $license_check as $addon_response ) {
+			if ( ! isset( $addon_response->item_id, $addon_response->license, $grouped_addons[ $addon_response->item_id ] ) ) {
+				$this->log->error( 'Invalid response for individual addon during bulk license status check.', [ 'response' => $addon_response ] );
 
-				return true;
+				continue;
 			}
 
-			/* License status has changed. Update database */
-			// @TODO - get the right $this->data->addon to call
-			//$this->update_license_status_from_response( $response, true );
+			$addon = $grouped_addons[ $addon_response->item_id ];
+			if ( $addon->get_license_status() === $addon_response->license ) {
+				$this->log->notice(
+					'License status has not changed.',
+					[
+						'response' => $addon_response,
+						'slug'     => $addon->get_slug(),
+					]
+				);
+
+				continue;
+			}
+
+			$addon->update_license_status_from_response(
+				[
+					'response' => [ 'code' => 200 ],
+					'body'     => wp_json_encode( $addon_response ),
+				],
+				true
+			);
+
 		}
+
+		return true;
 	}
 
 	/**
