@@ -94,7 +94,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 		/* Clean up database */
 		if ( is_multisite() ) {
-			$sites = get_sites();
+			$sites           = get_sites();
+			$current_site_id = get_current_blog_id();
 
 			foreach ( $sites as $site ) {
 				$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
@@ -102,7 +103,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 				$this->remove_plugin_options();
 				$this->remove_plugin_form_settings();
 			}
-			restore_current_blog();
+
+			switch_to_blog( $current_site_id );
 		} else {
 			$this->remove_plugin_options();
 			$this->remove_plugin_form_settings();
@@ -206,6 +208,11 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function deactivate_plugin() {
-		deactivate_plugins( PDF_PLUGIN_BASENAME );
+		$basename = PDF_PLUGIN_BASENAME;
+		if ( is_multisite() && is_plugin_active_for_network( $basename ) ) {
+			deactivate_plugins( $basename, false, true );
+		} else {
+			deactivate_plugins( $basename );
+		}
 	}
 }
