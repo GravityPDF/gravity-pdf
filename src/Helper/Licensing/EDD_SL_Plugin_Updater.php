@@ -206,6 +206,8 @@ class EDD_SL_Plugin_Updater {
 			return;
 		}
 
+		$plugin_update = $update_cache->response[ $this->name ];
+
 		printf(
 			'<tr class="plugin-update-tr %3$s" id="%1$s-update" data-slug="%1$s" data-plugin="%2$s">',
 			esc_attr( $this->slug ),
@@ -217,19 +219,24 @@ class EDD_SL_Plugin_Updater {
 		echo '<div class="update-message notice inline notice-warning notice-alt"><p>';
 
 		$changelog_link = '';
-		if ( ! empty( $update_cache->response[ $this->name ]->sections->changelog ) ) {
+
+		$has_changelog = ! empty( $plugin_update->sections->changelog ) || ! empty( $plugin_update->sections['changelog'] );
+
+		if ( $has_changelog ) {
 			$changelog_link = add_query_arg(
-				array(
-					'edd_sl_action' => 'view_plugin_changelog',
-					'plugin'        => rawurlencode( $this->name ),
-					'slug'          => rawurlencode( $this->slug ),
-					'TB_iframe'     => 'true',
-					'width'         => 77,
-					'height'        => 911,
-				),
+				[
+					'gpdf_sl_action' => 'view_plugin_changelog',
+					'gpdf_sl_nonce'  => wp_create_nonce( 'install-plugin_' . $this->slug ),
+					'plugin'         => rawurlencode( $this->slug ),
+					'section'        => 'changelog',
+					'TB_iframe'      => 'true',
+					'width'          => 77,
+					'height'         => 911,
+				],
 				self_admin_url( 'index.php' )
 			);
 		}
+
 		$update_link = add_query_arg(
 			array(
 				'action' => 'upgrade-plugin',
@@ -247,14 +254,14 @@ class EDD_SL_Plugin_Updater {
 		if ( ! current_user_can( 'update_plugins' ) ) {
 			echo ' ';
 			esc_html_e( 'Contact your network administrator to install the update.', 'gravity-pdf' );
-		} elseif ( empty( $update_cache->response[ $this->name ]->package ) && ! empty( $changelog_link ) ) {
+		} elseif ( empty( $plugin_update->package ) && ! empty( $changelog_link ) ) {
 			echo ' ';
 			echo wp_kses(
 				sprintf(
 				/* translators: 1. opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate. */
 					__( '%1$sView version %2$s details%3$s.', 'gravity-pdf' ),
 					'<a target="_blank" class="thickbox open-plugin-details-modal" href="' . esc_url( $changelog_link ) . '">',
-					esc_html( $update_cache->response[ $this->name ]->new_version ),
+					esc_html( $plugin_update->new_version ),
 					'</a>'
 				),
 				[
@@ -271,10 +278,10 @@ class EDD_SL_Plugin_Updater {
 				sprintf(
 					__( '%1$sView version %2$s details%3$s or %4$supdate now%5$s.', 'gravity-pdf' ),
 					'<a target="_blank" class="thickbox open-plugin-details-modal" href="' . esc_url( $changelog_link ) . '">',
-					esc_html( $update_cache->response[ $this->name ]->new_version ),
+					esc_html( $plugin_update->new_version ),
 					'</a>',
 					'<a target="_blank" class="update-link" href="' . esc_url( wp_nonce_url( $update_link, 'upgrade-plugin_' . $file ) ) . '">',
-					'</a>',
+					'</a>'
 				),
 				[
 					'a' => [
@@ -500,33 +507,36 @@ class EDD_SL_Plugin_Updater {
 	public function show_changelog() {
 
 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( empty( $_REQUEST['edd_sl_action'] ) || 'view_plugin_changelog' !== $_REQUEST['edd_sl_action'] ) {
+		if ( empty( $_REQUEST['gpdf_sl_action'] ) || 'view_plugin_changelog' !== $_REQUEST['gpdf_sl_action'] ) {
 			return;
 		}
 
 		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( empty( $_REQUEST['plugin'] ) ) {
+		if ( empty( $_REQUEST['plugin'] ) || $this->slug !== $_REQUEST['plugin'] ) {
 			return;
 		}
 
-		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( empty( $_REQUEST['slug'] ) || $this->slug !== $_REQUEST['slug'] ) {
-			return;
-		}
+		check_admin_referer( 'install-plugin_' . $this->slug, 'gpdf_sl_nonce' );
 
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_die( esc_html__( 'You do not have permission to install plugin updates', 'gravity-pdf' ), esc_html__( 'Error', 'gravity-pdf' ), array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to install plugin updates', 'gravity-pdf' ), esc_html__( 'Error', 'gravity-pdf' ), [ 'response' => 403 ] );
 		}
 
-		$version_info = $this->get_repo_api_data();
-		if ( isset( $version_info->sections ) ) {
-			$sections = $this->convert_object_to_array( $version_info->sections );
-			if ( ! empty( $sections['changelog'] ) ) {
-				echo '<div style="background:#fff;padding:10px;">' . wp_kses_post( $sections['changelog'] ) . '</div>';
-			}
-		}
+		/* Masquerade as the plugin install screen */
+		global $hook_suffix, $body_id, $tab, $pagenow;
 
-		exit;
+		$pagenow     = 'plugin-install.php'; //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$hook_suffix = $pagenow; //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$body_id     = 'plugin-information'; //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$tab         = $body_id;
+
+		set_current_screen( 'plugin-install' );
+
+		wp_enqueue_script( 'plugin-install' );
+
+		/* Let WP output the changelog info */
+		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		install_plugin_information();
 	}
 
 	/**
@@ -558,7 +568,7 @@ class EDD_SL_Plugin_Updater {
 	public function get_version_from_remote() {
 		$api_params = array_merge(
 			[ 'edd_action' => 'get_version' ],
-			$this->get_version_api_params(),
+			$this->get_version_api_params()
 		);
 
 		/**
