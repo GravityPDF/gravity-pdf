@@ -177,7 +177,8 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 				$is_specific_gf_page = $pagenow === 'admin.php' && in_array( $_GET['page'] ?? '', [ 'gf_edit_forms', 'gf_entries', 'gf_settings' ], true ); /* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 
 				if ( $is_admin_area && ( $is_specific_wp_page || $is_specific_gf_page ) ) {
-					add_action( 'admin_notices', [ $this, 'display_notices' ] );
+					$notice_hook = is_multisite() && is_network_admin() ? 'network_admin_notices' : 'admin_notices';
+					add_action( $notice_hook, [ $this, 'display_notices' ] );
 				}
 
 				return;
