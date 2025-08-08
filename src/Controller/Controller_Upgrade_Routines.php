@@ -54,6 +54,10 @@ class Controller_Upgrade_Routines {
 			$this->update_background_processing_values();
 			$this->upgrade_custom_fonts();
 		}
+
+		if ( version_compare( $current_version, '6.14.0', '>=' ) && version_compare( $old_version, '6.14.0', '<' ) ) {
+			$this->remove_legacy_update_cache();
+		}
 	}
 
 	/**
@@ -88,5 +92,16 @@ class Controller_Upgrade_Routines {
 		}
 
 		$this->options->update_option( 'custom_fonts', $fonts );
+	}
+
+	/**
+	 * Remove Gravity PDF's edd_sl_* options
+	 *
+	 * @since 6.14.0
+	 */
+	protected function remove_legacy_update_cache() {
+		global $wpdb;
+
+		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'edd_sl_%' AND option_value LIKE '%gravity-pdf%'" );
 	}
 }
