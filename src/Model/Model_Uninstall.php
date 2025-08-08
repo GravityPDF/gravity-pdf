@@ -94,16 +94,21 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 		/* Clean up database */
 		if ( is_multisite() ) {
-			$sites = get_sites();
+			$sites           = get_sites();
+			$current_site_id = get_current_blog_id();
 
 			foreach ( $sites as $site ) {
 				$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 				switch_to_blog( $site['blog_id'] );
+
+				$this->remove_plugin_transients();
 				$this->remove_plugin_options();
 				$this->remove_plugin_form_settings();
 			}
-			restore_current_blog();
+
+			switch_to_blog( $current_site_id );
 		} else {
+			$this->remove_plugin_transients();
 			$this->remove_plugin_options();
 			$this->remove_plugin_form_settings();
 		}
@@ -122,6 +127,18 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Cleanup temporary data
+	 *
+	 * @since 6.14.0
+	 */
+	public function remove_plugin_transients() {
+		delete_transient( 'gfpdf_settings_user_data' );
+
+		$templates = \GPDFAPI::get_templates_class();
+		$templates->flush_template_transient_cache();
+	}
+
+	/**
 	 * Remove and options stored in the database
 	 *
 	 * @since 6.0
@@ -137,8 +154,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Remove all form settings from each individual form.
-	 * Because we stored out PDF settings with each form and have no index we need to individually load and forms and check them for Gravity PDF settings
+	 * Remove all PDF form settings for each form
 	 *
 	 * @since 6.0
 	 */
@@ -206,6 +222,11 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function deactivate_plugin() {
-		deactivate_plugins( PDF_PLUGIN_BASENAME );
+		$basename = PDF_PLUGIN_BASENAME;
+		if ( is_multisite() && is_plugin_active_for_network( $basename ) ) {
+			deactivate_plugins( $basename, false, true );
+		} else {
+			deactivate_plugins( $basename );
+		}
 	}
 }
