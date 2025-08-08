@@ -533,6 +533,7 @@ class EDD_SL_Plugin_Updater {
 		set_current_screen( 'plugin-install' );
 
 		wp_enqueue_script( 'plugin-install' );
+		wp_enqueue_script( 'updates' );
 
 		/* Let WP output the changelog info */
 		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
