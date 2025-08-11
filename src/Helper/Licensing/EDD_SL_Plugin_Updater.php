@@ -496,7 +496,7 @@ class EDD_SL_Plugin_Updater {
 	 * @return void
 	 */
 	public function log_failed_request() {
-		update_option( $this->failed_request_cache_key, strtotime( '+1 hour' ) );
+		update_option( $this->failed_request_cache_key, strtotime( '+1 hour' ), false );
 	}
 
 	/**
@@ -660,7 +660,7 @@ class EDD_SL_Plugin_Updater {
 			'value'   => wp_json_encode( $value ),
 		);
 
-		update_option( $cache_key, $data, 'no' );
+		update_option( $cache_key, $data, false );
 	}
 
 	/**
