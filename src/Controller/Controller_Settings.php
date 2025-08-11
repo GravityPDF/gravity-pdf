@@ -185,6 +185,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 				}
 			}
 		);
+
+		$this->maybe_schedule_network_update_check();
 	}
 
 	/**
@@ -300,5 +302,34 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		}
 
 		return $nav;
+	}
+
+	/**
+	 * On a Multisite installation where Gravity PDF isn't network/primary site activated,
+	 * add a scheduled task to display an update nag in the network admin on a best-effort basis
+	 *
+	 * @return void
+	 *
+	 * @since 6.14.0
+	 */
+	protected function maybe_schedule_network_update_check() {
+		if ( ! is_multisite() || get_current_blog_id() === 1 || is_plugin_active_for_network( PDF_PLUGIN_BASENAME ) ) {
+			return;
+		}
+
+		add_action( 'gfpdf_network_update_check', [ $this->model, 'run_network_update_check' ] );
+
+		if ( wp_next_scheduled( 'gfpdf_network_update_check' ) ) {
+			return;
+		}
+
+		switch_to_blog( 1 );
+		$timestamp = wp_next_scheduled( 'wp_update_plugins' );
+		restore_current_blog();
+
+		if ( $timestamp !== false ) {
+			/* Run action 1 minute after the primary site schedules a plugin update check */
+			wp_schedule_event( $timestamp + 60, 'twicedaily', 'gfpdf_network_update_check' );
+		}
 	}
 }

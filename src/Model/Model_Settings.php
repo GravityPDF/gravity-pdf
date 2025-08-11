@@ -550,6 +550,44 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Force the network to display update nags when the plugin is only activated on a subsite
+	 *
+	 * @return void
+	 *
+	 * @since 6.14.0
+	 */
+	public function run_network_update_check() {
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		$subsite_blog_id = get_current_blog_id();
+		if ( $subsite_blog_id === 1 ) {
+			return;
+		}
+
+		foreach ( [ $subsite_blog_id, 1 ] as $blog_id ) {
+			if ( $blog_id !== $subsite_blog_id ) {
+				switch_to_blog( $blog_id );
+			}
+
+			/*
+			 * Skip a full wp_plugin_update() check and instead force the
+			 * `pre_set_site_transient_update_plugins` filter do its job,
+			 * which many addons (including Gravity PDF) use to inject update info
+			 */
+			$update_info = get_site_transient( 'update_plugins' );
+			if ( $update_info !== false ) {
+				set_site_transient( 'update_plugins', $update_info );
+			}
+
+			if ( $blog_id !== $subsite_blog_id ) {
+				restore_current_blog();
+			}
+		}
+	}
+
+	/**
 	 * Do API call to GravityPDF.com to deactivate add-on license
 	 *
 	 * @param Helper_Abstract_Addon $addon
