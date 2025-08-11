@@ -119,7 +119,7 @@ class Model_Install extends Helper_Abstract_Model {
 		update_option( 'gfpdf_is_installed', true );
 		$this->data->is_installed = true;
 
-		/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_fully_loaded for more details about this action */
+		/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_plugin_installed for more details about this action */
 		do_action( 'gfpdf_plugin_installed' );
 	}
 
