@@ -68,19 +68,12 @@ add_action(
 
 		$logger = \GPDFAPI::get_log_class();
 
-		$request_body = $parsed_args['body'] ?? [];
-		if ( isset( $request_body['license'] ) && is_string( $request_body['license'] ) && strlen( $request_body['license'] ) > 2 ) {
-			/* mask the license key, if exists */
-			$license                 = $request_body['license'];
-			$request_body['license'] = substr( $license, 0, 1 ) . str_repeat( '*', strlen( $license ) - 2 ) . substr( $license, -1, 1 );
-		}
-
 		$logger->notice(
 			'Gravity PDF License Check API Request',
 			[
 				'url'    => $url,
 				'method' => $parsed_args['method'] ?? '',
-				'body'   => $request_body,
+				'body'   => $parsed_args['body'] ?? [],
 			]
 		);
 
