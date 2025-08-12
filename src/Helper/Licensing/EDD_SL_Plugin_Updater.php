@@ -525,10 +525,11 @@ class EDD_SL_Plugin_Updater {
 		/* Masquerade as the plugin install screen */
 		global $hook_suffix, $body_id, $tab, $pagenow;
 
+		/* install_plugin_information() calls `exit;` so there isn't a conflict/compat risk */
 		$pagenow     = 'plugin-install.php'; //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$hook_suffix = $pagenow; //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$body_id     = 'plugin-information'; //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-		$tab         = $body_id;
+		$tab         = $body_id; //phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 		set_current_screen( 'plugin-install' );
 
