@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper\Licensing;
 
-use stdClass;
-
 /**
  * @package     Gravity PDF
  * @author      Easy Digital Downloads
@@ -87,7 +85,7 @@ class EDD_SL_Plugin_Updater {
 	public function check_update( $_transient_data ) {
 
 		if ( ! is_object( $_transient_data ) ) {
-			$_transient_data = new stdClass();
+			$_transient_data = new \stdClass();
 		}
 
 		if ( ! empty( $_transient_data->response ) && ! empty( $_transient_data->response[ $this->name ] ) && false === $this->wp_override ) {
@@ -196,7 +194,7 @@ class EDD_SL_Plugin_Updater {
 
 		if ( ! isset( $update_cache->response[ $this->name ] ) ) {
 			if ( ! is_object( $update_cache ) ) {
-				$update_cache = new stdClass();
+				$update_cache = new \stdClass();
 			}
 			$update_cache->response[ $this->name ] = $this->get_repo_api_data();
 		}
