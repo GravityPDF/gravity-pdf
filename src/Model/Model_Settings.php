@@ -354,24 +354,31 @@ class Model_Settings extends Helper_Abstract_Model {
 			wp_die();
 		}
 
-		if ( $addon->deactivate_license() ) {
-			$this->log->notice( 'AJAX – Successfully Deactivated License' );
+		if ( ! $addon->deactivate_license() ) {
 			echo wp_json_encode(
 				[
-					'success' => esc_html__( 'License deactivated.', 'gravity-pdf' ),
-				]
-			);
-
-			wp_die();
-		} elseif ( $addon->schedule_license_check() ) {
-			echo wp_json_encode(
-				[
-					'error' => $addon->get_license_message(),
+					'error' => wp_kses(
+						sprintf(
+							__( 'An API error occurred and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
+							'<a href="https://gravitypdf.com/account/licenses/">',
+							'</a>'
+						),
+						[ 'a' => [ 'href' => [] ] ]
+					),
 				]
 			);
 
 			wp_die();
 		}
+
+		$this->log->notice( 'AJAX – Successfully Deactivated License' );
+		echo wp_json_encode(
+			[
+				'success' => esc_html__( 'License deactivated.', 'gravity-pdf' ),
+			]
+		);
+
+		wp_die();
 	}
 
 	/**

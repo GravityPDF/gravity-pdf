@@ -674,6 +674,8 @@ abstract class Helper_Abstract_Addon {
 			$settings[ "license_{$slug}_message" ]
 		);
 
+		wp_clear_scheduled_hook( 'gfpdf_' . $slug . '_license_check' );
+
 		$this->log->notice( 'Delete plugin license details' );
 
 		$this->options->update_settings( $settings );
@@ -991,6 +993,7 @@ abstract class Helper_Abstract_Addon {
 
 		/* Remove license data from database, no matter if the API request fails */
 		$this->delete_license_info();
+		$this->flush_update_cache();
 
 		/* If API error exit early */
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
@@ -1004,8 +1007,6 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		$this->log->notice( 'License successfully deactivated', [ 'slug' => $this->get_slug() ] );
-
-		$this->flush_update_cache();
 
 		return true;
 	}
