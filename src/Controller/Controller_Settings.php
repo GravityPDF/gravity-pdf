@@ -319,10 +319,12 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		add_action( 'gfpdf_network_update_check', [ $this->model, 'run_network_update_check' ] );
 
+		/* skip if event already scheduled */
 		if ( wp_next_scheduled( 'gfpdf_network_update_check' ) ) {
 			return;
 		}
 
+		/* grab the next run-time for a plugin update check on the primary site */
 		switch_to_blog( 1 );
 		$timestamp = wp_next_scheduled( 'wp_update_plugins' );
 		restore_current_blog();
