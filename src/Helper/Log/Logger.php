@@ -285,7 +285,7 @@ class Logger {
 	 * - Other WordPress plugins are shipping Psr\Log v2 and v3
 	 * - A PHP declaration error occurs when Gravity PDF runs alongside Psr\Log v2 or v3
 	 *
-	 * This is a temporary measure. Over time our plugins will be updated to support both \Psr\Log\LoggerInterface and '\GFPDF_Vendor\Psr\Log\AbstractLogger' and this won't be required.
+	 * This is a temporary measure. Over time our plugins will be updated to support both \Psr\Log\LoggerInterface and '\GFPDF_Vendor\Psr\Log\LoggerInterface' and this won't be required.
 	 *
 	 * @return LoggerInterface
 	 * @since 6.14.0
