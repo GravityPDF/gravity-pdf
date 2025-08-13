@@ -636,9 +636,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( ! is_wp_error( $pdf ) ) {
 				$template = $pdf['template'];
-			} elseif ( ! empty( $_POST['gfpdf_settings']['template'] ) ) {
+			} elseif ( ! empty( $_POST['gfpdf_settings']['template'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				/* in the middle of creating a new PDF, and not yet saved in the DB. Grab from POST data */
-				$template = sanitize_html_class( $_POST['gfpdf_settings']['template'] );
+				$template = sanitize_html_class( $_POST['gfpdf_settings']['template'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
 		}
 
