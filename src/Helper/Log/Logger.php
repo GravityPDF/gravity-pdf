@@ -54,6 +54,30 @@ class Logger {
 	protected $log;
 
 	/**
+	 * Defines the maximum file size for a log file.
+	 *
+	 * @since    6.14.0
+	 * @internal copied from \GFLogging to do log rotations
+	 */
+	protected $max_file_size = 5242880;
+
+	/**
+	 * Defines the maximum number of log files to store for a plugin.
+	 *
+	 * @since    6.14.0
+	 * @internal copied from \GFLogging to do log rotations
+	 */
+	protected $max_file_count = 10;
+
+	/**
+	 * Defines the date format for logged messages.
+	 *
+	 * @since    6.14.0
+	 * @internal copied from \GFLogging to do log rotations
+	 */
+	protected $date_format_log_file = 'YmdGis';
+
+	/**
 	 * Helper_Logger constructor.
 	 *
 	 * @param string $slug
@@ -170,6 +194,9 @@ class Logger {
 			return;
 		}
 
+		/* Add support for rotating logs */
+		$this->rotate_logs( $log_filename );
+
 		/* Convert Gravity Forms log levels to the appropriate Monolog level */
 		$monolog_level = $log_level === 4 ? MonoLogger::ERROR : MonoLogger::DEBUG;
 
@@ -198,5 +225,52 @@ class Logger {
 		);
 
 		$this->log->pushProcessor( $redact );
+	}
+
+	/**
+	 * Clean up log files.
+	 *
+	 * @param  string $file_path Path to log.
+	 *
+	 * @since  6.14.0
+	 * @internal copied from \GFLogging::maybe_reset_logs()
+	 */
+	protected function rotate_logs( $file_path ) {
+		$gmt_offset = get_option( 'gmt_offset', 0 ) * 3600;
+		$path       = pathinfo( $file_path );
+		$folder     = $path['dirname'] . '/';
+		$file_base  = $path['filename'];
+		$file_ext   = $path['extension'];
+
+		/* Check size of current file. If greater than max file size, rename using time. */
+		if ( is_file( $file_path ) && filesize( $file_path ) > $this->max_file_size ) {
+			$adjusted_date = gmdate( $this->date_format_log_file, time() + $gmt_offset );
+			$new_file_name = $file_base . '_' . $adjusted_date . '.' . $file_ext;
+			@rename( $file_path, $folder . $new_file_name ); // phpcs:ignore
+		}
+
+		/* Get files which match the base name. */
+		$similar_files = \GFCommon::glob( $file_base . '*.*', $folder );
+		$file_count    = count( $similar_files );
+
+		/* Check quantity of files and delete older ones if too many. */
+		if ( false !== $similar_files && $file_count > $this->max_file_count ) {
+
+			/* Sort by date so oldest are first. */
+			usort(
+				$similar_files,
+				function ( $a, $b ) {
+					return filemtime( $a ) - filemtime( $b );
+				}
+			);
+
+			$delete_count = $file_count - $this->max_file_count;
+
+			for ( $i = 0; $i < $delete_count; $i++ ) {
+				if ( is_file( $similar_files[ $i ] ) ) {
+					@unlink( $similar_files[ $i ] ); // phpcs:ignore
+				}
+			}
+		}
 	}
 }
