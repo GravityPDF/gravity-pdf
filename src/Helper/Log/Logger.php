@@ -174,7 +174,7 @@ class Logger {
 		$monolog_level = $log_level === 4 ? MonoLogger::ERROR : MonoLogger::DEBUG;
 
 		/* Setup our stream and change the format to more-suit Gravity Forms */
-		$formatter = new LineFormatter( "%datetime% - %level_name% --> %message%\n|--> %context%\n|--> %extra%\n", 'Y-m-d H:i:s (P)' );
+		$formatter = new LineFormatter( "%datetime% - %level_name% --> %message%\n|--> %context%\n|--> %extra%\n", 'Y-m-d H:i:s.u (P)' );
 		$stream    = new StreamHandler( $log_filename, $monolog_level );
 		$stream->setFormatter( $formatter );
 
