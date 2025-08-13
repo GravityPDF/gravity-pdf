@@ -180,5 +180,23 @@ class Logger {
 
 		/* Add our log file stream */
 		$this->log->pushHandler( $stream );
+
+		/* Add a redact handler to mask sensitive details */
+		$redact = new Redact_Processor(
+			[
+				/* license keys */
+				'license'         => -4,
+				'edd_license_key' => -4,
+
+				/* direct update links */
+				'package'         => 23,
+				'download_link'   => 23,
+			],
+			'*',
+			'%s',
+			32
+		);
+
+		$this->log->pushProcessor( $redact );
 	}
 }

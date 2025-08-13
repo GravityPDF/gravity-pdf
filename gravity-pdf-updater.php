@@ -77,11 +77,14 @@ add_action(
 			]
 		);
 
-		$response_code    = wp_remote_retrieve_response_code( $response );
+		$response_code      = wp_remote_retrieve_response_code( $response );
+		$response_body      = wp_remote_retrieve_body( $response );
+		$response_body_json = json_decode( $response_body, true );
+
 		$response_context = [
 			'status'  => $response_code,
-			'headers' => wp_remote_retrieve_headers( $response ),
-			'body'    => wp_remote_retrieve_body( $response ),
+			'headers' => (array) wp_remote_retrieve_headers( $response ),
+			'body'    => $response_body_json ?? $response_body,
 		];
 
 		if ( $response_code >= 300 ) {
