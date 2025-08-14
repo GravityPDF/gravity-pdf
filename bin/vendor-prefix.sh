@@ -45,5 +45,6 @@ eval "rm -Rf ${PLUGIN_DIR}vendor/myclabs"
 
 # Do this at the end as we have multiple vendor packages used
 eval "rm -Rf ${PLUGIN_DIR}vendor/gravitypdf"
+eval "rm -Rf ${PLUGIN_DIR}vendor/psr"
 
 eval "$COMPOSER dump-autoload --optimize --working-dir ${PLUGIN_DIR}"
