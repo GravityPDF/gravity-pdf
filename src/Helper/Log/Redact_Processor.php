@@ -84,6 +84,11 @@ class Redact_Processor implements ProcessorInterface {
 
 		$result = substr_replace( $value, $placeholder, max( 0, $length ), $hiddenLength );
 
+		/* If no length limit return the string as-is */
+		if ( ! is_integer( $this->lengthLimit ) ) {
+			return $result;
+		}
+
 		return $length > 0
 			? substr( $result, 0, $this->lengthLimit )
 			: substr( $result, -$this->lengthLimit );
