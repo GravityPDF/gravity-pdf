@@ -453,6 +453,9 @@ class Test_Addon extends WP_UnitTestCase {
 	}
 
 	public function test_auto_activate_license_constant() {
+		/* Set admin screen */
+		set_current_screen( 'index.php' );
+
 		$this->assertEmpty( $this->addon->get_license_status() );
 
 		add_filter( 'gfpdf_hardcoded_extension_license_key', function ( $key ) {

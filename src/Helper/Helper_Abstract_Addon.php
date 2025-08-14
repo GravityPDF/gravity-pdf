@@ -304,7 +304,7 @@ abstract class Helper_Abstract_Addon {
 
 		/* Maybe auto-activate hardcoded license */
 		$hardcoded_license = $this->get_license_key_from_constant();
-		if ( is_admin() && $hardcoded_license && empty( $this->get_license_status() ) ) {
+		if ( $hardcoded_license && is_admin() && empty( $this->get_license_status() ) ) {
 			$this->activate_license( $hardcoded_license, true );
 		}
 
