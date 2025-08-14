@@ -302,6 +302,12 @@ abstract class Helper_Abstract_Addon {
 		/* Get and store the license information from the database */
 		$this->get_license_info( true );
 
+		/* Maybe auto-activate hardcoded license */
+		$hardcoded_license = $this->get_license_key_from_constant();
+		if ( is_admin() && $hardcoded_license && empty( $this->get_license_status() ) ) {
+			$this->activate_license( $hardcoded_license, true );
+		}
+
 		/*
 		 * Register our plugin updater
 		 */
@@ -687,7 +693,40 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.2
 	 */
 	final public function get_license_key() {
-		return $this->license_key;
+		$hardcoded_license = $this->get_license_key_from_constant();
+
+		return $hardcoded_license ?: $this->license_key;
+	}
+
+	/**
+	 * Get a Gravity PDF license key defined in the `GPDF_LICENSE_KEY` PHP constant
+	 *
+	 * @return false|string
+	 *
+	 * @since 6.14.0
+	 */
+	final public function get_license_key_from_constant() {
+		$slug = $this->get_slug();
+
+		/** @var string|array $license_key */
+		$license_key = defined( 'GPDF_LICENSE_KEY' ) ? GPDF_LICENSE_KEY : null;
+		$license_key = apply_filters( 'gfpdf_hardcoded_extension_license_key', $license_key, $slug, $this );
+
+		if ( empty( $license_key ) ) {
+			return false;
+		}
+
+		/* universal license */
+		if ( is_string( $license_key ) ) {
+			return $license_key;
+		}
+
+		/* extension-specific license */
+		if ( is_array( $license_key ) && isset( $license_key[ $slug ] ) ) {
+			return $license_key[ $slug ];
+		}
+
+		return false;
 	}
 
 	/**
@@ -943,11 +982,13 @@ abstract class Helper_Abstract_Addon {
 	 * Do API call to GravityPDF.com to activate the current add-on license key
 	 *
 	 * @param string $license_key The current license key for this add-on
+	 * @param bool $use_database Auto-update the database with the response
+	 *
 	 * @return array The API response and license status
 	 *
 	 * @since 6.14.0
 	 */
-	public function activate_license( $license_key = '' ) {
+	public function activate_license( $license_key = '', $use_database = false ) {
 
 		if ( empty( $license_key ) ) {
 			$license_key = $this->get_license_key();
@@ -967,7 +1008,7 @@ abstract class Helper_Abstract_Addon {
 			]
 		);
 
-		$this->update_license_status_from_response( $response );
+		$this->update_license_status_from_response( $response, $use_database );
 
 		return $this->get_license_info();
 	}

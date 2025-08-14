@@ -90,6 +90,8 @@ class Test_Addon extends WP_UnitTestCase {
 
 		$data = \GPDFAPI::get_data_class();
 		$data->addon = [];
+
+		remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -188,6 +190,49 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'license_' . $this->addon->get_slug(), $settings );
 		$this->assertArrayNotHasKey( 'license_' . $this->addon->get_slug() . '_status', $settings );
 		$this->assertArrayNotHasKey( 'license_' . $this->addon->get_slug() . '_message', $settings );
+	}
+
+	public function test_get_license_key_from_constant() {
+		$this->assertFalse( $this->addon->get_license_key_from_constant() );
+		$this->assertFalse( $this->addon2->get_license_key_from_constant() );
+
+		add_filter( 'gfpdf_hardcoded_extension_license_key', function ( $key ) {
+			return 'abc123';
+		} );
+
+		$this->assertSame( 'abc123', $this->addon->get_license_key_from_constant() );
+		$this->assertSame( 'abc123', $this->addon2->get_license_key_from_constant() );
+
+		remove_all_filters( 'gfpdf_hardcoded_extension_license_key' );
+
+		add_filter( 'gfpdf_hardcoded_extension_license_key', function ( $key ) {
+			return [ 'my-custom-plugin' => 'abc456', 'my-custom-plugin2' => 'xyz987' ];
+		} );
+
+		$this->assertSame( 'abc456', $this->addon->get_license_key_from_constant() );
+		$this->assertSame( 'xyz987', $this->addon2->get_license_key_from_constant() );
+	}
+
+	public function test_license_constant_overrides_database() {
+		$this->addon->update_license_info(
+			[
+				'license' => 'my key',
+				'status'  => 'active',
+				'message' => 'Success!',
+			]
+		);
+
+		$license = $this->addon->get_license_info();
+
+		$this->assertSame( 'my key', $license['license'] );
+
+		add_filter( 'gfpdf_hardcoded_extension_license_key', function ( $key ) {
+			return 'abc123';
+		} );
+
+		$license = $this->addon->get_license_info();
+
+		$this->assertSame( 'abc123', $license['license'] );
 	}
 
 	/*
@@ -405,6 +450,32 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->addon->init();
 		do_action( 'init' );
 		$this->assertNotNull( $this->addon->get_plugin_updater() );
+	}
+
+	public function test_auto_activate_license_constant() {
+		$this->assertEmpty( $this->addon->get_license_status() );
+
+		add_filter( 'gfpdf_hardcoded_extension_license_key', function ( $key ) {
+			return 'abc123';
+		} );
+
+		$api_response = function () {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode(
+					[
+						'error' => 'missing',
+					]
+				),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$this->addon->init();
+
+		$this->assertNotEmpty( $this->addon->get_license_key() );
+		$this->assertNotEmpty( $this->addon->get_license_status() );
 	}
 }
 

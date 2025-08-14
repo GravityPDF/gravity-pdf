@@ -249,6 +249,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'id'   => 'license_' . $slug,
 				'name' => $addon->get_short_name(),
 				'type' => 'license',
+				'data' => $addon,
 			];
 
 			$fields[ 'license_' . $slug . '_message' ] = [
