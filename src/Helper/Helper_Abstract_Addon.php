@@ -635,8 +635,6 @@ abstract class Helper_Abstract_Addon {
 			'message' => $this->get_license_message(),
 		];
 
-		$this->log->notice( 'Get plugin license details', $license_details );
-
 		return $license_details;
 	}
 
