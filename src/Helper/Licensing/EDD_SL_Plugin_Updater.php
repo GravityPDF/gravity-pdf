@@ -19,12 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @author  Easy Digital Downloads
  * @version 1.9.4
- * @since 6.14.0 Modified to make this class more useful for our plugin suite
+ * @since   6.14.0 Modified to make this class more useful for our plugin suite
  */
 class EDD_SL_Plugin_Updater {
 
 	protected $api_url     = '';
-	protected $api_data    = array();
+	protected $api_data    = [];
 	protected $plugin_file = '';
 	protected $name        = '';
 	protected $slug        = '';
@@ -36,12 +36,9 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Class constructor.
 	 *
-	 * @uses plugin_basename()
-	 * @uses hook()
-	 *
-	 * @param string  $_api_url     The URL pointing to the custom API endpoint.
-	 * @param string  $_plugin_file Path to the plugin file.
-	 * @param array   $_api_data    Optional data to send with API calls.
+	 * @param string $_api_url     The URL pointing to the custom API endpoint.
+	 * @param string $_plugin_file Path to the plugin file.
+	 * @param array  $_api_data    Optional data to send with API calls.
 	 */
 	public function __construct( $_api_url, $_plugin_file, $_api_data = null ) {
 		$this->api_url                  = trailingslashit( $_api_url );
@@ -57,16 +54,12 @@ class EDD_SL_Plugin_Updater {
 
 	/**
 	 * Set up WordPress filters to hook into WP's update process.
-	 *
-	 * @uses add_filter()
-	 *
-	 * @return void
 	 */
 	public function init() {
-		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
-		add_filter( 'plugins_api', array( $this, 'plugins_api_filter' ), 10, 3 );
-		add_action( 'after_plugin_row', array( $this, 'show_update_notification' ), 10, 2 );
-		add_action( 'admin_init', array( $this, 'show_changelog' ) );
+		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
+		add_filter( 'plugins_api', [ $this, 'plugins_api_filter' ], 10, 3 );
+		add_action( 'after_plugin_row', [ $this, 'show_update_notification' ], 10, 2 );
+		add_action( 'admin_init', [ $this, 'show_changelog' ] );
 	}
 
 	/**
@@ -77,9 +70,8 @@ class EDD_SL_Plugin_Updater {
 	 * It is reassembled from parts of the native WordPress plugin update code.
 	 * See wp-includes/update.php line 121 for the original wp_update_plugins() function.
 	 *
-	 * @uses get_version_info()
+	 * @param object $_transient_data Update array build by WordPress.
 	 *
-	 * @param array   $_transient_data Update array build by WordPress.
 	 * @return array Modified update array with custom plugin data.
 	 */
 	public function check_update( $_transient_data ) {
@@ -127,8 +119,9 @@ class EDD_SL_Plugin_Updater {
 	 *
 	 * This is required so subsites in a Network can correctly display the changelog info
 	 *
-	 * @since 3.8.12
 	 * @return \stdClass|false
+	 *
+	 * @since 3.8.12
 	 */
 	public function get_update_transient_data() {
 		return $this->get_repo_api_data();
@@ -137,9 +130,11 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Gets the plugin's tested version.
 	 *
-	 * @since 1.9.2
 	 * @param object $version_info
+	 *
 	 * @return null|string
+	 *
+	 * @since 1.9.2
 	 */
 	public function get_tested_version( $version_info ) {
 
@@ -169,8 +164,9 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Show the update notification on multisite subsites.
 	 *
-	 * @param string  $file
-	 * @param array   $plugin
+	 * @param string $file
+	 * @param array  $plugin
+	 *
 	 * @return void
 	 */
 	public function show_update_notification( $file, $plugin ) {
@@ -236,10 +232,10 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		$update_link = add_query_arg(
-			array(
+			[
 				'action' => 'upgrade-plugin',
 				'plugin' => rawurlencode( $this->name ),
-			),
+			],
 			self_admin_url( 'update.php' )
 		);
 
@@ -327,11 +323,10 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Updates information on the "View version x.x details" page with custom data.
 	 *
-	 * @uses get_version_info()
+	 * @param mixed  $_data
+	 * @param string $_action
+	 * @param object $_args
 	 *
-	 * @param mixed   $_data
-	 * @param string  $_action
-	 * @param object  $_args
 	 * @return object $_data
 	 */
 	public function plugins_api_filter( $_data, $_action = '', $_args = null ) {
@@ -398,17 +393,17 @@ class EDD_SL_Plugin_Updater {
 	 * Some data like sections, banners, and icons are expected to be an associative array, however due to the JSON
 	 * decoding, they are objects. This method allows us to pass in the object and return an associative array.
 	 *
-	 * @since 3.6.5
-	 *
 	 * @param \stdClass|array $data
 	 *
 	 * @return array
+	 *
+	 * @since 3.6.5
 	 */
 	public function convert_object_to_array( $data ) {
 		if ( ! is_array( $data ) && ! is_object( $data ) ) {
-			return array();
+			return [];
 		}
-		$new_data = array();
+		$new_data = [];
 		foreach ( $data as $key => $value ) {
 			$new_data[ $key ] = is_object( $value ) ? $this->convert_object_to_array( $value ) : $value;
 		}
@@ -419,8 +414,9 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Disable SSL verification in order to prevent download update failures
 	 *
-	 * @param array   $args
-	 * @param string  $url
+	 * @param array  $args
+	 * @param string $url
+	 *
 	 * @return array
 	 */
 	public function http_request_args( $args, $url ) {
@@ -428,20 +424,17 @@ class EDD_SL_Plugin_Updater {
 		if ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' ) ) {
 			$args['sslverify'] = $this->verify_ssl();
 		}
+
 		return $args;
 	}
 
 	/**
 	 * Calls the API and, if successful, returns the object delivered by the API.
 	 *
-	 * @uses get_bloginfo()
-	 * @uses wp_remote_post()
-	 * @uses is_wp_error()
-	 *
 	 * @return \stdClass|false
 	 */
 	public function get_version_info() {
-		// Don't allow a plugin to ping itself
+		/* Don't allow a plugin to ping itself */
 		if ( trailingslashit( home_url() ) === $this->api_url ) {
 			return false;
 		}
@@ -456,14 +449,14 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Determines if a request has recently failed.
 	 *
-	 * @since 1.9.1
-	 *
 	 * @return bool
+	 *
+	 * @since 1.9.1
 	 */
 	public function request_recently_failed() {
 		$failed_request_details = get_option( $this->failed_request_cache_key );
 
-		// Request has never failed.
+		/* Request has never failed. */
 		if ( empty( $failed_request_details ) || ! is_numeric( $failed_request_details ) ) {
 			return false;
 		}
@@ -488,10 +481,9 @@ class EDD_SL_Plugin_Updater {
 	 * will be allowed again. This way if the site is down for some reason we don't bombard
 	 * it with failed API requests.
 	 *
-	 * @see EDD_SL_Plugin_Updater::request_recently_failed
+	 * @return void
 	 *
 	 * @since 1.9.1
-	 * @return void
 	 */
 	public function log_failed_request() {
 		update_option( $this->failed_request_cache_key, strtotime( '+1 hour' ), false );
@@ -543,6 +535,7 @@ class EDD_SL_Plugin_Updater {
 	 * Get the arguments required for the version API check
 	 *
 	 * @return array
+	 *
 	 * @since 6.14.0
 	 */
 	public function get_version_api_params() {
@@ -574,19 +567,19 @@ class EDD_SL_Plugin_Updater {
 		/**
 		 * Filters the parameters sent in the API request.
 		 *
-		 * @param array  $api_params        The array of data sent in the request.
-		 * @param array  $this->api_data    The array of data set up in the class constructor.
-		 * @param string $this->plugin_file The full path and filename of the file.
+		 * @param array  $api_params The array of data sent in the request.
+		 * @param array  $this       ->api_data    The array of data set up in the class constructor.
+		 * @param string $this       ->plugin_file The full path and filename of the file.
 		 */
 		$api_params = apply_filters( 'gpdf_sl_plugin_updater_api_params', $api_params, $this->api_data, $this->plugin_file );
 
 		$request = wp_remote_post(
 			$this->api_url,
-			array(
+			[
 				'timeout'   => 15,
 				'sslverify' => $this->verify_ssl(),
 				'body'      => $api_params,
-			)
+			]
 		);
 
 		if ( is_wp_error( $request ) || ( 200 !== wp_remote_retrieve_response_code( $request ) ) ) {
@@ -598,15 +591,14 @@ class EDD_SL_Plugin_Updater {
 		$response = json_decode( wp_remote_retrieve_body( $request ) );
 		$response = apply_filters( 'gpdf_sl_plugin_updater_api_response', $response, $this->api_data, $this->plugin_file );
 
-		$response = $this->standardize_api_response( $response );
-
-		return $response;
+		return $this->standardize_api_response( $response );
 	}
 
 	/**
 	 * Get the version info from the cache, if it exists.
 	 *
 	 * @param string $cache_key
+	 *
 	 * @return object|false
 	 */
 	public function get_cached_version_info( $cache_key = '' ) {
@@ -617,14 +609,14 @@ class EDD_SL_Plugin_Updater {
 
 		$cache = get_option( $cache_key );
 
-		// Cache is expired
+		/* Cache is expired */
 		if ( empty( $cache['timeout'] ) || time() > $cache['timeout'] ) {
 			return false;
 		}
 
 		$value = json_decode( $cache['value'] );
 
-		// Convert the sections/banners/icons back into arrays (it gets converted to an object at some point)
+		/* Convert the sections/banners/icons back into arrays (it gets converted to an object at some point) */
 		if ( isset( $value->sections ) && ! is_array( $value->sections ) ) {
 			$value->sections = $this->convert_object_to_array( $value->sections );
 		}
@@ -654,10 +646,10 @@ class EDD_SL_Plugin_Updater {
 			$cache_key = $this->get_cache_key();
 		}
 
-		$data = array(
+		$data = [
 			'timeout' => strtotime( '+3 hours', time() ),
 			'value'   => wp_json_encode( $value ),
-		);
+		];
 
 		update_option( $cache_key, $data, false );
 	}
@@ -700,11 +692,11 @@ class EDD_SL_Plugin_Updater {
 		);
 
 		/* Prevent a version check API call right after the plugin data is removed */
-		remove_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+		remove_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
 
 		$results = set_site_transient( 'update_plugins', $plugin_update );
 
-		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
 
 		return $results;
 	}
@@ -712,8 +704,9 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Returns if the SSL of the store should be verified.
 	 *
-	 * @since  1.6.13
 	 * @return bool
+	 *
+	 * @since  1.6.13
 	 */
 	public function verify_ssl() {
 		return (bool) apply_filters( 'gpdf_sl_api_request_verify_ssl', true, $this );
@@ -722,8 +715,9 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Gets the unique key (option name) for a plugin.
 	 *
-	 * @since 1.9.0
 	 * @return string
+	 *
+	 * @since 1.9.0
 	 */
 	public function get_cache_key() {
 		$string = $this->slug . $this->api_data['license'] . $this->beta;
@@ -772,7 +766,7 @@ class EDD_SL_Plugin_Updater {
 			}
 		}
 
-		// This is required for your plugin to support auto-updates in WordPress 5.5.
+		/* This is required for your plugin to support auto-updates in WordPress 5.5. */
 		$response->plugin = $this->name;
 		$response->id     = $this->name;
 		$response->tested = $this->get_tested_version( $response );
@@ -792,6 +786,7 @@ class EDD_SL_Plugin_Updater {
 
 	/**
 	 * @return string
+	 *
 	 * @since 6.14.0
 	 */
 	public function get_plugin_file() {
