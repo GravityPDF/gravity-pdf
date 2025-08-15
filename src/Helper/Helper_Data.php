@@ -192,6 +192,7 @@ class Helper_Data {
 			'default'             => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
 			'generic'             => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
 			'error'               => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
+			'rate_limit'          => __( 'The licensing server is temporarily unavailable.', 'gravity-pdf' ),
 		];
 	}
 

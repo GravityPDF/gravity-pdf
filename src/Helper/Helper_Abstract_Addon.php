@@ -842,8 +842,14 @@ abstract class Helper_Abstract_Addon {
 	 * @since 6.14.0
 	 */
 	public function update_license_status_from_response( $response, $use_database = false ) {
-		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( is_wp_error( $response ) || $response_code !== 200 ) {
 			$license_data = new \stdClass();
+
+			/* handle rate limiting */
+			if ( $response_code === 429 ) {
+				$license_data->error = 'rate_limit';
+			}
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 		}
