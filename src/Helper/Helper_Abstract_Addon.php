@@ -430,7 +430,12 @@ abstract class Helper_Abstract_Addon {
 		$this->plugin_updater = new EDD_SL_Plugin_Updater(
 			$this->data->store_url,
 			$this->get_main_plugin_file(),
-			$this->get_default_api_params()
+			array_merge(
+				$this->get_default_api_params(),
+				[
+					'wp_override' => current_user_can( 'update_plugins' ) && ! empty( $_GET['force-check'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				]
+			)
 		);
 
 		$this->plugin_updater->init();

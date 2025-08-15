@@ -46,9 +46,9 @@ class EDD_SL_Plugin_Updater {
 		$this->plugin_file              = $_plugin_file;
 		$this->name                     = plugin_basename( $_plugin_file );
 		$this->slug                     = basename( dirname( $_plugin_file ) );
-		$this->version                  = $_api_data['version'];
-		$this->wp_override              = isset( $_api_data['wp_override'] ) ? (bool) $_api_data['wp_override'] : false;
-		$this->beta                     = ! empty( $this->api_data['beta'] ) ? true : false;
+		$this->version                  = $_api_data['version'] ?? 0;
+		$this->wp_override              = isset( $_api_data['wp_override'] ) && (bool) $_api_data['wp_override'];
+		$this->beta                     = ! empty( $this->api_data['beta'] );
 		$this->failed_request_cache_key = 'gpdf_sl_failed_http_' . md5( $this->api_url );
 	}
 
@@ -80,8 +80,12 @@ class EDD_SL_Plugin_Updater {
 			$_transient_data = new \stdClass();
 		}
 
-		if ( ! empty( $_transient_data->response ) && ! empty( $_transient_data->response[ $this->name ] ) && false === $this->wp_override ) {
-			return $_transient_data;
+		if ( ! empty( $_transient_data->response ) && ! empty( $_transient_data->response[ $this->name ] ) ) {
+			if ( false === $this->wp_override ) {
+				return $_transient_data;
+			}
+
+			unset( $_transient_data->response[ $this->name ] );
 		}
 
 		$current = $this->get_update_transient_data();
@@ -214,7 +218,7 @@ class EDD_SL_Plugin_Updater {
 
 		$changelog_link = '';
 
-		$has_changelog = ! empty( $plugin_update->sections->changelog ) || ! empty( $plugin_update->sections['changelog'] );
+		$has_changelog = ! empty( $plugin_update->sections->changelog );
 
 		if ( $has_changelog ) {
 			$changelog_link = add_query_arg(
@@ -409,23 +413,6 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		return $new_data;
-	}
-
-	/**
-	 * Disable SSL verification in order to prevent download update failures
-	 *
-	 * @param array  $args
-	 * @param string $url
-	 *
-	 * @return array
-	 */
-	public function http_request_args( $args, $url ) {
-
-		if ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' ) ) {
-			$args['sslverify'] = $this->verify_ssl();
-		}
-
-		return $args;
 	}
 
 	/**

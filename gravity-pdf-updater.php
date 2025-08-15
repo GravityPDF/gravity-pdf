@@ -29,12 +29,13 @@ add_action(
 			GPDF_API_URL,
 			GPDF_PLUGIN_FILE,
 			[
-				'version'   => PDF_EXTENDED_VERSION,
-				'item_name' => 'Gravity PDF',
-				'item_id'   => 137043,
-				'license'   => md5( site_url() ),
-				'author'    => 'Blue Liquid Designs',
-				'beta'      => false,
+				'version'     => PDF_EXTENDED_VERSION,
+				'item_name'   => 'Gravity PDF',
+				'item_id'     => 137043,
+				'license'     => md5( site_url() ),
+				'author'      => 'Blue Liquid Designs',
+				'beta'        => false,
+				'wp_override' => current_user_can( 'update_plugins' ) && ! empty( $_GET['force-check'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			]
 		);
 
