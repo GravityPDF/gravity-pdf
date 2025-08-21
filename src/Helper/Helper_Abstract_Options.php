@@ -1723,9 +1723,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* get selected value (if any) */
 		$value = $this->get_form_value( $args );
 
-		$error_statuses = [ '', 'active' ];
-		$is_error       = ! in_array( $value['status'], $error_statuses, true );
-		$is_active      = $value['status'] === 'active';
+		/** @var Helper_Abstract_Addon $addon */
+		$addon             = $args['data'];
+		$hardcoded_license = $addon->get_license_key_from_constant();
+		if ( $hardcoded_license ) {
+			$value['key']   = $hardcoded_license;
+			$args['desc2']  = __( 'License key set by the site administrator.', 'gravity-pdf' );
+			$args['desc2'] .= ' <a href="https://docs.gravitypdf.com/v6/extensions/installing-upgrading-extensions#hardcode-license-with-php-constant">' . __( 'Learn more.', 'gravity-pdf' ) . '</a>';
+		}
+
+		$is_error  = ! in_array( $value['status'], [ '', 'active', 'valid' ], true );
+		$is_active = in_array( $value['status'], [ 'active', 'valid' ], true );
 		?>
 
 		<?php if ( ! empty( $value['msg'] ) ): ?>
@@ -1750,9 +1758,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
 			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
 			   value="<?php echo esc_attr( ! empty( $value['key'] ) ? sha1( $value['key'] ) : '' ); ?>"
+			   <?php echo $hardcoded_license ? 'readonly' : ''; ?>
 		/>
 
-		<?php if ( $is_active ): ?>
+		<?php if ( $is_active && ! $hardcoded_license ): ?>
 			<button type="button"
 					class="button primary white gfpdf-deactivate-license"
 					data-addon-name="<?php echo esc_attr( substr( $args['id'], 8 ) ); ?>"

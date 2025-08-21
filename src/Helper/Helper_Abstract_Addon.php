@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -25,35 +26,35 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @since 4.2
 	 */
-	private $slug;
+	protected $slug;
 
 	/**
 	 * @var string The add-on name (should match the name/title used in EDD)
 	 *
 	 * @since 4.2
 	 */
-	private $name;
+	protected $name;
 
 	/**
 	 * @var string The add-on author
 	 *
 	 * @since 4.2
 	 */
-	private $author;
+	protected $author;
 
 	/**
 	 * @var string The add-on version
 	 *
 	 * @since 4.2
 	 */
-	private $version;
+	protected $version;
 
 	/**
 	 * @var string The add-on mail file path
 	 *
 	 * @since 4.2
 	 */
-	private $addon_path_main_plugin_file;
+	protected $addon_path_main_plugin_file;
 
 	/**
 	 * Holds our registered objects
@@ -123,6 +124,42 @@ abstract class Helper_Abstract_Addon {
 	 * @internal This has been added for backwards compatibility. Use self::enable_settings_prefix() after initialization to opt in
 	 */
 	protected $use_settings_prefix = false;
+
+	/**
+	 * @var EDD_SL_Plugin_Updater
+	 * @since 6.14.0
+	 */
+	protected $plugin_updater;
+
+	/**
+	 * @var string The current license key for this addon
+	 * @since 6.14.0
+	 */
+	protected $license_key = '';
+
+	/**
+	 * @var string The current license key status (retrieved from the API) for this addon
+	 * @since 6.14.0
+	 */
+	protected $license_key_status = '';
+
+	/**
+	 * @var string The current license key message for this addon (based on the status)
+	 * @since 6.14.0
+	 */
+	protected $license_key_message = '';
+
+	/**
+	 * @var bool Whether the addon activated the license based on another addon activation
+	 * @since 6.14.0
+	 */
+	protected $license_auto_activated = false;
+
+	/**
+	 * @var bool Whether the addon deactivated the license based on another addon deactivation
+	 * @since 6.14.0
+	 */
+	protected $license_auto_deactivated = false;
 
 	/**
 	 * Helper_Abstract_Addon constructor.
@@ -253,6 +290,19 @@ abstract class Helper_Abstract_Addon {
 	}
 
 	/**
+	 * @return EDD_SL_Plugin_Updater|null
+	 * @since 6.14.0
+	 */
+	public function get_plugin_updater() {
+		$updater = $this->plugin_updater;
+		if ( ! $updater ) {
+			_doing_it_wrong( __METHOD__, 'This method should not be called before the "init" hook (priority 1)', '6.14.0' );
+		}
+
+		return $updater;
+	}
+
+	/**
 	 * Setup the add-on licensing and initialise any classes
 	 *
 	 * @param array $classes
@@ -261,13 +311,32 @@ abstract class Helper_Abstract_Addon {
 	 */
 	public function init( $classes = [] ) {
 
+		/* Get and store the license information from the database */
+		$this->get_license_info( true );
+
 		/*
-		 * Register our plugin updater on the admin initialisation action
-		 *
-		 * @Internal Due to WordPress.org rules we cannot initialisation the updater code in the core plugin
-		 *           Add-ons have to initialise this functionality via GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater
+		 * Register our plugin updater
 		 */
-		add_action( 'init', [ $this, 'plugin_updater' ] );
+		$central_plugin_updater = function () {
+			$this->central_plugin_updater();
+		};
+
+		add_action( 'init', $central_plugin_updater, 1 );
+
+		/* Maybe auto-activate hardcoded license */
+		$maybe_activate_hardcoded_license = function () {
+			$hardcoded_license = $this->get_license_key_from_constant();
+			if (
+				$hardcoded_license && /* is constant defined */
+				$hardcoded_license !== $this->license_key && /* is hardcoded license different to DB version */
+				! $this->license_auto_activated && /* if addon hasn't already be auto-activated when another addon was activated */
+				is_admin() /* is the admin area */
+			) {
+				$this->activate_license( $hardcoded_license, true );
+			}
+		};
+
+		add_action( 'init', $maybe_activate_hardcoded_license, 2 );
 
 		/*
 		 * Automatically register our addon with the main plugin to enable license management in the UI
@@ -281,22 +350,17 @@ abstract class Helper_Abstract_Addon {
 			add_filter( 'gfpdf_settings_extensions', [ $this, 'register_addon_fields' ] );
 		}
 
-		/*
-		 * Automatically schedule license checks weekly
-		 */
-		add_action( 'admin_init', [ $this, 'maybe_schedule_license_check' ] );
+		/* Add listener for now-deprecated individual licence check (handled in bulk in Controller_Settings) */
 		add_action( 'gfpdf_' . $this->get_slug() . '_license_check', [ $this, 'schedule_license_check' ] );
+
+		/* Add listener for other license activation/deactivation */
+		add_action( 'gfpdf_addon_post_license_activation', [ $this, 'maybe_auto_activate_license' ], 10, 3 );
+		add_action( 'gfpdf_addon_post_license_deactivation', [ $this, 'maybe_auto_deactivate_license' ], 10, 2 );
 
 		/*
 		 * Include info on plugin listing
 		 */
-		add_action(
-			'after_plugin_row_' . plugin_basename( $this->get_main_plugin_file() ),
-			[
-				$this,
-				'license_registration',
-			]
-		);
+		add_action( 'after_plugin_row_' . plugin_basename( $this->get_main_plugin_file() ), [ $this, 'license_registration' ] );
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		/*
@@ -329,15 +393,12 @@ abstract class Helper_Abstract_Addon {
 	/**
 	 * This method handles the add-on update code
 	 *
-	 * Due to WordPress.org rules we cannot initialisation the updater code in the core plugin so add-ons that utilise
-	 * this class need to handle that code themselves.
-	 *
 	 * Official Gravity PDF add-ons should initialise the GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater class
 	 * when the add-on license status is set to "active". You can check the status of the plugin
 	 * using the following:
 	 *
 	 * $license_info = $this->get_license_info();
-	 * if ( $license_info['status'] !== 'active' ) {
+	 * if ( in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) ) {
 	 *    return;
 	 * }
 	 *
@@ -357,14 +418,43 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 * @since 4.2
-	 *
+	 * @depecated 6.14.0 Use self::central_plugin_updater()
 	 */
-	abstract public function plugin_updater();
+	public function plugin_updater() {}
+
+	/**
+	 * @return array
+	 * @since 6.14.0
+	 */
+	public function get_default_api_params() {
+		return [
+			'version'   => $this->get_version(),
+			'license'   => $this->get_license_key(),
+			'item_name' => $this->get_short_name(),
+			'item_id'   => $this->get_edd_download_id(),
+			'author'    => $this->get_author(),
+			'beta'      => false,
+		];
+	}
+
+	/**
+	 * The central add-on update initializer
+	 *
+	 * @return void
+	 * @since 6.14
+	 */
+	protected function central_plugin_updater() {
+		$this->plugin_updater = new EDD_SL_Plugin_Updater(
+			$this->data->store_url,
+			$this->get_main_plugin_file(),
+			$this->get_default_api_params()
+		);
+
+		$this->plugin_updater->init();
+	}
 
 	/**
 	 * Register the add-on with Gravity PDF
-	 *
-	 * @Internal If you don't want the add-on licensing handled automatically in the UI override this method
 	 *
 	 * @since    4.2
 	 */
@@ -522,27 +612,28 @@ abstract class Helper_Abstract_Addon {
 	}
 
 	/**
-	 * Get the add-on license information stored in the database (if any)
+	 * Get the add-on license information (if any)
 	 *
-	 * @Internal If you don't want the add-on licensing handled automatically in the UI override this method
+	 * @param bool $use_database Fetch license info from the database
 	 *
 	 * @since    4.2
+	 * @since 6.14.0 Get license info stored in the object
 	 */
-	public function get_license_info() {
-		$settings = $this->options->get_settings();
+	public function get_license_info( $use_database = false ) {
+		if ( $use_database ) {
+			$settings = $this->options->get_settings();
 
-		$slug    = $this->get_slug();
-		$license = ( isset( $settings[ "license_$slug" ] ) ) ? $settings[ "license_$slug" ] : '';
-		$status  = ( isset( $settings[ "license_{$slug}_status" ] ) ) ? $settings[ "license_{$slug}_status" ] : '';
-		$message = ( isset( $settings[ "license_{$slug}_message" ] ) ) ? $settings[ "license_{$slug}_message" ] : '';
+			$slug                      = $this->get_slug();
+			$this->license_key         = $settings[ "license_$slug" ] ?? '';
+			$this->license_key_status  = $settings[ "license_{$slug}_status" ] ?? '';
+			$this->license_key_message = $settings[ "license_{$slug}_message" ] ?? '';
+		}
 
 		$license_details = [
-			'license' => $license,
-			'status'  => $status,
-			'message' => $message,
+			'license' => $this->get_license_key(),
+			'status'  => $this->get_license_status(),
+			'message' => $this->get_license_message(),
 		];
-
-		$this->log->notice( 'Get plugin license details', $license_details );
 
 		return $license_details;
 	}
@@ -551,18 +642,31 @@ abstract class Helper_Abstract_Addon {
 	 * Update the add-on license information stored in the database
 	 *
 	 * @param array $license_info
-	 *
-	 * @Internal If you don't want the add-on licensing handled automatically in the UI override this method
+	 * @param bool $use_database Whether to update the database or not. A DB update will auto-call Model_Settings::maybe_active_licenses(), which may not be ideal
 	 *
 	 * @since    4.2
+	 * @since 6.14.0 Added
 	 */
-	public function update_license_info( $license_info ) {
+	public function update_license_info( $license_info, $use_database = false ) {
+		$this->license_key         = $license_info['license'] ?? '';
+		$this->license_key_status  = $license_info['status'] ?? '';
+		$this->license_key_message = $license_info['message'] ?? '';
+
+		/* Check the update has been initialized before setting the license key */
+		if ( isset( $this->plugin_updater ) ) {
+			$this->plugin_updater->set_license_key( $this->license_key );
+		}
+
+		if ( ! $use_database ) {
+			return;
+		}
+
 		$settings = $this->options->get_settings();
 		$slug     = $this->get_slug();
 
-		$settings[ "license_$slug" ]           = $license_info['license'];
-		$settings[ "license_{$slug}_status" ]  = $license_info['status'];
-		$settings[ "license_{$slug}_message" ] = $license_info['message'];
+		$settings[ "license_$slug" ]           = $this->get_license_key();
+		$settings[ "license_{$slug}_status" ]  = $this->get_license_status();
+		$settings[ "license_{$slug}_message" ] = $this->get_license_message();
 
 		$this->log->notice( 'Update plugin license details', $license_info );
 
@@ -575,12 +679,23 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.2
 	 */
 	public function delete_license_info() {
+		$this->update_license_info( [] );
+
+		/* Check the update has been initialized before setting the license key */
+		if ( isset( $this->plugin_updater ) ) {
+			$this->plugin_updater->set_license_key( '' );
+		}
+
 		$settings = $this->options->get_settings();
 		$slug     = $this->get_slug();
 
-		unset( $settings[ "license_$slug" ] );
-		unset( $settings[ "license_{$slug}_status" ] );
-		unset( $settings[ "license_{$slug}_message" ] );
+		unset(
+			$settings[ "license_$slug" ],
+			$settings[ "license_{$slug}_status" ],
+			$settings[ "license_{$slug}_message" ]
+		);
+
+		wp_clear_scheduled_hook( 'gfpdf_' . $slug . '_license_check' );
 
 		$this->log->notice( 'Delete plugin license details' );
 
@@ -593,7 +708,44 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.2
 	 */
 	final public function get_license_key() {
-		return $this->get_license_info()['license'];
+		$hardcoded_license = $this->get_license_key_from_constant();
+
+		return $hardcoded_license ?: $this->license_key;
+	}
+
+	/**
+	 * Get a Gravity PDF license key defined in the `GPDF_LICENSE_KEY` PHP constant
+	 *
+	 * @return false|string
+	 *
+	 * @since 6.14.0
+	 */
+	final public function get_license_key_from_constant() {
+		$slug = $this->get_slug();
+
+		/** @var string|array $license_key */
+		$license_key = defined( 'GPDF_LICENSE_KEY' ) ? GPDF_LICENSE_KEY : null;
+		$license_key = apply_filters( 'gfpdf_addon_hardcoded_license_key', $license_key, $slug, $this );
+
+		if ( empty( $license_key ) ) {
+			return false;
+		}
+
+		/* universal license */
+		if ( is_string( $license_key ) ) {
+			return $license_key;
+		}
+
+		/* extension-specific license */
+		if ( is_array( $license_key ) && isset( $license_key[ $slug ] ) ) {
+			return $license_key[ $slug ];
+		}
+
+		if ( is_array( $license_key ) && isset( $license_key['*'] ) ) {
+			return $license_key['*'];
+		}
+
+		return false;
 	}
 
 	/**
@@ -602,7 +754,7 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.2
 	 */
 	final public function get_license_status() {
-		return $this->get_license_info()['status'];
+		return $this->license_key_status;
 	}
 
 	/**
@@ -611,7 +763,27 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.2
 	 */
 	final public function get_license_message() {
-		return $this->get_license_info()['message'];
+		return $this->license_key_message;
+	}
+
+	/**
+	 * Whether the addon activated the license based on another addon activation
+	 *
+	 * @return bool
+	 * @since 6.14.0
+	 */
+	final public function has_license_auto_activated() {
+		return $this->license_auto_activated;
+	}
+
+	/**
+	 * Whether the addon deactivated the license based on another addon deactivation.
+	 *
+	 * @return bool
+	 * @since 6.14.0
+	 */
+	final public function has_license_auto_deactivated() {
+		return $this->license_auto_deactivated;
 	}
 
 	/**
@@ -621,6 +793,8 @@ abstract class Helper_Abstract_Addon {
 	 *           and 2. Need to clear the scheduled hook when the plugin is deactivated
 	 *
 	 * @since    4.2
+	 *
+	 * @depreacted 6.14.0 Handled in bulk via Model_Settings::licensing_bulk_license_check()
 	 */
 	final public function maybe_schedule_license_check() {
 		if ( ! wp_next_scheduled( 'gfpdf_' . $this->get_slug() . '_license_check' ) ) {
@@ -631,15 +805,11 @@ abstract class Helper_Abstract_Addon {
 	/**
 	 * Makes an API call to check the status of the license and updates the license settings
 	 *
-	 * @Internal If you don't want the add-on licensing handled automatically in the UI override this method
-	 *
 	 * @since    4.2
 	 */
 	public function schedule_license_check() {
-		$license_info = $this->get_license_info();
-
-		/* If the license info is empty disable check */
-		if ( empty( array_filter( $license_info ) ) ) {
+		/* If there's no license key disable the check */
+		if ( empty( $this->get_license_key() ) ) {
 			return false;
 		}
 
@@ -647,52 +817,101 @@ abstract class Helper_Abstract_Addon {
 			$this->data->store_url,
 			[
 				'timeout' => 15,
-				'body'    => [
-					'edd_action'  => 'check_license',
-					'license'     => $license_info['license'],
-					'item_id'     => $this->get_edd_download_id(),
-					'item_name'   => rawurlencode( $this->get_short_name() ),
-					'url'         => home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
-				],
+				'body'    => array_merge(
+					[ 'edd_action' => 'check_license' ],
+					$this->get_default_api_params()
+				),
 			]
 		);
 
-		/* If there was a problem with the request we'll try again in an hour */
+		/* Check for problems contacting the licensing server */
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$this->log->error( 'Failed to contact remote API for license status check. Rescheduling.' );
-			wp_schedule_single_event( strtotime( '+ 1 hour' ), 'gfpdf_' . $this->get_slug() . '_license_check' );
+			$this->log->error(
+				'Failed to contact remote API for license status check.',
+				[
+					'slug'  => $this->get_slug(),
+					'error' => is_wp_error( $response ) ? $response->get_error_message() : wp_remote_retrieve_response_code( $response ),
+				]
+			);
+
+			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_' . $this->get_slug() . '_license_check' );
 
 			return false;
 		}
 
+		/* Check for a malformed response */
 		$license_check = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( $license_check === null ) {
+			$this->log->error(
+				'Invalid response returned from license status check.',
+				[
+					'slug'     => $this->get_slug(),
+					'response' => wp_remote_retrieve_body( $response ),
+				]
+			);
 
-		/* License still valid, no need to do anything */
-		if ( isset( $license_check->license ) && $license_check->license === 'valid' ) {
-			$this->log->notice( 'License key still valid.' );
+			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_' . $this->get_slug() . '_license_check' );
 
 			return false;
 		}
 
-		/* Error occurred. Update status and message in the license settings */
+		if ( isset( $license_check->license ) && $license_check->license === 'valid' ) {
+			/* License is still valid, do nothing */
+
+			return true;
+		}
+
+		/* License status has changed. Update database */
+		return $this->update_license_status_from_response( $this->get_license_key(), $response, true );
+	}
+
+	/**
+	 * Parse and extract the addon license status from the API response
+	 *
+	 * @param string $license_key Current license key
+	 * @param array|\WP_Error $response The raw response from wp_remote_*())
+	 * @param bool $use_database Whether to save the license info in the database
+	 *
+	 * @return bool
+	 *
+	 * @since 6.14.0
+	 */
+	public function update_license_status_from_response( $license_key, $response, $use_database = false ) {
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( is_wp_error( $response ) || $response_code !== 200 ) {
+			$license_data = new \stdClass();
+
+			/* handle rate limiting */
+			if ( $response_code === 429 ) {
+				$license_data->error = 'rate_limit';
+			}
+		} else {
+			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		}
+
+		$license_info       = $this->get_license_info();
 		$possible_responses = $this->data->addon_license_responses( $this->get_name() );
 
-		/* Ensure we have a known error */
-		if ( ! isset( $license_check->license ) || ! isset( $possible_responses[ $license_check->license ] ) ) {
-			$this->log->error( 'Unknown license status returned from remote API' );
-
-			return false;
+		$status = 'error';
+		if ( ! empty( $license_data->error ) ) {
+			$status = $license_data->error;
+		} elseif ( ! empty( $license_data->license ) ) {
+			$status = $license_data->license;
 		}
 
-		$license_info['status']  = $license_check->license;
-		$license_info['message'] = $possible_responses[ $license_check->license ];
+		$license_info['license'] = $license_key;
+		$license_info['status']  = $status;
+		$license_info['message'] = $possible_responses[ $license_info['status'] ] ?? $possible_responses['generic'];
 
-		switch ( $license_check->license ) {
+		switch ( $license_info['status'] ) {
 			case 'expired':
 				$date_format = get_option( 'date_format' );
-				$dt          = new \DateTimeImmutable( $license_check->expires, wp_timezone() );
-				$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
+				try {
+					$dt   = new \DateTimeImmutable( $license_data->expires, wp_timezone() );
+					$date = $dt->format( $date_format );
+				} catch ( \Exception $e ) {
+					$date = gmdate( $date_format, false );
+				}
 
 				$url = add_query_arg(
 					[
@@ -711,7 +930,7 @@ abstract class Helper_Abstract_Addon {
 					[
 						'edd_action'            => 'add_to_cart',
 						'download_id'           => $this->get_edd_download_id(),
-						'edd_options[price_id]' => $license_check->price_id,
+						'edd_options[price_id]' => $license_data->price_id,
 					],
 					'https://gravitypdf.com/checkout/'
 				);
@@ -724,8 +943,8 @@ abstract class Helper_Abstract_Addon {
 					[
 						'view'       => 'upgrades',
 						'action'     => 'manage_licenses',
-						'license_id' => $license_check->license_id,
-						'payment_id' => $license_check->payment_id,
+						'license_id' => $license_data->license_id,
+						'payment_id' => $license_data->payment_id,
 					],
 					'https://gravitypdf.com/account/'
 				);
@@ -734,10 +953,12 @@ abstract class Helper_Abstract_Addon {
 				break;
 		}
 
-		$this->log->notice( 'License key no longer valid', $license_info );
-		$this->update_license_info( $license_info );
+		$this->log->notice( 'License key status', array_merge( $license_info, [ 'slug' => $this->get_slug() ] ) );
 
-		return true;
+		$this->update_license_info( $license_info, $use_database );
+		$this->flush_update_cache();
+
+		return in_array( $license_info['status'], [ 'active', 'valid' ], true );
 	}
 
 	/**
@@ -746,11 +967,8 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.3
 	 */
 	public function license_registration() {
-
-		$license_info = $this->get_license_info();
-		$edd_id       = $this->get_edd_download_id();
-
-		if ( $license_info['status'] === 'active' || empty( $edd_id ) ) {
+		$edd_id = $this->get_edd_download_id();
+		if ( in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) || empty( $edd_id ) ) {
 			return;
 		}
 
@@ -805,5 +1023,170 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		return (array) $links;
+	}
+
+	/**
+	 * Do API call to GravityPDF.com to activate the current add-on license key
+	 *
+	 * @param string $license_key The current license key for this add-on
+	 * @param bool $use_database Auto-update the database with the response
+	 *
+	 * @return array The API response and license status
+	 *
+	 * @since 6.14.0
+	 */
+	public function activate_license( $license_key = '', $use_database = false ) {
+
+		if ( empty( $license_key ) ) {
+			$license_key = $this->get_license_key();
+		}
+
+		$response = wp_remote_post(
+			$this->data->store_url,
+			[
+				'timeout' => 15,
+				'body'    => array_merge(
+					$this->get_default_api_params(),
+					[
+						'edd_action' => 'activate_license',
+						'license'    => $license_key,
+					],
+				),
+			]
+		);
+
+		$this->update_license_status_from_response( $license_key, $response, $use_database );
+
+		do_action( 'gfpdf_addon_post_license_activation', $response, $this, $use_database );
+
+		return $this->get_license_info();
+	}
+
+	/**
+	 * Listen for all license activations, and auto-activate addon if license supports it
+	 *
+	 * @param array $response
+	 * @param Helper_Abstract_Addon $addon
+	 *
+	 * @return void
+	 *
+	 * @since 6.14.0
+	 */
+	public function maybe_auto_activate_license( $response, $addon, $use_database ) {
+		/* skip if current addon doing licence activation */
+		if ( $this->get_edd_download_id() === $addon->get_edd_download_id() ) {
+			return;
+		}
+
+		/* skip if invalid response, or not an Access Pass license */
+		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( ! $license_data ) {
+			return;
+		}
+
+		if ( ! isset( $license_data->products ) || ! is_array( $license_data->products ) ) {
+			return;
+		}
+
+		/* skip if addon not available in Access Pass */
+		if ( ! in_array( (int) $this->get_edd_download_id(), $license_data->products, true ) ) {
+			return;
+		}
+
+		$this->update_license_info( $addon->get_license_info(), $use_database );
+
+		$this->license_auto_activated = true;
+	}
+
+	/**
+	 * Do API call to GravityPDF.com to deactivate add-on license
+	 *
+	 * @return bool
+	 *
+	 * @since 6.14.0
+	 */
+	public function deactivate_license() {
+		$response = wp_remote_post(
+			$this->data->store_url,
+			[
+				'timeout' => 15,
+				'body'    => array_merge(
+					[ 'edd_action' => 'deactivate_license' ],
+					$this->get_default_api_params()
+				),
+			]
+		);
+
+		/* Remove license data from database, no matter if the API request fails */
+		$this->delete_license_info();
+		$this->flush_update_cache();
+
+		/* If API error exit early */
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return false;
+		}
+
+		/* Get API response and check license is now deactivated */
+		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
+			return false;
+		}
+
+		$this->log->notice( 'License successfully deactivated', [ 'slug' => $this->get_slug() ] );
+
+		do_action( 'gfpdf_addon_post_license_deactivation', $response, $this );
+
+		return true;
+	}
+
+	/**
+	 * Listen for all license deactivations, and auto-deactivate addon if license supports it
+	 *
+	 * @param array $response
+	 * @param Helper_Abstract_Addon $addon
+	 *
+	 * @return void
+	 *
+	 * @since 6.14.0
+	 */
+	public function maybe_auto_deactivate_license( $response, $addon ) {
+		/* skip if current addon doing licence activation */
+		if ( $this->get_edd_download_id() === $addon->get_edd_download_id() ) {
+			return;
+		}
+
+		/* skip if invalid response, or not an Access Pass license */
+		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( ! $license_data ) {
+			return;
+		}
+
+		if ( ! isset( $license_data->products ) || ! is_array( $license_data->products ) ) {
+			return;
+		}
+
+		/* skip if addon not available in Access Pass */
+		if ( ! in_array( (int) $this->get_edd_download_id(), $license_data->products, true ) ) {
+			return;
+		}
+
+		$this->update_license_info( $addon->get_license_info(), true );
+
+		$this->license_auto_deactivated = true;
+	}
+
+	/**
+	 * Delete the add-on update information
+	 *
+	 * @since 6.14.0
+	 * @return void
+	 */
+	public function flush_update_cache() {
+		if ( ! $this->plugin_updater ) {
+			return;
+		}
+
+		$this->plugin_updater->delete_version_info_cache();
+		$this->plugin_updater->delete_transient_plugin_info();
 	}
 }
