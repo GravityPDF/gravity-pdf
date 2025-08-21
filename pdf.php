@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 6.13.1
+Version: 6.14.0
 Description: Automatically generate highly-customizable PDF documents using Gravity Forms and WordPress (canonical)
 Author: Blue Liquid Designs
 Author URI: https://blueliquiddesigns.com.au
@@ -36,12 +36,12 @@ if ( defined( 'PDF_PLUGIN_BASENAME' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '6.13.1' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '6.14.0' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
 define( 'GPDF_PLUGIN_FILE', __FILE__ );
-define( 'GPDF_API_URL', 'https://gravitypdf.com?api=1' );
+define( 'GPDF_API_URL', 'https://api.gravitypdf.com' );
 
 if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 	/*
@@ -177,7 +177,8 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 				$is_specific_gf_page = $pagenow === 'admin.php' && in_array( $_GET['page'] ?? '', [ 'gf_edit_forms', 'gf_entries', 'gf_settings' ], true ); /* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 
 				if ( $is_admin_area && ( $is_specific_wp_page || $is_specific_gf_page ) ) {
-					add_action( 'admin_notices', [ $this, 'display_notices' ] );
+					$notice_hook = is_multisite() && is_network_admin() ? 'network_admin_notices' : 'admin_notices';
+					add_action( $notice_hook, [ $this, 'display_notices' ] );
 				}
 
 				return;

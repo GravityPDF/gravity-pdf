@@ -49,8 +49,4 @@ return [
 			);
 		},
 	],
-
-	'whitelist' => [
-		'Psr\*',
-	],
 ];

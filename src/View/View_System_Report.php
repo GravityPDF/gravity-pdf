@@ -107,8 +107,8 @@ class View_System_Report extends Helper_Abstract_View {
 		$output = $this->get_icon( $is_protected );
 
 		if ( ! $is_protected ) {
-			$output .= ' ' . sprintf( esc_html__( "We've detected the PDFs saved in Gravity PDF's %1\$stmp%2\$s directory can be publicly accessed.", 'gravity-pdf' ), '<code>', '</code>' );
-			$output .= ' ' . sprintf( esc_html__( 'We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the folder outside your public website directory%4$s.', 'gravity-pdf' ), '<code>', '</code>', '<a href="https://docs.gravitypdf.com/v6/developers/filters/gfpdf_tmp_location/">', '</a>' );
+			$output .= ' ' . sprintf( esc_html__( "Gravity PDF's temporary directory is publicly accessible.", 'gravity-pdf' ) );
+			$output .= ' ' . sprintf( esc_html__( 'It is recommended to %1$smove the folder outside the public server directory%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/developers/filters/gfpdf_tmp_location/">', '</a>' );
 		}
 
 		return $output;

@@ -35,6 +35,8 @@ class Test_Logger extends WP_UnitTestCase {
 		parent::set_up();
 
 		$this->logger = new Helper_Logger( 'slug', 'Name' );
+
+		update_option( 'gform_enable_logging', true );
 	}
 
 	/**
@@ -61,5 +63,49 @@ class Test_Logger extends WP_UnitTestCase {
 		$results = $this->logger->register_logger_with_gf( [] );
 		$this->assertArrayHasKey( 'slug', $results );
 		$this->assertEquals( 'Name', $results['slug'] );
+	}
+
+	/**
+	 * @since 6.14.0
+	 */
+	public function test_logs_rotate() {
+		$gf_logger = \GFLogging::get_instance();
+		$dir      = $gf_logger->get_log_dir();
+
+		/* Prepare GF logging environment */
+		$gf_logger->delete_log_files();
+		$gf_logger->update_plugin_settings( [
+			'slug' => [
+				'enable' => true,
+				'file_name' => sha1( time() ),
+				'log_level' => 3,
+			]
+		] );
+
+		$log_filename = $gf_logger->get_log_file_name( 'slug' );
+
+		/* Create and verify log files */
+		$path       = pathinfo( $log_filename );
+		$file_base  = $path['filename'];
+		$file_ext   = $path['extension'];
+
+		wp_mkdir_p( $dir );
+		for ( $x = 1; $x <= 15; $x ++ ) {
+			$adjusted_date = gmdate( 'YmdGis', time() );
+			$new_file_name = $file_base . '_' . $adjusted_date .  $x . '.' . $file_ext;
+			touch( $dir . $new_file_name );
+		}
+
+		$files = \GFCommon::glob( '*.txt', $dir );
+		$this->assertNotEmpty( $files );
+		$this->assertCount( 15, $files );
+
+		/* Set up logger + log rotation */
+		$this->logger->get_logger();
+
+		/* Verify logs were rotated to the maximum number allowed */
+		$files = \GFCommon::glob( '*.txt', $dir );
+		$this->assertNotEmpty( $files );
+		$this->assertCount( 10, $files );
 	}
 }

@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Log\Logger;
-
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2025, Blue Liquid Designs
@@ -16,8 +14,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * @since 6.14.0 Moved logic into \GFPDF\Helper\Log\Logger
+ * @since 6.14.0
  */
-class Helper_Logger extends Logger {
+interface Helper_Interface_Extension_Uninstaller {
 
+	/**
+	 * Run a custom uninstall action when the Gravity PDF uninstaller is running
+	 *
+	 * @return void
+	 * @since  6.14
+	 */
+	public function uninstall();
 }

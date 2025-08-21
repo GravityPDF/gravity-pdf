@@ -31,28 +31,38 @@ export function setupLicenseDeactivation () {
       /* Remove our loading spinner */
       $spinner.remove()
 
-      /* cleanup inputs */
-      $('#gfpdf_settings\\[license_' + slug + '\\]').val('')
-      $('#gfpdf_settings\\[license_' + slug + '_message\\]').val('')
-      $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
-      $container.find('button').remove()
+      /* update UI to reflect deactivation */
+      postLicenseDeactivation(response.success ?? response.error, slug, $container)
 
-      if (response.success) {
-        $container
-          .find('#message')
-          .removeClass('error')
-          .addClass('success')
-          .html(response.success)
-      } else {
-        /* Show error message */
-        $container
-          .find('#message')
-          .removeClass('success')
-          .addClass('error')
-          .html(response.error)
+      /* handle any shared licenses that were also deactivated */
+      if (response.success && Array.isArray(response?.extra)) {
+        response.extra.forEach(item => postLicenseDeactivation(response.success, item, $('#gfpdf-settings-field-wrapper-license_' + item)))
       }
     })
 
     return false
   })
+}
+
+function postLicenseDeactivation (status, slug, $container) {
+  /* cleanup inputs */
+  $('#gfpdf_settings\\[license_' + slug + '\\]').val('')
+  $('#gfpdf_settings\\[license_' + slug + '_message\\]').val('')
+  $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
+  $container.find('button').remove()
+
+  if (status) {
+    $container
+      .find('#message')
+      .removeClass('error')
+      .addClass('success')
+      .html(status)
+  } else {
+    /* Show error message */
+    $container
+      .find('#message')
+      .removeClass('success')
+      .addClass('error')
+      .html(status)
+  }
 }
