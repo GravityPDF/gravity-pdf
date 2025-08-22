@@ -443,6 +443,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		$bulk_api_params = [];
 		foreach ( $products as $product ) {
+			/* skip improperly-registered plugins */
+			if ( ! $product ) {
+				continue;
+			}
+
 			$bulk_api_params[] = $product->get_version_api_params();
 		}
 
