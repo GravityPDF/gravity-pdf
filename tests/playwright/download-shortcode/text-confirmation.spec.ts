@@ -1,6 +1,6 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import {test} from '@self:playwright/fixtures/test';
+import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {
@@ -17,7 +17,10 @@ test.describe('[gravitypdf] Shortcode', () => {
 
 		// setup form and PDF
 		const form = await pdf.createForm('Text Confirmation');
-		const pdfId = await pdf.createPdf(form.id, 'Text Confirmation Document');
+		const pdfId = await pdf.createPdf(
+			form.id,
+			'Text Confirmation Document'
+		);
 
 		// setup default confirmation
 		await pdf.navigateToFormConfirmation(form.id);

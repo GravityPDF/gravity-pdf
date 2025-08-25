@@ -1,7 +1,7 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import {expect} from '@wordpress/e2e-test-utils-playwright';
-import {test} from '@self:playwright/fixtures/test';
+import { expect } from '@wordpress/e2e-test-utils-playwright';
+import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {
@@ -21,7 +21,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		const pdfId = await pdf.createPdf(form.id, pdfLabel);
 		await pdf.copyDownloadShortcodeToClipboard(form.id, pdfId);
 
-    await expect(page.locator('#tab_PDF')).toHaveScreenshot();
+		await expect(page.locator('#tab_PDF')).toHaveScreenshot();
 
 		// Add a new PDF and paste into the Label
 		await pdf.navigateToNewFormPdf(form.id);

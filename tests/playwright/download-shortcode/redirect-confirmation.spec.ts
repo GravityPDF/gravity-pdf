@@ -1,6 +1,10 @@
-import type { Admin, Editor, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import type {
+	Admin,
+	Editor,
+	RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import {test} from '@self:playwright/fixtures/test';
+import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {

@@ -88,7 +88,6 @@
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome -L",
     "test:e2e:playwright": "wp-scripts test-playwright --config tools/playwright/config.ts",
     "test:e2e:playwright:debug": "wp-scripts test-playwright --config tools/playwright/config.ts --ui",
-
     "reset:e2e": "bash ./tools/wp-env/reset.sh",
     "test:php": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
     "test:php:multisite": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",

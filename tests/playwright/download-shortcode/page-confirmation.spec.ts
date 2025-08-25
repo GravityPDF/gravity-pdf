@@ -1,6 +1,10 @@
-import type { Admin, Editor, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import type {
+	Admin,
+	Editor,
+	RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import {test} from '@self:playwright/fixtures/test';
+import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {
@@ -19,7 +23,10 @@ test.describe('[gravitypdf] Shortcode', () => {
 
 		// setup form and PDF
 		const form = await pdf.createForm('Page Confirmation');
-		const pdfId = await pdf.createPdf(form.id, 'Page Confirmation Document');
+		const pdfId = await pdf.createPdf(
+			form.id,
+			'Page Confirmation Document'
+		);
 
 		// Create Page with shortcode embedded
 		await admin.createNewPost({
