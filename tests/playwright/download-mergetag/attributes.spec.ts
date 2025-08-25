@@ -1,7 +1,7 @@
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import GravityForms from '../../utils/gravityforms';
+import GravityForms from '@self:playwright/utils/gravityforms';
 
 test.describe('Mergetag attributes', () => {
 	test('Plain Permalinks', async ({

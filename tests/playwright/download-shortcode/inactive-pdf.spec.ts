@@ -1,8 +1,8 @@
-import {test} from '../../fixtures/test'
-import {expect} from '@wordpress/e2e-test-utils-playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import GravityForms from '../../utils/gravityforms';
+import {expect} from '@wordpress/e2e-test-utils-playwright';
+import {test} from '@self:playwright/fixtures/test';
+import GravityForms from '@self:playwright/utils/gravityforms';
 
 test.describe('[gravitypdf] Shortcode', () => {
     let gf = null;

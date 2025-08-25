@@ -1,13 +1,8 @@
-import {test} from '../../fixtures/test'
-import GravityForms from '../../utils/gravityforms';
-import Assertions from '../../utils/assertions';
-
-import type {
-	Admin,
-	Editor,
-	RequestUtils,
-} from '@wordpress/e2e-test-utils-playwright';
+import type { Admin, Editor, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
+import {test} from '@self:playwright/fixtures/test';
+import GravityForms from '@self:playwright/utils/gravityforms';
+import Assertions from '@self:playwright/utils/assertions';
 
 test.describe('[gravitypdf] Shortcode', () => {
 	test('Redirect confirmation', async ({

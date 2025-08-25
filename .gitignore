@@ -53,4 +53,5 @@ Thumbs.db
 
 # Environment File
 .env
+auth.json
 .claude/settings.local.json

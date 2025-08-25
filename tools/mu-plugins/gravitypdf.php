@@ -5,4 +5,4 @@ if ( ! defined( 'TEST_SUITE' ) || ! TEST_SUITE ) {
 	return;
 }
 
-error_reporting( E_ALL ^ E_DEPRECATED ); //phpcs:ignore
+add_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );

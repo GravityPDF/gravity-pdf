@@ -16,13 +16,19 @@
       "php": "7.3.0"
     },
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "composer/installers": false
     }
   },
   "repositories": [
     {
       "type": "vcs",
       "url": "https://github.com/GravityPDF/url-signer"
+    },
+
+    {
+      "type": "composer",
+      "url": "https://composer.gravity.io"
     }
   ],
   "require": {
@@ -41,13 +47,15 @@
     "roave/security-advisories": "dev-master",
     "yoast/phpunit-polyfills": "^3.0",
     "wp-phpunit/wp-phpunit": "^6.4",
-    "humbug/php-scoper": "^0.15.0"
+    "humbug/php-scoper": "^0.15.0",
+    "gravity/gravityforms": "*",
+    "gravity/gravityformspolls": "*",
+    "gravity/gravityformssurvey": "*",
+    "gravity/gravityformsquiz": "*"
   },
   "autoload": {
     "psr-4": {
-      "GFPDF\\": "src/",
-      "Psr\\Http\\Message\\": "vendor/psr/http-message/src",
-      "Psr\\Log\\": "vendor/psr/log/Psr/Log"
+      "GFPDF\\": "src/"
     },
     "classmap": [
       "vendor_prefixed/"

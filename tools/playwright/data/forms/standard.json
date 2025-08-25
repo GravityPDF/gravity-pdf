@@ -815,7 +815,7 @@
 				},
 				{
 					"id": "11.3",
-					"label": "AM\/PM",
+					"label": "AM/PM",
 					"name": ""
 				}
 			],
@@ -962,12 +962,12 @@
 				},
 				{
 					"id": 13.4,
-					"label": "State \/ Province",
+					"label": "State / Province",
 					"name": ""
 				},
 				{
 					"id": 13.5,
-					"label": "ZIP \/ Postal Code",
+					"label": "ZIP / Postal Code",
 					"name": ""
 				},
 				{
@@ -1147,9 +1147,9 @@
 	"gravityformsquiz": {
 		"grading": "none",
 		"passPercent": "50",
-		"failConfirmationMessage": "<strong>Quiz Results:<\/strong> You Failed!\n<strong>Correct Answers:<\/strong> {quiz_score}\n<strong>Percentage:<\/strong> {quiz_percent}%",
-		"passConfirmationMessage": "<strong>Quiz Results:<\/strong> You Passed!\n<strong>Correct Answers:<\/strong> {quiz_score}\n<strong>Percentage:<\/strong> {quiz_percent}%",
-		"letterConfirmationMessage": "<strong>Quiz Grade:<\/strong> {quiz_grade}\n<strong>Correct Answers:<\/strong> {quiz_score}\n<strong>Percentage:<\/strong> {quiz_percent}%",
+		"failConfirmationMessage": "<strong>Quiz Results:</strong> You Failed!\n<strong>Correct Answers:</strong> {quiz_score}\n<strong>Percentage:</strong> {quiz_percent}%",
+		"passConfirmationMessage": "<strong>Quiz Results:</strong> You Passed!\n<strong>Correct Answers:</strong> {quiz_score}\n<strong>Percentage:</strong> {quiz_percent}%",
+		"letterConfirmationMessage": "<strong>Quiz Grade:</strong> {quiz_grade}\n<strong>Correct Answers:</strong> {quiz_score}\n<strong>Percentage:</strong> {quiz_percent}%",
 		"grades": [
 			{
 				"text": "A",

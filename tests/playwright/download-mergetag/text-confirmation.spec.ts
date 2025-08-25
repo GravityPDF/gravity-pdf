@@ -1,8 +1,8 @@
-import {test} from '../../fixtures/test'
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import GravityForms from '../../utils/gravityforms';
-import Assertions from '../../utils/assertions';
+import {test} from '@self:playwright/fixtures/test';
+import GravityForms from '@self:playwright/utils/gravityforms';
+import Assertions from '@self:playwright/utils/assertions';
 
 test.describe('{Label:pdf:[id]} Merge Tag', () => {
 	test('Text Confirmation Mergetag Selector', async ({
