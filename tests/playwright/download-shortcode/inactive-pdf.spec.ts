@@ -8,9 +8,6 @@ test.describe('[gravitypdf] Shortcode', () => {
     let pdf = null;
     let form = null;
 
-    // @TODO - create Fixture https://playwright.dev/docs/test-fixtures
-    // Extend WP's test function and define all our Gravity Forms and Gravity PDF helpers
-
     test.beforeEach(
       async ({
         requestUtils,
