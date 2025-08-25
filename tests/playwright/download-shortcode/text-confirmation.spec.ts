@@ -33,7 +33,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		await gf.saveForm();
 
 		// verify the results
-		const pdfLink = await page.getByRole('link', { name: 'Download PDF' });
+		const pdfLink = page.getByRole('link', { name: 'Download PDF' });
 
 		const assertions = new Assertions(page);
 		await assertions.downloadAndVerifyPdf(

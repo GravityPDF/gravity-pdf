@@ -36,7 +36,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		await gf.navigateToFormPreview(form.id);
 		const assertions = new Assertions(page);
 		await assertions.downloadAndVerifyPdf(
-			await page.getByRole('button', { name: /(save|submit)/i }),
+			page.getByRole('button', { name: /(save|submit)/i }),
 			'Redirect Confirmation Document.pdf'
 		);
 	});

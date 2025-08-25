@@ -26,7 +26,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 
 		const label = page.getByLabel('Label');
 		await label.press('ControlOrMeta+v');
-		expect(label).toHaveValue(
+		await expect(label).toHaveValue(
 			`[gravitypdf name="${pdfLabel}" id="${pdfId}" text="Download PDF"]`
 		);
 	});
