@@ -45,6 +45,7 @@ test.describe('Single PDF', () => {
     const pdfLink = page.getByRole('link', { name: 'View PDF' });
     await page.locator('.has-row-actions').first().hover()
 
+    await expect(page.locator('#the-list')).toHaveScreenshot();
     await pdf.downloadAndVerifyPdf(pdfLink, 'Single #1.pdf');
   });
 
