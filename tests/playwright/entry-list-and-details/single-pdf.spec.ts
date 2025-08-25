@@ -1,3 +1,4 @@
+import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import {test} from '@self:playwright/fixtures/test';
@@ -6,9 +7,7 @@ import Pdf from '@self:playwright/utils/gravitypdf';
 test.describe('Single PDF', () => {
   let form = null;
   let pdf = null;
-
-  // @TODO - create Fixture https://playwright.dev/docs/test-fixtures
-  // Extend WP's test function and define all our Gravity Forms and Gravity PDF helpers
+  let entry = null;
 
   test.beforeEach(
     async ({
@@ -29,8 +28,7 @@ test.describe('Single PDF', () => {
       await pdf.createPdf(form.id, "Single #1")
 
       // create entry
-      await pdf.navigateToFormPreview(form.id);
-      await pdf.saveForm();
+      entry = await pdf.createEntry( { form_id: form.id } );
     },
   );
 
@@ -47,10 +45,7 @@ test.describe('Single PDF', () => {
     const pdfLink = page.getByRole('link', { name: 'View PDF' });
     await page.locator('.has-row-actions').first().hover()
 
-    await pdf.downloadAndVerifyPdf(
-      pdfLink,
-      'Single #1.pdf'
-    );
+    await pdf.downloadAndVerifyPdf(pdfLink, 'Single #1.pdf');
   });
 
   test('Entry List, Download', async ({
@@ -67,21 +62,24 @@ test.describe('Single PDF', () => {
     const pdfLink = page.getByRole('link', { name: 'Download PDF' });
     await page.locator('.has-row-actions').first().hover()
 
-    await pdf.downloadAndVerifyPdf(
-      pdfLink,
-      'Single #1.pdf'
-    );
+    await pdf.downloadAndVerifyPdf(pdfLink, 'Single #1.pdf');
   });
 
-  // test( 'Entry Details', async ({
-  //                                 requestUtils,
-  //                                 page,
-  //                                 admin,
-  //                               }: {
-  //   requestUtils: RequestUtils;
-  //   page: Page;
-  //   admin: Admin;
-  // }) => {
-  //
-  // });
+  test( 'Entry Details', async ({
+                                  requestUtils,
+                                  page,
+                                  admin,
+                                }: {
+    requestUtils: RequestUtils;
+    page: Page;
+    admin: Admin;
+  }) => {
+    await pdf.navigateToEntryDetail(entry.form_id, entry.id)
+
+    const viewPdfLink = page.getByRole('link', { name: 'View', exact: true })
+    const downloadPdfLink = page.getByRole('link', { name: 'Download', exact: true });
+
+    await pdf.downloadAndVerifyPdf(viewPdfLink, 'Single #1.pdf');
+    await pdf.downloadAndVerifyPdf(downloadPdfLink, 'Single #1.pdf');
+  });
 })

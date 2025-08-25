@@ -8,6 +8,10 @@ type Form = {
 	title: string;
 };
 
+type Entry = {
+  form_id: number;
+}
+
 export default class GravityForms {
 	protected requestUtils: RequestUtils;
 	protected admin: Admin;
@@ -38,6 +42,14 @@ export default class GravityForms {
 			data: { ...form },
 		});
 	}
+
+  async createEntry(entry: Entry) {
+    return await this.requestUtils.rest({
+      method: 'POST',
+      path: `/gf/v2/entries`,
+      data: { ...entry }
+    })
+  }
 
 	async getFormIdByName(name: string): Promise<number> {
 		await this.navigateToFormList();
@@ -95,7 +107,7 @@ export default class GravityForms {
   async navigateToEntryDetail(formId: number, entryId: number) {
     await this.admin.visitAdminPage(
       'admin.php',
-      `page=gf_entries&id=${formId}&lid=${entryId}`
+      `page=gf_entries&view=entry&id=${formId}&lid=${entryId}`
     );
   }
 
