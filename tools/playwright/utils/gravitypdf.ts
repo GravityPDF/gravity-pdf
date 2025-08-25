@@ -4,7 +4,7 @@ import type { Readable } from "stream";
 import { URL } from "node:url";
 import GravityForms from "@self:playwright/utils/gravityforms";
 
-export default class Pdf extends GravityForms{
+export default class Pdf extends GravityForms {
   async navigateToPdfSettings() {
     await this.admin.visitAdminPage('admin.php', 'page=gf_settings&subview=PDF');
   }
@@ -49,6 +49,13 @@ export default class Pdf extends GravityForms{
   async navigateToNewFormPdf(formId: number) {
     await this.navigateToFormPdfList(formId);
     await this.page.getByRole('link', { name: 'Add new PDF' }).click();
+  }
+
+  async navigateToFormPdf(formId: number, pdfId: string) {
+    await this.admin.visitAdminPage(
+      'admin.php',
+      `page=gf_edit_forms&view=settings&subview=PDF&id=${formId}&pid=${pdfId}`
+    );
   }
 
   async copyDownloadShortcodeToClipboard(formId: number, pdfId: string) {

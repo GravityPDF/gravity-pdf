@@ -1224,7 +1224,7 @@
 	"notifications": [
 		{
 			"id": "52246fd7af858",
-			"name": "sdf",
+			"name": "Admin Notification",
 			"event": "form_submission",
 			"to": "stevehenty@gmail.com",
 			"toType": "email",

@@ -1848,7 +1848,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<?php if ( $toggle !== false ): ?>
-			<?php $this->start_toggle_input( $toggle, $value ); ?>
+			<?php $this->start_toggle_input( $toggle, $value, $args['id'] ); ?>
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
@@ -2065,7 +2065,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<?php if ( $toggle !== false ): ?>
-			<?php $this->start_toggle_input( $toggle, $value ); ?>
+			<?php $this->start_toggle_input( $toggle, $value, $args['id'] ); ?>
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
@@ -2496,12 +2496,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param string $toggle The text to be used in the toggle
 	 * @param string $value  Whether the field currently has a value
+	 * @param string $element_id The base ID for the toggle
 	 *
 	 * @return void
 	 *
 	 * @since 6.4
+	 * @since 6.14 Added $element_id
 	 */
-	public function start_toggle_input( $toggle, $value ) {
+	public function start_toggle_input( $toggle, $value, $element_id = '' ) {
 		$has_value = ! empty( $value ) ? 1 : 0;
 
 		?>
@@ -2509,6 +2511,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<label>
 			<input class="gfpdf-input-toggle"
 				   type="checkbox"
+				   id="<?php echo esc_attr( $element_id . '_toggle' ); ?>"
 				   value="1"
 				   <?php checked( $has_value, 1 ); ?>
 			/>
