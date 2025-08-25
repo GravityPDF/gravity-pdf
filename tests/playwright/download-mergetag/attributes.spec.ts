@@ -1,7 +1,7 @@
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import GravityForms from '@self:playwright/utils/gravityforms';
+import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('Mergetag attributes', () => {
 	test('Plain Permalinks', async ({
@@ -13,16 +13,16 @@ test.describe('Mergetag attributes', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		const gf = new GravityForms(requestUtils, admin, page);
+		const pdf = new Pdf(requestUtils, admin, page);
 
 		// setup form and PDF
-		const form = await gf.createForm('Mergetag Attributes');
-		await gf.navigateToFormPreview(form.id);
-		await gf.saveForm();
-		const pdfId = await gf.createPdf(form.id, 'Mergetag');
+		const form = await pdf.createForm('Mergetag Attributes');
+		await pdf.navigateToFormPreview(form.id);
+		await pdf.saveForm();
+		const pdfId = await pdf.createPdf(form.id, 'Mergetag');
 
 		// setup default confirmation
-		await gf.navigateToFormConfirmation(form.id);
+		await pdf.navigateToFormConfirmation(form.id);
 
 		// Clear confirmation message and use the mergetag selector
 		const content = `
@@ -34,12 +34,12 @@ test.describe('Mergetag attributes', () => {
         Print Signed: {Mergetag:pdf:${pdfId}:signed:print}
         Download Signed: {Mergetag:pdf:${pdfId}:download:signed}
         `;
-		await gf.setRichTextContent('#gform_setting_message', content);
-		await gf.saveForm();
+		await pdf.setRichTextContent('#gform_setting_message', content);
+		await pdf.saveForm();
 
 		// preview and submit form
-		await gf.navigateToFormPreview(form.id);
-		await gf.saveForm();
+		await pdf.navigateToFormPreview(form.id);
+		await pdf.saveForm();
 
 		// verify the results
 		const confirmation = await page.locator('#preview_form_container');

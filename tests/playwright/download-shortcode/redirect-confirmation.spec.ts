@@ -1,8 +1,7 @@
 import type { Admin, Editor, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import {test} from '@self:playwright/fixtures/test';
-import GravityForms from '@self:playwright/utils/gravityforms';
-import Assertions from '@self:playwright/utils/assertions';
+import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {
 	test('Redirect confirmation', async ({
@@ -15,27 +14,26 @@ test.describe('[gravitypdf] Shortcode', () => {
 		admin: Admin;
 		editor: Editor;
 	}) => {
-		const gf = new GravityForms(requestUtils, admin, page);
+		const pdf = new Pdf(requestUtils, admin, page);
 
 		// setup form and PDF
-		const form = await gf.createForm('Redirect Confirmation');
-		const pdfId = await gf.createPdf(
+		const form = await pdf.createForm('Redirect Confirmation');
+		const pdfId = await pdf.createPdf(
 			form.id,
 			'Redirect Confirmation Document'
 		);
 
 		// setup default confirmation
-		await gf.navigateToFormConfirmation(form.id);
+		await pdf.navigateToFormConfirmation(form.id);
 		await page.getByRole('radio', { name: 'Redirect' }).check();
 		await page
 			.getByRole('textbox', { name: 'Redirect URL' })
 			.fill('[gravitypdf id="' + pdfId + '"]');
-		await gf.saveForm();
+		await pdf.saveForm();
 
 		// preview and submit form
-		await gf.navigateToFormPreview(form.id);
-		const assertions = new Assertions(page);
-		await assertions.downloadAndVerifyPdf(
+		await pdf.navigateToFormPreview(form.id);
+		await pdf.downloadAndVerifyPdf(
 			page.getByRole('button', { name: /(save|submit)/i }),
 			'Redirect Confirmation Document.pdf'
 		);

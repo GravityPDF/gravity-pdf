@@ -9,9 +9,9 @@ type Form = {
 };
 
 export default class GravityForms {
-	private requestUtils: RequestUtils;
-	private admin: Admin;
-	private page: Page;
+	protected requestUtils: RequestUtils;
+	protected admin: Admin;
+	protected page: Page;
 
 	constructor(requestUtils: RequestUtils, admin: Admin, page: Page) {
 		this.requestUtils = requestUtils;
@@ -85,40 +85,22 @@ export default class GravityForms {
 			.click();
 	}
 
-	async navigateToFormPdfList(formId: number) {
-		await this.navigateToFormSettingsById(formId, 'PDF');
-	}
+  async navigateToEntryList(formId: number) {
+    await this.admin.visitAdminPage(
+      'admin.php',
+      `page=gf_entries&id=${formId}`
+    );
+  }
+
+  async navigateToEntryDetail(formId: number, entryId: number) {
+    await this.admin.visitAdminPage(
+      'admin.php',
+      `page=gf_entries&id=${formId}&lid=${entryId}`
+    );
+  }
 
 	async navigateToFormPreview(formId: number) {
 		await this.page.goto('/?gf_page=preview&id=' + formId);
-	}
-
-	/*
-	 * PDF Management
-	 */
-	async createPdf(formId: number, label: string) {
-		await this.navigateToNewFormPdf(formId);
-		await this.page.getByLabel('Label').fill(label);
-		await this.page.getByLabel('Filename').fill(label);
-		await this.page
-			.getByRole('button', { name: 'Add PDF' })
-			.first()
-			.click();
-
-		// return PDF ID (@TODO update with the REST API settings once implemented)
-		const pdfUrl = new URL(this.page.url());
-
-		return pdfUrl.searchParams.get('pid');
-	}
-
-	async navigateToNewFormPdf(formId: number) {
-		await this.navigateToFormPdfList(formId);
-		await this.page.getByRole('link', { name: 'Add new PDF' }).click();
-	}
-
-	async copyDownloadShortcodeToClipboard(formId: number, pdfId: string) {
-		await this.navigateToFormPdfList(formId);
-		await this.page.locator(`#gfpdf-${pdfId}`).getByRole('dialog').click();
 	}
 
 	/*

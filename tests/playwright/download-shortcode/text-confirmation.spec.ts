@@ -1,8 +1,7 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import {test} from '@self:playwright/fixtures/test';
-import GravityForms from '@self:playwright/utils/gravityforms';
-import Assertions from '@self:playwright/utils/assertions';
+import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {
 	test('Text confirmation', async ({
@@ -14,29 +13,28 @@ test.describe('[gravitypdf] Shortcode', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		const gf = new GravityForms(requestUtils, admin, page);
+		const pdf = new Pdf(requestUtils, admin, page);
 
 		// setup form and PDF
-		const form = await gf.createForm('Text Confirmation');
-		const pdfId = await gf.createPdf(form.id, 'Text Confirmation Document');
+		const form = await pdf.createForm('Text Confirmation');
+		const pdfId = await pdf.createPdf(form.id, 'Text Confirmation Document');
 
 		// setup default confirmation
-		await gf.navigateToFormConfirmation(form.id);
-		await gf.setRichTextContent(
+		await pdf.navigateToFormConfirmation(form.id);
+		await pdf.setRichTextContent(
 			'#gform_setting_message',
 			`[gravitypdf id="${pdfId}"]`
 		);
-		await gf.saveForm();
+		await pdf.saveForm();
 
 		// preview and submit form
-		await gf.navigateToFormPreview(form.id);
-		await gf.saveForm();
+		await pdf.navigateToFormPreview(form.id);
+		await pdf.saveForm();
 
 		// verify the results
 		const pdfLink = page.getByRole('link', { name: 'Download PDF' });
 
-		const assertions = new Assertions(page);
-		await assertions.downloadAndVerifyPdf(
+		await pdf.downloadAndVerifyPdf(
 			pdfLink,
 			'Text Confirmation Document.pdf'
 		);

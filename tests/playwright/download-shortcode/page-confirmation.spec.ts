@@ -1,8 +1,7 @@
 import type { Admin, Editor, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import {test} from '@self:playwright/fixtures/test';
-import GravityForms from '@self:playwright/utils/gravityforms';
-import Assertions from '@self:playwright/utils/assertions';
+import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {
 	test('Page confirmation', async ({
@@ -16,11 +15,11 @@ test.describe('[gravitypdf] Shortcode', () => {
 		admin: Admin;
 		editor: Editor;
 	}) => {
-		const gf = new GravityForms(requestUtils, admin, page);
+		const pdf = new Pdf(requestUtils, admin, page);
 
 		// setup form and PDF
-		const form = await gf.createForm('Page Confirmation');
-		const pdfId = await gf.createPdf(form.id, 'Page Confirmation Document');
+		const form = await pdf.createForm('Page Confirmation');
+		const pdfId = await pdf.createPdf(form.id, 'Page Confirmation Document');
 
 		// Create Page with shortcode embedded
 		await admin.createNewPost({
@@ -36,7 +35,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		await editor.publishPost();
 
 		// setup default confirmation
-		await gf.navigateToFormConfirmation(form.id);
+		await pdf.navigateToFormConfirmation(form.id);
 		await page.getByRole('radio', { name: 'Page' }).check();
 		await page.getByRole('button', { name: 'Select a Page' }).click();
 		await page
@@ -49,17 +48,16 @@ test.describe('[gravitypdf] Shortcode', () => {
 		await page
 			.getByRole('textbox', { name: 'Data via Query' })
 			.fill('entry={entry_id}');
-		await gf.saveForm();
+		await pdf.saveForm();
 
 		// preview and submit form
-		await gf.navigateToFormPreview(form.id);
-		await gf.saveForm();
+		await pdf.navigateToFormPreview(form.id);
+		await pdf.saveForm();
 
 		// verify the results
-		const pdfLink = await page.getByRole('link', { name: 'Download PDF' });
+		const pdfLink = page.getByRole('link', { name: 'Download PDF' });
 
-		const assertions = new Assertions(page);
-		await assertions.downloadAndVerifyPdf(
+		await pdf.downloadAndVerifyPdf(
 			pdfLink,
 			'Page Confirmation Document.pdf'
 		);

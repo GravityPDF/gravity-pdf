@@ -2,10 +2,10 @@ import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import {expect} from '@wordpress/e2e-test-utils-playwright';
 import {test} from '@self:playwright/fixtures/test';
-import GravityForms from '@self:playwright/utils/gravityforms';
+import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('[gravitypdf] Shortcode', () => {
-    let gf = null;
+    let pdf = null;
     let form = null;
 
     // @TODO - create Fixture https://playwright.dev/docs/test-fixtures
@@ -22,38 +22,22 @@ test.describe('[gravitypdf] Shortcode', () => {
         admin: Admin;
       }) => {
           // setup form and inactive PDF
-        gf = new GravityForms(requestUtils, admin, page);
-        form = await gf.createForm("Inactive PDF on Text Confirmation");
+        pdf = new Pdf(requestUtils, admin, page);
+        form = await pdf.createForm("Inactive PDF on Text Confirmation");
 
-        const pdfId = await gf.createPdf(form.id, "Inactive PDF Document");
-        await gf.navigateToFormPdfList(form.id);
+        await pdf.setPdfSetting('Debug Mode', false);
+        const pdfId = await pdf.createPdf(form.id, "Inactive PDF Document");
+        await pdf.navigateToFormPdfList(form.id);
         await page.getByRole("button", { name: "Active", exact: true }).click();
 
         // setup default confirmation
-        await gf.navigateToFormConfirmation(form.id);
-        await gf.setRichTextContent(
+        await pdf.navigateToFormConfirmation(form.id);
+        await pdf.setRichTextContent(
           "#gform_setting_message",
           `[gravitypdf id="${pdfId}"]`,
         );
-        await gf.saveForm();
+        await pdf.saveForm();
       },
-    );
-
-    test.beforeEach(
-        async ({
-                   requestUtils,
-                   page,
-                   admin,
-               }: {
-            requestUtils: RequestUtils;
-            page: Page;
-            admin: Admin;
-        }) => {
-            // Disable Debug Mode
-            await admin.visitAdminPage('admin.php', 'page=gf_settings&subview=PDF');
-            await page.getByRole('checkbox', { name: 'Debug Mode' }).uncheck();
-            await page.getByRole('button', { name: 'Save Settings' }).click()
-        }
     );
 
     test('Disabled PDF, Debug Mode Off', async ({
@@ -66,8 +50,8 @@ test.describe('[gravitypdf] Shortcode', () => {
         admin: Admin;
     }) => {
         // preview and submit form
-        await gf.navigateToFormPreview(form.id);
-        await gf.saveForm();
+        await pdf.navigateToFormPreview(form.id);
+        await pdf.saveForm();
 
         // verify the results
         await expect(page.getByRole('link', { name: 'Download PDF' })).not.toBeAttached()
@@ -82,12 +66,11 @@ test.describe('[gravitypdf] Shortcode', () => {
         page: Page;
         admin: Admin;
     }) => {
-        await page.getByRole('checkbox', { name: 'Debug Mode' }).check();
-        await page.getByRole('button', { name: 'Save Settings' }).click()
+        await pdf.setPdfSetting('Debug Mode', true);
 
         // preview and submit form
-        await gf.navigateToFormPreview(form.id);
-        await gf.saveForm();
+        await pdf.navigateToFormPreview(form.id);
+        await pdf.saveForm();
 
         // verify the results
         await expect(page.getByRole('link', { name: 'Download PDF' })).not.toBeAttached()
