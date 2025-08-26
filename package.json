@@ -67,7 +67,6 @@
     "lint:css": "wp-scripts lint-style ./src/assets/**/*.scss ./src/assets/**/*.pcss",
     "lint:js": "wp-scripts lint-js ./src/assets/js ./tests/js-unit ./tests/playwright",
     "wp-env": "wp-env",
-    "wp-env:reset": "bash ./tools/wp-env/reset.sh",
     "test:php": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
     "test:php:multisite": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",
     "test:e2e:playwright": "wp-scripts test-playwright --config tools/playwright/config.ts",
