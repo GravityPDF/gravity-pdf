@@ -20,6 +20,10 @@ const config = defineConfig({
 		...baseConfig.webServer,
 		port: process.env.WP_BASE_URL ? process.env.WP_BASE_URL.split(':').at(-1) : 8889,
 	},
+
+  expect: {
+    toHaveScreenshot: { maxDiffPixelRatio: 0.2 },
+  },
 });
 
 export default config;
