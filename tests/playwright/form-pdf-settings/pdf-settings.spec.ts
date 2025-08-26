@@ -71,13 +71,26 @@ test.describe('Form PDF Settings', () => {
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 
-    const elements = page.locator('#gfpdf-settings-field-wrapper-notification').getByRole('checkbox')
-    await expect(elements).toHaveCount(1)
+		const elements = page
+			.locator('#gfpdf-settings-field-wrapper-notification')
+			.getByRole('checkbox');
+		await expect(elements).toHaveCount(1);
 
-    // Add another Notification
-    await pdf.addNotification(form.id, 'User Notification');
+		// Add another Notification
+		await pdf.addNotification(form.id, 'User Notification');
 
-    await pdf.navigateToNewFormPdf(form.id);
-    await expect(elements).toHaveCount(2)
+		await pdf.createPdf(form.id, 'PDF Notification');
+		await expect(elements).toHaveCount(2);
+
+		await page.getByRole('checkbox', { name: 'User Notification' }).click();
+		await page.getByRole('button', { name: 'Update PDF' }).first().click();
+
+		await expect(
+			page.getByRole('checkbox', { name: 'Admin Notification' })
+		).not.toBeChecked();
+		await expect(
+			page.getByRole('checkbox', { name: 'User Notification' })
+		).toBeChecked();
 	});
+
 });
