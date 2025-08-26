@@ -5,6 +5,7 @@ import { handlePDFConditionalLogic } from './handlePDFConditionalLogic'
 import { handleOwnerRestriction } from './handleOwnerRestriction'
 import { toggleFontAppearance } from './toggleFontAppearance'
 import { toggleAppearanceTab } from './toggleAppearanceTab'
+import { handleMergeTags } from '../common/handleMergeTags'
 
 export function doFormSettingsEditPage () {
   setupRequiredFields($('#gfpdf_pdf_form'))
@@ -15,18 +16,7 @@ export function doFormSettingsEditPage () {
   handleOwnerRestriction()
   toggleFontAppearance($('#gfpdf_settings\\[template\\]').data('template_group'))
   toggleAppearanceTab()
-
-  /* Add better merge tag support */
-  $('.gform-settings-field').each(function () {
-    $(this)
-      .find('.merge-tag-support, .merge-tag-support + span')
-      .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag"></div>')
-
-    $(this)
-      .find('.all-merge-tags.textarea')
-      .parent()
-      .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag gfpdf-merge-tag-container"></div>')
-  })
+  handleMergeTags()
 
   /* Hide Template section, if empty */
   const $templateSection = $('#gfpdf-fieldset-gfpdf_form_settings_template')
