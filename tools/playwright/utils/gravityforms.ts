@@ -118,6 +118,22 @@ export default class GravityForms {
 	/*
 	 * Settings management
 	 */
+  async addNotification(formId: number, name: string) {
+    await this.admin.visitAdminPage(
+      'admin.php',
+      `subview=notification&page=gf_edit_forms&view=settings&id=${formId}`
+    );
+
+    await this.page.getByRole('link', { name: 'Add New' }).click();
+
+    await this.page.getByRole('textbox', { name: 'Name' }).first().fill(name);
+    await this.page.getByRole('textbox', { name: 'Send To Email' }).fill('hi@example.com');
+    await this.page.getByRole('textbox', { name: 'Subject' }).fill('Subject');
+    await this.setRichTextContent('#gform_setting_message', 'Message');
+
+    await this.page.getByRole('button', { name: 'Update Notification' }).click();
+  }
+
 	async setRichTextContent(
 		containerSelector: string,
 		content: string,

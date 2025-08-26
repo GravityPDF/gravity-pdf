@@ -70,6 +70,14 @@ test.describe('Form PDF Settings', () => {
 		admin: Admin;
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await expect(page.locator('#tab_PDF')).toHaveScreenshot({});
+
+    const elements = page.locator('#gfpdf-settings-field-wrapper-notification').getByRole('checkbox')
+    await expect(elements).toHaveCount(1)
+
+    // Add another Notification
+    await pdf.addNotification(form.id, 'User Notification');
+
+    await pdf.navigateToNewFormPdf(form.id);
+    await expect(elements).toHaveCount(2)
 	});
 });
