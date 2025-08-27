@@ -2,7 +2,6 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { findByTestAttr } from '../../testUtils'
 import { CloseDialog } from '../../../../../src/assets/js/react/components/Modal/CloseDialog'
-import * as utilitiesA from '../../../../../src/assets/js/react/utilities/FontManager/associatedFontManagerSelectBox'
 import * as utilitiesB from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont'
 
 describe('CloseDialog - CloseDialog.js', () => {
@@ -12,9 +11,10 @@ describe('CloseDialog - CloseDialog.js', () => {
     getCustomFontList: jest.fn(),
     clearAddFontMsg: jest.fn(),
     templateList: [{}],
-    fontList: [{}],
-    selectedFont: '',
-    msg: { success: {}, error: {} },
+    msg: {
+      success: {},
+      error: {}
+    },
     history: { push: jest.fn() }
   }
   const wrapper = shallow(<CloseDialog {...props} />)
@@ -32,7 +32,13 @@ describe('CloseDialog - CloseDialog.js', () => {
 
       instance.componentDidMount()
       // simulate event
-      map.keydown({ keyCode: 27, target: { className: '', value: '' } })
+      map.keydown({
+        keyCode: 27,
+        target: {
+          className: '',
+          value: ''
+        }
+      })
 
       expect(handleKeyPress).toHaveBeenCalledTimes(1)
     })
@@ -44,35 +50,6 @@ describe('CloseDialog - CloseDialog.js', () => {
 
       expect(props.getCustomFontList).toHaveBeenCalledTimes(1)
     })
-
-    test('componentWillUnmount() - Remove keydown listener to document on mount', () => {
-      // Mock font manager select box DOM
-      document.body.innerHTML =
-        '<div class="gfpdf-font-manager">' +
-        ' <select class="gfpdf_settings_default_font " name="gfpdf_settings[default_font]">' +
-        '   <optgroup label="User-Defined Fonts">' +
-        '     <option value="z" />' +
-        '     <option value="c" />' +
-        '   </optgroup>' +
-        ' </select>' +
-        '</div>'
-
-      const map = {}
-
-      document.removeEventListener = jest.fn((event, cb) => {
-        map[event] = cb
-      })
-
-      const handleKeyPress = jest.spyOn(wrapper.instance(), 'handleKeyPress')
-      const associatedFontManagerSelectBox = jest.spyOn(utilitiesA, 'associatedFontManagerSelectBox')
-
-      instance.componentWillUnmount()
-      // simulate event
-      map.keydown({ keyCode: 27, target: { className: '', value: '' } })
-
-      expect(handleKeyPress).toHaveBeenCalledTimes(1)
-      expect(associatedFontManagerSelectBox).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('RUN COMPONENT METHODS', () => {
@@ -82,9 +59,15 @@ describe('CloseDialog - CloseDialog.js', () => {
         '<div class="update-font show">' +
         '</div>'
 
-      const msg = { success: { addFont: {} }, error: {} }
-      const history = { push: jest.fn(), location: { pathname: '\'/fontmanager/' } }
-      const wrapper = shallow(<CloseDialog {...props} id='yes' history={history} msg={msg} />)
+      const msg = {
+        success: { addFont: {} },
+        error: {}
+      }
+      const history = {
+        push: jest.fn(),
+        location: { pathname: '\'/fontmanager/' }
+      }
+      const wrapper = shallow(<CloseDialog {...props} id="yes" history={history} msg={msg} />)
       const instance = wrapper.instance()
       const toggleUpdateFont = jest.spyOn(utilitiesB, 'toggleUpdateFont')
       const e = { keyCode: 27 }
@@ -97,7 +80,13 @@ describe('CloseDialog - CloseDialog.js', () => {
 
     test('handleKeyPress() - Close modal', () => {
       const handleCloseDialog = jest.spyOn(wrapper.instance(), 'handleCloseDialog')
-      const e = { keyCode: 27, target: { className: '', value: '' } }
+      const e = {
+        keyCode: 27,
+        target: {
+          className: '',
+          value: ''
+        }
+      }
       instance.handleKeyPress(e)
 
       expect(handleCloseDialog).toHaveBeenCalledTimes(1)

@@ -22,6 +22,7 @@ import {
   DELETE_FONT_SUCCESS,
   DELETE_FONT_ERROR
 } from '../actions/fontManager'
+import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox'
 
 /**
  * @package     Gravity PDF
@@ -73,6 +74,19 @@ export function * getCustomFontList () {
  */
 export function * watchAddFont () {
   yield takeLatest(ADD_FONT, addFont)
+}
+
+/**
+ * A watcher that get triggered when custom font list is successfully requested
+ *
+ * @since 6.14.2
+ */
+export function * watchGetCustomFontListSuccess () {
+  yield takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, function (response) {
+    const fontList = response.payload
+
+    associatedFontManagerSelectBox(fontList)
+  })
 }
 
 /**

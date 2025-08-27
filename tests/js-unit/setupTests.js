@@ -1,5 +1,6 @@
 import Enzyme from 'enzyme'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import CSS from 'css.escape' // eslint-disable-line
 
 Enzyme.configure({
   adapter: new Adapter(),
@@ -33,7 +34,9 @@ window.GFPDF = {
   addUpdateFontSuccess: 'Your font has been saved.',
   addFatalError: 'A problem occurred. Reload the page and try again.',
   fontFileInvalid: 'Font file(s) are malformed and cannot be used with Gravity PDF',
-  manage: 'Advanced'
+  manage: 'Advanced',
+  fontManagerTitle: 'Font Manager',
+  fontUserDefinedGroup: 'User-Defined Fonts',
 }
 
 window.gfpdf_migration_multisite_ids = []

@@ -1,12 +1,22 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 import { findByTestAttr } from '../../testUtils'
-import FontManager from '../../../../../src/assets/js/react/components/FontManager/FontManager'
+import { FontManager } from '../../../../../src/assets/js/react/components/FontManager/FontManager'
 
 describe('FontManager - FontManager.js', () => {
 
-  const props = { history: {} }
+  const props = {
+    history: {},
+    fontList: [],
+    selectedFont: '',
+  }
   const wrapper = shallow(<FontManager {...props} />)
+
+  beforeEach(() => {
+    // Mock font select DOM
+    document.body.innerHTML =
+      '<div class="gfpdf-font-manager"><select> <option value="dejavusans">Dejavu Sans</option> </select></div>'
+  })
 
   describe('RUN LIFECYCLE METHODS', () => {
     test('componentDidMount() - Add focus event to document option on mount', () => {
@@ -25,7 +35,10 @@ describe('FontManager - FontManager.js', () => {
       // Call componentDidMount()
       wrapper.instance().componentDidMount()
       // Simulate 'tab' keyboard press
-      map.focus({ keyCode: 9, stopPropagation: jest.fn() })
+      map.focus({
+        keyCode: 9,
+        stopPropagation: jest.fn()
+      })
 
       expect(focus).toHaveBeenCalledTimes(1)
       expect(handleFocus).toHaveBeenCalledTimes(1)
@@ -47,7 +60,10 @@ describe('FontManager - FontManager.js', () => {
       // Call componentDidMount()
       wrapper.instance().componentWillUnmount()
       // Simulate 'tab' keyboard press
-      map.focus({ keyCode: 9, stopPropagation: jest.fn() })
+      map.focus({
+        keyCode: 9,
+        stopPropagation: jest.fn()
+      })
 
       expect(focus).toHaveBeenCalledTimes(0)
       expect(handleFocus).toHaveBeenCalledTimes(1)

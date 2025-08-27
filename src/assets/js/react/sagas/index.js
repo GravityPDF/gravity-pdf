@@ -3,7 +3,13 @@ import { all } from 'redux-saga/effects'
 /* Sagas */
 import { watchUpdateSelectBox, watchTemplateProcessing, watchpostTemplateUploadProcessing } from './templates'
 import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts'
-import { watchGetCustomFontList, watchAddFont, watchEditFont, watchDeleteFont } from './fontManager'
+import {
+  watchGetCustomFontList,
+  watchAddFont,
+  watchEditFont,
+  watchDeleteFont,
+  watchGetCustomFontListSuccess
+} from './fontManager'
 
 /**
  * @package     Gravity PDF
@@ -27,6 +33,7 @@ export default function * rootSaga () {
     watchGetCustomFontList(),
     watchAddFont(),
     watchEditFont(),
-    watchDeleteFont()
+    watchDeleteFont(),
+    watchGetCustomFontListSuccess()
   ])
 }

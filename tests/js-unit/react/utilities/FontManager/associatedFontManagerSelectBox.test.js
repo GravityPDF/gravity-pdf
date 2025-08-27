@@ -35,10 +35,17 @@ describe('Utilities/FontManager - associatedFontManagerSelectBox.js', () => {
   })
 
   test('associatedFontManagerSelectBox() - Set current selected font value', () => {
-    expect(associatedFontManagerSelectBox(fontList, 'gugi')).toBe('gugi')
+    associatedFontManagerSelectBox(fontList, 'gugi')
+
+    expect(document.querySelector('.gfpdf-font-manager select').value).toBe(
+      'gugi'
+    )
   })
 
-  test('associatedFontManagerSelectBox() - Assign default value if selected item is deleted', () => {
-    expect(associatedFontManagerSelectBox(fontList, 'arial')).toBe('0')
+  test('associatedFontManagerSelectBox() - Set empty value if selected item is deleted', () => {
+    associatedFontManagerSelectBox(fontList, 'arial')
+    expect(document.querySelector('.gfpdf-font-manager select').value).toBe(
+      ''
+    )
   })
 })

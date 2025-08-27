@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 /* Components */
 import FontManagerHeader from './FontManagerHeader'
 import FontManagerBody from './FontManagerBody'
+import { connect } from 'react-redux'
+import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox'
 
 /**
  * @package     Gravity PDF
@@ -25,7 +27,9 @@ export class FontManager extends Component {
    */
   static propTypes = {
     id: PropTypes.string,
-    history: PropTypes.object.isRequired
+    history: PropTypes.object.isRequired,
+    fontList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    selectedFont: PropTypes.string.isRequired
   }
 
   /**
@@ -59,6 +63,19 @@ export class FontManager extends Component {
    */
   componentWillUnmount () {
     document.removeEventListener('focus', this.handleFocus, true)
+
+    const {
+      fontList,
+      selectedFont
+    } = this.props
+    const tabLocation = window.location.search.substring(
+      window.location.search.lastIndexOf('=') + 1
+    )
+
+    /* When closed, ensure font select box has the latest custom font data */
+    if (tabLocation !== 'tools') {
+      return associatedFontManagerSelectBox(fontList, selectedFont)
+    }
   }
 
   /**
@@ -83,7 +100,10 @@ export class FontManager extends Component {
    * @since 6.0
    */
   render () {
-    const { id, history } = this.props
+    const {
+      id,
+      history
+    } = this.props
 
     return (
       <div
@@ -102,4 +122,21 @@ export class FontManager extends Component {
   }
 }
 
-export default FontManager
+/**
+ * Map redux state to props
+ *
+ * @param { Object } state
+ *
+ * @return {{
+ *  fontList: Array<Object>,
+ *  selectedFont: string,
+ * }} mappedState
+ *
+ * @since 6.14.2
+ */
+const mapStateToProps = (state) => ({
+  fontList: state.fontManager.fontList,
+  selectedFont: state.fontManager.selectedFont
+})
+
+export default connect(mapStateToProps, {})(FontManager)

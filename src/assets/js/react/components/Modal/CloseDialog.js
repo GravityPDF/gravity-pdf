@@ -4,9 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 /* Redux actions */
-import { getCustomFontList, clearAddFontMsg } from '../../actions/fontManager'
+import { clearAddFontMsg } from '../../actions/fontManager'
 /* Utilities */
-import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox'
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont'
 
 /**
@@ -30,11 +29,7 @@ export class CloseDialog extends Component {
   static propTypes = {
     id: PropTypes.string,
     closeRoute: PropTypes.string,
-    getCustomFontList: PropTypes.func.isRequired,
     clearAddFontMsg: PropTypes.func.isRequired,
-    templateList: PropTypes.arrayOf(PropTypes.object).isRequired,
-    fontList: PropTypes.arrayOf(PropTypes.object).isRequired,
-    selectedFont: PropTypes.string.isRequired,
     msg: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired
   }
@@ -49,36 +44,12 @@ export class CloseDialog extends Component {
   }
 
   /**
-   * Check for new added template and fetch new fontList to trigger a request of
-   * updated font manager select box
-   *
-   * @param prevProps: object
-   *
-   * @since 6.0
-   */
-  componentDidUpdate (prevProps) {
-    const { templateList, getCustomFontList } = this.props
-
-    if (prevProps.templateList !== templateList) {
-      getCustomFontList()
-    }
-  }
-
-  /**
    * Remove keydown listener to document on mount
    *
    * @since 6.0
    */
   componentWillUnmount () {
     document.removeEventListener('keydown', this.handleKeyPress, false)
-
-    const { fontList, selectedFont } = this.props
-    const tabLocation = window.location.search.substr(window.location.search.lastIndexOf('=') + 1)
-
-    /* Ensure associated font manager select box has the latest data */
-    if (tabLocation !== 'tools') {
-      return associatedFontManagerSelectBox(fontList, selectedFont)
-    }
   }
 
   /**
@@ -144,18 +115,12 @@ export class CloseDialog extends Component {
  * @param state: object
  *
  * @returns {{
- *  templateList: array of object,
- *  fontList: array of object,
- *  selectedFont: string,
  *  msg: object
  * }}
  *
  * @since 6.0
  */
 const mapStateToProps = state => ({
-  templateList: state.template.list,
-  fontList: state.fontManager.fontList,
-  selectedFont: state.fontManager.selectedFont,
   msg: state.fontManager.msg
 })
 
@@ -165,6 +130,5 @@ const mapStateToProps = state => ({
  * @since 6.0
  */
 export default withRouter(connect(mapStateToProps, {
-  getCustomFontList,
   clearAddFontMsg
 })(CloseDialog))
