@@ -236,7 +236,7 @@ test.describe('Form PDF Settings', () => {
 		await page
 			.locator('input[type=file]')
 			.setInputFiles(
-				__dirname + '/../../tools/playwright/data/images/thumbnail.jpg'
+				__dirname + '/../../../tools/playwright/data/images/thumbnail.jpg'
 			);
 		await page.getByRole('button', { name: 'Select Media' }).click();
 

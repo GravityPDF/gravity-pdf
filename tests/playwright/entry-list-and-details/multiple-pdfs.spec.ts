@@ -25,7 +25,7 @@ test.describe('Multiple PDF', () => {
 
 			// setup PDF
 			for (let i = 1; i <= 2; i++) {
-				await pdf.setPdfSetting('View', true);
+				await pdf.setGlobalPdfSetting('View', true);
 				await pdf.createPdf(form.id, `Multiple #${i}`);
 			}
 
@@ -66,7 +66,7 @@ test.describe('Multiple PDF', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		await pdf.setPdfSetting('Download', true);
+		await pdf.setGlobalPdfSetting('Download', true);
 		await pdf.navigateToEntryList(form.id);
 		const pdfLink = page.getByRole('link', { name: 'Download PDFs' });
 		await page.locator('.has-row-actions').first().hover();

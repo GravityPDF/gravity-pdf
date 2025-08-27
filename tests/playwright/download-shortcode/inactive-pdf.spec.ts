@@ -22,7 +22,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Inactive PDF on Text Confirmation');
 
-			await pdf.setPdfSetting('Debug Mode', false);
+			await pdf.setGlobalPdfSetting('Debug Mode', false);
 			const pdfId = await pdf.createPdf(form.id, 'Inactive PDF Document');
 			await pdf.navigateToFormPdfList(form.id);
 			await page
@@ -67,7 +67,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		await pdf.setPdfSetting('Debug Mode', true);
+		await pdf.setGlobalPdfSetting('Debug Mode', true);
 
 		// preview and submit form
 		await pdf.navigateToFormPreview(form.id);

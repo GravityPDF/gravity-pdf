@@ -24,7 +24,7 @@ test.describe('Single PDF', () => {
 			form = await pdf.createForm('Single PDF');
 
 			// setup PDF
-			await pdf.setPdfSetting('View', true);
+			await pdf.setGlobalPdfSetting('View', true);
 			await pdf.createPdf(form.id, 'Single #1');
 
 			// create entry
@@ -58,7 +58,7 @@ test.describe('Single PDF', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		await pdf.setPdfSetting('Download', true);
+		await pdf.setGlobalPdfSetting('Download', true);
 		await pdf.navigateToEntryList(form.id);
 		const pdfLink = page.getByRole('link', { name: 'Download PDF' });
 		await page.locator('.has-row-actions').first().hover();
