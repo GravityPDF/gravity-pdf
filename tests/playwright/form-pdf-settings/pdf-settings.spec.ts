@@ -137,4 +137,32 @@ test.describe('Form PDF Settings', () => {
 
     await expect(page.locator('#gfpdf-settings-field-wrapper-conditional')).toHaveScreenshot();
 	});
+
+  test('Paper', async ({
+                                     requestUtils,
+                                     page,
+                                     admin,
+                                   }: {
+    requestUtils: RequestUtils;
+    page: Page;
+    admin: Admin;
+  }) => {
+    await pdf.createPdf(form.id, 'Paper');
+
+    await page.getByLabel('Paper Size').selectOption('LETTER');
+    await page.getByLabel('Paper Size').selectOption('A4');
+    await page.getByLabel('Paper Size').selectOption('B3');
+    await page.getByLabel('Paper Size').selectOption('RA1');
+    await page.getByLabel('Paper Size').selectOption('CUSTOM');
+    await page.locator('#gfpdf_settings\\[custom_pdf_size\\]_measurement').selectOption('inches');
+    await page.locator('#gfpdf_settings\\[custom_pdf_size\\]_width').fill('5');
+    await page.locator('#gfpdf_settings\\[custom_pdf_size\\]_height').fill('7');
+    await page.getByLabel('Paper Orientation').selectOption('landscape');
+
+    await pdf.addOrUpdatePdf();
+
+    await expect(page.locator('#gfpdf-settings-field-wrapper-pdf_size')).toHaveScreenshot();
+    await expect(page.locator('#gfpdf-settings-field-wrapper-custom_pdf_size')).toHaveScreenshot();
+    await expect(page.locator('#gfpdf-settings-field-wrapper-orientation')).toHaveScreenshot();
+  });
 });
