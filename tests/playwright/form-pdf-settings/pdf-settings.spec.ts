@@ -165,4 +165,61 @@ test.describe('Form PDF Settings', () => {
     await expect(page.locator('#gfpdf-settings-field-wrapper-custom_pdf_size')).toHaveScreenshot();
     await expect(page.locator('#gfpdf-settings-field-wrapper-orientation')).toHaveScreenshot();
   });
+
+  test('Color Picker', async ({
+                         requestUtils,
+                         page,
+                         admin,
+                       }: {
+    requestUtils: RequestUtils;
+    page: Page;
+    admin: Admin;
+  }) => {
+    await pdf.createPdf(form.id, 'Color Picker');
+
+    await page.getByRole('button', { name: 'Select Color' }).first().click();
+    await page.locator('.iris-square-inner.iris-square-vert').first().click({ position: { x: 100, y: 100 }});
+    await page.getByRole('textbox', { name: 'Font Color' }).click();
+
+    await expect(page.getByRole('textbox', { name: 'Font Color' })).toHaveValue('#898989');
+    await expect(page.locator('#gfpdf-settings-field-wrapper-font_colour')).toHaveScreenshot();
+  });
+
+  test('PDF Security', async ({
+                                requestUtils,
+                                page,
+                                admin,
+                              }: {
+    requestUtils: RequestUtils;
+    page: Page;
+    admin: Admin;
+  }) => {
+    await pdf.createPdf(form.id, 'PDF Security');
+
+    await expect(page.getByRole('textbox', { name: 'Password' })).not.toBeVisible()
+    await expect(page.getByRole('checkbox', { name: 'Print - High Resolution' })).not.toBeVisible()
+
+    await page.getByText( 'Enable PDF Security' ).first().click();
+
+    await expect(page.getByRole('textbox', { name: 'Password' })).toBeVisible()
+    await expect(page.getByRole('checkbox', { name: 'Print - High Resolution' })).toBeVisible()
+
+    await page.getByRole('radio', { name: 'PDF/A-1b' }).check();
+
+    await expect(page.getByText( 'Enable PDF Security' ).first()).not.toBeVisible()
+    await expect(page.getByRole('textbox', { name: 'Password' })).not.toBeVisible()
+    await expect(page.getByRole('checkbox', { name: 'Print - High Resolution' })).not.toBeVisible()
+
+    await page.getByRole('radio', { name: 'Standard' }).check();
+
+    await expect(page.getByRole('textbox', { name: 'Password' })).toBeVisible()
+    await expect(page.getByRole('checkbox', { name: 'Print - High Resolution' })).toBeVisible()
+
+    await page.locator('#gfpdf-settings-field-wrapper-password').getByTitle('Insert Merge Tags').click();
+    await page.getByRole('button', { name: 'Date (dd/mm/yyyy)' }).click();
+
+    await expect(page.locator('#gfpdf-settings-field-wrapper-password')).toHaveScreenshot();
+  });
+
+
 });
