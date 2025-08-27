@@ -5,12 +5,12 @@ import { URL } from "node:url";
 import GravityForms from "@self:playwright/utils/gravityforms";
 
 export default class Pdf extends GravityForms {
-  async navigateToPdfSettings() {
+  async navigateToGlobalPdfSettings() {
     await this.admin.visitAdminPage('admin.php', 'page=gf_settings&subview=PDF');
   }
 
-  async setPdfSetting(label:string, value: any) {
-    await this.navigateToPdfSettings();
+  async setGlobalPdfSetting(label:string, value: any) {
+    await this.navigateToGlobalPdfSettings();
 
     const setting = this.page.getByLabel(label).first()
     console.log(setting.getAttribute('type'))
@@ -51,11 +51,14 @@ export default class Pdf extends GravityForms {
     } else {
       await this.page.getByRole('button', { name: 'Update PDF' }).first().click();
     }
+
+    await expect(this.page.getByRole('button', { name: 'Manage PDF Templates'})).toBeVisible();
   }
 
   async navigateToNewFormPdf(formId: number) {
     await this.navigateToFormPdfList(formId);
     await this.page.getByRole('link', { name: 'Add new PDF' }).click();
+    await expect(this.page.getByRole('button', { name: 'Manage PDF Templates'})).toBeVisible();
   }
 
   async navigateToFormPdf(formId: number, pdfId: string) {
@@ -63,11 +66,35 @@ export default class Pdf extends GravityForms {
       'admin.php',
       `page=gf_edit_forms&view=settings&subview=PDF&id=${formId}&pid=${pdfId}`
     );
+    await expect(this.page.getByRole('button', { name: 'Manage PDF Templates'})).toBeVisible();
   }
 
   async copyDownloadShortcodeToClipboard(formId: number, pdfId: string) {
     await this.navigateToFormPdfList(formId);
     await this.page.locator(`#gfpdf-${pdfId}`).getByRole('dialog').click();
+  }
+
+  async checkRichTextEditor(container: Locator) {
+    // Merge Tag Selector
+    await container.getByTitle('Insert Merge Tags').click();
+    await container.getByRole('button', { name: 'Radio' }).click();
+    await container.getByTitle('Insert Merge Tags').click();
+    await container.getByRole('button', { name: 'Entry Id' }).click();
+
+    // Add Media
+    await container.getByRole('button', { name: 'Add Media' }).click();
+    await this.page.getByRole('tab', { name: 'Upload files' }).click();
+    await this.page.locator('.media-modal-content:visible').locator('input[type=file]').setInputFiles(__dirname + '/../data/images/thumbnail.jpg');
+    await this.page.getByRole('button', { name: 'Insert into Post' }).click();
+
+    await expect(container).toHaveScreenshot();
+
+    // Code View
+    container.getByRole('button', { name: /^Code$/ }).first().click();
+
+    await expect(container.getByRole('textbox').last()).toHaveValue(/^\{Radio:1}\{entry_id}<img .+/)
+
+    await expect(container).toHaveScreenshot();
   }
 
   async downloadAndVerifyPdf(pdfLink: Locator, expectedFilename: string) {
