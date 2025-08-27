@@ -83,7 +83,7 @@ test.describe('Form PDF Settings', () => {
 		await expect(elements).toHaveCount(2);
 
 		await page.getByRole('checkbox', { name: 'User Notification' }).click();
-		await page.getByRole('button', { name: 'Update PDF' }).first().click();
+		await pdf.addOrUpdatePdf();
 
 		await expect(
 			page.getByRole('checkbox', { name: 'Admin Notification' })
@@ -93,4 +93,48 @@ test.describe('Form PDF Settings', () => {
 		).toBeChecked();
 	});
 
+  test('Filename', async ({
+                                     requestUtils,
+                                     page,
+                                     admin,
+                                   }: {
+    requestUtils: RequestUtils;
+    page: Page;
+    admin: Admin;
+  }) => {
+    await pdf.createPdf(form.id, 'Filename');
+
+    await page.getByRole('textbox', { name: 'Filename' }).click();
+    await page.getByTitle('Insert Merge Tags').nth(0).click();
+    await page.getByRole('textbox', { name: 'Search Merge Tags' }).fill('date');
+    await page.getByRole('button', { name: 'Date (dd/mm/yyyy)' }).click();
+    await page.getByRole('textbox', { name: 'Filename' }).click();
+    await page.getByRole('textbox', { name: 'Filename' }).pressSequentially('-{entry_id}');
+    await pdf.addOrUpdatePdf();
+
+    await expect(page.locator('#gfpdf-settings-field-wrapper-filename')).toHaveScreenshot();
+  });
+
+	test('Conditional Logic', async ({
+		requestUtils,
+		page,
+		admin,
+	}: {
+		requestUtils: RequestUtils;
+		page: Page;
+		admin: Admin;
+	}) => {
+		await pdf.createPdf(form.id, 'Conditional Logic');
+
+    await page.getByRole('checkbox', { name: 'Enable conditional logic', exact: true }).check();
+    await page.locator('#gfpdf_action_type').selectOption('hide');
+    await page.locator('#gfpdf_logic_type').selectOption('any');
+    await page.locator('#gfpdf_rule_value_0').selectOption('Second Choice');
+    await page.getByTitle('add another rule').first().click();
+    await page.locator('#gfpdf_rule_field_1').selectOption('status');
+    await page.locator('#gfpdf_rule_value_1').selectOption('spam');
+    await pdf.addOrUpdatePdf();
+
+    await expect(page.locator('#gfpdf-settings-field-wrapper-conditional')).toHaveScreenshot();
+	});
 });

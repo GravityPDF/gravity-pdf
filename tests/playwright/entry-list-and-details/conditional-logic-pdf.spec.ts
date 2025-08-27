@@ -32,10 +32,7 @@ test.describe('Conditional PDF', () => {
 					exact: true,
 				})
 				.check();
-			await page
-				.getByRole('button', { name: 'Update PDF' })
-				.first()
-				.click();
+			await pdf.addOrUpdatePdf();
 
 			// create entry
 			entry1 = await pdf.createEntry({ form_id: form.id });

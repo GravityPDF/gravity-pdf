@@ -35,15 +35,22 @@ export default class Pdf extends GravityForms {
     await this.navigateToNewFormPdf(formId);
     await this.page.getByLabel('Label').fill(label);
     await this.page.getByLabel('Filename').fill(label);
-    await this.page
-      .getByRole('button', { name: 'Add PDF' })
-      .first()
-      .click();
+    await this.addOrUpdatePdf()
 
     // return PDF ID (@TODO update with the REST API settings once implemented)
     const pdfUrl = new URL(this.page.url());
 
     return pdfUrl.searchParams.get('pid');
+  }
+
+  async addOrUpdatePdf() {
+    const addButton = this.page.getByRole("button", { name: "Add PDF" });
+
+    if (await addButton.count() > 0) {
+      await addButton.first().click();
+    } else {
+      await this.page.getByRole('button', { name: 'Update PDF' }).first().click();
+    }
   }
 
   async navigateToNewFormPdf(formId: number) {
