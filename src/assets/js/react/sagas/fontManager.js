@@ -68,6 +68,19 @@ export function* getCustomFontList() {
 }
 
 /**
+ * A watcher that get triggered when custom font list is successfully requested
+ *
+ * @since 6.0
+ */
+export function* watchGetCustomFontListSuccess() {
+	yield takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, function (response) {
+		const fontList = response.payload;
+
+		associatedFontManagerSelectBox(fontList);
+	});
+}
+
+/**
  * A watcher that get triggered when a new add font request is submitted
  *
  * @since 6.0
