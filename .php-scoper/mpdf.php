@@ -63,7 +63,7 @@ return [
 			}
 
 			if ( basename( $filePath ) === 'ServiceFactory.php' ) {
-				$content = str_replace( 'new Cache(', 'new \GFPDF\Helper\Mpdf\Cache(', $content );
+				$content = str_replace( "new \\$prefix\\Mpdf\\Cache(", 'new \GFPDF\Helper\Mpdf\Cache(', $content );
 			}
 
 			/* Remove type hinting from prefixed logger */
