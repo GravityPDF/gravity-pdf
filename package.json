@@ -54,20 +54,20 @@
   },
   "scripts": {
     "start": "npm run wp-env start && npm run dev:hot",
-    "dev": "WP_DEVTOOL=inline-source-map wp-scripts start --webpack-src-dir=./src/assets/js --webpack-no-externals",
+    "dev": "WP_DEVTOOL=inline-source-map wp-scripts start -- --webpack-src-dir=./src/assets/js --webpack-no-externals",
     "dev:build": "npm run dev -- --no-watch",
-    "build": "wp-scripts build --webpack-src-dir=./src/assets/js --webpack-no-externals",
-    "format": "wp-scripts format ./src/assets ./tests/js-unit ./tests/playwright && npm run lint:js --fix && npm run lint:css --fix",
+    "build": "wp-scripts build -- --webpack-src-dir=./src/assets/js --webpack-no-externals",
+    "format": "wp-scripts format ./src/assets ./tests/js-unit ./tests/playwright && npm run lint:js -- --fix && npm run lint:css -- --fix",
     "lint:css": "wp-scripts lint-style ./src/assets/**/*.scss ./src/assets/**/*.pcss",
     "lint:js": "wp-scripts lint-js ./src/assets/js ./tests/js-unit ./tests/playwright",
     "wp-env": "wp-env",
     "test:php": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/phpunit.xml.dist",
     "test:php:multisite": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",
-    "test:e2e:playwright": "wp-scripts test-playwright --config tools/playwright/config.ts",
-    "test:e2e:playwright:debug": "wp-scripts test-playwright --config tools/playwright/config.ts --ui",
-    "test:js": "jest --verbose",
-    "test:js:coverage": "jest --coverage --verbose",
-    "test:js:watch": "jest --watchAll",
+    "test:e2e:playwright": "wp-scripts test-playwright -- --config tools/playwright/config.ts",
+    "test:e2e:playwright:debug": "wp-scripts test-playwright -- --config tools/playwright/config.ts --ui",
+    "test:js": "jest -- --verbose",
+    "test:js:coverage": "jest -- --coverage --verbose",
+    "test:js:watch": "jest -- --watchAll",
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json"
   }
 }
