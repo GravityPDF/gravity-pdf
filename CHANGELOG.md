@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.13.2
+* 🐞 Bug: Fix plugin build issue preventing the mPDF cache filesystem fix (6.13.0) from working
+* 🧹 Housekeeping: Add upgrade routine to reset the temporary directory permissions
+
 ## 6.13.1
 * 🐞 Bug: Only enable image PDF debugging when both `WP_DEBUG` and `WP_DEBUG_DISPLAY` constants are set to true 
 
