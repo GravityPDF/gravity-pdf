@@ -453,7 +453,7 @@ class Helper_PDF {
 	 */
 	public function set_creator( $text = '' ) {
 		if ( empty( $text ) ) {
-			$this->mpdf->SetCreator( 'Gravity PDF v' . PDF_EXTENDED_VERSION . '. https://gravitypdf.com' );
+			$this->mpdf->SetCreator( 'Gravity PDF, gravitypdf.com' );
 		} else {
 			$this->mpdf->SetCreator( $text );
 		}
@@ -646,6 +646,8 @@ class Helper_PDF {
 					'orientation'            => $this->orientation,
 
 					'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
+
+					'exposeVersion'          => false,
 				],
 				$this->form,
 				$this->entry,
