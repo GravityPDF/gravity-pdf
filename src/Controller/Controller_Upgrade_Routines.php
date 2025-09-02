@@ -113,26 +113,32 @@ class Controller_Upgrade_Routines {
 		foreach ( $folders as $folder ) {
 			/* Try get the folder permission from the parent directory */
 			$folder_perms = 0755;
-			$parent_dir   = dirname( $folder );
+
+			/* Ignore parent folder if it is `/` */
+			$parent_dir = dirname( $folder ) !== '/' ? dirname( $folder ) : $folder;
 			if ( is_dir( $parent_dir ) ) {
 				$stat         = @stat( $parent_dir ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 				$folder_perms = $stat ? $stat['mode'] & 0007777 : 0755;
 			}
 
-			/* Get all directories in folder */
-			$dir            = new \RecursiveDirectoryIterator( $folder, \RecursiveDirectoryIterator::SKIP_DOTS );
-			$files          = new \RecursiveCallbackFilterIterator(
-				$dir,
-				function ( $current, $key, $iterator ) {
-					return $iterator->hasChildren() || $current->isDir();
-				}
-			);
-			$files_iterator = new \RecursiveIteratorIterator( $files, \RecursiveIteratorIterator::SELF_FIRST );
+			try {
+				/* Get all directories in folder */
+				$dir            = new \RecursiveDirectoryIterator( $folder, \RecursiveDirectoryIterator::SKIP_DOTS );
+				$files          = new \RecursiveCallbackFilterIterator(
+					$dir,
+					function ( $current, $key, $iterator ) {
+						return $iterator->hasChildren() || $current->isDir();
+					}
+				);
+				$files_iterator = new \RecursiveIteratorIterator( $files, \RecursiveIteratorIterator::SELF_FIRST );
 
-			/* Reset permissions on folder and all subdirectories */
-			chmod( $folder, $folder_perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
-			foreach ( $files_iterator as $file ) {
-				chmod( $file->getRealPath(), $folder_perms ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+				/* Reset permissions on folder and all subdirectories */
+				@chmod( $folder, $folder_perms ); // phpcs:ignore
+				foreach ( $files_iterator as $file ) {
+					@chmod( $file->getRealPath(), $folder_perms ); // phpcs:ignore
+				}
+			} catch ( \Exception $e ) {
+				// do nothing
 			}
 		}
 	}
