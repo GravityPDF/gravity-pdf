@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.13.3
+* 🔒 Security: Remove the mPDF and Gravity PDF version numbers in the PDF metadata
+* 🐞Bug: Resolve PHP error in 6.13.2 upgrade routine if the temporary PDF directory has been incorrectly set to a shared system folder
+* 🐞Bug: Resolve PHP error if the `page` or `subview` admin URL parameters are arrays
+
 ## 6.13.2
 * 🐞 Bug: Fix plugin build issue preventing the mPDF cache filesystem fix (6.13.0) from working
 * 🧹 Housekeeping: Add upgrade routine to reset the temporary directory permissions
