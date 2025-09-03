@@ -65,9 +65,9 @@
     "test:php:multisite": "npm run wp-env run tests-wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/multisite.xml",
     "test:e2e:playwright": "wp-scripts test-playwright -- --config tools/playwright/config.ts",
     "test:e2e:playwright:debug": "wp-scripts test-playwright -- --config tools/playwright/config.ts --ui",
-    "test:js": "jest -- --verbose",
-    "test:js:coverage": "jest -- --coverage --verbose",
-    "test:js:watch": "jest -- --watchAll",
+    "test:js": "jest --verbose",
+    "test:js:coverage": "jest --coverage --verbose",
+    "test:js:watch": "jest --watchAll",
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json"
   }
 }
