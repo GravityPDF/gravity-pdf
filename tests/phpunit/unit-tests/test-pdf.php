@@ -107,8 +107,8 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertSame( 10, has_action( 'parse_request', [ $this->controller, 'process_legacy_pdf_endpoint' ] ) );
-		$this->assertSame( 10, has_action( 'parse_request', [ $this->controller, 'process_pdf_endpoint' ] ) );
+		$this->assertSame( 1, has_action( 'parse_request', [ $this->controller, 'process_legacy_pdf_endpoint' ] ) );
+		$this->assertSame( 1, has_action( 'parse_request', [ $this->controller, 'process_pdf_endpoint' ] ) );
 
 		$this->assertSame(
 			10,
