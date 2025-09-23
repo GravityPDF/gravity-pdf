@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.13.4
+* 🐞Bug: Resolve PDF View/Download issue if both Event Espresso and LifterLMS plugin are installed 
+
 ## 6.13.3
 * 🔒 Security: Remove the mPDF and Gravity PDF version numbers in the PDF metadata
 * 🐞Bug: Resolve PHP error in 6.13.2 upgrade routine if the temporary PDF directory has been incorrectly set to a shared system folder
