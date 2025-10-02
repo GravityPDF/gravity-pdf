@@ -311,12 +311,12 @@ class Helper_PDF {
 
 		switch ( $this->output ) {
 			case 'DISPLAY':
-				$this->prevent_caching();
+				$this->pre_stream_actions();
 				$this->mpdf->Output( $this->filename, 'I' );
 				exit;
 
 			case 'DOWNLOAD':
-				$this->prevent_caching();
+				$this->pre_stream_actions();
 				$this->mpdf->Output( $this->filename, 'D' );
 				exit;
 
@@ -993,13 +993,23 @@ class Helper_PDF {
 
 
 	/**
-	 * Ensure the PDF doesn't get cached
+	 * Actions to run before a PDF is streamed to the browser
 	 *
-	 * @since 4.0
+	 * @since 6.13.5
 	 */
-	protected function prevent_caching() {
+	protected function pre_stream_actions() {
+		/* Close any open buffers to prevent anything from modifying the binary PDF stream */
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
+
+		/* Define the PDF as not cacheable, for plugins that support it  */
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
+		}
+
+		if ( ! headers_sent() ) {
+			send_nosniff_header();
 		}
 	}
 }
