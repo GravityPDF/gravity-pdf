@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.13.5
+* 🐞Bug: Ensure background queue uses correct entry data when resending notifications
+* 🐞Bug: Prevent plugins corrupting PDF data when viewing/downloading (via output buffer)
+
 ## 6.13.4
 * 🐞Bug: Resolve PDF View/Download issue if both Event Espresso and LifterLMS plugin are installed 
 
