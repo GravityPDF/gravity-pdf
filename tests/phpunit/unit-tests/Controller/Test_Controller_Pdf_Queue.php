@@ -66,7 +66,7 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 		$this->queue_mock->method( 'save' )
 						 ->willReturn( $this->queue_mock );
 
-		$this->controller = new Controller_Pdf_Queue( $this->queue_mock, $model_pdf, $gfpdf->log );
+		$this->controller = new Controller_Pdf_Queue( $this->queue_mock, $model_pdf, $gfpdf->log, $gfpdf->gform );
 	}
 
 	/**
@@ -277,28 +277,26 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	 */
 	public function test_queue_async_form_submission_tasks() {
 		$results                             = $this->create_form_and_entries();
-		$entry                               = $results['entry'];
 		$form                                = $results['form'];
+		$entry = $results['entry'];
 		$form['notifications']['1254123223'] = $form['notifications']['54bca349732b8'];
 		$form['notifications']['54bca349732b8']['isActive'] = true;
 
-		foreach( $form['notifications'] as $notification ) {
+		/* Queue multiple entry notifications */
+		foreach ( $form['notifications'] as $notification ) {
 			$this->controller->maybe_disable_submission_notifications( false, $notification, $form, $entry );
 		}
-		
 		$this->controller->queue_async_form_submission_tasks( $entry, $form );
 
 		$queue = $this->queue_mock->get_data();
 
-		$this->assertCount( 7, $queue );
+		$this->assertCount( 5, $queue );
 
-		$this->assertStringContainsString( 'create_pdf', $queue[0][0]['func'] );
-		$this->assertStringContainsString( 'create_pdf', $queue[1][0]['func'] );
-		$this->assertStringContainsString( 'send_notification', $queue[2][0]['func'] );
-		$this->assertStringContainsString( 'create_pdf', $queue[3][0]['func'] );
-		$this->assertStringContainsString( 'create_pdf', $queue[4][0]['func'] );
-		$this->assertStringContainsString( 'send_notification', $queue[5][0]['func'] );
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[6][0]['func'] );
+		$this->assertStringContainsString( 'create-pdf-1-1', $queue[0][0]['id'] );
+		$this->assertStringContainsString( 'create-pdf-1-1', $queue[1][0]['id'] );
+		$this->assertStringContainsString( 'send-notification-1-1', $queue[2][0]['id'] );
+		$this->assertStringContainsString( 'send-notification-1-1', $queue[3][0]['id'] );
+		$this->assertStringContainsString( 'cleanup-pdf-1-1', $queue[4][0]['id'] );
 	}
 
 	/**
@@ -308,22 +306,30 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	 */
 	public function test_queue_async_resend_notification_tasks() {
 		$results = $this->create_form_and_entries();
-		$entry   = $results['entry'];
 		$form    = $results['form'];
 		$form['notifications']['54bca349732b8']['isActive'] = true;
 
-		foreach( $form['notifications'] as $notification ) {
-			$this->controller->maybe_disable_resend_notifications( false, $notification, $form, $entry );
+		foreach( $GLOBALS['GFPDF_Test']->entries['all-form-fields'] as $entry ) {
+			foreach ( $form['notifications'] as $notification ) {
+				$this->controller->maybe_disable_submission_notifications( false, $notification, $form, $entry );
+			}
 		}
 
-		$this->controller->queue_dispatch_resend_notification_tasks( $form, $entry );
+		$this->controller->queue_dispatch_resend_notification_tasks();
 
 		$queue = $this->queue_mock->get_data();
 
-		$this->assertStringContainsString( 'create_pdf', $queue[0][0]['func'] );
-		$this->assertStringContainsString( 'create_pdf', $queue[1][0]['func'] );
-		$this->assertStringContainsString( 'send_notification', $queue[2][0]['func'] );
-		$this->assertStringContainsString( 'cleanup_pdfs', $queue[3][0]['func'] );
+		$this->assertCount( 28, $queue );
+
+		$this->assertStringContainsString( 'create-pdf-1-1', $queue[0][0]['id'] );
+		$this->assertStringContainsString( 'create-pdf-1-1', $queue[1][0]['id'] );
+		$this->assertStringContainsString( 'send-notification-1-1', $queue[2][0]['id'] );
+		$this->assertStringContainsString( 'cleanup-pdf-1-1', $queue[3][0]['id'] );
+
+		$this->assertStringContainsString( 'create-pdf-1-7', $queue[24][0]['id'] );
+		$this->assertStringContainsString( 'create-pdf-1-7', $queue[25][0]['id'] );
+		$this->assertStringContainsString( 'send-notification-1-7', $queue[26][0]['id'] );
+		$this->assertStringContainsString( 'cleanup-pdf-1-7', $queue[27][0]['id'] );
 	}
 
 	/**
@@ -337,12 +343,12 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 						 ->method( 'dispatch' )
 						 ->willReturn( $this->queue_mock );
 
-		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0 ] );
+		$this->controller->queue_dispatch_resend_notification_tasks();
 
 		$this->assertSame( 0, $spy->getInvocationCount() );
 
 		$this->queue_mock->push_to_queue( 'item' );
-		$this->controller->queue_dispatch_resend_notification_tasks( [ 'id' => 0 ], [ 'id' => 0 ]);
+		$this->controller->queue_dispatch_resend_notification_tasks();
 
 		$this->assertSame( 1, $spy->getInvocationCount() );
 	}
