@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.14.0
+* 🎉 Feature: Rotate Gravity PDF log files when Gravity Forms logging is enabled. This prevents the log file getting to large.
+* 🎉 Feature: Add support for using v1, v2, and v3 of the PSR/Log Composer library with Gravity PDF
+* 🐞Bug: Fix PHP error if a third-party plugin loads PSR/Log v2 or v3
+
 ## 6.13.5
 * 🐞Bug: Ensure background queue uses correct entry data when resending notifications
 * 🐞Bug: Prevent plugins corrupting PDF data when viewing/downloading (via output buffer)
