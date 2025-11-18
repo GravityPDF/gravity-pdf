@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.14.1
+* 🧹 Housekeeping: Use the field type (not input type) in the field class name 
+* 🧹 Housekeeping: Use the field type (not input type) in the `gfpdf_pdf_field_content_{$type}` filter
+
 ## 6.14.0
 * 🎉 Feature: Rotate Gravity PDF log files when Gravity Forms logging is enabled. This prevents the log file getting to large.
 * 🎉 Feature: Add support for using v1, v2, and v3 of the PSR/Log Composer library with Gravity PDF
