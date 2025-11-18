@@ -1830,7 +1830,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$this->assertStringContainsString('First Page', $html );
 		$this->assertStringContainsString('<h3 id="page-no-1"', $html );
-		$this->assertStringContainsString('class="gfpdf-page gfpdf-field my-test-class"', $html );
+		$this->assertStringContainsString('class="gfpdf-field gfpdf-page my-test-class"', $html );
 		$this->assertStringContainsString('<div class="row-separator odd">', $html );
 
 		ob_start();

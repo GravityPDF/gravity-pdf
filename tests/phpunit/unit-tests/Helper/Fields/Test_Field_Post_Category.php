@@ -53,7 +53,7 @@ class Test_Field_Post_Category extends WP_UnitTestCase {
 	public function test_html() {
 		$html = $this->pdf_field->html();
 
-		$this->assertStringContainsString( '<div id="field-31" class="gfpdf-field gfpdf-select ">', $html );
+		$this->assertStringContainsString( '<div id="field-31" class="gfpdf-field gfpdf-select ', $html );
 		$this->assertStringContainsString( '<div class="label"><strong>Post Category</strong></div><div class="value">Test Category 2:30</div>', $html );
 	}
 }

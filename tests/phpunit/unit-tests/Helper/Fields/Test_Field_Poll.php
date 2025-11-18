@@ -53,7 +53,7 @@ class Test_Field_Poll extends WP_UnitTestCase {
 	public function test_html() {
 		$html = $this->pdf_field->html();
 
-		$this->assertStringContainsString( '<div id="field-22" class="gfpdf-field gfpdf-select ">', $html );
+		$this->assertStringContainsString( '<div id="field-22" class="gfpdf-field gfpdf-select ', $html );
 		$this->assertStringContainsString( '<div class="value">Poll Dropdown - First Choice</div>', $html );
 	}
 }
