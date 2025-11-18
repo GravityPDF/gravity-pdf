@@ -1,7 +1,7 @@
 # Changelog
 
 ## 6.14.1
-* 🧹 Housekeeping: Use the field type (not input type) in the field class name 
+* 🧹 Housekeeping: Add `gfpdf-{$type}` CSS class to the HTML mark-up when a field uses a different input type 
 * 🧹 Housekeeping: Use the field type (not input type) in the `gfpdf_pdf_field_content_{$type}` filter
 
 ## 6.14.0
