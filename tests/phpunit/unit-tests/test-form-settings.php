@@ -295,7 +295,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_process_list_view() {
-
+		$GLOBALS['plugin_page'] = '';
 		$GLOBALS['hook_suffix'] = '';
 
 		require_once( GFCommon::get_base_path() . '/form_settings.php' );
@@ -333,6 +333,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_show_edit_view() {
+		$GLOBALS['plugin_page'] = '';
+		$GLOBALS['hook_suffix'] = '';
 
 		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
