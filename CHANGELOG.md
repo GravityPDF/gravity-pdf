@@ -3,6 +3,7 @@
 ## 6.14.1
 * 🧹 Housekeeping: Add `gfpdf-{$type}` CSS class to the HTML mark-up when a field uses a different input type 
 * 🧹 Housekeeping: Use the field type (not input type) in the `gfpdf_pdf_field_content_{$type}` filter
+* 🐞Bug: Fix PHP error if another plugin lazy loads the PSR/Log v1 library 
 
 ## 6.14.0
 * 🎉 Feature: Rotate Gravity PDF log files when Gravity Forms logging is enabled. This prevents the log file getting to large.

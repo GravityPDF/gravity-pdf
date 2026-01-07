@@ -68,7 +68,6 @@ return [
 
 			/* Remove type hinting from prefixed logger */
 			$files = [
-				'LoggerAwareInterface.php',
 				'LoggerAwareTrait.php',
 				'MpdfPsrLogAwareTrait.php',
 				'PsrLogAwareTrait.php'
