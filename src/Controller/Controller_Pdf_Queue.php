@@ -55,9 +55,17 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	protected $queue;
 
 	/**
+	 * @var Helper_Form
+	 *
+	 * @since 6.13.5
+	 */
+	protected $form;
+
+	/**
 	 * @var array An array containing the notification objects to be sent using background processing during a request
 	 *
 	 * @since 6.11.0
+	 * @since 6.13.5 Group by form ID and Entry ID [ formId => [ entryId => [] ] ]
 	 */
 	protected $form_async_notifications = [];
 
@@ -70,11 +78,12 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 *
 	 * @since 5.0
 	 */
-	public function __construct( Helper_Pdf_Queue $queue, Model_PDF $model_pdf, LoggerInterface $log ) {
+	public function __construct( Helper_Pdf_Queue $queue, Model_PDF $model_pdf, LoggerInterface $log, Helper_Form $form ) {
 		/* Assign our internal variables */
 		$this->log       = $log;
 		$this->model_pdf = $model_pdf;
 		$this->queue     = $queue;
+		$this->form      = $form;
 	}
 
 	/**
@@ -87,9 +96,10 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	public function init() {
 		add_filter( 'gform_disable_notification', [ $this, 'maybe_disable_submission_notifications' ], 9999, 5 );
 		add_action( 'gform_after_submission', [ $this, 'queue_async_form_submission_tasks' ], 5, 2 );
+		add_action( 'gform_after_submission', [ $this, 'dispatch_queue' ], 100 );
 
 		add_filter( 'gform_disable_resend_notification', [ $this, 'maybe_disable_resend_notifications' ], 10, 4 );
-		add_action( 'gform_post_resend_all_notifications', [ $this, 'queue_dispatch_resend_notification_tasks' ], 10, 2 );
+		add_action( 'gform_post_resend_all_notifications', [ $this, 'queue_dispatch_resend_notification_tasks' ] );
 	}
 
 	/**
@@ -161,7 +171,15 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	protected function should_send_async_notification( $is_disabled, $notification, $form, $entry ) {
 		$send_async_notification = $this->do_we_disable_notification( $is_disabled, $notification, $form, $entry );
 		if ( $send_async_notification ) {
-			$this->form_async_notifications[] = $notification;
+			if ( ! isset( $this->form_async_notifications[ $form['id'] ] ) ) {
+				$this->form_async_notifications[ $form['id'] ] = [];
+			}
+
+			if ( ! isset( $this->form_async_notifications[ $form['id'] ][ $entry['id'] ] ) ) {
+				$this->form_async_notifications[ $form['id'] ][ $entry['id'] ] = [];
+			}
+
+			$this->form_async_notifications[ $form['id'] ][ $entry['id'] ][] = $notification;
 		}
 
 		return $send_async_notification;
@@ -207,6 +225,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @param array $form
 	 *
 	 * @since 5.0
+	 * @since 6.13.5 Move queue dispatch to self::queue_async_form_submission_dispatch()
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
 		$this->queue_async_tasks( $form, $entry );
@@ -214,20 +233,46 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 		if ( count( $this->queue->get_data() ) > 0 ) {
 			$this->queue_cleanup_task( $form, $entry );
 		}
-
-		$this->dispatch_queue();
 	}
 
 	/**
 	 * Queue and send the notifications after the resend notification process has completed
 	 *
-	 * @param array $form
-	 * @param array $entry
-	 *
 	 * @since 5.0
+	 * @since 6.13.5 $form and $entry arguments ignored and now set in self::should_send_async_notification()
 	 */
-	public function queue_dispatch_resend_notification_tasks( $form, $entry ) {
-		$this->queue_async_form_submission_tasks( $entry, $form );
+	public function queue_dispatch_resend_notification_tasks( $form = null, $entry = null ) {
+		if ( ! is_null( $entry ) ) {
+			_doing_it_wrong( __METHOD__, '$entry argument ignored and now set in self::should_send_async_notification()', '6.13.5' );
+		}
+
+		/* loop over all form/entries */
+		foreach ( $this->form_async_notifications as $form_id => $entry_data ) {
+			$form = $this->form->get_form( $form_id );
+			if ( ! $form ) {
+				$this->log->error( 'Form not found', $form_id );
+				continue;
+			}
+
+			$entry_ids = array_keys( $entry_data );
+			foreach ( $entry_ids as $entry_id ) {
+				$entry = $this->form->get_entry( $entry_id );
+				if ( is_wp_error( $entry ) ) {
+					$this->log->error(
+						'Entry not found',
+						[
+							'entry_id'  => $entry_id,
+							'exception' => $entry->get_error_message() ,
+						]
+					);
+					continue;
+				}
+
+				$this->queue_async_form_submission_tasks( $entry, $form );
+			}
+		}
+
+		$this->dispatch_queue();
 	}
 
 	/**
@@ -241,13 +286,12 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @since 6.11.0
 	 */
 	public function queue_async_tasks( $form, $entry ) {
-		foreach ( $this->form_async_notifications as $notification ) {
-			$tasks = $this->get_queue_tasks( $entry, $form, [ $notification ] );
+		$notifications = $this->form_async_notifications[ $form['id'] ][ $entry['id'] ] ?? [];
+		$tasks         = $this->get_queue_tasks( $entry, $form, $notifications );
 
-			/* Push each task individually for forwards compatibility with new Background Processing update */
-			foreach ( $tasks as $task ) {
-				$this->queue->push_to_queue( [ $task ] );
-			}
+		/* Push each task individually for forwards compatibility with new Background Processing update */
+		foreach ( $tasks as $task ) {
+			$this->queue->push_to_queue( [ $task ] );
 		}
 	}
 

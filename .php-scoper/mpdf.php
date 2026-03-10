@@ -72,7 +72,7 @@ return [
 			];
 
 			if ( in_array( basename( $filePath ), $files, true ) ) {
-				$content = str_replace( '(LoggerInterface ', '(', $content );
+				$content = str_replace( "\\$prefix\\Psr\\Log\\LoggerInterface", '\\Psr\\Log\\LoggerInterface', $content );
 			}
 
 			/* Global polyfills */

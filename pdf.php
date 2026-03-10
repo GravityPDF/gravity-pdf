@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 6.14.0
+Version: 6.14.1
 Description: Automatically generate highly-customizable PDF documents using Gravity Forms and WordPress (canonical)
 Author: Blue Liquid Designs
 Author URI: https://blueliquiddesigns.com.au
@@ -36,7 +36,7 @@ if ( defined( 'PDF_PLUGIN_BASENAME' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '6.14.0' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '6.14.1' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -223,7 +223,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 			if ( ! class_exists( 'GFCommon' ) ) {
 				$this->notices[] = static function () {
 					/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Open Tag 3. Html Anchor Close Tag */
-					return sprintf( esc_html__( '%1$sGravity Forms%3$s is required to use Gravity PDF. %2$sGet more information%3$s.', 'gravity-pdf' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#gravity-forms-is-required">', '</a>' );
+					return sprintf( esc_html__( '%1$sGravity Forms%3$s is required to use Gravity PDF. %2$sGet more information%3$s.', 'gravity-pdf' ), '<a href="https://gpdf.us/gf">', '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#gravity-forms-is-required">', '</a>' );
 				};
 
 				return false;
@@ -232,7 +232,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 			if ( ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
 				$this->notices[] = function () {
 					/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. Plugin version number 4. Html Anchor Open Tag */
-					return sprintf( esc_html__( '%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more information%2$s.', 'gravity-pdf' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#gravity-forms-version-x-is-required">' );
+					return sprintf( esc_html__( '%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more information%2$s.', 'gravity-pdf' ), '<a href="https://gpdf.us/gf">', '</a>', $this->required_gf_version, '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#gravity-forms-version-x-is-required">' );
 				};
 
 				return false;

@@ -88,7 +88,7 @@ class Test_Field_Markup extends WP_UnitTestCase {
 		$field = new Field_Text( $text_field, GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 		$array_css = explode( ' ', $field->get_field_classes() );
 
-		$this->assertCount( 8, $array_css );
+		$this->assertCount( 10, $array_css );
 
 		$this->assertContains( 'exclude', $array_css );
 		$this->assertContains( 'class7', $array_css );
@@ -101,8 +101,6 @@ class Test_Field_Markup extends WP_UnitTestCase {
 		$field = new Field_Textarea( $text_field, GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 		$array_css = explode( ' ', $field->get_field_classes() );
 
-		$this->assertCount( 2, $array_css );
-
-		$this->assertCount( 2, $array_css );
+		$this->assertCount( 4, $array_css );
 	}
 }

@@ -295,7 +295,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_process_list_view() {
-
+		$GLOBALS['plugin_page'] = '';
 		$GLOBALS['hook_suffix'] = '';
 		$GLOBALS['plugin_page'] = '';
 
@@ -334,6 +334,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_show_edit_view() {
+		$GLOBALS['plugin_page'] = '';
+		$GLOBALS['hook_suffix'] = '';
 
 		$GLOBALS['plugin_page'] = '';
 

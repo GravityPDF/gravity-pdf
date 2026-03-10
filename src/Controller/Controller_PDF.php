@@ -117,8 +117,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_actions() {
 		/* Process PDF if needed */
-		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ] ); /* legacy PDF endpoint */
-		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ] ); /* new PDF endpoint */
+		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ], 1 ); /* legacy PDF endpoint */
+		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ], 1 ); /* new PDF endpoint */
 
 		/* Allow custom PDF tags / CSS */
 		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ] );

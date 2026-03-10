@@ -80,15 +80,26 @@ class Helper_Misc {
 	 *
 	 */
 	public function is_gfpdf_page() {
-		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
-		if ( is_admin() && ( ! empty( $_GET['page'] ) || ! empty( $_GET['subview'] ) ) ) {
-			if ( strpos( $_GET['page'] ?? '', 'gfpdf-' ) === 0 || strtoupper( $_GET['subview'] ?? '' ) === 'PDF' ) {
-				return true;
-			}
+		if ( ! is_admin() ) {
+			return false;
 		}
-		/* phpcs:enable */
 
-		return false;
+		$page    = $_GET['page'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$subview = $_GET['subview'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( empty( $page ) && empty( $subview ) ) {
+			return false;
+		}
+
+		if ( ! is_string( $page ) || ! is_string( $subview ) ) {
+			return false;
+		}
+
+		if ( strpos( $page, 'gfpdf-' ) !== 0 && strtoupper( $subview ) !== 'PDF' ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
