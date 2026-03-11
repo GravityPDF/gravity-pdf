@@ -50,6 +50,7 @@ FILES=(
 "${PACKAGE_DIR}/.eslintignore"
 "${PACKAGE_DIR}/.eslintrc.js"
 "${PACKAGE_DIR}/babel.config.js"
+"${PACKAGE_DIR}/.browserslistrc"
 )
 
 for i in "${FILES[@]}"

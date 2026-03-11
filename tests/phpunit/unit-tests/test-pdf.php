@@ -23,7 +23,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Endpoint Functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -269,7 +269,9 @@ class Test_PDF extends WP_UnitTestCase {
 			'pdf_error'
 		);
 
-		$method->setAccessible( true );
+		if ( version_compare( PHP_VERSION, '8.1', '<' )  ) {
+			$method->setAccessible( true );
+		}
 
 		/* Ensure our public errors are shown */
 

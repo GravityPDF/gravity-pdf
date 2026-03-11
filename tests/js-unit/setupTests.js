@@ -1,6 +1,7 @@
 import util from 'util';
 import Enzyme from 'enzyme';
 import Adapter from '@cfaester/enzyme-adapter-react-18';
+import CSS from 'css.escape'; // eslint-disable-line
 
 Object.defineProperty(global, 'TextEncoder', {
 	value: util.TextEncoder,

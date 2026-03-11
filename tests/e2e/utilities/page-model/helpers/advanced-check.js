@@ -6,59 +6,23 @@ import Pdf from '../helpers/pdf';
 const pdf = new Pdf();
 
 class AdvancedCheck {
-	constructor() {
-		// Shortcode section
-		this.confirmationTextCheckbox = Selector(
-			'#gform-settings-radio-choice-type0'
-		)
-			.find( 'input' )
-			.withAttribute( 'id', 'type0' );
-		this.confirmationPageCheckbox = Selector(
-			'#gform-settings-radio-choice-type1'
-		)
-			.find( 'input' )
-			.withAttribute( 'id', 'type1' );
-		this.confirmationRedirectCheckbox = Selector(
-			'#gform-settings-radio-choice-type2'
-		)
-			.find( 'input' )
-			.withAttribute( 'id', 'type2' );
-		this.shortcodeBox = Selector( 'button.btn-shortcode' );
-		this.confirmationPageSelectBox = Selector( '#gform_setting_page' ).find(
-			'button#gform-page-control'
-		);
-		this.queryStringInputBox = Selector(
-			'#gform_setting_queryString'
-		).find( '[id="queryString"]' );
-		this.wysiwgEditorTextTab = Selector(
-			'#gform-settings-section-confirmations'
-		)
-			.find( '.wp-editor-tabs' )
-			.find( 'button' )
-			.withText( 'Text' );
-		this.wysiwgEditor = Selector( 'div' ).find(
-			'textarea[class^="merge-tag-support"]'
-		);
-		this.redirectInputBox =
-			Selector( '#gform_setting_url' ).find( '[id="url"]' );
-		this.previewLink = Selector(
-			'#gf_toolbar_buttons_container a'
-		).addCustomDOMProperties( {
-			href: ( el ) => el.href,
-		} );
-		this.saveConfirmationButton = Selector(
-			'.gform-settings-save-container'
-		)
-			.find( 'button' )
-			.withText( 'Save Confirmation' );
-		this.formInputField = Selector( 'input' ).withAttribute(
-			'name',
-			'input_1'
-		);
-		this.submitButton = Selector( 'input' ).withAttribute(
-			'value',
-			'Submit'
-		);
+  constructor () {
+    // Shortcode section
+    this.confirmationTextCheckbox = Selector('#gform-settings-radio-choice-type0').find('input').withAttribute('id', 'type0')
+    this.confirmationPageCheckbox = Selector('#gform-settings-radio-choice-type1').find('input').withAttribute('id', 'type1')
+    this.confirmationRedirectCheckbox = Selector('#gform-settings-radio-choice-type2').find('input').withAttribute('id', 'type2')
+    this.shortcodeBox = Selector('button').withAttribute('aria-label', 'Copy the Sample PDF shortcode to the clipboard')
+    this.confirmationPageSelectBox = Selector('#gform_setting_page').find('button#gform-page-control')
+    this.queryStringInputBox = Selector('#gform_setting_queryString').find('[id="queryString"]')
+    this.wysiwgEditorTextTab = Selector('#gform-settings-section-confirmations').find('.wp-editor-tabs').find('button').withText('Code')
+    this.wysiwgEditor = Selector('div').find('textarea[class^="merge-tag-support"]')
+    this.redirectInputBox = Selector('#gform_setting_url').find('[id="url"]')
+    this.previewLink = Selector('#gf_toolbar_buttons_container a').addCustomDOMProperties({
+      href: el => el.href
+    })
+    this.saveConfirmationButton = Selector('.gform-settings-save-container').find('button').withText('Save Confirmation')
+    this.formInputField = Selector('input').withAttribute('name', 'input_1')
+    this.submitButton = Selector('input').withAttribute('value', 'Submit')
 
 		// General Settings - Debug Mode field
 		this.debugModeCheckbox = Selector( '#gfpdf-fieldset-debug_mode' ).find(

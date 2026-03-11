@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -468,7 +468,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 						/*
 						 * General filter
 						 *
-						 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
+						 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
 						 */
 						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 
@@ -476,7 +476,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 							/*
 							 * Field type specific filter
 							 *
-							 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
+							 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
 							 */
 							$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 						}
@@ -545,7 +545,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				/*
 				 * If string, sanitize and add error if appropriate
 				 *
-				 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
+				 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
 				 */
 				$value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key );
 				if ( empty( $value ) ) {
@@ -709,7 +709,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'first_footer'         => [ $this->options, 'get_first_page_footer_field' ],
 		];
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_core_template_fields_list/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_core_template_fields_list/ for more details about this filter */
 		$core_fields = apply_filters( 'gfpdf_core_template_fields_list', $core_fields, $template_settings, $config_class );
 
 		foreach ( $core_fields as $id => $method ) {

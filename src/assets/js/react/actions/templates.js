@@ -24,7 +24,7 @@ export const CLEAR_TEMPLATE_UPLOAD_PROCESSING =
  * Redux Actions - payloads of information that send data from your application to your store
  *
  * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */

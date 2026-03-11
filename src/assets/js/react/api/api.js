@@ -1,6 +1,6 @@
 /**
- * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
@@ -8,33 +8,40 @@
 /**
  * Wrapper for the fetch() API which return a promise response
  *
- * @param { string }                         url     url of the request
- * @param { Object }                         init    options to be passed on fetch request
- * @param { {
- *   useNativeResponse?: boolean
- *   useNativeErrorResponse?: boolean
- * }= } options used when you need a custom logic for handling success or error responses
+ * @param {string} url
+ * @param {Object} init
  *
- * @return { Promise<*> } response - it might be either a parsed response or a raw response
+ * @return {Promise} response
  *
  * @since 6.0
  */
-export const api = async (url, init, options) => {
-	const response = await fetch(url, init);
+export const api = async (url, init) => {
+	return await window.fetch(url, init);
+};
 
-	if (!response.ok) {
-		if (options?.useNativeErrorResponse) {
-			return response;
+/**
+ * Try parse the API response as JSON, accounting for a PHP error output before the payload
+ *
+ * @param {string} str
+ * @return {Object|Array} Parsed JSON value, or `{ error: string }` if parsing fails
+ */
+export const getJsonString = (str) => {
+	for (const character of ['{', '[']) {
+		let testStr = str;
+		const index = testStr.indexOf(character);
+		if (index > 0) {
+			testStr = testStr.slice(index);
 		}
 
-		const parsedResponse = await response.json();
-
-		throw new Error(parsedResponse.error);
+		try {
+			return JSON.parse(testStr);
+		} catch (e) {}
 	}
 
-	if (options?.useNativeResponse) {
-		return response;
-	}
+	// eslint-disable-next-line no-console
+	console.error('Invalid API response', str);
 
-	return await response.json();
+	return {
+		error: GFPDF.addFatalError,
+	};
 };

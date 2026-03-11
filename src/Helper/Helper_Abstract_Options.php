@@ -10,7 +10,7 @@ use WP_Error;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -321,7 +321,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$settings = $is_temp ? (array) $tmp_settings : get_option( 'gfpdf_settings', [] );
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_settings/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_settings/ for more details about this filter */
 		$settings = apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
 
 		/* Ensure $settings is an array and has not been corrupted somehow */
@@ -457,7 +457,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$pdf = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', esc_html__( 'You must pass in a valid PDF ID', 'gravity-pdf' ) );
 
 			if ( ! is_wp_error( $pdf ) ) {
-				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_config/ for more details about these filters */
+				/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_config/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_pdf_config', $pdf, $form_id );
 				$pdf = apply_filters( 'gfpdf_pdf_config_' . $form_id, $pdf, $form_id );
 
@@ -494,7 +494,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$pdf['id']     = ( isset( $pdf['id'] ) ) ? $pdf['id'] : uniqid();
 			$pdf['active'] = ( isset( $pdf['active'] ) ) ? $pdf['active'] : true;
 
-			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_add_pdf/ for more details about these filters */
+			/* See https://docs.gravitypdf.com/developers/filters/gfpdf_form_add_pdf/ for more details about these filters */
 			$pdf = apply_filters( 'gfpdf_form_add_pdf', $pdf, $form_id );
 			$pdf = apply_filters( 'gfpdf_form_add_pdf_' . $form_id, $pdf, $form_id );
 
@@ -567,7 +567,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( $filters ) {
 				$this->log->notice( 'Run PDF Update Filters' );
 
-				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_update_pdf/ for more details about these filters */
+				/* See https://docs.gravitypdf.com/developers/filters/gfpdf_form_update_pdf/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_form_update_pdf', $pdf, $form_id, $pdf_id );
 				$pdf = apply_filters( 'gfpdf_form_update_pdf_' . $form_id, $pdf, $form_id, $pdf_id );
 			}
@@ -694,7 +694,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$value = ( ! empty( $gfpdf_options[ $key ] ) ) ? $gfpdf_options[ $key ] : $fallback;
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_option/ for more details about these filters */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_option/ for more details about these filters */
 		$value = apply_filters( 'gfpdf_get_option', $value, $key, $fallback );
 		$value = apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $fallback );
 
@@ -735,7 +735,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* First let's grab the current settings */
 		$options = get_option( 'gfpdf_settings', [] );
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_update_option/ for more details about these filters */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_update_option/ for more details about these filters */
 		$value = apply_filters( 'gfpdf_update_option', $value, $key );
 		$value = apply_filters( 'gfpdf_update_option_' . $key, $value, $key );
 
@@ -823,7 +823,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 		}
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_capabilities/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_capabilities/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_capabilities', $capabilities );
 	}
@@ -1163,7 +1163,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/*
 			 * General filter
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
+			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
 			 */
 			$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize', $input[ $key ], $key, $input, $settings[ $key ] );
 
@@ -1171,7 +1171,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				/*
 				 * Field type specific filter
 				 *
-				 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
+				 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
 				 */
 				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[ $key ] );
 			}
@@ -1527,9 +1527,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		?>
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
 				<?php echo wp_kses_post( $args['desc2'] ); ?>
-			</label>
 		</div>
 
 		<input type="checkbox"
@@ -1571,9 +1569,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		?>
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php
@@ -1628,9 +1624,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php
@@ -1685,9 +1679,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<input type="text"
@@ -1811,9 +1803,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<input type="number"
@@ -1862,9 +1852,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<textarea cols="50"
@@ -1909,9 +1897,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<input type="password"
@@ -1957,9 +1943,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php if ( ! empty( $args['chosen'] ) ): ?>
@@ -2085,9 +2069,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php if ( function_exists( 'wp_editor' ) ): ?>
@@ -2152,9 +2134,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<div class="gfpdf-upload-setting-container">
@@ -2202,9 +2182,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<div>
@@ -2283,7 +2261,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		?>
 		<div class="gform-settings-field gform-settings-field__toggle <?php echo esc_attr( $class ); ?>">
-			<div class="gform-settings-description gform-kitchen-sink"><?php echo wp_kses_post( $args['desc'] ); ?></div>
+			<div class="gform-settings-description gform-kitchen-sink">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</div>
 
 			<span class="gform-settings-input__container">
 				<input type="checkbox" id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" value="Yes" <?php echo checked( $value, 'Yes', false ); ?> />
@@ -2383,9 +2363,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php esc_html_e( 'Width', 'gravity-pdf' ); ?>

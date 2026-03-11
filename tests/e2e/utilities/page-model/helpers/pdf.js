@@ -136,67 +136,27 @@ class Pdf {
 			.find('input')
 			.withAttribute('type', 'button');
 
-		// Template - Header field
-		this.headerWpEditorBox = Selector(
-			'#gfpdf-settings-field-wrapper-header'
-		).find('[id="wp-gfpdf_settings_header-editor-container"]');
-		this.headerWpEditorBoxTextPanelLink = Selector(
-			'#gfpdf-settings-field-wrapper-header'
-		)
-			.find('.wp-editor-tabs')
-			.find('button')
-			.withText('Text');
-		this.headerWpEditorBoxContentArea = Selector(
-			'#gfpdf-settings-field-wrapper-header'
-		).find('[class^="gfpdf_settings_header"]');
+    // Template - Header field
+    this.headerWpEditorBox = Selector('#gfpdf-settings-field-wrapper-header').find('[id="wp-gfpdf_settings_header-editor-container"]')
+    this.headerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-header').find('.wp-editor-tabs').find('button').withText('Code')
+    this.headerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-header').find('[class^="gfpdf_settings_header"]')
 
-		// Template - First Page Header field
-		this.firstPageHeaderCheckbox = Selector(
-			'#gfpdf-settings-field-wrapper-first_header'
-		).find('[class^="gfpdf-input-toggle"]');
-		this.firstPageHeaderWpEditorBox = Selector(
-			'#gfpdf-settings-field-wrapper-first_header'
-		).find('[id="wp-gfpdf_settings_first_header-editor-container"]');
-		this.firstPageHeaderWpEditorBoxTextPanelLink = Selector(
-			'#gfpdf-settings-field-wrapper-first_header'
-		)
-			.find('.wp-editor-tabs')
-			.find('button')
-			.withText('Text');
-		this.firstPageHeaderWpEditorBoxContentArea = Selector(
-			'#gfpdf-settings-field-wrapper-first_header'
-		).find('[class^="gfpdf_settings_first_header"]');
+    // Template - First Page Header field
+    this.firstPageHeaderCheckbox = Selector('#gfpdf-settings-field-wrapper-first_header').find('[class^="gfpdf-input-toggle"]')
+    this.firstPageHeaderWpEditorBox = Selector('#gfpdf-settings-field-wrapper-first_header').find('[id="wp-gfpdf_settings_first_header-editor-container"]')
+    this.firstPageHeaderWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_header').find('.wp-editor-tabs').find('button').withText('Code')
+    this.firstPageHeaderWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_header').find('[class^="gfpdf_settings_first_header"]')
 
-		// Template - Footer field
-		this.footerWpEditorBox = Selector(
-			'#gfpdf-settings-field-wrapper-footer'
-		).find('[id="wp-gfpdf_settings_footer-editor-container"]');
-		this.footerWpEditorBoxTextPanelLink = Selector(
-			'#gfpdf-settings-field-wrapper-footer'
-		)
-			.find('.wp-editor-tabs')
-			.find('button')
-			.withText('Text');
-		this.footerWpEditorBoxContentArea = Selector(
-			'#gfpdf-settings-field-wrapper-footer'
-		).find('[class^="gfpdf_settings_footer"]');
+    // Template - Footer field
+    this.footerWpEditorBox = Selector('#gfpdf-settings-field-wrapper-footer').find('[id="wp-gfpdf_settings_footer-editor-container"]')
+    this.footerWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-footer').find('.wp-editor-tabs').find('button').withText('Code')
+    this.footerWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-footer').find('[class^="gfpdf_settings_footer"]')
 
-		// Template - First Page Footer field
-		this.firstPageFooterCheckbox = Selector(
-			'#gfpdf-settings-field-wrapper-first_footer'
-		).find('[class^="gfpdf-input-toggle"]');
-		this.firstPageFooterWpEditorBox = Selector(
-			'#gfpdf-settings-field-wrapper-first_footer'
-		).find('[id="wp-gfpdf_settings_first_footer-editor-container"]');
-		this.firstPageFooterWpEditorBoxTextPanelLink = Selector(
-			'#gfpdf-settings-field-wrapper-first_footer'
-		)
-			.find('.wp-editor-tabs')
-			.find('button')
-			.withText('Text');
-		this.firstPageFooterWpEditorBoxContentArea = Selector(
-			'#gfpdf-settings-field-wrapper-first_footer'
-		).find('[class^="gfpdf_settings_first_footer"]');
+    // Template - First Page Footer field
+    this.firstPageFooterCheckbox = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[class^="gfpdf-input-toggle"]')
+    this.firstPageFooterWpEditorBox = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[id="wp-gfpdf_settings_first_footer-editor-container"]')
+    this.firstPageFooterWpEditorBoxTextPanelLink = Selector('#gfpdf-settings-field-wrapper-first_footer').find('.wp-editor-tabs').find('button').withText('Code')
+    this.firstPageFooterWpEditorBoxContentArea = Selector('#gfpdf-settings-field-wrapper-first_footer').find('[class^="gfpdf_settings_first_footer"]')
 
 		// Advanced - Format field
 		this.formatStandardCheckbox = Selector(

@@ -10,7 +10,7 @@ import withRouterHooks from '../../utilities/withRouterHooks';
  * Renders our Advanced Template Selector container which is shared amongst the components
  *
  * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */

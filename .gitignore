@@ -52,4 +52,4 @@ Thumbs.db
 
 # Environment File
 .env
-
+.claude/settings.local.json

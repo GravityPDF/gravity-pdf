@@ -3,14 +3,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 /* Redux actions */
-import { getCustomFontList, clearAddFontMsg } from '../../actions/fontManager';
+import { clearAddFontMsg } from '../../actions/fontManager';
 /* Utilities */
-import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox';
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
 /**
- * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
@@ -29,11 +28,7 @@ export class CloseDialog extends Component {
 	static propTypes = {
 		id: PropTypes.string,
 		closeRoute: PropTypes.string,
-		getCustomFontList: PropTypes.func.isRequired,
 		clearAddFontMsg: PropTypes.func.isRequired,
-		templateList: PropTypes.arrayOf(PropTypes.object).isRequired,
-		fontList: PropTypes.arrayOf(PropTypes.object).isRequired,
-		selectedFont: PropTypes.string.isRequired,
 		msg: PropTypes.object.isRequired,
 		navigate: PropTypes.func.isRequired,
 		pathname: PropTypes.string.isRequired,
@@ -49,38 +44,12 @@ export class CloseDialog extends Component {
 	}
 
 	/**
-	 * Check for new added template and fetch new fontList to trigger a request of
-	 * updated font manager select box
-	 *
-	 * @param { Readonly<Object> } prevProps
-	 *
-	 * @since 6.0
-	 */
-	componentDidUpdate(prevProps) {
-		const { templateList, getCustomFontList: getFonts } = this.props;
-
-		if (prevProps.templateList !== templateList) {
-			getFonts();
-		}
-	}
-
-	/**
 	 * Remove keydown listener to document on mount
 	 *
 	 * @since 6.0
 	 */
 	componentWillUnmount() {
 		document.removeEventListener('keydown', this.handleKeyPress, false);
-
-		const { fontList, selectedFont } = this.props;
-		const tabLocation = window.location.search.substring(
-			window.location.search.lastIndexOf('=') + 1
-		);
-
-		/* Ensure associated font manager select box has the latest data */
-		if (tabLocation !== 'tools') {
-			return associatedFontManagerSelectBox(fontList, selectedFont);
-		}
 	}
 
 	/**
@@ -101,7 +70,7 @@ export class CloseDialog extends Component {
 		} = this.props;
 
 		/* Close font manager 'Update Font' column first */
-		if (e.keyCode === 27 && id) {
+		if (e.key === 'Escape' && id) {
 			/* Remove previous msg */
 			if ((success && success.addFont) || (error && error.addFont)) {
 				clear();
@@ -112,7 +81,7 @@ export class CloseDialog extends Component {
 
 		/* Close modal */
 		if (
-			e.keyCode === 27 &&
+			e.key === 'Escape' &&
 			(e.target.className !== 'wp-filter-search' || e.target.value === '')
 		) {
 			this.handleCloseDialog();
@@ -157,18 +126,12 @@ export class CloseDialog extends Component {
  * @param { Object } state.fontManager
  *
  * @return {{
- *  templateList: Array<Object>,
- *  fontList: Array<Object>,
- *  selectedFont: string,
- *  msg: Object
- * }} mappedState
+ *  msg: object
+ * }} Redux data
  *
  * @since 6.0
  */
 const mapStateToProps = (state) => ({
-	templateList: state.template.list,
-	fontList: state.fontManager.fontList,
-	selectedFont: state.fontManager.selectedFont,
 	msg: state.fontManager.msg,
 });
 
@@ -178,6 +141,5 @@ const mapStateToProps = (state) => ({
  * @since 6.0
  */
 export default connect(mapStateToProps, {
-	getCustomFontList,
 	clearAddFontMsg,
 })(CloseDialog);

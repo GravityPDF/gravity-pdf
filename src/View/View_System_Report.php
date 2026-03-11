@@ -8,7 +8,7 @@ use GFPDF\Helper\Helper_Abstract_View;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -80,7 +80,7 @@ class View_System_Report extends Helper_Abstract_View {
 		$output .= ( $memory >= 128 ) ? $this->markup_yes : $this->markup_warning;
 		if ( $memory < 128 ) {
 			$output .= '<br />';
-			$output .= sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %1$sFind out how to increase this limit%2$s.', 'gravity-pdf' ), '<br /><a href="https://docs.gravitypdf.com/v6/users/increasing-memory-limit">', '</a>' );
+			$output .= sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %1$sFind out how to increase this limit%2$s.', 'gravity-pdf' ), '<br /><a href="https://docs.gravitypdf.com/users/increasing-memory-limit">', '</a>' );
 		}
 
 		return $output;
@@ -108,7 +108,7 @@ class View_System_Report extends Helper_Abstract_View {
 
 		if ( ! $is_protected ) {
 			$output .= ' ' . sprintf( esc_html__( "Gravity PDF's temporary directory is publicly accessible.", 'gravity-pdf' ) );
-			$output .= ' ' . sprintf( esc_html__( 'It is recommended to %1$smove the folder outside the public server directory%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/developers/filters/gfpdf_tmp_location/">', '</a>' );
+			$output .= ' ' . sprintf( esc_html__( 'It is recommended to %1$smove the folder outside the public server directory%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/">', '</a>' );
 		}
 
 		return $output;
@@ -140,7 +140,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @since 6.0
 	 */
 	public function get_template_upgrade_message(): string {
-		$learn_more_url = 'https://docs.gravitypdf.com/v6/developers/template-hierarchy';
+		$learn_more_url = 'https://docs.gravitypdf.com/developers/template-hierarchy';
 
 		return $this->markup_warning . ' <a href="' . $learn_more_url . '">' . esc_html__( 'Learn how to update', 'gravity-pdf' ) . '</a>';
 	}

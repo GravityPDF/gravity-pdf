@@ -6,7 +6,7 @@ use GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -213,7 +213,7 @@ class Helper_Data {
 		$user_capabilities = is_object( $user_data ) ? $user_data->allcaps : [];
 		$user_capabilities = is_super_admin() ? [ 'administrator' => true ] : $user_capabilities;
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_localised_script_array/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_localised_script_array/ for more details about this filter */
 
 		return apply_filters(
 			'gfpdf_localised_script_array',
@@ -294,8 +294,10 @@ class Helper_Data {
 				'coreFontAriaLabel'                    => esc_html__( 'Core font installation', 'gravity-pdf' ),
 
 				/* Font Manager */
+				'fontManagerTitle'                     => esc_html__( 'Font Manager', 'gravity-pdf' ),
 				'fontManagerSearchPlaceHolder'         => esc_html__( 'Search installed fonts', 'gravity-pdf' ),
 				'fontListInstalledFonts'               => esc_html__( 'Installed Fonts', 'gravity-pdf' ),
+				'fontUserDefinedGroup'                 => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
 				'fontListRegular'                      => esc_html__( 'Regular', 'gravity-pdf' ),
 				'fontListRegularRequired'              => esc_html__( 'Regular %1$s(required)%2$s', 'gravity-pdf' ),
 				'fontListItalics'                      => esc_html__( 'Italics', 'gravity-pdf' ),

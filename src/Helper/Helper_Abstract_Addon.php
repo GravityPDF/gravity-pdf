@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -1014,10 +1014,10 @@ abstract class Helper_Abstract_Addon {
 
 			$doc_slug = $this->get_addon_documentation_slug();
 			if ( ! empty( $doc_slug ) ) {
-				$row_meta['docs'] = '<a href="' . esc_url( 'https://docs.gravitypdf.com/v6/extensions/' . str_replace( 'shop-plugin-', '', $doc_slug ) . '/' ) . '" title="' . esc_attr__( 'View plugin Documentation', 'gravity-pdf' ) . '">' . esc_html__( 'Docs', 'gravity-pdf' ) . '</a>';
+				$row_meta['docs'] = '<a href="' . esc_url( 'https://docs.gravitypdf.com/extensions/' . str_replace( 'shop-plugin-', '', $doc_slug ) . '/' ) . '" title="' . esc_attr__( 'View plugin Documentation', 'gravity-pdf' ) . '">' . esc_html__( 'Docs', 'gravity-pdf' ) . '</a>';
 			}
 
-			$row_meta['support'] = '<a href="' . esc_url( 'https://gravitypdf.com/support/#contact-support' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-pdf' ) . '">' . esc_html__( 'Support', 'gravity-pdf' ) . '</a>';
+			$row_meta['support'] = '<a href="' . esc_url( 'https://gravitypdf.com/help/' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-pdf' ) . '">' . esc_html__( 'Support', 'gravity-pdf' ) . '</a>';
 
 			return apply_filters( 'gfpdf_addon_row_meta', array_merge( $links, $row_meta ), $file, $this );
 		}

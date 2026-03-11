@@ -12,11 +12,12 @@ import {
 	watchAddFont,
 	watchEditFont,
 	watchDeleteFont,
+	watchGetCustomFontListSuccess,
 } from './fontManager';
 
 /**
- * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.2
  */
@@ -37,5 +38,6 @@ export default function* rootSaga() {
 		watchAddFont(),
 		watchEditFont(),
 		watchDeleteFont(),
+		watchGetCustomFontListSuccess(),
 	]);
 }

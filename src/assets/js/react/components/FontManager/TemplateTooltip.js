@@ -7,7 +7,7 @@ import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontList
 
 /**
  * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
@@ -101,8 +101,8 @@ export class TemplateTooltip extends Component {
 							// eslint-disable-next-line @wordpress/valid-sprintf
 							__html: sprintf(
 								GFPDF.fontManagerTemplateTooltipDesc,
-								'<a href="https://docs.gravitypdf.com/v6/developers/first-custom-pdf">',
-								'<a href="https://docs.gravitypdf.com/v6/users/setup-pdf#font">',
+								'<a href="https://docs.gravitypdf.com/developers/first-custom-pdf">',
+								'<a href="https://docs.gravitypdf.com/users/setup-pdf#font">',
 								'</a>'
 							),
 						}}

@@ -7,8 +7,8 @@ import CloseDialog from '../Modal/CloseDialog';
 import withRouterHooks from '../../utilities/withRouterHooks';
 
 /**
- * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
@@ -25,7 +25,7 @@ const CloseDialogWithRouter = withRouterHooks(CloseDialog);
  */
 const FontManagerHeader = ({ id }) => (
 	<div data-test="component-FontManagerHeader" className="theme-header">
-		<h1>Font Manager</h1>
+		<h1>{GFPDF.fontManagerTitle}</h1>
 
 		<CloseDialogWithRouter id={id} />
 	</div>

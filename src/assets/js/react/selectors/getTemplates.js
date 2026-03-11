@@ -8,7 +8,7 @@ import versionCompare from '../utilities/versionCompare';
  * It also checks if the PDF templates are compatible with the current version of Gravity PDF
  *
  * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
@@ -36,10 +36,10 @@ export const searchTemplates = (term, templates) => {
 	 */
 
 	/* eslint-disable */
-	term = term.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' );
-	term = term.replace( / /g, ')(?=.*' );
+	term = term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+	term = term.replace(/ /g, ')(?=.*');
 
-	const match = new RegExp( '^(?=.*' + term + ').+', 'i' );
+	const match = new RegExp('^(?=.*' + term + ').+', 'i');
 	/* eslint-enable */
 
 	/* Filter through the templates. Any templates return "true" in out match.test() statement will be included */

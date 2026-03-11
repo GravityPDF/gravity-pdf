@@ -6,6 +6,7 @@ import { initialiseCommonElements } from './initialiseCommonElements';
 import { doMergetags } from './dynamicTemplateFields/doMergetags';
 import { toggleFontAppearance } from '../pdf/toggleFontAppearance';
 import { insertAfter } from '../../../react/utilities/PdfSettings/addEditButton';
+import { handleMergeTags } from './handleMergeTags';
 
 /**
  * PDF Templates can assign their own custom settings which can enhance a template
@@ -81,6 +82,9 @@ export function setupDynamicTemplateFields() {
 					/* reinitialise new dom elements */
 					initialiseCommonElements.runElements();
 					doMergetags();
+					handleMergeTags(
+						'#gfpdf-fieldset-gfpdf_form_settings_template'
+					);
 					gform_initialize_tooltips();
 				} else {
 					/* Remove floating Add/Edit PDF button */

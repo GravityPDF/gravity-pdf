@@ -25,7 +25,7 @@ import withRouterHooks from '../../utilities/withRouterHooks';
  * Renders a single PDF template, which get displayed on the /template/:id page.
  *
  * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */

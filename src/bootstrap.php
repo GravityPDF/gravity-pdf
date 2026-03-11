@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -251,7 +251,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/*
 		 * Trigger action to signify Gravity PDF is now loaded
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_fully_loaded for more details about this action
+		 * See https://docs.gravitypdf.com/developers/actions/gfpdf_fully_loaded for more details about this action
 		 */
 		do_action( 'gfpdf_fully_loaded', $this );
 	}
@@ -326,7 +326,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( $file === PDF_PLUGIN_BASENAME ) {
 			$row_meta = [
-				'docs'           => '<a href="' . esc_url( 'https://docs.gravitypdf.com/v6/users/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-pdf' ) . '">' . esc_html__( 'Docs', 'gravity-pdf' ) . '</a>',
+				'docs'           => '<a href="' . esc_url( 'https://docs.gravitypdf.com/users/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-pdf' ) . '">' . esc_html__( 'Docs', 'gravity-pdf' ) . '</a>',
 				'support'        => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-pdf' ) . '">' . esc_html__( 'Support', 'gravity-pdf' ) . '</a>',
 				'extension-shop' => '<a href="' . esc_url( 'https://gravitypdf.com/store/#extensions' ) . '" title="' . esc_attr__( 'View Gravity PDF Extensions Shop', 'gravity-pdf' ) . '">' . esc_html__( 'Extensions', 'gravity-pdf' ) . '</a>',
 				'template-shop'  => '<a href="' . esc_url( 'https://gravitypdf.com/store/#templates' ) . '" title="' . esc_attr__( 'View Gravity PDF Template Shop', 'gravity-pdf' ) . '">' . esc_html__( 'Templates', 'gravity-pdf' ) . '</a>',
@@ -376,7 +376,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_styles() {
-		$version = PDF_EXTENDED_VERSION;
+		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
 
 		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'build/assets/app.bundle.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
 	}
@@ -391,7 +391,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	private function register_scripts() {
 		global $wp_version;
 
-		$version = defined( 'WP_DEBUG' ) && WP_DEBUG === true ? time() : PDF_EXTENDED_VERSION;
+		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
 		$args    = version_compare( $wp_version, '6.3.0', '>=' ) ? [ 'strategy' => 'defer' ] : true;
 
 		$pdf_settings_dependencies = [
@@ -413,12 +413,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
-
-		/* Localise admin script */
-		$data = $this->data->get_localised_script_data( $this->options, $this->gform );
-
-		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
-		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
 	}
 
 	/**
@@ -449,6 +443,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* Load TinyMCE styles */
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
+
+			/* Localise admin script */
+			$data = $this->data->get_localised_script_data( $this->options, $this->gform );
+
+			wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
+			wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
 		}
 
 		if ( rgget( 'page' ) === 'gf_entries' ) {
@@ -523,7 +523,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_scripts, $items );
 		}
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_gf_noconflict_scripts for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_gf_noconflict_scripts for more details about this filter */
 
 		return apply_filters( 'gfpdf_gf_noconflict_scripts', $items );
 	}
@@ -561,7 +561,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_styles, $items );
 		}
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_gf_noconflict_styles for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_gf_noconflict_styles for more details about this filter */
 
 		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
 	}

@@ -1,4 +1,4 @@
-# Copyright (C) 2025, Blue Liquid Designs
+# Copyright (c) 2026, Blue Liquid Designs
 # This file is distributed under the same license as the Gravity PDF package.
 msgid ""
 msgstr ""

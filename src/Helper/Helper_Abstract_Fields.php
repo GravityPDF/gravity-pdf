@@ -11,7 +11,7 @@ use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -249,7 +249,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		/*
 		 * Get the Gravity Forms field value
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_value for more details about this filter
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_field_value for more details about this filter
 		 */
 
 		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry, $this->form, $this );
@@ -264,7 +264,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 */
 	final public function get_label() {
 		/*
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_label for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_field_label for usage
 		 */
 		return apply_filters( 'gfpdf_field_label', $this->field->label, $this->field, $this->entry );
 	}
@@ -344,7 +344,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'] ?? 0, $this->form['id'] ?? 0 );
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_field_content for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_field_content for usage
 		 *
 		 * @since 4.2
 		 */
@@ -369,7 +369,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 				 . '</div>'
 				 . '</div>';
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_html_value for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_field_html_value for more details about this filter */
 		$html = apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry, $this );
 
 		if ( $this->get_output() ) {

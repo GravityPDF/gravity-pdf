@@ -14,7 +14,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Abstract Addon functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.2
  */
@@ -83,6 +83,8 @@ class Test_Addon extends WP_UnitTestCase {
 			new Helper_Logger( 'my-custom-plugin2', 'My Custom Plugin2' ),
 			new Helper_Notices()
 		);
+
+		remove_all_actions( 'init' );
 	}
 
 	public function tear_down() {

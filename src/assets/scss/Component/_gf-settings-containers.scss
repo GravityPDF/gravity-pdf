@@ -26,22 +26,25 @@
       .gform-settings-panel__title {
         color: #23282d;
         font-size: .8125rem;
+        margin-bottom: 0.25rem;
       }
-    }
-
-    legend {
-      font-size: .875rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .gform-settings-panel__header legend {
-      margin-bottom: 0;
     }
   }
 
   .gform-settings-panel--collapsible {
     .gform-settings-panel--full {
       grid-column: span 2;
+    }
+  }
+
+  .gfpdf-settings-field-wrapper > {
+    .gform-settings-panel__title > {
+      label,
+      legend {
+        display: inline;
+        vertical-align: bottom;
+        padding: 0;
+      }
     }
   }
 }

@@ -39,8 +39,9 @@ describe('Sagas - fontManager.js', () => {
 	describe('Worker saga - getCustomFontList()', () => {
 		const response = {
 			ok: true,
-			json: jest.fn(),
+			body: [],
 		};
+		const responseBody = response.body;
 		const gen = getCustomFontList();
 
 		test('should check that saga call the API apiGetCustomFontList', () => {
@@ -49,7 +50,7 @@ describe('Sagas - fontManager.js', () => {
 			expect(gen.next(response).value).toEqual(
 				put({
 					type: GET_CUSTOM_FONT_LIST_SUCCESS,
-					payload: response,
+					payload: responseBody,
 				})
 			);
 		});
@@ -76,19 +77,20 @@ describe('Sagas - fontManager.js', () => {
 	describe('Worker saga - addFont()', () => {
 		const response = {
 			ok: true,
-			json: jest.fn(),
+			body: {},
 		};
+		const responseBody = response.body;
 		const data = { payload: {} };
+		const gen = addFont(data);
 
 		test('should check that saga call the API apiAddFont', () => {
-			const gen = addFont(data);
 			expect(gen.next().value).toEqual(call(api.apiAddFont, {}));
 
 			expect(gen.next(response).value).toEqual(
 				put({
 					type: ADD_FONT_SUCCESS,
 					payload: {
-						font: response,
+						font: responseBody,
 						msg: '<strong>Your font has been saved.</strong>',
 					},
 				})
@@ -96,10 +98,6 @@ describe('Sagas - fontManager.js', () => {
 		});
 
 		test('should check that saga handles correctly the failure of apiAddFont API call (500 error)', () => {
-			const gen = addFont(data);
-
-			gen.next();
-
 			expect(gen.throw({ status: 500 }).value).toEqual(
 				put({
 					type: ADD_FONT_ERROR,
@@ -110,19 +108,17 @@ describe('Sagas - fontManager.js', () => {
 		});
 
 		test("should check that saga handles correctly the failure of apiAddFont API call (400 error 'font_validation_error')", () => {
-			const gen = addFont(data);
+			const gen2 = addFont(data);
 
-			gen.next();
-			gen.next(response);
-			gen.throw({
-				status: 400,
-				json: jest.fn(),
-			});
+			gen2.next();
 
 			expect(
-				gen.next({
-					code: 'font_validation_error',
-					message: 'text',
+				gen2.throw({
+					status: 400,
+					body: {
+						code: 'font_validation_error',
+						message: 'text',
+					},
 				}).value
 			).toEqual(
 				put({
@@ -137,16 +133,16 @@ describe('Sagas - fontManager.js', () => {
 		});
 
 		test('should check that saga handles correctly the failure of apiAddFont API call', () => {
-			const gen = addFont(data);
+			const gen2 = addFont(data);
 
-			gen.next();
-			gen.next(response);
-			gen.throw({
-				status: 400,
-				json: jest.fn(),
-			});
+			gen2.next();
 
-			expect(gen.next({ message: 'text' }).value).toEqual(
+			expect(
+				gen2.throw({
+					status: 400,
+					body: { message: 'text' },
+				}).value
+			).toEqual(
 				put({
 					type: ADD_FONT_ERROR,
 					payload: 'text',
@@ -166,19 +162,20 @@ describe('Sagas - fontManager.js', () => {
 	describe('Worker saga - editFont()', () => {
 		const response = {
 			ok: true,
-			json: jest.fn(),
+			body: {},
 		};
+		const responseBody = response.body;
 		const data = { payload: {} };
+		const gen = editFont(data);
 
 		test('should check that saga call the API apiEditFont', () => {
-			const gen = editFont(data);
 			expect(gen.next().value).toEqual(call(api.apiEditFont, {}));
 
 			expect(gen.next(response).value).toEqual(
 				put({
 					type: EDIT_FONT_SUCCESS,
 					payload: {
-						font: response,
+						font: responseBody,
 						msg: '<strong>Your font has been saved.</strong>',
 					},
 				})
@@ -186,15 +183,12 @@ describe('Sagas - fontManager.js', () => {
 		});
 
 		test("should check that saga handles correctly the failure of apiEditFont API call (500 error and response.code not equal to 'font_file_gone_missing')", () => {
-			const gen = editFont(data);
-
-			gen.next();
-			gen.throw({
-				status: 500,
-				json: jest.fn(),
-			});
-
-			expect(gen.next({ code: '' }).value).toEqual(
+			expect(
+				gen.throw({
+					status: 500,
+					body: { code: '' },
+				}).value
+			).toEqual(
 				put({
 					type: EDIT_FONT_ERROR,
 					payload:
@@ -204,19 +198,17 @@ describe('Sagas - fontManager.js', () => {
 		});
 
 		test("should check that saga handles correctly the failure of apiEditFont API call (400 error 'font_validation_error')", () => {
-			const gen = editFont(data);
+			const gen2 = editFont(data);
 
-			gen.next();
-			gen.next(response);
-			gen.throw({
-				status: 400,
-				json: jest.fn(),
-			});
+			gen2.next();
 
 			expect(
-				gen.next({
-					code: 'font_validation_error',
-					message: 'text',
+				gen2.throw({
+					status: 400,
+					body: {
+						code: 'font_validation_error',
+						message: 'text',
+					},
 				}).value
 			).toEqual(
 				put({
@@ -231,16 +223,16 @@ describe('Sagas - fontManager.js', () => {
 		});
 
 		test('should check that saga handles correctly the failure of apiEditFont API call (fatal error)', () => {
-			const gen = editFont(data);
+			const gen2 = editFont(data);
 
-			gen.next();
-			gen.next(response);
-			gen.throw({
-				status: 400,
-				json: jest.fn(),
-			});
+			gen2.next();
 
-			expect(gen.next({ message: '' }).value).toEqual(
+			expect(
+				gen2.throw({
+					status: 400,
+					body: { message: '' },
+				}).value
+			).toEqual(
 				put({
 					type: EDIT_FONT_ERROR,
 					payload:
@@ -250,16 +242,16 @@ describe('Sagas - fontManager.js', () => {
 		});
 
 		test('should check that saga handles correctly the failure of apiEditFont API call (response message)', () => {
-			const gen = editFont(data);
+			const gen2 = editFont(data);
 
-			gen.next();
-			gen.next(response);
-			gen.throw({
-				status: 400,
-				json: jest.fn(),
-			});
+			gen2.next();
 
-			expect(gen.next({ message: 'text' }).value).toEqual(
+			expect(
+				gen2.throw({
+					status: 400,
+					body: { message: 'text' },
+				}).value
+			).toEqual(
 				put({
 					type: EDIT_FONT_ERROR,
 					payload: 'text',
@@ -281,7 +273,7 @@ describe('Sagas - fontManager.js', () => {
 	describe('Worker saga - deleteFont()', () => {
 		const response = {
 			ok: true,
-			json: jest.fn(),
+			body: {},
 		};
 		const data = { payload: {} };
 		const gen = deleteFont(data);

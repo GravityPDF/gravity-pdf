@@ -16,7 +16,7 @@ import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts';
 
 /**
  * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.2
  */
@@ -29,7 +29,7 @@ import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts';
 export function* getFilesFromGitHub() {
 	try {
 		const response = yield call(apiGetFilesFromGitHub);
-		yield put(getFilesFromGitHubSuccess(response));
+		yield put(getFilesFromGitHubSuccess(response.body));
 	} catch (error) {
 		yield put(getFilesFromGitHubFailed(GFPDF.coreFontGithubError));
 	}

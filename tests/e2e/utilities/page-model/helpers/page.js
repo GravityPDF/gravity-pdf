@@ -10,7 +10,7 @@ class Page {
     this.titleField = Selector('.editor-post-title__input')
     this.addBlockIcon = Selector('button.editor-document-tools__inserter-toggle')
     this.searchBlock = Selector('.block-editor-inserter__search').find('input').withAttribute('type', 'search')
-    this.paragraphButton = Selector('button.editor-block-list-item-paragraph')
+    this.paragraphButton = Selector('button.editor-block-list-item-paragraph\\/paragraph')
     this.shortcodeLink = Selector('button.editor-block-list-item-shortcode')
     this.shortcodeTextarea = Selector('textarea').withAttribute('placeholder', 'Write shortcode here…')
     this.trashLink = Selector('a').withAttribute('aria-label', 'Move “Test-page” to the Trash')
@@ -26,7 +26,7 @@ class Page {
   }
 
   async addNewPage () {
-    await t.click(link('.wrap', 'Add New'))
+    await t.click(link('.wrap', 'Add Page'))
 
     if (await this.closePopupButton.exists) await t.click(this.closePopupButton)
     if (await this.closePopupPattern.exists) await t.click(this.closePopupPattern)

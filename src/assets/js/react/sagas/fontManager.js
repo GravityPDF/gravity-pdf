@@ -22,10 +22,11 @@ import {
 	DELETE_FONT_SUCCESS,
 	DELETE_FONT_ERROR,
 } from '../actions/fontManager';
+import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
 
 /**
- * @package			Gravity PDF
- * @copyright   Copyright (c) 2025, Blue Liquid Designs
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
@@ -48,13 +49,15 @@ export function* getCustomFontList() {
 	try {
 		const response = yield call(apiGetCustomFontList);
 
-		if (Object.hasOwn(response, 'ok') && !response?.ok) {
+		if (!response.ok) {
 			throw response;
 		}
 
+		const responseBody = response.body;
+
 		yield put({
 			type: GET_CUSTOM_FONT_LIST_SUCCESS,
-			payload: response,
+			payload: responseBody,
 		});
 	} catch (error) {
 		yield put({
@@ -74,32 +77,23 @@ export function* watchAddFont() {
 }
 
 /**
- * @typedef { Object } FontStyles
- * @property { string } italics     - name of italics style
- * @property { string } bold        - name of bold style
- * @property { string } bolditalics - name of bold italics style
- * @property { string } regular     - name of regular style
+ * A watcher that get triggered when custom font list is successfully requested
+ *
+ * @since 6.14.2
  */
+export function* watchGetCustomFontListSuccess() {
+	yield takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, function (response) {
+		const fontList = response.payload;
+
+		associatedFontManagerSelectBox(fontList);
+	});
+}
 
 /**
  * Generate response for add font request
  *
- * @param { Object }     payload
- * @param { string }     payload.label
- * @param { Object }     payload.addFont
- * @param { FontStyles } payload.addFont.fontStyles
- * @param { boolean }    payload.addFont.disableUpdateButton
- * @param { string }     payload.addFont.id
- * @param { string }     payload.addFont.label
- * @param { boolean }    payload.addFont.validateLabel
- * @param { boolean }    payload.addFont.validateRegular
- * @param { Object }     payload.updateFont
- * @param { FontStyles } payload.updateFont.fontStyles
- * @param { boolean }    payload.updateFont.disableUpdateButton
- * @param { string }     payload.updateFont.id
- * @param { string }     payload.updateFont.label
- * @param { boolean }    payload.updateFont.validateLabel
- * @param { boolean }    payload.updateFont.validateRegular
+ * @param {Object}                                                                                                     params
+ * @param {{ label: string, regular: string|File, italics: string|File, bold: string|File, bolditalics: string|File }} params.payload
  *
  * @since 6.0
  */
@@ -107,12 +101,14 @@ export function* addFont({ payload }) {
 	try {
 		const response = yield call(apiAddFont, payload);
 
-		if (Object.hasOwn(response, 'ok') && !response?.ok) {
+		if (!response.ok) {
 			throw response;
 		}
 
+		const responseBody = response.body;
+
 		const data = {
-			font: response,
+			font: responseBody,
 			msg: '<strong>' + GFPDF.addUpdateFontSuccess + '</strong>',
 		};
 
@@ -128,7 +124,7 @@ export function* addFont({ payload }) {
 			});
 		}
 
-		const response = yield error.json();
+		const response = error.body;
 
 		if (error.status === 400 && response.code === 'font_validation_error') {
 			return yield put({
@@ -159,24 +155,8 @@ export function* watchEditFont() {
 /**
  * Generate response for edit font request
  *
- * @param { Object }     payload
- * @param { string }     payload.id
- * @param { Object }     payload.font
- * @param { string }     payload.font.label
- * @param { Object }     payload.addFont
- * @param { FontStyles } payload.addFont.fontStyles
- * @param { boolean }    payload.addFont.disableUpdateButton
- * @param { string }     payload.addFont.id
- * @param { string }     payload.addFont.label
- * @param { boolean }    payload.addFont.validateLabel
- * @param { boolean }    payload.addFont.validateRegular
- * @param { Object }     payload.updateFont
- * @param { FontStyles } payload.updateFont.fontStyles
- * @param { boolean }    payload.updateFont.disableUpdateButton
- * @param { string }     payload.updateFont.id
- * @param { string }     payload.updateFont.label
- * @param { boolean }    payload.updateFont.validateLabel
- * @param { boolean }    payload.updateFont.validateRegular
+ * @param {Object}                                                                                                   params
+ * @param {{ id: string, font: { label: string, regular?: File, italics?: File, bold?: File, bolditalics?: File } }} params.payload
  *
  * @since 6.0
  */
@@ -184,12 +164,14 @@ export function* editFont({ payload }) {
 	try {
 		const response = yield call(apiEditFont, payload);
 
-		if (Object.hasOwn(response, 'ok') && !response?.ok) {
+		if (!response.ok) {
 			throw response;
 		}
 
+		const responseBody = response.body;
+
 		const data = {
-			font: response,
+			font: responseBody,
 			msg: '<strong>' + GFPDF.addUpdateFontSuccess + '</strong>',
 		};
 
@@ -198,7 +180,7 @@ export function* editFont({ payload }) {
 			payload: data,
 		});
 	} catch (error) {
-		const response = yield error.json();
+		const response = error.body;
 
 		if (
 			error.status === 500 &&
@@ -242,7 +224,8 @@ export function* watchDeleteFont() {
 /**
  * Generate response for delete font request
  *
- * @param { string } payload
+ * @param {Object} params
+ * @param {string} params.payload - ID of the font to delete
  *
  * @since 6.0
  */
@@ -250,7 +233,7 @@ export function* deleteFont({ payload }) {
 	try {
 		const response = yield call(apiDeleteFont, payload);
 
-		if (Object.hasOwn(response, 'ok') && !response?.ok) {
+		if (!response.ok) {
 			throw response;
 		}
 
