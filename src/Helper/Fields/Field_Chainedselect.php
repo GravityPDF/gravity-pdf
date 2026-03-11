@@ -61,7 +61,9 @@ class Field_Chainedselect extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$html = GFCommon::get_lead_field_display( $this->field, $this->get_value(), $this->entry['currency'] );
+		$property = version_compare( \GFForms::$version, '2.9.29', '>=' ) ? $this->entry : $this->entry['currency'];
+
+		$html = GFCommon::get_lead_field_display( $this->field, $this->get_value(), $property );
 		$html = apply_filters( 'gform_entry_field_value', $html, $this->field, $this->entry, $this->form );
 
 		return parent::html( $html );
