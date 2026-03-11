@@ -53,6 +53,9 @@
     "gravity/gravityformssurvey": "*",
     "gravity/gravityformsquiz": "*"
   },
+  "suggest": {
+    "roots/wordpress-full": "Install to do step debugging on the WordPress codebase."
+  },
   "autoload": {
     "psr-4": {
       "GFPDF\\": "src/"
