@@ -225,7 +225,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* add custom classes to form */
 		$form_classes = '';
-		if ( version_compare( '2.6-rc-1', GFCommon::$version, '>=' ) ) {
+		if ( version_compare( '2.6-rc-1', \GFForms::$version, '>=' ) ) {
 			$form_classes .= 'gfpdf-gf-2-6';
 		}
 

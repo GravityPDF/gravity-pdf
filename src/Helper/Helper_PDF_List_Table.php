@@ -223,7 +223,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			$text  = __( 'Inactive', 'gravity-pdf' );
 		}
 
-		$gf_less_than_288 = version_compare( \GFCommon::$version, '2.8.8', '<' );
+		$gf_less_than_288 = version_compare( \GFForms::$version, '2.8.8', '<' );
 
 		?>
 
@@ -289,7 +289,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		ob_start();
 		/* If the current GF version is 2.6 or higher, use the new updated UI for the shortcode button or else use the pre GF 2.5 version. */
-		if ( version_compare( '2.6-rc-1', \GFCommon::$version, '<=' ) ):
+		if ( version_compare( '2.6-rc-1', \GFForms::$version, '<=' ) ):
 			?>
 			<button type="button"
 					class="gform-button gform-button--size-r gform-button--white gform-button--icon-leading gform-embed-form__shortcode-trigger btn-shortcode"

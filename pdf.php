@@ -220,7 +220,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		public function check_gravity_forms() {
 
 			/* Gravity Forms version not compatible */
-			if ( ! class_exists( 'GFCommon' ) ) {
+			if ( ! class_exists( '\GFForms' ) ) {
 				$this->notices[] = static function () {
 					/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Open Tag 3. Html Anchor Close Tag */
 					return sprintf( esc_html__( '%1$sGravity Forms%3$s is required to use Gravity PDF. %2$sGet more information%3$s.', 'gravity-pdf' ), '<a href="https://gpdf.us/gf">', '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#gravity-forms-is-required">', '</a>' );
@@ -229,7 +229,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 				return false;
 			}
 
-			if ( ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
+			if ( ! version_compare( \GFForms::$version, $this->required_gf_version, '>=' ) ) {
 				$this->notices[] = function () {
 					/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. Plugin version number 4. Html Anchor Open Tag */
 					return sprintf( esc_html__( '%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more information%2$s.', 'gravity-pdf' ), '<a href="https://gpdf.us/gf">', '</a>', $this->required_gf_version, '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#gravity-forms-version-x-is-required">' );
