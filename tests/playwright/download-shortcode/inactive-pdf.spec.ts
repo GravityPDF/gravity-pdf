@@ -56,6 +56,10 @@ test.describe('[gravitypdf] Shortcode', () => {
 		await expect(
 			page.getByRole('link', { name: 'Download PDF' })
 		).not.toBeAttached();
+
+		await expect(
+			page.getByText('PDF link not displayed')
+		).not.toContainText('Admin Only Message');
 	});
 
 	test('Disabled PDF, Debug Mode On', async ({

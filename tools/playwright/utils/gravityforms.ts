@@ -9,8 +9,10 @@ type Form = {
 };
 
 type Entry = {
-  form_id: number;
-}
+	form_id: number;
+	created_by?: number;
+	ip?: string;
+};
 
 export default class GravityForms {
 	protected requestUtils: RequestUtils;
@@ -43,13 +45,13 @@ export default class GravityForms {
 		});
 	}
 
-  async createEntry(entry: Entry) {
-    return await this.requestUtils.rest({
-      method: 'POST',
-      path: `/gf/v2/entries`,
-      data: { ...entry }
-    })
-  }
+	async createEntry(entry: Entry) {
+		return await this.requestUtils.rest({
+			method: 'POST',
+			path: `/gf/v2/entries`,
+			data: { ...entry },
+		});
+	}
 
 	async getFormIdByName(name: string): Promise<number> {
 		await this.navigateToFormList();
@@ -97,19 +99,19 @@ export default class GravityForms {
 			.click();
 	}
 
-  async navigateToEntryList(formId: number) {
-    await this.admin.visitAdminPage(
-      'admin.php',
-      `page=gf_entries&id=${formId}`
-    );
-  }
+	async navigateToEntryList(formId: number) {
+		await this.admin.visitAdminPage(
+			'admin.php',
+			`page=gf_entries&id=${formId}`
+		);
+	}
 
-  async navigateToEntryDetail(formId: number, entryId: number) {
-    await this.admin.visitAdminPage(
-      'admin.php',
-      `page=gf_entries&view=entry&id=${formId}&lid=${entryId}`
-    );
-  }
+	async navigateToEntryDetail(formId: number, entryId: number) {
+		await this.admin.visitAdminPage(
+			'admin.php',
+			`page=gf_entries&view=entry&id=${formId}&lid=${entryId}`
+		);
+	}
 
 	async navigateToFormPreview(formId: number) {
 		await this.page.goto('/?gf_page=preview&id=' + formId);
@@ -118,21 +120,30 @@ export default class GravityForms {
 	/*
 	 * Settings management
 	 */
-  async addNotification(formId: number, name: string) {
-    await this.admin.visitAdminPage(
-      'admin.php',
-      `subview=notification&page=gf_edit_forms&view=settings&id=${formId}`
-    );
+	async addNotification(formId: number, name: string) {
+		await this.admin.visitAdminPage(
+			'admin.php',
+			`subview=notification&page=gf_edit_forms&view=settings&id=${formId}`
+		);
 
-    await this.page.getByRole('link', { name: 'Add New' }).click();
+		await this.page.getByRole('link', { name: 'Add New' }).click();
 
-    await this.page.getByRole('textbox', { name: 'Name' }).first().fill(name);
-    await this.page.getByRole('textbox', { name: 'Send To Email' }).fill('hi@example.com');
-    await this.page.getByRole('textbox', { name: 'Subject' }).fill('Subject');
-    await this.setRichTextContent('#gform_setting_message', 'Message');
+		await this.page
+			.getByRole('textbox', { name: 'Name' })
+			.first()
+			.fill(name);
+		await this.page
+			.getByRole('textbox', { name: 'Send To Email' })
+			.fill('hi@example.com');
+		await this.page
+			.getByRole('textbox', { name: 'Subject' })
+			.fill('Subject');
+		await this.setRichTextContent('#gform_setting_message', 'Message');
 
-    await this.page.getByRole('button', { name: 'Update Notification' }).click();
-  }
+		await this.page
+			.getByRole('button', { name: 'Update Notification' })
+			.click();
+	}
 
 	async setRichTextContent(
 		containerSelector: string,

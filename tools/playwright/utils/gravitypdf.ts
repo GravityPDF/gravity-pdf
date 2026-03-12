@@ -1,127 +1,200 @@
-import { expect } from "@wordpress/e2e-test-utils-playwright";
-import type { Locator } from "@playwright/test";
-import type { Readable } from "stream";
-import { URL } from "node:url";
-import GravityForms from "@self:playwright/utils/gravityforms";
+import { expect } from '@wordpress/e2e-test-utils-playwright';
+import type { Locator } from '@playwright/test';
+import type { Readable } from 'stream';
+import { URL } from 'node:url';
+import GravityForms from '@self:playwright/utils/gravityforms';
 
 export default class Pdf extends GravityForms {
-  async navigateToGlobalPdfSettings() {
-    await this.admin.visitAdminPage('admin.php', 'page=gf_settings&subview=PDF');
-  }
+	async navigateToGlobalPdfSettings() {
+		await this.admin.visitAdminPage(
+			'admin.php',
+			'page=gf_settings&subview=PDF'
+		);
+	}
 
-  async setGlobalPdfSetting(label:string, value: any) {
-    await this.navigateToGlobalPdfSettings();
+	async setGlobalPdfSetting(label: string, value: any) {
+		await this.navigateToGlobalPdfSettings();
 
-    const setting = this.page.getByLabel(label).first()
-    console.log(setting.getAttribute('type'))
+		const setting = this.page.getByLabel(label).first();
 
-    switch(await setting.getAttribute('type')) {
-      case 'checkbox':
-          value ? await setting.check() : await setting.uncheck();
-          break;
+		switch (await setting.getAttribute('type')) {
+			case 'checkbox':
+				// eslint-disable-next-line no-unused-expressions
+				value ? await setting.check() : await setting.uncheck();
+				break;
 
-      case 'radio':
-        value ? await setting.check() : await setting.uncheck();
-    }
+			case 'radio':
+				// eslint-disable-next-line no-unused-expressions
+				value ? await setting.check() : await setting.uncheck();
+		}
 
-    await this.page.getByRole('button', { name: 'Save Settings' }).click()
-  }
+		await this.page.getByRole('button', { name: 'Save Settings' }).click();
+	}
 
-  async navigateToFormPdfList(formId: number) {
-    await this.navigateToFormSettingsById(formId, 'PDF');
-  }
+	async fillField(label: string, value: string) {
+		await this.page.getByLabel(label).fill(value);
+	}
 
-  async createPdf(formId: number, label: string) {
-    await this.navigateToNewFormPdf(formId);
-    await this.page.getByLabel('Label').fill(label);
-    await this.page.getByLabel('Filename').fill(label);
-    await this.addOrUpdatePdf()
+	async selectField(label: string, value: string) {
+		await this.page.getByLabel(label).selectOption(value);
+	}
 
-    // return PDF ID (@TODO update with the REST API settings once implemented)
-    const pdfUrl = new URL(this.page.url());
+	async checkField(label: string, value: boolean) {
+		const checkbox = this.page.getByLabel(label);
+		// eslint-disable-next-line no-unused-expressions
+		value ? await checkbox.check() : await checkbox.uncheck();
+	}
 
-    return pdfUrl.searchParams.get('pid');
-  }
+	async chooseField(label: string, value: string) {
+		await this.page.getByRole('radio', { name: value }).check();
+	}
 
-  async addOrUpdatePdf() {
-    const addButton = this.page.getByRole("button", { name: "Add PDF" });
+	async navigateToFormPdfList(formId: number) {
+		await this.navigateToFormSettingsById(formId, 'PDF');
+	}
 
-    if (await addButton.count() > 0) {
-      await addButton.first().click();
-    } else {
-      await this.page.getByRole('button', { name: 'Update PDF' }).first().click();
-    }
+	async createPdf(formId: number, label: string) {
+		await this.navigateToNewFormPdf(formId);
+		await this.page.getByLabel('Label').fill(label);
+		await this.page.getByLabel('Filename').fill(label);
+		await this.addOrUpdatePdf();
 
-    await expect(this.page.getByRole('button', { name: 'Manage PDF Templates'})).toBeVisible();
-  }
+		// return PDF ID (@TODO update with the REST API settings once implemented)
+		const pdfUrl = new URL(this.page.url());
 
-  async navigateToNewFormPdf(formId: number) {
-    await this.navigateToFormPdfList(formId);
-    await this.page.getByRole('link', { name: 'Add new PDF' }).click();
-    await expect(this.page.getByRole('button', { name: 'Manage PDF Templates'})).toBeVisible();
-  }
+		return pdfUrl.searchParams.get('pid');
+	}
 
-  async navigateToFormPdf(formId: number, pdfId: string) {
-    await this.admin.visitAdminPage(
-      'admin.php',
-      `page=gf_edit_forms&view=settings&subview=PDF&id=${formId}&pid=${pdfId}`
-    );
-    await expect(this.page.getByRole('button', { name: 'Manage PDF Templates'})).toBeVisible();
-  }
+	async addOrUpdatePdf() {
+		const addButton = this.page.getByRole('button', { name: 'Add PDF' });
 
-  async copyDownloadShortcodeToClipboard(formId: number, pdfId: string) {
-    await this.navigateToFormPdfList(formId);
-    await this.page.locator(`#gfpdf-${pdfId}`).getByRole('dialog').click();
-  }
+		if ((await addButton.count()) > 0) {
+			await addButton.first().click();
+		} else {
+			await this.page
+				.getByRole('button', { name: 'Update PDF' })
+				.first()
+				.click();
+		}
 
-  async checkRichTextEditor(container: Locator) {
-    // Merge Tag Selector
-    await container.getByTitle('Insert Merge Tags').click();
-    await container.getByRole('button', { name: 'Radio' }).click();
-    await container.getByTitle('Insert Merge Tags').click();
-    await container.getByRole('button', { name: 'Entry Id' }).click();
+		await expect(
+			this.page.getByRole('button', { name: 'Manage PDF Templates' })
+		).toBeVisible();
+	}
 
-    // Add Media
-    await container.getByRole('button', { name: 'Add Media' }).click();
-    await this.page.getByRole('tab', { name: 'Upload files' }).click();
-    await this.page.locator('.media-modal-content:visible').locator('input[type=file]').setInputFiles(__dirname + '/../data/images/thumbnail.jpg');
-    await this.page.getByRole('button', { name: 'Insert into Post' }).click();
+	async navigateToNewFormPdf(formId: number) {
+		await this.navigateToFormPdfList(formId);
+		await this.page.getByRole('link', { name: 'Add new PDF' }).click();
+		await expect(
+			this.page.getByRole('button', { name: 'Manage PDF Templates' })
+		).toBeVisible();
+	}
 
-    await expect(container).toHaveScreenshot();
+	async navigateToFormPdf(formId: number, pdfId: string) {
+		await this.admin.visitAdminPage(
+			'admin.php',
+			`page=gf_edit_forms&view=settings&subview=PDF&id=${formId}&pid=${pdfId}`
+		);
+		await expect(
+			this.page.getByRole('button', { name: 'Manage PDF Templates' })
+		).toBeVisible();
+	}
 
-    // Code View
-    container.getByRole('button', { name: /^Code$/ }).first().click();
+	async copyDownloadShortcodeToClipboard(formId: number, pdfId: string) {
+		await this.navigateToFormPdfList(formId);
+		await this.page.locator(`#gfpdf-${pdfId}`).getByRole('dialog').click();
+	}
 
-    await expect(container.getByRole('textbox').last()).toHaveValue(/^\{Radio:1}\{entry_id}<img .+/)
+	async checkRichTextEditor(container: Locator) {
+		// Merge Tag Selector
+		await container.getByTitle('Insert Merge Tags').click();
+		await container.getByRole('button', { name: 'Radio' }).click();
+		await container.getByTitle('Insert Merge Tags').click();
+		await container.getByRole('button', { name: 'Entry Id' }).click();
 
-    await expect(container).toHaveScreenshot();
-  }
+		// Add Media
+		await container.getByRole('button', { name: 'Add Media' }).click();
+		await this.page.getByRole('tab', { name: 'Upload files' }).click();
+		await this.page
+			.locator('.media-modal-content:visible')
+			.locator('input[type=file]')
+			.setInputFiles(__dirname + '/../data/images/thumbnail.jpg');
+		await this.page
+			.getByRole('button', { name: 'Insert into Post' })
+			.click();
 
-  async downloadAndVerifyPdf(pdfLink: Locator, expectedFilename: string) {
-    await expect(pdfLink).toBeAttached();
+		await expect(container).toHaveScreenshot();
 
-    const downloadPromise = this.page.waitForEvent('download');
-    await pdfLink.click();
-    const download = await downloadPromise;
+		// Code View
+		await container
+			.getByRole('button', { name: /^Code$/ })
+			.first()
+			.click();
 
-    // download the PDF and verify it's valid
-    expect(download.suggestedFilename()).toBe(expectedFilename);
-    const pdfStream = await download.createReadStream();
+		await expect(container.getByRole('textbox').last()).toHaveValue(
+			/^\{Radio:1}\{entry_id}<img .+/
+		);
 
-    async function readPdf(readable: Readable) {
-      let data = '';
-      for await (const chunk of readable) {
-        data += chunk;
-      }
+		await expect(container).toHaveScreenshot();
+	}
 
-      return data;
-    }
+	async downloadAndVerifyPdf(pdfLink: Locator, expectedFilename: string) {
+		await expect(pdfLink).toBeAttached();
 
-    const pdfContent = await readPdf(pdfStream);
-    expect(pdfContent.substring(0, 7)).toEqual(
-      expect.stringContaining('%PDF-1.')
-    );
-    expect(pdfContent).toEqual(expect.stringContaining('startxref'));
-    expect(pdfContent).toEqual(expect.stringContaining('%%EOF'));
-  }
+		const downloadPromise = this.page.waitForEvent('download');
+		await pdfLink.click();
+		const download = await downloadPromise;
+
+		// download the PDF and verify it's valid
+		expect(download.suggestedFilename()).toBe(expectedFilename);
+		const pdfStream = await download.createReadStream();
+
+		async function readPdf(readable: Readable) {
+			let data = '';
+			for await (const chunk of readable) {
+				data += chunk;
+			}
+
+			return data;
+		}
+
+		const pdfContent = await readPdf(pdfStream);
+		expect(pdfContent.substring(0, 7)).toEqual(
+			expect.stringContaining('%PDF-1.')
+		);
+		expect(pdfContent).toEqual(expect.stringContaining('startxref'));
+		expect(pdfContent).toEqual(expect.stringContaining('%%EOF'));
+	}
+
+	async gotoPdfAndVerify(url: string, expectedFilename: string) {
+		const downloadPromise = this.page.waitForEvent('download');
+
+		try {
+			await this.page.goto(url, { waitUntil: 'networkidle' });
+		} catch (e) {
+			console.log(e);
+		}
+
+		const download = await downloadPromise;
+
+		// download the PDF and verify it's valid
+		expect(download.suggestedFilename()).toBe(expectedFilename);
+		const pdfStream = await download.createReadStream();
+
+		async function readPdf(readable: Readable) {
+			let data = '';
+			for await (const chunk of readable) {
+				data += chunk;
+			}
+
+			return data;
+		}
+
+		const pdfContent = await readPdf(pdfStream);
+		expect(pdfContent.substring(0, 7)).toEqual(
+			expect.stringContaining('%PDF-1.')
+		);
+		expect(pdfContent).toEqual(expect.stringContaining('startxref'));
+		expect(pdfContent).toEqual(expect.stringContaining('%%EOF'));
+	}
 }
