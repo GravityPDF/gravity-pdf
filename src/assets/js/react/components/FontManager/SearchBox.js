@@ -135,8 +135,6 @@ export class SearchBox extends Component {
 					onChange={this.handleSearch}
 					onKeyDown={(e) => e.keyCode === 13 && e.preventDefault()}
 					ref={(node) => (this.input = node)}
-					// eslint-disable-next-line jsx-a11y/tabindex-no-positive
-					tabIndex="143"
 				/>
 			</div>
 		);

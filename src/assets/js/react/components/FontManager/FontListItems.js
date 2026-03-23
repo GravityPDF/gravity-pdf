@@ -362,7 +362,7 @@ export class FontListItems extends Component {
 		const { id, loading, fontList, searchResult, selectedFont } =
 			this.props;
 		const list = !searchResult ? fontList : searchResult;
-		const tabIndex = updateFontVisible ? '-1' : '144';
+		const tabIndex = !updateFontVisible ? '0' : '-1';
 
 		return (
 			<div

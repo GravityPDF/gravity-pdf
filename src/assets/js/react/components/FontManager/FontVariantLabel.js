@@ -1,7 +1,6 @@
 /* Dependencies */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { sprintf } from 'sprintf-js';
 
 /**
  * @package			Gravity PDF
@@ -25,17 +24,12 @@ const FontVariantLabel = ({ label, font }) => (
 		htmlFor={'gfpdf-font-variant-' + label}
 	>
 		{label === 'regular' && font === 'false' && (
-			<span
-				dangerouslySetInnerHTML={{
-					// eslint can't parse %s found on fontListRegularRequired
-					// eslint-disable-next-line @wordpress/valid-sprintf
-					__html: sprintf(
-						GFPDF.fontListRegularRequired,
-						'' + "<span class='required'>",
-						'</span>'
-					),
-				}}
-			/>
+			<span>
+				{GFPDF.fontListRegular}{' '}
+				<span className="required">
+					{GFPDF.fontManagerRequiredLabel}
+				</span>
+			</span>
 		)}
 		{label === 'regular' && font === 'true' && GFPDF.fontListRegular}
 		{label === 'italics' && GFPDF.fontListItalics}

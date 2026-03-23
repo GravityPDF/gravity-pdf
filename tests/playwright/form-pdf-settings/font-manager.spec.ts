@@ -29,13 +29,13 @@ test.describe('Font Manager', () => {
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 
-		await expect(page.getByLabel('Font')).toBeVisible();
+		await expect(page.getByLabel('Font', { exact: true })).toBeVisible();
 		await page
 			.locator('#gfpdf-settings-field-wrapper-font-container')
 			.getByRole('button', { name: 'Manage' })
 			.click();
 		await expect(
-			page.getByRole('heading', { name: 'Font Manager' })
+			page.getByRole('heading', { name: 'Font Manager', exact: true })
 		).toBeVisible();
 	});
 
@@ -43,26 +43,30 @@ test.describe('Font Manager', () => {
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page.getByLabel('Font').click();
+
+		const select = await page.getByLabel('Font', { exact: true });
 
 		await expect(
-			page.getByRole('group', { name: 'Unicode' })
-		).toBeVisible();
-		await expect(
-			page.getByRole('option', { name: 'Dejavu Sans Condensed' })
-		).toBeVisible();
-		await expect(page.getByRole('group', { name: 'Indic' })).toBeVisible();
-		await expect(
-			page.getByRole('option', { name: 'Lohit Kannada' })
-		).toBeVisible();
+			select.locator('optgroup[label="Unicode"]')
+		).toBeAttached();
+
+		await expect(select.locator('optgroup[label="Indic"]')).toBeAttached();
+
+		await select.selectOption('Dejavu Sans Condensed');
+		await select.selectOption('Lohit Kannada');
 	});
 
 	test('should save selected font', async ({ page }) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page.getByLabel('Font').selectOption('mph2bdamase');
+		await page
+			.getByLabel('Font', { exact: true })
+			.selectOption('mph2bdamase');
+
 		await pdf.addOrUpdatePdf();
 
-		await expect(page.getByLabel('Font')).toHaveValue('mph2bdamase');
+		await expect(page.getByLabel('Font', { exact: true })).toHaveValue(
+			'mph2bdamase'
+		);
 	});
 
 	test('should display font manager error validation', async ({ page }) => {
@@ -72,7 +76,9 @@ test.describe('Font Manager', () => {
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
-		await page.getByRole('button', { name: 'Add Font →' }).click();
+		await page
+			.getByRole('button', { name: 'Add font', visible: true })
+			.click();
 
 		await expect(
 			page.locator('.input-label-validation-error')
@@ -104,25 +110,30 @@ test.describe('Font Manager', () => {
 			.click();
 
 		// Add Font
-		await page.locator('#gfpdf-add-font-name-input').fill('Roboto');
 		await page
-			.locator('input[aria-labelledby*="gfpdf-font-variant-regular"]')
+			.locator('[data-test="component-AddFont"]')
+			.getByRole('textbox', { name: 'Font Name' })
+			.fill('Roboto');
+
+		await page
+			.locator('#gfpdf-font-variant-regular-addFont')
 			.setInputFiles(path.join(resourcesPath, 'Roboto-Regular.ttf'));
-		await page.getByRole('button', { name: 'Add Font →' }).click();
+
+		await page
+			.getByRole('button', { name: 'Add font', visible: true })
+			.click();
 
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
 		const fontItems = page.locator('.font-list-item');
 		await expect(fontItems).toHaveCount(1);
 
 		// Search Font
+		await page.locator('#font-manager-search-box').fill('Arial');
+		await expect(fontItems).toHaveCount(0);
 		await page.locator('#font-manager-search-box').fill('Roboto');
 		await expect(fontItems).toHaveCount(1);
 
-		// Edit Font - check toggled state for disabled 'Update Font' button
-		await fontItems.first().click();
-		const updateButton = page.getByRole('button', {
-			name: 'Update Font →',
-		});
+		const updateButton = page.getByRole('button', { name: 'Update Font' });
 		await expect(updateButton).toBeDisabled();
 
 		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
@@ -136,16 +147,15 @@ test.describe('Font Manager', () => {
 		await fontItems.first().click();
 		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
 		await page
-			.locator('input[aria-labelledby*="gfpdf-font-variant-italics"]')
+			.locator('#gfpdf-font-variant-italics-updateFont')
 			.setInputFiles(
 				path.join(resourcesPath, 'Roboto-RegularItalic.ttf')
 			);
 		await page
-			.locator('input[aria-labelledby*="gfpdf-font-variant-bold"]')
-			.first()
+			.locator('#gfpdf-font-variant-bold-updateFont')
 			.setInputFiles(path.join(resourcesPath, 'Roboto-Bold.ttf'));
 		await page
-			.locator('input[aria-labelledby*="gfpdf-font-variant-bolditalics"]')
+			.locator('#gfpdf-font-variant-bolditalics-updateFont')
 			.setInputFiles(path.join(resourcesPath, 'Roboto-BoldItalic.ttf'));
 
 		await updateButton.click();
@@ -153,20 +163,40 @@ test.describe('Font Manager', () => {
 		await expect(page.getByText('Roboto 2')).toBeVisible();
 
 		// Delete Font
-		await page.locator('.dashicons-trash').click();
+		page.on('dialog', (dialog) => dialog.accept());
+		await fontItems.locator('.dashicons-trash').click();
 		await expect(page.getByText('Font list empty.')).toBeVisible();
 	});
 
-	test('should be able to close font manager popup', async ({ page }) => {
+	test('should be able to close font manager popup with button', async ({
+		page,
+	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 		await page
 			.locator('#gfpdf-settings-field-wrapper-font-container')
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
-		await page.getByRole('button', { name: 'Close dialog' }).click();
-		await expect(
-			page.locator('.container.theme-wrap.font-manager')
-		).not.toBeVisible();
+		const popup = await page.locator('.container.theme-wrap.font-manager');
+
+		await expect(popup).toBeVisible();
+		await page.locator('[data-test="component-CloseDialog"]').click();
+		await expect(popup).not.toBeVisible();
+	});
+
+	test('should be able to close font manager popup with esc key', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.locator('#gfpdf-settings-field-wrapper-font-container')
+			.getByRole('button', { name: 'Manage' })
+			.click();
+
+		const popup = await page.locator('.container.theme-wrap.font-manager');
+
+		await expect(popup).toBeVisible();
+		await page.keyboard.press('Escape');
+		await expect(popup).not.toBeVisible();
 	});
 });

@@ -43,6 +43,7 @@ export class AddUpdateFontFooter extends Component {
 	static propTypes = {
 		state: PropTypes.string,
 		id: PropTypes.string,
+		type: PropTypes.string,
 		disabled: PropTypes.bool,
 		onHandleCancelEditFont: PropTypes.func,
 		onHandleCancelEditFontKeypress: PropTypes.func,
@@ -136,6 +137,7 @@ export class AddUpdateFontFooter extends Component {
 	render() {
 		const {
 			state,
+			type,
 			id,
 			disabled,
 			onHandleCancelEditFont,
@@ -177,7 +179,7 @@ export class AddUpdateFontFooter extends Component {
 			>
 				<div className="buttons-icons-container">
 					<div>
-						{id && (
+						{type === 'update' && (
 							<button
 								className="button gfpdf-button primary cancel"
 								onClick={onHandleCancelEditFont}
@@ -194,9 +196,13 @@ export class AddUpdateFontFooter extends Component {
 							className="button gfpdf-button primary"
 							tabIndex={tabIndex}
 							disabled={disabled}
-							aria-label={GFPDF.fontManagerUpdateFontAriaLabel}
+							aria-label={
+								type === 'update'
+									? GFPDF.fontManagerUpdateFontAriaLabel
+									: GFPDF.fontManagerAddFontAriaLabel
+							}
 						>
-							{id
+							{type === 'update'
 								? GFPDF.fontManagerUpdateTitle + ' →'
 								: GFPDF.fontManagerAddTitle + ' →'}
 						</button>

@@ -1,7 +1,6 @@
 /* Dependencies */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { sprintf } from 'sprintf-js';
 /* Components */
 import FontVariant from './FontVariant';
 import AddUpdateFontFooter from './AddUpdateFontFooter';
@@ -50,14 +49,6 @@ export const AddFont = ({
 	tabIndexFontFiles,
 	tabIndexFooterButtons,
 }) => {
-	// eslint can't detect %s found on fontManagerFontNameLabel
-	// eslint-disable-next-line @wordpress/valid-sprintf
-	const fontNameLabel = sprintf(
-		GFPDF.fontManagerFontNameLabel,
-		"<span class='required'>",
-		'</span>'
-	);
-
 	return (
 		<div data-test="component-AddFont" className="add-font">
 			<form onSubmit={onHandleSubmit}>
@@ -66,10 +57,14 @@ export const AddFont = ({
 				<p>{GFPDF.fontManagerAddDesc}</p>
 
 				<label
-					htmlFor="gfpdf-font-name-input"
-					dangerouslySetInnerHTML={{ __html: fontNameLabel }}
-					aria-label={fontNameLabel}
-				/>
+					htmlFor="gfpdf-add-font-name-input"
+					aria-label={GFPDF.fontManagerFontNameLabel}
+				>
+					{GFPDF.fontManagerFontNameLabel}{' '}
+					<span className="required">
+						{GFPDF.fontManagerRequiredLabel}
+					</span>
+				</label>
 
 				<p id="gfpdf-font-name-desc-add">
 					{GFPDF.fontManagerFontNameDesc}
@@ -96,12 +91,8 @@ export const AddFont = ({
 						</span>
 					)}
 				</div>
-
-				<label
-					htmlFor="gfpdf-font-files-label-add"
-					id="gfpdf-font-files-label-add"
-					aria-labelledby="gfpdf-font-files-description-add"
-				>
+				{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+				<label id="gfpdf-font-files-label-add">
 					{GFPDF.fontManagerFontFilesLabel}
 				</label>
 
@@ -120,6 +111,7 @@ export const AddFont = ({
 				/>
 
 				<AddUpdateFontFooter
+					type="add"
 					state="addFont"
 					msg={msg}
 					loading={loading}
