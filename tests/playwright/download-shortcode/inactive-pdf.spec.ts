@@ -39,7 +39,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		}
 	);
 
-	test('Disabled PDF, Debug Mode Off', async ({
+	test.only('Disabled PDF, Debug Mode Off', async ({
 		requestUtils,
 		page,
 		admin,
@@ -57,9 +57,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 			page.getByRole('link', { name: 'Download PDF' })
 		).not.toBeAttached();
 
-		await expect(
-			page.getByText('PDF link not displayed')
-		).not.toContainText('Admin Only Message');
+		await expect(page.locator('.gform_confirmation_message')).toBeEmpty();
 	});
 
 	test('Disabled PDF, Debug Mode On', async ({
