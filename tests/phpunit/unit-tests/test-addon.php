@@ -83,6 +83,8 @@ class Test_Addon extends WP_UnitTestCase {
 			new Helper_Logger( 'my-custom-plugin2', 'My Custom Plugin2' ),
 			new Helper_Notices()
 		);
+
+		remove_all_actions( 'init' );
 	}
 
 	/**

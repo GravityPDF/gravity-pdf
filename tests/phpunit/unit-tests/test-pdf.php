@@ -269,7 +269,9 @@ class Test_PDF extends WP_UnitTestCase {
 			'pdf_error'
 		);
 
-		$method->setAccessible( true );
+		if ( version_compare( PHP_VERSION, '8.1', '<' )  ) {
+			$method->setAccessible( true );
+		}
 
 		/* Ensure our public errors are shown */
 
