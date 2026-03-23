@@ -1,6 +1,6 @@
 {
   "core": "https://wordpress.org/latest.zip",
-  "phpVersion": "8.4",
+  "phpVersion": "8.5",
   "plugins": [],
   "lifecycleScripts": {
     "afterStart": "bash tools/wp-env/configure.sh",
