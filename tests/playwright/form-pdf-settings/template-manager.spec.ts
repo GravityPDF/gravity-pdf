@@ -29,35 +29,37 @@ test.describe('Template Manager', () => {
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 
-		await expect(page.getByLabel('Template')).toBeVisible();
-		await page
-			.locator('#gpdf-advance-template-selector')
-			.getByRole('button', { name: 'Manage' })
-			.click();
-		await expect(
-			page.getByRole('heading', { name: 'Installed PDFs' })
-		).toBeVisible();
+		const select = page.getByRole('group', {name: 'General'})
+			.getByLabel('Template', {exact: true});
+
+		await expect(select).toBeVisible();
+		await page.locator('[data-test="component-templateButton"]').click();
+		await expect(page.getByRole('heading', { name: 'Installed PDFs' })).toBeVisible();
 	});
 
 	test('should display default core templates', async ({ page }) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page.getByLabel('Template').click();
 
-		await expect(page.getByRole('group', { name: 'Core' })).toBeVisible();
-		await expect(
-			page.getByRole('option', { name: 'Blank Slate' })
-		).toBeVisible();
-		await expect(
-			page.getByRole('option', { name: 'Focus Gravity' })
-		).toBeVisible();
+		const select = page
+			.getByRole('group', { name: 'General' })
+			.getByLabel('Template', { exact: true });
+
+		await expect(select.locator('optgroup[label="Core"]')).toBeAttached();
+		await select.selectOption('Blank Slate');
+		await select.selectOption('Focus Gravity');
 	});
 
 	test('should save selected template', async ({ page }) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page.getByLabel('Template').selectOption('rubix');
+
+		const select = page
+			.getByRole('group', { name: 'General' })
+			.getByLabel('Template', { exact: true });
+
+		await select.selectOption('rubix');
 		await pdf.addOrUpdatePdf();
 
-		await expect(page.getByLabel('Template')).toHaveValue('rubix');
+		await expect(select).toHaveValue('rubix');
 	});
 
 	test('should successfully search, upload, show details, and delete template', async ({
@@ -73,29 +75,29 @@ test.describe('Template Manager', () => {
 		);
 
 		await pdf.navigateToNewFormPdf(form.id);
-		await page
-			.locator('#gpdf-advance-template-selector')
-			.getByRole('button', { name: 'Manage' })
-			.click();
+		await page.locator('[data-test="component-templateButton"]').click();
 
 		// Search
 		await page.locator('#wp-filter-search-input').fill('rubix');
-		await expect(page.locator('.theme')).toHaveCount(1);
-		await expect(page.locator('.theme-name')).toHaveText('Rubix');
+		await expect(page.locator('[data-test=component-templateListItem]')).toHaveCount(1);
+		await expect(page.locator('[data-test=component-name]')).toHaveText('Rubix');
 
 		// Upload
 		await page
-			.locator('input[type="file"]')
+			.locator('[data-test=component-templateUploader] input[type="file"]')
 			.setInputFiles(path.join(resourcesPath, 'test-template.zip'));
+
+		// @TODO - caching issue after installing a new template...
+
 		await expect(
 			page.getByText('Template successfully installed')
 		).toBeVisible();
 
 		// Template Details
 		await page
-			.locator('.theme[data-slug="test-template"]')
 			.getByText('Template Details')
 			.click();
+
 		await expect(page.locator('.theme-name.current')).toHaveText(
 			'Test Template'
 		);
@@ -120,14 +122,21 @@ test.describe('Template Manager', () => {
 		).not.toBeVisible();
 	});
 
-	test('should be able to close template manager popup', async ({ page }) => {
+	test('should be able to close template manager popup button', async ({ page }) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page
-			.locator('#gpdf-advance-template-selector')
-			.getByRole('button', { name: 'Manage' })
-			.click();
+		await page.locator('[data-test="component-templateButton"]').click();
 
-		await page.getByRole('button', { name: 'Close dialog' }).click();
-		await expect(page.locator('.container.theme-wrap')).not.toBeVisible();
+		const popup = page.locator('.container.theme-wrap');
+		await page.locator('[data-test="component-CloseDialog"]').click();
+		await expect(popup).not.toBeVisible();
+	});
+
+	test('should be able to close template manager popup escape', async ({ page }) => {
+		await pdf.navigateToNewFormPdf(form.id);
+		await page.locator('[data-test="component-templateButton"]').click();
+
+		const popup = page.locator('.container.theme-wrap');
+		await page.keyboard.press('Escape');
+		await expect(popup).not.toBeVisible();
 	});
 });

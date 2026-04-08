@@ -71,7 +71,7 @@ test.describe('PDF Security and Access Policies', () => {
 		).toBeVisible();
 	});
 
-	test.only('should show error if "Restrict Owner" is enabled and visiting as that user', async ({
+	test('should show error if "Restrict Owner" is enabled and visiting as that user', async ({
 		requestUtils,
 		page,
 		admin,
@@ -107,7 +107,6 @@ test.describe('PDF Security and Access Policies', () => {
 		await admin.context.clearCookies();
 		await requestUtils.login({ username: userId, password: '123456' });
 
-
 		await admin.visitAdminPage('profile.php');
 		await page.goto(`/?gpdf=1&pid=${pdfId}&lid=${entry.id}`);
 
@@ -117,41 +116,41 @@ test.describe('PDF Security and Access Policies', () => {
 		).toBeVisible();
 	});
 
-	// test('should download PDF when "Restrict Owner" is enabled and downloading as current user', async ({
-	// 	requestUtils,
-	// 	page,
-	// 	admin,
-	// }: {
-	// 	requestUtils: RequestUtils;
-	// 	page: Page;
-	// 	admin: Admin;
-	// }) => {
-	// 	const user = await requestUtils.createUser({
-	// 		username: crypto.randomBytes(20).toString('hex'),
-	// 		email: crypto.randomBytes(20).toString('hex') + '@example.com',
-	// 	});
-	//
-	// 	await pdf.navigateToNewFormPdf(form.id);
-	// 	const pdfId = await pdf.createPdf(form.id, 'Restrict Owner');
-	//
-	// 	await pdf.navigateToFormPdf(form.id, pdfId);
-	// 	await pdf.checkField('Restrict Owner', true);
-	// 	await pdf.addOrUpdatePdf();
-	//
-	// 	const entry = await pdf.createEntry({
-	// 		form_id: form.id,
-	// 		created_by: user.id,
-	// 	});
-	//
-	// 	// Visit the PDF link as anon
-	// 	const anonContext = await browser.newContext();
-	// 	const anonPage = await anonContext.newPage();
-	// 	await anonPage.goto(`/?gpdf=1&pid=${pdfId}&lid=${entry.id}`);
-	//
-	// 	// Should redirect to login
-	// 	await expect(anonPage.locator('#login form')).toBeVisible();
-	// 	await anonContext.close();
-	// });
+	test('should download PDF when "Restrict Owner" is enabled and downloading as current user', async ({
+		requestUtils,
+		page,
+		admin,
+	}: {
+		requestUtils: RequestUtils;
+		page: Page;
+		admin: Admin;
+	}) => {
+		const user = await requestUtils.createUser({
+			username: crypto.randomBytes(20).toString('hex'),
+			email: crypto.randomBytes(20).toString('hex') + '@example.com',
+		});
+
+		await pdf.navigateToNewFormPdf(form.id);
+		const pdfId = await pdf.createPdf(form.id, 'Restrict Owner');
+
+		await pdf.navigateToFormPdf(form.id, pdfId);
+		await pdf.checkField('Restrict Owner', true);
+		await pdf.addOrUpdatePdf();
+
+		const entry = await pdf.createEntry({
+			form_id: form.id,
+			created_by: user.id,
+		});
+
+		// Visit the PDF link as anon
+		const anonContext = await browser.newContext();
+		const anonPage = await anonContext.newPage();
+		await anonPage.goto(`/?gpdf=1&pid=${pdfId}&lid=${entry.id}`);
+
+		// Should redirect to login
+		await expect(anonPage.locator('#login form')).toBeVisible();
+		await anonContext.close();
+	});
 
 	test('should allow access to a public PDF for anonymous users', async ({
 		requestUtils,

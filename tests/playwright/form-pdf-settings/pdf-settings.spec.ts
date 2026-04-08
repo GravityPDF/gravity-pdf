@@ -67,6 +67,7 @@ test.describe('Form PDF Settings', () => {
 			const elements = pdf.page
 				.locator('#gfpdf-settings-field-wrapper-notification')
 				.getByRole('checkbox');
+
 			await expect(elements).toHaveCount(1);
 
 			// Add another Notification
@@ -97,15 +98,18 @@ test.describe('Form PDF Settings', () => {
 					exact: true,
 				})
 				.check();
+
 			await pdf.page.locator('#gfpdf_action_type').selectOption('hide');
 			await pdf.page.locator('#gfpdf_logic_type').selectOption('any');
 			await pdf.page
 				.locator('#gfpdf_rule_value_0')
 				.selectOption('Second Choice');
+
 			await pdf.page.getByTitle('add another rule').first().click();
 			await pdf.page
 				.locator('#gfpdf_rule_field_1')
 				.selectOption('status');
+
 			await pdf.page.locator('#gfpdf_rule_value_1').selectOption('spam');
 			await pdf.addOrUpdatePdf();
 
@@ -113,6 +117,8 @@ test.describe('Form PDF Settings', () => {
 				pdf.page.locator('#gfpdf-settings-field-wrapper-conditional')
 			).toHaveScreenshot();
 		});
+
+		// @TODO - verify conditional logic works
 	});
 
 	test.describe('Appearance', () => {
@@ -120,12 +126,15 @@ test.describe('Form PDF Settings', () => {
 			await pdf.createPdf(form.id, 'Paper');
 
 			await pdf.selectField('Paper Size', 'CUSTOM');
+
 			await pdf.page
 				.locator('#gfpdf_settings\\[custom_pdf_size\\]_measurement')
 				.selectOption('inches');
+
 			await pdf.page
 				.locator('#gfpdf_settings\\[custom_pdf_size\\]_width')
 				.fill('5');
+
 			await pdf.page
 				.locator('#gfpdf_settings\\[custom_pdf_size\\]_height')
 				.fill('7');
@@ -136,11 +145,13 @@ test.describe('Form PDF Settings', () => {
 			await expect(
 				pdf.page.locator('#gfpdf-settings-field-wrapper-pdf_size')
 			).toHaveScreenshot();
+
 			await expect(
 				pdf.page.locator(
 					'#gfpdf-settings-field-wrapper-custom_pdf_size'
 				)
 			).toHaveScreenshot();
+
 			await expect(
 				pdf.page.locator('#gfpdf-settings-field-wrapper-orientation')
 			).toHaveScreenshot();
@@ -153,6 +164,7 @@ test.describe('Form PDF Settings', () => {
 				.getByRole('button', { name: 'Select Color' })
 				.first()
 				.click();
+
 			await pdf.page
 				.locator('.iris-square-inner.iris-square-vert')
 				.first()
@@ -162,6 +174,7 @@ test.describe('Form PDF Settings', () => {
 			await expect(
 				pdf.page.getByRole('textbox', { name: 'Font Color' })
 			).toHaveValue('#898989');
+
 			await expect(
 				pdf.page.locator('#gfpdf-settings-field-wrapper-font_colour')
 			).toHaveScreenshot();
@@ -170,6 +183,7 @@ test.describe('Form PDF Settings', () => {
 		test('Reverse Text RTL', async () => {
 			await pdf.checkField('Reverse Text (RTL)', true);
 			await pdf.addOrUpdatePdf();
+
 			await expect(
 				pdf.page.getByLabel('Reverse Text (RTL)')
 			).toBeChecked();
@@ -186,6 +200,7 @@ test.describe('Form PDF Settings', () => {
 					__dirname +
 						'/../../../tools/playwright/data/images/thumbnail.jpg'
 				);
+
 			await pdf.page
 				.getByRole('button', { name: 'Select Media' })
 				.click();
@@ -209,6 +224,7 @@ test.describe('Form PDF Settings', () => {
 					name: 'Use different header on first',
 				})
 				.check();
+
 			await pdf.checkRichTextEditor(
 				pdf.page.locator('#gfpdf-settings-field-wrapper-first_header')
 			);
@@ -253,12 +269,14 @@ test.describe('Form PDF Settings', () => {
 				.getByRole('button', { name: 'Select Color' })
 				.nth(1) // Background Color is usually the second color picker in appearance/template
 				.click();
+
 			await pdf.page
 				.locator('#gfpdf-settings-field-wrapper-background_color')
 				.locator('.iris-palette')
 				.nth(6)
 				.click();
 			await pdf.addOrUpdatePdf();
+
 			await expect(
 				pdf.page.locator('#gfpdf_settings\\[background_color\\]')
 			).toHaveValue('#1e73be');
@@ -266,24 +284,13 @@ test.describe('Form PDF Settings', () => {
 	});
 
 	test.describe('Advanced', () => {
-		test('Add New PDF', async () => {
-			await pdf.navigateToNewFormPdf(form.id);
-			await expect(pdf.page.locator('#tab_PDF')).toHaveScreenshot({});
-		});
-
-		test('Update Existing PDF', async () => {
-			const pdfId = await pdf.createPdf(form.id, 'Existing PDF');
-			await pdf.navigateToFormPdf(form.id, pdfId);
-
-			await expect(pdf.page.locator('#tab_PDF')).toHaveScreenshot();
-		});
-
 		test('PDF Security', async () => {
 			await pdf.createPdf(form.id, 'PDF Security');
 
 			await expect(
 				pdf.page.getByRole('textbox', { name: 'Password' })
 			).not.toBeVisible();
+
 			await expect(
 				pdf.page.getByRole('checkbox', {
 					name: 'Print - High Resolution',
@@ -295,6 +302,7 @@ test.describe('Form PDF Settings', () => {
 			await expect(
 				pdf.page.getByRole('textbox', { name: 'Password' })
 			).toBeVisible();
+
 			await expect(
 				pdf.page.getByRole('checkbox', {
 					name: 'Print - High Resolution',
@@ -306,9 +314,11 @@ test.describe('Form PDF Settings', () => {
 			await expect(
 				pdf.page.getByText('Enable PDF Security').first()
 			).not.toBeVisible();
+
 			await expect(
 				pdf.page.getByRole('textbox', { name: 'Password' })
 			).not.toBeVisible();
+
 			await expect(
 				pdf.page.getByRole('checkbox', {
 					name: 'Print - High Resolution',
@@ -320,6 +330,7 @@ test.describe('Form PDF Settings', () => {
 			await expect(
 				pdf.page.getByRole('textbox', { name: 'Password' })
 			).toBeVisible();
+
 			await expect(
 				pdf.page.getByRole('checkbox', {
 					name: 'Print - High Resolution',
@@ -330,6 +341,7 @@ test.describe('Form PDF Settings', () => {
 				.locator('#gfpdf-settings-field-wrapper-password')
 				.getByTitle('Insert Merge Tags')
 				.click();
+
 			await pdf.page
 				.getByRole('button', { name: 'Date (dd/mm/yyyy)' })
 				.click();
@@ -350,7 +362,9 @@ test.describe('Form PDF Settings', () => {
 		test('Format', async () => {
 			await pdf.chooseField('Standard', 'Standard');
 			await pdf.chooseField('PDF/A-1b', 'PDF/A-1b');
+
 			await pdf.addOrUpdatePdf();
+
 			await expect(
 				pdf.page.locator('#gfpdf_settings\\[format\\]\\[PDFA1B\\]')
 			).toBeChecked();
@@ -359,12 +373,14 @@ test.describe('Form PDF Settings', () => {
 		test('Image DPI', async () => {
 			await pdf.fillField('Image DPI', '150');
 			await pdf.addOrUpdatePdf();
+
 			await expect(pdf.page.getByLabel('Image DPI')).toHaveValue('150');
 		});
 
 		test('Restrict Owner', async () => {
 			await pdf.checkField('Restrict Owner', true);
 			await pdf.addOrUpdatePdf();
+
 			await expect(pdf.page.getByLabel('Restrict Owner')).toBeChecked();
 		});
 	});

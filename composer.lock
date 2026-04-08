@@ -4,25 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79a28e25cb94c4a1b1450563a320f103",
+    "content-hash": "b20e0d73c7ac7c1c9385d047f21bb37f",
     "packages": [
         {
             "name": "gravitypdf/querypath",
-            "version": "4.1.0",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GravityPDF/querypath.git",
-                "reference": "32b08b5b5295fa3b84baeb91685c66ca86b1c591"
+                "reference": "6599a112e2f0759c6a05b364641dfcff7247ab7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GravityPDF/querypath/zipball/32b08b5b5295fa3b84baeb91685c66ca86b1c591",
-                "reference": "32b08b5b5295fa3b84baeb91685c66ca86b1c591",
+                "url": "https://api.github.com/repos/GravityPDF/querypath/zipball/6599a112e2f0759c6a05b364641dfcff7247ab7e",
+                "reference": "6599a112e2f0759c6a05b364641dfcff7247ab7e",
                 "shasum": ""
             },
             "require": {
                 "masterminds/html5": "^2.0",
-                "php": "^7.1 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
+                "php": "^7.1 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
             },
             "replace": {
                 "arthurkushman/query-path": "3.1.4",
@@ -48,7 +48,7 @@
             "license": [
                 "MIT"
             ],
-            "description": "PHP library for HTML(5)/XML querying (CSS 4 or XPath) and processing (like jQuery) with PHP8.3 support",
+            "description": "PHP library for HTML(5)/XML querying (CSS 4 or XPath) and processing (like jQuery) with PHP 7.0 to 8.5 support",
             "homepage": "https://github.com/gravitypdf/querypath",
             "keywords": [
                 "css",
@@ -68,7 +68,7 @@
                     "type": "paypal"
                 }
             ],
-            "time": "2025-02-04T05:00:04+00:00"
+            "time": "2026-03-17T06:14:13+00:00"
         },
         {
             "name": "gravitypdf/upload",
@@ -558,16 +558,16 @@
         },
         {
             "name": "mpdf/mpdf",
-            "version": "v8.3.0",
+            "version": "v8.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mpdf/mpdf.git",
-                "reference": "0e552ec93cf01dc830599e303b200edb600d8094"
+                "reference": "2a454ec334109911fdb323a284c19dbf3f049810"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mpdf/mpdf/zipball/0e552ec93cf01dc830599e303b200edb600d8094",
-                "reference": "0e552ec93cf01dc830599e303b200edb600d8094",
+                "url": "https://api.github.com/repos/mpdf/mpdf/zipball/2a454ec334109911fdb323a284c19dbf3f049810",
+                "reference": "2a454ec334109911fdb323a284c19dbf3f049810",
                 "shasum": ""
             },
             "require": {
@@ -636,7 +636,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-02-27T08:41:25+00:00"
+            "time": "2026-03-11T10:58:44+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",
@@ -1012,28 +1012,99 @@
             "time": "2021-05-03T11:20:27+00:00"
         },
         {
-            "name": "setasign/fpdi",
-            "version": "v2.6.4",
+            "name": "roots/wordpress-full",
+            "version": "7.0-beta5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Setasign/FPDI.git",
-                "reference": "4b53852fde2734ec6a07e458a085db627c60eada"
+                "url": "https://github.com/WordPress/WordPress.git",
+                "reference": "master"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Setasign/FPDI/zipball/4b53852fde2734ec6a07e458a085db627c60eada",
-                "reference": "4b53852fde2734ec6a07e458a085db627c60eada",
+                "url": "https://downloads.wordpress.org/release/wordpress-7.0-beta5.zip",
+                "reference": "master",
+                "shasum": "a80374b9a60300199f5295db2df8210feec6da68"
+            },
+            "require": {
+                "php": ">= 7.4"
+            },
+            "provide": {
+                "wordpress/core-implementation": "7.0-beta5"
+            },
+            "suggest": {
+                "ext-curl": "Performs remote request operations.",
+                "ext-dom": "Used to validate Text Widget content and to automatically configuring IIS7+.",
+                "ext-exif": "Works with metadata stored in images.",
+                "ext-fileinfo": "Used to detect mimetype of file uploads.",
+                "ext-hash": "Used for hashing, including passwords and update packages.",
+                "ext-imagick": "Provides better image quality for media uploads.",
+                "ext-json": "Used for communications with other servers.",
+                "ext-libsodium": "Validates Signatures and provides securely random bytes.",
+                "ext-mbstring": "Used to properly handle UTF8 text.",
+                "ext-mysqli": "Connects to MySQL for database interactions.",
+                "ext-openssl": "Permits SSL-based connections to other hosts.",
+                "ext-pcre": "Increases performance of pattern matching in code searches.",
+                "ext-xml": "Used for XML parsing, such as from a third-party site.",
+                "ext-zip": "Used for decompressing Plugins, Themes, and WordPress update packages."
+            },
+            "type": "wordpress-core",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "WordPress Community",
+                    "homepage": "https://wordpress.org/about/"
+                }
+            ],
+            "description": "WordPress is open source software you can use to create a beautiful website, blog, or app.",
+            "homepage": "https://wordpress.org/",
+            "keywords": [
+                "blog",
+                "cms",
+                "wordpress"
+            ],
+            "support": {
+                "docs": "https://developer.wordpress.org/",
+                "forum": "https://wordpress.org/support/",
+                "irc": "irc://irc.freenode.net/wordpress",
+                "issues": "https://core.trac.wordpress.org/",
+                "rss": "https://wordpress.org/news/feed/",
+                "source": "https://core.trac.wordpress.org/browser",
+                "wiki": "https://codex.wordpress.org/"
+            },
+            "funding": [
+                {
+                    "url": "https://wordpressfoundation.org/donate/",
+                    "type": "other"
+                }
+            ],
+            "time": "2026-03-12T15:40:16+00:00"
+        },
+        {
+            "name": "setasign/fpdi",
+            "version": "v2.6.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Setasign/FPDI.git",
+                "reference": "de0cf35911be3e9ea63b48e0f307883b1c7c48ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Setasign/FPDI/zipball/de0cf35911be3e9ea63b48e0f307883b1c7c48ac",
+                "reference": "de0cf35911be3e9ea63b48e0f307883b1c7c48ac",
                 "shasum": ""
             },
             "require": {
                 "ext-zlib": "*",
-                "php": "^7.1 || ^8.0"
+                "php": ">=7.2 <=8.5.99999"
             },
             "conflict": {
                 "setasign/tfpdf": "<1.31"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7",
+                "phpunit/phpunit": "^8.5.52",
                 "setasign/fpdf": "~1.8.6",
                 "setasign/tfpdf": "~1.33",
                 "squizlabs/php_codesniffer": "^3.5",
@@ -1073,7 +1144,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Setasign/FPDI/issues",
-                "source": "https://github.com/Setasign/FPDI/tree/v2.6.4"
+                "source": "https://github.com/Setasign/FPDI/tree/v2.6.6"
             },
             "funding": [
                 {
@@ -1081,7 +1152,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-05T09:57:14+00:00"
+            "time": "2026-03-13T08:38:20+00:00"
         },
         {
             "name": "spatie/url-signer",
@@ -1535,10 +1606,10 @@
         },
         {
             "name": "gravity/gravityforms",
-            "version": "2.9.29",
+            "version": "2.9.30",
             "dist": {
                 "type": "zip",
-                "url": "https://composer.gravity.io/downloads/?plugin=gravityforms&version=2.9.29"
+                "url": "https://composer.gravity.io/downloads/?plugin=gravityforms&version=2.9.30"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -2751,18 +2822,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "4c336cfd0f836275a3ea63a79b5111903f4a8c30"
+                "reference": "e19b0f27b204991af95a5fefad00630bc3e376ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/4c336cfd0f836275a3ea63a79b5111903f4a8c30",
-                "reference": "4c336cfd0f836275a3ea63a79b5111903f4a8c30",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/e19b0f27b204991af95a5fefad00630bc3e376ae",
+                "reference": "e19b0f27b204991af95a5fefad00630bc3e376ae",
                 "shasum": ""
             },
             "conflict": {
                 "3f/pygmentize": "<1.2",
                 "adaptcms/adaptcms": "<=1.3",
-                "admidio/admidio": "<5.0.6",
+                "admidio/admidio": "<=5.0.6",
                 "adodb/adodb-php": "<=5.22.9",
                 "aheinze/cockpit": "<2.2",
                 "aimeos/ai-admin-graphql": ">=2022.04.1,<2022.10.10|>=2023.04.1,<2023.10.6|>=2024.04.1,<2024.07.2",
@@ -2804,6 +2875,7 @@
                 "athlon1600/php-proxy": "<=5.1",
                 "athlon1600/php-proxy-app": "<=3",
                 "athlon1600/youtube-downloader": "<=4",
+                "aureuserp/aureuserp": "<1.3.0.0-beta1",
                 "austintoddj/canvas": "<=3.4.2",
                 "auth0/auth0-php": ">=3.3,<8.18",
                 "auth0/login": "<7.20",
@@ -2811,8 +2883,10 @@
                 "auth0/wordpress": "<=5.4",
                 "automad/automad": "<2.0.0.0-alpha5",
                 "automattic/jetpack": "<9.8",
+                "avideo/avideo": "<=26",
                 "awesome-support/awesome-support": "<=6.0.7",
                 "aws/aws-sdk-php": "<3.368",
+                "ayacoo/redirect-tab": "<2.1.2|>=3,<3.1.7|>=4,<4.0.5",
                 "azuracast/azuracast": "<=0.23.3",
                 "b13/seo_basics": "<0.8.2",
                 "backdrop/backdrop": "<=1.32",
@@ -2873,7 +2947,7 @@
                 "ckeditor/ckeditor": "<4.25",
                 "clickstorm/cs-seo": ">=6,<6.8|>=7,<7.5|>=8,<8.4|>=9,<9.3",
                 "co-stack/fal_sftp": "<0.2.6",
-                "cockpit-hq/cockpit": "<2.11.4",
+                "cockpit-hq/cockpit": "<2.13.5",
                 "code16/sharp": "<9.11.1",
                 "codeception/codeception": "<3.1.3|>=4,<4.1.22",
                 "codeigniter/framework": "<3.1.10",
@@ -2898,11 +2972,15 @@
                 "corveda/phpsandbox": "<1.3.5",
                 "cosenary/instagram": "<=2.3",
                 "couleurcitron/tarteaucitron-wp": "<0.3",
-                "cpsit/typo3-mailqueue": "<0.4.3|>=0.5,<0.5.1",
-                "craftcms/cms": "<4.17.3|>=5,<=5.9.8",
+                "cpsit/typo3-mailqueue": "<0.4.5|>=0.5,<0.5.2",
+                "craftcms/aws-s3": ">=2.0.2,<=2.2.4",
+                "craftcms/azure-blob": ">=2.0.0.0-beta1,<=2.1",
+                "craftcms/cms": "<=4.17.5|>=5,<=5.9.11",
                 "craftcms/commerce": ">=4,<4.11|>=5,<5.6",
                 "craftcms/composer": ">=4.0.0.0-RC1-dev,<=4.10|>=5.0.0.0-RC1-dev,<=5.5.1",
                 "craftcms/craft": ">=3.5,<=4.16.17|>=5.0.0.0-RC1-dev,<=5.8.21",
+                "craftcms/google-cloud": ">=2.0.0.0-beta1,<=2.2",
+                "craftcms/webhooks": ">=3,<3.2",
                 "croogo/croogo": "<=4.0.7",
                 "cuyz/valinor": "<0.12",
                 "czim/file-handling": "<1.5|>=2,<2.3",
@@ -2940,6 +3018,7 @@
                 "dolibarr/dolibarr": "<21.0.3",
                 "dompdf/dompdf": "<2.0.4",
                 "doublethreedigital/guest-entries": "<3.1.2",
+                "dreamfactory/df-core": "<1.0.4",
                 "drupal-pattern-lab/unified-twig-extensions": "<=0.1",
                 "drupal/access_code": "<2.0.5",
                 "drupal/acquia_dam": "<1.1.5",
@@ -3023,7 +3102,7 @@
                 "filament/actions": ">=3.2,<3.2.123",
                 "filament/filament": ">=4,<4.3.1",
                 "filament/infolists": ">=3,<3.2.115",
-                "filament/tables": ">=3,<3.2.115",
+                "filament/tables": ">=3,<3.2.115|>=4,<4.8.5|>=5,<5.3.5",
                 "filegator/filegator": "<7.8",
                 "filp/whoops": "<2.1.13",
                 "fineuploader/php-traditional-server": "<=1.2.2",
@@ -3137,6 +3216,7 @@
                 "jbartels/wec-map": "<3.0.3",
                 "jcbrand/converse.js": "<3.3.3",
                 "joelbutcher/socialstream": "<5.6|>=6,<6.2",
+                "johnbillion/query-monitor": "<3.20.4",
                 "johnbillion/wp-crontrol": "<1.16.2|>=1.17,<1.19.2",
                 "joomla/application": "<1.0.13",
                 "joomla/archive": "<1.1.12|>=2,<2.0.1",
@@ -3155,6 +3235,7 @@
                 "jweiland/events2": "<8.3.8|>=9,<9.0.6",
                 "jweiland/kk-downloader": "<1.2.2",
                 "kazist/phpwhois": "<=4.2.6",
+                "kelvinmo/simplejwt": "<=1.1",
                 "kelvinmo/simplexrd": "<3.1.1",
                 "kevinpapst/kimai2": "<1.16.7",
                 "khodakhah/nodcms": "<=3",
@@ -3183,7 +3264,7 @@
                 "lavalite/cms": "<=10.1",
                 "lavitto/typo3-form-to-database": "<2.2.5|>=3,<3.2.2|>=4,<4.2.3|>=5,<5.0.2",
                 "lcobucci/jwt": ">=3.4,<3.4.6|>=4,<4.0.4|>=4.1,<4.1.5",
-                "league/commonmark": "<=2.8",
+                "league/commonmark": "<=2.8.1",
                 "league/flysystem": "<1.1.4|>=2,<2.1.1",
                 "league/oauth2-server": ">=8.3.2,<8.4.2|>=8.5,<8.5.3",
                 "leantime/leantime": "<3.3",
@@ -3192,7 +3273,7 @@
                 "librenms/librenms": "<26.2",
                 "liftkit/database": "<2.13.2",
                 "lightsaml/lightsaml": "<1.3.5",
-                "limesurvey/limesurvey": "<6.5.12",
+                "limesurvey/limesurvey": "<6.15.4",
                 "livehelperchat/livehelperchat": "<=3.91",
                 "livewire-filemanager/filemanager": "<=1.0.4",
                 "livewire/livewire": "<2.12.7|>=3.0.0.0-beta1,<3.6.4",
@@ -3355,7 +3436,7 @@
                 "phpoffice/phpexcel": "<=1.8.2",
                 "phpoffice/phpspreadsheet": "<1.30|>=2,<2.1.12|>=2.2,<2.4|>=3,<3.10|>=4,<5",
                 "phppgadmin/phppgadmin": "<=7.13",
-                "phpseclib/phpseclib": "<2.0.47|>=3,<3.0.36",
+                "phpseclib/phpseclib": "<=2.0.51|>=3,<=3.0.49",
                 "phpservermon/phpservermon": "<3.6",
                 "phpsysinfo/phpsysinfo": "<3.4.3",
                 "phpunit/phpunit": "<8.5.52|>=9,<9.6.33|>=10,<10.5.62|>=11,<11.5.50|>=12,<12.5.8",
@@ -3411,6 +3492,7 @@
                 "rainlab/blog-plugin": "<1.4.1",
                 "rainlab/debugbar-plugin": "<3.1",
                 "rainlab/user-plugin": "<=1.4.5",
+                "ralffreit/mfa-email": "<=2",
                 "rankmath/seo-by-rank-math": "<=1.0.95",
                 "rap2hpoutre/laravel-log-viewer": "<0.13",
                 "react/http": ">=0.7,<1.9",
@@ -3421,7 +3503,7 @@
                 "reportico-web/reportico": "<=8.1",
                 "rhukster/dom-sanitizer": "<1.0.7",
                 "rmccue/requests": ">=1.6,<1.8",
-                "robrichards/xmlseclibs": "<=3.1.3",
+                "robrichards/xmlseclibs": "<3.1.5",
                 "roots/soil": "<4.1",
                 "roundcube/roundcubemail": "<1.5.10|>=1.6,<1.6.11",
                 "rudloff/alltube": "<3.0.3",
@@ -3437,8 +3519,8 @@
                 "setasign/fpdi": "<2.6.4",
                 "sfroemken/url_redirect": "<=1.2.1",
                 "sheng/yiicms": "<1.2.1",
-                "shopware/core": "<6.6.10.9-dev|>=6.7,<6.7.6.1-dev",
-                "shopware/platform": "<6.6.10.7-dev|>=6.7,<6.7.3.1-dev",
+                "shopware/core": "<6.6.10.15-dev|>=6.7,<6.7.8.1-dev",
+                "shopware/platform": "<6.6.10.15-dev|>=6.7,<6.7.8.1-dev",
                 "shopware/production": "<=6.3.5.2",
                 "shopware/shopware": "<=5.7.17|>=6.4.6,<6.6.10.10-dev|>=6.7,<6.7.6.1-dev",
                 "shopware/storefront": "<6.6.10.10-dev|>=6.7,<6.7.5.1-dev",
@@ -3472,7 +3554,7 @@
                 "simplesamlphp/simplesamlphp-module-openid": "<1",
                 "simplesamlphp/simplesamlphp-module-openidprovider": "<0.9",
                 "simplesamlphp/xml-common": "<1.20",
-                "simplesamlphp/xml-security": "==1.6.11",
+                "simplesamlphp/xml-security": "<1.13.9|>=2,<2.3.1",
                 "simplito/elliptic-php": "<1.0.6",
                 "sitegeist/fluid-components": "<3.5",
                 "sjbr/sr-feuser-register": "<2.6.2|>=5.1,<12.5",
@@ -3500,7 +3582,7 @@
                 "starcitizentools/short-description": ">=4,<4.0.1",
                 "starcitizentools/tabber-neue": ">=1.9.1,<2.7.2|>=3,<3.1.1",
                 "starcitizenwiki/embedvideo": "<=4",
-                "statamic/cms": "<5.73.11|>=6,<6.4",
+                "statamic/cms": "<5.73.14|>=6,<6.7.1",
                 "stormpath/sdk": "<9.9.99",
                 "studio-42/elfinder": "<=2.1.64",
                 "studiomitte/friendlycaptcha": "<0.1.4",
@@ -3661,7 +3743,7 @@
                 "wikibase/wikibase": "<=1.39.3",
                 "wikimedia/parsoid": "<0.12.2",
                 "willdurand/js-translation-bundle": "<2.1.1",
-                "winter/wn-backend-module": "<1.2.4",
+                "winter/wn-backend-module": "<1.2.12",
                 "winter/wn-cms-module": "<=1.2.9",
                 "winter/wn-dusk-plugin": "<2.1",
                 "winter/wn-system-module": "<1.2.4",
@@ -3675,7 +3757,7 @@
                 "wpcloud/wp-stateless": "<3.2",
                 "wpglobus/wpglobus": "<=1.9.6",
                 "wpmetabox/meta-box": "<5.11.2",
-                "wwbn/avideo": "<25",
+                "wwbn/avideo": "<=26",
                 "xataface/xataface": "<3",
                 "xpressengine/xpressengine": "<3.0.15",
                 "yab/quarx": "<2.4.5",
@@ -3694,6 +3776,7 @@
                 "yiisoft/yii2-redis": "<2.0.20",
                 "yikesinc/yikes-inc-easy-mailchimp-extender": "<6.8.6",
                 "yoast-seo-for-typo3/yoast_seo": "<7.2.3",
+                "yoast/duplicate-post": "<=4.5",
                 "yourls/yourls": "<=1.10.2",
                 "yuan1994/tpadmin": "<=1.3.12",
                 "yungifez/skuul": "<=2.6.5",
@@ -3772,7 +3855,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-11T01:36:21+00:00"
+            "time": "2026-03-20T22:08:23+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -5679,7 +5762,7 @@
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "6.9.3",
+            "version": "6.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-phpunit/wp-phpunit.git",
@@ -5792,7 +5875,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "roave/security-advisories": 20
+        "roave/security-advisories": 20,
+        "roots/wordpress-full": 10
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -5803,5 +5887,5 @@
     "platform-overrides": {
         "php": "7.3.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
