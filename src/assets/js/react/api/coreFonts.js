@@ -1,5 +1,5 @@
 /* Dependencies */
-import request from 'superagent/dist/superagent.min'
+import { api, getJsonString } from './api'
 
 /**
  * @package     Gravity PDF
@@ -11,30 +11,55 @@ import request from 'superagent/dist/superagent.min'
 /**
  * Do AJAX call
  *
- * @returns {{method.get}}
+ * @returns {Object}
  *
  * @since 5.2
  */
-export function apiGetFilesFromGitHub () {
-  return request
-    .get(GFPDF.pluginUrl + 'dist/payload/core-fonts.json')
-    .accept('application/json')
-    .type('json')
-    .parse(response => JSON.parse(response.text))
+export async function apiGetFilesFromGitHub () {
+  const response = await api(GFPDF.pluginUrl + 'dist/payload/core-fonts.json', {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json'
+    }
+  })
+
+  const text = await response.text()
+  const body = getJsonString(text)
+
+  return {
+    body,
+    text,
+    status: response.status,
+    ok: response.ok
+  }
 }
 
 /**
  * Do AJAX call
  *
- * @param file
- * @returns {{method.post}}
+ * @param {string} file
+ * @returns {Object}
  *
  * @since 5.2
  */
-export function apiPostDownloadFonts (file) {
-  return request
-    .post(GFPDF.ajaxUrl)
-    .field('action', 'gfpdf_save_core_font')
-    .field('nonce', GFPDF.ajaxNonce)
-    .field('font_name', file)
+export async function apiPostDownloadFonts (file) {
+  const formData = new window.FormData()
+  formData.append('action', 'gfpdf_save_core_font')
+  formData.append('nonce', GFPDF.ajaxNonce)
+  formData.append('font_name', file)
+
+  const response = await api(GFPDF.ajaxUrl, {
+    method: 'POST',
+    body: formData
+  })
+
+  const text = await response.text()
+  const body = getJsonString(text)
+
+  return {
+    body,
+    text,
+    status: response.status,
+    ok: response.ok
+  }
 }

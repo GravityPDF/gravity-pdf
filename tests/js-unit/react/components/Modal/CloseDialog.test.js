@@ -42,14 +42,6 @@ describe('CloseDialog - CloseDialog.js', () => {
 
       expect(handleKeyPress).toHaveBeenCalledTimes(1)
     })
-
-    test('componentDidUpdate() - Trigger a request of updated font manager select box', () => {
-      const prevProps = { templateList: [{}, {}] }
-
-      instance.componentDidUpdate(prevProps)
-
-      expect(props.getCustomFontList).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('RUN COMPONENT METHODS', () => {

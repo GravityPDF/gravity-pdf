@@ -38,17 +38,15 @@ describe('Sagas - fontManager.js', () => {
   describe('Worker saga - getCustomFontList()', () => {
     const response = {
       ok: true,
-      json: jest.fn()
+      body: []
     }
-    const responseBody = []
+    const responseBody = response.body
     const gen = getCustomFontList()
 
     test('should check that saga call the API apiGetCustomFontList', () => {
       expect(gen.next().value).toEqual(call(api.apiGetCustomFontList))
 
-      gen.next(response)
-
-      expect(gen.next(responseBody).value).toEqual(put({
+      expect(gen.next(response).value).toEqual(put({
         type: GET_CUSTOM_FONT_LIST_SUCCESS,
         payload: responseBody
       }))
@@ -73,18 +71,16 @@ describe('Sagas - fontManager.js', () => {
   describe('Worker saga - addFont()', () => {
     const response = {
       ok: true,
-      json: jest.fn()
+      body: {}
     }
-    const responseBody = {}
+    const responseBody = response.body
     const data = { payload: {} }
     const gen = addFont(data)
 
     test('should check that saga call the API apiAddFont', () => {
       expect(gen.next().value).toEqual(call(api.apiAddFont, {}))
 
-      gen.next(response)
-
-      expect(gen.next(responseBody).value).toEqual(put({
+      expect(gen.next(response).value).toEqual(put({
         type: ADD_FONT_SUCCESS,
         payload: {
           font: responseBody,
@@ -104,16 +100,13 @@ describe('Sagas - fontManager.js', () => {
       const gen = addFont(data)
 
       gen.next()
-      gen.next(response)
-      gen.next(responseBody)
-      gen.throw({
-        status: 400,
-        json: jest.fn()
-      })
 
-      expect(gen.next({
-        code: 'font_validation_error',
-        message: 'text'
+      expect(gen.throw({
+        status: 400,
+        body: {
+          code: 'font_validation_error',
+          message: 'text'
+        }
       }).value).toEqual(put({
         type: ADD_FONT_ERROR,
         payload: {
@@ -127,14 +120,11 @@ describe('Sagas - fontManager.js', () => {
       const gen = addFont(data)
 
       gen.next()
-      gen.next(response)
-      gen.next(responseBody)
-      gen.throw({
-        status: 400,
-        json: jest.fn()
-      })
 
-      expect(gen.next({ message: 'text' }).value).toEqual(put({
+      expect(gen.throw({
+        status: 400,
+        body: { message: 'text' }
+      }).value).toEqual(put({
         type: ADD_FONT_ERROR,
         payload: 'text'
       }))
@@ -152,18 +142,16 @@ describe('Sagas - fontManager.js', () => {
   describe('Worker saga - editFont()', () => {
     const response = {
       ok: true,
-      json: jest.fn()
+      body: {}
     }
-    const responseBody = {}
+    const responseBody = response.body
     const data = { payload: {} }
     const gen = editFont(data)
 
     test('should check that saga call the API apiEditFont', () => {
       expect(gen.next().value).toEqual(call(api.apiEditFont, {}))
 
-      gen.next(response)
-
-      expect(gen.next(responseBody).value).toEqual(put({
+      expect(gen.next(response).value).toEqual(put({
         type: EDIT_FONT_SUCCESS,
         payload: {
           font: responseBody,
@@ -173,12 +161,10 @@ describe('Sagas - fontManager.js', () => {
     })
 
     test('should check that saga handles correctly the failure of apiEditFont API call (500 error and response.code not equal to \'font_file_gone_missing\')', () => {
-      gen.throw({
+      expect(gen.throw({
         status: 500,
-        json: jest.fn()
-      })
-
-      expect(gen.next({ code: '' }).value).toEqual(put({
+        body: { code: '' }
+      }).value).toEqual(put({
         type: EDIT_FONT_ERROR,
         payload: 'A problem occurred. Reload the page and try again.'
       }))
@@ -188,16 +174,13 @@ describe('Sagas - fontManager.js', () => {
       const gen = editFont(data)
 
       gen.next()
-      gen.next(response)
-      gen.next(responseBody)
-      gen.throw({
+      
+      expect(gen.throw({
         status: 400,
-        json: jest.fn()
-      })
-
-      expect(gen.next({
-        code: 'font_validation_error',
-        message: 'text'
+        body: {
+          code: 'font_validation_error',
+          message: 'text'
+        }
       }).value).toEqual(put({
         type: EDIT_FONT_ERROR,
         payload: {
@@ -211,14 +194,11 @@ describe('Sagas - fontManager.js', () => {
       const gen = editFont(data)
 
       gen.next()
-      gen.next(response)
-      gen.next(responseBody)
-      gen.throw({
+      
+      expect(gen.throw({
         status: 400,
-        json: jest.fn()
-      })
-
-      expect(gen.next({ message: '' }).value).toEqual(put({
+        body: { message: '' }
+      }).value).toEqual(put({
         type: EDIT_FONT_ERROR,
         payload: 'A problem occurred. Reload the page and try again.'
       }))
@@ -228,14 +208,11 @@ describe('Sagas - fontManager.js', () => {
       const gen = editFont(data)
 
       gen.next()
-      gen.next(response)
-      gen.next(responseBody)
-      gen.throw({
+      
+      expect(gen.throw({
         status: 400,
-        json: jest.fn()
-      })
-
-      expect(gen.next({ message: 'text' }).value).toEqual(put({
+        body: { message: 'text' }
+      }).value).toEqual(put({
         type: EDIT_FONT_ERROR,
         payload: 'text'
       }))
@@ -253,7 +230,7 @@ describe('Sagas - fontManager.js', () => {
   describe('Worker saga - deleteFont()', () => {
     const response = {
       ok: true,
-      json: jest.fn()
+      body: {}
     }
     const data = { payload: {} }
     const gen = deleteFont(data)

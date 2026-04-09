@@ -434,7 +434,6 @@ class Helper_Templates {
 	 */
 	public function flush_template_transient_cache() {
 		delete_transient( $this->data->template_transient_cache );
-		delete_transient( $this->data->template_transient_cache . '-template-list' );
 	}
 
 	/**

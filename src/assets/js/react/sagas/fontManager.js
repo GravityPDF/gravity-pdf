@@ -53,7 +53,7 @@ export function * getCustomFontList () {
       throw response
     }
 
-    const responseBody = yield response.json()
+    const responseBody = response.body
 
     yield put({
       type: GET_CUSTOM_FONT_LIST_SUCCESS,
@@ -104,7 +104,7 @@ export function * addFont ({ payload }) {
       throw response
     }
 
-    const responseBody = yield response.json()
+    const responseBody = response.body
 
     const data = {
       font: responseBody,
@@ -123,7 +123,7 @@ export function * addFont ({ payload }) {
       })
     }
 
-    const response = yield error.json()
+    const response = error.body
 
     if (error.status === 400 && response.code === 'font_validation_error') {
       return yield put({
@@ -163,7 +163,7 @@ export function * editFont ({ payload }) {
       throw response
     }
 
-    const responseBody = yield response.json()
+    const responseBody = response.body
 
     const data = {
       font: responseBody,
@@ -175,7 +175,7 @@ export function * editFont ({ payload }) {
       payload: data
     })
   } catch (error) {
-    const response = yield error.json()
+    const response = error.body
 
     if (error.status === 500 && response.code !== 'font_file_gone_missing') {
       return yield put({
