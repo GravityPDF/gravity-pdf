@@ -14,7 +14,7 @@ class AdvancedCheck {
     this.shortcodeBox = Selector('button').withAttribute('aria-label', 'Copy the Sample PDF shortcode to the clipboard')
     this.confirmationPageSelectBox = Selector('#gform_setting_page').find('button#gform-page-control')
     this.queryStringInputBox = Selector('#gform_setting_queryString').find('[id="queryString"]')
-    this.wysiwgEditorTextTab = Selector('#gform-settings-section-confirmations').find('.wp-editor-tabs').find('button').withText('Text')
+    this.wysiwgEditorTextTab = Selector('#gform-settings-section-confirmations').find('.wp-editor-tabs').find('button').withText('Code')
     this.wysiwgEditor = Selector('div').find('textarea[class^="merge-tag-support"]')
     this.redirectInputBox = Selector('#gform_setting_url').find('[id="url"]')
     this.previewLink = Selector('#gf_toolbar_buttons_container a').addCustomDOMProperties({
