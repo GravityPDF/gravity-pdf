@@ -116,6 +116,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		update_option( 'gf_db_version', GFForms::$version );
 		GFFormsModel::drop_tables();
 		gf_upgrade()->maybe_upgrade();
+		add_filter( 'gform_disable_dom_parser', '__return_true' );
 
 		// Enabling GF Rest API v2.
 		global $gf_webapi;
