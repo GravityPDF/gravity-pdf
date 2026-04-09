@@ -19,7 +19,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="<?php echo esc_attr( $args['id'] ); ?>" class="<?php echo esc_attr( $args['class'] ); ?>">
 	<?php if ( ! empty( $args['title'] ) ): ?>
 		<div class='gform-settings-panel__title'>
-			<?php echo esc_html( $args['title'] ); ?>
+			<label for="gfpdf_settings[<?php echo esc_attr( $args['callback_args']['id'] ); ?>]">
+				<?php echo esc_html( $args['title'] ); ?>
+			</label>
 
 			<?php if ( ! empty( $args['tooltip'] ) ): ?>
 				<?php echo wp_kses_post( $args['tooltip'] ); ?>

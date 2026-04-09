@@ -1527,9 +1527,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		?>
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
 				<?php echo wp_kses_post( $args['desc2'] ); ?>
-			</label>
 		</div>
 
 		<input type="checkbox"
@@ -1571,9 +1569,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		?>
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php
@@ -1628,9 +1624,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php
@@ -1685,9 +1679,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<input type="text"
@@ -1802,9 +1794,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<input type="number"
@@ -1853,9 +1843,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<textarea cols="50"
@@ -1900,9 +1888,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<input type="password"
@@ -1948,9 +1934,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php if ( ! empty( $args['chosen'] ) ): ?>
@@ -2076,9 +2060,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php if ( function_exists( 'wp_editor' ) ): ?>
@@ -2143,9 +2125,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<div class="gfpdf-upload-setting-container">
@@ -2193,9 +2173,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<div>
@@ -2274,7 +2252,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		?>
 		<div class="gform-settings-field gform-settings-field__toggle <?php echo esc_attr( $class ); ?>">
-			<div class="gform-settings-description gform-kitchen-sink"><?php echo wp_kses_post( $args['desc'] ); ?></div>
+			<div class="gform-settings-description gform-kitchen-sink">
+				<?php echo wp_kses_post( $args['desc'] ); ?>
+			</div>
 
 			<span class="gform-settings-input__container">
 				<input type="checkbox" id="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" value="Yes" <?php echo checked( $value, 'Yes', false ); ?> />
@@ -2374,9 +2354,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
-			<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]">
-				<?php echo wp_kses_post( $args['desc'] ); ?>
-			</label>
+			<?php echo wp_kses_post( $args['desc'] ); ?>
 		</div>
 
 		<?php esc_html_e( 'Width', 'gravity-pdf' ); ?>
