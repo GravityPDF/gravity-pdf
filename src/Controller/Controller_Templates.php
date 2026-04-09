@@ -5,6 +5,7 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Interface_Actions;
+use GFPDF\Model\Model_Templates;
 
 /**
  * @package     Gravity PDF
@@ -30,7 +31,7 @@ class Controller_Templates extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Model $model
+	 * @param Model_Templates $model
 	 *
 	 * @since 4.1
 	 */

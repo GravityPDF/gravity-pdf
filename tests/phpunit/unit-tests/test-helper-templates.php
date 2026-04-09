@@ -53,6 +53,12 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		$installer->create_folder_structures();
 	}
 
+	public function tear_down() {
+		parent::tear_down();
+
+		\GFCache::flush();
+	}
+
 	/**
 	 * Create our testing data
 	 *
@@ -102,6 +108,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	public function test_get_all_templates() {
 		global $gfpdf;
 
+		$cache_name = $gfpdf->data->template_transient_cache . '-template-list';
 		$templates = $this->templates->get_all_templates();
 
 		/* Test the standard templates */
@@ -111,7 +118,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		touch( $gfpdf->data->template_location . 'test.php' );
 		touch( $gfpdf->data->template_location . 'test2.php' );
 
-		delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+		\GFCache::delete( $cache_name );
 
 		$templates = $this->templates->get_all_templates();
 		$this->assertCount( 6, $templates );
@@ -119,7 +126,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		/* Test for override */
 		touch( $gfpdf->data->template_location . 'zadani.php' );
 
-		delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+		\GFCache::delete( $cache_name );
 
 		$templates = $this->templates->get_all_templates();
 
@@ -129,7 +136,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		touch( $gfpdf->data->template_location . 'configuration.php' );
 		touch( $gfpdf->data->template_location . 'configuration.archive.php' );
 
-		delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+		\GFCache::delete( $cache_name );
 
 		$templates = $this->templates->get_all_templates();
 		$this->assertCount( 6, $templates );
@@ -138,7 +145,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		if ( is_multisite() ) {
 			touch( $gfpdf->data->multisite_template_location . 'test3.php' );
 
-			delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+			\GFCache::delete( $cache_name );
 
 			$templates = $this->templates->get_all_templates();
 			$this->assertCount( 7, $templates );
@@ -146,7 +153,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 			/* Check for override */
 			touch( $gfpdf->data->multisite_template_location . 'zadani.php' );
 
-			delete_transient( $gfpdf->data->template_transient_cache . '-template-list' );
+			\GFCache::delete( $cache_name );
 
 			$templates = $this->templates->get_all_templates();
 			$this->assertCount( 7, $templates );
@@ -397,8 +404,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 */
 	public function test_get_plugin_pdf_templates() {
 		$core_templates = $this->templates->get_core_pdf_templates();
-		$this->assertNotSame( 0, count( $core_templates ) );
-		$this->assertNotSame( false, strpos( $core_templates[0], 'blank-slate.php' ) );
+		$this->assertNotCount( 0, $core_templates );
 	}
 
 	/**

@@ -404,12 +404,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version, true );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version, true );
-
-		/* Localise admin script */
-		$data = $this->data->get_localised_script_data( $this->options, $this->gform );
-
-		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
-		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
 	}
 
 	/**
@@ -440,6 +434,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* Load TinyMCE styles */
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
+
+			/* Localise admin script */
+			$data = $this->data->get_localised_script_data( $this->options, $this->gform );
+
+			wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
+			wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
 		}
 
 		if ( rgget( 'page' ) === 'gf_entries' ) {
