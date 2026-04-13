@@ -32,10 +32,10 @@ GFCommon::display_admin_message();
 
 	<div id="gpdf-action-links">
 		<a href="https://docs.gravitypdf.com/users/five-minute-install/" class="button button-primary button-large"><?php esc_html_e( 'View Documentation', 'gravity-pdf' ); ?></a>
-		<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-pdf' ); ?></a>
+		<a href="https://gravitypdf.com/help/open-a-support-ticket/" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-pdf' ); ?></a>
 
 		<p>
-			<?php printf( esc_html__( 'Support hours are 9:00am-5:00pm Monday to Friday, %1$sSydney Australia time%2$s (public holidays excluded).', 'gravity-pdf' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
+			<?php printf( esc_html__( 'Support hours are 9:00am-5:00pm Monday to Friday, %1$sSydney Australia time%2$s (public holidays excluded).', 'gravity-pdf' ), '<br><a href="https://time.is/Sydney">', '</a>' ); ?>
 		</p>
 	</div>
 

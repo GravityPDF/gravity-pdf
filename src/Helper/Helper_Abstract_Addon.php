@@ -799,7 +799,7 @@ abstract class Helper_Abstract_Addon {
 				$row_meta['docs'] = '<a href="' . esc_url( 'https://docs.gravitypdf.com/extensions/' . str_replace( 'shop-plugin-', '', $doc_slug ) . '/' ) . '" title="' . esc_attr__( 'View plugin Documentation', 'gravity-pdf' ) . '">' . esc_html__( 'Docs', 'gravity-pdf' ) . '</a>';
 			}
 
-			$row_meta['support'] = '<a href="' . esc_url( 'https://gravitypdf.com/support/#contact-support' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-pdf' ) . '">' . esc_html__( 'Support', 'gravity-pdf' ) . '</a>';
+			$row_meta['support'] = '<a href="' . esc_url( 'https://gravitypdf.com/help/' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-pdf' ) . '">' . esc_html__( 'Support', 'gravity-pdf' ) . '</a>';
 
 			return apply_filters( 'gfpdf_addon_row_meta', array_merge( $links, $row_meta ), $file, $this );
 		}
