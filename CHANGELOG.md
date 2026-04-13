@@ -2,6 +2,18 @@
 
 ## Gravity PDF
 
+### 6.14.2
+* 🐞Bug: Fix PHP warning caused by the GFCommon::get_lead_field_display() API change in Gravity Forms 2.9.29
+* 🐞Bug: Fix merge tag rendering issue when switching between PDF templates
+* 🐞Bug: Fix Font Manager to Font select field syncing issue
+* 🐞Bug: Fix edge-case issue with the URL signing feature and improve verification/validation checks 
+* 🐞Bug: Rename Chinese language files so it is correctly used when the site language is set to the zh_CN locale.
+* 🧹 Housekeeping: Improve template caching and performance
+* 🧹 Housekeeping: Update PHP and Javascript dependencies
+* 🧹 Housekeeping: Disable asset caching when `SCRIPT_DEBUG` constant enabled
+* 🧹 Housekeeping: Update admin settings markup to improve accessibility
+* 🧹 Housekeeping: Update documentation and support links
+
 ### 6.14.1
 * 🧹 Housekeeping: Add `gfpdf-{$type}` CSS class to the HTML mark-up when a field uses a different input type 
 * 🧹 Housekeeping: Use the field type (not input type) in the `gfpdf_pdf_field_content_{$type}` filter
