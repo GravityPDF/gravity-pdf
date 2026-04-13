@@ -94,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run E2E tests
-        run: yarn test:e2e:headless --stop-on-first-fail
+        run: yarn test:e2e:headless
 
       - name: Dump log files on failure
         if: failure()
