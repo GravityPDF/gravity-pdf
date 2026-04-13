@@ -43,6 +43,7 @@ FILES=(
 "${PACKAGE_DIR}/.nvmrc"
 "${PACKAGE_DIR}/.wp-env.json"
 "${PACKAGE_DIR}/.testcaferc.js"
+"${PACKAGE_DIR}/.browserslistrc"
 )
 
 for i in "${FILES[@]}"
