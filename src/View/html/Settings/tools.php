@@ -43,7 +43,7 @@ GFCommon::display_admin_message();
 	</form>
 
 	<?php
-	/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_post_tools_settings_page for more details about this action */
+	/* See https://docs.gravitypdf.com/developers/actions/gfpdf_post_tools_settings_page for more details about this action */
 	do_action( 'gfpdf_post_tools_settings_page' );
 	?>
 

@@ -44,7 +44,7 @@ abstract class Helper_Abstract_Fields_Input_Type extends Helper_Abstract_Fields 
 			/* check load our class */
 			if ( class_exists( $class ) ) {
 
-				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_class/ for more details about these filters */
+				/* See https://docs.gravitypdf.com/developers/filters/gfpdf_field_class/ for more details about these filters */
 				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
 				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType, $this->fieldObject, $field, $entry, $this->form );
 			} else {

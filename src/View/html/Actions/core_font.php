@@ -26,5 +26,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<br>
 
-	<a href="https://docs.gravitypdf.com/v6/users/core-pdf-fonts"><?php esc_html_e( 'Get more info.', 'gravity-pdf' ); ?></a>
+	<a href="https://docs.gravitypdf.com/users/core-pdf-fonts"><?php esc_html_e( 'Get more info.', 'gravity-pdf' ); ?></a>
 </div>

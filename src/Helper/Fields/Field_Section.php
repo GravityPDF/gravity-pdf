@@ -131,7 +131,7 @@ class Field_Section extends Helper_Abstract_Fields {
 		$html .= '</div>';
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_section_break_html/ for more information about this filter
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_field_section_break_html/ for more information about this filter
 		 *
 		 * @since 4.1
 		 */

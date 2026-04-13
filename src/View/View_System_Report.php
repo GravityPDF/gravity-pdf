@@ -80,7 +80,7 @@ class View_System_Report extends Helper_Abstract_View {
 		$output .= ( $memory >= 128 ) ? $this->markup_yes : $this->markup_warning;
 		if ( $memory < 128 ) {
 			$output .= '<br />';
-			$output .= sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %1$sFind out how to increase this limit%2$s.', 'gravity-pdf' ), '<br /><a href="https://docs.gravitypdf.com/v6/users/increasing-memory-limit">', '</a>' );
+			$output .= sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %1$sFind out how to increase this limit%2$s.', 'gravity-pdf' ), '<br /><a href="https://docs.gravitypdf.com/users/increasing-memory-limit">', '</a>' );
 		}
 
 		return $output;
@@ -108,7 +108,7 @@ class View_System_Report extends Helper_Abstract_View {
 
 		if ( ! $is_protected ) {
 			$output .= ' ' . sprintf( esc_html__( "We've detected the PDFs saved in Gravity PDF's %1\$stmp%2\$s directory can be publicly accessed.", 'gravity-pdf' ), '<code>', '</code>' );
-			$output .= ' ' . sprintf( esc_html__( 'We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the folder outside your public website directory%4$s.', 'gravity-pdf' ), '<code>', '</code>', '<a href="https://docs.gravitypdf.com/v6/developers/filters/gfpdf_tmp_location/">', '</a>' );
+			$output .= ' ' . sprintf( esc_html__( 'We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the folder outside your public website directory%4$s.', 'gravity-pdf' ), '<code>', '</code>', '<a href="https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/">', '</a>' );
 		}
 
 		return $output;
@@ -140,7 +140,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @since 6.0
 	 */
 	public function get_template_upgrade_message(): string {
-		$learn_more_url = 'https://docs.gravitypdf.com/v6/developers/template-hierarchy';
+		$learn_more_url = 'https://docs.gravitypdf.com/developers/template-hierarchy';
 
 		return $this->markup_warning . ' <a href="' . $learn_more_url . '">' . esc_html__( 'Learn how to update', 'gravity-pdf' ) . '</a>';
 	}

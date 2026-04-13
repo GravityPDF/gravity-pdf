@@ -321,7 +321,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$settings = $is_temp ? (array) $tmp_settings : get_option( 'gfpdf_settings', [] );
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_settings/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_settings/ for more details about this filter */
 		$settings = apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
 
 		/* Ensure $settings is an array and has not been corrupted somehow */
@@ -457,7 +457,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$pdf = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', esc_html__( 'You must pass in a valid PDF ID', 'gravity-pdf' ) );
 
 			if ( ! is_wp_error( $pdf ) ) {
-				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_config/ for more details about these filters */
+				/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_config/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_pdf_config', $pdf, $form_id );
 				$pdf = apply_filters( 'gfpdf_pdf_config_' . $form_id, $pdf, $form_id );
 
@@ -494,7 +494,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$pdf['id']     = ( isset( $pdf['id'] ) ) ? $pdf['id'] : uniqid();
 			$pdf['active'] = ( isset( $pdf['active'] ) ) ? $pdf['active'] : true;
 
-			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_add_pdf/ for more details about these filters */
+			/* See https://docs.gravitypdf.com/developers/filters/gfpdf_form_add_pdf/ for more details about these filters */
 			$pdf = apply_filters( 'gfpdf_form_add_pdf', $pdf, $form_id );
 			$pdf = apply_filters( 'gfpdf_form_add_pdf_' . $form_id, $pdf, $form_id );
 
@@ -567,7 +567,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( $filters ) {
 				$this->log->notice( 'Run PDF Update Filters' );
 
-				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_update_pdf/ for more details about these filters */
+				/* See https://docs.gravitypdf.com/developers/filters/gfpdf_form_update_pdf/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_form_update_pdf', $pdf, $form_id, $pdf_id );
 				$pdf = apply_filters( 'gfpdf_form_update_pdf_' . $form_id, $pdf, $form_id, $pdf_id );
 			}
@@ -694,7 +694,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$value = ( ! empty( $gfpdf_options[ $key ] ) ) ? $gfpdf_options[ $key ] : $fallback;
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_option/ for more details about these filters */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_option/ for more details about these filters */
 		$value = apply_filters( 'gfpdf_get_option', $value, $key, $fallback );
 		$value = apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $fallback );
 
@@ -735,7 +735,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* First let's grab the current settings */
 		$options = get_option( 'gfpdf_settings', [] );
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_update_option/ for more details about these filters */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_update_option/ for more details about these filters */
 		$value = apply_filters( 'gfpdf_update_option', $value, $key );
 		$value = apply_filters( 'gfpdf_update_option_' . $key, $value, $key );
 
@@ -823,7 +823,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 		}
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_capabilities/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_capabilities/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_capabilities', $capabilities );
 	}
@@ -1163,7 +1163,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/*
 			 * General filter
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
+			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
 			 */
 			$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize', $input[ $key ], $key, $input, $settings[ $key ] );
 
@@ -1171,7 +1171,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				/*
 				 * Field type specific filter
 				 *
-				 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
+				 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
 				 */
 				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[ $key ] );
 			}

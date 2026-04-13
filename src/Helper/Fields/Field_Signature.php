@@ -134,7 +134,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 			if ( $signature_details !== false ) {
 				$optimised_width = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
 
-				/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_signature_width/ for more details about this filter */
+				/* See https://docs.gravitypdf.com/developers/filters/gfpdf_signature_width/ for more details about this filter */
 				$optimised_width = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );
 
 				$optimised_height = $signature_details[1] / 3;
