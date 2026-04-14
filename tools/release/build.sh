@@ -24,18 +24,18 @@ git archive HEAD ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
 tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm -f ${PACKAGE_DIR}/package.tar.gz
 
 # Run Build
-yarn install --frozen-lockfile --cwd ${PACKAGE_DIR}
-yarn --cwd ${PACKAGE_DIR} build
+#yarn install --frozen-lockfile --cwd ${PACKAGE_DIR}
+#yarn --cwd ${PACKAGE_DIR} build
 
 # Install all dependencies (including dev)
 # Prefix will run as post-install command script - Requires php-scoper from dev dependencies
-composer install --prefer-dist --working-dir ${PACKAGE_DIR}
+#composer install --prefer-dist --working-dir ${PACKAGE_DIR}
 
 # Run vendor cleanup - Ensures that there's no dev dependencies on production
-PLUGIN_DIR="$PACKAGE_DIR" bash ./tools/scoper/cleanup.sh
+#PLUGIN_DIR="$PACKAGE_DIR" bash ./tools/scoper/cleanup.sh
 
 # Cleanup Node JS
-rm -f -R ${PACKAGE_DIR}/node_modules
+#rm -f -R ${PACKAGE_DIR}/node_modules
 
 # Cleanup additional build files
 FILES=(
@@ -52,13 +52,16 @@ FILES=(
 ".browserslistrc"
 )
 
+echo "$PWD"
 for i in "${FILES[@]}"
 do
+  echo "${PACKAGE_DIR}/${i}"
     rm -f "${PACKAGE_DIR}/${i}"
 done
 
 rm -f -R "${PACKAGE_DIR}/tmp"
 rm -f -R "${PACKAGE_DIR}/tools"
+rm -f -R "${PACKAGE_DIR}/.claude"
 
 # Generate language files
 cd "${PACKAGE_DIR}"

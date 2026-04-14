@@ -71,7 +71,7 @@
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
-    "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json"
+    "prebuild:core-fonts": "bash tools/release/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json"
   },
   "resolutions": {
     "sprintf-js": "1.1.3",
