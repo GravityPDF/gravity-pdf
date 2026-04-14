@@ -8,7 +8,7 @@ Author URI: https://blueliquiddesigns.com.au
 Plugin URI: https://gravitypdf.com
 Update URI: https://gravitypdf.com
 Text Domain: gravity-pdf
-Domain Path: /src/assets/languages
+Domain Path: /languages
 Requires at least: 5.3
 Requires PHP: 7.3
 License: GPL-2.0
@@ -149,7 +149,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		public function plugins_loaded() {
 
 			/* Register language files early so startup errors can be translated */
-			load_plugin_textdomain( 'gravity-pdf', false, dirname( plugin_basename( __FILE__ ) ) . '/src/assets/languages/' );
+			load_plugin_textdomain( 'gravity-pdf', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 			/* Notify administrator current version is not canonical */
 			if ( ! is_file( __DIR__ . '/gravity-pdf-updater.php' ) ) {

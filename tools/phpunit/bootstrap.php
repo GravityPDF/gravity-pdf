@@ -88,7 +88,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * @since 6.3
 	 */
 	public function mocks() {
-		require_once 'unit-tests/Mocks/zapier-mock.php';
+		require_once __DIR__ . '/Mocks/zapier-mock.php';
 	}
 
 	/**
@@ -147,7 +147,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		];
 
 		foreach ( $forms as $json ) {
-			$form                                 = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
+			$form                                 = json_decode( trim( file_get_contents( __DIR__ . '/unit-tests/json/' . $json ) ), true );
 			$form_id                              = GFAPI::add_form( $form );
 			$this->form[ substr( $json, 0, -5 ) ] = GFAPI::get_form( $form_id );
 		}
@@ -162,7 +162,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		];
 
 		foreach ( $entries as $id => $json ) {
-			$entries   = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
+			$entries   = json_decode( trim( file_get_contents( __DIR__ . '/../../tests/phpunit/unit-tests/json/' . $json ) ), true );
 			$entry_ids = GFAPI::add_entries( $entries, $this->form[ $id ]['id'] );
 
 			/* Loop through our new entry IDs and get the actual entries */

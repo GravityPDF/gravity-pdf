@@ -6,8 +6,16 @@
     "phpcs:lint": "./vendor/bin/phpcs --standard=./tools/phpcs/config.xml",
     "phpcs:fix": "./vendor/bin/phpcbf --standard=./tools/phpcs/config.xml",
     "phpcs:compatibility": "./vendor/bin/phpcs --standard=./tools/phpcs/config-php-compatibility.xml",
-    "prefix": "bash ./tools/scoper/prefix.sh",
-    "post-install-cmd": "@composer prefix"
+    "release": "bash ./tools/release/build.sh",
+    "translate": "bash ./tools/potomatic/translate.sh",
+    "prefix": "bash ./tools/php-scoper/prefix.sh",
+    "post-install-cmd": [
+      "@composer prefix",
+      "yarn && yarn build"
+    ],
+    "post-update-cmd": [
+      "@composer prefix"
+    ]
   },
   "repositories": [
     {
