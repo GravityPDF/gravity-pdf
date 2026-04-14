@@ -308,7 +308,7 @@ export class FontListItems extends Component {
 	/**
 	 * Handle the process of selecting and deselecting of font type/name (radio button)
 	 *
-	 * @param { Event & { target: InputEvent } } e
+	 * @param { Event } e
 	 *
 	 * @since 6.0
 	 */

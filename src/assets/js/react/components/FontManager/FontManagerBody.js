@@ -279,8 +279,8 @@ export class FontManagerBody extends Component {
 	/**
 	 * Listen to font name input box field change
 	 *
-	 * @param { Event & { target: InputEvent } } e
-	 * @param { string }                         state
+	 * @param { Event }  e
+	 * @param { string } state
 	 * @since 6.0
 	 */
 	handleInputChange = (e, state) => {

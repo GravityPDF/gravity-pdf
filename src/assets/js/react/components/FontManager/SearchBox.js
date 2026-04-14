@@ -96,7 +96,7 @@ export class SearchBox extends Component {
 	/**
 	 * Listen to search box input field change
 	 *
-	 * @param { Event & { target: InputEvent } } e
+	 * @param { Event } e
 	 *
 	 * @since 6.0
 	 */

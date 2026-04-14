@@ -29,7 +29,19 @@ module.exports = {
 	rules: {
 		'no-alert': 'off',
 		'jest/no-done-callback': 'off',
-		camelcase: 'off',
+		'camelcase': 'off',
 		'jsdoc/empty-tags': ['off', { tags: ['package'] }],
+    '@typescript-eslint/no-unused-vars': 'off'
 	},
+  settings: {
+    jsdoc: {
+      mode: 'closure',
+    },
+    "import/resolver": {
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+      "typescript": {}
+    }
+  },
 };
