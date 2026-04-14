@@ -16,9 +16,10 @@ yarn build        # Production webpack build
 yarn test:js      # Run Jest unit tests
 yarn test:js -- tests/js-unit/react/sagas/fontManager.test.js  # Run single test file
 yarn test:js -- --testNamePattern="test name"                   # Run single test by name
-yarn lint:js      # ESLint check
-yarn lint:css     # Sass/CSS lint check
-yarn format       # Auto-fix JS/CSS/PHP formatting
+yarn lint:js        # ESLint check
+yarn lint:js --fix  # Auto-fix ESLint errors (e.g. JSDoc alignment)
+yarn lint:css       # Sass/CSS lint check
+yarn format         # Auto-fix JS/CSS/PHP formatting
 ```
 
 ### PHP
@@ -80,7 +81,7 @@ Legacy jQuery code coexists with the React app; they are separate bundles and do
 
 - **PHP tests**: `tests/phpunit/` mirrors `src/` structure. Extends `WP_UnitTestCase`. Mock data in `tests/phpunit/unit-tests/Mocks/`.
 - **JS tests**: `tests/js-unit/` mirrors React source structure. Uses Jest + Enzyme. Coverage threshold: 75%.
-- **E2E tests**: `tests/e2e/` uses TestCafe against a running WordPress instance.
+- **E2E tests (Playwright)**: `yarn test:e2e:playwright` — config at `tools/playwright/config.ts`. Use `yarn test:e2e:playwright:debug` for the interactive UI mode.
 
 ### Key Constraints
 
