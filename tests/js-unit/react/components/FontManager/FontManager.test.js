@@ -11,8 +11,6 @@ describe('FontManager - FontManager.js', () => {
 		params: {
 			id: '1',
 		},
-		fontList: [],
-		selectedFont: '',
 	};
 
 	beforeEach(() => {

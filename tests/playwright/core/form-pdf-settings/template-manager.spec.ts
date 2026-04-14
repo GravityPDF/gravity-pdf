@@ -29,12 +29,15 @@ test.describe('Template Manager', () => {
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 
-		const select = page.getByRole('group', {name: 'General'})
-			.getByLabel('Template', {exact: true});
+		const select = page
+			.getByRole('group', { name: 'General' })
+			.getByLabel('Template', { exact: true });
 
 		await expect(select).toBeVisible();
 		await page.locator('[data-test="component-templateButton"]').click();
-		await expect(page.getByRole('heading', { name: 'Installed PDFs' })).toBeVisible();
+		await expect(
+			page.getByRole('heading', { name: 'Installed PDFs' })
+		).toBeVisible();
 	});
 
 	test('should display default core templates', async ({ page }) => {
@@ -79,12 +82,18 @@ test.describe('Template Manager', () => {
 
 		// Search
 		await page.locator('#wp-filter-search-input').fill('rubix');
-		await expect(page.locator('[data-test=component-templateListItem]')).toHaveCount(1);
-		await expect(page.locator('[data-test=component-name]')).toHaveText('Rubix');
+		await expect(
+			page.locator('[data-test=component-templateListItem]')
+		).toHaveCount(1);
+		await expect(page.locator('[data-test=component-name]')).toHaveText(
+			'Rubix'
+		);
 
 		// Upload
 		await page
-			.locator('[data-test=component-templateUploader] input[type="file"]')
+			.locator(
+				'[data-test=component-templateUploader] input[type="file"]'
+			)
 			.setInputFiles(path.join(resourcesPath, 'test-template.zip'));
 
 		// @TODO - caching issue after installing a new template...
@@ -94,9 +103,7 @@ test.describe('Template Manager', () => {
 		).toBeVisible();
 
 		// Template Details
-		await page
-			.getByText('Template Details')
-			.click();
+		await page.getByText('Template Details').click();
 
 		await expect(page.locator('.theme-name.current')).toHaveText(
 			'Test Template'
@@ -122,7 +129,9 @@ test.describe('Template Manager', () => {
 		).not.toBeVisible();
 	});
 
-	test('should be able to close template manager popup button', async ({ page }) => {
+	test('should be able to close template manager popup button', async ({
+		page,
+	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 		await page.locator('[data-test="component-templateButton"]').click();
 
@@ -131,7 +140,9 @@ test.describe('Template Manager', () => {
 		await expect(popup).not.toBeVisible();
 	});
 
-	test('should be able to close template manager popup escape', async ({ page }) => {
+	test('should be able to close template manager popup escape', async ({
+		page,
+	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 		await page.locator('[data-test="component-templateButton"]').click();
 

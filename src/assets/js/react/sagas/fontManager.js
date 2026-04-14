@@ -155,8 +155,8 @@ export function* watchEditFont() {
 /**
  * Generate response for edit font request
  *
- * @param {Object}                                                                                                   params
- * @param {{ id: string, font: { label: string, regular?: File, italics?: File, bold?: File, bolditalics?: File } }} params.payload
+ * @param {Object}                                                                                                                           params
+ * @param {{ id: string, font: { label: string, regular: string|File, italics: string|File, bold: string|File, bolditalics: string|File } }} params.payload
  *
  * @since 6.0
  */
