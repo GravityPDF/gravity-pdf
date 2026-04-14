@@ -3,22 +3,11 @@
   "license": "GPL-2.0-or-later",
   "homepage": "https://gravitypdf.com",
   "scripts": {
-    "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
-    "lint:fix": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
-    "lint:compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
-    "prefix": "bash ./bin/vendor-prefix.sh",
+    "phpcs:lint": "./vendor/bin/phpcs --standard=./tools/phpcs/config.xml",
+    "phpcs:fix": "./vendor/bin/phpcbf --standard=./tools/phpcs/config.xml",
+    "phpcs:compatibility": "./vendor/bin/phpcs --standard=./tools/phpcs/config-php-compatibility.xml",
+    "prefix": "bash ./tools/scoper/prefix.sh",
     "post-install-cmd": "@composer prefix"
-  },
-  "config": {
-    "preferred-install": "dist",
-    "autoloader-suffix": "GravityPDFPlugin",
-    "platform": {
-      "php": "7.3.0"
-    },
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true,
-      "composer/installers": false
-    }
   },
   "repositories": [
     {
@@ -28,7 +17,10 @@
 
     {
       "type": "composer",
-      "url": "https://composer.gravity.io"
+      "url": "https://composer.gravity.io",
+      "only": [
+        "gravity/*"
+      ]
     }
   ],
   "require": {
@@ -38,15 +30,14 @@
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
     "gravitypdf/querypath": "^4.0",
-    "gravitypdf/upload": "^3.0",
-    "roots/wordpress-full": "7.0.0-beta5"
+    "gravitypdf/upload": "^3.0"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
     "wp-coding-standards/wpcs": "^3.0.0",
     "phpcompatibility/phpcompatibility-wp": "*",
     "roave/security-advisories": "dev-master",
-    "yoast/phpunit-polyfills": "^3.0",
+    "yoast/phpunit-polyfills": "^4.0",
     "wp-phpunit/wp-phpunit": "^6.4",
     "humbug/php-scoper": "^0.15.0",
     "gravity/gravityforms": "*",
@@ -64,5 +55,16 @@
     "classmap": [
       "vendor_prefixed/"
     ]
+  },
+  "config": {
+    "preferred-install": "dist",
+    "autoloader-suffix": "GravityPDFPlugin",
+    "platform": {
+      "php": "7.3.0"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "composer/installers": false
+    }
   }
 }

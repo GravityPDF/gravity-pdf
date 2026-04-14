@@ -28,9 +28,9 @@ export default class GravityForms {
 	/*
 	 * Form management
 	 */
-	async createForm(title: string) {
+	async createForm(title: string, type: string = 'standard.json') {
 		const formJson: string = await readFile(
-			__dirname + '/../data/forms/standard.json',
+			__dirname + '/../data/forms/' + type,
 			'utf8'
 		);
 
@@ -80,6 +80,11 @@ export default class GravityForms {
 		);
 	}
 
+	async saveFormEditor() {
+		await this.page.getByRole('button', { name: 'Save Form' }).click();
+		await this.page.waitForTimeout(3500);
+	}
+
 	async navigateToFormSettingsById(formId: number, subview = '') {
 		await this.admin.visitAdminPage(
 			'admin.php',
@@ -126,23 +131,14 @@ export default class GravityForms {
 			`subview=notification&page=gf_edit_forms&view=settings&id=${formId}`
 		);
 
-		await this.page.getByRole('link', { name: 'Add New' }).click();
+		await this.page.getByRole('link', {name: 'Add New'}).click();
 
-		await this.page
-			.getByRole('textbox', { name: 'Name' })
-			.first()
-			.fill(name);
-		await this.page
-			.getByRole('textbox', { name: 'Send To Email' })
-			.fill('hi@example.com');
-		await this.page
-			.getByRole('textbox', { name: 'Subject' })
-			.fill('Subject');
+		await this.page.getByRole('textbox', {name: 'Name'}).first().fill(name);
+		await this.page.getByRole('textbox', {name: 'Send To Email'}).fill('hi@example.com');
+		await this.page.getByRole('textbox', {name: 'Subject'}).fill('Subject');
 		await this.setRichTextContent('#gform_setting_message', 'Message');
 
-		await this.page
-			.getByRole('button', { name: 'Update Notification' })
-			.click();
+		await this.page.getByRole('button', {name: 'Update Notification'}).click();
 	}
 
 	async setRichTextContent(
@@ -165,7 +161,7 @@ export default class GravityForms {
 			: textbox.pressSequentially(content));
 	}
 
-	async saveForm() {
+	async submitForm() {
 		await this.page
 			.getByRole('button', { name: /(save|submit)/i })
 			.last()

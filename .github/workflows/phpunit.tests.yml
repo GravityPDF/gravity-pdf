@@ -14,28 +14,14 @@ env:
   GF_LICENSE: ${{ secrets.GF_LICENSE }}
 
 jobs:
-  # Runs the PHPUnit tests for WordPress.
-  #
-  # Performs the following steps:
-  # - Set environment variables.
-  # - Sets up the environment variables needed for testing with memcached (if desired).
-  # - Downloads the built WordPress artifact from the previous job.
-  # - Unzips the artifact.
-  # - Installs NodeJS
-  # - Sets up caching for NPM.
-  # _ Installs NPM dependencies using install-changed to hash the `package.json` file.
-  # - Configures caching for Composer.
-  # _ Installs Composer dependencies (if desired).
-  # - Logs Docker debug information (about both the Docker installation within the runner).
-  # - Starts the WordPress Docker container.
-  # - Starts the memcached server after the Docker network has been created (if desired).
-  # - Logs WordPress Docker container debug information.
-  # - Logs debug general information.
-  # - Logs the running Docker containers.
-  # - Logs debug information about what's installed within the WordPress Docker containers.
-  # - Install WordPress within the Docker container.
-  # - Run the PHPUnit tests.
-  # - Reports test results to the Distributed Hosting Tests.
+  # Only run this action if a Pull Request contains the label 'run-tests'
+  check_for_string_in_pull_request_comment:
+    name: Should workflow run?
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests') }}
+        uses: action-pack/cancel@v1
+
   test-php:
     name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -63,33 +49,17 @@ jobs:
           echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      # Docs: https://github.com/shivammathur/setup-php
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v4
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-      
 
       - name: Log debug information
         run: |
@@ -104,28 +74,19 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
+          composer install --no-progress --no-ansi --no-interaction
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install JS Dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ ! matrix.report }}
-        run: |
-          yarn wp-env start
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn wp-env:integration start --debug
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ matrix.report }}
-        run: |
-          PHP_ENABLE_XDEBUG=true yarn wp-env start
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn wp-env:integration start --xdebug=debug
 
       - name: Run PHPUnit tests
         if: ${{ ! matrix.multisite }}
@@ -146,10 +107,10 @@ jobs:
           yarn run test:php --group ajax --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage2.xml
 
       - name: Code Coverage Upload
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         if: ${{ matrix.report }}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          files: tmp/coverage/report-xml/php-coverage1.xml
+          directory: tmp/coverage/report-xml
 

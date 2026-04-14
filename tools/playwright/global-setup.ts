@@ -1,17 +1,14 @@
-import { request } from '@playwright/test';
-import type { FullConfig } from '@playwright/test';
-import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import { test as setup } from '@playwright/test';
 
-async function globalSetup(config: FullConfig) {
-	const { storageState, baseURL } = config.projects[0].use;
-	const storageStatePath =
-		typeof storageState === 'string' ? storageState : undefined;
+setup('setup', async ({ request }, testInfo) => {
 
-	const requestContext = await request.newContext({
-		baseURL,
-	});
+	const storageStatePath = testInfo.project.metadata.storageStatePath as string;
 
-	const requestUtils = new RequestUtils(requestContext, {
+	process.env.WP_BASE_URL = testInfo.project.use.baseURL as string;
+	process.env.STORAGE_STATE_PATH = storageStatePath;
+
+	const { RequestUtils } = await import('@wordpress/e2e-test-utils-playwright');
+	const requestUtils = new RequestUtils(request, {
 		storageStatePath,
 	});
 
@@ -20,14 +17,11 @@ async function globalSetup(config: FullConfig) {
 
 	// Reset the test environment before running the tests.
 	await Promise.all([
+		requestUtils.activatePlugin('gravity-forms'),
+		requestUtils.activatePlugin('gravity-pdf'),
 		requestUtils.activateTheme('twentytwentyfive'),
-		// Disable this test plugin as it's conflicting with some of the tests.
 		requestUtils.deleteAllPosts(),
 		requestUtils.deleteAllBlocks(),
-		requestUtils.resetPreferences(),
+		requestUtils.resetPreferences()
 	]);
-
-	await requestContext.dispose();
-}
-
-export default globalSetup;
+});
