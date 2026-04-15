@@ -11,36 +11,55 @@ Gravity PDF is a WordPress plugin that generates PDF documents from Gravity Form
 ### JavaScript
 
 ```bash
-yarn dev          # Start webpack dev server with hot reload
-yarn build        # Production webpack build
-yarn test:js      # Run Jest unit tests
+yarn dev              # Start webpack dev server with hot reload
+yarn dev:build        # One-shot webpack build without watching
+yarn build            # Production webpack build
+yarn test:js          # Run Jest unit tests
+yarn test:js:watch    # Run Jest in watch mode
 yarn test:js -- tests/js-unit/react/sagas/fontManager.test.js  # Run single test file
 yarn test:js -- --testNamePattern="test name"                   # Run single test by name
-yarn lint:js        # ESLint check
-yarn lint:js --fix  # Auto-fix ESLint errors (e.g. JSDoc alignment)
-yarn lint:css       # Sass/CSS lint check
-yarn format         # Auto-fix JS/CSS/PHP formatting
+yarn lint:js          # ESLint check
+yarn lint:js --fix    # Auto-fix ESLint errors (e.g. JSDoc alignment)
+yarn lint:css         # Sass/CSS lint check
+yarn format           # Auto-fix JS/CSS/PHP formatting
 ```
 
 ### PHP
 
 ```bash
-npm run test:php                           # Run PHPUnit in Docker (wp-env required)
-npm run test:php -- --filter TestClassName # Run single test class
-npm run test:php -- --filter testMethod    # Run single test method
-npm run test:php:multisite                 # Run multisite PHPUnit tests
+yarn test:php                           # Run PHPUnit in Docker (`yarn wp-env:integration start` required)
+yarn test:php -- --filter TestClassName # Run single test class
+yarn test:php -- --filter testMethod    # Run single test method
+yarn test:php:multisite                 # Run multisite PHPUnit tests
 composer lint                              # PHPCS check
 composer lint:fix                          # PHPCS auto-fix
 ```
 
-PHP tests run inside a Docker container via `wp-env` — you cannot run PHPUnit directly. Start the environment first with `yarn wp-env start`.
+PHP tests run inside a Docker container via `wp-env` — you cannot run PHPUnit directly. Start the environment first with `yarn wp-env:integration start`.
+
+### E2E Tests (Playwright)
+
+```bash
+yarn wp-env:e2e start && yarn wp-env:e2e:permalinks start   # Start dedicated E2E environment (port 8702 and 8703)
+yarn test:e2e                                               # Run all Playwright tests (headless)
+yarn test:e2e:debug                                         # Open Playwright UI for interactive debugging
+```
+
+E2E tests live in `tests/playwright/` and are split into two projects:
+- `core/` — tests against the standard environment (port 8702, plain permalinks)
+- `permalinks/` — tests against an environment with pretty permalinks (port 8703, started automatically)
+
+Artifacts (screenshots, traces) are written to `tmp/artifacts/`.
 
 ### Environment
 
 ```bash
-yarn wp-env start   # Start Docker WordPress dev environment
-yarn wp-env stop    # Stop Docker environment
-yarn start          # Start environment + hot reload dev server
+yarn wp-env start                 # Start dev environment (port 8700)
+yarn wp-env:integration start     # Start PHP test environment (port 8701)
+yarn wp-env:e2e start             # Start E2E test environment (port 8702)
+yarn wp-env:e2e:permalinks start  # Start E2E test environment with pretty permalinks enabled (port 8703)
+yarn wp-env stop                  # Stop the default dev environment
+yarn start                        # Start dev environment + hot reload dev server
 ```
 
 ## Architecture
@@ -81,11 +100,12 @@ Legacy jQuery code coexists with the React app; they are separate bundles and do
 
 - **PHP tests**: `tests/phpunit/` mirrors `src/` structure. Extends `WP_UnitTestCase`. Mock data in `tests/phpunit/unit-tests/Mocks/`.
 - **JS tests**: `tests/js-unit/` mirrors React source structure. Uses Jest + Enzyme. Coverage threshold: 75%.
-- **E2E tests (Playwright)**: `yarn test:e2e:playwright` — config at `tools/playwright/config.ts`. Use `yarn test:e2e:playwright:debug` for the interactive UI mode.
+- **E2E tests (Playwright)**: `yarn test:e2e` — config at `tools/playwright/config.ts`. Use `yarn test:e2e:playwright` for the interactive UI mode.
 
 ### Key Constraints
 
 - PRs must target the `development` branch (not `main`)
+- Each PR should contain a single commit
 - Minimum PHP 7.3 compatibility required
 - jQuery is an external (provided by WordPress); never bundle it
 - Run `composer prefix` after adding new Composer dependencies to namespace them via php-scoper
