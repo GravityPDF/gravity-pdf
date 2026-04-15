@@ -74,7 +74,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 
-		$fonts = glob( dirname( __FILE__ ) . '/fonts/' . '*.[tT][tT][fF]' );
+		$fonts = glob( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . '*.[tT][tT][fF]' );
 		$fonts = ( is_array( $fonts ) ) ? $fonts : [];
 
 		foreach ( $fonts as $font ) {

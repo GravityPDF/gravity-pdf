@@ -23,9 +23,5 @@
     "tests": {
       "port": 8703
     }
-  },
-  "lifecycleScripts": {
-    "afterStart": "yarn wp-env:integration run cli wp plugin activate gravityforms gravityformspolls gravityformsquiz gravityformssurvey gravity-pdf",
-    "afterReset": "yarn wp-env:integration run cli wp plugin activate gravityforms gravityformspolls gravityformsquiz gravityformssurvey gravity-pdf"
   }
 }

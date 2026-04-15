@@ -17,7 +17,7 @@ function auth_redirect() {
 }
 
 /* Define custom config to override the URL used for the test site */
-define( 'WP_TESTS_CONFIG_FILE_PATH', '/var/www/html/wp-content/plugins/gravity-pdf/tests/phpunit/wp-tests-config.php' );
+define( 'WP_TESTS_CONFIG_FILE_PATH', '/var/www/html/wp-content/plugins/gravity-pdf/tools/phpunit/wp-tests-config.php' );
 
 /**
  * Gravity PDF Unit Tests Bootstrap
@@ -147,7 +147,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		];
 
 		foreach ( $forms as $json ) {
-			$form                                 = json_decode( trim( file_get_contents( __DIR__ . '/unit-tests/json/' . $json ) ), true );
+			$form                                 = json_decode( trim( file_get_contents( __DIR__ . '/data/forms/' . $json ) ), true );
 			$form_id                              = GFAPI::add_form( $form );
 			$this->form[ substr( $json, 0, -5 ) ] = GFAPI::get_form( $form_id );
 		}
@@ -162,7 +162,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		];
 
 		foreach ( $entries as $id => $json ) {
-			$entries   = json_decode( trim( file_get_contents( __DIR__ . '/../../tests/phpunit/unit-tests/json/' . $json ) ), true );
+			$entries   = json_decode( trim( file_get_contents( __DIR__ . '/data/entries/' . $json ) ), true );
 			$entry_ids = GFAPI::add_entries( $entries, $this->form[ $id ]['id'] );
 
 			/* Loop through our new entry IDs and get the actual entries */
