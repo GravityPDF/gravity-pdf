@@ -74,9 +74,10 @@ jobs:
       - name: Install / Setup Gravity PDF + WordPress
         run: |
           yarn wp-env:e2e start --debug
+          yarn wp-env:e2e:permalinks start --debug
 
       - name: Run the tests
-        run: yarn test:e2e:playwright:headless
+        run: yarn test:e2e
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
 
