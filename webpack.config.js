@@ -3,7 +3,6 @@ const { resolve } = require('path');
 
 module.exports = {
 	...defaultConfig,
-	devtool: 'source-map',
 	entry: {
 		'app.bundle': './src/assets/js/react/gfpdf-main.js',
 		'gfpdf-entries': './src/assets/js/legacy/gfpdf-entries.js',
