@@ -117,9 +117,45 @@ test.describe('Form PDF Settings', () => {
 			await expect(
 				pdf.page.locator('#gfpdf-settings-field-wrapper-conditional')
 			).toHaveScreenshot();
-		});
 
-		// @TODO - verify conditional logic works
+			// Entry 1: Radio = "Second Choice" → PDF hidden by conditional logic
+			const entry1 = await pdf.createEntry({
+				form_id: form.id,
+				1: 'Second Choice',
+			});
+
+			await pdf.navigateToEntryList(form.id);
+			await expect(
+				pdf.page.getByRole('link', { name: 'View PDF' })
+			).not.toBeAttached();
+
+			await pdf.navigateToEntryDetail(entry1.form_id, entry1.id);
+			await expect(
+				pdf.page.getByRole('link', { name: 'View', exact: true })
+			).not.toBeAttached();
+			await expect(
+				pdf.page.getByRole('link', { name: 'Download', exact: true })
+			).not.toBeAttached();
+
+			// Entry 2: Radio = "First Choice" → PDF passes conditional logic
+			const entry2 = await pdf.createEntry({
+				form_id: form.id,
+				1: 'First Choice',
+			});
+
+			await pdf.navigateToEntryList(form.id);
+			await expect(
+				pdf.page.getByRole('link', { name: 'View PDF' })
+			).toBeAttached();
+
+			await pdf.navigateToEntryDetail(entry2.form_id, entry2.id);
+			await expect(
+				pdf.page.getByRole('link', { name: 'View', exact: true })
+			).toBeAttached();
+			await expect(
+				pdf.page.getByRole('link', { name: 'Download', exact: true })
+			).toBeAttached();
+		});
 	});
 
 	test.describe('Appearance', () => {
