@@ -41,14 +41,20 @@ describe('FontManager - FontVariant.js', () => {
 			const wrapper = mount(
 				<FontVariant {...props} fontStyles={{ regular: '' }} />
 			);
-			const component = findByTestAttr(wrapper, 'component-FontVariant-add');
+			const component = findByTestAttr(
+				wrapper,
+				'component-FontVariant-add'
+			);
 
 			expect(component.length).toBe(1);
 		});
 
 		test('render delete input field', () => {
 			const wrapper = mount(<FontVariant {...props} />);
-			const component = findByTestAttr(wrapper, 'component-FontVariant-delete');
+			const component = findByTestAttr(
+				wrapper,
+				'component-FontVariant-delete'
+			);
 
 			expect(component.length).toBe(4);
 		});

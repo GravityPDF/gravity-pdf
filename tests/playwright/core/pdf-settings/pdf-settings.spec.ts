@@ -3,7 +3,7 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
-import * as path from "node:path";
+import * as path from 'node:path';
 
 test.describe('Form PDF Settings', () => {
 	let pdf = null;

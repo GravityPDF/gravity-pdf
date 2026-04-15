@@ -22,11 +22,11 @@
   "testsEnvironment": false,
   "env": {
     "tests": {
-      "port": 8702
+      "port": 8703
     }
   },
   "lifecycleScripts": {
-    "afterStart": "rm -R ./tmp/artifacts || true && yarn wp-env:e2e run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e run cli wp rewrite structure '' --hard",
-    "afterReset": "rm -R ./tmp/artifacts || true && yarn wp-env:e2e run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e run cli wp rewrite structure '' --hard"
+    "afterStart": "rm -R ./tmp/artifacts || true && yarn wp-env:e2e:permalinks run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e:permalinks run cli wp rewrite structure '/%postname%/' --hard",
+    "afterReset": "rm -R ./tmp/artifacts || true && yarn wp-env:e2e:permalinks run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e:permalinks run cli wp rewrite structure '/%postname%/' --hard"
   }
 }

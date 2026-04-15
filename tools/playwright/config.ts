@@ -9,7 +9,7 @@ const config = defineConfig({
 	...baseConfig,
 
 	fullyParallel: true,
-	workers: 1,
+	workers: 4,
 	quiet: !!process.env.CI,
 	maxFailures: process.env.CI ? 5 : 0,
 
@@ -56,17 +56,49 @@ const config = defineConfig({
 				),
 			},
 		},
+
+		{
+			name: 'setup-core-with-permalinks',
+			testDir: path.join(process.cwd(), 'tools/playwright'),
+			testMatch: /.*global-setup\.ts/,
+			use: {
+				baseURL: 'http://localhost:8703',
+				storageState: { cookies: [], origins: [] },
+			},
+			metadata: {
+				storageStatePath: path.join(
+					process.cwd(),
+					'tmp/artifacts/storage-states/e2e-permalinks.json'
+				),
+			},
+		},
+
 		{
 			name: 'core',
 			dependencies: ['setup-core'],
 			testDir: path.join(process.cwd(), 'tests/playwright'),
-			testMatch: /core\/.*(test|spec).(js|ts|mjs)/,
+			testMatch: /(core|permalinks)\/.*(test|spec).(js|ts|mjs)/,
 			use: {
 				...devices['Desktop Chrome'],
 				baseURL: 'http://localhost:8702',
 				storageState: path.join(
 					process.cwd(),
 					'tmp/artifacts/storage-states/e2e.json'
+				),
+			},
+		},
+
+		{
+			name: 'core-with-permalinks',
+			dependencies: ['setup-core-with-permalinks'],
+			testDir: path.join(process.cwd(), 'tests/playwright'),
+			testMatch: /permalinks\/.*(test|spec).(js|ts|mjs)/,
+			use: {
+				...devices['Desktop Chrome'],
+				baseURL: 'http://localhost:8703',
+				storageState: path.join(
+					process.cwd(),
+					'tmp/artifacts/storage-states/e2e-permalinks.json'
 				),
 			},
 		},

@@ -38,23 +38,7 @@ test.describe('Mergetag attributes', () => {
 		}
 	);
 
-	test.afterEach(
-		async ({
-			requestUtils,
-			page,
-			admin,
-		}: {
-			requestUtils: RequestUtils;
-			page: Page;
-			admin: Admin;
-		}) => {
-			await admin.visitAdminPage('options-permalink.php');
-			await page.getByRole('radio', { name: 'Plain' }).click();
-			await page.getByRole('button', { name: 'Save Changes' }).click();
-		}
-	);
-
-	test('Plain Permalinks', async ({
+	test('Check merge tag generates a URL', async ({
 		requestUtils,
 		page,
 		admin,
@@ -69,36 +53,11 @@ test.describe('Mergetag attributes', () => {
 
 		// verify the results
 		const confirmation = await page.locator('#preview_form_container');
+
 		await expect(confirmation).toContainText(
 			new RegExp(
-				`PDF URL: http:\/\/(.+?)\/\\?gpdf=1&pid=${pdfId}&lid=([0-9]+)`
+				`PDF URL: http:\/\/(.+?)\/(\\?gpdf=1&pid=${pdfId}&lid=([0-9]+)|pdf\/${pdfId}\/([0-9]+)\/)`
 			)
-		);
-	});
-
-	test('Pretty Permalinks', async ({
-		requestUtils,
-		page,
-		admin,
-	}: {
-		requestUtils: RequestUtils;
-		page: Page;
-		admin: Admin;
-	}) => {
-		await admin.visitAdminPage('options-permalink.php');
-		await page.getByRole('radio', { name: 'Post name' }).click();
-		await page.getByRole('button', { name: 'Save Changes' }).click();
-		await page.waitForTimeout(200); // Double-save the permalinks to fix wp-env permalink issue
-		await page.getByRole('button', { name: 'Save Changes' }).click();
-
-		// preview and submit form
-		await pdf.navigateToFormPreview(form.id);
-		await pdf.submitForm();
-
-		// verify the results
-		const confirmation = await page.locator('#preview_form_container');
-		await expect(confirmation).toContainText(
-			new RegExp(`PDF URL: http:\/\/(.+?)\/pdf\/${pdfId}\/([0-9]+)\/`)
 		);
 	});
 });

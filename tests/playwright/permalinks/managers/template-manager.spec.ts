@@ -103,16 +103,21 @@ test.describe('Template Manager', () => {
 			.locator('[data-test="component-templateDetails"]')
 			.click();
 
-		await expect(page.locator('.theme-name')).toContainText(
-			'Test Template'
-		);
+		await expect(
+			page
+				.locator('[data-test="component-name"]')
+				.getByText('Test Template')
+		).toBeAttached();
+
 		await expect(
 			page.locator('[data-test="component-group"]')
 		).toContainText('Custom');
 
 		// Delete
 		page.on('dialog', (dialog) => dialog.accept());
-		await page.getByRole('button', { name: 'Delete' }).click();
+		await page
+			.locator('[data-test="component-templateDeleteButton"]')
+			.click();
 
 		await expect(
 			page.locator('.theme[data-slug="test-template"]')
@@ -138,6 +143,7 @@ test.describe('Template Manager', () => {
 
 		const popup = page.locator('.container.theme-wrap');
 		await page.keyboard.press('Escape');
+		await page.waitForTimeout(300);
 		await expect(popup).not.toBeVisible();
 	});
 });

@@ -3,8 +3,8 @@ import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
-test.describe('{Label:pdf:[id]} Merge Tag', () => {
-	test('Text Confirmation Mergetag Selector', async ({
+test.describe('[gravitypdf] Shortcode', () => {
+	test('Text confirmation', async ({
 		requestUtils,
 		page,
 		admin,
@@ -16,22 +16,17 @@ test.describe('{Label:pdf:[id]} Merge Tag', () => {
 		const pdf = new Pdf(requestUtils, admin, page);
 
 		// setup form and PDF
-		const form = await pdf.createForm('Text Confirmation Mergetag');
-		await pdf.navigateToFormPreview(form.id);
-		await pdf.submitForm();
-		await pdf.createPdf(form.id, 'Text Confirmation Mergetag Document');
+		const form = await pdf.createForm('Text Confirmation');
+		const pdfId = await pdf.createPdf(
+			form.id,
+			'Text Confirmation Document'
+		);
 
 		// setup default confirmation
 		await pdf.navigateToFormConfirmation(form.id);
-
-		// Clear confirmation message and use the mergetag selector
-		await pdf.setRichTextContent('#gform_setting_message', '<a href="');
-		await page.getByRole('button', { name: '' }).click(); // mergetag selector icon
-		await page.getByRole('button', { name: 'Mergetag Document' }).click();
 		await pdf.setRichTextContent(
 			'#gform_setting_message',
-			'">View PDF</a>',
-			true
+			`[gravitypdf id="${pdfId}"]`
 		);
 		await pdf.submitForm();
 
@@ -40,11 +35,11 @@ test.describe('{Label:pdf:[id]} Merge Tag', () => {
 		await pdf.submitForm();
 
 		// verify the results
-		const pdfLink = await page.getByRole('link', { name: 'View PDF' });
+		const pdfLink = page.getByRole('link', { name: 'Download PDF' });
 
 		await pdf.downloadAndVerifyPdf(
 			pdfLink,
-			'Text Confirmation Mergetag Document.pdf'
+			'Text Confirmation Document.pdf'
 		);
 	});
 });

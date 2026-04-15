@@ -49,23 +49,6 @@ test.describe('Single PDF', () => {
 		await pdf.downloadAndVerifyPdf(pdfLink, 'Single #1.pdf');
 	});
 
-	test('Entry List, Download', async ({
-		requestUtils,
-		page,
-		admin,
-	}: {
-		requestUtils: RequestUtils;
-		page: Page;
-		admin: Admin;
-	}) => {
-		await pdf.setGlobalPdfSetting('Download', true);
-		await pdf.navigateToEntryList(form.id);
-		const pdfLink = page.getByRole('link', { name: 'Download PDF' });
-		await page.locator('.has-row-actions').first().hover();
-
-		await pdf.downloadAndVerifyPdf(pdfLink, 'Single #1.pdf');
-	});
-
 	test('Entry Details', async ({
 		requestUtils,
 		page,

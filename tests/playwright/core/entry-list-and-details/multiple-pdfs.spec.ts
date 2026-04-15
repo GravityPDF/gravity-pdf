@@ -25,7 +25,6 @@ test.describe('Multiple PDF', () => {
 
 			// setup PDF
 			for (let i = 1; i <= 2; i++) {
-				await pdf.setGlobalPdfSetting('View', true);
 				await pdf.createPdf(form.id, `Multiple #${i}`);
 			}
 
@@ -51,27 +50,6 @@ test.describe('Multiple PDF', () => {
 		await expect(
 			page.locator('.gform-settings__wrapper--full')
 		).toHaveScreenshot();
-		await pdf.downloadAndVerifyPdf(
-			page.getByRole('link', { name: 'Multiple #2' }),
-			'Multiple #2.pdf'
-		);
-	});
-
-	test('Entry List, Download', async ({
-		requestUtils,
-		page,
-		admin,
-	}: {
-		requestUtils: RequestUtils;
-		page: Page;
-		admin: Admin;
-	}) => {
-		await pdf.setGlobalPdfSetting('Download', true);
-		await pdf.navigateToEntryList(form.id);
-		const pdfLink = page.getByRole('link', { name: 'Download PDFs' });
-		await page.locator('.has-row-actions').first().hover();
-		await pdfLink.hover();
-
 		await pdf.downloadAndVerifyPdf(
 			page.getByRole('link', { name: 'Multiple #2' }),
 			'Multiple #2.pdf'

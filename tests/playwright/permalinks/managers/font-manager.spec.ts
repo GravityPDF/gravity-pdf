@@ -109,7 +109,9 @@ test.describe('Font Manager', () => {
 
 		await page
 			.locator('#gfpdf-font-variant-regular-addFont')
-			.setInputFiles(path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf'));
+			.setInputFiles(
+				path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
+			);
 
 		await page
 			.getByRole('button', { name: 'Add font' })
@@ -146,10 +148,14 @@ test.describe('Font Manager', () => {
 			);
 		await page
 			.locator('#gfpdf-font-variant-bold-updateFont')
-			.setInputFiles(path.join(resourcesPath, 'fonts', 'Roboto-Bold.ttf'));
+			.setInputFiles(
+				path.join(resourcesPath, 'fonts', 'Roboto-Bold.ttf')
+			);
 		await page
 			.locator('#gfpdf-font-variant-bolditalics-updateFont')
-			.setInputFiles(path.join(resourcesPath, 'fonts', 'Roboto-BoldItalic.ttf'));
+			.setInputFiles(
+				path.join(resourcesPath, 'fonts', 'Roboto-BoldItalic.ttf')
+			);
 
 		await updateButton.click();
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
