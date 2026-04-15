@@ -285,6 +285,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			__( 'Download PDF', 'gravity-pdf' )
 		);
 
+		/* translators: %s: PDF name */
 		$aria_label = sprintf( __( 'Copy the %s PDF shortcode to the clipboard', 'gravity-pdf' ), $item['name'] );
 
 		ob_start();
@@ -371,6 +372,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		?>
 
+		<?php /* translators: %s: PDF name */ ?>
 		<a href="<?php echo esc_url( $edit_url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( '%s PDF', 'gravity-pdf' ), $pdf_name ) ); ?>"><strong><?php echo esc_html( $pdf_name ); ?></strong></a>
 		<div class="row-actions">
 
@@ -401,6 +403,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function no_items() {
 		echo '<label>';
+		/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-pdf' ), "<a href='" . esc_url( add_query_arg( [ 'pid' => 0 ] ) ) . "'>", '</a>' );
 		echo '</label>';
 	}
