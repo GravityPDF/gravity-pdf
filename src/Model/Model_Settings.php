@@ -424,7 +424,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return array
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function licensing_bulk_get_version_api_params( $api_params ) {
 		/* Skip if the core updater isn't initialized or there are no addons */
@@ -498,7 +498,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function licensing_bulk_license_check() {
 		$addons = $this->data->addon;
@@ -603,7 +603,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function run_network_update_check() {
 		if ( ! is_multisite() ) {
@@ -637,7 +637,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 4.2
-	 * @deprecated 6.14.0 Moved to Addon framework
+	 * @deprecated 6.15.0 Moved to Addon framework
 	 */
 	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key = '' ) {
 		return $addon->deactivate_license();

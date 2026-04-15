@@ -143,7 +143,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	/**
 	 * Cleanup temporary data
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function remove_plugin_transients() {
 		delete_transient( 'gfpdf_settings_user_data' );
@@ -238,7 +238,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	 * @param string|array $basename
 	 *
 	 * @since 6.0
-	 * @since 6.14.0 Added $basename argument
+	 * @since 6.15.0 Added $basename argument
 	 */
 	public function deactivate_plugin( $basename = '' ) {
 		if ( empty( $basename ) ) {

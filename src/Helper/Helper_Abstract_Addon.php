@@ -127,37 +127,37 @@ abstract class Helper_Abstract_Addon {
 
 	/**
 	 * @var EDD_SL_Plugin_Updater
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	protected $plugin_updater;
 
 	/**
 	 * @var string The current license key for this addon
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	protected $license_key = '';
 
 	/**
 	 * @var string The current license key status (retrieved from the API) for this addon
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	protected $license_key_status = '';
 
 	/**
 	 * @var string The current license key message for this addon (based on the status)
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	protected $license_key_message = '';
 
 	/**
 	 * @var bool Whether the addon activated the license based on another addon activation
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	protected $license_auto_activated = false;
 
 	/**
 	 * @var bool Whether the addon deactivated the license based on another addon deactivation
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	protected $license_auto_deactivated = false;
 
@@ -291,12 +291,12 @@ abstract class Helper_Abstract_Addon {
 
 	/**
 	 * @return EDD_SL_Plugin_Updater|null
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function get_plugin_updater() {
 		$updater = $this->plugin_updater;
 		if ( ! $updater ) {
-			_doing_it_wrong( __METHOD__, 'This method should not be called before the "init" hook (priority 1)', '6.14.0' );
+			_doing_it_wrong( __METHOD__, 'This method should not be called before the "init" hook (priority 1)', '6.15.0' );
 		}
 
 		return $updater;
@@ -418,13 +418,13 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 * @since 4.2
-	 * @depecated 6.14.0 Use self::central_plugin_updater()
+	 * @depecated 6.15.0 Use self::central_plugin_updater()
 	 */
 	public function plugin_updater() {}
 
 	/**
 	 * @return array
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function get_default_api_params() {
 		return [
@@ -617,7 +617,7 @@ abstract class Helper_Abstract_Addon {
 	 * @param bool $use_database Fetch license info from the database
 	 *
 	 * @since    4.2
-	 * @since 6.14.0 Get license info stored in the object
+	 * @since 6.15.0 Get license info stored in the object
 	 */
 	public function get_license_info( $use_database = false ) {
 		if ( $use_database ) {
@@ -645,7 +645,7 @@ abstract class Helper_Abstract_Addon {
 	 * @param bool $use_database Whether to update the database or not. A DB update will auto-call Model_Settings::maybe_active_licenses(), which may not be ideal
 	 *
 	 * @since    4.2
-	 * @since 6.14.0 Added
+	 * @since 6.15.0 Added
 	 */
 	public function update_license_info( $license_info, $use_database = false ) {
 		$this->license_key         = $license_info['license'] ?? '';
@@ -718,7 +718,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return false|string
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	final public function get_license_key_from_constant() {
 		$slug = $this->get_slug();
@@ -770,7 +770,7 @@ abstract class Helper_Abstract_Addon {
 	 * Whether the addon activated the license based on another addon activation
 	 *
 	 * @return bool
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	final public function has_license_auto_activated() {
 		return $this->license_auto_activated;
@@ -780,7 +780,7 @@ abstract class Helper_Abstract_Addon {
 	 * Whether the addon deactivated the license based on another addon deactivation.
 	 *
 	 * @return bool
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	final public function has_license_auto_deactivated() {
 		return $this->license_auto_deactivated;
@@ -794,7 +794,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @since    4.2
 	 *
-	 * @depreacted 6.14.0 Handled in bulk via Model_Settings::licensing_bulk_license_check()
+	 * @depreacted 6.15.0 Handled in bulk via Model_Settings::licensing_bulk_license_check()
 	 */
 	final public function maybe_schedule_license_check() {
 		if ( ! wp_next_scheduled( 'gfpdf_' . $this->get_slug() . '_license_check' ) ) {
@@ -874,7 +874,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function update_license_status_from_response( $license_key, $response, $use_database = false ) {
 		$response_code = wp_remote_retrieve_response_code( $response );
@@ -1034,7 +1034,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return array The API response and license status
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function activate_license( $license_key = '', $use_database = false ) {
 
@@ -1071,7 +1071,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function maybe_auto_activate_license( $response, $addon, $use_database ) {
 		/* skip if current addon doing licence activation */
@@ -1104,7 +1104,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function deactivate_license() {
 		$response = wp_remote_post(
@@ -1148,7 +1148,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function maybe_auto_deactivate_license( $response, $addon ) {
 		/* skip if current addon doing licence activation */
@@ -1179,7 +1179,7 @@ abstract class Helper_Abstract_Addon {
 	/**
 	 * Delete the add-on update information
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 * @return void
 	 */
 	public function flush_update_cache() {
