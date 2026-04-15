@@ -32,7 +32,7 @@ test.describe('Advanced Template Checks', () => {
 		await pdf.navigateToFormPdfList(form.id);
 		const toggle = page
 			.locator(`#gfpdf-${pdfId}`)
-			.locator('button.pdf-status-on-off');
+			.locator('button.gform-status-indicator');
 
 		// Toggle off
 		await toggle.click();
@@ -52,7 +52,7 @@ test.describe('Advanced Template Checks', () => {
 		await pdf.navigateToFormPdfList(form.id);
 		const toggle = page
 			.locator(`#gfpdf-${pdfId}`)
-			.locator('button.pdf-status-on-off');
+			.locator('button.gform-status-indicator');
 		await toggle.click();
 
 		const entry = await pdf.createEntry({ form_id: form.id });
@@ -72,8 +72,11 @@ test.describe('Advanced Template Checks', () => {
 		const pdfId = await pdf.createPdf(form.id, 'Conditional Test');
 
 		await pdf.navigateToFormPdf(form.id, pdfId);
-		await page.getByLabel('Enable conditional logic').check();
-		await page.locator('#gfpdf_rule_value_0').selectOption('NonExistent');
+		await page
+			.getByText('Enable conditional logic', { exact: true })
+			.check();
+
+		await page.locator('#gfpdf_rule_value_0').selectOption('Third Choice');
 		await pdf.addOrUpdatePdf();
 
 		await pdf.createEntry({ form_id: form.id });
@@ -91,6 +94,6 @@ test.describe('Advanced Template Checks', () => {
 		await page.locator('.name').first().hover();
 		await page.getByRole('link', { name: 'Duplicate' }).click();
 
-		await expect(page.locator('tr.type-pdf')).toHaveCount(2);
+		await expect(page.locator('tr[id^="gfpdf-"]')).toHaveCount(2);
 	});
 });

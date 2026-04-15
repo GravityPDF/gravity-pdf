@@ -73,7 +73,8 @@ test.describe('[gravitypdf] Shortcode', () => {
 		await admin.visitAdminPage('options-permalink.php');
 		await page.getByRole('radio', { name: 'Post name' }).click();
 		await page.getByRole('button', { name: 'Save Changes' }).click();
-		await admin.visitAdminPage('options-permalink.php');
+		await page.waitForTimeout(200); // Double-save the permalinks to fix wp-env permalink issue
+		await page.getByRole('button', { name: 'Save Changes' }).click();
 
 		// setup form and PDF
 		const form = await pdf.createForm('Text Confirmation');

@@ -88,6 +88,8 @@ test.describe('Mergetag attributes', () => {
 		await admin.visitAdminPage('options-permalink.php');
 		await page.getByRole('radio', { name: 'Post name' }).click();
 		await page.getByRole('button', { name: 'Save Changes' }).click();
+		await page.waitForTimeout(200); // Double-save the permalinks to fix wp-env permalink issue
+		await page.getByRole('button', { name: 'Save Changes' }).click();
 
 		// preview and submit form
 		await pdf.navigateToFormPreview(form.id);

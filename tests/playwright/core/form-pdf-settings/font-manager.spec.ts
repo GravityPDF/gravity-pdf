@@ -1,7 +1,7 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { test } from '@self:playwright/fixtures/test';
+import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import * as path from 'path';
 
@@ -77,7 +77,8 @@ test.describe('Font Manager', () => {
 			.click();
 
 		await page
-			.getByRole('button', { name: 'Add font', visible: true })
+			.getByRole('button', { name: 'Add font' })
+			.filter({ visible: true })
 			.click();
 
 		await expect(
@@ -94,15 +95,6 @@ test.describe('Font Manager', () => {
 	test('should successfully add, search, edit, and delete new font', async ({
 		page,
 	}) => {
-		const resourcesPath = path.join(
-			__dirname,
-			'..',
-			'..',
-			'e2e',
-			'utilities',
-			'resources'
-		);
-
 		await pdf.navigateToNewFormPdf(form.id);
 		await page
 			.locator('#gfpdf-settings-field-wrapper-font-container')
@@ -117,10 +109,11 @@ test.describe('Font Manager', () => {
 
 		await page
 			.locator('#gfpdf-font-variant-regular-addFont')
-			.setInputFiles(path.join(resourcesPath, 'Roboto-Regular.ttf'));
+			.setInputFiles(path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf'));
 
 		await page
-			.getByRole('button', { name: 'Add font', visible: true })
+			.getByRole('button', { name: 'Add font' })
+			.filter({ visible: true })
 			.click();
 
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
@@ -149,14 +142,14 @@ test.describe('Font Manager', () => {
 		await page
 			.locator('#gfpdf-font-variant-italics-updateFont')
 			.setInputFiles(
-				path.join(resourcesPath, 'Roboto-RegularItalic.ttf')
+				path.join(resourcesPath, 'fonts', 'Roboto-RegularItalic.ttf')
 			);
 		await page
 			.locator('#gfpdf-font-variant-bold-updateFont')
-			.setInputFiles(path.join(resourcesPath, 'Roboto-Bold.ttf'));
+			.setInputFiles(path.join(resourcesPath, 'fonts', 'Roboto-Bold.ttf'));
 		await page
 			.locator('#gfpdf-font-variant-bolditalics-updateFont')
-			.setInputFiles(path.join(resourcesPath, 'Roboto-BoldItalic.ttf'));
+			.setInputFiles(path.join(resourcesPath, 'fonts', 'Roboto-BoldItalic.ttf'));
 
 		await updateButton.click();
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();

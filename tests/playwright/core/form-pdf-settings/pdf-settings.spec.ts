@@ -1,8 +1,9 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { test } from '@self:playwright/fixtures/test';
+import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import * as path from "node:path";
 
 test.describe('Form PDF Settings', () => {
 	let pdf = null;
@@ -197,8 +198,7 @@ test.describe('Form PDF Settings', () => {
 			await pdf.page
 				.locator('input[type=file]')
 				.setInputFiles(
-					__dirname +
-						'/../../../tools/playwright/data/images/thumbnail.jpg'
+					path.join(resourcesPath, 'images', 'thumbnail.jpg')
 				);
 
 			await pdf.page
@@ -265,16 +265,18 @@ test.describe('Form PDF Settings', () => {
 		});
 
 		test('Background Color', async () => {
-			await pdf.page
-				.getByRole('button', { name: 'Select Color' })
-				.nth(1) // Background Color is usually the second color picker in appearance/template
-				.click();
+			// Set the color via JavaScript since the wp-color-picker input
+			// is enhanced and not directly fillable
+			await pdf.page.evaluate(() => {
+				const input = document.querySelector(
+					'#gfpdf_settings\\[background_color\\]'
+				) as HTMLInputElement;
+				if (input) {
+					input.value = '#1e73be';
+					input.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+			});
 
-			await pdf.page
-				.locator('#gfpdf-settings-field-wrapper-background_color')
-				.locator('.iris-palette')
-				.nth(6)
-				.click();
 			await pdf.addOrUpdatePdf();
 
 			await expect(

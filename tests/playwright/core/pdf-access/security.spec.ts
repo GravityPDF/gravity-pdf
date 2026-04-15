@@ -99,20 +99,18 @@ test.describe('PDF Security and Access Policies', () => {
 			created_by: user.id,
 		});
 
-		// Create and set new user
-		// @TODO
-		//
-		// @see https://github.com/WordPress/gutenberg/blob/trunk/test/e2e/specs/editor/collaboration/fixtures/collaboration-utils.ts#L26
-		// @see https://github.com/WordPress/gutenberg/blob/trunk/test/e2e/specs/editor/collaboration/fixtures/collaboration-utils.ts#L26
+		// Log in as the entry creator user
 		await admin.context.clearCookies();
-		await requestUtils.login({ username: userId, password: '123456' });
+		await page.goto('/wp-login.php');
+		await page.getByLabel('Username or Email Address').fill(userId);
+		await page.getByLabel('Password', { exact: true }).fill('123456');
+		await page.getByRole('button', { name: 'Log In' }).click();
 
-		await admin.visitAdminPage('profile.php');
 		await page.goto(`/?gpdf=1&pid=${pdfId}&lid=${entry.id}`);
 
-		// Should redirect to login
+		// Should show access denied error
 		await expect(
-			page.getByRole('button', { name: 'Log In' })
+			page.getByText('You do not have access to view this PDF.')
 		).toBeVisible();
 	});
 
@@ -125,9 +123,11 @@ test.describe('PDF Security and Access Policies', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
+		const userPass = crypto.randomBytes(20).toString('hex');
 		const user = await requestUtils.createUser({
 			username: crypto.randomBytes(20).toString('hex'),
 			email: crypto.randomBytes(20).toString('hex') + '@example.com',
+			password: userPass,
 		});
 
 		await pdf.navigateToNewFormPdf(form.id);
@@ -142,14 +142,12 @@ test.describe('PDF Security and Access Policies', () => {
 			created_by: user.id,
 		});
 
-		// Visit the PDF link as anon
-		const anonContext = await browser.newContext();
-		const anonPage = await anonContext.newPage();
-		await anonPage.goto(`/?gpdf=1&pid=${pdfId}&lid=${entry.id}`);
+		// Visit the PDF link as anon (clear cookies to simulate anonymous user)
+		await page.context().clearCookies();
+		await page.goto(`/?gpdf=1&pid=${pdfId}&lid=${entry.id}`);
 
 		// Should redirect to login
-		await expect(anonPage.locator('#login form')).toBeVisible();
-		await anonContext.close();
+		await expect(page.locator('#login form')).toBeVisible();
 	});
 
 	test('should allow access to a public PDF for anonymous users', async ({

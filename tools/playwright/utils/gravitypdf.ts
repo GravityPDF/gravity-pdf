@@ -171,9 +171,7 @@ export default class Pdf extends GravityForms {
 
 		try {
 			await this.page.goto(url, { waitUntil: 'networkidle' });
-		} catch (e) {
-			console.log(e);
-		}
+		} catch (e) {}
 
 		const download = await downloadPromise;
 

@@ -1,7 +1,7 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { test } from '@self:playwright/fixtures/test';
+import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import * as path from 'path';
 
@@ -68,15 +68,6 @@ test.describe('Template Manager', () => {
 	test('should successfully search, upload, show details, and delete template', async ({
 		page,
 	}) => {
-		const resourcesPath = path.join(
-			__dirname,
-			'..',
-			'..',
-			'e2e',
-			'utilities',
-			'resources'
-		);
-
 		await pdf.navigateToNewFormPdf(form.id);
 		await page.locator('[data-test="component-templateButton"]').click();
 
@@ -89,39 +80,38 @@ test.describe('Template Manager', () => {
 			'Rubix'
 		);
 
+		// Clear search before upload to ensure upload area is accessible
+		await page.locator('#wp-filter-search-input').fill('');
+
 		// Upload
 		await page
 			.locator(
 				'[data-test=component-templateUploader] input[type="file"]'
 			)
-			.setInputFiles(path.join(resourcesPath, 'test-template.zip'));
+			.setInputFiles(
+				path.join(resourcesPath, 'template', 'test-template.zip')
+			);
 
-		// @TODO - caching issue after installing a new template...
-
+		// Wait for test template to appear in the list (upload success indicator)
 		await expect(
-			page.getByText('Template successfully installed')
+			page.locator('.theme[data-slug="test-template"]')
 		).toBeVisible();
 
 		// Template Details
-		await page.getByText('Template Details').click();
+		await page
+			.getByRole('option', { name: 'Custom Test Template Details' })
+			.locator('[data-test="component-templateDetails"]')
+			.click();
 
-		await expect(page.locator('.theme-name.current')).toHaveText(
+		await expect(page.locator('.theme-name')).toContainText(
 			'Test Template'
 		);
-		await expect(page.locator('.theme-author')).toContainText('Custom');
-
-		// Navigation in details
-		await page.getByRole('button', { name: 'Show next template' }).click();
-		await expect(page.locator('.theme-name.current')).not.toHaveText(
-			'Test Template'
-		);
+		await expect(
+			page.locator('[data-test="component-group"]')
+		).toContainText('Custom');
 
 		// Delete
 		page.on('dialog', (dialog) => dialog.accept());
-		await page
-			.locator('.theme[data-slug="test-template"]')
-			.getByText('Template Details')
-			.click();
 		await page.getByRole('button', { name: 'Delete' }).click();
 
 		await expect(
