@@ -68,6 +68,8 @@ rm -f -R "${PACKAGE_DIR}/tmp"
 rm -f -R "${PACKAGE_DIR}/tools"
 rm -f -R "${PACKAGE_DIR}/.claude"
 
+cd "${PACKAGE_DIR}/../"
+
 rm -r -f "${PACKAGE_NAME}"
 mv ${VERSION} "${PACKAGE_NAME}"
 zip -r -q "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}"
