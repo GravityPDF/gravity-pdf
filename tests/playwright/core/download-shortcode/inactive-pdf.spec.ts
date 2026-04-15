@@ -35,11 +35,11 @@ test.describe('[gravitypdf] Shortcode', () => {
 				'#gform_setting_message',
 				`[gravitypdf id="${pdfId}"]`
 			);
-			await pdf.saveForm();
+			await pdf.submitForm();
 		}
 	);
 
-	test.only('Disabled PDF, Debug Mode Off', async ({
+	test('Disabled PDF, Debug Mode Off', async ({
 		requestUtils,
 		page,
 		admin,
@@ -50,7 +50,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 	}) => {
 		// preview and submit form
 		await pdf.navigateToFormPreview(form.id);
-		await pdf.saveForm();
+		await pdf.submitForm();
 
 		// verify the results
 		await expect(
@@ -73,7 +73,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 
 		// preview and submit form
 		await pdf.navigateToFormPreview(form.id);
-		await pdf.saveForm();
+		await pdf.submitForm();
 
 		// verify the results
 		await expect(

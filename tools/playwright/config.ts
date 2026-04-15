@@ -3,13 +3,13 @@ import * as path from 'path';
 
 process.env.WP_ARTIFACTS_PATH = path.join(process.cwd(), 'tmp/artifacts');
 
-const baseConfig = require('@wordpress/scripts/config/playwright.config.js');
+import baseConfig = require('@wordpress/scripts/config/playwright.config.js');
 
 const config = defineConfig({
 	...baseConfig,
 
 	fullyParallel: true,
-	workers: 4,
+	workers: 1,
 	quiet: !!process.env.CI,
 	maxFailures: process.env.CI ? 5 : 0,
 
@@ -25,14 +25,14 @@ const config = defineConfig({
 	webServer: [
 		{
 			...baseConfig.webServer,
-			command: 'npm run wp-env:e2e start',
+			command: 'yarn wp-env:e2e start',
 			name: 'Core',
 			port: 8702,
 		},
 	],
 
 	expect: {
-		toHaveScreenshot: {maxDiffPixelRatio: 0.1},
+		toHaveScreenshot: { maxDiffPixelRatio: 0.1 },
 	},
 
 	use: {
@@ -46,12 +46,15 @@ const config = defineConfig({
 			testDir: path.join(process.cwd(), 'tools/playwright'),
 			testMatch: /.*global-setup\.ts/,
 			use: {
-				baseURL: 'http://localhost:8902',
+				baseURL: 'http://localhost:8702',
 				storageState: { cookies: [], origins: [] },
 			},
 			metadata: {
-				storageStatePath: path.join(process.cwd(), 'tmp/artifacts/storage-states/e2e.json'),
-			}
+				storageStatePath: path.join(
+					process.cwd(),
+					'tmp/artifacts/storage-states/e2e.json'
+				),
+			},
 		},
 		{
 			name: 'core',
@@ -60,10 +63,13 @@ const config = defineConfig({
 			testMatch: /core\/.*(test|spec).(js|ts|mjs)/,
 			use: {
 				...devices['Desktop Chrome'],
-				baseURL: 'http://localhost:8902',
-				storageState: path.join(process.cwd(), 'tmp/artifacts/storage-states/e2e.json'),
-			}
-		}
+				baseURL: 'http://localhost:8702',
+				storageState: path.join(
+					process.cwd(),
+					'tmp/artifacts/storage-states/e2e.json'
+				),
+			},
+		},
 	],
 });
 

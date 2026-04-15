@@ -23,7 +23,7 @@ test.describe('Mergetag attributes', () => {
 			// setup form and PDF
 			form = await pdf.createForm('Mergetag Attributes');
 			await pdf.navigateToFormPreview(form.id);
-			await pdf.saveForm();
+			await pdf.submitForm();
 			pdfId = await pdf.createPdf(form.id, 'Mergetag');
 
 			// setup default confirmation
@@ -34,7 +34,7 @@ test.describe('Mergetag attributes', () => {
         PDF URL: {Mergetag:pdf:${pdfId}}
         `;
 			await pdf.setRichTextContent('#gform_setting_message', content);
-			await pdf.saveForm();
+			await pdf.submitForm();
 		}
 	);
 
@@ -65,7 +65,7 @@ test.describe('Mergetag attributes', () => {
 	}) => {
 		// preview and submit form
 		await pdf.navigateToFormPreview(form.id);
-		await pdf.saveForm();
+		await pdf.submitForm();
 
 		// verify the results
 		const confirmation = await page.locator('#preview_form_container');
@@ -91,7 +91,7 @@ test.describe('Mergetag attributes', () => {
 
 		// preview and submit form
 		await pdf.navigateToFormPreview(form.id);
-		await pdf.saveForm();
+		await pdf.submitForm();
 
 		// verify the results
 		const confirmation = await page.locator('#preview_form_container');

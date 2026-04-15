@@ -1,5 +1,6 @@
 {
-  "core": "https://wordpress.org/latest.zip",
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "core": "https://wordpress.org/nightly-builds/wordpress-latest.zip",
   "phpVersion": "8.5",
   "plugins": [],
   "mappings": {
@@ -25,7 +26,7 @@
     }
   },
   "lifecycleScripts": {
-    "afterStart": "rm -R ./tmp/artifacts && yarn wp-env:e2e run cli wp plugin activate gravityforms gravityformspolls gravityformsquiz gravityformssurvey gravity-pdf",
-    "afterReset": "rm -R ./tmp/artifacts && yarn wp-env:e2e run cli wp plugin activate gravityforms gravityformspolls gravityformsquiz gravityformssurvey gravity-pdf"
+    "afterStart": "rm -R ./tmp/artifacts && yarn wp-env:e2e run cli wp plugin activate gravityforms gravityformspolls gravityformsquiz gravityformssurvey gravity-pdf && yarn wp-env:e2e run cli wp rewrite structure '' --hard",
+    "afterReset": "rm -R ./tmp/artifacts && yarn wp-env:e2e run cli wp plugin activate gravityforms gravityformspolls gravityformsquiz gravityformssurvey gravity-pdf && yarn wp-env:e2e run cli wp rewrite structure '' --hard"
   }
 }

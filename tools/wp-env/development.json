@@ -1,5 +1,6 @@
 {
-  "core": "https://wordpress.org/latest.zip",
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "core": "https://wordpress.org/nightly-builds/wordpress-latest.zip",
   "phpVersion": "8.5",
   "plugins": [],
   "mappings": {
@@ -21,7 +22,7 @@
     }
   },
   "lifecycleScripts": {
-    "afterStart": "yarn wp-env run cli wp plugin activate gravityforms gravity-pdf",
-    "afterReset": "yarn wp-env run cli wp plugin activate gravityforms gravity-pdf"
+    "afterStart": "yarn wp-env run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env run cli wp rewrite structure '/%postname%/' --hard",
+    "afterReset": "yarn wp-env run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env run cli wp rewrite structure '/%postname%/' --hard"
   }
 }
