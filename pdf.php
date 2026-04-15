@@ -47,13 +47,11 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 	/*
 	 * Add our activation hook and deactivation hooks
 	 */
-	require_once PDF_PLUGIN_DIR . 'src/Controller/Controller_Activation.php';
+	require_once __DIR__ . '/src/Controller/Controller_Activation.php';
+	require_once __DIR__ . '/gravity-pdf-updater.php';
+
 	register_deactivation_hook( __FILE__, array( 'Controller_Activation', 'deactivation' ) );
 
-	/* If canonical plugin load the plugin updater */
-	if ( is_file( __DIR__ . '/gravity-pdf-updater.php' ) ) {
-		require_once __DIR__ . '/gravity-pdf-updater.php';
-	}
 
 	/**
 	 * Plugin initialization class
@@ -150,12 +148,6 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 
 			/* Register language files early so startup errors can be translated */
 			load_plugin_textdomain( 'gravity-pdf', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-
-			/* Notify administrator current version is not canonical */
-			if ( ! is_file( __DIR__ . '/gravity-pdf-updater.php' ) ) {
-				add_action( 'admin_init', [ $this, 'maybe_display_canonical_plugin_notice' ] );
-				add_action( 'after_plugin_row', [ $this, 'maybe_display_canonical_plugin_notice_below_plugin' ], 10, 2 );
-			}
 
 			/* Check minimum requirements are met */
 			$this->is_compatible_wordpress_version();
@@ -513,34 +505,9 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 * @return void
 		 *
 		 * @since 6.12
+		 * @deprecated
 		 */
-		public function maybe_display_canonical_plugin_notice() {
-			if ( ! method_exists( '\GFCommon', 'add_dismissible_message' ) ) {
-				return;
-			}
-
-			$message = wp_kses(
-				sprintf(
-					__( 'The Gravity PDF plugin has a new home! In order to get updates direct from GravityPDF.com %1$syou need to perform a one-time download of the plugin%2$s.', 'gravity-pdf' ),
-					'<a href="https://gravitypdf.com/news/installing-and-upgrading-to-the-canonical-version-of-gravity-pdf/" target="_blank">',
-					'</a>',
-				),
-				[
-					'a' => [
-						'href'   => true,
-						'target' => true,
-					],
-				]
-			);
-
-			\GFCommon::add_dismissible_message(
-				$message,
-				'gravity-pdf-canonical-plugin-notice',
-				'warning',
-				'install_plugins',
-				true
-			);
-		}
+		public function maybe_display_canonical_plugin_notice() {}
 
 		/**
 		 * Notify administrator they are not using the canonical version of Gravity PDF
@@ -548,40 +515,9 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 * @return void
 		 *
 		 * @since 6.12
+		 * @deprecated
 		 */
-		public function maybe_display_canonical_plugin_notice_below_plugin( $plugin_file, $plugin_data ) {
-			if ( ! isset( $plugin_data['TextDomain'] ) || $plugin_data['TextDomain'] !== 'gravity-forms-pdf-extended' ) {
-				return;
-			}
-
-			printf(
-				'<tr class="plugin-update-tr %3$s" id="%1$s-update" data-slug="%1$s" data-plugin="%2$s">',
-				esc_attr( $plugin_data['slug'] ),
-				esc_attr( $plugin_data['plugin'] ),
-				'active'
-			);
-
-			echo '<td colspan="4" class="plugin-update colspanchange">';
-			echo '<div class="notice inline notice-warning notice-alt"><p>';
-
-			echo wp_kses(
-				sprintf(
-					__( 'The Gravity PDF plugin has a new home! In order to get updates direct from GravityPDF.com %1$syou need to perform a one-time download of the plugin%2$s.', 'gravity-pdf' ),
-					'<a href="https://gravitypdf.com/news/installing-and-upgrading-to-the-canonical-version-of-gravity-pdf/" target="_blank">',
-					'</a>',
-				),
-				[
-					'a' => [
-						'href'   => true,
-						'target' => true,
-					],
-				]
-			);
-
-			echo '</p></div>';
-			echo '</td>';
-			echo '</tr>';
-		}
+		public function maybe_display_canonical_plugin_notice_below_plugin( $plugin_file, $plugin_data ) {}
 	}
 }
 
