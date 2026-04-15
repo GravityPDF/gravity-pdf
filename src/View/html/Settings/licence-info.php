@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <p>
 	<?php
 	printf(
+		/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 		esc_html__( 'To take advantage of automatic updates enter and save your license key(s) below. %1$sYou can find your purchased licenses in your GravityPDF.com account%2$s.', 'gravity-pdf' ),
 		'<a href="https://gravitypdf.com/account/licenses/">',
 		'</a>'

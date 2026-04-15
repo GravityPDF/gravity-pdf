@@ -360,6 +360,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				[
 					'error' => wp_kses(
 						sprintf(
+							/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 							__( 'An unknown error occurred, and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
 							'<a href="https://gravitypdf.com/account/licenses/">',
 							'</a>'
@@ -377,6 +378,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				[
 					'error' => wp_kses(
 						sprintf(
+							/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 							__( 'An API error occurred and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
 							'<a href="https://gravitypdf.com/account/licenses/">',
 							'</a>'

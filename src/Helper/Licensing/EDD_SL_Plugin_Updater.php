@@ -285,6 +285,7 @@ class EDD_SL_Plugin_Updater {
 			echo ' ';
 			echo wp_kses(
 				sprintf(
+					/* translators: 1: Opening <a> tag, 2: Version number, 3: Closing </a> tag, 4: Opening <a> tag, 5: Closing </a> tag */
 					__( '%1$sView version %2$s details%3$s or %4$supdate now%5$s.', 'gravity-pdf' ),
 					'<a target="_blank" class="thickbox open-plugin-details-modal" href="' . esc_url( $changelog_link ) . '">',
 					esc_html( $plugin_update->new_version ),

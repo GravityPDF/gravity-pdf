@@ -979,6 +979,7 @@ abstract class Helper_Abstract_Addon {
 				<div class="update-message">
 					<?php
 					printf(
+						/* translators: 1: Opening <a> tag, 2: Add-on name, 3: Closing </a> tag, 4: Opening <a> tag, 5: Closing </a> tag */
 						esc_html__(
 							'%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades and support. Need a license key? %4$sPurchase one now%5$s.',
 							'gravity-pdf'

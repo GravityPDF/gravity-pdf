@@ -1741,7 +1741,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" class="screen-reader-text">
-			<?php echo esc_html( sprintf( __( '%s license key', 'gravity-pdf' ), $args['name'] ) ); ?>
+			<?php /* translators: %s: add-on name */ echo esc_html( sprintf( __( '%s license key', 'gravity-pdf' ), $args['name'] ) ); ?>
 		</label>
 
 		<input autocomplete="off"
@@ -2464,6 +2464,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 */
 	public function missing_callback( $args ) {
+		/* translators: %s: setting ID */
 		echo wp_kses_post( sprintf( __( 'The callback used for the %s setting is missing.', 'gravity-pdf' ), "<strong>{$args['id']}</strong>" ) );
 	}
 

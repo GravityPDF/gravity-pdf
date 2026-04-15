@@ -398,6 +398,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-pdf' ), '<a href="' . esc_url( remove_query_arg( 'pid' ) ) . '">', '</a>' ) );
 
 			return true;
