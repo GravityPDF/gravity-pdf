@@ -96,7 +96,7 @@ describe('FontManager - AddFontFooter.js', () => {
 
 		test('render cancel button', () => {
 			const wrapper = shallow(
-				<AddUpdateFontFooter {...props} id="active" />
+				<AddUpdateFontFooter {...props} id="active" type="update" />
 			);
 
 			expect(wrapper.find('button.cancel').length).toBe(1);
@@ -109,7 +109,7 @@ describe('FontManager - AddFontFooter.js', () => {
 
 		test('render update font button', () => {
 			const wrapper = shallow(
-				<AddUpdateFontFooter {...props} id="active" />
+				<AddUpdateFontFooter {...props} id="active" type="update" />
 			);
 
 			expect(wrapper.find('button').at(1).text()).toBe('Update Font →');

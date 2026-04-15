@@ -79,5 +79,8 @@
     "i10n:update-po": "wp i18n update-po languages/gravity-pdf.pot languages",
     "i10n:make-mo": "wp i18n make-mo languages",
     "i10n:translate": "potomatic --output-dir=./languages --po-file-prefix=gravity-pdf- --pot-file-path=./languages/gravity-pdf.pot --use-dictionary --dictionary-path=./tools/potomatic/dictionaries --target-languages=es_ES,fr_FR,de_DE,de_DE-formal,it_IT,nl_NL,ru_RU,zh_CN"
+  },
+  "resolutions": {
+    "cheerio": "1.0.0-rc.10"
   }
 }

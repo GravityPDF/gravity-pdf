@@ -46,6 +46,7 @@ window.GFPDF = {
 	searchBoxResetTitle: 'Clear search.',
 	fontManagerTitle: 'Font Manager',
 	fontUserDefinedGroup: 'User-Defined Fonts',
+	fontManagerRequiredLabel: '(required)',
 };
 
 window.gfpdf_migration_multisite_ids = [];

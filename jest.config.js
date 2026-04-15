@@ -19,6 +19,9 @@ module.exports = {
 		},
 	},
 	setupFilesAfterEnv: [ './tests/js-unit/setupTests.js' ],
-  coverageDirectory: './tmp/jest-coverage',
+	coverageDirectory: './tmp/jest-coverage',
 	testEnvironment: 'jsdom',
+	testEnvironmentOptions: {
+		customExportConditions: [ 'require', 'node', 'node-addons' ],
+	},
 };
