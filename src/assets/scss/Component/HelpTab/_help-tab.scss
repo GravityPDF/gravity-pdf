@@ -49,7 +49,7 @@
       .button-large {
         background: var(--wp-admin-theme-color, '#007cba');
         border: none;
-        height: 35px;
+        height: 40px;
         line-height: 40px;
         padding: 0 16px;
 
@@ -89,6 +89,8 @@
         background: #fff;
         box-shadow: 0 1px 1px 0 rgba(85, 95, 110, .2);
         padding: 16px 16px 16px 46px;
+        min-height: 40px;
+        line-height: normal;
         vertical-align: middle;
         white-space: normal;
         font-size: inherit;

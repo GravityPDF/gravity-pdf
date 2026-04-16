@@ -383,7 +383,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 			if ( ! preg_match( '/^[a-zA-Z0-9-_]+.php$/', $basename ) ) {
 				/* translators: %s: filename */
-			throw new Exception( sprintf( esc_html__( 'The filename %s contains invalid characters. Only alphanumeric, hyphen, and underscore allowed.', 'gravity-pdf' ), esc_html( $basename ) ) );
+				throw new Exception( sprintf( esc_html__( 'The filename %s contains invalid characters. Only alphanumeric, hyphen, and underscore allowed.', 'gravity-pdf' ), esc_html( $basename ) ) );
 			}
 
 			/* Check if we have a valid v4 template header in the file */
@@ -398,7 +398,7 @@ class Model_Templates extends Helper_Abstract_Model {
 				/* Check the first 8kiB contains the string RGForms or GFForms, which signifies our v3 templates */
 				if ( strpos( $file_data, 'RGForms' ) === false && strpos( $file_data, 'GFForms' ) === false ) {
 					/* translators: %s: filename */
-				throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-pdf' ), esc_html( $basename ) ) );
+					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-pdf' ), esc_html( $basename ) ) );
 				}
 			}
 		}

@@ -111,7 +111,7 @@ class View_System_Report extends Helper_Abstract_View {
 		if ( ! $is_protected ) {
 			$output .= ' ' . sprintf( esc_html__( "Gravity PDF's temporary directory is publicly accessible.", 'gravity-pdf' ) );
 			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
-		$output .= ' ' . sprintf( esc_html__( 'It is recommended to %1$smove the folder outside the public server directory%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/">', '</a>' );
+			$output .= ' ' . sprintf( esc_html__( 'It is recommended to %1$smove the folder outside the public server directory%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/">', '</a>' );
 		}
 
 		return $output;

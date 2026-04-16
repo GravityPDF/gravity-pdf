@@ -2,14 +2,30 @@
 
 #tab_PDF {
 
+  .button:not(.wp-editor-wrap .button) {
+    @include button.reset;
+    line-height: 2.95;
+
+    &:not(.primary):hover {
+      border-color: unset;
+      background-color: unset;
+    }
+  }
+
   /* Template and Font Manager Advanced Button */
-  #gpdf-advance-template-selector, #gpdf-advance-font-manager-selector {
+  #gfpdf-template-container, #gfpdf-font-manager-container {
     display: inline-block;
     vertical-align: top;
 
     button {
       @include button.reset;
-      line-height: 2.95;
+      min-height: 32px;
+      line-height: 2.30769231;
+
+      &.primary:hover {
+        background: #242748;
+        border-color: #242748;
+      }
     }
   }
 }

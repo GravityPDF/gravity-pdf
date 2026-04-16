@@ -143,7 +143,7 @@ test.describe('Template Manager', () => {
 
 		const popup = page.locator('.container.theme-wrap');
 		await page.keyboard.press('Escape');
-		await page.waitForTimeout(300);
+		await page.keyboard.press('Escape');
 		await expect(popup).not.toBeVisible();
 	});
 });
