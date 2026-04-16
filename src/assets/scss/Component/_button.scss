@@ -2,7 +2,7 @@
 
 #tab_PDF {
 
-  .button:not(.wp-editor-wrap .button) {
+  .button:not(.wp-editor-wrap .button):not(.wp-picker-container .button) {
     @include button.reset;
     line-height: 2.95;
 

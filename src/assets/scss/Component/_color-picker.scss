@@ -3,13 +3,14 @@
 #tab_PDF {
   .wp-picker-container {
 
-    button {
+    .button {
       padding: 0 0 0 35px;
       border-width: 1px;
       border-style: solid;
       border-color: rgb(144, 146, 178);
       border-image: initial;
       height: auto;
+      line-height: 2.7;
 
       .wp-color-result-text {
         font-size: 0.875rem;
