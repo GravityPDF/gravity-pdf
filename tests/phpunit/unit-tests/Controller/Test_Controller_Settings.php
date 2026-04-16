@@ -34,6 +34,8 @@ class Test_Controller_Settings extends WP_UnitTestCase {
 
 		parent::set_up();
 
+		remove_all_actions( 'init' );
+
 		$model = $gfpdf->singleton->get_class( 'Model_Settings' );
 		$view  = $gfpdf->singleton->get_class( 'View_Settings' );
 
@@ -61,7 +63,7 @@ class Test_Controller_Settings extends WP_UnitTestCase {
 		);
 
 		$addon->init();
-		$this->controller->add_filters();
+		$this->controller->init();
 		do_action( 'init' );
 
 		$this->assertNotFalse( wp_next_scheduled( 'gfpdf_bulk_license_check' ) );

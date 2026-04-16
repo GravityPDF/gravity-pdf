@@ -46,6 +46,8 @@ class Test_Model_Settings extends WP_UnitTestCase {
 
 		parent::set_up();
 
+		remove_all_actions( 'init' );
+
 		$this->model = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		$this->addon = new ModelSettingsAddon(
@@ -78,30 +80,31 @@ class Test_Model_Settings extends WP_UnitTestCase {
 
 		$this->addon1->set_edd_download_id( 10 );
 
-		$this->addon->init();
-		$this->addon1->init();
+		$data = \GPDFAPI::get_data_class();
+		$data->updater = null;
+		$data->addon = [];
 	}
 
 	public function tear_down() {
 		parent::tear_down();
+
 		$data = \GPDFAPI::get_data_class();
+		$data->updater = null;
 		$data->addon = [];
 	}
 
 	public function test_license_bulk_get_version_api_params_skipped() {
 		/* Check skipped when not initialized */
-		$data          = \GPDFAPI::get_data_class();
-		$data->updater = null;
-		$data->addon   = [];
 		$this->assertTrue( $this->model->licensing_bulk_get_version_api_params( true ) );
 	}
 
 	public function test_license_bulk_get_version_api_params_core_plugin() {
-		$data        = \GPDFAPI::get_data_class();
-		$data->addon = [];
+		$this->addon->init();
+
 		do_action( 'init' );
 
 		$params = $this->model->licensing_bulk_get_version_api_params( [] );
+
 		$this->assertArrayHasKey( 'edd_action', $params );
 		$this->assertArrayHasKey( 'products', $params );
 		$this->assertCount( 1, $params['products'] );
@@ -111,24 +114,27 @@ class Test_Model_Settings extends WP_UnitTestCase {
 	}
 
 	public function test_licensing_bulk_get_version_api_response() {
+		$this->addon->init();
+		$this->addon1->init();
+
 		do_action( 'init' );
 
 		$params = $this->model->licensing_bulk_get_version_api_params( [] );
 		$this->assertArrayHasKey( 'edd_action', $params );
 		$this->assertArrayHasKey( 'products', $params );
-		$this->assertCount( 3, $params['products'] );
+		$this->assertCount( 2, $params['products'] );
 		$this->assertArrayHasKey( 'license', $params['products'][0] );
 		$this->assertArrayHasKey( 'item_id', $params['products'][0] );
 		$this->assertArrayHasKey( 'url', $params['products'][0] );
 		$this->assertArrayHasKey( 'license', $params['products'][1] );
 		$this->assertArrayHasKey( 'item_id', $params['products'][1] );
 		$this->assertArrayHasKey( 'url', $params['products'][1] );
-		$this->assertArrayHasKey( 'license', $params['products'][2] );
-		$this->assertArrayHasKey( 'item_id', $params['products'][2] );
-		$this->assertArrayHasKey( 'url', $params['products'][2] );
 	}
 
 	public function test_licensing_bulk_license_check_success() {
+		$this->addon->init();
+		$this->addon1->init();
+
 		do_action( 'init' );
 
 		$data = \GPDFAPI::get_data_class();
@@ -164,13 +170,13 @@ class Test_Model_Settings extends WP_UnitTestCase {
 	}
 
 	public function test_licensing_bulk_license_check_no_addons() {
-		$data        = \GPDFAPI::get_data_class();
-		$data->addon = [];
-
 		$this->assertFalse( $this->model->licensing_bulk_license_check() );
 	}
 
 	public function test_licensing_bulk_license_check_bad_status_code() {
+		$this->addon->init();
+		$this->addon1->init();
+
 		do_action( 'init' );
 
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
@@ -198,6 +204,9 @@ class Test_Model_Settings extends WP_UnitTestCase {
 	}
 
 	public function test_licensing_bulk_license_check_bad_response() {
+		$this->addon->init();
+		$this->addon1->init();
+
 		do_action( 'init' );
 
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );

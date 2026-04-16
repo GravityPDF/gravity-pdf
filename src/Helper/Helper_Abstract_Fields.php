@@ -242,7 +242,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		 * @credit Zack Katz (Gravity View author)
 		 * @fixed  Gravity Forms 1.9.13.25
 		 */
-		if ( class_exists( 'GFCache' ) && version_compare( GFCommon::$version, '1.9.13.25', '<' ) ) {
+		if ( class_exists( 'GFCache' ) && version_compare( \GFForms::$version, '1.9.13.25', '<' ) ) {
 			GFCache::set( 'GFFormsModel::get_lead_field_value_' . $this->entry['id'] . '_' . $this->field->id, false, false, 0 );
 		}
 

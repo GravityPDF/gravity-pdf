@@ -64,8 +64,8 @@ class Test_Field_Image_Choice extends WP_UnitTestCase {
 
 	protected function get_choices( $id ) {
 		$wp_factory = static::factory();
-		$media_id1  = $wp_factory->attachment->create_upload_object( __DIR__ . '/../../../data/images/test-media.png' );
-		$media_id2  = $wp_factory->attachment->create_upload_object( __DIR__ . '/../../../data/images/test-media.png' );
+		$media_id1  = $wp_factory->attachment->create_upload_object( PDF_PLUGIN_DIR . '/tools/phpunit/data/images/test-media.png' );
+		$media_id2  = $wp_factory->attachment->create_upload_object( PDF_PLUGIN_DIR . '/tools/phpunit/data/images/test-media.png' );
 
 		$choices = [
 			[

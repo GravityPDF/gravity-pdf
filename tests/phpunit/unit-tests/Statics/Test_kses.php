@@ -73,8 +73,8 @@ class Test_Kses extends WP_UnitTestCase {
 			[ '<select><option selected="selected" value="aaa">A</option><option>B</option></select>' ],
 			[ '<annotation content="Text" pos-x="20" pos-y="50" author="Name" subject="Value" />' ],
 			[ '<bookmark content="A" level="1" />' ],
-			[ '<column column-count="3" vAlign="j" column-gap="50">' ],
-			[ '<column column-count="3" vAlign="j" column-gap="50" />Content<columnbreak /> More content' ],
+			[ '<column column-count="3" valign="j" column-gap="50">' ],
+			[ '<column column-count="3" valign="j" column-gap="50" />Content<columnbreak /> More content' ],
 			[ '<htmlpageheader name="Name">Content here</htmlpageheader>' ],
 			[ '<htmlpagefooter name="Name">Content here</htmlpagefooter>' ],
 			[ '<sethtmlpageheader name="Name" value="1" show-this-page="1" />' ],
@@ -82,9 +82,9 @@ class Test_Kses extends WP_UnitTestCase {
 			[ '<indexentry />' ],
 			[ '<indexentry content="Name" xref="Value" />' ],
 			[ '<indexinsert links="on" />' ],
-			[ '<tocpagebreak paging="1" links="1" name="A" toc-preHTML="B" toc-postHTML="C" toc-page-selector="D" toc-sheet-size="E" />' ],
-			['<tocpagebreak toc-odd-header-name="A" toc-odd-footer-name="B" toc-odd-header-value="C" toc-odd-footer-value="D" />'],
-			[ '<tocpagebreak toc-bookmarkText="A" toc-resetpagenum="1" toc-resetpagestyle="A" toc-suppress="1" />' ],
+			[ '<tocpagebreak paging="1" links="1" name="A" toc-prehtml="B" toc-posthtml="C" toc-page-selector="D" toc-sheet-size="E" />' ],
+			[ '<tocpagebreak toc-odd-header-name="A" toc-odd-footer-name="B" toc-odd-header-value="C" toc-odd-footer-value="D" />'],
+			[ '<tocpagebreak toc-bookmarktext="A" toc-resetpagenum="1" toc-resetpagestyle="A" toc-suppress="1" />' ],
 			[ '<tocentry content="A" level="B" name="C" />' ],
 			[ '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII" alt="Icon" width="200mm" />']
 		];
