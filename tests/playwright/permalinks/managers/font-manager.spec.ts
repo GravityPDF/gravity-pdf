@@ -103,7 +103,7 @@ test.describe('Font Manager', () => {
 
 		// Add Font
 		await page
-			.locator('[data-test="component-AddFont"]')
+			.locator('.add-font')
 			.getByRole('textbox', { name: 'Font Name' })
 			.fill('Roboto');
 
@@ -179,7 +179,7 @@ test.describe('Font Manager', () => {
 		const popup = await page.locator('.container.theme-wrap.font-manager');
 
 		await expect(popup).toBeVisible();
-		await page.locator('[data-test="component-CloseDialog"]').click();
+		await page.getByRole('button', { name: 'close', exact: true }).click();
 		await expect(popup).not.toBeVisible();
 	});
 

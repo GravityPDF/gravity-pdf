@@ -310,7 +310,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 *
 	 * @return void
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	protected function maybe_schedule_network_update_check() {
 		if ( ! is_multisite() || get_current_blog_id() === 1 || is_plugin_active_for_network( PDF_PLUGIN_BASENAME ) ) {

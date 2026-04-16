@@ -94,12 +94,11 @@ jobs:
         if: success()
         with:
           name: test-results
-          path: ./tmp/artifacts/test-results/chromatic-archives
+          path: ./tmp/artifacts/test-results
 
       - name: Dump log files on failure
         if: failure()
-        run: |
-          yarn wp-env:e2e run wordpress "cp -r /var/www/html/wp-content/uploads/gravity_forms/logs/ /var/www/html/wp-content/plugins/gravity-pdf/tmp/artifacts/logs"        
+        run: yarn wp-env:e2e run wordpress "cp" "-r" "/var/www/html/wp-content/uploads/gravity_forms/logs/" "/var/www/html/wp-content/plugins/gravity-pdf/tmp/artifacts/logs"
 
       - name: Upload artifacts on failure
         uses: actions/upload-artifact@v6
@@ -144,7 +143,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Download Playwright test results
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: test-results
           path: ./test-results
@@ -155,5 +154,3 @@ jobs:
           playwright: true
           autoAcceptChanges: "development"
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-        env:
-          CHROMATIC_ARCHIVE_LOCATION: ./test-results

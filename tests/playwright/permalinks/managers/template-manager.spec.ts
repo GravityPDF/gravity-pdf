@@ -34,7 +34,9 @@ test.describe('Template Manager', () => {
 			.getByLabel('Template', { exact: true });
 
 		await expect(select).toBeVisible();
-		await page.locator('[data-test="component-templateButton"]').click();
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
 		await expect(
 			page.getByRole('heading', { name: 'Installed PDFs' })
 		).toBeVisible();
@@ -69,25 +71,26 @@ test.describe('Template Manager', () => {
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page.locator('[data-test="component-templateButton"]').click();
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
+
+		const templateManager = page.locator('.container.theme-wrap');
 
 		// Search
 		await page.locator('#wp-filter-search-input').fill('rubix');
+		await expect(templateManager.getByRole('option')).toHaveCount(1);
 		await expect(
-			page.locator('[data-test=component-templateListItem]')
-		).toHaveCount(1);
-		await expect(page.locator('[data-test=component-name]')).toHaveText(
-			'Rubix'
-		);
+			templateManager.getByRole('option').locator('h2.theme-name')
+		).toHaveText('Rubix');
 
 		// Clear search before upload to ensure upload area is accessible
 		await page.locator('#wp-filter-search-input').fill('');
 
 		// Upload
 		await page
-			.locator(
-				'[data-test=component-templateUploader] input[type="file"]'
-			)
+			.locator('.gfpdf-dropzone')
+			.locator('input[type="file"]')
 			.setInputFiles(
 				path.join(resourcesPath, 'template', 'test-template.zip')
 			);
@@ -98,26 +101,22 @@ test.describe('Template Manager', () => {
 		).toBeVisible();
 
 		// Template Details
-		await page
+		await templateManager
 			.getByRole('option', { name: 'Custom Test Template Details' })
-			.locator('[data-test="component-templateDetails"]')
+			.locator('.more-details')
 			.click();
 
 		await expect(
-			page
-				.locator('[data-test="component-name"]')
-				.getByText('Test Template')
+			page.locator('h2.theme-name', { hasText: 'Test Template' })
 		).toBeAttached();
 
 		await expect(
-			page.locator('[data-test="component-group"]').getByText('Custom')
+			page.locator('p.theme-author', { hasText: 'Custom' })
 		).toBeAttached();
 
 		// Delete
 		page.on('dialog', (dialog) => dialog.accept());
-		await page
-			.locator('[data-test="component-templateDeleteButton"]')
-			.click();
+		await page.getByRole('button', { name: 'Delete Template' }).click();
 
 		await expect(
 			page.locator('.theme[data-slug="test-template"]')
@@ -128,10 +127,12 @@ test.describe('Template Manager', () => {
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page.locator('[data-test="component-templateButton"]').click();
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
 
 		const popup = page.locator('.container.theme-wrap');
-		await page.locator('[data-test="component-CloseDialog"]').click();
+		await page.getByRole('button', { name: 'close', exact: true }).click();
 		await expect(popup).not.toBeVisible();
 	});
 
@@ -139,7 +140,9 @@ test.describe('Template Manager', () => {
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page.locator('[data-test="component-templateButton"]').click();
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
 
 		const popup = page.locator('.container.theme-wrap');
 		await popup.focus();

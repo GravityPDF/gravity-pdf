@@ -85,9 +85,9 @@ export const apiAddFont = async (font) => {
 /**
  * Fetch API request to edit font details (POST)
  *
- * @param {Object}                                                                             params
- * @param {string}                                                                             params.id   - ID of the font to update
- * @param {{ label: string, regular?: File, italics?: File, bold?: File, bolditalics?: File }} params.font - Only changed variants are included
+ * @param {Object}                                                                                                     params
+ * @param {string}                                                                                                     params.id   - ID of the font to update
+ * @param {{ label: string, regular: string|File, italics: string|File, bold: string|File, bolditalics: string|File }} params.font - Only changed variants are included
  *
  * @return {{ body: FontItem, text: string, status: number, ok: boolean }} The updated font
  *

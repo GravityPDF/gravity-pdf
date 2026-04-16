@@ -11,6 +11,11 @@ Request → Load Skills → Gather Context → Execute
 Skills contain critical workflows and protocols not in base context.
 Loading them first prevents missing key instructions.
 
+### Planning
+
+When creating plans, always save them to: ./claude/plans/YYYY-MM-DD-<topic>.md
+Never use the default plan location. Use the ./claude/plans/ directory.
+
 ### Context Management Strategy
 
 **Central AI should conserve context to extend pre-compaction capacity**:

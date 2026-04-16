@@ -543,6 +543,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 		foreach ( $files as $id => $file ) {
 			if ( ! isset( $file['name'] ) || ! is_file( $this->font_dir_path . $file['name'] ) ) {
+				/* translators: %s: font filename */
 				$errors[ $id ] = sprintf( __( 'Cannot find %s.', 'gravity-pdf' ), $file['name'] );
 				continue;
 			}

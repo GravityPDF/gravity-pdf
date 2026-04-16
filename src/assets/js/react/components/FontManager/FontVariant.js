@@ -38,9 +38,14 @@ export const FontVariant = ({
 }) => (
 	<div data-test="component-FontVariant" id="gfpdf-font-files-setting">
 		{Object.entries(fontStyles).map(([key, font]) => {
-			const id = 'gfpdf-font-variant-' + key + ' ' + state;
-			const ariaLabelledby = id + ' gfpdf-font-files-label';
-			const ariaDescribedby = 'gfpdf-font-files-description';
+			const id = `gfpdf-font-variant-${key}-${state}`;
+			const ariaLabelledby =
+				'gfpdf-font-files-label-' +
+				(state === 'addFont' ? 'add' : 'update');
+			const ariaDescribedby =
+				'gfpdf-font-files-description-' +
+				(state === 'addFont' ? 'add' : 'update');
+
 			const currentUploadFontName =
 				font !== '' && typeof font !== 'object';
 			const fontName = currentUploadFontName
@@ -82,7 +87,7 @@ export const FontVariant = ({
 						>
 							{font ? (
 								<input
-									data-test="input-delete"
+									data-test="component-FontVariant-delete"
 									id={id}
 									aria-labelledby={ariaLabelledby}
 									aria-describedby={ariaDescribedby}
@@ -97,7 +102,7 @@ export const FontVariant = ({
 								/>
 							) : (
 								<input
-									data-test="input-add"
+									data-test="component-FontVariant-add"
 									id={id}
 									aria-labelledby={ariaLabelledby}
 									aria-describedby={ariaDescribedby}

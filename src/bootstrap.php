@@ -131,6 +131,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function __call( $name, $arguments ) {
+		/* translators: %s: deprecated method name */
 		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
 	}
 
@@ -208,7 +209,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		);
 
 		/* Load Background Queue classes */
-		if ( version_compare( \GFCommon::$version, '2.9.7.2', '>=' ) ) {
+		if ( version_compare( \GFForms::$version, '2.9.7.2', '>=' ) ) {
 			if ( ! class_exists( '\Gravity_Forms\Gravity_Forms\Async\GF_Background_Process' ) ) {
 				require_once GFCommon::get_base_path() . '/includes/async/class-gf-background-process.php';
 			}

@@ -79,7 +79,7 @@ export default class Pdf extends GravityForms {
 
 		await expect(
 			this.page.getByRole('button', { name: 'Manage PDF Templates' })
-		).toBeVisible();
+		).toBeVisible({ timeout: 30000 });
 	}
 
 	async navigateToNewFormPdf(formId: number) {
@@ -87,7 +87,7 @@ export default class Pdf extends GravityForms {
 		await this.page.getByRole('link', { name: 'Add new PDF' }).click();
 		await expect(
 			this.page.getByRole('button', { name: 'Manage PDF Templates' })
-		).toBeVisible();
+		).toBeVisible({ timeout: 30000 });
 	}
 
 	async navigateToFormPdf(formId: number, pdfId: string) {
@@ -97,7 +97,7 @@ export default class Pdf extends GravityForms {
 		);
 		await expect(
 			this.page.getByRole('button', { name: 'Manage PDF Templates' })
-		).toBeVisible();
+		).toBeVisible({ timeout: 30000 });
 	}
 
 	async copyDownloadShortcodeToClipboard(formId: number, pdfId: string) {

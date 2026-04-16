@@ -157,13 +157,9 @@ export default class GravityForms {
 	) {
 		const container = await this.page.locator(containerSelector);
 
-		// swap to code view
-		container
-			.getByRole('button', { name: /^Code$/ })
-			.first()
-			.click();
+		await this.switchToCodeEditor();
 
-		const textbox = await container.getByRole('textbox').last();
+		const textbox = container.getByRole('textbox').last();
 
 		if (append) {
 			content = (await textbox.inputValue()) + content;
@@ -174,6 +170,16 @@ export default class GravityForms {
 		await this.page.waitForTimeout(500);
 
 		expect(await textbox.inputValue()).toEqual(content);
+	}
+
+	async switchToCodeEditor() {
+		for (const button of await this.page
+			.locator('.wp-editor-tabs')
+			.getByRole('button', { name: /^Code$/ })
+			.filter({ visible: true })
+			.all()) {
+			await button.click();
+		}
 	}
 
 	async submitForm() {

@@ -34,7 +34,7 @@ import {
 export function* updateSelectBox() {
 	try {
 		const response = yield call(apiPostUpdateSelectBox);
-		yield put(updateSelectBoxSuccess(response));
+		yield put(updateSelectBoxSuccess(response.body));
 	} catch (error) {
 		yield put(updateSelectBoxFailed());
 	}
@@ -70,7 +70,7 @@ export function* templateUploadProcessing(action) {
 			action.payload.file,
 			action.payload.filename
 		);
-		yield put(templateUploadProcessingSuccess(response));
+		yield put(templateUploadProcessingSuccess(response.body));
 	} catch (error) {
 		yield put(
 			templateUploadProcessingFailed({

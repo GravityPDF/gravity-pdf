@@ -1741,7 +1741,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" class="screen-reader-text">
-			<?php echo esc_html( sprintf( __( '%s license key', 'gravity-pdf' ), $args['name'] ) ); ?>
+			<?php /* translators: %s: add-on name */ echo esc_html( sprintf( __( '%s license key', 'gravity-pdf' ), $args['name'] ) ); ?>
 		</label>
 
 		<input autocomplete="off"
@@ -1848,7 +1848,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<?php if ( $toggle !== false ): ?>
-			<?php $this->start_toggle_input( $toggle, $value ); ?>
+			<?php $this->start_toggle_input( $toggle, $value, $args['id'] ); ?>
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
@@ -2065,7 +2065,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<?php if ( $toggle !== false ): ?>
-			<?php $this->start_toggle_input( $toggle, $value ); ?>
+			<?php $this->start_toggle_input( $toggle, $value, $args['id'] ); ?>
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
@@ -2464,6 +2464,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 */
 	public function missing_callback( $args ) {
+		/* translators: %s: setting ID */
 		echo wp_kses_post( sprintf( __( 'The callback used for the %s setting is missing.', 'gravity-pdf' ), "<strong>{$args['id']}</strong>" ) );
 	}
 
@@ -2496,12 +2497,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param string $toggle The text to be used in the toggle
 	 * @param string $value  Whether the field currently has a value
+	 * @param string $element_id The base ID for the toggle
 	 *
 	 * @return void
 	 *
 	 * @since 6.4
+	 * @since 6.14 Added $element_id
 	 */
-	public function start_toggle_input( $toggle, $value ) {
+	public function start_toggle_input( $toggle, $value, $element_id = '' ) {
 		$has_value = ! empty( $value ) ? 1 : 0;
 
 		?>
@@ -2509,6 +2512,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<label>
 			<input class="gfpdf-input-toggle"
 				   type="checkbox"
+				   id="<?php echo esc_attr( $element_id . '_toggle' ); ?>"
 				   value="1"
 				   <?php checked( $has_value, 1 ); ?>
 			/>

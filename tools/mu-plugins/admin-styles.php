@@ -1,7 +1,7 @@
 <?php
 
 /* Only run on the E2E test site and excluded from production build */
-if ( ! defined( 'TEST_SUITE' ) || ! TEST_SUITE ) {
+if ( ! defined( 'E2E_TEST_SUITE' ) || ! E2E_TEST_SUITE ) {
 	return;
 }
 

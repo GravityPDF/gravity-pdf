@@ -64,7 +64,7 @@ if ( $collapsible ) {
 
 				<label class="gform-settings-panel__collapsible-toggle" for="<?php echo esc_attr( $collapsible_name ); ?>">
 					<span class="screen-reader-text">
-						<?php printf( esc_html__( 'Toggle %s Section', 'gravity-pdf' ), esc_html( $args['title'] ) ); ?>
+						<?php /* translators: %s: section title */ printf( esc_html__( 'Toggle %s Section', 'gravity-pdf' ), esc_html( $args['title'] ) ); ?>
 					</span>
 				</label>
 			</span>

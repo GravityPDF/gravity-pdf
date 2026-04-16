@@ -46,7 +46,11 @@ test.describe('Form PDF Settings', () => {
 		test('Filename', async ({}, testinfo) => {
 			await pdf.createPdf(form.id, 'Filename');
 
-			await pdf.page.getByRole('textbox', { name: 'Filename' }).click();
+			const filename = pdf.page.getByRole('textbox', {
+				name: 'Filename',
+			});
+
+			await filename.click();
 			await pdf.page.getByTitle('Insert Merge Tags').nth(0).click();
 			await pdf.page
 				.getByRole('textbox', { name: 'Search Merge Tags' })
@@ -54,12 +58,12 @@ test.describe('Form PDF Settings', () => {
 			await pdf.page
 				.getByRole('button', { name: 'Date (dd/mm/yyyy)' })
 				.click();
-			await pdf.page.getByRole('textbox', { name: 'Filename' }).click();
-			await pdf.page
-				.getByRole('textbox', { name: 'Filename' })
-				.pressSequentially('-{entry_id}');
+			await filename.click();
+			await filename.pressSequentially('-{entry_id}');
 			await pdf.addOrUpdatePdf();
 
+			await pdf.page.waitForTimeout(1000);
+			await pdf.switchToCodeEditor();
 			await takeSnapshot(pdf.page, testinfo);
 		});
 
@@ -113,6 +117,8 @@ test.describe('Form PDF Settings', () => {
 			await pdf.page.locator('#gfpdf_rule_value_1').selectOption('spam');
 			await pdf.addOrUpdatePdf();
 
+			await pdf.page.waitForTimeout(1000);
+			await pdf.switchToCodeEditor();
 			await takeSnapshot(pdf.page, testinfo);
 
 			// Entry 1: Radio = "Second Choice" → PDF hidden by conditional logic
@@ -176,18 +182,19 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.addOrUpdatePdf();
 
-			await pdf.page.waitForTimeout(500);
-
+			await pdf.page.waitForTimeout(1000);
+			await pdf.switchToCodeEditor();
 			await takeSnapshot(pdf.page, testinfo);
 		});
 
 		test('Color Picker', async ({}, testinfo) => {
 			await pdf.createPdf(form.id, 'Color Picker');
 
-			await pdf.page
+			const colorPicker = pdf.page
 				.getByRole('button', { name: 'Select Color' })
-				.first()
-				.click();
+				.first();
+
+			await colorPicker.click();
 
 			await pdf.page
 				.locator('.iris-square-inner.iris-square-vert')
@@ -199,6 +206,8 @@ test.describe('Form PDF Settings', () => {
 				pdf.page.getByRole('textbox', { name: 'Font Color' })
 			).toHaveValue('#898989');
 
+			await pdf.switchToCodeEditor();
+			await colorPicker.click();
 			await takeSnapshot(pdf.page, testinfo);
 		});
 
@@ -250,6 +259,7 @@ test.describe('Form PDF Settings', () => {
 				pdf.page.locator('#gfpdf-settings-field-wrapper-first_header')
 			);
 
+			await pdf.switchToCodeEditor();
 			await takeSnapshot(pdf.page, testinfo);
 		});
 
@@ -371,6 +381,7 @@ test.describe('Form PDF Settings', () => {
 				.getByRole('button', { name: 'Date (dd/mm/yyyy)' })
 				.click();
 
+			await pdf.switchToCodeEditor();
 			await takeSnapshot(pdf.page, testinfo);
 		});
 

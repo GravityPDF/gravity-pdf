@@ -73,7 +73,10 @@ test.describe('Advanced Template Checks', () => {
 
 		await pdf.navigateToFormPdf(form.id, pdfId);
 		await page
-			.getByText('Enable conditional logic', { exact: true })
+			.getByRole('checkbox', {
+				name: 'Enable conditional logic',
+				exact: true,
+			})
 			.check();
 
 		await page.locator('#gfpdf_rule_value_0').selectOption('Third Choice');

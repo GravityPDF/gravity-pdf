@@ -47,7 +47,7 @@ export class TemplateTooltip extends Component {
 	/**
 	 * Handle auto highlighting of the information box content once clicked
 	 *
-	 * @param { Event & { target: HTMLInputElement } } e
+	 * @param { Event } e
 	 *
 	 * @since 6.0
 	 */

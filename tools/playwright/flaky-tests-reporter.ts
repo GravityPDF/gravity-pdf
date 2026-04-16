@@ -6,9 +6,11 @@
  *   but displayed as **passed** in the original test suite.
  * - If it fail all 3 times, then it's a **failed** test.
  */
-import { writeFileSync, mkdirSync } from 'fs';
+/**
+ * External dependencies
+ */
+import fs from 'fs';
 import type { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
-import config from './config';
 import filenamify from 'filenamify';
 
 type FormattedTestResult = Omit<TestResult, 'steps'>;
@@ -25,9 +27,7 @@ class FlakyTestsReporter implements Reporter {
 
 	onBegin() {
 		try {
-			mkdirSync(config.outputDir + '/flaky-tests', {
-				recursive: true,
-			});
+			fs.mkdirSync('flaky-tests');
 		} catch (err) {
 			if (
 				err instanceof Error &&
@@ -55,8 +55,8 @@ class FlakyTestsReporter implements Reporter {
 				break;
 			}
 			case 'flaky': {
-				writeFileSync(
-					`"${config.outputDir}/flaky-tests/${filenamify(testTitle)}.json`,
+				fs.writeFileSync(
+					`flaky-tests/${filenamify(testTitle)}.json`,
 					JSON.stringify({
 						version: 1,
 						runner: '@playwright/test',

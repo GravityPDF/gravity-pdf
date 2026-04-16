@@ -218,7 +218,7 @@ class Field_Products extends Helper_Abstract_Fields {
 								</tr>
 								<tr>
 									<td colspan="2"
-										class="shipping totals"><?php Kses::output( sprintf( __( 'Shipping (%s)', 'gravity-pdf' ), wp_specialchars_decode( $products['products_totals']['shipping_name'], ENT_QUOTES ) ) ); ?></td>
+										class="shipping totals"><?php /* translators: %s: shipping method name */ Kses::output( sprintf( __( 'Shipping (%s)', 'gravity-pdf' ), wp_specialchars_decode( $products['products_totals']['shipping_name'], ENT_QUOTES ) ) ); ?></td>
 									<td class="shipping_amount totals"><?php echo esc_html( $products['products_totals']['shipping_formatted'] ); ?></td>
 								</tr>
 							<?php endif; ?>
