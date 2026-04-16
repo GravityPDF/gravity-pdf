@@ -63,6 +63,9 @@ jobs:
           php -i
           locale -a
 
+      - name: Add auth details for private composer packages
+        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+
       - name: Install Composer dependencies
         run: |
           composer install --no-progress --no-ansi --no-interaction

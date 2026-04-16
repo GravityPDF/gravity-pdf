@@ -3,26 +3,32 @@
   "license": "GPL-2.0-or-later",
   "homepage": "https://gravitypdf.com",
   "scripts": {
-    "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
-    "lint:fix": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
-    "lint:compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
-    "prefix": "bash ./bin/vendor-prefix.sh",
-    "post-install-cmd": "@composer prefix"
-  },
-  "config": {
-    "preferred-install": "dist",
-    "autoloader-suffix": "GravityPDFPlugin",
-    "platform": {
-      "php": "7.3.0"
-    },
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
-    }
+    "phpcs:lint": "./vendor/bin/phpcs --standard=./tools/phpcs/config.xml",
+    "phpcs:fix": "./vendor/bin/phpcbf --standard=./tools/phpcs/config.xml",
+    "phpcs:compatibility": "./vendor/bin/phpcs --standard=./tools/phpcs/config-php-compatibility.xml",
+    "release": "bash ./tools/release/build.sh",
+    "translate": "bash ./tools/potomatic/translate.sh",
+    "prefix": "bash ./tools/php-scoper/prefix.sh",
+    "post-install-cmd": [
+      "@composer prefix",
+      "yarn && yarn build"
+    ],
+    "post-update-cmd": [
+      "@composer prefix"
+    ]
   },
   "repositories": [
     {
       "type": "vcs",
       "url": "https://github.com/GravityPDF/url-signer"
+    },
+
+    {
+      "type": "composer",
+      "url": "https://composer.gravity.io",
+      "only": [
+        "gravity/*"
+      ]
     }
   ],
   "require": {
@@ -39,18 +45,34 @@
     "wp-coding-standards/wpcs": "^3.0.0",
     "phpcompatibility/phpcompatibility-wp": "*",
     "roave/security-advisories": "dev-master",
-    "yoast/phpunit-polyfills": "^3.0",
+    "yoast/phpunit-polyfills": "^4.0",
     "wp-phpunit/wp-phpunit": "^6.4",
-    "humbug/php-scoper": "^0.15.0"
+    "humbug/php-scoper": "^0.15.0",
+    "gravity/gravityforms": "*",
+    "gravity/gravityformspolls": "*",
+    "gravity/gravityformssurvey": "*",
+    "gravity/gravityformsquiz": "*"
+  },
+  "suggest": {
+    "roots/wordpress-full": "Install to do step debugging on the WordPress codebase."
   },
   "autoload": {
     "psr-4": {
-      "GFPDF\\": "src/",
-      "Psr\\Http\\Message\\": "vendor/psr/http-message/src",
-      "Psr\\Log\\": "vendor/psr/log/Psr/Log"
+      "GFPDF\\": "src/"
     },
     "classmap": [
       "vendor_prefixed/"
     ]
+  },
+  "config": {
+    "preferred-install": "dist",
+    "autoloader-suffix": "GravityPDFPlugin",
+    "platform": {
+      "php": "7.3.0"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "composer/installers": false
+    }
   }
 }

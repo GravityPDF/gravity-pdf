@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -25,22 +25,12 @@ jobs:
         uses: devops-actions/action-get-tag@v1.0.2
 
       - name: Setup Node JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
 
-      - name: General debug information
-        run: |
-          npm --version
-          node --version
-          yarn --version
-          curl --version
-          git --version
-          php --version
-          composer --version        
-
       - name: Gravity PDF Build
-        run: bash ./bin/build.sh $SOURCE_TAG
+        run: bash ./tools/release/build.sh $SOURCE_TAG
         env:
           SOURCE_TAG: ${{steps.tag.outputs.tag}}
 

@@ -41,6 +41,7 @@ build/assets/*
 /coverage
 /screenshots
 /artifacts
+/tests/playwright/artifacts
 
 # Others
 _notes
@@ -52,4 +53,7 @@ Thumbs.db
 
 # Environment File
 .env
+auth.json
 .claude/settings.local.json
+.claude/worktrees
+.claude/plans

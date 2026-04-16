@@ -13,6 +13,9 @@ PACKAGE_DIR="${TMP_DIR}${VERSION}"
 WORKING_DIR=$PWD
 PACKAGE_NAME="gravity-pdf"
 
+# Ensure a fresh build
+rm -f -r "${PACKAGE_DIR}"
+
 # Create the working directory
 mkdir -p ${PACKAGE_DIR}
 
@@ -20,8 +23,9 @@ mkdir -p ${PACKAGE_DIR}
 git archive HEAD ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
 tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm -f ${PACKAGE_DIR}/package.tar.gz
 
-# Run Composer
-yarn install --cwd ${PACKAGE_DIR}
+# Run Build
+yarn install --frozen-lockfile --cwd ${PACKAGE_DIR}
+yarn i10n
 yarn --cwd ${PACKAGE_DIR} build
 
 # Install all dependencies (including dev)
@@ -29,49 +33,42 @@ yarn --cwd ${PACKAGE_DIR} build
 composer install --prefer-dist --working-dir ${PACKAGE_DIR}
 
 # Run vendor cleanup - Ensures that there's no dev dependencies on production
-PLUGIN_DIR="$PACKAGE_DIR" bash ./bin/vendor-cleanup.sh
+PLUGIN_DIR="$PACKAGE_DIR" bash ./tools/php-scoper/cleanup.sh
 
 # Cleanup Node JS
 rm -f -R ${PACKAGE_DIR}/node_modules
 
 # Cleanup additional build files
 FILES=(
-"${PACKAGE_DIR}/composer.json"
-"${PACKAGE_DIR}/composer.lock"
-"${PACKAGE_DIR}/package.json"
-"${PACKAGE_DIR}/yarn.lock"
-"${PACKAGE_DIR}/.babelrc"
-"${PACKAGE_DIR}/webpack.config.js"
-"${PACKAGE_DIR}/php-scoper.phar"
-"${PACKAGE_DIR}/vendor_prefixed/.gitkeep"
-"${PACKAGE_DIR}/.nvmrc"
-"${PACKAGE_DIR}/.wp-env.json"
-"${PACKAGE_DIR}/.testcaferc.js"
-"${PACKAGE_DIR}/.eslintignore"
-"${PACKAGE_DIR}/.eslintrc.js"
-"${PACKAGE_DIR}/babel.config.js"
-"${PACKAGE_DIR}/.browserslistrc"
+"composer.json"
+"composer.lock"
+"package.json"
+"yarn.lock"
+".gitignore"
+".stylelintrc.json"
+"webpack.config.js"
+".nvmrc"
+".env.example"
+"tsconfig.json"
+".browserslistrc"
+".eslintignore"
+".eslintrc.js"
+".gitattributes"
+"babel.config.js"
+"jest.config.js"
 )
 
+echo "$PWD"
 for i in "${FILES[@]}"
 do
-    rm -f ${i}
+    rm -f "${PACKAGE_DIR}/${i}"
 done
 
-rm -f -R "${PACKAGE_DIR}/src/assets/scss"
-rm -f -R "${PACKAGE_DIR}/src/assets/js"
-rm -f -R "${PACKAGE_DIR}/bin"
-rm -f -R "${PACKAGE_DIR}/.php-scoper"
-rm -f -R "${PACKAGE_DIR}/webpack-configs"
+rm -f -R "${PACKAGE_DIR}/tmp"
 rm -f -R "${PACKAGE_DIR}/tools"
+rm -f -R "${PACKAGE_DIR}/.claude"
 
-# Generate language files
-cd "${PACKAGE_DIR}"
-npm install --global wp-pot-cli
-wp-pot --domain gravity-pdf --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --src 'gravity-pdf-updater.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-pdf.pot > /dev/null
-
-# Create zip package
-cd "../"
+cd "${PACKAGE_DIR}/../"
 
 rm -r -f "${PACKAGE_NAME}"
 mv ${VERSION} "${PACKAGE_NAME}"

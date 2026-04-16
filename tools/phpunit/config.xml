@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+         bootstrap="./bootstrap.php"
+         cacheResultFile="../../tmp/phpunit/phpunit.result.cache"
+         colors="true"
+         beStrictAboutOutputDuringTests="true"
+>
+    <testsuites>
+        <testsuite name="integration">
+            <directory suffix=".php">../../tests/phpunit/unit-tests/</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage cacheDirectory="../../tmp/phpunit">
+        <include>
+            <directory suffix=".php">../../src/</directory>
+            <file>../../pdf.php</file>
+            <file>../../api.php</file>
+            <file>../../gravity-pdf-updater.php</file>
+        </include>
+    </coverage>
+</phpunit>

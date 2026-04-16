@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Enable Logging for Gravity PDF et al.
  *
- * @since 6.14.0 Moved from \GFPDF\Helper\Helper_Logger
+ * @since 6.15.0 Moved from \GFPDF\Helper\Helper_Logger
  */
 class Logger {
 
@@ -56,7 +56,7 @@ class Logger {
 	/**
 	 * Defines the maximum file size for a log file.
 	 *
-	 * @since    6.14.0
+	 * @since    6.15.0
 	 * @internal copied from \GFLogging to do log rotations
 	 */
 	protected $max_file_size = 5242880;
@@ -64,7 +64,7 @@ class Logger {
 	/**
 	 * Defines the maximum number of log files to store for a plugin.
 	 *
-	 * @since    6.14.0
+	 * @since    6.15.0
 	 * @internal copied from \GFLogging to do log rotations
 	 */
 	protected $max_file_count = 10;
@@ -72,7 +72,7 @@ class Logger {
 	/**
 	 * Defines the date format for logged messages.
 	 *
-	 * @since    6.14.0
+	 * @since    6.15.0
 	 * @internal copied from \GFLogging to do log rotations
 	 */
 	protected $date_format_log_file = 'YmdGis';
@@ -160,7 +160,7 @@ class Logger {
 	 * @return void
 	 *
 	 * @since 4.2
-	 * @since 6.14.0 Dropped support for separate GF Logging plugin + Gravity Forms < 2.5
+	 * @since 6.15.0 Dropped support for separate GF Logging plugin + Gravity Forms < 2.5
 	 */
 	protected function setup_gravityforms_logging() {
 		/* Skip if dependency or setting not available/enabled */
@@ -232,7 +232,7 @@ class Logger {
 	 *
 	 * @param string $file_path Path to log.
 	 *
-	 * @since    6.14.0
+	 * @since    6.15.0
 	 * @internal copied from \GFLogging::maybe_reset_logs()
 	 */
 	protected function rotate_logs( $file_path ) {
@@ -288,7 +288,7 @@ class Logger {
 	 * This is a temporary measure. Over time our plugins will be updated to support both \Psr\Log\LoggerInterface and '\GFPDF_Vendor\Psr\Log\LoggerInterface' and this won't be required.
 	 *
 	 * @return LoggerInterface
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 *
 	 */
 	protected function get_monolog() {

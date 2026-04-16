@@ -34,3 +34,5 @@ do
 done
 
 eval "$COMPOSER dump-autoload --optimize --working-dir ${PLUGIN_DIR}"
+
+rm -f "${PLUGIN_DIR}/vendor_prefixed/.gitkeep"
