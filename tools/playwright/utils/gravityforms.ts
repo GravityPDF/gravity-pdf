@@ -1,5 +1,4 @@
 import { readFile } from 'fs/promises';
-import { URL } from 'node:url';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 
@@ -131,14 +130,23 @@ export default class GravityForms {
 			`subview=notification&page=gf_edit_forms&view=settings&id=${formId}`
 		);
 
-		await this.page.getByRole('link', {name: 'Add New'}).click();
+		await this.page.getByRole('link', { name: 'Add New' }).click();
 
-		await this.page.getByRole('textbox', {name: 'Name'}).first().fill(name);
-		await this.page.getByRole('textbox', {name: 'Send To Email'}).fill('hi@example.com');
-		await this.page.getByRole('textbox', {name: 'Subject'}).fill('Subject');
+		await this.page
+			.getByRole('textbox', { name: 'Name' })
+			.first()
+			.fill(name);
+		await this.page
+			.getByRole('textbox', { name: 'Send To Email' })
+			.fill('hi@example.com');
+		await this.page
+			.getByRole('textbox', { name: 'Subject' })
+			.fill('Subject');
 		await this.setRichTextContent('#gform_setting_message', 'Message');
 
-		await this.page.getByRole('button', {name: 'Update Notification'}).click();
+		await this.page
+			.getByRole('button', { name: 'Update Notification' })
+			.click();
 	}
 
 	async setRichTextContent(
@@ -156,9 +164,11 @@ export default class GravityForms {
 
 		const textbox = await container.getByRole('textbox').last();
 
-		await (!append
-			? textbox.fill(content)
-			: textbox.pressSequentially(content));
+		if (append) {
+			content = (await textbox.inputValue()) + content;
+		}
+
+		await textbox.fill(content);
 	}
 
 	async submitForm() {

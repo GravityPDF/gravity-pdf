@@ -4,7 +4,7 @@ import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('{Label:pdf:[id]} Merge Tag', () => {
-	test.only('Text Confirmation Mergetag Selector', async ({
+	test('Text Confirmation Mergetag Selector', async ({
 		requestUtils,
 		page,
 		admin,
@@ -33,7 +33,6 @@ test.describe('{Label:pdf:[id]} Merge Tag', () => {
 			'">View PDF</a>',
 			true
 		);
-		await page.waitForTimeout(300);
 		await pdf.submitForm();
 
 		// preview and submit form
