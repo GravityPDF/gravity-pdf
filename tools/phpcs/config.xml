@@ -44,6 +44,7 @@
         <exclude name="Universal.Operators.DisallowShortTernary.Found"/>
 
         <exclude-pattern>/tests/*</exclude-pattern>
+        <exclude-pattern>/languages/*</exclude-pattern>
     </rule>
 
     <!-- Include the best parts of PSR-1 -->
