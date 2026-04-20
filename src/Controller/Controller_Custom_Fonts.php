@@ -20,6 +20,7 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 use WP_REST_Request;
@@ -335,7 +336,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				if ( $useKashida !== null ) {
 					$useKashida = (int) $useKashida;
 					if ( $useKashida < 0 || $useKashida > 100 ) {
-						throw new \InvalidArgumentException( __( 'Kashida needs to be a value between 0-100', 'gravity-pdf' ) );
+						throw new InvalidArgumentException( __( 'Kashida needs to be a value between 0-100', 'gravity-pdf' ) );
 					}
 				}
 

@@ -90,7 +90,7 @@ test.describe('PDF Security and Access Policies', () => {
 		await pdf.navigateToNewFormPdf(form.id);
 		const pdfId = await pdf.createPdf(form.id, 'Restrict Owner');
 
-		await pdf.navigateToFormPdf(form.id, pdfId);
+		await pdf.navigateToFormPdf(form.id, pdfId!);
 		await pdf.checkField('Restrict Owner', true);
 		await pdf.addOrUpdatePdf();
 
@@ -133,7 +133,7 @@ test.describe('PDF Security and Access Policies', () => {
 		await pdf.navigateToNewFormPdf(form.id);
 		const pdfId = await pdf.createPdf(form.id, 'Restrict Owner');
 
-		await pdf.navigateToFormPdf(form.id, pdfId);
+		await pdf.navigateToFormPdf(form.id, pdfId!);
 		await pdf.checkField('Restrict Owner', true);
 		await pdf.addOrUpdatePdf();
 
@@ -162,7 +162,7 @@ test.describe('PDF Security and Access Policies', () => {
 		await pdf.navigateToNewFormPdf(form.id);
 		const pdfId = await pdf.createPdf(form.id, 'Public PDF');
 
-		await pdf.navigateToFormPdf(form.id, pdfId);
+		await pdf.navigateToFormPdf(form.id, pdfId!);
 		await pdf.checkField('Enable Public Access', true);
 		await pdf.addOrUpdatePdf();
 

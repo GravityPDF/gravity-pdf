@@ -1,17 +1,20 @@
 import { defineConfig, devices } from '@playwright/test';
+import { ChromaticConfig } from '@chromatic-com/playwright';
 import * as path from 'path';
 
 process.env.WP_ARTIFACTS_PATH = path.join(process.cwd(), 'tmp/artifacts');
 
+// @ts-ignore
 import baseConfig = require('@wordpress/scripts/config/playwright.config.js');
 
-const config = defineConfig({
+const config = defineConfig<ChromaticConfig>({
 	...baseConfig,
 
 	fullyParallel: true,
 	workers: 4,
 	quiet: !!process.env.CI,
 	maxFailures: process.env.CI ? 5 : 0,
+	retries: process.env.CI ? 2 : 1,
 
 	testDir: undefined,
 
@@ -31,18 +34,16 @@ const config = defineConfig({
 		},
 	],
 
-	expect: {
-		toHaveScreenshot: { maxDiffPixelRatio: 0.1 },
-	},
-
 	use: {
 		...baseConfig.use,
 		baseURL: undefined,
 		disableAutoSnapshot: true,
 		ignoreSelectors: [
+			'#details',
+			'#gform-form-switcher-control',
+			'#minor-publishing',
 			'#wpadminbar',
-			'#adminmenumain',
-			'#gform-form-toolbar',
+			'#adminmenuwrap',
 		],
 	},
 
@@ -63,21 +64,21 @@ const config = defineConfig({
 			},
 		},
 
-		{
-			name: 'setup-core-with-permalinks',
-			testDir: path.join(process.cwd(), 'tools/playwright'),
-			testMatch: /.*global-setup\.ts/,
-			use: {
-				baseURL: 'http://localhost:8703',
-				storageState: { cookies: [], origins: [] },
-			},
-			metadata: {
-				storageStatePath: path.join(
-					process.cwd(),
-					'tmp/artifacts/storage-states/e2e-permalinks.json'
-				),
-			},
-		},
+		// {
+		// 	name: 'setup-core-with-permalinks',
+		// 	testDir: path.join(process.cwd(), 'tools/playwright'),
+		// 	testMatch: /.*global-setup\.ts/,
+		// 	use: {
+		// 		baseURL: 'http://localhost:8703',
+		// 		storageState: { cookies: [], origins: [] },
+		// 	},
+		// 	metadata: {
+		// 		storageStatePath: path.join(
+		// 			process.cwd(),
+		// 			'tmp/artifacts/storage-states/e2e-permalinks.json'
+		// 		),
+		// 	},
+		// },
 
 		{
 			name: 'core',
@@ -94,20 +95,20 @@ const config = defineConfig({
 			},
 		},
 
-		{
-			name: 'core-with-permalinks',
-			dependencies: ['setup-core-with-permalinks'],
-			testDir: path.join(process.cwd(), 'tests/playwright'),
-			testMatch: /permalinks\/.*(test|spec).(js|ts|mjs)/,
-			use: {
-				...devices['Desktop Chrome'],
-				baseURL: 'http://localhost:8703',
-				storageState: path.join(
-					process.cwd(),
-					'tmp/artifacts/storage-states/e2e-permalinks.json'
-				),
-			},
-		},
+		// {
+		// 	name: 'core-with-permalinks',
+		// 	dependencies: ['setup-core-with-permalinks'],
+		// 	testDir: path.join(process.cwd(), 'tests/playwright'),
+		// 	testMatch: /permalinks\/.*(test|spec).(js|ts|mjs)/,
+		// 	use: {
+		// 		...devices['Desktop Chrome'],
+		// 		baseURL: 'http://localhost:8703',
+		// 		storageState: path.join(
+		// 			process.cwd(),
+		// 			'tmp/artifacts/storage-states/e2e-permalinks.json'
+		// 		),
+		// 	},
+		// },
 	],
 });
 

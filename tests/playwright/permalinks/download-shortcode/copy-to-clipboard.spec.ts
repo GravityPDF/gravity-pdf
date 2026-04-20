@@ -20,7 +20,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		const pdf = new Pdf(requestUtils, admin, page);
 		const form = await pdf.createForm('Copy to Clipboard');
 		const pdfId = await pdf.createPdf(form.id, pdfLabel);
-		await pdf.copyDownloadShortcodeToClipboard(form.id, pdfId);
+		await pdf.copyDownloadShortcodeToClipboard(form.id, pdfId!);
 
 		await takeSnapshot(page, testinfo);
 

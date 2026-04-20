@@ -3,12 +3,13 @@ import type { Page } from '@playwright/test';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import type { Entry, Form } from '@self:playwright/utils/gravityforms';
 
 test.describe('Conditional PDF', () => {
-	let form = null;
-	let pdf = null;
-	let entry1 = null;
-	let entry2 = null;
+	let form: Form;
+	let pdf: Pdf;
+	let entry1: Entry;
+	let entry2: Entry;
 
 	test.beforeEach(
 		async ({
@@ -39,7 +40,7 @@ test.describe('Conditional PDF', () => {
 			entry2 = await pdf.createEntry({
 				form_id: form.id,
 				1: 'First Choice',
-			});
+			} as any);
 		}
 	);
 
@@ -67,7 +68,7 @@ test.describe('Conditional PDF', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		await pdf.navigateToEntryDetail(entry1.form_id, entry1.id);
+		await pdf.navigateToEntryDetail(entry1.form_id, entry1.id!);
 		await expect(
 			page.getByRole('link', { name: 'View', exact: true })
 		).not.toBeAttached();
@@ -75,7 +76,7 @@ test.describe('Conditional PDF', () => {
 			page.getByRole('link', { name: 'Download', exact: true })
 		).not.toBeAttached();
 
-		await pdf.navigateToEntryDetail(entry2.form_id, entry2.id);
+		await pdf.navigateToEntryDetail(entry2.form_id, entry2.id!);
 		await expect(
 			page.getByRole('link', { name: 'View', exact: true })
 		).toBeAttached();

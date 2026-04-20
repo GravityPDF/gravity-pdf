@@ -3,11 +3,12 @@ import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import { takeSnapshot } from '@chromatic-com/playwright';
+import type { Entry, Form } from '@self:playwright/utils/gravityforms';
 
 test.describe('Single PDF', () => {
-	let form = null;
-	let pdf = null;
-	let entry = null;
+	let form: Form;
+	let pdf: Pdf;
+	let entry: Entry;
 
 	test.beforeEach(
 		async ({
@@ -58,7 +59,7 @@ test.describe('Single PDF', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		await pdf.navigateToEntryDetail(entry.form_id, entry.id);
+		await pdf.navigateToEntryDetail(entry.form_id, entry.id || 0);
 
 		const viewPdfLink = page.getByRole('link', {
 			name: 'View',

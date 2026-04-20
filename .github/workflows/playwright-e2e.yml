@@ -51,6 +51,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - name: Log debug information
         run: |
@@ -138,6 +139,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - name: Install JS Dependencies
         run: yarn install --frozen-lockfile
@@ -153,4 +155,5 @@ jobs:
         with:
           playwright: true
           autoAcceptChanges: "development"
+          exitOnceUploaded: true
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

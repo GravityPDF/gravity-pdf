@@ -1,0 +1,134 @@
+
+.gfpdf-font-manager-modal {
+  #gfpdf-font-manager-container {
+    .add-update-font-column {
+      .footer {
+        padding-bottom: 40px;
+
+        .buttons-icons-container {
+          display: grid;
+          grid-template-columns: 3fr 1fr;
+
+          .cancel {
+            button {
+              margin-bottom: 0;
+            }
+          }
+
+          .gfpdf-spinner {
+            padding-left: 0;
+          }
+
+          .button {
+            height: 35px;
+            margin-right: 8px;
+          }
+
+          .select-delete-icons-container {
+            justify-self: end;
+
+            .dashicons {
+              width: auto;
+              height: auto;
+            }
+          }
+        }
+
+        .dashicons {
+          border: 1px solid var(--gfpdf-lighter-highlight-color);
+          border-radius: 3px;
+          margin-right: 0.3rem;
+          padding: 0.4rem;
+
+          &:hover {
+            cursor: pointer;
+          }
+
+          &.dashicons-yes {
+            &:hover {
+              background-color: var(--gfpdf-lighter-highlight-color);
+              color: white;
+            }
+
+            &.checked {
+              background-color: var(--gfpdf-success-color);
+              color: white;
+
+              &:hover {
+                background-color: var(--gfpdf-lighter-highlight-color);
+                color: var(--gfpdf-highlight-color);
+              }
+            }
+          }
+
+          &.dashicons-trash {
+            color: var(--gfpdf-highlight-color);
+
+            &:hover {
+              background-color: var(--gfpdf-error-color);
+              color: white;
+            }
+          }
+        }
+
+        .msg {
+          display: block;
+
+          &.template-usage-link {
+            margin-top: 1rem;
+
+            a {
+              color: var(--gfpdf-link-color);
+              cursor: pointer;
+              text-decoration: underline;
+            }
+
+            .dashicons {
+              border: 0px;
+              font-size: 0.9rem;
+              margin-top: 0.2rem;
+              padding: 0;
+            }
+
+            div {
+              margin-left: 1.6rem;
+            }
+
+            #template_usage_info_box {
+              color: #000;
+              font-family: "Courier New", Courier, monospace;
+              font-size: 0.8rem;
+              margin: 0.5rem 0 0 1.6rem;
+              height: 170px;
+              width: 80%;
+              border: 3px solid #aaaaaa;
+              border-radius: 5px;
+            }
+          }
+
+          .template-usage-link__button {
+            background-color: unset;
+            border: unset;
+            box-shadow: unset;
+            text-decoration: underline;
+            color: var(--gfpdf-link-color);
+            padding: 0;
+
+            &:hover {
+              cursor: pointer;
+            }
+          }
+
+          &.success {
+            color: var(--gfpdf-success-color);
+          }
+
+          &.error {
+            color: var(--gfpdf-error-color);
+          }
+
+        }
+      }
+    }
+  }
+}
