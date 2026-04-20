@@ -1,346 +1,248 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import { storeFactory, findByTestAttr } from '../../testUtils';
-import ConnectedTemplateUploader, {
-	TemplateUploader,
-	mapDispatchToProps,
-} from '../../../../../src/assets/js/react/components/Template/TemplateUploader';
+import { act, fireEvent } from '@testing-library/react';
+import {
+	findByTestAttr,
+	renderWithStore,
+	createTestStore,
+} from '../../testUtilsRTL';
+import TemplateUploader from '../../../../../src/assets/js/react/components/Template/TemplateUploader';
+
+jest.mock(
+	'react-dropzone',
+	() =>
+		function Dropzone({ onDrop, children }) {
+			return (
+				<>
+					<button
+						data-test="drop-valid-file"
+						onClick={() =>
+							onDrop([{ name: 'template.zip', size: 1024 }])
+						}
+					/>
+					<button
+						data-test="drop-invalid-ext"
+						onClick={() =>
+							onDrop([{ name: 'template.txt', size: 1024 }])
+						}
+					/>
+					<button
+						data-test="drop-large-file"
+						onClick={() =>
+							onDrop([
+								{ name: 'template.zip', size: 1024 * 10241 },
+							])
+						}
+					/>
+					{children({
+						getRootProps: () => ({}),
+						getInputProps: () => ({}),
+						isDragActive: false,
+					})}
+				</>
+			);
+		}
+);
 
 describe('Template - TemplateUploader.js', () => {
-	let wrapper;
-	let component;
-	const postTemplateUploadProcessingMock = jest.fn();
-	const addNewTemplateMock = jest.fn();
-	const clearTemplateUploadProcessingMock = jest.fn();
-	const updateTemplateParamMock = jest.fn();
+	const initialState = {
+		template: {
+			list: [
+				{ id: 'blank-slate', template: 'Blank Slate' },
+				{ id: 'rubix', template: 'Rubix' },
+			],
+			activeTemplate: '',
+			search: '',
+			updateSelectBoxText: '',
+			templateProcessing: '',
+			templateUploadProcessingSuccess: {},
+			templateUploadProcessingError: {},
+		},
+	};
 
-	describe('Check for redux properties', () => {
-		const setup = (state = {}) => {
-			const store = storeFactory(state);
-			wrapper = shallow(<ConnectedTemplateUploader store={store} />)
-				.dive()
-				.dive();
-
-			return wrapper;
-		};
-		const dispatch = jest.fn();
-
-		setup();
-
-		test('has access to `list` state', () => {
-			wrapper = setup();
-			const templatesProp = wrapper.instance().props.templates;
-
-			expect(templatesProp).toBeInstanceOf(Array);
-		});
-
-		test('has access to `templateUploadProcessingSuccess` state', () => {
-			wrapper = setup({
-				template: { templateUploadProcessingSuccess: { test: 'test' } },
-			});
-			const templateUploadProcessingSuccessProp =
-				wrapper.instance().props.templateUploadProcessingSuccess;
-
-			expect(templateUploadProcessingSuccessProp).toBeInstanceOf(Object);
-			expect(templateUploadProcessingSuccessProp).toEqual({
-				test: 'test',
-			});
-		});
-
-		test('has access to `templateUploadProcessingError` state', () => {
-			wrapper = setup({
-				template: { templateUploadProcessingError: { error: 'test' } },
-			});
-			const templateUploadProcessingErrorProp =
-				wrapper.instance().props.templateUploadProcessingError;
-
-			expect(templateUploadProcessingErrorProp).toBeInstanceOf(Object);
-			expect(templateUploadProcessingErrorProp).toEqual({
-				error: 'test',
-			});
-		});
-
-		test('check for mapDispatchToProps addNewTemplate()', () => {
-			mapDispatchToProps(dispatch).addNewTemplate();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'ADD_TEMPLATE',
-			});
-		});
-
-		test('check for mapDispatchToProps updateTemplateParam()', () => {
-			mapDispatchToProps(dispatch).updateTemplateParam();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'UPDATE_TEMPLATE_PARAM',
-			});
-		});
-
-		test('check for mapDispatchToProps postTemplateUploadProcessing()', () => {
-			mapDispatchToProps(dispatch).postTemplateUploadProcessing();
-
-			expect(dispatch.mock.calls[0][0].type).toBe(
-				'POST_TEMPLATE_UPLOAD_PROCESSING'
-			);
-		});
-
-		test('check for mapDispatchToProps clearTemplateUploadProcessing()', () => {
-			mapDispatchToProps(dispatch).clearTemplateUploadProcessing();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'CLEAR_TEMPLATE_UPLOAD_PROCESSING',
-			});
-		});
-	});
-
-	describe('Component functions', () => {
-		test('handleOndrop() - Manages the template file upload', () => {
-			const acceptedFiles = [
-				{
-					lastModified: 1552267520000,
-					name: 'gpdf-cellulose-1.4.0.zip',
-					path: 'gpdf-cellulose-1.4.0.zip',
-					size: 1137334,
-					type: 'application/zip',
-					webkitRelativePath: '',
-				},
-			];
-
-			wrapper = shallow(
-				<TemplateUploader
-					postTemplateUploadProcessing={
-						postTemplateUploadProcessingMock
-					}
-				/>
-			);
-			wrapper.instance().handleOndrop(acceptedFiles);
-
-			expect(wrapper.state('ajax')).toBe(true);
-			expect(wrapper.state('error')).toBe('');
-			expect(wrapper.state('message')).toBe('');
-			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(1);
-		});
-
-		test('checkFilename() - Checks if the uploaded file has a .zip extension', () => {
-			let name;
-			name = 'gpdf-cellulose-1.4.0.zip';
-
-			wrapper = shallow(
-				<TemplateUploader filenameErrorText="errorText" />
-			);
-
-			expect(wrapper.instance().checkFilename(name)).toBe(true);
-
-			name = 'gpdf-cellulose-1.4.0';
-
-			wrapper.instance().checkFilename(name);
-
-			expect(wrapper.state('error')).toBe('errorText');
-			expect(wrapper.instance().checkFilename(name)).toBe(false);
-		});
-
-		test('checkFilesize() - Checks if the file size is larger than 5MB', () => {
-			let size;
-			size = 1137334;
-
-			wrapper = shallow(
-				<TemplateUploader filesizeErrorText="errorText" />
-			);
-
-			expect(wrapper.instance().checkFilesize(size)).toBe(true);
-
-			size = 999999999;
-
-			wrapper.instance().checkFilesize(size);
-			expect(wrapper.state('error')).toBe('errorText');
-			expect(wrapper.instance().checkFilesize(size)).toBe(false);
-		});
-
-		test('ajaxSuccess() - Update our Redux store with the new PDF template details', () => {
-			let response;
-			const templates = [
-				{ template: 'Blank Slate', id: 'blank-slate' },
-				{ template: 'Focus Gravity', id: 'focus-gravity' },
-				{ template: 'Rubix', id: 'rubix' },
-				{ template: 'Zadani', id: 'zadani' },
-			];
-			response = {
-				templates: [{ template: 'Cellulose', id: 'gpdf-cellulose' }],
-			};
-
-			wrapper = shallow(
-				<TemplateUploader
-					templates={templates}
-					addNewTemplate={addNewTemplateMock}
-					clearTemplateUploadProcessing={
-						clearTemplateUploadProcessingMock
-					}
-					templateSuccessfullyInstalledUpdated="successText"
-				/>
-			);
-			wrapper.instance().ajaxSuccess(response);
-
-			expect(addNewTemplateMock.mock.calls.length).toBe(1);
-			expect(wrapper.state('ajax')).toBe(false);
-			expect(wrapper.state('message')).toBe('successText');
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1);
-
-			response = { templates: [{ template: 'Rubix', id: 'rubix' }] };
-
-			wrapper = shallow(
-				<TemplateUploader
-					templates={templates}
-					updateTemplateParam={updateTemplateParamMock}
-					clearTemplateUploadProcessing={
-						clearTemplateUploadProcessingMock
-					}
-					templateSuccessfullyInstalledUpdated="successText"
-				/>
-			);
-			wrapper.instance().ajaxSuccess(response);
-
-			expect(addNewTemplateMock.mock.calls.length).toBe(1);
-			expect(wrapper.state('ajax')).toBe(false);
-			expect(wrapper.state('message')).toBe('successText');
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(2);
-		});
-
-		test('ajaxFailed() - Show any errors to the user when AJAX request fails for any reason', () => {
-			let error;
-			error = {
-				message: 'error',
-			};
-
-			wrapper = shallow(
-				<TemplateUploader
-					clearTemplateUploadProcessing={
-						clearTemplateUploadProcessingMock
-					}
-				/>
-			);
-			wrapper.instance().ajaxFailed(error);
-
-			expect(wrapper.state('error')).toBe('error');
-			expect(wrapper.state('ajax')).toBe(false);
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1);
-
-			error = {
-				response: {
-					body: {},
-				},
-			};
-
-			wrapper = shallow(
-				<TemplateUploader
-					clearTemplateUploadProcessing={
-						clearTemplateUploadProcessingMock
-					}
-					genericUploadErrorText="errorText"
-				/>
-			);
-			wrapper.instance().ajaxFailed(error);
-
-			expect(wrapper.state('error')).toBe('errorText');
-			expect(wrapper.state('ajax')).toBe(false);
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(2);
-		});
-
-		test('removeMessage() - Remove message from state once the timeout has finished', () => {
-			wrapper = shallow(<TemplateUploader />);
-			wrapper.instance().removeMessage();
-
-			expect(wrapper.state('message')).toBe('');
-		});
-	});
-
-	describe('Run Lifecycle methods', () => {
-		test('componentDidUpdate() - Fires appropriate function based on Redux store data (success)', () => {
-			const props = {
-				templateUploadProcessingSuccess: {
-					templates: [
-						{
-							template: 'Cellulose',
-							id: 'gpdf-cellulose',
-						},
-					],
-				},
-				templateUploadProcessingError: {},
-			};
-			const prevProps = {
-				templateUploadProcessingSuccess: {},
-				templateUploadProcessingError: {},
-			};
-			const templates = [
-				{ template: 'Blank Slate', id: 'blank-slate' },
-				{ template: 'Focus Gravity', id: 'focus-gravity' },
-				{ template: 'Rubix', id: 'rubix' },
-				{ template: 'Zadani', id: 'zadani' },
-			];
-			wrapper = shallow(
-				<TemplateUploader
-					templates={templates}
-					addNewTemplate={addNewTemplateMock}
-					clearTemplateUploadProcessing={
-						clearTemplateUploadProcessingMock
-					}
-					{...props}
-				/>
-			);
-			const ajaxSuccess = jest.spyOn(wrapper.instance(), 'ajaxSuccess');
-			wrapper.instance().componentDidUpdate(prevProps);
-
-			expect(ajaxSuccess).toHaveBeenCalledTimes(1);
-		});
-
-		test('componentDidUpdate() - Fires appropriate function based on Redux store data (error)', () => {
-			const props = {
-				templateUploadProcessingSuccess: {},
-				templateUploadProcessingError: {
-					response: {
-						body: {
-							error: 'error',
-						},
-					},
-				},
-			};
-			const prevProps = {
-				templateUploadProcessingSuccess: {},
-				templateUploadProcessingError: {},
-			};
-			wrapper = shallow(
-				<TemplateUploader
-					clearTemplateUploadProcessing={
-						clearTemplateUploadProcessingMock
-					}
-					{...props}
-				/>
-			);
-			const ajaxFailed = jest.spyOn(wrapper.instance(), 'ajaxFailed');
-			wrapper.instance().componentDidUpdate(prevProps);
-
-			expect(ajaxFailed).toHaveBeenCalledTimes(1);
-		});
-	});
+	const defaultProps = {
+		genericUploadErrorText: 'Generic upload error',
+		addTemplateText: 'Add New Template',
+		filenameErrorText: 'Filename must be a zip file',
+		filesizeErrorText: 'File size exceeds limit',
+		installSuccessText: 'Installed successfully',
+		installUpdatedText: 'Updated successfully',
+		templateSuccessfullyInstalledUpdated:
+			'Template installed/updated successfully',
+		templateInstallInstructions: 'Drag & drop your zip file',
+	};
 
 	test('renders <TemplateUploader /> component', () => {
-		wrapper = shallow(<TemplateUploader />);
-		component = findByTestAttr(wrapper, 'component-templateUploader');
-
-		expect(component.length).toBe(1);
+		const { container } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			initialState
+		);
+		expect(
+			findByTestAttr(container, 'component-templateUploader')
+		).toBeInTheDocument();
 	});
 
-	test('renders <Dropzone /> component', () => {
-		wrapper = shallow(<TemplateUploader />);
-		component = findByTestAttr(wrapper, 'component-dropzone');
-
-		expect(component.length).toBe(1);
+	test('renders Dropzone area', () => {
+		const { container } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			initialState
+		);
+		expect(
+			findByTestAttr(container, 'drop-valid-file')
+		).toBeInTheDocument();
 	});
 
-	test("renders <ShowMessage /> component if state.error !== ''", async () => {
-		wrapper = mount(<TemplateUploader />);
-		React.act(() => wrapper.setState({ error: 'errorText' }));
-		component = findByTestAttr(wrapper, 'component-stateError-showMessage');
+	test('valid file drop dispatches POST_TEMPLATE_UPLOAD_PROCESSING', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		const { container } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			{},
+			{},
+			store
+		);
+		fireEvent.click(findByTestAttr(container, 'drop-valid-file'));
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'POST_TEMPLATE_UPLOAD_PROCESSING' })
+		);
+	});
 
-		expect(component.length).toBe(1);
+	test('invalid file extension shows filename error', () => {
+		const { container, getByText } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			initialState
+		);
+		fireEvent.click(findByTestAttr(container, 'drop-invalid-ext'));
+		expect(getByText('Filename must be a zip file')).toBeInTheDocument();
+	});
+
+	test('oversized file shows filesize error', () => {
+		const { container, getByText } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			initialState
+		);
+		fireEvent.click(findByTestAttr(container, 'drop-large-file'));
+		expect(getByText('File size exceeds limit')).toBeInTheDocument();
+	});
+
+	test('success with new template dispatches ADD_TEMPLATE and shows success message', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		const { getByText } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			{},
+			{},
+			store
+		);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_UPLOAD_PROCESSING_SUCCESS',
+				payload: {
+					templates: [{ id: 'cellulose', template: 'Cellulose' }],
+				},
+			});
+		});
+
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'ADD_TEMPLATE' })
+		);
+		expect(
+			getByText('Template installed/updated successfully')
+		).toBeInTheDocument();
+	});
+
+	test('success with existing template dispatches UPDATE_TEMPLATE_PARAM', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		renderWithStore(<TemplateUploader {...defaultProps} />, {}, {}, store);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_UPLOAD_PROCESSING_SUCCESS',
+				payload: { templates: [{ id: 'rubix', template: 'Rubix' }] },
+			});
+		});
+
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'UPDATE_TEMPLATE_PARAM' })
+		);
+	});
+
+	test('success dispatches CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		renderWithStore(<TemplateUploader {...defaultProps} />, {}, {}, store);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_UPLOAD_PROCESSING_SUCCESS',
+				payload: {
+					templates: [{ id: 'cellulose', template: 'Cellulose' }],
+				},
+			});
+		});
+
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: 'CLEAR_TEMPLATE_UPLOAD_PROCESSING',
+			})
+		);
+	});
+
+	test('error response shows error message from payload', () => {
+		const store = createTestStore(initialState);
+		const { getByText } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			{},
+			{},
+			store
+		);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_UPLOAD_PROCESSING_FAILED',
+				payload: { message: 'Specific upload error' },
+			});
+		});
+
+		expect(getByText('Specific upload error')).toBeInTheDocument();
+	});
+
+	test('error response falls back to genericUploadErrorText when no message', () => {
+		const store = createTestStore(initialState);
+		const { getByText } = renderWithStore(
+			<TemplateUploader {...defaultProps} />,
+			{},
+			{},
+			store
+		);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_UPLOAD_PROCESSING_FAILED',
+				payload: { code: 'upload_error' },
+			});
+		});
+
+		expect(getByText('Generic upload error')).toBeInTheDocument();
+	});
+
+	test('error response dispatches CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		renderWithStore(<TemplateUploader {...defaultProps} />, {}, {}, store);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_UPLOAD_PROCESSING_FAILED',
+				payload: { message: 'error' },
+			});
+		});
+
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: 'CLEAR_TEMPLATE_UPLOAD_PROCESSING',
+			})
+		);
 	});
 });

@@ -1,13 +1,13 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 /* Redux actions */
 import {
 	clearAddFontMsg as clearAddFontMsgAction,
 	deleteFont as deleteFontAction,
 	selectFont as selectFontAction,
-	moveSelectedFontToTop as moveSelectedFontAction,
+	moveSelectedFontToTop as moveSelectedFontToTopAction,
 } from '../../actions/fontManager';
 /* Components */
 import FontListIcon from './FontListIcon';
@@ -16,7 +16,7 @@ import Spinner from '../Spinner';
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
 /**
- * @package			Gravity PDF
+ * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -25,221 +25,103 @@ import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 /**
  * FontListItems component
  *
+ * @param {Object} root0
+ * @param {*}      root0.id
+ * @param {*}      root0.navigate
  * @since 6.0
  */
-export class FontListItems extends Component {
-	/**
-	 * PropTypes
-	 *
-	 * @since 6.0
-	 */
-	static propTypes = {
-		id: PropTypes.string,
-		navigate: PropTypes.func.isRequired,
-		clearAddFontMsg: PropTypes.func.isRequired,
-		msg: PropTypes.object.isRequired,
-		deleteFont: PropTypes.func.isRequired,
-		selectFont: PropTypes.func.isRequired,
-		moveSelectedFontToTop: PropTypes.func.isRequired,
-		fontList: PropTypes.arrayOf(
-			PropTypes.shape({
-				font_name: PropTypes.string.isRequired,
-				id: PropTypes.string.isRequired,
-				regular: PropTypes.string.isRequired,
-				italics: PropTypes.string.isRequired,
-				bold: PropTypes.string.isRequired,
-				bolditalics: PropTypes.string.isRequired,
-			})
-		).isRequired,
-		searchResult: PropTypes.oneOfType([
-			PropTypes.oneOf([null]).isRequired,
-			PropTypes.arrayOf(PropTypes.object).isRequired,
-		]),
-		selectedFont: PropTypes.string.isRequired,
-		loading: PropTypes.bool.isRequired,
-	};
+const FontListItems = ({ id, navigate }) => {
+	const dispatch = useDispatch();
+	const loading = useSelector((s) => s.fontManager.deleteFontLoading);
+	const fontList = useSelector((s) => s.fontManager.fontList);
+	const searchResult = useSelector((s) => s.fontManager.searchResult);
+	const selectedFont = useSelector((s) => s.fontManager.selectedFont);
+	const msg = useSelector((s) => s.fontManager.msg);
 
-	/**
-	 * Initialize component state
-	 *
-	 * @type {{ disableSelectFontName: boolean, deleteId: string, moveSelectedFontToTop: boolean }}
-	 *
-	 * @since 6.0
-	 */
-	state = {
-		disableSelectFontName: false,
-		deleteId: '',
-		moveSelectedFontToTop: true,
-	};
+	const [disableSelectFontName, setDisableSelectFontName] = useState(false);
+	const [deleteId, setDeleteId] = useState('');
+	/* One-shot flag: only move selected font to top once */
+	const moveSelectedFontToTopRef = useRef(true);
 
-	/**
-	 * On mount, Call the method handleDisableSelectFields()
-	 *
-	 * @since 6.0
-	 */
-	componentDidMount() {
-		const { selectedFont } = this.props;
+	/* Track previous values to replicate componentDidUpdate prevProps comparisons */
+	const prevLoadingRef = useRef(loading);
+	const prevFontListRef = useRef(fontList);
+	const prevSelectedFontRef = useRef(selectedFont);
 
-		this.handleDisableSelectFields();
-
-		/* Move selected font at the top of the list */
-		if (selectedFont) {
-			this.handleMoveSelectedFontAtTheTopOfTheList(selectedFont);
-		}
-	}
-
-	/**
-	 * If component did update and new props are received we'll check if the methods
-	 * handleResetLoadingState() and toggleUpdateFont() will be called
-	 *
-	 * @param { Object } prevProps
-	 *
-	 * @since 6.0
-	 */
-	componentDidUpdate(prevProps) {
-		const { navigate, loading, fontList, selectedFont, id } = this.props;
-		const updateFontVisible = document.querySelector('.update-font.show');
-
-		/* Reset/Clear deleteId loading state */
-		if (prevProps.loading !== loading && !loading) {
-			this.handleResetLoadingState();
-		}
-
-		/* Remove update font panel after font is successfully deleted */
-		if (
-			prevProps.loading !== loading &&
-			prevProps.fontList !== fontList &&
-			updateFontVisible
-		) {
-			toggleUpdateFont(navigate);
-		}
-
-		/* Move selected font at the top of the list */
-		if (
-			prevProps.selectedFont === '' &&
-			selectedFont &&
-			!id &&
-			this.state.moveSelectedFontToTop
-		) {
-			this.handleMoveSelectedFontAtTheTopOfTheList(selectedFont);
-		}
-	}
-
-	/**
-	 * Check URL to distinguish the current location. If current location is under
-	 * tools tab then disable select font name functionality (radio button)
-	 *
-	 * @since 6.0
-	 */
-	handleDisableSelectFields = () => {
+	/* componentDidMount: disable select fields + optionally move selected font to top */
+	useEffect(() => {
 		const tabLocation = window.location.search.substr(
 			window.location.search.lastIndexOf('=') + 1
 		);
 
 		if (tabLocation === 'tools') {
-			return this.setState({ disableSelectFontName: true });
-		}
-
-		this.handleSetSelectedFontNameValue(tabLocation);
-	};
-
-	/**
-	 * Handle the functionality to select and set default font type to be used in PDFs (radio button)
-	 *
-	 * @param { string } location
-	 *
-	 * @since 6.0
-	 */
-	handleSetSelectedFontNameValue = (location) => {
-		let fontManagerSelectBoxValue;
-		const { fontList, selectFont } = this.props;
-
-		/* If location not under Global/General settings */
-		if (location !== 'PDF' && location !== 'general') {
-			fontManagerSelectBoxValue = document.querySelector(
-				'#gfpdf_settings\\[font\\]'
-			).value;
+			setDisableSelectFontName(true);
 		} else {
-			fontManagerSelectBoxValue = document.querySelector(
-				'#gfpdf_settings\\[default_font\\]'
-			).value;
+			let selectBoxValue;
+
+			if (tabLocation !== 'PDF' && tabLocation !== 'general') {
+				selectBoxValue = document.querySelector(
+					'#gfpdf_settings\\[font\\]'
+				).value;
+			} else {
+				selectBoxValue = document.querySelector(
+					'#gfpdf_settings\\[default_font\\]'
+				).value;
+			}
+
+			const fontExists =
+				fontList && fontList.filter((f) => f.id === selectBoxValue)[0];
+			dispatch(selectFontAction(fontExists ? selectBoxValue : ''));
 		}
 
-		/* Do nothing if selected value doesn't exist on font manager fontList */
+		if (selectedFont) {
+			moveSelectedFontToTopRef.current = false;
+			dispatch(moveSelectedFontToTopAction(selectedFont));
+		}
+	}, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+	/* componentDidUpdate: reset delete loading state + toggle update font panel on deletion */
+	useEffect(() => {
+		const prevLoading = prevLoadingRef.current;
+		const prevFontList = prevFontListRef.current;
+		prevLoadingRef.current = loading;
+		prevFontListRef.current = fontList;
+
+		if (prevLoading !== loading && !loading) {
+			setDeleteId('');
+		}
+
+		const updateFontVisible = document.querySelector('.update-font.show');
 		if (
-			!this.handleCheckSelectBoxValue(fontList, fontManagerSelectBoxValue)
+			prevLoading !== loading &&
+			prevFontList !== fontList &&
+			updateFontVisible
 		) {
-			/* Call redux action selectFont() */
-			return selectFont('');
+			toggleUpdateFont(navigate);
 		}
+	}, [loading, fontList, navigate]);
 
-		/* Call redux action selectFont() */
-		selectFont(fontManagerSelectBoxValue);
-	};
+	/* componentDidUpdate: move selected font to top when it changes from empty */
+	useEffect(() => {
+		const prevSelectedFont = prevSelectedFontRef.current;
+		prevSelectedFontRef.current = selectedFont;
 
-	/**
-	 * Handle check if font manager default selected font type is listed on custom font list
-	 *
-	 * @param { Array<Object> } fontList
-	 * @param { string }        value
-	 *
-	 * @return { boolean } condition value
-	 *
-	 * @since 6.0
-	 */
-	handleCheckSelectBoxValue = (fontList, value) => {
-		const checkIfValueExist =
-			fontList && fontList.filter((font) => font.id === value)[0];
-
-		if (!checkIfValueExist) {
-			return false;
+		if (
+			prevSelectedFont === '' &&
+			selectedFont &&
+			!id &&
+			moveSelectedFontToTopRef.current
+		) {
+			moveSelectedFontToTopRef.current = false;
+			dispatch(moveSelectedFontToTopAction(selectedFont));
 		}
+	}, [selectedFont, id, dispatch]);
 
-		return true;
-	};
+	const handleFontClick = (fontId) => {
+		const { success, error } = msg;
 
-	/**
-	 * Reset deleteId state. The state of deleteId is used to match the current delete id request and
-	 * trigger loading spinner
-	 *
-	 * @since 6.0
-	 */
-	handleResetLoadingState = () => {
-		this.setState({ deleteId: '' });
-	};
-
-	/**
-	 * Move selected font at the very top of the font list
-	 *
-	 * @param { string } selectedFont
-	 *
-	 * @since 6.0
-	 */
-	handleMoveSelectedFontAtTheTopOfTheList = (selectedFont) => {
-		this.setState({ moveSelectedFontToTop: false });
-
-		this.props.moveSelectedFontToTop(selectedFont);
-	};
-
-	/**
-	 * Handle font click to display or hide update font panel
-	 *
-	 * @param { string } fontId
-	 *
-	 * @since 6.0
-	 */
-	handleFontClick = (fontId) => {
-		const {
-			id,
-			navigate,
-			clearAddFontMsg,
-			msg: { success, error },
-		} = this.props;
-
-		/* Remove previous msg */
 		if ((success && success.addFont) || (error && error.addFont)) {
-			/* Call redux action clearAddFontMsg */
-			clearAddFontMsg();
+			dispatch(clearAddFontMsgAction());
 		}
 
 		if (id === fontId) {
@@ -249,234 +131,126 @@ export class FontListItems extends Component {
 		toggleUpdateFont(navigate, fontId);
 	};
 
-	/**
-	 * Listen to an 'enter' keyboard event on font list item
-	 *
-	 * @param { KeyboardEvent } e
-	 * @param { string }        fontId
-	 *
-	 * @since 6.0
-	 */
-	handleFontClickKeypress = (e, fontId) => {
-		const enter = 'Enter';
-		const space = ' ';
-
-		/* Check if a keyboard keypress is 'enter' (13) and call the method handleFontClick() */
-		if (e.key === enter || e.key === space) {
-			this.handleFontClick(fontId);
+	const handleFontClickKeypress = (e, fontId) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			handleFontClick(fontId);
 		}
 	};
 
-	/**
-	 * Handle request of font deletion
-	 *
-	 * @param { Event }  e
-	 * @param { string } fontId
-	 *
-	 * @since 6.0
-	 */
-	handleDeleteFont = (e, fontId) => {
+	const handleDeleteFont = (e, fontId) => {
 		e.stopPropagation();
+		setDeleteId(fontId);
 
-		this.setState({ deleteId: fontId });
-
-		/* Fire a native window alert box to confirm deletion request */
 		if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
-			/* Call redux action deleteFont */
-			this.props.deleteFont(fontId);
+			dispatch(deleteFontAction(fontId));
 		}
 	};
 
-	/**
-	 * Listen to an 'enter' keyboard event for font deletion
-	 *
-	 * @param { KeyboardEvent } e
-	 * @param { string }        fontId
-	 *
-	 * @since 6.0
-	 */
-	handleDeleteFontKeypress = (e, fontId) => {
-		const enter = 'Enter';
-		const space = ' ';
-
-		/* Check if a keyboard keypress is 'enter' (13) and call the method handleDeleteFont() */
-		if (e.key === enter || e.key === space) {
-			this.handleDeleteFont(e, fontId);
+	const handleDeleteFontKeypress = (e, fontId) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			handleDeleteFont(e, fontId);
 		}
 	};
 
-	/**
-	 * Handle the process of selecting and deselecting of font type/name (radio button)
-	 *
-	 * @param { Event } e
-	 *
-	 * @since 6.0
-	 */
-	handleSelectFont = (e) => {
-		this.props.selectFont(e.target.value);
+	const handleSelectFont = (e) => {
+		dispatch(selectFontAction(e.target.value));
 
 		const installedFonts = document.querySelectorAll('.select-font-name');
-
-		/* Handle font list keyboard accessibility thing */
 		installedFonts.forEach((item) => {
-			if (item.value === e.target.value) {
-				item.checked = true;
-
-				return;
-			}
-
-			item.checked = false;
+			item.checked = item.value === e.target.value;
 		});
 	};
 
-	/**
-	 * Listen to an 'enter' or 'space' keyboard event for selecting a font type/name (radio button)
-	 *
-	 * @param { KeyboardEvent } e
-	 *
-	 * @since 6.0
-	 */
-	handleSelectFontKeypress = (e) => {
-		const enter = 'Enter';
-		const space = ' ';
-
-		/*
-		 * Check if a keyboard keypress is 'enter' (13) or 'space' (12) and call the method handleDeleteFont()
-		 */
-		if (e.key === enter || e.key === space) {
+	const handleSelectFontKeypress = (e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
 			e.stopPropagation();
-
-			this.handleSelectFont(e);
+			handleSelectFont(e);
 		}
 	};
 
-	/**
-	 * Display the font list items UI
-	 *
-	 * @since 6.0
-	 */
-	render() {
-		const updateFontVisible = document.querySelector('.update-font.show');
-		const { disableSelectFontName, deleteId } = this.state;
-		const { id, loading, fontList, searchResult, selectedFont } =
-			this.props;
-		const list = !searchResult ? fontList : searchResult;
-		const tabIndex = !updateFontVisible ? '0' : '-1';
+	const updateFontVisible = document.querySelector('.update-font.show');
+	const list = !searchResult ? fontList : searchResult;
+	const tabIndex = !updateFontVisible ? '0' : '-1';
 
-		return (
-			<div
-				data-test="component-FontListItems"
-				className="font-list-items"
-				role="listbox"
-				aria-label={GFPDF.fontListInstalledFonts}
-				aria-live="polite"
-			>
-				{list &&
-					list.map((font) => {
-						return (
-							<div
-								key={font.id}
-								className={
-									'font-list-item' +
-									(font.id === id ? ' active' : '')
-								}
-								onClick={() => this.handleFontClick(font.id)}
-								onKeyDown={(e) =>
-									this.handleFontClickKeypress(e, font.id)
-								}
-								tabIndex={tabIndex}
-								role="option"
-							>
-								<span className="font-name">
-									{!disableSelectFontName && (
-										<input
-											type="radio"
-											className="select-font-name"
-											name={'select-font-name-' + font.id}
-											value={font.id}
-											onChange={(e) =>
-												this.handleSelectFont(e)
-											}
-											onClick={(e) => e.stopPropagation()}
-											onKeyDown={(e) =>
-												this.handleSelectFontKeypress(e)
-											}
-											checked={font.id === selectedFont}
-											aria-label={
-												GFPDF.fontManagerSelectFontAriaLabel +
-												': ' +
-												font.font_name
-											}
-											tabIndex={tabIndex}
-										/>
-									)}
-									{font.font_name}
-								</span>
-
-								<FontListIcon font={font.regular} />
-								<FontListIcon font={font.italics} />
-								<FontListIcon font={font.bold} />
-								<FontListIcon font={font.bolditalics} />
-
-								{loading && deleteId === font.id ? (
-									<Spinner style="delete-font" />
-								) : (
-									<span
-										role="button"
-										className="dashicons dashicons-trash"
-										onClick={(e) =>
-											this.handleDeleteFont(e, font.id)
-										}
+	return (
+		<div
+			data-test="component-FontListItems"
+			className="font-list-items"
+			role="listbox"
+			aria-label={GFPDF.fontListInstalledFonts}
+			aria-live="polite"
+		>
+			{list &&
+				list.map((font) => {
+					return (
+						<div
+							key={font.id}
+							className={
+								'font-list-item' +
+								(font.id === id ? ' active' : '')
+							}
+							onClick={() => handleFontClick(font.id)}
+							onKeyDown={(e) =>
+								handleFontClickKeypress(e, font.id)
+							}
+							tabIndex={tabIndex}
+							role="option"
+						>
+							<span className="font-name">
+								{!disableSelectFontName && (
+									<input
+										type="radio"
+										className="select-font-name"
+										name={'select-font-name-' + font.id}
+										value={font.id}
+										onChange={(e) => handleSelectFont(e)}
+										onClick={(e) => e.stopPropagation()}
 										onKeyDown={(e) =>
-											this.handleDeleteFontKeypress(
-												e,
-												font.id
-											)
+											handleSelectFontKeypress(e)
+										}
+										checked={font.id === selectedFont}
+										aria-label={
+											GFPDF.fontManagerSelectFontAriaLabel +
+											': ' +
+											font.font_name
 										}
 										tabIndex={tabIndex}
 									/>
 								)}
-							</div>
-						);
-					})}
-			</div>
-		);
-	}
-}
+								{font.font_name}
+							</span>
 
-/**
- * Map redux state to props
- *
- * @param { Object } state
- * @param { Object } state.fontManager
- *
- * @return {{
- *   loading: boolean,
- *   fontList: Array<Object>,
- *   searchResult: null | Array<Object>,
- *   selectedFont: string,
- *   msg: object,
- * }} mappedState
- *
- * @since 6.0
- */
-const mapStateToProps = (state) => ({
-	loading: state.fontManager.deleteFontLoading,
-	fontList: state.fontManager.fontList,
-	searchResult: state.fontManager.searchResult,
-	selectedFont: state.fontManager.selectedFont,
-	msg: state.fontManager.msg,
-});
+							<FontListIcon font={font.regular} />
+							<FontListIcon font={font.italics} />
+							<FontListIcon font={font.bold} />
+							<FontListIcon font={font.bolditalics} />
 
-/**
- * Connect and dispatch redux actions as props
- *
- * @since 6.0
- */
-export default connect(mapStateToProps, {
-	clearAddFontMsg: clearAddFontMsgAction,
-	deleteFont: deleteFontAction,
-	selectFont: selectFontAction,
-	moveSelectedFontToTop: moveSelectedFontAction,
-})(FontListItems);
+							{loading && deleteId === font.id ? (
+								<Spinner style="delete-font" />
+							) : (
+								<span
+									role="button"
+									className="dashicons dashicons-trash"
+									onClick={(e) =>
+										handleDeleteFont(e, font.id)
+									}
+									onKeyDown={(e) =>
+										handleDeleteFontKeypress(e, font.id)
+									}
+									tabIndex={tabIndex}
+								/>
+							)}
+						</div>
+					);
+				})}
+		</div>
+	);
+};
+
+FontListItems.propTypes = {
+	id: PropTypes.string,
+	navigate: PropTypes.func.isRequired,
+};
+
+export default FontListItems;

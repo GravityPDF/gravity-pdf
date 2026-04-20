@@ -377,7 +377,18 @@ describe('Reducers - fontManagerReducer.js', () => {
 				payload: 'robot',
 			});
 
-			expect(state.searchResult).toEqual([newInitialState.fontList[1]]);
+			/* immer does not mutate the input state, so we assert the reduced
+			   filenames explicitly rather than relying on newInitialState mutation */
+			expect(state.searchResult).toEqual([
+				{
+					font_name: 'Roboto',
+					id: 'roboto',
+					regular: 'roboto.ttf',
+					italics: 'roboto.ttf',
+					bold: 'roboto.ttf',
+					bolditalics: 'aroboto.ttf',
+				},
+			]);
 
 			newState = reducer(newInitialState, {
 				type: SEARCH_FONT_LIST,

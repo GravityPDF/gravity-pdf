@@ -1,7 +1,7 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 /* Components */
 import TemplateContainer from './TemplateContainer';
 import TemplateHeaderNavigation from './TemplateHeaderNavigation';
@@ -30,163 +30,144 @@ import withRouterHooks from '../../utilities/withRouterHooks';
  * @since       4.1
  */
 
-/**
- * React Component
- *
- * @since 4.1
- */
-export class TemplateSingle extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		template: PropTypes.object,
-		activeTemplate: PropTypes.string,
-		templateIndex: PropTypes.number,
-		templates: PropTypes.array,
-		showPreviousTemplateText: PropTypes.string,
-		showNextTemplateText: PropTypes.string,
-		ajaxUrl: PropTypes.string,
-		ajaxNonce: PropTypes.string,
-		activateText: PropTypes.string,
-		pdfWorkingDirPath: PropTypes.string,
-		templateDeleteText: PropTypes.string,
-		templateConfirmDeleteText: PropTypes.string,
-		templateDeleteErrorText: PropTypes.string,
-		currentTemplateText: PropTypes.string,
-		versionText: PropTypes.string,
-		groupText: PropTypes.string,
-		tagsText: PropTypes.string,
-	};
-
-	/**
-	 * Ensure the component doesn't try and re-render when a template isn't found.
-	 * This problem seems to be prevelant due to a race condition when deleting a template and updating the URL
-	 *
-	 * @param { Readonly<Object> } nextProps
-	 *
-	 * @since 4.2
-	 */
-	shouldComponentUpdate(nextProps) {
-		return !!nextProps.template;
-	}
-
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		const item = this.props.template;
-		const isCurrentTemplate = this.props.activeTemplate === item.id;
-
-		/* Display our Single Template container */
-		return (
-			<TemplateContainer
-				data-test="component-templateSingle"
-				header={
-					<TemplateHeaderNavigationWithRouter
-						template={item}
-						templateIndex={this.props.templateIndex}
-						templates={this.props.templates}
-						showPreviousTemplateText={
-							this.props.showPreviousTemplateText
-						}
-						showNextTemplateText={this.props.showNextTemplateText}
-					/>
-				}
-				footer={
-					<TemplateFooterActions
-						template={item}
-						isActiveTemplate={isCurrentTemplate}
-						ajaxUrl={this.props.ajaxUrl}
-						ajaxNonce={this.props.ajaxNonce}
-						activateText={this.props.activateText}
-						pdfWorkingDirPath={this.props.pdfWorkingDirPath}
-						templateDeleteText={this.props.templateDeleteText}
-						templateConfirmDeleteText={
-							this.props.templateConfirmDeleteText
-						}
-						templateDeleteErrorText={
-							this.props.templateDeleteErrorText
-						}
-					/>
-				}
-				closeRoute="/template"
-			>
-				<div
-					id="gfpdf-template-detail-view"
-					className="gfpdf-template-detail"
-				>
-					<TemplateScreenshots image={item.screenshot} />
-					<div className="theme-info">
-						<CurrentTemplate
-							isCurrentTemplate={isCurrentTemplate}
-							label={this.props.currentTemplateText}
-						/>
-						<Name
-							name={item.template}
-							version={item.version}
-							versionLabel={this.props.versionText}
-						/>
-						<Author author={item.author} uri={item['author uri']} />
-						<Group
-							group={item.group}
-							label={this.props.groupText}
-						/>
-						{item.long_message ? (
-							<ShowMessage
-								data-test="component-showMessageLong_message"
-								text={item.long_message}
-							/>
-						) : null}
-						{item.long_error ? (
-							<ShowMessage
-								data-test="component-showMessageLong_error"
-								text={item.long_error}
-								error
-							/>
-						) : null}
-						<Description desc={item.description} />
-						<Tags tags={item.tags} label={this.props.tagsText} />
-					</div>
-				</div>
-			</TemplateContainer>
-		);
-	}
-}
-
 const TemplateHeaderNavigationWithRouter = withRouterHooks(
 	TemplateHeaderNavigation
 );
 
 /**
- * Map state to props
+ * React Component
  *
- * @param { Object } state The current Redux State
- * @param { Object } props The current React props
- *
- * @return {{ template, templateIndex, templates, activeTemplate }} mapped state
- *
+ * @param {Object} root0
+ * @param {*}      root0.params
+ * @param {*}      root0.showPreviousTemplateText
+ * @param {*}      root0.showNextTemplateText
+ * @param {*}      root0.ajaxUrl
+ * @param {*}      root0.ajaxNonce
+ * @param {*}      root0.activateText
+ * @param {*}      root0.pdfWorkingDirPath
+ * @param {*}      root0.templateDeleteText
+ * @param {*}      root0.templateConfirmDeleteText
+ * @param {*}      root0.templateDeleteErrorText
+ * @param {*}      root0.currentTemplateText
+ * @param {*}      root0.versionText
+ * @param {*}      root0.groupText
+ * @param {*}      root0.tagsText
  * @since 4.1
  */
-const MapStateToProps = (state, props) => {
-	/* found our selected template */
-	const templates = getTemplates(state);
-	const id = props.params.id;
-	const findCurrentTemplate = (item) => {
-		return item.id === id;
-	};
+const TemplateSingle = ({
+	params,
+	showPreviousTemplateText,
+	showNextTemplateText,
+	ajaxUrl,
+	ajaxNonce,
+	activateText,
+	pdfWorkingDirPath,
+	templateDeleteText,
+	templateConfirmDeleteText,
+	templateDeleteErrorText,
+	currentTemplateText,
+	versionText,
+	groupText,
+	tagsText,
+}) => {
+	const templates = useSelector(getTemplates);
+	const activeTemplate = useSelector((s) => s.template.activeTemplate);
 
-	return {
-		template: templates.find(findCurrentTemplate),
-		templateIndex: templates.findIndex(findCurrentTemplate),
-		templates,
-		activeTemplate: state.template.activeTemplate,
-	};
+	const id = params?.id;
+	const findCurrentTemplate = (item) => item.id === id;
+	const template = templates?.find(findCurrentTemplate);
+	const templateIndex = templates?.findIndex(findCurrentTemplate);
+
+	/* Prevent rendering when a template isn't found (race condition on delete) */
+	if (!template) {
+		return null;
+	}
+
+	const isCurrentTemplate = activeTemplate === template.id;
+
+	return (
+		<TemplateContainer
+			data-test="component-templateSingle"
+			header={
+				<TemplateHeaderNavigationWithRouter
+					template={template}
+					templateIndex={templateIndex}
+					templates={templates}
+					showPreviousTemplateText={showPreviousTemplateText}
+					showNextTemplateText={showNextTemplateText}
+				/>
+			}
+			footer={
+				<TemplateFooterActions
+					template={template}
+					isActiveTemplate={isCurrentTemplate}
+					ajaxUrl={ajaxUrl}
+					ajaxNonce={ajaxNonce}
+					activateText={activateText}
+					pdfWorkingDirPath={pdfWorkingDirPath}
+					templateDeleteText={templateDeleteText}
+					templateConfirmDeleteText={templateConfirmDeleteText}
+					templateDeleteErrorText={templateDeleteErrorText}
+				/>
+			}
+			closeRoute="/template"
+		>
+			<div
+				id="gfpdf-template-detail-view"
+				className="gfpdf-template-detail"
+			>
+				<TemplateScreenshots image={template.screenshot} />
+				<div className="theme-info">
+					<CurrentTemplate
+						isCurrentTemplate={isCurrentTemplate}
+						label={currentTemplateText}
+					/>
+					<Name
+						name={template.template}
+						version={template.version}
+						versionLabel={versionText}
+					/>
+					<Author
+						author={template.author}
+						uri={template['author uri']}
+					/>
+					<Group group={template.group} label={groupText} />
+					{template.long_message ? (
+						<ShowMessage
+							data-test="component-showMessageLong_message"
+							text={template.long_message}
+						/>
+					) : null}
+					{template.long_error ? (
+						<ShowMessage
+							data-test="component-showMessageLong_error"
+							text={template.long_error}
+							error
+						/>
+					) : null}
+					<Description desc={template.description} />
+					<Tags tags={template.tags} label={tagsText} />
+				</div>
+			</div>
+		</TemplateContainer>
+	);
 };
 
-/**
- * Maps our Redux store to our React component
- *
- * @since 4.1
- */
-export default connect(MapStateToProps)(TemplateSingle);
+TemplateSingle.propTypes = {
+	params: PropTypes.object,
+	showPreviousTemplateText: PropTypes.string,
+	showNextTemplateText: PropTypes.string,
+	ajaxUrl: PropTypes.string,
+	ajaxNonce: PropTypes.string,
+	activateText: PropTypes.string,
+	pdfWorkingDirPath: PropTypes.string,
+	templateDeleteText: PropTypes.string,
+	templateConfirmDeleteText: PropTypes.string,
+	templateDeleteErrorText: PropTypes.string,
+	currentTemplateText: PropTypes.string,
+	versionText: PropTypes.string,
+	groupText: PropTypes.string,
+	tagsText: PropTypes.string,
+};
+
+export default TemplateSingle;

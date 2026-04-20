@@ -1,28 +1,26 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { render } from '@testing-library/react';
+import { findByTestAttr } from '../../testUtilsRTL';
 import {
 	TemplateDetails,
 	Group,
 } from '../../../../../src/assets/js/react/components/Template/TemplateListItemComponents';
 
 describe('Template - TemplateListItemComponents.js', () => {
-	let wrapper;
-	let component;
-
 	test('renders <TemplateDetails /> component and text', () => {
-		wrapper = shallow(<TemplateDetails label={'Label Text'} />);
-		component = findByTestAttr(wrapper, 'component-templateDetails');
-
-		expect(component.length).toBe(1);
-		expect(component.text()).toBe('Label Text');
+		const { container } = render(<TemplateDetails label="Label Text" />);
+		const component = findByTestAttr(
+			container,
+			'component-templateDetails'
+		);
+		expect(component).toBeInTheDocument();
+		expect(component.textContent).toBe('Label Text');
 	});
 
 	test('renders <Group /> component and text', () => {
-		wrapper = shallow(<Group group={'Group Text'} />);
-		component = findByTestAttr(wrapper, 'component-group');
-
-		expect(component.length).toBe(1);
-		expect(component.text()).toBe('Group Text');
+		const { container } = render(<Group group="Group Text" />);
+		const component = findByTestAttr(container, 'component-group');
+		expect(component).toBeInTheDocument();
+		expect(component.textContent).toBe('Group Text');
 	});
 });

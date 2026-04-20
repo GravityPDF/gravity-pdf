@@ -6,7 +6,6 @@ import { Routes as Switch, Route } from 'react-router-dom';
 import CoreFontContainer from '../components/CoreFonts/CoreFontContainer';
 import Empty from '../components/Empty';
 /* Helpers */
-import withRouterHooks from '../utilities/withRouterHooks.js';
 import CustomHashRouter from '../components/CustomHashRouter';
 
 /**
@@ -68,7 +67,7 @@ Routes.propTypes = {
  */
 const CoreFont = ({ button }) => {
 	return (
-		<CoreFontContainerWithRouter
+		<CoreFontContainer
 			buttonClassName={button.className}
 			buttonText={button.innerText}
 			success={GFPDF.coreFontSuccess}
@@ -81,8 +80,6 @@ const CoreFont = ({ button }) => {
 		/>
 	);
 };
-
-const CoreFontContainerWithRouter = withRouterHooks(CoreFontContainer);
 
 /**
  * @since 5.0

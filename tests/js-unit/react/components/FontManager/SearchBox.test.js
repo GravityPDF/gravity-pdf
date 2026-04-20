@@ -1,75 +1,123 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
-import { SearchBox } from '../../../../../src/assets/js/react/components/FontManager/SearchBox';
+import { act, fireEvent } from '@testing-library/react';
+import {
+	findByTestAttr,
+	renderWithStore,
+	createTestStore,
+} from '../../testUtilsRTL';
+import SearchBox from '../../../../../src/assets/js/react/components/FontManager/SearchBox';
 
 describe('FontManager - SearchBox.js', () => {
-	const props = {
-		id: 'arial',
-		msg: { success: {} },
-		searchResult: null,
-		resetSearchResult: jest.fn(),
-		searchFontList: jest.fn(),
+	const initialState = {
+		fontManager: {
+			loading: false,
+			addFontLoading: false,
+			deleteFontLoading: false,
+			fontList: [],
+			searchResult: null,
+			selectedFont: '',
+			msg: {},
+		},
 	};
-	const wrapper = shallow(<SearchBox {...props} />);
+
+	describe('RENDERS COMPONENT', () => {
+		test('render <SearchBox /> component', () => {
+			const { container } = renderWithStore(
+				<SearchBox id="arial" />,
+				initialState
+			);
+			expect(
+				findByTestAttr(container, 'component-SearchBox')
+			).toBeInTheDocument();
+		});
+	});
 
 	describe('RUN LIFECYCLE METHODS', () => {
-		test('componentDidMount() - Add focus event to document on mount', () => {
-			const mockRef = jest.fn();
+		test('resets search input when searchResult changes to null', () => {
+			const store = createTestStore({
+				fontManager: {
+					...initialState.fontManager,
+					searchResult: [{ id: 'arial' }],
+				},
+			});
+			const { container } = renderWithStore(
+				<SearchBox id="arial" />,
+				{},
+				{},
+				store
+			);
+			const input = findByTestAttr(container, 'component-SearchBox');
 
-			wrapper.instance().input = { focus: mockRef };
-			wrapper.instance().componentDidMount();
+			fireEvent.change(input, { target: { value: 'arial' } });
+			expect(input.value).toBe('arial');
 
-			expect(mockRef).toHaveBeenCalledTimes(1);
+			act(() => {
+				store.dispatch({ type: 'RESET_SEARCH_RESULT' });
+			});
+
+			expect(input.value).toBe('');
 		});
 
-		test('componentDidUpdate() - Fires appropriate action based on redux store data', () => {
-			const instance = wrapper.instance();
-			const resetSearchState = jest.spyOn(instance, 'resetSearchState');
-			const prevProps = { searchResult: [{}] };
+		test('dispatches resetSearchResult on unmount when search input is not empty', () => {
+			const store = createTestStore(initialState);
+			const dispatchSpy = jest.spyOn(store, 'dispatch');
+			const { container, unmount } = renderWithStore(
+				<SearchBox id="arial" />,
+				{},
+				{},
+				store
+			);
 
-			instance.componentDidUpdate(prevProps);
+			fireEvent.change(findByTestAttr(container, 'component-SearchBox'), {
+				target: { value: 'arial' },
+			});
 
-			expect(resetSearchState).toHaveBeenCalledTimes(2);
+			unmount();
+
+			expect(dispatchSpy).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'RESET_SEARCH_RESULT' })
+			);
 		});
 
-		test('componentWillUnmount() - Call our redux action resetSearchResult() (true)', () => {
-			wrapper.setState({ searchInput: 'arial' });
-			wrapper.instance().componentWillUnmount();
+		test('does not dispatch resetSearchResult on unmount when search input is empty', () => {
+			const store = createTestStore(initialState);
+			const dispatchSpy = jest.spyOn(store, 'dispatch');
+			const { unmount } = renderWithStore(
+				<SearchBox id="arial" />,
+				{},
+				{},
+				store
+			);
 
-			expect(props.resetSearchResult).toHaveBeenCalledTimes(1);
-		});
+			unmount();
 
-		test('componentWillUnmount() - Call our redux action resetSearchResult() (false)', () => {
-			wrapper.setState({ searchInput: '' });
-			wrapper.instance().componentWillUnmount();
-
-			expect(props.resetSearchResult).toHaveBeenCalledTimes(0);
+			expect(dispatchSpy).not.toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'RESET_SEARCH_RESULT' })
+			);
 		});
 	});
 
 	describe('RUN COMPONENT METHODS', () => {
-		test('handleSearch() - Listen to search box input field change', () => {
-			const e = { target: { value: 'arial' } };
+		test('handleSearch() - updates input value and dispatches searchFontList', () => {
+			const store = createTestStore(initialState);
+			const dispatchSpy = jest.spyOn(store, 'dispatch');
+			const { container } = renderWithStore(
+				<SearchBox id="arial" />,
+				{},
+				{},
+				store
+			);
 
-			wrapper.instance().handleSearch(e);
+			fireEvent.change(findByTestAttr(container, 'component-SearchBox'), {
+				target: { value: 'arial' },
+			});
 
-			expect(wrapper.state('searchInput')).toBe('arial');
-			expect(props.searchFontList).toHaveBeenCalledTimes(1);
-		});
-
-		test('resetSearchState() - Reset component searchInput state', () => {
-			wrapper.instance().resetSearchState();
-
-			expect(wrapper.state('searchInput')).toBe('');
-		});
-	});
-
-	describe('RENDERS COMPONENT', () => {
-		test('render <SearchBox /> component', () => {
-			const component = findByTestAttr(wrapper, 'component-SearchBox');
-
-			expect(component.length).toBe(1);
+			expect(findByTestAttr(container, 'component-SearchBox').value).toBe(
+				'arial'
+			);
+			expect(dispatchSpy).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'SEARCH_FONT_LIST' })
+			);
 		});
 	});
 });

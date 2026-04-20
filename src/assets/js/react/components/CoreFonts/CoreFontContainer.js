@@ -1,7 +1,8 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
 /* Components */
 import { CoreFontListResults } from './CoreFontListResults';
 import Counter from './CoreFontCounter';
@@ -26,290 +27,149 @@ import {
 /**
  * Handles the grunt work for our Core Font downloader (API calls, display, state ect)
  *
+ * @param {Object} root0
+ * @param {*}      root0.buttonClassName
+ * @param {*}      root0.buttonText
+ * @param {*}      root0.counterText
+ * @param {*}      root0.retryText
  * @since 5.0
  */
-export class CoreFontContainer extends Component {
-	/**
-	 *
-	 * @since 5.0
-	 */
-	static propTypes = {
-		location: PropTypes.object,
-		requestDownload: PropTypes.string,
-		clearRequestRemainingData: PropTypes.func,
-		getFilesFromGitHub: PropTypes.func,
-		buttonClicked: PropTypes.bool,
-		fontList: PropTypes.array,
-		getFilesFromGitHubFailed: PropTypes.string,
-		retry: PropTypes.array,
-		clearConsole: PropTypes.func,
-		navigate: PropTypes.func,
-		clearButtonClickedAndRetryList: PropTypes.func,
-		downloadFontsApiCall: PropTypes.func,
-		addToConsole: PropTypes.func,
-		console: PropTypes.object,
-		buttonClassName: PropTypes.string,
-		buttonText: PropTypes.string,
-		counterText: PropTypes.string,
-		retryText: PropTypes.string,
-		queue: PropTypes.number,
+const CoreFontContainer = ({
+	buttonClassName,
+	buttonText,
+	counterText,
+	retryText,
+}) => {
+	const navigate = useNavigate();
+	const location = useLocation();
+	const dispatch = useDispatch();
+
+	const buttonClicked = useSelector((state) => state.coreFonts.buttonClicked);
+	const fontList = useSelector((state) => state.coreFonts.fontList);
+	const getFilesFromGitHubFailed = useSelector(
+		(state) => state.coreFonts.getFilesFromGitHubFailed
+	);
+	const consoleList = useSelector((state) => state.coreFonts.console);
+	const retry = useSelector((state) => state.coreFonts.retry);
+	const requestDownload = useSelector(
+		(state) => state.coreFonts.requestDownload
+	);
+	const queue = useSelector((state) => state.coreFonts.downloadCounter);
+
+	const [ajax, setAjax] = useState(false);
+
+	const handleGithubApiError = (error) => {
+		setAjax(false);
+		dispatch(addToConsole('completed', 'error', error));
+		navigate('/');
 	};
 
-	/**
-	 * Switches to show loaders
-	 *
-	 * @type {{ajax: boolean}}
-	 *
-	 * @since 5.0
-	 */
-	state = {
-		ajax: false,
-	};
-
-	/**
-	 * If component did update and new props are received we'll check if the font list should be loaded
-	 *
-	 * @param { Readonly<Object> } prevProps
-	 *
-	 * @since 5.0
-	 */
-	componentDidUpdate(prevProps) {
-		const {
-			fontList,
-			buttonClicked,
-			location,
-			retry,
-			getFilesFromGitHubFailed,
-			requestDownload,
-		} = this.props;
-
-		/* Load current font list */
-		if (fontList.length > 0 && buttonClicked) {
-			this.startDownloadFonts(fontList);
-		}
-
-		/* Check for /downloadCoreFonts redirect URL and run the installer */
-		if (
-			location.pathname === '/downloadCoreFonts' &&
-			prevProps?.location.pathname !== location.pathname
-		) {
-			this.handleTriggerFontDownload();
-		}
-
-		/* Load current hash history location & retry font list */
-		if (location.pathname === '/retryDownloadCoreFonts') {
-			this.maybeStartDownload(location.pathname, retry);
-		}
-
-		/* Load error if something went wrong */
-		if (getFilesFromGitHubFailed !== '' && buttonClicked) {
-			this.startDownloadFonts(fontList, getFilesFromGitHubFailed);
-		}
-
-		/* If request download is finished, call resetState function */
-		if (requestDownload === 'finished') {
-			this.resetState();
-		}
-	}
-
-	/**
-	 * Check for /downloadCoreFonts redirect URL and run the installer
-	 *
-	 * @since 5.0
-	 */
-	componentDidMount() {
-		if (this.props.location.pathname === '/downloadCoreFonts') {
-			this.handleTriggerFontDownload();
-		}
-	}
-
-	/**
-	 * If the Hash History matches our keys (and not already loading) start the download
-	 *
-	 * @param { string }        location
-	 * @param { Array<Object> } fontList
-	 * @param { Object= }       error
-	 *
-	 * @since 5.0
-	 */
-	maybeStartDownload = (location, fontList, error = null) => {
-		if (location === '/downloadCoreFonts') {
-			this.startDownloadFonts(fontList, error);
-		}
-
-		if (location === '/retryDownloadCoreFonts') {
-			this.setState({ ajax: true });
-			this.startDownloadFonts(fontList, error);
-		}
-	};
-
-	/**
-	 * Call our server to download the fonts in batches of 5
-	 *
-	 * @param { Array<Object> } files The font files to download (usually passed in from the 'retry' prop)
-	 * @param { Object }        error
-	 *
-	 * @since 5.0
-	 */
-	startDownloadFonts = (files, error) => {
+	const startDownloadFonts = (files, error) => {
 		if (files.length === 0) {
-			this.props.clearButtonClickedAndRetryList();
-
-			return this.handleGithubApiError(error);
+			dispatch(clearButtonClickedAndRetryList());
+			return handleGithubApiError(error);
 		}
 
-		this.props.clearConsole();
-		this.props.clearButtonClickedAndRetryList();
-
-		/* Clean Hash History */
-		this.props.navigate('/');
+		dispatch(clearConsole());
+		dispatch(clearButtonClickedAndRetryList());
+		navigate('/');
 
 		setTimeout(
-			() => files.map((file) => this.props.downloadFontsApiCall(file)),
+			() => files.forEach((file) => dispatch(downloadFontsApiCall(file))),
 			300
 		);
 	};
 
-	/**
-	 * Add a GitHub API overall status to the console
-	 *
-	 * @param { Object } error
-	 *
-	 * @since 5.0
-	 */
-	handleGithubApiError = (error) => {
-		this.setState({ ajax: false });
-		this.props.addToConsole('completed', 'error', error);
-		this.props.navigate('/');
-	};
+	const maybeStartDownload = (loc, files, error = null) => {
+		if (loc === '/downloadCoreFonts') {
+			startDownloadFonts(files, error);
+		}
 
-	/**
-	 * Request GitHub for font names & trigger font download
-	 *
-	 * @since 5.0
-	 */
-	handleTriggerFontDownload = () => {
-		if (this.state.ajax === false) {
-			/* Get the font names from GitHub we need to download */
-			this.setState({ ajax: true }, () => {
-				this.props.getFilesFromGitHub();
-			});
+		if (loc === '/retryDownloadCoreFonts') {
+			setAjax(true);
+			startDownloadFonts(files, error);
 		}
 	};
 
-	/**
-	 * Reset ajax/loading state to false
-	 *
-	 * @since 5.0
-	 */
-	resetState = () => {
-		const { clearRequestRemainingData: clear, navigate } = this.props;
+	const handleTriggerFontDownload = () => {
+		if (!ajax) {
+			setAjax(true);
+			dispatch(getFilesFromGitHub());
+		}
+	};
 
-		this.setState({ ajax: false });
-		clear();
+	const resetState = () => {
+		setAjax(false);
+		dispatch(clearRequestRemainingData());
 		navigate('/');
 	};
 
-	/**
-	 * Renders our Core Font downloader UI
-	 *
-	 * @return {JSX.Element} CoreFontContainer Component
-	 *
-	 * @since 5.0
-	 */
-	render() {
-		const { ajax } = this.state;
+	/* Check for /downloadCoreFonts redirect URL and run the installer */
+	useEffect(() => {
+		if (location.pathname === '/downloadCoreFonts') {
+			handleTriggerFontDownload();
+		}
+	}, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
-		const {
-			fontList,
-			buttonClassName,
-			buttonText,
-			counterText,
-			queue,
-			navigate,
-			console: consoleList,
-			retry,
-			retryText,
-		} = this.props;
+	/* Load current font list when fontList and buttonClicked are both available */
+	useEffect(() => {
+		if (fontList.length > 0 && buttonClicked) {
+			startDownloadFonts(fontList);
+		}
+	}, [fontList, buttonClicked]); // eslint-disable-line react-hooks/exhaustive-deps
 
-		const disabled = (queue < fontList.length && queue !== 0) || ajax;
+	/* Load current hash history location & retry font list */
+	useEffect(() => {
+		if (location.pathname === '/retryDownloadCoreFonts') {
+			maybeStartDownload(location.pathname, retry);
+		}
+	}, [location.pathname, retry]); // eslint-disable-line react-hooks/exhaustive-deps
 
-		return (
-			<div data-test="component-coreFont-downloader">
-				<button
-					data-test="component-coreFont-button"
-					className={buttonClassName}
-					type="button"
-					onClick={this.handleTriggerFontDownload}
-					disabled={disabled}
-				>
-					{buttonText}
-				</button>
-				{ajax && <Spinner />}
-				{ajax && queue !== 0 && (
-					<Counter text={counterText} queue={queue} />
-				)}
-				<CoreFontListResults
-					navigate={navigate}
-					console={consoleList}
-					retry={retry}
-					retryText={retryText}
-				/>
-			</div>
-		);
-	}
-}
+	/* Load error if something went wrong */
+	useEffect(() => {
+		if (getFilesFromGitHubFailed !== '' && buttonClicked) {
+			startDownloadFonts(fontList, getFilesFromGitHubFailed);
+		}
+	}, [getFilesFromGitHubFailed, buttonClicked]); // eslint-disable-line react-hooks/exhaustive-deps
 
-/**
- * Map Redux state to props
- *
- * @param { Object } state
- * @param { Object } state.coreFonts
- *
- * @return {{
- *  buttonClicked: boolean,
- *  fontList: Array<Object>,
- *  getFilesFromGitHubFailed: string,
- *  console: Object,
- *  retry: Array<*>,
- *  requestDownload: string,
- *  queue: boolean
- * }} mapped state
- *
- * @since 5.0
- */
-const mapStateToProps = (state) => {
-	return {
-		buttonClicked: state.coreFonts.buttonClicked,
-		fontList: state.coreFonts.fontList,
-		getFilesFromGitHubFailed: state.coreFonts.getFilesFromGitHubFailed,
-		console: state.coreFonts.console,
-		retry: state.coreFonts.retry,
-		requestDownload: state.coreFonts.requestDownload,
-		queue: state.coreFonts.downloadCounter,
-	};
+	/* If request download is finished, call resetState */
+	useEffect(() => {
+		if (requestDownload === 'finished') {
+			resetState();
+		}
+	}, [requestDownload]); // eslint-disable-line react-hooks/exhaustive-deps
+
+	const disabled = (queue < fontList.length && queue !== 0) || ajax;
+
+	return (
+		<div data-test="component-coreFont-downloader">
+			<button
+				data-test="component-coreFont-button"
+				className={buttonClassName}
+				type="button"
+				onClick={handleTriggerFontDownload}
+				disabled={disabled}
+			>
+				{buttonText}
+			</button>
+			{ajax && <Spinner />}
+			{ajax && queue !== 0 && (
+				<Counter text={counterText} queue={queue} />
+			)}
+			<CoreFontListResults
+				console={consoleList}
+				retry={retry}
+				retryText={retryText}
+			/>
+		</div>
+	);
 };
 
-/**
- * Map Redux actions to props
- *
- * @return {{
- *  addToConsole,
- *  clearButtonClickedAndRetryList,
- *  getFilesFromGitHub,
- *  downloadFontsApiCall,
- *  clearRequestRemainingData,
- *  clearConsole
- * }} mapped dispatch
- *
- * @since 5.0
- */
+CoreFontContainer.propTypes = {
+	buttonClassName: PropTypes.string,
+	buttonText: PropTypes.string,
+	counterText: PropTypes.string,
+	retryText: PropTypes.string,
+};
 
-export default connect(mapStateToProps, {
-	addToConsole,
-	clearButtonClickedAndRetryList,
-	getFilesFromGitHub,
-	downloadFontsApiCall,
-	clearRequestRemainingData,
-	clearConsole,
-})(CoreFontContainer);
+export default CoreFontContainer;

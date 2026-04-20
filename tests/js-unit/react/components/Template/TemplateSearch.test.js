@@ -1,87 +1,83 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { storeFactory, findByTestAttr } from '../../testUtils';
-import ConnectedTemplateSearch, {
-	TemplateSearch,
-	mapDispatchToProps,
-} from '../../../../../src/assets/js/react/components/Template/TemplateSearch';
+import { fireEvent } from '@testing-library/react';
+import {
+	findByTestAttr,
+	renderWithStore,
+	createTestStore,
+} from '../../testUtilsRTL';
+import TemplateSearch from '../../../../../src/assets/js/react/components/Template/TemplateSearch';
+
+jest.mock('lodash.debounce', () => (fn) => fn);
 
 describe('Template - TemplateSearch.js', () => {
-	let wrapper;
-	let component;
-	const onSearchMock = jest.fn();
+	const initialState = {
+		template: {
+			list: [],
+			activeTemplate: '',
+			search: '',
+			updateSelectBoxText: '',
+			templateProcessing: '',
+			templateUploadProcessingSuccess: {},
+			templateUploadProcessingError: {},
+		},
+	};
 
-	describe('Check for redux properties', () => {
-		const setup = (state = {}) => {
-			const store = storeFactory(state);
-			wrapper = shallow(<ConnectedTemplateSearch store={store} />)
-				.dive()
-				.dive();
+	test('renders <TemplateSearch /> component', () => {
+		const { container } = renderWithStore(<TemplateSearch />, initialState);
+		expect(
+			findByTestAttr(container, 'component-templateSearch')
+		).toBeInTheDocument();
+	});
 
-			return wrapper;
-		};
-		const dispatch = jest.fn();
+	test('renders search input element', () => {
+		const { container } = renderWithStore(<TemplateSearch />, initialState);
+		expect(
+			container.querySelector('input[type="search"]')
+		).toBeInTheDocument();
+	});
 
-		test('has access to `search` state', () => {
-			wrapper = setup({ template: { search: 'test' } });
-			const searchProp = wrapper.instance().props.search;
+	test('dispatches SEARCH_TEMPLATES action on input change', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		const { container } = renderWithStore(
+			<TemplateSearch />,
+			{},
+			{},
+			store
+		);
 
-			expect(searchProp).toBe('test');
+		fireEvent.change(container.querySelector('input'), {
+			target: { value: 'zadani' },
 		});
 
-		test('check for mapDispatchToProps onSearch()', () => {
-			mapDispatchToProps(dispatch).onSearch();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
 				type: 'SEARCH_TEMPLATES',
-			});
-		});
+				text: 'zadani',
+			})
+		);
 	});
 
-	describe('Component functions', () => {
-		const e = { target: { value: 'rubix' }, persist() {} };
+	test('dispatches SEARCH_TEMPLATES with empty string when input is cleared', () => {
+		const stateWithSearch = {
+			...initialState,
+			template: { ...initialState.template, search: 'rubix' },
+		};
+		const store = createTestStore(stateWithSearch);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		const { container } = renderWithStore(
+			<TemplateSearch />,
+			{},
+			{},
+			store
+		);
 
-		test('handleSearch() - Handles our search event', (done) => {
-			wrapper = shallow(<TemplateSearch onSearch={onSearchMock} />);
-			wrapper.instance().handleSearch(e);
-
-			// Add timout since debounce is setup in actual component
-			setTimeout(() => {
-				expect(onSearchMock.mock.calls.length).toBe(1);
-				done();
-			}, 300);
+		fireEvent.change(container.querySelector('input'), {
+			target: { value: '' },
 		});
 
-		test('runSearch() - Update our Redux store with the search value', (done) => {
-			wrapper = shallow(<TemplateSearch onSearch={onSearchMock} />);
-			wrapper.instance().runSearch(e);
-
-			// Add timout since debounce is setup in actual component
-			setTimeout(() => {
-				expect(onSearchMock.mock.calls.length).toBe(1);
-				done();
-			}, 300);
-		});
-	});
-
-	describe('Run Lifecycle methods', () => {
-		test('componentDidMount() - On mount, add focus to the search box', () => {
-			const mockRef = jest.fn();
-			wrapper = shallow(<TemplateSearch />);
-			wrapper.instance().input = {
-				focus: mockRef,
-			};
-			wrapper.instance().componentDidMount();
-
-			expect(mockRef).toHaveBeenCalledTimes(1);
-		});
-	});
-
-	test('renders <TemplateSearch /> component and search input box', () => {
-		wrapper = shallow(<TemplateSearch />);
-		component = findByTestAttr(wrapper, 'component-templateSearch');
-
-		expect(component.length).toBe(1);
-		expect(wrapper.find('input').length).toBe(1);
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'SEARCH_TEMPLATES', text: '' })
+		);
 	});
 });

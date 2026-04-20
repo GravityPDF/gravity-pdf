@@ -1,7 +1,7 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 /* Components */
 import TemplateContainer from './TemplateContainer';
 import TemplateListItem from './TemplateListItem';
@@ -28,110 +28,107 @@ const TemplateListItemWithRouter = withRouterHooks(TemplateListItem);
 /**
  * React Component
  *
+ * @param {Object} root0
+ * @param {*}      root0.templateHeaderText
+ * @param {*}      root0.templateDetailsText
+ * @param {*}      root0.activateText
+ * @param {*}      root0.ajaxUrl
+ * @param {*}      root0.ajaxNonce
+ * @param {*}      root0.addTemplateText
+ * @param {*}      root0.genericUploadErrorText
+ * @param {*}      root0.filenameErrorText
+ * @param {*}      root0.filesizeErrorText
+ * @param {*}      root0.installSuccessText
+ * @param {*}      root0.installUpdatedText
+ * @param {*}      root0.templateSuccessfullyInstalledUpdated
+ * @param {*}      root0.templateInstallInstructions
  * @since 4.1
  */
-export class TemplateList extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		templateHeaderText: PropTypes.string,
-		templates: PropTypes.array,
-		templateDetailsText: PropTypes.string,
-		activateText: PropTypes.string,
-		ajaxUrl: PropTypes.string,
-		ajaxNonce: PropTypes.string,
-		addTemplateText: PropTypes.string,
-		genericUploadErrorText: PropTypes.string,
-		filenameErrorText: PropTypes.string,
-		filesizeErrorText: PropTypes.string,
-		installSuccessText: PropTypes.string,
-		installUpdatedText: PropTypes.string,
-		templateSuccessfullyInstalledUpdated: PropTypes.string,
-		templateInstallInstructions: PropTypes.string,
-	};
+const TemplateList = ({
+	templateHeaderText,
+	templateDetailsText,
+	activateText,
+	ajaxUrl,
+	ajaxNonce,
+	addTemplateText,
+	genericUploadErrorText,
+	filenameErrorText,
+	filesizeErrorText,
+	installSuccessText,
+	installUpdatedText,
+	templateSuccessfullyInstalledUpdated,
+	templateInstallInstructions,
+}) => {
+	const templates = useSelector(getTemplates);
 
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		const hasUserPrivs =
-			GFPDF.userCapabilities.administrator ||
-			GFPDF.userCapabilities.gravityforms_edit_settings ||
-			false;
+	const hasUserPrivs =
+		GFPDF.userCapabilities.administrator ||
+		GFPDF.userCapabilities.gravityforms_edit_settings ||
+		false;
 
-		return (
-			<TemplateContainer
-				data-test="component-templateList"
-				header={
-					<TemplateHeaderTitle
-						data-test="component-templateHeaderTitle"
-						header={this.props.templateHeaderText}
-					/>
-				}
-				closeRoute="/"
-			>
-				<TemplateSearch data-test="component-templateSearch" />
-				<div role="listbox">
-					{this.props.templates?.map((value, index) => {
-						return (
-							<TemplateListItemWithRouter
-								data-test="component-templateListItem"
-								key={index}
-								template={value}
-								templateDetailsText={
-									this.props.templateDetailsText
-								}
-								activateText={this.props.activateText}
-							/>
-						);
-					})}
-
-					{hasUserPrivs && (
-						<TemplateUploader
-							data-test="component-templateUploader"
-							ajaxUrl={this.props.ajaxUrl}
-							ajaxNonce={this.props.ajaxNonce}
-							addTemplateText={this.props.addTemplateText}
-							genericUploadErrorText={
-								this.props.genericUploadErrorText
-							}
-							filenameErrorText={this.props.filenameErrorText}
-							filesizeErrorText={this.props.filesizeErrorText}
-							installSuccessText={this.props.installSuccessText}
-							installUpdatedText={this.props.installUpdatedText}
-							templateSuccessfullyInstalledUpdated={
-								this.props.templateSuccessfullyInstalledUpdated
-							}
-							templateInstallInstructions={
-								this.props.templateInstallInstructions
-							}
+	return (
+		<TemplateContainer
+			data-test="component-templateList"
+			header={
+				<TemplateHeaderTitle
+					data-test="component-templateHeaderTitle"
+					header={templateHeaderText}
+				/>
+			}
+			closeRoute="/"
+		>
+			<TemplateSearch data-test="component-templateSearch" />
+			<div role="listbox">
+				{templates?.map((value, index) => {
+					return (
+						<TemplateListItemWithRouter
+							data-test="component-templateListItem"
+							key={index}
+							template={value}
+							templateDetailsText={templateDetailsText}
+							activateText={activateText}
 						/>
-					)}
-				</div>
-			</TemplateContainer>
-		);
-	}
-}
+					);
+				})}
 
-/**
- * Map state to props
- *
- * @param { Readonly<Object> } state The current Redux State
- *
- * @return {{ templates }} mapped state
- *
- * @since 4.1
- */
-const mapStateToProps = (state) => {
-	return {
-		templates: getTemplates(state),
-	};
+				{hasUserPrivs && (
+					<TemplateUploader
+						data-test="component-templateUploader"
+						ajaxUrl={ajaxUrl}
+						ajaxNonce={ajaxNonce}
+						addTemplateText={addTemplateText}
+						genericUploadErrorText={genericUploadErrorText}
+						filenameErrorText={filenameErrorText}
+						filesizeErrorText={filesizeErrorText}
+						installSuccessText={installSuccessText}
+						installUpdatedText={installUpdatedText}
+						templateSuccessfullyInstalledUpdated={
+							templateSuccessfullyInstalledUpdated
+						}
+						templateInstallInstructions={
+							templateInstallInstructions
+						}
+					/>
+				)}
+			</div>
+		</TemplateContainer>
+	);
 };
 
-/**
- * Maps our Redux store to our React component
- *
- * @since 4.1
- */
-export default connect(mapStateToProps)(TemplateList);
+TemplateList.propTypes = {
+	templateHeaderText: PropTypes.string,
+	templateDetailsText: PropTypes.string,
+	activateText: PropTypes.string,
+	ajaxUrl: PropTypes.string,
+	ajaxNonce: PropTypes.string,
+	addTemplateText: PropTypes.string,
+	genericUploadErrorText: PropTypes.string,
+	filenameErrorText: PropTypes.string,
+	filesizeErrorText: PropTypes.string,
+	installSuccessText: PropTypes.string,
+	installUpdatedText: PropTypes.string,
+	templateSuccessfullyInstalledUpdated: PropTypes.string,
+	templateInstallInstructions: PropTypes.string,
+};
+
+export default TemplateList;

@@ -1,17 +1,17 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
 /* Components */
 import ShowMessage from '../ShowMessage';
 /* Redux actions */
 import {
-	addTemplate,
-	updateTemplateParam,
-	postTemplateUploadProcessing,
-	clearTemplateUploadProcessing,
+	addTemplate as addTemplateAction,
+	updateTemplateParam as updateTemplateParamAction,
+	postTemplateUploadProcessing as postTemplateUploadProcessingAction,
+	clearTemplateUploadProcessing as clearTemplateUploadProcessingAction,
 } from '../../actions/templates';
 
 /**
@@ -26,352 +26,215 @@ import {
 /**
  * React Component
  *
+ * @param {Object} root0
+ * @param {*}      root0.genericUploadErrorText
+ * @param {*}      root0.addTemplateText
+ * @param {*}      root0.filenameErrorText
+ * @param {*}      root0.filesizeErrorText
+ * @param {*}      root0.installSuccessText
+ * @param {*}      root0.installUpdatedText
+ * @param {*}      root0.templateSuccessfullyInstalledUpdated
+ * @param {*}      root0.templateInstallInstructions
  * @since 4.1
  */
-export class TemplateUploader extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		genericUploadErrorText: PropTypes.string,
-		addTemplateText: PropTypes.string,
-		filenameErrorText: PropTypes.string,
-		filesizeErrorText: PropTypes.string,
-		installSuccessText: PropTypes.string,
-		installUpdatedText: PropTypes.string,
-		templateSuccessfullyInstalledUpdated: PropTypes.string,
-		templateInstallInstructions: PropTypes.string,
-		addNewTemplate: PropTypes.func,
-		updateTemplateParam: PropTypes.func,
-		postTemplateUploadProcessing: PropTypes.func,
-		clearTemplateUploadProcessing: PropTypes.func,
-		templates: PropTypes.array,
-		templateUploadProcessingSuccess: PropTypes.object,
-		templateUploadProcessingError: PropTypes.object,
-	};
+const TemplateUploader = ({
+	genericUploadErrorText,
+	addTemplateText,
+	filenameErrorText,
+	filesizeErrorText,
+	installSuccessText,
+	installUpdatedText,
+	templateSuccessfullyInstalledUpdated,
+	templateInstallInstructions,
+}) => {
+	const dispatch = useDispatch();
+	const templates = useSelector((s) => s.template.list);
+	const templateUploadProcessingSuccess = useSelector(
+		(s) => s.template.templateUploadProcessingSuccess
+	);
+	const templateUploadProcessingError = useSelector(
+		(s) => s.template.templateUploadProcessingError
+	);
 
-	/**
-	 * Setup internal component state that doesn't need to be in Redux
-	 *
-	 * @return {{ajax: boolean, error: string, message: string}}
-	 *
-	 * @since 4.1
-	 */
-	state = {
-		ajax: false,
-		error: '',
-		message: '',
-	};
+	const [ajax, setAjax] = useState(false);
+	const [error, setError] = useState('');
+	const [message, setMessage] = useState('');
 
-	/**
-	 * If component did update, fires appropriate function based on Redux store data
-	 *
-	 * @param { Object } prevProps
-	 *
-	 * @since 4.1
-	 */
-	componentDidUpdate(prevProps) {
-		const {
-			templateUploadProcessingSuccess,
-			templateUploadProcessingError,
-		} = this.props;
+	/* Track previous values to replicate componentDidUpdate comparisons */
+	const prevSuccessRef = useRef(templateUploadProcessingSuccess);
+	const prevErrorRef = useRef(templateUploadProcessingError);
+
+	/* componentDidUpdate: respond when upload processing state changes */
+	useEffect(() => {
+		const prevSuccess = prevSuccessRef.current;
+		prevSuccessRef.current = templateUploadProcessingSuccess;
+
+		const prevError = prevErrorRef.current;
+		prevErrorRef.current = templateUploadProcessingError;
+
+		const ajaxSuccess = (response) => {
+			response.templates.forEach((template) => {
+				const matched = templates.find(
+					(item) => item.id === template.id
+				);
+				if (matched === undefined) {
+					dispatch(
+						addTemplateAction({
+							...template,
+							new: true,
+							message: installSuccessText,
+						})
+					);
+				} else {
+					dispatch(
+						updateTemplateParamAction(
+							template.id,
+							'message',
+							installUpdatedText
+						)
+					);
+				}
+			});
+			setAjax(false);
+			setMessage(templateSuccessfullyInstalledUpdated);
+			dispatch(clearTemplateUploadProcessingAction());
+		};
+
+		const ajaxFailed = (err) => {
+			setError(err?.message || genericUploadErrorText);
+			setAjax(false);
+			dispatch(clearTemplateUploadProcessingAction());
+		};
 
 		if (
-			prevProps.templateUploadProcessingSuccess !==
-				templateUploadProcessingSuccess &&
+			prevSuccess !== templateUploadProcessingSuccess &&
 			templateUploadProcessingSuccess?.templates?.length > 0
 		) {
-			this.ajaxSuccess(templateUploadProcessingSuccess);
+			ajaxSuccess(templateUploadProcessingSuccess);
 		}
 
 		if (
-			prevProps.templateUploadProcessingError !==
-				templateUploadProcessingError &&
+			prevError !== templateUploadProcessingError &&
 			Object.keys(templateUploadProcessingError).length > 0
 		) {
-			this.ajaxFailed(templateUploadProcessingError);
+			ajaxFailed(templateUploadProcessingError);
 		}
-	}
+	}, [
+		templateUploadProcessingSuccess,
+		templateUploadProcessingError,
+		templates,
+		installSuccessText,
+		installUpdatedText,
+		genericUploadErrorText,
+		templateSuccessfullyInstalledUpdated,
+		dispatch,
+	]);
 
-	/**
-	 * Manages the template file upload
-	 *
-	 * @param { Array<Object> } acceptedFiles The array of uploaded files we should send to the server
-	 *
-	 * @since 4.1
-	 */
-	handleOndrop = (acceptedFiles) => {
-		/* Handle file upload and pass in an nonce!!! */
+	const checkFilename = (name) => {
+		if (name.substr(name.length - 4) !== '.zip') {
+			setError(filenameErrorText);
+			return false;
+		}
+		return true;
+	};
+
+	const checkFilesize = (size) => {
+		if (size / 1024 > 10240) {
+			setError(filesizeErrorText);
+			return false;
+		}
+		return true;
+	};
+
+	const handleOndrop = (acceptedFiles) => {
 		if (acceptedFiles instanceof Array && acceptedFiles.length > 0) {
 			acceptedFiles.forEach((file) => {
 				const filename = file.name;
 
-				/* Do validation */
-				if (
-					!this.checkFilename(filename) ||
-					!this.checkFilesize(file.size)
-				) {
+				if (!checkFilename(filename) || !checkFilesize(file.size)) {
 					return;
 				}
 
-				/* Add our loader */
-				this.setState({
-					ajax: true,
-					error: '',
-					message: '',
-				});
+				setAjax(true);
+				setError('');
+				setMessage('');
 
-				/* POST the PDF template to our endpoint for processing */
-				this.props.postTemplateUploadProcessing(file, filename);
+				dispatch(postTemplateUploadProcessingAction(file, filename));
 			});
 		}
 	};
 
-	/**
-	 * Checks if the uploaded file has a .zip extension
-	 * We do this instead of mime type checking as it doesn't work in all browsers
-	 *
-	 * @param { string } name
-	 *
-	 * @return { boolean } conditional value
-	 *
-	 * @since 4.1
-	 */
-	checkFilename = (name) => {
-		if (name.substr(name.length - 4) !== '.zip') {
-			/* Tell use about incorrect file type */
-			this.setState({
-				error: this.props.filenameErrorText,
-			});
-
-			return false;
-		}
-
-		return true;
+	const removeMessage = () => {
+		setMessage('');
 	};
 
-	/**
-	 * Checks if the file size is larger than 5MB
-	 *
-	 * @param { number } size File size in bytes
-	 *
-	 * @return { boolean } conditional value
-	 *
-	 * @since 4.1
-	 */
-	checkFilesize = (size) => {
-		/* Check the file is no larger than 10MB (convert from bytes to KB) */
-		if (size / 1024 > 10240) {
-			/* Tell use about incorrect file type */
-			this.setState({
-				error: this.props.filesizeErrorText,
-			});
-
-			return false;
-		}
-
-		return true;
-	};
-
-	/**
-	 * Update our Redux store with the new PDF template details
-	 * If our upload AJAX call to the server passed this function gets fired
-	 *
-	 * @param { Object } response
-	 *
-	 * @since 4.1
-	 */
-	ajaxSuccess = (response) => {
-		/* Update our Redux Store with the new template(s) */
-		response.templates.forEach((template) => {
-			/* Check if template already in the list before adding to our store */
-			const matched = this.props.templates.find((item) => {
-				return item.id === template.id;
-			});
-
-			if (matched === undefined) {
-				template.new = true; // ensure new templates go to end of list
-				template.message = this.props.installSuccessText;
-				this.props.addNewTemplate(template);
-			} else {
-				this.props.updateTemplateParam(
-					template.id,
-					'message',
-					this.props.installUpdatedText
-				);
-			}
-		});
-
-		/* Mark as success and stop AJAX spinner */
-		this.setState({
-			ajax: false,
-			message: this.props.templateSuccessfullyInstalledUpdated,
-		});
-
-		/* Clean/Reset our Redux Store state for templateUploadProcessing */
-		this.props.clearTemplateUploadProcessing();
-	};
-
-	/**
-	 * Show any errors to the user when AJAX request fails for any reason
-	 *
-	 * @param { string } error
-	 *
-	 * @since 4.1
-	 */
-	ajaxFailed = (error) => {
-		/* Let the user know there was a problem with the upload */
-		this.setState({
-			error: error?.message || this.props.genericUploadErrorText,
-			ajax: false,
-		});
-
-		/* Clean/Reset our Redux Store state for templateUploadProcessing */
-		this.props.clearTemplateUploadProcessing();
-	};
-
-	/**
-	 * Remove message from state once the timeout has finished
-	 *
-	 * @since 4.1
-	 */
-	removeMessage = () => {
-		this.setState({
-			message: '',
-		});
-	};
-
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		return (
-			<div
-				data-test="component-templateUploader"
-				className="theme add-new-theme gfpdf-dropzone"
-			>
-				<Dropzone
-					data-test="component-dropzone"
-					onDrop={this.handleOndrop}
-				>
-					{({ getRootProps, getInputProps, isDragActive }) => {
-						return (
-							<div
-								{...getRootProps()}
-								className={classNames('dropzone', {
-									'dropzone--isActive': isDragActive,
-								})}
+	return (
+		<div
+			data-test="component-templateUploader"
+			className="theme add-new-theme gfpdf-dropzone"
+		>
+			<Dropzone data-test="component-dropzone" onDrop={handleOndrop}>
+				{({ getRootProps, getInputProps, isDragActive }) => {
+					return (
+						<div
+							{...getRootProps()}
+							className={classNames('dropzone', {
+								'dropzone--isActive': isDragActive,
+							})}
+						>
+							<input {...getInputProps()} />
+							<a
+								href="#/template"
+								className={ajax ? 'doing-ajax' : ''}
+								aria-labelledby="gfpdf-template-install-instructions"
 							>
-								<input {...getInputProps()} />
-								<a
-									href="#/template"
-									className={
-										this.state.ajax ? 'doing-ajax' : ''
-									}
-									aria-labelledby="gfpdf-template-install-instructions"
-								>
-									<div className="theme-screenshot">
-										<span />
-									</div>
-
-									{this.state.error !== '' && (
-										<ShowMessage
-											data-test="component-stateError-showMessage"
-											text={this.state.error}
-											error
-										/>
-									)}
-									{this.state.message !== '' ? (
-										<ShowMessage
-											data-test="component-stateMessage-showMessage"
-											text={this.state.message}
-											dismissable
-											dismissableCallback={
-												this.removeMessage
-											}
-										/>
-									) : null}
-
-									<h2 className="theme-name">
-										{this.props.addTemplateText}
-									</h2>
-								</a>
-								<div
-									className="gfpdf-template-install-instructions"
-									id="gfpdf-template-install-instructions"
-								>
-									{this.props.templateInstallInstructions}
+								<div className="theme-screenshot">
+									<span />
 								</div>
+
+								{error !== '' && (
+									<ShowMessage
+										data-test="component-stateError-showMessage"
+										text={error}
+										error
+									/>
+								)}
+								{message !== '' ? (
+									<ShowMessage
+										data-test="component-stateMessage-showMessage"
+										text={message}
+										dismissable
+										dismissableCallback={removeMessage}
+									/>
+								) : null}
+
+								<h2 className="theme-name">
+									{addTemplateText}
+								</h2>
+							</a>
+							<div
+								className="gfpdf-template-install-instructions"
+								id="gfpdf-template-install-instructions"
+							>
+								{templateInstallInstructions}
 							</div>
-						);
-					}}
-				</Dropzone>
-			</div>
-		);
-	}
-}
-
-/**
- * Map Redux state to props
- *
- * @param { Object } state
- * @param { Object } state.template
- *
- * @return {{
- * templates: Array<Object>,
- * templateUploadProcessingSuccess: Object,
- * templateUploadProcessingError: Object
- * }} mapped state
- *
- * @since 5.2
- */
-const mapStateToProps = (state) => {
-	return {
-		templates: state.template.list,
-		templateUploadProcessingSuccess:
-			state.template.templateUploadProcessingSuccess,
-		templateUploadProcessingError:
-			state.template.templateUploadProcessingError,
-	};
+						</div>
+					);
+				}}
+			</Dropzone>
+		</div>
+	);
 };
 
-/**
- * Map actions to props
- *
- * @param { Function } dispatch Redux dispatcher
- *
- * @return {{
- * 	addNewTemplate: Function
- * 	updateTemplateParam: Function
- * 	postTemplateUploadProcessing: Function
- * 	clearTemplateUploadProcessing: Function
- * 	}} mappedDispatch
- *
- * @since 4.1
- */
-export const mapDispatchToProps = (dispatch) => {
-	return {
-		addNewTemplate: (template) => {
-			dispatch(addTemplate(template));
-		},
-
-		updateTemplateParam: (id, name, value) => {
-			dispatch(updateTemplateParam(id, name, value));
-		},
-
-		postTemplateUploadProcessing: (file, filename) => {
-			dispatch(postTemplateUploadProcessing(file, filename));
-		},
-
-		clearTemplateUploadProcessing: () => {
-			dispatch(clearTemplateUploadProcessing());
-		},
-	};
+TemplateUploader.propTypes = {
+	genericUploadErrorText: PropTypes.string,
+	addTemplateText: PropTypes.string,
+	filenameErrorText: PropTypes.string,
+	filesizeErrorText: PropTypes.string,
+	installSuccessText: PropTypes.string,
+	installUpdatedText: PropTypes.string,
+	templateSuccessfullyInstalledUpdated: PropTypes.string,
+	templateInstallInstructions: PropTypes.string,
 };
 
-/**
- * Maps our Redux store to our React component
- *
- * @since 4.1
- */
-export default connect(mapStateToProps, mapDispatchToProps)(TemplateUploader);
+export default TemplateUploader;

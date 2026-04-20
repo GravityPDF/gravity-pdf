@@ -1,7 +1,7 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 /* Components */
 import TemplateScreenshot from './TemplateScreenshot';
 import ShowMessage from '../ShowMessage';
@@ -9,7 +9,7 @@ import { TemplateDetails, Group } from './TemplateListItemComponents';
 import { Name } from './TemplateSingleComponents';
 import TemplateActivateButton from './TemplateActivateButton';
 /* Redux actions */
-import { updateTemplateParam } from '../../actions/templates';
+import { updateTemplateParam as updateTemplateParamAction } from '../../actions/templates';
 /* Helpers */
 import withRouterHooks from '../../utilities/withRouterHooks';
 
@@ -22,161 +22,97 @@ import withRouterHooks from '../../utilities/withRouterHooks';
  * @since       4.1
  */
 
-/**
- * React Component
- *
- * @since 4.1
- */
-export class TemplateListItem extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		navigate: PropTypes.func,
-		template: PropTypes.object,
-		activeTemplate: PropTypes.string,
-		updateTemplateParam: PropTypes.func,
-		activateText: PropTypes.string,
-		templateDetailsText: PropTypes.string,
-	};
-
-	/**
-	 * Check if the Enter key is pressed and not focused on a button
-	 * then display the template details page
-	 *
-	 * @param {Object} e Event
-	 *
-	 * @since 4.1
-	 */
-	handleMaybeShowDetailedTemplate = (e) => {
-		/* Show detailed template when the Enter key is pressed and the active element doesn't include a 'button' class */
-		if (e.keyCode === 13 && e.target.className.indexOf('button') === -1) {
-			this.handleShowDetailedTemplate();
-		}
-	};
-
-	/**
-	 * Update the URL to show the PDF template details page
-	 *
-	 * @since 4.1
-	 */
-	handleShowDetailedTemplate = () => {
-		this.props.navigate('/template/' + this.props.template.id);
-	};
-
-	/**
-	 * Call Redux action to remove any stored messages for this template
-	 *
-	 * @since 4.1
-	 */
-	removeMessage = () => {
-		this.props.updateTemplateParam(this.props.template.id, 'message', null);
-	};
-
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		const item = this.props.template;
-		const isActiveTemplate = this.props.activeTemplate === item.id;
-		const isCompatible = item.compatible;
-		const activeTemplate = isActiveTemplate ? 'active theme' : 'theme';
-
-		return (
-			<div
-				data-test="component-templateListItem"
-				onClick={this.handleShowDetailedTemplate}
-				onKeyDown={this.handleMaybeShowDetailedTemplate}
-				className={activeTemplate}
-				data-slug={item.id}
-				role="option"
-				tabIndex="0"
-				aria-label={
-					item.group + ' ' + item.template + ' ' + GFPDF.details
-				}
-			>
-				<TemplateScreenshot
-					data-test="component-templateScreenshot"
-					image={item.screenshot}
-				/>
-				{item.error ? (
-					<ShowMessage
-						data-test="component-showMessage"
-						text={item.error}
-						error
-					/>
-				) : null}
-				{item.message ? (
-					<ShowMessage
-						data-test="component-showMessage"
-						text={item.message}
-						dismissableCallback={this.removeMessage}
-						dismissable
-						delay={12000}
-					/>
-				) : null}
-
-				<TemplateDetails
-					data-test="component-templateDetails"
-					label={this.props.templateDetailsText}
-				/>
-				<Group data-test="component-group" group={item.group} />
-				<Name data-test="component-name" name={item.template} />
-
-				<div className="theme-actions">
-					{!isActiveTemplate && isCompatible ? (
-						<TemplateActivateButtonWithRouter
-							data-test="component-templateActivateButton"
-							template={this.props.template}
-							buttonText={this.props.activateText}
-						/>
-					) : null}
-				</div>
-			</div>
-		);
-	}
-}
-
 const TemplateActivateButtonWithRouter = withRouterHooks(
 	TemplateActivateButton
 );
 
 /**
- * Map state to props
+ * React Component
  *
- * @param { Readonly<Object> } state          The current Redux State
- * @param { Object }           state.template
- *
- * @return {{ activeTemplate: string }} mapped state
- *
+ * @param {Object} root0
+ * @param {*}      root0.navigate
+ * @param {*}      root0.template
+ * @param {*}      root0.activateText
+ * @param {*}      root0.templateDetailsText
  * @since 4.1
  */
-const mapStateToProps = (state) => {
-	return {
-		activeTemplate: state.template.activeTemplate,
+const TemplateListItem = ({
+	navigate,
+	template,
+	activateText,
+	templateDetailsText,
+}) => {
+	const dispatch = useDispatch();
+	const activeTemplate = useSelector((s) => s.template.activeTemplate);
+
+	const handleShowDetailedTemplate = () => {
+		navigate('/template/' + template.id);
 	};
+
+	const handleMaybeShowDetailedTemplate = (e) => {
+		if (e.keyCode === 13 && e.target.className.indexOf('button') === -1) {
+			handleShowDetailedTemplate();
+		}
+	};
+
+	const removeMessage = () => {
+		dispatch(updateTemplateParamAction(template.id, 'message', null));
+	};
+
+	const isActiveTemplate = activeTemplate === template?.id;
+	const isCompatible = template?.compatible;
+	const activeClass = isActiveTemplate ? 'active theme' : 'theme';
+
+	return (
+		<div
+			data-test="component-templateListItem"
+			onClick={handleShowDetailedTemplate}
+			onKeyDown={handleMaybeShowDetailedTemplate}
+			className={activeClass}
+			data-slug={template?.id}
+			role="option"
+			tabIndex="0"
+			aria-label={
+				template?.group + ' ' + template?.template + ' ' + GFPDF.details
+			}
+		>
+			<TemplateScreenshot image={template?.screenshot} />
+
+			{template?.error ? (
+				<ShowMessage text={template.error} error />
+			) : null}
+
+			{template?.message ? (
+				<ShowMessage
+					text={template.message}
+					dismissableCallback={removeMessage}
+					dismissable
+					delay={12000}
+				/>
+			) : null}
+
+			<TemplateDetails label={templateDetailsText} />
+			<Group group={template?.group} />
+			<Name name={template?.template} />
+
+			<div className="theme-actions">
+				{!isActiveTemplate && isCompatible ? (
+					<TemplateActivateButtonWithRouter
+						template={template}
+						buttonText={activateText}
+					/>
+				) : null}
+			</div>
+		</div>
+	);
 };
 
-/**
- * Map actions to props
- *
- * @param { Function } dispatch Redux dispatcher
- *
- * @return {{ updateTemplateParam: Function }} mapped dispatch
- *
- * @since 4.1
- */
-export const mapDispatchToProps = (dispatch) => {
-	return {
-		updateTemplateParam: (id, name, value) => {
-			dispatch(updateTemplateParam(id, name, value));
-		},
-	};
+TemplateListItem.propTypes = {
+	navigate: PropTypes.func,
+	template: PropTypes.object,
+	activeTemplate: PropTypes.string,
+	activateText: PropTypes.string,
+	templateDetailsText: PropTypes.string,
 };
 
-/**
- * Maps our Redux store to our React component
- *
- * @since 4.1
- */
-export default connect(mapStateToProps, mapDispatchToProps)(TemplateListItem);
+export default TemplateListItem;

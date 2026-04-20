@@ -1,10 +1,17 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { render, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { findByTestAttr } from '../../testUtilsRTL';
 import {
 	CoreFontListResults,
 	Retry,
 } from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontListResults';
+
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+	...jest.requireActual('react-router-dom'),
+	useNavigate: () => mockNavigate,
+}));
 
 describe('CoreFonts - CoreFontListResults.js', () => {
 	describe('CoreFontListResults Component', () => {
@@ -45,101 +52,119 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 		};
 
 		test('renders <CoreFontListResults /> component container', () => {
-			const wrapper = shallow(
-				<CoreFontListResults console={dataPending} retry={[]} />
-			);
-			const component = findByTestAttr(
-				wrapper,
-				'component-coreFont-container'
+			const { container } = render(
+				<MemoryRouter>
+					<CoreFontListResults console={dataPending} retry={[]} />
+				</MemoryRouter>
 			);
 
-			expect(component.length).toBe(1);
+			expect(
+				findByTestAttr(container, 'component-coreFont-container')
+			).toBeInTheDocument();
 		});
 
 		test('renders console pending output for our core font downloader', () => {
-			const wrapper = shallow(
-				<CoreFontListResults console={dataPending} retry={[]} />
+			const { container } = render(
+				<MemoryRouter>
+					<CoreFontListResults console={dataPending} retry={[]} />
+				</MemoryRouter>
+			);
+			const pending = container.querySelectorAll(
+				'.gfpdf-core-font-status-pending'
 			);
 
-			expect(
-				wrapper.find('.gfpdf-core-font-status-pending').length
-			).toEqual(2);
-			expect(
-				wrapper.find('.gfpdf-core-font-status-pending').at(0).text()
-			).toBe('Downloading Abyssinica_SIL.ttf... ');
-			expect(
-				wrapper.find('.gfpdf-core-font-status-pending').at(1).text()
-			).toBe('Downloading AboriginalSansREGULAR.ttf... ');
+			expect(pending).toHaveLength(2);
+			expect(pending[0].textContent).toBe(
+				'Downloading Abyssinica_SIL.ttf... '
+			);
+			expect(pending[1].textContent).toBe(
+				'Downloading AboriginalSansREGULAR.ttf... '
+			);
 		});
 
 		test('renders console success output for our core font downloader', () => {
-			const wrapper = shallow(
-				<CoreFontListResults console={dataSuccess} retry={[]} />
+			const { container } = render(
+				<MemoryRouter>
+					<CoreFontListResults console={dataSuccess} retry={[]} />
+				</MemoryRouter>
+			);
+			const success = container.querySelectorAll(
+				'.gfpdf-core-font-status-success'
 			);
 
-			expect(
-				wrapper.find('.gfpdf-core-font-status-success').length
-			).toEqual(2);
-			expect(
-				wrapper.find('.gfpdf-core-font-status-success').at(0).text()
-			).toBe('Completed installation of Abyssinica_SIL.ttf ');
-			expect(
-				wrapper.find('.gfpdf-core-font-status-success').at(1).text()
-			).toBe('Completed installation of AboriginalSansREGULAR.ttf ');
+			expect(success).toHaveLength(2);
+			expect(success[0].textContent).toBe(
+				'Completed installation of Abyssinica_SIL.ttf '
+			);
+			expect(success[1].textContent).toBe(
+				'Completed installation of AboriginalSansREGULAR.ttf '
+			);
 		});
 
 		test('renders list spacer container component <ListSpacer />', () => {
-			const wrapper = shallow(
-				<CoreFontListResults console={dataCompleted} retry={[]} />
+			const { container } = render(
+				<MemoryRouter>
+					<CoreFontListResults console={dataCompleted} retry={[]} />
+				</MemoryRouter>
+			);
+			const success = container.querySelectorAll(
+				'.gfpdf-core-font-status-success'
 			);
 
-			expect(
-				wrapper.find('.gfpdf-core-font-status-success').length
-			).toEqual(2);
-			expect(
-				wrapper.find('.gfpdf-core-font-status-success').at(0).text()
-			).toBe(
-				'ALL CORE FONTS SUCCESSFULLY INSTALLED <CoreFontListSpacer />'
+			expect(success).toHaveLength(2);
+			expect(success[0].textContent).toBe(
+				'ALL CORE FONTS SUCCESSFULLY INSTALLED ---'
 			);
-			expect(
-				wrapper.find('.gfpdf-core-font-status-success').at(1).text()
-			).toBe('Completed installation of Abyssinica_SIL.ttf ');
+			expect(success[1].textContent).toBe(
+				'Completed installation of Abyssinica_SIL.ttf '
+			);
 		});
 
 		test('renders retry component <Retry />', () => {
-			const wrapper = shallow(
-				<CoreFontListResults console={dataCompleted} retry={fontList} />
+			const { container } = render(
+				<MemoryRouter>
+					<CoreFontListResults
+						console={dataCompleted}
+						retry={fontList}
+					/>
+				</MemoryRouter>
 			);
 
-			expect(wrapper.find('Retry').length).toEqual(1);
+			expect(
+				findByTestAttr(container, 'component-retry-link')
+			).toBeInTheDocument();
 		});
 	});
 
 	describe('Retry Component', () => {
-		test('renders <Retry /> component container', () => {
-			const wrapper = shallow(<Retry />);
-			const component = findByTestAttr(wrapper, 'component-retry-link');
+		beforeEach(() => {
+			mockNavigate.mockClear();
+		});
 
-			expect(component.length).toBe(1);
+		test('renders <Retry /> component container', () => {
+			const { container } = render(<Retry />);
+
+			expect(
+				findByTestAttr(container, 'component-retry-link')
+			).toBeInTheDocument();
 		});
 
 		test('renders link text', () => {
-			const wrapper = shallow(
+			const { container } = render(
 				<Retry retryText="Retry Failed Downloads?" />
 			);
 
-			expect(wrapper.find('button').text()).toBe(
+			expect(container.querySelector('button').textContent).toBe(
 				'Retry Failed Downloads?'
 			);
 		});
 
 		test('check link click', () => {
-			const navigate = jest.fn();
-			const wrapper = shallow(<Retry navigate={navigate} />);
-			const retryLink = findByTestAttr(wrapper, 'component-retry-link');
-			retryLink.simulate('click', { preventDefault() {} });
+			const { container } = render(<Retry />);
+			fireEvent.click(findByTestAttr(container, 'component-retry-link'));
 
-			expect(navigate.mock.calls.length).toBe(1);
+			expect(mockNavigate).toHaveBeenCalledTimes(1);
+			expect(mockNavigate).toHaveBeenCalledWith('retryDownloadCoreFonts');
 		});
 	});
 });

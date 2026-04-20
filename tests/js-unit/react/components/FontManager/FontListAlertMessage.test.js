@@ -1,72 +1,37 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
-import { FontListAlertMessage } from '../../../../../src/assets/js/react/components/FontManager/FontListAlertMessage';
+import { screen } from '@testing-library/react';
+import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
+import FontListAlertMessage from '../../../../../src/assets/js/react/components/FontManager/FontListAlertMessage';
 
 describe('FontManager - FontListAlertMessage.js', () => {
-	// Mock component props
-	const props = {
-		getCustomFontList: jest.fn(),
-		resetSearchResult: jest.fn(),
-	};
-
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontListAlertMessage /> component', () => {
-			const wrapper = shallow(<FontListAlertMessage {...props} />);
-			const component = findByTestAttr(
-				wrapper,
-				'component-FontListAlertMessage'
-			);
-
-			expect(component.length).toBe(1);
+			const { container } = renderWithStore(<FontListAlertMessage />);
+			expect(
+				findByTestAttr(container, 'component-FontListAlertMessage')
+			).toBeInTheDocument();
 		});
 
 		test('display font list empty message', () => {
-			const empty = true;
-			const wrapper = mount(
-				<FontListAlertMessage {...props} empty={empty} />
-			);
-
-			expect(
-				wrapper
-					.find('span')
-					.findWhere((node) => node.text() === 'Font list empty.')
-					.exists()
-			).toBe(true);
+			renderWithStore(<FontListAlertMessage empty={true} />);
+			expect(screen.getByText('Font list empty.')).toBeInTheDocument();
 		});
 
 		test('display search result empty message', () => {
-			const empty = false;
-			const wrapper = mount(
-				<FontListAlertMessage {...props} empty={empty} />
-			);
-
+			renderWithStore(<FontListAlertMessage empty={false} />);
 			expect(
-				wrapper
-					.find('span')
-					.findWhere(
-						(node) =>
-							node.text() ===
-							'No fonts matching your search found.'
-					)
-					.exists()
-			).toBe(true);
-			expect(
-				wrapper
-					.find('button')
-					.findWhere((node) => node.text() === 'Clear search.')
-					.exists()
-			).toBe(true);
+				screen.getByText('No fonts matching your search found.')
+			).toBeInTheDocument();
+			expect(screen.getByText('Clear search.')).toBeInTheDocument();
 		});
 
 		test('display API call request link', () => {
-			const empty = false;
-			const error = 'error';
-			const wrapper = mount(
-				<FontListAlertMessage {...props} empty={empty} error={error} />
+			renderWithStore(
+				<FontListAlertMessage empty={false} error="error" />
 			);
-
-			expect(wrapper.find('button').exists()).toBeTruthy();
+			expect(
+				screen.getByRole('button', { name: 'error' })
+			).toBeInTheDocument();
 		});
 	});
 });

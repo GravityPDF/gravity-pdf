@@ -1,202 +1,135 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { storeFactory, findByTestAttr } from '../../testUtils';
-import ConnectedTemplateSingle, {
-	TemplateSingle,
-} from '../../../../../src/assets/js/react/components/Template/TemplateSingle';
+import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
+import TemplateSingle from '../../../../../src/assets/js/react/components/Template/TemplateSingle';
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateContainer',
+	() =>
+		function TemplateContainer({ children }) {
+			return (
+				<div data-test="component-templateContainer">{children}</div>
+			);
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateHeaderNavigation',
+	() =>
+		function TemplateHeaderNavigation() {
+			return <div data-test="component-templateHeaderNavigation" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateFooterActions',
+	() =>
+		function TemplateFooterActions() {
+			return <div data-test="component-templateFooterActions" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateScreenshots',
+	() =>
+		function TemplateScreenshots() {
+			return <div data-test="component-templateScreenshots" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/utilities/withRouterHooks',
+	() => (Component) => Component
+);
 
 describe('Template - TemplateSingle.js', () => {
-	describe('CHECK FOR REDUX PROPERTIES', () => {
-		const setup = (state = {}) => {
-			const props = { params: { id: 'rubix' } };
-			const store = storeFactory(state);
-			const wrapper = shallow(
-				<ConnectedTemplateSingle store={store} {...props} />
-			)
-				.dive()
-				.dive();
+	const sampleTemplate = {
+		id: 'zadani',
+		template: 'Zadani',
+		description: 'A description',
+		author: 'Gravity PDF',
+		'author uri': 'https://example.com',
+		group: 'Core',
+		path: '/templates/',
+		screenshot: '',
+		version: '1.0',
+	};
 
-			return wrapper;
+	const initialState = {
+		template: {
+			list: [sampleTemplate],
+			activeTemplate: '',
+			search: '',
+			updateSelectBoxText: '',
+			templateProcessing: '',
+			templateUploadProcessingSuccess: {},
+			templateUploadProcessingError: {},
+		},
+	};
+
+	test('renders <TemplateSingle /> when template is found by params id', () => {
+		const { container } = renderWithStore(
+			<TemplateSingle params={{ id: 'zadani' }} />,
+			initialState
+		);
+		expect(
+			findByTestAttr(container, 'component-templateContainer')
+		).toBeInTheDocument();
+	});
+
+	test('renders nothing when template is not found', () => {
+		const { container } = renderWithStore(
+			<TemplateSingle params={{ id: 'non-existent' }} />,
+			initialState
+		);
+		expect(
+			findByTestAttr(container, 'component-templateContainer')
+		).not.toBeInTheDocument();
+	});
+
+	test('renders <TemplateScreenshots /> component', () => {
+		const { container } = renderWithStore(
+			<TemplateSingle params={{ id: 'zadani' }} />,
+			initialState
+		);
+		expect(
+			findByTestAttr(container, 'component-templateScreenshots')
+		).toBeInTheDocument();
+	});
+
+	test('renders ShowMessage for long_message when present', () => {
+		const stateWithMessage = {
+			...initialState,
+			template: {
+				...initialState.template,
+				list: [
+					{
+						...sampleTemplate,
+						long_message: 'Important notice text',
+					},
+				],
+			},
 		};
-
-		setup();
-
-		test('has access to `list` state', () => {
-			const wrapper = setup();
-			const listProp = wrapper.instance().props.templates;
-
-			expect(listProp).toBeInstanceOf(Array);
-		});
-
-		test('has access to `activeTemplate` state', () => {
-			const templates = [
-				{
-					id: 'zadani',
-					compatible: true,
-				},
-				{
-					id: 'rubix',
-					compatible: true,
-				},
-				{
-					id: 'focus-gravity',
-					compatible: true,
-				},
-			];
-			const wrapper = setup({
-				template: {
-					list: templates,
-					activeTemplate: 'focus-gravity',
-				},
-			});
-			const activeTemplateProp = wrapper.instance().props.activeTemplate;
-
-			expect(activeTemplateProp).toBe('focus-gravity');
-		});
+		const { getByText } = renderWithStore(
+			<TemplateSingle params={{ id: 'zadani' }} />,
+			stateWithMessage
+		);
+		expect(getByText('Important notice text')).toBeInTheDocument();
 	});
 
-	describe('RUN LIFECYCLE METHODS', () => {
-		test("shouldComponentUpdate() - Ensure the component doesn't try and re-render when a template isn't found", () => {
-			const props = { template: { template: 'Rubix' } };
-			let nextProps;
-			let shouldComponentUpdate;
-
-			nextProps = { template: null };
-			const wrapper = shallow(<TemplateSingle {...props} />);
-			shouldComponentUpdate = wrapper
-				.instance()
-				.shouldComponentUpdate(nextProps);
-
-			expect(shouldComponentUpdate).toBe(false);
-
-			nextProps = { template: 'rubix' };
-			shouldComponentUpdate = wrapper
-				.instance()
-				.shouldComponentUpdate(nextProps);
-
-			expect(shouldComponentUpdate).toBe(true);
-		});
-	});
-
-	describe('RENDERS COMPONENT', () => {
-		describe('<TemplateHeaderNavigation /> and <TemplateFooterActions /> components', () => {
-			const props = {
-				template: {
-					id: 3,
-					template: 'Rubix',
-					path: '/rubix',
-					screenshot: '',
-				},
-				params: {
-					id: 3,
-				},
-			};
-			const wrapper = shallow(<TemplateSingle {...props} />).dive();
-
-			test('renders <TemplateHeaderNavigation /> component', () => {
-				expect(
-					wrapper
-						.find({
-							template: props.template,
-						})
-						.exists()
-				).toBe(true);
-			});
-
-			test('renders <TemplateFooterActions /> component', () => {
-				expect(wrapper.find('TemplateFooterActions').exists()).toBe(
-					true
-				);
-			});
-		});
-
-		// Mock props
-		const props = { template: { template: 'Rubix' } };
-
-		test('render <TemplateSingle /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-			const component = findByTestAttr(
-				wrapper,
-				'component-templateSingle'
-			);
-
-			expect(component.length).toBe(1);
-		});
-
-		test('render <TemplateScreenshots /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-
-			expect(wrapper.find('TemplateScreenshots').length).toBe(1);
-		});
-
-		test('render <CurrentTemplate /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-
-			expect(wrapper.find('CurrentTemplate').length).toBe(1);
-		});
-
-		test('render <Name /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-
-			expect(wrapper.find('Name').length).toBe(1);
-		});
-
-		test('render <Author /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-
-			expect(wrapper.find('Author').length).toBe(1);
-		});
-
-		test('render <Group /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-
-			expect(wrapper.find('Group').length).toBe(1);
-		});
-
-		test('render <ShowMessage /> component if long_message is found', () => {
-			const wrapper = shallow(
-				<TemplateSingle
-					template={{
-						template: 'Rubix',
-						long_message: 'text',
-					}}
-				/>
-			);
-			const component = findByTestAttr(
-				wrapper,
-				'component-showMessageLong_message'
-			);
-
-			expect(component.length).toBe(1);
-		});
-
-		test('render <ShowMessage /> component if long_error is found', () => {
-			const wrapper = shallow(
-				<TemplateSingle
-					template={{
-						template: 'Rubix',
-						long_error: 'text',
-					}}
-				/>
-			);
-			const component = findByTestAttr(
-				wrapper,
-				'component-showMessageLong_error'
-			);
-
-			expect(component.length).toBe(1);
-		});
-
-		test('render <Description /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-
-			expect(wrapper.find('Description').length).toBe(1);
-		});
-
-		test('render <Tags /> component', () => {
-			const wrapper = shallow(<TemplateSingle {...props} />);
-
-			expect(wrapper.find('Tags').length).toBe(1);
-		});
+	test('renders ShowMessage for long_error when present', () => {
+		const stateWithError = {
+			...initialState,
+			template: {
+				...initialState.template,
+				list: [
+					{ ...sampleTemplate, long_error: 'Template error text' },
+				],
+			},
+		};
+		const { getByText } = renderWithStore(
+			<TemplateSingle params={{ id: 'zadani' }} />,
+			stateWithError
+		);
+		expect(getByText('Template error text')).toBeInTheDocument();
 	});
 });

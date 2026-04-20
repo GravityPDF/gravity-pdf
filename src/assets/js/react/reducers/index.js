@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from '@reduxjs/toolkit';
 import templateReducer from './templateReducer';
 import coreFontsReducer from './coreFontReducer';
 import fontManagerReducer from './fontManagerReducer';

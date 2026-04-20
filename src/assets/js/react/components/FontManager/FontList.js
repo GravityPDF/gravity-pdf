@@ -1,7 +1,7 @@
 /* Dependencies */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 /* Components */
 import FontListHeader from './FontListHeader';
 import FontListItems from './FontListItems';
@@ -9,7 +9,7 @@ import FontListSkeleton from './FontListSkeleton';
 import FontListAlertMessage from './FontListAlertMessage';
 
 /**
- * @package			Gravity PDF
+ * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -18,26 +18,18 @@ import FontListAlertMessage from './FontListAlertMessage';
 /**
  * Display font list UI
  *
- * @param { Object }        props
- * @param { string }        props.id
- * @param { boolean }       props.loading
- * @param { Array<Object> } props.fontList
- * @param { Object }        props.searchResult
- * @param { Object }        props.msg
- * @param { Object }        props.msg.error
- *
- * @return {JSX.Element} FontList component
- *
+ * @param {Object} root0
+ * @param {*}      root0.id
+ * @param {*}      root0.navigate
  * @since 6.0
  */
-export const FontList = ({
-	id,
-	loading,
-	fontList,
-	searchResult,
-	msg: { error },
-	navigate,
-}) => {
+const FontList = ({ id, navigate }) => {
+	const loading = useSelector((state) => state.fontManager.loading);
+	const fontList = useSelector((state) => state.fontManager.fontList);
+	const searchResult = useSelector((state) => state.fontManager.searchResult);
+	const msg = useSelector((state) => state.fontManager.msg);
+	const { error } = msg;
+
 	const fontListError = error && error.fontList;
 	const fontListEmpty = fontList.length === 0 && !searchResult;
 	const checkSearchResult =
@@ -71,43 +63,9 @@ export const FontList = ({
 	);
 };
 
-/**
- * Map redux state to props
- *
- * @param { Object } state
- * @param { Object } state.fontManager
- *
- * @return {{
- *   loading: boolean,
- *   fontList: Array<Object>,
- *   searchResult: (null | Array<Object>),
- *   msg: Object,
- * }} mappedState
- *
- * @since 6.0
- */
-const mapStateToProps = (state) => ({
-	loading: state.fontManager.loading,
-	fontList: state.fontManager.fontList,
-	searchResult: state.fontManager.searchResult,
-	msg: state.fontManager.msg,
-});
-
-/**
- * PropTypes
- *
- * @since 6.0
- */
 FontList.propTypes = {
 	id: PropTypes.string,
-	loading: PropTypes.bool.isRequired,
-	fontList: PropTypes.arrayOf(PropTypes.object).isRequired,
-	searchResult: PropTypes.oneOfType([
-		PropTypes.oneOf([null]).isRequired,
-		PropTypes.arrayOf(PropTypes.object).isRequired,
-	]),
-	msg: PropTypes.object.isRequired,
 	navigate: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, {})(FontList);
+export default FontList;

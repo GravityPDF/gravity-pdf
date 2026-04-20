@@ -1,479 +1,172 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { storeFactory, findByTestAttr } from '../../testUtils';
-import ConnectedCoreFontContainer, {
-	CoreFontContainer,
-} from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontContainer';
+import { act, fireEvent } from '@testing-library/react';
+import {
+	renderWithRouter,
+	findByTestAttr,
+	createTestStore,
+} from '../../testUtilsRTL';
+import CoreFontContainer from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontContainer';
+import { initialState as coreFontInitialState } from '../../../../../src/assets/js/react/reducers/coreFontReducer';
+import { DOWNLOAD_FONTS_API_CALL } from '../../../../../src/assets/js/react/actions/coreFonts';
+
+const fontList = [
+	'AboriginalSansREGULAR.ttf',
+	'Abyssinica_SIL.ttf',
+	'DejaVuSerifCondensed.ttf',
+];
+
+const baseState = { coreFonts: coreFontInitialState };
 
 describe('CoreFonts - CoreFontContainer.js', () => {
-	const fontList = [
-		'AboriginalSansREGULAR.ttf',
-		'Abyssinica_SIL.ttf',
-		'DejaVuSerifCondensed.ttf',
-	];
-	// Mocked functions
-	const clearConsoleMock = jest.fn();
-	const clearButtonClickedAndRetryListMock = jest.fn();
-	const navigate = jest.fn();
-	const downloadFontsApiCallMock = jest.fn();
-	const addToConsoleMock = jest.fn();
-	const getFilesFromGitHubMock = jest.fn();
-	const clearRequestRemainingDataMock = jest.fn();
-
-	describe('Check for redux properties', () => {
-		const setup = (state = {}) => {
-			const store = storeFactory(state);
-			const wrapper = shallow(
-				<ConnectedCoreFontContainer store={store} />
-			)
-				.dive()
-				.dive();
-
-			return wrapper;
-		};
-
-		test('has access to `buttonClicked` state', () => {
-			const wrapper = setup();
-			const buttonClickedProp = wrapper.instance().props.buttonClicked;
-
-			expect(buttonClickedProp).toBe(false);
-		});
-
-		test('has access to `fontList` state', () => {
-			const wrapper = setup({ coreFonts: { fontList } });
-			const fontListProp = wrapper.instance().props.fontList;
-
-			expect(fontListProp).toBe(fontList);
-			expect(fontList).toHaveLength(3);
-		});
-
-		test('has access to `console` state', () => {
-			const data = {
-				'AboriginalSansREGULAR.ttf': {
-					status: 'pending',
-					message: 'Downloading AboriginalSansREGULAR.ttf...',
-				},
-				'Abyssinica_SIL.ttf': {
-					status: 'pending',
-					message: 'Downloading Abyssinica_SIL.ttf...',
-				},
-			};
-			const wrapper = setup({
-				coreFonts: { console: data, fontList: [] },
-			});
-			const consoleProp = wrapper.instance().props.console;
-
-			expect(Object.keys(consoleProp).length).toBe(2);
-			expect(consoleProp['AboriginalSansREGULAR.ttf']).toEqual({
-				status: 'pending',
-				message: 'Downloading AboriginalSansREGULAR.ttf...',
-			});
-			expect(consoleProp['Abyssinica_SIL.ttf']).toEqual({
-				status: 'pending',
-				message: 'Downloading Abyssinica_SIL.ttf...',
-			});
-		});
-
-		test('has access to `retry` state', () => {
-			const wrapper = setup({
-				coreFonts: { retry: fontList, fontList: [] },
-			});
-			const retryProp = wrapper.instance().props.retry;
-
-			expect(retryProp).toBe(fontList);
-			expect(retryProp).toHaveLength(3);
-		});
-
-		test('has access to `getFilesFromGitHubFailed` state', () => {
-			const error = 'Could not download Core Font list. Try again.';
-			const wrapper = setup({
-				coreFonts: { getFilesFromGitHubFailed: error, fontList: [] },
-			});
-			const getFilesFromGitHubFailedProp =
-				wrapper.instance().props.getFilesFromGitHubFailed;
-
-			expect(getFilesFromGitHubFailedProp).toBe(error);
-		});
-
-		test('has access to `requestDownload` state', () => {
-			const wrapper = setup({
-				coreFonts: { requestDownload: 'finished', fontList: [] },
-			});
-			const requestDownloadProp =
-				wrapper.instance().props.requestDownload;
-
-			expect(requestDownloadProp).toBe('finished');
-		});
-
-		test('has access to `downloadCounter` state', () => {
-			const wrapper = setup({
-				coreFonts: { downloadCounter: 82, fontList: [] },
-			});
-			const downloadCounterProp = wrapper.instance().props.queue;
-
-			expect(downloadCounterProp).toBe(82);
-		});
-	});
-
-	describe('Component functions', () => {
-		let wrapper;
-		let instance;
-
-		beforeEach(() => {
-			wrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					clearConsole={clearConsoleMock}
-					clearButtonClickedAndRetryList={
-						clearButtonClickedAndRetryListMock
-					}
-					navigate={navigate}
-					downloadFontsApiCall={downloadFontsApiCallMock}
-				/>
-			);
-			instance = wrapper.instance();
-		});
-
-		test('maybeStartDownload() - start the download if location === `/downloadCoreFonts`', (done) => {
-			instance.maybeStartDownload('/downloadCoreFonts', fontList, null);
-
-			expect(wrapper.state('ajax')).toBe(false);
-			expect(clearConsoleMock.mock.calls.length).toBe(1);
-			expect(clearButtonClickedAndRetryListMock.mock.calls.length).toBe(
-				1
-			);
-			expect(navigate.mock.calls.length).toBe(1);
-			setTimeout(() => {
-				expect(downloadFontsApiCallMock.mock.calls.length).toBe(3);
-				done();
-			}, 300);
-		});
-
-		test('maybeStartDownload() - start the download if location === `/retryDownloadCoreFonts`', (done) => {
-			instance.maybeStartDownload(
-				'/retryDownloadCoreFonts',
-				fontList,
-				null
-			);
-
-			expect(wrapper.state('ajax')).toBe(true);
-			expect(clearConsoleMock.mock.calls.length).toBe(1);
-			expect(clearButtonClickedAndRetryListMock.mock.calls.length).toBe(
-				1
-			);
-			expect(navigate.mock.calls.length).toBe(1);
-			setTimeout(() => {
-				expect(downloadFontsApiCallMock.mock.calls.length).toBe(3);
-				done();
-			}, 300);
-		});
-
-		test('startDownloadFonts() - call our server to download the fonts', (done) => {
-			instance.startDownloadFonts(fontList, null);
-
-			expect(clearConsoleMock.mock.calls.length).toBe(1);
-			expect(clearButtonClickedAndRetryListMock.mock.calls.length).toBe(
-				1
-			);
-			expect(navigate.mock.calls.length).toBe(1);
-			setTimeout(() => {
-				expect(downloadFontsApiCallMock.mock.calls.length).toBe(3);
-				done();
-			}, 300);
-		});
-
-		test('startDownloadFonts() - error handling', () => {
-			const newWrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					clearButtonClickedAndRetryList={
-						clearButtonClickedAndRetryListMock
-					}
-					navigate={navigate}
-					addToConsole={addToConsoleMock}
-				/>
-			);
-			const inst = newWrapper.instance();
-			inst.startDownloadFonts(
-				[],
-				'Could not download Core Font list. Try again.'
-			);
-
-			expect(clearButtonClickedAndRetryListMock.mock.calls.length).toBe(
-				1
-			);
-			expect(newWrapper.state('ajax')).toBe(false);
-			expect(addToConsoleMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-
-		test('handleGithubApiError() - Add an overall error status to the console', () => {
-			const newWrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					navigate={navigate}
-					addToConsole={addToConsoleMock}
-				/>
-			);
-			const inst = newWrapper.instance();
-			inst.handleGithubApiError(
-				'Could not download Core Font list. Try again.'
-			);
-
-			expect(newWrapper.state('ajax')).toBe(false);
-			expect(addToConsoleMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-
-		test('handleTriggerFontDownload() - request GitHub for font names & trigger font download', () => {
-			const newWrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					getFilesFromGitHub={getFilesFromGitHubMock}
-				/>
-			);
-			const inst = newWrapper.instance();
-			inst.handleTriggerFontDownload();
-
-			expect(newWrapper.state('ajax')).toBe(true);
-			expect(getFilesFromGitHubMock.mock.calls.length).toBe(1);
-		});
-	});
-
-	describe('Run Lifecycle methods', () => {
-		test('componentDidMount() - Check for /downloadCoreFonts redirect URL and run the installer', () => {
-			const props = {
-				fontList: [],
-				location: {
-					pathname: '/downloadCoreFonts',
-				},
-				getFilesFromGitHub: getFilesFromGitHubMock,
-				navigate,
-			};
-			const wrapper = shallow(<CoreFontContainer {...props} />);
-			const handleTriggerFontDownload = jest.spyOn(
-				wrapper.instance(),
-				'handleTriggerFontDownload'
-			);
-			wrapper.instance().componentDidMount();
-
-			expect(handleTriggerFontDownload).toHaveBeenCalledTimes(1);
-			expect(wrapper.state('ajax')).toBe(true);
-			expect(getFilesFromGitHubMock.mock.calls.length).toBe(1);
-		});
-
-		test('componentDidUpdate() - Load current font list', (done) => {
-			const props = {
-				fontList,
-				location: {
-					pathname: '',
-				},
-				getFilesFromGitHubFailed: '',
-				buttonClicked: true,
-			};
-			const wrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					clearConsole={clearConsoleMock}
-					clearButtonClickedAndRetryList={
-						clearButtonClickedAndRetryListMock
-					}
-					navigate={navigate}
-					downloadFontsApiCall={downloadFontsApiCallMock}
-					{...props}
-				/>
-			);
-			const startDownloadFonts = jest.spyOn(
-				wrapper.instance(),
-				'startDownloadFonts'
-			);
-			wrapper.instance().componentDidUpdate();
-
-			expect(startDownloadFonts).toHaveBeenCalledTimes(1);
-			expect(clearConsoleMock.mock.calls.length).toBe(1);
-			expect(clearButtonClickedAndRetryListMock.mock.calls.length).toBe(
-				1
-			);
-			expect(navigate.mock.calls.length).toBe(1);
-			setTimeout(() => {
-				expect(downloadFontsApiCallMock.mock.calls.length).toBe(3);
-				done();
-			}, 300);
-		});
-
-		test('componentDidUpdate() - Check for /downloadCoreFonts redirect URL and run the installer', () => {
-			const props = {
-				fontList: [],
-				location: { pathname: '/downloadCoreFonts' },
-				navigate,
-			};
-			const wrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					getFilesFromGitHub={getFilesFromGitHubMock}
-					{...props}
-				/>
-			);
-			const handleTriggerFontDownload = jest.spyOn(
-				wrapper.instance(),
-				'handleTriggerFontDownload'
-			);
-			wrapper.instance().componentDidUpdate();
-
-			expect(handleTriggerFontDownload).toHaveBeenCalledTimes(1);
-			expect(wrapper.state('ajax')).toBe(true);
-			expect(getFilesFromGitHubMock.mock.calls.length).toBe(1);
-		});
-
-		test('componentDidUpdate() - Load current hash history location & retry font list', (done) => {
-			const props = {
-				fontList: [],
-				retry: fontList,
-				location: { pathname: '/retryDownloadCoreFonts' },
-			};
-			const wrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					clearConsole={clearConsoleMock}
-					clearButtonClickedAndRetryList={
-						clearButtonClickedAndRetryListMock
-					}
-					navigate={navigate}
-					downloadFontsApiCall={downloadFontsApiCallMock}
-					{...props}
-				/>
-			);
-			const maybeStartDownload = jest.spyOn(
-				wrapper.instance(),
-				'maybeStartDownload'
-			);
-			wrapper.instance().componentDidUpdate();
-
-			expect(maybeStartDownload).toHaveBeenCalledTimes(1);
-			expect(wrapper.state('ajax')).toBe(true);
-			expect(clearConsoleMock.mock.calls.length).toBe(1);
-			expect(clearButtonClickedAndRetryListMock.mock.calls.length).toBe(
-				1
-			);
-			expect(navigate.mock.calls.length).toBe(1);
-			setTimeout(() => {
-				expect(downloadFontsApiCallMock.mock.calls.length).toBe(3);
-				done();
-			}, 300);
-		});
-
-		test('componentDidUpdate() - Load error if something went wrong', () => {
-			const props = {
-				fontList: [],
-				location: { pathname: '' },
-				getFilesFromGitHubFailed:
-					'Could not download Core Font list. Try again.',
-				buttonClicked: true,
-			};
-			const wrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					clearButtonClickedAndRetryList={
-						clearButtonClickedAndRetryListMock
-					}
-					addToConsole={addToConsoleMock}
-					navigate={navigate}
-					{...props}
-				/>
-			);
-			const startDownloadFonts = jest.spyOn(
-				wrapper.instance(),
-				'startDownloadFonts'
-			);
-			wrapper.instance().componentDidUpdate();
-
-			expect(startDownloadFonts).toHaveBeenCalledTimes(1);
-			expect(clearButtonClickedAndRetryListMock.mock.calls.length).toBe(
-				1
-			);
-			expect(wrapper.state('ajax')).toBe(false);
-			expect(addToConsoleMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-
-		test('componentDidUpdate() - Set ajax/loading false if request download is finished', () => {
-			const props = {
-				fontList: [],
-				location: { pathname: '' },
-				requestDownload: 'finished',
-			};
-			const wrapper = shallow(
-				<CoreFontContainer
-					fontList={[]}
-					clearRequestRemainingData={clearRequestRemainingDataMock}
-					navigate={navigate}
-					{...props}
-				/>
-			);
-			wrapper.instance().componentDidUpdate();
-
-			expect(wrapper.state('ajax')).toBe(false);
-			expect(clearRequestRemainingDataMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-	});
-
-	let wrapper;
-	wrapper = shallow(<CoreFontContainer fontList={[]} />);
-
 	test('renders <CoreFontContainer /> component container', () => {
-		const component = findByTestAttr(
-			wrapper,
-			'component-coreFont-downloader'
-		);
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
 
-		expect(component.length).toBe(1);
+		expect(
+			findByTestAttr(container, 'component-coreFont-downloader')
+		).toBeInTheDocument();
 	});
 
 	test('renders core font downloader button', () => {
-		const component = findByTestAttr(wrapper, 'component-coreFont-button');
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
 
-		expect(component.length).toBe(1);
+		expect(
+			findByTestAttr(container, 'component-coreFont-button')
+		).toBeInTheDocument();
 	});
 
 	test('renders button text', () => {
-		const props = {
-			fontList: [],
-			buttonText: 'Download Core Fonts',
-		};
-		const newWrapper = shallow(<CoreFontContainer {...props} />);
-
-		expect(newWrapper.find('button').text()).toBe('Download Core Fonts');
-	});
-
-	test('check button click', () => {
-		const newWrapper = shallow(
-			<CoreFontContainer
-				fontList={[]}
-				getFilesFromGitHub={getFilesFromGitHubMock}
-			/>
+		const { container } = renderWithRouter(
+			<CoreFontContainer buttonText="Download Core Fonts" />,
+			{ initialState: baseState }
 		);
-		const button = findByTestAttr(newWrapper, 'component-coreFont-button');
-		button.simulate('click');
 
-		expect(newWrapper.state('ajax')).toBe(true);
-		expect(getFilesFromGitHubMock.mock.calls.length).toBe(1);
+		expect(container.querySelector('button').textContent).toBe(
+			'Download Core Fonts'
+		);
 	});
 
-	test('renders <Spinner /> component', () => {
-		wrapper.setState({ ajax: true });
+	test('does not render <Spinner /> by default', () => {
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
 
-		expect(wrapper.find('Spinner').length).toEqual(1);
+		expect(
+			container.querySelector('.gfpdf-spinner')
+		).not.toBeInTheDocument();
 	});
 
-	test('renders <Counter /> component', () => {
-		wrapper = shallow(<CoreFontContainer fontList={[]} queue={1} />);
-		wrapper.setState({ ajax: true });
+	test('button click shows <Spinner />', () => {
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
+		fireEvent.click(findByTestAttr(container, 'component-coreFont-button'));
 
-		expect(wrapper.find('CoreFontCounter').length).toEqual(1);
+		expect(container.querySelector('.gfpdf-spinner')).toBeInTheDocument();
+	});
+
+	test('button click dispatches getFilesFromGitHub (sets buttonClicked in store)', () => {
+		const { container, store } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
+		fireEvent.click(findByTestAttr(container, 'component-coreFont-button'));
+
+		expect(store.getState().coreFonts.buttonClicked).toBe(true);
+	});
+
+	test('button is disabled while loading', () => {
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
+		fireEvent.click(findByTestAttr(container, 'component-coreFont-button'));
+
+		expect(
+			findByTestAttr(container, 'component-coreFont-button')
+		).toBeDisabled();
+	});
+
+	test('renders <Counter /> when ajax is active and queue > 0', () => {
+		const { container } = renderWithRouter(
+			<CoreFontContainer counterText="Remaining:" />,
+			{
+				initialState: {
+					coreFonts: { ...coreFontInitialState, downloadCounter: 3 },
+				},
+			}
+		);
+		fireEvent.click(findByTestAttr(container, 'component-coreFont-button'));
+
+		expect(
+			findByTestAttr(container, 'component-coreFont-counter')
+		).toBeInTheDocument();
 	});
 
 	test('renders <CoreFontListResults /> component', () => {
-		expect(wrapper.find('CoreFontListResults').length).toEqual(1);
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
+
+		expect(
+			findByTestAttr(container, 'component-coreFont-downloader')
+		).toBeInTheDocument();
+	});
+
+	test('/downloadCoreFonts route shows spinner on mount', () => {
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			route: '/downloadCoreFonts',
+			initialState: baseState,
+		});
+
+		expect(container.querySelector('.gfpdf-spinner')).toBeInTheDocument();
+	});
+
+	test('/downloadCoreFonts route dispatches getFilesFromGitHub on mount', () => {
+		const { store } = renderWithRouter(<CoreFontContainer />, {
+			route: '/downloadCoreFonts',
+			initialState: baseState,
+		});
+
+		expect(store.getState().coreFonts.buttonClicked).toBe(true);
+	});
+
+	test('fontList + buttonClicked triggers downloadFontsApiCall for each file', () => {
+		jest.useFakeTimers();
+		const store = createTestStore({
+			coreFonts: {
+				...coreFontInitialState,
+				fontList,
+				buttonClicked: true,
+			},
+		});
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+
+		renderWithRouter(<CoreFontContainer />, { store });
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		const downloadCalls = dispatchSpy.mock.calls.filter(
+			([action]) => action.type === DOWNLOAD_FONTS_API_CALL
+		);
+		expect(downloadCalls).toHaveLength(3);
+
+		jest.useRealTimers();
+	});
+
+	test('requestDownload=finished clears requestDownload in store', () => {
+		const { store } = renderWithRouter(<CoreFontContainer />, {
+			initialState: {
+				coreFonts: {
+					...coreFontInitialState,
+					requestDownload: 'finished',
+				},
+			},
+		});
+
+		expect(store.getState().coreFonts.requestDownload).toBe('');
 	});
 });

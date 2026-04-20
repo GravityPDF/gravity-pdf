@@ -1,7 +1,7 @@
 /* Dependencies */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 /* Redux actions */
 import {
 	getCustomFontList as getCustomFontListAction,
@@ -9,7 +9,7 @@ import {
 } from '../../actions/fontManager';
 
 /**
- * @package			Gravity PDF
+ * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -18,35 +18,36 @@ import {
 /**
  * Display alert message for font list UI
  *
- * @param { Object }   props
- * @param { boolean }  props.empty
- * @param { string }   props.error
- * @param { Function } props.getCustomFontList
- * @param { Function } props.resetSearchResult
- *
+ * @param {Object} root0
+ * @param {*}      root0.empty
+ * @param {*}      root0.error
  * @since 6.0
  */
-export const FontListAlertMessage = ({
-	empty,
-	error,
-	getCustomFontList,
-	resetSearchResult,
-}) => {
+const FontListAlertMessage = ({ empty, error }) => {
+	const dispatch = useDispatch();
+
 	const fontListEmpty = <span>{GFPDF.fontListEmpty}</span>;
 	const searchResultEmpty = (
 		<span>
 			{GFPDF.searchResultEmpty}{' '}
-			<button type="button" className="link" onClick={resetSearchResult}>
+			<button
+				type="button"
+				className="link"
+				onClick={() => dispatch(resetSearchResultAction())}
+			>
 				{GFPDF.searchBoxResetTitle}
 			</button>
 		</span>
 	);
 	const apiError = (
-		<button type="button" className="link" onClick={getCustomFontList}>
+		<button
+			type="button"
+			className="link"
+			onClick={() => dispatch(getCustomFontListAction())}
+		>
 			{error}
 		</button>
 	);
-	// const displayContent = empty ? fontListEmpty : !error ? searchResultEmpty : apiError
 	const hasNoError = !error ? searchResultEmpty : apiError;
 	const displayContent = empty ? fontListEmpty : hasNoError;
 
@@ -60,24 +61,9 @@ export const FontListAlertMessage = ({
 	);
 };
 
-/**
- * PropTypes
- *
- * @since 6.0
- */
 FontListAlertMessage.propTypes = {
 	empty: PropTypes.bool,
 	error: PropTypes.string,
-	getCustomFontList: PropTypes.func.isRequired,
-	resetSearchResult: PropTypes.func.isRequired,
 };
 
-/**
- * Connect and dispatch redux actions as props
- *
- * @since 6.0
- */
-export default connect(null, {
-	getCustomFontList: getCustomFontListAction,
-	resetSearchResult: resetSearchResultAction,
-})(FontListAlertMessage);
+export default FontListAlertMessage;

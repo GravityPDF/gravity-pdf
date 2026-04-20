@@ -1,10 +1,10 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 /* Components */
 import FontManagerHeader from './FontManagerHeader';
 import FontManagerBody from './FontManagerBody';
-import { connect } from 'react-redux';
 import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox';
 
 /**
@@ -17,40 +17,31 @@ import { associatedFontManagerSelectBox } from '../../utilities/FontManager/asso
 /**
  * FontManager component
  *
+ * @param {Object} root0
+ * @param {*}      root0.params
+ * @param {*}      root0.navigate
  * @since 6.0
  */
-export class FontManager extends Component {
-	/**
-	 * PropTypes
-	 *
-	 * @since 6.0
-	 */
-	static propTypes = {
-		params: PropTypes.object,
-		navigate: PropTypes.func.isRequired,
-		fontList: PropTypes.arrayOf(PropTypes.object).isRequired,
-		selectedFont: PropTypes.string.isRequired,
-	};
+const FontManager = ({ params, navigate }) => {
+	const fontList = useSelector((s) => s.fontManager.fontList);
+	const selectedFont = useSelector((s) => s.fontManager.selectedFont);
+	const containerRef = useRef(null);
 
-	/**
-	 * @param { Object } props
-	 *
-	 * @since 6.0
-	 */
-	constructor(props) {
-		super(props);
-		this.handleFocus = this.handleFocus.bind(this);
-	}
+	/* Mirror latest values in refs so unmount cleanup reads current data, not stale closure */
+	const fontListRef = useRef(fontList);
+	fontListRef.current = fontList;
+	const selectedFontRef = useRef(selectedFont);
+	selectedFontRef.current = selectedFont;
 
-	/**
-	 * On mount, add focus event to document option on mount
-	 * Also, if focus isn't currently applied to the search box we'll apply it
-	 * to our container to help with tabbing between elements
-	 *
-	 * @since 6.0
-	 */
-	componentDidMount() {
-		document.addEventListener('focus', this.handleFocus, true);
+	useEffect(() => {
+		const handleFocus = (e) => {
+			if (!containerRef.current.contains(e.target)) {
+				e.stopPropagation();
+				containerRef.current.focus();
+			}
+		};
+
+		document.addEventListener('focus', handleFocus, true);
 
 		/* Add focus if not currently applied to search box */
 		if (
@@ -59,86 +50,42 @@ export class FontManager extends Component {
 			// eslint-disable-next-line @wordpress/no-global-active-element
 			document.activeElement.className !== 'wp-filter-search'
 		) {
-			this.container.focus();
+			containerRef.current.focus();
 		}
-	}
 
-	/**
-	 * Cleanup our document event listeners
-	 *
-	 * @since 6.0
-	 */
-	componentWillUnmount() {
-		document.removeEventListener('focus', this.handleFocus, true);
+		return () => {
+			document.removeEventListener('focus', handleFocus, true);
 
-		const { fontList, selectedFont } = this.props;
-		const tabLocation = window.location.search.substring(
-			window.location.search.lastIndexOf('=') + 1
-		);
+			const tabLocation = window.location.search.substring(
+				window.location.search.lastIndexOf('=') + 1
+			);
 
-		/* When closed, ensure font select box has the latest custom font data */
-		if (tabLocation !== 'tools') {
-			return associatedFontManagerSelectBox(fontList, selectedFont);
-		}
-	}
+			if (tabLocation !== 'tools') {
+				associatedFontManagerSelectBox(
+					fontListRef.current,
+					selectedFontRef.current
+				);
+			}
+		};
+	}, []);
 
-	/**
-	 * When a focus event is fired and it's not apart of any DOM elements in our
-	 * container we will focus the container instead. In most cases this keeps the focus from
-	 * jumping outside our font manager container and allows for better keyboard navigation
-	 *
-	 * @param { Event } e
-	 *
-	 * @since 6.0
-	 */
-	handleFocus(e) {
-		if (!this.container.contains(e.target)) {
-			e.stopPropagation();
-			this.container.focus();
-		}
-	}
+	const { id } = params;
 
-	/**
-	 * Display font manager UI
-	 *
-	 * @since 6.0
-	 */
-	render() {
-		const { params, navigate } = this.props;
-		const { id } = params;
+	return (
+		<div data-test="component-FontManager" ref={containerRef} tabIndex="0">
+			<div className="backdrop theme-backdrop" />
+			<div className="container theme-wrap font-manager">
+				<FontManagerHeader id={id} />
 
-		return (
-			<div
-				data-test="component-FontManager"
-				ref={(node) => (this.container = node)}
-				tabIndex="0"
-			>
-				<div className="backdrop theme-backdrop" />
-				<div className="container theme-wrap font-manager">
-					<FontManagerHeader id={id} />
-
-					<FontManagerBody id={id} navigate={navigate} />
-				</div>
+				<FontManagerBody id={id} navigate={navigate} />
 			</div>
-		);
-	}
-}
+		</div>
+	);
+};
 
-/**
- * Map redux state to props
- *
- * @param { Object } state
- *
- * @return {{
- *  fontList: Array<Object>,
- *  selectedFont: string,
- * }} mappedState
- *
- * @since 6.14.2
- */
-const mapStateToProps = (state) => ({
-	fontList: state.fontManager.fontList,
-	selectedFont: state.fontManager.selectedFont,
-});
+FontManager.propTypes = {
+	params: PropTypes.object,
+	navigate: PropTypes.func.isRequired,
+};
 
-export default connect(mapStateToProps, {})(FontManager);
+export default FontManager;

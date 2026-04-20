@@ -1,6 +1,5 @@
 /* Dependencies */
-import $ from 'jquery';
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -15,150 +14,82 @@ import PropTypes from 'prop-types';
 /**
  * React Component
  *
+ * @param {Object} root0
+ * @param {*}      root0.text
+ * @param {*}      root0.error
+ * @param {*}      root0.delay
+ * @param {*}      root0.dismissable
+ * @param {*}      root0.dismissableCallback
  * @since 4.1
  */
-export class ShowMessage extends Component {
-	/**
-	 * Pass the "dismissable" prop to enable auto-clearing
-	 *
-	 * @return {{delay: number, dismissable: boolean}}
-	 *
-	 * @since 4.1
-	 */
-	static defaultProps = {
-		delay: 4000,
-		dismissable: false,
-	};
+const ShowMessage = ({
+	text,
+	error,
+	delay = 4000,
+	dismissable = false,
+	dismissableCallback,
+}) => {
+	const [visible, setVisible] = useState(true);
+	const timerRef = useRef(null);
 
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		text: PropTypes.string.isRequired,
-		error: PropTypes.bool,
-		delay: PropTypes.number,
-		dismissable: PropTypes.bool,
-		dismissableCallback: PropTypes.func,
-	};
-
-	/**
-	 * @return {{visible: boolean}}
-	 *
-	 * @since 4.1
-	 */
-	state = {
-		visible: true,
-	};
-
-	/**
-	 * On mount, maybe set dismissable timer
-	 *
-	 * @since 4.1
-	 */
-	componentDidMount() {
-		this.shouldSetTimer();
-	}
-
-	/**
-	 * If component did update, call reset state function
-	 *
-	 * @param { Readonly<Object> } prevProps
-	 * @param { Readonly<Object> } prevState
-	 *
-	 * @since 4.1
-	 */
-	componentDidUpdate(prevProps, prevState) {
-		if (!prevState.visible) {
-			this.resetState();
-		}
-	}
-
-	/**
-	 * Clear timeout on unmount
-	 *
-	 * @since 4.1
-	 */
-	componentWillUnmount() {
-		if (this.props.dismissable) {
-			clearTimeout(this._timer);
-		}
-	}
-
-	/**
-	 * Check if we should make the message auto-dismissable
-	 *
-	 * @since 4.1
-	 */
-	shouldSetTimer = () => {
-		if (this.props.dismissable) {
-			this.setTimer();
+	const clearExistingTimer = () => {
+		if (timerRef.current !== null) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
 		}
 	};
 
-	/**
-	 * Slide message up after "X" milliseconds (see props.delay)
-	 * and triggers callback if passed in (see props.dismissableCallback)
-	 *
-	 * Also clears the initial timeout if called multiple times before removal
-	 *
-	 * @since 4.1
-	 */
-	setTimer = () => {
-		// clear any existing timer
-		this._timer = this._timer !== null ? clearTimeout(this._timer) : null;
-
-		// hide after `delay` milliseconds
-		this._timer = setTimeout(() => {
-			$(this._message)
-				.removeClass('inline')
-				.slideUp(400, () => {
-					$(this._message).removeAttr('style');
-					this.setState({ visible: false });
-					this._timer = null;
-
-					if (this.props.dismissableCallback) {
-						this.props.dismissableCallback();
-					}
-				});
-		}, this.props.delay);
+	const startTimer = () => {
+		clearExistingTimer();
+		timerRef.current = setTimeout(() => {
+			setVisible(false);
+			timerRef.current = null;
+			if (dismissableCallback) {
+				dismissableCallback();
+			}
+		}, delay);
 	};
 
-	/**
-	 * Resets our state and timer
-	 *
-	 * @since 4.1
-	 */
-	resetState = () => {
-		this.setState({ visible: true });
-		this.shouldSetTimer();
-	};
-
-	/**
-	 * Renders our message or error
-	 *
-	 * @since 4.1
-	 */
-	render() {
-		const { text, error } = this.props;
-
-		let classes = 'notice inline';
-
-		if (error) {
-			classes = classes + ' error';
+	/* On mount, maybe set dismissable timer; clear timer on unmount */
+	useEffect(() => {
+		if (dismissable) {
+			startTimer();
 		}
+		return () => {
+			if (dismissable) {
+				clearTimeout(timerRef.current);
+			}
+		};
+	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-		return this.state.visible ? (
-			<div
-				data-test="component-showMessage"
-				ref={(message) => (this._message = message)}
-				className={classes}
-			>
-				<p>{text}</p>
-			</div>
-		) : (
-			<div />
-		);
-	}
-}
+	/* When hidden and then re-rendered with new text, show again */
+	useEffect(() => {
+		if (!visible) {
+			setVisible(true);
+			if (dismissable) {
+				startTimer();
+			}
+		}
+	}, [text]); // eslint-disable-line react-hooks/exhaustive-deps
 
+	const classes = 'notice inline' + (error ? ' error' : '');
+
+	return visible ? (
+		<div data-test="component-showMessage" className={classes}>
+			<p>{text}</p>
+		</div>
+	) : (
+		<div />
+	);
+};
+
+ShowMessage.propTypes = {
+	text: PropTypes.string.isRequired,
+	error: PropTypes.bool,
+	delay: PropTypes.number,
+	dismissable: PropTypes.bool,
+	dismissableCallback: PropTypes.func,
+};
+
+export { ShowMessage };
 export default ShowMessage;

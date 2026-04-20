@@ -1,104 +1,119 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
-import { FontManager } from '../../../../../src/assets/js/react/components/FontManager/FontManager';
+import { findByTestAttr, renderWithRouter } from '../../testUtilsRTL';
+import FontManager from '../../../../../src/assets/js/react/components/FontManager/FontManager';
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/FontManager/FontManagerHeader',
+	() =>
+		function FontManagerHeader() {
+			return <div data-test="component-FontManagerHeader" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/FontManager/FontManagerBody',
+	() =>
+		function FontManagerBody() {
+			return <div data-test="component-FontManagerBody" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/utilities/FontManager/associatedFontManagerSelectBox',
+	() => ({
+		associatedFontManagerSelectBox: jest.fn(),
+	})
+);
 
 describe('FontManager - FontManager.js', () => {
-	const props = {
-		navigate: jest.fn(),
-		fontList: [],
-		selectedFont: '',
-		params: {
-			id: '1',
+	const navigate = jest.fn();
+	const params = { id: undefined };
+
+	const initialState = {
+		fontManager: {
+			loading: false,
+			addFontLoading: false,
+			deleteFontLoading: false,
+			fontList: [],
+			searchResult: null,
+			selectedFont: '',
+			msg: {},
 		},
 	};
 
-	beforeEach(() => {
-		// Mock font select DOM
-		document.body.innerHTML =
-			'<div class="gfpdf-font-manager"><select> <option value="dejavusans">Dejavu Sans</option> </select></div>';
+	afterEach(() => {
+		jest.restoreAllMocks();
 	});
 
 	describe('RUN LIFECYCLE METHODS', () => {
-		test('componentDidMount() - Add focus event to document option on mount', () => {
-			FontManager.prototype.container = { focus: jest.fn() };
+		test('componentDidMount() - adds focus event listener to document', () => {
+			const addEventListenerSpy = jest.spyOn(
+				document,
+				'addEventListener'
+			);
 
-			const map = {};
+			renderWithRouter(
+				<FontManager navigate={navigate} params={params} />,
+				{ initialState }
+			);
 
-			document.addEventListener = jest.fn((event, cb) => {
-				map[event] = cb;
-			});
-
-			const focus = jest.spyOn(FontManager.prototype.container, 'focus');
-			const handleFocus = jest
-				.spyOn(FontManager.prototype, 'handleFocus')
-				.mockImplementation(() => jest.fn());
-			const wrapper = shallow(<FontManager {...props} />);
-
-			// Call componentDidMount()
-			wrapper.instance().componentDidMount();
-			// Simulate 'tab' keyboard press
-			map.focus({ key: 'Tab', stopPropagation: jest.fn() });
-
-			expect(focus).toHaveBeenCalledTimes(1);
-			expect(handleFocus).toHaveBeenCalledTimes(1);
+			expect(addEventListenerSpy).toHaveBeenCalledWith(
+				'focus',
+				expect.any(Function),
+				true
+			);
 		});
 
-		test('componentWillUnmount - Cleanup our document event listeners', () => {
-			FontManager.prototype.container = { focus: jest.fn() };
+		test('componentWillUnmount() - removes focus event listener from document', () => {
+			const removeEventListenerSpy = jest.spyOn(
+				document,
+				'removeEventListener'
+			);
 
-			const map = {};
+			const { unmount } = renderWithRouter(
+				<FontManager navigate={navigate} params={params} />,
+				{ initialState }
+			);
 
-			document.removeEventListener = jest.fn((event, cb) => {
-				map[event] = cb;
-			});
+			unmount();
 
-			const focus = jest.spyOn(FontManager.prototype.container, 'focus');
-			const handleFocus = jest
-				.spyOn(FontManager.prototype, 'handleFocus')
-				.mockImplementation(() => jest.fn());
-			const wrapper = shallow(<FontManager {...props} />);
-
-			// Call componentDidMount()
-			wrapper.instance().componentWillUnmount();
-			// Simulate 'tab' keyboard press
-			map.focus({ key: 'Tab', stopPropagation: jest.fn() });
-
-			expect(focus).toHaveBeenCalledTimes(0);
-			expect(handleFocus).toHaveBeenCalledTimes(1);
-		});
-	});
-
-	describe('RUN COMPONENT METHODS', () => {
-		test("handleFocus() - When a focus event is fired and it's not apart of any DOM elements in our container we will focus the container instead.", () => {
-			const handleFocus = jest
-				.spyOn(FontManager.prototype, 'handleFocus')
-				.mockImplementation(() => jest.fn());
-			const wrapper = shallow(<FontManager {...props} />);
-
-			// Call handleFocus()
-			wrapper.instance().handleFocus();
-
-			expect(handleFocus).toHaveBeenCalledTimes(1);
+			expect(removeEventListenerSpy).toHaveBeenCalledWith(
+				'focus',
+				expect.any(Function),
+				true
+			);
 		});
 	});
 
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontManager /> component', () => {
-			const wrapper = shallow(<FontManager {...props} />);
-			const component = findByTestAttr(wrapper, 'component-FontManager');
-
-			expect(component.length).toBe(1);
+			const { container } = renderWithRouter(
+				<FontManager navigate={navigate} params={params} />,
+				{ initialState }
+			);
+			expect(
+				findByTestAttr(container, 'component-FontManager')
+			).toBeInTheDocument();
 		});
 
 		test('render <FontManagerHeader /> component', () => {
-			const wrapper = shallow(<FontManager {...props} />);
-			expect(wrapper.find('FontManagerHeader').length).toBe(1);
+			const { container } = renderWithRouter(
+				<FontManager navigate={navigate} params={params} />,
+				{ initialState }
+			);
+			expect(
+				findByTestAttr(container, 'component-FontManagerHeader')
+			).toBeInTheDocument();
 		});
 
 		test('render <FontManagerBody /> component', () => {
-			const wrapper = shallow(<FontManager {...props} />);
-			expect(wrapper.find('Connect(FontManagerBody)').length).toBe(1);
+			const { container } = renderWithRouter(
+				<FontManager navigate={navigate} params={params} />,
+				{ initialState }
+			);
+			expect(
+				findByTestAttr(container, 'component-FontManagerBody')
+			).toBeInTheDocument();
 		});
 	});
 });

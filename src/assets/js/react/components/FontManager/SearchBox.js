@@ -1,12 +1,12 @@
 /* Dependencies */
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 /* Redux actions */
 import { resetSearchResult, searchFontList } from '../../actions/fontManager';
 
 /**
- * @package			Gravity PDF
+ * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
@@ -15,152 +15,76 @@ import { resetSearchResult, searchFontList } from '../../actions/fontManager';
 /**
  * SearchBox component
  *
+ * @param {Object} root0
+ * @param {*}      root0.id
  * @since 6.0
  */
-export class SearchBox extends Component {
-	/**
-	 * PropTypes
-	 *
-	 * @since 6.0
-	 */
-	static propTypes = {
-		id: PropTypes.string,
-		searchResult: PropTypes.oneOfType([
-			PropTypes.oneOf([null]).isRequired,
-			PropTypes.arrayOf(PropTypes.object).isRequired,
-		]),
-		msg: PropTypes.object.isRequired,
-		resetSearchResult: PropTypes.func.isRequired,
-		searchFontList: PropTypes.func.isRequired,
-	};
+const SearchBox = ({ id }) => {
+	const dispatch = useDispatch();
+	const searchResult = useSelector((state) => state.fontManager.searchResult);
+	const msg = useSelector((state) => state.fontManager.msg);
+	const [searchInput, setSearchInput] = useState('');
+	const inputRef = useRef(null);
 
-	/**
-	 * Initialize component state
-	 *
-	 * @type {{ searchInput: string }}
-	 *
-	 * @since 6.0
-	 */
-	state = {
-		searchInput: '',
-	};
+	/* Track the latest searchInput value for unmount cleanup without stale closure */
+	const lastSearchInput = useRef('');
 
-	/**
-	 * On mount, Add focus event to document on mount
-	 *
-	 * @since 6.0
-	 */
-	componentDidMount() {
-		/* add focus to element */
-		this.input.focus();
-	}
+	/* Focus the search input on mount */
+	useEffect(() => {
+		inputRef.current.focus();
+	}, []);
 
-	/**
-	 * If component did update and new props are received,
-	 * fires appropriate action based on redux store data
-	 *
-	 * @param { Object } prevProps
-	 *
-	 * @since 6.0
-	 */
-	componentDidUpdate(prevProps) {
-		const { id, searchResult, msg } = this.props;
-
-		/* Call the method resetSearchState() */
-		if (prevProps.searchResult !== searchResult && !searchResult) {
-			this.resetSearchState();
+	/* Reset search state when searchResult becomes null */
+	useEffect(() => {
+		if (!searchResult) {
+			setSearchInput('');
+			lastSearchInput.current = '';
 		}
+	}, [searchResult]);
 
-		/* Clear search box after a successful font has been added */
-		if (
-			JSON.stringify(prevProps.msg) !== JSON.stringify(msg) &&
-			msg.success &&
-			id
-		) {
-			this.resetSearchState();
+	/* Clear search box after a successful font has been added */
+	useEffect(() => {
+		if (msg.success && id) {
+			setSearchInput('');
+			lastSearchInput.current = '';
 		}
-	}
+	}, [msg, id]);
 
-	/**
-	 * On component unmount, Call our redux action resetSearchResult()
-	 *
-	 * @since 6.0
-	 */
-	componentWillUnmount() {
-		if (this.state.searchInput !== '') {
-			/* Call redux action resetSearchResult() */
-			this.props.resetSearchResult();
-		}
-	}
+	/* Dispatch resetSearchResult on unmount if search input is not empty */
+	useEffect(() => {
+		return () => {
+			if (lastSearchInput.current !== '') {
+				dispatch(resetSearchResult());
+			}
+		};
+	}, [dispatch]);
 
-	/**
-	 * Listen to search box input field change
-	 *
-	 * @param { Event } e
-	 *
-	 * @since 6.0
-	 */
-	handleSearch = (e) => {
+	const handleSearch = (e) => {
 		const data = e.target.value;
-
-		this.setState({ searchInput: data });
-		/* Call redux action searchFontList() */
-		this.props.searchFontList(data);
+		lastSearchInput.current = data;
+		setSearchInput(data);
+		dispatch(searchFontList(data));
 	};
 
-	/**
-	 * Reset component searchInput state
-	 *
-	 * @since 6.0
-	 */
-	resetSearchState = () => {
-		this.setState({ searchInput: '' });
-	};
+	return (
+		<div role="form">
+			<input
+				data-test="component-SearchBox"
+				type="search"
+				id="font-manager-search-box"
+				className="wp-filter-search"
+				placeholder={GFPDF.fontManagerSearchPlaceHolder}
+				value={searchInput}
+				onChange={handleSearch}
+				onKeyDown={(e) => e.keyCode === 13 && e.preventDefault()}
+				ref={inputRef}
+			/>
+		</div>
+	);
+};
 
-	/**
-	 * Display font manager search box UI
-	 *
-	 * @since 6.0
-	 */
-	render() {
-		return (
-			<div role="form">
-				<input
-					data-test="component-SearchBox"
-					type="search"
-					id="font-manager-search-box"
-					className="wp-filter-search"
-					placeholder={GFPDF.fontManagerSearchPlaceHolder}
-					value={this.state.searchInput}
-					onChange={this.handleSearch}
-					onKeyDown={(e) => e.keyCode === 13 && e.preventDefault()}
-					ref={(node) => (this.input = node)}
-				/>
-			</div>
-		);
-	}
-}
+SearchBox.propTypes = {
+	id: PropTypes.string,
+};
 
-/**
- * Map redux state to props
- *
- * @param { Object } state
- *
- * @return {{ searchResult: null | Array<Object>, msg: Object }} mapped state
- *
- * @since 6.0
- */
-const mapStateToProps = (state) => ({
-	searchResult: state.fontManager.searchResult,
-	msg: state.fontManager.msg,
-});
-
-/**
- * Connect and dispatch redux actions as props
- *
- * @since 6.0
- */
-export default connect(mapStateToProps, {
-	resetSearchResult,
-	searchFontList,
-})(SearchBox);
+export default SearchBox;

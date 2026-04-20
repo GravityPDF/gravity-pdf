@@ -1,85 +1,91 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import { Provider } from 'react-redux';
-import { findByTestAttr } from '../../testUtils';
-import { MemoryRouter } from 'react-router-dom';
-import configureMockStore from 'redux-mock-store';
+import { render } from '@testing-library/react';
+import { findByTestAttr } from '../../testUtilsRTL';
 import TemplateFooterActions from '../../../../../src/assets/js/react/components/Template/TemplateFooterActions';
 
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateActivateButton',
+	() =>
+		function TemplateActivateButton() {
+			return <div data-test="component-templateActivateButton" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateDeleteButton',
+	() =>
+		function TemplateDeleteButton() {
+			return <div data-test="component-templateDeleteButton" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/utilities/withRouterHooks',
+	() => (Component) => Component
+);
+
 describe('Template - TemplateFooterActions.js', () => {
-	let wrapper;
-
-	describe('Component functions', () => {
-		test('notCoreTemplate() - Check if the current PDF template is a core template or not (i.e is shipped with Gravity PDF)', () => {
-			const template = {
-				compatible: false,
-				path: '',
-			};
-			wrapper = shallow(<TemplateFooterActions template={template} />);
-			const notCoreTemplate = jest.spyOn(
-				wrapper.instance(),
-				'notCoreTemplate'
-			);
-			wrapper.instance().notCoreTemplate(template);
-
-			expect(notCoreTemplate).toHaveBeenCalledTimes(1);
-		});
-	});
-
 	test('renders <TemplateFooterActions /> component', () => {
-		const template = {
-			compatible: false,
-			path: '',
-		};
-		wrapper = shallow(<TemplateFooterActions template={template} />);
-		const component = findByTestAttr(
-			wrapper,
-			'component-templateFooterActions'
+		const template = { compatible: false, path: '' };
+		const { container } = render(
+			<TemplateFooterActions template={template} />
 		);
-
-		expect(component.length).toBe(1);
+		expect(
+			findByTestAttr(container, 'component-templateFooterActions')
+		).toBeInTheDocument();
 	});
 
-	test('renders <TemplateActivateButton /> component', () => {
-		const template = {
-			compatible: true,
-			path: '',
-		};
-		wrapper = shallow(
+	test('renders <TemplateActivateButton /> when isActiveTemplate is false and template is compatible', () => {
+		const template = { compatible: true, path: '' };
+		const { container } = render(
 			<TemplateFooterActions
 				template={template}
 				isActiveTemplate={false}
 			/>
 		);
-
 		expect(
-			wrapper
-				.find({
-					template,
-				})
-				.exists()
-		).toBe(true);
+			findByTestAttr(container, 'component-templateActivateButton')
+		).toBeInTheDocument();
 	});
 
-	test('renders <TemplateDeleteButton /> component', () => {
-		const mockStore = configureMockStore();
-		const store = mockStore({ template: { templateProcessing: '' } });
-		const template = {
-			compatible: true,
-			path: '/',
-		};
-		wrapper = mount(
-			<Provider store={store}>
-				<MemoryRouter>
-					<TemplateFooterActions
-						template={template}
-						isActiveTemplate={false}
-						pdfWorkingDirPath="/"
-					/>
-				</MemoryRouter>
-			</Provider>
+	test('does not render <TemplateActivateButton /> when isActiveTemplate is true', () => {
+		const template = { compatible: true, path: '' };
+		const { container } = render(
+			<TemplateFooterActions
+				template={template}
+				isActiveTemplate={true}
+			/>
 		);
+		expect(
+			findByTestAttr(container, 'component-templateActivateButton')
+		).not.toBeInTheDocument();
+	});
 
-		expect(wrapper.find('TemplateDeleteButton').length).toBe(1);
+	test('renders <TemplateDeleteButton /> when isActiveTemplate is false and path is not core', () => {
+		const template = { compatible: true, path: '/uploads/pdf-extended/' };
+		const { container } = render(
+			<TemplateFooterActions
+				template={template}
+				isActiveTemplate={false}
+				pdfWorkingDirPath="/uploads/"
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		).toBeInTheDocument();
+	});
+
+	test('does not render <TemplateDeleteButton /> when path is core template', () => {
+		const template = { compatible: true, path: '/core/templates/' };
+		const { container } = render(
+			<TemplateFooterActions
+				template={template}
+				isActiveTemplate={false}
+				pdfWorkingDirPath="/uploads/"
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		).not.toBeInTheDocument();
 	});
 });

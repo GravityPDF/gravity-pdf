@@ -1,4 +1,5 @@
 /* Dependencies */
+import { createSlice } from '@reduxjs/toolkit';
 import { sprintf } from 'sprintf-js';
 /* Redux action types */
 import {
@@ -25,7 +26,6 @@ import {
 } from '../actions/fontManager';
 /* Utilities */
 import {
-	findAndUpdate,
 	findAndRemove,
 	reduceFontFileName,
 	checkFontListIncludes,
@@ -67,216 +67,185 @@ export const initialState = {
 	msg: {},
 };
 
-/**
- * The action for "fontManager" reducer which updates its state
- *
- * @param { FontManagerReducerState } state
- * @param { Object }                  action
- * @param { Object }                  action.payload
- * @param { string }                  action.type
- *
- * @return { FontManagerReducerState } state
- *
- * @since 6.0
- */
-export default function (state = initialState, action) {
-	const { payload } = action;
-
-	switch (action.type) {
-		/**
-		 * Process GET_CUSTOM_FONT_LIST
-		 *
-		 * @since 6.0
-		 */
-		case GET_CUSTOM_FONT_LIST: {
-			return {
+const fontManagerSlice = createSlice({
+	name: 'fontManager',
+	initialState,
+	reducers: {},
+	extraReducers: (builder) => {
+		builder
+			.addCase(GET_CUSTOM_FONT_LIST, (state) => ({
 				...state,
 				loading: true,
 				msg: {},
-			};
-		}
-
-		/**
-		 * Process GET_CUSTOM_FONT_LIST_SUCCESS
-		 *
-		 * @since 6.0
-		 */
-		case GET_CUSTOM_FONT_LIST_SUCCESS:
-			return {
+			}))
+			.addCase(GET_CUSTOM_FONT_LIST_SUCCESS, (state, action) => ({
 				...state,
 				loading: false,
-				fontList: payload,
-			};
-
-		/**
-		 * Process GET_CUSTOM_FONT_LIST_ERROR
-		 *
-		 * @since 6.0
-		 */
-		case GET_CUSTOM_FONT_LIST_ERROR:
-			return {
+				fontList: action.payload,
+			}))
+			.addCase(GET_CUSTOM_FONT_LIST_ERROR, (state, action) => ({
 				...state,
 				loading: false,
-				msg: { error: { fontList: payload } },
-			};
+				msg: { error: { fontList: action.payload } },
+			}))
+			.addCase(ADD_FONT, (state) => {
+				const msg = { ...state.msg };
 
-		/**
-		 * Process ADD_FONT
-		 *
-		 * @since 6.0
-		 */
-		case ADD_FONT: {
-			const msg = { ...state.msg };
+				/* Clear previous fontValidation error msg */
+				if (msg.error && msg.error.fontValidationError) {
+					delete msg.error.fontValidationError;
+				}
 
-			/* Clear previous fontValidation error msg */
-			if (msg.error && msg.error.fontValidationError) {
-				delete msg.error.fontValidationError;
-			}
+				return {
+					...state,
+					addFontLoading: true,
+					msg: clearMsg({ ...msg }),
+				};
+			})
+			.addCase(ADD_FONT_SUCCESS, (state, action) => {
+				const payload = action.payload;
 
-			return {
-				...state,
-				addFontLoading: true,
-				msg: clearMsg({ ...msg }),
-			};
-		}
+				if (state.msg.error && state.msg.error.fontList) {
+					return {
+						...state,
+						addFontLoading: false,
+						msg: {
+							...state.msg,
+							success: { addFont: payload.msg },
+						},
+					};
+				}
 
-		/**
-		 * Process ADD_FONT_SUCCESS
-		 *
-		 * @since 6.0
-		 */
-		case ADD_FONT_SUCCESS: {
-			if (state.msg.error && state.msg.error.fontList) {
+				const updatedFontList = [...state.fontList, payload.font];
+
 				return {
 					...state,
 					addFontLoading: false,
-					msg: { ...state.msg, success: { addFont: payload.msg } },
+					fontList: updatedFontList,
+					searchResult: state.searchResult ? updatedFontList : null,
+					msg: { success: { addFont: payload.msg } },
 				};
-			}
+			})
+			.addCase(ADD_FONT_ERROR, (state, action) => {
+				const payload = action.payload;
+				let msg;
 
-			const updatedFontList = [...state.fontList, payload.font];
-
-			return {
-				...state,
-				addFontLoading: false,
-				fontList: updatedFontList,
-				searchResult: state.searchResult ? updatedFontList : null,
-				msg: { success: { addFont: payload.msg } },
-			};
-		}
-
-		/**
-		 * Process ADD_FONT_ERROR & EDIT_FONT_ERROR
-		 *
-		 * @since 6.0
-		 */
-		case ADD_FONT_ERROR:
-		case EDIT_FONT_ERROR: {
-			let msg;
-
-			msg = {
-				...state.msg,
-				error: { ...state.msg.error, addFont: payload },
-			};
-
-			if (payload.fontValidationError) {
 				msg = {
 					...state.msg,
-					error: {
-						...state.msg.error,
-						addFont: payload.msg,
-						// %s is found inside fontValidationError
-						// eslint-disable-next-line @wordpress/valid-sprintf
-						fontValidationError: sprintf(
-							payload.fontValidationError,
-							'<strong>',
-							'</strong>'
-						),
-					},
+					error: { ...state.msg.error, addFont: payload },
 				};
-			}
 
-			/* Clear deleteFont error msg */
-			if (msg.error && msg.error.deleteFont) {
-				delete msg.error.deleteFont;
-			}
+				if (payload.fontValidationError) {
+					msg = {
+						...state.msg,
+						error: {
+							...state.msg.error,
+							addFont: payload.msg,
+							// %s is found inside fontValidationError
+							// eslint-disable-next-line @wordpress/valid-sprintf
+							fontValidationError: sprintf(
+								payload.fontValidationError,
+								'<strong>',
+								'</strong>'
+							),
+						},
+					};
+				}
 
-			return {
-				...state,
-				addFontLoading: false,
-				msg,
-			};
-		}
+				/* Clear deleteFont error msg */
+				if (msg.error && msg.error.deleteFont) {
+					delete msg.error.deleteFont;
+				}
 
-		/**
-		 * Process EDIT_FONT
-		 *
-		 * @since 6.0
-		 */
-		case EDIT_FONT: {
-			const msg = { ...state.msg };
-
-			/* Clear previous success msg */
-			if (msg.success) {
-				delete msg.success;
-			}
-
-			/* Clear previous addFont error msg */
-			if (msg.error && msg.error.addFont) {
-				delete msg.error.addFont;
-			}
-
-			/* Clear previous fontValidation error msg */
-			if (msg.error && msg.error.fontValidationError) {
-				delete msg.error.fontValidationError;
-			}
-
-			return {
-				...state,
-				addFontLoading: true,
-				msg,
-			};
-		}
-
-		/**
-		 * Process EDIT_FONT_SUCCESS
-		 *
-		 * Update fontList state with the new font details
-		 *
-		 * @since 6.0
-		 */
-		case EDIT_FONT_SUCCESS: {
-			const msg = { success: { addFont: payload.msg } };
-
-			/* Update search result in case there's an ongoing search */
-			if (state.searchResult) {
 				return {
 					...state,
 					addFontLoading: false,
-					fontList: findAndUpdate([...state.fontList], payload),
-					searchResult: findAndUpdate(
-						[...state.searchResult],
-						payload
-					),
 					msg,
 				};
-			}
+			})
+			.addCase(EDIT_FONT, (state) => {
+				const msg = { ...state.msg };
 
-			return {
-				...state,
-				addFontLoading: false,
-				fontList: findAndUpdate([...state.fontList], payload),
-				msg,
-			};
-		}
+				/* Clear previous success msg */
+				if (msg.success) {
+					delete msg.success;
+				}
 
-		/**
-		 * Process VALIDATION_ERROR
-		 *
-		 * @since 6.0
-		 */
-		case VALIDATION_ERROR:
-			return {
+				/* Clear previous addFont error msg */
+				if (msg.error && msg.error.addFont) {
+					delete msg.error.addFont;
+				}
+
+				/* Clear previous fontValidation error msg */
+				if (msg.error && msg.error.fontValidationError) {
+					delete msg.error.fontValidationError;
+				}
+
+				return {
+					...state,
+					addFontLoading: true,
+					msg,
+				};
+			})
+			.addCase(EDIT_FONT_ERROR, (state, action) => {
+				const payload = action.payload;
+				let msg;
+
+				msg = {
+					...state.msg,
+					error: { ...state.msg.error, addFont: payload },
+				};
+
+				if (payload.fontValidationError) {
+					msg = {
+						...state.msg,
+						error: {
+							...state.msg.error,
+							addFont: payload.msg,
+							// %s is found inside fontValidationError
+							// eslint-disable-next-line @wordpress/valid-sprintf
+							fontValidationError: sprintf(
+								payload.fontValidationError,
+								'<strong>',
+								'</strong>'
+							),
+						},
+					};
+				}
+
+				/* Clear deleteFont error msg */
+				if (msg.error && msg.error.deleteFont) {
+					delete msg.error.deleteFont;
+				}
+
+				return {
+					...state,
+					addFontLoading: false,
+					msg,
+				};
+			})
+			.addCase(EDIT_FONT_SUCCESS, (state, action) => {
+				const { font, msg } = action.payload;
+				state.addFontLoading = false;
+				state.msg = { success: { addFont: msg } };
+
+				const applyUpdate = (list) => {
+					const item = list.find((f) => f.id === font.id);
+					if (item) {
+						item.font_name = font.font_name;
+						item.regular = font.regular;
+						item.italics = font.italics;
+						item.bold = font.bold;
+						item.bolditalics = font.bolditalics;
+					}
+				};
+
+				applyUpdate(state.fontList);
+				if (state.searchResult) {
+					applyUpdate(state.searchResult);
+				}
+			})
+			.addCase(VALIDATION_ERROR, (state) => ({
 				...state,
 				msg: {
 					error: {
@@ -290,229 +259,159 @@ export default function (state = initialState, action) {
 						),
 					},
 				},
-			};
+			}))
+			.addCase(DELETE_VARIANT_ERROR, (state, action) => {
+				const addFont = { ...state.msg.error.addFont };
+				delete addFont[action.payload];
 
-		/**
-		 * Process DELETE_VARIANT_ERROR
-		 *
-		 * @since 6.0
-		 */
-		case DELETE_VARIANT_ERROR: {
-			const addFont = { ...state.msg.error.addFont };
-			delete addFont[payload];
+				return {
+					...state,
+					msg: { error: { ...state.msg.error, addFont } },
+				};
+			})
+			.addCase(DELETE_FONT, (state) => {
+				const msg = { ...state.msg };
 
-			return {
-				...state,
-				msg: { error: { ...state.msg.error, addFont } },
-			};
-		}
+				/* Clear previous success msg */
+				if (msg.success) {
+					delete msg.success;
+				}
 
-		/**
-		 * Process DELETE_FONT
-		 *
-		 * @since 6.0
-		 */
-		case DELETE_FONT: {
-			const msg = { ...state.msg };
+				/* Clear previous deleteFont error msg */
+				if (msg.error && msg.error.deleteFont) {
+					delete msg.error.deleteFont;
+				}
 
-			/* Clear previous success msg */
-			if (msg.success) {
-				delete msg.success;
-			}
+				return {
+					...state,
+					deleteFontLoading: true,
+					msg,
+				};
+			})
+			.addCase(DELETE_FONT_SUCCESS, (state, action) => {
+				const payload = action.payload;
 
-			/* Clear previous deleteFont error msg */
-			if (msg.error && msg.error.deleteFont) {
-				delete msg.error.deleteFont;
-			}
+				/* Delete from the list during active search */
+				if (state.searchResult) {
+					return {
+						...state,
+						deleteFontLoading: false,
+						fontList: findAndRemove([...state.fontList], payload),
+						searchResult:
+							findAndRemove([...state.searchResult], payload)
+								.length === 0
+								? null
+								: findAndRemove(
+										[...state.searchResult],
+										payload
+									),
+					};
+				}
 
-			return {
-				...state,
-				deleteFontLoading: true,
-				msg,
-			};
-		}
-
-		/**
-		 * Process DELETE_FONT_SUCCESS
-		 *
-		 * @since 6.0
-		 */
-		case DELETE_FONT_SUCCESS: {
-			/* Delete from the list during active search */
-			if (state.searchResult) {
 				return {
 					...state,
 					deleteFontLoading: false,
 					fontList: findAndRemove([...state.fontList], payload),
-					searchResult:
-						findAndRemove([...state.searchResult], payload)
-							.length === 0
-							? null
-							: findAndRemove([...state.searchResult], payload),
 				};
-			}
-
-			return {
-				...state,
-				deleteFontLoading: false,
-				fontList: findAndRemove([...state.fontList], payload),
-			};
-		}
-
-		/**
-		 * Process DELETE_FONT_ERROR
-		 *
-		 * @since 6.0
-		 */
-		case DELETE_FONT_ERROR:
-			return {
+			})
+			.addCase(DELETE_FONT_ERROR, (state, action) => ({
 				...state,
 				deleteFontLoading: false,
 				msg: {
 					...state.msg,
-					error: { ...state.msg.error, deleteFont: payload },
+					error: { ...state.msg.error, deleteFont: action.payload },
 				},
-			};
-
-		/**
-		 * Process CLEAR_ADD_FONT_MSG
-		 *
-		 * @since 6.0
-		 */
-		case CLEAR_ADD_FONT_MSG:
-			return {
+			}))
+			.addCase(CLEAR_ADD_FONT_MSG, (state) => ({
 				...state,
 				msg: clearMsg({ ...state.msg }),
-			};
-
-		/**
-		 * Process CLEAR_DROPZONE_ERROR
-		 *
-		 * @since 6.0
-		 */
-		case CLEAR_DROPZONE_ERROR: {
-			const addFont = state.msg.error.addFont;
-			if (typeof addFont === 'object') {
-				delete addFont[payload];
-			}
-
-			return {
-				...state,
-				msg: { ...state.msg, error: { ...state.msg.error, addFont } },
-			};
-		}
-
-		/**
-		 * Process RESET_SEARCH_RESULT
-		 *
-		 * @since 6.0
-		 */
-		case RESET_SEARCH_RESULT:
-			return {
+			}))
+			.addCase(CLEAR_DROPZONE_ERROR, (state, action) => {
+				const addFont = state.msg.error?.addFont;
+				if (typeof addFont === 'object' && addFont !== null) {
+					delete state.msg.error.addFont[action.payload];
+				}
+			})
+			.addCase(RESET_SEARCH_RESULT, (state) => ({
 				...state,
 				searchResult: null,
-			};
+			}))
+			.addCase(SEARCH_FONT_LIST, (state, action) => {
+				const payload = action.payload;
+				const fontList = [...state.fontList];
 
-		/**
-		 * Process SEARCH_FONT_LIST
-		 *
-		 * @since 6.0
-		 */
-		case SEARCH_FONT_LIST: {
-			const fontList = [...state.fontList];
+				if (payload === '') {
+					state.searchResult = fontList;
+					return;
+				}
 
-			if (payload === '') {
+				const keyword = payload.toLowerCase();
+				const searchResult = [];
+				const modifiedFontList = fontList.map((font) => {
+					font.regular = reduceFontFileName(font.regular);
+					font.italics = reduceFontFileName(font.italics);
+					font.bold = reduceFontFileName(font.bold);
+					font.bolditalics = reduceFontFileName(font.bolditalics);
+
+					return { ...font };
+				});
+
+				modifiedFontList.map((font) => {
+					if (
+						checkFontListIncludes(font.font_name, keyword) ||
+						checkFontListIncludes(font.regular, keyword) ||
+						checkFontListIncludes(font.italics, keyword) ||
+						checkFontListIncludes(font.bold, keyword) ||
+						checkFontListIncludes(font.bolditalics, keyword)
+					) {
+						return searchResult.push(font);
+					}
+
+					return false;
+				});
+
+				const relevant = [];
+				const related = [];
+
+				/* Construct 2 arrays containing the most relevant and the related results */
+				searchResult.map((item) => {
+					if (item.font_name.toLowerCase().includes(keyword)) {
+						return relevant.push(item);
+					}
+
+					return related.push(item);
+				});
+
+				/* Sort and combine mostRelevant and related array into 1 array */
+				state.searchResult = [
+					...relevant.sort((a, b) =>
+						a.font_name.localeCompare(b.font_name)
+					),
+					...related.sort((a, b) =>
+						a.font_name.localeCompare(b.font_name)
+					),
+				];
+			})
+			.addCase(SELECT_FONT, (state, action) => ({
+				...state,
+				selectedFont: action.payload,
+			}))
+			.addCase(MOVE_SELECTED_FONT_TO_TOP, (state, action) => {
+				const fontList = [...state.fontList];
+				const filterFontList = fontList.filter(
+					(item) => item.id !== action.payload
+				);
+				const getPayloadItem = fontList.filter(
+					(item) => item.id === action.payload
+				);
+				const list = [...getPayloadItem, ...filterFontList];
+
 				return {
 					...state,
-					searchResult: fontList,
+					fontList: list,
 				};
-			}
-
-			const keyword = payload.toLowerCase();
-			const searchResult = [];
-			const modifiedFontList = fontList.map((font) => {
-				font.regular = reduceFontFileName(font.regular);
-				font.italics = reduceFontFileName(font.italics);
-				font.bold = reduceFontFileName(font.bold);
-				font.bolditalics = reduceFontFileName(font.bolditalics);
-
-				return { ...font };
 			});
+	},
+});
 
-			modifiedFontList.map((font) => {
-				if (
-					checkFontListIncludes(font.font_name, keyword) ||
-					checkFontListIncludes(font.regular, keyword) ||
-					checkFontListIncludes(font.italics, keyword) ||
-					checkFontListIncludes(font.bold, keyword) ||
-					checkFontListIncludes(font.bolditalics, keyword)
-				) {
-					return searchResult.push(font);
-				}
-
-				return false;
-			});
-
-			const relevant = [];
-			const related = [];
-
-			/* Construct 2 arrays containing the most relevant and the related results */
-			searchResult.map((item) => {
-				if (item.font_name.toLowerCase().includes(keyword)) {
-					return relevant.push(item);
-				}
-
-				return related.push(item);
-			});
-
-			/* Sort and combine mostRelevant and related array into 1 array */
-			const result = [
-				...relevant.sort((a, b) =>
-					a.font_name.localeCompare(b.font_name)
-				),
-				...related.sort((a, b) =>
-					a.font_name.localeCompare(b.font_name)
-				),
-			];
-
-			return {
-				...state,
-				searchResult: result,
-			};
-		}
-
-		/**
-		 * Process SELECT_FONT
-		 *
-		 * @since 6.0
-		 */
-		case SELECT_FONT:
-			return {
-				...state,
-				selectedFont: payload,
-			};
-
-		/**
-		 * Process MOVE_SELECTED_FONT_TO_TOP
-		 *
-		 * @since 6.0
-		 */
-		case MOVE_SELECTED_FONT_TO_TOP: {
-			const fontList = [...state.fontList];
-			const filterFontList = fontList.filter(
-				(item) => item.id !== payload
-			);
-			const getPayloadItem = fontList.filter(
-				(item) => item.id === payload
-			);
-			const list = [...getPayloadItem, ...filterFontList];
-
-			return {
-				...state,
-				fontList: list,
-			};
-		}
-	}
-
-	return state;
-}
+export default fontManagerSlice.reducer;

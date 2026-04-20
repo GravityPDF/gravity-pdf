@@ -1,29 +1,25 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { findByTestAttr, renderWithRouter } from '../../testUtilsRTL';
 import FontManagerHeader from '../../../../../src/assets/js/react/components/FontManager/FontManagerHeader';
 
 describe('FontManager - FontManagerHeader.js', () => {
-	const wrapper = shallow(<FontManagerHeader id="rubix" />);
-
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontManagerHeader /> component', () => {
-			const component = findByTestAttr(
-				wrapper,
-				'component-FontManagerHeader'
+			const { container } = renderWithRouter(
+				<FontManagerHeader id="rubix" />
 			);
-
-			expect(component.length).toBe(1);
+			expect(
+				findByTestAttr(container, 'component-FontManagerHeader')
+			).toBeInTheDocument();
 		});
 
 		test('render <CloseDialog /> component', () => {
+			const { container } = renderWithRouter(
+				<FontManagerHeader id="rubix" />
+			);
 			expect(
-				wrapper
-					.find({
-						id: 'rubix',
-					})
-					.exists()
-			).toBe(true);
+				findByTestAttr(container, 'component-CloseDialog')
+			).toBeInTheDocument();
 		});
 	});
 });

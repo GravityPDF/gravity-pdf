@@ -1,71 +1,120 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { storeFactory, findByTestAttr } from '../../testUtils';
-import ConnectedTemplateList, {
-	TemplateList,
-} from '../../../../../src/assets/js/react/components/Template/TemplateList';
+import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
+import TemplateList from '../../../../../src/assets/js/react/components/Template/TemplateList';
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateContainer',
+	() =>
+		function TemplateContainer({ children }) {
+			return <div data-test="component-templateList">{children}</div>;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateHeaderTitle',
+	() =>
+		function TemplateHeaderTitle() {
+			return <div data-test="component-templateHeaderTitle" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateSearch',
+	() =>
+		function TemplateSearch() {
+			return <div data-test="component-templateSearch" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateListItem',
+	() =>
+		function TemplateListItem() {
+			return <div data-test="component-templateListItem" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateUploader',
+	() =>
+		function TemplateUploader() {
+			return <div data-test="component-templateUploader" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/utilities/withRouterHooks',
+	() => (Component) => Component
+);
 
 describe('Template - TemplateList.js', () => {
-	describe('Check for redux properties', () => {
-		const setup = (state = {}) => {
-			const store = storeFactory(state);
-			const wrapper = shallow(<ConnectedTemplateList store={store} />)
-				.dive()
-				.dive();
+	const sampleTemplate = {
+		id: 'zadani',
+		template: 'Zadani',
+		description: '',
+		author: '',
+		group: '',
+		path: '/templates/',
+	};
 
-			return wrapper;
-		};
-
-		test('has access to `list` state', () => {
-			const wrapper = setup();
-			const list = wrapper.instance().props.templates;
-
-			expect(list).toBeInstanceOf(Array);
-			expect(list.length).toBeGreaterThan(0);
-		});
-	});
-
-	const templates = [
-		{ id: 'blank-slate', template: 'Blank Slate' },
-		{ id: 'focus-gravity', template: 'Focus Gravity' },
-		{ id: 'rubix', template: 'Rubix' },
-		{ id: 'zadani', template: 'Zadani' },
-	];
-	const wrapper = shallow(<TemplateList templates={templates} />);
+	const initialState = {
+		template: {
+			list: [sampleTemplate],
+			activeTemplate: '',
+			search: '',
+			updateSelectBoxText: '',
+			templateProcessing: '',
+			templateUploadProcessingSuccess: {},
+			templateUploadProcessingError: {},
+		},
+	};
 
 	test('renders <TemplateList /> component', () => {
-		const component = findByTestAttr(wrapper, 'component-templateList');
-
-		expect(component.length).toBe(1);
-	});
-
-	test('renders <TemplateHeaderTitle /> component', () => {
-		const newWrapper = shallow(
-			<TemplateList templates={templates} />
-		).dive();
-		const component = findByTestAttr(
-			newWrapper,
-			'component-templateHeaderTitle'
-		);
-
-		expect(component.length).toBe(1);
+		const { container } = renderWithStore(<TemplateList />, initialState);
+		expect(
+			findByTestAttr(container, 'component-templateList')
+		).toBeInTheDocument();
 	});
 
 	test('renders <TemplateSearch /> component', () => {
-		expect(wrapper.find('Connect(TemplateSearch)').length).toBe(1);
-	});
-
-	test('renders <TemplateListItem /> component', () => {
+		const { container } = renderWithStore(<TemplateList />, initialState);
 		expect(
-			wrapper
-				.find({
-					'data-test': 'component-templateListItem',
-				})
-				.exists()
-		).toBe(true);
+			findByTestAttr(container, 'component-templateSearch')
+		).toBeInTheDocument();
 	});
 
-	test('renders <TemplateUploader /> component', () => {
-		expect(wrapper.find('Connect(TemplateUploader)').length).toBe(1);
+	test('renders <TemplateListItem /> for each template in store', () => {
+		const { container } = renderWithStore(<TemplateList />, initialState);
+		expect(
+			container.querySelectorAll(
+				'[data-test="component-templateListItem"]'
+			)
+		).toHaveLength(1);
+	});
+
+	test('renders <TemplateUploader /> when user has admin privileges', () => {
+		const { container } = renderWithStore(<TemplateList />, initialState);
+		expect(
+			findByTestAttr(container, 'component-templateUploader')
+		).toBeInTheDocument();
+	});
+
+	test('reads template list from Redux store', () => {
+		const multiState = {
+			...initialState,
+			template: {
+				...initialState.template,
+				list: [
+					sampleTemplate,
+					{ ...sampleTemplate, id: 'rubix', template: 'Rubix' },
+				],
+			},
+		};
+		const { container } = renderWithStore(<TemplateList />, multiState);
+		expect(
+			container.querySelectorAll(
+				'[data-test="component-templateListItem"]'
+			)
+		).toHaveLength(2);
 	});
 });

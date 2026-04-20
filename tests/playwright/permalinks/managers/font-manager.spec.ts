@@ -3,11 +3,12 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import { Form } from '@self:playwright/utils/gravityforms';
 import * as path from 'path';
 
-test.describe('Font Manager', () => {
+test.describe(() => {
 	let pdf: Pdf;
-	let form: any;
+	let form: Form;
 
 	test.beforeEach(
 		async ({
@@ -21,6 +22,26 @@ test.describe('Font Manager', () => {
 		}) => {
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Font Manager');
+
+			// Delete any fonts
+			await pdf.navigateToNewFormPdf(form.id);
+			await page
+				.locator('#gfpdf-settings-field-wrapper-font-container')
+				.getByRole('button', { name: 'Manage' })
+				.click();
+
+			const fontItems = page
+				.locator('.font-list-items .dashicons-trash')
+				.filter({ visible: true });
+
+			await page.waitForTimeout(500);
+
+			const fontItemsCount = await fontItems.count();
+
+			page.on('dialog', (dialog) => dialog.accept());
+			for (let i = fontItemsCount - 1; i >= 0; i--) {
+				await fontItems.nth(i).click();
+			}
 		}
 	);
 
@@ -101,6 +122,8 @@ test.describe('Font Manager', () => {
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
+		const fontItems = page.locator('.font-list-item');
+
 		// Add Font
 		await page
 			.locator('.add-font')
@@ -119,7 +142,6 @@ test.describe('Font Manager', () => {
 			.click();
 
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
-		const fontItems = page.locator('.font-list-item');
 		await expect(fontItems).toHaveCount(1);
 
 		// Search Font
@@ -158,12 +180,13 @@ test.describe('Font Manager', () => {
 			);
 
 		await updateButton.click();
+		await page.waitForTimeout(500);
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
 		await expect(page.getByText('Roboto 2')).toBeVisible();
 
 		// Delete Font
-		page.on('dialog', (dialog) => dialog.accept());
 		await fontItems.locator('.dashicons-trash').click();
+		await page.waitForTimeout(500);
 		await expect(page.getByText('Font list empty.')).toBeVisible();
 	});
 
@@ -198,4 +221,4 @@ test.describe('Font Manager', () => {
 		await page.keyboard.press('Escape');
 		await expect(popup).not.toBeVisible();
 	});
-});
+}, 'Font Manager');

@@ -1,30 +1,29 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { render } from '@testing-library/react';
+import { findByTestAttr } from '../../testUtilsRTL';
 import FontListIcon from '../../../../../src/assets/js/react/components/FontManager/FontListIcon';
 
 describe('FontManager - FontListIcon.js', () => {
-	// Mock component props
-	const props = { font: '' };
-
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontListIcon /> component', () => {
-			const wrapper = shallow(<FontListIcon {...props} />);
-			const component = findByTestAttr(wrapper, 'component-FontListIcon');
-
-			expect(component.length).toBe(1);
+			const { container } = render(<FontListIcon font="" />);
+			expect(
+				findByTestAttr(container, 'component-FontListIcon')
+			).toBeInTheDocument();
 		});
 
 		test('render "check" icon', () => {
-			const wrapper = shallow(<FontListIcon font="arial" />);
-
-			expect(wrapper.find('span.dashicons-yes').length).toBe(1);
+			const { container } = render(<FontListIcon font="arial" />);
+			expect(
+				container.querySelector('span.dashicons-yes')
+			).toBeInTheDocument();
 		});
 
 		test('render "x" icon', () => {
-			const wrapper = shallow(<FontListIcon {...props} />);
-
-			expect(wrapper.find('span.dashicons-no-alt').length).toBe(1);
+			const { container } = render(<FontListIcon font="" />);
+			expect(
+				container.querySelector('span.dashicons-no-alt')
+			).toBeInTheDocument();
 		});
 	});
 });

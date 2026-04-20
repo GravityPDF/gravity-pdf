@@ -1,5 +1,5 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -14,48 +14,34 @@ import PropTypes from 'prop-types';
 /**
  * React Component
  *
+ * @param {Object} root0
+ * @param {*}      root0.navigate
  * @since 4.1
  */
-class TemplateButton extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		navigate: PropTypes.func,
-	};
-
-	/**
-	 * When the button is clicked we'll display the `/template` route
-	 *
-	 * @param {Object} e Event
-	 *
-	 * @since 4.1
-	 */
-	handleClick = (e) => {
+const TemplateButton = ({ navigate }) => {
+	const handleClick = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		this.props.navigate('template');
+		navigate('template');
 	};
 
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		return (
-			<button
-				data-test="component-templateButton"
-				type="button"
-				id="fancy-template-selector"
-				className="button gfpdf-button"
-				onClick={this.handleClick}
-				ref={(node) => (this.button = node)}
-				aria-label={GFPDF.manageTemplates}
-			>
-				{GFPDF.manage}
-			</button>
-		);
-	}
-}
+	return (
+		<button
+			data-test="component-templateButton"
+			type="button"
+			id="fancy-template-selector"
+			className="button gfpdf-button"
+			onClick={handleClick}
+			aria-label={GFPDF.manageTemplates}
+		>
+			{GFPDF.manage}
+		</button>
+	);
+};
+
+TemplateButton.propTypes = {
+	navigate: PropTypes.func,
+};
 
 export default TemplateButton;

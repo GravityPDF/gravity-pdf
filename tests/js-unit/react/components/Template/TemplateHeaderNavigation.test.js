@@ -1,169 +1,191 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
-import { TemplateHeaderNavigation } from '../../../../../src/assets/js/react/components/Template/TemplateHeaderNavigation';
+import { render, fireEvent } from '@testing-library/react';
+import { findByTestAttr } from '../../testUtilsRTL';
+import TemplateHeaderNavigation from '../../../../../src/assets/js/react/components/Template/TemplateHeaderNavigation';
 
 describe('Template - TemplateHeaderNavigation.js', () => {
-	const props = {
-		templateIndex: 2,
-		templates: [
-			{ id: 'blank-slate', template: 'Blank Slate' },
-			{ id: 'focus-gravity', template: 'Focus Gravity' },
-			{ id: 'rubix', template: 'Rubix' },
-			{ id: 'zadani', template: 'Zadani' },
-		],
-		showPreviousTemplateText: 'Show previous',
-		showNextTemplateText: 'Show next template',
-	};
-
 	const navigate = jest.fn();
+	const templates = [
+		{ id: 'blank-slate', template: 'Blank Slate' },
+		{ id: 'focus-gravity', template: 'Focus Gravity' },
+		{ id: 'rubix', template: 'Rubix' },
+		{ id: 'zadani', template: 'Zadani' },
+	];
 
-	describe('Component functions', () => {
-		let wrapper;
-
-		test('handlePreviousTemplate() - Attempt to get the previous template in our list and update the URL', () => {
-			wrapper = shallow(
-				<TemplateHeaderNavigation {...props} navigate={navigate} />
-			);
-			const instance = wrapper.instance();
-			instance.handlePreviousTemplate({
-				preventDefault() {},
-				stopPropagation() {},
-			});
-
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-
-		test('handleNextTemplate() - Attempt to get the next template in our list and update the URL', () => {
-			wrapper = shallow(
-				<TemplateHeaderNavigation {...props} navigate={navigate} />
-			);
-			const instance = wrapper.instance();
-			instance.handleNextTemplate({
-				preventDefault() {},
-				stopPropagation() {},
-			});
-
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-
-		test('handleKeyPress() - Checks if the Left arrow keys are pressed and fire appropriate function', () => {
-			const e = {
-				keyCode: 37,
-				preventDefault() {},
-				stopPropagation() {},
-			};
-
-			wrapper = shallow(
-				<TemplateHeaderNavigation {...props} navigate={navigate} />
-			);
-			const instance = wrapper.instance();
-			instance.handleKeyPress(e);
-
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-
-		test('handleKeyPress() - Checks if the Right arrow keys are pressed and fire appropriate function', () => {
-			const e = {
-				keyCode: 39,
-				preventDefault() {},
-				stopPropagation() {},
-			};
-
-			wrapper = shallow(
-				<TemplateHeaderNavigation {...props} navigate={navigate} />
-			);
-			const instance = wrapper.instance();
-			instance.handleKeyPress(e);
-
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-	});
-
-	describe('Run Lifecycle methods', () => {
-		let wrapper;
-
-		test('componentDidMount() - Add window event listeners', () => {
-			const map = {};
-			window.addEventListener = jest.fn((event, cb) => {
-				map[event] = cb;
-			});
-			wrapper = shallow(
-				<TemplateHeaderNavigation {...props} navigate={navigate} />
-			);
-			const handleKeyPress = jest.spyOn(
-				wrapper.instance(),
-				'handleKeyPress'
-			);
-			wrapper.instance().componentDidMount();
-			// simulate event
-			map.keydown({
-				keyCode: 37,
-				preventDefault() {},
-				stopPropagation() {},
-			});
-
-			expect(handleKeyPress).toHaveBeenCalledTimes(1);
-		});
-
-		test('componentWillUnmount() - Cleanup window event listeners', () => {
-			const map = {};
-			window.removeEventListener = jest.fn((event, cb) => {
-				map[event] = cb;
-			});
-			wrapper = shallow(
-				<TemplateHeaderNavigation {...props} navigate={navigate} />
-			);
-			const handleKeyPress = jest.spyOn(
-				wrapper.instance(),
-				'handleKeyPress'
-			);
-			wrapper.instance().componentWillUnmount();
-			// simulate event
-			map.keydown({
-				keyCode: 37,
-				preventDefault() {},
-				stopPropagation() {},
-			});
-
-			expect(handleKeyPress).toHaveBeenCalledTimes(1);
-		});
-	});
-
-	const wrapper = shallow(<TemplateHeaderNavigation {...props} />);
+	beforeEach(() => jest.clearAllMocks());
+	afterEach(() => jest.restoreAllMocks());
 
 	test('renders <TemplateHeaderNavigation /> component', () => {
-		const component = findByTestAttr(
-			wrapper,
-			'component-templateHeaderNavigation'
+		const { container } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
 		);
-
-		expect(component.length).toBe(1);
-	});
-
-	test('renders `show previous` and `show next` template buttons', () => {
-		const previousButton = findByTestAttr(
-			wrapper,
-			'component-showPreviousTemplateButton'
-		);
-		const nextButton = findByTestAttr(
-			wrapper,
-			'component-showNextTemplateButton'
-		);
-
-		expect(previousButton.length).toBe(1);
-		expect(nextButton.length).toBe(1);
-	});
-
-	test('renders screen reader text for `show previous` and `show next` template buttons', () => {
 		expect(
-			findByTestAttr(
-				wrapper,
-				'component-showPreviousTemplateButton'
-			).text()
+			findByTestAttr(container, 'component-templateHeaderNavigation')
+		).toBeInTheDocument();
+	});
+
+	test('renders previous and next buttons', () => {
+		const { container } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-showPreviousTemplateButton')
+		).toBeInTheDocument();
+		expect(
+			findByTestAttr(container, 'component-showNextTemplateButton')
+		).toBeInTheDocument();
+	});
+
+	test('renders screen reader text for previous and next buttons', () => {
+		const { container } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+				showPreviousTemplateText="Show previous"
+				showNextTemplateText="Show next template"
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-showPreviousTemplateButton')
+				.textContent
 		).toBe('Show previous');
 		expect(
-			findByTestAttr(wrapper, 'component-showNextTemplateButton').text()
+			findByTestAttr(container, 'component-showNextTemplateButton')
+				.textContent
 		).toBe('Show next template');
+	});
+
+	test('previous button click navigates to previous template', () => {
+		const { container } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
+		);
+		fireEvent.click(
+			findByTestAttr(container, 'component-showPreviousTemplateButton')
+		);
+		expect(navigate).toHaveBeenCalledWith('/template/blank-slate');
+	});
+
+	test('next button click navigates to next template', () => {
+		const { container } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
+		);
+		fireEvent.click(
+			findByTestAttr(container, 'component-showNextTemplateButton')
+		);
+		expect(navigate).toHaveBeenCalledWith('/template/rubix');
+	});
+
+	test('previous button is disabled when on first template', () => {
+		const { container } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={0}
+				template={templates[0]}
+				navigate={navigate}
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-showPreviousTemplateButton')
+		).toBeDisabled();
+	});
+
+	test('next button is disabled when on last template', () => {
+		const { container } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={3}
+				template={templates[3]}
+				navigate={navigate}
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-showNextTemplateButton')
+		).toBeDisabled();
+	});
+
+	test('left arrow keydown navigates to previous template', () => {
+		render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
+		);
+		fireEvent.keyDown(window, { keyCode: 37 });
+		expect(navigate).toHaveBeenCalledWith('/template/blank-slate');
+	});
+
+	test('right arrow keydown navigates to next template', () => {
+		render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
+		);
+		fireEvent.keyDown(window, { keyCode: 39 });
+		expect(navigate).toHaveBeenCalledWith('/template/rubix');
+	});
+
+	test('attaches keydown event listener to window on mount', () => {
+		const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+		render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
+		);
+		expect(addEventListenerSpy).toHaveBeenCalledWith(
+			'keydown',
+			expect.any(Function),
+			false
+		);
+	});
+
+	test('removes keydown event listener from window on unmount', () => {
+		const removeEventListenerSpy = jest.spyOn(
+			window,
+			'removeEventListener'
+		);
+		const { unmount } = render(
+			<TemplateHeaderNavigation
+				templates={templates}
+				templateIndex={1}
+				template={templates[1]}
+				navigate={navigate}
+			/>
+		);
+		unmount();
+		expect(removeEventListenerSpy).toHaveBeenCalledWith(
+			'keydown',
+			expect.any(Function),
+			false
+		);
 	});
 });

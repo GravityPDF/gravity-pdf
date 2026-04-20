@@ -1,6 +1,5 @@
 /* Dependencies */
-import { composeWithDevTools } from '@redux-devtools/extension';
-import { createStore, applyMiddleware } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 /* Root Saga */
 import rootSaga from '../sagas';
@@ -14,17 +13,19 @@ import rootReducer from '../reducers/index';
  * @since       5.0
  */
 
-/* Combine our Redux Reducers */
-const reducers = rootReducer;
 /* Initialize Saga Middleware */
 const sagaMiddleware = createSagaMiddleware();
 export const middlewares = [sagaMiddleware];
-const middlewareEnhancer = applyMiddleware(...middlewares);
-const enhancers = [middlewareEnhancer];
-/* Initialize Redux dev tools */
-const composedEnhancers = composeWithDevTools(...enhancers);
-/* Create our store and enable composedEnhancers */
-const store = createStore(reducers, composedEnhancers);
+
+/* Create our store with RTK configureStore (includes DevTools automatically) */
+const store = configureStore({
+	reducer: rootReducer,
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware({
+			thunk: false,
+			serializableCheck: false,
+		}).concat(sagaMiddleware),
+});
 
 /* Run Saga Middleware */
 sagaMiddleware.run(rootSaga);

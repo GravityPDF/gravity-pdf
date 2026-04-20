@@ -1,3 +1,5 @@
+/* Dependencies */
+import { createSlice } from '@reduxjs/toolkit';
 /* Redux action types */
 import {
 	ADD_TO_CONSOLE,
@@ -46,28 +48,13 @@ export const initialState = {
 	downloadCounter: 0,
 };
 
-/**
- * The action coreFont reducer which updates our state
- *
- * @param { CoreFontReducerState } state          The current state of our template store
- * @param { Object }               action         The Redux action details being triggered
- * @param { string }               action.type
- * @param { string }               action.key
- * @param { string }               action.status
- * @param { string }               action.message
- * @param { Array<Object> }        action.payload
- *
- * @return {*} State (whether updated or note)
- *
- * @since 5.0
- */
-export default function (state = initialState, action) {
-	switch (action.type) {
-		/**
-		 * @since 5.0
-		 */
-		case ADD_TO_CONSOLE:
-			return {
+const coreFontSlice = createSlice({
+	name: 'coreFonts',
+	initialState,
+	reducers: {},
+	extraReducers: (builder) => {
+		builder
+			.addCase(ADD_TO_CONSOLE, (state, action) => ({
 				...state,
 				console: {
 					...state.console,
@@ -76,130 +63,91 @@ export default function (state = initialState, action) {
 						message: action.message,
 					},
 				},
-			};
-
-		/**
-		 * @since 5.0
-		 */
-		case CLEAR_CONSOLE:
-			return {
+			}))
+			.addCase(CLEAR_CONSOLE, (state) => ({
 				...state,
 				console: {},
-			};
+			}))
+			.addCase(ADD_TO_RETRY_LIST, (state, action) => {
+				/* Do not allow the same item in the retry list */
+				if (state.retry.includes(action.name)) {
+					return state;
+				}
 
-		/**
-		 * @since 5.0
-		 */
-		case ADD_TO_RETRY_LIST:
-			/* Do not allow the same item in the retry list */
-			if (state.retry.includes(action.name)) {
-				break;
-			}
-
-			return {
-				...state,
-				retry: [...state.retry, action.name],
-			};
-
-		/**
-		 * @since 5.0
-		 */
-		case CLEAR_BUTTON_CLICKED_AND_RETRY_LIST:
-			return {
+				return {
+					...state,
+					retry: [...state.retry, action.name],
+				};
+			})
+			.addCase(CLEAR_BUTTON_CLICKED_AND_RETRY_LIST, (state) => ({
 				...state,
 				retry: [],
 				buttonClicked: false,
-			};
-
-		/**
-		 * @since 5.2
-		 */
-		case GET_FILES_FROM_GITHUB:
-			return {
+			}))
+			.addCase(GET_FILES_FROM_GITHUB, (state) => ({
 				...state,
 				buttonClicked: true,
-			};
+			}))
+			.addCase(GET_FILES_FROM_GITHUB_SUCCESS, (state, action) => {
+				const files = action.payload.map((item) => item.name);
 
-		/**
-		 * @since 5.2
-		 */
-		case GET_FILES_FROM_GITHUB_SUCCESS: {
-			const files = action.payload.map((item) => item.name);
-
-			return {
-				...state,
-				fontList: files,
-				downloadCounter: files.length,
-			};
-		}
-
-		/**
-		 * @since 5.2
-		 */
-		case GET_FILES_FROM_GITHUB_FAILED:
-			return {
+				return {
+					...state,
+					fontList: files,
+					downloadCounter: files.length,
+				};
+			})
+			.addCase(GET_FILES_FROM_GITHUB_FAILED, (state, action) => ({
 				...state,
 				getFilesFromGitHubFailed: action.payload,
-			};
+			}))
+			.addCase(REQUEST_SENT_COUNTER, (state) => {
+				/* Show the overall status once all the fonts have been downloaded (or tried to) */
+				const errors = state.retry.length;
+				const status = errors ? 'error' : 'success';
+				const message = errors
+					? GFPDF.coreFontError.replace('%s', errors)
+					: GFPDF.coreFontSuccess;
 
-		/**
-		 * @since 5.2
-		 */
-		case REQUEST_SENT_COUNTER: {
-			/* Show the overall status in the console once all the fonts have been downloaded (or tried to download) */
-			const errors = state.retry.length;
-			const status = errors ? 'error' : 'success';
-			const message = errors
-				? GFPDF.coreFontError.replace('%s', errors)
-				: GFPDF.coreFontSuccess;
+				const newCounter = state.downloadCounter - 1;
 
-			state.downloadCounter--;
-			if (state.downloadCounter === 0) {
-				/* Failed */
-				if (state.retry.length > 0) {
+				if (newCounter === 0) {
+					/* Failed */
+					if (state.retry.length > 0) {
+						return {
+							...state,
+							console: {
+								...state.console,
+								completed: { status, message },
+							},
+							downloadCounter: state.retry.length,
+							requestDownload: 'finished',
+						};
+					}
+					/* Success */
 					return {
 						...state,
 						console: {
 							...state.console,
-							completed: {
-								status,
-								message,
-							},
-						},
-						downloadCounter: state.retry.length,
-						requestDownload: 'finished',
-					};
-				}
-				/* Success */
-				if (state.retry.length === 0 && state.downloadCounter === 0) {
-					return {
-						...state,
-						console: {
-							...state.console,
-							completed: {
-								status,
-								message,
-							},
+							completed: { status, message },
 						},
 						downloadCounter: state.fontList.length,
 						requestDownload: 'finished',
 					};
 				}
-			}
-		}
 
-		/**
-		 * @since 5.2
-		 */
-		// fall through
-		case CLEAR_REQUEST_REMAINING_DATA:
-			return {
+				/* Counter still running — reset requestDownload (original fall-through behaviour) */
+				return {
+					...state,
+					downloadCounter: newCounter,
+					requestDownload: '',
+				};
+			})
+			.addCase(CLEAR_REQUEST_REMAINING_DATA, (state) => ({
 				...state,
 				requestDownload: '',
-			};
+			}));
+	},
+});
 
-		/* None of these actions fired so return state */
-		default:
-			return state;
-	}
-}
+export default coreFontSlice.reducer;

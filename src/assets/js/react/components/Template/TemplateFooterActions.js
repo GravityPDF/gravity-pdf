@@ -1,5 +1,5 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 /* Components */
 import TemplateActivateButton from './TemplateActivateButton';
@@ -17,82 +17,77 @@ import withRouterHooks from '../../utilities/withRouterHooks';
  * @since       4.1
  */
 
-/**
- * React Component
- *
- * @since 4.1
- */
-export class TemplateFooterActions extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		template: PropTypes.object.isRequired,
-		isActiveTemplate: PropTypes.bool,
-		ajaxUrl: PropTypes.string,
-		ajaxNonce: PropTypes.string,
-		activateText: PropTypes.string,
-		pdfWorkingDirPath: PropTypes.string,
-		templateDeleteText: PropTypes.string,
-		templateConfirmDeleteText: PropTypes.string,
-		templateDeleteErrorText: PropTypes.string,
-	};
-
-	/**
-	 * Check if the current PDF template is a core template or not (i.e is shipped with Gravity PDF)
-	 *
-	 * @param { Object } template
-	 *
-	 * @return { boolean } conditional value
-	 *
-	 * @since 4.1
-	 */
-	notCoreTemplate = (template) => {
-		return template.path.indexOf(this.props.pdfWorkingDirPath) !== -1;
-	};
-
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		const template = this.props.template;
-		const isCompatible = template.compatible;
-
-		return (
-			<div
-				data-test="component-templateFooterActions"
-				className="theme-actions"
-			>
-				{!this.props.isActiveTemplate && isCompatible ? (
-					<TemplateActivateButtonWithRouter
-						template={template}
-						buttonText={this.props.activateText}
-					/>
-				) : null}
-
-				{!this.props.isActiveTemplate &&
-				this.notCoreTemplate(template) ? (
-					<TemplateDeleteButtonWithRouter
-						template={template}
-						ajaxUrl={this.props.ajaxUrl}
-						ajaxNonce={this.props.ajaxNonce}
-						buttonText={this.props.templateDeleteText}
-						templateConfirmDeleteText={
-							this.props.templateConfirmDeleteText
-						}
-						templateDeleteErrorText={
-							this.props.templateDeleteErrorText
-						}
-					/>
-				) : null}
-			</div>
-		);
-	}
-}
-
 const TemplateActivateButtonWithRouter = withRouterHooks(
 	TemplateActivateButton
 );
 const TemplateDeleteButtonWithRouter = withRouterHooks(TemplateDeleteButton);
+
+/**
+ * React Component
+ *
+ * @param {Object} root0
+ * @param {*}      root0.template
+ * @param {*}      root0.isActiveTemplate
+ * @param {*}      root0.ajaxUrl
+ * @param {*}      root0.ajaxNonce
+ * @param {*}      root0.activateText
+ * @param {*}      root0.pdfWorkingDirPath
+ * @param {*}      root0.templateDeleteText
+ * @param {*}      root0.templateConfirmDeleteText
+ * @param {*}      root0.templateDeleteErrorText
+ * @since 4.1
+ */
+const TemplateFooterActions = ({
+	template,
+	isActiveTemplate,
+	ajaxUrl,
+	ajaxNonce,
+	activateText,
+	pdfWorkingDirPath,
+	templateDeleteText,
+	templateConfirmDeleteText,
+	templateDeleteErrorText,
+}) => {
+	const notCoreTemplate = (t) => t.path.indexOf(pdfWorkingDirPath) !== -1;
+
+	const isCompatible = template.compatible;
+
+	return (
+		<div
+			data-test="component-templateFooterActions"
+			className="theme-actions"
+		>
+			{!isActiveTemplate && isCompatible ? (
+				<TemplateActivateButtonWithRouter
+					template={template}
+					buttonText={activateText}
+				/>
+			) : null}
+
+			{!isActiveTemplate && notCoreTemplate(template) ? (
+				<TemplateDeleteButtonWithRouter
+					template={template}
+					ajaxUrl={ajaxUrl}
+					ajaxNonce={ajaxNonce}
+					buttonText={templateDeleteText}
+					templateConfirmDeleteText={templateConfirmDeleteText}
+					templateDeleteErrorText={templateDeleteErrorText}
+				/>
+			) : null}
+		</div>
+	);
+};
+
+TemplateFooterActions.propTypes = {
+	template: PropTypes.object.isRequired,
+	isActiveTemplate: PropTypes.bool,
+	ajaxUrl: PropTypes.string,
+	ajaxNonce: PropTypes.string,
+	activateText: PropTypes.string,
+	pdfWorkingDirPath: PropTypes.string,
+	templateDeleteText: PropTypes.string,
+	templateConfirmDeleteText: PropTypes.string,
+	templateDeleteErrorText: PropTypes.string,
+};
 
 export default TemplateFooterActions;

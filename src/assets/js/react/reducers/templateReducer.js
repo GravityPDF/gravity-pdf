@@ -1,3 +1,5 @@
+/* Dependencies */
+import { createSlice } from '@reduxjs/toolkit';
 /* Redux action types */
 import {
 	SEARCH_TEMPLATES,
@@ -52,161 +54,73 @@ export const initialState = {
 	templateUploadProcessingError: {},
 };
 
-/**
- * The action template reducer which updates our state
- *
- * @param { TemplateReducerState } state  The current state of our template store
- * @param { Object }               action The Redux action details being triggered
- *
- * @return { TemplateReducerState } State (whether updated or not)
- *
- * @since 4.1
- */
-export default function (state = initialState, action) {
-	switch (action.type) {
-		/**
-		 * Update the search key
-		 *
-		 * @since 4.1
-		 */
-		case SEARCH_TEMPLATES:
-			return {
+const templateSlice = createSlice({
+	name: 'template',
+	initialState,
+	reducers: {},
+	extraReducers: (builder) => {
+		builder
+			.addCase(SEARCH_TEMPLATES, (state, action) => ({
 				...state,
 				search: action.text,
-			};
-
-		/**
-		 * Update the activeTemplate key
-		 *
-		 * @since 4.1
-		 */
-		case SELECT_TEMPLATE:
-			return {
+			}))
+			.addCase(SELECT_TEMPLATE, (state, action) => ({
 				...state,
 				activeTemplate: action.id,
-			};
-
-		/**
-		 * Push a new template into List
-		 *
-		 * @since 4.1
-		 */
-		case ADD_TEMPLATE:
-			return {
+			}))
+			.addCase(ADD_TEMPLATE, (state, action) => ({
 				...state,
 				list: [...state.list, action.template],
-			};
-
-		/**
-		 * Update single parameter in template new value
-		 *
-		 * @since 4.1
-		 */
-		case UPDATE_TEMPLATE_PARAM: {
-			const updatedList = state.list.map((item) => {
-				if (item.id === action.id) {
-					return { ...item, [action.name]: action.value };
-				}
-				return item;
-			});
-			return {
-				...state,
-				list: updatedList,
-			};
-		}
-
-		/**
-		 * Remove template from List
-		 *
-		 * @since 4.1
-		 */
-		case DELETE_TEMPLATE: {
-			const list = state.list.filter((item) => item.id !== action.id);
-			return {
-				...state,
-				list: [...list],
-			};
-		}
-
-		/**
-		 * Update the new Select Box DOM data
-		 *
-		 * @since 5.2
-		 */
-		case UPDATE_SELECT_BOX_SUCCESS:
-			return {
+			}))
+			.addCase(UPDATE_TEMPLATE_PARAM, (state, action) => {
+				const updatedList = state.list.map((item) => {
+					if (item.id === action.id) {
+						return { ...item, [action.name]: action.value };
+					}
+					return item;
+				});
+				return {
+					...state,
+					list: updatedList,
+				};
+			})
+			.addCase(DELETE_TEMPLATE, (state, action) => {
+				const list = state.list.filter((item) => item.id !== action.id);
+				return {
+					...state,
+					list: [...list],
+				};
+			})
+			.addCase(UPDATE_SELECT_BOX_SUCCESS, (state, action) => ({
 				...state,
 				updateSelectBoxText: action.payload,
-			};
-
-		/**
-		 * Remove the PDF template automatically
-		 *
-		 * @since 5.2
-		 */
-		case TEMPLATE_PROCESSING_SUCCESS:
-			return {
+			}))
+			.addCase(TEMPLATE_PROCESSING_SUCCESS, (state, action) => ({
 				...state,
 				templateProcessing: action.payload,
-			};
-
-		/**
-		 * Fires Re-add template to our list and display an appropriate inline error message
-		 *
-		 * @since 5.2
-		 */
-		case TEMPLATE_PROCESSING_FAILED:
-			return {
+			}))
+			.addCase(TEMPLATE_PROCESSING_FAILED, (state, action) => ({
 				...state,
 				templateProcessing: action.payload,
-			};
-
-		/**
-		 * Clear/reset the templateProcessing state
-		 *
-		 * @since 5.2
-		 */
-		case CLEAR_TEMPLATE_PROCESSING:
-			return {
+			}))
+			.addCase(CLEAR_TEMPLATE_PROCESSING, (state) => ({
 				...state,
 				templateProcessing: '',
-			};
-
-		/**
-		 * Update with the new PDF template details
-		 *
-		 * @since 5.2
-		 */
-		case TEMPLATE_UPLOAD_PROCESSING_SUCCESS:
-			return {
+			}))
+			.addCase(TEMPLATE_UPLOAD_PROCESSING_SUCCESS, (state, action) => ({
 				...state,
 				templateUploadProcessingSuccess: action.payload,
-			};
-
-		/**
-		 * Update/Show error
-		 *
-		 * @since 5.2
-		 */
-		case TEMPLATE_UPLOAD_PROCESSING_FAILED:
-			return {
+			}))
+			.addCase(TEMPLATE_UPLOAD_PROCESSING_FAILED, (state, action) => ({
 				...state,
 				templateUploadProcessingError: action.payload,
-			};
-
-		/**
-		 * Clear/reset state of templateUploadProcessingSuccess & templateUploadProcessingError
-		 *
-		 * @since 5.2
-		 */
-		case CLEAR_TEMPLATE_UPLOAD_PROCESSING:
-			return {
+			}))
+			.addCase(CLEAR_TEMPLATE_UPLOAD_PROCESSING, (state) => ({
 				...state,
 				templateUploadProcessingSuccess: {},
 				templateUploadProcessingError: {},
-			};
-	}
+			}));
+	},
+});
 
-	/* None of these actions fired so return state */
-	return state;
-}
+export default templateSlice.reducer;

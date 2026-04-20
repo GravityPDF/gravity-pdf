@@ -1,7 +1,6 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
 /**
  * Renders the template navigation header that get displayed on the
@@ -16,173 +15,132 @@ import { connect } from 'react-redux';
 /**
  * React Component
  *
+ * @param {Object} root0
+ * @param {*}      root0.templates
+ * @param {*}      root0.templateIndex
+ * @param {*}      root0.template
+ * @param {*}      root0.navigate
+ * @param {*}      root0.showPreviousTemplateText
+ * @param {*}      root0.showNextTemplateText
  * @since 4.1
  */
-export class TemplateHeaderNavigation extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		templates: PropTypes.array.isRequired,
-		templateIndex: PropTypes.number.isRequired,
-		navigate: PropTypes.func,
-		isFirst: PropTypes.bool,
-		isLast: PropTypes.bool,
-		showPreviousTemplateText: PropTypes.string,
-		showNextTemplateText: PropTypes.string,
-	};
+const TemplateHeaderNavigation = ({
+	templates,
+	templateIndex,
+	template,
+	navigate,
+	showPreviousTemplateText,
+	showNextTemplateText,
+}) => {
+	const lastIdx = templates.length - 1;
+	const isFirst = templates[0]?.id === template?.id;
+	const isLast = templates[lastIdx]?.id === template?.id;
 
-	/**
-	 * Add window event listeners
-	 *
-	 * @since 4.1
-	 */
-	componentDidMount() {
-		window.addEventListener('keydown', this.handleKeyPress, false);
-	}
+	/* Ref mirrors for stale-closure-safe keydown handler */
+	const isFirstRef = useRef(isFirst);
+	isFirstRef.current = isFirst;
+	const isLastRef = useRef(isLast);
+	isLastRef.current = isLast;
+	const navigateRef = useRef(navigate);
+	navigateRef.current = navigate;
+	const templatesRef = useRef(templates);
+	templatesRef.current = templates;
+	const templateIndexRef = useRef(templateIndex);
+	templateIndexRef.current = templateIndex;
 
-	/**
-	 * Cleanup window event listeners
-	 *
-	 * @since 4.1
-	 */
-	componentWillUnmount() {
-		window.removeEventListener('keydown', this.handleKeyPress, false);
-	}
+	useEffect(() => {
+		const handleKeyPress = (e) => {
+			if (!isFirstRef.current && e.keyCode === 37) {
+				e.preventDefault();
+				e.stopPropagation();
+				const prevId =
+					templatesRef.current[templateIndexRef.current - 1]?.id;
+				if (prevId) {
+					navigateRef.current('/template/' + prevId);
+				}
+			}
+			if (!isLastRef.current && e.keyCode === 39) {
+				e.preventDefault();
+				e.stopPropagation();
+				const nextId =
+					templatesRef.current[templateIndexRef.current + 1]?.id;
+				if (nextId) {
+					navigateRef.current('/template/' + nextId);
+				}
+			}
+		};
 
-	/**
-	 * Attempt to get the previous template in our list and update the URL
-	 *
-	 * @param {Object} e Event
-	 *
-	 * @since 4.1
-	 */
-	handlePreviousTemplate = (e) => {
+		window.addEventListener('keydown', handleKeyPress, false);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyPress, false);
+		};
+	}, []);
+
+	const handlePreviousTemplate = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		const prevId = this.props.templates[this.props.templateIndex - 1].id;
-
+		const prevId = templates[templateIndex - 1]?.id;
 		if (prevId) {
-			this.props.navigate('/template/' + prevId);
+			navigate('/template/' + prevId);
 		}
 	};
 
-	/**
-	 * Attempt to get the next template in our list and update the URL
-	 *
-	 * @param {Object} e Event
-	 *
-	 * @since 4.1
-	 */
-	handleNextTemplate = (e) => {
+	const handleNextTemplate = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		const nextId = this.props.templates[this.props.templateIndex + 1].id;
-
+		const nextId = templates[templateIndex + 1]?.id;
 		if (nextId) {
-			this.props.navigate('/template/' + nextId);
+			navigate('/template/' + nextId);
 		}
 	};
 
-	/**
-	 * Checks if the Left or Right arrow keys are pressed and fires appropriate functions
-	 *
-	 * @param {Object} e Event
-	 *
-	 * @since 4.1
-	 */
-	handleKeyPress = (e) => {
-		/* Left Arrow */
-		if (!this.props.isFirst && e.keyCode === 37) {
-			this.handlePreviousTemplate(e);
-		}
+	const prevClass = isFirst
+		? 'dashicons dashicons-no left disabled'
+		: 'dashicons dashicons-no left';
+	const nextClass = isLast
+		? 'dashicons dashicons-no right disabled'
+		: 'dashicons dashicons-no right';
 
-		/* Right Arrow */
-		if (!this.props.isLast && e.keyCode === 39) {
-			this.handleNextTemplate(e);
-		}
-	};
+	const leftDisabled = isFirst ? 'disabled' : '';
+	const rightDisabled = isLast ? 'disabled' : '';
 
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		/*
-		 * Work our the correct classes and attributes for our left and right arrows
-		 * based on if we are currently showing the first or last templates
-		 */
-		const isFirst = this.props.isFirst;
-		const isLast = this.props.isLast;
+	return (
+		<span data-test="component-templateHeaderNavigation">
+			<button
+				data-test="component-showPreviousTemplateButton"
+				onClick={handlePreviousTemplate}
+				className={prevClass}
+				disabled={leftDisabled}
+			>
+				<span className="screen-reader-text">
+					{showPreviousTemplateText}
+				</span>
+			</button>
 
-		const prevClass = isFirst
-			? 'dashicons dashicons-no left disabled'
-			: 'dashicons dashicons-no left';
-		const nextClass = isLast
-			? 'dashicons dashicons-no right disabled'
-			: 'dashicons dashicons-no right';
-
-		const leftDisabled = isFirst ? 'disabled' : '';
-		const rightDisabled = isLast ? 'disabled' : '';
-
-		return (
-			<span data-test="component-templateHeaderNavigation">
-				<button
-					data-test="component-showPreviousTemplateButton"
-					onClick={this.handlePreviousTemplate}
-					onKeyDown={this.handleKeyPress}
-					className={prevClass}
-					disabled={leftDisabled}
-				>
-					<span className="screen-reader-text">
-						{this.props.showPreviousTemplateText}
-					</span>
-				</button>
-
-				<button
-					data-test="component-showNextTemplateButton"
-					onClick={this.handleNextTemplate}
-					onKeyDown={this.handleKeyPress}
-					className={nextClass}
-					disabled={rightDisabled}
-				>
-					<span className="screen-reader-text">
-						{this.props.showNextTemplateText}
-					</span>
-				</button>
-			</span>
-		);
-	}
-}
-
-/**
- * Map state to props
- *
- * @param { Object } state The current Redux State
- * @param { Object } props The current React props
- *
- * @return {{ isFirst: boolean, isLast: boolean }} mapped state
- *
- * @since 4.1
- */
-const MapStateToProps = (state, props) => {
-	/* Check if the current template is the first or last in our templates */
-	const templates = props.templates;
-	const currentTemplateId = props.template.id;
-	const lastTemplate = templates.length - 1;
-	const first = templates[0].id;
-	const last = templates[lastTemplate].id;
-
-	return {
-		isFirst: first === currentTemplateId,
-		isLast: last === currentTemplateId,
-	};
+			<button
+				data-test="component-showNextTemplateButton"
+				onClick={handleNextTemplate}
+				className={nextClass}
+				disabled={rightDisabled}
+			>
+				<span className="screen-reader-text">
+					{showNextTemplateText}
+				</span>
+			</button>
+		</span>
+	);
 };
 
-/**
- * Maps our Redux store to our React component
- *
- * @since 4.1
- */
-export default connect(MapStateToProps)(TemplateHeaderNavigation);
+TemplateHeaderNavigation.propTypes = {
+	templates: PropTypes.array.isRequired,
+	templateIndex: PropTypes.number.isRequired,
+	template: PropTypes.object,
+	navigate: PropTypes.func,
+	showPreviousTemplateText: PropTypes.string,
+	showNextTemplateText: PropTypes.string,
+};
+
+export default TemplateHeaderNavigation;

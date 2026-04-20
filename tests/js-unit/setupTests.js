@@ -1,16 +1,15 @@
 import util from 'util';
-import Enzyme from 'enzyme';
-import Adapter from '@cfaester/enzyme-adapter-react-18';
+import { setAutoFreeze } from 'immer';
+import '@testing-library/jest-dom';
 import CSS from 'css.escape'; // eslint-disable-line
 
 Object.defineProperty(global, 'TextEncoder', {
 	value: util.TextEncoder,
 });
 
-Enzyme.configure({
-	adapter: new Adapter(),
-	disableLifecycleMethods: true,
-});
+/* Prevent immer from freezing state objects, which would break tests that
+   mutate initialState directly before passing it to reducers. */
+setAutoFreeze(false);
 
 // setup global defaults that our tests/legacy code expect is present
 window.GFPDF = {

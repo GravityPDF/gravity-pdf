@@ -117,14 +117,14 @@ export function* addFont({ payload }) {
 			payload: data,
 		});
 	} catch (error) {
-		if (error.status === 500) {
+		const response = error.body;
+
+		if (!response || error.status === 500) {
 			return yield put({
 				type: ADD_FONT_ERROR,
 				payload: GFPDF.addFatalError,
 			});
 		}
-
-		const response = error.body;
 
 		if (error.status === 400 && response.code === 'font_validation_error') {
 			return yield put({
@@ -138,7 +138,7 @@ export function* addFont({ payload }) {
 
 		yield put({
 			type: ADD_FONT_ERROR,
-			payload: response.message,
+			payload: response.message || GFPDF.addFatalError,
 		});
 	}
 }
@@ -180,34 +180,30 @@ export function* editFont({ payload }) {
 			payload: data,
 		});
 	} catch (error) {
-		const response = error.body;
+		const response = error?.body;
+		const status = response?.status;
+		const code = response?.code;
 
-		if (
-			error.status === 500 &&
-			response.code !== 'font_file_gone_missing'
-		) {
+		if (status === 500 && code !== 'font_file_gone_missing') {
 			return yield put({
 				type: EDIT_FONT_ERROR,
 				payload: GFPDF.addFatalError,
 			});
 		}
 
-		if (error.status === 400 && response.code === 'font_validation_error') {
+		if (status === 400 && code === 'font_validation_error') {
 			return yield put({
 				type: EDIT_FONT_ERROR,
 				payload: {
 					fontValidationError: GFPDF.fontFileInvalid,
-					msg: response.message,
+					msg: response.message || GFPDF.addFatalError,
 				},
 			});
 		}
 
 		yield put({
 			type: EDIT_FONT_ERROR,
-			payload:
-				response.message === ''
-					? GFPDF.addFatalError
-					: response.message,
+			payload: response.message || GFPDF.addFatalError,
 		});
 	}
 }

@@ -1,187 +1,177 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import { storeFactory, findByTestAttr } from '../../testUtils';
-import { MemoryRouter } from 'react-router-dom';
-import ConnectedTemplateDeleteButton, {
-	TemplateDeleteButton,
-	mapDispatchToProps,
-} from '../../../../../src/assets/js/react/components/Template/TemplateDeleteButton';
+import { fireEvent, act } from '@testing-library/react';
+import {
+	findByTestAttr,
+	renderWithStore,
+	createTestStore,
+} from '../../testUtilsRTL';
+import TemplateDeleteButton from '../../../../../src/assets/js/react/components/Template/TemplateDeleteButton';
 
 describe('Template - TemplateDeleteButton.js', () => {
 	const navigate = jest.fn();
-	const pathname = '/';
-	const templateProcessingMock = jest.fn();
-	const onTemplateDeleteMock = jest.fn();
-	const addTemplateMock = jest.fn();
-	const clearTemplateProcessingMock = jest.fn();
+	const template = { id: 'zadani' };
 
-	describe('Check for redux properties', () => {
-		const setup = (state = {}) => {
-			const store = storeFactory(state);
-			const wrapper = mount(
-				<MemoryRouter>
-					<ConnectedTemplateDeleteButton store={store} />
-				</MemoryRouter>
-			);
+	const initialState = {
+		template: {
+			list: [template],
+			activeTemplate: '',
+			search: '',
+			updateSelectBoxText: '',
+			templateProcessing: '',
+			templateUploadProcessingSuccess: {},
+			templateUploadProcessingError: {},
+		},
+	};
 
-			return wrapper.find('TemplateDeleteButton');
-		};
-		const dispatch = jest.fn();
-
-		test('has access to `templateProcessing` state', () => {
-			const wrapper = setup({
-				template: { templateProcessing: 'success' },
-			});
-			const getTemplateProcessingProp =
-				wrapper.instance().props.getTemplateProcessing;
-
-			expect(getTemplateProcessingProp).toBe('success');
-		});
-
-		test('check for mapDispatchToProps addTemplate()', () => {
-			mapDispatchToProps(dispatch).addTemplate();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'ADD_TEMPLATE',
-			});
-		});
-
-		test('check for mapDispatchToProps onTemplateDelete()', () => {
-			mapDispatchToProps(dispatch).onTemplateDelete();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'DELETE_TEMPLATE',
-			});
-		});
-
-		test('check for mapDispatchToProps templateProcessing()', () => {
-			mapDispatchToProps(dispatch).templateProcessing();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'TEMPLATE_PROCESSING',
-			});
-		});
-
-		test('check for mapDispatchToProps clearTemplateProcessing()', () => {
-			mapDispatchToProps(dispatch).clearTemplateProcessing();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'CLEAR_TEMPLATE_PROCESSING',
-			});
-		});
+	beforeEach(() => {
+		jest.clearAllMocks();
+		window.confirm = jest.fn(() => true);
 	});
 
-	describe('Component methods', () => {
-		const wrapper = shallow(
+	test('renders <TemplateDeleteButton /> component', () => {
+		const { container } = renderWithStore(
 			<TemplateDeleteButton
-				template={{}}
-				templateProcessing={templateProcessingMock}
-				getTemplateProcessing="success"
 				navigate={navigate}
-				pathname={pathname}
-				onTemplateDelete={onTemplateDeleteMock}
-				addTemplate={addTemplateMock}
-				clearTemplateProcessing={clearTemplateProcessingMock}
-			/>
+				template={template}
+				buttonText="Delete"
+			/>,
+			initialState
 		);
-		const instance = wrapper.instance();
-
-		test('deleteTemplate() - Display a confirmation window asking user to verify they want template deleted. Once verified, we make an AJAX call to the server requesting template to be deleted.', () => {
-			window.confirm = jest.fn().mockImplementation(() => true);
-			const e = { preventDefault() {}, stopPropagation() {} };
-			instance.deleteTemplate(e);
-
-			expect(templateProcessingMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-			expect(onTemplateDeleteMock.mock.calls.length).toBe(1);
-		});
-
-		test('ajaxFailed() - If the server cannot delete the template we re-add the template to our list and display an appropriate inline error message', () => {
-			instance.ajaxFailed();
-
-			expect(addTemplateMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-			expect(clearTemplateProcessingMock.mock.calls.length).toBe(1);
-		});
+		expect(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		).toBeInTheDocument();
 	});
 
-	describe('Run lifecycle methods', () => {
-		test('componentDidUpdate() - Fires appropriate action based on (success) Redux store data', () => {
-			const props = { getTemplateProcessing: 'success' };
-			const wrapper = shallow(
-				<TemplateDeleteButton
-					navigate={navigate}
-					pathname={pathname}
-					{...props}
-				/>
-			);
-			wrapper.instance().componentDidUpdate();
-
-			expect(navigate.mock.calls.length).toBe(1);
-		});
-
-		test('componentDidUpdate() - Fires appropriate action based on (failed) Redux store data', () => {
-			const props = {
-				getTemplateProcessing: 'failed',
-			};
-			const wrapper = shallow(
-				<TemplateDeleteButton
-					addTemplate={addTemplateMock}
-					navigate={navigate}
-					clearTemplateProcessing={clearTemplateProcessingMock}
-					{...props}
-				/>
-			);
-			const ajaxFailed = jest.spyOn(wrapper.instance(), 'ajaxFailed');
-			wrapper.instance().componentDidUpdate();
-
-			expect(ajaxFailed).toHaveBeenCalledTimes(1);
-			expect(addTemplateMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-			expect(clearTemplateProcessingMock.mock.calls.length).toBe(1);
-		});
+	test('renders button text', () => {
+		const { container } = renderWithStore(
+			<TemplateDeleteButton
+				navigate={navigate}
+				template={template}
+				buttonText="Delete"
+			/>,
+			initialState
+		);
+		expect(container.querySelector('button').textContent).toBe('Delete');
 	});
 
-	describe('Renders component', () => {
-		let wrapper = shallow(<TemplateDeleteButton buttonText="Delete" />);
+	test('uses callbackFunction prop instead of built-in delete handler', () => {
+		const callbackFn = jest.fn();
+		const { container } = renderWithStore(
+			<TemplateDeleteButton
+				navigate={navigate}
+				template={template}
+				callbackFunction={callbackFn}
+				buttonText="Delete"
+			/>,
+			initialState
+		);
+		fireEvent.click(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		);
+		expect(callbackFn).toHaveBeenCalledTimes(1);
+	});
 
-		test('renders <TemplateDeleteButton /> component', () => {
-			const component = findByTestAttr(
-				wrapper,
-				'component-templateDeleteButton'
-			);
+	test('button click with confirm=true dispatches TEMPLATE_PROCESSING and DELETE_TEMPLATE', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		const { container } = renderWithStore(
+			<TemplateDeleteButton
+				navigate={navigate}
+				template={template}
+				buttonText="Delete"
+				templateConfirmDeleteText="Are you sure?"
+			/>,
+			{},
+			{},
+			store
+		);
 
-			expect(component.length).toBe(1);
-		});
+		fireEvent.click(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		);
 
-		test('display button text', () => {
-			expect(wrapper.find('button').text()).toBe('Delete');
-		});
+		expect(window.confirm).toHaveBeenCalledWith('Are you sure?');
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'TEMPLATE_PROCESSING' })
+		);
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'DELETE_TEMPLATE' })
+		);
+	});
 
-		test('check button click', () => {
-			window.confirm = jest.fn().mockImplementation(() => true);
-			wrapper = shallow(
-				<TemplateDeleteButton
-					template={{}}
-					templateProcessing={templateProcessingMock}
-					getTemplateProcessing="success"
-					navigate={navigate}
-					pathname={pathname}
-					onTemplateDelete={onTemplateDeleteMock}
-				/>
-			);
-			const button = findByTestAttr(
-				wrapper,
-				'component-templateDeleteButton'
-			);
-			button.simulate('click', {
-				preventDefault() {},
-				stopPropagation() {},
+	test('button click with confirm=false does not dispatch', () => {
+		window.confirm = jest.fn(() => false);
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		const { container } = renderWithStore(
+			<TemplateDeleteButton
+				navigate={navigate}
+				template={template}
+				buttonText="Delete"
+			/>,
+			{},
+			{},
+			store
+		);
+
+		fireEvent.click(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		);
+
+		expect(dispatchSpy).not.toHaveBeenCalled();
+	});
+
+	test('navigates to /template when templateProcessing changes to success', () => {
+		const store = createTestStore(initialState);
+		renderWithStore(
+			<TemplateDeleteButton
+				navigate={navigate}
+				template={template}
+				buttonText="Delete"
+			/>,
+			{},
+			{},
+			store
+		);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_PROCESSING_SUCCESS',
+				payload: 'success',
 			});
-
-			expect(templateProcessingMock.mock.calls.length).toBe(1);
-			expect(navigate.mock.calls.length).toBe(1);
-			expect(onTemplateDeleteMock.mock.calls.length).toBe(1);
 		});
+
+		expect(navigate).toHaveBeenCalledWith('/template');
+	});
+
+	test('dispatches ADD_TEMPLATE and CLEAR_TEMPLATE_PROCESSING and navigates when templateProcessing changes to failed', () => {
+		const store = createTestStore(initialState);
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		renderWithStore(
+			<TemplateDeleteButton
+				navigate={navigate}
+				template={template}
+				buttonText="Delete"
+				templateDeleteErrorText="Delete failed"
+			/>,
+			{},
+			{},
+			store
+		);
+
+		act(() => {
+			store.dispatch({
+				type: 'TEMPLATE_PROCESSING_FAILED',
+				payload: 'failed',
+			});
+		});
+
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'ADD_TEMPLATE' })
+		);
+		expect(navigate).toHaveBeenCalledWith('/template');
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'CLEAR_TEMPLATE_PROCESSING' })
+		);
 	});
 });

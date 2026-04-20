@@ -1,87 +1,75 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../testUtils';
+import { render, act } from '@testing-library/react';
+import { findByTestAttr } from '../testUtilsRTL';
 import ShowMessage from '../../../../src/assets/js/react/components/ShowMessage';
 
 describe('Components - ShowMessage.js', () => {
-	let wrapper;
-	let component;
+	test('renders <ShowMessage /> component', () => {
+		const { container } = render(<ShowMessage text="text" error />);
+		const component = findByTestAttr(container, 'component-showMessage');
 
-	describe('RUN LIFECYCLE METHODS', () => {
-		test('componentDidMount() - On mount, maybe set dismissable timer', () => {
-			wrapper = shallow(<ShowMessage text="text" dismissable={true} />);
-			const shouldSetTimer = jest.spyOn(
-				wrapper.instance(),
-				'shouldSetTimer'
-			);
-			const setTimer = jest.spyOn(wrapper.instance(), 'setTimer');
-			wrapper.instance().componentDidMount();
-
-			expect(shouldSetTimer).toHaveBeenCalledTimes(1);
-			expect(setTimer).toHaveBeenCalledTimes(1);
-		});
-
-		test('componentDidUpdate() - Resets our state and timer when new props received', () => {
-			const prevState = { visible: false };
-			wrapper = shallow(<ShowMessage text="text" />);
-			const shouldSetTimer = jest.spyOn(
-				wrapper.instance(),
-				'shouldSetTimer'
-			);
-			wrapper.instance().componentDidUpdate('', prevState);
-
-			expect(shouldSetTimer).toHaveBeenCalledTimes(1);
-			expect(wrapper.state('visible')).toBe(true);
-		});
-
-		test('componentWillUnmount() - Clear timeout on unmount', () => {
-			wrapper = shallow(<ShowMessage text="text" dismissable={true} />);
-
-			const clearTimeout = jest.spyOn(window, 'clearTimeout');
-
-			wrapper.instance().componentWillUnmount();
-
-			expect(clearTimeout).toHaveBeenCalledTimes(1);
-		});
+		expect(component).toBeInTheDocument();
+		expect(component.textContent).toBe('text');
+		expect(component).toHaveClass('notice', 'inline', 'error');
 	});
 
-	describe('RUN COMPONENT METHODS', () => {
-		test('shouldSetTimer() - Check if we should make the message auto-dismissable', () => {
-			wrapper = shallow(<ShowMessage text="text" dismissable={true} />);
-			const setTimer = jest.spyOn(wrapper.instance(), 'setTimer');
-			wrapper.instance().shouldSetTimer();
+	test('renders without error class when error prop not passed', () => {
+		const { container } = render(<ShowMessage text="text" />);
+		const component = findByTestAttr(container, 'component-showMessage');
 
-			expect(setTimer).toHaveBeenCalledTimes(1);
-		});
-
-		test('resetState() - Resets our state and timer', () => {
-			wrapper = shallow(<ShowMessage text="text" dismissable={true} />);
-
-			const instance = wrapper.instance();
-			const shouldSetTimer = jest.spyOn(instance, 'shouldSetTimer');
-
-			instance.resetState();
-
-			expect(wrapper.state('visible')).toBe(true);
-			expect(shouldSetTimer).toHaveBeenCalledTimes(1);
-		});
+		expect(component).not.toHaveClass('error');
 	});
 
-	describe('RENDERS COMPONENT', () => {
-		test('renders <ShowMessage /> component', () => {
-			wrapper = shallow(<ShowMessage text="text" error={true} />);
-			component = findByTestAttr(wrapper, 'component-showMessage');
+	test('auto-dismisses after delay and renders empty div', () => {
+		jest.useFakeTimers();
+		const { container } = render(
+			<ShowMessage text="text" dismissable delay={100} />
+		);
 
-			expect(component.length).toBe(1);
-			expect(component.text()).toBe('text');
-			expect(component.hasClass('notice inline error')).toEqual(true);
+		expect(
+			findByTestAttr(container, 'component-showMessage')
+		).toBeInTheDocument();
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		test('renders <ShowMessage /> component with an empty <div />', () => {
-			wrapper = shallow(<ShowMessage text="text" />);
-			wrapper.setState({ visible: false });
+		expect(
+			findByTestAttr(container, 'component-showMessage')
+		).not.toBeInTheDocument();
+		expect(container.innerHTML).toBe('<div></div>');
 
-			expect(wrapper.html()).toEqual('<div></div>');
+		jest.useRealTimers();
+	});
+
+	test('calls dismissableCallback after auto-dismiss', () => {
+		jest.useFakeTimers();
+		const callback = jest.fn();
+		render(
+			<ShowMessage
+				text="text"
+				dismissable
+				delay={100}
+				dismissableCallback={callback}
+			/>
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
+
+		expect(callback).toHaveBeenCalledTimes(1);
+
+		jest.useRealTimers();
+	});
+
+	test('clears timeout on unmount', () => {
+		const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
+		const { unmount } = render(<ShowMessage text="text" dismissable />);
+		unmount();
+
+		expect(clearTimeoutSpy).toHaveBeenCalled();
+
+		clearTimeoutSpy.mockRestore();
 	});
 });

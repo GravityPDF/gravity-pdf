@@ -1,18 +1,11 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import UpdateFont from '../../../../../src/assets/js/react/components/FontManager/UpdateFont';
 
 describe('FontManager - UpdateFont.js', () => {
-	// Mock component props
 	const props = {
 		id: 'firasanslight',
-		fontList: [
-			{
-				font_name: 'Fira Sans Light',
-				id: 'firasanslight',
-			},
-		],
+		fontList: [{ font_name: 'Fira Sans Light', id: 'firasanslight' }],
 		label: '',
 		onHandleInputChange: jest.fn(),
 		onHandleUpload: jest.fn(),
@@ -30,31 +23,41 @@ describe('FontManager - UpdateFont.js', () => {
 		tabIndexFontFiles: '',
 		tabIndexFooterButtons: '',
 	};
-	const wrapper = shallow(<UpdateFont {...props} />);
 
 	describe('RENDERS COMPONENT', () => {
 		test('render <UpdateFont /> component', () => {
-			const component = findByTestAttr(wrapper, 'component-UpdateFont');
-
-			expect(component.length).toBe(1);
+			const { container } = renderWithStore(<UpdateFont {...props} />);
+			expect(
+				findByTestAttr(container, 'component-UpdateFont')
+			).toBeInTheDocument();
 		});
 
 		test('render font name input box', () => {
+			const { container } = renderWithStore(<UpdateFont {...props} />);
 			expect(
-				wrapper.find('input#gfpdf-update-font-name-input').length
-			).toBe(1);
+				container.querySelector('input#gfpdf-update-font-name-input')
+			).toBeInTheDocument();
 		});
 
 		test('render font name validation error', () => {
-			expect(wrapper.find('span.required[role="alert"]').length).toBe(1);
+			const { container } = renderWithStore(<UpdateFont {...props} />);
+			expect(
+				container.querySelector('span.required[role="alert"]')
+			).toBeInTheDocument();
 		});
 
 		test('render <FontVariant /> component', () => {
-			expect(wrapper.find('FontVariant').length).toBe(1);
+			const { container } = renderWithStore(<UpdateFont {...props} />);
+			expect(
+				findByTestAttr(container, 'component-FontVariant')
+			).toBeInTheDocument();
 		});
 
 		test('render <AddUpdateFontFooter /> component', () => {
-			expect(wrapper.find('Connect(AddUpdateFontFooter)').length).toBe(1);
+			const { container } = renderWithStore(<UpdateFont {...props} />);
+			expect(
+				findByTestAttr(container, 'component-AddFontFooter')
+			).toBeInTheDocument();
 		});
 	});
 });

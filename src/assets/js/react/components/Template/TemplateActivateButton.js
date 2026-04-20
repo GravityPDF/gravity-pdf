@@ -1,7 +1,7 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 /* Redux actions */
 import { selectTemplate } from '../../actions/templates';
 
@@ -18,71 +18,40 @@ import { selectTemplate } from '../../actions/templates';
 /**
  * React Component
  *
+ * @param {Object} root0
+ * @param {*}      root0.navigate
+ * @param {*}      root0.template
+ * @param {*}      root0.buttonText
  * @since 4.1
  */
-export class TemplateActivateButton extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		navigate: PropTypes.func,
-		onTemplateSelect: PropTypes.func,
-		template: PropTypes.object,
-		buttonText: PropTypes.string,
-	};
+const TemplateActivateButton = ({ navigate, template, buttonText }) => {
+	const dispatch = useDispatch();
 
-	/**
-	 * Update our route and trigger a Redux action to select the current template
-	 *
-	 * @param {Object} e Event
-	 *
-	 * @since 4.1
-	 */
-	handleSelectTemplate = (e) => {
+	const handleSelectTemplate = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		this.props.navigate('/');
-		this.props.onTemplateSelect(this.props.template.id);
+		navigate('/');
+		dispatch(selectTemplate(template?.id));
 	};
 
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		return (
-			<button
-				data-test="component-templateActivateButton"
-				type="button"
-				onClick={this.handleSelectTemplate}
-				className="button activate"
-				aria-label={this.props.buttonText + ' ' + GFPDF.template}
-			>
-				{this.props.buttonText}
-			</button>
-		);
-	}
-}
-
-/**
- * TemplateActivateButton
- * Map actions to props
- *
- * @param { Function } dispatch Redux dispatcher
- *
- * @return {{ onTemplateSelect: Function }} mapped dispatch
- *
- * @since 4.1
- */
-export const mapDispatchToProps = (dispatch) => {
-	return {
-		onTemplateSelect: (id) => dispatch(selectTemplate(id)),
-	};
+	return (
+		<button
+			data-test="component-templateActivateButton"
+			type="button"
+			onClick={handleSelectTemplate}
+			className="button activate"
+			aria-label={buttonText + ' ' + GFPDF.template}
+		>
+			{buttonText}
+		</button>
+	);
 };
 
-/**
- * Maps our Redux store to our React component
- *
- * @since 4.1
- */
-export default connect(null, mapDispatchToProps)(TemplateActivateButton);
+TemplateActivateButton.propTypes = {
+	navigate: PropTypes.func,
+	template: PropTypes.object,
+	buttonText: PropTypes.string,
+};
+
+export default TemplateActivateButton;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { render } from '@testing-library/react';
+import { findByTestAttr } from '../../testUtilsRTL';
 import FontVariant from '../../../../../src/assets/js/react/components/FontManager/FontVariant';
 
 describe('FontManager - FontVariant.js', () => {
@@ -24,45 +24,42 @@ describe('FontManager - FontVariant.js', () => {
 
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontVariant /> component', () => {
-			const wrapper = shallow(<FontVariant {...props} />);
-			const component = findByTestAttr(wrapper, 'component-FontVariant');
-
-			expect(component.length).toBe(1);
+			const { container } = render(<FontVariant {...props} />);
+			expect(
+				findByTestAttr(container, 'component-FontVariant')
+			).toBeInTheDocument();
 		});
 
-		test('render <Dropzone /> component', () => {
-			const wrapper = shallow(<FontVariant {...props} />);
-			const component = findByTestAttr(wrapper, 'component-Dropzone');
-
-			expect(component.length).toBe(4);
+		test('render four drop zones', () => {
+			const { container } = render(<FontVariant {...props} />);
+			expect(container.querySelectorAll('.drop-zone').length).toBe(4);
 		});
 
 		test('render add input field', () => {
-			const wrapper = mount(
+			const { container } = render(
 				<FontVariant {...props} fontStyles={{ regular: '' }} />
 			);
-			const component = findByTestAttr(
-				wrapper,
-				'component-FontVariant-add'
-			);
-
-			expect(component.length).toBe(1);
+			expect(
+				findByTestAttr(container, 'component-FontVariant-add')
+			).toBeInTheDocument();
 		});
 
 		test('render delete input field', () => {
-			const wrapper = mount(<FontVariant {...props} />);
-			const component = findByTestAttr(
-				wrapper,
-				'component-FontVariant-delete'
-			);
-
-			expect(component.length).toBe(4);
+			const { container } = render(<FontVariant {...props} />);
+			expect(
+				container.querySelectorAll(
+					'[data-test="component-FontVariant-delete"]'
+				).length
+			).toBe(4);
 		});
 
 		test('render <FontVariantLabel /> component', () => {
-			const wrapper = mount(<FontVariant {...props} />);
-
-			expect(wrapper.find('FontVariantLabel').length).toBe(4);
+			const { container } = render(<FontVariant {...props} />);
+			expect(
+				container.querySelectorAll(
+					'[data-test="component-FontVariantLabel"]'
+				).length
+			).toBe(4);
 		});
 	});
 });

@@ -1,79 +1,57 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { fireEvent } from '@testing-library/react';
 import {
-	TemplateActivateButton,
-	mapDispatchToProps,
-} from '../../../../../src/assets/js/react/components/Template/TemplateActivateButton';
+	findByTestAttr,
+	renderWithStore,
+	createTestStore,
+} from '../../testUtilsRTL';
+import TemplateActivateButton from '../../../../../src/assets/js/react/components/Template/TemplateActivateButton';
 
 describe('Template - TemplateActivateButton.js', () => {
 	const navigate = jest.fn();
-	const onTemplateSelectMock = jest.fn();
+	const template = { id: 'zadani' };
 
-	describe('Check for redux properties', () => {
-		const dispatch = jest.fn();
-
-		test('check for mapDispatchToProps onTemplateSelect()', () => {
-			mapDispatchToProps(dispatch).onTemplateSelect();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'SELECT_TEMPLATE',
-			});
-		});
-	});
-
-	describe('Component functions', () => {
-		test('handleSelectTemplate() - Update our route and trigger a Redux action to select the current template', () => {
-			const wrapper = shallow(
-				<TemplateActivateButton
-					navigate={navigate}
-					onTemplateSelect={onTemplateSelectMock}
-					template={{}}
-				/>
-			);
-			const instance = wrapper.instance();
-			instance.handleSelectTemplate({
-				preventDefault() {},
-				stopPropagation() {},
-			});
-
-			expect(navigate.mock.calls.length).toBe(1);
-			expect(onTemplateSelectMock.mock.calls.length).toBe(1);
-		});
+	beforeEach(() => {
+		jest.clearAllMocks();
 	});
 
 	test('renders <TemplateActivateButton /> component', () => {
-		const wrapper = shallow(<TemplateActivateButton navigate={navigate} />);
-		const component = findByTestAttr(
-			wrapper,
-			'component-templateActivateButton'
+		const { container } = renderWithStore(
+			<TemplateActivateButton navigate={navigate} template={template} />
 		);
-
-		expect(component.length).toBe(1);
+		expect(
+			findByTestAttr(container, 'component-templateActivateButton')
+		).toBeInTheDocument();
 	});
 
 	test('renders button text', () => {
-		const wrapper = shallow(
-			<TemplateActivateButton navigate={navigate} buttonText="Select" />
-		);
-
-		expect(wrapper.find('button').text()).toBe('Select');
-	});
-
-	test('check button click', () => {
-		const wrapper = shallow(
+		const { container } = renderWithStore(
 			<TemplateActivateButton
 				navigate={navigate}
-				onTemplateSelect={onTemplateSelectMock}
-				template={{}}
+				template={template}
+				buttonText="Select"
 			/>
 		);
-		wrapper.simulate('click', {
-			preventDefault() {},
-			stopPropagation() {},
-		});
+		expect(container.querySelector('button').textContent).toBe('Select');
+	});
 
-		expect(navigate.mock.calls.length).toBe(1);
-		expect(onTemplateSelectMock.mock.calls.length).toBe(1);
+	test('handleSelectTemplate() - calls navigate and dispatches selectTemplate', () => {
+		const store = createTestStore({});
+		const dispatchSpy = jest.spyOn(store, 'dispatch');
+		const { container } = renderWithStore(
+			<TemplateActivateButton navigate={navigate} template={template} />,
+			{},
+			{},
+			store
+		);
+
+		fireEvent.click(
+			findByTestAttr(container, 'component-templateActivateButton')
+		);
+
+		expect(navigate).toHaveBeenCalledWith('/');
+		expect(dispatchSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'SELECT_TEMPLATE' })
+		);
 	});
 });

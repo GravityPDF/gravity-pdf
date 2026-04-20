@@ -1,13 +1,13 @@
 /* Dependencies */
-import React, { Component } from 'react';
+import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 /* Redux actions */
 import {
-	addTemplate,
-	deleteTemplate,
-	templateProcessing,
-	clearTemplateProcessing,
+	addTemplate as addTemplateAction,
+	deleteTemplate as deleteTemplateAction,
+	templateProcessing as templateProcessingAction,
+	clearTemplateProcessing as clearTemplateProcessingAction,
 } from '../../actions/templates';
 
 /**
@@ -23,162 +23,94 @@ import {
 /**
  * React Component
  *
+ * @param {Object} root0
+ * @param {*}      root0.navigate
+ * @param {*}      root0.template
+ * @param {*}      root0.callbackFunction
+ * @param {*}      root0.buttonText
+ * @param {*}      root0.templateConfirmDeleteText
+ * @param {*}      root0.templateDeleteErrorText
  * @since 4.1
  */
-export class TemplateDeleteButton extends Component {
-	/**
-	 * @since 4.1
-	 */
-	static propTypes = {
-		template: PropTypes.object,
-		addTemplate: PropTypes.func,
-		onTemplateDelete: PropTypes.func,
-		callbackFunction: PropTypes.func,
-		templateProcessing: PropTypes.func,
-		clearTemplateProcessing: PropTypes.func,
-		getTemplateProcessing: PropTypes.string,
-		navigate: PropTypes.func,
-		buttonText: PropTypes.string,
-		templateConfirmDeleteText: PropTypes.string,
-		templateDeleteErrorText: PropTypes.string,
-	};
+const TemplateDeleteButton = ({
+	navigate,
+	template,
+	callbackFunction,
+	buttonText,
+	templateConfirmDeleteText,
+	templateDeleteErrorText,
+}) => {
+	const dispatch = useDispatch();
+	const getTemplateProcessing = useSelector(
+		(s) => s.template.templateProcessing
+	);
 
-	/**
-	 * If component did update, fires appropriate action based on Redux store data
-	 *
-	 * @since 4.1
-	 */
-	componentDidUpdate() {
-		const { getTemplateProcessing, navigate } = this.props;
+	/* Track previous value to replicate componentDidUpdate comparisons */
+	const prevGetTemplateProcessingRef = useRef(getTemplateProcessing);
+
+	/* componentDidUpdate: navigate/recover when templateProcessing changes */
+	useEffect(() => {
+		const prev = prevGetTemplateProcessingRef.current;
+		prevGetTemplateProcessingRef.current = getTemplateProcessing;
+
+		if (prev === getTemplateProcessing) {
+			return;
+		}
 
 		if (getTemplateProcessing === 'success') {
 			navigate('/template');
 		}
 
 		if (getTemplateProcessing === 'failed') {
-			this.ajaxFailed();
+			dispatch(
+				addTemplateAction({
+					...template,
+					error: templateDeleteErrorText,
+				})
+			);
+			navigate('/template');
+			dispatch(clearTemplateProcessingAction());
 		}
-	}
+	}, [
+		getTemplateProcessing,
+		navigate,
+		dispatch,
+		template,
+		templateDeleteErrorText,
+	]);
 
-	/**
-	 * Display a confirmation window asking user to verify they want template deleted.
-	 *
-	 * Once verified, we make an AJAX call to the server requesting template to be deleted.
-	 *
-	 * Before we receive the response we remove the PDF template automatically and update the
-	 * URL to /template. If the AJAX call fails the PDF template gets restored to our list with
-	 * an appropriate error message (it feels snapper this way).
-	 *
-	 * @param {Object} e Event
-	 */
-	deleteTemplate = (e) => {
+	const deleteTemplate = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		if (window.confirm(this.props.templateConfirmDeleteText)) {
-			/* POST the PDF template to our endpoint for processing */
-			this.props.templateProcessing(this.props.template.id);
 
-			if (this.props.getTemplateProcessing === 'success') {
-				this.props.navigate('/template');
-			}
-
-			this.props.onTemplateDelete(this.props.template.id);
+		if (window.confirm(templateConfirmDeleteText)) {
+			dispatch(templateProcessingAction(template?.id));
+			dispatch(deleteTemplateAction(template?.id));
 		}
 	};
 
-	/**
-	 * If the server cannot delete the template we re-add the template to our list
-	 * and display an appropriate inline error message
-	 *
-	 * @since 4.1
-	 */
-	ajaxFailed = () => {
-		const errorTemplate = {
-			...this.props.template,
-			error: this.props.templateDeleteErrorText,
-		};
-		this.props.addTemplate(errorTemplate);
+	const handleClick = callbackFunction || deleteTemplate;
 
-		this.props.navigate('/template');
-		this.props.clearTemplateProcessing();
-	};
-
-	/**
-	 * @since 4.1
-	 */
-	render() {
-		const callback = this.props.callbackFunction
-			? this.props.callbackFunction
-			: this.deleteTemplate;
-
-		return (
-			<button
-				data-test="component-templateDeleteButton"
-				type="button"
-				onClick={callback}
-				className="button button-secondary delete-theme ed_button"
-				aria-label={this.props.buttonText + ' ' + GFPDF.template}
-			>
-				{this.props.buttonText}
-			</button>
-		);
-	}
-}
-
-/**
- * Map Redux state to props
- *
- * @param { Object } state
- * @param { Object } state.template
- *
- * @return {{ getTemplateProcessing: string }} mapped state
- *
- * @since 5.2
- */
-const mapStateToProps = (state) => ({
-	getTemplateProcessing: state.template.templateProcessing,
-});
-
-/**
- * Map actions to props
- *
- * @param { Function } dispatch Redux dispatcher
- *
- * @return {{
- * addTemplate: Function,
- * onTemplateDelete: Function,
- * templateProcessing: Function,
- * clearTemplateProcessingValue: Function
- * }} mapped dispatch
- *
- * @since 4.1
- */
-export const mapDispatchToProps = (dispatch) => {
-	return {
-		addTemplate: (template) => {
-			dispatch(addTemplate(template));
-		},
-
-		onTemplateDelete: (id) => {
-			dispatch(deleteTemplate(id));
-		},
-
-		templateProcessing: (templateId) => {
-			dispatch(templateProcessing(templateId));
-		},
-
-		clearTemplateProcessing: () => {
-			dispatch(clearTemplateProcessing());
-		},
-	};
+	return (
+		<button
+			data-test="component-templateDeleteButton"
+			type="button"
+			onClick={handleClick}
+			className="button button-secondary delete-theme ed_button"
+			aria-label={buttonText + ' ' + GFPDF.template}
+		>
+			{buttonText}
+		</button>
+	);
 };
 
-/**
- * Maps our Redux store to our React component
- *
- * @since 4.1
- */
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(TemplateDeleteButton);
+TemplateDeleteButton.propTypes = {
+	template: PropTypes.object,
+	callbackFunction: PropTypes.func,
+	navigate: PropTypes.func,
+	buttonText: PropTypes.string,
+	templateConfirmDeleteText: PropTypes.string,
+	templateDeleteErrorText: PropTypes.string,
+};
+
+export default TemplateDeleteButton;

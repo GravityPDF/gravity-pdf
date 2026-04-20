@@ -1,17 +1,25 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { findByTestAttr } from '../../testUtils';
+import { render } from '@testing-library/react';
+import { findByTestAttr } from '../../testUtilsRTL';
 import TemplateHeaderTitle from '../../../../../src/assets/js/react/components/Template/TemplateHeaderTitle';
 
 describe('Template - TemplateHeaderTitle.js', () => {
-	const wrapper = shallow(<TemplateHeaderTitle header={'Sample Text'} />);
-	const component = findByTestAttr(wrapper, 'component-templateHeaderTitle');
-
 	test('renders <TemplateHeaderTitle /> component', () => {
-		expect(component.length).toBe(1);
+		const { container } = render(
+			<TemplateHeaderTitle header="Sample Text" />
+		);
+		expect(
+			findByTestAttr(container, 'component-templateHeaderTitle')
+		).toBeInTheDocument();
 	});
 
 	test('renders component text', () => {
-		expect(component.text()).toBe('Sample Text');
+		const { container } = render(
+			<TemplateHeaderTitle header="Sample Text" />
+		);
+		expect(
+			findByTestAttr(container, 'component-templateHeaderTitle')
+				.textContent
+		).toBe('Sample Text');
 	});
 });
