@@ -1,11 +1,9 @@
 /* Dependencies */
 import { lazy, Suspense, createRoot } from '@wordpress/element';
 import { Routes as Switch, Route } from 'react-router-dom';
-import watch from 'redux-watch';
-/* Redux store */
-import { getStore } from '../store';
-/* Redux actions */
-import { selectTemplate, updateSelectBox } from '../actions/templates';
+import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
+/* Store name */
+import { TEMPLATE_STORE_NAME } from '../store/templateStore';
 /* Routes */
 import templateRouter from '../router/templateRouter';
 /* Helpers */
@@ -26,19 +24,15 @@ const TemplateButton = lazy(
  * @since       4.1
  */
 
-type Store = ReturnType<typeof getStore>;
-
 /**
  * Handles the loading of our Fancy Template Selector
  *
- * @param $templateField
+ * @param templateField
  * @since 4.1
  */
-export function templateBootstrap($templateField: JQuery): void {
-	const store = getStore();
-
+export function templateBootstrap(templateField: HTMLSelectElement): void {
 	/* Create our button container and render our component in it */
-	createTemplateMarkup($templateField);
+	createTemplateMarkup(templateField);
 
 	const container = document.getElementById('gpdf-advance-template-selector');
 
@@ -57,13 +51,13 @@ export function templateBootstrap($templateField: JQuery): void {
 	);
 
 	/* Mount our router */
-	templateRouter(store);
+	templateRouter();
 
 	/*
-	 * Listen for Redux store updates and do DOM updates
+	 * Listen for @wordpress/data store updates and do DOM updates
 	 */
-	activeTemplateStoreListener(store, $templateField);
-	templateChangeStoreListener(store, $templateField);
+	activeTemplateStoreListener(templateField);
+	templateChangeStoreListener(templateField);
 }
 
 const TemplateButtonWithRouter = withRouterHooks(TemplateButton);
@@ -71,46 +65,55 @@ const TemplateButtonWithRouter = withRouterHooks(TemplateButton);
 /**
  * Dynamically add the required markup to attach our React components to.
  *
- * @param $templateField
+ * @param templateField
  * @since 4.1
  */
-export function createTemplateMarkup($templateField: JQuery): void {
-	$templateField
-		.wrap('<div id="gfpdf-settings-field-wrapper-template-container" />')
-		.parent()
-		.append('<span id="gpdf-advance-template-selector">')
-		.append('<div id="gfpdf-overlay" class="theme-overlay">');
+export function createTemplateMarkup(templateField: HTMLSelectElement): void {
+	const wrapper = document.createElement('div');
+	wrapper.id = 'gfpdf-settings-field-wrapper-template-container';
+	templateField.parentNode!.insertBefore(wrapper, templateField);
+	wrapper.appendChild(templateField);
+
+	const selectorSpan = document.createElement('span');
+	selectorSpan.id = 'gpdf-advance-template-selector';
+	wrapper.appendChild(selectorSpan);
+
+	const overlayDiv = document.createElement('div');
+	overlayDiv.id = 'gfpdf-overlay';
+	overlayDiv.className = 'theme-overlay';
+	wrapper.appendChild(overlayDiv);
 }
 
 /**
- * Listen for updates to the template.activeTemplate data in our Redux store
+ * Listen for updates to the template.activeTemplate data in our @wordpress/data store
  * and update the select box value based on this change. Also, listen for changes
  * to our select box and update the store when needed.
  *
- * @param store
- * @param $templateField
+ * @param templateField
  * @since 4.1
  */
 export function activeTemplateStoreListener(
-	store: Store,
-	$templateField: JQuery
+	templateField: HTMLSelectElement
 ): void {
-	/* Watch our store for changes */
-	const w = watch<string>(store.getState, 'template.activeTemplate');
-	store.subscribe(
-		w((template) => {
-			/* Check store and DOM are different to prevent any update recursions */
-			if ($templateField.val() !== template) {
-				$templateField.val(template).trigger('change');
-			}
-		})
-	);
+	let prevActiveTemplate = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
 
-	/* Watch our DOM for changes */
-	$templateField[0].addEventListener('change', () => {
-		/* Check store and DOM are different to prevent any update recursions */
-		if ($templateField.val() !== store.getState().template.activeTemplate) {
-			store.dispatch(selectTemplate($templateField.val() as string));
+	/* Watch store for changes */
+	subscribe(() => {
+		const activeTemplate = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
+		if (activeTemplate !== prevActiveTemplate) {
+			prevActiveTemplate = activeTemplate;
+			if (templateField.value !== activeTemplate) {
+				templateField.value = activeTemplate;
+				templateField.dispatchEvent(new Event('change'));
+			}
+		}
+	}, TEMPLATE_STORE_NAME);
+
+	/* Watch DOM for changes */
+	templateField.addEventListener('change', () => {
+		const activeTemplate = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
+		if (templateField.value !== activeTemplate) {
+			void wpDispatch(TEMPLATE_STORE_NAME).selectTemplate(templateField.value);
 		}
 	});
 }
@@ -120,44 +123,29 @@ export function activeTemplateStoreListener(
  * rebuild this. Instead of duplicating the code on both server and client side we do an AJAX call to
  * get the new select box HTML when the template.list length changes and update the DOM accordingly.
  *
- * @param store
- * @param $templateField
+ * @param templateField
  * @since 4.1
  */
 export function templateChangeStoreListener(
-	store: Store,
-	$templateField: JQuery
+	templateField: HTMLSelectElement
 ): void {
-	/* Track the initial list size */
-	let listCount = store.getState().template.list.length;
+	let prevListLength = (select(TEMPLATE_STORE_NAME).getList() as unknown[]).length;
+	let prevSelectBoxText = select(TEMPLATE_STORE_NAME).getUpdateSelectBoxText() as string;
 
-	/* Watch our store for changes */
-	const w = watch<{ length: number }>(store.getState, 'template.list');
-	store.subscribe(
-		w((list) => {
-			/* Only update if the list size differs from what we expect */
-			if (listCount !== list.length) {
-				/* update the list size so we don't run it twice */
-				listCount = list.length;
+	subscribe(() => {
+		const list = select(TEMPLATE_STORE_NAME).getList() as unknown[];
+		const updateSelectBoxText = select(TEMPLATE_STORE_NAME).getUpdateSelectBoxText() as string;
 
-				/* Dispatch Redux Action for an AJAX call to get the new Select Box DOM */
-				store.dispatch(updateSelectBox());
+		if (list.length !== prevListLength) {
+			prevListLength = list.length;
+			void wpDispatch(TEMPLATE_STORE_NAME).updateSelectBox();
+		}
 
-				/* Watch our store for changes */
-				const watchSelectBoxText = watch<string>(
-					store.getState,
-					'template.updateSelectBoxText'
-				);
-				store.subscribe(
-					watchSelectBoxText((updateSelectBoxText) => {
-						/* Update $templateField */
-						$templateField
-							.html(updateSelectBoxText)
-							.val(store.getState().template.activeTemplate)
-							.trigger('chosen:updated');
-					})
-				);
-			}
-		})
-	);
+		if (updateSelectBoxText && updateSelectBoxText !== prevSelectBoxText) {
+			prevSelectBoxText = updateSelectBoxText;
+			templateField.innerHTML = updateSelectBoxText;
+			templateField.value = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
+			templateField.dispatchEvent(new CustomEvent('chosen:updated'));
+		}
+	}, TEMPLATE_STORE_NAME);
 }

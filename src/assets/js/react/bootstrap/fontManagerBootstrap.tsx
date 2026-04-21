@@ -3,8 +3,6 @@ import { lazy, Suspense, createRoot } from '@wordpress/element';
 import { Route, Routes } from 'react-router-dom';
 /* Routes */
 import { fontManagerRouter } from '../router/fontManagerRouter';
-/* Redux store */
-import { getStore } from '../store';
 /* Helpers */
 import withRouterHooks from '../utilities/withRouterHooks';
 /* Components */
@@ -32,7 +30,6 @@ export function fontManagerBootstrap(
 	defaultFontField: Element,
 	buttonStyle?: string
 ): void {
-	const store = getStore();
 	/* Prevent button reset styling on tools tab */
 	const preventButtonReset = !buttonStyle ? '' : buttonStyle;
 
@@ -55,7 +52,7 @@ export function fontManagerBootstrap(
 		</Suspense>
 	);
 
-	fontManagerRouter(store);
+	fontManagerRouter();
 }
 
 const AdvancedButtonWithRouter = withRouterHooks(AdvancedButton);

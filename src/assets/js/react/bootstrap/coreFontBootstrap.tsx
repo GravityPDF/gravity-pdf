@@ -1,8 +1,5 @@
 /* Dependencies */
 import { lazy, Suspense, createRoot } from '@wordpress/element';
-import { Provider } from 'react-redux';
-/* Redux store */
-import { getStore } from '../store';
 /* Routes */
 const Routes = lazy(() => import('../router/coreFontRouter'));
 
@@ -25,15 +22,12 @@ export default function coreFontBootstrap(): void {
 		'gfpdf-button-wrapper-install_core_fonts'
 	);
 	const button = container!.getElementsByTagName('button')[0];
-	const store = getStore();
 
 	const root = createRoot(container!);
 
 	root.render(
 		<Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
-			<Provider store={store}>
-				<Routes button={button} />
-			</Provider>
+			<Routes button={button} />
 		</Suspense>
 	);
 }

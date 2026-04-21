@@ -40,6 +40,16 @@ import { CoreFontState, ConsoleLine } from '../types';
 
 export const CORE_FONTS_STORE_NAME = 'gravity-pdf/core-fonts' as const;
 
+export const coreFontInitialState: CoreFontState = {
+	buttonClicked: false,
+	fontList: [],
+	console: {},
+	retry: [],
+	getFilesFromGitHubFailed: '',
+	requestDownload: '',
+	downloadCounter: 0,
+};
+
 type ThunkArgs = { dispatch: (action: unknown) => unknown };
 
 function taggedThunk<TArgs extends unknown[]>(
@@ -54,17 +64,7 @@ function taggedThunk<TArgs extends unknown[]>(
 }
 
 export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
-	const defaultInitial: CoreFontState = {
-		buttonClicked: false,
-		fontList: [],
-		console: {},
-		retry: [],
-		getFilesFromGitHubFailed: '',
-		requestDownload: '',
-		downloadCounter: 0,
-	};
-
-	const initial: CoreFontState = { ...defaultInitial, ...overrideInitial };
+	const initial: CoreFontState = { ...coreFontInitialState, ...overrideInitial };
 
 	function reducer(
 		state: CoreFontState = initial,

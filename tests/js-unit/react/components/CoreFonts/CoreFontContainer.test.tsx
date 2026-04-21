@@ -5,7 +5,7 @@ import {
 	createTestStore,
 } from '../../testUtilsRTL';
 import CoreFontContainer from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontContainer';
-import { initialState as coreFontInitialState } from '../../../../../src/assets/js/react/reducers/coreFontReducer';
+import { coreFontInitialState } from '../../../../../src/assets/js/react/store/coreFontsStore';
 import { DOWNLOAD_FONTS_API_CALL } from '../../../../../src/assets/js/react/actions/coreFonts';
 
 jest.mock('../../../../../src/assets/js/react/api/coreFonts', () => ({

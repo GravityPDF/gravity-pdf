@@ -1,33 +1,18 @@
 /* Dependencies */
 import { lazy, Suspense, createRoot } from '@wordpress/element';
-import { Provider } from 'react-redux';
 import { Routes as Switch, Route } from 'react-router-dom';
 /* Components */
 import Empty from '../components/Empty';
 import CustomHashRouter from '../components/CustomHashRouter';
 import withRouterHooks from '../utilities/withRouterHooks';
-/* Store */
-import { getStore } from '../store';
 const TemplateList = lazy(() => import('../components/Template/TemplateList'));
 const TemplateSingle = lazy(
 	() => import('../components/Template/TemplateSingle')
 );
 
 /**
- * React Router v3 Routes with our Redux store integrated
- *
- * Once React Router v4 becomes stable we'll update as required, or if we need to decouple our
- * routes for another module.
- *
- * @package			Gravity PDF
- * @copyright   Copyright (c) 2026, Blue Liquid Designs
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.1
- */
-
-/**
- * Contains the React Router Routes for our Advanced Template Selector.
- * We are using hashHistory instead of browserHistory so as not to affect the backend
+ * React Router Routes for our Advanced Template Selector.
+ * We are using hashHistory instead of browserHistory so as not to affect the backend.
  *
  * Routes include:
  *
@@ -35,8 +20,12 @@ const TemplateSingle = lazy(
  * /template/:id (../components/TemplateSingle)
  * All other routes (../components/Empty)
  *
- * @since 4.1
+ * @package			Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       4.1
  */
+
 export const Routes = (): JSX.Element => (
 	<Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
 		<CustomHashRouter>
@@ -106,21 +95,15 @@ export const Routes = (): JSX.Element => (
 const TemplateSingleWithRouter = withRouterHooks(TemplateSingle);
 
 /**
- * Setup React Router with our Redux Store
+ * Setup React Router for the Template Selector — no Provider needed,
+ * components read state directly from the @wordpress/data global registry.
  *
- * @param store
  * @since 4.1
  */
-export default function TemplatesRouter(
-	store: ReturnType<typeof getStore>
-): void {
+export default function TemplatesRouter(): void {
 	const container = document.getElementById('gfpdf-overlay');
 
 	const root = createRoot(container!);
 
-	root.render(
-		<Provider store={store}>
-			<Routes />
-		</Provider>
-	);
+	root.render(<Routes />);
 }

@@ -1,5 +1,7 @@
 /* Dependencies */
 import domReady from '@wordpress/dom-ready';
+/* Store — register all @wordpress/data stores before any bootstrap runs */
+import './store';
 /* Bootstrap */
 import { templateBootstrap } from './bootstrap/templateBootstrap';
 import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap';
@@ -42,15 +44,13 @@ domReady(() => {
 			window.Promise = Promise;
 		}
 
-		/* Check if we should show the Fancy Template Picker */
-		const templateId =
-			'#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]';
-		// jQuery is a WordPress global; $templateField typing stays JQuery until PR 2 refactors templateBootstrap
-		const $templateField = jQuery(templateId);
+		/* A given admin page renders only one of these selects at a time */
+		const templateField = document.querySelector<HTMLSelectElement>(
+			'#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]'
+		);
 
-		/* Run this code if the element exists */
-		if ($templateField.length > 0) {
-			templateBootstrap($templateField);
+		if (templateField) {
+			templateBootstrap(templateField);
 		}
 	}
 
