@@ -1,7 +1,6 @@
 /* Dependencies */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { sprintf } from 'sprintf-js';
 /* Components */
 import FontVariant from './FontVariant';
 import AddUpdateFontFooter from './AddUpdateFontFooter';
@@ -58,26 +57,22 @@ export const UpdateFont = ({
 	tabIndexFontFiles,
 	tabIndexFooterButtons,
 }) => {
-	// %s is found inside fontManagerFontNameLabel which is not detected by eslint
-	// eslint-disable-next-line @wordpress/valid-sprintf
-	const fontNameLabel = sprintf(
-		GFPDF.fontManagerFontNameLabel,
-		"<span class='required'>",
-		'</span>'
-	);
-
 	return (
 		<div data-test="component-UpdateFont" className="update-font">
-			<form onSubmit={onHandleSubmit}>
+			<form name="component-PDF-UpdateFont" onSubmit={onHandleSubmit}>
 				<h2>{GFPDF.fontManagerUpdateTitle}</h2>
 
 				<p>{GFPDF.fontManagerUpdateDesc}</p>
 
 				<label
-					htmlFor="gfpdf-font-name-input"
-					dangerouslySetInnerHTML={{ __html: fontNameLabel }}
-					aria-label={fontNameLabel}
-				/>
+					htmlFor="gfpdf-update-font-name-input"
+					aria-label={GFPDF.fontManagerFontNameLabel}
+				>
+					{GFPDF.fontManagerFontNameLabel}{' '}
+					<span className="required">
+						{GFPDF.fontManagerRequiredLabel}
+					</span>
+				</label>
 
 				<p id="gfpdf-font-name-desc-update">
 					{GFPDF.fontManagerFontNameDesc}
@@ -105,11 +100,8 @@ export const UpdateFont = ({
 					)}
 				</div>
 
-				<label
-					id="gfpdf-font-files-label-update"
-					htmlFor="gfpdf-font-files-label-update"
-					aria-labelledby="gfpdf-font-files-description-update"
-				>
+				{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+				<label id="gfpdf-font-files-label-update">
 					{GFPDF.fontManagerFontFilesLabel}
 				</label>
 
@@ -128,6 +120,7 @@ export const UpdateFont = ({
 				/>
 
 				<AddUpdateFontFooter
+					type="update"
 					id={id}
 					label={label}
 					disabled={disableUpdateButton}

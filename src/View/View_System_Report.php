@@ -80,6 +80,7 @@ class View_System_Report extends Helper_Abstract_View {
 		$output .= ( $memory >= 128 ) ? $this->markup_yes : $this->markup_warning;
 		if ( $memory < 128 ) {
 			$output .= '<br />';
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 			$output .= sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %1$sFind out how to increase this limit%2$s.', 'gravity-pdf' ), '<br /><a href="https://docs.gravitypdf.com/users/increasing-memory-limit">', '</a>' );
 		}
 
@@ -93,6 +94,7 @@ class View_System_Report extends Helper_Abstract_View {
 		$output = $allow_url_fopen ? $this->markup_yes : $this->markup_warning;
 
 		if ( ! $allow_url_fopen ) {
+			/* translators: 1: Opening <a><code> tags, 2: Closing </code></a> tags */
 			$output .= ' ' . sprintf( esc_html__( 'We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s is disabled.', 'gravity-pdf' ), '<a href="https://www.php.net/manual/en/filesystem.configuration.php#ini.allow-url-fopen"><code>', '</code></a>' );
 			$output .= ' ' . esc_html__( 'You may notice image display issues in your PDFs. Contact your web hosting provider for assistance enabling this feature.', 'gravity-pdf' );
 		}
@@ -108,6 +110,7 @@ class View_System_Report extends Helper_Abstract_View {
 
 		if ( ! $is_protected ) {
 			$output .= ' ' . sprintf( esc_html__( "Gravity PDF's temporary directory is publicly accessible.", 'gravity-pdf' ) );
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 			$output .= ' ' . sprintf( esc_html__( 'It is recommended to %1$smove the folder outside the public server directory%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/">', '</a>' );
 		}
 
@@ -124,6 +127,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @since 6.0
 	 */
 	public function get_template_check_message( string $path, string $template_version, string $core_version ): array {
+		/* translators: 1: Template file path, 2: Current template version (wrapped in styled <span>), 3: Latest core version */
 		$message = sprintf( esc_html__( '%1$s version %2$s is out of date. The core version is %3$s', 'gravity-pdf' ), $path, '<span style="color: #ff0000;font-weight:bold">' . $template_version . '</span>', $core_version );
 
 		$export_message = sprintf( '%1$s version %2$s is out of date. The core version is %3$s', $path, $template_version, $core_version );

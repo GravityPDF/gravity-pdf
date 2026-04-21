@@ -2540,6 +2540,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		array_map(
 			function ( $item ) use ( $form ) {
+				/* translators: %d: page number */
 				$item->label   = sprintf( esc_html__( 'Page %d', 'gravity-pdf' ), $item->pageNumber );
 				$item->content = $form['pagination']['pages'][ $item->pageNumber - 1 ] ?? '';
 			},

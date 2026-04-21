@@ -68,18 +68,9 @@ export function* getCustomFontList() {
 }
 
 /**
- * A watcher that get triggered when a new add font request is submitted
- *
- * @since 6.0
- */
-export function* watchAddFont() {
-	yield takeLatest(ADD_FONT, addFont);
-}
-
-/**
  * A watcher that get triggered when custom font list is successfully requested
  *
- * @since 6.14.2
+ * @since 6.0
  */
 export function* watchGetCustomFontListSuccess() {
 	yield takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, function (response) {
@@ -87,6 +78,15 @@ export function* watchGetCustomFontListSuccess() {
 
 		associatedFontManagerSelectBox(fontList);
 	});
+}
+
+/**
+ * A watcher that get triggered when a new add font request is submitted
+ *
+ * @since 6.0
+ */
+export function* watchAddFont() {
+	yield takeLatest(ADD_FONT, addFont);
 }
 
 /**
@@ -155,8 +155,8 @@ export function* watchEditFont() {
 /**
  * Generate response for edit font request
  *
- * @param {Object}                                                                                                   params
- * @param {{ id: string, font: { label: string, regular?: File, italics?: File, bold?: File, bolditalics?: File } }} params.payload
+ * @param {Object}                                                                                                                           params
+ * @param {{ id: string, font: { label: string, regular: string|File, italics: string|File, bold: string|File, bolditalics: string|File } }} params.payload
  *
  * @since 6.0
  */

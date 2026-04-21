@@ -261,6 +261,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$is_canonical_release             = is_file( plugin_dir_path( GPDF_PLUGIN_FILE ) . 'gravity-pdf-updater.php' );
 		$is_not_canonical_release_message = wp_kses(
 			sprintf(
+				/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 				__( 'In order to get updates direct from GravityPDF.com %1$syou need to perform a one-time download of the plugin%2$s.', 'gravity-pdf' ),
 				'<a href="https://gravitypdf.com/news/installing-and-upgrading-to-the-canonical-version-of-gravity-pdf/">',
 				'</a>',

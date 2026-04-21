@@ -180,14 +180,19 @@ class Helper_Data {
 		return [
 			'active'              => __( 'Your support license key has been activated for this domain.', 'gravity-pdf' ),
 			'valid'               => __( 'Your support license key has been activated for this domain.', 'gravity-pdf' ),
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag. Note: %%s is a placeholder for the expiry date filled in later. */
 			'expired'             => sprintf( __( 'This license key expired on %%s. %1$sPlease renew your license to continue receiving updates and support%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 			'revoked'             => sprintf( __( 'This license key has been cancelled (most likely due to a refund request). %1$sPlease consider purchasing a new license%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
 			'disabled'            => sprintf( __( 'This license key has been cancelled (most likely due to a refund request). %1$sPlease consider purchasing a new license%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
 			'missing'             => __( 'This license key is invalid. Please check your key has been entered correctly.', 'gravity-pdf' ),
 			'invalid'             => __( 'The license key is invalid. Please check your key has been entered correctly.', 'gravity-pdf' ),
 			'site_inactive'       => __( 'Your license key is valid but does not match your current domain. This usually occurs if your domain URL changes. Please resave the settings to activate the license for this website.', 'gravity-pdf' ),
+			/* translators: %s: add-on name */
 			'item_name_mismatch'  => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-pdf' ), $addon_name ),
+			/* translators: %s: add-on name */
 			'invalid_item_id'     => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-pdf' ), $addon_name ),
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 			'no_activations_left' => sprintf( __( 'This license key has reached its activation limit. %1$sPlease upgrade your license to increase the site limit (you only pay the difference)%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
 			'default'             => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
 			'generic'             => __( 'An unknown error occurred while checking the license.', 'gravity-pdf' ),
@@ -267,7 +272,9 @@ class Helper_Data {
 				'noResultText'                         => esc_html__( "It doesn't look like there are any topics related to your issue.", 'gravity-pdf' ),
 				'getSearchResultError'                 => esc_html__( 'An error occurred. Please try again', 'gravity-pdf' ),
 
+				/* translators: %s: minimum required Gravity PDF version number */
 				'requiresGravityPdfVersion'            => esc_html__( 'Requires Gravity PDF v%s', 'gravity-pdf' ),
+				/* translators: %s: minimum required Gravity PDF version number */
 				'templateNotCompatibleWithGravityPdfVersion' => esc_html__( 'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.', 'gravity-pdf' ),
 				'templateDetails'                      => esc_html__( 'Template Details', 'gravity-pdf' ),
 				'currentTemplate'                      => esc_html__( 'Current Template', 'gravity-pdf' ),
@@ -279,15 +286,20 @@ class Helper_Data {
 				'templateSuccessfullyUpdated'          => esc_html__( 'Template successfully updated', 'gravity-pdf' ),
 				'templateSuccessfullyInstalledUpdated' => esc_html__( 'PDF Template(s) Successfully Installed / Updated', 'gravity-pdf' ),
 				'problemWithTheUpload'                 => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-pdf' ),
+				/* translators: %s: newline characters separating the two sentences */
 				'doYouWantToDeleteTemplate'            => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-pdf' ), "\n\n" ),
 				'couldNotDeleteTemplate'               => esc_html__( 'Could not delete template.', 'gravity-pdf' ),
 				'templateInstallInstructions'          => esc_html__( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-pdf' ),
 
 				'coreFontSuccess'                      => esc_html__( 'ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-pdf' ),
+				/* translators: %s: number of fonts that failed to install */
 				'coreFontError'                        => esc_html__( '%s CORE FONT(S) DID NOT INSTALL CORRECTLY', 'gravity-pdf' ),
 				'coreFontGithubError'                  => esc_html__( 'Could not download Core Font list. Try again.', 'gravity-pdf' ),
+				/* translators: %s: font name */
 				'coreFontItemPendingMessage'           => esc_html__( 'Downloading %s...', 'gravity-pdf' ),
+				/* translators: %s: font name */
 				'coreFontItemSuccessMessage'           => esc_html__( 'Completed installation of %s', 'gravity-pdf' ),
+				/* translators: %s: font name */
 				'coreFontItemErrorMessage'             => esc_html__( 'Failed installation of %s', 'gravity-pdf' ),
 				'coreFontCounter'                      => esc_html__( 'Fonts remaining:', 'gravity-pdf' ),
 				'coreFontRetry'                        => esc_html__( 'Retry Failed Downloads?', 'gravity-pdf' ),
@@ -299,7 +311,6 @@ class Helper_Data {
 				'fontListInstalledFonts'               => esc_html__( 'Installed Fonts', 'gravity-pdf' ),
 				'fontUserDefinedGroup'                 => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
 				'fontListRegular'                      => esc_html__( 'Regular', 'gravity-pdf' ),
-				'fontListRegularRequired'              => esc_html__( 'Regular %1$s(required)%2$s', 'gravity-pdf' ),
 				'fontListItalics'                      => esc_html__( 'Italics', 'gravity-pdf' ),
 				'fontListBold'                         => esc_html__( 'Bold', 'gravity-pdf' ),
 				'fontListBoldItalics'                  => esc_html__( 'Bold Italics', 'gravity-pdf' ),
@@ -307,7 +318,8 @@ class Helper_Data {
 				'fontManagerUpdateTitle'               => esc_html__( 'Update Font', 'gravity-pdf' ),
 				'fontManagerAddDesc'                   => esc_html__( 'Install new fonts for use in your PDF documents.', 'gravity-pdf' ),
 				'fontManagerUpdateDesc'                => esc_html__( 'Once saved, PDFs configured to use this font will have your changes applied automatically for newly-generated documents.', 'gravity-pdf' ),
-				'fontManagerFontNameLabel'             => esc_html__( 'Font Name %1$s(required)%2$s', 'gravity-pdf' ),
+				'fontManagerFontNameLabel'             => esc_html__( 'Font Name', 'gravity-pdf' ),
+				'fontManagerRequiredLabel'             => esc_html__( '(required)', 'gravity-pdf' ),
 				'fontManagerFontNameDesc'              => esc_html__( 'The font name can only contain letters, numbers and spaces.', 'gravity-pdf' ),
 				'fontManagerFontNameValidationError'   => esc_html__( 'Please choose a name contains letters and/or numbers (and a space if you want it).', 'gravity-pdf' ),
 				'fontManagerFontFilesLabel'            => esc_html__( 'Font Files', 'gravity-pdf' ),
@@ -316,7 +328,9 @@ class Helper_Data {
 				'fontManagerTemplateTooltipLabel'      => esc_html__( 'View template usage', 'gravity-pdf' ),
 				'fontManagerCancelButtonText'          => esc_html__( '← Cancel', 'gravity-pdf' ),
 				'fontManagerDeleteFontConfirmation'    => esc_html__( 'Are you sure you want to delete this font?', 'gravity-pdf' ),
+				/* translators: 1: Opening <a> tag (custom template link), 2: Opening <a> tag (font setting link), 3: Closing </a> tag */
 				'fontManagerTemplateTooltipDesc'       => esc_html__( 'Add this snippet %1$sin a custom template%3$s to selectively set the font on blocks of text. If you want to apply the font to the entire PDF, %2$suse the Font setting%3$s when configuring the PDF on the form.', 'gravity-pdf' ),
+				'fontManagerAddFontAriaLabel'          => esc_html__( 'Add font', 'gravity-pdf' ),
 				'fontManagerUpdateFontAriaLabel'       => esc_html__( 'Update font', 'gravity-pdf' ),
 				'fontManagerSelectFontAriaLabel'       => esc_html__( 'Select font', 'gravity-pdf' ),
 				'fontManagerDeleteFontAriaLabel'       => esc_html__( 'Delete font', 'gravity-pdf' ),
@@ -326,9 +340,12 @@ class Helper_Data {
 				'searchResultEmpty'                    => esc_html__( 'No fonts matching your search found.', 'gravity-pdf' ),
 				'searchClear'                          => esc_html__( 'Clear Search.', 'gravity-pdf' ),
 				'addUpdateFontSuccess'                 => esc_html__( 'Your font has been saved.', 'gravity-pdf' ),
+				/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
 				'addUpdateFontError'                   => esc_html__( '%1$sThe action could not be completed.%2$s Resolve the highlighted issues above and then try again.', 'gravity-pdf' ),
 				'addFatalError'                        => esc_html__( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
+				/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
 				'fontFileMissing'                      => esc_html__( '%1$sFont file(s) missing from the server.%2$s Please upload the font(s) again and then save.', 'gravity-pdf' ),
+				/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
 				'fontFileInvalid'                      => esc_html__( '%1$sFont file(s) are malformed%2$s and cannot be used with Gravity PDF.', 'gravity-pdf' ),
 
 				'uninstallWarning'                     => esc_html__( "Warning! ALL Gravity PDF data, including templates, will be deleted. This cannot be undone. 'OK' to delete, 'Cancel' to stop.", 'gravity-pdf' ),

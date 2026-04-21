@@ -71,7 +71,7 @@ export function* getDownloadFonts(chan) {
 		try {
 			const response = yield call(apiPostDownloadFonts, payload);
 
-			if (Object.hasOwn(response, 'ok') && !response.ok) {
+			if (!response.body) {
 				throw response;
 			}
 

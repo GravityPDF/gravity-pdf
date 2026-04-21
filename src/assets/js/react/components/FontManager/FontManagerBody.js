@@ -279,8 +279,8 @@ export class FontManagerBody extends Component {
 	/**
 	 * Listen to font name input box field change
 	 *
-	 * @param { Event & { target: InputEvent } } e
-	 * @param { string }                         state
+	 * @param { Event }  e
+	 * @param { string } state
 	 * @since 6.0
 	 */
 	handleInputChange = (e, state) => {
@@ -596,11 +596,9 @@ export class FontManagerBody extends Component {
 						onHandleSubmit={this.handleSubmit}
 						msg={msg}
 						loading={loading}
-						tabIndexFontName={!updateFontVisible ? '145' : '-1'}
-						tabIndexFontFiles={!updateFontVisible ? '146' : '-1'}
-						tabIndexFooterButtons={
-							!updateFontVisible ? '147' : '-1'
-						}
+						tabIndexFontName={!updateFontVisible ? '0' : '-1'}
+						tabIndexFontFiles={!updateFontVisible ? '0' : '-1'}
+						tabIndexFooterButtons={!updateFontVisible ? '0' : '-1'}
 						{...this.state.addFont}
 					/>
 
@@ -616,9 +614,9 @@ export class FontManagerBody extends Component {
 						fontList={fontList}
 						msg={msg}
 						loading={loading}
-						tabIndexFontName={updateFontVisible ? '145' : '-1'}
-						tabIndexFontFiles={updateFontVisible ? '146' : '-1'}
-						tabIndexFooterButtons={updateFontVisible ? '147' : '-1'}
+						tabIndexFontName={updateFontVisible ? '0' : '-1'}
+						tabIndexFontFiles={updateFontVisible ? '0' : '-1'}
+						tabIndexFooterButtons={updateFontVisible ? '0' : '-1'}
 						{...this.state.updateFont}
 					/>
 				</div>

@@ -47,7 +47,7 @@ describe('FontManager - AddFont.js', () => {
 
 		test('render font name validation error', () => {
 			const wrapper = shallow(<AddFont {...props} />);
-			expect(wrapper.find('span.required').length).toBe(1);
+			expect(wrapper.find('span.required[role="alert"]').length).toBe(1);
 		});
 
 		test('hide font name validation error', () => {
@@ -56,7 +56,7 @@ describe('FontManager - AddFont.js', () => {
 				<AddFont {...props} validateLabel={validateLabel} />
 			);
 
-			expect(wrapper.find('span.required').length).toBe(0);
+			expect(wrapper.find('span.required[role="alert"]').length).toBe(0);
 		});
 
 		test('render font files label text', () => {

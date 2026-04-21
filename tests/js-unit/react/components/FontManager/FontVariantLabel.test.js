@@ -15,7 +15,9 @@ describe('FontManager - FontVariantLabel.js', () => {
 			);
 
 			expect(component.length).toBe(1);
-			expect(wrapper.find('span').text()).toBe('Regular');
+			expect(wrapper.find('span').first().text()).toBe(
+				'Regular (required)'
+			);
 		});
 	});
 });

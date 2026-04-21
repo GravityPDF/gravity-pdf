@@ -176,127 +176,125 @@
             }
           }
 
-          form {
-            h2 {
-              font-size: 1.8em;
-              margin: 0.5rem 0;
+          h2 {
+            font-size: 1.8em;
+            margin: 0.5rem 0;
 
-              & + p {
-                margin: 0;
+            & + p {
+              margin: 0;
+            }
+          }
+
+          label {
+            display: block;
+            margin-top: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+
+            & + p {
+              margin: 0.325rem 0;
+            }
+          }
+
+          .required {
+            color: base.$validation-error-color;
+            font-size: 0.8rem;
+          }
+
+          #gfpdf-font-files-setting {
+            display: grid;
+            grid-template-columns: 50% 50%;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+            margin: 0.75rem 0;
+            width: 96%;
+
+            a {
+              color: unset;
+
+              &:focus {
+                box-shadow: unset;
               }
             }
 
-            label {
-              display: block;
-              margin-top: 1rem;
-              font-size: 1rem;
-              font-weight: 600;
+            .drop-zone {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              border: 5px dashed base.$lighter-highlight-color;
+              height: 160px;
+              transition: all 0.3s ease-out;
 
-              & + p {
-                margin: 0.325rem 0;
-              }
-            }
+              &:hover,
+              &.active {
+                background-color: base.$lighter-highlight-color;
+                border: 5px solid base.$lighter-highlight-color;
 
-            .required {
-              color: base.$validation-error-color;
-              font-size: 0.8rem;
-            }
-
-            #gfpdf-font-files-setting {
-              display: grid;
-              grid-template-columns: 50% 50%;
-              grid-template-rows: 1fr 1fr;
-              gap: 1rem;
-              margin: 0.75rem 0;
-              width: 96%;
-
-              a {
-                color: unset;
-
-                &:focus {
-                  box-shadow: unset;
+                .dashicons {
+                  background-color: #ffffff;
+                  color: base.$highlight-color;
                 }
               }
 
-              .drop-zone {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                border: 5px dashed base.$lighter-highlight-color;
-                height: 160px;
-                transition: all 0.3s ease-out;
+              &:focus {
+                outline: none;
+                border: 5px dashed base.$default-text-color;
+              }
 
-                &:hover,
-                &.active {
-                  background-color: base.$lighter-highlight-color;
-                  border: 5px solid base.$lighter-highlight-color;
+              &.required {
+                border: 5px dashed base.$error-color;
 
-                  .dashicons {
-                    background-color: #ffffff;
-                    color: base.$highlight-color;
-                  }
-                }
-
-                &:focus {
-                  outline: none;
-                  border: 5px dashed base.$default-text-color;
-                }
-
-                &.required {
-                  border: 5px dashed base.$error-color;
-
-                  .dashicons {
-                    background-color: base.$error-color;
-                    color: #ffffff;
-                  }
-
-                  &:focus {
-                    border-color: base.$default-text-color;
-                  }
-                }
-
-                &.error {
-                  background-color: base.$validation-error-color;
-                  border-color: base.$validation-error-color;
+                .dashicons {
+                  background-color: base.$error-color;
                   color: #ffffff;
                 }
 
-                input {
-                  display: none;
+                &:focus {
+                  border-color: base.$default-text-color;
                 }
+              }
 
-                .gfpdf-font-filename {
-                  overflow: hidden;
-                  text-align: center;
+              &.error {
+                background-color: base.$validation-error-color;
+                border-color: base.$validation-error-color;
+                color: #ffffff;
+              }
 
-                  &.required {
-                    color: base.$validation-error-color;
-                  }
+              input {
+                display: none;
+              }
+
+              .gfpdf-font-filename {
+                overflow: hidden;
+                text-align: center;
+
+                &.required {
+                  color: base.$validation-error-color;
                 }
+              }
 
-                .dashicons {
-                  width: 70px;
-                  height: 70px;
-                  margin: 0.675rem;
-                  background-color: base.$lighter-highlight-color;
-                  border-radius: 50%;
-                  font-size: 3.2rem;
-                  color: base.$highlight-color;
-                  cursor: pointer;
+              .dashicons {
+                width: 70px;
+                height: 70px;
+                margin: 0.675rem;
+                background-color: base.$lighter-highlight-color;
+                border-radius: 50%;
+                font-size: 3.2rem;
+                color: base.$highlight-color;
+                cursor: pointer;
 
-                  &:before {
-                    margin-left: -1px;
-                    vertical-align: middle;
-                  }
+                &:before {
+                  margin-left: -1px;
+                  vertical-align: middle;
                 }
+              }
 
-                .dashicons-trash {
-                  font-size: 2.9rem;
+              .dashicons-trash {
+                font-size: 2.9rem;
 
-                  &:before {
-                    margin-left: 3px;
-                  }
+                &:before {
+                  margin-left: 3px;
                 }
               }
             }

@@ -111,8 +111,7 @@ export class FontManager extends Component {
 			<div
 				data-test="component-FontManager"
 				ref={(node) => (this.container = node)}
-				// eslint-disable-next-line jsx-a11y/tabindex-no-positive
-				tabIndex="140"
+				tabIndex="0"
 			>
 				<div className="backdrop theme-backdrop" />
 				<div className="container theme-wrap font-manager">

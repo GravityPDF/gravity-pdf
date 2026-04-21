@@ -360,6 +360,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				[
 					'error' => wp_kses(
 						sprintf(
+							/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 							__( 'An unknown error occurred, and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
 							'<a href="https://gravitypdf.com/account/licenses/">',
 							'</a>'
@@ -377,6 +378,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				[
 					'error' => wp_kses(
 						sprintf(
+							/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 							__( 'An API error occurred and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
 							'<a href="https://gravitypdf.com/account/licenses/">',
 							'</a>'
@@ -422,7 +424,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return array
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function licensing_bulk_get_version_api_params( $api_params ) {
 		/* Skip if the core updater isn't initialized or there are no addons */
@@ -443,6 +445,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		$bulk_api_params = [];
 		foreach ( $products as $product ) {
+			/* skip improperly-registered plugins */
+			if ( ! $product ) {
+				continue;
+			}
+
 			$bulk_api_params[] = $product->get_version_api_params();
 		}
 
@@ -491,7 +498,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function licensing_bulk_license_check() {
 		$addons = $this->data->addon;
@@ -596,7 +603,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 *
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function run_network_update_check() {
 		if ( ! is_multisite() ) {
@@ -630,7 +637,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 4.2
-	 * @deprecated 6.14.0 Moved to Addon framework
+	 * @deprecated 6.15.0 Moved to Addon framework
 	 */
 	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key = '' ) {
 		return $addon->deactivate_license();

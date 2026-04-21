@@ -74,7 +74,7 @@ export class TemplateContainer extends Component {
 	 * container we will focus the container instead. In most cases this keeps the focus from
 	 * jumping outside our Template Container and allows for better keyboard navigation.
 	 *
-	 * @param { Event & { target: InputEvent } } e
+	 * @param { Event } e
 	 *
 	 * @since 4.1
 	 */

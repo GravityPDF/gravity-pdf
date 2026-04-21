@@ -46,7 +46,7 @@ describe('FontManager - UpdateFont.js', () => {
 		});
 
 		test('render font name validation error', () => {
-			expect(wrapper.find('span.required').length).toBe(1);
+			expect(wrapper.find('span.required[role="alert"]').length).toBe(1);
 		});
 
 		test('render <FontVariant /> component', () => {
