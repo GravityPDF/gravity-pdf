@@ -14,10 +14,9 @@ import {
 	Description,
 	Tags,
 } from './TemplateSingleComponents';
-/* Redux hooks */
-import { useAppSelector } from '../../store/hooks';
-/* Selectors */
-import getTemplates from '../../selectors/getTemplates';
+/* Store */
+import { useSelect } from '@wordpress/data';
+import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 /* Helpers */
 import withRouterHooks from '../../utilities/withRouterHooks';
 
@@ -67,8 +66,14 @@ const TemplateSingle = ({
 	groupText,
 	tagsText,
 }: Props) => {
-	const templates = useAppSelector(getTemplates);
-	const activeTemplate = useAppSelector((s) => s.template.activeTemplate);
+	const templates = useSelect(
+		(select) => select(TEMPLATE_STORE_NAME).getFilteredTemplates(),
+		[]
+	);
+	const activeTemplate = useSelect(
+		(select) => select(TEMPLATE_STORE_NAME).getActiveTemplate(),
+		[]
+	);
 
 	const id = params?.id;
 	const findCurrentTemplate = (item: { id: string }) => item.id === id;

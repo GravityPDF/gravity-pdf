@@ -4,14 +4,9 @@ import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
 /* Components */
 import ShowMessage from '../ShowMessage';
-/* Redux hooks and actions */
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import {
-	addTemplate as addTemplateAction,
-	updateTemplateParam as updateTemplateParamAction,
-	postTemplateUploadProcessing as postTemplateUploadProcessingAction,
-	clearTemplateUploadProcessing as clearTemplateUploadProcessingAction,
-} from '../../actions/templates';
+/* Store */
+import { useSelect, useDispatch } from '@wordpress/data';
+import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -53,13 +48,25 @@ const TemplateUploader = ({
 	templateSuccessfullyInstalledUpdated,
 	templateInstallInstructions,
 }: Props) => {
-	const dispatch = useAppDispatch();
-	const templates = useAppSelector((s) => s.template.list);
-	const templateUploadProcessingSuccess = useAppSelector(
-		(s) => s.template.templateUploadProcessingSuccess
+	const {
+		addTemplate,
+		updateTemplateParam,
+		postTemplateUploadProcessing,
+		clearTemplateUploadProcessing,
+	} = useDispatch(TEMPLATE_STORE_NAME);
+	const templates = useSelect(
+		(select) => select(TEMPLATE_STORE_NAME).getList(),
+		[]
 	);
-	const templateUploadProcessingError = useAppSelector(
-		(s) => s.template.templateUploadProcessingError
+	const templateUploadProcessingSuccess = useSelect(
+		(select) =>
+			select(TEMPLATE_STORE_NAME).getTemplateUploadProcessingSuccess(),
+		[]
+	);
+	const templateUploadProcessingError = useSelect(
+		(select) =>
+			select(TEMPLATE_STORE_NAME).getTemplateUploadProcessingError(),
+		[]
 	);
 
 	const [ajax, setAjax] = useState(false);
@@ -84,32 +91,28 @@ const TemplateUploader = ({
 					(item) => item.id === template.id
 				);
 				if (matched === undefined) {
-					dispatch(
-						addTemplateAction({
-							...template,
-							new: true,
-							message: installSuccessText,
-						})
-					);
+					addTemplate({
+						...template,
+						new: true,
+						message: installSuccessText,
+					});
 				} else {
-					dispatch(
-						updateTemplateParamAction(
-							template.id,
-							'message',
-							installUpdatedText ?? null
-						)
+					updateTemplateParam(
+						template.id,
+						'message',
+						installUpdatedText ?? null
 					);
 				}
 			});
 			setAjax(false);
 			setMessage(templateSuccessfullyInstalledUpdated ?? '');
-			dispatch(clearTemplateUploadProcessingAction());
+			clearTemplateUploadProcessing();
 		};
 
 		const ajaxFailed = (err: UploadErrorResponse) => {
 			setError(err?.message || genericUploadErrorText || '');
 			setAjax(false);
-			dispatch(clearTemplateUploadProcessingAction());
+			clearTemplateUploadProcessing();
 		};
 
 		const successWithTemplates =
@@ -135,7 +138,9 @@ const TemplateUploader = ({
 		installUpdatedText,
 		genericUploadErrorText,
 		templateSuccessfullyInstalledUpdated,
-		dispatch,
+		addTemplate,
+		updateTemplateParam,
+		clearTemplateUploadProcessing,
 	]);
 
 	const checkFilename = (name: string) => {
@@ -167,7 +172,7 @@ const TemplateUploader = ({
 				setError('');
 				setMessage('');
 
-				dispatch(postTemplateUploadProcessingAction(file, filename));
+				postTemplateUploadProcessing(file, filename);
 			});
 		}
 	};

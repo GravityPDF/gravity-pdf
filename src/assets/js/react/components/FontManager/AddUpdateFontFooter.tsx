@@ -1,15 +1,12 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf } from 'sprintf-js';
 /* Components */
 import Spinner from '../Spinner';
-/* Redux actions */
-import {
-	selectFont as selectFontAction,
-	deleteFont as deleteFontAction,
-} from '../../actions/fontManager';
 import TemplateTooltip from './TemplateTooltip';
+/* Store */
+import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 /* Types */
 import { FontManagerMsg } from '../../types';
 
@@ -43,13 +40,16 @@ const AddUpdateFontFooter = ({
 	loading,
 	tabIndex,
 }: Props) => {
-	const dispatch = useAppDispatch();
-	const selectedFont = useAppSelector((s) => s.fontManager.selectedFont);
+	const { selectFont, deleteFont } = useDispatch(FONT_MANAGER_STORE_NAME);
+	const selectedFont = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getSelectedFont(),
+		[]
+	);
 
 	const tabIndexNum = parseInt(tabIndex, 10);
 
 	const handleSelectFont = (fontId: string) => {
-		dispatch(selectFontAction(fontId === selectedFont ? '' : fontId));
+		selectFont(fontId === selectedFont ? '' : fontId);
 	};
 
 	const handleSelectFontKeypress = (
@@ -57,13 +57,13 @@ const AddUpdateFontFooter = ({
 		fontId: string
 	) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			dispatch(selectFontAction(fontId === selectedFont ? '' : fontId));
+			selectFont(fontId === selectedFont ? '' : fontId);
 		}
 	};
 
 	const handleDeleteFont = (fontId: string) => {
 		if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
-			dispatch(deleteFontAction(fontId));
+			deleteFont(fontId);
 		}
 	};
 
@@ -73,7 +73,7 @@ const AddUpdateFontFooter = ({
 	) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
-				dispatch(deleteFontAction(fontId));
+				deleteFont(fontId);
 			}
 		}
 	};

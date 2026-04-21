@@ -2,14 +2,8 @@
 import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-/* Redux actions */
-import {
-	clearAddFontMsg as clearAddFontMsgAction,
-	deleteFont as deleteFontAction,
-	selectFont as selectFontAction,
-	moveSelectedFontToTop as moveSelectedFontToTopAction,
-} from '../../actions/fontManager';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 /* Components */
 import FontListIcon from './FontListIcon';
 import Spinner from '../Spinner';
@@ -30,12 +24,32 @@ interface Props {
 }
 
 const FontListItems = ({ id, navigate }: Props) => {
-	const dispatch = useAppDispatch();
-	const loading = useAppSelector((s) => s.fontManager.deleteFontLoading);
-	const fontList = useAppSelector((s) => s.fontManager.fontList);
-	const searchResult = useAppSelector((s) => s.fontManager.searchResult);
-	const selectedFont = useAppSelector((s) => s.fontManager.selectedFont);
-	const msg = useAppSelector((s) => s.fontManager.msg);
+	const {
+		clearAddFontMsg,
+		deleteFont,
+		selectFont,
+		moveSelectedFontToTop,
+	} = useDispatch(FONT_MANAGER_STORE_NAME);
+	const loading = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getDeleteFontLoading(),
+		[]
+	);
+	const fontList = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getFontList(),
+		[]
+	);
+	const searchResult = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getSearchResult(),
+		[]
+	);
+	const selectedFont = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getSelectedFont(),
+		[]
+	);
+	const msg = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
+		[]
+	);
 
 	const [disableSelectFontName, setDisableSelectFontName] = useState(false);
 	const [deleteId, setDeleteId] = useState('');
@@ -74,12 +88,12 @@ const FontListItems = ({ id, navigate }: Props) => {
 
 			const fontExists =
 				fontList && fontList.filter((f) => f.id === selectBoxValue)[0];
-			dispatch(selectFontAction(fontExists ? selectBoxValue : ''));
+			selectFont(fontExists ? selectBoxValue : '');
 		}
 
 		if (selectedFont) {
 			moveSelectedFontToTopRef.current = false;
-			dispatch(moveSelectedFontToTopAction(selectedFont));
+			moveSelectedFontToTop(selectedFont);
 		}
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -116,15 +130,15 @@ const FontListItems = ({ id, navigate }: Props) => {
 			moveSelectedFontToTopRef.current
 		) {
 			moveSelectedFontToTopRef.current = false;
-			dispatch(moveSelectedFontToTopAction(selectedFont));
+			moveSelectedFontToTop(selectedFont);
 		}
-	}, [selectedFont, id, dispatch]);
+	}, [selectedFont, id, moveSelectedFontToTop]);
 
 	const handleFontClick = (fontId: string) => {
 		const { success, error } = msg;
 
 		if ((success && success.addFont) || (error && error.addFont)) {
-			dispatch(clearAddFontMsgAction());
+			clearAddFontMsg();
 		}
 
 		if (id === fontId) {
@@ -148,7 +162,7 @@ const FontListItems = ({ id, navigate }: Props) => {
 		setDeleteId(fontId);
 
 		if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
-			dispatch(deleteFontAction(fontId));
+			deleteFont(fontId);
 		}
 	};
 
@@ -162,7 +176,7 @@ const FontListItems = ({ id, navigate }: Props) => {
 	};
 
 	const handleSelectFont = (e: React.ChangeEvent<HTMLInputElement>) => {
-		dispatch(selectFontAction(e.target.value));
+		selectFont(e.target.value);
 
 		const installedFonts =
 			document.querySelectorAll<HTMLInputElement>('.select-font-name');

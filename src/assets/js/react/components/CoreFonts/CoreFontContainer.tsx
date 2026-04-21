@@ -5,17 +5,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { CoreFontListResults } from './CoreFontListResults';
 import Counter from './CoreFontCounter';
 import Spinner from '../Spinner';
-/* Redux */
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-/* Redux actions */
-import {
-	clearButtonClickedAndRetryList,
-	addToConsole,
-	getFilesFromGitHub,
-	downloadFontsApiCall,
-	clearRequestRemainingData,
-	clearConsole,
-} from '../../actions/coreFonts';
+/* Store */
+import { useSelect, useDispatch } from '@wordpress/data';
+import { CORE_FONTS_STORE_NAME } from '../../store/coreFontsStore';
 
 /**
  * @package			Gravity PDF
@@ -39,27 +31,49 @@ const CoreFontContainer = ({
 }: Props) => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const dispatch = useAppDispatch();
+	const {
+		clearButtonClickedAndRetryList,
+		addToConsole,
+		getFilesFromGitHub,
+		downloadFonts,
+		clearRequestRemainingData,
+		clearConsole,
+	} = useDispatch(CORE_FONTS_STORE_NAME);
 
-	const buttonClicked = useAppSelector(
-		(state) => state.coreFonts.buttonClicked
+	const buttonClicked = useSelect(
+		(select) => select(CORE_FONTS_STORE_NAME).getButtonClicked(),
+		[]
 	);
-	const fontList = useAppSelector((state) => state.coreFonts.fontList);
-	const getFilesFromGitHubFailed = useAppSelector(
-		(state) => state.coreFonts.getFilesFromGitHubFailed
+	const fontList = useSelect(
+		(select) => select(CORE_FONTS_STORE_NAME).getFontList(),
+		[]
 	);
-	const consoleList = useAppSelector((state) => state.coreFonts.console);
-	const retry = useAppSelector((state) => state.coreFonts.retry);
-	const requestDownload = useAppSelector(
-		(state) => state.coreFonts.requestDownload
+	const getFilesFromGitHubFailed = useSelect(
+		(select) => select(CORE_FONTS_STORE_NAME).getFilesFromGitHubFailed(),
+		[]
 	);
-	const queue = useAppSelector((state) => state.coreFonts.downloadCounter);
+	const consoleList = useSelect(
+		(select) => select(CORE_FONTS_STORE_NAME).getConsole(),
+		[]
+	);
+	const retry = useSelect(
+		(select) => select(CORE_FONTS_STORE_NAME).getRetry(),
+		[]
+	);
+	const requestDownload = useSelect(
+		(select) => select(CORE_FONTS_STORE_NAME).getRequestDownload(),
+		[]
+	);
+	const queue = useSelect(
+		(select) => select(CORE_FONTS_STORE_NAME).getDownloadCounter(),
+		[]
+	);
 
 	const [ajax, setAjax] = useState(false);
 
 	const handleGithubApiError = (error: string) => {
 		setAjax(false);
-		dispatch(addToConsole('completed', 'error', error));
+		addToConsole('completed', 'error', error);
 		navigate('/');
 	};
 
@@ -68,16 +82,16 @@ const CoreFontContainer = ({
 		error: string | null = null
 	) => {
 		if (files.length === 0) {
-			dispatch(clearButtonClickedAndRetryList());
+			clearButtonClickedAndRetryList();
 			return handleGithubApiError(error ?? '');
 		}
 
-		dispatch(clearConsole());
-		dispatch(clearButtonClickedAndRetryList());
+		clearConsole();
+		clearButtonClickedAndRetryList();
 		navigate('/');
 
 		setTimeout(
-			() => files.forEach((file) => dispatch(downloadFontsApiCall(file))),
+			() => files.forEach((file) => downloadFonts(file)),
 			300
 		);
 	};
@@ -100,13 +114,13 @@ const CoreFontContainer = ({
 	const handleTriggerFontDownload = () => {
 		if (!ajax) {
 			setAjax(true);
-			dispatch(getFilesFromGitHub());
+			getFilesFromGitHub();
 		}
 	};
 
 	const resetState = () => {
 		setAjax(false);
-		dispatch(clearRequestRemainingData());
+		clearRequestRemainingData();
 		navigate('/');
 	};
 

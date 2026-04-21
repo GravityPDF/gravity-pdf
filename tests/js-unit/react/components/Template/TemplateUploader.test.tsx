@@ -8,6 +8,27 @@ import {
 import TemplateUploader from '../../../../../src/assets/js/react/components/Template/TemplateUploader';
 import type { TemplateState } from '../../../../../src/assets/js/react/types';
 
+jest.mock('../../../../../src/assets/js/react/api/templates', () => ({
+	apiPostUpdateSelectBox: jest.fn().mockResolvedValue({
+		ok: true,
+		status: 200,
+		text: '""',
+		body: '',
+	}),
+	apiPostTemplateProcessing: jest.fn().mockResolvedValue({
+		ok: true,
+		status: 200,
+		text: '""',
+		body: '',
+	}),
+	apiPostTemplateUploadProcessing: jest.fn().mockResolvedValue({
+		ok: true,
+		status: 200,
+		text: '{}',
+		body: {},
+	}),
+}));
+
 jest.mock(
 	'react-dropzone',
 	() =>

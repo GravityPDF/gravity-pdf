@@ -2,18 +2,8 @@
 import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-/* Redux actions */
-import {
-	getCustomFontList as getCustomFontListAction,
-	addFont as addFontAction,
-	editFont as editFontAction,
-	validationError as validationErrorAction,
-	deleteVariantError as deleteVariantAction,
-	selectFont as selectFontAction,
-	clearAddFontMsg as clearAddFontMsgAction,
-	clearDropzoneError as clearDropzoneErrorAction,
-} from '../../actions/fontManager';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 /* Components */
 import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
@@ -46,10 +36,28 @@ interface Props {
 }
 
 const FontManagerBody = ({ id, navigate }: Props) => {
-	const dispatch = useAppDispatch();
-	const loading = useAppSelector((s) => s.fontManager.addFontLoading);
-	const fontList = useAppSelector((s) => s.fontManager.fontList);
-	const msg = useAppSelector((s) => s.fontManager.msg);
+	const {
+		getCustomFontList,
+		addFont,
+		editFont,
+		validationError,
+		deleteVariantError,
+		selectFont,
+		clearDropzoneError,
+		clearAddFontMsg,
+	} = useDispatch(FONT_MANAGER_STORE_NAME);
+	const loading = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getAddFontLoading(),
+		[]
+	);
+	const fontList = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getFontList(),
+		[]
+	);
+	const msg = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
+		[]
+	);
 
 	const [addFontState, setAddFontState] =
 		useState<AddUpdateFontState>(initialState);
@@ -63,7 +71,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 
 	/* componentDidMount: fetch font list, auto-open update panel if id is in URL */
 	useEffect(() => {
-		dispatch(getCustomFontListAction());
+		getCustomFontList();
 
 		if (id) {
 			addClass(document.querySelector('.update-font'), navigate, id);
@@ -127,10 +135,10 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 
 			/* Auto select new added font and open update panel */
 			const newFont = fontList[fontList.length - 1];
-			dispatch(selectFontAction(newFont.id));
+			selectFont(newFont.id);
 			toggleUpdateFont(navigate, newFont.id);
 		}
-	}, [id, fontList, msg, navigate, dispatch]);
+	}, [id, fontList, msg, navigate, selectFont]);
 
 	const handleGetCurrentColumnState = (column: string): AddUpdateFontState =>
 		column === 'addFont' ? addFontState : updateFontState;
@@ -148,7 +156,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 			if (dropZone) {
 				dropZone.classList.remove('error');
 			}
-			dispatch(clearDropzoneErrorAction(key));
+			clearDropzoneError(key);
 		}
 
 		const currentState = handleGetCurrentColumnState(state);
@@ -194,7 +202,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 		) {
 			Object.entries(msg.error.addFont).forEach(([key]) => {
 				if (fontVariant === key) {
-					dispatch(deleteVariantAction(fontVariant));
+					deleteVariantError(fontVariant);
 				}
 			});
 		}
@@ -245,7 +253,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 			return true;
 		}
 
-		dispatch(validationErrorAction());
+		validationError();
 		return false;
 	};
 
@@ -281,7 +289,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 			return;
 		}
 
-		dispatch(addFontAction({ label, ...fontStyles }));
+		addFont({ label, ...fontStyles });
 	};
 
 	const handleEditFont = (fontId: string) => {
@@ -317,22 +325,22 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 			label === currentFont.font_name &&
 			JSON.stringify(fontStyles) === JSON.stringify(currentFontStyles)
 		) {
-			dispatch(clearAddFontMsgAction());
+			clearAddFontMsg();
 			return;
 		}
 
-		dispatch(editFontAction({ id: fontId, font: { label, ...data } }));
+		editFont({ id: fontId, font: { label, ...data } });
 	};
 
 	const handleCancelEditFont = () => {
 		toggleUpdateFont(navigate);
-		dispatch(clearAddFontMsgAction());
+		clearAddFontMsg();
 	};
 
 	const handleCancelEditFontKeypress = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			toggleUpdateFont(navigate);
-			dispatch(clearAddFontMsgAction());
+			clearAddFontMsg();
 		}
 	};
 

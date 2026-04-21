@@ -147,7 +147,7 @@ describe('FontManager - FontListItems.js', () => {
 			act(() => {
 				store.dispatch({
 					type: 'DELETE_FONT_SUCCESS',
-					payload: { id: sampleFont.id },
+					payload: sampleFont.id,
 				});
 			});
 

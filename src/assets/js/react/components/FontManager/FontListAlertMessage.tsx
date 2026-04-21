@@ -1,10 +1,6 @@
 /* Dependencies */
-import { useAppDispatch } from '../../store/hooks';
-/* Redux actions */
-import {
-	getCustomFontList as getCustomFontListAction,
-	resetSearchResult as resetSearchResultAction,
-} from '../../actions/fontManager';
+import { useDispatch } from '@wordpress/data';
+import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 
 /**
  * @package     Gravity PDF
@@ -19,7 +15,8 @@ interface Props {
 }
 
 const FontListAlertMessage = ({ empty, error }: Props) => {
-	const dispatch = useAppDispatch();
+	const { resetSearchResult, getCustomFontList } =
+		useDispatch(FONT_MANAGER_STORE_NAME);
 
 	const fontListEmpty = <span>{GFPDF.fontListEmpty}</span>;
 	const searchResultEmpty = (
@@ -28,7 +25,7 @@ const FontListAlertMessage = ({ empty, error }: Props) => {
 			<button
 				type="button"
 				className="link"
-				onClick={() => dispatch(resetSearchResultAction())}
+				onClick={() => resetSearchResult()}
 			>
 				{GFPDF.searchBoxResetTitle}
 			</button>
@@ -38,7 +35,7 @@ const FontListAlertMessage = ({ empty, error }: Props) => {
 		<button
 			type="button"
 			className="link"
-			onClick={() => dispatch(getCustomFontListAction())}
+			onClick={() => getCustomFontList()}
 		>
 			{error}
 		</button>

@@ -8,6 +8,21 @@ import CoreFontContainer from '../../../../../src/assets/js/react/components/Cor
 import { initialState as coreFontInitialState } from '../../../../../src/assets/js/react/reducers/coreFontReducer';
 import { DOWNLOAD_FONTS_API_CALL } from '../../../../../src/assets/js/react/actions/coreFonts';
 
+jest.mock('../../../../../src/assets/js/react/api/coreFonts', () => ({
+	apiGetFilesFromGitHub: jest.fn().mockResolvedValue({
+		ok: true,
+		status: 200,
+		text: '[]',
+		body: [],
+	}),
+	apiPostDownloadFonts: jest.fn().mockResolvedValue({
+		ok: true,
+		status: 200,
+		text: '[]',
+		body: null,
+	}),
+}));
+
 const fontList = [
 	'AboriginalSansREGULAR.ttf',
 	'Abyssinica_SIL.ttf',
@@ -157,7 +172,9 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 		});
 
 		const downloadCalls = dispatchSpy.mock.calls.filter(
-			([action]) => action.type === DOWNLOAD_FONTS_API_CALL
+			([action]) =>
+				typeof action !== 'function' &&
+				action.type === DOWNLOAD_FONTS_API_CALL
 		);
 		expect(downloadCalls).toHaveLength(3);
 

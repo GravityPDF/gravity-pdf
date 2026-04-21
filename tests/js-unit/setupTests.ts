@@ -9,6 +9,18 @@ Object.defineProperty(global, 'TextEncoder', {
 	value: util.TextEncoder,
 });
 
+/* Provide a no-op fetch so generator actions don't crash when jsdom
+   doesn't include a native fetch implementation. Individual tests that
+   need specific API responses should mock their API modules directly. */
+if (typeof window.fetch === 'undefined') {
+	window.fetch = jest.fn().mockResolvedValue({
+		ok: true,
+		status: 200,
+		text: async () => '[]',
+		json: async () => [],
+	} as unknown as Response);
+}
+
 /* Prevent immer from freezing state objects, which would break tests that
    mutate initialState directly before passing it to reducers. */
 setAutoFreeze(false);

@@ -7,9 +7,9 @@ import ShowMessage from '../ShowMessage';
 import { TemplateDetails, Group } from './TemplateListItemComponents';
 import { Name } from './TemplateSingleComponents';
 import TemplateActivateButton from './TemplateActivateButton';
-/* Redux hooks and actions */
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { updateTemplateParam as updateTemplateParamAction } from '../../actions/templates';
+/* Store */
+import { useSelect, useDispatch } from '@wordpress/data';
+import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 /* Helpers */
 import withRouterHooks from '../../utilities/withRouterHooks';
 /* Types */
@@ -41,8 +41,11 @@ const TemplateListItem = ({
 	activateText,
 	templateDetailsText,
 }: Props) => {
-	const dispatch = useAppDispatch();
-	const activeTemplate = useAppSelector((s) => s.template.activeTemplate);
+	const { updateTemplateParam } = useDispatch(TEMPLATE_STORE_NAME);
+	const activeTemplate = useSelect(
+		(select) => select(TEMPLATE_STORE_NAME).getActiveTemplate(),
+		[]
+	);
 
 	const handleShowDetailedTemplate = () => {
 		navigate('/template/' + template.id);
@@ -60,7 +63,7 @@ const TemplateListItem = ({
 	};
 
 	const removeMessage = () => {
-		dispatch(updateTemplateParamAction(template.id, 'message', null));
+		updateTemplateParam(template.id, 'message', null);
 	};
 
 	const isActiveTemplate = activeTemplate === template?.id;

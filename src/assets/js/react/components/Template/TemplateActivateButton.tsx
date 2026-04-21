@@ -1,9 +1,9 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
-/* Redux actions */
-import { useAppDispatch } from '../../store/hooks';
-import { selectTemplate } from '../../actions/templates';
+/* Store */
+import { useDispatch } from '@wordpress/data';
+import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -24,7 +24,7 @@ interface Props {
 }
 
 const TemplateActivateButton = ({ navigate, template, buttonText }: Props) => {
-	const dispatch = useAppDispatch();
+	const { selectTemplate } = useDispatch(TEMPLATE_STORE_NAME);
 
 	const handleSelectTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
@@ -32,7 +32,7 @@ const TemplateActivateButton = ({ navigate, template, buttonText }: Props) => {
 
 		navigate('/');
 		if (template?.id) {
-			dispatch(selectTemplate(template.id));
+			selectTemplate(template.id);
 		}
 	};
 

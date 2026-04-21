@@ -5,10 +5,9 @@ import TemplateListItem from './TemplateListItem';
 import TemplateSearch from './TemplateSearch';
 import TemplateHeaderTitle from './TemplateHeaderTitle';
 import TemplateUploader from './TemplateUploader';
-/* Redux hooks */
-import { useAppSelector } from '../../store/hooks';
-/* Selectors */
-import getTemplates from '../../selectors/getTemplates';
+/* Store */
+import { useSelect } from '@wordpress/data';
+import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 /* Helpers */
 import withRouterHooks from '../../utilities/withRouterHooks';
 
@@ -55,7 +54,10 @@ const TemplateList = ({
 	templateSuccessfullyInstalledUpdated,
 	templateInstallInstructions,
 }: Props) => {
-	const templates = useAppSelector(getTemplates);
+	const templates = useSelect(
+		(select) => select(TEMPLATE_STORE_NAME).getFilteredTemplates(),
+		[]
+	);
 
 	const hasUserPrivs =
 		GFPDF.userCapabilities.administrator ||

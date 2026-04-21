@@ -98,41 +98,21 @@ describe('Selectors - getTemplates', () => {
 	describe('selector', () => {
 		test('check we get the correct results back from the actual reselect function', () => {
 			const selectorFn = selector as unknown as (
-				...args: unknown[]
+				state: unknown
 			) => TemplateItem[];
-			const state = {
-				template: {
-					list: templates,
-					search: '',
-					activeTemplate: '',
-				},
-			};
+
 			/* check the sort works */
-			let list = selectorFn(state, state, state);
+			let list = selectorFn({ list: templates, search: '', activeTemplate: '' });
 
 			expect(list[0].id).toBe('adelade');
 
 			/* check the search works */
-			const state2 = {
-				template: {
-					list: templates,
-					search: 'default',
-					activeTemplate: '',
-				},
-			};
-			list = selectorFn(state2, state2, state2);
+			list = selectorFn({ list: templates, search: 'default', activeTemplate: '' });
 
 			expect(list.length).toBe(3);
 
 			/* check the sort and search works */
-			const state3 = {
-				template: {
-					list: templates,
-					search: 'core',
-					activeTemplate: 'zadani',
-				},
-			};
-			list = selectorFn(state3, state3, state3);
+			list = selectorFn({ list: templates, search: 'core', activeTemplate: 'zadani' });
 			const checkforLast = list.length - 1;
 
 			expect(list.length).toBe(5);

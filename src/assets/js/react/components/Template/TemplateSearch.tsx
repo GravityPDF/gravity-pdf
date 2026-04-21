@@ -1,10 +1,10 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { useRef, useEffect, useMemo } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import debounce from 'lodash.debounce';
-/* Redux hooks and actions */
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { searchTemplates as searchTemplatesAction } from '../../actions/templates';
+/* Store */
+import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 
 /**
  * Handles the PDF template search functionality
@@ -16,17 +16,16 @@ import { searchTemplates as searchTemplatesAction } from '../../actions/template
  */
 
 const TemplateSearch = () => {
-	const dispatch = useAppDispatch();
-	const search = useAppSelector((s) => s.template.search);
+	const { searchTemplates } = useDispatch(TEMPLATE_STORE_NAME);
+	const search = useSelect(
+		(select) => select(TEMPLATE_STORE_NAME).getSearch(),
+		[]
+	);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const runSearch = useMemo(
-		() =>
-			debounce(
-				(value: string) => dispatch(searchTemplatesAction(value)),
-				200
-			),
-		[dispatch]
+		() => debounce((value: string) => searchTemplates(value), 200),
+		[searchTemplates]
 	);
 
 	useEffect(() => {

@@ -1,7 +1,8 @@
 /* Dependencies */
 import { useEffect, useRef } from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
-import { useAppSelector } from '../../store/hooks';
+import { useSelect } from '@wordpress/data';
+import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 /* Components */
 import FontManagerHeader from './FontManagerHeader';
 import FontManagerBody from './FontManagerBody';
@@ -21,8 +22,14 @@ interface Props {
 }
 
 const FontManager = ({ params, navigate }: Props) => {
-	const fontList = useAppSelector((s) => s.fontManager.fontList);
-	const selectedFont = useAppSelector((s) => s.fontManager.selectedFont);
+	const fontList = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getFontList(),
+		[]
+	);
+	const selectedFont = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getSelectedFont(),
+		[]
+	);
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	/* Mirror latest values in refs so unmount cleanup reads current data, not stale closure */

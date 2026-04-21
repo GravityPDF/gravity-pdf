@@ -2,14 +2,9 @@
 import * as React from '@wordpress/element';
 import { useRef, useEffect } from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
-/* Redux hooks and actions */
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import {
-	addTemplate as addTemplateAction,
-	deleteTemplate as deleteTemplateAction,
-	templateProcessing as templateProcessingAction,
-	clearTemplateProcessing as clearTemplateProcessingAction,
-} from '../../actions/templates';
+/* Store */
+import { useSelect, useDispatch } from '@wordpress/data';
+import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -42,9 +37,15 @@ const TemplateDeleteButton = ({
 	templateConfirmDeleteText,
 	templateDeleteErrorText,
 }: Props) => {
-	const dispatch = useAppDispatch();
-	const getTemplateProcessing = useAppSelector(
-		(s) => s.template.templateProcessing
+	const {
+		addTemplate,
+		deleteTemplate,
+		templateProcessing,
+		clearTemplateProcessing,
+	} = useDispatch(TEMPLATE_STORE_NAME);
+	const getTemplateProcessing = useSelect(
+		(select) => select(TEMPLATE_STORE_NAME).getTemplateProcessing(),
+		[]
 	);
 
 	/* Track previous value to replicate componentDidUpdate comparisons */
@@ -64,36 +65,35 @@ const TemplateDeleteButton = ({
 		}
 
 		if (getTemplateProcessing === 'failed') {
-			dispatch(
-				addTemplateAction({
-					...template,
-					error: templateDeleteErrorText,
-				} as TemplateItem)
-			);
+			addTemplate({
+				...template,
+				error: templateDeleteErrorText,
+			} as TemplateItem);
 			navigate('/template');
-			dispatch(clearTemplateProcessingAction());
+			clearTemplateProcessing();
 		}
 	}, [
 		getTemplateProcessing,
 		navigate,
-		dispatch,
+		addTemplate,
+		clearTemplateProcessing,
 		template,
 		templateDeleteErrorText,
 	]);
 
-	const deleteTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleDeleteTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 
 		if (window.confirm(templateConfirmDeleteText)) {
 			if (template?.id) {
-				dispatch(templateProcessingAction(template.id));
-				dispatch(deleteTemplateAction(template.id));
+				templateProcessing(template.id);
+				deleteTemplate(template.id);
 			}
 		}
 	};
 
-	const handleClick = callbackFunction || deleteTemplate;
+	const handleClick = callbackFunction || handleDeleteTemplate;
 
 	return (
 		<button

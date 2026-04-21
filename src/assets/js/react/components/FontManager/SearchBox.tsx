@@ -1,9 +1,8 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
-/* Redux actions */
-import { resetSearchResult, searchFontList } from '../../actions/fontManager';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 
 /**
  * @package     Gravity PDF
@@ -17,11 +16,16 @@ interface Props {
 }
 
 const SearchBox = ({ id }: Props) => {
-	const dispatch = useAppDispatch();
-	const searchResult = useAppSelector(
-		(state) => state.fontManager.searchResult
+	const { resetSearchResult, searchFontList } =
+		useDispatch(FONT_MANAGER_STORE_NAME);
+	const searchResult = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getSearchResult(),
+		[]
 	);
-	const msg = useAppSelector((state) => state.fontManager.msg);
+	const msg = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
+		[]
+	);
 	const [searchInput, setSearchInput] = useState('');
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,16 +57,16 @@ const SearchBox = ({ id }: Props) => {
 	useEffect(() => {
 		return () => {
 			if (lastSearchInput.current !== '') {
-				dispatch(resetSearchResult());
+				resetSearchResult();
 			}
 		};
-	}, [dispatch]);
+	}, [resetSearchResult]);
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const data = e.target.value;
 		lastSearchInput.current = data;
 		setSearchInput(data);
-		dispatch(searchFontList(data));
+		searchFontList(data);
 	};
 
 	return (

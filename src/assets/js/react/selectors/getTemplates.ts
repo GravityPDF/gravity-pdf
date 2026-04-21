@@ -15,12 +15,10 @@ import { TemplateItem, TemplateState } from '../types';
  * @since       4.1
  */
 
-/* Assign specific parts of the Redux store to constants (note, we are returning functions) */
-const getTemplates = (state: { template: TemplateState }) =>
-	state.template.list;
-const getSearch = (state: { template: TemplateState }) => state.template.search;
-const getActiveTemplate = (state: { template: TemplateState }) =>
-	state.template.activeTemplate;
+/* Input selectors — receive the template slice state directly (as used by createReduxStore) */
+const getTemplates = (state: TemplateState) => state.list;
+const getSearch = (state: TemplateState) => state.search;
+const getActiveTemplate = (state: TemplateState) => state.activeTemplate;
 
 export const searchTemplates = (
 	term: string,

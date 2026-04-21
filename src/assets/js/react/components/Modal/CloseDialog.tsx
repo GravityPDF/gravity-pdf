@@ -1,10 +1,9 @@
 /* Dependencies */
 import { useEffect } from '@wordpress/element';
 import { useNavigate, useLocation } from 'react-router-dom';
-/* Redux actions */
-import { clearAddFontMsg } from '../../actions/fontManager';
-/* Redux hooks */
-import { useAppSelector, useAppDispatch } from '../../store/hooks';
+/* Store */
+import { useSelect, useDispatch } from '@wordpress/data';
+import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 /* Utilities */
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
@@ -23,8 +22,11 @@ interface Props {
 export const CloseDialog = ({ id, closeRoute }: Props) => {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
-	const dispatch = useAppDispatch();
-	const msg = useAppSelector((state) => state.fontManager.msg);
+	const { clearAddFontMsg } = useDispatch(FONT_MANAGER_STORE_NAME);
+	const msg = useSelect(
+		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
+		[]
+	);
 
 	const handleCloseDialog = () => {
 		navigate(closeRoute || '/');
@@ -36,7 +38,7 @@ export const CloseDialog = ({ id, closeRoute }: Props) => {
 		/* Close font manager 'Update Font' column first */
 		if (e.key === 'Escape' && id) {
 			if ((success && success.addFont) || (error && error.addFont)) {
-				dispatch(clearAddFontMsg());
+				clearAddFontMsg();
 			}
 
 			return toggleUpdateFont(navigate, '', pathname);
