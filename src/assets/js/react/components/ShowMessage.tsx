@@ -1,5 +1,5 @@
 /* Dependencies */
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Renders a message or error, with the option to self-clear itself

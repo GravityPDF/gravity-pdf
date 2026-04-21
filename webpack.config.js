@@ -1,5 +1,6 @@
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 const { resolve } = require('path');
+const I18nCheckWebpackPlugin = require('@automattic/i18n-check-webpack-plugin');
 
 module.exports = {
 	...defaultConfig,
@@ -21,4 +22,10 @@ module.exports = {
 		...defaultConfig.externals,
 		jquery: 'jQuery',
 	},
+	plugins: [
+		...defaultConfig.plugins,
+		new I18nCheckWebpackPlugin({
+			expectDomain: 'gravity-pdf',
+		}),
+	],
 };

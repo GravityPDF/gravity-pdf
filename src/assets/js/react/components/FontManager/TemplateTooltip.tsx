@@ -1,5 +1,6 @@
 /* Dependencies */
-import React, { useState } from 'react';
+import * as React from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { sprintf } from 'sprintf-js';
 /* Utilities */
 import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';

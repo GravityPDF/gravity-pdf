@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 import { Routes as Switch, Route } from 'react-router-dom';
 /* Components */
 import CoreFontContainer from '../components/CoreFonts/CoreFontContainer';

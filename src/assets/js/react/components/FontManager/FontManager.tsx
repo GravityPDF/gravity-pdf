@@ -1,5 +1,5 @@
 /* Dependencies */
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 /* Components */

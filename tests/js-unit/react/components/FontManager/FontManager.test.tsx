@@ -1,4 +1,3 @@
-import React from 'react';
 import { findByTestAttr, renderWithRouter } from '../../testUtilsRTL';
 import FontManager from '../../../../../src/assets/js/react/components/FontManager/FontManager';
 

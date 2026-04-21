@@ -1,5 +1,6 @@
 /* Dependencies */
-import React, { useRef, useEffect } from 'react';
+import * as React from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
 /* Redux hooks and actions */
 import { useAppSelector, useAppDispatch } from '../../store/hooks';

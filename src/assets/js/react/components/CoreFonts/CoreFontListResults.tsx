@@ -1,5 +1,5 @@
 /* Dependencies */
-import React from 'react';
+import * as React from '@wordpress/element';
 import { useNavigate } from 'react-router-dom';
 /* Components */
 import ListSpacer from './CoreFontListSpacer';

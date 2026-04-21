@@ -1,4 +1,3 @@
-import React from 'react';
 import { act, fireEvent } from '@testing-library/react';
 import {
 	findByTestAttr,

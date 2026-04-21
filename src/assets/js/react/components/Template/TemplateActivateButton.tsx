@@ -1,5 +1,5 @@
 /* Dependencies */
-import React from 'react';
+import * as React from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
 /* Redux actions */
 import { useAppDispatch } from '../../store/hooks';

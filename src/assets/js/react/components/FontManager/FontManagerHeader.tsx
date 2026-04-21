@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 /* Components */
 import CloseDialog from '../Modal/CloseDialog';
 

@@ -1,5 +1,5 @@
 /* Dependencies */
-import React, { useEffect } from 'react';
+import { useEffect } from '@wordpress/element';
 import { useNavigate, useLocation } from 'react-router-dom';
 /* Redux actions */
 import { clearAddFontMsg } from '../../actions/fontManager';

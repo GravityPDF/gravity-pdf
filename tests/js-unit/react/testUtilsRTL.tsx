@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from '@wordpress/element';
 import { render, RenderOptions } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';

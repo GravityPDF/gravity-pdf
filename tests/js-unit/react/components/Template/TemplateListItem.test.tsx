@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from '@wordpress/element';
 import { fireEvent } from '@testing-library/react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import TemplateListItem from '../../../../../src/assets/js/react/components/Template/TemplateListItem';

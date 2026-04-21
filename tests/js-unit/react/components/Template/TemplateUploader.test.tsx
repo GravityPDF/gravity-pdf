@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from '@wordpress/element';
 import { act, fireEvent } from '@testing-library/react';
 import {
 	findByTestAttr,

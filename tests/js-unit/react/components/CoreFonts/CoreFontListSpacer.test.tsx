@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react';
 import { findByTestAttr } from '../../testUtilsRTL';
 import CoreFontListSpacer from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontListSpacer';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react';
 import Empty from '../../../../src/assets/js/react/components/Empty';
 

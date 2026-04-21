@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 
 /**
  * Contains stateless React components for our Template List Items

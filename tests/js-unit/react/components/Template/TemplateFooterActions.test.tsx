@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from '@wordpress/element';
 import { render } from '@testing-library/react';
 import { findByTestAttr } from '../../testUtilsRTL';
 import TemplateFooterActions from '../../../../../src/assets/js/react/components/Template/TemplateFooterActions';

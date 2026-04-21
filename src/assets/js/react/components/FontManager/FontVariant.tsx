@@ -1,5 +1,5 @@
 /* Dependencies */
-import React from 'react';
+import * as React from '@wordpress/element';
 import Dropzone from 'react-dropzone';
 /* Components */
 import FontVariantLabel from './FontVariantLabel';

@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 
 /**
  * @package			Gravity PDF

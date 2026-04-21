@@ -1,6 +1,5 @@
 /* Dependencies */
-import React, { lazy, Suspense } from 'react';
-import { createRoot } from 'react-dom/client';
+import { lazy, Suspense, createRoot } from '@wordpress/element';
 import { Provider } from 'react-redux';
 /* Redux store */
 import { getStore } from '../store';

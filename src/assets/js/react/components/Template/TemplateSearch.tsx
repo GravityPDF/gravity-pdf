@@ -1,5 +1,6 @@
 /* Dependencies */
-import React, { useRef, useEffect, useMemo } from 'react';
+import * as React from '@wordpress/element';
+import { useRef, useEffect, useMemo } from '@wordpress/element';
 import debounce from 'lodash.debounce';
 /* Redux hooks and actions */
 import { useAppSelector, useAppDispatch } from '../../store/hooks';

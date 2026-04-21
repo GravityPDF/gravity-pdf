@@ -1,6 +1,5 @@
 /* Dependencies */
-import React, { lazy, Suspense } from 'react';
-import { createRoot } from 'react-dom/client';
+import { lazy, Suspense, createRoot } from '@wordpress/element';
 import { Routes as Switch, Route } from 'react-router-dom';
 import watch from 'redux-watch';
 /* Redux store */

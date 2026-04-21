@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 /* Components */
 import TemplateActivateButton from './TemplateActivateButton';
 import TemplateDeleteButton from './TemplateDeleteButton';

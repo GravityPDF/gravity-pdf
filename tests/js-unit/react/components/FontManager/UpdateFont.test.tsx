@@ -1,4 +1,3 @@
-import React from 'react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import UpdateFont from '../../../../../src/assets/js/react/components/FontManager/UpdateFont';
 import type { FontStyles } from '../../../../../src/assets/js/react/components/FontManager/InitialAddUpdateState';

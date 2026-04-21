@@ -1,5 +1,5 @@
 /* Dependencies */
-import React from 'react';
+import * as React from '@wordpress/element';
 /* Components */
 import FontVariant from './FontVariant';
 import AddUpdateFontFooter from './AddUpdateFontFooter';

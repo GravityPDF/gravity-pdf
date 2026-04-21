@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { findByTestAttr } from '../../testUtilsRTL';
 import TemplateButton from '../../../../../src/assets/js/react/components/Template/TemplateButton';

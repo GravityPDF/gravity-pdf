@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 import { NavigateFunction } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 /* Components */

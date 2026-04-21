@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 
 /**
  * Display the Template Screenshot for the List Items

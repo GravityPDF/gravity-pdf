@@ -1,4 +1,3 @@
-import React from 'react';
 import { fireEvent } from '@testing-library/react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import AddFont from '../../../../../src/assets/js/react/components/FontManager/AddFont';

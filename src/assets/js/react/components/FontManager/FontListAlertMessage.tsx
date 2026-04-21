@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 import { useAppDispatch } from '../../store/hooks';
 /* Redux actions */
 import {

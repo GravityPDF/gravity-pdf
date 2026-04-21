@@ -1,5 +1,4 @@
 /* Dependencies */
-import React from 'react';
 /* Components */
 import TemplateContainer from './TemplateContainer';
 import TemplateListItem from './TemplateListItem';

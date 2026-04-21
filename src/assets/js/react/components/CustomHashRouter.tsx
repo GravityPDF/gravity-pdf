@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from '@wordpress/element';
 import { createHashHistory } from 'history';
 import { Router } from 'react-router-dom';
 

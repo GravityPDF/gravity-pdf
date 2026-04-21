@@ -1,5 +1,5 @@
 /* Dependencies */
-import $ from 'jquery';
+import domReady from '@wordpress/dom-ready';
 /* Bootstrap */
 import { templateBootstrap } from './bootstrap/templateBootstrap';
 import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap';
@@ -30,7 +30,7 @@ declare let __webpack_public_path__: string;
  *
  * @since 4.1
  */
-$(function () {
+domReady(() => {
 	'use strict';
 
 	__webpack_public_path__ = GFPDF.pluginUrl + 'build/assets/'; // eslint-disable-line
@@ -45,7 +45,8 @@ $(function () {
 		/* Check if we should show the Fancy Template Picker */
 		const templateId =
 			'#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]';
-		const $templateField = $(templateId);
+		// jQuery is a WordPress global; $templateField typing stays JQuery until PR 2 refactors templateBootstrap
+		const $templateField = jQuery(templateId);
 
 		/* Run this code if the element exists */
 		if ($templateField.length > 0) {
@@ -54,12 +55,12 @@ $(function () {
 	}
 
 	/* Initialize the Core Font downloader */
-	if ($('#gfpdf-button-wrapper-install_core_fonts').length) {
+	if (document.getElementById('gfpdf-button-wrapper-install_core_fonts')) {
 		coreFontBootstrap();
 	}
 
 	/* Initialize the Search Bar for Help Tab */
-	if ($('#gpdf-search').length) {
+	if (document.getElementById('gpdf-search')) {
 		helpBootstrap();
 	}
 

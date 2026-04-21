@@ -1,5 +1,6 @@
 /* Dependencies */
-import React, { useState, useEffect, useRef } from 'react';
+import * as React from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 /* Redux actions */
 import { resetSearchResult, searchFontList } from '../../actions/fontManager';

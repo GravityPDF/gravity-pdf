@@ -1,5 +1,5 @@
 /* Dependencies */
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
 /* Components */

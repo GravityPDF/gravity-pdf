@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from '@wordpress/element';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 // Higher Order Component

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from '@wordpress/element';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import TemplateSingle from '../../../../../src/assets/js/react/components/Template/TemplateSingle';
 import type { TemplateState } from '../../../../../src/assets/js/react/types';

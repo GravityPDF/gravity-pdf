@@ -1,4 +1,3 @@
-import React from 'react';
 import { screen } from '@testing-library/react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import FontListAlertMessage from '../../../../../src/assets/js/react/components/FontManager/FontListAlertMessage';

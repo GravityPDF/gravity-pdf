@@ -1,5 +1,6 @@
 /* Dependencies */
-import React, { useRef, useEffect } from 'react';
+import * as React from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 /* Components */
 import CloseDialog from '../Modal/CloseDialog';
 
