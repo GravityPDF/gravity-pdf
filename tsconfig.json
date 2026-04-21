@@ -1,13 +1,28 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
+    "lib": [ "ES2020", "DOM", "DOM.Iterable" ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": [ "jest", "node", "jquery" ],
     "baseUrl": ".",
     "paths": {
       "@self:playwright/*": [ "./tools/playwright/*" ]
     }
   },
-  "exclude": [
-    "build",
-    "node_modules",
-    "vendor"
-  ]
+  "include": [
+    "src/assets/js/react/**/*",
+    "src/assets/js/legacy/**/*",
+    "src/assets/js/admin/**/*",
+    "tests/js-unit/react/**/*",
+    "tests/js-unit/setupTests.ts"
+  ],
+  "exclude": [ "build", "node_modules", "vendor", "vendor_prefixed" ]
 }

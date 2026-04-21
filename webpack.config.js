@@ -4,9 +4,9 @@ const { resolve } = require('path');
 module.exports = {
 	...defaultConfig,
 	entry: {
-		'app.bundle': './src/assets/js/react/gfpdf-main.js',
-		'gfpdf-entries': './src/assets/js/legacy/gfpdf-entries.js',
-		admin: './src/assets/js/admin/bootstrap.js',
+		'app.bundle': './src/assets/js/react/gfpdf-main.ts',
+		'gfpdf-entries': './src/assets/js/legacy/gfpdf-entries.ts',
+		admin: './src/assets/js/admin/bootstrap.ts',
 	},
 	optimization: {
 		...defaultConfig.optimization,

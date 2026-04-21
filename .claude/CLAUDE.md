@@ -16,6 +16,11 @@ Loading them first prevents missing key instructions.
 When creating plans, always save them to: ./claude/plans/YYYY-MM-DD-<topic>.md
 Never use the default plan location. Use the ./claude/plans/ directory.
 
+### Memory
+
+Save project memory to ./claude/memory/YYYY-MM-DD-<topic>.md
+Never use the default memory location. Use the ./claude/memory directory.
+
 ### Context Management Strategy
 
 **Central AI should conserve context to extend pre-compaction capacity**:
