@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __ } from '@wordpress/i18n';
 import { Routes as Switch, Route } from 'react-router-dom';
 /* Components */
 import CoreFontContainer from '../components/CoreFonts/CoreFontContainer';
@@ -63,8 +64,8 @@ const CoreFont = ({ button }: RoutesProps): JSX.Element => {
 		<CoreFontContainer
 			buttonClassName={button.className}
 			buttonText={button.innerText}
-			counterText={GFPDF.coreFontCounter}
-			retryText={GFPDF.coreFontRetry}
+			counterText={__('Fonts remaining:', 'gravity-pdf')}
+			retryText={__('Retry Failed Downloads?', 'gravity-pdf')}
 		/>
 	);
 };

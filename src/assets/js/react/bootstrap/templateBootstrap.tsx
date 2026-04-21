@@ -40,7 +40,7 @@ export function templateBootstrap(templateField: HTMLSelectElement): void {
 
 	/* Render our React Component in the DOM */
 	root.render(
-		<Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
+		<Suspense fallback={<div />}>
 			<CustomHashRouter>
 				<Switch>
 					<Route path="/" element={<TemplateButtonWithRouter />} />

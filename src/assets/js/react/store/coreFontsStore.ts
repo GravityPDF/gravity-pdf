@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __, sprintf } from '@wordpress/i18n';
 import { createReduxStore } from '@wordpress/data';
 /* Actions */
 import {
@@ -115,8 +116,8 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 				const errors = state.retry.length;
 				const status = errors ? 'error' : 'success';
 				const message = errors
-					? GFPDF.coreFontError.replace('%s', String(errors))
-					: GFPDF.coreFontSuccess;
+					? sprintf(__('%s CORE FONT(S) DID NOT INSTALL CORRECTLY', 'gravity-pdf'), String(errors))
+					: __('ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-pdf');
 				const newCounter = state.downloadCounter - 1;
 
 				if (newCounter === 0) {
@@ -177,7 +178,7 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 						const response = await apiGetFilesFromGitHub();
 						dispatch(getFilesFromGitHubSuccess(response.body));
 					} catch {
-						dispatch(getFilesFromGitHubFailed(GFPDF.coreFontGithubError));
+						dispatch(getFilesFromGitHubFailed(__('Could not download Core Font list. Try again.', 'gravity-pdf')));
 					}
 				}
 			),
@@ -191,13 +192,13 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 						dispatch(addToConsole(
 							file,
 							'success',
-							GFPDF.coreFontItemSuccessMessage.replace('%s', file)
+							sprintf(__('Completed installation of %s', 'gravity-pdf'), file)
 						));
 					} catch {
 						dispatch(addToConsole(
 							file,
 							'error',
-							GFPDF.coreFontItemErrorMessage.replace('%s', file)
+							sprintf(__('Failed installation of %s', 'gravity-pdf'), file)
 						));
 						dispatch(addToRetryList(file));
 					} finally {

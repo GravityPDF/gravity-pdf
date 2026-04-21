@@ -1,5 +1,6 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 /* Components */
 import TemplateScreenshot from './TemplateScreenshot';
@@ -83,7 +84,7 @@ const TemplateListItem = ({
 			role="option"
 			tabIndex={0}
 			aria-label={
-				template?.group + ' ' + template?.template + ' ' + GFPDF.details
+				template?.group + ' ' + template?.template + ' ' + __('Details', 'gravity-pdf')
 			}
 		>
 			<TemplateScreenshot image={template?.screenshot} />

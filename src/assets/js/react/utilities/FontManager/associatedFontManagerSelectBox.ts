@@ -5,6 +5,7 @@
  * @since       6.0
  */
 
+import { __ } from '@wordpress/i18n';
 import { FontItem } from '../../types';
 
 export function associatedFontManagerSelectBox(
@@ -22,7 +23,7 @@ export function associatedFontManagerSelectBox(
 	const selectedValue = fontManagerSelectBox.value;
 	const definedFontsOptgroup = document.querySelector(
 		// eslint-disable-next-line no-undef
-		'optgroup[label="' + CSS.escape(GFPDF.fontUserDefinedGroup) + '"]'
+		'optgroup[label="' + CSS.escape(__('User-Defined Fonts', 'gravity-pdf')) + '"]'
 	);
 
 	// Remove the entire User-Defined Font group if it exists
@@ -37,7 +38,7 @@ export function associatedFontManagerSelectBox(
 
 	// Build our new custom font group
 	const optgroup = document.createElement('optgroup');
-	optgroup.setAttribute('label', GFPDF.fontUserDefinedGroup);
+	optgroup.setAttribute('label', __('User-Defined Fonts', 'gravity-pdf'));
 
 	/* Build User-Defined Fonts optgroup list */
 	fontList.map((font) => {

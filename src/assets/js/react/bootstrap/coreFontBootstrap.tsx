@@ -26,7 +26,7 @@ export default function coreFontBootstrap(): void {
 	const root = createRoot(container!);
 
 	root.render(
-		<Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
+		<Suspense fallback={<div />}>
 			<Routes button={button} />
 		</Suspense>
 	);

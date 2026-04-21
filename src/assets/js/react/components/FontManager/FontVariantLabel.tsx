@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __ } from '@wordpress/i18n';
 
 /**
  * @package			Gravity PDF
@@ -19,16 +20,16 @@ const FontVariantLabel = ({ label, font }: Props) => (
 	>
 		{label === 'regular' && font === 'false' && (
 			<span>
-				{GFPDF.fontListRegular}{' '}
+				{__('Regular', 'gravity-pdf')}{' '}
 				<span className="required">
-					{GFPDF.fontManagerRequiredLabel}
+					{__('(required)', 'gravity-pdf')}
 				</span>
 			</span>
 		)}
-		{label === 'regular' && font === 'true' && GFPDF.fontListRegular}
-		{label === 'italics' && GFPDF.fontListItalics}
-		{label === 'bold' && GFPDF.fontListBold}
-		{label === 'bolditalics' && GFPDF.fontListBoldItalics}
+		{label === 'regular' && font === 'true' && __('Regular', 'gravity-pdf')}
+		{label === 'italics' && __('Italics', 'gravity-pdf')}
+		{label === 'bold' && __('Bold', 'gravity-pdf')}
+		{label === 'bolditalics' && __('Bold Italics', 'gravity-pdf')}
 	</label>
 );
 

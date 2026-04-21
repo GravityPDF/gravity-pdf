@@ -1,6 +1,7 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 
@@ -76,7 +77,7 @@ const SearchBox = ({ id }: Props) => {
 				type="search"
 				id="font-manager-search-box"
 				className="wp-filter-search"
-				placeholder={GFPDF.fontManagerSearchPlaceHolder}
+				placeholder={__('Search installed fonts', 'gravity-pdf')}
 				value={searchInput}
 				onChange={handleSearch}
 				onKeyDown={(e) => e.keyCode === 13 && e.preventDefault()}

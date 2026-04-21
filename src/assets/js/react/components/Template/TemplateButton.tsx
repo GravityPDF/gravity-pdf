@@ -1,5 +1,6 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 
 /**
@@ -30,9 +31,9 @@ const TemplateButton = ({ navigate }: Props) => {
 			id="fancy-template-selector"
 			className="button gfpdf-button"
 			onClick={handleClick}
-			aria-label={GFPDF.manageTemplates}
+			aria-label={__('Manage PDF Templates', 'gravity-pdf')}
 		>
-			{GFPDF.manage}
+			{__('Manage', 'gravity-pdf')}
 		</button>
 	);
 };

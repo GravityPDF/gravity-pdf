@@ -1,6 +1,7 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { useRef, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 /* Store */
@@ -39,7 +40,7 @@ const TemplateSearch = () => {
 				className="wp-filter-search"
 				id="wp-filter-search-input"
 				ref={inputRef}
-				placeholder={GFPDF.searchTemplatePlaceholder}
+				placeholder={__('Search Installed Templates', 'gravity-pdf')}
 				type="search"
 				aria-describedby="live-search-desc"
 				onChange={handleSearch}

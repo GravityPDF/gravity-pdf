@@ -13,10 +13,7 @@ interface Props {
 
 export const Alert = ({ msg }: Props) => (
 	<div data-test="component-Alert" id="gf-admin-notices-wrapper">
-		<div
-			className="notice notice-error gf-notice"
-			dangerouslySetInnerHTML={{ __html: msg }}
-		/>
+		<div className="notice notice-error gf-notice">{msg}</div>
 	</div>
 );
 

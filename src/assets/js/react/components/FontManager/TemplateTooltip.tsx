@@ -1,7 +1,7 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
-import { useState } from '@wordpress/element';
-import { sprintf } from 'sprintf-js';
+import { useState, createInterpolateElement } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 /* Utilities */
 import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
 
@@ -56,22 +56,22 @@ const TemplateTooltip = ({ id }: Props) => {
 				onClick={handleDisplayInfo}
 				className="template-usage-link__button"
 			>
-				{GFPDF.fontManagerTemplateTooltipLabel}
+				{__('View template usage', 'gravity-pdf')}
 			</button>
 
 			{tooltip && (
-				<div
-					dangerouslySetInnerHTML={{
-						// eslint can't detect %s found on fontManagerTemplateTooltipDesc
-						// eslint-disable-next-line @wordpress/valid-sprintf
-						__html: sprintf(
-							GFPDF.fontManagerTemplateTooltipDesc,
-							'<a href="https://docs.gravitypdf.com/developers/first-custom-pdf">',
-							'<a href="https://docs.gravitypdf.com/users/setup-pdf#font">',
-							'</a>'
+				<div>
+					{createInterpolateElement(
+						__(
+							'Add this snippet <link1>in a custom template</link1> to selectively set the font on blocks of text. If you want to apply the font to the entire PDF, <link2>use the Font setting</link2> when configuring the PDF on the form.',
+							'gravity-pdf'
 						),
-					}}
-				/>
+						{
+							link1: <a href="https://docs.gravitypdf.com/developers/first-custom-pdf" />,
+							link2: <a href="https://docs.gravitypdf.com/users/setup-pdf#font" />,
+						}
+					)}
+				</div>
 			)}
 
 			{tooltip && (

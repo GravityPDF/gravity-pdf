@@ -1,5 +1,6 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 /* Components */
 import FontVariant from './FontVariant';
 import AddUpdateFontFooter from './AddUpdateFontFooter';
@@ -55,22 +56,22 @@ export const AddFont = ({
 	return (
 		<div data-test="component-AddFont" className="add-font">
 			<form onSubmit={onHandleSubmit}>
-				<h2>{GFPDF.fontManagerAddTitle}</h2>
+				<h2>{__('Add Font', 'gravity-pdf')}</h2>
 
-				<p>{GFPDF.fontManagerAddDesc}</p>
+				<p>{__('Install new fonts for use in your PDF documents.', 'gravity-pdf')}</p>
 
 				<label
 					htmlFor="gfpdf-add-font-name-input"
-					aria-label={GFPDF.fontManagerFontNameLabel}
+					aria-label={__('Font Name', 'gravity-pdf')}
 				>
-					{GFPDF.fontManagerFontNameLabel}{' '}
+					{__('Font Name', 'gravity-pdf')}{' '}
 					<span className="required">
-						{GFPDF.fontManagerRequiredLabel}
+						{__('(required)', 'gravity-pdf')}
 					</span>
 				</label>
 
 				<p id="gfpdf-font-name-desc-add">
-					{GFPDF.fontManagerFontNameDesc}
+					{__('The font name can only contain letters, numbers and spaces.', 'gravity-pdf')}
 				</p>
 
 				<input
@@ -90,17 +91,17 @@ export const AddFont = ({
 				<div aria-live="polite">
 					{!validateLabel && (
 						<span className="required" role="alert">
-							<em>{GFPDF.fontManagerFontNameValidationError}</em>
+							<em>{__('Please choose a name contains letters and/or numbers (and a space if you want it).', 'gravity-pdf')}</em>
 						</span>
 					)}
 				</div>
 				{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 				<label id="gfpdf-font-files-label-add">
-					{GFPDF.fontManagerFontFilesLabel}
+					{__('Font Files', 'gravity-pdf')}
 				</label>
 
 				<p id="gfpdf-font-files-description-add">
-					{GFPDF.fontManagerFontFilesDesc}
+					{__('Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.', 'gravity-pdf')}
 				</p>
 
 				<FontVariant

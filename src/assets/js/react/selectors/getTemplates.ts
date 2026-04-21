@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __, sprintf } from '@wordpress/i18n';
 import { createSelector } from 'reselect';
 /* Utilities */
 import versionCompare from '../utilities/versionCompare';
@@ -115,15 +116,11 @@ export const addCompatibilityCheck = (
 			return {
 				...template,
 				compatible: false,
-				error: GFPDF.requiresGravityPdfVersion.replace(
-					/%s/g,
+				error: sprintf(__('Requires Gravity PDF v%s', 'gravity-pdf'), requiredVersion),
+				long_error: sprintf(
+					__('This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.', 'gravity-pdf'),
 					requiredVersion
 				),
-				long_error:
-					GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(
-						/%s/g,
-						requiredVersion
-					),
 			};
 		}
 		/* If versionCompare() passed we'll mark as true */

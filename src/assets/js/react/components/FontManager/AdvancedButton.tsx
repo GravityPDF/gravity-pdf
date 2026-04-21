@@ -1,5 +1,6 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * @package     Gravity PDF
@@ -25,7 +26,7 @@ const AdvancedButton = ({ navigate }: Props) => {
 			className="button gfpdf-button"
 			onClick={handleClick}
 		>
-			{GFPDF.manage}
+			{__('Manage', 'gravity-pdf')}
 		</button>
 	);
 };

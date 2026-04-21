@@ -1,5 +1,6 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import Dropzone from 'react-dropzone';
 /* Components */
 import FontVariantLabel from './FontVariantLabel';
@@ -115,9 +116,7 @@ export const FontVariant = ({
 							<span className="gfpdf-font-filename">
 								{regularFieldValidation && (
 									<span className="required">
-										{
-											GFPDF.fontManagerFontFileRequiredRegular
-										}
+										{__('Add a .ttf font file.', 'gravity-pdf')}
 									</span>
 								)}
 								{!fontFileMissing ? fontName : fontFileMissing}

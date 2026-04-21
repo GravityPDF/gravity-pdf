@@ -1,3 +1,6 @@
+/* Dependencies */
+import { __ } from '@wordpress/i18n';
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -29,6 +32,6 @@ export const getJsonString = (str: string): unknown => {
 	console.error('Invalid API response', str);
 
 	return {
-		error: GFPDF.addFatalError,
+		error: __('A problem occurred. Reload the page and try again.', 'gravity-pdf'),
 	};
 };

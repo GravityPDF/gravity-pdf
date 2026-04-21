@@ -42,7 +42,7 @@ export function fontManagerBootstrap(
 	const root = createRoot(container!);
 
 	root.render(
-		<Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
+		<Suspense fallback={<div />}>
 			<CustomHashRouter>
 				<Routes>
 					<Route path="/" element={<AdvancedButtonWithRouter />} />

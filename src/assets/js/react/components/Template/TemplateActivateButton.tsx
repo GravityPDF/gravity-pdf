@@ -1,5 +1,6 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 /* Store */
 import { useDispatch } from '@wordpress/data';
@@ -42,7 +43,7 @@ const TemplateActivateButton = ({ navigate, template, buttonText }: Props) => {
 			type="button"
 			onClick={handleSelectTemplate}
 			className="button activate"
-			aria-label={buttonText + ' ' + GFPDF.template}
+			aria-label={buttonText + ' ' + __('Template', 'gravity-pdf')}
 		>
 			{buttonText}
 		</button>

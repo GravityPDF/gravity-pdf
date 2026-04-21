@@ -1,6 +1,7 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { useNavigate } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 /* Components */
 import ListSpacer from './CoreFontListSpacer';
 /* Types */
@@ -31,7 +32,7 @@ export const CoreFontListResults = ({
 		<ul
 			data-test="component-coreFont-container"
 			className="gfpdf-core-font-list-results-container"
-			aria-label={GFPDF.coreFontAriaLabel}
+			aria-label={__('Core font installation', 'gravity-pdf')}
 		>
 			{lines.map((key) => (
 				<li

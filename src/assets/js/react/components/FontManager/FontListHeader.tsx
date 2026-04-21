@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __ } from '@wordpress/i18n';
 
 /**
  * @package			Gravity PDF
@@ -9,11 +10,11 @@
 
 const FontListHeader = () => (
 	<div data-test="component-FontListHeader" className="font-list-header">
-		<div className="font-name">{GFPDF.fontListInstalledFonts}</div>
-		<div>{GFPDF.fontListRegular}</div>
-		<div>{GFPDF.fontListItalics}</div>
-		<div>{GFPDF.fontListBold}</div>
-		<div>{GFPDF.fontListBoldItalics}</div>
+		<div className="font-name">{__('Installed Fonts', 'gravity-pdf')}</div>
+		<div>{__('Regular', 'gravity-pdf')}</div>
+		<div>{__('Italics', 'gravity-pdf')}</div>
+		<div>{__('Bold', 'gravity-pdf')}</div>
+		<div>{__('Bold Italics', 'gravity-pdf')}</div>
 		<div />
 	</div>
 );

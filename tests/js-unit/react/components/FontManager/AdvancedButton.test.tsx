@@ -16,7 +16,7 @@ describe('FontManager - AdvancedButton.js', () => {
 			);
 
 			expect(component).toBeInTheDocument();
-			expect(component!.textContent).toBe('Advanced');
+			expect(component!.textContent).toBe('Manage');
 		});
 	});
 

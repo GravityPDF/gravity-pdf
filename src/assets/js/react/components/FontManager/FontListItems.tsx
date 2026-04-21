@@ -1,6 +1,7 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
@@ -161,7 +162,7 @@ const FontListItems = ({ id, navigate }: Props) => {
 		e.stopPropagation();
 		setDeleteId(fontId);
 
-		if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
+		if (window.confirm(__('Are you sure you want to delete this font?', 'gravity-pdf'))) {
 			deleteFont(fontId);
 		}
 	};
@@ -206,7 +207,7 @@ const FontListItems = ({ id, navigate }: Props) => {
 			data-test="component-FontListItems"
 			className="font-list-items"
 			role="listbox"
-			aria-label={GFPDF.fontListInstalledFonts}
+			aria-label={__('Installed Fonts', 'gravity-pdf')}
 			aria-live="polite"
 		>
 			{list &&
@@ -240,7 +241,7 @@ const FontListItems = ({ id, navigate }: Props) => {
 										}
 										checked={font.id === selectedFont}
 										aria-label={
-											GFPDF.fontManagerSelectFontAriaLabel +
+											__('Select font', 'gravity-pdf') +
 											': ' +
 											font.font_name
 										}

@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
 
@@ -18,16 +19,16 @@ const FontListAlertMessage = ({ empty, error }: Props) => {
 	const { resetSearchResult, getCustomFontList } =
 		useDispatch(FONT_MANAGER_STORE_NAME);
 
-	const fontListEmpty = <span>{GFPDF.fontListEmpty}</span>;
+	const fontListEmpty = <span>{__('Font list empty.', 'gravity-pdf')}</span>;
 	const searchResultEmpty = (
 		<span>
-			{GFPDF.searchResultEmpty}{' '}
+			{__('No fonts matching your search found.', 'gravity-pdf')}{' '}
 			<button
 				type="button"
 				className="link"
 				onClick={() => resetSearchResult()}
 			>
-				{GFPDF.searchBoxResetTitle}
+				{__('Clear your search query.', 'gravity-pdf')}
 			</button>
 		</span>
 	);

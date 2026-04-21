@@ -1,6 +1,7 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { useRef, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -101,7 +102,7 @@ const TemplateDeleteButton = ({
 			type="button"
 			onClick={handleClick}
 			className="button button-secondary delete-theme ed_button"
-			aria-label={buttonText + ' ' + GFPDF.template}
+			aria-label={buttonText + ' ' + __('Template', 'gravity-pdf')}
 		>
 			{buttonText}
 		</button>

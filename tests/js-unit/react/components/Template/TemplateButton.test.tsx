@@ -18,9 +18,7 @@ describe('Template - TemplateButton.js', () => {
 
 	test('renders button text', () => {
 		const { container } = render(<TemplateButton navigate={navigate} />);
-		expect(container.querySelector('button')!.textContent).toBe(
-			GFPDF.manage
-		);
+		expect(container.querySelector('button')!.textContent).toBe('Manage');
 	});
 
 	test('handleClick() - calls navigate with template route', () => {

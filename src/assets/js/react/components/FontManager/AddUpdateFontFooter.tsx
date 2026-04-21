@@ -1,7 +1,8 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { sprintf } from 'sprintf-js';
+import { __ } from '@wordpress/i18n';
 /* Components */
 import Spinner from '../Spinner';
 import TemplateTooltip from './TemplateTooltip';
@@ -62,7 +63,7 @@ const AddUpdateFontFooter = ({
 	};
 
 	const handleDeleteFont = (fontId: string) => {
-		if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
+		if (window.confirm(__('Are you sure you want to delete this font?', 'gravity-pdf'))) {
 			deleteFont(fontId);
 		}
 	};
@@ -72,7 +73,7 @@ const AddUpdateFontFooter = ({
 		fontId: string
 	) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
+			if (window.confirm(__('Are you sure you want to delete this font?', 'gravity-pdf'))) {
 				deleteFont(fontId);
 			}
 		}
@@ -105,9 +106,9 @@ const AddUpdateFontFooter = ({
 							onKeyDown={onHandleCancelEditFontKeypress}
 							type="button"
 							tabIndex={tabIndexNum}
-							aria-label={GFPDF.cancel}
+							aria-label={__('Cancel', 'gravity-pdf')}
 						>
-							{GFPDF.fontManagerCancelButtonText}
+							{__('← Cancel', 'gravity-pdf')}
 						</button>
 					)}
 
@@ -117,13 +118,13 @@ const AddUpdateFontFooter = ({
 						disabled={disabled}
 						aria-label={
 							type === 'update'
-								? GFPDF.fontManagerUpdateFontAriaLabel
-								: GFPDF.fontManagerAddFontAriaLabel
+								? __('Update font', 'gravity-pdf')
+								: __('Add font', 'gravity-pdf')
 						}
 					>
 						{type === 'update'
-							? GFPDF.fontManagerUpdateTitle + ' →'
-							: GFPDF.fontManagerAddTitle + ' →'}
+							? __('Update Font', 'gravity-pdf') + ' →'
+							: __('Add Font', 'gravity-pdf') + ' →'}
 					</button>
 
 					{loading && <Spinner style="add-update-font" />}
@@ -139,7 +140,7 @@ const AddUpdateFontFooter = ({
 							onKeyDown={(e) => handleSelectFontKeypress(e, id)}
 							type="button"
 							tabIndex={tabIndexNum}
-							aria-label={GFPDF.fontManagerSelectFontAriaLabel}
+							aria-label={__('Select font', 'gravity-pdf')}
 						/>
 					)}
 
@@ -150,43 +151,42 @@ const AddUpdateFontFooter = ({
 							onKeyDown={(e) => handleDeleteFontKeypress(e, id)}
 							type="button"
 							tabIndex={tabIndexNum}
-							aria-label={GFPDF.fontManagerDeleteFontAriaLabel}
+							aria-label={__('Delete font', 'gravity-pdf')}
 						/>
 					)}
 				</div>
 			</div>
 
 			{showSuccessAddFont && (
-				<span
-					className="msg success"
-					dangerouslySetInnerHTML={{ __html: success!.addFont! }}
-				/>
+				<span className="msg success">
+					<strong>{success!.addFont!}</strong>
+				</span>
 			)}
 
 			{displayInvalidFileErrorMessage && (
-				<span
-					className="msg error"
-					dangerouslySetInnerHTML={{
-						__html: errorFontValidation as string,
-					}}
-				/>
+				<span className="msg error">
+					{createInterpolateElement(
+						errorFontValidation as string,
+						{ strong: <strong /> }
+					)}
+				</span>
 			)}
 
 			{displayGenericErrorMessage && (
-				<span
-					className="msg error"
-					dangerouslySetInnerHTML={{
-						__html:
-							typeof error?.addFont === 'object'
-								? // eslint-disable-next-line @wordpress/valid-sprintf
-									sprintf(
-										GFPDF.fontFileMissing,
-										'<strong>',
-										'</strong>'
-									)
-								: (error?.addFont as string),
-					}}
-				/>
+				<span className="msg error">
+					{typeof error?.addFont === 'object'
+						? createInterpolateElement(
+								__(
+									'<strong>Font file(s) missing from the server.</strong> Please upload the font(s) again and then save.',
+									'gravity-pdf'
+								),
+								{ strong: <strong /> }
+							)
+						: createInterpolateElement(
+								error?.addFont as string,
+								{ strong: <strong /> }
+							)}
+				</span>
 			)}
 
 			{id && <TemplateTooltip id={id} />}

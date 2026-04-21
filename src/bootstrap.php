@@ -405,6 +405,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		];
 
 		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'build/assets/admin.min.js', $pdf_settings_dependencies, $version, $args );
+		wp_set_script_translations( 'gfpdf_js_settings', 'gravity-pdf', PDF_PLUGIN_DIR . 'languages' );
 
 		/* add hot reloading in development */
 		$asset               = file_exists( PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php' )
@@ -413,6 +414,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$bundle_dependencies = $asset['dependencies'] ?? [];
 
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
+		wp_set_script_translations( 'gfpdf_js_entrypoint', 'gravity-pdf', PDF_PLUGIN_DIR . 'languages' );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
 	}
 

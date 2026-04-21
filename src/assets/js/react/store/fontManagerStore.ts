@@ -1,6 +1,6 @@
 /* Dependencies */
 import { createReduxStore } from '@wordpress/data';
-import { sprintf } from 'sprintf-js';
+import { __ } from '@wordpress/i18n';
 /* Action type constants */
 import {
 	GET_CUSTOM_FONT_LIST,
@@ -162,12 +162,7 @@ export function createFontManagerStore(
 					errorUpdate = {
 						...state.msg.error,
 						addFont: payload.msg,
-						// eslint-disable-next-line @wordpress/valid-sprintf
-						fontValidationError: sprintf(
-							payload.fontValidationError,
-							'<strong>',
-							'</strong>'
-						),
+						fontValidationError: payload.fontValidationError,
 					};
 				} else {
 					errorUpdate = {
@@ -239,12 +234,7 @@ export function createFontManagerStore(
 					errorUpdate = {
 						...state.msg.error,
 						addFont: payload.msg,
-						// eslint-disable-next-line @wordpress/valid-sprintf
-						fontValidationError: sprintf(
-							payload.fontValidationError,
-							'<strong>',
-							'</strong>'
-						),
+						fontValidationError: payload.fontValidationError,
 					};
 				} else {
 					errorUpdate = {
@@ -267,11 +257,9 @@ export function createFontManagerStore(
 					msg: {
 						error: {
 							...(state.msg.error ?? {}),
-							// eslint-disable-next-line @wordpress/valid-sprintf
-							addFont: sprintf(
-								GFPDF.addUpdateFontError,
-								'<strong>',
-								'</strong>'
+							addFont: __(
+								'<strong>The action could not be completed.</strong> Resolve the highlighted issues above and then try again.',
+								'gravity-pdf'
 							),
 						},
 					},
@@ -465,7 +453,7 @@ export function createFontManagerStore(
 					} catch {
 						dispatch({
 							type: GET_CUSTOM_FONT_LIST_ERROR,
-							payload: GFPDF.addFatalError,
+							payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 						});
 					}
 				}
@@ -484,10 +472,7 @@ export function createFontManagerStore(
 							type: ADD_FONT_SUCCESS,
 							payload: {
 								font: response.body,
-								msg:
-									'<strong>' +
-									GFPDF.addUpdateFontSuccess +
-									'</strong>',
+								msg: __( 'Your font has been saved.', 'gravity-pdf' ),
 							},
 						});
 					} catch (error) {
@@ -501,7 +486,7 @@ export function createFontManagerStore(
 						if (!response || err.status === 500) {
 							dispatch({
 								type: ADD_FONT_ERROR,
-								payload: GFPDF.addFatalError,
+								payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 							});
 							return;
 						}
@@ -513,7 +498,7 @@ export function createFontManagerStore(
 							dispatch({
 								type: ADD_FONT_ERROR,
 								payload: {
-									fontValidationError: GFPDF.fontFileInvalid,
+									fontValidationError: __( '<strong>Font file(s) are malformed</strong> and cannot be used with Gravity PDF.', 'gravity-pdf' ),
 									msg: response.message,
 								},
 							});
@@ -523,7 +508,7 @@ export function createFontManagerStore(
 						dispatch({
 							type: ADD_FONT_ERROR,
 							payload:
-								response.message || GFPDF.addFatalError,
+								response.message || __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 						});
 					}
 				}
@@ -545,10 +530,7 @@ export function createFontManagerStore(
 							type: EDIT_FONT_SUCCESS,
 							payload: {
 								font: response.body,
-								msg:
-									'<strong>' +
-									GFPDF.addUpdateFontSuccess +
-									'</strong>',
+								msg: __( 'Your font has been saved.', 'gravity-pdf' ),
 							},
 						});
 					} catch (error) {
@@ -567,7 +549,7 @@ export function createFontManagerStore(
 						) {
 							dispatch({
 								type: EDIT_FONT_ERROR,
-								payload: GFPDF.addFatalError,
+								payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 							});
 							return;
 						}
@@ -579,10 +561,10 @@ export function createFontManagerStore(
 							dispatch({
 								type: EDIT_FONT_ERROR,
 								payload: {
-									fontValidationError: GFPDF.fontFileInvalid,
+									fontValidationError: __( '<strong>Font file(s) are malformed</strong> and cannot be used with Gravity PDF.', 'gravity-pdf' ),
 									msg:
 										response?.message ||
-										GFPDF.addFatalError,
+										__( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 								},
 							});
 							return;
@@ -591,7 +573,7 @@ export function createFontManagerStore(
 						dispatch({
 							type: EDIT_FONT_ERROR,
 							payload:
-								response?.message || GFPDF.addFatalError,
+								response?.message || __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 						});
 					}
 				}
@@ -610,7 +592,7 @@ export function createFontManagerStore(
 					} catch {
 						dispatch({
 							type: DELETE_FONT_ERROR,
-							payload: GFPDF.addFatalError,
+							payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 						});
 					}
 				}

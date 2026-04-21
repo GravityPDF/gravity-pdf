@@ -21,7 +21,7 @@ export default function helpBootstrap(): void {
 	const root = createRoot(container!);
 
 	root.render(
-		<Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
+		<Suspense fallback={<div />}>
 			<HelpContainer />
 		</Suspense>
 	);

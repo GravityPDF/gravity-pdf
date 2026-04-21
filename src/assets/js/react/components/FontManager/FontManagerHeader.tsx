@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __ } from '@wordpress/i18n';
 /* Components */
 import CloseDialog from '../Modal/CloseDialog';
 
@@ -15,7 +16,7 @@ interface Props {
 
 const FontManagerHeader = ({ id }: Props) => (
 	<div data-test="component-FontManagerHeader" className="theme-header">
-		<h1>{GFPDF.fontManagerTitle}</h1>
+		<h1>{__('Font Manager', 'gravity-pdf')}</h1>
 
 		<CloseDialog id={id} />
 	</div>
