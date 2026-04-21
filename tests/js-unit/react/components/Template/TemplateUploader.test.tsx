@@ -29,51 +29,35 @@ jest.mock('../../../../../src/assets/js/react/api/templates', () => ({
 	}),
 }));
 
-jest.mock(
-	'react-dropzone',
-	() =>
-		function Dropzone({
-			onDrop,
-			children,
-		}: {
-			onDrop: (files: { name: string; size: number }[]) => void;
-			children: (props: {
-				getRootProps: () => object;
-				getInputProps: () => object;
-				isDragActive: boolean;
-			}) => React.ReactNode;
-		}) {
-			return (
-				<>
-					<button
-						data-test="drop-valid-file"
-						onClick={() =>
-							onDrop([{ name: 'template.zip', size: 1024 }])
-						}
-					/>
-					<button
-						data-test="drop-invalid-ext"
-						onClick={() =>
-							onDrop([{ name: 'template.txt', size: 1024 }])
-						}
-					/>
-					<button
-						data-test="drop-large-file"
-						onClick={() =>
-							onDrop([
-								{ name: 'template.zip', size: 1024 * 10241 },
-							])
-						}
-					/>
-					{children({
-						getRootProps: () => ({}),
-						getInputProps: () => ({}),
-						isDragActive: false,
-					})}
-				</>
-			);
-		}
-);
+jest.mock('@wordpress/components', () => ({
+	...jest.requireActual('@wordpress/components'),
+	DropZone: ({
+		onFilesDrop,
+	}: {
+		onFilesDrop?: (files: { name: string; size: number }[]) => void;
+	}) => (
+		<>
+			<button
+				data-test="drop-valid-file"
+				onClick={() =>
+					onFilesDrop?.([{ name: 'template.zip', size: 1024 }])
+				}
+			/>
+			<button
+				data-test="drop-invalid-ext"
+				onClick={() =>
+					onFilesDrop?.([{ name: 'template.txt', size: 1024 }])
+				}
+			/>
+			<button
+				data-test="drop-large-file"
+				onClick={() =>
+					onFilesDrop?.([{ name: 'template.zip', size: 1024 * 10241 }])
+				}
+			/>
+		</>
+	),
+}));
 
 describe('Template - TemplateUploader.js', () => {
 	const initialState = {

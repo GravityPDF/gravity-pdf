@@ -1,6 +1,9 @@
 /* Dependencies */
 import { useEffect } from '@wordpress/element';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '@wordpress/components';
+import { closeSmall } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
@@ -62,15 +65,13 @@ export const CloseDialog = ({ id, closeRoute }: Props) => {
 	}); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
-		<button
-			type="button"
+		<Button
 			data-test="component-CloseDialog"
-			className="close dashicons dashicons-no"
+			className="close"
 			onClick={handleCloseDialog}
-			aria-label="close"
-		>
-			<span className="screen-reader-text">{GFPDF.closeDialog}</span>
-		</button>
+			icon={closeSmall}
+			label={__('Close dialog', 'gravity-pdf')}
+		/>
 	);
 };
 

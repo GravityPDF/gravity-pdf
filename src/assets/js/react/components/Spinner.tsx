@@ -1,4 +1,5 @@
 /* Dependencies */
+import { Spinner as WPSpinner } from '@wordpress/components';
 
 /**
  * @package			Gravity PDF
@@ -12,11 +13,7 @@ interface Props {
 }
 
 const Spinner = ({ style }: Props) => (
-	<img
-		alt={GFPDF.spinnerAlt}
-		src={GFPDF.spinnerUrl}
-		className={'gfpdf-spinner ' + style}
-	/>
+	<WPSpinner className={'gfpdf-spinner ' + (style ?? '')} />
 );
 
 export default Spinner;

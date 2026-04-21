@@ -1,7 +1,6 @@
 /* Dependencies */
 import { useState, useRef, useEffect } from '@wordpress/element';
-import classNames from 'classnames';
-import Dropzone from 'react-dropzone';
+import { DropZone } from '@wordpress/components';
 /* Components */
 import ShowMessage from '../ShowMessage';
 /* Store */
@@ -72,6 +71,8 @@ const TemplateUploader = ({
 	const [ajax, setAjax] = useState(false);
 	const [error, setError] = useState('');
 	const [message, setMessage] = useState('');
+
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	/* Track previous values to replicate componentDidUpdate comparisons */
 	const prevSuccessRef = useRef(templateUploadProcessingSuccess);
@@ -159,7 +160,7 @@ const TemplateUploader = ({
 		return true;
 	};
 
-	const handleOndrop = (acceptedFiles: File[]) => {
+	const handleOndrop = (acceptedFiles: { name: string; size: number }[]) => {
 		if (acceptedFiles instanceof Array && acceptedFiles.length > 0) {
 			acceptedFiles.forEach((file) => {
 				const filename = file.name;
@@ -172,9 +173,18 @@ const TemplateUploader = ({
 				setError('');
 				setMessage('');
 
-				postTemplateUploadProcessing(file, filename);
+				postTemplateUploadProcessing(file as File, filename);
 			});
 		}
+	};
+
+	const handleFilesDrop = (files: File[]) => {
+		handleOndrop(files);
+	};
+
+	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const files = Array.from(e.target.files ?? []);
+		if (files.length) handleOndrop(files);
 	};
 
 	const removeMessage = () => {
@@ -186,55 +196,59 @@ const TemplateUploader = ({
 			data-test="component-templateUploader"
 			className="theme add-new-theme gfpdf-dropzone"
 		>
-			<Dropzone data-test="component-dropzone" onDrop={handleOndrop}>
-				{({ getRootProps, getInputProps, isDragActive }) => {
-					return (
-						<div
-							{...getRootProps()}
-							className={classNames('dropzone', {
-								'dropzone--isActive': isDragActive,
-							})}
-						>
-							<input {...getInputProps()} />
-							<a
-								href="#/template"
-								className={ajax ? 'doing-ajax' : ''}
-								aria-labelledby="gfpdf-template-install-instructions"
-							>
-								<div className="theme-screenshot">
-									<span />
-								</div>
+			<div className="dropzone">
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept=".zip"
+					style={{ display: 'none' }}
+					onChange={handleFileSelect}
+				/>
+				<DropZone onFilesDrop={handleFilesDrop} />
+				<a
+					href="#/template"
+					onClick={(e) => {
+						e.preventDefault();
+						fileInputRef.current?.click();
+					}}
+					onKeyDown={(e) => {
+						if (e.key === ' ') {
+							e.preventDefault();
+							fileInputRef.current?.click();
+						}
+					}}
+					className={ajax ? 'doing-ajax' : ''}
+					aria-labelledby="gfpdf-template-install-instructions"
+				>
+					<div className="theme-screenshot">
+						<span />
+					</div>
 
-								{error !== '' && (
-									<ShowMessage
-										data-test="component-stateError-showMessage"
-										text={error}
-										error
-									/>
-								)}
-								{message !== '' ? (
-									<ShowMessage
-										data-test="component-stateMessage-showMessage"
-										text={message}
-										dismissable
-										dismissableCallback={removeMessage}
-									/>
-								) : null}
+					{error !== '' && (
+						<ShowMessage
+							data-test="component-stateError-showMessage"
+							text={error}
+							error
+						/>
+					)}
+					{message !== '' ? (
+						<ShowMessage
+							data-test="component-stateMessage-showMessage"
+							text={message}
+							dismissable
+							dismissableCallback={removeMessage}
+						/>
+					) : null}
 
-								<h2 className="theme-name">
-									{addTemplateText}
-								</h2>
-							</a>
-							<div
-								className="gfpdf-template-install-instructions"
-								id="gfpdf-template-install-instructions"
-							>
-								{templateInstallInstructions}
-							</div>
-						</div>
-					);
-				}}
-			</Dropzone>
+					<h2 className="theme-name">{addTemplateText}</h2>
+				</a>
+				<div
+					className="gfpdf-template-install-instructions"
+					id="gfpdf-template-install-instructions"
+				>
+					{templateInstallInstructions}
+				</div>
+			</div>
 		</div>
 	);
 };

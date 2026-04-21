@@ -1,8 +1,8 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
-import { useRef, useEffect, useMemo } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import debounce from 'lodash.debounce';
+import { useDebounce } from '@wordpress/compose';
 /* Store */
 import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 
@@ -23,10 +23,7 @@ const TemplateSearch = () => {
 	);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const runSearch = useMemo(
-		() => debounce((value: string) => searchTemplates(value), 200),
-		[searchTemplates]
-	);
+	const runSearch = useDebounce(searchTemplates, 200);
 
 	useEffect(() => {
 		inputRef.current?.focus();

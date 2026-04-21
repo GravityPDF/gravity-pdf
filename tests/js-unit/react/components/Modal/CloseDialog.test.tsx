@@ -85,12 +85,12 @@ describe('CloseDialog - CloseDialog.js', () => {
 			).toBeInTheDocument();
 		});
 
-		test('render button screen reader text', () => {
+		test('render button accessible label', () => {
 			const { container } = renderWithStore(<CloseDialog />);
 
-			expect(container.querySelector('span')!.textContent).toBe(
-				'Close dialog'
-			);
+			expect(
+				container.querySelector('button[data-test="component-CloseDialog"]')
+			).toHaveAttribute('aria-label', 'Close dialog');
 		});
 
 		test('check button click', () => {

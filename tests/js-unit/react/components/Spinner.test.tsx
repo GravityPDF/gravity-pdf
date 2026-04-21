@@ -5,7 +5,7 @@ describe('Components - Spinner.js', () => {
 	test('renders <Spinner /> component', () => {
 		const { container } = render(<Spinner />);
 
-		expect(container.querySelector('img')).toBeInTheDocument();
-		expect(container.querySelector('img')).toHaveClass('gfpdf-spinner');
+		expect(container.querySelector('svg')).toBeInTheDocument();
+		expect(container.querySelector('svg')).toHaveClass('gfpdf-spinner');
 	});
 });

@@ -6,7 +6,10 @@ import {
 } from '../../testUtilsRTL';
 import TemplateSearch from '../../../../../src/assets/js/react/components/Template/TemplateSearch';
 
-jest.mock('lodash.debounce', () => (fn: (...args: unknown[]) => unknown) => fn);
+jest.mock('@wordpress/compose', () => ({
+	...jest.requireActual('@wordpress/compose'),
+	useDebounce: (fn: (...args: unknown[]) => unknown) => fn,
+}));
 
 describe('Template - TemplateSearch.js', () => {
 	const initialState = {
