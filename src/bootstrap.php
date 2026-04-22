@@ -391,7 +391,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_scripts() {
-		Assets::register_script(
+		$this->register_script(
 			'gfpdf_js_settings',
 			'build/assets/admin.min.js',
 			PDF_PLUGIN_DIR . 'pdf.php',
@@ -411,9 +411,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				'minify'       => null,
 			]
 		);
-		wp_set_script_translations( 'gfpdf_js_settings', 'gravity-pdf', PDF_PLUGIN_DIR . 'languages' );
 
-		Assets::register_script(
+		$this->register_script(
 			'gfpdf_js_entrypoint',
 			'build/assets/app.bundle.min.js',
 			PDF_PLUGIN_DIR . 'pdf.php',
@@ -425,9 +424,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				'minify'     => null,
 			]
 		);
-		wp_set_script_translations( 'gfpdf_js_entrypoint', 'gravity-pdf', PDF_PLUGIN_DIR . 'languages' );
 
-		Assets::register_script(
+		$this->register_script(
 			'gfpdf_js_entries',
 			'build/assets/gfpdf-entries.min.js',
 			PDF_PLUGIN_DIR . 'pdf.php',
@@ -439,6 +437,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				'minify'       => null,
 			]
 		);
+	}
+
+	private function register_script( string $handle, string $path, string $base, array $options = [] ): void {
+		Assets::register_script( $handle, $path, $base, $options );
+		if ( ! empty( $options['textdomain'] ) ) {
+			wp_set_script_translations( $handle, $options['textdomain'], PDF_PLUGIN_DIR . 'languages' );
+		}
 	}
 
 	/**
