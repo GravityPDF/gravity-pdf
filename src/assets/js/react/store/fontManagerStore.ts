@@ -62,6 +62,20 @@ type WPRestError = {
 	data?: { status?: number };
 };
 
+const abortControllers = {
+	getList: null as AbortController | null,
+	addFont: null as AbortController | null,
+	editFont: null as AbortController | null,
+	deleteFont: null as AbortController | null,
+};
+
+function abortAndCreate(key: keyof typeof abortControllers): AbortController {
+	abortControllers[key]?.abort();
+	const controller = new AbortController();
+	abortControllers[key] = controller;
+	return controller;
+}
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -452,15 +466,21 @@ export function createFontManagerStore(
 				GET_CUSTOM_FONT_LIST,
 				() =>
 					async ({ dispatch }: ThunkArgs) => {
+						const controller = abortAndCreate('getList');
 						dispatch(getCustomFontListAction());
 						try {
-							const fontList = await apiGetCustomFontList();
+							const fontList = await apiGetCustomFontList(
+								controller.signal
+							);
 							dispatch({
 								type: GET_CUSTOM_FONT_LIST_SUCCESS,
 								payload: fontList,
 							});
 							associatedFontManagerSelectBox(fontList);
-						} catch {
+						} catch (error) {
+							if ((error as Error)?.name === 'AbortError') {
+								return;
+							}
 							dispatch({
 								type: GET_CUSTOM_FONT_LIST_ERROR,
 								payload: __(
@@ -476,9 +496,13 @@ export function createFontManagerStore(
 				ADD_FONT,
 				(font: FontFormData) =>
 					async ({ dispatch }: ThunkArgs) => {
+						const controller = abortAndCreate('addFont');
 						dispatch(addFontSyncAction(font));
 						try {
-							const savedFont = await apiAddFont(font);
+							const savedFont = await apiAddFont(
+								font,
+								controller.signal
+							);
 							dispatch({
 								type: ADD_FONT_SUCCESS,
 								payload: {
@@ -491,6 +515,9 @@ export function createFontManagerStore(
 							});
 							speak(__('Font saved.', 'gravity-pdf'));
 						} catch (error) {
+							if ((error as Error)?.name === 'AbortError') {
+								return;
+							}
 							const err = error as WPRestError;
 							const status = err.data?.status;
 							const code = err.code;
@@ -552,9 +579,13 @@ export function createFontManagerStore(
 				EDIT_FONT,
 				(fontDetails: { id: string; font: Partial<FontFormData> }) =>
 					async ({ dispatch }: ThunkArgs) => {
+						const controller = abortAndCreate('editFont');
 						dispatch(editFontSyncAction(fontDetails));
 						try {
-							const savedFont = await apiEditFont(fontDetails);
+							const savedFont = await apiEditFont({
+								...fontDetails,
+								signal: controller.signal,
+							});
 							dispatch({
 								type: EDIT_FONT_SUCCESS,
 								payload: {
@@ -567,6 +598,9 @@ export function createFontManagerStore(
 							});
 							speak(__('Font saved.', 'gravity-pdf'));
 						} catch (error) {
+							if ((error as Error)?.name === 'AbortError') {
+								return;
+							}
 							const err = error as WPRestError;
 							const status = err?.data?.status;
 							const code = err?.code;
@@ -636,15 +670,19 @@ export function createFontManagerStore(
 				DELETE_FONT,
 				(id: string) =>
 					async ({ dispatch }: ThunkArgs) => {
+						const controller = abortAndCreate('deleteFont');
 						dispatch(deleteFontSyncAction(id));
 						try {
-							await apiDeleteFont(id);
+							await apiDeleteFont(id, controller.signal);
 							dispatch({
 								type: DELETE_FONT_SUCCESS,
 								payload: id,
 							});
 							speak(__('Font deleted.', 'gravity-pdf'));
-						} catch {
+						} catch (error) {
+							if ((error as Error)?.name === 'AbortError') {
+								return;
+							}
 							dispatch({
 								type: DELETE_FONT_ERROR,
 								payload: __(

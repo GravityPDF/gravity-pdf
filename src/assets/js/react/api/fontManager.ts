@@ -11,32 +11,44 @@ import { FontItem, FontFormData } from '../types';
  * @since       6.0
  */
 
-export const apiGetCustomFontList = (): Promise<FontItem[]> =>
-	apiFetch<FontItem[]>({ path: '/gfpdf/v1/fonts/' });
+export const apiGetCustomFontList = (
+	signal?: AbortSignal
+): Promise<FontItem[]> =>
+	apiFetch<FontItem[]>({ path: '/gfpdf/v1/fonts/', signal });
 
-export const apiAddFont = (font: FontFormData): Promise<FontItem> => {
+export const apiAddFont = (
+	font: FontFormData,
+	signal?: AbortSignal
+): Promise<FontItem> => {
 	const formData = serialize(font);
 	return apiFetch<FontItem>({
 		path: '/gfpdf/v1/fonts/',
 		method: 'POST',
 		body: formData,
+		signal,
 	});
 };
 
 export const apiEditFont = ({
 	id,
 	font,
+	signal,
 }: {
 	id: string;
 	font: Partial<FontFormData>;
+	signal?: AbortSignal;
 }): Promise<FontItem> => {
 	const formData = serialize({ ...font });
 	return apiFetch<FontItem>({
 		path: `/gfpdf/v1/fonts/${id}`,
 		method: 'POST',
 		body: formData,
+		signal,
 	});
 };
 
-export const apiDeleteFont = (id: string): Promise<unknown> =>
-	apiFetch({ path: `/gfpdf/v1/fonts/${id}`, method: 'DELETE' });
+export const apiDeleteFont = (
+	id: string,
+	signal?: AbortSignal
+): Promise<unknown> =>
+	apiFetch({ path: `/gfpdf/v1/fonts/${id}`, method: 'DELETE', signal });

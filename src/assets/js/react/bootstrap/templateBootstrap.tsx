@@ -94,13 +94,13 @@ export function createTemplateMarkup(templateField: HTMLSelectElement): void {
  */
 export function activeTemplateStoreListener(
 	templateField: HTMLSelectElement
-): void {
+): () => void {
 	let prevActiveTemplate = select(
 		TEMPLATE_STORE_NAME
 	).getActiveTemplate() as string;
 
 	/* Watch store for changes */
-	subscribe(() => {
+	const unsubscribeActive = subscribe(() => {
 		const activeTemplate = select(
 			TEMPLATE_STORE_NAME
 		).getActiveTemplate() as string;
@@ -124,6 +124,8 @@ export function activeTemplateStoreListener(
 			);
 		}
 	});
+
+	return unsubscribeActive;
 }
 
 /**
@@ -136,14 +138,14 @@ export function activeTemplateStoreListener(
  */
 export function templateChangeStoreListener(
 	templateField: HTMLSelectElement
-): void {
+): () => void {
 	let prevListLength = (select(TEMPLATE_STORE_NAME).getList() as unknown[])
 		.length;
 	let prevSelectBoxText = select(
 		TEMPLATE_STORE_NAME
 	).getUpdateSelectBoxText() as string;
 
-	subscribe(() => {
+	const unsubscribeChange = subscribe(() => {
 		const list = select(TEMPLATE_STORE_NAME).getList() as unknown[];
 		const updateSelectBoxText = select(
 			TEMPLATE_STORE_NAME
@@ -163,4 +165,6 @@ export function templateChangeStoreListener(
 			templateField.dispatchEvent(new CustomEvent('chosen:updated'));
 		}
 	}, TEMPLATE_STORE_NAME);
+
+	return unsubscribeChange;
 }

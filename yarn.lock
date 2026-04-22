@@ -4612,7 +4612,7 @@
     "@wordpress/dom-ready" "^4.44.0"
     "@wordpress/i18n" "^6.17.0"
 
-"@wordpress/api-fetch@*", "@wordpress/api-fetch@^7.44.0":
+"@wordpress/api-fetch@*":
   version "7.44.0"
   resolved "https://registry.yarnpkg.com/@wordpress/api-fetch/-/api-fetch-7.44.0.tgz#518c55ae7bdb4a97fb117aa9dc0e987e3aa9e652"
   integrity sha512-KZP5Y0AzUVPRbwCsp2MUNEjIyYPJdaa7ojzYyc/IVlaAlbXVdd0Ofk8UDf4l8PjtXkyyPs9pX9sFy5iNcrF2cQ==
@@ -4731,15 +4731,6 @@
     change-case "^4.1.2"
     mousetrap "^1.6.5"
     use-memo-one "^1.1.1"
-
-"@wordpress/data-controls@*":
-  version "4.44.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/data-controls/-/data-controls-4.44.0.tgz#f8cdff578932d7c8cbd8db391f2049abf01cef47"
-  integrity sha512-xwbDOEkoXOqWfTFEd/7eEXuu7WfksJaqc7wP22e0l706evD4dl09MYEpoLnvgqhIUa4sXAsitzHcgE3cCpnctA==
-  dependencies:
-    "@wordpress/api-fetch" "^7.44.0"
-    "@wordpress/data" "^10.44.0"
-    "@wordpress/deprecated" "^4.44.0"
 
 "@wordpress/data@*", "@wordpress/data@^10.44.0":
   version "10.44.0"
@@ -4864,15 +4855,15 @@
     simple-git "^3.5.0"
     yargs "^17.3.0"
 
-"@wordpress/escape-html@*", "@wordpress/escape-html@^3.44.0":
-  version "3.44.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/escape-html/-/escape-html-3.44.0.tgz#87d2257b810161d821f685a99b153d0841a46216"
-  integrity sha512-nAEshSe6IYFr3G8sfY8o9pYNTRKvxocQ3DXs3KUesmdaEtrtJSlDmrMOI3FIgaYfv1PP6d+cDZpsygp6IZGo2w==
-
 "@wordpress/escape-html@^3.43.0":
   version "3.43.0"
   resolved "https://registry.yarnpkg.com/@wordpress/escape-html/-/escape-html-3.43.0.tgz#275defcf758c33a78178adbfa8ea98ddad22352f"
   integrity sha512-Mo6b0y1vEnj/x7MVp+pe5IYYLs2X5ke5spuncrReO2Qb+iXw/d7694kpMGHyIVzBPj3ekwxEYezirW5OQrppOw==
+
+"@wordpress/escape-html@^3.44.0":
+  version "3.44.0"
+  resolved "https://registry.yarnpkg.com/@wordpress/escape-html/-/escape-html-3.44.0.tgz#87d2257b810161d821f685a99b153d0841a46216"
+  integrity sha512-nAEshSe6IYFr3G8sfY8o9pYNTRKvxocQ3DXs3KUesmdaEtrtJSlDmrMOI3FIgaYfv1PP6d+cDZpsygp6IZGo2w==
 
 "@wordpress/eslint-plugin@^22.11.0":
   version "22.22.0"
@@ -5048,7 +5039,7 @@
   resolved "https://registry.yarnpkg.com/@wordpress/private-apis/-/private-apis-1.44.0.tgz#f967736e57fba05e663b2f8e344db1f2c20b0b23"
   integrity sha512-fTR1HRshYIrN4yau/Z+zxY+oRFnJz/LS8XGeXx43PT5O4B25+4kO41ApdS9FG56erg8HqUB6HoqDUcReT5pzlQ==
 
-"@wordpress/redux-routine@*", "@wordpress/redux-routine@^5.44.0":
+"@wordpress/redux-routine@^5.44.0":
   version "5.44.0"
   resolved "https://registry.yarnpkg.com/@wordpress/redux-routine/-/redux-routine-5.44.0.tgz#d22394bb635650712480574317ef04937bebc4d1"
   integrity sha512-8BL3M85yv1Tx/pFgJxB9BhQYcQO/lQRkU8RzSGiQDpDmZPAFe4+5MJcymWVXExq1rKEy5sYJFNiGPB6NMGtr1g==
@@ -5809,11 +5800,6 @@ atomically@^2.0.3:
   dependencies:
     stubborn-fs "^2.0.0"
     when-exit "^2.1.4"
-
-attr-accept@^2.2.4:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/attr-accept/-/attr-accept-2.2.5.tgz#d7061d958e6d4f97bf8665c68b75851a0713ab5e"
-  integrity sha512-0bDNnY/u6pPwHDMoF0FieU354oBi0a8rD9FcsLwzcGWbc8KS8KPIi7y+s13OlVY+gMWc/9xEMUgNE6Qm8ZllYQ==
 
 autoprefixer@^10.4.20:
   version "10.5.0"
@@ -8423,13 +8409,6 @@ file-entry-cache@^6.0.1:
   integrity sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==
   dependencies:
     flat-cache "^3.0.4"
-
-file-selector@^2.1.0:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/file-selector/-/file-selector-2.1.2.tgz#fe7c7ee9e550952dfbc863d73b14dc740d7de8b4"
-  integrity sha512-QgXo+mXTe8ljeqUFaX3QVHc5osSItJ/Km+xpocx0aSqWGMSCf6qYs/VnzZgS864Pjn5iceMRFigeAV7AfTlaig==
-  dependencies:
-    tslib "^2.7.0"
 
 filename-reserved-regex@^2.0.0:
   version "2.0.0"
@@ -12727,15 +12706,6 @@ react-dom@^18.3.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.2"
 
-react-dropzone@^14.2.2:
-  version "14.4.1"
-  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-14.4.1.tgz#a33b5c348365bfc73d5fec69c91cb32c350cb9d4"
-  integrity sha512-QDuV76v3uKbHiH34SpwifZ+gOLi1+RdsCO1kl5vxMT4wW8R82+sthjvBw4th3NHF/XX6FBsqDYZVNN+pnhaw0g==
-  dependencies:
-    attr-accept "^2.2.4"
-    file-selector "^2.1.0"
-    prop-types "^15.8.1"
-
 react-instantsearch-core@7.29.0:
   version "7.29.0"
   resolved "https://registry.yarnpkg.com/react-instantsearch-core/-/react-instantsearch-core-7.29.0.tgz#96d4515e19bab04f49c949de0972f66de4b950f2"
@@ -13012,11 +12982,6 @@ requires-port@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==
-
-reselect@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/reselect/-/reselect-5.1.1.tgz#c766b1eb5d558291e5e550298adb0becc24bb72e"
-  integrity sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==
 
 resolve-alpn@^1.0.0:
   version "1.2.1"
@@ -13749,11 +13714,6 @@ speedline-core@^1.4.3:
     image-ssim "^0.2.0"
     jpeg-js "^0.4.1"
 
-sprintf-js@^1.1.2:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.1.3.tgz#4914b903a2f8b685d17fdf78a70e917e872e444a"
-  integrity sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==
-
 sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
@@ -14464,7 +14424,7 @@ tslib@^1.8.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.2.0, tslib@^2.4.0, tslib@^2.4.1, tslib@^2.7.0, tslib@^2.8.0:
+tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.2.0, tslib@^2.4.0, tslib@^2.4.1, tslib@^2.8.0:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==

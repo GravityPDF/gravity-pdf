@@ -52,7 +52,7 @@ import { TemplateItem, TemplateState } from '../types';
  * @since       7.0
  */
 
-export const TEMPLATE_STORE_NAME = 'gravity-pdf/template' as const;
+export const TEMPLATE_STORE_NAME = 'gravity-pdf/templates' as const;
 
 type ThunkArgs = { dispatch: (action: unknown) => unknown };
 
