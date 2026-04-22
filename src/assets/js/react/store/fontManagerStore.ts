@@ -54,12 +54,13 @@ import {
 } from '../utilities/FontManager/fontManagerReducer';
 import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
 /* Types */
-import {
-	FontItem,
-	FontFormData,
-	FontManagerState,
-	ApiResponse,
-} from '../types';
+import { FontItem, FontFormData, FontManagerState } from '../types';
+
+type WPRestError = {
+	code?: string;
+	message?: string;
+	data?: { status?: number };
+};
 
 /**
  * @package     Gravity PDF
@@ -453,15 +454,12 @@ export function createFontManagerStore(
 					async ({ dispatch }: ThunkArgs) => {
 						dispatch(getCustomFontListAction());
 						try {
-							const response = await apiGetCustomFontList();
-							if (!response.ok) {
-								throw response;
-							}
+							const fontList = await apiGetCustomFontList();
 							dispatch({
 								type: GET_CUSTOM_FONT_LIST_SUCCESS,
-								payload: response.body,
+								payload: fontList,
 							});
-							associatedFontManagerSelectBox(response.body);
+							associatedFontManagerSelectBox(fontList);
 						} catch {
 							dispatch({
 								type: GET_CUSTOM_FONT_LIST_ERROR,
@@ -480,14 +478,11 @@ export function createFontManagerStore(
 					async ({ dispatch }: ThunkArgs) => {
 						dispatch(addFontSyncAction(font));
 						try {
-							const response = await apiAddFont(font);
-							if (!response.ok) {
-								throw response;
-							}
+							const savedFont = await apiAddFont(font);
 							dispatch({
 								type: ADD_FONT_SUCCESS,
 								payload: {
-									font: response.body,
+									font: savedFont,
 									msg: __(
 										'Your font has been saved.',
 										'gravity-pdf'
@@ -496,14 +491,11 @@ export function createFontManagerStore(
 							});
 							speak(__('Font saved.', 'gravity-pdf'));
 						} catch (error) {
-							const err = error as ApiResponse<{
-								code?: string;
-								message?: string;
-								status?: number;
-							}>;
-							const response = err.body;
+							const err = error as WPRestError;
+							const status = err.data?.status;
+							const code = err.code;
 
-							if (!response || err.status === 500) {
+							if (!code || status === 500) {
 								dispatch({
 									type: ADD_FONT_ERROR,
 									payload: __(
@@ -519,8 +511,8 @@ export function createFontManagerStore(
 							}
 
 							if (
-								err.status === 400 &&
-								response.code === 'font_validation_error'
+								status === 400 &&
+								code === 'font_validation_error'
 							) {
 								dispatch({
 									type: ADD_FONT_ERROR,
@@ -529,7 +521,7 @@ export function createFontManagerStore(
 											'<strong>Font file(s) are malformed</strong> and cannot be used with Gravity PDF.',
 											'gravity-pdf'
 										),
-										msg: response.message,
+										msg: err.message,
 									},
 								});
 								speak(
@@ -542,7 +534,7 @@ export function createFontManagerStore(
 							dispatch({
 								type: ADD_FONT_ERROR,
 								payload:
-									response.message ||
+									err.message ||
 									__(
 										'A problem occurred. Reload the page and try again.',
 										'gravity-pdf'
@@ -562,14 +554,11 @@ export function createFontManagerStore(
 					async ({ dispatch }: ThunkArgs) => {
 						dispatch(editFontSyncAction(fontDetails));
 						try {
-							const response = await apiEditFont(fontDetails);
-							if (!response.ok) {
-								throw response;
-							}
+							const savedFont = await apiEditFont(fontDetails);
 							dispatch({
 								type: EDIT_FONT_SUCCESS,
 								payload: {
-									font: response.body,
+									font: savedFont,
 									msg: __(
 										'Your font has been saved.',
 										'gravity-pdf'
@@ -578,14 +567,9 @@ export function createFontManagerStore(
 							});
 							speak(__('Font saved.', 'gravity-pdf'));
 						} catch (error) {
-							const err = error as ApiResponse<{
-								code?: string;
-								message?: string;
-								status?: number;
-							}>;
-							const response = err?.body;
-							const status = err?.status;
-							const code = response?.code;
+							const err = error as WPRestError;
+							const status = err?.data?.status;
+							const code = err?.code;
 
 							if (
 								status === 500 &&
@@ -617,7 +601,7 @@ export function createFontManagerStore(
 											'gravity-pdf'
 										),
 										msg:
-											response?.message ||
+											err?.message ||
 											__(
 												'A problem occurred. Reload the page and try again.',
 												'gravity-pdf'
@@ -634,7 +618,7 @@ export function createFontManagerStore(
 							dispatch({
 								type: EDIT_FONT_ERROR,
 								payload:
-									response?.message ||
+									err?.message ||
 									__(
 										'A problem occurred. Reload the page and try again.',
 										'gravity-pdf'
@@ -654,10 +638,7 @@ export function createFontManagerStore(
 					async ({ dispatch }: ThunkArgs) => {
 						dispatch(deleteFontSyncAction(id));
 						try {
-							const response = await apiDeleteFont(id);
-							if (!response.ok) {
-								throw response;
-							}
+							await apiDeleteFont(id);
 							dispatch({
 								type: DELETE_FONT_SUCCESS,
 								payload: id,

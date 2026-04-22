@@ -9,24 +9,9 @@ import TemplateUploader from '../../../../../src/assets/js/react/components/Temp
 import type { TemplateState } from '../../../../../src/assets/js/react/types';
 
 jest.mock('../../../../../src/assets/js/react/api/templates', () => ({
-	apiPostUpdateSelectBox: jest.fn().mockResolvedValue({
-		ok: true,
-		status: 200,
-		text: '""',
-		body: '',
-	}),
-	apiPostTemplateProcessing: jest.fn().mockResolvedValue({
-		ok: true,
-		status: 200,
-		text: '""',
-		body: '',
-	}),
-	apiPostTemplateUploadProcessing: jest.fn().mockResolvedValue({
-		ok: true,
-		status: 200,
-		text: '{}',
-		body: {},
-	}),
+	apiPostUpdateSelectBox: jest.fn().mockResolvedValue(''),
+	apiPostTemplateProcessing: jest.fn().mockResolvedValue(null),
+	apiPostTemplateUploadProcessing: jest.fn().mockResolvedValue({}),
 }));
 
 jest.mock('@wordpress/components', () => ({

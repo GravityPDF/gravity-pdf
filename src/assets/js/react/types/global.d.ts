@@ -10,9 +10,6 @@ declare global {
 }
 
 export interface GFPDFGlobal {
-	/* WordPress REST API */
-	restUrl: string;
-	restNonce: string;
 	ajaxUrl: string;
 	ajaxNonce: string;
 

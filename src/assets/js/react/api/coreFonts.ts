@@ -1,7 +1,7 @@
 /* Dependencies */
-import { api, getJsonString } from './api';
-/* Types */
-import { ApiResponse } from '../types';
+import apiFetch from '@wordpress/api-fetch';
+/* APIs */
+import { getJsonString } from './api';
 
 /**
  * @package     Gravity PDF
@@ -15,50 +15,34 @@ interface CoreFontItem {
 	[key: string]: unknown;
 }
 
-export async function apiGetFilesFromGitHub(): Promise<
-	ApiResponse<CoreFontItem[]>
-> {
-	const response = await api(
-		GFPDF.pluginUrl + 'build/payload/core-fonts.json',
-		{
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-			},
-		}
-	);
-
+export async function apiGetFilesFromGitHub(): Promise<CoreFontItem[]> {
+	const response = await apiFetch<Response>({
+		url: GFPDF.pluginUrl + 'build/payload/core-fonts.json',
+		method: 'GET',
+		parse: false,
+	});
+	if (!response.ok) {
+		throw new Error(`Request failed: ${response.status}`);
+	}
 	const text = await response.text();
-	const body = getJsonString(text) as CoreFontItem[];
-
-	return {
-		body,
-		text,
-		status: response.status,
-		ok: response.ok,
-	};
+	return getJsonString(text) as CoreFontItem[];
 }
 
-export async function apiPostDownloadFonts(
-	file: string
-): Promise<ApiResponse<unknown>> {
+export async function apiPostDownloadFonts(file: string): Promise<unknown> {
 	const formData = new window.FormData();
 	formData.append('action', 'gfpdf_save_core_font');
 	formData.append('nonce', GFPDF.ajaxNonce);
 	formData.append('font_name', file);
 
-	const response = await api(GFPDF.ajaxUrl, {
+	const response = await apiFetch<Response>({
+		url: GFPDF.ajaxUrl,
 		method: 'POST',
 		body: formData,
+		parse: false,
 	});
-
+	if (!response.ok) {
+		throw new Error(`Request failed: ${response.status}`);
+	}
 	const text = await response.text();
-	const body = getJsonString(text);
-
-	return {
-		body,
-		text,
-		status: response.status,
-		ok: response.ok,
-	};
+	return getJsonString(text);
 }

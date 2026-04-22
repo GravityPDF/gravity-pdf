@@ -9,18 +9,8 @@ import { coreFontInitialState } from '../../../../../src/assets/js/react/store/c
 import { DOWNLOAD_FONTS_API_CALL } from '../../../../../src/assets/js/react/actions/coreFonts';
 
 jest.mock('../../../../../src/assets/js/react/api/coreFonts', () => ({
-	apiGetFilesFromGitHub: jest.fn().mockResolvedValue({
-		ok: true,
-		status: 200,
-		text: '[]',
-		body: [],
-	}),
-	apiPostDownloadFonts: jest.fn().mockResolvedValue({
-		ok: true,
-		status: 200,
-		text: '[]',
-		body: null,
-	}),
+	apiGetFilesFromGitHub: jest.fn().mockResolvedValue([]),
+	apiPostDownloadFonts: jest.fn().mockResolvedValue(null),
 }));
 
 const fontList = [

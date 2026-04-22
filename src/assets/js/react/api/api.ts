@@ -8,13 +8,6 @@ import { __ } from '@wordpress/i18n';
  * @since       6.0
  */
 
-export const api = async (
-	url: string,
-	init?: RequestInit
-): Promise<Response> => {
-	return await window.fetch(url, init);
-};
-
 export const getJsonString = (str: string): unknown => {
 	for (const character of ['{', '[']) {
 		let testStr = str;

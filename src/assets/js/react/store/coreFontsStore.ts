@@ -126,6 +126,7 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 				const status = errors ? 'error' : 'success';
 				const message = errors
 					? sprintf(
+							/* translators: %s: number of fonts that failed to install */
 							__(
 								'%s CORE FONT(S) DID NOT INSTALL CORRECTLY',
 								'gravity-pdf'
@@ -194,8 +195,8 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 					async ({ dispatch }: ThunkArgs) => {
 						dispatch(getFilesFromGitHubAction());
 						try {
-							const response = await apiGetFilesFromGitHub();
-							dispatch(getFilesFromGitHubSuccess(response.body));
+							const fontList = await apiGetFilesFromGitHub();
+							dispatch(getFilesFromGitHubSuccess(fontList));
 						} catch {
 							const errorMsg = __(
 								'Could not download Core Font list. Try again.',
@@ -212,7 +213,11 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 				(file: string) =>
 					async ({ dispatch, select }: ThunkArgs) => {
 						speak(
-							sprintf(__('Downloading %s', 'gravity-pdf'), file)
+							sprintf(
+								/* translators: %s: font filename being downloaded */
+								__('Downloading %s', 'gravity-pdf'),
+								file
+							)
 						);
 						dispatch(downloadFontsApiCall(file));
 						try {
@@ -222,6 +227,7 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 									file,
 									'success',
 									sprintf(
+										/* translators: %s: font filename */
 										__(
 											'Completed installation of %s',
 											'gravity-pdf'
@@ -236,6 +242,7 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 									file,
 									'error',
 									sprintf(
+										/* translators: %s: font filename */
 										__(
 											'Failed installation of %s',
 											'gravity-pdf'
@@ -252,6 +259,7 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 								if (retryCount > 0) {
 									speak(
 										sprintf(
+											/* translators: %d: number of fonts that failed */
 											__(
 												'%d core font(s) failed to install.',
 												'gravity-pdf'

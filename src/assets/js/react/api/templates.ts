@@ -1,7 +1,7 @@
 /* Dependencies */
-import { api, getJsonString } from './api';
-/* Types */
-import { ApiResponse } from '../types';
+import apiFetch from '@wordpress/api-fetch';
+/* APIs */
+import { getJsonString } from './api';
 
 /**
  * @package     Gravity PDF
@@ -10,71 +10,45 @@ import { ApiResponse } from '../types';
  * @since       5.2
  */
 
-export async function apiPostUpdateSelectBox(): Promise<ApiResponse<string>> {
+async function ajaxFetch(formData: FormData): Promise<string> {
+	const response = await apiFetch<Response>({
+		url: GFPDF.ajaxUrl,
+		method: 'POST',
+		body: formData,
+		parse: false,
+	});
+	if (!response.ok) {
+		throw new Error(`Request failed: ${response.status}`);
+	}
+	return response.text();
+}
+
+export async function apiPostUpdateSelectBox(): Promise<string> {
 	const formData = new window.FormData();
 	formData.append('action', 'gfpdf_get_template_options');
 	formData.append('nonce', GFPDF.ajaxNonce);
-
-	const response = await api(GFPDF.ajaxUrl, {
-		method: 'POST',
-		body: formData,
-	});
-
-	const text = await response.text();
-
-	return {
-		body: text,
-		text,
-		status: response.status,
-		ok: response.ok,
-	};
+	return ajaxFetch(formData);
 }
 
 export async function apiPostTemplateProcessing(
 	templateId: string
-): Promise<ApiResponse<unknown>> {
+): Promise<unknown> {
 	const formData = new window.FormData();
 	formData.append('action', 'gfpdf_delete_template');
 	formData.append('nonce', GFPDF.ajaxNonce);
 	formData.append('id', templateId);
-
-	const response = await api(GFPDF.ajaxUrl, {
-		method: 'POST',
-		body: formData,
-	});
-
-	const text = await response.text();
-	const body = getJsonString(text);
-
-	return {
-		body,
-		text,
-		status: response.status,
-		ok: response.ok,
-	};
+	const text = await ajaxFetch(formData);
+	return getJsonString(text);
 }
 
 export async function apiPostTemplateUploadProcessing(
 	file: File,
 	filename: string
-): Promise<ApiResponse<unknown>> {
+): Promise<unknown> {
 	const formData = new window.FormData();
 	formData.append('action', 'gfpdf_upload_template');
 	formData.append('nonce', GFPDF.ajaxNonce);
 	formData.append('template', file, filename);
-
-	const response = await api(GFPDF.ajaxUrl, {
-		method: 'POST',
-		body: formData,
-	});
-
-	const text = await response.text();
-	const body = getJsonString(text);
-
-	return {
-		body,
-		text,
-		status: response.status,
-		ok: response.ok,
-	};
+	const text = await ajaxFetch(formData);
+	return getJsonString(text);
 }

@@ -43,7 +43,7 @@ import {
 /* Selectors */
 import getFilteredTemplates from '../selectors/getTemplates';
 /* Types */
-import { TemplateItem, TemplateState, ApiResponse } from '../types';
+import { TemplateItem, TemplateState } from '../types';
 
 /**
  * @package     Gravity PDF
@@ -180,8 +180,8 @@ export function createTemplateStore(overrideInitial?: Partial<TemplateState>) {
 				() =>
 					async ({ dispatch }: ThunkArgs) => {
 						try {
-							const response = await apiPostUpdateSelectBox();
-							dispatch(updateSelectBoxSuccess(response.body));
+							const html = await apiPostUpdateSelectBox();
+							dispatch(updateSelectBoxSuccess(html));
 						} catch {
 							dispatch(updateSelectBoxFailed());
 						}
@@ -211,14 +211,13 @@ export function createTemplateStore(overrideInitial?: Partial<TemplateState>) {
 				(file: File, filename: string) =>
 					async ({ dispatch }: ThunkArgs) => {
 						try {
-							const response =
-								await apiPostTemplateUploadProcessing(
-									file,
-									filename
-								);
+							const body = await apiPostTemplateUploadProcessing(
+								file,
+								filename
+							);
 							dispatch(
 								templateUploadProcessingSuccess(
-									response.body as Record<string, unknown>
+									body as Record<string, unknown>
 								)
 							);
 							speak(__('Template installed.', 'gravity-pdf'));
