@@ -27,10 +27,5 @@ export interface GFPDFGlobal {
 	activeDefaultTemplate: string;
 	userCapabilities: Record<string, boolean | string | undefined>;
 
-	/* Admin bundle (admin.min.js) — migrated to __() separately */
-	spinnerAlt: string;
 	spinnerUrl: string;
-	letsGoCreateOne: string;
-	thisFormHasNoPdfs: string;
-	pdfDeleteWarning: string;
 }

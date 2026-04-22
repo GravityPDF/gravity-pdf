@@ -404,12 +404,14 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 					'jquery-color',
 					'wp-color-picker',
 				],
+				'textdomain'   => 'gravity-pdf',
 				'in_footer'    => true,
 				'strategy'     => 'defer',
 				'css_path'     => null,
 				'minify'       => null,
 			]
 		);
+		wp_set_script_translations( 'gfpdf_js_settings', 'gravity-pdf', PDF_PLUGIN_DIR . 'languages' );
 
 		Assets::register_script(
 			'gfpdf_js_entrypoint',

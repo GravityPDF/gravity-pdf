@@ -1,4 +1,5 @@
 const $ = jQuery;
+import { __ } from '@wordpress/i18n';
 import { ajaxCall } from '../../../helper/ajaxCall';
 import { spinner } from '../../../helper/spinner';
 import { showMessage } from '../../../helper/showMessage';
@@ -30,8 +31,11 @@ export function setupAJAXListDeleteListener(): void {
 					'href',
 					$('#gfpdf_list_form a.button:first').attr('href') ?? ''
 				)
-				.append(GFPDF.letsGoCreateOne + '.');
-			$cell.append(GFPDF.thisFormHasNoPdfs).append(' ').append($addNew);
+				.append(__("Let's go create one", 'gravity-pdf') + '.');
+			$cell
+				.append(__("This form doesn't have any PDFs.", 'gravity-pdf'))
+				.append(' ')
+				.append($addNew);
 			$row.append($cell);
 			$container.append($row);
 		}
@@ -73,7 +77,15 @@ export function setupAJAXListDeleteListener(): void {
 	/* Add live delete listener */
 	$('#gfpdf_list_form').on('click', 'a.submitdelete', function () {
 		const id = String($(this).data('id'));
-		if (id.length > 0 && window.confirm(GFPDF.pdfDeleteWarning)) {
+		if (
+			id.length > 0 &&
+			window.confirm(
+				__(
+					"WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete.",
+					'gravity-pdf'
+				)
+			)
+		) {
 			const $elm = $(this);
 			deletePdf($elm);
 		}
