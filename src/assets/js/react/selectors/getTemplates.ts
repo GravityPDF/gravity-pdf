@@ -1,6 +1,6 @@
 /* Dependencies */
 import { __, sprintf } from '@wordpress/i18n';
-import { createSelector } from 'reselect';
+import { createSelector } from '@wordpress/data';
 /* Utilities */
 import versionCompare from '../utilities/versionCompare';
 /* Types */
@@ -15,11 +15,6 @@ import { TemplateItem, TemplateState } from '../types';
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
-
-/* Input selectors — receive the template slice state directly (as used by createReduxStore) */
-const getTemplates = (state: TemplateState) => state.list;
-const getSearch = (state: TemplateState) => state.search;
-const getActiveTemplate = (state: TemplateState) => state.activeTemplate;
 
 export const searchTemplates = (
 	term: string,
@@ -129,14 +124,12 @@ export const addCompatibilityCheck = (
 };
 
 export default createSelector(
-	[getTemplates, getSearch, getActiveTemplate],
-	(templates, search, activeTemplate) => {
-		templates = addCompatibilityCheck(templates);
-
-		if (search) {
-			templates = searchTemplates(search, templates);
+	(state: TemplateState) => {
+		let templates = addCompatibilityCheck(state.list);
+		if (state.search) {
+			templates = searchTemplates(state.search, templates);
 		}
-
-		return sortTemplates(templates, activeTemplate);
-	}
+		return sortTemplates(templates, state.activeTemplate);
+	},
+	(state: TemplateState) => [state.list, state.search, state.activeTemplate]
 );
