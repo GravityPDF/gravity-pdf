@@ -184,7 +184,9 @@ const TemplateUploader = ({
 
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = Array.from(e.target.files ?? []);
-		if (files.length) handleOndrop(files);
+		if (files.length) {
+			handleOndrop(files);
+		}
 	};
 
 	const removeMessage = () => {

@@ -54,7 +54,12 @@ import {
 } from '../utilities/FontManager/fontManagerReducer';
 import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
 /* Types */
-import { FontItem, FontFormData, FontManagerState, ApiResponse } from '../types';
+import {
+	FontItem,
+	FontFormData,
+	FontManagerState,
+	ApiResponse,
+} from '../types';
 
 /**
  * @package     Gravity PDF
@@ -72,7 +77,9 @@ function taggedThunk<TArgs extends unknown[]>(
 	factory: (...args: TArgs) => (args: ThunkArgs) => Promise<void>
 ): (...args: TArgs) => ((args: ThunkArgs) => Promise<void>) & { type: string } {
 	return (...args: TArgs) => {
-		const thunk = factory(...args) as ((args: ThunkArgs) => Promise<void>) & { type: string };
+		const thunk = factory(...args) as ((
+			args: ThunkArgs
+		) => Promise<void>) & { type: string };
 		thunk.type = type;
 		return thunk;
 	};
@@ -130,7 +137,10 @@ export function createFontManagerStore(
 			}
 
 			case ADD_FONT_SUCCESS: {
-				const payload = action.payload as { font: FontItem; msg: string };
+				const payload = action.payload as {
+					font: FontItem;
+					msg: string;
+				};
 				if (state.msg.error && state.msg.error.fontList) {
 					return {
 						...state,
@@ -439,174 +449,234 @@ export function createFontManagerStore(
 			/* Thunk action creators (tagged for spy compatibility) */
 			getCustomFontList: taggedThunk(
 				GET_CUSTOM_FONT_LIST,
-				() => async ({ dispatch }: ThunkArgs) => {
-					dispatch(getCustomFontListAction());
-					try {
-						const response = await apiGetCustomFontList();
-						if (!response.ok) {
-							throw response;
+				() =>
+					async ({ dispatch }: ThunkArgs) => {
+						dispatch(getCustomFontListAction());
+						try {
+							const response = await apiGetCustomFontList();
+							if (!response.ok) {
+								throw response;
+							}
+							dispatch({
+								type: GET_CUSTOM_FONT_LIST_SUCCESS,
+								payload: response.body,
+							});
+							associatedFontManagerSelectBox(response.body);
+						} catch {
+							dispatch({
+								type: GET_CUSTOM_FONT_LIST_ERROR,
+								payload: __(
+									'A problem occurred. Reload the page and try again.',
+									'gravity-pdf'
+								),
+							});
 						}
-						dispatch({
-							type: GET_CUSTOM_FONT_LIST_SUCCESS,
-							payload: response.body,
-						});
-						associatedFontManagerSelectBox(response.body);
-					} catch {
-						dispatch({
-							type: GET_CUSTOM_FONT_LIST_ERROR,
-							payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
-						});
 					}
-				}
 			),
 
 			addFont: taggedThunk(
 				ADD_FONT,
-				(font: FontFormData) => async ({ dispatch }: ThunkArgs) => {
-					dispatch(addFontSyncAction(font));
-					try {
-						const response = await apiAddFont(font);
-						if (!response.ok) {
-							throw response;
-						}
-						dispatch({
-							type: ADD_FONT_SUCCESS,
-							payload: {
-								font: response.body,
-								msg: __( 'Your font has been saved.', 'gravity-pdf' ),
-							},
-						});
-						speak(__('Font saved.', 'gravity-pdf'));
-					} catch (error) {
-						const err = error as ApiResponse<{
-							code?: string;
-							message?: string;
-							status?: number;
-						}>;
-						const response = err.body;
-
-						if (!response || err.status === 500) {
+				(font: FontFormData) =>
+					async ({ dispatch }: ThunkArgs) => {
+						dispatch(addFontSyncAction(font));
+						try {
+							const response = await apiAddFont(font);
+							if (!response.ok) {
+								throw response;
+							}
 							dispatch({
-								type: ADD_FONT_ERROR,
-								payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
-							});
-							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
-							return;
-						}
-
-						if (
-							err.status === 400 &&
-							response.code === 'font_validation_error'
-						) {
-							dispatch({
-								type: ADD_FONT_ERROR,
+								type: ADD_FONT_SUCCESS,
 								payload: {
-									fontValidationError: __( '<strong>Font file(s) are malformed</strong> and cannot be used with Gravity PDF.', 'gravity-pdf' ),
-									msg: response.message,
+									font: response.body,
+									msg: __(
+										'Your font has been saved.',
+										'gravity-pdf'
+									),
 								},
 							});
-							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
-							return;
-						}
+							speak(__('Font saved.', 'gravity-pdf'));
+						} catch (error) {
+							const err = error as ApiResponse<{
+								code?: string;
+								message?: string;
+								status?: number;
+							}>;
+							const response = err.body;
 
-						dispatch({
-							type: ADD_FONT_ERROR,
-							payload:
-								response.message || __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
-						});
-						speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
+							if (!response || err.status === 500) {
+								dispatch({
+									type: ADD_FONT_ERROR,
+									payload: __(
+										'A problem occurred. Reload the page and try again.',
+										'gravity-pdf'
+									),
+								});
+								speak(
+									__('Error saving font.', 'gravity-pdf'),
+									'assertive'
+								);
+								return;
+							}
+
+							if (
+								err.status === 400 &&
+								response.code === 'font_validation_error'
+							) {
+								dispatch({
+									type: ADD_FONT_ERROR,
+									payload: {
+										fontValidationError: __(
+											'<strong>Font file(s) are malformed</strong> and cannot be used with Gravity PDF.',
+											'gravity-pdf'
+										),
+										msg: response.message,
+									},
+								});
+								speak(
+									__('Error saving font.', 'gravity-pdf'),
+									'assertive'
+								);
+								return;
+							}
+
+							dispatch({
+								type: ADD_FONT_ERROR,
+								payload:
+									response.message ||
+									__(
+										'A problem occurred. Reload the page and try again.',
+										'gravity-pdf'
+									),
+							});
+							speak(
+								__('Error saving font.', 'gravity-pdf'),
+								'assertive'
+							);
+						}
 					}
-				}
 			),
 
 			editFont: taggedThunk(
 				EDIT_FONT,
-				(fontDetails: {
-					id: string;
-					font: Partial<FontFormData>;
-				}) => async ({ dispatch }: ThunkArgs) => {
-					dispatch(editFontSyncAction(fontDetails));
-					try {
-						const response = await apiEditFont(fontDetails);
-						if (!response.ok) {
-							throw response;
-						}
-						dispatch({
-							type: EDIT_FONT_SUCCESS,
-							payload: {
-								font: response.body,
-								msg: __( 'Your font has been saved.', 'gravity-pdf' ),
-							},
-						});
-						speak(__('Font saved.', 'gravity-pdf'));
-					} catch (error) {
-						const err = error as ApiResponse<{
-							code?: string;
-							message?: string;
-							status?: number;
-						}>;
-						const response = err?.body;
-						const status = err?.status;
-						const code = response?.code;
-
-						if (
-							status === 500 &&
-							code !== 'font_file_gone_missing'
-						) {
+				(fontDetails: { id: string; font: Partial<FontFormData> }) =>
+					async ({ dispatch }: ThunkArgs) => {
+						dispatch(editFontSyncAction(fontDetails));
+						try {
+							const response = await apiEditFont(fontDetails);
+							if (!response.ok) {
+								throw response;
+							}
 							dispatch({
-								type: EDIT_FONT_ERROR,
-								payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
-							});
-							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
-							return;
-						}
-
-						if (
-							status === 400 &&
-							code === 'font_validation_error'
-						) {
-							dispatch({
-								type: EDIT_FONT_ERROR,
+								type: EDIT_FONT_SUCCESS,
 								payload: {
-									fontValidationError: __( '<strong>Font file(s) are malformed</strong> and cannot be used with Gravity PDF.', 'gravity-pdf' ),
-									msg:
-										response?.message ||
-										__( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
+									font: response.body,
+									msg: __(
+										'Your font has been saved.',
+										'gravity-pdf'
+									),
 								},
 							});
-							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
-							return;
-						}
+							speak(__('Font saved.', 'gravity-pdf'));
+						} catch (error) {
+							const err = error as ApiResponse<{
+								code?: string;
+								message?: string;
+								status?: number;
+							}>;
+							const response = err?.body;
+							const status = err?.status;
+							const code = response?.code;
 
-						dispatch({
-							type: EDIT_FONT_ERROR,
-							payload:
-								response?.message || __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
-						});
-						speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
+							if (
+								status === 500 &&
+								code !== 'font_file_gone_missing'
+							) {
+								dispatch({
+									type: EDIT_FONT_ERROR,
+									payload: __(
+										'A problem occurred. Reload the page and try again.',
+										'gravity-pdf'
+									),
+								});
+								speak(
+									__('Error saving font.', 'gravity-pdf'),
+									'assertive'
+								);
+								return;
+							}
+
+							if (
+								status === 400 &&
+								code === 'font_validation_error'
+							) {
+								dispatch({
+									type: EDIT_FONT_ERROR,
+									payload: {
+										fontValidationError: __(
+											'<strong>Font file(s) are malformed</strong> and cannot be used with Gravity PDF.',
+											'gravity-pdf'
+										),
+										msg:
+											response?.message ||
+											__(
+												'A problem occurred. Reload the page and try again.',
+												'gravity-pdf'
+											),
+									},
+								});
+								speak(
+									__('Error saving font.', 'gravity-pdf'),
+									'assertive'
+								);
+								return;
+							}
+
+							dispatch({
+								type: EDIT_FONT_ERROR,
+								payload:
+									response?.message ||
+									__(
+										'A problem occurred. Reload the page and try again.',
+										'gravity-pdf'
+									),
+							});
+							speak(
+								__('Error saving font.', 'gravity-pdf'),
+								'assertive'
+							);
+						}
 					}
-				}
 			),
 
 			deleteFont: taggedThunk(
 				DELETE_FONT,
-				(id: string) => async ({ dispatch }: ThunkArgs) => {
-					dispatch(deleteFontSyncAction(id));
-					try {
-						const response = await apiDeleteFont(id);
-						if (!response.ok) {
-							throw response;
+				(id: string) =>
+					async ({ dispatch }: ThunkArgs) => {
+						dispatch(deleteFontSyncAction(id));
+						try {
+							const response = await apiDeleteFont(id);
+							if (!response.ok) {
+								throw response;
+							}
+							dispatch({
+								type: DELETE_FONT_SUCCESS,
+								payload: id,
+							});
+							speak(__('Font deleted.', 'gravity-pdf'));
+						} catch {
+							dispatch({
+								type: DELETE_FONT_ERROR,
+								payload: __(
+									'A problem occurred. Reload the page and try again.',
+									'gravity-pdf'
+								),
+							});
+							speak(
+								__('Error deleting font.', 'gravity-pdf'),
+								'assertive'
+							);
 						}
-						dispatch({ type: DELETE_FONT_SUCCESS, payload: id });
-						speak(__('Font deleted.', 'gravity-pdf'));
-					} catch {
-						dispatch({
-							type: DELETE_FONT_ERROR,
-							payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
-						});
-						speak(__('Error deleting font.', 'gravity-pdf'), 'assertive');
 					}
-				}
 			),
 		},
 		selectors: {

@@ -95,11 +95,15 @@ export function createTemplateMarkup(templateField: HTMLSelectElement): void {
 export function activeTemplateStoreListener(
 	templateField: HTMLSelectElement
 ): void {
-	let prevActiveTemplate = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
+	let prevActiveTemplate = select(
+		TEMPLATE_STORE_NAME
+	).getActiveTemplate() as string;
 
 	/* Watch store for changes */
 	subscribe(() => {
-		const activeTemplate = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
+		const activeTemplate = select(
+			TEMPLATE_STORE_NAME
+		).getActiveTemplate() as string;
 		if (activeTemplate !== prevActiveTemplate) {
 			prevActiveTemplate = activeTemplate;
 			if (templateField.value !== activeTemplate) {
@@ -111,9 +115,13 @@ export function activeTemplateStoreListener(
 
 	/* Watch DOM for changes */
 	templateField.addEventListener('change', () => {
-		const activeTemplate = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
+		const activeTemplate = select(
+			TEMPLATE_STORE_NAME
+		).getActiveTemplate() as string;
 		if (templateField.value !== activeTemplate) {
-			void wpDispatch(TEMPLATE_STORE_NAME).selectTemplate(templateField.value);
+			void wpDispatch(TEMPLATE_STORE_NAME).selectTemplate(
+				templateField.value
+			);
 		}
 	});
 }
@@ -129,12 +137,17 @@ export function activeTemplateStoreListener(
 export function templateChangeStoreListener(
 	templateField: HTMLSelectElement
 ): void {
-	let prevListLength = (select(TEMPLATE_STORE_NAME).getList() as unknown[]).length;
-	let prevSelectBoxText = select(TEMPLATE_STORE_NAME).getUpdateSelectBoxText() as string;
+	let prevListLength = (select(TEMPLATE_STORE_NAME).getList() as unknown[])
+		.length;
+	let prevSelectBoxText = select(
+		TEMPLATE_STORE_NAME
+	).getUpdateSelectBoxText() as string;
 
 	subscribe(() => {
 		const list = select(TEMPLATE_STORE_NAME).getList() as unknown[];
-		const updateSelectBoxText = select(TEMPLATE_STORE_NAME).getUpdateSelectBoxText() as string;
+		const updateSelectBoxText = select(
+			TEMPLATE_STORE_NAME
+		).getUpdateSelectBoxText() as string;
 
 		if (list.length !== prevListLength) {
 			prevListLength = list.length;
@@ -144,7 +157,9 @@ export function templateChangeStoreListener(
 		if (updateSelectBoxText && updateSelectBoxText !== prevSelectBoxText) {
 			prevSelectBoxText = updateSelectBoxText;
 			templateField.innerHTML = updateSelectBoxText;
-			templateField.value = select(TEMPLATE_STORE_NAME).getActiveTemplate() as string;
+			templateField.value = select(
+				TEMPLATE_STORE_NAME
+			).getActiveTemplate() as string;
 			templateField.dispatchEvent(new CustomEvent('chosen:updated'));
 		}
 	}, TEMPLATE_STORE_NAME);

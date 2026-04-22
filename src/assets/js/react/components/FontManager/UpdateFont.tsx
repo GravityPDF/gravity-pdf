@@ -66,7 +66,12 @@ export const UpdateFont = ({
 			<form name="component-PDF-UpdateFont" onSubmit={onHandleSubmit}>
 				<h2>{__('Update Font', 'gravity-pdf')}</h2>
 
-				<p>{__('Once saved, PDFs configured to use this font will have your changes applied automatically for newly-generated documents.', 'gravity-pdf')}</p>
+				<p>
+					{__(
+						'Once saved, PDFs configured to use this font will have your changes applied automatically for newly-generated documents.',
+						'gravity-pdf'
+					)}
+				</p>
 
 				<label
 					htmlFor="gfpdf-update-font-name-input"
@@ -79,7 +84,10 @@ export const UpdateFont = ({
 				</label>
 
 				<p id="gfpdf-font-name-desc-update">
-					{__('The font name can only contain letters, numbers and spaces.', 'gravity-pdf')}
+					{__(
+						'The font name can only contain letters, numbers and spaces.',
+						'gravity-pdf'
+					)}
 				</p>
 
 				<input
@@ -99,7 +107,12 @@ export const UpdateFont = ({
 				<div aria-live="polite">
 					{!validateLabel && (
 						<span className="required" role="alert">
-							<em>{__('Please choose a name contains letters and/or numbers (and a space if you want it).', 'gravity-pdf')}</em>
+							<em>
+								{__(
+									'Please choose a name contains letters and/or numbers (and a space if you want it).',
+									'gravity-pdf'
+								)}
+							</em>
 						</span>
 					)}
 				</div>
@@ -110,7 +123,10 @@ export const UpdateFont = ({
 				</label>
 
 				<p id="gfpdf-font-files-description-update">
-					{__('Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.', 'gravity-pdf')}
+					{__(
+						'Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.',
+						'gravity-pdf'
+					)}
 				</p>
 
 				<FontVariant

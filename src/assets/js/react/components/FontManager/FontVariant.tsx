@@ -66,8 +66,7 @@ function FontVariantItem({
 		'gfpdf-font-files-description-' +
 		(state === 'addFont' ? 'add' : 'update');
 
-	const currentUploadFontName =
-		font !== '' && typeof font !== 'object';
+	const currentUploadFontName = font !== '' && typeof font !== 'object';
 	const fontName = currentUploadFontName
 		? (font as string).substr((font as string).lastIndexOf('/') + 1)
 		: (font as File).name;
@@ -76,14 +75,10 @@ function FontVariantItem({
 		typeof error.addFont === 'object' &&
 		(error.addFont as Record<string, string>)[key];
 	const regularFieldValidation =
-		key === 'regular' &&
-		!validateRegular &&
-		fontStyles.regular === '';
+		key === 'regular' && !validateRegular && fontStyles.regular === '';
 	const dropZoneActive = font ? ' active' : '';
 	const dropZoneError = fontFileMissing ? ' error' : '';
-	const dropZoneRequiredRegular = regularFieldValidation
-		? ' required'
-		: '';
+	const dropZoneRequiredRegular = regularFieldValidation ? ' required' : '';
 	const dropZoneClassEnhancement =
 		dropZoneActive + dropZoneError + dropZoneRequiredRegular;
 	const dropZoneIcon = font ? 'trash' : 'plus';
@@ -94,7 +89,9 @@ function FontVariantItem({
 			<DropZone
 				onFilesDrop={(files) => {
 					const file = files.find((f) => f.name.endsWith('.ttf'));
-					if (file) onHandleUpload(key, file, state);
+					if (file) {
+						onHandleUpload(key, file, state);
+					}
 				}}
 			/>
 			<a
@@ -133,7 +130,9 @@ function FontVariantItem({
 						style={{ display: 'none' }}
 						onChange={(e) => {
 							const file = e.target.files?.[0];
-							if (file) onHandleUpload(key, file, state);
+							if (file) {
+								onHandleUpload(key, file, state);
+							}
 						}}
 					/>
 				)}
@@ -147,16 +146,9 @@ function FontVariantItem({
 					{!fontFileMissing ? fontName : fontFileMissing}
 				</span>
 
-				<span
-					className={
-						'dashicons dashicons-' + dropZoneIcon
-					}
-				/>
+				<span className={'dashicons dashicons-' + dropZoneIcon} />
 
-				<FontVariantLabel
-					label={key}
-					font={displayRequiredText}
-				/>
+				<FontVariantLabel label={key} font={displayRequiredText} />
 			</a>
 		</div>
 	);

@@ -84,7 +84,11 @@ const TemplateListItem = ({
 			role="option"
 			tabIndex={0}
 			aria-label={
-				template?.group + ' ' + template?.template + ' ' + __('Details', 'gravity-pdf')
+				template?.group +
+				' ' +
+				template?.template +
+				' ' +
+				__('Details', 'gravity-pdf')
 			}
 		>
 			<TemplateScreenshot image={template?.screenshot} />

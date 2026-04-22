@@ -89,7 +89,9 @@ describe('CloseDialog - CloseDialog.js', () => {
 			const { container } = renderWithStore(<CloseDialog />);
 
 			expect(
-				container.querySelector('button[data-test="component-CloseDialog"]')
+				container.querySelector(
+					'button[data-test="component-CloseDialog"]'
+				)
 			).toHaveAttribute('aria-label', 'Close dialog');
 		});
 

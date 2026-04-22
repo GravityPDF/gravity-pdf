@@ -23,7 +23,9 @@ export function associatedFontManagerSelectBox(
 	const selectedValue = fontManagerSelectBox.value;
 	const definedFontsOptgroup = document.querySelector(
 		// eslint-disable-next-line no-undef
-		'optgroup[label="' + CSS.escape(__('User-Defined Fonts', 'gravity-pdf')) + '"]'
+		'optgroup[label="' +
+			CSS.escape(__('User-Defined Fonts', 'gravity-pdf')) +
+			'"]'
 	);
 
 	// Remove the entire User-Defined Font group if it exists

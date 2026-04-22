@@ -61,10 +61,19 @@ export const HelpContainer = () => {
 			/>
 
 			<SearchBox
-				placeholder={__('Search the Gravity PDF Documentation...', 'gravity-pdf')}
+				placeholder={__(
+					'Search the Gravity PDF Documentation…',
+					'gravity-pdf'
+				)}
 				translations={{
-					submitButtonTitle: __('Submit your search query.', 'gravity-pdf'),
-					resetButtonTitle: __('Clear your search query.', 'gravity-pdf'),
+					submitButtonTitle: __(
+						'Submit your search query.',
+						'gravity-pdf'
+					),
+					resetButtonTitle: __(
+						'Clear your search query.',
+						'gravity-pdf'
+					),
 				}}
 			/>
 
@@ -99,7 +108,12 @@ function EmptyQueryBoundary({ children, fallback }: EmptyQueryBoundaryProps) {
 function NoResults() {
 	return (
 		<div className="search-result">
-			<em>{__("It doesn't look like there are any topics related to your issue.", 'gravity-pdf')}</em>
+			<em>
+				{__(
+					"It doesn't look like there are any topics related to your issue.",
+					'gravity-pdf'
+				)}
+			</em>
 		</div>
 	);
 }

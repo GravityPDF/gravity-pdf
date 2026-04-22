@@ -52,7 +52,9 @@ jest.mock('@wordpress/components', () => ({
 			<button
 				data-test="drop-large-file"
 				onClick={() =>
-					onFilesDrop?.([{ name: 'template.zip', size: 1024 * 10241 }])
+					onFilesDrop?.([
+						{ name: 'template.zip', size: 1024 * 10241 },
+					])
 				}
 			/>
 		</>

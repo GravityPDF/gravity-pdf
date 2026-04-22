@@ -49,11 +49,12 @@ export type TestStore = {
 };
 
 function isGenerator(obj: unknown): boolean {
-	if (!obj || typeof obj !== 'object') return false;
+	if (!obj || typeof obj !== 'object') {
+		return false;
+	}
 	const o = obj as Record<PropertyKey, unknown>;
 	return (
-		typeof o[Symbol.iterator] === 'function' &&
-		typeof o.next === 'function'
+		typeof o[Symbol.iterator] === 'function' && typeof o.next === 'function'
 	);
 }
 
@@ -70,6 +71,7 @@ function isGenerator(obj: unknown): boolean {
  * jest.spyOn(store, 'dispatch') intercepts all dispatches because both the
  * patched rawStore.dispatch and test-direct calls go through testStore.dispatch
  * via property lookup.
+ * @param initialState
  */
 export function createTestStore(
 	initialState: TestInitialState = {}
@@ -87,14 +89,17 @@ export function createTestStore(
 	] as const;
 
 	/* Capture original (pre-patch) dispatches for each store */
-	const originalDispatches = {} as Record<string, (action: unknown) => unknown>;
+	const originalDispatches = {} as Record<
+		string,
+		(action: unknown) => unknown
+	>;
 	for (const name of storeNames) {
 		/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 		const rawStore = (registry as any).stores?.[name]?.store;
 		if (rawStore) {
-			originalDispatches[name] = rawStore.dispatch.bind(
-				rawStore
-			) as (action: unknown) => unknown;
+			originalDispatches[name] = rawStore.dispatch.bind(rawStore) as (
+				action: unknown
+			) => unknown;
 		}
 	}
 
@@ -121,7 +126,9 @@ export function createTestStore(
 			return {
 				template: getRaw(TEMPLATE_STORE_NAME) as TemplateState,
 				coreFonts: getRaw(CORE_FONTS_STORE_NAME) as CoreFontState,
-				fontManager: getRaw(FONT_MANAGER_STORE_NAME) as FontManagerState,
+				fontManager: getRaw(
+					FONT_MANAGER_STORE_NAME
+				) as FontManagerState,
 			};
 		},
 	};

@@ -32,6 +32,9 @@ export const getJsonString = (str: string): unknown => {
 	console.error('Invalid API response', str);
 
 	return {
-		error: __('A problem occurred. Reload the page and try again.', 'gravity-pdf'),
+		error: __(
+			'A problem occurred. Reload the page and try again.',
+			'gravity-pdf'
+		),
 	};
 };

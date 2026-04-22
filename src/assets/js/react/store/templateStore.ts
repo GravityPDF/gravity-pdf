@@ -63,7 +63,9 @@ function taggedThunk<TArgs extends unknown[]>(
 	factory: (...args: TArgs) => (args: ThunkArgs) => Promise<void>
 ): (...args: TArgs) => ((args: ThunkArgs) => Promise<void>) & { type: string } {
 	return (...args: TArgs) => {
-		const thunk = factory(...args) as ((args: ThunkArgs) => Promise<void>) & { type: string };
+		const thunk = factory(...args) as ((
+			args: ThunkArgs
+		) => Promise<void>) & { type: string };
 		thunk.type = type;
 		return thunk;
 	};
@@ -175,49 +177,63 @@ export function createTemplateStore(overrideInitial?: Partial<TemplateState>) {
 			/* Thunk action creators (tagged with action type for spy compatibility) */
 			updateSelectBox: taggedThunk(
 				UPDATE_SELECT_BOX,
-				() => async ({ dispatch }: ThunkArgs) => {
-					try {
-						const response = await apiPostUpdateSelectBox();
-						dispatch(updateSelectBoxSuccess(response.body));
-					} catch {
-						dispatch(updateSelectBoxFailed());
+				() =>
+					async ({ dispatch }: ThunkArgs) => {
+						try {
+							const response = await apiPostUpdateSelectBox();
+							dispatch(updateSelectBoxSuccess(response.body));
+						} catch {
+							dispatch(updateSelectBoxFailed());
+						}
 					}
-				}
 			),
 
 			templateProcessing: taggedThunk(
 				TEMPLATE_PROCESSING,
-				(templateId: string) => async ({ dispatch }: ThunkArgs) => {
-					try {
-						await apiPostTemplateProcessing(templateId);
-						dispatch(templateProcessingSuccess('success'));
-						speak(__('Template activated.', 'gravity-pdf'));
-					} catch {
-						dispatch(templateProcessingFailed('failed'));
-						speak(__('Error activating template.', 'gravity-pdf'), 'assertive');
+				(templateId: string) =>
+					async ({ dispatch }: ThunkArgs) => {
+						try {
+							await apiPostTemplateProcessing(templateId);
+							dispatch(templateProcessingSuccess('success'));
+							speak(__('Template activated.', 'gravity-pdf'));
+						} catch {
+							dispatch(templateProcessingFailed('failed'));
+							speak(
+								__('Error activating template.', 'gravity-pdf'),
+								'assertive'
+							);
+						}
 					}
-				}
 			),
 
 			postTemplateUploadProcessing: taggedThunk(
 				POST_TEMPLATE_UPLOAD_PROCESSING,
-				(file: File, filename: string) => async ({ dispatch }: ThunkArgs) => {
-					try {
-						const response = await apiPostTemplateUploadProcessing(
-							file,
-							filename
-						);
-						dispatch(templateUploadProcessingSuccess(
-							response.body as Record<string, unknown>
-						));
-						speak(__('Template installed.', 'gravity-pdf'));
-					} catch (error) {
-						dispatch(templateUploadProcessingFailed({
-							message: (error as Error).message,
-						}));
-						speak(__('Error installing template.', 'gravity-pdf'), 'assertive');
+				(file: File, filename: string) =>
+					async ({ dispatch }: ThunkArgs) => {
+						try {
+							const response =
+								await apiPostTemplateUploadProcessing(
+									file,
+									filename
+								);
+							dispatch(
+								templateUploadProcessingSuccess(
+									response.body as Record<string, unknown>
+								)
+							);
+							speak(__('Template installed.', 'gravity-pdf'));
+						} catch (error) {
+							dispatch(
+								templateUploadProcessingFailed({
+									message: (error as Error).message,
+								})
+							);
+							speak(
+								__('Error installing template.', 'gravity-pdf'),
+								'assertive'
+							);
+						}
 					}
-				}
 			),
 		},
 		selectors: {

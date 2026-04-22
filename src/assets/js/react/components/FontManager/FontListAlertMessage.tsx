@@ -16,8 +16,9 @@ interface Props {
 }
 
 const FontListAlertMessage = ({ empty, error }: Props) => {
-	const { resetSearchResult, getCustomFontList } =
-		useDispatch(FONT_MANAGER_STORE_NAME);
+	const { resetSearchResult, getCustomFontList } = useDispatch(
+		FONT_MANAGER_STORE_NAME
+	);
 
 	const fontListEmpty = <span>{__('Font list empty.', 'gravity-pdf')}</span>;
 	const searchResultEmpty = (

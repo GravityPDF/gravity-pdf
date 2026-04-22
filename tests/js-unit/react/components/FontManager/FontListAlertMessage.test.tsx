@@ -21,7 +21,9 @@ describe('FontManager - FontListAlertMessage.js', () => {
 			expect(
 				screen.getByText('No fonts matching your search found.')
 			).toBeInTheDocument();
-			expect(screen.getByText('Clear your search query.')).toBeInTheDocument();
+			expect(
+				screen.getByText('Clear your search query.')
+			).toBeInTheDocument();
 		});
 
 		test('display API call request link', () => {

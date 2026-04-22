@@ -25,12 +25,8 @@ interface Props {
 }
 
 const FontListItems = ({ id, navigate }: Props) => {
-	const {
-		clearAddFontMsg,
-		deleteFont,
-		selectFont,
-		moveSelectedFontToTop,
-	} = useDispatch(FONT_MANAGER_STORE_NAME);
+	const { clearAddFontMsg, deleteFont, selectFont, moveSelectedFontToTop } =
+		useDispatch(FONT_MANAGER_STORE_NAME);
 	const loading = useSelect(
 		(select) => select(FONT_MANAGER_STORE_NAME).getDeleteFontLoading(),
 		[]
@@ -162,7 +158,11 @@ const FontListItems = ({ id, navigate }: Props) => {
 		e.stopPropagation();
 		setDeleteId(fontId);
 
-		if (window.confirm(__('Are you sure you want to delete this font?', 'gravity-pdf'))) {
+		if (
+			window.confirm(
+				__('Are you sure you want to delete this font?', 'gravity-pdf')
+			)
+		) {
 			deleteFont(fontId);
 		}
 	};

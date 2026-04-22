@@ -90,10 +90,7 @@ const CoreFontContainer = ({
 		clearButtonClickedAndRetryList();
 		navigate('/');
 
-		setTimeout(
-			() => files.forEach((file) => downloadFonts(file)),
-			300
-		);
+		setTimeout(() => files.forEach((file) => downloadFonts(file)), 300);
 	};
 
 	const maybeStartDownload = (

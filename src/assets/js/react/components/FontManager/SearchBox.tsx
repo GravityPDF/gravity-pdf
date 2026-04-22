@@ -17,8 +17,9 @@ interface Props {
 }
 
 const SearchBox = ({ id }: Props) => {
-	const { resetSearchResult, searchFontList } =
-		useDispatch(FONT_MANAGER_STORE_NAME);
+	const { resetSearchResult, searchFontList } = useDispatch(
+		FONT_MANAGER_STORE_NAME
+	);
 	const searchResult = useSelect(
 		(select) => select(FONT_MANAGER_STORE_NAME).getSearchResult(),
 		[]

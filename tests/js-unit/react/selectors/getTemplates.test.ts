@@ -102,17 +102,29 @@ describe('Selectors - getTemplates', () => {
 			) => TemplateItem[];
 
 			/* check the sort works */
-			let list = selectorFn({ list: templates, search: '', activeTemplate: '' });
+			let list = selectorFn({
+				list: templates,
+				search: '',
+				activeTemplate: '',
+			});
 
 			expect(list[0].id).toBe('adelade');
 
 			/* check the search works */
-			list = selectorFn({ list: templates, search: 'default', activeTemplate: '' });
+			list = selectorFn({
+				list: templates,
+				search: 'default',
+				activeTemplate: '',
+			});
 
 			expect(list.length).toBe(3);
 
 			/* check the sort and search works */
-			list = selectorFn({ list: templates, search: 'core', activeTemplate: 'zadani' });
+			list = selectorFn({
+				list: templates,
+				search: 'core',
+				activeTemplate: 'zadani',
+			});
 			const checkforLast = list.length - 1;
 
 			expect(list.length).toBe(5);

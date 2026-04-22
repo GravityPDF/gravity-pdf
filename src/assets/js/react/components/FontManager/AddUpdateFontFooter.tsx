@@ -63,7 +63,11 @@ const AddUpdateFontFooter = ({
 	};
 
 	const handleDeleteFont = (fontId: string) => {
-		if (window.confirm(__('Are you sure you want to delete this font?', 'gravity-pdf'))) {
+		if (
+			window.confirm(
+				__('Are you sure you want to delete this font?', 'gravity-pdf')
+			)
+		) {
 			deleteFont(fontId);
 		}
 	};
@@ -73,7 +77,14 @@ const AddUpdateFontFooter = ({
 		fontId: string
 	) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			if (window.confirm(__('Are you sure you want to delete this font?', 'gravity-pdf'))) {
+			if (
+				window.confirm(
+					__(
+						'Are you sure you want to delete this font?',
+						'gravity-pdf'
+					)
+				)
+			) {
 				deleteFont(fontId);
 			}
 		}
@@ -165,10 +176,9 @@ const AddUpdateFontFooter = ({
 
 			{displayInvalidFileErrorMessage && (
 				<span className="msg error">
-					{createInterpolateElement(
-						errorFontValidation as string,
-						{ strong: <strong /> }
-					)}
+					{createInterpolateElement(errorFontValidation as string, {
+						strong: <strong />,
+					})}
 				</span>
 			)}
 
@@ -182,10 +192,9 @@ const AddUpdateFontFooter = ({
 								),
 								{ strong: <strong /> }
 							)
-						: createInterpolateElement(
-								error?.addFont as string,
-								{ strong: <strong /> }
-							)}
+						: createInterpolateElement(error?.addFont as string, {
+								strong: <strong />,
+							})}
 				</span>
 			)}
 

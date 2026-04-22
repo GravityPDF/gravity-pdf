@@ -37,17 +37,47 @@ export const Routes = (): JSX.Element => (
 						<TemplateList
 							ajaxUrl={GFPDF.ajaxUrl}
 							ajaxNonce={GFPDF.ajaxNonce}
-							templateDetailsText={__('Template Details', 'gravity-pdf')}
-							templateHeaderText={__('Installed PDFs', 'gravity-pdf')}
-							genericUploadErrorText={__('There was a problem with the upload. Reload the page and try again.', 'gravity-pdf')}
+							templateDetailsText={__(
+								'Template Details',
+								'gravity-pdf'
+							)}
+							templateHeaderText={__(
+								'Installed PDFs',
+								'gravity-pdf'
+							)}
+							genericUploadErrorText={__(
+								'There was a problem with the upload. Reload the page and try again.',
+								'gravity-pdf'
+							)}
 							activateText={__('Select', 'gravity-pdf')}
-							addTemplateText={__('Add New Template', 'gravity-pdf')}
-							filenameErrorText={__('Upload is not a valid template. Upload a .zip file.', 'gravity-pdf')}
-							filesizeErrorText={__('Upload exceeds the 10MB limit.', 'gravity-pdf')}
-							installSuccessText={__('Template successfully installed', 'gravity-pdf')}
-							installUpdatedText={__('Template successfully updated', 'gravity-pdf')}
-							templateSuccessfullyInstalledUpdated={__('PDF Template(s) Successfully Installed / Updated', 'gravity-pdf')}
-							templateInstallInstructions={__('If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-pdf')}
+							addTemplateText={__(
+								'Add New Template',
+								'gravity-pdf'
+							)}
+							filenameErrorText={__(
+								'Upload is not a valid template. Upload a .zip file.',
+								'gravity-pdf'
+							)}
+							filesizeErrorText={__(
+								'Upload exceeds the 10MB limit.',
+								'gravity-pdf'
+							)}
+							installSuccessText={__(
+								'Template successfully installed',
+								'gravity-pdf'
+							)}
+							installUpdatedText={__(
+								'Template successfully updated',
+								'gravity-pdf'
+							)}
+							templateSuccessfullyInstalledUpdated={__(
+								'PDF Template(s) Successfully Installed / Updated',
+								'gravity-pdf'
+							)}
+							templateInstallInstructions={__(
+								'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).',
+								'gravity-pdf'
+							)}
 						/>
 					}
 				/>
@@ -61,16 +91,31 @@ export const Routes = (): JSX.Element => (
 							activateText={__('Select', 'gravity-pdf')}
 							templateDeleteText={__('Delete', 'gravity-pdf')}
 							templateConfirmDeleteText={sprintf(
-								__("Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-pdf'),
+								__(
+									"Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.",
+									'gravity-pdf'
+								),
 								'\n\n'
 							)}
-							templateDeleteErrorText={__('Could not delete template.', 'gravity-pdf')}
-							currentTemplateText={__('Current Template', 'gravity-pdf')}
+							templateDeleteErrorText={__(
+								'Could not delete template.',
+								'gravity-pdf'
+							)}
+							currentTemplateText={__(
+								'Current Template',
+								'gravity-pdf'
+							)}
 							versionText={__('Version', 'gravity-pdf')}
 							groupText={__('Group', 'gravity-pdf')}
 							tagsText={__('Tags', 'gravity-pdf')}
-							showPreviousTemplateText={__('Show previous template', 'gravity-pdf')}
-							showNextTemplateText={__('Show next template', 'gravity-pdf')}
+							showPreviousTemplateText={__(
+								'Show previous template',
+								'gravity-pdf'
+							)}
+							showNextTemplateText={__(
+								'Show next template',
+								'gravity-pdf'
+							)}
 						/>
 					}
 				/>

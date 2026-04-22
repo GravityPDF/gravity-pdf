@@ -26,10 +26,7 @@ import {
 	clearRequestRemainingData,
 } from '../actions/coreFonts';
 /* APIs */
-import {
-	apiGetFilesFromGitHub,
-	apiPostDownloadFonts,
-} from '../api/coreFonts';
+import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts';
 /* Types */
 import { CoreFontState, ConsoleLine } from '../types';
 
@@ -65,14 +62,19 @@ function taggedThunk<TArgs extends unknown[]>(
 	factory: (...args: TArgs) => (args: ThunkArgs) => Promise<void>
 ): (...args: TArgs) => ((args: ThunkArgs) => Promise<void>) & { type: string } {
 	return (...args: TArgs) => {
-		const thunk = factory(...args) as ((args: ThunkArgs) => Promise<void>) & { type: string };
+		const thunk = factory(...args) as ((
+			args: ThunkArgs
+		) => Promise<void>) & { type: string };
 		thunk.type = type;
 		return thunk;
 	};
 }
 
 export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
-	const initial: CoreFontState = { ...coreFontInitialState, ...overrideInitial };
+	const initial: CoreFontState = {
+		...coreFontInitialState,
+		...overrideInitial,
+	};
 
 	function reducer(
 		state: CoreFontState = initial,
@@ -105,9 +107,9 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 			case GET_FILES_FROM_GITHUB:
 				return { ...state, buttonClicked: true };
 			case GET_FILES_FROM_GITHUB_SUCCESS: {
-				const files = (
-					action.payload as Array<{ name: string }>
-				).map((item) => item.name);
+				const files = (action.payload as Array<{ name: string }>).map(
+					(item) => item.name
+				);
 				return {
 					...state,
 					fontList: files,
@@ -123,8 +125,17 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 				const errors = state.retry.length;
 				const status = errors ? 'error' : 'success';
 				const message = errors
-					? sprintf(__('%s CORE FONT(S) DID NOT INSTALL CORRECTLY', 'gravity-pdf'), String(errors))
-					: __('ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-pdf');
+					? sprintf(
+							__(
+								'%s CORE FONT(S) DID NOT INSTALL CORRECTLY',
+								'gravity-pdf'
+							),
+							String(errors)
+						)
+					: __(
+							'ALL CORE FONTS SUCCESSFULLY INSTALLED',
+							'gravity-pdf'
+						);
 				const newCounter = state.downloadCounter - 1;
 
 				if (newCounter === 0) {
@@ -179,53 +190,87 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 			/* Thunk action creators (tagged for spy compatibility) */
 			getFilesFromGitHub: taggedThunk(
 				GET_FILES_FROM_GITHUB,
-				() => async ({ dispatch }: ThunkArgs) => {
-					dispatch(getFilesFromGitHubAction());
-					try {
-						const response = await apiGetFilesFromGitHub();
-						dispatch(getFilesFromGitHubSuccess(response.body));
-					} catch {
-						const errorMsg = __('Could not download Core Font list. Try again.', 'gravity-pdf');
-						dispatch(getFilesFromGitHubFailed(errorMsg));
-						speak(errorMsg, 'assertive');
+				() =>
+					async ({ dispatch }: ThunkArgs) => {
+						dispatch(getFilesFromGitHubAction());
+						try {
+							const response = await apiGetFilesFromGitHub();
+							dispatch(getFilesFromGitHubSuccess(response.body));
+						} catch {
+							const errorMsg = __(
+								'Could not download Core Font list. Try again.',
+								'gravity-pdf'
+							);
+							dispatch(getFilesFromGitHubFailed(errorMsg));
+							speak(errorMsg, 'assertive');
+						}
 					}
-				}
 			),
 
 			downloadFonts: taggedThunk(
 				DOWNLOAD_FONTS_API_CALL,
-				(file: string) => async ({ dispatch, select }: ThunkArgs) => {
-					speak(sprintf(__('Downloading %s', 'gravity-pdf'), file));
-					dispatch(downloadFontsApiCall(file));
-					try {
-						await apiPostDownloadFonts(file);
-						dispatch(addToConsole(
-							file,
-							'success',
-							sprintf(__('Completed installation of %s', 'gravity-pdf'), file)
-						));
-					} catch {
-						dispatch(addToConsole(
-							file,
-							'error',
-							sprintf(__('Failed installation of %s', 'gravity-pdf'), file)
-						));
-						dispatch(addToRetryList(file));
-					} finally {
-						dispatch(currentDownload());
-						if (select.getRequestDownload() === 'finished') {
-							const retryCount = select.getRetry().length;
-							if (retryCount > 0) {
-								speak(
-									sprintf(__('%d core font(s) failed to install.', 'gravity-pdf'), retryCount),
-									'assertive'
-								);
-							} else {
-								speak(__('Core fonts downloaded.', 'gravity-pdf'));
+				(file: string) =>
+					async ({ dispatch, select }: ThunkArgs) => {
+						speak(
+							sprintf(__('Downloading %s', 'gravity-pdf'), file)
+						);
+						dispatch(downloadFontsApiCall(file));
+						try {
+							await apiPostDownloadFonts(file);
+							dispatch(
+								addToConsole(
+									file,
+									'success',
+									sprintf(
+										__(
+											'Completed installation of %s',
+											'gravity-pdf'
+										),
+										file
+									)
+								)
+							);
+						} catch {
+							dispatch(
+								addToConsole(
+									file,
+									'error',
+									sprintf(
+										__(
+											'Failed installation of %s',
+											'gravity-pdf'
+										),
+										file
+									)
+								)
+							);
+							dispatch(addToRetryList(file));
+						} finally {
+							dispatch(currentDownload());
+							if (select.getRequestDownload() === 'finished') {
+								const retryCount = select.getRetry().length;
+								if (retryCount > 0) {
+									speak(
+										sprintf(
+											__(
+												'%d core font(s) failed to install.',
+												'gravity-pdf'
+											),
+											retryCount
+										),
+										'assertive'
+									);
+								} else {
+									speak(
+										__(
+											'Core fonts downloaded.',
+											'gravity-pdf'
+										)
+									);
+								}
 							}
 						}
 					}
-				}
 			),
 		},
 		selectors: {

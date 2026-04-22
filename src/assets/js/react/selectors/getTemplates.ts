@@ -111,9 +111,15 @@ export const addCompatibilityCheck = (
 			return {
 				...template,
 				compatible: false,
-				error: sprintf(__('Requires Gravity PDF v%s', 'gravity-pdf'), requiredVersion),
+				error: sprintf(
+					__('Requires Gravity PDF v%s', 'gravity-pdf'),
+					requiredVersion
+				),
 				long_error: sprintf(
-					__('This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.', 'gravity-pdf'),
+					__(
+						'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.',
+						'gravity-pdf'
+					),
 					requiredVersion
 				),
 			};
