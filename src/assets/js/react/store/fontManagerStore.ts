@@ -1,5 +1,6 @@
 /* Dependencies */
 import { createReduxStore } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 /* Action type constants */
 import {
@@ -475,6 +476,7 @@ export function createFontManagerStore(
 								msg: __( 'Your font has been saved.', 'gravity-pdf' ),
 							},
 						});
+						speak(__('Font saved.', 'gravity-pdf'));
 					} catch (error) {
 						const err = error as ApiResponse<{
 							code?: string;
@@ -488,6 +490,7 @@ export function createFontManagerStore(
 								type: ADD_FONT_ERROR,
 								payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 							});
+							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
 							return;
 						}
 
@@ -502,6 +505,7 @@ export function createFontManagerStore(
 									msg: response.message,
 								},
 							});
+							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
 							return;
 						}
 
@@ -510,6 +514,7 @@ export function createFontManagerStore(
 							payload:
 								response.message || __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 						});
+						speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
 					}
 				}
 			),
@@ -533,6 +538,7 @@ export function createFontManagerStore(
 								msg: __( 'Your font has been saved.', 'gravity-pdf' ),
 							},
 						});
+						speak(__('Font saved.', 'gravity-pdf'));
 					} catch (error) {
 						const err = error as ApiResponse<{
 							code?: string;
@@ -551,6 +557,7 @@ export function createFontManagerStore(
 								type: EDIT_FONT_ERROR,
 								payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 							});
+							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
 							return;
 						}
 
@@ -567,6 +574,7 @@ export function createFontManagerStore(
 										__( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 								},
 							});
+							speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
 							return;
 						}
 
@@ -575,6 +583,7 @@ export function createFontManagerStore(
 							payload:
 								response?.message || __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 						});
+						speak(__('Error saving font.', 'gravity-pdf'), 'assertive');
 					}
 				}
 			),
@@ -589,11 +598,13 @@ export function createFontManagerStore(
 							throw response;
 						}
 						dispatch({ type: DELETE_FONT_SUCCESS, payload: id });
+						speak(__('Font deleted.', 'gravity-pdf'));
 					} catch {
 						dispatch({
 							type: DELETE_FONT_ERROR,
 							payload: __( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
 						});
+						speak(__('Error deleting font.', 'gravity-pdf'), 'assertive');
 					}
 				}
 			),

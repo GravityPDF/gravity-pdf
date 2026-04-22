@@ -1,5 +1,6 @@
 /* Dependencies */
 import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { createReduxStore } from '@wordpress/data';
 /* Actions */
 import {
@@ -51,7 +52,13 @@ export const coreFontInitialState: CoreFontState = {
 	downloadCounter: 0,
 };
 
-type ThunkArgs = { dispatch: (action: unknown) => unknown };
+type ThunkArgs = {
+	dispatch: (action: unknown) => unknown;
+	select: {
+		getRequestDownload: () => string;
+		getRetry: () => string[];
+	};
+};
 
 function taggedThunk<TArgs extends unknown[]>(
 	type: string,
@@ -178,14 +185,17 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 						const response = await apiGetFilesFromGitHub();
 						dispatch(getFilesFromGitHubSuccess(response.body));
 					} catch {
-						dispatch(getFilesFromGitHubFailed(__('Could not download Core Font list. Try again.', 'gravity-pdf')));
+						const errorMsg = __('Could not download Core Font list. Try again.', 'gravity-pdf');
+						dispatch(getFilesFromGitHubFailed(errorMsg));
+						speak(errorMsg, 'assertive');
 					}
 				}
 			),
 
 			downloadFonts: taggedThunk(
 				DOWNLOAD_FONTS_API_CALL,
-				(file: string) => async ({ dispatch }: ThunkArgs) => {
+				(file: string) => async ({ dispatch, select }: ThunkArgs) => {
+					speak(sprintf(__('Downloading %s', 'gravity-pdf'), file));
 					dispatch(downloadFontsApiCall(file));
 					try {
 						await apiPostDownloadFonts(file);
@@ -203,6 +213,17 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 						dispatch(addToRetryList(file));
 					} finally {
 						dispatch(currentDownload());
+						if (select.getRequestDownload() === 'finished') {
+							const retryCount = select.getRetry().length;
+							if (retryCount > 0) {
+								speak(
+									sprintf(__('%d core font(s) failed to install.', 'gravity-pdf'), retryCount),
+									'assertive'
+								);
+							} else {
+								speak(__('Core fonts downloaded.', 'gravity-pdf'));
+							}
+						}
 					}
 				}
 			),

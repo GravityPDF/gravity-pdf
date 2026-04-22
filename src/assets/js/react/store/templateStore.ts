@@ -1,5 +1,7 @@
 /* Dependencies */
 import { createReduxStore } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 /* Actions */
 import {
 	SEARCH_TEMPLATES,
@@ -189,8 +191,10 @@ export function createTemplateStore(overrideInitial?: Partial<TemplateState>) {
 					try {
 						await apiPostTemplateProcessing(templateId);
 						dispatch(templateProcessingSuccess('success'));
+						speak(__('Template activated.', 'gravity-pdf'));
 					} catch {
 						dispatch(templateProcessingFailed('failed'));
+						speak(__('Error activating template.', 'gravity-pdf'), 'assertive');
 					}
 				}
 			),
@@ -206,10 +210,12 @@ export function createTemplateStore(overrideInitial?: Partial<TemplateState>) {
 						dispatch(templateUploadProcessingSuccess(
 							response.body as Record<string, unknown>
 						));
+						speak(__('Template installed.', 'gravity-pdf'));
 					} catch (error) {
 						dispatch(templateUploadProcessingFailed({
 							message: (error as Error).message,
 						}));
+						speak(__('Error installing template.', 'gravity-pdf'), 'assertive');
 					}
 				}
 			),
