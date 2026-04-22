@@ -38,7 +38,8 @@
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
     "gravitypdf/querypath": "^4.0",
-    "gravitypdf/upload": "^3.0"
+    "gravitypdf/upload": "^3.0",
+    "automattic/jetpack-assets": "^4.3"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",

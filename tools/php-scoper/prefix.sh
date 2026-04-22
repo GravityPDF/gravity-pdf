@@ -31,6 +31,12 @@ eval "rm -Rf ${PLUGIN_DIR}vendor/masterminds"
 # Codeguy
 eval "$PHP ${PLUGIN_DIR}vendor/bin/php-scoper add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/gravitypdf/upload --config=${PLUGIN_DIR}tools/php-scoper/config/upload.php -n -vvv"
 
+# Jetpack Assets (must run before mpdf step which removes vendor/myclabs, a php-scoper dependency)
+eval "$PHP ${PLUGIN_DIR}vendor/bin/php-scoper add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}tools/php-scoper/config/jetpack-assets.php -n -vvv"
+eval "rm -Rf ${PLUGIN_DIR}vendor/automattic"
+# Regenerate autoloader so subsequent php-scoper invocations do not try to load the removed actions.php
+eval "$COMPOSER dump-autoload --no-scripts --working-dir ${PLUGIN_DIR}"
+
 # Mpdf
 eval "$PHP ${PLUGIN_DIR}vendor/bin/php-scoper add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}tools/php-scoper/config/mpdf.php -n -vvv"
 eval "rm -Rf ${PLUGIN_DIR}vendor/mpdf"
