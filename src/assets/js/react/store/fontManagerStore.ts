@@ -683,6 +683,7 @@ export function createFontManagerStore(
 							if ((error as Error)?.name === 'AbortError') {
 								return;
 							}
+
 							dispatch({
 								type: DELETE_FONT_ERROR,
 								payload: __(

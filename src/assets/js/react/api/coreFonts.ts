@@ -44,5 +44,9 @@ export async function apiPostDownloadFonts(file: string): Promise<unknown> {
 		throw new Error(`Request failed: ${response.status}`);
 	}
 	const text = await response.text();
-	return getJsonString(text);
+	const body = getJsonString(text);
+	if (!body) {
+		throw new Error('Font download failed');
+	}
+	return body;
 }

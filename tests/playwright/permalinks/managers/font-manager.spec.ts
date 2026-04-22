@@ -22,28 +22,30 @@ test.describe(() => {
 		}) => {
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Font Manager');
-
-			// Delete any fonts
-			await pdf.navigateToNewFormPdf(form.id);
-			await page
-				.locator('#gfpdf-settings-field-wrapper-font-container')
-				.getByRole('button', { name: 'Manage' })
-				.click();
-
-			const fontItems = page
-				.locator('.font-list-items .dashicons-trash')
-				.filter({ visible: true });
-
-			await page.waitForTimeout(500);
-
-			const fontItemsCount = await fontItems.count();
-
-			page.on('dialog', (dialog) => dialog.accept());
-			for (let i = fontItemsCount - 1; i >= 0; i--) {
-				await fontItems.nth(i).click();
-			}
 		}
 	);
+
+	async function deleteAnyFonts(page: Page): Promise<void> {
+		// Delete any fonts
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.locator('#gfpdf-settings-field-wrapper-font-container')
+			.getByRole('button', { name: 'Manage' })
+			.click();
+
+		const fontItems = page
+			.locator('.font-list-items .dashicons-trash')
+			.filter({ visible: true });
+
+		await page.waitForTimeout(500);
+
+		const fontItemsCount = await fontItems.count();
+
+		page.on('dialog', (dialog) => dialog.accept());
+		for (let i = fontItemsCount - 1; i >= 0; i--) {
+			await fontItems.nth(i).click();
+		}
+	}
 
 	test('should display "Font" field and open Font Manager', async ({
 		page,
@@ -88,6 +90,8 @@ test.describe(() => {
 		await expect(page.getByLabel('Font', { exact: true })).toHaveValue(
 			'mph2bdamase'
 		);
+
+		await deleteAnyFonts(page);
 	});
 
 	test('should display font manager error validation', async ({ page }) => {
@@ -185,9 +189,11 @@ test.describe(() => {
 		await expect(page.getByText('Roboto 2')).toBeVisible();
 
 		// Delete Font
-		await fontItems.locator('.dashicons-trash').click();
-		await page.waitForTimeout(500);
-		await expect(page.getByText('Font list empty.')).toBeVisible();
+		page.on('dialog', (dialog) => dialog.accept());
+		await page.getByRole('button', { name: 'Delete font' }).click();
+		await expect(page.getByText('Font list empty.')).toBeVisible({
+			timeout: 10000,
+		});
 	});
 
 	test('should be able to close font manager popup with button', async ({
@@ -202,7 +208,7 @@ test.describe(() => {
 		const popup = await page.locator('.container.theme-wrap.font-manager');
 
 		await expect(popup).toBeVisible();
-		await page.getByRole('button', { name: 'close', exact: true }).click();
+		await page.getByRole('button', { name: 'Close dialog' }).click();
 		await expect(popup).not.toBeVisible();
 	});
 

@@ -406,7 +406,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			FlushCache::flush();
 
-			return;
+			return [ 'status' => 'OK' ];
 
 		} catch ( GravityPdfDatabaseUpdateException $e ) {
 			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );

@@ -14,7 +14,7 @@ import { FontItem, FontFormData } from '../types';
 export const apiGetCustomFontList = (
 	signal?: AbortSignal
 ): Promise<FontItem[]> =>
-	apiFetch<FontItem[]>({ path: '/gfpdf/v1/fonts/', signal });
+	apiFetch<FontItem[]>({ path: '/gravity-pdf/v1/fonts/', signal });
 
 export const apiAddFont = (
 	font: FontFormData,
@@ -22,7 +22,7 @@ export const apiAddFont = (
 ): Promise<FontItem> => {
 	const formData = serialize(font);
 	return apiFetch<FontItem>({
-		path: '/gfpdf/v1/fonts/',
+		path: '/gravity-pdf/v1/fonts/',
 		method: 'POST',
 		body: formData,
 		signal,
@@ -40,7 +40,7 @@ export const apiEditFont = ({
 }): Promise<FontItem> => {
 	const formData = serialize({ ...font });
 	return apiFetch<FontItem>({
-		path: `/gfpdf/v1/fonts/${id}`,
+		path: `/gravity-pdf/v1/fonts/${id}`,
 		method: 'POST',
 		body: formData,
 		signal,
@@ -51,4 +51,4 @@ export const apiDeleteFont = (
 	id: string,
 	signal?: AbortSignal
 ): Promise<unknown> =>
-	apiFetch({ path: `/gfpdf/v1/fonts/${id}`, method: 'DELETE', signal });
+	apiFetch({ path: `/gravity-pdf/v1/fonts/${id}`, method: 'DELETE', signal });

@@ -12,6 +12,7 @@ const config = defineConfig({
 	workers: 4,
 	quiet: !!process.env.CI,
 	maxFailures: process.env.CI ? 5 : 0,
+	retries: process.env.CI ? 2 : 1,
 
 	testDir: undefined,
 
@@ -39,11 +40,6 @@ const config = defineConfig({
 		...baseConfig.use,
 		baseURL: undefined,
 		disableAutoSnapshot: true,
-		ignoreSelectors: [
-			'#wpadminbar',
-			'#adminmenumain',
-			'#gform-form-toolbar',
-		],
 	},
 
 	projects: [

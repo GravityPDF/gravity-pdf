@@ -132,7 +132,7 @@ test.describe('Template Manager', () => {
 			.click();
 
 		const popup = page.locator('.container.theme-wrap');
-		await page.getByRole('button', { name: 'close', exact: true }).click();
+		await page.getByRole('button', { name: 'Close dialog' }).click();
 		await expect(popup).not.toBeVisible();
 	});
 
