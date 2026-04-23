@@ -1,7 +1,7 @@
 /* Dependencies */
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 
 /**
  * Render the button used to option our Fancy PDF template selector
@@ -21,7 +21,7 @@ const TemplateButton = ({ navigate }: Props) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		navigate('template');
+		navigate('/template');
 	};
 
 	return (

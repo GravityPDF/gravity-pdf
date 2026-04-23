@@ -1,6 +1,6 @@
 /* Dependencies */
 import type { MouseEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
 /* Components */
 import ListSpacer from './CoreFontListSpacer';

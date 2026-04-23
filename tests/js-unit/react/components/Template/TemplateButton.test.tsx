@@ -24,6 +24,6 @@ describe('Template - TemplateButton.js', () => {
 	test('handleClick() - calls navigate with template route', () => {
 		const { container } = render(<TemplateButton navigate={navigate} />);
 		fireEvent.click(container.querySelector('button')!);
-		expect(navigate).toHaveBeenCalledWith('template');
+		expect(navigate).toHaveBeenCalledWith('/template');
 	});
 });

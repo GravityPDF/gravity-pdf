@@ -1,5 +1,5 @@
 /* Dependencies */
-import { Params } from 'react-router-dom';
+import { Params } from 'react-router';
 /* Components */
 import TemplateContainer from './TemplateContainer';
 import TemplateHeaderNavigation from './TemplateHeaderNavigation';

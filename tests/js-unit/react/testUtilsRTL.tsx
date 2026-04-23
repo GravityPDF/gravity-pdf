@@ -2,7 +2,7 @@ import * as React from '@wordpress/element';
 import type { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 import {
 	createTemplateStore,
@@ -196,11 +196,7 @@ export function renderWithRouter(
 
 	const Wrapper = ({ children }: { children: ReactNode }) => (
 		<RegistryProvider value={registry}>
-			<MemoryRouter
-				initialEntries={[route]}
-			>
-				{children}
-			</MemoryRouter>
+			<MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
 		</RegistryProvider>
 	);
 

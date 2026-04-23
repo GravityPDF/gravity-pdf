@@ -1,11 +1,11 @@
 /* Dependencies */
 import { __ } from '@wordpress/i18n';
-import { Routes as Switch, Route } from 'react-router-dom';
+import { Routes as Switch, Route } from 'react-router';
 /* Components */
 import CoreFontContainer from '../components/CoreFonts/CoreFontContainer';
 import Empty from '../components/Empty';
 /* Helpers */
-import { HashRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router';
 
 /**
  * @package			Gravity PDF

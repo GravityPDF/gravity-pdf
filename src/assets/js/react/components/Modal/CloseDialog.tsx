@@ -1,6 +1,6 @@
 /* Dependencies */
 import { useEffect } from '@wordpress/element';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';

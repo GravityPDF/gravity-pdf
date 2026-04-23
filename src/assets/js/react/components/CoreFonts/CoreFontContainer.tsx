@@ -1,6 +1,6 @@
 /* Dependencies */
 import { useState, useEffect } from '@wordpress/element';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 /* Components */
 import { CoreFontListResults } from './CoreFontListResults';
 import Counter from './CoreFontCounter';

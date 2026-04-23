@@ -2,7 +2,7 @@
 import { useRef, useEffect } from '@wordpress/element';
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';

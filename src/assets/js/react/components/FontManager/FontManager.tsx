@@ -1,6 +1,6 @@
 /* Dependencies */
 import { useEffect, useRef } from '@wordpress/element';
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 import { useSelect } from '@wordpress/data';
 import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */

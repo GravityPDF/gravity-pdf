@@ -1,19 +1,15 @@
 /* Dependencies */
-import { lazy, Suspense, createRoot } from '@wordpress/element';
-import { Routes as Switch, Route } from 'react-router-dom';
+import { createRoot, createPortal } from '@wordpress/element';
 import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
+import { HashRouter, useLocation } from 'react-router';
 /* Store name */
 import { TEMPLATE_STORE_NAME, templateStore } from '../store/templateStore';
 /* Routes */
-import templateRouter from '../router/templateRouter';
+import TemplateRoutes from '../router/templateRouter';
 /* Helpers */
 import withRouterHooks from '../utilities/withRouterHooks';
 /* Components */
-import { HashRouter } from 'react-router-dom';
-import Empty from '../components/Empty';
-const TemplateButton = lazy(
-	() => import('../components/Template/TemplateButton')
-);
+import TemplateButton from '../components/Template/TemplateButton';
 
 /**
  * Advanced Template Selector Bootstrap
@@ -24,34 +20,49 @@ const TemplateButton = lazy(
  * @since       4.1
  */
 
+const TemplateButtonWithRouter = withRouterHooks(TemplateButton);
+
+interface AppProps {
+	buttonContainer: Element;
+}
+
+const TemplateApp = ({ buttonContainer }: AppProps) => {
+	const { pathname } = useLocation();
+	const isOpen = pathname.startsWith('/template');
+
+	return (
+		<>
+			{/* Portal renders the button in its sibling DOM node; hidden while modal is open */}
+			{!isOpen &&
+				createPortal(<TemplateButtonWithRouter />, buttonContainer)}
+
+			<TemplateRoutes />
+		</>
+	);
+};
+
 /**
- * Handles the loading of our Fancy Template Selector
+ * Handles the loading of the Fancy Template Selector.
+ *
+ * Mounts the button and overlay as a single React root so they share one
+ * HashRouter context — no shared-history coordination required.
  *
  * @param templateField
  * @since 4.1
  */
 export function templateBootstrap(templateField: HTMLSelectElement): void {
-	/* Create our button container and render our component in it */
 	createTemplateMarkup(templateField);
 
-	const container = document.getElementById('gpdf-advance-template-selector');
+	const buttonContainer = document.getElementById(
+		'gpdf-advance-template-selector'
+	)!;
+	const overlayContainer = document.getElementById('gfpdf-overlay')!;
 
-	const root = createRoot(container!);
-
-	/* Render our React Component in the DOM */
-	root.render(
-		<Suspense fallback={<div />}>
-			<HashRouter>
-				<Switch>
-					<Route path="/" element={<TemplateButtonWithRouter />} />
-					<Route path="*" element={<Empty />} />
-				</Switch>
-			</HashRouter>
-		</Suspense>
+	createRoot(overlayContainer).render(
+		<HashRouter>
+			<TemplateApp buttonContainer={buttonContainer} />
+		</HashRouter>
 	);
-
-	/* Mount our router */
-	templateRouter();
 
 	/*
 	 * Listen for @wordpress/data store updates and do DOM updates
@@ -59,8 +70,6 @@ export function templateBootstrap(templateField: HTMLSelectElement): void {
 	activeTemplateStoreListener(templateField);
 	templateChangeStoreListener(templateField);
 }
-
-const TemplateButtonWithRouter = withRouterHooks(TemplateButton);
 
 /**
  * Dynamically add the required markup to attach our React components to.

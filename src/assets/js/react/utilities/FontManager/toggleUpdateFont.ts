@@ -5,7 +5,7 @@
  * @since       6.0
  */
 
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 
 export function toggleUpdateFont(
 	navigate: NavigateFunction,

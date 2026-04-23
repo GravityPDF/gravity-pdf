@@ -1,7 +1,7 @@
 /* Dependencies */
 import { useRef, useEffect } from '@wordpress/element';
 import type { MouseEvent } from 'react';
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 /* Types */
 import { TemplateItem } from '../../types';
 

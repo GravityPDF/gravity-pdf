@@ -1,13 +1,12 @@
 /* Dependencies */
-import { lazy, Suspense, createRoot } from '@wordpress/element';
-import { Route, Routes } from 'react-router-dom';
-/* Routes */
-import { fontManagerRouter } from '../router/fontManagerRouter';
+import { lazy, Suspense, createRoot, createPortal } from '@wordpress/element';
+import { HashRouter, Routes, Route, useLocation } from 'react-router';
 /* Helpers */
 import withRouterHooks from '../utilities/withRouterHooks';
 /* Components */
-import { HashRouter } from 'react-router-dom';
+import FontManager from '../components/FontManager/FontManager';
 import Empty from '../components/Empty';
+
 const AdvancedButton = lazy(
 	() => import('../components/FontManager/AdvancedButton')
 );
@@ -19,8 +18,40 @@ const AdvancedButton = lazy(
  * @since       6.0
  */
 
+const AdvancedButtonWithRouter = withRouterHooks(AdvancedButton);
+const FontManagerWithRouter = withRouterHooks(FontManager);
+
+interface AppProps {
+	buttonContainer: Element;
+}
+
+const FontManagerApp = ({ buttonContainer }: AppProps) => {
+	const { pathname } = useLocation();
+	const isOpen = pathname.startsWith('/fontmanager');
+
+	return (
+		<>
+			{/* Portal renders the button in its sibling DOM node; hidden while modal is open */}
+			{!isOpen &&
+				createPortal(<AdvancedButtonWithRouter />, buttonContainer)}
+
+			<Routes>
+				<Route
+					path="/fontmanager/"
+					element={<FontManagerWithRouter />}
+				/>
+				<Route
+					path="/fontmanager/:id"
+					element={<FontManagerWithRouter />}
+				/>
+				<Route path="*" element={<Empty />} />
+			</Routes>
+		</>
+	);
+};
+
 /**
- * Mount our font manager advanced button on the DOM
+ * Mount the font manager button and overlay as a single React root.
  *
  * @param defaultFontField
  * @param buttonStyle
@@ -35,27 +66,19 @@ export function fontManagerBootstrap(
 
 	createAdvancedButtonWrapper(defaultFontField, preventButtonReset);
 
-	const container = document.querySelector(
+	const buttonContainer = document.querySelector(
 		'#gpdf-advance-font-manager-selector' + preventButtonReset
-	);
+	)!;
+	const overlayContainer = document.querySelector('#font-manager-overlay')!;
 
-	const root = createRoot(container!);
-
-	root.render(
+	createRoot(overlayContainer).render(
 		<Suspense fallback={<div />}>
 			<HashRouter>
-				<Routes>
-					<Route path="/" element={<AdvancedButtonWithRouter />} />
-					<Route path="*" element={<Empty />} />
-				</Routes>
+				<FontManagerApp buttonContainer={buttonContainer} />
 			</HashRouter>
 		</Suspense>
 	);
-
-	fontManagerRouter();
 }
-
-const AdvancedButtonWithRouter = withRouterHooks(AdvancedButton);
 
 /**
  * Create html element wrapper for our font manager advanced button

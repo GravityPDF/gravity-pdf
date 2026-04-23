@@ -116,7 +116,10 @@ export const FontVariant = ({
 							<span className="gfpdf-font-filename">
 								{regularFieldValidation && (
 									<span className="required">
-										{__('Add a .ttf font file.', 'gravity-pdf')}
+										{__(
+											'Add a .ttf font file.',
+											'gravity-pdf'
+										)}
 									</span>
 								)}
 								{!fontFileMissing ? fontName : fontFileMissing}

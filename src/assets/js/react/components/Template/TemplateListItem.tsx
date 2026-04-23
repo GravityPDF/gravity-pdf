@@ -1,7 +1,7 @@
 /* Dependencies */
 import { __ } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 /* Components */
 import TemplateScreenshot from './TemplateScreenshot';
 import ShowMessage from '../ShowMessage';

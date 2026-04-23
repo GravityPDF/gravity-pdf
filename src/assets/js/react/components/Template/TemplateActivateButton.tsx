@@ -1,7 +1,7 @@
 /* Dependencies */
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 /* Store */
 import { useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME } from '../../store/templateStore';

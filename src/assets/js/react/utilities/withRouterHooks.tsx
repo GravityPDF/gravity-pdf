@@ -1,5 +1,5 @@
 import * as React from '@wordpress/element';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router';
 
 // Higher Order Component
 const withRouterHooks = <P extends object>(

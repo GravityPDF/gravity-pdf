@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import type { KeyboardEvent, MouseEvent, ChangeEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router-dom';
+import { NavigateFunction } from 'react-router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	FONT_MANAGER_STORE_NAME,
