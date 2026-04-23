@@ -88,6 +88,17 @@ jest.mock(
 	})
 );
 
+jest.mock('../../../../../src/assets/js/react/api/fontManager', () => ({
+	apiGetCustomFontList: jest
+		.fn()
+		.mockRejectedValue(
+			Object.assign(new Error('Aborted'), { name: 'AbortError' })
+		),
+	apiAddFont: jest.fn(),
+	apiEditFont: jest.fn(),
+	apiDeleteFont: jest.fn(),
+}));
+
 const {
 	toggleUpdateFont,
 	addClass,

@@ -10,6 +10,12 @@ import type {
 	TemplateState,
 } from '../../../../../src/assets/js/react/types';
 
+jest.mock('../../../../../src/assets/js/react/api/templates', () => ({
+	apiPostUpdateSelectBox: jest.fn(() => new Promise(() => {})),
+	apiPostTemplateProcessing: jest.fn(() => new Promise(() => {})),
+	apiPostTemplateUploadProcessing: jest.fn(() => new Promise(() => {})),
+}));
+
 describe('Template - TemplateDeleteButton.js', () => {
 	const navigate = jest.fn();
 	const template = { id: 'zadani' } as TemplateItem;

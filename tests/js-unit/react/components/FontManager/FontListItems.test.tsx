@@ -17,6 +17,17 @@ const {
 	toggleUpdateFont,
 } = require('../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont');
 
+jest.mock('../../../../../src/assets/js/react/api/fontManager', () => ({
+	apiGetCustomFontList: jest.fn(() => new Promise(() => {})),
+	apiAddFont: jest.fn(() => new Promise(() => {})),
+	apiEditFont: jest.fn(() => new Promise(() => {})),
+	apiDeleteFont: jest
+		.fn()
+		.mockRejectedValue(
+			Object.assign(new Error('Aborted'), { name: 'AbortError' })
+		),
+}));
+
 describe('FontManager - FontListItems.js', () => {
 	const navigate = jest.fn();
 
