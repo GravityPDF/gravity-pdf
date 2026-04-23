@@ -145,6 +145,8 @@ const CoreFontContainer = () => {
 				variant="secondary"
 				onClick={handleTriggerFontDownload}
 				disabled={disabled}
+				accessibleWhenDisabled={true}
+				__next40pxDefaultSize={true}
 			>
 				{__('Download Core Fonts', 'gravity-pdf')}
 			</Button>

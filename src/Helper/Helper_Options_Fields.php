@@ -225,9 +225,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'install_core_fonts' => [
 						'id'   => 'install_core_fonts',
 						'name' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
-						'desc' => esc_html__( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-pdf' ) . ' <a href="https://docs.gravitypdf.com/users/core-pdf-fonts">' . esc_html__( 'Get more info.', 'gravity-pdf' ) . '</a>',
-						'type' => 'button',
-						'std'  => esc_html__( 'Download Core Fonts', 'gravity-pdf' ),
+						'desc' => '<div class="gform-settings-description gform-kitchen-sink">' . esc_html__( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-pdf' ) . ' <a href="https://docs.gravitypdf.com/users/core-pdf-fonts">' . esc_html__( 'Get more info.', 'gravity-pdf' ) . '</a><div id="gfpdf-button-wrapper-install_core_fonts"></div></div>',
+						'type' => 'descriptive_text',
 					],
 
 					'manage_fonts'       => [
