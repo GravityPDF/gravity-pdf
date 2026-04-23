@@ -19,7 +19,7 @@ describe('FontManager - FontVariant.js', () => {
 		onHandleUpload: jest.fn(),
 		onHandleDeleteFontStyle: jest.fn(),
 		msg: {},
-		tabIndex: '146',
+		tabIndex: 0,
 	};
 
 	describe('RENDERS COMPONENT', () => {
