@@ -1,17 +1,10 @@
 import { render, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { findByTestAttr } from '../../testUtilsRTL';
 import {
 	CoreFontListResults,
 	Retry,
 } from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontListResults';
 import type { ConsoleLine } from '../../../../../src/assets/js/react/types';
-
-const mockNavigate = jest.fn();
-jest.mock('react-router', () => ({
-	...jest.requireActual('react-router'),
-	useNavigate: () => mockNavigate,
-}));
 
 describe('CoreFonts - CoreFontListResults.js', () => {
 	describe('CoreFontListResults Component', () => {
@@ -53,9 +46,7 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 
 		test('renders <CoreFontListResults /> component container', () => {
 			const { container } = render(
-				<MemoryRouter>
-					<CoreFontListResults console={dataPending} retry={[]} />
-				</MemoryRouter>
+				<CoreFontListResults console={dataPending} retry={[]} />
 			);
 
 			expect(
@@ -65,9 +56,7 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 
 		test('renders console pending output for our core font downloader', () => {
 			const { container } = render(
-				<MemoryRouter>
-					<CoreFontListResults console={dataPending} retry={[]} />
-				</MemoryRouter>
+				<CoreFontListResults console={dataPending} retry={[]} />
 			);
 			const pending = container.querySelectorAll(
 				'.gfpdf-core-font-status-pending'
@@ -84,9 +73,7 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 
 		test('renders console success output for our core font downloader', () => {
 			const { container } = render(
-				<MemoryRouter>
-					<CoreFontListResults console={dataSuccess} retry={[]} />
-				</MemoryRouter>
+				<CoreFontListResults console={dataSuccess} retry={[]} />
 			);
 			const success = container.querySelectorAll(
 				'.gfpdf-core-font-status-success'
@@ -103,9 +90,7 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 
 		test('renders list spacer container component <ListSpacer />', () => {
 			const { container } = render(
-				<MemoryRouter>
-					<CoreFontListResults console={dataCompleted} retry={[]} />
-				</MemoryRouter>
+				<CoreFontListResults console={dataCompleted} retry={[]} />
 			);
 			const success = container.querySelectorAll(
 				'.gfpdf-core-font-status-success'
@@ -122,12 +107,7 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 
 		test('renders retry component <Retry />', () => {
 			const { container } = render(
-				<MemoryRouter>
-					<CoreFontListResults
-						console={dataCompleted}
-						retry={fontList}
-					/>
-				</MemoryRouter>
+				<CoreFontListResults console={dataCompleted} retry={fontList} />
 			);
 
 			expect(
@@ -137,10 +117,6 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 	});
 
 	describe('Retry Component', () => {
-		beforeEach(() => {
-			mockNavigate.mockClear();
-		});
-
 		test('renders <Retry /> component container', () => {
 			const { container } = render(<Retry />);
 
@@ -158,11 +134,11 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 		});
 
 		test('check link click', () => {
-			const { container } = render(<Retry />);
+			const mockOnRetry = jest.fn();
+			const { container } = render(<Retry onRetry={mockOnRetry} />);
 			fireEvent.click(findByTestAttr(container, 'component-retry-link')!);
 
-			expect(mockNavigate).toHaveBeenCalledTimes(1);
-			expect(mockNavigate).toHaveBeenCalledWith('retryDownloadCoreFonts');
+			expect(mockOnRetry).toHaveBeenCalledTimes(1);
 		});
 	});
 });

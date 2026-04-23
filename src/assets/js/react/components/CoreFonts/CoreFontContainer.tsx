@@ -1,6 +1,5 @@
 /* Dependencies */
 import { useState, useEffect } from '@wordpress/element';
-import { useNavigate, useLocation } from 'react-router';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 /* Components */
@@ -22,8 +21,6 @@ import {
  */
 
 const CoreFontContainer = () => {
-	const navigate = useNavigate();
-	const location = useLocation();
 	const {
 		clearButtonClickedAndRetryList,
 		addToConsole,
@@ -69,13 +66,11 @@ const CoreFontContainer = () => {
 			clearButtonClickedAndRetryList();
 			setIsLoading(false);
 			addToConsole('completed', 'error', error ?? '');
-			navigate('/');
 			return;
 		}
 
 		clearConsole();
 		clearButtonClickedAndRetryList();
-		navigate('/');
 
 		for (let i = 0; i < files.length; i += 5) {
 			await Promise.all(
@@ -85,55 +80,56 @@ const CoreFontContainer = () => {
 	};
 
 	const handleTriggerFontDownload = () => {
-		if (!isLoading) {
-			setIsLoading(true);
-			getFilesFromGitHub();
+		if (isLoading) {
+			return;
 		}
+		setIsLoading(true);
+		getFilesFromGitHub();
+	};
+
+	const handleRetry = () => {
+		if (retry.length === 0) {
+			return;
+		}
+		setIsLoading(true);
+		void startDownloadFonts(retry);
 	};
 
 	const resetState = () => {
 		setIsLoading(false);
 		clearRequestRemainingData();
-		navigate('/');
 	};
 
-	/* Check for /downloadCoreFonts redirect URL and run the installer */
+	/* Auto-start download when navigated here from WP backend via hash URL */
 	useEffect(() => {
-		if (location.pathname === '/downloadCoreFonts') {
-			handleTriggerFontDownload();
+		if (window.location.hash !== '#/downloadCoreFonts') {
+			return;
 		}
-	}, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+		handleTriggerFontDownload();
+	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* Load current font list when fontList and buttonClicked are both available */
 	useEffect(() => {
-		if (fontList.length > 0 && buttonClicked) {
-			void startDownloadFonts(fontList);
+		if (fontList.length === 0 || !buttonClicked) {
+			return;
 		}
+		void startDownloadFonts(fontList);
 	}, [fontList, buttonClicked]); // eslint-disable-line react-hooks/exhaustive-deps
-
-	/* Load current hash history location & retry font list */
-	useEffect(() => {
-		if (
-			location.pathname === '/retryDownloadCoreFonts' &&
-			retry.length > 0
-		) {
-			setIsLoading(true);
-			void startDownloadFonts(retry);
-		}
-	}, [location.pathname, retry]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* Load error if something went wrong */
 	useEffect(() => {
-		if (getFilesFromGitHubFailed !== '' && buttonClicked) {
-			void startDownloadFonts(fontList, getFilesFromGitHubFailed);
+		if (getFilesFromGitHubFailed === '' || !buttonClicked) {
+			return;
 		}
+		void startDownloadFonts(fontList, getFilesFromGitHubFailed);
 	}, [getFilesFromGitHubFailed, buttonClicked]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* If request download is finished, call resetState */
 	useEffect(() => {
-		if (requestDownload === 'finished') {
-			resetState();
+		if (requestDownload !== 'finished') {
+			return;
 		}
+		resetState();
 	}, [requestDownload]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const disabled = (queue < fontList.length && queue !== 0) || isLoading;
@@ -152,7 +148,11 @@ const CoreFontContainer = () => {
 			</Button>
 			{isLoading && <Spinner />}
 			{isLoading && queue !== 0 && <Counter queue={queue} />}
-			<CoreFontListResults console={consoleList} retry={retry} />
+			<CoreFontListResults
+				console={consoleList}
+				retry={retry}
+				onRetry={handleRetry}
+			/>
 		</div>
 	);
 };

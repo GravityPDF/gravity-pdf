@@ -1,6 +1,6 @@
 import { act, fireEvent } from '@testing-library/react';
 import {
-	renderWithRouter,
+	renderWithStore,
 	findByTestAttr,
 	createTestStore,
 } from '../../testUtilsRTL';
@@ -23,9 +23,7 @@ const baseState = { coreFonts: coreFontInitialState };
 
 describe('CoreFonts - CoreFontContainer.js', () => {
 	test('renders <CoreFontContainer /> component container', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
 
 		expect(
 			findByTestAttr(container, 'component-coreFont-downloader')
@@ -33,9 +31,7 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('renders core font downloader button', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
 
 		expect(
 			findByTestAttr(container, 'component-coreFont-button')
@@ -43,9 +39,7 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('renders button text', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
 
 		expect(container.querySelector('button')!.textContent).toBe(
 			'Download Core Fonts'
@@ -53,9 +47,7 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('does not render <Spinner /> by default', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
 
 		expect(
 			container.querySelector('.gfpdf-spinner')
@@ -63,9 +55,7 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('button click shows <Spinner />', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
 		fireEvent.click(
 			findByTestAttr(container, 'component-coreFont-button')!
 		);
@@ -74,9 +64,10 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('button click dispatches getFilesFromGitHub (sets buttonClicked in store)', () => {
-		const { container, store } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container, store } = renderWithStore(
+			<CoreFontContainer />,
+			baseState
+		);
 		fireEvent.click(
 			findByTestAttr(container, 'component-coreFont-button')!
 		);
@@ -85,23 +76,19 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('button is disabled while loading', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
 		fireEvent.click(
 			findByTestAttr(container, 'component-coreFont-button')!
 		);
 
 		expect(
 			findByTestAttr(container, 'component-coreFont-button')
-		).toBeDisabled();
+		).toHaveAttribute('aria-disabled', 'true');
 	});
 
 	test('renders <Counter /> when ajax is active and queue > 0', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: {
-				coreFonts: { ...coreFontInitialState, downloadCounter: 3 },
-			},
+		const { container } = renderWithStore(<CoreFontContainer />, {
+			coreFonts: { ...coreFontInitialState, downloadCounter: 3 },
 		});
 		fireEvent.click(
 			findByTestAttr(container, 'component-coreFont-button')!
@@ -113,29 +100,25 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('renders <CoreFontListResults /> component', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			initialState: baseState,
-		});
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
 
 		expect(
 			findByTestAttr(container, 'component-coreFont-downloader')
 		).toBeInTheDocument();
 	});
 
-	test('/downloadCoreFonts route shows spinner on mount', () => {
-		const { container } = renderWithRouter(<CoreFontContainer />, {
-			route: '/downloadCoreFonts',
-			initialState: baseState,
-		});
+	test('auto-start shows spinner when hash is #/downloadCoreFonts', () => {
+		window.location.hash = '#/downloadCoreFonts';
+		const { container } = renderWithStore(<CoreFontContainer />, baseState);
+		window.location.hash = '';
 
 		expect(container.querySelector('.gfpdf-spinner')).toBeInTheDocument();
 	});
 
-	test('/downloadCoreFonts route dispatches getFilesFromGitHub on mount', () => {
-		const { store } = renderWithRouter(<CoreFontContainer />, {
-			route: '/downloadCoreFonts',
-			initialState: baseState,
-		});
+	test('auto-start dispatches getFilesFromGitHub when hash is #/downloadCoreFonts', () => {
+		window.location.hash = '#/downloadCoreFonts';
+		const { store } = renderWithStore(<CoreFontContainer />, baseState);
+		window.location.hash = '';
 
 		expect(store.getState().coreFonts.buttonClicked).toBe(true);
 	});
@@ -151,7 +134,7 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 
 		await act(async () => {
-			renderWithRouter(<CoreFontContainer />, { store });
+			renderWithStore(<CoreFontContainer />, {}, {}, store);
 		});
 
 		const downloadCalls = dispatchSpy.mock.calls.filter(
@@ -163,12 +146,10 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('requestDownload=finished clears requestDownload in store', () => {
-		const { store } = renderWithRouter(<CoreFontContainer />, {
-			initialState: {
-				coreFonts: {
-					...coreFontInitialState,
-					requestDownload: 'finished',
-				},
+		const { store } = renderWithStore(<CoreFontContainer />, {
+			coreFonts: {
+				...coreFontInitialState,
+				requestDownload: 'finished',
 			},
 		});
 

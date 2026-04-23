@@ -1,7 +1,7 @@
 /* Dependencies */
-import { lazy, Suspense, createRoot } from '@wordpress/element';
-/* Routes */
-const Routes = lazy(() => import('../router/coreFontRouter'));
+import { createRoot } from '@wordpress/element';
+/* Components */
+import CoreFontContainer from '../components/CoreFonts/CoreFontContainer';
 
 /**
  * Core Font Downloader Bootstrap
@@ -22,11 +22,5 @@ export default function coreFontBootstrap(): void {
 		'gfpdf-button-wrapper-install_core_fonts'
 	);
 
-	const root = createRoot(container!);
-
-	root.render(
-		<Suspense fallback={<div />}>
-			<Routes />
-		</Suspense>
-	);
+	createRoot(container!).render(<CoreFontContainer />);
 }

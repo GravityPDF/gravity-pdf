@@ -1,6 +1,4 @@
 /* Dependencies */
-import type { MouseEvent } from 'react';
-import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
 /* Components */
 import ListSpacer from './CoreFontListSpacer';
@@ -17,11 +15,13 @@ import type { ConsoleLine } from '../../types';
 interface CoreFontListResultsProps {
 	console?: Record<string, ConsoleLine>;
 	retry?: string[];
+	onRetry?: () => void;
 }
 
 export const CoreFontListResults = ({
 	console: consoleMap = {},
 	retry = [],
+	onRetry,
 }: CoreFontListResultsProps) => {
 	const lines = Object.keys(consoleMap).reverse();
 	const hasRetry = retry.length > 0;
@@ -41,7 +41,9 @@ export const CoreFontListResults = ({
 					}
 				>
 					{consoleMap[key].message}{' '}
-					{key === 'completed' && hasRetry && <Retry />}
+					{key === 'completed' && hasRetry && (
+						<Retry onRetry={onRetry} />
+					)}
 					{key === 'completed' && <ListSpacer />}
 				</li>
 			))}
@@ -49,23 +51,18 @@ export const CoreFontListResults = ({
 	);
 };
 
-export const Retry = () => {
-	const navigate = useNavigate();
+interface RetryProps {
+	onRetry?: () => void;
+}
 
-	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-		e.preventDefault();
-		navigate('retryDownloadCoreFonts');
-	};
-
-	return (
-		<button
-			data-test="component-retry-link"
-			type="button"
-			onClick={handleClick}
-			aria-live="polite"
-			className="gfpdf-core-font-retry-link"
-		>
-			{__('Retry Failed Downloads?', 'gravity-pdf')}
-		</button>
-	);
-};
+export const Retry = ({ onRetry }: RetryProps) => (
+	<button
+		data-test="component-retry-link"
+		type="button"
+		onClick={onRetry}
+		aria-live="polite"
+		className="gfpdf-core-font-retry-link"
+	>
+		{__('Retry Failed Downloads?', 'gravity-pdf')}
+	</button>
+);
