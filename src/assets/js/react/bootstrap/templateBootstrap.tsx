@@ -9,7 +9,7 @@ import templateRouter from '../router/templateRouter';
 /* Helpers */
 import withRouterHooks from '../utilities/withRouterHooks';
 /* Components */
-import CustomHashRouter from '../components/CustomHashRouter';
+import { HashRouter } from 'react-router-dom';
 import Empty from '../components/Empty';
 const TemplateButton = lazy(
 	() => import('../components/Template/TemplateButton')
@@ -41,12 +41,12 @@ export function templateBootstrap(templateField: HTMLSelectElement): void {
 	/* Render our React Component in the DOM */
 	root.render(
 		<Suspense fallback={<div />}>
-			<CustomHashRouter>
+			<HashRouter>
 				<Switch>
 					<Route path="/" element={<TemplateButtonWithRouter />} />
 					<Route path="*" element={<Empty />} />
 				</Switch>
-			</CustomHashRouter>
+			</HashRouter>
 		</Suspense>
 	);
 

@@ -51,4 +51,9 @@ export const apiDeleteFont = (
 	id: string,
 	signal?: AbortSignal
 ): Promise<unknown> =>
-	apiFetch({ path: `/gravity-pdf/v1/fonts/${id}`, method: 'DELETE', signal });
+	apiFetch({
+		path: `/gravity-pdf/v1/fonts/${id}`,
+		method: 'DELETE',
+		signal,
+		parse: false,
+	});

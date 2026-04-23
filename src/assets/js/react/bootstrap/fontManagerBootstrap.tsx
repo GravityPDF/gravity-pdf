@@ -6,7 +6,7 @@ import { fontManagerRouter } from '../router/fontManagerRouter';
 /* Helpers */
 import withRouterHooks from '../utilities/withRouterHooks';
 /* Components */
-import CustomHashRouter from '../components/CustomHashRouter';
+import { HashRouter } from 'react-router-dom';
 import Empty from '../components/Empty';
 const AdvancedButton = lazy(
 	() => import('../components/FontManager/AdvancedButton')
@@ -43,12 +43,12 @@ export function fontManagerBootstrap(
 
 	root.render(
 		<Suspense fallback={<div />}>
-			<CustomHashRouter>
+			<HashRouter>
 				<Routes>
 					<Route path="/" element={<AdvancedButtonWithRouter />} />
 					<Route path="*" element={<Empty />} />
 				</Routes>
-			</CustomHashRouter>
+			</HashRouter>
 		</Suspense>
 	);
 

@@ -37,9 +37,9 @@ interface Props {
 	disableUpdateButton: boolean;
 	msg: FontManagerMsg;
 	loading: boolean;
-	tabIndexFontName: string;
-	tabIndexFontFiles: string;
-	tabIndexFooterButtons: string;
+	tabIndexFontName: number;
+	tabIndexFontFiles: number;
+	tabIndexFooterButtons: number;
 }
 
 export const UpdateFont = ({
@@ -101,7 +101,7 @@ export const UpdateFont = ({
 					value={label}
 					maxLength={60}
 					onChange={(e) => onHandleInputChange(e, 'updateFont')}
-					tabIndex={parseInt(tabIndexFontName, 10)}
+					tabIndex={tabIndexFontName}
 				/>
 
 				<div aria-live="polite">

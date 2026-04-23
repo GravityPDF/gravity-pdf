@@ -30,7 +30,7 @@ interface Props {
 	onHandleCancelEditFontKeypress?: (e: KeyboardEvent) => void;
 	msg: FontManagerMsg;
 	loading: boolean;
-	tabIndex: string;
+	tabIndex: number;
 }
 
 const AddUpdateFontFooter = ({
@@ -49,8 +49,6 @@ const AddUpdateFontFooter = ({
 		(select) => select(fontManagerStore).getSelectedFont(),
 		[]
 	);
-
-	const tabIndexNum = parseInt(tabIndex, 10);
 
 	const handleSelectFont = (fontId: string) => {
 		selectFont(fontId === selectedFont ? '' : fontId);
@@ -113,7 +111,7 @@ const AddUpdateFontFooter = ({
 							onClick={onHandleCancelEditFont}
 							onKeyDown={onHandleCancelEditFontKeypress}
 							type="button"
-							tabIndex={tabIndexNum}
+							tabIndex={tabIndex}
 							aria-label={__('Cancel', 'gravity-pdf')}
 						>
 							{__('← Cancel', 'gravity-pdf')}
@@ -122,7 +120,7 @@ const AddUpdateFontFooter = ({
 
 					<button
 						className="button gfpdf-button primary"
-						tabIndex={tabIndexNum}
+						tabIndex={tabIndex}
 						disabled={disabled}
 						aria-label={
 							type === 'update'
@@ -147,7 +145,7 @@ const AddUpdateFontFooter = ({
 							onClick={() => handleSelectFont(id)}
 							onKeyDown={(e) => handleSelectFontKeypress(e, id)}
 							type="button"
-							tabIndex={tabIndexNum}
+							tabIndex={tabIndex}
 							aria-label={__('Select font', 'gravity-pdf')}
 						/>
 					)}
@@ -158,7 +156,7 @@ const AddUpdateFontFooter = ({
 							onClick={() => handleDeleteFont(id)}
 							onKeyDown={(e) => handleDeleteFontKeypress(e, id)}
 							type="button"
-							tabIndex={tabIndexNum}
+							tabIndex={tabIndex}
 							aria-label={__('Delete font', 'gravity-pdf')}
 						/>
 					)}

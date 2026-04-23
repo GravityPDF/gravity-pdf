@@ -196,7 +196,11 @@ export function renderWithRouter(
 
 	const Wrapper = ({ children }: { children: ReactNode }) => (
 		<RegistryProvider value={registry}>
-			<MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+			<MemoryRouter
+				initialEntries={[route]}
+			>
+				{children}
+			</MemoryRouter>
 		</RegistryProvider>
 	);
 

@@ -5,7 +5,7 @@ import { Routes as Switch, Route } from 'react-router-dom';
 import CoreFontContainer from '../components/CoreFonts/CoreFontContainer';
 import Empty from '../components/Empty';
 /* Helpers */
-import CustomHashRouter from '../components/CustomHashRouter';
+import { HashRouter } from 'react-router-dom';
 
 /**
  * @package			Gravity PDF
@@ -33,7 +33,7 @@ interface RoutesProps {
  */
 const Routes = ({ button }: RoutesProps): JSX.Element => {
 	return (
-		<CustomHashRouter>
+		<HashRouter>
 			<Switch>
 				<Route path="/" element={<CoreFont button={button} />} />
 
@@ -48,7 +48,7 @@ const Routes = ({ button }: RoutesProps): JSX.Element => {
 				/>
 				<Route path="*" element={<Empty />} />
 			</Switch>
-		</CustomHashRouter>
+		</HashRouter>
 	);
 };
 

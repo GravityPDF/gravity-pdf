@@ -380,9 +380,9 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 					onHandleSubmit={handleSubmit}
 					msg={msg}
 					loading={loading}
-					tabIndexFontName={!updateFontVisible ? '0' : '-1'}
-					tabIndexFontFiles={!updateFontVisible ? '0' : '-1'}
-					tabIndexFooterButtons={!updateFontVisible ? '0' : '-1'}
+					tabIndexFontName={!updateFontVisible ? 0 : -1}
+					tabIndexFontFiles={!updateFontVisible ? 0 : -1}
+					tabIndexFooterButtons={!updateFontVisible ? 0 : -1}
 					{...addFontState}
 				/>
 
@@ -397,9 +397,9 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 					onHandleSubmit={handleSubmit}
 					msg={msg}
 					loading={loading}
-					tabIndexFontName={updateFontVisible ? '0' : '-1'}
-					tabIndexFontFiles={updateFontVisible ? '0' : '-1'}
-					tabIndexFooterButtons={updateFontVisible ? '0' : '-1'}
+					tabIndexFontName={updateFontVisible ? 0 : -1}
+					tabIndexFontFiles={updateFontVisible ? 0 : -1}
+					tabIndexFooterButtons={updateFontVisible ? 0 : -1}
 					{...updateFontState}
 				/>
 			</div>

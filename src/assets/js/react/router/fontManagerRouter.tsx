@@ -5,7 +5,7 @@ import { Routes as Switch, Route } from 'react-router-dom';
 import FontManager from '../components/FontManager/FontManager';
 import Empty from '../components/Empty';
 import withRouterHooks from '../utilities/withRouterHooks';
-import CustomHashRouter from '../components/CustomHashRouter';
+import { HashRouter } from 'react-router-dom';
 
 /**
  * React Router routes for the Font Manager.
@@ -23,7 +23,7 @@ import CustomHashRouter from '../components/CustomHashRouter';
  */
 
 export const Routes = (): JSX.Element => (
-	<CustomHashRouter>
+	<HashRouter>
 		<Switch>
 			<Route path="/fontmanager/" element={<FontManagerWithRouter />} />
 			<Route
@@ -32,7 +32,7 @@ export const Routes = (): JSX.Element => (
 			/>
 			<Route path="*" element={<Empty />} />
 		</Switch>
-	</CustomHashRouter>
+	</HashRouter>
 );
 
 const FontManagerWithRouter = withRouterHooks(FontManager);

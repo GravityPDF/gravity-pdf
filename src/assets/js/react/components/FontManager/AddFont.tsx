@@ -33,9 +33,9 @@ interface Props {
 	validateRegular: boolean;
 	msg: FontManagerMsg;
 	loading: boolean;
-	tabIndexFontName: string;
-	tabIndexFontFiles: string;
-	tabIndexFooterButtons: string;
+	tabIndexFontName: number;
+	tabIndexFontFiles: number;
+	tabIndexFooterButtons: number;
 }
 
 export const AddFont = ({
@@ -93,7 +93,7 @@ export const AddFont = ({
 					value={label}
 					maxLength={60}
 					onChange={(e) => onHandleInputChange(e, 'addFont')}
-					tabIndex={parseInt(tabIndexFontName, 10)}
+					tabIndex={tabIndexFontName}
 				/>
 
 				<div aria-live="polite">

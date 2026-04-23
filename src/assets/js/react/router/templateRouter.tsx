@@ -4,7 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Routes as Switch, Route } from 'react-router-dom';
 /* Components */
 import Empty from '../components/Empty';
-import CustomHashRouter from '../components/CustomHashRouter';
+import { HashRouter } from 'react-router-dom';
 import withRouterHooks from '../utilities/withRouterHooks';
 const TemplateList = lazy(() => import('../components/Template/TemplateList'));
 const TemplateSingle = lazy(
@@ -29,7 +29,7 @@ const TemplateSingle = lazy(
 
 export const Routes = (): JSX.Element => (
 	<Suspense fallback={<div />}>
-		<CustomHashRouter>
+		<HashRouter>
 			<Switch>
 				<Route
 					path="/template"
@@ -122,7 +122,7 @@ export const Routes = (): JSX.Element => (
 				/>
 				<Route path="*" element={<Empty />} />
 			</Switch>
-		</CustomHashRouter>
+		</HashRouter>
 	</Suspense>
 );
 

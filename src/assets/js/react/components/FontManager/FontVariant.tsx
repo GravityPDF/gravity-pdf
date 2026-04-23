@@ -27,7 +27,7 @@ interface Props {
 		state: string
 	) => void;
 	msg: FontManagerMsg;
-	tabIndex: string;
+	tabIndex: number;
 }
 
 interface ItemProps {
@@ -43,7 +43,7 @@ interface ItemProps {
 		state: string
 	) => void;
 	error: FontManagerMsg['error'];
-	tabIndex: string;
+	tabIndex: number;
 }
 
 function FontVariantItem({
@@ -97,7 +97,7 @@ function FontVariantItem({
 			<button
 				type="button"
 				className={'drop-zone' + dropZoneClassEnhancement}
-				tabIndex={parseInt(tabIndex, 10)}
+				tabIndex={tabIndex}
 				onClick={(e) => {
 					if (font) {
 						onHandleDeleteFontStyle(e, key, state);
