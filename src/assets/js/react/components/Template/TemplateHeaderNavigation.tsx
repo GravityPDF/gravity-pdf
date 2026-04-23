@@ -1,6 +1,6 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useRef, useEffect } from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 /* Types */
 import { TemplateItem } from '../../types';
@@ -77,7 +77,7 @@ const TemplateHeaderNavigation = ({
 		};
 	}, []);
 
-	const handlePreviousTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handlePreviousTemplate = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -87,7 +87,7 @@ const TemplateHeaderNavigation = ({
 		}
 	};
 
-	const handleNextTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleNextTemplate = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 

@@ -67,12 +67,14 @@ const TemplateTooltip = ({ id }: Props) => {
 							'gravity-pdf'
 						),
 						{
+							/* eslint-disable jsx-a11y/anchor-has-content */
 							link1: (
 								<a href="https://docs.gravitypdf.com/developers/first-custom-pdf" />
 							),
 							link2: (
 								<a href="https://docs.gravitypdf.com/users/setup-pdf#font" />
 							),
+							/* eslint-enable jsx-a11y/anchor-has-content */
 						}
 					)}
 				</div>

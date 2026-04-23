@@ -16,7 +16,7 @@ interface CoreFontItem {
 }
 
 export async function apiGetFilesFromGitHub(): Promise<CoreFontItem[]> {
-	const response = await apiFetch<Response>({
+	const response = await apiFetch({
 		url: GFPDF.pluginUrl + 'build/payload/core-fonts.json',
 		method: 'GET',
 		parse: false,
@@ -34,7 +34,7 @@ export async function apiPostDownloadFonts(file: string): Promise<unknown> {
 	formData.append('nonce', GFPDF.ajaxNonce);
 	formData.append('font_name', file);
 
-	const response = await apiFetch<Response>({
+	const response = await apiFetch({
 		url: GFPDF.ajaxUrl,
 		method: 'POST',
 		body: formData,

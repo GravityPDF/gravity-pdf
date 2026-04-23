@@ -1,4 +1,5 @@
 import * as React from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { createHashHistory } from 'history';
 import { Router } from 'react-router-dom';
 
@@ -9,7 +10,7 @@ export const sharedHashHistory = createHashHistory({ window });
  * @since 6.12
  */
 interface Props {
-	children: React.ReactNode;
+	children: ReactNode;
 }
 
 function CustomHashRouter({ children }: Props) {

@@ -1,10 +1,13 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import type { KeyboardEvent, MouseEvent, ChangeEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../../store/fontManagerStore';
 /* Components */
 import FontListIcon from './FontListIcon';
 import Spinner from '../Spinner';
@@ -28,25 +31,22 @@ const FontListItems = ({ id, navigate }: Props) => {
 	const { clearAddFontMsg, deleteFont, selectFont, moveSelectedFontToTop } =
 		useDispatch(FONT_MANAGER_STORE_NAME);
 	const loading = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getDeleteFontLoading(),
+		(select) => select(fontManagerStore).getDeleteFontLoading(),
 		[]
 	);
 	const fontList = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getFontList(),
+		(select) => select(fontManagerStore).getFontList(),
 		[]
 	);
 	const searchResult = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getSearchResult(),
+		(select) => select(fontManagerStore).getSearchResult(),
 		[]
 	);
 	const selectedFont = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getSelectedFont(),
+		(select) => select(fontManagerStore).getSelectedFont(),
 		[]
 	);
-	const msg = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
-		[]
-	);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 
 	const [disableSelectFontName, setDisableSelectFontName] = useState(false);
 	const [deleteId, setDeleteId] = useState('');
@@ -145,16 +145,13 @@ const FontListItems = ({ id, navigate }: Props) => {
 		toggleUpdateFont(navigate, fontId);
 	};
 
-	const handleFontClickKeypress = (
-		e: React.KeyboardEvent,
-		fontId: string
-	) => {
+	const handleFontClickKeypress = (e: KeyboardEvent, fontId: string) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			handleFontClick(fontId);
 		}
 	};
 
-	const handleDeleteFont = (e: React.MouseEvent, fontId: string) => {
+	const handleDeleteFont = (e: MouseEvent, fontId: string) => {
 		e.stopPropagation();
 		setDeleteId(fontId);
 
@@ -167,16 +164,13 @@ const FontListItems = ({ id, navigate }: Props) => {
 		}
 	};
 
-	const handleDeleteFontKeypress = (
-		e: React.KeyboardEvent,
-		fontId: string
-	) => {
+	const handleDeleteFontKeypress = (e: KeyboardEvent, fontId: string) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			handleDeleteFont(e as unknown as React.MouseEvent, fontId);
+			handleDeleteFont(e as unknown as MouseEvent, fontId);
 		}
 	};
 
-	const handleSelectFont = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSelectFont = (e: ChangeEvent<HTMLInputElement>) => {
 		selectFont(e.target.value);
 
 		const installedFonts =
@@ -186,15 +180,11 @@ const FontListItems = ({ id, navigate }: Props) => {
 		});
 	};
 
-	const handleSelectFontKeypress = (
-		e: React.KeyboardEvent<HTMLInputElement>
-	) => {
+	const handleSelectFontKeypress = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
 			e.stopPropagation();
-			handleSelectFont(
-				e as unknown as React.ChangeEvent<HTMLInputElement>
-			);
+			handleSelectFont(e as unknown as ChangeEvent<HTMLInputElement>);
 		}
 	};
 

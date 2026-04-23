@@ -7,7 +7,7 @@ import TemplateHeaderTitle from './TemplateHeaderTitle';
 import TemplateUploader from './TemplateUploader';
 /* Store */
 import { useSelect } from '@wordpress/data';
-import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
+import { templateStore } from '../../store/templateStore';
 /* Helpers */
 import withRouterHooks from '../../utilities/withRouterHooks';
 
@@ -55,7 +55,7 @@ const TemplateList = ({
 	templateInstallInstructions,
 }: Props) => {
 	const templates = useSelect(
-		(select) => select(TEMPLATE_STORE_NAME).getFilteredTemplates(),
+		(select) => select(templateStore).getFilteredTemplates(),
 		[]
 	);
 

@@ -5,7 +5,7 @@ import { DropZone } from '@wordpress/components';
 import ShowMessage from '../ShowMessage';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
+import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -54,17 +54,15 @@ const TemplateUploader = ({
 		clearTemplateUploadProcessing,
 	} = useDispatch(TEMPLATE_STORE_NAME);
 	const templates = useSelect(
-		(select) => select(TEMPLATE_STORE_NAME).getList(),
+		(select) => select(templateStore).getList(),
 		[]
 	);
 	const templateUploadProcessingSuccess = useSelect(
-		(select) =>
-			select(TEMPLATE_STORE_NAME).getTemplateUploadProcessingSuccess(),
+		(select) => select(templateStore).getTemplateUploadProcessingSuccess(),
 		[]
 	);
 	const templateUploadProcessingError = useSelect(
-		(select) =>
-			select(TEMPLATE_STORE_NAME).getTemplateUploadProcessingError(),
+		(select) => select(templateStore).getTemplateUploadProcessingError(),
 		[]
 	);
 

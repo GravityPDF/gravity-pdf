@@ -1,5 +1,5 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
+import type { ChangeEvent, MouseEvent, KeyboardEvent, FormEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 /* Components */
 import FontVariant from './FontVariant';
@@ -19,18 +19,18 @@ interface Props {
 	id?: string;
 	label: string;
 	onHandleInputChange: (
-		e: React.ChangeEvent<HTMLInputElement>,
+		e: ChangeEvent<HTMLInputElement>,
 		state: 'addFont' | 'updateFont'
 	) => void;
 	onHandleUpload: (key: string, file: File, state: string) => void;
 	onHandleDeleteFontStyle: (
-		e: React.MouseEvent,
+		e: MouseEvent,
 		key: string,
 		state: string
 	) => void;
 	onHandleCancelEditFont: () => void;
-	onHandleCancelEditFontKeypress: (e: React.KeyboardEvent) => void;
-	onHandleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+	onHandleCancelEditFontKeypress: (e: KeyboardEvent) => void;
+	onHandleSubmit: (e: FormEvent<HTMLFormElement>) => void;
 	fontStyles: FontStyles;
 	validateLabel: boolean;
 	validateRegular: boolean;

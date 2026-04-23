@@ -6,7 +6,10 @@ import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../../store/fontManagerStore';
 /* Utilities */
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
@@ -26,10 +29,7 @@ export const CloseDialog = ({ id, closeRoute }: Props) => {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const { clearAddFontMsg } = useDispatch(FONT_MANAGER_STORE_NAME);
-	const msg = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
-		[]
-	);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 
 	const handleCloseDialog = () => {
 		navigate(closeRoute || '/');

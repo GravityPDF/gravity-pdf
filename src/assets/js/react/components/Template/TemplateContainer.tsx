@@ -1,6 +1,6 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useRef, useEffect } from '@wordpress/element';
+import type { ReactNode } from 'react';
 /* Components */
 import CloseDialog from '../Modal/CloseDialog';
 
@@ -14,9 +14,9 @@ import CloseDialog from '../Modal/CloseDialog';
  */
 
 interface Props {
-	header?: React.ReactNode;
-	footer?: React.ReactNode;
-	children: React.ReactNode;
+	header?: ReactNode;
+	footer?: ReactNode;
+	children: ReactNode;
 	closeRoute?: string;
 }
 

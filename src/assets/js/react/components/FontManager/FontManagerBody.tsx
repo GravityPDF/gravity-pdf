@@ -1,9 +1,12 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import type { MouseEvent, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../../store/fontManagerStore';
 /* Components */
 import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
@@ -47,17 +50,14 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 		clearAddFontMsg,
 	} = useDispatch(FONT_MANAGER_STORE_NAME);
 	const loading = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getAddFontLoading(),
+		(select) => select(fontManagerStore).getAddFontLoading(),
 		[]
 	);
 	const fontList = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getFontList(),
+		(select) => select(fontManagerStore).getFontList(),
 		[]
 	);
-	const msg = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
-		[]
-	);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 
 	const [addFontState, setAddFontState] =
 		useState<AddUpdateFontState>(initialState);
@@ -144,7 +144,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 		column === 'addFont' ? addFontState : updateFontState;
 
 	const handleDeleteFontStyle = (
-		e: React.MouseEvent,
+		e: MouseEvent,
 		key: string,
 		state: string
 	) => {
@@ -179,7 +179,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 	};
 
 	const handleInputChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
+		e: ChangeEvent<HTMLInputElement>,
 		state: 'addFont' | 'updateFont'
 	) => {
 		const currentState = handleGetCurrentColumnState(state);
@@ -337,14 +337,14 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 		clearAddFontMsg();
 	};
 
-	const handleCancelEditFontKeypress = (e: React.KeyboardEvent) => {
+	const handleCancelEditFontKeypress = (e: KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			toggleUpdateFont(navigate);
 			clearAddFontMsg();
 		}
 	};
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		if (id) {

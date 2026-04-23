@@ -112,10 +112,12 @@ export const addCompatibilityCheck = (
 				...template,
 				compatible: false,
 				error: sprintf(
+					/* translators: %s is replaced with the required version number */
 					__('Requires Gravity PDF v%s', 'gravity-pdf'),
 					requiredVersion
 				),
 				long_error: sprintf(
+					/* translators: %s is replaced with the required version number */
 					__(
 						'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.',
 						'gravity-pdf'

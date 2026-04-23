@@ -1,5 +1,5 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const AdvancedButton = ({ navigate }: Props) => {
-	const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		navigate?.('/fontmanager/');
 	};

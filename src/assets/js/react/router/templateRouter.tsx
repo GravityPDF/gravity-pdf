@@ -91,6 +91,7 @@ export const Routes = (): JSX.Element => (
 							activateText={__('Select', 'gravity-pdf')}
 							templateDeleteText={__('Delete', 'gravity-pdf')}
 							templateConfirmDeleteText={sprintf(
+								/* translators: %s is replaced with a double newline */
 								__(
 									"Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.",
 									'gravity-pdf'

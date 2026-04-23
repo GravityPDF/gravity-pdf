@@ -1,13 +1,16 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { createInterpolateElement } from '@wordpress/element';
+import type { KeyboardEvent } from 'react';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 /* Components */
 import Spinner from '../Spinner';
 import TemplateTooltip from './TemplateTooltip';
 /* Store */
-import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../../store/fontManagerStore';
 /* Types */
 import { FontManagerMsg } from '../../types';
 
@@ -24,7 +27,7 @@ interface Props {
 	type?: string;
 	disabled?: boolean;
 	onHandleCancelEditFont?: () => void;
-	onHandleCancelEditFontKeypress?: (e: React.KeyboardEvent) => void;
+	onHandleCancelEditFontKeypress?: (e: KeyboardEvent) => void;
 	msg: FontManagerMsg;
 	loading: boolean;
 	tabIndex: string;
@@ -43,7 +46,7 @@ const AddUpdateFontFooter = ({
 }: Props) => {
 	const { selectFont, deleteFont } = useDispatch(FONT_MANAGER_STORE_NAME);
 	const selectedFont = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getSelectedFont(),
+		(select) => select(fontManagerStore).getSelectedFont(),
 		[]
 	);
 
@@ -53,10 +56,7 @@ const AddUpdateFontFooter = ({
 		selectFont(fontId === selectedFont ? '' : fontId);
 	};
 
-	const handleSelectFontKeypress = (
-		e: React.KeyboardEvent,
-		fontId: string
-	) => {
+	const handleSelectFontKeypress = (e: KeyboardEvent, fontId: string) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			selectFont(fontId === selectedFont ? '' : fontId);
 		}
@@ -72,10 +72,7 @@ const AddUpdateFontFooter = ({
 		}
 	};
 
-	const handleDeleteFontKeypress = (
-		e: React.KeyboardEvent,
-		fontId: string
-	) => {
+	const handleDeleteFontKeypress = (e: KeyboardEvent, fontId: string) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			if (
 				window.confirm(

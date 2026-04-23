@@ -1,4 +1,5 @@
 import * as React from '@wordpress/element';
+import type { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { MemoryRouter } from 'react-router-dom';
@@ -156,7 +157,7 @@ export function createTestStore(
 }
 
 export function renderWithStore(
-	ui: React.ReactElement,
+	ui: ReactElement,
 	initialState: TestInitialState = {},
 	renderOptions: Omit<RenderOptions, 'wrapper'> = {},
 	passedStore?: TestStore
@@ -165,7 +166,7 @@ export function renderWithStore(
 		passedStore !== undefined ? passedStore : createTestStore(initialState);
 	const { registry } = store;
 
-	const Wrapper = ({ children }: { children: React.ReactNode }) => (
+	const Wrapper = ({ children }: { children: ReactNode }) => (
 		<RegistryProvider value={registry}>{children}</RegistryProvider>
 	);
 
@@ -176,7 +177,7 @@ export function renderWithStore(
 }
 
 export function renderWithRouter(
-	ui: React.ReactElement,
+	ui: ReactElement,
 	{
 		route = '/',
 		initialState = {},
@@ -193,7 +194,7 @@ export function renderWithRouter(
 		passedStore !== undefined ? passedStore : createTestStore(initialState);
 	const { registry } = store;
 
-	const Wrapper = ({ children }: { children: React.ReactNode }) => (
+	const Wrapper = ({ children }: { children: ReactNode }) => (
 		<RegistryProvider value={registry}>
 			<MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
 		</RegistryProvider>

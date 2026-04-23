@@ -164,7 +164,7 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 		const downloadCalls = dispatchSpy.mock.calls.filter(
 			([action]) =>
 				typeof action !== 'function' &&
-				action.type === DOWNLOAD_FONTS_API_CALL
+				(action as { type?: string }).type === DOWNLOAD_FONTS_API_CALL
 		);
 		expect(downloadCalls).toHaveLength(3);
 

@@ -1,7 +1,7 @@
 /* Dependencies */
 import { NavigateFunction } from 'react-router-dom';
 import { useSelect } from '@wordpress/data';
-import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
+import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */
 import FontListHeader from './FontListHeader';
 import FontListItems from './FontListItems';
@@ -22,21 +22,18 @@ interface Props {
 
 const FontList = ({ id, navigate }: Props) => {
 	const loading = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getLoading(),
+		(select) => select(fontManagerStore).getLoading(),
 		[]
 	);
 	const fontList = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getFontList(),
+		(select) => select(fontManagerStore).getFontList(),
 		[]
 	);
 	const searchResult = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getSearchResult(),
+		(select) => select(fontManagerStore).getSearchResult(),
 		[]
 	);
-	const msg = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
-		[]
-	);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 	const { error } = msg;
 
 	const fontListError = error && error.fontList;

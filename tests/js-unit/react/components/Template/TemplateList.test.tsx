@@ -1,4 +1,5 @@
 import * as React from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import TemplateList from '../../../../../src/assets/js/react/components/Template/TemplateList';
 import type { TemplateState } from '../../../../../src/assets/js/react/types';
@@ -6,11 +7,7 @@ import type { TemplateState } from '../../../../../src/assets/js/react/types';
 jest.mock(
 	'../../../../../src/assets/js/react/components/Template/TemplateContainer',
 	() =>
-		function TemplateContainer({
-			children,
-		}: {
-			children: React.ReactNode;
-		}) {
+		function TemplateContainer({ children }: { children: ReactNode }) {
 			return <div data-test="component-templateList">{children}</div>;
 		}
 );

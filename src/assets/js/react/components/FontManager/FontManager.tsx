@@ -2,7 +2,7 @@
 import { useEffect, useRef } from '@wordpress/element';
 import { NavigateFunction } from 'react-router-dom';
 import { useSelect } from '@wordpress/data';
-import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
+import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */
 import FontManagerHeader from './FontManagerHeader';
 import FontManagerBody from './FontManagerBody';
@@ -23,11 +23,11 @@ interface Props {
 
 const FontManager = ({ params, navigate }: Props) => {
 	const fontList = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getFontList(),
+		(select) => select(fontManagerStore).getFontList(),
 		[]
 	);
 	const selectedFont = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getSelectedFont(),
+		(select) => select(fontManagerStore).getSelectedFont(),
 		[]
 	);
 	const containerRef = useRef<HTMLDivElement>(null);

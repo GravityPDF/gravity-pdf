@@ -3,7 +3,7 @@ import { lazy, Suspense, createRoot } from '@wordpress/element';
 import { Routes as Switch, Route } from 'react-router-dom';
 import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
 /* Store name */
-import { TEMPLATE_STORE_NAME } from '../store/templateStore';
+import { TEMPLATE_STORE_NAME, templateStore } from '../store/templateStore';
 /* Routes */
 import templateRouter from '../router/templateRouter';
 /* Helpers */
@@ -119,9 +119,7 @@ export function activeTemplateStoreListener(
 			TEMPLATE_STORE_NAME
 		).getActiveTemplate() as string;
 		if (templateField.value !== activeTemplate) {
-			void wpDispatch(TEMPLATE_STORE_NAME).selectTemplate(
-				templateField.value
-			);
+			void wpDispatch(templateStore).selectTemplate(templateField.value);
 		}
 	});
 
@@ -153,7 +151,7 @@ export function templateChangeStoreListener(
 
 		if (list.length !== prevListLength) {
 			prevListLength = list.length;
-			void wpDispatch(TEMPLATE_STORE_NAME).updateSelectBox();
+			void wpDispatch(templateStore).updateSelectBox();
 		}
 
 		if (updateSelectBoxText && updateSelectBoxText !== prevSelectBoxText) {

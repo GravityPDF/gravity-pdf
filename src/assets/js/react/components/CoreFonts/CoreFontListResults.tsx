@@ -1,5 +1,5 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 /* Components */
@@ -60,7 +60,7 @@ interface RetryProps {
 export const Retry = ({ retryText }: RetryProps) => {
 	const navigate = useNavigate();
 
-	const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		navigate('retryDownloadCoreFonts');
 	};

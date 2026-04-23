@@ -11,7 +11,7 @@ import { getJsonString } from './api';
  */
 
 async function ajaxFetch(formData: FormData): Promise<string> {
-	const response = await apiFetch<Response>({
+	const response = await apiFetch({
 		url: GFPDF.ajaxUrl,
 		method: 'POST',
 		body: formData,

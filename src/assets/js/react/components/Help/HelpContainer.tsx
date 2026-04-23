@@ -1,4 +1,5 @@
 import * as React from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
 import { liteClient } from 'algoliasearch/lite';
 import {
@@ -87,8 +88,8 @@ export const HelpContainer = () => {
 };
 
 interface EmptyQueryBoundaryProps {
-	children: React.ReactNode;
-	fallback: React.ReactNode;
+	children: ReactNode;
+	fallback: ReactNode;
 }
 
 function EmptyQueryBoundary({ children, fallback }: EmptyQueryBoundaryProps) {

@@ -1,11 +1,11 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useRef, useEffect } from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
+import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -22,7 +22,7 @@ import { TemplateItem } from '../../types';
 interface Props {
 	navigate: NavigateFunction;
 	template?: TemplateItem;
-	callbackFunction?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+	callbackFunction?: (e: MouseEvent<HTMLButtonElement>) => void;
 	buttonText?: string;
 	templateConfirmDeleteText?: string;
 	templateDeleteErrorText?: string;
@@ -45,7 +45,7 @@ const TemplateDeleteButton = ({
 		clearTemplateProcessing,
 	} = useDispatch(TEMPLATE_STORE_NAME);
 	const getTemplateProcessing = useSelect(
-		(select) => select(TEMPLATE_STORE_NAME).getTemplateProcessing(),
+		(select) => select(templateStore).getTemplateProcessing(),
 		[]
 	);
 
@@ -82,7 +82,7 @@ const TemplateDeleteButton = ({
 		templateDeleteErrorText,
 	]);
 
-	const handleDeleteTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleDeleteTemplate = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 

@@ -1,6 +1,6 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import type { KeyboardEvent } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 /* Components */
 import TemplateScreenshot from './TemplateScreenshot';
@@ -10,7 +10,7 @@ import { Name } from './TemplateSingleComponents';
 import TemplateActivateButton from './TemplateActivateButton';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
+import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
 /* Helpers */
 import withRouterHooks from '../../utilities/withRouterHooks';
 /* Types */
@@ -44,7 +44,7 @@ const TemplateListItem = ({
 }: Props) => {
 	const { updateTemplateParam } = useDispatch(TEMPLATE_STORE_NAME);
 	const activeTemplate = useSelect(
-		(select) => select(TEMPLATE_STORE_NAME).getActiveTemplate(),
+		(select) => select(templateStore).getActiveTemplate(),
 		[]
 	);
 
@@ -53,7 +53,7 @@ const TemplateListItem = ({
 	};
 
 	const handleMaybeShowDetailedTemplate = (
-		e: React.KeyboardEvent<HTMLDivElement>
+		e: KeyboardEvent<HTMLDivElement>
 	) => {
 		if (
 			e.keyCode === 13 &&

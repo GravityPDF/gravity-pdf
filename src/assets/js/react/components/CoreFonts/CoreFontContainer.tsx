@@ -7,7 +7,10 @@ import Counter from './CoreFontCounter';
 import Spinner from '../Spinner';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { CORE_FONTS_STORE_NAME } from '../../store/coreFontsStore';
+import {
+	CORE_FONTS_STORE_NAME,
+	coreFontsStore,
+} from '../../store/coreFontsStore';
 
 /**
  * @package			Gravity PDF
@@ -41,31 +44,28 @@ const CoreFontContainer = ({
 	} = useDispatch(CORE_FONTS_STORE_NAME);
 
 	const buttonClicked = useSelect(
-		(select) => select(CORE_FONTS_STORE_NAME).getButtonClicked(),
+		(select) => select(coreFontsStore).getButtonClicked(),
 		[]
 	);
 	const fontList = useSelect(
-		(select) => select(CORE_FONTS_STORE_NAME).getFontList(),
+		(select) => select(coreFontsStore).getFontList(),
 		[]
 	);
 	const getFilesFromGitHubFailed = useSelect(
-		(select) => select(CORE_FONTS_STORE_NAME).getFilesFromGitHubFailed(),
+		(select) => select(coreFontsStore).getFilesFromGitHubFailed(),
 		[]
 	);
 	const consoleList = useSelect(
-		(select) => select(CORE_FONTS_STORE_NAME).getConsole(),
+		(select) => select(coreFontsStore).getConsole(),
 		[]
 	);
-	const retry = useSelect(
-		(select) => select(CORE_FONTS_STORE_NAME).getRetry(),
-		[]
-	);
+	const retry = useSelect((select) => select(coreFontsStore).getRetry(), []);
 	const requestDownload = useSelect(
-		(select) => select(CORE_FONTS_STORE_NAME).getRequestDownload(),
+		(select) => select(coreFontsStore).getRequestDownload(),
 		[]
 	);
 	const queue = useSelect(
-		(select) => select(CORE_FONTS_STORE_NAME).getDownloadCounter(),
+		(select) => select(coreFontsStore).getDownloadCounter(),
 		[]
 	);
 

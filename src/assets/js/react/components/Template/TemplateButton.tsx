@@ -1,5 +1,5 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ interface Props {
 }
 
 const TemplateButton = ({ navigate }: Props) => {
-	const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 

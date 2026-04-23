@@ -1,6 +1,6 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useRef } from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { DropZone } from '@wordpress/components';
 /* Components */
@@ -22,7 +22,7 @@ interface Props {
 	validateRegular: boolean;
 	onHandleUpload: (key: string, file: File, state: string) => void;
 	onHandleDeleteFontStyle: (
-		e: React.MouseEvent,
+		e: MouseEvent,
 		key: string,
 		state: string
 	) => void;
@@ -38,7 +38,7 @@ interface ItemProps {
 	fontStyles: FontStyles;
 	onHandleUpload: (key: string, file: File, state: string) => void;
 	onHandleDeleteFontStyle: (
-		e: React.MouseEvent,
+		e: MouseEvent,
 		key: string,
 		state: string
 	) => void;
@@ -94,18 +94,14 @@ function FontVariantItem({
 					}
 				}}
 			/>
-			<a
+			<button
+				type="button"
 				className={'drop-zone' + dropZoneClassEnhancement}
 				tabIndex={parseInt(tabIndex, 10)}
 				onClick={(e) => {
 					if (font) {
-						onHandleDeleteFontStyle(
-							e as unknown as React.MouseEvent,
-							key,
-							state
-						);
+						onHandleDeleteFontStyle(e, key, state);
 					} else {
-						e.preventDefault();
 						fileInputRef.current?.click();
 					}
 				}}
@@ -149,7 +145,7 @@ function FontVariantItem({
 				<span className={'dashicons dashicons-' + dropZoneIcon} />
 
 				<FontVariantLabel label={key} font={displayRequiredText} />
-			</a>
+			</button>
 		</div>
 	);
 }

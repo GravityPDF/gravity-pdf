@@ -1,9 +1,12 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import type { ChangeEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { FONT_MANAGER_STORE_NAME } from '../../store/fontManagerStore';
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../../store/fontManagerStore';
 
 /**
  * @package     Gravity PDF
@@ -21,13 +24,10 @@ const SearchBox = ({ id }: Props) => {
 		FONT_MANAGER_STORE_NAME
 	);
 	const searchResult = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getSearchResult(),
+		(select) => select(fontManagerStore).getSearchResult(),
 		[]
 	);
-	const msg = useSelect(
-		(select) => select(FONT_MANAGER_STORE_NAME).getMsg(),
-		[]
-	);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 	const [searchInput, setSearchInput] = useState('');
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -64,7 +64,7 @@ const SearchBox = ({ id }: Props) => {
 		};
 	}, [resetSearchResult]);
 
-	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
 		const data = e.target.value;
 		lastSearchInput.current = data;
 		setSearchInput(data);

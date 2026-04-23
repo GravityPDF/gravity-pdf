@@ -1,5 +1,5 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { NavigateFunction } from 'react-router-dom';
 /* Store */
@@ -27,7 +27,7 @@ interface Props {
 const TemplateActivateButton = ({ navigate, template, buttonText }: Props) => {
 	const { selectTemplate } = useDispatch(TEMPLATE_STORE_NAME);
 
-	const handleSelectTemplate = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleSelectTemplate = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 

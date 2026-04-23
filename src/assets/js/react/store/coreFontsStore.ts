@@ -196,7 +196,11 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 						dispatch(getFilesFromGitHubAction());
 						try {
 							const fontList = await apiGetFilesFromGitHub();
-							dispatch(getFilesFromGitHubSuccess(fontList));
+							dispatch(
+								getFilesFromGitHubSuccess(
+									fontList.map((f) => f.name)
+								)
+							);
 						} catch {
 							const errorMsg = __(
 								'Could not download Core Font list. Try again.',

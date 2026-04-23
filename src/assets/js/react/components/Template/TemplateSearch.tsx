@@ -1,11 +1,11 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { useRef, useEffect } from '@wordpress/element';
+import type { ChangeEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 /* Store */
-import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
+import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
 
 /**
  * Handles the PDF template search functionality
@@ -18,10 +18,7 @@ import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
 
 const TemplateSearch = () => {
 	const { searchTemplates } = useDispatch(TEMPLATE_STORE_NAME);
-	const search = useSelect(
-		(select) => select(TEMPLATE_STORE_NAME).getSearch(),
-		[]
-	);
+	const search = useSelect((select) => select(templateStore).getSearch(), []);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const runSearch = useDebounce(searchTemplates, 200);
@@ -30,7 +27,7 @@ const TemplateSearch = () => {
 		inputRef.current?.focus();
 	}, []);
 
-	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
 		runSearch(e.target.value || '');
 	};
 
