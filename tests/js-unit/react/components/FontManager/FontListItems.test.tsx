@@ -42,6 +42,7 @@ describe('FontManager - FontListItems.js', () => {
 	const defaultProps = {
 		activeFontId: '',
 		onSelectFont: jest.fn(),
+		hasDetailOpen: false,
 	};
 
 	/* FontListItems' mount effect calls document.querySelector on this element */
@@ -127,8 +128,6 @@ describe('FontManager - FontListItems.js', () => {
 		});
 
 		test('componentDidUpdate() - calls onSelectFont("") after font deletion', () => {
-			document.body.innerHTML += '<div class="update-font show"></div>';
-
 			const onSelectFont = jest.fn();
 			const store = createTestStore({
 				fontManager: {
@@ -137,7 +136,11 @@ describe('FontManager - FontListItems.js', () => {
 				},
 			});
 			renderWithStore(
-				<FontListItems activeFontId="" onSelectFont={onSelectFont} />,
+				<FontListItems
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					hasDetailOpen={true}
+				/>,
 				{},
 				{},
 				store
@@ -156,13 +159,15 @@ describe('FontManager - FontListItems.js', () => {
 
 	describe('RUN COMPONENT METHODS', () => {
 		test('handleFontClick() - dispatches clearAddFontMsg and calls onSelectFont', () => {
-			document.body.innerHTML += '<div class="update-font show"></div>';
-
 			const onSelectFont = jest.fn();
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontListItems activeFontId="" onSelectFont={onSelectFont} />,
+				<FontListItems
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					hasDetailOpen={false}
+				/>,
 				{},
 				{},
 				store
@@ -180,7 +185,11 @@ describe('FontManager - FontListItems.js', () => {
 			const onSelectFont = jest.fn();
 			const store = createTestStore(initialState);
 			const { container } = renderWithStore(
-				<FontListItems activeFontId="" onSelectFont={onSelectFont} />,
+				<FontListItems
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					hasDetailOpen={false}
+				/>,
 				{},
 				{},
 				store

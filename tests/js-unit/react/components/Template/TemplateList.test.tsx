@@ -12,14 +12,6 @@ jest.mock(
 );
 
 jest.mock(
-	'../../../../../src/assets/js/react/components/Template/TemplateHeaderTitle',
-	() =>
-		function TemplateHeaderTitle() {
-			return <div data-test="component-templateHeaderTitle" />;
-		}
-);
-
-jest.mock(
 	'../../../../../src/assets/js/react/components/Template/TemplateSearch',
 	() =>
 		function TemplateSearch() {

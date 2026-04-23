@@ -1,78 +1,51 @@
 import { render } from '@testing-library/react';
-import { findByTestAttr } from '../../testUtilsRTL';
 import TemplateContainer from '../../../../../src/assets/js/react/components/Template/TemplateContainer';
 
-jest.mock(
-	'../../../../../src/assets/js/react/components/Modal/CloseDialog',
-	() =>
-		function CloseDialog() {
-			return <div data-test="component-CloseDialog" />;
-		}
-);
+/* Modal portals into document.body, so queries must run against `document`, not the render container */
+const findInDocument = (val: string) =>
+	document.querySelector(`[data-test="${val}"]`);
 
 describe('Template - TemplateContainer.js', () => {
 	afterEach(() => jest.restoreAllMocks());
 
 	test('renders <TemplateContainer /> component', () => {
-		const { container } = render(
-			<TemplateContainer onClose={jest.fn()}>
-				<div>content</div>
-			</TemplateContainer>
-		);
-		expect(
-			findByTestAttr(container, 'component-templateContainer')
-		).toBeInTheDocument();
-	});
-
-	test('renders children', () => {
-		const { getByText } = render(
-			<TemplateContainer onClose={jest.fn()}>
-				<div>test-child</div>
-			</TemplateContainer>
-		);
-		expect(getByText('test-child')).toBeInTheDocument();
-	});
-
-	test('renders <CloseDialog /> component', () => {
-		const { container } = render(
-			<TemplateContainer onClose={jest.fn()}>
-				<div>content</div>
-			</TemplateContainer>
-		);
-		expect(
-			findByTestAttr(container, 'component-CloseDialog')
-		).toBeInTheDocument();
-	});
-
-	test('attaches focus event listener to document on mount', () => {
-		const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
 		render(
 			<TemplateContainer onClose={jest.fn()}>
 				<div>content</div>
 			</TemplateContainer>
 		);
-		expect(addEventListenerSpy).toHaveBeenCalledWith(
-			'focus',
-			expect.any(Function),
-			true
-		);
+		expect(
+			findInDocument('component-templateContainer')
+		).toBeInTheDocument();
 	});
 
-	test('removes focus event listener from document on unmount', () => {
-		const removeEventListenerSpy = jest.spyOn(
-			document,
-			'removeEventListener'
-		);
-		const { unmount } = render(
+	test('renders children', () => {
+		render(
 			<TemplateContainer onClose={jest.fn()}>
+				<div>test-child</div>
+			</TemplateContainer>
+		);
+		expect(document.body.textContent).toContain('test-child');
+	});
+
+	test('forwards title prop to Modal', () => {
+		render(
+			<TemplateContainer title="Installed PDFs" onClose={jest.fn()}>
 				<div>content</div>
 			</TemplateContainer>
 		);
-		unmount();
-		expect(removeEventListenerSpy).toHaveBeenCalledWith(
-			'focus',
-			expect.any(Function),
-			true
+		expect(document.body.textContent).toContain('Installed PDFs');
+	});
+
+	test('renders header above children when provided', () => {
+		render(
+			<TemplateContainer
+				header={<span>header-slot</span>}
+				onClose={jest.fn()}
+			>
+				<div>content</div>
+			</TemplateContainer>
 		);
+		expect(document.body.textContent).toContain('header-slot');
 	});
 });

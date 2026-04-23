@@ -6,6 +6,7 @@ describe('FontManager - FontList.js', () => {
 	const defaultProps = {
 		activeFontId: '',
 		onSelectFont: jest.fn(),
+		hasDetailOpen: false,
 	};
 
 	/* FontListItems.componentDidMount calls document.querySelector on this element */

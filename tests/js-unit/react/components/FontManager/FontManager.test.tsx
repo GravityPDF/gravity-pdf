@@ -1,13 +1,5 @@
-import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
+import { renderWithStore } from '../../testUtilsRTL';
 import FontManager from '../../../../../src/assets/js/react/components/FontManager/FontManager';
-
-jest.mock(
-	'../../../../../src/assets/js/react/components/FontManager/FontManagerHeader',
-	() =>
-		function FontManagerHeader() {
-			return <div data-test="component-FontManagerHeader" />;
-		}
-);
 
 jest.mock(
 	'../../../../../src/assets/js/react/components/FontManager/FontManagerBody',
@@ -23,6 +15,10 @@ jest.mock(
 		associatedFontManagerSelectBox: jest.fn(),
 	})
 );
+
+/* Modal portals into document.body, so queries must run against `document`, not the render container */
+const findInDocument = (val: string) =>
+	document.querySelector(`[data-test="${val}"]`);
 
 describe('FontManager - FontManager.js', () => {
 	const onSelectFont = jest.fn();
@@ -44,13 +40,8 @@ describe('FontManager - FontManager.js', () => {
 		jest.restoreAllMocks();
 	});
 
-	describe('RUN LIFECYCLE METHODS', () => {
-		test('componentDidMount() - adds focus event listener to document', () => {
-			const addEventListenerSpy = jest.spyOn(
-				document,
-				'addEventListener'
-			);
-
+	describe('RENDERS COMPONENT', () => {
+		test('render <FontManager /> component', () => {
 			renderWithStore(
 				<FontManager
 					activeFontId=""
@@ -59,70 +50,11 @@ describe('FontManager - FontManager.js', () => {
 				/>,
 				initialState
 			);
-
-			expect(addEventListenerSpy).toHaveBeenCalledWith(
-				'focus',
-				expect.any(Function),
-				true
-			);
-		});
-
-		test('componentWillUnmount() - removes focus event listener from document', () => {
-			const removeEventListenerSpy = jest.spyOn(
-				document,
-				'removeEventListener'
-			);
-
-			const { unmount } = renderWithStore(
-				<FontManager
-					activeFontId=""
-					onSelectFont={onSelectFont}
-					onClose={onClose}
-				/>,
-				initialState
-			);
-
-			unmount();
-
-			expect(removeEventListenerSpy).toHaveBeenCalledWith(
-				'focus',
-				expect.any(Function),
-				true
-			);
-		});
-	});
-
-	describe('RENDERS COMPONENT', () => {
-		test('render <FontManager /> component', () => {
-			const { container } = renderWithStore(
-				<FontManager
-					activeFontId=""
-					onSelectFont={onSelectFont}
-					onClose={onClose}
-				/>,
-				initialState
-			);
-			expect(
-				findByTestAttr(container, 'component-FontManager')
-			).toBeInTheDocument();
-		});
-
-		test('render <FontManagerHeader /> component', () => {
-			const { container } = renderWithStore(
-				<FontManager
-					activeFontId=""
-					onSelectFont={onSelectFont}
-					onClose={onClose}
-				/>,
-				initialState
-			);
-			expect(
-				findByTestAttr(container, 'component-FontManagerHeader')
-			).toBeInTheDocument();
+			expect(findInDocument('component-FontManager')).toBeInTheDocument();
 		});
 
 		test('render <FontManagerBody /> component', () => {
-			const { container } = renderWithStore(
+			renderWithStore(
 				<FontManager
 					activeFontId=""
 					onSelectFont={onSelectFont}
@@ -131,8 +63,20 @@ describe('FontManager - FontManager.js', () => {
 				initialState
 			);
 			expect(
-				findByTestAttr(container, 'component-FontManagerBody')
+				findInDocument('component-FontManagerBody')
 			).toBeInTheDocument();
+		});
+
+		test('renders Modal with Font Manager title', () => {
+			renderWithStore(
+				<FontManager
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					onClose={onClose}
+				/>,
+				initialState
+			);
+			expect(document.body.textContent).toContain('Font Manager');
 		});
 	});
 });

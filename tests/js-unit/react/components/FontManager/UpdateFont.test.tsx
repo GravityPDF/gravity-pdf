@@ -9,6 +9,7 @@ import type {
 describe('FontManager - UpdateFont.js', () => {
 	const props = {
 		id: 'firasanslight',
+		isOpen: false,
 		fontList: [
 			{ font_name: 'Fira Sans Light', id: 'firasanslight' } as FontItem,
 		],

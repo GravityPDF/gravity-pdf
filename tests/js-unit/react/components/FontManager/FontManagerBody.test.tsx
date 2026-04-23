@@ -137,23 +137,6 @@ describe('FontManager - FontManagerBody.js', () => {
 			);
 		});
 
-		test('componentDidMount() - adds .show class to update-font when activeFontId is set', () => {
-			document.body.innerHTML = '<div class="update-font"></div>';
-			renderWithStore(
-				<FontManagerBody
-					activeFontId={sampleFont.id}
-					onSelectFont={jest.fn()}
-				/>,
-				initialState
-			);
-
-			expect(
-				document
-					.querySelector('.update-font')
-					?.classList.contains('show')
-			).toBe(true);
-		});
-
 		test('componentDidUpdate() - calls onSelectFont with empty string when id becomes invalid', () => {
 			const onSelectFont = jest.fn();
 			const store = createTestStore({
