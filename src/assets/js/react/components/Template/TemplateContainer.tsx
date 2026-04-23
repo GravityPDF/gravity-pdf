@@ -17,10 +17,10 @@ interface Props {
 	header?: ReactNode;
 	footer?: ReactNode;
 	children: ReactNode;
-	closeRoute?: string;
+	onClose: () => void;
 }
 
-const TemplateContainer = ({ header, footer, children, closeRoute }: Props) => {
+const TemplateContainer = ({ header, footer, children, onClose }: Props) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -58,7 +58,7 @@ const TemplateContainer = ({ header, footer, children, closeRoute }: Props) => {
 			<div className="container theme-wrap">
 				<div className="theme-header">
 					{header}
-					<CloseDialog closeRoute={closeRoute} />
+					<CloseDialog onClose={onClose} />
 				</div>
 
 				<div

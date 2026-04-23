@@ -5,25 +5,13 @@ import {
 	createTestStore,
 } from '../../testUtilsRTL';
 import { CloseDialog } from '../../../../../src/assets/js/react/components/Modal/CloseDialog';
-import * as utilitiesB from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont';
 import type { FontManagerState } from '../../../../../src/assets/js/react/types';
 
-const mockNavigate = jest.fn();
-jest.mock('react-router', () => ({
-	...jest.requireActual('react-router'),
-	useNavigate: () => mockNavigate,
-	useLocation: () => ({ pathname: '/fontmanager/' }),
-}));
-
 describe('CloseDialog - CloseDialog.js', () => {
-	beforeEach(() => {
-		mockNavigate.mockClear();
-	});
-
 	describe('RUN LIFECYCLE METHODS', () => {
 		test('keydown listener is assigned to document on mount', () => {
 			const addEventSpy = jest.spyOn(document, 'addEventListener');
-			renderWithStore(<CloseDialog />);
+			renderWithStore(<CloseDialog onClose={jest.fn()} />);
 
 			expect(addEventSpy).toHaveBeenCalledWith(
 				'keydown',
@@ -46,39 +34,54 @@ describe('CloseDialog - CloseDialog.js', () => {
 			};
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
-			const toggleUpdateFont = jest.spyOn(utilitiesB, 'toggleUpdateFont');
+			const mockOnClose = jest.fn();
+			const mockOnCloseDetail = jest.fn();
 
-			renderWithStore(<CloseDialog id="yes" />, {}, {}, store);
+			renderWithStore(
+				<CloseDialog
+					onClose={mockOnClose}
+					onCloseDetail={mockOnCloseDetail}
+					hasDetailOpen={true}
+				/>,
+				{},
+				{},
+				store
+			);
 			fireEvent.keyDown(document, { key: 'Escape' });
 
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'CLEAR_ADD_FONT_MSG' })
 			);
-			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
-
-			toggleUpdateFont.mockRestore();
+			expect(mockOnCloseDetail).toHaveBeenCalledTimes(1);
+			expect(mockOnClose).not.toHaveBeenCalled();
 		});
 
 		test('handleKeyPress() - Close modal', () => {
-			renderWithStore(<CloseDialog />);
+			const mockOnClose = jest.fn();
+			renderWithStore(<CloseDialog onClose={mockOnClose} />);
 			fireEvent.keyDown(document, { key: 'Escape' });
 
-			expect(mockNavigate).toHaveBeenCalledWith('/');
+			expect(mockOnClose).toHaveBeenCalledTimes(1);
 		});
 
-		test('handleCloseDialog() - trigger router', () => {
-			const { container } = renderWithStore(<CloseDialog />);
+		test('handleCloseDialog() - button click calls onClose', () => {
+			const mockOnClose = jest.fn();
+			const { container } = renderWithStore(
+				<CloseDialog onClose={mockOnClose} />
+			);
 			fireEvent.click(
 				findByTestAttr(container, 'component-CloseDialog')!
 			);
 
-			expect(mockNavigate).toHaveBeenCalledWith('/');
+			expect(mockOnClose).toHaveBeenCalledTimes(1);
 		});
 	});
 
 	describe('RENDERS COMPONENT', () => {
 		test('render <CloseDialog /> component', () => {
-			const { container } = renderWithStore(<CloseDialog />);
+			const { container } = renderWithStore(
+				<CloseDialog onClose={jest.fn()} />
+			);
 
 			expect(
 				findByTestAttr(container, 'component-CloseDialog')
@@ -86,7 +89,9 @@ describe('CloseDialog - CloseDialog.js', () => {
 		});
 
 		test('render button accessible label', () => {
-			const { container } = renderWithStore(<CloseDialog />);
+			const { container } = renderWithStore(
+				<CloseDialog onClose={jest.fn()} />
+			);
 
 			expect(
 				container.querySelector(
@@ -96,12 +101,15 @@ describe('CloseDialog - CloseDialog.js', () => {
 		});
 
 		test('check button click', () => {
-			const { container } = renderWithStore(<CloseDialog />);
+			const mockOnClose = jest.fn();
+			const { container } = renderWithStore(
+				<CloseDialog onClose={mockOnClose} />
+			);
 			fireEvent.click(
 				findByTestAttr(container, 'component-CloseDialog')!
 			);
 
-			expect(mockNavigate).toHaveBeenCalledTimes(1);
+			expect(mockOnClose).toHaveBeenCalledTimes(1);
 		});
 	});
 });

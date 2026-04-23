@@ -74,14 +74,6 @@ jest.mock(
 );
 
 jest.mock(
-	'../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont',
-	() => ({
-		toggleUpdateFont: jest.fn(),
-		addClass: jest.fn(),
-	})
-);
-
-jest.mock(
 	'../../../../../src/assets/js/react/utilities/FontManager/adjustFontListHeight',
 	() => ({
 		adjustFontListHeight: jest.fn(),
@@ -99,14 +91,7 @@ jest.mock('../../../../../src/assets/js/react/api/fontManager', () => ({
 	apiDeleteFont: jest.fn(),
 }));
 
-const {
-	toggleUpdateFont,
-	addClass,
-} = require('../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont');
-
 describe('FontManager - FontManagerBody.js', () => {
-	const navigate = jest.fn();
-
 	const sampleFont = {
 		font_name: 'Fira Sans Light',
 		id: 'firasanslight',
@@ -141,7 +126,7 @@ describe('FontManager - FontManagerBody.js', () => {
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 
 			renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody activeFontId="" onSelectFont={jest.fn()} />,
 				{},
 				{},
 				store
@@ -152,37 +137,33 @@ describe('FontManager - FontManagerBody.js', () => {
 			);
 		});
 
-		test('componentDidMount() - calls addClass to auto-open update panel when id is set', () => {
+		test('componentDidMount() - adds .show class to update-font when activeFontId is set', () => {
+			document.body.innerHTML = '<div class="update-font"></div>';
 			renderWithStore(
-				<FontManagerBody id={sampleFont.id} navigate={navigate} />,
+				<FontManagerBody
+					activeFontId={sampleFont.id}
+					onSelectFont={jest.fn()}
+				/>,
 				initialState
 			);
 
-			expect(addClass).toHaveBeenCalledTimes(1);
+			expect(
+				document
+					.querySelector('.update-font')
+					?.classList.contains('show')
+			).toBe(true);
 		});
 
-		test('componentDidUpdate() - navigates to /fontmanager/ when id becomes invalid', () => {
+		test('componentDidUpdate() - calls onSelectFont with empty string when id becomes invalid', () => {
+			const onSelectFont = jest.fn();
 			const store = createTestStore({
 				fontManager: { ...initialState.fontManager, fontList: [] },
 			});
 			const { rerender } = renderWithStore(
-				<FontManagerBody id="roboto" navigate={navigate} />,
-				{},
-				{},
-				store
-			);
-
-			act(() => {
-				rerender(<FontManagerBody id="arial" navigate={navigate} />);
-			});
-
-			expect(navigate).toHaveBeenCalledWith('/fontmanager/');
-		});
-
-		test('componentDidUpdate() - loads font details when id changes to a valid font', () => {
-			const store = createTestStore(initialState);
-			const { rerender, container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody
+					activeFontId="roboto"
+					onSelectFont={onSelectFont}
+				/>,
 				{},
 				{},
 				store
@@ -190,7 +171,31 @@ describe('FontManager - FontManagerBody.js', () => {
 
 			act(() => {
 				rerender(
-					<FontManagerBody id={sampleFont.id} navigate={navigate} />
+					<FontManagerBody
+						activeFontId="arial"
+						onSelectFont={onSelectFont}
+					/>
+				);
+			});
+
+			expect(onSelectFont).toHaveBeenCalledWith('');
+		});
+
+		test('componentDidUpdate() - loads font details when activeFontId changes to a valid font', () => {
+			const store = createTestStore(initialState);
+			const { rerender, container } = renderWithStore(
+				<FontManagerBody activeFontId="" onSelectFont={jest.fn()} />,
+				{},
+				{},
+				store
+			);
+
+			act(() => {
+				rerender(
+					<FontManagerBody
+						activeFontId={sampleFont.id}
+						onSelectFont={jest.fn()}
+					/>
 				);
 			});
 
@@ -206,7 +211,7 @@ describe('FontManager - FontManagerBody.js', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody activeFontId="" onSelectFont={jest.fn()} />,
 				{},
 				{},
 				store
@@ -219,11 +224,15 @@ describe('FontManager - FontManagerBody.js', () => {
 			);
 		});
 
-		test('handleCancelEditFont() - calls toggleUpdateFont and dispatches clearAddFontMsg', () => {
+		test('handleCancelEditFont() - calls onSelectFont and dispatches clearAddFontMsg', () => {
+			const onSelectFont = jest.fn();
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontManagerBody id={sampleFont.id} navigate={navigate} />,
+				<FontManagerBody
+					activeFontId={sampleFont.id}
+					onSelectFont={onSelectFont}
+				/>,
 				{},
 				{},
 				store
@@ -231,15 +240,19 @@ describe('FontManager - FontManagerBody.js', () => {
 
 			fireEvent.click(findByTestAttr(container, 'cancel-button')!);
 
-			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
+			expect(onSelectFont).toHaveBeenCalledWith('');
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'CLEAR_ADD_FONT_MSG' })
 			);
 		});
 
-		test('handleCancelEditFontKeypress() - calls toggleUpdateFont on Enter key', () => {
+		test('handleCancelEditFontKeypress() - calls onSelectFont on Enter key', () => {
+			const onSelectFont = jest.fn();
 			const { container } = renderWithStore(
-				<FontManagerBody id={sampleFont.id} navigate={navigate} />,
+				<FontManagerBody
+					activeFontId={sampleFont.id}
+					onSelectFont={onSelectFont}
+				/>,
 				initialState
 			);
 
@@ -247,16 +260,16 @@ describe('FontManager - FontManagerBody.js', () => {
 				key: 'Enter',
 			});
 
-			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
+			expect(onSelectFont).toHaveBeenCalledWith('');
 		});
 
-		test('handleSubmit() - dispatches editFont when update form has valid existing data', () => {
+		test('handleSubmit() - dispatches clearAddFontMsg when update form has no changes', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 
-			/* Render with id to trigger handleRequestFontDetails and populate updateFontState */
+			/* Render with activeFontId to trigger handleRequestFontDetails and populate updateFontState */
 			const { rerender, container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody activeFontId="" onSelectFont={jest.fn()} />,
 				{},
 				{},
 				store
@@ -264,7 +277,10 @@ describe('FontManager - FontManagerBody.js', () => {
 
 			act(() => {
 				rerender(
-					<FontManagerBody id={sampleFont.id} navigate={navigate} />
+					<FontManagerBody
+						activeFontId={sampleFont.id}
+						onSelectFont={jest.fn()}
+					/>
 				);
 			});
 
@@ -281,9 +297,14 @@ describe('FontManager - FontManagerBody.js', () => {
 	});
 
 	describe('RENDERS COMPONENT', () => {
+		const defaultProps = {
+			activeFontId: '',
+			onSelectFont: jest.fn(),
+		};
+
 		test('render <FontManagerBody /> component', () => {
 			const { container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody {...defaultProps} />,
 				initialState
 			);
 			expect(
@@ -293,7 +314,7 @@ describe('FontManager - FontManagerBody.js', () => {
 
 		test('render <SearchBox /> component', () => {
 			const { container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody {...defaultProps} />,
 				initialState
 			);
 			expect(
@@ -305,7 +326,7 @@ describe('FontManager - FontManagerBody.js', () => {
 			/* GET_CUSTOM_FONT_LIST resets msg to {} on mount, so dispatch the error after */
 			const store = createTestStore(initialState);
 			const { container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody {...defaultProps} />,
 				{},
 				{},
 				store
@@ -325,7 +346,7 @@ describe('FontManager - FontManagerBody.js', () => {
 
 		test('render <FontList /> component', () => {
 			const { container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody {...defaultProps} />,
 				initialState
 			);
 			expect(
@@ -335,7 +356,7 @@ describe('FontManager - FontManagerBody.js', () => {
 
 		test('render <AddFont /> component', () => {
 			const { container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody {...defaultProps} />,
 				initialState
 			);
 			expect(
@@ -345,7 +366,7 @@ describe('FontManager - FontManagerBody.js', () => {
 
 		test('render <UpdateFont /> component', () => {
 			const { container } = renderWithStore(
-				<FontManagerBody navigate={navigate} />,
+				<FontManagerBody {...defaultProps} />,
 				initialState
 			);
 			expect(

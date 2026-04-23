@@ -1,5 +1,4 @@
 /* Dependencies */
-import { NavigateFunction } from 'react-router';
 import { useSelect } from '@wordpress/data';
 import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */
@@ -16,11 +15,11 @@ import FontListAlertMessage from './FontListAlertMessage';
  */
 
 interface Props {
-	id?: string;
-	navigate: NavigateFunction;
+	activeFontId: string;
+	onSelectFont: (id: string) => void;
 }
 
-const FontList = ({ id, navigate }: Props) => {
+const FontList = ({ activeFontId, onSelectFont }: Props) => {
 	const loading = useSelect(
 		(select) => select(fontManagerStore).getLoading(),
 		[]
@@ -55,7 +54,10 @@ const FontList = ({ id, navigate }: Props) => {
 			{loading ? (
 				<FontListSkeleton />
 			) : (
-				<FontListItems id={id} navigate={navigate} />
+				<FontListItems
+					activeFontId={activeFontId}
+					onSelectFont={onSelectFont}
+				/>
 			)}
 
 			{fontListEmpty && emptySearchResult && (

@@ -1,5 +1,5 @@
 /* Dependencies */
-import { Params } from 'react-router';
+import { __, sprintf } from '@wordpress/i18n';
 /* Components */
 import TemplateContainer from './TemplateContainer';
 import TemplateHeaderNavigation from './TemplateHeaderNavigation';
@@ -17,11 +17,9 @@ import {
 /* Store */
 import { useSelect } from '@wordpress/data';
 import { templateStore } from '../../store/templateStore';
-/* Helpers */
-import withRouterHooks from '../../utilities/withRouterHooks';
 
 /**
- * Renders a single PDF template, which get displayed on the /template/:id page.
+ * Renders a single PDF template, displayed in the detail view.
  *
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -29,42 +27,16 @@ import withRouterHooks from '../../utilities/withRouterHooks';
  * @since       4.1
  */
 
-const TemplateHeaderNavigationWithRouter = withRouterHooks(
-	TemplateHeaderNavigation
-);
-
 interface Props {
-	params?: Readonly<Params<string>>;
-	showPreviousTemplateText?: string;
-	showNextTemplateText?: string;
-	ajaxUrl?: string;
-	ajaxNonce?: string;
-	activateText?: string;
-	pdfWorkingDirPath?: string;
-	templateDeleteText?: string;
-	templateConfirmDeleteText?: string;
-	templateDeleteErrorText?: string;
-	currentTemplateText?: string;
-	versionText?: string;
-	groupText?: string;
-	tagsText?: string;
+	activeTemplateId: string;
+	onSelectTemplate: (id: string) => void;
+	onClose: () => void;
 }
 
 const TemplateSingle = ({
-	params,
-	showPreviousTemplateText,
-	showNextTemplateText,
-	ajaxUrl,
-	ajaxNonce,
-	activateText,
-	pdfWorkingDirPath,
-	templateDeleteText,
-	templateConfirmDeleteText,
-	templateDeleteErrorText,
-	currentTemplateText,
-	versionText,
-	groupText,
-	tagsText,
+	activeTemplateId,
+	onSelectTemplate,
+	onClose,
 }: Props) => {
 	const templates = useSelect(
 		(select) => select(templateStore).getFilteredTemplates(),
@@ -75,8 +47,8 @@ const TemplateSingle = ({
 		[]
 	);
 
-	const id = params?.id;
-	const findCurrentTemplate = (item: { id: string }) => item.id === id;
+	const findCurrentTemplate = (item: { id: string }) =>
+		item.id === activeTemplateId;
 	const template = templates?.find(findCurrentTemplate);
 	const templateIndex = templates?.findIndex(findCurrentTemplate);
 
@@ -92,28 +64,45 @@ const TemplateSingle = ({
 	return (
 		<TemplateContainer
 			header={
-				<TemplateHeaderNavigationWithRouter
+				<TemplateHeaderNavigation
 					template={template}
 					templateIndex={templateIndex}
 					templates={templates}
-					showPreviousTemplateText={showPreviousTemplateText}
-					showNextTemplateText={showNextTemplateText}
+					onSelectTemplate={onSelectTemplate}
+					showPreviousTemplateText={__(
+						'Show previous template',
+						'gravity-pdf'
+					)}
+					showNextTemplateText={__(
+						'Show next template',
+						'gravity-pdf'
+					)}
 				/>
 			}
 			footer={
 				<TemplateFooterActions
 					template={template}
+					onSelectTemplate={onSelectTemplate}
+					onClose={onClose}
 					isActiveTemplate={isCurrentTemplate}
-					ajaxUrl={ajaxUrl}
-					ajaxNonce={ajaxNonce}
-					activateText={activateText}
-					pdfWorkingDirPath={pdfWorkingDirPath}
-					templateDeleteText={templateDeleteText}
-					templateConfirmDeleteText={templateConfirmDeleteText}
-					templateDeleteErrorText={templateDeleteErrorText}
+					activateText={__('Select', 'gravity-pdf')}
+					pdfWorkingDirPath={GFPDF.pdfWorkingDir}
+					templateDeleteText={__('Delete', 'gravity-pdf')}
+					templateConfirmDeleteText={sprintf(
+						/* translators: %s is replaced with a double newline */
+						__(
+							"Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.",
+							'gravity-pdf'
+						),
+						'\n\n'
+					)}
+					templateDeleteErrorText={__(
+						'Could not delete template.',
+						'gravity-pdf'
+					)}
 				/>
 			}
-			closeRoute="/template"
+			onClose={() => onSelectTemplate('')}
 		>
 			<div
 				id="gfpdf-template-detail-view"
@@ -123,18 +112,21 @@ const TemplateSingle = ({
 				<div className="theme-info">
 					<CurrentTemplate
 						isCurrentTemplate={isCurrentTemplate}
-						label={currentTemplateText}
+						label={__('Current Template', 'gravity-pdf')}
 					/>
 					<Name
 						name={template.template}
 						version={template.version}
-						versionLabel={versionText}
+						versionLabel={__('Version', 'gravity-pdf')}
 					/>
 					<Author
 						author={template.author}
 						uri={template['author uri'] as string | undefined}
 					/>
-					<Group group={template.group} label={groupText} />
+					<Group
+						group={template.group}
+						label={__('Group', 'gravity-pdf')}
+					/>
 					{longMessage ? (
 						<ShowMessage
 							data-test="component-showMessageLong_message"
@@ -149,7 +141,10 @@ const TemplateSingle = ({
 						/>
 					) : null}
 					<Description desc={template.description} />
-					<Tags tags={template.tags} label={tagsText} />
+					<Tags
+						tags={template.tags}
+						label={__('Tags', 'gravity-pdf')}
+					/>
 				</div>
 			</div>
 		</TemplateContainer>

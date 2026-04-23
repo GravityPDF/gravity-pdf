@@ -1,4 +1,3 @@
-import * as React from '@wordpress/element';
 import { render } from '@testing-library/react';
 import { findByTestAttr } from '../../testUtilsRTL';
 import TemplateFooterActions from '../../../../../src/assets/js/react/components/Template/TemplateFooterActions';
@@ -20,19 +19,19 @@ jest.mock(
 		}
 );
 
-jest.mock(
-	'../../../../../src/assets/js/react/utilities/withRouterHooks',
-	() => (Component: React.ComponentType) => Component
-);
-
 describe('Template - TemplateFooterActions.js', () => {
+	const defaultProps = {
+		onSelectTemplate: jest.fn(),
+		onClose: jest.fn(),
+	};
+
 	test('renders <TemplateFooterActions /> component', () => {
 		const template = {
 			compatible: false,
 			path: '',
 		} as unknown as TemplateItem;
 		const { container } = render(
-			<TemplateFooterActions template={template} />
+			<TemplateFooterActions {...defaultProps} template={template} />
 		);
 		expect(
 			findByTestAttr(container, 'component-templateFooterActions')
@@ -46,6 +45,7 @@ describe('Template - TemplateFooterActions.js', () => {
 		} as unknown as TemplateItem;
 		const { container } = render(
 			<TemplateFooterActions
+				{...defaultProps}
 				template={template}
 				isActiveTemplate={false}
 			/>
@@ -62,6 +62,7 @@ describe('Template - TemplateFooterActions.js', () => {
 		} as unknown as TemplateItem;
 		const { container } = render(
 			<TemplateFooterActions
+				{...defaultProps}
 				template={template}
 				isActiveTemplate={true}
 			/>
@@ -78,6 +79,7 @@ describe('Template - TemplateFooterActions.js', () => {
 		} as unknown as TemplateItem;
 		const { container } = render(
 			<TemplateFooterActions
+				{...defaultProps}
 				template={template}
 				isActiveTemplate={false}
 				pdfWorkingDirPath="/uploads/"
@@ -95,6 +97,7 @@ describe('Template - TemplateFooterActions.js', () => {
 		} as unknown as TemplateItem;
 		const { container } = render(
 			<TemplateFooterActions
+				{...defaultProps}
 				template={template}
 				isActiveTemplate={false}
 				pdfWorkingDirPath="/uploads/"

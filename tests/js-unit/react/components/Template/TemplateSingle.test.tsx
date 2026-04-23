@@ -1,4 +1,3 @@
-import * as React from '@wordpress/element';
 import type { ReactNode } from 'react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import TemplateSingle from '../../../../../src/assets/js/react/components/Template/TemplateSingle';
@@ -38,12 +37,12 @@ jest.mock(
 		}
 );
 
-jest.mock(
-	'../../../../../src/assets/js/react/utilities/withRouterHooks',
-	() => (Component: React.ComponentType) => Component
-);
-
 describe('Template - TemplateSingle.js', () => {
+	const defaultProps = {
+		onSelectTemplate: jest.fn(),
+		onClose: jest.fn(),
+	};
+
 	const sampleTemplate = {
 		id: 'zadani',
 		template: 'Zadani',
@@ -68,9 +67,9 @@ describe('Template - TemplateSingle.js', () => {
 		} as unknown as TemplateState,
 	};
 
-	test('renders <TemplateSingle /> when template is found by params id', () => {
+	test('renders <TemplateSingle /> when template is found by activeTemplateId', () => {
 		const { container } = renderWithStore(
-			<TemplateSingle params={{ id: 'zadani' }} />,
+			<TemplateSingle {...defaultProps} activeTemplateId="zadani" />,
 			initialState
 		);
 		expect(
@@ -80,7 +79,10 @@ describe('Template - TemplateSingle.js', () => {
 
 	test('renders nothing when template is not found', () => {
 		const { container } = renderWithStore(
-			<TemplateSingle params={{ id: 'non-existent' }} />,
+			<TemplateSingle
+				{...defaultProps}
+				activeTemplateId="non-existent"
+			/>,
 			initialState
 		);
 		expect(
@@ -90,7 +92,7 @@ describe('Template - TemplateSingle.js', () => {
 
 	test('renders <TemplateScreenshots /> component', () => {
 		const { container } = renderWithStore(
-			<TemplateSingle params={{ id: 'zadani' }} />,
+			<TemplateSingle {...defaultProps} activeTemplateId="zadani" />,
 			initialState
 		);
 		expect(
@@ -112,7 +114,7 @@ describe('Template - TemplateSingle.js', () => {
 			} as unknown as TemplateState,
 		};
 		const { getByText } = renderWithStore(
-			<TemplateSingle params={{ id: 'zadani' }} />,
+			<TemplateSingle {...defaultProps} activeTemplateId="zadani" />,
 			stateWithMessage
 		);
 		expect(getByText('Important notice text')).toBeInTheDocument();
@@ -129,7 +131,7 @@ describe('Template - TemplateSingle.js', () => {
 			} as unknown as TemplateState,
 		};
 		const { getByText } = renderWithStore(
-			<TemplateSingle params={{ id: 'zadani' }} />,
+			<TemplateSingle {...defaultProps} activeTemplateId="zadani" />,
 			stateWithError
 		);
 		expect(getByText('Template error text')).toBeInTheDocument();

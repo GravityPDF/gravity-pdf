@@ -1,15 +1,13 @@
 /* Dependencies */
-import { lazy, Suspense, createRoot, createPortal } from '@wordpress/element';
-import { HashRouter, Routes, Route, useLocation } from 'react-router';
-/* Helpers */
-import withRouterHooks from '../utilities/withRouterHooks';
+import {
+	useState,
+	useEffect,
+	createRoot,
+	createPortal,
+} from '@wordpress/element';
 /* Components */
+import AdvancedButton from '../components/FontManager/AdvancedButton';
 import FontManager from '../components/FontManager/FontManager';
-import Empty from '../components/Empty';
-
-const AdvancedButton = lazy(
-	() => import('../components/FontManager/AdvancedButton')
-);
 
 /**
  * @package			Gravity PDF
@@ -18,34 +16,44 @@ const AdvancedButton = lazy(
  * @since       6.0
  */
 
-const AdvancedButtonWithRouter = withRouterHooks(AdvancedButton);
-const FontManagerWithRouter = withRouterHooks(FontManager);
-
 interface AppProps {
 	buttonContainer: Element;
 }
 
 const FontManagerApp = ({ buttonContainer }: AppProps) => {
-	const { pathname } = useLocation();
-	const isOpen = pathname.startsWith('/fontmanager');
+	const [isOpen, setIsOpen] = useState(false);
+	const [activeFontId, setActiveFontId] = useState('');
+
+	/* Auto-open when navigated here from WP backend via hash URL */
+	useEffect(() => {
+		if (window.location.hash !== '#/fontmanager') {
+			return;
+		}
+		setIsOpen(true);
+	}, []);
+
+	const handleOpen = () => {
+		setIsOpen(true);
+	};
+
+	const handleClose = () => {
+		setIsOpen(false);
+		setActiveFontId('');
+	};
 
 	return (
 		<>
-			{/* Portal renders the button in its sibling DOM node; hidden while modal is open */}
-			{!isOpen &&
-				createPortal(<AdvancedButtonWithRouter />, buttonContainer)}
-
-			<Routes>
-				<Route
-					path="/fontmanager/"
-					element={<FontManagerWithRouter />}
+			{createPortal(
+				<AdvancedButton onOpen={handleOpen} />,
+				buttonContainer
+			)}
+			{isOpen && (
+				<FontManager
+					activeFontId={activeFontId}
+					onSelectFont={setActiveFontId}
+					onClose={handleClose}
 				/>
-				<Route
-					path="/fontmanager/:id"
-					element={<FontManagerWithRouter />}
-				/>
-				<Route path="*" element={<Empty />} />
-			</Routes>
+			)}
 		</>
 	);
 };
@@ -72,11 +80,7 @@ export function fontManagerBootstrap(
 	const overlayContainer = document.querySelector('#font-manager-overlay')!;
 
 	createRoot(overlayContainer).render(
-		<Suspense fallback={<div />}>
-			<HashRouter>
-				<FontManagerApp buttonContainer={buttonContainer} />
-			</HashRouter>
-		</Suspense>
+		<FontManagerApp buttonContainer={buttonContainer} />
 	);
 }
 

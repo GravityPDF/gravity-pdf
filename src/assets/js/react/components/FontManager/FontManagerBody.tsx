@@ -1,7 +1,6 @@
 /* Dependencies */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import type { MouseEvent, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
-import { NavigateFunction } from 'react-router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	FONT_MANAGER_STORE_NAME,
@@ -19,10 +18,6 @@ import initialState, {
 } from './InitialAddUpdateState';
 /* Utilities */
 import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
-import {
-	toggleUpdateFont,
-	addClass,
-} from '../../utilities/FontManager/toggleUpdateFont';
 /* Types */
 import { FontItem, FontManagerMsg } from '../../types';
 
@@ -34,11 +29,15 @@ import { FontItem, FontManagerMsg } from '../../types';
  */
 
 interface Props {
-	id?: string;
-	navigate: NavigateFunction;
+	activeFontId: string;
+	onSelectFont: (id: string) => void;
 }
 
-const FontManagerBody = ({ id, navigate }: Props) => {
+function setUpdateFontPanelVisible(visible: boolean): void {
+	document.querySelector('.update-font')?.classList.toggle('show', visible);
+}
+
+const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 	const {
 		getCustomFontList,
 		addFont,
@@ -65,25 +64,25 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 		useState<AddUpdateFontState>(initialState);
 
 	/* Track previous props for componentDidUpdate comparisons */
-	const prevIdRef = useRef(id);
+	const prevIdRef = useRef(activeFontId);
 	const prevFontListRef = useRef<FontItem[]>(fontList);
 	const prevMsgRef = useRef<FontManagerMsg>(msg);
 
-	/* componentDidMount: fetch font list, auto-open update panel if id is in URL */
+	/* componentDidMount: fetch font list, auto-open update panel if activeFontId is set */
 	useEffect(() => {
 		getCustomFontList();
 
-		if (id) {
-			addClass(document.querySelector('.update-font'), navigate, id);
+		if (activeFontId) {
+			setUpdateFontPanelVisible(true);
 		}
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-	/* componentDidUpdate: react to id/fontList/msg changes */
+	/* componentDidUpdate: react to activeFontId/fontList/msg changes */
 	useEffect(() => {
 		const prevId = prevIdRef.current;
 		const prevFontList = prevFontListRef.current;
 		const prevMsg = prevMsgRef.current;
-		prevIdRef.current = id;
+		prevIdRef.current = activeFontId;
 		prevFontListRef.current = fontList;
 		prevMsgRef.current = msg;
 
@@ -91,7 +90,7 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 			!!(list && list.filter((f) => f.id === fontId)[0]);
 
 		const handleRequestFontDetails = () => {
-			const font = fontList.filter((f) => f.id === id)[0];
+			const font = fontList.filter((f) => f.id === activeFontId)[0];
 			setAddFontState(initialState);
 			setUpdateFontState({
 				id: font.id,
@@ -110,23 +109,25 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 		};
 
 		/* If font name is selected, load its details */
-		if (prevId !== id && id) {
-			if (!handleCheckValidId(fontList, id)) {
-				return navigate('/fontmanager/');
+		if (prevId !== activeFontId && activeFontId) {
+			if (!handleCheckValidId(fontList, activeFontId)) {
+				onSelectFont('');
+				return;
 			}
 			handleRequestFontDetails();
 		}
 
 		/* If font list updated while an id is active, reload details */
-		if (prevFontList !== fontList && fontList && id) {
-			if (!handleCheckValidId(fontList, id)) {
-				return navigate('/fontmanager/');
+		if (prevFontList !== fontList && fontList && activeFontId) {
+			if (!handleCheckValidId(fontList, activeFontId)) {
+				onSelectFont('');
+				return;
 			}
 			handleRequestFontDetails();
 		}
 
 		/* If font was successfully installed, auto-select and show update panel */
-		if (prevMsg !== msg && msg.success && !id) {
+		if (prevMsg !== msg && msg.success && !activeFontId) {
 			if (msg.error && msg.error.fontList) {
 				setAddFontState(initialState);
 				setUpdateFontState(initialState);
@@ -136,9 +137,10 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 			/* Auto select new added font and open update panel */
 			const newFont = fontList[fontList.length - 1];
 			selectFont(newFont.id);
-			toggleUpdateFont(navigate, newFont.id);
+			setUpdateFontPanelVisible(true);
+			onSelectFont(newFont.id);
 		}
-	}, [id, fontList, msg, navigate, selectFont]);
+	}, [activeFontId, fontList, msg, onSelectFont, selectFont]);
 
 	const handleGetCurrentColumnState = (column: string): AddUpdateFontState =>
 		column === 'addFont' ? addFontState : updateFontState;
@@ -261,8 +263,8 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 		newState: AddUpdateFontState,
 		state: string
 	) => {
-		if (state === 'updateFont' && id) {
-			const activeFont = fontList.filter((f) => f.id === id)[0];
+		if (state === 'updateFont' && activeFontId) {
+			const activeFont = fontList.filter((f) => f.id === activeFontId)[0];
 			if (!activeFont) {
 				return;
 			}
@@ -333,13 +335,15 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 	};
 
 	const handleCancelEditFont = () => {
-		toggleUpdateFont(navigate);
+		setUpdateFontPanelVisible(false);
+		onSelectFont('');
 		clearAddFontMsg();
 	};
 
 	const handleCancelEditFontKeypress = (e: KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			toggleUpdateFont(navigate);
+			setUpdateFontPanelVisible(false);
+			onSelectFont('');
 			clearAddFontMsg();
 		}
 	};
@@ -347,8 +351,8 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		if (id) {
-			return handleEditFont(id);
+		if (activeFontId) {
+			return handleEditFont(activeFontId);
 		}
 
 		handleAddFont();
@@ -363,13 +367,16 @@ const FontManagerBody = ({ id, navigate }: Props) => {
 			className="wp-clearfix theme-about"
 		>
 			<div className="font-list-column container">
-				<SearchBox id={id} />
+				<SearchBox id={activeFontId} />
 
 				{msg.error && msg.error.deleteFont && (
 					<Alert msg={msg.error.deleteFont} />
 				)}
 
-				<FontList id={id} navigate={navigate} />
+				<FontList
+					activeFontId={activeFontId}
+					onSelectFont={onSelectFont}
+				/>
 			</div>
 
 			<div className="add-update-font-column container">

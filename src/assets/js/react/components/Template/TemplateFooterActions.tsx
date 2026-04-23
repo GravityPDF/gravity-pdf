@@ -2,14 +2,12 @@
 /* Components */
 import TemplateActivateButton from './TemplateActivateButton';
 import TemplateDeleteButton from './TemplateDeleteButton';
-/* Helpers */
-import withRouterHooks from '../../utilities/withRouterHooks';
 /* Types */
 import { TemplateItem } from '../../types';
 
 /**
  * Renders the template footer actions that get displayed on the
- * /template/:id pages.
+ * template detail view.
  *
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -17,13 +15,10 @@ import { TemplateItem } from '../../types';
  * @since       4.1
  */
 
-const TemplateActivateButtonWithRouter = withRouterHooks(
-	TemplateActivateButton
-);
-const TemplateDeleteButtonWithRouter = withRouterHooks(TemplateDeleteButton);
-
 interface Props {
 	template: TemplateItem;
+	onSelectTemplate: (id: string) => void;
+	onClose: () => void;
 	isActiveTemplate?: boolean;
 	ajaxUrl?: string;
 	ajaxNonce?: string;
@@ -36,6 +31,8 @@ interface Props {
 
 const TemplateFooterActions = ({
 	template,
+	onSelectTemplate,
+	onClose,
 	isActiveTemplate,
 	ajaxUrl,
 	ajaxNonce,
@@ -56,14 +53,16 @@ const TemplateFooterActions = ({
 			className="theme-actions"
 		>
 			{!isActiveTemplate && isCompatible ? (
-				<TemplateActivateButtonWithRouter
+				<TemplateActivateButton
+					onClose={onClose}
 					template={template}
 					buttonText={activateText}
 				/>
 			) : null}
 
 			{!isActiveTemplate && notCoreTemplate(template) ? (
-				<TemplateDeleteButtonWithRouter
+				<TemplateDeleteButton
+					onSelectTemplate={onSelectTemplate}
 					template={template}
 					ajaxUrl={ajaxUrl}
 					ajaxNonce={ajaxNonce}

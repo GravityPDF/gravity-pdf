@@ -4,7 +4,7 @@ import TemplateHeaderNavigation from '../../../../../src/assets/js/react/compone
 import type { TemplateItem } from '../../../../../src/assets/js/react/types';
 
 describe('Template - TemplateHeaderNavigation.js', () => {
-	const navigate = jest.fn();
+	const onSelectTemplate = jest.fn();
 	const templates = [
 		{ id: 'blank-slate', template: 'Blank Slate' },
 		{ id: 'focus-gravity', template: 'Focus Gravity' },
@@ -21,7 +21,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		expect(
@@ -35,7 +35,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		expect(
@@ -52,7 +52,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 				showPreviousTemplateText="Show previous"
 				showNextTemplateText="Show next template"
 			/>
@@ -67,34 +67,34 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 		).toBe('Show next template');
 	});
 
-	test('previous button click navigates to previous template', () => {
+	test('previous button click calls onSelectTemplate with previous id', () => {
 		const { container } = render(
 			<TemplateHeaderNavigation
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		fireEvent.click(
 			findByTestAttr(container, 'component-showPreviousTemplateButton')!
 		);
-		expect(navigate).toHaveBeenCalledWith('/template/blank-slate');
+		expect(onSelectTemplate).toHaveBeenCalledWith('blank-slate');
 	});
 
-	test('next button click navigates to next template', () => {
+	test('next button click calls onSelectTemplate with next id', () => {
 		const { container } = render(
 			<TemplateHeaderNavigation
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		fireEvent.click(
 			findByTestAttr(container, 'component-showNextTemplateButton')!
 		);
-		expect(navigate).toHaveBeenCalledWith('/template/rubix');
+		expect(onSelectTemplate).toHaveBeenCalledWith('rubix');
 	});
 
 	test('previous button is disabled when on first template', () => {
@@ -103,7 +103,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				templates={templates}
 				templateIndex={0}
 				template={templates[0]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		expect(
@@ -117,7 +117,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				templates={templates}
 				templateIndex={3}
 				template={templates[3]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		expect(
@@ -125,30 +125,30 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 		).toBeDisabled();
 	});
 
-	test('left arrow keydown navigates to previous template', () => {
+	test('left arrow keydown calls onSelectTemplate with previous id', () => {
 		render(
 			<TemplateHeaderNavigation
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		fireEvent.keyDown(window, { keyCode: 37 });
-		expect(navigate).toHaveBeenCalledWith('/template/blank-slate');
+		expect(onSelectTemplate).toHaveBeenCalledWith('blank-slate');
 	});
 
-	test('right arrow keydown navigates to next template', () => {
+	test('right arrow keydown calls onSelectTemplate with next id', () => {
 		render(
 			<TemplateHeaderNavigation
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		fireEvent.keyDown(window, { keyCode: 39 });
-		expect(navigate).toHaveBeenCalledWith('/template/rubix');
+		expect(onSelectTemplate).toHaveBeenCalledWith('rubix');
 	});
 
 	test('attaches keydown event listener to window on mount', () => {
@@ -158,7 +158,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		expect(addEventListenerSpy).toHaveBeenCalledWith(
@@ -178,7 +178,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 			/>
 		);
 		unmount();

@@ -1,15 +1,22 @@
 /* Dependencies */
-import { createRoot, createPortal } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	lazy,
+	Suspense,
+	createRoot,
+	createPortal,
+} from '@wordpress/element';
 import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
-import { HashRouter, useLocation } from 'react-router';
-/* Store name */
+/* Store */
 import { TEMPLATE_STORE_NAME, templateStore } from '../store/templateStore';
-/* Routes */
-import TemplateRoutes from '../router/templateRouter';
-/* Helpers */
-import withRouterHooks from '../utilities/withRouterHooks';
 /* Components */
 import TemplateButton from '../components/Template/TemplateButton';
+
+const TemplateList = lazy(() => import('../components/Template/TemplateList'));
+const TemplateSingle = lazy(
+	() => import('../components/Template/TemplateSingle')
+);
 
 /**
  * Advanced Template Selector Bootstrap
@@ -20,32 +27,59 @@ import TemplateButton from '../components/Template/TemplateButton';
  * @since       4.1
  */
 
-const TemplateButtonWithRouter = withRouterHooks(TemplateButton);
-
 interface AppProps {
 	buttonContainer: Element;
 }
 
 const TemplateApp = ({ buttonContainer }: AppProps) => {
-	const { pathname } = useLocation();
-	const isOpen = pathname.startsWith('/template');
+	const [isOpen, setIsOpen] = useState(false);
+	const [activeTemplateId, setActiveTemplateId] = useState('');
+
+	/* Auto-open when navigated here from WP backend via hash URL */
+	useEffect(() => {
+		if (window.location.hash !== '#/template') {
+			return;
+		}
+		setIsOpen(true);
+	}, []);
+
+	const handleOpen = () => {
+		setIsOpen(true);
+	};
+
+	const handleClose = () => {
+		setIsOpen(false);
+		setActiveTemplateId('');
+	};
 
 	return (
 		<>
-			{/* Portal renders the button in its sibling DOM node; hidden while modal is open */}
-			{!isOpen &&
-				createPortal(<TemplateButtonWithRouter />, buttonContainer)}
-
-			<TemplateRoutes />
+			{createPortal(
+				<TemplateButton onOpen={handleOpen} />,
+				buttonContainer
+			)}
+			{isOpen && (
+				<Suspense fallback={<div />}>
+					{activeTemplateId ? (
+						<TemplateSingle
+							activeTemplateId={activeTemplateId}
+							onSelectTemplate={setActiveTemplateId}
+							onClose={handleClose}
+						/>
+					) : (
+						<TemplateList
+							onSelectTemplate={setActiveTemplateId}
+							onClose={handleClose}
+						/>
+					)}
+				</Suspense>
+			)}
 		</>
 	);
 };
 
 /**
  * Handles the loading of the Fancy Template Selector.
- *
- * Mounts the button and overlay as a single React root so they share one
- * HashRouter context — no shared-history coordination required.
  *
  * @param templateField
  * @since 4.1
@@ -59,9 +93,7 @@ export function templateBootstrap(templateField: HTMLSelectElement): void {
 	const overlayContainer = document.getElementById('gfpdf-overlay')!;
 
 	createRoot(overlayContainer).render(
-		<HashRouter>
-			<TemplateApp buttonContainer={buttonContainer} />
-		</HashRouter>
+		<TemplateApp buttonContainer={buttonContainer} />
 	);
 
 	/*

@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __ } from '@wordpress/i18n';
 /* Components */
 import TemplateContainer from './TemplateContainer';
 import TemplateListItem from './TemplateListItem';
@@ -8,8 +9,6 @@ import TemplateUploader from './TemplateUploader';
 /* Store */
 import { useSelect } from '@wordpress/data';
 import { templateStore } from '../../store/templateStore';
-/* Helpers */
-import withRouterHooks from '../../utilities/withRouterHooks';
 
 /**
  * The master component for rendering the all PDF templates as a list
@@ -20,40 +19,12 @@ import withRouterHooks from '../../utilities/withRouterHooks';
  * @since       4.1
  */
 
-/* Temp fix: Create a HoC to support new react router */
-const TemplateListItemWithRouter = withRouterHooks(TemplateListItem);
-
 interface Props {
-	templateHeaderText?: string;
-	templateDetailsText?: string;
-	activateText?: string;
-	ajaxUrl?: string;
-	ajaxNonce?: string;
-	addTemplateText?: string;
-	genericUploadErrorText?: string;
-	filenameErrorText?: string;
-	filesizeErrorText?: string;
-	installSuccessText?: string;
-	installUpdatedText?: string;
-	templateSuccessfullyInstalledUpdated?: string;
-	templateInstallInstructions?: string;
+	onSelectTemplate: (id: string) => void;
+	onClose: () => void;
 }
 
-const TemplateList = ({
-	templateHeaderText,
-	templateDetailsText,
-	activateText,
-	ajaxUrl,
-	ajaxNonce,
-	addTemplateText,
-	genericUploadErrorText,
-	filenameErrorText,
-	filesizeErrorText,
-	installSuccessText,
-	installUpdatedText,
-	templateSuccessfullyInstalledUpdated,
-	templateInstallInstructions,
-}: Props) => {
+const TemplateList = ({ onSelectTemplate, onClose }: Props) => {
 	const templates = useSelect(
 		(select) => select(templateStore).getFilteredTemplates(),
 		[]
@@ -66,36 +37,62 @@ const TemplateList = ({
 
 	return (
 		<TemplateContainer
-			header={<TemplateHeaderTitle header={templateHeaderText} />}
-			closeRoute="/"
+			header={
+				<TemplateHeaderTitle
+					header={__('Installed PDFs', 'gravity-pdf')}
+				/>
+			}
+			onClose={onClose}
 		>
 			<TemplateSearch />
 			<div role="listbox">
 				{templates?.map((value, index) => {
 					return (
-						<TemplateListItemWithRouter
+						<TemplateListItem
 							key={index}
+							onSelectTemplate={onSelectTemplate}
+							onClose={onClose}
 							template={value}
-							templateDetailsText={templateDetailsText}
-							activateText={activateText}
+							templateDetailsText={__(
+								'Template Details',
+								'gravity-pdf'
+							)}
+							activateText={__('Select', 'gravity-pdf')}
 						/>
 					);
 				})}
 
 				{hasUserPrivs && (
 					<TemplateUploader
-						addTemplateText={addTemplateText}
-						genericUploadErrorText={genericUploadErrorText}
-						filenameErrorText={filenameErrorText}
-						filesizeErrorText={filesizeErrorText}
-						installSuccessText={installSuccessText}
-						installUpdatedText={installUpdatedText}
-						templateSuccessfullyInstalledUpdated={
-							templateSuccessfullyInstalledUpdated
-						}
-						templateInstallInstructions={
-							templateInstallInstructions
-						}
+						addTemplateText={__('Add New Template', 'gravity-pdf')}
+						genericUploadErrorText={__(
+							'There was a problem with the upload. Reload the page and try again.',
+							'gravity-pdf'
+						)}
+						filenameErrorText={__(
+							'Upload is not a valid template. Upload a .zip file.',
+							'gravity-pdf'
+						)}
+						filesizeErrorText={__(
+							'Upload exceeds the 10MB limit.',
+							'gravity-pdf'
+						)}
+						installSuccessText={__(
+							'Template successfully installed',
+							'gravity-pdf'
+						)}
+						installUpdatedText={__(
+							'Template successfully updated',
+							'gravity-pdf'
+						)}
+						templateSuccessfullyInstalledUpdated={__(
+							'PDF Template(s) Successfully Installed / Updated',
+							'gravity-pdf'
+						)}
+						templateInstallInstructions={__(
+							'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).',
+							'gravity-pdf'
+						)}
 					/>
 				)}
 			</div>

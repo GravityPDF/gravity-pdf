@@ -1,7 +1,6 @@
 /* Dependencies */
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router';
 /* Store */
 import { useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
@@ -19,19 +18,19 @@ import { TemplateItem } from '../../types';
  */
 
 interface Props {
-	navigate: NavigateFunction;
+	onClose: () => void;
 	template?: TemplateItem;
 	buttonText?: string;
 }
 
-const TemplateActivateButton = ({ navigate, template, buttonText }: Props) => {
+const TemplateActivateButton = ({ onClose, template, buttonText }: Props) => {
 	const { selectTemplate } = useDispatch(TEMPLATE_STORE_NAME);
 
 	const handleSelectTemplate = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		navigate('/');
+		onClose();
 		if (template?.id) {
 			selectTemplate(template.id);
 		}

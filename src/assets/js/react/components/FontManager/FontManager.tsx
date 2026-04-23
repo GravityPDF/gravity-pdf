@@ -1,6 +1,5 @@
 /* Dependencies */
 import { useEffect, useRef } from '@wordpress/element';
-import { NavigateFunction } from 'react-router';
 import { useSelect } from '@wordpress/data';
 import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */
@@ -17,11 +16,12 @@ import { FontItem } from '../../types';
  */
 
 interface Props {
-	params?: { id?: string };
-	navigate: NavigateFunction;
+	activeFontId: string;
+	onSelectFont: (id: string) => void;
+	onClose: () => void;
 }
 
-const FontManager = ({ params, navigate }: Props) => {
+const FontManager = ({ activeFontId, onSelectFont, onClose }: Props) => {
 	const fontList = useSelect(
 		(select) => select(fontManagerStore).getFontList(),
 		[]
@@ -78,15 +78,20 @@ const FontManager = ({ params, navigate }: Props) => {
 		};
 	}, []);
 
-	const id = params?.id;
-
 	return (
 		<div data-test="component-FontManager" ref={containerRef} tabIndex={0}>
 			<div className="backdrop theme-backdrop" />
 			<div className="container theme-wrap font-manager">
-				<FontManagerHeader id={id} />
+				<FontManagerHeader
+					activeFontId={activeFontId}
+					onSelectFont={onSelectFont}
+					onClose={onClose}
+				/>
 
-				<FontManagerBody id={id} navigate={navigate} />
+				<FontManagerBody
+					activeFontId={activeFontId}
+					onSelectFont={onSelectFont}
+				/>
 			</div>
 		</div>
 	);

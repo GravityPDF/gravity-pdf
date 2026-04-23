@@ -8,7 +8,6 @@ import TemplateActivateButton from '../../../../../src/assets/js/react/component
 import type { TemplateItem } from '../../../../../src/assets/js/react/types';
 
 describe('Template - TemplateActivateButton.js', () => {
-	const navigate = jest.fn();
 	const template = { id: 'zadani' } as TemplateItem;
 
 	beforeEach(() => {
@@ -17,7 +16,7 @@ describe('Template - TemplateActivateButton.js', () => {
 
 	test('renders <TemplateActivateButton /> component', () => {
 		const { container } = renderWithStore(
-			<TemplateActivateButton navigate={navigate} template={template} />
+			<TemplateActivateButton onClose={jest.fn()} template={template} />
 		);
 		expect(
 			findByTestAttr(container, 'component-templateActivateButton')
@@ -27,7 +26,7 @@ describe('Template - TemplateActivateButton.js', () => {
 	test('renders button text', () => {
 		const { container } = renderWithStore(
 			<TemplateActivateButton
-				navigate={navigate}
+				onClose={jest.fn()}
 				template={template}
 				buttonText="Select"
 			/>
@@ -35,11 +34,12 @@ describe('Template - TemplateActivateButton.js', () => {
 		expect(container.querySelector('button')!.textContent).toBe('Select');
 	});
 
-	test('handleSelectTemplate() - calls navigate and dispatches selectTemplate', () => {
+	test('handleSelectTemplate() - calls onClose and dispatches selectTemplate', () => {
+		const onClose = jest.fn();
 		const store = createTestStore({});
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		const { container } = renderWithStore(
-			<TemplateActivateButton navigate={navigate} template={template} />,
+			<TemplateActivateButton onClose={onClose} template={template} />,
 			{},
 			{},
 			store
@@ -49,7 +49,7 @@ describe('Template - TemplateActivateButton.js', () => {
 			findByTestAttr(container, 'component-templateActivateButton')!
 		);
 
-		expect(navigate).toHaveBeenCalledWith('/');
+		expect(onClose).toHaveBeenCalledTimes(1);
 		expect(dispatchSpy).toHaveBeenCalledWith(
 			expect.objectContaining({ type: 'SELECT_TEMPLATE' })
 		);

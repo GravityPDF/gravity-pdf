@@ -1,7 +1,6 @@
 /* Dependencies */
 import { __ } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
-import { NavigateFunction } from 'react-router';
 /* Components */
 import TemplateScreenshot from './TemplateScreenshot';
 import ShowMessage from '../ShowMessage';
@@ -11,8 +10,6 @@ import TemplateActivateButton from './TemplateActivateButton';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
-/* Helpers */
-import withRouterHooks from '../../utilities/withRouterHooks';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -25,19 +22,17 @@ import { TemplateItem } from '../../types';
  * @since       4.1
  */
 
-const TemplateActivateButtonWithRouter = withRouterHooks(
-	TemplateActivateButton
-);
-
 interface Props {
-	navigate: NavigateFunction;
+	onSelectTemplate: (id: string) => void;
+	onClose: () => void;
 	template: TemplateItem;
 	activateText?: string;
 	templateDetailsText?: string;
 }
 
 const TemplateListItem = ({
-	navigate,
+	onSelectTemplate,
+	onClose,
 	template,
 	activateText,
 	templateDetailsText,
@@ -49,7 +44,7 @@ const TemplateListItem = ({
 	);
 
 	const handleShowDetailedTemplate = () => {
-		navigate('/template/' + template.id);
+		onSelectTemplate(template.id);
 	};
 
 	const handleMaybeShowDetailedTemplate = (
@@ -110,7 +105,8 @@ const TemplateListItem = ({
 
 			<div className="theme-actions">
 				{!isActiveTemplate && isCompatible ? (
-					<TemplateActivateButtonWithRouter
+					<TemplateActivateButton
+						onClose={onClose}
 						template={template}
 						buttonText={activateText}
 					/>

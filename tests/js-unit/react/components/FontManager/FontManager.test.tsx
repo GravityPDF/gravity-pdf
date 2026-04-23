@@ -1,4 +1,4 @@
-import { findByTestAttr, renderWithRouter } from '../../testUtilsRTL';
+import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import FontManager from '../../../../../src/assets/js/react/components/FontManager/FontManager';
 
 jest.mock(
@@ -25,8 +25,8 @@ jest.mock(
 );
 
 describe('FontManager - FontManager.js', () => {
-	const navigate = jest.fn();
-	const params = { id: undefined };
+	const onSelectFont = jest.fn();
+	const onClose = jest.fn();
 
 	const initialState = {
 		fontManager: {
@@ -51,9 +51,13 @@ describe('FontManager - FontManager.js', () => {
 				'addEventListener'
 			);
 
-			renderWithRouter(
-				<FontManager navigate={navigate} params={params} />,
-				{ initialState }
+			renderWithStore(
+				<FontManager
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					onClose={onClose}
+				/>,
+				initialState
 			);
 
 			expect(addEventListenerSpy).toHaveBeenCalledWith(
@@ -69,9 +73,13 @@ describe('FontManager - FontManager.js', () => {
 				'removeEventListener'
 			);
 
-			const { unmount } = renderWithRouter(
-				<FontManager navigate={navigate} params={params} />,
-				{ initialState }
+			const { unmount } = renderWithStore(
+				<FontManager
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					onClose={onClose}
+				/>,
+				initialState
 			);
 
 			unmount();
@@ -86,9 +94,13 @@ describe('FontManager - FontManager.js', () => {
 
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontManager /> component', () => {
-			const { container } = renderWithRouter(
-				<FontManager navigate={navigate} params={params} />,
-				{ initialState }
+			const { container } = renderWithStore(
+				<FontManager
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					onClose={onClose}
+				/>,
+				initialState
 			);
 			expect(
 				findByTestAttr(container, 'component-FontManager')
@@ -96,9 +108,13 @@ describe('FontManager - FontManager.js', () => {
 		});
 
 		test('render <FontManagerHeader /> component', () => {
-			const { container } = renderWithRouter(
-				<FontManager navigate={navigate} params={params} />,
-				{ initialState }
+			const { container } = renderWithStore(
+				<FontManager
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					onClose={onClose}
+				/>,
+				initialState
 			);
 			expect(
 				findByTestAttr(container, 'component-FontManagerHeader')
@@ -106,9 +122,13 @@ describe('FontManager - FontManager.js', () => {
 		});
 
 		test('render <FontManagerBody /> component', () => {
-			const { container } = renderWithRouter(
-				<FontManager navigate={navigate} params={params} />,
-				{ initialState }
+			const { container } = renderWithStore(
+				<FontManager
+					activeFontId=""
+					onSelectFont={onSelectFont}
+					onClose={onClose}
+				/>,
+				initialState
 			);
 			expect(
 				findByTestAttr(container, 'component-FontManagerBody')

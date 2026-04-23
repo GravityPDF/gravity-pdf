@@ -15,7 +15,7 @@ describe('Template - TemplateContainer.js', () => {
 
 	test('renders <TemplateContainer /> component', () => {
 		const { container } = render(
-			<TemplateContainer>
+			<TemplateContainer onClose={jest.fn()}>
 				<div>content</div>
 			</TemplateContainer>
 		);
@@ -26,7 +26,7 @@ describe('Template - TemplateContainer.js', () => {
 
 	test('renders children', () => {
 		const { getByText } = render(
-			<TemplateContainer>
+			<TemplateContainer onClose={jest.fn()}>
 				<div>test-child</div>
 			</TemplateContainer>
 		);
@@ -35,7 +35,7 @@ describe('Template - TemplateContainer.js', () => {
 
 	test('renders <CloseDialog /> component', () => {
 		const { container } = render(
-			<TemplateContainer>
+			<TemplateContainer onClose={jest.fn()}>
 				<div>content</div>
 			</TemplateContainer>
 		);
@@ -47,7 +47,7 @@ describe('Template - TemplateContainer.js', () => {
 	test('attaches focus event listener to document on mount', () => {
 		const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
 		render(
-			<TemplateContainer>
+			<TemplateContainer onClose={jest.fn()}>
 				<div>content</div>
 			</TemplateContainer>
 		);
@@ -64,7 +64,7 @@ describe('Template - TemplateContainer.js', () => {
 			'removeEventListener'
 		);
 		const { unmount } = render(
-			<TemplateContainer>
+			<TemplateContainer onClose={jest.fn()}>
 				<div>content</div>
 			</TemplateContainer>
 		);

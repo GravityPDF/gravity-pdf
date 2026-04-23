@@ -2,7 +2,6 @@ import * as React from '@wordpress/element';
 import type { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import { MemoryRouter } from 'react-router';
 
 import {
 	createTemplateStore,
@@ -168,36 +167,6 @@ export function renderWithStore(
 
 	const Wrapper = ({ children }: { children: ReactNode }) => (
 		<RegistryProvider value={registry}>{children}</RegistryProvider>
-	);
-
-	return {
-		...render(ui, { wrapper: Wrapper, ...renderOptions }),
-		store,
-	};
-}
-
-export function renderWithRouter(
-	ui: ReactElement,
-	{
-		route = '/',
-		initialState = {},
-		store: passedStore,
-		renderOptions = {},
-	}: {
-		route?: string;
-		initialState?: TestInitialState;
-		store?: TestStore;
-		renderOptions?: Omit<RenderOptions, 'wrapper'>;
-	} = {}
-): ReturnType<typeof render> & { store: TestStore } {
-	const store =
-		passedStore !== undefined ? passedStore : createTestStore(initialState);
-	const { registry } = store;
-
-	const Wrapper = ({ children }: { children: ReactNode }) => (
-		<RegistryProvider value={registry}>
-			<MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
-		</RegistryProvider>
 	);
 
 	return {

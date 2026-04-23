@@ -1,4 +1,3 @@
-import * as React from '@wordpress/element';
 import type { ReactNode } from 'react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import TemplateList from '../../../../../src/assets/js/react/components/Template/TemplateList';
@@ -44,12 +43,12 @@ jest.mock(
 		}
 );
 
-jest.mock(
-	'../../../../../src/assets/js/react/utilities/withRouterHooks',
-	() => (Component: React.ComponentType) => Component
-);
-
 describe('Template - TemplateList.js', () => {
+	const defaultProps = {
+		onSelectTemplate: jest.fn(),
+		onClose: jest.fn(),
+	};
+
 	const sampleTemplate = {
 		id: 'zadani',
 		template: 'Zadani',
@@ -72,21 +71,30 @@ describe('Template - TemplateList.js', () => {
 	};
 
 	test('renders <TemplateList /> component', () => {
-		const { container } = renderWithStore(<TemplateList />, initialState);
+		const { container } = renderWithStore(
+			<TemplateList {...defaultProps} />,
+			initialState
+		);
 		expect(
 			findByTestAttr(container, 'component-templateList')
 		).toBeInTheDocument();
 	});
 
 	test('renders <TemplateSearch /> component', () => {
-		const { container } = renderWithStore(<TemplateList />, initialState);
+		const { container } = renderWithStore(
+			<TemplateList {...defaultProps} />,
+			initialState
+		);
 		expect(
 			findByTestAttr(container, 'component-templateSearch')
 		).toBeInTheDocument();
 	});
 
 	test('renders <TemplateListItem /> for each template in store', () => {
-		const { container } = renderWithStore(<TemplateList />, initialState);
+		const { container } = renderWithStore(
+			<TemplateList {...defaultProps} />,
+			initialState
+		);
 		expect(
 			container.querySelectorAll(
 				'[data-test="component-templateListItem"]'
@@ -95,7 +103,10 @@ describe('Template - TemplateList.js', () => {
 	});
 
 	test('renders <TemplateUploader /> when user has admin privileges', () => {
-		const { container } = renderWithStore(<TemplateList />, initialState);
+		const { container } = renderWithStore(
+			<TemplateList {...defaultProps} />,
+			initialState
+		);
 		expect(
 			findByTestAttr(container, 'component-templateUploader')
 		).toBeInTheDocument();
@@ -112,7 +123,10 @@ describe('Template - TemplateList.js', () => {
 				],
 			} as unknown as TemplateState,
 		};
-		const { container } = renderWithStore(<TemplateList />, multiState);
+		const { container } = renderWithStore(
+			<TemplateList {...defaultProps} />,
+			multiState
+		);
 		expect(
 			container.querySelectorAll(
 				'[data-test="component-templateListItem"]'

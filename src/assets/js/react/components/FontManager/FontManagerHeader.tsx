@@ -11,14 +11,25 @@ import CloseDialog from '../Modal/CloseDialog';
  */
 
 interface Props {
-	id?: string;
+	activeFontId: string;
+	onSelectFont: (id: string) => void;
+	onClose: () => void;
 }
 
-const FontManagerHeader = ({ id }: Props) => (
+const FontManagerHeader = ({ activeFontId, onSelectFont, onClose }: Props) => (
 	<div data-test="component-FontManagerHeader" className="theme-header">
 		<h1>{__('Font Manager', 'gravity-pdf')}</h1>
 
-		<CloseDialog id={id} />
+		<CloseDialog
+			onClose={onClose}
+			onCloseDetail={() => {
+				document
+					.querySelector('.update-font')
+					?.classList.remove('show');
+				onSelectFont('');
+			}}
+			hasDetailOpen={!!activeFontId}
+		/>
 	</div>
 );
 

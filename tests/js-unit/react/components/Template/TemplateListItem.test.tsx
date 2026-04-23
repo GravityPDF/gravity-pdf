@@ -1,4 +1,3 @@
-import * as React from '@wordpress/element';
 import { fireEvent } from '@testing-library/react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import TemplateListItem from '../../../../../src/assets/js/react/components/Template/TemplateListItem';
@@ -15,13 +14,7 @@ jest.mock(
 		}
 );
 
-jest.mock(
-	'../../../../../src/assets/js/react/utilities/withRouterHooks',
-	() => (Component: React.ComponentType) => Component
-);
-
 describe('Template - TemplateListItem.js', () => {
-	const navigate = jest.fn();
 	const template = {
 		id: 'zadani',
 		template: 'Zadani',
@@ -45,7 +38,11 @@ describe('Template - TemplateListItem.js', () => {
 
 	test('renders <TemplateListItem /> component', () => {
 		const { container } = renderWithStore(
-			<TemplateListItem navigate={navigate} template={template} />,
+			<TemplateListItem
+				onSelectTemplate={jest.fn()}
+				onClose={jest.fn()}
+				template={template}
+			/>,
 			initialState
 		);
 		expect(
@@ -53,20 +50,30 @@ describe('Template - TemplateListItem.js', () => {
 		).toBeInTheDocument();
 	});
 
-	test('click navigates to template detail page', () => {
+	test('click calls onSelectTemplate with template id', () => {
+		const onSelectTemplate = jest.fn();
 		const { container } = renderWithStore(
-			<TemplateListItem navigate={navigate} template={template} />,
+			<TemplateListItem
+				onSelectTemplate={onSelectTemplate}
+				onClose={jest.fn()}
+				template={template}
+			/>,
 			initialState
 		);
 		fireEvent.click(
 			findByTestAttr(container, 'component-templateListItem')!
 		);
-		expect(navigate).toHaveBeenCalledWith('/template/zadani');
+		expect(onSelectTemplate).toHaveBeenCalledWith('zadani');
 	});
 
-	test('Enter keydown on non-button element navigates to template detail page', () => {
+	test('Enter keydown on non-button element calls onSelectTemplate', () => {
+		const onSelectTemplate = jest.fn();
 		const { container } = renderWithStore(
-			<TemplateListItem navigate={navigate} template={template} />,
+			<TemplateListItem
+				onSelectTemplate={onSelectTemplate}
+				onClose={jest.fn()}
+				template={template}
+			/>,
 			initialState
 		);
 		const listItem = findByTestAttr(
@@ -74,12 +81,16 @@ describe('Template - TemplateListItem.js', () => {
 			'component-templateListItem'
 		);
 		fireEvent.keyDown(listItem!, { keyCode: 13 });
-		expect(navigate).toHaveBeenCalledWith('/template/zadani');
+		expect(onSelectTemplate).toHaveBeenCalledWith('zadani');
 	});
 
 	test('renders <TemplateActivateButton /> when template is compatible and not active', () => {
 		const { container } = renderWithStore(
-			<TemplateListItem navigate={navigate} template={template} />,
+			<TemplateListItem
+				onSelectTemplate={jest.fn()}
+				onClose={jest.fn()}
+				template={template}
+			/>,
 			initialState
 		);
 		expect(
@@ -93,7 +104,11 @@ describe('Template - TemplateListItem.js', () => {
 			template: { ...initialState.template, activeTemplate: 'zadani' },
 		};
 		const { container } = renderWithStore(
-			<TemplateListItem navigate={navigate} template={template} />,
+			<TemplateListItem
+				onSelectTemplate={jest.fn()}
+				onClose={jest.fn()}
+				template={template}
+			/>,
 			activeState
 		);
 		expect(
@@ -105,7 +120,8 @@ describe('Template - TemplateListItem.js', () => {
 		const incompatibleTemplate = { ...template, compatible: false };
 		const { container } = renderWithStore(
 			<TemplateListItem
-				navigate={navigate}
+				onSelectTemplate={jest.fn()}
+				onClose={jest.fn()}
 				template={incompatibleTemplate}
 			/>,
 			initialState

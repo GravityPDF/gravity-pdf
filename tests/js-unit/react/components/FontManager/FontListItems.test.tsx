@@ -6,17 +6,6 @@ import {
 } from '../../testUtilsRTL';
 import FontListItems from '../../../../../src/assets/js/react/components/FontManager/FontListItems';
 
-jest.mock(
-	'../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont',
-	() => ({
-		toggleUpdateFont: jest.fn(),
-	})
-);
-
-const {
-	toggleUpdateFont,
-} = require('../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont');
-
 jest.mock('../../../../../src/assets/js/react/api/fontManager', () => ({
 	apiGetCustomFontList: jest.fn(() => new Promise(() => {})),
 	apiAddFont: jest.fn(() => new Promise(() => {})),
@@ -29,8 +18,6 @@ jest.mock('../../../../../src/assets/js/react/api/fontManager', () => ({
 }));
 
 describe('FontManager - FontListItems.js', () => {
-	const navigate = jest.fn();
-
 	const sampleFont = {
 		font_name: 'Fira Sans Light',
 		id: 'firasanslight',
@@ -50,6 +37,11 @@ describe('FontManager - FontListItems.js', () => {
 			selectedFont: 'roboto',
 			msg: { success: { addFont: 'success' } },
 		},
+	};
+
+	const defaultProps = {
+		activeFontId: '',
+		onSelectFont: jest.fn(),
 	};
 
 	/* FontListItems' mount effect calls document.querySelector on this element */
@@ -74,12 +66,7 @@ describe('FontManager - FontListItems.js', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 
-			renderWithStore(
-				<FontListItems navigate={navigate} />,
-				{},
-				{},
-				store
-			);
+			renderWithStore(<FontListItems {...defaultProps} />, {}, {}, store);
 
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'MOVE_SELECTED_FONT_TO_TOP' })
@@ -96,7 +83,7 @@ describe('FontManager - FontListItems.js', () => {
 				fontManager: { ...initialState.fontManager, selectedFont: '' },
 			});
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				{},
 				{},
 				store
@@ -115,7 +102,7 @@ describe('FontManager - FontListItems.js', () => {
 				},
 			});
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				{},
 				{},
 				store
@@ -139,9 +126,10 @@ describe('FontManager - FontListItems.js', () => {
 			).not.toBeInTheDocument();
 		});
 
-		test('componentDidUpdate() - calls toggleUpdateFont after font deletion', () => {
+		test('componentDidUpdate() - calls onSelectFont("") after font deletion', () => {
 			document.body.innerHTML += '<div class="update-font show"></div>';
 
+			const onSelectFont = jest.fn();
 			const store = createTestStore({
 				fontManager: {
 					...initialState.fontManager,
@@ -149,7 +137,7 @@ describe('FontManager - FontListItems.js', () => {
 				},
 			});
 			renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems activeFontId="" onSelectFont={onSelectFont} />,
 				{},
 				{},
 				store
@@ -162,18 +150,19 @@ describe('FontManager - FontListItems.js', () => {
 				});
 			});
 
-			expect(toggleUpdateFont).toHaveBeenCalled();
+			expect(onSelectFont).toHaveBeenCalledWith('');
 		});
 	});
 
 	describe('RUN COMPONENT METHODS', () => {
-		test('handleFontClick() - dispatches clearAddFontMsg and calls toggleUpdateFont', () => {
+		test('handleFontClick() - dispatches clearAddFontMsg and calls onSelectFont', () => {
 			document.body.innerHTML += '<div class="update-font show"></div>';
 
+			const onSelectFont = jest.fn();
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems activeFontId="" onSelectFont={onSelectFont} />,
 				{},
 				{},
 				store
@@ -184,13 +173,14 @@ describe('FontManager - FontListItems.js', () => {
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'CLEAR_ADD_FONT_MSG' })
 			);
-			expect(toggleUpdateFont).toHaveBeenCalled();
+			expect(onSelectFont).toHaveBeenCalledWith(sampleFont.id);
 		});
 
-		test('handleFontClickKeypress() - calls handleFontClick on Enter key', () => {
+		test('handleFontClickKeypress() - calls onSelectFont on Enter key', () => {
+			const onSelectFont = jest.fn();
 			const store = createTestStore(initialState);
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems activeFontId="" onSelectFont={onSelectFont} />,
 				{},
 				{},
 				store
@@ -200,7 +190,7 @@ describe('FontManager - FontListItems.js', () => {
 				key: 'Enter',
 			});
 
-			expect(toggleUpdateFont).toHaveBeenCalled();
+			expect(onSelectFont).toHaveBeenCalledWith(sampleFont.id);
 		});
 
 		test('handleDeleteFont() - dispatches deleteFont when confirmed', () => {
@@ -208,7 +198,7 @@ describe('FontManager - FontListItems.js', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				{},
 				{},
 				store
@@ -226,7 +216,7 @@ describe('FontManager - FontListItems.js', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				{},
 				{},
 				store
@@ -246,7 +236,7 @@ describe('FontManager - FontListItems.js', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				{},
 				{},
 				store
@@ -264,7 +254,7 @@ describe('FontManager - FontListItems.js', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				{},
 				{},
 				store
@@ -287,7 +277,7 @@ describe('FontManager - FontListItems.js', () => {
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontListItems /> component', () => {
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				initialState
 			);
 			expect(
@@ -297,7 +287,7 @@ describe('FontManager - FontListItems.js', () => {
 
 		test('render delete trash icon', () => {
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				initialState
 			);
 			expect(
@@ -307,7 +297,7 @@ describe('FontManager - FontListItems.js', () => {
 
 		test('render radio button for select font name', () => {
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				initialState
 			);
 			const name = 'select-font-name-' + sampleFont.id;
@@ -318,7 +308,7 @@ describe('FontManager - FontListItems.js', () => {
 
 		test('render font name', () => {
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				initialState
 			);
 			expect(
@@ -328,7 +318,7 @@ describe('FontManager - FontListItems.js', () => {
 
 		test('render <FontListIcon /> components', () => {
 			const { container } = renderWithStore(
-				<FontListItems navigate={navigate} />,
+				<FontListItems {...defaultProps} />,
 				initialState
 			);
 			expect(

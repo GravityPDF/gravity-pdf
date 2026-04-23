@@ -3,13 +3,11 @@ import { findByTestAttr } from '../../testUtilsRTL';
 import AdvancedButton from '../../../../../src/assets/js/react/components/FontManager/AdvancedButton';
 
 describe('FontManager - AdvancedButton.js', () => {
-	const navigate = jest.fn();
+	const onOpen = jest.fn();
 
 	describe('RENDERS COMPONENT', () => {
 		test('render <AdvancedButton /> component', () => {
-			const { container } = render(
-				<AdvancedButton navigate={navigate} />
-			);
+			const { container } = render(<AdvancedButton onOpen={onOpen} />);
 			const component = findByTestAttr(
 				container,
 				'component-AdvancedButton'
@@ -21,14 +19,12 @@ describe('FontManager - AdvancedButton.js', () => {
 	});
 
 	describe('RUN COMPONENT METHODS', () => {
-		test('clicking the button navigates to /fontmanager/', () => {
-			const { container } = render(
-				<AdvancedButton navigate={navigate} />
-			);
+		test('clicking the button calls onOpen', () => {
+			const { container } = render(<AdvancedButton onOpen={onOpen} />);
 			fireEvent.click(
 				findByTestAttr(container, 'component-AdvancedButton')!
 			);
-			expect(navigate).toHaveBeenCalledWith('/fontmanager/');
+			expect(onOpen).toHaveBeenCalledTimes(1);
 		});
 	});
 });

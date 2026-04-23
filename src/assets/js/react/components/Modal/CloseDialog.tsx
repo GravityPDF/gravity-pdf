@@ -1,6 +1,5 @@
 /* Dependencies */
 import { useEffect } from '@wordpress/element';
-import { useNavigate, useLocation } from 'react-router';
 import { Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -10,8 +9,6 @@ import {
 	FONT_MANAGER_STORE_NAME,
 	fontManagerStore,
 } from '../../store/fontManagerStore';
-/* Utilities */
-import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
 /**
  * @package     Gravity PDF
@@ -21,40 +18,43 @@ import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
  */
 
 interface Props {
-	id?: string;
-	closeRoute?: string;
+	onClose: () => void;
+	onCloseDetail?: () => void;
+	hasDetailOpen?: boolean;
 }
 
-export const CloseDialog = ({ id, closeRoute }: Props) => {
-	const navigate = useNavigate();
-	const { pathname } = useLocation();
+export const CloseDialog = ({
+	onClose,
+	onCloseDetail,
+	hasDetailOpen,
+}: Props) => {
 	const { clearAddFontMsg } = useDispatch(FONT_MANAGER_STORE_NAME);
 	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 
-	const handleCloseDialog = () => {
-		navigate(closeRoute || '/');
-	};
-
 	const handleKeyPress = (e: KeyboardEvent) => {
-		const { success, error } = msg;
+		if (e.key !== 'Escape') {
+			return;
+		}
 
 		/* Close font manager 'Update Font' column first */
-		if (e.key === 'Escape' && id) {
+		if (hasDetailOpen && onCloseDetail) {
+			const { success, error } = msg;
 			if ((success && success.addFont) || (error && error.addFont)) {
 				clearAddFontMsg();
 			}
-
-			return toggleUpdateFont(navigate, '', pathname);
+			onCloseDetail();
+			return;
 		}
 
-		/* Close modal */
+		/* Close modal (unless typing in the search field) */
+		const target = e.target as HTMLElement;
 		if (
-			e.key === 'Escape' &&
-			((e.target as HTMLElement).className !== 'wp-filter-search' ||
-				(e.target as HTMLInputElement).value === '')
+			target.className === 'wp-filter-search' &&
+			(target as HTMLInputElement).value !== ''
 		) {
-			handleCloseDialog();
+			return;
 		}
+		onClose();
 	};
 
 	useEffect(() => {
@@ -68,7 +68,7 @@ export const CloseDialog = ({ id, closeRoute }: Props) => {
 		<Button
 			data-test="component-CloseDialog"
 			className="close"
-			onClick={handleCloseDialog}
+			onClick={onClose}
 			icon={closeSmall}
 			label={__('Close dialog', 'gravity-pdf')}
 		/>

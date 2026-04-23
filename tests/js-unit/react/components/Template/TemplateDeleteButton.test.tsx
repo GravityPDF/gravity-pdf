@@ -17,7 +17,6 @@ jest.mock('../../../../../src/assets/js/react/api/templates', () => ({
 }));
 
 describe('Template - TemplateDeleteButton.js', () => {
-	const navigate = jest.fn();
 	const template = { id: 'zadani' } as TemplateItem;
 
 	const initialState = {
@@ -40,7 +39,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 	test('renders <TemplateDeleteButton /> component', () => {
 		const { container } = renderWithStore(
 			<TemplateDeleteButton
-				navigate={navigate}
+				onSelectTemplate={jest.fn()}
 				template={template}
 				buttonText="Delete"
 			/>,
@@ -54,7 +53,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 	test('renders button text', () => {
 		const { container } = renderWithStore(
 			<TemplateDeleteButton
-				navigate={navigate}
+				onSelectTemplate={jest.fn()}
 				template={template}
 				buttonText="Delete"
 			/>,
@@ -67,7 +66,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 		const callbackFn = jest.fn();
 		const { container } = renderWithStore(
 			<TemplateDeleteButton
-				navigate={navigate}
+				onSelectTemplate={jest.fn()}
 				template={template}
 				callbackFunction={callbackFn}
 				buttonText="Delete"
@@ -85,7 +84,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		const { container } = renderWithStore(
 			<TemplateDeleteButton
-				navigate={navigate}
+				onSelectTemplate={jest.fn()}
 				template={template}
 				buttonText="Delete"
 				templateConfirmDeleteText="Are you sure?"
@@ -114,7 +113,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		const { container } = renderWithStore(
 			<TemplateDeleteButton
-				navigate={navigate}
+				onSelectTemplate={jest.fn()}
 				template={template}
 				buttonText="Delete"
 			/>,
@@ -130,11 +129,12 @@ describe('Template - TemplateDeleteButton.js', () => {
 		expect(dispatchSpy).not.toHaveBeenCalled();
 	});
 
-	test('navigates to /template when templateProcessing changes to success', () => {
+	test("calls onSelectTemplate('') when templateProcessing changes to success", () => {
+		const onSelectTemplate = jest.fn();
 		const store = createTestStore(initialState);
 		renderWithStore(
 			<TemplateDeleteButton
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 				template={template}
 				buttonText="Delete"
 			/>,
@@ -150,15 +150,16 @@ describe('Template - TemplateDeleteButton.js', () => {
 			});
 		});
 
-		expect(navigate).toHaveBeenCalledWith('/template');
+		expect(onSelectTemplate).toHaveBeenCalledWith('');
 	});
 
-	test('dispatches ADD_TEMPLATE and CLEAR_TEMPLATE_PROCESSING and navigates when templateProcessing changes to failed', () => {
+	test('dispatches ADD_TEMPLATE and CLEAR_TEMPLATE_PROCESSING and calls onSelectTemplate when templateProcessing changes to failed', () => {
+		const onSelectTemplate = jest.fn();
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		renderWithStore(
 			<TemplateDeleteButton
-				navigate={navigate}
+				onSelectTemplate={onSelectTemplate}
 				template={template}
 				buttonText="Delete"
 				templateDeleteErrorText="Delete failed"
@@ -178,7 +179,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 		expect(dispatchSpy).toHaveBeenCalledWith(
 			expect.objectContaining({ type: 'ADD_TEMPLATE' })
 		);
-		expect(navigate).toHaveBeenCalledWith('/template');
+		expect(onSelectTemplate).toHaveBeenCalledWith('');
 		expect(dispatchSpy).toHaveBeenCalledWith(
 			expect.objectContaining({ type: 'CLEAR_TEMPLATE_PROCESSING' })
 		);

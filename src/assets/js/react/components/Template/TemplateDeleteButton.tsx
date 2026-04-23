@@ -2,7 +2,6 @@
 import { useRef, useEffect } from '@wordpress/element';
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
@@ -20,7 +19,7 @@ import { TemplateItem } from '../../types';
  */
 
 interface Props {
-	navigate: NavigateFunction;
+	onSelectTemplate: (id: string) => void;
 	template?: TemplateItem;
 	callbackFunction?: (e: MouseEvent<HTMLButtonElement>) => void;
 	buttonText?: string;
@@ -31,7 +30,7 @@ interface Props {
 }
 
 const TemplateDeleteButton = ({
-	navigate,
+	onSelectTemplate,
 	template,
 	callbackFunction,
 	buttonText,
@@ -62,7 +61,7 @@ const TemplateDeleteButton = ({
 		}
 
 		if (getTemplateProcessing === 'success') {
-			navigate('/template');
+			onSelectTemplate('');
 		}
 
 		if (getTemplateProcessing === 'failed') {
@@ -70,12 +69,12 @@ const TemplateDeleteButton = ({
 				...template,
 				error: templateDeleteErrorText,
 			} as TemplateItem);
-			navigate('/template');
+			onSelectTemplate('');
 			clearTemplateProcessing();
 		}
 	}, [
 		getTemplateProcessing,
-		navigate,
+		onSelectTemplate,
 		addTemplate,
 		clearTemplateProcessing,
 		template,

@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import type { KeyboardEvent, MouseEvent, ChangeEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	FONT_MANAGER_STORE_NAME,
@@ -11,8 +10,7 @@ import {
 /* Components */
 import FontListIcon from './FontListIcon';
 import Spinner from '../Spinner';
-/* Utilities */
-import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
+/* Types */
 import { FontItem } from '../../types';
 
 /**
@@ -23,11 +21,15 @@ import { FontItem } from '../../types';
  */
 
 interface Props {
-	id?: string;
-	navigate: NavigateFunction;
+	activeFontId: string;
+	onSelectFont: (id: string) => void;
 }
 
-const FontListItems = ({ id, navigate }: Props) => {
+function setUpdateFontPanelVisible(visible: boolean): void {
+	document.querySelector('.update-font')?.classList.toggle('show', visible);
+}
+
+const FontListItems = ({ activeFontId, onSelectFont }: Props) => {
 	const { clearAddFontMsg, deleteFont, selectFont, moveSelectedFontToTop } =
 		useDispatch(FONT_MANAGER_STORE_NAME);
 	const loading = useSelect(
@@ -111,9 +113,10 @@ const FontListItems = ({ id, navigate }: Props) => {
 			prevFontList !== fontList &&
 			updateFontVisible
 		) {
-			toggleUpdateFont(navigate);
+			setUpdateFontPanelVisible(false);
+			onSelectFont('');
 		}
-	}, [loading, fontList, navigate]);
+	}, [loading, fontList, onSelectFont]);
 
 	/* componentDidUpdate: move selected font to top when it changes from empty */
 	useEffect(() => {
@@ -123,13 +126,13 @@ const FontListItems = ({ id, navigate }: Props) => {
 		if (
 			prevSelectedFont === '' &&
 			selectedFont &&
-			!id &&
+			!activeFontId &&
 			moveSelectedFontToTopRef.current
 		) {
 			moveSelectedFontToTopRef.current = false;
 			moveSelectedFontToTop(selectedFont);
 		}
-	}, [selectedFont, id, moveSelectedFontToTop]);
+	}, [selectedFont, activeFontId, moveSelectedFontToTop]);
 
 	const handleFontClick = (fontId: string) => {
 		const { success, error } = msg;
@@ -138,11 +141,14 @@ const FontListItems = ({ id, navigate }: Props) => {
 			clearAddFontMsg();
 		}
 
-		if (id === fontId) {
-			return toggleUpdateFont(navigate);
+		if (activeFontId === fontId) {
+			setUpdateFontPanelVisible(false);
+			onSelectFont('');
+			return;
 		}
 
-		toggleUpdateFont(navigate, fontId);
+		setUpdateFontPanelVisible(true);
+		onSelectFont(fontId);
 	};
 
 	const handleFontClickKeypress = (e: KeyboardEvent, fontId: string) => {
@@ -207,7 +213,7 @@ const FontListItems = ({ id, navigate }: Props) => {
 							key={font.id}
 							className={
 								'font-list-item' +
-								(font.id === id ? ' active' : '')
+								(font.id === activeFontId ? ' active' : '')
 							}
 							onClick={() => handleFontClick(font.id)}
 							onKeyDown={(e) =>
@@ -215,7 +221,7 @@ const FontListItems = ({ id, navigate }: Props) => {
 							}
 							tabIndex={tabIndex}
 							role="option"
-							aria-selected={font.id === id}
+							aria-selected={font.id === activeFontId}
 						>
 							<span className="font-name">
 								{!disableSelectFontName && (

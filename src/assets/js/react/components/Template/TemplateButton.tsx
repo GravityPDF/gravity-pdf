@@ -1,10 +1,9 @@
 /* Dependencies */
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { NavigateFunction } from 'react-router';
 
 /**
- * Render the button used to option our Fancy PDF template selector
+ * Render the button used to open our Fancy PDF template selector
  *
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -13,15 +12,15 @@ import { NavigateFunction } from 'react-router';
  */
 
 interface Props {
-	navigate: NavigateFunction;
+	onOpen: () => void;
 }
 
-const TemplateButton = ({ navigate }: Props) => {
+const TemplateButton = ({ onOpen }: Props) => {
 	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		navigate('/template');
+		onOpen();
 	};
 
 	return (

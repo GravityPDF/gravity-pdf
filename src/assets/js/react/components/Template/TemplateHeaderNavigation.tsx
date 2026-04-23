@@ -1,7 +1,6 @@
 /* Dependencies */
 import { useRef, useEffect } from '@wordpress/element';
 import type { MouseEvent } from 'react';
-import { NavigateFunction } from 'react-router';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -19,7 +18,7 @@ interface Props {
 	templates: TemplateItem[];
 	templateIndex: number;
 	template?: TemplateItem;
-	navigate: NavigateFunction;
+	onSelectTemplate: (id: string) => void;
 	showPreviousTemplateText?: string;
 	showNextTemplateText?: string;
 }
@@ -28,7 +27,7 @@ const TemplateHeaderNavigation = ({
 	templates,
 	templateIndex,
 	template,
-	navigate,
+	onSelectTemplate,
 	showPreviousTemplateText,
 	showNextTemplateText,
 }: Props) => {
@@ -41,8 +40,8 @@ const TemplateHeaderNavigation = ({
 	isFirstRef.current = isFirst;
 	const isLastRef = useRef(isLast);
 	isLastRef.current = isLast;
-	const navigateRef = useRef(navigate);
-	navigateRef.current = navigate;
+	const onSelectTemplateRef = useRef(onSelectTemplate);
+	onSelectTemplateRef.current = onSelectTemplate;
 	const templatesRef = useRef(templates);
 	templatesRef.current = templates;
 	const templateIndexRef = useRef(templateIndex);
@@ -56,7 +55,7 @@ const TemplateHeaderNavigation = ({
 				const prevId =
 					templatesRef.current[templateIndexRef.current - 1]?.id;
 				if (prevId) {
-					navigateRef.current('/template/' + prevId);
+					onSelectTemplateRef.current(prevId);
 				}
 			}
 			if (!isLastRef.current && e.keyCode === 39) {
@@ -65,7 +64,7 @@ const TemplateHeaderNavigation = ({
 				const nextId =
 					templatesRef.current[templateIndexRef.current + 1]?.id;
 				if (nextId) {
-					navigateRef.current('/template/' + nextId);
+					onSelectTemplateRef.current(nextId);
 				}
 			}
 		};
@@ -83,7 +82,7 @@ const TemplateHeaderNavigation = ({
 
 		const prevId = templates[templateIndex - 1]?.id;
 		if (prevId) {
-			navigate('/template/' + prevId);
+			onSelectTemplate(prevId);
 		}
 	};
 
@@ -93,7 +92,7 @@ const TemplateHeaderNavigation = ({
 
 		const nextId = templates[templateIndex + 1]?.id;
 		if (nextId) {
-			navigate('/template/' + nextId);
+			onSelectTemplate(nextId);
 		}
 	};
 

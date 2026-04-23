@@ -10,13 +10,13 @@ import { __ } from '@wordpress/i18n';
  */
 
 interface Props {
-	navigate?: (path: string) => void;
+	onOpen: () => void;
 }
 
-const AdvancedButton = ({ navigate }: Props) => {
+const AdvancedButton = ({ onOpen }: Props) => {
 	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
-		navigate?.('/fontmanager/');
+		onOpen();
 	};
 
 	return (

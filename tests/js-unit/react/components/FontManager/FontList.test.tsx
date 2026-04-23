@@ -3,7 +3,10 @@ import FontList from '../../../../../src/assets/js/react/components/FontManager/
 import type { FontManagerState } from '../../../../../src/assets/js/react/types';
 
 describe('FontManager - FontList.js', () => {
-	const navigate = jest.fn();
+	const defaultProps = {
+		activeFontId: '',
+		onSelectFont: jest.fn(),
+	};
 
 	/* FontListItems.componentDidMount calls document.querySelector on this element */
 	beforeEach(() => {
@@ -26,7 +29,7 @@ describe('FontManager - FontList.js', () => {
 	describe('RENDERS COMPONENT', () => {
 		test('render <FontList /> component', () => {
 			const { container } = renderWithStore(
-				<FontList navigate={navigate} />,
+				<FontList {...defaultProps} />,
 				loadingState
 			);
 			expect(
@@ -36,7 +39,7 @@ describe('FontManager - FontList.js', () => {
 
 		test('render <FontListHeader /> component', () => {
 			const { container } = renderWithStore(
-				<FontList navigate={navigate} />,
+				<FontList {...defaultProps} />,
 				loadingState
 			);
 			expect(
@@ -46,7 +49,7 @@ describe('FontManager - FontList.js', () => {
 
 		test('render <FontListSkeleton /> when loading', () => {
 			const { container } = renderWithStore(
-				<FontList navigate={navigate} />,
+				<FontList {...defaultProps} />,
 				loadingState
 			);
 			expect(
@@ -56,7 +59,7 @@ describe('FontManager - FontList.js', () => {
 
 		test('render <FontListItems /> when not loading', () => {
 			const { container } = renderWithStore(
-				<FontList navigate={navigate} />,
+				<FontList {...defaultProps} />,
 				{
 					fontManager: {
 						loading: false,
@@ -73,7 +76,7 @@ describe('FontManager - FontList.js', () => {
 
 		test('render <FontListAlertMessage /> component', () => {
 			const { container } = renderWithStore(
-				<FontList navigate={navigate} />,
+				<FontList {...defaultProps} />,
 				loadingState
 			);
 			expect(
