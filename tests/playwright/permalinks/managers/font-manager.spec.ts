@@ -205,10 +205,10 @@ test.describe(() => {
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
-		const popup = await page.locator('.container.theme-wrap.font-manager');
+		const popup = await page.locator('.gfpdf-font-manager-modal');
 
 		await expect(popup).toBeVisible();
-		await page.getByRole('button', { name: 'Close dialog' }).click();
+		await popup.getByRole('button', { name: 'Close' }).click();
 		await expect(popup).not.toBeVisible();
 	});
 
@@ -221,7 +221,7 @@ test.describe(() => {
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
-		const popup = await page.locator('.container.theme-wrap.font-manager');
+		const popup = await page.locator('.gfpdf-font-manager-modal');
 
 		await expect(popup).toBeVisible();
 		await page.keyboard.press('Escape');
