@@ -17,9 +17,10 @@ import FontListAlertMessage from './FontListAlertMessage';
 interface Props {
 	activeFontId: string;
 	onSelectFont: (id: string) => void;
+	hasDetailOpen: boolean;
 }
 
-const FontList = ({ activeFontId, onSelectFont }: Props) => {
+const FontList = ({ activeFontId, onSelectFont, hasDetailOpen }: Props) => {
 	const loading = useSelect(
 		(select) => select(fontManagerStore).getLoading(),
 		[]
@@ -57,6 +58,7 @@ const FontList = ({ activeFontId, onSelectFont }: Props) => {
 				<FontListItems
 					activeFontId={activeFontId}
 					onSelectFont={onSelectFont}
+					hasDetailOpen={hasDetailOpen}
 				/>
 			)}
 

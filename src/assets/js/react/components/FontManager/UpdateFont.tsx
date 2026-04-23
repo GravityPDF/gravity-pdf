@@ -18,6 +18,7 @@ import { FontStyles } from './InitialAddUpdateState';
 interface Props {
 	id?: string;
 	label: string;
+	isOpen: boolean;
 	onHandleInputChange: (
 		e: ChangeEvent<HTMLInputElement>,
 		state: 'addFont' | 'updateFont'
@@ -45,6 +46,7 @@ interface Props {
 export const UpdateFont = ({
 	id,
 	label,
+	isOpen,
 	onHandleInputChange,
 	onHandleUpload,
 	onHandleDeleteFontStyle,
@@ -62,7 +64,10 @@ export const UpdateFont = ({
 	tabIndexFooterButtons,
 }: Props) => {
 	return (
-		<div data-test="component-UpdateFont" className="update-font">
+		<div
+			data-test="component-UpdateFont"
+			className={'update-font' + (isOpen ? ' show' : '')}
+		>
 			<form name="component-PDF-UpdateFont" onSubmit={onHandleSubmit}>
 				<h2>{__('Update Font', 'gravity-pdf')}</h2>
 

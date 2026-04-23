@@ -1,8 +1,6 @@
 /* Dependencies */
-import { useRef, useEffect } from '@wordpress/element';
 import type { ReactNode } from 'react';
-/* Components */
-import CloseDialog from '../Modal/CloseDialog';
+import { Modal } from '@wordpress/components';
 
 /**
  * Renders our Advanced Template Selector container which is shared amongst the components
@@ -14,63 +12,41 @@ import CloseDialog from '../Modal/CloseDialog';
  */
 
 interface Props {
+	title?: string;
 	header?: ReactNode;
 	footer?: ReactNode;
 	children: ReactNode;
 	onClose: () => void;
 }
 
-const TemplateContainer = ({ header, footer, children, onClose }: Props) => {
-	const containerRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const handleFocus = (e: FocusEvent) => {
-			if (
-				containerRef.current &&
-				!containerRef.current.contains(e.target as Node)
-			) {
-				e.stopPropagation();
-				containerRef.current.focus();
-			}
-		};
-
-		document.addEventListener('focus', handleFocus, true);
-
-		if (
-			containerRef.current &&
-			containerRef.current.className !== 'wp-filter-search'
-		) {
-			containerRef.current.focus();
-		}
-
-		return () => {
-			document.removeEventListener('focus', handleFocus, true);
-		};
-	}, []);
-
+const TemplateContainer = ({
+	title,
+	header,
+	footer,
+	children,
+	onClose,
+}: Props) => {
 	return (
-		<div
-			data-test="component-templateContainer"
-			ref={containerRef}
-			tabIndex={0}
+		<Modal
+			title={title}
+			onRequestClose={onClose}
+			className="gfpdf-template-manager-modal"
+			size="large"
 		>
-			<div className="backdrop theme-backdrop" />
-			<div className="container theme-wrap">
-				<div className="theme-header">
-					{header}
-					<CloseDialog onClose={onClose} />
-				</div>
-
+			<div
+				data-test="component-templateContainer"
+				className="gfpdf-template-manager-body"
+			>
+				{header}
 				<div
 					id="gfpdf-template-container"
 					className="theme-about wp-clearfix theme-browser rendered"
 				>
 					{children}
 				</div>
-
 				{footer}
 			</div>
-		</div>
+		</Modal>
 	);
 };
 

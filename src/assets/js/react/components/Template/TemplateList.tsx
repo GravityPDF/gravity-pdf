@@ -4,7 +4,6 @@ import { __ } from '@wordpress/i18n';
 import TemplateContainer from './TemplateContainer';
 import TemplateListItem from './TemplateListItem';
 import TemplateSearch from './TemplateSearch';
-import TemplateHeaderTitle from './TemplateHeaderTitle';
 import TemplateUploader from './TemplateUploader';
 /* Store */
 import { useSelect } from '@wordpress/data';
@@ -37,11 +36,7 @@ const TemplateList = ({ onSelectTemplate, onClose }: Props) => {
 
 	return (
 		<TemplateContainer
-			header={
-				<TemplateHeaderTitle
-					header={__('Installed PDFs', 'gravity-pdf')}
-				/>
-			}
+			title={__('Installed PDFs', 'gravity-pdf')}
 			onClose={onClose}
 		>
 			<TemplateSearch />

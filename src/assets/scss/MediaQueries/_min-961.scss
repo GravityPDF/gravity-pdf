@@ -1,26 +1,22 @@
 /* 960px and below */
 @media only screen and (max-width: 960px) {
-  #tab_PDF {
+  .gfpdf-font-manager-modal {
+    .font-manager {
+      #gfpdf-font-manager-container {
+        display: flex;
+        flex-direction: column;
 
-    /* Font manager modal */
-    #font-manager-overlay {
-      .font-manager {
-        #gfpdf-font-manager-container {
-          display: flex;
-          flex-direction: column;
-
-          /* Font list */
-          .font-list-column {
-            .font-list {
-              width: 85%;
-            }
+        /* Font list */
+        .font-list-column {
+          .font-list {
+            width: 85%;
           }
+        }
 
-          /* Add font */
-          .add-update-font-column {
-            .update-font {
-              left: -800px;
-            }
+        /* Add font */
+        .add-update-font-column {
+          .update-font {
+            left: -800px;
           }
         }
       }

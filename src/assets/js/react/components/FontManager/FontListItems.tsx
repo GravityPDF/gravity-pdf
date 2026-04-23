@@ -23,13 +23,14 @@ import { FontItem } from '../../types';
 interface Props {
 	activeFontId: string;
 	onSelectFont: (id: string) => void;
+	hasDetailOpen: boolean;
 }
 
-function setUpdateFontPanelVisible(visible: boolean): void {
-	document.querySelector('.update-font')?.classList.toggle('show', visible);
-}
-
-const FontListItems = ({ activeFontId, onSelectFont }: Props) => {
+const FontListItems = ({
+	activeFontId,
+	onSelectFont,
+	hasDetailOpen,
+}: Props) => {
 	const { clearAddFontMsg, deleteFont, selectFont, moveSelectedFontToTop } =
 		useDispatch(FONT_MANAGER_STORE_NAME);
 	const loading = useSelect(
@@ -107,16 +108,14 @@ const FontListItems = ({ activeFontId, onSelectFont }: Props) => {
 			setDeleteId('');
 		}
 
-		const updateFontVisible = document.querySelector('.update-font.show');
 		if (
 			prevLoading !== loading &&
 			prevFontList !== fontList &&
-			updateFontVisible
+			hasDetailOpen
 		) {
-			setUpdateFontPanelVisible(false);
 			onSelectFont('');
 		}
-	}, [loading, fontList, onSelectFont]);
+	}, [loading, fontList, onSelectFont, hasDetailOpen]);
 
 	/* componentDidUpdate: move selected font to top when it changes from empty */
 	useEffect(() => {
@@ -142,12 +141,10 @@ const FontListItems = ({ activeFontId, onSelectFont }: Props) => {
 		}
 
 		if (activeFontId === fontId) {
-			setUpdateFontPanelVisible(false);
 			onSelectFont('');
 			return;
 		}
 
-		setUpdateFontPanelVisible(true);
 		onSelectFont(fontId);
 	};
 
@@ -194,9 +191,8 @@ const FontListItems = ({ activeFontId, onSelectFont }: Props) => {
 		}
 	};
 
-	const updateFontVisible = document.querySelector('.update-font.show');
 	const list = !searchResult ? fontList : searchResult;
-	const tabIndex = !updateFontVisible ? 0 : -1;
+	const tabIndex = !hasDetailOpen ? 0 : -1;
 
 	return (
 		<div

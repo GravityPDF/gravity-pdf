@@ -1,9 +1,14 @@
 /* Dependencies */
 import { useEffect, useRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { fontManagerStore } from '../../store/fontManagerStore';
+import type { KeyboardEvent } from 'react';
+import { Modal } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../../store/fontManagerStore';
 /* Components */
-import FontManagerHeader from './FontManagerHeader';
 import FontManagerBody from './FontManagerBody';
 import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox';
 import { FontItem } from '../../types';
@@ -22,6 +27,7 @@ interface Props {
 }
 
 const FontManager = ({ activeFontId, onSelectFont, onClose }: Props) => {
+	const { clearAddFontMsg } = useDispatch(FONT_MANAGER_STORE_NAME);
 	const fontList = useSelect(
 		(select) => select(fontManagerStore).getFontList(),
 		[]
@@ -30,7 +36,7 @@ const FontManager = ({ activeFontId, onSelectFont, onClose }: Props) => {
 		(select) => select(fontManagerStore).getSelectedFont(),
 		[]
 	);
-	const containerRef = useRef<HTMLDivElement>(null);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 
 	/* Mirror latest values in refs so unmount cleanup reads current data, not stale closure */
 	const fontListRef = useRef<FontItem[]>(fontList);
@@ -38,33 +44,9 @@ const FontManager = ({ activeFontId, onSelectFont, onClose }: Props) => {
 	const selectedFontRef = useRef(selectedFont);
 	selectedFontRef.current = selectedFont;
 
+	/* On unmount: sync selected font back to the associated <select> (skipped on tools tab) */
 	useEffect(() => {
-		const handleFocus = (e: FocusEvent) => {
-			if (
-				containerRef.current &&
-				!containerRef.current.contains(e.target as Node)
-			) {
-				e.stopPropagation();
-				containerRef.current.focus();
-			}
-		};
-
-		document.addEventListener('focus', handleFocus, true);
-
-		/* Add focus if not currently applied to search box */
-		if (
-			// eslint-disable-next-line @wordpress/no-global-active-element
-			document.activeElement &&
-			// eslint-disable-next-line @wordpress/no-global-active-element
-			(document.activeElement as HTMLElement).className !==
-				'wp-filter-search'
-		) {
-			containerRef.current?.focus();
-		}
-
 		return () => {
-			document.removeEventListener('focus', handleFocus, true);
-
 			const tabLocation = window.location.search.substring(
 				window.location.search.lastIndexOf('=') + 1
 			);
@@ -78,22 +60,40 @@ const FontManager = ({ activeFontId, onSelectFont, onClose }: Props) => {
 		};
 	}, []);
 
-	return (
-		<div data-test="component-FontManager" ref={containerRef} tabIndex={0}>
-			<div className="backdrop theme-backdrop" />
-			<div className="container theme-wrap font-manager">
-				<FontManagerHeader
-					activeFontId={activeFontId}
-					onSelectFont={onSelectFont}
-					onClose={onClose}
-				/>
+	/* Escape closes the detail panel (not the modal) when one is open */
+	const handleKeyDown = (e: KeyboardEvent) => {
+		if (e.key !== 'Escape' || !activeFontId) {
+			return;
+		}
 
+		e.stopPropagation();
+		onSelectFont('');
+
+		if (msg.success?.addFont || msg.error?.addFont) {
+			clearAddFontMsg();
+		}
+	};
+
+	return (
+		<Modal
+			title={__('Font Manager', 'gravity-pdf')}
+			onRequestClose={onClose}
+			className="gfpdf-font-manager-modal"
+			size="large"
+			shouldCloseOnEsc={!activeFontId}
+		>
+			{/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+			<div
+				data-test="component-FontManager"
+				className="font-manager"
+				onKeyDown={handleKeyDown}
+			>
 				<FontManagerBody
 					activeFontId={activeFontId}
 					onSelectFont={onSelectFont}
 				/>
 			</div>
-		</div>
+		</Modal>
 	);
 };
 

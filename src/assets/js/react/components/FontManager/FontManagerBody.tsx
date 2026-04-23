@@ -33,10 +33,6 @@ interface Props {
 	onSelectFont: (id: string) => void;
 }
 
-function setUpdateFontPanelVisible(visible: boolean): void {
-	document.querySelector('.update-font')?.classList.toggle('show', visible);
-}
-
 const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 	const {
 		getCustomFontList,
@@ -68,13 +64,9 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 	const prevFontListRef = useRef<FontItem[]>(fontList);
 	const prevMsgRef = useRef<FontManagerMsg>(msg);
 
-	/* componentDidMount: fetch font list, auto-open update panel if activeFontId is set */
+	/* componentDidMount: fetch font list */
 	useEffect(() => {
 		getCustomFontList();
-
-		if (activeFontId) {
-			setUpdateFontPanelVisible(true);
-		}
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* componentDidUpdate: react to activeFontId/fontList/msg changes */
@@ -134,10 +126,9 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 				return;
 			}
 
-			/* Auto select new added font and open update panel */
+			/* Auto select new added font (opens update panel via activeFontId) */
 			const newFont = fontList[fontList.length - 1];
 			selectFont(newFont.id);
-			setUpdateFontPanelVisible(true);
 			onSelectFont(newFont.id);
 		}
 	}, [activeFontId, fontList, msg, onSelectFont, selectFont]);
@@ -335,14 +326,12 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 	};
 
 	const handleCancelEditFont = () => {
-		setUpdateFontPanelVisible(false);
 		onSelectFont('');
 		clearAddFontMsg();
 	};
 
 	const handleCancelEditFontKeypress = (e: KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			setUpdateFontPanelVisible(false);
 			onSelectFont('');
 			clearAddFontMsg();
 		}
@@ -358,7 +347,7 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 		handleAddFont();
 	};
 
-	const updateFontVisible = document.querySelector('.update-font.show');
+	const detailOpen = Boolean(activeFontId);
 
 	return (
 		<div
@@ -376,6 +365,7 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 				<FontList
 					activeFontId={activeFontId}
 					onSelectFont={onSelectFont}
+					hasDetailOpen={detailOpen}
 				/>
 			</div>
 
@@ -387,13 +377,14 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 					onHandleSubmit={handleSubmit}
 					msg={msg}
 					loading={loading}
-					tabIndexFontName={!updateFontVisible ? 0 : -1}
-					tabIndexFontFiles={!updateFontVisible ? 0 : -1}
-					tabIndexFooterButtons={!updateFontVisible ? 0 : -1}
+					tabIndexFontName={!detailOpen ? 0 : -1}
+					tabIndexFontFiles={!detailOpen ? 0 : -1}
+					tabIndexFooterButtons={!detailOpen ? 0 : -1}
 					{...addFontState}
 				/>
 
 				<UpdateFont
+					isOpen={detailOpen}
 					onHandleInputChange={handleInputChange}
 					onHandleUpload={handleUpload}
 					onHandleDeleteFontStyle={handleDeleteFontStyle}
@@ -404,9 +395,9 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 					onHandleSubmit={handleSubmit}
 					msg={msg}
 					loading={loading}
-					tabIndexFontName={updateFontVisible ? 0 : -1}
-					tabIndexFontFiles={updateFontVisible ? 0 : -1}
-					tabIndexFooterButtons={updateFontVisible ? 0 : -1}
+					tabIndexFontName={detailOpen ? 0 : -1}
+					tabIndexFontFiles={detailOpen ? 0 : -1}
+					tabIndexFooterButtons={detailOpen ? 0 : -1}
 					{...updateFontState}
 				/>
 			</div>

@@ -1,10 +1,5 @@
 /* Dependencies */
-import {
-	useState,
-	useEffect,
-	createRoot,
-	createPortal,
-} from '@wordpress/element';
+import { useState, createRoot, createPortal } from '@wordpress/element';
 /* Components */
 import AdvancedButton from '../components/FontManager/AdvancedButton';
 import FontManager from '../components/FontManager/FontManager';
@@ -21,16 +16,11 @@ interface AppProps {
 }
 
 const FontManagerApp = ({ buttonContainer }: AppProps) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const [activeFontId, setActiveFontId] = useState('');
-
 	/* Auto-open when navigated here from WP backend via hash URL */
-	useEffect(() => {
-		if (window.location.hash !== '#/fontmanager') {
-			return;
-		}
-		setIsOpen(true);
-	}, []);
+	const [isOpen, setIsOpen] = useState(() =>
+		window.location.hash.startsWith('#/fontmanager')
+	);
+	const [activeFontId, setActiveFontId] = useState('');
 
 	const handleOpen = () => {
 		setIsOpen(true);

@@ -1,7 +1,6 @@
 /* Dependencies */
 import {
 	useState,
-	useEffect,
 	lazy,
 	Suspense,
 	createRoot,
@@ -32,16 +31,11 @@ interface AppProps {
 }
 
 const TemplateApp = ({ buttonContainer }: AppProps) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const [activeTemplateId, setActiveTemplateId] = useState('');
-
 	/* Auto-open when navigated here from WP backend via hash URL */
-	useEffect(() => {
-		if (window.location.hash !== '#/template') {
-			return;
-		}
-		setIsOpen(true);
-	}, []);
+	const [isOpen, setIsOpen] = useState(() =>
+		window.location.hash.startsWith('#/template')
+	);
+	const [activeTemplateId, setActiveTemplateId] = useState('');
 
 	const handleOpen = () => {
 		setIsOpen(true);

@@ -63,6 +63,7 @@ const TemplateSingle = ({
 
 	return (
 		<TemplateContainer
+			title={template.template}
 			header={
 				<TemplateHeaderNavigation
 					template={template}
