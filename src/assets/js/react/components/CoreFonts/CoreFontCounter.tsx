@@ -1,4 +1,5 @@
 /* Dependencies */
+import { __ } from '@wordpress/i18n';
 
 /**
  * @package			Gravity PDF
@@ -9,15 +10,14 @@
 
 interface Props {
 	queue?: number;
-	text?: string;
 }
 
-const CoreFontCounter = ({ queue, text }: Props) => (
+const CoreFontCounter = ({ queue }: Props) => (
 	<span
 		data-test="component-coreFont-counter"
 		className="gfpdf-core-font-counter"
 	>
-		{text} {queue}
+		{__('Fonts remaining:', 'gravity-pdf')} {queue}
 	</span>
 );
 

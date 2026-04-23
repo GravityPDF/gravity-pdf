@@ -17,13 +17,11 @@ import type { ConsoleLine } from '../../types';
 interface CoreFontListResultsProps {
 	console?: Record<string, ConsoleLine>;
 	retry?: string[];
-	retryText?: string;
 }
 
 export const CoreFontListResults = ({
 	console: consoleMap = {},
 	retry = [],
-	retryText,
 }: CoreFontListResultsProps) => {
 	const lines = Object.keys(consoleMap).reverse();
 	const hasRetry = retry.length > 0;
@@ -43,9 +41,7 @@ export const CoreFontListResults = ({
 					}
 				>
 					{consoleMap[key].message}{' '}
-					{key === 'completed' && hasRetry && (
-						<Retry retryText={retryText} />
-					)}
+					{key === 'completed' && hasRetry && <Retry />}
 					{key === 'completed' && <ListSpacer />}
 				</li>
 			))}
@@ -53,11 +49,7 @@ export const CoreFontListResults = ({
 	);
 };
 
-interface RetryProps {
-	retryText?: string;
-}
-
-export const Retry = ({ retryText }: RetryProps) => {
+export const Retry = () => {
 	const navigate = useNavigate();
 
 	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -73,7 +65,7 @@ export const Retry = ({ retryText }: RetryProps) => {
 			aria-live="polite"
 			className="gfpdf-core-font-retry-link"
 		>
-			{retryText}
+			{__('Retry Failed Downloads?', 'gravity-pdf')}
 		</button>
 	);
 };

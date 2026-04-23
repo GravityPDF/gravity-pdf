@@ -43,10 +43,9 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('renders button text', () => {
-		const { container } = renderWithRouter(
-			<CoreFontContainer buttonText="Download Core Fonts" />,
-			{ initialState: baseState }
-		);
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: baseState,
+		});
 
 		expect(container.querySelector('button')!.textContent).toBe(
 			'Download Core Fonts'
@@ -99,14 +98,11 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 	});
 
 	test('renders <Counter /> when ajax is active and queue > 0', () => {
-		const { container } = renderWithRouter(
-			<CoreFontContainer counterText="Remaining:" />,
-			{
-				initialState: {
-					coreFonts: { ...coreFontInitialState, downloadCounter: 3 },
-				},
-			}
-		);
+		const { container } = renderWithRouter(<CoreFontContainer />, {
+			initialState: {
+				coreFonts: { ...coreFontInitialState, downloadCounter: 3 },
+			},
+		});
 		fireEvent.click(
 			findByTestAttr(container, 'component-coreFont-button')!
 		);
@@ -144,8 +140,7 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 		expect(store.getState().coreFonts.buttonClicked).toBe(true);
 	});
 
-	test('fontList + buttonClicked triggers downloadFontsApiCall for each file', () => {
-		jest.useFakeTimers();
+	test('fontList + buttonClicked triggers downloadFontsApiCall for each file', async () => {
 		const store = createTestStore({
 			coreFonts: {
 				...coreFontInitialState,
@@ -155,10 +150,8 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 		});
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 
-		renderWithRouter(<CoreFontContainer />, { store });
-
-		act(() => {
-			jest.runAllTimers();
+		await act(async () => {
+			renderWithRouter(<CoreFontContainer />, { store });
 		});
 
 		const downloadCalls = dispatchSpy.mock.calls.filter(
@@ -167,8 +160,6 @@ describe('CoreFonts - CoreFontContainer.js', () => {
 				(action as { type?: string }).type === DOWNLOAD_FONTS_API_CALL
 		);
 		expect(downloadCalls).toHaveLength(3);
-
-		jest.useRealTimers();
 	});
 
 	test('requestDownload=finished clears requestDownload in store', () => {

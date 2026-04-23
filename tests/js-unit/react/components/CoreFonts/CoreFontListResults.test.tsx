@@ -150,9 +150,7 @@ describe('CoreFonts - CoreFontListResults.js', () => {
 		});
 
 		test('renders link text', () => {
-			const { container } = render(
-				<Retry retryText="Retry Failed Downloads?" />
-			);
+			const { container } = render(<Retry />);
 
 			expect(container.querySelector('button')!.textContent).toBe(
 				'Retry Failed Downloads?'

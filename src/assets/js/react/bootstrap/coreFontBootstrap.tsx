@@ -21,13 +21,12 @@ export default function coreFontBootstrap(): void {
 	const container = document.getElementById(
 		'gfpdf-button-wrapper-install_core_fonts'
 	);
-	const button = container!.getElementsByTagName('button')[0];
 
 	const root = createRoot(container!);
 
 	root.render(
 		<Suspense fallback={<div />}>
-			<Routes button={button} />
+			<Routes />
 		</Suspense>
 	);
 }

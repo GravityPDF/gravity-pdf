@@ -14,9 +14,7 @@ describe('CoreFonts - CoreFontCounter.js', () => {
 	});
 
 	test('display an inline counter', () => {
-		const { container } = render(
-			<CoreFontCounter text="Fonts remaining:" queue={8} />
-		);
+		const { container } = render(<CoreFontCounter queue={8} />);
 
 		expect(container.querySelector('span')!.textContent).toBe(
 			'Fonts remaining: 8'

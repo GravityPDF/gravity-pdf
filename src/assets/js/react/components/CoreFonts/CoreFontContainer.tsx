@@ -1,6 +1,8 @@
 /* Dependencies */
 import { useState, useEffect } from '@wordpress/element';
 import { useNavigate, useLocation } from 'react-router';
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 /* Components */
 import { CoreFontListResults } from './CoreFontListResults';
 import Counter from './CoreFontCounter';
@@ -19,19 +21,7 @@ import {
  * @since       5.0
  */
 
-interface Props {
-	buttonClassName?: string;
-	buttonText?: string;
-	counterText?: string;
-	retryText?: string;
-}
-
-const CoreFontContainer = ({
-	buttonClassName,
-	buttonText,
-	counterText,
-	retryText,
-}: Props) => {
+const CoreFontContainer = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const {
@@ -69,65 +59,40 @@ const CoreFontContainer = ({
 		[]
 	);
 
-	const [ajax, setAjax] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
-	const handleGithubApiError = (error: string) => {
-		setAjax(false);
-		addToConsole('completed', 'error', error);
-		navigate('/');
-	};
-
-	const startDownloadFonts = (
+	const startDownloadFonts = async (
 		files: string[],
 		error: string | null = null
 	) => {
 		if (files.length === 0) {
 			clearButtonClickedAndRetryList();
-			return handleGithubApiError(error ?? '');
+			setIsLoading(false);
+			addToConsole('completed', 'error', error ?? '');
+			navigate('/');
+			return;
 		}
 
 		clearConsole();
 		clearButtonClickedAndRetryList();
 		navigate('/');
 
-		setTimeout(() => {
-			const downloadQueue = [...files];
-			const runWorker = async () => {
-				while (downloadQueue.length > 0) {
-					const file = downloadQueue.shift()!;
-					await downloadFonts(file);
-				}
-			};
-			void Promise.all(
-				Array.from({ length: Math.min(5, files.length) }, runWorker)
+		for (let i = 0; i < files.length; i += 5) {
+			await Promise.all(
+				files.slice(i, i + 5).map((file) => downloadFonts(file))
 			);
-		}, 300);
-	};
-
-	const maybeStartDownload = (
-		loc: string,
-		files: string[],
-		error: string | null = null
-	) => {
-		if (loc === '/downloadCoreFonts') {
-			startDownloadFonts(files, error);
-		}
-
-		if (loc === '/retryDownloadCoreFonts') {
-			setAjax(true);
-			startDownloadFonts(files, error);
 		}
 	};
 
 	const handleTriggerFontDownload = () => {
-		if (!ajax) {
-			setAjax(true);
+		if (!isLoading) {
+			setIsLoading(true);
 			getFilesFromGitHub();
 		}
 	};
 
 	const resetState = () => {
-		setAjax(false);
+		setIsLoading(false);
 		clearRequestRemainingData();
 		navigate('/');
 	};
@@ -142,21 +107,25 @@ const CoreFontContainer = ({
 	/* Load current font list when fontList and buttonClicked are both available */
 	useEffect(() => {
 		if (fontList.length > 0 && buttonClicked) {
-			startDownloadFonts(fontList);
+			void startDownloadFonts(fontList);
 		}
 	}, [fontList, buttonClicked]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* Load current hash history location & retry font list */
 	useEffect(() => {
-		if (location.pathname === '/retryDownloadCoreFonts') {
-			maybeStartDownload(location.pathname, retry);
+		if (
+			location.pathname === '/retryDownloadCoreFonts' &&
+			retry.length > 0
+		) {
+			setIsLoading(true);
+			void startDownloadFonts(retry);
 		}
 	}, [location.pathname, retry]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* Load error if something went wrong */
 	useEffect(() => {
 		if (getFilesFromGitHubFailed !== '' && buttonClicked) {
-			startDownloadFonts(fontList, getFilesFromGitHubFailed);
+			void startDownloadFonts(fontList, getFilesFromGitHubFailed);
 		}
 	}, [getFilesFromGitHubFailed, buttonClicked]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -167,28 +136,21 @@ const CoreFontContainer = ({
 		}
 	}, [requestDownload]); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const disabled = (queue < fontList.length && queue !== 0) || ajax;
+	const disabled = (queue < fontList.length && queue !== 0) || isLoading;
 
 	return (
 		<div data-test="component-coreFont-downloader">
-			<button
+			<Button
 				data-test="component-coreFont-button"
-				className={buttonClassName}
-				type="button"
+				variant="secondary"
 				onClick={handleTriggerFontDownload}
 				disabled={disabled}
 			>
-				{buttonText}
-			</button>
-			{ajax && <Spinner />}
-			{ajax && queue !== 0 && (
-				<Counter text={counterText} queue={queue} />
-			)}
-			<CoreFontListResults
-				console={consoleList}
-				retry={retry}
-				retryText={retryText}
-			/>
+				{__('Download Core Fonts', 'gravity-pdf')}
+			</Button>
+			{isLoading && <Spinner />}
+			{isLoading && queue !== 0 && <Counter queue={queue} />}
+			<CoreFontListResults console={consoleList} retry={retry} />
 		</div>
 	);
 };

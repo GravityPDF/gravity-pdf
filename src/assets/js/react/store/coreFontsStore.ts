@@ -107,9 +107,7 @@ export function createCoreFontsStore(overrideInitial?: Partial<CoreFontState>) {
 			case GET_FILES_FROM_GITHUB:
 				return { ...state, buttonClicked: true };
 			case GET_FILES_FROM_GITHUB_SUCCESS: {
-				const files = (action.payload as Array<{ name: string }>).map(
-					(item) => item.name
-				);
+				const files = action.payload as string[];
 				return {
 					...state,
 					fontList: files,
