@@ -79,7 +79,7 @@ const FontManager = ({ activeFontId, onSelectFont, onClose }: Props) => {
 			title={__('Font Manager', 'gravity-pdf')}
 			onRequestClose={onClose}
 			className="gfpdf-font-manager-modal"
-			size="large"
+			size="fill"
 			shouldCloseOnEsc={!activeFontId}
 		>
 			{/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}

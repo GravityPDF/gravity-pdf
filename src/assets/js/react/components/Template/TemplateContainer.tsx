@@ -31,7 +31,7 @@ const TemplateContainer = ({
 			title={title}
 			onRequestClose={onClose}
 			className="gfpdf-template-manager-modal"
-			size="large"
+			size="fill"
 		>
 			<div
 				data-test="component-templateContainer"
