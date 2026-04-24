@@ -1,17 +1,6 @@
-import type { ReactNode } from 'react';
 import { findByTestAttr, renderWithStore } from '../../testUtilsRTL';
 import TemplateSingle from '../../../../../src/assets/js/react/components/Template/TemplateSingle';
 import type { TemplateState } from '../../../../../src/assets/js/react/types';
-
-jest.mock(
-	'../../../../../src/assets/js/react/components/Template/TemplateContainer',
-	() =>
-		function TemplateContainer({ children }: { children: ReactNode }) {
-			return (
-				<div data-test="component-templateContainer">{children}</div>
-			);
-		}
-);
 
 jest.mock(
 	'../../../../../src/assets/js/react/components/Template/TemplateHeaderNavigation',
@@ -81,7 +70,13 @@ describe('Template - TemplateSingle.js', () => {
 			initialState
 		);
 		expect(
-			findByTestAttr(container, 'component-templateContainer')
+			findByTestAttr(container, 'component-templateHeaderNavigation')
+		).toBeInTheDocument();
+		expect(
+			findByTestAttr(container, 'component-templateFooterActions')
+		).toBeInTheDocument();
+		expect(
+			container.querySelector('#gfpdf-template-detail-view')
 		).toBeInTheDocument();
 	});
 
@@ -94,7 +89,7 @@ describe('Template - TemplateSingle.js', () => {
 			initialState
 		);
 		expect(
-			findByTestAttr(container, 'component-templateContainer')
+			container.querySelector('#gfpdf-template-detail-view')
 		).not.toBeInTheDocument();
 	});
 

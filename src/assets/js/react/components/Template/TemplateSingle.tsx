@@ -1,7 +1,6 @@
 /* Dependencies */
 import { __ } from '@wordpress/i18n';
 /* Components */
-import TemplateContainer from './TemplateContainer';
 import TemplateHeaderNavigation from './TemplateHeaderNavigation';
 import TemplateFooterActions from './TemplateFooterActions';
 import TemplateScreenshot from './TemplateScreenshot';
@@ -12,6 +11,7 @@ import { templateStore } from '../../store/templateStore';
 
 /**
  * Renders a single PDF template, displayed in the detail view.
+ * Rendered as the modal body when a template is selected.
  *
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -55,107 +55,110 @@ const TemplateSingle = ({
 	const authorUri = template['author uri'] as string | undefined;
 
 	return (
-		<TemplateContainer
-			title={template.template}
-			header={
-				<TemplateHeaderNavigation
-					template={template}
-					templateIndex={templateIndex}
-					templates={templates}
-					onSelectTemplate={onSelectTemplate}
-				/>
-			}
-			footer={
-				<TemplateFooterActions
-					template={template}
-					onSelectTemplate={onSelectTemplate}
-					onClose={onClose}
-					isActiveTemplate={isCurrentTemplate}
-					pdfWorkingDirPath={GFPDF.pdfWorkingDir}
-				/>
-			}
-			onClose={() => onSelectTemplate('')}
-		>
-			<div
-				id="gfpdf-template-detail-view"
-				className="gfpdf-template-detail"
-			>
-				<TemplateScreenshot image={template.screenshot} wrapped />
-				<div className="theme-info">
-					{isCurrentTemplate ? (
-						<span
-							data-test="component-currentTemplate"
-							className="current-label"
-						>
-							{__('Current Template', 'gravity-pdf')}
-						</span>
-					) : null}
+		<>
+			<TemplateHeaderNavigation
+				template={template}
+				templateIndex={templateIndex}
+				templates={templates}
+				onSelectTemplate={onSelectTemplate}
+			/>
 
-					<h2 data-test="component-name" className="theme-name">
-						{template.template}
-						{template.version ? (
+			<div
+				id="gfpdf-template-container"
+				className="theme-about wp-clearfix theme-browser rendered"
+			>
+				<div
+					id="gfpdf-template-detail-view"
+					className="gfpdf-template-detail"
+				>
+					<TemplateScreenshot image={template.screenshot} wrapped />
+					<div className="theme-info">
+						{isCurrentTemplate ? (
 							<span
-								data-test="component-version"
-								className="theme-version"
+								data-test="component-currentTemplate"
+								className="current-label"
 							>
-								{__('Version', 'gravity-pdf')}:{' '}
-								{template.version}
+								{__('Current Template', 'gravity-pdf')}
 							</span>
 						) : null}
-					</h2>
 
-					{authorUri ? (
+						<h2 data-test="component-name" className="theme-name">
+							{template.template}
+							{template.version ? (
+								<span
+									data-test="component-version"
+									className="theme-version"
+								>
+									{__('Version', 'gravity-pdf')}:{' '}
+									{template.version}
+								</span>
+							) : null}
+						</h2>
+
+						{authorUri ? (
+							<p
+								data-test="component-author"
+								className="theme-author"
+							>
+								<a href={authorUri}>{template.author}</a>
+							</p>
+						) : (
+							<p
+								data-test="component-author"
+								className="theme-author"
+							>
+								{template.author}
+							</p>
+						)}
+
+						<p data-test="component-group" className="theme-author">
+							<strong>
+								{__('Group', 'gravity-pdf')}: {template.group}
+							</strong>
+						</p>
+
+						{longMessage ? (
+							<ShowMessage
+								data-test="component-showMessageLong_message"
+								text={longMessage}
+							/>
+						) : null}
+						{longError ? (
+							<ShowMessage
+								data-test="component-showMessageLong_error"
+								text={longError}
+								error
+							/>
+						) : null}
+
 						<p
-							data-test="component-author"
-							className="theme-author"
+							data-test="component-description"
+							className="theme-description"
 						>
-							<a href={authorUri}>{template.author}</a>
+							{template.description}
 						</p>
-					) : (
-						<p
-							data-test="component-author"
-							className="theme-author"
-						>
-							{template.author}
-						</p>
-					)}
 
-					<p data-test="component-group" className="theme-author">
-						<strong>
-							{__('Group', 'gravity-pdf')}: {template.group}
-						</strong>
-					</p>
-
-					{longMessage ? (
-						<ShowMessage
-							data-test="component-showMessageLong_message"
-							text={longMessage}
-						/>
-					) : null}
-					{longError ? (
-						<ShowMessage
-							data-test="component-showMessageLong_error"
-							text={longError}
-							error
-						/>
-					) : null}
-
-					<p
-						data-test="component-description"
-						className="theme-description"
-					>
-						{template.description}
-					</p>
-
-					{template.tags ? (
-						<p data-test="component-tags" className="theme-tags">
-							<span>{__('Tags', 'gravity-pdf')}:</span>{' '}
-							{template.tags}
-						</p>
-					) : null}
+						{template.tags ? (
+							<p
+								data-test="component-tags"
+								className="theme-tags"
+							>
+								<span>{__('Tags', 'gravity-pdf')}:</span>{' '}
+								{template.tags}
+							</p>
+						) : null}
+					</div>
 				</div>
 			</div>
-		</TemplateContainer>
+
+			<TemplateFooterActions
+				template={template}
+				onSelectTemplate={onSelectTemplate}
+				onClose={onClose}
+				isActiveTemplate={isCurrentTemplate}
+				pdfWorkingDirPath={GFPDF.pdfWorkingDir}
+			/>
+		</>
 	);
 };
 

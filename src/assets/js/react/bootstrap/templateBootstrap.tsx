@@ -2,8 +2,8 @@
 import { useState, lazy, Suspense, createRoot } from '@wordpress/element';
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { subscribe, select, dispatch } from '@wordpress/data';
+import { Button, Modal } from '@wordpress/components';
+import { subscribe, select, dispatch, useSelect } from '@wordpress/data';
 /* Store */
 import { TEMPLATE_STORE_NAME, templateStore } from '../store/templateStore';
 
@@ -28,10 +28,37 @@ const TemplateApp = () => {
 	);
 	const [activeTemplateId, setActiveTemplateId] = useState('');
 
-	const handleClose = () => {
+	/* Resolve the active template's display name for the Modal title */
+	const activeTemplateName = useSelect(
+		(s) => {
+			if (!activeTemplateId) {
+				return null;
+			}
+			const match = (
+				s(templateStore).getFilteredTemplates() as
+					| { id: string; template?: string }[]
+					| null
+			)?.find((t) => t.id === activeTemplateId);
+			return match?.template ?? null;
+		},
+		[activeTemplateId]
+	);
+
+	const handleCloseModal = () => {
 		setIsOpen(false);
 		setActiveTemplateId('');
 	};
+
+	/* Back-from-detail (if viewing a template) OR close the modal (if on the list) */
+	const handleRequestClose = () => {
+		if (activeTemplateId) {
+			setActiveTemplateId('');
+			return;
+		}
+		handleCloseModal();
+	};
+
+	const title = activeTemplateName ?? __('Installed PDFs', 'gravity-pdf');
 
 	return (
 		<>
@@ -50,20 +77,32 @@ const TemplateApp = () => {
 			</Button>
 
 			{isOpen && (
-				<Suspense fallback={<div />}>
-					{activeTemplateId ? (
-						<TemplateSingle
-							activeTemplateId={activeTemplateId}
-							onSelectTemplate={setActiveTemplateId}
-							onClose={handleClose}
-						/>
-					) : (
-						<TemplateList
-							onSelectTemplate={setActiveTemplateId}
-							onClose={handleClose}
-						/>
-					)}
-				</Suspense>
+				<Modal
+					title={title}
+					onRequestClose={handleRequestClose}
+					className="gfpdf-template-manager-modal"
+					size="fill"
+				>
+					<div
+						data-test="component-templateContainer"
+						className="gfpdf-template-manager-body"
+					>
+						<Suspense fallback={<div />}>
+							{activeTemplateId ? (
+								<TemplateSingle
+									activeTemplateId={activeTemplateId}
+									onSelectTemplate={setActiveTemplateId}
+									onClose={handleCloseModal}
+								/>
+							) : (
+								<TemplateList
+									onSelectTemplate={setActiveTemplateId}
+									onClose={handleCloseModal}
+								/>
+							)}
+						</Suspense>
+					</div>
+				</Modal>
 			)}
 		</>
 	);

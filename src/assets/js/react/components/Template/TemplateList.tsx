@@ -1,7 +1,5 @@
 /* Dependencies */
-import { __ } from '@wordpress/i18n';
 /* Components */
-import TemplateContainer from './TemplateContainer';
 import TemplateListItem from './TemplateListItem';
 import TemplateSearch from './TemplateSearch';
 import TemplateUploader from './TemplateUploader';
@@ -10,7 +8,8 @@ import { useSelect } from '@wordpress/data';
 import { templateStore } from '../../store/templateStore';
 
 /**
- * The master component for rendering the all PDF templates as a list
+ * The master component for rendering the all PDF templates as a list.
+ * Rendered as the modal body when no template is selected.
  *
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -35,24 +34,26 @@ const TemplateList = ({ onSelectTemplate, onClose }: Props) => {
 		false;
 
 	return (
-		<TemplateContainer
-			title={__('Installed PDFs', 'gravity-pdf')}
-			onClose={onClose}
-		>
+		<>
 			<TemplateSearch />
-			<div role="listbox">
-				{templates?.map((value, index) => (
-					<TemplateListItem
-						key={index}
-						onSelectTemplate={onSelectTemplate}
-						onClose={onClose}
-						template={value}
-					/>
-				))}
+			<div
+				id="gfpdf-template-container"
+				className="theme-about wp-clearfix theme-browser rendered"
+			>
+				<div role="listbox">
+					{templates?.map((value, index) => (
+						<TemplateListItem
+							key={index}
+							onSelectTemplate={onSelectTemplate}
+							onClose={onClose}
+							template={value}
+						/>
+					))}
 
-				{hasUserPrivs && <TemplateUploader />}
+					{hasUserPrivs && <TemplateUploader />}
+				</div>
 			</div>
-		</TemplateContainer>
+		</>
 	);
 };
 
