@@ -56,12 +56,16 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 			/>
 		);
 		expect(
-			findByTestAttr(container, 'component-showPreviousTemplateButton')!
-				.getAttribute('aria-label')
+			findByTestAttr(
+				container,
+				'component-showPreviousTemplateButton'
+			)!.getAttribute('aria-label')
 		).toBe('Show previous template');
 		expect(
-			findByTestAttr(container, 'component-showNextTemplateButton')!
-				.getAttribute('aria-label')
+			findByTestAttr(
+				container,
+				'component-showNextTemplateButton'
+			)!.getAttribute('aria-label')
 		).toBe('Show next template');
 	});
 

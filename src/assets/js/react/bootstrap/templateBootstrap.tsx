@@ -1,5 +1,6 @@
 /* Dependencies */
 import { useState, lazy, Suspense, createRoot } from '@wordpress/element';
+import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
@@ -37,7 +38,7 @@ const TemplateApp = () => {
 			<Button
 				data-test="component-templateButton"
 				variant="secondary"
-				onClick={(e: Event) => {
+				onClick={(e: MouseEvent<HTMLButtonElement>) => {
 					/* Parent Gravity Forms row has a click listener we don't want to fire */
 					e.stopPropagation();
 					setIsOpen(true);
@@ -47,6 +48,7 @@ const TemplateApp = () => {
 			>
 				{__('Manage', 'gravity-pdf')}
 			</Button>
+
 			{isOpen && (
 				<Suspense fallback={<div />}>
 					{activeTemplateId ? (

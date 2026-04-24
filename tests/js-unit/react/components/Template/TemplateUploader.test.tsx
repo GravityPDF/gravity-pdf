@@ -63,14 +63,20 @@ describe('Template - TemplateUploader.js', () => {
 	};
 
 	test('renders <TemplateUploader /> component', () => {
-		const { container } = renderWithStore(<TemplateUploader />, initialState);
+		const { container } = renderWithStore(
+			<TemplateUploader />,
+			initialState
+		);
 		expect(
 			findByTestAttr(container, 'component-templateUploader')
 		).toBeInTheDocument();
 	});
 
 	test('renders Dropzone area', () => {
-		const { container } = renderWithStore(<TemplateUploader />, initialState);
+		const { container } = renderWithStore(
+			<TemplateUploader />,
+			initialState
+		);
 		expect(
 			findByTestAttr(container, 'drop-valid-file')
 		).toBeInTheDocument();
@@ -108,9 +114,7 @@ describe('Template - TemplateUploader.js', () => {
 			initialState
 		);
 		fireEvent.click(findByTestAttr(container, 'drop-large-file')!);
-		expect(
-			getByText('Upload exceeds the 10MB limit.')
-		).toBeInTheDocument();
+		expect(getByText('Upload exceeds the 10MB limit.')).toBeInTheDocument();
 	});
 
 	test('success with new template dispatches ADD_TEMPLATE and shows success message', () => {
