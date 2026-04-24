@@ -38,14 +38,16 @@ describe('FontManager - FontList.js', () => {
 			).toBeInTheDocument();
 		});
 
-		test('render <FontListHeader /> component', () => {
+		test('render the font list header row', () => {
 			const { container } = renderWithStore(
 				<FontList {...defaultProps} />,
 				loadingState
 			);
-			expect(
-				findByTestAttr(container, 'component-FontListHeader')
-			).toBeInTheDocument();
+			const header = container.querySelector('.font-list-header');
+			expect(header).toBeInTheDocument();
+			expect(header!.querySelector('.font-name')!.textContent).toBe(
+				'Installed Fonts'
+			);
 		});
 
 		test('render <FontListSkeleton /> when loading', () => {

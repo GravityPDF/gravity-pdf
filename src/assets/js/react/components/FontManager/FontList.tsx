@@ -1,8 +1,8 @@
 /* Dependencies */
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */
-import FontListHeader from './FontListHeader';
 import FontListItems from './FontListItems';
 import FontListSkeleton from './FontListSkeleton';
 import FontListAlertMessage from './FontListAlertMessage';
@@ -50,7 +50,16 @@ const FontList = ({ activeFontId, onSelectFont, hasDetailOpen }: Props) => {
 			className="font-list"
 			aria-live="polite"
 		>
-			<FontListHeader />
+			<div className="font-list-header">
+				<div className="font-name">
+					{__('Installed Fonts', 'gravity-pdf')}
+				</div>
+				<div>{__('Regular', 'gravity-pdf')}</div>
+				<div>{__('Italics', 'gravity-pdf')}</div>
+				<div>{__('Bold', 'gravity-pdf')}</div>
+				<div>{__('Bold Italics', 'gravity-pdf')}</div>
+				<div />
+			</div>
 
 			{loading ? (
 				<FontListSkeleton />
