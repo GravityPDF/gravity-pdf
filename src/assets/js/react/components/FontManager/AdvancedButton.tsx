@@ -1,6 +1,6 @@
 /* Dependencies */
-import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 /**
  * @package     Gravity PDF
@@ -13,22 +13,15 @@ interface Props {
 	onOpen: () => void;
 }
 
-const AdvancedButton = ({ onOpen }: Props) => {
-	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-		e.preventDefault();
-		onOpen();
-	};
-
-	return (
-		<button
-			data-test="component-AdvancedButton"
-			type="button"
-			className="button gfpdf-button"
-			onClick={handleClick}
-		>
-			{__('Manage', 'gravity-pdf')}
-		</button>
-	);
-};
+const AdvancedButton = ({ onOpen }: Props) => (
+	<Button
+		data-test="component-AdvancedButton"
+		variant="secondary"
+		onClick={onOpen}
+		__next40pxDefaultSize={true}
+	>
+		{__('Manage', 'gravity-pdf')}
+	</Button>
+);
 
 export default AdvancedButton;

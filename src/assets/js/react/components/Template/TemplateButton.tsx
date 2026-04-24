@@ -1,6 +1,7 @@
 /* Dependencies */
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 /**
  * Render the button used to open our Fancy PDF template selector
@@ -17,23 +18,21 @@ interface Props {
 
 const TemplateButton = ({ onOpen }: Props) => {
 	const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-		e.preventDefault();
+		/* Parent Gravity Forms row has a click listener we don't want to fire */
 		e.stopPropagation();
-
 		onOpen();
 	};
 
 	return (
-		<button
+		<Button
 			data-test="component-templateButton"
-			type="button"
-			id="fancy-template-selector"
-			className="button gfpdf-button"
+			variant="secondary"
 			onClick={handleClick}
 			aria-label={__('Manage PDF Templates', 'gravity-pdf')}
+			__next40pxDefaultSize={true}
 		>
 			{__('Manage', 'gravity-pdf')}
-		</button>
+		</Button>
 	);
 };
 
