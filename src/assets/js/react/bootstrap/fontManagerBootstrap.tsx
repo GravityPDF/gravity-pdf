@@ -52,20 +52,13 @@ const FontManagerApp = ({ buttonContainer }: AppProps) => {
  * Mount the font manager button and overlay as a single React root.
  *
  * @param defaultFontField
- * @param buttonStyle
  * @since 6.0
  */
-export function fontManagerBootstrap(
-	defaultFontField: Element,
-	buttonStyle?: string
-): void {
-	/* Prevent button reset styling on tools tab */
-	const preventButtonReset = !buttonStyle ? '' : buttonStyle;
-
-	createAdvancedButtonWrapper(defaultFontField, preventButtonReset);
+export function fontManagerBootstrap(defaultFontField: Element): void {
+	createAdvancedButtonWrapper(defaultFontField);
 
 	const buttonContainer = document.querySelector(
-		'#gpdf-advance-font-manager-selector' + preventButtonReset
+		'#gpdf-advance-font-manager-selector'
 	)!;
 	const overlayContainer = document.querySelector('#font-manager-overlay')!;
 
@@ -78,18 +71,11 @@ export function fontManagerBootstrap(
  * Create html element wrapper for our font manager advanced button
  *
  * @param defaultFontField
- * @param preventButtonReset
  * @since 6.0
  */
-export function createAdvancedButtonWrapper(
-	defaultFontField: Element,
-	preventButtonReset: string
-): void {
+export function createAdvancedButtonWrapper(defaultFontField: Element): void {
 	const fontWrapper = document.createElement('span');
-	fontWrapper.setAttribute(
-		'id',
-		'gpdf-advance-font-manager-selector' + preventButtonReset
-	);
+	fontWrapper.setAttribute('id', 'gpdf-advance-font-manager-selector');
 
 	const popupWrapper = document.createElement('div');
 	popupWrapper.setAttribute('id', 'font-manager-overlay');

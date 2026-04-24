@@ -87,7 +87,7 @@ domReady(() => {
 
 	/* Initialize font manager under tools tab  */
 	if (fmToolsTab !== null) {
-		fontManagerBootstrap(fmToolsTab, '-prevent-button-reset');
+		fontManagerBootstrap(fmToolsTab);
 	}
 
 	/* Initialize font manager under PDF settings */
