@@ -41,7 +41,6 @@ describe('Template - TemplateDeleteButton.js', () => {
 			<TemplateDeleteButton
 				onSelectTemplate={jest.fn()}
 				template={template}
-				buttonText="Delete"
 			/>,
 			initialState
 		);
@@ -55,28 +54,10 @@ describe('Template - TemplateDeleteButton.js', () => {
 			<TemplateDeleteButton
 				onSelectTemplate={jest.fn()}
 				template={template}
-				buttonText="Delete"
 			/>,
 			initialState
 		);
 		expect(container.querySelector('button')!.textContent).toBe('Delete');
-	});
-
-	test('uses callbackFunction prop instead of built-in delete handler', () => {
-		const callbackFn = jest.fn();
-		const { container } = renderWithStore(
-			<TemplateDeleteButton
-				onSelectTemplate={jest.fn()}
-				template={template}
-				callbackFunction={callbackFn}
-				buttonText="Delete"
-			/>,
-			initialState
-		);
-		fireEvent.click(
-			findByTestAttr(container, 'component-templateDeleteButton')!
-		);
-		expect(callbackFn).toHaveBeenCalledTimes(1);
 	});
 
 	test('button click with confirm=true dispatches TEMPLATE_PROCESSING and DELETE_TEMPLATE', () => {
@@ -86,8 +67,6 @@ describe('Template - TemplateDeleteButton.js', () => {
 			<TemplateDeleteButton
 				onSelectTemplate={jest.fn()}
 				template={template}
-				buttonText="Delete"
-				templateConfirmDeleteText="Are you sure?"
 			/>,
 			{},
 			{},
@@ -98,7 +77,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 			findByTestAttr(container, 'component-templateDeleteButton')!
 		);
 
-		expect(window.confirm).toHaveBeenCalledWith('Are you sure?');
+		expect(window.confirm).toHaveBeenCalled();
 		expect(dispatchSpy).toHaveBeenCalledWith(
 			expect.objectContaining({ type: 'TEMPLATE_PROCESSING' })
 		);
@@ -115,7 +94,6 @@ describe('Template - TemplateDeleteButton.js', () => {
 			<TemplateDeleteButton
 				onSelectTemplate={jest.fn()}
 				template={template}
-				buttonText="Delete"
 			/>,
 			{},
 			{},
@@ -136,7 +114,6 @@ describe('Template - TemplateDeleteButton.js', () => {
 			<TemplateDeleteButton
 				onSelectTemplate={onSelectTemplate}
 				template={template}
-				buttonText="Delete"
 			/>,
 			{},
 			{},
@@ -161,8 +138,6 @@ describe('Template - TemplateDeleteButton.js', () => {
 			<TemplateDeleteButton
 				onSelectTemplate={onSelectTemplate}
 				template={template}
-				buttonText="Delete"
-				templateDeleteErrorText="Delete failed"
 			/>,
 			{},
 			{},

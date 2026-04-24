@@ -1,19 +1,11 @@
 /* Dependencies */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 /* Components */
 import TemplateContainer from './TemplateContainer';
 import TemplateHeaderNavigation from './TemplateHeaderNavigation';
 import TemplateFooterActions from './TemplateFooterActions';
-import TemplateScreenshots from './TemplateScreenshots';
+import TemplateScreenshot from './TemplateScreenshot';
 import ShowMessage from '../ShowMessage';
-import {
-	CurrentTemplate,
-	Name,
-	Author,
-	Group,
-	Description,
-	Tags,
-} from './TemplateSingleComponents';
 /* Store */
 import { useSelect } from '@wordpress/data';
 import { templateStore } from '../../store/templateStore';
@@ -60,6 +52,7 @@ const TemplateSingle = ({
 	const isCurrentTemplate = activeTemplate === template.id;
 	const longMessage = template.long_message as string | undefined;
 	const longError = template.long_error as string | undefined;
+	const authorUri = template['author uri'] as string | undefined;
 
 	return (
 		<TemplateContainer
@@ -70,14 +63,6 @@ const TemplateSingle = ({
 					templateIndex={templateIndex}
 					templates={templates}
 					onSelectTemplate={onSelectTemplate}
-					showPreviousTemplateText={__(
-						'Show previous template',
-						'gravity-pdf'
-					)}
-					showNextTemplateText={__(
-						'Show next template',
-						'gravity-pdf'
-					)}
 				/>
 			}
 			footer={
@@ -86,21 +71,7 @@ const TemplateSingle = ({
 					onSelectTemplate={onSelectTemplate}
 					onClose={onClose}
 					isActiveTemplate={isCurrentTemplate}
-					activateText={__('Select', 'gravity-pdf')}
 					pdfWorkingDirPath={GFPDF.pdfWorkingDir}
-					templateDeleteText={__('Delete', 'gravity-pdf')}
-					templateConfirmDeleteText={sprintf(
-						/* translators: %s is replaced with a double newline */
-						__(
-							"Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.",
-							'gravity-pdf'
-						),
-						'\n\n'
-					)}
-					templateDeleteErrorText={__(
-						'Could not delete template.',
-						'gravity-pdf'
-					)}
 				/>
 			}
 			onClose={() => onSelectTemplate('')}
@@ -109,25 +80,52 @@ const TemplateSingle = ({
 				id="gfpdf-template-detail-view"
 				className="gfpdf-template-detail"
 			>
-				<TemplateScreenshots image={template.screenshot} />
+				<TemplateScreenshot image={template.screenshot} wrapped />
 				<div className="theme-info">
-					<CurrentTemplate
-						isCurrentTemplate={isCurrentTemplate}
-						label={__('Current Template', 'gravity-pdf')}
-					/>
-					<Name
-						name={template.template}
-						version={template.version}
-						versionLabel={__('Version', 'gravity-pdf')}
-					/>
-					<Author
-						author={template.author}
-						uri={template['author uri'] as string | undefined}
-					/>
-					<Group
-						group={template.group}
-						label={__('Group', 'gravity-pdf')}
-					/>
+					{isCurrentTemplate ? (
+						<span
+							data-test="component-currentTemplate"
+							className="current-label"
+						>
+							{__('Current Template', 'gravity-pdf')}
+						</span>
+					) : null}
+
+					<h2 data-test="component-name" className="theme-name">
+						{template.template}
+						{template.version ? (
+							<span
+								data-test="component-version"
+								className="theme-version"
+							>
+								{__('Version', 'gravity-pdf')}:{' '}
+								{template.version}
+							</span>
+						) : null}
+					</h2>
+
+					{authorUri ? (
+						<p
+							data-test="component-author"
+							className="theme-author"
+						>
+							<a href={authorUri}>{template.author}</a>
+						</p>
+					) : (
+						<p
+							data-test="component-author"
+							className="theme-author"
+						>
+							{template.author}
+						</p>
+					)}
+
+					<p data-test="component-group" className="theme-author">
+						<strong>
+							{__('Group', 'gravity-pdf')}: {template.group}
+						</strong>
+					</p>
+
 					{longMessage ? (
 						<ShowMessage
 							data-test="component-showMessageLong_message"
@@ -141,11 +139,20 @@ const TemplateSingle = ({
 							error
 						/>
 					) : null}
-					<Description desc={template.description} />
-					<Tags
-						tags={template.tags}
-						label={__('Tags', 'gravity-pdf')}
-					/>
+
+					<p
+						data-test="component-description"
+						className="theme-description"
+					>
+						{template.description}
+					</p>
+
+					{template.tags ? (
+						<p data-test="component-tags" className="theme-tags">
+							<span>{__('Tags', 'gravity-pdf')}:</span>{' '}
+							{template.tags}
+						</p>
+					) : null}
 				</div>
 			</div>
 		</TemplateContainer>

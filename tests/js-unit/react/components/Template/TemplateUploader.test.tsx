@@ -62,33 +62,15 @@ describe('Template - TemplateUploader.js', () => {
 		} as unknown as TemplateState,
 	};
 
-	const defaultProps = {
-		genericUploadErrorText: 'Generic upload error',
-		addTemplateText: 'Add New Template',
-		filenameErrorText: 'Filename must be a zip file',
-		filesizeErrorText: 'File size exceeds limit',
-		installSuccessText: 'Installed successfully',
-		installUpdatedText: 'Updated successfully',
-		templateSuccessfullyInstalledUpdated:
-			'Template installed/updated successfully',
-		templateInstallInstructions: 'Drag & drop your zip file',
-	};
-
 	test('renders <TemplateUploader /> component', () => {
-		const { container } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
-			initialState
-		);
+		const { container } = renderWithStore(<TemplateUploader />, initialState);
 		expect(
 			findByTestAttr(container, 'component-templateUploader')
 		).toBeInTheDocument();
 	});
 
 	test('renders Dropzone area', () => {
-		const { container } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
-			initialState
-		);
+		const { container } = renderWithStore(<TemplateUploader />, initialState);
 		expect(
 			findByTestAttr(container, 'drop-valid-file')
 		).toBeInTheDocument();
@@ -98,7 +80,7 @@ describe('Template - TemplateUploader.js', () => {
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		const { container } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
+			<TemplateUploader />,
 			{},
 			{},
 			store
@@ -111,27 +93,31 @@ describe('Template - TemplateUploader.js', () => {
 
 	test('invalid file extension shows filename error', () => {
 		const { container, getByText } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
+			<TemplateUploader />,
 			initialState
 		);
 		fireEvent.click(findByTestAttr(container, 'drop-invalid-ext')!);
-		expect(getByText('Filename must be a zip file')).toBeInTheDocument();
+		expect(
+			getByText('Upload is not a valid template. Upload a .zip file.')
+		).toBeInTheDocument();
 	});
 
 	test('oversized file shows filesize error', () => {
 		const { container, getByText } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
+			<TemplateUploader />,
 			initialState
 		);
 		fireEvent.click(findByTestAttr(container, 'drop-large-file')!);
-		expect(getByText('File size exceeds limit')).toBeInTheDocument();
+		expect(
+			getByText('Upload exceeds the 10MB limit.')
+		).toBeInTheDocument();
 	});
 
 	test('success with new template dispatches ADD_TEMPLATE and shows success message', () => {
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		const { getByText } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
+			<TemplateUploader />,
 			{},
 			{},
 			store
@@ -150,14 +136,14 @@ describe('Template - TemplateUploader.js', () => {
 			expect.objectContaining({ type: 'ADD_TEMPLATE' })
 		);
 		expect(
-			getByText('Template installed/updated successfully')
+			getByText('PDF Template(s) Successfully Installed / Updated')
 		).toBeInTheDocument();
 	});
 
 	test('success with existing template dispatches UPDATE_TEMPLATE_PARAM', () => {
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
-		renderWithStore(<TemplateUploader {...defaultProps} />, {}, {}, store);
+		renderWithStore(<TemplateUploader />, {}, {}, store);
 
 		act(() => {
 			store.dispatch({
@@ -174,7 +160,7 @@ describe('Template - TemplateUploader.js', () => {
 	test('success dispatches CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
-		renderWithStore(<TemplateUploader {...defaultProps} />, {}, {}, store);
+		renderWithStore(<TemplateUploader />, {}, {}, store);
 
 		act(() => {
 			store.dispatch({
@@ -195,7 +181,7 @@ describe('Template - TemplateUploader.js', () => {
 	test('error response shows error message from payload', () => {
 		const store = createTestStore(initialState);
 		const { getByText } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
+			<TemplateUploader />,
 			{},
 			{},
 			store
@@ -211,10 +197,10 @@ describe('Template - TemplateUploader.js', () => {
 		expect(getByText('Specific upload error')).toBeInTheDocument();
 	});
 
-	test('error response falls back to genericUploadErrorText when no message', () => {
+	test('error response falls back to generic text when no message', () => {
 		const store = createTestStore(initialState);
 		const { getByText } = renderWithStore(
-			<TemplateUploader {...defaultProps} />,
+			<TemplateUploader />,
 			{},
 			{},
 			store
@@ -227,13 +213,17 @@ describe('Template - TemplateUploader.js', () => {
 			});
 		});
 
-		expect(getByText('Generic upload error')).toBeInTheDocument();
+		expect(
+			getByText(
+				'There was a problem with the upload. Reload the page and try again.'
+			)
+		).toBeInTheDocument();
 	});
 
 	test('error response dispatches CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
-		renderWithStore(<TemplateUploader {...defaultProps} />, {}, {}, store);
+		renderWithStore(<TemplateUploader />, {}, {}, store);
 
 		act(() => {
 			store.dispatch({

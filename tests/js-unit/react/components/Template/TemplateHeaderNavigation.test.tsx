@@ -46,24 +46,22 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 		).toBeInTheDocument();
 	});
 
-	test('renders screen reader text for previous and next buttons', () => {
+	test('renders accessible labels on previous and next buttons', () => {
 		const { container } = render(
 			<TemplateHeaderNavigation
 				templates={templates}
 				templateIndex={1}
 				template={templates[1]}
 				onSelectTemplate={onSelectTemplate}
-				showPreviousTemplateText="Show previous"
-				showNextTemplateText="Show next template"
 			/>
 		);
 		expect(
 			findByTestAttr(container, 'component-showPreviousTemplateButton')!
-				.textContent
-		).toBe('Show previous');
+				.getAttribute('aria-label')
+		).toBe('Show previous template');
 		expect(
 			findByTestAttr(container, 'component-showNextTemplateButton')!
-				.textContent
+				.getAttribute('aria-label')
 		).toBe('Show next template');
 	});
 
@@ -108,7 +106,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 		);
 		expect(
 			findByTestAttr(container, 'component-showPreviousTemplateButton')
-		).toBeDisabled();
+		).toHaveAttribute('aria-disabled', 'true');
 	});
 
 	test('next button is disabled when on last template', () => {
@@ -122,10 +120,10 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 		);
 		expect(
 			findByTestAttr(container, 'component-showNextTemplateButton')
-		).toBeDisabled();
+		).toHaveAttribute('aria-disabled', 'true');
 	});
 
-	test('left arrow keydown calls onSelectTemplate with previous id', () => {
+	test('ArrowLeft keydown calls onSelectTemplate with previous id', () => {
 		render(
 			<TemplateHeaderNavigation
 				templates={templates}
@@ -134,11 +132,11 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				onSelectTemplate={onSelectTemplate}
 			/>
 		);
-		fireEvent.keyDown(window, { keyCode: 37 });
+		fireEvent.keyDown(window, { key: 'ArrowLeft' });
 		expect(onSelectTemplate).toHaveBeenCalledWith('blank-slate');
 	});
 
-	test('right arrow keydown calls onSelectTemplate with next id', () => {
+	test('ArrowRight keydown calls onSelectTemplate with next id', () => {
 		render(
 			<TemplateHeaderNavigation
 				templates={templates}
@@ -147,7 +145,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 				onSelectTemplate={onSelectTemplate}
 			/>
 		);
-		fireEvent.keyDown(window, { keyCode: 39 });
+		fireEvent.keyDown(window, { key: 'ArrowRight' });
 		expect(onSelectTemplate).toHaveBeenCalledWith('rubix');
 	});
 
@@ -163,8 +161,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 		);
 		expect(addEventListenerSpy).toHaveBeenCalledWith(
 			'keydown',
-			expect.any(Function),
-			false
+			expect.any(Function)
 		);
 	});
 
@@ -184,8 +181,7 @@ describe('Template - TemplateHeaderNavigation.js', () => {
 		unmount();
 		expect(removeEventListenerSpy).toHaveBeenCalledWith(
 			'keydown',
-			expect.any(Function),
-			false
+			expect.any(Function)
 		);
 	});
 });

@@ -1,10 +1,10 @@
 /* Dependencies */
 import { useState, lazy, Suspense, createRoot } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
 /* Store */
 import { TEMPLATE_STORE_NAME, templateStore } from '../store/templateStore';
-/* Components */
-import TemplateButton from '../components/Template/TemplateButton';
 
 const TemplateList = lazy(() => import('../components/Template/TemplateList'));
 const TemplateSingle = lazy(
@@ -34,7 +34,19 @@ const TemplateApp = () => {
 
 	return (
 		<>
-			<TemplateButton onOpen={() => setIsOpen(true)} />
+			<Button
+				data-test="component-templateButton"
+				variant="secondary"
+				onClick={(e: Event) => {
+					/* Parent Gravity Forms row has a click listener we don't want to fire */
+					e.stopPropagation();
+					setIsOpen(true);
+				}}
+				aria-label={__('Manage PDF Templates', 'gravity-pdf')}
+				__next40pxDefaultSize={true}
+			>
+				{__('Manage', 'gravity-pdf')}
+			</Button>
 			{isOpen && (
 				<Suspense fallback={<div />}>
 					{activeTemplateId ? (

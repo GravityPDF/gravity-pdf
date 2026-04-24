@@ -1,7 +1,8 @@
 /* Dependencies */
 import { useRef, useEffect } from '@wordpress/element';
 import type { MouseEvent } from 'react';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
@@ -21,22 +22,9 @@ import { TemplateItem } from '../../types';
 interface Props {
 	onSelectTemplate: (id: string) => void;
 	template?: TemplateItem;
-	callbackFunction?: (e: MouseEvent<HTMLButtonElement>) => void;
-	buttonText?: string;
-	templateConfirmDeleteText?: string;
-	templateDeleteErrorText?: string;
-	ajaxUrl?: string;
-	ajaxNonce?: string;
 }
 
-const TemplateDeleteButton = ({
-	onSelectTemplate,
-	template,
-	callbackFunction,
-	buttonText,
-	templateConfirmDeleteText,
-	templateDeleteErrorText,
-}: Props) => {
+const TemplateDeleteButton = ({ onSelectTemplate, template }: Props) => {
 	const {
 		addTemplate,
 		deleteTemplate,
@@ -67,7 +55,7 @@ const TemplateDeleteButton = ({
 		if (getTemplateProcessing === 'failed') {
 			addTemplate({
 				...template,
-				error: templateDeleteErrorText,
+				error: __('Could not delete template.', 'gravity-pdf'),
 			} as TemplateItem);
 			onSelectTemplate('');
 			clearTemplateProcessing();
@@ -78,14 +66,22 @@ const TemplateDeleteButton = ({
 		addTemplate,
 		clearTemplateProcessing,
 		template,
-		templateDeleteErrorText,
 	]);
 
 	const handleDeleteTemplate = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		if (window.confirm(templateConfirmDeleteText)) {
+		const confirmMessage = sprintf(
+			/* translators: %s is replaced with a double newline */
+			__(
+				"Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.",
+				'gravity-pdf'
+			),
+			'\n\n'
+		);
+
+		if (window.confirm(confirmMessage)) {
 			if (template?.id) {
 				templateProcessing(template.id);
 				deleteTemplate(template.id);
@@ -93,18 +89,17 @@ const TemplateDeleteButton = ({
 		}
 	};
 
-	const handleClick = callbackFunction || handleDeleteTemplate;
-
 	return (
-		<button
+		<Button
 			data-test="component-templateDeleteButton"
-			type="button"
-			onClick={handleClick}
-			className="button button-secondary delete-theme ed_button"
-			aria-label={buttonText + ' ' + __('Template', 'gravity-pdf')}
+			variant="secondary"
+			isDestructive
+			onClick={handleDeleteTemplate}
+			aria-label={__('Delete Template', 'gravity-pdf')}
+			__next40pxDefaultSize={true}
 		>
-			{buttonText}
-		</button>
+			{__('Delete', 'gravity-pdf')}
+		</Button>
 	);
 };
 

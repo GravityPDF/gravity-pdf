@@ -1,5 +1,6 @@
 /* Dependencies */
 import { useState, useRef, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { DropZone } from '@wordpress/components';
 /* Components */
 import ShowMessage from '../ShowMessage';
@@ -26,27 +27,7 @@ interface UploadErrorResponse {
 	message?: string;
 }
 
-interface Props {
-	genericUploadErrorText?: string;
-	addTemplateText?: string;
-	filenameErrorText?: string;
-	filesizeErrorText?: string;
-	installSuccessText?: string;
-	installUpdatedText?: string;
-	templateSuccessfullyInstalledUpdated?: string;
-	templateInstallInstructions?: string;
-}
-
-const TemplateUploader = ({
-	genericUploadErrorText,
-	addTemplateText,
-	filenameErrorText,
-	filesizeErrorText,
-	installSuccessText,
-	installUpdatedText,
-	templateSuccessfullyInstalledUpdated,
-	templateInstallInstructions,
-}: Props) => {
+const TemplateUploader = () => {
 	const {
 		addTemplate,
 		updateTemplateParam,
@@ -93,23 +74,37 @@ const TemplateUploader = ({
 					addTemplate({
 						...template,
 						new: true,
-						message: installSuccessText,
+						message: __(
+							'Template successfully installed',
+							'gravity-pdf'
+						),
 					});
 				} else {
 					updateTemplateParam(
 						template.id,
 						'message',
-						installUpdatedText ?? null
+						__('Template successfully updated', 'gravity-pdf')
 					);
 				}
 			});
 			setAjax(false);
-			setMessage(templateSuccessfullyInstalledUpdated ?? '');
+			setMessage(
+				__(
+					'PDF Template(s) Successfully Installed / Updated',
+					'gravity-pdf'
+				)
+			);
 			clearTemplateUploadProcessing();
 		};
 
 		const ajaxFailed = (err: UploadErrorResponse) => {
-			setError(err?.message || genericUploadErrorText || '');
+			setError(
+				err?.message ||
+					__(
+						'There was a problem with the upload. Reload the page and try again.',
+						'gravity-pdf'
+					)
+			);
 			setAjax(false);
 			clearTemplateUploadProcessing();
 		};
@@ -133,10 +128,6 @@ const TemplateUploader = ({
 		templateUploadProcessingSuccess,
 		templateUploadProcessingError,
 		templates,
-		installSuccessText,
-		installUpdatedText,
-		genericUploadErrorText,
-		templateSuccessfullyInstalledUpdated,
 		addTemplate,
 		updateTemplateParam,
 		clearTemplateUploadProcessing,
@@ -144,7 +135,12 @@ const TemplateUploader = ({
 
 	const checkFilename = (name: string) => {
 		if (name.substr(name.length - 4) !== '.zip') {
-			setError(filenameErrorText ?? '');
+			setError(
+				__(
+					'Upload is not a valid template. Upload a .zip file.',
+					'gravity-pdf'
+				)
+			);
 			return false;
 		}
 		return true;
@@ -152,7 +148,7 @@ const TemplateUploader = ({
 
 	const checkFilesize = (size: number) => {
 		if (size / 1024 > 10240) {
-			setError(filesizeErrorText ?? '');
+			setError(__('Upload exceeds the 10MB limit.', 'gravity-pdf'));
 			return false;
 		}
 		return true;
@@ -240,13 +236,18 @@ const TemplateUploader = ({
 						/>
 					) : null}
 
-					<h2 className="theme-name">{addTemplateText}</h2>
+					<h2 className="theme-name">
+						{__('Add New Template', 'gravity-pdf')}
+					</h2>
 				</a>
 				<div
 					className="gfpdf-template-install-instructions"
 					id="gfpdf-template-install-instructions"
 				>
-					{templateInstallInstructions}
+					{__(
+						'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).',
+						'gravity-pdf'
+					)}
 				</div>
 			</div>
 		</div>

@@ -4,8 +4,6 @@ import type { KeyboardEvent } from 'react';
 /* Components */
 import TemplateScreenshot from './TemplateScreenshot';
 import ShowMessage from '../ShowMessage';
-import { TemplateDetails, Group } from './TemplateListItemComponents';
-import { Name } from './TemplateSingleComponents';
 import TemplateActivateButton from './TemplateActivateButton';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -26,17 +24,9 @@ interface Props {
 	onSelectTemplate: (id: string) => void;
 	onClose: () => void;
 	template: TemplateItem;
-	activateText?: string;
-	templateDetailsText?: string;
 }
 
-const TemplateListItem = ({
-	onSelectTemplate,
-	onClose,
-	template,
-	activateText,
-	templateDetailsText,
-}: Props) => {
+const TemplateListItem = ({ onSelectTemplate, onClose, template }: Props) => {
 	const { updateTemplateParam } = useDispatch(TEMPLATE_STORE_NAME);
 	const activeTemplate = useSelect(
 		(select) => select(templateStore).getActiveTemplate(),
@@ -99,16 +89,24 @@ const TemplateListItem = ({
 				/>
 			) : null}
 
-			<TemplateDetails label={templateDetailsText} />
-			<Group group={template?.group} />
-			<Name name={template?.template} />
+			<span
+				data-test="component-templateDetails"
+				className="more-details"
+			>
+				{__('Template Details', 'gravity-pdf')}
+			</span>
+			<p data-test="component-group" className="theme-author">
+				{template?.group}
+			</p>
+			<h2 data-test="component-name" className="theme-name">
+				{template?.template}
+			</h2>
 
 			<div className="theme-actions">
 				{!isActiveTemplate && isCompatible ? (
 					<TemplateActivateButton
 						onClose={onClose}
 						template={template}
-						buttonText={activateText}
 					/>
 				) : null}
 			</div>

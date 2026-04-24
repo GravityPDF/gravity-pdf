@@ -1,6 +1,7 @@
 /* Dependencies */
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 /* Store */
 import { useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME } from '../../store/templateStore';
@@ -20,10 +21,9 @@ import { TemplateItem } from '../../types';
 interface Props {
 	onClose: () => void;
 	template?: TemplateItem;
-	buttonText?: string;
 }
 
-const TemplateActivateButton = ({ onClose, template, buttonText }: Props) => {
+const TemplateActivateButton = ({ onClose, template }: Props) => {
 	const { selectTemplate } = useDispatch(TEMPLATE_STORE_NAME);
 
 	const handleSelectTemplate = (e: MouseEvent<HTMLButtonElement>) => {
@@ -37,15 +37,15 @@ const TemplateActivateButton = ({ onClose, template, buttonText }: Props) => {
 	};
 
 	return (
-		<button
+		<Button
 			data-test="component-templateActivateButton"
-			type="button"
+			variant="primary"
 			onClick={handleSelectTemplate}
-			className="button activate"
-			aria-label={buttonText + ' ' + __('Template', 'gravity-pdf')}
+			aria-label={__('Select Template', 'gravity-pdf')}
+			__next40pxDefaultSize={true}
 		>
-			{buttonText}
-		</button>
+			{__('Select', 'gravity-pdf')}
+		</Button>
 	);
 };
 

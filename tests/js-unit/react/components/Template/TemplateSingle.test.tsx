@@ -30,10 +30,18 @@ jest.mock(
 );
 
 jest.mock(
-	'../../../../../src/assets/js/react/components/Template/TemplateScreenshots',
+	'../../../../../src/assets/js/react/components/Template/TemplateScreenshot',
 	() =>
-		function TemplateScreenshots() {
-			return <div data-test="component-templateScreenshots" />;
+		function TemplateScreenshot({ wrapped }: { wrapped?: boolean }) {
+			return (
+				<div
+					data-test={
+						wrapped
+							? 'component-templateScreenshots'
+							: 'component-templateScreenshot'
+					}
+				/>
+			);
 		}
 );
 

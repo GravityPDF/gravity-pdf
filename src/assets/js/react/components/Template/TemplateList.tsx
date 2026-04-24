@@ -41,55 +41,16 @@ const TemplateList = ({ onSelectTemplate, onClose }: Props) => {
 		>
 			<TemplateSearch />
 			<div role="listbox">
-				{templates?.map((value, index) => {
-					return (
-						<TemplateListItem
-							key={index}
-							onSelectTemplate={onSelectTemplate}
-							onClose={onClose}
-							template={value}
-							templateDetailsText={__(
-								'Template Details',
-								'gravity-pdf'
-							)}
-							activateText={__('Select', 'gravity-pdf')}
-						/>
-					);
-				})}
-
-				{hasUserPrivs && (
-					<TemplateUploader
-						addTemplateText={__('Add New Template', 'gravity-pdf')}
-						genericUploadErrorText={__(
-							'There was a problem with the upload. Reload the page and try again.',
-							'gravity-pdf'
-						)}
-						filenameErrorText={__(
-							'Upload is not a valid template. Upload a .zip file.',
-							'gravity-pdf'
-						)}
-						filesizeErrorText={__(
-							'Upload exceeds the 10MB limit.',
-							'gravity-pdf'
-						)}
-						installSuccessText={__(
-							'Template successfully installed',
-							'gravity-pdf'
-						)}
-						installUpdatedText={__(
-							'Template successfully updated',
-							'gravity-pdf'
-						)}
-						templateSuccessfullyInstalledUpdated={__(
-							'PDF Template(s) Successfully Installed / Updated',
-							'gravity-pdf'
-						)}
-						templateInstallInstructions={__(
-							'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).',
-							'gravity-pdf'
-						)}
+				{templates?.map((value, index) => (
+					<TemplateListItem
+						key={index}
+						onSelectTemplate={onSelectTemplate}
+						onClose={onClose}
+						template={value}
 					/>
-				)}
+				))}
+
+				{hasUserPrivs && <TemplateUploader />}
 			</div>
 		</TemplateContainer>
 	);

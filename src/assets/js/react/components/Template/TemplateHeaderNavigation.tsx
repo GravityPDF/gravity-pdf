@@ -1,6 +1,9 @@
 /* Dependencies */
-import { useRef, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import type { MouseEvent } from 'react';
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 /* Types */
 import { TemplateItem } from '../../types';
 
@@ -19,8 +22,6 @@ interface Props {
 	templateIndex: number;
 	template?: TemplateItem;
 	onSelectTemplate: (id: string) => void;
-	showPreviousTemplateText?: string;
-	showNextTemplateText?: string;
 }
 
 const TemplateHeaderNavigation = ({
@@ -28,53 +29,36 @@ const TemplateHeaderNavigation = ({
 	templateIndex,
 	template,
 	onSelectTemplate,
-	showPreviousTemplateText,
-	showNextTemplateText,
 }: Props) => {
 	const lastIdx = templates.length - 1;
 	const isFirst = templates[0]?.id === template?.id;
 	const isLast = templates[lastIdx]?.id === template?.id;
 
-	/* Ref mirrors for stale-closure-safe keydown handler */
-	const isFirstRef = useRef(isFirst);
-	isFirstRef.current = isFirst;
-	const isLastRef = useRef(isLast);
-	isLastRef.current = isLast;
-	const onSelectTemplateRef = useRef(onSelectTemplate);
-	onSelectTemplateRef.current = onSelectTemplate;
-	const templatesRef = useRef(templates);
-	templatesRef.current = templates;
-	const templateIndexRef = useRef(templateIndex);
-	templateIndexRef.current = templateIndex;
-
 	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
-			if (!isFirstRef.current && e.keyCode === 37) {
+			if (!isFirst && e.key === 'ArrowLeft') {
 				e.preventDefault();
 				e.stopPropagation();
-				const prevId =
-					templatesRef.current[templateIndexRef.current - 1]?.id;
+				const prevId = templates[templateIndex - 1]?.id;
 				if (prevId) {
-					onSelectTemplateRef.current(prevId);
+					onSelectTemplate(prevId);
 				}
 			}
-			if (!isLastRef.current && e.keyCode === 39) {
+			if (!isLast && e.key === 'ArrowRight') {
 				e.preventDefault();
 				e.stopPropagation();
-				const nextId =
-					templatesRef.current[templateIndexRef.current + 1]?.id;
+				const nextId = templates[templateIndex + 1]?.id;
 				if (nextId) {
-					onSelectTemplateRef.current(nextId);
+					onSelectTemplate(nextId);
 				}
 			}
 		};
 
-		window.addEventListener('keydown', handleKeyPress, false);
-
+		window.addEventListener('keydown', handleKeyPress);
 		return () => {
-			window.removeEventListener('keydown', handleKeyPress, false);
+			window.removeEventListener('keydown', handleKeyPress);
 		};
-	}, []);
+	}, [isFirst, isLast, templates, templateIndex, onSelectTemplate]);
 
 	const handlePreviousTemplate = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
@@ -96,36 +80,24 @@ const TemplateHeaderNavigation = ({
 		}
 	};
 
-	const prevClass = isFirst
-		? 'dashicons dashicons-no left disabled'
-		: 'dashicons dashicons-no left';
-	const nextClass = isLast
-		? 'dashicons dashicons-no right disabled'
-		: 'dashicons dashicons-no right';
-
 	return (
 		<span data-test="component-templateHeaderNavigation">
-			<button
+			<Button
 				data-test="component-showPreviousTemplateButton"
+				icon={chevronLeft}
+				label={__('Show previous template', 'gravity-pdf')}
 				onClick={handlePreviousTemplate}
-				className={prevClass}
 				disabled={isFirst}
-			>
-				<span className="screen-reader-text">
-					{showPreviousTemplateText}
-				</span>
-			</button>
-
-			<button
+				accessibleWhenDisabled
+			/>
+			<Button
 				data-test="component-showNextTemplateButton"
+				icon={chevronRight}
+				label={__('Show next template', 'gravity-pdf')}
 				onClick={handleNextTemplate}
-				className={nextClass}
 				disabled={isLast}
-			>
-				<span className="screen-reader-text">
-					{showNextTemplateText}
-				</span>
-			</button>
+				accessibleWhenDisabled
+			/>
 		</span>
 	);
 };

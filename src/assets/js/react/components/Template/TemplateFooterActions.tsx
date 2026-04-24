@@ -20,13 +20,7 @@ interface Props {
 	onSelectTemplate: (id: string) => void;
 	onClose: () => void;
 	isActiveTemplate?: boolean;
-	ajaxUrl?: string;
-	ajaxNonce?: string;
-	activateText?: string;
 	pdfWorkingDirPath?: string;
-	templateDeleteText?: string;
-	templateConfirmDeleteText?: string;
-	templateDeleteErrorText?: string;
 }
 
 const TemplateFooterActions = ({
@@ -34,13 +28,7 @@ const TemplateFooterActions = ({
 	onSelectTemplate,
 	onClose,
 	isActiveTemplate,
-	ajaxUrl,
-	ajaxNonce,
-	activateText,
 	pdfWorkingDirPath,
-	templateDeleteText,
-	templateConfirmDeleteText,
-	templateDeleteErrorText,
 }: Props) => {
 	const notCoreTemplate = (t: TemplateItem) =>
 		String(t.path).indexOf(pdfWorkingDirPath ?? '') !== -1;
@@ -53,22 +41,13 @@ const TemplateFooterActions = ({
 			className="theme-actions"
 		>
 			{!isActiveTemplate && isCompatible ? (
-				<TemplateActivateButton
-					onClose={onClose}
-					template={template}
-					buttonText={activateText}
-				/>
+				<TemplateActivateButton onClose={onClose} template={template} />
 			) : null}
 
 			{!isActiveTemplate && notCoreTemplate(template) ? (
 				<TemplateDeleteButton
 					onSelectTemplate={onSelectTemplate}
 					template={template}
-					ajaxUrl={ajaxUrl}
-					ajaxNonce={ajaxNonce}
-					buttonText={templateDeleteText}
-					templateConfirmDeleteText={templateConfirmDeleteText}
-					templateDeleteErrorText={templateDeleteErrorText}
 				/>
 			) : null}
 		</div>
