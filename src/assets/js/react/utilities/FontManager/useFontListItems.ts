@@ -8,8 +8,6 @@ import {
 	FONT_MANAGER_STORE_NAME,
 	fontManagerStore,
 } from '../../store/fontManagerStore';
-/* Types */
-import type { FontItem } from '../../types';
 
 /**
  * @package     Gravity PDF
@@ -51,13 +49,8 @@ export function useFontListItems({
 
 	const [disableSelectFontName, setDisableSelectFontName] = useState(false);
 	const [deleteId, setDeleteId] = useState('');
-	/* One-shot flag: only move selected font to top once */
+	/* One-shot flag: only move selected font to top once per mount */
 	const moveSelectedFontToTopRef = useRef(true);
-
-	/* Track previous values so we can react to delete-loading completion */
-	const prevLoadingRef = useRef(loading);
-	const prevFontListRef = useRef<FontItem[]>(fontList);
-	const prevSelectedFontRef = useRef(selectedFont);
 
 	/* componentDidMount: disable select fields + optionally move selected font to top */
 	useEffect(() => {
@@ -95,40 +88,35 @@ export function useFontListItems({
 		}
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-	/* Reset deleteId + close the detail panel when the delete-loading flag flips off */
+	/* Reset deleteId whenever the delete-loading flag flips off */
 	useEffect(() => {
-		const prevLoading = prevLoadingRef.current;
-		const prevFontList = prevFontListRef.current;
-		prevLoadingRef.current = loading;
-		prevFontListRef.current = fontList;
-
-		if (prevLoading !== loading && !loading) {
+		if (!loading) {
 			setDeleteId('');
 		}
+	}, [loading]);
 
-		if (
-			prevLoading !== loading &&
-			prevFontList !== fontList &&
-			hasDetailOpen
-		) {
-			onSelectFont('');
-		}
-	}, [loading, fontList, onSelectFont, hasDetailOpen]);
-
-	/* Move selected font to top when it first becomes non-empty */
+	/* If the detail panel is open and the font list just changed after a delete
+	   request completed, close the detail panel — the deleted font is gone. */
 	useEffect(() => {
-		const prevSelectedFont = prevSelectedFontRef.current;
-		prevSelectedFontRef.current = selectedFont;
-
-		if (
-			prevSelectedFont === '' &&
-			selectedFont &&
-			!activeFontId &&
-			moveSelectedFontToTopRef.current
-		) {
-			moveSelectedFontToTopRef.current = false;
-			moveSelectedFontToTop(selectedFont);
+		if (loading || !hasDetailOpen) {
+			return;
 		}
+		onSelectFont('');
+		/* Intentional: only fire when fontList changes. Including loading /
+		   hasDetailOpen would re-trigger on irrelevant state flips. */
+	}, [fontList]); // eslint-disable-line react-hooks/exhaustive-deps
+
+	/* Move selected font to top the first time it becomes non-empty */
+	useEffect(() => {
+		if (
+			!selectedFont ||
+			activeFontId ||
+			!moveSelectedFontToTopRef.current
+		) {
+			return;
+		}
+		moveSelectedFontToTopRef.current = false;
+		moveSelectedFontToTop(selectedFont);
 	}, [selectedFont, activeFontId, moveSelectedFontToTop]);
 
 	const handleFontClick = (fontId: string) => {
