@@ -1,8 +1,20 @@
 /* Dependencies */
-import { useState, createRoot } from '@wordpress/element';
+import { useState, useEffect, useRef, createRoot } from '@wordpress/element';
+import type { KeyboardEvent, MouseEvent } from 'react';
+import { Button, Modal } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+/* Store */
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../store/fontManagerStore';
 /* Components */
-import AdvancedButton from '../components/FontManager/AdvancedButton';
-import FontManager from '../components/FontManager/FontManager';
+import FontManagerBody from '../components/FontManager/FontManagerBody';
+/* Utilities */
+import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
+/* Types */
+import type { FontItem } from '../types';
 
 /**
  * @package			Gravity PDF
@@ -18,20 +30,96 @@ const FontManagerApp = () => {
 	);
 	const [activeFontId, setActiveFontId] = useState('');
 
-	const handleClose = () => {
+	const { clearAddFontMsg } = useDispatch(FONT_MANAGER_STORE_NAME);
+	const fontList = useSelect(
+		(select) => select(fontManagerStore).getFontList(),
+		[]
+	);
+	const selectedFont = useSelect(
+		(select) => select(fontManagerStore).getSelectedFont(),
+		[]
+	);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
+
+	/* Mirror latest values in refs so the close-side-effect reads current data */
+	const fontListRef = useRef<FontItem[]>(fontList);
+	fontListRef.current = fontList;
+	const selectedFontRef = useRef(selectedFont);
+	selectedFontRef.current = selectedFont;
+
+	/* On Modal close (isOpen true -> false): sync the selected font back to the
+	   associated <select>. Skipped on the Tools tab where there is no select. */
+	const prevIsOpenRef = useRef(isOpen);
+	useEffect(() => {
+		const wasOpen = prevIsOpenRef.current;
+		prevIsOpenRef.current = isOpen;
+		if (!(wasOpen && !isOpen)) {
+			return;
+		}
+		const tabLocation = window.location.search.substring(
+			window.location.search.lastIndexOf('=') + 1
+		);
+		if (tabLocation === 'tools') {
+			return;
+		}
+		associatedFontManagerSelectBox(
+			fontListRef.current,
+			selectedFontRef.current
+		);
+	}, [isOpen]);
+
+	const handleCloseModal = () => {
 		setIsOpen(false);
 		setActiveFontId('');
 	};
 
+	/* Escape closes the detail panel (not the modal) when one is open */
+	const handleKeyDown = (e: KeyboardEvent) => {
+		if (e.key !== 'Escape' || !activeFontId) {
+			return;
+		}
+		e.stopPropagation();
+		setActiveFontId('');
+		if (msg.success?.addFont || msg.error?.addFont) {
+			clearAddFontMsg();
+		}
+	};
+
 	return (
 		<>
-			<AdvancedButton onOpen={() => setIsOpen(true)} />
+			<Button
+				data-test="component-AdvancedButton"
+				variant="secondary"
+				onClick={(e: MouseEvent<HTMLButtonElement>) => {
+					e.stopPropagation();
+					setIsOpen(true);
+				}}
+				aria-label={__('Manage Fonts', 'gravity-pdf')}
+				__next40pxDefaultSize={true}
+			>
+				{__('Manage', 'gravity-pdf')}
+			</Button>
+
 			{isOpen && (
-				<FontManager
-					activeFontId={activeFontId}
-					onSelectFont={setActiveFontId}
-					onClose={handleClose}
-				/>
+				<Modal
+					title={__('Font Manager', 'gravity-pdf')}
+					onRequestClose={handleCloseModal}
+					className="gfpdf-font-manager-modal"
+					size="fill"
+					shouldCloseOnEsc={!activeFontId}
+				>
+					{/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+					<div
+						data-test="component-FontManager"
+						className="font-manager"
+						onKeyDown={handleKeyDown}
+					>
+						<FontManagerBody
+							activeFontId={activeFontId}
+							onSelectFont={setActiveFontId}
+						/>
+					</div>
+				</Modal>
 			)}
 		</>
 	);

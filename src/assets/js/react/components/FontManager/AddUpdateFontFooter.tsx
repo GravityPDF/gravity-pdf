@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 /* Components */
 import Spinner from '../Spinner';
-import TemplateTooltip from './TemplateTooltip';
+import FontUsageSnippet from './FontUsageSnippet';
 /* Store */
 import {
 	FONT_MANAGER_STORE_NAME,
@@ -22,9 +22,8 @@ import { FontManagerMsg } from '../../types';
  */
 
 interface Props {
-	state?: string;
 	id?: string;
-	type?: string;
+	type: 'add' | 'update';
 	disabled?: boolean;
 	onHandleCancelEditFont?: () => void;
 	onHandleCancelEditFontKeypress?: (e: KeyboardEvent) => void;
@@ -34,7 +33,6 @@ interface Props {
 }
 
 const AddUpdateFontFooter = ({
-	state,
 	id,
 	type,
 	disabled,
@@ -86,11 +84,10 @@ const AddUpdateFontFooter = ({
 	};
 
 	const { success, error } = msg;
-	const cancelButton = document.querySelector('.footer button.cancel');
 	const errorFontList = error && error.fontList;
 	const successAddFont = success && success.addFont;
 	const showSuccessAddFont =
-		(successAddFont && errorFontList) || (successAddFont && !state);
+		(successAddFont && errorFontList) || (successAddFont && type === 'add');
 	const errorAddFont = error && error.addFont;
 	const errorFontValidation = errorAddFont && error?.fontValidationError;
 	const selectedBoxStyle =
@@ -99,10 +96,7 @@ const AddUpdateFontFooter = ({
 	const displayGenericErrorMessage = errorAddFont && !errorFontValidation;
 
 	return (
-		<footer
-			data-test="component-AddFontFooter"
-			className={'footer' + (cancelButton ? ' cancel' : '')}
-		>
+		<footer data-test="component-AddFontFooter" className="footer">
 			<div className="buttons-icons-container">
 				<div>
 					{type === 'update' && (
@@ -193,7 +187,7 @@ const AddUpdateFontFooter = ({
 				</span>
 			)}
 
-			{id && <TemplateTooltip id={id} />}
+			{id && <FontUsageSnippet id={id} />}
 		</footer>
 	);
 };

@@ -6,6 +6,9 @@ import { __ } from '@wordpress/i18n';
 import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
 
 /**
+ * Expandable snippet explaining how to reference a custom font from a PDF
+ * template. Rendered inside the Font Manager update footer.
+ *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -16,7 +19,7 @@ interface Props {
 	id?: string;
 }
 
-const TemplateTooltip = ({ id }: Props) => {
+const FontUsageSnippet = ({ id }: Props) => {
 	const [tooltip, setTooltip] = useState(false);
 
 	const handleDisplayInfo = () => {
@@ -43,7 +46,7 @@ const TemplateTooltip = ({ id }: Props) => {
 
 	return (
 		<div
-			data-test="component-TemplateTooltip"
+			data-test="component-FontUsageSnippet"
 			className="msg template-usage-link"
 		>
 			{tooltip ? (
@@ -92,4 +95,4 @@ const TemplateTooltip = ({ id }: Props) => {
 	);
 };
 
-export default TemplateTooltip;
+export default FontUsageSnippet;

@@ -10,8 +10,7 @@ import {
 import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
 import FontList from './FontList';
-import AddFont from './AddFont';
-import UpdateFont from './UpdateFont';
+import FontForm from './FontForm';
 import initialState, {
 	AddUpdateFontState,
 	FontStyles,
@@ -370,7 +369,8 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 			</div>
 
 			<div className="add-update-font-column container">
-				<AddFont
+				<FontForm
+					mode="add"
 					onHandleInputChange={handleInputChange}
 					onHandleUpload={handleUpload}
 					onHandleDeleteFontStyle={handleDeleteFontStyle}
@@ -383,7 +383,8 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 					{...addFontState}
 				/>
 
-				<UpdateFont
+				<FontForm
+					mode="update"
 					isOpen={detailOpen}
 					onHandleInputChange={handleInputChange}
 					onHandleUpload={handleUpload}

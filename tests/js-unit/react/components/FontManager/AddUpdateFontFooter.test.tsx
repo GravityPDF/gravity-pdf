@@ -28,6 +28,7 @@ describe('FontManager - AddFontFooter.js', () => {
 		msg: defaultMsg,
 		loading: true,
 		tabIndex: '148',
+		type: 'add' as const,
 	};
 
 	describe('RENDERS COMPONENT', () => {

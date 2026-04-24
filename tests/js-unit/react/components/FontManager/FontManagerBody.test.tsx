@@ -23,42 +23,35 @@ jest.mock(
 );
 
 jest.mock(
-	'../../../../../src/assets/js/react/components/FontManager/AddFont',
+	'../../../../../src/assets/js/react/components/FontManager/FontForm',
 	() =>
-		function AddFont({ onHandleSubmit }: { onHandleSubmit: jest.Mock }) {
-			return (
-				<form data-test="component-AddFont" onSubmit={onHandleSubmit}>
-					<button type="submit">Submit</button>
-				</form>
-			);
-		}
-);
-
-jest.mock(
-	'../../../../../src/assets/js/react/components/FontManager/UpdateFont',
-	() =>
-		function UpdateFont({
+		function FontForm({
+			mode,
 			onHandleSubmit,
 			onHandleCancelEditFont,
 			onHandleCancelEditFontKeypress,
 		}: {
+			mode: 'add' | 'update';
 			onHandleSubmit: jest.Mock;
-			onHandleCancelEditFont: jest.Mock;
-			onHandleCancelEditFontKeypress: jest.Mock;
+			onHandleCancelEditFont?: jest.Mock;
+			onHandleCancelEditFontKeypress?: jest.Mock;
 		}) {
+			const testId =
+				mode === 'update'
+					? 'component-UpdateFont'
+					: 'component-AddFont';
 			return (
-				<form
-					data-test="component-UpdateFont"
-					onSubmit={onHandleSubmit}
-				>
-					<button
-						type="button"
-						data-test="cancel-button"
-						onClick={onHandleCancelEditFont}
-						onKeyDown={onHandleCancelEditFontKeypress}
-					>
-						Cancel
-					</button>
+				<form data-test={testId} onSubmit={onHandleSubmit}>
+					{mode === 'update' && (
+						<button
+							type="button"
+							data-test="cancel-button"
+							onClick={onHandleCancelEditFont}
+							onKeyDown={onHandleCancelEditFontKeypress}
+						>
+							Cancel
+						</button>
+					)}
 					<button type="submit">Submit</button>
 				</form>
 			);

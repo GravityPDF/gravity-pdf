@@ -1,18 +1,18 @@
 import { render, fireEvent } from '@testing-library/react';
 import { findByTestAttr } from '../../testUtilsRTL';
-import TemplateTooltip from '../../../../../src/assets/js/react/components/FontManager/TemplateTooltip';
+import FontUsageSnippet from '../../../../../src/assets/js/react/components/FontManager/FontUsageSnippet';
 
-describe('FontManager - TemplateTooltip.js', () => {
+describe('FontManager - FontUsageSnippet.js', () => {
 	describe('RENDERS COMPONENT', () => {
-		test('render <TemplateTooltip /> component', () => {
-			const { container } = render(<TemplateTooltip id="gotham" />);
+		test('render <FontUsageSnippet /> component', () => {
+			const { container } = render(<FontUsageSnippet id="gotham" />);
 			expect(
-				findByTestAttr(container, 'component-TemplateTooltip')
+				findByTestAttr(container, 'component-FontUsageSnippet')
 			).toBeInTheDocument();
 		});
 
 		test('renders arrow-right icon when tooltip is closed, arrow-down and textarea when open', () => {
-			const { container } = render(<TemplateTooltip />);
+			const { container } = render(<FontUsageSnippet />);
 
 			expect(
 				container.querySelector('.dashicons-arrow-right-alt2')
@@ -39,7 +39,7 @@ describe('FontManager - TemplateTooltip.js', () => {
 
 	describe('RUN COMPONENT METHODS', () => {
 		test('handleContentHighlight() - focuses, selects, and copies textarea content', () => {
-			const { container } = render(<TemplateTooltip id="gotham" />);
+			const { container } = render(<FontUsageSnippet id="gotham" />);
 
 			fireEvent.click(container.querySelector('button')!);
 

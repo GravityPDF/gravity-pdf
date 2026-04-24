@@ -1,5 +1,5 @@
 /* Dependencies */
-import type { ChangeEvent, MouseEvent, FormEvent } from 'react';
+import type { ChangeEvent, MouseEvent, KeyboardEvent, FormEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 /* Components */
 import FontVariant from './FontVariant';
@@ -9,14 +9,21 @@ import { FontManagerMsg } from '../../types';
 import { FontStyles } from './InitialAddUpdateState';
 
 /**
+ * Unified Add/Update font form.
+ *
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
 
+type Mode = 'add' | 'update';
+
 interface Props {
+	mode: Mode;
+	id?: string;
 	label: string;
+	isOpen?: boolean;
 	onHandleInputChange: (
 		e: ChangeEvent<HTMLInputElement>,
 		state: 'addFont' | 'updateFont'
@@ -27,10 +34,13 @@ interface Props {
 		key: string,
 		state: string
 	) => void;
+	onHandleCancelEditFont?: () => void;
+	onHandleCancelEditFontKeypress?: (e: KeyboardEvent) => void;
 	onHandleSubmit: (e: FormEvent<HTMLFormElement>) => void;
 	fontStyles: FontStyles;
 	validateLabel: boolean;
 	validateRegular: boolean;
+	disableUpdateButton?: boolean;
 	msg: FontManagerMsg;
 	loading: boolean;
 	tabIndexFontName: number;
@@ -38,35 +48,60 @@ interface Props {
 	tabIndexFooterButtons: number;
 }
 
-export const AddFont = ({
+const FontForm = ({
+	mode,
+	id,
 	label,
+	isOpen,
 	onHandleInputChange,
 	onHandleUpload,
 	onHandleDeleteFontStyle,
+	onHandleCancelEditFont,
+	onHandleCancelEditFontKeypress,
 	onHandleSubmit,
 	fontStyles,
 	validateLabel,
 	validateRegular,
+	disableUpdateButton,
 	msg,
 	loading,
 	tabIndexFontName,
 	tabIndexFontFiles,
 	tabIndexFooterButtons,
 }: Props) => {
-	return (
-		<div data-test="component-AddFont" className="add-font">
-			<form onSubmit={onHandleSubmit}>
-				<h2>{__('Add Font', 'gravity-pdf')}</h2>
+	const isUpdate = mode === 'update';
+	const state: 'addFont' | 'updateFont' = isUpdate ? 'updateFont' : 'addFont';
+	const idSuffix = mode;
 
-				<p>
-					{__(
-						'Install new fonts for use in your PDF documents.',
-						'gravity-pdf'
-					)}
-				</p>
+	const heading = isUpdate
+		? __('Update Font', 'gravity-pdf')
+		: __('Add Font', 'gravity-pdf');
+	const description = isUpdate
+		? __(
+				'Once saved, PDFs configured to use this font will have your changes applied automatically for newly-generated documents.',
+				'gravity-pdf'
+			)
+		: __('Install new fonts for use in your PDF documents.', 'gravity-pdf');
+
+	const wrapperClass = isUpdate
+		? 'update-font' + (isOpen ? ' show' : '')
+		: 'add-font';
+
+	return (
+		<div
+			data-test={isUpdate ? 'component-UpdateFont' : 'component-AddFont'}
+			className={wrapperClass}
+		>
+			<form
+				name={isUpdate ? 'component-PDF-UpdateFont' : undefined}
+				onSubmit={onHandleSubmit}
+			>
+				<h2>{heading}</h2>
+
+				<p>{description}</p>
 
 				<label
-					htmlFor="gfpdf-add-font-name-input"
+					htmlFor={`gfpdf-${idSuffix}-font-name-input`}
 					aria-label={__('Font Name', 'gravity-pdf')}
 				>
 					{__('Font Name', 'gravity-pdf')}{' '}
@@ -75,7 +110,7 @@ export const AddFont = ({
 					</span>
 				</label>
 
-				<p id="gfpdf-font-name-desc-add">
+				<p id={`gfpdf-font-name-desc-${idSuffix}`}>
 					{__(
 						'The font name can only contain letters, numbers and spaces.',
 						'gravity-pdf'
@@ -84,15 +119,15 @@ export const AddFont = ({
 
 				<input
 					type="text"
-					id="gfpdf-add-font-name-input"
+					id={`gfpdf-${idSuffix}-font-name-input`}
 					className={
 						!validateLabel ? 'input-label-validation-error' : ''
 					}
-					aria-describedby="gfpdf-font-name-desc-add"
+					aria-describedby={`gfpdf-font-name-desc-${idSuffix}`}
 					name="label"
 					value={label}
 					maxLength={60}
-					onChange={(e) => onHandleInputChange(e, 'addFont')}
+					onChange={(e) => onHandleInputChange(e, state)}
 					tabIndex={tabIndexFontName}
 				/>
 
@@ -108,12 +143,13 @@ export const AddFont = ({
 						</span>
 					)}
 				</div>
+
 				{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-				<label id="gfpdf-font-files-label-add">
+				<label id={`gfpdf-font-files-label-${idSuffix}`}>
 					{__('Font Files', 'gravity-pdf')}
 				</label>
 
-				<p id="gfpdf-font-files-description-add">
+				<p id={`gfpdf-font-files-description-${idSuffix}`}>
 					{__(
 						'Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.',
 						'gravity-pdf'
@@ -121,7 +157,7 @@ export const AddFont = ({
 				</p>
 
 				<FontVariant
-					state="addFont"
+					state={state}
 					fontStyles={fontStyles}
 					validateRegular={validateRegular}
 					onHandleUpload={onHandleUpload}
@@ -130,16 +166,30 @@ export const AddFont = ({
 					tabIndex={tabIndexFontFiles}
 				/>
 
-				<AddUpdateFontFooter
-					type="add"
-					state="addFont"
-					msg={msg}
-					loading={loading}
-					tabIndex={tabIndexFooterButtons}
-				/>
+				{isUpdate ? (
+					<AddUpdateFontFooter
+						type="update"
+						id={id}
+						disabled={disableUpdateButton}
+						onHandleCancelEditFont={onHandleCancelEditFont}
+						onHandleCancelEditFontKeypress={
+							onHandleCancelEditFontKeypress
+						}
+						msg={msg}
+						loading={loading}
+						tabIndex={tabIndexFooterButtons}
+					/>
+				) : (
+					<AddUpdateFontFooter
+						type="add"
+						msg={msg}
+						loading={loading}
+						tabIndex={tabIndexFooterButtons}
+					/>
+				)}
 			</form>
 		</div>
 	);
 };
 
-export default AddFont;
+export default FontForm;
