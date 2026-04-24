@@ -156,11 +156,9 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 		e.preventDefault();
 
 		if (msg.error && msg.error.addFont) {
-			const forValue = `gfpdf-font-variant-${key}`;
-			const dropZone = document.querySelector(`div[for=${forValue}]`);
-			if (dropZone) {
-				dropZone.classList.remove('error');
-			}
+			/* clearDropzoneError removes this variant's key from msg.error.addFont
+			   in the store, which causes FontVariant to re-render without the
+			   `error` class on the next render cycle. */
 			clearDropzoneError(key);
 		}
 
