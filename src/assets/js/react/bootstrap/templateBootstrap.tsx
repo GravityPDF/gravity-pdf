@@ -1,11 +1,5 @@
 /* Dependencies */
-import {
-	useState,
-	lazy,
-	Suspense,
-	createRoot,
-	createPortal,
-} from '@wordpress/element';
+import { useState, lazy, Suspense, createRoot } from '@wordpress/element';
 import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
 /* Store */
 import { TEMPLATE_STORE_NAME, templateStore } from '../store/templateStore';
@@ -26,20 +20,12 @@ const TemplateSingle = lazy(
  * @since       4.1
  */
 
-interface AppProps {
-	buttonContainer: Element;
-}
-
-const TemplateApp = ({ buttonContainer }: AppProps) => {
+const TemplateApp = () => {
 	/* Auto-open when navigated here from WP backend via hash URL */
 	const [isOpen, setIsOpen] = useState(() =>
 		window.location.hash.startsWith('#/template')
 	);
 	const [activeTemplateId, setActiveTemplateId] = useState('');
-
-	const handleOpen = () => {
-		setIsOpen(true);
-	};
 
 	const handleClose = () => {
 		setIsOpen(false);
@@ -48,10 +34,7 @@ const TemplateApp = ({ buttonContainer }: AppProps) => {
 
 	return (
 		<>
-			{createPortal(
-				<TemplateButton onOpen={handleOpen} />,
-				buttonContainer
-			)}
+			<TemplateButton onOpen={() => setIsOpen(true)} />
 			{isOpen && (
 				<Suspense fallback={<div />}>
 					{activeTemplateId ? (
@@ -79,16 +62,8 @@ const TemplateApp = ({ buttonContainer }: AppProps) => {
  * @since 4.1
  */
 export function templateBootstrap(templateField: HTMLSelectElement): void {
-	createTemplateMarkup(templateField);
-
-	const buttonContainer = document.getElementById(
-		'gpdf-advance-template-selector'
-	)!;
-	const overlayContainer = document.getElementById('gfpdf-overlay')!;
-
-	createRoot(overlayContainer).render(
-		<TemplateApp buttonContainer={buttonContainer} />
-	);
+	const mountPoint = createTemplateMarkup(templateField);
+	createRoot(mountPoint).render(<TemplateApp />);
 
 	/*
 	 * Listen for @wordpress/data store updates and do DOM updates
@@ -98,25 +73,25 @@ export function templateBootstrap(templateField: HTMLSelectElement): void {
 }
 
 /**
- * Dynamically add the required markup to attach our React components to.
+ * Wrap the template <select> in a flex container and append a <span> mount
+ * point for the React root.
  *
  * @param templateField
  * @since 4.1
  */
-export function createTemplateMarkup(templateField: HTMLSelectElement): void {
+export function createTemplateMarkup(
+	templateField: HTMLSelectElement
+): HTMLSpanElement {
 	const wrapper = document.createElement('div');
 	wrapper.id = 'gfpdf-settings-field-wrapper-template-container';
 	templateField.parentNode!.insertBefore(wrapper, templateField);
 	wrapper.appendChild(templateField);
 
-	const selectorSpan = document.createElement('span');
-	selectorSpan.id = 'gpdf-advance-template-selector';
-	wrapper.appendChild(selectorSpan);
+	const mountPoint = document.createElement('span');
+	mountPoint.id = 'gpdf-advance-template-selector';
+	wrapper.appendChild(mountPoint);
 
-	const overlayDiv = document.createElement('div');
-	overlayDiv.id = 'gfpdf-overlay';
-	overlayDiv.className = 'theme-overlay';
-	wrapper.appendChild(overlayDiv);
+	return mountPoint;
 }
 
 /**

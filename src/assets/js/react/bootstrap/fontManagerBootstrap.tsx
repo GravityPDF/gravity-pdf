@@ -1,5 +1,5 @@
 /* Dependencies */
-import { useState, createRoot, createPortal } from '@wordpress/element';
+import { useState, createRoot } from '@wordpress/element';
 /* Components */
 import AdvancedButton from '../components/FontManager/AdvancedButton';
 import FontManager from '../components/FontManager/FontManager';
@@ -11,20 +11,12 @@ import FontManager from '../components/FontManager/FontManager';
  * @since       6.0
  */
 
-interface AppProps {
-	buttonContainer: Element;
-}
-
-const FontManagerApp = ({ buttonContainer }: AppProps) => {
+const FontManagerApp = () => {
 	/* Auto-open when navigated here from WP backend via hash URL */
 	const [isOpen, setIsOpen] = useState(() =>
 		window.location.hash.startsWith('#/fontmanager')
 	);
 	const [activeFontId, setActiveFontId] = useState('');
-
-	const handleOpen = () => {
-		setIsOpen(true);
-	};
 
 	const handleClose = () => {
 		setIsOpen(false);
@@ -33,10 +25,7 @@ const FontManagerApp = ({ buttonContainer }: AppProps) => {
 
 	return (
 		<>
-			{createPortal(
-				<AdvancedButton onOpen={handleOpen} />,
-				buttonContainer
-			)}
+			<AdvancedButton onOpen={() => setIsOpen(true)} />
 			{isOpen && (
 				<FontManager
 					activeFontId={activeFontId}
@@ -49,50 +38,39 @@ const FontManagerApp = ({ buttonContainer }: AppProps) => {
 };
 
 /**
- * Mount the font manager button and overlay as a single React root.
+ * Mount the font manager on a single React root adjacent to the field.
  *
  * @param defaultFontField
  * @since 6.0
  */
 export function fontManagerBootstrap(defaultFontField: Element): void {
-	createAdvancedButtonWrapper(defaultFontField);
-
-	const buttonContainer = document.querySelector(
-		'#gpdf-advance-font-manager-selector'
-	)!;
-	const overlayContainer = document.querySelector('#font-manager-overlay')!;
-
-	createRoot(overlayContainer).render(
-		<FontManagerApp buttonContainer={buttonContainer} />
-	);
+	const mountPoint = createAdvancedButtonWrapper(defaultFontField);
+	createRoot(mountPoint).render(<FontManagerApp />);
 }
 
 /**
- * Create html element wrapper for our font manager advanced button
+ * Wrap a <select> field in a flex container (for inline select + button
+ * layout) and append a <span> mount point for the React root. For non-select
+ * anchors (e.g. the Tools tab wrapper), append the mount point directly.
  *
  * @param defaultFontField
  * @since 6.0
  */
-export function createAdvancedButtonWrapper(defaultFontField: Element): void {
-	const fontWrapper = document.createElement('span');
-	fontWrapper.setAttribute('id', 'gpdf-advance-font-manager-selector');
-
-	const popupWrapper = document.createElement('div');
-	popupWrapper.setAttribute('id', 'font-manager-overlay');
-	popupWrapper.setAttribute('class', 'theme-overlay');
+export function createAdvancedButtonWrapper(
+	defaultFontField: Element
+): HTMLSpanElement {
+	const mountPoint = document.createElement('span');
+	mountPoint.id = 'gpdf-advance-font-manager-selector';
 
 	if (defaultFontField.nodeName === 'SELECT') {
 		const wrapper = document.createElement('div');
-		wrapper.setAttribute(
-			'id',
-			'gfpdf-settings-field-wrapper-font-container'
-		);
-		wrapper.innerHTML = (defaultFontField as HTMLElement).outerHTML;
-		wrapper.appendChild(fontWrapper);
-		wrapper.appendChild(popupWrapper);
-		(defaultFontField as HTMLElement).outerHTML = wrapper.outerHTML;
+		wrapper.id = 'gfpdf-settings-field-wrapper-font-container';
+		defaultFontField.parentNode!.insertBefore(wrapper, defaultFontField);
+		wrapper.appendChild(defaultFontField);
+		wrapper.appendChild(mountPoint);
 	} else {
-		defaultFontField.appendChild(fontWrapper);
-		defaultFontField.appendChild(popupWrapper);
+		defaultFontField.appendChild(mountPoint);
 	}
+
+	return mountPoint;
 }
