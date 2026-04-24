@@ -3,7 +3,7 @@ import { useState, lazy, Suspense, createRoot } from '@wordpress/element';
 import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { subscribe, select, dispatch as wpDispatch } from '@wordpress/data';
+import { subscribe, select, dispatch } from '@wordpress/data';
 /* Store */
 import { TEMPLATE_STORE_NAME, templateStore } from '../store/templateStore';
 
@@ -143,7 +143,7 @@ export function activeTemplateStoreListener(
 			TEMPLATE_STORE_NAME
 		).getActiveTemplate() as string;
 		if (templateField.value !== activeTemplate) {
-			void wpDispatch(templateStore).selectTemplate(templateField.value);
+			void dispatch(templateStore).selectTemplate(templateField.value);
 		}
 	});
 
@@ -175,7 +175,7 @@ export function templateChangeStoreListener(
 
 		if (list.length !== prevListLength) {
 			prevListLength = list.length;
-			void wpDispatch(templateStore).updateSelectBox();
+			void dispatch(templateStore).updateSelectBox();
 		}
 
 		if (updateSelectBoxText && updateSelectBoxText !== prevSelectBoxText) {
