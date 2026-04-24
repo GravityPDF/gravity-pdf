@@ -114,6 +114,17 @@ test.describe('Template Manager', () => {
 			page.locator('p.theme-author', { hasText: 'Custom' })
 		).toBeAttached();
 
+		// Prev/Next navigation chevrons — guards against the previous
+		// dashicons-no regression
+		await expect(
+			templateManager.getByRole('button', {
+				name: 'Show previous template',
+			})
+		).toBeVisible();
+		await expect(
+			templateManager.getByRole('button', { name: 'Show next template' })
+		).toBeVisible();
+
 		// Delete
 		await page.getByRole('button', { name: 'Delete Template' }).click();
 		await page
