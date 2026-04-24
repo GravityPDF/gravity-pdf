@@ -9,6 +9,22 @@ Object.defineProperty(global, 'TextEncoder', {
 	value: util.TextEncoder,
 });
 
+/* Stub window.matchMedia because @wordpress/components Modal (used by
+   ConfirmDialog) queries it on mount, and jsdom doesn't provide it. */
+Object.defineProperty(window, 'matchMedia', {
+	writable: true,
+	value: jest.fn().mockImplementation((query: string) => ({
+		matches: false,
+		media: query,
+		onchange: null,
+		addListener: jest.fn(),
+		removeListener: jest.fn(),
+		addEventListener: jest.fn(),
+		removeEventListener: jest.fn(),
+		dispatchEvent: jest.fn(),
+	})),
+});
+
 /* Provide a no-op fetch so generator actions don't crash when jsdom
    doesn't include a native fetch implementation. Individual tests that
    need specific API responses should mock their API modules directly. */

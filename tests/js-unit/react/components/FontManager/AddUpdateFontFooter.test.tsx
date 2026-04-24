@@ -190,8 +190,14 @@ describe('FontManager - AddFontFooter.js', () => {
 			);
 		});
 
-		test('handleDeleteFont() - dispatches deleteFont when confirmed', () => {
-			global.confirm = () => true;
+		const findDialogButton = (text: string) =>
+			Array.from(
+				document.body.querySelectorAll<HTMLButtonElement>(
+					'.components-modal__frame button'
+				)
+			).find((b) => b.textContent === text);
+
+		test('delete flow - dispatches deleteFont when ConfirmDialog OK clicked', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
@@ -202,14 +208,14 @@ describe('FontManager - AddFontFooter.js', () => {
 			);
 
 			fireEvent.click(container.querySelector('button.dashicons-trash')!);
+			fireEvent.click(findDialogButton('OK')!);
 
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'DELETE_FONT' })
 			);
 		});
 
-		test('handleDeleteFont() - does not dispatch deleteFont when not confirmed', () => {
-			global.confirm = () => false;
+		test('delete flow - does not dispatch deleteFont when Cancel clicked', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
@@ -220,14 +226,14 @@ describe('FontManager - AddFontFooter.js', () => {
 			);
 
 			fireEvent.click(container.querySelector('button.dashicons-trash')!);
+			fireEvent.click(findDialogButton('Cancel')!);
 
 			expect(dispatchSpy).not.toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'DELETE_FONT' })
 			);
 		});
 
-		test('handleDeleteFontKeypress() - dispatches deleteFont on Enter when confirmed', () => {
-			global.confirm = () => true;
+		test('delete flow - Enter on trash opens ConfirmDialog, OK dispatches', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
@@ -239,18 +245,16 @@ describe('FontManager - AddFontFooter.js', () => {
 
 			fireEvent.keyDown(
 				container.querySelector('button.dashicons-trash')!,
-				{
-					key: 'Enter',
-				}
+				{ key: 'Enter' }
 			);
+			fireEvent.click(findDialogButton('OK')!);
 
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'DELETE_FONT' })
 			);
 		});
 
-		test('handleDeleteFontKeypress() - does not dispatch deleteFont on non-Enter key', () => {
-			global.confirm = () => false;
+		test('delete flow - non-Enter key on trash does not open ConfirmDialog', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
@@ -262,11 +266,10 @@ describe('FontManager - AddFontFooter.js', () => {
 
 			fireEvent.keyDown(
 				container.querySelector('button.dashicons-trash')!,
-				{
-					key: 'Tab',
-				}
+				{ key: 'Tab' }
 			);
 
+			expect(findDialogButton('OK')).toBeUndefined();
 			expect(dispatchSpy).not.toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'DELETE_FONT' })
 			);

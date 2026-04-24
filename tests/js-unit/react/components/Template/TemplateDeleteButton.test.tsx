@@ -60,7 +60,14 @@ describe('Template - TemplateDeleteButton.js', () => {
 		expect(container.querySelector('button')!.textContent).toBe('Delete');
 	});
 
-	test('button click with confirm=true dispatches TEMPLATE_PROCESSING and DELETE_TEMPLATE', () => {
+	const findDialogButton = (text: string) =>
+		Array.from(
+			document.body.querySelectorAll<HTMLButtonElement>(
+				'.components-modal__frame button'
+			)
+		).find((b) => b.textContent === text);
+
+	test('delete flow - OK in ConfirmDialog dispatches TEMPLATE_PROCESSING and DELETE_TEMPLATE', () => {
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		const { container } = renderWithStore(
@@ -76,8 +83,8 @@ describe('Template - TemplateDeleteButton.js', () => {
 		fireEvent.click(
 			findByTestAttr(container, 'component-templateDeleteButton')!
 		);
+		fireEvent.click(findDialogButton('OK')!);
 
-		expect(window.confirm).toHaveBeenCalled();
 		expect(dispatchSpy).toHaveBeenCalledWith(
 			expect.objectContaining({ type: 'TEMPLATE_PROCESSING' })
 		);
@@ -86,8 +93,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 		);
 	});
 
-	test('button click with confirm=false does not dispatch', () => {
-		window.confirm = jest.fn(() => false);
+	test('delete flow - Cancel in ConfirmDialog does not dispatch', () => {
 		const store = createTestStore(initialState);
 		const dispatchSpy = jest.spyOn(store, 'dispatch');
 		const { container } = renderWithStore(
@@ -103,6 +109,7 @@ describe('Template - TemplateDeleteButton.js', () => {
 		fireEvent.click(
 			findByTestAttr(container, 'component-templateDeleteButton')!
 		);
+		fireEvent.click(findDialogButton('Cancel')!);
 
 		expect(dispatchSpy).not.toHaveBeenCalled();
 	});

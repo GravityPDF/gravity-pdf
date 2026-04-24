@@ -1,7 +1,6 @@
 /* Dependencies */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import type { KeyboardEvent, MouseEvent, ChangeEvent } from 'react';
-import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 /* Store */
 import {
@@ -49,6 +48,7 @@ export function useFontListItems({
 
 	const [disableSelectFontName, setDisableSelectFontName] = useState(false);
 	const [deleteId, setDeleteId] = useState('');
+	const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 	/* One-shot flag: only move selected font to top once per mount */
 	const moveSelectedFontToTopRef = useRef(true);
 
@@ -140,24 +140,26 @@ export function useFontListItems({
 		}
 	};
 
-	const handleDeleteFont = (e: MouseEvent, fontId: string) => {
+	const requestDeleteFont = (e: MouseEvent, fontId: string) => {
 		e.stopPropagation();
-		setDeleteId(fontId);
-
-		if (
-			window.confirm(
-				__('Are you sure you want to delete this font?', 'gravity-pdf')
-			)
-		) {
-			deleteFont(fontId);
-		}
+		setPendingDeleteId(fontId);
 	};
 
-	const handleDeleteFontKeypress = (e: KeyboardEvent, fontId: string) => {
+	const requestDeleteFontKeypress = (e: KeyboardEvent, fontId: string) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			handleDeleteFont(e as unknown as MouseEvent, fontId);
+			requestDeleteFont(e as unknown as MouseEvent, fontId);
 		}
 	};
+
+	const confirmDeleteFont = () => {
+		if (pendingDeleteId) {
+			setDeleteId(pendingDeleteId);
+			deleteFont(pendingDeleteId);
+		}
+		setPendingDeleteId(null);
+	};
+
+	const cancelDeleteFont = () => setPendingDeleteId(null);
 
 	const handleSelectFont = (e: ChangeEvent<HTMLInputElement>) => {
 		selectFont(e.target.value);
@@ -178,10 +180,13 @@ export function useFontListItems({
 		selectedFont,
 		disableSelectFontName,
 		deleteId,
+		pendingDeleteId,
 		handleFontClick,
 		handleFontClickKeypress,
-		handleDeleteFont,
-		handleDeleteFontKeypress,
+		requestDeleteFont,
+		requestDeleteFontKeypress,
+		confirmDeleteFont,
+		cancelDeleteFont,
 		handleSelectFont,
 		handleSelectFontKeypress,
 	};

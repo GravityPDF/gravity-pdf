@@ -109,11 +109,17 @@ describe('FontManager - FontListItems.js', () => {
 				store
 			);
 
-			/* Simulate delete to set deleteId */
-			global.confirm = () => true;
+			/* Trigger the delete flow: click trash -> ConfirmDialog opens,
+			   click OK -> deleteId is set and deleteFont dispatched. */
 			fireEvent.click(container.querySelector('.dashicons-trash')!);
+			const okButton = Array.from(
+				document.body.querySelectorAll<HTMLButtonElement>(
+					'.components-modal__frame button'
+				)
+			).find((b) => b.textContent === 'OK')!;
+			fireEvent.click(okButton);
 
-			/* Finish loading — spinner should be showing now */
+			/* DELETE_FONT_SUCCESS flips deleteFontLoading off, which clears deleteId */
 			act(() => {
 				store.dispatch({
 					type: 'DELETE_FONT_SUCCESS',
@@ -202,8 +208,7 @@ describe('FontManager - FontListItems.js', () => {
 			expect(onSelectFont).toHaveBeenCalledWith(sampleFont.id);
 		});
 
-		test('handleDeleteFont() - dispatches deleteFont when confirmed', () => {
-			global.confirm = () => true;
+		test('handleDeleteFont() - dispatches deleteFont when ConfirmDialog OK clicked', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
@@ -215,13 +220,19 @@ describe('FontManager - FontListItems.js', () => {
 
 			fireEvent.click(container.querySelector('.dashicons-trash')!);
 
+			const okButton = Array.from(
+				document.body.querySelectorAll<HTMLButtonElement>(
+					'.components-modal__frame button'
+				)
+			).find((b) => b.textContent === 'OK')!;
+			fireEvent.click(okButton);
+
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'DELETE_FONT' })
 			);
 		});
 
-		test('handleDeleteFontKeypress() - dispatches deleteFont on Enter key when confirmed', () => {
-			global.confirm = () => true;
+		test('handleDeleteFontKeypress() - dispatches deleteFont on Enter when OK clicked', () => {
 			const store = createTestStore(initialState);
 			const dispatchSpy = jest.spyOn(store, 'dispatch');
 			const { container } = renderWithStore(
@@ -235,6 +246,13 @@ describe('FontManager - FontListItems.js', () => {
 				key: 'Enter',
 				stopPropagation: jest.fn(),
 			});
+
+			const okButton = Array.from(
+				document.body.querySelectorAll<HTMLButtonElement>(
+					'.components-modal__frame button'
+				)
+			).find((b) => b.textContent === 'OK')!;
+			fireEvent.click(okButton);
 
 			expect(dispatchSpy).toHaveBeenCalledWith(
 				expect.objectContaining({ type: 'DELETE_FONT' })

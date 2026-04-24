@@ -115,8 +115,11 @@ test.describe('Template Manager', () => {
 		).toBeAttached();
 
 		// Delete
-		page.on('dialog', (dialog) => dialog.accept());
 		await page.getByRole('button', { name: 'Delete Template' }).click();
+		await page
+			.locator('.components-modal__frame')
+			.getByRole('button', { name: 'OK' })
+			.click();
 
 		await expect(
 			page.locator('.theme[data-slug="test-template"]')

@@ -1,5 +1,7 @@
 /* Dependencies */
 import { __ } from '@wordpress/i18n';
+// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 /* Components */
 import FontListIcon from './FontListIcon';
 import Spinner from '../Spinner';
@@ -31,10 +33,13 @@ const FontListItems = ({
 		selectedFont,
 		disableSelectFontName,
 		deleteId,
+		pendingDeleteId,
 		handleFontClick,
 		handleFontClickKeypress,
-		handleDeleteFont,
-		handleDeleteFontKeypress,
+		requestDeleteFont,
+		requestDeleteFontKeypress,
+		confirmDeleteFont,
+		cancelDeleteFont,
 		handleSelectFont,
 		handleSelectFontKeypress,
 	} = useFontListItems({ activeFontId, onSelectFont, hasDetailOpen });
@@ -99,15 +104,26 @@ const FontListItems = ({
 							<span
 								role="button"
 								className="dashicons dashicons-trash"
-								onClick={(e) => handleDeleteFont(e, font.id)}
+								onClick={(e) => requestDeleteFont(e, font.id)}
 								onKeyDown={(e) =>
-									handleDeleteFontKeypress(e, font.id)
+									requestDeleteFontKeypress(e, font.id)
 								}
 								tabIndex={tabIndex}
 							/>
 						)}
 					</div>
 				))}
+
+			<ConfirmDialog
+				isOpen={pendingDeleteId !== null}
+				onConfirm={confirmDeleteFont}
+				onCancel={cancelDeleteFont}
+			>
+				{__(
+					'Are you sure you want to delete this font?',
+					'gravity-pdf'
+				)}
+			</ConfirmDialog>
 		</div>
 	);
 };

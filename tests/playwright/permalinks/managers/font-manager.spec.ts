@@ -41,9 +41,12 @@ test.describe(() => {
 
 		const fontItemsCount = await fontItems.count();
 
-		page.on('dialog', (dialog) => dialog.accept());
 		for (let i = fontItemsCount - 1; i >= 0; i--) {
 			await fontItems.nth(i).click();
+			await page
+				.locator('.components-modal__frame')
+				.getByRole('button', { name: 'OK' })
+				.click();
 		}
 	}
 
@@ -189,8 +192,11 @@ test.describe(() => {
 		await expect(page.getByText('Roboto 2')).toBeVisible();
 
 		// Delete Font
-		page.on('dialog', (dialog) => dialog.accept());
 		await page.getByRole('button', { name: 'Delete font' }).click();
+		await page
+			.locator('.components-modal__frame')
+			.getByRole('button', { name: 'OK' })
+			.click();
 		await expect(page.getByText('Font list empty.')).toBeVisible({
 			timeout: 10000,
 		});

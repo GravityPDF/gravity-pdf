@@ -1,8 +1,10 @@
 /* Dependencies */
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, useState } from '@wordpress/element';
 import type { KeyboardEvent } from 'react';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 /* Components */
 import Spinner from '../Spinner';
 import FontUsageSnippet from './FontUsageSnippet';
@@ -48,6 +50,8 @@ const AddUpdateFontFooter = ({
 		[]
 	);
 
+	const [confirmingDelete, setConfirmingDelete] = useState(false);
+
 	const handleSelectFont = (fontId: string) => {
 		selectFont(fontId === selectedFont ? '' : fontId);
 	};
@@ -58,30 +62,22 @@ const AddUpdateFontFooter = ({
 		}
 	};
 
-	const handleDeleteFont = (fontId: string) => {
-		if (
-			window.confirm(
-				__('Are you sure you want to delete this font?', 'gravity-pdf')
-			)
-		) {
-			deleteFont(fontId);
+	const requestDeleteFont = () => setConfirmingDelete(true);
+
+	const requestDeleteFontKeypress = (e: KeyboardEvent) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			setConfirmingDelete(true);
 		}
 	};
 
-	const handleDeleteFontKeypress = (e: KeyboardEvent, fontId: string) => {
-		if (e.key === 'Enter' || e.key === ' ') {
-			if (
-				window.confirm(
-					__(
-						'Are you sure you want to delete this font?',
-						'gravity-pdf'
-					)
-				)
-			) {
-				deleteFont(fontId);
-			}
+	const confirmDeleteFont = () => {
+		if (id) {
+			deleteFont(id);
 		}
+		setConfirmingDelete(false);
 	};
+
+	const cancelDeleteFont = () => setConfirmingDelete(false);
 
 	const { success, error } = msg;
 	const errorFontList = error && error.fontList;
@@ -147,8 +143,8 @@ const AddUpdateFontFooter = ({
 					{id && (
 						<button
 							className="dashicons dashicons-trash"
-							onClick={() => handleDeleteFont(id)}
-							onKeyDown={(e) => handleDeleteFontKeypress(e, id)}
+							onClick={requestDeleteFont}
+							onKeyDown={requestDeleteFontKeypress}
 							type="button"
 							tabIndex={tabIndex}
 							aria-label={__('Delete font', 'gravity-pdf')}
@@ -188,6 +184,17 @@ const AddUpdateFontFooter = ({
 			)}
 
 			{id && <FontUsageSnippet id={id} />}
+
+			<ConfirmDialog
+				isOpen={confirmingDelete}
+				onConfirm={confirmDeleteFont}
+				onCancel={cancelDeleteFont}
+			>
+				{__(
+					'Are you sure you want to delete this font?',
+					'gravity-pdf'
+				)}
+			</ConfirmDialog>
 		</footer>
 	);
 };

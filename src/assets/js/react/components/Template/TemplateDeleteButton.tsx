@@ -1,8 +1,12 @@
 /* Dependencies */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import type { MouseEvent } from 'react';
-import { __, sprintf } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import {
+	Button,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 /* Store */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { TEMPLATE_STORE_NAME, templateStore } from '../../store/templateStore';
@@ -36,6 +40,8 @@ const TemplateDeleteButton = ({ onSelectTemplate, template }: Props) => {
 		[]
 	);
 
+	const [confirming, setConfirming] = useState(false);
+
 	/* Track previous value to replicate componentDidUpdate comparisons */
 	const prevGetTemplateProcessingRef = useRef(getTemplateProcessing);
 
@@ -68,38 +74,56 @@ const TemplateDeleteButton = ({ onSelectTemplate, template }: Props) => {
 		template,
 	]);
 
-	const handleDeleteTemplate = (e: MouseEvent<HTMLButtonElement>) => {
+	const requestDelete = (e: MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-
-		const confirmMessage = sprintf(
-			/* translators: %s is replaced with a double newline */
-			__(
-				"Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.",
-				'gravity-pdf'
-			),
-			'\n\n'
-		);
-
-		if (window.confirm(confirmMessage)) {
-			if (template?.id) {
-				templateProcessing(template.id);
-				deleteTemplate(template.id);
-			}
-		}
+		setConfirming(true);
 	};
 
+	const confirmDelete = () => {
+		if (template?.id) {
+			templateProcessing(template.id);
+			deleteTemplate(template.id);
+		}
+		setConfirming(false);
+	};
+
+	const cancelDelete = () => setConfirming(false);
+
 	return (
-		<Button
-			data-test="component-templateDeleteButton"
-			variant="secondary"
-			isDestructive
-			onClick={handleDeleteTemplate}
-			aria-label={__('Delete Template', 'gravity-pdf')}
-			__next40pxDefaultSize={true}
-		>
-			{__('Delete', 'gravity-pdf')}
-		</Button>
+		<>
+			<Button
+				data-test="component-templateDeleteButton"
+				variant="secondary"
+				isDestructive
+				onClick={requestDelete}
+				aria-label={__('Delete Template', 'gravity-pdf')}
+				__next40pxDefaultSize={true}
+			>
+				{__('Delete', 'gravity-pdf')}
+			</Button>
+
+			<ConfirmDialog
+				isOpen={confirming}
+				onConfirm={confirmDelete}
+				onCancel={cancelDelete}
+			>
+				<>
+					<p>
+						{__(
+							'Do you really want to delete this PDF template?',
+							'gravity-pdf'
+						)}
+					</p>
+					<p>
+						{__(
+							"Click 'Cancel' to go back, 'OK' to confirm the delete.",
+							'gravity-pdf'
+						)}
+					</p>
+				</>
+			</ConfirmDialog>
+		</>
 	);
 };
 
