@@ -161,12 +161,6 @@ export function useFontListItems({
 
 	const handleSelectFont = (e: ChangeEvent<HTMLInputElement>) => {
 		selectFont(e.target.value);
-
-		const installedFonts =
-			document.querySelectorAll<HTMLInputElement>('.select-font-name');
-		installedFonts.forEach((item) => {
-			item.checked = item.value === e.target.value;
-		});
 	};
 
 	const handleSelectFontKeypress = (e: KeyboardEvent<HTMLInputElement>) => {
