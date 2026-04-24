@@ -24,13 +24,18 @@ const FontUsageSnippet = ({ id }: Props) => {
 		setTooltip((prev) => !prev);
 	};
 
-	const handleContentHighlight = (
+	const handleContentHighlight = async (
 		e: React.SyntheticEvent<HTMLTextAreaElement>
 	) => {
 		const target = e.currentTarget;
 		target.focus();
 		target.select();
-		document.execCommand('copy');
+		try {
+			await navigator.clipboard.writeText(target.value);
+		} catch {
+			/* Clipboard API unavailable or permission denied — the select + focus
+			   is still useful so the user can manually copy with Cmd/Ctrl+C. */
+		}
 	};
 
 	const textareaValue = `<style>

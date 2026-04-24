@@ -46,13 +46,19 @@ describe('FontManager - FontUsageSnippet.js', () => {
 			const textarea = container.querySelector('textarea')!;
 			const focusMock = jest.spyOn(textarea, 'focus');
 			const selectMock = jest.spyOn(textarea, 'select');
-			document.execCommand = jest.fn();
+			const writeText = jest.fn().mockResolvedValue(undefined);
+			Object.defineProperty(navigator, 'clipboard', {
+				value: { writeText },
+				configurable: true,
+			});
 
 			fireEvent.click(textarea);
 
 			expect(focusMock).toHaveBeenCalledTimes(1);
 			expect(selectMock).toHaveBeenCalledTimes(1);
-			expect(document.execCommand).toHaveBeenCalledWith('copy');
+			expect(writeText).toHaveBeenCalledWith(
+				expect.stringContaining('font-gotham')
+			);
 		});
 	});
 });
