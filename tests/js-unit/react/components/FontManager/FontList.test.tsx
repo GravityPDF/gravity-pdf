@@ -50,14 +50,19 @@ describe('FontManager - FontList.js', () => {
 			);
 		});
 
-		test('render <FontListSkeleton /> when loading', () => {
+		test('render the skeleton placeholder when loading', () => {
 			const { container } = renderWithStore(
 				<FontList {...defaultProps} />,
 				loadingState
 			);
 			expect(
-				findByTestAttr(container, 'component-FontListSkeleton')
+				container.querySelector('.font-list-items-skeleton')
 			).toBeInTheDocument();
+			expect(
+				container.querySelectorAll(
+					'.font-list-items-skeleton .font-list-item'
+				)
+			).toHaveLength(8);
 		});
 
 		test('render <FontListItems /> when not loading', () => {

@@ -4,8 +4,9 @@ import { __ } from '@wordpress/i18n';
 import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */
 import FontListItems from './FontListItems';
-import FontListSkeleton from './FontListSkeleton';
 import FontListAlertMessage from './FontListAlertMessage';
+
+const SKELETON_ROWS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 /**
  * @package     Gravity PDF
@@ -62,7 +63,28 @@ const FontList = ({ activeFontId, onSelectFont, hasDetailOpen }: Props) => {
 			</div>
 
 			{loading ? (
-				<FontListSkeleton />
+				<div className="font-list-items-skeleton">
+					{SKELETON_ROWS.map((row) => (
+						<div key={row} className="font-list-item">
+							<div>
+								<span className="placeholder dashicons dashicons-trash" />
+							</div>
+							<span className="placeholder font-name" />
+							<div>
+								<span className="placeholder dashicons dashicons-yes" />
+							</div>
+							<div>
+								<span className="placeholder dashicons dashicons-no-alt" />
+							</div>
+							<div>
+								<span className="placeholder dashicons dashicons-no-alt" />
+							</div>
+							<div>
+								<span className="placeholder dashicons dashicons-no-alt" />
+							</div>
+						</div>
+					))}
+				</div>
 			) : (
 				<FontListItems
 					activeFontId={activeFontId}
