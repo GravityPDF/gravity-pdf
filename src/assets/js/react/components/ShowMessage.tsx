@@ -37,6 +37,8 @@ const ShowMessage = ({
 
 	const startTimer = () => {
 		clearExistingTimer();
+		/* Auto-dismiss: the component's core feature is to hide itself after
+		   `delay` ms. The setTimeout is intentional and lifecycle-managed. */
 		timerRef.current = setTimeout(() => {
 			setVisible(false);
 			timerRef.current = null;

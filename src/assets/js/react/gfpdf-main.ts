@@ -64,6 +64,8 @@ domReady(() => {
 		helpBootstrap();
 	}
 
+	/* Bootstrap feature detection: these queries locate Gravity-Forms-rendered
+	   settings fields on the page and decide which React feature to mount. */
 	const fmGeneralSettingsTab = document.querySelector(
 		'#gfpdf-settings-field-wrapper-default_font select'
 	);

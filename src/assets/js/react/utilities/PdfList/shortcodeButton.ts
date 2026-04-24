@@ -64,6 +64,7 @@ export default function shortcodeButton(): void {
 					'gform-embed-form__shortcode-trigger--copied'
 				);
 			}
+			/* Show "Copied!" feedback for 3s, then reset the button label */
 			setTimeout(() => this.buttonDefault(), 3000);
 		}
 	}

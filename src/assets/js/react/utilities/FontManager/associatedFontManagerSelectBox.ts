@@ -8,6 +8,10 @@
 import { __ } from '@wordpress/i18n';
 import { FontItem } from '../../types';
 
+/* This function's whole purpose is cross-boundary DOM mutation: it rewrites
+   the native Gravity-Forms-rendered <select>'s "User-Defined Fonts" optgroup
+   so the GF field stays in sync with the React-managed font list. The DOM
+   queries are inherent — the target <select> is not a React-owned element. */
 export function associatedFontManagerSelectBox(
 	fontList: FontItem[],
 	id = ''

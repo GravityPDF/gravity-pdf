@@ -52,7 +52,11 @@ export function useFontListItems({
 	/* One-shot flag: only move selected font to top once per mount */
 	const moveSelectedFontToTopRef = useRef(true);
 
-	/* componentDidMount: disable select fields + optionally move selected font to top */
+	/* componentDidMount: disable select fields + optionally move selected font
+	   to top. The two document.querySelector calls read the current value of the
+	   native Gravity-Forms <select> so the list's initial selection matches what
+	   the form field is already showing. The select is not React-owned, so the
+	   cross-boundary read is inherent. */
 	useEffect(() => {
 		const tabLocation = window.location.search.substr(
 			window.location.search.lastIndexOf('=') + 1
