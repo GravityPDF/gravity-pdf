@@ -16,6 +16,7 @@ module.exports = {
 	output: {
 		...defaultConfig.output,
 		filename: '[name].min.js',
+		chunkFilename: '[name].js?ver=[contenthash]',
 		path: resolve(process.cwd(), 'build/assets'),
 	},
 	externals: {
