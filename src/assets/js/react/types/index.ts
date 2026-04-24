@@ -52,6 +52,20 @@ export interface FontManagerMsg {
 	};
 }
 
+export interface FontFormState {
+	id?: string;
+	label: string;
+	fontStyles: {
+		regular: string | File;
+		italics: string | File;
+		bold: string | File;
+		bolditalics: string | File;
+	};
+	validateLabel: boolean;
+	validateRegular: boolean;
+	disableUpdateButton: boolean;
+}
+
 export interface FontManagerState {
 	loading: boolean;
 	addFontLoading: boolean;
@@ -60,6 +74,8 @@ export interface FontManagerState {
 	searchResult: FontItem[] | null;
 	selectedFont: string;
 	msg: FontManagerMsg;
+	addFont: FontFormState;
+	updateFont: FontFormState;
 }
 
 export interface ConsoleLine {

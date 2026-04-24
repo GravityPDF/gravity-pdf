@@ -162,7 +162,7 @@ test.describe(() => {
 
 		// Cancel button
 		await page.getByRole('button', { name: 'Cancel' }).click();
-		await expect(page.locator('.update-font.show')).not.toBeVisible();
+		await expect(page.locator('.update-font')).not.toBeVisible();
 
 		// Edit Font properly
 		await fontItems.first().click();

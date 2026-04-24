@@ -340,14 +340,21 @@ describe('FontManager - FontManagerBody.js', () => {
 			).toBeInTheDocument();
 		});
 
-		test('render <UpdateFont /> component', () => {
+		test('render <UpdateFont /> component when a font is active', () => {
 			const { container } = renderWithStore(
-				<FontManagerBody {...defaultProps} />,
+				<FontManagerBody
+					activeFontId={sampleFont.id}
+					onSelectFont={jest.fn()}
+				/>,
 				initialState
 			);
 			expect(
 				findByTestAttr(container, 'component-UpdateFont')
 			).toBeInTheDocument();
+			/* Add form is NOT mounted in parallel under the conditional-render model */
+			expect(
+				findByTestAttr(container, 'component-AddFont')
+			).not.toBeInTheDocument();
 		});
 	});
 });

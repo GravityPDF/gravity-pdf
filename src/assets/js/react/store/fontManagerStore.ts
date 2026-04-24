@@ -24,6 +24,10 @@ import {
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
 	MOVE_SELECTED_FONT_TO_TOP,
+	SET_ADD_FONT_STATE,
+	SET_UPDATE_FONT_STATE,
+	RESET_ADD_FONT_STATE,
+	RESET_UPDATE_FONT_STATE,
 	/* Sync action creators yielded inside generators */
 	getCustomFontList as getCustomFontListAction,
 	addFont as addFontSyncAction,
@@ -38,6 +42,10 @@ import {
 	resetSearchResult,
 	selectFont,
 	moveSelectedFontToTop,
+	setAddFontState,
+	setUpdateFontState,
+	resetAddFontState,
+	resetUpdateFontState,
 } from '../actions/fontManager';
 /* APIs */
 import {
@@ -54,7 +62,12 @@ import {
 } from '../utilities/FontManager/fontManagerReducer';
 import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
 /* Types */
-import { FontItem, FontFormData, FontManagerState } from '../types';
+import {
+	FontItem,
+	FontFormData,
+	FontFormState,
+	FontManagerState,
+} from '../types';
 
 type WPRestError = {
 	code?: string;
@@ -100,6 +113,20 @@ function taggedThunk<TArgs extends unknown[]>(
 	};
 }
 
+const defaultFormState: FontFormState = {
+	id: '',
+	label: '',
+	fontStyles: {
+		regular: '',
+		italics: '',
+		bold: '',
+		bolditalics: '',
+	},
+	validateLabel: true,
+	validateRegular: true,
+	disableUpdateButton: false,
+};
+
 export function createFontManagerStore(
 	overrideInitial?: Partial<FontManagerState>
 ) {
@@ -111,6 +138,8 @@ export function createFontManagerStore(
 		searchResult: null,
 		selectedFont: '',
 		msg: {},
+		addFont: defaultFormState,
+		updateFont: defaultFormState,
 	};
 
 	const initial: FontManagerState = { ...defaultInitial, ...overrideInitial };
@@ -443,6 +472,21 @@ export function createFontManagerStore(
 				return { ...state, fontList: [...match, ...rest] };
 			}
 
+			case SET_ADD_FONT_STATE:
+				return { ...state, addFont: action.payload as FontFormState };
+
+			case SET_UPDATE_FONT_STATE:
+				return {
+					...state,
+					updateFont: action.payload as FontFormState,
+				};
+
+			case RESET_ADD_FONT_STATE:
+				return { ...state, addFont: defaultFormState };
+
+			case RESET_UPDATE_FONT_STATE:
+				return { ...state, updateFont: defaultFormState };
+
 			default:
 				return state;
 		}
@@ -460,6 +504,10 @@ export function createFontManagerStore(
 			resetSearchResult,
 			selectFont,
 			moveSelectedFontToTop,
+			setAddFontState,
+			setUpdateFontState,
+			resetAddFontState,
+			resetUpdateFontState,
 
 			/* Thunk action creators (tagged for spy compatibility) */
 			getCustomFontList: taggedThunk(
@@ -709,6 +757,8 @@ export function createFontManagerStore(
 			getSearchResult: (state: FontManagerState) => state.searchResult,
 			getSelectedFont: (state: FontManagerState) => state.selectedFont,
 			getMsg: (state: FontManagerState) => state.msg,
+			getAddFontState: (state: FontManagerState) => state.addFont,
+			getUpdateFontState: (state: FontManagerState) => state.updateFont,
 		},
 	});
 }

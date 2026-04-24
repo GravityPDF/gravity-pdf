@@ -1,5 +1,5 @@
 /* Dependencies */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import type { MouseEvent, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -11,14 +11,10 @@ import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
 import FontList from './FontList';
 import FontForm from './FontForm';
-import initialState, {
-	AddUpdateFontState,
-	FontStyles,
-} from './InitialAddUpdateState';
 /* Utilities */
 import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
 /* Types */
-import { FontItem, FontManagerMsg } from '../../types';
+import { FontFormState } from '../../types';
 
 /**
  * @package     Gravity PDF
@@ -26,6 +22,8 @@ import { FontItem, FontManagerMsg } from '../../types';
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
+
+type FontStyles = FontFormState['fontStyles'];
 
 interface Props {
 	activeFontId: string;
@@ -42,6 +40,10 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 		selectFont,
 		clearDropzoneError,
 		clearAddFontMsg,
+		setAddFontState,
+		setUpdateFontState,
+		resetAddFontState,
+		resetUpdateFontState,
 	} = useDispatch(FONT_MANAGER_STORE_NAME);
 	const loading = useSelect(
 		(select) => select(fontManagerStore).getAddFontLoading(),
@@ -52,88 +54,102 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 		[]
 	);
 	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
-
-	const [addFontState, setAddFontState] =
-		useState<AddUpdateFontState>(initialState);
-	const [updateFontState, setUpdateFontState] =
-		useState<AddUpdateFontState>(initialState);
-
-	/* Track previous props for componentDidUpdate comparisons */
-	const prevIdRef = useRef(activeFontId);
-	const prevFontListRef = useRef<FontItem[]>(fontList);
-	const prevMsgRef = useRef<FontManagerMsg>(msg);
+	const addFontState = useSelect(
+		(select) => select(fontManagerStore).getAddFontState(),
+		[]
+	);
+	const updateFontState = useSelect(
+		(select) => select(fontManagerStore).getUpdateFontState(),
+		[]
+	);
 
 	/* componentDidMount: fetch font list */
 	useEffect(() => {
 		getCustomFontList();
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-	/* componentDidUpdate: react to activeFontId/fontList/msg changes */
+	/* Load (or reload) the selected font's details when the id changes or when
+	   the font list refreshes while an id is active. */
 	useEffect(() => {
-		const prevId = prevIdRef.current;
-		const prevFontList = prevFontListRef.current;
-		const prevMsg = prevMsgRef.current;
-		prevIdRef.current = activeFontId;
-		prevFontListRef.current = fontList;
-		prevMsgRef.current = msg;
-
-		const handleCheckValidId = (list: FontItem[], fontId: string) =>
-			!!(list && list.filter((f) => f.id === fontId)[0]);
-
-		const handleRequestFontDetails = () => {
-			const font = fontList.filter((f) => f.id === activeFontId)[0];
-			setAddFontState(initialState);
-			setUpdateFontState({
-				id: font.id,
-				label: font.font_name,
-				fontStyles: {
-					regular: font.regular,
-					italics: font.italics,
-					bold: font.bold,
-					bolditalics: font.bolditalics,
-				},
-				validateLabel: true,
-				validateRegular: true,
-				disableUpdateButton: true,
-			});
-			setTimeout(() => adjustFontListHeight(), 100);
-		};
-
-		/* If font name is selected, load its details */
-		if (prevId !== activeFontId && activeFontId) {
-			if (!handleCheckValidId(fontList, activeFontId)) {
-				onSelectFont('');
-				return;
-			}
-			handleRequestFontDetails();
+		if (!activeFontId) {
+			return;
 		}
 
-		/* If font list updated while an id is active, reload details */
-		if (prevFontList !== fontList && fontList && activeFontId) {
-			if (!handleCheckValidId(fontList, activeFontId)) {
-				onSelectFont('');
-				return;
-			}
-			handleRequestFontDetails();
+		const font = fontList.find((f) => f.id === activeFontId);
+		if (!font) {
+			onSelectFont('');
+			return;
 		}
 
-		/* If font was successfully installed, auto-select and show update panel */
-		if (prevMsg !== msg && msg.success && !activeFontId) {
-			if (msg.error && msg.error.fontList) {
-				setAddFontState(initialState);
-				setUpdateFontState(initialState);
-				return;
-			}
+		resetAddFontState();
+		setUpdateFontState({
+			id: font.id,
+			label: font.font_name,
+			fontStyles: {
+				regular: font.regular,
+				italics: font.italics,
+				bold: font.bold,
+				bolditalics: font.bolditalics,
+			},
+			validateLabel: true,
+			validateRegular: true,
+			disableUpdateButton: true,
+		});
+		setTimeout(() => adjustFontListHeight(), 100);
+	}, [activeFontId, fontList, onSelectFont]); // eslint-disable-line react-hooks/exhaustive-deps
 
-			/* Auto select new added font (opens update panel via activeFontId) */
-			const newFont = fontList[fontList.length - 1];
-			selectFont(newFont.id);
-			onSelectFont(newFont.id);
+	/* Auto-select a newly-installed font once the server confirms success. */
+	useEffect(() => {
+		if (!msg.success || activeFontId) {
+			return;
 		}
-	}, [activeFontId, fontList, msg, onSelectFont, selectFont]);
 
-	const handleGetCurrentColumnState = (column: string): AddUpdateFontState =>
+		if (msg.error && msg.error.fontList) {
+			resetAddFontState();
+			resetUpdateFontState();
+			return;
+		}
+
+		const newFont = fontList[fontList.length - 1];
+		if (!newFont) {
+			return;
+		}
+		selectFont(newFont.id);
+		onSelectFont(newFont.id);
+		// Intentionally ignores activeFontId/fontList/etc. deps — fire only on msg
+		// changes so list refreshes don't retrigger auto-select.
+	}, [msg]); // eslint-disable-line react-hooks/exhaustive-deps
+
+	const getCurrentColumnState = (column: string): FontFormState =>
 		column === 'addFont' ? addFontState : updateFontState;
+
+	const applyStateForColumn = (
+		column: string,
+		nextState: FontFormState
+	): void => {
+		if (column === 'addFont') {
+			setAddFontState(nextState);
+			return;
+		}
+		/* update column: re-compute the disableUpdateButton flag based on the active font */
+		if (!activeFontId) {
+			setUpdateFontState(nextState);
+			return;
+		}
+		const activeFont = fontList.find((f) => f.id === activeFontId);
+		if (!activeFont) {
+			setUpdateFontState(nextState);
+			return;
+		}
+		const { label, fontStyles } = nextState;
+		const unchanged =
+			activeFont.font_name === label &&
+			activeFont.regular === fontStyles.regular &&
+			activeFont.italics === fontStyles.italics &&
+			activeFont.bold === fontStyles.bold &&
+			activeFont.bolditalics === fontStyles.bolditalics;
+		setUpdateFontState({ ...nextState, disableUpdateButton: unchanged });
+	};
 
 	const handleDeleteFontStyle = (
 		e: MouseEvent,
@@ -151,39 +167,26 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 			clearDropzoneError(key);
 		}
 
-		const currentState = handleGetCurrentColumnState(state);
-		const updatedState: AddUpdateFontState = {
+		const currentState = getCurrentColumnState(state);
+		applyStateForColumn(state, {
 			...currentState,
 			fontStyles: {
 				...currentState.fontStyles,
 				[key]: '',
 			},
 			validateRegular: true,
-		};
-
-		if (state === 'addFont') {
-			setAddFontState(updatedState);
-			handleUpdateFontStateAfterChange(updatedState, state);
-		} else {
-			setUpdateFontState(updatedState);
-			handleUpdateFontStateAfterChange(updatedState, state);
-		}
+		});
 	};
 
 	const handleInputChange = (
 		e: ChangeEvent<HTMLInputElement>,
 		state: 'addFont' | 'updateFont'
 	) => {
-		const currentState = handleGetCurrentColumnState(state);
-		const updatedState = { ...currentState, label: e.target.value };
-
-		if (state === 'addFont') {
-			setAddFontState(updatedState);
-			handleUpdateFontStateAfterChange(updatedState, state);
-		} else {
-			setUpdateFontState(updatedState);
-			handleUpdateFontStateAfterChange(updatedState, state);
-		}
+		const currentState = getCurrentColumnState(state);
+		applyStateForColumn(state, {
+			...currentState,
+			label: e.target.value,
+		});
 	};
 
 	const handleUpload = (fontVariant: string, file: File, state: string) => {
@@ -199,29 +202,21 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 			});
 		}
 
-		const currentState = handleGetCurrentColumnState(state);
-		const updatedState: AddUpdateFontState = {
+		const currentState = getCurrentColumnState(state);
+		applyStateForColumn(state, {
 			...currentState,
 			fontStyles: {
 				...currentState.fontStyles,
 				[fontVariant]: !file ? '' : file,
 			} as FontStyles,
-		};
-
-		if (state === 'addFont') {
-			setAddFontState(updatedState);
-			handleUpdateFontStateAfterChange(updatedState, state);
-		} else {
-			setUpdateFontState(updatedState);
-			handleUpdateFontStateAfterChange(updatedState, state);
-		}
+		});
 	};
 
-	const handleValidateInputFields = (
+	const validateInputFields = (
 		state: string,
 		label: string,
 		regular: string | File,
-		currentUpdateFontState?: AddUpdateFontState
+		currentUpdateFontState?: FontFormState
 	): boolean => {
 		const defaultState =
 			state === 'addFont'
@@ -249,35 +244,10 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 		return false;
 	};
 
-	const handleUpdateFontStateAfterChange = (
-		newState: AddUpdateFontState,
-		state: string
-	) => {
-		if (state === 'updateFont' && activeFontId) {
-			const activeFont = fontList.filter((f) => f.id === activeFontId)[0];
-			if (!activeFont) {
-				return;
-			}
-
-			const { label, fontStyles } = newState;
-			const unchanged =
-				activeFont.font_name === label &&
-				activeFont.regular === fontStyles.regular &&
-				activeFont.italics === fontStyles.italics &&
-				activeFont.bold === fontStyles.bold &&
-				activeFont.bolditalics === fontStyles.bolditalics;
-
-			setUpdateFontState({
-				...newState,
-				disableUpdateButton: unchanged,
-			});
-		}
-	};
-
 	const handleAddFont = () => {
 		const { label, fontStyles } = addFontState;
 
-		if (!handleValidateInputFields('addFont', label, fontStyles.regular)) {
+		if (!validateInputFields('addFont', label, fontStyles.regular)) {
 			return;
 		}
 
@@ -289,7 +259,7 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 		const data: Partial<FontStyles> = {};
 
 		if (
-			!handleValidateInputFields(
+			!validateInputFields(
 				'updateFont',
 				label,
 				fontStyles.regular,
@@ -305,7 +275,10 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 			}
 		});
 
-		const currentFont = fontList.filter((f) => f.id === fontId)[0];
+		const currentFont = fontList.find((f) => f.id === fontId);
+		if (!currentFont) {
+			return;
+		}
 		const currentFontStyles = {
 			regular: currentFont.regular,
 			italics: currentFont.italics,
@@ -369,38 +342,27 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 			</div>
 
 			<div className="add-update-font-column container">
-				<FontForm
-					mode="add"
-					onHandleInputChange={handleInputChange}
-					onHandleUpload={handleUpload}
-					onHandleDeleteFontStyle={handleDeleteFontStyle}
-					onHandleSubmit={handleSubmit}
-					msg={msg}
-					loading={loading}
-					tabIndexFontName={!detailOpen ? 0 : -1}
-					tabIndexFontFiles={!detailOpen ? 0 : -1}
-					tabIndexFooterButtons={!detailOpen ? 0 : -1}
-					{...addFontState}
-				/>
-
-				<FontForm
-					mode="update"
-					isOpen={detailOpen}
-					onHandleInputChange={handleInputChange}
-					onHandleUpload={handleUpload}
-					onHandleDeleteFontStyle={handleDeleteFontStyle}
-					onHandleCancelEditFont={handleCancelEditFont}
-					onHandleCancelEditFontKeypress={
-						handleCancelEditFontKeypress
-					}
-					onHandleSubmit={handleSubmit}
-					msg={msg}
-					loading={loading}
-					tabIndexFontName={detailOpen ? 0 : -1}
-					tabIndexFontFiles={detailOpen ? 0 : -1}
-					tabIndexFooterButtons={detailOpen ? 0 : -1}
-					{...updateFontState}
-				/>
+				{detailOpen ? (
+					<FontForm
+						mode="update"
+						onHandleInputChange={handleInputChange}
+						onHandleUpload={handleUpload}
+						onHandleDeleteFontStyle={handleDeleteFontStyle}
+						onHandleCancelEditFont={handleCancelEditFont}
+						onHandleCancelEditFontKeypress={
+							handleCancelEditFontKeypress
+						}
+						onHandleSubmit={handleSubmit}
+					/>
+				) : (
+					<FontForm
+						mode="add"
+						onHandleInputChange={handleInputChange}
+						onHandleUpload={handleUpload}
+						onHandleDeleteFontStyle={handleDeleteFontStyle}
+						onHandleSubmit={handleSubmit}
+					/>
+				)}
 			</div>
 		</div>
 	);

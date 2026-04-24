@@ -6,10 +6,6 @@
 
         /* Add font */
         .add-update-font-column {
-          .update-font {
-            left: -450px;
-          }
-
           form {
             .footer {
               .buttons-icons-container {
@@ -52,17 +48,4 @@
     }
   }
 
-  .gfpdf-font-manager-modal {
-    .font-manager {
-      #gfpdf-font-manager-container {
-
-        /* Add font */
-        .add-update-font-column {
-          .update-font {
-            left: -590px;
-          }
-        }
-      }
-    }
-  }
 }

@@ -20,6 +20,10 @@ export const RESET_SEARCH_RESULT = 'RESET_SEARCH_RESULT' as const;
 export const SEARCH_FONT_LIST = 'SEARCH_FONT_LIST' as const;
 export const SELECT_FONT = 'SELECT_FONT' as const;
 export const MOVE_SELECTED_FONT_TO_TOP = 'MOVE_SELECTED_FONT_TO_TOP' as const;
+export const SET_ADD_FONT_STATE = 'SET_ADD_FONT_STATE' as const;
+export const SET_UPDATE_FONT_STATE = 'SET_UPDATE_FONT_STATE' as const;
+export const RESET_ADD_FONT_STATE = 'RESET_ADD_FONT_STATE' as const;
+export const RESET_UPDATE_FONT_STATE = 'RESET_UPDATE_FONT_STATE' as const;
 
 /**
  * @package			Gravity PDF
@@ -28,7 +32,7 @@ export const MOVE_SELECTED_FONT_TO_TOP = 'MOVE_SELECTED_FONT_TO_TOP' as const;
  * @since       6.0
  */
 
-import { FontFormData } from '../types';
+import { FontFormData, FontFormState } from '../types';
 
 export const getCustomFontList = () => {
 	return {
@@ -110,5 +114,31 @@ export const moveSelectedFontToTop = (fontId: string) => {
 	return {
 		type: MOVE_SELECTED_FONT_TO_TOP,
 		payload: fontId,
+	};
+};
+
+export const setAddFontState = (state: FontFormState) => {
+	return {
+		type: SET_ADD_FONT_STATE,
+		payload: state,
+	};
+};
+
+export const setUpdateFontState = (state: FontFormState) => {
+	return {
+		type: SET_UPDATE_FONT_STATE,
+		payload: state,
+	};
+};
+
+export const resetAddFontState = () => {
+	return {
+		type: RESET_ADD_FONT_STATE,
+	};
+};
+
+export const resetUpdateFontState = () => {
+	return {
+		type: RESET_UPDATE_FONT_STATE,
 	};
 };

@@ -24,17 +24,6 @@ html[dir="rtl"] .gfpdf-font-manager-modal {
           }
         }
       }
-
-      /* Add font */
-      .add-update-font-column {
-        .update-font {
-          right: -720px;
-
-          &.show {
-            right: 0;
-          }
-        }
-      }
     }
   }
 }

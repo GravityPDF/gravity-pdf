@@ -1,15 +1,15 @@
 /* Dependencies */
 import type { ChangeEvent, MouseEvent, KeyboardEvent, FormEvent } from 'react';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+/* Store */
+import { fontManagerStore } from '../../store/fontManagerStore';
 /* Components */
 import FontVariant from './FontVariant';
 import AddUpdateFontFooter from './AddUpdateFontFooter';
-/* Types */
-import { FontManagerMsg } from '../../types';
-import { FontStyles } from './InitialAddUpdateState';
 
 /**
- * Unified Add/Update font form.
+ * Unified Add/Update font form. Reads its own state from fontManagerStore.
  *
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -21,9 +21,6 @@ type Mode = 'add' | 'update';
 
 interface Props {
 	mode: Mode;
-	id?: string;
-	label: string;
-	isOpen?: boolean;
 	onHandleInputChange: (
 		e: ChangeEvent<HTMLInputElement>,
 		state: 'addFont' | 'updateFont'
@@ -37,41 +34,35 @@ interface Props {
 	onHandleCancelEditFont?: () => void;
 	onHandleCancelEditFontKeypress?: (e: KeyboardEvent) => void;
 	onHandleSubmit: (e: FormEvent<HTMLFormElement>) => void;
-	fontStyles: FontStyles;
-	validateLabel: boolean;
-	validateRegular: boolean;
-	disableUpdateButton?: boolean;
-	msg: FontManagerMsg;
-	loading: boolean;
-	tabIndexFontName: number;
-	tabIndexFontFiles: number;
-	tabIndexFooterButtons: number;
 }
 
 const FontForm = ({
 	mode,
-	id,
-	label,
-	isOpen,
 	onHandleInputChange,
 	onHandleUpload,
 	onHandleDeleteFontStyle,
 	onHandleCancelEditFont,
 	onHandleCancelEditFontKeypress,
 	onHandleSubmit,
-	fontStyles,
-	validateLabel,
-	validateRegular,
-	disableUpdateButton,
-	msg,
-	loading,
-	tabIndexFontName,
-	tabIndexFontFiles,
-	tabIndexFooterButtons,
 }: Props) => {
 	const isUpdate = mode === 'update';
 	const state: 'addFont' | 'updateFont' = isUpdate ? 'updateFont' : 'addFont';
 	const idSuffix = mode;
+
+	const formState = useSelect(
+		(select) =>
+			isUpdate
+				? select(fontManagerStore).getUpdateFontState()
+				: select(fontManagerStore).getAddFontState(),
+		[isUpdate]
+	);
+	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
+	const loading = useSelect(
+		(select) => select(fontManagerStore).getAddFontLoading(),
+		[]
+	);
+
+	const { id, label, fontStyles, validateLabel, validateRegular } = formState;
 
 	const heading = isUpdate
 		? __('Update Font', 'gravity-pdf')
@@ -83,14 +74,10 @@ const FontForm = ({
 			)
 		: __('Install new fonts for use in your PDF documents.', 'gravity-pdf');
 
-	const wrapperClass = isUpdate
-		? 'update-font' + (isOpen ? ' show' : '')
-		: 'add-font';
-
 	return (
 		<div
 			data-test={isUpdate ? 'component-UpdateFont' : 'component-AddFont'}
-			className={wrapperClass}
+			className={isUpdate ? 'update-font' : 'add-font'}
 		>
 			<form
 				name={isUpdate ? 'component-PDF-UpdateFont' : undefined}
@@ -128,7 +115,7 @@ const FontForm = ({
 					value={label}
 					maxLength={60}
 					onChange={(e) => onHandleInputChange(e, state)}
-					tabIndex={tabIndexFontName}
+					tabIndex={0}
 				/>
 
 				<div aria-live="polite">
@@ -163,28 +150,28 @@ const FontForm = ({
 					onHandleUpload={onHandleUpload}
 					onHandleDeleteFontStyle={onHandleDeleteFontStyle}
 					msg={msg}
-					tabIndex={tabIndexFontFiles}
+					tabIndex={0}
 				/>
 
 				{isUpdate ? (
 					<AddUpdateFontFooter
 						type="update"
 						id={id}
-						disabled={disableUpdateButton}
+						disabled={formState.disableUpdateButton}
 						onHandleCancelEditFont={onHandleCancelEditFont}
 						onHandleCancelEditFontKeypress={
 							onHandleCancelEditFontKeypress
 						}
 						msg={msg}
 						loading={loading}
-						tabIndex={tabIndexFooterButtons}
+						tabIndex={0}
 					/>
 				) : (
 					<AddUpdateFontFooter
 						type="add"
 						msg={msg}
 						loading={loading}
-						tabIndex={tabIndexFooterButtons}
+						tabIndex={0}
 					/>
 				)}
 			</form>
