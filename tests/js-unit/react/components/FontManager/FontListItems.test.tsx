@@ -343,14 +343,14 @@ describe('FontManager - FontListItems.js', () => {
 			).toContain('Fira Sans Light');
 		});
 
-		test('render <FontListIcon /> components', () => {
+		test('render four font-variant icons per row', () => {
 			const { container } = renderWithStore(
 				<FontListItems {...defaultProps} />,
 				initialState
 			);
 			expect(
 				container.querySelectorAll(
-					'[data-test="component-FontListIcon"]'
+					'.font-list-item .dashicons-yes, .font-list-item .dashicons-no-alt'
 				)
 			).toHaveLength(4);
 		});

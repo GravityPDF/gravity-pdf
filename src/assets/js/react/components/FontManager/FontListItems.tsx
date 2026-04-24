@@ -3,7 +3,6 @@ import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 /* Components */
-import FontListIcon from './FontListIcon';
 import Spinner from '../Spinner';
 /* Hooks */
 import { useFontListItems } from '../../utilities/FontManager/useFontListItems';
@@ -20,6 +19,12 @@ interface Props {
 	onSelectFont: (id: string) => void;
 	hasDetailOpen: boolean;
 }
+
+const Icon = ({ font }: { font: string }) => (
+	<div>
+		<span className={'dashicons dashicons-' + (font ? 'yes' : 'no-alt')} />
+	</div>
+);
 
 const FontListItems = ({
 	activeFontId,
@@ -93,10 +98,10 @@ const FontListItems = ({
 							{font.font_name}
 						</span>
 
-						<FontListIcon font={font.regular} />
-						<FontListIcon font={font.italics} />
-						<FontListIcon font={font.bold} />
-						<FontListIcon font={font.bolditalics} />
+						<Icon font={font.regular} />
+						<Icon font={font.italics} />
+						<Icon font={font.bold} />
+						<Icon font={font.bolditalics} />
 
 						{loading && deleteId === font.id ? (
 							<Spinner style="delete-font" />
