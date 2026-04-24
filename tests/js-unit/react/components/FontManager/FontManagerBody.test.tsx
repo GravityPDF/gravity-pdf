@@ -66,13 +66,6 @@ jest.mock(
 		}
 );
 
-jest.mock(
-	'../../../../../src/assets/js/react/utilities/FontManager/adjustFontListHeight',
-	() => ({
-		adjustFontListHeight: jest.fn(),
-	})
-);
-
 jest.mock('../../../../../src/assets/js/react/api/fontManager', () => ({
 	apiGetCustomFontList: jest
 		.fn()

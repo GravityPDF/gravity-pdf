@@ -2,8 +2,6 @@
 import * as React from '@wordpress/element';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-/* Utilities */
-import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
 
 /**
  * Expandable snippet explaining how to reference a custom font from a PDF
@@ -24,7 +22,6 @@ const FontUsageSnippet = ({ id }: Props) => {
 
 	const handleDisplayInfo = () => {
 		setTooltip((prev) => !prev);
-		setTimeout(() => adjustFontListHeight(), 100);
 	};
 
 	const handleContentHighlight = (

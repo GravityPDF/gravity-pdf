@@ -11,8 +11,6 @@ import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
 import FontList from './FontList';
 import FontForm from './FontForm';
-/* Utilities */
-import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
 /* Types */
 import { FontFormState } from '../../types';
 
@@ -95,7 +93,6 @@ const FontManagerBody = ({ activeFontId, onSelectFont }: Props) => {
 			validateRegular: true,
 			disableUpdateButton: true,
 		});
-		setTimeout(() => adjustFontListHeight(), 100);
 	}, [activeFontId, fontList, onSelectFont]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* Auto-select a newly-installed font once the server confirms success. */
