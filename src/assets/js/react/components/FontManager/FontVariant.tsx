@@ -1,7 +1,7 @@
 /* Dependencies */
 import * as React from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import Dropzone from 'react-dropzone';
+import { DropZone, FormFileUpload } from '@wordpress/components';
 /* Components */
 import FontVariantLabel from './FontVariantLabel';
 /* Types */
@@ -28,6 +28,8 @@ interface Props {
 	msg: FontManagerMsg;
 	tabIndex: number;
 }
+
+const isTtf = (file: File) => file.name.toLowerCase().endsWith('.ttf');
 
 export const FontVariant = ({
 	state,
@@ -73,71 +75,97 @@ export const FontVariant = ({
 			const dropZoneIcon = font ? 'trash' : 'plus';
 			const displayRequiredText = font ? 'true' : 'false';
 
+			const handleFilesDrop = (files: File[]) => {
+				const file = files.find(isTtf);
+				if (file) {
+					onHandleUpload(key, file, state);
+				}
+			};
+
+			const tileContent = (
+				<>
+					<DropZone onFilesDrop={handleFilesDrop} />
+
+					<span className="gfpdf-font-filename">
+						{regularFieldValidation && (
+							<span className="required">
+								{__('Add a .ttf font file.', 'gravity-pdf')}
+							</span>
+						)}
+						{!fontFileMissing ? fontName : fontFileMissing}
+					</span>
+
+					<span className={'dashicons dashicons-' + dropZoneIcon} />
+
+					<FontVariantLabel label={key} font={displayRequiredText} />
+				</>
+			);
+
+			if (font) {
+				return (
+					/* eslint-disable-next-line jsx-a11y/anchor-is-valid */
+					<a
+						key={key}
+						className={'drop-zone' + dropZoneClassEnhancement}
+						data-test="component-FontVariant-delete"
+						id={id}
+						tabIndex={tabIndex}
+						role="button"
+						aria-labelledby={ariaLabelledby}
+						aria-describedby={ariaDescribedby}
+						onClick={(e) => onHandleDeleteFontStyle(e, key, state)}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								onHandleDeleteFontStyle(
+									e as unknown as React.MouseEvent,
+									key,
+									state
+								);
+							}
+						}}
+					>
+						{tileContent}
+					</a>
+				);
+			}
+
 			return (
-				<Dropzone
+				<FormFileUpload
 					key={key}
-					accept={{ 'font/ttf': ['.ttf'] }}
-					onDrop={(acceptedFiles) =>
-						onHandleUpload(key, acceptedFiles[0], state)
-					}
+					accept=".ttf"
 					multiple={false}
-				>
-					{({ getRootProps, getInputProps }) => (
+					onChange={(e) => {
+						const file = e.currentTarget.files?.[0];
+						if (file) {
+							onHandleUpload(key, file, state);
+						}
+					}}
+					render={({ openFileDialog }) => (
+						/* eslint-disable-next-line jsx-a11y/anchor-is-valid */
 						<a
 							className={'drop-zone' + dropZoneClassEnhancement}
-							{...getRootProps()}
+							data-test="component-FontVariant-add"
+							id={id}
 							tabIndex={tabIndex}
-						>
-							{font ? (
-								<input
-									data-test="component-FontVariant-delete"
-									id={id}
-									aria-labelledby={ariaLabelledby}
-									aria-describedby={ariaDescribedby}
-									{...getInputProps({
-										onClick: (e) =>
-											onHandleDeleteFontStyle(
-												e as unknown as React.MouseEvent,
-												key,
-												state
-											),
-									})}
-								/>
-							) : (
-								<input
-									data-test="component-FontVariant-add"
-									id={id}
-									aria-labelledby={ariaLabelledby}
-									aria-describedby={ariaDescribedby}
-									{...getInputProps()}
-								/>
-							)}
-
-							<span className="gfpdf-font-filename">
-								{regularFieldValidation && (
-									<span className="required">
-										{__(
-											'Add a .ttf font file.',
-											'gravity-pdf'
-										)}
-									</span>
-								)}
-								{!fontFileMissing ? fontName : fontFileMissing}
-							</span>
-
-							<span
-								className={
-									'dashicons dashicons-' + dropZoneIcon
+							role="button"
+							aria-labelledby={ariaLabelledby}
+							aria-describedby={ariaDescribedby}
+							onClick={(e) => {
+								e.preventDefault();
+								openFileDialog();
+							}}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									openFileDialog();
 								}
-							/>
-
-							<FontVariantLabel
-								label={key}
-								font={displayRequiredText}
-							/>
+							}}
+						>
+							{tileContent}
 						</a>
 					)}
-				</Dropzone>
+				/>
 			);
 		})}
 	</div>

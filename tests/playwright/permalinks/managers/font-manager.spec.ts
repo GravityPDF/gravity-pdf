@@ -123,6 +123,10 @@ test.describe(() => {
 	test('should successfully add, search, edit, and delete new font', async ({
 		page,
 	}) => {
+		/* Clear any fonts left behind by prior failed runs so the count
+		   assertions below start from a known-empty list. */
+		await deleteAnyFonts(page);
+
 		await pdf.navigateToNewFormPdf(form.id);
 		await page
 			.locator('#gfpdf-settings-field-wrapper-font-container')
@@ -138,7 +142,7 @@ test.describe(() => {
 			.fill('Roboto');
 
 		await page
-			.locator('#gfpdf-font-variant-regular-addFont')
+			.locator('#gfpdf-font-variant-regular-addFont + input[type="file"]')
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
 			);
@@ -171,17 +175,21 @@ test.describe(() => {
 		await fontItems.first().click();
 		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
 		await page
-			.locator('#gfpdf-font-variant-italics-updateFont')
+			.locator(
+				'#gfpdf-font-variant-italics-updateFont + input[type="file"]'
+			)
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-RegularItalic.ttf')
 			);
 		await page
-			.locator('#gfpdf-font-variant-bold-updateFont')
+			.locator('#gfpdf-font-variant-bold-updateFont + input[type="file"]')
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-Bold.ttf')
 			);
 		await page
-			.locator('#gfpdf-font-variant-bolditalics-updateFont')
+			.locator(
+				'#gfpdf-font-variant-bolditalics-updateFont + input[type="file"]'
+			)
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-BoldItalic.ttf')
 			);

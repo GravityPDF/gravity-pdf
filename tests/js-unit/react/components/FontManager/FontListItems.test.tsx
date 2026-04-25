@@ -133,7 +133,7 @@ describe('FontManager - FontListItems.js', () => {
 			).not.toBeInTheDocument();
 		});
 
-		test('componentDidUpdate() - calls onSelectFont("") after font deletion', () => {
+		test('componentDidUpdate() - calls onSelectFont("") when the active font is removed from the list', () => {
 			const onSelectFont = jest.fn();
 			const store = createTestStore({
 				fontManager: {
@@ -143,7 +143,7 @@ describe('FontManager - FontListItems.js', () => {
 			});
 			renderWithStore(
 				<FontListItems
-					activeFontId=""
+					activeFontId={sampleFont.id}
 					onSelectFont={onSelectFont}
 					hasDetailOpen={true}
 				/>,
@@ -160,6 +160,38 @@ describe('FontManager - FontListItems.js', () => {
 			});
 
 			expect(onSelectFont).toHaveBeenCalledWith('');
+		});
+
+		test('componentDidUpdate() - does not call onSelectFont when the active font is just edited', () => {
+			const onSelectFont = jest.fn();
+			const store = createTestStore({
+				fontManager: {
+					...initialState.fontManager,
+					deleteFontLoading: false,
+				},
+			});
+			renderWithStore(
+				<FontListItems
+					activeFontId={sampleFont.id}
+					onSelectFont={onSelectFont}
+					hasDetailOpen={true}
+				/>,
+				{},
+				{},
+				store
+			);
+
+			act(() => {
+				store.dispatch({
+					type: 'EDIT_FONT_SUCCESS',
+					payload: {
+						font: { ...sampleFont, font_name: 'Fira Sans Bold' },
+						msg: 'saved',
+					},
+				});
+			});
+
+			expect(onSelectFont).not.toHaveBeenCalledWith('');
 		});
 	});
 

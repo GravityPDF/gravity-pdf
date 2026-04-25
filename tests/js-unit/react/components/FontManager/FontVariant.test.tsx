@@ -1,7 +1,28 @@
-import { render } from '@testing-library/react';
+import * as React from '@wordpress/element';
+import { fireEvent, render } from '@testing-library/react';
 import { findByTestAttr } from '../../testUtilsRTL';
 import FontVariant from '../../../../../src/assets/js/react/components/FontManager/FontVariant';
 import type { FontStyles } from '../../../../../src/assets/js/react/components/FontManager/InitialAddUpdateState';
+
+jest.mock('@wordpress/components', () => ({
+	...jest.requireActual('@wordpress/components'),
+	DropZone: ({ onFilesDrop }: { onFilesDrop?: (files: File[]) => void }) => (
+		<button
+			data-test="drop-ttf"
+			onClick={() =>
+				onFilesDrop?.([
+					new File([''], 'replace.ttf', { type: 'font/ttf' }),
+				])
+			}
+		/>
+	),
+	FormFileUpload: ({
+		render: renderProp,
+	}: {
+		render?: (arg: { openFileDialog: () => void }) => React.ReactNode;
+	}) =>
+		renderProp ? <>{renderProp({ openFileDialog: jest.fn() })}</> : null,
+}));
 
 describe('FontManager - FontVariant.js', () => {
 	const props = {
@@ -63,6 +84,29 @@ describe('FontManager - FontVariant.js', () => {
 					'[data-test="component-FontVariantLabel"]'
 				).length
 			).toBe(4);
+		});
+	});
+
+	describe('REPLACE-IN-PLACE BEHAVIOUR', () => {
+		test('dropping a .ttf on a filled tile calls onHandleUpload', () => {
+			const onHandleUpload = jest.fn();
+			const { container } = render(
+				<FontVariant {...props} onHandleUpload={onHandleUpload} />
+			);
+
+			const dropTriggers = container.querySelectorAll(
+				'[data-test="drop-ttf"]'
+			);
+			expect(dropTriggers.length).toBe(4);
+
+			fireEvent.click(dropTriggers[0]);
+
+			expect(onHandleUpload).toHaveBeenCalledTimes(1);
+			expect(onHandleUpload).toHaveBeenCalledWith(
+				'regular',
+				expect.any(File),
+				'addFont'
+			);
 		});
 	});
 });

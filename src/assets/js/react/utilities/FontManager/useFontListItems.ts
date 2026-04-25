@@ -99,15 +99,21 @@ export function useFontListItems({
 		}
 	}, [loading]);
 
-	/* If the detail panel is open and the font list just changed after a delete
-	   request completed, close the detail panel — the deleted font is gone. */
+	/* If the detail panel is open and the active font has been removed from
+	   the list (delete completed), close the detail panel. EDIT_FONT_SUCCESS
+	   also mutates fontList in place; only deselect when the id is actually
+	   gone, otherwise an edit would unexpectedly kick the user back to add
+	   mode. */
 	useEffect(() => {
-		if (loading || !hasDetailOpen) {
+		if (loading || !hasDetailOpen || !activeFontId) {
 			return;
 		}
-		onSelectFont('');
+		const stillExists = fontList.some((f) => f.id === activeFontId);
+		if (!stillExists) {
+			onSelectFont('');
+		}
 		/* Intentional: only fire when fontList changes. Including loading /
-		   hasDetailOpen would re-trigger on irrelevant state flips. */
+		   hasDetailOpen / activeFontId would re-trigger on irrelevant flips. */
 	}, [fontList]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/* Move selected font to top the first time it becomes non-empty */

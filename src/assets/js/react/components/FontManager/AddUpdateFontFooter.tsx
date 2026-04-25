@@ -80,10 +80,13 @@ const AddUpdateFontFooter = ({
 	const cancelDeleteFont = () => setConfirmingDelete(false);
 
 	const { success, error } = msg;
-	const errorFontList = error && error.fontList;
+	/* `success.addFont` is dispatched by both ADD_FONT_SUCCESS and EDIT_FONT_SUCCESS
+	   (see fontManagerStore). Show it in both modes — after a successful add the
+	   form auto-transitions to update mode (FontManagerBody:99), and after an edit
+	   the form was already in update mode, so a `type === 'add'`-only gate would
+	   never let the user see the confirmation. */
 	const successAddFont = success && success.addFont;
-	const showSuccessAddFont =
-		(successAddFont && errorFontList) || (successAddFont && type === 'add');
+	const showSuccessAddFont = Boolean(successAddFont);
 	const errorAddFont = error && error.addFont;
 	const errorFontValidation = errorAddFont && error?.fontValidationError;
 	const selectedBoxStyle =
