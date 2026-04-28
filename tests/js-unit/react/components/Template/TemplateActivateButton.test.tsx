@@ -25,11 +25,7 @@ describe('Template - TemplateActivateButton.js', () => {
 
 	test('renders button text', () => {
 		const { container } = renderWithStore(
-			<TemplateActivateButton
-				onClose={jest.fn()}
-				template={template}
-				buttonText="Select"
-			/>
+			<TemplateActivateButton onClose={jest.fn()} template={template} />
 		);
 		expect(container.querySelector('button')!.textContent).toBe('Select');
 	});

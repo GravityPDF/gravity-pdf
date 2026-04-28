@@ -1,7 +1,7 @@
 /* Dependencies */
-import * as React from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DropZone, FormFileUpload } from '@wordpress/components';
+import type { MouseEvent } from 'react';
 /* Components */
 import FontVariantLabel from './FontVariantLabel';
 /* Types */
@@ -21,7 +21,7 @@ interface Props {
 	validateRegular: boolean;
 	onHandleUpload: (key: string, file: File, state: string) => void;
 	onHandleDeleteFontStyle: (
-		e: React.MouseEvent,
+		e: MouseEvent,
 		key: string,
 		state: string
 	) => void;
@@ -118,7 +118,7 @@ export const FontVariant = ({
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
 								onHandleDeleteFontStyle(
-									e as unknown as React.MouseEvent,
+									e as unknown as MouseEvent,
 									key,
 									state
 								);

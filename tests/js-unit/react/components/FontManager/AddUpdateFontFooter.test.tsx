@@ -27,7 +27,7 @@ describe('FontManager - AddFontFooter.js', () => {
 	const defaultProps = {
 		msg: defaultMsg,
 		loading: true,
-		tabIndex: '148',
+		tabIndex: 148,
 		type: 'add' as const,
 	};
 

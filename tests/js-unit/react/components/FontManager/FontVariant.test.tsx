@@ -1,5 +1,5 @@
-import * as React from '@wordpress/element';
 import { fireEvent, render } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { findByTestAttr } from '../../testUtilsRTL';
 import FontVariant from '../../../../../src/assets/js/react/components/FontManager/FontVariant';
 import type { FontStyles } from '../../../../../src/assets/js/react/components/FontManager/InitialAddUpdateState';
@@ -19,7 +19,7 @@ jest.mock('@wordpress/components', () => ({
 	FormFileUpload: ({
 		render: renderProp,
 	}: {
-		render?: (arg: { openFileDialog: () => void }) => React.ReactNode;
+		render?: (arg: { openFileDialog: () => void }) => ReactNode;
 	}) =>
 		renderProp ? <>{renderProp({ openFileDialog: jest.fn() })}</> : null,
 }));
