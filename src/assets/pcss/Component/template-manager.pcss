@@ -1,4 +1,3 @@
-@use '../base';
 
 #tab_PDF {
   #gfpdf_settings\[template\], #gfpdf_settings\[default_template\] {
@@ -86,10 +85,10 @@
     }
 
     .notice {
-      border-color: base.$success-color;
+      border-color: var(--gfpdf-success-color);
 
       &.error {
-        border-color: base.$error-color;
+        border-color: var(--gfpdf-error-color);
         color: #000;
         margin: 0;
         padding: 1px 12px;

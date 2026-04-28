@@ -1,4 +1,3 @@
-@use "../../base";
 
 #tab_PDF {
 
@@ -28,14 +27,14 @@
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 2rem;
-			color: base.$default-text-color;
+			color: var(--gfpdf-default-text-color);
 
 			.wp-filter-search {
 				width: 60%;
 			}
 
 			.input-label-validation-error {
-				border-color: base.$error-color;
+				border-color: var(--gfpdf-error-color);
 			}
 
 			/* Font list */
@@ -56,7 +55,7 @@
 						box-shadow: unset;
 
 						.link {
-							color: base.$link-color;
+							color: var(--gfpdf-link-color);
 							cursor: pointer;
 							text-decoration: underline;
 						}
@@ -66,7 +65,7 @@
 							border: unset;
 							box-shadow: unset;
 							text-decoration: underline;
-							color: base.$link-color;
+							color: var(--gfpdf-link-color);
 							padding: 0;
 
 							&:hover {
@@ -102,32 +101,32 @@
 					.font-list-items {
 
 						.font-list-item {
-							border-top: 1px solid base.$lighter-highlight-color;
+							border-top: 1px solid var(--gfpdf-lighter-highlight-color);
 
 							&:hover {
 								cursor: pointer;
-								background: base.$lighter-highlight-color;
+								background: var(--gfpdf-lighter-highlight-color);
 							}
 
 							&.active {
-								background-color: base.$lighter-highlight-color;
+								background-color: var(--gfpdf-lighter-highlight-color);
 							}
 
 							&:focus {
-								border: 1px dotted base.$highlight-color;
+								border: 1px dotted var(--gfpdf-highlight-color);
 							}
 						}
 
 						/* Icons */
 						.dashicons-trash {
-							color: base.$highlight-color;
+							color: var(--gfpdf-highlight-color);
 							text-align: center;
 							transition: color 0.25s ease;
 							margin-left: 5px;
 
 							&:focus,
 							&:hover {
-								color: base.$error-color;
+								color: var(--gfpdf-error-color);
 							}
 						}
 
@@ -137,11 +136,11 @@
 						}
 
 						.dashicons-yes {
-							color: base.$success-color;
+							color: var(--gfpdf-success-color);
 						}
 
 						.dashicons-no-alt {
-							color: base.$highlight-color;
+							color: var(--gfpdf-highlight-color);
 						}
 					}
 				}
@@ -190,7 +189,7 @@
 				}
 
 				.required {
-					color: base.$validation-error-color;
+					color: var(--gfpdf-validation-error-color);
 					font-size: 0.8rem;
 				}
 
@@ -222,42 +221,42 @@
 						flex-direction: column;
 						align-items: center;
 						justify-content: center;
-						border: 5px dashed base.$lighter-highlight-color;
+						border: 5px dashed var(--gfpdf-lighter-highlight-color);
 						height: 160px;
 						transition: all 0.3s ease-out;
 
 						&:hover,
 						&.active {
-							background-color: base.$lighter-highlight-color;
-							border: 5px solid base.$lighter-highlight-color;
+							background-color: var(--gfpdf-lighter-highlight-color);
+							border: 5px solid var(--gfpdf-lighter-highlight-color);
 
 							.dashicons {
 								background-color: #fff;
-								color: base.$highlight-color;
+								color: var(--gfpdf-highlight-color);
 							}
 						}
 
 						&:focus {
 							outline: none;
-							border: 5px dashed base.$default-text-color;
+							border: 5px dashed var(--gfpdf-default-text-color);
 						}
 
 						&.required {
-							border: 5px dashed base.$error-color;
+							border: 5px dashed var(--gfpdf-error-color);
 
 							.dashicons {
-								background-color: base.$error-color;
+								background-color: var(--gfpdf-error-color);
 								color: #fff;
 							}
 
 							&:focus {
-								border-color: base.$default-text-color;
+								border-color: var(--gfpdf-default-text-color);
 							}
 						}
 
 						&.error {
-							background-color: base.$validation-error-color;
-							border-color: base.$validation-error-color;
+							background-color: var(--gfpdf-validation-error-color);
+							border-color: var(--gfpdf-validation-error-color);
 							color: #fff;
 						}
 
@@ -266,7 +265,7 @@
 							text-align: center;
 
 							&.required {
-								color: base.$validation-error-color;
+								color: var(--gfpdf-validation-error-color);
 							}
 						}
 
@@ -274,10 +273,10 @@
 							width: 70px;
 							height: 70px;
 							margin: 0.675rem;
-							background-color: base.$lighter-highlight-color;
+							background-color: var(--gfpdf-lighter-highlight-color);
 							border-radius: 50%;
 							font-size: 3.2rem;
-							color: base.$highlight-color;
+							color: var(--gfpdf-highlight-color);
 							cursor: pointer;
 
 							&::before {

@@ -1,9 +1,11 @@
-@use '../Mixins/button';
 
 #tab_PDF {
 
   .button:not(.wp-editor-wrap .button):not(.wp-picker-container .button) {
-    @include button.reset;
+    font-size: 0.9rem;
+    padding: 0 0.75rem;
+    height: auto;
+    line-height: 2.54545455;
     line-height: 2.95;
 
     &:not(.primary):hover {
@@ -18,7 +20,10 @@
     vertical-align: top;
 
     button {
-      @include button.reset;
+      font-size: 0.9rem;
+      padding: 0 0.75rem;
+      height: auto;
+      line-height: 2.54545455;
       min-height: 32px;
       line-height: 2.30769231;
 

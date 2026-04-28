@@ -10,8 +10,8 @@ import helpBootstrap from './bootstrap/helpBootstrap';
 /* Utilities */
 import { addEditButton } from './utilities/PdfSettings/addEditButton';
 import shortcodeButton from './utilities/PdfList/shortcodeButton';
-/* Sass Styling */
-import '../../scss/gfpdf-styles.scss';
+/* PostCSS Styling */
+import '../../pcss/gfpdf-styles.pcss';
 
 /**
  * JS Entry point for WebPack

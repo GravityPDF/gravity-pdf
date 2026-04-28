@@ -1,20 +1,10 @@
-@mixin set-about {
-  max-width: none;
-  min-height: 0;
-  line-height: 1.8em;
-}
-
-@mixin align-center {
-  text-align: center;
-  margin-right: 0;
-}
-
 #tab_PDF {
 
   .gpdf-help {
 
     h2 {
-      @include align-center;
+      text-align: center;
+      margin-right: 0;
       color: #242748;
       font-size: 2.375rem;
       font-weight: 400;
@@ -33,8 +23,11 @@
     }
 
     .about-text {
-      @include align-center;
-      @include set-about;
+      text-align: center;
+      margin-right: 0;
+      max-width: none;
+      min-height: 0;
+      line-height: 1.8em;
 
       .about-text-disclaimer {
         font-size: 13px;
