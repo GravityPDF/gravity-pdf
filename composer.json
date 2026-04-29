@@ -49,13 +49,11 @@
     "yoast/phpunit-polyfills": "^4.0",
     "wp-phpunit/wp-phpunit": "^6.4",
     "humbug/php-scoper": "^0.15.0",
+    "roots/wordpress-full": "*",
     "gravity/gravityforms": "*",
     "gravity/gravityformspolls": "*",
     "gravity/gravityformssurvey": "*",
     "gravity/gravityformsquiz": "*"
-  },
-  "suggest": {
-    "roots/wordpress-full": "Install to do step debugging on the WordPress codebase."
   },
   "autoload": {
     "psr-4": {
