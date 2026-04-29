@@ -41,7 +41,7 @@ test.describe('Tools Tab', () => {
 				'page=gf_settings&subview=PDF&tab=tools'
 			);
 
-			await page.route('**/wp-admin/admin-ajax.php', async (route) => {
+			await page.route('**/wp-admin/admin-ajax.php*', async (route) => {
 				const postData = route.request().postData() ?? '';
 				if (postData.includes('gfpdf_save_core_font')) {
 					await route.fulfill({

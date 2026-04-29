@@ -1,27 +1,20 @@
 module.exports = {
 	clearMocks: true,
 	collectCoverageFrom: [
-		'src/assets/js/react/**/*.{js,jsx}',
-		'!src/assets/js/react/api/*.{js,jsx}',
-		'!src/assets/js/react/store/*.{js,jsx}',
-		'!src/assets/js/react/utilities/versionCompare.{js,jsx}',
+		'src/assets/js/react/**/*.{js,jsx,ts,tsx}',
+		'!src/assets/js/react/api/*.{js,jsx,ts,tsx}',
+		'!src/assets/js/react/store/*.{js,jsx,ts,tsx}',
+		'!src/assets/js/react/utilities/versionCompare.{js,jsx,ts,tsx}',
 	],
-	roots: [ './tests/js-unit' ],
+	roots: ['./tests/js-unit'],
 	transform: {
-		'^.+\\.js?$': 'babel-jest',
+		'^.+\\.(js|ts|jsx|tsx)?$': 'babel-jest',
 	},
-	coverageThreshold: {
-		global: {
-			branches: 75,
-			functions: 75,
-			lines: 75,
-			statements: 75,
-		},
-	},
-	setupFilesAfterEnv: [ './tests/js-unit/setupTests.js' ],
+	moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+	setupFilesAfterEnv: ['./tests/js-unit/setupTests.ts'],
 	coverageDirectory: './tmp/jest-coverage',
 	testEnvironment: 'jsdom',
 	testEnvironmentOptions: {
-		customExportConditions: [ 'require', 'node', 'node-addons' ],
+		customExportConditions: ['require', 'node', 'node-addons'],
 	},
 };

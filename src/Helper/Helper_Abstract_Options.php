@@ -2,9 +2,11 @@
 
 namespace GFPDF\Helper;
 
+use GFFormsModel;
 use GFPDF\Controller\Controller_Custom_Fonts;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Statics\Kses;
+use GPDFAPI;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -1016,7 +1018,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_custom_fonts() {
 		/** @var Controller_Custom_Fonts $custom_font_controller */
-		$custom_font_controller = \GPDFAPI::get_mvc_class( 'Controller_Custom_Fonts' );
+		$custom_font_controller = GPDFAPI::get_mvc_class( 'Controller_Custom_Fonts' );
 
 		return $custom_font_controller->get_all_items();
 	}
@@ -1032,7 +1034,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_font_short_name( $name ): string {
 		/** @var Model_Custom_Fonts $custom_font_model */
-		$custom_font_model = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+		$custom_font_model = GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
 
 		return $custom_font_model->get_font_short_name( $name );
 	}
@@ -1278,7 +1280,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		if ( ( $settings['id'] ?? '' ) === 'conditionalLogic' ) {
-			return ! empty( $value ) ? wp_json_encode( \GFFormsModel::sanitize_conditional_logic( json_decode( $value, true ) ) ) : '';
+			return ! empty( $value ) ? wp_json_encode( GFFormsModel::sanitize_conditional_logic( json_decode( $value, true ) ) ) : '';
 		}
 
 		switch ( $settings['type'] ) {
@@ -2083,7 +2085,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					[
 						'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']',
 						'textarea_rows' => $rows,
-						'editor_height' => $rows * 10, /* estimate row height at 10px */
+						'editor_height' => max( (int) $rows * 20, 150 ), /* row height ~20px, with a 200px floor */
 						'editor_class'  => 'gfpdf_settings_' . $args['id'] . ' ' . $class,
 						'autop'         => false,
 					]

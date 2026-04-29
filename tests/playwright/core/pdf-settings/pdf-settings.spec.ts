@@ -3,12 +3,13 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import type { Form } from '@self:playwright/utils/gravityforms';
 import * as path from 'node:path';
 import { takeSnapshot } from '@chromatic-com/playwright';
 
 test.describe('Form PDF Settings', () => {
-	let pdf = null;
-	let form = null;
+	let pdf: Pdf;
+	let form: Form;
 
 	test.beforeEach(
 		async ({
@@ -125,14 +126,14 @@ test.describe('Form PDF Settings', () => {
 			const entry1 = await pdf.createEntry({
 				form_id: form.id,
 				1: 'Second Choice',
-			});
+			} as any);
 
 			await pdf.navigateToEntryList(form.id);
 			await expect(
 				pdf.page.getByRole('link', { name: 'View PDF' })
 			).not.toBeAttached();
 
-			await pdf.navigateToEntryDetail(entry1.form_id, entry1.id);
+			await pdf.navigateToEntryDetail(entry1.form_id, entry1.id!);
 			await expect(
 				pdf.page.getByRole('link', { name: 'View', exact: true })
 			).not.toBeAttached();
@@ -144,14 +145,14 @@ test.describe('Form PDF Settings', () => {
 			const entry2 = await pdf.createEntry({
 				form_id: form.id,
 				1: 'First Choice',
-			});
+			} as any);
 
 			await pdf.navigateToEntryList(form.id);
 			await expect(
 				pdf.page.getByRole('link', { name: 'View PDF' })
 			).toBeAttached();
 
-			await pdf.navigateToEntryDetail(entry2.form_id, entry2.id);
+			await pdf.navigateToEntryDetail(entry2.form_id, entry2.id!);
 			await expect(
 				pdf.page.getByRole('link', { name: 'View', exact: true })
 			).toBeAttached();

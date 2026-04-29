@@ -1,0 +1,110 @@
+import { render } from '@testing-library/react';
+import { findByTestAttr } from '../../testUtilsRTL';
+import TemplateFooterActions from '../../../../../src/assets/js/react/components/Template/TemplateFooterActions';
+import type { TemplateItem } from '../../../../../src/assets/js/react/types';
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateActivateButton',
+	() =>
+		function TemplateActivateButton() {
+			return <div data-test="component-templateActivateButton" />;
+		}
+);
+
+jest.mock(
+	'../../../../../src/assets/js/react/components/Template/TemplateDeleteButton',
+	() =>
+		function TemplateDeleteButton() {
+			return <div data-test="component-templateDeleteButton" />;
+		}
+);
+
+describe('Template - TemplateFooterActions.js', () => {
+	const defaultProps = {
+		onSelectTemplate: jest.fn(),
+		onClose: jest.fn(),
+	};
+
+	test('renders <TemplateFooterActions /> component', () => {
+		const template = {
+			compatible: false,
+			path: '',
+		} as unknown as TemplateItem;
+		const { container } = render(
+			<TemplateFooterActions {...defaultProps} template={template} />
+		);
+		expect(
+			findByTestAttr(container, 'component-templateFooterActions')
+		).toBeInTheDocument();
+	});
+
+	test('renders <TemplateActivateButton /> when isActiveTemplate is false and template is compatible', () => {
+		const template = {
+			compatible: true,
+			path: '',
+		} as unknown as TemplateItem;
+		const { container } = render(
+			<TemplateFooterActions
+				{...defaultProps}
+				template={template}
+				isActiveTemplate={false}
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-templateActivateButton')
+		).toBeInTheDocument();
+	});
+
+	test('does not render <TemplateActivateButton /> when isActiveTemplate is true', () => {
+		const template = {
+			compatible: true,
+			path: '',
+		} as unknown as TemplateItem;
+		const { container } = render(
+			<TemplateFooterActions
+				{...defaultProps}
+				template={template}
+				isActiveTemplate={true}
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-templateActivateButton')
+		).not.toBeInTheDocument();
+	});
+
+	test('renders <TemplateDeleteButton /> when isActiveTemplate is false and path is not core', () => {
+		const template = {
+			compatible: true,
+			path: '/uploads/pdf-extended/',
+		} as unknown as TemplateItem;
+		const { container } = render(
+			<TemplateFooterActions
+				{...defaultProps}
+				template={template}
+				isActiveTemplate={false}
+				pdfWorkingDirPath="/uploads/"
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		).toBeInTheDocument();
+	});
+
+	test('does not render <TemplateDeleteButton /> when path is core template', () => {
+		const template = {
+			compatible: true,
+			path: '/core/templates/',
+		} as unknown as TemplateItem;
+		const { container } = render(
+			<TemplateFooterActions
+				{...defaultProps}
+				template={template}
+				isActiveTemplate={false}
+				pdfWorkingDirPath="/uploads/"
+			/>
+		);
+		expect(
+			findByTestAttr(container, 'component-templateDeleteButton')
+		).not.toBeInTheDocument();
+	});
+});

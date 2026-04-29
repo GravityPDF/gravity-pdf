@@ -75,7 +75,7 @@ test.describe('Template Manager', () => {
 			.getByRole('button', { name: 'Manage PDF Templates' })
 			.click();
 
-		const templateManager = page.locator('.container.theme-wrap');
+		const templateManager = page.locator('.gfpdf-template-manager-modal');
 
 		// Search
 		await page.locator('#wp-filter-search-input').fill('rubix');
@@ -114,9 +114,23 @@ test.describe('Template Manager', () => {
 			page.locator('p.theme-author', { hasText: 'Custom' })
 		).toBeAttached();
 
+		// Prev/Next navigation chevrons — guards against the previous
+		// dashicons-no regression
+		await expect(
+			templateManager.getByRole('button', {
+				name: 'Show previous template',
+			})
+		).toBeVisible();
+		await expect(
+			templateManager.getByRole('button', { name: 'Show next template' })
+		).toBeVisible();
+
 		// Delete
-		page.on('dialog', (dialog) => dialog.accept());
 		await page.getByRole('button', { name: 'Delete Template' }).click();
+		await page
+			.locator('.components-modal__frame')
+			.getByRole('button', { name: 'OK' })
+			.click();
 
 		await expect(
 			page.locator('.theme[data-slug="test-template"]')
@@ -131,8 +145,8 @@ test.describe('Template Manager', () => {
 			.getByRole('button', { name: 'Manage PDF Templates' })
 			.click();
 
-		const popup = page.locator('.container.theme-wrap');
-		await page.getByRole('button', { name: 'close', exact: true }).click();
+		const popup = page.locator('.gfpdf-template-manager-modal');
+		await popup.getByRole('button', { name: 'Close' }).click();
 		await expect(popup).not.toBeVisible();
 	});
 
@@ -144,8 +158,8 @@ test.describe('Template Manager', () => {
 			.getByRole('button', { name: 'Manage PDF Templates' })
 			.click();
 
-		const popup = page.locator('.container.theme-wrap');
-		await popup.focus();
+		const popup = page.locator('.gfpdf-template-manager-modal');
+		await expect(popup).toBeVisible();
 		await page.keyboard.press('Escape');
 		await expect(popup).not.toBeVisible();
 	});

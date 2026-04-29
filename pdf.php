@@ -9,7 +9,7 @@ Plugin URI: https://gravitypdf.com
 Update URI: https://gravitypdf.com
 Text Domain: gravity-pdf
 Domain Path: /languages
-Requires at least: 5.3
+Requires at least: 6.2
 Requires PHP: 7.3
 License: GPL-2.0
 License URI: https://opensource.org/licenses/gpl-2.0.php
@@ -104,7 +104,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 *
 		 * @since 4.0
 		 */
-		public $required_wp_version = '5.3';
+		public $required_wp_version = '6.2';
 
 		/**
 		 * The plugin's required PHP version
@@ -221,7 +221,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 				return false;
 			}
 
-			if ( ! version_compare( \GFForms::$version, $this->required_gf_version, '>=' ) ) {
+			if ( ! version_compare( GFForms::$version, $this->required_gf_version, '>=' ) ) {
 				$this->notices[] = function () {
 					/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. Plugin version number 4. Html Anchor Open Tag */
 					return sprintf( esc_html__( '%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more information%2$s.', 'gravity-pdf' ), '<a href="https://gpdf.us/gf">', '</a>', $this->required_gf_version, '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#gravity-forms-version-x-is-required">' );

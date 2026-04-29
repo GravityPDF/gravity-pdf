@@ -3,12 +3,13 @@ import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
-type Form = {
+export type Form = {
 	id: number;
 	title: string;
 };
 
-type Entry = {
+export type Entry = {
+	id?: number;
 	form_id: number;
 	created_by?: number;
 	ip?: string;
@@ -17,7 +18,7 @@ type Entry = {
 export default class GravityForms {
 	protected requestUtils: RequestUtils;
 	protected admin: Admin;
-	protected page: Page;
+	public page: Page;
 
 	constructor(requestUtils: RequestUtils, admin: Admin, page: Page) {
 		this.requestUtils = requestUtils;

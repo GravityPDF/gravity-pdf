@@ -213,7 +213,6 @@ class Helper_Data {
 	 */
 	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $gform ) {
 
-		$custom_fonts      = array_values( $options->get_custom_fonts() );
 		$user_data         = get_userdata( get_current_user_id() );
 		$user_capabilities = is_object( $user_data ) ? $user_data->allcaps : [];
 		$user_capabilities = is_super_admin() ? [ 'administrator' => true ] : $user_capabilities;
@@ -223,138 +222,13 @@ class Helper_Data {
 		return apply_filters(
 			'gfpdf_localised_script_array',
 			[
-				'ajaxUrl'                              => admin_url( 'admin-ajax.php' ),
-				'ajaxNonce'                            => wp_create_nonce( 'gfpdf_ajax_nonce' ),
-				'restUrl'                              => rest_url( 'gravity-pdf/v1/' ),
-				'restNonce'                            => wp_create_nonce( 'wp_rest' ),
-				'currentVersion'                       => PDF_EXTENDED_VERSION,
-				'pdfWorkingDir'                        => PDF_TEMPLATE_LOCATION,
-				'pluginUrl'                            => PDF_PLUGIN_URL,
-				'pluginPath'                           => PDF_PLUGIN_DIR,
-				'customFontData'                       => wp_json_encode( $custom_fonts ),
-				'userCapabilities'                     => $user_capabilities,
-
-				'spinnerUrl'                           => admin_url( 'images/spinner-2x.gif' ),
-				'spinnerAlt'                           => esc_html__( 'Loading...', 'gravity-pdf' ),
-				'continue'                             => esc_html__( 'Continue', 'gravity-pdf' ),
-				'uninstall'                            => esc_html__( 'Uninstall', 'gravity-pdf' ),
-				'cancel'                               => esc_html__( 'Cancel', 'gravity-pdf' ),
-				'delete'                               => esc_html__( 'Delete', 'gravity-pdf' ),
-				'active'                               => esc_html__( 'Active', 'gravity-pdf' ),
-				'inactive'                             => esc_html__( 'Inactive', 'gravity-pdf' ),
-				'conditionalText'                      => esc_html__( 'this PDF if', 'gravity-pdf' ),
-				'enable'                               => esc_html__( 'Enable', 'gravity-pdf' ),
-				'disable'                              => esc_html__( 'Disable', 'gravity-pdf' ),
-				'updateSuccess'                        => esc_html__( 'Successfully Updated', 'gravity-pdf' ),
-				'deleteSuccess'                        => esc_html__( 'Successfully Deleted', 'gravity-pdf' ),
-				'no'                                   => esc_html__( 'No', 'gravity-pdf' ),
-				'yes'                                  => esc_html__( 'Yes', 'gravity-pdf' ),
-				'standard'                             => esc_html__( 'Standard', 'gravity-pdf' ),
-				'advanced'                             => esc_html__( 'Advanced', 'gravity-pdf' ),
-				'manage'                               => esc_html__( 'Manage', 'gravity-pdf' ),
-				'details'                              => esc_html__( 'Details', 'gravity-pdf' ),
-				'select'                               => esc_html__( 'Select', 'gravity-pdf' ),
-				'version'                              => esc_html__( 'Version', 'gravity-pdf' ),
-				'group'                                => esc_html__( 'Group', 'gravity-pdf' ),
-				'tags'                                 => esc_html__( 'Tags', 'gravity-pdf' ),
-
-				'template'                             => esc_html__( 'Template', 'gravity-pdf' ),
-				'manageTemplates'                      => esc_html__( 'Manage PDF Templates', 'gravity-pdf' ),
-				'addNewTemplate'                       => esc_html__( 'Add New Template', 'gravity-pdf' ),
-				'thisFormHasNoPdfs'                    => esc_html__( "This form doesn't have any PDFs.", 'gravity-pdf' ),
-				'letsGoCreateOne'                      => esc_html__( "Let's go create one", 'gravity-pdf' ),
-				'installedPdfs'                        => esc_html__( 'Installed PDFs', 'gravity-pdf' ),
-				'searchTemplatePlaceholder'            => esc_html__( 'Search Installed Templates', 'gravity-pdf' ),
-				'closeDialog'                          => esc_html__( 'Close dialog', 'gravity-pdf' ),
-
-				'searchPlaceholder'                    => esc_html__( 'Search the Gravity PDF Knowledgebase...', 'gravity-pdf' ),
-				'searchResultHeadingText'              => esc_html__( 'Gravity PDF Documentation', 'gravity-pdf' ),
-				'noResultText'                         => esc_html__( "It doesn't look like there are any topics related to your issue.", 'gravity-pdf' ),
-				'getSearchResultError'                 => esc_html__( 'An error occurred. Please try again', 'gravity-pdf' ),
-
-				/* translators: %s: minimum required Gravity PDF version number */
-				'requiresGravityPdfVersion'            => esc_html__( 'Requires Gravity PDF v%s', 'gravity-pdf' ),
-				/* translators: %s: minimum required Gravity PDF version number */
-				'templateNotCompatibleWithGravityPdfVersion' => esc_html__( 'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.', 'gravity-pdf' ),
-				'templateDetails'                      => esc_html__( 'Template Details', 'gravity-pdf' ),
-				'currentTemplate'                      => esc_html__( 'Current Template', 'gravity-pdf' ),
-				'showPreviousTemplate'                 => esc_html__( 'Show previous template', 'gravity-pdf' ),
-				'showNextTemplate'                     => esc_html__( 'Show next template', 'gravity-pdf' ),
-				'uploadInvalidNotZipFile'              => esc_html__( 'Upload is not a valid template. Upload a .zip file.', 'gravity-pdf' ),
-				'uploadInvalidExceedsFileSizeLimit'    => esc_html__( 'Upload exceeds the 10MB limit.', 'gravity-pdf' ),
-				'templateSuccessfullyInstalled'        => esc_html__( 'Template successfully installed', 'gravity-pdf' ),
-				'templateSuccessfullyUpdated'          => esc_html__( 'Template successfully updated', 'gravity-pdf' ),
-				'templateSuccessfullyInstalledUpdated' => esc_html__( 'PDF Template(s) Successfully Installed / Updated', 'gravity-pdf' ),
-				'problemWithTheUpload'                 => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-pdf' ),
-				/* translators: %s: newline characters separating the two sentences */
-				'doYouWantToDeleteTemplate'            => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-pdf' ), "\n\n" ),
-				'couldNotDeleteTemplate'               => esc_html__( 'Could not delete template.', 'gravity-pdf' ),
-				'templateInstallInstructions'          => esc_html__( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-pdf' ),
-
-				'coreFontSuccess'                      => esc_html__( 'ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-pdf' ),
-				/* translators: %s: number of fonts that failed to install */
-				'coreFontError'                        => esc_html__( '%s CORE FONT(S) DID NOT INSTALL CORRECTLY', 'gravity-pdf' ),
-				'coreFontGithubError'                  => esc_html__( 'Could not download Core Font list. Try again.', 'gravity-pdf' ),
-				/* translators: %s: font name */
-				'coreFontItemPendingMessage'           => esc_html__( 'Downloading %s...', 'gravity-pdf' ),
-				/* translators: %s: font name */
-				'coreFontItemSuccessMessage'           => esc_html__( 'Completed installation of %s', 'gravity-pdf' ),
-				/* translators: %s: font name */
-				'coreFontItemErrorMessage'             => esc_html__( 'Failed installation of %s', 'gravity-pdf' ),
-				'coreFontCounter'                      => esc_html__( 'Fonts remaining:', 'gravity-pdf' ),
-				'coreFontRetry'                        => esc_html__( 'Retry Failed Downloads?', 'gravity-pdf' ),
-				'coreFontAriaLabel'                    => esc_html__( 'Core font installation', 'gravity-pdf' ),
-
-				/* Font Manager */
-				'fontManagerTitle'                     => esc_html__( 'Font Manager', 'gravity-pdf' ),
-				'fontManagerSearchPlaceHolder'         => esc_html__( 'Search installed fonts', 'gravity-pdf' ),
-				'fontListInstalledFonts'               => esc_html__( 'Installed Fonts', 'gravity-pdf' ),
-				'fontUserDefinedGroup'                 => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
-				'fontListRegular'                      => esc_html__( 'Regular', 'gravity-pdf' ),
-				'fontListItalics'                      => esc_html__( 'Italics', 'gravity-pdf' ),
-				'fontListBold'                         => esc_html__( 'Bold', 'gravity-pdf' ),
-				'fontListBoldItalics'                  => esc_html__( 'Bold Italics', 'gravity-pdf' ),
-				'fontManagerAddTitle'                  => esc_html__( 'Add Font', 'gravity-pdf' ),
-				'fontManagerUpdateTitle'               => esc_html__( 'Update Font', 'gravity-pdf' ),
-				'fontManagerAddDesc'                   => esc_html__( 'Install new fonts for use in your PDF documents.', 'gravity-pdf' ),
-				'fontManagerUpdateDesc'                => esc_html__( 'Once saved, PDFs configured to use this font will have your changes applied automatically for newly-generated documents.', 'gravity-pdf' ),
-				'fontManagerFontNameLabel'             => esc_html__( 'Font Name', 'gravity-pdf' ),
-				'fontManagerRequiredLabel'             => esc_html__( '(required)', 'gravity-pdf' ),
-				'fontManagerFontNameDesc'              => esc_html__( 'The font name can only contain letters, numbers and spaces.', 'gravity-pdf' ),
-				'fontManagerFontNameValidationError'   => esc_html__( 'Please choose a name contains letters and/or numbers (and a space if you want it).', 'gravity-pdf' ),
-				'fontManagerFontFilesLabel'            => esc_html__( 'Font Files', 'gravity-pdf' ),
-				'fontManagerFontFilesDesc'             => esc_html__( 'Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.', 'gravity-pdf' ),
-				'fontManagerFontFileRequiredRegular'   => esc_html__( 'Add a .ttf font file.', 'gravity-pdf' ),
-				'fontManagerTemplateTooltipLabel'      => esc_html__( 'View template usage', 'gravity-pdf' ),
-				'fontManagerCancelButtonText'          => esc_html__( '← Cancel', 'gravity-pdf' ),
-				'fontManagerDeleteFontConfirmation'    => esc_html__( 'Are you sure you want to delete this font?', 'gravity-pdf' ),
-				/* translators: 1: Opening <a> tag (custom template link), 2: Opening <a> tag (font setting link), 3: Closing </a> tag */
-				'fontManagerTemplateTooltipDesc'       => esc_html__( 'Add this snippet %1$sin a custom template%3$s to selectively set the font on blocks of text. If you want to apply the font to the entire PDF, %2$suse the Font setting%3$s when configuring the PDF on the form.', 'gravity-pdf' ),
-				'fontManagerAddFontAriaLabel'          => esc_html__( 'Add font', 'gravity-pdf' ),
-				'fontManagerUpdateFontAriaLabel'       => esc_html__( 'Update font', 'gravity-pdf' ),
-				'fontManagerSelectFontAriaLabel'       => esc_html__( 'Select font', 'gravity-pdf' ),
-				'fontManagerDeleteFontAriaLabel'       => esc_html__( 'Delete font', 'gravity-pdf' ),
-
-				/* Font Manager API response */
-				'fontListEmpty'                        => esc_html__( 'Font list empty.', 'gravity-pdf' ),
-				'searchResultEmpty'                    => esc_html__( 'No fonts matching your search found.', 'gravity-pdf' ),
-				'searchClear'                          => esc_html__( 'Clear Search.', 'gravity-pdf' ),
-				'addUpdateFontSuccess'                 => esc_html__( 'Your font has been saved.', 'gravity-pdf' ),
-				/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
-				'addUpdateFontError'                   => esc_html__( '%1$sThe action could not be completed.%2$s Resolve the highlighted issues above and then try again.', 'gravity-pdf' ),
-				'addFatalError'                        => esc_html__( 'A problem occurred. Reload the page and try again.', 'gravity-pdf' ),
-				/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
-				'fontFileMissing'                      => esc_html__( '%1$sFont file(s) missing from the server.%2$s Please upload the font(s) again and then save.', 'gravity-pdf' ),
-				/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
-				'fontFileInvalid'                      => esc_html__( '%1$sFont file(s) are malformed%2$s and cannot be used with Gravity PDF.', 'gravity-pdf' ),
-
-				'uninstallWarning'                     => esc_html__( "Warning! ALL Gravity PDF data, including templates, will be deleted. This cannot be undone. 'OK' to delete, 'Cancel' to stop.", 'gravity-pdf' ),
-				'pdfDeleteWarning'                     => esc_html__( "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete.", 'gravity-pdf' ),
-
-				/* Help page */
-				'searchBoxPlaceHolderText'             => esc_html__( 'Search the Gravity PDF Documentation...', 'gravity-pdf' ),
-				'searchBoxSubmitTitle'                 => esc_html__( 'Submit your search query.', 'gravity-pdf' ),
-				'searchBoxResetTitle'                  => esc_html__( 'Clear your search query.', 'gravity-pdf' ),
+				'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+				'ajaxNonce'        => wp_create_nonce( 'gfpdf_ajax_nonce' ),
+				'currentVersion'   => PDF_EXTENDED_VERSION,
+				'pdfWorkingDir'    => PDF_TEMPLATE_LOCATION,
+				'pluginUrl'        => PDF_PLUGIN_URL,
+				'userCapabilities' => $user_capabilities,
+				'spinnerUrl'       => admin_url( 'images/spinner-2x.gif' ),
 			]
 		);
 	}

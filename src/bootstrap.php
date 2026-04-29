@@ -16,6 +16,7 @@ use GFPDF\Model;
 use GFPDF\View;
 use GFPDF_Core;
 use GFPDF_Major_Compatibility_Checks;
+use GFPDF_Vendor\Automattic\Jetpack\Assets;
 use Psr\Log\LoggerInterface;
 
 /*
@@ -390,30 +391,59 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_scripts() {
-		global $wp_version;
+		$this->register_script(
+			'gfpdf_js_settings',
+			'build/assets/admin.min.js',
+			PDF_PLUGIN_DIR . 'pdf.php',
+			[
+				'dependencies' => [
+					'jquery-ui-tooltip',
+					'gform_forms',
+					'gform_form_admin',
+					'gform_selectwoo',
+					'jquery-color',
+					'wp-color-picker',
+				],
+				'textdomain'   => 'gravity-pdf',
+				'in_footer'    => true,
+				'strategy'     => 'defer',
+				'css_path'     => null,
+				'minify'       => null,
+			]
+		);
 
-		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
-		$args    = version_compare( $wp_version, '6.3.0', '>=' ) ? [ 'strategy' => 'defer' ] : true;
+		$this->register_script(
+			'gfpdf_js_entrypoint',
+			'build/assets/app.bundle.min.js',
+			PDF_PLUGIN_DIR . 'pdf.php',
+			[
+				'textdomain' => 'gravity-pdf',
+				'in_footer'  => true,
+				'strategy'   => 'defer',
+				'css_path'   => null,
+				'minify'     => null,
+			]
+		);
 
-		$pdf_settings_dependencies = [
-			'jquery-ui-tooltip',
-			'gform_forms',
-			'gform_form_admin',
-			'gform_selectwoo',
-			'jquery-color',
-			'wp-color-picker',
-		];
+		$this->register_script(
+			'gfpdf_js_entries',
+			'build/assets/gfpdf-entries.min.js',
+			PDF_PLUGIN_DIR . 'pdf.php',
+			[
+				'dependencies' => [ 'jquery' ],
+				'in_footer'    => true,
+				'strategy'     => 'defer',
+				'css_path'     => null,
+				'minify'       => null,
+			]
+		);
+	}
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'build/assets/admin.min.js', $pdf_settings_dependencies, $version, $args );
-
-		/* add hot reloading in development */
-		$asset               = file_exists( PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php' )
-			? require PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php'
-			: [ 'dependencies' => [ 'jquery' ] ];
-		$bundle_dependencies = $asset['dependencies'] ?? [];
-
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
+	private function register_script( string $handle, string $path, string $base, array $options = [] ): void {
+		Assets::register_script( $handle, $path, $base, $options );
+		if ( ! empty( $options['textdomain'] ) ) {
+			wp_set_script_translations( $handle, $options['textdomain'], PDF_PLUGIN_DIR . 'languages' );
+		}
 	}
 
 	/**
@@ -434,6 +464,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* load styles */
 			wp_enqueue_style( 'gfpdf_css_styles' );
+			wp_enqueue_style( 'wp-components' );
 
 			/* load scripts */
 			wp_enqueue_script( 'gfpdf_js_settings' );

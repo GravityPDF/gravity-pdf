@@ -3,10 +3,11 @@ import type { Page } from '@playwright/test';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import type { Form } from '@self:playwright/utils/gravityforms';
 
 test.describe('[gravitypdf] Shortcode', () => {
-	let pdf = null;
-	let form = null;
+	let pdf: Pdf;
+	let form: Form;
 
 	test.beforeEach(
 		async ({

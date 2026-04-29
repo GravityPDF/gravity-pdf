@@ -22,7 +22,6 @@
     }
   },
   "lifecycleScripts": {
-    "afterStart": "yarn wp-env run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env run cli wp rewrite structure '/%postname%/' --hard",
-    "afterReset": "yarn wp-env run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env run cli wp rewrite structure '/%postname%/' --hard"
+
   }
 }

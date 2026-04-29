@@ -154,9 +154,7 @@ class Test_Helper_Data extends WP_UnitTestCase {
 			'ajaxNonce',
 			'currentVersion',
 			'pdfWorkingDir',
-			'customFontData',
 			'spinnerUrl',
-			'spinnerAlt',
 		];
 
 		foreach ( $required_keys as $key ) {

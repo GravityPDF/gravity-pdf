@@ -1,0 +1,98 @@
+
+#tab_PDF {
+  #gfpdf_settings\[template\], #gfpdf_settings\[default_template\] {
+    margin: 0 0.2rem 0.2rem 0;
+  }
+
+  #gfpdf_pdf_form #gfpdf-settings-field-wrapper-template-container {
+    display: flex;
+  }
+}
+
+.gfpdf-template-manager-modal {
+  #gfpdf-template-container {
+    .theme {
+      .theme-author {
+        display: block;
+      }
+
+      &.active .theme-name {
+        background: #1d2327;
+      }
+
+      .theme-actions {
+        opacity: 1;
+        left: inherit;
+        border-top: none;
+        height: 41px;
+        padding: 6px 3px 0;
+        top: auto;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
+        -webkit-transform: none;
+        transform: none;
+        box-shadow: none;
+      }
+
+      @-moz-keyframes gfpdfspin {
+        100% {
+          -moz-transform: rotate(-360deg);
+        }
+      }
+      @-webkit-keyframes gfpdfspin {
+        100% {
+          -webkit-transform: rotate(-360deg);
+        }
+      }
+      @keyframes gfpdfspin {
+        100% {
+          -webkit-transform: rotate(-360deg);
+          transform: rotate(-360deg);
+        }
+      }
+
+      .doing-ajax span:after,
+      .doing-ajax:hover span:after {
+        font-family: dashicons;
+        content: "\f531";
+        font-size: 79px;
+        background: none;
+        width: auto;
+        height: auto;
+        left: 51.5%;
+        text-indent: 0;
+        -webkit-animation: gfpdfspin 1s infinite linear;
+        animation: gfpdfspin 1s infinite linear;
+      }
+
+      &.gfpdf-dropzone-active .doing-ajax span:after,
+      .doing-ajax:hover span:after,
+      .doing-ajax:focus span:after {
+        color: #FFF;
+        background: none;
+      }
+    }
+
+    .gfpdf-dropzone {
+      .dropzone {
+        .gfpdf-template-install-instructions {
+          font-size: 85%;
+          text-align: center;
+          margin-top: 5px;
+        }
+      }
+    }
+
+    .notice {
+      border-color: var(--gfpdf-success-color);
+
+      &.error {
+        border-color: var(--gfpdf-error-color);
+        color: #000;
+        margin: 0;
+        padding: 1px 12px;
+      }
+    }
+  }
+}

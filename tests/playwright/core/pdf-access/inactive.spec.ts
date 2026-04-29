@@ -71,7 +71,7 @@ test.describe('Advanced Template Checks', () => {
 		await pdf.navigateToFormPdfList(form.id);
 		const pdfId = await pdf.createPdf(form.id, 'Conditional Test');
 
-		await pdf.navigateToFormPdf(form.id, pdfId);
+		await pdf.navigateToFormPdf(form.id, pdfId!);
 		await page
 			.getByRole('checkbox', {
 				name: 'Enable conditional logic',

@@ -3,11 +3,12 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import { Form } from '@self:playwright/utils/gravityforms';
 import * as path from 'path';
 
 test.describe('Font Manager', () => {
 	let pdf: Pdf;
-	let form: any;
+	let form: Form;
 
 	test.beforeEach(
 		async ({
@@ -23,6 +24,31 @@ test.describe('Font Manager', () => {
 			form = await pdf.createForm('Font Manager');
 		}
 	);
+
+	async function deleteAnyFonts(page: Page): Promise<void> {
+		// Delete any fonts
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.locator('#gfpdf-settings-field-wrapper-font-container')
+			.getByRole('button', { name: 'Manage' })
+			.click();
+
+		const fontItems = page
+			.locator('.font-list-items .dashicons-trash')
+			.filter({ visible: true });
+
+		await page.waitForTimeout(500);
+
+		const fontItemsCount = await fontItems.count();
+
+		for (let i = fontItemsCount - 1; i >= 0; i--) {
+			await fontItems.nth(i).click();
+			await page
+				.locator('.components-modal__frame')
+				.getByRole('button', { name: 'OK' })
+				.click();
+		}
+	}
 
 	test('should display "Font" field and open Font Manager', async ({
 		page,
@@ -67,6 +93,8 @@ test.describe('Font Manager', () => {
 		await expect(page.getByLabel('Font', { exact: true })).toHaveValue(
 			'mph2bdamase'
 		);
+
+		await deleteAnyFonts(page);
 	});
 
 	test('should display font manager error validation', async ({ page }) => {
@@ -95,11 +123,17 @@ test.describe('Font Manager', () => {
 	test('should successfully add, search, edit, and delete new font', async ({
 		page,
 	}) => {
+		/* Clear any fonts left behind by prior failed runs so the count
+		   assertions below start from a known-empty list. */
+		await deleteAnyFonts(page);
+
 		await pdf.navigateToNewFormPdf(form.id);
 		await page
 			.locator('#gfpdf-settings-field-wrapper-font-container')
 			.getByRole('button', { name: 'Manage' })
 			.click();
+
+		const fontItems = page.locator('.font-list-item');
 
 		// Add Font
 		await page
@@ -108,7 +142,7 @@ test.describe('Font Manager', () => {
 			.fill('Roboto');
 
 		await page
-			.locator('#gfpdf-font-variant-regular-addFont')
+			.locator('#gfpdf-font-variant-regular-addFont + input[type="file"]')
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
 			);
@@ -119,7 +153,6 @@ test.describe('Font Manager', () => {
 			.click();
 
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
-		const fontItems = page.locator('.font-list-item');
 		await expect(fontItems).toHaveCount(1);
 
 		// Search Font
@@ -136,35 +169,45 @@ test.describe('Font Manager', () => {
 
 		// Cancel button
 		await page.getByRole('button', { name: 'Cancel' }).click();
-		await expect(page.locator('.update-font.show')).not.toBeVisible();
+		await expect(page.locator('.update-font')).not.toBeVisible();
 
 		// Edit Font properly
 		await fontItems.first().click();
 		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
 		await page
-			.locator('#gfpdf-font-variant-italics-updateFont')
+			.locator(
+				'#gfpdf-font-variant-italics-updateFont + input[type="file"]'
+			)
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-RegularItalic.ttf')
 			);
 		await page
-			.locator('#gfpdf-font-variant-bold-updateFont')
+			.locator('#gfpdf-font-variant-bold-updateFont + input[type="file"]')
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-Bold.ttf')
 			);
 		await page
-			.locator('#gfpdf-font-variant-bolditalics-updateFont')
+			.locator(
+				'#gfpdf-font-variant-bolditalics-updateFont + input[type="file"]'
+			)
 			.setInputFiles(
 				path.join(resourcesPath, 'fonts', 'Roboto-BoldItalic.ttf')
 			);
 
 		await updateButton.click();
+		await page.waitForTimeout(500);
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
 		await expect(page.getByText('Roboto 2')).toBeVisible();
 
 		// Delete Font
-		page.on('dialog', (dialog) => dialog.accept());
-		await fontItems.locator('.dashicons-trash').click();
-		await expect(page.getByText('Font list empty.')).toBeVisible();
+		await page.getByRole('button', { name: 'Delete font' }).click();
+		await page
+			.locator('.components-modal__frame')
+			.getByRole('button', { name: 'OK' })
+			.click();
+		await expect(page.getByText('Font list empty.')).toBeVisible({
+			timeout: 10000,
+		});
 	});
 
 	test('should be able to close font manager popup with button', async ({
@@ -176,10 +219,10 @@ test.describe('Font Manager', () => {
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
-		const popup = await page.locator('.container.theme-wrap.font-manager');
+		const popup = await page.locator('.gfpdf-font-manager-modal');
 
 		await expect(popup).toBeVisible();
-		await page.getByRole('button', { name: 'close', exact: true }).click();
+		await popup.getByRole('button', { name: 'Close' }).click();
 		await expect(popup).not.toBeVisible();
 	});
 
@@ -192,7 +235,7 @@ test.describe('Font Manager', () => {
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
-		const popup = await page.locator('.container.theme-wrap.font-manager');
+		const popup = await page.locator('.gfpdf-font-manager-modal');
 
 		await expect(popup).toBeVisible();
 		await page.keyboard.press('Escape');

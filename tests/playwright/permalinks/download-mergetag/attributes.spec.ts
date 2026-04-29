@@ -2,11 +2,12 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import type { Form } from '@self:playwright/utils/gravityforms';
 
 test.describe('Mergetag attributes', () => {
-	let pdf = null;
-	let form = null;
-	let pdfId = null;
+	let pdf: Pdf;
+	let form: Form;
+	let pdfId: string;
 
 	test.beforeEach(
 		async ({
@@ -24,7 +25,7 @@ test.describe('Mergetag attributes', () => {
 			form = await pdf.createForm('Mergetag Attributes');
 			await pdf.navigateToFormPreview(form.id);
 			await pdf.submitForm();
-			pdfId = await pdf.createPdf(form.id, 'Mergetag');
+			pdfId = (await pdf.createPdf(form.id, 'Mergetag'))!;
 
 			// setup default confirmation
 			await pdf.navigateToFormConfirmation(form.id);
