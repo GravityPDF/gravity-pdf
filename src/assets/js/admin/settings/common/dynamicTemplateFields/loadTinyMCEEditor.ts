@@ -7,7 +7,7 @@ declare const QTags:
 	| (((opts: { id: string }) => void) & { _buttonsInit: () => void })
 	| undefined;
 declare const switchEditors:
-	| { switchto: (el: HTMLElement, mode: string) => void }
+	| { go: (id: string, mode: string) => void }
 	| undefined;
 declare function getUserSetting(name: string, fallback?: string): string;
 /* eslint-enable no-var */
@@ -56,7 +56,7 @@ export function loadTinyMCEEditor(
 	}
 
 	/* Load our new editors */
-	$.each(editors, function (_index: number, fullId: string) {
+	editors.forEach(function (fullId: string) {
 		/* Setup out selector */
 		settings.selector = '#' + fullId;
 
@@ -74,15 +74,10 @@ export function loadTinyMCEEditor(
 			/* remember last tab selected */
 			if (
 				typeof switchEditors !== 'undefined' &&
-				typeof switchEditors.switchto === 'function'
+				typeof switchEditors.go === 'function'
 			) {
-				switchEditors.switchto(
-					jQuery('#wp-' + fullId + '-wrap').find(
-						'.wp-switch-editor.switch-' +
-							(getUserSetting('editor') === 'html'
-								? 'html'
-								: 'tmce')
-					)[0],
+				switchEditors.go(
+					fullId,
 					getUserSetting('editor') === 'html' ? 'html' : 'tmce'
 				);
 			}
