@@ -1,29 +1,46 @@
-html[dir="rtl"] {
-  #tab_PDF {
+/**
+ * RTL overrides for the Font Manager modal.
+ *
+ * The new layout is built on @wordpress/components which already
+ * RTL-mirrors most of its primitives — these rules only flip the few
+ * Font-Manager-specific affordances that have explicit left/right values.
+ */
 
-    /* Font manager selector box */
-    #gfpdf_settings\[default_font\], #gfpdf_settings\[font\] {
-      margin: 0 0 0.2rem 0.2rem;
-    }
-  }
+html[dir="rtl"] {
+	#tab_PDF {
+		#gfpdf_settings\[default_font\],
+		#gfpdf_settings\[font\] {
+			margin: 0 0 0.2rem 0.2rem;
+		}
+	}
 }
 
 html[dir="rtl"] .gfpdf-font-manager-modal {
-  .font-manager {
-    #gfpdf-font-manager-container {
+	.gfpdf-fm-sidebar {
+		border-right: 0;
+		border-left: 1px solid var(--gfpdf-lighter-highlight-color);
+	}
 
-      /* Font list */
-      .font-list-column {
-        .font-list {
-          .font-list-header,
-          .font-list-item {
+	.gfpdf-fm-row {
+		border-left: 0;
+		border-right: 3px solid transparent;
+	}
 
-            .font-name {
-              text-align: right;
-            }
-          }
-        }
-      }
-    }
-  }
+	.gfpdf-fm-row.is-selected {
+		border-right-color: #3858e9;
+	}
+
+	.gfpdf-fm-row__active-bar {
+		left: auto;
+		right: 0;
+		border-radius: 2px 0 0 2px;
+	}
+
+	.gfpdf-fm-variant-row.is-drag-over {
+		box-shadow: inset 0 0 0 2px #3858e9;
+	}
+
+	.gfpdf-fm-detail-footer .gfpdf-fm-delete-button {
+		order: -1;
+	}
 }

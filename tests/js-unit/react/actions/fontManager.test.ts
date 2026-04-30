@@ -22,7 +22,14 @@ import {
 	selectFont,
 	SELECT_FONT,
 	moveSelectedFontToTop,
+	startEditing,
+	START_EDITING,
+	setEditingState,
+	SET_EDITING_STATE,
+	resetEditingState,
+	RESET_EDITING_STATE,
 } from '../../../../src/assets/js/react/actions/fontManager';
+import type { EditingFontState } from '../../../../src/assets/js/react/types';
 
 describe('Redux actions - fontManager.js', () => {
 	let results;
@@ -107,5 +114,39 @@ describe('Redux actions - fontManager.js', () => {
 
 		expect(results.type).toEqual('MOVE_SELECTED_FONT_TO_TOP');
 		expect(results.payload).toBe('roboto');
+	});
+
+	test('startEditing - returns null payload when called without an id', () => {
+		const action = startEditing();
+		expect(action.type).toEqual(START_EDITING);
+		expect(action.payload).toBeNull();
+	});
+
+	test('startEditing - returns the id payload when called with an id', () => {
+		const action = startEditing('roboto');
+		expect(action.type).toEqual(START_EDITING);
+		expect(action.payload).toBe('roboto');
+	});
+
+	test('setEditingState - returns the action with the editing state payload', () => {
+		const editing: EditingFontState = {
+			id: 'roboto',
+			isDraft: false,
+			label: 'Roboto',
+			fontStyles: {
+				regular: 'roboto.ttf',
+				italics: '',
+				bold: '',
+				bolditalics: '',
+			},
+		};
+		const action = setEditingState(editing);
+		expect(action.type).toEqual(SET_EDITING_STATE);
+		expect(action.payload).toEqual(editing);
+	});
+
+	test('resetEditingState - returns the reset action', () => {
+		const action = resetEditingState();
+		expect(action.type).toEqual(RESET_EDITING_STATE);
 	});
 });

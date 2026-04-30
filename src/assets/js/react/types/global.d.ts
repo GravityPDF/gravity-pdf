@@ -16,6 +16,7 @@ export interface GFPDFGlobal {
 	/* Plugin info */
 	pluginUrl: string;
 	pdfWorkingDir: string;
+	customFontUrlBase: string;
 	currentVersion: string;
 
 	/* Templates — runtime config (not translated) */

@@ -25,6 +25,24 @@ Object.defineProperty(window, 'matchMedia', {
 	})),
 });
 
+/* jsdom doesn't implement URL.createObjectURL/revokeObjectURL — the
+   FontPreview component uses them to build @font-face src for unsaved
+   draft variants. */
+if (typeof URL.createObjectURL === 'undefined') {
+	(
+		URL as unknown as { createObjectURL: (b: Blob) => string }
+	).createObjectURL = () => 'blob:mock';
+	(
+		URL as unknown as { revokeObjectURL: (u: string) => void }
+	).revokeObjectURL = () => undefined;
+}
+
+/* jsdom doesn't implement Element.scrollIntoView. FontList scrolls the
+   active descendant into view when the list selection changes. */
+if (typeof Element.prototype.scrollIntoView === 'undefined') {
+	Element.prototype.scrollIntoView = () => undefined;
+}
+
 /* Provide a no-op fetch so generator actions don't crash when jsdom
    doesn't include a native fetch implementation. Individual tests that
    need specific API responses should mock their API modules directly. */

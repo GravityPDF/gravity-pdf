@@ -24,10 +24,9 @@ import {
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
 	MOVE_SELECTED_FONT_TO_TOP,
-	SET_ADD_FONT_STATE,
-	SET_UPDATE_FONT_STATE,
-	RESET_ADD_FONT_STATE,
-	RESET_UPDATE_FONT_STATE,
+	START_EDITING,
+	SET_EDITING_STATE,
+	RESET_EDITING_STATE,
 	/* Sync action creators yielded inside generators */
 	getCustomFontList as getCustomFontListAction,
 	addFont as addFontSyncAction,
@@ -42,10 +41,9 @@ import {
 	resetSearchResult,
 	selectFont,
 	moveSelectedFontToTop,
-	setAddFontState,
-	setUpdateFontState,
-	resetAddFontState,
-	resetUpdateFontState,
+	startEditing,
+	setEditingState,
+	resetEditingState,
 } from '../actions/fontManager';
 /* APIs */
 import {
@@ -65,7 +63,7 @@ import { associatedFontManagerSelectBox } from '../utilities/FontManager/associa
 import {
 	FontItem,
 	FontFormData,
-	FontFormState,
+	EditingFontState,
 	FontManagerState,
 } from '../types';
 
@@ -113,19 +111,35 @@ function taggedThunk<TArgs extends unknown[]>(
 	};
 }
 
-const defaultFormState: FontFormState = {
-	id: '',
-	label: '',
-	fontStyles: {
-		regular: '',
-		italics: '',
-		bold: '',
-		bolditalics: '',
-	},
-	validateLabel: true,
-	validateRegular: true,
-	disableUpdateButton: false,
-};
+/* Hydrate the editing slice from a saved FontItem (Edit-existing path). */
+function hydrateEditingFromFont(font: FontItem): EditingFontState {
+	return {
+		id: font.id,
+		isDraft: false,
+		label: font.font_name,
+		fontStyles: {
+			regular: font.regular,
+			italics: font.italics,
+			bold: font.bold,
+			bolditalics: font.bolditalics,
+		},
+	};
+}
+
+/* Build a fresh empty draft (Add-new-font path). */
+function emptyDraftState(): EditingFontState {
+	return {
+		id: `draft-${Date.now()}`,
+		isDraft: true,
+		label: '',
+		fontStyles: {
+			regular: '',
+			italics: '',
+			bold: '',
+			bolditalics: '',
+		},
+	};
+}
 
 export function createFontManagerStore(
 	overrideInitial?: Partial<FontManagerState>
@@ -138,8 +152,7 @@ export function createFontManagerStore(
 		searchResult: null,
 		selectedFont: '',
 		msg: {},
-		addFont: defaultFormState,
-		updateFont: defaultFormState,
+		editingFont: null,
 	};
 
 	const initial: FontManagerState = { ...defaultInitial, ...overrideInitial };
@@ -472,20 +485,26 @@ export function createFontManagerStore(
 				return { ...state, fontList: [...match, ...rest] };
 			}
 
-			case SET_ADD_FONT_STATE:
-				return { ...state, addFont: action.payload as FontFormState };
+			case START_EDITING: {
+				const id = action.payload as string | null;
+				if (!id) {
+					return { ...state, editingFont: emptyDraftState() };
+				}
+				const font = state.fontList.find((f) => f.id === id);
+				if (!font) {
+					return state;
+				}
+				return { ...state, editingFont: hydrateEditingFromFont(font) };
+			}
 
-			case SET_UPDATE_FONT_STATE:
+			case SET_EDITING_STATE:
 				return {
 					...state,
-					updateFont: action.payload as FontFormState,
+					editingFont: action.payload as EditingFontState,
 				};
 
-			case RESET_ADD_FONT_STATE:
-				return { ...state, addFont: defaultFormState };
-
-			case RESET_UPDATE_FONT_STATE:
-				return { ...state, updateFont: defaultFormState };
+			case RESET_EDITING_STATE:
+				return { ...state, editingFont: null };
 
 			default:
 				return state;
@@ -504,10 +523,9 @@ export function createFontManagerStore(
 			resetSearchResult,
 			selectFont,
 			moveSelectedFontToTop,
-			setAddFontState,
-			setUpdateFontState,
-			resetAddFontState,
-			resetUpdateFontState,
+			startEditing,
+			setEditingState,
+			resetEditingState,
 
 			/* Thunk action creators (tagged for spy compatibility) */
 			getCustomFontList: taggedThunk(
@@ -757,8 +775,7 @@ export function createFontManagerStore(
 			getSearchResult: (state: FontManagerState) => state.searchResult,
 			getSelectedFont: (state: FontManagerState) => state.selectedFont,
 			getMsg: (state: FontManagerState) => state.msg,
-			getAddFontState: (state: FontManagerState) => state.addFont,
-			getUpdateFontState: (state: FontManagerState) => state.updateFont,
+			getEditingFont: (state: FontManagerState) => state.editingFont,
 		},
 	});
 }

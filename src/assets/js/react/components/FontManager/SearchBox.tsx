@@ -1,8 +1,9 @@
 /* Dependencies */
 import { useState, useEffect, useRef } from '@wordpress/element';
-import type { ChangeEvent } from 'react';
+import { SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+/* Store */
 import {
 	FONT_MANAGER_STORE_NAME,
 	fontManagerStore,
@@ -12,14 +13,10 @@ import {
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       6.0
+ * @since       7.0
  */
 
-interface Props {
-	id?: string;
-}
-
-const SearchBox = ({ id }: Props) => {
+const SearchBox = () => {
 	const { resetSearchResult, searchFontList } = useDispatch(
 		FONT_MANAGER_STORE_NAME
 	);
@@ -27,62 +24,39 @@ const SearchBox = ({ id }: Props) => {
 		(select) => select(fontManagerStore).getSearchResult(),
 		[]
 	);
-	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
-	const [searchInput, setSearchInput] = useState('');
-	const inputRef = useRef<HTMLInputElement>(null);
+	const [value, setValue] = useState('');
+	const lastValueRef = useRef('');
 
-	/* Track the latest searchInput value for unmount cleanup without stale closure */
-	const lastSearchInput = useRef('');
-
-	/* Focus the search input on mount */
-	useEffect(() => {
-		inputRef.current?.focus();
-	}, []);
-
-	/* Reset search state when searchResult becomes null */
+	/* Reset local input when searchResult clears externally */
 	useEffect(() => {
 		if (!searchResult) {
-			setSearchInput('');
-			lastSearchInput.current = '';
+			setValue('');
+			lastValueRef.current = '';
 		}
 	}, [searchResult]);
 
-	/* Clear search box after a successful font has been added */
-	useEffect(() => {
-		if (msg.success && id) {
-			setSearchInput('');
-			lastSearchInput.current = '';
-		}
-	}, [msg, id]);
-
-	/* Dispatch resetSearchResult on unmount if search input is not empty */
 	useEffect(() => {
 		return () => {
-			if (lastSearchInput.current !== '') {
+			if (lastValueRef.current !== '') {
 				resetSearchResult();
 			}
 		};
 	}, [resetSearchResult]);
 
-	const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-		const data = e.target.value;
-		lastSearchInput.current = data;
-		setSearchInput(data);
-		searchFontList(data);
+	const handleChange = (next: string) => {
+		lastValueRef.current = next;
+		setValue(next);
+		searchFontList(next);
 	};
 
 	return (
-		<div role="form">
-			<input
-				data-test="component-SearchBox"
-				type="search"
-				id="font-manager-search-box"
-				className="wp-filter-search"
-				placeholder={__('Search installed fonts', 'gravity-pdf')}
-				value={searchInput}
-				onChange={handleSearch}
-				onKeyDown={(e) => e.keyCode === 13 && e.preventDefault()}
-				ref={inputRef}
+		<div data-test="component-SearchBox" className="gfpdf-fm-search">
+			<SearchControl
+				__nextHasNoMarginBottom
+				label={__('Search fonts', 'gravity-pdf')}
+				placeholder={__('Search fonts…', 'gravity-pdf')}
+				value={value}
+				onChange={handleChange}
 			/>
 		</div>
 	);

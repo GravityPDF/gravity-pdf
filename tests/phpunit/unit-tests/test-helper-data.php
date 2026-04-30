@@ -155,6 +155,7 @@ class Test_Helper_Data extends WP_UnitTestCase {
 			'currentVersion',
 			'pdfWorkingDir',
 			'spinnerUrl',
+			'customFontUrlBase',
 		];
 
 		foreach ( $required_keys as $key ) {
