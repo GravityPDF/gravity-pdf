@@ -24,11 +24,18 @@ export interface FontManagerUiState {
 export const FontManagerUiContext = createContext<{
 	getState: () => FontManagerUiState;
 	setState: (next: Partial<FontManagerUiState>) => void;
+	/**
+	 * Run `continueAction` immediately when the editing slice is clean,
+	 * otherwise surface a "Discard unsaved changes?" confirm dialog
+	 * (handled by the bootstrap) and run the action only on confirm.
+	 */
+	requestDiscard: (continueAction: () => void) => void;
 }>({
 	getState: () => ({ confirmOpen: false, dirty: false }),
 	setState: () => {
 		/* default no-op for tests that render the modal in isolation */
 	},
+	requestDiscard: (continueAction) => continueAction(),
 });
 
 export function useFontManagerUi() {

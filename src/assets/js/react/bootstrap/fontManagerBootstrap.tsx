@@ -3,11 +3,15 @@ import { useState, useEffect, useRef, createRoot } from '@wordpress/element';
 import type { MouseEvent } from 'react';
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 /* Store */
-import { fontManagerStore } from '../store/fontManagerStore';
+import {
+	FONT_MANAGER_STORE_NAME,
+	fontManagerStore,
+} from '../store/fontManagerStore';
 /* Components */
 import FontManagerModal from '../components/FontManager/FontManagerModal';
+import DiscardChangesDialog from '../components/FontManager/DiscardChangesDialog';
 /* Utilities */
 import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
 import {
@@ -43,6 +47,7 @@ const FontManagerApp = () => {
 		(select) => select(fontManagerStore).getSelectedFont(),
 		[]
 	);
+	const { resetEditingState } = useDispatch(FONT_MANAGER_STORE_NAME);
 
 	/* Mirror latest values in refs so the close-side-effect reads current data */
 	const fontListRef = useRef<FontItem[]>(fontList);
@@ -53,15 +58,32 @@ const FontManagerApp = () => {
 	/* UI flags from inside the modal — we read these to decide whether Esc
 	   should close the outer Modal. The inner FontManagerModal mutates
 	   `state` via setState, but we never re-render the bootstrap on those
-	   flips because shouldCloseOnEsc reads getState() at event time. */
+	   flips because the close-handler reads getState() at event time. */
 	const uiStateRef = useRef<FontManagerUiState>({
 		dirty: false,
 		confirmOpen: false,
 	});
+
+	/* "Discard unsaved changes?" dialog state. Lives here so both the outer
+	   Modal Esc/close path and the modal's mobile back button can route
+	   through requestDiscard() and reuse the same dialog. */
+	const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
+	const pendingDiscardActionRef = useRef<(() => void) | null>(null);
+	const discardDialogOpenRef = useRef(false);
+	discardDialogOpenRef.current = discardDialogOpen;
+
 	const uiContextValue = useRef({
 		getState: () => uiStateRef.current,
 		setState: (next: Partial<FontManagerUiState>) => {
 			uiStateRef.current = { ...uiStateRef.current, ...next };
+		},
+		requestDiscard: (continueAction: () => void) => {
+			if (!uiStateRef.current.dirty) {
+				continueAction();
+				return;
+			}
+			pendingDiscardActionRef.current = continueAction;
+			setDiscardDialogOpen(true);
 		},
 	}).current;
 
@@ -85,13 +107,35 @@ const FontManagerApp = () => {
 	}, [isOpen]);
 
 	const handleCloseModal = () => {
-		/* If a confirm dialog is open, the inner Modal handles its own Esc.
-		   If the form is dirty, ignore the close request — the user must
-		   explicitly Cancel/Save first. The Snackbar is enough warning. */
-		if (uiStateRef.current.dirty || uiStateRef.current.confirmOpen) {
+		/* If an inner confirm dialog (delete / replace-files) or our own
+		   discard dialog is open, ignore the close request — the open
+		   dialog catches Esc itself. */
+		if (uiStateRef.current.confirmOpen || discardDialogOpenRef.current) {
+			return;
+		}
+		/* With unsaved changes, surface the discard dialog instead of
+		   silently swallowing the close (a11y commitment §3). */
+		if (uiStateRef.current.dirty) {
+			pendingDiscardActionRef.current = () => setIsOpen(false);
+			setDiscardDialogOpen(true);
 			return;
 		}
 		setIsOpen(false);
+	};
+
+	const confirmDiscard = () => {
+		resetEditingState();
+		setDiscardDialogOpen(false);
+		const next = pendingDiscardActionRef.current;
+		pendingDiscardActionRef.current = null;
+		if (next) {
+			next();
+		}
+	};
+
+	const cancelDiscard = () => {
+		pendingDiscardActionRef.current = null;
+		setDiscardDialogOpen(false);
 	};
 
 	const tabLocation = tabLocationFromQuery();
@@ -121,6 +165,12 @@ const FontManagerApp = () => {
 					<FontManagerModal tabLocation={tabLocation} />
 				</Modal>
 			)}
+
+			<DiscardChangesDialog
+				isOpen={discardDialogOpen}
+				onConfirm={confirmDiscard}
+				onCancel={cancelDiscard}
+			/>
 		</FontManagerUiContext.Provider>
 	);
 };
