@@ -3,7 +3,6 @@ import {
 	findAndRemove,
 	reduceFontFileName,
 	checkFontListIncludes,
-	clearMsg,
 } from '../../../../../src/assets/js/react/utilities/FontManager/fontManagerReducer';
 
 describe('Utilities/FontManager - fontManagerReducer.js', () => {
@@ -60,13 +59,5 @@ describe('Utilities/FontManager - fontManagerReducer.js', () => {
 
 	test('checkFontListIncludes() (false) -', () => {
 		expect(checkFontListIncludes('gotham', 'roboto')).toBe(false);
-	});
-
-	test('clearMsg() -', () => {
-		const msg = {
-			success: { addFont: 'success' },
-			error: { addFont: 'error' },
-		};
-		expect(clearMsg(msg)).toEqual({ error: {} });
 	});
 });

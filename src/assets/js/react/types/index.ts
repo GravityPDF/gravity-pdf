@@ -52,18 +52,23 @@ export interface FontManagerMsg {
 	};
 }
 
-export interface FontFormState {
-	id?: string;
+export interface FontVariantStyles {
+	regular: string | File;
+	italics: string | File;
+	bold: string | File;
+	bolditalics: string | File;
+}
+
+/**
+ * Unified slice covering both the "Add font" draft and the "Edit existing
+ * font" working copy. `id` carries the saved font id when isDraft is false,
+ * or a temporary `draft-<timestamp>` id when isDraft is true.
+ */
+export interface EditingFontState {
+	id: string;
+	isDraft: boolean;
 	label: string;
-	fontStyles: {
-		regular: string | File;
-		italics: string | File;
-		bold: string | File;
-		bolditalics: string | File;
-	};
-	validateLabel: boolean;
-	validateRegular: boolean;
-	disableUpdateButton: boolean;
+	fontStyles: FontVariantStyles;
 }
 
 export interface FontManagerState {
@@ -74,8 +79,7 @@ export interface FontManagerState {
 	searchResult: FontItem[] | null;
 	selectedFont: string;
 	msg: FontManagerMsg;
-	addFont: FontFormState;
-	updateFont: FontFormState;
+	editingFont: EditingFontState | null;
 }
 
 export interface ConsoleLine {

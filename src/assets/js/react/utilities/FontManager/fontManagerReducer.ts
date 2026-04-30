@@ -5,7 +5,7 @@
  * @since       6.0
  */
 
-import { FontItem, FontManagerMsg } from '../../types';
+import { FontItem } from '../../types';
 
 export function findAndUpdate(
 	data: FontItem[],
@@ -38,20 +38,4 @@ export function reduceFontFileName(key: string): string {
 
 export function checkFontListIncludes(font: string, keyword: string): boolean {
 	return font.replace('.ttf', '').toLowerCase().includes(keyword);
-}
-
-export function clearMsg(payload: FontManagerMsg): FontManagerMsg {
-	const msg = { ...payload };
-
-	/* Clear previous success msg */
-	if (msg.success) {
-		delete msg.success;
-	}
-
-	/* Clear previous addFont error msg */
-	if (msg.error && msg.error.addFont) {
-		delete msg.error.addFont;
-	}
-
-	return msg;
 }

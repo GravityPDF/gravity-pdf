@@ -217,18 +217,25 @@ class Helper_Data {
 		$user_capabilities = is_object( $user_data ) ? $user_data->allcaps : [];
 		$user_capabilities = is_super_admin() ? [ 'administrator' => true ] : $user_capabilities;
 
+		/* template_location_url is populated during bootstrap; fall back to
+		   an empty string so this method remains safe on bare Helper_Data
+		   instances (used by some unit tests). */
+		$template_location_url_key = is_multisite() ? 'multisite_template_location_url' : 'template_location_url';
+		$template_location_url     = isset( $this->$template_location_url_key ) ? $this->$template_location_url_key : '';
+
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_localised_script_array/ for more details about this filter */
 
 		return apply_filters(
 			'gfpdf_localised_script_array',
 			[
-				'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
-				'ajaxNonce'        => wp_create_nonce( 'gfpdf_ajax_nonce' ),
-				'currentVersion'   => PDF_EXTENDED_VERSION,
-				'pdfWorkingDir'    => PDF_TEMPLATE_LOCATION,
-				'pluginUrl'        => PDF_PLUGIN_URL,
-				'userCapabilities' => $user_capabilities,
-				'spinnerUrl'       => admin_url( 'images/spinner-2x.gif' ),
+				'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
+				'ajaxNonce'         => wp_create_nonce( 'gfpdf_ajax_nonce' ),
+				'currentVersion'    => PDF_EXTENDED_VERSION,
+				'pdfWorkingDir'     => PDF_TEMPLATE_LOCATION,
+				'pluginUrl'         => PDF_PLUGIN_URL,
+				'userCapabilities'  => $user_capabilities,
+				'spinnerUrl'        => admin_url( 'images/spinner-2x.gif' ),
+				'customFontUrlBase' => trailingslashit( $template_location_url ) . 'fonts/',
 			]
 		);
 	}

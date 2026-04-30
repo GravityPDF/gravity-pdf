@@ -1,18 +1,19 @@
 /* Dependencies */
 import { useState, useEffect, useRef, createRoot } from '@wordpress/element';
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 /* Store */
-import {
-	FONT_MANAGER_STORE_NAME,
-	fontManagerStore,
-} from '../store/fontManagerStore';
+import { fontManagerStore } from '../store/fontManagerStore';
 /* Components */
-import FontManagerBody from '../components/FontManager/FontManagerBody';
+import FontManagerModal from '../components/FontManager/FontManagerModal';
 /* Utilities */
 import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
+import {
+	FontManagerUiContext,
+	type FontManagerUiState,
+} from '../utilities/FontManager/FontManagerUiContext';
 /* Types */
 import type { FontItem } from '../types';
 
@@ -23,14 +24,17 @@ import type { FontItem } from '../types';
  * @since       6.0
  */
 
+const tabLocationFromQuery = (): string =>
+	window.location.search.substring(
+		window.location.search.lastIndexOf('=') + 1
+	);
+
 const FontManagerApp = () => {
 	/* Auto-open when navigated here from WP backend via hash URL */
 	const [isOpen, setIsOpen] = useState(() =>
 		window.location.hash.startsWith('#/fontmanager')
 	);
-	const [activeFontId, setActiveFontId] = useState('');
 
-	const { clearAddFontMsg } = useDispatch(FONT_MANAGER_STORE_NAME);
 	const fontList = useSelect(
 		(select) => select(fontManagerStore).getFontList(),
 		[]
@@ -39,7 +43,6 @@ const FontManagerApp = () => {
 		(select) => select(fontManagerStore).getSelectedFont(),
 		[]
 	);
-	const msg = useSelect((select) => select(fontManagerStore).getMsg(), []);
 
 	/* Mirror latest values in refs so the close-side-effect reads current data */
 	const fontListRef = useRef<FontItem[]>(fontList);
@@ -47,8 +50,24 @@ const FontManagerApp = () => {
 	const selectedFontRef = useRef(selectedFont);
 	selectedFontRef.current = selectedFont;
 
-	/* On Modal close (isOpen true -> false): sync the selected font back to the
-	   associated <select>. Skipped on the Tools tab where there is no select. */
+	/* UI flags from inside the modal — we read these to decide whether Esc
+	   should close the outer Modal. The inner FontManagerModal mutates
+	   `state` via setState, but we never re-render the bootstrap on those
+	   flips because shouldCloseOnEsc reads getState() at event time. */
+	const uiStateRef = useRef<FontManagerUiState>({
+		dirty: false,
+		confirmOpen: false,
+	});
+	const uiContextValue = useRef({
+		getState: () => uiStateRef.current,
+		setState: (next: Partial<FontManagerUiState>) => {
+			uiStateRef.current = { ...uiStateRef.current, ...next };
+		},
+	}).current;
+
+	/* On Modal close (isOpen true -> false): sync the selected font back to
+	   the associated <select>. Skipped on the Tools tab where there is no
+	   select. */
 	const prevIsOpenRef = useRef(isOpen);
 	useEffect(() => {
 		const wasOpen = prevIsOpenRef.current;
@@ -56,10 +75,7 @@ const FontManagerApp = () => {
 		if (!(wasOpen && !isOpen)) {
 			return;
 		}
-		const tabLocation = window.location.search.substring(
-			window.location.search.lastIndexOf('=') + 1
-		);
-		if (tabLocation === 'tools') {
+		if (tabLocationFromQuery() === 'tools') {
 			return;
 		}
 		associatedFontManagerSelectBox(
@@ -69,24 +85,19 @@ const FontManagerApp = () => {
 	}, [isOpen]);
 
 	const handleCloseModal = () => {
-		setIsOpen(false);
-		setActiveFontId('');
-	};
-
-	/* Escape closes the detail panel (not the modal) when one is open */
-	const handleKeyDown = (e: KeyboardEvent) => {
-		if (e.key !== 'Escape' || !activeFontId) {
+		/* If a confirm dialog is open, the inner Modal handles its own Esc.
+		   If the form is dirty, ignore the close request — the user must
+		   explicitly Cancel/Save first. The Snackbar is enough warning. */
+		if (uiStateRef.current.dirty || uiStateRef.current.confirmOpen) {
 			return;
 		}
-		e.stopPropagation();
-		setActiveFontId('');
-		if (msg.success?.addFont || msg.error?.addFont) {
-			clearAddFontMsg();
-		}
+		setIsOpen(false);
 	};
 
+	const tabLocation = tabLocationFromQuery();
+
 	return (
-		<>
+		<FontManagerUiContext.Provider value={uiContextValue}>
 			<Button
 				data-test="component-AdvancedButton"
 				variant="secondary"
@@ -106,22 +117,11 @@ const FontManagerApp = () => {
 					onRequestClose={handleCloseModal}
 					className="gfpdf-font-manager-modal"
 					size="fill"
-					shouldCloseOnEsc={!activeFontId}
 				>
-					{/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-					<div
-						data-test="component-FontManager"
-						className="font-manager"
-						onKeyDown={handleKeyDown}
-					>
-						<FontManagerBody
-							activeFontId={activeFontId}
-							onSelectFont={setActiveFontId}
-						/>
-					</div>
+					<FontManagerModal tabLocation={tabLocation} />
 				</Modal>
 			)}
-		</>
+		</FontManagerUiContext.Provider>
 	);
 };
 
