@@ -20,6 +20,7 @@
   "include": [
     "src/assets/js/**/*",
     "tests/**/*",
+    "tools/**/*"
   ],
   "exclude": [ "build", "node_modules", "vendor", "vendor_prefixed" ]
 }

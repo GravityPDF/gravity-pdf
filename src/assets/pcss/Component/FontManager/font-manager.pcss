@@ -581,6 +581,26 @@
 	max-width: 400px;
 }
 
+/* __experimentalConfirmDialog has no isDestructive prop, so paint the primary
+   confirm button red ourselves when the dialog is marked destructive. */
+.gfpdf-fm-dialog--destructive .components-button.is-primary {
+	background: #cc1818;
+	box-shadow: inset 0 0 0 1px #cc1818;
+	color: #fff;
+}
+
+.gfpdf-fm-dialog--destructive .components-button.is-primary:hover:not(:disabled) {
+	background: #a30b0b;
+	box-shadow: inset 0 0 0 1px #a30b0b;
+}
+
+.gfpdf-fm-dialog--destructive .components-button.is-primary:focus:not(:disabled) {
+	box-shadow:
+		inset 0 0 0 1px #fff,
+		0 0 0 var(--wp-admin-border-width-focus, 2px) #cc1818;
+	outline: 2px solid transparent;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
 	.gfpdf-font-manager-modal {
@@ -623,6 +643,11 @@
 
 @media (max-width: 640px) {
 	.gfpdf-font-manager-modal {
+		/* Go edge-to-edge so the WP modal chrome (radius + drop shadow) doesn't
+		   visually float a card on top of a tiny viewport. */
+		border-radius: 0;
+		box-shadow: none;
+
 		.gfpdf-fm-body[data-mobile-view="list"] .gfpdf-fm-detail {
 			display: none;
 		}
