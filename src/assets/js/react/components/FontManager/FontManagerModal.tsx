@@ -212,8 +212,11 @@ const FontManagerModal = ({ tabLocation }: Props) => {
 	);
 
 	const onMobileBack = useCallback(() => {
-		setMobileView('list');
-	}, []);
+		/* When the editing slice is dirty, surface the same "Discard unsaved
+		   changes?" dialog as Esc on the outer Modal (a11y commitment §9).
+		   ui.requestDiscard runs the action straight through when not dirty. */
+		ui.requestDiscard(() => setMobileView('list'));
+	}, [ui]);
 
 	const onSetActive = useCallback(() => {
 		if (!editingFont || !savedFont) {

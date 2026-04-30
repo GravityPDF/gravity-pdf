@@ -49,9 +49,11 @@ test.describe('Font Manager', () => {
 		   leaving any saved fonts un-cleaned. The list paints either a row
 		   or the empty-state copy when loading completes. */
 		await expect(
-			page.locator(
-				'[data-test="component-FontListItem"], .gfpdf-fm-list__empty'
-			).first()
+			page
+				.locator(
+					'[data-test="component-FontListItem"], .gfpdf-fm-list__empty'
+				)
+				.first()
 		).toBeVisible();
 
 		const rows = page.locator('[data-test="component-FontListItem"]');
@@ -174,7 +176,12 @@ test.describe('Font Manager', () => {
 
 		await detail.getByRole('button', { name: 'Add font' }).click();
 
-		await expect(page.locator('.components-snackbar').filter({ hasText: 'Your font has been saved.' }).last()).toBeVisible();
+		await expect(
+			page
+				.locator('.components-snackbar')
+				.filter({ hasText: 'Your font has been saved.' })
+				.last()
+		).toBeVisible();
 		await expect(rows).toHaveCount(1);
 
 		// Search Font
@@ -215,7 +222,12 @@ test.describe('Font Manager', () => {
 		/* Adding net-new variants to an existing font is non-destructive
 		   (no SaveReplaceDialog), so the save proceeds straight through. */
 		await detail.getByRole('button', { name: 'Save changes' }).click();
-		await expect(page.locator('.components-snackbar').filter({ hasText: 'Your font has been saved.' }).last()).toBeVisible();
+		await expect(
+			page
+				.locator('.components-snackbar')
+				.filter({ hasText: 'Your font has been saved.' })
+				.last()
+		).toBeVisible();
 		await expect(page.getByText('Roboto 2')).toBeVisible();
 
 		// Delete Font
@@ -257,6 +269,194 @@ test.describe('Font Manager', () => {
 		await expect(popup).not.toBeVisible();
 	});
 
+	test('drag-and-drop a .ttf onto the Regular variant uploads the file', async ({
+		page,
+	}) => {
+		await deleteAnyFonts(page);
+		await openFontManager(page);
+
+		const sidebar = page.locator('[data-test="component-FontSidebar"]');
+		const detail = page.locator('[data-test="component-FontDetail"]');
+		await sidebar.getByRole('button', { name: /add new font/i }).click();
+		await detail.getByLabel('Font name').fill('DropFont');
+
+		const fontPath = path.join(
+			resourcesPath,
+			'fonts',
+			'Roboto-Regular.ttf'
+		);
+		const fontBytes = (await import('fs')).readFileSync(fontPath);
+
+		const regularRow = page.locator(
+			'[data-test="component-VariantRow"][data-variant-key="regular"]'
+		);
+
+		/* Construct a DataTransfer in the page context and dispatch a real
+		   drop event on the WP DropZone — setInputFiles only works for the
+		   underlying <input>, but the DropZone listens to drop events. */
+		const dataTransferHandle = await page.evaluateHandle(
+			({ buf, name, type }) => {
+				const dt = new DataTransfer();
+				const file = new File([new Uint8Array(buf)], name, { type });
+				dt.items.add(file);
+				return dt;
+			},
+			{
+				buf: Array.from(new Uint8Array(fontBytes)),
+				name: 'Roboto-Regular.ttf',
+				type: 'font/ttf',
+			}
+		);
+
+		const dropZone = regularRow.locator('.components-drop-zone');
+		await dropZone.dispatchEvent('drop', {
+			dataTransfer: dataTransferHandle,
+		});
+
+		/* Once the file is accepted the row flips to is-filled and the
+		   filename is shown — the Save button also becomes enabled. */
+		await expect(regularRow).toHaveClass(/is-filled/);
+		await expect(
+			detail.getByRole('button', { name: 'Add font' })
+		).toBeEnabled();
+
+		await detail.getByRole('button', { name: 'Add font' }).click();
+		await expect(
+			page
+				.locator('.components-snackbar')
+				.filter({ hasText: 'Your font has been saved.' })
+				.last()
+		).toBeVisible();
+
+		await deleteAnyFonts(page);
+	});
+
+	test('mobile single-pane: tapping a row reveals the detail and back returns to the list', async ({
+		page,
+	}) => {
+		/* Set up a font we can navigate to */
+		await deleteAnyFonts(page);
+		await openFontManager(page);
+		const sidebar = page.locator('[data-test="component-FontSidebar"]');
+		const detail = page.locator('[data-test="component-FontDetail"]');
+
+		await sidebar.getByRole('button', { name: /add new font/i }).click();
+		await detail.getByLabel('Font name').fill('Roboto');
+		await page
+			.locator(
+				'[data-test="component-VariantRow"][data-variant-key="regular"] input[type="file"]'
+			)
+			.setInputFiles(
+				path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
+			);
+		await detail.getByRole('button', { name: 'Add font' }).click();
+		await expect(
+			page
+				.locator('.components-snackbar')
+				.filter({ hasText: 'Your font has been saved.' })
+				.last()
+		).toBeVisible();
+
+		/* Resize to a mobile viewport — the modal body flips to a
+		   single-pane layout driven by the data-mobile-view attribute. */
+		await page.setViewportSize({ width: 375, height: 800 });
+
+		const body = page.locator('.gfpdf-fm-body');
+		await expect(body).toHaveAttribute('data-mobile-view', 'list');
+
+		/* Tap the row → switches to the detail pane */
+		await page
+			.locator('[data-test="component-FontListItem"]')
+			.first()
+			.click();
+		await expect(body).toHaveAttribute('data-mobile-view', 'detail');
+
+		/* Mobile back button → returns to the list pane */
+		await detail
+			.getByRole('button', { name: /back to font list/i })
+			.click();
+		await expect(body).toHaveAttribute('data-mobile-view', 'list');
+
+		/* Reset viewport so the cleanup runs in the desktop layout */
+		await page.setViewportSize({ width: 1280, height: 800 });
+		await deleteAnyFonts(page);
+	});
+
+	test('Template Usage discloses a snippet and the Copy button signals success', async ({
+		page,
+		context,
+	}) => {
+		/* Grant clipboard-write so navigator.clipboard.writeText() succeeds
+		   in headless Chromium (otherwise the silent catch in TemplateUsage
+		   swallows the result and the "Copied" feedback never appears). */
+		await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+
+		await deleteAnyFonts(page);
+		await openFontManager(page);
+
+		const sidebar = page.locator('[data-test="component-FontSidebar"]');
+		const detail = page.locator('[data-test="component-FontDetail"]');
+		await sidebar.getByRole('button', { name: /add new font/i }).click();
+		await detail.getByLabel('Font name').fill('Roboto');
+		await page
+			.locator(
+				'[data-test="component-VariantRow"][data-variant-key="regular"] input[type="file"]'
+			)
+			.setInputFiles(
+				path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
+			);
+		await detail.getByRole('button', { name: 'Add font' }).click();
+		await expect(
+			page
+				.locator('.components-snackbar')
+				.filter({ hasText: 'Your font has been saved.' })
+				.last()
+		).toBeVisible();
+
+		/* Re-select the saved row to ensure savedFont is populated (the
+		   Preview + TemplateUsage block only renders for saved fonts with a
+		   Regular variant). */
+		await page
+			.locator('[data-test="component-FontListItem"]')
+			.first()
+			.click();
+
+		const templateUsage = page.locator(
+			'[data-test="component-TemplateUsage"]'
+		);
+		await expect(templateUsage).toBeVisible();
+
+		/* Disclosure starts collapsed — expand it. */
+		await templateUsage
+			.getByRole('button', { name: /show template usage/i })
+			.click();
+		await expect(templateUsage.getByRole('region')).toBeVisible();
+
+		/* The snippet is deterministic per font id — verify the rendered
+		   <code> block contains both <style> and <div class="font-..."> from
+		   the prototype shape. */
+		const codeBlock = templateUsage.locator('pre code');
+		await expect(codeBlock).toContainText('<style>');
+		await expect(codeBlock).toContainText('font-family');
+
+		/* Click Copy snippet — the button flips to "Copied" for ~1.5s. */
+		await templateUsage
+			.getByRole('button', { name: /copy snippet/i })
+			.click();
+		await expect(
+			templateUsage.getByRole('button', { name: 'Copied' })
+		).toBeVisible();
+
+		/* Verify what landed on the clipboard matches the rendered snippet. */
+		const expectedSnippet = await codeBlock.textContent();
+		const clipboardText = await page.evaluate(() =>
+			navigator.clipboard.readText()
+		);
+		expect(clipboardText).toBe(expectedSnippet);
+
+		await deleteAnyFonts(page);
+	});
+
 	test('Set as active syncs the parent <select> after closing the modal', async ({
 		page,
 	}) => {
@@ -278,7 +478,12 @@ test.describe('Font Manager', () => {
 				path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
 			);
 		await detail.getByRole('button', { name: 'Add font' }).click();
-		await expect(page.locator('.components-snackbar').filter({ hasText: 'Your font has been saved.' }).last()).toBeVisible();
+		await expect(
+			page
+				.locator('.components-snackbar')
+				.filter({ hasText: 'Your font has been saved.' })
+				.last()
+		).toBeVisible();
 
 		/* The Set as active button only appears once the font is saved with
 		   a Regular variant. */
