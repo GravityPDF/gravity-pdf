@@ -4,7 +4,6 @@
   "phpVersion": "8.5",
   "plugins": [],
   "mappings": {
-    "wp-cli.yml": "./tools/wp-env/wp-cli.yml",
     "wp-content/mu-plugins": "./tools/mu-plugins",
     "wp-content/plugins/gravityforms": "./vendor/gravity/gravityforms",
     "wp-content/plugins/gravityformspolls": "./vendor/gravity/gravityformspolls",

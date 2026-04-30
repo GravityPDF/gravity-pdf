@@ -4,7 +4,6 @@
   "phpVersion": "8.5",
   "plugins": [],
   "mappings": {
-    "wp-cli.yml": "./tools/wp-env/wp-cli.yml",
     "wp-content/mu-plugins": "./tools/mu-plugins",
     "wp-content/plugins/gravityforms": "./vendor/gravity/gravityforms",
     "wp-content/plugins/gravityformspolls": "./vendor/gravity/gravityformspolls",
@@ -27,7 +26,7 @@
     }
   },
   "lifecycleScripts": {
-    "afterStart": "rm -R ./tmp/artifacts || true && yarn wp-env:e2e:permalinks run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e:permalinks run cli wp rewrite structure '/%postname%/' --hard",
-    "afterReset": "rm -R ./tmp/artifacts || true && yarn wp-env:e2e:permalinks run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e:permalinks run cli wp rewrite structure '/%postname%/' --hard"
+    "afterStart": "yarn wp-env:e2e:permalinks run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e:permalinks run cli wp rewrite structure '/%postname%/' --hard",
+    "afterReset": "yarn wp-env:e2e:permalinks run cli wp plugin activate gravityforms gravity-pdf && yarn wp-env:e2e:permalinks run cli wp rewrite structure '/%postname%/' --hard"
   }
 }
