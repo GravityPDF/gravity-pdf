@@ -63,7 +63,7 @@
     "check-licenses": "wp-scripts check-licenses --prod --gpl2",
     "format": "wp-scripts format ./src/assets ./tests/js-unit ./tests/playwright && yarn lint:js --fix && yarn lint:css --fix",
     "lint:css": "wp-scripts lint-style ./src/assets/**/*.pcss",
-    "lint:js": "wp-scripts lint-js ./src/assets/js ./tests/js-unit ./tests/playwright",
+    "lint:js": "wp-scripts lint-js ./src/assets/js ./tests/ ./tools",
     "wp-env:all:start": "concurrently 'yarn wp-env start --debug' 'yarn wp-env:integration start --debug' 'yarn wp-env:e2e start --debug' 'yarn wp-env:e2e:permalinks start --debug'",
     "wp-env:all:reset": "concurrently 'yarn wp-env restart' 'yarn wp-env:integration restart' 'yarn wp-env:e2e restart' 'yarn wp-env:e2e:permalinks restart'",
     "wp-env:all:stop": "concurrently 'yarn wp-env stop' 'yarn wp-env:integration stop' 'yarn wp-env:e2e stop' 'yarn wp-env:e2e:permalinks stop'",
