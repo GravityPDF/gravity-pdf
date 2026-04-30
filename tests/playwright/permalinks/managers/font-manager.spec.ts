@@ -358,9 +358,16 @@ test.describe('Font Manager', () => {
 				.last()
 		).toBeVisible();
 
-		/* Resize to a mobile viewport — the modal body flips to a
-		   single-pane layout driven by the data-mobile-view attribute. */
+		/* Close and re-open in a mobile viewport — after Save the editingFont
+		   is still populated, so the body would already be on the detail pane.
+		   Closing clears the modal's local state and re-opening at 375px gives
+		   us a clean list pane to start the navigation from. */
+		const popup = page.locator('.gfpdf-font-manager-modal');
+		await popup.getByRole('button', { name: 'Close' }).click();
+		await expect(popup).not.toBeVisible();
+
 		await page.setViewportSize({ width: 375, height: 800 });
+		await openFontManager(page);
 
 		const body = page.locator('.gfpdf-fm-body');
 		await expect(body).toHaveAttribute('data-mobile-view', 'list');
@@ -440,13 +447,14 @@ test.describe('Font Manager', () => {
 		await expect(codeBlock).toContainText('<style>');
 		await expect(codeBlock).toContainText('font-family');
 
-		/* Click Copy snippet — the button flips to "Copied" for ~1.5s. */
-		await templateUsage
-			.getByRole('button', { name: /copy snippet/i })
-			.click();
-		await expect(
-			templateUsage.getByRole('button', { name: 'Copied' })
-		).toBeVisible();
+		/* Click Copy snippet — the button flips to "Copied" for ~1.5s. The
+		   button keeps a stable aria-label="Copy snippet" so we have to assert
+		   the visible label change rather than the accessible name. */
+		const copyButton = templateUsage.getByRole('button', {
+			name: /copy snippet/i,
+		});
+		await copyButton.click();
+		await expect(copyButton).toHaveText(/copied/i);
 
 		/* Verify what landed on the clipboard matches the rendered snippet. */
 		const expectedSnippet = await codeBlock.textContent();
