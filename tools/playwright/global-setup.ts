@@ -1,4 +1,4 @@
-import { test as setup } from '@playwright/test';
+import { test as setup } from '@self:playwright/fixtures/test';
 
 setup('setup', async ({ request }, testInfo) => {
 	const storageStatePath = testInfo.project.metadata
