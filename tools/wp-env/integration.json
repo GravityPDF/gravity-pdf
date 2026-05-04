@@ -21,7 +21,7 @@
   "testsEnvironment": false,
   "env": {
     "tests": {
-      "port": 8703
+      "port": 8701
     }
   }
 }

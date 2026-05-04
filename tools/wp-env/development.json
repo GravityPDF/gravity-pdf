@@ -17,7 +17,7 @@
   "testsEnvironment": false,
   "env": {
     "tests": {
-      "port": 8701
+      "port": 8700
     }
   },
   "lifecycleScripts": {
