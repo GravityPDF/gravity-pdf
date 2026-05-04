@@ -1,8 +1,7 @@
 import * as crypto from 'node:crypto';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
-import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { test } from '@self:playwright/fixtures/test';
+import { test, expect } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
 test.describe('PDF Security and Access Policies', () => {

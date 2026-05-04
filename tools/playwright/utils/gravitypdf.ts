@@ -1,4 +1,4 @@
-import { expect } from '@wordpress/e2e-test-utils-playwright';
+import { expect } from '@self:playwright/fixtures/test';
 import type { Locator } from '@playwright/test';
 import type { Readable } from 'stream';
 import { URL } from 'node:url';

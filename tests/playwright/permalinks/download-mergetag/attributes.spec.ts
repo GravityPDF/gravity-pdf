@@ -1,5 +1,5 @@
-import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import { test, expect } from '@self:playwright/fixtures/test';
 import type { Page } from '@playwright/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import type { Form } from '@self:playwright/utils/gravityforms';
