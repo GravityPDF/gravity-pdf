@@ -1,8 +1,7 @@
-import { expect } from '@wordpress/e2e-test-utils-playwright';
 import { takeSnapshot } from '@chromatic-com/playwright';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { test } from '@self:playwright/fixtures/test';
+import { test, expect } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import type { Entry, Form } from '@self:playwright/utils/gravityforms';
 
