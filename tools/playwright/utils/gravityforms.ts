@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { expect } from '@playwright/test';
+import { expect } from '@self:playwright/fixtures/test';
 
 export type Form = {
 	id: number;
