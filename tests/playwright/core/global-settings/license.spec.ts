@@ -1,7 +1,6 @@
 import type { Admin } from '@wordpress/e2e-test-utils-playwright';
-import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { test } from '@self:playwright/fixtures/test';
+import { test, expect } from '@self:playwright/fixtures/test';
 import { takeSnapshot } from '@chromatic-com/playwright';
 
 test.describe('License Tab', () => {
