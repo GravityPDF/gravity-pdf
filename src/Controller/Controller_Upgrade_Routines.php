@@ -58,6 +58,10 @@ class Controller_Upgrade_Routines {
 		if ( version_compare( $current_version, '6.13.2', '>=' ) && version_compare( $old_version, '6.13.2', '<' ) ) {
 			$this->fix_tmp_folder_permissions();
 		}
+
+		if ( version_compare( $current_version, '6.15.0', '>=' ) && version_compare( $old_version, '6.14.0', '<' ) ) {
+			$this->remove_legacy_update_cache();
+		}
 	}
 
 	/**
@@ -141,5 +145,16 @@ class Controller_Upgrade_Routines {
 				// do nothing
 			}
 		}
+	}
+
+	/**
+	 * Remove Gravity PDF's edd_sl_* options
+	 *
+	 * @since 6.15.0
+	 */
+	protected function remove_legacy_update_cache() {
+		global $wpdb;
+
+		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'edd_sl_%' AND option_value LIKE '%gravity-pdf%'" );
 	}
 }
