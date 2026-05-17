@@ -225,7 +225,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* add custom classes to form */
 		$form_classes = '';
-		if ( version_compare( '2.6-rc-1', GFCommon::$version, '>=' ) ) {
+		if ( version_compare( '2.6-rc-1', \GFForms::$version, '<=' ) ) {
 			$form_classes .= 'gfpdf-gf-2-6';
 		}
 
@@ -398,6 +398,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-pdf' ), '<a href="' . esc_url( remove_query_arg( 'pid' ) ) . '">', '</a>' ) );
 
 			return true;
@@ -627,6 +628,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* phpcs:enable */
 
 		/* If we don't have a specific PDF we'll use the defaults */
+		$template = '';
 		if ( empty( $pid ) || empty( $form_id ) ) {
 			$template = $this->options->get_option( 'default_template', 'zadani' );
 		} else {
@@ -635,8 +637,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( ! is_wp_error( $pdf ) ) {
 				$template = $pdf['template'];
-			} else {
-				$template = '';
+			} elseif ( ! empty( $_POST['gfpdf_settings']['template'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				/* in the middle of creating a new PDF, and not yet saved in the DB. Grab from POST data */
+				$template = sanitize_html_class( $_POST['gfpdf_settings']['template'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
 		}
 

@@ -51,6 +51,7 @@ class Controller_Export_Entries {
 
 			$form['fields'][] = [
 				'id'    => 'gpdf_' . $pdf['id'],
+				/* translators: %s: PDF name */
 				'label' => sprintf( __( 'PDF: %s', 'gravity-pdf' ), $pdf['name'] ),
 			];
 		}

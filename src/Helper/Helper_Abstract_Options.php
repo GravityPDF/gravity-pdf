@@ -1715,9 +1715,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* get selected value (if any) */
 		$value = $this->get_form_value( $args );
 
-		$error_statuses = [ '', 'active' ];
-		$is_error       = ! in_array( $value['status'], $error_statuses, true );
-		$is_active      = $value['status'] === 'active';
+		/** @var Helper_Abstract_Addon $addon */
+		$addon             = $args['data'];
+		$hardcoded_license = $addon->get_license_key_from_constant();
+		if ( $hardcoded_license ) {
+			$value['key']   = $hardcoded_license;
+			$args['desc2']  = __( 'License key set by the site administrator.', 'gravity-pdf' );
+			$args['desc2'] .= ' <a href="https://docs.gravitypdf.com/v6/extensions/installing-upgrading-extensions#hardcode-license-with-php-constant">' . __( 'Learn more.', 'gravity-pdf' ) . '</a>';
+		}
+
+		$is_error  = ! in_array( $value['status'], [ '', 'active', 'valid' ], true );
+		$is_active = in_array( $value['status'], [ 'active', 'valid' ], true );
 		?>
 
 		<?php if ( ! empty( $value['msg'] ) ): ?>
@@ -1733,7 +1741,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<?php endif; ?>
 
 		<label for="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]" class="screen-reader-text">
-			<?php echo esc_html( sprintf( __( '%s license key', 'gravity-pdf' ), $args['name'] ) ); ?>
+			<?php /* translators: %s: add-on name */ echo esc_html( sprintf( __( '%s license key', 'gravity-pdf' ), $args['name'] ) ); ?>
 		</label>
 
 		<input autocomplete="off"
@@ -1742,9 +1750,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			   class="<?php echo esc_attr( 'gfpdf_settings_' . $args['id'] ); ?>"
 			   name="gfpdf_settings[<?php echo esc_attr( $args['id'] ); ?>]"
 			   value="<?php echo esc_attr( ! empty( $value['key'] ) ? sha1( $value['key'] ) : '' ); ?>"
+			   <?php echo $hardcoded_license ? 'readonly' : ''; ?>
 		/>
 
-		<?php if ( $is_active ): ?>
+		<?php if ( $is_active && ! $hardcoded_license ): ?>
 			<button type="button"
 					class="button primary white gfpdf-deactivate-license"
 					data-addon-name="<?php echo esc_attr( substr( $args['id'], 8 ) ); ?>"
@@ -1839,7 +1848,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<?php if ( $toggle !== false ): ?>
-			<?php $this->start_toggle_input( $toggle, $value ); ?>
+			<?php $this->start_toggle_input( $toggle, $value, $args['id'] ); ?>
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
@@ -2056,7 +2065,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		?>
 
 		<?php if ( $toggle !== false ): ?>
-			<?php $this->start_toggle_input( $toggle, $value ); ?>
+			<?php $this->start_toggle_input( $toggle, $value, $args['id'] ); ?>
 		<?php endif; ?>
 
 		<div class="gform-settings-description gform-kitchen-sink">
@@ -2455,6 +2464,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 */
 	public function missing_callback( $args ) {
+		/* translators: %s: setting ID */
 		echo wp_kses_post( sprintf( __( 'The callback used for the %s setting is missing.', 'gravity-pdf' ), "<strong>{$args['id']}</strong>" ) );
 	}
 
@@ -2487,12 +2497,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param string $toggle The text to be used in the toggle
 	 * @param string $value  Whether the field currently has a value
+	 * @param string $element_id The base ID for the toggle
 	 *
 	 * @return void
 	 *
 	 * @since 6.4
+	 * @since 6.14 Added $element_id
 	 */
-	public function start_toggle_input( $toggle, $value ) {
+	public function start_toggle_input( $toggle, $value, $element_id = '' ) {
 		$has_value = ! empty( $value ) ? 1 : 0;
 
 		?>
@@ -2500,6 +2512,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		<label>
 			<input class="gfpdf-input-toggle"
 				   type="checkbox"
+				   id="<?php echo esc_attr( $element_id . '_toggle' ); ?>"
 				   value="1"
 				   <?php checked( $has_value, 1 ); ?>
 			/>
