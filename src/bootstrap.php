@@ -131,6 +131,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function __call( $name, $arguments ) {
+		/* translators: %s: deprecated method name */
 		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
 	}
 
@@ -208,7 +209,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		);
 
 		/* Load Background Queue classes */
-		if ( version_compare( \GFCommon::$version, '2.9.7.2', '>=' ) ) {
+		if ( version_compare( \GFForms::$version, '2.9.7.2', '>=' ) ) {
 			if ( ! class_exists( '\Gravity_Forms\Gravity_Forms\Async\GF_Background_Process' ) ) {
 				require_once GFCommon::get_base_path() . '/includes/async/class-gf-background-process.php';
 			}
@@ -378,7 +379,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	private function register_styles() {
 		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
 
-		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-styles.min.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'build/assets/app.bundle.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
 	}
 
 	/**
@@ -389,7 +390,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_scripts() {
+		global $wp_version;
+
 		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
+		$args    = version_compare( $wp_version, '6.3.0', '>=' ) ? [ 'strategy' => 'defer' ] : true;
 
 		$pdf_settings_dependencies = [
 			'jquery-ui-tooltip',
@@ -400,10 +404,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependencies, $version, true );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'build/assets/admin.min.js', $pdf_settings_dependencies, $version, $args );
 
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version, true );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version, true );
+		/* add hot reloading in development */
+		$asset               = file_exists( PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php' )
+			? require PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php'
+			: [ 'dependencies' => [ 'jquery' ] ];
+		$bundle_dependencies = $asset['dependencies'] ?? [];
+
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
 	}
 
 	/**

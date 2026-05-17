@@ -404,6 +404,7 @@ final class GPDFAPI {
 
 		/* Check the option doesn't already exist */
 		if ( null !== $options->get_option( $key, null ) ) {
+			/* translators: %s: option key name */
 			return new WP_Error( 'option_exists', esc_html__( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-pdf' ) );
 		}
 
