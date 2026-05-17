@@ -5,9 +5,6 @@ declare( strict_types=1 );
 use Isolated\Symfony\Component\Finder\Finder;
 
 $path = './';
-if ( isset( $_SERVER['argv'][0] ) ) {
-	$path = dirname( $_SERVER['argv'][0] ) . '/';
-}
 
 return [
 
@@ -21,10 +18,10 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/gravitypdf/querypath/' )->depth( '== 0' )->name( [ 'CREDITS', 'COPYING-MIT.txt' ] ),
-		Finder::create()->files()->in( $path . 'vendor/gravitypdf/querypath/src/' )->name( [ '*.php' ] ),
-		Finder::create()->files()->in( $path . 'vendor/masterminds/html5/' )->depth( '== 0' )->name( [ 'LICENSE.txt', 'CREDITS' ] ),
-		Finder::create()->files()->in( $path . 'vendor/masterminds/html5/src/' )->name( [ '*.php' ] ),
+		Finder::create()->files()->in( $path . 'vendor/spatie/url-signer/' )->exclude( 'tests' )->name( [ '*.php', 'LICENSE.md' ] ),
+		Finder::create()->files()->in( $path . 'vendor/league/uri/' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/league/uri-components/' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/league/uri-interfaces/' )->name( [ '*.php', 'LICENSE' ] ),
 	],
 
 	/*
@@ -35,18 +32,5 @@ return [
 	 *
 	 * For more see: https://github.com/humbug/php-scoper#patchers
 	 */
-	'patchers'  => [
-		function( string $filePath, string $prefix, string $content ): string {
-
-			if ( basename( $filePath ) === 'DOMTraverser.php' ) {
-				$content = str_replace( "\\$prefix\SPLObjectStorage", '\SPLObjectStorage', $content );
-			}
-
-			return str_replace(
-				"'\\\\QueryPath\\\\",
-				"'\\\\$prefix\\\\QueryPath\\\\",
-				$content
-			);
-		},
-	],
+	'patchers'  => [],
 ];

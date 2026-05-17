@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Gravity PDF">
+<ruleset name="PDF for GravityView">
     <description>Customise the WordPress Coding Standard</description>
 
     <!-- Only scan PHP files. -->
@@ -14,16 +14,11 @@
     -->
     <ini name="memory_limit" value="256M"/>
 
-    <!-- Strip the filepaths down to the relevant bit. -->
-    <arg name="basepath" value="./"/>
-
     <!-- Check up to 20 files simultaneously. -->
     <arg name="parallel" value="20"/>
 
     <!-- Show sniff codes in all reports -->
     <arg value="ps"/>
-
-    <file>.</file>
 
     <!-- Add generic PHP Linting Rule -->
     <rule ref="Generic.PHP.Syntax"/>
@@ -46,8 +41,10 @@
         <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
         <exclude name="PSR12.Files.FileHeader.IncorrectOrder"/>
         <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed"/>
+        <exclude name="Universal.Operators.DisallowShortTernary.Found"/>
 
         <exclude-pattern>/tests/*</exclude-pattern>
+        <exclude-pattern>/languages/*</exclude-pattern>
     </rule>
 
     <!-- Include the best parts of PSR-1 -->
@@ -76,7 +73,7 @@
 
     <rule ref="WordPress.WP.I18n">
         <properties>
-            <property name="text_domain" type="array" value="gravity-pdf, gravityforms, default"/>
+            <property name="text_domain" type="string" value="gravity-pdf"/>
         </properties>
     </rule>
 
@@ -92,11 +89,12 @@
     </rule>
 
     <!-- Exclude a bunch of directories -->
-    <exclude-pattern>/wordpress/*</exclude-pattern>
     <exclude-pattern>/tmp/*</exclude-pattern>
     <exclude-pattern>/vendor/*</exclude-pattern>
     <exclude-pattern>/vendor_prefixed/*</exclude-pattern>
     <exclude-pattern>/node_modules/*</exclude-pattern>
-    <exclude-pattern>/src/helper/licensing/EDD_SL_Plugin_Updater.php</exclude-pattern>
-    <exclude-pattern>/.php-scoper/*</exclude-pattern>
+    <exclude-pattern>/build/*</exclude-pattern>
+    <exclude-pattern>/tools/*</exclude-pattern>
+    <exclude-pattern>/languages/*</exclude-pattern>
+    <exclude-pattern>/.claude/*</exclude-pattern>
 </ruleset>

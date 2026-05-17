@@ -5,9 +5,6 @@ declare( strict_types=1 );
 use Isolated\Symfony\Component\Finder\Finder;
 
 $path = './';
-if ( isset( $_SERVER['argv'][0] ) ) {
-	$path = dirname( $_SERVER['argv'][0] ) . '/';
-}
 
 return [
 

@@ -5,9 +5,6 @@ declare( strict_types=1 );
 use Isolated\Symfony\Component\Finder\Finder;
 
 $path = './';
-if ( isset( $_SERVER['argv'][0] ) ) {
-	$path = dirname( $_SERVER['argv'][0] ) . '/';
-}
 
 return [
 
@@ -21,7 +18,8 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/monolog/monolog/' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/gravitypdf/upload/src' )->name( [ '*.php' ] ),
+		Finder::create()->files()->in( $path . 'vendor/gravitypdf/upload' )->depth( '==0' )->name( [ 'LICENSE' ] ),
 	],
 
 	/*
@@ -32,18 +30,5 @@ return [
 	 *
 	 * For more see: https://github.com/humbug/php-scoper#patchers
 	 */
-	'patchers'  => [
-		function( string $filePath, string $prefix, string $content ): string {
-
-			if ( basename( $filePath ) === 'Logger.php' ) {
-				$content = str_replace( "\\$prefix\\Fiber", '\Fiber', $content );
-			}
-
-			return $content;
-		},
-	],
-
-	'whitelist' => [
-		'Psr\*',
-	],
+	'patchers'  => [],
 ];
