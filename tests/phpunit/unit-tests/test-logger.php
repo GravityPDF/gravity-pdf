@@ -66,7 +66,7 @@ class Test_Logger extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.14.0
+	 * @since 6.15.0
 	 */
 	public function test_logs_rotate() {
 		$gf_logger = \GFLogging::get_instance();

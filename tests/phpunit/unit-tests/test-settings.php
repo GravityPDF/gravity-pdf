@@ -535,18 +535,28 @@ class Test_Settings extends WP_UnitTestCase {
 			],
 
 			[
-				'An error occurred, please try again',
+				'An unknown error occurred while checking the license.',
 				[ 'error' => 'default', 'price_id' => 1 ],
 			],
 
 			[
-				'An error occurred, please try again',
+				'An unknown error occurred while checking the license.',
 				[ 'error' => 'generic', 'price_id' => 1 ],
 			],
 
 			[
+				'An unknown error occurred while checking the license.',
+				[ 'error' => 'error', 'price_id' => 1 ],
+			],
+
+			[
 				'Your support license key has been activated for this domain',
-				[ 'success' => 'true' ],
+				[ 'license' => 'valid' ],
+			],
+
+			[
+				'Your support license key has been activated for this domain',
+				[ 'license' => 'active' ],
 			],
 		];
 	}
@@ -591,6 +601,62 @@ class Test_Settings extends WP_UnitTestCase {
 			[ false, [ 'license' => '' ], 200 ],
 			[ false, [ 'license' => 'deactivated' ], 500 ],
 		];
+	}
+
+	public function test_api_status_error() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 401 ],
+				'body'     => ''
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_my-custom-plugin'         => 'user license key',
+				'license_my-custom-plugin_message' => '',
+				'license_my-custom-plugin_status'  => '',
+			]
+		);
+
+		$this->assertSame( 'An unknown error occurred while checking the license.', $results['license_my-custom-plugin_message'] );
+
+		remove_filter( 'pre_http_request', $api_response );
+		$gfpdf->data->addon = [];
+	}
+
+	public function test_api_body_error() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 201 ],
+				'body'     => '<!Doctype html>'
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_my-custom-plugin'         => 'user license key',
+				'license_my-custom-plugin_message' => '',
+				'license_my-custom-plugin_status'  => '',
+			]
+		);
+
+		$this->assertSame( 'An unknown error occurred while checking the license.', $results['license_my-custom-plugin_message'] );
+
+		remove_filter( 'pre_http_request', $api_response );
+		$gfpdf->data->addon = [];
 	}
 }
 

@@ -1,112 +1,111 @@
-import React from 'react'
-import { shallow } from 'enzyme'
-import { findByTestAttr } from '../../testUtils'
-import { CloseDialog } from '../../../../../src/assets/js/react/components/Modal/CloseDialog'
-import * as utilitiesB from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont'
+import React from 'react';
+import { shallow } from 'enzyme';
+import { findByTestAttr } from '../../testUtils';
+import { CloseDialog } from '../../../../../src/assets/js/react/components/Modal/CloseDialog';
+import * as utilitiesB from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont';
 
 describe('CloseDialog - CloseDialog.js', () => {
+	// Mock component props data
+	const props = {
+		getCustomFontList: jest.fn(),
+		clearAddFontMsg: jest.fn(),
+		templateList: [{}],
+		msg: { success: {}, error: {} },
+		navigate: jest.fn(),
+		pathname: '/fontmanager/',
+	};
 
-  // Mock component props data
-  const props = {
-    getCustomFontList: jest.fn(),
-    clearAddFontMsg: jest.fn(),
-    templateList: [{}],
-    msg: {
-      success: {},
-      error: {}
-    },
-    history: { push: jest.fn() }
-  }
-  const wrapper = shallow(<CloseDialog {...props} />)
-  const instance = wrapper.instance()
+	describe('RUN LIFECYCLE METHODS', () => {
+		test('componentDidMount() - Assign keydown listener to document on mount', () => {
+			const map = {};
 
-  describe('RUN LIFECYCLE METHODS', () => {
-    test('componentDidMount() - Assign keydown listener to document on mount', () => {
-      const map = {}
+			document.addEventListener = jest.fn((event, cb) => {
+				map[event] = cb;
+			});
 
-      document.addEventListener = jest.fn((event, cb) => {
-        map[event] = cb
-      })
+			const wrapper = shallow(<CloseDialog {...props} />);
+			const instance = wrapper.instance();
 
-      const handleKeyPress = jest.spyOn(wrapper.instance(), 'handleKeyPress')
+			const handleKeyPress = jest.spyOn(
+				wrapper.instance(),
+				'handleKeyPress'
+			);
 
-      instance.componentDidMount()
-      // simulate event
-      map.keydown({
-        keyCode: 27,
-        target: {
-          className: '',
-          value: ''
-        }
-      })
+			instance.componentDidMount();
+			// simulate event
+			map.keydown({
+				key: 'Escape',
+				target: { className: '', value: '' },
+			});
 
-      expect(handleKeyPress).toHaveBeenCalledTimes(1)
-    })
-  })
+			expect(handleKeyPress).toHaveBeenCalledTimes(1);
+		});
+	});
 
-  describe('RUN COMPONENT METHODS', () => {
-    test('handleKeyPress() - Close font manager \'Update Font\' panel first', () => {
-      // Mock update font panel DOM
-      document.body.innerHTML =
-        '<div class="update-font show">' +
-        '</div>'
+	describe('RUN COMPONENT METHODS', () => {
+		test("handleKeyPress() - Close font manager 'Update Font' panel first", () => {
+			// Mock update font panel DOM
+			document.body.innerHTML =
+				'<div class="update-font show">' + '</div>';
 
-      const msg = {
-        success: { addFont: {} },
-        error: {}
-      }
-      const history = {
-        push: jest.fn(),
-        location: { pathname: '\'/fontmanager/' }
-      }
-      const wrapper = shallow(<CloseDialog {...props} id="yes" history={history} msg={msg} />)
-      const instance = wrapper.instance()
-      const toggleUpdateFont = jest.spyOn(utilitiesB, 'toggleUpdateFont')
-      const e = { keyCode: 27 }
+			const msg = { success: { addFont: {} }, error: {} };
+			const wrapper = shallow(
+				<CloseDialog {...props} id="yes" msg={msg} />
+			);
+			const instance = wrapper.instance();
+			const toggleUpdateFont = jest.spyOn(utilitiesB, 'toggleUpdateFont');
+			const e = { key: 'Escape' };
 
-      instance.handleKeyPress(e)
+			instance.handleKeyPress(e);
 
-      expect(props.clearAddFontMsg).toHaveBeenCalledTimes(1)
-      expect(toggleUpdateFont).toHaveBeenCalledTimes(1)
-    })
+			expect(props.clearAddFontMsg).toHaveBeenCalledTimes(1);
+			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
+		});
 
-    test('handleKeyPress() - Close modal', () => {
-      const handleCloseDialog = jest.spyOn(wrapper.instance(), 'handleCloseDialog')
-      const e = {
-        keyCode: 27,
-        target: {
-          className: '',
-          value: ''
-        }
-      }
-      instance.handleKeyPress(e)
+		test('handleKeyPress() - Close modal', () => {
+			const wrapper = shallow(<CloseDialog {...props} />);
+			const instance = wrapper.instance();
 
-      expect(handleCloseDialog).toHaveBeenCalledTimes(1)
-      expect(props.history.push.mock.calls.length).toBe(1)
-    })
+			const handleCloseDialog = jest.spyOn(
+				wrapper.instance(),
+				'handleCloseDialog'
+			);
+			const e = { key: 'Escape', target: { className: '', value: '' } };
+			instance.handleKeyPress(e);
 
-    test('handleCloseDialog() - trigger router', () => {
-      instance.handleCloseDialog()
+			expect(handleCloseDialog).toHaveBeenCalledTimes(1);
+			expect(props.navigate.mock.calls.length).toBe(1);
+		});
 
-      expect(props.history.push.mock.calls.length).toBe(1)
-    })
-  })
+		test('handleCloseDialog() - trigger router', () => {
+			const wrapper = shallow(<CloseDialog {...props} />);
+			const instance = wrapper.instance();
 
-  describe('RENDERS COMPONENT', () => {
-    test('render <CloseDialog /> component', () => {
-      const component = findByTestAttr(wrapper, 'component-CloseDialog')
+			instance.handleCloseDialog();
 
-      expect(component.length).toBe(1)
-    })
+			expect(props.navigate.mock.calls.length).toBe(1);
+		});
+	});
 
-    test('render button screen reader text', () => {
-      expect(wrapper.find('span').text()).toBe('Close dialog')
-    })
+	describe('RENDERS COMPONENT', () => {
+		test('render <CloseDialog /> component', () => {
+			const wrapper = shallow(<CloseDialog {...props} />);
 
-    test('check button click', () => {
-      wrapper.simulate('click')
+			const component = findByTestAttr(wrapper, 'component-CloseDialog');
 
-      expect(props.history.push.mock.calls.length).toBe(1)
-    })
-  })
-})
+			expect(component.length).toBe(1);
+		});
+
+		test('render button screen reader text', () => {
+			const wrapper = shallow(<CloseDialog {...props} />);
+			expect(wrapper.find('span').text()).toBe('Close dialog');
+		});
+
+		test('check button click', () => {
+			const wrapper = shallow(<CloseDialog {...props} />);
+			wrapper.simulate('click');
+
+			expect(props.navigate.mock.calls.length).toBe(1);
+		});
+	});
+});

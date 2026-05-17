@@ -19,7 +19,7 @@ class GF_UnitTest_Factory {
 
 	public $form_filename;
 
-	function __construct( $form_filename = "" ) {
+	function __construct( $form_filename = '' ) {
 		$this->form_filename = $form_filename;
 		$this->form          = new GF_UnitTest_Factory_For_Form( $this );
 		$this->entry         = new GF_UnitTest_Factory_For_Entry( $this );
@@ -35,10 +35,10 @@ class GF_UnitTest_Factory_For_Form extends GF_UnitTest_Factory_For_Thing {
 
 		$filename = $this->factory->form_filename;
 		if ( empty( $filename ) ) {
-			$filename = "standard.json";
+			$filename = 'standard.json';
 		}
 
-		$form_json = file_get_contents( dirname( __FILE__ ) . "/data/forms/" . $filename );
+		$form_json = file_get_contents( __DIR__ . '/data/forms/' . $filename );
 		$forms     = json_decode( $form_json, true );
 		$form      = $forms[0];
 
@@ -77,7 +77,7 @@ class GF_UnitTest_Factory_For_Form extends GF_UnitTest_Factory_For_Thing {
 	 * @return array A form array as returned by Gravity Forms
 	 */
 	function import_and_get( $filename ) {
-		$form_json = file_get_contents( dirname( __FILE__ ) . "/data/forms/" . $filename );
+		$form_json = file_get_contents( __DIR__ . '/data/forms/' . $filename );
 		$forms     = json_decode( $form_json, true );
 		$form      = $forms[0];
 
@@ -96,9 +96,9 @@ class GF_UnitTest_Factory_For_Entry extends GF_UnitTest_Factory_For_Thing {
 		$form = $this->factory->form->get_form_by_id( $form_id );
 
 		$results = [];
-		for ( $i = 0; $i < $count; $i++ ) {
+		for ( $i = 0; $i < $count; $i ++ ) {
 			$entry            = $this->generate_random_entry_object( $form );
-			$entry["form_id"] = $form_id;
+			$entry['form_id'] = $form_id;
 			$results[]        = $this->create( $entry );
 		}
 
@@ -107,60 +107,33 @@ class GF_UnitTest_Factory_For_Entry extends GF_UnitTest_Factory_For_Thing {
 
 	function generate_random_entry_object( $form ) {
 
-		$fields = $form["fields"];
+		$fields = $form['fields'];
 		foreach ( $fields as $field ) {
 			/* @var GF_Field $field */
 			$type = GFFormsModel::get_input_type( $field );
-			if ( in_array( $type, [ "html", "page", "section" ] ) ) {
+			if ( in_array( $type, [ 'html', 'page', 'section' ] ) ) {
 				continue;
 			}
 			$inputs = $field->get_entry_inputs();
 			if ( is_array( $inputs ) ) {
 				foreach ( $inputs as $index => $input ) {
-					$entry[ (string) $input["id"] ] = isset( $field["choices"] ) && is_array( $field["choices"] ) ? $field["choices"][ $index ]["value"] : $this->_get_random_value( $field );
+					$entry[ (string) $input['id'] ] = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'][ $index ]['value'] : $this->_get_random_value( $field );
 				}
 			} else {
-				$entry[ (string) $field["id"] ] = $this->_get_random_value( $field );
+				$entry[ (string) $field['id'] ] = $this->_get_random_value( $field );
 			}
 		}
 
 		return $entry;
 	}
 
-	private function _get_random_value( $field ) {
-		$type = GFFormsModel::get_input_type( $field );
-		switch ( $type ) {
-			case "number" :
-				$value = rand( 0, 10 );
-			break;
-			case "date" :
-				$value = date( 'Y-m-d', strtotime( '+' . mt_rand( 0, 30 ) . ' days' ) );
-			break;
-			case "time" :
-				$ampm  = [ "am", "pm" ];
-				$value = sprintf( "%02d:%02d %s", rand( 1, 12 ), rand( 1, 60 ), $ampm[ array_rand( $ampm ) ] );
-			break;
-			case "list" :
-				$value = serialize( [ "testvalue" . uniqid(), "testvalue" . uniqid(), "testvalue" . uniqid() ] );
-			break;
-			case "website" :
-				$value = "http://website" . uniqid() . ".com";
-			break;
-			case "phone" :
-				$value = sprintf( "(%03d)%03d-%04d", rand( 1, 999 ), rand( 1, 999 ), rand( 1, 9999 ) );
-			break;
-			default :
-				$value = "testvalue" . uniqid();
-		}
-
-		return $value;
-	}
-
 	function get_entry_by_id( $entry_id ) {
 		return $this->get_object_by_id( $entry_id );
-	}	function create_object( $entry ) {
-	return GFAPI::add_entry( $entry );
-}
+	}
+
+	function create_object( $entry ) {
+		return GFAPI::add_entry( $entry );
+	}
 
 	/**
 	 * Imports and returns an entry from a json file.
@@ -171,7 +144,7 @@ class GF_UnitTest_Factory_For_Entry extends GF_UnitTest_Factory_For_Thing {
 	 * @return array
 	 */
 	public function import_and_get( $filename, $form_id ) {
-		$entry = json_decode( file_get_contents( dirname( __FILE__ ) . "/data/forms/" . $filename ), true );
+		$entry = json_decode( file_get_contents( __DIR__ . '/data/forms/' . $filename ), true );
 
 		return $this->create_and_get( [ 'form_id' => $form_id ], $entry );
 	}
@@ -182,10 +155,37 @@ class GF_UnitTest_Factory_For_Entry extends GF_UnitTest_Factory_For_Thing {
 		return GFAPI::update_entry( $entry );
 	}
 
-
-
 	function get_object_by_id( $entry_id ) {
 		return GFAPI::get_entry( $entry_id );
+	}
+
+	private function _get_random_value( $field ) {
+		$type = GFFormsModel::get_input_type( $field );
+		switch ( $type ) {
+			case 'number' :
+				$value = rand( 0, 10 );
+			break;
+			case 'date' :
+				$value = date( 'Y-m-d', strtotime( '+' . mt_rand( 0, 30 ) . ' days' ) );
+			break;
+			case 'time' :
+				$ampm  = [ 'am', 'pm' ];
+				$value = sprintf( '%02d:%02d %s', rand( 1, 12 ), rand( 1, 60 ), $ampm[ array_rand( $ampm ) ] );
+			break;
+			case 'list' :
+				$value = serialize( [ 'testvalue' . uniqid(), 'testvalue' . uniqid(), 'testvalue' . uniqid() ] );
+			break;
+			case 'website' :
+				$value = 'http://website' . uniqid() . '.com';
+			break;
+			case 'phone' :
+				$value = sprintf( '(%03d)%03d-%04d', rand( 1, 999 ), rand( 1, 999 ), rand( 1, 9999 ) );
+			break;
+			default :
+				$value = 'testvalue' . uniqid();
+		}
+
+		return $value;
 	}
 
 }
@@ -323,7 +323,7 @@ abstract class GF_UnitTest_Factory_For_Thing {
 
 	function create_many( $count, $args = [], $generation_definitions = null ) {
 		$results = [];
-		for ( $i = 0; $i < $count; $i++ ) {
+		for ( $i = 0; $i < $count; $i ++ ) {
 			$results[] = $this->create( $args, $generation_definitions );
 		}
 
@@ -362,7 +362,7 @@ class GF_UnitTest_Generator_Sequence {
 
 	function next() {
 		$generated = sprintf( $this->template_string, $this->next );
-		$this->next++;
+		$this->next ++;
 
 		return $generated;
 	}

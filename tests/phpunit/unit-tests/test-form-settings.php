@@ -297,6 +297,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	public function test_process_list_view() {
 		$GLOBALS['plugin_page'] = '';
 		$GLOBALS['hook_suffix'] = '';
+		$GLOBALS['plugin_page'] = '';
 
 		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
@@ -335,6 +336,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	public function test_show_edit_view() {
 		$GLOBALS['plugin_page'] = '';
 		$GLOBALS['hook_suffix'] = '';
+
+		$GLOBALS['plugin_page'] = '';
 
 		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
@@ -470,7 +473,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		remove_all_filters( 'gfpdf_form_settings_sanitize_hidden' );
 
 		/* get faux input data */
-		$input = json_decode( file_get_contents( dirname( __FILE__ ) . '/json/form-settings-sample-input.json' ), true );
+		$input = json_decode( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/forms/form-settings-sample-input.json' ), true );
 
 		/* Set up global filters we can check */
 		add_filter(

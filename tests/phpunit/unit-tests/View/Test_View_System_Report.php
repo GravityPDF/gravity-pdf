@@ -42,8 +42,8 @@ class Test_View_System_Report extends WP_UnitTestCase {
 	}
 
 	public function test_temp_folder_protected_success() {
-		$this->assertStringNotContainsString( 'be publicly accessed', $this->view->get_temp_folder_protected( true ) );
-		$this->assertStringContainsString( 'be publicly accessed', $this->view->get_temp_folder_protected( false ) );
+		$this->assertStringNotContainsString( 'temporary directory is publicly accessible', $this->view->get_temp_folder_protected( true ) );
+		$this->assertStringContainsString( 'temporary directory is publicly accessible', $this->view->get_temp_folder_protected( false ) );
 	}
 
 	public function test_allow_url_fopen_success() {
