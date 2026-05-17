@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * PSR\Log v2/v3 Compatible Monolog Proxy class
  *
- * @since 6.15.0
+ * @since 6.14.0
  *
  * phpcs:disable Generic.PHP.Syntax.PHPSyntax
  */

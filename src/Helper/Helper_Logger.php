@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * @since 6.15.0 Moved logic into \GFPDF\Helper\Log\Logger
+ * @since 6.14.0 Moved logic into \GFPDF\Helper\Log\Logger
  */
 class Helper_Logger extends Logger {
 
