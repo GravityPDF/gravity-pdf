@@ -261,6 +261,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$is_canonical_release             = is_file( plugin_dir_path( GPDF_PLUGIN_FILE ) . 'gravity-pdf-updater.php' );
 		$is_not_canonical_release_message = wp_kses(
 			sprintf(
+				/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 				__( 'In order to get updates direct from GravityPDF.com %1$syou need to perform a one-time download of the plugin%2$s.', 'gravity-pdf' ),
 				'<a href="https://gravitypdf.com/news/installing-and-upgrading-to-the-canonical-version-of-gravity-pdf/">',
 				'</a>',
@@ -367,52 +368,52 @@ class Model_System_Report extends Helper_Abstract_Model {
 	public function test_public_tmp_directory_access(): bool {
 		$tmp_dir       = $this->data->template_tmp_location;
 		$tmp_test_file = 'public_tmp_directory_test.txt';
-		$return        = true;
+		$path          = $tmp_dir . $tmp_test_file;
 
 		/* create our file */
-		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
+		file_put_contents( $path, 'failed-if-read' );
 
 		/* verify text file exists */
-		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
+		if ( ! is_file( $path ) ) {
+			$this->log->error(
+				'Could not write to PDF temporary directory to test for public access',
+				[
+					'path' => $path,
+				]
+			);
 
-			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
-			if ( $site_url !== false ) {
-
-				$response = wp_remote_get( $site_url . $tmp_test_file );
-
-				if ( ! is_wp_error( $response ) ) {
-
-					/*
-					 * Check if the web server responded with an OK status code.
-					 * If we can read the contents of the file, then mark as failed
-					 */
-					if (
-						isset( $response['response']['code'] ) &&
-						$response['response']['code'] === 200 &&
-						isset( $response['body'] ) &&
-						$response['body'] === 'failed-if-read'
-					) {
-						$response_object = $response['http_response'];
-						$raw_response    = $response_object->get_response_object();
-
-						$this->log->warning(
-							'PDF temporary directory not protected',
-							[
-								'url'         => $raw_response->url,
-								'status_code' => $raw_response->status_code,
-								'response'    => $raw_response->raw,
-							]
-						);
-
-						$return = false;
-					}
-				}
-			}
-
-			@unlink( $tmp_dir . $tmp_test_file ); /* phpcs:ignore */
+			return true;
 		}
 
-		return $return;
+		$site_url = $this->misc->convert_path_to_url( $tmp_dir );
+		if ( $site_url === false ) {
+			@unlink( $path ); /* phpcs:ignore */
+
+			$this->log->error(
+				'Could not convert path to URL to test for public access',
+				[
+					'path' => $path,
+				]
+			);
+
+			return true;
+		}
+
+		$response = wp_remote_get( $site_url . $tmp_test_file );
+		if ( is_wp_error( $response ) ) {
+			@unlink( $path ); /* phpcs:ignore */
+
+			return true;
+		}
+
+		@unlink( $path ); /* phpcs:ignore */
+
+		/* if we read the contents of the file over HTTP the directory is publicly accessible */
+		if ( trim( wp_remote_retrieve_body( $response ) ) !== 'failed-if-read' ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
