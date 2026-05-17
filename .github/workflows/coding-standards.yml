@@ -10,91 +10,58 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
   cancel-in-progress: true
 
-
 jobs:
-  # Runs PHP coding standards checks.
-  #
-  # Violations are reported inline with annotations.
-  #
-  # Performs the following steps:
-  # - Checks out the repository.
-  # - Configures caching for Composer.
-  # - Sets up PHP.
-  # - Logs debug information.
-  # - Installs Composer dependencies (from cache if possible).
-  # - Logs PHP_CodeSniffer debug information.
-  # - Runs PHPCS on the full codebase with warnings suppressed.
-  # - Runs PHPCS on the `tests` directory without warnings suppressed.
+  # Only run this action if a Pull Request contains the label 'run-tests'
+  check_for_string_in_pull_request_comment:
+    name: Should workflow run?
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests') }}
+        uses: action-pack/cancel@v1
+
   phpcs:
     name: PHP coding standards
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
           tools: composer, cs2pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log debug information
         run: |
           php --version
           composer --version
 
+      - name: Add auth details for private composer packages
+        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+
       - name: Install Composer dependencies
         run: |
-          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction
+          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log PHPCS debug information
-        run: composer run lint -- -i
+        run: composer run phpcs:lint .
 
       - name: Run PHP compatibility tests
-        run: composer run lint -- --standard=phpcompat.xml.dist -q --report=checkstyle | cs2pr
+        run: composer run phpcs:compatibility .
 
-      - name: Run PHPCS on all plugin files
-        run: composer run lint -- -q -n --report=checkstyle | cs2pr
-
-  # Runs the JavaScript coding standards checks.
-  #
-  # Performs the following steps:
-  # - Checks out the repository.
-  # - Logs debug information about the runner container.
-  # - Installs NodeJS
-  # - Sets up caching for NPM.
-  # - Logs updated debug information.
-  # _ Installs NPM dependencies using install-changed to hash the `package.json` file.
-  # - Run the Run ESLint checks.
   jshint:
     name: JavaScript coding standards
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v4
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
 
       - name: Log debug information
         run: |
@@ -106,8 +73,10 @@ jobs:
           locale -a
 
       - name: Install Dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Run ESLint
         run: yarn lint:js
+
+      - name: Run CSS Lint
+        run: yarn lint:css

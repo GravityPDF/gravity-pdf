@@ -25,11 +25,11 @@ The Docker setup will create a fully functional development environment preconfi
 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/` from the terminal
 2. Copy and rename `.env.example` to `.env`, then replace `00000000000000000000000000000000` with a valid Gravity Forms license key 
-3. Run `yarn && yarn build:production`
-4. Start Docker and then run `yarn env:install` to setup the local development environment
+3. Run `composer install`
+3. Run `yarn && yarn start`
 5. Access a local development site at `http://localhost:8888` with the login `admin` and `password`.
 
-If you shut down Docker and want to fire up the environment later, use `yarn wp-env start`. You can reset the database back to its original state with `yarn wp-env clean all`. When all else fails, delete everything and start again with `yarn wp-env destroy`.
+You can reset the database back to its original state with `yarn wp-env clean all`. When all else fails, delete everything and start again with `yarn wp-env destroy`.
 
 [See the WordPress Developer Handbook for more details about managing the docker environment](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-run-container-command).
 
@@ -39,26 +39,21 @@ X-Debug is enabled by default for step debugging and profiling. If you need to [
 
 ### Switch PHP Versions
 
-The default version that will be configured is PHP8.0. If you want to change this you can adjust the `phpVersion` value in the `.wp-env.json` file and then stop and start the environment with `yarn wp-env start`.
-
-## Setup without Docker
-
-If you would rather use your own development environment, you can build Gravity PDF using the following commands. 
-
-1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
-1. Run `yarn && yarn build:production`
-1. Run `composer install`
-1. Run `composer run prefix`
+The default version that will be configured is PHP8.3. If you want to change this you can adjust the `phpVersion` value in the `.wp-env.json` file and then stop and start the environment with `yarn wp-env start`.
 
 ## Building JavaScript
 
-If you are making changes to any of the JavaScript or CSS, run `yarn build:dev` to ensure the files automatically gets built when you make changes on the file system.
+If you are making changes to any of the JavaScript or CSS, run `yarn dev` to ensure the files automatically gets built when you make changes on the file system.
 
 ## Linting
 
-To lint your JS code use `yarn lint:js`, and to try automatically fix it use `yarn lint:js:fix`.
+To lint your:
 
-To lint your PHP code, use `composer lint`, and to try automatically fix it use `composer lint:fix`.
+1. JS code using `yarn lint:js`
+2. CSS code using `yarn lint:css`
+3. PHP code using `composer lint`
+
+You can auto-fix many issues with `yarn format` and `composer lint:fix`.
 
 ## Automated Tests
 
