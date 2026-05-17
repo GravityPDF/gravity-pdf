@@ -136,15 +136,16 @@ class Model_Templates extends Helper_Abstract_Model {
 				]
 			);
 
-			header( 'Content-Type: application/json' );
-			echo wp_json_encode(
-				[
-					'error' => $e->getMessage(),
-				]
-			);
-
 			/* Bad Response */
-			wp_die( '', 400 );
+			header( 'Content-Type: application/json' );
+			wp_die(
+				wp_json_encode(
+					[
+						'error' => $e->getMessage(),
+					]
+				),
+				400
+			);
 		}
 
 		/* Copy all the files to the active PDF working directory */
@@ -180,14 +181,14 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Return newly-installed template headers */
 		header( 'Content-Type: application/json' );
-		echo wp_json_encode(
-			[
-				'templates' => $headers,
-			]
+		wp_die(
+			wp_json_encode(
+				[
+					'templates' => $headers,
+				]
+			),
+			200
 		);
-
-		/* Okay Response */
-		wp_die( '', 200 );
 	}
 
 	/**
@@ -381,6 +382,7 @@ class Model_Templates extends Helper_Abstract_Model {
 			$basename = wp_basename( $file );
 
 			if ( ! preg_match( '/^[a-zA-Z0-9-_]+.php$/', $basename ) ) {
+				/* translators: %s: filename */
 				throw new Exception( sprintf( esc_html__( 'The filename %s contains invalid characters. Only alphanumeric, hyphen, and underscore allowed.', 'gravity-pdf' ), esc_html( $basename ) ) );
 			}
 
@@ -395,6 +397,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 				/* Check the first 8kiB contains the string RGForms or GFForms, which signifies our v3 templates */
 				if ( strpos( $file_data, 'RGForms' ) === false && strpos( $file_data, 'GFForms' ) === false ) {
+					/* translators: %s: filename */
 					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-pdf' ), esc_html( $basename ) ) );
 				}
 			}
