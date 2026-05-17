@@ -6,7 +6,7 @@ use WP_UnitTestCase;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -20,40 +20,53 @@ use WP_UnitTestCase;
  */
 class Test_Controller_System_Report extends WP_UnitTestCase {
 
-	/**
-	 * @dataProvider data_gfpdf_system_status_items_php
-	 */
-	public function test_system_report_php( $table_index, $key ) {
-		$system_report = apply_filters( 'gform_system_report', [] );
-		$this->assertArrayHasKey( $key, $system_report[0]['tables'][ $table_index ]['items'] );
+	public function set_up() {
+		parent::set_up();
 
-		/* Test that our data is spliced into the correct location in the array */
-		$system_report = apply_filters( 'gform_system_report', [ [] ] );
-		$this->assertArrayHasKey( $key, $system_report[1]['tables'][ $table_index ]['items'] );
+		add_filter( 'pre_http_request', [ $this, 'get_public_dir_api_response' ] );
 	}
 
-	public function data_gfpdf_system_status_items_php() {
+	public function tear_down() {
+		remove_filter( 'pre_http_request', [ $this, 'get_public_dir_api_response' ] );
+
+		parent::tear_down();
+	}
+
+	/**
+	 * Override API request to speed up unit test
+	 *
+	 * @return array
+	 */
+	public function get_public_dir_api_response() {
 		return [
-			[ 0, 'memory' ],
-			[ 0, 'allow_url_fopen' ],
-			[ 0, 'default_charset' ],
-			[ 0, 'internal_encoding' ],
-
-			[ 1, 'pdf_working_directory' ],
-			[ 1, 'pdf_working_directory_url' ],
-			[ 1, 'font_folder_location' ],
-			[ 1, 'temp_folder_location' ],
-			[ 1, 'temp_folder_permission' ],
-			[ 1, 'temp_folder_protected' ],
-			[ 1, 'mpdf_temp_folder_location' ],
-
-			[ 2, 'pdf_entry_list_action' ],
-			[ 2, 'background_processing_enabled' ],
-			[ 2, 'debug_mode_enabled' ],
-
-			[ 3, 'user_restrictions' ],
-			[ 3, 'logged_out_timeout' ],
+			'response' => [ 'code' => 200 ],
+			'body'     => 'failed-if-read',
 		];
+	}
+
+	public function test_system_report_php() {
+		/* Test that our data is spliced into the correct location in the array */
+		$system_report = apply_filters( 'gform_system_report', [ [] ] );
+
+		$this->assertArrayHasKey( 'memory', $system_report[1]['tables'][0]['items'] );
+		$this->assertArrayHasKey( 'allow_url_fopen', $system_report[1]['tables'][0]['items'] );
+		$this->assertArrayHasKey( 'default_charset', $system_report[1]['tables'][0]['items'] );
+		$this->assertArrayHasKey( 'internal_encoding', $system_report[1]['tables'][0]['items'] );
+
+		$this->assertArrayHasKey( 'pdf_working_directory', $system_report[1]['tables'][1]['items'] );
+		$this->assertArrayHasKey( 'pdf_working_directory_url', $system_report[1]['tables'][1]['items'] );
+		$this->assertArrayHasKey( 'font_folder_location', $system_report[1]['tables'][1]['items'] );
+		$this->assertArrayHasKey( 'temp_folder_location', $system_report[1]['tables'][1]['items'] );
+		$this->assertArrayHasKey( 'temp_folder_permission', $system_report[1]['tables'][1]['items'] );
+		$this->assertArrayHasKey( 'temp_folder_protected', $system_report[1]['tables'][1]['items'] );
+		$this->assertArrayHasKey( 'mpdf_temp_folder_location', $system_report[1]['tables'][1]['items'] );
+
+		$this->assertArrayHasKey( 'pdf_entry_list_action', $system_report[1]['tables'][2]['items'] );
+		$this->assertArrayHasKey( 'background_processing_enabled', $system_report[1]['tables'][2]['items'] );
+		$this->assertArrayHasKey( 'debug_mode_enabled', $system_report[1]['tables'][2]['items'] );
+
+		$this->assertArrayHasKey( 'user_restrictions', $system_report[1]['tables'][3]['items'] );
+		$this->assertArrayHasKey( 'logged_out_timeout', $system_report[1]['tables'][3]['items'] );
 	}
 
 	public function test_system_report_outdated_template() {

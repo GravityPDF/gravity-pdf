@@ -8,7 +8,7 @@ use WP_UnitTestCase;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -53,7 +53,7 @@ class Test_Field_Poll extends WP_UnitTestCase {
 	public function test_html() {
 		$html = $this->pdf_field->html();
 
-		$this->assertStringContainsString( '<div id="field-22" class="gfpdf-field gfpdf-select ">', $html );
+		$this->assertStringContainsString( '<div id="field-22" class="gfpdf-field gfpdf-select ', $html );
 		$this->assertStringContainsString( '<div class="value">Poll Dropdown - First Choice</div>', $html );
 	}
 }

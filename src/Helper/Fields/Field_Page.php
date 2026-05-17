@@ -7,7 +7,7 @@ use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -38,7 +38,7 @@ class Field_Page extends Helper_Abstract_Fields {
 
 		ob_start();
 		?>
-		<h3 id="<?php echo esc_attr( 'page-no-' . $page_number ); ?>" class="gfpdf-page gfpdf-field <?php echo esc_attr( $this->get_field_classes() ); ?>">
+		<h3 id="<?php echo esc_attr( 'page-no-' . $page_number ); ?>" class="<?php echo esc_attr( $this->get_field_classes() ); ?>">
 			<?php echo wp_kses_post( $this->value() ); ?>
 		</h3>
 		<?php

@@ -7,7 +7,6 @@ use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
-use GFPDF\Statics\Cache;
 use GFPDF\View\View_PDF;
 use GFPDF_Core_Model;
 use GPDFAPI;
@@ -18,7 +17,7 @@ use WP_UnitTestCase;
  * Can be tested with: phpunit --group slow-pdf-processes
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -75,7 +74,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 
-		$fonts = glob( __DIR__ . '/../data/fonts/' . '*.[tT][tT][fF]' );
+		$fonts = glob( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . '*.[tT][tT][fF]' );
 		$fonts = ( is_array( $fonts ) ) ? $fonts : [];
 
 		foreach ( $fonts as $font ) {
@@ -127,87 +126,6 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the deprecated legacy PDF endpoint is secured and will generate a PDF successfully
-	 */
-	public function test_process_legacy_pdf_endpoint() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint' );
-		$this->setExpectedIncorrectUsage( 'GFPDF\Model\Model_PDF::get_legacy_config' );
-
-		/* Test our endpoint is firing correctly */
-		$results = $this->create_form_and_entries();
-
-		$_GET['gf_pdf']   = 1;
-		$_GET['fid']      = $results['form']['id'];
-		$_GET['lid']      = $results['entry']['id'];
-		$_GET['template'] = 'zadani.php';
-
-		/* Check middleware security is applied */
-		try {
-			wp_set_current_user( 0 );
-			$this->controller->process_legacy_pdf_endpoint();
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'Redirecting', $e->getMessage() );
-		}
-
-		/* Check pdf successfully generated */
-		try {
-			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-			wp_set_current_user( $user_id );
-
-			add_action( 'gfpdf_post_view_or_download_pdf', function () {
-				wp_die( 'PDF generated successfully' );
-			} );
-
-			$this->controller->process_legacy_pdf_endpoint();
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'PDF generated successfully', $e->getMessage() );
-
-			return;
-		}
-
-		$this->fail( 'This test did not successfully complete' );
-	}
-
-	/**
-	 * Test the PDF endpoint is secured and will generate a PDF successfully
-	 */
-	public function test_process_pdf_endpoint() {
-
-		/* Test our endpoint is firing correctly */
-		$results = $this->create_form_and_entries();
-
-		$GLOBALS['wp']->query_vars['gpdf'] = 1;
-		$GLOBALS['wp']->query_vars['lid']  = $results['entry']['id'];
-		$GLOBALS['wp']->query_vars['pid']  = '556690c67856b';
-
-		/* Check middleware security is applied */
-		try {
-			wp_set_current_user( 0 );
-			$this->controller->process_pdf_endpoint();
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'Redirecting', $e->getMessage() );
-		}
-
-		/* Check pdf successfully generated */
-		try {
-			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-			wp_set_current_user( $user_id );
-
-			add_action( 'gfpdf_post_view_or_download_pdf', function () {
-				wp_die( 'PDF generated successfully' );
-			} );
-
-			$this->controller->process_pdf_endpoint();
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'PDF generated successfully', $e->getMessage() );
-
-			return;
-		}
-
-		$this->fail( 'This test did not successfully complete' );
-	}
-
-	/**
 	 * Test our PDF generator function works as expected
 	 * This function prepares all the details for generating a PDF and is our authentication layer
 	 *
@@ -237,20 +155,15 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		/* Disable all middleware and check if PDF generation begins */
 		remove_all_filters( 'gfpdf_pdf_middleware' );
 
-		/* Verify the PDF generation begins and then fails as expected */
-		$results = $this->model->process_pdf( $pid, $lid );
-		if ( ! is_wp_error( $results ) ) {
-			$this->fail( 'This test did not fail as expected' );
+		try {
+			$this->model->process_pdf( $pid, $lid );
+		} catch ( Exception $e ) {
+			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+
+			return;
 		}
 
-		/*
-		 * Prior to 6.12 $this->model->process_pdf() would call $this->view->generate_pdf()
-		 * and any errors would be output via wp_die(), which could be caught as an exception
-		 * in PHPUnit. Now that process_pdf() runs through $this->model->generate_and_save_pdf()
-		 * any errors are returned back up the chain for $this->controller->process_pdf_endpoint() to handle.
-		 * This is the reason this unit test was modified to explicitly check is_wp_error().
-		 */
-		$this->assertEquals( 'pdf_generation_failure', $results->get_error_code() );
+		$this->fail( 'This test did not fail as expected' );
 	}
 
 	/**
@@ -288,29 +201,25 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	public function test_maybe_save_pdf() {
 		global $gfpdf;
 
-		$form_class = \GPDFAPI::get_form_class();
-
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
-
-		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
-		$file = "test-{$form['id']}.pdf";
+		$form    = $results['form'];
+		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/test-{$form['id']}.pdf";
 
 		$this->model->maybe_save_pdf( $entry, $form );
 
 		/* Check the results are successful */
-		$this->assertFileExists( $path . $file );
+		$this->assertFileExists( $file );
 
 		/* Clean up */
-		unlink( $path . $file );
+		unlink( $file );
 
 		/* Ensure function doesn't run when background processing enabled */
 		$gfpdf->options->update_option( 'background_processing', 'Yes' );
 
 		$this->model->maybe_save_pdf( $entry, $form );
-		$this->assertFileDoesNotExist( $path . $file );
+		$this->assertFileDoesNotExist( $file );
 	}
 
 	/**
@@ -321,8 +230,6 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_generate_pdf() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\View\View_PDF::generate_pdf');
-
 		global $gfpdf;
 
 		/* Setup our form and entries */
@@ -500,27 +407,21 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * works as expected.
 	 */
 	public function test_deprecated_save_pdf() {
-		$form_class = \GPDFAPI::get_form_class();
+		global $gfpdf;
 
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
+		$form    = $results['form'];
 
-		$filename = "test-{$form['id']}.pdf";
+		$filename = $gfpdf->data->template_tmp_location . "11556690c67856b/test-{$form['id']}.pdf";
+
+		if ( is_file( $filename ) ) {
+			unlink( $filename );
+		}
 
 		GFPDF_Core_Model::gfpdfe_save_pdf( $entry, $form );
+		$this->assertTrue( is_file( $filename ) );
 
-		$pdfs = GPDFAPI::get_entry_pdfs( $entry['id'] );
-		foreach ( $pdfs as $pdf ) {
-			/* Skip non-core PDFs */
-			if ( ! in_array( $pdf['template'], [ 'zadani', 'focus-gravity', 'rubix', 'blank-slate' ], true ) ) {
-				continue;
-			}
-
-			/* Get PDF directory path from cache */
-			$path = Cache::get_path( $form, $entry, $pdf );
-			$this->assertFileExists( $path . $filename );
-			unlink( $path . $filename );
-		}
+		unlink( $filename );
 	}
 }

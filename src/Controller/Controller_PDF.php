@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -110,8 +110,8 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 */
 	public function add_actions() {
 		/* Process PDF if needed */
-		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ] ); /* legacy PDF endpoint */
-		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ] ); /* new PDF endpoint */
+		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ], 1 ); /* legacy PDF endpoint */
+		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ], 1 ); /* new PDF endpoint */
 
 		/* Set up pre- and post-generation PDF hooks */
 		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ] );

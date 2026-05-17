@@ -12,7 +12,7 @@ use WPAjaxDieStopException;
  * Test Gravity AJAX Functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -79,7 +79,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 * @since 4.0
 	 */
 	private function import_form() {
-		$json          = json_decode( trim( file_get_contents( __DIR__ . '/../data/json/form-settings.json' ) ), true );
+		$json          = json_decode( trim( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/forms/form-settings.json' ) ), true );
 		$this->form_id = GFAPI::add_form( $json );
 	}
 

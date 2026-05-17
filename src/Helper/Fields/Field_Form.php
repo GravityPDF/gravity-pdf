@@ -14,7 +14,7 @@ use GPDFAPI;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -91,10 +91,10 @@ class Field_Form extends Helper_Abstract_Fields {
 			$this->field->id = "$field_id-$key";
 
 			$html .= parent::html( $markup );
-		}
 
-		/* Reset the ID back to the original value */
-		$this->field->id = $field_id;
+			/* Reset the ID back to the original value */
+			$this->field->id = $field_id;
+		}
 
 		return $html;
 	}

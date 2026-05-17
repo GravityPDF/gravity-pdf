@@ -14,7 +14,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Abstract Addon functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.2
  */
@@ -83,6 +83,17 @@ class Test_Addon extends WP_UnitTestCase {
 			new Helper_Logger( 'my-custom-plugin2', 'My Custom Plugin2' ),
 			new Helper_Notices()
 		);
+
+		remove_all_actions( 'init' );
+	}
+
+	public function tear_down() {
+		parent::tear_down();
+
+		$data = \GPDFAPI::get_data_class();
+		$data->addon = [];
+
+		remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -132,8 +143,6 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->addon->init( [ $sub_addon ] );
 
 		$this->assertTrue( $sub_addon->run );
-		$this->assertEquals( 10, has_action( 'init', [ $this->addon, 'plugin_updater' ] ) );
-		$this->assertEquals( 10, has_action( 'admin_init', [ $this->addon, 'maybe_schedule_license_check' ] ) );
 		$this->assertEquals(
 			10,
 			has_action(
@@ -183,6 +192,49 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'license_' . $this->addon->get_slug(), $settings );
 		$this->assertArrayNotHasKey( 'license_' . $this->addon->get_slug() . '_status', $settings );
 		$this->assertArrayNotHasKey( 'license_' . $this->addon->get_slug() . '_message', $settings );
+	}
+
+	public function test_get_license_key_from_constant() {
+		$this->assertFalse( $this->addon->get_license_key_from_constant() );
+		$this->assertFalse( $this->addon2->get_license_key_from_constant() );
+
+		add_filter( 'gfpdf_addon_hardcoded_license_key', function ( $key ) {
+			return 'abc123';
+		} );
+
+		$this->assertSame( 'abc123', $this->addon->get_license_key_from_constant() );
+		$this->assertSame( 'abc123', $this->addon2->get_license_key_from_constant() );
+
+		remove_all_filters( 'gfpdf_addon_hardcoded_license_key' );
+
+		add_filter( 'gfpdf_addon_hardcoded_license_key', function ( $key ) {
+			return [ 'my-custom-plugin' => 'abc456', 'my-custom-plugin2' => 'xyz987' ];
+		} );
+
+		$this->assertSame( 'abc456', $this->addon->get_license_key_from_constant() );
+		$this->assertSame( 'xyz987', $this->addon2->get_license_key_from_constant() );
+	}
+
+	public function test_license_constant_overrides_database() {
+		$this->addon->update_license_info(
+			[
+				'license' => 'my key',
+				'status'  => 'active',
+				'message' => 'Success!',
+			]
+		);
+
+		$license = $this->addon->get_license_info();
+
+		$this->assertSame( 'my key', $license['license'] );
+
+		add_filter( 'gfpdf_addon_hardcoded_license_key', function ( $key ) {
+			return 'abc123';
+		} );
+
+		$license = $this->addon->get_license_info();
+
+		$this->assertSame( 'abc123', $license['license'] );
 	}
 
 	/*
@@ -249,9 +301,10 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_schedule_license_check() {
+		/* Test a bad request */
 		$api_response = function() {
 			return [
-				'response' => [ 'code' => 201 ],
+				'response' => [ 'code' => 301 ],
 			];
 		};
 
@@ -260,7 +313,7 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->addon->update_license_info( [
 			'license' => '12345',
 			'status'  => 'active',
-			'message' => '',
+			'message' => 'Your license key is valid!',
 		] );
 
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_' . $this->addon->get_slug() . '_license_check' ) );
@@ -269,6 +322,22 @@ class Test_Addon extends WP_UnitTestCase {
 
 		remove_filter( 'pre_http_request', $api_response );
 
+		/* Do a good request */
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [ 'license' => 'valid' ] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$this->assertTrue( $this->addon->schedule_license_check() );
+		$this->assertSame(  'Your license key is valid!', $this->addon->get_license_message() );
+
+		remove_filter( 'pre_http_request', $api_response );
+
+		/* Test with a revoked license */
 		$api_response = function() {
 			return [
 				'response' => [ 'code' => 200 ],
@@ -278,7 +347,7 @@ class Test_Addon extends WP_UnitTestCase {
 
 		add_filter( 'pre_http_request', $api_response );
 
-		$this->assertTrue( $this->addon->schedule_license_check() );
+		$this->assertFalse( $this->addon->schedule_license_check() );
 		$this->assertStringContainsString( 'This license key has been cancelled', $this->addon->get_license_message() );
 
 		remove_filter( 'pre_http_request', $api_response );
@@ -374,6 +443,45 @@ class Test_Addon extends WP_UnitTestCase {
 		/* Check we can access the saved settings without using the prefix */
 		$this->assertSame( 'Use Fallback', $this->addon2->get_addon_setting_value( 'addon_field', 'Use Fallback' ) );
 		$this->assertSame( 'Loading1', $this->addon2->get_addon_setting_value( 'string_loading_title' ) );
+	}
+
+	public function test_central_plugin_updater() {
+		$this->setExpectedIncorrectUsage( 'GFPDF\Helper\Helper_Abstract_Addon::get_plugin_updater' );
+		$this->assertNull( $this->addon->get_plugin_updater() );
+
+		$this->addon->init();
+		do_action( 'init' );
+		$this->assertNotNull( $this->addon->get_plugin_updater() );
+	}
+
+	public function test_auto_activate_license_constant() {
+		/* Set admin screen */
+		set_current_screen( 'index.php' );
+
+		$this->assertEmpty( $this->addon->get_license_status() );
+
+		add_filter( 'gfpdf_addon_hardcoded_license_key', function ( $key ) {
+			return 'abc123';
+		} );
+
+		$api_response = function () {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode(
+					[
+						'error' => 'missing',
+					]
+				),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$this->addon->init();
+		do_action( 'init' );
+
+		$this->assertNotEmpty( $this->addon->get_license_key() );
+		$this->assertNotEmpty( $this->addon->get_license_status() );
 	}
 }
 

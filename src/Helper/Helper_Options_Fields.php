@@ -6,7 +6,7 @@ use WP_Error;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -57,7 +57,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * General Settings
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_settings_general/ for more details about this filter
+			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_general/ for more details about this filter
 			 */
 			'general_defaults'                => apply_filters(
 				'gfpdf_settings_general_defaults',
@@ -65,10 +65,12 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'default_template'        => [
 						'id'      => 'default_template',
 						'name'    => esc_html__( 'Default Template', 'gravity-pdf' ),
-						'desc'    => sprintf( __( 'Choose an existing template or purchased more %1$sfrom our template shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create a custom solution.', 'gravity-pdf' ), '<a href="https://gravitypdf.com/store/#templates">', '</a>', '<a href="https://docs.gravitypdf.com/v6/developers/start-customising">', '</a>', '<a href="https://gravitypdf.com/bespoke/">', '</a>' ),
+						/* translators: 1: Opening <a> tag (template shop), 2: Closing </a> tag, 3: Opening <a> tag (build your own), 4: Closing </a> tag, 5: Opening <a> tag (hire us), 6: Closing </a> tag */
+						'desc'    => sprintf( esc_html__( 'Choose an existing template or purchased more %1$sfrom our template shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create a custom solution.', 'gravity-pdf' ), '<a href="https://gravitypdf.com/store/#templates">', '</a>', '<a href="https://docs.gravitypdf.com/developers/start-customising">', '</a>', '<a href="https://gravitypdf.com/bespoke/">', '</a>' ),
 						'type'    => 'select',
 						'options' => $this->templates->get_all_templates_by_group(),
 						'std'     => 'zadani',
+						/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
 						'tooltip' => '<h6>' . esc_html__( 'Templates', 'gravity-pdf' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %1$sfour completely-free and highly customizable designs%2$s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-pdf' ), '<strong>', '</strong>' ),
 					],
 
@@ -135,7 +137,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'default_action'        => [
 						'id'      => 'default_action',
 						'name'    => esc_html__( 'Entry View', 'gravity-pdf' ),
-						'desc'    => sprintf( __( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-pdf' ), '<a href="' . admin_url( 'admin.php?page=gf_entries' ) . '">', '</a>' ),
+						/* translators: 1: Opening <a> tag (entries list page), 2: Closing </a> tag */
+						'desc'    => sprintf( esc_html__( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-pdf' ), '<a href="' . esc_url( admin_url( 'admin.php?page=gf_entries' ) ) . '">', '</a>' ),
 						'type'    => 'radio',
 						'options' => [
 							'View'     => esc_html__( 'View', 'gravity-pdf' ),
@@ -147,7 +150,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'background_processing' => [
 						'id'   => 'background_processing',
 						'name' => esc_html__( 'Background Processing', 'gravity-pdf' ),
-						'desc' => sprintf( __( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %1$sRequires Background tasks to be enabled%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/users/background-processing/">', '</a>' ),
+						/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+						'desc' => sprintf( esc_html__( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %1$sRequires Background tasks to be enabled%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/users/background-processing/">', '</a>' ),
 						'type' => 'toggle',
 						'std'  => '0',
 					],
@@ -162,15 +166,16 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				]
 			),
 
-			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_settings_general_security/ for more details about this filter */
+			/* See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_general_security/ for more details about this filter */
 			'general_security'                => apply_filters(
 				'gfpdf_settings_general_security',
 				[
 					'logged_out_timeout'     => [
 						'id'      => 'logged_out_timeout',
 						'name'    => esc_html__( 'Logged Out Timeout', 'gravity-pdf' ),
+						/* translators: 1: Opening <em> tag, 2: Closing </em> tag */
+						'desc'    => sprintf( esc_html__( 'Limit how long a %1$slogged out%2$s users has direct access to the PDF after completing the form. Set to 0 to disable time limit (not recommended).', 'gravity-pdf' ), '<em>', '</em>' ),
 						'desc2'   => esc_html__( 'minutes', 'gravity-pdf' ),
-						'desc'    => sprintf( __( 'Limit how long a %1$slogged out%2$s users has direct access to the PDF after completing the form. Set to 0 to disable time limit (not recommended).', 'gravity-pdf' ), '<em>', '</em>' ),
 						'type'    => 'number',
 						'size'    => 'small',
 						'std'     => 20,
@@ -214,7 +219,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Tools Settings
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_settings_tools/ for more details about this filter
+			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_tools/ for more details about this filter
 			 */
 			'tools'                           => apply_filters(
 				'gfpdf_settings_tools',
@@ -222,7 +227,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'install_core_fonts' => [
 						'id'   => 'install_core_fonts',
 						'name' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
-						'desc' => __( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-pdf' ) . ' <a href="https://docs.gravitypdf.com/v6/users/core-pdf-fonts">' . __( 'Get more info.', 'gravity-pdf' ) . '</a>',
+						'desc' => esc_html__( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-pdf' ) . ' <a href="https://docs.gravitypdf.com/users/core-pdf-fonts">' . esc_html__( 'Get more info.', 'gravity-pdf' ) . '</a>',
 						'type' => 'button',
 						'std'  => __( 'Download Core Fonts', 'gravity-pdf' ),
 					],
@@ -230,7 +235,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'manage_fonts'       => [
 						'id'   => 'manage_fonts',
 						'name' => esc_html__( 'Fonts', 'gravity-pdf' ),
-						'desc' => '<div class="gform-settings-description gform-kitchen-sink">' . sprintf( __( 'Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font files are supported.', 'gravity-pdf' ), '<code>', '</code>' ) . '</div>',
+						/* translators: 1: Opening <code> tag, 2: Closing </code> tag */
+						'desc' => '<div class="gform-settings-description gform-kitchen-sink">' . sprintf( esc_html__( 'Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font files are supported.', 'gravity-pdf' ), '<code>', '</code>' ) . '</div>',
 						'type' => 'descriptive_text',
 					],
 				]
@@ -239,7 +245,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Form (PDF) Settings
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings/ for more details about this filter
+			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings/ for more details about this filter
 			 */
 			'form_settings'                   => apply_filters(
 				'gfpdf_form_settings',
@@ -259,7 +265,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'template'         => [
 						'id'         => 'template',
 						'name'       => esc_html__( 'Template', 'gravity-pdf' ),
-						'desc'       => sprintf( __( 'Templates control the overall look and feel of the PDFs, and additional templates can be %1$spurchased from the online store%4$s. If you want to digitize and automate your existing documents, %2$suse our Bespoke PDF service%4$s. Developers can also %3$sbuild their own templates%4$s.', 'gravity-pdf' ), '<a href="https://gravitypdf.com/store/#templates">', '<a href="https://gravitypdf.com/bespoke/">', '<a href="https://docs.gravitypdf.com/v6/developers/start-customising/">', '</a>' ),
+						/* translators: 1: Opening <a> tag (template store), 2: Opening <a> tag (bespoke service), 3: Opening <a> tag (build your own), 4: Closing </a> tag */
+						'desc'       => sprintf( esc_html__( 'Templates control the overall look and feel of the PDFs, and additional templates can be %1$spurchased from the online store%4$s. If you want to digitize and automate your existing documents, %2$suse our Bespoke PDF service%4$s. Developers can also %3$sbuild their own templates%4$s.', 'gravity-pdf' ), '<a href="https://gravitypdf.com/store/#templates">', '<a href="https://gravitypdf.com/bespoke/">', '<a href="https://docs.gravitypdf.com/developers/start-customising/">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->templates->get_all_templates_by_group(),
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
@@ -269,7 +276,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'notification'     => [
 						'id'          => 'notification',
 						'name'        => esc_html__( 'Notifications', 'gravity-pdf' ),
-						'desc'        => sprintf( __( 'Send the PDF as an email attachment for the selected notification(s). %1$sPassword protect the PDF%3$s if security is a concern. Alternatively, %2$suse the [gravitypdf] shortcode%3$s directly in your Notification message.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/users/setup-pdf#password">', '<a href="https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags">', '</a>' ),
+						/* translators: 1: Opening <a> tag (password protect link), 2: Opening <a> tag (shortcode link), 3: Closing </a> tag */
+						'desc'        => sprintf( esc_html__( 'Send the PDF as an email attachment for the selected notification(s). %1$sPassword protect the PDF%3$s if security is a concern. Alternatively, %2$suse the [gravitypdf] shortcode%3$s directly in your Notification message.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/users/setup-pdf#password">', '<a href="https://docs.gravitypdf.com/users/shortcodes-and-mergetags">', '</a>' ),
 						'type'        => 'multicheck',
 						'options'     => [],
 						'placeholder' => esc_html__( 'Choose a Notification', 'gravity-pdf' ),
@@ -310,7 +318,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'         => 'filename',
 						'name'       => esc_html__( 'Filename', 'gravity-pdf' ),
 						'type'       => 'text',
-						'desc'       => sprintf( __( 'Set the filename for the generated PDF (excluding the .pdf extension). Mergetags are supported, and invalid characters %s are automatically converted to an underscore.', 'gravity-pdf' ), '<code>/ \ " * ? | : &lt; &gt;</code>' ),
+						/* translators: %s: list of invalid characters wrapped in <code> tags */
+						'desc'       => sprintf( esc_html__( 'Set the filename for the generated PDF (excluding the .pdf extension). Mergetags are supported, and invalid characters %s are automatically converted to an underscore.', 'gravity-pdf' ), '<code>/ \ " * ? | : &lt; &gt;</code>' ),
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 						'required'   => true,
 						'schema'     => [
@@ -395,7 +404,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Form (PDF) Settings Appearance
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_appearance/ for more details about this filter
+			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_appearance/ for more details about this filter
 			 */
 			'form_settings_appearance'        => apply_filters(
 				'gfpdf_form_settings_appearance',
@@ -548,7 +557,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			 * This filter allows templates to add custom options for use specific to that template
 			 * Gravity PDF autoloads a PHP template file if it exists and loads it up with this filter
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/developer-template-configuration-and-image/#template-configuration for more details
+			 * See https://docs.gravitypdf.com/developers/filters/developer-template-configuration-and-image/#template-configuration for more details
 			 */
 			'form_settings_custom_appearance' => apply_filters(
 				'gfpdf_form_settings_custom_appearance',
@@ -558,7 +567,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Form (PDF) Settings Advanced
 			 *
-			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_advanced/ for more details about this filter
+			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_advanced/ for more details about this filter
 			 */
 			'form_settings_advanced'          => apply_filters(
 				'gfpdf_form_settings_advanced',
@@ -647,13 +656,15 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'   => 'public_access',
 						'name' => esc_html__( 'Enable Public Access', 'gravity-pdf' ),
 						'type' => 'toggle',
-						'desc' => sprintf( __( "When public access is on all security protocols are disabled and %3\$sanyone can view the PDF document for ALL your form's entries%4\$s. For better security, %1\$suse the signed PDF urls feature instead%2\$s.", 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags#before-you-get-started">', '</a>', '<strong>', '</strong>' ),
+						/* translators: 1: Opening <a> tag, 2: Closing </a> tag, 3: Opening <strong> tag, 4: Closing </strong> tag */
+						'desc' => sprintf( esc_html__( "When public access is on all security protocols are disabled and %3\$sanyone can view the PDF document for ALL your form's entries%4\$s. For better security, %1\$suse the signed PDF urls feature instead%2\$s.", 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/users/shortcodes-and-mergetags#before-you-get-started">', '</a>', '<strong>', '</strong>' ),
 					],
 
 					'restrict_owner'  => [
 						'id'   => 'restrict_owner',
 						'name' => esc_html__( 'Restrict Owner', 'gravity-pdf' ),
-						'desc' => sprintf( __( 'When enabled, the original entry owner will NOT be able to view the PDFs. This setting is overridden %1$swhen using signed PDF urls%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags#before-you-get-started">', '</a>' ),
+						/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+						'desc' => sprintf( esc_html__( 'When enabled, the original entry owner will NOT be able to view the PDFs. This setting is overridden %1$swhen using signed PDF urls%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/users/shortcodes-and-mergetags#before-you-get-started">', '</a>' ),
 						'type' => 'toggle',
 						'std'  => $this->get_option( 'default_restrict_owner', '0' ),
 					],
@@ -661,7 +672,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 		];
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_registered_fields/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_registered_fields/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
 	}
@@ -712,7 +723,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 		/**
 		 * Use the filter below to return 'true' which will enable the master password field
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_enable_master_password_field/ for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_enable_master_password_field/ for usage
 		 */
 		if ( ! apply_filters( 'gfpdf_enable_master_password_field', false, $settings ) ) {
 			return $settings;
@@ -762,7 +773,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			[
 				'id'   => 'show_page_names',
 				'name' => esc_html__( 'Show Page Names', 'gravity-pdf' ),
-				'desc' => sprintf( __( 'Display form page names on the PDF. Requires the use of the %1$sPage Break field%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravityforms.com/page-break/">', '</a>' ),
+				/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+				'desc' => sprintf( esc_html__( 'Display form page names on the PDF. Requires the use of the %1$sPage Break field%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravityforms.com/page-break/">', '</a>' ),
 				'type' => 'toggle',
 			]
 		);
@@ -860,7 +872,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'name'       => esc_html__( 'Header', 'gravity-pdf' ),
 				'type'       => 'rich_editor',
 				'size'       => 8,
-				'desc'       => sprintf( __( 'The header is included at the top of each page. For simple columns %1$stry this HTML table snippet%2$s.', 'gravity-pdf' ), '<a href="https://gist.github.com/jakejackson1/997b5dedf0a5e665e8ef">', '</a>' ),
+				/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+				'desc'       => sprintf( esc_html__( 'The header is included at the top of each page. For simple columns %1$stry this HTML table snippet%2$s.', 'gravity-pdf' ), '<a href="https://gist.github.com/jakejackson1/997b5dedf0a5e665e8ef">', '</a>' ),
 				'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
 			]
 		);
@@ -903,7 +916,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'name'       => esc_html__( 'Footer', 'gravity-pdf' ),
 				'type'       => 'rich_editor',
 				'size'       => 8,
-				'desc'       => sprintf( __( 'The footer is included at the bottom of every page. For simple text footers use the left, center and right alignment buttons in the editor. For simple columns %1$stry this HTML table snippet%2$s. Use the special %3$s{PAGENO}%4$s and %3$s{nbpg}%4$s tags to display page numbering. ', 'gravity-pdf' ), '<a href="https://gist.github.com/jakejackson1/e6179a96cd97ef0a8457">', '</a>', '<em>', '</em>' ),
+				/* translators: 1: Opening <a> tag, 2: Closing </a> tag, 3: Opening <em> tag, 4: Closing </em> tag */
+				'desc'       => sprintf( esc_html__( 'The footer is included at the bottom of every page. For simple text footers use the left, center and right alignment buttons in the editor. For simple columns %1$stry this HTML table snippet%2$s. Use the special %3$s{PAGENO}%4$s and %3$s{nbpg}%4$s tags to display page numbering. ', 'gravity-pdf' ), '<a href="https://gist.github.com/jakejackson1/e6179a96cd97ef0a8457">', '</a>', '<em>', '</em>' ),
 				'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
 			]
 		);

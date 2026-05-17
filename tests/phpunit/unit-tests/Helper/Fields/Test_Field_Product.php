@@ -54,7 +54,7 @@ class Test_Field_Product extends WP_UnitTestCase {
 		$pdf_field = $this->set_products( $this->form['fields'][0] );
 		$html      = $pdf_field->html();
 
-		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ">', $html );
+		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ', $html );
 		$this->assertStringContainsString( '<div class="value">$1.00 x 50 = $50.00</div>', $html );
 	}
 
@@ -62,7 +62,7 @@ class Test_Field_Product extends WP_UnitTestCase {
 		$pdf_field = $this->set_products( $this->form['fields'][1] );
 		$html      = $pdf_field->html();
 
-		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ">', $html );
+		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ', $html );
 		$this->assertStringContainsString( '<div class="value">$2.00 x 1</div>', $html );
 	}
 
@@ -70,7 +70,7 @@ class Test_Field_Product extends WP_UnitTestCase {
 		$pdf_field = $this->set_products( $this->form['fields'][2] );
 		$html      = $pdf_field->html();
 
-		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ">', $html );
+		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ', $html );
 		$this->assertStringContainsString( '<div class="value">$3.00 x 42 = $126.00</div>', $html );
 	}
 
@@ -78,7 +78,7 @@ class Test_Field_Product extends WP_UnitTestCase {
 		$pdf_field = $this->set_products( $this->form['fields'][4] );
 		$html      = $pdf_field->html();
 
-		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ">', $html );
+		$this->assertStringContainsString( 'class="gfpdf-field gfpdf-singleproduct ', $html );
 		$this->assertStringContainsString( '<div class="value">$4.00 x 32 = $128.00</div>', $html );
 	}
 

@@ -1,76 +1,79 @@
-import React from 'react'
-import { shallow } from 'enzyme'
-import { findByTestAttr } from '../../testUtils'
-import { TemplateActivateButton } from '../../../../../src/assets/js/react/components/Template/TemplateActivateButton'
-import { mapDispatchToProps } from '../../../../../src/assets/js/react/components/Template/TemplateActivateButton'
+import React from 'react';
+import { shallow } from 'enzyme';
+import { findByTestAttr } from '../../testUtils';
+import {
+	TemplateActivateButton,
+	mapDispatchToProps,
+} from '../../../../../src/assets/js/react/components/Template/TemplateActivateButton';
 
 describe('Template - TemplateActivateButton.js', () => {
+	const navigate = jest.fn();
+	const onTemplateSelectMock = jest.fn();
 
-  const historyMock = { push: jest.fn() }
-  const onTemplateSelectMock = jest.fn()
+	describe('Check for redux properties', () => {
+		const dispatch = jest.fn();
 
-  describe('Check for redux properties', () => {
+		test('check for mapDispatchToProps onTemplateSelect()', () => {
+			mapDispatchToProps(dispatch).onTemplateSelect();
 
-    const dispatch = jest.fn()
+			expect(dispatch.mock.calls[0][0]).toEqual({
+				type: 'SELECT_TEMPLATE',
+			});
+		});
+	});
 
-    test('check for mapDispatchToProps onTemplateSelect()', () => {
-      mapDispatchToProps(dispatch).onTemplateSelect()
+	describe('Component functions', () => {
+		test('handleSelectTemplate() - Update our route and trigger a Redux action to select the current template', () => {
+			const wrapper = shallow(
+				<TemplateActivateButton
+					navigate={navigate}
+					onTemplateSelect={onTemplateSelectMock}
+					template={{}}
+				/>
+			);
+			const instance = wrapper.instance();
+			instance.handleSelectTemplate({
+				preventDefault() {},
+				stopPropagation() {},
+			});
 
-      expect(dispatch.mock.calls[0][0]).toEqual({ type: 'SELECT_TEMPLATE' })
-    })
-  })
+			expect(navigate.mock.calls.length).toBe(1);
+			expect(onTemplateSelectMock.mock.calls.length).toBe(1);
+		});
+	});
 
-  describe('Component functions', () => {
+	test('renders <TemplateActivateButton /> component', () => {
+		const wrapper = shallow(<TemplateActivateButton navigate={navigate} />);
+		const component = findByTestAttr(
+			wrapper,
+			'component-templateActivateButton'
+		);
 
-    test('handleSelectTemplate() - Update our route and trigger a Redux action to select the current template', () => {
-      const wrapper = shallow(
-        <TemplateActivateButton
-          history={historyMock}
-          onTemplateSelect={onTemplateSelectMock}
-          template={{}}
-        />
-      )
-      const instance = wrapper.instance()
-      instance.handleSelectTemplate({ preventDefault() {}, stopPropagation() {} })
+		expect(component.length).toBe(1);
+	});
 
-      expect(historyMock.push.mock.calls.length).toBe(1)
-      expect(onTemplateSelectMock.mock.calls.length).toBe(1)
-    })
-  })
+	test('renders button text', () => {
+		const wrapper = shallow(
+			<TemplateActivateButton navigate={navigate} buttonText="Select" />
+		);
 
-  test('renders <TemplateActivateButton /> component', () => {
-    const wrapper = shallow(
-      <TemplateActivateButton
-        history={historyMock}
-      />
-    )
-    const component = findByTestAttr(wrapper, 'component-templateActivateButton')
+		expect(wrapper.find('button').text()).toBe('Select');
+	});
 
-    expect(component.length).toBe(1)
-  })
+	test('check button click', () => {
+		const wrapper = shallow(
+			<TemplateActivateButton
+				navigate={navigate}
+				onTemplateSelect={onTemplateSelectMock}
+				template={{}}
+			/>
+		);
+		wrapper.simulate('click', {
+			preventDefault() {},
+			stopPropagation() {},
+		});
 
-  test('renders button text', () => {
-    const wrapper = shallow(
-      <TemplateActivateButton
-        history={historyMock}
-        buttonText='Select'
-      />
-    )
-
-    expect(wrapper.find('a').text()).toBe('Select')
-  })
-
-  test('check button click', () => {
-    const wrapper = shallow(
-      <TemplateActivateButton
-        history={historyMock}
-        onTemplateSelect={onTemplateSelectMock}
-        template={{}}
-      />
-    )
-    wrapper.simulate('click', { preventDefault() {}, stopPropagation() {} })
-
-    expect(historyMock.push.mock.calls.length).toBe(1)
-    expect(onTemplateSelectMock.mock.calls.length).toBe(1)
-  })
-})
+		expect(navigate.mock.calls.length).toBe(1);
+		expect(onTemplateSelectMock.mock.calls.length).toBe(1);
+	});
+});

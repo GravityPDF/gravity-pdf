@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -119,7 +119,7 @@ class Model_Install extends Helper_Abstract_Model {
 		update_option( 'gfpdf_is_installed', true );
 		$this->data->is_installed = true;
 
-		/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_fully_loaded for more details about this action */
+		/* See https://docs.gravitypdf.com/developers/actions/gfpdf_fully_loaded for more details about this action */
 		do_action( 'gfpdf_plugin_installed' );
 	}
 
@@ -142,7 +142,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function get_working_directory() {
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_working_folder_name/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_working_folder_name/ for more details about this filter */
 		return apply_filters( 'gfpdf_working_folder_name', 'PDF_EXTENDED_TEMPLATES' );
 	}
 
@@ -182,24 +182,24 @@ class Model_Install extends Helper_Abstract_Model {
 		$upload_dir_url = $this->data->upload_dir_url;
 
 		/* Legacy Filters */
-		$this->data->template_location     = apply_filters( 'gfpdfe_template_location', $template_dir, $working_folder, $upload_dir );
-		$this->data->template_location_url = apply_filters( 'gfpdfe_template_location_uri', $template_url, $working_folder, $upload_dir_url );
+		$this->data->template_location     = trailingslashit( apply_filters( 'gfpdfe_template_location', $template_dir, $working_folder, $upload_dir ) );
+		$this->data->template_location_url = trailingslashit( apply_filters( 'gfpdfe_template_location_uri', $template_url, $working_folder, $upload_dir_url ) );
 
 		/* Allow user to change directory location(s) */
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_template_location/ for more details about this filter */
-		$this->data->template_location = apply_filters( 'gfpdf_template_location', $this->data->template_location, $working_folder, $upload_dir ); /* needs to be accessible from the web */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_template_location/ for more details about this filter */
+		$this->data->template_location = trailingslashit( apply_filters( 'gfpdf_template_location', $this->data->template_location, $working_folder, $upload_dir ) ); /* needs to be accessible from the web */
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_template_location_uri/ for more details about this filter */
-		$this->data->template_location_url = apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $working_folder, $upload_dir_url ); /* needs to be accessible from the web */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_template_location_uri/ for more details about this filter */
+		$this->data->template_location_url = trailingslashit( apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $working_folder, $upload_dir_url ) ); /* needs to be accessible from the web */
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_font_location/ for more details about this filter */
-		$this->data->template_font_location = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_font_location/ for more details about this filter */
+		$this->data->template_font_location = trailingslashit( apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ) ); /* can be in a directory not accessible via the web */
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_tmp_location/ for more details about this filter */
-		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/ for more details about this filter */
+		$this->data->template_tmp_location = trailingslashit( apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ) ); /* encouraged to move this to a directory not accessible via the web */
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_mpdf_tmp_location/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_mpdf_tmp_location/ for more details about this filter */
 		$mpdf_tmp_path                 = $this->data->template_tmp_location . 'mpdf';
 		$this->data->mpdf_tmp_location = untrailingslashit( apply_filters( 'gfpdf_mpdf_tmp_location', $mpdf_tmp_path ) );
 	}
@@ -213,34 +213,35 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function setup_multisite_template_location() {
 
-		if ( is_multisite() ) {
-
-			$blog_id = get_current_blog_id();
-
-			$template_dir   = $this->data->template_location . $blog_id . '/';
-			$template_url   = $this->data->template_location_url . $blog_id . '/';
-			$working_folder = $this->data->working_folder;
-			$upload_dir     = $this->data->upload_dir;
-			$upload_dir_url = $this->data->upload_dir_url;
-
-			/**
-			 * Allow user to change directory location(s)
-			 *
-			 * @internal Folder location needs to be accessible from the web
-			 */
-
-			/* Global filter */
-
-			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_multisite_template_location/ for more details about this filter */
-			$this->data->multisite_template_location = apply_filters( 'gfpdf_multisite_template_location', $template_dir, $working_folder, $upload_dir, $blog_id );
-
-			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_multisite_template_location_uri/ for more details about this filter */
-			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri', $template_url, $working_folder, $upload_dir_url, $blog_id );
-
-			/* Per-blog filters */
-			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location_' . $blog_id, $this->data->multisite_template_location, $working_folder, $upload_dir, $blog_id );
-			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri_' . $blog_id, $this->data->multisite_template_location_url, $working_folder, $upload_dir_url, $blog_id );
+		if ( ! is_multisite() ) {
+			return;
 		}
+
+		$blog_id = get_current_blog_id();
+
+		$template_dir   = $this->data->template_location . $blog_id . '/';
+		$template_url   = $this->data->template_location_url . $blog_id . '/';
+		$working_folder = $this->data->working_folder;
+		$upload_dir     = $this->data->upload_dir;
+		$upload_dir_url = $this->data->upload_dir_url;
+
+		/**
+		 * Allow user to change directory location(s)
+		 *
+		 * @internal Folder location needs to be accessible from the web
+		 */
+
+		/* Global filter */
+
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_multisite_template_location/ for more details about this filter */
+		$this->data->multisite_template_location = trailingslashit( apply_filters( 'gfpdf_multisite_template_location', $template_dir, $working_folder, $upload_dir, $blog_id ) );
+
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_multisite_template_location_uri/ for more details about this filter */
+		$this->data->multisite_template_location_url = trailingslashit( apply_filters( 'gfpdf_multisite_template_location_uri', $template_url, $working_folder, $upload_dir_url, $blog_id ) );
+
+		/* Per-blog filters */
+		$this->data->multisite_template_location     = trailingslashit( apply_filters( 'gfpdf_multisite_template_location_' . $blog_id, $this->data->multisite_template_location, $working_folder, $upload_dir, $blog_id ) );
+		$this->data->multisite_template_location_url = trailingslashit( apply_filters( 'gfpdf_multisite_template_location_uri_' . $blog_id, $this->data->multisite_template_location_url, $working_folder, $upload_dir_url, $blog_id ) );
 	}
 
 	/**
@@ -254,10 +255,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function create_folder_structures() {
 
-		/* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
-		if ( is_admin() &&
-			 ( rgget( 'page' ) === 'gfpdf-getting-started' || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) )
-		) {
+		/* don't create the folder structure if an AJAX or REST API request */
+		if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 			return null;
 		}
 
@@ -267,7 +266,6 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->data->template_font_location,
 			$this->data->template_tmp_location,
 			$this->data->mpdf_tmp_location,
-			$this->data->mpdf_tmp_location . '/ttfontdata',
 		];
 
 		if ( is_multisite() ) {
@@ -288,6 +286,7 @@ class Model_Install extends Helper_Abstract_Model {
 						]
 					);
 
+					/* translators: %s: directory path wrapped in <code> tags */
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			} elseif ( ! wp_is_writable( $dir ) ) {
@@ -299,6 +298,7 @@ class Model_Install extends Helper_Abstract_Model {
 					]
 				);
 
+				/* translators: %s: directory path wrapped in <code> tags */
 				$this->notices->add_error( sprintf( esc_html__( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 			}
 

@@ -6,7 +6,7 @@ use WP_Error;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -102,6 +102,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 		/* Additional validation on the path to ensure $filename stays in the $this->get_view_dir_path() directory and doesn't traverse it */
 		$path_to_test = realpath( $path );
 		if ( $path_to_test === false || strpos( $path_to_test, realpath( $this->get_view_dir_path() ) ) !== 0 ) {
+			/* translators: %s: filename */
 			return new WP_Error( 'invalid_path', sprintf( esc_html__( '%s is an invalid filename', 'gravity-pdf' ), $filename ) );
 		}
 
@@ -126,6 +127,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 			}
 		}
 
+		/* translators: %s: filename */
 		return new WP_Error( 'invalid_path', sprintf( esc_html__( 'Cannot find file %s', 'gravity-pdf' ), $filename ) );
 	}
 

@@ -10,7 +10,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Options API Class
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -56,7 +56,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->options = \GPDFAPI::get_options_class();
 
 		/* load settings in database  */
-		update_option( 'gfpdf_settings', json_decode( file_get_contents( __DIR__ . '/../data/json/options-settings.json' ), true ) );
+		update_option( 'gfpdf_settings', json_decode( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/pdf/options-settings.json' ), true ) );
 
 		/* Load a form / form PDF settings into database */
 		$this->form_id                                = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];

@@ -14,7 +14,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Uninstall functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -131,16 +131,25 @@ class Test_Uninstaller extends WP_UnitTestCase {
 		$installer->check_install_status();
 
 		update_option( 'gfpdf_settings', [] );
+		update_option( 'gpdf_sl_abc_123', true );
+		update_option( 'gpdf_sl_failed_123', true );
 
 		$this->assertNotFalse( get_option( 'gfpdf_is_installed' ) );
 		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
 		$this->assertNotFalse( get_option( 'gfpdf_settings' ) );
+		$this->assertNotFalse( get_option( 'gpdf_sl_abc_123' ) );
+		$this->assertNotFalse( get_option( 'gpdf_sl_failed_123' ) );
 
 		$this->model->remove_plugin_options();
+
+		/* flush the options cache so fresh values can be checked from the database */
+		wp_cache_delete( 'alloptions', 'options' );
 
 		$this->assertFalse( get_option( 'gfpdf_is_installed' ) );
 		$this->assertFalse( get_option( 'gfpdf_current_version' ) );
 		$this->assertFalse( get_option( 'gfpdf_settings' ) );
+		$this->assertFalse( get_option( 'gpdf_sl_abc_123' ) );
+		$this->assertFalse( get_option( 'gpdf_sl_failed_123' ) );
 
 		wp_set_current_user( 0 );
 	}

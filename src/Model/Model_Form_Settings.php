@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -225,7 +225,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* add custom classes to form */
 		$form_classes = '';
-		if ( version_compare( '2.6-rc-1', GFCommon::$version, '>=' ) ) {
+		if ( version_compare( '2.6-rc-1', \GFForms::$version, '<=' ) ) {
 			$form_classes .= 'gfpdf-gf-2-6';
 		}
 
@@ -398,6 +398,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-pdf' ), '<a href="' . esc_url( remove_query_arg( 'pid' ) ) . '">', '</a>' ) );
 
 			return true;
@@ -468,7 +469,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 						/*
 						 * General filter
 						 *
-						 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
+						 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
 						 */
 						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 
@@ -476,7 +477,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 							/*
 							 * Field type specific filter
 							 *
-							 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
+							 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
 							 */
 							$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 						}
@@ -545,7 +546,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				/*
 				 * If string, sanitize and add error if appropriate
 				 *
-				 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
+				 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_settings_sanitize/ for more details about this filter
 				 */
 				$value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key );
 				if ( empty( $value ) ) {
@@ -627,6 +628,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* phpcs:enable */
 
 		/* If we don't have a specific PDF we'll use the defaults */
+		$template = '';
 		if ( empty( $pid ) || empty( $form_id ) ) {
 			$template = $this->options->get_option( 'default_template', 'zadani' );
 		} else {
@@ -635,8 +637,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( ! is_wp_error( $pdf ) ) {
 				$template = $pdf['template'];
-			} else {
-				$template = '';
+			} elseif ( ! empty( $_POST['gfpdf_settings']['template'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				/* in the middle of creating a new PDF, and not yet saved in the DB. Grab from POST data */
+				$template = sanitize_html_class( $_POST['gfpdf_settings']['template'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
 		}
 
@@ -707,7 +710,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'first_footer'         => [ $this->options, 'get_first_page_footer_field' ],
 		];
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_core_template_fields_list/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_core_template_fields_list/ for more details about this filter */
 		$core_fields = apply_filters( 'gfpdf_core_template_fields_list', $core_fields, $template_settings, $config_class );
 
 		foreach ( $core_fields as $id => $method ) {

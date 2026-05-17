@@ -17,6 +17,10 @@
     }
 
     // Merge tag box
+    .gform-settings-input__container--with-merge-tag {
+      width: 100%;
+    }
+
     .all-merge-tags {
       &.textarea {
         .tooltip-merge-tag {
@@ -50,17 +54,7 @@
   .gfpdf-gf-2-6 {
     .gfpdf-settings-field-wrapper {
       .wp-editor-wrap {
-        margin-right: 0rem;
-      }
-    }
-
-    .wp-media-buttons {
-      .all-merge-tags {
-        top: -0.15rem;
-      }
-
-      .gform-icon--merge-tag {
-        font-size: 2.25rem;
+        margin-right: 0;
       }
     }
   }

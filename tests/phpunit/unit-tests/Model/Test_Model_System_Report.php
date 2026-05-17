@@ -9,7 +9,7 @@ use WP_UnitTestCase;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -19,7 +19,7 @@ use WP_UnitTestCase;
  * @package GFPDF\Model
  *
  * @group   model
- * @group   pdf
+ * @group   system-report
  */
 class Test_Model_System_Report extends WP_UnitTestCase {
 
@@ -38,6 +38,26 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 
 		/* Setup our test classes */
 		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks, new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ) );
+
+		add_filter( 'pre_http_request', [ $this, 'get_public_dir_api_response' ] );
+	}
+
+	public function tear_down() {
+		remove_all_filters( 'pre_http_request' );
+
+		parent::tear_down();
+	}
+
+	/**
+	 * Override API request to speed up unit test
+	 *
+	 * @return array
+	 */
+	public function get_public_dir_api_response() {
+		return [
+			'response' => [ 'code' => 200 ],
+			'body'     => 'failed-if-read',
+		];
 	}
 
 	public function test_get_report_structure() {
@@ -74,6 +94,16 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 	}
 
 	public function test_public_tmp_directory_access() {
+		$this->assertFalse( $this->model->test_public_tmp_directory_access() );
+
+		remove_all_filters( 'pre_http_request' );
+
+		add_filter( 'pre_http_request', function() {
+			return [
+				'response' => [ 'code' => 403 ],
+			];
+		} );
+
 		$this->assertTrue( $this->model->test_public_tmp_directory_access() );
 	}
 

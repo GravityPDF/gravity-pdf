@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@self:playwright/*": [ "./tools/playwright/*" ]
+    }
+  },
+  "exclude": [
+    "build",
+    "node_modules",
+    "vendor"
+  ]
+}

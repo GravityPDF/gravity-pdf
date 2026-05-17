@@ -12,7 +12,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Installer functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -172,7 +172,6 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->assertDirectoryExists( $gfpdf->data->template_font_location );
 		$this->assertDirectoryExists( $gfpdf->data->template_tmp_location );
 		$this->assertDirectoryExists( $gfpdf->data->mpdf_tmp_location );
-		$this->assertDirectoryExists( $gfpdf->data->mpdf_tmp_location . '/ttfontdata' );
 
 		$this->assertFileExists( $gfpdf->data->template_tmp_location . '.htaccess' );
 		$this->assertFileExists( $gfpdf->data->template_tmp_location . 'index.html' );

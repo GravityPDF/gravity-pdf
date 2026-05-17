@@ -24,7 +24,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Endpoint Functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -108,8 +108,8 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertSame( 10, has_action( 'parse_request', [ $this->controller, 'process_legacy_pdf_endpoint' ] ) );
-		$this->assertSame( 10, has_action( 'parse_request', [ $this->controller, 'process_pdf_endpoint' ] ) );
+		$this->assertSame( 1, has_action( 'parse_request', [ $this->controller, 'process_legacy_pdf_endpoint' ] ) );
+		$this->assertSame( 1, has_action( 'parse_request', [ $this->controller, 'process_pdf_endpoint' ] ) );
 
 		$this->assertSame(
 			10,
@@ -252,7 +252,9 @@ class Test_PDF extends WP_UnitTestCase {
 			'pdf_error'
 		);
 
-		$method->setAccessible( true );
+		if ( version_compare( PHP_VERSION, '8.1', '<' )  ) {
+			$method->setAccessible( true );
+		}
 
 		/* Ensure our public errors are shown */
 
@@ -1261,7 +1263,11 @@ class Test_PDF extends WP_UnitTestCase {
 			'test5'     => time() - ( 15 * 3600 ),
 			'test6'     => time() - ( 0.25 * 3600 ),
 			'.htaccess' => time() - ( 48 * 3600 ),
-			'mpdf/test' => time() - ( 25 * 3600 ), /* normally deleted, but excluded */
+			'mpdf/test' => time() - ( 0.5 * 3600 ),
+			'mpdf/test1' => time() - 3601,
+			'mpdf/test2' => time() - 3600,
+			'mpdf/test3' => time() - ( 25 * 3600 ),
+
 		];
 
 		foreach ( $files as $file => $modified ) {
@@ -1280,6 +1286,9 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertFileExists( $tmp . 'test6' );
 		$this->assertFileExists( $tmp . '.htaccess' );
 		$this->assertFileExists( $tmp . 'mpdf/test' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/test1' );
+		$this->assertFileExists( $tmp . 'mpdf/test2' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/test3' );
 
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
@@ -1810,7 +1819,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$this->assertStringContainsString('First Page', $html );
 		$this->assertStringContainsString('<h3 id="page-no-1"', $html );
-		$this->assertStringContainsString('class="gfpdf-page gfpdf-field my-test-class"', $html );
+		$this->assertStringContainsString('class="gfpdf-field gfpdf-page my-test-class"', $html );
 		$this->assertStringContainsString('<div class="row-separator odd">', $html );
 
 		ob_start();

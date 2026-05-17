@@ -1,9 +1,9 @@
 /* Dependencies */
-import request from 'superagent/dist/superagent.min'
+import { api, getJsonString } from './api';
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.2
  */
@@ -11,47 +11,89 @@ import request from 'superagent/dist/superagent.min'
 /**
  * Do AJAX call
  *
- * @returns {{method.post}}
+ * @return {{ body: string, text: string, status: number, ok: boolean }} Raw HTML option elements for the template select box (`body` equals `text`)
  *
  * @since 5.2
  */
-export function apiPostUpdateSelectBox () {
-  return request
-    .post(GFPDF.ajaxUrl)
-    .field('action', 'gfpdf_get_template_options')
-    .field('nonce', GFPDF.ajaxNonce)
+export async function apiPostUpdateSelectBox() {
+	const formData = new window.FormData();
+	formData.append('action', 'gfpdf_get_template_options');
+	formData.append('nonce', GFPDF.ajaxNonce);
+
+	const response = await api(GFPDF.ajaxUrl, {
+		method: 'POST',
+		body: formData,
+	});
+
+	const text = await response.text();
+
+	return {
+		body: text,
+		text,
+		status: response.status,
+		ok: response.ok,
+	};
 }
 
 /**
  * Do AJAX call
  *
- * @param {String} templateId
+ * @param {string} templateId - ID of the template to delete/process
  *
- * @returns {{method.post}}
+ * @return {{ body: Object, text: string, status: number, ok: boolean }} Server acknowledgement (response body is not used by callers)
  *
  * @since 5.2
  */
-export function apiPostTemplateProcessing (templateId) {
-  return request
-    .post(GFPDF.ajaxUrl)
-    .field('action', 'gfpdf_delete_template')
-    .field('nonce', GFPDF.ajaxNonce)
-    .field('id', templateId)
+export async function apiPostTemplateProcessing(templateId) {
+	const formData = new window.FormData();
+	formData.append('action', 'gfpdf_delete_template');
+	formData.append('nonce', GFPDF.ajaxNonce);
+	formData.append('id', templateId);
+
+	const response = await api(GFPDF.ajaxUrl, {
+		method: 'POST',
+		body: formData,
+	});
+
+	const text = await response.text();
+	const body = getJsonString(text);
+
+	return {
+		body,
+		text,
+		status: response.status,
+		ok: response.ok,
+	};
 }
 
 /**
  * Do AJAX call
  *
- * @param {{file: Object, filename: String}}
+ * @param {File}   file     - The zip file to upload
+ * @param {string} filename - Original filename of the zip
  *
- * @returns {{method.post}}
+ * @return {{ body: Object, text: string, status: number, ok: boolean }} Uploaded template data passed to `templateUploadProcessingSuccess`
  *
  * @since 5.2
  */
-export function apiPostTemplateUploadProcessing (file, filename) {
-  return request
-    .post(GFPDF.ajaxUrl)
-    .field('action', 'gfpdf_upload_template')
-    .field('nonce', GFPDF.ajaxNonce)
-    .attach('template', file, filename)
+export async function apiPostTemplateUploadProcessing(file, filename) {
+	const formData = new window.FormData();
+	formData.append('action', 'gfpdf_upload_template');
+	formData.append('nonce', GFPDF.ajaxNonce);
+	formData.append('template', file, filename);
+
+	const response = await api(GFPDF.ajaxUrl, {
+		method: 'POST',
+		body: formData,
+	});
+
+	const text = await response.text();
+	const body = getJsonString(text);
+
+	return {
+		body,
+		text,
+		status: response.status,
+		ok: response.ok,
+	};
 }

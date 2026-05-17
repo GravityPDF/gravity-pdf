@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -137,7 +137,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			],
 		];
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_one_time_action_routes for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_one_time_action_routes for more details about this filter */
 
 		return apply_filters( 'gfpdf_one_time_action_routes', $routes );
 	}

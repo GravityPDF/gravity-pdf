@@ -1,6 +1,6 @@
 /**
- * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @package			Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
@@ -11,15 +11,15 @@
  * @since 6.0
  */
 export default {
-  id: '',
-  label: '',
-  fontStyles: {
-    regular: '',
-    italics: '',
-    bold: '',
-    bolditalics: ''
-  },
-  validateLabel: true,
-  validateRegular: true,
-  disableUpdateButton: false
-}
+	id: '',
+	label: '',
+	fontStyles: {
+		regular: '',
+		italics: '',
+		bold: '',
+		bolditalics: '',
+	},
+	validateLabel: true,
+	validateRegular: true,
+	disableUpdateButton: false,
+};

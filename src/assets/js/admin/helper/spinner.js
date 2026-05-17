@@ -1,8 +1,14 @@
-import $ from 'jquery'
+import $ from 'jquery';
 
-export function spinner (classname) {
-  return $('<img />')
-    .attr('alt', GFPDF.spinnerAlt)
-    .attr('src', GFPDF.spinnerUrl)
-    .addClass(classname)
+export function spinner(classname) {
+	const $spinner = $(
+		'<img alt=' +
+			GFPDF.spinnerAlt +
+			' src=' +
+			GFPDF.spinnerUrl +
+			' class=' +
+			classname +
+			' />'
+	);
+	return $spinner;
 }
