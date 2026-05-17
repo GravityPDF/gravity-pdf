@@ -2,7 +2,7 @@
 /*
 Plugin Name: Gravity PDF
 Version: 6.14.2
-Description: Automatically generate highly-customizable PDF documents using Gravity Forms and WordPress (canonical)
+Description: Automatically generate highly customizable PDF documents using Gravity Forms and WordPress (canonical)
 Author: Blue Liquid Designs
 Author URI: https://blueliquiddesigns.com.au
 Plugin URI: https://gravitypdf.com
