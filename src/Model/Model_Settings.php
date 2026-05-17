@@ -249,6 +249,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'id'   => 'license_' . $slug,
 				'name' => $addon->get_short_name(),
 				'type' => 'license',
+				'data' => $addon,
 			];
 
 			$fields[ 'license_' . $slug . '_message' ] = [
@@ -288,6 +289,11 @@ class Model_Settings extends Helper_Abstract_Model {
 				continue;
 			}
 
+			/* Skip if addon has been auto-activated */
+			if ( $addon->has_license_auto_activated() ) {
+				continue;
+			}
+
 			/* Check if the license key is now empty */
 			if ( trim( $input[ $option_key ] ) === '' ) {
 				$input[ $option_key . '_message' ] = '';
@@ -296,138 +302,36 @@ class Model_Settings extends Helper_Abstract_Model {
 				continue;
 			}
 
-			/* Ensure the un-hashed license key saved in the database is not overridden by the hashed license when resbumitting form */
+			/* Ensure the un-hashed license key saved in the database is not overridden by the hashed license when resubmitting form */
 			if ( isset( $settings[ $option_key ] ) && sha1( $settings[ $option_key ] ) === $input[ $option_key ] ) {
 				$input[ $option_key ] = $settings[ $option_key ];
 			}
 
-			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
+			/* Run license activation if a new key was submitted, or the existing key isn't valid */
 			if (
-				$input[ $option_key . '_status' ] !== 'active' ||
+				! in_array( $input[ $option_key . '_status' ], [ 'active', 'valid' ], true ) ||
 				( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] )
 			) {
-				$results = $this->activate_license( $addon, $input[ $option_key ] );
+				$results = $addon->activate_license( $input[ $option_key ] );
 
 				$input[ $option_key . '_message' ] = $results['message'];
 				$input[ $option_key . '_status' ]  = $results['status'];
 			}
 		}
 
-		return $input;
-	}
-
-	/**
-	 * Do API call to GravityPDF.com to activate the current add-on license key
-	 *
-	 * @param Helper_Abstract_Addon $addon       The current add-on class (stored in $data->addon)
-	 * @param string                $license_key The current license key for this add-on
-	 *
-	 * @return array The API response and license status
-	 *
-	 * @since 4.2
-	 */
-	protected function activate_license( Helper_Abstract_Addon $addon, $license_key ) {
-
-		$response = wp_remote_post(
-			$this->data->store_url,
-			[
-				'timeout' => 15,
-				'body'    => [
-					'edd_action'  => 'activate_license',
-					'license'     => $license_key,
-					'item_id'     => $addon->get_edd_download_id(),
-					'item_name'   => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
-					'url'         => home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
-				],
-			]
-		);
-
-		$possible_responses = $this->data->addon_license_responses( $addon->get_name() );
-
-		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $possible_responses['generic'];
-			$status  = 'error';
-
-			$this->log->error(
-				'License activation failure',
-				[
-					'data' => $message,
-				]
-			);
-		} else {
-			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-			$message      = __( 'Your support license key has been activated for this domain.', 'gravity-pdf' );
-			$status       = 'active';
-
-			if ( ! isset( $license_data->success ) || false === $license_data->success ) {
-				$message = $possible_responses['generic'];
-				$status  = 'error';
-
-				if ( isset( $license_data->error, $possible_responses[ $license_data->error ] ) ) {
-					$message = $possible_responses[ $license_data->error ];
-					$status  = $license_data->error;
-
-					switch ( $license_data->error ) {
-						case 'expired':
-							$date_format = get_option( 'date_format' );
-							$dt          = new \DateTimeImmutable( $license_data->expires, wp_timezone() );
-							$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
-
-							$url = add_query_arg(
-								[
-									'edd_license_key' => $license_key,
-									'download_id'     => $addon->get_edd_download_id(),
-								],
-								'https://gravitypdf.com/checkout/'
-							);
-
-							$message = sprintf( $message, $date, $url );
-							break;
-
-						case 'revoked':
-						case 'disabled':
-							$url = add_query_arg(
-								[
-									'edd_action'  => 'add_to_cart',
-									'download_id' => $addon->get_edd_download_id(),
-									'edd_options[price_id]' => $license_data->price_id,
-								],
-								'https://gravitypdf.com/checkout/'
-							);
-
-							$message = sprintf( $message, $url );
-							break;
-
-						case 'no_activations_left':
-							$url = add_query_arg(
-								[
-									'view'       => 'upgrades',
-									'action'     => 'manage_licenses',
-									'license_id' => $license_data->license_id,
-									'payment_id' => $license_data->payment_id,
-								],
-								'https://gravitypdf.com/account/'
-							);
-
-							$message = sprintf( $message, $url );
-							break;
-					}
-				}
-
-				$this->log->error(
-					'License activation failure',
-					[
-						'data' => $license_data,
-					]
-				);
+		/* Save auto-activated license key info */
+		foreach ( $this->data->addon as $addon ) {
+			if ( ! $addon->has_license_auto_activated() ) {
+				continue;
 			}
+
+			$option_key                        = 'license_' . $addon->get_slug();
+			$input[ $option_key ]              = $addon->get_license_key();
+			$input[ $option_key . '_message' ] = $addon->get_license_message();
+			$input[ $option_key . '_status' ]  = $addon->get_license_status();
 		}
 
-		return [
-			'message' => $message,
-			'status'  => $status,
-		];
+		return $input;
 	}
 
 	/**
@@ -449,45 +353,279 @@ class Model_Settings extends Helper_Abstract_Model {
 		$addon = $this->data->addon[ ( $_POST['addon_name'] ?? '' ) ] ?? false;
 
 		/* Check add-on currently installed */
-		if ( ! empty( $addon ) ) {
-			if ( $this->deactivate_license_key( $addon, $addon->get_license_key() ) ) {
-				$this->log->notice( 'AJAX – Successfully Deactivated License' );
-				echo wp_json_encode(
-					[
-						'success' => esc_html__( 'License deactivated.', 'gravity-pdf' ),
-					]
-				);
+		if ( empty( $addon ) ) {
+			$this->log->error( 'AJAX Endpoint Error' );
 
-				wp_die();
-			} elseif ( $addon->schedule_license_check() ) {
-				$license_info = $addon->get_license_info();
+			echo wp_json_encode(
+				[
+					'error' => wp_kses(
+						sprintf(
+							/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+							__( 'An unknown error occurred, and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
+							'<a href="https://gravitypdf.com/account/licenses/">',
+							'</a>'
+						),
+						[ 'a' => [ 'href' => [] ] ]
+					),
+				]
+			);
 
-				echo wp_json_encode(
-					[
-						'error' => $license_info['message'],
-					]
-				);
-
-				wp_die();
-			}
+			wp_die();
 		}
 
-		$this->log->error( 'AJAX Endpoint Error' );
+		if ( ! empty( $addon->get_license_status() ) && ! $addon->deactivate_license() ) {
+			echo wp_json_encode(
+				[
+					'error' => wp_kses(
+						sprintf(
+							/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+							__( 'An API error occurred and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
+							'<a href="https://gravitypdf.com/account/licenses/">',
+							'</a>'
+						),
+						[ 'a' => [ 'href' => [] ] ]
+					),
+				]
+			);
+
+			wp_die();
+		}
+
+		/* All Access Pass licenses are site-activated, not product-activated. Deactivate other addons linked to license */
+		$extra = [];
+		foreach ( $this->data->addon as $addon ) {
+			if ( ! $addon->has_license_auto_deactivated() ) {
+				continue;
+			}
+
+			$extra[] = $addon->get_slug();
+		}
+
+		$this->log->notice( 'AJAX – Successfully Deactivated License' );
+
+		$message = empty( $extra ) ?
+			esc_html__( 'License key deactivated.', 'gravity-pdf' ) :
+			esc_html__( 'Access Pass license key deactivated.', 'gravity-pdf' );
 
 		echo wp_json_encode(
 			[
-				'error' => wp_kses(
-					sprintf(
-						__( 'An unknown error occurred, and your license key may not have been correctly deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your site has been unlinked from the key.', 'gravity-pdf' ),
-						'<a href="https://gravitypdf.com/account/licenses/">',
-						'</a>'
-					),
-					[ 'a' => [ 'href' => [] ] ]
-				),
+				'success' => $message,
+				'extra'   => $extra,
 			]
 		);
 
 		wp_die();
+	}
+
+	/**
+	 * Optimize plugin version checks by combining them into a single request
+	 *
+	 * @param array $api_params
+	 *
+	 * @return array
+	 *
+	 * @since 6.15.0
+	 */
+	public function licensing_bulk_get_version_api_params( $api_params ) {
+		/* Skip if the core updater isn't initialized or there are no addons */
+		if ( empty( $this->data->updater ) && empty( $this->data->addon ) ) {
+			return $api_params;
+		}
+
+		/* Build new parameters */
+		$products = array_merge(
+			[ 'gravity-pdf' => $this->data->updater ],
+			array_map(
+				function ( $addon ) {
+					return $addon->get_plugin_updater();
+				},
+				$this->data->addon
+			)
+		);
+
+		$bulk_api_params = [];
+		foreach ( $products as $product ) {
+			/* skip improperly-registered plugins */
+			if ( ! $product ) {
+				continue;
+			}
+
+			$bulk_api_params[] = $product->get_version_api_params();
+		}
+
+		return [
+			'edd_action' => 'get_version',
+			'products'   => $bulk_api_params,
+		];
+	}
+
+	/**
+	 * @param mixed $response
+	 *
+	 * @return \StdClass
+	 */
+	public function licensing_bulk_get_version_api_response( $response, $api_data, $plugin_file ) {
+		if ( ! is_array( $response ) ) {
+			return $response;
+		}
+
+		$initial_request_data = null;
+
+		foreach ( $response as $product ) {
+			if ( ! isset( $product->slug ) ) {
+				continue;
+			} elseif ( isset( $this->data->addon[ $product->slug ] ) ) {
+				$updater = $this->data->addon[ $product->slug ]->get_plugin_updater();
+			} elseif ( $product->slug === 'gravity-pdf' ) {
+				$updater = $this->data->updater;
+			} else {
+				continue; // couldn't link response to a product, skip.
+			}
+
+			/* skip the product that initialized the request, as it'll be handled in the return method */
+			if ( $updater->get_plugin_file() !== $plugin_file ) {
+				$updater->set_version_info_cache( $updater->standardize_api_response( $product ) );
+			} else {
+				$initial_request_data = $product;
+			}
+		}
+
+		return $initial_request_data;
+	}
+
+	/**
+	 * Check the status of licenses from the API in bulk
+	 *
+	 * @return bool
+	 *
+	 * @since 6.15.0
+	 */
+	public function licensing_bulk_license_check() {
+		$addons = $this->data->addon;
+		if ( empty( $addons ) ) {
+			return false;
+		}
+
+		$bulk_api_params = [];
+		$grouped_addons  = [];
+
+		foreach ( $addons as $addon ) {
+			/* Skip if no license key has been saved */
+			if ( empty( $addon->get_license_key() ) ) {
+				continue;
+			}
+
+			$updater = $addon->get_plugin_updater();
+			if ( ! $updater ) {
+				continue;
+			}
+
+			$bulk_api_params[]                               = $updater->get_version_api_params();
+			$grouped_addons[ $addon->get_edd_download_id() ] = $addon;
+		}
+
+		if ( empty( $bulk_api_params ) ) {
+			return false;
+		}
+
+		$response = wp_remote_post(
+			$this->data->store_url,
+			[
+				'timeout' => 15,
+				'body'    => [
+					'edd_action' => 'check_license',
+					'products'   => $bulk_api_params,
+				],
+			]
+		);
+
+		/* Check for problems contacting the licensing server */
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			$this->log->error(
+				'Failed to contact remote API for bulk license status check.',
+				[
+					'error' => is_wp_error( $response ) ? $response->get_error_message() : wp_remote_retrieve_response_code( $response ),
+				]
+			);
+
+			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+
+			return false;
+		}
+
+		/* Check for a malformed response */
+		$license_check = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( ! is_array( $license_check ) ) {
+			$this->log->error( 'Invalid response returned from bulk license status check.', [ 'response' => wp_remote_retrieve_body( $response ) ] );
+
+			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+
+			return false;
+		}
+
+		/* Loop over the response and update any licenses that have changed */
+		foreach ( $license_check as $addon_response ) {
+			if ( ! isset( $addon_response->item_id, $addon_response->license, $grouped_addons[ $addon_response->item_id ] ) ) {
+				$this->log->error( 'Invalid response for individual addon during bulk license status check.', [ 'response' => $addon_response ] );
+
+				continue;
+			}
+
+			$addon = $grouped_addons[ $addon_response->item_id ];
+			if ( $addon->get_license_status() === $addon_response->license ) {
+				$this->log->notice(
+					'License status has not changed.',
+					[
+						'response' => $addon_response,
+						'slug'     => $addon->get_slug(),
+					]
+				);
+
+				continue;
+			}
+
+			$addon->update_license_status_from_response(
+				$addon->get_license_key(),
+				[
+					'response' => [ 'code' => 200 ],
+					'body'     => wp_json_encode( $addon_response ),
+				],
+				true
+			);
+
+		}
+
+		return true;
+	}
+
+	/**
+	 * Force the network to display update nags when the plugin is only activated on a subsite
+	 *
+	 * @return void
+	 *
+	 * @since 6.15.0
+	 */
+	public function run_network_update_check() {
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		if ( get_current_blog_id() === 1 ) {
+			return;
+		}
+
+		/*
+		 * Skip a full wp_plugin_update() check and instead force the
+		 * `pre_set_site_transient_update_plugins` filter do its job,
+		 * which many addons (including Gravity PDF) use to inject update info
+		 */
+		switch_to_blog( 1 );
+		$update_info = get_site_transient( 'update_plugins' );
+		if ( $update_info !== false ) {
+			set_site_transient( 'update_plugins', $update_info );
+		}
+
+		restore_current_blog();
 	}
 
 	/**
@@ -499,47 +637,10 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 4.2
+	 * @deprecated 6.15.0 Moved to Addon framework
 	 */
-	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key ) {
-
-		/* Remove license data from database, no matter if the API request fails */
-		$addon->delete_license_info();
-
-		$response = wp_remote_post(
-			$this->data->store_url,
-			[
-				'timeout' => 15,
-				'body'    => [
-					'edd_action'  => 'deactivate_license',
-					'license'     => $license_key,
-					'item_id'     => $addon->get_edd_download_id(),
-					'item_name'   => rawurlencode( $addon->get_short_name() ), // the name of our product in EDD
-					'url'         => home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
-				],
-			]
-		);
-
-		/* If API error exit early */
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			return false;
-		}
-
-		/* Get API response and check license is now deactivated */
-		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
-			return false;
-		}
-
-		$this->log->notice(
-			'License successfully deactivated',
-			[
-				'slug'    => $addon->get_slug(),
-				'license' => $license_key,
-			]
-		);
-
-		return true;
+	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key = '' ) {
+		return $addon->deactivate_license();
 	}
 
 	/**
