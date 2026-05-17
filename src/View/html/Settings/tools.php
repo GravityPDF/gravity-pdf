@@ -23,7 +23,7 @@ GFCommon::display_admin_message();
 <div id="pdfextended-settings">
 
 	<!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
-	<form name="gfpdf-settings-form-<?php echo esc_attr( wp_rand() ); ?>" method="post" class="gform_settings_form">
+	<form name="gfpdf-settings-form-<?php echo esc_attr( wp_rand() ); ?>" method="post" class="gform_settings_form gforms_edit_form">
 
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 

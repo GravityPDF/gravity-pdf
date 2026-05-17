@@ -22,5 +22,18 @@
     .gfpdf-core-font-status-error {
       color: base.$error-color;
     }
+
+    .gfpdf-core-font-retry-link {
+      background-color: unset;
+      border: unset;
+      box-shadow: unset;
+      text-decoration: underline;
+      color: inherit;
+      padding: 0;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
   }
 }

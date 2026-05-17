@@ -627,6 +627,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* phpcs:enable */
 
 		/* If we don't have a specific PDF we'll use the defaults */
+		$template = '';
 		if ( empty( $pid ) || empty( $form_id ) ) {
 			$template = $this->options->get_option( 'default_template', 'zadani' );
 		} else {
@@ -635,8 +636,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( ! is_wp_error( $pdf ) ) {
 				$template = $pdf['template'];
-			} else {
-				$template = '';
+			} elseif ( ! empty( $_POST['gfpdf_settings']['template'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				/* in the middle of creating a new PDF, and not yet saved in the DB. Grab from POST data */
+				$template = sanitize_html_class( $_POST['gfpdf_settings']['template'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
 		}
 
