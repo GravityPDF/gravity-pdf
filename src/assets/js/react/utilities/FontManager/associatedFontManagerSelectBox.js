@@ -6,55 +6,65 @@
  */
 
 /**
+ * @typedef { Object } Font
+ * @property { string } id          - the font id
+ * @property { string } font_name   - the name of the font
+ * @property { string } regular     - file name for regular
+ * @property { string } italics     - file name for italics
+ * @property { string } bold        - file name for bold
+ * @property { string } bolditalics - file name for bold italics
+ */
+
+/**
  * This function is used to update font manager "dropdown select box" selected value
  *
- * @param fontList: array of object
- * @param id string
+ * @param { Array<Font> } fontList
+ * @param { string }      id
  *
  * @since 6.0
  */
-export function associatedFontManagerSelectBox (fontList, id = '') {
-  const fontManagerSelectBox = document.querySelector(
-    '.gfpdf-font-manager select'
-  )
+export function associatedFontManagerSelectBox(fontList, id = '') {
+	const fontManagerSelectBox = document.querySelector(
+		'.gfpdf-font-manager select'
+	);
 
-  if (!fontManagerSelectBox) {
-    return
-  }
+	if (!fontManagerSelectBox) {
+		return;
+	}
 
-  const selectedValue = fontManagerSelectBox.value
-  const definedFontsOptgroup = document.querySelector(
-    // eslint-disable-next-line no-undef
-    'optgroup[label="' + CSS.escape(GFPDF.fontUserDefinedGroup) + '"]'
-  )
+	const selectedValue = fontManagerSelectBox.value;
+	const definedFontsOptgroup = document.querySelector(
+		// eslint-disable-next-line no-undef
+		'optgroup[label="' + CSS.escape(GFPDF.fontUserDefinedGroup) + '"]'
+	);
 
-  // Remove the entire User-Defined Font group if it exists
-  if (definedFontsOptgroup) {
-    definedFontsOptgroup.remove()
-  }
+	// Remove the entire User-Defined Font group if it exists
+	if (definedFontsOptgroup) {
+		definedFontsOptgroup.remove();
+	}
 
-  // Do nothing if no custom fonts
-  if (fontList.length === 0) {
-    return
-  }
+	// Do nothing if no custom fonts
+	if (fontList.length === 0) {
+		return;
+	}
 
-  // Build our new custom font group
-  const optgroup = document.createElement('optgroup')
-  optgroup.setAttribute('label', GFPDF.fontUserDefinedGroup)
+	// Build our new custom font group
+	const optgroup = document.createElement('optgroup');
+	optgroup.setAttribute('label', GFPDF.fontUserDefinedGroup);
 
-  /* Build User-Defined Fonts optgroup list */
-  fontList.map((font) => {
-    const option = document.createElement('option')
-    option.text = font.font_name
-    option.value = font.id
+	/* Build User-Defined Fonts optgroup list */
+	fontList.map((font) => {
+		const option = document.createElement('option');
+		option.text = font.font_name;
+		option.value = font.id;
 
-    return optgroup.appendChild(option)
-  })
+		return optgroup.appendChild(option);
+	});
 
-  fontManagerSelectBox.insertBefore(
-    optgroup,
-    fontManagerSelectBox.childNodes[0]
-  )
+	fontManagerSelectBox.insertBefore(
+		optgroup,
+		fontManagerSelectBox.childNodes[0]
+	);
 
-  fontManagerSelectBox.value = !id ? selectedValue : id
+	fontManagerSelectBox.value = !id ? selectedValue : id;
 }

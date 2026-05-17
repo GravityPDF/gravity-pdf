@@ -1,6 +1,6 @@
-import { setupAJAXListDeleteListener } from './list/setupAJAXListDeleteListener'
-import { setupAJAXListDuplicateListener } from './list/setupAJAXListDuplicateListener'
-import { setupAJAXListStateListener } from './list/setupAJAXListStateListener'
+import { setupAJAXListDeleteListener } from './list/setupAJAXListDeleteListener';
+import { setupAJAXListDuplicateListener } from './list/setupAJAXListDuplicateListener';
+import { setupAJAXListStateListener } from './list/setupAJAXListStateListener';
 
 /**
  * Process the functionality for the PDF form settings 'list' page
@@ -8,11 +8,11 @@ import { setupAJAXListStateListener } from './list/setupAJAXListStateListener'
  * @since 4.0
  */
 class DoFormSettingsListPage {
-  setupAJAXListListener () {
-    setupAJAXListDeleteListener()
-    setupAJAXListDuplicateListener()
-    setupAJAXListStateListener()
-  }
+	setupAJAXListListener() {
+		setupAJAXListDeleteListener();
+		setupAJAXListDuplicateListener();
+		setupAJAXListStateListener();
+	}
 }
 
-export const doFormSettingsListPage = new DoFormSettingsListPage()
+export const doFormSettingsListPage = new DoFormSettingsListPage();

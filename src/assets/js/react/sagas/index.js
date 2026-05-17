@@ -1,15 +1,19 @@
 /* Dependencies */
-import { all } from 'redux-saga/effects'
+import { all } from 'redux-saga/effects';
 /* Sagas */
-import { watchUpdateSelectBox, watchTemplateProcessing, watchpostTemplateUploadProcessing } from './templates'
-import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts'
 import {
-  watchGetCustomFontList,
-  watchAddFont,
-  watchEditFont,
-  watchDeleteFont,
-  watchGetCustomFontListSuccess
-} from './fontManager'
+	watchUpdateSelectBox,
+	watchTemplateProcessing,
+	watchpostTemplateUploadProcessing,
+} from './templates';
+import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts';
+import {
+	watchGetCustomFontList,
+	watchAddFont,
+	watchEditFont,
+	watchDeleteFont,
+	watchGetCustomFontListSuccess,
+} from './fontManager';
 
 /**
  * @package     Gravity PDF
@@ -23,17 +27,17 @@ import {
  *
  * @since 5.2
  */
-export default function * rootSaga () {
-  yield all([
-    watchUpdateSelectBox(),
-    watchTemplateProcessing(),
-    watchpostTemplateUploadProcessing(),
-    watchGetFilesFromGitHub(),
-    watchDownloadFonts(),
-    watchGetCustomFontList(),
-    watchAddFont(),
-    watchEditFont(),
-    watchDeleteFont(),
-    watchGetCustomFontListSuccess()
-  ])
+export default function* rootSaga() {
+	yield all([
+		watchUpdateSelectBox(),
+		watchTemplateProcessing(),
+		watchpostTemplateUploadProcessing(),
+		watchGetFilesFromGitHub(),
+		watchDownloadFonts(),
+		watchGetCustomFontList(),
+		watchAddFont(),
+		watchEditFont(),
+		watchDeleteFont(),
+		watchGetCustomFontListSuccess(),
+	]);
 }
