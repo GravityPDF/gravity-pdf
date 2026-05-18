@@ -13,6 +13,7 @@ import {
 	TEMPLATE_PROCESSING,
 	TEMPLATE_PROCESSING_FAILED,
 	POST_TEMPLATE_UPLOAD_PROCESSING,
+	TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 	TEMPLATE_UPLOAD_PROCESSING_FAILED,
 } from '../../../../src/assets/js/react/actions/templates';
 import * as api from '../../../../src/assets/js/react/api/templates';
@@ -123,6 +124,26 @@ describe('Sagas - templates', () => {
 			);
 		});
 
+		test('should route to success when the API responds with ok and a templates array', () => {
+			const newaction = {
+				payload: { file: { data: 'test' }, filename: 'test' },
+			};
+			const gen = templateUploadProcessing(newaction);
+			gen.next();
+
+			const response = {
+				ok: true,
+				status: 200,
+				body: { templates: [{ id: 'foo' }] },
+			};
+			expect(gen.next(response).value).toEqual(
+				put({
+					type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
+					payload: response.body,
+				})
+			);
+		});
+
 		test('should route to failed when the API response is missing a templates array', () => {
 			const newaction = {
 				payload: { file: { data: 'test' }, filename: 'test' },
@@ -146,9 +167,7 @@ describe('Sagas - templates', () => {
 			const gen = templateUploadProcessing(newaction);
 			gen.next();
 
-			expect(
-				gen.throw({ message: 'network failure' }).value
-			).toEqual(
+			expect(gen.throw({ message: 'network failure' }).value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
 					payload: { message: 'network failure' },
