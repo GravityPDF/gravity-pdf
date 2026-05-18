@@ -48,7 +48,6 @@ class Debug {
 		$gform = \GPDFAPI::get_form_class();
 
 		return $gform->has_capability( 'gravityforms_logging' );
-
 	}
 
 	/**

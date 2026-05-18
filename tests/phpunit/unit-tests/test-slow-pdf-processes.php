@@ -321,7 +321,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_generate_pdf() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\View\View_PDF::generate_pdf');
+		$this->setExpectedIncorrectUsage( 'GFPDF\View\View_PDF::generate_pdf' );
 
 		global $gfpdf;
 
@@ -340,15 +340,32 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		/* Add filters to force the PDF to throw and error */
 		add_filter(
 			'mpdf_output_destination',
-			function() {
+			function () {
 				return 'O';
 			}
 		);
+
+		/*
+		 * Helper_PDF::pre_stream_actions() drains every active output buffer (`while ob_get_level() > 0`)
+		 * before mPDF streams the PDF. When generate_pdf() blows up later in the pipeline and we catch the
+		 * WPDieException, PHPUnit's own output buffers are already gone and beStrictAboutOutputDuringTests
+		 * flags the test as risky. Record the buffer depth before the call and re-establish it afterwards
+		 * (closing any extras above the line and opening any missing below) so the test owns the buffer
+		 * level on the way out.
+		 */
+		$initial_ob_level = ob_get_level();
 
 		try {
 			$this->view->generate_pdf( $entry, $pdf );
 		} catch ( Exception $e ) {
 			/* Expected */
+		}
+
+		while ( ob_get_level() > $initial_ob_level ) {
+			ob_end_clean();
+		}
+		while ( ob_get_level() < $initial_ob_level ) {
+			ob_start();
 		}
 
 		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );

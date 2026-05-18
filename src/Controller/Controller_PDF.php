@@ -118,7 +118,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		add_action( 'gfpdf_post_pdf_generation', [ $this, 'remove_pre_pdf_hooks' ] );
 
 		/* Set up pre generation hooks when streaming PDF to the browser */
-		$add_pre_view_or_download_pdf_hooks = function( $form, $entry, $settings ) {
+		$add_pre_view_or_download_pdf_hooks = function ( $form, $entry, $settings ) {
 			$this->add_pre_view_or_download_pdf_hooks( $form, $entry, $settings );
 		};
 
@@ -145,7 +145,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		/* Gravity Wiz Nested Forms support */
 		if ( function_exists( 'gp_nested_forms' ) ) {
-			$included_nested_forms_in_cache_hash = function( $data, $form, $entry, $pdf_settings ) {
+			$included_nested_forms_in_cache_hash = function ( $data, $form, $entry, $pdf_settings ) {
 				return $this->included_nested_forms_in_cache_hash( $data, $form, $entry, $pdf_settings );
 			};
 
@@ -197,7 +197,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		add_filter( 'gfpdf_pdf_html_output', 'do_shortcode' );
 
 		/* Add support for ?html=1 helper parameter */
-		$add_view_html_debugger = function( $html, $form, $entry, $pdf_settings, $helper_pdf ) {
+		$add_view_html_debugger = function ( $html, $form, $entry, $pdf_settings, $helper_pdf ) {
 			return $this->add_view_html_debugger( $html, $form, $entry, $pdf_settings, $helper_pdf );
 		};
 
@@ -214,14 +214,14 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		add_filter( 'gform_entry_detail_meta_boxes', [ $this->model, 'register_pdf_meta_box' ], 10, 3 );
 
 		/* Manipulate the form object (array) when generating PDFs */
-		$add_current_form_object_hooks = function( $form, $entry, $source ) {
+		$add_current_form_object_hooks = function ( $form, $entry, $source ) {
 			return $this->add_current_form_object_hooks( $form, $entry, $source );
 		};
 
 		add_filter( 'gfpdf_current_form_object', $add_current_form_object_hooks, 10, 3 );
 
 		/* Manipulate the PDF settings object (array) when generating PDFs */
-		$add_current_pdf_settings_object_hooks = function( $pdf_settings, $form, $entry ) {
+		$add_current_pdf_settings_object_hooks = function ( $pdf_settings, $form, $entry ) {
 			return $this->add_current_pdf_settings_object_hooks( $pdf_settings, $form, $entry );
 		};
 
