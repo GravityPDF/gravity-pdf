@@ -2691,7 +2691,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			exit;
 		}
 
-		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile */
+		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- streaming the generated PDF straight to the response; WP_Filesystem has no equivalent streaming primitive. */
 
 		exit;
 	}

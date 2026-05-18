@@ -969,6 +969,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	public function get_template_schema( $template ) {
+		// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- $item is the filter's incoming value, intentionally ignored so we can force-return our $template.
 		$current_template = function ( $item ) use ( $template ) {
 			return $template;
 		};
