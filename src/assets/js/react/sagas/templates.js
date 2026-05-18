@@ -62,9 +62,15 @@ export function * templateProcessing (action) {
 export function * templateUploadProcessing (action) {
   try {
     const response = yield call(apiPostTemplateUploadProcessing, action.payload.file, action.payload.filename)
+
+    if (!response.ok || !response.body || !Array.isArray(response.body.templates)) {
+      yield put(templateUploadProcessingFailed(response))
+      return
+    }
+
     yield put(templateUploadProcessingSuccess(response))
   } catch (error) {
-    yield put(templateUploadProcessingFailed(error))
+    yield put(templateUploadProcessingFailed({ ok: false, body: null }))
   }
 }
 

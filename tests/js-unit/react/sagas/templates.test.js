@@ -74,17 +74,45 @@ describe('Sagas - templates', () => {
   })
 
   describe('templateUploadProcessing()', () => {
-    const newaction = { payload: { file: { data: 'test' }, filename: 'test' } }
-    const gen = templateUploadProcessing(newaction)
-
     test('should check that saga asks to call the API for templateUploadProcessing', () => {
+      const newaction = { payload: { file: { data: 'test' }, filename: 'test' } }
+      const gen = templateUploadProcessing(newaction)
+
       expect(gen.next().value).toEqual(call(api.apiPostTemplateUploadProcessing, newaction.payload.file, newaction.payload.filename))
     })
 
-    test('should check that saga handles correctly to the failure of templateUploadProcessing API call', () => {
-      expect(gen.throw({ error: 'template upload processing failed' }).value).toEqual(put({
+    test('should route to failed when the API responds with a non-ok status', () => {
+      const newaction = { payload: { file: { data: 'test' }, filename: 'test' } }
+      const gen = templateUploadProcessing(newaction)
+      gen.next()
+
+      const response = { ok: false, status: 400, body: { error: 'invalid zip' } }
+      expect(gen.next(response).value).toEqual(put({
         type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-        payload: { error: 'template upload processing failed' }
+        payload: response
+      }))
+    })
+
+    test('should route to failed when the API response is missing a templates array', () => {
+      const newaction = { payload: { file: { data: 'test' }, filename: 'test' } }
+      const gen = templateUploadProcessing(newaction)
+      gen.next()
+
+      const response = { ok: true, status: 200, body: 400 }
+      expect(gen.next(response).value).toEqual(put({
+        type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
+        payload: response
+      }))
+    })
+
+    test('should route to failed when the fetch itself throws', () => {
+      const newaction = { payload: { file: { data: 'test' }, filename: 'test' } }
+      const gen = templateUploadProcessing(newaction)
+      gen.next()
+
+      expect(gen.throw({ error: 'network failure' }).value).toEqual(put({
+        type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
+        payload: { ok: false, body: null }
       }))
     })
   })

@@ -171,28 +171,26 @@ describe('Template - TemplateUploader.js', () => {
     })
 
     test('ajaxFailed() - Show any errors to the user when AJAX request fails for any reason', () => {
-      let error
-      error = {
-        response: {
-          body: {
-            error: 'error'
-          }
+      let response
+      response = {
+        ok: false,
+        body: {
+          error: 'error'
         }
       }
 
       wrapper = shallow(
         <TemplateUploader clearTemplateUploadProcessing={clearTemplateUploadProcessingMock} />
       )
-      wrapper.instance().ajaxFailed(error)
+      wrapper.instance().ajaxFailed(response)
 
       expect(wrapper.state('error')).toBe('error')
       expect(wrapper.state('ajax')).toBe(false)
       expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1)
 
-      error = {
-        response: {
-          body: {}
-        }
+      response = {
+        ok: false,
+        body: {}
       }
 
       wrapper = shallow(
@@ -200,11 +198,27 @@ describe('Template - TemplateUploader.js', () => {
           clearTemplateUploadProcessing={clearTemplateUploadProcessingMock}
           genericUploadErrorText={'errorText'} />
       )
-      wrapper.instance().ajaxFailed(error)
+      wrapper.instance().ajaxFailed(response)
 
       expect(wrapper.state('error')).toBe('errorText')
       expect(wrapper.state('ajax')).toBe(false)
       expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(2)
+
+      /* Non-JSON body (e.g. server returns "400") falls back to the generic message */
+      response = {
+        ok: false,
+        body: 400
+      }
+
+      wrapper = shallow(
+        <TemplateUploader
+          clearTemplateUploadProcessing={clearTemplateUploadProcessingMock}
+          genericUploadErrorText={'errorText'} />
+      )
+      wrapper.instance().ajaxFailed(response)
+
+      expect(wrapper.state('error')).toBe('errorText')
+      expect(wrapper.state('ajax')).toBe(false)
     })
 
     test('removeMessage() - Remove message from state once the timeout has finished', () => {
@@ -259,10 +273,10 @@ describe('Template - TemplateUploader.js', () => {
       const props = {
         templateUploadProcessingSuccess: {},
         templateUploadProcessingError: {
-          response: {
-            body: {
-              error: 'error'
-            }
+          ok: false,
+          status: 400,
+          body: {
+            error: 'error'
           }
         }
       }

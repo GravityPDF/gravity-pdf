@@ -207,10 +207,15 @@ export class TemplateUploader extends Component {
    *
    * @since 4.1
    */
-  ajaxFailed = (error) => {
-    /* Let the user know there was a problem with the upload */
+  ajaxFailed = (response) => {
+    /* Surface the server-provided error message when one is present;
+       otherwise fall back to the generic upload error */
+    const message = response && response.body && typeof response.body === 'object' && response.body.error
+      ? response.body.error
+      : this.props.genericUploadErrorText
+
     this.setState({
-      error: (error.response.body && error.response.body.error !== undefined) ? error.response.body.error : this.props.genericUploadErrorText,
+      error: message,
       ajax: false
     })
 
