@@ -2,6 +2,7 @@ name: Coding Standards
 
 on:
   pull_request:
+    types: [ opened, reopened, synchronize, labeled ]
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
