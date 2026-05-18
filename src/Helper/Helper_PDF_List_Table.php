@@ -6,7 +6,7 @@ use WP_List_Table;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -99,7 +99,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'shortcode'     => esc_html__( 'Shortcode', 'gravity-pdf' ) . gform_tooltip( 'pdf_shortcode', 'gfpdf-tooltip', true ),
 		];
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_list_columns/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_list_columns/ for more details about this filter */
 		$columns = apply_filters( 'gfpdf_pdf_list_columns', $columns );
 
 		return $columns;
@@ -194,7 +194,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$action = 'gfpdf_pdf_list_column_' . $column;
 
 		if ( has_action( $action ) ) {
-			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_list_column_id/ for more details about this action */
+			/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_list_column_id/ for more details about this action */
 			do_action( $action, $item );
 		} else {
 			echo wp_kses_post( $item[ $column ] ?? '' );
@@ -223,7 +223,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			$text  = __( 'Inactive', 'gravity-pdf' );
 		}
 
-		$gf_less_than_288 = version_compare( \GFCommon::$version, '2.8.8', '<' );
+		$gf_less_than_288 = version_compare( \GFForms::$version, '2.8.8', '<' );
 
 		?>
 
@@ -285,11 +285,12 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			__( 'Download PDF', 'gravity-pdf' )
 		);
 
+		/* translators: %s: PDF name */
 		$aria_label = sprintf( __( 'Copy the %s PDF shortcode to the clipboard', 'gravity-pdf' ), $item['name'] );
 
 		ob_start();
 		/* If the current GF version is 2.6 or higher, use the new updated UI for the shortcode button or else use the pre GF 2.5 version. */
-		if ( version_compare( '2.6-rc-1', \GFCommon::$version, '<=' ) ):
+		if ( version_compare( '2.6-rc-1', \GFForms::$version, '<=' ) ):
 			?>
 			<button type="button"
 					class="gform-button gform-button--size-r gform-button--white gform-button--icon-leading gform-embed-form__shortcode-trigger btn-shortcode"
@@ -366,11 +367,12 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-pdf' ) . '" class="submitdelete" data-id="' . esc_attr( $item['id'] ) . '" data-nonce="' . esc_attr( $delete_nonce ) . '" data-fid="' . esc_attr( $form_id ) . '" href="#">' . esc_html__( 'Delete', 'gravity-pdf' ) . '</a>',
 		];
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_actions/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_actions/ for more details about this filter */
 		$actions = apply_filters( 'gfpdf_pdf_actions', $actions, $item );
 
 		?>
 
+		<?php /* translators: %s: PDF name */ ?>
 		<a href="<?php echo esc_url( $edit_url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( '%s PDF', 'gravity-pdf' ), $pdf_name ) ); ?>"><strong><?php echo esc_html( $pdf_name ); ?></strong></a>
 		<div class="row-actions">
 
@@ -401,6 +403,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function no_items() {
 		echo '<label>';
+		/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-pdf' ), "<a href='" . esc_url( add_query_arg( [ 'pid' => 0 ] ) ) . "'>", '</a>' );
 		echo '</label>';
 	}

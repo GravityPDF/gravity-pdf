@@ -1,6 +1,6 @@
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -10,42 +10,51 @@
  * @param {Element} pdfSettingFieldSets
  * @param {Element} form
  */
-export function actionToolbar (pdfSettingFieldSets, form) {
-  const items = Array.from(pdfSettingFieldSets)
-  /* Remove last element of the array */
-  items.pop()
+export function actionToolbar(pdfSettingFieldSets, form) {
+	const items = Array.from(pdfSettingFieldSets);
+	/* Remove last element of the array */
+	items.pop();
 
-  items.map((fieldset, index) => {
-    /* Check if fieldset is hidden */
-    if (fieldset.style.display !== 'none') {
-      const collapsibleToggleIcon = fieldset.querySelector('.gform-settings-panel__collapsible-toggle-checkbox')
+	items.map((fieldset, index) => {
+		/* Check if fieldset is hidden */
+		if (fieldset.style.display !== 'none') {
+			const collapsibleToggleIcon = fieldset.querySelector(
+				'.gform-settings-panel__collapsible-toggle-checkbox'
+			);
 
-      collapsibleToggleIcon.addEventListener('click', () => insertAfter(fieldset, form, index))
+			collapsibleToggleIcon.addEventListener('click', () =>
+				insertAfter(fieldset, form, index)
+			);
 
-      return insertAfter(fieldset, form, index, 'firstLoad')
-    }
+			return insertAfter(fieldset, form, index, 'firstLoad');
+		}
 
-    return false
-  })
+		return false;
+	});
 }
 
-export function insertAfter (fieldset, form, index, firstLoad) {
-  const wrapperClass = 'form-action-toolbar-' + index
+export function insertAfter(fieldset, form, index, firstLoad) {
+	const wrapperClass = 'form-action-toolbar-' + index;
 
-  if (!fieldset.classList.contains('gform-settings-panel--collapsed')) {
-    // get the original toolbar
-    const actionToolbar = form.querySelector('.form-action-toolbar:last-of-type')
-    const actionToolbarClone = actionToolbar.cloneNode(true)
+	if (!fieldset.classList.contains('gform-settings-panel--collapsed')) {
+		// get the original toolbar
+		const originalToolbar = form.querySelector(
+			'.form-action-toolbar:last-of-type'
+		);
+		const actionToolbarClone = originalToolbar.cloneNode(true);
 
-    actionToolbarClone.classList.add(wrapperClass)
+		actionToolbarClone.classList.add(wrapperClass);
 
-    return fieldset.parentNode.insertBefore(actionToolbarClone, fieldset.nextSibling)
-  }
+		return fieldset.parentNode.insertBefore(
+			actionToolbarClone,
+			fieldset.nextSibling
+		);
+	}
 
-  if (firstLoad) {
-    return
-  }
+	if (firstLoad) {
+		return;
+	}
 
-  /* Remove button when fieldset collapsed */
-  document.querySelector(`.${wrapperClass}`).remove()
+	/* Remove button when fieldset collapsed */
+	document.querySelector(`.${wrapperClass}`).remove();
 }

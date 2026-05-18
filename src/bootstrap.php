@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -131,6 +131,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function __call( $name, $arguments ) {
+		/* translators: %s: deprecated method name */
 		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
 	}
 
@@ -207,6 +208,19 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->templates
 		);
 
+		/* Load Background Queue classes */
+		if ( version_compare( \GFForms::$version, '2.9.7.2', '>=' ) ) {
+			if ( ! class_exists( '\Gravity_Forms\Gravity_Forms\Async\GF_Background_Process' ) ) {
+				require_once GFCommon::get_base_path() . '/includes/async/class-gf-background-process.php';
+			}
+
+			if ( ! class_exists( 'GF_Background_Process' ) ) {
+				class_alias( \Gravity_Forms\Gravity_Forms\Async\GF_Background_Process::class, 'GF_Background_Process', false );
+			}
+		} elseif ( ! class_exists( 'WP_Async_Request' ) ) {
+				require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
+		}
+
 		/* Setup our Singleton object */
 		$this->singleton = new Helper_Singleton();
 
@@ -239,7 +253,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/*
 		 * Trigger action to signify Gravity PDF is now loaded
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_fully_loaded for more details about this action
+		 * See https://docs.gravitypdf.com/developers/actions/gfpdf_fully_loaded for more details about this action
 		 */
 		do_action( 'gfpdf_fully_loaded', $this );
 	}
@@ -314,7 +328,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( $file === PDF_PLUGIN_BASENAME ) {
 			$row_meta = [
-				'docs'           => '<a href="' . esc_url( 'https://docs.gravitypdf.com/v6/users/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-pdf' ) . '">' . esc_html__( 'Docs', 'gravity-pdf' ) . '</a>',
+				'docs'           => '<a href="' . esc_url( 'https://docs.gravitypdf.com/users/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-pdf' ) . '">' . esc_html__( 'Docs', 'gravity-pdf' ) . '</a>',
 				'support'        => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-pdf' ) . '">' . esc_html__( 'Support', 'gravity-pdf' ) . '</a>',
 				'extension-shop' => '<a href="' . esc_url( 'https://gravitypdf.com/store/#extensions' ) . '" title="' . esc_attr__( 'View Gravity PDF Extensions Shop', 'gravity-pdf' ) . '">' . esc_html__( 'Extensions', 'gravity-pdf' ) . '</a>',
 				'template-shop'  => '<a href="' . esc_url( 'https://gravitypdf.com/store/#templates' ) . '" title="' . esc_attr__( 'View Gravity PDF Template Shop', 'gravity-pdf' ) . '">' . esc_html__( 'Templates', 'gravity-pdf' ) . '</a>',
@@ -364,9 +378,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_styles() {
-		$version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ) ? time() : PDF_EXTENDED_VERSION;
+		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
 
-		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-styles.min.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'build/assets/app.bundle.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
 	}
 
 	/**
@@ -377,7 +391,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_scripts() {
-		$version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ) ? time() : PDF_EXTENDED_VERSION;
+		global $wp_version;
+
+		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
+		$args    = version_compare( $wp_version, '6.3.0', '>=' ) ? [ 'strategy' => 'defer' ] : true;
 
 		$pdf_settings_dependencies = [
 			'jquery-ui-tooltip',
@@ -388,16 +405,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependencies, $version, true );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'build/assets/admin.min.js', $pdf_settings_dependencies, $version, $args );
 
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version, true );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version, true );
+		/* add hot reloading in development */
+		$asset               = file_exists( PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php' )
+			? require PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php'
+			: [ 'dependencies' => [ 'jquery' ] ];
+		$bundle_dependencies = $asset['dependencies'] ?? [];
 
-		/* Localise admin script */
-		$data = $this->data->get_localised_script_data( $this->options, $this->gform );
-
-		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
-		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
 	}
 
 	/**
@@ -428,6 +445,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* Load TinyMCE styles */
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
+
+			/* Localise admin script */
+			$data = $this->data->get_localised_script_data( $this->options, $this->gform );
+
+			wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
+			wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
 		}
 
 		if ( rgget( 'page' ) === 'gf_entries' ) {
@@ -502,7 +525,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_scripts, $items );
 		}
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_gf_noconflict_scripts for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_gf_noconflict_scripts for more details about this filter */
 
 		return apply_filters( 'gfpdf_gf_noconflict_scripts', $items );
 	}
@@ -540,7 +563,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_styles, $items );
 		}
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_gf_noconflict_styles for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_gf_noconflict_styles for more details about this filter */
 
 		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
 	}
@@ -707,7 +730,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $pdf_preview_controller );
 
 		/* Log any errors for PDF endpoints */
-		$rest_request_after_callback = function( $response, $handle, $request ) {
+		$rest_request_after_callback = function ( $response, $handle, $request ) {
 			if ( is_wp_error( $response ) && strpos( $request->get_route(), '/gravity-pdf' ) === 0 ) {
 				$this->log->error(
 					'The REST API request generated an error: ' . $request->get_route(),
@@ -963,7 +986,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function async_pdfs() {
 		$queue     = new Helper\Helper_Pdf_Queue( $this->log );
 		$model_pdf = $this->singleton->get_class( 'Model_PDF' );
-		$class     = new Controller\Controller_Pdf_Queue( $queue, $model_pdf, $this->log );
+		$class     = new Controller\Controller_Pdf_Queue( $queue, $model_pdf, $this->log, $this->gform );
 
 		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
 			$class->init();
@@ -971,6 +994,28 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$this->singleton->add_class( $queue );
 		$this->singleton->add_class( $class );
+
+		/**
+		 * Clear our any items in the queue when the feature is toggled on/off
+		 *
+		 * Needs to be outside the controller class so it works when the feature is toggled on and off.
+		 *
+		 * @param string $new_value The value being saved for the Background Processing setting
+		 *
+		 * @since 6.12.6
+		 */
+		$gfpdf_settings_sanitize = function ( $new_value, $key ) use ( $queue ) {
+			if ( $key === 'background_processing' ) {
+				$current_value = \GPDFAPI::get_plugin_option( 'background_processing' );
+				if ( $current_value !== $new_value ) {
+					$queue->clear_queue();
+				}
+			}
+
+			return $new_value;
+		};
+
+		add_filter( 'gfpdf_settings_sanitize', $gfpdf_settings_sanitize, 10, 2 );
 	}
 
 	/**

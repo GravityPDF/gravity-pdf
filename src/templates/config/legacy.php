@@ -8,6 +8,12 @@ use GFPDF\Helper\Helper_Interface_Config;
  * Handles our v3 legacy templates configuration (default-template.php, default-template-two-rows.php and default-template-no-style.php)
  */
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
 /* Exit if accessed directly */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

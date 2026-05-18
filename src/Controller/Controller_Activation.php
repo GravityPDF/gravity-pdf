@@ -8,7 +8,7 @@
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -70,6 +70,8 @@ class Controller_Activation {
 
 		/* Remove our scheduled tasks */
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+		wp_clear_scheduled_hook( 'gfpdf_network_update_check' );
+		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
 
 		/* Flush caches */
 		$templates = \GPDFAPI::get_templates_class();

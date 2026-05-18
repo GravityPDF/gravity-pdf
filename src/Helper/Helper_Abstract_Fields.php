@@ -11,7 +11,7 @@ use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -242,14 +242,14 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		 * @credit Zack Katz (Gravity View author)
 		 * @fixed  Gravity Forms 1.9.13.25
 		 */
-		if ( class_exists( 'GFCache' ) && version_compare( GFCommon::$version, '1.9.13.25', '<' ) ) {
+		if ( class_exists( 'GFCache' ) && version_compare( \GFForms::$version, '1.9.13.25', '<' ) ) {
 			GFCache::set( 'GFFormsModel::get_lead_field_value_' . $this->entry['id'] . '_' . $this->field->id, false, false, 0 );
 		}
 
 		/*
 		 * Get the Gravity Forms field value
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_value for more details about this filter
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_field_value for more details about this filter
 		 */
 
 		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry, $this->form, $this );
@@ -264,7 +264,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 */
 	final public function get_label() {
 		/*
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_label for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_field_label for usage
 		 */
 		return apply_filters( 'gfpdf_field_label', $this->field->label, $this->field, $this->entry );
 	}
@@ -341,20 +341,19 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		}
 
 		/* Backwards compat */
-		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] );
+		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'] ?? 0, $this->form['id'] ?? 0 );
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_field_content for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_field_content for usage
 		 *
 		 * @since 4.2
 		 */
 		$value = apply_filters( 'gfpdf_pdf_field_content', $value, $this->field, $this->entry, $this->form, $this );
-		$value = apply_filters( 'gfpdf_pdf_field_content_' . $this->field->get_input_type(), $value, $this->field, $this->entry, $this->form, $this );
+		$value = apply_filters( 'gfpdf_pdf_field_content_' . $this->field->type, $value, $this->field, $this->entry, $this->form, $this );
 
 		$label = $this->get_label();
-		$type  = $this->field->get_input_type();
 
-		$html = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="gfpdf-field ' . esc_attr( 'gfpdf-' . $type ) . ' ' . esc_attr( $this->get_field_classes() ) . '">
+		$html = '<div id="' . esc_attr( 'field-' . $this->field->id ) . '" class="' . esc_attr( $this->get_field_classes() ) . '">
 					<div class="inner-container">';
 
 		if ( $show_label ) {
@@ -370,7 +369,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 				 . '</div>'
 				 . '</div>';
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_html_value for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_field_html_value for more details about this filter */
 		$html = apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry, $this );
 
 		if ( $this->get_output() ) {
@@ -413,9 +412,22 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 6.5
 	 */
 	public function get_field_classes(): string {
+
+		$core_classes = [
+			'gfpdf-field',
+			'gfpdf-' . $this->field->get_input_type(),
+		];
+
+		if ( $this->field->type !== $this->field->get_input_type() ) {
+			$core_classes[] = 'gfpdf-' . $this->field->type;
+		}
+
 		return implode(
 			' ',
-			array_slice( explode( ' ', $this->field->cssClass ), 0, 8 )
+			array_merge(
+				$core_classes,
+				array_slice( explode( ' ', $this->field->cssClass ), 0, 8 ),
+			)
 		);
 	}
 

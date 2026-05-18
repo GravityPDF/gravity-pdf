@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Form;
+use GFPDF\Helper\Helper_Interface_Extension_Uninstaller;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Pdf_Queue;
@@ -13,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -94,16 +95,21 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 		/* Clean up database */
 		if ( is_multisite() ) {
-			$sites = get_sites();
+			$sites           = get_sites();
+			$current_site_id = get_current_blog_id();
 
 			foreach ( $sites as $site ) {
 				$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 				switch_to_blog( $site['blog_id'] );
+
+				$this->remove_plugin_transients();
 				$this->remove_plugin_options();
 				$this->remove_plugin_form_settings();
 			}
-			restore_current_blog();
+
+			switch_to_blog( $current_site_id );
 		} else {
+			$this->remove_plugin_transients();
 			$this->remove_plugin_options();
 			$this->remove_plugin_form_settings();
 		}
@@ -118,7 +124,32 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 		do_action( 'gfpdf_post_uninstall_plugin' );
 
-		$this->deactivate_plugin();
+		/* Run addon uninstaller (if any) and deactivate addon */
+		$plugins_to_deactivate = [];
+		foreach ( $this->data->addon as $addon ) {
+			$plugins_to_deactivate[] = plugin_basename( $addon->get_main_plugin_file() );
+
+			if ( $addon instanceof Helper_Interface_Extension_Uninstaller ) {
+				$addon->uninstall();
+			}
+		}
+
+		/* add core plugin to deactivation list and deactivate all Gravity PDF plugins */
+		$plugins_to_deactivate[] = PDF_PLUGIN_BASENAME;
+
+		$this->deactivate_plugin( $plugins_to_deactivate );
+	}
+
+	/**
+	 * Cleanup temporary data
+	 *
+	 * @since 6.15.0
+	 */
+	public function remove_plugin_transients() {
+		delete_transient( 'gfpdf_settings_user_data' );
+
+		$templates = \GPDFAPI::get_templates_class();
+		$templates->flush_template_transient_cache();
 	}
 
 	/**
@@ -130,11 +161,14 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
+
+		/* Remove license API data */
+		global $wpdb;
+		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gpdf_sl_%'" );
 	}
 
 	/**
-	 * Remove all form settings from each individual form.
-	 * Because we stored out PDF settings with each form and have no index we need to individually load and forms and check them for Gravity PDF settings
+	 * Remove all PDF form settings for each form
 	 *
 	 * @since 6.0
 	 */
@@ -155,6 +189,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 					]
 				);
 
+				/* translators: %s: form ID and title */
 				$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-pdf' ), $form['id'] . ': ' . $form['title'] ) );
 			}
 		}
@@ -190,6 +225,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 						]
 					);
 
+					/* translators: %s: directory path wrapped in <code> tags */
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
@@ -197,11 +233,51 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Deactivate Gravity PDF
+	 * Deactivate plugin
+	 *
+	 * @param string|array $basename
 	 *
 	 * @since 6.0
+	 * @since 6.15.0 Added $basename argument
 	 */
-	public function deactivate_plugin() {
-		deactivate_plugins( PDF_PLUGIN_BASENAME );
+	public function deactivate_plugin( $basename = '' ) {
+		if ( empty( $basename ) ) {
+			$basename = PDF_PLUGIN_BASENAME;
+		}
+
+		if ( ! is_array( $basename ) ) {
+			$basename = [ $basename ];
+		}
+
+		foreach ( $basename as $plugin ) {
+			/* Normal site deactivation */
+			if ( ! is_multisite() ) {
+				deactivate_plugins( $plugin );
+			}
+
+			/* Multisite Network plugin deactivation */
+			if ( is_plugin_active_for_network( $plugin ) ) {
+				deactivate_plugins( $plugin, false, true );
+			}
+		}
+
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		/* Individual multisite deactivation */
+		$sites           = get_sites();
+		$current_site_id = get_current_blog_id();
+
+		foreach ( $sites as $site ) {
+			$site = (array) $site;
+			switch_to_blog( $site['blog_id'] );
+
+			foreach ( $basename as $plugin ) {
+				deactivate_plugins( $plugin );
+			}
+		}
+
+		switch_to_blog( $current_site_id );
 	}
 }

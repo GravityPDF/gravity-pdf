@@ -13,7 +13,7 @@ use WP_Error;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -80,15 +80,26 @@ class Helper_Misc {
 	 *
 	 */
 	public function is_gfpdf_page() {
-		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
-		if ( is_admin() && ( ! empty( $_GET['page'] ) || ! empty( $_GET['subview'] ) ) ) {
-			if ( strpos( $_GET['page'] ?? '', 'gfpdf-' ) === 0 || strtoupper( $_GET['subview'] ?? '' ) === 'PDF' ) {
-				return true;
-			}
+		if ( ! is_admin() ) {
+			return false;
 		}
-		/* phpcs:enable */
 
-		return false;
+		$page    = $_GET['page'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$subview = $_GET['subview'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( empty( $page ) && empty( $subview ) ) {
+			return false;
+		}
+
+		if ( ! is_string( $page ) || ! is_string( $subview ) ) {
+			return false;
+		}
+
+		if ( strpos( $page, 'gfpdf-' ) !== 0 && strtoupper( $subview ) !== 'PDF' ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -353,9 +364,65 @@ class Helper_Misc {
 	 * @return bool|WP_Error
 	 *
 	 * @since 4.0
+	 * @since 6.13.0 Directories not managed by Gravity PDF will throw an error if tried to be deleted
 	 */
 	public function rmdir( $dir, bool $delete_top_level_dir = true ) {
 
+		/*
+		 * Do not allow directories outside the folders managed by Gravity PDF to be deleted
+		 */
+		$folders = [
+			$this->data->template_location,
+			$this->data->template_font_location,
+			$this->data->template_tmp_location,
+			$this->data->mpdf_tmp_location,
+		];
+
+		if ( is_multisite() ) {
+			$folders[] = $this->data->multisite_template_location;
+		}
+
+		/* Verify $dir is a real path on the current file system */
+		$path_to_test = realpath( $dir );
+		if ( $path_to_test === false ) {
+			$this->log->error(
+				'Filesystem Delete Error',
+				[
+					'dir'       => $dir,
+					'exception' => 'Not a real path on the file system',
+				]
+			);
+
+			return new WP_Error( 'gfpdf_rmdir_not_a_real_path' );
+		}
+
+		/* Check if $dir to delete falls inside one of the Gravity PDF directories */
+		$allowed_to_delete = false;
+		foreach ( $folders as $folder ) {
+			$real_folder_path = realpath( $folder );
+			if ( ! $real_folder_path ) {
+				continue;
+			}
+
+			if ( strpos( $path_to_test, $real_folder_path ) === 0 ) {
+				$allowed_to_delete = true;
+				break;
+			}
+		}
+
+		if ( ! $allowed_to_delete ) {
+			$this->log->error(
+				'Filesystem Delete Error',
+				[
+					'dir'       => $dir,
+					'exception' => 'Directory falls outside of approved paths',
+				]
+			);
+
+			return new WP_Error( 'gfpdf_rmdir_directory_not_approved', esc_html( 'Cannot delete path. Directory falls outside of approved Gravity PDF paths: ' . $dir ) );
+		}
+
+		/* Path is managed by Gravity PDF and can be deleted */
 		$this->log->notice( sprintf( 'Begin deleting directory recursively: %s', $dir ) );
 
 		try {
@@ -368,7 +435,7 @@ class Helper_Misc {
 				$function  = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
 				$real_path = $fileinfo->getRealPath();
 				if ( ! $function( $real_path ) ) {
-					throw new Exception( 'Could not run ' . $function . ' on  ' . $real_path );
+					throw new Exception( esc_html( 'Could not run ' . $function . ' on  ' . $real_path ) );
 				}
 
 				$this->log->notice( sprintf( 'Successfully ran `%s` on %s', $function, $real_path ) );
@@ -382,7 +449,7 @@ class Helper_Misc {
 				]
 			);
 
-			return new WP_Error( 'recursion_delete_problem', $e );
+			return new WP_Error( 'recursion_delete_problem', esc_html( $e ) );
 		}
 
 		$results = true;
@@ -445,8 +512,7 @@ class Helper_Misc {
 
 			foreach ( $files as $fileinfo ) {
 				if ( $fileinfo->isDir() && ! file_exists( $destination . $files->getSubPathName() ) ) {
-					/* phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged */
-					if ( wp_mkdir_p( $destination . $files->getSubPathName() ) ) {
+					if ( ! wp_mkdir_p( $destination . $files->getSubPathName() ) ) {
 						$this->log->error(
 							'Failed Creating Folder',
 							[
@@ -908,14 +974,14 @@ class Helper_Misc {
 	/**
 	 * Flatten an array by its keys or value
 	 *
-	 * @param array $array A single or one-level-deep multidimensional array
-	 * @param string $type 'keys' or 'values'
+	 * @param array  $items A single or one-level-deep multidimensional array
+	 * @param string $type  'keys' or 'values'
 	 *
 	 * @return array
 	 *
 	 * @since 7.0.0
 	 */
-	public function flatten_array( array $array, $type = 'keys' ) {
+	public function flatten_array( array $items, $type = 'keys' ) {
 		if ( ! in_array( $type, [ 'keys', 'values' ], true ) ) {
 			_doing_it_wrong( __METHOD__, '$type can only be "keys" or "values"', '6.12' );
 
@@ -923,12 +989,12 @@ class Helper_Misc {
 		}
 
 		/* exit early if empty array */
-		if ( empty( $array ) ) {
-			return $array;
+		if ( empty( $items ) ) {
+			return $items;
 		}
 
-		$array = array_map(
-			function( $value, $key ) use ( $type ) {
+		$items = array_map(
+			function ( $value, $key ) use ( $type ) {
 				/* handle multi-dimensional array */
 				if ( is_array( $value ) ) {
 					  return call_user_func( 'array_' . $type, $value );
@@ -937,11 +1003,11 @@ class Helper_Misc {
 				/* handle single-dimensional array */
 				return $type === 'keys' ? [ $key ] : [ $value ];
 			},
-			$array,
-			array_keys( $array )
+			$items,
+			array_keys( $items )
 		);
 
-		return array_merge( ...array_values( $array ) );
+		return array_merge( ...array_values( $items ) );
 	}
 
 	/**

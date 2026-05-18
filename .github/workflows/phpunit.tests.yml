@@ -2,6 +2,11 @@ name: PHPUnit Tests
 
 on:
   pull_request:
+    types: [ opened, reopened, synchronize, labeled ]
+  push:
+    branches: [ development ]
+  schedule:
+    - cron: "15 19 * * 0,3" # Runs early on Monday and Thursday Sydney time
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -14,44 +19,27 @@ env:
   GF_LICENSE: ${{ secrets.GF_LICENSE }}
 
 jobs:
-  # Runs the PHPUnit tests for WordPress.
-  #
-  # Performs the following steps:
-  # - Set environment variables.
-  # - Sets up the environment variables needed for testing with memcached (if desired).
-  # - Downloads the built WordPress artifact from the previous job.
-  # - Unzips the artifact.
-  # - Installs NodeJS
-  # - Sets up caching for NPM.
-  # _ Installs NPM dependencies using install-changed to hash the `package.json` file.
-  # - Configures caching for Composer.
-  # _ Installs Composer dependencies (if desired).
-  # - Logs Docker debug information (about both the Docker installation within the runner).
-  # - Starts the WordPress Docker container.
-  # - Starts the memcached server after the Docker network has been created (if desired).
-  # - Logs WordPress Docker container debug information.
-  # - Logs debug general information.
-  # - Logs the running Docker containers.
-  # - Logs debug information about what's installed within the WordPress Docker containers.
-  # - Install WordPress within the Docker container.
-  # - Run the PHPUnit tests.
-  # - Reports test results to the Distributed Hosting Tests.
+  # Only run this action if a Pull Request contains the label 'run-tests'
+  check_for_string_in_pull_request_comment:
+    name: Should workflow run?
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests') }}
+        uses: action-pack/cancel@v1
+
   test-php:
-    name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ${{ matrix.os }}
+    name: ${{ matrix.php }}${{ matrix.report && ' coverage' || '' }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        php: [ '8.3', '8.2', '8.1', '8.0', '7.4', '7.3' ]
+        # PRs run a tightened matrix (floor / coverage / ceiling) for fast feedback.
+        # Push to development/main and the scheduled cron run the full 7-version matrix.
+        php: ${{ fromJSON(github.event_name == 'pull_request' && '["7.4","8.3","8.5"]' || '["7.4","8.0","8.1","8.2","8.3","8.4","8.5"]') }}
         os: [ ubuntu-latest ]
-        multisite: [ false ]
         include:
           - php: '8.3'
             os: ubuntu-latest
-            multisite: true
-          - php: '8.3'
-            os: ubuntu-latest
-            multisite: false
             report: true
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
@@ -63,33 +51,18 @@ jobs:
           echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      # Docs: https://github.com/shivammathur/setup-php
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v4
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
 
       - name: Log debug information
         run: |
@@ -98,52 +71,69 @@ jobs:
           node --version
           curl --version
           git --version
-          svn --version
           php --version
           php -i
           locale -a
 
-      - name: Install Dependencies
+      - name: Add auth details for private composer packages
+        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php${{ matrix.php }}-
+
+      - name: Install Composer dependencies
         run: |
-          yarn
+          composer install --no-progress --no-ansi --no-interaction
+          echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache wp-env work directory
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/wp-env
+            ~/.wp-env
+          key: wp-env-integration-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('tools/wp-env/integration.json', 'composer.lock') }}
+          restore-keys: |
+            wp-env-integration-${{ runner.os }}-php${{ matrix.php }}-
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ ! matrix.report }}
-        run: |
-          yarn env:install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn wp-env:integration start
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ matrix.report }}
-        run: |
-          PHP_ENABLE_XDEBUG=true yarn env:install
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn wp-env:integration start --xdebug=debug
 
       - name: Run PHPUnit tests
-        if: ${{ ! matrix.multisite }}
+        if: ${{ ! matrix.report }}
         run: |
           yarn test:php --do-not-cache-result --verbose
-          yarn test:php --group ajax --do-not-cache-result --verbose
 
+      # Multisite suite reuses the already-running php 8.3 container instead of
+      # spinning up its own matrix cell + cold wp-env start.
       - name: Run Multisite PHPUnit tests
-        if: ${{ matrix.multisite }}
+        if: ${{ matrix.php == '8.3' && ! matrix.report }}
         run: |
           yarn test:php:multisite --verbose
-          yarn test:php:multisite --group ajax --verbose
 
       - name: Generate Code Coverage Report for PHP
         if: ${{ matrix.report }}
         run: |  
-          yarn run test:php --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml
-          yarn run test:php --group ajax --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage2.xml
+          yarn test:php --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml      
 
       - name: Code Coverage Upload
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         if: ${{ matrix.report }}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          files: tmp/coverage/report-xml/php-coverage1.xml
+          directory: tmp/coverage/report-xml
 

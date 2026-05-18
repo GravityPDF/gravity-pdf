@@ -10,7 +10,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Helper Misc Functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -207,12 +207,12 @@ class Test_API extends WP_UnitTestCase {
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
 		$table = GPDFAPI::likert_table( $entry, 26, true );
-		$this->assertNotFalse( strpos( $table, "class='gsurvey-likert-choice-label'" ) );
+		$this->assertStringContainsString( "class='gsurvey-likert-choice-label'", $table );
 
 		ob_start();
 		GPDFAPI::likert_table( $entry, 26 );
 		$table = ob_get_clean();
-		$this->assertNotFalse( strpos( $table, "class='gsurvey-likert-choice-label'" ) );
+		$this->assertStringContainsString( "class='gsurvey-likert-choice-label'", $table );
 	}
 
 	/**
@@ -236,7 +236,7 @@ class Test_API extends WP_UnitTestCase {
 		$this->assertEquals( 'font_validation_error', $results->get_error_code() );
 
 		/* Test we correctly install the font */
-		$ttf_file = __DIR__ . '/../data/fonts/Chewy.ttf';
+		$ttf_file = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',
@@ -254,7 +254,7 @@ class Test_API extends WP_UnitTestCase {
 	}
 
 	public function test_add_pdf_font_duplicate() {
-		$ttf_file = __DIR__ . '/../data/fonts/Chewy.ttf';
+		$ttf_file = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',
@@ -284,7 +284,7 @@ class Test_API extends WP_UnitTestCase {
 		$this->assertEquals( 'invalid_font_id', $results->get_error_code() );
 
 		/* Add a font and then see if we can remove it */
-		$ttf_file = __DIR__ . '/../data/fonts/Chewy.ttf';
+		$ttf_file = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',

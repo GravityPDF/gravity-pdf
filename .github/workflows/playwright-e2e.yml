@@ -1,0 +1,231 @@
+name: Playwright End-to-End Tests
+
+on:
+  schedule:
+    - cron: "15 19 * * 0,3" # Runs early on Monday and Thursday Sydney time
+
+  pull_request:
+    types: [ opened, reopened, synchronize, labeled ]
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+  # The concurrency group contains the workflow name and the branch name for pull requests
+  # or the commit hash for any other events.
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  # Only run this action if a Pull Request contains the label 'run-tests'
+  check_for_string_in_pull_request_comment:
+    name: Should workflow run?
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests') }}
+        uses: action-pack/cancel@v1
+
+  e2e-playwright:
+    name: Playwright E2E Tests (shard ${{ matrix.shard }}/${{ strategy.job-total }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [ 1, 2, 3, 4 ]
+
+    steps:
+      - name: Configure environment variables
+        run: |
+          echo "PHP_FPM_UID=$(id -u)" >> $GITHUB_ENV
+          echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+        env:
+          CHROMATIC_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          CHROMATIC_SHA: ${{ github.event.pull_request.head.sha || github.ref }}
+          CHROMATIC_SLUG: ${{ github.repository }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Log debug information
+        run: |
+          npm --version
+          yarn --version
+          node --version
+          curl --version
+          git --version
+          php --version
+          php -i
+          locale -a
+
+      - name: Add auth details for private composer packages
+        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ runner.os }}-e2e-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-e2e-
+
+      - name: Install Composer dependencies
+        run: |
+          time composer install --no-progress --no-ansi --no-interaction
+          echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: time npx playwright install --with-deps chromium
+
+      - name: Install playwright system deps (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: time npx playwright install-deps chromium
+
+      - name: Cache wp-env work directory
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/wp-env
+            ~/.wp-env
+          key: wp-env-e2e-${{ runner.os }}-${{ hashFiles('tools/wp-env/e2e.json', 'composer.lock') }}
+          restore-keys: |
+            wp-env-e2e-${{ runner.os }}-
+
+      - name: Install / Setup Gravity PDF + WordPress
+        run: time yarn wp-env:e2e start
+
+      # wp-env caches its work directory on disk but Docker volumes (MySQL
+      # data) aren't cached, so a restored work-dir can pair with a fresh
+      # empty DB. wp-env's lazy start then sees the work-dir as "already
+      # configured" and skips `wp core install`, leaving Playwright tests
+      # to fail with "The site you have requested is not installed."
+      - name: Ensure WordPress is installed (wp-env cache fallback)
+        run: |
+          time yarn wp-env:e2e run cli bash -c '
+            if ! wp core is-installed >/dev/null 2>&1; then
+              echo "wp-env work-dir cache hit a fresh DB volume — running wp core install."
+              wp core install \
+                --url=http://localhost:8702 \
+                --title=Test \
+                --admin_user=admin \
+                --admin_password=password \
+                --admin_email=admin@test.local \
+                --skip-email
+            else
+              echo "WordPress already installed."
+            fi
+          '
+
+      - name: Run the tests
+        run: time yarn test:e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
+
+      - uses: actions/upload-artifact@v6
+        if: success()
+        with:
+          name: test-results-shard-${{ matrix.shard }}
+          path: ./tmp/artifacts/test-results
+
+      - name: Dump log files on failure
+        if: failure()
+        run: yarn wp-env:e2e run wordpress "cp" "-r" "/var/www/html/wp-content/uploads/gravity_forms/logs/" "/var/www/html/wp-content/plugins/gravity-pdf/tmp/artifacts/logs"
+
+      - name: Upload artifacts on failure
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: failure-artifacts-shard-${{ matrix.shard }}
+          path: tmp/artifacts
+
+  notify:
+    name: Send weekly run notification
+    needs: e2e-playwright
+    if: ${{ always() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Success Email for weekly runner
+        uses: dawidd6/action-send-mail@v16
+        if: ${{ needs.e2e-playwright.result == 'success' }}
+        with:
+          connection_url: ${{secrets.MAIL_CONNECTION}}
+          subject: Gravity PDF E2E Tests Completed
+          to: ${{secrets.MAIL_TO}}
+          from: ${{secrets.MAIL_FROM}}
+          body: View results at https://github.com/GravityPDF/gravity-pdf/actions/runs/${{github.run_id}}
+
+      - name: Send Failure Email for weekly runner
+        uses: dawidd6/action-send-mail@v16
+        if: ${{ needs.e2e-playwright.result != 'success' }}
+        with:
+          connection_url: ${{secrets.MAIL_CONNECTION}}
+          subject: Gravity PDF E2E Tests Failed
+          to: ${{secrets.MAIL_TO}}
+          from: ${{secrets.MAIL_FROM}}
+          body: View results at https://github.com/GravityPDF/gravity-pdf/actions/runs/${{github.run_id}}
+
+  chromatic:
+    name: Run Chromatic
+    needs: e2e-playwright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install JS Dependencies
+        run: yarn install --frozen-lockfile
+
+      # `merge-multiple: true` extracts shard artifacts in parallel into the
+      # same directory. Each shard writes the same `chromatic-archives/**`
+      # filenames (Playwright runs the full `core` project on every shard
+      # because it's listed in `setup-core-with-permalinks.dependencies`), so
+      # the parallel writes race and leave large snapshot.json files with
+      # tail bytes from the longer writer after a shorter writer's truncate.
+      # Chromatic then fails the affected snapshots with "Unexpected
+      # non-whitespace character after JSON at position …". Download each
+      # shard to its own subdirectory and merge serially to avoid the race.
+      - name: Download Playwright test results from all shards
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-results-shard-*
+          path: ./shard-artifacts
+
+      - name: Merge shard artifacts serially
+        run: |
+          mkdir -p ./test-results
+          for shard_dir in ./shard-artifacts/test-results-shard-*/; do
+            cp -R "${shard_dir}." ./test-results/
+          done
+
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          playwright: true
+          autoAcceptChanges: "development"
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

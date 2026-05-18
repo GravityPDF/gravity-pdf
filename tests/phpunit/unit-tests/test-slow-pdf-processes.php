@@ -18,7 +18,7 @@ use WP_UnitTestCase;
  * Can be tested with: phpunit --group slow-pdf-processes
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -75,7 +75,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 
-		$fonts = glob( __DIR__ . '/../data/fonts/' . '*.[tT][tT][fF]' );
+		$fonts = glob( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . '*.[tT][tT][fF]' );
 		$fonts = ( is_array( $fonts ) ) ? $fonts : [];
 
 		foreach ( $fonts as $font ) {
@@ -321,7 +321,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_generate_pdf() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\View\View_PDF::generate_pdf');
+		$this->setExpectedIncorrectUsage( 'GFPDF\View\View_PDF::generate_pdf' );
 
 		global $gfpdf;
 
@@ -340,15 +340,22 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		/* Add filters to force the PDF to throw and error */
 		add_filter(
 			'mpdf_output_destination',
-			function() {
+			function () {
 				return 'O';
 			}
 		);
+
+		/* generate_pdf() drains all output buffers before streaming; restore PHPUnit's depth so beStrictAboutOutputDuringTests doesn't flag the test risky. */
+		$initial_ob_level = ob_get_level();
 
 		try {
 			$this->view->generate_pdf( $entry, $pdf );
 		} catch ( Exception $e ) {
 			/* Expected */
+		}
+
+		while ( ob_get_level() < $initial_ob_level ) {
+			ob_start();
 		}
 
 		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );

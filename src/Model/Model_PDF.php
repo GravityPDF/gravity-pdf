@@ -35,7 +35,7 @@ use WP_Error;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -223,7 +223,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 *
 		 * If any of the filters return a WP_Error object the request will not be fulfilled
 		 *
-		 * Refer to https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_middleware/
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_middleware/ for more details about this filter
 		 */
 		$middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings );
 		if ( is_wp_error( $middleware ) ) {
@@ -803,7 +803,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_pdf_display_list/ for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_get_pdf_display_list/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -832,7 +832,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_active_pdfs/ for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_get_active_pdfs/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -860,7 +860,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/*
 		 * Add filter to modify PDF name
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_filename/ for more details about this filter
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_filename/ for more details about this filter
 		 */
 		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $settings );
 
@@ -1016,7 +1016,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			margin-bottom: 0;
 		  }
 		</style>
-		
+
 		<div id="gravitypdf-pdf-box-container" class="postbox">
 
 			<h3 class="hndle" style="cursor:default;">
@@ -1169,7 +1169,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_maybe_attach_to_notification/ for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_maybe_attach_to_notification/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -1223,7 +1223,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function process_and_save_pdf( Helper_PDF $pdf_generator ) {
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_override_pdf_bypass/ for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_override_pdf_bypass/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -1431,7 +1431,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_data/ for usage
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_form_data/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -1711,7 +1711,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 
 				/*
-				 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_class/ for more details about these filters
+				 * See https://docs.gravitypdf.com/developers/filters/gfpdf_field_class/ for more details about these filters
 				 */
 				$class = apply_filters( 'gfpdf_field_class', $class, $field, $entry, $form );
 				$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
@@ -1836,7 +1836,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * Disable aggregate addon data (speeds up PDF generation time)
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_disable_global_addon_data/
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_disable_global_addon_data/
 		 *
 		 * @since 5.1
 		 */
@@ -1973,52 +1973,65 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
 
-			/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_post_save_pdf for more details about these actions */
+			/* See https://docs.gravitypdf.com/developers/actions/gfpdf_post_save_pdf for more details about these actions */
 			do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
 			do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
 		}
 	}
 
 	/**
-	 * Clean-up our tmp directory every 12 hours
+	 * Clean-up the tmp directory/ies
 	 *
 	 * @return void
 	 *
 	 * @since 4.0
 	 */
 	public function cleanup_tmp_dir() {
-		$max_file_age  = time() - 3600; /* Max age is 1 hour old */
-		$tmp_directory = $this->data->template_tmp_location;
 
-		if ( ! is_dir( $tmp_directory ) ) {
-			return;
-		}
+		$config = [
+			/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
+			[
+				'dir' => $this->data->mpdf_tmp_location,
+				'age' => time() - 3600, // 1 hour
+			],
 
-		try {
-			$directory_list = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator( $tmp_directory, RecursiveDirectoryIterator::SKIP_DOTS ),
-				RecursiveIteratorIterator::CHILD_FIRST
-			);
+			[
+				'dir' => $this->data->template_tmp_location,
+				'age' => time() - 12 * 3600, // 12 hour
+			],
+		];
 
-			foreach ( $directory_list as $file ) {
-				if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
-					continue;
-				}
-
-				if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
-					( $file->isDir() ) ?
-						$this->misc->rmdir( $file->getPathName() ) :
-						@unlink( $file->getPathName() ); //phpcs:ignore
-				}
+		foreach ( $config as $item ) {
+			if ( ! is_dir( $item['dir'] ) ) {
+				continue;
 			}
-		} catch ( Exception $e ) {
-			$this->log->error(
-				'Filesystem Delete Error',
-				[
-					'dir'       => $tmp_directory,
-					'exception' => $e->getMessage(),
-				]
-			);
+
+			try {
+				$directory_list = new RecursiveIteratorIterator(
+					new RecursiveDirectoryIterator( $item['dir'], RecursiveDirectoryIterator::SKIP_DOTS ),
+					RecursiveIteratorIterator::CHILD_FIRST
+				);
+
+				foreach ( $directory_list as $file ) {
+					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) ) {
+						continue;
+					}
+
+					if ( $file->isReadable() && $file->getMTime() < $item['age'] ) {
+						( $file->isDir() ) ?
+							$this->misc->rmdir( $file->getPathName() ) :
+							@unlink( $file->getPathName() ); //phpcs:ignore
+					}
+				}
+			} catch ( Exception $e ) {
+				$this->log->error(
+					'Filesystem Delete Error',
+					[
+						'dir'       => $item['dir'],
+						'exception' => $e->getMessage(),
+					]
+				);
+			}
 		}
 	}
 
@@ -2458,7 +2471,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 5.3
 	 */
 	public function process_gp_populate_anything( $text, $form, $entry ) {
-		if ( ! class_exists( 'GP_Populate_Anything_Live_Merge_Tags' ) ) {
+		if ( ! method_exists( '\GP_Populate_Anything_Live_Merge_Tags', 'replace_live_merge_tags_static' ) ) {
 			return $text;
 		}
 
@@ -2566,6 +2579,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		array_map(
 			function ( $item ) use ( $form ) {
+				/* translators: %d: page number */
 				$item->label   = sprintf( esc_html__( 'Page %d', 'gravity-pdf' ), $item->pageNumber );
 				$item->content = $form['pagination']['pages'][ $item->pageNumber - 1 ] ?? '';
 			},
@@ -2587,6 +2601,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 6.10.2
 	 */
 	public function gp_populate_anything_hydrate_form( $form, $entry ) {
+		if ( ! method_exists( '\GP_Populate_Anything', 'populate_form' ) ) {
+			return $form;
+		}
+
 		static $cache = [];
 
 		$form_id  = $form['id'] ?? '';
@@ -2673,7 +2691,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			exit;
 		}
 
-		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile */
+		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- streaming PDF response. */
 
 		exit;
 	}

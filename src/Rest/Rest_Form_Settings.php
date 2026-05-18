@@ -173,7 +173,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 						'description'       => __( 'The identifier for the PDF', 'gravity-pdf' ),
 						'type'              => 'string',
 						'required'          => true,
-						'validate_callback' => function( $param, $request ) {
+						'validate_callback' => function ( $param, $request ) {
 							$pdf = GPDFAPI::get_pdf( $request->get_param( 'form' ), $param );
 
 							if ( ! is_wp_error( $pdf ) ) {
@@ -969,7 +969,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	public function get_template_schema( $template ) {
-		$current_template = function( $item ) use ( $template ) {
+		$current_template = function ( $item ) use ( $template ) {
 			return $template;
 		};
 
@@ -1016,7 +1016,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				'default'     => $default,
 				'context'     => [ 'edit', $group ],
 				'arg_options' => [
-					'sanitize_callback' => function( $param, $request, $key ) {
+					'sanitize_callback' => function ( $param, $request, $key ) {
 						return is_array( $param ) ? array_map( 'sanitize_text_field', $param ) : sanitize_text_field( $param );
 					},
 
@@ -1081,7 +1081,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 
 				case 'rich_editor':
 					$schema[ $id ]['format']                           = 'rich_text';
-					$schema[ $id ]['arg_options']['sanitize_callback'] = function( $param, $request, $key ) {
+					$schema[ $id ]['arg_options']['sanitize_callback'] = function ( $param, $request, $key ) {
 						return $this->sanitize_rich_text( $param );
 					};
 					break;

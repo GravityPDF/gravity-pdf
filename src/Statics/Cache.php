@@ -91,7 +91,7 @@ class Cache {
 		 * in a GF_Field object, it adds the value automatically and sets it to an empty string.
 		 */
 		array_map(
-			function( $field ) {
+			function ( $field ) {
 				/** @var \GF_Field $field */
 				/* Set when accessing \GFCommon::selection_display() */
 				if ( in_array( $field->get_input_type(), [ 'checkbox', 'radio', 'select' ], true ) ) {

@@ -10,7 +10,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Loader Class
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -106,7 +106,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 */
 	public function test_check_gravityforms( $min_version, $test_gf_version, $expected ) {
 		/* set up our current Gravity Forms version and the min version */
-		GFCommon::$version                     = $test_gf_version;
+		\GFForms::$version                     = $test_gf_version;
 		$this->gravitypdf->required_gf_version = $min_version;
 
 		/* run our test */

@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -455,7 +455,8 @@ class View_Settings extends Helper_Abstract_View {
 	 */
 	public function add_tooltips( $tooltips ) {
 
-		$tooltips['pdf_shortcode'] = '<h6>' . esc_html__( 'PDF Download Link', 'gravity-pdf' ) . '</h6>' . sprintf( esc_html__( "Include the [gravitypdf] shortcode in the form's Confirmation or Notification settings to display a PDF download link. %1\$sGet more info%2\$s.", 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags">', '</a>' );
+		/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+		$tooltips['pdf_shortcode'] = '<h6>' . esc_html__( 'PDF Download Link', 'gravity-pdf' ) . '</h6>' . sprintf( esc_html__( "Include the [gravitypdf] shortcode in the form's Confirmation or Notification settings to display a PDF download link. %1\$sGet more info%2\$s.", 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/users/shortcodes-and-mergetags">', '</a>' );
 		return apply_filters( 'gravitypdf_registered_tooltips', $tooltips );
 	}
 }

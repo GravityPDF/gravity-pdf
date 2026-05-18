@@ -4,7 +4,7 @@
  * The "View PDF" link for the entry list page
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -29,6 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php do_action( 'gfpdf_entry_detail_post_pdf_name_markup', $pdf, $args['pdfs'] ); ?>
 
+			<?php /* translators: %s: PDF name */ ?>
 			<div class="gfpdf_detailed_pdf_cta" aria-label="<?php echo esc_attr( sprintf( __( 'View or download %s.pdf', 'gravity-pdf' ), $pdf['name'] ) ); ?>">
 				<?php do_action( 'gfpdf_entry_detail_pre_pdf_links_markup', $pdf, $args['pdfs'] ); ?>
 

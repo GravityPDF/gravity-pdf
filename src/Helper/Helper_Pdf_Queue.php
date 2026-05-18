@@ -9,21 +9,13 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
 /* Exit if accessed directly */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
-}
-
-if ( ! class_exists( 'WP_Async_Request' ) ) {
-	require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
-}
-
-if ( ! class_exists( 'GF_Background_Process' ) ) {
-	require_once GFCommon::get_base_path() . '/includes/libraries/gf-background-process.php';
 }
 
 /**
@@ -48,6 +40,15 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	 * @since 5.0
 	 */
 	protected $action = 'gravitypdf';
+
+	/**
+	 * Restrict object instantiation when using unserialize.
+	 *
+	 * @since 2.9.7
+	 *
+	 * @var bool|array
+	 */
+	protected $allowed_batch_data_classes = false;
 
 	/**
 	 * Helper_Pdf_Queue constructor.
@@ -88,6 +89,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 		/* Something went wrong so cancel queue */
 		if ( ! isset( $callback['id'], $callback['func'] ) ) {
 			$this->log->critical( 'PDF queue ran with invalid queue item', [ 'callbacks' => $callbacks ] );
+
 			return false;
 		}
 
@@ -107,6 +109,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 					'callbacks' => $callbacks,
 				]
 			);
+
 			return false;
 		}
 
@@ -128,9 +131,9 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 				]
 			);
 
-			/* Add back to our queue to retry (up to a grand total of three times) */
-			if ( empty( $callback['retry'] ) || $callback['retry'] < 2 ) {
-				$callback['retry'] = isset( $callback['retry'] ) ? $callback['retry'] + 1 : 1;
+			/* Add back to our queue to retry once */
+			if ( empty( $callback['retry'] ) ) {
+				$callback['retry'] = 1;
 				array_unshift( $callbacks, $callback );
 			} else {
 				$this->log->error(
@@ -139,17 +142,6 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 						$callback['id']
 					)
 				);
-
-				if ( $callback['unrecoverable'] ?? false ) {
-					$this->log->critical(
-						'Cancel async queue due to retry limit reached on unrecoverable callback.',
-						[
-							'callbacks' => $callbacks,
-						]
-					);
-
-					$callbacks = [];
-				}
 			}
 		}
 

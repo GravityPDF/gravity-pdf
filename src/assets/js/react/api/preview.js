@@ -1,4 +1,4 @@
-import { api } from './api'
+import { api } from './api';
 
 /**
  * @package     Gravity PDF
@@ -8,76 +8,87 @@ import { api } from './api'
 
 /**
  * A cache of template schema data, grouped by form
- * @type {object}
+ * @type {Object}
  */
-const templateSchema = {}
+const templateSchema = {};
 
 /**
  * Get template schema data
  *
- * @param {int} formId
+ * @param {number} formId
  * @param {string} template
- * @returns {object} Template Schema data
+ * @return {Object} Template schema.
  *
  * @since 7.0
  */
-export async function getTemplateSchema (formId, template) {
-  // add formId key to cache
-  if (!templateSchema[formId]) {
-    templateSchema[formId] = {}
-  }
+export async function getTemplateSchema(formId, template) {
+	// add formId key to cache
+	if (!templateSchema[formId]) {
+		templateSchema[formId] = {};
+	}
 
-  // return cached schema
-  if (templateSchema[formId][template]) {
-    return templateSchema[formId][template]
-  }
+	// return cached schema
+	if (templateSchema[formId][template]) {
+		return templateSchema[formId][template];
+	}
 
-  const url = GFPDF.restUrl + 'form/' + encodeURIComponent(formId) + '/schema/?template=' + encodeURIComponent(template)
-  const response = await api(url, {
-    method: 'GET',
-    headers: {
-      'X-WP-Nonce': GFPDF.restNonce
-    }
-  })
+	const url =
+		GFPDF.restUrl +
+		'form/' +
+		encodeURIComponent(formId) +
+		'/schema/?template=' +
+		encodeURIComponent(template);
+	const response = await api(url, {
+		method: 'GET',
+		headers: {
+			'X-WP-Nonce': GFPDF.restNonce,
+		},
+	});
 
-  try {
-    if (!response.ok) {
-      throw new Error(await response.json())
-    }
+	try {
+		if (!response.ok) {
+			throw new Error(await response.json());
+		}
 
-    templateSchema[formId][template] = await response.json()
+		templateSchema[formId][template] = await response.json();
 
-    return templateSchema[formId][template]
-  } catch (e) {
-    console.error(e)
-  }
+		return templateSchema[formId][template];
+	} catch (e) {
+		// eslint-disable-next-line no-console
+		console.error(e);
+	}
 }
 
 /**
  * Generate a PDF Preview using the defined PDF settings
  *
  * @param {FormData} formData
- * @returns {Blob|null}
+ * @return {Blob|null} The rendered PDF, or null on failure.
  *
  * @since 7.0
  */
-export async function getPdfPreview (formData) {
-  const url = GFPDF.restUrl + 'form/' + encodeURIComponent(formData.get('form')) + '/preview'
-  const response = await api(url, {
-    method: 'POST',
-    headers: {
-      'X-WP-Nonce': GFPDF.restNonce
-    },
-    body: formData
-  })
+export async function getPdfPreview(formData) {
+	const url =
+		GFPDF.restUrl +
+		'form/' +
+		encodeURIComponent(formData.get('form')) +
+		'/preview';
+	const response = await api(url, {
+		method: 'POST',
+		headers: {
+			'X-WP-Nonce': GFPDF.restNonce,
+		},
+		body: formData,
+	});
 
-  try {
-    if (!response.ok) {
-      throw new Error(await response.json())
-    }
+	try {
+		if (!response.ok) {
+			throw new Error(await response.json());
+		}
 
-    return await response.blob()
-  } catch (e) {
-    console.error(e)
-  }
+		return await response.blob();
+	} catch (e) {
+		// eslint-disable-next-line no-console
+		console.error(e);
+	}
 }

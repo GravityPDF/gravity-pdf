@@ -3,16 +3,18 @@
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
-use GFPDF_Vendor\Mpdf\Mpdf;
+use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
+use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
 use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -225,7 +227,7 @@ class Helper_PDF {
 		/*
 		 * Allow $mpdf object class to be modified after it is fully initialised
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_mpdf_post_init_class/ for more details about this filter
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_mpdf_post_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_post_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
 	}
@@ -267,7 +269,7 @@ class Helper_PDF {
 		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $args['settings'] ); /* Backwards compat */
 		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $args['settings'] ); /* Backwards compat */
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
 		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
 		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
 
@@ -295,7 +297,7 @@ class Helper_PDF {
 		/*
 		 * Allow $mpdf object class to be modified
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_mpdf_class/ for more details about this filter
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_mpdf_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
@@ -308,12 +310,12 @@ class Helper_PDF {
 
 		switch ( $this->output ) {
 			case 'DISPLAY':
-				$this->prevent_caching();
+				$this->pre_stream_actions();
 				$this->mpdf->Output( $this->filename, 'I' );
 				exit;
 
 			case 'DOWNLOAD':
-				$this->prevent_caching();
+				$this->pre_stream_actions();
 				$this->mpdf->Output( $this->filename, 'D' );
 				exit;
 
@@ -386,6 +388,7 @@ class Helper_PDF {
 		/* Check if there are version requirements */
 		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
 		if ( ! $this->templates->is_template_compatible( $template_info['required_pdf_version'] ) ) {
+			/* translators: 1: PDF template name wrapped in <em> tags, 2: Required Gravity PDF version wrapped in <em> tags */
 			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-pdf' ), '<em>' . esc_html( $template ) . '</em>', '<em>' . esc_html( $template_info['required_pdf_version'] ) . '</em>' ) );
 		}
 	}
@@ -452,7 +455,7 @@ class Helper_PDF {
 	 */
 	public function set_creator( $text = '' ) {
 		if ( empty( $text ) ) {
-			$this->mpdf->SetCreator( 'Gravity PDF v' . PDF_EXTENDED_VERSION . '. https://gravitypdf.com' );
+			$this->mpdf->SetCreator( 'Gravity PDF, gravitypdf.com' );
 		} else {
 			$this->mpdf->SetCreator( $text );
 		}
@@ -626,21 +629,13 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
-		$this->mpdf = new Helper_Mpdf(
+		$this->mpdf = new Mpdf(
 			apply_filters(
 				'gfpdf_mpdf_class_config',
 				[
-					'fontDir'                => [
-						$this->data->template_font_location,
-					],
-
+					'fontDir'                => [ $this->data->template_font_location ],
 					'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
-
 					'tempDir'                => $this->data->mpdf_tmp_location,
-
-					'curlCaCertificate'      => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
-					'curlFollowLocation'     => true,
-					'curlUserAgent'          => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0',
 
 					'allow_output_buffering' => true,
 					'autoLangToFont'         => true,
@@ -659,11 +654,25 @@ class Helper_PDF {
 					'orientation'            => $this->orientation,
 
 					'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
+
+					'exposeVersion'          => false,
 				],
 				$this->form,
 				$this->entry,
 				$this->settings,
 				$this
+			),
+			new SimpleContainer(
+				apply_filters(
+					'gfpdf_mpdf_class_container',
+					[
+						'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
+					],
+					$this->form,
+					$this->entry,
+					$this->settings,
+					$this
+				)
 			)
 		);
 
@@ -673,7 +682,7 @@ class Helper_PDF {
 		 * Allow $mpdf object class to be modified
 		 * Note: in some circumstances using WriteHTML() during this filter will break headers/footers
 		 *
-		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_mpdf_init_class/ for more details about this filter
+		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_mpdf_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
 	}
@@ -942,13 +951,23 @@ class Helper_PDF {
 
 
 	/**
-	 * Ensure the PDF doesn't get cached
+	 * Actions to run before a PDF is streamed to the browser
 	 *
-	 * @since 4.0
+	 * @since 6.13.5
 	 */
-	protected function prevent_caching() {
+	protected function pre_stream_actions() {
+		/* Close any open buffers to prevent anything from modifying the binary PDF stream */
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
+
+		/* Define the PDF as not cacheable, for plugins that support it  */
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
+		}
+
+		if ( ! headers_sent() ) {
+			send_nosniff_header();
 		}
 	}
 }

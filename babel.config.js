@@ -1,0 +1,4 @@
+module.exports = {
+	presets: [ '@wordpress/babel-preset-default' ],
+	plugins: [ 'babel-plugin-inline-json-import' ],
+};

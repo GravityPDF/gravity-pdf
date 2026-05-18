@@ -9,7 +9,7 @@ use stdClass;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -110,14 +110,12 @@ class Helper_Templates {
 	 * @since 4.1
 	 */
 	public function get_all_templates() {
-		$options    = GPDFAPI::get_options_class();
-		$debug      = $options->get_option( 'debug_mode', 'No' );
-		$cache_name = $this->data->template_transient_cache . '-template-list';
-
-		if ( $debug === 'No' ) {
-			$cache = get_transient( $cache_name );
-			if ( is_array( $cache ) && ! empty( $cache ) ) {
-				return $cache;
+		if ( class_exists( 'GFCache' ) ) {
+			$cache_name    = $this->data->template_transient_cache . '-template-list';
+			$found         = false;
+			$template_list = \GFCache::get( $cache_name, $found, false );
+			if ( ! empty( $template_list ) ) {
+				return $template_list;
 			}
 		}
 
@@ -142,7 +140,9 @@ class Helper_Templates {
 			);
 		}
 
-		set_transient( $cache_name, $template_list, 604800 );
+		if ( class_exists( 'GFCache' ) ) {
+			\GFCache::set( $cache_name, $template_list );
+		}
 
 		return $template_list;
 	}
@@ -159,11 +159,11 @@ class Helper_Templates {
 
 		/* Get current multisite templates, if any */
 		if ( is_multisite() ) {
-			$raw_templates[] = glob( $this->data->multisite_template_location . '*.php', GLOB_NOSORT );
+			$raw_templates[] = $this->get_all_templates_in_folder( $this->data->multisite_template_location );
 		}
 
 		/* Get the current user-templates and the core templates */
-		$raw_templates[] = glob( $this->data->template_location . '*.php', GLOB_NOSORT );
+		$raw_templates[] = $this->get_all_templates_in_folder( $this->data->template_location );
 		$raw_templates[] = $this->get_core_pdf_templates();
 
 		return apply_filters( 'gfpdf_unfiltered_template_list', $raw_templates );
@@ -438,7 +438,6 @@ class Helper_Templates {
 	 */
 	public function flush_template_transient_cache() {
 		delete_transient( $this->data->template_transient_cache );
-		delete_transient( $this->data->template_transient_cache . '-template-list' );
 	}
 
 	/**
@@ -470,16 +469,48 @@ class Helper_Templates {
 	}
 
 	/**
-	 * Returns an array of the current PDF templates shipped with Gravity PDF
+	 * Returns an array of the PDF templates shipped with Gravity PDF
 	 *
 	 * @return array
 	 *
 	 * @since 4.1
+	 *
+	 * @internal This is hardcoded to reduce a filesystem lookup
 	 */
 	public function get_core_pdf_templates() {
-		$templates = glob( PDF_PLUGIN_DIR . 'src/templates/*.php' );
+		return [
+			PDF_PLUGIN_DIR . 'src/templates/zadani.php',
+			PDF_PLUGIN_DIR . 'src/templates/rubix.php',
+			PDF_PLUGIN_DIR . 'src/templates/focus-gravity.php',
+			PDF_PLUGIN_DIR . 'src/templates/blank-slate.php',
+		];
+	}
 
-		return ( is_array( $templates ) ) ? $templates : [];
+	/**
+	 * @param string $folder
+	 *
+	 * @return array
+	 */
+	public function get_all_templates_in_folder( $folder ) {
+		try {
+			$dir   = new \FilesystemIterator( $folder );
+			$files = new \CallbackFilterIterator(
+				$dir,
+				function ( $current ) {
+					return ! $current->isDir() && $current->getExtension() === 'php';
+				}
+			);
+
+			$templates = [];
+			foreach ( $files as $file ) {
+				$templates[] = $file->getPathname();
+			}
+
+			return $templates;
+		} catch ( \Exception $e ) {
+			$this->log->error( $e->getMessage() );
+			return [];
+		}
 	}
 
 	/**
@@ -506,7 +537,7 @@ class Helper_Templates {
 		}
 
 		if ( $include_core ) {
-			array_push( $config_paths, PDF_PLUGIN_DIR . 'src/templates/config/' );
+			$config_paths[] = PDF_PLUGIN_DIR . 'src/templates/config/';
 		}
 
 		$config_paths = apply_filters( 'gfpdf_template_config_paths', $config_paths );
@@ -727,7 +758,7 @@ class Helper_Templates {
 			$config->set_settings( $settings );
 		}
 
-		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_template_args/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_template_args/ for more details about this filter */
 
 		return apply_filters(
 			'gfpdf_template_args',

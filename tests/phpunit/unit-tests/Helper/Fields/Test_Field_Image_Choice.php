@@ -9,7 +9,7 @@ use WP_UnitTestCase;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -64,8 +64,8 @@ class Test_Field_Image_Choice extends WP_UnitTestCase {
 
 	protected function get_choices( $id ) {
 		$wp_factory = static::factory();
-		$media_id1  = $wp_factory->attachment->create_upload_object( __DIR__ . '/../../../data/images/test-media.png' );
-		$media_id2  = $wp_factory->attachment->create_upload_object( __DIR__ . '/../../../data/images/test-media.png' );
+		$media_id1  = $wp_factory->attachment->create_upload_object( PDF_PLUGIN_DIR . '/tools/phpunit/data/images/test-media.png' );
+		$media_id2  = $wp_factory->attachment->create_upload_object( PDF_PLUGIN_DIR . '/tools/phpunit/data/images/test-media.png' );
 
 		$choices = [
 			[
@@ -139,7 +139,7 @@ class Test_Field_Image_Choice extends WP_UnitTestCase {
 		$pdf_field = new Field_Image_Choice( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();
-		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ">', $html );
+		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ', $html );
 		$this->assertStringContainsString( '<div class="label"><strong>Radio Multi Choice</strong></div><div class="value">Option 2</div>', $html );
 	}
 
@@ -153,7 +153,7 @@ class Test_Field_Image_Choice extends WP_UnitTestCase {
 		$pdf_field = new Field_Image_Choice( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();
-		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ">', $html );
+		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ', $html );
 		$this->assertStringContainsString( '<div class="label"><strong>Radio Multi Choice</strong></div><div class="value"><strong>Option</strong> 3</div>', $html );
 
 		/* pass user-defined string and verify response is escaped in the PDF */
@@ -165,7 +165,7 @@ class Test_Field_Image_Choice extends WP_UnitTestCase {
 		$pdf_field = new Field_Image_Choice( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();
-		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ">', $html );
+		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ', $html );
 		$this->assertStringContainsString( '<div class="label"><strong>Radio Multi Choice</strong></div><div class="value">&lt;em&gt;My answer&lt;/em&gt;</div>', $html );
 	}
 
@@ -179,7 +179,7 @@ class Test_Field_Image_Choice extends WP_UnitTestCase {
 		$pdf_field = new Field_Image_Choice( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();
-		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ">', $html );
+		$this->assertStringContainsString( '<div id="field-1" class="gfpdf-field gfpdf-radio ', $html );
 		$this->assertStringContainsString( '<div class="label"><strong>Radio Multi Choice</strong></div><div class="value">Select an option</div>', $html );
 	}
 
@@ -226,7 +226,7 @@ class Test_Field_Image_Choice extends WP_UnitTestCase {
 		$pdf_field = new Field_Image_Choice( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();
-		$this->assertStringContainsString( '<div id="field-2" class="gfpdf-field gfpdf-checkbox ">', $html );
+		$this->assertStringContainsString( '<div id="field-2" class="gfpdf-field gfpdf-checkbox ', $html );
 		$this->assertStringContainsString( '<div class="label"><strong>Checkbox Multi Choice</strong></div><div class="value"><ul class="bulleted checkbox"><li id="field-2-option-1">Option 1</li><li id="field-2-option-2"><strong>Option</strong> 3</li></ul></div>', $html );
 	}
 

@@ -4,7 +4,7 @@
  * The Review Plugin Notice
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2024, Blue Liquid Designs
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -26,5 +26,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<br>
 
-	<a href="https://docs.gravitypdf.com/v6/users/core-pdf-fonts"><?php esc_html_e( 'Get more info.', 'gravity-pdf' ); ?></a>
+	<a href="https://docs.gravitypdf.com/users/core-pdf-fonts"><?php esc_html_e( 'Get more info.', 'gravity-pdf' ); ?></a>
 </div>
