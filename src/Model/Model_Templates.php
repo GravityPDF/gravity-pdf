@@ -356,8 +356,21 @@ class Model_Templates extends Helper_Abstract_Model {
 			throw new Exception( esc_html( $results->get_error_message() ) );
 		}
 
-		/* Check unzipped templates for a valid v4 header, or v3 string pattern */
-		$files = glob( $dir . '*.php', GLOB_NOSORT );
+		/* glob() can return a stale (empty) listing when called immediately after
+		   unzip_file() writes new entries via the WP_Filesystem abstraction —
+		   use scandir() (which always reads from disk) and filter for .php
+		   files manually so the directory listing is reliable */
+		$files = array_map(
+			function ( $file ) use ( $dir ) {
+				return $dir . $file;
+			},
+			array_filter(
+				is_dir( $dir ) ? scandir( $dir ) : [],
+				static function ( $file ) {
+					return substr( $file, -4 ) === '.php';
+				}
+			)
+		);
 
 		if ( ! is_array( $files ) || count( $files ) === 0 ) {
 			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );

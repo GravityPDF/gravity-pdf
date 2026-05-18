@@ -228,68 +228,89 @@ class Test_Templates extends WP_UnitTestCase {
 	public function test_unzip_and_verify_templates() {
 		global $gfpdf;
 
-		/* Check an error is thrown if trying to unzip a zip file */
-		try {
-			$this->model->unzip_and_verify_templates( 'test.txt' );
-		} catch ( Exception $e ) {
-			//do nothing
-		}
-
-		$this->assertEquals( 'Incompatible Archive.', $e->getMessage() );
-		unset( $e );
-
-		/* Create empty archive and check an exception is thrown for no PDF templates found */
-		$test_file = $gfpdf->data->template_tmp_location . 'test-archive.zip';
+		/* Use a unique archive name so leftover state from earlier (or interrupted)
+		   runs cannot pollute the path the unzip extracts into */
+		$test_file = $gfpdf->data->template_tmp_location . 'test-archive-' . uniqid() . '.zip';
 		$test_dir  = $this->model->get_unzipped_dir_name( $test_file );
 
-		$zip = new ZipArchive();
-		$zip->open( $test_file, ZipArchive::CREATE );
-		$zip->addFromString( 'tmp', '' );
-		$zip->close();
-
-		try {
-			$this->model->unzip_and_verify_templates( $test_file );
-		} catch ( Exception $e ) {
-			//do nothing
+		/* Make sure no stale state at $test_dir is present and that the template
+		   transient cache cannot return a cached "Legacy" group for the unzipped
+		   files (any prior call to get_template_info_by_path() with the same path
+		   would otherwise short-circuit the v4 header check) */
+		if ( file_exists( $test_file ) ) {
+			unlink( $test_file );
 		}
-
-		$this->assertEquals( 'No valid PDF template found in Zip archive.', $e->getMessage() );
-		unset( $e );
-
-		unlink( $test_file );
 		$gfpdf->misc->rmdir( $test_dir );
-
-		/* Zip up two of the core PDF template files and check no exceptions are thrown */
-		$zip = new ZipArchive();
-		$zip->open( $test_file, ZipArchive::CREATE );
-		$zip->addFile( PDF_PLUGIN_DIR . 'src/templates/zadani.php', 'zadani.php' );
-		$zip->addFile( PDF_PLUGIN_DIR . 'src/templates/rubix.php', 'rubix.php' );
-		$zip->close();
+		$gfpdf->templates->flush_template_transient_cache();
 
 		try {
-			$this->model->unzip_and_verify_templates( $test_file );
-		} catch ( Exception $e ) {
-			//do nothing
+			/* Check an error is thrown if trying to unzip a zip file */
+			try {
+				$this->model->unzip_and_verify_templates( 'test.txt' );
+			} catch ( Exception $e ) {
+				//do nothing
+			}
+
+			$this->assertEquals( 'Incompatible Archive.', $e->getMessage() );
+			unset( $e );
+
+			/* Create empty archive and check an exception is thrown for no PDF templates found */
+			$zip = new ZipArchive();
+			$zip->open( $test_file, ZipArchive::CREATE );
+			$zip->addFromString( 'tmp', '' );
+			$zip->close();
+
+			try {
+				$this->model->unzip_and_verify_templates( $test_file );
+			} catch ( Exception $e ) {
+				//do nothing
+			}
+
+			$this->assertEquals( 'No valid PDF template found in Zip archive.', $e->getMessage() );
+			unset( $e );
+
+			unlink( $test_file );
+			$gfpdf->misc->rmdir( $test_dir );
+
+			/* Zip up two of the core PDF template files and check no exceptions are thrown */
+			$zip = new ZipArchive();
+			$zip->open( $test_file, ZipArchive::CREATE );
+			$zip->addFile( PDF_PLUGIN_DIR . 'src/templates/zadani.php', 'zadani.php' );
+			$zip->addFile( PDF_PLUGIN_DIR . 'src/templates/rubix.php', 'rubix.php' );
+			$zip->close();
+
+			try {
+				$this->model->unzip_and_verify_templates( $test_file );
+			} catch ( Exception $e ) {
+				//do nothing
+			}
+
+			$this->assertFalse(
+				isset( $e ),
+				'Expected no exception when unzipping a valid template archive, got: ' . ( isset( $e ) ? $e->getMessage() : '' )
+			);
+
+			/* Add an invalid filename to the zip and verify an error occurs */
+			$zip->open( $test_file );
+			$zip->addFile( PDF_PLUGIN_DIR . 'src/templates/zadani.php', 'zad@!@#$%^&*().php' );
+			$zip->close();
+
+			try {
+				$this->model->unzip_and_verify_templates( $test_file );
+			} catch ( Exception $e ) {
+				//do nothing
+			}
+
+			$this->assertStringContainsString( 'contains invalid characters.', $e->getMessage() );
+		} finally {
+			/* Cleanup runs even if an assertion fails mid-test so we don't leak
+			   filesystem state into subsequent tests in the suite */
+			if ( file_exists( $test_file ) ) {
+				unlink( $test_file );
+			}
+			$gfpdf->misc->rmdir( $test_dir );
+			$gfpdf->templates->flush_template_transient_cache();
 		}
-
-		$this->assertFalse( isset( $e ) );
-
-		/* Add an invalid filename to the zip and verify an error occurs */
-		$zip->open( $test_file );
-		$zip->addFile( PDF_PLUGIN_DIR . 'src/templates/zadani.php', 'zad@!@#$%^&*().php' );
-		$zip->close();
-
-		try {
-			$this->model->unzip_and_verify_templates( $test_file );
-		} catch ( Exception $e ) {
-			//do nothing
-		}
-
-		$this->assertStringContainsString( 'contains invalid characters.', $e->getMessage() );
-
-		/* Cleanup */
-		unlink( $test_file );
-		$gfpdf->misc->rmdir( $test_dir );
 	}
 
 	/**
