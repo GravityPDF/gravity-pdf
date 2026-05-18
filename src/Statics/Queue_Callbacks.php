@@ -47,7 +47,9 @@ class Queue_Callbacks {
 		wp_set_current_user( $user_id );
 
 		/* For performance, only generate the PDF if it does not currently exist on disk */
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
 		$pdf = GPDFAPI::create_pdf( $entry_id, $pdf_id );
+		remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
 
 		/* Reset existing user */
 		wp_set_current_user( $backup_user_id );
