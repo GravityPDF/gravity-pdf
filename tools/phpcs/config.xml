@@ -40,6 +40,7 @@
         <exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_fclose"/>
         <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
         <exclude name="PSR12.Files.FileHeader.IncorrectOrder"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.Found"/>
         <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed"/>
         <exclude name="Universal.Operators.DisallowShortTernary.Found"/>
 

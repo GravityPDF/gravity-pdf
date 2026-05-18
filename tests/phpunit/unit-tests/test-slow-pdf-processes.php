@@ -347,11 +347,10 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		/*
 		 * Helper_PDF::pre_stream_actions() drains every active output buffer (`while ob_get_level() > 0`)
-		 * before mPDF streams the PDF. When generate_pdf() blows up later in the pipeline and we catch the
-		 * WPDieException, PHPUnit's own output buffers are already gone and beStrictAboutOutputDuringTests
-		 * flags the test as risky. Record the buffer depth before the call and re-establish it afterwards
-		 * (closing any extras above the line and opening any missing below) so the test owns the buffer
-		 * level on the way out.
+		 * before mPDF streams the PDF, including PHPUnit's own. When generate_pdf() blows up later in the
+		 * pipeline and we catch the WPDieException, those buffers are already gone and
+		 * beStrictAboutOutputDuringTests flags the test as risky on teardown. Record the buffer depth
+		 * before the call and re-open empties up to that level afterwards.
 		 */
 		$initial_ob_level = ob_get_level();
 
@@ -361,9 +360,6 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 			/* Expected */
 		}
 
-		while ( ob_get_level() > $initial_ob_level ) {
-			ob_end_clean();
-		}
 		while ( ob_get_level() < $initial_ob_level ) {
 			ob_start();
 		}
