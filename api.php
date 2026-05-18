@@ -222,11 +222,11 @@ final class GPDFAPI {
 	public static function get_pdf_class( $type = 'view' ) {
 
 		if ( $type === 'view' ) {
-			return static::get_mvc_class( 'View_PDF' );
+			return self::get_mvc_class( 'View_PDF' );
 		}
 
 		if ( $type === 'model' ) {
-			return static::get_mvc_class( 'Model_PDF' );
+			return self::get_mvc_class( 'Model_PDF' );
 		}
 
 		return new WP_Error( 'invalid_type', esc_html__( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-pdf' ) );
@@ -244,7 +244,7 @@ final class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function get_form_pdfs( $form_id ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->get_form_pdfs( $form_id );
 	}
@@ -263,7 +263,7 @@ final class GPDFAPI {
 	 * @since 6.0
 	 */
 	public static function get_entry_pdfs( $entry_id ) {
-		$form_class = static::get_form_class();
+		$form_class = self::get_form_class();
 
 		/* Get our entry */
 		$entry = $form_class->get_entry( $entry_id );
@@ -273,8 +273,8 @@ final class GPDFAPI {
 		}
 
 		/** @var \GFPDF\Model\Model_PDF $model_pdf */
-		$model_pdf = static::get_mvc_class( 'Model_PDF' );
-		$pdfs      = static::get_form_pdfs( $entry['form_id'] );
+		$model_pdf = self::get_mvc_class( 'Model_PDF' );
+		$pdfs      = self::get_form_pdfs( $entry['form_id'] );
 
 		return $model_pdf->get_active_pdfs( $pdfs, $entry );
 	}
@@ -291,7 +291,7 @@ final class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function get_pdf( $form_id, $pdf_id ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->get_pdf( $form_id, $pdf_id );
 	}
@@ -309,7 +309,7 @@ final class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function add_pdf( $form_id, $settings = [] ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->add_pdf( $form_id, $settings );
 	}
@@ -328,7 +328,7 @@ final class GPDFAPI {
 	 * @since  4.0
 	 */
 	public static function update_pdf( $form_id, $pdf_id, $settings = [] ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->update_pdf( $form_id, $pdf_id, $settings );
 	}
@@ -346,7 +346,7 @@ final class GPDFAPI {
 	 * @since  4.0
 	 */
 	public static function delete_pdf( $form_id, $pdf_id ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->delete_pdf( $form_id, $pdf_id );
 	}
@@ -361,7 +361,7 @@ final class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function get_plugin_settings() {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->get_settings();
 	}
@@ -378,10 +378,10 @@ final class GPDFAPI {
 	 *
 	 * @since 4.0
 	 */
-	public static function get_plugin_option( $key, $default = '' ) {
-		$options = static::get_options_class();
+	public static function get_plugin_option( $key, $default_value = '' ) {
+		$options = self::get_options_class();
 
-		return $options->get_option( $key, $default );
+		return $options->get_option( $key, $default_value );
 	}
 
 	/**
@@ -400,7 +400,7 @@ final class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function add_plugin_option( $key, $value ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		/* Check the option doesn't already exist */
 		if ( null !== $options->get_option( $key, null ) ) {
@@ -408,7 +408,7 @@ final class GPDFAPI {
 			return new WP_Error( 'option_exists', esc_html__( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-pdf' ) );
 		}
 
-		return static::update_plugin_option( $key, $value );
+		return self::update_plugin_option( $key, $value );
 	}
 
 	/**
@@ -426,7 +426,7 @@ final class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function update_plugin_option( $key, $value ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->update_option( $key, $value );
 	}
@@ -443,7 +443,7 @@ final class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function delete_plugin_option( $key ) {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->delete_option( $key );
 	}
@@ -465,7 +465,7 @@ final class GPDFAPI {
 	 */
 	public static function create_pdf( $entry_id, $pdf_id, $bypass_cache = false ) {
 
-		$form_class = static::get_form_class();
+		$form_class = self::get_form_class();
 
 		/* Get our entry */
 		$entry = $form_class->get_entry( $entry_id );
@@ -475,7 +475,7 @@ final class GPDFAPI {
 		}
 
 		/* Get our settings */
-		$setting = static::get_pdf( $entry['form_id'], $pdf_id );
+		$setting = self::get_pdf( $entry['form_id'], $pdf_id );
 
 		if ( is_wp_error( $setting ) ) {
 			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-pdf' ) );
@@ -486,7 +486,7 @@ final class GPDFAPI {
 		}
 
 		/** @var \GFPDF\Model\Model_PDF $pdf */
-		$pdf         = static::get_mvc_class( 'Model_PDF' );
+		$pdf         = self::get_mvc_class( 'Model_PDF' );
 		$path_to_pdf = $pdf->generate_and_save_pdf( $entry, $setting );
 
 		if ( $bypass_cache ) {
@@ -502,20 +502,20 @@ final class GPDFAPI {
 	 * See https://docs.gravitypdf.com/v6/developers/api/product_table/ for more information about this method
 	 *
 	 * @param  array   $entry  The Gravity Form entry
-	 * @param  boolean $return Whether to output or return the HTML
+	 * @param  boolean $should_return Whether to output or return the HTML
 	 *
 	 * @return string|void     The product table or null
 	 *
 	 * @since  4.0
 	 */
-	public static function product_table( $entry, $return = false ) {
+	public static function product_table( $entry, $should_return = false ) {
 		global $gfpdf;
 
 		$products = new GFPDF\Helper\Fields\Field_Products( new GF_Field(), $entry, $gfpdf->gform, $gfpdf->misc );
 
 		if ( ! $products->is_empty() ) {
 
-			if ( $return ) {
+			if ( $should_return ) {
 				$html = $products->html();
 				unset( $products );
 
@@ -537,14 +537,14 @@ final class GPDFAPI {
 	 * See https://docs.gravitypdf.com/v6/developers/api/likert_table for more information about this method
 	 *
 	 * @param  array   $entry    The Gravity Form entry
-	 * @param  integer $field_id The likert field ID
-	 * @param  boolean $return   Whether to output or return the HTML
+	 * @param  integer $field_id      The likert field ID
+	 * @param  boolean $should_return Whether to output or return the HTML
 	 *
 	 * @return Mixed    The likert table or null
 	 *
 	 * @since  4.0
 	 */
-	public static function likert_table( $entry, $field_id, $return = false ) {
+	public static function likert_table( $entry, $field_id, $should_return = false ) {
 		global $gfpdf;
 
 		/* Get our form */
@@ -563,7 +563,7 @@ final class GPDFAPI {
 				/* Output our likert */
 				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->gform, $gfpdf->misc );
 
-				if ( $return ) {
+				if ( $should_return ) {
 					$html = $likert->html();
 					unset( $likert );
 
@@ -589,7 +589,7 @@ final class GPDFAPI {
 	 * @since 4.3
 	 */
 	public static function get_pdf_fonts() {
-		$options = static::get_options_class();
+		$options = self::get_options_class();
 
 		return $options->get_installed_fonts();
 	}
@@ -622,7 +622,7 @@ final class GPDFAPI {
 	 */
 	public static function add_pdf_font( $font ) {
 
-		$installed_fonts = static::get_pdf_fonts();
+		$installed_fonts = self::get_pdf_fonts();
 
 		$font_name              = $font['font_name'] ?? '';
 		$user_defined_font_list = $installed_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] ?? [];
@@ -632,6 +632,7 @@ final class GPDFAPI {
 			return true;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- programmatic API helper: $_FILES is swapped out for a synthetic payload built from the $font argument, not from an unverified form submission.
 		$files_backup = $_FILES;
 		$_FILES       = [];
 
@@ -655,6 +656,7 @@ final class GPDFAPI {
 			}
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- programmatic API helper: $_FILES was populated above from the $font argument, not from an unverified form submission.
 		$request->set_file_params( $_FILES );
 		$response = $controller->add_item( $request );
 

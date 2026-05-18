@@ -283,7 +283,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'placeholder' => esc_html__( 'Choose a Notification', 'gravity-pdf' ),
 						'schema'      => [
 							'arg_options' => [
-								'validate_callback' => function( $param, $request, $key ) {
+								'validate_callback' => function ( $param, $request, $key ) {
 									$form = $this->gform->get_form( $request->get_param( 'form' ) );
 									if ( ! is_array( $form ) ) {
 										return new \WP_Error( 'missing_form' );
@@ -327,7 +327,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'description' => sprintf( __( 'Set the filename for the generated PDF (excluding the .pdf extension). Mergetags are supported, and invalid characters %s are automatically converted to an underscore.', 'gravity-pdf' ), '/ \ " * ? | : < >' ),
 							'minLength'   => 1,
 							'arg_options' => [
-								'sanitize_callback' => function( $param, $request, $key ) {
+								'sanitize_callback' => function ( $param, $request, $key ) {
 									$param = $this->misc->remove_extension_from_string( $param, '.pdf' );
 									$param = sanitize_text_field( $param );
 
@@ -453,7 +453,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 								],
 							],
 							'arg_options'          => [
-								'get_callback'    => function( $item, $id, $request, $type ) {
+								'get_callback'    => function ( $item, $id, $request, $type ) {
 									if ( strtoupper( $item['pdf_size'] ?? '' ) !== 'CUSTOM' ) {
 										return null;
 									}
@@ -474,7 +474,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 									];
 								},
 
-								'update_callback' => function( $item, $id, $request, $type ) {
+								'update_callback' => function ( $item, $id, $request, $type ) {
 									if ( strtoupper( $request['pdf_size'] ?? '' ) !== 'CUSTOM' && strtoupper( $item['pdf_size'] ?? '' ) !== 'CUSTOM' ) {
 										return '';
 									}

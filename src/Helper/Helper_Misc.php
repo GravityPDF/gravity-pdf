@@ -974,14 +974,14 @@ class Helper_Misc {
 	/**
 	 * Flatten an array by its keys or value
 	 *
-	 * @param array $array A single or one-level-deep multidimensional array
-	 * @param string $type 'keys' or 'values'
+	 * @param array  $items A single or one-level-deep multidimensional array
+	 * @param string $type  'keys' or 'values'
 	 *
 	 * @return array
 	 *
 	 * @since 7.0.0
 	 */
-	public function flatten_array( array $array, $type = 'keys' ) {
+	public function flatten_array( array $items, $type = 'keys' ) {
 		if ( ! in_array( $type, [ 'keys', 'values' ], true ) ) {
 			_doing_it_wrong( __METHOD__, '$type can only be "keys" or "values"', '6.12' );
 
@@ -989,12 +989,12 @@ class Helper_Misc {
 		}
 
 		/* exit early if empty array */
-		if ( empty( $array ) ) {
-			return $array;
+		if ( empty( $items ) ) {
+			return $items;
 		}
 
-		$array = array_map(
-			function( $value, $key ) use ( $type ) {
+		$items = array_map(
+			function ( $value, $key ) use ( $type ) {
 				/* handle multi-dimensional array */
 				if ( is_array( $value ) ) {
 					  return call_user_func( 'array_' . $type, $value );
@@ -1003,11 +1003,11 @@ class Helper_Misc {
 				/* handle single-dimensional array */
 				return $type === 'keys' ? [ $key ] : [ $value ];
 			},
-			$array,
-			array_keys( $array )
+			$items,
+			array_keys( $items )
 		);
 
-		return array_merge( ...array_values( $array ) );
+		return array_merge( ...array_values( $items ) );
 	}
 
 	/**
