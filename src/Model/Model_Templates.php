@@ -14,6 +14,8 @@ use GFPDF_Vendor\GravityPdf\Upload\Validation\Mimetype;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Size;
 use GPDFAPI;
 use Psr\Log\LoggerInterface;
+use CallbackFilterIterator;
+use FilesystemIterator;
 
 /**
  * @package     Gravity PDF
@@ -156,7 +158,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Get the template headers now all the files are in the right location */
 		$this->templates->flush_template_transient_cache();
-		$headers = $this->get_template_info( glob( $unzipped_dir_name . '*.php', GLOB_NOSORT ) );
+		$headers = $this->get_template_info( $this->find_template_files( $unzipped_dir_name ) );
 
 		/* Fix template path */
 		$headers = array_map(
@@ -338,6 +340,42 @@ class Model_Templates extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Walk $dir and return the full path to every top-level .php file inside it.
+	 *
+	 * Used in place of glob( $dir . '*.php' ) because glob() can return a stale
+	 * (empty) listing when called immediately after unzip_file() writes new
+	 * entries through the WP_Filesystem abstraction. The iterator reads each
+	 * entry from disk on every call. Matches the non-recursive pattern used
+	 * by Helper_Templates::get_all_templates_in_folder() so a zip whose
+	 * templates pass validation here will also be discoverable post-install.
+	 *
+	 * @param string $dir The directory to walk
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.14.3
+	 */
+	protected function find_template_files( $dir ) {
+		if ( ! is_dir( $dir ) ) {
+			return [];
+		}
+
+		$iterator = new CallbackFilterIterator(
+			new FilesystemIterator( $dir, FilesystemIterator::SKIP_DOTS ),
+			static function ( $file ) {
+				return $file->isFile() && strtolower( $file->getExtension() ) === 'php';
+			}
+		);
+
+		$files = [];
+		foreach ( $iterator as $file ) {
+			$files[] = $file->getPathname();
+		}
+
+		return $files;
+	}
+
+	/**
 	 * Extracts the zip file, checks there are valid PDF template files found and retrieves information about them
 	 *
 	 * @param string $zip_path The full path to the zip file
@@ -357,21 +395,8 @@ class Model_Templates extends Helper_Abstract_Model {
 			throw new Exception( esc_html( $results->get_error_message() ) );
 		}
 
-		/* glob() can return a stale (empty) listing when called immediately after
-		   unzip_file() writes new entries via the WP_Filesystem abstraction —
-		   use scandir() (which always reads from disk) and filter for .php
-		   files manually so the directory listing is reliable */
-		$files = array_map(
-			function ( $file ) use ( $dir ) {
-				return $dir . $file;
-			},
-			array_filter(
-				is_dir( $dir ) ? scandir( $dir ) : [],
-				static function ( $file ) {
-					return substr( $file, -4 ) === '.php';
-				}
-			)
-		);
+		/* Check unzipped templates for a valid v4 header, or v3 string pattern */
+		$files = $this->find_template_files( $dir );
 
 		if ( ! is_array( $files ) || count( $files ) === 0 ) {
 			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );
