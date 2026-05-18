@@ -32,7 +32,7 @@ class Test_Rest_Pdf_Preview extends Test_Rest {
 		/* Configure mPDF with available fonts */
 		$config = static function ( $config ) {
 			return array_merge( $config, [
-				'fontDir'  => __DIR__ . '/../../data/fonts/',
+				'fontDir'  => PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/',
 				'fontdata' => [
 					'dejavusans' => [
 						'R'          => 'DejaVuSans.ttf',
