@@ -358,4 +358,155 @@ describe('formValuesSnapshot helpers', () => {
       expect($container.find('[name="gfpdf_settings[rubix_container_background_colour]"]').val()).toBe('#cccccc')
     })
   })
+
+  describe('all standard form field types round-trip', () => {
+    it('saves and restores every standard HTML form input type', () => {
+      /* User-edited values per field type — what we expect to see after the round-trip */
+      const edited = {
+        text: 'edited text',
+        password: 'edited-pass',
+        email: 'edited@example.com',
+        url: 'https://example.com/edited',
+        tel: '+61400000000',
+        search: 'edited query',
+        number: '42',
+        color: '#ff8800',
+        date: '2026-05-19',
+        time: '14:30',
+        month: '2026-05',
+        week: '2026-W20',
+        'datetime-local': '2026-05-19T14:30',
+        range: '75',
+        hidden: 'edited-hidden-token',
+        textarea: 'edited textarea body',
+        select_single: 'b',
+        select_multiple: ['a', 'c']
+      }
+
+      const $container = mountContainer(`
+        <input type="text"           name="gfpdf_settings[text]"           value="default text" />
+        <input type="password"       name="gfpdf_settings[password]"       value="default-pass" />
+        <input type="email"          name="gfpdf_settings[email]"          value="default@example.com" />
+        <input type="url"            name="gfpdf_settings[url]"            value="https://example.com/default" />
+        <input type="tel"            name="gfpdf_settings[tel]"            value="+61400000001" />
+        <input type="search"         name="gfpdf_settings[search]"         value="default query" />
+        <input type="number"         name="gfpdf_settings[number]"         value="10" />
+        <input type="color"          name="gfpdf_settings[color]"          value="#000000" />
+        <input type="date"           name="gfpdf_settings[date]"           value="2026-01-01" />
+        <input type="time"           name="gfpdf_settings[time]"           value="09:00" />
+        <input type="month"          name="gfpdf_settings[month]"          value="2026-01" />
+        <input type="week"           name="gfpdf_settings[week]"           value="2026-W01" />
+        <input type="datetime-local" name="gfpdf_settings[datetime-local]" value="2026-01-01T09:00" />
+        <input type="range"          name="gfpdf_settings[range]"          min="0" max="100" value="0" />
+        <input type="hidden"         name="gfpdf_settings[hidden]"         value="default-hidden-token" />
+        <textarea                    name="gfpdf_settings[textarea]">default textarea body</textarea>
+
+        <select name="gfpdf_settings[select_single]">
+          <option value="a" selected>A</option>
+          <option value="b">B</option>
+          <option value="c">C</option>
+        </select>
+
+        <select name="gfpdf_settings[select_multiple]" multiple>
+          <option value="a">A</option>
+          <option value="b" selected>B</option>
+          <option value="c">C</option>
+        </select>
+
+        <input type="checkbox" name="gfpdf_settings[single_checkbox]" value="Yes" />
+
+        <input type="checkbox" name="gfpdf_settings[multi_checkbox][]" value="one"   checked />
+        <input type="checkbox" name="gfpdf_settings[multi_checkbox][]" value="two" />
+        <input type="checkbox" name="gfpdf_settings[multi_checkbox][]" value="three" />
+
+        <input type="radio"    name="gfpdf_settings[radio]" value="portrait"  checked />
+        <input type="radio"    name="gfpdf_settings[radio]" value="landscape" />
+      `)
+
+      /* Apply user edits */
+      Object.entries(edited).forEach(([type, value]) => {
+        const name = type === 'select_single' || type === 'select_multiple' || type === 'textarea'
+          ? `gfpdf_settings[${type}]`
+          : `gfpdf_settings[${type}]`
+        $container.find(`[name="${name}"]`).val(value)
+      })
+      $container.find('[name="gfpdf_settings[single_checkbox]"]').prop('checked', true)
+      $container.find('[name="gfpdf_settings[multi_checkbox][]"][value="one"]').prop('checked', false)
+      $container.find('[name="gfpdf_settings[multi_checkbox][]"][value="two"]').prop('checked', true)
+      $container.find('[name="gfpdf_settings[multi_checkbox][]"][value="three"]').prop('checked', true)
+      $container.find('[name="gfpdf_settings[radio]"][value="portrait"]').prop('checked', false)
+      $container.find('[name="gfpdf_settings[radio]"][value="landscape"]').prop('checked', true)
+
+      /* Snapshot */
+      const snapshot = snapshotFormValues($container)
+
+      /* HTML swap — same field names, defaults restored as if a new template was loaded */
+      $container.html(`
+        <input type="text"           name="gfpdf_settings[text]"           value="default text" />
+        <input type="password"       name="gfpdf_settings[password]"       value="default-pass" />
+        <input type="email"          name="gfpdf_settings[email]"          value="default@example.com" />
+        <input type="url"            name="gfpdf_settings[url]"            value="https://example.com/default" />
+        <input type="tel"            name="gfpdf_settings[tel]"            value="+61400000001" />
+        <input type="search"         name="gfpdf_settings[search]"         value="default query" />
+        <input type="number"         name="gfpdf_settings[number]"         value="10" />
+        <input type="color"          name="gfpdf_settings[color]"          value="#000000" />
+        <input type="date"           name="gfpdf_settings[date]"           value="2026-01-01" />
+        <input type="time"           name="gfpdf_settings[time]"           value="09:00" />
+        <input type="month"          name="gfpdf_settings[month]"          value="2026-01" />
+        <input type="week"           name="gfpdf_settings[week]"           value="2026-W01" />
+        <input type="datetime-local" name="gfpdf_settings[datetime-local]" value="2026-01-01T09:00" />
+        <input type="range"          name="gfpdf_settings[range]"          min="0" max="100" value="0" />
+        <input type="hidden"         name="gfpdf_settings[hidden]"         value="default-hidden-token" />
+        <textarea                    name="gfpdf_settings[textarea]">default textarea body</textarea>
+
+        <select name="gfpdf_settings[select_single]">
+          <option value="a" selected>A</option>
+          <option value="b">B</option>
+          <option value="c">C</option>
+        </select>
+
+        <select name="gfpdf_settings[select_multiple]" multiple>
+          <option value="a">A</option>
+          <option value="b" selected>B</option>
+          <option value="c">C</option>
+        </select>
+
+        <input type="checkbox" name="gfpdf_settings[single_checkbox]" value="Yes" />
+
+        <input type="checkbox" name="gfpdf_settings[multi_checkbox][]" value="one"   checked />
+        <input type="checkbox" name="gfpdf_settings[multi_checkbox][]" value="two" />
+        <input type="checkbox" name="gfpdf_settings[multi_checkbox][]" value="three" />
+
+        <input type="radio"    name="gfpdf_settings[radio]" value="portrait"  checked />
+        <input type="radio"    name="gfpdf_settings[radio]" value="landscape" />
+      `)
+
+      /* Sanity check — pre-restore values are the defaults, not the edits */
+      expect($container.find('[name="gfpdf_settings[text]"]').val()).toBe('default text')
+      expect($container.find('[name="gfpdf_settings[single_checkbox]"]').prop('checked')).toBe(false)
+
+      restoreFormValues($container, snapshot)
+
+      /* Every text-like field should now hold the edited value */
+      Object.entries(edited).forEach(([type, value]) => {
+        if (type === 'select_multiple') return /* asserted separately below */
+        expect($container.find(`[name="gfpdf_settings[${type}]"]`).val()).toBe(value)
+      })
+
+      /* select-multiple: snapshot stored an array, restore writes that array back */
+      expect($container.find('[name="gfpdf_settings[select_multiple]"]').val()).toEqual(['a', 'c'])
+
+      /* Checkbox: false → true was captured */
+      expect($container.find('[name="gfpdf_settings[single_checkbox]"]').prop('checked')).toBe(true)
+
+      /* Multi-checkbox group: each value flipped independently */
+      expect($container.find('[name="gfpdf_settings[multi_checkbox][]"][value="one"]').prop('checked')).toBe(false)
+      expect($container.find('[name="gfpdf_settings[multi_checkbox][]"][value="two"]').prop('checked')).toBe(true)
+      expect($container.find('[name="gfpdf_settings[multi_checkbox][]"][value="three"]').prop('checked')).toBe(true)
+
+      /* Radio group: selection moved from portrait → landscape */
+      expect($container.find('[name="gfpdf_settings[radio]"][value="portrait"]').prop('checked')).toBe(false)
+      expect($container.find('[name="gfpdf_settings[radio]"][value="landscape"]').prop('checked')).toBe(true)
+    })
+  })
 })
