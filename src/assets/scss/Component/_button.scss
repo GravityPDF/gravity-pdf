@@ -17,7 +17,7 @@
     display: inline-block;
     vertical-align: top;
 
-    button {
+    button, .button {
       @include button.reset;
       min-height: 32px;
       line-height: 2.30769231;
