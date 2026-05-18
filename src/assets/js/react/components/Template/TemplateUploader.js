@@ -215,7 +215,7 @@ export class TemplateUploader extends Component {
 	/**
 	 * Show any errors to the user when AJAX request fails for any reason
 	 *
-	 * @param { string } error
+	 * @param { Object } error
 	 *
 	 * @since 4.1
 	 */
