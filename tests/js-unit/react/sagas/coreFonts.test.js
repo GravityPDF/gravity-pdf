@@ -40,6 +40,15 @@ describe('Sagas - coreFonts', () => {
         payload: GFPDF.coreFontGithubError
       }))
     })
+
+    test('should treat a non-2xx fetch response as a failure even though fetch did not throw', () => {
+      const failingGen = getFilesFromGitHub()
+      failingGen.next()
+      expect(failingGen.next({ ok: false, body: {} }).value).toEqual(put({
+        type: GET_FILES_FROM_GITHUB_FAILED,
+        payload: GFPDF.coreFontGithubError
+      }))
+    })
   })
 
   describe('watchDownloadFonts()', () => {
@@ -68,7 +77,7 @@ describe('Sagas - coreFonts', () => {
 
     test('should display the success download message', () => {
       expect(gen.next().value).toEqual(call(api.apiPostDownloadFonts, payload))
-      expect(gen.next({ body: 'test' }).value).toEqual(put(addToConsole(payload, 'success', '[object Object]')))
+      expect(gen.next({ ok: true, body: 'test' }).value).toEqual(put(addToConsole(payload, 'success', '[object Object]')))
     })
 
     test('should display the error download message', () => {
@@ -78,6 +87,18 @@ describe('Sagas - coreFonts', () => {
 
     test('should pass to redux store', () => {
       expect(gen.next().value).toEqual(put(currentDownload()))
+    })
+
+    test('should treat a non-2xx fetch response as a failure even though fetch did not throw', () => {
+      const failingGen = getDownloadFonts(channel)
+      const failingPayload = downloadFontsApiCall('test2.ttf')
+
+      failingGen.next()
+      failingGen.next(failingPayload)
+      failingGen.next()
+
+      expect(failingGen.next({ ok: false, body: {} }).value).toEqual(put(addToConsole(failingPayload, 'error', '[object Object]')))
+      expect(failingGen.next().value).toEqual(put(addToRetryList(failingPayload)))
     })
   })
 })
