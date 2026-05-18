@@ -38,10 +38,10 @@ export function insertAfter(fieldset, form, index, firstLoad) {
 
 	if (!fieldset.classList.contains('gform-settings-panel--collapsed')) {
 		// get the original toolbar
-		const actionToolbar = form.querySelector(
+		const originalToolbar = form.querySelector(
 			'.form-action-toolbar:last-of-type'
 		);
-		const actionToolbarClone = actionToolbar.cloneNode(true);
+		const actionToolbarClone = originalToolbar.cloneNode(true);
 
 		actionToolbarClone.classList.add(wrapperClass);
 

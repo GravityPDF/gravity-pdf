@@ -1256,12 +1256,12 @@ class Test_PDF extends WP_UnitTestCase {
 		/* Create our files to test */
 		$files = [
 			'test'      => time(),
-			'test1'     => time() - ( 1 * 3600 ),
-			'test2'     => time() - ( 1.01 * 3600 ),
-			'test3'     => time() - ( 1.1 * 3600 ),
+			'test1'     => time() - ( 11.5 * 3600 ),
+			'test2'     => time() - ( 12.01 * 3600 ),
+			'test3'     => time() - ( 12.5 * 3600 ),
 			'test4'     => time() - ( 25 * 3600 ),
 			'test5'     => time() - ( 15 * 3600 ),
-			'test6'     => time() - ( 0.25 * 3600 ),
+			'test6'     => time() - ( 5 * 3600 ),
 			'.htaccess' => time() - ( 48 * 3600 ),
 			'mpdf/test' => time() - ( 0.5 * 3600 ),
 			'mpdf/test1' => time() - 3601,
