@@ -116,7 +116,7 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test our queue retries once when a function throws an exception (so the callback runs twice total: initial attempt + 1 retry)
+	 * Test our queue retries once on exception.
 	 *
 	 * @since 5.0
 	 */

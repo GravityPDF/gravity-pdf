@@ -17,7 +17,7 @@ const templateSchema = {};
  *
  * @param {number} formId
  * @param {string} template
- * @return {Object} Template Schema data.
+ * @return {Object} Template schema.
  *
  * @since 7.0
  */
@@ -54,7 +54,7 @@ export async function getTemplateSchema(formId, template) {
 
 		return templateSchema[formId][template];
 	} catch (e) {
-		// eslint-disable-next-line no-console -- surface schema fetch errors to the browser console for diagnostics.
+		// eslint-disable-next-line no-console
 		console.error(e);
 	}
 }
@@ -63,7 +63,7 @@ export async function getTemplateSchema(formId, template) {
  * Generate a PDF Preview using the defined PDF settings
  *
  * @param {FormData} formData
- * @return {Blob|null} The rendered PDF preview, or `null` if the request failed.
+ * @return {Blob|null} The rendered PDF, or null on failure.
  *
  * @since 7.0
  */
@@ -88,7 +88,7 @@ export async function getPdfPreview(formData) {
 
 		return await response.blob();
 	} catch (e) {
-		// eslint-disable-next-line no-console -- surface preview render errors to the browser console for diagnostics.
+		// eslint-disable-next-line no-console
 		console.error(e);
 	}
 }

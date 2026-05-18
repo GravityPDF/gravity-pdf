@@ -9,8 +9,8 @@ import $ from 'jquery';
 /**
  * Prepare form inputs for use with Gravity PDF Form Settings API
  *
- * @param {Object} schema Valid Preview API schema for the current template.
- * @return {FormData} Serialised PDF settings ready to POST.
+ * @param {Object} schema
+ * @return {FormData} Serialised PDF settings.
  *
  * @since 7.0
  */
@@ -133,7 +133,7 @@ gform.addFilter('gfpdf_preview_settings', (formData, schema) => {
 /**
  * Turn off conditional logic for PDF preview
  */
-// eslint-disable-next-line no-unused-vars -- gform.addFilter is variadic and supplies (formData, schema) even though `schema` is unused here.
+// eslint-disable-next-line no-unused-vars -- filter signature requires schema arg.
 gform.addFilter('gfpdf_preview_settings', (formData, schema) => {
 	formData.delete('conditional');
 	formData.delete('conditionalLogic');
@@ -145,7 +145,7 @@ gform.addFilter('gfpdf_preview_settings', (formData, schema) => {
  * Unset the Label / Filename if empty for PDF Preview
  * The default value set in the schema will be used instead
  */
-// eslint-disable-next-line no-unused-vars -- gform.addFilter is variadic and supplies (formData, schema) even though `schema` is unused here.
+// eslint-disable-next-line no-unused-vars -- filter signature requires schema arg.
 gform.addFilter('gfpdf_preview_settings', (formData, schema) => {
 	if (formData.get('name') === '') {
 		formData.delete('name');
@@ -162,7 +162,7 @@ gform.addFilter('gfpdf_preview_settings', (formData, schema) => {
  * Trigger the submit events on the form so fields can save their data
  * but cancel the event before the browser actually posts the form data
  *
- * @param {string} formId The id of the form DOM node to fake-submit.
+ * @param {string} formId
  *
  * @since 7.0
  */

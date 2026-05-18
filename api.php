@@ -632,7 +632,7 @@ final class GPDFAPI {
 			return true;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- programmatic API helper: $_FILES is swapped out for a synthetic payload built from the $font argument, not from an unverified form submission.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- synthetic $_FILES built from $font arg, not a form post.
 		$files_backup = $_FILES;
 		$_FILES       = [];
 
@@ -656,7 +656,7 @@ final class GPDFAPI {
 			}
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- programmatic API helper: $_FILES was populated above from the $font argument, not from an unverified form submission.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- $_FILES populated above from $font arg, not a form post.
 		$request->set_file_params( $_FILES );
 		$response = $controller->add_item( $request );
 
