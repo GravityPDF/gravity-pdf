@@ -229,6 +229,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->upgrade_routine();
 		$this->gf_settings();
 		$this->gf_form_settings();
+		$this->rest_api();
 		$this->pdf();
 		$this->shortcodes();
 		$this->mergetags();
@@ -710,6 +711,42 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $view );
+	}
+
+	/**
+	 * Register Rest API
+	 *
+	 * @since 7.0.0
+	 */
+	public function rest_api() {
+		$form_setting_controller = new Rest\Rest_Form_Settings( $this->options, $this->gform, $this->misc, $this->templates );
+		$form_setting_controller->init();
+
+		$pdf_preview_controller = new Rest\Rest_Pdf_Preview( $this->options, $this->gform, $this->misc, $this->templates );
+		$pdf_preview_controller->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $form_setting_controller );
+		$this->singleton->add_class( $pdf_preview_controller );
+
+		/* Log any errors for PDF endpoints */
+		$rest_request_after_callback = function ( $response, $handle, $request ) {
+			if ( is_wp_error( $response ) && strpos( $request->get_route(), '/gravity-pdf' ) === 0 ) {
+				$this->log->error(
+					'The REST API request generated an error: ' . $request->get_route(),
+					[
+						'message' => $response->get_error_message(),
+						'code'    => $response->get_error_code(),
+						'method'  => $request->get_method(),
+						'params'  => $request->get_params(),
+					]
+				);
+			}
+
+			return $response;
+		};
+
+		add_filter( 'rest_request_after_callbacks', $rest_request_after_callback, 10, 3 );
 	}
 
 	/**
