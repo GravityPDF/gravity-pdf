@@ -148,7 +148,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			throw new GravityPdfShortcodePdfInactiveException();
 		}
 
-		if ( isset( $settings['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $settings['conditionalLogic'], $entry ) ) {
+		if ( ! $this->misc->conditional_logic_passes( $settings, $entry ) ) {
 			throw new GravityPdfShortcodePdfConditionalLogicFailedException();
 		}
 
