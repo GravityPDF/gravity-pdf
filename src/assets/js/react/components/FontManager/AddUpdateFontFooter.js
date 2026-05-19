@@ -11,6 +11,7 @@ import {
 	deleteFont as deleteFontAction,
 } from '../../actions/fontManager';
 import TemplateTooltip from './TemplateTooltip';
+import { getTabLocation } from '../../utilities/FontManager/getTabLocation';
 
 /**
  * @package			Gravity PDF
@@ -166,11 +167,8 @@ export class AddUpdateFontFooter extends Component {
 		);
 		const selectedBoxStyle =
 			id !== '' && id === selectedFont ? ' checked' : ' uncheck';
-		/* The select-default-font tick has no meaning on the Tools tab (no parent font dropdown) */
-		const tabLocation = window.location.search.substr(
-			window.location.search.lastIndexOf('=') + 1
-		);
-		const hideSelectFontButton = tabLocation === 'tools';
+		/* No parent font dropdown on the Tools tab, so the tick has no target */
+		const hideSelectFontButton = getTabLocation() === 'tools';
 		/* Display error message for uploading invalid font file */
 		const displayInvalidFileErrorMessage =
 			errorAddFont && errorFontValidation;

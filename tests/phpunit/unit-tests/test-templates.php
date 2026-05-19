@@ -228,19 +228,12 @@ class Test_Templates extends WP_UnitTestCase {
 	public function test_unzip_and_verify_templates() {
 		global $gfpdf;
 
-		/* Use a unique archive name so leftover state from earlier (or interrupted)
-		   runs cannot pollute the path the unzip extracts into */
+		/* uniqid() prevents collisions with state leaked from earlier runs */
 		$test_file = $gfpdf->data->template_tmp_location . 'test-archive-' . uniqid() . '.zip';
 		$test_dir  = $this->model->get_unzipped_dir_name( $test_file );
 
-		/* Make sure no stale state at $test_dir is present and that the template
-		   transient cache cannot return a cached "Legacy" group for the unzipped
-		   files (any prior call to get_template_info_by_path() with the same path
-		   would otherwise short-circuit the v4 header check) */
-		if ( file_exists( $test_file ) ) {
-			unlink( $test_file );
-		}
-		$gfpdf->misc->rmdir( $test_dir );
+		/* A cached "Legacy" group for the unzipped path would short-circuit the
+		   v4 header check and falsely throw "not a valid PDF Template" */
 		$gfpdf->templates->flush_template_transient_cache();
 
 		try {
@@ -303,8 +296,6 @@ class Test_Templates extends WP_UnitTestCase {
 
 			$this->assertStringContainsString( 'contains invalid characters.', $e->getMessage() );
 		} finally {
-			/* Cleanup runs even if an assertion fails mid-test so we don't leak
-			   filesystem state into subsequent tests in the suite */
 			if ( file_exists( $test_file ) ) {
 				unlink( $test_file );
 			}
