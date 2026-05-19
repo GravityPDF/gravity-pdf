@@ -2,6 +2,12 @@
 
 ## Gravity PDF
 
+### 6.14.3
+* 🐞Bug: Preserve the selected template when setting up a new PDF on a form
+* 🐞Bug: Reset Gravity Wiz Nested Form field IDs after each group in PDFs
+* 🧹 Housekeeping: Better screen-reader support for admin pages
+* 🧹 Housekeeping: WordPress 7.0 Compatibility
+
 ### 6.14.2
 * 🐞Bug: Fix PHP warning caused by the GFCommon::get_lead_field_display() API change in Gravity Forms 2.9.29
 * 🐞Bug: Fix merge tag rendering issue when switching between PDF templates
