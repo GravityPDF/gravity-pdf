@@ -1,9 +1,7 @@
-import $ from 'jquery';
-
 /**
  * Initialises AJAX-loaded wp_editor TinyMCE containers for use
- * @param { Array<Object> } editors  The DOM element IDs to parse
- * @param { Object }        settings The TinyMCE settings to use
+ * @param { Array<string> }          editors  The DOM element IDs to parse
+ * @param { Record<string, unknown> } settings The TinyMCE settings to use
  *
  * @since  4.0
  */
@@ -41,7 +39,7 @@ export function loadTinyMCEEditor(editors, settings) {
 	}
 
 	/* Load our new editors */
-	$.each(editors, function (index, fullId) {
+	editors.forEach(function (fullId) {
 		/* Setup out selector */
 		settings.selector = '#' + fullId;
 
@@ -57,14 +55,13 @@ export function loadTinyMCEEditor(editors, settings) {
 			QTags._buttonsInit();
 
 			/* remember last tab selected */
-			if (typeof switchEditors.switchto === 'function') {
-				switchEditors.switchto(
-					jQuery('#wp-' + fullId + '-wrap').find(
-						'.wp-switch-editor.switch-' +
-							(getUserSetting('editor') === 'html'
-								? 'html'
-								: 'tmce')
-					)[0]
+			if (
+				typeof switchEditors !== 'undefined' &&
+				typeof switchEditors.go === 'function'
+			) {
+				switchEditors.go(
+					fullId,
+					getUserSetting('editor') === 'html' ? 'html' : 'tmce'
 				);
 			}
 		}
