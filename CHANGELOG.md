@@ -8,7 +8,7 @@
 * 🧹 Housekeeping: Remove obsolete Gravity Forms cache workaround
 * 🐞 Bug: Honor PDF Conditional Logic toggle setting, so disabling it in the UI skips stale conditional rules
 * 🐞 Bug: Fix Rich Text Editor rendering error when switching PDF templates
-* 🐞 Bug: Preserve unsaved edits to the Template fields if switching to another PDF templates with the same fields (eg. Core / Invoice / Certificate)
+* 🐞 Bug: Preserve unsaved edits to the Template fields if switching to a PDF template with the same fields (eg. Core / Invoice / Certificate)
 * 🐞 Bug: Preserve the selected template when adding a new PDF
 * 🐞 Bug: Fix Gravity Forms 2.6+ version detection on PDF form-settings pages
 * 🐞 Bug: Fix regression in the Template Manager when an invalid .zip is uploaded
