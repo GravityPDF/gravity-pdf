@@ -7,6 +7,12 @@ import { doMergetags } from './dynamicTemplateFields/doMergetags';
 import { toggleFontAppearance } from '../pdf/toggleFontAppearance';
 import { insertAfter } from '../../../react/utilities/PdfSettings/actionToolbar';
 import { handleMergeTags } from './handleMergeTags';
+import {
+	snapshotFormValues,
+	restoreFormValues,
+	TEMPLATE_SECTION_SELECTOR,
+	TEMPLATE_DROPDOWN_SELECTOR,
+} from './dynamicTemplateFields/formValuesSnapshot';
 
 /**
  * PDF Templates can assign their own custom settings which can enhance a template
@@ -16,13 +22,17 @@ import { handleMergeTags } from './handleMergeTags';
  */
 export function setupDynamicTemplateFields() {
 	/* Add change listener to our template */
-	$('#gfpdf_settings\\[template\\]')
+	$(TEMPLATE_DROPDOWN_SELECTOR)
 		.off('change')
 		.on('change', function () {
 			/* Add spinner */
 			const $spinner = spinner('gfpdf-spinner-template');
 
 			$(this).next().after($spinner);
+
+			const formValuesSnapshot = snapshotFormValues(
+				$(TEMPLATE_SECTION_SELECTOR)
+			);
 
 			const data = {
 				action: 'gfpdf_get_template_fields',
@@ -62,20 +72,24 @@ export function setupDynamicTemplateFields() {
 					/* Add action toolbar after template section */
 					if (!actionToolbar) {
 						insertAfter(
-							$(
-								'#gfpdf-fieldset-gfpdf_form_settings_template'
-							)[0],
+							$(TEMPLATE_SECTION_SELECTOR)[0],
 							$('#gfpdf_pdf_form')[0],
 							'2',
 							true
 						);
 					}
 
+					const $templateSection = $(
+						TEMPLATE_SECTION_SELECTOR
+					).show();
+
 					/* Replace the custom appearance with the AJAX response fields */
-					$('#gfpdf-fieldset-gfpdf_form_settings_template')
-						.show()
+					$templateSection
 						.find('.gform-settings-panel__content')
 						.html(response.fields);
+
+					/* Restore before re-init so TinyMCE/wpColorPicker mount over restored values */
+					restoreFormValues($templateSection, formValuesSnapshot);
 
 					/* Load our new editors */
 					loadTinyMCEEditor(
@@ -86,9 +100,7 @@ export function setupDynamicTemplateFields() {
 					/* reinitialise new dom elements */
 					initialiseCommonElements.runElements();
 					doMergetags();
-					handleMergeTags(
-						'#gfpdf-fieldset-gfpdf_form_settings_template'
-					);
+					handleMergeTags(TEMPLATE_SECTION_SELECTOR);
 					gform_initialize_tooltips();
 				} else {
 					/* Remove floating action toolbar */
@@ -97,7 +109,7 @@ export function setupDynamicTemplateFields() {
 					}
 
 					/* Hide our template nav item as there are no fields and clear our the HTML */
-					$('#gfpdf-fieldset-gfpdf_form_settings_template')
+					$(TEMPLATE_SECTION_SELECTOR)
 						.hide()
 						.find('.gform-settings-panel__content')
 						.html('');
