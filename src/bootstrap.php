@@ -3,8 +3,7 @@
 namespace GFPDF;
 
 use GFCommon;
-use GFPDF\Controller;
-use GFPDF\Helper;
+use GFForms;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
@@ -12,10 +11,10 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Singleton;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF\Model;
-use GFPDF\View;
 use GFPDF_Core;
 use GFPDF_Major_Compatibility_Checks;
+use GPDFAPI;
+use Gravity_Forms\Gravity_Forms\Async\GF_Background_Process;
 use Psr\Log\LoggerInterface;
 
 /*
@@ -209,13 +208,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		);
 
 		/* Load Background Queue classes */
-		if ( version_compare( \GFForms::$version, '2.9.7.2', '>=' ) ) {
+		if ( version_compare( GFForms::$version, '2.9.7.2', '>=' ) ) {
 			if ( ! class_exists( '\Gravity_Forms\Gravity_Forms\Async\GF_Background_Process' ) ) {
 				require_once GFCommon::get_base_path() . '/includes/async/class-gf-background-process.php';
 			}
 
 			if ( ! class_exists( 'GF_Background_Process' ) ) {
-				class_alias( \Gravity_Forms\Gravity_Forms\Async\GF_Background_Process::class, 'GF_Background_Process', false );
+				class_alias( GF_Background_Process::class, 'GF_Background_Process', false );
 			}
 		} elseif ( ! class_exists( 'WP_Async_Request' ) ) {
 				require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
@@ -1006,7 +1005,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		 */
 		$gfpdf_settings_sanitize = function ( $new_value, $key ) use ( $queue ) {
 			if ( $key === 'background_processing' ) {
-				$current_value = \GPDFAPI::get_plugin_option( 'background_processing' );
+				$current_value = GPDFAPI::get_plugin_option( 'background_processing' );
 				if ( $current_value !== $new_value ) {
 					$queue->clear_queue();
 				}
