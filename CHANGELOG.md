@@ -4,15 +4,14 @@
 
 ### 6.14.3
 * 🧹 Housekeeping: WordPress 7.0 Compatibility
-* 🧹 Housekeeping: Remove obsolete Gravity Forms cache workaround
 * 🧹 Housekeeping: Better screen-reader support for admin pages
-* 🐞Bug: Preserve the selected template when setting up a new PDF on a form
-* 🐞Bug: Reset Gravity Wiz Nested Form field IDs after each group in PDFs
-* 🐞Bug: Preserve unsaved edits to the Template fields when switching PDF templates
-* 🐞Bug: Fix JavaScript error switching PDF templates when the editor was set to Text mode
-* 🐞Bug: Fix TinyMCE editor reload when switching PDF templates
-* 🐞Bug: Fix Gravity Forms 2.6+ version detection on PDF form-settings pages
+* 🧹 Housekeeping: Remove obsolete Gravity Forms cache workaround
 * 🐞Bug: Honor the PDF Conditional Logic toggle so disabling it in the UI skips stale conditional rules
+* 🐞Bug: Fix JavaScript error switching PDF templates when the editor was set to Text mode
+* 🐞Bug: Preserve unsaved edits to the Template fields when switching PDF templates
+* 🐞Bug: Preserve the selected template when setting up a new PDF on a form
+* 🐞Bug: Fix Gravity Forms 2.6+ version detection on PDF form-settings pages
+* 🐞Bug: Reset Gravity Wiz Nested Form field IDs after each group in PDFs
 
 ### 6.14.2
 * 🐞Bug: Fix PHP warning caused by the GFCommon::get_lead_field_display() API change in Gravity Forms 2.9.29
