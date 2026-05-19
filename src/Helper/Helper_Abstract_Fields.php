@@ -4,8 +4,6 @@ namespace GFPDF\Helper;
 
 use Exception;
 use GF_Field;
-use GFCache;
-use GFCommon;
 use GFFormsModel;
 use GFPDF\Statics\Kses;
 
@@ -231,20 +229,6 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 4.0
 	 */
 	final public function get_value() {
-
-		/**
-		 * Gravity Forms' GFCache function was thrashing the database, causing double the amount of time for the field_value() method to run.
-		 * The reason is that the cache was checking against a field value stored in a transient every time `GFFormsModel::get_lead_field_value()` is called.
-		 * We're forcing the cache to skip the extra database lookup and just get the value.
-		 *
-		 * @hack
-		 * @since  4.0
-		 * @credit Zack Katz (Gravity View author)
-		 * @fixed  Gravity Forms 1.9.13.25
-		 */
-		if ( class_exists( 'GFCache' ) && version_compare( GFCommon::$version, '1.9.13.25', '<' ) ) {
-			GFCache::set( 'GFFormsModel::get_lead_field_value_' . $this->entry['id'] . '_' . $this->field->id, false, false, 0 );
-		}
 
 		/*
 		 * Get the Gravity Forms field value
