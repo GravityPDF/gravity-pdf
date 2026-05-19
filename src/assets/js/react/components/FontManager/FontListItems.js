@@ -9,6 +9,7 @@ import FontListIcon from './FontListIcon'
 import Spinner from '../Spinner'
 /* Utilities */
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont'
+import { getTabLocation } from '../../utilities/FontManager/getTabLocation'
 
 /**
  * @package     Gravity PDF
@@ -118,7 +119,7 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   handleDisableSelectFields = () => {
-    const tabLocation = window.location.search.substr(window.location.search.lastIndexOf('=') + 1)
+    const tabLocation = getTabLocation()
 
     if (tabLocation === 'tools') {
       return this.setState({ disableSelectFontName: true })

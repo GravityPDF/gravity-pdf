@@ -26,8 +26,6 @@
           display: block;
         }
 
-        /* Without border-box the 24px horizontal padding overflows the
-           20% / 60% / 20% positioning and shifts the hover label off-centre */
         .more-details {
           box-sizing: border-box;
         }

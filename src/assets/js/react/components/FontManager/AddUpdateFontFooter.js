@@ -8,6 +8,7 @@ import Spinner from '../Spinner'
 /* Redux actions */
 import { selectFont, deleteFont } from '../../actions/fontManager'
 import TemplateTooltip from './TemplateTooltip'
+import { getTabLocation } from '../../utilities/FontManager/getTabLocation'
 
 /**
  * @package     Gravity PDF
@@ -150,9 +151,8 @@ export class AddUpdateFontFooter extends Component {
     const errorFontValidation = (errorAddFont && error.fontValidationError) && error.fontValidationError
     const fontFileMissing = sprintf(GFPDF.fontFileMissing, '<strong>', '</strong>')
     const selectedBoxStyle = (id !== '') && (id === selectedFont) ? ' checked' : ' uncheck'
-    /* The select-default-font tick has no meaning on the Tools tab (no parent font dropdown) */
-    const tabLocation = window.location.search.substr(window.location.search.lastIndexOf('=') + 1)
-    const hideSelectFontButton = tabLocation === 'tools'
+    /* No parent font dropdown on the Tools tab, so the tick has no target */
+    const hideSelectFontButton = getTabLocation() === 'tools'
     /* Display error message for uploading invalid font file */
     const displayInvalidFileErrorMessage = errorAddFont && errorFontValidation
     /* Display generic error messages including missing font file */
