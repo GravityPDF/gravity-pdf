@@ -48,7 +48,7 @@ export function setupDynamicTemplateFields () {
           if (editor !== null) {
             /* Bug Fix for Firefox - http://www.tinymce.com/develop/bugtracker_view.php?id=3152 */
             try {
-              tinyMCE.remove(editor)
+              tinyMCE.remove('#' + value)
             } catch (e) {
               // empty
             }
@@ -67,7 +67,10 @@ export function setupDynamicTemplateFields () {
           .html(response.fields)
 
         /* Load our new editors */
-        loadTinyMCEEditor(response.editors, response.editor_init)
+        loadTinyMCEEditor(
+          response.editors ?? [],
+          response.editor_init ?? {}
+        )
 
         /* reinitialise new dom elements */
         initialiseCommonElements.runElements()
