@@ -17,11 +17,11 @@
 * 🐞 Bug: Reset Gravity Wiz Nested Form field IDs after each group in PDFs
 
 ### 6.14.2
-* 🐞Bug: Fix PHP warning caused by the GFCommon::get_lead_field_display() API change in Gravity Forms 2.9.29
-* 🐞Bug: Fix merge tag rendering issue when switching between PDF templates
-* 🐞Bug: Fix Font Manager to Font select field syncing issue
-* 🐞Bug: Fix edge-case issue with the URL signing feature and improve verification/validation checks 
-* 🐞Bug: Rename Chinese language files so it is correctly used when the site language is set to the zh_CN locale.
+* 🐞 Bug: Fix PHP warning caused by the GFCommon::get_lead_field_display() API change in Gravity Forms 2.9.29
+* 🐞 Bug: Fix merge tag rendering issue when switching between PDF templates
+* 🐞 Bug: Fix Font Manager to Font select field syncing issue
+* 🐞 Bug: Fix edge-case issue with the URL signing feature and improve verification/validation checks 
+* 🐞 Bug: Rename Chinese language files so it is correctly used when the site language is set to the zh_CN locale.
 * 🧹 Housekeeping: Improve template caching and performance
 * 🧹 Housekeeping: Update PHP and Javascript dependencies
 * 🧹 Housekeeping: Disable asset caching when `SCRIPT_DEBUG` constant enabled
@@ -31,24 +31,24 @@
 ### 6.14.1
 * 🧹 Housekeeping: Add `gfpdf-{$type}` CSS class to the HTML mark-up when a field uses a different input type 
 * 🧹 Housekeeping: Use the field type (not input type) in the `gfpdf_pdf_field_content_{$type}` filter
-* 🐞Bug: Fix PHP error if another plugin lazy loads the PSR/Log v1 library 
+* 🐞 Bug: Fix PHP error if another plugin lazy loads the PSR/Log v1 library 
 
 ### 6.14.0
 * 🎉 Feature: Rotate Gravity PDF log files when Gravity Forms logging is enabled. This prevents the log file getting to large.
 * 🎉 Feature: Add support for using v1, v2, and v3 of the PSR/Log Composer library with Gravity PDF
-* 🐞Bug: Fix PHP error if a third-party plugin loads PSR/Log v2 or v3
+* 🐞 Bug: Fix PHP error if a third-party plugin loads PSR/Log v2 or v3
 
 ### 6.13.5
-* 🐞Bug: Ensure background queue uses correct entry data when resending notifications
-* 🐞Bug: Prevent plugins corrupting PDF data when viewing/downloading (via output buffer)
+* 🐞 Bug: Ensure background queue uses correct entry data when resending notifications
+* 🐞 Bug: Prevent plugins corrupting PDF data when viewing/downloading (via output buffer)
 
 ### 6.13.4
-* 🐞Bug: Resolve PDF View/Download issue if both Event Espresso and LifterLMS plugin are installed 
+* 🐞 Bug: Resolve PDF View/Download issue if both Event Espresso and LifterLMS plugin are installed 
 
 ### 6.13.3
 * 🔒 Security: Remove the mPDF and Gravity PDF version numbers in the PDF metadata
-* 🐞Bug: Resolve PHP error in 6.13.2 upgrade routine if the temporary PDF directory has been incorrectly set to a shared system folder
-* 🐞Bug: Resolve PHP error if the `page` or `subview` admin URL parameters are arrays
+* 🐞 Bug: Resolve PHP error in 6.13.2 upgrade routine if the temporary PDF directory has been incorrectly set to a shared system folder
+* 🐞 Bug: Resolve PHP error if the `page` or `subview` admin URL parameters are arrays
 
 ### 6.13.2
 * 🐞 Bug: Fix plugin build issue preventing the mPDF cache filesystem fix (6.13.0) from working
