@@ -209,7 +209,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Load Background Queue classes */
 		if ( version_compare( GFForms::$version, '2.9.7.2', '>=' ) ) {
-			if ( ! class_exists( '\Gravity_Forms\Gravity_Forms\Async\GF_Background_Process' ) ) {
+			if ( ! class_exists( GF_Background_Process::class ) ) {
 				require_once GFCommon::get_base_path() . '/includes/async/class-gf-background-process.php';
 			}
 
