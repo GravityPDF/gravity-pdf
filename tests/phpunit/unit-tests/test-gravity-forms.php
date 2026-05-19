@@ -3,6 +3,7 @@
 namespace GFPDF\Tests;
 
 use GFCommon;
+use GFForms;
 use GFFormsModel;
 use PDF_Common;
 use RGFormsModel;
@@ -492,13 +493,13 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that GFCommon::$version will produce
+	 * Test that \GFForms::$version will produce
 	 * the expected result.
 	 *
 	 * @since 3.6
 	 */
 	public function test_gf_version() {
-		$version = GFCommon::$version;
+		$version = GFForms::$version;
 
 		/* which the version number is a string before we try to match it */
 		$this->assertEquals( true, is_string( $version ) );

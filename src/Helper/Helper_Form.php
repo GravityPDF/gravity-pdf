@@ -4,6 +4,7 @@ namespace GFPDF\Helper;
 
 use GFAPI;
 use GFCommon;
+use GFForms;
 use GFFormsModel;
 use WP_Error;
 
@@ -33,7 +34,7 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * @since 4.0
 	 */
 	public function get_version() {
-		return GFCommon::$version;
+		return GFForms::$version;
 	}
 
 	/**

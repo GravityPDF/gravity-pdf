@@ -2,8 +2,8 @@
 
 namespace GFPDF\Model;
 
+use GFForms;
 use GFFormsModel;
-use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
@@ -225,7 +225,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* add custom classes to form */
 		$form_classes = '';
-		if ( version_compare( '2.6-rc-1', GFCommon::$version, '>=' ) ) {
+		if ( version_compare( GFForms::$version, '2.6.0', '>=' ) ) {
 			$form_classes .= 'gfpdf-gf-2-6';
 		}
 
