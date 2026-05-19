@@ -5,6 +5,11 @@
 ### 6.14.3
 * 🐞Bug: Preserve the selected template when setting up a new PDF on a form
 * 🐞Bug: Reset Gravity Wiz Nested Form field IDs after each group in PDFs
+* 🐞Bug: Preserve unsaved edits to the Template fields when switching PDF templates
+* 🐞Bug: Fix JavaScript error switching PDF templates when the editor was set to Text mode
+* 🐞Bug: Fix TinyMCE editor reload when switching PDF templates
+* 🐞Bug: Fix Gravity Forms 2.6+ version detection on PDF form-settings pages
+* 🧹 Housekeeping: Remove obsolete Gravity Forms cache workaround
 * 🧹 Housekeeping: Better screen-reader support for admin pages
 * 🧹 Housekeeping: WordPress 7.0 Compatibility
 
