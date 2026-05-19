@@ -182,7 +182,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 				/* Strip tag if config not valid, it isn't active or conditional logic is not met */
 				if ( is_wp_error( $config )
 					 || $config['active'] !== true
-					 || ( isset( $config['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $config['conditionalLogic'], $entry ) )
+					 || ! $this->misc->conditional_logic_passes( $config, $entry )
 				) {
 					$error = 'Conditional logic did not pass';
 					if ( is_wp_error( $config ) ) {

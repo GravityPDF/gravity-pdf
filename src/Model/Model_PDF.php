@@ -448,7 +448,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_conditional( $action, $entry, $settings ) {
 
 		if ( ! is_wp_error( $action ) ) {
-			if ( isset( $settings['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $settings['conditionalLogic'], $entry ) ) {
+			if ( ! $this->misc->conditional_logic_passes( $settings, $entry ) ) {
 				return new WP_Error( 'conditional_logic', esc_html__( 'PDF conditional logic requirements have not been met.', 'gravity-pdf' ) );
 			}
 		}
@@ -826,7 +826,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
 		foreach ( $pdfs as $pdf ) {
-			if ( $pdf['active'] && ( empty( $pdf['conditionalLogic'] ) || $this->misc->evaluate_conditional_logic( $pdf['conditionalLogic'], $entry ) ) ) {
+			if ( $pdf['active'] && $this->misc->conditional_logic_passes( $pdf, $entry ) ) {
 				$filtered[ $pdf['id'] ] = $pdf;
 			}
 		}
