@@ -7,6 +7,10 @@ import { doMergetags } from './dynamicTemplateFields/doMergetags'
 import { toggleFontAppearance } from '../pdf/toggleFontAppearance'
 import { insertAfter } from '../../../react/utilities/PdfSettings/addEditButton'
 import { handleMergeTags } from './handleMergeTags'
+import { snapshotFormValues, restoreFormValues } from './dynamicTemplateFields/formValuesSnapshot'
+
+const TEMPLATE_SECTION_SELECTOR = '#gfpdf-fieldset-gfpdf_form_settings_template'
+const TEMPLATE_DROPDOWN_SELECTOR = '#gfpdf_settings\\[template\\]'
 
 /**
  * PDF Templates can assign their own custom settings which can enhance a template
@@ -16,11 +20,14 @@ import { handleMergeTags } from './handleMergeTags'
  */
 export function setupDynamicTemplateFields () {
   /* Add change listener to our template */
-  $('#gfpdf_settings\\[template\\]').off('change').on('change', function () {
+  $(TEMPLATE_DROPDOWN_SELECTOR).off('change').on('change', function () {
     /* Add spinner */
     const $spinner = spinner('gfpdf-spinner-template')
 
     $(this).next().after($spinner)
+
+    /* Snapshot any unsaved edits so they can be re-applied to matching fields in the new template */
+    const formValuesSnapshot = snapshotFormValues($(TEMPLATE_SECTION_SELECTOR))
 
     const data = {
       action: 'gfpdf_get_template_fields',
@@ -57,14 +64,16 @@ export function setupDynamicTemplateFields () {
 
         /* Add floating Add/Edit PDF button */
         if (!addEditButton) {
-          insertAfter($('#gfpdf-fieldset-gfpdf_form_settings_template')[0], $('#gfpdf_pdf_form')[0], '2')
+          insertAfter($(TEMPLATE_SECTION_SELECTOR)[0], $('#gfpdf_pdf_form')[0], '2')
         }
 
+        const $templateSection = $(TEMPLATE_SECTION_SELECTOR).show()
+
         /* Replace the custom appearance with the AJAX response fields */
-        $('#gfpdf-fieldset-gfpdf_form_settings_template')
-          .show()
-          .find('.gform-settings-panel__content')
-          .html(response.fields)
+        $templateSection.find('.gform-settings-panel__content').html(response.fields)
+
+        /* Re-apply snapshotted values before re-init so TinyMCE & wpColorPicker mount on top of the restored values */
+        restoreFormValues($templateSection, formValuesSnapshot)
 
         /* Load our new editors */
         loadTinyMCEEditor(
@@ -75,7 +84,7 @@ export function setupDynamicTemplateFields () {
         /* reinitialise new dom elements */
         initialiseCommonElements.runElements()
         doMergetags()
-        handleMergeTags('#gfpdf-fieldset-gfpdf_form_settings_template')
+        handleMergeTags(TEMPLATE_SECTION_SELECTOR)
         gform_initialize_tooltips()
       } else {
         /* Remove floating Add/Edit PDF button */
@@ -84,7 +93,7 @@ export function setupDynamicTemplateFields () {
         }
 
         /* Hide our template nav item as there are no fields and clear our the HTML */
-        $('#gfpdf-fieldset-gfpdf_form_settings_template')
+        $(TEMPLATE_SECTION_SELECTOR)
           .hide()
           .find('.gform-settings-panel__content')
           .html('')
