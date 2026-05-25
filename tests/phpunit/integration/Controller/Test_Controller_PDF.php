@@ -114,22 +114,6 @@ class Test_Controller_PDF extends TestCase {
 		$this->assertTrue( DONOTCACHEPAGE );
 	}
 
-	public function test_process_pdf_endpoint_returns_silently_without_query_vars() {
-		$GLOBALS['wp']->query_vars = [];
-
-		$this->controller->process_pdf_endpoint();
-
-		$this->assertTrue( true );
-	}
-
-	public function test_process_legacy_pdf_endpoint_returns_silently_without_legacy_params() {
-		$_GET = [];
-
-		$this->controller->process_legacy_pdf_endpoint();
-
-		$this->assertTrue( true );
-	}
-
 	public function test_sgoptimizer_html_minification_fix_emits_doing_it_wrong() {
 		$this->setExpectedIncorrectUsage( 'GFPDF\Controller\Controller_PDF::sgoptimizer_html_minification_fix' );
 

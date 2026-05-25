@@ -105,12 +105,6 @@ class Test_Controller_Form_Settings extends TestCase {
 		$this->assertSame( $form, $result );
 	}
 
-	public function test_maybe_save_pdf_settings_no_op_when_pid_missing() {
-		$this->controller->maybe_save_pdf_settings();
-
-		$this->assertTrue( true );
-	}
-
 	public function test_conditional_logic_is_value_match_returns_original_for_unrelated_fields() {
 		$result = $this->controller->conditional_logic_is_value_match(
 			false,

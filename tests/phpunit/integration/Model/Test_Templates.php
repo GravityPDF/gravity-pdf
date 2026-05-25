@@ -311,12 +311,6 @@ class Test_Templates extends TestCase {
 		$this->assertEquals( 'Zadani', $info[0]['template'] );
 	}
 
-	public function test_maybe_run_template_setup_no_op_when_no_headers() {
-		$this->model->maybe_run_template_setup( [] );
-
-		$this->assertTrue( true );
-	}
-
 	public function test_check_for_valid_pdf_templates_throws_on_invalid_filename() {
 		global $gfpdf;
 

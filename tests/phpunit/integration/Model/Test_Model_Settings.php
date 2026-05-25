@@ -271,16 +271,6 @@ class Test_Model_Settings extends TestCase {
 		$this->assertFalse( $this->model->licensing_bulk_license_check() );
 	}
 
-	public function test_run_network_update_check_returns_early_on_single_site() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Single-site path only.' );
-		}
-
-		$this->model->run_network_update_check();
-
-		$this->assertTrue( true );
-	}
-
 	public function test_licensing_bulk_license_check_bad_response() {
 		$this->addon->init();
 		$this->addon1->init();

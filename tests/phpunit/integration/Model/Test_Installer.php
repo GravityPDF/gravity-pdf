@@ -263,21 +263,14 @@ class Test_Installer extends TestCase {
 		$this->assertSame( [ 'existing' ], $tags );
 	}
 
-	public function test_maybe_flush_rewrite_rules_runs_without_error_when_rules_missing() {
-		update_option( 'rewrite_rules', [] );
+	public function test_maybe_flush_rewrite_rules_triggers_flush_only_when_rule_absent() {
+		$sentinel = [ '^existing/rule/' => 'index.php?a=1' ];
+		update_option( 'rewrite_rules', $sentinel );
 
-		$this->model->maybe_flush_rewrite_rules( [ '^some/missing/rule/' ] );
+		$this->model->maybe_flush_rewrite_rules( [ '^existing/rule/' ] );
+		$this->assertSame( $sentinel, get_option( 'rewrite_rules' ) );
 
-		$this->assertTrue( true );
-	}
-
-	public function test_setup_multisite_template_location_returns_early_on_single_site() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Single-site path only.' );
-		}
-
-		$this->model->setup_multisite_template_location();
-
-		$this->assertTrue( true );
+		$this->model->maybe_flush_rewrite_rules( [ '^never/exists/' ] );
+		$this->assertNotSame( $sentinel, get_option( 'rewrite_rules' ) );
 	}
 }

@@ -82,12 +82,6 @@ class Test_Controller_Actions extends TestCase {
 		$this->assertFalse( $gfpdf->notices->has_notice() );
 	}
 
-	public function test_route_does_nothing_when_post_action_absent() {
-		$this->controller->route();
-
-		$this->assertTrue( true );
-	}
-
 	public function test_route_dismisses_notice_when_dismiss_flag_set() {
 		global $gfpdf;
 

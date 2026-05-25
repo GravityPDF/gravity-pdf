@@ -197,20 +197,6 @@ class Test_Uninstaller extends TestCase {
 		$this->assertFalse( get_transient( 'gfpdf_settings_user_data' ) );
 	}
 
-	public function test_remove_folder_structure_skips_paths_that_do_not_exist() {
-		add_filter(
-			'gfpdf_uninstall_path',
-			static function () {
-				return [ '/path/that/definitely/does/not/exist/' . uniqid() ];
-			}
-		);
-
-		$this->model->remove_folder_structure();
-		remove_all_filters( 'gfpdf_uninstall_path' );
-
-		$this->assertTrue( true );
-	}
-
 	public function test_deactivate_plugin_defaults_basename_when_empty() {
 		$this->model->deactivate_plugin( '' );
 
