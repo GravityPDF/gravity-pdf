@@ -60,9 +60,9 @@ class Test_Controller_Install extends TestCase {
 		wp_set_current_user( 0 );
 		set_current_screen( 'edit.php' );
 
-		// No capability, so the method exits early without touching options.
 		$before = get_option( 'gfpdf_current_version' );
 		$this->controller->check_install_status();
+
 		$this->assertSame( $before, get_option( 'gfpdf_current_version' ) );
 	}
 

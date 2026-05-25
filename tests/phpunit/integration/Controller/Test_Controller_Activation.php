@@ -8,9 +8,6 @@ use Controller_Activation;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
- * Controller_Activation is the only top-level (no-namespace) class in the
- * plugin because the deactivation hook fires before namespacing is loaded.
- *
  * @package GFPDF\Controller
  *
  * @group   controller

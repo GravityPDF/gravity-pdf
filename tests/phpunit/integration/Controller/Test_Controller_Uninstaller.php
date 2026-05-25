@@ -77,11 +77,9 @@ class Test_Controller_Uninstaller extends TestCase {
 
 	public function test_init_skips_registration_outside_uninstall_subview() {
 		$_GET = [ 'page' => 'gf_settings', 'subview' => 'something-else' ];
-
 		$this->controller->init();
-
 		$_GET = [];
 
-		$this->assertTrue( true, 'init() returns silently when not on uninstall subview' );
+		$this->assertTrue( true );
 	}
 }

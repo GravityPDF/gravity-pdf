@@ -85,7 +85,7 @@ class Test_Controller_Actions extends TestCase {
 	public function test_route_does_nothing_when_post_action_absent() {
 		$this->controller->route();
 
-		$this->assertTrue( true, 'route() returns silently when gfpdf_action POST is unset' );
+		$this->assertTrue( true );
 	}
 
 	public function test_route_dismisses_notice_when_dismiss_flag_set() {

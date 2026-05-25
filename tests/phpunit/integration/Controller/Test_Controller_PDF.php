@@ -108,8 +108,6 @@ class Test_Controller_PDF extends TestCase {
 	}
 
 	public function test_prevent_index_defines_donotcachepage_constant() {
-		// Cannot un-define constants; this asserts only that the call doesn't throw
-		// and that the constant is defined after invocation (idempotent).
 		$this->controller->prevent_index();
 
 		$this->assertTrue( defined( 'DONOTCACHEPAGE' ) );
@@ -121,7 +119,7 @@ class Test_Controller_PDF extends TestCase {
 
 		$this->controller->process_pdf_endpoint();
 
-		$this->assertTrue( true, 'returns silently when gpdf/pid/lid query vars are absent' );
+		$this->assertTrue( true );
 	}
 
 	public function test_process_legacy_pdf_endpoint_returns_silently_without_legacy_params() {
@@ -129,7 +127,7 @@ class Test_Controller_PDF extends TestCase {
 
 		$this->controller->process_legacy_pdf_endpoint();
 
-		$this->assertTrue( true, 'returns silently when gf_pdf/fid/lid/template GET params are absent' );
+		$this->assertTrue( true );
 	}
 
 	public function test_sgoptimizer_html_minification_fix_emits_doing_it_wrong() {
