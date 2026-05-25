@@ -83,6 +83,21 @@ class GF_UnitTest_Factory_For_Form extends GF_UnitTest_Factory_For_Thing {
 
 		return $this->create_and_get( [], $form );
 	}
+
+	/**
+	 * Create form from a single-object JSON file (the shape used by the
+	 * bootstrap fixture files in data/forms/<key>.json — distinct from the
+	 * array-wrapped Gravity Forms export shape that import_and_get() reads).
+	 *
+	 * @param string $filename Name of the file in data/forms/.
+	 *
+	 * @return array A form array as returned by Gravity Forms.
+	 */
+	function import_fixture_and_get( $filename ) {
+		$form = json_decode( file_get_contents( __DIR__ . '/data/forms/' . $filename ), true );
+
+		return $this->create_and_get( [], $form );
+	}
 }
 
 class GF_UnitTest_Factory_For_Entry extends GF_UnitTest_Factory_For_Thing {
@@ -147,6 +162,27 @@ class GF_UnitTest_Factory_For_Entry extends GF_UnitTest_Factory_For_Thing {
 		$entry = json_decode( file_get_contents( __DIR__ . '/data/forms/' . $filename ), true );
 
 		return $this->create_and_get( [ 'form_id' => $form_id ], $entry );
+	}
+
+	/**
+	 * Bulk-imports a JSON array of entries from data/entries/ and assigns them all
+	 * to $form_id. Returns the entries in insertion order, freshly fetched.
+	 *
+	 * @param string $filename Name of the file in data/entries/.
+	 * @param int    $form_id  The ID of the form the entries should be assigned to.
+	 *
+	 * @return array[]
+	 */
+	public function import_many_and_get( $filename, $form_id ) {
+		$entries   = json_decode( file_get_contents( __DIR__ . '/data/entries/' . $filename ), true );
+		$entry_ids = GFAPI::add_entries( $entries, $form_id );
+
+		$result = [];
+		foreach ( $entry_ids as $id ) {
+			$result[] = GFAPI::get_entry( $id );
+		}
+
+		return $result;
 	}
 
 	function update_object( $entry_id, $entry ) {

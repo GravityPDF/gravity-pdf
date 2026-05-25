@@ -17,4 +17,9 @@ abstract class TestCase extends WP_UnitTestCase {
 		parent::set_up();
 		$this->assertFixturesIntact();
 	}
+
+	public static function tear_down_after_class() {
+		static::cleanup_class_fixtures();
+		parent::tear_down_after_class();
+	}
 }
