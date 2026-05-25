@@ -4,8 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Statics;
 
-use GFPDF\Exceptions\GravityPdfException;
-use WP_UnitTestCase;
+use GFPDF\Tests\Integration\TestCase;
 
 /**
  * @package     Gravity PDF
@@ -18,7 +17,7 @@ use WP_UnitTestCase;
  *
  * @group     statics
  */
-class Test_Kses extends WP_UnitTestCase {
+class Test_Kses extends TestCase {
 
 	/**
 	 * @dataProvider provider_parse_pdf_tags_and_attributes

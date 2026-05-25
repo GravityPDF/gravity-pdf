@@ -80,15 +80,39 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		/* Load Mocks */
 		$this->mocks();
+
+		/* Load shared TestCase + Concerns infrastructure (Phase 1 of phpunit refactor) */
+		$this->load_test_infrastructure();
 	}
 
 	/**
-	 * Load Addon Mocks
+	 * Load Addon Mocks.
+	 *
+	 * Currently loads the Zapier add-on stub so tests that exercise the Zapier
+	 * integration code paths can run without the real add-on installed.
 	 *
 	 * @since 6.3
 	 */
 	public function mocks() {
 		require_once __DIR__ . '/Mocks/zapier-mock.php';
+	}
+
+	/**
+	 * Load the shared TestCase + trait files used by tests under
+	 * tests/phpunit/integration/. Required explicitly because the
+	 * Concerns/ directory is intentionally not part of the PHPUnit
+	 * <testsuites> <directory> list.
+	 *
+	 * @since 7.0
+	 */
+	public function load_test_infrastructure() {
+		$root = $this->plugin_dir . '/tests/phpunit';
+
+		require_once $root . '/Concerns/HasGfpdfFixtures.php';
+		require_once $root . '/Concerns/CleansFilesystem.php';
+		require_once $root . '/Concerns/UsesFactory.php';
+		require_once $root . '/integration/TestCase.php';
+		require_once $root . '/integration/AjaxTestCase.php';
 	}
 
 	/**

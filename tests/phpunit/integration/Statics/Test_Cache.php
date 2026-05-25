@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Statics;
 
-use WP_UnitTestCase;
+use GFPDF\Tests\Integration\TestCase;
 
 /**
  * @package     Gravity PDF
@@ -15,7 +15,7 @@ use WP_UnitTestCase;
 /**
  * @group     statics
  */
-class Test_Cache extends WP_UnitTestCase {
+class Test_Cache extends TestCase {
 
 	public function test_get_hash() {
 		$results = $this->create_form_and_entries();
@@ -41,11 +41,10 @@ class Test_Cache extends WP_UnitTestCase {
 	}
 
 	protected function create_form_and_entries() {
-		global $gfpdf;
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
-
+		$gfpdf                                     = $this->gfpdf();
 		$gfpdf->data->form_settings                = [];
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 
