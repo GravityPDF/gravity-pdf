@@ -217,7 +217,41 @@ The biggest single gain is `src/bootstrap.php` (+46 statements): tests for `plug
 
 `Model_PDF` and `Helper/Log/Logger` gains are smaller in absolute terms because their remaining uncovered branches require third-party dependencies (Gravity Forms add-on data sources, PSR-Log v2/v3 libraries) that aren't loaded in this test bootstrap — see the standing note about `MonoLoggerPsrLog2And3` (commit `b2cce9ed`).
 
-Two consecutive coverage runs land at 80.37–80.38% (2-statement drift in `Statics/`). The CI gate is ratcheted to **80.25%** — ~0.10 pp safety margin below the worst observed run, still well above the previous floor of 79.95%.
+Two consecutive coverage runs land at 80.37–80.38% (2-statement drift in `Statics/`). The CI gate is ratcheted to **80.25%** — ~0.10 pp safety margin below the worst observed run, still well above the previous floor of 79.95%. See follow-up #4 below for a methodology fix that surfaces an additional ~1.20 pp of coverage that was being measured but discarded.
+
+## Phase 4 follow-up #4 (2026-05-25) — measurement methodology
+
+The Phase 0–follow-up #3 baselines all measured **single-site PHPUnit coverage only**, even though the project ships a separate multisite PHPUnit suite (`tools/phpunit/config-multisite.xml`) that the integration job also runs. Tests that guard with `markTestSkipped( ! is_multisite() )` (the 7 `test_show_update_notification_*` cases, the multisite-only branch of `is_non_active_multisite`, and the `set_version_info_cache` multisite skip) execute under the multisite suite but never contributed to the coverage-gate measurement.
+
+Resolution:
+
+1. `tools/phpunit/coverage-gate.php` and `tools/phpunit/coverage-baseline.php` now accept multiple Clover paths and **union per-line counts** (a line is "covered" if any input has `count > 0`). Helper extracted to `tools/phpunit/coverage-merge-lib.php`.
+2. `.github/workflows/phpunit.tests.yml` runs `phpunit -c tools/phpunit/config-multisite.xml --coverage-clover=...` alongside the single-site coverage step and passes both clovers to the gate.
+3. Local reproduction: see the updated methodology section below.
+
+| `src/` subdirectory | Single-site only | Single + multisite (union) | Δ |
+| :--- | ---: | ---: | ---: |
+| `Helper/Licensing/` | 60.07% | **96.31%** | +36.24 pp |
+| `Model/` | 82.89% | **84.07%** | +1.18 pp |
+| `Helper/` (top level) | 84.92% | **85.17%** | +0.25 pp |
+| `Statics/` | 93.66% | **94.52%** | +0.86 pp |
+| `Helper/Log/` | 70.00% | **73.91%** | +3.91 pp |
+| `Controller/` | 85.18% | **85.27%** | +0.09 pp |
+| `Helper/Mpdf/` | 93.18% | 93.18% | 0 |
+| `Helper/Fields/` | 86.43% | 86.43% | 0 |
+| `Helper/Fonts/` | 81.58% | 81.58% | 0 |
+| **OVERALL** | 80.37% | **81.57%** | **+1.20 pp** |
+
+The bulk of the gain is `show_update_notification` in `EDD_SL_Plugin_Updater` — 7 multisite-only tests that were always pinning behavior, just not measured.
+
+Remaining genuine `Helper/Licensing` gaps after the union (11 statements):
+
+- `check_update` non-object-input branch (`L80`) — easy add later.
+- `show_changelog` happy path (`L495–L510`) — calls `install_plugin_information()` → `exit;`, untestable without process forking.
+
+The CI gate is ratcheted to **81.45%** — ~0.10 pp safety margin below the merged measurement, well above the previous floor of 80.25%.
+
+**Statement-total drift note:** the union baseline reports **12 998** total statements vs single-site's **13 008**. The merge script uses the first input's `<file><line type="stmt">` set as the canonical statement list; lines that xdebug instruments as statements in one bootstrap but as different element types in the other contribute small drift. Worth knowing when comparing absolute statement counts across follow-ups; the ratios are stable.
 
 ## Playwright (e2e) baseline
 
@@ -269,15 +303,30 @@ yarn test:php:multisite \
 yarn wp-env:integration start --xdebug=coverage
 
 # The yarn wrapper produces a "RecursiveDirectoryIterator on src/templates"
-# failure under xdebug 3 coverage — invoke phpunit directly:
+# failure under xdebug 3 coverage — invoke phpunit directly. Run both
+# single-site and multisite under coverage to capture multisite-only tests.
 yarn wp-env:integration run wordpress bash -c '
   cd /var/www/html/wp-content/plugins/gravity-pdf &&
   vendor/bin/phpunit \
     -c tools/phpunit/config.xml \
     --do-not-cache-result \
     --coverage-clover=tmp/coverage/report-xml/baseline.xml \
-    --log-junit=tmp/junit/phpunit-coverage.xml
+    --log-junit=tmp/junit/phpunit-coverage.xml &&
+  vendor/bin/phpunit \
+    -c tools/phpunit/config-multisite.xml \
+    --do-not-cache-result \
+    --coverage-clover=tmp/coverage/report-xml/multisite.xml \
+    --log-junit=tmp/junit/phpunit-coverage-ms.xml
 '
+
+# Pass both clovers to the gate + breakdown — they union per-line.
+php tools/phpunit/coverage-gate.php \
+  tmp/coverage/report-xml/baseline.xml \
+  tmp/coverage/report-xml/multisite.xml
+
+php tools/phpunit/coverage-baseline.php \
+  tmp/coverage/report-xml/baseline.xml \
+  tmp/coverage/report-xml/multisite.xml
 ```
 
 Per-`src/`-subdir coverage is extracted from the Clover XML — every `<file>` element has a `name` attribute (the full absolute path, despite the attribute name) and a `<metrics>` child with `statements`/`coveredstatements`/`elements`/`coveredelements`. Group by the first path segment under `src/`, with `Helper/<sub>` broken out one level deeper. Run `php tools/phpunit/coverage-baseline.php` to regenerate the per-subdir table above from the Clover XML.

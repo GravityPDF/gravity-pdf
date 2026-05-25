@@ -1,33 +1,29 @@
 <?php
 /**
- * Fail the build if overall line coverage falls below the Phase 0 baseline.
+ * Fail the build if overall line coverage falls below the documented floor.
  *
- * Usage: php tools/phpunit/coverage-gate.php [path/to/clover.xml]
+ * Usage:
+ *   php tools/phpunit/coverage-gate.php [<clover.xml> ...]
  *
- * Defaults to tmp/coverage/report-xml/baseline.xml. Ratchet the floor upward
- * by editing MIN_COVERAGE_PERCENT below; the value is also documented in
- * tests/phpunit/COVERAGE_BASELINE.md.
+ * Accepts one or more Clover paths. Multiple paths are union-merged
+ * per-line so the gate reflects coverage from both single-site and
+ * multisite PHPUnit runs.
+ *
+ * Ratchet the floor upward by editing MIN_COVERAGE_PERCENT below;
+ * tests/phpunit/COVERAGE_BASELINE.md documents the current value.
  */
 
-const MIN_COVERAGE_PERCENT = 80.25;
+const MIN_COVERAGE_PERCENT = 81.45;
 
-$xml_path = $argv[1] ?? 'tmp/coverage/report-xml/baseline.xml';
+require __DIR__ . '/coverage-merge-lib.php';
 
-$xml = @simplexml_load_file( $xml_path );
-if ( false === $xml ) {
-	fwrite( STDERR, "coverage-gate: cannot read $xml_path\n" );
-	exit( 1 );
+$paths = array_slice( $argv, 1 );
+if ( empty( $paths ) ) {
+	$paths = [ 'tmp/coverage/report-xml/baseline.xml' ];
 }
 
-if ( ! isset( $xml->project->metrics ) ) {
-	fwrite( STDERR, "coverage-gate: <project><metrics> missing in $xml_path\n" );
-	exit( 1 );
-}
-
-$totals     = $xml->project->metrics;
-$statements = (int) $totals['statements'];
-$covered    = (int) $totals['coveredstatements'];
-$percent    = $statements > 0 ? ( $covered / $statements * 100 ) : 0.0;
+[ $statements, $covered ] = coverage_merge_totals( $paths );
+$percent                  = $statements > 0 ? ( $covered / $statements * 100 ) : 0.0;
 
 printf(
 	"coverage: %d/%d statements covered (%.2f%%); floor: %.2f%%\n",

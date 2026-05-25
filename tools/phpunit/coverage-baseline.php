@@ -1,12 +1,17 @@
 <?php
 /**
- * Print a per-`src/`-subdir coverage breakdown from a PHPUnit Clover XML.
+ * Print a per-`src/`-subdir coverage breakdown from PHPUnit Clover XML.
  *
- * Usage: php tools/phpunit/coverage-baseline.php [path/to/clover.xml]
+ * Usage: php tools/phpunit/coverage-baseline.php [<clover.xml> ...]
  *
- * Default path: tmp/coverage/report-xml/baseline.xml. See
+ * Accepts one or more Clover paths. Multiple paths are union-merged
+ * per-line so the breakdown reflects coverage from both single-site
+ * and multisite PHPUnit runs. Defaults to
+ * tmp/coverage/report-xml/baseline.xml. See
  * tests/phpunit/COVERAGE_BASELINE.md for how to produce the input XML.
  */
+
+require __DIR__ . '/coverage-merge-lib.php';
 
 function bucket_for( $path ) {
 	foreach ( [ '/pdf.php', '/api.php', '/gravity-pdf-updater.php' ] as $suffix ) {
@@ -28,26 +33,40 @@ function bucket_for( $path ) {
 	return $parts[0];
 }
 
-$xml_path = $argv[1] ?? 'tmp/coverage/report-xml/baseline.xml';
-$xml      = simplexml_load_file( $xml_path );
-if ( false === $xml ) {
-	fwrite( STDERR, "Failed to parse $xml_path\n" );
-	exit( 1 );
+$paths = array_slice( $argv, 1 );
+if ( empty( $paths ) ) {
+	$paths = [ 'tmp/coverage/report-xml/baseline.xml' ];
 }
+
+$union = coverage_union_lines( $paths );
+$base  = coverage_load_clover( $paths[0] );
 
 $buckets = [];
 $overall = [ 'st' => 0, 'covst' => 0, 'el' => 0, 'covel' => 0 ];
 
-foreach ( $xml->xpath( '//file' ) as $f ) {
-	$bucket = bucket_for( (string) $f['name'] );
-	if ( null === $bucket || ! isset( $f->metrics ) ) {
+foreach ( $base->xpath( '//file' ) as $f ) {
+	$name   = (string) $f['name'];
+	$bucket = bucket_for( $name );
+	if ( null === $bucket ) {
 		continue;
 	}
-	$m     = $f->metrics;
-	$st    = (int) $m['statements'];
-	$covst = (int) $m['coveredstatements'];
-	$el    = (int) $m['elements'];
-	$covel = (int) $m['coveredelements'];
+
+	$st = 0; $covst = 0; $el = 0; $covel = 0;
+	foreach ( $f->line as $line ) {
+		$type  = (string) $line['type'];
+		$count = $union[ $name ][ (int) $line['num'] ];
+
+		$el++;
+		if ( $count > 0 ) {
+			$covel++;
+		}
+		if ( $type === 'stmt' ) {
+			$st++;
+			if ( $count > 0 ) {
+				$covst++;
+			}
+		}
+	}
 
 	if ( ! isset( $buckets[ $bucket ] ) ) {
 		$buckets[ $bucket ] = [ 'st' => 0, 'covst' => 0, 'el' => 0, 'covel' => 0, 'files' => 0 ];
