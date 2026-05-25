@@ -108,11 +108,51 @@ Source: `tmp/coverage/report-xml/baseline.xml` (Clover format, 845 KB, 208 files
 | Plugin root (`pdf.php`, `api.php`, `gravity-pdf-updater.php`) | 3 | 209 / 289 | **72.32%** | Mixed |
 | **OVERALL** | **208** | **9928 / 13007** | **76.33%** | — |
 
-The **76.33%** overall is the CI gate enforced by `tools/phpunit/coverage-gate.php`: `coverage ≥ 76.33%` per PR, ratcheted upward quarterly by editing the `MIN_COVERAGE_PERCENT` constant in that file.
+The **76.33%** overall was the CI gate enforced by `tools/phpunit/coverage-gate.php` at the end of Phase 0. See the Phase 4 revision below for the current floor.
 
 Coverage runtime overhead is modest in xdebug `coverage` mode: 47s (vs 38s without) — only ~24% slower.
 
 > **Important methodology note** — `yarn test:php --coverage-clover=...` consistently fails on this codebase with `RecursiveDirectoryIterator::__construct(.../src/templates): Failed to open directory` when invoked through the yarn wrapper, even when `src/templates/` exists and is readable. **Invoking `vendor/bin/phpunit` directly inside the container works.** Suspected cause is a working-directory resolution quirk in PHPUnit 9.6 + Xdebug 3 coverage when the config path is absolute. Phase 4 switched `.github/workflows/phpunit.tests.yml` to the direct-phpunit form and changed the coverage cell's wp-env startup from `--xdebug=debug` (no-op for coverage) to `--xdebug=coverage`.
+
+## Phase 4 revision (2026-05-25)
+
+After Phase 4 closed the bulk of the coverage gap — characterization tests for Exceptions, Statics, 11 untested controllers, 5 model gaps, 49 helpers (including all `Helper/Fields/`), Views, and the `Helper/Log` + `Helper/Mpdf` mirror work — re-running the same methodology yields:
+
+| Metric | Phase 0 | Phase 4 | Δ |
+| --- | ---: | ---: | ---: |
+| Test count | 1119 | **1424** | +305 |
+| Assertions | 4088 | **21314** | +17226 |
+| Wall-clock (coverage mode) | 47s | **42s** | −5s |
+| Wall-clock (no coverage) | 41.7s | **31.7s** | −10s |
+
+| `src/` subdirectory | Files | Stmts covered / total | Line coverage | Δ vs Phase 0 |
+| :--- | ---: | :--- | ---: | ---: |
+| `src/Statics/` | 4 | 327 / 347 | **94.24%** | +11.53 pp |
+| `src/Helper/Mpdf/` | 3 | 41 / 44 | **93.18%** | +18.18 pp |
+| `src/Rest/` | 2 | 546 / 588 | **92.86%** | 0 |
+| `src/Helper/Fields/` | 60 | 1541 / 1783 | **86.43%** | +13.78 pp |
+| `src/Controller/` | 19 | 937 / 1100 | **85.18%** | +3.73 pp |
+| `src/Helper/` (top level) | 39 | 3386 / 4026 | **84.10%** | +0.44 pp |
+| `src/Model/` | 11 | 1975 / 2385 | **82.81%** | +1.55 pp |
+| `src/Helper/Fonts/` | 5 | 31 / 38 | **81.58%** | 0 |
+| Plugin root | 3 | 209 / 289 | **72.32%** | 0 |
+| `src/Helper/Log/` | 3 | 118 / 170 | **69.41%** | 0 |
+| `src/View/` | 35 | 686 / 1054 | **65.09%** | +3.68 pp |
+| `src/Helper/Licensing/` | 1 | 168 / 298 | **56.38%** | 0 |
+| `src/` root | 3 | 290 / 557 | **52.06%** | 0 |
+| `src/Exceptions/` | 11 | 11 / 22 | **50.00%** | +27.27 pp |
+| `src/templates/` | 9 | 97 / 307 | **31.60%** | 0 |
+| **OVERALL** | **208** | **10363 / 13008** | **79.67%** | **+3.34 pp** |
+
+The CI gate in `tools/phpunit/coverage-gate.php` is now ratcheted to **79.67%** — Phase 4 gains are locked in.
+
+Remaining gaps worth a follow-up pass (numbers in pp from 100%):
+
+- **Helper/Licensing** (43.6 pp gap, 130 statements) — `EDD_SL_Plugin_Updater` has large untested update/notice branches. Single file, single test class.
+- **Helper/Log** (30.6 pp gap, 52 statements) — `Log/Logger::get_monolog()` has the PSR-Log v2/v3 detection branches; `MonoLoggerPsrLog2And3` itself cannot be exercised at runtime in this test env (see commit `b2cce9ed`).
+- **src/ root** (47.9 pp gap, 267 statements) — `bootstrap.php` activation paths are genuinely hard to characterize without rewriting the bootstrap as a class.
+- **View** (34.9 pp gap, 368 statements) — most remaining uncovered Views are HTML-partial paths; out of scope per the plan.
+- **Exceptions** (50.0 pp gap, 11 statements) — the hierarchy test pins inheritance for all subclasses but doesn't construct each one. Tiny absolute gap; not worth a dedicated pass.
 
 ## Playwright (e2e) baseline
 
