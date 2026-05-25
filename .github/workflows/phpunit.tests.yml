@@ -115,19 +115,33 @@ jobs:
       - name: Run PHPUnit tests
         if: ${{ ! matrix.report }}
         run: |
-          yarn test:php --do-not-cache-result --verbose
+          yarn test:php --do-not-cache-result --verbose --log-junit=/var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-integration-php${{ matrix.php }}.xml
 
       # Multisite suite reuses the already-running php 8.3 container instead of
       # spinning up its own matrix cell + cold wp-env start.
       - name: Run Multisite PHPUnit tests
         if: ${{ matrix.php == '8.3' && ! matrix.report }}
         run: |
-          yarn test:php:multisite --verbose
+          yarn test:php:multisite --verbose --log-junit=/var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-multisite-php${{ matrix.php }}.xml
 
       - name: Generate Code Coverage Report for PHP
         if: ${{ matrix.report }}
-        run: |  
-          yarn test:php --do-not-cache-result --verbose --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml      
+        run: |
+          yarn test:php --do-not-cache-result --verbose --log-junit=/var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-coverage-php${{ matrix.php }}.xml --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml
+
+      - name: Upload PHPUnit JUnit timings
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: phpunit-junit-php${{ matrix.php }}${{ matrix.report && '-coverage' || '' }}
+          path: tmp/junit/*.xml
+
+      - name: Upload PHPUnit coverage XML
+        uses: actions/upload-artifact@v6
+        if: ${{ matrix.report && always() }}
+        with:
+          name: phpunit-coverage-clover
+          path: tmp/coverage/report-xml/*.xml
 
       - name: Code Coverage Upload
         uses: codecov/codecov-action@v6

@@ -1,0 +1,194 @@
+# PHPUnit Test Suite Baseline
+
+Captured: 2026-05-25 (Phase 0 of [`.claude/plans/2026-05-25-phpunit-tests-refactor.md`](../../.claude/plans/2026-05-25-phpunit-tests-refactor.md)).
+
+This file is the reference point every later phase compares against. Treat the numbers below as the line that must not regress (test count, coverage), and the runtime as the budget later phases should match within ±10%.
+
+## Runtime baseline (live wp-env:integration, no xdebug, no coverage)
+
+| Metric | Value |
+| --- | --- |
+| Test count | **1119** |
+| Assertions | **4088** |
+| Skipped | 8 (multisite-only tests, expected) |
+| Sum of test-case times | **38.46s** |
+| Wall-clock (incl. PHPUnit boot) | **41.69s** |
+| Wrapper-inclusive (yarn + docker exec) | 42.63s |
+
+Slowest 15 tests (live JUnit, `tmp/junit/phpunit-integration.xml`):
+
+| Time | Test |
+| ---: | :--- |
+| 4.032s | `Test_PDF_Ajax::test_ajax_process_uploaded_template` |
+| 3.570s | `Test_PDF_Ajax::test_render_template_fields` |
+| 3.428s | `Test_PDF_Ajax::test_delete_gf_pdf_setting` |
+| 3.161s | `Test_PDF_Ajax::test_ajax_process_license_deactivation` |
+| 3.153s | `Test_PDF_Ajax::test_ajax_process_build_template_options_html` |
+| 3.125s | `Test_PDF_Ajax::test_duplicate_gf_pdf_settings` |
+| 3.120s | `Test_PDF_Ajax::test_ajax_save_core_font` |
+| 3.098s | `Test_PDF_Ajax::test_ajax_process_delete_template` |
+| 1.366s | `Test_EDD_SL_Plugin_Updater::test_check_update_already_exists` |
+| 1.192s | `Test_Request::test_send_request_status_error` |
+| 1.008s | `Test_Url_Signer::test_expiration_failure` (intentional `sleep(1)`) |
+| 0.766s | `Test_Request::test_send_request_success` |
+| 0.641s | `Test_Slow_PDF_Processes::test_process_legacy_pdf_endpoint` |
+| 0.496s | `Test_Slow_PDF_Processes::test_process_pdf_endpoint` |
+| 0.455s | `Test_Slow_PDF_Processes::test_generate_and_save_pdf` |
+
+**Headline finding**: the 9 `Test_PDF_Ajax` tests account for **26.70s — 69% of total suite runtime**. Phase 2's split of `test-ajax.php` into focused `*_Ajax.php` files (one per target Model) is the highest-leverage perf work in the refactor.
+
+## Per-namespace runtime breakdown
+
+| Namespace | Time | Tests | Avg/test |
+| :--- | ---: | ---: | ---: |
+| `GFPDF\Tests\` (root `test-*.php`) | 33.58s | 753 | 44.6ms |
+| `GFPDF\Helper\` | 3.90s | 102 | 38.2ms |
+| `GFPDF\Controller\` | 0.81s | 31 | 26.0ms |
+| `GFPDF\Model\` | 0.15s | 138 | 1.1ms |
+| `GFPDF\Statics\` | 0.03s | 90 | 0.3ms |
+| `GFPDF\View\` | 0.00s | 5 | 0.3ms |
+
+`Helper/` subdivision:
+
+| Sub-namespace | Time | Tests |
+| :--- | ---: | ---: |
+| `Helper/Mpdf` | 2.13s | 8 |
+| `Helper/Licensing` | 1.42s | 19 |
+| `Helper/Fields` | 0.33s | 49 |
+| `Helper/Log` | 0.01s | 20 |
+| `Helper/(top-level)` | 0.01s | 5 |
+| `Helper/Fonts` | 0.00s | 1 |
+
+Heaviest cross-cutting files (root `test-*.php`, sorted by total time):
+
+| File | Time | Tests |
+| :--- | ---: | ---: |
+| `Test_PDF_Ajax` | 26.70s | 9 |
+| `Test_Slow_PDF_Processes` | 3.76s | 18 |
+| `Test_Url_Signer` | 1.02s | 23 |
+| `Test_Rest_Form_Settings` | 0.64s | 31 |
+| `Test_PDF` | 0.24s | 75 |
+| `Test_Options_API` | 0.11s | 81 |
+| `Test_Helper_Misc` | 0.03s | 73 |
+
+(Full file-level breakdown reproducible from `tmp/junit/phpunit-integration.xml` via the methodology section below.)
+
+## Multisite runtime baseline
+
+Source: `tmp/junit/phpunit-multisite.xml`, captured via `yarn test:php:multisite`.
+
+| Metric | Value |
+| --- | --- |
+| Test count | **1119** (same surface, different bootstrap) |
+| Assertions | 4119 |
+| Skipped | 1 (non-multisite-only test, expected) |
+| Sum of test-case times | **38.64s** |
+| Wall-clock | 41.81s |
+
+## Coverage baseline (live wp-env:integration, xdebug coverage mode, PHP 8.5)
+
+Source: `tmp/coverage/report-xml/baseline.xml` (Clover format, 845 KB, 208 files).
+
+| `src/` subdirectory | Files | Statements covered / total | Line coverage | Phase 4 priority |
+| :--- | ---: | :--- | ---: | :--- |
+| `src/Rest/` | 2 | 546 / 588 | **92.86%** | Already strong — no new work |
+| `src/Helper/` (top level) | 39 | 3368 / 4026 | **83.66%** | Mixed — abstracts critical, fill targeted gaps |
+| `src/Statics/` | 4 | 287 / 347 | **82.71%** | Fill `Debug.php`, `Queue_Callbacks.php` |
+| `src/Helper/Fonts/` | 5 | 31 / 38 | **81.58%** | Already strong |
+| `src/Controller/` | 19 | 896 / 1100 | **81.45%** | High — 11 of 19 still without dedicated tests |
+| `src/Model/` | 11 | 1938 / 2385 | **81.26%** | High — `Model_PDF` characterization (per plan §"Critical-class characterization tests") |
+| `src/Helper/Mpdf/` | 3 | 33 / 44 | **75.00%** | Low — small surface |
+| `src/Helper/Fields/` | 60 | 1296 / 1784 | **72.65%** | High — sparse coverage across ~60 field handlers |
+| `src/Helper/Log/` | 3 | 118 / 170 | **69.41%** | Medium |
+| `src/View/` | 35 | 646 / 1052 | **61.41%** | Out of scope — mostly HTML partials |
+| `src/Helper/Licensing/` | 1 | 168 / 298 | **56.38%** | Medium — large untested branches |
+| `src/` root (`bootstrap.php`, `autoload.php`, `deprecated.php`) | 3 | 290 / 557 | **52.06%** | Low — bootstrap has activation paths hard to cover |
+| `src/templates/` | 9 | 97 / 307 | **31.60%** | Out of scope — PDF templates, not code-under-test |
+| `src/Exceptions/` | 11 | 5 / 22 | **22.73%** | Per-plan single hierarchy smoke test |
+| Plugin root (`pdf.php`, `api.php`, `gravity-pdf-updater.php`) | 3 | 209 / 289 | **72.32%** | Mixed |
+| **OVERALL** | **208** | **9928 / 13007** | **76.33%** | — |
+
+The **76.33%** overall is the CI gate that Phase 4 introduces: `coverage ≥ 76.33%` per PR, ratcheted upward quarterly.
+
+Coverage runtime overhead is modest in xdebug `coverage` mode: 47s (vs 38s without) — only ~24% slower.
+
+> **Important methodology note** — `yarn test:php --coverage-clover=...` consistently fails on this codebase with `RecursiveDirectoryIterator::__construct(.../src/templates): Failed to open directory` when invoked through the yarn wrapper, even when `src/templates/` exists and is readable. **Invoking `vendor/bin/phpunit` directly inside the container works.** Suspected cause is a working-directory resolution quirk in PHPUnit 9.6 + Xdebug 3 coverage when the config path is absolute. This affects the CI workflow's coverage cell too (`.github/workflows/phpunit.tests.yml`); the Phase 4 CI coverage gate will need to switch the coverage step to the direct-phpunit form documented below. Filed as a follow-up for Phase 4.
+
+## Playwright (e2e) baseline
+
+| Metric | Value (local 2026-05-25) |
+| --- | --- |
+| Passed | 6 |
+| Failed | 60 |
+| Did not run | 21 |
+| Wall-clock | 8.4m |
+
+The local run is **not green**, but the failures look environmental (post-`dist/` rebuild, fresh wp-env, etc.) rather than refactor-driven — the PHPUnit refactor has not touched any code yet. For the authoritative Playwright baseline, **compare future PRs against the GitHub Actions Playwright workflow artifacts** (`.github/workflows/playwright-e2e.yml`) on the same commit, not the local run.
+
+This is recorded only so a contributor on a fresh machine doesn't conclude their environment is broken when they see the same numbers. Phase 2 changes touch fixture bootstrap; before merging Phase 2 verify Playwright in CI matches the pre-refactor CI baseline.
+
+## Methodology — how to reproduce
+
+The numbers above are captured from a **live** wp-env run, not from `.phpunit.result.cache`. The cache file is stale almost the moment it lands; for regression detection, always re-run.
+
+Boot the environments once per session:
+
+```bash
+yarn wp-env:integration start    # port 8701, used by yarn test:php
+yarn wp-env:e2e start            # port 8702, used by yarn test:e2e
+```
+
+### Runtime + JUnit
+
+```bash
+yarn test:php \
+  --do-not-cache-result \
+  --verbose \
+  --log-junit=/var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-integration.xml
+```
+
+The Docker container mounts the plugin directory, so `tmp/junit/phpunit-integration.xml` appears on the host. Parse it with `xml.etree.ElementTree` to recompute the per-namespace and slowest-test tables above.
+
+### Multisite
+
+```bash
+yarn test:php:multisite \
+  --verbose \
+  --log-junit=/var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-multisite.xml
+```
+
+### Coverage (requires xdebug `coverage` mode — restart wp-env first)
+
+```bash
+# Note: --xdebug=debug is NOT enough; coverage needs xdebug.mode=coverage.
+yarn wp-env:integration start --xdebug=coverage
+
+# The yarn wrapper produces a "RecursiveDirectoryIterator on src/templates"
+# failure under xdebug 3 coverage — invoke phpunit directly:
+yarn wp-env:integration run wordpress bash -c '
+  cd /var/www/html/wp-content/plugins/gravity-pdf &&
+  vendor/bin/phpunit \
+    -c tools/phpunit/config.xml \
+    --do-not-cache-result \
+    --coverage-clover=tmp/coverage/report-xml/baseline.xml \
+    --log-junit=tmp/junit/phpunit-coverage.xml
+'
+```
+
+Per-`src/`-subdir coverage is extracted from the Clover XML — every `<file>` element has a `name` attribute (the full absolute path, despite the attribute name) and a `<metrics>` child with `statements`/`coveredstatements`/`elements`/`coveredelements`. Group by the first path segment under `src/`, with `Helper/<sub>` broken out one level deeper. Run `tools/phpunit/coverage-baseline.py` to regenerate the per-subdir table above from the Clover XML.
+
+### Playwright
+
+```bash
+yarn test:e2e
+```
+
+### Comparing a future run against this baseline
+
+After running any of the above, diff the new JUnit/clover against the artifacts uploaded by CI (workflow `.github/workflows/phpunit.tests.yml`, artifacts `phpunit-junit-php8.3` and `phpunit-coverage-clover`). A regression is:
+
+- Runtime: more than +10% on the sum of test-case times.
+- Test count: any decrease (a moved test is still a test).
+- Coverage: any decrease in overall line coverage, or any decrease in per-`src/`-subdir coverage by more than 1 percentage point.
+
+If a phase intentionally trades runtime for clarity (e.g., splitting `test-ajax.php` adds per-class setup overhead), record the new baseline here in a "phase N revision" section rather than relaxing the gate.
