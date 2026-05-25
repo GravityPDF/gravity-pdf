@@ -25,6 +25,11 @@ class Test_Controller_Zapier extends TestCase {
 	 */
 	protected $controller;
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		parent::set_up();
 
@@ -32,7 +37,7 @@ class Test_Controller_Zapier extends TestCase {
 	}
 
 	public function test_add_zapier_support_active_pdfs() {
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 		$body  = $this->controller->add_zapier_support( [], [], $entry );
 
 		$this->assertCount( 8, $body );
@@ -59,7 +64,7 @@ class Test_Controller_Zapier extends TestCase {
 	}
 
 	public function test_add_zapier_support_conditional_logic() {
-		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry    = $this->entry( 'all-form-fields' );
 		$entry[7] = 'Albania';
 		\GFAPI::update_entry( $entry );
 

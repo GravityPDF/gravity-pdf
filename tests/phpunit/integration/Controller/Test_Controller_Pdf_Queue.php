@@ -26,6 +26,11 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Controller_Pdf_Queue extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	/**
 	 * @var Controller_Pdf_Queue
 	 * @since 5.0
@@ -78,8 +83,8 @@ class Test_Controller_Pdf_Queue extends TestCase {
 	private function create_form_and_entries() {
 		global $gfpdf;
 
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$gfpdf->data->form_settings                = [];
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
@@ -293,10 +298,11 @@ class Test_Controller_Pdf_Queue extends TestCase {
 
 		$this->assertCount( 4, $queue );
 
-		$this->assertStringContainsString( 'create-pdf-1-1', $queue[0][0]['id'] );
-		$this->assertStringContainsString( 'create-pdf-1-1', $queue[1][0]['id'] );
-		$this->assertStringContainsString( 'send-notification-1-1', $queue[2][0]['id'] );
-		$this->assertStringContainsString( 'send-notification-1-1', $queue[3][0]['id'] );
+		$prefix = "{$form['id']}-{$entry['id']}";
+		$this->assertStringContainsString( "create-pdf-$prefix", $queue[0][0]['id'] );
+		$this->assertStringContainsString( "create-pdf-$prefix", $queue[1][0]['id'] );
+		$this->assertStringContainsString( "send-notification-$prefix", $queue[2][0]['id'] );
+		$this->assertStringContainsString( "send-notification-$prefix", $queue[3][0]['id'] );
 	}
 
 	/**
@@ -309,7 +315,7 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		$form    = $results['form'];
 		$form['notifications']['54bca349732b8']['isActive'] = true;
 
-		foreach( $GLOBALS['GFPDF_Test']->entries['all-form-fields'] as $entry ) {
+		foreach ( $this->entries( 'all-form-fields' ) as $entry ) {
 			foreach ( $form['notifications'] as $notification ) {
 				$this->controller->maybe_disable_submission_notifications( false, $notification, $form, $entry );
 			}
@@ -321,13 +327,17 @@ class Test_Controller_Pdf_Queue extends TestCase {
 
 		$this->assertCount( 21, $queue );
 
-		$this->assertStringContainsString( 'create-pdf-1-1', $queue[0][0]['id'] );
-		$this->assertStringContainsString( 'create-pdf-1-1', $queue[1][0]['id'] );
-		$this->assertStringContainsString( 'send-notification-1-1', $queue[2][0]['id'] );
+		$entries     = $this->entries( 'all-form-fields' );
+		$first_entry = "{$form['id']}-{$entries[0]['id']}";
+		$last_entry  = "{$form['id']}-{$entries[6]['id']}";
 
-		$this->assertStringContainsString( 'create-pdf-1-7', $queue[18][0]['id'] );
-		$this->assertStringContainsString( 'create-pdf-1-7', $queue[19][0]['id'] );
-		$this->assertStringContainsString( 'send-notification-1-7', $queue[20][0]['id'] );
+		$this->assertStringContainsString( "create-pdf-$first_entry", $queue[0][0]['id'] );
+		$this->assertStringContainsString( "create-pdf-$first_entry", $queue[1][0]['id'] );
+		$this->assertStringContainsString( "send-notification-$first_entry", $queue[2][0]['id'] );
+
+		$this->assertStringContainsString( "create-pdf-$last_entry", $queue[18][0]['id'] );
+		$this->assertStringContainsString( "create-pdf-$last_entry", $queue[19][0]['id'] );
+		$this->assertStringContainsString( "send-notification-$last_entry", $queue[20][0]['id'] );
 	}
 
 	/**

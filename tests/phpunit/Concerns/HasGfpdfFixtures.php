@@ -140,6 +140,26 @@ trait HasGfpdfFixtures {
 	}
 
 	/**
+	 * Returns the full entry list for $key (for foreach/array_column use).
+	 *
+	 * @param string $key Entry-set key.
+	 *
+	 * @return array[]
+	 */
+	protected function entries( $key ) {
+		$cache = self::$fixture_caches[ static::class ]['entries'] ?? [];
+		if ( isset( $cache[ $key ] ) ) {
+			return $cache[ $key ];
+		}
+
+		if ( ! isset( $GLOBALS['GFPDF_Test']->entries[ $key ] ) ) {
+			$this->fail( "Entry fixture set '$key' is not loaded." );
+		}
+
+		return $GLOBALS['GFPDF_Test']->entries[ $key ];
+	}
+
+	/**
 	 * Returns the Gravity PDF Router (DI container).
 	 *
 	 * @return \GFPDF\Router

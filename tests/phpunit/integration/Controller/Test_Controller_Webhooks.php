@@ -20,12 +20,17 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Controller_Webhooks extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	/**
 	 * Test we add the PDF URLs to the Webhook request data when the request type is "all_fields"
 	 */
 	public function test_webhook_request_data_all_fields() {
 		$feed         = [ 'meta' => [ 'requestBodyType' => 'all_fields' ] ];
-		$entry        = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry        = $this->entry( 'all-form-fields' );
 		$request_data = $entry;
 
 		$request_data = apply_filters( 'gform_webhooks_request_data', $request_data, $feed, $entry );
@@ -42,7 +47,7 @@ class Test_Controller_Webhooks extends TestCase {
 	 */
 	public function test_webhook_request_data_select_fields() {
 		$feed         = [ 'meta' => [ 'requestBodyType' => 'select_fields' ] ];
-		$entry        = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry        = $this->entry( 'all-form-fields' );
 		$request_data = $entry;
 
 		$request_data = apply_filters( 'gform_webhooks_request_data', $request_data, $feed, $entry );

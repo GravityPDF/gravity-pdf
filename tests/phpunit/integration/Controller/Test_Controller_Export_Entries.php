@@ -19,8 +19,14 @@ use GFPDF\Tests\Integration\TestCase;
  * @group   export
  */
 class Test_Controller_Export_Entries extends TestCase {
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function test_add_pdfs_to_export_fields() {
-		$form = apply_filters( 'gform_export_fields', $GLOBALS['GFPDF_Test']->form['all-form-fields'] );
+		$form = apply_filters( 'gform_export_fields', $this->form( 'all-form-fields' ) );
 
 		$field_ids = array_column( $form['fields'], 'id' );
 
@@ -41,21 +47,21 @@ class Test_Controller_Export_Entries extends TestCase {
 	}
 
 	public function test_get_export_field_empty_pdf_value_if_failed_conditional_logic() {
-		$form_id  = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
-		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form_id  = $this->form( 'all-form-fields' )['id'];
+		$entry    = $this->entry( 'all-form-fields' );
 		$field_id = 'gpdf_555ad84787d7e';
 		$this->assertEmpty( apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
 	}
 
 	public function test_get_export_field_pdf_value() {
-		$form_id  = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
-		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form_id  = $this->form( 'all-form-fields' )['id'];
+		$entry    = $this->entry( 'all-form-fields' );
 		$field_id = 'gpdf_556690c67856b';
 		$this->assertStringContainsString( 'http://example.org/?gpdf=1', apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
 	}
 
 	public function test_get_export_field_empty_value() {
-		$form_id  = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
+		$form_id  = $this->form( 'all-form-fields' )['id'];
 		$field_id = 'gpdf_555ad84787d7e';
 		$value    = 'item';
 		$this->assertSame( $value, apply_filters( 'gform_export_field_value', $value, $form_id, $field_id, [] ) );
