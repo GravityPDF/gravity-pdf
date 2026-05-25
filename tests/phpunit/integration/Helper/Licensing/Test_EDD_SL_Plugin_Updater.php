@@ -973,4 +973,90 @@ class Test_EDD_SL_Plugin_Updater extends TestCase {
 
 		$this->assertEmpty( get_option( $this->class->get_cache_key() ) );
 	}
+
+	public function test_show_changelog_wp_dies_without_update_plugins_capability() {
+		$user_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		wp_set_current_user( $user_id );
+
+		$_REQUEST['gpdf_sl_action'] = 'view_plugin_changelog';
+		$_REQUEST['plugin']         = 'test-plugin';
+		$_REQUEST['gpdf_sl_nonce']  = wp_create_nonce( 'install-plugin_test-plugin' );
+
+		try {
+			$this->class->show_changelog();
+			$this->fail( 'Expected WPDieException' );
+		} catch ( \WPDieException $e ) {
+			$this->assertStringContainsString( 'do not have permission', $e->getMessage() );
+		} finally {
+			unset( $_REQUEST['gpdf_sl_action'], $_REQUEST['plugin'], $_REQUEST['gpdf_sl_nonce'] );
+		}
+	}
+
+	public function test_get_version_from_remote_returns_false_on_wp_error() {
+		add_filter( 'pre_http_request', function () {
+			return new \WP_Error( 'http_error', 'Connection refused' );
+		} );
+
+		$this->assertFalse( $this->class->get_version_from_remote() );
+		$this->assertTrue( $this->class->request_recently_failed() );
+	}
+
+	public function test_request_recently_failed_returns_false_for_non_numeric_value() {
+		update_option( 'gpdf_sl_failed_http_' . md5( 'http://store.com/' ), 'not-a-number' );
+
+		$this->assertFalse( $this->class->request_recently_failed() );
+	}
+
+	public function test_log_failed_request_persists_future_timestamp() {
+		$this->class->log_failed_request();
+
+		$stored = get_option( 'gpdf_sl_failed_http_' . md5( 'http://store.com/' ) );
+
+		$this->assertGreaterThan( time(), (int) $stored );
+	}
+
+	public function test_get_cached_version_info_uses_explicit_cache_key() {
+		$key = 'gpdf_sl_custom_key';
+
+		update_option( $key, [
+			'timeout' => time() + 60,
+			'value'   => json_encode( [ 'new_version' => '5.5' ] ),
+		] );
+
+		$result = $this->class->get_cached_version_info( $key );
+
+		$this->assertSame( '5.5', $result->new_version );
+	}
+
+	public function test_set_version_info_cache_uses_explicit_cache_key_on_single_site() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Test targets single-site path' );
+		}
+
+		$key = 'gpdf_sl_explicit_key';
+		$this->class->set_version_info_cache( [ 'foo' => 'bar' ], $key );
+
+		$stored = get_option( $key );
+		$this->assertSame( '{"foo":"bar"}', $stored['value'] );
+		$this->assertGreaterThan( time(), $stored['timeout'] );
+	}
+
+	public function test_delete_version_info_cache_uses_explicit_cache_key() {
+		$key = 'gpdf_sl_to_delete';
+		update_option( $key, 'something' );
+
+		$this->assertTrue( $this->class->delete_version_info_cache( $key ) );
+		$this->assertFalse( get_option( $key ) );
+	}
+
+	public function test_get_repo_api_data_returns_cached_when_present() {
+		update_option( $this->class->get_cache_key(), [
+			'timeout' => time() + 60,
+			'value'   => json_encode( [ 'new_version' => '2.0' ] ),
+		] );
+
+		$result = $this->class->get_repo_api_data();
+
+		$this->assertSame( '2.0', $result->new_version );
+	}
 }
