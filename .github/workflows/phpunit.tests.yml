@@ -110,7 +110,7 @@ jobs:
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ matrix.report }}
-        run: yarn wp-env:integration start --xdebug=debug
+        run: yarn wp-env:integration start --xdebug=coverage
 
       - name: Run PHPUnit tests
         if: ${{ ! matrix.report }}
@@ -124,10 +124,25 @@ jobs:
         run: |
           yarn test:php:multisite --verbose --log-junit=/var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-multisite-php${{ matrix.php }}.xml
 
+      # The yarn test:php wrapper fails under xdebug coverage with
+      # "RecursiveDirectoryIterator on src/templates" (PHPUnit 9.6 + Xdebug 3
+      # working-dir resolution). Invoke phpunit directly inside the container.
       - name: Generate Code Coverage Report for PHP
         if: ${{ matrix.report }}
         run: |
-          yarn test:php --do-not-cache-result --verbose --log-junit=/var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-coverage-php${{ matrix.php }}.xml --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml
+          yarn wp-env:integration run wordpress bash -c '
+            cd /var/www/html/wp-content/plugins/gravity-pdf &&
+            vendor/bin/phpunit \
+              -c tools/phpunit/config.xml \
+              --do-not-cache-result \
+              --verbose \
+              --log-junit=tmp/junit/phpunit-coverage-php${{ matrix.php }}.xml \
+              --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml
+          '
+
+      - name: Enforce coverage floor
+        if: ${{ matrix.report }}
+        run: php tools/phpunit/coverage-gate.php tmp/coverage/report-xml/php-coverage1.xml
 
       - name: Upload PHPUnit JUnit timings
         uses: actions/upload-artifact@v6

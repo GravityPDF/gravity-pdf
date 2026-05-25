@@ -108,11 +108,11 @@ Source: `tmp/coverage/report-xml/baseline.xml` (Clover format, 845 KB, 208 files
 | Plugin root (`pdf.php`, `api.php`, `gravity-pdf-updater.php`) | 3 | 209 / 289 | **72.32%** | Mixed |
 | **OVERALL** | **208** | **9928 / 13007** | **76.33%** | — |
 
-The **76.33%** overall is the CI gate that Phase 4 introduces: `coverage ≥ 76.33%` per PR, ratcheted upward quarterly.
+The **76.33%** overall is the CI gate enforced by `tools/phpunit/coverage-gate.php`: `coverage ≥ 76.33%` per PR, ratcheted upward quarterly by editing the `MIN_COVERAGE_PERCENT` constant in that file.
 
 Coverage runtime overhead is modest in xdebug `coverage` mode: 47s (vs 38s without) — only ~24% slower.
 
-> **Important methodology note** — `yarn test:php --coverage-clover=...` consistently fails on this codebase with `RecursiveDirectoryIterator::__construct(.../src/templates): Failed to open directory` when invoked through the yarn wrapper, even when `src/templates/` exists and is readable. **Invoking `vendor/bin/phpunit` directly inside the container works.** Suspected cause is a working-directory resolution quirk in PHPUnit 9.6 + Xdebug 3 coverage when the config path is absolute. This affects the CI workflow's coverage cell too (`.github/workflows/phpunit.tests.yml`); the Phase 4 CI coverage gate will need to switch the coverage step to the direct-phpunit form documented below. Filed as a follow-up for Phase 4.
+> **Important methodology note** — `yarn test:php --coverage-clover=...` consistently fails on this codebase with `RecursiveDirectoryIterator::__construct(.../src/templates): Failed to open directory` when invoked through the yarn wrapper, even when `src/templates/` exists and is readable. **Invoking `vendor/bin/phpunit` directly inside the container works.** Suspected cause is a working-directory resolution quirk in PHPUnit 9.6 + Xdebug 3 coverage when the config path is absolute. Phase 4 switched `.github/workflows/phpunit.tests.yml` to the direct-phpunit form and changed the coverage cell's wp-env startup from `--xdebug=debug` (no-op for coverage) to `--xdebug=coverage`.
 
 ## Playwright (e2e) baseline
 
