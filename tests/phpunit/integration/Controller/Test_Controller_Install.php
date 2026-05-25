@@ -71,6 +71,11 @@ class Test_Controller_Install extends TestCase {
 		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
 		wp_set_current_user( $admin );
 
+		/* Multisite gates activate_plugins behind super admin; without the promotion
+		   check_install_status() short-circuits on the capability check. No-op on
+		   single-site. */
+		grant_super_admin( $admin );
+
 		update_option( 'gfpdf_current_version', '0.0.1' );
 
 		$captured = [];
