@@ -173,5 +173,76 @@ class Test_Model_PDF extends TestCase {
 
 	}
 
+	public function test_field_middle_page_skips_page_fields_by_default() {
+		$field = new \GF_Field();
+		$field->type = 'page';
 
+		$this->assertTrue( $this->model->field_middle_page( false, $field, [], [], [] ) );
+	}
+
+	public function test_field_middle_page_keeps_page_fields_when_meta_enabled() {
+		$field = new \GF_Field();
+		$field->type = 'page';
+
+		$config = [ 'meta' => [ 'page_names' => true ] ];
+
+		$this->assertFalse( $this->model->field_middle_page( false, $field, [], [], $config ) );
+	}
+
+	public function test_field_middle_page_passes_through_non_page_fields() {
+		$field = new \GF_Field();
+		$field->type = 'text';
+
+		$this->assertFalse( $this->model->field_middle_page( false, $field, [], [], [] ) );
+	}
+
+	public function test_field_middle_page_returns_action_when_already_skipped() {
+		$field = new \GF_Field();
+		$field->type = 'page';
+
+		$this->assertTrue( $this->model->field_middle_page( true, $field, [], [], [] ) );
+	}
+
+	public function test_is_gform_asynchronous_notifications_enabled_returns_filtered_value() {
+		$form = [ 'id' => 42 ];
+		$entry = [ 'id' => 1 ];
+
+		$this->assertFalse( $this->model->is_gform_asynchronous_notifications_enabled( [], $form, $entry ) );
+
+		add_filter( 'gform_is_asynchronous_notifications_enabled', '__return_true' );
+		$this->assertTrue( $this->model->is_gform_asynchronous_notifications_enabled( [], $form, $entry ) );
+		remove_filter( 'gform_is_asynchronous_notifications_enabled', '__return_true' );
+
+		add_filter( 'gform_is_asynchronous_notifications_enabled_42', '__return_true' );
+		$this->assertTrue( $this->model->is_gform_asynchronous_notifications_enabled( [], $form, $entry ) );
+		remove_filter( 'gform_is_asynchronous_notifications_enabled_42', '__return_true' );
+	}
+
+	public function test_can_user_view_pdf_with_capabilities_returns_false_for_anonymous() {
+		wp_set_current_user( 0 );
+
+		$this->assertFalse( $this->model->can_user_view_pdf_with_capabilities() );
+	}
+
+	public function test_can_user_view_pdf_with_capabilities_returns_true_for_admin() {
+		$admin = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $admin );
+
+		$this->assertTrue( $this->model->can_user_view_pdf_with_capabilities() );
+	}
+
+	public function test_can_user_view_pdf_with_capabilities_respects_admin_capabilities_option() {
+		global $gfpdf;
+
+		$user = $this->factory->user->create( [ 'role' => 'editor' ] );
+		wp_set_current_user( $user );
+
+		$gfpdf->options->update_option( 'admin_capabilities', [ 'manage_options' ] );
+		$this->assertFalse( $this->model->can_user_view_pdf_with_capabilities() );
+
+		$gfpdf->options->update_option( 'admin_capabilities', [ 'edit_posts' ] );
+		$this->assertTrue( $this->model->can_user_view_pdf_with_capabilities() );
+
+		$gfpdf->options->delete_option( 'admin_capabilities' );
+	}
 }

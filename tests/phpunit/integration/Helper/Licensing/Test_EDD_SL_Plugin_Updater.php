@@ -770,4 +770,207 @@ class Test_EDD_SL_Plugin_Updater extends TestCase {
 		$this->assertStringNotContainsString( 'update now', $output );
 		$this->assertStringNotContainsString( 'Update now.', $output );
 	}
+
+	public function test_check_update_short_circuits_when_response_already_set_and_no_override() {
+		$transient           = new \stdClass();
+		$transient->response = [
+			'test-plugin/test-plugin.php' => 'preset',
+		];
+
+		$result = $this->class->check_update( $transient );
+
+		$this->assertSame( 'preset', $result->response['test-plugin/test-plugin.php'] );
+		$this->assertEmpty( get_option( $this->class->get_cache_key() ) );
+	}
+
+	public function test_get_tested_version_returns_null_when_tested_is_empty() {
+		$version_info         = new \stdClass();
+		$version_info->tested = '';
+
+		$this->assertNull( $this->class->get_tested_version( $version_info ) );
+
+		$bare = new \stdClass();
+		$this->assertNull( $this->class->get_tested_version( $bare ) );
+	}
+
+	public function test_show_update_notification_skipped_in_network_admin() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Not running multisite tests' );
+		}
+
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		grant_super_admin( $user_id );
+		wp_set_current_user( $user_id );
+
+		set_current_screen( 'plugins-network' );
+
+		$this->class->init();
+
+		ob_start();
+		do_action( 'after_plugin_row', 'test-plugin/test-plugin.php', [ 'Name' => 'Test Plugin' ] );
+		$this->assertEmpty( ob_get_clean() );
+	}
+
+	public function test_show_update_notification_skipped_for_mismatched_file() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Not running multisite tests' );
+		}
+
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		grant_super_admin( $user_id );
+		wp_set_current_user( $user_id );
+
+		$this->class->init();
+
+		ob_start();
+		do_action( 'after_plugin_row', 'some-other/some-other.php', [ 'Name' => 'Other Plugin' ] );
+		$this->assertEmpty( ob_get_clean() );
+	}
+
+	public function test_show_update_notification_with_update_no_package_no_changelog() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Not running multisite tests' );
+		}
+
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		grant_super_admin( $user_id );
+		wp_set_current_user( $user_id );
+
+		$this->class->init();
+
+		$api_response = function () {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [
+					'new_version'    => '0.2',
+					'stable_version' => '0.2',
+					'name'           => 'Test Plugin',
+					'slug'           => 'test-plugin',
+					'sections'       => [
+						'description' => 'Excerpt here',
+					],
+					'banners'        => [],
+					'icons'          => [],
+					'requires'       => '6.4',
+					'requires_php'   => '7.3',
+					'tested'         => '10.1',
+				] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		ob_start();
+		do_action( 'after_plugin_row', 'test-plugin/test-plugin.php', [ 'Name' => 'Test Plugin' ] );
+
+		$output = ob_get_clean();
+		$this->assertStringContainsString( 'There is a new version of Test Plugin available.', $output );
+		$this->assertStringNotContainsString( 'View version', $output );
+		$this->assertStringNotContainsString( 'update now', $output );
+		$this->assertStringNotContainsString( 'Update now.', $output );
+	}
+
+	public function test_show_changelog_returns_early_when_action_missing() {
+		unset( $_REQUEST['gpdf_sl_action'], $_REQUEST['plugin'] );
+
+		ob_start();
+		$this->class->show_changelog();
+		$this->assertEmpty( ob_get_clean() );
+	}
+
+	public function test_show_changelog_returns_early_for_mismatched_plugin() {
+		$_REQUEST['gpdf_sl_action'] = 'view_plugin_changelog';
+		$_REQUEST['plugin']         = 'something-else';
+
+		ob_start();
+		$this->class->show_changelog();
+		$output = ob_get_clean();
+
+		unset( $_REQUEST['gpdf_sl_action'], $_REQUEST['plugin'] );
+
+		$this->assertEmpty( $output );
+	}
+
+	public function test_convert_object_to_array_returns_empty_for_scalar_input() {
+		$this->assertSame( [], $this->class->convert_object_to_array( 'a-string' ) );
+		$this->assertSame( [], $this->class->convert_object_to_array( 42 ) );
+		$this->assertSame( [], $this->class->convert_object_to_array( null ) );
+	}
+
+	public function test_convert_object_to_array_recurses_into_nested_objects() {
+		$inner        = new \stdClass();
+		$inner->color = 'blue';
+
+		$outer        = new \stdClass();
+		$outer->inner = $inner;
+		$outer->scalar = 'x';
+
+		$result = $this->class->convert_object_to_array( $outer );
+
+		$this->assertSame( 'x', $result['scalar'] );
+		$this->assertSame( [ 'color' => 'blue' ], $result['inner'] );
+	}
+
+	public function test_verify_ssl_defaults_true_and_respects_filter() {
+		$this->assertTrue( $this->class->verify_ssl() );
+
+		add_filter( 'gpdf_sl_api_request_verify_ssl', '__return_false' );
+		$this->assertFalse( $this->class->verify_ssl() );
+		remove_filter( 'gpdf_sl_api_request_verify_ssl', '__return_false' );
+	}
+
+	public function test_get_active_plugins_merges_single_site_and_network_keys() {
+		update_option( 'active_plugins', [ 'a/a.php', 'b/b.php' ] );
+		update_site_option( 'active_sitewide_plugins', [ 'c/c.php' => 1, 'd/d.php' => 1 ] );
+
+		$merged = $this->class->get_active_plugins();
+
+		$this->assertContains( 'a/a.php', $merged );
+		$this->assertContains( 'b/b.php', $merged );
+		$this->assertContains( 'c/c.php', $merged );
+		$this->assertContains( 'd/d.php', $merged );
+	}
+
+	public function test_standardize_api_response_returns_false_for_empty_input() {
+		$this->assertFalse( $this->class->standardize_api_response( null ) );
+		$this->assertFalse( $this->class->standardize_api_response( '' ) );
+		$this->assertFalse( $this->class->standardize_api_response( false ) );
+	}
+
+	public function test_standardize_api_response_defaults_missing_requires_keys() {
+		$response              = new \stdClass();
+		$response->new_version = '0.2';
+
+		$result = $this->class->standardize_api_response( $response );
+
+		$this->assertSame( '', $result->requires );
+		$this->assertSame( '', $result->requires_php );
+		$this->assertSame( 'test-plugin/test-plugin.php', $result->plugin );
+		$this->assertSame( 'test-plugin/test-plugin.php', $result->id );
+	}
+
+	public function test_delete_transient_plugin_info_short_circuits_when_entry_missing() {
+		$transient           = new \stdClass();
+		$transient->response = [
+			'some-other/some-other.php' => 'untouched',
+		];
+		set_site_transient( 'update_plugins', $transient );
+
+		$this->assertTrue( $this->class->delete_transient_plugin_info() );
+
+		$after = get_site_transient( 'update_plugins' );
+		$this->assertSame( 'untouched', $after->response['some-other/some-other.php'] );
+	}
+
+	public function test_set_version_info_cache_skipped_when_plugin_not_active_in_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Not running multisite tests' );
+		}
+
+		update_option( 'active_plugins', [] );
+
+		$this->class->set_version_info_cache( [ 'foo' => 'bar' ] );
+
+		$this->assertEmpty( get_option( $this->class->get_cache_key() ) );
+	}
 }
