@@ -1,0 +1,97 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace GFPDF\Helper\Fields;
+
+use GF_Field;
+use GFPDF\Tests\Integration\TestCase;
+
+/**
+ * @group   helper
+ * @group   fields
+ */
+class Test_Field_Likert extends TestCase {
+
+	private function make_single_row_field(): array {
+		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$gf_field = null;
+		foreach ( $form['fields'] as $field ) {
+			if ( $field->type === 'survey' && isset( $field->inputType ) && $field->inputType === 'likert' && empty( $field->inputs ) ) {
+				$gf_field = $field;
+				break;
+			}
+		}
+
+		if ( ! $gf_field ) {
+			$this->fail( 'No single-row likert field found in all-form-fields fixture' );
+		}
+
+		return [ $gf_field, $form ];
+	}
+
+	public function test_value_returns_col_and_row_keys_for_single_row_likert() {
+		[ $gf_field, $form ] = $this->make_single_row_field();
+
+		$entry = [
+			'id'      => 0,
+			'form_id' => $form['id'],
+			(string) $gf_field->id => 'glikertcol2636762f85',
+		];
+
+		$pdf_field = new Field_Likert( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$value     = $pdf_field->value();
+
+		$this->assertArrayHasKey( 'col', $value );
+		$this->assertArrayHasKey( 'row', $value );
+		$this->assertContains( 'selected', $value['row'] );
+	}
+
+	public function test_is_empty_when_no_choice_selected() {
+		[ $gf_field, $form ] = $this->make_single_row_field();
+
+		$entry     = [ 'id' => 0, 'form_id' => $form['id'] ];
+		$pdf_field = new Field_Likert( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+
+		$this->assertTrue( $pdf_field->is_empty() );
+	}
+
+	public function test_form_data_uses_survey_likert_key() {
+		[ $gf_field, $form ] = $this->make_single_row_field();
+
+		$entry = [
+			'id'      => 0,
+			'form_id' => $form['id'],
+			(string) $gf_field->id => 'glikertcol2636762f85',
+		];
+
+		$pdf_field = new Field_Likert( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$form_data = $pdf_field->form_data();
+
+		$this->assertArrayHasKey( 'survey', $form_data );
+		$this->assertArrayHasKey( 'likert', $form_data['survey'] );
+		$this->assertArrayHasKey( $gf_field->id, $form_data['survey']['likert'] );
+	}
+
+	public function test_value_multi_row_contains_rows_key() {
+		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$gf_field = null;
+		foreach ( $form['fields'] as $field ) {
+			if ( $field->type === 'survey' && isset( $field->inputType ) && $field->inputType === 'likert' && ! empty( $field->inputs ) ) {
+				$gf_field = $field;
+				break;
+			}
+		}
+
+		if ( ! $gf_field ) {
+			$this->fail( 'No multi-row likert field found in all-form-fields fixture' );
+		}
+
+		$entry = [ 'id' => 0, 'form_id' => $form['id'] ];
+
+		$pdf_field = new Field_Likert( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$value     = $pdf_field->value();
+
+		$this->assertArrayHasKey( 'rows', $value );
+	}
+}

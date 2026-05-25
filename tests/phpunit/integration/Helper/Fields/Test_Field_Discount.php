@@ -1,0 +1,73 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace GFPDF\Helper\Fields;
+
+use GF_Field;
+use GFPDF\Tests\Integration\TestCase;
+
+/**
+ * @group   helper
+ * @group   fields
+ */
+class Test_Field_Discount extends TestCase {
+
+	/**
+	 * Builds a Field_Discount whose Field_Products companion uses a real GF entry
+	 * so GFCommon::get_product_fields() can resolve the form. Field id 99 is used
+	 * so it has no matching product in the fixture → value() returns [].
+	 */
+	private function make_pdf_field_with_real_entry(): Field_Discount {
+		$form_data              = $this->form( 'non-group-products-form' );
+		$form_id                = $this->gf_factory()->form->create( [], $form_data );
+		$entry_data             = $GLOBALS['GFPDF_Test']->entries['non-group-products-form'][0];
+		$entry_data['form_id']  = $form_id;
+		$entry_id               = $this->gf_factory()->entry->create( $entry_data );
+		$entry                  = \GFAPI::get_entry( $entry_id );
+
+		$gf_field       = new GF_Field();
+		$gf_field->id   = 99;
+		$gf_field->type = 'discount';
+
+		$pdf_field = new Field_Discount( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$pdf_field->set_products( new Field_Products( new GF_Field(), $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) );
+
+		return $pdf_field;
+	}
+
+	public function test_is_empty_when_gp_ecommerce_fields_absent() {
+		$gf_field       = new GF_Field();
+		$gf_field->id   = 1;
+		$gf_field->type = 'discount';
+
+		$entry     = [ 'id' => 0, 'form_id' => 0 ];
+		$pdf_field = new Field_Discount( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$pdf_field->set_products( new Field_Products( new GF_Field(), $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) );
+
+		/*
+		 * GP_Ecommerce_Fields is not present in the test environment so
+		 * Field_Discount::is_empty() short-circuits and returns true.
+		 */
+		$this->assertTrue( $pdf_field->is_empty() );
+	}
+
+	public function test_value_returns_empty_array_when_no_matching_product() {
+		$pdf_field = $this->make_pdf_field_with_real_entry();
+		$value     = $pdf_field->value();
+
+		$this->assertIsArray( $value );
+		$this->assertEmpty( $value );
+	}
+
+	public function test_form_data_returns_empty_strings_when_no_discount() {
+		$pdf_field = $this->make_pdf_field_with_real_entry();
+		$form_data = $pdf_field->form_data();
+
+		$this->assertArrayHasKey( 'field', $form_data );
+
+		foreach ( $form_data['field'] as $v ) {
+			$this->assertSame( '', $v );
+		}
+	}
+}
