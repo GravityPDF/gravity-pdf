@@ -144,11 +144,36 @@ After Phase 4 closed the bulk of the coverage gap — characterization tests for
 | `src/templates/` | 9 | 97 / 307 | **31.60%** | 0 |
 | **OVERALL** | **208** | **10363 / 13008** | **79.67%** | **+3.34 pp** |
 
-The CI gate in `tools/phpunit/coverage-gate.php` is now ratcheted to **79.67%** — Phase 4 gains are locked in.
+The CI gate in `tools/phpunit/coverage-gate.php` was ratcheted to **79.67%** at the close of Phase 4. The follow-up pass below raised it to **80.06%**.
 
-Remaining gaps worth a follow-up pass (numbers in pp from 100%):
+## Phase 4 follow-up (2026-05-25)
 
-- **Helper/Licensing** (43.6 pp gap, 130 statements) — `EDD_SL_Plugin_Updater` has large untested update/notice branches. Single file, single test class.
+Critical-class gap-fill pass on `Helper/Licensing/EDD_SL_Plugin_Updater`, `Helper_Abstract_Addon`, and `Model_PDF`:
+
+| Metric | Phase 4 | Follow-up | Δ |
+| --- | ---: | ---: | ---: |
+| Test count | 1424 | **1471** | +47 |
+| Assertions | 21314 | **21970** | +656 |
+| Wall-clock (coverage mode) | 42s | 55s | +13s |
+| Wall-clock (no coverage) | 31.7s | 38.2s | +6.5s |
+
+Coverage-mode wall-clock grew because the new tests exercise hot paths under xdebug instrumentation; the no-coverage delta is the truer signal of suite weight.
+
+| `src/` subdirectory | Files | Stmts covered / total | Line coverage | Δ vs Phase 4 |
+| :--- | ---: | :--- | ---: | ---: |
+| `src/Helper/Licensing/` | 1 | 176 / 298 | **59.06%** | +2.68 pp |
+| `src/Helper/` (top level) | 39 | 3428 / 4026 | **85.15%** | +1.05 pp |
+| `src/Model/` | 11 | 1976 / 2385 | **82.85%** | +0.04 pp |
+| **OVERALL** | **208** | **10414 / 13008** | **80.06%** | **+0.39 pp** |
+
+All other subdirectories unchanged.
+
+The CI gate in `tools/phpunit/coverage-gate.php` is now ratcheted to **80.06%**.
+
+Remaining gaps after the follow-up pass:
+
+- **Helper/Licensing** (40.9 pp gap, 122 statements) — remaining uncovered code is `get_version_from_remote` failure modes that require deeper mocking, and `show_changelog`'s `install_plugin_information()` path (calls `exit;`).
+- **Model_PDF** still has ~17% uncovered, mostly in seldom-exercised paths like `get_quiz_results`/`get_poll_results`/`get_survey_results` add-on integration branches.
 - **Helper/Log** (30.6 pp gap, 52 statements) — `Log/Logger::get_monolog()` has the PSR-Log v2/v3 detection branches; `MonoLoggerPsrLog2And3` itself cannot be exercised at runtime in this test env (see commit `b2cce9ed`).
 - **src/ root** (47.9 pp gap, 267 statements) — `bootstrap.php` activation paths are genuinely hard to characterize without rewriting the bootstrap as a class.
 - **View** (34.9 pp gap, 368 statements) — most remaining uncovered Views are HTML-partial paths; out of scope per the plan.

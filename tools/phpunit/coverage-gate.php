@@ -9,7 +9,7 @@
  * tests/phpunit/COVERAGE_BASELINE.md.
  */
 
-const MIN_COVERAGE_PERCENT = 79.67;
+const MIN_COVERAGE_PERCENT = 80.06;
 
 $xml_path = $argv[1] ?? 'tmp/coverage/report-xml/baseline.xml';
 
