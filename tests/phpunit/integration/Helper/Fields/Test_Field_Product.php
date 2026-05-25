@@ -42,9 +42,9 @@ class Test_Field_Product extends TestCase {
 		$this->form = $GLOBALS['GFPDF_Test']->form['non-group-products-form'];
 		$entry      = $GLOBALS['GFPDF_Test']->entries['non-group-products-form'][0];
 
-		$form_id    = \GFAPI::add_form( $this->form );
+		$form_id    = $this->gf_factory()->form->create([], $this->form);
 		$entry['form_id'] = $form_id;
-		$this->entry_id   = \GFAPI::add_entry( $entry );
+		$this->entry_id   = $this->gf_factory()->entry->create($entry);
 		$this->entry      = $entry;
 
 		parent::set_up();

@@ -38,9 +38,9 @@ class Test_Field_Option extends TestCase {
 		$this->form  = $GLOBALS['GFPDF_Test']->form['non-group-products-form'];
 		$this->entry = $GLOBALS['GFPDF_Test']->entries['non-group-products-form'][0];
 
-		$form_id                = \GFAPI::add_form( $this->form );
+		$form_id                = $this->gf_factory()->form->create([], $this->form);
 		$this->entry['form_id'] = $form_id;
-		$entry_id = \GFAPI::add_entry( $this->entry);
+		$entry_id = $this->gf_factory()->entry->create($this->entry);
 		$this->pdf_field  = new Field_Option( new \GF_Field_Option( $this->form['fields'][4] ), \GFAPI::get_entry( $entry_id ), \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 	}
 

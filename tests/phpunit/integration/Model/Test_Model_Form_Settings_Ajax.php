@@ -19,7 +19,7 @@ class Test_Model_Form_Settings_Ajax extends AjaxTestCase {
 		parent::set_up();
 
 		$json          = json_decode( trim( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/forms/form-settings.json' ) ), true );
-		$this->form_id = GFAPI::add_form( $json );
+		$this->form_id = $this->gf_factory()->form->create([], $json);
 	}
 
 	public function test_change_state_pdf_setting() {

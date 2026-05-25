@@ -62,46 +62,38 @@ class Test_Slow_PDF_Processes extends TestCase {
 	 *
 	 * @since 4.0
 	 */
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		global $gfpdf;
+		foreach ( glob( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/*.[tT][tT][fF]' ) ?: [] as $font ) {
+			@copy( $font, $gfpdf->data->template_font_location . basename( $font ) );
+		}
+	}
+
+	public static function tear_down_after_class() {
+		global $gfpdf;
+		foreach ( glob( $gfpdf->data->template_font_location . '*.[tT][tT][fF]' ) ?: [] as $font ) {
+			@unlink( $font );
+		}
+
+		parent::tear_down_after_class();
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
-		/* run parent method */
 		parent::set_up();
 
-		/* Setup our test classes */
-		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer() );
-		$this->view  = new View_PDF( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
-
+		$this->model      = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer() );
+		$this->view       = new View_PDF( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
-
-		$fonts = glob( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . '*.[tT][tT][fF]' );
-		$fonts = ( is_array( $fonts ) ) ? $fonts : [];
-
-		foreach ( $fonts as $font ) {
-			$font_name = basename( $font );
-			/* phpcs:disable */
-			@copy( $font, $gfpdf->data->template_font_location . $font_name );
-			/* phpcs:enable */
-		}
 
 		error_reporting( E_ALL & ~E_NOTICE );
 	}
 
-	/**
-	 * @since 5.0
-	 */
 	public function tear_down() {
-		global $gfpdf;
-
-		$fonts = glob( $gfpdf->data->template_font_location . '*.[tT][tT][fF]' );
-		$fonts = ( is_array( $fonts ) ) ? $fonts : [];
-
-		foreach ( $fonts as $font ) {
-			@unlink( $font );
-		}
-
 		parent::tear_down();
-
 		error_reporting( E_ALL );
 	}
 

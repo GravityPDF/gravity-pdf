@@ -34,9 +34,9 @@ class Test_Field_Markup extends TestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
 
-		$form_id          = GFAPI::add_form( $form );
+		$form_id          = $this->gf_factory()->form->create([], $form);
 		$entry['form_id'] = $form_id;
-		$entry_id         = GFAPI::add_entry( $entry );
+		$entry_id         = $this->gf_factory()->entry->create($entry);
 
 		$repeater = new GF_Field_Repeater( $form['fields'][1] );
 
@@ -57,9 +57,9 @@ class Test_Field_Markup extends TestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
 
-		$form_id          = GFAPI::add_form( $form );
+		$form_id          = $this->gf_factory()->form->create([], $form);
 		$entry['form_id'] = $form_id;
-		$entry_id         = GFAPI::add_entry( $entry );
+		$entry_id         = $this->gf_factory()->entry->create($entry);
 
 		$consent = new GF_Field_Consent( $form['fields'][0] );
 
@@ -77,9 +77,9 @@ class Test_Field_Markup extends TestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
-		$form_id          = GFAPI::add_form( $form );
+		$form_id          = $this->gf_factory()->form->create([], $form);
 		$entry['form_id'] = $form_id;
-		$entry_id         = GFAPI::add_entry( $entry );
+		$entry_id         = $this->gf_factory()->entry->create($entry);
 
 		/* Verify classes are truncated at 8 */
 		$text_field = new GF_Field_Text( $form['fields'][0] );

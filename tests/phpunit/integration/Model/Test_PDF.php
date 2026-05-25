@@ -386,7 +386,7 @@ class Test_PDF extends TestCase {
 			);
 		}
 
-		switch_to_blog( $this->factory()->blog->create() );
+		switch_to_blog( self::factory()->blog->create() );
 		gf_upgrade()->install();
 
 		/* Setup some test data */
@@ -395,10 +395,10 @@ class Test_PDF extends TestCase {
 		$entry            = $results['entry'];
 		$entry['form_id'] = $results['form']['id'];
 
-		$form_id          = GFAPI::add_form( $results['form'] );
+		$form_id          = $this->gf_factory()->form->create([], $results['form']);
 		$entry            = $results['entry'];
 		$entry['form_id'] = $form_id;
-		$entry_id         = GFAPI::add_entry( $entry );
+		$entry_id         = $this->gf_factory()->entry->create($entry);
 
 		$options = GPDFAPI::get_options_class();
 		$options->set_plugin_settings();

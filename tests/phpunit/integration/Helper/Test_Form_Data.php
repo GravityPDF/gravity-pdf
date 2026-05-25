@@ -267,17 +267,15 @@ class Test_Form_Data extends TestCase {
 	 */
 	public function test_field_number_currency() {
 		$form_json = json_decode( trim( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/forms/number-fields.json' ) ), true );
-		$form_id   = GFAPI::add_form( $form_json );
+		$form_id   = $this->gf_factory()->form->create([], $form_json);
 
-		$entry_id = GFAPI::add_entry(
-			[
+		$entry_id = $this->gf_factory()->entry->create([
 				'form_id'  => $form_id,
 				'currency' => 'EUR',
 				'1'        => 1000.10,
 				'2'        => 2000.10,
 				'3'        => 3000.10,
-			]
-		);
+			]);
 
 		$form_data = GPDFAPI::get_form_data( $entry_id );
 
@@ -285,15 +283,13 @@ class Test_Form_Data extends TestCase {
 		$this->assertEquals( '2000,1', $form_data['field'][2] );
 		$this->assertEquals( '3.000,10 &#8364;', $form_data['field'][3] );
 
-		$entry_id = GFAPI::add_entry(
-			[
+		$entry_id = $this->gf_factory()->entry->create([
 				'form_id'  => $form_id,
 				'currency' => 'AUD',
 				'1'        => 1000.10,
 				'2'        => 2000.10,
 				'3'        => 3000.10,
-			]
-		);
+			]);
 
 		$form_data = GPDFAPI::get_form_data( $entry_id );
 
@@ -1537,7 +1533,7 @@ class Test_Form_Data extends TestCase {
 	public function test_euro_product_data() {
 		$json            = json_decode( trim( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/entries/all-form-euro-product-entry.json' ) ), true );
 		$json['form_id'] = $this->form['id'];
-		$entry_id        = GFAPI::add_entry( $json );
+		$entry_id        = $this->gf_factory()->entry->create($json);
 		$entry           = GFAPI::get_entry( $entry_id );
 		$form_data       = GFPDFEntryDetail::lead_detail_grid_array( $this->form['id'], $entry );
 		$products        = $form_data['products'];
@@ -1571,9 +1567,9 @@ class Test_Form_Data extends TestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
 		$entry =  $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
 
-		$form_id          = GFAPI::add_form( $form );
+		$form_id          = $this->gf_factory()->form->create([], $form);
 		$entry['form_id'] = $form_id;
-		$entry_id         = GFAPI::add_entry( $entry );
+		$entry_id         = $this->gf_factory()->entry->create($entry);
 
 		$form_data = GPDFAPI::get_form_data( $entry_id );
 
@@ -1589,9 +1585,9 @@ class Test_Form_Data extends TestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
 		$entry =  $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
 
-		$form_id          = GFAPI::add_form( $form );
+		$form_id          = $this->gf_factory()->form->create([], $form);
 		$entry['form_id'] = $form_id;
-		$entry_id         = GFAPI::add_entry( $entry );
+		$entry_id         = $this->gf_factory()->entry->create($entry);
 
 		$form_data = GPDFAPI::get_form_data( $entry_id );
 

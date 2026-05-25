@@ -41,9 +41,9 @@ class Test_Field_Products extends TestCase {
 		$this->form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$this->entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
-		$form_id                = GFAPI::add_form( $this->form );
+		$form_id                = $this->gf_factory()->form->create([], $this->form);
 		$this->entry['form_id'] = $form_id;
-		$entry_id               = GFAPI::add_entry( $this->entry );
+		$entry_id               = $this->gf_factory()->entry->create($this->entry);
 		$this->pdf_field        = new Field_Products( new \GF_Field_Product(), GFAPI::get_entry( $entry_id ), GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 	}
 
