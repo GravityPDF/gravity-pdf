@@ -15,10 +15,7 @@ trait UsesFactory {
 	/** @var GF_UnitTest_Factory|null */
 	private $gfpdf_factory;
 
-	/**
-	 * @return GF_UnitTest_Factory
-	 */
-	protected function gf_factory() {
+	protected function gf_factory(): GF_UnitTest_Factory {
 		if ( null === $this->gfpdf_factory ) {
 			$this->gfpdf_factory = new GF_UnitTest_Factory();
 		}
