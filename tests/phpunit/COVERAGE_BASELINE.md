@@ -175,7 +175,7 @@ yarn wp-env:integration run wordpress bash -c '
 '
 ```
 
-Per-`src/`-subdir coverage is extracted from the Clover XML — every `<file>` element has a `name` attribute (the full absolute path, despite the attribute name) and a `<metrics>` child with `statements`/`coveredstatements`/`elements`/`coveredelements`. Group by the first path segment under `src/`, with `Helper/<sub>` broken out one level deeper. Run `tools/phpunit/coverage-baseline.py` to regenerate the per-subdir table above from the Clover XML.
+Per-`src/`-subdir coverage is extracted from the Clover XML — every `<file>` element has a `name` attribute (the full absolute path, despite the attribute name) and a `<metrics>` child with `statements`/`coveredstatements`/`elements`/`coveredelements`. Group by the first path segment under `src/`, with `Helper/<sub>` broken out one level deeper. Run `php tools/phpunit/coverage-baseline.php` to regenerate the per-subdir table above from the Clover XML.
 
 ### Playwright
 
