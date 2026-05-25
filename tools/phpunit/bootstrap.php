@@ -108,6 +108,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		require_once $root . '/Concerns/HasGfpdfFixtures.php';
 		require_once $root . '/integration/TestCase.php';
+		require_once $root . '/integration/AjaxTestCase.php';
 	}
 
 	/**
