@@ -24,10 +24,15 @@ class Test_Field_Section extends TestCase {
 
 	public $pdf_field;
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		parent::set_up();
 
-		$this->form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$this->form = $this->form( 'all-form-fields' );
 
 		foreach ( $this->form['fields'] as $field ) {
 			if ( $field->type === 'section' ) {
