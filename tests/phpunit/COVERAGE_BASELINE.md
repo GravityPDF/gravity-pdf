@@ -116,16 +116,16 @@ Coverage runtime overhead is modest in xdebug `coverage` mode: 47s (vs 38s witho
 
 ## Playwright (e2e) baseline
 
-| Metric | Value (local 2026-05-25) |
+| Metric | Value (local 2026-05-25, post `yarn build` + `composer install`) |
 | --- | --- |
-| Passed | 6 |
-| Failed | 60 |
-| Did not run | 21 |
-| Wall-clock | 8.4m |
+| Passed | 87 |
+| Failed | 0 |
+| Did not run | 0 |
+| Wall-clock | 2.2m (135s) |
 
-The local run is **not green**, but the failures look environmental (post-`dist/` rebuild, fresh wp-env, etc.) rather than refactor-driven — the PHPUnit refactor has not touched any code yet. For the authoritative Playwright baseline, **compare future PRs against the GitHub Actions Playwright workflow artifacts** (`.github/workflows/playwright-e2e.yml`) on the same commit, not the local run.
+Local run is fully green. The earlier captured run (6/60/21 in 8.4m) failed because `dist/` and `vendor/` were not built — Playwright requires both before the plugin will boot.
 
-This is recorded only so a contributor on a fresh machine doesn't conclude their environment is broken when they see the same numbers. Phase 2 changes touch fixture bootstrap; before merging Phase 2 verify Playwright in CI matches the pre-refactor CI baseline.
+For runtime regression detection prefer the sharded GitHub Actions Playwright workflow (`.github/workflows/playwright-e2e.yml`, 4-way `--shard`) — local wall-clock varies by machine. Phase 2 changes touch fixture bootstrap; before merging Phase 2 verify Playwright remains green in CI.
 
 ## Methodology — how to reproduce
 
