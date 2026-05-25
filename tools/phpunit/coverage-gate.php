@@ -2,17 +2,16 @@
 /**
  * Fail the build if overall line coverage falls below the Phase 0 baseline.
  *
- * Usage: php tools/phpunit/coverage-gate.php [path/to/clover.xml] [min-percent]
+ * Usage: php tools/phpunit/coverage-gate.php [path/to/clover.xml]
  *
- * Defaults: tmp/coverage/report-xml/baseline.xml at 76.33%.
- * Baseline is documented in tests/phpunit/COVERAGE_BASELINE.md and is meant to
- * ratchet upward quarterly — update the constant below when raising it.
+ * Defaults to tmp/coverage/report-xml/baseline.xml. Ratchet the floor upward
+ * by editing MIN_COVERAGE_PERCENT below; the value is also documented in
+ * tests/phpunit/COVERAGE_BASELINE.md.
  */
 
 const MIN_COVERAGE_PERCENT = 76.33;
 
-$xml_path    = $argv[1] ?? 'tmp/coverage/report-xml/baseline.xml';
-$min_percent = isset( $argv[2] ) ? (float) $argv[2] : MIN_COVERAGE_PERCENT;
+$xml_path = $argv[1] ?? 'tmp/coverage/report-xml/baseline.xml';
 
 $xml = @simplexml_load_file( $xml_path );
 if ( false === $xml ) {
@@ -35,11 +34,11 @@ printf(
 	$covered,
 	$statements,
 	$percent,
-	$min_percent
+	MIN_COVERAGE_PERCENT
 );
 
-if ( round( $percent, 2 ) < $min_percent ) {
-	fwrite( STDERR, sprintf( "FAIL: coverage %.2f%% below floor %.2f%%\n", $percent, $min_percent ) );
+if ( round( $percent, 2 ) < MIN_COVERAGE_PERCENT ) {
+	fwrite( STDERR, sprintf( "FAIL: coverage %.2f%% below floor %.2f%%\n", $percent, MIN_COVERAGE_PERCENT ) );
 	exit( 1 );
 }
 
