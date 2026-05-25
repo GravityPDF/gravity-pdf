@@ -8,9 +8,9 @@ namespace GFPDF\Tests\Concerns;
  * Ergonomic accessors for the shared form/entry fixtures loaded once per
  * suite by tools/phpunit/bootstrap.php into $GLOBALS['GFPDF_Test'].
  *
- * Both \GFPDF\Tests\Integration\TestCase and AjaxTestCase use this trait —
- * PHP has no multiple inheritance, so the accessors must live in a trait
- * that each base class can `use`.
+ * Lives in a trait so a future AJAX base extending WP_Ajax_UnitTestCase can
+ * share the same accessors without duplicating them (PHP has no multiple
+ * inheritance).
  */
 trait HasGfpdfFixtures {
 

@@ -81,7 +81,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		/* Load Mocks */
 		$this->mocks();
 
-		/* Load shared TestCase + Concerns infrastructure (Phase 1 of phpunit refactor) */
 		$this->load_test_infrastructure();
 	}
 
@@ -98,10 +97,9 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	}
 
 	/**
-	 * Load the shared TestCase + trait files used by tests under
-	 * tests/phpunit/integration/. Required explicitly because the
-	 * Concerns/ directory is intentionally not part of the PHPUnit
-	 * <testsuites> <directory> list.
+	 * Required explicitly because tests/phpunit/Concerns/ is intentionally
+	 * not part of the PHPUnit <testsuites> <directory> list (traits are not
+	 * tests).
 	 *
 	 * @since 7.0
 	 */
@@ -109,10 +107,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		$root = $this->plugin_dir . '/tests/phpunit';
 
 		require_once $root . '/Concerns/HasGfpdfFixtures.php';
-		require_once $root . '/Concerns/CleansFilesystem.php';
-		require_once $root . '/Concerns/UsesFactory.php';
 		require_once $root . '/integration/TestCase.php';
-		require_once $root . '/integration/AjaxTestCase.php';
 	}
 
 	/**

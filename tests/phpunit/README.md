@@ -14,12 +14,9 @@ tests/phpunit/
 ├── COVERAGE_BASELINE.md
 ├── README.md                         ← you are here
 ├── Concerns/                         ← shared traits (NOT discovered by PHPUnit)
-│   ├── HasGfpdfFixtures.php
-│   ├── CleansFilesystem.php
-│   └── UsesFactory.php
+│   └── HasGfpdfFixtures.php
 ├── integration/                      ← new location, mirrors src/ 1:1
 │   ├── TestCase.php
-│   ├── AjaxTestCase.php
 │   └── Statics/
 │       ├── Test_Cache.php
 │       └── Test_kses.php
@@ -42,15 +39,10 @@ One `Test_<ClassName>.php` per non-trivial `src/` class, at the matching path.
 Class name = `Test_<ClassName>`; method names use `test_` snake_case to keep
 `phpunit --filter test_something` searches predictable.
 
-## Choosing a base class
+## Base class
 
-| Need | Base class |
-| :--- | :--- |
-| Standard integration test (DB, hooks, options) | `\GFPDF\Tests\Integration\TestCase` |
-| Test that dispatches a `wp_ajax_*` action via `_handleAjax()` | `\GFPDF\Tests\Integration\AjaxTestCase` |
-
-Both extend WordPress's stock test cases and `use \GFPDF\Tests\Concerns\HasGfpdfFixtures`,
-which provides:
+Tests extend `\GFPDF\Tests\Integration\TestCase`, which extends `WP_UnitTestCase`
+and `use`s `\GFPDF\Tests\Concerns\HasGfpdfFixtures`. The trait provides:
 
 - `$this->form( 'all-form-fields' )` — shared form fixture loaded once per suite.
 - `$this->entry( 'all-form-fields', 0 )` — shared entry fixture.
@@ -58,6 +50,9 @@ which provides:
 - `$this->assertFixturesIntact()` — automatically called from `set_up()` to catch
   cross-test fixture mutation. Override `set_up()` only if you call
   `parent::set_up()`.
+
+A second base for `WP_Ajax_UnitTestCase`-derived tests will be added when Phase 2
+splits `test-ajax.php`.
 
 ## Writing a new test
 
@@ -101,10 +96,10 @@ batches of entries into `$GLOBALS['GFPDF_Test']` once per suite. Use the trait
 accessors rather than the global directly — same source, but failures point
 to the missing key instead of throwing an undefined-index notice.
 
-**Never call `GFAPI::add_form()` / `GFAPI::add_entry()` in a test body.**
-Phase 3 of the refactor enforces this; use the existing factory
-(`GF_UnitTest_Factory` at `tools/phpunit/gravityforms-factory.php`) via the
-`UsesFactory` trait when you need a per-test form/entry.
+**Avoid calling `GFAPI::add_form()` / `GFAPI::add_entry()` from a test body** —
+prefer the existing `GF_UnitTest_Factory` (`tools/phpunit/gravityforms-factory.php`)
+when you need a per-test form/entry. Phase 3 of the refactor will enforce this
+across the suite and ship a trait-based accessor.
 
 ## The "test if non-trivial" rule
 
