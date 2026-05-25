@@ -76,4 +76,56 @@ class Test_Logger extends TestCase {
 		$files = \GFCommon::glob( '*.txt', $dir );
 		$this->assertCount( 10, $files );
 	}
+
+	public function test_setup_gravityforms_logging_no_op_when_plugin_disabled_globally() {
+		delete_option( 'gform_enable_logging' );
+
+		$logger = ( new Logger( 'slug', 'Name' ) )->get_logger();
+
+		$handlers = $logger->getHandlers();
+		$this->assertCount( 1, $handlers );
+		$this->assertInstanceOf( 'GFPDF_Vendor\Monolog\Handler\NullHandler', $handlers[0] );
+	}
+
+	public function test_setup_gravityforms_logging_no_op_when_log_level_is_off() {
+		\GFLogging::get_instance()->update_plugin_settings(
+			[
+				'level_off_slug' => [
+					'enable'    => true,
+					'file_name' => sha1( (string) time() ) . '_off',
+					'log_level' => 6,
+				],
+			]
+		);
+
+		$logger = ( new Logger( 'level_off_slug', 'Name' ) )->get_logger();
+
+		$handlers = $logger->getHandlers();
+		$this->assertCount( 1, $handlers );
+		$this->assertInstanceOf( 'GFPDF_Vendor\Monolog\Handler\NullHandler', $handlers[0] );
+	}
+
+	public function test_setup_gravityforms_logging_uses_error_level_when_log_level_is_4() {
+		$gf_logger = \GFLogging::get_instance();
+		$gf_logger->delete_log_files();
+		$gf_logger->update_plugin_settings(
+			[
+				'error_slug' => [
+					'enable'    => true,
+					'file_name' => sha1( (string) time() ) . '_error',
+					'log_level' => 4,
+				],
+			]
+		);
+
+		$logger = ( new Logger( 'error_slug', 'Name' ) )->get_logger();
+
+		$stream_handlers = array_filter(
+			$logger->getHandlers(),
+			static fn( $h ) => $h instanceof \GFPDF_Vendor\Monolog\Handler\StreamHandler
+		);
+
+		$this->assertCount( 1, $stream_handlers );
+		$this->assertSame( \GFPDF_Vendor\Monolog\Logger::ERROR, reset( $stream_handlers )->getLevel() );
+	}
 }

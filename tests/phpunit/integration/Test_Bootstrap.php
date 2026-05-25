@@ -250,4 +250,85 @@ class Test_Bootstrap extends TestCase {
 		$this->assertTrue( is_array( $gfpdf->data->addon ) );
 		$this->assertNotEmpty( $gfpdf->data->store_url );
 	}
+
+	public function test_plugin_action_links_prepends_settings_link() {
+		$links = $this->loader->plugin_action_links( [ 'deactivate' => '<a>Deactivate</a>' ] );
+
+		$keys = array_keys( $links );
+		$this->assertSame( 'settings', $keys[0] );
+		$this->assertStringContainsString( 'View Gravity PDF Settings', $links['settings'] );
+		$this->assertArrayHasKey( 'deactivate', $links );
+	}
+
+	public function test_plugin_row_meta_passes_through_for_unrelated_plugins() {
+		$links = $this->loader->plugin_row_meta( [ 'view-details' => '<a>View</a>' ], 'other-plugin/other.php' );
+
+		$this->assertSame( [ 'view-details' => '<a>View</a>' ], $links );
+	}
+
+	public function test_plugin_row_meta_adds_docs_links_for_gravity_pdf() {
+		$links = $this->loader->plugin_row_meta( [ 'view-details' => '<a>View</a>' ], PDF_PLUGIN_BASENAME );
+
+		$this->assertArrayHasKey( 'docs', $links );
+		$this->assertArrayHasKey( 'support', $links );
+		$this->assertArrayHasKey( 'extension-shop', $links );
+		$this->assertArrayHasKey( 'template-shop', $links );
+	}
+
+	public function test_add_body_class_appends_gfpdf_page_class_on_admin_pdf_page() {
+		set_current_screen( 'dashboard' );
+		$_GET['page'] = 'gfpdf-tools';
+
+		$classes = $this->loader->add_body_class( 'foo' );
+
+		unset( $_GET['page'] );
+
+		$this->assertSame( 'foo gfpdf-page', $classes );
+	}
+
+	public function test_add_body_class_passes_through_when_not_on_gfpdf_page() {
+		$this->assertSame( 'foo', $this->loader->add_body_class( 'foo' ) );
+	}
+
+	public function test_tinymce_styles_appends_to_existing_content_style() {
+		$result = $this->loader->tinymce_styles( [ 'content_style' => 'p { color: red; }' ] );
+
+		$this->assertStringStartsWith( 'p { color: red; } ', $result['content_style'] );
+		$this->assertStringContainsString( 'body#tinymce', $result['content_style'] );
+	}
+
+	public function test_tinymce_styles_sets_content_style_when_missing() {
+		$result = $this->loader->tinymce_styles( [] );
+
+		$this->assertStringContainsString( 'body#tinymce', $result['content_style'] );
+	}
+
+	public function test_register_assets_registers_gfpdf_styles_and_scripts() {
+		$this->loader->register_assets();
+
+		$this->assertTrue( wp_style_is( 'gfpdf_css_styles', 'registered' ) );
+		$this->assertTrue( wp_script_is( 'gfpdf_js_settings', 'registered' ) );
+		$this->assertTrue( wp_script_is( 'gfpdf_js_entrypoint', 'registered' ) );
+		$this->assertTrue( wp_script_is( 'gfpdf_js_entries', 'registered' ) );
+	}
+
+	public function test_get_config_data_delegates_to_get_default_config_data() {
+		$this->assertSame(
+			$this->loader->get_default_config_data( 1 ),
+			$this->loader->get_config_data( 1 )
+		);
+	}
+
+	public function test_add_admin_messages_routes_errors_and_notices_into_notice_system() {
+		add_settings_error( 'gfpdf-notices', 'err-code', 'Boom', 'error' );
+		add_settings_error( 'gfpdf-notices', 'ok-code', 'All good', 'updated' );
+
+		$this->loader->add_admin_messages();
+
+		$this->assertTrue( $this->loader->notices->has_error() );
+		$this->assertTrue( $this->loader->notices->has_notice() );
+
+		global $wp_settings_errors;
+		$wp_settings_errors = [];
+	}
 }

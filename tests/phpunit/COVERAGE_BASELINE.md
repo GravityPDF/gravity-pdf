@@ -195,7 +195,29 @@ Second gap-fill pass on `Helper/Licensing/EDD_SL_Plugin_Updater` — 8 new tests
 
 **Note on the overall delta:** the previous follow-up's 80.06% measurement was at the high end of natural xdebug coverage variance. Re-measuring the same source/tests pre-this-change yields **79.97%** (3 statement drift in Helper top-level + Statics), and three runs with the new tests applied land at 80.00–80.01%. The Helper/Licensing **+3 statements / +1.01 pp** is reproducible; the overall floor sits ~0.05 pp below the previously reported figure once natural variance is accounted for.
 
-The CI gate in `tools/phpunit/coverage-gate.php` is recalibrated to **79.95%** — a ~0.05 pp safety margin below the worst observed run with the new tests included, still well above the Phase 4 baseline of 79.67%.
+The CI gate in `tools/phpunit/coverage-gate.php` is recalibrated to **79.95%** — a ~0.05 pp safety margin below the worst observed run with the new tests included, still well above the Phase 4 baseline of 79.67%. See follow-up #3 below for a further ratchet to **80.25%** after a third gap-fill pass.
+
+## Phase 4 follow-up #3 (2026-05-25)
+
+Third gap-fill pass targeting the remaining items on the follow-up #2 punch list: `Model_PDF` quiz/poll/survey add-on integration branches, `Helper/Log/Logger` `setup_gravityforms_logging` early-return + ERROR-level branches, and `src/bootstrap.php` plugin-meta/admin-message/asset-registration paths.
+
+| Metric | Follow-up #2 | Follow-up #3 | Δ |
+| --- | ---: | ---: | ---: |
+| Test count | 1479 | **1500** | +21 |
+| Assertions | 22078 | **22368** | +290 |
+
+| `src/` subdirectory | Files | Stmts covered / total | Line coverage | Δ vs Follow-up #2 |
+| :--- | ---: | :--- | ---: | ---: |
+| `src/` root | 3 | 336 / 557 | **60.32%** | +8.26 pp |
+| `src/Model/` | 11 | 1977 / 2385 | **82.89%** | +0.04 pp |
+| `src/Helper/Log/` | 3 | 119 / 170 | **70.00%** | +0.59 pp |
+| **OVERALL** | **208** | **10456 / 13008** | **80.38%** | **+0.38 pp** |
+
+The biggest single gain is `src/bootstrap.php` (+46 statements): tests for `plugin_action_links`, `plugin_row_meta`, `add_body_class`, `tinymce_styles`, `register_assets`, `get_config_data`, and `add_admin_messages` exercise paths previously reachable only via real WordPress page loads.
+
+`Model_PDF` and `Helper/Log/Logger` gains are smaller in absolute terms because their remaining uncovered branches require third-party dependencies (Gravity Forms add-on data sources, PSR-Log v2/v3 libraries) that aren't loaded in this test bootstrap — see the standing note about `MonoLoggerPsrLog2And3` (commit `b2cce9ed`).
+
+Two consecutive coverage runs land at 80.37–80.38% (2-statement drift in `Statics/`). The CI gate is ratcheted to **80.25%** — ~0.10 pp safety margin below the worst observed run, still well above the previous floor of 79.95%.
 
 ## Playwright (e2e) baseline
 

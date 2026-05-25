@@ -245,4 +245,70 @@ class Test_Model_PDF extends TestCase {
 
 		$gfpdf->options->delete_option( 'admin_capabilities' );
 	}
+
+	public function test_get_quiz_results_returns_empty_when_form_has_no_quiz_field() {
+		$form  = [ 'id' => 1, 'fields' => [ [ 'type' => 'text' ] ] ];
+		$entry = [ 'id' => 1 ];
+
+		$this->assertSame( [], $this->model->get_quiz_results( $form, $entry ) );
+	}
+
+	public function test_get_survey_results_returns_empty_when_form_has_no_survey_field() {
+		$form  = [ 'id' => 1, 'fields' => [ [ 'type' => 'text' ] ] ];
+		$entry = [ 'id' => 1 ];
+
+		$this->assertSame( [], $this->model->get_survey_results( $form, $entry ) );
+	}
+
+	public function test_get_poll_results_returns_empty_when_form_has_no_poll_field() {
+		$form  = [ 'id' => 1, 'fields' => [ [ 'type' => 'text' ] ] ];
+		$entry = [ 'id' => 1 ];
+
+		$this->assertSame( [], $this->model->get_poll_results( $form, $entry ) );
+	}
+
+	public function test_get_quiz_results_populates_config_and_results_when_quiz_field_present() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$data = $this->model->get_quiz_results( $form, $entry );
+
+		$this->assertArrayHasKey( 'quiz', $data );
+		$this->assertArrayHasKey( 'config', $data['quiz'] );
+		$this->assertArrayHasKey( 'results', $data['quiz'] );
+		$this->assertArrayHasKey( 'global', $data['quiz'] );
+	}
+
+	public function test_get_poll_results_populates_global_data_when_poll_field_present() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$data = $this->model->get_poll_results( $form, $entry );
+
+		$this->assertArrayHasKey( 'poll', $data );
+		$this->assertArrayHasKey( 'global', $data['poll'] );
+	}
+
+	public function test_get_survey_results_populates_global_data_when_survey_field_present() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$data = $this->model->get_survey_results( $form, $entry );
+
+		$this->assertArrayHasKey( 'survey', $data );
+		$this->assertArrayHasKey( 'global', $data['survey'] );
+	}
+
+	public function test_get_addon_global_data_short_circuits_when_filter_disables_it() {
+		add_filter( 'gfpdf_disable_global_addon_data', '__return_true' );
+
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$data = $this->model->get_poll_results( $form, $entry );
+
+		remove_filter( 'gfpdf_disable_global_addon_data', '__return_true' );
+
+		$this->assertSame( [], $data );
+	}
 }
