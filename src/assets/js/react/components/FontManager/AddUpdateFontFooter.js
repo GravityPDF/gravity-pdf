@@ -11,6 +11,7 @@ import {
 	deleteFont as deleteFontAction,
 } from '../../actions/fontManager';
 import TemplateTooltip from './TemplateTooltip';
+import { getTabLocation } from '../../utilities/FontManager/getTabLocation';
 
 /**
  * @package			Gravity PDF
@@ -166,6 +167,8 @@ export class AddUpdateFontFooter extends Component {
 		);
 		const selectedBoxStyle =
 			id !== '' && id === selectedFont ? ' checked' : ' uncheck';
+		/* No parent font dropdown on the Tools tab, so the tick has no target */
+		const hideSelectFontButton = getTabLocation() === 'tools';
 		/* Display error message for uploading invalid font file */
 		const displayInvalidFileErrorMessage =
 			errorAddFont && errorFontValidation;
@@ -211,7 +214,7 @@ export class AddUpdateFontFooter extends Component {
 					</div>
 
 					<div className="select-delete-icons-container">
-						{id && (
+						{id && !hideSelectFontButton && (
 							<button
 								className={
 									'dashicons dashicons-yes' + selectedBoxStyle

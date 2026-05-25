@@ -70,6 +70,25 @@ export function* templateUploadProcessing(action) {
 			action.payload.file,
 			action.payload.filename
 		);
+
+		if (
+			!response.ok ||
+			!response.body ||
+			!Array.isArray(response.body.templates)
+		) {
+			yield put(
+				templateUploadProcessingFailed({
+					message:
+						response.body &&
+						typeof response.body === 'object' &&
+						response.body.error
+							? response.body.error
+							: '',
+				})
+			);
+			return;
+		}
+
 		yield put(templateUploadProcessingSuccess(response.body));
 	} catch (error) {
 		yield put(

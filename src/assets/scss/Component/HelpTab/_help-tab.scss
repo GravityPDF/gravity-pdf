@@ -228,7 +228,7 @@
         line-height: 32px;
       }
 
-      ol {
+      ul {
         margin: 0;
         list-style: none;
 
@@ -270,6 +270,11 @@
                     text-overflow: ellipsis;
                   }
                 }
+
+                .hit-action {
+                  color: #fff;
+                  visibility: visible;
+                }
               }
             }
 
@@ -309,6 +314,16 @@
                   color: rgb(150, 159, 175);
                   font-size: 0.75rem;
                 }
+              }
+
+              .hit-action {
+                align-items: center;
+                color: rgb(150, 159, 175);
+                display: flex;
+                height: 22px;
+                stroke-width: 1.4;
+                visibility: hidden;
+                width: 22px;
               }
             }
           }

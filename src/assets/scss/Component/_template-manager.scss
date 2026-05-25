@@ -26,6 +26,10 @@
           display: block;
         }
 
+        .more-details {
+          box-sizing: border-box;
+        }
+
         &.active .theme-name {
           background: #1d2327;
         }

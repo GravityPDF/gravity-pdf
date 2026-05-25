@@ -156,7 +156,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Get the template headers now all the files are in the right location */
 		$this->templates->flush_template_transient_cache();
-		$headers = $this->get_template_info( glob( $unzipped_dir_name . '*.php', GLOB_NOSORT ) );
+		$headers = $this->get_template_info( $this->templates->get_all_templates_in_folder( $unzipped_dir_name ) );
 
 		/* Fix template path */
 		$headers = array_map(
@@ -357,8 +357,10 @@ class Model_Templates extends Helper_Abstract_Model {
 			throw new Exception( esc_html( $results->get_error_message() ) );
 		}
 
-		/* Check unzipped templates for a valid v4 header, or v3 string pattern */
-		$files = glob( $dir . '*.php', GLOB_NOSORT );
+		/* Check unzipped templates for a valid v4 header, or v3 string pattern.
+		   Avoid glob() here — it can return a stale (empty) listing when called
+		   immediately after unzip_file() writes via the WP_Filesystem abstraction */
+		$files = $this->templates->get_all_templates_in_folder( $dir );
 
 		if ( ! is_array( $files ) || count( $files ) === 0 ) {
 			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );

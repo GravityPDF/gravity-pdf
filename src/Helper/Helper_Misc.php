@@ -833,6 +833,39 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Whether a PDF's saved settings should pass the entry through conditional-logic gating.
+	 *
+	 * The form-settings UI exposes two related fields: the `conditional` toggle (the user-visible
+	 * on/off switch) and the `conditionalLogic` rules array. They can drift out of sync — the
+	 * toggle gets disabled while the rules array keeps its previous value — so trusting only
+	 * `conditionalLogic` makes the runtime disagree with what the UI shows.
+	 *
+	 * Returns true when the entry is allowed (toggle off, no rules, or rules pass), false when
+	 * the toggle is on and rules explicitly reject the entry.
+	 *
+	 * The `conditional` key may be absent on very old settings; treat that as "no override,
+	 * fall back to the rules" so legacy behaviour is preserved.
+	 *
+	 * @param array $settings The PDF settings array
+	 * @param array $entry    The Gravity Forms entry
+	 *
+	 * @return bool
+	 *
+	 * @since 6.14.3
+	 */
+	public function conditional_logic_passes( $settings, $entry ) {
+		if ( array_key_exists( 'conditional', $settings ) && empty( $settings['conditional'] ) ) {
+			return true;
+		}
+
+		if ( empty( $settings['conditionalLogic'] ) ) {
+			return true;
+		}
+
+		return $this->evaluate_conditional_logic( $settings['conditionalLogic'], $entry );
+	}
+
+	/**
 	 * Determine if the logic should show or hide the item
 	 *
 	 * @param array $logic

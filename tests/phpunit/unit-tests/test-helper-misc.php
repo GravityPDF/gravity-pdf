@@ -376,6 +376,93 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Verify conditional_logic_passes() honours the `conditional` toggle as the source of
+	 * truth for whether conditional-logic gating runs.
+	 *
+	 * Regression coverage for the case where the user disables the toggle in the UI but
+	 * a stale `conditionalLogic` rules array remains in the saved settings — the runtime
+	 * must not reject entries against rules the UI says are off.
+	 *
+	 * @since 6.14.3
+	 */
+	public function test_conditional_logic_passes() {
+		$data             = $this->create_form_and_entries();
+		$entry            = $data['entry'];
+		$entry['form_id'] = $data['form']['id'];
+
+		$failing_rules = [
+			'actionType' => 'show',
+			'logicType'  => 'all',
+			'rules'      => [
+				[
+					'fieldId'  => '1',
+					'operator' => 'is',
+					'value'    => 'this-will-never-match',
+				],
+			],
+		];
+
+		$passing_rules = [
+			'actionType' => 'show',
+			'logicType'  => 'all',
+			'rules'      => [
+				[
+					'fieldId'  => '1',
+					'operator' => 'is',
+					'value'    => 'My Single Line Response',
+				],
+			],
+		];
+
+		/* Toggle off + stale failing rules → passes (the bug we are fixing) */
+		$this->assertTrue(
+			$this->misc->conditional_logic_passes(
+				[ 'conditional' => '', 'conditionalLogic' => $failing_rules ],
+				$entry
+			),
+			'Toggle off with stale failing rules must pass — UI says conditional logic is disabled.'
+		);
+
+		/* Toggle off + passing rules → still passes (toggle short-circuits before evaluation) */
+		$this->assertTrue(
+			$this->misc->conditional_logic_passes(
+				[ 'conditional' => '', 'conditionalLogic' => $passing_rules ],
+				$entry
+			)
+		);
+
+		/* Toggle on + passing rules → passes */
+		$this->assertTrue(
+			$this->misc->conditional_logic_passes(
+				[ 'conditional' => '1', 'conditionalLogic' => $passing_rules ],
+				$entry
+			)
+		);
+
+		/* Toggle on + failing rules → fails */
+		$this->assertFalse(
+			$this->misc->conditional_logic_passes(
+				[ 'conditional' => '1', 'conditionalLogic' => $failing_rules ],
+				$entry
+			)
+		);
+
+		/* No conditional logic rules at all → passes regardless of toggle */
+		$this->assertTrue( $this->misc->conditional_logic_passes( [ 'conditional' => '1' ], $entry ) );
+		$this->assertTrue( $this->misc->conditional_logic_passes( [], $entry ) );
+
+		/* Legacy settings (no `conditional` key) fall back to evaluating the rules */
+		$this->assertTrue(
+			$this->misc->conditional_logic_passes( [ 'conditionalLogic' => $passing_rules ], $entry ),
+			'Legacy settings without the toggle should evaluate the rules normally.'
+		);
+		$this->assertFalse(
+			$this->misc->conditional_logic_passes( [ 'conditionalLogic' => $failing_rules ], $entry ),
+			'Legacy settings without the toggle should still reject entries against failing rules.'
+		);
+	}
+
+	/**
 	 * Ensure we correctly return an appropriate class name based on the file path given
 	 *
 	 * @param string $expected The expected value

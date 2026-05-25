@@ -29,6 +29,11 @@ import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts';
 export function* getFilesFromGitHub() {
 	try {
 		const response = yield call(apiGetFilesFromGitHub);
+
+		if (!response.ok || !response.body) {
+			throw response;
+		}
+
 		yield put(getFilesFromGitHubSuccess(response.body));
 	} catch (error) {
 		yield put(getFilesFromGitHubFailed(GFPDF.coreFontGithubError));
@@ -71,7 +76,7 @@ export function* getDownloadFonts(chan) {
 		try {
 			const response = yield call(apiPostDownloadFonts, payload);
 
-			if (!response.body) {
+			if (!response.ok || !response.body) {
 				throw response;
 			}
 

@@ -2,7 +2,7 @@
 
 namespace GFPDF\Tests;
 
-use GFCommon;
+use GFForms;
 use GFPDF_Major_Compatibility_Checks;
 use WP_UnitTestCase;
 
@@ -106,7 +106,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 */
 	public function test_check_gravityforms( $min_version, $test_gf_version, $expected ) {
 		/* set up our current Gravity Forms version and the min version */
-		\GFForms::$version                     = $test_gf_version;
+		GFForms::$version                      = $test_gf_version;
 		$this->gravitypdf->required_gf_version = $min_version;
 
 		/* run our test */

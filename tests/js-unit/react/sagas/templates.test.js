@@ -13,6 +13,7 @@ import {
 	TEMPLATE_PROCESSING,
 	TEMPLATE_PROCESSING_FAILED,
 	POST_TEMPLATE_UPLOAD_PROCESSING,
+	TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 	TEMPLATE_UPLOAD_PROCESSING_FAILED,
 } from '../../../../src/assets/js/react/actions/templates';
 import * as api from '../../../../src/assets/js/react/api/templates';
@@ -88,12 +89,12 @@ describe('Sagas - templates', () => {
 	});
 
 	describe('templateUploadProcessing()', () => {
-		const newaction = {
-			payload: { file: { data: 'test' }, filename: 'test' },
-		};
-		const gen = templateUploadProcessing(newaction);
-
 		test('should check that saga asks to call the API for templateUploadProcessing', () => {
+			const newaction = {
+				payload: { file: { data: 'test' }, filename: 'test' },
+			};
+			const gen = templateUploadProcessing(newaction);
+
 			expect(gen.next().value).toEqual(
 				call(
 					api.apiPostTemplateUploadProcessing,
@@ -103,14 +104,73 @@ describe('Sagas - templates', () => {
 			);
 		});
 
-		test('should check that saga handles correctly to the failure of templateUploadProcessing API call', () => {
-			expect(
-				gen.throw({ message: 'template upload processing failed' })
-					.value
-			).toEqual(
+		test('should route to failed when the API responds with a non-ok status', () => {
+			const newaction = {
+				payload: { file: { data: 'test' }, filename: 'test' },
+			};
+			const gen = templateUploadProcessing(newaction);
+			gen.next();
+
+			const response = {
+				ok: false,
+				status: 400,
+				body: { error: 'invalid zip' },
+			};
+			expect(gen.next(response).value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-					payload: { message: 'template upload processing failed' },
+					payload: { message: 'invalid zip' },
+				})
+			);
+		});
+
+		test('should route to success when the API responds with ok and a templates array', () => {
+			const newaction = {
+				payload: { file: { data: 'test' }, filename: 'test' },
+			};
+			const gen = templateUploadProcessing(newaction);
+			gen.next();
+
+			const response = {
+				ok: true,
+				status: 200,
+				body: { templates: [{ id: 'foo' }] },
+			};
+			expect(gen.next(response).value).toEqual(
+				put({
+					type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
+					payload: response.body,
+				})
+			);
+		});
+
+		test('should route to failed when the API response is missing a templates array', () => {
+			const newaction = {
+				payload: { file: { data: 'test' }, filename: 'test' },
+			};
+			const gen = templateUploadProcessing(newaction);
+			gen.next();
+
+			const response = { ok: true, status: 200, body: 400 };
+			expect(gen.next(response).value).toEqual(
+				put({
+					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
+					payload: { message: '' },
+				})
+			);
+		});
+
+		test('should route to failed when the fetch itself throws', () => {
+			const newaction = {
+				payload: { file: { data: 'test' }, filename: 'test' },
+			};
+			const gen = templateUploadProcessing(newaction);
+			gen.next();
+
+			expect(gen.throw({ message: 'network failure' }).value).toEqual(
+				put({
+					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
+					payload: { message: 'network failure' },
 				})
 			);
 		});
