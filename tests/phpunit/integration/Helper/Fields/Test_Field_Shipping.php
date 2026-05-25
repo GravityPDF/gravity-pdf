@@ -8,11 +8,6 @@ use GF_Field;
 use GF_Field_Shipping;
 use GFPDF\Tests\Integration\TestCase;
 
-/**
- * @package     Gravity PDF
- * @copyright   Copyright (c) 2026, Blue Liquid Designs
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- */
 
 /**
  * @group   helper

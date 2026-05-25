@@ -8,11 +8,6 @@ use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\FileInfo;
 
-/**
- * @package     Gravity PDF
- * @copyright   Copyright (c) 2026, Blue Liquid Designs
- * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- */
 
 /**
  * @group   helper
