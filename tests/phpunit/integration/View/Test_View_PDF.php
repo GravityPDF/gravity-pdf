@@ -15,6 +15,11 @@ class Test_View_PDF extends TestCase {
 	/** @var View_PDF */
 	private $view;
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
@@ -69,7 +74,7 @@ class Test_View_PDF extends TestCase {
 	}
 
 	public function test_autoprocess_core_template_options_prepends_styles_for_standard_template() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$html     = '<p>original</p>';
 		$entry    = [ 'form_id' => $form['id'] ];
 		$settings = [ 'template' => 'zadani' ];
