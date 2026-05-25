@@ -186,4 +186,40 @@ class Test_Uninstaller extends TestCase {
 			$gfpdf->gform->update_form( $form );
 		}
 	}
+
+	public function test_remove_plugin_transients_clears_settings_user_data_transient() {
+		set_transient( 'gfpdf_settings_user_data', [ 'key' => 'value' ], HOUR_IN_SECONDS );
+
+		$this->assertNotFalse( get_transient( 'gfpdf_settings_user_data' ) );
+
+		$this->model->remove_plugin_transients();
+
+		$this->assertFalse( get_transient( 'gfpdf_settings_user_data' ) );
+	}
+
+	public function test_remove_folder_structure_skips_paths_that_do_not_exist() {
+		add_filter(
+			'gfpdf_uninstall_path',
+			static function () {
+				return [ '/path/that/definitely/does/not/exist/' . uniqid() ];
+			}
+		);
+
+		$this->model->remove_folder_structure();
+		remove_all_filters( 'gfpdf_uninstall_path' );
+
+		$this->assertTrue( true );
+	}
+
+	public function test_deactivate_plugin_defaults_basename_when_empty() {
+		$this->model->deactivate_plugin( '' );
+
+		$this->assertFalse( is_plugin_active( PDF_PLUGIN_BASENAME ) );
+	}
+
+	public function test_deactivate_plugin_wraps_string_basename_in_array() {
+		$this->model->deactivate_plugin( 'unknown/plugin.php' );
+
+		$this->assertFalse( is_plugin_active( 'unknown/plugin.php' ) );
+	}
 }

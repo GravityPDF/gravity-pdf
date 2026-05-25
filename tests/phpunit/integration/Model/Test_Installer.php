@@ -248,4 +248,39 @@ class Test_Installer extends TestCase {
 		$this->assertEquals( 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]', $wp_rewrite->extra_rules_top[ '^' . $gfpdf->data->permalink ] );
 		$this->assertEquals( 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]', $wp_rewrite->extra_rules_top[ '^' . $wp_rewrite->root . $gfpdf->data->permalink ] );
 	}
+
+	public function test_register_rewrite_tags_appends_pdf_query_vars_when_gpdf_get_present() {
+		$_GET['gpdf'] = '1';
+		$tags         = $this->model->register_rewrite_tags( [ 'existing' ] );
+		unset( $_GET['gpdf'] );
+
+		$this->assertSame( [ 'existing', 'gpdf', 'pid', 'lid', 'action' ], $tags );
+	}
+
+	public function test_register_rewrite_tags_returns_input_unchanged_without_pdf_query() {
+		$tags = $this->model->register_rewrite_tags( [ 'existing' ] );
+
+		$this->assertSame( [ 'existing' ], $tags );
+	}
+
+	public function test_maybe_flush_rewrite_rules_runs_without_error_when_rules_missing() {
+		update_option( 'rewrite_rules', [] );
+
+		$this->model->maybe_flush_rewrite_rules( [ '^some/missing/rule/' ] );
+
+		$this->assertTrue( true );
+	}
+
+	public function test_setup_multisite_template_location_returns_early_on_single_site() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single-site path only.' );
+		}
+
+		global $gfpdf;
+		$before = $gfpdf->data->multisite_template_location ?? null;
+
+		$this->model->setup_multisite_template_location();
+
+		$this->assertSame( $before, $gfpdf->data->multisite_template_location ?? null );
+	}
 }

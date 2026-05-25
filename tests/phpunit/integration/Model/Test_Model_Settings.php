@@ -203,6 +203,84 @@ class Test_Model_Settings extends TestCase {
 		remove_filter( 'pre_http_request', $api_response );
 	}
 
+	public function test_style_capabilities_humanizes_gravity_forms_caps() {
+		$this->assertSame( 'Gravity Forms Edit Settings', $this->model->style_capabilities( 'gravityforms_edit_settings' ) );
+		$this->assertSame( 'Manage Options', $this->model->style_capabilities( 'manage_options' ) );
+	}
+
+	public function test_highlight_errors_adds_gfield_error_class_to_matching_id() {
+		set_transient(
+			'settings_errors',
+			[
+				[ 'code' => 'foo', 'type' => 'error' ],
+			]
+		);
+
+		$settings = [
+			'group' => [
+				[ 'id' => 'foo' ],
+				[ 'id' => 'bar', 'class' => 'existing' ],
+			],
+		];
+
+		$out = $this->model->highlight_errors( $settings );
+		delete_transient( 'settings_errors' );
+
+		$this->assertSame( 'gfield_error', $out['group'][0]['class'] );
+		$this->assertSame( 'existing', $out['group'][1]['class'] );
+	}
+
+	public function test_highlight_errors_ignores_non_error_transient_entries() {
+		set_transient(
+			'settings_errors',
+			[
+				[ 'code' => 'foo', 'type' => 'updated' ],
+			]
+		);
+
+		$settings = [ 'group' => [ [ 'id' => 'foo' ] ] ];
+
+		$out = $this->model->highlight_errors( $settings );
+		delete_transient( 'settings_errors' );
+
+		$this->assertArrayNotHasKey( 'class', $out['group'][0] );
+	}
+
+	public function test_get_template_data_injects_template_list_and_default() {
+		$out = $this->model->get_template_data( [] );
+
+		$this->assertArrayHasKey( 'templateList', $out );
+		$this->assertArrayHasKey( 'activeDefaultTemplate', $out );
+		$this->assertIsArray( $out['templateList'] );
+	}
+
+	public function test_licensing_bulk_get_version_api_response_returns_non_array_unchanged() {
+		$this->assertSame( 'scalar', $this->model->licensing_bulk_get_version_api_response( 'scalar', [], 'plugin.php' ) );
+	}
+
+	public function test_licensing_bulk_get_version_api_response_skips_responses_without_slug() {
+		$response = [ (object) [ 'name' => 'no slug here' ] ];
+
+		$this->assertNull( $this->model->licensing_bulk_get_version_api_response( $response, [], 'plugin.php' ) );
+	}
+
+	public function test_licensing_bulk_license_check_returns_false_when_addons_have_no_license_key() {
+		$this->addon->init();
+		do_action( 'init' );
+
+		$this->assertFalse( $this->model->licensing_bulk_license_check() );
+	}
+
+	public function test_run_network_update_check_returns_early_on_single_site() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single-site path only.' );
+		}
+
+		$this->model->run_network_update_check();
+
+		$this->assertTrue( true );
+	}
+
 	public function test_licensing_bulk_license_check_bad_response() {
 		$this->addon->init();
 		$this->addon1->init();

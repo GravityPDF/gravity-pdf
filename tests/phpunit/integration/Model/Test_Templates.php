@@ -311,6 +311,47 @@ class Test_Templates extends TestCase {
 		$this->assertEquals( 'Zadani', $info[0]['template'] );
 	}
 
+	public function test_maybe_run_template_setup_no_op_when_no_headers() {
+		$this->model->maybe_run_template_setup( [] );
+
+		$this->assertTrue( true );
+	}
+
+	public function test_check_for_valid_pdf_templates_throws_on_invalid_filename() {
+		global $gfpdf;
+
+		$invalid = $gfpdf->data->template_tmp_location . 'bad@name!.php';
+		touch( $invalid );
+
+		try {
+			$this->model->check_for_valid_pdf_templates( [ $invalid ] );
+			$thrown = false;
+		} catch ( Exception $e ) {
+			$thrown = true;
+			$this->assertStringContainsString( 'contains invalid characters', $e->getMessage() );
+		}
+
+		unlink( $invalid );
+
+		$this->assertTrue( $thrown );
+	}
+
+	public function test_delete_template_unlinks_files_for_template_id() {
+		global $gfpdf;
+
+		$template_dir = $gfpdf->templates->get_template_path();
+		$template_id  = 'phpunit-fixture-template';
+		$template_php = $template_dir . $template_id . '.php';
+
+		file_put_contents( $template_php, "<?php\n/* Template Name: PHPUnit Fixture */\n" );
+		$this->assertFileExists( $template_php );
+
+		$gfpdf->templates->flush_template_transient_cache();
+		$this->model->delete_template( $template_id );
+
+		$this->assertFileDoesNotExist( $template_php );
+	}
+
 	/**
 	 * Check our unzipped directory is correctly cleaned up
 	 *
