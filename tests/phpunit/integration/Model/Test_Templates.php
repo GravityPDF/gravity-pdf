@@ -54,6 +54,14 @@ class Test_Templates extends TestCase {
 		/* run parent method */
 		parent::set_up();
 
+		/* Test_Uninstaller leaves the folder structure removed; recreate the template dirs this test writes into. */
+		wp_mkdir_p( $gfpdf->data->template_tmp_location );
+		wp_mkdir_p( $gfpdf->data->template_location );
+
+		/* Stale template cache from other tests can map basenames to deleted paths, so get_file_data() blows up. */
+		\GFCache::flush();
+		$gfpdf->templates->flush_template_transient_cache();
+
 		/* Setup our test classes */
 		$this->model      = new Model_Templates( $gfpdf->templates, $gfpdf->log, $gfpdf->data, $gfpdf->misc );
 		$this->controller = new Controller_Templates( $this->model );

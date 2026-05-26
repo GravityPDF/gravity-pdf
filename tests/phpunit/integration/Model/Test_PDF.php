@@ -74,10 +74,24 @@ class Test_PDF extends TestCase {
 	}
 
 	public function set_up() {
-		global $gfpdf;
+		global $gfpdf, $wp_settings_errors;
 
 		/* run parent method */
 		parent::set_up();
+
+		/*
+		 * Clear state that other tests leak and that interferes with the signed URL middleware:
+		 *  - $_GET[page/subview] flips is_gfpdf_page() true, which makes get_settings() consult the transient.
+		 *  - The transient itself, populated by Test_Options_API, replaces the cached secret on reload.
+		 *  - $wp_settings_errors carrying over derails update_settings()'s sanitize branching.
+		 *  - Re-sync the in-memory cache with the DB. Test_Uninstaller wipes the gfpdf_settings option
+		 *    but leaves $gfpdf->options->settings populated, so sign() reads a stale signed_secret_token
+		 *    that disappears on the next set_plugin_settings() reload, breaking signature verification.
+		 */
+		unset( $_GET['page'], $_GET['subview'] );
+		delete_transient( 'gfpdf_settings_user_data' );
+		$wp_settings_errors = [];
+		$gfpdf->options->set_plugin_settings();
 
 		/* Setup our test classes */
 		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer() );

@@ -41,7 +41,28 @@ abstract class Test_Rest extends TestCase {
 	protected static $editor_id;
 
 	function set_up() {
+		global $gfpdf;
+
 		parent::set_up();
+
+		/* Start anonymous — tests like test_create_item_preview assert a 401 before they wp_set_current_user themselves. */
+		unset( $GLOBALS['current_user'] );
+		wp_set_current_user( 0 );
+
+		/*
+		 * Flush template caches. Other tests can prime GFCache with a stale (often empty) template list;
+		 * the REST schema enum for 'template'/'pdf_size' is built from that list at dispatch time, so a stale
+		 * cache yields an empty enum, which fails rest_not_in_enum validation against the field defaults.
+		 */
+		\GFCache::flush();
+		$gfpdf->templates->flush_template_transient_cache();
+
+		/*
+		 * Re-sync gfpdf_settings cache with DB. Tests that write 'default_template'/'default_pdf_size'
+		 * values (e.g. via test_get_settings) leave the in-memory cache populated with non-default values
+		 * — those flow into the REST schema's std → default → enum-validation failure here.
+		 */
+		$gfpdf->options->set_plugin_settings();
 
 		self::$admin_id  = $this->factory->user->create( [ 'role' => 'administrator', ] );
 		self::$editor_id = $this->factory->user->create( [ 'role' => 'editor', ] );

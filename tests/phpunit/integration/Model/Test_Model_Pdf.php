@@ -45,9 +45,28 @@ class Test_Model_PDF extends TestCase {
 	}
 
 	public function set_up() {
-		global $gfpdf;
+		global $gfpdf, $wp_settings_errors;
 
 		parent::set_up();
+
+		/*
+		 * Reset state that bleeds in from other tests and corrupts the middleware pipeline:
+		 *  - $_SERVER IP/host/URI keys: GFFormsModel::get_ip() honours HTTP_X_FORWARDED_FOR, so a leaked value
+		 *    makes the IP-match middleware decide the wrong way.
+		 *  - $_GET[expires/signature]: signed-URL middleware fires when these are present.
+		 *  - $_GET[page/subview] + transient: flip is_gfpdf_page() and replace the cached secret on reload.
+		 */
+		unset(
+			$_SERVER['HTTP_X_FORWARDED_FOR'],
+			$_SERVER['REMOTE_ADDR'],
+			$_SERVER['SERVER_ADDR'],
+			$_GET['expires'],
+			$_GET['signature'],
+			$_GET['page'],
+			$_GET['subview']
+		);
+		delete_transient( 'gfpdf_settings_user_data' );
+		$wp_settings_errors = [];
 
 		/* Setup our test classes */
 		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer() );

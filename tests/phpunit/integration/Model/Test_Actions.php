@@ -62,6 +62,16 @@ class Test_Actions extends TestCase {
 		/* run parent method */
 		parent::set_up();
 
+		/* Shared singleton — drop any notices leaked from prior tests */
+		$gfpdf->notices->clear();
+
+		/*
+		 * Re-sync options cache with DB. test_route() inside this class dismisses the 'test_action'
+		 * notice via the options cache; the DB write rolls back at end of test but the in-memory
+		 * cache persists, leaving is_notice_already_dismissed() returning true for later tests.
+		 */
+		$gfpdf->options->set_plugin_settings();
+
 		/* Setup our test classes */
 		$this->model = new Model_Actions( $gfpdf->data, $gfpdf->options, $gfpdf->notices );
 		$this->view  = new View_Actions( [] );

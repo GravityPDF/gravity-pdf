@@ -49,11 +49,29 @@ class Test_Uninstaller extends TestCase {
 	 *
 	 * @since 6.0
 	 */
+	/*
+	 * Loaded here (not via load_fixtures in set_up_before_class) because tests in this class
+	 * unset gfpdf_form_settings on every form. GFAPI writes bypass the WP test transaction,
+	 * so the removal persists across tests — reseeding per-test keeps each test self-contained.
+	 */
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		parent::set_up();
 
 		$this->controller = Controller_Uninstaller::get_instance();
 		$this->model      = $this->controller->model;
+
+		/* Restore the fixture's PDF settings, undone by any prior uninstall test in this class. */
+		$fixture_form = $this->form( 'all-form-fields' );
+		$current      = \GFAPI::get_form( $fixture_form['id'] );
+		if ( $current && ! isset( $current['gfpdf_form_settings'] ) && isset( $fixture_form['gfpdf_form_settings'] ) ) {
+			$current['gfpdf_form_settings'] = $fixture_form['gfpdf_form_settings'];
+			\GFAPI::update_form( $current );
+		}
 	}
 
 	/**
@@ -81,6 +99,9 @@ class Test_Uninstaller extends TestCase {
 		global $gfpdf;
 		$installer_model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), $this->model );
 		$installer       = new Controller_Install( $installer_model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
+
+		/* Force install_plugin() to run even when a prior test left $data->is_installed=true after wiping the DB option */
+		$gfpdf->data->is_installed = false;
 		$installer->check_install_status();
 
 		/* Verify the plugin is installed correctly before removing */
@@ -127,6 +148,9 @@ class Test_Uninstaller extends TestCase {
 		global $gfpdf;
 		$installer_model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), $this->model );
 		$installer       = new Controller_Install( $installer_model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
+
+		/* Force install_plugin() to run even when a prior test left $data->is_installed=true after wiping the DB option */
+		$gfpdf->data->is_installed = false;
 		$installer->check_install_status();
 
 		update_option( 'gfpdf_settings', [] );

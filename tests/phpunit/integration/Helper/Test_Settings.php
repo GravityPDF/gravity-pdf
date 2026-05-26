@@ -65,6 +65,9 @@ class Test_Settings extends TestCase {
 		/* run parent method */
 		parent::set_up();
 
+		/* Drop any add-ons leaked from other tests (e.g. Test_Addon, Test_Model_Settings) — the licensing tests assert against a clean addon registry. */
+		$gfpdf->data->addon = [];
+
 		/* Setup our test classes */
 		$this->model = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 		$this->view  = new View_Settings( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
