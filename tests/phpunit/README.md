@@ -113,7 +113,7 @@ Conventions:
 - `declare(strict_types=1);` — required.
 - Namespace matches the class under test (`GFPDF\Statics`, `GFPDF\Model`, etc.).
 - `@group` annotation — every test class should have at least one (e.g. `controller`,
-  `model`, `helper`, `ajax`, `slow-pdf-processes`) so contributors can run a slice.
+  `model`, `helper`, `ajax`) so contributors can run a slice.
 
 ## Fixture access
 

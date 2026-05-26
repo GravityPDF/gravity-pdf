@@ -13,8 +13,7 @@ use GPDFAPI;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
- * Any slow PDF-generation related tests should be included here. By default, this is excluded from the usual tests
- * Can be tested with: phpunit --group slow-pdf-processes
+ * PDF-generation tests that exercise the full mPDF render path.
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -26,7 +25,6 @@ use GFPDF\Tests\Integration\TestCase;
  * Test the model / view / controller for the PDF Endpoint functionality
  *
  * @since 4.0
- * @group slow-pdf-processes
  */
 class Test_Slow_PDF_Processes extends TestCase {
 
