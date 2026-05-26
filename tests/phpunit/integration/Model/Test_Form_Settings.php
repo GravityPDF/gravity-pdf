@@ -67,6 +67,14 @@ class Test_Form_Settings extends TestCase {
 	 *
 	 * @since 4.0
 	 */
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures(
+			[ 'form-settings', 'all-form-fields' ],
+			[ 'all-form-fields' ]
+		);
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
@@ -94,8 +102,8 @@ class Test_Form_Settings extends TestCase {
 	private function setup_form() {
 		global $gfpdf;
 
-		$this->form_id                                = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
-		$gfpdf->data->form_settings[ $this->form_id ] = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
+		$this->form_id                                = $this->form( 'form-settings' )['id'];
+		$gfpdf->data->form_settings[ $this->form_id ] = $this->form( 'form-settings' )['gfpdf_form_settings'];
 
 	}
 
@@ -771,8 +779,8 @@ class Test_Form_Settings extends TestCase {
 	}
 
 	public function test_conditional_logic_set_rule_source_value() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		/* Do basic test */
 		$rule  = [ 'fieldId' => 'status' ];

@@ -56,6 +56,11 @@ class Test_Shortcodes extends TestCase {
 	 *
 	 * @since 4.0
 	 */
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
@@ -112,7 +117,7 @@ class Test_Shortcodes extends TestCase {
 	 */
 	public function test_gravitypdf_shortcode() {
 
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 
 		/* Test for a failed result */
 		$this->assertEquals( '', $this->model->process( [] ) );
@@ -227,7 +232,7 @@ class Test_Shortcodes extends TestCase {
 			]
 		);
 
-		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $url );
+		$this->assertStringContainsString( "?gpdf=1&pid=556690c67856b&lid={$entry['id']}&action=download", $url );
 		$this->assertStringNotContainsString( 'href=', $url );
 		$this->assertStringNotContainsString( 'Download PDF', $url );
 
@@ -327,9 +332,9 @@ class Test_Shortcodes extends TestCase {
 
 		/* Setup test data */
 		$confirmation         = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
-		$form                 = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form                 = $this->form( 'all-form-fields' );
 		$form['confirmation'] = $form['confirmations']['54bca34973cdd'];
-		$lead                 = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$lead                 = $this->entry( 'all-form-fields' );
 
 		/* Check our entry ID is being automatically added */
 		$results = $this->model->gravitypdf_confirmation( $confirmation, $form, $lead );
@@ -362,8 +367,8 @@ class Test_Shortcodes extends TestCase {
 		/* Setup test data */
 		$notification            = [];
 		$notification['message'] = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
-		$form                    = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$lead                    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form                    = $this->form( 'all-form-fields' );
+		$lead                    = $this->entry( 'all-form-fields' );
 
 		/* Check our entry ID is being automatically added */
 		$results = $this->model->gravitypdf_notification( $notification, $form, $lead );
@@ -454,22 +459,22 @@ class Test_Shortcodes extends TestCase {
 	 */
 	public function test_gravitypdf_redirect_confirmation_shortcode_processing() {
 
-		$form                        = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form                        = $this->form( 'all-form-fields' );
 		$form['confirmation']        = $form['confirmations']['54bca34973cdd'];
 		$form['confirmation']['url'] = '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1"]';
 
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 
 		$this->assertTrue( $this->model->gravitypdf_redirect_confirmation_shortcode_processing( true, $form, $entry ) );
 
 		$form['confirmation']['type'] = 'redirect';
 		$confirmation                 = [ 'redirect' => '' ];
 		$results                      = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
-		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $results['redirect'] );
+		$this->assertStringContainsString( "?gpdf=1&pid=556690c67856b&lid={$entry['id']}&action=download", $results['redirect'] );
 
 		$form['confirmation']['url'] = '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1" signed="1"]';
 		$results                     = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
-		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $results['redirect'] );
+		$this->assertStringContainsString( "?gpdf=1&pid=556690c67856b&lid={$entry['id']}&action=download", $results['redirect'] );
 		$this->assertStringContainsString( '&signature=', $results['redirect'] );
 		$this->assertStringContainsString( '&expires=', $results['redirect'] );
 	}

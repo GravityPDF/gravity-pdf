@@ -68,6 +68,11 @@ class Test_PDF extends TestCase {
 	 *
 	 * @since 4.0
 	 */
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
@@ -90,8 +95,8 @@ class Test_PDF extends TestCase {
 	private function create_form_and_entries() {
 		global $gfpdf;
 
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 
@@ -733,9 +738,10 @@ class Test_PDF extends TestCase {
 
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
+		$lid = $entry['id'];
 		$this->assertStringContainsString( 'test-', $pdfs[0]['name'] );
-		$this->assertStringContainsString( 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1', $pdfs[0]['view'] );
-		$this->assertStringContainsString( 'http://example.org/?gpdf=1&pid=556690c67856b&lid=1&action=download', $pdfs[0]['download'] );
+		$this->assertStringContainsString( "http://example.org/?gpdf=1&pid=556690c67856b&lid=$lid", $pdfs[0]['view'] );
+		$this->assertStringContainsString( "http://example.org/?gpdf=1&pid=556690c67856b&lid=$lid&action=download", $pdfs[0]['download'] );
 
 		/* Process fancy permalinks */
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
@@ -769,8 +775,9 @@ class Test_PDF extends TestCase {
 		$this->model->view_pdf_gravityflow_inbox( $form, $entry, [], [] );
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( 'http://example.org/?gpdf=1&#038;pid=fawf90c678523b&#038;lid=1', $html );
-		$this->assertStringContainsString( 'http://example.org/?gpdf=1&#038;pid=fawf90c678523b&#038;lid=1&#038;action=download', $html );
+		$lid = $entry['id'];
+		$this->assertStringContainsString( "http://example.org/?gpdf=1&#038;pid=fawf90c678523b&#038;lid=$lid", $html );
+		$this->assertStringContainsString( "http://example.org/?gpdf=1&#038;pid=fawf90c678523b&#038;lid=$lid&#038;action=download", $html );
 
 		/* Process fancy permalinks */
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
@@ -1845,8 +1852,8 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_apply_backwards_compatibility_filters() {
-		$entry            = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
-		$entry['form_id'] = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
+		$entry            = $this->entry( 'all-form-fields' );
+		$entry['form_id'] = $this->form( 'all-form-fields' )['id'];
 
 		$settings = [
 			'filename'        => 'My PDF Document',
@@ -2036,7 +2043,7 @@ class Test_PDF extends TestCase {
 		global $gfpdf;
 
 		$settings  = [ 'id' => '556690c67856b', 'template' => 'zadani' ];
-		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry     = $this->entry( 'all-form-fields' );
 		$form      = $gfpdf->gform->get_form( $entry['form_id'] );
 		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
 

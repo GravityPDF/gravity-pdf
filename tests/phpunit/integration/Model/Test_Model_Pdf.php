@@ -39,6 +39,11 @@ class Test_Model_PDF extends TestCase {
 	 */
 	public $view;
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
@@ -268,8 +273,8 @@ class Test_Model_PDF extends TestCase {
 	}
 
 	public function test_get_quiz_results_populates_config_and_results_when_quiz_field_present() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$data = $this->model->get_quiz_results( $form, $entry );
 
@@ -280,8 +285,8 @@ class Test_Model_PDF extends TestCase {
 	}
 
 	public function test_get_poll_results_populates_global_data_when_poll_field_present() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$data = $this->model->get_poll_results( $form, $entry );
 
@@ -290,8 +295,8 @@ class Test_Model_PDF extends TestCase {
 	}
 
 	public function test_get_survey_results_populates_global_data_when_survey_field_present() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$data = $this->model->get_survey_results( $form, $entry );
 
@@ -302,8 +307,8 @@ class Test_Model_PDF extends TestCase {
 	public function test_get_addon_global_data_short_circuits_when_filter_disables_it() {
 		add_filter( 'gfpdf_disable_global_addon_data', '__return_true' );
 
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$data = $this->model->get_poll_results( $form, $entry );
 

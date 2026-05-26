@@ -41,6 +41,11 @@ class Test_Model_Pdf_Meta_Box extends TestCase {
 	/**
 	 * The WP Unit Test Set up function
 	 */
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
@@ -59,8 +64,8 @@ class Test_Model_Pdf_Meta_Box extends TestCase {
 	protected function create_form_and_entries() {
 		global $gfpdf;
 
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 

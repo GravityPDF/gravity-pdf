@@ -34,6 +34,11 @@ class Test_Model_Mergetags extends TestCase {
 	 */
 	public $model;
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function set_up() {
 		global $gfpdf;
 
@@ -57,7 +62,7 @@ class Test_Model_Mergetags extends TestCase {
 	 * Check we correctly load the form's PDF mergetags in the correct format
 	 */
 	public function test_add_mergetags() {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 
 		$tags = $this->model->add_pdf_mergetags( [], $form['id'] );
 
@@ -217,8 +222,12 @@ class Test_Model_Mergetags extends TestCase {
 	 * @dataProvider provider_modifier_pdf_mergetags_no_permalinks
 	 */
 	public function test_process_pdf_mergetags( $expected, $text, $encode = true ) {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
+
+		// Provider strings use the legacy entry-ID slot (lid=1 or /1/). Substitute
+		// with the per-class fixture's actual entry ID before comparing.
+		$expected = strtr( $expected, [ 'lid=1' => "lid={$entry['id']}", '/1/' => "/{$entry['id']}/" ] );
 
 		$results = $this->model->process_pdf_mergetags( $text, $form, $entry, $encode );
 
@@ -347,8 +356,8 @@ class Test_Model_Mergetags extends TestCase {
 	 * @dataProvider provider_signed_modifier_pdf_mergetags
 	 */
 	public function test_process_pdf_mergetags_signed_no_permalink( $text ) {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$results = $this->model->process_pdf_mergetags( $text, $form, $entry, false );
 
@@ -378,8 +387,8 @@ class Test_Model_Mergetags extends TestCase {
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
 		flush_rewrite_rules();
 
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$results = $this->model->process_pdf_mergetags( $text, $form, $entry, false );
 
@@ -421,7 +430,7 @@ class Test_Model_Mergetags extends TestCase {
 	}
 
 	public function test_add_field_map_choices() {
-		$form          = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form          = $this->form( 'all-form-fields' );
 		$test_fields[] = [
 			'label'   => 'Entry Properties',
 			'choices' => [],
@@ -445,8 +454,8 @@ class Test_Model_Mergetags extends TestCase {
 	}
 
 	public function test_process_field_value() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$this->assertEmpty( $this->model->process_field_value( '', $form, $entry, '{My First PDF Template:pdf:555ad84787d7e}' ) );
 
@@ -464,14 +473,14 @@ class Test_Model_Mergetags extends TestCase {
 
 	/* Test if fields does not contain Entry Properties label. */
 	public function test_empty_field_map_choices() {
-		$form   = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form   = $this->form( 'all-form-fields' );
 		$fields = $this->model->add_field_map_choices( [], $form['id'], [], [] );
 		$this->assertEmpty( $fields );
 	}
 
 	/* Test if there are no pdf template included on the form . */
 	public function test_no_pdf_template() {
-		$form          = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form          = $this->form( 'all-form-fields' );
 		$test_fields[] = [
 			'label'   => 'Entry Properties',
 			'choices' => [],
