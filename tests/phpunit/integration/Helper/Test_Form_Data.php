@@ -24,10 +24,42 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Form_Data extends TestCase {
 
-	// Holdout: the all-form-fields entry JSON hardcodes upload paths like
-	// gravity_forms/1-<hash>/<file>, so test_post_fields only passes when the
-	// form has id=1 (the legacy bootstrap order). Accessors fall through to
-	// $GLOBALS['GFPDF_Test']; Phase D must address before deleting the global.
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures(
+			[ 'all-form-fields', 'repeater-consent-form', 'repeater-empty-form' ],
+			[ 'all-form-fields', 'repeater-consent-form', 'repeater-empty-form' ]
+		);
+
+		// The all-form-fields entry JSON hardcodes upload URLs against form_id=1's
+		// upload directory (gravity_forms/1-<wp_hash(1)>/…). Rewrite each entry's
+		// file/post-image fields to point at the per-class form's upload dir so
+		// test_upload_field and test_post_fields resolve secured URLs correctly.
+		static::rewrite_upload_paths_for_all_form_fields();
+	}
+
+	private static function rewrite_upload_paths_for_all_form_fields() {
+		$form_id = self::$fixture_caches[ static::class ]['forms']['all-form-fields']['id'];
+		$slug    = '1-' . wp_hash( 1 );
+		$replace = $form_id . '-' . wp_hash( $form_id );
+
+		// Multi-file fields store a JSON-encoded array of URLs (with escaped slashes),
+		// so str_replace needs to match the bare slug — that covers both `gravity_forms/<slug>`
+		// and `gravity_forms\/<slug>` without coupling to either escape form.
+		foreach ( self::$fixture_caches[ static::class ]['entries']['all-form-fields'] as $i => $entry ) {
+			$updated = false;
+			foreach ( $entry as $field_id => $value ) {
+				if ( is_string( $value ) && strpos( $value, $slug ) !== false ) {
+					$entry[ $field_id ] = str_replace( $slug, $replace, $value );
+					$updated            = true;
+				}
+			}
+			if ( $updated ) {
+				\GFAPI::update_entry( $entry );
+				self::$fixture_caches[ static::class ]['entries']['all-form-fields'][ $i ] = $entry;
+			}
+		}
+	}
 	/**
 	 * The Gravity Form
 	 *
@@ -86,7 +118,7 @@ class Test_Form_Data extends TestCase {
 		/*
 		 * Run our tests...
 		 */
-		$this->assertEquals( 'ALL FIELDS', $data['form_title'] );
+		$this->assertEquals( $this->form( 'all-form-fields' )['title'], $data['form_title'] );
 		$this->assertEquals( 'This is the form description...', $data['form_description'] );
 		$this->assertArrayHasKey( 'pages', $data );
 

@@ -34,8 +34,12 @@ trait HasGfpdfFixtures {
 	 * Per-class fixture cache, keyed by class name (late static binding).
 	 *
 	 * Shape: [ 'Test_Foo' => [ 'forms' => [ key => array ], 'entries' => [ key => array[] ] ] ].
+	 *
+	 * Protected (not private) so subclasses can patch entries after load_fixtures
+	 * — e.g. Test_Form_Data rewrites file-upload URLs to match the per-class form's
+	 * upload directory before tests run.
 	 */
-	private static $fixture_caches = [];
+	protected static $fixture_caches = [];
 
 	/**
 	 * Class-scoped fixture loader. Call from set_up_before_class().
