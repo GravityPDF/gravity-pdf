@@ -21,6 +21,11 @@ use GFPDF\Tests\Integration\TestCase;
  * @group bootstrap
  */
 class Test_Bootstrap extends TestCase {
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'form-settings' ] );
+	}
 	/**
 	 * Our Gravity PDF Router object
 	 *
@@ -224,12 +229,12 @@ class Test_Bootstrap extends TestCase {
 		$this->assertFalse( $settings['section_content'] );
 
 		/* Test pass */
-		$form_id                          = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
+		$form_id                          = $this->form( 'form-settings' )['id'];
 		$pid                              = '555ad84787d7e';
 		$GLOBALS['wp']->query_vars['pid'] = $pid;
 
 		$gfpdf->data->form_settings                                   = [];
-		$gfpdf->data->form_settings[ $form_id ]                       = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
+		$gfpdf->data->form_settings[ $form_id ]                       = $this->form( 'form-settings' )['gfpdf_form_settings'];
 		$gfpdf->data->form_settings[ $form_id ][ $pid ]['html_field'] = 'Yes';
 
 		$settings = $this->loader->get_default_config_data( $form_id );

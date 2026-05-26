@@ -23,6 +23,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_API extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures(
+			[ 'all-form-fields', 'form-settings' ],
+			[ 'all-form-fields' ]
+		);
+	}
+
 	/**
 	 * Check the correct class is returned
 	 *
@@ -62,7 +70,7 @@ class Test_API extends TestCase {
 	public function test_get_form_pdfs() {
 		$this->assertTrue( is_wp_error( GPDFAPI::get_form_pdfs( null ) ) );
 
-		$pdfs = GPDFAPI::get_form_pdfs( $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'] );
+		$pdfs = GPDFAPI::get_form_pdfs( $this->form( 'all-form-fields' )['id'] );
 		$this->assertCount( 4, $pdfs );
 
 		$this->assertArrayHasKey( 'id', $pdfs['555ad84787d7e'] );
@@ -80,7 +88,7 @@ class Test_API extends TestCase {
 	public function test_get_entry_pdfs() {
 		$this->assertTrue( is_wp_error( GPDFAPI::get_entry_pdfs( null ) ) );
 
-		$pdfs = GPDFAPI::get_entry_pdfs( $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0]['id'] );
+		$pdfs = GPDFAPI::get_entry_pdfs( $this->entry( 'all-form-fields' )['id'] );
 		$this->assertCount( 2, $pdfs );
 
 		$this->assertArrayHasKey( 'id', $pdfs['fawf90c678523b'] );
@@ -126,21 +134,21 @@ class Test_API extends TestCase {
 	public function test_add_update_delete() {
 
 		/* Check we can add a new PDF */
-		$id = GPDFAPI::add_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], [ 'working' => 'yes' ] );
+		$id = GPDFAPI::add_pdf( $this->form( 'form-settings' )['id'], [ 'working' => 'yes' ] );
 		$this->assertNotFalse( $id );
 
 		/* Check we can get the PDF details */
-		$pdf = GPDFAPI::get_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id );
+		$pdf = GPDFAPI::get_pdf( $this->form( 'form-settings' )['id'], $id );
 		$this->assertEquals( 'yes', $pdf['working'] );
 
 		/* Check we can update the PDF details correctly */
-		GPDFAPI::update_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id, [ 'working' => 'no' ] );
-		$pdf = GPDFAPI::get_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id );
+		GPDFAPI::update_pdf( $this->form( 'form-settings' )['id'], $id, [ 'working' => 'no' ] );
+		$pdf = GPDFAPI::get_pdf( $this->form( 'form-settings' )['id'], $id );
 		$this->assertEquals( 'no', $pdf['working'] );
 
 		/* Check we can delete the PDF correctly */
-		GPDFAPI::delete_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id );
-		$pdf = GPDFAPI::get_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id );
+		GPDFAPI::delete_pdf( $this->form( 'form-settings' )['id'], $id );
+		$pdf = GPDFAPI::get_pdf( $this->form( 'form-settings' )['id'], $id );
 		$this->assertTrue( is_wp_error( $pdf ) );
 	}
 
@@ -187,7 +195,7 @@ class Test_API extends TestCase {
 	 */
 	public function test_product_table() {
 
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 
 		$table = GPDFAPI::product_table( $entry, true );
 		$this->assertNotFalse( strpos( $table, '<table class="entry-products' ) );
@@ -204,7 +212,7 @@ class Test_API extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_likert_table() {
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 
 		$table = GPDFAPI::likert_table( $entry, 26, true );
 		$this->assertStringContainsString( "class='gsurvey-likert-choice-label'", $table );
@@ -305,7 +313,7 @@ class Test_API extends TestCase {
 	 * @since 5.0
 	 */
 	public function test_get_form_data() {
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 
 		$results = GPDFAPI::get_form_data( $entry['id'] );
 
