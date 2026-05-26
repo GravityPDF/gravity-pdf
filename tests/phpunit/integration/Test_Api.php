@@ -273,6 +273,9 @@ class Test_API extends TestCase {
 		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
 
 		$this->assertCount( 1, GPDFAPI::get_pdf_fonts()['User-Defined Fonts'] ?? [] );
+
+		/* Filesystem writes outlive the test transaction; remove the copied TTF so it doesn't collide with later tests' add_pdf_font calls. */
+		GPDFAPI::delete_pdf_font( 'test' );
 	}
 
 	/**
