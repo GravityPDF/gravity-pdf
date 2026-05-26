@@ -920,7 +920,18 @@ class Test_PDF extends TestCase {
 	 *
 	 */
 	public function test_get_pdf_url_no_perma( $pid, $id, $download, $print, $expected ) {
+		global $wp_rewrite;
+
+		/* Force plain permalinks — get_pdf_url branches on using_permalinks(), and a sibling
+		 * test (or multisite's non-empty default) can leave permalink_structure pretty. */
+		$old_permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->set_permalink_structure( '' );
+		flush_rewrite_rules();
+
 		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id, $download, $print ) );
+
+		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
+		flush_rewrite_rules();
 	}
 
 	/**
