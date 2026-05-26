@@ -13,8 +13,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_V3_Section extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	public function test_html_contains_h2_with_section_title() {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'section' ) {
@@ -34,7 +40,7 @@ class Test_Field_V3_Section extends TestCase {
 	}
 
 	public function test_html_omits_description_div_when_value_param_is_empty() {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'section' ) {
@@ -52,7 +58,7 @@ class Test_Field_V3_Section extends TestCase {
 	}
 
 	public function test_html_includes_description_div_when_value_param_is_non_empty() {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'section' ) {

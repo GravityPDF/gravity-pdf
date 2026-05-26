@@ -14,8 +14,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Checkbox extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	private function make_field(): GF_Field_Checkbox {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'checkbox' ) {
 				return new GF_Field_Checkbox( $field );
@@ -26,7 +32,7 @@ class Test_Field_Checkbox extends TestCase {
 
 	public function test_html_renders_checked_choices_as_list() {
 		$gf_field = $this->make_field();
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 
 		$entry = [
 			'id'      => 0,
@@ -45,7 +51,7 @@ class Test_Field_Checkbox extends TestCase {
 
 	public function test_html_is_empty_wrapper_when_nothing_checked() {
 		$gf_field = $this->make_field();
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 
 		$entry     = [ 'id' => 0, 'form_id' => $form['id'] ];
 		$pdf_field = new Field_Checkbox( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
@@ -55,7 +61,7 @@ class Test_Field_Checkbox extends TestCase {
 
 	public function test_form_data_contains_value_and_name_keys() {
 		$gf_field = $this->make_field();
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 
 		$entry = [
 			'id'      => 0,
@@ -73,7 +79,7 @@ class Test_Field_Checkbox extends TestCase {
 
 	public function test_show_value_filter_uses_value_instead_of_label() {
 		$gf_field = $this->make_field();
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 
 		/*
 		 * Choice 2: label = "Checkbox Choice 2 Text", value = "Checkbox Choice 2".

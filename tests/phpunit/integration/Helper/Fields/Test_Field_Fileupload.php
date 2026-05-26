@@ -13,8 +13,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Fileupload extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	public function test_html_contains_anchor_for_single_file() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'fileupload' && ! $field->multipleFiles ) {
@@ -38,7 +44,7 @@ class Test_Field_Fileupload extends TestCase {
 	}
 
 	public function test_html_is_empty_wrapper_when_no_file() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'fileupload' && ! $field->multipleFiles ) {
@@ -54,7 +60,7 @@ class Test_Field_Fileupload extends TestCase {
 	}
 
 	public function test_html_renders_multiple_files() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'fileupload' && $field->multipleFiles ) {

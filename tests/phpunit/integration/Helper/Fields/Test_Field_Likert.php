@@ -13,8 +13,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Likert extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	private function make_single_row_field(): array {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'survey' && isset( $field->inputType ) && $field->inputType === 'likert' && empty( $field->inputs ) ) {
@@ -74,7 +80,7 @@ class Test_Field_Likert extends TestCase {
 	}
 
 	public function test_value_multi_row_contains_rows_key() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'survey' && isset( $field->inputType ) && $field->inputType === 'likert' && ! empty( $field->inputs ) ) {

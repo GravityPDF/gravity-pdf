@@ -18,6 +18,12 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Option extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'non-group-products-form' ], [ 'non-group-products-form' ] );
+	}
+
+
 	/**
 	 * @var array
 	 */
@@ -35,8 +41,8 @@ class Test_Field_Option extends TestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->form  = $GLOBALS['GFPDF_Test']->form['non-group-products-form'];
-		$this->entry = $GLOBALS['GFPDF_Test']->entries['non-group-products-form'][0];
+		$this->form  = $this->form( 'non-group-products-form' );
+		$this->entry = $this->entry( 'non-group-products-form' );
 
 		$form_id                = $this->gf_factory()->form->create([], $this->form);
 		$this->entry['form_id'] = $form_id;

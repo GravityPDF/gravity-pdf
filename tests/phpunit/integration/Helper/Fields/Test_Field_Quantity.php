@@ -14,6 +14,12 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Quantity extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'non-group-products-form' ], [ 'non-group-products-form' ] );
+	}
+
+
 	/**
 	 * Creates a real GF form+entry in the DB from the non-group-products-form fixture
 	 * and returns the live entry array. Field_Products requires a non-null form to
@@ -22,7 +28,7 @@ class Test_Field_Quantity extends TestCase {
 	private function make_real_entry(): array {
 		$form_data             = $this->form( 'non-group-products-form' );
 		$form_id               = $this->gf_factory()->form->create( [], $form_data );
-		$entry_data            = $GLOBALS['GFPDF_Test']->entries['non-group-products-form'][0];
+		$entry_data            = $this->entry( 'non-group-products-form' );
 		$entry_data['form_id'] = $form_id;
 		$entry_id              = $this->gf_factory()->entry->create( $entry_data );
 

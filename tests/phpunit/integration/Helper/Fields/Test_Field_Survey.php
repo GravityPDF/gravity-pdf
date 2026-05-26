@@ -18,6 +18,12 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Survey extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
+
 	/**
 	 * @var array
 	 */
@@ -36,7 +42,7 @@ class Test_Field_Survey extends TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$this->form = $this->form( 'all-form-fields' );
 
 		foreach ( $this->form['fields'] as $field ) {
 			if ( $field->type === 'survey' ) {
@@ -45,15 +51,16 @@ class Test_Field_Survey extends TestCase {
 			}
 		}
 
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 
 		$this->pdf_field = new Field_Survey( $this->gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 	}
 
 	public function test_html() {
-		$html = $this->pdf_field->html();
+		$html    = $this->pdf_field->html();
+		$form_id = $this->form( 'all-form-fields' )['id'];
 
-		$this->assertStringContainsString( "<table aria-label='Likert Survey Field' class='gsurvey-likert' id='input_1_26'>", $html );
-		$this->assertStringContainsString( "<input name='input_26' type='radio' value='glikertcol2636762f85' checked='checked' id='choice_1_26_1' />", $html );
+		$this->assertStringContainsString( "<table aria-label='Likert Survey Field' class='gsurvey-likert' id='input_{$form_id}_26'>", $html );
+		$this->assertStringContainsString( "<input name='input_26' type='radio' value='glikertcol2636762f85' checked='checked' id='choice_{$form_id}_26_1' />", $html );
 	}
 }

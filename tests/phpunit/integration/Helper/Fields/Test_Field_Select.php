@@ -22,6 +22,12 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Select extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	public $form;
 
 	public $gf_field;
@@ -31,7 +37,7 @@ class Test_Field_Select extends TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$this->form = $this->form( 'all-form-fields' );
 
 		foreach ( $this->form['fields'] as $field ) {
 			if ( $field->type === 'select' ) {

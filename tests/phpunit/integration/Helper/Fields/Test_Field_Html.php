@@ -13,8 +13,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Html extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	public function test_html_renders_field_content() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'html' ) {

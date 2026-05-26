@@ -14,8 +14,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Address extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	public function test_html_renders_street_and_city() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'address' ) {
@@ -45,7 +51,7 @@ class Test_Field_Address extends TestCase {
 	}
 
 	public function test_value_returns_keyed_array() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'address' ) {
@@ -74,7 +80,7 @@ class Test_Field_Address extends TestCase {
 	}
 
 	public function test_is_empty_when_all_inputs_blank() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'address' ) {
@@ -90,7 +96,7 @@ class Test_Field_Address extends TestCase {
 	}
 
 	public function test_zip_before_city_format() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'address' ) {

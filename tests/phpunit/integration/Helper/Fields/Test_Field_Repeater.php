@@ -22,6 +22,12 @@ use GPDFAPI;
  */
 class Test_Field_Repeater extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'repeater-consent-form' ], [ 'repeater-consent-form' ] );
+	}
+
+
 	public $form;
 
 	public $entry;
@@ -31,8 +37,8 @@ class Test_Field_Repeater extends TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
-		$this->entry = $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
+		$this->form  = $this->form( 'repeater-consent-form' );
+		$this->entry = $this->entry( 'repeater-consent-form' );
 
 		$this->pdf_field        = new Field_Repeater( new \GF_Field_Repeater( $this->form['fields'][1] ), $this->entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 

@@ -14,8 +14,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Number extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	public function test_value_applies_decimal_dot_format() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'number' ) {

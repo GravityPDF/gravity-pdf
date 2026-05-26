@@ -13,6 +13,12 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Discount extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'non-group-products-form' ], [ 'non-group-products-form' ] );
+	}
+
+
 	/**
 	 * Builds a Field_Discount whose Field_Products companion uses a real GF entry
 	 * so GFCommon::get_product_fields() can resolve the form. Field id 99 is used
@@ -21,7 +27,7 @@ class Test_Field_Discount extends TestCase {
 	private function make_pdf_field_with_real_entry(): Field_Discount {
 		$form_data              = $this->form( 'non-group-products-form' );
 		$form_id                = $this->gf_factory()->form->create( [], $form_data );
-		$entry_data             = $GLOBALS['GFPDF_Test']->entries['non-group-products-form'][0];
+		$entry_data             = $this->entry( 'non-group-products-form' );
 		$entry_data['form_id']  = $form_id;
 		$entry_id               = $this->gf_factory()->entry->create( $entry_data );
 		$entry                  = \GFAPI::get_entry( $entry_id );

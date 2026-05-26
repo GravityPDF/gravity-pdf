@@ -13,8 +13,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Fg_Ls_Consent extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'repeater-consent-form' ] );
+	}
+
+
 	private function make_field_and_entry(): array {
-		$form = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
+		$form = $this->form( 'repeater-consent-form' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'consent' ) {

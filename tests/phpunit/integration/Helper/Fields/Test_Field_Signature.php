@@ -18,6 +18,12 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Signature extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
+
 	/**
 	 * @var array
 	 */
@@ -31,7 +37,7 @@ class Test_Field_Signature extends TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$this->form = $this->form( 'all-form-fields' );
 
 		foreach ( $this->form['fields'] as $field ) {
 			if ( $field->type === 'signature' ) {
@@ -42,7 +48,7 @@ class Test_Field_Signature extends TestCase {
 	}
 
 	public function test_html_with_windows_drive_path() {
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 		$field = new class( $this->gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) extends Field_Signature {
 			public function value() {
 				return [
@@ -61,7 +67,7 @@ class Test_Field_Signature extends TestCase {
 	}
 
 	public function test_html_with_windows_unc_path() {
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 		$field = new class( $this->gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) extends Field_Signature {
 			public function value() {
 				return [
@@ -97,7 +103,7 @@ class Test_Field_Signature extends TestCase {
 	}
 
 	public function test_html_with_linux_path() {
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $this->entry( 'all-form-fields' );
 		$field = new class( $this->gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) extends Field_Signature {
 			public function value() {
 				return [

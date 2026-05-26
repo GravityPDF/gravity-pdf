@@ -13,9 +13,15 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Phone extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
+
 	public function test_html_contains_phone_number() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'phone' ) {
@@ -30,8 +36,8 @@ class Test_Field_Phone extends TestCase {
 	}
 
 	public function test_value_returns_entry_phone_number() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'phone' ) {
@@ -46,7 +52,7 @@ class Test_Field_Phone extends TestCase {
 	}
 
 	public function test_empty_entry_produces_empty_value() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form  = $this->form( 'all-form-fields' );
 		$entry = [ 'id' => 0, 'form_id' => $form['id'] ];
 
 		foreach ( $form['fields'] as $field ) {

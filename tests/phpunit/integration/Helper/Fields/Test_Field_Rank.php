@@ -12,8 +12,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Rank extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
+
 	protected function rank_field(): \GF_Field {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'survey' && $field->inputType === 'rank' ) {
 				return $field;
@@ -23,7 +29,7 @@ class Test_Field_Rank extends TestCase {
 	}
 
 	public function test_value_returns_array_of_choice_labels_in_entry_order() {
-		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry     = $this->entry( 'all-form-fields' );
 		$pdf_field = new Field_Rank( $this->rank_field(), $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$value = $pdf_field->value();
@@ -34,7 +40,7 @@ class Test_Field_Rank extends TestCase {
 	}
 
 	public function test_value_first_element_matches_entry_first_ranked_choice() {
-		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry     = $this->entry( 'all-form-fields' );
 		$pdf_field = new Field_Rank( $this->rank_field(), $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$value = $pdf_field->value();
@@ -43,7 +49,7 @@ class Test_Field_Rank extends TestCase {
 	}
 
 	public function test_form_data_nests_value_under_survey_rank_key() {
-		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry     = $this->entry( 'all-form-fields' );
 		$gf_field  = $this->rank_field();
 		$pdf_field = new Field_Rank( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 

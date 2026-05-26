@@ -14,6 +14,12 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Total extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'non-group-products-form' ], [ 'non-group-products-form' ] );
+	}
+
+
 	/**
 	 * Creates a real GF form with no product fields and a matching entry.
 	 * Field_Products::value() returns [] when the form has no products, which
@@ -60,7 +66,7 @@ class Test_Field_Total extends TestCase {
 		/* Create a form+entry from the non-group-products-form fixture so real products exist. */
 		$form_data             = $this->form( 'non-group-products-form' );
 		$form_id               = $this->gf_factory()->form->create( [], $form_data );
-		$entry_data            = $GLOBALS['GFPDF_Test']->entries['non-group-products-form'][0];
+		$entry_data            = $this->entry( 'non-group-products-form' );
 		$entry_data['form_id'] = $form_id;
 		$entry_id              = $this->gf_factory()->entry->create( $entry_data );
 		$entry                 = \GFAPI::get_entry( $entry_id );

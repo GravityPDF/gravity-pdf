@@ -20,6 +20,11 @@ namespace GFPDF\Helper\Fields {
 	 */
 	class Test_Field_Form extends TestCase {
 
+		public static function set_up_before_class() {
+			parent::set_up_before_class();
+			static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+		}
+
 		public $form;
 
 		public $gf_field;
@@ -29,12 +34,12 @@ namespace GFPDF\Helper\Fields {
 		public function set_up() {
 			parent::set_up();
 
-			$this->form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+			$this->form = $this->form( 'all-form-fields' );
 
 			$entry = [
 				'id'      => 0,
 				'form_id' => $this->form['id'],
-				'1'       => implode( ',', array_column( $GLOBALS['GFPDF_Test']->entries['all-form-fields'], 'id' ) ),
+				'1'       => implode( ',', array_column( $this->entries( 'all-form-fields' ), 'id' ) ),
 			];
 
 			$this->gf_field = new \GP_Field_Nested_Form( [

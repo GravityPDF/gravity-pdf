@@ -13,8 +13,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_V3_List extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
+
 	protected function list_field_by_id( int $field_id ): GF_Field_List {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 		foreach ( $form['fields'] as $field ) {
 			if ( (int) $field->id === $field_id ) {
 				return new GF_Field_List( $field );
@@ -25,7 +31,7 @@ class Test_Field_V3_List extends TestCase {
 
 	public function test_single_column_html_renders_bullet_list() {
 		$gf_field  = $this->list_field_by_id( 20 );
-		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry     = $this->entry( 'all-form-fields' );
 		$pdf_field = new Field_V3_List( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();
@@ -36,7 +42,7 @@ class Test_Field_V3_List extends TestCase {
 
 	public function test_multi_column_html_falls_through_to_parent_table() {
 		$gf_field  = $this->list_field_by_id( 21 );
-		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry     = $this->entry( 'all-form-fields' );
 		$pdf_field = new Field_V3_List( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();
@@ -47,7 +53,7 @@ class Test_Field_V3_List extends TestCase {
 
 	public function test_empty_list_returns_empty_html() {
 		$gf_field  = $this->list_field_by_id( 20 );
-		$entry     = [ 'id' => 0, 'form_id' => $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'] ];
+		$entry     = [ 'id' => 0, 'form_id' => $this->form( 'all-form-fields' )['id'] ];
 		$pdf_field = new Field_V3_List( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
 		$html = $pdf_field->html();

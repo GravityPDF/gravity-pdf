@@ -14,12 +14,18 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Date extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	public function test_value_formats_date_per_field_dateformat() {
 		/*
 		 * The all-form-fields fixture uses dateFormat 'dmy' for field 12.
 		 * GF stores dates as Y-m-d; GFCommon::date_display() converts them.
 		 */
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'date' ) {
@@ -42,7 +48,7 @@ class Test_Field_Date extends TestCase {
 	}
 
 	public function test_html_contains_formatted_date() {
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 		$gf_field = null;
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'date' ) {

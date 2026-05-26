@@ -13,8 +13,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Name extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
+
 	private function make_field(): GF_Field_Name {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'name' ) {
 				return new GF_Field_Name( $field );
@@ -25,7 +31,7 @@ class Test_Field_Name extends TestCase {
 
 	public function test_html_renders_full_name_from_subfields() {
 		$gf_field = $this->make_field();
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 
 		$entry = [
 			'id'      => 0,
@@ -45,7 +51,7 @@ class Test_Field_Name extends TestCase {
 
 	public function test_value_returns_keyed_name_parts() {
 		$gf_field = $this->make_field();
-		$form     = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form     = $this->form( 'all-form-fields' );
 
 		$entry = [
 			'id'      => 0,
@@ -67,7 +73,7 @@ class Test_Field_Name extends TestCase {
 
 	public function test_is_empty_when_all_subfields_blank() {
 		$gf_field  = $this->make_field();
-		$form      = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form      = $this->form( 'all-form-fields' );
 		$entry     = [ 'id' => 0, 'form_id' => $form['id'] ];
 		$pdf_field = new Field_Name( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 

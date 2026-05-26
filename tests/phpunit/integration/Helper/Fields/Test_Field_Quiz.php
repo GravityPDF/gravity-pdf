@@ -12,8 +12,14 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Quiz extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
+
 	protected function quiz_field_by_id( int $field_id ): \GF_Field {
-		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $this->form( 'all-form-fields' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( (int) $field->id === $field_id ) {
@@ -25,8 +31,8 @@ class Test_Field_Quiz extends TestCase {
 	}
 
 	public function test_value_returns_matching_choice_text_for_single_answer() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$gf_field  = $this->quiz_field_by_id( 24 );
 		$pdf_field = new Field_Quiz( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
@@ -38,7 +44,7 @@ class Test_Field_Quiz extends TestCase {
 	}
 
 	public function test_value_returns_empty_array_when_no_entry_match() {
-		$form      = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form      = $this->form( 'all-form-fields' );
 		$gf_field  = $this->quiz_field_by_id( 24 );
 		$entry     = [ 'id' => 0, 'form_id' => $form['id'] ];
 		$pdf_field = new Field_Quiz( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
@@ -47,8 +53,8 @@ class Test_Field_Quiz extends TestCase {
 	}
 
 	public function test_value_includes_correctness_flag() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		$gf_field  = $this->quiz_field_by_id( 24 );
 		$pdf_field = new Field_Quiz( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );

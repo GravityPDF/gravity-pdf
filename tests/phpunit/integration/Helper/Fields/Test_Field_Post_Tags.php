@@ -13,9 +13,15 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Field_Post_Tags extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
+
 	public function test_html_contains_all_tags() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
 
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'post_tags' ) {
