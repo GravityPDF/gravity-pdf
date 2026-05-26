@@ -12,6 +12,11 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Helper_PDF_List_Table extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'form-settings' ] );
+	}
+
 	private Helper_PDF_List_Table $table;
 
 	public function set_up(): void {

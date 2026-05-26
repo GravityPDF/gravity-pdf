@@ -15,7 +15,8 @@ abstract class AjaxTestCase extends WP_Ajax_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->assertFixturesIntact();
+
+		$this->gfpdf()->data->form_settings = [];
 	}
 
 	public static function tear_down_after_class() {

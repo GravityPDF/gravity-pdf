@@ -7,19 +7,14 @@ namespace GFPDF\Tests\Concerns;
 /**
  * Class-scoped form/entry fixtures plus ergonomic accessors.
  *
- * New pattern (preferred): each test class declares the fixtures it needs in
- * set_up_before_class() via load_fixtures(), reads them via $this->form() /
- * $this->entry(), and inherits cleanup via tear_down_after_class().
- *
- * Legacy pattern (Phase A–C only): the accessors fall back to the shared
- * $GLOBALS['GFPDF_Test'] global populated by tools/phpunit/bootstrap.php. The
- * fallback and assertFixturesIntact() are removed in Phase D once every test
- * file has been migrated to the new pattern.
+ * Each test class declares the fixtures it needs in set_up_before_class() via
+ * load_fixtures(), reads them via $this->form() / $this->entry() / $this->entries(),
+ * and inherits cleanup via tear_down_after_class() (wired in TestCase / AjaxTestCase).
  */
 trait HasGfpdfFixtures {
 
 	/**
-	 * Form key → entry-fixture filename. The legacy bootstrap mixes
+	 * Form key → entry-fixture filename. The original bootstrap mixed
 	 * -entries.json and -entry.json suffixes, so a map is the source of truth.
 	 */
 	private static $entry_filenames = [
@@ -100,8 +95,7 @@ trait HasGfpdfFixtures {
 	}
 
 	/**
-	 * Returns the form fixture stored under $key. Checks the per-class cache
-	 * first; falls back to the legacy global during the migration window.
+	 * Returns the form fixture stored under $key (declared via load_fixtures).
 	 *
 	 * @param string $key Form key.
 	 *
@@ -109,21 +103,16 @@ trait HasGfpdfFixtures {
 	 */
 	protected function form( $key ) {
 		$cache = self::$fixture_caches[ static::class ]['forms'] ?? [];
-		if ( isset( $cache[ $key ] ) ) {
-			return $cache[ $key ];
+		if ( ! isset( $cache[ $key ] ) ) {
+			$available = implode( ', ', array_keys( $cache ) ) ?: '(none)';
+			$this->fail( "Form fixture '$key' is not loaded. Available in " . static::class . ": $available" );
 		}
 
-		if ( ! isset( $GLOBALS['GFPDF_Test']->form[ $key ] ) ) {
-			$available = implode( ', ', array_keys( (array) $GLOBALS['GFPDF_Test']->form ) );
-			$this->fail( "Form fixture '$key' is not loaded. Available: $available" );
-		}
-
-		return $GLOBALS['GFPDF_Test']->form[ $key ];
+		return $cache[ $key ];
 	}
 
 	/**
-	 * Returns one of the entry fixtures stored under $key. Same lookup order
-	 * as form(): per-class cache first, legacy global fallback.
+	 * Returns one of the entry fixtures stored under $key.
 	 *
 	 * @param string $key   Entry-set key (same key as the parent form).
 	 * @param int    $index Zero-based index into the entry list.
@@ -132,15 +121,11 @@ trait HasGfpdfFixtures {
 	 */
 	protected function entry( $key, $index = 0 ) {
 		$cache = self::$fixture_caches[ static::class ]['entries'] ?? [];
-		if ( isset( $cache[ $key ][ $index ] ) ) {
-			return $cache[ $key ][ $index ];
+		if ( ! isset( $cache[ $key ][ $index ] ) ) {
+			$this->fail( "Entry fixture '$key'[$index] is not loaded in " . static::class . '.' );
 		}
 
-		if ( ! isset( $GLOBALS['GFPDF_Test']->entries[ $key ][ $index ] ) ) {
-			$this->fail( "Entry fixture '$key'[$index] is not loaded." );
-		}
-
-		return $GLOBALS['GFPDF_Test']->entries[ $key ][ $index ];
+		return $cache[ $key ][ $index ];
 	}
 
 	/**
@@ -152,15 +137,11 @@ trait HasGfpdfFixtures {
 	 */
 	protected function entries( $key ) {
 		$cache = self::$fixture_caches[ static::class ]['entries'] ?? [];
-		if ( isset( $cache[ $key ] ) ) {
-			return $cache[ $key ];
+		if ( ! isset( $cache[ $key ] ) ) {
+			$this->fail( "Entry fixture set '$key' is not loaded in " . static::class . '.' );
 		}
 
-		if ( ! isset( $GLOBALS['GFPDF_Test']->entries[ $key ] ) ) {
-			$this->fail( "Entry fixture set '$key' is not loaded." );
-		}
-
-		return $GLOBALS['GFPDF_Test']->entries[ $key ];
+		return $cache[ $key ];
 	}
 
 	/**
@@ -172,44 +153,5 @@ trait HasGfpdfFixtures {
 		global $gfpdf;
 
 		return $gfpdf;
-	}
-
-	/**
-	 * Sentinel check that the legacy shared global is intact. Catches tests that
-	 * mutate $GLOBALS['GFPDF_Test'] without restoring it. Removed in Phase D
-	 * along with the global itself.
-	 */
-	protected function assertFixturesIntact() {
-		$expected_forms = [
-			'all-form-fields',
-			'form-settings',
-			'gravityform-1',
-			'gravityform-2',
-			'repeater-empty-form',
-			'repeater-consent-form',
-			'non-group-products-form',
-		];
-
-		$expected_entries = [
-			'all-form-fields',
-			'gravityform-1',
-			'repeater-empty-form',
-			'repeater-consent-form',
-			'non-group-products-form',
-		];
-
-		foreach ( $expected_forms as $key ) {
-			$this->assertNotEmpty(
-				$GLOBALS['GFPDF_Test']->form[ $key ] ?? null,
-				"Shared form fixture '$key' missing — a prior test mutated \$GLOBALS['GFPDF_Test']->form"
-			);
-		}
-
-		foreach ( $expected_entries as $key ) {
-			$this->assertNotEmpty(
-				$GLOBALS['GFPDF_Test']->entries[ $key ] ?? null,
-				"Shared entry fixture '$key' missing — a prior test mutated \$GLOBALS['GFPDF_Test']->entries"
-			);
-		}
 	}
 }

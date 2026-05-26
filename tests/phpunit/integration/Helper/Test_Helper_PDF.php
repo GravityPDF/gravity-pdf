@@ -13,6 +13,11 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Helper_PDF extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'gravityform-1' ], [ 'gravityform-1' ] );
+	}
+
 	private Helper_PDF $pdf;
 
 	public function set_up(): void {

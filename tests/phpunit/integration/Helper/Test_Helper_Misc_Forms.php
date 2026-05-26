@@ -10,6 +10,11 @@ use GPDFAPI;
  */
 class Test_Helper_Misc_Forms extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	/** @var Helper_Misc */
 	public $misc;
 

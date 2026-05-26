@@ -53,6 +53,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # Phase D grep gate: block re-introduction of the legacy shared fixture
+      # global and direct GFAPI form/entry creates in tests. Fixtures must go
+      # through the per-class load_fixtures() loader on HasGfpdfFixtures.
+      - name: Fail on banned fixture patterns
+        run: |
+          if grep -rnE "\\\$GLOBALS\\[['\\\"]GFPDF_Test['\\\"]\\]|GFAPI::add_(form|entry)\\b" tests/phpunit/integration/ --include="*.php"; then
+            echo "::error::Banned fixture pattern found in tests/phpunit/integration/. Use static::load_fixtures() instead."
+            exit 1
+          fi
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:

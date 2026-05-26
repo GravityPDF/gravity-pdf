@@ -14,6 +14,11 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Queue_Callbacks extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
+
 	public function test_create_pdf_throws_when_generation_returns_wp_error() {
 		$this->expectException( Exception::class );
 		Queue_Callbacks::create_pdf( 0, '' );

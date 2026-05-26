@@ -1090,7 +1090,7 @@ class Test_PDF extends TestCase {
 		$pdf = new Helper_PDF(
 			[
 				'id'      => 1,
-				'form_id' => 1,
+				'form_id' => $this->form( 'all-form-fields' )['id'],
 			],
 			[ 'id' => '556690c67856b' ],
 			$gfpdf->gform,
@@ -1122,7 +1122,7 @@ class Test_PDF extends TestCase {
 		$pdf = new Helper_PDF(
 			[
 				'id'      => 1,
-				'form_id' => 1,
+				'form_id' => $this->form( 'all-form-fields' )['id'],
 			],
 			[ 'id' => '556690c67856b' ],
 			$gfpdf->gform,
@@ -1153,7 +1153,7 @@ class Test_PDF extends TestCase {
 		$pdf = new Helper_PDF(
 			[
 				'id'      => 1,
-				'form_id' => 1,
+				'form_id' => $this->form( 'all-form-fields' )['id'],
 			],
 			[ 'id' => '556690c67856b', 'template' => 'zadani' ],
 			$gfpdf->gform,
@@ -1199,7 +1199,7 @@ class Test_PDF extends TestCase {
 		$pdf = new Helper_PDF(
 			[
 				'id'      => 1,
-				'form_id' => 1,
+				'form_id' => $this->form( 'all-form-fields' )['id'],
 			],
 			[
 				'id' => '556690c67856b',
@@ -1227,7 +1227,7 @@ class Test_PDF extends TestCase {
 		$pdf = new Helper_PDF(
 			[
 				'id'      => 1,
-				'form_id' => 1,
+				'form_id' => $this->form( 'all-form-fields' )['id'],
 			],
 			[ 'id' => '556690c67856b', 'template' => 'zadani' ],
 			$gfpdf->gform,
@@ -1816,10 +1816,10 @@ class Test_PDF extends TestCase {
 			]
 		];
 
-		$products = new Field_Products( new GF_Field(), [ 'form_id' => 1 ], $gfpdf->gform, $gfpdf->misc );
+		$products = new Field_Products( new GF_Field(), [ 'form_id' => $this->form( 'all-form-fields' )['id'] ], $gfpdf->gform, $gfpdf->misc );
 
 		ob_start();
-		$this->view->process_field( $form['fields'][0], [ 'form_id' => 1 ], $form, $config, $products, new Helper_Field_Container(), $this->model );
+		$this->view->process_field( $form['fields'][0], [ 'form_id' => $this->form( 'all-form-fields' )['id'] ], $form, $config, $products, new Helper_Field_Container(), $this->model );
 
 		$html = ob_get_clean();
 
@@ -1829,7 +1829,7 @@ class Test_PDF extends TestCase {
 		$this->assertStringContainsString('<div class="row-separator odd">', $html );
 
 		ob_start();
-		$this->view->process_field( $form['fields'][1], [ 'form_id' => 1 ], $form, $config, $products, new Helper_Field_Container(), $this->model );
+		$this->view->process_field( $form['fields'][1], [ 'form_id' => $this->form( 'all-form-fields' )['id'] ], $form, $config, $products, new Helper_Field_Container(), $this->model );
 
 		$html = ob_get_clean();
 
@@ -1839,7 +1839,7 @@ class Test_PDF extends TestCase {
 		$config['meta']['empty'] = false;
 
 		ob_start();
-		$this->view->process_field( $form['fields'][1], [ 'form_id' => 1 ], $form, $config, $products, new Helper_Field_Container(), $this->model );
+		$this->view->process_field( $form['fields'][1], [ 'form_id' => $this->form( 'all-form-fields' )['id'] ], $form, $config, $products, new Helper_Field_Container(), $this->model );
 
 		$html = ob_get_clean();
 
@@ -2060,7 +2060,7 @@ class Test_PDF extends TestCase {
 		$pdf = new Helper_PDF(
 			[
 				'id'      => 1,
-				'form_id' => 1,
+				'form_id' => $this->form( 'all-form-fields' )['id'],
 			],
 			$settings,
 			$gfpdf->gform,
@@ -2112,7 +2112,7 @@ class Test_PDF extends TestCase {
 			new Helper_PDF(
 				[
 					'id'      => 1,
-					'form_id' => 1,
+					'form_id' => $this->form( 'all-form-fields' )['id'],
 				],
 				[ 'id' => '556690c67856b' ],
 				GPDFAPI::get_form_class(),

@@ -17,6 +17,11 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Cache extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+	}
+
 	public function test_get_hash() {
 		$results = $this->create_form_and_entries();
 

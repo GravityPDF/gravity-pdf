@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace GFPDF\Tests\Integration;
 
 /**
- * Infrastructure self-test for HasGfpdfFixtures::load_fixtures() and the per-class
- * fixture cache. Not a mirror of a src/ class — it pins the Phase A migration
- * scaffolding so a regression in load_fixtures/cleanup_class_fixtures fails
- * loudly before bulk Phase C sweeps depend on it.
+ * Infrastructure self-test for HasGfpdfFixtures::load_fixtures and the per-class
+ * fixture cache. Not a mirror of a src/ class — pins the fixture-loading machinery
+ * so a regression here fails loudly before downstream classes inherit it.
  *
  * @group fixtures-loader
  */
@@ -22,23 +21,16 @@ class Test_Fixtures_Loader extends TestCase {
 		);
 	}
 
-	public function test_form_accessor_returns_per_class_form_not_legacy_global() {
+	public function test_form_accessor_returns_loaded_fixture() {
 		$form = $this->form( 'gravityform-1' );
 
-		$this->assertNotSame(
-			$GLOBALS['GFPDF_Test']->form['gravityform-1']['id'],
-			$form['id']
-		);
-		// Field count proves the same JSON was loaded (GFAPI rewrites titles with
-		// `(1)` suffixes to dedupe, so the title is unreliable for shape checks).
-		$this->assertSame(
-			count( $GLOBALS['GFPDF_Test']->form['gravityform-1']['fields'] ),
-			count( $form['fields'] )
-		);
+		$this->assertIsInt( $form['id'] );
+		$this->assertGreaterThan( 0, $form['id'] );
+		$this->assertNotEmpty( $form['fields'] );
 	}
 
 	public function test_entry_accessor_returns_entries_linked_to_loaded_form() {
-		$entry = $this->entry( 'gravityform-1', 0 );
+		$entry = $this->entry( 'gravityform-1' );
 
 		$this->assertSame(
 			$this->form( 'gravityform-1' )['id'],
@@ -46,10 +38,20 @@ class Test_Fixtures_Loader extends TestCase {
 		);
 	}
 
-	public function test_unloaded_key_falls_back_to_legacy_global() {
-		$this->assertSame(
-			$GLOBALS['GFPDF_Test']->form['form-settings']['id'],
-			$this->form( 'form-settings' )['id']
-		);
+	public function test_entries_accessor_returns_full_list() {
+		$entries = $this->entries( 'gravityform-1' );
+
+		$this->assertCount( 3, $entries );
+		$this->assertSame( $entries[0]['id'], $this->entry( 'gravityform-1', 0 )['id'] );
+	}
+
+	public function test_unloaded_form_key_fails_with_helpful_message() {
+		try {
+			$this->form( 'not-loaded' );
+			$this->fail( 'Expected fail() on unloaded key' );
+		} catch ( \PHPUnit\Framework\AssertionFailedError $e ) {
+			$this->assertStringContainsString( "Form fixture 'not-loaded' is not loaded", $e->getMessage() );
+			$this->assertStringContainsString( 'gravityform-1', $e->getMessage() );
+		}
 	}
 }
