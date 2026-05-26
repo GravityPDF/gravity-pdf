@@ -54,7 +54,7 @@ class Test_Templates extends TestCase {
 		/* run parent method */
 		parent::set_up();
 
-		/* Test_Uninstaller leaves the folder structure removed; recreate the template dirs this test writes into. */
+		/* Test_Uninstaller leaves the folder structure removed; recreate so tests can write into them. */
 		wp_mkdir_p( $gfpdf->data->template_tmp_location );
 		wp_mkdir_p( $gfpdf->data->template_location );
 
@@ -234,6 +234,12 @@ class Test_Templates extends TestCase {
 	 */
 	public function test_unzip_and_verify_templates() {
 		global $gfpdf;
+
+		/* Drop leftovers from a prior invocation that aborted partway — ZipArchive::CREATE
+		 * opens existing files (it doesn't truncate), so a stale test-archive.zip would get
+		 * appended to and verify_templates would see a mixed archive. */
+		@unlink( $gfpdf->data->template_tmp_location . 'test-archive.zip' ); /* phpcs:ignore */
+		$gfpdf->misc->rmdir( $gfpdf->data->template_tmp_location . 'test-archive/' );
 
 		/* Check an error is thrown if trying to unzip a zip file */
 		try {

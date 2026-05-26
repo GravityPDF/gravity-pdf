@@ -162,6 +162,16 @@ class Test_Helper_Templates extends TestCase {
 			$templates = $this->templates->get_all_templates();
 			$this->assertCount( 7, $templates );
 		}
+
+		/* Files persist across yarn test:php invocations (Docker volume); a later run's cached template
+		 * list still references them after Test_Helper_Templates::set_up rmdirs the directory. */
+		foreach ( [ 'test.php', 'test2.php', 'zadani.php', 'configuration.php', 'configuration.archive.php' ] as $file ) {
+			@unlink( $gfpdf->data->template_location . $file ); /* phpcs:ignore */
+		}
+		if ( is_multisite() ) {
+			@unlink( $gfpdf->data->multisite_template_location . 'test3.php' ); /* phpcs:ignore */
+			@unlink( $gfpdf->data->multisite_template_location . 'zadani.php' ); /* phpcs:ignore */
+		}
 	}
 
 	/**

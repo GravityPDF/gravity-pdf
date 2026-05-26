@@ -24,6 +24,8 @@ class Test_FlushCache extends TestCase {
 
 	public function test_flush_cache() {
 		$data = \GPDFAPI::get_data_class();
+		wp_mkdir_p( $data->mpdf_tmp_location );
+
 		$file = $data->mpdf_tmp_location . '/test';
 
 		touch( $file );
