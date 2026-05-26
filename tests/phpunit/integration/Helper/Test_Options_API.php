@@ -22,6 +22,11 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Options_API extends TestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'form-settings' ] );
+	}
+
 	/**
 	 * Our Gravity PDF Options API Object
 	 *
@@ -58,8 +63,8 @@ class Test_Options_API extends TestCase {
 		update_option( 'gfpdf_settings', json_decode( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/pdf/options-settings.json' ), true ) );
 
 		/* Load a form / form PDF settings into database */
-		$this->form_id                                = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
-		$gfpdf->data->form_settings[ $this->form_id ] = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
+		$this->form_id                                = $this->form( 'form-settings' )['id'];
+		$gfpdf->data->form_settings[ $this->form_id ] = $this->form( 'form-settings' )['gfpdf_form_settings'];
 
 		/* Set up our global settings */
 		$this->options->set_plugin_settings();

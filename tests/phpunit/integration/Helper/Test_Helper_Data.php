@@ -21,6 +21,11 @@ use GFPDF\Tests\Integration\TestCase;
  * @group data
  */
 class Test_Helper_Data extends TestCase {
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures( [ 'all-form-fields' ] );
+	}
 	/**
 	 * Our Gravity PDF Data object
 	 *
@@ -164,7 +169,7 @@ class Test_Helper_Data extends TestCase {
 	}
 
 	public function test_get_conditional_logic_options() {
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form  = $this->form( 'all-form-fields' );
 
 		$conditional_logic_options = $this->data->get_conditional_logic_options( $form );
 

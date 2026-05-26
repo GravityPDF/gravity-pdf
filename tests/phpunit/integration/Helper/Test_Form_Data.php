@@ -23,6 +23,14 @@ use GFPDF\Tests\Integration\TestCase;
  * @group form-data
  */
 class Test_Form_Data extends TestCase {
+
+	// Holdout: this class depends on the legacy bootstrap-time form_id=1, because
+	// the all-form-fields entry JSON hardcodes upload paths like
+	// gravity_forms/1-<hash>/<file>. Per-class fixtures would create the form with
+	// a fresh ID, leaving the entry URLs pointing at a non-existent upload dir and
+	// breaking test_post_fields' secured-URL assertions. Accessors fall through to
+	// $GLOBALS['GFPDF_Test'] via the legacy fallback; Phase D must address before
+	// it can delete the global.
 	/**
 	 * The Gravity Form
 	 *
@@ -65,9 +73,9 @@ class Test_Form_Data extends TestCase {
 	 * @since 4.0
 	 */
 	private function setup_stubs() {
-		$this->form      = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$this->entries   = $GLOBALS['GFPDF_Test']->entries['all-form-fields'];
-		$this->form_data = $GLOBALS['GFPDF_Test']->form_data['all-form-fields'][0];
+		$this->form      = $this->form( 'all-form-fields' );
+		$this->entries   = $this->entries( 'all-form-fields' );
+		$this->form_data = \GPDFAPI::get_form_data( $this->entries[0]['id'] );
 	}
 
 	/**
@@ -1564,8 +1572,8 @@ class Test_Form_Data extends TestCase {
 	 * Test the Gravity Forms Consent field form data
 	 */
 	public function test_consent_field_data() {
-		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
-		$entry =  $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
+		$form  = $this->form( 'repeater-consent-form' );
+		$entry =  $this->entry( 'repeater-consent-form' );
 
 		$form_id          = $this->gf_factory()->form->create([], $form);
 		$entry['form_id'] = $form_id;
@@ -1582,8 +1590,8 @@ class Test_Form_Data extends TestCase {
 	 * Test the Gravity Forms Repeater field form data
 	 */
 	public function test_repeater_field_data() {
-		$form  = $GLOBALS['GFPDF_Test']->form['repeater-consent-form'];
-		$entry =  $GLOBALS['GFPDF_Test']->entries['repeater-consent-form'][0];
+		$form  = $this->form( 'repeater-consent-form' );
+		$entry =  $this->entry( 'repeater-consent-form' );
 
 		$form_id          = $this->gf_factory()->form->create([], $form);
 		$entry['form_id'] = $form_id;
@@ -1622,8 +1630,8 @@ class Test_Form_Data extends TestCase {
 	 * @since 6.4
 	 */
 	public function test_repeater_maybe_show_section_title() {
-		$form  = $GLOBALS['GFPDF_Test']->form['repeater-empty-form'];
-		$entry = $GLOBALS['GFPDF_Test']->entries['repeater-empty-form'][0];
+		$form  = $this->form( 'repeater-empty-form' );
+		$entry = $this->entry( 'repeater-empty-form' );
 
 		/** @var \GF_Field_Repeater $repeater_field */
 		$repeater_field = new \GF_Field_Repeater( $form['fields'][1]['fields'][2]['fields'][2]['fields'][0] );

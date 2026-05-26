@@ -24,6 +24,14 @@ use WP_User;
  * @group gravity-forms
  */
 class Test_Gravity_Forms extends TestCase {
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+		static::load_fixtures(
+			[ 'form-settings', 'gravityform-1' ],
+			[ 'gravityform-1' ]
+		);
+	}
 	/**
 	 * The Gravity Form ID assigned to the imported form
 	 *
@@ -50,7 +58,7 @@ class Test_Gravity_Forms extends TestCase {
 	 * @since 4.0
 	 */
 	private function setup_form() {
-		$this->form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
+		$this->form_id = $this->form( 'form-settings' )['id'];
 	}
 
 	/**
@@ -66,7 +74,7 @@ class Test_Gravity_Forms extends TestCase {
 		$form = GFFormsModel::get_form_meta( $this->form_id );
 
 		/* Test that the data was returned correctly */
-		$this->assertEquals( 'My First Form', $form['title'] );
+		$this->assertEquals( $this->form( 'form-settings' )['title'], $form['title'] );
 		$this->assertArrayHasKey( 'notifications', $form );
 		$this->assertArrayHasKey( 'confirmations', $form );
 		$this->assertArrayHasKey( 'gfpdf_form_settings', $form );
@@ -296,13 +304,13 @@ class Test_Gravity_Forms extends TestCase {
 	 * @since 3.6
 	 */
 	public function test_get_forms() {
-		$form = RGFormsModel::get_form_meta( $GLOBALS['GFPDF_Test']->form['gravityform-1']['id'] );
+		$form = RGFormsModel::get_form_meta( $this->form( 'gravityform-1' )['id'] );
 
 		/*
 		 * Check the basics
 		 * Title is there, field number is correct
 		 */
-		$this->assertEquals( 'Simple Form Testing', $form['title'] );
+		$this->assertEquals( $this->form( 'gravityform-1' )['title'], $form['title'] );
 		$this->assertEquals( true, is_array( $form['fields'] ) );
 		$this->assertEquals( 7, count( $form['fields'] ) );
 		$this->assertEquals( 1, $form['is_active'] );
@@ -363,7 +371,7 @@ class Test_Gravity_Forms extends TestCase {
 	 * @since 3.6
 	 */
 	public function test_get_entry() {
-		$entry = RGFormsModel::get_lead( $GLOBALS['GFPDF_Test']->entries['gravityform-1'][0]['id'] );
+		$entry = RGFormsModel::get_lead( $this->entry( 'gravityform-1', 0 )['id'] );
 
 		$valid_entries = [
 			'id',
@@ -395,7 +403,7 @@ class Test_Gravity_Forms extends TestCase {
 		$this->assertEquals( 'Name', $entry['1.6'] );
 		$this->assertEquals( 'First Choice', $entry[5] );
 
-		$entry = RGFormsModel::get_lead( $GLOBALS['GFPDF_Test']->entries['gravityform-1'][1]['id'] );
+		$entry = RGFormsModel::get_lead( $this->entry( 'gravityform-1', 1 )['id'] );
 
 		$this->assertEquals( 'First', $entry['1.3'] );
 		$this->assertEquals( 'Last', $entry['1.6'] );
@@ -409,7 +417,7 @@ class Test_Gravity_Forms extends TestCase {
 		$this->assertEquals( 'Second Choice', $entry['5'] );
 		$this->assertEquals( 'First Choice,Second Choice,Third Choice', $entry['6'] );
 
-		$entry = RGFormsModel::get_lead( $GLOBALS['GFPDF_Test']->entries['gravityform-1'][2]['id'] );
+		$entry = RGFormsModel::get_lead( $this->entry( 'gravityform-1', 2 )['id'] );
 
 		$this->assertEquals( 'Jake', $entry['1.3'] );
 		$this->assertEquals( 'Jackson', $entry['1.6'] );
@@ -438,7 +446,12 @@ class Test_Gravity_Forms extends TestCase {
 	 * @dataProvider provider_mergetag_test
 	 */
 	public function test_replace_variables( $mergetag, $value ) {
-		$this->assertEquals( $value, PDF_Common::do_mergetags( $mergetag, $GLOBALS['GFPDF_Test']->form['gravityform-1']['id'], $GLOBALS['GFPDF_Test']->entries['gravityform-1'][2]['id'] ) );
+		// Per-class form titles are dedup-suffixed by GFAPI (e.g. "Simple Form Testing (1)").
+		// Substitute the provider's expected title with the actual loaded form title.
+		if ( $mergetag === '{form_title}' ) {
+			$value = $this->form( 'gravityform-1' )['title'];
+		}
+		$this->assertEquals( $value, PDF_Common::do_mergetags( $mergetag, $this->form( 'gravityform-1' )['id'], $this->entry( 'gravityform-1', 2 )['id'] ) );
 	}
 
 	/**
