@@ -44,16 +44,6 @@ class Test_Uninstaller extends TestCase {
 	 */
 	public $model;
 
-	/**
-	 * The WP Unit Test Set up function
-	 *
-	 * @since 6.0
-	 */
-	/*
-	 * Loaded here (not via load_fixtures in set_up_before_class) because tests in this class
-	 * unset gfpdf_form_settings on every form. GFAPI writes bypass the WP test transaction,
-	 * so the removal persists across tests — reseeding per-test keeps each test self-contained.
-	 */
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 		static::load_fixtures( [ 'all-form-fields' ] );
@@ -65,10 +55,10 @@ class Test_Uninstaller extends TestCase {
 		$this->controller = Controller_Uninstaller::get_instance();
 		$this->model      = $this->controller->model;
 
-		/* Restore the fixture's PDF settings, undone by any prior uninstall test in this class. */
+		/* Reseed the fixture's PDF settings per test — GFAPI writes bypass the WP test transaction, so a prior uninstall test in this class leaves them unset. */
 		$fixture_form = $this->form( 'all-form-fields' );
 		$current      = \GFAPI::get_form( $fixture_form['id'] );
-		if ( $current && ! isset( $current['gfpdf_form_settings'] ) && isset( $fixture_form['gfpdf_form_settings'] ) ) {
+		if ( $current && ! isset( $current['gfpdf_form_settings'] ) ) {
 			$current['gfpdf_form_settings'] = $fixture_form['gfpdf_form_settings'];
 			\GFAPI::update_form( $current );
 		}
