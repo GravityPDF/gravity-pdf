@@ -24,13 +24,10 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Form_Data extends TestCase {
 
-	// Holdout: this class depends on the legacy bootstrap-time form_id=1, because
-	// the all-form-fields entry JSON hardcodes upload paths like
-	// gravity_forms/1-<hash>/<file>. Per-class fixtures would create the form with
-	// a fresh ID, leaving the entry URLs pointing at a non-existent upload dir and
-	// breaking test_post_fields' secured-URL assertions. Accessors fall through to
-	// $GLOBALS['GFPDF_Test'] via the legacy fallback; Phase D must address before
-	// it can delete the global.
+	// Holdout: the all-form-fields entry JSON hardcodes upload paths like
+	// gravity_forms/1-<hash>/<file>, so test_post_fields only passes when the
+	// form has id=1 (the legacy bootstrap order). Accessors fall through to
+	// $GLOBALS['GFPDF_Test']; Phase D must address before deleting the global.
 	/**
 	 * The Gravity Form
 	 *
