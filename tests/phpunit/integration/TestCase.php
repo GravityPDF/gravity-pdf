@@ -15,9 +15,6 @@ abstract class TestCase extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-
-		// Reset the per-form settings cache. Tests that mutate it must
-		// rely on their own set_up() to restore state for the next test.
 		$this->gfpdf()->data->form_settings = [];
 	}
 
