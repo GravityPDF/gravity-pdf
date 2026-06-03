@@ -36,26 +36,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	public $plugin_dir;
 
 	/**
-	 * @var array GF Form array
-	 */
-	public $form = [];
-
-	/**
-	 * @var array GF Entry array
-	 */
-	public $entry = [];
-
-	/**
-	 * @var array Array of GF Entries
-	 */
-	public $entries = [];
-
-	/**
-	 * @var  array $form_data
-	 */
-	public $form_data = [];
-
-	/**
 	 * Setup the unit testing environment
 	 *
 	 * @since 4.0
@@ -72,9 +52,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		/* load Gravity PDF */
 		tests_add_filter( 'muplugins_loaded', [ $this, 'load' ] );
 
-		/* load Gravity PDF objects */
-		tests_add_filter( 'after_setup_theme', [ $this, 'create_stubs' ], 20 );
-
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
 
@@ -83,12 +60,18 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	}
 
 	/**
-	 * Load Addon Mocks
+	 * Load Addon Mocks.
+	 *
+	 * Stubs for add-on classes that aren't installed in the test environment
+	 * (Zapier, Chained Selects, Gravity Perks Nested Forms) so tests exercising
+	 * those integration code paths can run.
 	 *
 	 * @since 6.3
 	 */
 	public function mocks() {
 		require_once __DIR__ . '/Mocks/zapier-mock.php';
+		require_once __DIR__ . '/Mocks/gf-chained-field-select-mock.php';
+		require_once __DIR__ . '/Mocks/gp-field-nested-form-mock.php';
 	}
 
 	/**
@@ -97,14 +80,18 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * @since 4.0
 	 */
 	public function load() {
-		error_reporting( E_ALL & ~E_DEPRECATED );
+		/*
+		 * Gravity Forms, its add-ons, and pdf.php's include-time wiring emit
+		 * E_DEPRECATED notices on PHP 8.x. Suppress them across the whole
+		 * bootstrap; the previous level is restored at the end so deprecations
+		 * from code-under-test still surface during the actual test run.
+		 */
+		$previous_error_level = error_reporting( E_ALL & ~E_DEPRECATED );
 
 		require_once( __DIR__ . '/gravityforms-factory.php' );
 
 		require_once $this->plugin_dir . '/../gravityforms/gravityforms.php';
-		require_once $this->plugin_dir . '/../gravityformspolls/polls.php';
-		require_once $this->plugin_dir . '/../gravityformsquiz/quiz.php';
-		require_once $this->plugin_dir . '/../gravityformssurvey/survey.php';
+		require_once __DIR__ . '/stubs/gravity-forms-addons.php';
 		require_once( GFCommon::get_base_path() . '/tooltips.php' );
 
 		/* set up Gravity Forms database */
@@ -124,63 +111,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		$gf_webapi->update_plugin_settings( [ 'enabled' => '1', 'version' => 'v2' ] );
 
 		require_once $this->plugin_dir . '/pdf.php';
-	}
 
-	/**
-	 * Create our Gravity Form stubs for use in our tests
-	 *
-	 * @since 4.0
-	 */
-	public function create_stubs() {
-		global $gfpdf;
-
-		/* Import all JSON forms into Gravity Forms */
-		$forms = [
-			'all-form-fields.json',
-			'form-settings.json',
-			'gravityform-1.json',
-			'gravityform-2.json',
-			'repeater-empty-form.json',
-			'repeater-consent-form.json',
-			'non-group-products-form.json',
-
-		];
-
-		foreach ( $forms as $json ) {
-			$form                                 = json_decode( trim( file_get_contents( __DIR__ . '/data/forms/' . $json ) ), true );
-			$form_id                              = GFAPI::add_form( $form );
-			$this->form[ substr( $json, 0, -5 ) ] = GFAPI::get_form( $form_id );
-		}
-
-		/* Import our entries */
-		$entries = [
-			'all-form-fields'     => 'all-form-fields-entries.json',
-			'gravityform-1'       => 'gravityform-1-entries.json',
-			'repeater-empty-form' => 'repeater-empty-entry.json',
-			'repeater-consent-form' => 'repeater-consent-entry.json',
-			'non-group-products-form' => 'non-group-products-form-entries.json',
-		];
-
-		foreach ( $entries as $id => $json ) {
-			$entries   = json_decode( trim( file_get_contents( __DIR__ . '/data/entries/' . $json ) ), true );
-			$entry_ids = GFAPI::add_entries( $entries, $this->form[ $id ]['id'] );
-
-			/* Loop through our new entry IDs and get the actual entries */
-			$this->entries[ $id ] = [];
-			foreach ( $entry_ids as $lid ) {
-				$entry                  = GFAPI::get_entry( $lid );
-				$this->entries[ $id ][] = $entry;
-
-				/* We only need to run this once */
-				if ( ! isset( $this->form_data[ $id ] ) ) {
-					$this->form_data[ $id ][] = GPDFAPI::get_form_data( $entry['id'] );
-				}
-			}
-		}
-
-		$gfpdf->data->form_settings = [];
+		error_reporting( $previous_error_level );
 	}
 
 }
 
-$GLOBALS['GFPDF_Test'] = new GravityPDF_Unit_Tests_Bootstrap();
+new GravityPDF_Unit_Tests_Bootstrap();

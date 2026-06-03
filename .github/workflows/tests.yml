@@ -1,0 +1,581 @@
+name: Tests
+
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize, labeled ]
+  schedule:
+    - cron: "0 20 * * 0,2,4" # Mon/Wed/Fri 6am Sydney AEST (7am during AEDT)
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+env:
+  GF_LICENSE: ${{ secrets.GF_LICENSE }}
+
+jobs:
+  check_for_run_tests_label_in_pr:
+    name: Should workflow run?
+    runs-on: ubuntu-latest
+    steps:
+      # pull_request:opened can fire before labels are applied (empty webhook payload labels[]) —
+      # read live labels via gh-api; runner spin-up absorbs the propagation window.
+      - name: Check for run-tests label
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name' | grep -qx 'run-tests'
+
+  # composer.json's post-install-cmd chains `composer prefix` + `yarn install && yarn build`, so one composer install
+  # here primes vendor/, vendor_prefixed/, node_modules/, and build/assets/ for every downstream matrix.
+  prebuild:
+    name: Prebuild shared caches
+    needs: check_for_run_tests_label_in_pr
+    runs-on: ubuntu-latest
+    outputs:
+      chromatic-enabled: ${{ steps.chromatic-gate.outputs.enabled }}
+    steps:
+      - name: Decide whether Chromatic runs this push
+        id: chromatic-gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_DRAFT: ${{ github.event.pull_request.draft }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          enabled=true
+          reason=enabled
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+              if [ "$PR_DRAFT" = "true" ]; then
+                  enabled=false; reason=draft
+              elif printf '%s' "$PR_TITLE" | grep -qiwE 'wip'; then
+                  enabled=false; reason='WIP in title'
+              elif printf '%s' "$PR_BODY"  | grep -qiwE 'wip'; then
+                  enabled=false; reason='WIP in body'
+              fi
+          fi
+          echo "[chromatic-gate] enabled=$enabled ($reason)"
+          echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # Bundled — composer install + the php-scoper post step produce them together; they must invalidate together.
+      - name: Check Composer vendor cache
+        id: vendor-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            vendor
+            vendor_prefixed
+          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
+          lookup-only: true
+
+      - name: Check node_modules cache
+        id: nm-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+          lookup-only: true
+
+      # Lets Playwright shards skip the webpack rebuild.
+      - name: Check build assets cache
+        id: build-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: build/assets
+          key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
+          lookup-only: true
+
+      - name: Setup PHP
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Setup Node JS
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Add auth details for private composer packages
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
+        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+
+      - name: Install Composer dependencies (post-install-cmd also runs php-scoper + yarn install + yarn build)
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
+        run: composer install --no-progress --no-ansi --no-interaction
+
+      # Save only on success() — one composer install produces all three artifacts, so a partway failure
+      # could cache incomplete state.
+      - name: Save Composer vendor
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            vendor
+            vendor_prefixed
+          key: ${{ steps.vendor-cache.outputs.cache-primary-key }}
+
+      - name: Save node_modules
+        if: ${{ steps.nm-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: node_modules
+          key: ${{ steps.nm-cache.outputs.cache-primary-key }}
+
+      - name: Save build assets
+        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: build/assets
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
+
+  test-js:
+    name: JavaScript Tests
+    needs: prebuild
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Log debug information
+        run: |
+          node --version
+          yarn --version
+
+      # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently re-installing.
+      - name: Restore node_modules
+        uses: actions/cache/restore@v5
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+          fail-on-cache-miss: true
+
+      - name: Run Jest tests
+        run: yarn test:js:coverage
+
+      - name: Post coverage PR comment
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: lucassabreu/comment-coverage-clover@v0.17.0
+        with:
+          file: ./tmp/jest-coverage/clover.xml
+          signature: ":robot: Jest coverage report"
+
+  test-php:
+    name: PHPUnit ${{ matrix.php }}${{ matrix.report && ' coverage' || '' }} on ${{ matrix.os }}
+    needs: prebuild
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # PRs run a tightened floor/ceiling matrix for fast feedback; cron runs the full matrix down to the
+        # composer.json floor. The run-tests-php-all label forces the full matrix on a PR — applied post-open,
+        # so the labeled event re-runs this workflow with a payload that carries the label.
+        php: ${{ fromJSON((github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests-php-all')) && '["7.4","8.5"]' || '["7.4","8.0","8.1","8.2","8.3","8.4","8.5"]') }}
+        os: [ ubuntu-latest ]
+        include:
+          # These flags merge into the matching base cells (no extra cells spawned) and drive the
+          # conditional steps below: coverage runs once on 8.3, multisite on the floor + ceiling.
+          - php: '8.3'
+            os: ubuntu-latest
+            report: true
+          - php: '7.4'
+            os: ubuntu-latest
+            multisite: true
+          - php: '8.5'
+            os: ubuntu-latest
+            multisite: true
+    env:
+      WP_ENV_PHP_VERSION: ${{ matrix.php }}
+
+    steps:
+      - name: Configure environment variables
+        run: |
+          echo "PHP_FPM_UID=$(id -u)" >> $GITHUB_ENV
+          echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
+
+      # Route Docker Hub pulls through Google's unauthenticated mirror — parallel matrix cells got silently
+      # rate-limited on docker.io (manifested as wp-env "Done in 13s" with no containers actually running).
+      - name: Use Google's Docker Hub mirror to avoid rate limits
+        run: |
+          echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # Locks in the static::load_fixtures() contract — the shared $GLOBALS['GFPDF_Test'] global
+      # and direct GFAPI form/entry creates have been removed; this gate stops them returning.
+      - name: Fail on banned fixture patterns
+        run: |
+          if grep -rnE "\\\$GLOBALS\\[['\\\"]GFPDF_Test['\\\"]\\]|GFAPI::add_(form|entry)\\b" tests/phpunit/integration/ --include="*.php"; then
+            echo "::error::Banned fixture pattern found in tests/phpunit/integration/. Use static::load_fixtures() instead."
+            exit 1
+          fi
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Log debug information
+        run: |
+          npm --version
+          yarn --version
+          node --version
+          curl --version
+          git --version
+          php --version
+          php -i
+          locale -a
+
+      # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently
+      # re-installing per matrix cell.
+      - name: Restore Composer vendor
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            vendor
+            vendor_prefixed
+          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
+          fail-on-cache-miss: true
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v5
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+          fail-on-cache-miss: true
+
+      # No restore-keys: the work-dir embeds the downloaded WordPress core, so restoring it across a
+      # core-version bump (the key hashes the config) leaves wp-env with a stale WP that silently fails
+      # to start. A clean miss re-downloads the pinned version instead.
+      - name: Cache wp-env work directory
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/wp-env
+            ~/.wp-env
+          key: wp-env-integration-v2-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('tools/wp-env/integration.json', 'composer.lock') }}
+
+      # Pre-fetch the pinned WordPress core so wp-env's start has nothing to download. Its in-start core
+      # fetch silently aborts provisioning on the CI runners (only the DB container comes up); pointing
+      # WP_ENV_CORE at a local directory sidesteps that. URL is read from the config to stay single-source.
+      - name: Pre-download WordPress core
+        run: |
+          curl -fsSL "$(jq -r '.core' tools/wp-env/integration.json)" -o "$RUNNER_TEMP/wp-core.zip"
+          unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
+          echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
+
+      - name: Install / Setup Gravity PDF + WordPress
+        if: ${{ ! matrix.report }}
+        run: yarn wp-env:integration start
+
+      - name: Install / Setup Gravity PDF + WordPress
+        if: ${{ matrix.report }}
+        run: yarn wp-env:integration start --xdebug=coverage
+
+      # retry.sh re-runs failed tests once (--filter built from the JUnit XML) so a single transient flake
+      # doesn't burn a matrix rerun; retries log as ::warning:: so flakes stay visible.
+      - name: Run PHPUnit tests
+        if: ${{ ! matrix.report }}
+        run: |
+          tools/phpunit/retry.sh test:php \
+            /var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-integration-php${{ matrix.php }}.xml \
+            --do-not-cache-result --verbose
+
+      # Multisite-tagged cells (floor + ceiling) reuse their already-running single-site wp-env rather than
+      # spinning a dedicated cell. The 8.3 coverage cell runs multisite separately, for the merged report.
+      - name: Run Multisite PHPUnit tests
+        if: ${{ matrix.multisite }}
+        run: |
+          tools/phpunit/retry.sh test:php:multisite \
+            /var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-multisite-php${{ matrix.php }}.xml \
+            --verbose
+
+      - name: Generate Code Coverage Report for PHP (single-site)
+        if: ${{ matrix.report }}
+        run: |
+          tools/phpunit/retry.sh test:php \
+            /var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-coverage-php${{ matrix.php }}.xml \
+            --do-not-cache-result --verbose \
+            --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage1.xml
+
+      - name: Generate Code Coverage Report for PHP (multisite)
+        if: ${{ matrix.report }}
+        run: |
+          tools/phpunit/retry.sh test:php:multisite \
+            /var/www/html/wp-content/plugins/gravity-pdf/tmp/junit/phpunit-coverage-multisite-php${{ matrix.php }}.xml \
+            --do-not-cache-result --verbose \
+            --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage-multisite.xml
+
+      - name: Upload PHPUnit JUnit timings
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: phpunit-junit-php${{ matrix.php }}${{ matrix.report && '-coverage' || '' }}
+          path: tmp/junit/*.xml
+
+      - name: Merge single-site + multisite Clover
+        if: ${{ matrix.report && github.event_name == 'pull_request' }}
+        run: |
+          php tools/phpunit/coverage-merge.php \
+            tmp/coverage/report-xml/merged.xml \
+            tmp/coverage/report-xml/php-coverage1.xml \
+            tmp/coverage/report-xml/php-coverage-multisite.xml
+
+      # Custom signature so this comment doesn't collide with test-js' coverage comment — the action keys
+      # de-duplication off the signature string, so identical defaults would overwrite each other.
+      - name: Post coverage PR comment
+        if: ${{ matrix.report && github.event_name == 'pull_request' }}
+        uses: lucassabreu/comment-coverage-clover@v0.17.0
+        with:
+          file: tmp/coverage/report-xml/merged.xml
+          signature: ":robot: PHPUnit coverage report"
+
+  e2e-playwright:
+    name: Playwright E2E Tests (shard ${{ matrix.shard }}/${{ strategy.job-total }})
+    needs: prebuild
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [ 1, 2, 3, 4 ]
+
+    steps:
+      - name: Configure environment variables
+        run: |
+          echo "PHP_FPM_UID=$(id -u)" >> $GITHUB_ENV
+          echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
+
+      # Route Docker Hub pulls through Google's unauthenticated mirror — the 4 parallel shards got silently
+      # rate-limited on docker.io (manifested as wp-env "Done in 13s" with no containers actually running).
+      - name: Use Google's Docker Hub mirror to avoid rate limits
+        run: |
+          echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        env:
+          CHROMATIC_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          CHROMATIC_SHA: ${{ github.event.pull_request.head.sha || github.ref }}
+          CHROMATIC_SLUG: ${{ github.repository }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Log debug information
+        run: |
+          npm --version
+          yarn --version
+          node --version
+          curl --version
+          git --version
+          php --version
+          php -i
+          locale -a
+
+      # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently
+      # re-installing per shard.
+      - name: Restore Composer vendor
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            vendor
+            vendor_prefixed
+          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
+          fail-on-cache-miss: true
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v5
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+          fail-on-cache-miss: true
+
+      - name: Restore build assets
+        uses: actions/cache/restore@v5
+        with:
+          path: build/assets
+          key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
+          fail-on-cache-miss: true
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install playwright system deps (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # No restore-keys: the work-dir embeds the downloaded WordPress core, so restoring it across a
+      # core-version bump (the key hashes the config) leaves wp-env with a stale WP that silently fails
+      # to start. A clean miss re-downloads the pinned version instead.
+      - name: Cache wp-env work directory
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/wp-env
+            ~/.wp-env
+          key: wp-env-e2e-v2-${{ runner.os }}-${{ hashFiles('tools/wp-env/e2e.json', 'composer.lock') }}
+
+      # See the integration job: pre-fetch core so wp-env's start has nothing to download.
+      - name: Pre-download WordPress core
+        run: |
+          curl -fsSL "$(jq -r '.core' tools/wp-env/e2e.json)" -o "$RUNNER_TEMP/wp-core.zip"
+          unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
+          echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
+
+      - name: Install / Setup Gravity PDF + WordPress
+        run: yarn wp-env:e2e start
+
+      # wp-env's work-dir is cached but its MySQL volume isn't, so a restored work-dir can pair with a fresh empty DB
+      # — wp-env then skips `wp core install` and Playwright fails with "The site you have requested is not installed."
+      - name: Ensure WordPress is installed (wp-env cache fallback)
+        run: |
+          yarn wp-env:e2e run cli bash -c '
+            if ! wp core is-installed >/dev/null 2>&1; then
+              echo "wp-env work-dir cache hit a fresh DB volume — running wp core install."
+              wp core install \
+                --url=http://localhost:8702 \
+                --title=Test \
+                --admin_user=admin \
+                --admin_password=password \
+                --admin_email=admin@test.local \
+                --skip-email
+            else
+              echo "WordPress already installed."
+            fi
+          '
+
+      - name: Run the tests
+        run: yarn test:e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
+          # '0' no-ops @chromatic-com/playwright's takeSnapshot — saves ~20–40% wall-clock when Chromatic is off.
+          CHROMATIC: ${{ needs.prebuild.outputs.chromatic-enabled == 'true' && '1' || '0' }}
+
+      - uses: actions/upload-artifact@v6
+        if: success() && needs.prebuild.outputs.chromatic-enabled == 'true'
+        with:
+          name: test-results-shard-${{ matrix.shard }}
+          path: ./tmp/artifacts/test-results
+
+      - name: Dump log files on failure
+        if: failure()
+        run: yarn wp-env:e2e run wordpress "cp" "-r" "/var/www/html/wp-content/uploads/gravity_forms/logs/" "/var/www/html/wp-content/plugins/gravity-pdf/tmp/artifacts/logs"
+
+      - name: Upload artifacts on failure
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: failure-artifacts-shard-${{ matrix.shard }}
+          path: tmp/artifacts
+
+  notify:
+    name: Notify on weekly run
+    needs: [ test-js, test-php, e2e-playwright ]
+    if: ${{ always() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    env:
+      HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
+    steps:
+      - name: Post Slack notification for weekly run
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "${{ env.HEADLINE }}"
+            blocks:
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: |
+                    *${{ env.HEADLINE }}*
+
+                    JavaScript: ${{ needs.test-js.result }}
+                    PHPUnit: ${{ needs.test-php.result }}
+                    E2E (Playwright): ${{ needs.e2e-playwright.result }}
+
+                    <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>
+
+  chromatic:
+    name: Run Chromatic
+    needs: [ prebuild, e2e-playwright ]
+    if: needs.prebuild.outputs.chromatic-enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Restore node_modules
+        id: nm-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+
+      - name: Install JS Dependencies
+        if: steps.nm-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      # Every shard writes the same chromatic-archives/** filenames, so `merge-multiple: true` races parallel writes
+      # and Chromatic fails with "Unexpected non-whitespace character after JSON…". Per-shard subdirs + serial merge.
+      - name: Download Playwright test results from all shards
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-results-shard-*
+          path: ./shard-artifacts
+
+      - name: Merge shard artifacts serially
+        run: |
+          mkdir -p ./test-results
+          for shard_dir in ./shard-artifacts/test-results-shard-*/; do
+            cp -R "${shard_dir}." ./test-results/
+          done
+
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          playwright: true
+          autoAcceptChanges: "development"
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

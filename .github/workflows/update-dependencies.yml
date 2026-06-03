@@ -1,0 +1,125 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Weekly on Monday at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-deps:
+    name: Bump WordPress core + Composer packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          tools: composer
+
+      - name: Add auth details for private composer packages
+        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+
+      - name: Resolve latest stable WordPress version
+        id: wp
+        run: |
+          latest=$(curl -fsSL https://api.wordpress.org/core/version-check/1.7/ \
+            | python3 -c "import sys, json; print(json.load(sys.stdin)['offers'][0]['version'])")
+          if [ -z "$latest" ]; then
+            echo "Failed to resolve latest WordPress version" >&2
+            exit 1
+          fi
+          # integration.json is the canonical source for the current WP pin;
+          # the three wp-env configs are kept in lockstep.
+          current=$(grep -oE 'wordpress-[0-9]+\.[0-9]+(\.[0-9]+)?\.zip' tools/wp-env/integration.json \
+            | head -n1 | sed -E 's/wordpress-([0-9.]+)\.zip/\1/')
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          [ "$latest" != "$current" ] && echo "changed=true" >> "$GITHUB_OUTPUT" || echo "changed=false" >> "$GITHUB_OUTPUT"
+
+      - name: Update wp-env configs
+        if: steps.wp.outputs.changed == 'true'
+        run: |
+          for file in tools/wp-env/development.json \
+                      tools/wp-env/integration.json \
+                      tools/wp-env/e2e.json; do
+            sed -i -E "s|wordpress-[0-9]+\.[0-9]+(\.[0-9]+)?\.zip|wordpress-${{ steps.wp.outputs.latest }}.zip|g" "$file"
+          done
+
+      # Snapshot before/after so the PR body can render a Before/After table.
+      - name: Snapshot current Composer versions
+        run: |
+          jq -r '
+            (.packages + .["packages-dev"])
+            | map(select(.name == "gravity/gravityforms"))
+            | map("\(.name) \(.version)")
+            | sort
+            | .[]
+          ' composer.lock > /tmp/composer-before.txt
+          cat /tmp/composer-before.txt
+
+      # --no-scripts skips post-update-cmd (php-scoper prefix); vendor_prefixed/ isn't committed so the rebuild is wasted work.
+      - name: Update target Composer packages
+        run: |
+          composer update \
+            gravity/gravityforms \
+            --with-all-dependencies \
+            --no-progress --no-ansi --no-interaction --no-scripts
+
+      - name: Snapshot updated Composer versions
+        run: |
+          jq -r '
+            (.packages + .["packages-dev"])
+            | map(select(.name == "gravity/gravityforms"))
+            | map("\(.name) \(.version)")
+            | sort
+            | .[]
+          ' composer.lock > /tmp/composer-after.txt
+          cat /tmp/composer-after.txt
+
+      - name: Build PR body
+        id: body
+        run: |
+          {
+            echo "text<<BODY_EOF"
+            echo "Automated weekly dependency refresh."
+            echo ""
+            if [ "${{ steps.wp.outputs.changed }}" = "true" ]; then
+              echo "**WordPress core (wp-env configs):** \`${{ steps.wp.outputs.current }}\` → \`${{ steps.wp.outputs.latest }}\`"
+              echo ""
+            fi
+            echo "**Composer packages** — \`gravity/gravityforms\`"
+            echo ""
+            echo "| Package | Before | After |"
+            echo "| --- | --- | --- |"
+            join -a1 -a2 -e '—' -o '0,1.2,2.2' /tmp/composer-before.txt /tmp/composer-after.txt \
+              | awk '$2 != $3 { printf "| %s | `%s` | `%s` |\n", $1, $2, $3 }'
+            echo "BODY_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # WORKFLOW_PAT (not GITHUB_TOKEN) so the PR's events fire tests.yml — GITHUB_TOKEN-attributed events are suppressed to prevent recursion.
+      # add-paths restricts the commit to lock + wp-env configs so a dirty vendor/ on the runner can't leak in.
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.WORKFLOW_PAT }}
+          branch: chore/weekly-deps-update
+          base: development
+          add-paths: |
+            composer.lock
+            tools/wp-env/development.json
+            tools/wp-env/integration.json
+            tools/wp-env/e2e.json
+          commit-message: "chore(deps): weekly bump of WordPress core + Gravity Forms"
+          title: "chore(deps): weekly bump of WordPress core + Gravity Forms"
+          body: ${{ steps.body.outputs.text }}
+          labels: |
+            dependencies
+            run-tests
+          delete-branch: true
