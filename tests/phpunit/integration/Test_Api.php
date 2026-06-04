@@ -384,4 +384,34 @@ class Test_API extends TestCase {
 
 		$this->assertSame( 'My Single Line Response', $results['field'][1] );
 	}
+
+	/**
+	 * Check we can retrieve the PDF filename, with and without the extension, and that the
+	 * WP_Error paths are returned for invalid entry IDs and invalid PDF IDs.
+	 *
+	 * @since 7.0
+	 */
+	public function test_get_pdf_filename() {
+		$entry_id = $this->entry( 'all-form-fields' )['id'];
+		$pdf_id   = '555ad84787d7e';
+
+		/* The extension is excluded by default */
+		$this->assertSame( 'test', GPDFAPI::get_pdf_filename( $entry_id, $pdf_id ) );
+
+		/* Explicitly excluding the extension matches the default */
+		$this->assertSame( 'test', GPDFAPI::get_pdf_filename( $entry_id, $pdf_id, false ) );
+
+		/* The extension is included when requested */
+		$this->assertSame( 'test.pdf', GPDFAPI::get_pdf_filename( $entry_id, $pdf_id, true ) );
+
+		/* An invalid entry ID returns a WP_Error */
+		$invalid_entry = GPDFAPI::get_pdf_filename( '', $pdf_id );
+		$this->assertInstanceOf( \WP_Error::class, $invalid_entry );
+		$this->assertSame( 'invalid_entry', $invalid_entry->get_error_code() );
+
+		/* A valid entry with an invalid PDF ID returns a WP_Error */
+		$invalid_pdf = GPDFAPI::get_pdf_filename( $entry_id, 'does-not-exist' );
+		$this->assertInstanceOf( \WP_Error::class, $invalid_pdf );
+		$this->assertSame( 'invalid_pdf_setting', $invalid_pdf->get_error_code() );
+	}
 }
