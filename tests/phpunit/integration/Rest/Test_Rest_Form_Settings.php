@@ -811,6 +811,12 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		$this->assertArrayHasKey( 'logicType', $args['conditionalLogic']['properties'] );
 		$this->assertArrayHasKey( 'rules', $args['conditionalLogic']['properties'] );
 
+		/* Each conditional logic rule property should be flagged as required in the schema */
+		$rule_properties = $args['conditionalLogic']['properties']['rules']['items']['properties'];
+		$this->assertTrue( $rule_properties['fieldId']['required'] );
+		$this->assertTrue( $rule_properties['operator']['required'] );
+		$this->assertTrue( $rule_properties['value']['required'] );
+
 		$this->assertContains( 'A4', $args['pdf_size']['enum'] );
 		$this->assertContains( 'CUSTOM', $args['pdf_size']['enum'] );
 
@@ -943,6 +949,35 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		$this->assertSame( 'rest_property_required', $data['data']['details']['conditionalLogic']['code'] );
 		$this->assertSame( 'rest_invalid_type', $data['data']['details']['font_size']['code'] );
 		$this->assertSame( 'rest_invalid_hex_color', $data['data']['details']['font_colour']['code'] );
+	}
+
+	/**
+	 * Check the REST API rejects conditional logic rules that are missing a required property
+	 */
+	public function test_input_validation_conditional_logic_rule_required() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/gravity-pdf/v1/form/' . $this->form_id );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+
+		/* The single rule omits the required "value" property */
+		$request->set_body_params( [
+			'name'             => 'Label',
+			'template'         => 'rubix',
+			'conditionalLogic' => [
+				'actionType' => 'show',
+				'logicType'  => 'any',
+				'rules'      => [
+					[ 'fieldId' => '7', 'operator' => 'is' ],
+				],
+			],
+		] );
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_property_required', $data['data']['details']['conditionalLogic']['code'] );
 	}
 
 	/**
