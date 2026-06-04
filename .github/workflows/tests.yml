@@ -461,24 +461,16 @@ jobs:
       - name: Install / Setup Gravity PDF + WordPress
         run: yarn wp-env:e2e start
 
-      # wp-env's work-dir is cached but its MySQL volume isn't, so a restored work-dir can pair with a fresh empty DB
-      # — wp-env then skips `wp core install` and Playwright fails with "The site you have requested is not installed."
+      # wp-env's work-dir is cached but its MySQL volume isn't, so a restored work-dir can pair with a fresh empty DB.
+      # A bare `wp core install` leaves the env half-configured (GF REST never enables), so run wp-env's full reset.
       - name: Ensure WordPress is installed (wp-env cache fallback)
         run: |
-          yarn wp-env:e2e run cli bash -c '
-            if ! wp core is-installed >/dev/null 2>&1; then
-              echo "wp-env work-dir cache hit a fresh DB volume — running wp core install."
-              wp core install \
-                --url=http://localhost:8702 \
-                --title=Test \
-                --admin_user=admin \
-                --admin_password=password \
-                --admin_email=admin@test.local \
-                --skip-email
-            else
-              echo "WordPress already installed."
-            fi
-          '
+          if yarn wp-env:e2e run cli wp core is-installed >/dev/null 2>&1; then
+            echo "WordPress already installed."
+          else
+            echo "wp-env work-dir cache hit a fresh DB volume — running wp-env reset for a full install."
+            yarn wp-env:e2e reset
+          fi
 
       - name: Run the tests
         run: yarn test:e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
