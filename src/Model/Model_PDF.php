@@ -2453,7 +2453,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 5.0
 	 */
 	public function set_watermark_font( $mpdf, $form, $entry, $settings ) {
-		$mpdf->watermark_font = ( isset( $settings['watermark_font'] ) ) ? $settings['watermark_font'] : $settings['font'];
+		$mpdf->watermark_font = $settings['watermark_font'] ?? $settings['font'] ?? $this->options->get_option( 'default_font', 'dejavusanscondensed' );
 
 		return $mpdf;
 	}

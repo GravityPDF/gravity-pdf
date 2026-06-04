@@ -131,6 +131,21 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 	}
 
 	/**
+	 * Verify the signature on the URL of the current request
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function verify_current_request() {
+		$protocol = isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+		$domain   = isset( $_SERVER['HTTP_HOST'] ) ? wp_unslash( $_SERVER['HTTP_HOST'] ) : '';
+		$request  = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+
+		return $this->verify( esc_url_raw( $protocol . $domain . $request ) );
+	}
+
+	/**
 	 * Validate the URL and return the results
 	 *
 	 * @param string $url

@@ -176,15 +176,17 @@ class Rest_Form_Settings extends WP_REST_Controller {
 						'validate_callback' => function ( $param, $request ) {
 							$pdf = GPDFAPI::get_pdf( $request->get_param( 'form' ), $param );
 
+							/* PDF found, PDF ID is valid */
 							if ( ! is_wp_error( $pdf ) ) {
 								return true;
 							}
 
+							/* Get list of valid IDs and include in error */
 							$pdfs = GPDFAPI::get_form_pdfs( $request->get_param( 'form' ) );
 
 							/* translators: 1: Parameter, 2: List of valid values. */
 
-							return new WP_Error( 'rest_not_in_enum', wp_sprintf( __( '%1$s is not one of %2$l.', 'default' ), $param, ! is_wp_error( $pdfs ) ? array_keys( $pdfs ) : '' ) );
+							return new WP_Error( 'rest_not_in_enum', wp_sprintf( __( '%1$s is not one of %2$l.', 'default' ), $param, ! is_wp_error( $pdfs ) ? array_keys( $pdfs ) : '""' ) );
 						},
 					],
 				],
@@ -346,7 +348,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function check_form_is_valid( $form_id ) {
 		if ( is_array( $this->gform->get_form( $form_id ) ) ) {
@@ -368,10 +370,10 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function check_entry_is_valid( $entry_id, $request ) {
-		$entry = \GFAPI::get_entry( $entry_id );
+		$entry = $this->gform->get_entry( $entry_id );
 		if ( is_wp_error( $entry ) ) {
 			return new WP_Error(
 				'rest_invalid_param',
@@ -397,7 +399,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has read access, otherwise WP_Error object.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function get_items_permissions_check( $request ) {
 		return $this->get_item_permissions_check( $request );
@@ -410,7 +412,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function get_items( $request ) {
 		$entry_id = $request->get_param( 'entry' );
@@ -444,7 +446,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has read access for the item, otherwise WP_Error object.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function get_item_permissions_check( $request ) {
 		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) ) {
@@ -465,7 +467,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return \WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function get_item( $request ) {
 		$pdf = \GPDFAPI::get_pdf( $request->get_param( 'form' ), $request->get_param( 'pdf' ) );
@@ -487,7 +489,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function create_item_permissions_check( $request ) {
 		if ( $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
@@ -508,7 +510,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function create_item( $request ) {
 		if ( ! empty( $request->get_param( 'pdf' ) ) ) {
@@ -567,7 +569,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has access to update the item, WP_Error object otherwise.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function update_item_permissions_check( $request ) {
 		return $this->create_item_permissions_check( $request );
@@ -580,7 +582,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function update_item( $request ) {
 		$form_id = $request->get_param( 'form' );
@@ -632,7 +634,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has access to delete the item, WP_Error object otherwise.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function delete_item_permissions_check( $request ) {
 		return $this->create_item_permissions_check( $request );
@@ -645,7 +647,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function delete_item( $request ) {
 		$pdf = \GPDFAPI::get_pdf( $request->get_param( 'form' ), $request->get_param( 'pdf' ) );
@@ -690,7 +692,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return \WP_REST_Response Response object.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		/* Restores the more descriptive, specific name for use within this method (PHP 8 fix). */
@@ -791,7 +793,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return array PDF settings
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	protected function prepare_item_for_database( $request ) {
 		$prepared_pdf = [];
@@ -859,7 +861,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return array Collection parameters.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function get_collection_params() {
 		return [
@@ -872,7 +874,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return array Item schema data.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	public function get_item_schema() {
 		/* returned cached schema + additional fields */
@@ -890,7 +892,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				'id'     => [
 					'description' => __( 'Unique identifier for the PDF.', 'gravity-pdf' ),
 					'type'        => 'string',
-					'context'     => [ 'edit' ],
+					'context'     => [ 'edit', 'embed' ],
 					'readonly'    => true,
 					'pattern'     => '[a-fA-F0-9]{13}',
 				],
@@ -898,7 +900,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				'form'   => [
 					'description' => __( 'The Gravity Forms ID the PDF is configured on.', 'gravity-pdf' ),
 					'type'        => 'integer',
-					'context'     => [ 'edit' ],
+					'context'     => [ 'edit', 'embed' ],
 					'readonly'    => true,
 				],
 
@@ -906,7 +908,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 					'description' => __( 'The current state of the PDF.', 'gravity-pdf' ),
 					'type'        => 'boolean',
 					'default'     => true,
-					'context'     => [ 'edit' ],
+					'context'     => [ 'edit', 'embed' ],
 				],
 			],
 		];
@@ -991,7 +993,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return array
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	protected function get_section_schema( $settings, $group ) {
 		$generic_description = __( 'Content for the specific property.', 'gravity-pdf' );
@@ -1014,7 +1016,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				'description' => ! empty( $value['desc'] ) ? wp_strip_all_tags( $value['desc'] ) : $generic_description,
 				'type'        => 'string',
 				'default'     => $default,
-				'context'     => [ 'edit', $group ],
+				'context'     => [ 'edit', 'embed', $group ],
 				'arg_options' => [
 					'sanitize_callback' => function ( $param, $request, $key ) {
 						return is_array( $param ) ? array_map( 'sanitize_text_field', $param ) : sanitize_text_field( $param );
@@ -1128,7 +1130,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return array[]
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	protected function prepare_links( $data, $request ) {
 
@@ -1189,7 +1191,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 *
 	 * @return string
 	 *
-	 * @since 7.0.0
+	 * @since 7.0
 	 */
 	protected function sanitize_rich_text( $html ) {
 		if ( strpos( $html, 'telnet://{' ) !== false ) {

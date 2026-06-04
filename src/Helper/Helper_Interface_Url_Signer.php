@@ -42,4 +42,13 @@ interface Helper_Interface_Url_Signer {
 	 * @since 5.2
 	 */
 	public function verify( $url );
+
+	/**
+	 * Verify the signature on the URL of the current request
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function verify_current_request();
 }

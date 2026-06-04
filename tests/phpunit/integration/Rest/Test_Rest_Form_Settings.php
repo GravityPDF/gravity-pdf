@@ -51,7 +51,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 
 		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
 
-		$contexts = [ 'advanced', 'appearance', 'edit', 'general', 'template' ];
+		$contexts = [ 'advanced', 'appearance', 'edit', 'embed', 'general', 'template' ];
 
 		$enum = $data['endpoints'][0]['args']['context']['enum'];
 		sort( $enum );
