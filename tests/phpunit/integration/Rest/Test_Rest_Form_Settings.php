@@ -822,7 +822,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		$this->assertContains( 'landscape', $args['orientation']['enum'] );
 
 		$this->assertSame( 'boolean', $args['rtl']['type'] );
-		$this->assertSame( 'yes_no', $args['rtl']['format'] );
+		$this->assertSame( 'yes-no', $args['rtl']['format'] );
 
 		$this->assertContains( 'Standard', $args['format']['enum'] );
 		$this->assertContains( 'PDFX1A', $args['format']['enum'] );
@@ -1212,5 +1212,95 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		$this->assertArrayNotHasKey( 'filename', $schema['properties'] );
 		$this->assertArrayNotHasKey( 'notification', $schema['properties'] );
 		$this->assertArrayNotHasKey( 'conditionalLogic', $schema['properties'] );
+	}
+
+	/**
+	 * Register an additional checkbox settings field so the REST schema generates a checkbox-format boolean.
+	 *
+	 * @param array $fields The existing advanced settings fields.
+	 *
+	 * @return array
+	 */
+	public function add_checkbox_field( $fields ) {
+		$fields['my_checkbox'] = [
+			'id'   => 'my_checkbox',
+			'name' => 'My Checkbox',
+			'type' => 'checkbox',
+			'std'  => false,
+		];
+
+		return $fields;
+	}
+
+	/**
+	 * Toggle and checkbox boolean fields must expose distinct schema formats so the API can serialise them
+	 * back to their respective storage values ('Yes'/'No' vs '1'/'').
+	 */
+	public function test_checkbox_and_toggle_schema_format() {
+		add_filter( 'gfpdf_form_settings_advanced', [ $this, 'add_checkbox_field' ] );
+
+		$schema = $this->api->get_item_schema();
+		$args   = $schema['properties'];
+
+		/* Toggle fields are flagged with the 'yes-no' format */
+		$this->assertSame( 'boolean', $args['rtl']['type'] );
+		$this->assertSame( 'yes-no', $args['rtl']['format'] );
+
+		/* Checkbox fields are flagged with the 'checkbox' format */
+		$this->assertSame( 'boolean', $args['my_checkbox']['type'] );
+		$this->assertSame( 'checkbox', $args['my_checkbox']['format'] );
+		$this->assertFalse( $args['my_checkbox']['default'] );
+	}
+
+	/**
+	 * A checkbox field stores '1' when enabled and '' when disabled, whereas a toggle field stores 'Yes'/'No'.
+	 */
+	public function test_checkbox_value_round_trip() {
+		add_filter( 'gfpdf_form_settings_advanced', [ $this, 'add_checkbox_field' ] );
+
+		/* Re-register the routes so the dispatched schema picks up the new checkbox field */
+		$this->api->register_routes();
+
+		wp_set_current_user( self::$admin_id );
+
+		/* Enabled checkbox is stored as '1', toggle as 'Yes' */
+		$request = new WP_REST_Request( 'POST', '/gravity-pdf/v1/form/' . $this->form_id );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( [
+			'name'        => 'Label',
+			'template'    => 'rubix',
+			'rtl'         => true,
+			'my_checkbox' => true,
+		] );
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertTrue( $data['my_checkbox'] );
+
+		$pdf = \GPDFAPI::get_pdf( $this->form_id, $data['id'] );
+		$this->assertSame( '1', $pdf['my_checkbox'] );
+		$this->assertSame( 'Yes', $pdf['rtl'] );
+
+		/* Disabled checkbox is stored as '', toggle as 'No' */
+		$request = new WP_REST_Request( 'POST', '/gravity-pdf/v1/form/' . $this->form_id );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( [
+			'name'        => 'Label',
+			'template'    => 'rubix',
+			'rtl'         => false,
+			'my_checkbox' => false,
+		] );
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertFalse( $data['my_checkbox'] );
+
+		$pdf = \GPDFAPI::get_pdf( $this->form_id, $data['id'] );
+		$this->assertSame( '', $pdf['my_checkbox'] );
+		$this->assertSame( 'No', $pdf['rtl'] );
 	}
 }
