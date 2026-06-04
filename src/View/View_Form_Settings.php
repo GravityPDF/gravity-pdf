@@ -33,9 +33,32 @@ class View_Form_Settings extends Helper_Abstract_View {
 
 	public function add_edit( $vars ) {
 
-		$markup = new View_GravityForm_Settings_Markup();
+		$markup   = new View_GravityForm_Settings_Markup();
+		$sections = $this->get_sections( $markup );
 
-		$sections = [
+		$vars = array_merge(
+			$vars,
+			[
+				'callback' => static function () use ( $markup, $sections ) {
+					$markup->do_settings_sections( $sections, true );
+				},
+			]
+		);
+
+		$this->load( 'add_edit', $vars );
+	}
+
+	/**
+	 * Build the form-settings sections rendered inside the add/edit page.
+	 *
+	 * @param View_GravityForm_Settings_Markup $markup The markup helper bound to each section callback.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 *
+	 * @since 7.0
+	 */
+	public function get_sections( View_GravityForm_Settings_Markup $markup ): array {
+		return [
 			[
 				'id'               => 'gfpdf_form_settings_general',
 				'width'            => 'full',
@@ -84,16 +107,5 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'collapsible-open' => true,
 			],
 		];
-
-		$vars = array_merge(
-			$vars,
-			[
-				'callback' => static function () use ( $markup, $sections ) {
-					$markup->do_settings_sections( $sections, true );
-				},
-			]
-		);
-
-		$this->load( 'add_edit', $vars );
 	}
 }

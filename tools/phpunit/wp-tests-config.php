@@ -117,6 +117,7 @@ define( 'WP_HOME', 'http://example.org' );
 define( 'WP_DEBUG_DISPLAY', false );
 define( 'WP_DEBUG_LOG', '/var/www/html/wp-content/plugins/gravity-pdf/tmp/debug.log' );
 define( 'WP_DEBUG', true );
+define( 'WP_HTTP_BLOCK_EXTERNAL', true );
 
 /* Add any custom values between this line and the "stop editing" line. */
 

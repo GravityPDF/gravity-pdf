@@ -32,7 +32,7 @@
     }
   ],
   "require": {
-    "php": ">=7.3",
+    "php": ">=7.4",
     "mpdf/mpdf": "^8.2.4",
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
@@ -48,10 +48,7 @@
     "yoast/phpunit-polyfills": "^4.0",
     "wp-phpunit/wp-phpunit": "^6.4",
     "humbug/php-scoper": "^0.15.0",
-    "gravity/gravityforms": "*",
-    "gravity/gravityformspolls": "*",
-    "gravity/gravityformssurvey": "*",
-    "gravity/gravityformsquiz": "*"
+    "gravity/gravityforms": "*"
   },
   "suggest": {
     "roots/wordpress-full": "Install to do step debugging on the WordPress codebase."
@@ -64,11 +61,20 @@
       "vendor_prefixed/"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "GFPDF\\Tests\\Concerns\\": "tests/phpunit/Concerns/"
+    },
+    "classmap": [
+      "tests/phpunit/integration/TestCase.php",
+      "tests/phpunit/integration/AjaxTestCase.php"
+    ]
+  },
   "config": {
     "preferred-install": "dist",
     "autoloader-suffix": "GravityPDFPlugin",
     "platform": {
-      "php": "7.3.0"
+      "php": "7.4"
     },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,

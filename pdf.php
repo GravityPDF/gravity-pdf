@@ -10,7 +10,7 @@ Update URI: https://gravitypdf.com
 Text Domain: gravity-pdf
 Domain Path: /languages
 Requires at least: 5.3
-Requires PHP: 7.3
+Requires PHP: 7.4
 License: GPL-2.0
 License URI: https://opensource.org/licenses/gpl-2.0.php
 */
@@ -113,7 +113,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 *
 		 * @since 4.0
 		 */
-		public $required_php_version = '7.3';
+		public $required_php_version = '7.4';
 
 		/**
 		 * Set our required variables for a fallback and attempt to initialise

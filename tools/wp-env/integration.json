@@ -1,14 +1,11 @@
 {
   "$schema": "https://schemas.wp.org/trunk/wp-env.json",
-  "core": "https://wordpress.org/wordpress-6.9.4.zip",
+  "core": "https://wordpress.org/wordpress-7.0.zip",
   "phpVersion": "8.5",
   "plugins": [],
   "mappings": {
     "wp-content/mu-plugins": "./tools/mu-plugins",
     "wp-content/plugins/gravityforms": "./vendor/gravity/gravityforms",
-    "wp-content/plugins/gravityformspolls": "./vendor/gravity/gravityformspolls",
-    "wp-content/plugins/gravityformsquiz": "./vendor/gravity/gravityformsquiz",
-    "wp-content/plugins/gravityformssurvey": "./vendor/gravity/gravityformssurvey",
     "wp-content/plugins/gravity-pdf": "."
   },
   "config": {

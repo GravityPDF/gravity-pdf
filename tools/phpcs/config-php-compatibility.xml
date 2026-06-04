@@ -4,8 +4,8 @@
 
     <rule ref="PHPCompatibilityWP"/>
 
-    <!-- WordPress Core currently supports PHP 7.3+ -->
-    <config name="testVersion" value="7.3-"/>
+    <!-- composer.json floor is 7.4 (Gravity Forms 2.9 uses 7.4 syntax in required includes). -->
+    <config name="testVersion" value="7.4-"/>
 
     <!-- Only scan PHP files. -->
     <arg name="extensions" value="php"/>
