@@ -18,12 +18,6 @@ add_action(
 			return;
 		}
 
-		/*
-		 * Enable the GF REST API (v2). This is idempotent rather than gated on the one-shot
-		 * `gform_pending_installation` flag: in CI the wp-env work-dir cache can be restored against a fresh
-		 * MySQL volume, which wipes the saved API setting while leaving the flag unset — so the flag-gated
-		 * version never re-enabled the API and /gf/v2 returned 404. Re-enable whenever it isn't already on.
-		 */
 		global $gf_webapi;
 		$gf_webapi = GFWebAPI::get_instance();
 
@@ -33,7 +27,7 @@ add_action(
 		}
 
 		update_option( 'gform_pending_installation', false );
-		\GFSettings::enable_logging();
+		GFSettings::enable_logging();
 
 		$gf_webapi->update_plugin_settings(
 			[
