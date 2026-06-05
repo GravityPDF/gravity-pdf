@@ -60,11 +60,6 @@ global $wp_settings_fields;
 				   name="submit"
 				   value="<?php echo esc_attr( $args['button_label'] ); ?>"
 				   class="button primary large" />
-
-			<input type="button"
-				   name="gpdf-preview-pdf-settings"
-				   value="<?php echo esc_attr__( 'Preview PDF', 'gravity-pdf' ); ?>"
-				   class="button large" />
 		</div>
 
 		<div class="extensions-upsell">

@@ -41,7 +41,7 @@ abstract class Test_Rest extends TestCase {
 
 		parent::set_up();
 
-		/* Start anonymous — tests like test_create_item_preview assert a 401 before they wp_set_current_user themselves. */
+		/* Start anonymous — some tests assert a 401 before they wp_set_current_user themselves. */
 		unset( $GLOBALS['current_user'] );
 		wp_set_current_user( 0 );
 

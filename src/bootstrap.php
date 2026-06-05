@@ -721,15 +721,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$form_setting_controller = new Rest\Rest_Form_Settings( $this->options, $this->gform, $this->misc, $this->templates );
 		$form_setting_controller->init();
 
-		$pdf_preview_controller = new Rest\Rest_Pdf_Preview( $this->options, $this->gform, $this->misc, $this->templates );
-		$pdf_preview_controller->init();
-
 		$download_pdf_controller = new Rest\Rest_Download_Pdf( $this->gform, new Helper\Helper_Url_Signer() );
 		$download_pdf_controller->init();
 
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $form_setting_controller );
-		$this->singleton->add_class( $pdf_preview_controller );
 		$this->singleton->add_class( $download_pdf_controller );
 
 		/* Log any errors for PDF endpoints */
