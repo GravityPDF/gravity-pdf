@@ -22,7 +22,7 @@ class Test_Logger extends TestCase {
 	}
 
 	public function test_logger() {
-		$this->assertInstanceOf( '\Psr\Log\LoggerInterface', $this->logger->get_logger() );
+		$this->assertInstanceOf( '\GFPDF_Vendor\Psr\Log\LoggerInterface', $this->logger->get_logger() );
 		$this->assertSame(
 			10,
 			has_filter(

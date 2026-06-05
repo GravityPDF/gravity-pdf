@@ -7,10 +7,10 @@ use GFLogging;
 use GFPDF_Vendor\Monolog\Formatter\LineFormatter;
 use GFPDF_Vendor\Monolog\Handler\NullHandler;
 use GFPDF_Vendor\Monolog\Handler\StreamHandler;
-use GFPDF_Vendor\Monolog\Logger as MonoLoggerPsrLog1;
+use GFPDF_Vendor\Monolog\Logger as Monolog;
 use GFPDF_Vendor\Monolog\Processor\IntrospectionProcessor;
 use GFPDF_Vendor\Monolog\Processor\MemoryPeakUsageProcessor;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -134,14 +134,14 @@ class Logger {
 
 		/* Setup our Gravity Forms local file logger, if enabled */
 		try {
-			$this->log = $this->get_monolog();
+			$this->log = new Monolog( $this->slug );
 			$this->log->setTimezone( wp_timezone() );
 
 			$this->setup_gravityforms_logging();
 
 			/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
 			if ( count( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
-				$this->log->pushProcessor( new IntrospectionProcessor( MonoLoggerPsrLog1::DEBUG, [ 'MonoLogger' ] ) );
+				$this->log->pushProcessor( new IntrospectionProcessor( Monolog::DEBUG, [ 'MonoLogger' ] ) );
 				$this->log->pushProcessor( new MemoryPeakUsageProcessor() );
 
 				return;
@@ -151,7 +151,7 @@ class Logger {
 		}
 
 		/* Disable logging if using CLI, or if Gravity Forms logging isn't enabled */
-		$this->log->pushHandler( new NullHandler( MonoLoggerPsrLog1::INFO ) ); /* throw logs away */
+		$this->log->pushHandler( new NullHandler( Monolog::INFO ) ); /* throw logs away */
 	}
 
 	/**
@@ -198,7 +198,7 @@ class Logger {
 		$this->rotate_logs( $log_filename );
 
 		/* Convert Gravity Forms log levels to the appropriate Monolog level */
-		$monolog_level = $log_level === 4 ? MonoLoggerPsrLog1::ERROR : MonoLoggerPsrLog1::DEBUG;
+		$monolog_level = $log_level === 4 ? Monolog::ERROR : Monolog::DEBUG;
 
 		/* Setup our stream and change the format to more-suit Gravity Forms */
 		$formatter = new LineFormatter( "%datetime% - %level_name% --> %message%\n|--> %context%\n|--> %extra%\n", 'Y-m-d H:i:s.u (P)' );
@@ -271,70 +271,6 @@ class Logger {
 					@unlink( $similar_files[ $i ] ); // phpcs:ignore
 				}
 			}
-		}
-	}
-
-	/**
-	 * Return a class that is compatible with the PSR/Log version loaded
-	 *
-	 * This compatibility layer is necessary because:
-	 *
-	 * - \Psr\Log\LoggerInterface is type-hinted throughout Gravity PDF + add-ons and not easily altered
-	 * - Gravity PDF includes v1 of the Psr\Log library, which is incompatible with v2 and v3
-	 * - While Gravity PDF supports PHP 7.3+ the Psr\Log library cannot be upgraded from v1
-	 * - Other WordPress plugins are shipping Psr\Log v2 and v3
-	 * - A PHP declaration error occurs when Gravity PDF runs alongside Psr\Log v2 or v3
-	 *
-	 * This is a temporary measure. Over time our plugins will be updated to support both \Psr\Log\LoggerInterface and '\GFPDF_Vendor\Psr\Log\LoggerInterface' and this won't be required.
-	 *
-	 * @return LoggerInterface
-	 * @since 6.14.0
-	 *
-	 */
-	protected function get_monolog() {
-		static $psr_log_version;
-
-		if ( empty( $psr_log_version ) ) {
-			/* Check what version of \Psr\Log is actually loaded and return a compatible version of Monolog */
-			if ( trait_exists( '\Psr\Log\LoggerTrait' ) ) {
-				$reflected       = new \ReflectionClass( '\Psr\Log\LoggerTrait' );
-				$psr_log_content = file_get_contents( $reflected->getFileName() ); //phpcs:ignore
-
-				/* Test for v3 */
-				if ( strpos( $psr_log_content, 'function log($level, string|\Stringable $message, array $context = []): void;' ) !== false ) {
-					$psr_log_version = 3;
-				}
-
-				/* Test for v2 */
-				if ( strpos( $psr_log_content, 'function log($level, string|\Stringable $message, array $context = []);' ) !== false ) {
-					$psr_log_version = 2;
-				}
-
-				/* Default to v1 when no match found */
-				if ( empty( $psr_log_version ) ) {
-					$psr_log_version = 1;
-				}
-			} else {
-				/* No PSR Log library loaded. Alias namespaced v1 */
-				$psr_log_version = 1;
-				class_alias( '\GFPDF_Vendor\Psr\Log\AbstractLogger', '\Psr\Log\AbstractLogger' );
-				class_alias( '\GFPDF_Vendor\Psr\Log\InvalidArgumentException', '\Psr\Log\InvalidArgumentException' );
-				class_alias( '\GFPDF_Vendor\Psr\Log\LoggerAwareInterface', '\Psr\Log\LoggerAwareInterface' );
-				class_alias( '\GFPDF_Vendor\Psr\Log\LoggerAwareTrait', '\Psr\Log\LoggerAwareTrait' );
-				class_alias( '\GFPDF_Vendor\Psr\Log\LoggerInterface', '\Psr\Log\LoggerInterface' );
-				class_alias( '\GFPDF_Vendor\Psr\Log\LoggerTrait', '\Psr\Log\LoggerTrait' );
-				class_alias( '\GFPDF_Vendor\Psr\Log\LogLevel', '\Psr\Log\LogLevel' );
-				class_alias( '\GFPDF_Vendor\Psr\Log\NullLogger', '\Psr\Log\NullLogger' );
-			}
-		}
-
-		switch ( $psr_log_version ) {
-			case 1:
-				return new MonoLoggerPsrLog1( $this->slug );
-
-			case 2:
-			case 3:
-				return new MonoLoggerPsrLog2And3( $this->slug );
 		}
 	}
 }

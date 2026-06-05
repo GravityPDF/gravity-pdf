@@ -63,18 +63,6 @@ return [
 				$content = str_replace( "new \\$prefix\\Mpdf\\Cache(", 'new \GFPDF\Helper\Mpdf\Cache(', $content );
 			}
 
-			/* Remove type hinting from prefixed logger */
-			$files = [
-				'LoggerAwareInterface.php',
-				'LoggerAwareTrait.php',
-				'MpdfPsrLogAwareTrait.php',
-				'PsrLogAwareTrait.php'
-			];
-
-			if ( in_array( basename( $filePath ), $files, true ) ) {
-				$content = str_replace( "\\$prefix\\Psr\\Log\\LoggerInterface", '\\Psr\\Log\\LoggerInterface', $content );
-			}
-
 			/* Global polyfills */
 			if ( basename( $filePath ) === 'functions.php' ) {
 				$content = str_replace( "namespace $prefix;", '', $content );

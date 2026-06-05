@@ -22,7 +22,7 @@ use GFPDF\Helper\Helper_Templates;
 use GFPDF\Statics\Debug;
 use GFPDF\Statics\Kses;
 use GFPDFEntryDetail;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
 
 /**
