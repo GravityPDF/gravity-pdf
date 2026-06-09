@@ -443,6 +443,12 @@ class Model_Settings extends Helper_Abstract_Model {
 			)
 		);
 
+		/*
+		 * Keep $bulk_api_params numerically indexed. The API keys its response array by the same
+		 * keys it receives, so numeric indices make it return a JSON array (which the response
+		 * handlers below decode via is_array()). Switching to slug keys would return a JSON object
+		 * and silently break bulk handling.
+		 */
 		$bulk_api_params = [];
 		foreach ( $products as $product ) {
 			/* skip improperly-registered plugins */
