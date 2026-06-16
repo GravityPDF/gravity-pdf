@@ -33,7 +33,7 @@
   ],
   "require": {
     "php": ">=7.4",
-    "mpdf/mpdf": "^8.2.4",
+    "mpdf/mpdf": "dev-development",
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",

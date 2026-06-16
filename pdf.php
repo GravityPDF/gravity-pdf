@@ -158,7 +158,6 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 			$this->check_gravity_forms();
 			$this->check_php();
 			$this->check_mb_string();
-			$this->check_mb_string_regex();
 			$this->check_ctype();
 			$this->check_gd();
 			$this->check_dom();
@@ -292,20 +291,10 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 * @return boolean Whether compatible or not
 		 *
 		 * @since 4.0
+		 * @depecated 6.15.0
 		 */
 		public function check_mb_string_regex() {
-
-			/* Check MB String is compiled with regex capabilities */
-			if ( extension_loaded( 'mbstring' ) && ! function_exists( 'mb_regex_encoding' ) ) {
-				$this->notices[] = static function () {
-					/* translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag */
-					return sprintf( esc_html__( 'The PHP extension MB String does not have MB Regex enabled. Contact your web hosting provider to fix. %1$sGet more information%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#the-php-extension-mb-string-does-not-have-mb-regex-enabled">', '</a>' );
-				};
-
-				return false;
-			}
-
-			return true;
+			// no-op; requirement removed from mPDF
 		}
 
 		/**
