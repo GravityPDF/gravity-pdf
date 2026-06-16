@@ -399,8 +399,9 @@ class Helper_Misc {
 		/* Check if $dir to delete falls inside one of the Gravity PDF directories */
 		$allowed_to_delete = false;
 		foreach ( $folders as $folder ) {
+			$folder_path = realpath( $folder );
 
-			if ( strpos( $path_to_test, realpath( $folder ) ) === 0 ) {
+			if ( $folder_path !== false && strpos( $path_to_test, $folder_path ) === 0 ) {
 				$allowed_to_delete = true;
 				break;
 			}
