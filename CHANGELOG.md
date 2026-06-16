@@ -2,6 +2,11 @@
 
 ## Gravity PDF
 
+### 6.15.0
+* 🎉 Feature: Switch the update/license API server to api.gravitypdf.com
+* 🧹 Housekeeping: Remove MBString Regex as a software dependency
+* 🧹 Housekeeping: Update the mPDF library to the latest version
+
 ### 6.14.3
 * 🧹 Housekeeping: WordPress 7.0 Compatibility
 * 🧹 Housekeeping: Improved screen-reader support for admin pages
