@@ -41,7 +41,10 @@ define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory pat
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
 define( 'GPDF_PLUGIN_FILE', __FILE__ );
-define( 'GPDF_API_URL', 'https://gravitypdf.com?api=1' );
+
+if ( ! defined( 'GPDF_API_URL' ) ) {
+	define( 'GPDF_API_URL', 'https://api.gravitypdf.com' );
+}
 
 if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 	/*
