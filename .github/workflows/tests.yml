@@ -509,6 +509,7 @@ jobs:
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
+          errors: true
           payload: |
             text: "${{ env.HEADLINE }}"
             blocks:
