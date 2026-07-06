@@ -1538,10 +1538,10 @@
         },
         {
             "name": "gravity/gravityforms",
-            "version": "2.10.4",
+            "version": "2.10.5",
             "dist": {
                 "type": "zip",
-                "url": "https://composer.gravity.io/downloads/?plugin=gravityforms&version=2.10.4"
+                "url": "https://composer.gravity.io/downloads/?plugin=gravityforms&version=2.10.5"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
