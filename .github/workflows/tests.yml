@@ -1,6 +1,7 @@
 name: Tests
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [ opened, reopened, synchronize, labeled ]
   schedule:
