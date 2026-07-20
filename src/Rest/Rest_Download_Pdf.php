@@ -96,7 +96,7 @@ class Rest_Download_Pdf {
 			[
 				'args' => [
 					'entry' => [
-						'description'       => __( 'The unique identifier for the Gravity Forms entry.', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The unique identifier for the Gravity Forms entry.', 'gravity-pdf' ),
 						'type'              => 'integer',
 						'required'          => true,
 						'validate_callback' => function ( $param, $request ) {
@@ -108,14 +108,14 @@ class Rest_Download_Pdf {
 
 							return new WP_Error(
 								'rest_invalid_param',
-								sprintf( __( 'Invalid entry ID %d provided.', 'gravity-forms-pdf-extended' ), $param ),
+								sprintf( __( 'Invalid entry ID %d provided.', 'gravity-pdf' ), $param ),
 								[ 'status' => 400 ]
 							);
 						},
 					],
 
 					'pdf'   => [
-						'description'       => __( 'The identifier for the PDF', 'gravity-forms-pdf-extended' ),
+						'description'       => __( 'The identifier for the PDF', 'gravity-pdf' ),
 						'type'              => 'string',
 						'required'          => true,
 						'validate_callback' => function ( $param, $request ) {
