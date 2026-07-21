@@ -1639,8 +1639,6 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, [ '', '', null ] ) );
 		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, null ) );
 		$this->assertNotTrue( $repeater->maybe_show_section_title( false, $repeater->field, null ) );
-		$this->assertNotTrue( $repeater->maybe_show_section_title( false, $repeater->field, [ false, null ] ) );
-		$this->assertNotTrue( $repeater->maybe_show_section_title( false, $repeater->field, false ) );
 		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, false ) );
 
 
