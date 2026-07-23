@@ -131,18 +131,48 @@ class Test_Uninstaller extends WP_UnitTestCase {
 		$installer->check_install_status();
 
 		update_option( 'gfpdf_settings', [] );
+		update_option( 'gpdf_sl_abc_123', true );
+		update_option( 'gpdf_sl_failed_123', true );
 
 		$this->assertNotFalse( get_option( 'gfpdf_is_installed' ) );
 		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
 		$this->assertNotFalse( get_option( 'gfpdf_settings' ) );
+		$this->assertNotFalse( get_option( 'gpdf_sl_abc_123' ) );
+		$this->assertNotFalse( get_option( 'gpdf_sl_failed_123' ) );
 
 		$this->model->remove_plugin_options();
+
+		/* flush the options cache so fresh values can be checked from the database */
+		wp_cache_delete( 'alloptions', 'options' );
 
 		$this->assertFalse( get_option( 'gfpdf_is_installed' ) );
 		$this->assertFalse( get_option( 'gfpdf_current_version' ) );
 		$this->assertFalse( get_option( 'gfpdf_settings' ) );
+		$this->assertFalse( get_option( 'gpdf_sl_abc_123' ) );
+		$this->assertFalse( get_option( 'gpdf_sl_failed_123' ) );
 
 		wp_set_current_user( 0 );
+	}
+
+	/**
+	 * The network-shared license package cache lives in sitemeta, so it needs its own cleanup on uninstall
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_remove_plugin_network_options() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Network options only exist on Multisite' );
+		}
+
+		update_site_option( 'gpdf_sl_net_abc123', [ 'timeout' => time(), 'value' => '{}' ] );
+		$this->assertNotFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
+
+		$this->model->remove_plugin_network_options();
+
+		/* The direct SQL delete bypasses the object cache */
+		wp_cache_flush();
+
+		$this->assertFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
 	}
 
 	/**

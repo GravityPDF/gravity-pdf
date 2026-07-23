@@ -3,6 +3,10 @@
 namespace GFPDF\Tests;
 
 use GFAPI;
+use GFPDF\Helper\Helper_Abstract_Addon;
+use GFPDF\Helper\Helper_Logger;
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Singleton;
 use WP_Ajax_UnitTestCase;
 use WPAjaxDieContinueException;
 use WPAjaxDieStopException;
@@ -501,6 +505,95 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertStringContainsString( 'An unknown error occurred', json_decode( $this->_last_response )->error );
 	}
 
+	public function test_ajax_process_license_deactivation_shares_access_pass_siblings() {
+		global $gfpdf;
+
+		$this->_setRole( 'administrator' );
+
+		$master  = $this->register_deactivation_addon( 'master-plugin', 'Master', '/master/file.php', 5 );
+		$sibling = $this->register_deactivation_addon( 'sibling-plugin', 'Sibling', '/sibling/file.php', 10 );
+		$master->update_license_info( [ 'license' => 'AP-KEY', 'status' => 'active', 'message' => 'ok' ] );
+		$sibling->update_license_info( [ 'license' => 'AP-KEY', 'status' => 'active', 'message' => 'ok' ] );
+
+		/* The API confirms deactivation and reports the pass products, so the sibling auto-deactivates too */
+		$api = static function () {
+			return [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'deactivated', 'products' => [ 5, 10 ] ] ) ];
+		};
+		add_filter( 'pre_http_request', $api );
+
+		$_POST['nonce']      = wp_create_nonce( 'gfpdf_deactivate_license' );
+		$_POST['addon_name'] = 'master-plugin';
+
+		try {
+			$this->_handleAjax( 'gfpdf_deactivate_license' );
+		} catch ( WPAjaxDieContinueException $e ) {
+			/* do nothing (wp_die expected) */
+		}
+
+		$response = json_decode( $this->_last_response );
+
+		$this->assertTrue( isset( $response->success ), 'Expected a success response' );
+		$this->assertContains( 'sibling-plugin', $response->extra );
+
+		remove_filter( 'pre_http_request', $api );
+		remove_all_actions( 'gfpdf_addon_post_license_deactivation' );
+		$gfpdf->data->addon = [];
+	}
+
+	public function test_ajax_process_license_deactivation_api_failure() {
+		global $gfpdf;
+
+		$this->_setRole( 'administrator' );
+
+		$master = $this->register_deactivation_addon( 'master-plugin', 'Master', '/master/file.php', 5 );
+		$master->update_license_info( [ 'license' => 'KEY', 'status' => 'active', 'message' => 'ok' ] );
+
+		/* API unreachable → deactivate_license() returns false → the API-error branch responds */
+		$api = static function () {
+			return new \WP_Error( 'down', 'API unreachable' );
+		};
+		add_filter( 'pre_http_request', $api );
+
+		$_POST['nonce']      = wp_create_nonce( 'gfpdf_deactivate_license' );
+		$_POST['addon_name'] = 'master-plugin';
+
+		try {
+			$this->_handleAjax( 'gfpdf_deactivate_license' );
+		} catch ( WPAjaxDieContinueException $e ) {
+			/* do nothing (wp_die expected) */
+		}
+
+		$this->assertStringContainsString( 'An API error occurred', json_decode( $this->_last_response )->error );
+
+		remove_filter( 'pre_http_request', $api );
+		$gfpdf->data->addon = [];
+	}
+
+	/**
+	 * Build and register an add-on for the license-deactivation AJAX tests.
+	 */
+	private function register_deactivation_addon( $slug, $name, $file, $edd_id ) {
+		global $gfpdf;
+
+		$addon = new AjaxDeactivationAddon(
+			$slug,
+			$name,
+			'Gravity PDF',
+			'1.0',
+			$file,
+			$gfpdf->data,
+			$gfpdf->options,
+			new Helper_Singleton(),
+			new Helper_Logger( $slug, $name ),
+			new Helper_Notices()
+		);
+
+		$addon->set_edd_download_id( $edd_id );
+		$addon->init();
+
+		return $addon;
+	}
+
 	public function test_ajax_save_core_font() {
 		/* set up our post data and role */
 		$this->_setRole( 'administrator' );
@@ -549,4 +642,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		$this->assertTrue( json_decode( $this->_last_response ) );
 	}
+}
+
+class AjaxDeactivationAddon extends Helper_Abstract_Addon {
 }

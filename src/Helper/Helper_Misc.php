@@ -1068,4 +1068,25 @@ class Helper_Misc {
 			wp_die( '401', 401 );
 		}
 	}
+
+	/**
+	 * Whether the current site is a secondary site on a Multisite network where the plugin is network activated
+	 *
+	 * Used to restrict license/update API checks to the primary site.
+	 *
+	 * @param string $plugin_basename The plugin to test for network activation (eg. PDF_PLUGIN_BASENAME)
+	 *
+	 * @return bool
+	 *
+	 * @since 6.16.0
+	 */
+	public function is_secondary_network_site( $plugin_basename ) {
+		if ( ! is_multisite() || is_main_site() ) {
+			return false;
+		}
+
+		$network_plugins = (array) get_site_option( 'active_sitewide_plugins', [] );
+
+		return isset( $network_plugins[ $plugin_basename ] );
+	}
 }

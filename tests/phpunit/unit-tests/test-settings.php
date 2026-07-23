@@ -290,6 +290,37 @@ class Test_Settings extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The License tab is removed on secondary network sites — licensing is managed by the primary site
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_license_tab_hidden_on_secondary_network_site() {
+		global $gfpdf;
+
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		$this->add_addon_1();
+
+		/* Primary site: the License tab is present */
+		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
+		$this->assertContains( 'license', $tabs );
+
+		/* Pose as a secondary site with Gravity PDF network-activated */
+		$network_plugins = static function () { return [ PDF_PLUGIN_BASENAME => time() ]; };
+		add_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		switch_to_blog( PHP_INT_MAX );
+
+		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
+		$this->assertNotContains( 'license', $tabs );
+
+		restore_current_blog();
+		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		$gfpdf->data->addon = [];
+	}
+
+	/**
 	 * Verify errors are highlighted appropriately
 	 *
 	 * @since 4.0
@@ -535,18 +566,28 @@ class Test_Settings extends WP_UnitTestCase {
 			],
 
 			[
-				'An error occurred, please try again',
+				'An unknown error occurred while checking the license.',
 				[ 'error' => 'default', 'price_id' => 1 ],
 			],
 
 			[
-				'An error occurred, please try again',
+				'An unknown error occurred while checking the license.',
 				[ 'error' => 'generic', 'price_id' => 1 ],
 			],
 
 			[
+				'An unknown error occurred while checking the license.',
+				[ 'error' => 'error', 'price_id' => 1 ],
+			],
+
+			[
 				'Your support license key has been activated for this domain',
-				[ 'success' => 'true' ],
+				[ 'license' => 'valid' ],
+			],
+
+			[
+				'Your support license key has been activated for this domain',
+				[ 'license' => 'active' ],
 			],
 		];
 	}
@@ -591,6 +632,62 @@ class Test_Settings extends WP_UnitTestCase {
 			[ false, [ 'license' => '' ], 200 ],
 			[ false, [ 'license' => 'deactivated' ], 500 ],
 		];
+	}
+
+	public function test_api_status_error() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 401 ],
+				'body'     => ''
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_my-custom-plugin'         => 'user license key',
+				'license_my-custom-plugin_message' => '',
+				'license_my-custom-plugin_status'  => '',
+			]
+		);
+
+		$this->assertSame( 'An unknown error occurred while checking the license.', $results['license_my-custom-plugin_message'] );
+
+		remove_filter( 'pre_http_request', $api_response );
+		$gfpdf->data->addon = [];
+	}
+
+	public function test_api_body_error() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 201 ],
+				'body'     => '<!Doctype html>'
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_my-custom-plugin'         => 'user license key',
+				'license_my-custom-plugin_message' => '',
+				'license_my-custom-plugin_status'  => '',
+			]
+		);
+
+		$this->assertSame( 'An unknown error occurred while checking the license.', $results['license_my-custom-plugin_message'] );
+
+		remove_filter( 'pre_http_request', $api_response );
+		$gfpdf->data->addon = [];
 	}
 }
 
