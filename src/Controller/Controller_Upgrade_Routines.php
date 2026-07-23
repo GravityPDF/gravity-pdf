@@ -58,6 +58,10 @@ class Controller_Upgrade_Routines {
 		if ( version_compare( $current_version, '6.13.2', '>=' ) && version_compare( $old_version, '6.13.2', '<' ) ) {
 			$this->fix_tmp_folder_permissions();
 		}
+
+		if ( version_compare( $current_version, '6.16.0', '>=' ) && version_compare( $old_version, '6.16.0', '<' ) ) {
+			$this->remove_legacy_update_cache();
+		}
 	}
 
 	/**
@@ -141,5 +145,22 @@ class Controller_Upgrade_Routines {
 				// do nothing
 			}
 		}
+	}
+
+	/**
+	 * Remove Gravity PDF's legacy edd_sl_* update cache options left behind by the previous plugin updater
+	 *
+	 * @since 6.16.0
+	 */
+	protected function remove_legacy_update_cache() {
+		global $wpdb;
+
+		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'edd_sl_%' AND option_value LIKE '%gravity-pdf%'" );
+
+		/* The failure-backoff option stores a bare timestamp, so the value filter above can't match it — target both
+		   the historical (≤6.14.x) and the 6.15.0 API hosts by exact name. 6.15.0's key was autoloaded, so a site that
+		   ever hit an API failure would otherwise carry a stale autoloaded option forever. */
+		delete_option( 'edd_sl_failed_http_' . md5( 'https://gravitypdf.com?api=1' ) );
+		delete_option( 'edd_sl_failed_http_' . md5( GPDF_API_URL ) );
 	}
 }

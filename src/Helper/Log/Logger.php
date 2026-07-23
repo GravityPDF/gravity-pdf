@@ -207,6 +207,9 @@ class Logger {
 
 		/* Add our log file stream */
 		$this->log->pushHandler( $stream );
+
+		/* Add a redact processor to mask secrets (license keys, signed update URLs, tokens) from the log */
+		$this->log->pushProcessor( new Redact_Processor( $this->slug ) );
 	}
 
 	/**

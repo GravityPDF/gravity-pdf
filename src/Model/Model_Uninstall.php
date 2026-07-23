@@ -103,6 +103,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 				$this->remove_plugin_form_settings();
 			}
 			restore_current_blog();
+
+			$this->remove_plugin_network_options();
 		} else {
 			$this->remove_plugin_options();
 			$this->remove_plugin_form_settings();
@@ -130,6 +132,23 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
+
+		/* Remove license API data */
+		global $wpdb;
+		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gpdf_sl_%'" );
+	}
+
+	/**
+	 * Remove the network-shared license package cache stored in sitemeta on a Multisite
+	 *
+	 * The per-site caches removed by remove_plugin_options() live in each site's options table; the network cache
+	 * (see EDD_SL_Plugin_Updater::get_network_cache_key()) is a single network option, so it's cleaned up once here.
+	 *
+	 * @since 6.16.0
+	 */
+	public function remove_plugin_network_options() {
+		global $wpdb;
+		$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE 'gpdf_sl_net_%'" );
 	}
 
 	/**

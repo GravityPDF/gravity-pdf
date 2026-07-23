@@ -170,6 +170,27 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 * Add AJAX Action Endpoints
 		 */
 		add_action( 'wp_ajax_gfpdf_deactivate_license', [ $this->model, 'process_license_deactivation' ] );
+
+		/* Schedule License Check for all add-ons */
+		add_action(
+			'init',
+			function () {
+				if ( empty( $this->data->addon ) ) {
+					return;
+				}
+
+				if ( $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+					return;
+				}
+
+				add_action( 'gfpdf_bulk_license_check', [ $this->model, 'licensing_bulk_license_check' ] );
+				if ( ! wp_next_scheduled( 'gfpdf_bulk_license_check' ) ) {
+					wp_schedule_single_event( strtotime( '+1 week' ), 'gfpdf_bulk_license_check' );
+				}
+			}
+		);
+
+		$this->maybe_schedule_network_update_check();
 	}
 
 	/**
@@ -200,6 +221,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* Register add-ons for licensing page */
 		add_filter( 'gfpdf_settings_licenses', [ $this->model, 'register_addons_for_licensing' ] );
 		add_filter( 'gfpdf_settings_license_sanitize', [ $this->model, 'maybe_active_licenses' ] );
+		add_filter( 'gpdf_sl_plugin_updater_api_params', [ $this->model, 'licensing_bulk_get_version_api_params' ] );
+		add_filter( 'gpdf_sl_plugin_updater_api_response', [ $this->model, 'licensing_bulk_get_version_api_response' ], 10, 3 );
 	}
 
 	/**
@@ -283,5 +306,33 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		}
 
 		return $nav;
+	}
+
+	/**
+	 * On a Multisite installation where Gravity PDF isn't network/primary site activated,
+	 * add a scheduled task to display an update nag in the network admin on a best-effort basis
+	 *
+	 * @return void
+	 *
+	 * @since 6.16.0
+	 */
+	protected function maybe_schedule_network_update_check() {
+		if ( ! is_multisite() || is_main_site() ) {
+			return;
+		}
+
+		/* Network-activated installs already receive update checks through the normal flow */
+		if ( $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+			return;
+		}
+
+		add_action( 'gfpdf_network_update_check', [ $this->model, 'run_network_update_check' ] );
+
+		/* skip if event already scheduled; run_network_update_check() re-arms it each cycle */
+		if ( wp_next_scheduled( 'gfpdf_network_update_check' ) ) {
+			return;
+		}
+
+		$this->model->schedule_network_update_check();
 	}
 }
