@@ -63,4 +63,26 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 
 		delete_option( 'edd_sl_version_info_456' );
 	}
+
+	public function test_6_16_0_removes_legacy_license_check_cron() {
+		$future = time() + HOUR_IN_SECONDS;
+
+		/* Deprecated per-add-on events left behind by pre-6.16.0 installs */
+		wp_schedule_single_event( $future, 'gfpdf_core_booster_license_check' );
+		wp_schedule_single_event( $future, 'gfpdf_business_plus_license_check' );
+
+		/* The bulk check that replaced them, and an unrelated hook, must both survive */
+		wp_schedule_single_event( $future, 'gfpdf_bulk_license_check' );
+		wp_schedule_single_event( $future, 'gfpdf_cleanup_tmp_dir' );
+
+		do_action( 'gfpdf_version_changed', '6.15.0', '6.16.0' );
+
+		$this->assertFalse( wp_next_scheduled( 'gfpdf_core_booster_license_check' ) );
+		$this->assertFalse( wp_next_scheduled( 'gfpdf_business_plus_license_check' ) );
+		$this->assertNotFalse( wp_next_scheduled( 'gfpdf_bulk_license_check' ) );
+		$this->assertNotFalse( wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) );
+
+		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
+		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+	}
 }
