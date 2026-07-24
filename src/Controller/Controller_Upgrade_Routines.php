@@ -155,7 +155,18 @@ class Controller_Upgrade_Routines {
 	protected function remove_legacy_update_cache() {
 		global $wpdb;
 
-		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'edd_sl_%' AND option_value LIKE '%gravity-pdf%'" );
+		/* Delete via the API: a stale autoloaded row left in the cache is the cost this routine exists to remove */
+		$keys = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s AND option_value LIKE %s",
+				$wpdb->esc_like( 'edd_sl_' ) . '%',
+				'%' . $wpdb->esc_like( 'gravity-pdf' ) . '%'
+			)
+		);
+
+		foreach ( $keys as $key ) {
+			delete_option( $key );
+		}
 
 		/* The failure-backoff option stores a bare timestamp, so the value filter above can't match it — target both
 		   the historical (≤6.14.x) and the 6.15.0 API hosts by exact name. 6.15.0's key was autoloaded, so a site that
