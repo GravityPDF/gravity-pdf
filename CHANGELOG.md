@@ -2,6 +2,31 @@
 
 ## Gravity PDF
 
+### 6.16.0
+* 🎉 Feature: Gravity Forms 3.0 compatibility
+* 🎉 Feature: Auto-activate/deactivate license key for installed Gravity PDF extensions when saving an Access Pass   
+* 🎉 Feature: Support for setting a license key in code using the PHP constant `GPDF_LICENSE_KEY`
+* 🔒 Security: Redact sensitive information from log files
+* 🔒 Security: Harden update and license checks
+* 🧹 Housekeeping: Bulk license + update check for all Gravity PDF products
+* 🧹 Housekeeping: When network activated on Multisite, license checks are now completed by the primary site
+* 🧹 Housekeeping: When network activated on Multisite, the license admin page is hidden when not the primary site
+* 🧹 Housekeeping: Turn autoloading off for the update cache data
+* 🧹 Housekeeping: Run an upgrade routine to remove the old update cache
+* 🧹 Housekeeping: Delete all licensing data when running the uninstaller
+* 🧹 Housekeeping: Update PHP and JavaScript dependencies
+* 🐞 Bug: Show an error message when the license deactivation request fails with a server or authentication error, instead of leaving the spinner running
+* 🐞 Bug: Ignore repeat clicks of the Deactivate button while a request is in progress
+* 🐞 Bug: Clearing a license key from the settings now updates the license status straight away
+* 🐞 Bug: Fix PHP fatal error when doing an update check and the licensing server is unavailable
+* 🐞 Bug: Stop repeated update requests if the licensing server returns an empty response
+* 💻 Developer: Add `GPDFAPI::get_pdf_filename( $entry_id, $pdf_id, $include_extension )` to get the filename of a PDF
+* 💻 Developer: Add `gfpdf_addon_hardcoded_license_key` filter to override the `GPDF_LICENSE_KEY` constant
+* 💻 Developer: Add `gfpdf_logging_redact_keys` filter to redact additional keys from the Gravity PDF logs
+* 💻 Developer: Replace `edd_sl_*` hooks with `gpdf_sl_*` hooks
+* 💻 Developer: Add `gfpdf_addon_post_license_activation` and `gfpdf_addon_post_license_deactivation` actions
+* 💻 Developer: Deprecate `Helper_Abstract_Addon::plugin_updater()`, `Helper_Abstract_Addon::schedule_license_check()`, and `Model_Settings::deactivate_license_key()`
+
 ### 6.15.0
 * 🎉 Feature: Switch the update/license API server to api.gravitypdf.com
 * 🧹 Housekeeping: Remove MBString Regex as a software dependency
