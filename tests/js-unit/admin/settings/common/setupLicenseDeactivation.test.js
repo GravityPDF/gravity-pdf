@@ -74,12 +74,11 @@ describe('setupLicenseDeactivation', () => {
   })
 
   describe('on an application error (HTTP 200 { error })', () => {
-    it('keeps the field and button so the user can retry, and shows the error', () => {
+    it('still removes the key from the site, but shows the error', () => {
       deactivate({ error: 'An API error occurred.' })
 
-      expect(fieldValue('sample')).toBe('a-real-license-key')
-      expect($('.gfpdf-deactivate-license').length).toBe(1)
-      expect($('.gfpdf-deactivate-license').prop('disabled')).toBe(false)
+      expect(fieldValue('sample')).toBe('')
+      expect($('.gfpdf-deactivate-license').length).toBe(0)
 
       const $message = $('#gfpdf-settings-field-wrapper-license_sample #message')
       expect($message.hasClass('error')).toBe(true)
@@ -89,13 +88,12 @@ describe('setupLicenseDeactivation', () => {
   })
 
   describe('on a transport/auth failure (jqXHR, not our JSON)', () => {
-    it('does not clear the field or remove the button, and shows the generic fallback message', () => {
+    it('still removes the key from the site, and shows the generic fallback message', () => {
       /* jQuery's error handler passes the raw jqXHR — neither success nor error is a string */
       deactivate({ readyState: 4, status: 401, statusText: 'Unauthorized' })
 
-      expect(fieldValue('sample')).toBe('a-real-license-key')
-      expect($('.gfpdf-deactivate-license').length).toBe(1)
-      expect($('.gfpdf-deactivate-license').prop('disabled')).toBe(false)
+      expect(fieldValue('sample')).toBe('')
+      expect($('.gfpdf-deactivate-license').length).toBe(0)
 
       const $message = $('#gfpdf-settings-field-wrapper-license_sample #message')
       expect($message.hasClass('error')).toBe(true)

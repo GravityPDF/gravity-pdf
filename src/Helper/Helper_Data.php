@@ -242,7 +242,7 @@ class Helper_Data {
 				'disable'                              => esc_html__( 'Disable', 'gravity-pdf' ),
 				'updateSuccess'                        => esc_html__( 'Successfully Updated', 'gravity-pdf' ),
 				'deleteSuccess'                        => esc_html__( 'Successfully Deleted', 'gravity-pdf' ),
-				'licenseDeactivationError'             => esc_html__( 'An error occurred and your license key may not have been deactivated. Reload the page and try again.', 'gravity-pdf' ),
+				'licenseDeactivationError'             => esc_html__( 'An error occurred and your license key may not have been correctly deactivated. Login to your GravityPDF.com account and check if your site has been unlinked from the key.', 'gravity-pdf' ),
 				'no'                                   => esc_html__( 'No', 'gravity-pdf' ),
 				'yes'                                  => esc_html__( 'Yes', 'gravity-pdf' ),
 				'standard'                             => esc_html__( 'Standard', 'gravity-pdf' ),
