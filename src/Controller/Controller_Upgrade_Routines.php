@@ -184,6 +184,7 @@ class Controller_Upgrade_Routines {
 	 * @since 6.16.0
 	 */
 	protected function remove_legacy_license_check_cron() {
+		/* No public API lists all scheduled hooks, so read the cron array via the core internal (guarded below). */
 		$cron = _get_cron_array();
 		if ( ! is_array( $cron ) ) {
 			return;
