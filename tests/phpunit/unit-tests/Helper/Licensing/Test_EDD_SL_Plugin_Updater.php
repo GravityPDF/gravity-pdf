@@ -1065,4 +1065,91 @@ class Test_EDD_SL_Plugin_Updater extends WP_UnitTestCase {
 		$this->assertSame( '0.2', $result->new_version );
 		$this->assertEmpty( $result->package );
 	}
+
+	public function test_delete_network_version_info_cache_withdraws_own_promotion() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		delete_site_option( $this->class->get_network_cache_key() );
+		$this->class->set_license_status( 'valid' );
+
+		$licensed              = new \stdClass();
+		$licensed->new_version = '0.2';
+		$licensed->package     = 'https://store.com/download/licensed-123';
+		$this->class->set_version_info_cache( $licensed );
+
+		$cache = get_site_option( $this->class->get_network_cache_key() );
+		$this->assertSame( get_current_blog_id(), $cache['blog_id'] );
+
+		/* A failed or throttled check is not a verdict on the license, so the shared package stands */
+		foreach ( [ 'error', 'rate_limit' ] as $status ) {
+			$this->class->set_license_status( $status );
+			$this->assertFalse( $this->class->delete_network_version_info_cache(), $status );
+		}
+
+		/* Removing the key does withdraw it */
+		$this->class->set_license_key( '' );
+		$this->assertTrue( $this->class->delete_network_version_info_cache() );
+		$this->assertFalse( get_site_option( $this->class->get_network_cache_key() ) );
+	}
+
+	/**
+	 * @dataProvider providerUnentitledLicenseStatus
+	 */
+	public function test_delete_network_version_info_cache_withdraws_on_store_rejection( $status ) {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		delete_site_option( $this->class->get_network_cache_key() );
+		$this->class->set_license_status( 'valid' );
+
+		$licensed              = new \stdClass();
+		$licensed->new_version = '0.2';
+		$licensed->package     = 'https://store.com/download/licensed-123';
+		$this->class->set_version_info_cache( $licensed );
+
+		/* The key stays populated on a rejection, so the status is the only signal the entitlement ended */
+		$this->class->set_license_status( $status );
+
+		$this->assertTrue( $this->class->delete_network_version_info_cache() );
+		$this->assertFalse( get_site_option( $this->class->get_network_cache_key() ) );
+	}
+
+	public function providerUnentitledLicenseStatus() {
+		return [
+			[ 'expired' ],
+			[ 'revoked' ],
+			[ 'disabled' ],
+			[ 'missing' ],
+			[ 'invalid' ],
+			[ 'site_inactive' ],
+			[ 'item_name_mismatch' ],
+			[ 'invalid_item_id' ],
+			[ 'no_activations_left' ],
+		];
+	}
+
+	public function test_delete_network_version_info_cache_keeps_another_sites_promotion() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		/* Another site promoted this package, so its license is still active and the package must survive */
+		$network              = new \stdClass();
+		$network->new_version = '0.2';
+		$network->package     = 'https://store.com/download/licensed-123';
+		update_site_option(
+			$this->class->get_network_cache_key(),
+			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( $network ), 'blog_id' => get_current_blog_id() + 1 ]
+		);
+
+		$this->class->set_license_key( '' );
+
+		$this->assertFalse( $this->class->delete_network_version_info_cache() );
+		$this->assertNotEmpty( get_site_option( $this->class->get_network_cache_key() ) );
+
+		delete_site_option( $this->class->get_network_cache_key() );
+	}
 }

@@ -605,6 +605,51 @@ class Test_Model_Settings extends WP_UnitTestCase {
 		$this->assertSame( '', $this->addon->get_license_key() );
 	}
 
+	public function test_maybe_active_licenses_flushes_update_cache_on_empty_key() {
+		do_action( 'init' );
+
+		$options = \GPDFAPI::get_options_class();
+		$slug    = $this->addon->get_slug();
+
+		$settings                    = $options->get_settings();
+		$settings[ "license_$slug" ] = 'old-key';
+		$options->update_settings( $settings );
+
+		$this->addon->update_license_info( [ 'license' => 'old-key', 'status' => 'active', 'message' => 'ok' ] );
+
+		$updater = $this->addon->get_plugin_updater();
+		update_option(
+			$updater->get_cache_key(),
+			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( (object) [ 'new_version' => '2.0' ] ) ]
+		);
+
+		$this->model->maybe_active_licenses( [ "license_$slug" => '' ] );
+
+		/* The cached update info was fetched with the now-removed key, so it must not outlive it */
+		$this->assertFalse( $updater->get_cached_version_info() );
+
+		delete_option( $updater->get_cache_key() );
+	}
+
+	public function test_maybe_active_licenses_skips_flush_for_unlicensed_addon() {
+		do_action( 'init' );
+
+		$slug    = $this->addon->get_slug();
+		$updater = $this->addon->get_plugin_updater();
+
+		update_option(
+			$updater->get_cache_key(),
+			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( (object) [ 'new_version' => '2.0' ] ) ]
+		);
+
+		/* Every add-on posts an empty license field on an unrelated save; one that never had a key keeps its cache */
+		$this->model->maybe_active_licenses( [ "license_$slug" => '' ] );
+
+		$this->assertIsObject( $updater->get_cached_version_info() );
+
+		delete_option( $updater->get_cache_key() );
+	}
+
 	public function test_licensing_bulk_license_check_skips_malformed_and_unknown_items() {
 		do_action( 'init' );
 

@@ -737,6 +737,96 @@ class Test_Addon extends WP_UnitTestCase {
 
 		$this->assertFalse( $this->addon->has_license_auto_deactivated() );
 	}
+
+	/**
+	 * The sibling's cached update info was fetched unlicensed (so it holds no package) and must not survive the
+	 * Access Pass adopting a key.
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_maybe_auto_activate_license_flushes_update_cache() {
+		$this->addon->set_edd_download_id( 10 );
+		$this->addon2->set_edd_download_id( 20 );
+
+		/* Seed first — init() re-reads the license info from the database, overwriting the in-memory copy */
+		$updater = $this->seed_update_cache( $this->addon2 );
+
+		$this->addon->update_license_info( [ 'license' => 'AP-KEY', 'status' => 'active', 'message' => 'ok' ] );
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'valid', 'products' => [ 10, 20 ] ] ) ];
+		$this->addon2->maybe_auto_activate_license( $response, $this->addon, false );
+
+		$this->assertFalse( $updater->get_cached_version_info() );
+
+		$this->addon->delete_license_info();
+		$this->addon2->delete_license_info();
+	}
+
+	/**
+	 * @since 6.16.0
+	 */
+	public function test_maybe_auto_deactivate_license_flushes_update_cache() {
+		$this->addon->set_edd_download_id( 10 );
+		$this->addon2->set_edd_download_id( 20 );
+		$this->addon->delete_license_info();
+
+		$updater = $this->seed_update_cache( $this->addon2 );
+
+		$this->addon2->update_license_info( [ 'license' => 'AP-KEY', 'status' => 'active', 'message' => 'ok' ] );
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'deactivated', 'products' => [ 10, 20 ] ] ) ];
+		$this->addon2->maybe_auto_deactivate_license( $response, $this->addon );
+
+		$this->assertFalse( $updater->get_cached_version_info() );
+
+		$this->addon2->delete_license_info();
+	}
+
+	/**
+	 * A store rejection arrives with the key still populated, so the status has to carry the withdrawal end to end.
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_rejected_license_response_withdraws_network_package() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		$this->addon->init();
+		do_action( 'init' );
+
+		$updater = $this->addon->get_plugin_updater();
+		$package = (object) [ 'new_version' => '2.0', 'package' => 'https://store.com/download/123' ];
+
+		update_site_option(
+			$updater->get_network_cache_key(),
+			[ 'timeout' => strtotime( '+3 days' ), 'value' => wp_json_encode( $package ), 'blog_id' => get_current_blog_id() ]
+		);
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'expired', 'expires' => '2020-01-01 00:00:00' ] ) ];
+		$this->addon->update_license_status_from_response( 'unchanged-key', $response );
+
+		$this->assertSame( 'expired', $this->addon->get_license_status() );
+		$this->assertFalse( get_site_option( $updater->get_network_cache_key() ) );
+	}
+
+	/**
+	 * Boot the add-on's updater and prime its version-info cache
+	 *
+	 * @return \GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater
+	 */
+	private function seed_update_cache( $addon ) {
+		$addon->init();
+		do_action( 'init' );
+
+		$updater = $addon->get_plugin_updater();
+		update_option(
+			$updater->get_cache_key(),
+			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( (object) [ 'new_version' => '2.0', 'package' => '' ] ) ]
+		);
+
+		return $updater;
+	}
 }
 
 /**

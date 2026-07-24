@@ -20,6 +20,7 @@
 * 🐞 Bug: Show an error message when the license deactivation request fails with a server or authentication error, instead of leaving the spinner running
 * 🐞 Bug: Ignore repeat clicks of the Deactivate button while a request is in progress
 * 🐞 Bug: Clearing a license key from the settings now updates the license status straight away
+* 🐞 Bug: Delete all cached update information when a license key is deactivated/cleared from the settings page, or is rejected by the licensing server
 * 🐞 Bug: Fix PHP fatal error when doing an update check and the licensing server is unavailable
 * 🐞 Bug: Stop repeated update requests if the licensing server returns an empty response
 * 💻 Developer: Add `GPDFAPI::get_pdf_filename( $entry_id, $pdf_id, $include_extension )` to get the filename of a PDF

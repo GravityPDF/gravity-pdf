@@ -308,6 +308,12 @@ class Model_Settings extends Helper_Abstract_Model {
 					]
 				);
 
+				/* Clearing the field removes the license as surely as the Deactivate button does — drop the cached
+				   package. Every add-on posts an empty field on an unrelated save, so only flush when a key was set. */
+				if ( ! empty( $settings[ $option_key ] ) ) {
+					$addon->flush_update_cache();
+				}
+
 				continue;
 			}
 
