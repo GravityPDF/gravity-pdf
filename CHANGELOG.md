@@ -11,6 +11,8 @@
 * 🧹 Housekeeping: Bulk license + update check for all Gravity PDF products
 * 🧹 Housekeeping: When network activated on Multisite, license checks are now completed by the primary site
 * 🧹 Housekeeping: When network activated on Multisite, the license admin page is hidden when not the primary site
+* 🧹 Housekeeping: When not network activated on Multisite, share the update cache across the network for an active license key
+* 🧹 Housekeeping: When the primary site is not activated on Multisite, display upgrade notices in the network admin on a best-effort basis
 * 🧹 Housekeeping: Turn autoloading off for the update cache data
 * 🧹 Housekeeping: Run an upgrade routine to remove the old update cache
 * 🧹 Housekeeping: Delete all licensing data when running the uninstaller
