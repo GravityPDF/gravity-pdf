@@ -39,6 +39,22 @@ class EDD_SL_Plugin_Updater {
 	/* The network-shared package outlives the per-site 3h check cache so a quiet licensed site can't let it lapse */
 	protected const NETWORK_CACHE_TTL = 3 * DAY_IN_SECONDS;
 
+	/*
+	 * Drawn from Helper_Data::addon_license_responses(). `error` and `rate_limit` are deliberately absent — a failed or
+	 * throttled request is not a verdict on the license, so it must not strip a package other sites depend on.
+	 */
+	protected const UNENTITLED_LICENSE_STATUSES = [
+		'expired',
+		'revoked',
+		'disabled',
+		'missing',
+		'invalid',
+		'site_inactive',
+		'item_name_mismatch',
+		'invalid_item_id',
+		'no_activations_left',
+	];
+
 	/**
 	 * Class constructor.
 	 *
@@ -735,11 +751,12 @@ class EDD_SL_Plugin_Updater {
 		/*
 		 * Promote the package to a network option so any site on the Multisite can install the update. The store can
 		 * return a package URL even when the license is inactive (that URL errors on access), so only an active license
-		 * is allowed to share its package.
+		 * is allowed to share its package. The promoting site is recorded so it alone can withdraw the package later.
 		 */
 		if ( is_multisite() && $this->is_license_active() && is_object( $value ) && ! empty( $value->package ) ) {
 			$network_data            = $data;
 			$network_data['timeout'] = time() + self::NETWORK_CACHE_TTL;
+			$network_data['blog_id'] = get_current_blog_id();
 			update_site_option( $this->get_network_cache_key(), $network_data );
 		}
 	}
@@ -759,6 +776,35 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		return delete_option( $cache_key );
+	}
+
+	/**
+	 * Withdraw the package this site shared with the network, so a removed license stops backing network-wide downloads
+	 *
+	 * Ownership counts as much as the license state: a package promoted by another site belongs to a site that is still
+	 * licensed, and must outlive this one losing its own.
+	 *
+	 * @return bool
+	 *
+	 * @since 6.16.0
+	 */
+	public function delete_network_version_info_cache() {
+		if ( ! is_multisite() ) {
+			return false;
+		}
+
+		$lost_license = empty( $this->api_data['license'] ) || in_array( $this->license_status, self::UNENTITLED_LICENSE_STATUSES, true );
+		if ( ! $lost_license ) {
+			return false;
+		}
+
+		$cache_key = $this->get_network_cache_key();
+		$cache     = get_site_option( $cache_key );
+		if ( ! is_array( $cache ) || (int) ( $cache['blog_id'] ?? 0 ) !== get_current_blog_id() ) {
+			return false;
+		}
+
+		return delete_site_option( $cache_key );
 	}
 
 	/**

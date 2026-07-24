@@ -141,8 +141,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	/**
 	 * Remove the network-shared license package cache stored in sitemeta on a Multisite
 	 *
-	 * The per-site caches removed by remove_plugin_options() live in each site's options table; the network cache
-	 * (see EDD_SL_Plugin_Updater::get_network_cache_key()) is a single network option, so it's cleaned up once here.
+	 * Every extension keeps its own entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all are
+	 * network-scoped rather than per-site, so one wildcard pass clears them without walking the site list.
 	 *
 	 * @since 6.16.0
 	 */

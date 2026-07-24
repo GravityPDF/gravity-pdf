@@ -711,6 +711,22 @@ abstract class Helper_Abstract_Addon {
 	}
 
 	/**
+	 * Whether incoming license info differs from what this add-on already holds
+	 *
+	 * The incoming key is compared against the raw `$license_key` property, not get_license_key(), which folds in the
+	 * `GPDF_LICENSE_KEY` constant and so reads identically on both sides however the add-on's own key changed.
+	 *
+	 * @param array $license_info
+	 *
+	 * @return bool
+	 *
+	 * @since 6.16.0
+	 */
+	private function license_info_has_changed( $license_info ) {
+		return $license_info['license'] !== $this->license_key || $license_info['status'] !== $this->license_key_status;
+	}
+
+	/**
 	 * Remove the license info and keys from the settings
 	 *
 	 * @since 4.2
@@ -1169,7 +1185,16 @@ abstract class Helper_Abstract_Addon {
 			return;
 		}
 
-		$this->update_license_info( $addon->get_license_info(), $use_database );
+		$license_info = $addon->get_license_info();
+		$has_changed  = $this->license_info_has_changed( $license_info );
+
+		$this->update_license_info( $license_info, $use_database );
+
+		/* Cached update info was fetched under the old key, so it holds no package for the new one. A hardcoded key
+		   re-fires this action every few hours, so skip the flush when nothing actually moved. */
+		if ( $has_changed ) {
+			$this->flush_update_cache();
+		}
 
 		$this->license_auto_activated = true;
 	}
@@ -1251,7 +1276,14 @@ abstract class Helper_Abstract_Addon {
 			return;
 		}
 
-		$this->update_license_info( $addon->get_license_info(), true );
+		$license_info = $addon->get_license_info();
+		$has_changed  = $this->license_info_has_changed( $license_info );
+
+		$this->update_license_info( $license_info, true );
+
+		if ( $has_changed ) {
+			$this->flush_update_cache();
+		}
 
 		$this->license_auto_deactivated = true;
 	}
@@ -1269,5 +1301,6 @@ abstract class Helper_Abstract_Addon {
 
 		$this->plugin_updater->delete_version_info_cache();
 		$this->plugin_updater->delete_transient_plugin_info();
+		$this->plugin_updater->delete_network_version_info_cache();
 	}
 }
