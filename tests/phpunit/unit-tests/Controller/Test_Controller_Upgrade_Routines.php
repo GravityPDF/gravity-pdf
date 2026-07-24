@@ -47,4 +47,20 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 		$this->assertSame( 'No', $this->options->get_option( 'background_processing' ) );
 	}
 
+	public function test_6_16_0_removes_legacy_update_cache() {
+		update_option( 'edd_sl_version_info_123', 'a payload naming gravity-pdf' );
+		update_option( 'edd_sl_failed_http_' . md5( GPDF_API_URL ), time() );
+
+		/* An unrelated add-on's cache shares the prefix but not the value, and must survive */
+		update_option( 'edd_sl_version_info_456', 'a payload naming another-plugin' );
+
+		do_action( 'gfpdf_version_changed', '6.15.0', '6.16.0' );
+
+		/* No cache flush here on purpose — the routine must invalidate what it deletes */
+		$this->assertFalse( get_option( 'edd_sl_version_info_123' ) );
+		$this->assertFalse( get_option( 'edd_sl_failed_http_' . md5( GPDF_API_URL ) ) );
+		$this->assertNotFalse( get_option( 'edd_sl_version_info_456' ) );
+
+		delete_option( 'edd_sl_version_info_456' );
+	}
 }

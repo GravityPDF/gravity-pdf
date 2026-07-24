@@ -133,9 +133,16 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
 
-		/* Remove license API data */
+		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
 		global $wpdb;
-		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'gpdf_sl_%'" );
+
+		$keys = $wpdb->get_col(
+			$wpdb->prepare( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s", $wpdb->esc_like( 'gpdf_sl_' ) . '%' )
+		);
+
+		foreach ( $keys as $key ) {
+			delete_option( $key );
+		}
 	}
 
 	/**
@@ -148,7 +155,16 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	 */
 	public function remove_plugin_network_options() {
 		global $wpdb;
-		$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE 'gpdf_sl_net_%'" );
+
+		/* delete_network_option() rather than delete_site_option(), which would narrow the sweep to the current
+		   network and strand rows belonging to the others sharing this sitemeta table */
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( "SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s", $wpdb->esc_like( 'gpdf_sl_net_' ) . '%' )
+		);
+
+		foreach ( $rows as $row ) {
+			delete_network_option( $row->site_id, $row->meta_key );
+		}
 	}
 
 	/**
