@@ -41,21 +41,17 @@ export function setupLicenseDeactivation () {
 
       /* Our endpoint always returns a `success` or `error` string. A transport/auth failure (eg. a 500, or the 401
          from handle_ajax_authentication) instead hits jQuery's error handler with the raw jqXHR, so neither is set. */
-      const successMessage = typeof response?.success === 'string' ? response.success : null
-      if (successMessage === null) {
-        /* Deactivation didn't complete — re-enable the button and surface the error so the user can retry */
-        $button.prop('disabled', false)
-        const error = typeof response?.error === 'string' ? response.error : GFPDF.licenseDeactivationError
-        showLicenseMessage($container, error, false)
-        return
-      }
+      const success = typeof response?.success === 'string'
+      const message = success
+        ? response.success
+        : (typeof response?.error === 'string' ? response.error : GFPDF.licenseDeactivationError)
 
-      /* update UI to reflect deactivation */
-      postLicenseDeactivation(slug, $container, successMessage)
+      /* deactivate_license() drops the key from this site even when the API rejects it, so always clear the UI */
+      postLicenseDeactivation(slug, $container, message, success)
 
       /* handle any shared licenses that were also deactivated */
-      if (Array.isArray(response.extra)) {
-        response.extra.forEach(item => postLicenseDeactivation(item, $('#gfpdf-settings-field-wrapper-license_' + item), successMessage))
+      if (success && Array.isArray(response.extra)) {
+        response.extra.forEach(item => postLicenseDeactivation(item, $('#gfpdf-settings-field-wrapper-license_' + item), message, true))
       }
     })
 
@@ -63,17 +59,13 @@ export function setupLicenseDeactivation () {
   })
 }
 
-function postLicenseDeactivation (slug, $container, message) {
+function postLicenseDeactivation (slug, $container, message, success) {
   /* cleanup inputs */
   $('#gfpdf_settings\\[license_' + slug + '\\]').val('')
   $('#gfpdf_settings\\[license_' + slug + '_message\\]').val('')
   $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
   $container.find('button').remove()
 
-  showLicenseMessage($container, message, true)
-}
-
-function showLicenseMessage ($container, message, success) {
   $container
     .find('#message')
     .toggleClass('success', success)
