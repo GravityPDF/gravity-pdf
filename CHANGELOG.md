@@ -14,7 +14,7 @@
 * 🧹 Housekeeping: When not network activated on Multisite, share the update cache across the network for an active license key
 * 🧹 Housekeeping: When the primary site is not activated on Multisite, display upgrade notices in the network admin on a best-effort basis
 * 🧹 Housekeeping: Turn autoloading off for the update cache data
-* 🧹 Housekeeping: Run an upgrade routine to remove the old update cache
+* 🧹 Housekeeping: Run an upgrade routine to remove the old update cache and cron
 * 🧹 Housekeeping: Delete all licensing data when running the uninstaller
 * 🧹 Housekeeping: Update PHP and JavaScript dependencies
 * 🐞 Bug: Show an error message when the license deactivation request fails with a server or authentication error, instead of leaving the spinner running

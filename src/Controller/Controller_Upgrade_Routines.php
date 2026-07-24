@@ -61,6 +61,7 @@ class Controller_Upgrade_Routines {
 
 		if ( version_compare( $current_version, '6.16.0', '>=' ) && version_compare( $old_version, '6.16.0', '<' ) ) {
 			$this->remove_legacy_update_cache();
+			$this->remove_legacy_license_check_cron();
 		}
 	}
 
@@ -173,5 +174,29 @@ class Controller_Upgrade_Routines {
 		   ever hit an API failure would otherwise carry a stale autoloaded option forever. */
 		delete_option( 'edd_sl_failed_http_' . md5( 'https://gravitypdf.com?api=1' ) );
 		delete_option( 'edd_sl_failed_http_' . md5( GPDF_API_URL ) );
+	}
+
+	/**
+	 * Unschedule the deprecated per-add-on `gfpdf_<slug>_license_check` cron events, superseded by the bulk check
+	 *
+	 * Sweep by pattern rather than by known slug so events left by add-ons that are no longer active are also removed.
+	 *
+	 * @since 6.16.0
+	 */
+	protected function remove_legacy_license_check_cron() {
+		/* No public API lists all scheduled hooks, so read the cron array via the core internal (guarded below). */
+		$cron = _get_cron_array();
+		if ( ! is_array( $cron ) ) {
+			return;
+		}
+
+		foreach ( $cron as $events ) {
+			foreach ( array_keys( $events ) as $hook ) {
+				/* Match the old per-add-on events but keep the 6.16.0 bulk check that replaced them */
+				if ( $hook !== 'gfpdf_bulk_license_check' && preg_match( '/^gfpdf_.+_license_check$/', $hook ) ) {
+					wp_unschedule_hook( $hook );
+				}
+			}
+		}
 	}
 }
