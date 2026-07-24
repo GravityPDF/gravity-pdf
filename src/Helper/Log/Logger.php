@@ -208,23 +208,8 @@ class Logger {
 		/* Add our log file stream */
 		$this->log->pushHandler( $stream );
 
-		/* Add a redact handler to mask sensitive details */
-		$redact = new Redact_Processor(
-			[
-				/* only mask values that look like a license key */
-				'license'         => '/[A-Fa-f0-9]{28}/',
-				'edd_license_key' => '/[A-Fa-f0-9]{28}/',
-
-				/* direct update links */
-				'package'         => 23,
-				'download_link'   => 23,
-			],
-			'*',
-			'%s',
-			32
-		);
-
-		$this->log->pushProcessor( $redact );
+		/* Add a redact processor to mask secrets (license keys, signed update URLs, tokens) from the log */
+		$this->log->pushProcessor( new Redact_Processor( $this->slug ) );
 	}
 
 	/**

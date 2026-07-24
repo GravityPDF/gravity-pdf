@@ -1715,9 +1715,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* get selected value (if any) */
 		$value = $this->get_form_value( $args );
 
-		/** @var Helper_Abstract_Addon $addon */
-		$addon             = $args['data'];
-		$hardcoded_license = $addon->get_license_key_from_constant();
+		/** @var Helper_Abstract_Addon|null $addon */
+		$addon             = $args['data'] ?? null;
+		$hardcoded_license = $addon instanceof Helper_Abstract_Addon ? $addon->get_license_key_from_constant() : '';
 		if ( $hardcoded_license ) {
 			$value['key']   = $hardcoded_license;
 			$args['desc2']  = __( 'License key set by the site administrator.', 'gravity-pdf' );

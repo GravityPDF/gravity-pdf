@@ -289,8 +289,8 @@ class Model_Settings extends Helper_Abstract_Model {
 				continue;
 			}
 
-			/* Skip if addon has been auto-activated */
-			if ( $addon->has_license_auto_activated() ) {
+			/* An admin-managed key is authoritative — ignore the submitted value and don't burn an activation */
+			if ( $addon->is_license_admin_managed() ) {
 				continue;
 			}
 
@@ -298,6 +298,21 @@ class Model_Settings extends Helper_Abstract_Model {
 			if ( trim( $input[ $option_key ] ) === '' ) {
 				$input[ $option_key . '_message' ] = '';
 				$input[ $option_key . '_status' ]  = '';
+
+				/* Sync the in-memory copy too, else get_license_status() returns the stale prior value this request */
+				$addon->update_license_info(
+					[
+						'license' => '',
+						'status'  => '',
+						'message' => '',
+					]
+				);
+
+				/* Clearing the field removes the license as surely as the Deactivate button does — drop the cached
+				   package. Every add-on posts an empty field on an unrelated save, so only flush when a key was set. */
+				if ( ! empty( $settings[ $option_key ] ) ) {
+					$addon->flush_update_cache();
+				}
 
 				continue;
 			}
@@ -309,7 +324,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			/* Run license activation if a new key was submitted, or the existing key isn't valid */
 			if (
-				! in_array( $input[ $option_key . '_status' ], [ 'active', 'valid' ], true ) ||
+				! in_array( $input[ $option_key . '_status' ] ?? '', [ 'active', 'valid' ], true ) ||
 				( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] )
 			) {
 				$results = $addon->activate_license( $input[ $option_key ] );
@@ -319,9 +334,9 @@ class Model_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		/* Save auto-activated license key info */
+		/* Persist the authoritative key/status for admin-managed addons */
 		foreach ( $this->data->addon as $addon ) {
-			if ( ! $addon->has_license_auto_activated() ) {
+			if ( ! $addon->is_license_admin_managed() ) {
 				continue;
 			}
 
@@ -424,17 +439,11 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return array
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function licensing_bulk_get_version_api_params( $api_params ) {
-		/* Skip if the core updater isn't initialized or there are no addons */
-		if ( empty( $this->data->updater ) && empty( $this->data->addon ) ) {
-			return $api_params;
-		}
-
-		/* Build new parameters */
-		$products = array_merge(
-			[ 'gravity-pdf' => $this->data->updater ],
+		/* Collect each add-on updater, dropping any that haven't been initialized (a third-party subclass may return null) */
+		$products = array_filter(
 			array_map(
 				function ( $addon ) {
 					return $addon->get_plugin_updater();
@@ -443,19 +452,18 @@ class Model_Settings extends Helper_Abstract_Model {
 			)
 		);
 
-		/*
-		 * Keep $bulk_api_params numerically indexed. The API keys its response array by the same
-		 * keys it receives, so numeric indices make it return a JSON array (which the response
-		 * handlers below decode via is_array()). Switching to slug keys would return a JSON object
-		 * and silently break bulk handling.
-		 */
+		/* Include the core plugin only when its updater exists (absent on the non-canonical wordpress.org build) */
+		if ( ! empty( $this->data->updater ) ) {
+			$products = array_merge( [ 'gravity-pdf' => $this->data->updater ], $products );
+		}
+
+		/* Nothing to bundle — leave the individual request untouched */
+		if ( empty( $products ) ) {
+			return $api_params;
+		}
+
 		$bulk_api_params = [];
 		foreach ( $products as $product ) {
-			/* skip improperly-registered plugins */
-			if ( ! $product ) {
-				continue;
-			}
-
 			$bulk_api_params[] = $product->get_version_api_params();
 		}
 
@@ -466,27 +474,44 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @param mixed $response
+	 * Handle the bulk get_version API response: cache each bundled product against its own updater and hand back the
+	 * product that initiated the request for its normal caching path.
 	 *
-	 * @return \StdClass
+	 * @param mixed  $response    The decoded API response — an array of product objects, or a non-array passed straight through
+	 * @param array  $api_data    The initiating updater's API data (part of the filter signature; unused here)
+	 * @param string $plugin_file The initiating plugin file, used to single out which product to hand back
+	 *
+	 * @return \stdClass|mixed|null The initiating product object, null when it isn't in the response, or $response unchanged when not an array
+	 *
+	 * @since 6.16.0
 	 */
 	public function licensing_bulk_get_version_api_response( $response, $api_data, $plugin_file ) {
 		if ( ! is_array( $response ) ) {
 			return $response;
 		}
 
+		/* Map each bundled updater by the slug it sent (the plugin-folder basename the API echoes back), so a response
+		   links to the right product even when an add-on's registered slug differs from its folder — e.g. a renamed folder. */
+		$updaters = [];
+		foreach ( $this->data->addon as $addon ) {
+			$updater = $addon->get_plugin_updater();
+			if ( $updater ) {
+				$updaters[ $updater->get_slug() ] = $updater;
+			}
+		}
+
+		if ( ! empty( $this->data->updater ) ) {
+			$updaters[ $this->data->updater->get_slug() ] = $this->data->updater;
+		}
+
 		$initial_request_data = null;
 
 		foreach ( $response as $product ) {
-			if ( ! isset( $product->slug ) ) {
-				continue;
-			} elseif ( isset( $this->data->addon[ $product->slug ] ) ) {
-				$updater = $this->data->addon[ $product->slug ]->get_plugin_updater();
-			} elseif ( $product->slug === 'gravity-pdf' ) {
-				$updater = $this->data->updater;
-			} else {
+			if ( ! isset( $product->slug, $updaters[ $product->slug ] ) ) {
 				continue; // couldn't link response to a product, skip.
 			}
+
+			$updater = $updaters[ $product->slug ];
 
 			/* skip the product that initialized the request, as it'll be handled in the return method */
 			if ( $updater->get_plugin_file() !== $plugin_file ) {
@@ -504,9 +529,13 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function licensing_bulk_license_check() {
+		if ( $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+			return false;
+		}
+
 		$addons = $this->data->addon;
 		if ( empty( $addons ) ) {
 			return false;
@@ -560,9 +589,14 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* Check for a malformed response */
-		$license_check = json_decode( wp_remote_retrieve_body( $response ) );
+		$body          = wp_remote_retrieve_body( $response );
+		$license_check = json_decode( $body );
 		if ( ! is_array( $license_check ) ) {
-			$this->log->error( 'Invalid response returned from bulk license status check.', [ 'response' => wp_remote_retrieve_body( $response ) ] );
+			/* Log the decoded body so the redactor can traverse nested keys; cap the raw fallback to bound any leak */
+			$this->log->error(
+				'Invalid response returned from bulk license status check.',
+				[ 'response' => $license_check ?? substr( $body, 0, 500 ) ]
+			);
 
 			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
 
@@ -609,29 +643,57 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function run_network_update_check() {
-		if ( ! is_multisite() ) {
+		if ( ! is_multisite() || is_main_site() ) {
 			return;
 		}
 
-		if ( get_current_blog_id() === 1 ) {
+		/* Network-activated installs receive update checks through the normal flow, so don't re-arm the event there */
+		if ( $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
 			return;
 		}
 
 		/*
-		 * Skip a full wp_plugin_update() check and instead force the
-		 * `pre_set_site_transient_update_plugins` filter do its job,
-		 * which many addons (including Gravity PDF) use to inject update info
+		 * Skip a full wp_plugin_update() check and instead force the `pre_set_site_transient_update_plugins` filter to
+		 * do its job, which many addons (including Gravity PDF) use to inject update info. Run in the current (subsite)
+		 * context, not the main site: update_plugins is network-global, so re-injecting here fires check_update() where
+		 * the per-site add-on is active and its cached network package is found — no per-updater API request.
 		 */
-		switch_to_blog( 1 );
 		$update_info = get_site_transient( 'update_plugins' );
 		if ( $update_info !== false ) {
 			set_site_transient( 'update_plugins', $update_info );
 		}
 
+		/* Re-arm the one-off event so the next run re-syncs to the primary site's plugin update schedule */
+		$this->schedule_network_update_check();
+	}
+
+	/**
+	 * Schedule the next one-off network update check, one minute after the primary site's plugin update check
+	 *
+	 * A self-rescheduling single event (rather than a fixed recurring one) recomputes the offset every cycle, so it
+	 * re-syncs whenever WordPress reschedules its own plugin update check.
+	 *
+	 * @return void
+	 *
+	 * @since 6.16.0
+	 */
+	public function schedule_network_update_check() {
+		switch_to_blog( get_main_site_id() );
+		$timestamp = wp_next_scheduled( 'wp_update_plugins' );
 		restore_current_blog();
+
+		if ( $timestamp === false ) {
+			$timestamp = time() + 12 * HOUR_IN_SECONDS;
+		}
+
+		/* wp_next_scheduled() returns a past time when the primary site's cron is quiet; floor to the future so the
+		   self-rescheduling event isn't perpetually due (which would re-fire on every cron spawn). */
+		$timestamp = max( $timestamp, time() + HOUR_IN_SECONDS );
+
+		wp_schedule_single_event( $timestamp + 60, 'gfpdf_network_update_check' );
 	}
 
 	/**
@@ -643,7 +705,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 4.2
-	 * @deprecated 6.15.0 Moved to Addon framework
+	 * @deprecated 6.16.0 Moved to Addon framework
 	 */
 	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key = '' ) {
 		return $addon->deactivate_license();

@@ -179,6 +179,10 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 					return;
 				}
 
+				if ( $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+					return;
+				}
+
 				add_action( 'gfpdf_bulk_license_check', [ $this->model, 'licensing_bulk_license_check' ] );
 				if ( ! wp_next_scheduled( 'gfpdf_bulk_license_check' ) ) {
 					wp_schedule_single_event( strtotime( '+1 week' ), 'gfpdf_bulk_license_check' );
@@ -310,28 +314,25 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 *
 	 * @return void
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected function maybe_schedule_network_update_check() {
-		if ( ! is_multisite() || get_current_blog_id() === 1 || is_plugin_active_for_network( PDF_PLUGIN_BASENAME ) ) {
+		if ( ! is_multisite() || is_main_site() ) {
+			return;
+		}
+
+		/* Network-activated installs already receive update checks through the normal flow */
+		if ( $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
 			return;
 		}
 
 		add_action( 'gfpdf_network_update_check', [ $this->model, 'run_network_update_check' ] );
 
-		/* skip if event already scheduled */
+		/* skip if event already scheduled; run_network_update_check() re-arms it each cycle */
 		if ( wp_next_scheduled( 'gfpdf_network_update_check' ) ) {
 			return;
 		}
 
-		/* grab the next run-time for a plugin update check on the primary site */
-		switch_to_blog( 1 );
-		$timestamp = wp_next_scheduled( 'wp_update_plugins' );
-		restore_current_blog();
-
-		if ( $timestamp !== false ) {
-			/* Run action 1 minute after the primary site schedules a plugin update check */
-			wp_schedule_event( $timestamp + 60, 'twicedaily', 'gfpdf_network_update_check' );
-		}
+		$this->model->schedule_network_update_check();
 	}
 }

@@ -191,6 +191,20 @@ class Test_Uninstaller extends TestCase {
 		wp_set_current_user( 0 );
 	}
 
+	public function test_remove_plugin_network_options() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Network options only exist on Multisite' );
+		}
+
+		update_site_option( 'gpdf_sl_net_abc123', [ 'timeout' => time(), 'value' => '{}' ] );
+		$this->assertNotFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
+
+		$this->model->remove_plugin_network_options();
+
+		/* No cache flush here on purpose — the uninstall must invalidate what it deletes */
+		$this->assertFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
+	}
+
 	/**
 	 * Check we are successfully removing our GF PDF Settings
 	 *
