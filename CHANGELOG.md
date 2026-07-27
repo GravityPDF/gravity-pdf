@@ -4,6 +4,7 @@
 
 ### 6.16.0
 * 🎉 Feature: Gravity Forms 3.0 compatibility
+* 🎉 Feature: Support the Gravity Forms 3.0 International (formatted) phone number format, displayed with the country and dial code in front of the number
 * 🎉 Feature: Auto-activate/deactivate license key for installed Gravity PDF extensions when saving an Access Pass   
 * 🎉 Feature: Support for setting a license key in code using the PHP constant `GPDF_LICENSE_KEY`
 * 🔒 Security: Redact sensitive information from log files
@@ -29,6 +30,7 @@
 * 💻 Developer: Replace `edd_sl_*` hooks with `gpdf_sl_*` hooks
 * 💻 Developer: Add `gfpdf_addon_post_license_activation` and `gfpdf_addon_post_license_deactivation` actions
 * 💻 Developer: Deprecate `Helper_Abstract_Addon::plugin_updater()`, `Helper_Abstract_Addon::schedule_license_check()`, and `Model_Settings::deactivate_license_key()`
+* 💻 Developer: Add `$form_data['phone']` which includes the country, dial code, national, formatted, and E.164 values of an International (formatted) phone number
 
 ### 6.15.0
 * 🎉 Feature: Switch the update/license API server to api.gravitypdf.com

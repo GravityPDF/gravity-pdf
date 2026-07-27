@@ -1374,6 +1374,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				'misc',
 				'field',
 				'list',
+				'phone',
 				'signature_details_id',
 				'products',
 				'products_totals',
