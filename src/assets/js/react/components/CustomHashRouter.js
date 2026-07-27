@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { createHashHistory } from 'history';
 import { Router } from 'react-router-dom';
 
-// Create a shared hash history instance
+// Module-level singleton so the independent React roots (template, font manager, core fonts) share one hash history
 export const sharedHashHistory = createHashHistory({ window });
 
 /**
@@ -14,30 +14,19 @@ export const sharedHashHistory = createHashHistory({ window });
  * @since 6.12
  */
 function CustomHashRouter({ children }) {
-	const historyRef = React.useRef();
-	if (historyRef.current === null) {
-		historyRef.current = sharedHashHistory;
-	}
-
-	const history = historyRef.current ?? sharedHashHistory;
-	const [state, setStateImpl] = React.useState({
-		action: history.action,
-		location: history.location,
+	const [state, setState] = React.useState({
+		action: sharedHashHistory.action,
+		location: sharedHashHistory.location,
 	});
 
-	const setState = React.useCallback(
-		(newState) => setStateImpl(newState),
-		[setStateImpl]
-	);
-
-	React.useLayoutEffect(() => history.listen(setState), [history, setState]);
+	React.useLayoutEffect(() => sharedHashHistory.listen(setState), []);
 
 	return (
 		<Router
 			basename="/"
 			location={state.location}
 			navigationType={state.action}
-			navigator={history}
+			navigator={sharedHashHistory}
 		>
 			{children}
 		</Router>
