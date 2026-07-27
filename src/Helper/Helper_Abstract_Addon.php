@@ -127,37 +127,37 @@ abstract class Helper_Abstract_Addon {
 
 	/**
 	 * @var EDD_SL_Plugin_Updater
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected $plugin_updater;
 
 	/**
 	 * @var string The current license key for this addon
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected $license_key = '';
 
 	/**
 	 * @var string The current license key status (retrieved from the API) for this addon
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected $license_key_status = '';
 
 	/**
 	 * @var string The current license key message for this addon (based on the status)
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected $license_key_message = '';
 
 	/**
 	 * @var bool Whether the addon activated the license based on another addon activation
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected $license_auto_activated = false;
 
 	/**
 	 * @var bool Whether the addon deactivated the license based on another addon deactivation
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected $license_auto_deactivated = false;
 
@@ -291,12 +291,12 @@ abstract class Helper_Abstract_Addon {
 
 	/**
 	 * @return EDD_SL_Plugin_Updater|null
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function get_plugin_updater() {
 		$updater = $this->plugin_updater;
 		if ( ! $updater ) {
-			_doing_it_wrong( __METHOD__, 'This method should not be called before the "init" hook (priority 1)', '6.15.0' );
+			_doing_it_wrong( __METHOD__, 'This method should not be called before the "init" hook (priority 1)', '6.16.0' );
 		}
 
 		return $updater;
@@ -325,15 +325,7 @@ abstract class Helper_Abstract_Addon {
 
 		/* Maybe auto-activate hardcoded license */
 		$maybe_activate_hardcoded_license = function () {
-			$hardcoded_license = $this->get_license_key_from_constant();
-			if (
-				$hardcoded_license && /* is constant defined */
-				$hardcoded_license !== $this->license_key && /* is hardcoded license different to DB version */
-				! $this->license_auto_activated && /* if addon hasn't already be auto-activated when another addon was activated */
-				is_admin() /* is the admin area */
-			) {
-				$this->activate_license( $hardcoded_license, true );
-			}
+			$this->maybe_activate_hardcoded_license();
 		};
 
 		add_action( 'init', $maybe_activate_hardcoded_license, 2 );
@@ -418,13 +410,13 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 * @since 4.2
-	 * @depecated 6.15.0 Use self::central_plugin_updater()
+	 * @deprecated 6.16.0 Use self::central_plugin_updater()
 	 */
 	public function plugin_updater() {}
 
 	/**
 	 * @return array
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function get_default_api_params() {
 		return [
@@ -441,7 +433,7 @@ abstract class Helper_Abstract_Addon {
 	 * The central add-on update initializer
 	 *
 	 * @return void
-	 * @since 6.14
+	 * @since 6.16.0
 	 */
 	protected function central_plugin_updater() {
 		$this->plugin_updater = new EDD_SL_Plugin_Updater(
@@ -450,7 +442,49 @@ abstract class Helper_Abstract_Addon {
 			$this->get_default_api_params()
 		);
 
+		$this->plugin_updater->set_license_status( $this->get_license_status() );
 		$this->plugin_updater->init();
+	}
+
+	/**
+	 * Activate a hardcoded license key (set via the GPDF_LICENSE_KEY constant) on an admin request.
+	 *
+	 * Retries while the stored status isn't active/valid so a transient API failure on the first attempt self-heals,
+	 * and re-activates when the constant key is rotated. A short backoff keeps a rejected or unreachable key from
+	 * hitting the licensing API on every admin request.
+	 *
+	 * @return void
+	 * @since 6.16.0
+	 */
+	protected function maybe_activate_hardcoded_license() {
+		$hardcoded_license = $this->get_license_key_from_constant();
+		if ( ! $hardcoded_license || $this->license_auto_activated || ! is_admin() ) {
+			return;
+		}
+
+		/* On a network-activated Multisite, only the primary site activates the hardcoded license */
+		if ( \GPDFAPI::get_misc_class()->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+			return;
+		}
+
+		$key_changed = $hardcoded_license !== $this->license_key;
+		$is_active   = in_array( $this->get_license_status(), [ 'active', 'valid' ], true );
+
+		if ( ! $key_changed && $is_active ) {
+			return;
+		}
+
+		/* Back off retries for an unchanged, still-inactive key so a bad or unreachable key doesn't POST every request */
+		$backoff = 'gfpdf_license_activation_' . $this->get_slug();
+		if ( ! $key_changed && get_transient( $backoff ) ) {
+			return;
+		}
+
+		$this->activate_license( $hardcoded_license, true );
+
+		if ( ! in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) ) {
+			set_transient( $backoff, 1, 3 * HOUR_IN_SECONDS );
+		}
 	}
 
 	/**
@@ -617,7 +651,7 @@ abstract class Helper_Abstract_Addon {
 	 * @param bool $use_database Fetch license info from the database
 	 *
 	 * @since    4.2
-	 * @since 6.15.0 Get license info stored in the object
+	 * @since 6.16.0 Get license info stored in the object
 	 */
 	public function get_license_info( $use_database = false ) {
 		if ( $use_database ) {
@@ -635,6 +669,8 @@ abstract class Helper_Abstract_Addon {
 			'message' => $this->get_license_message(),
 		];
 
+		$this->log->notice( 'Get plugin license details', $license_details );
+
 		return $license_details;
 	}
 
@@ -645,7 +681,7 @@ abstract class Helper_Abstract_Addon {
 	 * @param bool $use_database Whether to update the database or not. A DB update will auto-call Model_Settings::maybe_active_licenses(), which may not be ideal
 	 *
 	 * @since    4.2
-	 * @since 6.15.0 Added
+	 * @since 6.16.0 Added
 	 */
 	public function update_license_info( $license_info, $use_database = false ) {
 		$this->license_key         = $license_info['license'] ?? '';
@@ -655,6 +691,7 @@ abstract class Helper_Abstract_Addon {
 		/* Check the update has been initialized before setting the license key */
 		if ( isset( $this->plugin_updater ) ) {
 			$this->plugin_updater->set_license_key( $this->license_key );
+			$this->plugin_updater->set_license_status( $this->license_key_status );
 		}
 
 		if ( ! $use_database ) {
@@ -671,6 +708,22 @@ abstract class Helper_Abstract_Addon {
 		$this->log->notice( 'Update plugin license details', $license_info );
 
 		$this->options->update_settings( $settings );
+	}
+
+	/**
+	 * Whether incoming license info differs from what this add-on already holds
+	 *
+	 * The incoming key is compared against the raw `$license_key` property, not get_license_key(), which folds in the
+	 * `GPDF_LICENSE_KEY` constant and so reads identically on both sides however the add-on's own key changed.
+	 *
+	 * @param array $license_info
+	 *
+	 * @return bool
+	 *
+	 * @since 6.16.0
+	 */
+	private function license_info_has_changed( $license_info ) {
+		return $license_info['license'] !== $this->license_key || $license_info['status'] !== $this->license_key_status;
 	}
 
 	/**
@@ -718,7 +771,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return false|string
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	final public function get_license_key_from_constant() {
 		$slug = $this->get_slug();
@@ -770,17 +823,28 @@ abstract class Helper_Abstract_Addon {
 	 * Whether the addon activated the license based on another addon activation
 	 *
 	 * @return bool
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	final public function has_license_auto_activated() {
 		return $this->license_auto_activated;
 	}
 
 	/**
+	 * Whether the license key is controlled by the site rather than the settings form — a `GPDF_LICENSE_KEY`
+	 * constant or an auto-activated Access Pass. Such a key is authoritative: a submitted value must be ignored.
+	 *
+	 * @return bool
+	 * @since 6.16.0
+	 */
+	final public function is_license_admin_managed() {
+		return (bool) $this->get_license_key_from_constant() || $this->has_license_auto_activated();
+	}
+
+	/**
 	 * Whether the addon deactivated the license based on another addon deactivation.
 	 *
 	 * @return bool
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	final public function has_license_auto_deactivated() {
 		return $this->license_auto_deactivated;
@@ -794,7 +858,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @since    4.2
 	 *
-	 * @depreacted 6.15.0 Handled in bulk via Model_Settings::licensing_bulk_license_check()
+	 * @deprecated 6.16.0 Handled in bulk via Model_Settings::licensing_bulk_license_check()
 	 */
 	final public function maybe_schedule_license_check() {
 		if ( ! wp_next_scheduled( 'gfpdf_' . $this->get_slug() . '_license_check' ) ) {
@@ -808,6 +872,11 @@ abstract class Helper_Abstract_Addon {
 	 * @since    4.2
 	 */
 	public function schedule_license_check() {
+		/* On a network-activated Multisite, only the primary site runs the license check */
+		if ( \GPDFAPI::get_misc_class()->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+			return false;
+		}
+
 		/* If there's no license key disable the check */
 		if ( empty( $this->get_license_key() ) ) {
 			return false;
@@ -874,7 +943,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function update_license_status_from_response( $license_key, $response, $use_database = false ) {
 		$response_code = wp_remote_retrieve_response_code( $response );
@@ -889,7 +958,6 @@ abstract class Helper_Abstract_Addon {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 		}
 
-		$license_info       = $this->get_license_info();
 		$possible_responses = $this->data->addon_license_responses( $this->get_name() );
 
 		$status = 'error';
@@ -899,18 +967,30 @@ abstract class Helper_Abstract_Addon {
 			$status = $license_data->license;
 		}
 
-		$license_info['license'] = $license_key;
-		$license_info['status']  = $status;
-		$license_info['message'] = $possible_responses[ $license_info['status'] ] ?? $possible_responses['generic'];
+		/* Build the info fresh — all three fields are set here, so a get_license_info() read (and its per-call
+		   "Get plugin license details" notice) would be redundant */
+		$license_info = [
+			'license' => $license_key,
+			'status'  => $status,
+			'message' => $possible_responses[ $status ] ?? $possible_responses['generic'],
+		];
 
 		switch ( $license_info['status'] ) {
 			case 'expired':
 				$date_format = get_option( 'date_format' );
-				try {
-					$dt   = new \DateTimeImmutable( $license_data->expires, wp_timezone() );
-					$date = $dt->format( $date_format );
-				} catch ( \Exception $e ) {
-					$date = gmdate( $date_format, false );
+				$expires     = $license_data->expires ?? '';
+
+				if ( empty( $expires ) ) {
+					/* DateTimeImmutable('') silently resolves to "now", implying the key expired today; surface unknown */
+					$date = __( 'an unknown date', 'gravity-pdf' );
+				} else {
+					try {
+						$dt   = new \DateTimeImmutable( $expires, wp_timezone() );
+						$date = $dt->format( $date_format );
+					} catch ( \Exception $e ) {
+						/* gmdate() without a timestamp uses the current time, avoiding the 1 Jan 1970 gmdate(fmt, false) gives */
+						$date = gmdate( $date_format );
+					}
 				}
 
 				$url = add_query_arg(
@@ -930,7 +1010,7 @@ abstract class Helper_Abstract_Addon {
 					[
 						'edd_action'            => 'add_to_cart',
 						'download_id'           => $this->get_edd_download_id(),
-						'edd_options[price_id]' => $license_data->price_id,
+						'edd_options[price_id]' => $license_data->price_id ?? '',
 					],
 					'https://gravitypdf.com/checkout/'
 				);
@@ -943,8 +1023,8 @@ abstract class Helper_Abstract_Addon {
 					[
 						'view'       => 'upgrades',
 						'action'     => 'manage_licenses',
-						'license_id' => $license_data->license_id,
-						'payment_id' => $license_data->payment_id,
+						'license_id' => $license_data->license_id ?? '',
+						'payment_id' => $license_data->payment_id ?? '',
 					],
 					'https://gravitypdf.com/account/'
 				);
@@ -967,6 +1047,12 @@ abstract class Helper_Abstract_Addon {
 	 * @since 4.3
 	 */
 	public function license_registration() {
+
+		/* On a network-activated Multisite, the primary site manages licensing */
+		if ( \GPDFAPI::get_misc_class()->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+			return;
+		}
+
 		$edd_id = $this->get_edd_download_id();
 		if ( in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) || empty( $edd_id ) ) {
 			return;
@@ -1034,7 +1120,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return array The API response and license status
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function activate_license( $license_key = '', $use_database = false ) {
 
@@ -1071,9 +1157,15 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
-	public function maybe_auto_activate_license( $response, $addon, $use_database ) {
+	public function maybe_auto_activate_license( $response, $addon, $use_database = false ) {
+		/* The gfpdf_addon_post_license_activation action is public: a third-party do_action() may fire it with fewer
+		   args (default $use_database) or a non-addon second arg — bail before dereferencing it */
+		if ( ! $addon instanceof self ) {
+			return;
+		}
+
 		/* skip if current addon doing licence activation */
 		if ( $this->get_edd_download_id() === $addon->get_edd_download_id() ) {
 			return;
@@ -1094,7 +1186,16 @@ abstract class Helper_Abstract_Addon {
 			return;
 		}
 
-		$this->update_license_info( $addon->get_license_info(), $use_database );
+		$license_info = $addon->get_license_info();
+		$has_changed  = $this->license_info_has_changed( $license_info );
+
+		$this->update_license_info( $license_info, $use_database );
+
+		/* Cached update info was fetched under the old key, so it holds no package for the new one. A hardcoded key
+		   re-fires this action every few hours, so skip the flush when nothing actually moved. */
+		if ( $has_changed ) {
+			$this->flush_update_cache();
+		}
 
 		$this->license_auto_activated = true;
 	}
@@ -1104,7 +1205,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function deactivate_license() {
 		$response = wp_remote_post(
@@ -1148,9 +1249,14 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function maybe_auto_deactivate_license( $response, $addon ) {
+		/* Public action (see maybe_auto_activate_license): guard against a non-addon second arg from a third-party do_action() */
+		if ( ! $addon instanceof self ) {
+			return;
+		}
+
 		/* skip if current addon doing licence activation */
 		if ( $this->get_edd_download_id() === $addon->get_edd_download_id() ) {
 			return;
@@ -1171,7 +1277,14 @@ abstract class Helper_Abstract_Addon {
 			return;
 		}
 
-		$this->update_license_info( $addon->get_license_info(), true );
+		$license_info = $addon->get_license_info();
+		$has_changed  = $this->license_info_has_changed( $license_info );
+
+		$this->update_license_info( $license_info, true );
+
+		if ( $has_changed ) {
+			$this->flush_update_cache();
+		}
 
 		$this->license_auto_deactivated = true;
 	}
@@ -1179,7 +1292,7 @@ abstract class Helper_Abstract_Addon {
 	/**
 	 * Delete the add-on update information
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 * @return void
 	 */
 	public function flush_update_cache() {
@@ -1189,5 +1302,6 @@ abstract class Helper_Abstract_Addon {
 
 		$this->plugin_updater->delete_version_info_cache();
 		$this->plugin_updater->delete_transient_plugin_info();
+		$this->plugin_updater->delete_network_version_info_cache();
 	}
 }

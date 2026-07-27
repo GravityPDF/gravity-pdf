@@ -186,8 +186,8 @@ class View_Settings extends Helper_Abstract_View {
 			],
 		];
 
-		/* Add License tab if necessary */
-		if ( count( $this->data->addon ) > 0 ) {
+		/* Add License tab if necessary (skip on secondary network sites — the primary site manages licensing) */
+		if ( count( $this->data->addon ) > 0 && ! $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
 			$navigation[10] = [
 				'name' => esc_html__( 'License', 'gravity-pdf' ),
 				'id'   => 'license',

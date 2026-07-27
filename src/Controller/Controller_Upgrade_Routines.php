@@ -64,8 +64,9 @@ class Controller_Upgrade_Routines {
 			$this->fix_tmp_folder_permissions();
 		}
 
-		if ( version_compare( $current_version, '6.15.0', '>=' ) && version_compare( $old_version, '6.14.0', '<' ) ) {
+		if ( version_compare( $current_version, '6.16.0', '>=' ) && version_compare( $old_version, '6.16.0', '<' ) ) {
 			$this->remove_legacy_update_cache();
+			$this->remove_legacy_license_check_cron();
 		}
 	}
 
@@ -153,13 +154,54 @@ class Controller_Upgrade_Routines {
 	}
 
 	/**
-	 * Remove Gravity PDF's edd_sl_* options
+	 * Remove Gravity PDF's legacy edd_sl_* update cache options left behind by the previous plugin updater
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected function remove_legacy_update_cache() {
 		global $wpdb;
 
-		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'edd_sl_%' AND option_value LIKE '%gravity-pdf%'" );
+		/* Delete via the API: a stale autoloaded row left in the cache is the cost this routine exists to remove */
+		$keys = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s AND option_value LIKE %s",
+				$wpdb->esc_like( 'edd_sl_' ) . '%',
+				'%' . $wpdb->esc_like( 'gravity-pdf' ) . '%'
+			)
+		);
+
+		foreach ( $keys as $key ) {
+			delete_option( $key );
+		}
+
+		/* The failure-backoff option stores a bare timestamp, so the value filter above can't match it — target both
+		   the historical (≤6.14.x) and the 6.15.0 API hosts by exact name. 6.15.0's key was autoloaded, so a site that
+		   ever hit an API failure would otherwise carry a stale autoloaded option forever. */
+		delete_option( 'edd_sl_failed_http_' . md5( 'https://gravitypdf.com?api=1' ) );
+		delete_option( 'edd_sl_failed_http_' . md5( GPDF_API_URL ) );
+	}
+
+	/**
+	 * Unschedule the deprecated per-add-on `gfpdf_<slug>_license_check` cron events, superseded by the bulk check
+	 *
+	 * Sweep by pattern rather than by known slug so events left by add-ons that are no longer active are also removed.
+	 *
+	 * @since 6.16.0
+	 */
+	protected function remove_legacy_license_check_cron() {
+		/* No public API lists all scheduled hooks, so read the cron array via the core internal (guarded below). */
+		$cron = _get_cron_array();
+		if ( ! is_array( $cron ) ) {
+			return;
+		}
+
+		foreach ( $cron as $events ) {
+			foreach ( array_keys( $events ) as $hook ) {
+				/* Match the old per-add-on events but keep the 6.16.0 bulk check that replaced them */
+				if ( $hook !== 'gfpdf_bulk_license_check' && preg_match( '/^gfpdf_.+_license_check$/', $hook ) ) {
+					wp_unschedule_hook( $hook );
+				}
+			}
+		}
 	}
 }

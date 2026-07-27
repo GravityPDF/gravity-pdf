@@ -58,8 +58,8 @@ add_action(
 add_action(
 	'http_api_debug',
 	function ( $response, $context, $class_object, $parsed_args, $url ) {
-		/* Log only Gravity PDF requests */
-		if ( $url !== GPDF_API_URL ) {
+		/* Log only Gravity PDF requests. The self-update check posts to a trailingslashit()'d URL, so normalise both sides. */
+		if ( untrailingslashit( $url ) !== untrailingslashit( GPDF_API_URL ) ) {
 			return;
 		}
 

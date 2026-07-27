@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @author  Easy Digital Downloads
  * @version 1.9.4
- * @since   6.15.0 Modified to make this class more useful for our plugin suite
+ * @since   6.16.0 Modified to make this class more useful for our plugin suite
  */
 class EDD_SL_Plugin_Updater {
 
@@ -32,6 +32,28 @@ class EDD_SL_Plugin_Updater {
 	protected $wp_override = false;
 	protected $beta        = false;
 	protected $failed_request_cache_key;
+
+	/* Local gate for sharing a package across a Multisite; kept off api_data so it never rides an outbound API request */
+	protected $license_status = '';
+
+	/* The network-shared package outlives the per-site 3h check cache so a quiet licensed site can't let it lapse */
+	protected const NETWORK_CACHE_TTL = 3 * DAY_IN_SECONDS;
+
+	/*
+	 * Drawn from Helper_Data::addon_license_responses(). `error` and `rate_limit` are deliberately absent — a failed or
+	 * throttled request is not a verdict on the license, so it must not strip a package other sites depend on.
+	 */
+	protected const UNENTITLED_LICENSE_STATUSES = [
+		'expired',
+		'revoked',
+		'disabled',
+		'missing',
+		'invalid',
+		'site_inactive',
+		'item_name_mismatch',
+		'invalid_item_id',
+		'no_activations_left',
+	];
 
 	/**
 	 * Class constructor.
@@ -121,11 +143,44 @@ class EDD_SL_Plugin_Updater {
 	 */
 	public function get_repo_api_data() {
 		$version_info = $this->get_cached_version_info();
-		if ( $version_info !== false ) {
+		if ( false === $version_info ) {
+			$version_info = $this->get_version_info();
+		}
+
+		return $this->maybe_apply_network_package( $version_info );
+	}
+
+	/**
+	 * Borrow a licensed download package cached by another site on the network
+	 *
+	 * On a Multisite where the plugin is activated per-site (not network-wide) each site checks for updates using its
+	 * own license. A site without a valid license still receives version info but an empty `package`, which would
+	 * otherwise overwrite the shared update_plugins transient and strip the download URL for every site. When any site
+	 * does hold a valid license it promotes its package to a network option (see set_version_info_cache()); here we fall
+	 * back to that package so the whole network can install the update.
+	 *
+	 * @param \stdClass|false $version_info
+	 *
+	 * @return \stdClass|false
+	 *
+	 * @since 6.16.0
+	 */
+	protected function maybe_apply_network_package( $version_info ) {
+		if ( ! is_multisite() || ! is_object( $version_info ) || ! empty( $version_info->package ) ) {
 			return $version_info;
 		}
 
-		return $this->get_version_info();
+		$network = $this->get_network_cached_version_info();
+		if (
+			is_object( $network )
+			&& ! empty( $network->package )
+			&& ! empty( $version_info->new_version )
+			&& version_compare( $network->new_version ?? '', $version_info->new_version, '>=' )
+		) {
+			$version_info->package = $network->package;
+		}
+
+		return $version_info;
 	}
 
 	/**
@@ -358,12 +413,9 @@ class EDD_SL_Plugin_Updater {
 		// Get the transient where we store the api request for this plugin for 24 hours
 		$edd_api_request_transient = $this->get_cached_version_info();
 
-		//If we have no transient-saved value, run the API, set a fresh transient with the API value, and return that value too right now.
+		//If we have no transient-saved value, run the API (which caches a successful response internally) and return it too right now.
 		if ( empty( $edd_api_request_transient ) ) {
 			$api_response = $this->get_version_info();
-
-			// Expires in 3 hours
-			$this->set_version_info_cache( $api_response );
 
 			if ( false !== $api_response ) {
 				$_data = $api_response;
@@ -372,12 +424,15 @@ class EDD_SL_Plugin_Updater {
 			$_data = $edd_api_request_transient;
 		}
 
-		if ( ! isset( $_data->plugin ) ) {
-			$_data->plugin = $this->name;
-		}
+		// $_data stays false when get_version_info() bails (API down, backoff, secondary site) — assigning to a bool fatals on PHP 8.
+		if ( is_object( $_data ) ) {
+			if ( ! isset( $_data->plugin ) ) {
+				$_data->plugin = $this->name;
+			}
 
-		if ( ! isset( $_data->version ) && ! empty( $_data->new_version ) ) {
-			$_data->version = $_data->new_version;
+			if ( ! isset( $_data->version ) && ! empty( $_data->new_version ) ) {
+				$_data->version = $_data->new_version;
+			}
 		}
 
 		return $_data;
@@ -408,6 +463,37 @@ class EDD_SL_Plugin_Updater {
 	}
 
 	/**
+	 * Normalize a sections/banners/icons value into an associative array.
+	 *
+	 * The store may hand these back as a JSON-encoded string, a legacy PHP-serialized array (a:N:{...}), or an
+	 * already-decoded object (some EDD endpoints). JSON is attempted first since it can't trigger object injection; a
+	 * serialized value is only unserialized when it is an array and with `allowed_classes => false`, so any nested
+	 * object is neutralized and a bare serialized-object payload (O:...) — the object-injection vector the earlier
+	 * hardening guarded against — is refused and collapses to an empty array.
+	 *
+	 * @param string|array|\stdClass $data
+	 *
+	 * @return array
+	 *
+	 * @since 6.16.0
+	 */
+	public function normalize_api_collection( $data ) {
+		if ( is_string( $data ) ) {
+			$json = json_decode( $data );
+
+			if ( json_last_error() === JSON_ERROR_NONE && ( is_array( $json ) || is_object( $json ) ) ) {
+				$data = $json;
+			} elseif ( preg_match( '/^a:\d+:\{/', $data ) ) {
+				$data = unserialize( $data, [ 'allowed_classes' => false ] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize -- object injection is guarded by allowed_classes => false
+			}
+		}
+
+		// A string we couldn't decode (or a failed unserialize) falls through here; convert_object_to_array() maps any
+		// non-array/object to [], so an unrecognized payload safely collapses to an empty collection.
+		return $this->convert_object_to_array( $data );
+	}
+
+	/**
 	 * Calls the API and, if successful, returns the object delivered by the API.
 	 *
 	 * @return \stdClass|false
@@ -415,6 +501,11 @@ class EDD_SL_Plugin_Updater {
 	public function get_version_info() {
 		/* Don't allow a plugin to ping itself */
 		if ( trailingslashit( home_url() ) === $this->api_url ) {
+			return false;
+		}
+
+		/* The primary site checks for updates on behalf of network-activated installs */
+		if ( \GPDFAPI::get_misc_class()->is_secondary_network_site( $this->name ) ) {
 			return false;
 		}
 
@@ -515,7 +606,7 @@ class EDD_SL_Plugin_Updater {
 	 *
 	 * @return array
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function get_version_api_params() {
 		return [
@@ -524,7 +615,7 @@ class EDD_SL_Plugin_Updater {
 			'item_id'     => $this->api_data['item_id'] ?? false,
 			'version'     => $this->api_data['version'] ?? false,
 			'slug'        => $this->slug,
-			'author'      => $this->api_data['author'],
+			'author'      => $this->api_data['author'] ?? '',
 			'url'         => home_url(),
 			'beta'        => $this->beta,
 			'php_version' => phpversion(),
@@ -571,6 +662,13 @@ class EDD_SL_Plugin_Updater {
 		$response = apply_filters( 'gpdf_sl_plugin_updater_api_response', $response, $this->api_data, $this->plugin_file );
 		$response = $this->standardize_api_response( $response );
 
+		// A 200 with an empty/unparseable body yields false — back off like any other failure so we don't re-POST every call.
+		if ( false === $response ) {
+			$this->log_failed_request();
+
+			return false;
+		}
+
 		$this->set_version_info_cache( $response );
 
 		return $response;
@@ -584,21 +682,44 @@ class EDD_SL_Plugin_Updater {
 	 * @return object|false
 	 */
 	public function get_cached_version_info( $cache_key = '' ) {
-
 		if ( empty( $cache_key ) ) {
 			$cache_key = $this->get_cache_key();
 		}
 
-		$cache = get_option( $cache_key );
+		return $this->read_timed_cache( get_option( $cache_key ) );
+	}
 
-		/* Cache is expired */
+	/**
+	 * Get the licensed version info promoted to the network cache by any site on a Multisite, if it exists
+	 *
+	 * @return \stdClass|false
+	 *
+	 * @since 6.16.0
+	 */
+	public function get_network_cached_version_info() {
+		return $this->read_timed_cache( get_site_option( $this->get_network_cache_key() ) );
+	}
+
+	/**
+	 * Decode a timed version-info cache payload, shared by the per-site and network cache readers
+	 *
+	 * @param mixed $cache The stored [ 'timeout' => int, 'value' => string ] payload
+	 *
+	 * @return \stdClass|false
+	 *
+	 * @since 6.16.0
+	 */
+	protected function read_timed_cache( $cache ) {
+		/* Guard against a corrupted scalar-string option: array access on a string throws a TypeError on PHP 8 */
+		if ( ! is_array( $cache ) ) {
+			return false;
+		}
+
 		if ( empty( $cache['timeout'] ) || time() > $cache['timeout'] ) {
 			return false;
 		}
 
-		$value = json_decode( $cache['value'] );
-
-		return $this->standardize_api_response( $value );
+		return $this->standardize_api_response( json_decode( $cache['value'] ) );
 	}
 
 	/**
@@ -626,6 +747,18 @@ class EDD_SL_Plugin_Updater {
 		];
 
 		update_option( $cache_key, $data, false );
+
+		/*
+		 * Promote the package to a network option so any site on the Multisite can install the update. The store can
+		 * return a package URL even when the license is inactive (that URL errors on access), so only an active license
+		 * is allowed to share its package. The promoting site is recorded so it alone can withdraw the package later.
+		 */
+		if ( is_multisite() && $this->is_license_active() && is_object( $value ) && ! empty( $value->package ) ) {
+			$network_data            = $data;
+			$network_data['timeout'] = time() + self::NETWORK_CACHE_TTL;
+			$network_data['blog_id'] = get_current_blog_id();
+			update_site_option( $this->get_network_cache_key(), $network_data );
+		}
 	}
 
 	/**
@@ -635,7 +768,7 @@ class EDD_SL_Plugin_Updater {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function delete_version_info_cache( $cache_key = '' ) {
 		if ( empty( $cache_key ) ) {
@@ -646,11 +779,40 @@ class EDD_SL_Plugin_Updater {
 	}
 
 	/**
+	 * Withdraw the package this site shared with the network, so a removed license stops backing network-wide downloads
+	 *
+	 * Ownership counts as much as the license state: a package promoted by another site belongs to a site that is still
+	 * licensed, and must outlive this one losing its own.
+	 *
+	 * @return bool
+	 *
+	 * @since 6.16.0
+	 */
+	public function delete_network_version_info_cache() {
+		if ( ! is_multisite() ) {
+			return false;
+		}
+
+		$lost_license = empty( $this->api_data['license'] ) || in_array( $this->license_status, self::UNENTITLED_LICENSE_STATUSES, true );
+		if ( ! $lost_license ) {
+			return false;
+		}
+
+		$cache_key = $this->get_network_cache_key();
+		$cache     = get_site_option( $cache_key );
+		if ( ! is_array( $cache ) || (int) ( $cache['blog_id'] ?? 0 ) !== get_current_blog_id() ) {
+			return false;
+		}
+
+		return delete_site_option( $cache_key );
+	}
+
+	/**
 	 * Delete the cached update info without removing the entire update plugin data
 	 *
 	 * @return bool
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function delete_transient_plugin_info() {
 		$plugin_update = get_site_transient( 'update_plugins' );
@@ -698,16 +860,51 @@ class EDD_SL_Plugin_Updater {
 	}
 
 	/**
+	 * The network option name used to share a licensed package across a Multisite
+	 *
+	 * @return string
+	 *
+	 * @since 6.16.0
+	 */
+	public function get_network_cache_key() {
+		return 'gpdf_sl_net_' . md5( $this->slug );
+	}
+
+	/**
 	 * Allow the license key to be set mid-flight
 	 *
 	 * @param string $license_key
 	 *
 	 * @return void
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function set_license_key( $license_key ) {
 		$this->api_data['license'] = $license_key;
+	}
+
+	/**
+	 * Allow the license status to be set mid-flight
+	 *
+	 * @param string $license_status
+	 *
+	 * @return void
+	 *
+	 * @since 6.16.0
+	 */
+	public function set_license_status( $license_status ) {
+		$this->license_status = $license_status;
+	}
+
+	/**
+	 * Whether the current site holds an active/valid license for this add-on
+	 *
+	 * @return bool
+	 *
+	 * @since 6.16.0
+	 */
+	protected function is_license_active() {
+		return in_array( $this->license_status, [ 'active', 'valid' ], true );
 	}
 
 	/**
@@ -716,20 +913,23 @@ class EDD_SL_Plugin_Updater {
 	 * @return false|\StdClass
 	 */
 	public function standardize_api_response( $response ) {
-		if ( empty( $response ) ) {
+		/* A non-object (false/null/scalar/array — from a filter or a malformed 200 body) would fatal on the property writes below (PHP 8) */
+		if ( ! is_object( $response ) ) {
 			return false;
 		}
 
+		// sections/banners/icons may arrive as a JSON string, a legacy serialized array, or an already-decoded object;
+		// normalize_api_collection() turns each into an array (see it for the object-injection guard on strings).
 		if ( isset( $response->sections ) ) {
-			$response->sections = $this->convert_object_to_array( maybe_unserialize( $response->sections ) );
+			$response->sections = $this->normalize_api_collection( $response->sections );
 		}
 
 		if ( isset( $response->banners ) ) {
-			$response->banners = $this->convert_object_to_array( maybe_unserialize( $response->banners ) );
+			$response->banners = $this->normalize_api_collection( $response->banners );
 		}
 
 		if ( isset( $response->icons ) ) {
-			$response->icons = $this->convert_object_to_array( maybe_unserialize( $response->icons ) );
+			$response->icons = $this->normalize_api_collection( $response->icons );
 		}
 
 		if ( ! empty( $response->sections ) ) {
@@ -757,10 +957,21 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * @return string
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	public function get_plugin_file() {
 		return $this->plugin_file;
+	}
+
+	/**
+	 * The plugin-folder basename sent as `slug` in the version API request and echoed back in the response.
+	 *
+	 * @return string
+	 *
+	 * @since 6.16.0
+	 */
+	public function get_slug() {
+		return $this->slug;
 	}
 
 	/**
@@ -773,14 +984,18 @@ class EDD_SL_Plugin_Updater {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.15.0
+	 * @since 6.16.0
 	 */
 	protected function is_non_active_multisite() {
 		if ( ! is_multisite() ) {
 			return false;
 		}
 
-		if ( is_plugin_active( $this->name ) ) {
+		// is_plugin_active() is in wp-admin/includes/plugin.php, unloaded on the frontend and during WP-Cron.
+		$active_plugins  = (array) get_option( 'active_plugins', [] );
+		$network_plugins = (array) get_site_option( 'active_sitewide_plugins', [] );
+
+		if ( in_array( $this->name, $active_plugins, true ) || isset( $network_plugins[ $this->name ] ) ) {
 			return false;
 		}
 

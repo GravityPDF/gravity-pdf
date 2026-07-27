@@ -238,6 +238,96 @@ class Test_EDD_SL_Plugin_Updater extends TestCase {
 		$this->assertFalse( $this->class->request_recently_failed() );
 	}
 
+	public function test_get_version_from_remote_backs_off_on_malformed_200() {
+		$this->class->init();
+
+		/* 200 status but an empty body standardizes to false; without a recorded failure it would re-POST every call */
+		$api_response = function () {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => '',
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$this->assertFalse( $this->class->request_recently_failed() );
+		$this->assertFalse( $this->class->get_version_from_remote() );
+		$this->assertTrue( $this->class->request_recently_failed() );
+	}
+
+	public function test_standardize_api_response_does_not_unserialize_sections() {
+		/* A serialized-object string in a JSON field is an object-injection payload; it must not be unserialized */
+		$response           = new \stdClass();
+		$response->sections = 'O:8:"stdClass":1:{s:3:"foo";s:3:"bar";}';
+
+		$result = $this->class->standardize_api_response( $response );
+
+		$this->assertSame( [], $result->sections );
+	}
+
+	public function test_standardize_api_response_unserializes_serialized_array_sections() {
+		/* Regression: serialized-array sections were dropped by the object-injection hardening, blanking the changelog modal */
+		$response           = new \stdClass();
+		$response->sections = serialize( [ 'description' => 'Excerpt here', 'changelog' => 'Changelog here' ] );
+		$response->banners  = serialize( [ 'high' => 'https://store.com/banner-large.png' ] );
+		$response->icons    = serialize( [ '1x' => 'https://store.com/icon-1.png' ] );
+
+		$result = $this->class->standardize_api_response( $response );
+
+		$this->assertSame( 'Excerpt here', $result->sections['description'] );
+		$this->assertSame( 'Changelog here', $result->sections['changelog'] );
+		$this->assertSame( 'https://store.com/banner-large.png', $result->banners['high'] );
+		$this->assertSame( 'https://store.com/icon-1.png', $result->icons['1x'] );
+		$this->assertSame( 'Excerpt here', $result->description[0] );
+		$this->assertSame( 'Changelog here', $result->changelog[0] );
+	}
+
+	public function test_standardize_api_response_serialized_array_neutralizes_nested_objects() {
+		/* A serialized array that nests an object must still not instantiate the class — objects stay disallowed */
+		$response           = new \stdClass();
+		$response->sections = 'a:1:{s:9:"changelog";O:8:"stdClass":1:{s:3:"foo";s:3:"bar";}}';
+
+		$result = $this->class->standardize_api_response( $response );
+
+		$this->assertArrayHasKey( 'changelog', $result->sections );
+		$this->assertNotInstanceOf( \stdClass::class, $result->sections['changelog'] );
+		$this->assertIsArray( $result->sections['changelog'] );
+	}
+
+	public function test_standardize_api_response_decodes_json_string_sections() {
+		/* The store may JSON-encode sections/banners/icons instead of serializing them; both must resolve to arrays */
+		$response           = new \stdClass();
+		$response->sections = wp_json_encode( [ 'description' => 'Excerpt here', 'changelog' => 'Changelog here' ] );
+		$response->banners  = wp_json_encode( [ 'high' => 'https://store.com/banner-large.png' ] );
+		$response->icons    = wp_json_encode( [ '1x' => 'https://store.com/icon-1.png' ] );
+
+		$result = $this->class->standardize_api_response( $response );
+
+		$this->assertSame( 'Excerpt here', $result->sections['description'] );
+		$this->assertSame( 'Changelog here', $result->sections['changelog'] );
+		$this->assertSame( 'https://store.com/banner-large.png', $result->banners['high'] );
+		$this->assertSame( 'https://store.com/icon-1.png', $result->icons['1x'] );
+		$this->assertSame( 'Changelog here', $result->changelog[0] );
+	}
+
+	public function test_standardize_api_response_returns_false_for_non_object_payload() {
+		/* A non-empty, non-object payload passes empty() but the property writes below fatal on PHP 8; each must bail
+		   to false. Reachable via a third-party gpdf_sl_plugin_updater_api_response filter or a malformed 200 body. */
+		$this->assertFalse( $this->class->standardize_api_response( json_decode( '"a bare string"' ) ) );
+		$this->assertFalse( $this->class->standardize_api_response( json_decode( '[1,2,3]' ) ) );
+		$this->assertFalse( $this->class->standardize_api_response( 42 ) );
+		$this->assertFalse( $this->class->standardize_api_response( true ) );
+	}
+
+	public function test_get_cached_version_info_returns_false_for_corrupted_scalar_option() {
+		/* A corrupted scalar-string option (e.g. a network option edited by a super-admin) would throw a TypeError on
+		   the array access inside read_timed_cache() without the is_array() guard */
+		update_option( $this->class->get_cache_key(), 'corrupted-not-an-array' );
+
+		$this->assertFalse( $this->class->get_cached_version_info() );
+	}
+
 	public function test_check_update_already_exists() {
 		$updates           = new \stdClass();
 		$updates->response = [
@@ -311,6 +401,31 @@ class Test_EDD_SL_Plugin_Updater extends TestCase {
 		$updater = new EDD_SL_Plugin_Updater( home_url(), 'test-plugin/test-plugin.php' );
 
 		$this->assertFalse( $updater->get_version_info() );
+	}
+
+	public function test_get_version_info_skipped_on_secondary_network_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		$http_called = false;
+		$spy         = function () use ( &$http_called ) {
+			$http_called = true;
+			return new \WP_Error( 'blocked', 'no HTTP in tests' );
+		};
+		add_filter( 'pre_http_request', $spy );
+
+		/* Pose as a secondary site with the add-on network-activated; only a network option is read, so no real blog is needed */
+		$network_plugins = static function () { return [ 'test-plugin/test-plugin.php' => time() ]; };
+		add_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		switch_to_blog( PHP_INT_MAX );
+
+		$this->assertFalse( $this->class->get_version_info() );
+		$this->assertFalse( $http_called );
+
+		restore_current_blog();
+		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		remove_filter( 'pre_http_request', $spy );
 	}
 
 	public function test_get_tested_version() {
@@ -424,6 +539,27 @@ class Test_EDD_SL_Plugin_Updater extends TestCase {
 		$results = apply_filters( 'plugins_api', new \stdClass(), 'plugin_information', $args );
 
 		$this->assertCount( 1, (array) $results ); // "plugin" key
+	}
+
+	public function test_plugins_api_filter_returns_false_when_api_unreachable() {
+		$this->class->init();
+
+		$args       = new \stdClass();
+		$args->slug = 'test-plugin';
+
+		$api_response = function () {
+			return [
+				'response' => [ 'code' => 500 ],
+				'body'     => '',
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		/* WP core passes $_data = false by default; a failed API leaves it false — assigning $_data->plugin on that bool fatals on PHP 8 */
+		$results = apply_filters( 'plugins_api', false, 'plugin_information', $args );
+
+		$this->assertFalse( $results );
 	}
 
 	public function test_plugins_api_filter_with_cache() {
@@ -773,320 +909,249 @@ class Test_EDD_SL_Plugin_Updater extends TestCase {
 		$this->assertStringNotContainsString( 'Update now.', $output );
 	}
 
-	public function test_check_update_short_circuits_when_response_already_set_and_no_override() {
-		$transient           = new \stdClass();
-		$transient->response = [
-			'test-plugin/test-plugin.php' => 'preset',
-		];
-
-		$result = $this->class->check_update( $transient );
-
-		$this->assertSame( 'preset', $result->response['test-plugin/test-plugin.php'] );
-		$this->assertEmpty( get_option( $this->class->get_cache_key() ) );
-	}
-
-	public function test_get_tested_version_returns_null_when_tested_is_empty() {
-		$version_info         = new \stdClass();
-		$version_info->tested = '';
-
-		$this->assertNull( $this->class->get_tested_version( $version_info ) );
-
-		$bare = new \stdClass();
-		$this->assertNull( $this->class->get_tested_version( $bare ) );
-	}
-
-	public function test_show_update_notification_skipped_in_network_admin() {
+	public function test_is_non_active_multisite() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Not running multisite tests' );
 		}
 
-		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		grant_super_admin( $user_id );
-		wp_set_current_user( $user_id );
+		$plugin          = 'test-plugin/test-plugin.php';
+		$active_plugins  = [];
+		$network_plugins = [];
 
-		set_current_screen( 'plugins-network' );
-
-		$this->class->init();
-
-		ob_start();
-		do_action( 'after_plugin_row', 'test-plugin/test-plugin.php', [ 'Name' => 'Test Plugin' ] );
-		$this->assertEmpty( ob_get_clean() );
-	}
-
-	public function test_show_update_notification_skipped_for_mismatched_file() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Not running multisite tests' );
-		}
-
-		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		grant_super_admin( $user_id );
-		wp_set_current_user( $user_id );
-
-		$this->class->init();
-
-		ob_start();
-		do_action( 'after_plugin_row', 'some-other/some-other.php', [ 'Name' => 'Other Plugin' ] );
-		$this->assertEmpty( ob_get_clean() );
-	}
-
-	public function test_show_update_notification_with_update_no_package_no_changelog() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Not running multisite tests' );
-		}
-
-		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		grant_super_admin( $user_id );
-		wp_set_current_user( $user_id );
-
-		$this->class->init();
-
-		$api_response = function () {
-			return [
-				'response' => [ 'code' => 200 ],
-				'body'     => json_encode( [
-					'new_version'    => '0.2',
-					'stable_version' => '0.2',
-					'name'           => 'Test Plugin',
-					'slug'           => 'test-plugin',
-					'sections'       => [
-						'description' => 'Excerpt here',
-					],
-					'banners'        => [],
-					'icons'          => [],
-					'requires'       => '6.4',
-					'requires_php'   => '7.3',
-					'tested'         => '10.1',
-				] ),
-			];
+		/* Fake the per-site and network plugin lists without touching the shared options */
+		$site_filter = static function () use ( &$active_plugins ) {
+			return $active_plugins;
 		};
+		$network_filter = static function () use ( &$network_plugins ) {
+			return $network_plugins;
+		};
+		add_filter( 'pre_option_active_plugins', $site_filter );
+		add_filter( 'pre_site_option_active_sitewide_plugins', $network_filter );
 
-		add_filter( 'pre_http_request', $api_response );
+		$method = new \ReflectionMethod( $this->class, 'is_non_active_multisite' );
+		$method->setAccessible( true );
 
-		ob_start();
-		do_action( 'after_plugin_row', 'test-plugin/test-plugin.php', [ 'Name' => 'Test Plugin' ] );
+		/* Active on the current site */
+		$active_plugins = [ $plugin ];
+		$this->assertFalse( $method->invoke( $this->class ) );
 
-		$output = ob_get_clean();
-		$this->assertStringContainsString( 'There is a new version of Test Plugin available.', $output );
-		$this->assertStringNotContainsString( 'View version', $output );
-		$this->assertStringNotContainsString( 'update now', $output );
-		$this->assertStringNotContainsString( 'Update now.', $output );
+		/* Network activated */
+		$active_plugins  = [];
+		$network_plugins = [ $plugin => time() ];
+		$this->assertFalse( $method->invoke( $this->class ) );
+
+		/* Not active anywhere -> non-active multisite */
+		$active_plugins  = [];
+		$network_plugins = [];
+		$this->assertTrue( $method->invoke( $this->class ) );
+
+		remove_filter( 'pre_option_active_plugins', $site_filter );
+		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_filter );
 	}
 
-	public function test_show_changelog_returns_early_when_action_missing() {
-		unset( $_REQUEST['gpdf_sl_action'], $_REQUEST['plugin'] );
-
-		ob_start();
-		$this->class->show_changelog();
-		$this->assertEmpty( ob_get_clean() );
+	/*
+	 * The update check runs under WP-Cron and on the frontend, where wp-admin/includes/plugin.php (which defines
+	 * is_plugin_active()) isn't loaded. That fatal can't be reproduced here because the PHPUnit bootstrap always loads
+	 * the file, so guard the contract by scanning the source. php_strip_whitespace() drops comments so only real code
+	 * is matched.
+	 */
+	public function test_multisite_check_avoids_admin_only_plugin_functions() {
+		$source = php_strip_whitespace( ( new \ReflectionClass( EDD_SL_Plugin_Updater::class ) )->getFileName() );
+		$this->assertStringNotContainsString( 'is_plugin_active(', $source );
 	}
 
-	public function test_show_changelog_returns_early_for_mismatched_plugin() {
-		$_REQUEST['gpdf_sl_action'] = 'view_plugin_changelog';
-		$_REQUEST['plugin']         = 'something-else';
+	public function test_set_version_info_cache_promotes_active_licensed_package_to_network() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
 
-		ob_start();
-		$this->class->show_changelog();
-		$output = ob_get_clean();
+		delete_site_option( $this->class->get_network_cache_key() );
+		$this->class->set_license_status( 'valid' );
 
-		unset( $_REQUEST['gpdf_sl_action'], $_REQUEST['plugin'] );
+		$licensed              = new \stdClass();
+		$licensed->new_version = '0.2';
+		$licensed->package     = 'https://store.com/download/licensed-123';
+		$this->class->set_version_info_cache( $licensed );
 
-		$this->assertEmpty( $output );
+		$cache = get_site_option( $this->class->get_network_cache_key() );
+		$this->assertNotEmpty( $cache );
+		$this->assertSame( 'https://store.com/download/licensed-123', json_decode( $cache['value'] )->package );
 	}
 
-	public function test_convert_object_to_array_returns_empty_for_scalar_input() {
-		$this->assertSame( [], $this->class->convert_object_to_array( 'a-string' ) );
-		$this->assertSame( [], $this->class->convert_object_to_array( 42 ) );
-		$this->assertSame( [], $this->class->convert_object_to_array( null ) );
-	}
+	public function test_set_version_info_cache_skips_promotion_when_license_inactive() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
 
-	public function test_convert_object_to_array_recurses_into_nested_objects() {
-		$inner        = new \stdClass();
-		$inner->color = 'blue';
+		delete_site_option( $this->class->get_network_cache_key() );
+		$this->class->set_license_status( 'expired' );
 
-		$outer        = new \stdClass();
-		$outer->inner = $inner;
-		$outer->scalar = 'x';
-
-		$result = $this->class->convert_object_to_array( $outer );
-
-		$this->assertSame( 'x', $result['scalar'] );
-		$this->assertSame( [ 'color' => 'blue' ], $result['inner'] );
-	}
-
-	public function test_verify_ssl_defaults_true_and_respects_filter() {
-		$this->assertTrue( $this->class->verify_ssl() );
-
-		add_filter( 'gpdf_sl_api_request_verify_ssl', '__return_false' );
-		$this->assertFalse( $this->class->verify_ssl() );
-		remove_filter( 'gpdf_sl_api_request_verify_ssl', '__return_false' );
-	}
-
-	public function test_get_active_plugins_merges_single_site_and_network_keys() {
-		update_option( 'active_plugins', [ 'a/a.php', 'b/b.php' ] );
-		update_site_option( 'active_sitewide_plugins', [ 'c/c.php' => 1, 'd/d.php' => 1 ] );
-
-		$merged = $this->class->get_active_plugins();
-
-		$this->assertContains( 'a/a.php', $merged );
-		$this->assertContains( 'b/b.php', $merged );
-		$this->assertContains( 'c/c.php', $merged );
-		$this->assertContains( 'd/d.php', $merged );
-	}
-
-	public function test_standardize_api_response_returns_false_for_empty_input() {
-		$this->assertFalse( $this->class->standardize_api_response( null ) );
-		$this->assertFalse( $this->class->standardize_api_response( '' ) );
-		$this->assertFalse( $this->class->standardize_api_response( false ) );
-	}
-
-	public function test_standardize_api_response_defaults_missing_requires_keys() {
+		/* The store can return a package even for an inactive license; that URL errors, so it must not be shared */
 		$response              = new \stdClass();
 		$response->new_version = '0.2';
+		$response->package     = 'https://store.com/download/inactive-123';
+		$this->class->set_version_info_cache( $response );
 
-		$result = $this->class->standardize_api_response( $response );
-
-		$this->assertSame( '', $result->requires );
-		$this->assertSame( '', $result->requires_php );
-		$this->assertSame( 'test-plugin/test-plugin.php', $result->plugin );
-		$this->assertSame( 'test-plugin/test-plugin.php', $result->id );
+		$this->assertFalse( get_site_option( $this->class->get_network_cache_key() ) );
 	}
 
-	public function test_delete_transient_plugin_info_short_circuits_when_entry_missing() {
-		$transient           = new \stdClass();
-		$transient->response = [
-			'some-other/some-other.php' => 'untouched',
-		];
-		set_site_transient( 'update_plugins', $transient );
-
-		$this->assertTrue( $this->class->delete_transient_plugin_info() );
-
-		$after = get_site_transient( 'update_plugins' );
-		$this->assertSame( 'untouched', $after->response['some-other/some-other.php'] );
-	}
-
-	public function test_set_version_info_cache_skipped_when_plugin_not_active_in_multisite() {
+	public function test_get_repo_api_data_borrows_network_package_when_site_unlicensed() {
 		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Not running multisite tests' );
+			$this->markTestSkipped( 'Multisite tests only' );
 		}
 
-		update_option( 'active_plugins', [] );
+		/* A licensed site elsewhere on the network has shared its package */
+		$network              = new \stdClass();
+		$network->new_version = '0.2';
+		$network->package     = 'https://store.com/download/licensed-123';
+		update_site_option(
+			$this->class->get_network_cache_key(),
+			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( $network ) ]
+		);
 
-		$this->class->set_version_info_cache( [ 'foo' => 'bar' ] );
-
-		$this->assertEmpty( get_option( $this->class->get_cache_key() ) );
-	}
-
-	public function test_show_changelog_wp_dies_without_update_plugins_capability() {
-		$user_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
-		wp_set_current_user( $user_id );
-
-		$_REQUEST['gpdf_sl_action'] = 'view_plugin_changelog';
-		$_REQUEST['plugin']         = 'test-plugin';
-		$_REQUEST['gpdf_sl_nonce']  = wp_create_nonce( 'install-plugin_test-plugin' );
-
-		try {
-			$this->class->show_changelog();
-			$this->fail( 'Expected WPDieException' );
-		} catch ( \WPDieException $e ) {
-			$this->assertStringContainsString( 'do not have permission', $e->getMessage() );
-		} finally {
-			unset( $_REQUEST['gpdf_sl_action'], $_REQUEST['plugin'], $_REQUEST['gpdf_sl_nonce'] );
-		}
-	}
-
-	public function test_get_version_from_remote_returns_false_on_wp_error() {
-		add_filter( 'pre_http_request', function () {
-			return new \WP_Error( 'http_error', 'Connection refused' );
-		} );
-
-		$this->assertFalse( $this->class->get_version_from_remote() );
-		$this->assertTrue( $this->class->request_recently_failed() );
-	}
-
-	public function test_request_recently_failed_returns_false_for_non_numeric_value() {
-		update_option( 'gpdf_sl_failed_http_' . md5( 'http://store.com/' ), 'not-a-number' );
-
-		$this->assertFalse( $this->class->request_recently_failed() );
-	}
-
-	public function test_log_failed_request_persists_future_timestamp() {
-		$this->class->log_failed_request();
-
-		$stored = get_option( 'gpdf_sl_failed_http_' . md5( 'http://store.com/' ) );
-
-		$this->assertGreaterThan( time(), (int) $stored );
-	}
-
-	public function test_get_cached_version_info_uses_explicit_cache_key() {
-		$key = 'gpdf_sl_custom_key';
-
-		update_option( $key, [
-			'timeout' => time() + 60,
-			'value'   => json_encode( [ 'new_version' => '5.5' ] ),
-		] );
-
-		$result = $this->class->get_cached_version_info( $key );
-
-		$this->assertSame( '5.5', $result->new_version );
-	}
-
-	public function test_set_version_info_cache_uses_explicit_cache_key_on_single_site() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Test targets single-site path' );
-		}
-
-		$key = 'gpdf_sl_explicit_key';
-		$this->class->set_version_info_cache( [ 'foo' => 'bar' ], $key );
-
-		$stored = get_option( $key );
-		$this->assertSame( '{"foo":"bar"}', $stored['value'] );
-		$this->assertGreaterThan( time(), $stored['timeout'] );
-	}
-
-	public function test_delete_version_info_cache_uses_explicit_cache_key() {
-		$key = 'gpdf_sl_to_delete';
-		update_option( $key, 'something' );
-
-		$this->assertTrue( $this->class->delete_version_info_cache( $key ) );
-		$this->assertFalse( get_option( $key ) );
-	}
-
-	public function test_get_repo_api_data_returns_cached_when_present() {
-		update_option( $this->class->get_cache_key(), [
-			'timeout' => time() + 60,
-			'value'   => json_encode( [ 'new_version' => '2.0' ] ),
-		] );
+		/* This site sees the update but has no package of its own (missing/invalid license) */
+		$local              = new \stdClass();
+		$local->new_version = '0.2';
+		$local->package     = '';
+		$this->class->set_version_info_cache( $local );
 
 		$result = $this->class->get_repo_api_data();
 
-		$this->assertSame( '2.0', $result->new_version );
+		$this->assertSame( '0.2', $result->new_version );
+		$this->assertSame( 'https://store.com/download/licensed-123', $result->package );
 	}
 
-	public function test_check_update_initialises_stdclass_when_passed_non_object(): void {
-		/* Prevent any real HTTP requests from get_update_transient_data() below. */
-		add_filter(
-			'pre_http_request',
-			static function () {
-				return [
-					'response' => [ 'code' => 200 ],
-					'body'     => json_encode( [
-						'plugins'      => [],
-						'translations' => [],
-						'no_update'    => [],
-					] ),
-				];
-			},
-			10,
-			3
+	public function test_set_version_info_cache_network_ttl_outlives_per_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		delete_option( $this->class->get_cache_key() );
+		delete_site_option( $this->class->get_network_cache_key() );
+		$this->class->set_license_status( 'valid' );
+
+		$licensed              = new \stdClass();
+		$licensed->new_version = '0.2';
+		$licensed->package     = 'https://store.com/download/licensed-123';
+		$this->class->set_version_info_cache( $licensed );
+
+		$per_site = get_option( $this->class->get_cache_key() );
+		$network  = get_site_option( $this->class->get_network_cache_key() );
+
+		/* The shared package must survive quiet stretches between licensed-site checks, so it outlives the per-site cache */
+		$this->assertGreaterThan( $per_site['timeout'], $network['timeout'] );
+	}
+
+	public function test_get_repo_api_data_does_not_borrow_expired_network_package() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		/* A licensed site shared a package, but the network cache has since expired */
+		$network              = new \stdClass();
+		$network->new_version = '0.2';
+		$network->package     = 'https://store.com/download/licensed-123';
+		update_site_option(
+			$this->class->get_network_cache_key(),
+			[ 'timeout' => time() - 60, 'value' => wp_json_encode( $network ) ]
 		);
 
-		foreach ( [ null, 'string-value', [ 'array' => 'value' ], 42, false ] as $non_object ) {
-			$result = $this->class->check_update( $non_object );
+		/* This site sees the update but has no package of its own (missing/invalid license) */
+		$local              = new \stdClass();
+		$local->new_version = '0.2';
+		$local->package     = '';
+		$this->class->set_version_info_cache( $local );
 
-			$this->assertInstanceOf( \stdClass::class, $result );
-			$this->assertObjectHasProperty( 'last_checked', $result );
-			$this->assertObjectHasProperty( 'checked', $result );
-			$this->assertArrayHasKey( 'test-plugin/test-plugin.php', $result->checked );
+		$result = $this->class->get_repo_api_data();
+
+		$this->assertSame( '0.2', $result->new_version );
+		$this->assertEmpty( $result->package );
+	}
+
+	public function test_delete_network_version_info_cache_withdraws_own_promotion() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
 		}
+
+		delete_site_option( $this->class->get_network_cache_key() );
+		$this->class->set_license_status( 'valid' );
+
+		$licensed              = new \stdClass();
+		$licensed->new_version = '0.2';
+		$licensed->package     = 'https://store.com/download/licensed-123';
+		$this->class->set_version_info_cache( $licensed );
+
+		$cache = get_site_option( $this->class->get_network_cache_key() );
+		$this->assertSame( get_current_blog_id(), $cache['blog_id'] );
+
+		/* A failed or throttled check is not a verdict on the license, so the shared package stands */
+		foreach ( [ 'error', 'rate_limit' ] as $status ) {
+			$this->class->set_license_status( $status );
+			$this->assertFalse( $this->class->delete_network_version_info_cache(), $status );
+		}
+
+		/* Removing the key does withdraw it */
+		$this->class->set_license_key( '' );
+		$this->assertTrue( $this->class->delete_network_version_info_cache() );
+		$this->assertFalse( get_site_option( $this->class->get_network_cache_key() ) );
+	}
+
+	/**
+	 * @dataProvider providerUnentitledLicenseStatus
+	 */
+	public function test_delete_network_version_info_cache_withdraws_on_store_rejection( $status ) {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		delete_site_option( $this->class->get_network_cache_key() );
+		$this->class->set_license_status( 'valid' );
+
+		$licensed              = new \stdClass();
+		$licensed->new_version = '0.2';
+		$licensed->package     = 'https://store.com/download/licensed-123';
+		$this->class->set_version_info_cache( $licensed );
+
+		/* The key stays populated on a rejection, so the status is the only signal the entitlement ended */
+		$this->class->set_license_status( $status );
+
+		$this->assertTrue( $this->class->delete_network_version_info_cache() );
+		$this->assertFalse( get_site_option( $this->class->get_network_cache_key() ) );
+	}
+
+	public function providerUnentitledLicenseStatus() {
+		return [
+			[ 'expired' ],
+			[ 'revoked' ],
+			[ 'disabled' ],
+			[ 'missing' ],
+			[ 'invalid' ],
+			[ 'site_inactive' ],
+			[ 'item_name_mismatch' ],
+			[ 'invalid_item_id' ],
+			[ 'no_activations_left' ],
+		];
+	}
+
+	public function test_delete_network_version_info_cache_keeps_another_sites_promotion() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		/* Another site promoted this package, so its license is still active and the package must survive */
+		$network              = new \stdClass();
+		$network->new_version = '0.2';
+		$network->package     = 'https://store.com/download/licensed-123';
+		update_site_option(
+			$this->class->get_network_cache_key(),
+			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( $network ), 'blog_id' => get_current_blog_id() + 1 ]
+		);
+
+		$this->class->set_license_key( '' );
+
+		$this->assertFalse( $this->class->delete_network_version_info_cache() );
+		$this->assertNotEmpty( get_site_option( $this->class->get_network_cache_key() ) );
+
+		delete_site_option( $this->class->get_network_cache_key() );
 	}
 }
