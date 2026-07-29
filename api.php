@@ -647,18 +647,21 @@ final class GPDFAPI {
 	 *   'font_name'   => 'Lato',
 	 *   'regular'     => '/full/path/to/font/Lato-Regular.ttf',
 	 *   'italics'     => '/full/path/to/font/Lato-Italic.ttf',
-	 *   'bold'        => '/full/path/to/font/Lato-Bold.ttf',
-	 *   'bolditalics' => '/full/path/to/font/Lato-BoldItalic.ttf',
+	 *   'bold'        => 'https://example.com/fonts/Lato-Bold.ttf',
+	 *   'bolditalics' => 'https://example.com/fonts/Lato-BoldItalic.ttf',
 	 * )
 	 *
 	 * Only the 'font_name' and 'regular' keys are required.
-	 * All fonts should be referenced with the full server path.
+	 * Fonts should be referenced with the full server path, or a http(s) URL that is downloaded
+	 * with wp_remote_get(). URLs must point to a .ttf file, resolve to a public address, and the
+	 * response cannot exceed 32MB.
 	 * Currently, only .ttf fonts are supported.
 	 * The font name can only contain alphanumeric characters, or a space
 	 *
 	 * @return bool|WP_Error
 	 *
 	 * @since 4.1
+	 * @since 6.17 Added support for http(s) URLs
 	 */
 	public static function add_pdf_font( $font ) {
 
@@ -683,30 +686,43 @@ final class GPDFAPI {
 		$request = new WP_REST_Request();
 		$request->set_param( 'label', $font['font_name'] ?? '' );
 
-		foreach ( $controller->get_font_keys() as $id ) {
-			if ( isset( $font[ $id ] ) && is_file( $font[ $id ] ) ) {
-				/* phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
-				$_FILES[ $id ] = [
-					'file'     => file_get_contents( $font[ $id ] ),
-					'name'     => basename( $font[ $id ] ),
-					'size'     => filesize( $font[ $id ] ),
-					'tmp_name' => $font[ $id ],
-					'error'    => UPLOAD_ERR_OK,
-				];
+		$downloader = new \GFPDF\Helper\Fonts\RemoteFontDownloader();
+
+		$id   = '';
+		$path = '';
+
+		try {
+			foreach ( $controller->get_font_keys() as $id ) {
+				$path = $font[ $id ] ?? '';
+				if ( ! is_string( $path ) || $path === '' ) {
+					continue;
+				}
+
+				/* Abort on the first bad URL rather than downloading fonts this call is going to discard */
+				if ( \GFPDF\Helper\Fonts\RemoteFontDownloader::is_url( $path ) ) {
+					$_FILES[ $id ] = $downloader->download( $path );
+				} elseif ( is_file( $path ) ) {
+					$_FILES[ $id ] = [
+						'name'     => basename( $path ),
+						'tmp_name' => $path,
+						'error'    => UPLOAD_ERR_OK,
+					];
+				}
 			}
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- $_FILES populated above from $font arg, not a form post.
+			$request->set_file_params( $_FILES );
+			$response = $controller->add_item( $request );
+
+			return is_wp_error( $response ) ? $response : true;
+		} catch ( \GFPDF\Exceptions\GravityPdfFontDownloadException $e ) {
+			self::get_log_class()->error( $e->getMessage(), [ 'url' => $path ] );
+
+			return new WP_Error( 'font_download_error', [ $id => $e->getMessage() ], [ 'status' => 400 ] );
+		} finally {
+			$_FILES = $files_backup;
+			$downloader->cleanup();
 		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- $_FILES populated above from $font arg, not a form post.
-		$request->set_file_params( $_FILES );
-		$response = $controller->add_item( $request );
-
-		$_FILES = $files_backup;
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		return true;
 	}
 
 	/**

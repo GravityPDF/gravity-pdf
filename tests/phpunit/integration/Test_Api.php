@@ -293,6 +293,142 @@ class Test_API extends TestCase {
 	}
 
 	/**
+	 * A public IP literal. Using an IP (instead of a hostname) keeps wp_http_validate_url() from
+	 * making a DNS lookup, so these tests never touch the network.
+	 */
+	private const FONT_URL = 'http://93.184.216.34/fonts/Chewy.ttf';
+
+	/**
+	 * Short-circuit wp_remote_get() and write the fixture font to the stream target
+	 */
+	private function mock_font_download( string $body, int $status = 200 ): void {
+		add_filter(
+			'pre_http_request',
+			function ( $preempt, $args ) use ( $body, $status ) {
+				if ( ! empty( $args['filename'] ) ) {
+					file_put_contents( $args['filename'], $body );
+				}
+
+				return [
+					'headers'  => [],
+					'body'     => '',
+					'response' => [
+						'code'    => $status,
+						'message' => get_status_header_desc( $status ),
+					],
+					'cookies'  => [],
+					'filename' => $args['filename'] ?? null,
+				];
+			},
+			10,
+			2
+		);
+	}
+
+	/**
+	 * @since 6.17
+	 */
+	public function test_add_pdf_font_from_url() {
+		$this->mock_font_download( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf' ) );
+
+		$results = GPDFAPI::add_pdf_font(
+			[
+				'font_name' => 'Test',
+				'regular'   => self::FONT_URL,
+			]
+		);
+
+		$this->assertTrue( $results );
+		$this->assertFileExists( PDF_FONT_LOCATION . 'Chewy.ttf' );
+
+		/* The temporary download is removed once the font is installed */
+		$this->assertSame( [], glob( get_temp_dir() . 'Chewy-*.tmp' ) );
+
+		GPDFAPI::delete_pdf_font( 'test' );
+	}
+
+	/**
+	 * URLs and absolute paths can be mixed within the one font
+	 *
+	 * @since 6.17
+	 */
+	public function test_add_pdf_font_from_url_and_path() {
+		$this->mock_font_download( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/DejaVuSans-Bold.ttf' ) );
+
+		$results = GPDFAPI::add_pdf_font(
+			[
+				'font_name' => 'Test',
+				'regular'   => PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf',
+				'bold'      => 'http://93.184.216.34/fonts/DejaVuSans-Bold.ttf',
+			]
+		);
+
+		$this->assertTrue( $results );
+
+		$font = GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->get_font_by_id( 'test' );
+		$this->assertSame( PDF_FONT_LOCATION . 'Chewy.ttf', $font['regular'] );
+		$this->assertFileExists( $font['bold'] );
+
+		GPDFAPI::delete_pdf_font( 'test' );
+	}
+
+	/**
+	 * A download failure surfaces as a font_download_error keyed by the font slot that failed
+	 *
+	 * The rejection rules themselves are covered by Test_RemoteFontDownloader; this only pins the wiring.
+	 *
+	 * @dataProvider provider_invalid_font_urls
+	 *
+	 * @since 6.17
+	 */
+	public function test_add_pdf_font_url_errors( string $url, int $status ) {
+		$this->mock_font_download( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf' ), $status );
+
+		$results = GPDFAPI::add_pdf_font(
+			[
+				'font_name' => 'Test',
+				'regular'   => $url,
+			]
+		);
+
+		$this->assertInstanceOf( \WP_Error::class, $results );
+		$this->assertSame( 'font_download_error', $results->get_error_code() );
+		$this->assertArrayHasKey( 'regular', $results->get_error_message() );
+
+		/* Nothing is installed, and no temporary file is left behind */
+		$this->assertArrayNotHasKey( 'User-Defined Fonts', GPDFAPI::get_pdf_fonts() );
+		$this->assertSame( [], glob( get_temp_dir() . 'Chewy-*.tmp' ) );
+	}
+
+	public function provider_invalid_font_urls(): array {
+		return [
+			'rejected before the request' => [ 'http://127.0.0.1/fonts/Chewy.ttf', 200 ],
+			'rejected after the request'  => [ self::FONT_URL, 404 ],
+		];
+	}
+
+	/**
+	 * A URL that downloads successfully but isn't a font is still rejected by the TTF validator
+	 *
+	 * @since 6.17
+	 */
+	public function test_add_pdf_font_url_rejects_non_font_content() {
+		$this->mock_font_download( '<html>not a font</html>' );
+
+		$results = GPDFAPI::add_pdf_font(
+			[
+				'font_name' => 'Test',
+				'regular'   => self::FONT_URL,
+			]
+		);
+
+		$this->assertInstanceOf( \WP_Error::class, $results );
+		$this->assertSame( 'font_validation_error', $results->get_error_code() );
+		$this->assertFileDoesNotExist( PDF_FONT_LOCATION . 'Chewy.ttf' );
+		$this->assertSame( [], glob( get_temp_dir() . 'Chewy-*.tmp' ) );
+	}
+
+	/**
 	 * Test we can correctly delete the font
 	 *
 	 * @since 4.1
