@@ -63,12 +63,9 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "GFPDF\\Tests\\Concerns\\": "tests/phpunit/Concerns/"
-    },
-    "classmap": [
-      "tests/phpunit/integration/TestCase.php",
-      "tests/phpunit/integration/AjaxTestCase.php"
-    ]
+      "GFPDF\\Tests\\Concerns\\": "tests/phpunit/Concerns/",
+      "GFPDF\\Tests\\Integration\\": "tests/phpunit/integration/"
+    }
   },
   "config": {
     "preferred-install": "dist",

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Abort on the first failure. Without this a broken step (a failed composer install skipping the
+# php-scoper prefix, say) still produced a zip, just one missing half the plugin.
+# No -u: BRANCH is intentionally unset below.
+set -eo pipefail
+
 echo $0 $1
 
 if [ $# -lt 1 ]; then
