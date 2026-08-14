@@ -123,7 +123,7 @@ class Test_View_PDF extends TestCase {
 	 * @group slow
 	 */
 	public function test_generate_pdf() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\View\View_PDF::generate_pdf' );
+		$this->setExpectedDeprecated( 'GFPDF\View\View_PDF::generate_pdf' );
 
 		global $gfpdf;
 

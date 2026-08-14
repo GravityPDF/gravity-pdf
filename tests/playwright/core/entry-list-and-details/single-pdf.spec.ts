@@ -2,7 +2,8 @@ import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
-import { takeSnapshot } from '@chromatic-com/playwright';
+import { FIXED_ENTRY_DATE } from '@self:playwright/utils/gravityforms';
+import { snapshot } from '@self:playwright/utils/snapshot';
 
 test.describe('Single PDF', () => {
 	let form = null;
@@ -28,7 +29,10 @@ test.describe('Single PDF', () => {
 			await pdf.createPdf(form.id, 'Single #1');
 
 			// create entry
-			entry = await pdf.createEntry({ form_id: form.id });
+			entry = await pdf.createEntry({
+				form_id: form.id,
+				date_created: FIXED_ENTRY_DATE,
+			});
 		}
 	);
 
@@ -45,7 +49,7 @@ test.describe('Single PDF', () => {
 		const pdfLink = page.getByRole('link', { name: 'View PDF' });
 		await page.locator('.has-row-actions').first().hover();
 
-		await takeSnapshot(page, testinfo);
+		await snapshot(page, testinfo);
 		await pdf.downloadAndVerifyPdf(pdfLink, 'Single #1.pdf');
 	});
 

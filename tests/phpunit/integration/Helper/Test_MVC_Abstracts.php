@@ -104,6 +104,8 @@ class Test_MVC_Abstracts extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_abstract_view() {
+		$this->setExpectedDeprecated( 'GFPDF\View\View_Settings::tabs' );
+
 		/*
 		 * Test our load function produces the correct output
 		 */

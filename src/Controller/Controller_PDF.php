@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Debug;
+use GFPDF\Statics\Deprecation_V3;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -204,7 +205,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		add_filter( 'gfpdf_pdf_html_output', $add_view_html_debugger, 9999, 5 );
 
 		/* Backwards compatibility for our Tier 2 plugin */
-		add_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ], 1, 8 );
+		add_filter( 'gfpdfe_pre_load_template', Deprecation_V3::INTERNAL_FILTER_CALLBACK, 1, 8 );
 
 		/* Pre-process our template arguments and automatically render them in PDF */
 		add_filter( 'gfpdf_template_args', [ $this->model, 'preprocess_template_arguments' ] );
@@ -240,7 +241,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 * add print dialog -> https://example.com/pdf/66307560bcdf4/2403/?print=1
 	 *
 	 * Recommend you generate the URL with a shortcode or merge tag
-	 * See https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags
+	 * See https://docs.gravitypdf.com/upgrade/legacy-download-urls/
 	 *
 	 * This method runs just before the main WP_Query class is executed
 	 *
@@ -292,7 +293,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 			return null;
 		}
 
-		_doing_it_wrong( __METHOD__, 'Legacy PDF URLs are deprecated. Replace with the [gravitypdf] shortcode or PDF merge tags. See https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags for usage instructions.', '4.0' );
+		_deprecated_function( __METHOD__, '4.0', 'the [gravitypdf] shortcode or PDF merge tags, https://docs.gravitypdf.com/upgrade/legacy-download-urls/' );
 
 		$config = [
 			'lid'      => (int) explode( ',', $_GET['lid'] )[0],
@@ -310,6 +311,9 @@ class Controller_PDF extends Helper_Abstract_Controller {
 			$this->pdf_error( $pid );
 		}
 
+		/* Report the form from now on, whether or not the URL itself lives anywhere the form scan can find it */
+		Deprecation_V3::record_legacy_endpoint_usage( $config['fid'] );
+
 		/* Store our ids in the WP query_vars object */
 		$GLOBALS['wp']->query_vars['gpdf'] = 1;
 		$GLOBALS['wp']->query_vars['pid']  = $pid;
@@ -323,7 +327,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 			]
 		);
 
-		$this->log->warning( 'Legacy PDF URLs are deprecated. Replace with the [gravitypdf] shortcode or PDF merge tags. See https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags for usage instructions.' );
+		$this->log->warning( sprintf( 'Legacy download URLs are removed in Gravity PDF %s. Replace with the [gravitypdf] shortcode or PDF merge tags. See https://docs.gravitypdf.com/upgrade/legacy-download-urls/ for upgrade instructions.', Deprecation_V3::REMOVED_IN ) );
 
 		/* Send to our model to handle validation / authentication */
 		do_action( 'gfpdf_legacy_pre_view_or_download_pdf', $config['lid'], $pid, $config['action'] );
@@ -399,7 +403,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 * @deprecated 6.12 All buffers are auto-closed before a PDF is sent to the browser
 	 */
 	public function sgoptimizer_html_minification_fix() {
-		_doing_it_wrong( __METHOD__, 'This method has been removed and no alternative is available.', '6.12' );
+		_deprecated_function( __METHOD__, '6.12' );
 	}
 
 	/**

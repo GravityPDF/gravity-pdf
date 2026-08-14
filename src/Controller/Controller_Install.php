@@ -206,6 +206,6 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * @deprecated 6.0
 	 */
 	public function maybe_uninstall() {
-		_doing_it_wrong( __METHOD__, 'This method has been moved to Controller_Uninstall::uninstall_addon()', '6.0' );
+		_deprecated_function( __METHOD__, '6.0', 'Controller_Uninstall::uninstall_addon()' );
 	}
 }

@@ -95,7 +95,7 @@ class Test_Controller_Install extends TestCase {
 	}
 
 	public function test_maybe_uninstall_emits_doing_it_wrong_notice() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\Controller\Controller_Install::maybe_uninstall' );
+		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_Install::maybe_uninstall' );
 
 		$this->controller->maybe_uninstall();
 	}

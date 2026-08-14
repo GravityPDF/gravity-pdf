@@ -61,7 +61,9 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @since 6.5
 	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
-	public function maybe_remove_non_pdf_messages(): void {}
+	public function maybe_remove_non_pdf_messages(): void {
+		_deprecated_function( __METHOD__, '6.11' );
+	}
 
 	/**
 	 * Determine which notice should be triggered
@@ -80,32 +82,32 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * Public endpoint for adding a new notice
 	 *
 	 * @param string $notice    The message to be queued
-	 * @param string $css_class The class that should be included with the notice box
+	 * @param string $css_class The class that should be included with the notice box. Pass a WordPress `notice-*`
+	 *                          state class, like `notice-warning`, to override the default success styling.
 	 *
 	 * @since 4.0
 	 */
 	public function add_notice( $notice, $css_class = '' ): void {
-		if ( empty( $css_class ) ) {
-			$this->notices[] = $notice;
-		} else {
-			$this->notices[ $css_class ] = $notice;
-		}
+		$this->notices[] = [
+			'message' => $notice,
+			'class'   => $css_class,
+		];
 	}
 
 	/**
 	 * Public endpoint for adding a new notice
 	 *
 	 * @param string $error     The error message that should be added
-	 * @param string $css_class Any class names that should apply to the error
+	 * @param string $css_class Any class names that should apply to the error, including a WordPress `notice-*`
+	 *                          state class to override the default error styling
 	 *
 	 * @since    4.0
 	 */
 	public function add_error( $error, $css_class = '' ) {
-		if ( empty( $css_class ) ) {
-			$this->errors[] = $error;
-		} else {
-			$this->errors[ $css_class ] = $error;
-		}
+		$this->errors[] = [
+			'message' => $error,
+			'class'   => $css_class,
+		];
 	}
 
 	/**
@@ -154,26 +156,26 @@ class Helper_Notices implements Helper_Interface_Actions {
 			return;
 		}
 
-		foreach ( $this->notices as $css_class => $notice ) {
-			$include_class = ( ! is_int( $css_class ) ) ? $css_class : '';
-			$this->html( $notice, 'updated ' . $include_class );
+		foreach ( $this->notices as $notice ) {
+			$this->html( $notice['message'], $notice['class'], 'updated' );
 		}
 
-		foreach ( $this->errors as $css_class => $error ) {
-			$include_class = ( ! is_int( $css_class ) ) ? $css_class : '';
-			$this->html( $error, 'error ' . $include_class );
+		foreach ( $this->errors as $error ) {
+			$this->html( $error['message'], $error['class'], 'error' );
 		}
 	}
 
 	/**
 	 * Generate the HTML used to display the notice / error
 	 *
-	 * @param string $text      The message to be displayed
-	 * @param string $css_class The class name (updated / error)
+	 * @param string $text          The message to be displayed
+	 * @param string $css_class     Any classes the caller asked for
+	 * @param string $default_state The state class used when the caller hasn't chosen one (updated / error)
 	 *
 	 * @since 4.0
+	 * @since 6.17.0 Added $default_state
 	 */
-	protected function html( string $text, string $css_class = 'updated' ): void {
+	protected function html( string $text, string $css_class = '', string $default_state = 'updated' ): void {
 		$allow_form_elements = static function ( $tags ) {
 			$tags['input'] = [
 				'type'  => true,
@@ -187,12 +189,16 @@ class Helper_Notices implements Helper_Interface_Actions {
 
 		add_filter( 'wp_kses_allowed_html', $allow_form_elements );
 
+		/* `div.updated` out-specifies `.notice-warning`, so a caller-supplied state replaces ours instead of joining it */
+		$state   = strpos( $css_class, 'notice-' ) === false ? $default_state : '';
+		$classes = trim( $state . ' ' . $css_class );
+
 		/* Add specific classes on Gravity Forms page so the notice displays correctly */
 		if ( class_exists( 'GFForms' ) && \GFForms::is_gravity_page() ) {
-			$classes  = 'notice gf-notice gform-settings__wrapper ' . $css_class;
-			$classes .= strpos( $css_class, 'updated' ) !== false ? ' notice-success' : '';
+			$classes  = 'notice gf-notice gform-settings__wrapper ' . $classes;
+			$classes .= $state === 'updated' ? ' notice-success' : '';
 		} else {
-			$classes = 'notice ' . $css_class;
+			$classes = 'notice ' . $classes;
 		}
 
 		?>
@@ -214,8 +220,9 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @return bool
 	 *
 	 * @since 6.11
+	 * @since 6.17.0 Made public so callers can skip building a notice that would be discarded
 	 */
-	protected function can_display_notice_on_this_page() {
+	public function can_display_notice_on_this_page() {
 		global $pagenow;
 
 		$misc = \GPDFAPI::get_misc_class();
@@ -251,6 +258,8 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
 	public function reset_gravityforms_messages( $messages ) {
+		_deprecated_function( __METHOD__, '6.11' );
+
 		return $messages;
 	}
 
@@ -265,6 +274,8 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
 	public function set_gravitypdf_notices( $messages ) {
+		_deprecated_function( __METHOD__, '6.11' );
+
 		return $messages;
 	}
 
@@ -279,6 +290,8 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
 	 */
 	public function set_gravitypdf_errors( $errors ) {
+		_deprecated_function( __METHOD__, '6.11' );
+
 		return $errors;
 	}
 }

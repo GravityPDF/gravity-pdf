@@ -788,7 +788,7 @@ class Helper_Misc {
 	 * @deprecated 6.12 compatibility code no longer required
 	 */
 	public function maybe_add_multicurrency_support() {
-		_doing_it_wrong( __METHOD__, 'This method has been removed and no alternative is available.', '6.12' );
+		_deprecated_function( __METHOD__, '6.12' );
 	}
 
 	/**

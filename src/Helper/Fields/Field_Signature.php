@@ -4,6 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use GFFormsModel;
 use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Statics\Deprecation;
 
 /**
  * @package     Gravity PDF
@@ -132,7 +133,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 			 * @param integer The original image width
 			 */
 			if ( $signature_details !== false ) {
-				$optimised_width = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
+				$optimised_width = Deprecation::apply_filters( 'gfpdfe_signature_width', [ $signature_details[0] / 3, $signature_details[0] ] );
 
 				/* See https://docs.gravitypdf.com/developers/filters/gfpdf_signature_width/ for more details about this filter */
 				$optimised_width = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );

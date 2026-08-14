@@ -49,8 +49,11 @@ yarn test:e2e:debug      # Open Playwright UI for interactive debugging
 ```
 
 E2E tests live in `tests/playwright/` and run against a single wp-env instance on port 8702. Permalink mode is flipped per Playwright project group via `tools/playwright/global-setup.ts` (which shells out to `wp-env run cli wp option update permalink_structure`):
-- `core` project — runs `core/*` and `permalinks/*` tests under plain permalinks.
-- `core-with-permalinks` project — re-runs `permalinks/*` tests under `/%postname%/` permalinks. Depends on `core` so it runs serially after the plain-permalink pass completes.
+- `core` project — runs `core/*` and `permalinks/*` tests under plain permalinks, less whatever `core-isolated` claims.
+- `core-isolated` project — specs whose fixtures change site-wide state the rest of the suite can observe (currently `core/system-status/*`, which raises an admin notice on every page the other snapshots are taken on). Depends on `core`, so nothing else is in flight while their state is live. `test.describe.configure({ mode: 'serial' })` only orders a single file and is not enough on its own.
+- `core-with-permalinks` project — re-runs `permalinks/*` tests under `/%postname%/` permalinks. Depends on `core-isolated` so it runs serially after the plain-permalink pass completes.
+
+Filters only narrow the projects you name: a project pulled in as a `dependency` runs in full regardless of `--grep` or a file filter. So a bare `yarn test:e2e -- <filter>` still runs everything, while `npx playwright test --config=tools/playwright/config.ts --project=core <filter>` runs just that slice plus `setup-core`. `--no-deps` isolates a project completely, but skipping `setup-core` leaves no storage state, so anything using `requestUtils` fails on auth.
 
 In CI, Playwright is sharded 4-ways via `--shard=N/4` (see `.github/workflows/playwright-e2e.yml`); each shard runs all setup projects against its own wp-env instance and executes its slice of the consumer projects' tests.
 

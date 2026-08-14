@@ -4,6 +4,8 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Statics\Deprecation;
+use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -22,6 +24,8 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Controller_Upgrade_Routines extends TestCase {
 
+	use CreatesLegacyDownloadUrls;
+
 	/**
 	 * @var \GFPDF\Helper\Helper_Options_Fields
 	 */
@@ -31,6 +35,33 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		parent::set_up();
 
 		$this->options = \GPDFAPI::get_options_class();
+	}
+
+	/**
+	 * A release is the moment a new round of removals arrives, so it is where detection runs for the notices that
+	 * report it — they would otherwise have to walk the database on every admin page load
+	 */
+	public function test_a_version_change_records_the_deprecated_functionality_in_use() {
+		$form_id = $this->create_form_with_legacy_url();
+
+		do_action( 'gfpdf_version_changed', '6.16.0', '6.17.0' );
+
+		$this->assertSame( [ 'legacy_endpoint' ], Deprecation::get_detected_features() );
+
+		/* Fixed on the site, so the next release clears the record the notices read */
+		\GFAPI::delete_form( $form_id );
+
+		do_action( 'gfpdf_version_changed', '6.17.0', '6.17.1' );
+
+		$this->assertSame( [], Deprecation::get_detected_features() );
+	}
+
+	public function test_an_install_records_the_deprecated_functionality_in_use() {
+		$this->create_form_with_legacy_url();
+
+		do_action( 'gfpdf_plugin_installed' );
+
+		$this->assertSame( [ 'legacy_endpoint' ], Deprecation::get_detected_features() );
 	}
 
 	public function test_6_0_0_background_process_upgrade_routine() {

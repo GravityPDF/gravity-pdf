@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import * as path from 'node:path';
-import { takeSnapshot } from '@chromatic-com/playwright';
+import { snapshot } from '@self:playwright/utils/snapshot';
 
 test.describe('Form PDF Settings', () => {
 	let pdf = null;
@@ -64,7 +64,7 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.page.waitForTimeout(1000);
 			await pdf.switchToCodeEditor();
-			await takeSnapshot(pdf.page, testinfo);
+			await snapshot(pdf.page, testinfo);
 		});
 
 		test('Notifications', async () => {
@@ -119,7 +119,7 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.page.waitForTimeout(1000);
 			await pdf.switchToCodeEditor();
-			await takeSnapshot(pdf.page, testinfo);
+			await snapshot(pdf.page, testinfo);
 
 			// Entry 1: Radio = "Second Choice" → PDF hidden by conditional logic
 			const entry1 = await pdf.createEntry({
@@ -184,7 +184,7 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.page.waitForTimeout(1000);
 			await pdf.switchToCodeEditor();
-			await takeSnapshot(pdf.page, testinfo);
+			await snapshot(pdf.page, testinfo);
 		});
 
 		test('Color Picker', async ({}, testinfo) => {
@@ -208,7 +208,7 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.switchToCodeEditor();
 			await colorPicker.click();
-			await takeSnapshot(pdf.page, testinfo);
+			await snapshot(pdf.page, testinfo);
 		});
 
 		test('Reverse Text RTL', async () => {
@@ -260,7 +260,7 @@ test.describe('Form PDF Settings', () => {
 			);
 
 			await pdf.switchToCodeEditor();
-			await takeSnapshot(pdf.page, testinfo);
+			await snapshot(pdf.page, testinfo);
 		});
 
 		test('Show Empty Fields', async () => {
@@ -382,7 +382,7 @@ test.describe('Form PDF Settings', () => {
 				.click();
 
 			await pdf.switchToCodeEditor();
-			await takeSnapshot(pdf.page, testinfo);
+			await snapshot(pdf.page, testinfo);
 		});
 
 		test('Public Access', async () => {

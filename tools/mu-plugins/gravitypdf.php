@@ -52,3 +52,39 @@ $addon = static function () {
 };
 
 add_action( 'init', $addon, 20 );
+
+/* The deprecation notices are under test, so only the core-font one stays suppressed for E2E runs */
+remove_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
+
+add_filter(
+	'gfpdf_one_time_action_routes',
+	static function ( $routes ) {
+		return array_values(
+			array_filter(
+				$routes,
+				static function ( $route ) {
+					return $route['action'] !== 'install_core_fonts';
+				}
+			)
+		);
+	}
+);
+
+/* Give the deprecation detection a third-party filter listener to find, on a hook of each shape it looks for: one
+   carrying the v3 `gfpdfe_` prefix and one it can only match by name. The callbacks are pass-throughs, so they
+   change nothing for the tests that run alongside them */
+add_action(
+	'init',
+	static function () {
+		if ( ! get_option( 'gfpdf_e2e_deprecated_filter' ) ) {
+			return;
+		}
+
+		$passthrough = static function ( $value ) {
+			return $value;
+		};
+
+		add_filter( 'gfpdf_rtl', $passthrough );
+		add_filter( 'gfpdf_legacy_templates', $passthrough );
+	}
+);

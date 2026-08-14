@@ -20,6 +20,8 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Statics\Debug;
+use GFPDF\Statics\Deprecation;
+use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Statics\Kses;
 use GFPDFEntryDetail;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -151,7 +153,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * @deprecated 6.12.0 Use \GPDFAPI::create_pdf() to generate PDFs
 	 */
 	public function generate_pdf( $entry, $settings ) {
-		_doing_it_wrong( __METHOD__, 'Use \GPDFAPI::create_pdf() to generate PDFs', '6.12' );
+		_deprecated_function( __METHOD__, '6.12', '\GPDFAPI::create_pdf()' );
 
 		$controller = $this->getController();
 		$model      = $controller->model;
@@ -159,7 +161,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		do_action( 'gfpdf_view_or_download_pdf', $form, $entry, $settings );
 
-		$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ?? 'download' ); /* Backwards compat */
+		$settings['pdf_action'] = Deprecation::apply_filters( 'gfpdfe_pdf_output_type', [ $settings['pdf_action'] ?? 'download' ] );
 
 		/* Setup the PDF that will be generated */
 		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
@@ -200,7 +202,7 @@ class View_PDF extends Helper_Abstract_View {
 			}
 
 			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-			if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
+			if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
 
 				/* Check if we should process this document using our legacy system */
 				if ( $model->handle_legacy_tier_2_processing( $pdf_generator, $entry, $settings, $args ) ) {
@@ -256,7 +258,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * @deprecated 4.1
 	 */
 	public function get_template_filename( $name ) {
-		_doing_it_wrong( __METHOD__, 'This method has been replaced by Helper_Misc::get_file_with_extension().', '4.1' );
+		_deprecated_function( __METHOD__, '4.1', 'Helper_Misc::get_file_with_extension()' );
 
 		return $this->misc->get_file_with_extension( $name, '.php' );
 	}
@@ -496,6 +498,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * @deprecated 6.10.1 Page fields are handled like all other fields, with markup generated using a dedicated Field_Page class
 	 */
 	public function display_page_name( $page, $form, Helper_Field_Container $container ) {
+		_deprecated_function( __METHOD__, '6.10.1', 'GFPDF\Helper\Fields\Field_Page' );
 
 		/* Only display the current page name if it exists */
 		if ( isset( $form['pagination']['pages'][ $page ] ) && strlen( trim( $form['pagination']['pages'][ $page ] ) ) > 0 ) {
@@ -540,16 +543,14 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
-		/* Prevent core styles loading if a v3 template or using our legacy Tier 2 add-on */
 		$template_info = $this->templates->get_template_info_by_id( $settings['template'] );
-		if (
-			( esc_html__( 'Legacy', 'gravity-pdf' ) !== $template_info['group'] ) &&
-			( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] )
-		) {
-			$html = $this->get_core_template_styles( $settings, $entry ) . $html;
+
+		/* A v3 template brings its own styles, and the Tier 2 add-on renders the document itself */
+		if ( $this->templates->is_legacy_template( $template_info ) || Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
+			return $html;
 		}
 
-		return $html;
+		return $this->get_core_template_styles( $settings, $entry ) . $html;
 	}
 
 	/**

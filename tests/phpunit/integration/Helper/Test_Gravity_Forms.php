@@ -437,6 +437,8 @@ class Test_Gravity_Forms extends TestCase {
 	 * @dataProvider provider_mergetag_test
 	 */
 	public function test_replace_variables( $mergetag, $value ) {
+		$this->setExpectedDeprecated( 'PDF_Common::do_mergetags' );
+
 		// Per-class form titles are dedup-suffixed by GFAPI (e.g. "Simple Form Testing (1)").
 		// Substitute the provider's expected title with the actual loaded form title.
 		if ( $mergetag === '{form_title}' ) {

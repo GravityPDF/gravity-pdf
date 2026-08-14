@@ -500,7 +500,9 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 * @since 6.12
 		 * @deprecated
 		 */
-		public function maybe_display_canonical_plugin_notice() {}
+		public function maybe_display_canonical_plugin_notice() {
+			_deprecated_function( __METHOD__, '6.12' );
+		}
 
 		/**
 		 * Notify administrator they are not using the canonical version of Gravity PDF
@@ -510,7 +512,9 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 * @since 6.12
 		 * @deprecated
 		 */
-		public function maybe_display_canonical_plugin_notice_below_plugin( $plugin_file, $plugin_data ) {}
+		public function maybe_display_canonical_plugin_notice_below_plugin( $plugin_file, $plugin_data ) {
+			_deprecated_function( __METHOD__, '6.12' );
+		}
 	}
 }
 

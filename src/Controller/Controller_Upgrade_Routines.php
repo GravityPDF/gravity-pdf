@@ -5,6 +5,7 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Statics\Deprecation;
 
 /**
  * @package     Gravity PDF
@@ -44,6 +45,7 @@ class Controller_Upgrade_Routines {
 	 */
 	public function init(): void {
 		add_action( 'gfpdf_version_changed', [ $this, 'maybe_run_upgrade' ], 10, 2 );
+		add_action( 'gfpdf_plugin_installed', [ $this, 'record_deprecated_functionality' ] );
 	}
 
 	/**
@@ -68,6 +70,23 @@ class Controller_Upgrade_Routines {
 			$this->remove_legacy_update_cache();
 			$this->remove_legacy_license_check_cron();
 		}
+
+		/* Deliberately ungated: every release is a chance for a new round of removals to arrive. Runs last, so it
+		   reflects the routines above */
+		$this->record_deprecated_functionality();
+	}
+
+	/**
+	 * Record the deprecated functionality this site uses, for the admin notices to read
+	 *
+	 * Taken at install and on every version change, since the notices would otherwise have to detect it on each of
+	 * the admin pages they can appear on. The system report and Site Health screens keep the record current in
+	 * between, detecting live as they do.
+	 *
+	 * @since 6.17.0
+	 */
+	public function record_deprecated_functionality(): void {
+		Deprecation::refresh_signals();
 	}
 
 	/**

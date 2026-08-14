@@ -155,6 +155,33 @@ class Test_Notices extends TestCase {
 		$this->assertStringContainsString( '<p>My First Error</p>', $html );
 	}
 
+	public function test_process_state_class() {
+		$this->notices->add_notice( 'My First Notice' );
+		$this->notices->add_notice( 'My Warning Notice', 'notice-warning' );
+		$this->notices->add_error( 'My Info Error', 'notice-info' );
+
+		ob_start();
+		$this->notices->process();
+		$html = ob_get_clean();
+
+		/* A `notice-*` class replaces the default state, instead of being appended to it */
+		$this->assertStringContainsString( '<div class="notice updated">', $html );
+		$this->assertStringContainsString( '<div class="notice notice-warning">', $html );
+		$this->assertStringContainsString( '<div class="notice notice-info">', $html );
+	}
+
+	public function test_process_same_class_twice() {
+		$this->notices->add_notice( 'My First Notice', 'notice-warning' );
+		$this->notices->add_notice( 'My Second Notice', 'notice-warning' );
+
+		ob_start();
+		$this->notices->process();
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( '<p>My First Notice</p>', $html );
+		$this->assertStringContainsString( '<p>My Second Notice</p>', $html );
+	}
+
 	public function test_html_notice() {
 		$form = 'Message <form method="post"><p><button class="button">Action</button><input class="button primary" type="submit" value="Dismiss" /></p></form>';
 

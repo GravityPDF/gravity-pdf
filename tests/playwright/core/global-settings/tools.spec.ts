@@ -2,7 +2,7 @@ import type { Admin } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
-import { takeSnapshot } from '@chromatic-com/playwright';
+import { snapshot } from '@self:playwright/utils/snapshot';
 
 test.describe('Tools Tab', () => {
 	test.describe('Install Core Fonts', () => {
@@ -65,7 +65,7 @@ test.describe('Tools Tab', () => {
 				})
 			).toBeVisible({ timeout: 60000 });
 
-			await takeSnapshot(page, testinfo);
+			await snapshot(page, testinfo);
 		});
 
 		test('should return download core fonts error/failed response', async ({

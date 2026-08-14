@@ -1,9 +1,10 @@
 import { expect } from '@wordpress/e2e-test-utils-playwright';
-import { takeSnapshot } from '@chromatic-com/playwright';
+import { snapshot } from '@self:playwright/utils/snapshot';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import { FIXED_ENTRY_DATE } from '@self:playwright/utils/gravityforms';
 
 test.describe('Multiple PDF', () => {
 	let form = null;
@@ -30,7 +31,10 @@ test.describe('Multiple PDF', () => {
 			}
 
 			// create entry
-			entry = await pdf.createEntry({ form_id: form.id });
+			entry = await pdf.createEntry({
+				form_id: form.id,
+				date_created: FIXED_ENTRY_DATE,
+			});
 		}
 	);
 
@@ -48,7 +52,7 @@ test.describe('Multiple PDF', () => {
 		await page.locator('.has-row-actions').first().hover();
 		await pdfLink.hover();
 
-		await takeSnapshot(page, testinfo);
+		await snapshot(page, testinfo);
 
 		await pdf.downloadAndVerifyPdf(
 			page.getByRole('link', { name: 'Multiple #2' }),
@@ -70,6 +74,6 @@ test.describe('Multiple PDF', () => {
 			page.getByLabel('View or download Multiple #2.pdf')
 		).toBeAttached();
 
-		await takeSnapshot(page, testinfo);
+		await snapshot(page, testinfo);
 	});
 });

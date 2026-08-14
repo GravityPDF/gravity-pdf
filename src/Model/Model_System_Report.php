@@ -9,6 +9,8 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Statics\Deprecation;
+use GFPDF\View\View_System_Report;
 use GFPDF_Major_Compatibility_Checks;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -90,11 +92,19 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 */
 	public function build_gravitypdf_report(): array {
 		$structure = $this->get_report_structure();
-		foreach ( $this->get_report_items() as $index => $report ) {
-			foreach ( $report as $id => $info ) {
-				$structure[0]['tables'][ $index ]['items'][ $id ] = $info;
-			}
+		$items     = $this->get_report_items();
+
+		foreach ( $structure[0]['tables'] as $index => $table ) {
+			$structure[0]['tables'][ $index ]['items'] = $items[ $table['id'] ] ?? [];
 		}
+
+		/* Drop any section with nothing to show, which is how the Deprecated section stays hidden on a clean site */
+		$structure[0]['tables'] = array_filter(
+			$structure[0]['tables'],
+			static function ( $table ) {
+				return ! empty( $table['items'] );
+			}
+		);
 
 		return $structure;
 	}
@@ -106,35 +116,49 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 */
 	public function get_report_structure(): array {
 		$title_export_prefix = 'Gravity PDF - ';
+		$deprecated_tables   = [];
+
+		/* Deprecation decides which groups there are and in what order; the view names them, once, for all three surfaces */
+		foreach ( View_System_Report::get_deprecated_groups() as $group => $names ) {
+			$deprecated_tables[] = [
+				'id'           => $group,
+				'title'        => esc_html( $names['label'] ),
+				'title_export' => $title_export_prefix . $names['label'],
+			];
+		}
+
 		return [
 			[
 				'title'        => esc_html__( 'Gravity PDF Environment', 'gravity-pdf' ),
 				'title_export' => 'Gravity PDF Environment',
-				'tables'       => [
+				'tables'       => array_merge(
+					$deprecated_tables,
 					[
-						'title'        => esc_html__( 'PHP', 'gravity-pdf' ),
-						'title_export' => $title_export_prefix . 'PHP',
-						'items'        => [],
-					],
+						[
+							'id'           => 'php',
+							'title'        => esc_html__( 'PHP', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'PHP',
+						],
 
-					[
-						'title'        => esc_html__( 'Directories and Permissions', 'gravity-pdf' ),
-						'title_export' => $title_export_prefix . 'Directories and Permissions',
-						'items'        => [],
-					],
+						[
+							'id'           => 'directories',
+							'title'        => esc_html__( 'Directories and Permissions', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'Directories and Permissions',
+						],
 
-					[
-						'title'        => esc_html__( 'Global Settings', 'gravity-pdf' ),
-						'title_export' => $title_export_prefix . 'Global Settings',
-						'items'        => [],
-					],
+						[
+							'id'           => 'global',
+							'title'        => esc_html__( 'Global Settings', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'Global Settings',
+						],
 
-					[
-						'title'        => esc_html__( 'Security Settings', 'gravity-pdf' ),
-						'title_export' => $title_export_prefix . 'Security Settings',
-						'items'        => [],
-					],
-				],
+						[
+							'id'           => 'security',
+							'title'        => esc_html__( 'Security Settings', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'Security Settings',
+						],
+					]
+				),
 			],
 		];
 	}
@@ -171,8 +195,13 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$temp_folder_protected  = $this->check_temp_folder_permission();
 		$temp_folder_permission = $this->is_temporary_folder_writable();
 
+		/* Keyed by group, which is what the matching report sections are named after */
+		foreach ( Deprecation::group_signals( Deprecation::refresh_signals() ) as $group => $signals ) {
+			$items[ $group ] = $this->get_deprecated_feature_items( $signals );
+		}
+
 		/* PHP */
-		$items[0] = [
+		$items['php'] = [
 			'memory'            => [
 				'label'        => esc_html__( 'WP Memory', 'gravity-pdf' ),
 				'label_export' => 'WP Memory',
@@ -200,7 +229,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		];
 
 		/* Directory and Permissions */
-		$items[1] = [
+		$items['directories'] = [
 			'pdf_working_directory'     => [
 				'label'        => esc_html__( 'PDF Working Directory', 'gravity-pdf' ),
 				'label_export' => 'PDF Working Directory',
@@ -246,10 +275,10 @@ class Model_System_Report extends Helper_Abstract_Model {
 			],
 		];
 
-		/* Check if outdated core template overrides and display warning */
+		/* Check for outdated core template overrides and display a warning */
 		$template_status = $this->check_core_template_override_versions();
 		if ( ! empty( $template_status ) ) {
-			$items[1]['outdated_templates'] = [
+			$items['directories']['outdated_templates'] = [
 				'label'        => esc_html__( 'Outdated Templates', 'gravity-pdf' ),
 				'label_export' => 'Outdated Templates',
 				'value'        => $template_status['value'],
@@ -269,7 +298,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 			[ 'a' => [ 'href' => true ] ]
 		);
 
-		$items[2] = [
+		$items['global'] = [
 			'canonical_release'             => [
 				'label'        => esc_html__( 'Canonical Release', 'gravity-pdf' ),
 				'label_export' => 'Canonical Release',
@@ -300,7 +329,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		];
 
 		/* Security Settings */
-		$items[3] = [
+		$items['security'] = [
 			'user_restrictions'  => [
 				'label'        => esc_html__( 'User Restrictions', 'gravity-pdf' ),
 				'label_export' => 'User Restrictions',
@@ -316,6 +345,27 @@ class Model_System_Report extends Helper_Abstract_Model {
 		];
 
 		return apply_filters( 'gfpdf_system_status_report_items', $items );
+	}
+
+	/**
+	 * Build the rows for one of the deprecation sections
+	 *
+	 * Each row is only included when that feature is actually in use on this site, and the section itself is
+	 * discarded by build_gravitypdf_report() when nothing is detected.
+	 *
+	 * @param array $signals The signals belonging to that section
+	 *
+	 * @since 6.17.0
+	 */
+	protected function get_deprecated_feature_items( array $signals ): array {
+		$view = $this->getController()->view;
+
+		$items = [];
+		foreach ( $signals as $key => $signal ) {
+			$items[ $key ] = $view->get_deprecated_feature_report_item( $key, $signal );
+		}
+
+		return $items;
 	}
 
 	/**
@@ -446,7 +496,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		foreach ( $templates as $path => $core_version ) {
 			$template = $this->templates->get_template_info_by_id( basename( $path, '.php' ) );
 			if ( version_compare( $core_version, $template['version'], '>' ) ) {
-				$relative_template_path = str_replace( ABSPATH, '/', $template['path'] );
+				$relative_template_path = $this->misc->relative_path( $template['path'], '/' );
 				$message                = $this->getController()->view->get_template_check_message( $relative_template_path, $template['version'], $core_version );
 
 				$value        .= $message['value'];

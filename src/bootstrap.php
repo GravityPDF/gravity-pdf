@@ -130,8 +130,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function __call( $name, $arguments ) {
-		/* translators: %s: deprecated method name */
-		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
+		_deprecated_function( esc_html( $name ), '4.0' );
 	}
 
 	/**
@@ -143,7 +142,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since  4.0
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
+		_deprecated_function( esc_html( $name ), '4.0' );
 	}
 
 	/**
@@ -920,7 +919,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
 		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates );
-		$class = new Controller\Controller_System_Report( $model, $view );
+		$class = new Controller\Controller_System_Report( $model, $view, $this->gform );
 		$class->init();
 
 		$this->singleton->add_class( $class );

@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Statics\Deprecation_V3;
 use WP_Error;
 
 /**
@@ -693,11 +694,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 */
 	public function get_advanced_template_field( $settings ) {
 
-		if ( ! class_exists( 'gfpdfe_business_plus' ) ) {
+		if ( ! Deprecation_V3::has_tier_2_addon() ) {
 			return $settings;
 		}
 
-		_doing_it_wrong( __METHOD__, 'Legacy templates are deprecated and no longer supported. Contact GravityPDF.com to discuss upgrade options.', '6.12' );
+		_deprecated_function( __METHOD__, '6.12', 'a Gravity PDF 6 template, https://docs.gravitypdf.com/upgrade/legacy-templates/' );
 
 		$settings['advanced_template'] = [
 			'id'   => 'advanced_template',
