@@ -363,7 +363,7 @@ final class GPDFAPI {
 	 *
 	 * @return string|WP_Error   Return the filename of the PDF, or a WP_Error on failure
 	 *
-	 * @since 7.0
+	 * @since 6.16.0
 	 */
 	public static function get_pdf_filename( $entry_id, $pdf_id, bool $include_extension = false ) {
 		$form_class = self::get_form_class();

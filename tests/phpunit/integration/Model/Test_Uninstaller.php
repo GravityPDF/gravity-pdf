@@ -179,9 +179,7 @@ class Test_Uninstaller extends TestCase {
 
 		$this->model->remove_plugin_options();
 
-		/* flush the options cache so fresh values can be checked from the database */
-		wp_cache_delete( 'alloptions', 'options' );
-
+		/* No cache flush here on purpose — the uninstall must invalidate what it deletes */
 		$this->assertFalse( get_option( 'gfpdf_is_installed' ) );
 		$this->assertFalse( get_option( 'gfpdf_current_version' ) );
 		$this->assertFalse( get_option( 'gfpdf_settings' ) );
