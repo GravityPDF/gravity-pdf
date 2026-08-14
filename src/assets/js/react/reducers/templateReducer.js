@@ -25,14 +25,21 @@ import {
  */
 
 /**
+ * @typedef { Object } TemplateUploadResult
+ * @property { boolean }       success   - whether the zip was installed
+ * @property { string }        filename  - the zip the result belongs to
+ * @property { Array<Object> } templates - the installed templates (successful uploads only)
+ * @property { string }        message   - the reason for the failure (failed uploads only)
+ */
+
+/**
  * @typedef { Object } TemplateReducerState
- * @property { Array<Object> } list                            - list of GFPDF prebuilt templates
- * @property { Object }        activeTemplate                  - current template used
- * @property { string }        search                          - filter keyword value
- * @property { string }        updateSelectBoxText             - state of select box text
- * @property { string }        templateProcessing              - state of template processed
- * @property { Object }        templateUploadProcessingSuccess - state when upload is successful
- * @property { Object }        templateUploadProcessingError   - state when upload is not successful
+ * @property { Array<Object> }               list                  - list of GFPDF prebuilt templates
+ * @property { Object }                      activeTemplate        - current template used
+ * @property { string }                      search                - filter keyword value
+ * @property { string }                      updateSelectBoxText   - state of select box text
+ * @property { string }                      templateProcessing    - state of template processed
+ * @property { Array<TemplateUploadResult> } templateUploadResults - results of the current upload batch
  */
 
 /**
@@ -48,8 +55,7 @@ export const initialState = {
 	search: '',
 	updateSelectBoxText: '',
 	templateProcessing: '',
-	templateUploadProcessingSuccess: {},
-	templateUploadProcessingError: {},
+	templateUploadResults: [],
 };
 
 /**
@@ -173,37 +179,43 @@ export default function (state = initialState, action) {
 			};
 
 		/**
-		 * Update with the new PDF template details
+		 * Record a successfully-installed zip. Results are appended (never replaced) so a batch of
+		 * uploads finishing in the same render can't overwrite each other
 		 *
 		 * @since 5.2
 		 */
 		case TEMPLATE_UPLOAD_PROCESSING_SUCCESS:
 			return {
 				...state,
-				templateUploadProcessingSuccess: action.payload,
+				templateUploadResults: [
+					...state.templateUploadResults,
+					{ ...action.payload, success: true },
+				],
 			};
 
 		/**
-		 * Update/Show error
+		 * Record a zip that failed to install
 		 *
 		 * @since 5.2
 		 */
 		case TEMPLATE_UPLOAD_PROCESSING_FAILED:
 			return {
 				...state,
-				templateUploadProcessingError: action.payload,
+				templateUploadResults: [
+					...state.templateUploadResults,
+					{ ...action.payload, success: false },
+				],
 			};
 
 		/**
-		 * Clear/reset state of templateUploadProcessingSuccess & templateUploadProcessingError
+		 * Clear/reset the results of the current upload batch
 		 *
 		 * @since 5.2
 		 */
 		case CLEAR_TEMPLATE_UPLOAD_PROCESSING:
 			return {
 				...state,
-				templateUploadProcessingSuccess: {},
-				templateUploadProcessingError: {},
+				templateUploadResults: [],
 			};
 	}
 

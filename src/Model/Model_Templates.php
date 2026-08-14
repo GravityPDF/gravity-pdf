@@ -10,7 +10,7 @@ use GFPDF\Helper\Helper_Templates;
 use GFPDF_Vendor\GravityPdf\Upload\File;
 use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
-use GFPDF_Vendor\GravityPdf\Upload\Validation\Mimetype;
+use GFPDF_Vendor\GravityPdf\Upload\Validation\FileType;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Size;
 use GPDFAPI;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -124,7 +124,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Unzip and check the PDF templates look valid */
 		try {
-			$this->unzip_and_verify_templates( $zip_path );
+			$unzipped_dir_name = $this->unzip_and_verify_templates( $zip_path );
 		} catch ( Exception $e ) {
 			$this->cleanup_template_files( $zip_path );
 
@@ -149,8 +149,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		}
 
 		/* Copy all the files to the active PDF working directory */
-		$unzipped_dir_name = $this->get_unzipped_dir_name( $zip_path );
-		$template_path     = $this->templates->get_template_path();
+		$template_path = $this->templates->get_template_path();
 
 		$results = $this->misc->copyr( $unzipped_dir_name, $template_path );
 
@@ -303,21 +302,18 @@ class Model_Templates extends Helper_Abstract_Model {
 		/* Validate our uploaded file and move to the PDF tmp directory for further processing */
 		$file->setName( uniqid() );
 
+		/* FileType requires the extension and the sniffed contents to describe the same format, where
+		   Extension and Mimetype side by side check two independent allow-lists. It sniffs, so it needs
+		   fileinfo — that should be loaded by default, but where it isn't, Extension on its own beats
+		   refusing every upload. */
 		$file->addValidations(
 			[
-				new Extension( 'zip' ),
-				new Size( '10240K' ), /* allow 10MB upload – accounts for fonts, PDF and PHP files */
+				new Size( Helper_Templates::get_max_upload_size() ),
+				extension_loaded( 'fileinfo' )
+					? new FileType( 'zip', [ 'application/zip', 'application/octet-stream' ] )
+					: new Extension( 'zip' ),
 			]
 		);
-
-		/* Do a check to ensure fileinfo is loaded. It should be loaded by default but in some cases this isn't so */
-		if ( extension_loaded( 'fileinfo' ) ) {
-			$file->addValidations(
-				[
-					new Mimetype( [ 'application/zip', 'application/octet-stream' ] ),
-				]
-			);
-		}
 
 		$file->upload();
 
@@ -342,9 +338,12 @@ class Model_Templates extends Helper_Abstract_Model {
 	 *
 	 * @param string $zip_path The full path to the zip file
 	 *
+	 * @return string The directory the PDF templates were found in
+	 *
 	 * @throws Exception Thrown if a PDF template file isn't valid
 	 *
 	 * @since 4.1
+	 * @since 6.17 Returns the directory the PDF templates were found in
 	 */
 	public function unzip_and_verify_templates( $zip_path ) {
 		$this->enable_wp_filesystem();
@@ -357,6 +356,8 @@ class Model_Templates extends Helper_Abstract_Model {
 			throw new Exception( esc_html( $results->get_error_message() ) );
 		}
 
+		$dir = $this->templates->get_template_root_dir( $dir );
+
 		/* Check unzipped templates for a valid v4 header, or v3 string pattern.
 		   Avoid glob() here — it can return a stale (empty) listing when called
 		   immediately after unzip_file() writes via the WP_Filesystem abstraction */
@@ -367,6 +368,8 @@ class Model_Templates extends Helper_Abstract_Model {
 		}
 
 		$this->check_for_valid_pdf_templates( $files );
+
+		return $dir;
 	}
 
 	/**

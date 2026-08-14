@@ -45,8 +45,6 @@ export const Routes = () => (
 					exact
 					element={
 						<TemplateList
-							ajaxUrl={GFPDF.ajaxUrl}
-							ajaxNonce={GFPDF.ajaxNonce}
 							templateDetailsText={GFPDF.templateDetails}
 							templateHeaderText={GFPDF.installedPdfs}
 							genericUploadErrorText={GFPDF.problemWithTheUpload}
@@ -68,6 +66,11 @@ export const Routes = () => (
 							templateInstallInstructions={
 								GFPDF.templateInstallInstructions
 							}
+							dropzoneText={GFPDF.templateUploadDropzone}
+							uploadInProgressText={
+								GFPDF.templateUploadInProgress
+							}
+							maxFileSize={GFPDF.templateUploadMaxSize}
 						/>
 					}
 				/>

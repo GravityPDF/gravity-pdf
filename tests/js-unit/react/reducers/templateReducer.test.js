@@ -182,60 +182,61 @@ describe('Reducers - templateReducer', () => {
 	});
 
 	describe('TEMPLATE_UPLOAD_PROCESSING_SUCCESS', () => {
-		test('check the correct state gets returned when this action runs', () => {
-			const test = { data: 'test' };
-			const newtest = { newtest: 'new-test' };
+		test('appends each result so concurrent uploads do not overwrite each other', () => {
 			newState = reducer(initialState, {
 				type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
-				payload: test,
+				payload: { filename: 'one.zip', templates: [] },
 			});
-
-			expect(newState.templateUploadProcessingSuccess).toBe(test);
 
 			newState = reducer(newState, {
 				type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
-				payload: newtest,
+				payload: { filename: 'two.zip', templates: [] },
 			});
 
-			expect(newState.templateUploadProcessingSuccess).toBe(newtest);
+			expect(newState.templateUploadResults).toEqual([
+				{ filename: 'one.zip', templates: [], success: true },
+				{ filename: 'two.zip', templates: [], success: true },
+			]);
 		});
 	});
 
 	describe('TEMPLATE_UPLOAD_PROCESSING_FAILED', () => {
-		test('check the correct state gets returned when this action runs', () => {
-			const error = { error: 'error' };
-			const newerror = { newerror: 'newerror' };
+		test('appends each result alongside any successful uploads', () => {
 			newState = reducer(initialState, {
-				type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-				payload: error,
+				type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
+				payload: { filename: 'one.zip', templates: [] },
 			});
-
-			expect(newState.templateUploadProcessingError).toBe(error);
 
 			newState = reducer(newState, {
 				type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-				payload: newerror,
+				payload: { filename: 'two.zip', message: 'error' },
 			});
 
-			expect(newState.templateUploadProcessingError).toBe(newerror);
+			expect(newState.templateUploadResults).toEqual([
+				{ filename: 'one.zip', templates: [], success: true },
+				{ filename: 'two.zip', message: 'error', success: false },
+			]);
 		});
 	});
 
 	describe('CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
 		test('check the correct state gets returned when this action runs', () => {
 			newState = reducer(initialState, {
-				type: CLEAR_TEMPLATE_UPLOAD_PROCESSING,
+				type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
+				payload: { filename: 'one.zip', templates: [] },
 			});
-
-			expect(newState.templateUploadProcessingSuccess).toEqual({});
-			expect(newState.templateUploadProcessingError).toEqual({});
 
 			newState = reducer(newState, {
 				type: CLEAR_TEMPLATE_UPLOAD_PROCESSING,
 			});
 
-			expect(newState.templateUploadProcessingSuccess).toEqual({});
-			expect(newState.templateUploadProcessingError).toEqual({});
+			expect(newState.templateUploadResults).toEqual([]);
+
+			newState = reducer(newState, {
+				type: CLEAR_TEMPLATE_UPLOAD_PROCESSING,
+			});
+
+			expect(newState.templateUploadResults).toEqual([]);
 		});
 	});
 

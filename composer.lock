@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "45c670075d119a64c3e7b101b78db661",
+    "content-hash": "e2f695d52575759449906f3ee12c5ada",
     "packages": [
         {
             "name": "gravitypdf/querypath",
@@ -72,16 +72,16 @@
         },
         {
             "name": "gravitypdf/upload",
-            "version": "3.1.0",
+            "version": "dev-hardening",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GravityPDF/Upload.git",
-                "reference": "7fff246f86d9b8f6277a0561ce28d2c229633e49"
+                "reference": "a3e2bc758266efe0ac377562f9b1ceb78d863bf5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GravityPDF/Upload/zipball/7fff246f86d9b8f6277a0561ce28d2c229633e49",
-                "reference": "7fff246f86d9b8f6277a0561ce28d2c229633e49",
+                "url": "https://api.github.com/repos/GravityPDF/Upload/zipball/a3e2bc758266efe0ac377562f9b1ceb78d863bf5",
+                "reference": "a3e2bc758266efe0ac377562f9b1ceb78d863bf5",
                 "shasum": ""
             },
             "require": {
@@ -94,8 +94,11 @@
             "require-dev": {
                 "php-parallel-lint/php-parallel-lint": "^1.3",
                 "phpstan/phpstan": "^1.8",
-                "squizlabs/php_codesniffer": "*",
+                "squizlabs/php_codesniffer": "^4.0",
                 "yoast/phpunit-polyfills": "^1.0"
+            },
+            "suggest": {
+                "ext-mbstring": "Truncates sanitized filenames on a character boundary and guarantees they are valid UTF-8"
             },
             "type": "library",
             "autoload": {
@@ -103,7 +106,23 @@
                     "GravityPdf\\Upload\\": "src/Upload"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "scripts": {
+                "check-syntax": [
+                    "@php ./vendor/bin/parallel-lint --exclude .git --exclude vendor ."
+                ],
+                "lint": [
+                    "@php ./vendor/bin/phpcs --standard=PSR12 ./src/ ./tests/"
+                ],
+                "lint:fix": [
+                    "@php ./vendor/bin/phpcbf --standard=PSR12 ./src/ ./tests/"
+                ],
+                "phpstan": [
+                    "@php ./vendor/bin/phpstan analyse -l 9 src tests"
+                ],
+                "phpunit": [
+                    "@php ./vendor/bin/phpunit"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -129,7 +148,7 @@
                 "issues": "https://github.com/gravitypdf/upload/issues",
                 "source": "https://github.com/gravitypdf/upload"
             },
-            "time": "2026-03-11T04:07:56+00:00"
+            "time": "2026-08-04T01:33:18+00:00"
         },
         {
             "name": "league/uri",
@@ -4895,6 +4914,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "gravitypdf/upload": 20,
         "mpdf/mpdf": 20,
         "roave/security-advisories": 20
     },

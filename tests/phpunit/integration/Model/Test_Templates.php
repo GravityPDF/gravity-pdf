@@ -7,6 +7,7 @@ use Exception;
 use GFPDF\Controller\Controller_Templates;
 use GFPDF\Helper\Fonts\LocalFile;
 use GFPDF\Helper\Fonts\LocalFilesystem;
+use GFPDF\Helper\Helper_Templates;
 use GFPDF\Model\Model_Templates;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF\Tests\Integration\TestCase;
@@ -179,6 +180,50 @@ class Test_Templates extends TestCase {
 		@unlink( $path );
 	}
 
+	/**
+	 * The upload has to be a zip by extension *and* by contents
+	 *
+	 * Validation\FileType pairs the two, where Extension and Mimetype side by side checked two
+	 * independent allow-lists and so accepted a file whose extension and contents disagreed.
+	 *
+	 * @since 6.17
+	 */
+	public function test_move_template_to_tmp_dir_requires_the_contents_to_match_the_extension() {
+		global $gfpdf;
+
+		/* A font wearing a .zip extension: the extension is allowed, the contents are not */
+		$disguised = $gfpdf->data->template_tmp_location . 'disguised.zip';
+		copy( PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/DejaVuSans.ttf', $disguised );
+
+		$_FILES['template'] = [
+			'name'     => 'disguised.zip',
+			'tmp_name' => $disguised,
+			'error'    => UPLOAD_ERR_OK,
+		];
+
+		try {
+			$this->model->move_template_to_tmp_dir( $this->getFileStub() );
+			$this->fail( 'Expected the disguised font to be refused.' );
+		} catch ( UploadException $e ) {
+			$this->assertSame( 'File validation failed', $e->getMessage() );
+		}
+
+		/* A real zip still passes */
+		$real = $this->make_zip( [ 'tmp' => '' ] );
+
+		$_FILES['template']['name']     = basename( $real );
+		$_FILES['template']['tmp_name'] = $real;
+
+		$path = $this->model->move_template_to_tmp_dir( $this->getFileStub() );
+
+		$this->assertFileExists( $path );
+
+		/* Cleanup */
+		@unlink( $disguised );
+		@unlink( $real );
+		@unlink( $path );
+	}
+
 
 	/**
 	 * Get if we get the expected results
@@ -294,6 +339,140 @@ class Test_Templates extends TestCase {
 			}
 			$gfpdf->templates->flush_template_transient_cache();
 		}
+	}
+
+	/**
+	 * Safari auto-extracts template zips on download. Re-zipping the resulting folder buries the PDF
+	 * templates a directory deep, which we need to see through.
+	 *
+	 * @since 6.17
+	 */
+	public function test_unzip_and_verify_templates_handles_rezipped_folder() {
+		global $gfpdf;
+
+		$gfpdf->templates->flush_template_transient_cache();
+
+		$zip = $this->make_zip(
+			[
+				'my-template/zadani.php'      => PDF_PLUGIN_DIR . 'src/templates/zadani.php',
+				'my-template/images/logo.txt' => 'not a template',
+			]
+		);
+
+		try {
+			$dir = $this->model->unzip_and_verify_templates( $zip );
+
+			$this->assertSame( $this->model->get_unzipped_dir_name( $zip ) . 'my-template/', $dir );
+			$this->assertFileExists( $dir . 'zadani.php' );
+		} finally {
+			@unlink( $zip ); /* phpcs:ignore */
+			$gfpdf->misc->rmdir( $this->model->get_unzipped_dir_name( $zip ) );
+			$gfpdf->templates->flush_template_transient_cache();
+		}
+	}
+
+	/**
+	 * @param string $expected  Path relative to the extracted directory
+	 * @param array  $entries   Zip contents
+	 *
+	 * @since        6.17
+	 *
+	 * @dataProvider provider_get_template_root_dir
+	 */
+	public function test_get_template_root_dir( string $expected, array $entries ) {
+		global $gfpdf;
+
+		$zip = $this->make_zip( $entries );
+
+		add_filter( 'filesystem_method', $direct = fn() => 'direct' );
+		WP_Filesystem();
+
+		try {
+			$dir = $this->model->get_unzipped_dir_name( $zip );
+			unzip_file( $zip, $dir );
+
+			$this->assertSame( $dir . $expected, $gfpdf->templates->get_template_root_dir( $dir ) );
+		} finally {
+			remove_filter( 'filesystem_method', $direct );
+			@unlink( $zip ); /* phpcs:ignore */
+			$gfpdf->misc->rmdir( $this->model->get_unzipped_dir_name( $zip ) );
+		}
+	}
+
+	/**
+	 * @return array
+	 *
+	 * @since 6.17
+	 */
+	public function provider_get_template_root_dir(): array {
+		$zadani = PDF_PLUGIN_DIR . 'src/templates/zadani.php';
+
+		return [
+			'templates at the top level'      => [
+				'',
+				[ 'zadani.php' => $zadani ],
+			],
+
+			'wrapped in a single folder'      => [
+				'my-template/',
+				[ 'my-template/zadani.php' => $zadani ],
+			],
+
+			/* A Finder-compressed folder — unzip_file() drops the root __MACOSX, leaving one wrapper */
+			'macOS-compressed folder'         => [
+				'my-template/',
+				[
+					'my-template/zadani.php'            => $zadani,
+					'__MACOSX/my-template/._zadani.php' => 'apple double',
+				],
+			],
+
+			'wrapped twice'                   => [
+				'outer/inner/',
+				[ 'outer/inner/zadani.php' => $zadani ],
+			],
+
+			'hidden folders are skipped'      => [
+				'my-template/',
+				[
+					'my-template/zadani.php' => $zadani,
+					'.git/HEAD'              => 'ref: refs/heads/main',
+				],
+			],
+
+			'ambiguous, so left alone'        => [
+				'',
+				[
+					'one/zadani.php' => $zadani,
+					'two/rubix.php'  => PDF_PLUGIN_DIR . 'src/templates/rubix.php',
+				],
+			],
+
+			'assets only, so left alone'      => [
+				'images/',
+				[ 'images/logo.txt' => 'not a template' ],
+			],
+		];
+	}
+
+	/**
+	 * @since 6.17
+	 */
+	public function test_get_max_upload_size() {
+		$this->assertSame( 32 * MB_IN_BYTES, Helper_Templates::MAX_UPLOAD_SIZE );
+
+		/* Never offer to accept more than the server itself will */
+		add_filter( 'upload_size_limit', $tiny = fn() => MB_IN_BYTES );
+		$this->assertSame( MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
+		remove_filter( 'upload_size_limit', $tiny );
+
+		add_filter( 'upload_size_limit', $huge = fn() => 512 * MB_IN_BYTES );
+		$this->assertSame( 32 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
+		remove_filter( 'upload_size_limit', $huge );
+
+		add_filter( 'gfpdf_template_max_upload_size', $override = fn() => 5 * MB_IN_BYTES );
+		$this->assertSame( 5 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
+		remove_filter( 'gfpdf_template_max_upload_size', $override );
 	}
 
 	/** Build a zip at a unique tmp path; entries map archive-name => file path (added via addFile) or raw content string (addFromString). */
