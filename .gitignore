@@ -16,6 +16,7 @@
 ### Libraries ###
 vendor/*
 vendor_prefixed/*
+tools/php-scoper/vendor/*
 
 ### Packages ###
 node_modules/*

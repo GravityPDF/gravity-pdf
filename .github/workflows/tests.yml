@@ -90,11 +90,13 @@ jobs:
           key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
           lookup-only: true
 
+      # 8.3 because this job runs php-scoper, which requires PHP 8.2+. composer.json pins the
+      # platform to 7.4, so the resolved dependencies are unaffected by the runtime version.
       - name: Setup PHP
         if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.3
 
       - name: Setup Node JS
         if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}

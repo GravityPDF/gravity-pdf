@@ -47,7 +47,6 @@
     "roave/security-advisories": "dev-master",
     "yoast/phpunit-polyfills": "^4.0",
     "wp-phpunit/wp-phpunit": "^6.4",
-    "humbug/php-scoper": "^0.15.0",
     "gravity/gravityforms": "*"
   },
   "suggest": {

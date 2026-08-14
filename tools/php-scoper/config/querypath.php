@@ -34,11 +34,16 @@ return [
 	 */
 	'patchers'  => [
 		function( string $filePath, string $prefix, string $content ): string {
-			return str_replace(
-				"'\\\\QueryPath\\\\",
-				"'\\\\$prefix\\\\QueryPath\\\\",
-				$content
-			);
+			/* Class names inside strings are left alone by php-scoper. Match both backslash spellings — how the printer escapes them depends on the parser version */
+			foreach ( [ '\\\\', '\\' ] as $slash ) {
+				$content = str_replace(
+					"'" . $slash . 'QueryPath' . $slash,
+					"'" . $slash . $prefix . $slash . 'QueryPath' . $slash,
+					$content
+				);
+			}
+
+			return $content;
 		},
 	],
 ];

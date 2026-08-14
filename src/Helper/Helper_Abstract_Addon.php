@@ -3,7 +3,7 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

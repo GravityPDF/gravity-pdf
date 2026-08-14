@@ -15,7 +15,7 @@ use GFPDF_Core;
 use GFPDF_Major_Compatibility_Checks;
 use GPDFAPI;
 use Gravity_Forms\Gravity_Forms\Async\GF_Background_Process;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /*
  * Bootstrap / Router Class

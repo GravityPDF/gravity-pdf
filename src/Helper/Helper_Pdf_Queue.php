@@ -5,7 +5,7 @@ namespace GFPDF\Helper;
 use Exception;
 use GF_Background_Process;
 use GFCommon;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

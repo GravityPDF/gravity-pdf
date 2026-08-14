@@ -12,7 +12,7 @@ use GFPDF\Helper\Helper_PDF;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Debug;
 use GFPDF\View\View_PDF;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

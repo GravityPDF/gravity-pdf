@@ -5,7 +5,7 @@ namespace GFPDF\Helper;
 use GFPDF\Controller\Controller_Custom_Fonts;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Statics\Kses;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
 
 /**
