@@ -321,6 +321,38 @@ class Test_Addon extends TestCase {
 	}
 
 	/**
+	 * @since 6.16.0
+	 */
+	public function test_schedule_license_check_skipped_on_secondary_network_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		/* A valid key so the check would otherwise build params and POST — proving the gate is what stops it */
+		$this->addon->update_license_info( [ 'license' => 'abc123', 'status' => 'valid' ] );
+
+		$http_called = false;
+		$spy         = function () use ( &$http_called ) {
+			$http_called = true;
+			return new \WP_Error( 'blocked', 'no HTTP in tests' );
+		};
+		add_filter( 'pre_http_request', $spy );
+
+		/* Pose as a secondary site with Gravity PDF network-activated; only a network option is read, so no real blog is needed */
+		$network_plugins = static function () { return [ PDF_PLUGIN_BASENAME => time() ]; };
+		add_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		switch_to_blog( PHP_INT_MAX );
+
+		$this->assertFalse( $this->addon->schedule_license_check() );
+		$this->assertFalse( $http_called );
+
+		restore_current_blog();
+		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		remove_filter( 'pre_http_request', $spy );
+		$this->addon->delete_license_info();
+	}
+
+	/**
 	 * @since 4.2
 	 */
 	public function test_auto_register_global_fields_fallback() {
@@ -450,6 +482,90 @@ class Test_Addon extends TestCase {
 		$this->assertNotEmpty( $this->addon->get_license_status() );
 	}
 
+	/**
+	 * @since 6.16.0
+	 */
+	public function test_hardcoded_license_retries_after_failed_activation() {
+		set_current_screen( 'index.php' );
+
+		add_filter( 'gfpdf_addon_hardcoded_license_key', function () {
+			return 'abc123';
+		} );
+
+		$http_calls = 0;
+		$ok         = false;
+		$api        = function () use ( &$http_calls, &$ok ) {
+			$http_calls++;
+
+			return $ok
+				? [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'valid' ] ) ]
+				: new \WP_Error( 'down', 'API unreachable' );
+		};
+
+		add_filter( 'pre_http_request', $api );
+
+		$this->addon->init();
+		$backoff = 'gfpdf_license_activation_' . $this->addon->get_slug();
+
+		/* First attempt: the API is down, so activation fails and isn't stored as active */
+		do_action( 'init' );
+		$this->assertSame( 1, $http_calls );
+		$this->assertNotContains( $this->addon->get_license_status(), [ 'active', 'valid' ] );
+
+		/* Backoff blocks an immediate retry so a bad/unreachable key doesn't POST on every request */
+		do_action( 'init' );
+		$this->assertSame( 1, $http_calls );
+
+		/* Once the backoff elapses the activation is retried — the old key-equality guard never retried */
+		delete_transient( $backoff );
+		$ok = true;
+		do_action( 'init' );
+		$this->assertSame( 2, $http_calls );
+		$this->assertSame( 'valid', $this->addon->get_license_status() );
+
+		remove_all_filters( 'gfpdf_addon_hardcoded_license_key' );
+	}
+
+	/**
+	 * @since 6.16.0
+	 */
+	public function test_hardcoded_license_activation_skipped_on_secondary_network_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		set_current_screen( 'index.php' );
+
+		add_filter( 'gfpdf_addon_hardcoded_license_key', static function () {
+			return 'abc123';
+		} );
+
+		$http_called = false;
+		$spy         = function () use ( &$http_called ) {
+			$http_called = true;
+			return new \WP_Error( 'blocked', 'no HTTP in tests' );
+		};
+		add_filter( 'pre_http_request', $spy );
+
+		/* Read the license state from the real blog before switching, so the assertions below reflect the gate */
+		$this->addon->init();
+
+		/* Pose as a secondary site with Gravity PDF network-activated; the primary handles activation */
+		$network_plugins = static function () { return [ PDF_PLUGIN_BASENAME => time() ]; };
+		add_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		switch_to_blog( PHP_INT_MAX );
+
+		do_action( 'init' );
+
+		$this->assertFalse( $http_called );
+		$this->assertEmpty( $this->addon->get_license_status() );
+
+		restore_current_blog();
+		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		remove_filter( 'pre_http_request', $spy );
+		remove_all_filters( 'gfpdf_addon_hardcoded_license_key' );
+	}
+
 	public function test_get_short_name_strips_gravity_pdf_prefix() {
 		$prefixed = new Addon(
 			'gpdf-sample',
@@ -552,6 +668,35 @@ class Test_Addon extends TestCase {
 		$this->assertStringContainsString( 'download_id=777', $output );
 	}
 
+	/**
+	 * @since 6.16.0
+	 */
+	public function test_license_registration_notice_hidden_on_secondary_network_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		/* Preconditions that would otherwise render the notice: a known EDD ID and an unregistered license */
+		$this->addon->set_edd_download_id( '123' );
+
+		/* Primary site shows the "Register your copy" prompt */
+		ob_start();
+		$this->addon->license_registration();
+		$this->assertStringContainsString( 'Register your copy', ob_get_clean() );
+
+		/* Pose as a secondary site with Gravity PDF network-activated; the primary handles licensing */
+		$network_plugins = static function () { return [ PDF_PLUGIN_BASENAME => time() ]; };
+		add_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		switch_to_blog( PHP_INT_MAX );
+
+		ob_start();
+		$this->addon->license_registration();
+		$this->assertEmpty( ob_get_clean() );
+
+		restore_current_blog();
+		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+	}
+
 	public function test_update_license_status_expired_response_includes_date_link() {
 		$this->addon->set_edd_download_id( '777' );
 
@@ -621,6 +766,34 @@ class Test_Addon extends TestCase {
 		$this->addon->update_license_status_from_response( 'abc', $response );
 
 		$this->assertSame( 'rate_limit', $this->addon->get_license_status() );
+	}
+
+	/**
+	 * A store rejection arrives with the key still populated, so the status has to carry the withdrawal end to end.
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_rejected_license_response_withdraws_network_package() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		$this->addon->init();
+		do_action( 'init' );
+
+		$updater = $this->addon->get_plugin_updater();
+		$package = (object) [ 'new_version' => '2.0', 'package' => 'https://store.com/download/123' ];
+
+		update_site_option(
+			$updater->get_network_cache_key(),
+			[ 'timeout' => strtotime( '+3 days' ), 'value' => wp_json_encode( $package ), 'blog_id' => get_current_blog_id() ]
+		);
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'expired', 'expires' => '2020-01-01 00:00:00' ] ) ];
+		$this->addon->update_license_status_from_response( 'unchanged-key', $response );
+
+		$this->assertSame( 'expired', $this->addon->get_license_status() );
+		$this->assertFalse( get_site_option( $updater->get_network_cache_key() ) );
 	}
 
 	public function test_activate_license_fires_action_and_returns_license_info() {
@@ -749,6 +922,7 @@ class Test_Addon extends TestCase {
 			new Helper_Notices()
 		);
 		$other->set_edd_download_id( '888' );
+		$other->update_license_info( [ 'license' => 'other-key', 'status' => 'valid', 'message' => '' ] );
 
 		$this->addon->set_edd_download_id( '777' );
 
@@ -760,6 +934,64 @@ class Test_Addon extends TestCase {
 		$this->addon->maybe_auto_activate_license( $response, $other, false );
 
 		$this->assertFalse( $this->addon->has_license_auto_activated() );
+		$this->assertEmpty( $this->addon->get_license_status() );
+	}
+
+	/**
+	 * A plain (non-Access-Pass) activation response has no products array, so nothing is shared.
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_maybe_auto_activate_license_ignores_non_access_pass_response() {
+		$this->addon->set_edd_download_id( 10 );
+		$this->addon2->set_edd_download_id( 20 );
+		$this->addon->update_license_info( [ 'license' => 'KEY', 'status' => 'active', 'message' => 'ok' ] );
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'valid' ] ) ];
+		$this->addon2->maybe_auto_activate_license( $response, $this->addon, false );
+
+		$this->assertFalse( $this->addon2->has_license_auto_activated() );
+
+		$this->addon->delete_license_info();
+	}
+
+	/**
+	 * The gfpdf_addon_post_license_activation action is public: a third-party do_action() may pass a non-addon second
+	 * arg (or omit the third), which must not fatal.
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_maybe_auto_activate_license_ignores_non_addon_arg() {
+		$this->addon->set_edd_download_id( 10 );
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'valid', 'products' => [ 10 ] ] ) ];
+		$this->addon->maybe_auto_activate_license( $response, 'not-an-addon' );
+
+		$this->assertFalse( $this->addon->has_license_auto_activated() );
+	}
+
+	/**
+	 * The sibling's cached update info was fetched unlicensed (so it holds no package) and must not survive the
+	 * Access Pass adopting a key.
+	 *
+	 * @since 6.16.0
+	 */
+	public function test_maybe_auto_activate_license_flushes_update_cache() {
+		$this->addon->set_edd_download_id( 10 );
+		$this->addon2->set_edd_download_id( 20 );
+
+		/* Seed first — init() re-reads the license info from the database, overwriting the in-memory copy */
+		$updater = $this->seed_update_cache( $this->addon2 );
+
+		$this->addon->update_license_info( [ 'license' => 'AP-KEY', 'status' => 'active', 'message' => 'ok' ] );
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'valid', 'products' => [ 10, 20 ] ] ) ];
+		$this->addon2->maybe_auto_activate_license( $response, $this->addon, false );
+
+		$this->assertFalse( $updater->get_cached_version_info() );
+
+		$this->addon->delete_license_info();
+		$this->addon2->delete_license_info();
 	}
 
 	public function test_maybe_auto_deactivate_license_when_addon_in_access_pass() {
@@ -779,6 +1011,9 @@ class Test_Addon extends TestCase {
 
 		$this->addon->set_edd_download_id( '777' );
 
+		/* The initiator has already wiped its own license before firing the action, so the sibling's must go too */
+		$this->addon->update_license_info( [ 'license' => 'AP-KEY', 'status' => 'active', 'message' => 'ok' ] );
+
 		$response = [
 			'response' => [ 'code' => 200 ],
 			'body'     => json_encode( [ 'products' => [ 777, 888 ] ] ),
@@ -787,6 +1022,41 @@ class Test_Addon extends TestCase {
 		$this->addon->maybe_auto_deactivate_license( $response, $other );
 
 		$this->assertTrue( $this->addon->has_license_auto_deactivated() );
+		$this->assertEmpty( $this->addon->get_license_status() );
+
+		$this->addon->delete_license_info();
+	}
+
+	/**
+	 * @since 6.16.0
+	 */
+	public function test_maybe_auto_deactivate_license_ignores_non_addon_arg() {
+		$this->addon->set_edd_download_id( 10 );
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'deactivated', 'products' => [ 10 ] ] ) ];
+		$this->addon->maybe_auto_deactivate_license( $response, 'not-an-addon' );
+
+		$this->assertFalse( $this->addon->has_license_auto_deactivated() );
+	}
+
+	/**
+	 * @since 6.16.0
+	 */
+	public function test_maybe_auto_deactivate_license_flushes_update_cache() {
+		$this->addon->set_edd_download_id( 10 );
+		$this->addon2->set_edd_download_id( 20 );
+		$this->addon->delete_license_info();
+
+		$updater = $this->seed_update_cache( $this->addon2 );
+
+		$this->addon2->update_license_info( [ 'license' => 'AP-KEY', 'status' => 'active', 'message' => 'ok' ] );
+
+		$response = [ 'response' => [ 'code' => 200 ], 'body' => wp_json_encode( [ 'license' => 'deactivated', 'products' => [ 10, 20 ] ] ) ];
+		$this->addon2->maybe_auto_deactivate_license( $response, $this->addon );
+
+		$this->assertFalse( $updater->get_cached_version_info() );
+
+		$this->addon2->delete_license_info();
 	}
 
 	public function test_flush_update_cache_is_noop_without_plugin_updater() {
@@ -803,6 +1073,26 @@ class Test_Addon extends TestCase {
 		$this->addon->flush_update_cache();
 
 		$this->assertEmpty( get_option( $this->addon->get_plugin_updater()->get_cache_key() ) );
+	}
+
+	/**
+	 * Boot the add-on's updater and prime its version-info cache
+	 *
+	 * @param Helper_Abstract_Addon $addon
+	 *
+	 * @return \GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater
+	 */
+	private function seed_update_cache( $addon ) {
+		$addon->init();
+		do_action( 'init' );
+
+		$updater = $addon->get_plugin_updater();
+		update_option(
+			$updater->get_cache_key(),
+			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( (object) [ 'new_version' => '2.0', 'package' => '' ] ) ]
+		);
+
+		return $updater;
 	}
 }
 

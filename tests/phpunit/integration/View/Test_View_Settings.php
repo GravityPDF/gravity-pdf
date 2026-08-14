@@ -67,6 +67,29 @@ class Test_View_Settings extends TestCase {
 		$this->assertArrayNotHasKey( 20, $tabs );
 	}
 
+	public function test_get_available_tabs_hides_license_tab_on_secondary_network_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		$this->data->add_addon( $this->make_addon( 'addon-a' ) );
+
+		/* Primary site: licensing is managed here, so the tab is present */
+		$this->assertContains( 'license', wp_list_pluck( $this->view->get_available_tabs(), 'id' ) );
+
+		/* Pose as a secondary site with Gravity PDF network-activated; only a network option is read, so no real blog is needed */
+		$network_plugins = static function () {
+			return [ PDF_PLUGIN_BASENAME => time() ];
+		};
+		add_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+		switch_to_blog( PHP_INT_MAX );
+
+		$this->assertNotContains( 'license', wp_list_pluck( $this->view->get_available_tabs(), 'id' ) );
+
+		restore_current_blog();
+		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
+	}
+
 	public function test_get_available_tabs_adds_extensions_tab_when_addon_implements_interface() {
 		$this->data->add_addon( $this->make_addon( 'addon-a' ) );
 		$this->data->add_addon( $this->make_extension_addon( 'addon-b' ) );
