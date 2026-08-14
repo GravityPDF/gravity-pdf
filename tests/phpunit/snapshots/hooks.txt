@@ -238,6 +238,7 @@ filter gfpdf_template_image_paths 1
 filter gfpdf_template_list 1
 filter gfpdf_template_location 3
 filter gfpdf_template_location_uri 3
+filter gfpdf_template_max_upload_size 1
 filter gfpdf_tmp_location 3
 filter gfpdf_uncached_pdf_max_age 1
 filter gfpdf_unfiltered_template_list 1

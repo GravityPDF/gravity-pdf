@@ -131,18 +131,24 @@ describe('Actions - templates', () => {
 
 	test('templateUploadProcessingSuccess - check if it returns the correct action', () => {
 		data = { success: { data: 'success' } };
-		results = templateUploadProcessingSuccess(data);
+		results = templateUploadProcessingSuccess(data, 'template.zip');
 
 		expect(results.type).toEqual(TEMPLATE_UPLOAD_PROCESSING_SUCCESS);
-		expect(results.payload).toEqual({ success: { data: 'success' } });
+		expect(results.payload).toEqual({
+			success: { data: 'success' },
+			filename: 'template.zip',
+		});
 	});
 
 	test('templateUploadProcessingFailed - check if it returns the correct action', () => {
 		data = { error: { error: 'error' } };
-		results = templateUploadProcessingFailed(data);
+		results = templateUploadProcessingFailed(data, 'template.zip');
 
 		expect(results.type).toEqual(TEMPLATE_UPLOAD_PROCESSING_FAILED);
-		expect(results.payload).toEqual({ error: { error: 'error' } });
+		expect(results.payload).toEqual({
+			error: { error: 'error' },
+			filename: 'template.zip',
+		});
 	});
 
 	test('clearTemplateUploadProcessing - check if it returns the correct action', () => {

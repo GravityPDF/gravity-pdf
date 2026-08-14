@@ -681,6 +681,7 @@ class GFPDF\Helper\Helper_Singleton
     public function get_class($name)
 
 class GFPDF\Helper\Helper_Templates
+    const MAX_UPLOAD_SIZE = 33554432
     public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Abstract_Form $gform)
     public function flush_template_transient_cache()
     public function get_all_template_info()
@@ -700,6 +701,7 @@ class GFPDF\Helper\Helper_Templates
     public function get_template_info_by_path($template_path, $cache_name = '', $cache_time = 604800)
     public function get_template_path()
     public function get_template_path_by_id($template_id, $include_core = true)
+    public function get_template_root_dir($dir)
     public function get_template_url()
     public function get_unfiltered_template_list()
     public function human_readable_template_name($name)
@@ -707,6 +709,7 @@ class GFPDF\Helper\Helper_Templates
     public function is_template_compatible($required_version)
     public function load_template_config_file($file)
     public function maybe_add_template_compatibility_notice($template_name, $required_version)
+    public static function get_max_upload_size()
 
 class GFPDF\Helper\Helper_Url_Signer implements GFPDF\Helper\Helper_Interface_Url_Signer
     public function sign($url, $expiration)

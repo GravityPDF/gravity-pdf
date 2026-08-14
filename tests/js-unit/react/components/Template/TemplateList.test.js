@@ -40,15 +40,17 @@ describe('Template - TemplateList.js', () => {
 	});
 
 	test('renders <TemplateHeaderTitle /> component', () => {
-		const newWrapper = shallow(
-			<TemplateList templates={templates} />
-		).dive();
-		const component = findByTestAttr(
-			newWrapper,
-			'component-templateHeaderTitle'
+		const header = findByTestAttr(wrapper, 'component-templateList').prop(
+			'header'
 		);
 
-		expect(component.length).toBe(1);
+		expect(header.props['data-test']).toBe('component-templateHeaderTitle');
+	});
+
+	test('renders <TemplateUploaderTile /> component', () => {
+		expect(
+			findByTestAttr(wrapper, 'component-templateUploaderTile').length
+		).toBe(1);
 	});
 
 	test('renders <TemplateSearch /> component', () => {

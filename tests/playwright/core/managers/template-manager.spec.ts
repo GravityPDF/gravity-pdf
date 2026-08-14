@@ -89,8 +89,7 @@ test.describe('Template Manager', () => {
 
 		// Upload
 		await page
-			.locator('.gfpdf-dropzone')
-			.locator('input[type="file"]')
+			.locator('.gfpdf-template-dropzone input[type="file"]')
 			.setInputFiles(
 				path.join(resourcesPath, 'template', 'test-template.zip')
 			);
@@ -121,6 +120,77 @@ test.describe('Template Manager', () => {
 		await expect(
 			page.locator('.theme[data-slug="test-template"]')
 		).not.toBeVisible();
+	});
+
+	test('should install every zip in a multi-file selection', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
+
+		// Fixtures used by no other test — they all share one WordPress instance
+		await page
+			.locator('.gfpdf-template-dropzone input[type="file"]')
+			.setInputFiles([
+				path.join(resourcesPath, 'template', 'bulk-sample.zip'),
+				path.join(resourcesPath, 'template', 'bulk-sample-two.zip'),
+			]);
+
+		await expect(
+			page.locator('.theme[data-slug="bulk-sample"]')
+		).toBeVisible();
+		await expect(
+			page.locator('.theme[data-slug="bulk-sample-two"]')
+		).toBeVisible();
+	});
+
+	test('should install a template zip that was re-zipped from an extracted folder', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
+
+		// Safari auto-extracts downloads, so users re-zip the folder and the templates end up nested
+		await page
+			.locator('.gfpdf-template-dropzone input[type="file"]')
+			.setInputFiles(
+				path.join(resourcesPath, 'template', 'rezipped-sample.zip')
+			);
+
+		await expect(
+			page.locator('.theme[data-slug="rezipped-sample"]')
+		).toBeVisible();
+	});
+
+	test('should treat the whole Template Manager window as a drop target', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
+
+		const overlay = page.locator('.gfpdf-dropzone-overlay');
+		await expect(overlay).toBeHidden();
+
+		// Drag a zip over the backdrop, which sits well outside the old "Add New Template" tile
+		await page.locator('.theme-backdrop').dispatchEvent('dragenter', {
+			dataTransfer: await page.evaluateHandle(() => {
+				const dataTransfer = new DataTransfer();
+				dataTransfer.items.add(
+					new File(['zip'], 'template.zip', {
+						type: 'application/zip',
+					})
+				);
+				return dataTransfer;
+			}),
+		});
+
+		await expect(overlay).toBeVisible();
 	});
 
 	test('should be able to close template manager popup button', async ({
