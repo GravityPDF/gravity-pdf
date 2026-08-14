@@ -10,7 +10,7 @@ use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

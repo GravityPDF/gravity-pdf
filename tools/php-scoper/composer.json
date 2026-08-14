@@ -1,0 +1,16 @@
+{
+  "name": "gravitypdf/php-scoper-toolchain",
+  "description": "Isolated php-scoper install. Kept out of the plugin's own dependency tree so the scoper can run on a modern PHP while the plugin stays pinned to the 7.4 platform.",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "humbug/php-scoper": "^0.18.19"
+  },
+  "config": {
+    "preferred-install": "dist",
+    "platform": {
+      "php": "8.2"
+    }
+  }
+}

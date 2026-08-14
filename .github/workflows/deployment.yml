@@ -12,10 +12,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # 8.3 because the release build runs php-scoper, which requires PHP 8.2+. composer.json pins
+      # the platform to 7.4, so the packaged dependencies are unaffected by the runtime version.
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.3
           coverage: none
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

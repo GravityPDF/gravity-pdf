@@ -41,9 +41,18 @@ return [
 	'patchers'  => [
 		function( string $filePath, string $prefix, string $content ): string {
 
+			/* Both backslash spellings are matched below — how the printer escapes them inside strings depends on the parser version */
+			$slashes = [ '\\\\', '\\' ];
+
 			/* Mpdf fixes */
 			if ( basename( $filePath ) === 'Tag.php' ) {
-				$content = str_replace( "'Mpdf\\\\Tag\\\\'", "'$prefix\\\\Mpdf\\\\Tag\\\\'", $content );
+				foreach ( $slashes as $slash ) {
+					$content = str_replace(
+						"'Mpdf" . $slash . 'Tag',
+						"'" . $prefix . $slash . 'Mpdf' . $slash . 'Tag',
+						$content
+					);
+				}
 			}
 
 			if ( basename( $filePath ) === 'FpdiTrait.php' ) {
@@ -55,24 +64,14 @@ return [
 			}
 
 			if ( basename( $filePath ) === 'Mpdf.php' ) {
-				$content = str_replace( "$prefix\\\\r\\\\n", '\\r\\n', $content );
-				$content = str_replace( "$prefix\\\\</t\\\\1", '</t\\\\1', $content );
+				foreach ( $slashes as $slash ) {
+					$content = str_replace( $prefix . $slash . 'r' . $slash . 'n', '\\r\\n', $content );
+					$content = str_replace( $prefix . $slash . '</t' . $slash . '1', '</t\\1', $content );
+				}
 			}
 
 			if ( basename( $filePath ) === 'ServiceFactory.php' ) {
 				$content = str_replace( "new \\$prefix\\Mpdf\\Cache(", 'new \GFPDF\Helper\Mpdf\Cache(', $content );
-			}
-
-			/* Remove type hinting from prefixed logger */
-			$files = [
-				'LoggerAwareInterface.php',
-				'LoggerAwareTrait.php',
-				'MpdfPsrLogAwareTrait.php',
-				'PsrLogAwareTrait.php'
-			];
-
-			if ( in_array( basename( $filePath ), $files, true ) ) {
-				$content = str_replace( "\\$prefix\\Psr\\Log\\LoggerInterface", '\\Psr\\Log\\LoggerInterface', $content );
 			}
 
 			/* Global polyfills */
