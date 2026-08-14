@@ -26,6 +26,10 @@ class LocalFile extends File {
 	 * @since 6.4
 	 */
 	public function isValid(): bool {
+		/* Reset rather than append, matching the parent: upload() calls isValid() again, so the
+		   `if ( ! $file->isValid() ) {…} $file->upload();` pattern would otherwise double every error */
+		$this->errors = $this->constructorErrors;
+
 		foreach ( $this->objects as $fileInfo ) {
 			$this->applyCallback( 'beforeValidationCallback', $fileInfo );
 			foreach ( $this->validations as $validation ) {

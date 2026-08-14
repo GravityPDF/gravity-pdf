@@ -87,6 +87,62 @@ class Test_LocalFile extends TestCase {
 	}
 
 	/**
+	 * LocalFile::isValid() resets its errors per call, so repeated calls don't accumulate duplicates.
+	 *
+	 * The override reimplements the parent's loop, so it needs the parent's reset of its own —
+	 * upload() calls isValid() again, which would otherwise report every error twice.
+	 */
+	public function test_is_valid_resets_errors_between_calls(): void {
+		$this->tmp_file = tempnam( sys_get_temp_dir(), 'gfpdf_test_' ) . '.ttf';
+		touch( $this->tmp_file );
+
+		$_FILES['font'] = [
+			'tmp_name' => $this->tmp_file,
+			'name'     => 'mybadfile.ttf',
+			'error'    => UPLOAD_ERR_OK,
+		];
+
+		$storage = new LocalFilesystem( sys_get_temp_dir() );
+		$file    = new LocalFile( 'font', $storage );
+
+		$file->addValidation(
+			new class implements ValidationInterface {
+				public function validate( FileInfoInterface $file ): void {
+					throw new UploadException( 'not a real font' );
+				}
+			}
+		);
+
+		$this->assertFalse( $file->isValid() );
+		$this->assertCount( 1, $file->getErrors() );
+
+		$this->assertFalse( $file->isValid() );
+		$this->assertCount( 1, $file->getErrors() );
+	}
+
+	/**
+	 * Errors recorded while reading $_FILES survive the reset.
+	 *
+	 * LocalFile skips the is-uploaded-file check, so a transfer-level failure is all it can report.
+	 */
+	public function test_is_valid_keeps_constructor_errors(): void {
+		$_FILES['font'] = [
+			'tmp_name' => '',
+			'name'     => 'too-big.ttf',
+			'error'    => UPLOAD_ERR_FORM_SIZE,
+		];
+
+		$storage = new LocalFilesystem( sys_get_temp_dir() );
+		$file    = new LocalFile( 'font', $storage );
+
+		$this->assertCount( 1, $file->getErrors() );
+
+		$this->assertFalse( $file->isValid() );
+		$this->assertCount( 1, $file->getErrors() );
+		$this->assertStringContainsString( 'too-big', $file->getErrors()[0] );
+	}
+
+	/**
 	 * LocalFile::isValid() returns true when all validations pass.
 	 */
 	public function test_is_valid_returns_true_when_all_validations_pass(): void {

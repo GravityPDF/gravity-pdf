@@ -24,6 +24,11 @@
     },
 
     {
+      "type": "vcs",
+      "url": "https://github.com/GravityPDF/Upload"
+    },
+
+    {
       "type": "composer",
       "url": "https://composer.gravity.io",
       "only": [
@@ -38,7 +43,7 @@
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
     "gravitypdf/querypath": "^4.0",
-    "gravitypdf/upload": "^3.0"
+    "gravitypdf/upload": "dev-hardening"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",

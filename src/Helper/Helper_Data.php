@@ -214,6 +214,7 @@ class Helper_Data {
 	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $gform ) {
 
 		$custom_fonts      = array_values( $options->get_custom_fonts() );
+		$max_upload_size   = Helper_Templates::get_max_upload_size();
 		$user_data         = get_userdata( get_current_user_id() );
 		$user_capabilities = is_object( $user_data ) ? $user_data->allcaps : [];
 		$user_capabilities = is_super_admin() ? [ 'administrator' => true ] : $user_capabilities;
@@ -282,7 +283,11 @@ class Helper_Data {
 				'showPreviousTemplate'                 => esc_html__( 'Show previous template', 'gravity-pdf' ),
 				'showNextTemplate'                     => esc_html__( 'Show next template', 'gravity-pdf' ),
 				'uploadInvalidNotZipFile'              => esc_html__( 'Upload is not a valid template. Upload a .zip file.', 'gravity-pdf' ),
-				'uploadInvalidExceedsFileSizeLimit'    => esc_html__( 'Upload exceeds the 10MB limit.', 'gravity-pdf' ),
+				/* translators: %s: the maximum upload size e.g. "32 MB" */
+				'uploadInvalidExceedsFileSizeLimit'    => sprintf( esc_html__( 'Upload exceeds the %s limit.', 'gravity-pdf' ), size_format( $max_upload_size ) ),
+				'templateUploadMaxSize'                => $max_upload_size,
+				'templateUploadDropzone'               => esc_html__( 'Drop PDF template .zip files anywhere to install', 'gravity-pdf' ),
+				'templateUploadInProgress'             => esc_html__( 'Installing PDF template(s)...', 'gravity-pdf' ),
 				'templateSuccessfullyInstalled'        => esc_html__( 'Template successfully installed', 'gravity-pdf' ),
 				'templateSuccessfullyUpdated'          => esc_html__( 'Template successfully updated', 'gravity-pdf' ),
 				'templateSuccessfullyInstalledUpdated' => esc_html__( 'PDF Template(s) Successfully Installed / Updated', 'gravity-pdf' ),

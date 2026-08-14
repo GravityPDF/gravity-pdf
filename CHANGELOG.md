@@ -2,6 +2,14 @@
 
 ## Gravity PDF
 
+### 6.17.0
+* 🎉 Feature: Install multiple PDF templates at once by selecting or dropping several zip files together
+* 🎉 Feature: Drop PDF template zip files anywhere in the Template Manager window to install them
+* 🎉 Feature: Accept PDF template zips with the templates nested inside a folder, which is what you get when re-zipping a Safari download
+* 🔒 Security: Harden PDF template and custom font uploads by upgrading the bundled upload library to 4.0
+* 🧹 Housekeeping: Raise the PDF template upload limit from 10MB to 32MB, capped by the server's own upload limit
+* 💻 Developer: Add `gfpdf_template_max_upload_size` filter to change the maximum PDF template zip size
+
 ### 6.16.0
 * 🎉 Feature: Gravity Forms 3.0 compatibility
 * 🎉 Feature: Support the Gravity Forms 3.0 International (formatted) phone number format, displayed with the country and dial code in front of the number

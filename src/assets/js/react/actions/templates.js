@@ -239,15 +239,17 @@ export const postTemplateUploadProcessing = (file, filename) => {
  * Fires request template to our endpoint for processing
  *
  * @param { Object } response
+ * @param { string } filename The zip the response belongs to
  *
  * @return {{ type: string, payload: Object }} action object
  *
  * @since 5.2
+ * @since 6.17 Added the `filename` parameter so concurrent uploads can be told apart
  */
-export const templateUploadProcessingSuccess = (response) => {
+export const templateUploadProcessingSuccess = (response, filename = '') => {
 	return {
 		type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
-		payload: response,
+		payload: { ...response, filename },
 	};
 };
 
@@ -255,20 +257,22 @@ export const templateUploadProcessingSuccess = (response) => {
  * Fires Update/Show error
  *
  * @param { Object } error
+ * @param { string } filename The zip the error belongs to
  *
  * @return {{ type: string, payload: Object }} action object
  *
  * @since 5.2
+ * @since 6.17 Added the `filename` parameter so concurrent uploads can be told apart
  */
-export const templateUploadProcessingFailed = (error) => {
+export const templateUploadProcessingFailed = (error, filename = '') => {
 	return {
 		type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-		payload: error,
+		payload: { ...error, filename },
 	};
 };
 
 /**
- * Fires to clear/reset data for templateUploadProcessingSuccess and templateUploadProcessingFailed
+ * Fires to clear/reset the results of the current batch of template uploads
  *
  * @return {{ type: string }} action object
  *
