@@ -46,7 +46,7 @@
     "phpcompatibility/phpcompatibility-wp": "*",
     "roave/security-advisories": "dev-master",
     "yoast/phpunit-polyfills": "^4.0",
-    "wp-phpunit/wp-phpunit": "^6.4",
+    "wp-phpunit/wp-phpunit": "^7.0",
     "gravity/gravityforms": "*"
   },
   "suggest": {
