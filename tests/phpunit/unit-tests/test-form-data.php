@@ -1462,6 +1462,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_empty_fields() {
+		$this->setExpectedDeprecated( 'GFPDFEntryDetail::lead_detail_grid_array' );
+
 		$entry     = $this->entries[6];
 		$form_data = GFPDFEntryDetail::lead_detail_grid_array( $this->form, $entry );
 
@@ -1536,6 +1538,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 * Ensure the Product data calculations are correct when using Euros (or similar comma/decimal switched currency)
 	 */
 	public function test_euro_product_data() {
+		$this->setExpectedDeprecated( 'GFPDFEntryDetail::lead_detail_grid_array' );
+
 		$json            = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/all-form-euro-product-entry.json' ) ), true );
 		$json['form_id'] = $this->form['id'];
 		$entry_id        = GFAPI::add_entry( $json );

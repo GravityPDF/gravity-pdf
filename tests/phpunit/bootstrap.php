@@ -80,6 +80,9 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		/* Load Mocks */
 		$this->mocks();
+
+		/* Load shared test traits */
+		$this->concerns();
 	}
 
 	/**
@@ -89,6 +92,32 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 */
 	public function mocks() {
 		require_once 'unit-tests/Mocks/zapier-mock.php';
+	}
+
+	/**
+	 * Autoload the traits shared between test classes
+	 *
+	 * @since 6.17
+	 */
+	public function concerns() {
+		$dir = $this->tests_dir . '/Concerns/';
+
+		/* autoloaded rather than required in a batch, since these traits compose each other */
+		spl_autoload_register(
+			function( $class ) use ( $dir ) {
+				$prefix = 'GFPDF\\Tests\\Concerns\\';
+
+				if ( strpos( $class, $prefix ) !== 0 ) {
+					return;
+				}
+
+				$file = $dir . strtr( substr( $class, strlen( $prefix ) ), '\\', '/' ) . '.php';
+
+				if ( file_exists( $file ) ) {
+					require_once $file;
+				}
+			}
+		);
 	}
 
 	/**

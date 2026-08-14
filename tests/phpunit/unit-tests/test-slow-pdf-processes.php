@@ -407,6 +407,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * works as expected.
 	 */
 	public function test_deprecated_save_pdf() {
+		$this->setExpectedDeprecated( 'GFPDF_Core_Model::gfpdfe_save_pdf' );
+
 		global $gfpdf;
 
 		$results = $this->create_form_and_entries();

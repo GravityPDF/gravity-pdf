@@ -4,8 +4,10 @@ namespace GFPDF\Helper;
 
 use Exception;
 use GFPDF\Helper\Mpdf\Request;
+use GFPDF\Statics\Deprecation;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF\Helper\Mpdf\Mpdf;
+use GFPDF\Statics\Deprecation_V3;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
@@ -265,8 +267,8 @@ class Helper_PDF {
 		}
 
 		/* Apply our filters */
-		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $args['settings'] ); /* Backwards compat */
-		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $args['settings'] ); /* Backwards compat */
+		$html = Deprecation::apply_filters( 'gfpdfe_pdf_template', [ $html, $form['id'], $this->entry['id'], $args['settings'] ] );
+		$html = Deprecation::apply_filters( 'gfpdfe_pdf_template_' . $form['id'], [ $html, $this->entry['id'], $args['settings'] ], 'gfpdf_pdf_html_output_' . $form['id'] );
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
 		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
@@ -303,9 +305,11 @@ class Helper_PDF {
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
 		/* deprecated backwards compatibility filters */
-		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
-		$this->mpdf = apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
-		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
+		$legacy_args = [ $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ];
+
+		foreach ( [ 'gfpdfe_mpdf_class_pre_render', 'gfpdfe_pre_render_pdf', 'gfpdfe_mpdf_class' ] as $legacy_hook ) {
+			$this->mpdf = Deprecation::apply_filters( $legacy_hook, array_merge( [ $this->mpdf ], $legacy_args ) );
+		}
 
 		do_action( 'gfpdf_pre_pdf_generation_output', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
@@ -386,6 +390,11 @@ class Helper_PDF {
 
 		/* Check if there are version requirements */
 		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
+
+		if ( $this->templates->is_legacy_template( $template_info ) ) {
+			Deprecation_V3::restore_v3_form_class();
+		}
+
 		if ( ! $this->templates->is_template_compatible( $template_info['required_pdf_version'] ) ) {
 			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-pdf' ), '<em>' . esc_html( $template ) . '</em>', '<em>' . esc_html( $template_info['required_pdf_version'] ) . '</em>' ) );
 		}

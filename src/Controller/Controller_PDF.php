@@ -11,9 +11,9 @@ use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Statics\Deprecation_V3;
 use GFPDF\View\View_PDF;
 use Psr\Log\LoggerInterface;
-use SiteGround_Optimizer\Minifier\Minifier;
 
 /**
  * @package     Gravity PDF
@@ -221,7 +221,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_pdf_core_template_html_output', [ $this->gform, 'process_tags' ], 10, 3 );
 
 		/* Backwards compatibility for our Tier 2 plugin */
-		add_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ], 1, 8 );
+		add_filter( 'gfpdfe_pre_load_template', Deprecation_V3::INTERNAL_FILTER_CALLBACK, 1, 8 );
 
 		/* Pre-process our template arguments and automatically render them in PDF */
 		add_filter( 'gfpdf_template_args', [ $this->model, 'preprocess_template_arguments' ] );
@@ -231,8 +231,6 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gform_before_resend_notifications', [ $this->model, 'resend_notification_pdf_cleanup' ], 10, 2 );
 
 		/* Third Party Conflict Fixes */
-		add_filter( 'gfpdf_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
-		add_filter( 'gfpdf_legacy_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
 		add_filter(
 			'gfpdf_pre_pdf_generation_output',
 			function () {
@@ -304,6 +302,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		$this->prevent_index();
 
+		_deprecated_function( __METHOD__, '4.0', 'the [gravitypdf] shortcode or PDF merge tags, https://docs.gravitypdf.com/upgrade/legacy-download-urls/' );
+
 		$config = [
 			'lid'      => (int) explode( ',', $_GET['lid'] )[0],
 			'fid'      => (int) $_GET['fid'],
@@ -327,10 +327,15 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			$this->pdf_error( $pid );
 		}
 
+		/* Report the form from now on, whether or not the URL itself lives anywhere the form scan can find it */
+		Deprecation_V3::record_legacy_endpoint_usage( $config['fid'] );
+
 		/* Store our ids in the WP query_vars object */
 		$GLOBALS['wp']->query_vars['gpdf'] = 1;
 		$GLOBALS['wp']->query_vars['pid']  = $pid;
 		$GLOBALS['wp']->query_vars['lid']  = $config['lid'];
+
+		$this->log->warning( sprintf( 'Legacy download URLs are removed in Gravity PDF %s. Replace with the [gravitypdf] shortcode or PDF merge tags. See https://docs.gravitypdf.com/upgrade/legacy-download-urls/ for upgrade instructions.', Deprecation_V3::REMOVED_IN ) );
 
 		/* Send to our model to handle validation / authentication */
 		do_action( 'gfpdf_legacy_pre_view_or_download_pdf', $config['lid'], $pid, $config['action'] );
@@ -373,20 +378,11 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * Disables the Siteground HTML Minifier when generating PDFs for the browser
 	 *
 	 * @since 5.1.5
-	 *
-	 * @see   https://github.com/GravityPDF/gravity-pdf/issues/863
+	 * @see https://github.com/GravityPDF/gravity-pdf/issues/863
+	 * @deprecated 6.12 All buffers are auto-closed before a PDF is sent to the browser
 	 */
 	public function sgoptimizer_html_minification_fix() {
-		if ( class_exists( '\SiteGround_Optimizer\Minifier\Minifier' ) ) {
-
-			/* Remove the shutdown buffer and manually close an open buffers */
-			$minifier = Minifier::get_instance();
-			remove_action( 'shutdown', [ $minifier, 'end_html_minifier_buffer' ] );
-
-			while ( ob_get_level() > 0 ) {
-				ob_end_clean();
-			}
-		}
+		_deprecated_function( __METHOD__, '6.12' );
 	}
 
 	/**

@@ -89,6 +89,8 @@ class Test_Deprecated extends WP_UnitTestCase {
 	public function test_render_save_pdf() {
 		global $gfpdf;
 
+		$this->setExpectedDeprecated( 'PDFRender::savePDF' );
+
 		$render = new PDFRender();
 		$render->savePDF( 'testing', 'mydocument.pdf', 20 );
 
@@ -121,6 +123,8 @@ class Test_Deprecated extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_common_get_ids() {
+		$this->setExpectedDeprecated( 'PDF_Common::get_ids' );
+
 		$GLOBALS['form_id'] = '20';
 		$_GET['lid']        = '20,21,23';
 
@@ -136,6 +140,8 @@ class Test_Deprecated extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_common_get_pdf_filename() {
+		$this->setExpectedDeprecated( 'PDF_Common::get_pdf_filename' );
+
 		$this->assertEquals( 'form-50-entry-2091.pdf', PDF_Common::get_pdf_filename( 50, 2091 ) );
 	}
 }

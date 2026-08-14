@@ -440,6 +440,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 * @dataProvider provider_mergetag_test
 	 */
 	public function test_replace_variables( $mergetag, $value ) {
+		$this->setExpectedDeprecated( 'PDF_Common::do_mergetags' );
+
 		$this->assertEquals( $value, PDF_Common::do_mergetags( $mergetag, $GLOBALS['GFPDF_Test']->form['gravityform-1']['id'], $GLOBALS['GFPDF_Test']->entries['gravityform-1'][2]['id'] ) );
 	}
 

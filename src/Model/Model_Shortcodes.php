@@ -47,7 +47,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	 * @internal Deprecated in 5.2. Use self::process()
 	 */
 	public function gravitypdf( $attributes ) {
-		_doing_it_wrong( __METHOD__, esc_html__( 'This method has been superseded by self::process()', 'gravity-pdf' ), '5.2' );
+		_deprecated_function( __METHOD__, '5.2', 'Model_Shortcodes::process()' );
 
 		return $this->process( $attributes );
 	}

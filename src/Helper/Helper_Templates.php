@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Statics\Deprecation;
 use GPDFAPI;
 use Psr\Log\LoggerInterface;
 use stdClass;
@@ -271,6 +272,19 @@ class Helper_Templates {
 			},
 			$this->get_all_templates()
 		);
+	}
+
+	/**
+	 * Check if the template info describes a legacy (v3) template
+	 *
+	 * A v3 template has no `Group` header, so self::get_template_info_by_path() falls back to the Legacy group.
+	 *
+	 * @param array $info The template header info
+	 *
+	 * @since 6.17.0
+	 */
+	public function is_legacy_template( array $info ): bool {
+		return ( $info['group'] ?? '' ) === esc_html__( 'Legacy', 'gravity-pdf' );
 	}
 
 	/**
@@ -766,7 +780,7 @@ class Helper_Templates {
 
 				'form_id'   => $form['id'], /* backwards compat */
 				'lead_ids'  => $legacy_ids, /* backwards compat */
-				'lead_id'   => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
+				'lead_id'   => Deprecation::apply_filters( 'gfpdfe_lead_id', [ $entry['id'], $form, $entry, $gfpdf ] ), /* backwards compat */
 
 				'form'      => $form,
 				'entry'     => $entry,

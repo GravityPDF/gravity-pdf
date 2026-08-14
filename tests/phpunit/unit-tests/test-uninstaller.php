@@ -8,6 +8,7 @@ use GFPDF\Controller\Controller_Uninstaller;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Uninstall;
+use GFPDF\Statics\Deprecation_V3;
 use WP_UnitTestCase;
 
 /**
@@ -130,9 +131,24 @@ class Test_Uninstaller extends WP_UnitTestCase {
 		$installer       = new Controller_Install( $installer_model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 		$installer->check_install_status();
 
-		update_option( 'gfpdf_settings', [] );
+		/* The deprecation notices' record of what this site uses, and the dismissals against it, ride in this row */
+		update_option(
+			'gfpdf_settings',
+			[
+				'deprecated_features' => [ 'legacy_endpoint' ],
+				'action_dismissal'    => [ 'deprecated_feature_legacy_endpoint' => 'deprecated_feature_legacy_endpoint' ],
+			]
+		);
+
+		/* The forms a legacy download URL has been served for are recorded in a row of their own */
+		update_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION, [ 1 ], false );
+
 		update_option( 'gpdf_sl_abc_123', true );
 		update_option( 'gpdf_sl_failed_123', true );
+
+		$this->assertArrayHasKey( 'deprecated_features', get_option( 'gfpdf_settings' ) );
+		$this->assertNotFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
+		$this->assertArrayHasKey( 'action_dismissal', get_option( 'gfpdf_settings' ) );
 
 		$this->assertNotFalse( get_option( 'gfpdf_is_installed' ) );
 		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
@@ -146,6 +162,7 @@ class Test_Uninstaller extends WP_UnitTestCase {
 		$this->assertFalse( get_option( 'gfpdf_is_installed' ) );
 		$this->assertFalse( get_option( 'gfpdf_current_version' ) );
 		$this->assertFalse( get_option( 'gfpdf_settings' ) );
+		$this->assertFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
 		$this->assertFalse( get_option( 'gpdf_sl_abc_123' ) );
 		$this->assertFalse( get_option( 'gpdf_sl_failed_123' ) );
 

@@ -235,6 +235,8 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_process_legacy_pdf_endpoint() {
+		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint' );
+		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config' );
 
 		/* Force a failure */
 		$this->assertNull( $this->controller->process_legacy_pdf_endpoint() );
@@ -815,6 +817,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_get_pdf_name() {
+		$this->setExpectedDeprecated( 'gfpdfe_pdf_filename' );
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
@@ -1536,6 +1539,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_get_legacy_config() {
+		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config' );
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
@@ -1767,6 +1771,8 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_legacy_display_page_name() {
+		$this->setExpectedDeprecated( 'GFPDF\View\View_PDF::display_page_name' );
+
 		$form = [
 			'pagination' => [
 				'pages' => [
@@ -1859,6 +1865,10 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_apply_backwards_compatibility_filters() {
+		foreach ( [ 'gfpdfe_pdf_name', 'gfpdfe_template', 'gfpdf_orientation', 'gfpdf_security', 'gfpdf_privilages', 'gfpdf_password', 'gfpdf_master_password', 'gfpdf_rtl' ] as $hook ) {
+			$this->setExpectedDeprecated( $hook );
+		}
+
 		$entry            = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$entry['form_id'] = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
 
@@ -2048,6 +2058,8 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function test_handle_legacy_tier_2_processing() {
 		global $gfpdf;
+
+		$this->setExpectedDeprecated( 'gfpdfe_pre_load_template' );
 
 		$settings  = [ 'id' => '556690c67856b', 'template' => 'zadani' ];
 		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];

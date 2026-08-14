@@ -158,6 +158,114 @@ class Test_Actions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The deprecation notice styles itself from what was detected, which is a database read — so the route defers it
+	 * rather than paying for it on every admin page that never shows the notice
+	 *
+	 * @since 6.17
+	 */
+	public function test_deprecated_feature_route_defers_its_notice_class() {
+		$route = array_column( $this->controller->get_routes(), null, 'action' )['deprecated_features'];
+
+		$this->assertIsCallable( $route['view_class'] );
+
+		/* Every v3 feature still works until 7.0, so the notice is a warning rather than an error */
+		$this->assertSame( 'notice-warning', call_user_func( $route['view_class'] ) );
+	}
+
+	/**
+	 * `view_class` is public API carrying a CSS class, and plenty of one-word class names are also PHP function
+	 * names — `link`, `key`, `header`. Resolving on `is_callable()` alone would call one and fatal the admin.
+	 *
+	 * @since 6.17
+	 */
+	public function test_route_notices_never_calls_a_string_view_class() {
+		global $gfpdf;
+
+		set_current_screen( 'edit.php' );
+
+		add_filter(
+			'gfpdf_one_time_action_routes',
+			function( $routes ) {
+
+				return [
+					[
+						'action'      => 'test_action',
+						'action_text' => 'My Test Action',
+						'condition'   => '__return_true',
+						'process'     => '__return_true',
+						'view'        => function() {
+							return 'my test view';
+						},
+						'view_class'  => 'link',
+						'capability'  => 'gravityforms_view_settings',
+					],
+				];
+			}
+		);
+
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->controller->route_notices();
+
+		ob_start();
+		$gfpdf->notices->process();
+		$html = ob_get_clean();
+
+		/* Carried through verbatim as a class, and no `notice-` prefix so it joins the default state */
+		$this->assertStringContainsString( 'class="notice updated link"', $html );
+
+		$gfpdf->notices->clear();
+		wp_set_current_user( 0 );
+	}
+
+	/**
+	 * A callable is resolved when the notice displays, so nothing queries the site to style one that never renders
+	 *
+	 * @since 6.17
+	 */
+	public function test_route_notices_resolves_a_callable_view_class() {
+		global $gfpdf;
+
+		set_current_screen( 'edit.php' );
+
+		add_filter(
+			'gfpdf_one_time_action_routes',
+			function( $routes ) {
+
+				return [
+					[
+						'action'      => 'test_action',
+						'action_text' => 'My Test Action',
+						'condition'   => '__return_true',
+						'process'     => '__return_true',
+						'view'        => function() {
+							return 'my test view';
+						},
+						'view_class'  => function() {
+							return 'notice-error';
+						},
+						'capability'  => 'gravityforms_view_settings',
+					],
+				];
+			}
+		);
+
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->controller->route_notices();
+
+		ob_start();
+		$gfpdf->notices->process();
+		$html = ob_get_clean();
+
+		/* A `notice-*` class replaces the default state rather than joining it */
+		$this->assertStringContainsString( 'class="notice notice-error"', $html );
+
+		$gfpdf->notices->clear();
+		wp_set_current_user( 0 );
+	}
+
+	/**
 	 * Test route notices are displayed correctly (verify capability, check for dismissal, check condition met)
 	 *
 	 * @since 4.0
