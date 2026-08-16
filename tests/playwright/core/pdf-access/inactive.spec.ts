@@ -58,8 +58,8 @@ test.describe('Advanced Template Checks', () => {
 		const entry = await pdf.createEntry({ form_id: form.id });
 		await pdf.navigateToEntryList(form.id);
 
-		// Entry list selectors might vary, using a common one
-		await page.locator('td.column-primary').first().hover();
+		// WP 7.1 renders the primary column as <th scope="row">; match on the class only
+		await page.locator('.column-primary').first().hover();
 		await expect(
 			page.locator('.gravitypdf-download-link')
 		).not.toBeVisible();
@@ -85,7 +85,7 @@ test.describe('Advanced Template Checks', () => {
 		await pdf.createEntry({ form_id: form.id });
 		await pdf.navigateToEntryList(form.id);
 
-		await page.locator('td.column-primary').first().hover();
+		await page.locator('.column-primary').first().hover();
 		await expect(page.getByText('View PDF')).not.toBeVisible();
 	});
 

@@ -373,7 +373,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	/**
 	 * Prevent user-data shortcodes from being processed by the PDF templates
 	 *
-	 * @param string $value The text to be converted
+	 * @param string|null $value The text to be converted
 	 *
 	 * @return string
 	 *
@@ -383,7 +383,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		$find      = [ '[', ']', '{', '}' ];
 		$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
 
-		return str_replace( $find, $converted, $value );
+		return str_replace( $find, $converted, $value ?? '' );
 	}
 
 	/**
