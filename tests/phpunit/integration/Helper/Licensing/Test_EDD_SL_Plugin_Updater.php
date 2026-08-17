@@ -929,7 +929,9 @@ class Test_EDD_SL_Plugin_Updater extends TestCase {
 		add_filter( 'pre_site_option_active_sitewide_plugins', $network_filter );
 
 		$method = new \ReflectionMethod( $this->class, 'is_non_active_multisite' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 
 		/* Active on the current site */
 		$active_plugins = [ $plugin ];
