@@ -154,7 +154,7 @@ class Test_Helper_Data extends TestCase {
 	public function test_localised_script() {
 		global $gfpdf;
 
-		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->gform );
+		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->gform, $gfpdf->templates );
 		$required_keys  = [
 			'ajaxUrl',
 			'ajaxNonce',
@@ -168,6 +168,10 @@ class Test_Helper_Data extends TestCase {
 		foreach ( $required_keys as $key ) {
 			$this->assertArrayHasKey( $key, $localised_data );
 		}
+
+		/* The React Template Manager compares this against each template path to decide if it can be deleted */
+		$working_dir = is_multisite() ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
+		$this->assertSame( $working_dir, $localised_data['pdfWorkingDir'] );
 	}
 
 	public function test_get_conditional_logic_options() {
