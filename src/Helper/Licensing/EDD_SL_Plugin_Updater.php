@@ -505,7 +505,7 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		/* The primary site checks for updates on behalf of network-activated installs */
-		if ( \GPDFAPI::get_misc_class()->is_secondary_network_site( $this->name ) ) {
+		if ( $this->is_secondary_network_site() ) {
 			return false;
 		}
 
@@ -1000,5 +1000,25 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Whether the current site is a secondary site on a Multisite network where the plugin is network activated
+	 *
+	 * Mirrors Helper_Misc::is_secondary_network_site(), which cannot be used here: the updater runs even when the
+	 * plugin's minimum requirements aren't met, and GPDFAPI is only available once the plugin has fully loaded.
+	 *
+	 * @return bool
+	 *
+	 * @since 6.16.1
+	 */
+	protected function is_secondary_network_site() {
+		if ( ! is_multisite() || is_main_site() ) {
+			return false;
+		}
+
+		$network_plugins = (array) get_site_option( 'active_sitewide_plugins', [] );
+
+		return isset( $network_plugins[ $this->name ] );
 	}
 }

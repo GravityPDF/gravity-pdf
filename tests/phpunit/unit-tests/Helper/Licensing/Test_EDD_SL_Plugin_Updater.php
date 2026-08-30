@@ -958,6 +958,15 @@ class Test_EDD_SL_Plugin_Updater extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'is_plugin_active(', $source );
 	}
 
+	/*
+	 * The updater loads even when the plugin's minimum requirements aren't met, so update checks keep working; GPDFAPI
+	 * only exists once the plugin has fully loaded. The PHPUnit bootstrap always loads it, so scan the source instead.
+	 */
+	public function test_updater_does_not_depend_on_gpdfapi() {
+		$source = php_strip_whitespace( ( new \ReflectionClass( EDD_SL_Plugin_Updater::class ) )->getFileName() );
+		$this->assertStringNotContainsString( 'GPDFAPI', $source );
+	}
+
 	public function test_set_version_info_cache_promotes_active_licensed_package_to_network() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Multisite tests only' );
