@@ -59,6 +59,14 @@
 
     <rule ref="Generic.Files.ByteOrderMark"/>
 
+    <!-- pdf.php loads these before it checks the plugin's minimum requirements, so GPDFAPI may not exist yet -->
+    <rule ref="./GravityPDF/Sniffs/EarlyLoad/GPDFAPIUsageSniff.php">
+        <include-pattern>/pdf\.php</include-pattern>
+        <include-pattern>/gravity-pdf-updater\.php</include-pattern>
+        <include-pattern>/src/Helper/Licensing/*</include-pattern>
+        <include-pattern>/src/Controller/Controller_Activation\.php</include-pattern>
+    </rule>
+
     <!-- Customise the WordPress Core Rules -->
     <rule ref="WordPress.Files.FileName">
         <properties>
