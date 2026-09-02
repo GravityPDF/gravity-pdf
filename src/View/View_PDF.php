@@ -19,6 +19,8 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Statics\Deprecation;
+use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Statics\Kses;
 use GFPDFEntryDetail;
 use GWConditionalLogicDateFields;
@@ -193,13 +195,13 @@ class View_PDF extends Helper_Abstract_View {
 			$pdf->set_template();
 
 			/* Set display type and allow user to override the behaviour */
-			$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ); /* Backwards compat */
+			$settings['pdf_action'] = Deprecation::apply_filters( 'gfpdfe_pdf_output_type', [ $settings['pdf_action'] ] );
 			if ( $settings['pdf_action'] === 'download' ) {
 				$pdf->set_output_type( 'download' );
 			}
 
 			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-			if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
+			if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
 
 				/* Check if we should process this document using our legacy system */
 				if ( $model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
@@ -534,6 +536,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * @deprecated 6.10.1 Page fields are handled like all other fields, with markup generated using a dedicated Field_Page class
 	 */
 	public function display_page_name( $page, $form, Helper_Field_Container $container ) {
+		_deprecated_function( __METHOD__, '6.10.1', 'GFPDF\Helper\Fields\Field_Page' );
 
 		/* Only display the current page name if it exists */
 		if ( isset( $form['pagination']['pages'][ $page ] ) && strlen( trim( $form['pagination']['pages'][ $page ] ) ) > 0 ) {
@@ -578,16 +581,14 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
-		/* Prevent core styles loading if a v3 template or using our legacy Tier 2 add-on */
 		$template_info = $this->templates->get_template_info_by_id( $settings['template'] );
-		if (
-			( esc_html__( 'Legacy', 'gravity-pdf' ) !== $template_info['group'] ) &&
-			( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] )
-		) {
-			$html = $this->get_core_template_styles( $settings, $entry ) . $html;
+
+		/* A v3 template brings its own styles, and the Tier 2 add-on renders the document itself */
+		if ( $this->templates->is_legacy_template( $template_info ) || Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
+			return $html;
 		}
 
-		return $html;
+		return $this->get_core_template_styles( $settings, $entry ) . $html;
 	}
 
 	/**

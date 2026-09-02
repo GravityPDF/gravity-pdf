@@ -22,6 +22,8 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Statics\Deprecation;
+use GFPDF\Statics\Deprecation_V3;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GFQuiz;
@@ -259,31 +261,31 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
-		$settings['filename'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_pdf_name', $settings['filename'], $form, $entry ) );
-		$settings['template'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_template', $settings['template'], $form, $entry ), '.php' );
+		$settings['filename'] = $this->misc->remove_extension_from_string( Deprecation::apply_filters( 'gfpdfe_pdf_name', [ $settings['filename'], $form, $entry ] ) );
+		$settings['template'] = $this->misc->remove_extension_from_string( Deprecation::apply_filters( 'gfpdfe_template', [ $settings['template'], $form, $entry ] ), '.php' );
 
 		if ( isset( $settings['orientation'] ) ) {
-			$settings['orientation'] = apply_filters( 'gfpdf_orientation', $settings['orientation'], $form, $entry );
+			$settings['orientation'] = Deprecation::apply_filters( 'gfpdf_orientation', [ $settings['orientation'], $form, $entry ] );
 		}
 
 		if ( isset( $settings['security'] ) ) {
-			$settings['security'] = $this->misc->update_deprecated_config( apply_filters( 'gfpdf_security', $settings['security'], $form, $entry ) );
+			$settings['security'] = $this->misc->update_deprecated_config( Deprecation::apply_filters( 'gfpdf_security', [ $settings['security'], $form, $entry ] ) );
 		}
 
 		if ( isset( $settings['privileges'] ) ) {
-			$settings['privileges'] = apply_filters( 'gfpdf_privilages', $settings['privileges'], $form, $entry );
+			$settings['privileges'] = Deprecation::apply_filters( 'gfpdf_privilages', [ $settings['privileges'], $form, $entry ] );
 		}
 
 		if ( isset( $settings['password'] ) ) {
-			$settings['password'] = apply_filters( 'gfpdf_password', $settings['password'], $form, $entry );
+			$settings['password'] = Deprecation::apply_filters( 'gfpdf_password', [ $settings['password'], $form, $entry ] );
 		}
 
 		if ( isset( $settings['master_password'] ) ) {
-			$settings['master_password'] = apply_filters( 'gfpdf_master_password', $settings['master_password'], $form, $entry );
+			$settings['master_password'] = Deprecation::apply_filters( 'gfpdf_master_password', [ $settings['master_password'], $form, $entry ] );
 		}
 
 		if ( isset( $settings['rtl'] ) ) {
-			$settings['rtl'] = $this->misc->update_deprecated_config( apply_filters( 'gfpdf_rtl', $settings['rtl'], $form, $entry ) );
+			$settings['rtl'] = $this->misc->update_deprecated_config( Deprecation::apply_filters( 'gfpdf_rtl', [ $settings['rtl'], $form, $entry ] ) );
 		}
 
 		return $settings;
@@ -834,7 +836,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $settings );
 
 		/* Backwards compatible filter */
-		$name = apply_filters( 'gfpdfe_pdf_filename', $name, $form, $entry, $settings );
+		$name = Deprecation::apply_filters( 'gfpdfe_pdf_filename', [ $name, $form, $entry, $settings ] );
 
 		/* Remove any characters that cannot be present in a filename */
 		$name = $this->misc->strip_invalid_characters( $name );
@@ -859,7 +861,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		global $wp_rewrite;
 
 		if ( $esc !== true ) {
-			_doing_it_wrong( __METHOD__, '$esc has been deprecated. Late-escape the returned value where appropriate.', '6.4.0' );
+			_deprecated_argument( __METHOD__, '6.4.0', 'The $esc argument is ignored. Late-escape the returned value where appropriate.' );
 		}
 
 		/*
@@ -1234,7 +1236,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$pdf->set_output_type( 'save' );
 
 				/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-				if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
+				if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
 
 					/* Check if we should process this document using our legacy system */
 					if ( $this->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
@@ -1426,17 +1428,24 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
-		$prevent_main_pdf_loader = apply_filters(
+		$this->log->warning( sprintf( 'Advanced Templating (Tier 2) processing is removed in Gravity PDF %s. Contact GravityPDF.com to discuss upgrade options.', Deprecation_V3::REMOVED_IN ) );
+
+		/* The add-on runs the template file itself, so Helper_PDF::set_template() never sees it */
+		Deprecation_V3::restore_v3_form_class();
+
+		$prevent_main_pdf_loader = Deprecation::apply_filters(
 			'gfpdfe_pre_load_template',
-			$form['id'],
-			$entry['id'],
-			basename( $pdf->get_template_path() ),
-			$form['id'] . $entry['id'],
-			$this->misc->backwards_compat_output( $pdf->get_output_type() ),
-			$pdf->get_filename(),
-			$this->misc->backwards_compat_conversion( $settings, $form, $entry ),
-			$args
-		); /* Backwards Compatibility */
+			[
+				$form['id'],
+				$entry['id'],
+				basename( $pdf->get_template_path() ),
+				$form['id'] . $entry['id'],
+				$this->misc->backwards_compat_output( $pdf->get_output_type() ),
+				$pdf->get_filename(),
+				$this->misc->backwards_compat_conversion( $settings, $form, $entry ),
+				$args,
+			]
+		);
 
 		return $prevent_main_pdf_loader === true;
 	}
@@ -2189,6 +2198,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function get_legacy_config( $config ) {
+		_deprecated_function( __METHOD__, '4.0', 'the [gravitypdf] shortcode or PDF merge tags, https://docs.gravitypdf.com/upgrade/legacy-download-urls/' );
 
 		/* Get the form settings */
 		$pdfs = $this->options->get_form_pdfs( $config['fid'] );

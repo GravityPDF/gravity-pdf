@@ -137,6 +137,8 @@ class View_Settings extends Helper_Abstract_View {
 	 * @deprecated 6.4
 	 */
 	public function tabs() {
+		_deprecated_function( __METHOD__, '6.4', 'View_Settings::sub_menu()' );
+
 		ob_start();
 		$this->sub_menu();
 

@@ -42,7 +42,7 @@ abstract class GFPDF_Deprecated_Abstract {
 	 *
 	 */
 	public function __call( $name, $arguments ) {
-		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
+		_deprecated_function( esc_html( static::class . '::' . $name ), '4.0' );
 	}
 
 	/**
@@ -55,7 +55,7 @@ abstract class GFPDF_Deprecated_Abstract {
 	 *
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		_doing_it_wrong( esc_html( $name ), esc_html( sprintf( __( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-pdf' ), $name ) ), '4.0' );
+		_deprecated_function( esc_html( static::class . '::' . $name ), '4.0' );
 	}
 }
 
@@ -130,6 +130,7 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public function savePDF( $raw_pdf_string, $filename, $id ) {
+		_deprecated_function( __METHOD__, '4.0', 'GPDFAPI::create_pdf()' );
 
 		/* create our path */
 		$path = apply_filters( 'gfpdf_legacy_save_path', PDF_SAVE_LOCATION . $id . '/', $filename, $id );
@@ -166,6 +167,7 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 	 *
 	 */
 	public static function prepare_ids( $form_id, $lead_id, $template, $id, $output, $filename, $arguments, $args ) {
+		/* No deprecation notice — core registers this callback itself on `gfpdfe_pre_load_template` */
 		global $lead_ids;
 		$lead_ids = $args['lead_ids'];
 
@@ -188,6 +190,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 4.0
 	 */
 	public static function get_ids() {
+		_deprecated_function( __METHOD__, '4.0' );
+
 		global $form_id, $lead_id, $lead_ids;
 
 		$form_id  = ! empty( (int) $form_id ) ? (int) $form_id : (int) rgget( 'fid' );
@@ -209,6 +213,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function get_upload_dir() {
+		_deprecated_function( __METHOD__, '4.0', 'Helper_Misc::get_upload_details()' );
+
 		$misc = GPDFAPI::get_misc_class();
 
 		return $misc->get_upload_details();
@@ -226,6 +232,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function do_mergetags( $text, $form_id, $lead_id ) {
+		_deprecated_function( __METHOD__, '4.0', 'Helper_Form::process_tags()' );
+
 		$gform = GPDFAPI::get_form_class();
 
 		return $gform->process_tags( $text, $gform->get_form( $form_id ), $gform->get_entry( $lead_id ) );
@@ -239,6 +247,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 4.0
 	 */
 	public static function view_data( $form_data ) {
+		_deprecated_function( __METHOD__, '4.0' );
+
 		$pdf_view = \GPDFAPI::get_pdf_class();
 		$pdf_view->maybe_view_form_data( $form_data );
 	}
@@ -253,6 +263,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function post( $name ) {
+		_deprecated_function( __METHOD__, '4.0' );
+
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		if ( isset( $_POST[ $name ] ) ) {
 			/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
@@ -272,6 +284,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function get( $name ) {
+		_deprecated_function( __METHOD__, '4.0' );
+
 		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
 		if ( isset( $_GET[ $name ] ) ) {
 			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
@@ -292,6 +306,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function get_pdf_filename( $form_id, $lead_id ) {
+		_deprecated_function( __METHOD__, '4.0', 'GPDFAPI::get_pdf_filename()' );
+
 		return "form-$form_id-entry-$lead_id.pdf";
 	}
 
@@ -305,6 +321,8 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 4.0
 	 */
 	public static function remove_invalid_characters( $name ) {
+		_deprecated_function( __METHOD__, '4.0', 'Helper_Misc::strip_invalid_characters()' );
+
 		$misc = GPDFAPI::get_misc_class();
 
 		return $misc->strip_invalid_characters( $name );
@@ -316,6 +334,7 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function setup_ids() {
+		_deprecated_function( __METHOD__, '4.0' );
 	}
 }
 
@@ -342,6 +361,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function lead_detail_grid( $form, $lead, $allow_display_empty_fields = false, $show_html = false, $show_page_name = false, $should_return = false ) {
+		_deprecated_function( __METHOD__, '4.0' );
+
 		$config = [
 			'meta' => [
 				'empty_field' => $allow_display_empty_fields,
@@ -367,6 +388,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 * @since 3.7
 	 */
 	public static function do_lead_detail_grid( $form, $lead, $config = [] ) {
+		_deprecated_function( __METHOD__, '4.0' );
 
 		/* Convert old config values to our new ones */
 		if ( ! isset( $config['meta'] ) ) {
@@ -614,6 +636,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function lead_detail_grid_array( $form, $lead ) {
+		_deprecated_function( __METHOD__, '4.0', 'GPDFAPI::get_form_data()' );
+
 		$model = GPDFAPI::get_pdf_class( 'model' );
 
 		return $model->get_form_data( $lead );
@@ -630,6 +654,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function product_table( $form, $lead ) {
+		_deprecated_function( __METHOD__, '4.0', 'GPDFAPI::product_table()' );
+
 		GPDFAPI::product_table( $lead );
 	}
 
@@ -645,6 +671,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function get_likert( $form, $lead, $field_id ) {
+		_deprecated_function( __METHOD__, '4.0', 'GPDFAPI::likert_table()' );
+
 		return GPDFAPI::likert_table( $lead, $field_id, true );
 	}
 }
@@ -680,6 +708,8 @@ class GFPDF_Core_Model extends GFPDF_Deprecated_Abstract {
 	 * @since 3.0
 	 */
 	public static function gfpdfe_save_pdf( $entry, $form ) {
+		_deprecated_function( __METHOD__, '4.0', 'GPDFAPI::create_pdf()' );
+
 		$pdfs = GPDFAPI::get_form_pdfs( $form['id'] );
 
 		if ( ! is_wp_error( $pdfs ) ) {
@@ -734,6 +764,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 		 * @since 5.0
 		 */
 		public function __construct( $mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P' ) {
+			_deprecated_function( 'mPDF::__construct', '5.0', 'GFPDF\Helper\Mpdf\Mpdf' );
 
 			$data                = GPDFAPI::get_data_class();
 			$default_font_config = ( new FontVariables() )->getDefaults();

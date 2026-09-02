@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Statics\Deprecation_V3;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -505,9 +507,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 */
 	public function get_advanced_template_field( $settings ) {
 
-		if ( ! class_exists( 'gfpdfe_business_plus' ) ) {
+		if ( ! Deprecation_V3::has_tier_2_addon() ) {
 			return $settings;
 		}
+
+		_deprecated_function( __METHOD__, '6.12', 'a Gravity PDF 6 template, https://docs.gravitypdf.com/upgrade/legacy-templates/' );
 
 		$settings['advanced_template'] = [
 			'id'   => 'advanced_template',

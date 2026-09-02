@@ -46,7 +46,12 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'title', $structure );
 		$this->assertArrayHasKey( 'title_export', $structure );
 		$this->assertArrayHasKey( 'tables', $structure );
-		$this->assertCount( 4, $structure['tables'] );
+
+		/* One section per deprecation group in use, then the four the report has always had */
+		$this->assertSame(
+			[ 'deprecated', 'php', 'directories', 'global', 'security' ],
+			array_column( $structure['tables'], 'id' )
+		);
 	}
 
 	public function test_move_gravitypdf_active_plugins_to_gf_addons() {

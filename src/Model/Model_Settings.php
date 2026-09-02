@@ -718,7 +718,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Removed in 6.0. Use GPDFAPI::delete_pdf_font()
 	 */
-	public function remove_font_file( $fonts ) {}
+	public function remove_font_file( $fonts ) {
+		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::delete_pdf_font()' );
+	}
 
 	/**
 	 * Check that the font name passed conforms to our expected naming convention
@@ -729,7 +731,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Moved in 6.0. Use Model_Custom_Fonts::check_font_name_valid()
 	 */
-	public function is_font_name_valid( $name ) {}
+	public function is_font_name_valid( $name ) {
+		_deprecated_function( __METHOD__, '6.0', 'Model_Custom_Fonts::check_font_name_valid()' );
+	}
 
 	/**
 	 * Query our custom fonts options table and check if the font name already exists
@@ -741,7 +745,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Removed in 6.0. Font names no longer need to be unique
 	 */
-	public function is_font_name_unique( $name, $id = '' ) {}
+	public function is_font_name_unique( $name, $id = '' ) {
+		_deprecated_function( __METHOD__, '6.0' );
+	}
 
 	/**
 	 * Handles the database updates required to save a new font
@@ -752,7 +758,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Moved in 6.0 to Model_Custom_Fonts::add_font()
 	 */
-	public function install_fonts( $fonts ) {}
+	public function install_fonts( $fonts ) {
+		_deprecated_function( __METHOD__, '6.0', 'Model_Custom_Fonts::add_font()' );
+	}
 
 	/**
 	 * AJAX Endpoint for saving the custom font
@@ -761,7 +769,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Moved in 6.0. Use GPDFAPI::add_pdf_font()
 	 */
-	public function save_font() {}
+	public function save_font() {
+		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::add_pdf_font()' );
+	}
 
 	/**
 	 * AJAX Endpoint for deleting a custom font
@@ -770,7 +780,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Moved in 6.0. Use GPDFAPI::delete_pdf_font()
 	 */
-	public function delete_font() {}
+	public function delete_font() {
+		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::delete_pdf_font()' );
+	}
 
 	/**
 	 * Validate user input and save as new font
@@ -781,7 +793,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Removed in 6.0. Use GPDFAPI::add_pdf_font()
 	 */
-	public function process_font( $font ) {}
+	public function process_font( $font ) {
+		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::add_pdf_font()' );
+	}
 
 	/**
 	 * Find the font unique ID from the font name
@@ -792,7 +806,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Removed in 6.0. Font names no longer linked to IDs.
 	 */
-	public function get_font_id_by_name( $font_name ) {}
+	public function get_font_id_by_name( $font_name ) {
+		_deprecated_function( __METHOD__, '6.0' );
+	}
 
 	/**
 	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
@@ -801,7 +817,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @deprecated Functionality removed in 6.0
 	 */
-	public function check_tmp_pdf_security() {}
+	public function check_tmp_pdf_security() {
+		_deprecated_function( __METHOD__, '6.0' );
+	}
 
 	/**
 	 * Create a file in our tmp directory and verify if it's protected from the public
@@ -813,6 +831,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @deprecated Moved in 6.0. Use Model_System_Report::test_public_tmp_directory_access()
 	 */
 	public function test_public_tmp_directory_access() {
+		_deprecated_function( __METHOD__, '6.0', 'Model_System_Report::test_public_tmp_directory_access()' );
+
 		/** @var Model_System_Report $model_system_report */
 		$model_system_report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
 

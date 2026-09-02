@@ -107,6 +107,10 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 
 		$args = array_merge( $this->data_cache, $args );
 
+		if ( isset( $args['content'] ) ) {
+			_deprecated_argument( esc_html( $this->view_type . '/' . $filename . '.php' ), '6.4.0', "Use \$args['callback'] instead" );
+		}
+
 		if ( is_readable( $path ) ) {
 
 			if ( $output ) {

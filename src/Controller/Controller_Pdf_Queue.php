@@ -243,7 +243,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 */
 	public function queue_dispatch_resend_notification_tasks( $form = null, $entry = null ) {
 		if ( ! is_null( $entry ) ) {
-			_doing_it_wrong( __METHOD__, '$entry argument ignored and now set in self::should_send_async_notification()', '6.13.5' );
+			_deprecated_argument( __METHOD__, '6.13.5', 'The $entry argument is ignored and now set in self::should_send_async_notification()' );
 		}
 
 		/* loop over all form/entries */
@@ -525,6 +525,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @deprecated 6.11
 	 */
 	public function queue_async_resend_notification_tasks( $notification, $form, $entry ) {
-		_doing_it_wrong( esc_html( 'queue_async_resend_notification_tasks() was removed in Gravity PDF 6.11' ) );
+		_deprecated_function( __METHOD__, '6.11' );
 	}
 }

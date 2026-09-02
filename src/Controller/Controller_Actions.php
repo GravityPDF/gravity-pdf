@@ -119,6 +119,12 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * condition: The function or method to call to determine if a notice should be displayed (Boolean)
 	 * process: The function to handle a successful action. On success the disable_route() method should be called
 	 * view: The function used to display the notice content
+	 * view_class: Optional classes for the notice box, including a `notice-*` state like `notice-warning`. A
+	 *             non-string callable is resolved when the notice displays, rather than when the route table is
+	 *             built; a string is always taken as the class itself
+	 * dismiss: Optional function to call when the notice is dismissed, instead of dismissing the route's own
+	 *          action ID. A route that supplies one records the dismissal wherever it likes, so it also owns
+	 *          suppressing itself afterwards through `condition`
 	 *
 	 * @return array
 	 *
@@ -126,20 +132,57 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function get_routes() {
 
-		$routes = [
+		$routes = array_merge(
 			[
-				'action'      => 'install_core_fonts',
-				'action_text' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
-				'condition'   => [ $this->model, 'core_font_condition' ],
-				'process'     => [ $this->model, 'core_font_redirect' ],
-				'view'        => [ $this->view, 'core_font' ],
-				'capability'  => 'gravityforms_edit_settings',
+				[
+					'action'      => 'install_core_fonts',
+					'action_text' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
+					'condition'   => [ $this->model, 'core_font_condition' ],
+					'process'     => [ $this->model, 'core_font_redirect' ],
+					'view'        => [ $this->view, 'core_font' ],
+					'capability'  => 'gravityforms_edit_settings',
+				],
 			],
-		];
+			$this->get_deprecated_feature_routes()
+		);
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_one_time_action_routes for more details about this filter */
 
 		return apply_filters( 'gfpdf_one_time_action_routes', $routes );
+	}
+
+	/**
+	 * Build the one notice route covering every deprecated feature in use
+	 *
+	 * One notice rather than one per feature: five separate warnings on the same admin screen is noise a reader
+	 * learns to scroll past. Dismissing it records each feature it listed, so silencing today's list says nothing
+	 * about the next round of removals — that arrives undismissed and raises the notice again. Site Health keeps
+	 * the whole picture either way, so nothing here is the last word on a feature.
+	 *
+	 * The condition reads what was recorded the last time deprecated functionality was detected, rather than
+	 * detecting for itself — see Deprecation::get_detected_features().
+	 *
+	 * @return array
+	 * @since 6.17.0
+	 */
+	protected function get_deprecated_feature_routes(): array {
+		return [
+			[
+				'action'      => 'deprecated_features',
+				'action_text' => esc_html__( 'View the system report', 'gravity-pdf' ),
+				'condition'   => [ $this->model, 'has_deprecated_features' ],
+				'process'     => [ $this->model, 'system_report_redirect' ],
+				/* One notice covers them all, so dismissing it dismisses each feature it was listing */
+				'dismiss'     => [ $this->model, 'dismiss_deprecated_features' ],
+				'view'        => function ( $action, $button_text ) {
+					return $this->view->deprecated_features( $this->model->get_undismissed_deprecated_features(), $action, $button_text );
+				},
+				'view_class'  => function () {
+					return $this->model->has_unsupported_deprecated_feature() ? 'notice-error' : 'notice-warning';
+				},
+				'capability'  => 'gravityforms_view_settings',
+			],
+		];
 	}
 
 	/**
@@ -158,6 +201,11 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			return null;
 		}
 
+		/* Don't run the route conditions, which query the database, on pages that discard the notice anyway */
+		if ( ! $this->notices->can_display_notice_on_this_page() ) {
+			return null;
+		}
+
 		foreach ( $this->get_routes() as $route ) {
 
 			/* Before displaying check the user has the correct capabilities, the notice isn't already been dismissed and the route condition has been met */
@@ -173,8 +221,17 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 					]
 				);
 
-				$class = ( isset( $route['view_class'] ) ) ? $route['view_class'] : '';
-				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ), $class );
+				$view_class = $route['view_class'] ?? '';
+
+				/* A string is always a CSS class: `is_callable()` alone matches any class name sharing a function name */
+				if ( ! is_string( $view_class ) && is_callable( $view_class ) ) {
+					$view_class = call_user_func( $view_class );
+				}
+
+				$this->notices->add_notice(
+					call_user_func( $route['view'], $route['action'], $route['action_text'] ),
+					$view_class
+				);
 			}
 		}
 	}
@@ -187,6 +244,11 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * @since 4.0
 	 */
 	public function route() {
+
+		/* Runs on every admin_init, including ajax, and the route table costs more to build than this check */
+		if ( rgpost( 'gfpdf_action' ) === '' ) {
+			return;
+		}
 
 		foreach ( $this->get_routes() as $route ) {
 
@@ -225,7 +287,11 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 						]
 					);
 
-					$this->model->dismiss_notice( $route['action'] );
+					if ( isset( $route['dismiss'] ) ) {
+						call_user_func( $route['dismiss'] );
+					} else {
+						$this->model->dismiss_notice( $route['action'] );
+					}
 				} else {
 					$this->log->notice(
 						'Trigger Action Process.',
