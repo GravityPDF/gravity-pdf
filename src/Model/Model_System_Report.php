@@ -35,6 +35,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_System_Report extends Helper_Abstract_Model {
 
 	/**
+	 * The ID given to our section heading in the Gravity Forms system report, so it can be linked to directly
+	 *
+	 * @var string
+	 * @since 6.17.0
+	 */
+	const SECTION_ANCHOR = 'gfpdf-system-report';
+
+	/**
 	 * The section each index of the pre-6.17.0 report items array stood for, in order
 	 *
 	 * Frozen — never extend or reorder. These are the four indexes a pre-6.17.0 listener names.
@@ -140,7 +148,12 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 		return [
 			[
-				'title'        => esc_html__( 'Gravity PDF Environment', 'gravity-pdf' ),
+				/* Gravity Forms echoes the title unescaped into an `h3`, which is the only way to anchor our section */
+				'title'        => sprintf(
+					'<span id="%s" style="scroll-margin-top: 50px">%s</span>',
+					self::SECTION_ANCHOR,
+					esc_html__( 'Gravity PDF Environment', 'gravity-pdf' )
+				),
 				'title_export' => 'Gravity PDF Environment',
 				'tables'       => array_merge(
 					$deprecated_tables,
@@ -172,6 +185,15 @@ class Model_System_Report extends Helper_Abstract_Model {
 				),
 			],
 		];
+	}
+
+	/**
+	 * The Gravity Forms system report, scrolled to the Gravity PDF section
+	 *
+	 * @since 6.17.0
+	 */
+	public static function get_report_url(): string {
+		return admin_url( 'admin.php?page=gf_system_status#' . self::SECTION_ANCHOR );
 	}
 
 	/**
