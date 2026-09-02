@@ -35,6 +35,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_System_Report extends Helper_Abstract_Model {
 
 	/**
+	 * The section each index of the pre-6.17.0 report items array stood for, in order
+	 *
+	 * Frozen — never extend or reorder. These are the four indexes a pre-6.17.0 listener names.
+	 *
+	 * @var array
+	 *
+	 * @since 6.17.0
+	 */
+	private const POSITIONAL_SECTIONS = [ 'php', 'directories', 'global', 'security' ];
+
+	/**
 	 * @var Helper_Abstract_Options
 	 *
 	 * @since 6.0
@@ -187,6 +198,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 *
 	 * @return array
 	 * @since 6.0
+	 * @since 6.17.0 Keyed by section name, filtered by `gfpdf_system_status_report_sections`
 	 */
 	protected function get_report_items(): array {
 		$items                  = [];
@@ -343,7 +355,45 @@ class Model_System_Report extends Helper_Abstract_Model {
 			],
 		];
 
-		return apply_filters( 'gfpdf_system_status_report_items', $items );
+		$items = $this->apply_deprecated_report_items_filter( $items );
+
+		return apply_filters( 'gfpdf_system_status_report_sections', $items );
+	}
+
+	/**
+	 * Pass the sections through the positional `gfpdf_system_status_report_items` filter
+	 *
+	 * Deliberately not registered on `Deprecation`: that registry is the v3 layer 7.0 removes, and this filter has
+	 * no removal scheduled.
+	 *
+	 * @param array $items Sections keyed by name
+	 *
+	 * @return array
+	 *
+	 * @since 6.17.0
+	 */
+	protected function apply_deprecated_report_items_filter( array $items ): array {
+		$positional = [];
+
+		/* Only the four a pre-6.17.0 listener knew: numbering the sections added since renumbers these */
+		foreach ( self::POSITIONAL_SECTIONS as $index => $section ) {
+			$positional[ $index ] = $items[ $section ] ?? [];
+		}
+
+		$positional = apply_filters_deprecated(
+			'gfpdf_system_status_report_items',
+			[ $positional ],
+			'6.17.0',
+			'gfpdf_system_status_report_sections',
+			esc_html__( 'The report sections are keyed by name rather than by position.', 'gravity-pdf' )
+		);
+
+		/* Read back off the same indexes, so an index the listener invents has no section to land in */
+		foreach ( self::POSITIONAL_SECTIONS as $index => $section ) {
+			$items[ $section ] = $positional[ $index ] ?? [];
+		}
+
+		return $items;
 	}
 
 	/**
