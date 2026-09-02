@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 
 /**
@@ -441,7 +442,7 @@ class View_System_Report extends Helper_Abstract_View {
 			}
 		}
 
-		$result['actions'] = '<p><a href="' . esc_url( admin_url( 'admin.php?page=gf_system_status' ) ) . '">' . esc_html__( 'View the Gravity Forms system report', 'gravity-pdf' ) . '</a></p>';
+		$result['actions'] = '<p><a href="' . esc_url( Model_System_Report::get_report_url() ) . '">' . esc_html__( 'View the Gravity Forms system report', 'gravity-pdf' ) . '</a></p>';
 
 		return $result;
 	}
