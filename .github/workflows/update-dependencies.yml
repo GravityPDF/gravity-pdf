@@ -23,34 +23,22 @@ jobs:
           php-version: 7.4
           tools: composer
 
+      - name: Setup Node JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
       - name: Add auth details for private composer packages
         run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
 
-      - name: Resolve latest stable WordPress version
+      # Pins the newest WordPress release, or its release candidate when one is in flight.
+      - name: Resolve target WordPress version
         id: wp
-        run: |
-          latest=$(curl -fsSL https://api.wordpress.org/core/version-check/1.7/ \
-            | python3 -c "import sys, json; print(json.load(sys.stdin)['offers'][0]['version'])")
-          if [ -z "$latest" ]; then
-            echo "Failed to resolve latest WordPress version" >&2
-            exit 1
-          fi
-          # integration.json is the canonical source for the current WP pin;
-          # the three wp-env configs are kept in lockstep.
-          current=$(grep -oE 'wordpress-[0-9]+\.[0-9]+(\.[0-9]+)?\.zip' tools/wp-env/integration.json \
-            | head -n1 | sed -E 's/wordpress-([0-9.]+)\.zip/\1/')
-          echo "latest=$latest" >> "$GITHUB_OUTPUT"
-          echo "current=$current" >> "$GITHUB_OUTPUT"
-          [ "$latest" != "$current" ] && echo "changed=true" >> "$GITHUB_OUTPUT" || echo "changed=false" >> "$GITHUB_OUTPUT"
+        run: node tools/wp-env/wp-version.mjs >> "$GITHUB_OUTPUT"
 
       - name: Update wp-env configs
         if: steps.wp.outputs.changed == 'true'
-        run: |
-          for file in tools/wp-env/development.json \
-                      tools/wp-env/integration.json \
-                      tools/wp-env/e2e.json; do
-            sed -i -E "s|wordpress-[0-9]+\.[0-9]+(\.[0-9]+)?\.zip|wordpress-${{ steps.wp.outputs.latest }}.zip|g" "$file"
-          done
+        run: node tools/wp-env/wp-version.mjs update "${{ steps.wp.outputs.latest }}"
 
       # Snapshot before/after so the PR body can render a Before/After table.
       - name: Snapshot current Composer versions
@@ -92,6 +80,11 @@ jobs:
             echo ""
             if [ "${{ steps.wp.outputs.changed }}" = "true" ]; then
               echo "**WordPress core (wp-env configs):** \`${{ steps.wp.outputs.current }}\` → \`${{ steps.wp.outputs.latest }}\`"
+              if [ "${{ steps.wp.outputs.prerelease }}" = "true" ]; then
+                echo ""
+                echo "> [!NOTE]"
+                echo "> This is a release candidate, not a final release."
+              fi
               echo ""
             fi
             echo "**Composer packages** — \`gravity/gravityforms\`"
