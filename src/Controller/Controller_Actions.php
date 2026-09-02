@@ -120,7 +120,8 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * process: The function to handle a successful action. On success the disable_route() method should be called
 	 * view: The function used to display the notice content
 	 * view_class: Optional classes for the notice box, including a `notice-*` state like `notice-warning`. A
-	 *             callable is resolved when the notice displays, rather than when the route table is built
+	 *             non-string callable is resolved when the notice displays, rather than when the route table is
+	 *             built; a string is always taken as the class itself
 	 * dismiss: Optional function to call when the notice is dismissed, instead of dismissing the route's own
 	 *          action ID. A route that supplies one records the dismissal wherever it likes, so it also owns
 	 *          suppressing itself afterwards through `condition`
@@ -222,9 +223,14 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 				$view_class = $route['view_class'] ?? '';
 
+				/* A string is always a CSS class: `is_callable()` alone matches any class name sharing a function name */
+				if ( ! is_string( $view_class ) && is_callable( $view_class ) ) {
+					$view_class = call_user_func( $view_class );
+				}
+
 				$this->notices->add_notice(
 					call_user_func( $route['view'], $route['action'], $route['action_text'] ),
-					is_callable( $view_class ) ? call_user_func( $view_class ) : $view_class
+					$view_class
 				);
 			}
 		}
