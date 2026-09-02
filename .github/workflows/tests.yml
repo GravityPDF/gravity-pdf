@@ -278,10 +278,11 @@ jobs:
 
       # Pre-fetch the pinned WordPress core so wp-env's start has nothing to download. Its in-start core
       # fetch silently aborts provisioning on the CI runners (only the DB container comes up); pointing
-      # WP_ENV_CORE at a local directory sidesteps that. URL is read from the config to stay single-source.
+      # WP_ENV_CORE at a local directory sidesteps that. URL is derived from the config's pin to stay single-source.
       - name: Pre-download WordPress core
         run: |
-          curl -fsSL "$(jq -r '.core' tools/wp-env/integration.json)" -o "$RUNNER_TEMP/wp-core.zip"
+          url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/integration.json)
+          curl -fsSL "$url" -o "$RUNNER_TEMP/wp-core.zip"
           unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
           echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
 
@@ -457,7 +458,8 @@ jobs:
       # See the integration job: pre-fetch core so wp-env's start has nothing to download.
       - name: Pre-download WordPress core
         run: |
-          curl -fsSL "$(jq -r '.core' tools/wp-env/e2e.json)" -o "$RUNNER_TEMP/wp-core.zip"
+          url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/e2e.json)
+          curl -fsSL "$url" -o "$RUNNER_TEMP/wp-core.zip"
           unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
           echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
 
