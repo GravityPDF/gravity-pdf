@@ -70,8 +70,11 @@ class Test_Controller_Actions extends TestCase {
 		$this->assertIsCallable( $route['view'] );
 		$this->assertIsCallable( $route['dismiss'] );
 
+		/* Resolved when the notice displays, so nothing queries the site to style a notice that never renders */
+		$this->assertIsCallable( $route['view_class'] );
+
 		/* Every v3 feature still works until 7.0, so the notice is a warning rather than an error */
-		$this->assertSame( 'notice-warning', $route['view_class'] );
+		$this->assertSame( 'notice-warning', call_user_func( $route['view_class'] ) );
 	}
 
 	/**

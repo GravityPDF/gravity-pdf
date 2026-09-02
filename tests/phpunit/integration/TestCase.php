@@ -26,6 +26,9 @@ abstract class TestCase extends WP_UnitTestCase {
 		 * that Test_PDF / Test_Model_Pdf already do ad-hoc to a blanket reset.
 		 */
 		delete_transient( 'gfpdf_settings_user_data' );
+
+		/* Deprecation holds its detections for the request; a test process is many requests' worth of site state */
+		\GFPDF\Statics\Deprecation::flush_cache();
 	}
 
 	public static function tear_down_after_class(): void {

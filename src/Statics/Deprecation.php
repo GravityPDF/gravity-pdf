@@ -42,6 +42,14 @@ class Deprecation {
 	const GROUP_DEPRECATED = 'deprecated';
 
 	/**
+	 * Memoised self::get_signals(), keyed by the registry that produced it
+	 *
+	 * @var array<string, array>
+	 * @since 6.17.0
+	 */
+	protected static $signals = [];
+
+	/**
 	 * The classes describing the functionality Gravity PDF is removing
 	 *
 	 * Add a class here to have its features detected and reported everywhere the existing ones are.
@@ -100,13 +108,36 @@ class Deprecation {
 	 * @since 6.17.0
 	 */
 	public static function get_signals(): array {
-		$signals = [];
+		/* Keyed by the registry like self::get_features() */
+		$key = static::class;
 
-		foreach ( static::get_features() as $key => $feature ) {
-			$signals[ $key ] = call_user_func( $feature['detect'] );
+		if ( ! isset( static::$signals[ $key ] ) ) {
+			$detected = [];
+
+			foreach ( static::get_features() as $feature_key => $feature ) {
+				$detected[ $feature_key ] = call_user_func( $feature['detect'] );
+			}
+
+			static::$signals[ $key ] = array_filter( $detected );
 		}
 
-		return array_filter( $signals );
+		return static::$signals[ $key ];
+	}
+
+	/**
+	 * Forget what the detectors found this request, here and in every provider
+	 *
+	 * The one entry point for invalidating detection, so nothing calling it has to know which class holds what.
+	 *
+	 * @since 6.17.0
+	 */
+	public static function flush_cache(): void {
+		/* Every registry, not just this one: a subclass shares the store, and a caller flushing means all of it */
+		static::$signals = [];
+
+		foreach ( static::get_providers() as $provider ) {
+			$provider::flush_cache();
+		}
 	}
 
 	/**

@@ -10,7 +10,6 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Model\Model_Actions;
-use GFPDF\Statics\Deprecation;
 use GFPDF\View\View_Actions;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -120,7 +119,8 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * condition: The function or method to call to determine if a notice should be displayed (Boolean)
 	 * process: The function to handle a successful action. On success the disable_route() method should be called
 	 * view: The function used to display the notice content
-	 * view_class: Optional classes for the notice box, including a `notice-*` state like `notice-warning`
+	 * view_class: Optional classes for the notice box, including a `notice-*` state like `notice-warning`. A
+	 *             callable is resolved when the notice displays, rather than when the route table is built
 	 * dismiss: Optional function to call when the notice is dismissed, instead of dismissing the route's own
 	 *          action ID. A route that supplies one records the dismissal wherever it likes, so it also owns
 	 *          suppressing itself afterwards through `condition`
@@ -176,7 +176,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				'view'        => function ( $action, $button_text ) {
 					return $this->view->deprecated_features( $this->model->get_undismissed_deprecated_features(), $action, $button_text );
 				},
-				'view_class'  => $this->model->has_unsupported_deprecated_feature() ? 'notice-error' : 'notice-warning',
+				'view_class'  => function () {
+					return $this->model->has_unsupported_deprecated_feature() ? 'notice-error' : 'notice-warning';
+				},
 				'capability'  => 'gravityforms_view_settings',
 			],
 		];
@@ -218,9 +220,11 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 					]
 				);
 
+				$view_class = $route['view_class'] ?? '';
+
 				$this->notices->add_notice(
 					call_user_func( $route['view'], $route['action'], $route['action_text'] ),
-					$route['view_class'] ?? ''
+					is_callable( $view_class ) ? call_user_func( $view_class ) : $view_class
 				);
 			}
 		}
