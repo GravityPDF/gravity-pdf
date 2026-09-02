@@ -242,7 +242,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since 6.17.0
 	 */
 	public function system_report_redirect() {
-		wp_safe_redirect( admin_url( 'admin.php?page=gf_system_status' ) );
+		wp_safe_redirect( Model_System_Report::get_report_url() );
 		exit;
 	}
 }

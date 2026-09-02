@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
@@ -424,6 +425,18 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertStringNotContainsString( '<h4>Unsupported</h4>', $result['description'] );
 		$this->assertStringContainsString( 'Legacy Download URLs', $result['description'] );
 		$this->assertStringContainsString( (string) $form_id, $result['description'] );
-		$this->assertStringContainsString( 'page=gf_system_status', $result['actions'] );
+		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::SECTION_ANCHOR, $result['actions'] );
+	}
+
+	/**
+	 * The notice and the Site Health test both link into the middle of a long report, so the section is anchored
+	 */
+	public function test_the_report_section_can_be_linked_to_directly() {
+		$system_report = apply_filters( 'gform_system_report', [] );
+
+		$this->assertStringContainsString( 'id="' . Model_System_Report::SECTION_ANCHOR . '"', $system_report[0]['title'] );
+		$this->assertStringContainsString( 'Gravity PDF Environment', $system_report[0]['title'] );
+
+		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::SECTION_ANCHOR, Model_System_Report::get_report_url() );
 	}
 }
