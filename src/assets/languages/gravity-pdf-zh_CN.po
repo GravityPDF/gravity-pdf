@@ -1,2308 +1,2519 @@
-# Copyright (C) 2024 Gravity PDF
-# This file is distributed under the same license as the Gravity PDF package.
+# Copyright (C) 2026 Blue Liquid Designs
+# This file is distributed under the GPL-2.0.
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity PDF\n"
-"POT-Creation-Date: 2024-10-21 04:06+0000\n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
+"Report-Msgid-Bugs-To: https://gravitypdf.com\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
-"Language: zh\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Poedit-Basepath: ..\n"
-"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;"
-"_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;"
-"esc_html_e;esc_html_x:1,2c\n"
-"X-Poedit-SourceCharset: UTF-8\n"
+"POT-Creation-Date: 2024-10-21 04:06+0000\n"
+"PO-Revision-Date: 2026-09-02 04:30+0000\n"
 "X-Generator: Poedit 3.5\n"
+"X-Domain: gravity-pdf\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh-CN\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: "
+"__;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_"
+"attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: ../../../api.php:232
+#: pdf.php:3
+#: src/Helper/Helper_Data.php:147
+#: src/Model/Model_PDF.php:994
+#: src/View/View_System_Report.php:414
+#. Plugin Name of the plugin
+msgid "Gravity PDF"
+msgstr "Gravity PDF"
+
+#: pdf.php:8
+#. Plugin URI of the plugin
+msgid "https://gravitypdf.com"
+msgstr "https://gravitypdf.com"
+
+#: pdf.php:5
+#. Description of the plugin
 msgid ""
-"The $type parameter is invalid. Only \"view\" and \"model\" are accepted"
+"Automatically generate highly customizable PDF documents using Gravity "
+"Forms and WordPress (canonical)"
+msgstr "使用 Gravity Forms 和 WordPress 自动生成高度可定制的 PDF 文档（标准版）"
+
+#: pdf.php:6
+#. Author of the plugin
+msgid "Blue Liquid Designs"
+msgstr "Blue Liquid Designs"
+
+#: pdf.php:7
+#. Author URI of the plugin
+msgid "https://blueliquiddesigns.com.au"
+msgstr "https://blueliquiddesigns.com.au"
+
+#: api.php:232
+msgid "The $type parameter is invalid. Only \"view\" and \"model\" are accepted"
 msgstr "参数 $type 无效。只接受 \"视图 \"和 \"模型"
 
-#: ../../../api.php:272, ../../../api.php:471
+#: api.php:272
+#: api.php:374
+#: api.php:511
 msgid "Make sure to pass in a valid Gravity Forms Entry ID"
 msgstr "确保输入有效的 Gravity Forms 入口 ID"
 
-#: ../../../api.php:407
-msgid ""
-"The option key %s already exists. Use GPDFAPI::update_plugin_option instead"
-msgstr "选项键 %s 已经存在。请改用 GPDFAPI::update_plugin_option"
-
-#: ../../../api.php:478
+#: api.php:380
+#: api.php:518
 msgid "Could not located the PDF Settings. Ensure you pass in a valid PDF ID."
 msgstr "无法定位 PDF 设置。请确保输入了有效的 PDF ID。"
 
-#: ../../../gravity-pdf-updater.php:126
-msgid "This is the non-canonical release of Gravity PDF."
-msgstr "这是《地心引力 PDF》的非正统版本。"
+#: api.php:447
+#, php-format
+msgid "The option key %s already exists. Use GPDFAPI::update_plugin_option instead"
+msgstr "选项键 %s 已经存在。请改用 GPDFAPI::update_plugin_option"
 
+#: api.php:662
+#: src/Helper/Helper_Abstract_Options.php:1002
+#: src/Helper/Helper_Data.php:300
+#: src/Model/Model_Custom_Fonts.php:238
+msgid "User-Defined Fonts"
+msgstr "用户自定义字体"
+
+#: gravity-pdf-updater.php:141
+msgid "This is the non-canonical release of Gravity PDF which can be deleted."
+msgstr "这是 Gravity PDF 的非标准版本，可以删除。"
+
+#: pdf.php:205
 #. translators: 1. WordPress version number 2. HTML Anchor Open Tag 3. Html Anchor Close Tag
-#: ../../../pdf.php:202
+#, php-format
 msgid ""
 "WordPress version %1$s is required: upgrade to the latest version. %2$sGet "
 "more information%3$s."
 msgstr "需要 WordPress 版本 %1$s：升级到最新版本。%2$s获取更多信息%3$s。"
 
+#: pdf.php:227
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Open Tag 3. Html Anchor Close Tag
-#: ../../../pdf.php:222
+#, php-format
 msgid ""
 "%1$sGravity Forms%3$s is required to use Gravity PDF. %2$sGet more "
 "information%3$s."
 msgstr "使用 Gravity PDF 时需要 %1$sGravity Forms%3$s。%2$s获取更多信息%3$s。"
 
+#: pdf.php:236
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. Plugin version number 4. Html Anchor Open Tag
-#: ../../../pdf.php:229
+#, php-format
 msgid ""
 "%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more "
 "information%2$s."
 msgstr "需要 %1$sGravity Forms%2$s %3$s 或更高版本。%4$s获取更多信息%2$s。"
 
+#: pdf.php:258
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. HTML Anchor Open Tag 4. HTML Anchor Close Tag
-#: ../../../pdf.php:249
+#, php-format
 msgid ""
-"You are running an %1$soutdated version of PHP%2$s. Contact your web hosting "
-"provider to update. %3$sGet more information%4$s."
-msgstr ""
-"%1$s您运行的 PHP%2$s 版本已过时。请联系您的虚拟主机提供商进行更新。%3$s获取更"
-"多信息%4$s。"
+"You are running an %1$soutdated version of PHP%2$s. Contact your web "
+"hosting provider to update. %3$sGet more information%4$s."
+msgstr "%1$s您运行的 PHP%2$s 版本已过时。请联系您的虚拟主机提供商进行更新。%3$s获取更多信息%4$s。"
 
+#: pdf.php:281
+#: pdf.php:318
+#: pdf.php:344
+#: pdf.php:366
+#: pdf.php:376
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name
-#: ../../../pdf.php:269, ../../../pdf.php:307, ../../../pdf.php:327,
-#: ../../../pdf.php:347, ../../../pdf.php:355
+#, php-format
 msgid ""
 "The PHP extension %3$s could not be detected. Contact your web hosting "
 "provider to fix. %1$sGet more information%2$s."
-msgstr ""
-"无法检测到 PHP 扩展名 %3$s。请联系您的虚拟主机提供商进行修复。%1$s获取更多信"
-"息%2$s。"
+msgstr "无法检测到 PHP 扩展名 %3$s。请联系您的虚拟主机提供商进行修复。%1$s获取更多信息%2$s。"
 
-#. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag
-#: ../../../pdf.php:289
-msgid ""
-"The PHP extension MB String does not have MB Regex enabled. Contact your web "
-"hosting provider to fix. %1$sGet more information%2$s."
-msgstr ""
-"PHP 扩展程序 MB String 未启用 MB Regex。请联系您的虚拟主机提供商进行修"
-"复。%1$s获取更多信息%2$s。"
-
+#: pdf.php:402
 #. translators: 1. RAM value in MB 2. HTML Anchor Open Tag 3. HTML Anchor Close Tag
-#: ../../../pdf.php:379
+#, php-format
 msgid ""
 "You need 128MB of WP Memory (RAM) but we only found %1$s available. %2$sTry "
 "these methods to increase your memory limit%3$s, otherwise contact your web "
 "hosting provider to fix."
 msgstr ""
-"您需要 128MB 的 WP 内存 (RAM)，但我们发现只有 %1$s 可用。%2$s请尝试以下方法提"
-"高内存上限%3$s，否则请联系虚拟主机提供商进行修复。"
+"您需要 128MB 的 WP 内存 (RAM)，但我们发现只有 %1$s "
+"可用。%2$s请尝试以下方法提高内存上限%3$s，否则请联系虚拟主机提供商进行修复。"
 
-#: ../../../pdf.php:472
-msgid ""
-"The minimum requirements for the Gravity PDF plugin have not been met. "
-"Please contact the site administrator for assistance."
-msgstr "未满足 Gravity PDF 插件的最低要求。请联系网站管理员寻求帮助。"
-
-#: ../../../pdf.php:463
+#: pdf.php:487
 msgid "Gravity PDF Installation Problem"
 msgstr "重力 PDF 安装问题"
 
-#: ../../../pdf.php:465
+#: pdf.php:489
 msgid ""
 "The minimum requirements for Gravity PDF have not been met. Please fix the "
 "issue(s) below to use the plugin:"
 msgstr "未满足 Gravity PDF 的最低要求。请修复以下问题以使用该插件："
 
-#: ../../../pdf.php:491, ../../../pdf.php:531
+#: pdf.php:496
+msgid ""
+"The minimum requirements for the Gravity PDF plugin have not been met. "
+"Please contact the site administrator for assistance."
+msgstr "未满足 Gravity PDF 插件的最低要求。请联系网站管理员寻求帮助。"
+
+#: pdf.php:515
+#: pdf.php:560
+#, php-format
 msgid ""
 "The Gravity PDF plugin has a new home! In order to get updates direct from "
-"GravityPDF.com %1$syou need to perform a one-time download of the plugin%2$s."
-msgstr ""
-"Gravity PDF 插件有了新家！为了直接从 GravityPDF.com %1$s获取更新，您需要一次"
-"性下载该插件%2$s。"
+"GravityPDF.com %1$syou need to perform a one-time download of the "
+"plugin%2$s."
+msgstr "Gravity PDF 插件有了新家！为了直接从 GravityPDF.com %1$s获取更新，您需要一次性下载该插件%2$s。"
 
-#: ../../bootstrap.php:134, ../../bootstrap.php:146, ../../deprecated.php:45,
-#: ../../deprecated.php:58
-msgid "\"%s\" has been deprecated as of Gravity PDF 4.0"
-msgstr "自 Gravity PDF 4.0 起，\"%s\"已被弃用"
-
-#: ../../bootstrap.php:296
+#: src/bootstrap.php:308
 msgid "View Gravity PDF Settings"
 msgstr "查看重力 PDF 设置"
 
-#: ../../bootstrap.php:296, ../../View/View_Settings.php:174
+#: src/bootstrap.php:308
+#: src/View/View_Settings.php:176
 msgid "Settings"
 msgstr "设置"
 
-#: ../../bootstrap.php:316
+#: src/bootstrap.php:328
 msgid "View Gravity PDF Documentation"
 msgstr "查看Gravity PDF文档"
 
-#: ../../bootstrap.php:316, ../../Helper/Helper_Abstract_Addon.php:799
+#: src/bootstrap.php:328
+#: src/Helper/Helper_Abstract_Addon.php:1103
 msgid "Docs"
 msgstr "文档"
 
-#: ../../bootstrap.php:317, ../../Helper/Helper_Abstract_Addon.php:802
+#: src/bootstrap.php:329
+#: src/Helper/Helper_Abstract_Addon.php:1106
 msgid "Get Help and Support"
 msgstr "获取帮助和支持"
 
-#: ../../bootstrap.php:317, ../../Helper/Helper_Abstract_Addon.php:802
+#: src/bootstrap.php:329
+#: src/Helper/Helper_Abstract_Addon.php:1106
 msgid "Support"
 msgstr "支持"
 
-#: ../../bootstrap.php:318
+#: src/bootstrap.php:330
 msgid "View Gravity PDF Extensions Shop"
 msgstr "查看重力 PDF 扩展商店"
 
-#: ../../bootstrap.php:318, ../../View/View_Settings.php:208
+#: src/bootstrap.php:330
+#: src/View/View_Settings.php:210
 msgid "Extensions"
 msgstr "扩展"
 
-#: ../../bootstrap.php:319
+#: src/bootstrap.php:331
 msgid "View Gravity PDF Template Shop"
 msgstr "查看重力 PDF 模板商店"
 
-#: ../../bootstrap.php:319, ../../Helper/Helper_Options_Fields.php:70
+#: src/bootstrap.php:331
+#: src/Helper/Helper_Options_Fields.php:72
 msgid "Templates"
 msgstr "模板"
 
-#: ../../Controller/Controller_Actions.php:132,
-#: ../../Helper/Helper_Options_Fields.php:222
+#: src/Controller/Controller_Actions.php:139
+#: src/Helper/Helper_Options_Fields.php:224
 msgid "Install Core Fonts"
 msgstr "安装核心字体"
 
-#: ../../Controller/Controller_Actions.php:207,
-#: ../../Model/Model_Form_Settings.php:171,
-#: ../../Model/Model_Form_Settings.php:208,
-#: ../../Model/Model_Form_Settings.php:330, ../../View/View_Settings.php:427
+#: src/Controller/Controller_Actions.php:172
+msgid "View the system report"
+msgstr "查看系统报告"
+
+#: src/Controller/Controller_Actions.php:269
+#: src/Model/Model_Form_Settings.php:171
+#: src/Model/Model_Form_Settings.php:208
+#: src/Model/Model_Form_Settings.php:330
+#: src/View/View_Settings.php:429
 msgid "You do not have permission to access this page"
 msgstr "您没有访问此页面的权限"
 
-#: ../../Controller/Controller_Actions.php:214
+#: src/Controller/Controller_Actions.php:276
 msgid "There was a problem processing the action. Please try again."
 msgstr "处理操作时出现问题。请重试。"
 
-#: ../../Controller/Controller_Custom_Fonts.php:121,
-#: ../../Controller/Controller_Custom_Fonts.php:150
+#: src/Controller/Controller_Custom_Fonts.php:121
+#: src/Controller/Controller_Custom_Fonts.php:150
 msgid "The font label used for the object"
 msgstr "对象使用的字体标签"
 
-#: ../../Controller/Controller_Custom_Fonts.php:156
+#: src/Controller/Controller_Custom_Fonts.php:156
 msgid ""
-"The path to the `regular` font file. Pass empty value if it should be deleted"
+"The path to the `regular` font file. Pass empty value if it should be "
+"deleted"
 msgstr "常规 \"字体文件的路径。如果应删除，则传递空值"
 
-#: ../../Controller/Controller_Custom_Fonts.php:162
+#: src/Controller/Controller_Custom_Fonts.php:162
 msgid ""
-"The path to the `italics` font file. Pass empty value if it should be deleted"
+"The path to the `italics` font file. Pass empty value if it should be "
+"deleted"
 msgstr "italics 字体文件的路径。如果应删除，则传递空值"
 
-#: ../../Controller/Controller_Custom_Fonts.php:168
-msgid ""
-"The path to the `bold` font file. Pass empty value if it should be deleted"
+#: src/Controller/Controller_Custom_Fonts.php:168
+msgid "The path to the `bold` font file. Pass empty value if it should be deleted"
 msgstr "粗体 \"字体文件的路径。如果应删除，则传递空值"
 
-#: ../../Controller/Controller_Custom_Fonts.php:174
+#: src/Controller/Controller_Custom_Fonts.php:174
 msgid ""
 "The path to the `bolditalics` font file. Pass empty value if it should be "
 "deleted"
 msgstr "字体文件 `bolditalics` 的路径。如果应删除，则传递空值"
 
-#: ../../Controller/Controller_Custom_Fonts.php:225
+#: src/Controller/Controller_Custom_Fonts.php:225
 msgid "The Regular font is required"
 msgstr "常规字体是必需的"
 
-#: ../../Controller/Controller_Custom_Fonts.php:338
+#: src/Controller/Controller_Custom_Fonts.php:338
 msgid "Kashida needs to be a value between 0-100"
 msgstr "Kashida 需要是一个介于 0-100 之间的值"
 
-#: ../../Controller/Controller_Custom_Fonts.php:480
+#: src/Controller/Controller_Custom_Fonts.php:480
 msgid "The upload is not a valid TTF file"
 msgstr "上传的不是有效的 TTF 文件"
 
-#: ../../Controller/Controller_Custom_Fonts.php:543
+#: src/Controller/Controller_Custom_Fonts.php:546
+#, php-format
 msgid "Cannot find %s."
 msgstr "无法找到 %s。"
 
-#: ../../Controller/Controller_Export_Entries.php:54
+#: src/Controller/Controller_Export_Entries.php:54
+#, php-format
 msgid "PDF: %s"
 msgstr "PDF：%s"
 
-#: ../../Controller/Controller_PDF.php:434, ../../View/View_PDF.php:244
+#: src/Controller/Controller_PDF.php:430
+#: src/View/View_PDF.php:246
 msgid "There was a problem generating your PDF"
 msgstr "生成 PDF 时出现问题"
 
-#: ../../Helper/Helper_Abstract_Addon.php:764
+#: src/Controller/Controller_System_Report.php:100
+msgid "Deprecated Gravity PDF functionality"
+msgstr "已弃用的 Gravity PDF 功能"
+
+#: src/Helper/Fields/Field_Consent.php:142
+msgid "Consent not given."
+msgstr "未经同意。"
+
+#: src/Helper/Fields/Field_Products.php:216
+msgid "Subtotal"
+msgstr "小计"
+
+#: src/Helper/Fields/Field_Products.php:221
+#, php-format
+msgid "Shipping (%s)"
+msgstr "运输 (%s)"
+
+#: src/Helper/Fields/Field_Tos.php:101
+msgid "Not accepted"
+msgstr "不接受"
+
+#: src/Helper/Helper_Abstract_Addon.php:985
+msgid "an unknown date"
+msgstr "未知日期"
+
+#: src/Helper/Helper_Abstract_Addon.php:1068
+#, php-format
 msgid ""
 "%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades "
 "and support. Need a license key? %4$sPurchase one now%5$s."
-msgstr ""
-"%1$s注册您的 %2$s%3$s 版本，即可获得自动升级和支持。需要许可证密钥？%4$s立即"
-"购买%5$s。"
+msgstr "%1$s注册您的 %2$s%3$s 版本，即可获得自动升级和支持。需要许可证密钥？%4$s立即购买%5$s。"
 
-#: ../../Helper/Helper_Abstract_Addon.php:799
+#: src/Helper/Helper_Abstract_Addon.php:1103
 msgid "View plugin Documentation"
 msgstr "查看插件文档"
 
-#: ../../Helper/Helper_Abstract_Options.php:396,
-#: ../../Helper/Helper_Abstract_Options.php:415
+#: src/Helper/Helper_Abstract_Options.php:396
+#: src/Helper/Helper_Abstract_Options.php:415
 msgid "You must pass in a valid form ID"
 msgstr "您必须输入有效的表格 ID"
 
-#: ../../Helper/Helper_Abstract_Options.php:457
+#: src/Helper/Helper_Abstract_Options.php:457
 msgid "You must pass in a valid PDF ID"
 msgstr "您必须提供有效的 PDF ID"
 
-#: ../../Helper/Helper_Abstract_Options.php:842
+#: src/Helper/Helper_Abstract_Options.php:842
 msgid "Common Sizes"
 msgstr "常用尺寸"
 
-#: ../../Helper/Helper_Abstract_Options.php:843
+#: src/Helper/Helper_Abstract_Options.php:843
 msgid "A4 (210 x 297mm)"
 msgstr "A4（210 x 297 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:844
+#: src/Helper/Helper_Abstract_Options.php:844
 msgid "Letter (8.5 x 11in)"
 msgstr "信纸（8.5 x 11 英寸）"
 
-#: ../../Helper/Helper_Abstract_Options.php:845
+#: src/Helper/Helper_Abstract_Options.php:845
 msgid "Legal (8.5 x 14in)"
 msgstr "标准（8.5 x 14 英寸）"
 
-#: ../../Helper/Helper_Abstract_Options.php:846
+#: src/Helper/Helper_Abstract_Options.php:846
 msgid "Ledger / Tabloid (11 x 17in)"
 msgstr "分类账/小开本（11 x 17 英寸）"
 
-#: ../../Helper/Helper_Abstract_Options.php:847
+#: src/Helper/Helper_Abstract_Options.php:847
 msgid "Executive (7 x 10in)"
 msgstr "行政（7 x 10 英寸）"
 
-#: ../../Helper/Helper_Abstract_Options.php:848,
-#: ../../Helper/Helper_Options_Fields.php:94,
-#: ../../Helper/Helper_Options_Fields.php:319
+#: src/Helper/Helper_Abstract_Options.php:848
+#: src/Helper/Helper_Options_Fields.php:96
+#: src/Helper/Helper_Options_Fields.php:321
 msgid "Custom Paper Size"
 msgstr "顧客備註"
 
-#: ../../Helper/Helper_Abstract_Options.php:851
+#: src/Helper/Helper_Abstract_Options.php:851
 msgid "\"A\" Sizes"
 msgstr "\"A\" 尺寸"
 
-#: ../../Helper/Helper_Abstract_Options.php:852
+#: src/Helper/Helper_Abstract_Options.php:852
 msgid "A0 (841 x 1189mm)"
 msgstr "A0（841 x 1189 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:853
+#: src/Helper/Helper_Abstract_Options.php:853
 msgid "A1 (594 x 841mm)"
 msgstr "A1（594 x 841 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:854
+#: src/Helper/Helper_Abstract_Options.php:854
 msgid "A2 (420 x 594mm)"
 msgstr "A2（420 x 594 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:855
+#: src/Helper/Helper_Abstract_Options.php:855
 msgid "A3 (297 x 420mm)"
 msgstr "A3（297 x 420 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:856
+#: src/Helper/Helper_Abstract_Options.php:856
 msgid "A5 (148 x 210mm)"
 msgstr "A5（148 x 210 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:857
+#: src/Helper/Helper_Abstract_Options.php:857
 msgid "A6 (105 x 148mm)"
 msgstr "A6（105 x 148 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:858
+#: src/Helper/Helper_Abstract_Options.php:858
 msgid "A7 (74 x 105mm)"
 msgstr "A7（74 x 105 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:859
+#: src/Helper/Helper_Abstract_Options.php:859
 msgid "A8 (52 x 74mm)"
 msgstr "A8（52 x 74 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:860
+#: src/Helper/Helper_Abstract_Options.php:860
 msgid "A9 (37 x 52mm)"
 msgstr "A9（37 x 52 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:861
+#: src/Helper/Helper_Abstract_Options.php:861
 msgid "A10 (26 x 37mm)"
 msgstr "A10（26 x 37 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:864
+#: src/Helper/Helper_Abstract_Options.php:864
 msgid "\"B\" Sizes"
 msgstr "\"B\" 尺寸"
 
-#: ../../Helper/Helper_Abstract_Options.php:865
+#: src/Helper/Helper_Abstract_Options.php:865
 msgid "B0 (1414 x 1000mm)"
 msgstr "B0（1414 x 1000 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:866
+#: src/Helper/Helper_Abstract_Options.php:866
 msgid "B1 (1000 x 707mm)"
 msgstr "B1（1000 x 707 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:867
+#: src/Helper/Helper_Abstract_Options.php:867
 msgid "B2 (707 x 500mm)"
 msgstr "B2（707 x 500 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:868
+#: src/Helper/Helper_Abstract_Options.php:868
 msgid "B3 (500 x 353mm)"
 msgstr "B3（500 x 353 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:869
+#: src/Helper/Helper_Abstract_Options.php:869
 msgid "B4 (353 x 250mm)"
 msgstr "B4（353 x 250 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:870
+#: src/Helper/Helper_Abstract_Options.php:870
 msgid "B5 (250 x 176mm)"
 msgstr "B5（250 x 176 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:871
+#: src/Helper/Helper_Abstract_Options.php:871
 msgid "B6 (176 x 125mm)"
 msgstr "B6（176 x 125 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:872
+#: src/Helper/Helper_Abstract_Options.php:872
 msgid "B7 (125 x 88mm)"
 msgstr "B7（125 x 88 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:873
+#: src/Helper/Helper_Abstract_Options.php:873
 msgid "B8 (88 x 62mm)"
 msgstr "B8（88 x 62 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:874
+#: src/Helper/Helper_Abstract_Options.php:874
 msgid "B9 (62 x 44mm)"
 msgstr "B9（62 x 44 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:875
+#: src/Helper/Helper_Abstract_Options.php:875
 msgid "B10 (44 x 31mm)"
 msgstr "B10（44 x 31 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:878
+#: src/Helper/Helper_Abstract_Options.php:878
 msgid "\"C\" Sizes"
 msgstr "\"C\" 尺寸"
 
-#: ../../Helper/Helper_Abstract_Options.php:879
+#: src/Helper/Helper_Abstract_Options.php:879
 msgid "C0 (1297 x 917mm)"
 msgstr "C0（1297 x 917 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:880
+#: src/Helper/Helper_Abstract_Options.php:880
 msgid "C1 (917 x 648mm)"
 msgstr "C1（917 x 648 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:881
+#: src/Helper/Helper_Abstract_Options.php:881
 msgid "C2 (648 x 458mm)"
 msgstr "C2（648 x 458 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:882
+#: src/Helper/Helper_Abstract_Options.php:882
 msgid "C3 (458 x 324mm)"
 msgstr "C3（458 x 324 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:883
+#: src/Helper/Helper_Abstract_Options.php:883
 msgid "C4 (324 x 229mm)"
 msgstr "C4（324 x 229 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:884
+#: src/Helper/Helper_Abstract_Options.php:884
 msgid "C5 (229 x 162mm)"
 msgstr "C5（229 x 162 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:885
+#: src/Helper/Helper_Abstract_Options.php:885
 msgid "C6 (162 x 114mm)"
 msgstr "C6（162 x 114 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:886
+#: src/Helper/Helper_Abstract_Options.php:886
 msgid "C7 (114 x 81mm)"
 msgstr "C7（114 x 81 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:887
+#: src/Helper/Helper_Abstract_Options.php:887
 msgid "C8 (81 x 57mm)"
 msgstr "C8（81 x 57 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:888
+#: src/Helper/Helper_Abstract_Options.php:888
 msgid "C9 (57 x 40mm)"
 msgstr "C9（57 x 40 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:889
+#: src/Helper/Helper_Abstract_Options.php:889
 msgid "C10 (40 x 28mm)"
 msgstr "C10（40 x 28 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:892
+#: src/Helper/Helper_Abstract_Options.php:892
 msgid "\"RA\" and \"SRA\" Sizes"
 msgstr "\"RA\" 和 \"SRA\" 尺寸"
 
-#: ../../Helper/Helper_Abstract_Options.php:893
+#: src/Helper/Helper_Abstract_Options.php:893
 msgid "RA0 (860 x 1220mm)"
 msgstr "RA0（860 x 1220 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:894
+#: src/Helper/Helper_Abstract_Options.php:894
 msgid "RA1 (610 x 860mm)"
 msgstr "RA1（610 x 860 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:895
+#: src/Helper/Helper_Abstract_Options.php:895
 msgid "RA2 (430 x 610mm)"
 msgstr "RA2（430 x 610 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:896
+#: src/Helper/Helper_Abstract_Options.php:896
 msgid "RA3 (305 x 430mm)"
 msgstr "RA3（305 x 430 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:897
+#: src/Helper/Helper_Abstract_Options.php:897
 msgid "RA4 (215 x 305mm)"
 msgstr "RA4（215 x 305 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:898
+#: src/Helper/Helper_Abstract_Options.php:898
 msgid "SRA0 (900 x 1280mm)"
 msgstr "SRA0（900 x 1280 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:899
+#: src/Helper/Helper_Abstract_Options.php:899
 msgid "SRA1 (640 x 900mm)"
 msgstr "SRA1（640 x 900 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:900
+#: src/Helper/Helper_Abstract_Options.php:900
 msgid "SRA2 (450 x 640mm)"
 msgstr "SRA2（450 x 640 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:901
+#: src/Helper/Helper_Abstract_Options.php:901
 msgid "SRA3 (320 x 450mm)"
 msgstr "SRA3（320 x 450 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:902
+#: src/Helper/Helper_Abstract_Options.php:902
 msgid "SRA4 (225 x 320mm)"
 msgstr "SRA4（225 x 320 毫米）"
 
-#: ../../Helper/Helper_Abstract_Options.php:918
+#: src/Helper/Helper_Abstract_Options.php:918
 msgid "Unicode"
 msgstr "Unicode"
 
-#: ../../Helper/Helper_Abstract_Options.php:932
+#: src/Helper/Helper_Abstract_Options.php:932
 msgid "Indic"
 msgstr "指标"
 
-#: ../../Helper/Helper_Abstract_Options.php:937
+#: src/Helper/Helper_Abstract_Options.php:937
 msgid "Arabic"
 msgstr "阿拉伯语"
 
-#: ../../Helper/Helper_Abstract_Options.php:943
+#: src/Helper/Helper_Abstract_Options.php:943
 msgid "Chinese, Japanese, Korean"
 msgstr "中文、日文、韩文"
 
-#: ../../Helper/Helper_Abstract_Options.php:948
+#: src/Helper/Helper_Abstract_Options.php:948
 msgid "Other"
 msgstr "其他"
 
-#: ../../Helper/Helper_Abstract_Options.php:1002
-msgid "User-Defined Fonts"
-msgstr "用户自定义字体"
-
-#: ../../Helper/Helper_Abstract_Options.php:1059
+#: src/Helper/Helper_Abstract_Options.php:1059
 msgid "Could not find Gravity PDF Font"
 msgstr "无法找到 Gravity PDF 字体"
 
-#: ../../Helper/Helper_Abstract_Options.php:1071,
-#: ../../Helper/Helper_PDF_List_Table.php:300
+#: src/Helper/Helper_Abstract_Options.php:1071
+#: src/Helper/Helper_PDF_List_Table.php:301
 msgid "Copy"
 msgstr "复制"
 
-#: ../../Helper/Helper_Abstract_Options.php:1072
+#: src/Helper/Helper_Abstract_Options.php:1072
 msgid "Print - Low Resolution"
 msgstr "打印 - 低分辨率"
 
-#: ../../Helper/Helper_Abstract_Options.php:1073
+#: src/Helper/Helper_Abstract_Options.php:1073
 msgid "Print - High Resolution"
 msgstr "打印 - 高分辨率"
 
-#: ../../Helper/Helper_Abstract_Options.php:1074
+#: src/Helper/Helper_Abstract_Options.php:1074
 msgid "Modify"
 msgstr "修改"
 
-#: ../../Helper/Helper_Abstract_Options.php:1075
+#: src/Helper/Helper_Abstract_Options.php:1075
 msgid "Annotate"
 msgstr "批注"
 
-#: ../../Helper/Helper_Abstract_Options.php:1076
+#: src/Helper/Helper_Abstract_Options.php:1076
 msgid "Fill Forms"
 msgstr "填写表格"
 
-#: ../../Helper/Helper_Abstract_Options.php:1077
+#: src/Helper/Helper_Abstract_Options.php:1077
 msgid "Extract"
 msgstr "提取"
 
-#: ../../Helper/Helper_Abstract_Options.php:1078
+#: src/Helper/Helper_Abstract_Options.php:1078
 msgid "Assemble"
 msgstr "组装"
 
-#: ../../Helper/Helper_Abstract_Options.php:1184
+#: src/Helper/Helper_Abstract_Options.php:1184
 msgid "Settings updated."
 msgstr "设置更新。"
 
-#: ../../Helper/Helper_Abstract_Options.php:1340,
-#: ../../Helper/Helper_Abstract_Options.php:1348,
-#: ../../Helper/Helper_Abstract_Options.php:1356
+#: src/Helper/Helper_Abstract_Options.php:1340
+#: src/Helper/Helper_Abstract_Options.php:1348
+#: src/Helper/Helper_Abstract_Options.php:1356
 msgid ""
-"PDF Settings could not be saved. Please enter all required information below."
+"PDF Settings could not be saved. Please enter all required information "
+"below."
 msgstr "无法保存 PDF 设置。请在下面输入所有必要信息。"
 
-#: ../../Helper/Helper_Abstract_Options.php:1744
+#: src/Helper/Helper_Abstract_Options.php:1723
+msgid "License key set by the site administrator."
+msgstr "由站点管理员设置的许可证密钥。"
+
+#: src/Helper/Helper_Abstract_Options.php:1724
+msgid "Learn more."
+msgstr "了解更多。"
+
+#: src/Helper/Helper_Abstract_Options.php:1744
+#, php-format
 msgid "%s license key"
 msgstr "%s 许可证密钥"
 
-#: ../../Helper/Helper_Abstract_Options.php:1761
+#: src/Helper/Helper_Abstract_Options.php:1762
 msgid "Deactivate License"
 msgstr "停用许可证"
 
-#: ../../Helper/Helper_Abstract_Options.php:2136,
-#: ../../Helper/Helper_Abstract_Options.php:2137
+#: src/Helper/Helper_Abstract_Options.php:2127
+#: src/Helper/Helper_Abstract_Options.php:2128
 msgid "Select Media"
 msgstr "选择媒体"
 
-#: ../../Helper/Helper_Abstract_Options.php:2138
+#: src/Helper/Helper_Abstract_Options.php:2129
 msgid "Upload File"
 msgstr "上传文件"
 
-#: ../../Helper/Helper_Abstract_Options.php:2382
+#: src/Helper/Helper_Abstract_Options.php:2369
 msgid "Width"
 msgstr "宽"
 
-#: ../../Helper/Helper_Abstract_Options.php:2394
+#: src/Helper/Helper_Abstract_Options.php:2381
 msgid "Height"
 msgstr "高"
 
-#: ../../Helper/Helper_Abstract_Options.php:2411
+#: src/Helper/Helper_Abstract_Options.php:2398
 msgid "mm"
 msgstr "毫米"
 
-#: ../../Helper/Helper_Abstract_Options.php:2412
+#: src/Helper/Helper_Abstract_Options.php:2399
 msgid "inches"
 msgstr "显示英寸"
 
-#: ../../Helper/Helper_Abstract_Options.php:2480
+#: src/Helper/Helper_Abstract_Options.php:2467
+#, php-format
 msgid "The callback used for the %s setting is missing."
 msgstr "用于 %s 设置的回调丢失。"
 
-#: ../../Helper/Helper_Abstract_View.php:105
+#: src/Helper/Helper_Abstract_View.php:105
+#, php-format
 msgid "%s is an invalid filename"
 msgstr "%s 是无效文件名"
 
-#: ../../Helper/Helper_Abstract_View.php:129
+#: src/Helper/Helper_Abstract_View.php:133
+#, php-format
 msgid "Cannot find file %s"
 msgstr "无法找到文件 %s"
 
-#: ../../Helper/Helper_Data.php:143, ../../Model/Model_Mergetags.php:125
+#: src/Helper/Helper_Data.php:146
+#: src/Model/Model_Mergetags.php:125
 msgid "PDF"
 msgstr "PDF"
 
-#: ../../Helper/Helper_Data.php:144, ../../Model/Model_PDF.php:987
-msgid "Gravity PDF"
-msgstr "Gravity PDF"
+#: src/Helper/Helper_Data.php:181
+#: src/Helper/Helper_Data.php:182
+msgid "Your support license key has been activated for this domain."
+msgstr "您的支持许可密钥已在此域激活。"
 
-#: ../../Helper/Helper_Data.php:178
+#: src/Helper/Helper_Data.php:183
+#, php-format
 msgid ""
 "This license key expired on %%s. %1$sPlease renew your license to continue "
 "receiving updates and support%2$s."
 msgstr "此许可证密钥已于 %%s 到期。%1$s请更新许可证以继续接收更新和支持%2$s。"
 
-#: ../../Helper/Helper_Data.php:179, ../../Helper/Helper_Data.php:180
+#: src/Helper/Helper_Data.php:184
+#: src/Helper/Helper_Data.php:185
+#, php-format
 msgid ""
 "This license key has been cancelled (most likely due to a refund request). "
 "%1$sPlease consider purchasing a new license%2$s."
-msgstr ""
-"该许可证密钥已被取消（很可能是由于退款请求）。%1$s请考虑购买新的许可证%2$s。"
+msgstr "该许可证密钥已被取消（很可能是由于退款请求）。%1$s请考虑购买新的许可证%2$s。"
 
-#: ../../Helper/Helper_Data.php:181
+#: src/Helper/Helper_Data.php:186
 msgid ""
 "This license key is invalid. Please check your key has been entered "
 "correctly."
 msgstr "此许可证密钥无效。请检查您输入的密钥是否正确。"
 
-#: ../../Helper/Helper_Data.php:182
+#: src/Helper/Helper_Data.php:187
 msgid ""
-"The license key is invalid. Please check your key has been entered correctly."
+"The license key is invalid. Please check your key has been entered "
+"correctly."
 msgstr "许可证密钥无效。请检查您输入的密钥是否正确。"
 
-#: ../../Helper/Helper_Data.php:183
+#: src/Helper/Helper_Data.php:188
 msgid ""
 "Your license key is valid but does not match your current domain. This "
 "usually occurs if your domain URL changes. Please resave the settings to "
 "activate the license for this website."
-msgstr ""
-"您的许可证密钥有效，但与您当前的域名不匹配。如果您的域名 URL 发生变化，通常会"
-"出现这种情况。请重新保存设置，以激活该网站的许可证。"
+msgstr "您的许可证密钥有效，但与您当前的域名不匹配。如果您的域名 URL 发生变化，通常会出现这种情况。请重新保存设置，以激活该网站的许可证。"
 
-#: ../../Helper/Helper_Data.php:184, ../../Helper/Helper_Data.php:185
+#: src/Helper/Helper_Data.php:189
+#: src/Helper/Helper_Data.php:190
+#, php-format
 msgid ""
 "This license key is not valid for %s. Please check your key is for this "
 "product."
 msgstr "此许可证密钥对 %s 无效。请检查您的密钥是否适用于该产品。"
 
-#: ../../Helper/Helper_Data.php:186
+#: src/Helper/Helper_Data.php:191
+#, php-format
 msgid ""
 "This license key has reached its activation limit. %1$sPlease upgrade your "
 "license to increase the site limit (you only pay the difference)%2$s."
-msgstr ""
-"此许可证密钥已达到激活上限。%1$s请升级您的许可证以增加站点限制（您只需支付差"
-"额）%2$s。"
+msgstr "此许可证密钥已达到激活上限。%1$s请升级您的许可证以增加站点限制（您只需支付差额）%2$s。"
 
-#: ../../Helper/Helper_Data.php:187, ../../Helper/Helper_Data.php:188
-msgid "An error occurred, please try again."
-msgstr "发生错误，请重试。"
+#: src/Helper/Helper_Data.php:192
+#: src/Helper/Helper_Data.php:193
+#: src/Helper/Helper_Data.php:194
+msgid "An unknown error occurred while checking the license."
+msgstr "检查许可证时发生未知错误。"
 
-#: ../../Helper/Helper_Data.php:226
+#: src/Helper/Helper_Data.php:195
+msgid "The licensing server is temporarily unavailable."
+msgstr "许可服务器暂时不可用。"
+
+#: src/Helper/Helper_Data.php:233
 msgid "Loading..."
 msgstr "加载中…"
 
-#: ../../Helper/Helper_Data.php:227
+#: src/Helper/Helper_Data.php:234
 msgid "Continue"
 msgstr "继续"
 
-#: ../../Helper/Helper_Data.php:228
+#: src/Helper/Helper_Data.php:235
 msgid "Uninstall"
 msgstr "卸载"
 
-#: ../../Helper/Helper_Data.php:229
+#: src/Helper/Helper_Data.php:236
 msgid "Cancel"
 msgstr "取消"
 
-#: ../../Helper/Helper_Data.php:230, ../../Helper/Helper_PDF_List_Table.php:366
+#: src/Helper/Helper_Data.php:237
+#: src/Helper/Helper_PDF_List_Table.php:367
 msgid "Delete"
 msgstr "删除"
 
-#: ../../Helper/Helper_Data.php:231,
-#: ../../Helper/Helper_PDF_List_Table.php:220,
-#: ../../Model/Model_Form_Settings.php:922
+#: src/Helper/Helper_Data.php:238
+#: src/Helper/Helper_PDF_List_Table.php:221
+#: src/Model/Model_Form_Settings.php:924
 msgid "Active"
 msgstr "活性"
 
-#: ../../Helper/Helper_Data.php:232,
-#: ../../Helper/Helper_PDF_List_Table.php:223,
-#: ../../Model/Model_Form_Settings.php:872,
-#: ../../Model/Model_Form_Settings.php:922
+#: src/Helper/Helper_Data.php:239
+#: src/Helper/Helper_PDF_List_Table.php:224
+#: src/Model/Model_Form_Settings.php:874
+#: src/Model/Model_Form_Settings.php:924
 msgid "Inactive"
 msgstr "未激活"
 
-#: ../../Helper/Helper_Data.php:233
+#: src/Helper/Helper_Data.php:240
 msgid "this PDF if"
 msgstr "这个PDF如果"
 
-#: ../../Helper/Helper_Data.php:234
+#: src/Helper/Helper_Data.php:241
 msgid "Enable"
 msgstr "启用"
 
-#: ../../Helper/Helper_Data.php:235
+#: src/Helper/Helper_Data.php:242
 msgid "Disable"
 msgstr "禁用"
 
-#: ../../Helper/Helper_Data.php:236
+#: src/Helper/Helper_Data.php:243
 msgid "Successfully Updated"
 msgstr "更新成功"
 
-#: ../../Helper/Helper_Data.php:237
+#: src/Helper/Helper_Data.php:244
 msgid "Successfully Deleted"
 msgstr "成功删除了"
 
-#: ../../Helper/Helper_Data.php:238, ../../Model/Model_System_Report.php:264
+#: src/Helper/Helper_Data.php:245
+msgid ""
+"An error occurred and your license key may not have been correctly "
+"deactivated. Login to your GravityPDF.com account and check if your site "
+"has been unlinked from the key."
+msgstr "发生错误，您的许可证密钥可能未被正确停用。登录您的 GravityPDF.com 账户，检查您的站点是否已与密钥解除关联。"
+
+#: src/Helper/Helper_Data.php:246
 msgid "No"
 msgstr "否"
 
-#: ../../Helper/Helper_Data.php:239, ../../Model/Model_System_Report.php:264
+#: src/Helper/Helper_Data.php:247
 msgid "Yes"
 msgstr "是"
 
-#: ../../Helper/Helper_Data.php:240
+#: src/Helper/Helper_Data.php:248
 msgid "Standard"
 msgstr "标准"
 
-#: ../../Helper/Helper_Data.php:241, ../../View/View_Form_Settings.php:78
+#: src/Helper/Helper_Data.php:249
+#: src/View/View_Form_Settings.php:78
 msgid "Advanced"
 msgstr "高级"
 
-#: ../../Helper/Helper_Data.php:242
+#: src/Helper/Helper_Data.php:250
 msgid "Manage"
 msgstr "管理"
 
-#: ../../Helper/Helper_Data.php:243
+#: src/Helper/Helper_Data.php:251
 msgid "Details"
 msgstr "详情"
 
-#: ../../Helper/Helper_Data.php:244
+#: src/Helper/Helper_Data.php:252
 msgid "Select"
 msgstr "选择"
 
-#: ../../Helper/Helper_Data.php:245
+#: src/Helper/Helper_Data.php:253
 msgid "Version"
 msgstr "版本"
 
-#: ../../Helper/Helper_Data.php:246
+#: src/Helper/Helper_Data.php:254
 msgid "Group"
 msgstr "组"
 
-#: ../../Helper/Helper_Data.php:247
+#: src/Helper/Helper_Data.php:255
 msgid "Tags"
 msgstr "标签"
 
-#: ../../Helper/Helper_Data.php:249,
-#: ../../Helper/Helper_Options_Fields.php:255,
-#: ../../Helper/Helper_PDF_List_Table.php:97,
-#: ../../View/View_Form_Settings.php:66
+#: src/Helper/Helper_Data.php:257
+#: src/Helper/Helper_Options_Fields.php:257
+#: src/Helper/Helper_PDF_List_Table.php:98
+#: src/View/View_Form_Settings.php:66
 msgid "Template"
 msgstr "模板"
 
-#: ../../Helper/Helper_Data.php:250
+#: src/Helper/Helper_Data.php:258
 msgid "Manage PDF Templates"
 msgstr "管理 PDF 模板"
 
-#: ../../Helper/Helper_Data.php:251
+#: src/Helper/Helper_Data.php:259
 msgid "Add New Template"
 msgstr "添加新模板"
 
-#: ../../Helper/Helper_Data.php:252
+#: src/Helper/Helper_Data.php:260
 msgid "This form doesn't have any PDFs."
 msgstr "此表格没有任何 PDF 文件。"
 
-#: ../../Helper/Helper_Data.php:253
+#: src/Helper/Helper_Data.php:261
 msgid "Let's go create one"
 msgstr "让我们创建一个"
 
-#: ../../Helper/Helper_Data.php:254
+#: src/Helper/Helper_Data.php:262
 msgid "Installed PDFs"
 msgstr "已安装的 PDF"
 
-#: ../../Helper/Helper_Data.php:255
+#: src/Helper/Helper_Data.php:263
 msgid "Search Installed Templates"
 msgstr "搜索已安装的模板"
 
-#: ../../Helper/Helper_Data.php:257
+#: src/Helper/Helper_Data.php:265
 msgid "Search the Gravity PDF Knowledgebase..."
 msgstr "搜索 Gravity PDF 知识库..."
 
-#: ../../Helper/Helper_Data.php:258
+#: src/Helper/Helper_Data.php:266
 msgid "Gravity PDF Documentation"
 msgstr "重力 PDF 文档"
 
-#: ../../Helper/Helper_Data.php:259
+#: src/Helper/Helper_Data.php:267
 msgid "It doesn't look like there are any topics related to your issue."
 msgstr "看起来没有与您的问题相关的主题。"
 
-#: ../../Helper/Helper_Data.php:260
+#: src/Helper/Helper_Data.php:268
 msgid "An error occurred. Please try again"
 msgstr "发生错误. 请重试"
 
-#: ../../Helper/Helper_Data.php:262
+#: src/Helper/Helper_Data.php:270
+#, php-format
 msgid "Requires Gravity PDF v%s"
-msgstr "需要重力 PDF v[0］"
+msgstr "需要重力 PDF v%s"
 
-#: ../../Helper/Helper_Data.php:263
+#: src/Helper/Helper_Data.php:271
+#, php-format
 msgid ""
 "This PDF template is not compatible with your version of Gravity PDF. This "
 "template required Gravity PDF v%s."
 msgstr "此 PDF 模板与您的 Gravity PDF 版本不兼容。此模板需要 Gravity PDF v%s。"
 
-#: ../../Helper/Helper_Data.php:264
+#: src/Helper/Helper_Data.php:272
 msgid "Template Details"
 msgstr "模板详情"
 
-#: ../../Helper/Helper_Data.php:265
+#: src/Helper/Helper_Data.php:273
 msgid "Current Template"
 msgstr "当前模板"
 
-#: ../../Helper/Helper_Data.php:266
+#: src/Helper/Helper_Data.php:274
 msgid "Show previous template"
 msgstr "显示以前的模板"
 
-#: ../../Helper/Helper_Data.php:267
+#: src/Helper/Helper_Data.php:275
 msgid "Show next template"
 msgstr "显示下一个模板"
 
-#: ../../Helper/Helper_Data.php:268
+#: src/Helper/Helper_Data.php:276
 msgid "Upload is not a valid template. Upload a .zip file."
 msgstr "上传的模板无效。上传 .zip 文件。"
 
-#: ../../Helper/Helper_Data.php:269
+#: src/Helper/Helper_Data.php:277
 msgid "Upload exceeds the 10MB limit."
 msgstr "上传超过 10MB 限制。"
 
-#: ../../Helper/Helper_Data.php:270
+#: src/Helper/Helper_Data.php:278
 msgid "Template successfully installed"
 msgstr "模板已成功安装"
 
-#: ../../Helper/Helper_Data.php:271
+#: src/Helper/Helper_Data.php:279
 msgid "Template successfully updated"
 msgstr "模板成功更新"
 
-#: ../../Helper/Helper_Data.php:272
+#: src/Helper/Helper_Data.php:280
 msgid "PDF Template(s) Successfully Installed / Updated"
 msgstr "PDF 模板已成功安装/更新"
 
-#: ../../Helper/Helper_Data.php:273
+#: src/Helper/Helper_Data.php:281
 msgid "There was a problem with the upload. Reload the page and try again."
 msgstr "上传过程中出现问题。请重新载入页面并再试一次。"
 
-#: ../../Helper/Helper_Data.php:274
+#: src/Helper/Helper_Data.php:282
+#, php-format
 msgid ""
 "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, "
 "'OK' to confirm the delete."
-msgstr ""
-"您真的要删除此 PDF 模板吗？%s单击 \"取消 \"返回，单击 \"确定 \"确认删除。"
+msgstr "您真的要删除此 PDF 模板吗？%s单击 \"取消 \"返回，单击 \"确定 \"确认删除。"
 
-#: ../../Helper/Helper_Data.php:275
+#: src/Helper/Helper_Data.php:283
 msgid "Could not delete template."
 msgstr "无法删除模板。"
 
-#: ../../Helper/Helper_Data.php:276
+#: src/Helper/Helper_Data.php:284
 msgid ""
 "If you have a PDF template in .zip format you may install it here. You can "
 "also update an existing PDF template (this will override any changes you "
 "have made)."
-msgstr ""
-"如果您有 .zip 格式的 PDF 模板，可以在此安装。您也可以更新现有的 PDF 模板（这"
-"将覆盖您所做的任何更改）。"
+msgstr "如果您有 .zip 格式的 PDF 模板，可以在此安装。您也可以更新现有的 PDF 模板（这将覆盖您所做的任何更改）。"
 
-#: ../../Helper/Helper_Data.php:278
+#: src/Helper/Helper_Data.php:286
 msgid "ALL CORE FONTS SUCCESSFULLY INSTALLED"
 msgstr "成功安装所有核心字体"
 
-#: ../../Helper/Helper_Data.php:279
+#: src/Helper/Helper_Data.php:287
+#, php-format
 msgid "%s CORE FONT(S) DID NOT INSTALL CORRECTLY"
 msgstr "%s 核心字体未正确安装"
 
-#: ../../Helper/Helper_Data.php:280
+#: src/Helper/Helper_Data.php:288
 msgid "Could not download Core Font list. Try again."
 msgstr "无法下载核心字体列表。请再试一次。"
 
-#: ../../Helper/Helper_Data.php:281
+#: src/Helper/Helper_Data.php:289
+#, php-format
 msgid "Downloading %s..."
 msgstr "下载 %s..."
 
-#: ../../Helper/Helper_Data.php:282
+#: src/Helper/Helper_Data.php:290
+#, php-format
 msgid "Completed installation of %s"
 msgstr "完成安装 %s"
 
-#: ../../Helper/Helper_Data.php:283
+#: src/Helper/Helper_Data.php:291
+#, php-format
 msgid "Failed installation of %s"
 msgstr "安装 %s 失败"
 
-#: ../../Helper/Helper_Data.php:284
+#: src/Helper/Helper_Data.php:292
 msgid "Fonts remaining:"
 msgstr "剩余字体:"
 
-#: ../../Helper/Helper_Data.php:285
+#: src/Helper/Helper_Data.php:293
 msgid "Retry Failed Downloads?"
 msgstr "重试失败的下载？"
 
-#: ../../Helper/Helper_Data.php:286
+#: src/Helper/Helper_Data.php:294
 msgid "Core font installation"
 msgstr "核心字体安装"
 
-#: ../../Helper/Helper_Data.php:289
+#: src/Helper/Helper_Data.php:297
+msgid "Font Manager"
+msgstr "字体管理器"
+
+#: src/Helper/Helper_Data.php:298
 msgid "Search installed fonts"
 msgstr "搜索已安装的字体"
 
-#: ../../Helper/Helper_Data.php:290
+#: src/Helper/Helper_Data.php:299
 msgid "Installed Fonts"
 msgstr "已安装的字体"
 
-#: ../../Helper/Helper_Data.php:291
+#: src/Helper/Helper_Data.php:301
 msgid "Regular"
 msgstr "常规"
 
-#: ../../Helper/Helper_Data.php:292
+#: src/Helper/Helper_Data.php:302
+#, php-format
 msgid "Regular %1$s(required)%2$s"
 msgstr "常规 %1$s（必填）%2$s"
 
-#: ../../Helper/Helper_Data.php:293
+#: src/Helper/Helper_Data.php:303
 msgid "Italics"
 msgstr "斜体字"
 
-#: ../../Helper/Helper_Data.php:294
+#: src/Helper/Helper_Data.php:304
 msgid "Bold"
 msgstr "黑体"
 
-#: ../../Helper/Helper_Data.php:295
+#: src/Helper/Helper_Data.php:305
 msgid "Bold Italics"
 msgstr "粗斜体"
 
-#: ../../Helper/Helper_Data.php:296
+#: src/Helper/Helper_Data.php:306
 msgid "Add Font"
 msgstr "添加字体"
 
-#: ../../Helper/Helper_Data.php:297
+#: src/Helper/Helper_Data.php:307
 msgid "Update Font"
 msgstr "更新字体"
 
-#: ../../Helper/Helper_Data.php:298
+#: src/Helper/Helper_Data.php:308
 msgid "Install new fonts for use in your PDF documents."
 msgstr "在 PDF 文档中安装新字体。"
 
-#: ../../Helper/Helper_Data.php:299
+#: src/Helper/Helper_Data.php:309
 msgid ""
 "Once saved, PDFs configured to use this font will have your changes applied "
 "automatically for newly-generated documents."
 msgstr "保存后，配置为使用此字体的 PDF 将在新生成的文档中自动应用您的更改。"
 
-#: ../../Helper/Helper_Data.php:300
+#: src/Helper/Helper_Data.php:310
+#, php-format
 msgid "Font Name %1$s(required)%2$s"
 msgstr "字体名称 %1$s（必填）%2$s"
 
-#: ../../Helper/Helper_Data.php:301
+#: src/Helper/Helper_Data.php:311
 msgid "The font name can only contain letters, numbers and spaces."
 msgstr "字体名称只能包含字母、数字和空格。"
 
-#: ../../Helper/Helper_Data.php:302
+#: src/Helper/Helper_Data.php:312
 msgid ""
 "Please choose a name contains letters and/or numbers (and a space if you "
 "want it)."
 msgstr "请选择一个包含字母和/或数字的名称（如果需要，还可以加上空格）。"
 
-#: ../../Helper/Helper_Data.php:303
+#: src/Helper/Helper_Data.php:313
 msgid "Font Files"
 msgstr "字体文件"
 
-#: ../../Helper/Helper_Data.php:304
+#: src/Helper/Helper_Data.php:314
 msgid ""
-"Select or drag and drop your .ttf font file for the variants below. Only the "
-"Regular type is required."
+"Select or drag and drop your .ttf font file for the variants below. Only "
+"the Regular type is required."
 msgstr "为下面的变体选择或拖放 .ttf 字体文件。只需要常规类型。"
 
-#: ../../Helper/Helper_Data.php:305
+#: src/Helper/Helper_Data.php:315
 msgid "Add a .ttf font file."
 msgstr "添加 .ttf 字体文件。"
 
-#: ../../Helper/Helper_Data.php:306
+#: src/Helper/Helper_Data.php:316
 msgid "View template usage"
 msgstr "查看模板使用情况"
 
-#: ../../Helper/Helper_Data.php:307
+#: src/Helper/Helper_Data.php:317
 msgid "← Cancel"
 msgstr "取消"
 
-#: ../../Helper/Helper_Data.php:308
+#: src/Helper/Helper_Data.php:318
 msgid "Are you sure you want to delete this font?"
 msgstr "您确定要删除这个吗？"
 
-#: ../../Helper/Helper_Data.php:309
+#: src/Helper/Helper_Data.php:319
+#, php-format
 msgid ""
-"Add this snippet %1$sin a custom template%3$s to selectively set the font on "
-"blocks of text. If you want to apply the font to the entire PDF, %2$suse the "
-"Font setting%3$s when configuring the PDF on the form."
+"Add this snippet %1$sin a custom template%3$s to selectively set the font "
+"on blocks of text. If you want to apply the font to the entire PDF, %2$suse "
+"the Font setting%3$s when configuring the PDF on the form."
 msgstr ""
-"在自定义模板%3$s中添加此片段%1$s，以选择性地设置文本块的字体。如果要将字体应"
-"用到整个 PDF，%2$s请在表单上配置 PDF 时使用字体设置%3$s。"
+"在自定义模板%3$s中添加此片段%1$s，以选择性地设置文本块的字体。如果要将字体应用到整个 PDF，%2$s请在表单上配置 PDF "
+"时使用字体设置%3$s。"
 
-#: ../../Helper/Helper_Data.php:310
+#: src/Helper/Helper_Data.php:320
 msgid "Update font"
 msgstr "更新字体"
 
-#: ../../Helper/Helper_Data.php:311
+#: src/Helper/Helper_Data.php:321
 msgid "Select font"
 msgstr "选择字体"
 
-#: ../../Helper/Helper_Data.php:312
+#: src/Helper/Helper_Data.php:322
 msgid "Delete font"
 msgstr "删除字体"
 
-#: ../../Helper/Helper_Data.php:315
+#: src/Helper/Helper_Data.php:325
 msgid "Font list empty."
 msgstr "字体列表为空。"
 
-#: ../../Helper/Helper_Data.php:316
+#: src/Helper/Helper_Data.php:326
 msgid "No fonts matching your search found."
 msgstr "未找到与您的搜索匹配的字体。"
 
-#: ../../Helper/Helper_Data.php:317
+#: src/Helper/Helper_Data.php:327
 msgid "Clear Search."
 msgstr "清除搜索。"
 
-#: ../../Helper/Helper_Data.php:318
+#: src/Helper/Helper_Data.php:328
 msgid "Your font has been saved."
 msgstr "您的字体已保存。"
 
-#: ../../Helper/Helper_Data.php:319
+#: src/Helper/Helper_Data.php:329
+#, php-format
 msgid ""
 "%1$sThe action could not be completed.%2$s Resolve the highlighted issues "
 "above and then try again."
 msgstr "%1$s操作无法完成。%2$s 解决上述突出显示的问题，然后再试一次。"
 
-#: ../../Helper/Helper_Data.php:320
+#: src/Helper/Helper_Data.php:330
 msgid "A problem occurred. Reload the page and try again."
 msgstr "出现问题。重新载入页面，再试一次。"
 
-#: ../../Helper/Helper_Data.php:321
+#: src/Helper/Helper_Data.php:331
+#, php-format
 msgid ""
 "%1$sFont file(s) missing from the server.%2$s Please upload the font(s) "
 "again and then save."
 msgstr "%1$s服务器上缺少字体文件。%2$s请重新上传字体，然后保存。"
 
-#: ../../Helper/Helper_Data.php:322
+#: src/Helper/Helper_Data.php:332
+#, php-format
 msgid "%1$sFont file(s) are malformed%2$s and cannot be used with Gravity PDF."
 msgstr "%1$s字体文件畸形%2$s，不能与 Gravity PDF 一起使用。"
 
-#: ../../Helper/Helper_Data.php:324
+#: src/Helper/Helper_Data.php:334
 msgid ""
 "Warning! ALL Gravity PDF data, including templates, will be deleted. This "
 "cannot be undone. 'OK' to delete, 'Cancel' to stop."
-msgstr ""
-"警告！所有 Gravity PDF 数据（包括模板）都将被删除。无法撤销。确定 \"删"
-"除，\"取消 \"停止。"
+msgstr "警告！所有 Gravity PDF 数据（包括模板）都将被删除。无法撤销。确定 \"删除，\"取消 \"停止。"
 
-#: ../../Helper/Helper_Data.php:325
-msgid ""
-"WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete."
+#: src/Helper/Helper_Data.php:335
+msgid "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete."
 msgstr "警告：您即将删除此 PDF。取消 \"可停止，\"确定 \"可删除。"
 
-#: ../../Helper/Helper_Data.php:328
+#: src/Helper/Helper_Data.php:338
 msgid "Search the Gravity PDF Documentation..."
 msgstr "搜索重力 PDF 文档..."
 
-#: ../../Helper/Helper_Data.php:329
+#: src/Helper/Helper_Data.php:339
 msgid "Submit your search query."
 msgstr "提交您的搜索查询。"
 
-#: ../../Helper/Helper_Data.php:330
+#: src/Helper/Helper_Data.php:340
 msgid "Clear your search query."
 msgstr "清除搜索查询。"
 
-#: ../../Helper/Helper_Data.php:488
+#: src/Helper/Helper_Data.php:498
 msgid "Approved"
 msgstr "批准"
 
-#: ../../Helper/Helper_Data.php:489
+#: src/Helper/Helper_Data.php:499
 msgid "Disapproved"
 msgstr "未获批准"
 
-#: ../../Helper/Helper_Data.php:490
+#: src/Helper/Helper_Data.php:500
 msgid "Unapproved"
 msgstr "未核准"
 
-#: ../../Helper/Helper_Options_Fields.php:65
+#: src/Helper/Helper_Options_Fields.php:67
 msgid "Default Template"
 msgstr "默认模板"
 
-#: ../../Helper/Helper_Options_Fields.php:66
+#: src/Helper/Helper_Options_Fields.php:68
+#, php-format
 msgid ""
 "Choose an existing template or purchased more %1$sfrom our template "
-"shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create a "
-"custom solution."
-msgstr ""
-"选择现有模板或从我们的模板商店%2$s购买更多%1$s模板。您也可以 %3$s 自建%4$s "
-"或 %5$s 聘请我们%6$s 为您量身定制解决方案。"
+"shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create "
+"a custom solution."
+msgstr "选择现有模板或从我们的模板商店%2$s购买更多%1$s模板。您也可以 %3$s 自建%4$s 或 %5$s 聘请我们%6$s 为您量身定制解决方案。"
 
-#: ../../Helper/Helper_Options_Fields.php:70
+#: src/Helper/Helper_Options_Fields.php:72
+#, php-format
 msgid ""
 "Gravity PDF comes with %1$sfour completely-free and highly customizable "
 "designs%2$s. You can also purchase additional templates from our template "
-"shop, hire us to integrate existing PDFs or, with a bit of technical know-"
-"how, build your own."
+"shop, hire us to integrate existing PDFs or, with a bit of technical "
+"know-how, build your own."
 msgstr ""
-"Gravity PDF 附带 %1$s4 种完全免费且高度可定制的设计%2$s。您还可以从我们的模板"
-"商店购买其他模板，聘请我们整合现有的 PDF，或者利用一些技术诀窍创建您自己的 "
-"PDF。"
+"Gravity PDF 附带 %1$s4 种完全免费且高度可定制的设计%2$s。您还可以从我们的模板商店购买其他模板，聘请我们整合现有的 "
+"PDF，或者利用一些技术诀窍创建您自己的 PDF。"
 
-#: ../../Helper/Helper_Options_Fields.php:75
+#: src/Helper/Helper_Options_Fields.php:77
 msgid "Default Font"
 msgstr "默认字体"
 
-#: ../../Helper/Helper_Options_Fields.php:76
+#: src/Helper/Helper_Options_Fields.php:78
 msgid ""
 "Set the default font type used in PDFs. Choose an existing font or install "
 "your own."
 msgstr "设置 PDF 中使用的默认字体类型。选择现有字体或安装自己的字体。"
 
-#: ../../Helper/Helper_Options_Fields.php:79,
-#: ../../Helper/Helper_Options_Fields.php:230
+#: src/Helper/Helper_Options_Fields.php:81
+#: src/Helper/Helper_Options_Fields.php:232
 msgid "Fonts"
 msgstr "字体"
 
-#: ../../Helper/Helper_Options_Fields.php:79
+#: src/Helper/Helper_Options_Fields.php:81
 msgid ""
 "Gravity PDF comes bundled with fonts for most languages world-wide. Want to "
 "use a specific font type? Use the font installer (found in the Tools tab)."
-msgstr ""
-"Gravity PDF 捆绑了全球大多数语言的字体。想要使用特定的字体类型？使用字体安装"
-"程序（可在 \"工具 \"选项卡中找到）。"
+msgstr "Gravity PDF 捆绑了全球大多数语言的字体。想要使用特定的字体类型？使用字体安装程序（可在 \"工具 \"选项卡中找到）。"
 
-#: ../../Helper/Helper_Options_Fields.php:85
+#: src/Helper/Helper_Options_Fields.php:87
 msgid "Default Paper Size"
 msgstr "默认纸张大小"
 
-#: ../../Helper/Helper_Options_Fields.php:86
+#: src/Helper/Helper_Options_Fields.php:88
 msgid "Set the default paper size used when generating PDFs."
 msgstr "设置生成 PDF 文件时使用的默认纸张大小。"
 
-#: ../../Helper/Helper_Options_Fields.php:95,
-#: ../../Helper/Helper_Options_Fields.php:320
+#: src/Helper/Helper_Options_Fields.php:97
+#: src/Helper/Helper_Options_Fields.php:322
 msgid "Control the exact paper size. Can be set in millimeters or inches."
 msgstr "精确控制纸张尺寸。可以毫米或英寸为单位设置。"
 
-#: ../../Helper/Helper_Options_Fields.php:102,
-#: ../../Helper/Helper_Options_Fields.php:106,
-#: ../../Helper/Helper_Options_Fields.php:372
+#: src/Helper/Helper_Options_Fields.php:104
+#: src/Helper/Helper_Options_Fields.php:108
+#: src/Helper/Helper_Options_Fields.php:374
 msgid "Reverse Text (RTL)"
 msgstr "反向文本 (RTL)"
 
-#: ../../Helper/Helper_Options_Fields.php:103
+#: src/Helper/Helper_Options_Fields.php:105
 msgid "Script like Arabic and Hebrew are written right to left."
 msgstr "阿拉伯文和希伯来文等文字都是从右到左书写的。"
 
-#: ../../Helper/Helper_Options_Fields.php:106
+#: src/Helper/Helper_Options_Fields.php:108
 msgid ""
 "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, "
 "Tifinar, Urdu or other RTL languages."
-msgstr ""
-"如果您使用阿拉伯语、希伯来语、叙利亚语、N'ko、Thaana、Tifinar、乌尔都语或其"
-"他 RTL 语言书写，请启用 RTL。"
+msgstr "如果您使用阿拉伯语、希伯来语、叙利亚语、N'ko、Thaana、Tifinar、乌尔都语或其他 RTL 语言书写，请启用 RTL。"
 
-#: ../../Helper/Helper_Options_Fields.php:111
+#: src/Helper/Helper_Options_Fields.php:113
 msgid "Default Font Size"
 msgstr "默认字体大小"
 
-#: ../../Helper/Helper_Options_Fields.php:112
+#: src/Helper/Helper_Options_Fields.php:114
 msgid "Set the default font size used in PDFs."
 msgstr "设置 PDF 文件中使用的默认字体大小。"
 
-#: ../../Helper/Helper_Options_Fields.php:122
+#: src/Helper/Helper_Options_Fields.php:124
 msgid "Default Font Color"
 msgstr "默认字体颜色"
 
-#: ../../Helper/Helper_Options_Fields.php:125
+#: src/Helper/Helper_Options_Fields.php:127
 msgid "Set the default font color used in PDFs."
 msgstr "设置 PDF 中使用的默认字体颜色。"
 
-#: ../../Helper/Helper_Options_Fields.php:135
+#: src/Helper/Helper_Options_Fields.php:137
 msgid "Entry View"
 msgstr "入口视图"
 
-#: ../../Helper/Helper_Options_Fields.php:136
+#: src/Helper/Helper_Options_Fields.php:138
+#, php-format
 msgid ""
 "Select the default action used when accessing a PDF from the %1$sGravity "
 "Forms entries list%2$s page."
 msgstr "选择从 %1$sGravity 表单条目列表%2$s 页面访问 PDF 时使用的默认操作。"
 
-#: ../../Helper/Helper_Options_Fields.php:139,
-#: ../../Model/Model_System_Report.php:269,
-#: ../../View/html/PDF/entry_detailed_pdf.php:35
+#: src/Helper/Helper_Options_Fields.php:141
+#: src/Model/Model_System_Report.php:323
+#: src/View/html/PDF/entry_detailed_pdf.php:35
 msgid "View"
 msgstr "查看"
 
-#: ../../Helper/Helper_Options_Fields.php:140,
-#: ../../Model/Model_System_Report.php:269,
-#: ../../View/html/PDF/entry_detailed_pdf.php:36
+#: src/Helper/Helper_Options_Fields.php:142
+#: src/Model/Model_System_Report.php:323
+#: src/View/html/PDF/entry_detailed_pdf.php:36
 msgid "Download"
 msgstr "下载"
 
-#: ../../Helper/Helper_Options_Fields.php:147,
-#: ../../Model/Model_System_Report.php:274
+#: src/Helper/Helper_Options_Fields.php:149
+#: src/Model/Model_System_Report.php:328
 msgid "Background Processing"
 msgstr "后台处理"
 
-#: ../../Helper/Helper_Options_Fields.php:148
+#: src/Helper/Helper_Options_Fields.php:150
+#, php-format
 msgid ""
 "When enable, form submission and resending notifications with PDFs are "
 "handled in a background task. %1$sRequires Background tasks to be "
 "enabled%2$s."
-msgstr ""
-"启用后，表单提交和重新发送 PDF 通知将在后台任务中处理。%1$s要求启用后台任"
-"务%2$s。"
+msgstr "启用后，表单提交和重新发送 PDF 通知将在后台任务中处理。%1$s要求启用后台任务%2$s。"
 
-#: ../../Helper/Helper_Options_Fields.php:155,
-#: ../../Model/Model_System_Report.php:280
+#: src/Helper/Helper_Options_Fields.php:157
+#: src/Model/Model_System_Report.php:335
 msgid "Debug Mode"
 msgstr "调试模式"
 
-#: ../../Helper/Helper_Options_Fields.php:158
+#: src/Helper/Helper_Options_Fields.php:160
 msgid ""
 "When enabled, debug information will be displayed on-screen for core "
 "features."
 msgstr "启用后，屏幕上将显示核心功能的调试信息。"
 
-#: ../../Helper/Helper_Options_Fields.php:169,
-#: ../../Helper/Helper_Options_Fields.php:175,
-#: ../../Model/Model_System_Report.php:294
+#: src/Helper/Helper_Options_Fields.php:171
+#: src/Helper/Helper_Options_Fields.php:177
+#: src/Model/Model_System_Report.php:351
 msgid "Logged Out Timeout"
 msgstr "登录超时"
 
-#: ../../Helper/Helper_Options_Fields.php:170
+#: src/Helper/Helper_Options_Fields.php:172
+#, php-format
 msgid ""
-"Limit how long a %1$slogged out%2$s users has direct access to the PDF after "
-"completing the form. Set to 0 to disable time limit (not recommended)."
-msgstr ""
-"限制 %1$slogged out%2$s 用户在完成表单后直接访问 PDF 的时间。设为 0 则禁用时"
-"间限制（不建议）。"
+"Limit how long a %1$slogged out%2$s users has direct access to the PDF "
+"after completing the form. Set to 0 to disable time limit (not recommended)."
+msgstr "限制 %1$slogged out%2$s 用户在完成表单后直接访问 PDF 的时间。设为 0 则禁用时间限制（不建议）。"
 
-#: ../../Helper/Helper_Options_Fields.php:171
+#: src/Helper/Helper_Options_Fields.php:173
 msgid "minutes"
 msgstr "分钟"
 
-#: ../../Helper/Helper_Options_Fields.php:175
+#: src/Helper/Helper_Options_Fields.php:177
 msgid ""
-"Logged out users can view PDFs when their IP matches the one assigned to the "
-"Gravity Form entry. Because IP addresses can change, a time-based "
+"Logged out users can view PDFs when their IP matches the one assigned to "
+"the Gravity Form entry. Because IP addresses can change, a time-based "
 "restriction also applies."
-msgstr ""
-"如果注销用户的 IP 与分配给重力表单条目的 IP 相匹配，他们就可以查看 PDF。由于 "
-"IP 地址可以更改，因此也适用基于时间的限制。"
+msgstr "如果注销用户的 IP 与分配给重力表单条目的 IP 相匹配，他们就可以查看 PDF。由于 IP 地址可以更改，因此也适用基于时间的限制。"
 
-#: ../../Helper/Helper_Options_Fields.php:180
+#: src/Helper/Helper_Options_Fields.php:182
 msgid "Default Owner Restrictions"
 msgstr "默认用户限制"
 
-#: ../../Helper/Helper_Options_Fields.php:181
+#: src/Helper/Helper_Options_Fields.php:183
 msgid ""
 "Set the default PDF owner permissions. When enabled, the original entry "
-"owner will NOT be able to view the PDFs (unless they have a User Restriction "
-"capability)."
-msgstr ""
-"设置默认 PDF 所有者权限。启用后，原始条目所有者将无法查看 PDF（除非他们有用户"
-"限制功能）。"
+"owner will NOT be able to view the PDFs (unless they have a User "
+"Restriction capability)."
+msgstr "设置默认 PDF 所有者权限。启用后，原始条目所有者将无法查看 PDF（除非他们有用户限制功能）。"
 
-#: ../../Helper/Helper_Options_Fields.php:184,
-#: ../../Helper/Helper_Options_Fields.php:478
+#: src/Helper/Helper_Options_Fields.php:186
+#: src/Helper/Helper_Options_Fields.php:480
 msgid "Restrict Owner"
 msgstr "限制所有者"
 
-#: ../../Helper/Helper_Options_Fields.php:184
+#: src/Helper/Helper_Options_Fields.php:186
 msgid ""
 "Enable this setting if your PDFs should not be viewable by the end user. "
 "This can be set on a per-PDF basis."
 msgstr "如果最终用户不能查看 PDF，请启用此设置。可根据每个 PDF 进行设置。"
 
-#: ../../Helper/Helper_Options_Fields.php:189,
-#: ../../Helper/Helper_Options_Fields.php:195
+#: src/Helper/Helper_Options_Fields.php:191
+#: src/Helper/Helper_Options_Fields.php:197
 msgid "User Restriction"
 msgstr "用户限制"
 
-#: ../../Helper/Helper_Options_Fields.php:191
+#: src/Helper/Helper_Options_Fields.php:193
 msgid ""
 "Restrict PDF access to users with any of these capabilities. The "
 "Administrator Role always has full access."
 msgstr "限制具有上述任何功能的用户访问 PDF。管理员角色始终拥有完全访问权。"
 
-#: ../../Helper/Helper_Options_Fields.php:195
+#: src/Helper/Helper_Options_Fields.php:197
 msgid ""
 "Only logged in users with any selected capability can view generated PDFs "
 "they don't have ownership of. Ownership refers to an end user who completed "
 "the original Gravity Form entry."
-msgstr ""
-"只有具有任何选定功能的登录用户才能查看生成的、不属于自己的 PDF。所有权指的是"
-"完成原始重力表单输入的最终用户。"
+msgstr "只有具有任何选定功能的登录用户才能查看生成的、不属于自己的 PDF。所有权指的是完成原始重力表单输入的最终用户。"
 
-#: ../../Helper/Helper_Options_Fields.php:223
+#: src/Helper/Helper_Options_Fields.php:225
 msgid ""
 "Automatically install the core fonts needed to generate PDF documents. This "
 "action only needs to be run once, as the fonts are preserved during plugin "
 "updates."
-msgstr ""
-"自动安装生成 PDF 文档所需的核心字体。此操作只需运行一次，因为字体会在插件更新"
-"时保留。"
+msgstr "自动安装生成 PDF 文档所需的核心字体。此操作只需运行一次，因为字体会在插件更新时保留。"
 
-#: ../../Helper/Helper_Options_Fields.php:223,
-#: ../../View/html/Actions/core_font.php:29
+#: src/Helper/Helper_Options_Fields.php:225
+#: src/View/html/Actions/core_font.php:29
 msgid "Get more info."
 msgstr "获取更多信息。"
 
-#: ../../Helper/Helper_Options_Fields.php:225
+#: src/Helper/Helper_Options_Fields.php:227
 msgid "Download Core Fonts"
 msgstr "下载核心字体"
 
-#: ../../Helper/Helper_Options_Fields.php:231
+#: src/Helper/Helper_Options_Fields.php:233
+#, php-format
 msgid ""
 "Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font "
 "files are supported."
 msgstr "在 PDF 文档中安装自定义字体。仅支持 %1$s.ttf%2$s 字体文件。"
 
-#: ../../Helper/Helper_Options_Fields.php:247,
-#: ../../Helper/Helper_PDF_List_Table.php:96
+#: src/Helper/Helper_Options_Fields.php:249
+#: src/Helper/Helper_PDF_List_Table.php:97
 msgid "Label"
 msgstr "标签"
 
-#: ../../Helper/Helper_Options_Fields.php:250
+#: src/Helper/Helper_Options_Fields.php:252
 msgid ""
 "Add a descriptive label to help you  differentiate between multiple PDF "
 "settings."
 msgstr "添加描述性标签，帮助您区分多个 PDF 设置。"
 
-#: ../../Helper/Helper_Options_Fields.php:256
+#: src/Helper/Helper_Options_Fields.php:258
+#, php-format
 msgid ""
 "Templates control the overall look and feel of the PDFs, and additional "
 "templates can be %1$spurchased from the online store%4$s. If you want to "
 "digitize and automate your existing documents, %2$suse our Bespoke PDF "
 "service%4$s. Developers can also %3$sbuild their own templates%4$s."
 msgstr ""
-"模板可以控制 PDF 的整体外观和感觉，还可以从在线商店%4$s%1$s购买其他模板。如果"
-"您想将现有文档数字化和自动化，%2$s请使用我们的定制 PDF 服务%4$s。开发人员也可"
-"以 %3$s 制作自己的模板%4$s。"
+"模板可以控制 PDF 的整体外观和感觉，还可以从在线商店%4$s%1$s购买其他模板。如果您想将现有文档数字化和自动化，%2$s请使用我们的定制 "
+"PDF 服务%4$s。开发人员也可以 %3$s 制作自己的模板%4$s。"
 
-#: ../../Helper/Helper_Options_Fields.php:265,
-#: ../../Helper/Helper_PDF_List_Table.php:98
+#: src/Helper/Helper_Options_Fields.php:267
+#: src/Helper/Helper_PDF_List_Table.php:99
 msgid "Notifications"
 msgstr "通知"
 
-#: ../../Helper/Helper_Options_Fields.php:266
+#: src/Helper/Helper_Options_Fields.php:268
+#, php-format
 msgid ""
 "Send the PDF as an email attachment for the selected notification(s). "
 "%1$sPassword protect the PDF%3$s if security is a concern. Alternatively, "
-"%2$suse the [gravitypdf] shortcode%3$s directly in your Notification message."
+"%2$suse the [gravitypdf] shortcode%3$s directly in your Notification "
+"message."
 msgstr ""
-"将 PDF 作为选定通知的电子邮件附件发送。%1$s如果担心安全问题，请对 PDF 进行密"
-"码保护%3$s。或者，%2$s直接在通知消息中使用 [gravitypdf] 简码%3$s。"
+"将 PDF 作为选定通知的电子邮件附件发送。%1$s如果担心安全问题，请对 PDF 进行密码保护%3$s。或者，%2$s直接在通知消息中使用 "
+"[gravitypdf] 简码%3$s。"
 
-#: ../../Helper/Helper_Options_Fields.php:269
+#: src/Helper/Helper_Options_Fields.php:271
 msgid "Choose a Notification"
 msgstr "选择通知"
 
-#: ../../Helper/Helper_Options_Fields.php:274
+#: src/Helper/Helper_Options_Fields.php:276
 msgid "Filename"
 msgstr "文件名"
 
-#: ../../Helper/Helper_Options_Fields.php:276
+#: src/Helper/Helper_Options_Fields.php:278
+#, php-format
 msgid ""
 "Set the filename for the generated PDF (excluding the .pdf extension). "
 "Mergetags are supported, and invalid characters %s are automatically "
 "converted to an underscore."
-msgstr ""
-"设置生成 PDF 的文件名（不包括 .pdf 扩展名）。支持合并标记，无效字符 %s 会自动"
-"转换为下划线。"
+msgstr "设置生成 PDF 的文件名（不包括 .pdf 扩展名）。支持合并标记，无效字符 %s 会自动转换为下划线。"
 
-#: ../../Helper/Helper_Options_Fields.php:283
+#: src/Helper/Helper_Options_Fields.php:285
 msgid "Conditional Logic"
 msgstr "条件逻辑"
 
-#: ../../Helper/Helper_Options_Fields.php:285
+#: src/Helper/Helper_Options_Fields.php:287
 msgid "Enable conditional logic"
 msgstr "启用条件逻辑"
 
-#: ../../Helper/Helper_Options_Fields.php:288
+#: src/Helper/Helper_Options_Fields.php:290
 msgid ""
 "Add rules to dynamically enable or disable the PDF. When disabled, PDFs do "
-"not show up in the admin area, cannot be viewed, and will not be attached to "
-"notifications."
-msgstr ""
-"添加规则以动态启用或禁用 PDF。禁用时，PDF 不会显示在管理区，无法查看，也不会"
-"附加到通知中。"
+"not show up in the admin area, cannot be viewed, and will not be attached "
+"to notifications."
+msgstr "添加规则以动态启用或禁用 PDF。禁用时，PDF 不会显示在管理区，无法查看，也不会附加到通知中。"
 
-#: ../../Helper/Helper_Options_Fields.php:309
+#: src/Helper/Helper_Options_Fields.php:311
 msgid "Paper Size"
 msgstr "纸张尺寸"
 
-#: ../../Helper/Helper_Options_Fields.php:310
+#: src/Helper/Helper_Options_Fields.php:312
 msgid "Set the paper size used when generating PDFs."
 msgstr "设置生成PDF时使用的纸张尺寸。"
 
-#: ../../Helper/Helper_Options_Fields.php:330
+#: src/Helper/Helper_Options_Fields.php:332
 msgid "Paper Orientation"
 msgstr "运单纸方向"
 
-#: ../../Helper/Helper_Options_Fields.php:333
+#: src/Helper/Helper_Options_Fields.php:335
 msgid "Portrait"
 msgstr "肖像"
 
-#: ../../Helper/Helper_Options_Fields.php:334
+#: src/Helper/Helper_Options_Fields.php:336
 msgid "Landscape"
 msgstr "景观"
 
-#: ../../Helper/Helper_Options_Fields.php:341
+#: src/Helper/Helper_Options_Fields.php:343
 msgid "Font"
 msgstr "字体"
 
-#: ../../Helper/Helper_Options_Fields.php:345
+#: src/Helper/Helper_Options_Fields.php:347
 msgid "Set the primary font used in PDFs. You can also install your own."
 msgstr "设置 PDF 中使用的主要字体。您也可以安装自己的字体。"
 
-#: ../../Helper/Helper_Options_Fields.php:351
+#: src/Helper/Helper_Options_Fields.php:353
 msgid "Font Size"
 msgstr "字体大小"
 
-#: ../../Helper/Helper_Options_Fields.php:352
+#: src/Helper/Helper_Options_Fields.php:354
 msgid "Set the font size to use in the PDF."
 msgstr "设置 PDF 中使用的字体大小。"
 
-#: ../../Helper/Helper_Options_Fields.php:363
+#: src/Helper/Helper_Options_Fields.php:365
 msgid "Font Color"
 msgstr "字体颜色"
 
-#: ../../Helper/Helper_Options_Fields.php:366
+#: src/Helper/Helper_Options_Fields.php:368
 msgid "Set the font color to use in the PDF."
 msgstr "设置PDF中使用的字体颜色。"
 
-#: ../../Helper/Helper_Options_Fields.php:373
+#: src/Helper/Helper_Options_Fields.php:375
 msgid ""
 "Script like Arabic, Hebrew, Syriac (and many others) are written right to "
 "left."
 msgstr "阿拉伯文、希伯来文、叙利亚文（以及其他许多文字）都是从右到左书写的。"
 
-#: ../../Helper/Helper_Options_Fields.php:403,
-#: ../../templates/config/focus-gravity.php:91
+#: src/Helper/Helper_Options_Fields.php:405
+#: src/templates/config/focus-gravity.php:91
 msgid "Format"
 msgstr "格式"
 
-#: ../../Helper/Helper_Options_Fields.php:404
+#: src/Helper/Helper_Options_Fields.php:406
 msgid ""
-"Generate a document adhering to the selected PDF format. Watermarks, alpha-"
-"transparency, and PDF Security are automatically disabled when using PDF/"
-"A-1b or PDF/X-1a formats."
-msgstr ""
-"生成符合所选 PDF 格式的文档。使用 PDF/A-1b 或 PDF/X-1a 格式时，水印、alpha-透"
-"明度和 PDF 安全性会自动禁用。"
+"Generate a document adhering to the selected PDF format. Watermarks, "
+"alpha-transparency, and PDF Security are automatically disabled when using "
+"PDF/A-1b or PDF/X-1a formats."
+msgstr "生成符合所选 PDF 格式的文档。使用 PDF/A-1b 或 PDF/X-1a 格式时，水印、alpha-透明度和 PDF 安全性会自动禁用。"
 
-#: ../../Helper/Helper_Options_Fields.php:416
+#: src/Helper/Helper_Options_Fields.php:418
 msgid "Enable PDF Security"
 msgstr "启用 PDF 安全性"
 
-#: ../../Helper/Helper_Options_Fields.php:417
+#: src/Helper/Helper_Options_Fields.php:419
 msgid "Password protect generated PDFs, and/or restrict user capabilities."
 msgstr "对生成的 PDF 文件进行密码保护，和/或限制用户功能。"
 
-#: ../../Helper/Helper_Options_Fields.php:423
+#: src/Helper/Helper_Options_Fields.php:425
 msgid "Password"
 msgstr "密码"
 
-#: ../../Helper/Helper_Options_Fields.php:425
+#: src/Helper/Helper_Options_Fields.php:427
 msgid ""
-"Password protect the PDF, or leave blank to disable. Mergetags are supported."
+"Password protect the PDF, or leave blank to disable. Mergetags are "
+"supported."
 msgstr "密码保护 PDF，或留空表示禁用。支持合并标记。"
 
-#: ../../Helper/Helper_Options_Fields.php:431
+#: src/Helper/Helper_Options_Fields.php:433
 msgid "Privileges"
 msgstr "权限"
 
-#: ../../Helper/Helper_Options_Fields.php:432
+#: src/Helper/Helper_Options_Fields.php:434
 msgid ""
-"Deselect privileges to restrict end user capabilities in the PDF. Privileges "
-"are trivial to bypass and are only suitable to specify your intentions to "
-"the user (and not as a means of access control or security)."
-msgstr ""
-"取消选择权限以限制 PDF 中最终用户的功能。特权很容易被绕过，只适合向用户说明你"
-"的意图（而不是作为访问控制或安全手段）。"
+"Deselect privileges to restrict end user capabilities in the PDF. "
+"Privileges are trivial to bypass and are only suitable to specify your "
+"intentions to the user (and not as a means of access control or security)."
+msgstr "取消选择权限以限制 PDF 中最终用户的功能。特权很容易被绕过，只适合向用户说明你的意图（而不是作为访问控制或安全手段）。"
 
-#: ../../Helper/Helper_Options_Fields.php:445
+#: src/Helper/Helper_Options_Fields.php:447
 msgid "Select End User PDF Privileges"
 msgstr "选择最终用户 PDF 权限"
 
-#: ../../Helper/Helper_Options_Fields.php:456
+#: src/Helper/Helper_Options_Fields.php:458
 msgid "Image DPI"
 msgstr "图片DPI"
 
-#: ../../Helper/Helper_Options_Fields.php:460
+#: src/Helper/Helper_Options_Fields.php:462
 msgid ""
 "Control the image DPI (dots per inch) in PDFs. Set to 300 when "
 "professionally printing document."
 msgstr "控制 PDF 中图像的 DPI（每英寸点数）。专业打印文档时设置为 300。"
 
-#: ../../Helper/Helper_Options_Fields.php:471
+#: src/Helper/Helper_Options_Fields.php:473
 msgid "Enable Public Access"
 msgstr "启用公众访问"
 
-#: ../../Helper/Helper_Options_Fields.php:473
+#: src/Helper/Helper_Options_Fields.php:475
+#, php-format
 msgid ""
 "When public access is on all security protocols are disabled and %3$sanyone "
 "can view the PDF document for ALL your form's entries%4$s. For better "
 "security, %1$suse the signed PDF urls feature instead%2$s."
 msgstr ""
-"当公共访问打开时，所有安全协议都会被禁用，%3$s任何人都可以查看所有表单条目的 "
-"PDF 文档%4$s。为提高安全性，%1$s请使用签名 PDF 网址功能%2$s。"
+"当公共访问打开时，所有安全协议都会被禁用，%3$s任何人都可以查看所有表单条目的 PDF 文档%4$s。为提高安全性，%1$s请使用签名 PDF "
+"网址功能%2$s。"
 
-#: ../../Helper/Helper_Options_Fields.php:479
+#: src/Helper/Helper_Options_Fields.php:481
+#, php-format
 msgid ""
 "When enabled, the original entry owner will NOT be able to view the PDFs. "
 "This setting is overridden %1$swhen using signed PDF urls%2$s."
-msgstr ""
-"启用后，原始条目的所有者将无法查看 PDF。使用已签名的 PDF 网址%2$s时，此设置会"
-"被覆盖%1$s。"
+msgstr "启用后，原始条目的所有者将无法查看 PDF。使用已签名的 PDF 网址%2$s时，此设置会被覆盖%1$s。"
 
-#: ../../Helper/Helper_Options_Fields.php:514
+#: src/Helper/Helper_Options_Fields.php:518
 msgid "Enable Advanced Templating"
 msgstr "启用高级模板"
 
-#: ../../Helper/Helper_Options_Fields.php:515
+#: src/Helper/Helper_Options_Fields.php:519
 msgid ""
 "A legacy setting used that enables a template to be treated as PHP, with "
 "direct access to the PDF engine."
 msgstr "一种传统设置，可将模板视为 PHP，直接访问 PDF 引擎。"
 
-#: ../../Helper/Helper_Options_Fields.php:547
+#: src/Helper/Helper_Options_Fields.php:551
 msgid "Master Password"
 msgstr "库管理密码"
 
-#: ../../Helper/Helper_Options_Fields.php:549
+#: src/Helper/Helper_Options_Fields.php:553
 msgid ""
-"Set the PDF Owner Password which is used to prevent the PDF privileges being "
-"changed."
+"Set the PDF Owner Password which is used to prevent the PDF privileges "
+"being changed."
 msgstr "设置 PDF 所有者密码，用于防止更改 PDF 权限。"
 
-#: ../../Helper/Helper_Options_Fields.php:568
+#: src/Helper/Helper_Options_Fields.php:572
 msgid "Show Form Title"
 msgstr "显示表单标题"
 
-#: ../../Helper/Helper_Options_Fields.php:569
+#: src/Helper/Helper_Options_Fields.php:573
 msgid "Display the form title at the beginning of the PDF."
 msgstr "在 PDF 文件开头显示表单标题。"
 
-#: ../../Helper/Helper_Options_Fields.php:588
+#: src/Helper/Helper_Options_Fields.php:592
 msgid "Show Page Names"
 msgstr "显示页面名称"
 
-#: ../../Helper/Helper_Options_Fields.php:589
+#: src/Helper/Helper_Options_Fields.php:593
+#, php-format
 msgid ""
 "Display form page names on the PDF. Requires the use of the %1$sPage Break "
 "field%2$s."
 msgstr "在 PDF 上显示表单页名称。需要使用 %1$sPage Break 字段%2$s。"
 
-#: ../../Helper/Helper_Options_Fields.php:607
+#: src/Helper/Helper_Options_Fields.php:611
 msgid "Show HTML Fields"
 msgstr "显示 HTML 字段"
 
-#: ../../Helper/Helper_Options_Fields.php:608
+#: src/Helper/Helper_Options_Fields.php:612
 msgid "Display HTML fields in the PDF."
 msgstr "在 PDF 中显示 HTML 字段。"
 
-#: ../../Helper/Helper_Options_Fields.php:626
+#: src/Helper/Helper_Options_Fields.php:630
 msgid "Show Section Break Description"
 msgstr "显示分段说明"
 
-#: ../../Helper/Helper_Options_Fields.php:627
+#: src/Helper/Helper_Options_Fields.php:631
 msgid "Display the Section Break field description in the PDF."
 msgstr "显示 PDF 中的分段字段说明。"
 
-#: ../../Helper/Helper_Options_Fields.php:645
+#: src/Helper/Helper_Options_Fields.php:649
 msgid "Enable Conditional Logic"
 msgstr "启用条件逻辑"
 
-#: ../../Helper/Helper_Options_Fields.php:646
+#: src/Helper/Helper_Options_Fields.php:650
 msgid ""
 "When enabled the PDF will adhere to the form field conditional logic and "
 "show/hide fields."
 msgstr "启用后，PDF 将遵循表单字段条件逻辑并显示/隐藏字段。"
 
-#: ../../Helper/Helper_Options_Fields.php:665
+#: src/Helper/Helper_Options_Fields.php:669
 msgid "Show Empty Fields"
 msgstr "显示空字段"
 
-#: ../../Helper/Helper_Options_Fields.php:666
+#: src/Helper/Helper_Options_Fields.php:670
 msgid "Display Empty fields in the PDF."
 msgstr "在 PDF 中显示空字段。"
 
-#: ../../Helper/Helper_Options_Fields.php:684
+#: src/Helper/Helper_Options_Fields.php:688
 msgid "Header"
 msgstr "页眉"
 
-#: ../../Helper/Helper_Options_Fields.php:687
+#: src/Helper/Helper_Options_Fields.php:691
+#, php-format
 msgid ""
 "The header is included at the top of each page. For simple columns %1$stry "
 "this HTML table snippet%2$s."
-msgstr ""
-"页眉包含在每个页面的顶部。对于简单的列%1$s，请尝试此 HTML 表格片段%2$s。"
+msgstr "页眉包含在每个页面的顶部。对于简单的列%1$s，请尝试此 HTML 表格片段%2$s。"
 
-#: ../../Helper/Helper_Options_Fields.php:705
+#: src/Helper/Helper_Options_Fields.php:709
 msgid "First Page Header"
 msgstr "首页页眉"
 
-#: ../../Helper/Helper_Options_Fields.php:708
+#: src/Helper/Helper_Options_Fields.php:712
 msgid "Override the header on the first page of the PDF."
 msgstr "覆盖 PDF 第一页的页眉。"
 
-#: ../../Helper/Helper_Options_Fields.php:710
+#: src/Helper/Helper_Options_Fields.php:714
 msgid "Use different header on first page of PDF?"
 msgstr "在 PDF 第一页使用不同的页眉？"
 
-#: ../../Helper/Helper_Options_Fields.php:727
+#: src/Helper/Helper_Options_Fields.php:731
 msgid "Footer"
 msgstr "页脚"
 
-#: ../../Helper/Helper_Options_Fields.php:730
+#: src/Helper/Helper_Options_Fields.php:734
+#, php-format
 msgid ""
 "The footer is included at the bottom of every page. For simple text footers "
 "use the left, center and right alignment buttons in the editor. For simple "
 "columns %1$stry this HTML table snippet%2$s. Use the special "
 "%3$s{PAGENO}%4$s and %3$s{nbpg}%4$s tags to display page numbering. "
 msgstr ""
-"页脚位于每个页面的底部。对于简单的文本页脚，可使用编辑器中的左对齐、居中对齐"
-"和右对齐按钮。对于简单的列%1$s，请尝试此 HTML 表格片段%2$s。使用特殊的 "
-"%3$s{PAGENO}%4$s 和 %3$s{nbpg}%4$s 标签显示页码。"
+"页脚位于每个页面的底部。对于简单的文本页脚，可使用编辑器中的左对齐、居中对齐和右对齐按钮。对于简单的列%1$s，请尝试此 HTML "
+"表格片段%2$s。使用特殊的 %3$s{PAGENO}%4$s 和 %3$s{nbpg}%4$s 标签显示页码。"
 
-#: ../../Helper/Helper_Options_Fields.php:748
+#: src/Helper/Helper_Options_Fields.php:752
 msgid "First Page Footer"
 msgstr "首页页脚"
 
-#: ../../Helper/Helper_Options_Fields.php:751
+#: src/Helper/Helper_Options_Fields.php:755
 msgid "Override the footer on the first page of the PDF."
 msgstr "覆盖 PDF 第一页的页脚。"
 
-#: ../../Helper/Helper_Options_Fields.php:753
+#: src/Helper/Helper_Options_Fields.php:757
 msgid "Use different footer on first page of PDF?"
 msgstr "在 PDF 第一页使用不同的页脚？"
 
-#: ../../Helper/Helper_Options_Fields.php:770
+#: src/Helper/Helper_Options_Fields.php:774
 msgid "Background Color"
 msgstr "背景颜色"
 
-#: ../../Helper/Helper_Options_Fields.php:773
+#: src/Helper/Helper_Options_Fields.php:777
 msgid "Set the background color for all pages."
 msgstr "设置所有页面的背景颜色。"
 
-#: ../../Helper/Helper_Options_Fields.php:790
+#: src/Helper/Helper_Options_Fields.php:794
 msgid "Background Image"
 msgstr "背景图像"
 
-#: ../../Helper/Helper_Options_Fields.php:792
+#: src/Helper/Helper_Options_Fields.php:796
 msgid ""
 "The background image is included on all pages. For optimal results, use an "
 "image the same dimensions as the paper size and run it through an image "
 "optimization tool before upload."
-msgstr ""
-"所有页面都包含背景图片。为获得最佳效果，请使用与纸张尺寸相同的图片，并在上传"
-"前通过图片优化工具进行优化。"
+msgstr "所有页面都包含背景图片。为获得最佳效果，请使用与纸张尺寸相同的图片，并在上传前通过图片优化工具进行优化。"
 
-#: ../../Helper/Helper_PDF.php:388
+#: src/Helper/Helper_PDF.php:399
+#, php-format
 msgid ""
 "The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the "
 "latest version."
 msgstr "PDF 模板 %1$s 需要 Gravity PDF 版本 %2$s。请升级到最新版本。"
 
-#: ../../Helper/Helper_PDF.php:925
+#: src/Helper/Helper_PDF.php:939
 msgid ""
 "This method has been removed because mPDF no longer supports setting the "
 "image DPI after the class is initialised."
 msgstr "删除该方法是因为 mPDF 不再支持在类初始化后设置图像 DPI。"
 
-#: ../../Helper/Helper_PDF_List_Table.php:99
+#: src/Helper/Helper_PDF_List_Table.php:100
 msgid "Shortcode"
 msgstr "短代码"
 
-#: ../../Helper/Helper_PDF_List_Table.php:138
+#: src/Helper/Helper_PDF_List_Table.php:139
 msgid "PDF List"
 msgstr "PDF 列表"
 
-#: ../../Helper/Helper_PDF_List_Table.php:250
+#: src/Helper/Helper_PDF_List_Table.php:251
 msgid "None"
 msgstr "无"
 
-#: ../../Helper/Helper_PDF_List_Table.php:285,
-#: ../../View/html/PDF/entry_list_pdf_single.php:29
+#: src/Helper/Helper_PDF_List_Table.php:286
+#: src/View/html/PDF/entry_list_pdf_single.php:29
 msgid "Download PDF"
 msgstr "下载 PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:288
+#: src/Helper/Helper_PDF_List_Table.php:289
+#, php-format
 msgid "Copy the %s PDF shortcode to the clipboard"
 msgstr "将 %s PDF 简码复制到剪贴板"
 
-#: ../../Helper/Helper_PDF_List_Table.php:307
-msgid "Shortcode copied!"
-msgstr "复制短代码！"
-
-#: ../../Helper/Helper_PDF_List_Table.php:311
-msgid "Copy Shortcode"
-msgstr "复制短代码"
-
-#: ../../Helper/Helper_PDF_List_Table.php:303
+#: src/Helper/Helper_PDF_List_Table.php:304
 msgid "Copied"
 msgstr "复制"
 
-#: ../../Helper/Helper_PDF_List_Table.php:364
+#: src/Helper/Helper_PDF_List_Table.php:308
+msgid "Shortcode copied!"
+msgstr "复制短代码！"
+
+#: src/Helper/Helper_PDF_List_Table.php:312
+msgid "Copy Shortcode"
+msgstr "复制短代码"
+
+#: src/Helper/Helper_PDF_List_Table.php:365
 msgid "Edit this PDF"
 msgstr "编辑此 PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:364
+#: src/Helper/Helper_PDF_List_Table.php:365
 msgid "Edit"
 msgstr "编辑"
 
-#: ../../Helper/Helper_PDF_List_Table.php:365
+#: src/Helper/Helper_PDF_List_Table.php:366
 msgid "Duplicate this PDF"
 msgstr "复制此 PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:365
+#: src/Helper/Helper_PDF_List_Table.php:366
 msgid "Duplicate"
 msgstr "重复"
 
-#: ../../Helper/Helper_PDF_List_Table.php:366
+#: src/Helper/Helper_PDF_List_Table.php:367
 msgid "Delete this PDF"
 msgstr "删除此 PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:374
+#: src/Helper/Helper_PDF_List_Table.php:375
+#, php-format
 msgid "%s PDF"
 msgstr "%s PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:404
+#: src/Helper/Helper_PDF_List_Table.php:405
+#, php-format
 msgid "This form doesn't have any PDFs. Let's go %1$screate one%2$s."
 msgstr "此表单没有任何 PDF 文件。让我们%1$s创建一个%2$s。"
 
-#: ../../Helper/Helper_Templates.php:224
+#: src/Helper/Helper_Templates.php:225
 msgid "Requires Gravity PDF"
 msgstr "需要重力 PDF"
 
-#: ../../Helper/Helper_Templates.php:335, ../../Helper/Helper_Templates.php:416
+#: src/Helper/Helper_Templates.php:287
+#: src/Helper/Helper_Templates.php:349
+#: src/Helper/Helper_Templates.php:430
 msgid "Legacy"
 msgstr "旧版"
 
-#: ../../Model/Model_Form_Settings.php:245
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:314
+#. translators: the plugin name.
+#, php-format
+msgid "There is a new version of %1$s available."
+msgstr "有一个新版本的%1$s可用。"
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:320
+msgid "Contact your network administrator to install the update."
+msgstr "联系您的网络管理员以安装更新。"
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:326
+#. translators: 1. opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate.
+#, php-format
+msgid "%1$sView version %2$s details%3$s."
+msgstr "%1$s查看版本%2$s详细信息%3$s。"
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:344
+#. translators: 1: Opening <a> tag, 2: Version number, 3: Closing </a> tag, 4: Opening <a> tag, 5: Closing </a> tag
+#, php-format
+msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
+msgstr "%1$s查看版本%2$s详细信息%3$s 或%4$s更新现在%5$s。"
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:364
+msgid "Update now."
+msgstr "现在更新。"
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:582
+msgid "You do not have permission to install plugin updates"
+msgstr "您没有安装插件更新的权限"
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:582
+msgid "Error"
+msgstr "错误"
+
+#: src/Model/Model_Form_Settings.php:245
 msgid "Update PDF"
 msgstr "更新 PDF"
 
-#: ../../Model/Model_Form_Settings.php:246
+#: src/Model/Model_Form_Settings.php:246
 msgid "Add PDF"
 msgstr "添加PDF"
 
-#: ../../Model/Model_Form_Settings.php:336,
-#: ../../Model/Model_Form_Settings.php:358,
-#: ../../Model/Model_Form_Settings.php:407,
-#: ../../Model/Model_Form_Settings.php:515
+#: src/Model/Model_Form_Settings.php:336
+#: src/Model/Model_Form_Settings.php:358
+#: src/Model/Model_Form_Settings.php:407
+#: src/Model/Model_Form_Settings.php:515
 msgid "There was a problem saving your PDF settings. Please try again."
 msgstr "保存 PDF 设置时出现问题。请重试。"
 
-#: ../../Model/Model_Form_Settings.php:379
+#: src/Model/Model_Form_Settings.php:379
 msgid "PDF could not be saved. Please enter all required information below."
 msgstr "无法保存 PDF。请在下面输入所有必要信息。"
 
-#: ../../Model/Model_Form_Settings.php:401
+#: src/Model/Model_Form_Settings.php:401
+#, php-format
 msgid "PDF saved successfully. %1$sBack to PDF list.%2$s"
 msgstr "PDF 已成功保存。%1$s返回 PDF 列表。%2$s"
 
-#: ../../Model/Model_Form_Settings.php:803
+#: src/Model/Model_Form_Settings.php:805
 msgid "PDF successfully deleted."
 msgstr "PDF 已成功删除。"
 
-#: ../../Model/Model_Form_Settings.php:866
+#: src/Model/Model_Form_Settings.php:868
 msgid "PDF successfully duplicated."
 msgstr "PDF 复制成功。"
 
-#: ../../Model/Model_Install.php:303
-msgid ""
-"Gravity PDF does not have write permission to the %s directory. Contact your "
-"web hosting provider to fix the issue."
-msgstr ""
-"Gravity PDF 没有 %s 目录的写入权限。请联系您的虚拟主机提供商以解决问题。"
-
-#: ../../Model/Model_Install.php:291
+#: src/Model/Model_Install.php:290
+#, php-format
 msgid ""
 "There was a problem creating the %s directory. Ensure you have write "
 "permissions to your uploads folder."
 msgstr "创建 %s 目录时出现问题。请确保您拥有上传文件夹的写入权限。"
 
-#: ../../Model/Model_Mergetags.php:292
+#: src/Model/Model_Install.php:301
+#, php-format
+msgid ""
+"Gravity PDF does not have write permission to the %s directory. Contact "
+"your web hosting provider to fix the issue."
+msgstr "Gravity PDF 没有 %s 目录的写入权限。请联系您的虚拟主机提供商以解决问题。"
+
+#: src/Model/Model_Mergetags.php:292
 msgid "Signed (+1 week)"
 msgstr "已签署（+1 周）"
 
-#: ../../Model/Model_Mergetags.php:301
+#: src/Model/Model_Mergetags.php:301
 msgid "Signed (+1 month)"
 msgstr "已签署 (+1 个月)"
 
-#: ../../Model/Model_Mergetags.php:310
+#: src/Model/Model_Mergetags.php:310
 msgid "Signed (+1 year)"
 msgstr "已签署（+1 年）"
 
-#: ../../Model/Model_Mergetags.php:321
+#: src/Model/Model_Mergetags.php:321
 msgid "PDF URLs"
 msgstr "PDF URL"
 
-#: ../../Model/Model_PDF.php:399
+#: src/Model/Model_PDF.php:401
 msgid "The PDF configuration is not currently active."
 msgstr "PDF 配置当前未激活。"
 
-#: ../../Model/Model_PDF.php:421
+#: src/Model/Model_PDF.php:423
 msgid "PDF conditional logic requirements have not been met."
 msgstr "PDF 条件逻辑要求未得到满足。"
 
-#: ../../Model/Model_PDF.php:510
+#: src/Model/Model_PDF.php:512
 msgid "Your PDF is no longer accessible."
 msgstr "您的 PDF 已无法访问。"
 
-#: ../../Model/Model_PDF.php:629, ../../Model/Model_PDF.php:659
+#: src/Model/Model_PDF.php:631
+#: src/Model/Model_PDF.php:667
 msgid "You do not have access to view this PDF."
 msgstr "您没有权限查看此 PDF 文件。"
 
-#: ../../Model/Model_PDF.php:1024
+#: src/Model/Model_PDF.php:1031
 msgid "PDFs"
 msgstr "PDF 文件"
 
-#: ../../Model/Model_PDF.php:1167
+#: src/Model/Model_PDF.php:1174
 msgid "The PDF could not be saved."
 msgstr "无法保存 PDF。"
 
-#: ../../Model/Model_PDF.php:2198
+#: src/Model/Model_PDF.php:2229
 msgid "Could not find PDF configuration requested"
 msgstr "无法找到所需的 PDF 配置"
 
-#: ../../Model/Model_PDF.php:2519
+#: src/Model/Model_PDF.php:2554
+#, php-format
 msgid "Page %d"
 msgstr "第%d页"
 
-#: ../../Model/Model_Settings.php:360
-msgid "Your support license key has been activated for this domain."
-msgstr "您的支持许可密钥已在此域激活。"
-
-#: ../../Model/Model_Settings.php:457
-msgid "License deactivated."
-msgstr "许可证已注销。"
-
-#: ../../Model/Model_Settings.php:481
+#: src/Model/Model_Settings.php:378
+#, php-format
 msgid ""
 "An unknown error occurred, and your license key may not have been correctly "
 "deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your "
 "site has been unlinked from the key."
-msgstr ""
-"出现未知错误，您的许可证密钥可能未正确停用。%1$s登录您的 GravityPDF.com 账"
-"户%2$s，检查您的网站是否已解除与密钥的链接。"
+msgstr "出现未知错误，您的许可证密钥可能未正确停用。%1$s登录您的 GravityPDF.com 账户%2$s，检查您的网站是否已解除与密钥的链接。"
 
-#: ../../Model/Model_Shortcodes.php:50
-msgid "This method has been superseded by self::process()"
-msgstr "此方法已被 self::process() 取代"
+#: src/Model/Model_Settings.php:395
+#, php-format
+msgid ""
+"An API error occurred and your license key may not have been correctly "
+"deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your "
+"site has been unlinked from the key."
+msgstr "发生 API 错误，您的许可证密钥可能未被正确停用。%1$s登录您的 GravityPDF.com 账户%2$s 并检查您的站点是否已与密钥解除关联。"
 
-#: ../../Model/Model_System_Report.php:111
+#: src/Model/Model_Settings.php:420
+msgid "License key deactivated."
+msgstr "许可证密钥已停用。"
+
+#: src/Model/Model_Settings.php:421
+msgid "Access Pass license key deactivated."
+msgstr "Access Pass 许可证密钥已停用。"
+
+#: src/Model/Model_System_Report.php:143
 msgid "Gravity PDF Environment"
 msgstr "重力 PDF 环境"
 
-#: ../../Model/Model_System_Report.php:115
+#: src/Model/Model_System_Report.php:150
 msgid "PHP"
 msgstr "PHP"
 
-#: ../../Model/Model_System_Report.php:121
+#: src/Model/Model_System_Report.php:156
 msgid "Directories and Permissions"
 msgstr "目录和权限"
 
-#: ../../Model/Model_System_Report.php:127
+#: src/Model/Model_System_Report.php:162
 msgid "Global Settings"
 msgstr "全局设置"
 
-#: ../../Model/Model_System_Report.php:133
+#: src/Model/Model_System_Report.php:168
 msgid "Security Settings"
 msgstr "安全设置"
 
-#: ../../Model/Model_System_Report.php:177
+#: src/Model/Model_System_Report.php:218
 msgid "WP Memory"
 msgstr "WP 内存"
 
-#: ../../Model/Model_System_Report.php:189
+#: src/Model/Model_System_Report.php:231
 msgid "Default Charset"
 msgstr "默认字符集"
 
-#: ../../Model/Model_System_Report.php:194
+#: src/Model/Model_System_Report.php:237
 msgid "Internal Encoding"
 msgstr "内部编码"
 
-#: ../../Model/Model_System_Report.php:202
+#: src/Model/Model_System_Report.php:246
 msgid "PDF Working Directory"
 msgstr "PDF 工作目录"
 
-#: ../../Model/Model_System_Report.php:207
+#: src/Model/Model_System_Report.php:252
 msgid "PDF Working Directory URL"
 msgstr "PDF 工作目录 URL"
 
-#: ../../Model/Model_System_Report.php:212
+#: src/Model/Model_System_Report.php:258
 msgid "Font Folder location"
 msgstr "字体文件夹位置"
 
-#: ../../Model/Model_System_Report.php:217
+#: src/Model/Model_System_Report.php:264
 msgid "Temporary Folder location"
 msgstr "临时文件夹位置"
 
-#: ../../Model/Model_System_Report.php:222
+#: src/Model/Model_System_Report.php:270
 msgid "Temporary Folder permissions"
 msgstr "临时文件夹权限"
 
-#: ../../Model/Model_System_Report.php:228
+#: src/Model/Model_System_Report.php:277
 msgid "Temporary Folder protected"
 msgstr "受保护的临时文件夹"
 
-#: ../../Model/Model_System_Report.php:234
+#: src/Model/Model_System_Report.php:284
 msgid "mPDF Temporary location"
 msgstr "mPDF 临时位置"
 
-#: ../../Model/Model_System_Report.php:243
+#: src/Model/Model_System_Report.php:294
 msgid "Outdated Templates"
 msgstr "过时的模板"
 
-#: ../../Model/Model_System_Report.php:253
+#: src/Model/Model_System_Report.php:305
+#, php-format
 msgid ""
-"In order to get updates direct from GravityPDF.com %1$syou need to perform a "
-"one-time download of the plugin%2$s."
+"In order to get updates direct from GravityPDF.com %1$syou need to perform "
+"a one-time download of the plugin%2$s."
 msgstr "要直接从 GravityPDF.com %1$s获取更新，您需要一次性下载插件%2$s。"
 
-#: ../../Model/Model_System_Report.php:262
+#: src/Model/Model_System_Report.php:314
 msgid "Canonical Release"
 msgstr "规范发布"
 
-#: ../../Model/Model_System_Report.php:268
+#: src/Model/Model_System_Report.php:321
 msgid "PDF Entry List Action"
 msgstr "PDF 输入列表操作"
 
-#: ../../Model/Model_System_Report.php:275,
-#: ../../Model/Model_System_Report.php:281
+#: src/Model/Model_System_Report.php:330
+#: src/Model/Model_System_Report.php:337
 msgid "Off"
 msgstr "关闭"
 
-#: ../../Model/Model_System_Report.php:289
+#: src/Model/Model_System_Report.php:345
 msgid "User Restrictions"
 msgstr "用户限制"
 
-#: ../../Model/Model_System_Report.php:295
+#: src/Model/Model_System_Report.php:353
 msgid "minute(s)"
 msgstr "分钟"
 
-#: ../../Model/Model_Templates.php:367
+#: src/Model/Model_System_Report.php:388
+msgid "The report sections are keyed by name rather than by position."
+msgstr "报告部分是按名称键控而非按位置。"
+
+#: src/Model/Model_Templates.php:365
 msgid "No valid PDF template found in Zip archive."
 msgstr "压缩包中未发现有效的 PDF 模板。"
 
-#: ../../Model/Model_Templates.php:388
+#: src/Model/Model_Templates.php:386
+#, php-format
 msgid ""
 "The filename %s contains invalid characters. Only alphanumeric, hyphen, and "
 "underscore allowed."
 msgstr "文件名 %s 包含无效字符。只允许字母数字、连字符和下划线。"
 
-#: ../../Model/Model_Templates.php:402
+#: src/Model/Model_Templates.php:400
+#, php-format
 msgid "The PHP file %s is not a valid PDF Template."
 msgstr "PHP 文件 %s 不是有效的 PDF 模板。"
 
-#: ../../Model/Model_Uninstall.php:158
+#: src/Model/Model_Uninstall.php:195
+#, php-format
 msgid ""
 "There was a problem removing the Gravity Form \"%s\" PDF configuration. Try "
 "delete manually."
 msgstr "移除重力表单\"%s\"时出现问题。PDF 配置。请尝试手动删除。"
 
-#: ../../Model/Model_Uninstall.php:193
-msgid ""
-"There was a problem removing the %s directory. Clean up manually via (S)FTP."
+#: src/Model/Model_Uninstall.php:230
+#, php-format
+msgid "There was a problem removing the %s directory. Clean up manually via (S)FTP."
 msgstr "删除 %s 目录时出现问题。通过 (S)FTP 手动清理。"
 
-#: ../../templates/blank-slate.php:3
-msgid "Blank Slate"
-msgstr "白板"
+#: src/Statics/Deprecation.php:246
+#. translators: %s: The name of the deprecated feature
+#, php-format
+msgid "%s is no longer supported."
+msgstr "%s 已不再受支持。"
 
-#: ../../templates/focus-gravity.php:3
-msgid "Focus Gravity"
-msgstr "聚焦重力"
+#: src/Statics/Deprecation.php:250
+#. translators: 1: The name of the deprecated feature, 2: The Gravity PDF version it is removed in
+#, php-format
+msgid "Support for %1$s will be removed in Gravity PDF %2$s."
+msgstr "对 %1$s 的支持将在 Gravity PDF %2$s 中移除。"
 
-#: ../../templates/rubix.php:3
-msgid "Rubix"
-msgstr "鲁比克斯"
+#: src/Statics/Deprecation.php:330
+#. translators: %s: The Gravity PDF version the filter is removed in
+#, php-format
+msgid "This filter is removed in Gravity PDF %s."
+msgstr "此过滤器在 Gravity PDF %s 中被移除。"
 
-#: ../../templates/zadani.php:3
-msgid "Zadani"
-msgstr "扎达尼"
+#: src/Statics/Deprecation_V3.php:133
+msgid "Legacy Templates"
+msgstr "旧版模板"
 
-#: ../../View/View_Form_Settings.php:42
-msgid "General"
-msgstr "常规"
+#: src/Statics/Deprecation_V3.php:141
+msgid "Business Plus Templates"
+msgstr "Business Plus 模板"
 
-#: ../../View/View_Form_Settings.php:54
-msgid "Appearance"
-msgstr "外观"
+#: src/Statics/Deprecation_V3.php:149
+msgid "Legacy Download URLs"
+msgstr "旧版下载链接"
 
-#: ../../View/View_Settings.php:179
-msgid "Tools"
-msgstr "工具"
+#: src/Statics/Deprecation_V3.php:155
+#. translators: %s: The Gravity PDF version the feature is removed in
+#, php-format
+msgid "Support for legacy download URLs will be removed in Gravity PDF %s."
+msgstr "对旧版下载链接的支持将在 Gravity PDF %s 中被移除。"
 
-#: ../../View/View_Settings.php:184
-msgid "Help"
-msgstr "帮助"
+#: src/Statics/Deprecation_V3.php:159
+msgid "Actions and Filters"
+msgstr "操作和过滤器"
 
-#: ../../View/View_Settings.php:192
-msgid "License"
-msgstr "许可证"
+#: src/Statics/Deprecation_V3.php:166
+#. translators: %s: The Gravity PDF version the hooks are removed in
+#, php-format
+msgid "Code on this site uses Gravity PDF hooks that are removed in version %s."
+msgstr "此站点上的代码使用了将在 %s 版本中移除的 Gravity PDF 钩子。"
 
-#: ../../View/View_Settings.php:241
-msgid "Default PDF Options"
-msgstr "默认 PDF 选项"
-
-#: ../../View/View_Settings.php:242
-msgid ""
-"Control the default settings to use when you create new PDFs on your forms."
-msgstr "控制在表单上创建新 PDF 时使用的默认设置。"
-
-#: ../../View/View_Settings.php:266
-msgid "Security"
-msgstr "安全"
-
-#: ../../View/View_Settings.php:299
-msgid "Licensing"
-msgstr "许可"
-
-#: ../../View/View_Settings.php:458
-msgid "PDF Download Link"
-msgstr "PDF 下载链接"
-
-#: ../../View/View_Settings.php:458
-msgid ""
-"Include the [gravitypdf] shortcode in the form's Confirmation or "
-"Notification settings to display a PDF download link. %1$sGet more info%2$s."
-msgstr ""
-"在表单的确认或通知设置中包含 [gravitypdf] 简码，以显示 PDF 下载链接。%1$s获取"
-"更多信息%2$s."
-
-#: ../../View/View_System_Report.php:76
-msgid "Unlimited"
-msgstr "无限"
-
-#: ../../View/View_System_Report.php:83
-msgid ""
-"We strongly recommend you have at least 128MB of available WP Memory (RAM) "
-"assigned to your website. %1$sFind out how to increase this limit%2$s."
-msgstr ""
-"我们强烈建议您为网站分配至少 128MB 的可用 WP 内存 (RAM)。%1$s了解如何提高此限"
-"制%2$s。"
-
-#: ../../View/View_System_Report.php:96
-msgid ""
-"We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s is "
-"disabled."
-msgstr "我们检测到 PHP 运行时配置设置 %1$sallow_url_fopen%2$s 已被禁用。"
-
-#: ../../View/View_System_Report.php:97
-msgid ""
-"You may notice image display issues in your PDFs. Contact your web hosting "
-"provider for assistance enabling this feature."
-msgstr ""
-"您可能会在 PDF 文件中发现图像显示问题。请联系您的网络托管服务提供商，以获取启"
-"用此功能的帮助。"
-
-#: ../../View/View_System_Report.php:110
-msgid ""
-"We've detected the PDFs saved in Gravity PDF's %1$stmp%2$s directory can be "
-"publicly accessed."
-msgstr ""
-"我们检测到保存在 Gravity PDF 的 %1$stmp%2$s 目录中的 PDF 可以被公开访问。"
-
-#: ../../View/View_System_Report.php:111
-msgid ""
-"We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the "
-"folder outside your public website directory%4$s."
-msgstr ""
-"我们建议您使用我们的 %1$sgfpdf_tmp_location%2$s 过滤器 %3$s 将文件夹移到公共"
-"网站目录之外%4$s。"
-
-#: ../../View/View_System_Report.php:127
-msgid "%1$s version %2$s is out of date. The core version is %3$s"
-msgstr "%1$s版本%2$s已过期。核心版本是%3$s"
-
-#: ../../View/View_System_Report.php:143
-msgid "Learn how to update"
-msgstr "了解如何更新它"
-
-#: ../../Helper/Fields/Field_Consent.php:142
-msgid "Consent not given."
-msgstr "未经同意。"
-
-#: ../../Helper/Fields/Field_Products.php:214
-msgid "Subtotal"
-msgstr "小计"
-
-#: ../../Helper/Fields/Field_Products.php:219
-msgid "Shipping (%s)"
-msgstr "运输 (%s)"
-
-#: ../../Helper/Fields/Field_Tos.php:101
-msgid "Not accepted"
-msgstr "不接受"
-
-#. translators: the plugin name.
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:299
-msgid "There is a new version of %1$s available."
-msgstr "有一个新版本的%1$s可用。"
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:329
-msgid "Update now."
-msgstr "现在更新。"
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:318
-msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
-msgstr "%1$s查看版本%2$s详细信息%3$s 或%4$s更新现在%5$s。"
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:310
-msgid "%1$sView version %2$s details%3$s."
-msgstr "%1$s查看版本%2$s详细信息%3$s。"
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:305
-msgid "Contact your network administrator to install the update."
-msgstr "联系您的网络管理员以安装更新。"
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:564
-msgid "You do not have permission to install plugin updates"
-msgstr "您没有安装插件更新的权限"
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:564
-msgid "Error"
-msgstr "错误"
-
-#: ../../templates/config/focus-gravity.php:75
+#: src/templates/config/focus-gravity.php:75
 msgid "Accent Color"
 msgstr "强调色"
 
-#: ../../templates/config/focus-gravity.php:77
+#: src/templates/config/focus-gravity.php:77
 msgid ""
 "The accent color is used for the page and section titles, as well as the "
 "border."
 msgstr "重点色用于页面和章节标题以及边框。"
 
-#: ../../templates/config/focus-gravity.php:83
+#: src/templates/config/focus-gravity.php:83
 msgid "Secondary Color"
 msgstr "次要颜色"
 
-#: ../../templates/config/focus-gravity.php:85
-msgid ""
-"The secondary color is used with the field labels and for alternate rows."
+#: src/templates/config/focus-gravity.php:85
+msgid "The secondary color is used with the field labels and for alternate rows."
 msgstr "辅助颜色用于字段标签和备用行。"
 
-#: ../../templates/config/focus-gravity.php:93
+#: src/templates/config/focus-gravity.php:93
 msgid "Combine the field label and value or have a distinct label/value."
 msgstr "合并字段标签和值，或使用不同的标签/值。"
 
-#: ../../templates/config/focus-gravity.php:95
+#: src/templates/config/focus-gravity.php:95
 msgid "Combined Label"
 msgstr "组合标签"
 
-#: ../../templates/config/focus-gravity.php:96
+#: src/templates/config/focus-gravity.php:96
 msgid "Split Label"
 msgstr "分割标签"
 
-#: ../../templates/config/rubix.php:69
+#: src/templates/config/rubix.php:69
 msgid "Container Background Color"
 msgstr "容器背景颜色"
 
-#: ../../templates/config/rubix.php:71
+#: src/templates/config/rubix.php:71
 msgid "Control the color of the field background."
 msgstr "控制字段背景的颜色。"
 
-#: ../../templates/config/zadani.php:69
+#: src/templates/config/zadani.php:69
 msgid "Field Border Color"
 msgstr "字段边框颜色"
 
-#: ../../templates/config/zadani.php:71
+#: src/templates/config/zadani.php:71
 msgid "Control the color of the field border."
 msgstr "控制字段边框的颜色。"
 
-#: ../../View/html/Actions/action_buttons.php:29
+#: src/View/html/Actions/action_buttons.php:29
 msgid "Dismiss Notice"
 msgstr "关闭通知"
 
-#: ../../View/html/Actions/core_font.php:21
+#: src/View/html/Actions/core_font.php:21
 msgid "Gravity PDF needs to download the Core PDF fonts."
 msgstr "Gravity PDF 需要下载 Core PDF 字体。"
 
-#: ../../View/html/Actions/core_font.php:25
+#: src/View/html/Actions/core_font.php:25
 msgid ""
-"Before you can generate a PDF using Gravity Forms, the core fonts need to be "
-"saved to your server. This only needs to be done once."
-msgstr ""
-"在使用 Gravity Forms 生成 PDF 之前，需要将核心字体保存到服务器上。这只需完成"
-"一次。"
+"Before you can generate a PDF using Gravity Forms, the core fonts need to "
+"be saved to your server. This only needs to be done once."
+msgstr "在使用 Gravity Forms 生成 PDF 之前，需要将核心字体保存到服务器上。这只需完成一次。"
 
-#: ../../View/html/FormSettings/add_edit.php:62,
-#: ../../View/html/Settings/general.php:50
+#: src/View/html/Actions/deprecated_features.php:24
+msgid "This site uses deprecated Gravity PDF functionality:"
+msgstr "此站点使用了已弃用的 Gravity PDF 功能："
+
+#: src/View/html/Actions/deprecated_features.php:31
+#: src/View/View_System_Report.php:458
+msgid "Learn how to upgrade"
+msgstr "了解如何升级"
+
+#: src/View/html/Actions/deprecated_features.php:36
+msgid ""
+"Dismissing this notice hides the items above. Anything found later is "
+"reported again."
+msgstr "关闭此通知将隐藏上述项目。之后发现的任何内容将再次报告。"
+
+#: src/View/html/FormSettings/add_edit.php:62
+#: src/View/html/Settings/general.php:50
 msgid "Want more features? Take a look at our addons."
 msgstr "想要更多功能？看看我们的附加组件。"
 
-#: ../../View/html/FormSettings/list.php:37
+#: src/View/html/FormSettings/list.php:37
 msgid "Add new PDF"
 msgstr "添加新的 PDF"
 
-#: ../../View/html/GravityForms/fieldset.php:67
+#: src/View/html/GravityForms/fieldset.php:67
+#, php-format
 msgid "Toggle %s Section"
 msgstr "切换%s部分"
 
-#: ../../View/html/PDF/entry_detailed_pdf.php:32
+#: src/View/html/PDF/entry_detailed_pdf.php:32
+#, php-format
 msgid "View or download %s.pdf"
 msgstr "查看或下载 %s.pdf"
 
-#: ../../View/html/PDF/entry_list_pdf_multiple.php:20
+#: src/View/html/PDF/entry_list_pdf_multiple.php:20
 msgid "Download PDFs"
 msgstr "下载 PDF"
 
-#: ../../View/html/PDF/entry_list_pdf_multiple.php:20
+#: src/View/html/PDF/entry_list_pdf_multiple.php:20
 msgid "View PDFs"
 msgstr "查看 PDF"
 
-#: ../../View/html/PDF/entry_list_pdf_single.php:29
+#: src/View/html/PDF/entry_list_pdf_single.php:29
 msgid "View PDF"
 msgstr "查看 PDF"
 
-#: ../../View/html/PDF/entry_no_valid_pdf.php:20
+#: src/View/html/PDF/entry_no_valid_pdf.php:20
 msgid "No PDFs available for this entry."
 msgstr "此条目暂无 PDF 文件。"
 
-#: ../../View/html/Settings/help.php:27
+#: src/View/html/Settings/help.php:27
 msgid "Get help with Gravity PDF"
 msgstr "获得重力 PDF 方面的帮助"
 
-#: ../../View/html/Settings/help.php:29
+#: src/View/html/Settings/help.php:29
 msgid ""
-"Search the documentation for an answer to your question. If you need further "
-"assistance, contact support and our team will be happy to help."
-msgstr ""
-"搜索文档，查找问题答案。如果您需要进一步帮助，请联系技术支持，我们的团队将竭"
-"诚为您服务。"
+"Search the documentation for an answer to your question. If you need "
+"further assistance, contact support and our team will be happy to help."
+msgstr "搜索文档，查找问题答案。如果您需要进一步帮助，请联系技术支持，我们的团队将竭诚为您服务。"
 
-#: ../../View/html/Settings/help.php:34
+#: src/View/html/Settings/help.php:34
 msgid "View Documentation"
 msgstr "查看文档"
 
-#: ../../View/html/Settings/help.php:35
+#: src/View/html/Settings/help.php:35
 msgid "Contact Support"
 msgstr "联系支持"
 
-#: ../../View/html/Settings/help.php:38
+#: src/View/html/Settings/help.php:38
+#, php-format
 msgid ""
 "Support hours are 9:00am-5:00pm Monday to Friday, %1$sSydney Australia "
 "time%2$s (public holidays excluded)."
-msgstr ""
-"支持时间为周一至周五上午 9:00-下午 5:00，%1$s澳大利亚悉尼时间%2$s（公共节假日"
-"除外）。"
+msgstr "支持时间为周一至周五上午 9:00-下午 5:00，%1$s澳大利亚悉尼时间%2$s（公共节假日除外）。"
 
-#: ../../View/html/Settings/licence-info.php:22
+#: src/View/html/Settings/licence-info.php:22
+#, php-format
 msgid ""
-"To take advantage of automatic updates for your Gravity PDF extension(s), "
-"enter and save your license key(s) below. %1$sYou can find your purchased "
-"licenses in your GravityPDF.com account%2$s."
-msgstr ""
-"要享受 Gravity PDF 扩展的自动更新，请在下面输入并保存您的许可证密钥。%1$s您可"
-"以在 GravityPDF.com 账户%2$s中找到已购买的许可证。"
+"To take advantage of automatic updates enter and save your license key(s) "
+"below. %1$sYou can find your purchased licenses in your GravityPDF.com "
+"account%2$s."
+msgstr "要利用自动更新，请在下方输入并保存您的许可证密钥。%1$s您可以在您的 GravityPDF.com 账户中找到您购买的许可证%2$s。"
 
-#: ../../View/html/Settings/licence-info.php:30
-msgid ""
-"When a Gravity PDF extension is enabled, the plugin periodically polls "
-"GravityPDF.com over HTTPS for your license status and plugin updates. The "
-"only data sent is your website domain name and license key (if provided). To "
-"opt-out you need to deactivate all Gravity PDF extensions."
-msgstr ""
-"启用 Gravity PDF 扩展后，插件会定期通过 HTTPS 轮询 GravityPDF.com，以了解您的"
-"许可证状态和插件更新。发送的唯一数据是您的网站域名和许可证密钥（如果提供）。"
-"要选择退出，您需要停用所有 Gravity PDF 扩展。"
-
-#: ../../View/html/Shortcodes/conditional_logic_not_met.php:20
+#: src/View/html/Shortcodes/conditional_logic_not_met.php:20
 msgid ""
 "PDF link not displayed because conditional logic requirements have not been "
 "met."
 msgstr "由于未满足条件逻辑要求，PDF 链接未显示。"
 
-#: ../../View/html/Shortcodes/conditional_logic_not_met.php:21,
-#: ../../View/html/Shortcodes/invalid_pdf_config.php:21,
-#: ../../View/html/Shortcodes/no_entry_id.php:21,
-#: ../../View/html/Shortcodes/pdf_not_active.php:21
+#: src/View/html/Shortcodes/conditional_logic_not_met.php:21
+#: src/View/html/Shortcodes/invalid_pdf_config.php:21
+#: src/View/html/Shortcodes/no_entry_id.php:21
+#: src/View/html/Shortcodes/pdf_not_active.php:21
 msgid "(Admin Only Message)"
 msgstr "(仅限管理员留言）"
 
-#: ../../View/html/Shortcodes/invalid_pdf_config.php:20
-msgid ""
-"Could not get Gravity PDF configuration using the PDF and Entry IDs passed."
+#: src/View/html/Shortcodes/invalid_pdf_config.php:20
+msgid "Could not get Gravity PDF configuration using the PDF and Entry IDs passed."
 msgstr "使用传入的 PDF 和条目 ID 无法获取 Gravity PDF 配置。"
 
-#: ../../View/html/Shortcodes/no_entry_id.php:20
+#: src/View/html/Shortcodes/no_entry_id.php:20
 msgid ""
-"No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry ID "
-"via the confirmation url query string – using either \"entry\" or \"lid\" as "
-"the query string name – or by passing an ID directly to the shortcode."
+"No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry "
+"ID via the confirmation url query string – using either \"entry\" or "
+"\"lid\" as the query string name – or by passing an ID directly to the "
+"shortcode."
 msgstr ""
-"没有向 Gravity PDF 传递 Gravity 表单条目 ID。请确保通过确认 url 查询字符串传"
-"递条目 ID（使用 \"entry \"或 \"lid \"作为查询字符串名称），或直接将 ID 传递给"
-"简码。"
+"没有向 Gravity PDF 传递 Gravity 表单条目 ID。请确保通过确认 url 查询字符串传递条目 ID（使用 \"entry \"或 "
+"\"lid \"作为查询字符串名称），或直接将 ID 传递给简码。"
 
-#: ../../View/html/Shortcodes/pdf_not_active.php:20
+#: src/View/html/Shortcodes/pdf_not_active.php:20
 msgid "PDF link not displayed because PDF is inactive."
 msgstr "未显示 PDF 链接，因为 PDF 处于非活动状态。"
 
-#: ../../View/html/Uninstaller/uninstall_button.php:39,
-#: ../../View/html/Uninstaller/uninstall_button.php:40
+#: src/View/html/Uninstaller/uninstall_button.php:39
+#: src/View/html/Uninstaller/uninstall_button.php:40
 msgid ""
 "This operation deletes ALL Gravity PDF settings and deactivates the plugin. "
 "If you continue, all settings, configuration, custom templates and fonts "
 "will be removed."
-msgstr ""
-"此操作将删除所有 Gravity PDF 设置并停用插件。如果继续，所有设置、配置、自定义"
-"模板和字体都将被删除。"
+msgstr "此操作将删除所有 Gravity PDF 设置并停用插件。如果继续，所有设置、配置、自定义模板和字体都将被删除。"
+
+#: src/View/View_Form_Settings.php:42
+msgid "General"
+msgstr "常规"
+
+#: src/View/View_Form_Settings.php:54
+msgid "Appearance"
+msgstr "外观"
+
+#: src/View/View_Settings.php:181
+msgid "Tools"
+msgstr "工具"
+
+#: src/View/View_Settings.php:186
+msgid "Help"
+msgstr "帮助"
+
+#: src/View/View_Settings.php:194
+msgid "License"
+msgstr "许可证"
+
+#: src/View/View_Settings.php:243
+msgid "Default PDF Options"
+msgstr "默认 PDF 选项"
+
+#: src/View/View_Settings.php:244
+msgid "Control the default settings to use when you create new PDFs on your forms."
+msgstr "控制在表单上创建新 PDF 时使用的默认设置。"
+
+#: src/View/View_Settings.php:268
+msgid "Security"
+msgstr "安全"
+
+#: src/View/View_Settings.php:301
+msgid "Licensing"
+msgstr "许可"
+
+#: src/View/View_Settings.php:460
+msgid "PDF Download Link"
+msgstr "PDF 下载链接"
+
+#: src/View/View_Settings.php:460
+#, php-format
+msgid ""
+"Include the [gravitypdf] shortcode in the form's Confirmation or "
+"Notification settings to display a PDF download link. %1$sGet more info%2$s."
+msgstr "在表单的确认或通知设置中包含 [gravitypdf] 简码，以显示 PDF 下载链接。%1$s获取更多信息%2$s."
+
+#: src/View/View_System_Report.php:77
+msgid "Unlimited"
+msgstr "无限"
+
+#: src/View/View_System_Report.php:84
+#, php-format
+msgid ""
+"We strongly recommend you have at least 128MB of available WP Memory (RAM) "
+"assigned to your website. %1$sFind out how to increase this limit%2$s."
+msgstr "我们强烈建议您为网站分配至少 128MB 的可用 WP 内存 (RAM)。%1$s了解如何提高此限制%2$s。"
+
+#: src/View/View_System_Report.php:97
+#, php-format
+msgid ""
+"We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s "
+"is disabled."
+msgstr "我们检测到 PHP 运行时配置设置 %1$sallow_url_fopen%2$s 已被禁用。"
+
+#: src/View/View_System_Report.php:98
+msgid ""
+"You may notice image display issues in your PDFs. Contact your web hosting "
+"provider for assistance enabling this feature."
+msgstr "您可能会在 PDF 文件中发现图像显示问题。请联系您的网络托管服务提供商，以获取启用此功能的帮助。"
+
+#: src/View/View_System_Report.php:111
+#, php-format
+msgid ""
+"We've detected the PDFs saved in Gravity PDF's %1$stmp%2$s directory can be "
+"publicly accessed."
+msgstr "我们检测到保存在 Gravity PDF 的 %1$stmp%2$s 目录中的 PDF 可以被公开访问。"
+
+#: src/View/View_System_Report.php:112
+#, php-format
+msgid ""
+"We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the "
+"folder outside your public website directory%4$s."
+msgstr "我们建议您使用我们的 %1$sgfpdf_tmp_location%2$s 过滤器 %3$s 将文件夹移到公共网站目录之外%4$s。"
+
+#: src/View/View_System_Report.php:128
+#, php-format
+msgid "%1$s version %2$s is out of date. The core version is %3$s"
+msgstr "%1$s版本%2$s已过期。核心版本是%3$s"
+
+#: src/View/View_System_Report.php:146
+msgid "Learn how to update"
+msgstr "了解如何更新它"
+
+#: src/View/View_System_Report.php:237
+#. translators: %1$s: The template file name
+#, php-format
+msgid "%1$s (not configured on a form)"
+msgstr "%1$s（未在表单中配置）"
+
+#: src/View/View_System_Report.php:240
+#. translators: 1: The template file name, 2: Comma separated list of form IDs
+#, php-format
+msgid "%1$s (form ID %2$s)"
+msgid_plural "%1$s (form IDs %2$s)"
+msgstr[0] "%1$s（表单 ID %2$s）"
+
+#: src/View/View_System_Report.php:266
+#. translators: %s: Comma separated list of form IDs
+#, php-format
+msgid "In use on form ID %s"
+msgstr "正在使用表单 ID %s"
+
+#: src/View/View_System_Report.php:308
+#. translators: 1: Filter name, 2: Number of callbacks attached to it
+#, php-format
+msgid "%1$s has %2$d listener"
+msgid_plural "%1$s has %2$d listeners"
+msgstr[0] "%1$s 有 %2$d 个监听器"
+
+#: src/View/View_System_Report.php:385
+msgid "Unsupported"
+msgstr "不支持"
+
+#: src/View/View_System_Report.php:386
+msgid ""
+"These features have been removed and any Gravity PDF document that relied "
+"on them will stop working."
+msgstr "这些功能已被移除，任何依赖它们的 Gravity PDF 文档将停止工作。"
+
+#: src/View/View_System_Report.php:390
+msgid "Deprecated"
+msgstr "已弃用"
+
+#: src/View/View_System_Report.php:391
+msgid ""
+"Legacy functionality that will be removed in an upcoming release. It's "
+"important to fix each item to keep your PDFs working correctly."
+msgstr "将在即将发布的版本中移除的旧版功能。修复每个项目对于保持您的 PDF 正常工作非常重要。"
+
+#: src/View/View_System_Report.php:411
+msgid "Your PDFs are ready for the next Gravity PDF release"
+msgstr "您的 PDF 已为下一版本的 Gravity PDF 准备就绪"
+
+#: src/View/View_System_Report.php:417
+msgid ""
+"Nothing on this site relies on Gravity PDF functionality that is scheduled "
+"for removal, so there is nothing to do."
+msgstr "此站点上没有依赖计划移除的 Gravity PDF 功能，因此无需操作。"
+
+#: src/View/View_System_Report.php:427
+msgid "Your site uses Gravity PDF functionality that is scheduled for removal"
+msgstr "您的站点使用了计划移除的 Gravity PDF 功能"
+
+#: src/View/View_System_Report.php:429
+msgid ""
+"Update each item below before the release that removes it, so the PDFs that "
+"rely on it will continue working. Each one links to instructions to upgrade."
+msgstr "请在移除此功能的版本发布前更新以下各项，以确保依赖该功能的 PDF 继续正常工作。每项均链接到升级说明。"
+
+#: src/View/View_System_Report.php:444
+msgid "View the Gravity Forms system report"
+msgstr "查看 Gravity Forms 系统报告"
+
+#: src/View/View_System_Report.php:493
+#. translators: %s: The group name, as get_deprecated_groups() gives it
+#, php-format
+msgid "%s functionality"
+msgstr "%s 功能"
+
+#: src/View/View_System_Report.php:494
+msgid "None detected"
+msgstr "未检测到"
+
+#: src/View/View_System_Report.php:500
+#. translators: %s: The group name, as get_deprecated_groups() gives it
+#, php-format
+msgid "Gravity PDF - %s Functionality"
+msgstr "Gravity PDF - %s 功能"

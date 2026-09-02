@@ -1,55 +1,98 @@
-# Copyright (C) 2024 Gravity PDF
-# This file is distributed under the same license as the Gravity PDF package.
+# Copyright (C) 2026 Blue Liquid Designs
+# This file is distributed under the GPL-2.0.
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity PDF\n"
-"POT-Creation-Date: 2024-10-21 04:06+0000\n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
+"Report-Msgid-Bugs-To: https://gravitypdf.com\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
-"Language: it\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Basepath: ..\n"
-"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;"
-"_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;"
-"esc_html_e;esc_html_x:1,2c\n"
-"X-Poedit-SourceCharset: UTF-8\n"
+"POT-Creation-Date: 2024-10-21 04:06+0000\n"
+"PO-Revision-Date: 2026-09-02 04:30+0000\n"
 "X-Generator: Poedit 3.5\n"
+"X-Domain: gravity-pdf\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: it-IT\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: "
+"__;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_"
+"attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: ../../../api.php:232
-msgid ""
-"The $type parameter is invalid. Only \"view\" and \"model\" are accepted"
-msgstr ""
-"Il parametro $type non è valido. Sono accettati solo \"view\" e \"model\""
+#: pdf.php:3
+#: src/Helper/Helper_Data.php:147
+#: src/Model/Model_PDF.php:994
+#: src/View/View_System_Report.php:414
+#. Plugin Name of the plugin
+msgid "Gravity PDF"
+msgstr "Gravity PDF"
 
-#: ../../../api.php:272, ../../../api.php:471
+#: pdf.php:8
+#. Plugin URI of the plugin
+msgid "https://gravitypdf.com"
+msgstr "https://gravitypdf.com"
+
+#: pdf.php:5
+#. Description of the plugin
+msgid ""
+"Automatically generate highly customizable PDF documents using Gravity "
+"Forms and WordPress (canonical)"
+msgstr ""
+"Genera automaticamente documenti PDF altamente personalizzabili usando "
+"Gravity Forms e WordPress (canonico)"
+
+#: pdf.php:6
+#. Author of the plugin
+msgid "Blue Liquid Designs"
+msgstr "Blue Liquid Designs"
+
+#: pdf.php:7
+#. Author URI of the plugin
+msgid "https://blueliquiddesigns.com.au"
+msgstr "https://blueliquiddesigns.com.au"
+
+#: api.php:232
+msgid "The $type parameter is invalid. Only \"view\" and \"model\" are accepted"
+msgstr "Il parametro $type non è valido. Sono accettati solo \"view\" e \"model\""
+
+#: api.php:272
+#: api.php:374
+#: api.php:511
 msgid "Make sure to pass in a valid Gravity Forms Entry ID"
 msgstr "Assicurarsi di inserire un ID di iscrizione a Gravity Forms valido"
 
-#: ../../../api.php:407
-msgid ""
-"The option key %s already exists. Use GPDFAPI::update_plugin_option instead"
-msgstr ""
-"La chiave dell'opzione %s esiste già. Utilizzare invece GPDFAPI::"
-"update_plugin_option"
-
-#: ../../../api.php:478
+#: api.php:380
+#: api.php:518
 msgid "Could not located the PDF Settings. Ensure you pass in a valid PDF ID."
 msgstr ""
 "Impossibile individuare le impostazioni del PDF. Assicurarsi di aver "
 "inserito un ID PDF valido."
 
-#: ../../../gravity-pdf-updater.php:126
-msgid "This is the non-canonical release of Gravity PDF."
-msgstr "Questa è la versione non canonica di Gravity PDF."
+#: api.php:447
+#, php-format
+msgid "The option key %s already exists. Use GPDFAPI::update_plugin_option instead"
+msgstr ""
+"La chiave dell'opzione %s esiste già. Utilizzare invece "
+"GPDFAPI::update_plugin_option"
 
+#: api.php:662
+#: src/Helper/Helper_Abstract_Options.php:1002
+#: src/Helper/Helper_Data.php:300
+#: src/Model/Model_Custom_Fonts.php:238
+msgid "User-Defined Fonts"
+msgstr "Font definiti dall'utente"
+
+#: gravity-pdf-updater.php:141
+msgid "This is the non-canonical release of Gravity PDF which can be deleted."
+msgstr "Questa è la versione non canonica di Gravity PDF che può essere eliminata."
+
+#: pdf.php:205
 #. translators: 1. WordPress version number 2. HTML Anchor Open Tag 3. Html Anchor Close Tag
-#: ../../../pdf.php:202
+#, php-format
 msgid ""
 "WordPress version %1$s is required: upgrade to the latest version. %2$sGet "
 "more information%3$s."
@@ -57,8 +100,9 @@ msgstr ""
 "È richiesta la versione di WordPress %1$s: aggiornare all'ultima versione. "
 "%2$sPer maggiori informazioni%3$s."
 
+#: pdf.php:227
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Open Tag 3. Html Anchor Close Tag
-#: ../../../pdf.php:222
+#, php-format
 msgid ""
 "%1$sGravity Forms%3$s is required to use Gravity PDF. %2$sGet more "
 "information%3$s."
@@ -66,8 +110,9 @@ msgstr ""
 "%1$sGravity Forms%3$s è necessario per utilizzare Gravity PDF. %2$sPer "
 "maggiori informazioni%3$s."
 
+#: pdf.php:236
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. Plugin version number 4. Html Anchor Open Tag
-#: ../../../pdf.php:229
+#, php-format
 msgid ""
 "%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more "
 "information%2$s."
@@ -75,19 +120,24 @@ msgstr ""
 "%1$sÈ richiesta la versione %3$s o superiore di Gravity Forms%2$s. %4$sPer "
 "maggiori informazioni%2$s."
 
+#: pdf.php:258
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. HTML Anchor Open Tag 4. HTML Anchor Close Tag
-#: ../../../pdf.php:249
+#, php-format
 msgid ""
-"You are running an %1$soutdated version of PHP%2$s. Contact your web hosting "
-"provider to update. %3$sGet more information%4$s."
+"You are running an %1$soutdated version of PHP%2$s. Contact your web "
+"hosting provider to update. %3$sGet more information%4$s."
 msgstr ""
 "È in esecuzione una versione %1$sobsoleta di PHP%2$s. Contattate il vostro "
 "provider di web hosting per aggiornarla. %3$sOttenere maggiori "
 "informazioni%4$s."
 
+#: pdf.php:281
+#: pdf.php:318
+#: pdf.php:344
+#: pdf.php:366
+#: pdf.php:376
 #. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag 3. PHP Extension name
-#: ../../../pdf.php:269, ../../../pdf.php:307, ../../../pdf.php:327,
-#: ../../../pdf.php:347, ../../../pdf.php:355
+#, php-format
 msgid ""
 "The PHP extension %3$s could not be detected. Contact your web hosting "
 "provider to fix. %1$sGet more information%2$s."
@@ -95,39 +145,24 @@ msgstr ""
 "L'estensione PHP %3$s non è stata rilevata. Contattare il provider di web "
 "hosting per risolvere il problema. %1$sOttenere maggiori informazioni%2$s."
 
-#. translators: 1. HTML Anchor Open Tag 2. HTML Anchor Close Tag
-#: ../../../pdf.php:289
-msgid ""
-"The PHP extension MB String does not have MB Regex enabled. Contact your web "
-"hosting provider to fix. %1$sGet more information%2$s."
-msgstr ""
-"L'estensione PHP MB String non ha abilitato MB Regex. Contattare il provider "
-"di web hosting per risolvere il problema. %1$sPer maggiori informazioni%2$s."
-
+#: pdf.php:402
 #. translators: 1. RAM value in MB 2. HTML Anchor Open Tag 3. HTML Anchor Close Tag
-#: ../../../pdf.php:379
+#, php-format
 msgid ""
 "You need 128MB of WP Memory (RAM) but we only found %1$s available. %2$sTry "
 "these methods to increase your memory limit%3$s, otherwise contact your web "
 "hosting provider to fix."
 msgstr ""
 "Sono necessari 128 MB di memoria WP (RAM), ma sono disponibili solo %1$s. "
-"%2$sProvate questi metodi per aumentare il limite di memoria%3$s, altrimenti "
-"contattate il vostro provider di web hosting per risolvere il problema."
+"%2$sProvate questi metodi per aumentare il limite di memoria%3$s, "
+"altrimenti contattate il vostro provider di web hosting per risolvere il "
+"problema."
 
-#: ../../../pdf.php:472
-msgid ""
-"The minimum requirements for the Gravity PDF plugin have not been met. "
-"Please contact the site administrator for assistance."
-msgstr ""
-"I requisiti minimi per il plugin Gravity PDF non sono stati soddisfatti. "
-"Contattare l'amministratore del sito per assistenza."
-
-#: ../../../pdf.php:463
+#: pdf.php:487
 msgid "Gravity PDF Installation Problem"
 msgstr "Problema di installazione di Gravity PDF"
 
-#: ../../../pdf.php:465
+#: pdf.php:489
 msgid ""
 "The minimum requirements for Gravity PDF have not been met. Please fix the "
 "issue(s) below to use the plugin:"
@@ -135,135 +170,182 @@ msgstr ""
 "I requisiti minimi per Gravity PDF non sono stati soddisfatti. Per "
 "utilizzare il plugin, risolvere i problemi indicati di seguito:"
 
-#: ../../../pdf.php:491, ../../../pdf.php:531
+#: pdf.php:496
+msgid ""
+"The minimum requirements for the Gravity PDF plugin have not been met. "
+"Please contact the site administrator for assistance."
+msgstr ""
+"I requisiti minimi per il plugin Gravity PDF non sono stati soddisfatti. "
+"Contattare l'amministratore del sito per assistenza."
+
+#: pdf.php:515
+#: pdf.php:560
+#, php-format
 msgid ""
 "The Gravity PDF plugin has a new home! In order to get updates direct from "
-"GravityPDF.com %1$syou need to perform a one-time download of the plugin%2$s."
+"GravityPDF.com %1$syou need to perform a one-time download of the "
+"plugin%2$s."
 msgstr ""
 "Il plugin Gravity PDF ha una nuova casa! Per ricevere gli aggiornamenti "
 "direttamente da GravityPDF.com %1$sè necessario eseguire un download unico "
 "del plugin%2$s."
 
-#: ../../bootstrap.php:134, ../../bootstrap.php:146, ../../deprecated.php:45,
-#: ../../deprecated.php:58
-msgid "\"%s\" has been deprecated as of Gravity PDF 4.0"
-msgstr "\"%s\" è stato deprecato a partire da Gravity PDF 4.0"
-
-#: ../../bootstrap.php:296
+#: src/bootstrap.php:308
 msgid "View Gravity PDF Settings"
 msgstr "Visualizza le impostazioni di Gravity PDF"
 
-#: ../../bootstrap.php:296, ../../View/View_Settings.php:174
+#: src/bootstrap.php:308
+#: src/View/View_Settings.php:176
 msgid "Settings"
 msgstr "Impostazioni"
 
-#: ../../bootstrap.php:316
+#: src/bootstrap.php:328
 msgid "View Gravity PDF Documentation"
 msgstr "Visualizza la documentazione PDF di Gravity"
 
-#: ../../bootstrap.php:316, ../../Helper/Helper_Abstract_Addon.php:799
+#: src/bootstrap.php:328
+#: src/Helper/Helper_Abstract_Addon.php:1103
 msgid "Docs"
 msgstr "Documenti"
 
-#: ../../bootstrap.php:317, ../../Helper/Helper_Abstract_Addon.php:802
+#: src/bootstrap.php:329
+#: src/Helper/Helper_Abstract_Addon.php:1106
 msgid "Get Help and Support"
 msgstr "Documentazione e Supporto"
 
-#: ../../bootstrap.php:317, ../../Helper/Helper_Abstract_Addon.php:802
+#: src/bootstrap.php:329
+#: src/Helper/Helper_Abstract_Addon.php:1106
 msgid "Support"
 msgstr "Supporto"
 
-#: ../../bootstrap.php:318
+#: src/bootstrap.php:330
 msgid "View Gravity PDF Extensions Shop"
 msgstr "Visualizza il negozio di estensioni Gravity PDF"
 
-#: ../../bootstrap.php:318, ../../View/View_Settings.php:208
+#: src/bootstrap.php:330
+#: src/View/View_Settings.php:210
 msgid "Extensions"
 msgstr "Estensioni"
 
-#: ../../bootstrap.php:319
+#: src/bootstrap.php:331
 msgid "View Gravity PDF Template Shop"
 msgstr "Visualizza il negozio di modelli PDF Gravity"
 
-#: ../../bootstrap.php:319, ../../Helper/Helper_Options_Fields.php:70
+#: src/bootstrap.php:331
+#: src/Helper/Helper_Options_Fields.php:72
 msgid "Templates"
 msgstr "Modelli"
 
-#: ../../Controller/Controller_Actions.php:132,
-#: ../../Helper/Helper_Options_Fields.php:222
+#: src/Controller/Controller_Actions.php:139
+#: src/Helper/Helper_Options_Fields.php:224
 msgid "Install Core Fonts"
 msgstr "Installare i font principali"
 
-#: ../../Controller/Controller_Actions.php:207,
-#: ../../Model/Model_Form_Settings.php:171,
-#: ../../Model/Model_Form_Settings.php:208,
-#: ../../Model/Model_Form_Settings.php:330, ../../View/View_Settings.php:427
+#: src/Controller/Controller_Actions.php:172
+msgid "View the system report"
+msgstr "Visualizza il report di sistema"
+
+#: src/Controller/Controller_Actions.php:269
+#: src/Model/Model_Form_Settings.php:171
+#: src/Model/Model_Form_Settings.php:208
+#: src/Model/Model_Form_Settings.php:330
+#: src/View/View_Settings.php:429
 msgid "You do not have permission to access this page"
 msgstr "Non si dispone dell'autorizzazione per accedere a questa pagina"
 
-#: ../../Controller/Controller_Actions.php:214
+#: src/Controller/Controller_Actions.php:276
 msgid "There was a problem processing the action. Please try again."
 msgstr "Si è verificato un problema nell'elaborazione dell'azione. Riprovare."
 
-#: ../../Controller/Controller_Custom_Fonts.php:121,
-#: ../../Controller/Controller_Custom_Fonts.php:150
+#: src/Controller/Controller_Custom_Fonts.php:121
+#: src/Controller/Controller_Custom_Fonts.php:150
 msgid "The font label used for the object"
 msgstr "L'etichetta del carattere utilizzata per l'oggetto"
 
-#: ../../Controller/Controller_Custom_Fonts.php:156
+#: src/Controller/Controller_Custom_Fonts.php:156
 msgid ""
-"The path to the `regular` font file. Pass empty value if it should be deleted"
+"The path to the `regular` font file. Pass empty value if it should be "
+"deleted"
 msgstr ""
 "Il percorso del file di font `regolare`. Passare un valore vuoto se deve "
 "essere cancellato"
 
-#: ../../Controller/Controller_Custom_Fonts.php:162
+#: src/Controller/Controller_Custom_Fonts.php:162
 msgid ""
-"The path to the `italics` font file. Pass empty value if it should be deleted"
+"The path to the `italics` font file. Pass empty value if it should be "
+"deleted"
 msgstr ""
 "Il percorso del file di font `italics`. Passare un valore vuoto se deve "
 "essere cancellato"
 
-#: ../../Controller/Controller_Custom_Fonts.php:168
-msgid ""
-"The path to the `bold` font file. Pass empty value if it should be deleted"
+#: src/Controller/Controller_Custom_Fonts.php:168
+msgid "The path to the `bold` font file. Pass empty value if it should be deleted"
 msgstr ""
-"Il percorso del file del font `bold`. Passare un valore vuoto se deve essere "
-"cancellato"
+"Il percorso del file del font `bold`. Passare un valore vuoto se deve "
+"essere cancellato"
 
-#: ../../Controller/Controller_Custom_Fonts.php:174
+#: src/Controller/Controller_Custom_Fonts.php:174
 msgid ""
 "The path to the `bolditalics` font file. Pass empty value if it should be "
 "deleted"
 msgstr ""
-"Il percorso del file del font `bolditalics`. Passare un valore vuoto se deve "
-"essere cancellato"
+"Il percorso del file del font `bolditalics`. Passare un valore vuoto se "
+"deve essere cancellato"
 
-#: ../../Controller/Controller_Custom_Fonts.php:225
+#: src/Controller/Controller_Custom_Fonts.php:225
 msgid "The Regular font is required"
 msgstr "È richiesto il carattere Regular"
 
-#: ../../Controller/Controller_Custom_Fonts.php:338
+#: src/Controller/Controller_Custom_Fonts.php:338
 msgid "Kashida needs to be a value between 0-100"
 msgstr "Kashida deve essere un valore compreso tra 0-100"
 
-#: ../../Controller/Controller_Custom_Fonts.php:480
+#: src/Controller/Controller_Custom_Fonts.php:480
 msgid "The upload is not a valid TTF file"
 msgstr "Il caricamento non è un file TTF valido"
 
-#: ../../Controller/Controller_Custom_Fonts.php:543
+#: src/Controller/Controller_Custom_Fonts.php:546
+#, php-format
 msgid "Cannot find %s."
 msgstr "Impossibile trovare %s."
 
-#: ../../Controller/Controller_Export_Entries.php:54
+#: src/Controller/Controller_Export_Entries.php:54
+#, php-format
 msgid "PDF: %s"
 msgstr "PDF: %s"
 
-#: ../../Controller/Controller_PDF.php:434, ../../View/View_PDF.php:244
+#: src/Controller/Controller_PDF.php:430
+#: src/View/View_PDF.php:246
 msgid "There was a problem generating your PDF"
 msgstr "Si è verificato un problema nella generazione del PDF"
 
-#: ../../Helper/Helper_Abstract_Addon.php:764
+#: src/Controller/Controller_System_Report.php:100
+msgid "Deprecated Gravity PDF functionality"
+msgstr "Funzionalità di Gravity PDF deprecata"
+
+#: src/Helper/Fields/Field_Consent.php:142
+msgid "Consent not given."
+msgstr "Il consenso non è stato dato."
+
+#: src/Helper/Fields/Field_Products.php:216
+msgid "Subtotal"
+msgstr "Subtotale"
+
+#: src/Helper/Fields/Field_Products.php:221
+#, php-format
+msgid "Shipping (%s)"
+msgstr "Spedizione (%s)"
+
+#: src/Helper/Fields/Field_Tos.php:101
+msgid "Not accepted"
+msgstr "Non accettato"
+
+#: src/Helper/Helper_Abstract_Addon.php:985
+msgid "an unknown date"
+msgstr "una data sconosciuta"
+
+#: src/Helper/Helper_Abstract_Addon.php:1068
+#, php-format
 msgid ""
 "%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades "
 "and support. Need a license key? %4$sPurchase one now%5$s."
@@ -272,361 +354,373 @@ msgstr ""
 "aggiornamenti automatici e all'assistenza. Avete bisogno di una chiave di "
 "licenza? %4$sAcquistatene una ora%5$s."
 
-#: ../../Helper/Helper_Abstract_Addon.php:799
+#: src/Helper/Helper_Abstract_Addon.php:1103
 msgid "View plugin Documentation"
 msgstr "Visualizza la documentazione del plugin"
 
-#: ../../Helper/Helper_Abstract_Options.php:396,
-#: ../../Helper/Helper_Abstract_Options.php:415
+#: src/Helper/Helper_Abstract_Options.php:396
+#: src/Helper/Helper_Abstract_Options.php:415
 msgid "You must pass in a valid form ID"
 msgstr "È necessario inserire un ID modulo valido"
 
-#: ../../Helper/Helper_Abstract_Options.php:457
+#: src/Helper/Helper_Abstract_Options.php:457
 msgid "You must pass in a valid PDF ID"
 msgstr "È necessario inserire un ID PDF valido"
 
-#: ../../Helper/Helper_Abstract_Options.php:842
+#: src/Helper/Helper_Abstract_Options.php:842
 msgid "Common Sizes"
 msgstr "Dimensioni comuni"
 
-#: ../../Helper/Helper_Abstract_Options.php:843
+#: src/Helper/Helper_Abstract_Options.php:843
 msgid "A4 (210 x 297mm)"
 msgstr "A4 (210 x 297 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:844
+#: src/Helper/Helper_Abstract_Options.php:844
 msgid "Letter (8.5 x 11in)"
 msgstr "Lettera (8,5 x 11 pollici)"
 
-#: ../../Helper/Helper_Abstract_Options.php:845
+#: src/Helper/Helper_Abstract_Options.php:845
 msgid "Legal (8.5 x 14in)"
 msgstr "Legale (8,5 x 14 pollici)"
 
-#: ../../Helper/Helper_Abstract_Options.php:846
+#: src/Helper/Helper_Abstract_Options.php:846
 msgid "Ledger / Tabloid (11 x 17in)"
 msgstr "Libro mastro / Tabloid (11 x 17 pollici)"
 
-#: ../../Helper/Helper_Abstract_Options.php:847
+#: src/Helper/Helper_Abstract_Options.php:847
 msgid "Executive (7 x 10in)"
 msgstr "Esecutivo (7 x 10 pollici)"
 
-#: ../../Helper/Helper_Abstract_Options.php:848,
-#: ../../Helper/Helper_Options_Fields.php:94,
-#: ../../Helper/Helper_Options_Fields.php:319
+#: src/Helper/Helper_Abstract_Options.php:848
+#: src/Helper/Helper_Options_Fields.php:96
+#: src/Helper/Helper_Options_Fields.php:321
 msgid "Custom Paper Size"
 msgstr "Formato carta personalizzato"
 
-#: ../../Helper/Helper_Abstract_Options.php:851
+#: src/Helper/Helper_Abstract_Options.php:851
 msgid "\"A\" Sizes"
 msgstr "\"Dimensioni \"A"
 
-#: ../../Helper/Helper_Abstract_Options.php:852
+#: src/Helper/Helper_Abstract_Options.php:852
 msgid "A0 (841 x 1189mm)"
 msgstr "A0 (841 x 1189 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:853
+#: src/Helper/Helper_Abstract_Options.php:853
 msgid "A1 (594 x 841mm)"
 msgstr "A1 (594 x 841 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:854
+#: src/Helper/Helper_Abstract_Options.php:854
 msgid "A2 (420 x 594mm)"
 msgstr "A2 (420 x 594 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:855
+#: src/Helper/Helper_Abstract_Options.php:855
 msgid "A3 (297 x 420mm)"
 msgstr "A3 (297 x 420 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:856
+#: src/Helper/Helper_Abstract_Options.php:856
 msgid "A5 (148 x 210mm)"
 msgstr "A5 (148 x 210 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:857
+#: src/Helper/Helper_Abstract_Options.php:857
 msgid "A6 (105 x 148mm)"
 msgstr "A6 (105 x 148 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:858
+#: src/Helper/Helper_Abstract_Options.php:858
 msgid "A7 (74 x 105mm)"
 msgstr "A7 (74 x 105 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:859
+#: src/Helper/Helper_Abstract_Options.php:859
 msgid "A8 (52 x 74mm)"
 msgstr "A8 (52 x 74 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:860
+#: src/Helper/Helper_Abstract_Options.php:860
 msgid "A9 (37 x 52mm)"
 msgstr "A9 (37 x 52 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:861
+#: src/Helper/Helper_Abstract_Options.php:861
 msgid "A10 (26 x 37mm)"
 msgstr "A10 (26 x 37 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:864
+#: src/Helper/Helper_Abstract_Options.php:864
 msgid "\"B\" Sizes"
 msgstr "\"Dimensioni \"B"
 
-#: ../../Helper/Helper_Abstract_Options.php:865
+#: src/Helper/Helper_Abstract_Options.php:865
 msgid "B0 (1414 x 1000mm)"
 msgstr "B0 (1414 x 1000 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:866
+#: src/Helper/Helper_Abstract_Options.php:866
 msgid "B1 (1000 x 707mm)"
 msgstr "B1 (1000 x 707 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:867
+#: src/Helper/Helper_Abstract_Options.php:867
 msgid "B2 (707 x 500mm)"
 msgstr "B2 (707 x 500 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:868
+#: src/Helper/Helper_Abstract_Options.php:868
 msgid "B3 (500 x 353mm)"
 msgstr "B3 (500 x 353 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:869
+#: src/Helper/Helper_Abstract_Options.php:869
 msgid "B4 (353 x 250mm)"
 msgstr "B4 (353 x 250 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:870
+#: src/Helper/Helper_Abstract_Options.php:870
 msgid "B5 (250 x 176mm)"
 msgstr "B5 (250 x 176 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:871
+#: src/Helper/Helper_Abstract_Options.php:871
 msgid "B6 (176 x 125mm)"
 msgstr "B6 (176 x 125 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:872
+#: src/Helper/Helper_Abstract_Options.php:872
 msgid "B7 (125 x 88mm)"
 msgstr "B7 (125 x 88 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:873
+#: src/Helper/Helper_Abstract_Options.php:873
 msgid "B8 (88 x 62mm)"
 msgstr "B8 (88 x 62 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:874
+#: src/Helper/Helper_Abstract_Options.php:874
 msgid "B9 (62 x 44mm)"
 msgstr "B9 (62 x 44 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:875
+#: src/Helper/Helper_Abstract_Options.php:875
 msgid "B10 (44 x 31mm)"
 msgstr "B10 (44 x 31 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:878
+#: src/Helper/Helper_Abstract_Options.php:878
 msgid "\"C\" Sizes"
 msgstr "\"Dimensioni \"C"
 
-#: ../../Helper/Helper_Abstract_Options.php:879
+#: src/Helper/Helper_Abstract_Options.php:879
 msgid "C0 (1297 x 917mm)"
 msgstr "C0 (1297 x 917 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:880
+#: src/Helper/Helper_Abstract_Options.php:880
 msgid "C1 (917 x 648mm)"
 msgstr "C1 (917 x 648 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:881
+#: src/Helper/Helper_Abstract_Options.php:881
 msgid "C2 (648 x 458mm)"
 msgstr "C2 (648 x 458 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:882
+#: src/Helper/Helper_Abstract_Options.php:882
 msgid "C3 (458 x 324mm)"
 msgstr "C3 (458 x 324 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:883
+#: src/Helper/Helper_Abstract_Options.php:883
 msgid "C4 (324 x 229mm)"
 msgstr "C4 (324 x 229 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:884
+#: src/Helper/Helper_Abstract_Options.php:884
 msgid "C5 (229 x 162mm)"
 msgstr "C5 (229 x 162 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:885
+#: src/Helper/Helper_Abstract_Options.php:885
 msgid "C6 (162 x 114mm)"
 msgstr "C6 (162 x 114 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:886
+#: src/Helper/Helper_Abstract_Options.php:886
 msgid "C7 (114 x 81mm)"
 msgstr "C7 (114 x 81 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:887
+#: src/Helper/Helper_Abstract_Options.php:887
 msgid "C8 (81 x 57mm)"
 msgstr "C8 (81 x 57 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:888
+#: src/Helper/Helper_Abstract_Options.php:888
 msgid "C9 (57 x 40mm)"
 msgstr "C9 (57 x 40 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:889
+#: src/Helper/Helper_Abstract_Options.php:889
 msgid "C10 (40 x 28mm)"
 msgstr "C10 (40 x 28 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:892
+#: src/Helper/Helper_Abstract_Options.php:892
 msgid "\"RA\" and \"SRA\" Sizes"
 msgstr "\"Taglie \"RA\" e \"SRA"
 
-#: ../../Helper/Helper_Abstract_Options.php:893
+#: src/Helper/Helper_Abstract_Options.php:893
 msgid "RA0 (860 x 1220mm)"
 msgstr "RA0 (860 x 1220 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:894
+#: src/Helper/Helper_Abstract_Options.php:894
 msgid "RA1 (610 x 860mm)"
 msgstr "RA1 (610 x 860 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:895
+#: src/Helper/Helper_Abstract_Options.php:895
 msgid "RA2 (430 x 610mm)"
 msgstr "RA2 (430 x 610 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:896
+#: src/Helper/Helper_Abstract_Options.php:896
 msgid "RA3 (305 x 430mm)"
 msgstr "RA3 (305 x 430 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:897
+#: src/Helper/Helper_Abstract_Options.php:897
 msgid "RA4 (215 x 305mm)"
 msgstr "RA4 (215 x 305 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:898
+#: src/Helper/Helper_Abstract_Options.php:898
 msgid "SRA0 (900 x 1280mm)"
 msgstr "SRA0 (900 x 1280 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:899
+#: src/Helper/Helper_Abstract_Options.php:899
 msgid "SRA1 (640 x 900mm)"
 msgstr "SRA1 (640 x 900 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:900
+#: src/Helper/Helper_Abstract_Options.php:900
 msgid "SRA2 (450 x 640mm)"
 msgstr "SRA2 (450 x 640 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:901
+#: src/Helper/Helper_Abstract_Options.php:901
 msgid "SRA3 (320 x 450mm)"
 msgstr "SRA3 (320 x 450 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:902
+#: src/Helper/Helper_Abstract_Options.php:902
 msgid "SRA4 (225 x 320mm)"
 msgstr "SRA4 (225 x 320 mm)"
 
-#: ../../Helper/Helper_Abstract_Options.php:918
+#: src/Helper/Helper_Abstract_Options.php:918
 msgid "Unicode"
 msgstr "Unicode"
 
-#: ../../Helper/Helper_Abstract_Options.php:932
+#: src/Helper/Helper_Abstract_Options.php:932
 msgid "Indic"
 msgstr "Indic"
 
-#: ../../Helper/Helper_Abstract_Options.php:937
+#: src/Helper/Helper_Abstract_Options.php:937
 msgid "Arabic"
 msgstr "Arabo"
 
-#: ../../Helper/Helper_Abstract_Options.php:943
+#: src/Helper/Helper_Abstract_Options.php:943
 msgid "Chinese, Japanese, Korean"
 msgstr "Cinese, giapponese, coreano"
 
-#: ../../Helper/Helper_Abstract_Options.php:948
+#: src/Helper/Helper_Abstract_Options.php:948
 msgid "Other"
 msgstr "Altro"
 
-#: ../../Helper/Helper_Abstract_Options.php:1002
-msgid "User-Defined Fonts"
-msgstr "Font definiti dall'utente"
-
-#: ../../Helper/Helper_Abstract_Options.php:1059
+#: src/Helper/Helper_Abstract_Options.php:1059
 msgid "Could not find Gravity PDF Font"
 msgstr "Impossibile trovare il font Gravity PDF"
 
-#: ../../Helper/Helper_Abstract_Options.php:1071,
-#: ../../Helper/Helper_PDF_List_Table.php:300
+#: src/Helper/Helper_Abstract_Options.php:1071
+#: src/Helper/Helper_PDF_List_Table.php:301
 msgid "Copy"
 msgstr "Copia"
 
-#: ../../Helper/Helper_Abstract_Options.php:1072
+#: src/Helper/Helper_Abstract_Options.php:1072
 msgid "Print - Low Resolution"
 msgstr "Stampa - Bassa risoluzione"
 
-#: ../../Helper/Helper_Abstract_Options.php:1073
+#: src/Helper/Helper_Abstract_Options.php:1073
 msgid "Print - High Resolution"
 msgstr "Stampa - Alta risoluzione"
 
-#: ../../Helper/Helper_Abstract_Options.php:1074
+#: src/Helper/Helper_Abstract_Options.php:1074
 msgid "Modify"
 msgstr "Modifica"
 
-#: ../../Helper/Helper_Abstract_Options.php:1075
+#: src/Helper/Helper_Abstract_Options.php:1075
 msgid "Annotate"
 msgstr "Annotare"
 
-#: ../../Helper/Helper_Abstract_Options.php:1076
+#: src/Helper/Helper_Abstract_Options.php:1076
 msgid "Fill Forms"
 msgstr "Compilazione di moduli"
 
-#: ../../Helper/Helper_Abstract_Options.php:1077
+#: src/Helper/Helper_Abstract_Options.php:1077
 msgid "Extract"
 msgstr "Estrai"
 
-#: ../../Helper/Helper_Abstract_Options.php:1078
+#: src/Helper/Helper_Abstract_Options.php:1078
 msgid "Assemble"
 msgstr "Assembla"
 
-#: ../../Helper/Helper_Abstract_Options.php:1184
+#: src/Helper/Helper_Abstract_Options.php:1184
 msgid "Settings updated."
 msgstr "Impostazioni aggiornate."
 
-#: ../../Helper/Helper_Abstract_Options.php:1340,
-#: ../../Helper/Helper_Abstract_Options.php:1348,
-#: ../../Helper/Helper_Abstract_Options.php:1356
+#: src/Helper/Helper_Abstract_Options.php:1340
+#: src/Helper/Helper_Abstract_Options.php:1348
+#: src/Helper/Helper_Abstract_Options.php:1356
 msgid ""
-"PDF Settings could not be saved. Please enter all required information below."
+"PDF Settings could not be saved. Please enter all required information "
+"below."
 msgstr ""
 "Non è stato possibile salvare le impostazioni del PDF. Inserire tutte le "
 "informazioni richieste di seguito."
 
-#: ../../Helper/Helper_Abstract_Options.php:1744
+#: src/Helper/Helper_Abstract_Options.php:1723
+msgid "License key set by the site administrator."
+msgstr "Chiave di licenza impostata dall'amministratore del sito."
+
+#: src/Helper/Helper_Abstract_Options.php:1724
+msgid "Learn more."
+msgstr "Per saperne di più."
+
+#: src/Helper/Helper_Abstract_Options.php:1744
+#, php-format
 msgid "%s license key"
 msgstr "%s chiave di licenza"
 
-#: ../../Helper/Helper_Abstract_Options.php:1761
+#: src/Helper/Helper_Abstract_Options.php:1762
 msgid "Deactivate License"
 msgstr "Disattiva Licenza"
 
-#: ../../Helper/Helper_Abstract_Options.php:2136,
-#: ../../Helper/Helper_Abstract_Options.php:2137
+#: src/Helper/Helper_Abstract_Options.php:2127
+#: src/Helper/Helper_Abstract_Options.php:2128
 msgid "Select Media"
 msgstr "Seleziona Media"
 
-#: ../../Helper/Helper_Abstract_Options.php:2138
+#: src/Helper/Helper_Abstract_Options.php:2129
 msgid "Upload File"
 msgstr "Carica File"
 
-#: ../../Helper/Helper_Abstract_Options.php:2382
+#: src/Helper/Helper_Abstract_Options.php:2369
 msgid "Width"
 msgstr "Larghezza"
 
-#: ../../Helper/Helper_Abstract_Options.php:2394
+#: src/Helper/Helper_Abstract_Options.php:2381
 msgid "Height"
 msgstr "Altezza"
 
-#: ../../Helper/Helper_Abstract_Options.php:2411
+#: src/Helper/Helper_Abstract_Options.php:2398
 msgid "mm"
 msgstr "mm"
 
-#: ../../Helper/Helper_Abstract_Options.php:2412
+#: src/Helper/Helper_Abstract_Options.php:2399
 msgid "inches"
 msgstr "pollici"
 
-#: ../../Helper/Helper_Abstract_Options.php:2480
+#: src/Helper/Helper_Abstract_Options.php:2467
+#, php-format
 msgid "The callback used for the %s setting is missing."
 msgstr "Manca il callback utilizzato per l'impostazione %s."
 
-#: ../../Helper/Helper_Abstract_View.php:105
+#: src/Helper/Helper_Abstract_View.php:105
+#, php-format
 msgid "%s is an invalid filename"
 msgstr "%s è un nome di file non valido"
 
-#: ../../Helper/Helper_Abstract_View.php:129
+#: src/Helper/Helper_Abstract_View.php:133
+#, php-format
 msgid "Cannot find file %s"
 msgstr "Impossibile trovare il file %s"
 
-#: ../../Helper/Helper_Data.php:143, ../../Model/Model_Mergetags.php:125
+#: src/Helper/Helper_Data.php:146
+#: src/Model/Model_Mergetags.php:125
 msgid "PDF"
 msgstr "PDF"
 
-#: ../../Helper/Helper_Data.php:144, ../../Model/Model_PDF.php:987
-msgid "Gravity PDF"
-msgstr "Gravity PDF"
+#: src/Helper/Helper_Data.php:181
+#: src/Helper/Helper_Data.php:182
+msgid "Your support license key has been activated for this domain."
+msgstr "La chiave di licenza di supporto è stata attivata per questo dominio."
 
-#: ../../Helper/Helper_Data.php:178
+#: src/Helper/Helper_Data.php:183
+#, php-format
 msgid ""
 "This license key expired on %%s. %1$sPlease renew your license to continue "
 "receiving updates and support%2$s."
@@ -634,7 +728,9 @@ msgstr ""
 "Questa chiave di licenza è scaduta il %%s. %1$sRinnovare la licenza per "
 "continuare a ricevere aggiornamenti e assistenza%2$s."
 
-#: ../../Helper/Helper_Data.php:179, ../../Helper/Helper_Data.php:180
+#: src/Helper/Helper_Data.php:184
+#: src/Helper/Helper_Data.php:185
+#, php-format
 msgid ""
 "This license key has been cancelled (most likely due to a refund request). "
 "%1$sPlease consider purchasing a new license%2$s."
@@ -643,7 +739,7 @@ msgstr ""
 "richiesta di rimborso). %1$sSi prega di considerare l'acquisto di una nuova "
 "licenza%2$s."
 
-#: ../../Helper/Helper_Data.php:181
+#: src/Helper/Helper_Data.php:186
 msgid ""
 "This license key is invalid. Please check your key has been entered "
 "correctly."
@@ -651,14 +747,15 @@ msgstr ""
 "Questa chiave di licenza non è valida. Verificare che la chiave sia stata "
 "inserita correttamente."
 
-#: ../../Helper/Helper_Data.php:182
+#: src/Helper/Helper_Data.php:187
 msgid ""
-"The license key is invalid. Please check your key has been entered correctly."
+"The license key is invalid. Please check your key has been entered "
+"correctly."
 msgstr ""
 "La chiave di licenza non è valida. Verificare che la chiave sia stata "
 "inserita correttamente."
 
-#: ../../Helper/Helper_Data.php:183
+#: src/Helper/Helper_Data.php:188
 msgid ""
 "Your license key is valid but does not match your current domain. This "
 "usually occurs if your domain URL changes. Please resave the settings to "
@@ -668,7 +765,9 @@ msgstr ""
 "accade di solito se l'URL del dominio cambia. Salvare nuovamente le "
 "impostazioni per attivare la licenza per questo sito web."
 
-#: ../../Helper/Helper_Data.php:184, ../../Helper/Helper_Data.php:185
+#: src/Helper/Helper_Data.php:189
+#: src/Helper/Helper_Data.php:190
+#, php-format
 msgid ""
 "This license key is not valid for %s. Please check your key is for this "
 "product."
@@ -676,7 +775,8 @@ msgstr ""
 "Questa chiave di licenza non è valida per %s. Verificare che la chiave sia "
 "valida per questo prodotto."
 
-#: ../../Helper/Helper_Data.php:186
+#: src/Helper/Helper_Data.php:191
+#, php-format
 msgid ""
 "This license key has reached its activation limit. %1$sPlease upgrade your "
 "license to increase the site limit (you only pay the difference)%2$s."
@@ -685,155 +785,175 @@ msgstr ""
 "%1$sAggiornare la licenza per aumentare il limite del sito (si paga solo la "
 "differenza)%2$s."
 
-#: ../../Helper/Helper_Data.php:187, ../../Helper/Helper_Data.php:188
-msgid "An error occurred, please try again."
-msgstr "Si è verificato un errore. Per favore riprovare."
+#: src/Helper/Helper_Data.php:192
+#: src/Helper/Helper_Data.php:193
+#: src/Helper/Helper_Data.php:194
+msgid "An unknown error occurred while checking the license."
+msgstr "Si è verificato un errore sconosciuto durante il controllo della licenza."
 
-#: ../../Helper/Helper_Data.php:226
+#: src/Helper/Helper_Data.php:195
+msgid "The licensing server is temporarily unavailable."
+msgstr "Il server di licenza non è temporaneamente disponibile."
+
+#: src/Helper/Helper_Data.php:233
 msgid "Loading..."
 msgstr "Caricamento..."
 
-#: ../../Helper/Helper_Data.php:227
+#: src/Helper/Helper_Data.php:234
 msgid "Continue"
 msgstr "Continua"
 
-#: ../../Helper/Helper_Data.php:228
+#: src/Helper/Helper_Data.php:235
 msgid "Uninstall"
 msgstr "Disinstalla"
 
-#: ../../Helper/Helper_Data.php:229
+#: src/Helper/Helper_Data.php:236
 msgid "Cancel"
 msgstr "Annulla"
 
-#: ../../Helper/Helper_Data.php:230, ../../Helper/Helper_PDF_List_Table.php:366
+#: src/Helper/Helper_Data.php:237
+#: src/Helper/Helper_PDF_List_Table.php:367
 msgid "Delete"
 msgstr "Elimina"
 
-#: ../../Helper/Helper_Data.php:231,
-#: ../../Helper/Helper_PDF_List_Table.php:220,
-#: ../../Model/Model_Form_Settings.php:922
+#: src/Helper/Helper_Data.php:238
+#: src/Helper/Helper_PDF_List_Table.php:221
+#: src/Model/Model_Form_Settings.php:924
 msgid "Active"
 msgstr "Attivo"
 
-#: ../../Helper/Helper_Data.php:232,
-#: ../../Helper/Helper_PDF_List_Table.php:223,
-#: ../../Model/Model_Form_Settings.php:872,
-#: ../../Model/Model_Form_Settings.php:922
+#: src/Helper/Helper_Data.php:239
+#: src/Helper/Helper_PDF_List_Table.php:224
+#: src/Model/Model_Form_Settings.php:874
+#: src/Model/Model_Form_Settings.php:924
 msgid "Inactive"
 msgstr "Inattivo"
 
-#: ../../Helper/Helper_Data.php:233
+#: src/Helper/Helper_Data.php:240
 msgid "this PDF if"
 msgstr "questo PDF se"
 
-#: ../../Helper/Helper_Data.php:234
+#: src/Helper/Helper_Data.php:241
 msgid "Enable"
 msgstr "Abilita"
 
-#: ../../Helper/Helper_Data.php:235
+#: src/Helper/Helper_Data.php:242
 msgid "Disable"
 msgstr "Disabilita"
 
-#: ../../Helper/Helper_Data.php:236
+#: src/Helper/Helper_Data.php:243
 msgid "Successfully Updated"
 msgstr "Aggiornamento avvenuto con successo"
 
-#: ../../Helper/Helper_Data.php:237
+#: src/Helper/Helper_Data.php:244
 msgid "Successfully Deleted"
 msgstr "Eliminazione avvenuta con successo"
 
-#: ../../Helper/Helper_Data.php:238, ../../Model/Model_System_Report.php:264
+#: src/Helper/Helper_Data.php:245
+msgid ""
+"An error occurred and your license key may not have been correctly "
+"deactivated. Login to your GravityPDF.com account and check if your site "
+"has been unlinked from the key."
+msgstr ""
+"Si è verificato un errore e la tua chiave di licenza potrebbe non essere "
+"stata disattivata correttamente. Accedi al tuo account su GravityPDF.com e "
+"verifica se il tuo sito è stato scollegato dalla chiave."
+
+#: src/Helper/Helper_Data.php:246
 msgid "No"
 msgstr "No"
 
-#: ../../Helper/Helper_Data.php:239, ../../Model/Model_System_Report.php:264
+#: src/Helper/Helper_Data.php:247
 msgid "Yes"
 msgstr "Sì"
 
-#: ../../Helper/Helper_Data.php:240
+#: src/Helper/Helper_Data.php:248
 msgid "Standard"
 msgstr "Standard"
 
-#: ../../Helper/Helper_Data.php:241, ../../View/View_Form_Settings.php:78
+#: src/Helper/Helper_Data.php:249
+#: src/View/View_Form_Settings.php:78
 msgid "Advanced"
 msgstr "Avanzate"
 
-#: ../../Helper/Helper_Data.php:242
+#: src/Helper/Helper_Data.php:250
 msgid "Manage"
 msgstr "Gestisci"
 
-#: ../../Helper/Helper_Data.php:243
+#: src/Helper/Helper_Data.php:251
 msgid "Details"
 msgstr "Dettagli"
 
-#: ../../Helper/Helper_Data.php:244
+#: src/Helper/Helper_Data.php:252
 msgid "Select"
 msgstr "Seleziona"
 
-#: ../../Helper/Helper_Data.php:245
+#: src/Helper/Helper_Data.php:253
 msgid "Version"
 msgstr "Versione"
 
-#: ../../Helper/Helper_Data.php:246
+#: src/Helper/Helper_Data.php:254
 msgid "Group"
 msgstr "Gruppo"
 
-#: ../../Helper/Helper_Data.php:247
+#: src/Helper/Helper_Data.php:255
 msgid "Tags"
 msgstr "Tags"
 
-#: ../../Helper/Helper_Data.php:249,
-#: ../../Helper/Helper_Options_Fields.php:255,
-#: ../../Helper/Helper_PDF_List_Table.php:97,
-#: ../../View/View_Form_Settings.php:66
+#: src/Helper/Helper_Data.php:257
+#: src/Helper/Helper_Options_Fields.php:257
+#: src/Helper/Helper_PDF_List_Table.php:98
+#: src/View/View_Form_Settings.php:66
 msgid "Template"
 msgstr "Modello"
 
-#: ../../Helper/Helper_Data.php:250
+#: src/Helper/Helper_Data.php:258
 msgid "Manage PDF Templates"
 msgstr "Gestione dei modelli PDF"
 
-#: ../../Helper/Helper_Data.php:251
+#: src/Helper/Helper_Data.php:259
 msgid "Add New Template"
 msgstr "Aggiungi un nuovo modello"
 
-#: ../../Helper/Helper_Data.php:252
+#: src/Helper/Helper_Data.php:260
 msgid "This form doesn't have any PDFs."
 msgstr "Questo modulo non ha alcun PDF."
 
-#: ../../Helper/Helper_Data.php:253
+#: src/Helper/Helper_Data.php:261
 msgid "Let's go create one"
 msgstr "Andiamo a crearne uno"
 
-#: ../../Helper/Helper_Data.php:254
+#: src/Helper/Helper_Data.php:262
 msgid "Installed PDFs"
 msgstr "PDF installati"
 
-#: ../../Helper/Helper_Data.php:255
+#: src/Helper/Helper_Data.php:263
 msgid "Search Installed Templates"
 msgstr "Ricerca dei modelli installati"
 
-#: ../../Helper/Helper_Data.php:257
+#: src/Helper/Helper_Data.php:265
 msgid "Search the Gravity PDF Knowledgebase..."
 msgstr "Cerca nella Knowledgebase di Gravity PDF..."
 
-#: ../../Helper/Helper_Data.php:258
+#: src/Helper/Helper_Data.php:266
 msgid "Gravity PDF Documentation"
 msgstr "Documentazione PDF di Gravity"
 
-#: ../../Helper/Helper_Data.php:259
+#: src/Helper/Helper_Data.php:267
 msgid "It doesn't look like there are any topics related to your issue."
 msgstr "Non sembra che ci siano argomenti correlati al problema."
 
-#: ../../Helper/Helper_Data.php:260
+#: src/Helper/Helper_Data.php:268
 msgid "An error occurred. Please try again"
 msgstr "Si è verificato un errore. Si prega di riprovare"
 
-#: ../../Helper/Helper_Data.php:262
+#: src/Helper/Helper_Data.php:270
+#, php-format
 msgid "Requires Gravity PDF v%s"
 msgstr "Richiede Gravity PDF v%s"
 
-#: ../../Helper/Helper_Data.php:263
+#: src/Helper/Helper_Data.php:271
+#, php-format
 msgid ""
 "This PDF template is not compatible with your version of Gravity PDF. This "
 "template required Gravity PDF v%s."
@@ -841,49 +961,50 @@ msgstr ""
 "Questo modello PDF non è compatibile con la versione di Gravity PDF in uso. "
 "Questo modello richiede Gravity PDF v%s."
 
-#: ../../Helper/Helper_Data.php:264
+#: src/Helper/Helper_Data.php:272
 msgid "Template Details"
 msgstr "Dettagli template"
 
-#: ../../Helper/Helper_Data.php:265
+#: src/Helper/Helper_Data.php:273
 msgid "Current Template"
 msgstr "Modello attuale"
 
-#: ../../Helper/Helper_Data.php:266
+#: src/Helper/Helper_Data.php:274
 msgid "Show previous template"
 msgstr "Mostra il modello precedente"
 
-#: ../../Helper/Helper_Data.php:267
+#: src/Helper/Helper_Data.php:275
 msgid "Show next template"
 msgstr "Visualizza modello successivo"
 
-#: ../../Helper/Helper_Data.php:268
+#: src/Helper/Helper_Data.php:276
 msgid "Upload is not a valid template. Upload a .zip file."
 msgstr "Il caricamento non è un modello valido. Caricare un file .zip."
 
-#: ../../Helper/Helper_Data.php:269
+#: src/Helper/Helper_Data.php:277
 msgid "Upload exceeds the 10MB limit."
 msgstr "Il caricamento supera il limite di 10 MB."
 
-#: ../../Helper/Helper_Data.php:270
+#: src/Helper/Helper_Data.php:278
 msgid "Template successfully installed"
 msgstr "Template installato con successo"
 
-#: ../../Helper/Helper_Data.php:271
+#: src/Helper/Helper_Data.php:279
 msgid "Template successfully updated"
 msgstr "Template aggiornato con successo"
 
-#: ../../Helper/Helper_Data.php:272
+#: src/Helper/Helper_Data.php:280
 msgid "PDF Template(s) Successfully Installed / Updated"
 msgstr "Modelli PDF installati/aggiornati con successo"
 
-#: ../../Helper/Helper_Data.php:273
+#: src/Helper/Helper_Data.php:281
 msgid "There was a problem with the upload. Reload the page and try again."
 msgstr ""
 "Si è verificato un problema con il caricamento. Ricaricare la pagina e "
 "riprovare."
 
-#: ../../Helper/Helper_Data.php:274
+#: src/Helper/Helper_Data.php:282
+#, php-format
 msgid ""
 "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, "
 "'OK' to confirm the delete."
@@ -891,11 +1012,11 @@ msgstr ""
 "Si desidera davvero eliminare questo modello PDF?%sFare clic su \"Annulla\" "
 "per tornare indietro, su \"OK\" per confermare l'eliminazione."
 
-#: ../../Helper/Helper_Data.php:275
+#: src/Helper/Helper_Data.php:283
 msgid "Could not delete template."
 msgstr "Impossibile eliminare il modello."
 
-#: ../../Helper/Helper_Data.php:276
+#: src/Helper/Helper_Data.php:284
 msgid ""
 "If you have a PDF template in .zip format you may install it here. You can "
 "also update an existing PDF template (this will override any changes you "
@@ -905,83 +1026,92 @@ msgstr ""
 "qui. È anche possibile aggiornare un modello PDF esistente (questa "
 "operazione annullerà le modifiche apportate)."
 
-#: ../../Helper/Helper_Data.php:278
+#: src/Helper/Helper_Data.php:286
 msgid "ALL CORE FONTS SUCCESSFULLY INSTALLED"
 msgstr "TUTTI I FONT PRINCIPALI SONO STATI INSTALLATI CON SUCCESSO"
 
-#: ../../Helper/Helper_Data.php:279
+#: src/Helper/Helper_Data.php:287
+#, php-format
 msgid "%s CORE FONT(S) DID NOT INSTALL CORRECTLY"
 msgstr "%s I FONT CORE NON SONO STATI INSTALLATI CORRETTAMENTE"
 
-#: ../../Helper/Helper_Data.php:280
+#: src/Helper/Helper_Data.php:288
 msgid "Could not download Core Font list. Try again."
 msgstr "Impossibile scaricare l'elenco dei font Core. Riprovare."
 
-#: ../../Helper/Helper_Data.php:281
+#: src/Helper/Helper_Data.php:289
+#, php-format
 msgid "Downloading %s..."
 msgstr "Download %s..."
 
-#: ../../Helper/Helper_Data.php:282
+#: src/Helper/Helper_Data.php:290
+#, php-format
 msgid "Completed installation of %s"
 msgstr "Installazione completata di %s"
 
-#: ../../Helper/Helper_Data.php:283
+#: src/Helper/Helper_Data.php:291
+#, php-format
 msgid "Failed installation of %s"
 msgstr "Installazione fallita di %s"
 
-#: ../../Helper/Helper_Data.php:284
+#: src/Helper/Helper_Data.php:292
 msgid "Fonts remaining:"
 msgstr "Caratteri rimanenti:"
 
-#: ../../Helper/Helper_Data.php:285
+#: src/Helper/Helper_Data.php:293
 msgid "Retry Failed Downloads?"
 msgstr "Riprovare i download falliti?"
 
-#: ../../Helper/Helper_Data.php:286
+#: src/Helper/Helper_Data.php:294
 msgid "Core font installation"
 msgstr "Installazione dei font principali"
 
-#: ../../Helper/Helper_Data.php:289
+#: src/Helper/Helper_Data.php:297
+msgid "Font Manager"
+msgstr "Gestore font"
+
+#: src/Helper/Helper_Data.php:298
 msgid "Search installed fonts"
 msgstr "Ricerca dei font installati"
 
-#: ../../Helper/Helper_Data.php:290
+#: src/Helper/Helper_Data.php:299
 msgid "Installed Fonts"
 msgstr "Font installati"
 
-#: ../../Helper/Helper_Data.php:291
+#: src/Helper/Helper_Data.php:301
 msgid "Regular"
 msgstr "Regolare"
 
-#: ../../Helper/Helper_Data.php:292
+#: src/Helper/Helper_Data.php:302
+#, php-format
 msgid "Regular %1$s(required)%2$s"
 msgstr "Regolare %1$s(obbligatorio)%2$s"
 
-#: ../../Helper/Helper_Data.php:293
+#: src/Helper/Helper_Data.php:303
 msgid "Italics"
 msgstr "Corsivo"
 
-#: ../../Helper/Helper_Data.php:294
+#: src/Helper/Helper_Data.php:304
 msgid "Bold"
 msgstr "Grassetto"
 
-#: ../../Helper/Helper_Data.php:295
+#: src/Helper/Helper_Data.php:305
 msgid "Bold Italics"
 msgstr "Grassetto corsivo"
 
-#: ../../Helper/Helper_Data.php:296
+#: src/Helper/Helper_Data.php:306
 msgid "Add Font"
 msgstr "Aggiungi Font"
 
-#: ../../Helper/Helper_Data.php:297
+#: src/Helper/Helper_Data.php:307
 msgid "Update Font"
 msgstr "Aggiornamento del carattere"
 
-#: ../../Helper/Helper_Data.php:298
+#: src/Helper/Helper_Data.php:308
 msgid "Install new fonts for use in your PDF documents."
 msgstr "Installare nuovi font da utilizzare nei documenti PDF."
 
-#: ../../Helper/Helper_Data.php:299
+#: src/Helper/Helper_Data.php:309
 msgid ""
 "Once saved, PDFs configured to use this font will have your changes applied "
 "automatically for newly-generated documents."
@@ -989,15 +1119,16 @@ msgstr ""
 "Una volta salvati, i PDF configurati per l'uso di questo font vedranno le "
 "modifiche applicate automaticamente ai nuovi documenti."
 
-#: ../../Helper/Helper_Data.php:300
+#: src/Helper/Helper_Data.php:310
+#, php-format
 msgid "Font Name %1$s(required)%2$s"
 msgstr "Nome del carattere %1$s(obbligatorio)%2$s"
 
-#: ../../Helper/Helper_Data.php:301
+#: src/Helper/Helper_Data.php:311
 msgid "The font name can only contain letters, numbers and spaces."
 msgstr "Il nome del font può contenere solo lettere, numeri e spazi."
 
-#: ../../Helper/Helper_Data.php:302
+#: src/Helper/Helper_Data.php:312
 msgid ""
 "Please choose a name contains letters and/or numbers (and a space if you "
 "want it)."
@@ -1005,74 +1136,76 @@ msgstr ""
 "Scegliete un nome che contenga lettere e/o numeri (e uno spazio, se lo "
 "desiderate)."
 
-#: ../../Helper/Helper_Data.php:303
+#: src/Helper/Helper_Data.php:313
 msgid "Font Files"
 msgstr "Caratteri"
 
-#: ../../Helper/Helper_Data.php:304
+#: src/Helper/Helper_Data.php:314
 msgid ""
-"Select or drag and drop your .ttf font file for the variants below. Only the "
-"Regular type is required."
+"Select or drag and drop your .ttf font file for the variants below. Only "
+"the Regular type is required."
 msgstr ""
 "Selezionate o trascinate il vostro file di font .ttf per le varianti qui "
 "sotto. È necessario solo il tipo Regular."
 
-#: ../../Helper/Helper_Data.php:305
+#: src/Helper/Helper_Data.php:315
 msgid "Add a .ttf font file."
 msgstr "Aggiungere un file di font .ttf."
 
-#: ../../Helper/Helper_Data.php:306
+#: src/Helper/Helper_Data.php:316
 msgid "View template usage"
 msgstr "Visualizza l'utilizzo del modello"
 
-#: ../../Helper/Helper_Data.php:307
+#: src/Helper/Helper_Data.php:317
 msgid "← Cancel"
 msgstr "← Annullamento"
 
-#: ../../Helper/Helper_Data.php:308
+#: src/Helper/Helper_Data.php:318
 msgid "Are you sure you want to delete this font?"
 msgstr "Confermi di voler eliminare questo font?"
 
-#: ../../Helper/Helper_Data.php:309
+#: src/Helper/Helper_Data.php:319
+#, php-format
 msgid ""
-"Add this snippet %1$sin a custom template%3$s to selectively set the font on "
-"blocks of text. If you want to apply the font to the entire PDF, %2$suse the "
-"Font setting%3$s when configuring the PDF on the form."
+"Add this snippet %1$sin a custom template%3$s to selectively set the font "
+"on blocks of text. If you want to apply the font to the entire PDF, %2$suse "
+"the Font setting%3$s when configuring the PDF on the form."
 msgstr ""
-"Aggiungere questo snippet %1$sin un modello personalizzato%3$s per impostare "
-"selettivamente il carattere sui blocchi di testo. Se si desidera applicare "
-"il font all'intero PDF, %2$sutilizzare l'impostazione Font%3$s quando si "
-"configura il PDF nel modulo."
+"Aggiungere questo snippet %1$sin un modello personalizzato%3$s per "
+"impostare selettivamente il carattere sui blocchi di testo. Se si desidera "
+"applicare il font all'intero PDF, %2$sutilizzare l'impostazione Font%3$s "
+"quando si configura il PDF nel modulo."
 
-#: ../../Helper/Helper_Data.php:310
+#: src/Helper/Helper_Data.php:320
 msgid "Update font"
 msgstr "Update Font"
 
-#: ../../Helper/Helper_Data.php:311
+#: src/Helper/Helper_Data.php:321
 msgid "Select font"
 msgstr "Selezionare il carattere"
 
-#: ../../Helper/Helper_Data.php:312
+#: src/Helper/Helper_Data.php:322
 msgid "Delete font"
 msgstr "Cancellare il carattere"
 
-#: ../../Helper/Helper_Data.php:315
+#: src/Helper/Helper_Data.php:325
 msgid "Font list empty."
 msgstr "Elenco di font vuoto."
 
-#: ../../Helper/Helper_Data.php:316
+#: src/Helper/Helper_Data.php:326
 msgid "No fonts matching your search found."
 msgstr "Non sono stati trovati font corrispondenti alla ricerca."
 
-#: ../../Helper/Helper_Data.php:317
+#: src/Helper/Helper_Data.php:327
 msgid "Clear Search."
 msgstr "Ricerca libera."
 
-#: ../../Helper/Helper_Data.php:318
+#: src/Helper/Helper_Data.php:328
 msgid "Your font has been saved."
 msgstr "Il font è stato salvato."
 
-#: ../../Helper/Helper_Data.php:319
+#: src/Helper/Helper_Data.php:329
+#, php-format
 msgid ""
 "%1$sThe action could not be completed.%2$s Resolve the highlighted issues "
 "above and then try again."
@@ -1080,11 +1213,12 @@ msgstr ""
 "%1$sNon è stato possibile completare l'azione.%2$s Risolvere i problemi "
 "evidenziati sopra e riprovare."
 
-#: ../../Helper/Helper_Data.php:320
+#: src/Helper/Helper_Data.php:330
 msgid "A problem occurred. Reload the page and try again."
 msgstr "Si è verificato un problema. Ricaricare la pagina e riprovare."
 
-#: ../../Helper/Helper_Data.php:321
+#: src/Helper/Helper_Data.php:331
+#, php-format
 msgid ""
 "%1$sFont file(s) missing from the server.%2$s Please upload the font(s) "
 "again and then save."
@@ -1092,13 +1226,14 @@ msgstr ""
 "%1$sFile di font mancanti dal server.%2$s Caricare nuovamente i font e "
 "salvare."
 
-#: ../../Helper/Helper_Data.php:322
+#: src/Helper/Helper_Data.php:332
+#, php-format
 msgid "%1$sFont file(s) are malformed%2$s and cannot be used with Gravity PDF."
 msgstr ""
 "%1$sI file di font sono malformati%2$s e non possono essere utilizzati con "
 "Gravity PDF."
 
-#: ../../Helper/Helper_Data.php:324
+#: src/Helper/Helper_Data.php:334
 msgid ""
 "Warning! ALL Gravity PDF data, including templates, will be deleted. This "
 "cannot be undone. 'OK' to delete, 'Cancel' to stop."
@@ -1107,68 +1242,69 @@ msgstr ""
 "eliminati. Non è possibile annullare l'operazione. oK\" per eliminare, "
 "\"Annulla\" per interrompere."
 
-#: ../../Helper/Helper_Data.php:325
-msgid ""
-"WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete."
+#: src/Helper/Helper_Data.php:335
+msgid "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete."
 msgstr ""
 "ATTENZIONE: si sta per eliminare questo PDF. annulla per interrompere, OK "
 "per eliminare."
 
-#: ../../Helper/Helper_Data.php:328
+#: src/Helper/Helper_Data.php:338
 msgid "Search the Gravity PDF Documentation..."
 msgstr "Ricerca nella documentazione PDF di Gravity..."
 
-#: ../../Helper/Helper_Data.php:329
+#: src/Helper/Helper_Data.php:339
 msgid "Submit your search query."
 msgstr "Invia la tua richiesta di ricerca."
 
-#: ../../Helper/Helper_Data.php:330
+#: src/Helper/Helper_Data.php:340
 msgid "Clear your search query."
 msgstr "Cancellare la query di ricerca."
 
-#: ../../Helper/Helper_Data.php:488
+#: src/Helper/Helper_Data.php:498
 msgid "Approved"
 msgstr "Approvato"
 
-#: ../../Helper/Helper_Data.php:489
+#: src/Helper/Helper_Data.php:499
 msgid "Disapproved"
 msgstr "Non Approvato"
 
-#: ../../Helper/Helper_Data.php:490
+#: src/Helper/Helper_Data.php:500
 msgid "Unapproved"
 msgstr "Non approvato"
 
-#: ../../Helper/Helper_Options_Fields.php:65
+#: src/Helper/Helper_Options_Fields.php:67
 msgid "Default Template"
 msgstr "Modello predefinito"
 
-#: ../../Helper/Helper_Options_Fields.php:66
+#: src/Helper/Helper_Options_Fields.php:68
+#, php-format
 msgid ""
 "Choose an existing template or purchased more %1$sfrom our template "
-"shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create a "
-"custom solution."
+"shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create "
+"a custom solution."
 msgstr ""
 "Scegliete un modello esistente o acquistatene altri %1$sdal nostro negozio "
 "di modelli%2$s. È anche possibile %3$scostruire il proprio%4$s o "
 "%5$sassumerci%6$s per creare una soluzione personalizzata."
 
-#: ../../Helper/Helper_Options_Fields.php:70
+#: src/Helper/Helper_Options_Fields.php:72
+#, php-format
 msgid ""
 "Gravity PDF comes with %1$sfour completely-free and highly customizable "
 "designs%2$s. You can also purchase additional templates from our template "
-"shop, hire us to integrate existing PDFs or, with a bit of technical know-"
-"how, build your own."
+"shop, hire us to integrate existing PDFs or, with a bit of technical "
+"know-how, build your own."
 msgstr ""
 "Gravity PDF viene fornito con %1$squattro modelli completamente gratuiti e "
-"altamente personalizzabili%2$s. È inoltre possibile acquistare altri modelli "
-"dal nostro negozio di modelli, incaricarci di integrare i PDF esistenti o, "
-"con un po' di know-how tecnico, costruire il proprio."
+"altamente personalizzabili%2$s. È inoltre possibile acquistare altri "
+"modelli dal nostro negozio di modelli, incaricarci di integrare i PDF "
+"esistenti o, con un po' di know-how tecnico, costruire il proprio."
 
-#: ../../Helper/Helper_Options_Fields.php:75
+#: src/Helper/Helper_Options_Fields.php:77
 msgid "Default Font"
 msgstr "Carattere predefinito"
 
-#: ../../Helper/Helper_Options_Fields.php:76
+#: src/Helper/Helper_Options_Fields.php:78
 msgid ""
 "Set the default font type used in PDFs. Choose an existing font or install "
 "your own."
@@ -1176,12 +1312,12 @@ msgstr ""
 "Impostare il tipo di font predefinito utilizzato nei PDF. Scegliete un font "
 "esistente o installate il vostro."
 
-#: ../../Helper/Helper_Options_Fields.php:79,
-#: ../../Helper/Helper_Options_Fields.php:230
+#: src/Helper/Helper_Options_Fields.php:81
+#: src/Helper/Helper_Options_Fields.php:232
 msgid "Fonts"
 msgstr "Caratteri"
 
-#: ../../Helper/Helper_Options_Fields.php:79
+#: src/Helper/Helper_Options_Fields.php:81
 msgid ""
 "Gravity PDF comes bundled with fonts for most languages world-wide. Want to "
 "use a specific font type? Use the font installer (found in the Tools tab)."
@@ -1190,34 +1326,32 @@ msgstr ""
 "mondo. Volete utilizzare un tipo di carattere specifico? Utilizzate il "
 "programma di installazione dei font (nella scheda Strumenti)."
 
-#: ../../Helper/Helper_Options_Fields.php:85
+#: src/Helper/Helper_Options_Fields.php:87
 msgid "Default Paper Size"
 msgstr "Formato carta predefinito"
 
-#: ../../Helper/Helper_Options_Fields.php:86
+#: src/Helper/Helper_Options_Fields.php:88
 msgid "Set the default paper size used when generating PDFs."
-msgstr ""
-"Impostare il formato carta predefinito utilizzato per la generazione di PDF."
+msgstr "Impostare il formato carta predefinito utilizzato per la generazione di PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:95,
-#: ../../Helper/Helper_Options_Fields.php:320
+#: src/Helper/Helper_Options_Fields.php:97
+#: src/Helper/Helper_Options_Fields.php:322
 msgid "Control the exact paper size. Can be set in millimeters or inches."
 msgstr ""
 "Controllo dell'esatto formato della carta. Può essere impostato in "
 "millimetri o pollici."
 
-#: ../../Helper/Helper_Options_Fields.php:102,
-#: ../../Helper/Helper_Options_Fields.php:106,
-#: ../../Helper/Helper_Options_Fields.php:372
+#: src/Helper/Helper_Options_Fields.php:104
+#: src/Helper/Helper_Options_Fields.php:108
+#: src/Helper/Helper_Options_Fields.php:374
 msgid "Reverse Text (RTL)"
 msgstr "Testo inverso (RTL)"
 
-#: ../../Helper/Helper_Options_Fields.php:103
+#: src/Helper/Helper_Options_Fields.php:105
 msgid "Script like Arabic and Hebrew are written right to left."
-msgstr ""
-"Le scritture come l'arabo e l'ebraico sono scritte da destra a sinistra."
+msgstr "Le scritture come l'arabo e l'ebraico sono scritte da destra a sinistra."
 
-#: ../../Helper/Helper_Options_Fields.php:106
+#: src/Helper/Helper_Options_Fields.php:108
 msgid ""
 "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, "
 "Tifinar, Urdu or other RTL languages."
@@ -1225,27 +1359,28 @@ msgstr ""
 "Abilitare l'RTL se si scrive in arabo, ebraico, siriaco, n'ko, thaana, "
 "tifinar, urdu o altre lingue RTL."
 
-#: ../../Helper/Helper_Options_Fields.php:111
+#: src/Helper/Helper_Options_Fields.php:113
 msgid "Default Font Size"
 msgstr "Dimensione predefinita del carattere"
 
-#: ../../Helper/Helper_Options_Fields.php:112
+#: src/Helper/Helper_Options_Fields.php:114
 msgid "Set the default font size used in PDFs."
 msgstr "Imposta la dimensione predefinita dei caratteri utilizzati nei PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:122
+#: src/Helper/Helper_Options_Fields.php:124
 msgid "Default Font Color"
 msgstr "Colore di default"
 
-#: ../../Helper/Helper_Options_Fields.php:125
+#: src/Helper/Helper_Options_Fields.php:127
 msgid "Set the default font color used in PDFs."
 msgstr "Imposta il colore predefinito dei caratteri utilizzati nei PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:135
+#: src/Helper/Helper_Options_Fields.php:137
 msgid "Entry View"
 msgstr "Vista Immissione"
 
-#: ../../Helper/Helper_Options_Fields.php:136
+#: src/Helper/Helper_Options_Fields.php:138
+#, php-format
 msgid ""
 "Select the default action used when accessing a PDF from the %1$sGravity "
 "Forms entries list%2$s page."
@@ -1253,39 +1388,40 @@ msgstr ""
 "Selezionare l'azione predefinita utilizzata quando si accede a un PDF dalla "
 "pagina %1$sElenco voci di Gravity Forms%2$s."
 
-#: ../../Helper/Helper_Options_Fields.php:139,
-#: ../../Model/Model_System_Report.php:269,
-#: ../../View/html/PDF/entry_detailed_pdf.php:35
+#: src/Helper/Helper_Options_Fields.php:141
+#: src/Model/Model_System_Report.php:323
+#: src/View/html/PDF/entry_detailed_pdf.php:35
 msgid "View"
 msgstr "Visualizzare"
 
-#: ../../Helper/Helper_Options_Fields.php:140,
-#: ../../Model/Model_System_Report.php:269,
-#: ../../View/html/PDF/entry_detailed_pdf.php:36
+#: src/Helper/Helper_Options_Fields.php:142
+#: src/Model/Model_System_Report.php:323
+#: src/View/html/PDF/entry_detailed_pdf.php:36
 msgid "Download"
 msgstr "Download"
 
-#: ../../Helper/Helper_Options_Fields.php:147,
-#: ../../Model/Model_System_Report.php:274
+#: src/Helper/Helper_Options_Fields.php:149
+#: src/Model/Model_System_Report.php:328
 msgid "Background Processing"
 msgstr "Elaborazione dello sfondo"
 
-#: ../../Helper/Helper_Options_Fields.php:148
+#: src/Helper/Helper_Options_Fields.php:150
+#, php-format
 msgid ""
 "When enable, form submission and resending notifications with PDFs are "
 "handled in a background task. %1$sRequires Background tasks to be "
 "enabled%2$s."
 msgstr ""
-"Se abilitato, l'invio del modulo e il reinvio delle notifiche con i PDF sono "
-"gestiti in un'attività in background. %1$sRichiede che le attività in "
+"Se abilitato, l'invio del modulo e il reinvio delle notifiche con i PDF "
+"sono gestiti in un'attività in background. %1$sRichiede che le attività in "
 "background siano abilitate%2$s."
 
-#: ../../Helper/Helper_Options_Fields.php:155,
-#: ../../Model/Model_System_Report.php:280
+#: src/Helper/Helper_Options_Fields.php:157
+#: src/Model/Model_System_Report.php:335
 msgid "Debug Mode"
 msgstr "Modalità debug"
 
-#: ../../Helper/Helper_Options_Fields.php:158
+#: src/Helper/Helper_Options_Fields.php:160
 msgid ""
 "When enabled, debug information will be displayed on-screen for core "
 "features."
@@ -1293,55 +1429,56 @@ msgstr ""
 "Quando è abilitata, le informazioni di debug vengono visualizzate sullo "
 "schermo per le funzioni principali."
 
-#: ../../Helper/Helper_Options_Fields.php:169,
-#: ../../Helper/Helper_Options_Fields.php:175,
-#: ../../Model/Model_System_Report.php:294
+#: src/Helper/Helper_Options_Fields.php:171
+#: src/Helper/Helper_Options_Fields.php:177
+#: src/Model/Model_System_Report.php:351
 msgid "Logged Out Timeout"
 msgstr "Timeout disconnesso"
 
-#: ../../Helper/Helper_Options_Fields.php:170
+#: src/Helper/Helper_Options_Fields.php:172
+#, php-format
 msgid ""
-"Limit how long a %1$slogged out%2$s users has direct access to the PDF after "
-"completing the form. Set to 0 to disable time limit (not recommended)."
+"Limit how long a %1$slogged out%2$s users has direct access to the PDF "
+"after completing the form. Set to 0 to disable time limit (not recommended)."
 msgstr ""
 "Limita il tempo in cui un utente %1$sdisconnesso%2$s ha accesso diretto al "
 "PDF dopo aver completato il modulo. Impostare su 0 per disabilitare il "
 "limite di tempo (non consigliato)."
 
-#: ../../Helper/Helper_Options_Fields.php:171
+#: src/Helper/Helper_Options_Fields.php:173
 msgid "minutes"
 msgstr "minuti"
 
-#: ../../Helper/Helper_Options_Fields.php:175
+#: src/Helper/Helper_Options_Fields.php:177
 msgid ""
-"Logged out users can view PDFs when their IP matches the one assigned to the "
-"Gravity Form entry. Because IP addresses can change, a time-based "
+"Logged out users can view PDFs when their IP matches the one assigned to "
+"the Gravity Form entry. Because IP addresses can change, a time-based "
 "restriction also applies."
 msgstr ""
 "Gli utenti disconnessi possono visualizzare i PDF se il loro IP corrisponde "
 "a quello assegnato alla voce del modulo Gravity. Poiché gli indirizzi IP "
 "possono cambiare, si applica anche una restrizione temporale."
 
-#: ../../Helper/Helper_Options_Fields.php:180
+#: src/Helper/Helper_Options_Fields.php:182
 msgid "Default Owner Restrictions"
 msgstr "Restrizioni predefinite del proprietario"
 
-#: ../../Helper/Helper_Options_Fields.php:181
+#: src/Helper/Helper_Options_Fields.php:183
 msgid ""
 "Set the default PDF owner permissions. When enabled, the original entry "
-"owner will NOT be able to view the PDFs (unless they have a User Restriction "
-"capability)."
+"owner will NOT be able to view the PDFs (unless they have a User "
+"Restriction capability)."
 msgstr ""
 "Imposta le autorizzazioni predefinite per il proprietario dei PDF. Quando è "
-"abilitato, il proprietario della voce originale NON potrà visualizzare i PDF "
-"(a meno che non abbia una funzione di restrizione utente)."
+"abilitato, il proprietario della voce originale NON potrà visualizzare i "
+"PDF (a meno che non abbia una funzione di restrizione utente)."
 
-#: ../../Helper/Helper_Options_Fields.php:184,
-#: ../../Helper/Helper_Options_Fields.php:478
+#: src/Helper/Helper_Options_Fields.php:186
+#: src/Helper/Helper_Options_Fields.php:480
 msgid "Restrict Owner"
 msgstr "Limitare il proprietario"
 
-#: ../../Helper/Helper_Options_Fields.php:184
+#: src/Helper/Helper_Options_Fields.php:186
 msgid ""
 "Enable this setting if your PDFs should not be viewable by the end user. "
 "This can be set on a per-PDF basis."
@@ -1349,12 +1486,12 @@ msgstr ""
 "Attivare questa impostazione se i PDF non devono essere visualizzati "
 "dall'utente finale. L'impostazione può essere fatta per ogni PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:189,
-#: ../../Helper/Helper_Options_Fields.php:195
+#: src/Helper/Helper_Options_Fields.php:191
+#: src/Helper/Helper_Options_Fields.php:197
 msgid "User Restriction"
 msgstr "Restrizioni utente"
 
-#: ../../Helper/Helper_Options_Fields.php:191
+#: src/Helper/Helper_Options_Fields.php:193
 msgid ""
 "Restrict PDF access to users with any of these capabilities. The "
 "Administrator Role always has full access."
@@ -1362,7 +1499,7 @@ msgstr ""
 "Limitare l'accesso ai PDF agli utenti con una qualsiasi di queste capacità. "
 "Il ruolo di amministratore ha sempre accesso completo."
 
-#: ../../Helper/Helper_Options_Fields.php:195
+#: src/Helper/Helper_Options_Fields.php:197
 msgid ""
 "Only logged in users with any selected capability can view generated PDFs "
 "they don't have ownership of. Ownership refers to an end user who completed "
@@ -1373,7 +1510,7 @@ msgstr ""
 "riferisce all'utente finale che ha completato l'inserimento del modulo "
 "Gravity originale."
 
-#: ../../Helper/Helper_Options_Fields.php:223
+#: src/Helper/Helper_Options_Fields.php:225
 msgid ""
 "Automatically install the core fonts needed to generate PDF documents. This "
 "action only needs to be run once, as the fonts are preserved during plugin "
@@ -1383,16 +1520,17 @@ msgstr ""
 "PDF. Questa azione deve essere eseguita solo una volta, poiché i font "
 "vengono conservati durante gli aggiornamenti del plugin."
 
-#: ../../Helper/Helper_Options_Fields.php:223,
-#: ../../View/html/Actions/core_font.php:29
+#: src/Helper/Helper_Options_Fields.php:225
+#: src/View/html/Actions/core_font.php:29
 msgid "Get more info."
 msgstr "Per saperne di più."
 
-#: ../../Helper/Helper_Options_Fields.php:225
+#: src/Helper/Helper_Options_Fields.php:227
 msgid "Download Core Fonts"
 msgstr "Scarica i font Core"
 
-#: ../../Helper/Helper_Options_Fields.php:231
+#: src/Helper/Helper_Options_Fields.php:233
+#, php-format
 msgid ""
 "Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font "
 "files are supported."
@@ -1400,12 +1538,12 @@ msgstr ""
 "Installare font personalizzati da utilizzare nei documenti PDF. Sono "
 "supportati solo i file di font %1$s.ttf%2$s."
 
-#: ../../Helper/Helper_Options_Fields.php:247,
-#: ../../Helper/Helper_PDF_List_Table.php:96
+#: src/Helper/Helper_Options_Fields.php:249
+#: src/Helper/Helper_PDF_List_Table.php:97
 msgid "Label"
 msgstr "Etichetta"
 
-#: ../../Helper/Helper_Options_Fields.php:250
+#: src/Helper/Helper_Options_Fields.php:252
 msgid ""
 "Add a descriptive label to help you  differentiate between multiple PDF "
 "settings."
@@ -1413,7 +1551,8 @@ msgstr ""
 "Aggiungete un'etichetta descrittiva per aiutarvi a distinguere tra più "
 "impostazioni PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:256
+#: src/Helper/Helper_Options_Fields.php:258
+#, php-format
 msgid ""
 "Templates control the overall look and feel of the PDFs, and additional "
 "templates can be %1$spurchased from the online store%4$s. If you want to "
@@ -1423,108 +1562,111 @@ msgstr ""
 "I modelli controllano l'aspetto generale dei PDF e possono essere "
 "%1$sacquistati nel negozio online%4$s. Se volete digitalizzare e "
 "automatizzare i vostri documenti esistenti, %2$sutilizzate il nostro "
-"servizio Bespoke PDF%4$s. Gli sviluppatori possono anche %3$screare i propri "
-"modelli%4$s."
+"servizio Bespoke PDF%4$s. Gli sviluppatori possono anche %3$screare i "
+"propri modelli%4$s."
 
-#: ../../Helper/Helper_Options_Fields.php:265,
-#: ../../Helper/Helper_PDF_List_Table.php:98
+#: src/Helper/Helper_Options_Fields.php:267
+#: src/Helper/Helper_PDF_List_Table.php:99
 msgid "Notifications"
 msgstr "Notifiche"
 
-#: ../../Helper/Helper_Options_Fields.php:266
+#: src/Helper/Helper_Options_Fields.php:268
+#, php-format
 msgid ""
 "Send the PDF as an email attachment for the selected notification(s). "
 "%1$sPassword protect the PDF%3$s if security is a concern. Alternatively, "
-"%2$suse the [gravitypdf] shortcode%3$s directly in your Notification message."
+"%2$suse the [gravitypdf] shortcode%3$s directly in your Notification "
+"message."
 msgstr ""
 "Invia il PDF come allegato e-mail per le notifiche selezionate. "
 "%1$sProteggere con password il PDF%3$s se la sicurezza è un problema. In "
 "alternativa, %2$sutilizzare lo shortcode [gravitypdf]%3$s direttamente nel "
 "messaggio di notifica."
 
-#: ../../Helper/Helper_Options_Fields.php:269
+#: src/Helper/Helper_Options_Fields.php:271
 msgid "Choose a Notification"
 msgstr "Scegliere una notifica"
 
-#: ../../Helper/Helper_Options_Fields.php:274
+#: src/Helper/Helper_Options_Fields.php:276
 msgid "Filename"
 msgstr "Nome del file"
 
-#: ../../Helper/Helper_Options_Fields.php:276
+#: src/Helper/Helper_Options_Fields.php:278
+#, php-format
 msgid ""
 "Set the filename for the generated PDF (excluding the .pdf extension). "
 "Mergetags are supported, and invalid characters %s are automatically "
 "converted to an underscore."
 msgstr ""
 "Imposta il nome del file per il PDF generato (esclusa l'estensione .pdf). I "
-"mergetag sono supportati e i caratteri non validi %s vengono automaticamente "
-"convertiti in un trattino basso."
+"mergetag sono supportati e i caratteri non validi %s vengono "
+"automaticamente convertiti in un trattino basso."
 
-#: ../../Helper/Helper_Options_Fields.php:283
+#: src/Helper/Helper_Options_Fields.php:285
 msgid "Conditional Logic"
 msgstr "Logica condizionale"
 
-#: ../../Helper/Helper_Options_Fields.php:285
+#: src/Helper/Helper_Options_Fields.php:287
 msgid "Enable conditional logic"
 msgstr "Abilitare le icone nella toolbar"
 
-#: ../../Helper/Helper_Options_Fields.php:288
+#: src/Helper/Helper_Options_Fields.php:290
 msgid ""
 "Add rules to dynamically enable or disable the PDF. When disabled, PDFs do "
-"not show up in the admin area, cannot be viewed, and will not be attached to "
-"notifications."
+"not show up in the admin area, cannot be viewed, and will not be attached "
+"to notifications."
 msgstr ""
 "Aggiungere regole per attivare o disattivare dinamicamente il PDF. Quando "
 "sono disabilitati, i PDF non appaiono nell'area di amministrazione, non "
 "possono essere visualizzati e non vengono allegati alle notifiche."
 
-#: ../../Helper/Helper_Options_Fields.php:309
+#: src/Helper/Helper_Options_Fields.php:311
 msgid "Paper Size"
 msgstr "Dimensione carta"
 
-#: ../../Helper/Helper_Options_Fields.php:310
+#: src/Helper/Helper_Options_Fields.php:312
 msgid "Set the paper size used when generating PDFs."
 msgstr "Impostare il formato carta utilizzato per la generazione di PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:330
+#: src/Helper/Helper_Options_Fields.php:332
 msgid "Paper Orientation"
 msgstr "Orientamento della carta"
 
-#: ../../Helper/Helper_Options_Fields.php:333
+#: src/Helper/Helper_Options_Fields.php:335
 msgid "Portrait"
 msgstr "Ritratto"
 
-#: ../../Helper/Helper_Options_Fields.php:334
+#: src/Helper/Helper_Options_Fields.php:336
 msgid "Landscape"
 msgstr "Paesaggio"
 
-#: ../../Helper/Helper_Options_Fields.php:341
+#: src/Helper/Helper_Options_Fields.php:343
 msgid "Font"
 msgstr "Font"
 
-#: ../../Helper/Helper_Options_Fields.php:345
+#: src/Helper/Helper_Options_Fields.php:347
 msgid "Set the primary font used in PDFs. You can also install your own."
 msgstr ""
 "Imposta il font principale utilizzato nei PDF. È anche possibile installare "
 "il proprio."
 
-#: ../../Helper/Helper_Options_Fields.php:351
+#: src/Helper/Helper_Options_Fields.php:353
 msgid "Font Size"
 msgstr "Dimensione Carattere"
 
-#: ../../Helper/Helper_Options_Fields.php:352
+#: src/Helper/Helper_Options_Fields.php:354
 msgid "Set the font size to use in the PDF."
 msgstr "Impostare la dimensione dei caratteri da utilizzare nel PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:363
+#: src/Helper/Helper_Options_Fields.php:365
 msgid "Font Color"
 msgstr "Colore del carattere"
 
-#: ../../Helper/Helper_Options_Fields.php:366
+#: src/Helper/Helper_Options_Fields.php:368
 msgid "Set the font color to use in the PDF."
 msgstr "Impostare il colore del carattere da utilizzare nel PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:373
+#: src/Helper/Helper_Options_Fields.php:375
 msgid ""
 "Script like Arabic, Hebrew, Syriac (and many others) are written right to "
 "left."
@@ -1532,65 +1674,67 @@ msgstr ""
 "Scritture come l'arabo, l'ebraico, il siriaco (e molte altre) sono scritte "
 "da destra a sinistra."
 
-#: ../../Helper/Helper_Options_Fields.php:403,
-#: ../../templates/config/focus-gravity.php:91
+#: src/Helper/Helper_Options_Fields.php:405
+#: src/templates/config/focus-gravity.php:91
 msgid "Format"
 msgstr "Formato"
 
-#: ../../Helper/Helper_Options_Fields.php:404
+#: src/Helper/Helper_Options_Fields.php:406
 msgid ""
-"Generate a document adhering to the selected PDF format. Watermarks, alpha-"
-"transparency, and PDF Security are automatically disabled when using PDF/"
-"A-1b or PDF/X-1a formats."
+"Generate a document adhering to the selected PDF format. Watermarks, "
+"alpha-transparency, and PDF Security are automatically disabled when using "
+"PDF/A-1b or PDF/X-1a formats."
 msgstr ""
 "Genera un documento conforme al formato PDF selezionato. Filigrane, "
 "trasparenza alfa e PDF Security sono automaticamente disabilitati quando si "
 "utilizzano i formati PDF/A-1b o PDF/X-1a."
 
-#: ../../Helper/Helper_Options_Fields.php:416
+#: src/Helper/Helper_Options_Fields.php:418
 msgid "Enable PDF Security"
 msgstr "Abilita protezione PDF"
 
-#: ../../Helper/Helper_Options_Fields.php:417
+#: src/Helper/Helper_Options_Fields.php:419
 msgid "Password protect generated PDFs, and/or restrict user capabilities."
 msgstr ""
-"Proteggere con password i PDF generati e/o limitare le capacità degli utenti."
+"Proteggere con password i PDF generati e/o limitare le capacità degli "
+"utenti."
 
-#: ../../Helper/Helper_Options_Fields.php:423
+#: src/Helper/Helper_Options_Fields.php:425
 msgid "Password"
 msgstr "Password"
 
-#: ../../Helper/Helper_Options_Fields.php:425
+#: src/Helper/Helper_Options_Fields.php:427
 msgid ""
-"Password protect the PDF, or leave blank to disable. Mergetags are supported."
+"Password protect the PDF, or leave blank to disable. Mergetags are "
+"supported."
 msgstr ""
 "Proteggere il PDF con password o lasciare vuoto per disabilitarlo. Sono "
 "supportati i mergetag."
 
-#: ../../Helper/Helper_Options_Fields.php:431
+#: src/Helper/Helper_Options_Fields.php:433
 msgid "Privileges"
 msgstr "Privilegi"
 
-#: ../../Helper/Helper_Options_Fields.php:432
+#: src/Helper/Helper_Options_Fields.php:434
 msgid ""
-"Deselect privileges to restrict end user capabilities in the PDF. Privileges "
-"are trivial to bypass and are only suitable to specify your intentions to "
-"the user (and not as a means of access control or security)."
+"Deselect privileges to restrict end user capabilities in the PDF. "
+"Privileges are trivial to bypass and are only suitable to specify your "
+"intentions to the user (and not as a means of access control or security)."
 msgstr ""
 "Deselezionare i privilegi per limitare le capacità dell'utente finale nel "
 "PDF. I privilegi sono banalmente aggirabili e sono adatti solo per "
 "specificare le proprie intenzioni all'utente (e non come mezzo di controllo "
 "degli accessi o di sicurezza)."
 
-#: ../../Helper/Helper_Options_Fields.php:445
+#: src/Helper/Helper_Options_Fields.php:447
 msgid "Select End User PDF Privileges"
 msgstr "Selezionare i privilegi PDF dell'utente finale"
 
-#: ../../Helper/Helper_Options_Fields.php:456
+#: src/Helper/Helper_Options_Fields.php:458
 msgid "Image DPI"
 msgstr "DPI Immagine"
 
-#: ../../Helper/Helper_Options_Fields.php:460
+#: src/Helper/Helper_Options_Fields.php:462
 msgid ""
 "Control the image DPI (dots per inch) in PDFs. Set to 300 when "
 "professionally printing document."
@@ -1598,11 +1742,12 @@ msgstr ""
 "Controlla i DPI (punti per pollice) dell'immagine nei PDF. Impostare 300 "
 "quando si stampa un documento professionale."
 
-#: ../../Helper/Helper_Options_Fields.php:471
+#: src/Helper/Helper_Options_Fields.php:473
 msgid "Enable Public Access"
 msgstr "Abilitare l'accesso pubblico"
 
-#: ../../Helper/Helper_Options_Fields.php:473
+#: src/Helper/Helper_Options_Fields.php:475
+#, php-format
 msgid ""
 "When public access is on all security protocols are disabled and %3$sanyone "
 "can view the PDF document for ALL your form's entries%4$s. For better "
@@ -1613,20 +1758,21 @@ msgstr ""
 "voci del modulo%4$s. Per una maggiore sicurezza, %1$sutilizzare invece la "
 "funzione URL PDF firmati%2$s."
 
-#: ../../Helper/Helper_Options_Fields.php:479
+#: src/Helper/Helper_Options_Fields.php:481
+#, php-format
 msgid ""
 "When enabled, the original entry owner will NOT be able to view the PDFs. "
 "This setting is overridden %1$swhen using signed PDF urls%2$s."
 msgstr ""
 "Se attivata, il proprietario della voce originale NON potrà visualizzare i "
-"PDF. Questa impostazione viene sovrascritta %1$squando si utilizzano URL PDF "
-"firmati%2$s."
+"PDF. Questa impostazione viene sovrascritta %1$squando si utilizzano URL "
+"PDF firmati%2$s."
 
-#: ../../Helper/Helper_Options_Fields.php:514
+#: src/Helper/Helper_Options_Fields.php:518
 msgid "Enable Advanced Templating"
 msgstr "Abilitare il template avanzato"
 
-#: ../../Helper/Helper_Options_Fields.php:515
+#: src/Helper/Helper_Options_Fields.php:519
 msgid ""
 "A legacy setting used that enables a template to be treated as PHP, with "
 "direct access to the PDF engine."
@@ -1634,31 +1780,32 @@ msgstr ""
 "Un'impostazione legacy che consente di trattare un modello come PHP, con "
 "accesso diretto al motore PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:547
+#: src/Helper/Helper_Options_Fields.php:551
 msgid "Master Password"
 msgstr "Password principale"
 
-#: ../../Helper/Helper_Options_Fields.php:549
+#: src/Helper/Helper_Options_Fields.php:553
 msgid ""
-"Set the PDF Owner Password which is used to prevent the PDF privileges being "
-"changed."
+"Set the PDF Owner Password which is used to prevent the PDF privileges "
+"being changed."
 msgstr ""
 "Impostare la password del proprietario del PDF, utilizzata per impedire la "
 "modifica dei privilegi del PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:568
+#: src/Helper/Helper_Options_Fields.php:572
 msgid "Show Form Title"
 msgstr "Mostra titolo del modulo"
 
-#: ../../Helper/Helper_Options_Fields.php:569
+#: src/Helper/Helper_Options_Fields.php:573
 msgid "Display the form title at the beginning of the PDF."
 msgstr "Visualizza il titolo del modulo all'inizio del PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:588
+#: src/Helper/Helper_Options_Fields.php:592
 msgid "Show Page Names"
 msgstr "Mostra i nomi delle pagine"
 
-#: ../../Helper/Helper_Options_Fields.php:589
+#: src/Helper/Helper_Options_Fields.php:593
+#, php-format
 msgid ""
 "Display form page names on the PDF. Requires the use of the %1$sPage Break "
 "field%2$s."
@@ -1666,27 +1813,27 @@ msgstr ""
 "Visualizza i nomi delle pagine del modulo nel PDF. Richiede l'uso del campo "
 "%1$sInterruzione di pagina%2$s."
 
-#: ../../Helper/Helper_Options_Fields.php:607
+#: src/Helper/Helper_Options_Fields.php:611
 msgid "Show HTML Fields"
 msgstr "Mostra campi HTML"
 
-#: ../../Helper/Helper_Options_Fields.php:608
+#: src/Helper/Helper_Options_Fields.php:612
 msgid "Display HTML fields in the PDF."
 msgstr "Visualizza i campi HTML nel PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:626
+#: src/Helper/Helper_Options_Fields.php:630
 msgid "Show Section Break Description"
 msgstr "Mostra la descrizione dell'interruzione di sezione"
 
-#: ../../Helper/Helper_Options_Fields.php:627
+#: src/Helper/Helper_Options_Fields.php:631
 msgid "Display the Section Break field description in the PDF."
 msgstr "Visualizza la descrizione del campo Interruzione di sezione nel PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:645
+#: src/Helper/Helper_Options_Fields.php:649
 msgid "Enable Conditional Logic"
 msgstr "Abilita la logica condizionale"
 
-#: ../../Helper/Helper_Options_Fields.php:646
+#: src/Helper/Helper_Options_Fields.php:650
 msgid ""
 "When enabled the PDF will adhere to the form field conditional logic and "
 "show/hide fields."
@@ -1694,19 +1841,20 @@ msgstr ""
 "Se abilitato, il PDF rispetterà la logica condizionale dei campi del modulo "
 "e mostrerà/nasconderà i campi."
 
-#: ../../Helper/Helper_Options_Fields.php:665
+#: src/Helper/Helper_Options_Fields.php:669
 msgid "Show Empty Fields"
 msgstr "Mostra i campi vuoti"
 
-#: ../../Helper/Helper_Options_Fields.php:666
+#: src/Helper/Helper_Options_Fields.php:670
 msgid "Display Empty fields in the PDF."
 msgstr "Visualizza i campi vuoti nel PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:684
+#: src/Helper/Helper_Options_Fields.php:688
 msgid "Header"
 msgstr "Header"
 
-#: ../../Helper/Helper_Options_Fields.php:687
+#: src/Helper/Helper_Options_Fields.php:691
+#, php-format
 msgid ""
 "The header is included at the top of each page. For simple columns %1$stry "
 "this HTML table snippet%2$s."
@@ -1714,23 +1862,24 @@ msgstr ""
 "L'intestazione è inclusa all'inizio di ogni pagina. Per le colonne semplici "
 "%1$sprovare questo frammento di tabella HTML%2$s."
 
-#: ../../Helper/Helper_Options_Fields.php:705
+#: src/Helper/Helper_Options_Fields.php:709
 msgid "First Page Header"
 msgstr "Intestazione della prima pagina"
 
-#: ../../Helper/Helper_Options_Fields.php:708
+#: src/Helper/Helper_Options_Fields.php:712
 msgid "Override the header on the first page of the PDF."
 msgstr "Sovrascrive l'intestazione della prima pagina del PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:710
+#: src/Helper/Helper_Options_Fields.php:714
 msgid "Use different header on first page of PDF?"
 msgstr "Utilizzare un'intestazione diversa sulla prima pagina del PDF?"
 
-#: ../../Helper/Helper_Options_Fields.php:727
+#: src/Helper/Helper_Options_Fields.php:731
 msgid "Footer"
 msgstr "Footer"
 
-#: ../../Helper/Helper_Options_Fields.php:730
+#: src/Helper/Helper_Options_Fields.php:734
+#, php-format
 msgid ""
 "The footer is included at the bottom of every page. For simple text footers "
 "use the left, center and right alignment buttons in the editor. For simple "
@@ -1744,31 +1893,31 @@ msgstr ""
 "%3$s{PAGENO}%4$s e %3$s{nbpg}%4$s per visualizzare la numerazione delle "
 "pagine. "
 
-#: ../../Helper/Helper_Options_Fields.php:748
+#: src/Helper/Helper_Options_Fields.php:752
 msgid "First Page Footer"
 msgstr "Piè di pagina della prima pagina"
 
-#: ../../Helper/Helper_Options_Fields.php:751
+#: src/Helper/Helper_Options_Fields.php:755
 msgid "Override the footer on the first page of the PDF."
 msgstr "Sovrascrive il piè di pagina della prima pagina del PDF."
 
-#: ../../Helper/Helper_Options_Fields.php:753
+#: src/Helper/Helper_Options_Fields.php:757
 msgid "Use different footer on first page of PDF?"
 msgstr "Utilizzare un piè di pagina diverso sulla prima pagina del PDF?"
 
-#: ../../Helper/Helper_Options_Fields.php:770
+#: src/Helper/Helper_Options_Fields.php:774
 msgid "Background Color"
 msgstr "Colore di sfondo"
 
-#: ../../Helper/Helper_Options_Fields.php:773
+#: src/Helper/Helper_Options_Fields.php:777
 msgid "Set the background color for all pages."
 msgstr "Impostare il colore di sfondo per tutte le pagine."
 
-#: ../../Helper/Helper_Options_Fields.php:790
+#: src/Helper/Helper_Options_Fields.php:794
 msgid "Background Image"
 msgstr "Immagine di Sfondo"
 
-#: ../../Helper/Helper_Options_Fields.php:792
+#: src/Helper/Helper_Options_Fields.php:796
 msgid ""
 "The background image is included on all pages. For optimal results, use an "
 "image the same dimensions as the paper size and run it through an image "
@@ -1779,7 +1928,8 @@ msgstr ""
 "carta e passatela attraverso uno strumento di ottimizzazione delle immagini "
 "prima di caricarla."
 
-#: ../../Helper/Helper_PDF.php:388
+#: src/Helper/Helper_PDF.php:399
+#, php-format
 msgid ""
 "The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the "
 "latest version."
@@ -1787,7 +1937,7 @@ msgstr ""
 "Il modello PDF %1$s richiede la versione di Gravity PDF %2$s. Aggiornare "
 "alla versione più recente."
 
-#: ../../Helper/Helper_PDF.php:925
+#: src/Helper/Helper_PDF.php:939
 msgid ""
 "This method has been removed because mPDF no longer supports setting the "
 "image DPI after the class is initialised."
@@ -1795,119 +1945,152 @@ msgstr ""
 "Questo metodo è stato rimosso perché mPDF non supporta più l'impostazione "
 "dei DPI dell'immagine dopo l'inizializzazione della classe."
 
-#: ../../Helper/Helper_PDF_List_Table.php:99
+#: src/Helper/Helper_PDF_List_Table.php:100
 msgid "Shortcode"
 msgstr "Codice abbreviato"
 
-#: ../../Helper/Helper_PDF_List_Table.php:138
+#: src/Helper/Helper_PDF_List_Table.php:139
 msgid "PDF List"
 msgstr "Elenco PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:250
+#: src/Helper/Helper_PDF_List_Table.php:251
 msgid "None"
 msgstr "Nessuna"
 
-#: ../../Helper/Helper_PDF_List_Table.php:285,
-#: ../../View/html/PDF/entry_list_pdf_single.php:29
+#: src/Helper/Helper_PDF_List_Table.php:286
+#: src/View/html/PDF/entry_list_pdf_single.php:29
 msgid "Download PDF"
 msgstr "Scarica PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:288
+#: src/Helper/Helper_PDF_List_Table.php:289
+#, php-format
 msgid "Copy the %s PDF shortcode to the clipboard"
 msgstr "Copiare il codice breve %s PDF negli appunti"
 
-#: ../../Helper/Helper_PDF_List_Table.php:307
-msgid "Shortcode copied!"
-msgstr "Shortcode copiato!"
-
-#: ../../Helper/Helper_PDF_List_Table.php:311
-msgid "Copy Shortcode"
-msgstr "Shortcode"
-
-#: ../../Helper/Helper_PDF_List_Table.php:303
+#: src/Helper/Helper_PDF_List_Table.php:304
 msgid "Copied"
 msgstr "Copiato"
 
-#: ../../Helper/Helper_PDF_List_Table.php:364
+#: src/Helper/Helper_PDF_List_Table.php:308
+msgid "Shortcode copied!"
+msgstr "Shortcode copiato!"
+
+#: src/Helper/Helper_PDF_List_Table.php:312
+msgid "Copy Shortcode"
+msgstr "Shortcode"
+
+#: src/Helper/Helper_PDF_List_Table.php:365
 msgid "Edit this PDF"
 msgstr "Modifica questo PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:364
+#: src/Helper/Helper_PDF_List_Table.php:365
 msgid "Edit"
 msgstr "Modifica"
 
-#: ../../Helper/Helper_PDF_List_Table.php:365
+#: src/Helper/Helper_PDF_List_Table.php:366
 msgid "Duplicate this PDF"
 msgstr "Duplicare questo PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:365
+#: src/Helper/Helper_PDF_List_Table.php:366
 msgid "Duplicate"
 msgstr "Duplica"
 
-#: ../../Helper/Helper_PDF_List_Table.php:366
+#: src/Helper/Helper_PDF_List_Table.php:367
 msgid "Delete this PDF"
 msgstr "Cancellare questo PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:374
+#: src/Helper/Helper_PDF_List_Table.php:375
+#, php-format
 msgid "%s PDF"
 msgstr "%s PDF"
 
-#: ../../Helper/Helper_PDF_List_Table.php:404
+#: src/Helper/Helper_PDF_List_Table.php:405
+#, php-format
 msgid "This form doesn't have any PDFs. Let's go %1$screate one%2$s."
 msgstr "Questo modulo non ha alcun PDF. Andiamo a %1$screarne uno%2$s."
 
-#: ../../Helper/Helper_Templates.php:224
+#: src/Helper/Helper_Templates.php:225
 msgid "Requires Gravity PDF"
 msgstr "Richiede il PDF Gravity"
 
-#: ../../Helper/Helper_Templates.php:335, ../../Helper/Helper_Templates.php:416
+#: src/Helper/Helper_Templates.php:287
+#: src/Helper/Helper_Templates.php:349
+#: src/Helper/Helper_Templates.php:430
 msgid "Legacy"
 msgstr "Legacy"
 
-#: ../../Model/Model_Form_Settings.php:245
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:314
+#. translators: the plugin name.
+#, php-format
+msgid "There is a new version of %1$s available."
+msgstr "È disponibile una nuova versione di %1$s."
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:320
+msgid "Contact your network administrator to install the update."
+msgstr "Contatta il tuo amministratore di rete per installare l'aggiornamento."
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:326
+#. translators: 1. opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate.
+#, php-format
+msgid "%1$sView version %2$s details%3$s."
+msgstr "%1$sGuarda i dettagli della versione %2$s%3$s."
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:344
+#. translators: 1: Opening <a> tag, 2: Version number, 3: Closing </a> tag, 4: Opening <a> tag, 5: Closing </a> tag
+#, php-format
+msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
+msgstr "%1$sGuarda i dettagli della versione %2$s%3$s o %4$saggiorna adesso%5$s."
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:364
+msgid "Update now."
+msgstr "Aggiorna adesso."
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:582
+msgid "You do not have permission to install plugin updates"
+msgstr "Non hai il permesso di installare gli aggiornamenti dei plugin"
+
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:582
+msgid "Error"
+msgstr "Errore"
+
+#: src/Model/Model_Form_Settings.php:245
 msgid "Update PDF"
 msgstr "Aggiornamento PDF"
 
-#: ../../Model/Model_Form_Settings.php:246
+#: src/Model/Model_Form_Settings.php:246
 msgid "Add PDF"
 msgstr "Aggiungi PDF"
 
-#: ../../Model/Model_Form_Settings.php:336,
-#: ../../Model/Model_Form_Settings.php:358,
-#: ../../Model/Model_Form_Settings.php:407,
-#: ../../Model/Model_Form_Settings.php:515
+#: src/Model/Model_Form_Settings.php:336
+#: src/Model/Model_Form_Settings.php:358
+#: src/Model/Model_Form_Settings.php:407
+#: src/Model/Model_Form_Settings.php:515
 msgid "There was a problem saving your PDF settings. Please try again."
 msgstr ""
 "Si è verificato un problema nel salvataggio delle impostazioni del PDF. "
 "Riprovare."
 
-#: ../../Model/Model_Form_Settings.php:379
+#: src/Model/Model_Form_Settings.php:379
 msgid "PDF could not be saved. Please enter all required information below."
 msgstr ""
 "Non è stato possibile salvare il PDF. Inserire tutte le informazioni "
 "richieste di seguito."
 
-#: ../../Model/Model_Form_Settings.php:401
+#: src/Model/Model_Form_Settings.php:401
+#, php-format
 msgid "PDF saved successfully. %1$sBack to PDF list.%2$s"
 msgstr "PDF salvato con successo. %1$sTorna all'elenco dei PDF.%2$s"
 
-#: ../../Model/Model_Form_Settings.php:803
+#: src/Model/Model_Form_Settings.php:805
 msgid "PDF successfully deleted."
 msgstr "PDF eliminato con successo."
 
-#: ../../Model/Model_Form_Settings.php:866
+#: src/Model/Model_Form_Settings.php:868
 msgid "PDF successfully duplicated."
 msgstr "PDF duplicato con successo."
 
-#: ../../Model/Model_Install.php:303
-msgid ""
-"Gravity PDF does not have write permission to the %s directory. Contact your "
-"web hosting provider to fix the issue."
-msgstr ""
-"Gravity PDF non dispone dei permessi di scrittura per la directory %s. "
-"Contattare il provider di web hosting per risolvere il problema."
-
-#: ../../Model/Model_Install.php:291
+#: src/Model/Model_Install.php:290
+#, php-format
 msgid ""
 "There was a problem creating the %s directory. Ensure you have write "
 "permissions to your uploads folder."
@@ -1915,63 +2098,67 @@ msgstr ""
 "Si è verificato un problema nella creazione della cartella %s. Assicurarsi "
 "di avere i permessi di scrittura sulla cartella uploads."
 
-#: ../../Model/Model_Mergetags.php:292
+#: src/Model/Model_Install.php:301
+#, php-format
+msgid ""
+"Gravity PDF does not have write permission to the %s directory. Contact "
+"your web hosting provider to fix the issue."
+msgstr ""
+"Gravity PDF non dispone dei permessi di scrittura per la directory %s. "
+"Contattare il provider di web hosting per risolvere il problema."
+
+#: src/Model/Model_Mergetags.php:292
 msgid "Signed (+1 week)"
 msgstr "Firmato (+1 settimana)"
 
-#: ../../Model/Model_Mergetags.php:301
+#: src/Model/Model_Mergetags.php:301
 msgid "Signed (+1 month)"
 msgstr "Firmato (+1 mese)"
 
-#: ../../Model/Model_Mergetags.php:310
+#: src/Model/Model_Mergetags.php:310
 msgid "Signed (+1 year)"
 msgstr "Firmato (+1 anno)"
 
-#: ../../Model/Model_Mergetags.php:321
+#: src/Model/Model_Mergetags.php:321
 msgid "PDF URLs"
 msgstr "URL PDF"
 
-#: ../../Model/Model_PDF.php:399
+#: src/Model/Model_PDF.php:401
 msgid "The PDF configuration is not currently active."
 msgstr "La configurazione PDF non è attualmente attiva."
 
-#: ../../Model/Model_PDF.php:421
+#: src/Model/Model_PDF.php:423
 msgid "PDF conditional logic requirements have not been met."
 msgstr "I requisiti della logica condizionale PDF non sono stati soddisfatti."
 
-#: ../../Model/Model_PDF.php:510
+#: src/Model/Model_PDF.php:512
 msgid "Your PDF is no longer accessible."
 msgstr "Il PDF non è più accessibile."
 
-#: ../../Model/Model_PDF.php:629, ../../Model/Model_PDF.php:659
+#: src/Model/Model_PDF.php:631
+#: src/Model/Model_PDF.php:667
 msgid "You do not have access to view this PDF."
 msgstr "Non avete accesso alla visualizzazione di questo PDF."
 
-#: ../../Model/Model_PDF.php:1024
+#: src/Model/Model_PDF.php:1031
 msgid "PDFs"
 msgstr "PDF"
 
-#: ../../Model/Model_PDF.php:1167
+#: src/Model/Model_PDF.php:1174
 msgid "The PDF could not be saved."
 msgstr "Non è stato possibile salvare il PDF."
 
-#: ../../Model/Model_PDF.php:2198
+#: src/Model/Model_PDF.php:2229
 msgid "Could not find PDF configuration requested"
 msgstr "Impossibile trovare la configurazione PDF richiesta"
 
-#: ../../Model/Model_PDF.php:2519
+#: src/Model/Model_PDF.php:2554
+#, php-format
 msgid "Page %d"
 msgstr "Pagina %d"
 
-#: ../../Model/Model_Settings.php:360
-msgid "Your support license key has been activated for this domain."
-msgstr "La chiave di licenza di supporto è stata attivata per questo dominio."
-
-#: ../../Model/Model_Settings.php:457
-msgid "License deactivated."
-msgstr "Licenza disattivata."
-
-#: ../../Model/Model_Settings.php:481
+#: src/Model/Model_Settings.php:378
+#, php-format
 msgid ""
 "An unknown error occurred, and your license key may not have been correctly "
 "deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your "
@@ -1982,108 +2169,132 @@ msgstr ""
 "GravityPDF.com%2$s e verificare se il proprio sito è stato scollegato dalla "
 "chiave."
 
-#: ../../Model/Model_Shortcodes.php:50
-msgid "This method has been superseded by self::process()"
-msgstr "Questo metodo è stato sostituito da self::process()"
+#: src/Model/Model_Settings.php:395
+#, php-format
+msgid ""
+"An API error occurred and your license key may not have been correctly "
+"deactivated. %1$sLogin to your GravityPDF.com account%2$s and check if your "
+"site has been unlinked from the key."
+msgstr ""
+"Si è verificato un errore API e la tua chiave di licenza potrebbe non "
+"essere stata disattivata correttamente. %1$sAccedi al tuo account su "
+"GravityPDF.com%2$s e verifica se il tuo sito è stato scollegato dalla "
+"chiave."
 
-#: ../../Model/Model_System_Report.php:111
+#: src/Model/Model_Settings.php:420
+msgid "License key deactivated."
+msgstr "Chiave di licenza disattivata."
+
+#: src/Model/Model_Settings.php:421
+msgid "Access Pass license key deactivated."
+msgstr "Chiave di licenza Access Pass disattivata."
+
+#: src/Model/Model_System_Report.php:143
 msgid "Gravity PDF Environment"
 msgstr "Gravità PDF Ambiente"
 
-#: ../../Model/Model_System_Report.php:115
+#: src/Model/Model_System_Report.php:150
 msgid "PHP"
 msgstr "PHP"
 
-#: ../../Model/Model_System_Report.php:121
+#: src/Model/Model_System_Report.php:156
 msgid "Directories and Permissions"
 msgstr "Directory e permessi"
 
-#: ../../Model/Model_System_Report.php:127
+#: src/Model/Model_System_Report.php:162
 msgid "Global Settings"
 msgstr "Impostazioni Globali"
 
-#: ../../Model/Model_System_Report.php:133
+#: src/Model/Model_System_Report.php:168
 msgid "Security Settings"
 msgstr "Impostazioni di sicurezza"
 
-#: ../../Model/Model_System_Report.php:177
+#: src/Model/Model_System_Report.php:218
 msgid "WP Memory"
 msgstr "Memoria WP"
 
-#: ../../Model/Model_System_Report.php:189
+#: src/Model/Model_System_Report.php:231
 msgid "Default Charset"
 msgstr "Set di caratteri predefinito"
 
-#: ../../Model/Model_System_Report.php:194
+#: src/Model/Model_System_Report.php:237
 msgid "Internal Encoding"
 msgstr "Codifica interna"
 
-#: ../../Model/Model_System_Report.php:202
+#: src/Model/Model_System_Report.php:246
 msgid "PDF Working Directory"
 msgstr "Directory di lavoro PDF"
 
-#: ../../Model/Model_System_Report.php:207
+#: src/Model/Model_System_Report.php:252
 msgid "PDF Working Directory URL"
 msgstr "URL della directory di lavoro PDF"
 
-#: ../../Model/Model_System_Report.php:212
+#: src/Model/Model_System_Report.php:258
 msgid "Font Folder location"
 msgstr "Posizione della cartella dei font"
 
-#: ../../Model/Model_System_Report.php:217
+#: src/Model/Model_System_Report.php:264
 msgid "Temporary Folder location"
 msgstr "Posizione della cartella temporanea"
 
-#: ../../Model/Model_System_Report.php:222
+#: src/Model/Model_System_Report.php:270
 msgid "Temporary Folder permissions"
 msgstr "Autorizzazioni della cartella temporanea"
 
-#: ../../Model/Model_System_Report.php:228
+#: src/Model/Model_System_Report.php:277
 msgid "Temporary Folder protected"
 msgstr "Cartella temporanea protetta"
 
-#: ../../Model/Model_System_Report.php:234
+#: src/Model/Model_System_Report.php:284
 msgid "mPDF Temporary location"
 msgstr "mPDF Posizione temporanea"
 
-#: ../../Model/Model_System_Report.php:243
+#: src/Model/Model_System_Report.php:294
 msgid "Outdated Templates"
 msgstr "Modelli obsoleti"
 
-#: ../../Model/Model_System_Report.php:253
+#: src/Model/Model_System_Report.php:305
+#, php-format
 msgid ""
-"In order to get updates direct from GravityPDF.com %1$syou need to perform a "
-"one-time download of the plugin%2$s."
+"In order to get updates direct from GravityPDF.com %1$syou need to perform "
+"a one-time download of the plugin%2$s."
 msgstr ""
 "Per ottenere gli aggiornamenti direttamente da GravityPDF.com %1$sè "
 "necessario eseguire un download unico del plugin%2$s."
 
-#: ../../Model/Model_System_Report.php:262
+#: src/Model/Model_System_Report.php:314
 msgid "Canonical Release"
 msgstr "Comunicato Canonical"
 
-#: ../../Model/Model_System_Report.php:268
+#: src/Model/Model_System_Report.php:321
 msgid "PDF Entry List Action"
 msgstr "Azione Elenco voci PDF"
 
-#: ../../Model/Model_System_Report.php:275,
-#: ../../Model/Model_System_Report.php:281
+#: src/Model/Model_System_Report.php:330
+#: src/Model/Model_System_Report.php:337
 msgid "Off"
 msgstr "Off"
 
-#: ../../Model/Model_System_Report.php:289
+#: src/Model/Model_System_Report.php:345
 msgid "User Restrictions"
 msgstr "Restrizioni per gli utenti"
 
-#: ../../Model/Model_System_Report.php:295
+#: src/Model/Model_System_Report.php:353
 msgid "minute(s)"
 msgstr "minuto(i)"
 
-#: ../../Model/Model_Templates.php:367
+#: src/Model/Model_System_Report.php:388
+msgid "The report sections are keyed by name rather than by position."
+msgstr ""
+"Le sezioni del report sono identificate per nome piuttosto che per "
+"posizione."
+
+#: src/Model/Model_Templates.php:365
 msgid "No valid PDF template found in Zip archive."
 msgstr "Non è stato trovato alcun modello PDF valido nell'archivio zip."
 
-#: ../../Model/Model_Templates.php:388
+#: src/Model/Model_Templates.php:386
+#, php-format
 msgid ""
 "The filename %s contains invalid characters. Only alphanumeric, hyphen, and "
 "underscore allowed."
@@ -2091,11 +2302,13 @@ msgstr ""
 "Il nome del file %s contiene caratteri non validi. Sono ammessi solo "
 "caratteri alfanumerici, trattini e trattini bassi."
 
-#: ../../Model/Model_Templates.php:402
+#: src/Model/Model_Templates.php:400
+#, php-format
 msgid "The PHP file %s is not a valid PDF Template."
 msgstr "Il file PHP %s non è un modello PDF valido."
 
-#: ../../Model/Model_Uninstall.php:158
+#: src/Model/Model_Uninstall.php:195
+#, php-format
 msgid ""
 "There was a problem removing the Gravity Form \"%s\" PDF configuration. Try "
 "delete manually."
@@ -2103,187 +2316,66 @@ msgstr ""
 "Si è verificato un problema nella rimozione della configurazione PDF di "
 "Gravity Form \"%s\" PDF. Provare a eliminarla manualmente."
 
-#: ../../Model/Model_Uninstall.php:193
-msgid ""
-"There was a problem removing the %s directory. Clean up manually via (S)FTP."
+#: src/Model/Model_Uninstall.php:230
+#, php-format
+msgid "There was a problem removing the %s directory. Clean up manually via (S)FTP."
 msgstr ""
 "Si è verificato un problema nella rimozione della directory %s. Pulire "
 "manualmente via (S)FTP."
 
-#: ../../templates/blank-slate.php:3
-msgid "Blank Slate"
-msgstr "Blank Slate"
+#: src/Statics/Deprecation.php:246
+#. translators: %s: The name of the deprecated feature
+#, php-format
+msgid "%s is no longer supported."
+msgstr "%s non è più supportato."
 
-#: ../../templates/focus-gravity.php:3
-msgid "Focus Gravity"
-msgstr "Focus Gravità"
+#: src/Statics/Deprecation.php:250
+#. translators: 1: The name of the deprecated feature, 2: The Gravity PDF version it is removed in
+#, php-format
+msgid "Support for %1$s will be removed in Gravity PDF %2$s."
+msgstr "Il supporto per %1$s sarà rimosso in Gravity PDF %2$s."
 
-#: ../../templates/rubix.php:3
-msgid "Rubix"
-msgstr "Rubix"
+#: src/Statics/Deprecation.php:330
+#. translators: %s: The Gravity PDF version the filter is removed in
+#, php-format
+msgid "This filter is removed in Gravity PDF %s."
+msgstr "Questo filtro è rimosso in Gravity PDF %s."
 
-#: ../../templates/zadani.php:3
-msgid "Zadani"
-msgstr "Zadani"
+#: src/Statics/Deprecation_V3.php:133
+msgid "Legacy Templates"
+msgstr "Modelli Legacy"
 
-#: ../../View/View_Form_Settings.php:42
-msgid "General"
-msgstr "Generale"
+#: src/Statics/Deprecation_V3.php:141
+msgid "Business Plus Templates"
+msgstr "Modelli Business Plus"
 
-#: ../../View/View_Form_Settings.php:54
-msgid "Appearance"
-msgstr "Aspetto"
+#: src/Statics/Deprecation_V3.php:149
+msgid "Legacy Download URLs"
+msgstr "URL di Download Legacy"
 
-#: ../../View/View_Settings.php:179
-msgid "Tools"
-msgstr "Strumenti"
+#: src/Statics/Deprecation_V3.php:155
+#. translators: %s: The Gravity PDF version the feature is removed in
+#, php-format
+msgid "Support for legacy download URLs will be removed in Gravity PDF %s."
+msgstr "Il supporto per gli URL di download legacy sarà rimosso in Gravity PDF %s."
 
-#: ../../View/View_Settings.php:184
-msgid "Help"
-msgstr "Aiuto"
+#: src/Statics/Deprecation_V3.php:159
+msgid "Actions and Filters"
+msgstr "Azioni e Filtri"
 
-#: ../../View/View_Settings.php:192
-msgid "License"
-msgstr "Licenza"
-
-#: ../../View/View_Settings.php:241
-msgid "Default PDF Options"
-msgstr "Opzioni PDF predefinite"
-
-#: ../../View/View_Settings.php:242
-msgid ""
-"Control the default settings to use when you create new PDFs on your forms."
+#: src/Statics/Deprecation_V3.php:166
+#. translators: %s: The Gravity PDF version the hooks are removed in
+#, php-format
+msgid "Code on this site uses Gravity PDF hooks that are removed in version %s."
 msgstr ""
-"Controllare le impostazioni predefinite da utilizzare quando si creano nuovi "
-"PDF sui moduli."
+"Il codice su questo sito utilizza hook di Gravity PDF che sono rimossi "
+"nella versione %s."
 
-#: ../../View/View_Settings.php:266
-msgid "Security"
-msgstr "Sicurezza"
-
-#: ../../View/View_Settings.php:299
-msgid "Licensing"
-msgstr "Licenza"
-
-#: ../../View/View_Settings.php:458
-msgid "PDF Download Link"
-msgstr "Link Download PDF"
-
-#: ../../View/View_Settings.php:458
-msgid ""
-"Include the [gravitypdf] shortcode in the form's Confirmation or "
-"Notification settings to display a PDF download link. %1$sGet more info%2$s."
-msgstr ""
-"Includere lo shortcode [gravitypdf] nelle impostazioni di conferma o di "
-"notifica del modulo per visualizzare un link per il download di un PDF. "
-"%1$sPer saperne di più%2$s."
-
-#: ../../View/View_System_Report.php:76
-msgid "Unlimited"
-msgstr "Illimitato"
-
-#: ../../View/View_System_Report.php:83
-msgid ""
-"We strongly recommend you have at least 128MB of available WP Memory (RAM) "
-"assigned to your website. %1$sFind out how to increase this limit%2$s."
-msgstr ""
-"Si consiglia vivamente di avere almeno 128 MB di memoria WP (RAM) "
-"disponibile assegnata al proprio sito web. %1$sScopri come aumentare questo "
-"limite%2$s."
-
-#: ../../View/View_System_Report.php:96
-msgid ""
-"We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s is "
-"disabled."
-msgstr ""
-"Abbiamo rilevato che l'impostazione di configurazione del runtime PHP "
-"%1$sallow_url_fopen%2$s è disabilitata."
-
-#: ../../View/View_System_Report.php:97
-msgid ""
-"You may notice image display issues in your PDFs. Contact your web hosting "
-"provider for assistance enabling this feature."
-msgstr ""
-"Potreste notare problemi di visualizzazione delle immagini nei vostri PDF. "
-"Contattate il vostro provider di hosting web per ottenere assistenza "
-"nell'attivazione di questa funzione."
-
-#: ../../View/View_System_Report.php:110
-msgid ""
-"We've detected the PDFs saved in Gravity PDF's %1$stmp%2$s directory can be "
-"publicly accessed."
-msgstr ""
-"Abbiamo rilevato che i PDF salvati nella directory %1$stmp%2$s di Gravity "
-"PDF sono accessibili al pubblico."
-
-#: ../../View/View_System_Report.php:111
-msgid ""
-"We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the "
-"folder outside your public website directory%4$s."
-msgstr ""
-"Si consiglia di utilizzare il filtro %1$sgfpdf_tmp_location%2$s per "
-"%3$sspostare la cartella al di fuori della directory del sito web "
-"pubblico%4$s."
-
-#: ../../View/View_System_Report.php:127
-msgid "%1$s version %2$s is out of date. The core version is %3$s"
-msgstr "%1$s versione%2$s non è aggiornato. La versione principale è%3$s"
-
-#: ../../View/View_System_Report.php:143
-msgid "Learn how to update"
-msgstr "Scopri come aggiornare"
-
-#: ../../Helper/Fields/Field_Consent.php:142
-msgid "Consent not given."
-msgstr "Il consenso non è stato dato."
-
-#: ../../Helper/Fields/Field_Products.php:214
-msgid "Subtotal"
-msgstr "Subtotale"
-
-#: ../../Helper/Fields/Field_Products.php:219
-msgid "Shipping (%s)"
-msgstr "Spedizione (%s)"
-
-#: ../../Helper/Fields/Field_Tos.php:101
-msgid "Not accepted"
-msgstr "Non accettato"
-
-#. translators: the plugin name.
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:299
-msgid "There is a new version of %1$s available."
-msgstr "È disponibile una nuova versione di %1$s."
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:329
-msgid "Update now."
-msgstr "Aggiorna adesso."
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:318
-msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
-msgstr ""
-"%1$sGuarda i dettagli della versione %2$s%3$s o %4$saggiorna adesso%5$s."
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:310
-msgid "%1$sView version %2$s details%3$s."
-msgstr "%1$sGuarda i dettagli della versione %2$s%3$s."
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:305
-msgid "Contact your network administrator to install the update."
-msgstr "Contatta il tuo amministratore di rete per installare l'aggiornamento."
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:564
-msgid "You do not have permission to install plugin updates"
-msgstr "Non hai il permesso di installare gli aggiornamenti dei plugin"
-
-#: ../../Helper/Licensing/EDD_SL_Plugin_Updater.php:564
-msgid "Error"
-msgstr "Errore"
-
-#: ../../templates/config/focus-gravity.php:75
+#: src/templates/config/focus-gravity.php:75
 msgid "Accent Color"
 msgstr "Colore di accento"
 
-#: ../../templates/config/focus-gravity.php:77
+#: src/templates/config/focus-gravity.php:77
 msgid ""
 "The accent color is used for the page and section titles, as well as the "
 "border."
@@ -2291,118 +2383,137 @@ msgstr ""
 "Il colore d'accento viene utilizzato per i titoli delle pagine e delle "
 "sezioni, oltre che per il bordo."
 
-#: ../../templates/config/focus-gravity.php:83
+#: src/templates/config/focus-gravity.php:83
 msgid "Secondary Color"
 msgstr "Colore Secondario"
 
-#: ../../templates/config/focus-gravity.php:85
-msgid ""
-"The secondary color is used with the field labels and for alternate rows."
+#: src/templates/config/focus-gravity.php:85
+msgid "The secondary color is used with the field labels and for alternate rows."
 msgstr ""
 "Il colore secondario viene utilizzato per le etichette dei campi e per le "
 "righe alternate."
 
-#: ../../templates/config/focus-gravity.php:93
+#: src/templates/config/focus-gravity.php:93
 msgid "Combine the field label and value or have a distinct label/value."
 msgstr ""
 "Combinare l'etichetta e il valore del campo o avere un'etichetta/valore "
 "distinti."
 
-#: ../../templates/config/focus-gravity.php:95
+#: src/templates/config/focus-gravity.php:95
 msgid "Combined Label"
 msgstr "Etichetta combinata"
 
-#: ../../templates/config/focus-gravity.php:96
+#: src/templates/config/focus-gravity.php:96
 msgid "Split Label"
 msgstr "Etichetta divisa"
 
-#: ../../templates/config/rubix.php:69
+#: src/templates/config/rubix.php:69
 msgid "Container Background Color"
 msgstr "Colore di sfondo del contenitore"
 
-#: ../../templates/config/rubix.php:71
+#: src/templates/config/rubix.php:71
 msgid "Control the color of the field background."
 msgstr "Controlla il colore dello sfondo del campo."
 
-#: ../../templates/config/zadani.php:69
+#: src/templates/config/zadani.php:69
 msgid "Field Border Color"
 msgstr "Colore bordo campo"
 
-#: ../../templates/config/zadani.php:71
+#: src/templates/config/zadani.php:71
 msgid "Control the color of the field border."
 msgstr "Controlla il colore del bordo del campo."
 
-#: ../../View/html/Actions/action_buttons.php:29
+#: src/View/html/Actions/action_buttons.php:29
 msgid "Dismiss Notice"
 msgstr "Avviso eliminato"
 
-#: ../../View/html/Actions/core_font.php:21
+#: src/View/html/Actions/core_font.php:21
 msgid "Gravity PDF needs to download the Core PDF fonts."
 msgstr "Gravity PDF deve scaricare i font Core PDF."
 
-#: ../../View/html/Actions/core_font.php:25
+#: src/View/html/Actions/core_font.php:25
 msgid ""
-"Before you can generate a PDF using Gravity Forms, the core fonts need to be "
-"saved to your server. This only needs to be done once."
+"Before you can generate a PDF using Gravity Forms, the core fonts need to "
+"be saved to your server. This only needs to be done once."
 msgstr ""
 "Prima di poter generare un PDF utilizzando Gravity Forms, i font principali "
 "devono essere salvati sul server. Questo deve essere fatto solo una volta."
 
-#: ../../View/html/FormSettings/add_edit.php:62,
-#: ../../View/html/Settings/general.php:50
+#: src/View/html/Actions/deprecated_features.php:24
+msgid "This site uses deprecated Gravity PDF functionality:"
+msgstr "Questo sito utilizza funzionalità deprecate di Gravity PDF:"
+
+#: src/View/html/Actions/deprecated_features.php:31
+#: src/View/View_System_Report.php:458
+msgid "Learn how to upgrade"
+msgstr "Scopri come aggiornare"
+
+#: src/View/html/Actions/deprecated_features.php:36
+msgid ""
+"Dismissing this notice hides the items above. Anything found later is "
+"reported again."
+msgstr ""
+"Ignorare questo avviso nasconde gli elementi sopra. Qualsiasi cosa trovata "
+"successivamente sarà segnalata di nuovo."
+
+#: src/View/html/FormSettings/add_edit.php:62
+#: src/View/html/Settings/general.php:50
 msgid "Want more features? Take a look at our addons."
 msgstr "Volete altre funzioni? Date un'occhiata ai nostri addons."
 
-#: ../../View/html/FormSettings/list.php:37
+#: src/View/html/FormSettings/list.php:37
 msgid "Add new PDF"
 msgstr "Aggiungi un nuovo PDF"
 
-#: ../../View/html/GravityForms/fieldset.php:67
+#: src/View/html/GravityForms/fieldset.php:67
+#, php-format
 msgid "Toggle %s Section"
 msgstr "Alterna %s Sezione"
 
-#: ../../View/html/PDF/entry_detailed_pdf.php:32
+#: src/View/html/PDF/entry_detailed_pdf.php:32
+#, php-format
 msgid "View or download %s.pdf"
 msgstr "Visualizza o scarica %s.pdf"
 
-#: ../../View/html/PDF/entry_list_pdf_multiple.php:20
+#: src/View/html/PDF/entry_list_pdf_multiple.php:20
 msgid "Download PDFs"
 msgstr "Scaricare PDF"
 
-#: ../../View/html/PDF/entry_list_pdf_multiple.php:20
+#: src/View/html/PDF/entry_list_pdf_multiple.php:20
 msgid "View PDFs"
 msgstr "Visualizza i PDF"
 
-#: ../../View/html/PDF/entry_list_pdf_single.php:29
+#: src/View/html/PDF/entry_list_pdf_single.php:29
 msgid "View PDF"
 msgstr "Visualizza PDF"
 
-#: ../../View/html/PDF/entry_no_valid_pdf.php:20
+#: src/View/html/PDF/entry_no_valid_pdf.php:20
 msgid "No PDFs available for this entry."
 msgstr "Non sono disponibili PDF per questa voce."
 
-#: ../../View/html/Settings/help.php:27
+#: src/View/html/Settings/help.php:27
 msgid "Get help with Gravity PDF"
 msgstr "Chiedete aiuto con Gravity PDF"
 
-#: ../../View/html/Settings/help.php:29
+#: src/View/html/Settings/help.php:29
 msgid ""
-"Search the documentation for an answer to your question. If you need further "
-"assistance, contact support and our team will be happy to help."
+"Search the documentation for an answer to your question. If you need "
+"further assistance, contact support and our team will be happy to help."
 msgstr ""
 "Cercate nella documentazione la risposta alla vostra domanda. Se avete "
 "bisogno di ulteriore assistenza, contattate il supporto e il nostro team "
 "sarà lieto di aiutarvi."
 
-#: ../../View/html/Settings/help.php:34
+#: src/View/html/Settings/help.php:34
 msgid "View Documentation"
 msgstr "Vedi la documentazione"
 
-#: ../../View/html/Settings/help.php:35
+#: src/View/html/Settings/help.php:35
 msgid "Contact Support"
 msgstr "Contatta il supporto"
 
-#: ../../View/html/Settings/help.php:38
+#: src/View/html/Settings/help.php:38
+#, php-format
 msgid ""
 "Support hours are 9:00am-5:00pm Monday to Friday, %1$sSydney Australia "
 "time%2$s (public holidays excluded)."
@@ -2410,30 +2521,18 @@ msgstr ""
 "L'orario di assistenza è dalle 9:00 alle 17:00 dal lunedì al venerdì, "
 "%1$sora di Sydney Australia%2$s (esclusi i giorni festivi)."
 
-#: ../../View/html/Settings/licence-info.php:22
+#: src/View/html/Settings/licence-info.php:22
+#, php-format
 msgid ""
-"To take advantage of automatic updates for your Gravity PDF extension(s), "
-"enter and save your license key(s) below. %1$sYou can find your purchased "
-"licenses in your GravityPDF.com account%2$s."
+"To take advantage of automatic updates enter and save your license key(s) "
+"below. %1$sYou can find your purchased licenses in your GravityPDF.com "
+"account%2$s."
 msgstr ""
-"Per usufruire degli aggiornamenti automatici per le estensioni di Gravity "
-"PDF, inserire e salvare le chiavi di licenza qui sotto. %1$sPotete trovare "
-"le licenze acquistate nel vostro account GravityPDF.com%2$s."
+"Per usufruire degli aggiornamenti automatici inserisci e salva la/le "
+"chiave/i di licenza qui sotto. %1$sPuoi trovare le licenze acquistate nel "
+"tuo account GravityPDF.com%2$s."
 
-#: ../../View/html/Settings/licence-info.php:30
-msgid ""
-"When a Gravity PDF extension is enabled, the plugin periodically polls "
-"GravityPDF.com over HTTPS for your license status and plugin updates. The "
-"only data sent is your website domain name and license key (if provided). To "
-"opt-out you need to deactivate all Gravity PDF extensions."
-msgstr ""
-"Quando un'estensione di Gravity PDF è abilitata, il plugin interroga "
-"periodicamente GravityPDF.com tramite HTTPS per conoscere lo stato della "
-"licenza e gli aggiornamenti del plugin. Gli unici dati inviati sono il nome "
-"del dominio del sito web e la chiave di licenza (se fornita). Per rinunciare "
-"è necessario disattivare tutte le estensioni di Gravity PDF."
-
-#: ../../View/html/Shortcodes/conditional_logic_not_met.php:20
+#: src/View/html/Shortcodes/conditional_logic_not_met.php:20
 msgid ""
 "PDF link not displayed because conditional logic requirements have not been "
 "met."
@@ -2441,37 +2540,37 @@ msgstr ""
 "Il link PDF non viene visualizzato perché i requisiti della logica "
 "condizionale non sono stati soddisfatti."
 
-#: ../../View/html/Shortcodes/conditional_logic_not_met.php:21,
-#: ../../View/html/Shortcodes/invalid_pdf_config.php:21,
-#: ../../View/html/Shortcodes/no_entry_id.php:21,
-#: ../../View/html/Shortcodes/pdf_not_active.php:21
+#: src/View/html/Shortcodes/conditional_logic_not_met.php:21
+#: src/View/html/Shortcodes/invalid_pdf_config.php:21
+#: src/View/html/Shortcodes/no_entry_id.php:21
+#: src/View/html/Shortcodes/pdf_not_active.php:21
 msgid "(Admin Only Message)"
 msgstr "(Messaggio riservato agli amministratori)"
 
-#: ../../View/html/Shortcodes/invalid_pdf_config.php:20
-msgid ""
-"Could not get Gravity PDF configuration using the PDF and Entry IDs passed."
+#: src/View/html/Shortcodes/invalid_pdf_config.php:20
+msgid "Could not get Gravity PDF configuration using the PDF and Entry IDs passed."
 msgstr ""
 "Impossibile ottenere la configurazione di Gravity PDF utilizzando il PDF e "
 "gli ID di ingresso forniti."
 
-#: ../../View/html/Shortcodes/no_entry_id.php:20
+#: src/View/html/Shortcodes/no_entry_id.php:20
 msgid ""
-"No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry ID "
-"via the confirmation url query string – using either \"entry\" or \"lid\" as "
-"the query string name – or by passing an ID directly to the shortcode."
+"No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry "
+"ID via the confirmation url query string – using either \"entry\" or "
+"\"lid\" as the query string name – or by passing an ID directly to the "
+"shortcode."
 msgstr ""
-"Nessun ID di iscrizione a Gravity Form passato a Gravity PDF. Assicurarsi di "
-"passare l'ID della voce tramite la query string dell'url di conferma, "
+"Nessun ID di iscrizione a Gravity Form passato a Gravity PDF. Assicurarsi "
+"di passare l'ID della voce tramite la query string dell'url di conferma, "
 "utilizzando \"entry\" o \"lid\" come nome della query string, oppure "
 "passando un ID direttamente allo shortcode."
 
-#: ../../View/html/Shortcodes/pdf_not_active.php:20
+#: src/View/html/Shortcodes/pdf_not_active.php:20
 msgid "PDF link not displayed because PDF is inactive."
 msgstr "Il link al PDF non viene visualizzato perché il PDF è inattivo."
 
-#: ../../View/html/Uninstaller/uninstall_button.php:39,
-#: ../../View/html/Uninstaller/uninstall_button.php:40
+#: src/View/html/Uninstaller/uninstall_button.php:39
+#: src/View/html/Uninstaller/uninstall_button.php:40
 msgid ""
 "This operation deletes ALL Gravity PDF settings and deactivates the plugin. "
 "If you continue, all settings, configuration, custom templates and fonts "
@@ -2480,3 +2579,214 @@ msgstr ""
 "Questa operazione cancella TUTTE le impostazioni di Gravity PDF e disattiva "
 "il plugin. Se si continua, tutte le impostazioni, la configurazione, i "
 "modelli personalizzati e i font verranno rimossi."
+
+#: src/View/View_Form_Settings.php:42
+msgid "General"
+msgstr "Generale"
+
+#: src/View/View_Form_Settings.php:54
+msgid "Appearance"
+msgstr "Aspetto"
+
+#: src/View/View_Settings.php:181
+msgid "Tools"
+msgstr "Strumenti"
+
+#: src/View/View_Settings.php:186
+msgid "Help"
+msgstr "Aiuto"
+
+#: src/View/View_Settings.php:194
+msgid "License"
+msgstr "Licenza"
+
+#: src/View/View_Settings.php:243
+msgid "Default PDF Options"
+msgstr "Opzioni PDF predefinite"
+
+#: src/View/View_Settings.php:244
+msgid "Control the default settings to use when you create new PDFs on your forms."
+msgstr ""
+"Controllare le impostazioni predefinite da utilizzare quando si creano "
+"nuovi PDF sui moduli."
+
+#: src/View/View_Settings.php:268
+msgid "Security"
+msgstr "Sicurezza"
+
+#: src/View/View_Settings.php:301
+msgid "Licensing"
+msgstr "Licenza"
+
+#: src/View/View_Settings.php:460
+msgid "PDF Download Link"
+msgstr "Link Download PDF"
+
+#: src/View/View_Settings.php:460
+#, php-format
+msgid ""
+"Include the [gravitypdf] shortcode in the form's Confirmation or "
+"Notification settings to display a PDF download link. %1$sGet more info%2$s."
+msgstr ""
+"Includere lo shortcode [gravitypdf] nelle impostazioni di conferma o di "
+"notifica del modulo per visualizzare un link per il download di un PDF. "
+"%1$sPer saperne di più%2$s."
+
+#: src/View/View_System_Report.php:77
+msgid "Unlimited"
+msgstr "Illimitato"
+
+#: src/View/View_System_Report.php:84
+#, php-format
+msgid ""
+"We strongly recommend you have at least 128MB of available WP Memory (RAM) "
+"assigned to your website. %1$sFind out how to increase this limit%2$s."
+msgstr ""
+"Si consiglia vivamente di avere almeno 128 MB di memoria WP (RAM) "
+"disponibile assegnata al proprio sito web. %1$sScopri come aumentare questo "
+"limite%2$s."
+
+#: src/View/View_System_Report.php:97
+#, php-format
+msgid ""
+"We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s "
+"is disabled."
+msgstr ""
+"Abbiamo rilevato che l'impostazione di configurazione del runtime PHP "
+"%1$sallow_url_fopen%2$s è disabilitata."
+
+#: src/View/View_System_Report.php:98
+msgid ""
+"You may notice image display issues in your PDFs. Contact your web hosting "
+"provider for assistance enabling this feature."
+msgstr ""
+"Potreste notare problemi di visualizzazione delle immagini nei vostri PDF. "
+"Contattate il vostro provider di hosting web per ottenere assistenza "
+"nell'attivazione di questa funzione."
+
+#: src/View/View_System_Report.php:111
+#, php-format
+msgid ""
+"We've detected the PDFs saved in Gravity PDF's %1$stmp%2$s directory can be "
+"publicly accessed."
+msgstr ""
+"Abbiamo rilevato che i PDF salvati nella directory %1$stmp%2$s di Gravity "
+"PDF sono accessibili al pubblico."
+
+#: src/View/View_System_Report.php:112
+#, php-format
+msgid ""
+"We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the "
+"folder outside your public website directory%4$s."
+msgstr ""
+"Si consiglia di utilizzare il filtro %1$sgfpdf_tmp_location%2$s per "
+"%3$sspostare la cartella al di fuori della directory del sito web "
+"pubblico%4$s."
+
+#: src/View/View_System_Report.php:128
+#, php-format
+msgid "%1$s version %2$s is out of date. The core version is %3$s"
+msgstr "%1$s versione%2$s non è aggiornato. La versione principale è%3$s"
+
+#: src/View/View_System_Report.php:146
+msgid "Learn how to update"
+msgstr "Scopri come aggiornare"
+
+#: src/View/View_System_Report.php:237
+#. translators: %1$s: The template file name
+#, php-format
+msgid "%1$s (not configured on a form)"
+msgstr "%1$s (non configurato su un modulo)"
+
+#: src/View/View_System_Report.php:240
+#. translators: 1: The template file name, 2: Comma separated list of form IDs
+#, php-format
+msgid "%1$s (form ID %2$s)"
+msgid_plural "%1$s (form IDs %2$s)"
+msgstr[0] "%1$s (ID modulo %2$s)"
+msgstr[1] "%1$s (ID moduli %2$s)"
+
+#: src/View/View_System_Report.php:266
+#. translators: %s: Comma separated list of form IDs
+#, php-format
+msgid "In use on form ID %s"
+msgstr "In uso sul modulo ID %s"
+
+#: src/View/View_System_Report.php:308
+#. translators: 1: Filter name, 2: Number of callbacks attached to it
+#, php-format
+msgid "%1$s has %2$d listener"
+msgid_plural "%1$s has %2$d listeners"
+msgstr[0] "%1$s ha %2$d listener"
+msgstr[1] "%1$s ha %2$d listener"
+
+#: src/View/View_System_Report.php:385
+msgid "Unsupported"
+msgstr "Non supportato"
+
+#: src/View/View_System_Report.php:386
+msgid ""
+"These features have been removed and any Gravity PDF document that relied "
+"on them will stop working."
+msgstr ""
+"Queste funzionalità sono state rimosse e qualsiasi documento di Gravity PDF "
+"che dipendeva da esse smetterà di funzionare."
+
+#: src/View/View_System_Report.php:390
+msgid "Deprecated"
+msgstr "Deprecato"
+
+#: src/View/View_System_Report.php:391
+msgid ""
+"Legacy functionality that will be removed in an upcoming release. It's "
+"important to fix each item to keep your PDFs working correctly."
+msgstr ""
+"Funzionalità legacy che sarà rimossa in una prossima versione. È importante "
+"correggere ogni elemento per mantenere i tuoi PDF funzionanti correttamente."
+
+#: src/View/View_System_Report.php:411
+msgid "Your PDFs are ready for the next Gravity PDF release"
+msgstr "I tuoi PDF sono pronti per la prossima versione di Gravity PDF"
+
+#: src/View/View_System_Report.php:417
+msgid ""
+"Nothing on this site relies on Gravity PDF functionality that is scheduled "
+"for removal, so there is nothing to do."
+msgstr ""
+"Nulla in questo sito si basa su funzionalità di Gravity PDF programmate per "
+"la rimozione, quindi non c'è nulla da fare."
+
+#: src/View/View_System_Report.php:427
+msgid "Your site uses Gravity PDF functionality that is scheduled for removal"
+msgstr ""
+"Il tuo sito utilizza funzionalità di Gravity PDF programmate per la "
+"rimozione"
+
+#: src/View/View_System_Report.php:429
+msgid ""
+"Update each item below before the release that removes it, so the PDFs that "
+"rely on it will continue working. Each one links to instructions to upgrade."
+msgstr ""
+"Aggiorna ogni voce qui sotto prima del rilascio che la rimuove, così i PDF "
+"che ne dipendono continueranno a funzionare. Ognuna collega alle istruzioni "
+"per l'aggiornamento."
+
+#: src/View/View_System_Report.php:444
+msgid "View the Gravity Forms system report"
+msgstr "Visualizza il rapporto di sistema di Gravity Forms"
+
+#: src/View/View_System_Report.php:493
+#. translators: %s: The group name, as get_deprecated_groups() gives it
+#, php-format
+msgid "%s functionality"
+msgstr "%s funzionalità"
+
+#: src/View/View_System_Report.php:494
+msgid "None detected"
+msgstr "Nessuna rilevata"
+
+#: src/View/View_System_Report.php:500
+#. translators: %s: The group name, as get_deprecated_groups() gives it
+#, php-format
+msgid "Gravity PDF - %s Functionality"
+msgstr "Gravity PDF - %s funzionalità"
