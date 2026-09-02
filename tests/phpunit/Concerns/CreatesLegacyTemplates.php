@@ -26,7 +26,7 @@ trait CreatesLegacyTemplates {
 
 		/* the template list is memoized per request by GFCache, and what Deprecation read off it by the detector */
 		\GFCache::flush();
-		\GFPDF\Statics\Deprecation_V3::flush_cache();
+		\GFPDF\Statics\Deprecation::flush_cache();
 
 		return $path;
 	}
@@ -57,6 +57,6 @@ trait CreatesLegacyTemplates {
 		}
 
 		\GFCache::flush();
-		\GFPDF\Statics\Deprecation_V3::flush_cache();
+		\GFPDF\Statics\Deprecation::flush_cache();
 	}
 }

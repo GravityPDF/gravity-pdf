@@ -57,4 +57,14 @@ interface Helper_Interface_Deprecated_Features {
 	 * @since 6.17.0
 	 */
 	public static function get_stored_options(): array;
+
+	/**
+	 * Forget anything this class held for the request, so the next detection reads the site as it is now
+	 *
+	 * Called by Deprecation::flush_cache(), which is the one entry point callers use. A class caching nothing
+	 * implements it empty.
+	 *
+	 * @since 6.17.0
+	 */
+	public static function flush_cache(): void;
 }

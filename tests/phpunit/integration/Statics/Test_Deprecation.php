@@ -60,6 +60,7 @@ class Test_Deprecation extends TestCase {
 		$this->assertSame( [], Fake_Deprecation::get_signals() );
 
 		Fake_Deprecated_Features::$detections = [ 'a detection' ];
+		Fake_Deprecation::flush_cache();
 
 		$signals = Fake_Deprecation::get_signals();
 
@@ -149,6 +150,9 @@ class Fake_Deprecated_Features implements Helper_Interface_Deprecated_Features {
 
 	public static function get_stored_options(): array {
 		return [ self::OPTION ];
+	}
+
+	public static function flush_cache(): void {
 	}
 }
 

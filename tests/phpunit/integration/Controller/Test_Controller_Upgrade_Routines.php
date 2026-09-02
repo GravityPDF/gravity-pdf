@@ -50,6 +50,7 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 		/* Fixed on the site, so the next release clears the record the notices read */
 		\GFAPI::delete_form( $form_id );
+		Deprecation::flush_cache();
 
 		do_action( 'gfpdf_version_changed', '6.17.0', '6.17.1' );
 

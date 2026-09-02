@@ -104,7 +104,7 @@ class Test_Deprecation_V3 extends TestCase {
 
 		/* A trashed form isn't in the user's form list, so there's nothing for them to act on */
 		\GFAPI::delete_form( $form_id );
-		Deprecation_V3::flush_cache();
+		Deprecation::flush_cache();
 
 		$this->assertSame( [], Deprecation_V3::get_legacy_templates()[ $path ] );
 

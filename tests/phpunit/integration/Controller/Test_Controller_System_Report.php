@@ -184,6 +184,7 @@ class Test_Controller_System_Report extends TestCase {
 		};
 
 		add_filter( 'gfpdfe_pdf_filename', $callback );
+		Deprecation::flush_cache();
 
 		$items = $this->get_deprecated_features();
 		$this->assertArrayHasKey( 'deprecated_filters', $items );

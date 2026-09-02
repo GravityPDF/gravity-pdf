@@ -381,6 +381,9 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 		/* The notices read a record taken at install and on each version change, which a URL followed since then
 		   won't be in yet */
 		Deprecation::mark_feature_detected( static::FEATURE_LEGACY_ENDPOINT );
+
+		/* This is what the endpoint detector reads, so anything detecting later in the request reads it fresh */
+		Deprecation::flush_cache();
 	}
 
 	/**
@@ -475,7 +478,7 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	 *
 	 * The scan reads the template directory and the stored forms, and nothing changes either between the two
 	 * detectors asking, so what it finds is held for the request. Anything that does change them while a request
-	 * is still running has to say so here.
+	 * is still running calls Deprecation::flush_cache(), which is what reaches this.
 	 *
 	 * @since 6.17.0
 	 */

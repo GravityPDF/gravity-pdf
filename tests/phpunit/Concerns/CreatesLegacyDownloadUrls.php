@@ -55,6 +55,9 @@ trait CreatesLegacyDownloadUrls {
 
 		\GFAPI::update_form( $form );
 
+		/* Deprecation holds what its detectors found for the request, and this is one of the things they read */
+		\GFPDF\Statics\Deprecation::flush_cache();
+
 		return (int) $form['id'];
 	}
 }
