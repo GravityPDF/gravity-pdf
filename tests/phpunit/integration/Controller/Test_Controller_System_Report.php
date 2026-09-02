@@ -96,6 +96,108 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	/**
+	 * The report was keyed by position until 6.17.0, so an add-on written against it names an index, not a section
+	 */
+	public function test_the_positional_report_items_filter_reaches_the_section_each_index_stood_for() {
+		$this->setExpectedDeprecated( 'gfpdf_system_status_report_items' );
+
+		$callback = static function ( $items ) {
+			foreach ( array_keys( $items ) as $index ) {
+				$items[ $index ][ 'row_' . $index ] = [
+					'label' => 'Third Party Row',
+					'value' => (string) $index,
+				];
+			}
+
+			/* What the filter takes out has to stay out, so the read-back replaces the section rather than merging it */
+			unset( $items[0]['default_charset'] );
+
+			/* No section has ever answered to this, so there is nowhere for it to land */
+			$items[4] = [ 'orphan_row' => [ 'label' => 'Orphan Row' ] ];
+
+			return $items;
+		};
+
+		add_filter( 'gfpdf_system_status_report_items', $callback );
+
+		$system_report = apply_filters( 'gform_system_report', [] );
+
+		remove_filter( 'gfpdf_system_status_report_items', $callback );
+
+		$this->assertArrayHasKey( 'row_0', $this->get_report_section( 'php', $system_report ) );
+		$this->assertArrayHasKey( 'row_1', $this->get_report_section( 'directories', $system_report ) );
+		$this->assertArrayHasKey( 'row_2', $this->get_report_section( 'global', $system_report ) );
+		$this->assertArrayHasKey( 'row_3', $this->get_report_section( 'security', $system_report ) );
+
+		$this->assertArrayNotHasKey( 'default_charset', $this->get_report_section( 'php', $system_report ) );
+		$this->assertCount( 4, $system_report[0]['tables'] );
+	}
+
+	/**
+	 * A section added since is held back from the positional filter, since numbering it renumbers the four below it
+	 */
+	public function test_the_positional_report_items_filter_is_held_to_the_four_sections_it_knew() {
+		$this->setExpectedDeprecated( 'gfpdf_system_status_report_items' );
+
+		$path       = $this->create_legacy_template();
+		$positional = [];
+		$named      = [];
+
+		$capture_positional = static function ( $items ) use ( &$positional ) {
+			$positional = $items;
+
+			return $items;
+		};
+
+		$capture_named = static function ( $items ) use ( &$named ) {
+			$named = $items;
+
+			return $items;
+		};
+
+		add_filter( 'gfpdf_system_status_report_items', $capture_positional );
+		add_filter( 'gfpdf_system_status_report_sections', $capture_named );
+
+		$system_report = apply_filters( 'gform_system_report', [] );
+
+		remove_filter( 'gfpdf_system_status_report_items', $capture_positional );
+		remove_filter( 'gfpdf_system_status_report_sections', $capture_named );
+
+		$this->assertSame( [ 0, 1, 2, 3 ], array_keys( $positional ) );
+
+		/* The replacement is keyed by name, so the section the positional filter never saw is in it */
+		$this->assertArrayHasKey( Deprecation::GROUP_DEPRECATED, $named );
+		$this->assertArrayHasKey( 'directories', $named );
+
+		/* And the section is still in the report */
+		$this->assertArrayHasKey( 'legacy_templates', $this->get_report_section( Deprecation::GROUP_DEPRECATED, $system_report ) );
+
+		$this->delete_legacy_templates( $path );
+	}
+
+	/**
+	 * Naming the section is what a section added or dropped above it no longer moves
+	 */
+	public function test_the_report_sections_filter_adds_a_row_by_section_name() {
+		$callback = static function ( $items ) {
+			$items['directories']['third_party_row'] = [
+				'label' => 'Third Party Row',
+				'value' => 'From the named filter',
+			];
+
+			return $items;
+		};
+
+		add_filter( 'gfpdf_system_status_report_sections', $callback );
+
+		$system_report = apply_filters( 'gform_system_report', [] );
+
+		remove_filter( 'gfpdf_system_status_report_sections', $callback );
+
+		$this->assertArrayHasKey( 'third_party_row', $this->get_report_section( 'directories', $system_report ) );
+	}
+
+	/**
 	 * Get the items of one Gravity PDF report section, by the ID the section declares
 	 *
 	 * Looked up by name so a section added or dropped above doesn't move every assertion below it.
