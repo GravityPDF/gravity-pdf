@@ -391,7 +391,7 @@ class Model_Templates extends Helper_Abstract_Model {
 			/* Check if we have a valid v4 template header in the file */
 			$info = $this->templates->get_template_info_by_path( $file );
 
-			if ( $info['group'] === esc_html__( 'Legacy', 'gravity-pdf' ) ) {
+			if ( $this->templates->is_legacy_template( $info ) ) {
 				/* Check if it's a v3 template */
 				$fp        = fopen( $file, 'rb' );
 				$file_data = fread( $fp, 8192 );

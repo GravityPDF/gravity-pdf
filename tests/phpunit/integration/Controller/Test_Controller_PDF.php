@@ -7,6 +7,8 @@ namespace GFPDF\Controller;
 use Exception;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Statics\Deprecation;
+use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF\View\View_PDF;
 use ReflectionMethod;
@@ -126,7 +128,7 @@ class Test_Controller_PDF extends TestCase {
 	}
 
 	public function test_sgoptimizer_html_minification_fix_emits_doing_it_wrong() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\Controller\Controller_PDF::sgoptimizer_html_minification_fix' );
+		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::sgoptimizer_html_minification_fix' );
 
 		$this->controller->sgoptimizer_html_minification_fix();
 	}
@@ -173,8 +175,8 @@ class Test_Controller_PDF extends TestCase {
 	 * @group slow
 	 */
 	public function test_process_legacy_pdf_endpoint() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint' );
-		$this->setExpectedIncorrectUsage( 'GFPDF\Model\Model_PDF::get_legacy_config' );
+		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint' );
+		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config' );
 
 		/* Test our endpoint is firing correctly */
 		$results = $this->form_and_entry();
@@ -209,6 +211,42 @@ class Test_Controller_PDF extends TestCase {
 
 			return;
 		}
+	}
+
+	/**
+	 * A legacy URL is often pasted somewhere the form scan can't see, so the endpoint records the form it served
+	 *
+	 * @group slow
+	 */
+	public function test_process_legacy_pdf_endpoint_records_the_form_it_served() {
+		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint' );
+		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config' );
+
+		$results = $this->form_and_entry();
+		$form_id = (int) $results['form']['id'];
+
+		$_GET['gf_pdf']   = 1;
+		$_GET['fid']      = $form_id;
+		$_GET['lid']      = $results['entry']['id'];
+		$_GET['template'] = 'zadani.php';
+
+		$this->assertSame( [], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
+
+		/* Recorded before the PDF is served, so a request the middleware turns away still counts as one made */
+		try {
+			wp_set_current_user( 0 );
+			$this->controller->process_legacy_pdf_endpoint();
+		} catch ( Exception $e ) {
+			$this->assertSame( 'Redirecting', $e->getMessage() );
+		}
+
+		$this->assertSame( [ $form_id ], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
+
+		/* The form's own settings never mentioned the URL, so only the record can report it */
+		$this->assertSame( [ $form_id ], Deprecation_V3::get_legacy_download_urls() );
+
+		/* The notices read a record taken at install and on each version change, which this happened after */
+		$this->assertContains( Deprecation_V3::FEATURE_LEGACY_ENDPOINT, Deprecation::get_detected_features() );
 	}
 
 	/**

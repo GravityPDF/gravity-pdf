@@ -10,6 +10,7 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Pdf_Queue;
+use GFPDF\Statics\Deprecation;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
@@ -182,8 +183,8 @@ class Model_Install extends Helper_Abstract_Model {
 		$upload_dir_url = $this->data->upload_dir_url;
 
 		/* Legacy Filters */
-		$this->data->template_location     = trailingslashit( apply_filters( 'gfpdfe_template_location', $template_dir, $working_folder, $upload_dir ) );
-		$this->data->template_location_url = trailingslashit( apply_filters( 'gfpdfe_template_location_uri', $template_url, $working_folder, $upload_dir_url ) );
+		$this->data->template_location     = trailingslashit( Deprecation::apply_filters( 'gfpdfe_template_location', [ $template_dir, $working_folder, $upload_dir ] ) );
+		$this->data->template_location_url = trailingslashit( Deprecation::apply_filters( 'gfpdfe_template_location_uri', [ $template_url, $working_folder, $upload_dir_url ] ) );
 
 		/* Allow user to change directory location(s) */
 
@@ -398,6 +399,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function uninstall_plugin() {
+		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::uninstall_plugin()' );
+
 		$this->uninstall->uninstall_plugin();
 	}
 
@@ -409,6 +412,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function remove_plugin_options() {
+		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::remove_plugin_options()' );
+
 		$this->uninstall->remove_plugin_options();
 	}
 
@@ -421,6 +426,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function remove_plugin_form_settings() {
+		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::remove_plugin_form_settings()' );
+
 		$this->uninstall->remove_plugin_form_settings();
 	}
 
@@ -432,6 +439,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function remove_folder_structure() {
+		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::remove_folder_structure()' );
+
 		$this->uninstall->remove_folder_structure();
 	}
 
@@ -443,6 +452,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function deactivate_plugin() {
+		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::deactivate_plugin()' );
+
 		$this->uninstall->deactivate_plugin();
 	}
 

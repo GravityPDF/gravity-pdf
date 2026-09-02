@@ -127,7 +127,7 @@ class Queue_Callbacks {
 	 * @deprecated 6.12 Caching layer + auto-purge added
 	 */
 	public static function cleanup_pdfs( $form_id, $entry_id ) {
-		_doing_it_wrong( __METHOD__, 'This method is deprecated and no alternative is available. The temporary cache is automatically cleaned every hour using the WP Cron.', '6.12' );
+		_deprecated_function( __METHOD__, '6.12' );
 
 		$gform = GPDFAPI::get_form_class();
 		$log   = GPDFAPI::get_log_class();

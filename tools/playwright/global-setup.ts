@@ -1,5 +1,5 @@
-import { execSync } from 'node:child_process';
 import { test as setup } from '@playwright/test';
+import { wpCli } from '@self:playwright/utils/wp-cli';
 
 setup('setup', async ({ request }, testInfo) => {
 	const storageStatePath = testInfo.project.metadata
@@ -22,19 +22,9 @@ setup('setup', async ({ request }, testInfo) => {
 		permalinkStructure === ''
 			? '(rm -f /var/www/html/.htaccess || true)'
 			: 'wp rewrite flush --hard';
-	const cmd = `yarn wp-env:e2e run cli bash -c "wp option update permalink_structure '${permalinkStructure}' && ${flush}"`;
-	try {
-		execSync(cmd, { stdio: ['ignore', 'pipe', 'pipe'] });
-	} catch (err) {
-		const e = err as {
-			stderr?: Buffer;
-			stdout?: Buffer;
-			status?: number;
-		};
-		throw new Error(
-			`Permalink flip failed (exit ${e.status ?? '?'})\n--- stdout ---\n${e.stdout?.toString() ?? '(empty)'}\n--- stderr ---\n${e.stderr?.toString() ?? '(empty)'}`
-		);
-	}
+	wpCli(
+		`wp option update permalink_structure '${permalinkStructure}' && ${flush}`
+	);
 
 	const { RequestUtils } =
 		await import('@wordpress/e2e-test-utils-playwright');

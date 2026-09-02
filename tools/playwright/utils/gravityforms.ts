@@ -12,7 +12,18 @@ type Entry = {
 	form_id: number;
 	created_by?: number;
 	ip?: string;
+	date_created?: string;
 };
+
+/**
+ * A `date_created` for entries whose creation date ends up in a Chromatic snapshot
+ *
+ * Gravity Forms stamps a new entry with the current UTC time and the entry list renders it to the minute, so a
+ * snapshot of that screen differs on every run no matter how long the test waits. GFAPI takes this verbatim when
+ * it is supplied. Pass it only where the date is on screen: an entry is also what Gravity PDF times anonymous
+ * access from, so backdating one withdraws access a logged out visitor is supposed to still have.
+ */
+export const FIXED_ENTRY_DATE = '2020-01-01 00:00:00';
 
 export default class GravityForms {
 	protected requestUtils: RequestUtils;
@@ -28,6 +39,24 @@ export default class GravityForms {
 	/*
 	 * Form management
 	 */
+	/**
+	 * Merge `patch` into a form over the REST API
+	 *
+	 * The endpoint replaces the whole form, so the current one is read back first. Used for settings the admin UI
+	 * doesn't offer, and for those it does when the point of the test is elsewhere.
+	 */
+	async updateForm(formId: number, patch: object) {
+		const form: object = await this.requestUtils.rest({
+			path: `/gf/v2/forms/${formId}`,
+		});
+
+		return await this.requestUtils.rest({
+			method: 'PUT',
+			path: `/gf/v2/forms/${formId}`,
+			data: { ...form, ...patch },
+		});
+	}
+
 	async createForm(title: string, type: string = 'standard.json') {
 		const formJson: string = await readFile(
 			__dirname + '/../data/forms/' + type,
@@ -157,6 +186,11 @@ export default class GravityForms {
 	) {
 		const container = await this.page.locator(containerSelector);
 
+		// The caller may have only just clicked through to this screen. `switchToCodeEditor()` cannot stand in
+		// for the wait: with nothing rendered yet it finds no editor to switch and returns at once, leaving the
+		// fill below to time out on a textarea that had not arrived.
+		await container.locator('.wp-editor-wrap').waitFor();
+
 		await this.switchToCodeEditor();
 
 		const textbox = container.getByRole('textbox').last();
@@ -173,6 +207,43 @@ export default class GravityForms {
 	}
 
 	async switchToCodeEditor() {
+		// The Code tab hands off to WordPress' `switchEditor()`, which calls `editor.hide()` and copies the
+		// TinyMCE iframe's height onto the textarea it reveals. Both need an initialised editor: clicking early
+		// throws out of `hide()` before the class swap below it, leaving the editor in visual mode with its
+		// textarea still hidden, and the height it copies is whatever the iframe had reached by then — which is
+		// what moves the box between snapshots. The images inside count too, since they are what the editor
+		// sizes itself around.
+		await this.page.waitForFunction(
+			() => {
+				const tinymce = (window as any).tinymce;
+
+				return Array.from(
+					document.querySelectorAll('.wp-editor-wrap.tmce-active')
+				)
+					.filter((wrap) => (wrap as HTMLElement).offsetParent)
+					.every((wrap) => {
+						const editor = tinymce?.get?.(
+							wrap.id.replace(/^wp-/, '').replace(/-wrap$/, '')
+						);
+
+						if (!editor?.initialized) {
+							return false;
+						}
+
+						const doc = editor.getDoc?.();
+
+						return (
+							!doc ||
+							Array.from(doc.images).every(
+								(image: any) => image.complete
+							)
+						);
+					});
+			},
+			undefined,
+			{ timeout: 15000 }
+		);
+
 		for (const button of await this.page
 			.locator('.wp-editor-tabs')
 			.getByRole('button', { name: /^Code$/ })

@@ -10,6 +10,7 @@ use GFPDF\Helper\Helper_Interface_Extension_Uninstaller;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Pdf_Queue;
+use GFPDF\Statics\Deprecation;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
@@ -163,6 +164,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
+		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
 		global $wpdb;

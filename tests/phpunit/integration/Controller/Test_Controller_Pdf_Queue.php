@@ -363,8 +363,8 @@ class Test_Controller_Pdf_Queue extends TestCase {
 	 * @since 5.0
 	 */
 	public function test_cleanup_pdfs() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\Statics\Queue_Callbacks::cleanup_pdfs' );
-		$this->setExpectedIncorrectUsage( 'GFPDF\Model\Model_PDF::cleanup_pdf' );
+		$this->setExpectedDeprecated( 'GFPDF\Statics\Queue_Callbacks::cleanup_pdfs' );
+		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::cleanup_pdf' );
 
 		$form_class = \GPDFAPI::get_form_class();
 

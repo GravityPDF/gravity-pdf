@@ -222,8 +222,8 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_process_legacy_pdf_endpoint() {
-		$this->setExpectedIncorrectUsage( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint');
-		$this->setExpectedIncorrectUsage( 'GFPDF\Model\Model_PDF::get_legacy_config');
+		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint');
+		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config');
 
 		/* Force a failure */
 		$this->assertNull( $this->controller->process_legacy_pdf_endpoint() );
@@ -814,6 +814,7 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_get_pdf_name() {
+		$this->setExpectedDeprecated( 'gfpdfe_pdf_filename' );
 
 		/* Setup some test data */
 		$results = $this->form_and_entry();
@@ -1340,7 +1341,7 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_cleanup_pdf() {
-		$this->setExpectedIncorrectUsage('GFPDF\Model\Model_PDF::cleanup_pdf');
+		$this->setExpectedDeprecated('GFPDF\Model\Model_PDF::cleanup_pdf');
 
 		$form_class = \GPDFAPI::get_form_class();
 
@@ -1559,7 +1560,7 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_get_legacy_config() {
-		$this->setExpectedIncorrectUsage('GFPDF\Model\Model_PDF::get_legacy_config');
+		$this->setExpectedDeprecated('GFPDF\Model\Model_PDF::get_legacy_config');
 
 		/* Setup some test data */
 		$results = $this->form_and_entry();
@@ -1590,7 +1591,7 @@ class Test_PDF extends TestCase {
 	 * @dataProvider provider_get_template_filename
 	 */
 	public function test_get_template_filename( $expected, $template ) {
-		$this->setExpectedIncorrectUsage('GFPDF\View\View_PDF::get_template_filename');
+		$this->setExpectedDeprecated('GFPDF\View\View_PDF::get_template_filename');
 		$this->assertSame( $expected, $this->view->get_template_filename( $template ) );
 	}
 
@@ -1795,6 +1796,8 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_legacy_display_page_name() {
+		$this->setExpectedDeprecated( 'GFPDF\View\View_PDF::display_page_name' );
+
 		$form = [
 			'pagination' => [
 				'pages' => [
@@ -1887,6 +1890,10 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_apply_backwards_compatibility_filters() {
+		foreach ( [ 'gfpdfe_pdf_name', 'gfpdfe_template', 'gfpdf_orientation', 'gfpdf_security', 'gfpdf_privilages', 'gfpdf_password', 'gfpdf_master_password', 'gfpdf_rtl' ] as $hook ) {
+			$this->setExpectedDeprecated( $hook );
+		}
+
 		$entry            = $this->entry( 'all-form-fields' );
 		$entry['form_id'] = $this->form( 'all-form-fields' )['id'];
 
@@ -2076,6 +2083,8 @@ class Test_PDF extends TestCase {
 	 */
 	public function test_handle_legacy_tier_2_processing() {
 		global $gfpdf;
+
+		$this->setExpectedDeprecated( 'gfpdfe_pre_load_template' );
 
 		$settings  = [ 'id' => '556690c67856b', 'template' => 'zadani' ];
 		$entry     = $this->entry( 'all-form-fields' );

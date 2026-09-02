@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
-import { takeSnapshot } from '@chromatic-com/playwright';
+import { snapshot } from '@self:playwright/utils/snapshot';
 
 test.describe('[gravitypdf] Shortcode', () => {
 	test('Copy to Clipboard', async ({
@@ -22,7 +22,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		const pdfId = await pdf.createPdf(form.id, pdfLabel);
 		await pdf.copyDownloadShortcodeToClipboard(form.id, pdfId);
 
-		await takeSnapshot(page, testinfo);
+		await snapshot(page, testinfo);
 
 		// Add a new PDF and paste into the Label
 		await pdf.navigateToNewFormPdf(form.id);

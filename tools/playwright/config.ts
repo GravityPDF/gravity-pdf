@@ -5,6 +5,11 @@ process.env.WP_ARTIFACTS_PATH = path.join(process.cwd(), 'tmp/artifacts');
 
 import baseConfig = require('@wordpress/scripts/config/playwright.config.js');
 
+// Specs whose fixtures change state the whole site can see. The deprecation notice renders on every admin page
+// the other snapshots are taken on, so `fullyParallel` running these beside them puts a notice in an unrelated
+// baseline. They get a project to themselves, ordered into the chain below so nothing else is in flight.
+const ISOLATED = /core\/system-status\/.*(test|spec)\.(js|ts|mjs)/;
+
 const config = defineConfig({
 	...baseConfig,
 
@@ -69,6 +74,22 @@ const config = defineConfig({
 			dependencies: ['setup-core'],
 			testDir: path.join(process.cwd(), 'tests/playwright'),
 			testMatch: /(core|permalinks)\/.*(test|spec).(js|ts|mjs)/,
+			testIgnore: ISOLATED,
+			use: {
+				...devices['Desktop Chrome'],
+				baseURL: 'http://localhost:8702',
+				storageState: path.join(
+					process.cwd(),
+					'tmp/artifacts/storage-states/e2e.json'
+				),
+			},
+		},
+
+		{
+			name: 'core-isolated',
+			dependencies: ['core'],
+			testDir: path.join(process.cwd(), 'tests/playwright'),
+			testMatch: ISOLATED,
 			use: {
 				...devices['Desktop Chrome'],
 				baseURL: 'http://localhost:8702',
@@ -81,7 +102,7 @@ const config = defineConfig({
 
 		{
 			name: 'setup-core-with-permalinks',
-			dependencies: ['core'],
+			dependencies: ['core-isolated'],
 			testDir: path.join(process.cwd(), 'tools/playwright'),
 			testMatch: /.*global-setup\.ts/,
 			use: {
