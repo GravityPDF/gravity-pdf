@@ -1010,7 +1010,7 @@ class EDD_SL_Plugin_Updater {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.16.1
+	 * @since 6.17.0
 	 */
 	protected function is_secondary_network_site() {
 		if ( ! is_multisite() || is_main_site() ) {

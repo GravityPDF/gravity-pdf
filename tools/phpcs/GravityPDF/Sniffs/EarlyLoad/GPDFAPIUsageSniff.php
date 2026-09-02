@@ -19,7 +19,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
  *
  * @see https://github.com/GravityPDF/gravity-pdf/issues/1703
  *
- * @since 6.16.1
+ * @since 6.17.0
  */
 class GPDFAPIUsageSniff implements Sniff {
 
