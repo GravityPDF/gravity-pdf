@@ -252,6 +252,49 @@ class Test_Controller_Actions extends TestCase {
 		$this->assertFalse( $gfpdf->notices->has_notice() );
 	}
 
+	/**
+	 * `view_class` is public API carrying a CSS class, and plenty of one-word class names are also PHP function
+	 * names — `link`, `key`, `header`. Resolving on `is_callable()` alone would call one and fatal the admin.
+	 */
+	public function test_a_string_view_class_is_never_called() {
+		global $gfpdf;
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		set_current_screen( 'dashboard' );
+
+		add_filter(
+			'gfpdf_one_time_action_routes',
+			static function () {
+				return [
+					[
+						'action'      => 'always_notify',
+						'action_text' => 'Do it',
+						'condition'   => '__return_true',
+						'process'     => '__return_true',
+						'view'        => static function () {
+							return 'A notice';
+						},
+						'view_class'  => 'link',
+						'capability'  => 'gravityforms_view_settings',
+					],
+				];
+			}
+		);
+
+		$gfpdf->notices->clear();
+		$this->controller->route_notices();
+
+		ob_start();
+		$gfpdf->notices->process();
+		$html = ob_get_clean();
+
+		/* Carried through verbatim as a class, and no `notice-` prefix so it joins the default state */
+		$this->assertStringContainsString( 'class="notice updated link"', $html );
+
+		remove_all_filters( 'gfpdf_one_time_action_routes' );
+		$gfpdf->notices->clear();
+	}
+
 	public function test_route_notices_skips_pages_the_notice_cannot_display_on() {
 		global $gfpdf, $pagenow;
 
