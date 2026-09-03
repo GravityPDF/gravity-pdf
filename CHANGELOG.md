@@ -2,6 +2,12 @@
 
 ## Gravity PDF
 
+### 6.17.0
+* 🎉 Feature: Add a legacy features alert to Site Health and System Status reports
+* 🐞 Bug: Fix fatal error during update checks when the plugin requirements not met
+* 🐞 Bug: A temporary fix for rendering legacy templates on Gravity Forms 3.0+
+* 💻 Developer: Deprecated functionality now triggers `_deprecated_function()`, so it appears in the WordPress deprecation log and Query Monitor
+
 ### 6.16.0
 * 🎉 Feature: Gravity Forms 3.0 compatibility
 * 🎉 Feature: Support the Gravity Forms 3.0 International (formatted) phone number format, displayed with the country and dial code in front of the number
