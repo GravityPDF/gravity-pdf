@@ -312,4 +312,13 @@ class Test_Deprecation_V3 extends TestCase {
 		$this->assertArrayNotHasKey( PDF_PLUGIN_DIR . 'src/templates/zadani.php', Deprecation_V3::get_legacy_templates() );
 		$this->assertSame( [], Deprecation_V3::get_business_plus_templates() );
 	}
+
+	/**
+	 * The notice reads the ignore list off the registration, so it has to name the callback we add ourselves
+	 */
+	public function test_the_hooks_feature_declares_the_listener_core_registers_itself() {
+		$feature = Deprecation::get_feature( 'deprecated_filters' );
+
+		$this->assertSame( [ Deprecation_V3::INTERNAL_FILTER_CALLBACK ], $feature['internal_callbacks'] );
+	}
 }
