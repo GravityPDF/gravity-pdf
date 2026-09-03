@@ -141,7 +141,7 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 			],
 
 			'business_plus_templates'       => [
-				'label'      => __( 'Business Plus Templates', 'gravity-pdf' ),
+				'label'      => __( 'Business Plus / Tier 2 Templates', 'gravity-pdf' ),
 				'group'      => Deprecation::GROUP_DEPRECATED,
 				'removed_in' => static::REMOVED_IN,
 				'url'        => 'https://docs.gravitypdf.com/upgrade/legacy-templates/#business-plus--tier-2-template-upgrade-guide',
