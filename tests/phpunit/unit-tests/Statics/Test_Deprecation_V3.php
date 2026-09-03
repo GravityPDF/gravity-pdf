@@ -42,17 +42,41 @@ class Test_Deprecation_V3 extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A Business Plus template drives the PDF engine itself, which is the one thing a plain v3 template never does
+	 * A Business Plus template hands itself to the Advanced Templating add-on, which a plain v3 template never does
 	 */
-	public function test_legacy_templates_are_split_by_whether_they_drive_the_pdf_engine() {
+	public function test_legacy_templates_are_split_by_whether_they_call_the_addon() {
 		$standard      = $this->create_legacy_template( 'my-standard-template.php' );
-		$business_plus = $this->create_legacy_template( 'my-business-plus-template.php', '$mpdf->AddPage();' );
+		$business_plus = $this->create_legacy_template( 'my-business-plus-template.php', 'gfpdfe_business_plus::initilise( $pdf_name );' );
 
 		$this->assertSame( [ $business_plus ], array_keys( Deprecation_V3::get_business_plus_templates() ) );
 		$this->assertArrayHasKey( $standard, Deprecation_V3::get_legacy_templates() );
 		$this->assertArrayNotHasKey( $business_plus, Deprecation_V3::get_legacy_templates() );
 
 		$this->delete_legacy_templates( $standard, $business_plus );
+	}
+
+	/**
+	 * PHP resolves the call whatever case it is written in, so the file is read the same way
+	 */
+	public function test_the_addon_call_is_matched_regardless_of_case() {
+		$path = $this->create_legacy_template( 'my-shouty-template.php', 'GFPDFE_Business_Plus::Initilise( $pdf_name );' );
+
+		$this->assertArrayHasKey( $path, Deprecation_V3::get_business_plus_templates() );
+
+		$this->delete_legacy_templates( $path );
+	}
+
+	/**
+	 * Touching `$mpdf` is not what makes a template Business Plus: the add-on's own boilerplate never does it, and
+	 * plenty of plain v3 templates reach the engine through a filter instead
+	 */
+	public function test_a_template_using_mpdf_alone_is_not_business_plus() {
+		$path = $this->create_legacy_template( 'my-mpdf-template.php', '$mpdf->AddPage();' );
+
+		$this->assertSame( [], Deprecation_V3::get_business_plus_templates() );
+		$this->assertArrayHasKey( $path, Deprecation_V3::get_legacy_templates() );
+
+		$this->delete_legacy_templates( $path );
 	}
 
 	/**
