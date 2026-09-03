@@ -35,6 +35,32 @@ class Mpdf extends MpdfCore {
 	}
 
 	/**
+	 * Discard an array passed as the second argument instead of fataling on it
+	 *
+	 * mPDF reads a `$condition` string in that position ('E', 'O', 'NEXT-ODD'...) and takes a custom page size via
+	 * `$newformat`, the last parameter. That has been the signature since mPDF 5.3, so a page size has never
+	 * belonged there — the supported call is `AddPageByArray( [ 'sheet-size' => [ $w, $h ] ] )`, which is where the
+	 * Business Plus add-on moved its own boilerplate in 1.0.3.
+	 *
+	 * Templates written against the boilerplate before that still call `AddPage( 'P', [ $w, $h ] )`, so the array
+	 * reaches `strtoupper()`. PHP 7 warned, returned null and carried on with no condition, leaving the page at the
+	 * size it already had; PHP 8 raises a TypeError and ends the request instead.
+	 *
+	 * Emptying the condition reproduces the PHP 7 result exactly — mPDF only ever compares it against non-empty
+	 * keywords, and blanks it itself when one doesn't apply. The page size the template asked for goes on being
+	 * ignored, as it always has been, so no existing PDF changes; this only takes away the fatal.
+	 *
+	 * @since 6.17.0
+	 */
+	public function AddPage( $orientation = '', $condition = '', $resetpagenum = '', $pagenumstyle = '', $suppress = '', $mgl = '', $mgr = '', $mgt = '', $mgb = '', $mgh = '', $mgf = '', $ohname = '', $ehname = '', $ofname = '', $efname = '', $ohvalue = 0, $ehvalue = 0, $ofvalue = 0, $efvalue = 0, $pagesel = '', $newformat = '' ) {
+		if ( is_array( $condition ) ) {
+			$condition = '';
+		}
+
+		return parent::AddPage( $orientation, $condition, $resetpagenum, $pagenumstyle, $suppress, $mgl, $mgr, $mgt, $mgb, $mgh, $mgf, $ohname, $ehname, $ofname, $efname, $ohvalue, $ehvalue, $ofvalue, $efvalue, $pagesel, $newformat );
+	}
+
+	/**
 	 * @param int    $pageNumber The page number.
 	 * @param null   $crop_x     mPDF 8.0 removed this parameter
 	 * @param null   $crop_y     mPDF 8.0 removed this parameter
