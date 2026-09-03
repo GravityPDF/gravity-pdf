@@ -247,7 +247,7 @@ class Test_Controller_System_Report extends TestCase {
 	public function test_system_report_business_plus_template_has_a_row_of_its_own() {
 		$this->assertArrayNotHasKey( 'business_plus_templates', $this->get_deprecated_features() );
 
-		$path = $this->create_legacy_template( 'my-business-plus-template.php', '$mpdf->AddPage();' );
+		$path = $this->create_legacy_template( 'my-business-plus-template.php', 'gfpdfe_business_plus::initilise( $pdf_name );' );
 
 		$items = $this->get_deprecated_features();
 		$this->assertSame( 'my-business-plus-template.php (not configured on a form)', $items['business_plus_templates']['value_export'] );
