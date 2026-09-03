@@ -415,7 +415,7 @@ class View_System_Report extends Helper_Abstract_View {
 				'label' => esc_html__( 'Gravity PDF', 'gravity-pdf' ),
 				'color' => 'blue',
 			],
-			'description' => '<p>' . esc_html__( 'Nothing on this site relies on Gravity PDF functionality that is scheduled for removal, so there is nothing to do.', 'gravity-pdf' ) . '</p>',
+			'description' => '<p>' . esc_html__( 'Nothing on this site uses Gravity PDF functionality that is scheduled for removal.', 'gravity-pdf' ) . '</p>',
 			'actions'     => '',
 			'test'        => 'gravity_pdf_deprecated_features',
 		];
@@ -427,7 +427,8 @@ class View_System_Report extends Helper_Abstract_View {
 		$result['status'] = 'recommended';
 		$result['label']  = esc_html__( 'Your site uses Gravity PDF functionality that is scheduled for removal', 'gravity-pdf' );
 
-		$result['description'] = '<p>' . esc_html__( 'Update each item below before the release that removes it, so the PDFs that rely on it will continue working. Each one links to instructions to upgrade.', 'gravity-pdf' ) . '</p>';
+		/* The group headings and their descriptions introduce the list, so nothing else does */
+		$result['description'] = '';
 
 		$groups = static::get_deprecated_groups();
 		foreach ( Deprecation::group_signals( $signals ) as $group => $group_signals ) {
@@ -462,10 +463,11 @@ class View_System_Report extends Helper_Abstract_View {
 	/**
 	 * Build the Site Health Info tab sections for the features detected on this site
 	 *
-	 * This is the tab users copy into a support ticket, so a section is present whether or not its group has
-	 * anything to report: an empty one says so, rather than leaving the reader to guess whether the check ran.
-	 * They report what the system report exports, which keeps the two plain-text surfaces reading the same by
-	 * construction.
+	 * A section is the only thing Site Health gives a heading and an intro paragraph of its own, so each group
+	 * takes one and heads it with its own name. This is the tab users copy into a support ticket, so a section is
+	 * present whether or not its group has anything to report: an empty one says so, rather than leaving the
+	 * reader to guess whether the check ran. The fields report what the system report exports, which keeps the two
+	 * plain-text surfaces reading the same by construction.
 	 *
 	 * @param array $signals The signals from Deprecation::get_signals()
 	 *
@@ -477,9 +479,10 @@ class View_System_Report extends Helper_Abstract_View {
 		$sections = [];
 
 		foreach ( static::get_deprecated_groups() as $group => $names ) {
-			$fields = [];
+			$detections = $grouped[ $group ] ?? [];
+			$fields     = [];
 
-			foreach ( $grouped[ $group ] ?? [] as $key => $signal ) {
+			foreach ( $detections as $key => $signal ) {
 				$message = $this->get_deprecated_feature_detail( $key, $signal );
 
 				$fields[ $key ] = [
@@ -496,10 +499,21 @@ class View_System_Report extends Helper_Abstract_View {
 				];
 			}
 
-			$sections[ 'gravity-pdf-' . $group ] = [
+			/* Site Health prints this above the table, unescaped, so the group heads its own panel here */
+			$description = sprintf(
+				'<h4>%s</h4>',
 				/* translators: %s: The group name, as get_deprecated_groups() gives it */
-				'label'       => sprintf( __( 'Gravity PDF - %s Functionality', 'gravity-pdf' ), $names['label'] ),
-				'description' => esc_html( $names['description'] ),
+				esc_html( sprintf( __( '%s Features', 'gravity-pdf' ), $names['label'] ) )
+			);
+
+			/* The intro tells the reader what to do about a list, so a group with nothing detected goes without it */
+			if ( $detections !== [] ) {
+				$description .= '<p>' . esc_html( $names['description'] ) . '</p>';
+			}
+
+			$sections[ 'gravity-pdf-' . $group ] = [
+				'label'       => __( 'Gravity PDF', 'gravity-pdf' ),
+				'description' => $description,
 				'fields'      => $fields,
 			];
 		}
