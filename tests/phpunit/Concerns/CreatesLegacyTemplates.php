@@ -14,7 +14,8 @@ trait CreatesLegacyTemplates {
 	/**
 	 * Write a v3 template, which is one carrying no file headers, and return its path
 	 *
-	 * A body calling `$mpdf->` is what makes it a Business Plus (Tier 2) template rather than a plain one.
+	 * A body calling `gfpdfe_business_plus::initilise` is what makes it a Business Plus (Tier 2) template rather
+	 * than a plain one.
 	 *
 	 * @param string $name The file to write into the PDF working directory
 	 * @param string $body PHP appended after the v3 boilerplate
