@@ -311,7 +311,13 @@ class Deprecation {
 			return $args[0];
 		}
 
-		$feature    = static::get_feature_by_hook( $hook_name );
+		$feature = static::get_feature_by_hook( $hook_name );
+
+		/* Our own listener still has to run — it just isn't a listener worth reporting */
+		if ( ! static::has_reportable_listener( $hook_name, $feature ) ) {
+			return apply_filters_ref_array( $hook_name, $args );
+		}
+
 		$removed_in = $feature['removed_in'] ?? '';
 
 		if ( $replacement === '' ) {
@@ -331,6 +337,48 @@ class Deprecation {
 				$removed_in
 			)
 		);
+	}
+
+	/**
+	 * Whether anything worth reporting is listening to a deprecated hook
+	 *
+	 * Gravity PDF registers callbacks on some of its own deprecated hooks, so a hook carrying only those has no
+	 * third-party listener to name — self::log_deprecated_filter() would write a line saying it does, and
+	 * `deprecated_hook_run` would fire for a deprecation nobody on the site introduced. They are still counted on a
+	 * site being developed against, where the listener is the developer's own to find.
+	 *
+	 * @param string $hook_name The deprecated hook being fired
+	 * @param array  $feature   The registered feature that owns it
+	 *
+	 * @since 6.17.0
+	 */
+	protected static function has_reportable_listener( string $hook_name, array $feature ): bool {
+		global $wp_filter;
+
+		if ( static::is_development_site() ) {
+			return true;
+		}
+
+		/* self::apply_filters() has already established the hook has callbacks, so it is registered */
+		return static::count_third_party_callbacks( $wp_filter[ $hook_name ], $feature['internal_callbacks'] ?? [] ) > 0;
+	}
+
+	/**
+	 * Whether this site is one someone is actively developing against
+	 *
+	 * Both signals are required. WP_DEBUG alone is set on plenty of live sites that log to file, and an environment
+	 * declared `development` alone says nothing about whether anyone is watching for the output.
+	 *
+	 * @since 6.17.0
+	 */
+	protected static function is_development_site(): bool {
+		/* wp_get_environment_type() is WP 5.5, and the plugin still activates on 5.3 — nothing declares itself
+		   development below that, so the site is treated as live */
+		if ( ! function_exists( 'wp_get_environment_type' ) || wp_get_environment_type() !== 'development' ) {
+			return false;
+		}
+
+		return defined( 'WP_DEBUG' ) && WP_DEBUG;
 	}
 
 	/**

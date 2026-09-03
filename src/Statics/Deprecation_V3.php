@@ -159,17 +159,19 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 			],
 
 			'deprecated_filters'            => [
-				'label'         => __( 'Actions and Filters', 'gravity-pdf' ),
-				'group'         => Deprecation::GROUP_DEPRECATED,
-				'removed_in'    => static::REMOVED_IN,
-				'url'           => 'https://docs.gravitypdf.com/upgrade/deprecated-filters/',
-				'detect'        => [ static::class, 'get_active_deprecated_filters' ],
+				'label'              => __( 'Actions and Filters', 'gravity-pdf' ),
+				'group'              => Deprecation::GROUP_DEPRECATED,
+				'removed_in'         => static::REMOVED_IN,
+				'url'                => 'https://docs.gravitypdf.com/upgrade/deprecated-filters/',
+				'detect'             => [ static::class, 'get_active_deprecated_filters' ],
 				/* The label is a category, so out of its report row the fallback would read as the whole hook API */
 				/* translators: %s: The Gravity PDF version the hooks are removed in */
-				'notice'        => __( 'Code on this site uses Gravity PDF hooks that are removed in version %s.', 'gravity-pdf' ),
-				'hooks'         => static::get_deprecated_filters(),
-				'deprecated_in' => static::DEPRECATED_IN,
-				'hook_prefix'   => static::HOOK_PREFIX,
+				'notice'             => __( 'Code on this site uses Gravity PDF hooks that are removed in version %s.', 'gravity-pdf' ),
+				'hooks'              => static::get_deprecated_filters(),
+				'deprecated_in'      => static::DEPRECATED_IN,
+				'hook_prefix'        => static::HOOK_PREFIX,
+				/* Declared so the notice discounts them the same way the detector already does */
+				'internal_callbacks' => [ static::INTERNAL_FILTER_CALLBACK ],
 			],
 		];
 	}
