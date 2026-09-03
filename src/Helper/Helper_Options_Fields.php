@@ -684,6 +684,9 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	/**
 	 * Enable advanced templating field if the user has our legacy premium plugin installed
 	 *
+	 * The add-on is reported by the deprecation report and its notice, so nothing is raised from here: this runs on
+	 * every PDF settings screen, and the report is the surface that can explain what to do about it.
+	 *
 	 * @param array $settings The 'form_settings_advanced' array
 	 *
 	 * @return array
@@ -697,8 +700,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		if ( ! Deprecation_V3::has_tier_2_addon() ) {
 			return $settings;
 		}
-
-		_deprecated_function( __METHOD__, '6.12', 'a Gravity PDF 6 template, https://docs.gravitypdf.com/upgrade/legacy-templates/' );
 
 		$settings['advanced_template'] = [
 			'id'   => 'advanced_template',
