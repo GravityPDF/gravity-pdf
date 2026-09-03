@@ -327,6 +327,10 @@ class Test_Controller_System_Report extends TestCase {
 
 		$this->assertSame( 'None detected', $info['gravity-pdf-deprecated']['fields']['deprecated']['value'] );
 
+		/* The group still heads its own panel, but the intro only makes sense against a list of detections */
+		$this->assertStringContainsString( '<h4>Deprecated Features</h4>', $info['gravity-pdf-deprecated']['description'] );
+		$this->assertStringNotContainsString( '<p>', $info['gravity-pdf-deprecated']['description'] );
+
 		/* No registered feature belongs to the other group, so it isn't carried around empty */
 		$this->assertArrayNotHasKey( 'gravity-pdf-unsupported', $info );
 	}
