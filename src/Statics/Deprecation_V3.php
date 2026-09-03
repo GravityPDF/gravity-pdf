@@ -92,12 +92,15 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	const HOOK_PREFIX = 'gfpdfe_';
 
 	/**
-	 * The call every Business Plus (Tier 2) template makes, and no plain v3 template does
+	 * The call every Business Plus (Tier 2) template opens with, and no plain v3 template makes
+	 *
+	 * This is the first line of the add-on's own template boilerplate, so every template built from it carries the
+	 * call verbatim. `initilise` is misspelt in the add-on itself — matching anything else finds nothing.
 	 *
 	 * @var string
 	 * @since 6.17.0
 	 */
-	const BUSINESS_PLUS_MARKER = '$mpdf->';
+	const BUSINESS_PLUS_MARKER = 'gfpdfe_business_plus::initilise';
 
 	/**
 	 * The class the v3 "Advanced Templating" (Tier 2) add-on declares
@@ -537,10 +540,10 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	}
 
 	/**
-	 * Check whether a legacy template drives the PDF engine itself
+	 * Check whether a legacy template hands itself to the Advanced Templating add-on
 	 *
-	 * Direct access to the engine is the one thing the Advanced Templating add-on gave a template and a plain v3
-	 * template never had, so the call is what tells the two apart.
+	 * Calling into the add-on is the one thing a Business Plus template does and a plain v3 template never did, so
+	 * the call is what tells the two apart. Matched case-insensitively, which is how PHP resolves the identifiers.
 	 *
 	 * @param string $path The absolute path to the template file
 	 *
@@ -550,6 +553,6 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 		//phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$contents = is_readable( $path ) ? (string) file_get_contents( $path ) : '';
 
-		return strpos( $contents, static::BUSINESS_PLUS_MARKER ) !== false;
+		return stripos( $contents, static::BUSINESS_PLUS_MARKER ) !== false;
 	}
 }

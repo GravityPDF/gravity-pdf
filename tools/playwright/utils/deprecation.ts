@@ -29,13 +29,12 @@ const BUSINESS_PLUS_TEMPLATE = 'e2e-business-plus.php';
 /**
  * Install one legacy template of each kind
  *
- * A v3 template is one carrying no file headers. What separates the two kinds is whether the file drives the PDF
- * engine, which only a Business Plus (Tier 2) template does — chr(36) writes the dollar sign, keeping it out of
- * the shell command where it would expand before WP-CLI saw it.
+ * A v3 template is one carrying no file headers. What separates the two kinds is whether the file hands itself to
+ * the Advanced Templating add-on, which only a Business Plus (Tier 2) template does.
  */
 export function installLegacyTemplates() {
 	wpCli(
-		`wp eval 'file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${LEGACY_TEMPLATE}\\", \\"<?php // a plain v3 template\\" ); file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${BUSINESS_PLUS_TEMPLATE}\\", \\"<?php \\" . chr( 36 ) . \\"mpdf->AddPage();\\" );'`
+		`wp eval 'file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${LEGACY_TEMPLATE}\\", \\"<?php // a plain v3 template\\" ); file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${BUSINESS_PLUS_TEMPLATE}\\", \\"<?php gfpdfe_business_plus::initilise();\\" );'`
 	);
 }
 
