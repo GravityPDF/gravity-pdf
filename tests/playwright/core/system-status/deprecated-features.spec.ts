@@ -89,7 +89,7 @@ test.describe('Deprecated Features', () => {
 
 		// A template that drives the PDF engine is a Business Plus one, and reports under its own heading
 		await expect(deprecated).toContainText(
-			'Support for Business Plus Templates will be removed in Gravity PDF 7.0.'
+			'Support for Business Plus / Tier 2 Templates will be removed in Gravity PDF 7.0.'
 		);
 		await expect(deprecated).toContainText(
 			'e2e-business-plus.php (not configured on a form)'
@@ -179,17 +179,24 @@ test.describe('Deprecated Features', () => {
 
 		// The group gets its own section, so a support ticket carries the detections with it
 		const deprecatedHeading = page.locator(
-			'.health-check-accordion-heading',
-			{
-				hasText: 'Gravity PDF - Deprecated Functionality',
-			}
+			'#health-check-section-gravity-pdf-deprecated'
 		);
 
-		await expect(deprecatedHeading).toBeVisible();
+		// The title no longer names the group, which the panel now does for itself
+		await expect(deprecatedHeading).toHaveText('Gravity PDF');
 		await deprecatedHeading.click();
 
 		const deprecated = page.locator(
 			'#health-check-accordion-block-gravity-pdf-deprecated'
+		);
+
+		await expect(
+			deprecated.locator('h4', { hasText: 'Deprecated Features' })
+		).toBeVisible();
+
+		// The intro belongs to a list, so it is present only because there is something to introduce
+		await expect(deprecated).toContainText(
+			'Legacy functionality that will be removed in an upcoming release'
 		);
 
 		// Templates are named by file, with the upgrade URL travelling in the support ticket beside them
@@ -233,7 +240,7 @@ test.describe('Deprecated Features', () => {
 			'Support for Legacy Templates will be removed in Gravity PDF 7.0.'
 		);
 		await expect(notice).toContainText(
-			'Support for Business Plus Templates will be removed in Gravity PDF 7.0.'
+			'Support for Business Plus / Tier 2 Templates will be removed in Gravity PDF 7.0.'
 		);
 		await expect(notice).toContainText(
 			'Support for legacy download URLs will be removed in Gravity PDF 7.0.'
