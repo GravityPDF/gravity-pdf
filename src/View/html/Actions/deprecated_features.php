@@ -24,9 +24,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php esc_html_e( 'This site uses deprecated Gravity PDF functionality:', 'gravity-pdf' ); ?>
 	</strong>
 
-	<ul style="list-style: disc; margin: 0.5em 0 0.5em 2em">
+	<?php /* Bullets are set per-item: Gravity Forms resets `ul li` to none, and wp_kses_post() drops the `list-style` shorthand */ ?>
+	<ul style="margin: 0.5em 0 0.5em 2em">
 		<?php foreach ( $args['features'] as $feature ) : ?>
-			<li>
+			<li style="list-style-type: disc">
 				<?php echo esc_html( $feature['notice'] ); ?>
 				<a href="<?php echo esc_url( $feature['url'] ); ?>"><?php esc_html_e( 'Learn how to upgrade', 'gravity-pdf' ); ?></a>
 			</li>
