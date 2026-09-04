@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a9d392aec421b5a279d8935b4eb0fdc2",
+    "content-hash": "df8dbd63587690d8ba6ef18c01b72639",
     "packages": [
         {
             "name": "gravitypdf/querypath",
@@ -561,20 +561,21 @@
         },
         {
             "name": "mpdf/mpdf",
-            "version": "dev-development",
+            "version": "dev-gravitypdf-7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mpdf/mpdf.git",
-                "reference": "389e19e726f8aea750ddb6f6817c3dbf6cd5440c"
+                "url": "https://github.com/GravityPDF/mpdf.git",
+                "reference": "a1becec26fe4a64b22b2c4e808551e74b80260f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mpdf/mpdf/zipball/389e19e726f8aea750ddb6f6817c3dbf6cd5440c",
-                "reference": "389e19e726f8aea750ddb6f6817c3dbf6cd5440c",
+                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/a1becec26fe4a64b22b2c4e808551e74b80260f9",
+                "reference": "a1becec26fe4a64b22b2c4e808551e74b80260f9",
                 "shasum": ""
             },
             "require": {
                 "ext-gd": "*",
+                "ext-json": "*",
                 "ext-mbstring": "*",
                 "mpdf/psr-http-message-shim": "^1.0 || ^2.0",
                 "mpdf/psr-log-aware-trait": "^2.0 || ^3.0",
@@ -587,6 +588,7 @@
             },
             "require-dev": {
                 "mockery/mockery": "^1.3.0",
+                "mpdf/font-bundle-all": "*",
                 "mpdf/qrcode": "^1.1.0",
                 "squizlabs/php_codesniffer": "^3.5.0",
                 "tracy/tracy": "~2.5",
@@ -596,19 +598,52 @@
                 "ext-bcmath": "Needed for generation of some types of barcodes",
                 "ext-imagick": "Needed if developing the Mpdf library",
                 "ext-xml": "Needed mainly for SVG manipulation",
-                "ext-zlib": "Needed for compression of embedded resources, such as fonts"
+                "ext-zlib": "Needed for compression of embedded resources, such as fonts",
+                "mpdf/font-bundle-all": "All official mPDF fonts that offers coverage for common and uncommon scripts worldwide. Uses 110MB of disk space.",
+                "mpdf/font-bundle-lite": "A subset of official mPDF fonts that offers coverage for most common scripts. Uses 30MB of disk space.",
+                "mpdf/font-dejavu-family": "A unicode font family with reasonable coverage of common scripts. Uses 10MB of disk space."
             },
-            "default-branch": true,
             "type": "library",
-            "autoload": {
-                "files": [
-                    "src/functions.php"
-                ],
-                "psr-4": {
-                    "Mpdf\\": "src/"
+            "extra": {
+                "branch-alias": {
+                    "dev-gravitypdf-7.0": "8.x-dev"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload": {
+                "psr-4": {
+                    "Mpdf\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Mpdf\\": "tests/Mpdf",
+                    "Snapshots\\": "tests/Snapshots",
+                    "Issues\\": "tests/Issues"
+                },
+                "files": [
+                    "src/functions-dev.php"
+                ]
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "php -r \"chmod('./tmp', 0777);\""
+                ],
+                "cs": [
+                    "@php vendor/bin/phpcs --report-width=160 --standard=ruleset.xml --severity=1 --warning-severity=0 --extensions=php src utils tests"
+                ],
+                "cs:fix": [
+                    "@php vendor/bin/phpcbf --standard=ruleset.xml --extensions=php src utils tests"
+                ],
+                "test": [
+                    "@php vendor/bin/phpunit"
+                ],
+                "coverage": [
+                    "@php vendor/bin/phpunit --coverage-text"
+                ]
+            },
             "license": [
                 "GPL-2.0-only"
             ],
@@ -630,17 +665,17 @@
                 "utf-8"
             ],
             "support": {
-                "docs": "https://mpdf.github.io",
                 "issues": "https://github.com/mpdf/mpdf/issues",
-                "source": "https://github.com/mpdf/mpdf"
+                "source": "https://github.com/mpdf/mpdf",
+                "docs": "https://mpdf.github.io"
             },
             "funding": [
                 {
-                    "url": "https://www.paypal.me/mpdf",
-                    "type": "custom"
+                    "type": "custom",
+                    "url": "https://www.paypal.me/mpdf"
                 }
             ],
-            "time": "2026-06-11T13:03:42+00:00"
+            "time": "2026-09-04T04:57:29+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",
