@@ -70,40 +70,75 @@ plan does not name it. Noto has no serif Canadian Aboriginal, so it has no repla
 
 ## Popular packs (§4.3) — licence pass and sizes
 
-Scanned `google/fonts@main`. "Blocked" = declares a Reserved Font Name **and** ships no `static/`, so the
-only way to get a static TTF is `instancer`, which makes a Modified Version that may not keep the name.
+**A first pass of this looked only at `github.com/google/fonts` and concluded that Lora, Merriweather,
+Playfair Display and Dancing Script were blocked — VF-only in that repo, each declaring a Reserved Font Name,
+so instancing would make a Modified Version that may not keep the name. That conclusion was wrong.** The repo
+is not the only upstream distribution: a family's own download manifest,
+`https://fonts.google.com/download/list?family=<Family>` (JSON after a `)]}'` prefix), lists `fileRefs`
+pointing at `fonts.gstatic.com`, and for these families it serves ready-made `static/*.ttf` under the same
+OFL. Those are **Google's own statics, not our instances**, so no RFN question arises and nothing is blocked.
 
-| Pack | Family | Licence | RFN | Statics | Verdict |
-|---|---|---|---|---|---|
-| sans | roboto | OFL | none | VF-only | instance |
-| sans | opensans | OFL | none | VF-only | instance |
-| sans | lato | OFL | **Lato** | yes (4 faces, 2.61 MB) | ship unmodified |
-| sans | montserrat | OFL | none | VF-only | instance |
-| mono | robotomono | OFL | none | VF-only | instance |
-| mono | jetbrainsmono | OFL | none | VF-only | instance |
-| mono | inconsolata | OFL | none | yes (416 KB) | ship unmodified |
-| serif | lora | OFL | **Lora** | VF-only | **blocked** |
-| serif | merriweather | OFL | **Merriweather** | VF-only | **blocked** |
-| serif | playfairdisplay | OFL | **Playfair Display** | VF-only | **blocked** |
-| cursive | dancingscript | OFL | **Dancing Script** | VF-only | **blocked** |
-| cursive | pacifico | OFL | none | yes (322 KB) | ship unmodified |
-| cursive | caveat | OFL | none | VF-only | instance |
-| cursive | greatvibes | OFL | none | yes (447 KB) | ship unmodified |
+Verified: the served statics carry the same version string and exactly the same cmap as the repo VF —
+Lora 3.008 (778 cps), Playfair Display 1.203 (659), Merriweather 2.100 (1,423), Dancing Script 2.001 (559),
+100% coverage in every case. All four render in the forked mPDF at `useOTL` 0 **and** 0xFF.
 
-**`popular-serif` as specified is entirely blocked.** Swaps that clear the bar, all OFL with no RFN:
-PT Serif (4 statics, 1.38 MB), Crimson Text (4 statics, 435 KB), Spectral (4 statics, 1.06 MB), Zilla Slab
-(4 statics, 1.07 MB); EB Garamond, Literata, Bitter, Vollkorn and Domine are VF-only but RFN-free, so
-instanceable. For `popular-cursive`, Dancing Script swaps to Allura (241 KB), Parisienne (60 KB),
-Cookie (43 KB), Satisfy (Apache, 47 KB) or Kalam (867 KB).
+**Source precedence for §4.3 step 2**, in order:
 
-**Dehinting collides with Reserved Font Names.** Dehinting is a modification, so an RFN family can only ship
-byte-identical to upstream. Measured savings: Lato −26 to −28% per face (≈ 690 KB over the four), instanced
-Roboto −17%, VF-derived instances that never carried hinting ≈ 0% (Montserrat −1.2%, JetBrains Mono −0.0%).
-Recommendation: **exempt RFN families from the dehint step** rather than drop them — the fonts are fetched on
-demand from our origin, so ~690 KB on Lato is not worth losing the family.
+1. upstream `static/` in `google/fonts` when the family has one;
+2. otherwise the family's Google Fonts download manifest;
+3. `fontTools.varLib.instancer` only when neither exists — and then an RFN still blocks it.
 
-**The popular families must declare `useOTL => 0`.** Lato's statics predate GDEF and mPDF refuses OTL
-outright (`does not include OTL tables (or at least not a GDEF table)`); instanced Montserrat at `0xFF`
-produces an `Undefined array key` warning storm from `TTFontFile.php:2819`. Roboto and JetBrains Mono are
-fine at `0xFF`, but none of these Latin families needs shaping and mPDF's `kern`-table kerning is
-independent of `useOTL`.
+Order 1 before 2 matters. **Lato** is the counter-example: the repo ships v2.015 statics with 2,196
+codepoints, while the manifest serves an old v1.104 "Western+Polish" build with **263** — 75 KB a face
+against 656 KB, but nine tenths of the character set gone. Everywhere else the two agreed.
+
+| Pack | Family | Source | Faces | Size |
+|---|---|---|---|---|
+| sans | lato | repo statics (v2.015) | 4 | 2.73 MB |
+| sans | roboto | manifest | 4 | 651 KB |
+| sans | opensans | manifest | 4 | 535 KB |
+| sans | montserrat | manifest | 4 | 1.35 MB |
+| | | | | **5.02 MB** |
+| serif | lora | manifest | 4 | 547 KB |
+| serif | merriweather | manifest (`Merriweather_24pt-*`) | 4 | 4.07 MB |
+| serif | playfairdisplay | manifest | 4 | 744 KB |
+| | | | | **5.31 MB** |
+| mono | robotomono | manifest | 4 | 365 KB |
+| mono | jetbrainsmono | manifest | 4 | 466 KB |
+| mono | inconsolata | repo statics | 2 | 213 KB |
+| | | | | **1.00 MB** |
+| cursive | dancingscript | manifest | 2 | 163 KB |
+| cursive | pacifico | repo static | 1 | 329 KB |
+| cursive | caveat | manifest | 2 | 514 KB |
+| cursive | greatvibes | repo static | 1 | 458 KB |
+| | | | | **1.46 MB** |
+
+**The four packs stand as the plan specifies them — no swaps are needed.** Two notes: Merriweather is 77% of
+`popular-serif` on its own (≈ 1 MB a face), and it now carries an optical-size axis, so its statics are named
+`Merriweather_24pt-*` / `Merriweather_120pt-*`; 24pt is the text default and the pipeline needs a rule for
+picking one, since §4.3 step 2 says optical-size axes are not instanced.
+
+**Dehinting still collides with Reserved Font Names.** Dehinting is a modification, so an RFN family ships
+byte-identical to upstream or not at all. Measured: Lato −26 to −28% a face (≈ 690 KB over the four),
+instanced Roboto −17%, instances of VFs that never carried hinting ≈ 0% (Montserrat −1.2%, JetBrains Mono
+−0.0%). Exempt RFN families from the dehint step rather than drop them.
+
+**The popular families should declare `useOTL => 0`.** Lato's statics predate GDEF and mPDF refuses OTL
+outright (`does not include OTL tables (or at least not a GDEF table)`) — true of both the repo and the
+manifest build; instanced Montserrat at `0xFF` produces an `Undefined array key` warning storm from
+`TTFontFile.php:2819`. Lora, Playfair Display, Merriweather, Roboto, JetBrains Mono and Dancing Script are
+fine at `0xFF`, but none of these Latin families needs shaping and mPDF's `kern`-table kerning is independent
+of `useOTL`.
+
+## Legal Signing already depends on five cursive families
+
+`src/View/html/PDF/add_legalsigning_styles.php:66-85` — the styles Gravity PDF injects for the Legal Signing
+for Gravity Forms field — sets `font-family` for **Caveat, Dancing Script, Homemade Apple, Permanent Marker**
+and **Rock Salt**, one per text-signature style the user picks. Dancing Script and Caveat are in
+`popular-cursive`; **Homemade Apple, Permanent Marker and Rock Salt are in no pack in the plan**, so a
+signature in one of those three falls back to `cursive` unless the site owner installs the font by hand.
+
+All three are Regular-only, are served as plain statics from their download manifests (no `static/` folder,
+no VF), and render in the forked mPDF at `useOTL => 0` — Homemade Apple 109,044 B, Permanent Marker 73,620 B,
+Rock Salt 119,328 B, 302 KB for the three. Adding them to `popular-cursive` takes it to ≈ 1.76 MB and makes
+the pack cover every signature style the add-on offers. Open for decision.
