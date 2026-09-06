@@ -1,7 +1,7 @@
 # Phase 0 spikes 0, 1, 3, 4 — fork, bundled fonts, release size, script detection
 
 Plan: `.claude/plans/2026-08-26-remove-core-font-installer.md` §5 Phase 0 spike 0, §9.18.
-Date: 2026-09-04. Pushed: `GravityPDF/mpdf:gravitypdf-7.0` @ `a1becec`, and the rebase force-pushed to
+Date: 2026-09-04. **The fork branch was renamed `gravitypdf-7.0` → `gravitypdf` on 2026-09-07**; names below are the current ones. Pushed: `GravityPDF/mpdf:gravitypdf` @ `a1becec`, and the rebase force-pushed to
 `jakejackson1/mpdf:decouple-fonts` — mpdf/mpdf#2161 now reports `MERGEABLE` with 7 commits.
 
 ## Rebase
@@ -36,7 +36,7 @@ it is #2161's bug rather than ours, and the fork's CI is unusable without it.
 4. **`mpdf/font-bundle-all` in `require-dev`** (above).
 5. **Default font sorted first in `fontdata`** — see the open question below.
 
-Fork-only, on `gravitypdf-7.0` alone and deliberately last so the PR branch is a clean prefix:
+Fork-only, on `gravitypdf` alone and deliberately last so the PR branch is a clean prefix:
 `packages export-ignore` in `.gitattributes`. Verified: `git archive` of the branch contains no `packages/`,
 no `ttfonts/` and no `linebrdict*.dat`.
 
@@ -63,8 +63,8 @@ and `fontdata`, layers only):
 
 ## Plugin side (Phase 1a, committed)
 
-`composer.json` gains the `vcs` repository entry and requires `dev-gravitypdf-7.0`; the fork also carries
-`extra.branch-alias` (`dev-gravitypdf-7.0` → `8.x-dev`) so dependents resolving by version constraint still work.
+`composer.json` gains the `vcs` repository entry and requires `dev-gravitypdf`; the fork also carries
+`extra.branch-alias` (`dev-gravitypdf` → `8.x-dev`) so dependents resolving by version constraint still work.
 
 - `vendor/mpdf/mpdf` drops from ~110 MB to **4.9 MB**. `packages/` is export-ignored and Composer does not read a
   dependency's own `path` repositories, so nothing pulls the font packages in.

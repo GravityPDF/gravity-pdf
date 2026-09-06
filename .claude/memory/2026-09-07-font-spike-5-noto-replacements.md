@@ -76,11 +76,13 @@ throws in two places — `TTFontFile::_getGSUBignoreString()` (`:2976`) and `Otl
 (`:4496`) — and in *both* the throw sits immediately above a complete implementation the author left
 unreachable, commented "Not tested yet" and "Change also in ttfontsuni.php". Replacing each throw with
 `$ignoreflag = $flag;` makes Noto Sans Sinhala render, matching the `hb-view` reference including the
-`ශ්‍රී` conjunct, and mPDF's own suite stays green. **Landed 2026-09-07 as `9af3710` on the PR branch**
-(merged to `gravitypdf-7.0` as `45f241a`, plugin lock re-pinned): the two throws removed, a guard kept for a
-filtering set GDEF does not define, and two tests — one per throw — against a 7.5 KB subset of Noto Sans
-Sinhala at `tests/data/ttf/NotoSansSinhala-Subset.ttf`, both of which fail without the change. mPDF's suite
-is 1,000 tests green and `composer cs` is clean.
+`ශ්‍රී` conjunct, and mPDF's own suite stays green. **Split out on 2026-09-07 as GravityPDF/mpdf#1**, against
+our own `gravitypdf` branch — it is unrelated to font packages, so it came off the upstream PR (`9af3710`
+removed from `decouple-fonts`, reverted on the fork as `46df585`) and the fork branch carries it only once
+that PR merges. The change: the two throws removed, a guard kept for a filtering set GDEF does not define,
+and two tests — one per throw — against a 7.5 KB subset of Noto Sans Sinhala at
+`tests/data/ttf/NotoSansSinhala-Subset.ttf`, both of which fail without it. mPDF's suite is 1,000 tests green
+and `composer cs` is clean.
 
 ### Harness trap worth remembering
 
