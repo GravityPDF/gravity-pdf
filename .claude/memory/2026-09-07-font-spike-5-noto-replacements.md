@@ -98,20 +98,23 @@ against 656 KB, but nine tenths of the character set gone. Everywhere else the t
 | sans | roboto | manifest | 4 | 651 KB |
 | sans | opensans | manifest | 4 | 535 KB |
 | sans | montserrat | manifest | 4 | 1.35 MB |
-| | | | | **5.02 MB** |
+| | | | | **5.27 MB** / 5,265,448 B |
 | serif | lora | manifest | 4 | 547 KB |
 | serif | merriweather | manifest (`Merriweather_24pt-*`) | 4 | 4.07 MB |
 | serif | playfairdisplay | manifest | 4 | 744 KB |
-| | | | | **5.31 MB** |
+| | | | | **5.56 MB** / 5,563,248 B |
 | mono | robotomono | manifest | 4 | 365 KB |
 | mono | jetbrainsmono | manifest | 4 | 466 KB |
 | mono | inconsolata | repo statics | 2 | 213 KB |
-| | | | | **1.00 MB** |
+| | | | | **1.04 MB** / 1,043,612 B |
 | cursive | dancingscript | manifest | 2 | 163 KB |
 | cursive | pacifico | repo static | 1 | 329 KB |
 | cursive | caveat | manifest | 2 | 514 KB |
 | cursive | greatvibes | repo static | 1 | 458 KB |
-| | | | | **1.46 MB** |
+| cursive | homemadeapple | repo static (Apache) | 1 | 110 KB |
+| cursive | permanentmarker | repo static (Apache) | 1 | 75 KB |
+| cursive | rocksalt | repo static (Apache) | 1 | 124 KB |
+| | | | | **1.77 MB** / 1,772,820 B |
 
 **The four packs stand as the plan specifies them — no swaps are needed.** Two notes: Merriweather is 77% of
 `popular-serif` on its own (≈ 1 MB a face), and it now carries an optical-size axis, so its statics are named
@@ -138,7 +141,11 @@ and **Rock Salt**, one per text-signature style the user picks. Dancing Script a
 `popular-cursive`; **Homemade Apple, Permanent Marker and Rock Salt are in no pack in the plan**, so a
 signature in one of those three falls back to `cursive` unless the site owner installs the font by hand.
 
-All three are Regular-only, are served as plain statics from their download manifests (no `static/` folder,
-no VF), and render in the forked mPDF at `useOTL => 0` — Homemade Apple 109,044 B, Permanent Marker 73,620 B,
-Rock Salt 119,328 B, 302 KB for the three. Adding them to `popular-cursive` takes it to ≈ 1.76 MB and makes
-the pack cover every signature style the add-on offers. Open for decision.
+**Decided 2026-09-07: all three join `popular-cursive`**, which now names seven families and covers every
+signature style the add-on offers. They are Regular-only with no variable font, and unlike the rest of the
+pack they sit under `apache/` in `google/fonts` with a plain static in the repo, so source precedence rule 1
+applies and no manifest lookup is needed: Homemade Apple 110,004 B, Permanent Marker 74,632 B, Rock Salt
+124,372 B — 309,008 B for the three, taking the pack to 1,772,820 B. Apache 2.0 has no Reserved Font Name, so
+the dehint step is allowed here: Rock Salt −12.5%, Homemade Apple −0.5%, Permanent Marker −0.8%. All three
+render in the forked mPDF at `useOTL => 0`, dehinted and not; at 0xFF they fail the same way Lato does
+(`does not include OTL tables (or at least not a GDEF table)`), so their entries must declare `useOTL => 0`.
