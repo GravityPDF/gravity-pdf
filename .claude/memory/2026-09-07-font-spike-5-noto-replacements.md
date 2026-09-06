@@ -38,6 +38,54 @@ mPDF handles formats 1 and 2 only.
 declares a non-zero `useOTL` has to be render-checked before it can be catalogued — spike 8 must add that
 check, and a family that fails has no fallback other than `useOTL => 0`.
 
+## Both blockers can be worked around (investigated 2026-09-07)
+
+Two independent blockers, two different fixes. None of these Noto faces declares a Reserved Font Name
+(`Copyright 2022 The Noto Project Authors`, OFL 1.1), so modifying them is permitted.
+
+### GSUB 5/3 — rewrite as 6/3 in the pipeline
+
+mPDF supports chaining contextual substitution (LookupType 6) in **all three** formats, and a type-5
+format-3 subtable is exactly a type-6 format-3 subtable with zero backtrack and zero lookahead. So the fix is
+a structural rewrite, not a loss of features: for each GSUB lookup whose subtables are all Context Format 3,
+swap each for a `ChainContextSubst` Format 3 carrying the same input coverages and the same
+`SubstLookupRecord`s, and set the lookup (or its Extension wrapper) to type 6. ~30 lines of fontTools, kept
+at `tmp/chainify.py`. Affected lookups: Tai Tham 1, Sundanese 2, Myanmar 4. No lookup in any of the three
+mixes formats, so converting whole lookups is safe.
+
+Lossless: `hb-shape` returns identical glyph and cluster output for original and converted across every test
+string. All three then load and render at `useOTL => 0xFF` where they previously threw.
+
+What it actually buys, measured as pixels differing between `useOTL` 0 and 0xFF on the same converted font
+at 150 dpi:
+
+| Font | Δpx | mPDF shaper | Reading |
+|---|---|---|---|
+| Noto Sans Myanmar | 1,949 | `M` (mym2), and the font declares `mym2` | Matches the `hb-view` reference — prefixed `ေ`, correct medials. **A real win.** |
+| Noto Sans Tai Tham | 203 | `E` (SEA); font declares only `DFLT`, which mPDF falls back to | Close to the reference, not certified cluster by cluster |
+| Noto Sans Sundanese | 23 | none — falls to the default shaper | Generic GSUB features only |
+| *control:* FreeSans Devanagari | 1,669 | `I` (Indic) | Confirms the measurement is sound |
+
+mPDF's shaper list is `Otl.php:232-267`: Indic, Arabic, Khmer, Thai, Lao, Sinhala, Myanmar, and an "SEA"
+shaper covering New Tai Lue, Cham and Tai Tham. Sundanese is in none of them.
+
+### MarkGlyphSets (Sinhala) — two lines in the fork, no font surgery
+
+Noto Sans Sinhala has **no** 5/3 subtables; its blocker is 12 lookups carrying `UseMarkFilteringSet`. mPDF
+throws in two places — `TTFontFile::_getGSUBignoreString()` (`:2976`) and `Otl::_getGCOMignoreString()`
+(`:4496`) — and in *both* the throw sits immediately above a complete implementation the author left
+unreachable, commented "Not tested yet" and "Change also in ttfontsuni.php". Replacing each throw with
+`$ignoreflag = $flag;` makes Noto Sans Sinhala render, matching the `hb-view` reference including the
+`ශ්‍රී` conjunct, and mPDF's own suite stays green (998 tests, 2,289 assertions). Patch kept at
+`scratchpad/spike5/mpdf-markglyphsets.patch`; the fork clone was restored clean.
+
+### Harness trap worth remembering
+
+mPDF caches parsed font metrics in `tempDir` keyed by the **font key** — not the file path, not the `useOTL`
+value. Reusing one `tempDir` across runs silently serves the first run's cache: an entire comparison pass
+reported 0 differing pixels for every script *including the Devanagari control* purely because of it. Give
+every render in a comparison its own `tempDir`.
+
 ## Decisions (§9.3)
 
 | Legacy | Replacement | In-script coverage | Render | Size | Decision |
