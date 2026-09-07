@@ -231,9 +231,19 @@ not looked at first — a process miss):
    the end; PHP 7's foreach-on-a-copy hides it, PHP 5.6 returns `null`. Fixed with `array_keys()` in
    `2bc01ee` (GravityPDF/mpdf#4). **Lesson: the 5.6 matrix cell is the only thing that catches array-pointer
    assumptions — a modern-PHP local run cannot.**
-2. **`Snapshot Tests`, upstream's.** `AutoFontSnapshotTest` fails on 7 pages, identically with and without
-   every one of our commits. The baselines predate the rework. Quantified: the original two commits alone
-   fail **9** snapshots / 74 pages; adding `mpdf/font-bundle-all` to `require-dev` drops that to **1** / 7.
+2. **`Snapshot Tests`, upstream's — and it was catching a real bug, not a stale baseline.**
+   `LanguageToFontRegistry` returns the first non-empty answer across packages, so a package answering for a
+   script it does not own wins on registration order. **Quivira claimed `latn` and `cyrl`** (plus tfng, brai,
+   ogam, runr, glag) in `fontByScript()`, so installing that package retargeted the two most common scripts;
+   Dejavu-Family collapsed Cyrillic/Greek/Vietnamese to `dejavusans` instead of `dejavusanscondensed`; and
+   Free-Family sent Vai to `freeserif` instead of `freesans`. Measured against upstream `LanguageToFont` at
+   `389e19e`: **44 of 250 language codes and 8 of 25 script tags** resolved differently. Fixed in
+   GravityPDF/mpdf#6, after which the snapshot is **pixel-identical to the committed baseline on all eight
+   pages** — no baseline regenerated. The fix belongs upstream too and is not yet on `decouple-fonts`.
+   Quantified along the way: the original two commits alone fail **9** snapshots / 74 pages; adding
+   `mpdf/font-bundle-all` to `require-dev` drops that to **1** / 7.
+   **Lesson: never re-baseline a snapshot before finding out what changed.** The baseline PDF is stored, not
+   images, so it can be regenerated and diffed locally without Imagick.
 3. **`Static Analysis`, pre-existing.** PHPStan `ignore.unmatched` on three baseline patterns; fails on a
    branch that only adds a `composer.json` `extra` block, so it is baseline drift against a newer PHPStan.
 
