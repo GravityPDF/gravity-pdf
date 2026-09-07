@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Helper\Fonts\Font_Schema;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Integration\TestCase;
@@ -35,6 +36,15 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		parent::set_up();
 
 		$this->options = \GPDFAPI::get_options_class();
+	}
+
+	public function tear_down(): void {
+		global $gfpdf;
+
+		/* The font gate below rebuilds it; the rest of the class never touches it, so this is free either way */
+		$gfpdf->font_repository = null;
+
+		parent::tear_down();
 	}
 
 	/**
@@ -166,6 +176,42 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+	}
+
+	/**
+	 * Declared last: it moves the schema version and rebuilds the shared repository, so nothing that assumes the
+	 * state the bootstrap left should run after it.
+	 *
+	 * The version option is the observable. `ensure_ready()` writes it only after the migration and every
+	 * population pass have succeeded, so seeing it current is seeing the whole routine finish.
+	 */
+	public function test_7_0_0_migrates_the_font_tables_before_the_first_render() {
+		global $gfpdf;
+
+		$schema = new Font_Schema( \GPDFAPI::get_log_class() );
+
+		/*
+		 * Both copies, since `is_current()` accepts either and multisite keeps a network one. An older version
+		 * rather than no version at all: `update_option()` compares against the cached value, so a deleted row is
+		 * the harder of the two to put back.
+		 */
+		update_option( Font_Schema::VERSION_OPTION, '6.0.0', true );
+
+		if ( is_multisite() ) {
+			update_site_option( Font_Schema::VERSION_OPTION, '6.0.0' );
+		}
+
+		/* `ensure_ready()` short-circuits on a per-instance flag, and the shared repository is long since ready */
+		$gfpdf->font_repository = null;
+
+		/* Control: the routine's other branches leave the tables alone, so the gate is what is being read */
+		do_action( 'gfpdf_version_changed', '6.15.0', '6.16.0' );
+
+		$this->assertSame( '6.0.0', get_option( Font_Schema::VERSION_OPTION ) );
+
+		do_action( 'gfpdf_version_changed', '6.17.0', '7.0.0' );
+
+		$this->assertSame( $schema->get_version(), get_option( Font_Schema::VERSION_OPTION ) );
 	}
 
 }

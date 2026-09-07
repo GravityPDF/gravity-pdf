@@ -7,7 +7,6 @@ namespace GFPDF\Model;
 use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Helper\Fonts\Font_Repository;
 use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_Options;
 
 /**
  * @package     Gravity PDF
@@ -30,19 +29,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Custom_Fonts extends Helper_Abstract_Model {
 
 	/**
-	 * @var Helper_Abstract_Options
-	 * @since 6.0
-	 */
-	protected $options;
-
-	/**
 	 * @var Font_Repository
 	 * @since 7.0
 	 */
 	protected $repository;
 
-	public function __construct( Helper_Abstract_Options $options, Font_Repository $repository ) {
-		$this->options    = $options;
+	public function __construct( Font_Repository $repository ) {
 		$this->repository = $repository;
 	}
 
@@ -148,7 +140,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 				'font_key'    => (string) $font['id'],
 				'label'       => (string) ( $font['font_name'] ?? $font['id'] ),
 				'source'      => 'custom',
-				'blog_id'     => is_multisite() ? get_current_blog_id() : null,
+				'blog_id'     => $this->repository->current_blog_id(),
 				'use_otl'     => (int) ( $font['useOTL'] ?? 0 ),
 				'use_kashida' => (int) ( $font['useKashida'] ?? 0 ),
 				'files'       => $this->repository->build_file_rows( $font ),
@@ -249,15 +241,8 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function has_unique_font_id( string $id ): bool {
-		if (
-			! $this->matches_reserved_font_id( $id ) &&
-			! $this->matches_core_font_id( $id ) &&
-			! $this->matches_custom_font_id( $id )
-		) {
-			return true;
-		}
-
-		return false;
+		/* Any row takes the key, whatever its coverage — the dropdown groups are derived from the rows now */
+		return $this->repository->is_key_available( $id ) && ! $this->matches_pdf_base_font( $id );
 	}
 
 	/**
@@ -265,11 +250,20 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 */
 	public function matches_reserved_font_id( string $id ): bool {
 		/* One reserved list, not two: the repository owns the keys mPDF resolves before it ever reads the font map */
-		if ( $this->repository->is_key_reserved( $id ) ) {
-			return true;
-		}
+		return $this->repository->is_key_reserved( $id ) || $this->matches_pdf_base_font( $id );
+	}
 
-		$core_fonts = [
+	/**
+	 * The PDF standard-14 base fonts and mPDF's `c`-prefixed variants, which it resolves without a font map
+	 *
+	 * Kept apart from `Font_Repository::RESERVED_KEYS` deliberately: these are barred from the *upload* path, where
+	 * a user typing "Arial" would be surprised by which font they got, but an imported or adopted file may claim
+	 * them — a site with a loose `Arial.ttf` kept rendering it as itself in 6.x and still does.
+	 *
+	 * @since 7.0
+	 */
+	public function matches_pdf_base_font( string $id ): bool {
+		$pdf_base_fonts = [
 			'arial',
 			'helvetica',
 			'helveticab',
@@ -302,25 +296,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 			'csymbol',
 		];
 
-		return in_array( $id, $core_fonts, true );
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	public function matches_core_font_id( string $id ): bool {
-		$default_fonts = $this->options->get_installed_fonts();
-
-		unset( $default_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] );
-
-		/* check for exact match */
-		foreach ( $default_fonts as $group ) {
-			if ( isset( $group[ $id ] ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		return in_array( $id, $pdf_base_fonts, true );
 	}
 
 	/**

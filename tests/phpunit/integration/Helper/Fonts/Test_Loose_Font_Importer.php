@@ -58,13 +58,7 @@ class Test_Loose_Font_Importer extends TestCase {
 
 	public function tear_down(): void {
 		$this->remove_font_rows();
-
-		/* This suite drops files under their own names, not the trait's `test-` prefix */
-		foreach ( glob( $this->font_dir . '*' ) ?: [] as $file ) {
-			if ( is_file( $file ) ) {
-				unlink( $file );
-			}
-		}
+		$this->remove_font_files();
 
 		GPDFAPI::get_options_class()->update_option( 'custom_fonts', [] );
 
@@ -75,15 +69,21 @@ class Test_Loose_Font_Importer extends TestCase {
 	 * Drop a real, parseable font into the fonts directory under a given name
 	 */
 	protected function drop( string $filename, string $source = 'DejaVuSans.ttf' ): string {
-		copy( PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/' . $source, $this->font_dir . $filename );
+		return $this->drop_font_fixture( $filename, $source );
+	}
 
-		return $filename;
+	public function test_a_file_the_core_font_installer_wrote_is_left_to_the_adopter() {
+		/* Byte-identical to the manifest entry, so it is adopted under its 6.x key rather than keyed by filename */
+		$this->drop( 'DejaVuSansCondensed.ttf', 'DejaVuSansCondensed.ttf' );
+
+		$this->assertNotContains( 'DejaVuSansCondensed.ttf', $this->importer->candidates() );
+		$this->assertSame( 0, $this->importer->run() );
 	}
 
 	public function test_a_loose_font_becomes_a_row_under_its_legacy_key() {
 		$this->drop( 'Roboto-Regular.ttf' );
 
-		$this->assertSame( 1, $this->importer->import() );
+		$this->assertSame( 1, $this->importer->run() );
 
 		/* The key 6.x derived, so a template's font-family keeps resolving */
 		$row = $this->repository->get( 'roboto-regular' );
@@ -98,7 +98,7 @@ class Test_Loose_Font_Importer extends TestCase {
 	public function test_an_underscore_key_is_valid_as_is() {
 		$this->drop( 'Open_Sans.ttf' );
 
-		$this->importer->import();
+		$this->importer->run();
 
 		$this->assertNotNull( $this->repository->get( 'open_sans' ) );
 	}
@@ -106,7 +106,7 @@ class Test_Loose_Font_Importer extends TestCase {
 	public function test_a_stem_outside_the_key_charset_collapses_to_hyphens() {
 		$this->drop( 'Foo.Bar.ttf' );
 
-		$this->importer->import();
+		$this->importer->run();
 
 		$this->assertNotNull( $this->repository->get( 'foo-bar' ) );
 	}
@@ -116,7 +116,7 @@ class Test_Loose_Font_Importer extends TestCase {
 		$this->drop( 'Good-Font.ttf' );
 
 		/* In 6.x a zero-byte file fatally broke the first render that selected it */
-		$this->assertSame( 1, $this->importer->import() );
+		$this->assertSame( 1, $this->importer->run() );
 
 		$this->assertNull( $this->repository->get( 'calibri' ) );
 		$this->assertNotNull( $this->repository->get( 'good-font' ) );
@@ -134,7 +134,7 @@ class Test_Loose_Font_Importer extends TestCase {
 			]
 		);
 
-		$this->assertSame( 0, $this->importer->import() );
+		$this->assertSame( 0, $this->importer->run() );
 		$this->assertCount( 1, $this->repository->all() );
 	}
 
@@ -152,15 +152,15 @@ class Test_Loose_Font_Importer extends TestCase {
 			]
 		);
 
-		$this->assertSame( 0, $this->importer->import() );
+		$this->assertSame( 0, $this->importer->run() );
 		$this->assertNull( $this->repository->get( 'migrating' ) );
 	}
 
 	public function test_a_second_pass_imports_nothing() {
 		$this->drop( 'Once.ttf' );
 
-		$this->assertSame( 1, $this->importer->import() );
-		$this->assertSame( 0, $this->importer->import() );
+		$this->assertSame( 1, $this->importer->run() );
+		$this->assertSame( 0, $this->importer->run() );
 		$this->assertCount( 1, $this->repository->all() );
 	}
 
@@ -176,7 +176,7 @@ class Test_Loose_Font_Importer extends TestCase {
 			]
 		);
 
-		$this->assertSame( 1, $this->importer->import() );
+		$this->assertSame( 1, $this->importer->run() );
 
 		$keys = array_keys( $this->repository->all() );
 
@@ -190,17 +190,17 @@ class Test_Loose_Font_Importer extends TestCase {
 	public function test_otf_files_are_ignored_as_they_always_were() {
 		copy( PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/DejaVuSans.ttf', $this->font_dir . 'Ignored.otf' );
 
-		$this->assertSame( 0, $this->importer->import() );
+		$this->assertSame( 0, $this->importer->run() );
 	}
 
 	public function test_an_empty_directory_imports_nothing() {
-		$this->assertSame( 0, $this->importer->import() );
+		$this->assertSame( 0, $this->importer->run() );
 		$this->assertSame( [], $this->repository->all() );
 	}
 
 	public function test_the_imported_font_renders() {
 		$this->drop( 'Renderable.ttf' );
-		$this->importer->import();
+		$this->importer->run();
 
 		$registry = GPDFAPI::get_font_registry();
 

@@ -3,7 +3,6 @@ import $ from 'jquery';
 /* Bootstrap */
 import { templateBootstrap } from './bootstrap/templateBootstrap';
 import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap';
-import coreFontBootstrap from './bootstrap/coreFontBootstrap';
 import helpBootstrap from './bootstrap/helpBootstrap';
 /* Utilities */
 import { actionToolbar } from './utilities/PdfSettings/actionToolbar';
@@ -50,11 +49,6 @@ $(function () {
 		if ($templateField.length > 0) {
 			templateBootstrap($templateField);
 		}
-	}
-
-	/* Initialize the Core Font downloader */
-	if ($('#gfpdf-button-wrapper-install_core_fonts').length) {
-		coreFontBootstrap();
 	}
 
 	/* Initialize the Search Bar for Help Tab */

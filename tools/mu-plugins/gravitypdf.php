@@ -10,10 +10,11 @@ if ( ! defined( 'TEST_SUITE' ) || ! TEST_SUITE ) {
 	return;
 }
 
-add_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
-
 /* Only run on E2E site and excluded from production build */
 if ( ! defined( 'E2E_TEST_SUITE' ) || ! E2E_TEST_SUITE ) {
+	/* PHPUnit wants no one-time action notices at all; the E2E suite tests the deprecation one, so it keeps them */
+	add_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
+
 	return;
 }
 
@@ -52,23 +53,6 @@ $addon = static function () {
 };
 
 add_action( 'init', $addon, 20 );
-
-/* The deprecation notices are under test, so only the core-font one stays suppressed for E2E runs */
-remove_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
-
-add_filter(
-	'gfpdf_one_time_action_routes',
-	static function ( $routes ) {
-		return array_values(
-			array_filter(
-				$routes,
-				static function ( $route ) {
-					return $route['action'] !== 'install_core_fonts';
-				}
-			)
-		);
-	}
-);
 
 /* Give the deprecation detection a third-party filter listener to find, on one hook of each shape the map names:
    a v3-shaped alias and a `gfpdf_legacy_` one. The dynamic `gfpdfe_` prefix walk is covered by PHPUnit instead,

@@ -81,4 +81,31 @@ trait HasFontRows {
 			unlink( $file );
 		}
 	}
+
+	/**
+	 * Empty the fonts directory
+	 *
+	 * For suites that drop files under real font names rather than the `test-` prefix `remove_font_rows()` sweeps.
+	 */
+	protected function remove_font_files(): void {
+		foreach ( glob( $this->font_dir() . '*' ) ?: [] as $file ) {
+			if ( is_file( $file ) ) {
+				unlink( $file );
+			}
+		}
+	}
+
+	/**
+	 * Copy one of the repo's real font fixtures into the fonts directory
+	 *
+	 * @param string      $filename What to call it once it is there
+	 * @param string|null $source   Which fixture to copy, defaulting to the one named
+	 *
+	 * @return string The filename, so a caller can pass it straight on
+	 */
+	protected function drop_font_fixture( string $filename, ?string $source = null ): string {
+		copy( PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/' . ( $source ?? $filename ), $this->font_dir() . $filename );
+
+		return $filename;
+	}
 }

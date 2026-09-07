@@ -226,7 +226,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->mergetags();
 		$this->actions();
 		$this->template_manager();
-		$this->load_core_font_handler();
 		$this->load_custom_font_handler();
 		$this->load_debug();
 		$this->check_system_status();
@@ -874,26 +873,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Initialise our core font AJAX handler
-	 *
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function load_core_font_handler() {
-		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
-		$class->init();
-
-		$this->singleton->add_class( $class );
-	}
-
-	/**
 	 * Initialise our custom font handler
 	 * @since 5.0
 	 *
 	 */
 	public function load_custom_font_handler(): void {
-		$model = new Model\Model_Custom_Fonts( $this->options, $this->get_font_repository() );
+		$model = new Model\Model_Custom_Fonts( $this->get_font_repository() );
 		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
 		$class->init();
 
@@ -922,7 +907,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->data->template_font_location
 			);
 
-			$this->font_repository->set_importer(
+			/* Order matters: an installer font is adopted under its 6.x key before the importer could key it by filename */
+			$this->font_repository->add_population_pass(
+				new Helper\Fonts\Legacy_Font_Adopter( $this->font_repository, $this->log )
+			);
+
+			$this->font_repository->add_population_pass(
 				new Helper\Fonts\Loose_Font_Importer(
 					$this->font_repository,
 					new Helper\Fonts\SupportsOtl( $this->data->template_font_location ),

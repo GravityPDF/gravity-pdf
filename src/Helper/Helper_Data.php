@@ -294,20 +294,6 @@ class Helper_Data {
 				'couldNotDeleteTemplate'               => esc_html__( 'Could not delete template.', 'gravity-pdf' ),
 				'templateInstallInstructions'          => esc_html__( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-pdf' ),
 
-				'coreFontSuccess'                      => esc_html__( 'ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-pdf' ),
-				/* translators: %s: number of fonts that failed to install */
-				'coreFontError'                        => esc_html__( '%s CORE FONT(S) DID NOT INSTALL CORRECTLY', 'gravity-pdf' ),
-				'coreFontGithubError'                  => esc_html__( 'Could not download Core Font list. Try again.', 'gravity-pdf' ),
-				/* translators: %s: font name */
-				'coreFontItemPendingMessage'           => esc_html__( 'Downloading %s...', 'gravity-pdf' ),
-				/* translators: %s: font name */
-				'coreFontItemSuccessMessage'           => esc_html__( 'Completed installation of %s', 'gravity-pdf' ),
-				/* translators: %s: font name */
-				'coreFontItemErrorMessage'             => esc_html__( 'Failed installation of %s', 'gravity-pdf' ),
-				'coreFontCounter'                      => esc_html__( 'Fonts remaining:', 'gravity-pdf' ),
-				'coreFontRetry'                        => esc_html__( 'Retry Failed Downloads?', 'gravity-pdf' ),
-				'coreFontAriaLabel'                    => esc_html__( 'Core font installation', 'gravity-pdf' ),
-
 				/* Font Manager */
 				'fontManagerTitle'                     => esc_html__( 'Font Manager', 'gravity-pdf' ),
 				'fontManagerSearchPlaceHolder'         => esc_html__( 'Search installed fonts', 'gravity-pdf' ),

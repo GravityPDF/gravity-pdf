@@ -133,10 +133,10 @@ class Font_Repository {
 	protected $lock;
 
 	/**
-	 * @var Loose_Font_Importer|null
+	 * @var Font_Population_Pass[] Run in order by ensure_ready(), once per site
 	 * @since 7.0
 	 */
-	protected $importer;
+	protected $passes = [];
 
 	/**
 	 * @var Helper_Misc
@@ -187,15 +187,15 @@ class Font_Repository {
 	}
 
 	/**
-	 * Hand the repository its loose-font importer
+	 * Add a pass that populates the tables from something already on the site
 	 *
-	 * Set after construction rather than injected, because the importer reads through this repository — passing it
-	 * to the constructor would be a cycle.
+	 * Added after construction rather than injected, because each pass reads through this repository — passing
+	 * them to the constructor would be a cycle. Order is the order they run in.
 	 *
 	 * @since 7.0
 	 */
-	public function set_importer( Loose_Font_Importer $importer ): void {
-		$this->importer = $importer;
+	public function add_population_pass( Font_Population_Pass $pass ): void {
+		$this->passes[] = $pass;
 	}
 
 	/**
@@ -239,9 +239,8 @@ class Font_Repository {
 		try {
 			$this->migration->from_option( $this );
 
-			/* Runs after the migration so a file a 6.x record names is never imported as a loose font */
-			if ( $this->importer !== null ) {
-				$this->importer->import();
+			foreach ( $this->passes as $pass ) {
+				$pass->run();
 			}
 
 			$this->schema->mark_current();
@@ -684,6 +683,42 @@ class Font_Repository {
 	 */
 	public function is_key_available( string $font_key ): bool {
 		return ! $this->is_key_reserved( $font_key ) && $this->get( $font_key ) === null;
+	}
+
+	/**
+	 * Which site a row created right now belongs to
+	 *
+	 * Stated once because four places insert rows. Font *files* are network-global, so this is only ever about
+	 * which site's Font Manager lists the row, never about which site can render it.
+	 *
+	 * @return int|null
+	 *
+	 * @since 7.0
+	 */
+	public function current_blog_id(): ?int {
+		return is_multisite() ? get_current_blog_id() : null;
+	}
+
+	/**
+	 * Every filename some font row already records
+	 *
+	 * The three passes that populate the tables — migration, legacy adoption, loose import — all need this to avoid
+	 * registering a file twice, so it lives with the rows rather than in each of them.
+	 *
+	 * @return array<string, true>
+	 *
+	 * @since 7.0
+	 */
+	public function claimed_filenames(): array {
+		$claimed = [];
+
+		foreach ( $this->all() as $row ) {
+			foreach ( $row['files'] as $file ) {
+				$claimed[ (string) $file['path'] ] = true;
+			}
+		}
+
+		return $claimed;
 	}
 
 	/**
