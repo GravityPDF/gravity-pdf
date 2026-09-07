@@ -45,10 +45,11 @@ it is #2161's bug rather than ours, and the fork's CI is unusable without it.
 4. **`mpdf/font-bundle-all` in `require-dev`** (above).
 5. **Default font sorted first in `fontdata`** — see the open question below.
 
-**Superseded 2026-09-07.** `gravitypdf` was reset to plain upstream `development` and is now rebuilt only
-through PRs on `GravityPDF/mpdf` — #2 font packages (head `decouple-fonts`), #1 `MarkGlyphSets`, #3
-`branch-alias`. `packages/ export-ignore` moved into the upstream PR, so the only fork-only content left is
-the branch alias. What follows describes the original direct-push arrangement:
+**Superseded 2026-09-07.** `gravitypdf` was reset to plain upstream `development` and rebuilt only through
+PRs on `GravityPDF/mpdf` — #2 font packages (head `decouple-fonts`), #3 `branch-alias`, #1 `MarkGlyphSets`,
+merged in that order the same day. The branch is now `08af490` = upstream `389e19e` + three merge commits, and
+nothing lands on it by direct push again. `packages/ export-ignore` moved into the upstream PR, so the only
+fork-only content left is the branch alias. What follows describes the original direct-push arrangement:
 
 Fork-only, on `gravitypdf` alone and deliberately last so the PR branch is a clean prefix:
 `packages export-ignore` in `.gitattributes`. Verified: `git archive` of the branch contains no `packages/`,
