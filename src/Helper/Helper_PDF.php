@@ -638,31 +638,13 @@ class Helper_PDF {
 
 		$config = apply_filters(
 			'gfpdf_mpdf_class_config',
-			[
-				'fontRegistry'           => $registry->build_font_registry(),
-				/* Left empty: each package layer appends its own directory, bundled first */
-				'fontDir'                => [],
-				'fontdata'               => apply_filters( 'mpdf_font_data', [] ),
-				'languageToFont'         => $language_to_font,
+			$registry->mpdf_font_config( $language_to_font ) + [
 				'tempDir'                => $this->data->mpdf_tmp_location,
 
 				'default_font'           => $registry->get_default_font( $this->settings ),
 				'baseScript'             => $registry->get_document_script( $this->settings ),
 
-				/*
-				 * A 7.0 requirement rather than a preference: mPDF never substitutes Arabic or Indic glyphs, so
-				 * a lang tag on the run is the only route to a font for those scripts, and this is what
-				 * supplies the tag.
-				 */
-				'autoScriptToLang'       => true,
-				/* No Latin-language rows in the map, so nothing flips words out of the chosen font mid-paragraph */
-				'autoVietnamese'         => false,
-				/* Arimo carries no legacy kern table, so GPOS kerning is its only route to it */
-				'useKerning'             => true,
-
 				'allow_output_buffering' => true,
-				'autoLangToFont'         => true,
-				'useSubstitutions'       => true,
 				'ignore_invalid_utf8'    => true,
 				'setAutoTopMargin'       => 'stretch',
 				'setAutoBottomMargin'    => 'stretch',

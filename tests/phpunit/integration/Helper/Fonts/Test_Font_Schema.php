@@ -168,4 +168,67 @@ class Test_Font_Schema extends TestCase {
 			$this->assertFalse( get_site_option( Font_Schema::VERSION_OPTION ) );
 		}
 	}
+
+	/**
+	 * Declared last on purpose: this suite's DDL commits, so a case that moves the schema version has to run after
+	 * `test_the_bootstrap_left_the_tables_in_place()`, which asserts the state the bootstrap left.
+	 */
+	public function test_ensure_ready_runs_every_population_pass_in_order() {
+		global $gfpdf;
+
+		$ran = [];
+
+		/* A fresh repository, so the plugin's own passes stay out of this and the shared one is left ready */
+		$repository = new Font_Repository(
+			$this->schema,
+			new Font_Migration( GPDFAPI::get_options_class(), GPDFAPI::get_log_class() ),
+			new Font_Lock(),
+			$gfpdf->misc,
+			GPDFAPI::get_log_class(),
+			$gfpdf->data->template_font_location
+		);
+
+		$repository->add_population_pass( $this->recording_pass( 'first', $ran ) );
+		$repository->add_population_pass( $this->recording_pass( 'second', $ran ) );
+
+		/*
+		 * ensure_ready() short-circuits on a current version. An older version is used rather than no version at
+		 * all: `update_option()` compares against the cached value, so a deleted row cannot be restored in
+		 * tear_down() once this suite's DDL has committed the deletion.
+		 */
+		update_option( $this->schema::VERSION_OPTION, '6.0.0', true );
+
+		$this->assertTrue( $repository->ensure_ready() );
+
+		/* Added order is run order: the adopter claims an installer font before the importer could key it by filename */
+		$this->assertSame( [ 'first', 'second' ], $ran );
+	}
+
+	/**
+	 * A population pass that records having been run, so order can be asserted
+	 *
+	 * @param string  $name What to record
+	 * @param array   $ran  Appended to, by reference
+	 */
+	protected function recording_pass( string $name, array &$ran ): Font_Population_Pass {
+		return new class( $name, $ran ) implements Font_Population_Pass {
+
+			/** @var string */
+			private $name;
+
+			/** @var array */
+			private $ran;
+
+			public function __construct( string $name, array &$ran ) {
+				$this->name = $name;
+				$this->ran  = &$ran;
+			}
+
+			public function run(): int {
+				$this->ran[] = $this->name;
+
+				return 0;
+			}
+		};
+	}
 }

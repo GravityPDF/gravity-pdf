@@ -6,6 +6,7 @@ namespace GFPDF\Helper\Fonts;
 
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF_Vendor\Mpdf\Fonts\FontRegistry;
+use GFPDF_Vendor\Mpdf\Language\LanguageToFontRegistry;
 use GFPDF_Vendor\Mpdf\Ucdn;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -123,6 +124,40 @@ class Registry {
 		$this->options     = $options;
 		$this->log         = $log;
 		$this->bundled_dir = trailingslashit( $bundled_dir );
+	}
+
+	/**
+	 * Every mPDF config key that decides which font a run of text gets
+	 *
+	 * Shared, because two places construct mPDF — `Helper_PDF::begin_pdf()` and the v3 `mPDF` shim in
+	 * `deprecated.php` — and each key here is load-bearing rather than a preference. Split out so the shim cannot
+	 * quietly drift into resolving fonts by different rules to every other PDF the plugin makes; the caller merges
+	 * its own per-document keys on top.
+	 *
+	 * @param LanguageToFontRegistry $language_to_font Handed in so the caller can keep adding to it after mPDF is built
+	 *
+	 * @since 7.0
+	 */
+	public function mpdf_font_config( LanguageToFontRegistry $language_to_font ): array {
+		return [
+			'fontRegistry'     => $this->build_font_registry(),
+			/* Left empty: each package layer appends its own directory, bundled first */
+			'fontDir'          => [],
+			'fontdata'         => apply_filters( 'mpdf_font_data', [] ),
+			'languageToFont'   => $language_to_font,
+
+			/*
+			 * A 7.0 requirement rather than a preference: mPDF never substitutes Arabic or Indic glyphs, so a lang
+			 * tag on the run is the only route to a font for those scripts, and this is what supplies the tag.
+			 */
+			'autoScriptToLang' => true,
+			/* No Latin-language rows in the map, so nothing flips words out of the chosen font mid-paragraph */
+			'autoVietnamese'   => false,
+			/* Arimo carries no legacy kern table, so GPOS kerning is its only route to it */
+			'useKerning'       => true,
+			'autoLangToFont'   => true,
+			'useSubstitutions' => true,
+		];
 	}
 
 	/**

@@ -4,6 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use Exception;
 use GF_Field_Consent;
+use GFPDF\Helper\Fonts\Registry;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
@@ -124,7 +125,8 @@ class Field_Consent extends Helper_Abstract_Fields {
 	 */
 	protected function get_consented_markup( $label ) {
 		return sprintf(
-			'<span class="consent-tick consent-accepted" style="font-family:dejavusans,sans-serif;">&#10004;</span> <span class="consent-label consent-accepted-label">%s</span>',
+			'<span class="consent-tick consent-accepted" style="font-family:%1$s,sans-serif;">&#10004;</span> <span class="consent-label consent-accepted-label">%2$s</span>',
+			Registry::BUNDLED_SYMBOLS,
 			$label
 		);
 	}
@@ -138,7 +140,8 @@ class Field_Consent extends Helper_Abstract_Fields {
 	 */
 	protected function get_non_consent_markup() {
 		return sprintf(
-			'<span class="consent-tick consent-not-accepted" style="font-family:dejavusans,sans-serif;">&#10006;</span> <span class="consent-label consent-not-accepted-label">%s</span>',
+			'<span class="consent-tick consent-not-accepted" style="font-family:%1$s,sans-serif;">&#10006;</span> <span class="consent-label consent-not-accepted-label">%2$s</span>',
+			Registry::BUNDLED_SYMBOLS,
 			__( 'Consent not given.', 'gravity-pdf' )
 		);
 	}

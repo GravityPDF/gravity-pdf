@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 7.0
  */
-class Loose_Font_Importer {
+class Loose_Font_Importer implements Font_Population_Pass {
 
 	/**
 	 * @var Font_Repository
@@ -75,7 +75,7 @@ class Loose_Font_Importer {
 	 *
 	 * @since 7.0
 	 */
-	public function import(): int {
+	public function run(): int {
 		$created = 0;
 
 		foreach ( $this->candidates() as $filename ) {
@@ -90,7 +90,7 @@ class Loose_Font_Importer {
 					'font_key'    => $font_key,
 					'label'       => $this->derive_label( $filename, $font_key ),
 					'source'      => 'imported',
-					'blog_id'     => is_multisite() ? get_current_blog_id() : null,
+					'blog_id'     => $this->repository->current_blog_id(),
 					'use_otl'     => $this->supports_otl->supports_otl( $filename ) ? 0xFF : 0,
 					'use_kashida' => 0,
 					'files'       => [
@@ -119,7 +119,9 @@ class Loose_Font_Importer {
 	 *
 	 * `.otf` was never picked up by 6.x's glob and still isn't. Files named by any site's `custom_fonts` snapshot
 	 * are excluded too: those belong to a migration, past or future, so one site's importer cannot swallow
-	 * another's not-yet-migrated faces as stem-keyed loose rows.
+	 * another's not-yet-migrated faces as stem-keyed loose rows. So are the core font installer's own filenames,
+	 * which `Legacy_Font_Adopter` owns — one that failed its hash check is left alone rather than imported under a
+	 * filename key, because a file that is not what the installer wrote is not a font this plugin put there.
 	 *
 	 * @return string[] Filenames, relative to the fonts directory
 	 *
@@ -153,19 +155,13 @@ class Loose_Font_Importer {
 	 * @since 7.0
 	 */
 	protected function claimed_filenames(): array {
-		$claimed = [];
-
-		foreach ( $this->repository->all() as $row ) {
-			foreach ( $row['files'] as $file ) {
-				$claimed[ (string) $file['path'] ] = true;
-			}
-		}
+		$claimed = $this->repository->claimed_filenames();
 
 		foreach ( $this->snapshot_filenames() as $filename ) {
 			$claimed[ $filename ] = true;
 		}
 
-		return $claimed;
+		return $claimed + Legacy_Installer_Files::filenames();
 	}
 
 	/**

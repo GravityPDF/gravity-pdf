@@ -91,7 +91,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'    => __( 'Set the default font type used in PDFs. Choose an existing font or install your own.', 'gravity-pdf' ),
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
-						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-pdf' ),
+						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with a font that covers Latin, Greek and Cyrillic. Want to use a specific font type? Add it with the Font Manager.', 'gravity-pdf' ),
 						'class'   => 'gfpdf-font-manager',
 					],
 

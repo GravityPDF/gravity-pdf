@@ -34,7 +34,7 @@ class Test_Model_Custom_Fonts extends TestCase {
 
 		parent::set_up();
 
-		$this->model = new Model_Custom_Fonts( GPDFAPI::get_options_class(), $gfpdf->get_font_repository() );
+		$this->model = new Model_Custom_Fonts( $gfpdf->get_font_repository() );
 	}
 
 	public function tear_down(): void {

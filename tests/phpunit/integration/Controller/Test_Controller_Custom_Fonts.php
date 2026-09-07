@@ -88,7 +88,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		remove_action( 'rest_api_init', [ $class, 'register_endpoints' ] );
 
 		/* Setup our test classes */
-		$this->model      = new Model_Custom_Fonts( $gfpdf->options, $gfpdf->get_font_repository() );
+		$this->model      = new Model_Custom_Fonts( $gfpdf->get_font_repository() );
 		$this->controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Helper\\Fonts\\LocalFilesystem', 'GFPDF\\Helper\\Fonts\\LocalFile' );
 
 		$this->controller->init();

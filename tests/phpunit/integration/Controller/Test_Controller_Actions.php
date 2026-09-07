@@ -56,7 +56,6 @@ class Test_Controller_Actions extends TestCase {
 		$this->assertCount( 1, $routes );
 
 		$this->assertSame( 'deprecated_features', $routes[0]['action'] );
-		$this->assertNotContains( 'install_core_fonts', array_column( $routes, 'action' ) );
 	}
 
 	public function test_every_deprecated_feature_shares_one_route() {
