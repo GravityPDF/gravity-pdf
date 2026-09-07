@@ -38,7 +38,7 @@
   ],
   "require": {
     "php": ">=7.4",
-    "mpdf/mpdf": "dev-gravitypdf",
+    "mpdf/mpdf": "dev-decouple-fonts",
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
