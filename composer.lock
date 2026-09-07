@@ -565,12 +565,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/GravityPDF/mpdf.git",
-                "reference": "08af490f7d7f498acaf8e3dca0bf6bf72aec07b2"
+                "reference": "92a372136f3cf3aa88a4066dcb670dfd794b9a59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/08af490f7d7f498acaf8e3dca0bf6bf72aec07b2",
-                "reference": "08af490f7d7f498acaf8e3dca0bf6bf72aec07b2",
+                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/92a372136f3cf3aa88a4066dcb670dfd794b9a59",
+                "reference": "92a372136f3cf3aa88a4066dcb670dfd794b9a59",
                 "shasum": ""
             },
             "require": {
@@ -676,7 +676,7 @@
                     "url": "https://www.paypal.me/mpdf"
                 }
             ],
-            "time": "2026-09-07T00:10:35+00:00"
+            "time": "2026-09-07T00:53:56+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",
