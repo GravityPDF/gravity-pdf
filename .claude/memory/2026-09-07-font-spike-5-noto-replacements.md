@@ -96,19 +96,21 @@ every render in a comparison its own `tempDir`.
 | Legacy | Replacement | In-script coverage | Render | Size | Decision |
 |---|---|---|---|---|---|
 | Aboriginal Sans (GPLv3, no exception) | Noto Sans Canadian Aboriginal | 710/710 of U+1400–167F + U+18B0–18FF | OK, `useOTL => 0` | 94,888 + 93,656 B | **Replace** |
-| Kaputa (Sinhala) | Noto Sans Sinhala | 80/80, +31 | **FAIL** | — | Keep as today |
-| Lanna Alif (Tai Tham) | Noto Sans Tai Tham | 127/127 | **FAIL** | — | Keep as today |
-| Zawgyi One (no licence) | Noto Sans Myanmar | 132/132, +91 | **FAIL** | — | Keep as today |
-| Sundanese Unicode (GPLv3, no exception) | Noto Sans Sundanese | 55/55, +17 | **FAIL** | — | Keep as today |
-| UnBatang (GPLv2, no exception) | Noto Sans KR | 11,522/11,522 Hangul + Jamo | OK, peak 26 MB | 12.45 MB R+B vs 12.95 MB | **Replace** |
-| Sun-ExtA (source/licence not found) | Noto Sans SC | 27,506/27,506 of URO + Ext A | OK, peak 26 MB | 10.60 MB vs 22.99 MB (−54%) | **Replace** |
+| Kaputa (Sinhala) | Noto Sans Sinhala | 80/80, +31 | OK **after the fork's MarkGlyphSets + GDEF offset fixes** | 178,804 B R+B | **Replace** (2026-09-07) |
+| Lanna Alif (Tai Tham) | Noto Sans Tai Tham | 127/127 | OK **after the 5/3 → 6/3 rewrite** | 233,736 B R+B | **Replace** (2026-09-07; taken on licence-hygiene/maintenance grounds — 203 Δpx, and it costs 97 KB) |
+| Zawgyi One (no licence) | Noto Sans Myanmar | 132/132, +91 | OK **after the 5/3 → 6/3 rewrite** | 295,096 B R+B | **Replace** (2026-09-07; strongest of the four — real `mym2` shaping, Unicode instead of Zawgyi) |
+| Sundanese Unicode (GPLv3, no exception) | Noto Sans Sundanese | 55/55, +17 | OK **after the 5/3 → 6/3 rewrite** | 22,784 B R+B | **Replace** (2026-09-07; a licence fix — mPDF has no Sundanese shaper, 23 Δpx) |
+| UnBatang (GPLv2, no exception) | Noto Sans KR | 11,522/11,522 Hangul + Jamo | OK, peak 26 MB | 12.45 MB R+B vs 12.95 MB | **Replace, R+B** (2026-09-07) |
+| Sun-ExtA (source/licence not found) | Noto Sans SC | 27,506/27,506 of URO + Ext A | OK, peak 26 MB | 10.60 MB vs 22.99 MB (−54%) | **Replace** (2026-09-07) |
 | Sun-ExtB | — | Noto Sans SC covers 54 of 42,711 Ext B codepoints | — | — | **No replacement; keep** |
 
 Notes on the two that replace cleanly:
 
 - **Korean.** UnBatang is a *serif* (Batang), so the faithful match is Noto Serif KR — but that is 28.25 MB
-  for R+B against UnBatang's 12.95 MB. Noto Sans KR is size-neutral and is the recommendation; the style
-  change is a product call, not a technical one.
+  for R+B against UnBatang's 12.95 MB. **Decided 2026-09-07: Noto Sans KR, Regular + Bold** — size-neutral, and the
+  serif → sans change reaches only *fresh* installs of the `korean` pack, because upgrade step 1c adopts an existing
+  site's `UnBatang_0613.ttf` under its frozen `unbatang` key as an `imported` row (§4.8 of the 7.0 plan). Noto Serif
+  KR rejected on size.
 - **CJK.** Noto Sans JP and TC are language-subset builds covering only 47% and 58% of URO + Ext A, so
   neither replaces Sun-ExtA — **SC alone does**, at 100%. Ext B has no Noto equivalent in `google/fonts`.
 - Both CJK families are VF-only in `google/fonts` and were instanced with `fontTools.varLib.instancer`
@@ -179,12 +181,62 @@ byte-identical to upstream or not at all. Measured: Lato −26 to −28% a face 
 instanced Roboto −17%, instances of VFs that never carried hinting ≈ 0% (Montserrat −1.2%, JetBrains Mono
 −0.0%). Exempt RFN families from the dehint step rather than drop them.
 
-**The popular families should declare `useOTL => 0`.** Lato's statics predate GDEF and mPDF refuses OTL
-outright (`does not include OTL tables (or at least not a GDEF table)`) — true of both the repo and the
-manifest build; instanced Montserrat at `0xFF` produces an `Undefined array key` warning storm from
-`TTFontFile.php:2819`. Lora, Playfair Display, Merriweather, Roboto, JetBrains Mono and Dancing Script are
-fine at `0xFF`, but none of these Latin families needs shaping and mPDF's `kern`-table kerning is independent
-of `useOTL`.
+**The `useOTL => 0` recommendation in the first pass was wrong, and was measured on the wrong file.** It rested on
+Lato failing (true) and on "instanced Montserrat at `0xFF` produces an `Undefined array key` warning storm" — but the
+plan ships Montserrat from Google's *manifest statics*, not an instance. Re-run against the shipped artefacts
+(2026-09-07), 44 faces across all four packs, Montserrat did not warn: it **exhausted 512 MB** in
+`_getGDEFtables()`, and Open Sans emitted **78,099** notices.
+
+**Root cause — one upstream bug.** `TTFontFile::_getGDEFtables()` reads the MarkGlyphSets coverage offsets and seeks
+to them *as absolute file offsets*; per the spec they are ULONGs measured from the start of the MarkGlyphSetsDef
+table. Montserrat's are 20/96/106/146, so mPDF parses the font's own table directory as a Coverage table — garbage
+that decodes as a format-2 range (OOM) or format 1 with bogus glyph IDs (the notice storm). **Every GDEF 1.2 font has
+silently had empty mark glyph sets**, including Noto Sans Sinhala: the fork's merged MarkGlyphSets fix
+(GravityPDF/mpdf#1) has been consuming garbage and worked only because the garbage parsed as an empty set.
+
+Correcting the seek unmasks two latent dereferences of a subtable whose entries were *all* filtered out by the Ignore
+flags, which therefore never gets a `subs` key: the second-pass loops for LookupTypes 2-4, and the secondary-lookup
+scan inside the chaining-context rules (`if (count($Lookup[$lup]['Subtable'][$lus]['subs']))` → `!empty(...)`, four
+sites). With all three fixed: mPDF's suite **1016 tests, 2307 assertions, OK**; Sinhala renders; Montserrat and Open
+Sans come back clean. Local commit `9dabb6a` on `spike/markglyphsets-offset`, **not yet PR'd**.
+
+**Per-family `useOTL` on the fixed parser** (Δpx = one sample document, all faces, 150 dpi; "shipped" = `useKerning`
+false, "kerned" = true):
+
+| Pack | Family | GDEF | GPOS `kern` | Δpx shipped | Δpx kerned | `useOTL` |
+|---|---|---|---|---|---|---|
+| sans | lato | **none** | unreachable | FAIL | — | `0` forced |
+| sans | roboto | Y | Y | 63,372 | 71,214 | `0xFF` |
+| sans | opensans | Y | — | 28,177 | 28,177 | `0xFF` |
+| sans | montserrat | Y | Y | 6,456 | 61,517 | `0xFF` |
+| serif | lora | Y | Y | 28,707 | 76,846 | `0xFF` |
+| serif | merriweather | Y | Y | 34,199 | 73,121 | `0xFF` |
+| serif | playfairdisplay | Y | Y | 55,649 | 84,987 | `0xFF` |
+| mono | robotomono | **none** | no GPOS | FAIL | — | `0` forced |
+| mono | jetbrainsmono | Y | — | **0** | **0** | `0` |
+| mono | inconsolata | Y | — | **0** | **0** | `0` |
+| cursive | dancingscript | Y | Y | 7,388 | 31,695 | `0xFF` |
+| cursive | pacifico | Y | Y | 21,039 | 26,371 | `0xFF` |
+| cursive | caveat | Y | Y | 37,787 | 37,838 | `0xFF` |
+| cursive | greatvibes | Y | Y | 14,807 | 17,642 | `0xFF` |
+| cursive | homemadeapple | **none** | no GPOS | FAIL | — | `0` forced |
+| cursive | permanentmarker | **none** | legacy `kern` | FAIL | — | `0` forced |
+| cursive | rocksalt | **none** | legacy `kern` | FAIL | — | `0` forced |
+
+Ten families take `0xFF`, seven take `0` — five for want of a GDEF table, and the two monospaces because they gain
+literally nothing. Parse cost of `0xFF` is negligible (+0.03 s, +6 MB on Merriweather's 853 KB GPOS, once per site).
+
+**Not one popular family ships a legacy `kern` table**; all their kerning is GPOS. So `useOTL => 0` does not merely
+forgo shaping, it forecloses kerning — which is why §9.25 (kerning on globally) depends on this table. Lato is the
+one case where the GPOS is genuinely dead weight: 210 KB a face, 840 KB of its 2.73 MB, unreachable without a GDEF.
+Merriweather's 853 KB a face is the opposite — fully usable at `0xFF`.
+
+**Kerning is a second, independent switch.** `useKerning` is `false` in mPDF's defaults and Gravity PDF never set it,
+so no release has ever kerned. It gates *both* paths (`Mpdf.php:4601-4607`), so `useOTL` alone never kerns. Measured
+cost on a 15-page submission PDF, warm metrics cache: Arimo 0.44 s → 1.12 s, DejaVu Sans Condensed 0.54 s → 0.77 s;
+at 10 pt body text the visual difference is sub-pixel, and the real wins are display sizes and script faces (Great
+Vibes' `TA` collision in "AVATAR" only resolves with kerning on). CSS `font-kerning: normal` works per element with
+the global off (verified, 20,003 px). **Decided 2026-09-07: on globally** — §9.25.
 
 ## Legal Signing already depends on five cursive families
 
@@ -202,3 +254,31 @@ applies and no manifest lookup is needed: Homemade Apple 110,004 B, Permanent Ma
 the dehint step is allowed here: Rock Salt −12.5%, Homemade Apple −0.5%, Permanent Marker −0.8%. All three
 render in the forked mPDF at `useOTL => 0`, dehinted and not; at 0xFF they fail the same way Lato does
 (`does not include OTL tables (or at least not a GDEF table)`), so their entries must declare `useOTL => 0`.
+
+## All seven swaps taken — 2026-09-07
+
+Decided in session and written into the 7.0 plan (§2.4, §4.3 pack table, §4.8 step 1c, §7 back-compat table, §9.3):
+**every flagged font is replaced except Sun-ExtB**, which has no Noto covering Plane 2 and is now the only font left
+in the pre-release legal-posture assessment. Three consequences the plan did not previously cover, added with them:
+
+1. **The pipeline needs a frozen `REPLACES` map** (old mPDF key → new key). `language_to_font`, `scripts` and
+   `languages` are generated from the prefixed `LanguageToFont` class, which is keyed on *mPDF's* font keys — so
+   without it `ko` generates to `unbatang`, no pack provides that key, and Korean silently falls through to the
+   backup font. A build-time check asserts every generated value is a key some pack registers.
+2. **Cherokee leaves the `americas` pack.** Aboriginal Sans covered 85/96 of U+13A0–13FF; Noto Sans Canadian
+   Aboriginal covers none of it. Measured: `indic`'s FreeSans covers exactly the same 85/96, and mPDF's own
+   `LanguageToFont` already sends Cherokee there — so only the pack's script list changes, not the coverage.
+3. **No upgraded site loses a font.** The replaced originals are all `LEGACY_INSTALLER_FILES` basenames, so upgrade
+   step 1c adopts each as an `imported` row under its frozen 6.x key with zero network. The swaps are a
+   fresh-install-only change — which is also what makes the Myanmar swap safe, since Zawgyi-encoded text would be
+   mojibake if re-rendered in Unicode Noto Sans Myanmar.
+
+Also closed the same day: **Aboriginal Serif** (no pack names it, so 7.0 does not ship it and it needs no
+replacement); **`popular-serif` keeps Merriweather** despite being 77% of the pack (Source Serif 4 / PT Serif were
+the smaller alternatives; the pack is never auto-installed, so only a site that clicks it pays); and the per-family
+**`useOTL`** table above is adopted as measured — ten `0xFF`, seven `0`.
+
+Pack sizes recomputed from the fork's font packages, since the plan's figures were 6.x's single-face core-fonts set:
+`cjk` 40.6 → 28.2 MB, `korean` 6.9 → 12.45 MB, `southeast-asian` 2.5 → 4.61 MB, `americas` 0.8 → 0.19 MB. The 7 MB
+inline cap still admits Korean on first render (Noto Sans KR's `R` is 6.22 MB, against UnBatang's 6.94) and still
+excludes the CJK BMP face (Noto Sans SC 10.60 MB).
