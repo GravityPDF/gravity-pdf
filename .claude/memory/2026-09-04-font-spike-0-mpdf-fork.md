@@ -214,3 +214,26 @@ forms) and none in halfwidth Katakana, both of which a hand-approximation would 
 - The generated gate's committed location and format are not specified by the plan. The spike emits
   `gate.php` returning a regex string; `fonts/` beside the faces it is derived from is the obvious home.
 - Remaining Phase 0 spikes: 5 (Noto replacements), 6 (pack split), 7 (file hosting), 8 (Google pipeline dry run).
+
+## CI on the fork (2026-09-07)
+
+**The `gravitypdf` branch gets no CI.** `tests.yml`, `snapshots.yml` and `cs.yml` fire on `pull_request` and
+on pushes to `master` / `development` / `test` only, so the fork branch is covered solely by its own PRs —
+and merging a PR with red checks leaves nothing to catch it afterwards. Adding `gravitypdf` to those push
+triggers is an open suggestion. That same trigger list is the way to run CI on an arbitrary commit: push it
+to `refs/heads/test` and the full matrix runs, which is how the failures below were attributed.
+
+Three checks were red on `decouple-fonts` when PRs #1–#3 were merged (they were visible on the PRs and were
+not looked at first — a process miss):
+
+1. **`Tests (5.6)`, ours.** `InitFontRegistryTest::testDefaultFontSortsFirstInFontdata` used
+   `key($mpdf->fontdata)`. `key()` reads the array's internal pointer, which mPDF has already advanced past
+   the end; PHP 7's foreach-on-a-copy hides it, PHP 5.6 returns `null`. Fixed with `array_keys()` in
+   `2bc01ee` (GravityPDF/mpdf#4). **Lesson: the 5.6 matrix cell is the only thing that catches array-pointer
+   assumptions — a modern-PHP local run cannot.**
+2. **`Snapshot Tests`, upstream's.** `AutoFontSnapshotTest` fails on 7 pages, identically with and without
+   every one of our commits. The baselines predate the rework. Quantified: the original two commits alone
+   fail **9** snapshots / 74 pages; adding `mpdf/font-bundle-all` to `require-dev` drops that to **1** / 7.
+3. **`Static Analysis`, pre-existing.** PHPStan `ignore.unmatched` on three baseline patterns; fails on a
+   branch that only adds a `composer.json` `extra` block, so it is baseline drift against a newer PHPStan.
+
