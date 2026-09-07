@@ -10,6 +10,15 @@ Date: 2026-09-04. **The fork branch was renamed `gravitypdf-7.0` → `gravitypdf
 `composer.json`: upstream added `ext-imagick` to `suggest` after the PR's base, the PR replaced the same block
 with the three font-bundle suggests. Resolved by keeping both. No other conflict across 248 files.
 
+Provenance, verified 2026-09-07: the pre-rebase head was **`4223d449`** (recovered from
+`repos/jakejackson1/mpdf/events`, since the PR timeline records force-pushes without before/after SHAs).
+Comparing the original PR diff `4c807ef...4223d449` against the rebased `389e19e...40aec72`: the same 248
+files, none added or lost, and only `composer.json` differs in line counts (11+/1− → 12+/2−) — exactly the
+conflict resolution above. The rebase dropped nothing. In particular `/packages export-ignore` was **never**
+in the upstream PR: `4223d449`'s `.gitattributes` carries only `*.gitattributes`, `/utils` and `/tests`. It
+was ours (`48b364a`, per the plan's spike 0 instruction) and moved onto `decouple-fonts` as `6e45465` on
+2026-09-07.
+
 ## Baseline: #2161 leaves mPDF's own suite red
 
 | Branch | Result |
