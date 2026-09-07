@@ -124,6 +124,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $font_repository;
 
 	/**
+	 * Holds our font Registry object
+	 * Builds what mPDF registers and what the Font Manager lists, from one read of the font tables
+	 *
+	 * @var Helper\Fonts\Registry
+	 *
+	 * @since 7.0
+	 */
+	public $font_registry;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -911,9 +921,36 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->log,
 				$this->data->template_font_location
 			);
+
+			$this->font_repository->set_importer(
+				new Helper\Fonts\Loose_Font_Importer(
+					$this->font_repository,
+					new Helper\Fonts\SupportsOtl( $this->data->template_font_location ),
+					$this->log,
+					$this->data->template_font_location
+				)
+			);
 		}
 
 		return $this->font_repository;
+	}
+
+	/**
+	 * Build the font registry, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_registry(): Helper\Fonts\Registry {
+		if ( $this->font_registry === null ) {
+			$this->font_registry = new Helper\Fonts\Registry(
+				$this->get_font_repository(),
+				$this->options,
+				$this->log,
+				PDF_PLUGIN_DIR . 'fonts'
+			);
+		}
+
+		return $this->font_registry;
 	}
 
 	/**

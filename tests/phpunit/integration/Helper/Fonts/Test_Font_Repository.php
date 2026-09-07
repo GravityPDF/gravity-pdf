@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Fonts;
 
+use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
 
@@ -23,6 +24,8 @@ use GPDFAPI;
  */
 class Test_Font_Repository extends TestCase {
 
+	use HasFontRows;
+
 	/**
 	 * @var Font_Repository
 	 */
@@ -34,24 +37,14 @@ class Test_Font_Repository extends TestCase {
 	public $font_dir;
 
 	public function set_up(): void {
-		global $gfpdf;
-
 		parent::set_up();
 
-		$this->repository = $gfpdf->get_font_repository();
-		$this->font_dir   = $this->repository->get_font_dir();
-
-		wp_mkdir_p( $this->font_dir );
+		$this->repository = $this->font_repository();
+		$this->font_dir   = $this->font_dir();
 	}
 
 	public function tear_down(): void {
-		foreach ( array_keys( $this->repository->all() ) as $font_key ) {
-			$this->repository->delete( $font_key, false );
-		}
-
-		foreach ( glob( $this->font_dir . 'test-*.ttf' ) ?: [] as $file ) {
-			unlink( $file );
-		}
+		$this->remove_font_rows();
 
 		GPDFAPI::get_options_class()->update_option( 'custom_fonts', [] );
 
@@ -65,22 +58,7 @@ class Test_Font_Repository extends TestCase {
 	}
 
 	protected function insert_font( string $font_key, array $overrides = [] ): int {
-		return $this->repository->insert(
-			array_merge(
-				[
-					'font_key' => $font_key,
-					'label'    => ucfirst( $font_key ),
-					'source'   => 'custom',
-					'files'    => [
-						'R' => [
-							'path' => $this->write_font_file( 'test-' . $font_key . '.ttf' ),
-							'size' => 3,
-						],
-					],
-				],
-				$overrides
-			)
-		);
+		return $this->install_font_row( $font_key, $overrides );
 	}
 
 	public function test_insert_round_trips_a_row_and_its_files() {

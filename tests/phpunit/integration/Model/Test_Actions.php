@@ -308,29 +308,6 @@ class Test_Actions extends TestCase {
 	}
 
 	/**
-	 * Check the core fonts installation prompt works as expected
-	 *
-	 * @since 5.0
-	 */
-	public function test_core_fonts_condition() {
-		global $gfpdf;
-
-		$path = $gfpdf->data->template_font_location;
-		set_current_screen( 'edit.php' );
-
-		$this->assertTrue( $this->model->core_font_condition() );
-
-		touch( $path . 'DejaVuSansCondensed.ttf' );
-		$this->assertFalse( $this->model->core_font_condition() );
-		unlink( $path . 'DejaVuSansCondensed.ttf' );
-
-		$_GET['page']    = 'gfpdf-page';
-		$_GET['subview'] = 'PDF';
-		$_GET['tab']     = 'tools';
-		$this->assertFalse( $this->model->core_font_condition() );
-	}
-
-	/**
 	 * Check our primary action button view generates correctly
 	 *
 	 * @since 4.0

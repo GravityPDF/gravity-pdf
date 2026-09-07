@@ -22,8 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The only reader and writer of the font tables
  *
  * `all()` is the single read behind the registry and the Font Manager alike, so what mPDF registers and what the UI
- * shows cannot drift. It performs no filesystem operation: 6.x globbed the fonts directory on every render, and on
- * NFS-backed hosts each stat is a network round trip.
+ * shows cannot drift. In steady state it performs no filesystem operation: 6.x globbed the fonts directory on every
+ * render, and on NFS-backed hosts each stat is a network round trip.
+ *
+ * The exception is `ensure_ready()`, which runs once per site and does scan the directory. It has to sit here
+ * rather than on the admin upgrade routine: that routine only fires on an admin page load, so a site that
+ * auto-updates and serves PDFs by REST or cron would render before it, and whichever request touches fonts first
+ * pays for the migration instead. Once `gfpdf_db_version` is written it is one autoloaded option read forever.
  *
  * @package GFPDF\Helper\Fonts
  *
@@ -84,6 +89,17 @@ class Font_Repository {
 	public const FACE_ROLES = [ 'R', 'B', 'I', 'BI' ];
 
 	/**
+	 * What a font key may contain
+	 *
+	 * mPDF keys are plain array keys, so this is the plugin's rule rather than a format requirement. It is here,
+	 * not on the model, because both the REST validation callback and the loose-font importer derive keys and must
+	 * agree on what they are allowed to produce.
+	 *
+	 * @since 7.0
+	 */
+	public const KEY_PATTERN = '/^[a-z0-9_\-]+$/';
+
+	/**
 	 * The 6.x face keys, mapped to the roles that replace them
 	 *
 	 * The public API, `Helper_Data::customFontData` and every add-on still speak the left-hand side, so this
@@ -115,6 +131,12 @@ class Font_Repository {
 	 * @since 7.0
 	 */
 	protected $lock;
+
+	/**
+	 * @var Loose_Font_Importer|null
+	 * @since 7.0
+	 */
+	protected $importer;
 
 	/**
 	 * @var Helper_Misc
@@ -165,6 +187,18 @@ class Font_Repository {
 	}
 
 	/**
+	 * Hand the repository its loose-font importer
+	 *
+	 * Set after construction rather than injected, because the importer reads through this repository — passing it
+	 * to the constructor would be a cycle.
+	 *
+	 * @since 7.0
+	 */
+	public function set_importer( Loose_Font_Importer $importer ): void {
+		$this->importer = $importer;
+	}
+
+	/**
 	 * Create the tables and migrate 6.x records, once
 	 *
 	 * Runs before this repository's first query on any request, so nothing on the render path depends on the admin
@@ -204,6 +238,11 @@ class Font_Repository {
 
 		try {
 			$this->migration->from_option( $this );
+
+			/* Runs after the migration so a file a 6.x record names is never imported as a loose font */
+			if ( $this->importer !== null ) {
+				$this->importer->import();
+			}
 
 			$this->schema->mark_current();
 		} catch ( \Throwable $e ) {
@@ -759,7 +798,7 @@ class Font_Repository {
 	/**
 	 * @since 7.0
 	 */
-	protected function get_last_changed(): string {
+	public function get_last_changed(): string {
 		$last_changed = wp_cache_get( static::CACHE_STAMP, static::CACHE_GROUP );
 
 		if ( ! is_string( $last_changed ) || $last_changed === '' ) {

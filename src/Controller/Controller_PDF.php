@@ -189,8 +189,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		add_filter( 'gform_notification', [ $this->model, 'notifications' ], 9999, 3 );
 
 		/* Change mPDF settings */
-		add_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] );
-		add_filter( 'mpdf_font_data', [ $this->model, 'add_unregistered_fonts_to_mPDF' ], 20 );
 		add_filter( 'gfpdf_mpdf_init_class', [ $this->model, 'set_watermark_font' ], 10, 4 );
 
 		/* Process mergetags and shortcodes in PDF */

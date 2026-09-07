@@ -36,7 +36,7 @@ class Test_Rest_Download_Pdf extends Test_Rest {
 		/* Configure mPDF with available fonts so the PDF generator can produce a document */
 		$config = static function ( $config ) {
 			return array_merge( $config, [
-				'fontDir'  => PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/',
+				'fontDir'  => [ PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts' ],
 				'fontdata' => [
 					'dejavusans' => [
 						'R'          => 'DejaVuSans.ttf',

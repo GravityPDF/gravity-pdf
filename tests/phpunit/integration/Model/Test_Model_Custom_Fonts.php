@@ -168,7 +168,7 @@ class Test_Model_Custom_Fonts extends TestCase {
 		$this->assertSame( 'myuniqueid', $this->model->get_unique_id( 'myuniqueid' ) );
 		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'arial' ), $this->model->get_unique_id( 'arial' ) );
 		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'symbol' ), $this->model->get_unique_id( 'symbol' ) );
-		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'dejavusans' ), $this->model->get_unique_id( 'dejavusans' ) );
+		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'gfpdf-arimo' ), $this->model->get_unique_id( 'gfpdf-arimo' ) );
 
 		$this->assertSame( 'font1', $this->model->get_unique_id( 'font1' ) );
 		$this->model->add_font(
@@ -195,7 +195,7 @@ class Test_Model_Custom_Fonts extends TestCase {
 			[ false, 'times' ],
 			[ false, 'ctimes' ],
 			[ false, 'chelvetica' ],
-			[ false, 'dejavusans' ],
+			[ false, 'gfpdf-arimo' ],
 			[ true, 'dejavusans1' ],
 		];
 	}

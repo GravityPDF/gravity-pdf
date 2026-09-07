@@ -46,26 +46,28 @@ test.describe('Font Manager', () => {
 
 		const select = await page.getByLabel('Font', { exact: true });
 
+		// 7.0 ships none of the 6.x core fonts, so the dropdown lists what the font registry actually has
 		await expect(
-			select.locator('optgroup[label="Unicode"]')
+			select.locator('optgroup[label="Bundled Fonts"]')
 		).toBeAttached();
 
-		await expect(select.locator('optgroup[label="Indic"]')).toBeAttached();
+		await expect(select.locator('optgroup[label="Unicode"]')).toHaveCount(
+			0
+		);
 
-		await select.selectOption('Dejavu Sans Condensed');
-		await select.selectOption('Lohit Kannada');
+		await select.selectOption('Arimo');
 	});
 
 	test('should save selected font', async ({ page }) => {
 		await pdf.navigateToNewFormPdf(form.id);
 		await page
 			.getByLabel('Font', { exact: true })
-			.selectOption('mph2bdamase');
+			.selectOption('gfpdf-arimo');
 
 		await pdf.addOrUpdatePdf();
 
 		await expect(page.getByLabel('Font', { exact: true })).toHaveValue(
-			'mph2bdamase'
+			'gfpdf-arimo'
 		);
 	});
 

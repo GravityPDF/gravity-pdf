@@ -916,64 +916,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_installed_fonts() {
-		$fonts = [
-			esc_html__( 'Unicode', 'gravity-pdf' ) => [
-				'dejavusanscondensed'  => 'Dejavu Sans Condensed',
-				'dejavusans'           => 'Dejavu Sans',
-				'dejavuserifcondensed' => 'Dejavu Serif Condensed',
-				'dejavuserif'          => 'Dejavu Serif',
-				'dejavusansmono'       => 'Dejavu Sans Mono',
-
-				'freesans'             => 'Free Sans',
-				'freeserif'            => 'Free Serif',
-				'freemono'             => 'Free Mono',
-
-				'mph2bdamase'          => 'MPH 2B Damase',
-			],
-
-			esc_html__( 'Indic', 'gravity-pdf' )   => [
-				'lohitkannada' => 'Lohit Kannada',
-				'pothana2000'  => 'Pothana2000',
-			],
-
-			esc_html__( 'Arabic', 'gravity-pdf' )  => [
-				'xbriyaz'               => 'XB Riyaz',
-				'lateef'                => 'Lateef',
-				'kfgqpcuthmantahanaskh' => 'Bahif Uthman Taha',
-			],
-
-			esc_html__( 'Chinese, Japanese, Korean', 'gravity-pdf' ) => [
-				'sun-exta' => 'Sun Ext',
-				'unbatang' => 'Un Batang (Korean)',
-			],
-
-			esc_html__( 'Other', 'gravity-pdf' )   => [
-				'estrangeloedessa' => 'Estrangelo Edessa (Syriac)',
-				'kaputaunicode'    => 'Kaputa (Sinhala)',
-				'abyssinicasil'    => 'Abyssinica SIL (Ethiopic)',
-				'aboriginalsans'   => 'Aboriginal Sans (Cherokee / Canadian)',
-				'jomolhari'        => 'Jomolhari (Tibetan)',
-				'sundaneseunicode' => 'Sundanese (Sundanese)',
-				'taiheritagepro'   => 'Tai Heritage Pro (Tai Viet)',
-				'aegyptus'         => 'Aegyptus (Egyptian Hieroglyphs)',
-				'akkadian'         => 'Akkadian (Cuneiform)',
-				'aegean'           => 'Aegean (Greek)',
-				'quivira'          => 'Quivira (Greek)',
-				'eeyekunicode'     => 'Eeyek (Meetei Mayek)',
-				'lannaalif'        => 'Lanna Alif (Tai Tham)',
-				'daibannasilbook'  => 'Dai Banna SIL (New Tai Lue)',
-				'garuda'           => 'Garuda (Thai)',
-				'khmeros'          => 'Khmer OS (Khmer)',
-				'dhyana'           => 'Dhyana (Lao)',
-				'tharlon'          => 'TharLon (Myanmar / Burmese)',
-				'padaukbook'       => 'Padauk Book (Myanmar / Burmese)',
-				'zawgyi-one'       => 'Zawgyi One (Myanmar / Burmese)',
-				'ayar'             => 'Ayar Myanmar (Myanmar / Burmese)',
-				'taameydavidclm'   => 'Taamey David CLM (Hebrew)',
-			],
-		];
-
-		$fonts = $this->add_custom_fonts( $fonts );
+		/*
+		 * 6.x hard-coded the core-font list here. 7.0 ships none of those files, so the list comes from the font
+		 * registry — the same read that decides what mPDF registers, which is what stops the dropdown offering a
+		 * font that cannot render. Custom fonts are rows now, so they arrive with everything else rather than
+		 * through add_custom_fonts().
+		 */
+		$fonts = \GPDFAPI::get_font_registry()->get_grouped_fonts();
 
 		return apply_filters( 'gfpdf_font_list', $fonts );
 	}
