@@ -356,6 +356,94 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Verify a path falls inside one of the directories Gravity PDF manages
+	 *
+	 * The guard behind every delete the plugin performs: `rmdir()` and `unlink()` share it rather than keeping two
+	 * copies that can drift.
+	 *
+	 * @param string $path The path to test
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function is_managed_path( string $path ) {
+		$folders = [
+			$this->data->template_location,
+			$this->data->template_font_location,
+			$this->data->template_tmp_location,
+			$this->data->mpdf_tmp_location,
+		];
+
+		if ( is_multisite() ) {
+			$folders[] = $this->data->multisite_template_location;
+		}
+
+		/* Verify $path is a real path on the current file system */
+		$path_to_test = realpath( $path );
+		if ( $path_to_test === false ) {
+			$this->log->error(
+				'Filesystem Delete Error',
+				[
+					'dir'       => $path,
+					'exception' => 'Not a real path on the file system',
+				]
+			);
+
+			return new WP_Error( 'gfpdf_rmdir_not_a_real_path' );
+		}
+
+		foreach ( $folders as $folder ) {
+			$folder_path = realpath( $folder );
+
+			if ( $folder_path !== false && strpos( $path_to_test, $folder_path ) === 0 ) {
+				return true;
+			}
+		}
+
+		$this->log->error(
+			'Filesystem Delete Error',
+			[
+				'dir'       => $path,
+				'exception' => 'Directory falls outside of approved paths',
+			]
+		);
+
+		return new WP_Error( 'gfpdf_rmdir_directory_not_approved', esc_html( 'Cannot delete path. Directory falls outside of approved Gravity PDF paths: ' . $path ) );
+	}
+
+	/**
+	 * Delete a single file inside one of the directories Gravity PDF manages
+	 *
+	 * @param string $file Absolute path to the file
+	 *
+	 * @return bool|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function unlink( string $file ) {
+		$managed = $this->is_managed_path( $file );
+		if ( is_wp_error( $managed ) ) {
+			return $managed;
+		}
+
+		if ( ! is_file( $file ) ) {
+			return new WP_Error( 'gfpdf_unlink_not_a_file', esc_html( 'Cannot delete path. Not a file: ' . $file ) );
+		}
+
+		$results = unlink( $file ); //phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+		if ( ! $results ) {
+			$this->log->error( sprintf( 'Could not delete the file: %s', $file ) );
+
+			return new WP_Error( 'gfpdf_unlink_failed', esc_html( 'Could not delete the file: ' . $file ) );
+		}
+
+		$this->log->notice( sprintf( 'Successfully ran `unlink` on %s', $file ) );
+
+		return true;
+	}
+
+	/**
 	 * This function recursively deletes all files and folders under the given directory, and then the directory itself
 	 * equivalent to Bash: rm -r $dir
 	 *
@@ -369,55 +457,9 @@ class Helper_Misc {
 	 */
 	public function rmdir( $dir, bool $delete_top_level_dir = true ) {
 
-		/*
-		 * Do not allow directories outside the folders managed by Gravity PDF to be deleted
-		 */
-		$folders = [
-			$this->data->template_location,
-			$this->data->template_font_location,
-			$this->data->template_tmp_location,
-			$this->data->mpdf_tmp_location,
-		];
-
-		if ( is_multisite() ) {
-			$folders[] = $this->data->multisite_template_location;
-		}
-
-		/* Verify $dir is a real path on the current file system */
-		$path_to_test = realpath( $dir );
-		if ( $path_to_test === false ) {
-			$this->log->error(
-				'Filesystem Delete Error',
-				[
-					'dir'       => $dir,
-					'exception' => 'Not a real path on the file system',
-				]
-			);
-
-			return new WP_Error( 'gfpdf_rmdir_not_a_real_path' );
-		}
-
-		/* Check if $dir to delete falls inside one of the Gravity PDF directories */
-		$allowed_to_delete = false;
-		foreach ( $folders as $folder ) {
-			$folder_path = realpath( $folder );
-
-			if ( $folder_path !== false && strpos( $path_to_test, $folder_path ) === 0 ) {
-				$allowed_to_delete = true;
-				break;
-			}
-		}
-
-		if ( ! $allowed_to_delete ) {
-			$this->log->error(
-				'Filesystem Delete Error',
-				[
-					'dir'       => $dir,
-					'exception' => 'Directory falls outside of approved paths',
-				]
-			);
-
-			return new WP_Error( 'gfpdf_rmdir_directory_not_approved', esc_html( 'Cannot delete path. Directory falls outside of approved Gravity PDF paths: ' . $dir ) );
+		$managed = $this->is_managed_path( $dir );
+		if ( is_wp_error( $managed ) ) {
+			return $managed;
 		}
 
 		/* Path is managed by Gravity PDF and can be deleted */

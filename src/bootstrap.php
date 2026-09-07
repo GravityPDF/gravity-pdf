@@ -114,6 +114,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $templates;
 
 	/**
+	 * Holds our Font_Repository object
+	 * The single reader and writer of the font tables
+	 *
+	 * @var Helper\Fonts\Font_Repository
+	 *
+	 * @since 7.0
+	 */
+	public $font_repository;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -244,6 +254,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
 		add_action( 'admin_init', [ $this, 'setup_settings_fields' ], 1 );
+
+		/* The font tables are network-global, so a deleted site leaves only its visibility rows behind */
+		add_action( 'wp_uninitialize_site', [ $this, 'remove_site_font_visibility' ] );
+	}
+
+	/**
+	 * Drop a deleted site's font visibility rows
+	 *
+	 * @param \WP_Site $site
+	 *
+	 * @since 7.0
+	 */
+	public function remove_site_font_visibility( $site ) {
+		$this->get_font_repository()->delete_site_rows( (int) $site->blog_id );
 	}
 
 	/**
@@ -859,12 +883,37 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	public function load_custom_font_handler(): void {
-		$model = new Model\Model_Custom_Fonts( $this->options );
+		$model = new Model\Model_Custom_Fonts( $this->options, $this->get_font_repository() );
 		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
 		$class->init();
 
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Build the font repository, once
+	 *
+	 * Deferred rather than built in init() because it needs `template_font_location`, which
+	 * `Controller_Install::setup_defaults()` sets.
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_repository(): Helper\Fonts\Font_Repository {
+		if ( $this->font_repository === null ) {
+			$schema = new Helper\Fonts\Font_Schema( $this->log );
+
+			$this->font_repository = new Helper\Fonts\Font_Repository(
+				$schema,
+				new Helper\Fonts\Font_Migration( $this->options, $this->log ),
+				new Helper\Fonts\Font_Lock(),
+				$this->misc,
+				$this->log,
+				$this->data->template_font_location
+			);
+		}
+
+		return $this->font_repository;
 	}
 
 	/**

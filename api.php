@@ -677,8 +677,10 @@ final class GPDFAPI {
 		$files_backup = $_FILES;
 		$_FILES       = [];
 
+		global $gfpdf;
+
 		$data       = self::get_data_class();
-		$model      = new \GFPDF\Model\Model_Custom_Fonts( self::get_options_class() );
+		$model      = new \GFPDF\Model\Model_Custom_Fonts( self::get_options_class(), $gfpdf->get_font_repository() );
 		$controller = new \GFPDF\Controller\Controller_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Helper\Fonts\LocalFilesystem', '\GFPDF\Helper\Fonts\LocalFile' );
 
 		$request = new WP_REST_Request();

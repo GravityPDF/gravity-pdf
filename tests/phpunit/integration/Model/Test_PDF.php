@@ -1325,7 +1325,7 @@ class Test_PDF extends TestCase {
 			],
 		];
 
-		$gfpdf->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		/* Check the results are accurate */
 		$results = $this->model->register_custom_font_data_with_mPDF( [ '1', '2' ] );
