@@ -30,15 +30,22 @@ class Test_Model_Custom_Fonts extends TestCase {
 	public $model;
 
 	public function set_up(): void {
+		global $gfpdf;
 
 		parent::set_up();
 
-		$this->model = new Model_Custom_Fonts( GPDFAPI::get_options_class() );
+		$this->model = new Model_Custom_Fonts( GPDFAPI::get_options_class(), $gfpdf->get_font_repository() );
 	}
 
 	public function tear_down(): void {
+		global $gfpdf;
+
 		$options = GPDFAPI::get_options_class();
 		$options->update_option( 'custom_fonts', [] );
+
+		foreach ( array_keys( $gfpdf->get_font_repository()->all() ) as $font_key ) {
+			$gfpdf->get_font_repository()->delete( $font_key, false );
+		}
 
 		parent::tear_down();
 	}
@@ -122,25 +129,25 @@ class Test_Model_Custom_Fonts extends TestCase {
 		$this->model->add_font(
 			[
 				'id'   => 'font1',
-				'name' => 'Font',
+				'font_name' => 'Font',
 			]
 		);
 
 		$font = $this->model->get_font_by_id( 'font1' );
-		$this->assertSame( 'Font', $font['name'] );
+		$this->assertSame( 'Font', $font['font_name'] );
 
-		$font['name'] = 'New Font';
+		$font['font_name'] = 'New Font';
 
 		$this->model->update_font( $font );
 		$font = $this->model->get_font_by_id( 'font1' );
-		$this->assertSame( 'New Font', $font['name'] );
+		$this->assertSame( 'New Font', $font['font_name'] );
 	}
 
 	public function test_delete_font_success() {
 		$this->model->add_font(
 			[
 				'id'   => 'font1',
-				'name' => 'Font',
+				'font_name' => 'Font',
 			]
 		);
 

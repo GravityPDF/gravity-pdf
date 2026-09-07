@@ -753,7 +753,7 @@ class Test_Options_API extends TestCase {
 			],
 		];
 
-		$this->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		$existing_fonts = [
 			'Unicode' => [
@@ -789,7 +789,7 @@ class Test_Options_API extends TestCase {
 			],
 		];
 
-		$this->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		$get_fonts = $this->options->get_custom_fonts();
 

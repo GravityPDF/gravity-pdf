@@ -112,7 +112,38 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		require_once $this->plugin_dir . '/pdf.php';
 
+		$this->create_font_tables();
+
 		error_reporting( $previous_error_level );
+	}
+
+	/**
+	 * Create the font tables for real, once, before the suite starts
+	 *
+	 * This has to happen here rather than in `ensure_ready()` during a test. WP_UnitTestCase installs filters that
+	 * turn CREATE TABLE into a TEMPORARY table, and a temporary table shadows the real one for the connection — so
+	 * a mid-test `ensure_ready()` would read empty shadows and its `SHOW TABLES` verify would misfire. Writing
+	 * `gfpdf_db_version` here makes `ensure_ready()` a no-op in every test.
+	 *
+	 * @since 7.0
+	 */
+	protected function create_font_tables() {
+		/* GPDFAPI is not wired up this early, and the schema only logs on failure, which is asserted below */
+		$schema = new \GFPDF\Helper\Fonts\Font_Schema( new \GFPDF_Vendor\Psr\Log\NullLogger() );
+
+		$schema->drop();
+		$schema->ensure();
+
+		$missing = $schema->get_missing_tables();
+		if ( count( $missing ) > 0 ) {
+			throw new RuntimeException( 'Could not create the Gravity PDF font tables: ' . implode( ', ', $missing ) );
+		}
+
+		$schema->mark_current();
+
+		if ( get_option( $schema::VERSION_OPTION ) !== $schema->get_version() ) {
+			throw new RuntimeException( 'The Gravity PDF font schema version was not recorded' );
+		}
 	}
 
 }

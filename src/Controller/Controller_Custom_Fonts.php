@@ -291,14 +291,17 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				$font['font_name'] = $label;
 			}
 
-			/* Delete any font files needed (any font key passed as a body param) */
+			/*
+			 * Clear any font faces the request asked to remove. The files go with the rows in `update_font()`:
+			 * unlinking here would run before the row is gone, and the shared delete path skips a path a
+			 * surviving row still records.
+			 */
 			$params = $request->get_body_params();
 			foreach ( $this->font_keys as $font_id ) {
 				if ( ! isset( $params[ $font_id ] ) || empty( $font[ $font_id ] ) ) {
 					continue;
 				}
 
-				$this->delete_font_file( basename( $font[ $font_id ] ) );
 				$font[ $font_id ] = '';
 			}
 
@@ -347,7 +350,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			}
 
 			/* Update database, if needed */
-			if ( $this->model->get_custom_fonts()[ $font['id'] ] !== $font && ! $this->model->update_font( $font ) ) {
+			if ( $this->model->get_font_by_id( $font['id'] ) !== $font && ! $this->model->update_font( $font ) ) {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
@@ -389,17 +392,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new GravityPdfIdException();
 			}
 
-			/* Delete TTF files from disk */
-			$font = $this->model->get_font_by_id( $id );
-			foreach ( $this->font_keys as $font_id ) {
-				if ( empty( $font[ $font_id ] ) ) {
-					continue;
-				}
-
-				$this->delete_font_file( basename( $font[ $font_id ] ) );
-			}
-
-			/* Update DB */
+			/* Removes the rows, then the files no surviving row records */
 			if ( ! $this->model->delete_font( $id ) ) {
 				throw new GravityPdfDatabaseUpdateException();
 			}
@@ -486,23 +479,6 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		}
 
 		return $files;
-	}
-
-	/**
-	 * @param string $file The filename of the font to be deleted
-	 *
-	 * @return bool
-	 * @since 6.0
-	 */
-	protected function delete_font_file( string $file ): bool {
-		if (
-			is_file( $this->font_dir_path . $file ) &&
-			! @unlink( $this->font_dir_path . $file ) /* phpcs:ignore */
-		) {
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
