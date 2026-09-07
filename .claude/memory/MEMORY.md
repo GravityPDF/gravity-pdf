@@ -8,3 +8,4 @@
 - [Font Spike 7: Hosting](2026-09-07-font-spike-7-hosting.md) — R2 on a public custom domain as `files_base`; GitHub releases ruled out (signed redirect vs `redirection => 0`, plus the AUP throttle clause); Worker binding isn't edge-cached
 - [Font Spike 8: Google pipeline](2026-09-07-font-spike-8-google-pipeline.md) — 2,050 families, true skip list is 1; ~7,800 files is the *variants* set not the default (3,423); GDEF 1.3 silently drops MarkGlyphSets on 80% of VFs (fork PRs #26 + #34, both green)
 - [Font Phase 1b: Tables](2026-09-07-font-phase-1b-tables.md) — the three font tables, repository and 6.x migration built; the temporary-table trap, rows-before-unlink ordering, and three tests that asserted on the store
+- [Font Phase 1c: Registry](2026-09-07-font-phase-1c-registry.md) — mPDF font wiring via the registry; the test-suite mu-plugin that hid every font bug, the fonttrans alias collapse (fork PR #36), and the fontDir array contract
