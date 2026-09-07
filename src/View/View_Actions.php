@@ -56,24 +56,6 @@ class View_Actions extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Load our Core Font Installer
-	 *
-	 * @param string $type        The action ID
-	 * @param string $button_text The primary button text
-	 *
-	 * @return string              The notice HTML
-	 *
-	 * @since 5.0
-	 */
-	public function core_font( $type, $button_text ) {
-
-		$html  = $this->load( 'core_font', [], false );
-		$html .= $this->get_action_buttons( $type, $button_text, 'disabled' );
-
-		return $html;
-	}
-
-	/**
 	 * Load the notice for the deprecated functionality the site still uses
 	 *
 	 * One notice lists them all, each named the same way so the list scans. That is deliberately the registration's

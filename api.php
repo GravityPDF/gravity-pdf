@@ -118,6 +118,19 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns the font registry, which builds what mPDF registers and what the Font Manager lists
+	 *
+	 * @return \GFPDF\Helper\Fonts\Registry
+	 *
+	 * @since 7.0
+	 */
+	public static function get_font_registry() {
+		global $gfpdf;
+
+		return $gfpdf->get_font_registry();
+	}
+
+	/**
 	 * Returns our miscellaneous methods (or common methods) used throughout the plugin.
 	 *
 	 * Usage:

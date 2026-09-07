@@ -2,11 +2,10 @@ import type { Admin } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
-import { snapshot } from '@self:playwright/utils/snapshot';
 
 test.describe('Tools Tab', () => {
 	test.describe('Install Core Fonts', () => {
-		test("should display 'Install Core Fonts' field", async ({
+		test('should no longer offer a core font installer', async ({
 			page,
 			admin,
 		}: {
@@ -17,80 +16,15 @@ test.describe('Tools Tab', () => {
 				'admin.php',
 				'page=gf_settings&subview=PDF&tab=tools'
 			);
+
+			// 7.0 bundles the fonts it needs, so there is nothing to download
+			await expect(
+				page.locator('#gfpdf-fieldset-install_core_fonts')
+			).toHaveCount(0);
 
 			await expect(
 				page.locator('legend', { hasText: 'Install Core Fonts' })
-			).toBeVisible();
-
-			await expect(
-				page
-					.locator('#gfpdf-fieldset-install_core_fonts')
-					.getByRole('button', { name: 'Download Core Fonts' })
-			).toBeVisible();
-		});
-
-		test('should return download core fonts successful response', async ({
-			page,
-			admin,
-		}: {
-			page: Page;
-			admin: Admin;
-		}, testinfo) => {
-			await admin.visitAdminPage(
-				'admin.php',
-				'page=gf_settings&subview=PDF&tab=tools'
-			);
-
-			await page.route('**/wp-admin/admin-ajax.php', async (route) => {
-				const postData = route.request().postData() ?? '';
-				if (postData.includes('gfpdf_save_core_font')) {
-					await route.fulfill({
-						status: 200,
-						contentType: 'application/json',
-						body: 'true',
-					});
-				} else {
-					await route.continue();
-				}
-			});
-
-			await page
-				.locator('#gfpdf-fieldset-install_core_fonts')
-				.getByRole('button', { name: 'Download Core Fonts' })
-				.click();
-
-			await expect(
-				page.locator('.gfpdf-core-font-status-success', {
-					hasText: 'ALL CORE FONTS SUCCESSFULLY INSTALLED',
-				})
-			).toBeVisible({ timeout: 60000 });
-
-			await snapshot(page, testinfo);
-		});
-
-		test('should return download core fonts error/failed response', async ({
-			page,
-			admin,
-		}: {
-			page: Page;
-			admin: Admin;
-		}) => {
-			await admin.visitAdminPage(
-				'admin.php',
-				'page=gf_settings&subview=PDF&tab=tools'
-			);
-
-			await page
-				.locator('#gfpdf-fieldset-install_core_fonts')
-				.getByRole('button', { name: 'Download Core Fonts' })
-				.click();
-
-			await expect(
-				page.locator('.gfpdf-core-font-status-error').first()
-			).toBeVisible({ timeout: 15000 });
-			await expect(
-				page.locator('.gfpdf-core-font-retry-link')
-			).toBeVisible();
+			).toHaveCount(0);
 		});
 	});
 

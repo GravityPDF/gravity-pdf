@@ -12,6 +12,7 @@ use GFPDF\Helper\Fields\Field_Products;
 use GFPDF\Helper\Helper_Abstract_Field_Products;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Fonts\Registry;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
@@ -147,7 +148,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer ) {
+	/**
+	 * @var Registry
+	 * @since 7.0
+	 */
+	protected $registry;
+
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Registry $registry = null ) {
 
 		/* Assign our internal variables */
 		$this->gform      = $gform;
@@ -158,6 +165,9 @@ class Model_PDF extends Helper_Abstract_Model {
 		$this->notices    = $notices;
 		$this->templates  = $templates;
 		$this->url_signer = $url_signer;
+
+		/* Optional so the eight-argument signature keeps working; the container supplies it */
+		$this->registry = $registry ?? \GPDFAPI::get_font_registry();
 	}
 
 	/**
@@ -2239,7 +2249,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 5.0
 	 */
 	public function set_watermark_font( $mpdf, $form, $entry, $settings ) {
-		$mpdf->watermark_font = $settings['watermark_font'] ?? $settings['font'] ?? $this->options->get_option( 'default_font', 'dejavusanscondensed' );
+		$mpdf->watermark_font = $settings['watermark_font'] ?? $this->registry->get_default_font( $settings );
 
 		return $mpdf;
 	}

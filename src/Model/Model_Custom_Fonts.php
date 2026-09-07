@@ -61,7 +61,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function check_font_id_valid( string $name ): bool {
-		return (bool) preg_match( '/^[a-z0-9_\-]+$/', $name );
+		return (bool) preg_match( Font_Repository::KEY_PATTERN, $name );
 	}
 
 	/**

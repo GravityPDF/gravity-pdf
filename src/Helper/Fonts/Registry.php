@@ -1,0 +1,539 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace GFPDF\Helper\Fonts;
+
+use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF_Vendor\Mpdf\Fonts\FontRegistry;
+use GFPDF_Vendor\Mpdf\Ucdn;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
+
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
+/* Exit if accessed directly */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Builds everything mPDF and the Font Manager need to know about fonts
+ *
+ * Both come from one read of the font tables, so what renders and what the UI lists cannot drift. Nothing here
+ * touches the filesystem, and nothing constructs `Font_Sources` — its filter runs third-party code the render path
+ * must not depend on.
+ *
+ * @package GFPDF\Helper\Fonts
+ *
+ * @since 7.0
+ */
+class Registry {
+
+	/**
+	 * The bundled font keys, which no catalogue entry may claim
+	 *
+	 * @since 7.0
+	 */
+	public const BUNDLED_FONT = 'gfpdf-arimo';
+
+	/**
+	 * Substitution-only: never offered as a document font
+	 *
+	 * @since 7.0
+	 */
+	public const BUNDLED_SYMBOLS = 'gfpdf-dejavu-symbols';
+
+	/**
+	 * The bundled map, before the installed rows overlay it
+	 *
+	 * Just Latin. This row is what sends Latin text inside a `zh` or `ar` document to Arimo rather than the pack
+	 * font's Latin glyphs. Latin-*language* rows are deliberately absent — an explicit `lang` attribute would flip
+	 * words out of the chosen font mid-paragraph — as are Greek, Cyrillic, Hebrew, Armenian and Georgian, which
+	 * mPDF happily scavenges per glyph from `backupSubsFont`.
+	 *
+	 * @since 7.0
+	 */
+	public const DEFAULT_LANGUAGE_MAP = [ 'und-latn' => self::BUNDLED_FONT ];
+
+	/**
+	 * Language or script tag => the document script it implies
+	 *
+	 * Anything not listed is Latin. Replaces mPDF's `mode`, which is a composite parser with a constructor font
+	 * lookup nothing may rely on.
+	 *
+	 * @since 7.0
+	 */
+	public const LANGUAGE_TO_SCRIPT = [
+		'ja' => Ucdn::SCRIPT_HAN,
+		'zh' => Ucdn::SCRIPT_HAN,
+		'ko' => Ucdn::SCRIPT_HANGUL,
+		'ar' => Ucdn::SCRIPT_ARABIC,
+		'fa' => Ucdn::SCRIPT_ARABIC,
+		'ur' => Ucdn::SCRIPT_ARABIC,
+		'ps' => Ucdn::SCRIPT_ARABIC,
+		'sd' => Ucdn::SCRIPT_ARABIC,
+		'hi' => Ucdn::SCRIPT_DEVANAGARI,
+		'mr' => Ucdn::SCRIPT_DEVANAGARI,
+		'ne' => Ucdn::SCRIPT_DEVANAGARI,
+		'th' => Ucdn::SCRIPT_THAI,
+		'he' => Ucdn::SCRIPT_HEBREW,
+	];
+
+	/**
+	 * @var Font_Repository
+	 * @since 7.0
+	 */
+	protected $repository;
+
+	/**
+	 * @var Helper_Abstract_Options
+	 * @since 7.0
+	 */
+	protected $options;
+
+	/**
+	 * @var LoggerInterface
+	 * @since 7.0
+	 */
+	protected $log;
+
+	/**
+	 * @var string Absolute path to the plugin's bundled fonts directory
+	 * @since 7.0
+	 */
+	protected $bundled_dir;
+
+	/**
+	 * @var array{stamp: string, package: Package}|null The installed layer this request has already built
+	 * @since 7.0
+	 */
+	protected $memo;
+
+	public function __construct(
+		Font_Repository $repository,
+		Helper_Abstract_Options $options,
+		LoggerInterface $log,
+		string $bundled_dir
+	) {
+		$this->repository  = $repository;
+		$this->options     = $options;
+		$this->log         = $log;
+		$this->bundled_dir = trailingslashit( $bundled_dir );
+	}
+
+	/**
+	 * The registry handed to mPDF as `fontRegistry`
+	 *
+	 * Installed is added first and bundled second, because `add()` prepends and mPDF reads the result in that
+	 * order: the bundled layer is read first, so its keys and its `backupSubsFont` entries sort ahead of the rows'.
+	 *
+	 * @since 7.0
+	 */
+	public function build_font_registry(): FontRegistry {
+		return new FontRegistry( [ $this->installed_package(), $this->bundled_package() ] );
+	}
+
+	/**
+	 * The fonts that ship inside the plugin
+	 *
+	 * A constant, not rows: they never toggle, never update and cannot be removed.
+	 *
+	 * @since 7.0
+	 */
+	public function bundled_package(): Package {
+		return new Package(
+			'gfpdf-bundled',
+			untrailingslashit( $this->bundled_dir ),
+			[
+				/* useOTL is load-bearing: the faces carry no legacy kern table, so GPOS is their only route to kerning */
+				static::BUNDLED_FONT    => [
+					'R'          => 'Arimo-Regular.ttf',
+					'B'          => 'Arimo-Bold.ttf',
+					'I'          => 'Arimo-Italic.ttf',
+					'BI'         => 'Arimo-BoldItalic.ttf',
+					'useOTL'     => 0xFF,
+					'useKashida' => 0,
+				],
+				static::BUNDLED_SYMBOLS => [
+					'R'          => 'DejaVuSansSymbols.ttf',
+					'useOTL'     => 0,
+					'useKashida' => 0,
+				],
+			],
+			[ static::BUNDLED_FONT, static::BUNDLED_SYMBOLS ],
+			$this->generic_families(),
+			$this->bundled_aliases()
+		);
+	}
+
+	/**
+	 * Every font row, whatever installed it
+	 *
+	 * Faces flagged `missing` are left out, so no fallback list ever names a file mPDF cannot load. Neither this
+	 * nor the bundled layer touches the disk.
+	 *
+	 * @since 7.0
+	 */
+	public function installed_package(): Package {
+		$last_changed = $this->repository->get_last_changed();
+
+		/*
+		 * One begin_pdf() reaches this through build_font_registry(), get_default_font() and the language map, and
+		 * a single PDF reaches it again through set_watermark_font() and the template styles. Building it once a
+		 * request matters most to queue and bulk jobs, which render many PDFs before the stamp can change.
+		 */
+		if ( $this->memo !== null && $this->memo['stamp'] === $last_changed ) {
+			return $this->memo['package'];
+		}
+
+		$rows = $this->rows();
+
+		$fonts        = [];
+		$backup_subs  = [];
+		$bmp          = [];
+		$substitution = [];
+		$dictionaries = [];
+
+		foreach ( $rows as $font_key => $row ) {
+			$faces = [];
+
+			foreach ( Font_Repository::FACE_ROLES as $role ) {
+				if ( isset( $row['files'][ $role ] ) && (int) $row['files'][ $role ]['missing'] === 0 ) {
+					$faces[ $role ] = $row['files'][ $role ]['path'];
+				}
+			}
+
+			/* A partially installed entry is a normal state, but a row with no readable face registers nothing */
+			if ( $faces === [] ) {
+				continue;
+			}
+
+			$faces['useOTL']     = (int) $row['use_otl'];
+			$faces['useKashida'] = (int) $row['use_kashida'];
+
+			$meta = $row['meta'];
+
+			if ( ! empty( $meta['sip_ext'] ) ) {
+				$faces['sip-ext'] = (string) $meta['sip_ext'];
+			}
+
+			$fonts[ $font_key ] = $faces;
+
+			if ( ! empty( $meta['backup_subs'] ) ) {
+				$backup_subs[] = $font_key;
+			}
+
+			if ( ! empty( $meta['bmp'] ) ) {
+				$bmp[] = $font_key;
+			}
+
+			foreach ( (array) ( $meta['family_substitution'] ?? [] ) as $family ) {
+				$substitution[ $family ][] = $font_key;
+			}
+
+			foreach ( $row['files'] as $role => $file ) {
+				if ( strpos( (string) $role, 'dict_' ) === 0 && (int) $file['missing'] === 0 ) {
+					$dictionaries[ substr( (string) $role, 5 ) ] = $this->repository->get_font_dir() . $file['path'];
+				}
+			}
+		}
+
+		$package = new Package(
+			'gfpdf-installed',
+			untrailingslashit( $this->repository->get_font_dir() ),
+			$fonts,
+			$backup_subs,
+			$substitution,
+			[],
+			$bmp,
+			$dictionaries
+		);
+
+		$this->memo = [
+			'stamp'   => $last_changed,
+			'package' => $package,
+		];
+
+		return $package;
+	}
+
+	/**
+	 * The one effective language map, as mPDF consumes it
+	 *
+	 * @since 7.0
+	 */
+	public function language_to_font(): Language_To_Font {
+		return new Language_To_Font( $this->effective_language_map() );
+	}
+
+	/**
+	 * The bundled map overlaid by the installed rows
+	 *
+	 * Installed beats bundled for the same code; between installed entries the earlier row wins, which is the
+	 * catalogue's `position` order.
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	public function default_language_map(): array {
+		$installed = [];
+
+		foreach ( $this->rows() as $font_key => $row ) {
+			foreach ( (array) ( $row['meta']['languages'] ?? [] ) as $code ) {
+				$code = strtolower( (string) $code );
+
+				/* Earlier row wins, which is the catalogue's position order */
+				if ( $code !== '' && ! isset( $installed[ $code ] ) ) {
+					$installed[ $code ] = $font_key;
+				}
+			}
+		}
+
+		return array_merge( static::DEFAULT_LANGUAGE_MAP, $installed );
+	}
+
+	/**
+	 * The default map with the user's overrides applied
+	 *
+	 * `*` removes a code so the document font stands. An override naming a font that is not registered is dropped
+	 * rather than obeyed, or a since-deleted font would send the run into mPDF's substitution instead of the map.
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	public function effective_language_map(): array {
+		$map       = $this->default_language_map();
+		$overrides = $this->options->get_option( 'font_language_overrides', [] );
+
+		if ( ! is_array( $overrides ) ) {
+			return $map;
+		}
+
+		$registered = $this->registered_keys();
+
+		foreach ( $overrides as $code => $font_key ) {
+			$code = strtolower( (string) $code );
+
+			if ( $font_key === '*' ) {
+				unset( $map[ $code ] );
+				continue;
+			}
+
+			if ( isset( $registered[ $font_key ] ) ) {
+				$map[ $code ] = (string) $font_key;
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * The font a PDF renders in
+	 *
+	 * Validated against what is actually registered, never derived from a list position: a saved font that is no
+	 * longer installed falls back rather than rendering as whatever happened to register first.
+	 *
+	 * @param array $settings The PDF's settings
+	 *
+	 * @since 7.0
+	 */
+	public function get_default_font( array $settings = [] ): string {
+		$registered = $this->registered_keys();
+
+		foreach ( [ $settings['font'] ?? '', $this->options->get_option( 'default_font', '' ) ] as $candidate ) {
+			$candidate = (string) $candidate;
+
+			if ( $candidate === '' ) {
+				continue;
+			}
+
+			if ( isset( $registered[ $candidate ] ) ) {
+				return $candidate;
+			}
+
+			$this->log->warning( 'The selected font is not installed, falling back to the bundled font', [ 'font' => $candidate ] );
+		}
+
+		/* Nothing was ever chosen: let the language map answer for the document's language before giving up */
+		$mapped = $this->language_to_font()->getLanguageOptions( $this->get_default_language(), false );
+
+		return $mapped !== '' && isset( $registered[ $mapped ] ) ? $mapped : static::BUNDLED_FONT;
+	}
+
+	/**
+	 * The site-wide document language, from the setting or the WordPress locale
+	 *
+	 * @since 7.0
+	 */
+	public function get_default_language(): string {
+		$saved = (string) $this->options->get_option( 'default_pdf_language', '' );
+
+		return $saved !== '' ? $saved : Language_To_Font::locale_to_language( get_locale() );
+	}
+
+	/**
+	 * The language a given PDF renders in
+	 *
+	 * @since 7.0
+	 */
+	public function get_document_language( array $settings = [] ): string {
+		$per_pdf = (string) ( $settings['pdf_language'] ?? '' );
+
+		return $per_pdf !== '' ? $per_pdf : $this->get_default_language();
+	}
+
+	/**
+	 * The document's base script, as `baseScript`
+	 *
+	 * Runs in this script are never tagged and inherit the document language, so the chosen font stands and OTL
+	 * `locl` picks that language's forms in fonts that carry them.
+	 *
+	 * @since 7.0
+	 */
+	public function get_document_script( array $settings = [] ): int {
+		$override = (string) $this->options->get_option( 'document_script', '' );
+
+		if ( $override !== '' && defined( Ucdn::class . '::' . $override ) ) {
+			return (int) constant( Ucdn::class . '::' . $override );
+		}
+
+		$language = strtolower( $this->get_document_language( $settings ) );
+		$primary  = explode( '-', $language )[0];
+
+		return static::LANGUAGE_TO_SCRIPT[ $primary ] ?? Ucdn::SCRIPT_LATIN;
+	}
+
+	/**
+	 * Every font key a PDF may name, grouped for the settings dropdown and the Font Manager
+	 *
+	 * @return array<string, array<string, string>>
+	 *
+	 * @since 7.0
+	 */
+	public function get_grouped_fonts(): array {
+		$groups = [
+			esc_html__( 'Bundled Fonts', 'gravity-pdf' ) => [ static::BUNDLED_FONT => 'Arimo' ],
+		];
+
+		$user_defined = esc_html__( 'User-Defined Fonts', 'gravity-pdf' );
+
+		foreach ( $this->rows() as $font_key => $row ) {
+			$label = $row['coverage'] === 1 ? esc_html__( 'Language Packs', 'gravity-pdf' ) : $user_defined;
+
+			$groups[ $label ][ $font_key ] = (string) $row['label'];
+		}
+
+		return array_filter( $groups );
+	}
+
+	/**
+	 * Every key mPDF will have registered, bundled included
+	 *
+	 * @return array<string, true>
+	 *
+	 * @since 7.0
+	 */
+	protected function registered_keys(): array {
+		$keys = [
+			static::BUNDLED_FONT    => true,
+			static::BUNDLED_SYMBOLS => true,
+		];
+
+		/* Read from the rows rather than the built layer: the fallback arrays it also assembles are not needed here */
+		foreach ( $this->rows() as $font_key => $row ) {
+			foreach ( Font_Repository::FACE_ROLES as $role ) {
+				if ( isset( $row['files'][ $role ] ) && (int) $row['files'][ $role ]['missing'] === 0 ) {
+					$keys[ $font_key ] = true;
+					break;
+				}
+			}
+		}
+
+		return $keys;
+	}
+
+	/**
+	 * The rows, read once per request
+	 *
+	 * @since 7.0
+	 */
+	protected function rows(): array {
+		return $this->repository->all();
+	}
+
+	/**
+	 * The canonical generic-family lists
+	 *
+	 * mPDF walks these for the first *available* key, so `sans` is always Arimo, and `serif` / `mono` become a real
+	 * serif or monospace as soon as a pack carrying one is installed. Rows and config append after these; nothing
+	 * prepends.
+	 *
+	 * @since 7.0
+	 */
+	protected function generic_families(): array {
+		return [
+			'sans_fonts'  => [
+				static::BUNDLED_FONT,
+				'sans',
+				'sans-serif',
+				'dejavusanscondensed',
+				'dejavusans',
+				'freesans',
+				'xbriyaz',
+				'garuda',
+				'arial',
+				'helvetica',
+				'liberationsans',
+			],
+			'serif_fonts' => [
+				'serif',
+				'tinos',
+				'times',
+				'timesnewroman',
+				'dejavuserifcondensed',
+				'dejavuserif',
+				'freeserif',
+				static::BUNDLED_FONT,
+			],
+			'mono_fonts'  => [
+				'mono',
+				'monospace',
+				'cousine',
+				'courier',
+				'couriernew',
+				'dejavusansmono',
+				'freemono',
+				'ocrb',
+				static::BUNDLED_FONT,
+			],
+		];
+	}
+
+	/**
+	 * `arial` / `helvetica` resolve to the bundled font, unless a row claims the name
+	 *
+	 * Arimo is metric-compatible with Arial, so templates written against those families keep their layout. An
+	 * upload or import may claim either key, and then it wins — the alias defers to a real font.
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	protected function bundled_aliases(): array {
+		$aliases = [];
+
+		foreach ( [ 'arial', 'helvetica' ] as $alias ) {
+			if ( $this->repository->get( $alias ) === null ) {
+				$aliases[ $alias ] = static::BUNDLED_FONT;
+			}
+		}
+
+		return $aliases;
+	}
+}

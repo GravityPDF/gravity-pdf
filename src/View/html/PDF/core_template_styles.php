@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @global $gfpdf
  */
 
-$font        = $settings['font'] ?? 'DejavuSansCondensed';
+$font        = $settings['font'] ?? \GPDFAPI::get_font_registry()->get_default_font();
 $font_colour = $settings['font_colour'] ?? '#333';
 $font_size   = $settings['font_size'] ?? '9';
 
