@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "04ded1b5fab68f24df5a678f22eb152d",
+    "content-hash": "eacf68d379a3467ee5cd29a8b7d609b0",
     "packages": [
         {
             "name": "gravitypdf/querypath",
@@ -561,16 +561,16 @@
         },
         {
             "name": "mpdf/mpdf",
-            "version": "dev-gravitypdf",
+            "version": "dev-decouple-fonts",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GravityPDF/mpdf.git",
-                "reference": "2c544d11b7b0d4bc930f9f4894f733e366f45277"
+                "reference": "6e454654d07420b7a7f60ee0cc42eaf267c0f584"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/2c544d11b7b0d4bc930f9f4894f733e366f45277",
-                "reference": "2c544d11b7b0d4bc930f9f4894f733e366f45277",
+                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/6e454654d07420b7a7f60ee0cc42eaf267c0f584",
+                "reference": "6e454654d07420b7a7f60ee0cc42eaf267c0f584",
                 "shasum": ""
             },
             "require": {
@@ -603,13 +603,7 @@
                 "mpdf/font-bundle-lite": "A subset of official mPDF fonts that offers coverage for most common scripts. Uses 30MB of disk space.",
                 "mpdf/font-dejavu-family": "A unicode font family with reasonable coverage of common scripts. Uses 10MB of disk space."
             },
-            "default-branch": true,
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-gravitypdf": "8.x-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Mpdf\\": "src/"
@@ -676,7 +670,7 @@
                     "url": "https://www.paypal.me/mpdf"
                 }
             ],
-            "time": "2026-09-06T23:51:33+00:00"
+            "time": "2026-09-07T00:03:01+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",
