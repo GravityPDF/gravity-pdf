@@ -154,7 +154,24 @@ Any test that fires `gfpdf_version_changed` to `7.0.0` now makes real HTTP unles
 
 **What is left in 3a all waits on a real published tree**: the real `GPDF_TRUST_KEYS` (public half only — the
 private half never leaves the update-server repo's CI secrets); `build/font-index/packs.json`, the shipped seed,
-which is a copy of the published `sources/packs-<sha>.json` and whose `files` hashes are hashes of real font files,
-so it cannot be written first; the CI check that runs `Font_Sources::validate_entry()` over that committed seed; and
-the **merge gate, which is not ours** — 3a does not land until `npm run check:fonts staging` passes ten assertions
-against the staging bucket.
+which is a verbatim copy of the published `sources/packs-<sha>.json` and whose `files` hashes are hashes of real
+font files, so it cannot be written first; that seed's CI check; and the **merge gate, which is not ours** — 3a does
+not land until `npm run check:fonts staging` passes ten assertions against the staging bucket.
+
+**The seed's CI check is the conformance test, and that is the whole answer to "how do the two repos stay in
+step".** It runs the *real consumer* over the committed seed — `Catalog_Sync::to_row()` plus
+`Font_Sources::validate_entry()` / `validate_fonts()` — asserting every entry survives with the expected row count,
+not merely that the JSON parses. Since the seed is verbatim pipeline output, that is the one place real output
+meets the real verifier: `check:fonts` asserts the *publisher's* expectations, and an entry `validate_entry()`
+refuses is dropped **silently** at sync — no error, just a pack missing from the catalogue.
+
+**A shared JSON-schema repo/package was proposed for this and rejected (2026-09-09).** The plugin validates at sync
+time on every site, so it can neither fetch a schema nor carry a JSON Schema validator in `vendor_prefixed/` (zip
+size, [[no-large-bundled-assets]]). The PHP validator therefore stays hand-written either way, and a shared schema
+would sit *beside* both implementations rather than replace either — three artefacts that can drift instead of two.
+Revisit only when there is a third consumer: third-party sources publishing their own root (§4.3 Sources, §10),
+where a schema earns its keep as documentation. And if drift ever does bite, the cheap fix is not a schema but
+extracting `validate_entry()` / `validate_fonts()` into a small Composer package the pipeline requires directly —
+that repo already runs PHP for step 4's `TTFontFile::getMetrics()`. Worth registering: the pipeline is necessarily
+**three languages** — Node to orchestrate, Python for `fontTools` instancing and preview subsetting, PHP for the
+mPDF parse and the GSUB 5/3 → 6/3 rewrite.
