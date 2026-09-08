@@ -88,8 +88,8 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		remove_action( 'rest_api_init', [ $class, 'register_endpoints' ] );
 
 		/* Setup our test classes */
-		$this->model      = new Model_Custom_Fonts( $gfpdf->options );
-		$this->controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Helper\\Fonts\\LocalFilesystem', 'GFPDF\\Helper\\Fonts\\LocalFile' );
+		$this->model      = new Model_Custom_Fonts( $gfpdf->get_font_repository() );
+		$this->controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Fonts\\LocalFilesystem', 'GFPDF\\Fonts\\LocalFile' );
 
 		$this->controller->init();
 
@@ -425,6 +425,8 @@ class Test_Controller_Custom_Fonts extends TestCase {
 	}
 
 	public function test_delete_item_with_font_reference_gone_success() {
+		global $gfpdf;
+
 		wp_set_current_user( $this->admin_user );
 
 		/* Create font */
@@ -435,9 +437,9 @@ class Test_Controller_Custom_Fonts extends TestCase {
 			]
 		);
 
-		$options = GPDFAPI::get_options_class();
-		$fonts   = $options->get_option( 'custom_fonts' );
-		unlink( $fonts['lato']['regular'] );
+		/* 7.0 records fonts in the font tables; `custom_fonts` is a frozen 6.x snapshot nothing writes any more */
+		$repository = $gfpdf->get_font_repository();
+		unlink( $repository->get_font_dir() . $repository->get( 'lato' )['files']['R']['path'] );
 
 		/* Delete font */
 		$request  = new WP_REST_Request( 'DELETE', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );

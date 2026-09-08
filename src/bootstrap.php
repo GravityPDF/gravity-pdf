@@ -114,6 +114,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $templates;
 
 	/**
+	 * Holds our Font_Repository object
+	 * The single reader and writer of the font tables
+	 *
+	 * @var Fonts\Font_Repository
+	 *
+	 * @since 7.0
+	 */
+	public $font_repository;
+
+	/**
+	 * Holds our font Registry object
+	 * Builds what mPDF registers and what the Font Manager lists, from one read of the font tables
+	 *
+	 * @var Fonts\Registry
+	 *
+	 * @since 7.0
+	 */
+	public $font_registry;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -206,7 +226,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->mergetags();
 		$this->actions();
 		$this->template_manager();
-		$this->load_core_font_handler();
 		$this->load_custom_font_handler();
 		$this->load_debug();
 		$this->check_system_status();
@@ -244,6 +263,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
 		add_action( 'admin_init', [ $this, 'setup_settings_fields' ], 1 );
+
+		/* The font tables are network-global, so a deleted site leaves only its visibility rows behind */
+		add_action( 'wp_uninitialize_site', [ $this, 'remove_site_font_visibility' ] );
+	}
+
+	/**
+	 * Drop a deleted site's font visibility rows
+	 *
+	 * @param \WP_Site $site
+	 *
+	 * @since 7.0
+	 */
+	public function remove_site_font_visibility( $site ) {
+		$this->get_font_repository()->delete_site_rows( (int) $site->blog_id );
 	}
 
 	/**
@@ -840,31 +873,74 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Initialise our core font AJAX handler
-	 *
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function load_core_font_handler() {
-		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
-		$class->init();
-
-		$this->singleton->add_class( $class );
-	}
-
-	/**
 	 * Initialise our custom font handler
 	 * @since 5.0
 	 *
 	 */
 	public function load_custom_font_handler(): void {
-		$model = new Model\Model_Custom_Fonts( $this->options );
+		$model = new Model\Model_Custom_Fonts( $this->get_font_repository() );
 		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
 		$class->init();
 
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Build the font repository, once
+	 *
+	 * Deferred rather than built in init() because it needs `template_font_location`, which
+	 * `Controller_Install::setup_defaults()` sets.
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_repository(): Fonts\Font_Repository {
+		if ( $this->font_repository === null ) {
+			$schema = new Fonts\Font_Schema( $this->log );
+
+			$this->font_repository = new Fonts\Font_Repository(
+				$schema,
+				new Fonts\Font_Migration( $this->options, $this->log ),
+				new Fonts\Font_Lock(),
+				$this->misc,
+				$this->log,
+				$this->data->template_font_location
+			);
+
+			/* Order matters: an installer font is adopted under its 6.x key before the importer could key it by filename */
+			$this->font_repository->add_population_pass(
+				new Fonts\Legacy_Font_Adopter( $this->font_repository, $this->log )
+			);
+
+			$this->font_repository->add_population_pass(
+				new Fonts\Loose_Font_Importer(
+					$this->font_repository,
+					new Fonts\SupportsOtl( $this->data->template_font_location ),
+					$this->log,
+					$this->data->template_font_location
+				)
+			);
+		}
+
+		return $this->font_repository;
+	}
+
+	/**
+	 * Build the font registry, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_registry(): Fonts\Registry {
+		if ( $this->font_registry === null ) {
+			$this->font_registry = new Fonts\Registry(
+				$this->get_font_repository(),
+				$this->options,
+				$this->log,
+				PDF_PLUGIN_DIR . 'fonts'
+			);
+		}
+
+		return $this->font_registry;
 	}
 
 	/**

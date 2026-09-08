@@ -52,14 +52,10 @@ class Test_Controller_Actions extends TestCase {
 	public function test_get_routes_includes_default_routes() {
 		$routes = $this->controller->get_routes();
 
-		/* The core font install, plus the one notice covering every deprecated feature at once */
-		$this->assertCount( 2, $routes );
+		/* 7.0 bundles the fonts it needs, so the core-font install nag is gone and only the deprecation notice remains */
+		$this->assertCount( 1, $routes );
 
-		$this->assertSame( 'install_core_fonts', $routes[0]['action'] );
-		$this->assertSame( 'gravityforms_edit_settings', $routes[0]['capability'] );
-		$this->assertIsCallable( $routes[0]['condition'] );
-		$this->assertIsCallable( $routes[0]['process'] );
-		$this->assertIsCallable( $routes[0]['view'] );
+		$this->assertSame( 'deprecated_features', $routes[0]['action'] );
 	}
 
 	public function test_every_deprecated_feature_shares_one_route() {

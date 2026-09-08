@@ -2,6 +2,7 @@
 
 namespace GFPDF\Model;
 
+use GFPDF\Fonts\Font_Schema;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
@@ -117,6 +118,9 @@ class Model_Uninstall extends Helper_Abstract_Model {
 			$this->remove_plugin_form_settings();
 		}
 
+		/* Drop the font tables in the same pass that deletes the files their rows describe */
+		$this->drop_font_tables();
+
 		/* Removes background processes */
 		$this->queue->clear_scheduled_events();
 		$this->queue->clear_queue( true );
@@ -164,6 +168,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
+		/* Per site, because the version is autoloaded per site; drop_font_tables() clears the network copy */
+		delete_option( Font_Schema::VERSION_OPTION );
 		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
@@ -198,6 +204,18 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		foreach ( $rows as $row ) {
 			delete_network_option( $row->site_id, $row->meta_key );
 		}
+	}
+
+	/**
+	 * Drop every table the font schema owns
+	 *
+	 * No conditions and no main-site qualifier: uninstalling is network-wide in effect and already super-admin
+	 * gated, and there is no sub-site uninstall.
+	 *
+	 * @since 7.0
+	 */
+	public function drop_font_tables() {
+		( new Font_Schema( $this->log ) )->drop();
 	}
 
 	/**

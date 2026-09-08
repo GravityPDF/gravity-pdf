@@ -185,6 +185,23 @@ trait HasGfpdfFixtures {
 	 *
 	 * @return \GFPDF\Router
 	 */
+	/**
+	 * Seed custom fonts as font-table rows
+	 *
+	 * 7.0 keeps font records in the font tables; `custom_fonts` is a frozen 6.x snapshot nothing reads or writes.
+	 *
+	 * @param array $fonts Records in the 6.x array shape
+	 *
+	 * @since 7.0
+	 */
+	protected function add_custom_font_rows( array $fonts ) {
+		$model = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+
+		foreach ( $fonts as $font ) {
+			$model->add_font( $font );
+		}
+	}
+
 	protected function gfpdf() {
 		global $gfpdf;
 

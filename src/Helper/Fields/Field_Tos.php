@@ -4,6 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use Exception;
 use GF_Field_Checkbox;
+use GFPDF\Fonts\Registry;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
@@ -95,11 +96,13 @@ class Field_Tos extends Helper_Abstract_Fields {
 			<div class='terms-of-service-text'>$terms</div>			
 		";
 
+		$symbols = Registry::BUNDLED_SYMBOLS;
+
 		if ( ! $this->is_field_empty() ) {
-			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10004;</span> $value</div>";
+			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:$symbols,sans-serif;'>&#10004;</span> $value</div>";
 		} else {
 			$not_accepted_text = __( 'Not accepted', 'gravity-pdf' );
-			$html             .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10006;</span> $not_accepted_text</div>";
+			$html             .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:$symbols,sans-serif;'>&#10006;</span> $not_accepted_text</div>";
 		}
 
 		return parent::html( $html );

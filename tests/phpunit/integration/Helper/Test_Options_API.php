@@ -727,12 +727,13 @@ class Test_Options_API extends TestCase {
 
 		$fonts = $this->options->get_installed_fonts();
 
-		$this->assertArrayHasKey( 'Unicode', $fonts );
-		$this->assertArrayHasKey( 'Indic', $fonts );
-		$this->assertArrayHasKey( 'Arabic', $fonts );
-		$this->assertArrayHasKey( 'Other', $fonts );
+		/* 7.0 ships none of the 6.x core fonts, so the list is whatever the registry has: the bundled font, plus rows */
+		$this->assertArrayHasKey( 'Bundled Fonts', $fonts );
+		$this->assertSame( 'Arimo', $fonts['Bundled Fonts']['gfpdf-arimo'] );
 
-		$this->assertTrue( isset( $fonts['Unicode']['dejavusans'] ) );
+		$this->add_custom_font_rows( [ [ 'id' => 'listed', 'font_name' => 'Listed Font' ] ] );
+
+		$this->assertSame( 'Listed Font', $this->options->get_installed_fonts()['User-Defined Fonts']['listed'] );
 	}
 
 	/**
@@ -753,7 +754,7 @@ class Test_Options_API extends TestCase {
 			],
 		];
 
-		$this->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		$existing_fonts = [
 			'Unicode' => [
@@ -789,7 +790,7 @@ class Test_Options_API extends TestCase {
 			],
 		];
 
-		$this->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		$get_fonts = $this->options->get_custom_fonts();
 

@@ -150,17 +150,9 @@ class Test_PDF extends TestCase {
 
 		$this->assertSame( 9999, has_filter( 'gform_notification', [ $this->model, 'notifications' ] ) );
 
-		$this->assertSame(
-			10,
-			has_filter(
-				'mpdf_font_data',
-				[
-					$this->model,
-					'register_custom_font_data_with_mPDF',
-				]
-			)
-		);
-		$this->assertSame( 20, has_filter( 'mpdf_font_data', [ $this->model, 'add_unregistered_fonts_to_mPDF' ] ) );
+		/* 7.0 registers fonts through the font registry; both legacy mpdf_font_data hooks are gone */
+		$this->assertFalse( has_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] ) );
+		$this->assertFalse( has_filter( 'mpdf_font_data', [ $this->model, 'add_unregistered_fonts_to_mPDF' ] ) );
 
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', [ $gfpdf->gform, 'process_tags' ] ) );
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', 'do_shortcode' ) );
@@ -1325,7 +1317,7 @@ class Test_PDF extends TestCase {
 			],
 		];
 
-		$gfpdf->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		/* Check the results are accurate */
 		$results = $this->model->register_custom_font_data_with_mPDF( [ '1', '2' ] );

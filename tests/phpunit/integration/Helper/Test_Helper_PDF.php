@@ -42,7 +42,7 @@ class Test_Helper_PDF extends TestCase {
 			'format'      => 'standard',
 			'security'    => 'No',
 			'rtl'         => 'No',
-			'font'        => 'dejavusans',
+			'font'        => 'gfpdf-arimo',
 			'font_size'   => 9,
 			'font_colour' => '#000',
 		];

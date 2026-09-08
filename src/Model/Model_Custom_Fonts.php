@@ -5,8 +5,8 @@ declare( strict_types=1 );
 namespace GFPDF\Model;
 
 use GFPDF\Exceptions\GravityPdfIdException;
+use GFPDF\Fonts\Font_Repository;
 use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_Options;
 
 /**
  * @package     Gravity PDF
@@ -29,13 +29,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Custom_Fonts extends Helper_Abstract_Model {
 
 	/**
-	 * @var Helper_Abstract_Options
-	 * @since 6.0
+	 * @var Font_Repository
+	 * @since 7.0
 	 */
-	protected $options;
+	protected $repository;
 
-	public function __construct( Helper_Abstract_Options $options ) {
-		$this->options = $options;
+	public function __construct( Font_Repository $repository ) {
+		$this->repository = $repository;
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function check_font_id_valid( string $name ): bool {
-		return (bool) preg_match( '/^[a-z0-9\-]+$/', $name );
+		return (bool) preg_match( Font_Repository::KEY_PATTERN, $name );
 	}
 
 	/**
@@ -62,25 +62,46 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function get_custom_fonts(): array {
-		$fonts = $this->options->get_option( 'custom_fonts' );
-
-		if ( ! is_array( $fonts ) ) {
-			return [];
-		}
-
 		$font_list = [];
-		foreach ( $fonts as $font ) {
-			/* Set defaults for all the non-required fields */
-			$font['italics']     = $font['italics'] ?? '';
-			$font['bold']        = $font['bold'] ?? '';
-			$font['bolditalics'] = $font['bolditalics'] ?? '';
-			$font['useOTL']      = $font['useOTL'] ?? 0x00;
-			$font['useKashida']  = $font['useKashida'] ?? 0;
 
-			$font_list[ $font['id'] ] = $font;
+		foreach ( $this->repository->all() as $font_key => $row ) {
+			if ( $row['coverage'] !== 0 ) {
+				continue;
+			}
+
+			$font_list[ $font_key ] = $this->to_legacy_shape( $font_key, $row );
 		}
 
 		return $font_list;
+	}
+
+	/**
+	 * Present a font row in the 6.x array shape
+	 *
+	 * `GPDFAPI::get_pdf_fonts()`, `Helper_Data::customFontData` and every add-on read this shape, so the faces are
+	 * rebuilt as absolute paths from the fonts directory the rows are relative to.
+	 *
+	 * @since 7.0
+	 */
+	protected function to_legacy_shape( string $font_key, array $row ): array {
+		$font = [
+			'id'          => $font_key,
+			'font_name'   => (string) $row['label'],
+			'regular'     => '',
+			'bold'        => '',
+			'italics'     => '',
+			'bolditalics' => '',
+			'useOTL'      => (int) $row['use_otl'],
+			'useKashida'  => (int) $row['use_kashida'],
+		];
+
+		foreach ( Font_Repository::LEGACY_FACE_ROLES as $face => $role ) {
+			if ( isset( $row['files'][ $role ] ) ) {
+				$font[ $face ] = $this->repository->get_font_dir() . $row['files'][ $role ]['path'];
+			}
+		}
+
+		return $font;
 	}
 
 	/**
@@ -110,15 +131,21 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function add_font( array $font ): bool {
-		$fonts = $this->get_custom_fonts();
-
-		if ( isset( $fonts[ $font['id'] ] ) ) {
+		if ( $this->matches_custom_font_id( $font['id'] ) ) {
 			throw new GravityPdfIdException();
 		}
 
-		$fonts[ $font['id'] ] = $font;
-
-		return $this->options->update_option( 'custom_fonts', $fonts );
+		return $this->repository->insert(
+			[
+				'font_key'    => (string) $font['id'],
+				'label'       => (string) ( $font['font_name'] ?? $font['id'] ),
+				'source'      => 'custom',
+				'blog_id'     => $this->repository->current_blog_id(),
+				'use_otl'     => (int) ( $font['useOTL'] ?? 0 ),
+				'use_kashida' => (int) ( $font['useKashida'] ?? 0 ),
+				'files'       => $this->repository->build_file_rows( $font ),
+			]
+		) > 0;
 	}
 
 	/**
@@ -129,10 +156,36 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function update_font( array $font ): bool {
-		$fonts                = $this->get_custom_fonts();
-		$fonts[ $font['id'] ] = $font;
+		$row = $this->repository->get( (string) $font['id'] );
 
-		return $this->options->update_option( 'custom_fonts', $fonts );
+		if ( $row === null ) {
+			return $this->add_font( $font );
+		}
+
+		$updated = $this->repository->update(
+			$row['id'],
+			[
+				'label'       => (string) ( $font['font_name'] ?? $row['label'] ),
+				'use_otl'     => (int) ( $font['useOTL'] ?? 0 ),
+				'use_kashida' => (int) ( $font['useKashida'] ?? 0 ),
+			]
+		);
+
+		if ( ! $updated ) {
+			return false;
+		}
+
+		$files = $this->repository->build_file_rows( $font );
+
+		foreach ( Font_Repository::LEGACY_FACE_ROLES as $role ) {
+			if ( isset( $files[ $role ] ) ) {
+				$this->repository->insert_file( $row['id'], $role, $files[ $role ] );
+			} elseif ( isset( $row['files'][ $role ] ) ) {
+				$this->repository->delete_file_row( $row['id'], $role );
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -142,15 +195,25 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @throws GravityPdfIdException Triggered if `id` already exists
 	 */
 	public function delete_font( string $id ): bool {
-		$fonts = $this->get_custom_fonts();
-
-		if ( ! isset( $fonts[ $id ] ) ) {
+		if ( ! $this->matches_custom_font_id( $id ) ) {
 			throw new GravityPdfIdException();
 		}
 
-		unset( $fonts[ $id ] );
+		return $this->repository->delete( $id );
+	}
 
-		return $this->options->update_option( 'custom_fonts', $fonts );
+	/**
+	 * The shared delete path for a single font file
+	 *
+	 * Replaces the controller's raw `@unlink`: it skips a path some surviving file row still records (two installs
+	 * of one entry share files) and unlinks the rest through the managed-folder guard.
+	 *
+	 * @param string $file The filename, relative to the fonts directory
+	 *
+	 * @since 7.0
+	 */
+	public function delete_font_file( string $file ): bool {
+		return $this->repository->delete_file( basename( $file ) );
 	}
 
 	/**
@@ -178,22 +241,29 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function has_unique_font_id( string $id ): bool {
-		if (
-			! $this->matches_reserved_font_id( $id ) &&
-			! $this->matches_core_font_id( $id ) &&
-			! $this->matches_custom_font_id( $id )
-		) {
-			return true;
-		}
-
-		return false;
+		/* Any row takes the key, whatever its coverage — the dropdown groups are derived from the rows now */
+		return $this->repository->is_key_available( $id ) && ! $this->matches_pdf_base_font( $id );
 	}
 
 	/**
 	 * @since 6.0
 	 */
 	public function matches_reserved_font_id( string $id ): bool {
-		$core_fonts = [
+		/* One reserved list, not two: the repository owns the keys mPDF resolves before it ever reads the font map */
+		return $this->repository->is_key_reserved( $id ) || $this->matches_pdf_base_font( $id );
+	}
+
+	/**
+	 * The PDF standard-14 base fonts and mPDF's `c`-prefixed variants, which it resolves without a font map
+	 *
+	 * Kept apart from `Font_Repository::RESERVED_KEYS` deliberately: these are barred from the *upload* path, where
+	 * a user typing "Arial" would be surprised by which font they got, but an imported or adopted file may claim
+	 * them — a site with a loose `Arial.ttf` kept rendering it as itself in 6.x and still does.
+	 *
+	 * @since 7.0
+	 */
+	public function matches_pdf_base_font( string $id ): bool {
+		$pdf_base_fonts = [
 			'arial',
 			'helvetica',
 			'helveticab',
@@ -226,32 +296,16 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 			'csymbol',
 		];
 
-		return in_array( $id, $core_fonts, true );
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	public function matches_core_font_id( string $id ): bool {
-		$default_fonts = $this->options->get_installed_fonts();
-
-		unset( $default_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] );
-
-		/* check for exact match */
-		foreach ( $default_fonts as $group ) {
-			if ( isset( $group[ $id ] ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		return in_array( $id, $pdf_base_fonts, true );
 	}
 
 	/**
 	 * @since 6.0
 	 */
 	public function matches_custom_font_id( string $id ): bool {
-		return in_array( $id, array_column( $this->get_custom_fonts(), 'id' ), true );
+		$row = $this->repository->get( $id );
+
+		return $row !== null && $row['coverage'] === 0;
 	}
 
 	/**

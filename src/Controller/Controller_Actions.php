@@ -132,19 +132,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function get_routes() {
 
-		$routes = array_merge(
-			[
-				[
-					'action'      => 'install_core_fonts',
-					'action_text' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
-					'condition'   => [ $this->model, 'core_font_condition' ],
-					'process'     => [ $this->model, 'core_font_redirect' ],
-					'view'        => [ $this->view, 'core_font' ],
-					'capability'  => 'gravityforms_edit_settings',
-				],
-			],
-			$this->get_deprecated_feature_routes()
-		);
+		$routes = $this->get_deprecated_feature_routes();
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_one_time_action_routes for more details about this filter */
 

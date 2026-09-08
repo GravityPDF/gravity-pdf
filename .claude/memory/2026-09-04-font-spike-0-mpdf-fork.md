@@ -1,0 +1,249 @@
+# Phase 0 spikes 0, 1, 3, 4 — fork, bundled fonts, release size, script detection
+
+Plan: `.claude/plans/2026-08-26-remove-core-font-installer.md` §5 Phase 0 spike 0, §9.18.
+Date: 2026-09-04. **The fork branch was renamed `gravitypdf-7.0` → `gravitypdf` on 2026-09-07**; names below are the current ones. Pushed: `GravityPDF/mpdf:gravitypdf` @ `a1becec`, and the rebase force-pushed to
+`jakejackson1/mpdf:decouple-fonts` — mpdf/mpdf#2161 now reports `MERGEABLE` with 7 commits.
+
+## Rebase
+
+`jakejackson1/mpdf:decouple-fonts` (2 commits, base `4c807ef`) rebased onto `389e19e`. One conflict, in
+`composer.json`: upstream added `ext-imagick` to `suggest` after the PR's base, the PR replaced the same block
+with the three font-bundle suggests. Resolved by keeping both. No other conflict across 248 files.
+
+Provenance, verified 2026-09-07: the pre-rebase head was **`4223d449`** (recovered from
+`repos/jakejackson1/mpdf/events`, since the PR timeline records force-pushes without before/after SHAs).
+Comparing the original PR diff `4c807ef...4223d449` against the rebased `389e19e...40aec72`: the same 248
+files, none added or lost, and only `composer.json` differs in line counts (11+/1− → 12+/2−) — exactly the
+conflict resolution above. The rebase dropped nothing. In particular `/packages export-ignore` was **never**
+in the upstream PR: `4223d449`'s `.gitattributes` carries only `*.gitattributes`, `/utils` and `/tests`. It
+was ours (`48b364a`, per the plan's spike 0 instruction) and moved onto `decouple-fonts` as `6e45465` on
+2026-09-07.
+
+## Baseline: #2161 leaves mPDF's own suite red
+
+| Branch | Result |
+|---|---|
+| upstream `development` @ `389e19e` | OK (975 tests) |
+| \+ #2161 rebased | 15 errors, 41 failures / 987 tests |
+| \+ #2161 rebased \+ `mpdf/font-bundle-all` in `require-dev` | OK (987 tests) |
+
+`packages/*` is declared as a `path` repository but nothing requires it, so a plain `composer install` registers
+no fonts and mPDF drops into core-font mode. The fix is one `require-dev` line — filed as its own commit, since
+it is #2161's bug rather than ours, and the fork's CI is unusable without it.
+
+## Extension commits (all five belong in the PR)
+
+1. **Line-break dictionaries as package data** — `FontRegistrationInterface::getLineBreakDictionaries()`,
+   `FontRegistration` default `[]`, `Mpdf::$lineBreakDictionaries` merged in `initFontRegistry()` with the same
+   first-wins precedence as `fontdata`, `Otl::seaLineBreaking()` early return, and `linebrdict{T,K,L}.dat` moved
+   into `packages/{Garuda,Khmer-OS,Dhyana}/fonts/`. Merged alongside `getFonts()`, **not** behind the
+   `autoloadConfig` gate — a dictionary is font data, not one of the four config lists that flag names.
+2. **`FontRegistry` fallback** — logs and registers nothing when `composer.lock` is absent instead of throwing.
+   Takes an optional third `$logger` constructor arg (untyped: mPDF still supports PHP 5.6, and a
+   `LoggerInterface $logger = null` hint is a deprecation on PHP 8.4+).
+3. **`fontFileFinder` container-resolvable** in `ServiceFactory::getServices()`.
+4. **`mpdf/font-bundle-all` in `require-dev`** (above).
+5. **Default font sorted first in `fontdata`** — see the open question below.
+
+**Superseded 2026-09-07.** `gravitypdf` was reset to plain upstream `development` and rebuilt only through
+PRs on `GravityPDF/mpdf` — #2 font packages (head `decouple-fonts`), #3 `branch-alias`, #1 `MarkGlyphSets`,
+merged in that order the same day. The branch is now `08af490` = upstream `389e19e` + three merge commits, and
+nothing lands on it by direct push again. `packages/ export-ignore` moved into the upstream PR, so the only
+fork-only content left is the branch alias. What follows describes the original direct-push arrangement:
+
+Fork-only, on `gravitypdf` alone and deliberately last so the PR branch is a clean prefix:
+`packages export-ignore` in `.gitattributes`. Verified: `git archive` of the branch contains no `packages/`,
+no `ttfonts/` and no `linebrdict*.dat`.
+
+Final state: **OK (994 tests)**, `composer cs` clean.
+
+## Verified behaviour
+
+Thai render (`font-family: garuda`, `autoScriptToLang` + `autoLangToFont` + `useSubstitutions`, empty `fontDir`
+and `fontdata`, layers only):
+
+- Garuda package registered → `lineBreakDictionaries = ['T' => …/packages/Garuda/fonts/linebrdictT.dat]`,
+  18,393-byte PDF, **0 notices**.
+- Same font registered with no dictionary → `lineBreakDictionaries = []`, 18,349-byte PDF (no U+200B word
+  breaks), **0 notices**. This is the plugin's state before the `southeast-asian` pack lands.
+
+## Corrections to the plan
+
+- **§5 spike 1 cannot assert `$mpdf->fontDir`.** It is `private` (`Mpdf.php:290`) and `Strict::__get()` throws
+  on any undeclared read. Assert through reflection, or through the `fontFileFinder` the layers configure.
+- **§4.1 / §9.18's "`initFontRegistry()` re-keys the map as `['gfpdf-arimo' => …] + $fontdata`"** is written as
+  if mPDF knows a plugin font key. Implemented generically instead: the entry named by `$config['default_font']`
+  is moved to the front of `fontdata` after the merge. Same outcome for us (`Helper_PDF` passes
+  `default_font => 'gfpdf-arimo'`, §4.8) and it is something upstream can take. **Confirm this reading.**
+
+## Plugin side (Phase 1a, committed)
+
+`composer.json` gains the `vcs` repository entry and requires `dev-gravitypdf`; the fork also carries
+`extra.branch-alias` (`dev-gravitypdf` → `8.x-dev`) so dependents resolving by version constraint still work.
+
+- `vendor/mpdf/mpdf` drops from ~110 MB to **4.9 MB**. `packages/` is export-ignored and Composer does not read a
+  dependency's own `path` repositories, so nothing pulls the font packages in.
+- `vendor_prefixed/` contains no `ttfonts/` and no `linebrdict*.dat`.
+- `GFPDF_Vendor\Mpdf\Fonts\{FontRegistry,FontRegistration,FontRegistrationInterface}` and
+  `GFPDF_Vendor\Mpdf\Language\LanguageToFontRegistry` all resolve; `getLineBreakDictionaries()` survives scoping.
+- `Test_Vendor_Prefixing` passes (11 tests); the **full PHP suite is green** (1637 tests, 46 skipped).
+
+The suite stays green only because `HasGfpdfFixtures::copy_test_fonts()` puts fonts in the uploads fonts dir and
+`add_unregistered_fonts_to_mPDF()` globs them — the fork empties `FontVariables`, so nothing else registers a
+font. A release build between 1a and 1c would emit core-font-only PDFs, which is what Phase 1c fixes.
+
+**Further plan correction:** §5 Phase 1a describes itself as "`composer.json`/`composer.lock` + regenerated
+`vendor_prefixed/` … so the vendor churn stays out of the review". There is no vendor churn — `vendor_prefixed/`
+holds one tracked file (`.gitkeep`) and is generated by `composer prefix` at install time. 1a is a two-file diff,
+which weakens the case for splitting it from 1b/1c at all.
+
+### wp-env trap
+
+`composer update` recreates `vendor/gravity/gravityforms`, which breaks the container's bind mount for it —
+PHPUnit then dies in bootstrap on `Failed opening required '.../gravityforms/gravityforms.php'`. Restart the
+environment (`yarn wp-env:integration start`) after any Composer run that touches `vendor/gravity`.
+
+### `getId()` landed (§9.23 resolved)
+
+`FontRegistry::add()` now keys by an overridable `FontRegistrationInterface::getId()`, defaulting to
+`get_class($this)` in the base — commit `1afecbc`, on the PR and merged into the fork. **So §9.23's optional
+collapse is available:** `Package_Bundled` and `Package_Installed` can become one `Package` class constructed
+with `($id, $directory, $fonts, $backup_subs, $substitution, $aliases, $bmp, $language_to_font, $dictionaries)`.
+Behaviour is identical either way; only the Phase 1 file list shrinks.
+
+Fork now at `d433c5e` (merge of `decouple-fonts`), pinned in the plugin's `composer.lock`. PR is `MERGEABLE`
+with 8 commits. A revised PR description is drafted in
+`.claude/plans/2026-09-04-mpdf-2161-upstream-feedback.md` for manual posting — nothing has been posted.
+
+---
+
+# Spike 1 — the two layers against the forked mPDF
+
+Harness: `tmp/font-bundle-spike/spike.php`, run through wp-env so the **prefixed** vendor is what is exercised.
+Two `FontRegistration` subclasses stand in for `Package_Bundled` / `Package_Installed`; `fontDir => []`,
+`fontdata => []`, `autoScriptToLang`, `autoLangToFont`, `useSubstitutions` per Appendix A.
+
+`fontDir` assembles from the layers alone, bundled first, exactly as §4.1 predicts:
+
+```
+[0] .../gravity-pdf/fonts
+[1] .../uploads-fonts
+available_unifonts[0] = gfpdf-arimo
+backupSubsFont        = gfpdf-arimo, gfpdf-dejavu-symbols
+sans_fonts[0]         = gfpdf-arimo
+```
+
+Every render below produced **zero notices** and `onlyCoreFonts === false`:
+
+| Case | Fonts loaded |
+|---|---|
+| Latin / Greek / Cyrillic / Vietnamese / Hebrew, with `<b>`, `<i>`, `<b><i>` | all four Arimo faces |
+| Consent ✔/✖ (normal, and `PDFA => true`) | `gfpdf-arimo`, `gfpdf-dejavu-symbols` |
+| Unknown `font-family`, `font-family: Arial`, `font-family: serif` | `gfpdf-arimo` |
+| Arabic + kanji with no pack | `gfpdf-arimo` (substitution boxes, as expected) |
+| `gfpdf-dejavu-symbols` (R only) with `<b>`/`<i>` | no error |
+
+`pdffonts` on the output confirms §4.2's requirement — every face embeds as **CID TrueType**, subsetted, with a
+unicode map, and **no ZapfDingbats appears in either tick PDF**:
+
+```
+MPDFAA+Arimo-Regular     CID TrueType  Identity-H  yes yes yes
+MPDFAA+DejaVuSans        CID TrueType  Identity-H  yes yes yes
+```
+
+Precedence, all three confirmed:
+
+- **Bundled beats installed** for a key both layers claim. `add()` prepends and bundled is added last, so it is
+  read first. This matches §2.4 ("among packages the last added wins") and §4.2 ("no downloaded file replaces a
+  bundled one") — but note §4.1's table describes the installed layer as carrying "every row", which reads as if
+  installed would win. It does not, and that is the intended behaviour.
+- Config `fontdata` beats both layers.
+- The default font still heads `available_unifonts` whatever `mpdf_font_data` returned first, and the add-on's
+  own key stays registered.
+
+# Spike 3 — release build size (both budgets met)
+
+`fonts/` is committed at the plugin root: four dehinted Arimo statics, `DejaVuSansSymbols.ttf`, both licence
+texts, `README.md`, `index.html`. `tools/release/build.sh` picks it up automatically — the zip is built from
+`git archive HEAD`, and no `.gitattributes` rule excludes it.
+
+| Measure | Value | Budget | |
+|---|---|---|---|
+| `fonts/` compressed in the zip | 863,403 B | ≤ 900,000 B | **PASS** |
+| Total zip | 5,156,617 B (5.16 MB) | ≤ 5.6 MB | **PASS** |
+| Net change vs 6.16.0 (4,707,366 B) | **+449,251 B (+0.45 MB)** | plan projected +0.87 MB | under |
+
+The zip contains no `linebrdict*`, no `ttfonts/` and no `packages/`. The plan's +0.87 MB estimate was
+pessimistic because the line-break dictionaries left with the fork.
+
+**Dehinting.** `fontTools.subset --no-hinting` also drops 60 unreachable glyphs per face, which would make the
+faces a subset — §4.2 says they are not subsetted. Use a direct dehint instead (drop `cvt `/`fpgm`/`prep`/`gasp`,
+clear each glyph's instructions, zero `maxp.maxSizeOfInstructions`); the script is recorded in `fonts/README.md`.
+Verified per face: glyph count and cmap unchanged, and every outline byte-identical to upstream via a
+`RecordingPen` comparison.
+
+# Spike 4 — `Script_Detector` cost (target < 2 ms)
+
+Harness: `tmp/script-detector-spike/`. `gate.php` is the generated negative character class — 95 ranges,
+1,432 bytes, built from the union of the Arimo faces' common cmap (3,010 codepoints, identical across all four)
+and the symbol supplement (1,095), for 4,001 covered codepoints. Only text tripping the gate is walked through
+the prefixed `Ucdn::get_script()` → `ScriptToLanguage::getLanguageByScript()`.
+
+| Case | Time | Detected |
+|---|---|---|
+| Pure Latin, 200 fields (14,678 chars) | **0.029 ms** | — |
+| Latin + Greek + Cyrillic | 0.044 ms | — |
+| Latin + ✔ ✖ | 0.034 ms | — |
+| One Arabic field | 0.036 ms | `und-Arab` |
+| One kanji field | 0.046 ms | `und-Hans`, `ja` |
+| One Thai field | 0.051 ms | `th` |
+| Arabic + kanji + Thai + Hindi | 0.043 ms | `und-Arab`, `und-Hans`, `th`, `hi` |
+| Every field non-Latin (worst case) | 0.531 ms | `und-Hans`, `ja` |
+
+Roughly 70× under budget on the ordinary case, 4× on the worst. The `\p{…}` alternation fallback §4.3 keeps in
+reserve is not needed. The kanji row also demonstrates §2.4's Han → `und-Hans` mapping first-hand, which is what
+the default-document-language setting exists to override.
+
+The gate must be generated, not hand-written: Arimo has **zero** codepoints in U+FB50–FDFF (Arabic presentation
+forms) and none in halfwidth Katakana, both of which a hand-approximation would likely treat as covered.
+
+## Still open
+
+- Spike 0's "confirm `fontFileFinder` is still the seam on the fork" is satisfied by the container change, but no
+  plugin-side `FontFileFinder` subclass exists yet (Phase 1c).
+- The generated gate's committed location and format are not specified by the plan. The spike emits
+  `gate.php` returning a regex string; `fonts/` beside the faces it is derived from is the obvious home.
+- Remaining Phase 0 spikes: 5 (Noto replacements), 6 (pack split), 7 (file hosting), 8 (Google pipeline dry run).
+
+## CI on the fork (2026-09-07)
+
+**The `gravitypdf` branch gets no CI.** `tests.yml`, `snapshots.yml` and `cs.yml` fire on `pull_request` and
+on pushes to `master` / `development` / `test` only, so the fork branch is covered solely by its own PRs —
+and merging a PR with red checks leaves nothing to catch it afterwards. Adding `gravitypdf` to those push
+triggers is an open suggestion. That same trigger list is the way to run CI on an arbitrary commit: push it
+to `refs/heads/test` and the full matrix runs, which is how the failures below were attributed.
+
+Three checks were red on `decouple-fonts` when PRs #1–#3 were merged (they were visible on the PRs and were
+not looked at first — a process miss):
+
+1. **`Tests (5.6)`, ours.** `InitFontRegistryTest::testDefaultFontSortsFirstInFontdata` used
+   `key($mpdf->fontdata)`. `key()` reads the array's internal pointer, which mPDF has already advanced past
+   the end; PHP 7's foreach-on-a-copy hides it, PHP 5.6 returns `null`. Fixed with `array_keys()` in
+   `2bc01ee` (GravityPDF/mpdf#4). **Lesson: the 5.6 matrix cell is the only thing that catches array-pointer
+   assumptions — a modern-PHP local run cannot.**
+2. **`Snapshot Tests`, upstream's — and it was catching a real bug, not a stale baseline.**
+   `LanguageToFontRegistry` returns the first non-empty answer across packages, so a package answering for a
+   script it does not own wins on registration order. **Quivira claimed `latn` and `cyrl`** (plus tfng, brai,
+   ogam, runr, glag) in `fontByScript()`, so installing that package retargeted the two most common scripts;
+   Dejavu-Family collapsed Cyrillic/Greek/Vietnamese to `dejavusans` instead of `dejavusanscondensed`; and
+   Free-Family sent Vai to `freeserif` instead of `freesans`. Measured against upstream `LanguageToFont` at
+   `389e19e`: **44 of 250 language codes and 8 of 25 script tags** resolved differently. Fixed in
+   GravityPDF/mpdf#6, after which the snapshot is **pixel-identical to the committed baseline on all eight
+   pages** — no baseline regenerated. The fix belongs upstream too and is not yet on `decouple-fonts`.
+   Quantified along the way: the original two commits alone fail **9** snapshots / 74 pages; adding
+   `mpdf/font-bundle-all` to `require-dev` drops that to **1** / 7.
+   **Lesson: never re-baseline a snapshot before finding out what changed.** The baseline PDF is stored, not
+   images, so it can be regenerated and diffed locally without Imagick.
+3. **`Static Analysis`, pre-existing.** PHPStan `ignore.unmatched` on three baseline patterns; fails on a
+   branch that only adds a `composer.json` `extra` block, so it is baseline drift against a newer PHPStan.
+

@@ -71,6 +71,13 @@ class Controller_Upgrade_Routines {
 			$this->remove_legacy_license_check_cron();
 		}
 
+		if ( version_compare( $current_version, '7.0.0', '>=' ) && version_compare( $old_version, '7.0.0', '<' ) ) {
+			/* Idempotent, and the render path calls it anyway — but until it completes, every request re-runs
+			   dbDelta and renders from an empty font table. Doing it here closes that window on the admin request
+			   that detected the upgrade. A site that never reaches this routine still migrates on its next render */
+			\GPDFAPI::get_font_repository()->ensure_ready();
+		}
+
 		/* Deliberately ungated: every release is a chance for a new round of removals to arrive. Runs last, so it
 		   reflects the routines above */
 		$this->record_deprecated_functionality();

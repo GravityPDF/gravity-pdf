@@ -5,7 +5,8 @@ namespace GFPDF\Helper;
 use Exception;
 use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
-use GFPDF_Vendor\Mpdf\Config\FontVariables;
+use GFPDF\Fonts\Registry;
+use GFPDF_Vendor\Mpdf\Language\LanguageToFontRegistry;
 use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF\Statics\Template_Constants;
 use GFPDF_Vendor\Mpdf\MpdfException;
@@ -190,7 +191,13 @@ class Helper_PDF {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log ) {
+	/**
+	 * @var Registry
+	 * @since 7.0
+	 */
+	protected $registry;
+
+	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log, ?Registry $registry = null ) {
 
 		/* Assign our internal variables */
 		$this->entry     = $entry;
@@ -200,7 +207,10 @@ class Helper_PDF {
 		$this->misc      = $misc;
 		$this->templates = $templates;
 		$this->log       = $log;
-		$this->form      = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
+
+		/* Optional so the seven-argument signature add-ons construct keeps working; the container supplies it */
+		$this->registry = $registry ?? \GPDFAPI::get_font_registry();
+		$this->form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
 
 		$this->set_path();
 		$this->set_print_dialog( ! empty( $settings['print'] ) );
@@ -618,41 +628,57 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function begin_pdf() {
-		$default_font_config = ( new FontVariables() )->getDefaults();
+		$registry = $this->registry;
+
+		/*
+		 * mPDF consults the registry members in reverse order of registration, so this one — added after
+		 * construction — is asked before any third party's.
+		 */
+		$language_to_font = new LanguageToFontRegistry();
+
+		$config = apply_filters(
+			'gfpdf_mpdf_class_config',
+			$registry->mpdf_font_config( $language_to_font ) + [
+				'tempDir'                => $this->data->mpdf_tmp_location,
+
+				'default_font'           => $registry->get_default_font( $this->settings ),
+				'baseScript'             => $registry->get_document_script( $this->settings ),
+
+				'allow_output_buffering' => true,
+				'ignore_invalid_utf8'    => true,
+				'setAutoTopMargin'       => 'stretch',
+				'setAutoBottomMargin'    => 'stretch',
+				'enableImports'          => true,
+				'use_kwt'                => true,
+				'keepColumns'            => true,
+				'biDirectional'          => true,
+				'showWatermarkText'      => true,
+				'showWatermarkImage'     => true,
+
+				'format'                 => $this->paper_size,
+				'orientation'            => $this->orientation,
+
+				'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
+
+				'exposeVersion'          => false,
+			],
+			$this->form,
+			$this->entry,
+			$this->settings,
+			$this
+		);
+
+		/*
+		 * Each package layer appends its directory through Mpdf::AddFontDirectory(), which does `$fontDir[] =`.
+		 * The filter is public and add-ons have long passed a bare string here, which used to be harmless because
+		 * nothing appended to it. Normalise rather than fatal on their behalf.
+		 */
+		if ( ! isset( $config['fontDir'] ) || ! is_array( $config['fontDir'] ) ) {
+			$config['fontDir'] = isset( $config['fontDir'] ) && $config['fontDir'] !== '' ? [ $config['fontDir'] ] : [];
+		}
 
 		$this->mpdf = new Mpdf(
-			apply_filters(
-				'gfpdf_mpdf_class_config',
-				[
-					'fontDir'                => [ $this->data->template_font_location ],
-					'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
-					'tempDir'                => $this->data->mpdf_tmp_location,
-
-					'allow_output_buffering' => true,
-					'autoLangToFont'         => true,
-					'useSubstitutions'       => true,
-					'ignore_invalid_utf8'    => true,
-					'setAutoTopMargin'       => 'stretch',
-					'setAutoBottomMargin'    => 'stretch',
-					'enableImports'          => true,
-					'use_kwt'                => true,
-					'keepColumns'            => true,
-					'biDirectional'          => true,
-					'showWatermarkText'      => true,
-					'showWatermarkImage'     => true,
-
-					'format'                 => $this->paper_size,
-					'orientation'            => $this->orientation,
-
-					'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
-
-					'exposeVersion'          => false,
-				],
-				$this->form,
-				$this->entry,
-				$this->settings,
-				$this
-			),
+			$config,
 			new SimpleContainer(
 				apply_filters(
 					'gfpdf_mpdf_class_container',
@@ -668,6 +694,13 @@ class Helper_PDF {
 		);
 
 		$this->mpdf->setLogger( $this->log );
+
+		$language_to_font->add( $registry->language_to_font() );
+
+		/* Public properties WriteHTML() re-reads, not config keys */
+		$document_language        = $registry->get_document_language( $this->settings );
+		$this->mpdf->default_lang = $document_language;
+		$this->mpdf->currentLang  = $document_language;
 
 		/**
 		 * Allow $mpdf object class to be modified
