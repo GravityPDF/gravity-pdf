@@ -4,9 +4,14 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Fonts\Catalog_Sync;
+use GFPDF\Fonts\Font_Lock;
 use GFPDF\Fonts\Font_Schema;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
+use GFPDF\Tests\Concerns\HasCatalogRows;
+use GFPDF\Tests\Concerns\MocksHttpRequests;
+use GFPDF\Tests\Concerns\PublishesFontIndexes;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -26,6 +31,9 @@ use GFPDF\Tests\Integration\TestCase;
 class Test_Controller_Upgrade_Routines extends TestCase {
 
 	use CreatesLegacyDownloadUrls;
+	use HasCatalogRows;
+	use MocksHttpRequests;
+	use PublishesFontIndexes;
 
 	/**
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -36,6 +44,12 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		parent::set_up();
 
 		$this->options = \GPDFAPI::get_options_class();
+
+		/* The 7.0 gate syncs the catalog inline, so every case in this file is sealed off from the network: an
+		   unrouted request gets a 404 rather than reaching fonts.gravitypdf.com */
+		$this->mock_http( [] );
+		$this->generate_font_signing_key();
+		$this->reset_catalog_state();
 	}
 
 	public function tear_down(): void {
@@ -43,8 +57,31 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 		/* The font gate below rebuilds it; the rest of the class never touches it, so this is free either way */
 		$gfpdf->font_repository = null;
+		$gfpdf->catalog_sync    = null;
+
+		$this->unmock_http();
+		$this->reset_catalog_state();
 
 		parent::tear_down();
+	}
+
+	protected function reset_catalog_state(): void {
+		$this->drop_catalog_rows();
+
+		delete_site_option( Catalog_Sync::OPTION );
+		delete_site_option( Catalog_Sync::GENERATED_OPTION );
+		( new Font_Lock() )->release( Catalog_Sync::LOCK );
+	}
+
+	/**
+	 * Write a shipped-index stand-in and hand back its path
+	 */
+	protected function seed_file(): string {
+		$file = wp_tempnam( 'packs-seed' );
+
+		file_put_contents( $file, (string) wp_json_encode( [ 'schema' => 1, 'entries' => [ $this->pack_entry( 'emoji' ) ] ] ) );
+
+		return $file;
 	}
 
 	/**
@@ -176,6 +213,73 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+	}
+
+	/**
+	 * Step 2. A site has no catalogue at all until this runs, so browsing, adoption and every install path would
+	 * be looking at an empty table for up to an hour if the sync were left to the scheduled listener.
+	 */
+	public function test_7_0_0_fills_the_font_catalog_inline() {
+		global $gfpdf;
+
+		$this->publish( [ $this->pack_entry( 'emoji' ), $this->pack_entry( 'arabic' ) ] );
+
+		$gfpdf->catalog_sync = $this->sync();
+
+		/* Control: the gate is what runs it, not the action */
+		do_action( 'gfpdf_version_changed', '6.15.0', '6.16.0' );
+
+		$this->assertSame( 0, $this->catalog_repository()->search( 'packs' )['total'] );
+
+		do_action( 'gfpdf_version_changed', '6.17.0', '7.0.0' );
+
+		$this->assertSame( [ 'emoji', 'arabic' ], wp_list_pluck( $this->catalog_repository()->search( 'packs' )['entries'], 'entry' ) );
+		$this->assertGreaterThan( 0, $gfpdf->catalog_sync->get_record( 'packs' )['synced'] );
+	}
+
+	/**
+	 * A blocked-egress upgrade is the offline install path's starting point: the catalogue still has to be
+	 * browsable and installable from hand-placed files, which needs rows.
+	 */
+	public function test_7_0_0_seeds_the_font_catalog_when_the_first_sync_fails() {
+		global $gfpdf;
+
+		$seed = $this->seed_file();
+
+		$this->publish( [ $this->pack_entry( 'emoji' ) ], [], [ 'index.json' => [ 'code' => 500 ] ] );
+
+		$gfpdf->catalog_sync = $this->sync( null, $seed );
+
+		do_action( 'gfpdf_version_changed', '6.17.0', '7.0.0' );
+
+		$record = $gfpdf->catalog_sync->get_record( 'packs' );
+
+		$this->assertSame( 1, $this->catalog_repository()->search( 'packs' )['total'] );
+		$this->assertTrue( $record['seeded'] );
+		$this->assertSame( 0, $record['synced'], 'a failed sync must not leave the seed reporting freshness' );
+		$this->assertNotSame( '', $record['last_error'] );
+
+		unlink( $seed );
+	}
+
+	/**
+	 * The seed is the fallback, not a second source of rows: a sync that worked must be left exactly as it is
+	 */
+	public function test_7_0_0_does_not_seed_over_a_successful_sync() {
+		global $gfpdf;
+
+		$seed = $this->seed_file();
+
+		$this->publish( [ $this->pack_entry( 'cjk' ) ] );
+
+		$gfpdf->catalog_sync = $this->sync( null, $seed );
+
+		do_action( 'gfpdf_version_changed', '6.17.0', '7.0.0' );
+
+		$this->assertSame( [ 'cjk' ], wp_list_pluck( $this->catalog_repository()->search( 'packs' )['entries'], 'entry' ) );
+		$this->assertFalse( $gfpdf->catalog_sync->get_record( 'packs' )['seeded'] );
+
+		unlink( $seed );
 	}
 
 	/**
