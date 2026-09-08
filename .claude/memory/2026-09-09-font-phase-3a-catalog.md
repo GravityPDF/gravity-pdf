@@ -104,7 +104,21 @@ other's direction and a constructor reference either way would be a cycle.
 - Both `fonts.gravitypdf.com` and `fonts-staging.gravitypdf.com` are already provisioned, so the 3a gate needs the
   real ~7,800-object publish run, not infrastructure.
 
-Still to build in 3a: `Rest_Font_Sources`, upgrade step 2, the shipped seed index, and
-`tools/release/font-release.mjs` (which must sign with `SIGNATURE_CONTEXT`). The **merge gate is not ours**: 3a does not
+**`Rest_Font_Sources` is built** — `GET /fonts/sources`, `GET /fonts/sources/{source}`,
+`GET /fonts/sources/{source}/{entry}`, `POST /fonts/sources/sync` in `src/Rest/`. The install/delete entry routes
+and `GET /fonts/status` are 3b/3c, since they need `Install_Queue`. Two things to keep true:
+
+- **`entry_json` must never reach the wire.** `prepare_row()` unsets it and `data`; a browse would otherwise drag a
+  LONGTEXT per card through the response, and the entry object is the installer's business.
+- **`sync` being a reserved source id is load-bearing.** Dropping the unknown-source guard makes
+  `GET /fonts/sources/sync` answer from the `{source}` route rather than 404 — a neuter caught exactly that, so the
+  reservation is not decoration.
+
+REST tests must mock HTTP for the sync route (`MocksHttpRequests`); the first version reached the real network,
+which is flaky and slow. `Test_Rest` starts anonymous, so every test sets its own user.
+
+Still to build in 3a: upgrade step 2, the shipped seed index, and `tools/release/font-release.mjs` (which must sign
+with `Catalog_Sync::SIGNATURE_CONTEXT` — nothing outside this repo verifies the signature, so the two halves can
+only be kept in step here). The **merge gate is not ours**: 3a does not
 land until `npm run check:fonts staging` passes ten assertions against the staging bucket, which needs the
 update-server repo's publisher and its secrets.
