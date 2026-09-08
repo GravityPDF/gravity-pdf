@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 /**
  * @package     Gravity PDF
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * registers them, harmless where they sit. And `Eeyek-Regular.ttf`: upstream added it to `eeyekunicode` after this
  * manifest was generated, so the installer never shipped it and no site can have it.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

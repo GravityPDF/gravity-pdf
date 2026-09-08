@@ -2,7 +2,7 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Fonts\Font_Schema;
+use GFPDF\Fonts\Font_Schema;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;

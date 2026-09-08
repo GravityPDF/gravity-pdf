@@ -129,7 +129,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 */
 	protected function create_font_tables() {
 		/* GPDFAPI is not wired up this early, and the schema only logs on failure, which is asserted below */
-		$schema = new \GFPDF\Helper\Fonts\Font_Schema( new \GFPDF_Vendor\Psr\Log\NullLogger() );
+		$schema = new \GFPDF\Fonts\Font_Schema( new \GFPDF_Vendor\Psr\Log\NullLogger() );
 
 		$schema->drop();
 		$schema->ensure();

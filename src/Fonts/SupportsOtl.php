@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Helper\Mpdf\Cache;
 use GFPDF_Vendor\Mpdf\Fonts\FontCache;
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class SupportsOtl
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 6.0
  */

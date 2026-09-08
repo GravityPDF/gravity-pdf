@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GPDFAPI;
 
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class FlushCache
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 6.0
  */

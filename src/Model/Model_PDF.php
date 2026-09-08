@@ -12,7 +12,7 @@ use GFPDF\Helper\Fields\Field_Products;
 use GFPDF\Helper\Helper_Abstract_Field_Products;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Fonts\Registry;
+use GFPDF\Fonts\Registry;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;

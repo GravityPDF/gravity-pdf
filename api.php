@@ -120,7 +120,7 @@ final class GPDFAPI {
 	/**
 	 * Returns the font registry, which builds what mPDF registers and what the Font Manager lists
 	 *
-	 * @return \GFPDF\Helper\Fonts\Registry
+	 * @return \GFPDF\Fonts\Registry
 	 *
 	 * @since 7.0
 	 */
@@ -136,7 +136,7 @@ final class GPDFAPI {
 	 * The lower-level companion to `get_font_registry()`: rows in, rows out, with none of the mPDF or Font Manager
 	 * shaping. Add-ons that only want to list or add fonts should keep using `get_pdf_fonts()` / `add_pdf_font()`.
 	 *
-	 * @return \GFPDF\Helper\Fonts\Font_Repository
+	 * @return \GFPDF\Fonts\Font_Repository
 	 *
 	 * @since 7.0
 	 */
@@ -710,7 +710,7 @@ final class GPDFAPI {
 
 		$data       = self::get_data_class();
 		$model      = new \GFPDF\Model\Model_Custom_Fonts( $gfpdf->get_font_repository() );
-		$controller = new \GFPDF\Controller\Controller_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Helper\Fonts\LocalFilesystem', '\GFPDF\Helper\Fonts\LocalFile' );
+		$controller = new \GFPDF\Controller\Controller_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Fonts\LocalFilesystem', '\GFPDF\Fonts\LocalFile' );
 
 		$request = new WP_REST_Request();
 		$request->set_param( 'label', $font['font_name'] ?? '' );

@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Integration\TestCase;
@@ -18,7 +18,7 @@ use GPDFAPI;
 /**
  * Class Test_Registry
  *
- * @package   GFPDF\Helper\Fonts
+ * @package   GFPDF\Fonts
  *
  * @group     helper
  * @group     fonts

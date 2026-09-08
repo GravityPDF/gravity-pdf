@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * `dbDelta()` is the create-from-scratch path and never drops or renames a column. Anything it cannot express is a
  * `MIGRATIONS` entry, applied in order when the stored version is older than the one it is keyed on.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

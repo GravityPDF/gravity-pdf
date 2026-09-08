@@ -117,7 +117,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Holds our Font_Repository object
 	 * The single reader and writer of the font tables
 	 *
-	 * @var Helper\Fonts\Font_Repository
+	 * @var Fonts\Font_Repository
 	 *
 	 * @since 7.0
 	 */
@@ -127,7 +127,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Holds our font Registry object
 	 * Builds what mPDF registers and what the Font Manager lists, from one read of the font tables
 	 *
-	 * @var Helper\Fonts\Registry
+	 * @var Fonts\Registry
 	 *
 	 * @since 7.0
 	 */
@@ -894,14 +894,14 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 * @since 7.0
 	 */
-	public function get_font_repository(): Helper\Fonts\Font_Repository {
+	public function get_font_repository(): Fonts\Font_Repository {
 		if ( $this->font_repository === null ) {
-			$schema = new Helper\Fonts\Font_Schema( $this->log );
+			$schema = new Fonts\Font_Schema( $this->log );
 
-			$this->font_repository = new Helper\Fonts\Font_Repository(
+			$this->font_repository = new Fonts\Font_Repository(
 				$schema,
-				new Helper\Fonts\Font_Migration( $this->options, $this->log ),
-				new Helper\Fonts\Font_Lock(),
+				new Fonts\Font_Migration( $this->options, $this->log ),
+				new Fonts\Font_Lock(),
 				$this->misc,
 				$this->log,
 				$this->data->template_font_location
@@ -909,13 +909,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* Order matters: an installer font is adopted under its 6.x key before the importer could key it by filename */
 			$this->font_repository->add_population_pass(
-				new Helper\Fonts\Legacy_Font_Adopter( $this->font_repository, $this->log )
+				new Fonts\Legacy_Font_Adopter( $this->font_repository, $this->log )
 			);
 
 			$this->font_repository->add_population_pass(
-				new Helper\Fonts\Loose_Font_Importer(
+				new Fonts\Loose_Font_Importer(
 					$this->font_repository,
-					new Helper\Fonts\SupportsOtl( $this->data->template_font_location ),
+					new Fonts\SupportsOtl( $this->data->template_font_location ),
 					$this->log,
 					$this->data->template_font_location
 				)
@@ -930,9 +930,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 * @since 7.0
 	 */
-	public function get_font_registry(): Helper\Fonts\Registry {
+	public function get_font_registry(): Fonts\Registry {
 		if ( $this->font_registry === null ) {
-			$this->font_registry = new Helper\Fonts\Registry(
+			$this->font_registry = new Fonts\Registry(
 				$this->get_font_repository(),
 				$this->options,
 				$this->log,

@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * upgrade. Every face is verified against the frozen manifest before it is written, so a truncated, replaced or
  * half-downloaded file produces no row rather than a phantom registration pointing at unusable bytes.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

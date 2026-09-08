@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Helper\Helper_Misc;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * auto-updates and serves PDFs by REST or cron would render before it, and whichever request touches fonts first
  * pays for the migration instead. Once `gfpdf_db_version` is written it is one autoloaded option read forever.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

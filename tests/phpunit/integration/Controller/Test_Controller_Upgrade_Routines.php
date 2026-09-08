@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Fonts\Font_Schema;
+use GFPDF\Fonts\Font_Schema;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Integration\TestCase;

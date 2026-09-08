@@ -18,7 +18,7 @@ npm script; 7 Jest specs, `Test_Controller_Save_Core_Fonts`, `Test_Model_Custom_
 ## The thing worth remembering: step 1c had to land here
 
 `build/payload/core-fonts.json` is the ONLY record of what the 6.x installer could write, and Phase 2 deletes it.
-So `src/Helper/Fonts/Legacy_Installer_Files.php` was generated in the same commit. Two things the plan didn't
+So `src/Fonts/Legacy_Installer_Files.php` was generated in the same commit. Two things the plan didn't
 anticipate, both discovered by looking at the data:
 
 1. **70 files are only 39 families.** `dejavusanscondensed` is four files under one mPDF key. A per-file map would

@@ -5,7 +5,7 @@ namespace GFPDF\Helper;
 use Exception;
 use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
-use GFPDF\Helper\Fonts\Registry;
+use GFPDF\Fonts\Registry;
 use GFPDF_Vendor\Mpdf\Language\LanguageToFontRegistry;
 use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF\Statics\Template_Constants;

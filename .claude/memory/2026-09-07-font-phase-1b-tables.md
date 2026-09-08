@@ -9,7 +9,7 @@ Phase 1b of `.claude/plans/2026-08-26-remove-core-font-installer.md` built 2026-
 `feature/remove-core-font-installer`. Font records move out of the `custom_fonts` key of the autoloaded
 `gfpdf_settings` blob into `{prefix}gravitypdf_font` / `_font_file` (+ `_font_site` on multisite).
 
-New: `src/Helper/Fonts/{Font_Schema,Font_Repository,Font_Migration,Font_Lock}.php`.
+New: `src/Fonts/{Font_Schema,Font_Repository,Font_Migration,Font_Lock}.php`.
 `Model_Custom_Fonts` is now a façade over `Font_Repository` with its 6.x array shape intact.
 
 **Things that bit, and would bite again:**
