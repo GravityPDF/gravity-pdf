@@ -80,7 +80,31 @@ four-version User-Agent, byte ceiling applied before *and* after the request). 3
   columns with it. `INSERT … ON DUPLICATE KEY UPDATE` naming index columns only is what keeps an in-flight install's
   phase. Neuter-tested.
 
-Still to build in 3a: `Font_Repository::adopt()` and the sync's call into it, `Rest_Font_Sources`, upgrade step 2,
-the shipped seed index, and `tools/release/font-release.mjs`. The **merge gate is not ours**: 3a does not
+**`adopt()` is built** (`Font_Repository::adopt( Catalog_Repository )`, called from `replace_source()` when the
+replaced source carries coverage entries). It looks under `{fonts dir}/{source}/{entry}/` — where an install writes
+and therefore where a hand-placed file must go. The 6.x installer's *flat* files are `Legacy_Font_Adopter`'s and are
+rows before this runs; a test pins that a flat file is not what adoption looks at, so the two passes cannot compete
+for the same bytes. `Catalog_Sync` takes the repository as a **callable**, because the two are built from each
+other's direction and a constructor reference either way would be a cycle.
+
+**Cross-checked against the update-server side (GravityPDF/gravitypdf-update-server#100, `feat/fonts-r2-store`) on
+2026-09-09 — no discrepancies:**
+
+- `files_base` is **omitted** by the publisher, exactly as §4.3 Hosting requires, and the checker's assertion 8
+  exists to catch one appearing or naming a foreign host. `Catalog_Repository::url_for()` building
+  `{root}/files/{remote_path}` from the *registered record's* root is correct and must stay that way.
+- Key layout matches what `Catalog_Sync` requests: `v1/index.json`, `v1/index.json.sig` (base64 of a 64-byte
+  signature), `v1/sources/{source}-{sha256}.json`, `v1/entries/{source}/{entry}-{sha256}.json`,
+  `v1/files/{remote_path}`. The root is `{ schema, generated, sources: { id: { sha256, size } } }`.
+- **The signing is not in that PR.** The publisher uploads an already-signed tree and the checker only asserts the
+  `.sig` is 64 base64 bytes and no older than the index — it has no public key. So both halves of the signature
+  contract live in *this* repo: `Catalog_Sync::SIGNATURE_CONTEXT` and the not-yet-built
+  `tools/release/font-release.mjs`. They cannot drift through another repo, but nothing outside this one will catch
+  it if they drift from each other.
+- Both `fonts.gravitypdf.com` and `fonts-staging.gravitypdf.com` are already provisioned, so the 3a gate needs the
+  real ~7,800-object publish run, not infrastructure.
+
+Still to build in 3a: `Rest_Font_Sources`, upgrade step 2, the shipped seed index, and
+`tools/release/font-release.mjs` (which must sign with `SIGNATURE_CONTEXT`). The **merge gate is not ours**: 3a does not
 land until `npm run check:fonts staging` passes ten assertions against the staging bucket, which needs the
 update-server repo's publisher and its secrets.
