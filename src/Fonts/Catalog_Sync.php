@@ -443,8 +443,12 @@ class Catalog_Sync {
 			return false;
 		}
 
-		/* Rows without a sync stamp: the record stays `seeded` with `synced` at zero, so nothing reports freshness
-		   the seed cannot have, and the shipped index's older `generated` means a real sync always replaces it */
+		/*
+		 * Rows without a sync stamp: the record stays `seeded` with `synced` at zero, so nothing reports freshness
+		 * the seed cannot have, and the shipped index's older `generated` means a real sync always replaces it.
+		 * The attempt and the error carry through untouched — seeding is a local fallback, not a sync attempt, so
+		 * it neither moves the retry clock nor erases the reason the sync that just failed gives the health check.
+		 */
 		return $this->replace_source(
 			'packs',
 			$index['entries'],
@@ -452,8 +456,8 @@ class Catalog_Sync {
 			[
 				'index_sha256' => '',
 				'synced'       => 0,
-				'last_attempt' => time(),
-				'last_error'   => '',
+				'last_attempt' => (int) $record['last_attempt'],
+				'last_error'   => (string) $record['last_error'],
 				'seeded'       => true,
 			]
 		);

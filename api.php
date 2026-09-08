@@ -147,6 +147,23 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns the font catalog sync, the single writer of the catalog table's index columns
+	 *
+	 * The catalogue refreshes itself on a schedule, so an add-on registering a `gfpdf_font_sources` record does not
+	 * need this. It is here for the two callers that cannot wait for that schedule: the install/upgrade routine,
+	 * which has no catalogue at all until it runs, and anything offering a manual refresh.
+	 *
+	 * @return \GFPDF\Fonts\Catalog_Sync
+	 *
+	 * @since 7.0
+	 */
+	public static function get_catalog_sync() {
+		global $gfpdf;
+
+		return $gfpdf->get_catalog_sync();
+	}
+
+	/**
 	 * Returns our miscellaneous methods (or common methods) used throughout the plugin.
 	 *
 	 * Usage:

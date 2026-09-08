@@ -76,11 +76,38 @@ class Controller_Upgrade_Routines {
 			   dbDelta and renders from an empty font table. Doing it here closes that window on the admin request
 			   that detected the upgrade. A site that never reaches this routine still migrates on its next render */
 			\GPDFAPI::get_font_repository()->ensure_ready();
+
+			$this->build_font_catalog();
 		}
 
 		/* Deliberately ungated: every release is a chance for a new round of removals to arrive. Runs last, so it
 		   reflects the routines above */
 		$this->record_deprecated_functionality();
+	}
+
+	/**
+	 * Fill the font catalog for the first time (§4.8 step 2)
+	 *
+	 * There is no catalogue before this runs, and browsing, adoption and every install path read one. It is inline
+	 * rather than left to the hourly listener so that a site which upgrades and immediately opens the Font Manager
+	 * sees the real catalogue, and so the adoption pass that turns the old installer's files into pack rows happens
+	 * in this request instead of up to an hour later.
+	 *
+	 * `maybe_run()` rather than `run()`: the sync state is network-wide, so on multisite the first sub-site to reach
+	 * this does the work and the rest skip it. On the paths this gate actually covers — a fresh install, or an
+	 * upgrade from 6.x — no source has ever been synced, so it always runs.
+	 *
+	 * A failure is not an error here. It logs, leaves `last_error` for the hourly listener to retry, and the seed
+	 * fills the catalog from the index shipped with the plugin so an air-gapped upgrade can still browse and install
+	 * offline; `seed()` no-ops once a real sync has landed.
+	 *
+	 * @since 7.0
+	 */
+	protected function build_font_catalog(): void {
+		$sync = \GPDFAPI::get_catalog_sync();
+
+		$sync->maybe_run();
+		$sync->seed();
 	}
 
 	/**
