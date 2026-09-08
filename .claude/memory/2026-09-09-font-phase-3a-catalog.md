@@ -10,9 +10,16 @@ Phase 3a of `.claude/plans/2026-08-26-remove-core-font-installer.md`, started 20
 **read half** of the data layer is built and inert — nothing syncs yet, so the table stays empty and no route reads
 it. PHPUnit 1,753 single-site / 1,753 multisite, PHPCS and the 7.4 compatibility sniff clean.
 
-New: `src/Fonts/{Font_Source,Font_Sources,Catalog_Repository,Font_Downloader}.php`, the `gravitypdf_font_catalog`
-table in `Font_Schema`, `GPDF_FONTS_URL` in `pdf.php`, the `MocksHttpRequests` test trait, and
-`Router::get_font_sources()` / `::get_catalog_repository()` / `::get_font_downloader()`.
+New: `src/Fonts/{Font_Source,Font_Sources,Catalog_Repository,Font_Downloader,Catalog_Sync}.php`,
+`src/Controller/Controller_Font_Catalog.php`, the `gravitypdf_font_catalog` table in `Font_Schema`,
+`GPDF_FONTS_URL` and `GPDF_TRUST_KEYS` in `pdf.php`, the `MocksHttpRequests` and `HasCatalogRows` test traits, and
+the matching `Router::get_*()` accessors.
+
+**`GPDF_TRUST_KEYS` ships as an empty array pending the real key** (see [[font-signing-keypair]] if that gets its
+own note). While it is empty every sync of a built-in source fails with `font_no_trust_keys` — verification fails
+closed and never degrades to origin trust, which a test pins. The keys are a constructor argument rather than read
+from the constant inside `Catalog_Sync`, so the suite signs its own roots with a throwaway `sodium_crypto_sign_keypair()`
+and exercises the real verification path.
 
 **`Font_Downloader` splits across 3a and 3b**, resolving §5's assignment of the whole class to 3b (3a cannot sync
 without it). Split by return type, not phase: 3a owns `fetch()`, the in-memory metadata read where the
@@ -31,7 +38,8 @@ four-version User-Agent, byte ceiling applied before *and* after the request). 3
 - **`Font_Schema::VERSION` has to move even for a pure dbDelta change.** `is_current()` short-circuits `ensure()`
   before the missing-table check runs, so a site holding `7.0.0` from Phase 1b would never create the new table.
   Bumped to `7.0.1`. It is a schema version, not the plugin's.
-- **A test helper named `entry()` fatals the entire PHPUnit run, silently.** `HasGfpdfFixtures::entry( $key,
+- **A test helper named `entry()` fatals the entire PHPUnit run, silently** (hit twice in one session — read this
+  before naming a helper). `HasGfpdfFixtures::entry( $key,
   $index = 0 )` is inherited through `GFPDF\Tests\Integration\TestCase`, so declaring `entry( array $overrides = [] ):
   array` in a test class is an incompatible-signature fatal at class load. PHPUnit loads every test file before
   printing its banner, so one bad file kills runs filtered to unrelated classes, with no output and no PHP error log
@@ -58,8 +66,21 @@ four-version User-Agent, byte ceiling applied before *and* after the request). 3
   currently has "African scripts" and "Americas". A wrong guess degrades to the index's own English string rather
   than breaking, but `font-release.mjs` must publish whatever these settle on.
 
-Still to build in 3a: `Catalog_Sync` (signed root, monotonic `generated`, `replace_source()`, the seed, the
-`catalog_sync` lock), the `gfpdf_font_catalog_root` option record, `Font_Repository::adopt()`, `Rest_Font_Sources`,
-upgrade step 2, `GPDF_TRUST_KEYS`, and `tools/release/font-release.mjs`. The **merge gate is not ours**: 3a does not
+**Signature design points worth not re-deriving:**
+
+- The context prefix (`gravitypdf/fonts/v1\n`) is prepended by the *verifier*, never carried in the signature file,
+  so the same key can sign other artefacts later and a signature can never verify across purposes. Pinned by a test
+  that signs the identical bytes under `gravitypdf/templates/v1\n` and expects a refusal.
+- `generated` is a **monotonic floor kept per root**, in its own site option keyed by `md5( root_url )` — the
+  per-source `gfpdf_font_catalog_root` record has no room for it and the root URL is the record's configuration,
+  not state. A server-side rollback therefore means re-signing the old tree with a newer timestamp.
+- The future check (7 days) exists so a forged root signed with a *leaked* key cannot shove the floor years forward
+  and lock every legitimate root out afterwards.
+- `REPLACE INTO` would be the natural-looking upsert and is wrong: it deletes and re-inserts, taking the status
+  columns with it. `INSERT … ON DUPLICATE KEY UPDATE` naming index columns only is what keeps an in-flight install's
+  phase. Neuter-tested.
+
+Still to build in 3a: `Font_Repository::adopt()` and the sync's call into it, `Rest_Font_Sources`, upgrade step 2,
+the shipped seed index, and `tools/release/font-release.mjs`. The **merge gate is not ours**: 3a does not
 land until `npm run check:fonts staging` passes ten assertions against the staging bucket, which needs the
 update-server repo's publisher and its secrets.
