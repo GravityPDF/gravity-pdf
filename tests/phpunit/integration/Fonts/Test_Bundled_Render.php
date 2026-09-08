@@ -62,6 +62,12 @@ class Test_Bundled_Render extends TestCase {
 		);
 
 		$method = new ReflectionMethod( Helper_PDF::class, 'begin_pdf' );
+
+		/* A no-op from 8.1, and required before it */
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
 		$method->invoke( $pdf );
 
 		return $pdf->get_pdf_class();
@@ -73,7 +79,12 @@ class Test_Bundled_Render extends TestCase {
 		$mpdf = $this->mpdf_for();
 
 		$reflection = new \ReflectionProperty( \GFPDF_Vendor\Mpdf\Mpdf::class, 'fontDir' );
-		$font_dir   = $reflection->getValue( $mpdf );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
+
+		$font_dir = $reflection->getValue( $mpdf );
 
 		$this->assertSame( untrailingslashit( PDF_PLUGIN_DIR . 'fonts' ), $font_dir[0] );
 		$this->assertSame( untrailingslashit( $gfpdf->data->template_font_location ), $font_dir[1] );
