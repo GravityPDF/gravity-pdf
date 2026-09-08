@@ -206,12 +206,14 @@ class Helper_Data {
 	 *
 	 * @param Helper_Abstract_Options $options
 	 * @param Helper_Abstract_Form    $gform
+	 * @param Helper_Templates        $templates
 	 *
 	 * @return array
 	 *
 	 * @since  4.0
+	 * @since  6.17.0 Added the $templates parameter
 	 */
-	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $gform ) {
+	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $gform, Helper_Templates $templates ) {
 
 		$custom_fonts      = array_values( $options->get_custom_fonts() );
 		$user_data         = get_userdata( get_current_user_id() );
@@ -228,7 +230,7 @@ class Helper_Data {
 				'restUrl'                              => rest_url( 'gravity-pdf/v1/' ),
 				'restNonce'                            => wp_create_nonce( 'wp_rest' ),
 				'currentVersion'                       => PDF_EXTENDED_VERSION,
-				'pdfWorkingDir'                        => PDF_TEMPLATE_LOCATION,
+				'pdfWorkingDir'                        => $templates->get_template_path(),
 				'pluginUrl'                            => PDF_PLUGIN_URL,
 				'pluginPath'                           => PDF_PLUGIN_DIR,
 				'customFontData'                       => wp_json_encode( $custom_fonts ),

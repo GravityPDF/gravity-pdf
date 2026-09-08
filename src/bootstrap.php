@@ -445,7 +445,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
 
 			/* Localise admin script */
-			$data = $this->data->get_localised_script_data( $this->options, $this->gform );
+			$data = $this->data->get_localised_script_data( $this->options, $this->gform, $this->templates );
 
 			wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
 			wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );
