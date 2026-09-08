@@ -186,6 +186,12 @@ class Catalog_Sync {
 	 */
 	protected $seed_file;
 
+	/**
+	 * @var callable A late-bound Font_Repository, because it and the catalogue are built either way round
+	 * @since 7.0
+	 */
+	protected $fonts;
+
 	public function __construct(
 		Font_Schema $schema,
 		Catalog_Repository $catalog,
@@ -194,7 +200,8 @@ class Catalog_Sync {
 		Font_Lock $lock,
 		LoggerInterface $log,
 		array $trust_keys,
-		string $seed_file
+		string $seed_file,
+		callable $fonts
 	) {
 		$this->schema     = $schema;
 		$this->catalog    = $catalog;
@@ -204,6 +211,7 @@ class Catalog_Sync {
 		$this->log        = $log;
 		$this->trust_keys = $trust_keys;
 		$this->seed_file  = $seed_file;
+		$this->fonts      = $fonts;
 	}
 
 	/**
@@ -413,7 +421,28 @@ class Catalog_Sync {
 		/* Bumped after the last statement, so no reader caches the old rows under the new stamp */
 		$this->catalog->flush();
 
+		/*
+		 * A site that ran the 6.x installer, or placed a pack's files by hand, has them registered here rather than
+		 * downloading what it already holds. Only worth a pass when this source actually carries coverage entries.
+		 */
+		if ( $this->has_coverage( $rows ) ) {
+			( $this->fonts )()->adopt( $this->catalog );
+		}
+
 		return true;
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	protected function has_coverage( array $rows ): bool {
+		foreach ( $rows as $row ) {
+			if ( (int) $row['coverage'] === 1 ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
