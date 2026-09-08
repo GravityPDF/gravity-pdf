@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;

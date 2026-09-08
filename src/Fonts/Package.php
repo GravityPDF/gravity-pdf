@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF_Vendor\Mpdf\Fonts\FontRegistration;
 
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * adds installed then bundled: a key both claim resolves to the bundled file, and no downloaded font can replace
  * one that ships with the plugin.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

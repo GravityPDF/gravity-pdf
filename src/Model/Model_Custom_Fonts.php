@@ -5,7 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Model;
 
 use GFPDF\Exceptions\GravityPdfIdException;
-use GFPDF\Helper\Fonts\Font_Repository;
+use GFPDF\Fonts\Font_Repository;
 use GFPDF\Helper\Helper_Abstract_Model;
 
 /**

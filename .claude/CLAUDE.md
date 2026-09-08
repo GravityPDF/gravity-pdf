@@ -78,7 +78,8 @@ The plugin follows an MVC pattern bootstrapped by the `Router` class in `src/boo
 - **`src/Controller/`** — Request handlers (forms, PDF generation, settings, fonts, templates, activation, etc.)
 - **`src/Model/`** — Business logic (PDF rendering via mPDF, settings management, merge tags, templates)
 - **`src/View/`** — Admin UI rendering; HTML templates live in `src/templates/`
-- **`src/Helper/`** — Abstract base classes for options, fields, forms, logging, and fonts
+- **`src/Helper/`** — Abstract base classes for options, fields, forms and logging, plus the packages that serve them (`Fields/`, `Licensing/`, `Log/`, `Mpdf/`)
+- **`src/Fonts/`** — The font subsystem: its own tables and schema, the mPDF registry, imports and (7.0+) language packs. Top-level rather than under `Helper/` because nothing in `Helper/` consumes it
 - **`vendor_prefixed/`** — Composer dependencies namespaced via `php-scoper` to avoid conflicts with other plugins
 
 Namespacing: all plugin code is under the `GFPDF\` namespace with PSR-4 autoloading.

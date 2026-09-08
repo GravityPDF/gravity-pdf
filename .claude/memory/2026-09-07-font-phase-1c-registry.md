@@ -9,7 +9,7 @@ Phase 1c of `.claude/plans/2026-08-26-remove-core-font-installer.md`, built 2026
 `feature/remove-core-font-installer`, on top of [[font-phase-1b-tables]]. mPDF's font wiring now comes from the
 font registry rather than a hard-coded core-font list and a per-render directory glob.
 
-New: `src/Helper/Fonts/{Registry,Package,Language_To_Font,Loose_Font_Importer}.php`. `Helper_PDF::begin_pdf()`
+New: `src/Fonts/{Registry,Package,Language_To_Font,Loose_Font_Importer}.php`. `Helper_PDF::begin_pdf()`
 builds the whole font config from `Registry`; `Helper_Abstract_Options::get_installed_fonts()` returns
 `Registry::get_grouped_fonts()`.
 

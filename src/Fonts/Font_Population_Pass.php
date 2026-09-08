@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 /**
  * @package     Gravity PDF
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * lock. Each is responsible for claiming what it owns, so a later pass never re-registers a file an earlier one
  * took.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

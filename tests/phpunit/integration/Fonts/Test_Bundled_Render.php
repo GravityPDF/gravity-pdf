@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Tests\Integration\TestCase;
@@ -20,7 +20,7 @@ use ReflectionMethod;
  * Until 7.0 the test suite forced mPDF into core-fonts mode through a mu-plugin, so no test ever proved a real
  * font was embedded. That stub is gone, and these cases are what replace it.
  *
- * @package   GFPDF\Helper\Fonts
+ * @package   GFPDF\Fonts
  *
  * @group     helper
  * @group     fonts

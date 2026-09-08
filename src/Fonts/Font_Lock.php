@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 /**
  * @package     Gravity PDF
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Backed by `add_site_option()`, which is an atomic INSERT: exactly one caller gets true. Network-scoped, because
  * everything it guards (the fonts directory, the font tables) is network-global.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

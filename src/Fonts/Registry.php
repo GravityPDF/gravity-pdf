@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF_Vendor\Mpdf\Fonts\FontRegistry;
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * touches the filesystem, and nothing constructs `Font_Sources` — its filter runs third-party code the render path
  * must not depend on.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */
@@ -129,10 +129,9 @@ class Registry {
 	/**
 	 * Every mPDF config key that decides which font a run of text gets
 	 *
-	 * Shared, because two places construct mPDF — `Helper_PDF::begin_pdf()` and the v3 `mPDF` shim in
-	 * `deprecated.php` — and each key here is load-bearing rather than a preference. Split out so the shim cannot
-	 * quietly drift into resolving fonts by different rules to every other PDF the plugin makes; the caller merges
-	 * its own per-document keys on top.
+	 * Kept here rather than inline in the caller because each key is load-bearing rather than a preference: the
+	 * registry decides how fonts resolve, so anything constructing mPDF takes this set whole and merges its own
+	 * per-document keys on top.
 	 *
 	 * @param LanguageToFontRegistry $language_to_font Handed in so the caller can keep adding to it after mPDF is built
 	 *

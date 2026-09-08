@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Integration\TestCase;
@@ -17,7 +17,7 @@ use GPDFAPI;
 /**
  * What the deleted core font installer left on disk keeps rendering
  *
- * @package   GFPDF\Helper\Fonts
+ * @package   GFPDF\Fonts
  *
  * @group     helper
  * @group     fonts

@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF_Vendor\Mpdf\Language\LanguageToFontInterface;
 
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * `Language\LanguageToFont` is deliberately kept out of the registry — it maps to the 6.x core fonts by name, and
  * none of those keys exist in 7.0.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

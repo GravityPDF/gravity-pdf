@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The `custom_fonts` key is never deleted. It stays as a frozen snapshot of the 6.x state — 7.0 reads it once and
  * writes it never — because deleting it was the one irreversible step in the upgrade, and the rollback path needs it.
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @since 7.0
  */

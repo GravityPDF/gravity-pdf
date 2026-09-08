@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
@@ -20,7 +20,7 @@ use GPDFAPI;
  * these cases drop both filters and work on the real tables. Its DDL commits the transaction, so rollback will not
  * clean up: tear_down() restores the filters, the canonical tables and the version by hand.
  *
- * @package   GFPDF\Helper\Fonts
+ * @package   GFPDF\Fonts
  *
  * @group     helper
  * @group     fonts

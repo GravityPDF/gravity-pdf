@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GFPDF\Tests\Concerns;
 
-use GFPDF\Helper\Fonts\Font_Repository;
+use GFPDF\Fonts\Font_Repository;
 
 /**
  * Font-table fixtures: install rows, then take them and their files away again.

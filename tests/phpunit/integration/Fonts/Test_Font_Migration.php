@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Helper\Fonts;
+namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
@@ -16,7 +16,7 @@ use GPDFAPI;
 /**
  * Class Test_Font_Migration
  *
- * @package   GFPDF\Helper\Fonts
+ * @package   GFPDF\Fonts
  *
  * @group     helper
  * @group     fonts

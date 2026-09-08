@@ -4,7 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use Exception;
 use GF_Field_Consent;
-use GFPDF\Helper\Fonts\Registry;
+use GFPDF\Fonts\Registry;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
