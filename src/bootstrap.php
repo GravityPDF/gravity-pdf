@@ -770,9 +770,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$download_pdf_controller = new Rest\Rest_Download_Pdf( $this->gform, new Helper\Helper_Url_Signer() );
 		$download_pdf_controller->init();
 
+		$font_sources_controller = new Rest\Rest_Font_Sources(
+			$this->get_catalog_repository(),
+			$this->get_catalog_sync(),
+			$this->get_font_sources(),
+			$this->gform
+		);
+		$font_sources_controller->init();
+
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $form_setting_controller );
 		$this->singleton->add_class( $download_pdf_controller );
+		$this->singleton->add_class( $font_sources_controller );
 
 		/* Log any errors for PDF endpoints */
 		$rest_request_after_callback = function ( $response, $handle, $request ) {
