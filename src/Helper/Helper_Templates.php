@@ -3,7 +3,6 @@
 namespace GFPDF\Helper;
 
 use Exception;
-use GFPDF\Statics\Deprecation;
 use GPDFAPI;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use stdClass;
@@ -184,6 +183,11 @@ class Helper_Templates {
 
 		foreach ( $template_list as $template_path ) {
 			$info = $this->get_template_info_by_path( $template_path );
+
+			/* Hidden for the same reason set_template() refuses them: selecting one cannot produce a PDF */
+			if ( $this->is_legacy_template( $info ) ) {
+				continue;
+			}
 
 			if ( $this->is_template_compatible( $info['required_pdf_version'] ) ) {
 				$template_groups[ $info['group'] ][ $info['id'] ] = $info['template'];
@@ -579,57 +583,45 @@ class Helper_Templates {
 	 */
 	public function get_config_class( $template_id ) {
 
-		/* Allow a user to change the current template configuration file if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
-			$template_id = rgget( 'template' );
-
-			/* Handle legacy v3 URL structure and strip .php from the end of the template */
-			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
-				$template_id = substr( $template_id, 0, -4 );
-			}
-
-			$template_id = sanitize_html_class( $template_id );
-		}
+		$template_id = $this->get_requested_template_id( $template_id );
 
 		try {
 			$class_path = $this->get_config_path_by_id( $template_id );
 		} catch ( Exception $e ) {
+			/* A template without a configuration file is ordinary, so it logs a step below one that fails to load */
 			$this->log->notice( $e->getMessage() );
+
+			return new stdClass();
 		}
 
 		try {
-			if ( ! empty( $class_path ) ) {
-				return $this->load_template_config_file( $class_path );
-			}
+			return $this->load_template_config_file( $class_path );
 		} catch ( Exception $e ) {
 			$this->log->warning( $e->getMessage() );
 		}
 
-		/* If class still empty it's either a legacy template or doesn't have a config. Check for legacy templates which support certain fields */
-		$legacy_templates = apply_filters(
-			'gfpdf_legacy_templates',
-			[
-				'default-template',
-				'default-template-two-rows',
-				'default-template-no-style',
-			]
-		);
+		/* A configuration file that won't load gets an empty class rather than nothing */
+		return new stdClass();
+	}
 
-		if ( in_array( $template_id, $legacy_templates, true ) ) {
-			try {
-				$class = $this->load_template_config_file( PDF_PLUGIN_DIR . 'src/templates/config/legacy.php' );
-			} catch ( Exception $e ) {
-				$this->log->error( 'Legacy Template Configuration Failed to Load' );
-			}
+	/**
+	 * Resolve the template to render, honouring a `?template=` override
+	 *
+	 * Shared with Helper_PDF::set_template() so the template file and the configuration class loaded alongside it can
+	 * never resolve to different templates, and the capability gate on the override only has to be right once.
+	 *
+	 * @param string $template_id The template the PDF settings ask for
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	public function get_requested_template_id( $template_id ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
+			return sanitize_html_class( rgget( 'template' ) );
 		}
 
-		/* If there is still no class loaded we'll pass along a new empty class */
-		if ( empty( $class ) ) {
-			$class = new stdClass();
-		}
-
-		return $class;
+		return $template_id;
 	}
 
 	/**
@@ -755,13 +747,14 @@ class Helper_Templates {
 	 * @param array  $form_data  The form data array, formatted form the $entry array
 	 * @param array  $settings   PDF Settings The current PDF settings
 	 * @param object $config     The current PDF template configuration class
-	 * @param array  $legacy_ids An array of multiple entry IDs for legacy templates only
+	 * @param array  $legacy_ids Deprecated. Not read — `lead_ids` always reports the entry being rendered
 	 *
 	 * @return array
 	 *
 	 * @since 4.1
+	 * @since 7.0 $legacy_ids is optional and no longer read
 	 */
-	public function get_template_arguments( $form, $fields, $entry, $form_data, $settings, $config, $legacy_ids ) {
+	public function get_template_arguments( $form, $fields, $entry, $form_data, $settings, $config, $legacy_ids = [] ) {
 		global $gfpdf;
 
 		/* Disable the field encryption checks which can slow down our entry queries */
@@ -779,8 +772,8 @@ class Helper_Templates {
 			[
 
 				'form_id'   => $form['id'], /* backwards compat */
-				'lead_ids'  => $legacy_ids, /* backwards compat */
-				'lead_id'   => Deprecation::apply_filters( 'gfpdfe_lead_id', [ $entry['id'], $form, $entry, $gfpdf ] ), /* backwards compat */
+				'lead_ids'  => [ $entry['id'] ], /* backwards compat */
+				'lead_id'   => $entry['id'], /* backwards compat */
 
 				'form'      => $form,
 				'entry'     => $entry,

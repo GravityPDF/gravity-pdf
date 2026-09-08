@@ -21,7 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div style="font-size:15px; line-height: 25px" role="alert" aria-live="polite">
 
 	<strong>
-		<?php esc_html_e( 'This site uses deprecated Gravity PDF functionality:', 'gravity-pdf' ); ?>
+		<?php
+		/* A feature that is already gone is breaking PDFs now, so the list can't be introduced as merely deprecated */
+		echo esc_html(
+			! empty( $args['unsupported'] )
+				? __( 'This site uses Gravity PDF functionality that has been removed:', 'gravity-pdf' )
+				: __( 'This site uses deprecated Gravity PDF functionality:', 'gravity-pdf' )
+		);
+		?>
 	</strong>
 
 	<?php /* Bullets are set per-item: Gravity Forms resets `ul li` to none, and wp_kses_post() drops the `list-style` shorthand */ ?>

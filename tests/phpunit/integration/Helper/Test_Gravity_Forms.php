@@ -6,7 +6,6 @@ namespace GFPDF\Helper;
 
 use GFForms;
 use GFFormsModel;
-use PDF_Common;
 use RGFormsModel;
 use GFPDF\Tests\Integration\TestCase;
 use WP_User;
@@ -437,14 +436,12 @@ class Test_Gravity_Forms extends TestCase {
 	 * @dataProvider provider_mergetag_test
 	 */
 	public function test_replace_variables( $mergetag, $value ) {
-		$this->setExpectedDeprecated( 'PDF_Common::do_mergetags' );
-
 		// Per-class form titles are dedup-suffixed by GFAPI (e.g. "Simple Form Testing (1)").
 		// Substitute the provider's expected title with the actual loaded form title.
 		if ( $mergetag === '{form_title}' ) {
 			$value = $this->form( 'gravityform-1' )['title'];
 		}
-		$this->assertSame( $value, PDF_Common::do_mergetags( $mergetag, $this->form( 'gravityform-1' )['id'], $this->entry( 'gravityform-1', 2 )['id'] ) );
+		$this->assertSame( $value, $this->gfpdf()->gform->process_tags( $mergetag, $this->form( 'gravityform-1' ), $this->entry( 'gravityform-1', 2 ) ) );
 	}
 
 	/**

@@ -97,11 +97,6 @@ if ( $collapsible ) {
 				$args['callback']
 			);
 		}
-
-		/** @deprecated 6.4.0 */
-		if ( isset( $args['content'] ) ) {
-			echo wp_kses_post( $args['content'] );
-		}
 		?>
 	</div>
 </fieldset>

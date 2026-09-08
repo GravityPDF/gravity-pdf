@@ -5,7 +5,6 @@ namespace GFPDF\Helper;
 use DOMElement;
 use Exception;
 use GFCommon;
-use GFMultiCurrency;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -26,6 +25,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since  4.0
  */
 class Helper_Misc {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -750,48 +751,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Backwards compatibility that allows multiple IDs to be passed to the renderer
-	 *
-	 * @param integer $entry_id The fallback ID if none present
-	 * @param array   $settings The current PDF settings
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_legacy_ids( $entry_id, $settings ) {
-
-		$leads    = rgget( 'lid' );
-		$override = ( $settings['public_access'] ?? '' ) === 'Yes';
-
-		if ( $leads && ( $override === true || $this->gform->has_capability( 'gravityforms_view_entries' ) ) ) {
-			$ids = array_filter( array_map( 'intval', explode( ',', $leads ) ) );
-
-			if ( count( $ids ) > 0 ) {
-				return $ids;
-			}
-		}
-
-		/* if not processing legacy endpoint, or if invalid IDs were passed we'll return the original entry ID */
-
-		return [ $entry_id ];
-	}
-
-	/**
-	 * Add support for the third-party plugin GF Multi Currency
-	 * https://github.com/ilanco/gravity-forms-multi-currency
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated 6.12 compatibility code no longer required
-	 */
-	public function maybe_add_multicurrency_support() {
-		_deprecated_function( __METHOD__, '6.12' );
-	}
-
-	/**
 	 * Remove an extension from the end of a string
 	 *
 	 * @param string $text
@@ -809,24 +768,6 @@ class Helper_Misc {
 		}
 
 		return $text;
-	}
-
-	/**
-	 *  Convert our v3 boolean values into 'Yes' or 'No' responses
-	 *
-	 * @param mixed $value
-	 *
-	 * @return mixed
-	 *
-	 * @since  4.0
-	 */
-	public function update_deprecated_config( $value ) {
-
-		if ( is_bool( $value ) ) {
-			$value = ( $value ) ? 'Yes' : 'No';
-		}
-
-		return $value;
 	}
 
 	/**
@@ -912,70 +853,6 @@ class Helper_Misc {
 		}
 
 		return $fields;
-	}
-
-	/**
-	 * Converts the 4.x settings array into a compatible 3.x settings array
-	 *
-	 * @param array $settings The 4.x settings to be converted
-	 * @param array $form     (since 4.0.6) The Gravity Forms array
-	 * @param array $entry    (since 4.0.6) The Gravity Forms entry
-	 *
-	 * @return array           The 3.x compatible settings
-	 *
-	 * @since 4.0
-	 */
-	public function backwards_compat_conversion( $settings, $form, $entry ) {
-
-		$compat                   = [];
-		$compat['premium']        = ( $settings['advanced_template'] ?? '' ) === 'Yes';
-		$compat['rtl']            = ( $settings['rtl'] ?? '' ) === 'Yes';
-		$compat['dpi']            = (int) ( $settings['image_dpi'] ?? 96 );
-		$compat['security']       = ( $settings['security'] ?? '' ) === 'Yes';
-		$compat['pdf_password']   = $this->gform->process_tags( $settings['password'] ?? '', $form, $entry );
-		$compat['pdf_privileges'] = $settings['privileges'] ?? '';
-		$compat['pdfa1b']         = ( $settings['format'] ?? '' ) === 'PDFA1B';
-		$compat['pdfx1a']         = ( $settings['format'] ?? '' ) === 'PDFX1A';
-
-		return $compat;
-	}
-
-	/**
-	 * Converts the 4.x output to into a compatible 3.x type
-	 *
-	 * @param string $type
-	 *
-	 * @return string
-	 *
-	 * @since 4.0
-	 */
-	public function backwards_compat_output( $type = '' ) {
-		switch ( strtolower( $type ) ) {
-			case 'display':
-				return 'view';
-
-			case 'download':
-				return 'download';
-
-			default:
-				return 'save';
-		}
-	}
-
-	/**
-	 * Check if the Gravity Forms GFEntryDetail class exists, otherwise load it
-	 *
-	 * @since 4.0
-	 */
-	public function maybe_load_gf_entry_detail_class() {
-		/* Ensure Gravity Forms GFEntryDetail class is loaded */
-		if ( ! class_exists( 'GFEntryDetail' ) ) {
-			$entry_details_file = GFCommon::get_base_path() . '/entry_detail.php';
-
-			if ( is_file( $entry_details_file ) ) {
-				require_once $entry_details_file;
-			}
-		}
 	}
 
 	/**

@@ -7,8 +7,6 @@ namespace GFPDF\Controller;
 use Exception;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
-use GFPDF\Statics\Deprecation;
-use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF\View\View_PDF;
 use ReflectionMethod;
@@ -56,12 +54,7 @@ class Test_Controller_PDF extends TestCase {
 			$GLOBALS['wp']->query_vars['gpdf'],
 			$GLOBALS['wp']->query_vars['pid'],
 			$GLOBALS['wp']->query_vars['lid'],
-			$_GET['gf_pdf'],
-			$_GET['fid'],
-			$_GET['lid'],
-			$_GET['template'],
-			$_GET['html'],
-			$_GET['raw']
+			$_GET['html']
 		);
 
 		parent::tear_down();
@@ -97,7 +90,6 @@ class Test_Controller_PDF extends TestCase {
 		$this->controller->init();
 
 		$this->assertNotFalse( has_action( 'parse_request', [ $this->controller, 'process_pdf_endpoint' ] ) );
-		$this->assertNotFalse( has_action( 'parse_request', [ $this->controller, 'process_legacy_pdf_endpoint' ] ) );
 		$this->assertNotFalse( has_filter( 'gfpdf_pdf_middleware' ) );
 		$this->assertNotFalse( has_filter( 'gfpdf_pdf_html_output' ) );
 	}
@@ -125,12 +117,6 @@ class Test_Controller_PDF extends TestCase {
 
 		$this->assertTrue( defined( 'DONOTCACHEPAGE' ) );
 		$this->assertTrue( DONOTCACHEPAGE );
-	}
-
-	public function test_sgoptimizer_html_minification_fix_emits_doing_it_wrong() {
-		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::sgoptimizer_html_minification_fix' );
-
-		$this->controller->sgoptimizer_html_minification_fix();
 	}
 
 	public function test_add_view_html_debugger_passes_through_non_string_input() {
@@ -167,86 +153,6 @@ class Test_Controller_PDF extends TestCase {
 		$result = $this->invoke_protected( 'add_current_form_object_hooks', [ [ 'fields' => [] ], [], 'source' ] );
 
 		$this->assertSame( [ 'fields' => [] ], $result );
-	}
-
-	/**
-	 * Test the deprecated legacy PDF endpoint is secured and will generate a PDF successfully
-	 *
-	 * @group slow
-	 */
-	public function test_process_legacy_pdf_endpoint() {
-		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint' );
-		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config' );
-
-		/* Test our endpoint is firing correctly */
-		$results = $this->form_and_entry();
-
-		$_GET['gf_pdf']   = 1;
-		$_GET['fid']      = $results['form']['id'];
-		$_GET['lid']      = $results['entry']['id'];
-		$_GET['template'] = 'zadani.php';
-
-		/* Check middleware security is applied */
-		try {
-			wp_set_current_user( 0 );
-			$this->controller->process_legacy_pdf_endpoint();
-			$this->fail( 'Expected Exception on middleware redirect was not thrown.' );
-		} catch ( Exception $e ) {
-			$this->assertSame( 'Redirecting', $e->getMessage() );
-		}
-
-		/* Check pdf successfully generated */
-		try {
-			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-			wp_set_current_user( $user_id );
-
-			add_action( 'gfpdf_post_view_or_download_pdf', function () {
-				wp_die( 'PDF generated successfully' );
-			} );
-
-			$this->controller->process_legacy_pdf_endpoint();
-			$this->fail( 'Expected Exception on successful PDF generation was not thrown.' );
-		} catch ( Exception $e ) {
-			$this->assertSame( 'PDF generated successfully', $e->getMessage() );
-
-			return;
-		}
-	}
-
-	/**
-	 * A legacy URL is often pasted somewhere the form scan can't see, so the endpoint records the form it served
-	 *
-	 * @group slow
-	 */
-	public function test_process_legacy_pdf_endpoint_records_the_form_it_served() {
-		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint' );
-		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config' );
-
-		$results = $this->form_and_entry();
-		$form_id = (int) $results['form']['id'];
-
-		$_GET['gf_pdf']   = 1;
-		$_GET['fid']      = $form_id;
-		$_GET['lid']      = $results['entry']['id'];
-		$_GET['template'] = 'zadani.php';
-
-		$this->assertSame( [], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
-
-		/* Recorded before the PDF is served, so a request the middleware turns away still counts as one made */
-		try {
-			wp_set_current_user( 0 );
-			$this->controller->process_legacy_pdf_endpoint();
-		} catch ( Exception $e ) {
-			$this->assertSame( 'Redirecting', $e->getMessage() );
-		}
-
-		$this->assertSame( [ $form_id ], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
-
-		/* The form's own settings never mentioned the URL, so only the record can report it */
-		$this->assertSame( [ $form_id ], Deprecation_V3::get_legacy_download_urls() );
-
-		/* The notices read a record taken at install and on each version change, which this happened after */
-		$this->assertContains( Deprecation_V3::FEATURE_LEGACY_ENDPOINT, Deprecation::get_detected_features() );
 	}
 
 	/**

@@ -8,6 +8,7 @@ use GFPDF\Exceptions\GravityPdfShortcodePdfConditionalLogicFailedException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfConfigNotFoundException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfInactiveException;
 use GFPDF\Helper\Helper_Abstract_Pdf_Shortcode;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GPDFAPI;
 
 /**
@@ -28,29 +29,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 
+	use Helper_Trait_Removed_Methods;
+
 	/**
 	 * @since 5.2
 	 */
 	const SHORTCODE = 'gravitypdf';
-
-	/**
-	 * Generates a direct link to the PDF that should be generated
-	 * If placed in a confirmation the appropriate entry will be displayed.
-	 * A user also has the option to pass in an "entry" parameter to define the entry ID
-	 *
-	 * @param array $attributes The shortcode attributes specified
-	 *
-	 * @return string
-	 *
-	 * @since    4.0
-	 *
-	 * @internal Deprecated in 5.2. Use Model_Shortcodes::process()
-	 */
-	public function gravitypdf( $attributes ) {
-		_deprecated_function( __METHOD__, '5.2', 'Model_Shortcodes::process()' );
-
-		return $this->process( $attributes );
-	}
 
 	/**
 	 * Generates a direct link to the PDF that should be generated

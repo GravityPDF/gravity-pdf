@@ -33,11 +33,6 @@ GFCommon::display_admin_message();
 		if ( isset( $args['callback'] ) ) {
 			call_user_func_array( $args['callback'], $args['callback_args'] ?? [] );
 		}
-
-		/** @deprecated 6.4.0 */
-		if ( isset( $args['content'] ) ) {
-			echo wp_kses_post( $args['content'] );
-		}
 		?>
 
 		<div id="submit-and-promo-container">

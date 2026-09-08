@@ -129,23 +129,6 @@ class View_Settings extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Load the Welcome Tab tabs
-	 *
-	 * @return string
-	 * @since 4.0
-	 *
-	 * @deprecated 6.4
-	 */
-	public function tabs() {
-		_deprecated_function( __METHOD__, '6.4', 'View_Settings::sub_menu()' );
-
-		ob_start();
-		$this->sub_menu();
-
-		return ob_get_clean();
-	}
-
-	/**
 	 * Display the sub menu for the global settings
 	 *
 	 * @since 6.4
@@ -158,7 +141,7 @@ class View_Settings extends Helper_Abstract_View {
 			'data'     => $this->data,
 		];
 
-		$this->load( 'tabs', $vars );
+		$this->load( 'sub_menu', $vars );
 	}
 
 	/**

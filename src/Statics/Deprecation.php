@@ -4,6 +4,8 @@ declare( strict_types=1 );
 
 namespace GFPDF\Statics;
 
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -24,6 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 6.17.0
  */
 class Deprecation {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Functionality that has been removed from Gravity PDF
@@ -190,6 +194,26 @@ class Deprecation {
 		$detected[] = $key;
 
 		\GPDFAPI::get_options_class()->update_option( 'deprecated_features', $detected );
+	}
+
+	/**
+	 * Whether any of these features has already been removed, rather than merely scheduled for removal
+	 *
+	 * Both the admin notice and the Site Health test escalate on this, and the copy each one leads with changes
+	 * with it, so the rule lives here rather than being spelt out per surface.
+	 *
+	 * @param string[] $keys The feature IDs to weigh
+	 *
+	 * @since 7.0
+	 */
+	public static function has_unsupported_feature( array $keys ): bool {
+		foreach ( $keys as $key ) {
+			if ( ( static::get_feature( $key )['group'] ?? '' ) === static::GROUP_UNSUPPORTED ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

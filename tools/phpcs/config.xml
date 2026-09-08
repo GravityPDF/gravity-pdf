@@ -52,7 +52,6 @@
     <rule ref="PSR1.Classes.ClassDeclaration">
         <exclude-pattern>/pdf.php</exclude-pattern>
         <exclude-pattern>/api.php</exclude-pattern>
-        <exclude-pattern>/src/deprecated.php</exclude-pattern>
         <exclude-pattern>/src/controller/Controller_Activation.php</exclude-pattern>
         <exclude-pattern>/tests/*</exclude-pattern>
     </rule>

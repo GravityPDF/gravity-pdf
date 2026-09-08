@@ -112,8 +112,8 @@ class Test_Controller_Actions extends TestCase {
 		$this->assertSame( [ 'legacy_templates', 'legacy_endpoint' ], $model->get_undismissed_deprecated_features() );
 
 		$html = $this->render_notices();
-		$this->assertStringContainsString( 'Support for Legacy Templates', $html );
-		$this->assertStringContainsString( 'Support for legacy download URLs', $html );
+		$this->assertStringContainsString( 'PDFs that use a legacy template can no longer be generated', $html );
+		$this->assertStringContainsString( 'Old PDF download links stopped working', $html );
 
 		$model->dismiss_deprecated_features();
 
@@ -121,18 +121,18 @@ class Test_Controller_Actions extends TestCase {
 
 		/* Other routes can still have a notice of their own, so only this one has to be gone */
 		$html = $this->render_notices();
-		$this->assertStringNotContainsString( 'Support for Legacy Templates', $html );
-		$this->assertStringNotContainsString( 'Support for legacy download URLs', $html );
+		$this->assertStringNotContainsString( 'PDFs that use a legacy template can no longer be generated', $html );
+		$this->assertStringNotContainsString( 'Old PDF download links stopped working', $html );
 
 		/* A feature detected after that dismissal was never listed, so the notice returns for it alone */
-		$options->update_option( 'deprecated_features', [ 'legacy_templates', 'legacy_endpoint', 'deprecated_filters' ] );
+		$options->update_option( 'deprecated_features', [ 'legacy_templates', 'legacy_endpoint', 'business_plus_templates' ] );
 
 		$this->assertTrue( $model->has_deprecated_features() );
-		$this->assertSame( [ 'deprecated_filters' ], $model->get_undismissed_deprecated_features() );
+		$this->assertSame( [ 'business_plus_templates' ], $model->get_undismissed_deprecated_features() );
 
 		$html = $this->render_notices();
-		$this->assertStringContainsString( 'Code on this site uses Gravity PDF hooks', $html );
-		$this->assertStringNotContainsString( 'Support for Legacy Templates', $html );
+		$this->assertStringContainsString( 'PDFs built with Advanced Templating can no longer be generated', $html );
+		$this->assertStringNotContainsString( 'PDFs that use a legacy template can no longer be generated', $html );
 
 		$pagenow = $original;
 		$gfpdf->notices->clear();
@@ -162,11 +162,11 @@ class Test_Controller_Actions extends TestCase {
 
 		$html = $this->get_rendered_notices();
 
-		$this->assertStringContainsString( 'Support for legacy download URLs will be removed in Gravity PDF 7.0.', $html );
+		$this->assertStringContainsString( 'Old PDF download links stopped working in Gravity PDF 7.0, so anyone who clicks one will not get their PDF. Replace those links with the [gravitypdf] shortcode or a PDF merge tag.', $html );
 		$this->assertStringContainsString( 'View the system report', $html );
 
-		/* Functionality still working, but not for much longer, reads as a warning rather than an error */
-		$this->assertStringContainsString( 'notice-warning', $html );
+		/* The endpoint is already gone rather than going, so the notice reads as an error rather than a warning */
+		$this->assertStringContainsString( 'notice-error', $html );
 
 		$pagenow = $original;
 		$gfpdf->notices->clear();
@@ -195,7 +195,7 @@ class Test_Controller_Actions extends TestCase {
 
 		/* Helper_Notices renders this on network_admin_notices rather than admin_notices */
 		$this->assertTrue( $gfpdf->notices->has_notice() );
-		$this->assertStringContainsString( 'Support for legacy download URLs', $this->get_rendered_notices() );
+		$this->assertStringContainsString( 'Old PDF download links stopped working', $this->get_rendered_notices() );
 
 		$pagenow = $original;
 		set_current_screen( 'dashboard' );

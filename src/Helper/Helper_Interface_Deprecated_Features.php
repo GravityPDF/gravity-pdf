@@ -38,11 +38,11 @@ interface Helper_Interface_Deprecated_Features {
 	 * - `notice`     (string)   What becomes of the feature, taking the removal version as `%s`. Read by every
 	 *                           surface, so it has to make sense with nothing else around it
 	 *
-	 * A feature made up of hooks declares more, so Deprecation::apply_filters() can warn the listeners by name:
+	 * A feature made up of hooks declares more, so the detector can name the hooks and their replacements:
 	 *
-	 * - `hooks`              (array<string, string>) Each deprecated hook mapped to its replacement, '' when none
-	 *                                               exists
-	 * - `deprecated_in`      (string)                The Gravity PDF version the hooks were deprecated in
+	 * - `hooks`              (array<string, string>) Each removed hook mapped to its replacement, '' when none exists
+	 * - `deprecated_in`      (string)                Optional. The Gravity PDF version the hooks were deprecated in,
+	 *                                                read by Deprecation::apply_filters() while they still fire
 	 * - `hook_prefix`        (string)                Optional. Claims any hook starting with it as well, which is
 	 *                                                how the dynamic hooks are matched
 	 * - `internal_callbacks` (array)                 Optional. The callbacks Gravity PDF registers on these hooks

@@ -8,8 +8,6 @@ use Exception;
 use GFPDF\Controller\Controller_Pdf_Queue;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Pdf_Queue;
-use GFPDF\Statics\Cache;
-use GFPDF\Statics\Queue_Callbacks;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -306,7 +304,7 @@ class Test_Controller_Pdf_Queue extends TestCase {
 	 *
 	 * @since 5.0
 	 */
-	public function test_queue_async_resend_notification_tasks() {
+	public function test_resend_notification_tasks_are_queued_per_entry() {
 		$results = $this->form_and_entry();
 		$form    = $results['form'];
 		$form['notifications']['54bca349732b8']['isActive'] = true;
@@ -355,35 +353,6 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		$this->controller->queue_dispatch_resend_notification_tasks();
 
 		$this->assertSame( 1, $spy->getInvocationCount() );
-	}
-
-	/**
-	 * Test PDFs are cleaned up correctly
-	 *
-	 * @since 5.0
-	 */
-	public function test_cleanup_pdfs() {
-		$this->setExpectedDeprecated( 'GFPDF\Statics\Queue_Callbacks::cleanup_pdfs' );
-		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::cleanup_pdf' );
-
-		$form_class = \GPDFAPI::get_form_class();
-
-		$results = $this->form_and_entry();
-		$entry   = $results['entry'];
-		$form    = $form_class->get_form( $results['form']['id'] );
-
-		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
-		$file = "test-{$form['id']}.pdf";
-
-		wp_mkdir_p( $path );
-		touch( $path . $file );
-
-		$this->assertFileExists( $path . $file );
-
-		Queue_Callbacks::cleanup_pdfs( $form['id'], $entry['id'] );
-
-		$this->assertFileDoesNotExist( $path . $file );
-		$this->assertFileDoesNotExist( $path );
 	}
 
 	/**

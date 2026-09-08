@@ -31,15 +31,6 @@ class Test_Deprecation_V3 extends TestCase {
 	}
 
 	/**
-	 * Passes either way on Gravity Forms 2.9, which still declares the class; it is 3.0 the shim exists for
-	 */
-	public function test_restore_v3_form_class_puts_back_the_class_v3_templates_guard_on() {
-		Deprecation_V3::restore_v3_form_class();
-
-		$this->assertTrue( class_exists( 'RGForms' ) );
-	}
-
-	/**
 	 * A Business Plus template hands itself to the Advanced Templating add-on, which a plain v3 template never does
 	 */
 	public function test_legacy_templates_are_split_by_whether_they_call_the_addon() {
@@ -144,7 +135,11 @@ class Test_Deprecation_V3 extends TestCase {
 		);
 
 		$this->assertSame( Deprecation_V3::REMOVED_IN, $features['legacy_templates']['removed_in'] );
-		$this->assertSame( Deprecation::GROUP_DEPRECATED, $features['legacy_templates']['group'] );
+
+		/* 7.0 removed everything the v3 provider detects, hooks included, so nothing here is merely deprecated */
+		foreach ( $features as $feature ) {
+			$this->assertSame( Deprecation::GROUP_UNSUPPORTED, $feature['group'] );
+		}
 	}
 
 	public function test_get_legacy_download_urls_searches_the_whole_form() {
@@ -169,89 +164,7 @@ class Test_Deprecation_V3 extends TestCase {
 	public function test_get_legacy_download_urls_ignores_a_partial_marker() {
 		$this->create_form_with_legacy_url( 'form', 'gf_pdf=0' );
 
-		/* Only `gf_pdf=1` routes to the legacy endpoint, so anything else is a false positive */
-		$this->assertSame( [], Deprecation_V3::get_legacy_download_urls() );
-	}
-
-	public function test_get_legacy_download_urls_includes_the_recorded_forms() {
-		$scanned  = $this->create_form_with_legacy_url();
-		$recorded = (int) $this->gf_factory()->form->create();
-
-		Deprecation_V3::record_legacy_endpoint_usage( $recorded );
-
-		/* A URL served for a form that never handed one out lives somewhere the scan can't see */
-		$this->assertSame( [ $recorded ], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
-		$this->assertSame( [ min( $scanned, $recorded ), max( $scanned, $recorded ) ], Deprecation_V3::get_legacy_download_urls() );
-
-		/* A form found by both sources is only reported once */
-		Deprecation_V3::record_legacy_endpoint_usage( $scanned );
-
-		$this->assertCount( 2, Deprecation_V3::get_legacy_download_urls() );
-	}
-
-	public function test_record_legacy_endpoint_usage_writes_once_a_day_per_form() {
-		$form_id = (int) $this->gf_factory()->form->create();
-
-		Deprecation_V3::record_legacy_endpoint_usage( $form_id );
-
-		/* Written from the front end but read on three admin paths, so it stays out of the autoloaded set */
-		$this->assertArrayNotHasKey( Deprecation_V3::LEGACY_ENDPOINT_OPTION, wp_load_alloptions() );
-
-		$writes = 0;
-		add_action(
-			'update_option_' . Deprecation_V3::LEGACY_ENDPOINT_OPTION,
-			function () use ( &$writes ) {
-				++$writes;
-			}
-		);
-
-		/* Every later request that day reads the record and leaves it alone */
-		Deprecation_V3::record_legacy_endpoint_usage( $form_id );
-
-		$this->assertSame( 0, $writes );
-		$this->assertSame( [ $form_id ], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
-
-		/* A link still being followed a day later refreshes the record, so it never reaches the expiry */
-		$stale = time() - Deprecation_V3::LEGACY_ENDPOINT_REFRESH - 1;
-		update_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION, [ $form_id => $stale ], false );
-
-		Deprecation_V3::record_legacy_endpoint_usage( $form_id );
-
-		$this->assertGreaterThan( $stale, get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION )[ $form_id ] );
-	}
-
-	public function test_get_recorded_legacy_endpoint_usage_expires_a_quiet_form() {
-		$form_id = (int) $this->gf_factory()->form->create();
-
-		Deprecation_V3::record_legacy_endpoint_usage( $form_id );
-
-		$this->assertSame( [ $form_id ], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
-
-		/* Nobody has followed a legacy URL for this form in a month, so it's no longer evidence one exists */
-		update_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION, [ $form_id => time() - Deprecation_V3::LEGACY_ENDPOINT_TTL - 1 ], false );
-
-		$this->assertSame( [], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
-		$this->assertSame( [], Deprecation_V3::get_legacy_download_urls() );
-
-		/* The expired record is flushed on the way out rather than left for the uninstaller */
-		$this->assertSame( [], get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
-
-		/* The next legacy URL served for the form puts it back */
-		Deprecation_V3::record_legacy_endpoint_usage( $form_id );
-
-		$this->assertSame( [ $form_id ], Deprecation_V3::get_recorded_legacy_endpoint_usage() );
-	}
-
-	public function test_get_legacy_download_urls_skips_trashed_recorded_forms() {
-		$form_id = (int) $this->gf_factory()->form->create();
-
-		Deprecation_V3::record_legacy_endpoint_usage( $form_id );
-
-		$this->assertSame( [ $form_id ], Deprecation_V3::get_legacy_download_urls() );
-
-		/* A trashed form isn't in the user's form list, so there's nothing for them to act on */
-		\GFAPI::delete_form( $form_id );
-
+		/* Only `gf_pdf=1` routed to the legacy endpoint, so anything else is a false positive */
 		$this->assertSame( [], Deprecation_V3::get_legacy_download_urls() );
 	}
 
@@ -264,11 +177,6 @@ class Test_Deprecation_V3 extends TestCase {
 		\GFAPI::delete_form( $form_id );
 
 		$this->assertSame( [], Deprecation_V3::get_legacy_download_urls() );
-	}
-
-	public function test_get_active_deprecated_filters_ignores_our_own_callback() {
-		$this->assertNotFalse( has_filter( 'gfpdfe_pre_load_template', Deprecation_V3::INTERNAL_FILTER_CALLBACK ) );
-		$this->assertArrayNotHasKey( 'gfpdfe_pre_load_template', Deprecation_V3::get_active_deprecated_filters() );
 	}
 
 	public function test_get_active_deprecated_filters_includes_dynamic_hooks() {
@@ -303,6 +211,13 @@ class Test_Deprecation_V3 extends TestCase {
 	}
 
 	/**
+	 * Nothing in core listens to these any more, so every callback the detector finds belongs to a third party
+	 */
+	public function test_get_active_deprecated_filters_reports_nothing_on_a_clean_install() {
+		$this->assertSame( [], Deprecation_V3::get_active_deprecated_filters() );
+	}
+
+	/**
 	 * The detection reads template files, not PDF settings, so a Core template stays out of the report no matter
 	 * how a PDF using it is configured
 	 */
@@ -313,12 +228,4 @@ class Test_Deprecation_V3 extends TestCase {
 		$this->assertSame( [], Deprecation_V3::get_business_plus_templates() );
 	}
 
-	/**
-	 * The notice reads the ignore list off the registration, so it has to name the callback we add ourselves
-	 */
-	public function test_the_hooks_feature_declares_the_listener_core_registers_itself() {
-		$feature = Deprecation::get_feature( 'deprecated_filters' );
-
-		$this->assertSame( [ Deprecation_V3::INTERNAL_FILTER_CALLBACK ], $feature['internal_callbacks'] );
-	}
 }

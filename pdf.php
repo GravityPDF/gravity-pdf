@@ -54,6 +54,9 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 	require_once __DIR__ . '/src/Controller/Controller_Activation.php';
 	require_once __DIR__ . '/gravity-pdf-updater.php';
 
+	/* Loaded by hand: this runs before the autoloader, and GFPDF_Major_Compatibility_Checks uses the trait */
+	require_once __DIR__ . '/src/Helper/Helper_Trait_Removed_Methods.php';
+
 	register_deactivation_hook( __FILE__, array( 'Controller_Activation', 'deactivation' ) );
 
 
@@ -64,6 +67,8 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 	 * @since 4.0
 	 */
 	class GFPDF_Major_Compatibility_Checks {
+
+		use \GFPDF\Helper\Helper_Trait_Removed_Methods;
 
 		/**
 		 * The plugin's basename
@@ -490,30 +495,6 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 				<p><?php esc_html_e( 'The minimum requirements for the Gravity PDF plugin have not been met. Please contact the site administrator for assistance.', 'gravity-pdf' ); ?></p>
 			<?php endif; ?>
 			<?php
-		}
-
-		/**
-		 * Notify administrator they are not using the canonical version of Gravity PDF
-		 *
-		 * @return void
-		 *
-		 * @since 6.12
-		 * @deprecated
-		 */
-		public function maybe_display_canonical_plugin_notice() {
-			_deprecated_function( __METHOD__, '6.12' );
-		}
-
-		/**
-		 * Notify administrator they are not using the canonical version of Gravity PDF
-		 *
-		 * @return void
-		 *
-		 * @since 6.12
-		 * @deprecated
-		 */
-		public function maybe_display_canonical_plugin_notice_below_plugin( $plugin_file, $plugin_data ) {
-			_deprecated_function( __METHOD__, '6.12' );
 		}
 	}
 }

@@ -2,7 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Statics\Deprecation_V3;
 use WP_Error;
 
 /**
@@ -33,7 +32,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	public function add_filters() {
 
 		/* Conditionally enable specific fields */
-		add_filter( 'gfpdf_form_settings_advanced', [ $this, 'get_advanced_template_field' ] );
 		add_filter( 'gfpdf_form_settings_advanced', [ $this, 'get_master_password_field' ] );
 
 		parent::add_filters();
@@ -47,6 +45,18 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 *
 	 */
 	public function get_registered_fields() {
+
+		$templates = $this->templates->get_all_templates_by_group();
+
+		/*
+		 * A global default still pointing at a template the list no longer offers - a v3 one, most likely - would be
+		 * handed to every PDF created after the upgrade, which is not a setting anyone chose. New PDFs start on the
+		 * bundled default instead, and the global settings screen shows the dead value so it can be corrected there.
+		 */
+		$default_template = $this->get_option( 'default_template', 'zadani' );
+		if ( ! in_array( $default_template, $this->misc->flatten_array( $templates ), true ) ) {
+			$default_template = 'zadani';
+		}
 
 		/**
 		 * Gravity PDF settings
@@ -69,7 +79,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						/* translators: 1: Opening <a> tag (template shop), 2: Closing </a> tag, 3: Opening <a> tag (build your own), 4: Closing </a> tag, 5: Opening <a> tag (hire us), 6: Closing </a> tag */
 						'desc'    => sprintf( esc_html__( 'Choose an existing template or purchased more %1$sfrom our template shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create a custom solution.', 'gravity-pdf' ), '<a href="https://gravitypdf.com/store/#templates">', '</a>', '<a href="https://docs.gravitypdf.com/developers/start-customising">', '</a>', '<a href="https://gravitypdf.com/bespoke/">', '</a>' ),
 						'type'    => 'select',
-						'options' => $this->templates->get_all_templates_by_group(),
+						'options' => $templates,
 						'std'     => 'zadani',
 						/* translators: 1: Opening <strong> tag, 2: Closing </strong> tag */
 						'tooltip' => '<h6>' . esc_html__( 'Templates', 'gravity-pdf' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %1$sfour completely-free and highly customizable designs%2$s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-pdf' ), '<strong>', '</strong>' ),
@@ -269,8 +279,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						/* translators: 1: Opening <a> tag (template store), 2: Opening <a> tag (bespoke service), 3: Opening <a> tag (build your own), 4: Closing </a> tag */
 						'desc'       => sprintf( esc_html__( 'Templates control the overall look and feel of the PDFs, and additional templates can be %1$spurchased from the online store%4$s. If you want to digitize and automate your existing documents, %2$suse our Bespoke PDF service%4$s. Developers can also %3$sbuild their own templates%4$s.', 'gravity-pdf' ), '<a href="https://gravitypdf.com/store/#templates">', '<a href="https://gravitypdf.com/bespoke/">', '<a href="https://docs.gravitypdf.com/developers/start-customising/">', '</a>' ),
 						'type'       => 'select',
-						'options'    => $this->templates->get_all_templates_by_group(),
-						'std'        => $this->get_option( 'default_template', 'zadani' ),
+						'options'    => $templates,
+						'std'        => $default_template,
 						'inputClass' => 'large',
 					],
 
@@ -679,36 +689,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_registered_fields/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
-	}
-
-	/**
-	 * Enable advanced templating field if the user has our legacy premium plugin installed
-	 *
-	 * The add-on is reported by the deprecation report and its notice, so nothing is raised from here: this runs on
-	 * every PDF settings screen, and the report is the surface that can explain what to do about it.
-	 *
-	 * @param array $settings The 'form_settings_advanced' array
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 *
-	 * @depreacted 6.12 The 'gfpdfe_business_plus' class/plugin is no longer supported and the custom template should be upgraded
-	 */
-	public function get_advanced_template_field( $settings ) {
-
-		if ( ! Deprecation_V3::has_tier_2_addon() ) {
-			return $settings;
-		}
-
-		$settings['advanced_template'] = [
-			'id'   => 'advanced_template',
-			'name' => esc_html__( 'Enable Advanced Templating', 'gravity-pdf' ),
-			'desc' => __( 'A legacy setting that enables a template to be treated as PHP, with direct access to the PDF engine.', 'gravity-pdf' ),
-			'type' => 'toggle',
-		];
-
-		return $settings;
 	}
 
 	/**

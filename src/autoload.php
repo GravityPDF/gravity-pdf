@@ -12,7 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once PDF_PLUGIN_DIR . 'vendor/autoload.php';
-require_once PDF_PLUGIN_DIR . 'src/deprecated.php';
 require_once PDF_PLUGIN_DIR . 'api.php';
 
 

@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -12,6 +13,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group   pdf
  */
 class Test_Helper_PDF extends TestCase {
+
+	use CreatesLegacyTemplates;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -121,6 +124,35 @@ class Test_Helper_PDF extends TestCase {
 		$this->assertNotEmpty( $path );
 		$this->assertStringEndsWith( 'zadani.php', $path );
 		$this->assertFileExists( $path );
+	}
+
+	/**
+	 * A v3 template is refused rather than included, since the Gravity Forms scaffolding its boilerplate guards on
+	 * is gone: it would return early, and mPDF would write a blank PDF the caller reads as a success
+	 */
+	public function test_set_template_refuses_a_legacy_template(): void {
+		global $gfpdf;
+
+		$path = $this->create_legacy_template();
+
+		$pdf = new Helper_PDF(
+			$this->entry( 'gravityform-1' ),
+			array_merge( $this->pdf->get_settings(), [ 'template' => 'my-legacy-template' ] ),
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
+
+		try {
+			$this->expectException( Exception::class );
+			$this->expectExceptionMessage( 'is a legacy (v3) template' );
+
+			$pdf->set_template();
+		} finally {
+			$this->delete_legacy_templates( $path );
+		}
 	}
 
 	public function test_init_constructs_mpdf_object_for_save_output(): void {

@@ -93,10 +93,4 @@ class Test_Controller_Install extends TestCase {
 		$this->assertSame( PDF_EXTENDED_VERSION, get_option( 'gfpdf_current_version' ) );
 		$this->assertSame( [ '0.0.1', PDF_EXTENDED_VERSION ], $captured );
 	}
-
-	public function test_maybe_uninstall_emits_doing_it_wrong_notice() {
-		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_Install::maybe_uninstall' );
-
-		$this->controller->maybe_uninstall();
-	}
 }

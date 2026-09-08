@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Pdf_Queue;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_PDF;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -30,6 +31,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since   5.0
  */
 class Controller_Pdf_Queue extends Helper_Abstract_Controller {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Holds our log class
@@ -294,21 +297,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Delete PDFs from disk once all tasks are processed
-	 *
-	 * @param array $form
-	 * @param array $entry
-	 *
-	 * @return void
-	 *
-	 * @since      6.11.0
-	 * @deprecated 6.12.0 Caching layer + auto-purge added
-	 */
-	public function queue_cleanup_task( $form, $entry ) {
-		_deprecated_function( __METHOD__, '6.12' );
-	}
-
-	/**
 	 * Dispatch the queue if it has any tasks
 	 *
 	 * @return void
@@ -502,20 +490,5 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 		/* Create a fresh queue in case the queue needs to be used again */
 		$this->queue                    = new Helper_Pdf_Queue( $this->log );
 		$this->form_async_notifications = [];
-	}
-
-	/**
-	 * Push jobs to our background process queue when resending notifications
-	 *
-	 * @param $notification
-	 * @param $form
-	 * @param $entry
-	 *
-	 * @since 5.0
-	 *
-	 * @deprecated 6.11
-	 */
-	public function queue_async_resend_notification_tasks( $notification, $form, $entry ) {
-		_deprecated_function( __METHOD__, '6.11' );
 	}
 }

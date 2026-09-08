@@ -12,6 +12,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
@@ -33,6 +34,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Model_Settings extends Helper_Abstract_Model {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Errors with the global form submission process are stored here
@@ -709,135 +712,5 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key = '' ) {
 		return $addon->deactivate_license();
-	}
-
-	/**
-	 * Removes the current font's TTF files from our font directory
-	 *
-	 * @param array $fonts The font config
-	 *
-	 * @since  4.0
-	 *
-	 * @deprecated Removed in 6.0. Use GPDFAPI::delete_pdf_font()
-	 */
-	public function remove_font_file( $fonts ) {
-		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::delete_pdf_font()' );
-	}
-
-	/**
-	 * Check that the font name passed conforms to our expected naming convention
-	 *
-	 * @param string $name The font name to check
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Moved in 6.0. Use Model_Custom_Fonts::check_font_name_valid()
-	 */
-	public function is_font_name_valid( $name ) {
-		_deprecated_function( __METHOD__, '6.0', 'Model_Custom_Fonts::check_font_name_valid()' );
-	}
-
-	/**
-	 * Query our custom fonts options table and check if the font name already exists
-	 *
-	 * @param string     $name The font name to check
-	 * @param int|string $id   The configuration ID (if any)
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Removed in 6.0. Font names no longer need to be unique
-	 */
-	public function is_font_name_unique( $name, $id = '' ) {
-		_deprecated_function( __METHOD__, '6.0' );
-	}
-
-	/**
-	 * Handles the database updates required to save a new font
-	 *
-	 * @param array $fonts
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Moved in 6.0 to Model_Custom_Fonts::add_font()
-	 */
-	public function install_fonts( $fonts ) {
-		_deprecated_function( __METHOD__, '6.0', 'Model_Custom_Fonts::add_font()' );
-	}
-
-	/**
-	 * AJAX Endpoint for saving the custom font
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Moved in 6.0. Use GPDFAPI::add_pdf_font()
-	 */
-	public function save_font() {
-		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::add_pdf_font()' );
-	}
-
-	/**
-	 * AJAX Endpoint for deleting a custom font
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Moved in 6.0. Use GPDFAPI::delete_pdf_font()
-	 */
-	public function delete_font() {
-		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::delete_pdf_font()' );
-	}
-
-	/**
-	 * Validate user input and save as new font
-	 *
-	 * @param array $font The four font fields to be processed
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Removed in 6.0. Use GPDFAPI::add_pdf_font()
-	 */
-	public function process_font( $font ) {
-		_deprecated_function( __METHOD__, '6.0', 'GPDFAPI::add_pdf_font()' );
-	}
-
-	/**
-	 * Find the font unique ID from the font name
-	 *
-	 * @param string $font_name
-	 *
-	 * @since 4.1
-	 *
-	 * @deprecated Removed in 6.0. Font names no longer linked to IDs.
-	 */
-	public function get_font_id_by_name( $font_name ) {
-		_deprecated_function( __METHOD__, '6.0' );
-	}
-
-	/**
-	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Functionality removed in 6.0
-	 */
-	public function check_tmp_pdf_security() {
-		_deprecated_function( __METHOD__, '6.0' );
-	}
-
-	/**
-	 * Create a file in our tmp directory and verify if it's protected from the public
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Moved in 6.0. Use Model_System_Report::test_public_tmp_directory_access()
-	 */
-	public function test_public_tmp_directory_access() {
-		_deprecated_function( __METHOD__, '6.0', 'Model_System_Report::test_public_tmp_directory_access()' );
-
-		/** @var Model_System_Report $model_system_report */
-		$model_system_report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
-
-		return $model_system_report->test_public_tmp_directory_access();
 	}
 }

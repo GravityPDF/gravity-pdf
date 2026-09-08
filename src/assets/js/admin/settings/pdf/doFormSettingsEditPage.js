@@ -4,7 +4,6 @@ import { handleSecurityConditionals } from './handleSecurityConditionals';
 import { handlePDFConditionalLogic } from './handlePDFConditionalLogic';
 import { handleOwnerRestriction } from './handleOwnerRestriction';
 import { toggleFontAppearance } from './toggleFontAppearance';
-import { toggleAppearanceTab } from './toggleAppearanceTab';
 import { handleMergeTags } from '../common/handleMergeTags';
 
 export function doFormSettingsEditPage() {
@@ -17,7 +16,6 @@ export function doFormSettingsEditPage() {
 	toggleFontAppearance(
 		$('#gfpdf_settings\\[template\\]').data('template_group')
 	);
-	toggleAppearanceTab();
 	handleMergeTags();
 
 	/* Add better merge tag support */

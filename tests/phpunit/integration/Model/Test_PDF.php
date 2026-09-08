@@ -115,7 +115,6 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertSame( 1, has_action( 'parse_request', [ $this->controller, 'process_legacy_pdf_endpoint' ] ) );
 		$this->assertSame( 1, has_action( 'parse_request', [ $this->controller, 'process_pdf_endpoint' ] ) );
 
 		$this->assertSame(
@@ -177,9 +176,6 @@ class Test_PDF extends TestCase {
 				]
 			)
 		);
-
-		/* Backwards compatibility */
-		$this->assertSame( 1, has_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ] ) );
 	}
 
 	/**
@@ -209,34 +205,6 @@ class Test_PDF extends TestCase {
 		try {
 			$this->controller->process_pdf_endpoint();
 			$this->fail( 'Expected Exception on PDF creation failure was not thrown.' );
-		} catch ( Exception $e ) {
-			$this->assertSame( 'There was a problem creating the PDF', $e->getMessage() );
-
-			return;
-		}
-	}
-
-	/**
-	 * Ensure our legacy PDF endpoint listener is working correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_process_legacy_pdf_endpoint() {
-		$this->setExpectedDeprecated( 'GFPDF\Controller\Controller_PDF::process_legacy_pdf_endpoint');
-		$this->setExpectedDeprecated( 'GFPDF\Model\Model_PDF::get_legacy_config');
-
-		/* Force a failure */
-		$this->assertNull( $this->controller->process_legacy_pdf_endpoint() );
-
-		/* Test our endpoint is firing correctly */
-		$_GET['gf_pdf']   = 1;
-		$_GET['fid']      = -1;
-		$_GET['lid']      = -1;
-		$_GET['template'] = 'test';
-
-		try {
-			$results = $this->controller->process_legacy_pdf_endpoint();
-			$this->fail( 'Expected Exception on legacy PDF creation failure was not thrown.' );
 		} catch ( Exception $e ) {
 			$this->assertSame( 'There was a problem creating the PDF', $e->getMessage() );
 
@@ -814,8 +782,6 @@ class Test_PDF extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_get_pdf_name() {
-		$this->setExpectedDeprecated( 'gfpdfe_pdf_filename' );
-
 		/* Setup some test data */
 		$results = $this->form_and_entry();
 		$form    = $results['form'];
@@ -838,15 +804,6 @@ class Test_PDF extends TestCase {
 
 		add_filter(
 			'gfpdf_pdf_filename',
-			function() {
-				return 'filter';
-			}
-		);
-
-		$this->assertSame( 'filter', $this->model->get_pdf_name( $pdf, $entry ) );
-
-		add_filter(
-			'gfpdfe_pdf_filename',
 			function() {
 				return 'filter';
 			}
@@ -1304,7 +1261,8 @@ class Test_PDF extends TestCase {
 			'.htaccess' => time() - ( 48 * 3600 ),
 			'mpdf/test' => time() - ( 0.5 * 3600 ),
 			'mpdf/test1' => time() - 3601,
-			'mpdf/test2' => time() - 3600,
+			/* Just inside the 1 hour cut-off, with slack so a second ticking over mid-test doesn't delete it */
+			'mpdf/test2' => time() - 3590,
 			'mpdf/test3' => time() - ( 25 * 3600 ),
 
 		];
@@ -1333,34 +1291,6 @@ class Test_PDF extends TestCase {
 		foreach ( $files as $file => $modified ) {
 			@unlink( $tmp . $file );
 		}
-	}
-
-	/**
-	 * Check that our PDF is cleaned up after the Gravity Forms entry save process
-	 *
-	 * @since 4.0
-	 */
-	public function test_cleanup_pdf() {
-		$this->setExpectedDeprecated('GFPDF\Model\Model_PDF::cleanup_pdf');
-
-		$form_class = \GPDFAPI::get_form_class();
-
-		/* Setup some test data */
-		$results = $this->form_and_entry();
-		$entry   = $results['entry'];
-		$form    = $form_class->get_form( $results['form']['id'] );  /* get from the database so the date created is accurate */
-
-		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
-		$file   = "test-{$form['id']}.pdf";
-
-		wp_mkdir_p( $path );
-		touch( $path . $file );
-
-		$this->assertFileExists( $path . $file );
-
-		$this->model->cleanup_pdf( $entry, $form );
-
-		$this->assertFileDoesNotExist( $path . $file );
 	}
 
 	/**
@@ -1555,64 +1485,6 @@ class Test_PDF extends TestCase {
 	}
 
 	/**
-	 * Check our legacy configuration is being loaded correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_legacy_config() {
-		$this->setExpectedDeprecated('GFPDF\Model\Model_PDF::get_legacy_config');
-
-		/* Setup some test data */
-		$results = $this->form_and_entry();
-		$form    = $results['form'];
-
-		/* Test our aid legacy PDF selector is working */
-		$config = [
-			'fid'      => $form['id'],
-			'aid'      => 3,
-			'template' => 'Gravity Forms Style',
-		];
-
-		$pid = $this->model->get_legacy_config( $config );
-		$this->assertSame( 'fawf90c678523b', $pid );
-
-		/* Test our fallback works */
-		unset( $config['aid'] );
-
-		$pid = $this->model->get_legacy_config( $config );
-		$this->assertSame( '555ad84787d7e', $pid );
-	}
-
-	/**
-	 * Test that we can successfully get the template filename
-	 *
-	 * @since        4.0
-	 *
-	 * @dataProvider provider_get_template_filename
-	 */
-	public function test_get_template_filename( $expected, $template ) {
-		$this->setExpectedDeprecated('GFPDF\View\View_PDF::get_template_filename');
-		$this->assertSame( $expected, $this->view->get_template_filename( $template ) );
-	}
-
-	/**
-	 * Our data provider for getting View_PDF::get_template_filename()
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function provider_get_template_filename(): array {
-		return [
-			[ 'my-pdf-document.php', 'my-pdf-document' ],
-			[ 'hello-world.ph.php', 'hello-world.ph' ],
-			[ 'gravitypdf.php', 'gravitypdf.php' ],
-			[ 'assimilate.p.php', 'assimilate.p' ],
-			[ 'groundhog..php', 'groundhog.' ],
-		];
-	}
-
-	/**
 	 * Check that we're correctly process a valid HTML structure
 	 *
 	 * @since 4.0
@@ -1790,52 +1662,6 @@ class Test_PDF extends TestCase {
 		$this->assertStringContainsString( '<h3 id="form_title">', $html );
 	}
 
-	/**
-	 * Test if we should be displaying the page name
-	 *
-	 * @since 4.0
-	 */
-	public function test_legacy_display_page_name() {
-		$this->setExpectedDeprecated( 'GFPDF\View\View_PDF::display_page_name' );
-
-		$form = [
-			'pagination' => [
-				'pages' => [
-					0 => 'My Test Page',
-					1 => '',
-					2 => 'Other Test Page',
-				],
-			],
-			'fields'     => [
-				new \GF_Field_Page( [ 'pageNumber' => 1, 'cssClass' => 'my-test-class' ] ),
-				new \GF_Field_Page( [ 'pageNumber' => 2 ] ),
-				new \GF_Field_Page( [ 'pageNumber' => 3, 'label' => 'Other Test Page' ] ),
-			],
-		];
-
-		ob_start();
-		$this->view->display_page_name( 0, $form, new Helper_Field_Container() );
-		$html = ob_get_clean();
-
-		$this->assertStringContainsString( '<h3 class="gfpdf-page gfpdf-field my-test-class', $html );
-		$this->assertStringContainsString( 'My Test Page', $html );
-
-		ob_start();
-		$this->view->display_page_name( 1, $form, new Helper_Field_Container() );
-		$html = ob_get_clean();
-
-		$this->assertStringNotContainsString( '<h3 class="gfpdf-page', $html );
-		$this->assertStringNotContainsString( 'My Test Page', $html );
-
-		/* test new signature */
-		ob_start();
-		$this->view->display_page_name( 2, $form, new Helper_Field_Container(), $form['fields'][2] );
-		$html = ob_get_clean();
-
-		$this->assertStringContainsString( '<h3 class="gfpdf-page', $html );
-		$this->assertStringContainsString( 'Other Test Page', $html );
-	}
-
 	public function test_page_break_field() {
 		global $gfpdf;
 
@@ -1882,107 +1708,6 @@ class Test_PDF extends TestCase {
 		$html = ob_get_clean();
 
 		$this->assertSame( '', $html );
-	}
-
-	/**
-	 * Check that our backwards compatibility filters work as expected
-	 *
-	 * @since 4.0
-	 */
-	public function test_apply_backwards_compatibility_filters() {
-		foreach ( [ 'gfpdfe_pdf_name', 'gfpdfe_template', 'gfpdf_orientation', 'gfpdf_security', 'gfpdf_privilages', 'gfpdf_password', 'gfpdf_master_password', 'gfpdf_rtl' ] as $hook ) {
-			$this->setExpectedDeprecated( $hook );
-		}
-
-		$entry            = $this->entry( 'all-form-fields' );
-		$entry['form_id'] = $this->form( 'all-form-fields' )['id'];
-
-		$settings = [
-			'filename'        => 'My PDF Document',
-			'template'        => 'zadani',
-			'orientation'     => 'portrait',
-			'security'        => 'Yes',
-			'privileges'      => [ 'print' ],
-			'password'        => 'fjai2i0ra0if',
-			'master_password' => 'A@490fkfkff',
-			'rtl'             => 'No',
-		];
-
-		/* Test everything passes back the same */
-		$results = $this->model->apply_backwards_compatibility_filters( $settings, $entry );
-
-		foreach ( $results as $key => $value ) {
-			$this->assertArrayHasKey( $key, $settings );
-			$this->assertSame( $value, $settings[ $key ] );
-		}
-
-		/* Add filters to manipulate the data */
-		add_filter(
-			'gfpdfe_pdf_name',
-			function( $item ) {
-				return 'big-document.pdf';
-			}
-		);
-
-		add_filter(
-			'gfpdfe_template',
-			function( $item ) {
-				return 'default-template.php';
-			}
-		);
-
-		add_filter(
-			'gfpdf_orientation',
-			function( $item ) {
-				return 'landscape';
-			}
-		);
-
-		add_filter(
-			'gfpdf_security',
-			function( $item ) {
-				return false;
-			}
-		);
-
-		add_filter(
-			'gfpdf_privilages',
-			function( $item ) {
-				return [ 'print', 'print-highres' ];
-			}
-		);
-
-		add_filter(
-			'gfpdf_password',
-			function( $item ) {
-				return 'pass';
-			}
-		);
-
-		add_filter(
-			'gfpdf_master_password',
-			function( $item ) {
-				return '';
-			}
-		);
-
-		add_filter(
-			'gfpdf_rtl',
-			function( $item ) {
-				return true;
-			}
-		);
-
-		$test = $this->model->apply_backwards_compatibility_filters( $settings, $entry );
-
-		$this->assertSame( 'big-document', $test['filename'] );
-		$this->assertSame( 'default-template', $test['template'] );
-		$this->assertSame( 'landscape', $test['orientation'] );
-		$this->assertSame( 'No', $test['security'] );
-		$this->assertCount( 2, $test['privileges'] );
-		$this->assertSame( 'pass', $test['password'] );
-		$this->assertSame( '', $test['master_password'] );
-		$this->assertSame( 'Yes', $test['rtl'] );
 	}
 
 	/**
@@ -2074,59 +1799,6 @@ class Test_PDF extends TestCase {
 		$this->assertStringContainsString( 'background-image-resize: 4;', $results );
 
 		$this->assertStringContainsString( 'background-color: #FF2222;', $results );
-	}
-
-	/**
-	 * Check that our backwards compatible Tier 2 add-on works as expected
-	 *
-	 * @since 4.0
-	 */
-	public function test_handle_legacy_tier_2_processing() {
-		global $gfpdf;
-
-		$this->setExpectedDeprecated( 'gfpdfe_pre_load_template' );
-
-		$settings  = [ 'id' => '556690c67856b', 'template' => 'zadani' ];
-		$entry     = $this->entry( 'all-form-fields' );
-		$form      = $gfpdf->gform->get_form( $entry['form_id'] );
-		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
-
-		$args = $gfpdf->templates->get_template_arguments(
-			$form,
-			$gfpdf->misc->get_fields_sorted_by_id( $form['id'] ),
-			$entry,
-			$model_pdf->get_form_data( $entry ),
-			$settings,
-			$gfpdf->templates->get_config_class( $settings['template'] ),
-			$gfpdf->misc->get_legacy_ids( $entry['id'], $settings )
-		);
-
-		$pdf = new Helper_PDF(
-			[
-				'id'      => 1,
-				'form_id' => $this->form( 'all-form-fields' )['id'],
-			],
-			$settings,
-			$gfpdf->gform,
-			$gfpdf->data,
-			$gfpdf->misc,
-			$gfpdf->templates,
-			$gfpdf->log
-		);
-		$pdf->set_template();
-		$pdf->set_output_type( 'save' );
-
-		$this->assertFalse( $this->model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) );
-
-		/* Set a filter and ensure the test passes */
-		add_filter(
-			'gfpdfe_pre_load_template',
-			function( $form_id ) {
-				return true;
-			}
-		);
-
-		$this->assertTrue( $this->model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) );
 	}
 
 	/**

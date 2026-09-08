@@ -55,10 +55,13 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * Triggered when invoking inaccessible methods in an object context
 	 * Use it to load in our view
 	 *
+	 * A name matching neither a method nor a template resolves to nothing, which is where a caller of a removed view
+	 * method ends up. Nothing in the plugin reads the return value of a view call, so the WP_Error alone is silent.
+	 *
 	 * @param string $name      Template name to load
 	 * @param array  $arguments Pass in additional parameters to the template view if needed
 	 *
-	 * @return string
+	 * @return string|WP_Error
 	 *
 	 * @since 4.0
 	 */
@@ -69,9 +72,17 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 			$vars = array_merge( $arguments[0], $vars );
 		}
 
-		/* load the about page view */
+		$results = $this->load( $name, $vars );
 
-		return $this->load( $name, $vars );
+		if ( is_wp_error( $results ) ) {
+			_doing_it_wrong(
+				esc_html( static::class . '::' . $name ),
+				esc_html__( 'No method or view template of that name exists.', 'gravity-pdf' ),
+				'7.0'
+			);
+		}
+
+		return $results;
 	}
 
 	/**
@@ -107,10 +118,6 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 		}
 
 		$args = array_merge( $this->data_cache, $args );
-
-		if ( isset( $args['content'] ) ) {
-			_deprecated_argument( esc_html( $this->view_type . '/' . $filename . '.php' ), '6.4.0', "Use \$args['callback'] instead" );
-		}
 
 		if ( is_readable( $path ) ) {
 

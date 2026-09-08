@@ -208,13 +208,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since 6.17.0
 	 */
 	public function has_unsupported_deprecated_feature(): bool {
-		foreach ( $this->get_undismissed_deprecated_features() as $key ) {
-			if ( ( Deprecation::get_feature( $key )['group'] ?? '' ) === Deprecation::GROUP_UNSUPPORTED ) {
-				return true;
-			}
-		}
-
-		return false;
+		return Deprecation::has_unsupported_feature( $this->get_undismissed_deprecated_features() );
 	}
 
 	/**

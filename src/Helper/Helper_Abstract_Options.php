@@ -30,6 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
+	use Helper_Trait_Removed_Methods;
+
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
@@ -1011,8 +1013,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return array
 	 *
 	 * @since 4.0
-	 *
-	 * @deprecated
 	 */
 	public function get_custom_fonts() {
 		/** @var Controller_Custom_Fonts $custom_font_controller */
@@ -1027,36 +1027,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param string $name The font name to convert
 	 *
 	 * @since  4.0
-	 *
-	 * @deprecated
 	 */
 	public function get_font_short_name( $name ): string {
 		/** @var Model_Custom_Fonts $custom_font_model */
 		$custom_font_model = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
 
 		return $custom_font_model->get_font_short_name( $name );
-	}
-
-	/**
-	 * Get the font's display name from the font key
-	 *
-	 * @param string $font_key The font key to search for
-	 *
-	 * @return mixed (String / Object)           The font display name or WP_Error
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated
-	 */
-	public function get_font_display_name( $font_key ) {
-
-		foreach ( $this->get_installed_fonts() as $groups ) {
-			if ( isset( $groups[ $font_key ] ) ) {
-				return $groups[ $font_key ];
-			}
-		}
-
-		return new WP_Error( 'font_not_found', esc_html__( 'Could not find Gravity PDF Font', 'gravity-pdf' ) );
 	}
 
 	/**
@@ -1987,6 +1963,43 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	}
 
 	/**
+	 * Add an option for any stored value the list no longer offers
+	 *
+	 * A select whose current value matches no option leaves the browser selecting the first one, so opening the page
+	 * and saving would quietly swap the setting for whatever happens to sort first. Showing the value makes replacing
+	 * it something an author chooses rather than a side effect of visiting the page.
+	 *
+	 * @param array        $options The option list, either flat or grouped into optgroups
+	 * @param array|string $value   The currently-stored value(s)
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	public function maybe_add_missing_options( $options, $value ) {
+		$available = array_map( 'strval', $this->misc->flatten_array( $options ) );
+		$missing   = [];
+
+		foreach ( (array) $value as $item ) {
+			if ( ! is_scalar( $item ) ) {
+				continue;
+			}
+
+			$item = (string) $item;
+
+			if ( $item === '' || in_array( $item, $available, true ) ) {
+				continue;
+			}
+
+			/* translators: %s: the stored setting value that is no longer installed */
+			$missing[ $item ] = sprintf( __( '%s (not currently available)', 'gravity-pdf' ), $item );
+		}
+
+		/* First, because the value belongs to none of the optgroups */
+		return $missing + $options;
+	}
+
+	/**
 	 * Build our option groups for the select box
 	 *
 	 * @param array        $options       The list of options that should be displayed
@@ -2001,6 +2014,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( ! $should_output ) {
 			ob_start();
 		}
+
+		$options = $this->maybe_add_missing_options( $options, $value );
 
 		foreach ( $options as $option => $name ) {
 			if ( ! is_array( $name ) ) {
