@@ -1,19 +1,21 @@
 ---
 name: font-phase-3a-catalog
-description: Phase 3a of the 7.0 font rewrite — the catalog table, source registry and catalog repository; dbDelta's silent column skip, and the two open items the sync half still needs
+description: Phase 3a of the 7.0 font rewrite — catalog table, sync, adoption, REST routes and the inline install/upgrade sync; dbDelta's silent column skip, the release pipeline moving to the update-server repo, and what still waits on a published tree
 metadata:
   type: project
 ---
 
 Phase 3a of `.claude/plans/2026-08-26-remove-core-font-installer.md`, started 2026-09-09 on
-`feature/font-catalog-sources`, stacked on [[font-phase-2-installer-removal]] (PR #1722) while that is open. The
-**read half** of the data layer is built and inert — nothing syncs yet, so the table stays empty and no route reads
-it. PHPUnit 1,753 single-site / 1,753 multisite, PHPCS and the 7.4 compatibility sniff clean.
+`feature/font-catalog-sources`, stacked on [[font-phase-2-installer-removal]] (PR #1722) while that is open.
+**All plugin-side 3a code is written**: the data layer, the sync, adoption, the REST routes and the inline
+install/upgrade sync. What is left waits on a real published tree (bottom of this note). PHPUnit 1,840 single-site
+/ 1,840 multisite, PHPCS and the 7.4 compatibility sniff clean.
 
-New: `src/Fonts/{Font_Source,Font_Sources,Catalog_Repository,Font_Downloader,Catalog_Sync}.php`,
-`src/Controller/Controller_Font_Catalog.php`, the `gravitypdf_font_catalog` table in `Font_Schema`,
-`GPDF_FONTS_URL` and `GPDF_TRUST_KEYS` in `pdf.php`, the `MocksHttpRequests` and `HasCatalogRows` test traits, and
-the matching `Router::get_*()` accessors.
+New: `src/Fonts/{Font_Source,Font_Sources,Catalog_Repository,Font_Downloader,Catalog_Sync,Catalog_Font_Adopter}.php`,
+`src/Rest/Rest_Font_Sources.php`, `src/Controller/Controller_Font_Catalog.php`, the `gravitypdf_font_catalog` table
+in `Font_Schema`, `GPDF_FONTS_URL` and `GPDF_TRUST_KEYS` in `pdf.php`, `GPDFAPI::get_catalog_sync()`, the
+`MocksHttpRequests` / `HasCatalogRows` / `PublishesFontIndexes` test traits, and the matching `Router::get_*()`
+accessors.
 
 **`GPDF_TRUST_KEYS` ships as an empty array pending the real key** (see [[font-signing-keypair]] if that gets its
 own note). While it is empty every sync of a built-in source fails with `font_no_trust_keys` — verification fails
@@ -64,7 +66,7 @@ four-version User-Agent, byte ceiling applied before *and* after the request). 3
 
 - **`african` and `americas` pack labels are inferred.** §4.3's table never states them; `get_translations()`
   currently has "African scripts" and "Americas". A wrong guess degrades to the index's own English string rather
-  than breaking, but `font-release.mjs` must publish whatever these settle on.
+  than breaking, but the pipeline must publish whatever these settle on.
 
 **Signature design points worth not re-deriving:**
 
@@ -80,12 +82,19 @@ four-version User-Agent, byte ceiling applied before *and* after the request). 3
   columns with it. `INSERT … ON DUPLICATE KEY UPDATE` naming index columns only is what keeps an in-flight install's
   phase. Neuter-tested.
 
-**`adopt()` is built** (`Font_Repository::adopt( Catalog_Repository )`, called from `replace_source()` when the
-replaced source carries coverage entries). It looks under `{fonts dir}/{source}/{entry}/` — where an install writes
-and therefore where a hand-placed file must go. The 6.x installer's *flat* files are `Legacy_Font_Adopter`'s and are
-rows before this runs; a test pins that a flat file is not what adoption looks at, so the two passes cannot compete
-for the same bytes. `Catalog_Sync` takes the repository as a **callable**, because the two are built from each
-other's direction and a constructor reference either way would be a cycle.
+**Adoption is `Catalog_Font_Adopter`**, called from `replace_source()` for the source it just replaced. It looks
+under `{fonts dir}/{source}/{entry}/` — where an install writes and therefore where a hand-placed file must go. The
+6.x installer's *flat* files are `Legacy_Font_Adopter`'s and are rows before this runs; a test pins that a flat file
+is not what adoption looks at, so the two passes cannot compete for the same bytes.
+
+**Correction, and worth reading before writing another "cycle" justification.** This started as
+`Font_Repository::adopt()` with `Catalog_Sync` holding the repository as a *callable*, on the stated grounds that
+"the two are built from each other's direction and a constructor reference either way would be a cycle". **That was
+false and never checked**: `Router::get_catalog_sync()` already calls `get_font_repository()` as its first argument
+and the repository never reaches back. Removing the closure exposed what it was hiding — `adopt()` was a population
+pass living inside the repository, inverting the dependency `Font_Population_Pass` exists to avoid and making
+`Font_Repository` read the catalog table its sibling documents it never consults. The lesson is the general one: a
+laziness workaround whose justification cannot be pointed at in code is usually covering a layering mistake.
 
 **Cross-checked against the update-server side (GravityPDF/gravitypdf-update-server#100, `feat/fonts-r2-store`) on
 2026-09-09 — no discrepancies:**
@@ -96,11 +105,16 @@ other's direction and a constructor reference either way would be a cycle.
 - Key layout matches what `Catalog_Sync` requests: `v1/index.json`, `v1/index.json.sig` (base64 of a 64-byte
   signature), `v1/sources/{source}-{sha256}.json`, `v1/entries/{source}/{entry}-{sha256}.json`,
   `v1/files/{remote_path}`. The root is `{ schema, generated, sources: { id: { sha256, size } } }`.
-- **The signing is not in that PR.** The publisher uploads an already-signed tree and the checker only asserts the
-  `.sig` is 64 base64 bytes and no older than the index — it has no public key. So both halves of the signature
-  contract live in *this* repo: `Catalog_Sync::SIGNATURE_CONTEXT` and the not-yet-built
-  `tools/release/font-release.mjs`. They cannot drift through another repo, but nothing outside this one will catch
-  it if they drift from each other.
+- **Signing was not in that PR, and has since moved there wholesale (2026-09-09, user decision).** The whole
+  release pipeline — build, pack, preview, sign, publish — lives in the update-server repo now, so this repo has no
+  signing step and no private key. It needs nothing from here: the three things the pipeline reads out of mPDF
+  (`LanguageToFont`, the `FontVariables` defaults, `TTFontFile::getMetrics()`) come from the fork as a public
+  Composer package, `mpdf/mpdf: dev-gravitypdf` over a VCS repository entry — the same two lines `composer.json`
+  declares here. What the plugin keeps is the *consuming* half, and it is the entire cross-repo interface:
+  `GPDF_TRUST_KEYS`, `Catalog_Sync::SIGNATURE_CONTEXT`, §4.5 Layout (URL + document shapes), the §4.3 entry schema,
+  and `Font_Sources::validate_entry()` / `validate_fonts()` as its executable form — an entry those reject is
+  dropped silently at sync. `tests/phpunit/Concerns/PublishesFontIndexes.php` is the worked example and the only
+  place the plugin side of the signature contract runs end to end.
 - Both `fonts.gravitypdf.com` and `fonts-staging.gravitypdf.com` are already provisioned, so the 3a gate needs the
   real ~7,800-object publish run, not infrastructure.
 
@@ -108,8 +122,11 @@ other's direction and a constructor reference either way would be a cycle.
 `GET /fonts/sources/{source}/{entry}`, `POST /fonts/sources/sync` in `src/Rest/`. The install/delete entry routes
 and `GET /fonts/status` are 3b/3c, since they need `Install_Queue`. Two things to keep true:
 
-- **`entry_json` must never reach the wire.** `prepare_row()` unsets it and `data`; a browse would otherwise drag a
-  LONGTEXT per card through the response, and the entry object is the installer's business.
+- **`prepare_row()` projects `Rest_Font_Sources::FIELDS`, it does not subtract.** It first built the response by
+  unsetting `entry_json` and `data` from the row — and the row is `list_columns()`, which carries the six install
+  *status* columns, so `GET /fonts/sources/{source}` was emitting `phase`, `error` and `retry_after` on a route
+  whose own docblock says it never carries installed state. Subtracting means every column added later for a
+  storage reason silently joins the payload. Named fields, with a test that fails on the old code.
 - **`sync` being a reserved source id is load-bearing.** Dropping the unknown-source guard makes
   `GET /fonts/sources/sync` answer from the `{source}` route rather than 404 — a neuter caught exactly that, so the
   reservation is not decoration.
@@ -117,8 +134,27 @@ and `GET /fonts/status` are 3b/3c, since they need `Install_Queue`. Two things t
 REST tests must mock HTTP for the sync route (`MocksHttpRequests`); the first version reached the real network,
 which is flaky and slow. `Test_Rest` starts anonymous, so every test sets its own user.
 
-Still to build in 3a: upgrade step 2, the shipped seed index, and `tools/release/font-release.mjs` (which must sign
-with `Catalog_Sync::SIGNATURE_CONTEXT` — nothing outside this repo verifies the signature, so the two halves can
-only be kept in step here). The **merge gate is not ours**: 3a does not
-land until `npm run check:fonts staging` passes ten assertions against the staging bucket, which needs the
-update-server repo's publisher and its secrets.
+**Upgrade step 2 is built** as `Controller_Upgrade_Routines::build_font_catalog()`, inside the existing 7.0 gate:
+`maybe_run()` then `seed()`. Three things worth not re-deriving:
+
+- `maybe_run()`, not `run()`. The sync state is a *network* option, so on multisite the first sub-site to reach the
+  gate does the work and the rest skip it. On the paths the gate covers — a fresh install (`gfpdf_current_version`
+  is empty, which `version_compare` puts below `7.0.0`) or an upgrade from 6.x — nothing has ever synced, so the
+  two are identical there.
+- Reached through `GPDFAPI::get_catalog_sync()` rather than injected. `Catalog_Sync` cannot be constructed at
+  bootstrap: it needs the font repository, which needs `template_font_location`, which
+  `Controller_Install::setup_defaults()` sets on a hook fired *after* the controller is built.
+- `seed()` no longer stamps `last_attempt` or clears `last_error`. Seeding is a local fallback, not a sync attempt;
+  writing those moved the retry clock and erased the only explanation of why a site is on the seed, which
+  `Catalog_Sync_Check` and the sources UI both need. Found by a test, not by review.
+
+Any test that fires `gfpdf_version_changed` to `7.0.0` now makes real HTTP unless it mocks — the pre-existing
+`Test_Controller_Upgrade_Routines` case would have reached `fonts.gravitypdf.com`. The whole file mocks in
+`set_up()`.
+
+**What is left in 3a all waits on a real published tree**: the real `GPDF_TRUST_KEYS` (public half only — the
+private half never leaves the update-server repo's CI secrets); `build/font-index/packs.json`, the shipped seed,
+which is a copy of the published `sources/packs-<sha>.json` and whose `files` hashes are hashes of real font files,
+so it cannot be written first; the CI check that runs `Font_Sources::validate_entry()` over that committed seed; and
+the **merge gate, which is not ours** — 3a does not land until `npm run check:fonts staging` passes ten assertions
+against the staging bucket.
