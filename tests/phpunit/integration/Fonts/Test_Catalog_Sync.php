@@ -75,7 +75,7 @@ class Test_Catalog_Sync extends TestCase {
 		parent::tear_down();
 	}
 
-	protected function sync( array $trust_keys = null, string $seed_file = '' ): Catalog_Sync {
+	protected function sync( ?array $trust_keys = null, string $seed_file = '' ): Catalog_Sync {
 		global $gfpdf;
 
 		return new Catalog_Sync(
@@ -86,7 +86,10 @@ class Test_Catalog_Sync extends TestCase {
 			new Font_Lock(),
 			GPDFAPI::get_log_class(),
 			$trust_keys === null ? [ $this->public_key ] : $trust_keys,
-			$seed_file
+			$seed_file,
+			static function () use ( $gfpdf ) {
+				return $gfpdf->get_font_repository();
+			}
 		);
 	}
 

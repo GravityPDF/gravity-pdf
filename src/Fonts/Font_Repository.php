@@ -722,6 +722,202 @@ class Font_Repository {
 	}
 
 	/**
+	 * Turn a coverage entry's files that are already on disk into installed rows
+	 *
+	 * Runs after a sync replaces a source holding coverage entries. Two things reach this: a site that ran the 6.x
+	 * core font installer, and a site where someone placed a pack's files by hand — which is the offline install
+	 * path, and why the shipped seed index matters. The installer itself has no "already on disk" branch; this is
+	 * that branch, in one place, for every source.
+	 *
+	 * Every candidate is verified — size first, then sha256 against the entry — before a row is written, so a row
+	 * never claims a hash the disk does not have. A file that fails is left alone and a real install downloads it
+	 * fresh. Idempotent: a matched file gains a row, and a file with a row is skipped, so nothing is hashed twice
+	 * across runs and a second call inserts nothing.
+	 *
+	 * @return int How many font rows were created
+	 *
+	 * @since 7.0
+	 */
+	public function adopt( Catalog_Repository $catalog ): int {
+		$this->ensure_ready();
+
+		$claimed = $this->claimed_filenames();
+		$taken   = array_flip( array_keys( $this->all() ) );
+		$created = 0;
+		$failed  = [];
+
+		foreach ( $catalog->coverage_entries() as $row ) {
+			$entry = $catalog->entry( (string) $row['source'], (string) $row['entry'] );
+
+			/* Only an inlined entry can be adopted: a pointed-at one names no files without a fetch */
+			if ( $entry === null || ! is_array( $entry['data'] ?? null ) ) {
+				continue;
+			}
+
+			$created += $this->adopt_entry( (string) $row['source'], (string) $row['entry'], $entry['data'], $row, $claimed, $taken, $failed );
+		}
+
+		if ( $created > 0 || $failed !== [] ) {
+			$this->log->notice(
+				'Adopted font files already on disk',
+				[
+					'adopted'      => $created,
+					'failed_check' => $failed,
+				]
+			);
+		}
+
+		return $created;
+	}
+
+	/**
+	 * Adopt every font key of one entry whose faces are present and verified
+	 *
+	 * @param array<string, true> $claimed Filenames some file row already records
+	 * @param array<string, true> $taken   Font keys already in use, kept current in memory because each insert
+	 *                                     flushes the cache the answer would otherwise come from
+	 * @param string[]            $failed  Files present but not what the entry describes, appended to
+	 *
+	 * @since 7.0
+	 */
+	protected function adopt_entry( string $source, string $entry_id, array $entry, array $catalog_row, array &$claimed, array &$taken, array &$failed ): int {
+		$files   = (array) ( $entry['files'] ?? [] );
+		$created = 0;
+
+		foreach ( (array) ( $entry['fonts'] ?? [] ) as $font_key => $roles ) {
+			$font_key = (string) $font_key;
+
+			if ( isset( $taken[ $font_key ] ) || $this->is_key_reserved( $font_key ) ) {
+				continue;
+			}
+
+			$verified = $this->verified_entry_files( $source, $entry_id, (array) $roles, $files, $claimed, $failed );
+
+			/* mPDF needs a regular face; a bold-only row would never render */
+			if ( ! isset( $verified['R'] ) ) {
+				continue;
+			}
+
+			$font_id = $this->insert(
+				[
+					'font_key'    => $font_key,
+					'label'       => count( (array) ( $entry['fonts'] ?? [] ) ) === 1 ? (string) $catalog_row['label'] : $font_key,
+					'source'      => $source,
+					'entry'       => $entry_id,
+					'coverage'    => 1,
+					'meta'        => $this->coverage_meta( $font_key, $entry, (array) $roles ),
+					'version'     => $catalog_row['version'] ?? null,
+					'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
+					'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
+					'files'       => $verified,
+				]
+			);
+
+			if ( $font_id > 0 ) {
+				++$created;
+
+				$taken[ $font_key ] = true;
+
+				foreach ( $verified as $file ) {
+					$claimed[ $file['path'] ] = true;
+				}
+			}
+		}
+
+		return $created;
+	}
+
+	/**
+	 * The faces of one font key that are on disk, unclaimed and byte-for-byte what the entry lists
+	 *
+	 * A source's files live under `{source}/{entry}/`, so adoption looks where an install would have written them
+	 * — which is also where a hand-placed file has to go. The 6.x installer's flat files are `Legacy_Font_Adopter`'s
+	 * job and are already rows by the time this runs.
+	 *
+	 * @return array<string, array{path: string, size: int, sha256: string}>
+	 *
+	 * @since 7.0
+	 */
+	protected function verified_entry_files( string $source, string $entry_id, array $roles, array $files, array $claimed, array &$failed ): array {
+		$verified = [];
+
+		foreach ( $roles as $role => $filename ) {
+			if ( in_array( $role, Font_Sources::NON_ROLE_KEYS, true ) || ! is_string( $filename ) ) {
+				continue;
+			}
+
+			$listed = $files[ $filename ] ?? null;
+
+			if ( ! is_array( $listed ) || ! isset( $listed['sha256'], $listed['size'] ) ) {
+				continue;
+			}
+
+			$relative = $source . '/' . $entry_id . '/' . $filename;
+			$absolute = $this->font_dir . $relative;
+
+			if ( isset( $claimed[ $relative ] ) || ! is_file( $absolute ) ) {
+				continue;
+			}
+
+			/* Size first, so a large file is never hashed only to be rejected on length */
+			if ( (int) filesize( $absolute ) !== (int) $listed['size'] || ! hash_equals( (string) $listed['sha256'], (string) hash_file( 'sha256', $absolute ) ) ) {
+				$failed[] = $relative;
+
+				if ( $role === 'R' ) {
+					return [];
+				}
+
+				continue;
+			}
+
+			$verified[ (string) $role ] = [
+				'path'   => $relative,
+				'size'   => (int) $listed['size'],
+				'sha256' => (string) $listed['sha256'],
+			];
+		}
+
+		return $verified;
+	}
+
+	/**
+	 * One font key's share of its entry's coverage maps
+	 *
+	 * Copied onto the row so the registry builds every mPDF fallback array from the rows alone, without opening a
+	 * source or decoding an entry on the load path.
+	 *
+	 * @since 7.0
+	 */
+	protected function coverage_meta( string $font_key, array $entry, array $roles ): array {
+		$languages = [];
+		foreach ( (array) ( $entry['language_to_font'] ?? [] ) as $code => $target ) {
+			if ( $target === $font_key ) {
+				$languages[] = (string) $code;
+			}
+		}
+
+		$families = [];
+		foreach ( (array) ( $entry['family_substitution'] ?? [] ) as $family => $keys ) {
+			if ( in_array( $font_key, (array) $keys, true ) ) {
+				$families[] = (string) $family;
+			}
+		}
+
+		$meta = [
+			'backup_subs'         => in_array( $font_key, (array) ( $entry['backup_subs_fonts'] ?? [] ), true ),
+			'bmp'                 => in_array( $font_key, (array) ( $entry['bmp_fonts'] ?? [] ), true ),
+			'family_substitution' => $families,
+			'languages'           => $languages,
+		];
+
+		if ( isset( $roles['sip-ext'] ) && is_string( $roles['sip-ext'] ) ) {
+			$meta['sip_ext'] = $roles['sip-ext'];
+		}
+
+		return $meta;
+	}
+
+	/**
 	 * Derive a free key, suffixing a taken one
 	 *
 	 * One rule everywhere: when the key is taken or reserved, append a short random suffix and log both spellings,
