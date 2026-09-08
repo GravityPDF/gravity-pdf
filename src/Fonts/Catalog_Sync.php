@@ -187,10 +187,10 @@ class Catalog_Sync {
 	protected $seed_file;
 
 	/**
-	 * @var callable A late-bound Font_Repository, because it and the catalogue are built either way round
+	 * @var Catalog_Font_Adopter
 	 * @since 7.0
 	 */
-	protected $fonts;
+	protected $adopter;
 
 	public function __construct(
 		Font_Schema $schema,
@@ -199,9 +199,9 @@ class Catalog_Sync {
 		Font_Downloader $downloader,
 		Font_Lock $lock,
 		LoggerInterface $log,
+		Catalog_Font_Adopter $adopter,
 		array $trust_keys,
-		string $seed_file,
-		callable $fonts
+		string $seed_file
 	) {
 		$this->schema     = $schema;
 		$this->catalog    = $catalog;
@@ -210,8 +210,8 @@ class Catalog_Sync {
 		$this->lock       = $lock;
 		$this->log        = $log;
 		$this->trust_keys = $trust_keys;
+		$this->adopter    = $adopter;
 		$this->seed_file  = $seed_file;
-		$this->fonts      = $fonts;
 	}
 
 	/**
@@ -260,15 +260,17 @@ class Catalog_Sync {
 	 * @since 7.0
 	 */
 	public function is_due(): bool {
-		$now = time();
+		$now      = time();
+		$records  = $this->get_records();
+		$interval = static::SYNC_INTERVAL + $this->jitter();
 
 		foreach ( array_keys( $this->sources->all() ) as $id ) {
-			$record = $this->get_record( $id );
+			$record = array_merge( static::default_record(), $records[ $id ] ?? [] );
 
 			$synced  = (int) $record['synced'];
 			$attempt = (int) $record['last_attempt'];
 
-			if ( $synced > 0 && ( $now - $synced ) < ( static::SYNC_INTERVAL + $this->jitter() ) ) {
+			if ( $synced > 0 && ( $now - $synced ) < $interval ) {
 				continue;
 			}
 
@@ -344,7 +346,7 @@ class Catalog_Sync {
 	 *
 	 * @since 7.0
 	 */
-	public function replace_source( string $id, array $entries, string $sha256 ): bool {
+	public function replace_source( string $id, array $entries, string $sha256, ?array $sync_state = null ): bool {
 		global $wpdb;
 
 		$rows = [];
@@ -361,15 +363,7 @@ class Catalog_Sync {
 					]
 				);
 
-				$this->update_record(
-					$id,
-					[
-						'last_attempt' => time(),
-						'last_error'   => $row->get_error_message(),
-					]
-				);
-
-				return false;
+				return $this->fail( $id, $row->get_error_message() );
 			}
 
 			$rows[] = $row;
@@ -379,70 +373,48 @@ class Catalog_Sync {
 
 		foreach ( array_chunk( $rows, static::CHUNK ) as $chunk ) {
 			if ( ! $this->upsert( $table, $chunk ) ) {
-				$this->update_record(
-					$id,
-					[
-						'last_attempt' => time(),
-						'last_error'   => $wpdb->last_error,
-					]
-				);
-
 				$this->catalog->flush();
 
-				return false;
+				return $this->fail( $id, $wpdb->last_error );
 			}
 		}
 
 		if ( ! $this->prune( $table, $id, wp_list_pluck( $rows, 'entry' ) ) ) {
-			$this->update_record(
-				$id,
-				[
-					'last_attempt' => time(),
-					'last_error'   => $wpdb->last_error,
-				]
-			);
-
 			$this->catalog->flush();
 
-			return false;
+			return $this->fail( $id, $wpdb->last_error );
 		}
 
+		/*
+		 * The caller decides what this run means. A real sync stamps `synced` and the index hash; the seed writes
+		 * rows without claiming a sync it never made, rather than stamping one and reversing it afterwards.
+		 */
 		$this->update_record(
 			$id,
-			[
-				'index_sha256' => $sha256,
-				'synced'       => time(),
-				'last_attempt' => time(),
-				'last_error'   => '',
-				'seeded'       => false,
-			]
+			$sync_state === null
+				? [
+					'index_sha256' => $sha256,
+					'synced'       => time(),
+					'last_attempt' => time(),
+					'last_error'   => '',
+					'seeded'       => false,
+				]
+				: $sync_state
 		);
 
 		/* Bumped after the last statement, so no reader caches the old rows under the new stamp */
 		$this->catalog->flush();
 
 		/*
-		 * A site that ran the 6.x installer, or placed a pack's files by hand, has them registered here rather than
-		 * downloading what it already holds. Only worth a pass when this source actually carries coverage entries.
+		 * A site that ran the 6.x installer, or placed a pack's files by hand, has them registered here rather
+		 * than downloading what it already holds. Scoped to this source: the adopter reads the catalogue, and
+		 * walking every source once per replaced source would re-read it S times per sync.
 		 */
-		if ( $this->has_coverage( $rows ) ) {
-			( $this->fonts )()->adopt( $this->catalog );
+		if ( in_array( 1, array_column( $rows, 'coverage' ), true ) ) {
+			$this->adopter->run( $id );
 		}
 
 		return true;
-	}
-
-	/**
-	 * @since 7.0
-	 */
-	protected function has_coverage( array $rows ): bool {
-		foreach ( $rows as $row ) {
-			if ( (int) $row['coverage'] === 1 ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -471,21 +443,20 @@ class Catalog_Sync {
 			return false;
 		}
 
-		if ( ! $this->replace_source( 'packs', $index['entries'], '' ) ) {
-			return false;
-		}
-
-		/* replace_source() marks a real sync; walk that back so nothing reports freshness the seed cannot have */
-		$this->update_record(
+		/* Rows without a sync stamp: the record stays `seeded` with `synced` at zero, so nothing reports freshness
+		   the seed cannot have, and the shipped index's older `generated` means a real sync always replaces it */
+		return $this->replace_source(
 			'packs',
+			$index['entries'],
+			'',
 			[
 				'index_sha256' => '',
 				'synced'       => 0,
+				'last_attempt' => time(),
+				'last_error'   => '',
 				'seeded'       => true,
 			]
 		);
-
-		return true;
 	}
 
 	/**
@@ -516,16 +487,22 @@ class Catalog_Sync {
 	 * @since 7.0
 	 */
 	public function get_record( string $id ): array {
-		return array_merge(
-			[
-				'index_sha256' => '',
-				'synced'       => 0,
-				'last_attempt' => 0,
-				'last_error'   => '',
-				'seeded'       => false,
-			],
-			$this->get_records()[ $id ] ?? []
-		);
+		return array_merge( static::default_record(), $this->get_records()[ $id ] ?? [] );
+	}
+
+	/**
+	 * The shape every source record has before a sync has written one
+	 *
+	 * @since 7.0
+	 */
+	public static function default_record(): array {
+		return [
+			'index_sha256' => '',
+			'synced'       => 0,
+			'last_attempt' => 0,
+			'last_error'   => '',
+			'seeded'       => false,
+		];
 	}
 
 	/**
@@ -778,13 +755,7 @@ class Catalog_Sync {
 				]
 			);
 
-			$this->update_record(
-				$id,
-				[
-					'last_attempt' => time(),
-					'last_error'   => $body->get_error_message(),
-				]
-			);
+			$this->fail( $id, $body->get_error_message() );
 
 			return;
 		}
@@ -792,13 +763,7 @@ class Catalog_Sync {
 		$index = json_decode( $body, true );
 
 		if ( ! is_array( $index ) || ! isset( $index['entries'] ) || ! is_array( $index['entries'] ) ) {
-			$this->update_record(
-				$id,
-				[
-					'last_attempt' => time(),
-					'last_error'   => 'The source index is not readable',
-				]
-			);
+			$this->fail( $id, 'The source index is not readable' );
 
 			return;
 		}
@@ -952,14 +917,28 @@ class Catalog_Sync {
 	 */
 	protected function record_failure( array $records, WP_Error $error ): void {
 		foreach ( $records as $record ) {
-			$this->update_record(
-				$record->get_id(),
-				[
-					'last_attempt' => time(),
-					'last_error'   => $error->get_error_message(),
-				]
-			);
+			$this->fail( $record->get_id(), $error->get_error_message() );
 		}
+	}
+
+	/**
+	 * Record that an attempt on this source failed, and answer false for the caller to return
+	 *
+	 * `last_attempt` always moves with `last_error`, which is what makes `maybe_run()` wait out `RETRY_BACKOFF`
+	 * rather than retrying on every tick.
+	 *
+	 * @since 7.0
+	 */
+	protected function fail( string $id, string $message ): bool {
+		$this->update_record(
+			$id,
+			[
+				'last_attempt' => time(),
+				'last_error'   => $message,
+			]
+		);
+
+		return false;
 	}
 
 	/**
@@ -967,7 +946,7 @@ class Catalog_Sync {
 	 */
 	protected function update_record( string $id, array $fields ): void {
 		$records        = $this->get_records();
-		$records[ $id ] = array_merge( $this->get_record( $id ), $fields );
+		$records[ $id ] = array_merge( static::default_record(), $records[ $id ] ?? [], $fields );
 
 		update_site_option( static::OPTION, $records );
 	}
@@ -1029,13 +1008,13 @@ class Catalog_Sync {
 			$value = implode( ',', array_map( 'strval', $value ) );
 		}
 
-		return $this->nullable_string( $value, 0 );
+		return $this->nullable_string( $value );
 	}
 
 	/**
 	 * @since 7.0
 	 */
-	protected function nullable_string( $value, int $limit ): ?string {
+	protected function nullable_string( $value, ?int $limit = null ): ?string {
 		if ( ! is_string( $value ) && ! is_numeric( $value ) ) {
 			return null;
 		}
@@ -1046,7 +1025,7 @@ class Catalog_Sync {
 			return null;
 		}
 
-		return $limit > 0 ? substr( $value, 0, $limit ) : $value;
+		return $limit === null ? $value : substr( $value, 0, $limit );
 	}
 
 	/**

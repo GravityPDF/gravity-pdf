@@ -76,7 +76,13 @@ class Font_Sources {
 	 * @since 7.0
 	 */
 	public static function get_translations(): array {
-		return [
+		static $translations = null;
+
+		if ( $translations !== null ) {
+			return $translations;
+		}
+
+		$translations = [
 			'packs/emoji/label'               => __( 'Emoji', 'gravity-pdf' ),
 			'packs/serif-mono/label'          => __( 'Serif & Monospace', 'gravity-pdf' ),
 			'packs/popular-sans/label'        => __( 'Popular Sans Serif', 'gravity-pdf' ),
@@ -98,6 +104,8 @@ class Font_Sources {
 			'packs/ancient-scripts/label'     => __( 'Ancient scripts', 'gravity-pdf' ),
 			'packs/barcode/label'             => __( 'Barcode', 'gravity-pdf' ),
 		];
+
+		return $translations;
 	}
 
 	/**
@@ -316,16 +324,16 @@ class Font_Sources {
 			}
 
 			foreach ( $roles as $role => $value ) {
-				if ( in_array( $role, [ 'useOTL', 'useKashida' ], true ) ) {
-					continue;
-				}
-
 				/* `sip-ext` names a font key, not a file, and may point outside this entry */
 				if ( $role === 'sip-ext' ) {
 					if ( ! is_string( $value ) || preg_match( static::KEY_PATTERN, $value ) !== 1 ) {
 						return sprintf( 'font "%s" has an invalid sip-ext target', $font_key );
 					}
 
+					continue;
+				}
+
+				if ( in_array( $role, static::NON_ROLE_KEYS, true ) ) {
 					continue;
 				}
 

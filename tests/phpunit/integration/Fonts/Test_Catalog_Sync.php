@@ -58,21 +58,22 @@ class Test_Catalog_Sync extends TestCase {
 		$this->secret_key = sodium_crypto_sign_secretkey( $pair );
 		$this->root       = trailingslashit( GPDF_FONTS_URL );
 
-		$this->drop_catalog_rows();
-		delete_site_option( Catalog_Sync::OPTION );
-		delete_site_option( Catalog_Sync::GENERATED_OPTION );
-		delete_site_option( 'gfpdf_lock_' . Catalog_Sync::LOCK );
+		$this->reset_sync_state();
 	}
 
 	public function tear_down(): void {
 		$this->unmock_http();
+		$this->reset_sync_state();
+
+		parent::tear_down();
+	}
+
+	protected function reset_sync_state(): void {
 		$this->drop_catalog_rows();
 
 		delete_site_option( Catalog_Sync::OPTION );
 		delete_site_option( Catalog_Sync::GENERATED_OPTION );
-		delete_site_option( 'gfpdf_lock_' . Catalog_Sync::LOCK );
-
-		parent::tear_down();
+		( new Font_Lock() )->release( Catalog_Sync::LOCK );
 	}
 
 	protected function sync( ?array $trust_keys = null, string $seed_file = '' ): Catalog_Sync {
@@ -85,11 +86,9 @@ class Test_Catalog_Sync extends TestCase {
 			new Font_Downloader( GPDFAPI::get_log_class() ),
 			new Font_Lock(),
 			GPDFAPI::get_log_class(),
+			new Catalog_Font_Adopter( $gfpdf->get_font_repository(), $this->catalog_repository(), GPDFAPI::get_log_class() ),
 			$trust_keys === null ? [ $this->public_key ] : $trust_keys,
-			$seed_file,
-			static function () use ( $gfpdf ) {
-				return $gfpdf->get_font_repository();
-			}
+			$seed_file
 		);
 	}
 

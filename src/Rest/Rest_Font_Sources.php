@@ -58,6 +58,36 @@ class Rest_Font_Sources extends WP_REST_Controller {
 	public const PER_PAGE = 50;
 
 	/**
+	 * The catalogue fields a route emits, named rather than subtracted from the row
+	 *
+	 * Projecting the row would make the response contract a function of the table: `list_columns()` carries the
+	 * six status columns, so "the row minus `entry_json`" ships install progress on a route that documents itself
+	 * as never carrying it, and every column added for a storage reason joins the payload silently.
+	 *
+	 * @since 7.0
+	 */
+	public const FIELDS = [
+		'source',
+		'entry',
+		'label',
+		'version',
+		'notes',
+		'released',
+		'coverage',
+		'position',
+		'license',
+		'size',
+		'files',
+		'category',
+		'subsets',
+		'preview_text',
+		'styles',
+		'always',
+		'scripts',
+		'languages',
+	];
+
+	/**
 	 * @var Catalog_Repository
 	 * @since 7.0
 	 */
@@ -189,11 +219,12 @@ class Rest_Font_Sources extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	public function get_items( $request ) {
-		$items = [];
+		$items   = [];
+		$records = $this->sync->get_records();
 
 		foreach ( $this->sources->all() as $id => $source ) {
 			$summary = $this->catalog->summary( $id );
-			$record  = $this->sync->get_record( $id );
+			$record  = array_merge( Catalog_Sync::default_record(), $records[ $id ] ?? [] );
 
 			$items[] = [
 				'id'           => $id,
@@ -366,16 +397,18 @@ class Rest_Font_Sources extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	protected function prepare_row( array $row ): array {
-		$row['label'] = Font_Sources::translate_entry( (string) $row['source'], (string) $row['entry'], 'label', (string) $row['label'] );
+		$previews = $this->catalog->preview_urls( $row );
+		$first    = reset( $previews );
 
-		$previews           = $this->catalog->preview_urls( $row );
-		$first              = reset( $previews );
-		$row['preview_url'] = is_array( $first ) ? ( $first['R'] ?? null ) : null;
+		$prepared = [];
+		foreach ( static::FIELDS as $field ) {
+			$prepared[ $field ] = $row[ $field ] ?? null;
+		}
 
-		/* The entry object is the installer's, never the browser's */
-		unset( $row['entry_json'], $row['data'] );
+		$prepared['label']       = Font_Sources::translate_entry( (string) $row['source'], (string) $row['entry'], 'label', (string) $row['label'] );
+		$prepared['preview_url'] = is_array( $first ) ? ( $first['R'] ?? null ) : null;
 
-		return $row;
+		return $prepared;
 	}
 
 	/**
@@ -413,7 +446,13 @@ class Rest_Font_Sources extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	protected function get_filter_labels(): array {
-		return [
+		static $labels = null;
+
+		if ( $labels !== null ) {
+			return $labels;
+		}
+
+		$labels = [
 			/* Categories */
 			'sans-serif'          => __( 'Sans-serif', 'gravity-pdf' ),
 			'serif'               => __( 'Serif', 'gravity-pdf' ),
@@ -443,5 +482,7 @@ class Rest_Font_Sources extends WP_REST_Controller {
 			'math'                => __( 'Math', 'gravity-pdf' ),
 			'symbols'             => __( 'Symbols', 'gravity-pdf' ),
 		];
+
+		return $labels;
 	}
 }

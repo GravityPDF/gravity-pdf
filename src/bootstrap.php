@@ -1062,12 +1062,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_font_downloader(),
 				new Fonts\Font_Lock(),
 				$this->log,
+				new Fonts\Catalog_Font_Adopter( $this->get_font_repository(), $this->get_catalog_repository(), $this->log ),
 				defined( 'GPDF_TRUST_KEYS' ) ? (array) GPDF_TRUST_KEYS : [],
-				PDF_PLUGIN_DIR . 'build/font-index/packs.json',
-				/* Late-bound: the repository and the catalogue are each built from the other's direction */
-				function () {
-					return $this->get_font_repository();
-				}
+				PDF_PLUGIN_DIR . 'build/font-index/packs.json'
 			);
 		}
 

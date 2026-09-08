@@ -46,42 +46,22 @@ class Catalog_Repository {
 	public const STATUS_COLUMNS = [ 'phase', 'phase_since', 'error', 'retry_after', 'missing_scripts', 'missing_since' ];
 
 	/**
-	 * Every column but `entry_json`, which only entry() and adopt() are allowed to select
+	 * Every column a list read selects: the index columns minus `entry_json`, plus the status columns
 	 *
-	 * Spelt out rather than `SELECT *` because `entry_json` is a LONGTEXT holding a whole entry object: a browse of
-	 * 1,800 rows would drag the lot through PHP and into the object cache for nothing.
+	 * Derived rather than typed out again, because a second literal list is one a new column can be left out of
+	 * silently. `entry_json` is a LONGTEXT holding a whole entry object, so a browse of ~1,800 rows would drag the
+	 * lot through PHP and into the object cache for nothing; only `entry()` and the adopter read it.
+	 *
+	 * @return string[]
 	 *
 	 * @since 7.0
 	 */
-	public const LIST_COLUMNS = [
-		'source',
-		'entry',
-		'label',
-		'version',
-		'notes',
-		'released',
-		'coverage',
-		'position',
-		'license',
-		'size',
-		'files',
-		'category',
-		'subsets',
-		'preview',
-		'preview_text',
-		'styles',
-		'always',
-		'scripts',
-		'languages',
-		'entry_sha256',
-		'font_keys',
-		'phase',
-		'phase_since',
-		'error',
-		'retry_after',
-		'missing_scripts',
-		'missing_since',
-	];
+	public static function list_columns(): array {
+		return array_merge(
+			array_values( array_diff( Catalog_Sync::INDEX_COLUMNS, [ 'entry_json' ] ) ),
+			static::STATUS_COLUMNS
+		);
+	}
 
 	/**
 	 * @var Font_Schema
@@ -169,7 +149,7 @@ class Catalog_Repository {
 		}
 
 		$table   = $this->schema->get_catalog_table();
-		$columns = implode( ', ', static::LIST_COLUMNS );
+		$columns = implode( ', ', static::list_columns() );
 		$clause  = implode( ' AND ', $where );
 
 		/* phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders -- table and column names come from this class; the placeholders sit inside $clause, which the sniff cannot see through, and every value is in $params; results are cached */
@@ -257,7 +237,7 @@ class Catalog_Repository {
 		}
 
 		$table   = $this->schema->get_catalog_table();
-		$columns = implode( ', ', static::LIST_COLUMNS );
+		$columns = implode( ', ', static::list_columns() );
 
 		/* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- table and column names come from this class; result is cached */
 		$rows = $wpdb->get_results( "SELECT {$columns} FROM {$table} WHERE coverage = 1 ORDER BY position ASC, entry ASC", ARRAY_A );
@@ -267,6 +247,50 @@ class Catalog_Repository {
 		wp_cache_set( $key, $rows, Font_Repository::CACHE_GROUP );
 
 		return $rows;
+	}
+
+	/**
+	 * Every coverage entry of one source, with its inlined entry decoded
+	 *
+	 * The adopter's read, and the only one besides `entry()` that touches `entry_json`. Deliberately uncached: it
+	 * runs after a sync rather than on any request path, and caching a LONGTEXT per row is exactly what the browse
+	 * reads avoid.
+	 *
+	 * @return array[] Each row with a decoded `data`, rows carrying no inlined entry omitted
+	 *
+	 * @since 7.0
+	 */
+	public function coverage_entries_for_adoption( string $source ): array {
+		global $wpdb;
+
+		$table   = $this->schema->get_catalog_table();
+		$columns = implode( ', ', static::list_columns() );
+
+		/* phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders -- table and column names come from this class; the value is prepared */
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( "SELECT {$columns}, entry_json FROM {$table} WHERE coverage = 1 AND source = %s ORDER BY position ASC, entry ASC", $source ),
+			ARRAY_A
+		);
+		/* phpcs:enable */
+
+		$decoded = [];
+		foreach ( (array) $rows as $row ) {
+			$data = $row['entry_json'] === null || $row['entry_json'] === '' ? null : json_decode( (string) $row['entry_json'], true );
+
+			/* A pointed-at entry names no files without a fetch, and adoption never fetches */
+			if ( ! is_array( $data ) ) {
+				continue;
+			}
+
+			unset( $row['entry_json'] );
+
+			$row         = $this->cast_row( $row );
+			$row['data'] = $data;
+
+			$decoded[] = $row;
+		}
+
+		return $decoded;
 	}
 
 	/**
