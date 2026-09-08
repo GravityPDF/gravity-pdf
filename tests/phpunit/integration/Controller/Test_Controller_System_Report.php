@@ -167,11 +167,11 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertSame( [ 0, 1, 2, 3 ], array_keys( $positional ) );
 
 		/* The replacement is keyed by name, so the section the positional filter never saw is in it */
-		$this->assertArrayHasKey( Deprecation::GROUP_DEPRECATED, $named );
+		$this->assertArrayHasKey( Deprecation::GROUP_UNSUPPORTED, $named );
 		$this->assertArrayHasKey( 'directories', $named );
 
 		/* And the section is still in the report */
-		$this->assertArrayHasKey( 'legacy_templates', $this->get_report_section( Deprecation::GROUP_DEPRECATED, $system_report ) );
+		$this->assertArrayHasKey( 'legacy_templates', $this->get_report_section( Deprecation::GROUP_UNSUPPORTED, $system_report ) );
 
 		$this->delete_legacy_templates( $path );
 	}
@@ -218,10 +218,10 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	/**
-	 * Get the items of the Deprecated section, which is only present when something is detected
+	 * Get the items of the Unsupported section, which is only present when something removed is still in use
 	 */
-	protected function get_deprecated_features(): array {
-		return $this->get_report_section( Deprecation::GROUP_DEPRECATED );
+	protected function get_unsupported_features(): array {
+		return $this->get_report_section( Deprecation::GROUP_UNSUPPORTED );
 	}
 
 	public function test_system_report_has_no_deprecated_features_section_by_default() {
@@ -231,11 +231,11 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	public function test_system_report_legacy_template() {
-		$this->assertArrayNotHasKey( 'legacy_templates', $this->get_deprecated_features() );
+		$this->assertArrayNotHasKey( 'legacy_templates', $this->get_unsupported_features() );
 
 		$legacy_path = $this->create_legacy_template();
 
-		$items = $this->get_deprecated_features();
+		$items = $this->get_unsupported_features();
 		$this->assertArrayHasKey( 'legacy_templates', $items );
 		$this->assertStringContainsString( 'my-legacy-template.php', $items['legacy_templates']['value_export'] );
 
@@ -246,11 +246,11 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	public function test_system_report_business_plus_template_has_a_row_of_its_own() {
-		$this->assertArrayNotHasKey( 'business_plus_templates', $this->get_deprecated_features() );
+		$this->assertArrayNotHasKey( 'business_plus_templates', $this->get_unsupported_features() );
 
 		$path = $this->create_legacy_template( 'my-business-plus-template.php', 'gfpdfe_business_plus::initilise( $pdf_name );' );
 
-		$items = $this->get_deprecated_features();
+		$items = $this->get_unsupported_features();
 		$this->assertSame( 'my-business-plus-template.php (not configured on a form)', $items['business_plus_templates']['value_export'] );
 
 		/* It upgrades differently to a plain v3 template, so it doesn't share that row or its guide */
@@ -261,11 +261,12 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	public function test_system_report_legacy_endpoint() {
-		$this->assertArrayNotHasKey( 'legacy_endpoint', $this->get_deprecated_features() );
+		$this->assertArrayNotHasKey( 'legacy_endpoint', $this->get_unsupported_features() );
 
 		$form_id = $this->create_form_with_legacy_url();
 
-		$items = $this->get_deprecated_features();
+		/* 7.0 removed the endpoint, so the URLs a form still hands out are reported as unsupported, not deprecated */
+		$items = $this->get_unsupported_features();
 		$this->assertArrayHasKey( 'legacy_endpoint', $items );
 		$this->assertStringContainsString( (string) $form_id, $items['legacy_endpoint']['value_export'] );
 		$this->assertFalse( $items['legacy_endpoint']['is_valid'] );
@@ -275,12 +276,12 @@ class Test_Controller_System_Report extends TestCase {
 		$this->create_form_with_advanced_templating();
 
 		/* The template file is what's reported, so a Core template isn't listed for how a PDF is configured */
-		$this->assertArrayNotHasKey( 'legacy_templates', $this->get_deprecated_features() );
-		$this->assertArrayNotHasKey( 'business_plus_templates', $this->get_deprecated_features() );
+		$this->assertArrayNotHasKey( 'legacy_templates', $this->get_unsupported_features() );
+		$this->assertArrayNotHasKey( 'business_plus_templates', $this->get_unsupported_features() );
 	}
 
-	public function test_system_report_deprecated_filters() {
-		$this->assertArrayNotHasKey( 'deprecated_filters', $this->get_deprecated_features() );
+	public function test_system_report_removed_filters() {
+		$this->assertArrayNotHasKey( 'deprecated_filters', $this->get_unsupported_features() );
 
 		$callback = static function ( $name ) {
 			return $name;
@@ -289,7 +290,7 @@ class Test_Controller_System_Report extends TestCase {
 		add_filter( 'gfpdfe_pdf_filename', $callback );
 		Deprecation::flush_cache();
 
-		$items = $this->get_deprecated_features();
+		$items = $this->get_unsupported_features();
 		$this->assertArrayHasKey( 'deprecated_filters', $items );
 		$this->assertStringContainsString( 'gfpdfe_pdf_filename', $items['deprecated_filters']['value_export'] );
 
@@ -325,14 +326,15 @@ class Test_Controller_System_Report extends TestCase {
 
 		$info = apply_filters( 'debug_information', [] );
 
-		$this->assertSame( 'None detected', $info['gravity-pdf-deprecated']['fields']['deprecated']['value'] );
+		/* The removed-feature group has its own panel, and reports nothing on a site that isn't using one */
+		$this->assertSame( 'None detected', $info['gravity-pdf-unsupported']['fields']['unsupported']['value'] );
 
 		/* The group still heads its own panel, but the intro only makes sense against a list of detections */
-		$this->assertStringContainsString( '<h4>Deprecated Features</h4>', $info['gravity-pdf-deprecated']['description'] );
-		$this->assertStringNotContainsString( '<p>', $info['gravity-pdf-deprecated']['description'] );
+		$this->assertStringContainsString( '<h4>Unsupported Features</h4>', $info['gravity-pdf-unsupported']['description'] );
+		$this->assertStringNotContainsString( '<p>', $info['gravity-pdf-unsupported']['description'] );
 
-		/* No registered feature belongs to the other group, so it isn't carried around empty */
-		$this->assertArrayNotHasKey( 'gravity-pdf-unsupported', $info );
+		/* Nothing declares the deprecated group since 7.0, so no surface carries an empty panel for it */
+		$this->assertArrayNotHasKey( 'gravity-pdf-deprecated', $info );
 	}
 
 	public function test_debug_information_is_gated_on_the_gravity_forms_capability() {
@@ -340,7 +342,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		$info = apply_filters( 'debug_information', [] );
 
-		$this->assertArrayNotHasKey( 'gravity-pdf-deprecated', $info );
+		$this->assertArrayNotHasKey( 'gravity-pdf-unsupported', $info );
 	}
 
 	public function test_debug_information_reports_each_signal() {
@@ -348,9 +350,10 @@ class Test_Controller_System_Report extends TestCase {
 
 		$form_id = $this->create_form_with_legacy_url();
 
-		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-deprecated']['fields'];
+		/* The endpoint is removed in 7.0, so the URLs still pointing at it report under Unsupported */
+		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-unsupported']['fields'];
 
-		$this->assertArrayNotHasKey( 'deprecated', $fields );
+		$this->assertArrayNotHasKey( 'unsupported', $fields );
 		$this->assertSame( 'Legacy Download URLs', $fields['legacy_endpoint']['label'] );
 		$this->assertStringContainsString( (string) $form_id, $fields['legacy_endpoint']['value'] );
 	}
@@ -361,10 +364,10 @@ class Test_Controller_System_Report extends TestCase {
 		$legacy_path = $this->create_legacy_template();
 
 		/* Templates live in one directory, which the report states of its own, so no surface repeats the path */
-		$items = $this->get_deprecated_features();
+		$items = $this->get_unsupported_features();
 		$this->assertSame( 'my-legacy-template.php (not configured on a form)', $items['legacy_templates']['value_export'] );
 
-		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-deprecated']['fields'];
+		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-unsupported']['fields'];
 		$this->assertStringContainsString( 'my-legacy-template.php', $fields['legacy_templates']['value'] );
 		$this->assertStringNotContainsString( 'PDF_EXTENDED_TEMPLATES', $fields['legacy_templates']['value'] );
 
@@ -389,14 +392,14 @@ class Test_Controller_System_Report extends TestCase {
 
 		$expected = sprintf( 'my-configured-template.php (form ID %d)', $form_id );
 
-		$items = $this->get_deprecated_features();
+		$items = $this->get_unsupported_features();
 		$this->assertSame( $expected, $items['legacy_templates']['value_export'] );
 
 		/* The display surfaces link each form to its PDF settings, which is where the template is changed */
 		$this->assertStringContainsString( 'subview=PDF', $items['legacy_templates']['value'] );
 		$this->assertStringContainsString( sprintf( '>%d</a>', $form_id ), $items['legacy_templates']['value'] );
 
-		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-deprecated']['fields'];
+		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-unsupported']['fields'];
 		$this->assertStringContainsString( $expected, $fields['legacy_templates']['value'] );
 
 		$result = call_user_func( $this->get_site_health_test()['test'] );
@@ -424,9 +427,11 @@ class Test_Controller_System_Report extends TestCase {
 
 		$result = call_user_func( $this->get_site_health_test()['test'] );
 
-		$this->assertSame( 'recommended', $result['status'] );
-		$this->assertStringContainsString( '<h4>Deprecated</h4>', $result['description'] );
-		$this->assertStringNotContainsString( '<h4>Unsupported</h4>', $result['description'] );
+		/* The endpoint is already gone, so the test escalates past 'recommended' */
+		$this->assertSame( 'critical', $result['status'] );
+		$this->assertStringContainsString( 'has been removed', $result['label'] );
+		$this->assertStringContainsString( '<h4>Unsupported</h4>', $result['description'] );
+		$this->assertStringNotContainsString( '<h4>Deprecated</h4>', $result['description'] );
 		$this->assertStringContainsString( 'Legacy Download URLs', $result['description'] );
 		$this->assertStringContainsString( (string) $form_id, $result['description'] );
 		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::SECTION_ANCHOR, $result['actions'] );

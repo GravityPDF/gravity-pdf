@@ -49,11 +49,6 @@ export function setupDynamicTemplateFields() {
 				/* Remove our UI loader */
 				$spinner.remove();
 
-				/* Reset our legacy Advanced Template option */
-				$('input[name="gfpdf_settings[advanced_template]"][value="No"]')
-					.prop('checked', true)
-					.trigger('change');
-
 				/* Only process if the response is valid */
 				if (response.fields) {
 					/* Remove any previously loaded editors to prevent conflicts loading an editor with same name */

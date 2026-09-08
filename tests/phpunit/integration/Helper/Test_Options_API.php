@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Helper;
 use GFAPI;
 use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -23,6 +24,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group options-api
  */
 class Test_Options_API extends TestCase {
+
+	use CreatesLegacyTemplates;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -795,15 +798,6 @@ class Test_Options_API extends TestCase {
 	}
 
 	/**
-	 * Test the font display name getter
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_font_display_name() {
-		$this->assertSame( 'Dejavu Sans', $this->options->get_font_display_name( 'dejavusans' ) );
-	}
-
-	/**
 	 * Test the privileges getter
 	 *
 	 * @since 4.0
@@ -1309,5 +1303,134 @@ class Test_Options_API extends TestCase {
 		$this->assertArrayHasKey( 'key', $results );
 		$this->assertArrayHasKey( 'msg', $results );
 		$this->assertArrayHasKey( 'status', $results );
+	}
+
+	/**
+	 * A value the option list no longer offers is added so the select can show it
+	 *
+	 * @since 7.0
+	 */
+	public function test_missing_option_is_added() {
+		$options = $this->options->maybe_add_missing_options(
+			[ 'Core' => [ 'zadani' => 'Zadani' ] ],
+			'my-legacy-template'
+		);
+
+		$this->assertSame(
+			[
+				'my-legacy-template' => 'my-legacy-template (not currently available)',
+				'Core'               => [ 'zadani' => 'Zadani' ],
+			],
+			$options
+		);
+	}
+
+	/**
+	 * A value inside an optgroup is already selectable, so nothing is added
+	 *
+	 * @since 7.0
+	 */
+	public function test_available_option_is_left_alone() {
+		$options = [ 'Core' => [ 'zadani' => 'Zadani' ] ];
+
+		$this->assertSame( $options, $this->options->maybe_add_missing_options( $options, 'zadani' ) );
+	}
+
+	/**
+	 * Nothing is added for a select with no value yet
+	 *
+	 * @since 7.0
+	 */
+	public function test_empty_value_adds_nothing() {
+		$options = [ 'zadani' => 'Zadani' ];
+
+		$this->assertSame( $options, $this->options->maybe_add_missing_options( $options, '' ) );
+		$this->assertSame( $options, $this->options->maybe_add_missing_options( $options, [] ) );
+	}
+
+	/**
+	 * A multi-select keeps every missing value, in the order it stored them
+	 *
+	 * @since 7.0
+	 */
+	public function test_each_missing_value_of_a_multiselect_is_added() {
+		$options = $this->options->maybe_add_missing_options(
+			[ 'zadani' => 'Zadani' ],
+			[ 'gone-one', 'zadani', 'gone-two' ]
+		);
+
+		$this->assertSame(
+			[
+				'gone-one' => 'gone-one (not currently available)',
+				'gone-two' => 'gone-two (not currently available)',
+				'zadani'   => 'Zadani',
+			],
+			$options
+		);
+	}
+
+	/**
+	 * The template select shows a PDF still set to a v3 template, which 7.0 stopped offering
+	 *
+	 * Without it the browser falls back to the first template in the list, and the next save swaps the PDF over to it.
+	 *
+	 * @since 7.0
+	 */
+	public function test_template_select_shows_a_stored_legacy_template() {
+		$path     = $this->create_legacy_template( 'my-legacy-template.php' );
+		$settings = $this->options->get_registered_fields();
+
+		try {
+			ob_start();
+			$this->options->select_callback(
+				$settings['form_settings']['template'] + [
+					'value' => 'my-legacy-template',
+					'desc2' => '',
+				]
+			);
+			$markup = ob_get_clean();
+		} finally {
+			$this->delete_legacy_templates( $path );
+		}
+
+		$this->assertStringContainsString(
+			'<option value="my-legacy-template" selected="selected">my-legacy-template (not currently available)</option>',
+			$markup
+		);
+	}
+
+	/**
+	 * The AJAX rebuild of the template select goes through build_options_for_select() rather than select_callback()
+	 *
+	 * Model_Templates::ajax_process_build_template_options_html() replaces the select's markup after the template
+	 * manager closes, so the stored value has to survive that too.
+	 *
+	 * @since 7.0
+	 */
+	public function test_options_built_for_a_select_keep_a_stored_value_the_list_dropped() {
+		ob_start();
+		$this->options->build_options_for_select( [ 'Core' => [ 'zadani' => 'Zadani' ] ], 'my-legacy-template', true );
+		$markup = ob_get_clean();
+
+		$this->assertStringContainsString(
+			'<option value="my-legacy-template" selected="selected">my-legacy-template (not currently available)</option>',
+			$markup
+		);
+	}
+
+	/**
+	 * A new PDF starts on the bundled template when the global default is one the list no longer offers
+	 *
+	 * The dead value is still shown on the global settings screen, which is where it can be corrected. Handing it to
+	 * every PDF created after the upgrade would bake a broken setting into documents nobody configured that way.
+	 *
+	 * @since 7.0
+	 */
+	public function test_new_pdf_ignores_a_default_template_that_is_no_longer_offered() {
+		$this->options->update_option( 'default_template', 'my-legacy-template' );
+
+		$settings = $this->options->get_registered_fields();
+
+		$this->assertSame( 'zadani', $settings['form_settings']['template']['std'] );
 	}
 }

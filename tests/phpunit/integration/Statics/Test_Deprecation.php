@@ -143,8 +143,8 @@ class Test_Deprecation extends TestCase {
 			Fake_Deprecation::get_groups()
 		);
 
-		/* The v3 provider declares one group today, so no surface carries the other around empty */
-		$this->assertSame( [ Deprecation::GROUP_DEPRECATED ], Deprecation::get_groups() );
+		/* Every feature the v3 provider declares is gone in 7.0, so the deprecated group is left out entirely */
+		$this->assertSame( [ Deprecation::GROUP_UNSUPPORTED ], Deprecation::get_groups() );
 
 		Fake_Deprecated_Features::$detections = [];
 	}

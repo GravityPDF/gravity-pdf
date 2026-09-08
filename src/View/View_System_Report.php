@@ -267,8 +267,9 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @since 6.17.0
 	 */
 	protected function get_legacy_endpoint_feature( array $form_ids, array $feature ): array {
+		/* The URLs no longer resolve, so what the form still hands out is a broken link rather than a feature in use */
 		/* translators: %s: Comma separated list of form IDs */
-		$in_use = __( 'In use on form ID %s', 'gravity-pdf' );
+		$in_use = __( 'Broken link stored on form ID %s', 'gravity-pdf' );
 
 		return [
 			'lines' => [ sprintf( $in_use, implode( ', ', $form_ids ) ) ],
@@ -297,14 +298,13 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Describe the deprecated v3 filters that have a third-party listener attached
+	 * Describe the removed v3 hooks that still have a listener attached
 	 *
 	 * @param array $filters Hook name mapped to the number of listeners
-	 * @param array $feature The feature's registration
 	 *
 	 * @since 6.17.0
 	 */
-	protected function get_deprecated_filter_feature( array $filters, array $feature ): array {
+	protected function get_deprecated_filter_feature( array $filters ): array {
 		$lines = [];
 
 		foreach ( $filters as $name => $count ) {
@@ -428,8 +428,14 @@ class View_System_Report extends Helper_Abstract_View {
 			return $result;
 		}
 
-		$result['status'] = 'recommended';
-		$result['label']  = esc_html__( 'Your site uses Gravity PDF functionality that is scheduled for removal', 'gravity-pdf' );
+		/* Something already removed is breaking PDFs now, rather than at some point in the future */
+		if ( Deprecation::has_unsupported_feature( array_keys( $signals ) ) ) {
+			$result['status'] = 'critical';
+			$result['label']  = esc_html__( 'Your site uses Gravity PDF functionality that has been removed', 'gravity-pdf' );
+		} else {
+			$result['status'] = 'recommended';
+			$result['label']  = esc_html__( 'Your site uses Gravity PDF functionality that is scheduled for removal', 'gravity-pdf' );
+		}
 
 		/* The group headings and their descriptions introduce the list, so nothing else does */
 		$result['description'] = '';

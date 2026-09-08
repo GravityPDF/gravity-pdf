@@ -70,35 +70,36 @@ test.describe('Deprecated Features', () => {
 				}),
 			});
 
-		const deprecated = sectionByTitle('Deprecated');
+		const unsupported = sectionByTitle('Unsupported');
 
-		await expect(deprecated).toBeVisible();
-
-		// No registered feature has already been removed, so that section isn't carried around empty
-		await expect(sectionByTitle('Unsupported')).toHaveCount(0);
+		// Everything the v3 provider detects is gone in 7.0, so there is nothing left to report as merely deprecated
+		await expect(sectionByTitle('Deprecated')).toHaveCount(0);
+		await expect(unsupported).toBeVisible();
 
 		// Templates are listed by file name alone, since the report states the working directory of its own, and
 		// by the forms configured to render through them
-		await expect(deprecated).toContainText(
-			'Support for Legacy Templates will be removed in Gravity PDF 7.0.'
+		await expect(unsupported).toContainText(
+			'PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0.'
 		);
-		await expect(deprecated).toContainText(
+		await expect(unsupported).toContainText(
 			`e2e-legacy.php (form ID ${formId})`
 		);
-		await expect(deprecated).not.toContainText('PDF_EXTENDED_TEMPLATES');
+		await expect(unsupported).not.toContainText('PDF_EXTENDED_TEMPLATES');
 
 		// A template that drives the PDF engine is a Business Plus one, and reports under its own heading
-		await expect(deprecated).toContainText(
-			'Support for Business Plus / Tier 2 Templates will be removed in Gravity PDF 7.0.'
+		await expect(unsupported).toContainText(
+			'PDFs built with Advanced Templating can no longer be generated in Gravity PDF 7.0.'
 		);
-		await expect(deprecated).toContainText(
+		await expect(unsupported).toContainText(
 			'e2e-business-plus.php (not configured on a form)'
 		);
 
 		// Each detected form links to its own PDF settings, which is where both the template and the URL are replaced
-		await expect(deprecated).toContainText(`In use on form ID ${formId}`);
+		await expect(unsupported).toContainText(
+			`Broken link stored on form ID ${formId}`
+		);
 
-		const formLinks = deprecated.getByRole('link', {
+		const formLinks = unsupported.getByRole('link', {
 			name: `${formId}`,
 			exact: true,
 		});
@@ -109,13 +110,13 @@ test.describe('Deprecated Features', () => {
 			new RegExp(`subview=PDF&id=${formId}$`)
 		);
 
-		// Both hook shapes are reported: the v3 `gfpdfe_` prefix, and the ones only the map can name
-		await expect(deprecated).toContainText('gfpdf_rtl has 1 listener');
-		await expect(deprecated).toContainText(
+		// Both hook shapes the map names are reported: a v3-shaped alias and a `gfpdf_legacy_` one
+		await expect(unsupported).toContainText('gfpdf_rtl has 1 listener');
+		await expect(unsupported).toContainText(
 			'gfpdf_legacy_templates has 1 listener'
 		);
 
-		await isolateForSnapshot(page, [deprecated]);
+		await isolateForSnapshot(page, [unsupported]);
 		await maskFormIds(page);
 
 		await snapshot(page, testinfo);
@@ -132,7 +133,7 @@ test.describe('Deprecated Features', () => {
 
 		const heading = page.locator('.health-check-accordion-heading', {
 			hasText:
-				'Your site uses Gravity PDF functionality that is scheduled for removal',
+				'Your site uses Gravity PDF functionality that has been removed',
 		});
 
 		await expect(heading).toBeVisible({ timeout: 30000 });
@@ -142,16 +143,18 @@ test.describe('Deprecated Features', () => {
 			'#health-check-accordion-block-gravity_pdf_deprecated_features'
 		);
 
-		// Each feature reads as it does in the system report, under the group heading it belongs to
+		// Each feature reads as it does in the system report, under the heading of the group it belongs to
 		await expect(
-			panel.getByRole('heading', { name: 'Deprecated', exact: true })
+			panel.getByRole('heading', { name: 'Unsupported', exact: true })
 		).toBeVisible();
 
 		await expect(panel).toContainText(
-			`e2e-legacy.php (form ID ${formId}). Support for Legacy Templates will be removed in Gravity PDF 7.0.`
+			`e2e-legacy.php (form ID ${formId}). PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0.`
 		);
 		await expect(panel).not.toContainText('PDF_EXTENDED_TEMPLATES');
-		await expect(panel).toContainText(`In use on form ID ${formId}`);
+		await expect(panel).toContainText(
+			`Broken link stored on form ID ${formId}`
+		);
 		await expect(panel).toContainText('gfpdf_rtl has 1 listener');
 		await expect(
 			panel.getByRole('link', { name: 'Learn how to upgrade' }).first()
@@ -177,39 +180,42 @@ test.describe('Deprecated Features', () => {
 	}, testinfo) => {
 		await admin.visitAdminPage('site-health.php', 'tab=debug');
 
-		// The group gets its own section, so a support ticket carries the detections with it
-		const deprecatedHeading = page.locator(
-			'#health-check-section-gravity-pdf-deprecated'
+		// Each group in use gets its own section, so a support ticket carries the detections split the way they are
+		// fixed. Only the unsupported group is declared since 7.0
+		const unsupportedHeading = page.locator(
+			'#health-check-section-gravity-pdf-unsupported'
 		);
 
 		// The title no longer names the group, which the panel now does for itself
-		await expect(deprecatedHeading).toHaveText('Gravity PDF');
-		await deprecatedHeading.click();
+		await expect(unsupportedHeading).toHaveText('Gravity PDF');
+		await unsupportedHeading.click();
 
-		const deprecated = page.locator(
-			'#health-check-accordion-block-gravity-pdf-deprecated'
+		const unsupported = page.locator(
+			'#health-check-accordion-block-gravity-pdf-unsupported'
 		);
 
 		await expect(
-			deprecated.locator('h4', { hasText: 'Deprecated Features' })
+			unsupported.locator('h4', { hasText: 'Unsupported Features' })
 		).toBeVisible();
 
 		// The intro belongs to a list, so it is present only because there is something to introduce
-		await expect(deprecated).toContainText(
-			'Legacy functionality that will be removed in an upcoming release'
+		await expect(unsupported).toContainText(
+			'These features have been removed and any Gravity PDF document that relied on them will stop working.'
 		);
 
 		// Templates are named by file, with the upgrade URL travelling in the support ticket beside them
-		await expect(deprecated).toContainText(
-			`e2e-legacy.php (form ID ${formId}). Support for Legacy Templates will be removed in Gravity PDF 7.0.`
+		await expect(unsupported).toContainText(
+			`e2e-legacy.php (form ID ${formId}). PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0.`
 		);
-		await expect(deprecated).toContainText(
+		await expect(unsupported).toContainText(
 			'https://docs.gravitypdf.com/upgrade/legacy-templates/'
 		);
-		await expect(deprecated).toContainText(`In use on form ID ${formId}`);
-		await expect(deprecated).toContainText('gfpdf_rtl has 1 listener');
+		await expect(unsupported).toContainText(
+			`Broken link stored on form ID ${formId}`
+		);
+		await expect(unsupported).toContainText('gfpdf_rtl has 1 listener');
 
-		await isolateForSnapshot(page, [deprecatedHeading, deprecated]);
+		await isolateForSnapshot(page, [unsupportedHeading, unsupported]);
 		await maskFormIds(page);
 
 		await snapshot(page, testinfo);
@@ -226,30 +232,32 @@ test.describe('Deprecated Features', () => {
 
 		// One notice for the lot, rather than one per feature competing for the same screen
 		const notice = page.locator('.notice', {
-			hasText: 'This site uses deprecated Gravity PDF functionality',
+			hasText:
+				'This site uses Gravity PDF functionality that has been removed',
 		});
 
 		await expect(notice).toHaveCount(1);
 		await expect(notice).toBeVisible();
 
-		// Functionality still working, but not for much longer, reads as a warning rather than an error
-		await expect(notice).toHaveClass(/notice-warning/);
+		// 7.0 removed features this site still uses, so the notice reads as an error rather than a warning
+		await expect(notice).toHaveClass(/notice-error/);
 
 		// Every detected feature is listed, each linking to the guide that covers it
 		await expect(notice).toContainText(
-			'Support for Legacy Templates will be removed in Gravity PDF 7.0.'
+			'PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0.'
 		);
 		await expect(notice).toContainText(
-			'Support for Business Plus / Tier 2 Templates will be removed in Gravity PDF 7.0.'
+			'PDFs built with Advanced Templating can no longer be generated in Gravity PDF 7.0.'
 		);
 		await expect(notice).toContainText(
-			'Support for legacy download URLs will be removed in Gravity PDF 7.0.'
+			'Old PDF download links stopped working in Gravity PDF 7.0, so anyone who clicks one will not get their PDF. Replace those links with the [gravitypdf] shortcode or a PDF merge tag.'
 		);
 
 		// The hooks item says what is actually affected: out of its report row, "Actions and Filters" reads as the lot
 		await expect(notice).toContainText(
-			'Code on this site uses Gravity PDF hooks that are removed in version 7.0.'
+			'Custom code on this site uses Gravity PDF hooks that were removed in version 7.0 and has stopped running. Update it to use the current hooks.'
 		);
+
 		await expect(
 			notice.getByRole('button', { name: 'View the system report' })
 		).toBeVisible();

@@ -117,7 +117,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 			$structure[0]['tables'][ $index ]['items'] = $items[ $table['id'] ] ?? [];
 		}
 
-		/* Drop any section with nothing to show, which is how the Deprecated section stays hidden on a clean site */
+		/* Drop any section with nothing to show, which is how the Unsupported section stays hidden on a clean site */
 		$structure[0]['tables'] = array_filter(
 			$structure[0]['tables'],
 			static function ( $table ) {
@@ -386,8 +386,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 	/**
 	 * Pass the sections through the positional `gfpdf_system_status_report_items` filter
 	 *
-	 * Deliberately not registered on `Deprecation`: that registry is the v3 layer 7.0 removes, and this filter has
-	 * no removal scheduled.
+	 * Fired directly rather than through `Deprecation`, which only detects and reports: this filter still works and
+	 * has no removal scheduled, so there is nothing for the registry to warn a site about.
 	 *
 	 * @param array $items Sections keyed by name
 	 *

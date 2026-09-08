@@ -9,9 +9,9 @@ use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Debug;
-use GFPDF\Statics\Deprecation_V3;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -36,6 +36,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Controller_PDF extends Helper_Abstract_Controller {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -111,7 +113,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 */
 	public function add_actions() {
 		/* Process PDF if needed */
-		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ], 1 ); /* legacy PDF endpoint */
 		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ], 1 ); /* new PDF endpoint */
 
 		/* Set up pre- and post-generation PDF hooks */
@@ -204,9 +205,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		add_filter( 'gfpdf_pdf_html_output', $add_view_html_debugger, 9999, 5 );
 
-		/* Backwards compatibility for our Tier 2 plugin */
-		add_filter( 'gfpdfe_pre_load_template', Deprecation_V3::INTERNAL_FILTER_CALLBACK, 1, 8 );
-
 		/* Pre-process our template arguments and automatically render them in PDF */
 		add_filter( 'gfpdf_template_args', [ $this->model, 'preprocess_template_arguments' ] );
 		add_filter( 'gfpdf_pdf_html_output', [ $this->view, 'autoprocess_core_template_options' ], 5, 4 );
@@ -220,13 +218,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		};
 
 		add_filter( 'gfpdf_current_form_object', $add_current_form_object_hooks, 10, 3 );
-
-		/* Manipulate the PDF settings object (array) when generating PDFs */
-		$add_current_pdf_settings_object_hooks = function ( $pdf_settings, $form, $entry ) {
-			return $this->add_current_pdf_settings_object_hooks( $pdf_settings, $form, $entry );
-		};
-
-		add_filter( 'gfpdf_current_pdf_settings_object', $add_current_pdf_settings_object_hooks, 10, 3 );
 	}
 
 	/**
@@ -279,74 +270,11 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Determines if we should process the legacy PDF endpoint at this stage (the one with $_GET variables)
-	 * Fires just before the main WP_Query is executed (we don't need it)
-	 *
-	 * @return void
-	 * @since 4.0
-	 * @deprecated 4.0 Added for backwards compatibility with v3 PDF links, but ideally should not be used
-	 */
-	public function process_legacy_pdf_endpoint() {
-
-		/* phpcs:disable WordPress.Security.NonceVerification.Recommended */
-		if ( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
-			return null;
-		}
-
-		_deprecated_function( __METHOD__, '4.0', 'the [gravitypdf] shortcode or PDF merge tags, https://docs.gravitypdf.com/upgrade/legacy-download-urls/' );
-
-		$config = [
-			'lid'      => (int) explode( ',', $_GET['lid'] )[0],
-			'fid'      => (int) $_GET['fid'],
-			'aid'      => isset( $_GET['aid'] ) ? (int) $_GET['aid'] : false,
-			'template' => sanitize_html_class( substr( $_GET['template'], 0, -4 ) ), /* strip .php from the template name */
-			'action'   => isset( $_GET['download'] ) ? 'download' : 'view',
-		];
-		/* phpcs:enable */
-
-		/* Attempt to find a valid config */
-		$pid = $this->model->get_legacy_config( $config );
-
-		if ( is_wp_error( $pid ) ) {
-			$this->pdf_error( $pid );
-		}
-
-		/* Report the form from now on, whether or not the URL itself lives anywhere the form scan can find it */
-		Deprecation_V3::record_legacy_endpoint_usage( $config['fid'] );
-
-		/* Store our ids in the WP query_vars object */
-		$GLOBALS['wp']->query_vars['gpdf'] = 1;
-		$GLOBALS['wp']->query_vars['pid']  = $pid;
-		$GLOBALS['wp']->query_vars['lid']  = $config['lid'];
-
-		$this->log->notice(
-			'Processing Legacy PDF endpoint.',
-			[
-				'config' => $config,
-				'pid'    => $pid,
-			]
-		);
-
-		$this->log->warning( sprintf( 'Legacy download URLs are removed in Gravity PDF %s. Replace with the [gravitypdf] shortcode or PDF merge tags. See https://docs.gravitypdf.com/upgrade/legacy-download-urls/ for upgrade instructions.', Deprecation_V3::REMOVED_IN ) );
-
-		/* Send to our model to handle validation / authentication */
-		do_action( 'gfpdf_legacy_pre_view_or_download_pdf', $config['lid'], $pid, $config['action'] );
-		$results = $this->model->process_pdf( $pid, $config['lid'], $config['action'] );
-
-		/* if error, display to user */
-		if ( is_wp_error( $results ) ) {
-			$this->pdf_error( $results );
-		}
-	}
-
-	/**
 	 * @since 5.1.1
 	 */
 	public function add_pre_pdf_hooks() {
 		add_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		add_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
-
-		$this->misc->maybe_load_gf_entry_detail_class(); /* Backwards compatible for legacy templates */
 
 		/* Gravity Wiz Populate Anything support */
 		if ( function_exists( 'gp_populate_anything' ) ) {
@@ -396,17 +324,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Disables the Siteground HTML Minifier when generating PDFs for the browser
-	 *
-	 * @since 5.1.5
-	 * @see https://github.com/GravityPDF/gravity-pdf/issues/863
-	 * @deprecated 6.12 All buffers are auto-closed before a PDF is sent to the browser
-	 */
-	public function sgoptimizer_html_minification_fix() {
-		_deprecated_function( __METHOD__, '6.12' );
-	}
-
-	/**
 	 * Modify the form object specifically for the PDF request
 	 *
 	 * @param array $form
@@ -436,23 +353,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		}
 
 		return $form;
-	}
-
-	/**
-	 * Modify the PDF settings specifically for the PDF request
-	 *
-	 * @param array $pdf_settings
-	 * @param array $form
-	 * @param array $entry
-	 *
-	 * @return array
-	 *
-	 * @since 7.0
-	 */
-	protected function add_current_pdf_settings_object_hooks( $pdf_settings, $form, $entry ) {
-		$pdf_settings = $this->model->apply_backwards_compatibility_filters( $pdf_settings, $entry );
-
-		return $pdf_settings;
 	}
 
 	/**

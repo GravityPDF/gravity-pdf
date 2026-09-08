@@ -4,8 +4,7 @@ namespace GFPDF\Statics;
 
 use Exception;
 use GFCommon;
-use GFPDF\Helper\Helper_PDF;
-use GFPDF\Model\Model_PDF;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GPDFAPI;
 
 /**
@@ -27,6 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since   5.0
  */
 class Queue_Callbacks {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Generate and save a PDF to disk
@@ -113,49 +114,5 @@ class Queue_Callbacks {
 
 		/* Reset existing user */
 		wp_set_current_user( $backup_user_id );
-	}
-
-	/**
-	 * Cleanup PDFs saved to disk
-	 *
-	 * @param $form_id
-	 * @param $entry_id
-	 *
-	 * @throws Exception
-	 *
-	 * @since 5.0
-	 * @deprecated 6.12 Caching layer + auto-purge added
-	 */
-	public static function cleanup_pdfs( $form_id, $entry_id ) {
-		_deprecated_function( __METHOD__, '6.12' );
-
-		$gform = GPDFAPI::get_form_class();
-		$log   = GPDFAPI::get_log_class();
-
-		/** @var Model_PDF $model_pdf */
-		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
-
-		$form  = $gform->get_form( $form_id );
-		$entry = $gform->get_entry( $entry_id );
-
-		if ( $form === null ) {
-			$log->error( 'Could not locate form', [ 'id' => $form_id ] );
-
-			throw new Exception();
-		}
-
-		if ( is_wp_error( $entry ) ) {
-			$log->error(
-				'Entry Error',
-				[
-					'code'    => $entry->get_error_code(),
-					'message' => $entry->get_error_message(),
-				]
-			);
-
-			throw new Exception();
-		}
-
-		$model_pdf->cleanup_pdf( $entry, $form );
 	}
 }

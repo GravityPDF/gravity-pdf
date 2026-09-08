@@ -70,9 +70,9 @@ add_filter(
 	}
 );
 
-/* Give the deprecation detection a third-party filter listener to find, on a hook of each shape it looks for: one
-   carrying the v3 `gfpdfe_` prefix and one it can only match by name. The callbacks are pass-throughs, so they
-   change nothing for the tests that run alongside them */
+/* Give the deprecation detection a third-party filter listener to find, on one hook of each shape the map names:
+   a v3-shaped alias and a `gfpdf_legacy_` one. The dynamic `gfpdfe_` prefix walk is covered by PHPUnit instead,
+   since it needs a form ID. The callbacks are pass-throughs, so they change nothing for the tests alongside them */
 add_action(
 	'init',
 	static function () {

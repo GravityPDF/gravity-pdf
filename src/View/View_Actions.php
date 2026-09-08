@@ -77,10 +77,10 @@ class View_Actions extends Helper_Abstract_View {
 	 * Load the notice for the deprecated functionality the site still uses
 	 *
 	 * One notice lists them all, each named the same way so the list scans. That is deliberately the registration's
-	 * own sentence rather than the tailored copy the report writes per feature: "These hooks will be removed"
-	 * makes sense under a row titled Actions and Filters, and not in a list where nothing else names it. The
-	 * detections are left to the report the button links to, since a notice is read at a glance and the template
-	 * files or form IDs behind a feature can run long.
+	 * own sentence rather than the tailored copy the report writes per feature, which is written to be read under
+	 * the row that titles it and not in a list where nothing else names the feature. The detections are left to the
+	 * report the button links to, since a notice is read at a glance and the template files or form IDs behind a
+	 * feature can run long.
 	 *
 	 * @param string[] $keys        The feature IDs from Deprecation::get_features()
 	 * @param string   $type        The action ID
@@ -101,7 +101,15 @@ class View_Actions extends Helper_Abstract_View {
 			];
 		}
 
-		$html  = $this->load( 'deprecated_features', [ 'features' => $features ], false );
+		$html = $this->load(
+			'deprecated_features',
+			[
+				'features'    => $features,
+				'unsupported' => Deprecation::has_unsupported_feature( $keys ),
+			],
+			false
+		);
+
 		$html .= $this->get_action_buttons( $type, $button_text );
 
 		return $html;

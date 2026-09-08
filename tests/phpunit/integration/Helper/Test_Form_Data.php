@@ -5,7 +5,6 @@ declare( strict_types=1 );
 namespace GFPDF\Helper;
 use GFAPI;
 use GFPDF\Helper\Fields\Field_Repeater;
-use GFPDFEntryDetail;
 use GPDFAPI;
 use GFPDF\Tests\Integration\TestCase;
 
@@ -1508,10 +1507,8 @@ class Test_Form_Data extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_empty_fields() {
-		$this->setExpectedDeprecated( 'GFPDFEntryDetail::lead_detail_grid_array' );
-
 		$entry     = $this->entries[6];
-		$form_data = GFPDFEntryDetail::lead_detail_grid_array( $this->form, $entry );
+		$form_data = GPDFAPI::get_form_data( $entry['id'] );
 
 		$this->assertSame( '', $form_data['field'][1] );
 		$this->assertSame( '', $form_data['field'][2] );
@@ -1584,14 +1581,12 @@ class Test_Form_Data extends TestCase {
 	 * Ensure the Product data calculations are correct when using Euros (or similar comma/decimal switched currency)
 	 */
 	public function test_euro_product_data() {
-		$this->setExpectedDeprecated( 'GFPDFEntryDetail::lead_detail_grid_array' );
-
 		$json                      = json_decode( trim( file_get_contents( PDF_PLUGIN_DIR . '/tools/phpunit/data/entries/all-form-euro-product-entry.json' ) ), true );
 		$json['form_id']           = $this->form['id'];
 		$entry_id                  = $this->gf_factory()->entry->create($json);
 		$this->created_entry_ids[] = $entry_id;
 		$entry                     = GFAPI::get_entry( $entry_id );
-		$form_data       = GFPDFEntryDetail::lead_detail_grid_array( $this->form['id'], $entry );
+		$form_data       = GPDFAPI::get_form_data( $entry['id'] );
 		$products        = $form_data['products'];
 		$totals          = $form_data['products_totals'];
 

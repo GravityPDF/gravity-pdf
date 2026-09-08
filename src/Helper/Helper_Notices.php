@@ -21,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Helper_Notices implements Helper_Interface_Actions {
 
+	use Helper_Trait_Removed_Methods;
+
 	/**
 	 * Holds any notices that we've triggered
 	 *
@@ -53,16 +55,6 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	public function add_actions(): void {
 		add_action( $this->get_notice_type(), [ $this, 'process' ] );
-	}
-
-	/**
-	 * Override GF notices on Gravity PDF pages
-	 *
-	 * @since 6.5
-	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
-	 */
-	public function maybe_remove_non_pdf_messages(): void {
-		_deprecated_function( __METHOD__, '6.11' );
 	}
 
 	/**
@@ -245,53 +237,5 @@ class Helper_Notices implements Helper_Interface_Actions {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Reset Gravity Forms messages
-	 *
-	 * @param array $messages The registered Gravity Forms messages
-	 *
-	 * @return array $this->errors
-	 *
-	 * @since 6.5
-	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
-	 */
-	public function reset_gravityforms_messages( $messages ) {
-		_deprecated_function( __METHOD__, '6.11' );
-
-		return $messages;
-	}
-
-	/**
-	 * Merge notices with the current Gravity Forms notice messages.
-	 *
-	 * @param array $messages The message to be displayed
-	 *
-	 * @return array
-	 *
-	 * @since 6.5
-	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
-	 */
-	public function set_gravitypdf_notices( $messages ) {
-		_deprecated_function( __METHOD__, '6.11' );
-
-		return $messages;
-	}
-
-	/**
-	 * Merge error with the current Gravity Forms error messages.
-	 *
-	 * @param array $errors The message to be displayed
-	 *
-	 * @return array
-	 *
-	 * @since 6.5
-	 * @deprecated 6.11 No longer required. Running all notices through standard WP hooks, but have included `gf-notice` class so GF does not remove it
-	 */
-	public function set_gravitypdf_errors( $errors ) {
-		_deprecated_function( __METHOD__, '6.11' );
-
-		return $errors;
 	}
 }

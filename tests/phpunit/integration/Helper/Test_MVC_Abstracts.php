@@ -104,14 +104,17 @@ class Test_MVC_Abstracts extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_abstract_view() {
-		$this->setExpectedDeprecated( 'GFPDF\View\View_Settings::tabs' );
-
 		/*
-		 * Test our load function produces the correct output
+		 * Test our load function produces the correct output, routed through __call()
 		 */
-		$this->assertNotEmpty( $this->view->tabs() );
+		ob_start();
+		$this->view->help();
+
+		$this->assertNotEmpty( ob_get_clean() );
 
 		/* check for error */
+		$this->setExpectedIncorrectUsage( View_Settings::class . '::load_none_existant_file' );
+
 		$error = $this->view->load_none_existant_file( [] );
 		$this->assertInstanceOf( \WP_Error::class, $error );
 

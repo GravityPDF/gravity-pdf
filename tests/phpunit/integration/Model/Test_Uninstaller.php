@@ -177,7 +177,7 @@ class Test_Uninstaller extends TestCase {
 			]
 		);
 
-		/* The forms a legacy download URL has been served for are recorded in a row of their own */
+		/* 6.17 recorded the forms a legacy download URL had been served for, and uninstall still clears that row */
 		update_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION, [ 1 ], false );
 
 		update_option( 'gpdf_sl_abc_123', true );

@@ -269,7 +269,7 @@ class Test_API extends TestCase {
 
 		$this->assertNotInstanceOf( \WP_Error::class, $results );
 		$this->assertTrue( $results );
-		$this->assertFileExists( PDF_FONT_LOCATION . 'Chewy.ttf' );
+		$this->assertFileExists( GPDFAPI::get_data_class()->template_font_location . 'Chewy.ttf' );
 
 		/* Clean up */
 		GPDFAPI::delete_pdf_font( 'test' );
@@ -323,7 +323,7 @@ class Test_API extends TestCase {
 		$results = GPDFAPI::delete_pdf_font( 'test' );
 
 		$this->assertTrue( $results );
-		$this->assertFileDoesNotExist( PDF_FONT_LOCATION . 'Chewy.ttf' );
+		$this->assertFileDoesNotExist( GPDFAPI::get_data_class()->template_font_location . 'Chewy.ttf' );
 	}
 
 	/**

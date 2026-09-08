@@ -10,7 +10,7 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Pdf_Queue;
-use GFPDF\Statics\Deprecation;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
@@ -32,6 +32,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Model_Install extends Helper_Abstract_Model {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Holds our log class
@@ -182,17 +184,13 @@ class Model_Install extends Helper_Abstract_Model {
 		$upload_dir     = $this->data->upload_dir;
 		$upload_dir_url = $this->data->upload_dir_url;
 
-		/* Legacy Filters */
-		$this->data->template_location     = trailingslashit( Deprecation::apply_filters( 'gfpdfe_template_location', [ $template_dir, $working_folder, $upload_dir ] ) );
-		$this->data->template_location_url = trailingslashit( Deprecation::apply_filters( 'gfpdfe_template_location_uri', [ $template_url, $working_folder, $upload_dir_url ] ) );
-
 		/* Allow user to change directory location(s) */
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_template_location/ for more details about this filter */
-		$this->data->template_location = trailingslashit( apply_filters( 'gfpdf_template_location', $this->data->template_location, $working_folder, $upload_dir ) ); /* needs to be accessible from the web */
+		$this->data->template_location = trailingslashit( apply_filters( 'gfpdf_template_location', $template_dir, $working_folder, $upload_dir ) ); /* needs to be accessible from the web */
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_template_location_uri/ for more details about this filter */
-		$this->data->template_location_url = trailingslashit( apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $working_folder, $upload_dir_url ) ); /* needs to be accessible from the web */
+		$this->data->template_location_url = trailingslashit( apply_filters( 'gfpdf_template_location_uri', $template_url, $working_folder, $upload_dir_url ) ); /* needs to be accessible from the web */
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_font_location/ for more details about this filter */
 		$this->data->template_font_location = trailingslashit( apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ) ); /* can be in a directory not accessible via the web */
@@ -248,7 +246,7 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Create the appropriate folder structure automatically
 	 * The upload directory should have all appropriate permissions to allow this kind of manipulation
-	 * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropriate folder
+	 * but devs who tap into the gfpdf_template_location filter will need to ensure we can write to the appropriate folder
 	 *
 	 * @return void
 	 * @since 4.0
@@ -358,7 +356,7 @@ class Model_Install extends Helper_Abstract_Model {
 		global $wp;
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-		if ( ! empty( $_GET['gpdf'] ) || ! empty( $_GET['gf_pdf'] ) || strpos( $wp->matched_query, 'gpdf=1' ) === 0 ) {
+		if ( ! empty( $_GET['gpdf'] ) || strpos( $wp->matched_query, 'gpdf=1' ) === 0 ) {
 			$tags[] = 'gpdf';
 			$tags[] = 'pid';
 			$tags[] = 'lid';
@@ -388,73 +386,6 @@ class Model_Install extends Helper_Abstract_Model {
 				break;
 			}
 		}
-	}
-
-
-	/**
-	 * The Gravity PDF Uninstaller
-	 *
-	 * @deprecated 6.0
-	 *
-	 * @since 4.0
-	 */
-	public function uninstall_plugin() {
-		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::uninstall_plugin()' );
-
-		$this->uninstall->uninstall_plugin();
-	}
-
-	/**
-	 * Remove and options stored in the database
-	 *
-	 * @deprecated 6.0
-	 *
-	 * @since 4.0
-	 */
-	public function remove_plugin_options() {
-		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::remove_plugin_options()' );
-
-		$this->uninstall->remove_plugin_options();
-	}
-
-	/**
-	 * Remove all form settings from each individual form.
-	 * Because we stored out PDF settings with each form and have no index we need to individually load and forms and check them for Gravity PDF settings
-	 *
-	 * @deprecated 6.0
-	 *
-	 * @since 4.0
-	 */
-	public function remove_plugin_form_settings() {
-		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::remove_plugin_form_settings()' );
-
-		$this->uninstall->remove_plugin_form_settings();
-	}
-
-	/**
-	 * Remove our PDF directory structure
-	 *
-	 * @deprecated 6.0
-	 *
-	 * @since 4.0
-	 */
-	public function remove_folder_structure() {
-		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::remove_folder_structure()' );
-
-		$this->uninstall->remove_folder_structure();
-	}
-
-	/**
-	 * Deactivate Gravity PDF
-	 *
-	 * @deprecated 6.0
-	 *
-	 * @since 4.0
-	 */
-	public function deactivate_plugin() {
-		_deprecated_function( __METHOD__, '6.0', 'Model_Uninstall::deactivate_plugin()' );
-
-		$this->uninstall->deactivate_plugin();
 	}
 
 	/**

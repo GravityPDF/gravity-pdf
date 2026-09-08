@@ -11,7 +11,7 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Singleton;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF_Core;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF_Major_Compatibility_Checks;
 use GPDFAPI;
 use Gravity_Forms\Gravity_Forms\Async\GF_Background_Process;
@@ -42,6 +42,8 @@ require_once __DIR__ . '/autoload.php';
  * @since 4.0
  */
 class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface_Filters {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Holds our log class
@@ -122,30 +124,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $singleton;
 
 	/**
-	 * Add user depreciation notice for any methods not included in current object
-	 *
-	 * @param string $name      The function name to be called
-	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
-	 *
-	 * @since 4.0
-	 */
-	public function __call( $name, $arguments ) {
-		_deprecated_function( esc_html( $name ), '4.0' );
-	}
-
-	/**
-	 * Add user depreciation notice for any methods not included in current object
-	 *
-	 * @param string $name      The function name to be called
-	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
-	 *
-	 * @since  4.0
-	 */
-	public static function __callStatic( $name, $arguments ) {
-		_deprecated_function( esc_html( $name ), '4.0' );
-	}
-
-	/**
 	 * Fired on the `after_setup_theme` action to initialise our plugin
 	 *
 	 * We do this on this hook instead of plugins_loaded so that users can tap into all our actions and filters
@@ -160,11 +138,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Initialise our Router class */
 		$gfpdf = new Router();
 		$gfpdf->init();
-
-		/* Add backwards compatibility support */
-		$deprecated = new GFPDF_Core();
-		$deprecated->setup_constants();
-		$deprecated->setup_deprecated_paths();
 	}
 
 	/**
@@ -445,7 +418,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
 
 			/* Localise admin script */
-			$data = $this->data->get_localised_script_data( $this->options, $this->gform );
+			$data = $this->data->get_localised_script_data( $this->options, $this->gform, $this->templates );
 
 			wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $data );
 			wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $data );

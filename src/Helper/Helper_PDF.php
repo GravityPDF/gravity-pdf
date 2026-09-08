@@ -5,10 +5,9 @@ namespace GFPDF\Helper;
 use Exception;
 use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
-use GFPDF\Statics\Deprecation;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF\Helper\Mpdf\Mpdf;
-use GFPDF\Statics\Deprecation_V3;
+use GFPDF\Statics\Template_Constants;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
@@ -205,6 +204,9 @@ class Helper_PDF {
 
 		$this->set_path();
 		$this->set_print_dialog( ! empty( $settings['print'] ) );
+
+		/* The earliest point common to every render path, and the only scope the v3 template constants exist in */
+		Template_Constants::maybe_define( $data, $templates );
 	}
 
 	/**
@@ -267,10 +269,6 @@ class Helper_PDF {
 			$html = $this->load_html( $args );
 		}
 
-		/* Apply our filters */
-		$html = Deprecation::apply_filters( 'gfpdfe_pdf_template', [ $html, $form['id'], $this->entry['id'], $args['settings'] ] );
-		$html = Deprecation::apply_filters( 'gfpdfe_pdf_template_' . $form['id'], [ $html, $this->entry['id'], $args['settings'] ], 'gfpdf_pdf_html_output_' . $form['id'] );
-
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
 		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
 		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
@@ -302,13 +300,6 @@ class Helper_PDF {
 		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_mpdf_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
-
-		/* deprecated backwards compatibility filters */
-		$legacy_args = [ $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ];
-
-		foreach ( [ 'gfpdfe_mpdf_class_pre_render', 'gfpdfe_pre_render_pdf', 'gfpdfe_mpdf_class' ] as $legacy_hook ) {
-			$this->mpdf = Deprecation::apply_filters( $legacy_hook, array_merge( [ $this->mpdf ], $legacy_args ) );
-		}
 
 		do_action( 'gfpdf_pre_pdf_generation_output', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
@@ -370,32 +361,23 @@ class Helper_PDF {
 	public function set_template() {
 
 		$template = ( isset( $this->settings['template'] ) ) ? $this->settings['template'] : '';
-
-		/* Allow a user to change the current template if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
-			$template = rgget( 'template' );
-
-			/*
-			 * Handle legacy v3 URL structure and strip .php from the end of the template
-			 */
-
-			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
-				$template = substr( $template, 0, -4 );
-			}
-
-			$template = sanitize_html_class( $template );
-		}
+		$template = $this->templates->get_requested_template_id( $template );
 
 		$this->template_path = $this->templates->get_template_path_by_id( $template );
 
-		/* Check if there are version requirements */
 		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
 
+		/* Refused rather than left to load_html(), which would include a v3 template whose Gravity Forms scaffolding
+		   is gone: its boilerplate returns early and mPDF writes a blank PDF the caller reads as a success */
 		if ( $this->templates->is_legacy_template( $template_info ) ) {
-			Deprecation_V3::restore_v3_form_class();
+			/* Named in full because no visitor reads this: Model_PDF::process_and_save_pdf() catches it into the log
+			   and returns a fixed message, and Controller_PDF::pdf_error() gates that on gravityforms_view_settings.
+			   Gating it a second time here would only blank the template name on cron, REST and WP-CLI renders */
+			/* translators: 1: PDF template name wrapped in <em> tags, 2: URL of the legacy template upgrade guide */
+			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s is a legacy (v3) template, which Gravity PDF no longer renders. Rebuild it as a v4 template: %2$s', 'gravity-pdf' ), '<em>' . esc_html( $template ) . '</em>', esc_url( 'https://docs.gravitypdf.com/upgrade/legacy-templates/' ) ) );
 		}
 
+		/* Check if there are version requirements */
 		if ( ! $this->templates->is_template_compatible( $template_info['required_pdf_version'] ) ) {
 			/* translators: 1: PDF template name wrapped in <em> tags, 2: Required Gravity PDF version wrapped in <em> tags */
 			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-pdf' ), '<em>' . esc_html( $template ) . '</em>', '<em>' . esc_html( $template_info['required_pdf_version'] ) . '</em>' ) );

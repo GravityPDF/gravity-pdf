@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Statics;
 
 use GFPDF\Helper\Helper_Interface_Deprecated_Features;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 
 /**
  * @package     Gravity PDF
@@ -24,6 +25,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 
+	use Helper_Trait_Removed_Methods;
+
 	/**
 	 * The release the v3 backwards compatibility layer is removed in
 	 *
@@ -31,22 +34,6 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	 * @since 6.17.0
 	 */
 	const REMOVED_IN = '7.0';
-
-	/**
-	 * The release the v3 backwards compatibility layer was deprecated in
-	 *
-	 * @var string
-	 * @since 6.17.0
-	 */
-	const DEPRECATED_IN = '4.0';
-
-	/**
-	 * The feature ID legacy download URLs are detected and reported under
-	 *
-	 * @var string
-	 * @since 6.17.0
-	 */
-	const FEATURE_LEGACY_ENDPOINT = 'legacy_endpoint';
 
 	/**
 	 * The query argument every legacy `?gf_pdf=1` download URL carries
@@ -57,31 +44,15 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	const LEGACY_URL_MARKER = 'gf_pdf=1';
 
 	/**
-	 * The option the forms that have served a legacy download URL are recorded in
+	 * The option 6.17 recorded the forms a legacy download URL had been served for
 	 *
-	 * Kept out of `gfpdf_settings` and out of the autoloaded set: it is written from the front end, and only the
-	 * report, Site Health and uninstall paths ever read it.
+	 * Nothing writes it since 7.0 removed the endpoint. It is still declared so uninstall clears the record left on
+	 * a site that ran 6.17.
 	 *
 	 * @var string
 	 * @since 6.17.0
 	 */
 	const LEGACY_ENDPOINT_OPTION = 'gfpdf_legacy_endpoint_usage';
-
-	/**
-	 * How long a form stays recorded after the last legacy download URL was served for it
-	 *
-	 * @var int
-	 * @since 6.17.0
-	 */
-	const LEGACY_ENDPOINT_TTL = 30 * DAY_IN_SECONDS;
-
-	/**
-	 * How often a form already on the record is written again
-	 *
-	 * @var int
-	 * @since 6.17.0
-	 */
-	const LEGACY_ENDPOINT_REFRESH = DAY_IN_SECONDS;
 
 	/**
 	 * The prefix every v3 hook carries, including the dynamic ones the map below can't name
@@ -103,22 +74,6 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	const BUSINESS_PLUS_MARKER = 'gfpdfe_business_plus::initilise';
 
 	/**
-	 * The class the v3 "Advanced Templating" (Tier 2) add-on declares
-	 *
-	 * @var string
-	 * @since 6.17.0
-	 */
-	const TIER_2_ADDON_CLASS = 'gfpdfe_business_plus';
-
-	/**
-	 * The `gfpdfe_pre_load_template` callback core registers itself, which the listener scan must ignore
-	 *
-	 * @var array
-	 * @since 6.17.0
-	 */
-	const INTERNAL_FILTER_CALLBACK = [ 'PDFRender', 'prepare_ids' ];
-
-	/**
 	 * What the legacy template scan found this request, keyed on the installed template list it read
 	 *
 	 * @var array<string, array<string, array<string, int[]>>>
@@ -132,52 +87,56 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	 */
 	public static function get_features(): array {
 		return [
-			'legacy_templates'              => [
+			'legacy_templates'        => [
 				'label'      => __( 'Legacy Templates', 'gravity-pdf' ),
-				'group'      => Deprecation::GROUP_DEPRECATED,
+				'group'      => Deprecation::GROUP_UNSUPPORTED,
 				'removed_in' => static::REMOVED_IN,
 				'url'        => 'https://docs.gravitypdf.com/upgrade/legacy-templates/',
 				'detect'     => [ static::class, 'get_legacy_templates' ],
+				/* translators: %s: The Gravity PDF version the feature was removed in */
+				'notice'     => __( 'PDFs that use a legacy template can no longer be generated in Gravity PDF %s. Rebuild those templates in the current format.', 'gravity-pdf' ),
 			],
 
-			'business_plus_templates'       => [
+			'business_plus_templates' => [
 				'label'      => __( 'Business Plus / Tier 2 Templates', 'gravity-pdf' ),
-				'group'      => Deprecation::GROUP_DEPRECATED,
+				'group'      => Deprecation::GROUP_UNSUPPORTED,
 				'removed_in' => static::REMOVED_IN,
 				'url'        => 'https://docs.gravitypdf.com/upgrade/legacy-templates/#business-plus--tier-2-template-upgrade-guide',
 				'detect'     => [ static::class, 'get_business_plus_templates' ],
+				/* translators: %s: The Gravity PDF version the feature was removed in */
+				'notice'     => __( 'PDFs built with Advanced Templating can no longer be generated in Gravity PDF %s. Contact GravityPDF.com to discuss your upgrade options.', 'gravity-pdf' ),
 			],
 
-			static::FEATURE_LEGACY_ENDPOINT => [
+			'legacy_endpoint'         => [
 				'label'      => __( 'Legacy Download URLs', 'gravity-pdf' ),
-				'group'      => Deprecation::GROUP_DEPRECATED,
+				'group'      => Deprecation::GROUP_UNSUPPORTED,
 				'removed_in' => static::REMOVED_IN,
 				'url'        => 'https://docs.gravitypdf.com/upgrade/legacy-download-urls/',
 				'detect'     => [ static::class, 'get_legacy_download_urls' ],
-				/* translators: %s: The Gravity PDF version the feature is removed in */
-				'notice'     => __( 'Support for legacy download URLs will be removed in Gravity PDF %s.', 'gravity-pdf' ),
+				/* translators: %s: The Gravity PDF version the feature was removed in */
+				'notice'     => __( 'Old PDF download links stopped working in Gravity PDF %s, so anyone who clicks one will not get their PDF. Replace those links with the [gravitypdf] shortcode or a PDF merge tag.', 'gravity-pdf' ),
 			],
 
-			'deprecated_filters'            => [
-				'label'              => __( 'Actions and Filters', 'gravity-pdf' ),
-				'group'              => Deprecation::GROUP_DEPRECATED,
-				'removed_in'         => static::REMOVED_IN,
-				'url'                => 'https://docs.gravitypdf.com/upgrade/deprecated-filters/',
-				'detect'             => [ static::class, 'get_active_deprecated_filters' ],
+			'deprecated_filters'      => [
+				'label'       => __( 'Actions and Filters', 'gravity-pdf' ),
+				'group'       => Deprecation::GROUP_UNSUPPORTED,
+				'removed_in'  => static::REMOVED_IN,
+				'url'         => 'https://docs.gravitypdf.com/upgrade/deprecated-filters/',
+				'detect'      => [ static::class, 'get_active_deprecated_filters' ],
 				/* The label is a category, so out of its report row the fallback would read as the whole hook API */
-				/* translators: %s: The Gravity PDF version the hooks are removed in */
-				'notice'             => __( 'Code on this site uses Gravity PDF hooks that are removed in version %s.', 'gravity-pdf' ),
-				'hooks'              => static::get_deprecated_filters(),
-				'deprecated_in'      => static::DEPRECATED_IN,
-				'hook_prefix'        => static::HOOK_PREFIX,
-				/* Declared so the notice discounts them the same way the detector already does */
-				'internal_callbacks' => [ static::INTERNAL_FILTER_CALLBACK ],
+				/* translators: %s: The Gravity PDF version the hooks were removed in */
+				'notice'      => __( 'Custom code on this site uses Gravity PDF hooks that were removed in version %s and has stopped running. Update it to use the current hooks.', 'gravity-pdf' ),
+				'hooks'       => static::get_deprecated_filters(),
+				'hook_prefix' => static::HOOK_PREFIX,
 			],
 		];
 	}
 
 	/**
-	 * The deprecated v3 filters still fired by core, mapped to their v4+ replacement
+	 * The v3 hooks Gravity PDF removed, mapped to their v4+ replacement
+	 *
+	 * Nothing fires these any more, so a listener is a callback that has silently stopped running. The map is what
+	 * the detector reports against, and what names the replacement to move to.
 	 *
 	 * An empty replacement means no equivalent exists.
 	 *
@@ -214,35 +173,15 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	}
 
 	/**
-	 * Get the deprecated v3 filters that currently have a third-party listener attached
+	 * Get the removed v3 hooks that still have a listener attached
+	 *
+	 * Nothing in core registers on these any more, so every callback found is third party.
 	 *
 	 * @return array<string, int> Hook name mapped to the number of listeners
 	 * @since 6.17.0
 	 */
 	public static function get_active_deprecated_filters(): array {
-		return Deprecation::get_hooks_with_listeners(
-			static::get_deprecated_filters(),
-			static::HOOK_PREFIX,
-			[ static::INTERNAL_FILTER_CALLBACK ]
-		);
-	}
-
-	/**
-	 * Restore the `RGForms` class the v3 template boilerplate guards on
-	 *
-	 * Gravity Forms declared `RGForms` as an empty subclass of `GFForms`, deprecated it in 2.10.5 and removed it in
-	 * 3.0. Every v3 template opens by checking for it and returning when it's missing, so the PDF renders with no
-	 * content at all — no fatal, and nothing in the log to explain the blank page. Aliasing the class it extended
-	 * puts the check back in the only place it still matters, until 7.0 removes these templates along with it.
-	 *
-	 * @since 6.17.0
-	 */
-	public static function restore_v3_form_class(): void {
-		if ( class_exists( 'RGForms' ) || ! class_exists( 'GFForms' ) ) {
-			return;
-		}
-
-		class_alias( 'GFForms', 'RGForms' );
+		return Deprecation::get_hooks_with_listeners( static::get_deprecated_filters(), static::HOOK_PREFIX );
 	}
 
 	/**
@@ -254,12 +193,11 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	}
 
 	/**
-	 * Get the forms still tied to a legacy `?gf_pdf=1` download URL
+	 * Get the forms still handing out a legacy `?gf_pdf=1` download URL
 	 *
-	 * Two sources are combined: the forms whose stored settings, confirmations or notifications hand one of these
-	 * URLs out, and the forms one has actually been served for — see self::record_legacy_endpoint_usage(). The scan
-	 * finds a URL nobody has followed yet; the record finds one living somewhere the scan can't see, like a page or
-	 * an email that has already gone out.
+	 * 7.0 removed the endpoint, and `gf_pdf` was never a registered query var, so WordPress sees no route at all and
+	 * serves the front page with a 200 — the link looks fine and quietly stops producing a PDF. Reporting the forms
+	 * whose stored settings, confirmations or notifications still contain one is what tells a site which to replace.
 	 *
 	 * @return array List of form IDs, ascending
 	 * @since 6.17.0
@@ -269,13 +207,9 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 
 		$marker = '%' . $wpdb->esc_like( static::LEGACY_URL_MARKER ) . '%';
 
-		/* Recorded IDs are cast on the way in and out, so they're safe to interpolate */
-		$recorded        = static::get_recorded_legacy_endpoint_usage();
-		$recorded_clause = $recorded === [] ? '' : sprintf( 'meta.form_id IN ( %s ) OR', implode( ',', $recorded ) );
-
 		$forms = static::scan_forms(
 			'meta.form_id',
-			"{$recorded_clause} meta.display_meta LIKE %s OR meta.confirmations LIKE %s OR meta.notifications LIKE %s",
+			'meta.display_meta LIKE %s OR meta.confirmations LIKE %s OR meta.notifications LIKE %s',
 			[ $marker, $marker, $marker ]
 		);
 
@@ -314,103 +248,6 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 			ARRAY_A
 		);
 		//phpcs:enable WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
-	}
-
-	/**
-	 * The forms a legacy `?gf_pdf=1` download URL has actually been served for
-	 *
-	 * A record older than self::LEGACY_ENDPOINT_TTL is dropped as it's read, so a form stops being reported once
-	 * the links pointing at it have gone quiet. Gravity PDF can't tell whether a URL it served last year still
-	 * exists, and without an expiry the form would be reported forever.
-	 *
-	 * @return array List of form IDs, ascending
-	 * @since 6.17.0
-	 */
-	public static function get_recorded_legacy_endpoint_usage(): array {
-		$recorded = array_map( 'intval', static::get_legacy_endpoint_records() );
-		$cutoff   = time() - static::LEGACY_ENDPOINT_TTL;
-
-		ksort( $recorded );
-
-		$current = array_filter(
-			$recorded,
-			function ( $last_served ) use ( $cutoff ) {
-				return $last_served >= $cutoff;
-			}
-		);
-
-		if ( $current !== $recorded ) {
-			update_option( static::LEGACY_ENDPOINT_OPTION, $current, false );
-		}
-
-		return array_map( 'intval', array_keys( $current ) );
-	}
-
-	/**
-	 * The raw record, mapping each form to when a legacy download URL was last served for it
-	 *
-	 * Left in the order it was stored: the front end reads this on every legacy download to check one timestamp,
-	 * and only self::get_recorded_legacy_endpoint_usage() promises an order.
-	 *
-	 * @return array<int, int> Form ID mapped to a Unix timestamp
-	 * @since 6.17.0
-	 */
-	protected static function get_legacy_endpoint_records(): array {
-		return (array) get_option( static::LEGACY_ENDPOINT_OPTION, [] );
-	}
-
-	/**
-	 * Record that a legacy `?gf_pdf=1` download URL has been served for a form
-	 *
-	 * Called by the endpoint itself, once it has resolved the request to a real PDF, so a URL that lives outside the
-	 * form's own settings is still reported. The timestamp is what self::get_recorded_legacy_endpoint_usage() expires
-	 * the form on, so it's refreshed while the links are still being followed — at most once a day, since this runs
-	 * on the front end.
-	 *
-	 * @param int $form_id The form the PDF was served from
-	 *
-	 * @since 6.17.0
-	 */
-	public static function record_legacy_endpoint_usage( int $form_id ): void {
-		$recorded = static::get_legacy_endpoint_records();
-		$now      = time();
-
-		if ( ( $recorded[ $form_id ] ?? 0 ) > $now - static::LEGACY_ENDPOINT_REFRESH ) {
-			return;
-		}
-
-		$recorded[ $form_id ] = $now;
-
-		update_option( static::LEGACY_ENDPOINT_OPTION, $recorded, false );
-
-		/* The notices read a record taken at install and on each version change, which a URL followed since then
-		   won't be in yet */
-		Deprecation::mark_feature_detected( static::FEATURE_LEGACY_ENDPOINT );
-
-		/* This is what the endpoint detector reads, so anything detecting later in the request reads it fresh */
-		Deprecation::flush_cache();
-	}
-
-	/**
-	 * Check if the v3 "Advanced Templating" (Tier 2) add-on is installed
-	 *
-	 * @since 6.17.0
-	 */
-	public static function has_tier_2_addon(): bool {
-		return class_exists( static::TIER_2_ADDON_CLASS );
-	}
-
-	/**
-	 * Check if a PDF is configured to use the v3 Advanced Templating mode
-	 *
-	 * Compared case-insensitively, which is how the render path has always read the setting.
-	 *
-	 * @param array $settings The PDF settings
-	 *
-	 * @since 6.17.0
-	 */
-	public static function is_advanced_template_pdf( array $settings ): bool {
-		return strtolower( (string) ( $settings['advanced_template'] ?? '' ) ) === 'yes';
 	}
 
 	/**

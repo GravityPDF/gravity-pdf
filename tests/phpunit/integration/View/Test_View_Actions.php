@@ -37,10 +37,10 @@ class Test_View_Actions extends TestCase {
 	public function test_deprecated_features_lists_each_one_and_links_to_its_upgrade_guide() {
 		$html = $this->view->deprecated_features( [ 'legacy_templates', 'legacy_endpoint' ], 'deprecated_features', 'View the system report' );
 
-		$this->assertStringContainsString( 'Support for Legacy Templates will be removed in Gravity PDF 7.0.', $html );
+		$this->assertStringContainsString( 'PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0. Rebuild those templates in the current format.', $html );
 		$this->assertStringContainsString( 'upgrade/legacy-templates/', $html );
 
-		$this->assertStringContainsString( 'Support for legacy download URLs will be removed in Gravity PDF 7.0.', $html );
+		$this->assertStringContainsString( 'Old PDF download links stopped working in Gravity PDF 7.0, so anyone who clicks one will not get their PDF. Replace those links with the [gravitypdf] shortcode or a PDF merge tag.', $html );
 		$this->assertStringContainsString( 'upgrade/legacy-download-urls/', $html );
 
 		/* The notice can be acted on or dismissed, and one dismissal covers everything it listed */

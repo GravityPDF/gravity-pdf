@@ -23,8 +23,7 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF\Statics\Deprecation;
-use GFPDF\Statics\Deprecation_V3;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GFQuiz;
@@ -56,6 +55,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @method Controller_PDF getController
  */
 class Model_PDF extends Helper_Abstract_Model {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -248,7 +249,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * To prevent cache misses we need to ensure we don't unnecessarily modify the settings array
 		 */
 		unset( $settings['pdf_action'] );
-		$action = Deprecation::apply_filters( 'gfpdfe_pdf_output_type', [ $action ] );
 		$action = in_array( $action, [ 'view', 'download' ], true ) ? $action : 'view';
 
 		/* Get the PDF document for the request */
@@ -275,51 +275,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		do_action( 'gfpdf_post_view_or_download_pdf', $path_to_pdf, $form, $entry, $settings, $action );
 
 		$this->send_pdf_to_browser( $path_to_pdf, $action );
-	}
-
-	/**
-	 * Apply filters to particular settings to maintain backwards compatibility
-	 * Note: If you want to modify the $settings array you should use the new "gfpdf_pdf_config" filter instead
-	 *
-	 * @param array $settings The PDF settings array
-	 * @param array $entry
-	 *
-	 * @return array           The $settings array
-	 *
-	 * @since  4.0
-	 */
-	public function apply_backwards_compatibility_filters( $settings, $entry ) {
-
-		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
-
-		$settings['filename'] = $this->misc->remove_extension_from_string( Deprecation::apply_filters( 'gfpdfe_pdf_name', [ $settings['filename'], $form, $entry ] ) );
-		$settings['template'] = $this->misc->remove_extension_from_string( Deprecation::apply_filters( 'gfpdfe_template', [ $settings['template'], $form, $entry ] ), '.php' );
-
-		if ( isset( $settings['orientation'] ) ) {
-			$settings['orientation'] = Deprecation::apply_filters( 'gfpdf_orientation', [ $settings['orientation'], $form, $entry ] );
-		}
-
-		if ( isset( $settings['security'] ) ) {
-			$settings['security'] = $this->misc->update_deprecated_config( Deprecation::apply_filters( 'gfpdf_security', [ $settings['security'], $form, $entry ] ) );
-		}
-
-		if ( isset( $settings['privileges'] ) ) {
-			$settings['privileges'] = Deprecation::apply_filters( 'gfpdf_privilages', [ $settings['privileges'], $form, $entry ] );
-		}
-
-		if ( isset( $settings['password'] ) ) {
-			$settings['password'] = Deprecation::apply_filters( 'gfpdf_password', [ $settings['password'], $form, $entry ] );
-		}
-
-		if ( isset( $settings['master_password'] ) ) {
-			$settings['master_password'] = Deprecation::apply_filters( 'gfpdf_master_password', [ $settings['master_password'], $form, $entry ] );
-		}
-
-		if ( isset( $settings['rtl'] ) ) {
-			$settings['rtl'] = $this->misc->update_deprecated_config( Deprecation::apply_filters( 'gfpdf_rtl', [ $settings['rtl'], $form, $entry ] ) );
-		}
-
-		return $settings;
 	}
 
 	/**
@@ -866,9 +821,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		 */
 		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $settings );
 
-		/* Backwards compatible filter */
-		$name = Deprecation::apply_filters( 'gfpdfe_pdf_filename', [ $name, $form, $entry, $settings ] );
-
 		/* Remove any characters that cannot be present in a filename */
 		$name = $this->misc->strip_invalid_characters( $name );
 
@@ -882,7 +834,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param integer $id           The Gravity Form entry ID
 	 * @param boolean $download     Whether the PDF should be downloaded or not
 	 * @param boolean $should_print Whether we should mark the PDF to be printed
-	 * @param boolean $esc          Whether to escape the URL or not
+	 * @param boolean $esc          Ignored since 6.4. The URL is always escaped; late-escape the return value instead
 	 *
 	 * @return string       Direct link to the PDF
 	 *
@@ -1252,8 +1204,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$entry,
 			$this->get_form_data( $entry ),
 			$settings,
-			$this->templates->get_config_class( $settings['template'] ),
-			$this->misc->get_legacy_ids( $entry['id'], $settings )
+			$this->templates->get_config_class( $settings['template'] )
 		);
 
 		/* Add backwards compatibility support */
@@ -1266,15 +1217,6 @@ class Model_PDF extends Helper_Abstract_Model {
 			$pdf_generator->init();
 			$pdf_generator->set_template();
 			$pdf_generator->set_output_type( 'save' );
-
-			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-			if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
-
-				/* Check if we should process this document using our legacy system */
-				if ( $this->handle_legacy_tier_2_processing( $pdf_generator, $entry, $settings, $args ) ) {
-					return true;
-				}
-			}
 
 			/* Render the PDF template HTML */
 			$pdf_generator->render_html( $args );
@@ -1439,44 +1381,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_form_data', $data, $entry, $form );
-	}
-
-	/**
-	 * Handles the loading and running of our legacy Tier 2 PDF templates
-	 *
-	 * @param Helper_PDF $pdf_generator The Helper_PDF object
-	 * @param array      $entry         The Gravity Forms raw entry data
-	 * @param array      $settings      The Gravity PDF settings
-	 * @param array      $args          The data that should be passed directly to a PDF template
-	 *
-	 * @return bool
-	 *
-	 * @since 4.0
-	 */
-	public function handle_legacy_tier_2_processing( Helper_PDF $pdf_generator, $entry, $settings, $args ) {
-
-		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
-
-		$this->log->warning( sprintf( 'Advanced Templating (Tier 2) processing is removed in Gravity PDF %s. Contact GravityPDF.com to discuss upgrade options.', Deprecation_V3::REMOVED_IN ) );
-
-		/* The add-on runs the template file itself, so Helper_PDF::set_template() never sees it */
-		Deprecation_V3::restore_v3_form_class();
-
-		$prevent_main_pdf_loader = Deprecation::apply_filters(
-			'gfpdfe_pre_load_template',
-			[
-				$form['id'],
-				$entry['id'],
-				basename( $pdf_generator->get_template_path() ),
-				$form['id'] . $entry['id'],
-				$this->misc->backwards_compat_output( $pdf_generator->get_output_type() ),
-				$pdf_generator->get_filename(),
-				$this->misc->backwards_compat_conversion( $settings, $form, $entry ),
-				$args,
-			]
-		);
-
-		return $prevent_main_pdf_loader === true;
 	}
 
 	/**
@@ -2046,92 +1950,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Triggered after the Gravity Form entry is updated
-	 *
-	 * @param array $form
-	 * @param int   $entry_id
-	 *
-	 * @deprecated 6.12 Caching layer + auto-purge added
-	 */
-	public function cleanup_pdf_after_submission( $form, $entry_id ) {
-		_deprecated_function( __METHOD__, '6.12' );
-
-		/* Exit if background processing is enabled */
-		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
-			return;
-		}
-
-		$entry = $this->gform->get_entry( $entry_id );
-
-		/* Exit if GF async notifications is enabled */
-		$notifications = array_column( $form['notifications'] ?? [], 'id' );
-		if ( $this->is_gform_asynchronous_notifications_enabled( $notifications, $form, $entry ) ) {
-			return;
-		}
-
-		$this->cleanup_pdf( $entry, $form );
-	}
-
-	/**
-	 * Remove the generated PDF from the server to save disk space
-	 *
-	 * @param array $entry The GF Entry Data
-	 * @param array $form  The Gravity Form
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated 6.12 Caching layer + auto-purge added
-	 */
-	public function cleanup_pdf( $entry, $form ) {
-		_deprecated_function( __METHOD__, '6.12' );
-
-		$pdfs = $this->get_active_pdfs( $form['gfpdf_form_settings'] ?? [], $entry );
-
-		if ( count( $pdfs ) === 0 ) {
-			return;
-		}
-
-		$tmp_path_directory = realpath( $this->data->template_tmp_location );
-
-		/* loop through each PDF config */
-		foreach ( $pdfs as $pdf ) {
-			$pdf_generator = new Helper_PDF( $entry, $pdf, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
-			$path          = $pdf_generator->get_path();
-
-			/* Verify we are only deleting files in the designated tmp directory */
-			$path_to_test = realpath( $path );
-			if ( $path_to_test === false || strpos( $path_to_test, $tmp_path_directory ) !== 0 || ! is_dir( $path ) ) {
-				continue;
-			}
-
-			$this->misc->rmdir( $path );
-		}
-	}
-
-	/**
-	 * Clean-up any PDFs stored on disk before we resend any notifications
-	 *
-	 * @param array $form    The Gravity Forms object
-	 * @param array $entries An array of Gravity Form entry IDs
-	 *
-	 * @return array We tapped into a filter so we need to return the form object
-	 * @since 4.0
-	 * @deprecated 6.12 Caching layer + auto-purge added
-	 */
-	public function resend_notification_pdf_cleanup( $form, $entries ) {
-		_deprecated_function( __METHOD__, '6.12' );
-
-		foreach ( $entries as $entry_id ) {
-			$entry = $this->gform->get_entry( $entry_id );
-			$this->cleanup_pdf( $entry, $form );
-		}
-
-		return $form;
-	}
-
-	/**
 	 * Check if any of the form's notification is set to asynchronous
 	 *
 	 * @param array $notifications An array containing the IDs of the notifications to be sent.
@@ -2223,48 +2041,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return $fonts;
-	}
-
-	/**
-	 * Attempts to find a configuration which matches the legacy routing method
-	 *
-	 * @param array $config
-	 *
-	 * @return mixed
-	 *
-	 * @since  4.0
-	 * @deprecated 4.0 Added for backwards compatibility, but ideally should not be used
-	 */
-	public function get_legacy_config( $config ) {
-		_deprecated_function( __METHOD__, '4.0', 'the [gravitypdf] shortcode or PDF merge tags, https://docs.gravitypdf.com/upgrade/legacy-download-urls/' );
-
-		/* Get the form settings */
-		$pdfs = $this->options->get_form_pdfs( $config['fid'] );
-
-		if ( is_wp_error( $pdfs ) ) {
-			return $pdfs;
-		}
-
-		/* Reindex the $pdfs keys */
-		$pdfs = array_values( $pdfs );
-
-		/* Use the legacy aid to determine which PDF to load */
-		if ( isset( $config['aid'] ) && $config['aid'] !== false ) {
-			$selector = $config['aid'] - 1;
-
-			if ( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] === $config['template'] ) {
-				return $pdfs[ $selector ]['id'];
-			}
-		}
-
-		/* The aid method failed so lets load the first matching configuration */
-		foreach ( $pdfs as $pdf ) {
-			if ( $pdf['active'] === true && $pdf['template'] === $config['template'] ) {
-				return $pdf['id'];
-			}
-		}
-
-		return new WP_Error( 'pdf_configuration_error', esc_html__( 'Could not find PDF configuration requested', 'gravity-pdf' ) );
 	}
 
 	/**

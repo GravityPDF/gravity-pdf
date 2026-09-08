@@ -12,6 +12,7 @@ use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Controller_Uninstaller;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_Install;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -33,6 +34,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Controller_Install extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+
+	use Helper_Trait_Removed_Methods;
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -196,16 +199,5 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			do_action( 'gfpdf_version_changed', get_option( 'gfpdf_current_version' ), PDF_EXTENDED_VERSION );
 			update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
 		}
-	}
-
-	/**
-	 * Determine if we should be saving the PDF settings
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated 6.0
-	 */
-	public function maybe_uninstall() {
-		_deprecated_function( __METHOD__, '6.0', 'Controller_Uninstall::uninstall_addon()' );
 	}
 }

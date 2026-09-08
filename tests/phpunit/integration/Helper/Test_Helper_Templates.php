@@ -6,6 +6,7 @@ namespace GFPDF\Helper;
 use Exception;
 use GFPDF\Helper\Helper_Templates;
 use GPDFAPI;
+use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -23,6 +24,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group helper-templates
  */
 class Test_Helper_Templates extends TestCase {
+
+	use CreatesLegacyTemplates;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -166,6 +169,20 @@ class Test_Helper_Templates extends TestCase {
 
 		$this->assertArrayHasKey( 'Core', $templates );
 		$this->assertCount( 4, $templates['Core'] );
+	}
+
+	/**
+	 * A v3 template is left out of the list the template dropdown is built from, since set_template() refuses to
+	 * render one: there is no point offering a selection that cannot produce a PDF
+	 */
+	public function test_get_all_templates_by_group_omits_legacy_templates() {
+		$path = $this->create_legacy_template();
+
+		$templates = $this->templates->get_all_templates_by_group();
+
+		$this->assertArrayNotHasKey( 'Legacy', $templates );
+
+		$this->delete_legacy_templates( $path );
 	}
 
 	/**
@@ -341,8 +358,8 @@ class Test_Helper_Templates extends TestCase {
 		/* Test default template */
 		$this->assertInstanceOf( 'GFPDF\Templates\Config\Zadani', $this->templates->get_config_class( 'zadani' ) );
 
-		/* Test legacy templates */
-		$this->assertInstanceOf( 'GFPDF\Templates\Config\Legacy', $this->templates->get_config_class( 'default-template' ) );
+		/* A v3 template no longer gets the shared Legacy config class */
+		$this->assertInstanceOf( 'stdClass', $this->templates->get_config_class( 'default-template' ) );
 	}
 
 	/**
@@ -491,8 +508,7 @@ class Test_Helper_Templates extends TestCase {
 			$entry,
 			$model_pdf->get_form_data( $entry ),
 			$pdf,
-			$this->templates->get_config_class( $pdf['template'] ),
-			$misc->get_legacy_ids( $entry['id'], $pdf )
+			$this->templates->get_config_class( $pdf['template'] )
 		);
 
 		/* Check all our keys exist */
@@ -525,5 +541,10 @@ class Test_Helper_Templates extends TestCase {
 
 		/* Check our config class has the settings populated */
 		$this->assertSame( $data['settings'], $data['config']->get_settings() );
+
+		/* The seventh argument is still accepted, so a caller on the old signature does not fatal, but it is ignored */
+		$data = $this->templates->get_template_arguments( $form, [], $entry, [], $pdf, null, [ 1, 2, 3 ] );
+
+		$this->assertSame( [ $entry['id'] ], $data['lead_ids'] );
 	}
 }

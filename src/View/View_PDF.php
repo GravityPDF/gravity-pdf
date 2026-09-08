@@ -17,13 +17,9 @@ use GFPDF\Helper\Helper_Field_Container_Gf25;
 use GFPDF\Helper\Helper_Field_Container_Void;
 use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Statics\Debug;
-use GFPDF\Statics\Deprecation;
-use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Statics\Kses;
-use GFPDFEntryDetail;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -145,6 +141,10 @@ class View_PDF extends Helper_Abstract_View {
 	/**
 	 * Legacy view/download PDF generator
 	 *
+	 * Since 7.0 this hands the whole job to \GPDFAPI::create_pdf() and streams what comes back, rather than driving
+	 * Helper_PDF itself. The API path is cached and runs the current hooks, so a caller still on this method gets the
+	 * same document every other render produces.
+	 *
 	 * @param array $entry    The Gravity Forms Entry to process
 	 * @param array $settings The Gravity Form PDF Settings
 	 *
@@ -155,112 +155,16 @@ class View_PDF extends Helper_Abstract_View {
 	public function generate_pdf( $entry, $settings ) {
 		_deprecated_function( __METHOD__, '6.12', '\GPDFAPI::create_pdf()' );
 
-		$controller = $this->getController();
-		$model      = $controller->model;
-		$form       = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
+		$path_to_pdf = \GPDFAPI::create_pdf( $entry['id'] ?? 0, $settings['id'] ?? '' );
 
-		do_action( 'gfpdf_view_or_download_pdf', $form, $entry, $settings );
-
-		$settings['pdf_action'] = Deprecation::apply_filters( 'gfpdfe_pdf_output_type', [ $settings['pdf_action'] ?? 'download' ] );
-
-		/* Setup the PDF that will be generated */
-		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
-		$pdf_generator->set_filename( $model->get_pdf_name( $settings, $entry ) );
-		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
-
-		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf_generator );
-
-		/**
-		 * Load our arguments that should be accessed by our PDF template
-		 *
-		 * @var array
-		 */
-		$args = $this->templates->get_template_arguments(
-			$form,
-			$this->misc->get_fields_sorted_by_id( $form['id'] ),
-			$entry,
-			$model->get_form_data( $entry ),
-			$settings,
-			$this->templates->get_config_class( $settings['template'] ),
-			$this->misc->get_legacy_ids( $entry['id'], $settings )
-		);
-
-		/* Show $form_data array if requested */
-		if ( $this->maybe_view_form_data() ) {
-			$this->view_form_data( $args['form_data'] ?? [] );
+		/* Model_PDF has already logged the cause; every message that reaches here is one a visitor may read */
+		if ( is_wp_error( $path_to_pdf ) ) {
+			wp_die( esc_html( $path_to_pdf->get_error_message() ) );
 		}
 
-		try {
-
-			/* Initialise our PDF helper class */
-			$pdf_generator->init();
-			$pdf_generator->set_template();
-
-			/* Set display type and allow user to override the behaviour */
-			if ( $settings['pdf_action'] === 'download' ) {
-				$pdf_generator->set_output_type( 'download' );
-			}
-
-			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-			if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
-
-				/* Check if we should process this document using our legacy system */
-				if ( $model->handle_legacy_tier_2_processing( $pdf_generator, $entry, $settings, $args ) ) {
-					return;
-				}
-			}
-
-			/* Determine if we should show the print dialog box */
-			if ( rgget( 'print' ) ) {
-				$pdf_generator->set_print_dialog();
-			}
-
-			/* Render the PDF template HTML */
-			$pdf_generator->render_html( $args );
-
-			/* Generate PDF */
-			$pdf_generator->generate();
-
-		} catch ( Exception $e ) {
-
-			$this->log->error(
-				'PDF Generation Error',
-				[
-					'entry'     => $entry,
-					'settings'  => $settings,
-					'exception' => $e->getMessage(),
-				]
-			);
-
-			if ( $this->gform->has_capability( 'gravityforms_view_entries' ) ) {
-				$message = sprintf(
-					'%s in %s on line %s',
-					$e->getMessage(),
-					$e->getFile(),
-					$e->getLine()
-				);
-
-				wp_die( esc_html( $message ) );
-			}
-
-			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-pdf' ) );
-		}
-	}
-
-	/**
-	 * Ensure a PHP extension is added to the end of the template name
-	 *
-	 * @param string $name The PHP template
-	 *
-	 * @return string
-	 *
-	 * @since  4.0
-	 * @deprecated 4.1
-	 */
-	public function get_template_filename( $name ) {
-		_deprecated_function( __METHOD__, '4.1', 'Helper_Misc::get_file_with_extension()' );
-
-		return $this->misc->get_file_with_extension( $name, '.php' );
+		/* Asked for by name rather than reached through getController(), which is null for the caller this method
+		   exists to keep alive: one that built View_PDF itself instead of taking the container's */
+		\GPDFAPI::get_pdf_class( 'model' )->send_pdf_to_browser( $path_to_pdf, $settings['pdf_action'] ?? 'download' );
 	}
 
 	/**
@@ -422,7 +326,6 @@ class View_PDF extends Helper_Abstract_View {
 		*/
 		$config['meta']           = $config['meta'] ?? []; /* ensure we have a meta key */
 		$show_empty_fields        = $config['meta']['empty'] ?? false; /* whether to show empty fields or not. Default is false */
-		$load_legacy_css          = $config['meta']['legacy_css'] ?? false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
 		$show_section_description = $config['meta']['section_content'] ?? false; /* whether we should include a section breaks content. Default to false */
 
 		/** @var \GFPDF\Helper\Helper_Abstract_Fields $class */
@@ -433,11 +336,6 @@ class View_PDF extends Helper_Abstract_View {
 
 			/* Only load our HTML if the field is NOT empty, or the $empty config option is true */
 			if ( $show_empty_fields === true || ! $class->is_empty() ) {
-				/* Load our legacy CSS class names */
-				if ( $load_legacy_css === true ) {
-					GFPDFEntryDetail::load_legacy_css( $field );
-				}
-
 				/**
 				 * Add CSS Ready Class Float Support to mPDF
 				 * Open a HTML container if needed
@@ -487,51 +385,6 @@ class View_PDF extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Output the current page name HTML
-	 *
-	 * @param integer                $page The current page number
-	 * @param array                  $form The form array
-	 * @param Helper_Field_Container $container
-	 *
-	 * @since    4.0
-	 *
-	 * @deprecated 6.10.1 Page fields are handled like all other fields, with markup generated using a dedicated Field_Page class
-	 */
-	public function display_page_name( $page, $form, Helper_Field_Container $container ) {
-		_deprecated_function( __METHOD__, '6.10.1', 'GFPDF\Helper\Fields\Field_Page' );
-
-		/* Only display the current page name if it exists */
-		if ( isset( $form['pagination']['pages'][ $page ] ) && strlen( trim( $form['pagination']['pages'][ $page ] ) ) > 0 ) {
-
-			/* correctly close / cleanup the HTML container if needed */
-			$container->close();
-
-			/* Find any CSS assigned to the page */
-			$classes = '';
-			foreach ( $form['fields'] as $field ) {
-				if ( $field->type === 'page' && $field->pageNumber === ( $page + 1 ) ) {
-					$classes = $field->cssClass;
-					break;
-				}
-			}
-
-			/* Load our HTML */
-			$html = $this->load(
-				'page_title',
-				[
-					'form'    => $form,
-					'page'    => $page,
-					'classes' => $classes,
-				],
-				false
-			);
-
-			/* Run it through a filter and output */
-			Kses::output( apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form ) );
-		}
-	}
-
-	/**
 	 * Automatically render our core PDF fields and add styles in templates to simplify there usage for users
 	 *
 	 * @param string $html The current HTML template being processed
@@ -543,13 +396,6 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
-		$template_info = $this->templates->get_template_info_by_id( $settings['template'] );
-
-		/* A v3 template brings its own styles, and the Tier 2 add-on renders the document itself */
-		if ( $this->templates->is_legacy_template( $template_info ) || Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
-			return $html;
-		}
-
 		return $this->get_core_template_styles( $settings, $entry ) . $html;
 	}
 
