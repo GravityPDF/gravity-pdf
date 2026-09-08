@@ -10,8 +10,15 @@ Phase 3a of `.claude/plans/2026-08-26-remove-core-font-installer.md`, started 20
 **read half** of the data layer is built and inert — nothing syncs yet, so the table stays empty and no route reads
 it. PHPUnit 1,753 single-site / 1,753 multisite, PHPCS and the 7.4 compatibility sniff clean.
 
-New: `src/Fonts/{Font_Source,Font_Sources,Catalog_Repository}.php`, the `gravitypdf_font_catalog` table in
-`Font_Schema`, `GPDF_FONTS_URL` in `pdf.php`, and `Router::get_font_sources()` / `::get_catalog_repository()`.
+New: `src/Fonts/{Font_Source,Font_Sources,Catalog_Repository,Font_Downloader}.php`, the `gravitypdf_font_catalog`
+table in `Font_Schema`, `GPDF_FONTS_URL` in `pdf.php`, the `MocksHttpRequests` test trait, and
+`Router::get_font_sources()` / `::get_catalog_repository()` / `::get_font_downloader()`.
+
+**`Font_Downloader` splits across 3a and 3b**, resolving §5's assignment of the whole class to 3b (3a cannot sync
+without it). Split by return type, not phase: 3a owns `fetch()`, the in-memory metadata read where the
+non-negotiable rules live (`https` only, `sslverify` hard-coded `true`, `redirection => 0`, 5 s connect timeout, the
+four-version User-Agent, byte ceiling applied before *and* after the request). 3b adds the streamed file half —
+`.part` per attempt, `Accept-Encoding: identity`, disk-space check, attempts — so `MAX_FILE_BYTES` lands there.
 
 **Things that bit, and would bite again:**
 
@@ -45,12 +52,8 @@ New: `src/Fonts/{Font_Source,Font_Sources,Catalog_Repository}.php`, the `gravity
 2. `set_status()` takes a `$bump` flag rather than special-casing `missing_scripts`. The render path's union-only
    write passes `false`, so the one status writer does not grow a per-column cache policy.
 
-**Two open items before the sync half:**
+**One open item before the sync half:**
 
-- **`Font_Downloader` is listed under 3b but 3a cannot sync without it.** §4.5's algorithm fetches the root and each
-  source index through it. Proposed: build the minimal primitive in 3a (plain and hash-verified `GET`, timeout 15
-  with a 5 s connect timeout, `sslverify` hard-coded `true`, the four-version User-Agent) and let 3b add `.part`
-  files, attempts and size caps. Undecided.
 - **`african` and `americas` pack labels are inferred.** §4.3's table never states them; `get_translations()`
   currently has "African scripts" and "Americas". A wrong guess degrades to the index's own English string rather
   than breaking, but `font-release.mjs` must publish whatever these settle on.
