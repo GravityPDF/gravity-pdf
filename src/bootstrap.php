@@ -134,6 +134,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $font_registry;
 
 	/**
+	 * Holds our Font_Sources object
+	 * The registered sources an entry can be installed from
+	 *
+	 * @var Fonts\Font_Sources
+	 *
+	 * @since 7.0
+	 */
+	public $font_sources;
+
+	/**
+	 * Holds our Catalog_Repository object
+	 * The single reader of the catalog table: what is installable, never what is installed
+	 *
+	 * @var Fonts\Catalog_Repository
+	 *
+	 * @since 7.0
+	 */
+	public $catalog_repository;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -941,6 +961,36 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->font_registry;
+	}
+
+	/**
+	 * Build the registered font sources, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_sources(): Fonts\Font_Sources {
+		if ( $this->font_sources === null ) {
+			$this->font_sources = new Fonts\Font_Sources( $this->log );
+		}
+
+		return $this->font_sources;
+	}
+
+	/**
+	 * Build the catalog repository, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_catalog_repository(): Fonts\Catalog_Repository {
+		if ( $this->catalog_repository === null ) {
+			$this->catalog_repository = new Fonts\Catalog_Repository(
+				$this->get_font_repository()->get_schema(),
+				$this->get_font_sources(),
+				$this->log
+			);
+		}
+
+		return $this->catalog_repository;
 	}
 
 	/**
