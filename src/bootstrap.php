@@ -154,6 +154,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $catalog_repository;
 
 	/**
+	 * Holds our Font_Downloader object
+	 * Every outbound request the font system makes
+	 *
+	 * @var Fonts\Font_Downloader
+	 *
+	 * @since 7.0
+	 */
+	public $font_downloader;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -991,6 +1001,19 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->catalog_repository;
+	}
+
+	/**
+	 * Build the font downloader, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_downloader(): Fonts\Font_Downloader {
+		if ( $this->font_downloader === null ) {
+			$this->font_downloader = new Fonts\Font_Downloader( $this->log );
+		}
+
+		return $this->font_downloader;
 	}
 
 	/**
