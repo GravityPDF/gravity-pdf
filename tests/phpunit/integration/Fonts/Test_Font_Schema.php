@@ -112,6 +112,47 @@ class Test_Font_Schema extends TestCase {
 		$this->assertSame( [], $this->schema->get_missing_tables() );
 	}
 
+	public function test_every_declared_column_reaches_the_database() {
+		global $wpdb;
+
+		$this->schema->drop();
+		$this->schema->ensure();
+
+		foreach ( $this->schema->get_table_definitions() as $sql ) {
+			preg_match( '/CREATE TABLE (\S+) \(/', $sql, $name );
+			$table = $name[1];
+
+			$actual = $wpdb->get_col( 'DESCRIBE ' . $table );
+
+			/* dbDelta skips a line it cannot parse without saying so, leaving the table present but short a column */
+			foreach ( $this->declared_columns( $sql ) as $column ) {
+				$this->assertContains( $column, $actual, "{$table}.{$column} was declared but never created" );
+			}
+		}
+	}
+
+	/**
+	 * The column names a CREATE TABLE statement declares, ignoring its key lines
+	 *
+	 * @return string[]
+	 */
+	protected function declared_columns( string $sql ): array {
+		preg_match( '/\((.*)\)[^)]*$/s', $sql, $body );
+
+		$columns = [];
+		foreach ( explode( "\n", $body[1] ) as $line ) {
+			$line = trim( $line );
+
+			if ( $line === '' || preg_match( '/^(PRIMARY KEY|UNIQUE KEY|KEY|INDEX)\b/i', $line ) ) {
+				continue;
+			}
+
+			$columns[] = strtok( $line, ' ' );
+		}
+
+		return $columns;
+	}
+
 	public function test_the_prefix_is_network_wide_on_multisite() {
 		global $wpdb;
 

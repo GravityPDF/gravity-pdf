@@ -47,6 +47,11 @@ if ( ! defined( 'GPDF_API_URL' ) ) {
 	define( 'GPDF_API_URL', 'https://api.gravitypdf.com' );
 }
 
+/* The fonts root, a second hostname beside the API: sync, installs and previews are all this one origin */
+if ( ! defined( 'GPDF_FONTS_URL' ) ) {
+	define( 'GPDF_FONTS_URL', 'https://fonts.gravitypdf.com/v1/' );
+}
+
 if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 	/*
 	 * Add our activation hook and deactivation hooks
