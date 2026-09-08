@@ -32,9 +32,12 @@ class Font_Schema {
 	/**
 	 * Bump whenever the table definitions below change, or a MIGRATIONS entry is added
 	 *
+	 * A schema version, not the plugin's: `is_current()` short-circuits `ensure()`, so a site holding the previous
+	 * value would never run dbDelta for a newly added table.
+	 *
 	 * @since 7.0
 	 */
-	public const VERSION = '7.0.0';
+	public const VERSION = '7.0.1';
 
 	/**
 	 * The option holding the schema version this site last created, GF-style
@@ -110,6 +113,13 @@ class Font_Schema {
 	}
 
 	/**
+	 * @since 7.0
+	 */
+	public function get_catalog_table(): string {
+		return $this->get_prefix() . 'gravitypdf_font_catalog';
+	}
+
+	/**
 	 * Every table this schema owns, in creation order
 	 *
 	 * @return string[]
@@ -120,6 +130,7 @@ class Font_Schema {
 		$tables = [
 			$this->get_font_table(),
 			$this->get_file_table(),
+			$this->get_catalog_table(),
 		];
 
 		if ( is_multisite() ) {
@@ -331,6 +342,40 @@ class Font_Schema {
 			PRIMARY KEY  (id),
 			UNIQUE KEY font_id_role (font_id,role),
 			KEY path (path(191))
+		) ENGINE=InnoDB {$charset_collate};";
+
+		$catalog_table = $this->get_catalog_table();
+
+		$sql[] = "CREATE TABLE {$catalog_table} (
+			source varchar(32) NOT NULL default '',
+			entry varchar(64) NOT NULL default '',
+			label varchar(255) NOT NULL default '',
+			version varchar(32) NOT NULL default '',
+			notes varchar(255) default NULL,
+			released date default NULL,
+			coverage tinyint(1) NOT NULL default 0,
+			position smallint(5) unsigned NOT NULL default 0,
+			license varchar(64) NOT NULL default '',
+			size int(10) unsigned NOT NULL default 0,
+			files smallint(5) unsigned NOT NULL default 0,
+			category varchar(32) default NULL,
+			subsets varchar(255) default NULL,
+			preview varchar(255) default NULL,
+			preview_text varchar(255) default NULL,
+			styles varchar(255) default NULL,
+			always tinyint(1) NOT NULL default 0,
+			scripts text,
+			languages text,
+			entry_sha256 char(64) default NULL,
+			entry_json longtext,
+			font_keys varchar(255) default NULL,
+			phase varchar(16) default NULL,
+			phase_since datetime default NULL,
+			error text,
+			retry_after datetime default NULL,
+			missing_scripts text,
+			missing_since datetime default NULL,
+			PRIMARY KEY  (source,entry)
 		) ENGINE=InnoDB {$charset_collate};";
 
 		if ( is_multisite() ) {
