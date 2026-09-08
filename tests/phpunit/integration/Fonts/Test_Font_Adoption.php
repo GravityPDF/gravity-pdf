@@ -7,6 +7,7 @@ namespace GFPDF\Fonts;
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Integration\TestCase;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -17,7 +18,7 @@ use GFPDF\Tests\Integration\TestCase;
 /**
  * Class Test_Font_Adoption
  *
- * Covers `Font_Repository::adopt()`: files already on disk becoming installed rows without a download.
+ * Covers `Catalog_Font_Adopter`: files already on disk becoming installed rows without a download.
  *
  * @package   GFPDF\Fonts
  *
@@ -38,6 +39,23 @@ class Test_Font_Adoption extends TestCase {
 		parent::set_up();
 
 		$this->drop_catalog_rows();
+	}
+
+	protected function adopter(): Catalog_Font_Adopter {
+		return new Catalog_Font_Adopter( $this->font_repository(), $this->catalog_repository(), GPDFAPI::get_log_class() );
+	}
+
+	/**
+	 * The emoji entry most of these cases vary one detail of
+	 */
+	protected function emoji_entry( array $file, array $overrides = [] ): array {
+		return array_merge(
+			[
+				'fonts' => [ 'notoemoji' => [ 'R' => 'NotoEmoji-Regular.ttf' ] ],
+				'files' => [ 'NotoEmoji-Regular.ttf' => $file ],
+			],
+			$overrides
+		);
 	}
 
 	public function tear_down(): void {
@@ -107,7 +125,7 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		$this->assertSame( 1, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 1, $this->adopter()->run( 'packs' ) );
 
 		$row = $this->font_repository()->get( 'notoemoji' );
 
@@ -124,32 +142,20 @@ class Test_Font_Adoption extends TestCase {
 	public function test_adoption_is_idempotent() {
 		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
 
-		$this->catalog_entry(
-			'emoji',
-			[
-				'fonts' => [ 'notoemoji' => [ 'R' => 'NotoEmoji-Regular.ttf' ] ],
-				'files' => [ 'NotoEmoji-Regular.ttf' => $file ],
-			]
-		);
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
-		$this->assertSame( 1, $this->font_repository()->adopt( $this->catalog_repository() ) );
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ), 'a second pass must insert nothing' );
+		$this->assertSame( 1, $this->adopter()->run( 'packs' ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ), 'a second pass must insert nothing' );
 	}
 
 	public function test_a_file_whose_hash_does_not_match_gets_no_row() {
 		$file           = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
 		$file['sha256'] = str_repeat( 'f', 64 );
 
-		$this->catalog_entry(
-			'emoji',
-			[
-				'fonts' => [ 'notoemoji' => [ 'R' => 'NotoEmoji-Regular.ttf' ] ],
-				'files' => [ 'NotoEmoji-Regular.ttf' => $file ],
-			]
-		);
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
 		/* A row must never claim a sha256 the disk does not have; a real install downloads it fresh instead */
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 		$this->assertNull( $this->font_repository()->get( 'notoemoji' ) );
 	}
 
@@ -157,15 +163,9 @@ class Test_Font_Adoption extends TestCase {
 		$file         = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'short' );
 		$file['size'] = 99999;
 
-		$this->catalog_entry(
-			'emoji',
-			[
-				'fonts' => [ 'notoemoji' => [ 'R' => 'NotoEmoji-Regular.ttf' ] ],
-				'files' => [ 'NotoEmoji-Regular.ttf' => $file ],
-			]
-		);
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 	}
 
 	public function test_an_absent_file_is_simply_not_adopted() {
@@ -183,7 +183,7 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 	}
 
 	public function test_a_font_without_a_verified_regular_face_is_skipped_entirely() {
@@ -210,7 +210,7 @@ class Test_Font_Adoption extends TestCase {
 		);
 
 		/* mPDF needs R; a bold-only row would never render */
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 		$this->assertNull( $this->font_repository()->get( 'dejavusans' ) );
 	}
 
@@ -240,7 +240,7 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		$this->assertSame( 1, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 1, $this->adopter()->run( 'packs' ) );
 
 		$row = $this->font_repository()->get( 'dejavusans' );
 
@@ -266,7 +266,7 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		$this->assertSame( 2, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 2, $this->adopter()->run( 'packs' ) );
 
 		/* Sharing source and entry is what groups them; the label falls back to the key rather than repeating */
 		$this->assertSame( 'tinos', $this->font_repository()->get( 'tinos' )['label'] );
@@ -276,16 +276,9 @@ class Test_Font_Adoption extends TestCase {
 	public function test_a_single_font_entry_takes_the_entry_label() {
 		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
 
-		$this->catalog_entry(
-			'emoji',
-			[
-				'fonts' => [ 'notoemoji' => [ 'R' => 'NotoEmoji-Regular.ttf' ] ],
-				'files' => [ 'NotoEmoji-Regular.ttf' => $file ],
-			],
-			[ 'label' => 'Emoji' ]
-		);
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ), [ 'label' => 'Emoji' ] );
 
-		$this->font_repository()->adopt( $this->catalog_repository() );
+		$this->adopter()->run( 'packs' );
 
 		$this->assertSame( 'Emoji', $this->font_repository()->get( 'notoemoji' )['label'] );
 	}
@@ -315,7 +308,7 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		$this->font_repository()->adopt( $this->catalog_repository() );
+		$this->adopter()->run( 'packs' );
 
 		$meta = $this->font_repository()->get( 'notosanssc' )['meta'];
 
@@ -332,15 +325,9 @@ class Test_Font_Adoption extends TestCase {
 
 		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
 
-		$this->catalog_entry(
-			'emoji',
-			[
-				'fonts' => [ 'notoemoji' => [ 'R' => 'NotoEmoji-Regular.ttf' ] ],
-				'files' => [ 'NotoEmoji-Regular.ttf' => $file ],
-			]
-		);
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 
 		/* The existing row wins: re-keying would register a font under a name no template mentions */
 		$this->assertSame( 'custom', $this->font_repository()->get( 'notoemoji' )['source'] );
@@ -363,8 +350,35 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		/* Adoption is for coverage entries; a display family is an explicit install */
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		/*
+		 * Run against `google` deliberately: with `packs` the source filter alone would answer 0 and the coverage
+		 * rule — a display family is an explicit install, never adopted — would go untested.
+		 */
+		$this->assertSame( 0, $this->adopter()->run( 'google' ) );
+	}
+
+	public function test_adoption_is_scoped_to_the_replaced_source() {
+		$emoji = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
+		$other = $this->place_file( 'other', 'thing', 'Thing-Regular.ttf', 'thing-bytes' );
+
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $emoji ) );
+		$this->insert_catalog_row(
+			'other',
+			'thing',
+			[
+				'coverage'   => 1,
+				'entry_json' => (string) wp_json_encode(
+					[
+						'fonts' => [ 'thing' => [ 'R' => 'Thing-Regular.ttf' ] ],
+						'files' => [ 'Thing-Regular.ttf' => $other ],
+					]
+				),
+			]
+		);
+
+		/* One sync replaces one source; walking every source per replacement re-reads the catalogue S times */
+		$this->assertSame( 1, $this->adopter()->run( 'packs' ) );
+		$this->assertNull( $this->font_repository()->get( 'thing' ) );
 	}
 
 	public function test_a_pointed_at_entry_is_skipped() {
@@ -380,21 +394,15 @@ class Test_Font_Adoption extends TestCase {
 		);
 
 		/* Without an inlined entry there is nothing naming the files, and adoption never fetches */
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 	}
 
 	public function test_a_file_another_row_already_claims_is_not_adopted_twice() {
 		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
 
-		$this->catalog_entry(
-			'emoji',
-			[
-				'fonts' => [ 'notoemoji' => [ 'R' => 'NotoEmoji-Regular.ttf' ] ],
-				'files' => [ 'NotoEmoji-Regular.ttf' => $file ],
-			]
-		);
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
-		$this->font_repository()->adopt( $this->catalog_repository() );
+		$this->adopter()->run( 'packs' );
 
 		/* A second entry naming the same file must not mint a second row over it */
 		$this->catalog_entry(
@@ -405,7 +413,7 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 	}
 
 	public function test_a_flat_legacy_file_is_not_what_adoption_looks_at() {
@@ -428,6 +436,6 @@ class Test_Font_Adoption extends TestCase {
 			]
 		);
 
-		$this->assertSame( 0, $this->font_repository()->adopt( $this->catalog_repository() ) );
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 	}
 }

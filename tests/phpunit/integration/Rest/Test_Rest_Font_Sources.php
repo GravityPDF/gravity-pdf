@@ -31,6 +31,9 @@ class Test_Rest_Font_Sources extends Test_Rest {
 
 		$this->drop_catalog_rows();
 		delete_site_option( Catalog_Sync::OPTION );
+
+		/* Most cases are an authorised browse; the anonymous ones sign back out */
+		wp_set_current_user( self::$admin_id );
 	}
 
 	public function tear_down(): void {
@@ -67,6 +70,8 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_an_anonymous_request_is_refused() {
+		wp_set_current_user( 0 );
+
 		$this->assertSame( 401, $this->get( '/fonts/sources' )->get_status() );
 		$this->assertSame( 401, $this->get( '/fonts/sources/packs' )->get_status() );
 	}
@@ -80,7 +85,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_the_sources_listing_reports_counts_and_never_synced() {
-		wp_set_current_user( self::$admin_id );
 		$this->seed_packs();
 
 		$data = $this->get( '/fonts/sources' )->get_data();
@@ -98,7 +102,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_the_sources_listing_carries_the_filter_vocabulary() {
-		wp_set_current_user( self::$admin_id );
 		$this->seed_packs();
 
 		$filters = $this->get( '/fonts/sources' )->get_data()[0]['filters'];
@@ -114,7 +117,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_an_untranslated_filter_id_is_title_cased_rather_than_dropped() {
-		wp_set_current_user( self::$admin_id );
 		$this->insert_catalog_row( 'packs', 'odd', [ 'category' => 'made-up-thing' ] );
 
 		$categories = wp_list_pluck( $this->get( '/fonts/sources' )->get_data()[0]['filters']['category'], 'label', 'id' );
@@ -123,7 +125,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_the_sources_listing_reflects_a_sync_record() {
-		wp_set_current_user( self::$admin_id );
 		$this->seed_packs();
 
 		$synced = time() - DAY_IN_SECONDS;
@@ -147,7 +148,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_a_source_search_returns_entries_in_index_order() {
-		wp_set_current_user( self::$admin_id );
 		$this->seed_packs();
 
 		$data = $this->get( '/fonts/sources/packs' )->get_data();
@@ -159,7 +159,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_the_coverage_param_is_the_language_packs_view() {
-		wp_set_current_user( self::$admin_id );
 		$this->seed_packs();
 
 		$data = $this->get( '/fonts/sources/packs', [ 'coverage' => 1 ] )->get_data();
@@ -168,7 +167,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_the_search_params_narrow_the_listing() {
-		wp_set_current_user( self::$admin_id );
 		$this->seed_packs();
 
 		$this->assertSame( [ 'dejavu' ], wp_list_pluck( $this->get( '/fonts/sources/packs', [ 's' => 'Latin' ] )->get_data()['entries'], 'entry' ) );
@@ -178,8 +176,32 @@ class Test_Rest_Font_Sources extends Test_Rest {
 		$this->assertSame( [ 'dejavu' ], wp_list_pluck( $this->get( '/fonts/sources/packs', [ 'subset' => 'latin-ext' ] )->get_data()['entries'], 'entry' ) );
 	}
 
+	public function test_a_listing_never_carries_install_progress() {
+		$this->insert_catalog_row(
+			'packs',
+			'emoji',
+			[
+				'phase'           => 'installing',
+				'phase_since'     => '2026-09-09 00:00:00',
+				'error'           => 'boom',
+				'retry_after'     => '2026-09-09 01:00:00',
+				'missing_scripts' => 'und-Zsye',
+				'missing_since'   => '2026-09-09 00:00:00',
+			]
+		);
+
+		$entry = $this->get( '/fonts/sources/packs' )->get_data()['entries'][0];
+
+		/*
+		 * Install progress belongs to `GET /fonts/status`. These are columns of the same row, so a response built
+		 * by subtracting from the row rather than naming its fields ships them without anyone deciding to.
+		 */
+		foreach ( [ 'phase', 'phase_since', 'error', 'retry_after', 'missing_scripts', 'missing_since' ] as $column ) {
+			$this->assertArrayNotHasKey( $column, $entry );
+		}
+	}
+
 	public function test_a_listing_never_leaks_the_entry_object() {
-		wp_set_current_user( self::$admin_id );
 		$this->insert_catalog_row( 'packs', 'emoji', [ 'entry_json' => '{"fonts":{"notoemoji":{"R":"A.ttf"}}}' ] );
 
 		$entry = $this->get( '/fonts/sources/packs' )->get_data()['entries'][0];
@@ -189,7 +211,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_a_card_carries_one_preview_url() {
-		wp_set_current_user( self::$admin_id );
 		$this->seed_packs();
 
 		$entries = wp_list_pluck( $this->get( '/fonts/sources/packs' )->get_data()['entries'], 'preview_url', 'entry' );
@@ -201,8 +222,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_an_unknown_source_is_a_404() {
-		wp_set_current_user( self::$admin_id );
-
 		$response = $this->get( '/fonts/sources/nope' );
 
 		$this->assertSame( 404, $response->get_status() );
@@ -210,7 +229,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_an_entry_returns_its_row_and_preview_urls() {
-		wp_set_current_user( self::$admin_id );
 		$this->insert_catalog_row(
 			'packs',
 			'dejavu',
@@ -236,8 +254,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_an_unknown_entry_is_a_404() {
-		wp_set_current_user( self::$admin_id );
-
 		$response = $this->get( '/fonts/sources/packs/nope' );
 
 		$this->assertSame( 404, $response->get_status() );
@@ -245,8 +261,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_a_pack_label_is_translated_on_the_way_out() {
-		wp_set_current_user( self::$admin_id );
-
 		/* The stored catalogue stays byte-identical to the index; translation happens at presentation */
 		$this->insert_catalog_row( 'packs', 'dejavu', [ 'label' => 'DejaVu' ] );
 
@@ -254,14 +268,10 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	}
 
 	public function test_sync_is_a_post_only_route() {
-		wp_set_current_user( self::$admin_id );
-
 		$this->assertSame( 404, $this->get( '/fonts/sources/sync' )->get_status() );
 	}
 
 	public function test_a_root_failure_is_a_502_and_proves_sync_is_not_shadowed() {
-		wp_set_current_user( self::$admin_id );
-
 		$this->mock_http( [ 'fonts.gravitypdf.com' => new WP_Error( 'http_request_failed', 'Connection timed out' ) ] );
 
 		$response = rest_do_request( new WP_REST_Request( 'POST', '/gravity-pdf/v1/fonts/sources/sync' ) );
@@ -275,18 +285,9 @@ class Test_Rest_Font_Sources extends Test_Rest {
 		$this->assertStringContainsString( 'Connection timed out', $response->get_data()['message'] );
 	}
 
-	public function test_an_up_to_date_root_reports_so_without_scheduling() {
-		wp_set_current_user( self::$admin_id );
-
-		/* An unsigned build fails closed, which is enough to show the route is wired to the sync rather than 404ing */
-		$this->mock_http( [ 'fonts.gravitypdf.com' => '{}' ] );
-
-		$response = rest_do_request( new WP_REST_Request( 'POST', '/gravity-pdf/v1/fonts/sources/sync' ) );
-
-		$this->assertSame( 502, $response->get_status() );
-	}
-
 	public function test_an_anonymous_sync_is_refused() {
+		wp_set_current_user( 0 );
+
 		$this->mock_http( [ 'fonts.gravitypdf.com' => '{}' ] );
 
 		/* Refused before the sync is ever asked to run */
