@@ -52,6 +52,22 @@ if ( ! defined( 'GPDF_FONTS_URL' ) ) {
 	define( 'GPDF_FONTS_URL', 'https://fonts.gravitypdf.com/v1/' );
 }
 
+/*
+ * ed25519 public keys the font root's signature is checked against, base64, newest first.
+ *
+ * The signed artefact is a context prefix plus the raw bytes of `index.json`, so one key can serve other signed
+ * distribution later without a signature ever verifying across purposes. Rotation ships old + new together and
+ * drops the old in a later release.
+ *
+ * TODO(7.0): replace the placeholder with the real public key before release. The private half belongs in CI
+ * secrets / offline with the release generator and must never be in this repository. While the array is empty
+ * every sync of a built-in source fails closed with `font_no_trust_keys`, which is the intended behaviour for an
+ * unconfigured build rather than a reason to skip verification.
+ */
+if ( ! defined( 'GPDF_TRUST_KEYS' ) ) {
+	define( 'GPDF_TRUST_KEYS', [] );
+}
+
 if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 	/*
 	 * Add our activation hook and deactivation hooks

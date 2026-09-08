@@ -164,6 +164,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $font_downloader;
 
 	/**
+	 * Holds our Catalog_Sync object
+	 * The single writer of the catalog table's index columns
+	 *
+	 * @var Fonts\Catalog_Sync
+	 *
+	 * @since 7.0
+	 */
+	public $catalog_sync;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -257,6 +267,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->actions();
 		$this->template_manager();
 		$this->load_custom_font_handler();
+		$this->load_font_catalog_handler();
 		$this->load_debug();
 		$this->check_system_status();
 		$this->export();
@@ -917,6 +928,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
+	 * Arm the catalog sync triggers
+	 *
+	 * @since 7.0
+	 */
+	public function load_font_catalog_handler(): void {
+		$class = new Controller\Controller_Font_Catalog( $this->get_catalog_sync(), $this->misc );
+		$class->init();
+
+		$this->singleton->add_class( $class );
+	}
+
+	/**
 	 * Build the font repository, once
 	 *
 	 * Deferred rather than built in init() because it needs `template_font_location`, which
@@ -1014,6 +1037,28 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->font_downloader;
+	}
+
+	/**
+	 * Build the catalog sync, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_catalog_sync(): Fonts\Catalog_Sync {
+		if ( $this->catalog_sync === null ) {
+			$this->catalog_sync = new Fonts\Catalog_Sync(
+				$this->get_font_repository()->get_schema(),
+				$this->get_catalog_repository(),
+				$this->get_font_sources(),
+				$this->get_font_downloader(),
+				new Fonts\Font_Lock(),
+				$this->log,
+				defined( 'GPDF_TRUST_KEYS' ) ? (array) GPDF_TRUST_KEYS : [],
+				PDF_PLUGIN_DIR . 'build/font-index/packs.json'
+			);
+		}
+
+		return $this->catalog_sync;
 	}
 
 	/**
