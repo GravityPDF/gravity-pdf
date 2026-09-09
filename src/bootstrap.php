@@ -221,6 +221,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $render_font_trigger;
 
 	/**
+	 * What asks the site's health checks, daily
+	 *
+	 * @var Helper\Health\Health_Runner
+	 *
+	 * @since 7.0
+	 */
+	public $health_runner;
+
+	/**
 	 * Holds our Font_Cache_Warmer object
 	 * Parses newly installed faces so no render is the first to do it
 	 *
@@ -325,6 +334,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->template_manager();
 		$this->load_custom_font_handler();
 		$this->load_font_catalog_handler();
+		$this->load_health_handler();
 		$this->load_debug();
 		$this->check_system_status();
 		$this->export();
@@ -1020,6 +1030,45 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$class->init();
 
 		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Arm the daily health run
+	 *
+	 * @since 7.0
+	 */
+	public function load_health_handler(): void {
+		$class = new Controller\Controller_Health( $this->get_health_runner(), $this->misc );
+		$class->init();
+
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Build the health runner, once, with the checks core registers
+	 *
+	 * The checks are handed in rather than built inside it: the runner is subsystem-agnostic by design, and
+	 * `gfpdf_health_checks` is how everything else — add-ons, and any future core check — joins them.
+	 *
+	 * @since 7.0
+	 */
+	public function get_health_runner(): Helper\Health\Health_Runner {
+		if ( $this->health_runner === null ) {
+			$configured = new Fonts\Health\Configured_Fonts( $this->options );
+
+			$this->health_runner = new Helper\Health\Health_Runner(
+				[
+					new Fonts\Health\Missing_Coverage_Check( $this->get_catalog_repository() ),
+					new Fonts\Health\Missing_Font_Files_Check( $this->get_font_repository(), $this->get_font_registry(), $configured ),
+					new Fonts\Health\Unregistered_Font_Check( $this->get_font_registry(), $this->get_catalog_repository(), $configured ),
+					new Fonts\Health\Catalog_Sync_Check( $this->get_catalog_sync() ),
+				],
+				new Fonts\Font_Lock(),
+				$this->log
+			);
+		}
+
+		return $this->health_runner;
 	}
 
 	/**

@@ -756,6 +756,18 @@ class Registry {
 	 *
 	 * @since 7.0
 	 */
+	/**
+	 * Whether a font key would resolve to something at render time
+	 *
+	 * The public half of `registered_keys()`, for the health check that asks about a saved setting rather than
+	 * about a row: a font whose only face is flagged missing is not registered, however present its row is.
+	 *
+	 * @since 7.0
+	 */
+	public function is_registered( string $font_key ): bool {
+		return isset( $this->registered_keys()[ $font_key ] );
+	}
+
 	protected function registered_keys(): array {
 		$keys = [
 			static::BUNDLED_FONT    => true,

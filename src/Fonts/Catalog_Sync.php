@@ -507,6 +507,33 @@ class Catalog_Sync {
 	 *
 	 * @since 7.0
 	 */
+	/**
+	 * The registered sources whose catalogue is too old to trust, with their records
+	 *
+	 * A source that has never synced counts: a site that has never reached the origin is exactly the case worth
+	 * telling an admin about.
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 7.0
+	 */
+	public function stale_sources(): array {
+		$stale = [];
+
+		foreach ( array_keys( $this->sources->all() ) as $id ) {
+			$record = $this->get_record( (string) $id );
+
+			if ( static::is_stale( $record ) ) {
+				$stale[ (string) $id ] = $record;
+			}
+		}
+
+		return $stale;
+	}
+
+	/**
+	 * @since 7.0
+	 */
 	public function get_records(): array {
 		$records = get_site_option( static::OPTION, [] );
 
