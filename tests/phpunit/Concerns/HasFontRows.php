@@ -105,6 +105,15 @@ trait HasFontRows {
 	}
 
 	/**
+	 * One file row of an installed font, by role
+	 *
+	 * @return array The `gravitypdf_font_file` row as `Font_Repository::all()` decodes it
+	 */
+	protected function file_row( string $font_key, string $role = 'R' ): array {
+		return $this->font_repository()->get( $font_key )['files'][ $role ];
+	}
+
+	/**
 	 * Drop every row and every test font file
 	 *
 	 * Rows go first with `$unlink_files` false, because the file sweep below is what removes them — the shared

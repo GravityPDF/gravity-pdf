@@ -680,9 +680,49 @@ class Font_Repository {
 	}
 
 	/**
+	 * The font and face role recording a path, or null when nothing does
+	 *
+	 * One indexed read like `recorded_hash()`, for the same reason: the caller has one path. `LIMIT 1` because two
+	 * installs of a display entry share their files, and a shared file fills the same role in both.
+	 *
+	 * @return array{font_key: string, role: string}|null
+	 *
+	 * @since 7.0
+	 */
+	public function file_for_path( string $path ): ?array {
+		global $wpdb;
+
+		$font_table = $this->schema->get_font_table();
+		$file_table = $this->schema->get_file_table();
+
+		/* phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names come from Font_Schema */
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT f.font_key, ff.role
+				   FROM {$file_table} ff
+				   INNER JOIN {$font_table} f ON f.id = ff.font_id
+				  WHERE ff.path = %s
+				  LIMIT 1",
+				$path
+			),
+			ARRAY_A
+		);
+		/* phpcs:enable */
+
+		return $row === null ? null : [
+			'font_key' => (string) $row['font_key'],
+			'role'     => (string) $row['role'],
+		];
+	}
+
+	/**
 	 * Flag or clear every file row recording a path
 	 *
 	 * Both installs of a display entry are flagged together, which is why this keys on the path rather than the row.
+	 *
+	 * Only a row that actually changed flushes — `wpdb::update()` counts changed rows, not matched ones. The
+	 * render-time path asks again on every render for as long as a file stays gone, and a flush there costs the
+	 * whole font cache and a re-read of both tables.
 	 *
 	 * @since 7.0
 	 */
@@ -690,7 +730,11 @@ class Font_Repository {
 		global $wpdb;
 
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery -- the font tables have no core API */
-		$wpdb->update( $this->schema->get_file_table(), [ 'missing' => (int) $missing ], [ 'path' => $path ] );
+		$updated = $wpdb->update( $this->schema->get_file_table(), [ 'missing' => (int) $missing ], [ 'path' => $path ] );
+
+		if ( ! $updated ) {
+			return;
+		}
 
 		$this->flush();
 	}

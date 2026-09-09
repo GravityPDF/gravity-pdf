@@ -50,6 +50,18 @@ class Registry {
 	public const BUNDLED_SYMBOLS = 'gfpdf-dejavu-symbols';
 
 	/**
+	 * The bundled font's four faces, which are also what a missing file is substituted with
+	 *
+	 * @since 7.0
+	 */
+	public const BUNDLED_FACES = [
+		'R'  => 'Arimo-Regular.ttf',
+		'B'  => 'Arimo-Bold.ttf',
+		'I'  => 'Arimo-Italic.ttf',
+		'BI' => 'Arimo-BoldItalic.ttf',
+	];
+
+	/**
 	 * The bundled map, before the installed rows overlay it
 	 *
 	 * Just Latin. This row is what sends Latin text inside a `zh` or `ar` document to Arimo rather than the pack
@@ -229,11 +241,7 @@ class Registry {
 			untrailingslashit( $this->bundled_dir ),
 			[
 				/* useOTL is load-bearing: the faces carry no legacy kern table, so GPOS is their only route to kerning */
-				static::BUNDLED_FONT    => [
-					'R'          => 'Arimo-Regular.ttf',
-					'B'          => 'Arimo-Bold.ttf',
-					'I'          => 'Arimo-Italic.ttf',
-					'BI'         => 'Arimo-BoldItalic.ttf',
+				static::BUNDLED_FONT    => static::BUNDLED_FACES + [
 					'useOTL'     => 0xFF,
 					'useKashida' => 0,
 				],
@@ -247,6 +255,17 @@ class Registry {
 			$this->generic_families(),
 			$this->bundled_aliases()
 		);
+	}
+
+	/**
+	 * The `fontFileFinder` mPDF resolves out of the container, in place of the one it would build itself
+	 *
+	 * @param object|null $inner A finder already in the container, which the returned one wraps rather than replaces
+	 *
+	 * @since 7.0
+	 */
+	public function font_file_finder( $inner = null ): Font_File_Finder {
+		return new Font_File_Finder( $this->repository, static::BUNDLED_FACES, $this->log, $inner );
 	}
 
 	/**
