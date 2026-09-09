@@ -194,6 +194,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $install_queue;
 
 	/**
+	 * Holds our Font_Cache_Warmer object
+	 * Parses newly installed faces so no render is the first to do it
+	 *
+	 * @var Fonts\Font_Cache_Warmer
+	 *
+	 * @since 7.0
+	 */
+	public $font_cache_warmer;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -1102,12 +1112,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_font_repository(),
 				$this->get_catalog_repository(),
 				$this->get_font_downloader(),
+				$this->get_font_cache_warmer(),
 				new Fonts\Font_Lock(),
 				$this->log
 			);
 		}
 
 		return $this->font_installer;
+	}
+
+	/**
+	 * Build the font cache warmer, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_cache_warmer(): Fonts\Font_Cache_Warmer {
+		if ( $this->font_cache_warmer === null ) {
+			$this->font_cache_warmer = new Fonts\Font_Cache_Warmer( $this->get_font_registry(), $this->data, $this->log );
+		}
+
+		return $this->font_cache_warmer;
 	}
 
 	/**

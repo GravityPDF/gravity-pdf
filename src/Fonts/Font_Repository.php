@@ -734,6 +734,29 @@ class Font_Repository {
 	}
 
 	/**
+	 * Every row one catalog entry installed, keyed by font key
+	 *
+	 * The install writes rows one file at a time and the entry's keys are only all present once the last one
+	 * lands, so the caller that needs the whole set — the cache warm — asks for it here rather than accumulating
+	 * it across calls it may not have made.
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 7.0
+	 */
+	public function rows_for_entry( string $source, string $entry ): array {
+		$rows = [];
+
+		foreach ( $this->all() as $font_key => $row ) {
+			if ( (string) $row['source'] === $source && (string) ( $row['entry'] ?? '' ) === $entry ) {
+				$rows[ (string) $font_key ] = $row;
+			}
+		}
+
+		return $rows;
+	}
+
+	/**
 	 * Every filename some font row already records
 	 *
 	 * The three passes that populate the tables — migration, legacy adoption, loose import — all need this to avoid

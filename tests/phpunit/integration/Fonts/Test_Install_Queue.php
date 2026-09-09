@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Concerns\HasCatalogRows;
+use GFPDF\Tests\Concerns\HasFontFixtures;
 use GFPDF\Tests\Concerns\MocksHttpRequests;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
@@ -26,6 +27,7 @@ use GPDFAPI;
 class Test_Install_Queue extends TestCase {
 
 	use HasCatalogRows;
+	use HasFontFixtures;
 	use MocksHttpRequests;
 
 	/**
@@ -75,8 +77,8 @@ class Test_Install_Queue extends TestCase {
 		$names = [];
 
 		for ( $i = 1; $i <= $count; $i++ ) {
-			$name   = sprintf( 'Noto-%d.ttf', $i );
-			$body   = sprintf( 'FONT-BYTES-%d', $i );
+			$name    = sprintf( 'Noto-%d.ttf', $i );
+			$body    = $this->file_bytes( $i );
 			$names[] = $name;
 
 			$fonts[ 'noto' . $i ] = [ 'R' => $name ];
@@ -103,6 +105,15 @@ class Test_Install_Queue extends TestCase {
 		);
 
 		return $names;
+	}
+
+	/**
+	 * A distinct real face per file, cycling: an install now ends by parsing what it downloaded
+	 */
+	protected function file_bytes( int $i ): string {
+		$faces = [ 'DejaVuSansSymbols', 'Arimo-Regular', 'Arimo-Bold', 'Arimo-Italic', 'Arimo-BoldItalic' ];
+
+		return $this->font_bytes( $faces[ ( $i - 1 ) % count( $faces ) ] );
 	}
 
 	protected function status( string $entry = 'emoji' ): array {
@@ -173,7 +184,7 @@ class Test_Install_Queue extends TestCase {
 	public function test_files_that_already_have_a_row_are_never_queued() {
 		$names = $this->seed_pack( 2 );
 
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
 		$this->unmock_http();
 
@@ -187,7 +198,7 @@ class Test_Install_Queue extends TestCase {
 	public function test_an_entry_whose_files_all_have_rows_is_not_claimed() {
 		$names = $this->seed_pack( 1 );
 
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
 		$this->unmock_http();
 
@@ -285,7 +296,7 @@ class Test_Install_Queue extends TestCase {
 	public function test_a_manual_install_under_its_own_key_queues_files_that_already_have_rows() {
 		$names = $this->seed_pack( 1 );
 
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
 		$this->unmock_http();
 
@@ -303,7 +314,7 @@ class Test_Install_Queue extends TestCase {
 
 	public function test_running_the_queue_installs_the_file_and_clears_the_phase() {
 		$names = $this->seed_pack( 1 );
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 
 		$this->queue->enqueue_once( $this->request( $names ) );
 		$this->assertSame( 1, $this->queue->run_inline() );
@@ -314,21 +325,21 @@ class Test_Install_Queue extends TestCase {
 
 	public function test_a_multi_file_entry_stays_installing_until_its_last_file_lands() {
 		$names = $this->seed_pack( 2 );
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 
 		$installer = $this->installer();
 
 		$installer->install_file( 'packs', 'emoji', $names[0] );
 		$this->assertSame( 'installing', $this->status()['phase'] );
 
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-2' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 2 ) ] );
 		$installer->install_file( 'packs', 'emoji', $names[1] );
 		$this->assertNull( $this->status()['phase'] );
 	}
 
 	public function test_a_queued_install_of_a_removed_entry_is_dropped_without_fetching() {
 		$names = $this->seed_pack( 1 );
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 
 		$this->queue->enqueue_once( $this->request( $names ) );
 
@@ -383,7 +394,7 @@ class Test_Install_Queue extends TestCase {
 
 	public function test_run_inline_drains_every_outstanding_batch() {
 		$names = $this->seed_pack( 3 );
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 
 		$this->queue->enqueue_once( $this->request( $names ) );
 
@@ -426,7 +437,7 @@ class Test_Install_Queue extends TestCase {
 
 	public function test_a_first_failure_backs_off_by_the_base_interval() {
 		$names = $this->seed_pack( 1 );
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'NOT-THE-BYTES-THE-INDEX-LISTS' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->corrupt_font_bytes() ] );
 
 		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
 
@@ -437,7 +448,7 @@ class Test_Install_Queue extends TestCase {
 
 	public function test_a_repeat_failure_escalates_the_backoff() {
 		$names = $this->seed_pack( 1 );
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'NOT-THE-BYTES-THE-INDEX-LISTS' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->corrupt_font_bytes() ] );
 
 		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
 
@@ -454,11 +465,11 @@ class Test_Install_Queue extends TestCase {
 	public function test_a_successful_install_clears_the_backoff() {
 		$names = $this->seed_pack( 1 );
 
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'WRONG' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->corrupt_font_bytes() ] );
 		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
 		$this->assertNotNull( $this->status()['retry_after'] );
 
-		$this->mock_http( [ 'fonts.gravitypdf.com' => 'FONT-BYTES-1' ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
 		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
 
 		/* Otherwise the next failure would open at 24 h because of one that has since been fixed */
