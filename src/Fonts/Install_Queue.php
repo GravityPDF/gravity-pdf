@@ -135,9 +135,10 @@ class Install_Queue extends Helper_Abstract_Queue {
 	 * the same request produce one batch without either taking a lock. Everything before the claim only decides
 	 * whether there is anything left to ask for.
 	 *
-	 * @param array $request `{ entry: '{source}/{entry}', background: string[], install?: array, force?: bool }` —
-	 *                       `inline` is trigger 3's own concurrent fetch and is deliberately not queued here. An
-	 *                       entry installed under more than one key passes `installs` instead: one
+	 * @param array $request `{ entry: '{source}/{entry}', background?: string[], install?: array, force?: bool }` —
+	 *                       `background` is optional: a caller that names no files gets the entry's own list,
+	 *                       resolved here. `inline` is trigger 3's own concurrent fetch and is deliberately not
+	 *                       queued. An entry installed under more than one key passes `installs` instead: one
 	 *                       `{ install, background }` pair per row, so the whole entry is claimed once
 	 * @param bool  $manual  A Font Manager install: ignores the auto-install gate, `retry_after` and `removed`
 	 *
@@ -156,6 +157,14 @@ class Install_Queue extends Helper_Abstract_Queue {
 
 		$items = [];
 		$force = ! empty( $request['force'] );
+
+		if ( ! isset( $request['background'] ) && ! isset( $request['installs'] ) ) {
+			$request['background'] = $this->entry_files( $source, $entry, $force );
+
+			if ( $request['background'] === [] ) {
+				return false;
+			}
+		}
 
 		foreach ( $this->requested_installs( $request ) as $requested ) {
 			$install = (array) ( $requested['install'] ?? [] );
@@ -191,6 +200,31 @@ class Install_Queue extends Helper_Abstract_Queue {
 		$this->flush();
 
 		return true;
+	}
+
+	/**
+	 * The files an entry has, for a caller that named none
+	 *
+	 * The triggers name an entry and nothing else, so this is where an entry document is read — **after** the
+	 * auto-install gate: a site with auto-install off must not pay for it, and for a source that points at its
+	 * entry file rather than inlining it, reading it is an HTTPS fetch. The count check comes first for the same
+	 * reason, and answers from the cached rows alone.
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	protected function entry_files( string $source, string $entry, bool $force ): array {
+		$expected = $this->catalog->file_count( $source, $entry );
+
+		/* A 0 means the index declared no count, so it is a reason to ask rather than to assume the entry is done */
+		if ( ! $force && $expected > 0 && count( $this->repository->paths_for_entry( $source, $entry ) ) >= $expected ) {
+			return [];
+		}
+
+		$files = $this->installer->files_for( $source . '/' . $entry );
+
+		return is_wp_error( $files ) ? [] : $files;
 	}
 
 	/**
@@ -319,19 +353,7 @@ class Install_Queue extends Helper_Abstract_Queue {
 		$retried = 0;
 
 		foreach ( $this->catalog->retryable_entries() as $candidate ) {
-			$id    = $candidate['source'] . '/' . $candidate['entry'];
-			$files = $this->installer->files_for( $id );
-
-			if ( is_wp_error( $files ) || $files === [] ) {
-				continue;
-			}
-
-			if ( $this->enqueue_once(
-				[
-					'entry'      => $id,
-					'background' => $files,
-				]
-			) ) {
+			if ( $this->enqueue_once( [ 'entry' => $candidate['source'] . '/' . $candidate['entry'] ] ) ) {
 				++$retried;
 			}
 		}

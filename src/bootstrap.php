@@ -194,6 +194,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $install_queue;
 
 	/**
+	 * What the install triggers ask before they queue anything
+	 *
+	 * @var Fonts\Coverage_Resolver
+	 *
+	 * @since 7.0
+	 */
+	public $coverage_resolver;
+
+	/**
 	 * Holds our Font_Cache_Warmer object
 	 * Parses newly installed faces so no render is the first to do it
 	 *
@@ -1168,6 +1177,22 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->install_queue;
+	}
+
+	/**
+	 * Build the coverage resolver, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_coverage_resolver(): Fonts\Coverage_Resolver {
+		if ( $this->coverage_resolver === null ) {
+			$this->coverage_resolver = new Fonts\Coverage_Resolver(
+				$this->get_catalog_repository(),
+				$this->get_font_registry()
+			);
+		}
+
+		return $this->coverage_resolver;
 	}
 
 	/**

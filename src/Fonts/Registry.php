@@ -621,13 +621,7 @@ class Registry {
 	 * @since 7.0
 	 */
 	protected function status_object( array $rows, ?array $catalog, bool $running ): array {
-		$paths = [];
-
-		foreach ( $rows as $row ) {
-			foreach ( $row['files'] as $file ) {
-				$paths[ (string) $file['path'] ] = true;
-			}
-		}
+		$paths = Font_Repository::paths_for_rows( $rows );
 
 		$phase  = $catalog === null ? '' : (string) $catalog['phase'];
 		$status = [

@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Concerns\HasCatalogRows;
+use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Concerns\HasFontFixtures;
 use GFPDF\Tests\Concerns\MocksHttpRequests;
 use GFPDF\Tests\Concerns\QueuesFontInstalls;
@@ -28,6 +29,7 @@ use GPDFAPI;
 class Test_Install_Queue extends TestCase {
 
 	use HasCatalogRows;
+	use HasFontRows;
 	use HasFontFixtures;
 	use MocksHttpRequests;
 	use QueuesFontInstalls;
@@ -126,6 +128,24 @@ class Test_Install_Queue extends TestCase {
 		$this->catalog_repository()->set_status( 'packs', $entry, $fields );
 	}
 
+	/**
+	 * Write an index column directly, the way `HasCatalogRows` writes the row: the sync owns them in production
+	 */
+	protected function set_catalog( array $columns, string $entry = 'emoji' ): void {
+		global $gfpdf, $wpdb;
+
+		$wpdb->update(
+			$gfpdf->get_font_repository()->get_schema()->get_catalog_table(),
+			$columns,
+			[
+				'source' => 'packs',
+				'entry'  => $entry,
+			]
+		);
+
+		$this->catalog_repository()->flush();
+	}
+
 	protected function installer(): Font_Installer {
 		global $gfpdf;
 
@@ -188,6 +208,94 @@ class Test_Install_Queue extends TestCase {
 
 		$this->assertFalse( $this->queue->enqueue_once( $this->request( $names ) ) );
 		$this->assertSame( [], $this->queued() );
+	}
+
+	public function test_a_request_naming_no_files_is_given_the_entrys_own() {
+		$names = $this->seed_pack( 3 );
+
+		$this->assertTrue( $this->queue->enqueue_once( [ 'entry' => 'packs/emoji' ] ) );
+		$this->assertSame( $names, array_column( $this->queued(), 'name' ) );
+	}
+
+	/**
+	 * An entry with no inlined document reaches the wire to name its own files, so it is what proves a read
+	 */
+	protected function seed_pointer_entry(): void {
+		$this->insert_catalog_row(
+			'packs',
+			'pointed-at',
+			[
+				'coverage'     => 1,
+				'files'        => 1,
+				/* No `entry_json`, but a hash to fetch one by: everything a pointer source needs to reach the wire */
+				'entry_sha256' => hash( 'sha256', 'never asked for' ),
+			]
+		);
+
+		$this->mock_http( [ 'fonts.gravitypdf.com' => 'never asked for' ] );
+	}
+
+	public function test_an_entry_with_every_file_installed_is_never_read() {
+		$this->seed_pointer_entry();
+		$this->install_entry_row( 'pointed', 'pointed-at' );
+
+		$this->assertFalse( $this->queue->enqueue_once( [ 'entry' => 'packs/pointed-at' ] ) );
+		$this->assertSame( [], $this->requested_urls() );
+		$this->assertSame( [], $this->queued() );
+	}
+
+	/**
+	 * The install route names the files a chosen set of variants resolves to, which is rarely the entry's whole list
+	 */
+	public function test_a_caller_that_names_its_files_gets_exactly_those() {
+		$names = $this->seed_pack( 3 );
+
+		$this->assertTrue( $this->queue->enqueue_once( $this->request( [ $names[1] ] ) ) );
+		$this->assertSame( [ $names[1] ], array_column( $this->queued(), 'name' ) );
+	}
+
+	public function test_an_entry_with_no_catalog_row_queues_nothing() {
+		$this->assertFalse( $this->queue->enqueue_once( [ 'entry' => 'packs/nothing-here' ] ) );
+		$this->assertSame( [], $this->queued() );
+	}
+
+	/**
+	 * The gate comes first, so a site with auto-install off never pays to read an entry it will not install
+	 */
+	public function test_the_gate_refuses_before_the_entry_is_read() {
+		$this->seed_pointer_entry();
+
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+		$queued = $this->queue->enqueue_once( [ 'entry' => 'packs/pointed-at' ] );
+		remove_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$this->assertFalse( $queued );
+		$this->assertSame( [], $this->requested_urls() );
+	}
+
+	/**
+	 * `files` defaults to 0 and the index need not declare one, so a 0 must mean "ask", never "already done"
+	 */
+	public function test_an_entry_declaring_no_file_count_is_still_read() {
+		$names = $this->seed_pack( 1 );
+		$this->set_catalog( [ 'files' => 0 ] );
+
+		$this->assertTrue( $this->queue->enqueue_once( [ 'entry' => 'packs/emoji' ] ) );
+		$this->assertSame( $names, array_column( $this->queued(), 'name' ) );
+	}
+
+	public function test_the_hourly_retry_resolves_the_files_it_never_named() {
+		$names = $this->seed_pack( 2 );
+
+		$this->set_status(
+			[
+				'phase'       => 'failed',
+				'retry_after' => gmdate( 'Y-m-d H:i:s', time() - HOUR_IN_SECONDS ),
+			]
+		);
+
+		$this->assertSame( 1, $this->queue->maybe_retry() );
+		$this->assertSame( $names, array_column( $this->queued(), 'name' ) );
 	}
 
 	public function test_a_failed_entry_inside_its_backoff_is_not_re_queued() {

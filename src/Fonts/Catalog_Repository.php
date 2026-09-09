@@ -266,6 +266,23 @@ class Catalog_Repository {
 	}
 
 	/**
+	 * How many files the catalogue says an entry has, or 0 when it does not say
+	 *
+	 * One column, because the caller wants a number and `entry()` would decode a whole entry document to hand it
+	 * one. A 0 means the index never declared a count, which is a reason to ask, not a reason to assume nothing.
+	 *
+	 * @since 7.0
+	 */
+	public function file_count( string $source, string $entry ): int {
+		global $wpdb;
+
+		$table = $this->schema->get_catalog_table();
+
+		/* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- table name comes from Font_Schema */
+		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT files FROM {$table} WHERE source = %s AND entry = %s", $source, $entry ) );
+	}
+
+	/**
 	 * Every coverage entry of one source, with its inlined entry decoded
 	 *
 	 * The adopter's read, and the only one besides `entry()` that touches `entry_json`. Deliberately uncached: it

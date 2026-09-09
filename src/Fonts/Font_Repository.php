@@ -859,6 +859,43 @@ class Font_Repository {
 	}
 
 	/**
+	 * The distinct files one catalogue entry has installed
+	 *
+	 * @return array<string, true>
+	 *
+	 * @since 7.0
+	 */
+	public function paths_for_entry( string $source, string $entry ): array {
+		return static::paths_for_rows( $this->rows_for_entry( $source, $entry ) );
+	}
+
+	/**
+	 * The distinct files a set of font rows records
+	 *
+	 * A fold rather than a query, because the two callers come at it from opposite ends: the install status has the
+	 * rows in hand and wants a count, the queue has an entry id and wants to know whether anything is outstanding.
+	 * One definition of "a file this entry has", either way — two installs of a display entry share files, so the
+	 * path decides, not the row.
+	 *
+	 * @param array[] $rows
+	 *
+	 * @return array<string, true>
+	 *
+	 * @since 7.0
+	 */
+	public static function paths_for_rows( array $rows ): array {
+		$paths = [];
+
+		foreach ( $rows as $row ) {
+			foreach ( $row['files'] as $file ) {
+				$paths[ (string) $file['path'] ] = true;
+			}
+		}
+
+		return $paths;
+	}
+
+	/**
 	 * Every filename some font row already records
 	 *
 	 * The three passes that populate the tables — migration, legacy adoption, loose import — all need this to avoid
