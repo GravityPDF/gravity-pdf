@@ -1923,6 +1923,12 @@ class Model_PDF extends Helper_Abstract_Model {
 				'dir' => $this->data->template_tmp_location,
 				'age' => time() - 12 * 3600, // 12 hour
 			],
+
+			/* Only ever holds `.part` files a killed font download orphaned; a live one is minutes old, not hours */
+			[
+				'dir' => trailingslashit( $this->data->template_font_location ) . '.tmp',
+				'age' => time() - 12 * 3600, // 12 hour
+			],
 		];
 
 		foreach ( $config as $item ) {

@@ -45,36 +45,54 @@ trait MocksHttpRequests {
 				}
 
 				if ( $response instanceof WP_Error ) {
+					/* WP_Http opens the target before the transfer, so a mid-transfer failure really does leave a
+					   partial file behind — the case the unlink-on-every-exit rule exists for */
+					if ( ! empty( $args['stream'] ) && ! empty( $args['filename'] ) ) {
+						file_put_contents( (string) $args['filename'], '' );
+					}
+
 					return $response;
 				}
 
 				$response = is_array( $response ) ? $response : [ 'body' => $response ];
 
-				return [
-					'headers'  => $response['headers'] ?? [],
-					'body'     => $response['body'] ?? '',
-					'response' => [
-						'code'    => $response['code'] ?? 200,
-						'message' => 'OK',
-					],
-					'cookies'  => [],
-					'filename' => null,
-				];
+				return $this->http_response( $response, $args );
 			}
 
-			return [
-				'headers'  => [],
-				'body'     => '',
-				'response' => [
-					'code'    => 404,
-					'message' => 'Not Found',
-				],
-				'cookies'  => [],
-				'filename' => null,
-			];
+			return $this->http_response( [ 'code' => 404 ], $args );
 		};
 
 		add_filter( 'pre_http_request', $this->http_filter, 10, 3 );
+	}
+
+	/**
+	 * Shape one routing-table entry the way `WP_Http` would have
+	 *
+	 * A streamed request writes the body to `filename` and hands back an empty body, so a test can exercise the
+	 * `.part` rules — the unlink-on-failure guarantee especially — rather than only the in-memory path.
+	 */
+	private function http_response( array $response, array $args ): array {
+		$body = (string) ( $response['body'] ?? '' );
+		$file = null;
+
+		if ( ! empty( $args['stream'] ) && ! empty( $args['filename'] ) ) {
+			$file = (string) $args['filename'];
+
+			file_put_contents( $file, $body );
+
+			$body = '';
+		}
+
+		return [
+			'headers'  => $response['headers'] ?? [],
+			'body'     => $body,
+			'response' => [
+				'code'    => $response['code'] ?? 200,
+				'message' => 'OK',
+			],
+			'cookies'  => [],
+			'filename' => $file,
+		];
 	}
 
 	protected function unmock_http(): void {

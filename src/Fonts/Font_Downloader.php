@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts;
 
+use GFPDF\Helper\Helper_Data;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -21,8 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Every outbound request the font system makes
  *
- * This half fetches metadata into memory — the root index, its signature, a source index, an entry file. The
- * streamed file downloads the installer needs are a second method on top of the same rules.
+ * `fetch()` pulls a metadata document into memory — the root index, its signature, a source index, an entry file.
+ * `download()` streams a font file to disk under the same rules, because a 17 MB TTF read into a string is a
+ * memory limit waiting to be hit on a shared host.
  *
  * The rules that are not negotiable: `https` only, `sslverify` hard-coded true (never
  * `EDD_SL_Plugin_Updater::verify_ssl()`, whose filter exists to let cheap hosts turn verification off), and a byte
@@ -67,13 +69,43 @@ class Font_Downloader {
 	public const MAX_METADATA_BYTES = 2097152;
 
 	/**
+	 * Sun-ExtB, the largest asset after the spike-5 swaps, is 17,632,200 bytes. Anything the pipeline cannot get
+	 * under this must be split or subset there rather than have the ceiling raised here
+	 *
+	 * @since 7.0
+	 */
+	public const MAX_FILE_BYTES = 26214400;
+
+	/**
+	 * @since 7.0
+	 */
+	public const FILE_TIMEOUT = 45;
+
+	/**
+	 * Room left over the file's own size, so an install cannot be the thing that fills a disk
+	 *
+	 * @since 7.0
+	 */
+	public const DISK_HEADROOM = 52428800;
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
 	protected $log;
 
-	public function __construct( LoggerInterface $log ) {
-		$this->log = $log;
+	/**
+	 * Read for `template_font_location` at download time, not construction: this class is built during bootstrap
+	 * and that path is not set until `Controller_Install::setup_defaults()` runs
+	 *
+	 * @var Helper_Data
+	 * @since 7.0
+	 */
+	protected $data;
+
+	public function __construct( LoggerInterface $log, Helper_Data $data ) {
+		$this->log  = $log;
+		$this->data = $data;
 	}
 
 	/**
@@ -141,6 +173,88 @@ class Font_Downloader {
 		$body = (string) wp_remote_retrieve_body( $response );
 
 		return $this->verify( $url, $body, $expected, $max_bytes );
+	}
+
+	/**
+	 * Stream one font file to a private temp name and return that path once it verifies
+	 *
+	 * Never writes to its destination: the caller renames the returned `.part` into place (§4.3 Installer step 3),
+	 * which is atomic because `.tmp/` sits at the fonts-dir root and is therefore the same filesystem. The name
+	 * carries a `uniqid()`, so two requests fetching the same file cannot interleave bytes in a shared target — the
+	 * failure mode that makes a truncated font look like a hash mismatch.
+	 *
+	 * **Every non-success exit unlinks its own `.part`**, exceptions included; only a process kill can orphan one,
+	 * and `cleanup_tmp_dir()` sweeps those hourly.
+	 *
+	 * @param array $expected `sha256` and `size` from the entry file (both required — a download is bounded by what
+	 *                        the index declares, which is why no sfnt parse is needed), `name` for the temp file,
+	 *                        `timeout` to override the background default, `request_args` for a third-party source
+	 *
+	 * @return string|WP_Error Path to the verified `.part` file
+	 *
+	 * @since 7.0
+	 */
+	public function download( string $url, array $expected = [] ) {
+		$error = $this->check_url( $url );
+		if ( $error !== null ) {
+			return $error;
+		}
+
+		$size = (int) ( $expected['size'] ?? 0 );
+
+		/* Refused before a byte is requested, exactly as `fetch()` refuses an over-sized index */
+		if ( $size > static::MAX_FILE_BYTES ) {
+			return new WP_Error(
+				'font_too_large',
+				sprintf( 'The file at %s declares %d bytes, over the %d byte ceiling', $url, $size, static::MAX_FILE_BYTES )
+			);
+		}
+
+		$error = $this->check_disk_space( $url, $size );
+		if ( $error !== null ) {
+			return $error;
+		}
+
+		$part = $this->part_path( (string) ( $expected['name'] ?? 'font' ) );
+		if ( is_wp_error( $part ) ) {
+			return $part;
+		}
+
+		$done = false;
+
+		try {
+			$response = $this->stream( $url, $part, $expected );
+
+			if ( is_wp_error( $response ) ) {
+				$this->log->error(
+					'Font download failed',
+					[
+						'url'   => $url,
+						'error' => $response->get_error_message(),
+					]
+				);
+
+				return $response;
+			}
+
+			$code = (int) wp_remote_retrieve_response_code( $response );
+			if ( $code !== 200 ) {
+				return new WP_Error( 'font_http_error', sprintf( 'The request for %s returned %d', $url, $code ) );
+			}
+
+			$error = $this->verify_file( $url, $part, $expected );
+			if ( $error !== null ) {
+				return $error;
+			}
+
+			$done = true;
+
+			return $part;
+		} finally {
+			if ( ! $done ) {
+				$this->unlink_part( $part );
+			}
+		}
 	}
 
 	/**
@@ -217,6 +331,148 @@ class Font_Downloader {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @return array|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function stream( string $url, string $part, array $expected ) {
+		$request_url = $url;
+		if ( count( (array) ( $expected['request_args'] ?? [] ) ) > 0 ) {
+			$request_url = add_query_arg( $expected['request_args'], $url );
+		}
+
+		return wp_safe_remote_get(
+			$request_url,
+			[
+				/* Hard-coded: this must never become a filter a host can answer with false */
+				'sslverify'           => true,
+				'redirection'         => 0,
+				'timeout'             => (int) ( $expected['timeout'] ?? $this->get_file_timeout() ),
+				'connect_timeout'     => static::CONNECT_TIMEOUT,
+				'limit_response_size' => static::MAX_FILE_BYTES,
+				'stream'              => true,
+				'filename'            => $part,
+				'user-agent'          => $this->get_user_agent(),
+				/* A TTF does not compress, and hash-of-bytes stays trivial when nothing decodes on the way in */
+				'headers'             => [ 'Accept-Encoding' => 'identity' ],
+			]
+		);
+	}
+
+	/**
+	 * The one filter over a font download's wall time, background fetches only
+	 *
+	 * Trigger 3's inline batch has its own 10 s constant instead: a submitter waiting on a render is not the place
+	 * to honour a host's 45-second patience.
+	 *
+	 * @since 7.0
+	 */
+	public function get_file_timeout(): int {
+		return max( 1, (int) apply_filters( 'gfpdf_font_download_timeout', static::FILE_TIMEOUT ) );
+	}
+
+	/**
+	 * Size first, then hash, same order and same reason as the in-memory half
+	 *
+	 * @since 7.0
+	 */
+	protected function verify_file( string $url, string $part, array $expected ): ?WP_Error {
+		if ( ! is_file( $part ) ) {
+			return new WP_Error( 'font_download_empty', sprintf( 'The download of %s wrote no file', $url ) );
+		}
+
+		$length = (int) filesize( $part );
+
+		if ( isset( $expected['size'] ) && $length !== (int) $expected['size'] ) {
+			return new WP_Error( 'font_size_mismatch', sprintf( 'The file at %s is %d bytes, not the %d the index lists', $url, $length, (int) $expected['size'] ) );
+		}
+
+		if ( isset( $expected['sha256'] ) && ! hash_equals( (string) $expected['sha256'], (string) hash_file( 'sha256', $part ) ) ) {
+			return new WP_Error( 'font_hash_mismatch', sprintf( 'The file at %s does not match the hash the index lists', $url ) );
+		}
+
+		return null;
+	}
+
+	/**
+	 * A private temp name under the fonts directory, so the later `rename()` never crosses a filesystem
+	 *
+	 * @return string|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function part_path( string $name ) {
+		$dir = $this->get_tmp_dir();
+
+		if ( ! wp_mkdir_p( $dir ) ) {
+			return new WP_Error( 'font_tmp_unwritable', sprintf( 'The font temp directory %s could not be created', $dir ) );
+		}
+
+		$name = sanitize_file_name( $name );
+
+		return $dir . ( $name !== '' ? $name : 'font' ) . '.' . uniqid( '', true ) . '.part';
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	public function get_tmp_dir(): string {
+		return trailingslashit( $this->data->template_font_location ) . '.tmp/';
+	}
+
+	/**
+	 * Refuse rather than half-write when the disk cannot hold the file plus room to work in
+	 *
+	 * A distinct code, not a fake hash mismatch: a run of these is a host problem the admin can act on, and
+	 * `Missing_Font_Files_Check` reports it as one. A host where `disk_free_space()` is disabled proceeds.
+	 *
+	 * @since 7.0
+	 */
+	protected function check_disk_space( string $url, int $size ): ?WP_Error {
+		if ( $size <= 0 ) {
+			return null;
+		}
+
+		$free = $this->free_space();
+
+		if ( $free === null || $free >= ( $size + static::DISK_HEADROOM ) ) {
+			return null;
+		}
+
+		return new WP_Error(
+			'font_disk_full',
+			sprintf( 'There is not enough free disk space to download %s: %d bytes needed, %d free', $url, $size + static::DISK_HEADROOM, (int) $free )
+		);
+	}
+
+	/**
+	 * Free bytes on the fonts filesystem, or null where the host will not say
+	 *
+	 * Its own method so the branch above is reachable from a test: nothing else can make a real disk nearly full.
+	 *
+	 * @since 7.0
+	 */
+	protected function free_space(): ?float {
+		if ( ! function_exists( 'disk_free_space' ) ) {
+			return null;
+		}
+
+		/* An open_basedir restriction warns rather than returning false */
+		$free = @disk_free_space( $this->data->template_font_location ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+		return $free === false ? null : (float) $free;
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	protected function unlink_part( string $part ): void {
+		if ( is_file( $part ) ) {
+			@unlink( $part ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.unlink_unlink -- a temp file we own; a failure here is the hourly sweep's problem
+		}
 	}
 
 	/**

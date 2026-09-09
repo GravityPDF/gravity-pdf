@@ -35,13 +35,29 @@ class Test_Font_Downloader extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->downloader = new Font_Downloader( GPDFAPI::get_log_class() );
+		$this->downloader = new Font_Downloader( GPDFAPI::get_log_class(), GPDFAPI::get_data_class() );
 	}
 
 	public function tear_down(): void {
 		$this->unmock_http();
 
+		foreach ( glob( $this->downloader->get_tmp_dir() . '*.part' ) ?: [] as $part ) {
+			unlink( $part );
+		}
+
 		parent::tear_down();
+	}
+
+	/**
+	 * Every `.part` currently in the fonts temp directory
+	 *
+	 * The unlink-on-failure guarantee is only observable from outside, so most of the streamed cases below assert
+	 * on this rather than on the return value alone.
+	 *
+	 * @return string[]
+	 */
+	protected function parts(): array {
+		return glob( $this->downloader->get_tmp_dir() . '*.part' ) ?: [];
 	}
 
 	public function test_a_body_comes_back_verbatim() {
@@ -220,5 +236,186 @@ class Test_Font_Downloader extends TestCase {
 		$this->downloader->fetch( 'https://fonts.example.com/v1/index.json', [ 'request_args' => [ 'token' => 'abc' ] ] );
 
 		$this->assertStringContainsString( 'token=abc', $this->requested_urls()[0] );
+	}
+
+	public function test_a_streamed_download_lands_in_a_part_file() {
+		$body = str_repeat( 'A', 2048 );
+
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $body ] );
+
+		$part = $this->downloader->download(
+			'https://fonts.gravitypdf.com/v1/files/fonts-v1.0.0/A.ttf',
+			[
+				'sha256' => hash( 'sha256', $body ),
+				'size'   => strlen( $body ),
+				'name'   => 'A.ttf',
+			]
+		);
+
+		$this->assertIsString( $part );
+		$this->assertStringEndsWith( '.part', $part );
+		$this->assertSame( $body, file_get_contents( $part ) );
+
+		/* The caller renames it into place, so the downloader must not have written the destination itself */
+		$this->assertStringContainsString( '/.tmp/', $part );
+	}
+
+	/**
+	 * @dataProvider provider_failed_downloads
+	 */
+	public function test_a_failed_download_leaves_no_part_behind( $response, string $expected, array $overrides = [] ) {
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $response ] );
+
+		$result = $this->downloader->download(
+			'https://fonts.gravitypdf.com/v1/files/fonts-v1.0.0/A.ttf',
+			array_merge(
+				[
+					'sha256' => hash( 'sha256', 'the right bytes' ),
+					'size'   => 15,
+					'name'   => 'A.ttf',
+				],
+				$overrides
+			)
+		);
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( $expected, $result->get_error_code() );
+
+		/* The whole point of the per-attempt name: a failure cannot leave a half-file for the next attempt to find */
+		$this->assertSame( [], $this->parts() );
+	}
+
+	public function provider_failed_downloads(): array {
+		return [
+			'a hash mismatch'   => [ 'the wrong bytes', 'font_hash_mismatch' ],
+			'a size mismatch'   => [ 'short', 'font_size_mismatch' ],
+			'an HTTP error'     => [ [ 'body' => '', 'code' => 500 ], 'font_http_error' ],
+			/* Passed through rather than wrapped, so the transport's own message reaches the log and the error ring */
+			'a transport error' => [ new WP_Error( 'http_request_failed', 'Operation timed out' ), 'http_request_failed' ],
+		];
+	}
+
+	public function test_a_declared_size_over_the_file_ceiling_is_refused_before_any_request() {
+		$this->mock_http( [ 'fonts.gravitypdf.com' => 'never reached' ] );
+
+		$result = $this->downloader->download(
+			'https://fonts.gravitypdf.com/v1/files/huge.ttf',
+			[ 'size' => Font_Downloader::MAX_FILE_BYTES + 1 ]
+		);
+
+		$this->assertSame( 'font_too_large', $result->get_error_code() );
+		$this->assertSame( [], $this->requested_urls(), 'an over-cap file must cost no bytes at all' );
+		$this->assertSame( [], $this->parts() );
+	}
+
+	public function test_a_non_https_download_is_refused_without_a_request() {
+		$this->mock_http( [ 'fonts.gravitypdf.com' => 'ok' ] );
+
+		$result = $this->downloader->download( 'http://fonts.gravitypdf.com/v1/files/A.ttf', [ 'size' => 10 ] );
+
+		$this->assertSame( 'font_insecure_url', $result->get_error_code() );
+		$this->assertSame( [], $this->requested_urls() );
+	}
+
+	public function test_two_attempts_at_one_file_never_share_a_target() {
+		$body = str_repeat( 'A', 64 );
+
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $body ] );
+
+		$expected = [
+			'sha256' => hash( 'sha256', $body ),
+			'size'   => strlen( $body ),
+			'name'   => 'A.ttf',
+		];
+
+		$first  = $this->downloader->download( 'https://fonts.gravitypdf.com/v1/files/A.ttf', $expected );
+		$second = $this->downloader->download( 'https://fonts.gravitypdf.com/v1/files/A.ttf', $expected );
+
+		/* Concurrent attempts interleaving bytes in a shared target is what makes a truncated font look like a
+		   hash mismatch, so the names must differ even for the same file */
+		$this->assertNotSame( $first, $second );
+		$this->assertCount( 2, $this->parts() );
+	}
+
+	public function test_a_font_fetch_is_streamed_and_uncompressed() {
+		$body = str_repeat( 'A', 32 );
+
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $body ] );
+
+		$this->downloader->download(
+			'https://fonts.gravitypdf.com/v1/files/A.ttf',
+			[
+				'sha256' => hash( 'sha256', $body ),
+				'size'   => strlen( $body ),
+			]
+		);
+
+		$args = $this->request_args_for( 'A.ttf' );
+
+		$this->assertTrue( $args['stream'] );
+		$this->assertTrue( $args['sslverify'] );
+		$this->assertSame( 0, $args['redirection'] );
+		$this->assertSame( Font_Downloader::MAX_FILE_BYTES, $args['limit_response_size'] );
+
+		/* A TTF does not compress, and nothing decoding on the way in keeps hash-of-bytes trivial */
+		$this->assertSame( 'identity', $args['headers']['Accept-Encoding'] );
+	}
+
+	public function test_the_background_timeout_is_filterable() {
+		$this->assertSame( Font_Downloader::FILE_TIMEOUT, $this->downloader->get_file_timeout() );
+
+		add_filter( 'gfpdf_font_download_timeout', fn() => 90 );
+
+		$this->assertSame( 90, $this->downloader->get_file_timeout() );
+
+		/* A host answering with nonsense must not turn into an instant-timeout loop */
+		add_filter( 'gfpdf_font_download_timeout', fn() => 0, 20 );
+
+		$this->assertSame( 1, $this->downloader->get_file_timeout() );
+
+		remove_all_filters( 'gfpdf_font_download_timeout' );
+	}
+
+	/**
+	 * A distinct code rather than a fake hash mismatch: a run of these is a host problem the admin can act on, and
+	 * the health check keys on it
+	 */
+	public function test_a_full_disk_is_refused_before_any_request() {
+		$this->mock_http( [ 'fonts.gravitypdf.com' => 'never reached' ] );
+
+		$downloader = new class( GPDFAPI::get_log_class(), GPDFAPI::get_data_class() ) extends Font_Downloader {
+			protected function free_space(): ?float {
+				return 1024.0;
+			}
+		};
+
+		$result = $downloader->download( 'https://fonts.gravitypdf.com/v1/files/A.ttf', [ 'size' => 2048 ] );
+
+		$this->assertSame( 'font_disk_full', $result->get_error_code() );
+		$this->assertSame( [], $this->requested_urls() );
+	}
+
+	public function test_a_host_that_will_not_report_free_space_proceeds() {
+		$body = str_repeat( 'A', 16 );
+
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $body ] );
+
+		$downloader = new class( GPDFAPI::get_log_class(), GPDFAPI::get_data_class() ) extends Font_Downloader {
+			protected function free_space(): ?float {
+				return null;
+			}
+		};
+
+		$part = $downloader->download(
+			'https://fonts.gravitypdf.com/v1/files/A.ttf',
+			[
+				'sha256' => hash( 'sha256', $body ),
+				'size'   => strlen( $body ),
+			]
+		);
+
+		$this->assertIsString( $part, 'open_basedir hiding disk_free_space() must not block every install' );
+
+		unlink( $part );
 	}
 }
