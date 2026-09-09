@@ -2,8 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Controller;
+namespace GFPDF\Rest;
 
+use GFPDF\Exceptions\GravityPdfIdException;
+use GFPDF\Fonts\Font_Repository;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
 use GPDFAPI;
@@ -17,17 +19,17 @@ use GFPDF\Tests\Integration\TestCase;
  */
 
 /**
- * Class Test_Controller_Custom_Fonts
+ * Class Test_Rest_Custom_Fonts
  *
- * @package GFPDF\Controller
+ * @package GFPDF\Rest
  *
- * @group   controller
+ * @group   api
  * @group   fonts
  */
-class Test_Controller_Custom_Fonts extends TestCase {
+class Test_Rest_Custom_Fonts extends TestCase {
 
 	/**
-	 * @var Controller_Custom_Fonts
+	 * @var Rest_Custom_Fonts
 	 */
 	protected $controller;
 
@@ -84,12 +86,12 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->tmp_font_location = $gfpdf->data->template_font_location;
 		wp_mkdir_p( $this->tmp_font_location );
 
-		$class = $gfpdf->singleton->get_class( 'Controller_Custom_Fonts' );
-		remove_action( 'rest_api_init', [ $class, 'register_endpoints' ] );
+		$class = $gfpdf->singleton->get_class( 'Rest_Custom_Fonts' );
+		remove_action( 'rest_api_init', [ $class, 'register_routes' ] );
 
 		/* Setup our test classes */
 		$this->model      = new Model_Custom_Fonts( $gfpdf->get_font_repository() );
-		$this->controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Fonts\\LocalFilesystem', 'GFPDF\\Fonts\\LocalFile' );
+		$this->controller = new Rest_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Fonts\\LocalFilesystem', 'GFPDF\\Fonts\\LocalFile' );
 
 		$this->controller->init();
 
@@ -129,7 +131,29 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$routes = $rest->get_routes( Helper_Data::REST_API_BASENAME . 'v1' );
 
 		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts', $routes );
-		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/(?P<id>[a-z0-9\-]+)', $routes );
+		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1' . Rest_Custom_Fonts::id_route(), $routes );
+	}
+
+	public function test_the_id_route_accepts_an_underscored_imported_key() {
+		$this->assertSame( 1, preg_match( '@^' . Rest_Custom_Fonts::id_route() . '$@', '/fonts/open_sans' ) );
+	}
+
+	/**
+	 * WordPress anchors the whole pattern, so this is the match a dispatched request would make
+	 */
+	public function test_the_id_route_never_swallows_a_literal_font_route() {
+		foreach ( Font_Repository::RESERVED_ROUTE_KEYS as $word ) {
+			$this->assertSame( 0, preg_match( '@^' . Rest_Custom_Fonts::id_route() . '$@', '/fonts/' . $word ), $word );
+		}
+	}
+
+	/**
+	 * A key equal to a route word would be unaddressable, so the upload path must never mint one
+	 */
+	public function test_a_font_named_after_a_literal_route_is_given_another_key() {
+		foreach ( Font_Repository::RESERVED_ROUTE_KEYS as $word ) {
+			$this->assertNotSame( $word, $this->model->get_unique_id( $word ), $word );
+		}
 	}
 
 	public function test_get_all_items() {
@@ -501,5 +525,40 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertEmpty( $this->controller->get_absolute_font_path( '' ) );
 
 		$this->assertSame( $this->tmp_font_location . 'font.ttf', $this->controller->get_absolute_font_path( 'font.ttf' ) );
+	}
+
+	/**
+	 * The one status `add_item()` answered differently from the other two routes
+	 *
+	 * Unreachable over the route — `get_unique_id()` suffixes until the key is free — so the model is stubbed to
+	 * throw what the catch is there for.
+	 */
+	public function test_an_invalid_font_id_is_a_client_error_on_every_route() {
+		global $gfpdf;
+
+		$controller = new Rest_Custom_Fonts(
+			new Throwing_Custom_Fonts_Model( $gfpdf->get_font_repository() ),
+			$gfpdf->log,
+			$gfpdf->gform,
+			$this->tmp_font_location
+		);
+
+		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
+		$request->set_param( 'label', 'Font' );
+
+		$error = $controller->add_item( $request );
+
+		$this->assertSame( 'invalid_font_id', $error->get_error_code() );
+		$this->assertSame( 400, $error->get_error_data()['status'] );
+	}
+}
+
+/**
+ * A model whose id derivation fails, for the catch that no request can reach
+ */
+class Throwing_Custom_Fonts_Model extends Model_Custom_Fonts {
+
+	public function get_unique_id( string $id ): string {
+		throw new GravityPdfIdException();
 	}
 }

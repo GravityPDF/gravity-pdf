@@ -2,21 +2,18 @@
 
 declare( strict_types=1 );
 
-namespace GFPDF\Controller;
+namespace GFPDF\Rest;
 
-use Closure;
 use Exception;
 use GFPDF\Exceptions\GravityPdfDatabaseUpdateException;
 use GFPDF\Exceptions\GravityPdfFontNotFoundException;
 use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Exceptions\GravityPdfModelNotUpdatedException;
 use GFPDF\Fonts\FlushCache;
+use GFPDF\Fonts\Font_Repository;
 use GFPDF\Fonts\SupportsOtl;
 use GFPDF\Fonts\TtfFontValidation;
-use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Abstract_Options;
-use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
@@ -37,23 +34,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Controller_Custom_Fonts
+ * Upload, edit and delete a font of the site's own
  *
- * @package GFPDF\Controller
+ * A font row, not a catalogue entry: `custom` and `imported` rows have no source and nothing to install, so this
+ * addresses them by their mPDF key alone. It shares `Rest_Font_Base` with the catalogue routes for the capability
+ * and nothing else.
+ *
+ * @package GFPDF\Rest
+ *
+ * @since 6.0
  */
-class Controller_Custom_Fonts extends Helper_Abstract_Controller {
+class Rest_Custom_Fonts extends Rest_Font_Base {
+
+	/**
+	 * @var Model_Custom_Fonts
+	 * @since 6.0
+	 */
+	protected $model;
 
 	/**
 	 * @var LoggerInterface
 	 * @since 6.0
 	 */
 	protected $log;
-
-	/**
-	 * @var Helper_Abstract_Form
-	 * @since 6.0
-	 */
-	protected $gform;
 
 	/**
 	 * @var string The absolute path to the Custom Fonts directory on the server
@@ -90,32 +93,52 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	}
 
 	/**
+	 * The `{id}` route, with the literal `/fonts/…` words it must not swallow excluded up front
+	 *
+	 * Built from `Font_Repository`'s two constants rather than spelled here: the charset is the font-key charset,
+	 * `_` included — an imported `Open_Sans.ttf` keys as `open_sans`, and a route narrower than the key rule is how
+	 * those rows became unaddressable in the first place. WordPress anchors the whole pattern, so excluding the bare
+	 * word is enough; a longer path can never reach a one-segment route.
+	 *
+	 * @since 7.0
+	 */
+	public static function id_route(): string {
+		return sprintf(
+			'/fonts/(?!(?:%s)$)(?P<id>[%s]+)',
+			implode( '|', Font_Repository::RESERVED_ROUTE_KEYS ),
+			Font_Repository::KEY_CHARS
+		);
+	}
+
+	/**
+	 * @deprecated 7.0 Renamed `register_routes()`, which is what `WP_REST_Controller` calls it
+	 *
 	 * @since 6.0
 	 */
-	public function init(): void {
-		add_action( 'rest_api_init', [ $this, 'register_endpoints' ] );
+	public function register_endpoints(): void {
+		$this->register_routes();
 	}
 
 	/**
 	 * Register the Font CRUD REST API endpoints
 	 *
-	 * @since 6.0
+	 * @since 7.0
 	 */
-	public function register_endpoints(): void {
+	public function register_routes() {
 		register_rest_route(
-			Helper_Data::REST_API_BASENAME . 'v1',
+			static::NAMESPACE,
 			'/fonts/',
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_all_items' ],
-					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'permission_callback' => [ $this, 'get_items_permissions_check' ],
 				],
 
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'add_item' ],
-					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
 					'args'                => [
 						'label' => [
 							'description'       => __( 'The font label used for the object', 'gravity-pdf' ),
@@ -129,8 +152,8 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		);
 
 		register_rest_route(
-			Helper_Data::REST_API_BASENAME . 'v1',
-			'/fonts/(?P<id>[a-z0-9\-]+)',
+			static::NAMESPACE,
+			static::id_route(),
 			[
 				'args' => [
 					'id' => [
@@ -144,7 +167,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'update_item' ],
-					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'permission_callback' => [ $this, 'update_item_permissions_check' ],
 					'args'                => [
 						'label'       => [
 							'description'       => __( 'The font label used for the object', 'gravity-pdf' ),
@@ -155,25 +178,25 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 						'regular'     => [
 							'description'       => __( 'The path to the `regular` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
-							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => [ $this, 'check_empty_string' ],
 						],
 
 						'italics'     => [
 							'description'       => __( 'The path to the `italics` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
-							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => [ $this, 'check_empty_string' ],
 						],
 
 						'bold'        => [
 							'description'       => __( 'The path to the `bold` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
-							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => [ $this, 'check_empty_string' ],
 						],
 
 						'bolditalics' => [
 							'description'       => __( 'The path to the `bolditalics` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
-							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => [ $this, 'check_empty_string' ],
 						],
 					],
 				],
@@ -181,7 +204,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_item' ],
-					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 				],
 			]
 		);
@@ -258,7 +281,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		} catch ( GravityPdfDatabaseUpdateException $e ) {
 			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );
 		} catch ( GravityPdfIdException $e ) {
-			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 500 ] );
+			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 400 ] );
 		} catch ( Exception $e ) {
 			return new WP_Error( 'unknown_error', $e->getMessage(), [ 'status' => 500 ] );
 		} finally {
@@ -273,11 +296,13 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 *
 	 * This endpoint acts like a PATCH request, and data that isn't passed won't be updated
 	 *
+	 * @param WP_REST_Request $request Untyped: `WP_REST_Controller` declares it so, and narrowing is a fatal
+	 *
 	 * @return array|WP_Error
 	 *
 	 * @since 6.0
 	 */
-	public function update_item( WP_REST_Request $request ) {
+	public function update_item( $request ) {
 		try {
 			$id = $request->get_param( 'id' );
 			if ( ! $this->model->matches_custom_font_id( $id ) ) {
@@ -379,13 +404,13 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request Untyped, as `update_item()` above
 	 *
 	 * @return void|WP_Error
 	 *
 	 * @since 6.0
 	 */
-	public function delete_item( WP_REST_Request $request ) {
+	public function delete_item( $request ) {
 		try {
 			$id = $request->get_param( 'id' );
 			if ( ! $this->model->matches_custom_font_id( $id ) ) {
@@ -486,22 +511,25 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 *
 	 * @since 6.0
 	 */
-	protected function check_empty_string( string $input ): bool {
+	public function check_empty_string( string $input ): bool {
 		return empty( $input );
 	}
 
 	/**
-	 * A permissions callback for the REST API endpoints
+	 * Logs the refusal, which the catalogue routes carry no logger to do
+	 *
+	 * @return true|WP_Error
 	 *
 	 * @since 6.0
 	 */
-	protected function check_permissions(): bool {
-		$capabilities = $this->gform->has_capability( 'gravityforms_edit_forms' );
-		if ( ! $capabilities ) {
+	public function get_items_permissions_check( $request ) {
+		$allowed = parent::get_items_permissions_check( $request );
+
+		if ( is_wp_error( $allowed ) ) {
 			$this->log->warning( 'Permission denied: user does not have "gravityforms_edit_forms" capabilities' );
 		}
 
-		return $capabilities;
+		return $allowed;
 	}
 
 	/**

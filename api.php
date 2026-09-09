@@ -744,7 +744,7 @@ final class GPDFAPI {
 
 		$data       = self::get_data_class();
 		$model      = new \GFPDF\Model\Model_Custom_Fonts( $gfpdf->get_font_repository() );
-		$controller = new \GFPDF\Controller\Controller_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Fonts\LocalFilesystem', '\GFPDF\Fonts\LocalFile' );
+		$controller = new \GFPDF\Rest\Rest_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Fonts\LocalFilesystem', '\GFPDF\Fonts\LocalFile' );
 
 		$request = new WP_REST_Request();
 		$request->set_param( 'label', $font['font_name'] ?? '' );
@@ -793,8 +793,8 @@ final class GPDFAPI {
 		$request = new WP_REST_Request();
 		$request->set_param( 'id', $font_id );
 
-		/** @var \GFPDF\Controller\Controller_Custom_Fonts $controller */
-		$controller = self::get_mvc_class( 'Controller_Custom_Fonts' );
+		/** @var \GFPDF\Rest\Rest_Custom_Fonts $controller */
+		$controller = self::get_mvc_class( 'Rest_Custom_Fonts' );
 
 		$response = $controller->delete_item( $request );
 		if ( is_wp_error( $response ) ) {

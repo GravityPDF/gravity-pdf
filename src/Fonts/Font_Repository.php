@@ -82,6 +82,17 @@ class Font_Repository {
 	];
 
 	/**
+	 * The literal words the `/fonts/{id}` route reserves, which are therefore keys nothing may mint
+	 *
+	 * Here rather than beside the route because a key outlives the route table: `/fonts/settings` is not registered
+	 * yet, and a site that minted `settings` before it ships would own a font it could never edit or delete.
+	 * `Rest_Custom_Fonts::id_route()` reads this same list, so the two can never disagree.
+	 *
+	 * @since 7.0
+	 */
+	public const RESERVED_ROUTE_KEYS = [ 'sources', 'status', 'settings', 'updates', 'browse', 'sync' ];
+
+	/**
 	 * The face roles a font row may carry, beside the `dict_*` line-break dictionaries
 	 *
 	 * @since 7.0
@@ -97,7 +108,12 @@ class Font_Repository {
 	 *
 	 * @since 7.0
 	 */
-	public const KEY_PATTERN = '/^[a-z0-9_\-]+$/';
+	public const KEY_CHARS = 'a-z0-9_\\-';
+
+	/**
+	 * @since 7.0
+	 */
+	public const KEY_PATTERN = '/^[' . self::KEY_CHARS . ']+$/';
 
 	/**
 	 * The 6.x face keys, mapped to the roles that replace them
@@ -792,7 +808,8 @@ class Font_Repository {
 	 * @since 7.0
 	 */
 	public function is_key_reserved( string $font_key ): bool {
-		return in_array( $font_key, static::RESERVED_KEYS, true );
+		return in_array( $font_key, static::RESERVED_KEYS, true )
+			|| in_array( $font_key, static::RESERVED_ROUTE_KEYS, true );
 	}
 
 	/**
