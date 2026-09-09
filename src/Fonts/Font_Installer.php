@@ -85,6 +85,12 @@ class Font_Installer {
 	protected $downloader;
 
 	/**
+	 * @var Font_Cache_Warmer
+	 * @since 7.0
+	 */
+	protected $warmer;
+
+	/**
 	 * @var Font_Lock
 	 * @since 7.0
 	 */
@@ -106,12 +112,14 @@ class Font_Installer {
 		Font_Repository $repository,
 		Catalog_Repository $catalog,
 		Font_Downloader $downloader,
+		Font_Cache_Warmer $warmer,
 		Font_Lock $lock,
 		LoggerInterface $log
 	) {
 		$this->repository = $repository;
 		$this->catalog    = $catalog;
 		$this->downloader = $downloader;
+		$this->warmer     = $warmer;
 		$this->lock       = $lock;
 		$this->log        = $log;
 	}
@@ -250,6 +258,12 @@ class Font_Installer {
 			$this->write_rows( $resolved, $install, $targets[ $name ], $path, $file );
 
 			if ( $this->install_complete( $resolved, $install, array_keys( $targets ) ) ) {
+				$unparseable = $this->warm( $source, $entry );
+
+				if ( $unparseable !== null ) {
+					return $this->fail( $source, $entry, $unparseable );
+				}
+
 				$this->catalog->set_status(
 					$source,
 					$entry,
@@ -267,6 +281,24 @@ class Font_Installer {
 		} finally {
 			$this->lock->release( $lock );
 		}
+	}
+
+	/**
+	 * Parse the entry's faces before calling the install done
+	 *
+	 * Ahead of clearing the phase, not after, so a font mPDF cannot read leaves a `failed` row and a retry rather
+	 * than an entry that looks installed and kills the first render that reaches for it.
+	 *
+	 * @since 7.0
+	 */
+	protected function warm( string $source, string $entry ): ?WP_Error {
+		$faces = [];
+
+		foreach ( $this->repository->rows_for_entry( $source, $entry ) as $font_key => $row ) {
+			$faces[ $font_key ] = array_keys( (array) $row['files'] );
+		}
+
+		return $this->warmer->warm( $faces );
 	}
 
 	/**

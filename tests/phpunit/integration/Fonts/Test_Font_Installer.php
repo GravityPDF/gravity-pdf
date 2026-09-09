@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Concerns\HasCatalogRows;
+use GFPDF\Tests\Concerns\HasFontFixtures;
 use GFPDF\Tests\Concerns\MocksHttpRequests;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
@@ -27,6 +28,7 @@ use WP_Error;
 class Test_Font_Installer extends TestCase {
 
 	use HasCatalogRows;
+	use HasFontFixtures;
 	use MocksHttpRequests;
 
 	/**
@@ -73,7 +75,8 @@ class Test_Font_Installer extends TestCase {
 	/**
 	 * A coverage entry with one font and one file, and the bytes its index describes
 	 */
-	protected function seed_pack( string $entry = 'emoji', array $overrides = [], string $body = 'REGULAR-BYTES' ): array {
+	protected function seed_pack( string $entry = 'emoji', array $overrides = [], ?string $body = null ): array {
+		$body = $body ?? $this->font_bytes();
 		$data = array_merge(
 			[
 				'fonts'             => [ 'notoemoji' => [ 'R' => 'NotoEmoji.ttf', 'useOTL' => 255 ] ],
@@ -116,7 +119,7 @@ class Test_Font_Installer extends TestCase {
 	}
 
 	public function test_an_install_writes_the_file_the_row_and_its_coverage_meta() {
-		$body = 'REGULAR-BYTES';
+		$body = $this->font_bytes();
 		$this->seed_pack( 'emoji', [], $body );
 
 		$this->assertTrue( $this->installer->install( 'packs/emoji' ) );
@@ -156,7 +159,7 @@ class Test_Font_Installer extends TestCase {
 	 */
 	public function test_a_failed_install_records_the_code_and_a_backoff( $response, string $expected ) {
 		$this->seed_pack();
-		$this->mock_http( [ 'fonts.gravitypdf.com' => $response ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => is_string( $response ) ? $this->broken_body( $response ) : $response ] );
 
 		$result = $this->installer->install( 'packs/emoji' );
 
@@ -176,12 +179,90 @@ class Test_Font_Installer extends TestCase {
 
 	public function provider_install_failures(): array {
 		return [
-			/* Same length as the fixture on purpose: a shorter body would trip the size check first and this case
-			   would never reach the hash it claims to test */
-			'the bytes do not match the index' => [ 'CORRUPT-BYTES', 'font_hash_mismatch' ],
-			'the body is the wrong length'     => [ 'SHORT', 'font_size_mismatch' ],
+			'the bytes do not match the index' => [ 'corrupt', 'font_hash_mismatch' ],
+			'the body is the wrong length'     => [ 'short', 'font_size_mismatch' ],
 			'the origin is down'               => [ [ 'body' => '', 'code' => 503 ], 'font_http_error' ],
 		];
+	}
+
+	/**
+	 * `corrupt` keeps the fixture's length on purpose: a shorter body trips the size check first, and the hash case
+	 * would never reach the hash it claims to test
+	 */
+	protected function broken_body( string $kind ): string {
+		return $kind === 'corrupt' ? $this->corrupt_font_bytes() : substr( $this->font_bytes(), 0, 128 );
+	}
+
+	/**
+	 * The whole point of parsing at install time: mPDF throws on a font it cannot read, and if the first parse
+	 * happens mid-render the PDF dies instead
+	 */
+	public function test_a_font_mpdf_cannot_parse_fails_the_entry_rather_than_a_later_render() {
+		/* Right size, right hash, but not a font — a truncated upload at the origin looks exactly like this */
+		$body = str_repeat( 'NOT-A-FONT-AT-ALL', 64 );
+		$this->seed_pack( 'emoji', [], $body );
+
+		$result = $this->installer->install( 'packs/emoji' );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'font_unparseable', $result->get_error_code() );
+
+		$status = $this->status();
+		$this->assertSame( 'failed', $status['phase'] );
+		$this->assertSame( 'font_unparseable', $status['error'] );
+		$this->assertNotNull( $status['retry_after'] );
+	}
+
+	public function test_a_successful_install_leaves_the_mpdf_metrics_cache_warm() {
+		global $gfpdf;
+
+		$this->seed_pack();
+
+		GPDFAPI::get_misc_class()->cleanup_dir( $gfpdf->data->mpdf_tmp_location );
+
+		$this->assertTrue( $this->installer->install( 'packs/emoji' ) );
+
+		/*
+		 * Written by the install rather than by whichever render got there first — that request is normally a form
+		 * submission waiting on a PDF, and this face is 146 KB where a CJK one is 17 MB.
+		 */
+		$this->assertFileExists( FlushCache::get_font_cache_dir() . 'notoemoji.mtx.json' );
+		$this->assertFileExists( FlushCache::get_font_cache_dir() . 'notoemoji.cw.dat' );
+	}
+
+	public function test_a_line_break_dictionary_is_never_handed_to_addfont() {
+		$body = $this->font_bytes();
+		$dict = 'DICTIONARY-DATA';
+
+		/* `dict_*` rows are shaper data, not faces: AddFont() would throw on one */
+		$this->seed_pack(
+			'thai',
+			[
+				'fonts' => [ 'notothai' => [ 'R' => 'NotoThai.ttf', 'dict_thai' => 'thai.txt' ] ],
+				'files' => [
+					'NotoThai.ttf' => [
+						'sha256'      => hash( 'sha256', $body ),
+						'size'        => strlen( $body ),
+						'remote_path' => 'fonts-v1.0.0/NotoThai.ttf',
+					],
+					'thai.txt'    => [
+						'sha256'      => hash( 'sha256', $dict ),
+						'size'        => strlen( $dict ),
+						'remote_path' => 'fonts-v1.0.0/thai.txt',
+					],
+				],
+			]
+		);
+
+		$this->mock_http(
+			[
+				'NotoThai.ttf' => $body,
+				'thai.txt'    => $dict,
+			]
+		);
+
+		$this->assertTrue( $this->installer->install( 'packs/thai' ) );
+		$this->assertNull( $this->status( 'thai' )['phase'] );
 	}
 
 	public function test_an_unknown_entry_is_refused_without_a_request() {
@@ -221,7 +302,7 @@ class Test_Font_Installer extends TestCase {
 	}
 
 	public function test_a_file_already_on_disk_from_a_crashed_install_is_adopted_not_refetched() {
-		$body = 'REGULAR-BYTES';
+		$body = $this->font_bytes();
 		$this->seed_pack( 'emoji', [], $body );
 
 		/* The window between a previous rename() and its row upsert */
@@ -235,11 +316,11 @@ class Test_Font_Installer extends TestCase {
 	}
 
 	public function test_a_file_on_disk_that_does_not_match_is_refetched() {
-		$body = 'REGULAR-BYTES';
+		$body = $this->font_bytes();
 		$this->seed_pack( 'emoji', [], $body );
 
 		wp_mkdir_p( $this->font_dir . 'packs/emoji' );
-		file_put_contents( $this->font_dir . 'packs/emoji/NotoEmoji.ttf', 'JUNK-OF-SAME-LEN' );
+		file_put_contents( $this->font_dir . 'packs/emoji/NotoEmoji.ttf', $this->corrupt_font_bytes() );
 
 		$this->assertTrue( $this->installer->install( 'packs/emoji' ) );
 
@@ -248,7 +329,7 @@ class Test_Font_Installer extends TestCase {
 	}
 
 	public function test_a_multi_font_pack_writes_a_row_per_key_sharing_one_download() {
-		$body = 'SHARED-BYTES';
+		$body = $this->font_bytes();
 
 		$this->seed_pack(
 			'cjk',
@@ -281,7 +362,7 @@ class Test_Font_Installer extends TestCase {
 	}
 
 	public function test_only_the_named_files_are_installed() {
-		$body = 'REGULAR-BYTES';
+		$body = $this->font_bytes();
 
 		$this->seed_pack(
 			'emoji',
@@ -311,7 +392,7 @@ class Test_Font_Installer extends TestCase {
 	}
 
 	public function test_a_display_entry_installs_under_the_entry_id_and_re_installs_in_place() {
-		$body = 'LATO-BYTES';
+		$body = $this->font_bytes();
 
 		$this->insert_catalog_row(
 			'packs',
@@ -358,8 +439,9 @@ class Test_Font_Installer extends TestCase {
 	 * orphan behind
 	 */
 	public function test_a_variants_swap_fetches_the_new_file_and_removes_the_one_nothing_references() {
-		$regular = 'FOUR-HUNDRED';
-		$light   = 'THREE-HUNDRED';
+		/* Two genuinely different faces: a same-size swap is exactly what mPDF's own cache check cannot see */
+		$regular = $this->font_bytes( 'Arimo-Regular' );
+		$light   = $this->font_bytes( 'DejaVuSansSymbols' );
 
 		$this->insert_catalog_row(
 			'packs',

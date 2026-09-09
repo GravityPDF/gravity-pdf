@@ -51,12 +51,23 @@ class FlushCache {
 	 */
 	public static function flush_font( string $font_key ): void {
 		$misc = GPDFAPI::get_misc_class();
-		$data = GPDFAPI::get_data_class();
 
 		foreach ( [ '', 'B', 'I', 'BI' ] as $suffix ) {
-			foreach ( glob( trailingslashit( $data->mpdf_tmp_location ) . 'ttfontdata/' . $font_key . $suffix . '.*' ) ?: [] as $file ) {
+			foreach ( glob( static::get_font_cache_dir() . $font_key . $suffix . '.*' ) ?: [] as $file ) {
 				$misc->unlink( $file );
 			}
 		}
+	}
+
+	/**
+	 * Where mPDF keeps its parsed font metrics
+	 *
+	 * mPDF puts its cache under `{tempDir}/mpdf`, not at `tempDir` itself (`ServiceFactory::getServices()`), so the
+	 * two `mpdf` segments are not a typo — `mpdf_tmp_location` is ours and the second is mPDF's own.
+	 *
+	 * @since 7.0
+	 */
+	public static function get_font_cache_dir(): string {
+		return trailingslashit( GPDFAPI::get_data_class()->mpdf_tmp_location ) . 'mpdf/ttfontdata/';
 	}
 }
