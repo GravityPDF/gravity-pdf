@@ -174,6 +174,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $catalog_sync;
 
 	/**
+	 * Holds our Font_Installer object
+	 * The one path from a catalog entry to font rows and files on disk
+	 *
+	 * @var Fonts\Font_Installer
+	 *
+	 * @since 7.0
+	 */
+	public $font_installer;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -1069,6 +1079,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->catalog_sync;
+	}
+
+	/**
+	 * Build the font installer, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_installer(): Fonts\Font_Installer {
+		if ( $this->font_installer === null ) {
+			$this->font_installer = new Fonts\Font_Installer(
+				$this->get_font_repository(),
+				$this->get_catalog_repository(),
+				$this->get_font_sources(),
+				$this->get_font_downloader(),
+				new Fonts\Font_Lock(),
+				$this->log
+			);
+		}
+
+		return $this->font_installer;
 	}
 
 	/**

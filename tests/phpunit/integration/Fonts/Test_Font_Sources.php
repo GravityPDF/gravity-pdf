@@ -210,4 +210,24 @@ class Test_Font_Sources extends TestCase {
 		/* Sun-ExtB is its own entry, so the supplement resolves only once cjk-ext-b is installed too */
 		$this->assertNull( Font_Sources::validate_entry( $this->valid_entry() ) );
 	}
+
+	/**
+	 * The pipeline names upright variants by weight alone (`400`, `700`), and PHP turns a numeric JSON object key
+	 * into an integer — so an `is_string()` gate here would reject every upright weight the `google` source
+	 * publishes while passing every italic (`400i`), and the whole family would fail validation at install
+	 */
+	public function test_a_numeric_variant_id_is_valid() {
+		$entry = [
+			'fonts'    => [ 'lato' => [ 'R' => 'Lato-Regular.ttf' ] ],
+			'variants' => [
+				'400'  => 'Lato-Regular.ttf',
+				'400i' => 'Lato-Regular.ttf',
+			],
+			'files'    => [
+				'Lato-Regular.ttf' => [ 'remote_path' => 'v/Lato-Regular.ttf' ],
+			],
+		];
+
+		$this->assertNull( Font_Sources::validate_entry( $entry ) );
+	}
 }

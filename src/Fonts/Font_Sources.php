@@ -240,6 +240,48 @@ class Font_Sources {
 	}
 
 	/**
+	 * One font key's share of its entry's coverage maps
+	 *
+	 * Copied onto the font row so the registry builds every mPDF fallback array from the rows alone, without
+	 * opening a source or decoding an entry on the load path. Shared by the two writers of coverage rows —
+	 * `Catalog_Font_Adopter` for files already on disk and `Font_Installer` for files it downloads — which must
+	 * agree exactly, or the same pack would mean different things depending on how it arrived.
+	 *
+	 * @param array $entry The decoded `entry` object
+	 * @param array $roles That font key's role map, for the `sip-ext` supplement
+	 *
+	 * @since 7.0
+	 */
+	public static function coverage_meta( string $font_key, array $entry, array $roles ): array {
+		$languages = [];
+		foreach ( (array) ( $entry['language_to_font'] ?? [] ) as $code => $target ) {
+			if ( $target === $font_key ) {
+				$languages[] = (string) $code;
+			}
+		}
+
+		$families = [];
+		foreach ( (array) ( $entry['family_substitution'] ?? [] ) as $family => $keys ) {
+			if ( in_array( $font_key, (array) $keys, true ) ) {
+				$families[] = (string) $family;
+			}
+		}
+
+		$meta = [
+			'backup_subs'         => in_array( $font_key, (array) ( $entry['backup_subs_fonts'] ?? [] ), true ),
+			'bmp'                 => in_array( $font_key, (array) ( $entry['bmp_fonts'] ?? [] ), true ),
+			'family_substitution' => $families,
+			'languages'           => $languages,
+		];
+
+		if ( isset( $roles['sip-ext'] ) && is_string( $roles['sip-ext'] ) ) {
+			$meta['sip_ext'] = $roles['sip-ext'];
+		}
+
+		return $meta;
+	}
+
+	/**
 	 * Whether one index entry is safe to store and install from
 	 *
 	 * Runs at both boundaries — mirroring an index in `Catalog_Sync` and decoding any `entry_json` in
@@ -283,8 +325,15 @@ class Font_Sources {
 		}
 
 		foreach ( (array) ( $entry['variants'] ?? [] ) as $variant => $filename ) {
-			if ( ! is_string( $variant ) || preg_match( static::KEY_PATTERN, $variant ) !== 1 ) {
-				return sprintf( 'variant id "%s" is not a valid key', (string) $variant );
+			/*
+			 * Cast, don't `is_string()`: the pipeline's variant ids are weights (`400`, `700`) and PHP turns a
+			 * numeric JSON object key into an integer, so an `is_string()` gate would reject every upright weight
+			 * the `google` source publishes while passing every italic (`400i`).
+			 */
+			$variant = (string) $variant;
+
+			if ( preg_match( static::KEY_PATTERN, $variant ) !== 1 ) {
+				return sprintf( 'variant id "%s" is not a valid key', $variant );
 			}
 
 			if ( ! is_string( $filename ) || ! isset( $files[ $filename ] ) ) {
@@ -315,8 +364,11 @@ class Font_Sources {
 		}
 
 		foreach ( $fonts as $font_key => $roles ) {
-			if ( ! is_string( $font_key ) || preg_match( static::KEY_PATTERN, $font_key ) !== 1 ) {
-				return sprintf( 'font key "%s" is not a valid key', (string) $font_key );
+			/* Cast for the same reason as the variant ids above: an all-digit key arrives as an integer */
+			$font_key = (string) $font_key;
+
+			if ( preg_match( static::KEY_PATTERN, $font_key ) !== 1 ) {
+				return sprintf( 'font key "%s" is not a valid key', $font_key );
 			}
 
 			if ( ! is_array( $roles ) ) {

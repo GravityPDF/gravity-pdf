@@ -152,7 +152,7 @@ class Catalog_Font_Adopter {
 					'source'      => $source,
 					'entry'       => $entry_id,
 					'coverage'    => 1,
-					'meta'        => $this->coverage_meta( $font_key, $entry, (array) $roles ),
+					'meta'        => Font_Sources::coverage_meta( $font_key, $entry, (array) $roles ),
 					'version'     => $row['version'] ?? null,
 					'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
 					'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
@@ -225,42 +225,5 @@ class Catalog_Font_Adopter {
 		}
 
 		return $verified;
-	}
-
-	/**
-	 * One font key's share of its entry's coverage maps
-	 *
-	 * Copied onto the row so the registry builds every mPDF fallback array from the rows alone, without opening a
-	 * source or decoding an entry on the load path.
-	 *
-	 * @since 7.0
-	 */
-	protected function coverage_meta( string $font_key, array $entry, array $roles ): array {
-		$languages = [];
-		foreach ( (array) ( $entry['language_to_font'] ?? [] ) as $code => $target ) {
-			if ( $target === $font_key ) {
-				$languages[] = (string) $code;
-			}
-		}
-
-		$families = [];
-		foreach ( (array) ( $entry['family_substitution'] ?? [] ) as $family => $keys ) {
-			if ( in_array( $font_key, (array) $keys, true ) ) {
-				$families[] = (string) $family;
-			}
-		}
-
-		$meta = [
-			'backup_subs'         => in_array( $font_key, (array) ( $entry['backup_subs_fonts'] ?? [] ), true ),
-			'bmp'                 => in_array( $font_key, (array) ( $entry['bmp_fonts'] ?? [] ), true ),
-			'family_substitution' => $families,
-			'languages'           => $languages,
-		];
-
-		if ( isset( $roles['sip-ext'] ) && is_string( $roles['sip-ext'] ) ) {
-			$meta['sip_ext'] = $roles['sip-ext'];
-		}
-
-		return $meta;
 	}
 }
