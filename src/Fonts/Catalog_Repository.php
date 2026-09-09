@@ -452,6 +452,50 @@ class Catalog_Repository {
 	}
 
 	/**
+	 * The catalogue entry that installs a font key, if any still does
+	 *
+	 * `font_keys` is mirrored on the row at sync precisely so a question like this needs no entry document. A key
+	 * nothing answers for is a font that has to be chosen again rather than installed.
+	 *
+	 * @return string|null `{source}/{entry}`
+	 *
+	 * @since 7.0
+	 */
+	public function entry_for_font_key( string $font_key ): ?string {
+		global $wpdb;
+
+		$table = $this->schema->get_catalog_table();
+
+		/* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- table name comes from Font_Schema */
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT source, entry FROM {$table} WHERE FIND_IN_SET( %s, font_keys ) > 0 ORDER BY position ASC, entry ASC LIMIT 1", $font_key ), ARRAY_A );
+
+		return is_array( $row ) ? $row['source'] . '/' . $row['entry'] : null;
+	}
+
+	/**
+	 * Every entry a render asked for and could not cover
+	 *
+	 * `Missing_Coverage_Check`'s read, and the only one of these columns besides the write below. Uncached on
+	 * purpose: it runs daily from cron over a table of a few hundred rows, and caching it would put a render-path
+	 * write in the position of having to invalidate something.
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	public function entries_missing_coverage(): array {
+		global $wpdb;
+
+		$table   = $this->schema->get_catalog_table();
+		$columns = implode( ', ', static::list_columns() );
+
+		/* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- table and column names come from this class */
+		$rows = $wpdb->get_results( "SELECT {$columns} FROM {$table} WHERE missing_scripts IS NOT NULL AND missing_scripts != '' ORDER BY position ASC, entry ASC", ARRAY_A );
+
+		return array_map( [ $this, 'cast_row' ], (array) $rows );
+	}
+
+	/**
 	 * Add to the scripts an entry was asked for and could not cover
 	 *
 	 * The render path's only catalogue write, and it must stay cheap and quiet: anonymous traffic reaches it, so it
