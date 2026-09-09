@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 7.0
  */
-class Rest_Font_Installs extends Rest_Font_Base {
+class Rest_Font_Installs extends Rest_Font_Entry_Base {
 
 	/**
 	 * How many keys one display entry may be installed under
@@ -122,7 +122,7 @@ class Rest_Font_Installs extends Rest_Font_Base {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'install_updates' ],
-					'permission_callback' => [ $this, 'update_item_permissions_check' ],
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
 				],
 			]
 		);
@@ -134,7 +134,7 @@ class Rest_Font_Installs extends Rest_Font_Base {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'install_entry' ],
-					'permission_callback' => [ $this, 'update_item_permissions_check' ],
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
 					'args'                => [
 						'label'    => [
 							'type'              => 'string',

@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Controller\Controller_Custom_Fonts;
+use GFPDF\Rest\Rest_Custom_Fonts;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Statics\Kses;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -964,8 +964,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_custom_fonts() {
-		/** @var Controller_Custom_Fonts $custom_font_controller */
-		$custom_font_controller = \GPDFAPI::get_mvc_class( 'Controller_Custom_Fonts' );
+		/** @var Rest_Custom_Fonts $custom_font_controller */
+		$custom_font_controller = \GPDFAPI::get_mvc_class( 'Rest_Custom_Fonts' );
 
 		return $custom_font_controller->get_all_items();
 	}

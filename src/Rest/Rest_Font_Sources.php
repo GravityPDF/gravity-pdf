@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 7.0
  */
-class Rest_Font_Sources extends Rest_Font_Base {
+class Rest_Font_Sources extends Rest_Font_Entry_Base {
 
 	/**
 	 * Fixed rather than a parameter: the browser is a grid of cards, not an export

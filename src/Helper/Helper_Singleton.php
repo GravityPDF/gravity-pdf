@@ -27,6 +27,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Singleton {
 
 	/**
+	 * Classes that answer to a name they no longer have, since a class alias cannot help a short-name lookup
+	 *
+	 * @since 7.0
+	 */
+	public const MOVED = [
+		'Controller_Custom_Fonts' => 'Rest_Custom_Fonts',
+	];
+
+	/**
 	 * Location for the classes
 	 *
 	 * @var array
@@ -83,6 +92,7 @@ class Helper_Singleton {
 			return $this->classes[ $name ];
 		}
 
-		return false;
+		/* Only once the current name has missed, so a rename costs nothing to every other lookup */
+		return $this->classes[ self::MOVED[ $name ] ?? $name ] ?? false;
 	}
 }

@@ -136,7 +136,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 		$this->assertArrayHasKey( '/gravity-pdf/v1/fonts/status', $routes );
 		$this->assertArrayHasKey( '/gravity-pdf/v1/fonts/updates', $routes );
 
-		$methods = wp_list_pluck( $routes[ '/gravity-pdf/v1' . Rest_Font_Base::ENTRY_ROUTE ], 'methods' );
+		$methods = wp_list_pluck( $routes[ '/gravity-pdf/v1' . Rest_Font_Entry_Base::ENTRY_ROUTE ], 'methods' );
 
 		/* GET is `Rest_Font_Sources`, POST and DELETE are this class; one constant is what keeps them one resource */
 		$this->assertSame( [ [ 'GET' => true ], [ 'POST' => true ], [ 'DELETE' => true ] ], array_values( $methods ) );

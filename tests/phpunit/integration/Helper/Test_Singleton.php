@@ -102,6 +102,11 @@ class Test_Singleton extends TestCase {
 	public function provider_registered_classes(): array {
 		return [
 			[ 'GFPDF\Controller\Controller_Actions', 'Controller_Actions' ],
+
+			/* The short name 6.x registered, resolved through `Helper_Singleton::MOVED` */
+			[ 'GFPDF\Rest\Rest_Custom_Fonts', 'Controller_Custom_Fonts' ],
+			[ 'GFPDF\Rest\Rest_Custom_Fonts', 'Rest_Custom_Fonts' ],
+
 			[ 'GFPDF\Controller\Controller_Form_Settings', 'Controller_Form_Settings' ],
 			[ 'GFPDF\Controller\Controller_Install', 'Controller_Install' ],
 			[ 'GFPDF\Controller\Controller_PDF', 'Controller_PDF' ],

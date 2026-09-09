@@ -55,7 +55,7 @@ class Font_Sources {
 	 *
 	 * @since 7.0
 	 */
-	public const KEY_PATTERN = '/^[a-z0-9_\-]+$/';
+	public const KEY_PATTERN = Font_Repository::KEY_PATTERN;
 
 	/**
 	 * Keys inside a `fonts` entry that name something other than a face role
