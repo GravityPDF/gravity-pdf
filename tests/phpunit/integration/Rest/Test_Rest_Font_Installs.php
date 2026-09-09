@@ -138,8 +138,8 @@ class Test_Rest_Font_Installs extends Test_Rest {
 
 		$methods = wp_list_pluck( $routes[ '/gravity-pdf/v1' . Rest_Font_Base::ENTRY_ROUTE ], 'methods' );
 
-		/* GET is `Rest_Font_Sources`, POST is this class; one constant is what keeps them the same resource */
-		$this->assertSame( [ [ 'GET' => true ], [ 'POST' => true ] ], array_values( $methods ) );
+		/* GET is `Rest_Font_Sources`, POST and DELETE are this class; one constant is what keeps them one resource */
+		$this->assertSame( [ [ 'GET' => true ], [ 'POST' => true ], [ 'DELETE' => true ] ], array_values( $methods ) );
 	}
 
 	public function test_an_anonymous_request_is_refused() {
@@ -155,6 +155,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 
 		$this->assertSame( 403, $this->get( '/fonts/status' )->get_status() );
 		$this->assertSame( 403, $this->post( '/fonts/sources/packs/emoji' )->get_status() );
+		$this->assertSame( 403, $this->delete( '/fonts/sources/packs/emoji' )->get_status() );
 	}
 
 	public function test_the_status_route_reports_every_entry_with_rows_or_a_phase() {
@@ -418,5 +419,40 @@ class Test_Rest_Font_Installs extends Test_Rest {
 		$data = (array) $this->get( '/fonts/status' )->get_data();
 
 		$this->assertTrue( $data['packs/emoji']['stuck'] );
+	}
+
+	public function test_deleting_an_entry_removes_its_fonts_and_answers_with_its_status() {
+		$this->seed_pack();
+		$this->install_entry_row( 'notoemoji', 'emoji' );
+
+		$response = $this->delete( '/fonts/sources/packs/emoji' );
+		$data     = (array) $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertFalse( $data['packs/emoji']['installed'] );
+		$this->assertNull( $this->font_repository()->get( 'notoemoji' ) );
+	}
+
+	public function test_deleting_a_queued_entry_leaves_the_tombstone_its_batch_reads() {
+		$this->seed_pack();
+
+		$this->assertSame( 202, $this->post( '/fonts/sources/packs/emoji' )->get_status() );
+		$this->assertSame( 200, $this->delete( '/fonts/sources/packs/emoji' )->get_status() );
+
+		/* The items are still in the batch; `removed` is what makes them drop instead of reinstalling */
+		$this->assertSame( 'removed', $this->status()['phase'] );
+		$this->assertCount( 1, $this->queued() );
+	}
+
+	public function test_deleting_an_entry_nothing_installed_is_not_a_404() {
+		$this->seed_pack();
+
+		/* Declining a language pack the always rule would keep reinstalling is the same call */
+		$this->assertSame( 200, $this->delete( '/fonts/sources/packs/emoji' )->get_status() );
+	}
+
+	public function test_deleting_an_unknown_entry_is_refused() {
+		$this->assertSame( 404, $this->delete( '/fonts/sources/nope/emoji' )->get_status() );
+		$this->assertSame( 404, $this->delete( '/fonts/sources/packs/nope' )->get_status() );
 	}
 }

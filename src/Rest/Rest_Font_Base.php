@@ -98,6 +98,21 @@ abstract class Rest_Font_Base extends WP_REST_Controller {
 	}
 
 	/**
+	 * Named apart from the update check because a DELETE route reads wrong pointing at the update one
+	 *
+	 * Not where the multisite file-delete capability goes: that question is per row — one display entry can hold
+	 * ten installs with different owners — and a permission callback sees only `{source, entry}`. It belongs on
+	 * `Font_Repository::delete_file()`, which every unlink in the plugin already passes through.
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function delete_item_permissions_check( $request ) {
+		return $this->get_items_permissions_check( $request );
+	}
+
+	/**
 	 * @since 7.0
 	 */
 	protected function check_source( string $id ): ?WP_Error {

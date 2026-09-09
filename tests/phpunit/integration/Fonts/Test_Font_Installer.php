@@ -74,8 +74,11 @@ class Test_Font_Installer extends TestCase {
 
 	/**
 	 * A coverage entry with one font and one file, and the bytes its index describes
+	 *
+	 * @param array $overrides The entry object's own fields
+	 * @param array $columns   The catalog row's, for the handful of tests that turn on a column rather than a font
 	 */
-	protected function seed_pack( string $entry = 'emoji', array $overrides = [], ?string $body = null ): array {
+	protected function seed_pack( string $entry = 'emoji', array $overrides = [], ?string $body = null, array $columns = [] ): array {
 		$body = $body ?? $this->font_bytes();
 		$data = array_merge(
 			[
@@ -96,11 +99,14 @@ class Test_Font_Installer extends TestCase {
 		$this->insert_catalog_row(
 			'packs',
 			$entry,
-			[
-				'coverage'   => 1,
-				'files'      => count( $data['files'] ),
-				'entry_json' => (string) wp_json_encode( $data ),
-			]
+			array_merge(
+				[
+					'coverage'   => 1,
+					'files'      => count( $data['files'] ),
+					'entry_json' => (string) wp_json_encode( $data ),
+				],
+				$columns
+			)
 		);
 
 		$this->mock_http( [ 'fonts.gravitypdf.com' => $body ] );
@@ -533,5 +539,133 @@ class Test_Font_Installer extends TestCase {
 
 		/* The file the role no longer references, and which no surviving row records */
 		$this->assertFileDoesNotExist( $this->font_dir . 'packs/lato/Lato-Regular.ttf' );
+	}
+
+	public function test_removing_an_entry_takes_its_rows_and_its_files() {
+		$this->seed_pack();
+
+		$this->assertTrue( $this->installer->install( 'packs/emoji' ) );
+		$this->assertFileExists( FlushCache::get_font_cache_dir() . 'notoemoji.mtx.json' );
+
+		$this->assertTrue( $this->installer->remove( 'packs/emoji' ) );
+
+		$this->assertNull( $this->font( 'notoemoji' ) );
+		$this->assertFileDoesNotExist( $this->font_dir . 'packs/emoji/NotoEmoji.ttf' );
+
+		/* mPDF re-parses on a size or `useOTL` change, so a removed key's metrics would otherwise never be evicted */
+		$this->assertFileDoesNotExist( FlushCache::get_font_cache_dir() . 'notoemoji.mtx.json' );
+	}
+
+	public function test_removing_a_family_installed_under_two_names_takes_both() {
+		$body = $this->font_bytes();
+
+		$this->seed_pack(
+			'lato',
+			[
+				'fonts'             => [ 'lato' => [ 'R' => 'Lato-Regular.ttf' ] ],
+				'files'             => [
+					'Lato-Regular.ttf' => [
+						'sha256'      => hash( 'sha256', $body ),
+						'size'        => strlen( $body ),
+						'remote_path' => 'fonts-v1.0.0/Lato-Regular.ttf',
+					],
+				],
+				'language_to_font'  => [],
+				'backup_subs_fonts' => [],
+			],
+			$body,
+			[ 'coverage' => 0 ]
+		);
+
+		$this->assertTrue( $this->installer->install( 'packs/lato' ) );
+		$this->assertTrue( $this->installer->install( 'packs/lato', [], [ 'label' => 'Lato Light' ] ) );
+
+		/* Both installs record the one file, so it survives the first row's delete and goes with the second */
+		$this->assertTrue( $this->installer->remove( 'packs/lato' ) );
+
+		$this->assertNull( $this->font( 'lato' ) );
+		$this->assertNull( $this->font( 'latolight' ) );
+		$this->assertFileDoesNotExist( $this->font_dir . 'packs/lato/Lato-Regular.ttf' );
+	}
+
+	public function test_removing_an_always_entry_leaves_a_tombstone() {
+		$this->seed_pack( 'emoji', [], null, [ 'always' => 1 ] );
+
+		$this->assertTrue( $this->installer->install( 'packs/emoji' ) );
+		$this->assertTrue( $this->installer->remove( 'packs/emoji' ) );
+
+		/* Without it the always rule reinstalls on the next render what the admin just declined */
+		$this->assertSame( 'removed', $this->status()['phase'] );
+	}
+
+	public function test_removing_an_entry_mid_install_leaves_a_tombstone() {
+		$this->seed_pack();
+		$this->catalog_repository()->set_status( 'packs', 'emoji', [ 'phase' => 'queued' ] );
+
+		$this->assertTrue( $this->installer->remove( 'packs/emoji' ) );
+
+		/* The batch still holds this entry's files; `removed` is what stops them being put back */
+		$status = $this->status();
+
+		$this->assertSame( 'removed', $status['phase'] );
+
+		/* The tombstone dates itself: written in the same statement, off the phase this one is replacing */
+		$this->assertNotNull( $status['phase_since'] );
+	}
+
+	public function test_removing_a_failed_entry_takes_its_error_and_backoff_with_it() {
+		$this->seed_pack();
+		$this->catalog_repository()->set_status(
+			'packs',
+			'emoji',
+			[
+				'phase'       => 'failed',
+				'error'       => 'nope',
+				'retry_after' => gmdate( 'Y-m-d H:i:s', time() + DAY_IN_SECONDS ),
+			]
+		);
+
+		$this->assertTrue( $this->installer->remove( 'packs/emoji' ) );
+
+		$status = $this->status();
+
+		/* Anything carried past the delete would only refuse the reinstall that usually follows it */
+		$this->assertNull( $status['phase'] );
+		$this->assertNull( $status['error'] );
+		$this->assertNull( $status['retry_after'] );
+	}
+
+	public function test_removing_an_entry_that_was_never_installed_is_not_an_error() {
+		$this->seed_pack();
+
+		$this->assertTrue( $this->installer->remove( 'packs/emoji' ) );
+		$this->assertNull( $this->status()['phase'] );
+	}
+
+	public function test_a_removal_is_refused_while_one_of_the_entry_files_is_installing() {
+		$this->seed_pack();
+
+		$lock = new Font_Lock();
+		$this->assertTrue( $lock->acquire( 'entry_packs_emoji', 60 ) );
+
+		try {
+			$removed = $this->installer->remove( 'packs/emoji' );
+		} finally {
+			$lock->release( 'entry_packs_emoji' );
+		}
+
+		$this->assertWPError( $removed );
+		$this->assertSame( 'font_install_in_progress', $removed->get_error_code() );
+	}
+
+	public function test_a_file_whose_entry_was_deleted_after_it_was_queued_is_never_written() {
+		$this->seed_pack();
+		$this->catalog_repository()->set_status( 'packs', 'emoji', [ 'phase' => 'removed' ] );
+
+		/* The queue checks before taking the lock; this is the window between the two */
+		$this->assertTrue( $this->installer->install_file( 'packs', 'emoji', 'NotoEmoji.ttf' ) );
+
+		$this->assertNull( $this->font( 'notoemoji' ) );
+		$this->assertSame( 'removed', $this->status()['phase'] );
 	}
 }

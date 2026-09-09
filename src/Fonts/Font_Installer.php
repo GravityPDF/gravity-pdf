@@ -241,6 +241,74 @@ class Font_Installer {
 	}
 
 	/**
+	 * Take the entry's lock, or say who is holding it
+	 *
+	 * Installing a file and removing the entry contend for one name deliberately — a file landing while the rows
+	 * are being deleted is the window this closes — and that only holds while both spell the name identically, a
+	 * drift no test could catch. Returning the error rather than a bool keeps that spelling in one place too.
+	 *
+	 * @return string|WP_Error The name to release in a `finally`
+	 *
+	 * @since 7.0
+	 */
+	protected function lock_entry( string $source, string $entry ) {
+		$lock = sprintf( 'entry_%s_%s', $source, $entry );
+
+		if ( ! $this->lock->acquire( $lock, static::LOCK_TTL ) ) {
+			return new WP_Error( 'font_install_in_progress', sprintf( 'Another request is working on %s/%s', $source, $entry ) );
+		}
+
+		return $lock;
+	}
+
+	/**
+	 * Remove an entry: its rows, its per-site toggles and the files nothing else records
+	 *
+	 * The install path run backwards, and the only step that can undo one already in flight — hence the same entry
+	 * lock the install takes, so the phase write and the row deletes cannot interleave with a file landing. The
+	 * rows, the files and the guard that spares whatever another install still records are `delete_entry()`'s; what
+	 * belongs here is the tombstone, and dropping the metrics cache of the keys that just went — mPDF regenerates
+	 * on a size or `useOTL` change, so nothing else would ever evict them.
+	 *
+	 * @param string $id `{source}/{entry}`
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function remove( string $id ) {
+		[ $source, $entry ] = Font_Sources::split( $id );
+
+		$lock = $this->lock_entry( $source, $entry );
+
+		if ( is_wp_error( $lock ) ) {
+			return $lock;
+		}
+
+		try {
+			$this->catalog->mark_removed( $source, $entry );
+
+			$keys = $this->repository->delete_entry( $source, $entry );
+
+			foreach ( $keys as $font_key ) {
+				FlushCache::flush_font( (string) $font_key );
+			}
+
+			$this->log->notice(
+				'Removed an installed font entry',
+				[
+					'entry' => $source . '/' . $entry,
+					'fonts' => $keys,
+				]
+			);
+
+			return true;
+		} finally {
+			$this->lock->release( $lock );
+		}
+	}
+
+	/**
 	 * Place and record one already-resolved file, alone in its entry
 	 *
 	 * Split from `install_file()` so `install()` resolves the entry once for the whole batch instead of once per
@@ -264,13 +332,19 @@ class Font_Installer {
 	protected function install_locked( array $resolved, string $name, array $install ) {
 		$source = (string) $resolved['row']['source'];
 		$entry  = (string) $resolved['row']['entry'];
-		$lock   = sprintf( 'entry_%s_%s', $source, $entry );
 
-		if ( ! $this->lock->acquire( $lock, static::LOCK_TTL ) ) {
-			return new WP_Error( 'font_install_in_progress', sprintf( 'Another request is installing %s/%s', $source, $entry ) );
+		$lock = $this->lock_entry( $source, $entry );
+
+		if ( is_wp_error( $lock ) ) {
+			return $lock;
 		}
 
 		try {
+			/* The gate every install path passes: writing `installing` for an entry a DELETE took would resurrect it */
+			if ( ! $this->catalog->is_wanted( $source, $entry ) ) {
+				return true;
+			}
+
 			$this->catalog->set_status( $source, $entry, [ 'phase' => 'installing' ] );
 
 			$targets = $this->targets( $resolved['data'], $install );

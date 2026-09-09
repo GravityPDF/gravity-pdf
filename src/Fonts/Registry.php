@@ -86,13 +86,6 @@ class Registry {
 	];
 
 	/**
-	 * The phases that mean an entry still has work outstanding
-	 *
-	 * @since 7.0
-	 */
-	public const LIVE_PHASES = [ 'queued', 'installing' ];
-
-	/**
 	 * A live entry whose phase has not moved for this long is worth re-dispatching
 	 *
 	 * Two of the poller's slowest intervals (§4.6 Store): long enough that a batch which simply has not been picked
@@ -693,7 +686,7 @@ class Registry {
 	 * @since 7.0
 	 */
 	protected function stalled_for( ?array $catalog, int $seconds ): bool {
-		if ( $catalog === null || ! in_array( (string) $catalog['phase'], static::LIVE_PHASES, true ) ) {
+		if ( $catalog === null || ! in_array( (string) $catalog['phase'], Catalog_Repository::LIVE_PHASES, true ) ) {
 			return false;
 		}
 

@@ -504,43 +504,84 @@ class Font_Repository {
 	/**
 	 * Remove a font row, its files and site toggles, then the files no surviving row records
 	 *
-	 * The shared delete path: file rows first, then the font row, then the unlink — so a file is only ever unlinked
-	 * once nothing records it, and a crash between the steps leaves rows that point at a file rather than a row
-	 * pointing at nothing.
-	 *
 	 * @param bool $unlink_files Whether to remove the files from disk as well as the rows
 	 *
 	 * @since 7.0
 	 */
 	public function delete( string $font_key, bool $unlink_files = true ): bool {
-		global $wpdb;
-
 		$font = $this->get( $font_key );
+
 		if ( $font === null ) {
 			return false;
 		}
 
-		$paths = array_values( array_unique( array_column( $font['files'], 'path' ) ) );
+		$this->delete_rows( [ $font ], $unlink_files );
 
-		/* phpcs:disable WordPress.DB.DirectDatabaseQuery -- the font tables have no core API */
-		$wpdb->delete( $this->schema->get_file_table(), [ 'font_id' => $font['id'] ] );
+		return true;
+	}
 
-		if ( is_multisite() ) {
-			$wpdb->delete( $this->schema->get_site_table(), [ 'font_id' => $font['id'] ] );
+	/**
+	 * Remove every row one catalogue entry installed
+	 *
+	 * Not a loop over `delete()`: that reads the whole table back to find each row and bumps the cache stamp on the
+	 * way out, so an entry installed under several keys paid a full re-select per key. Here the rows are read once
+	 * and the unlink pass runs after the last of them — which is also the only moment the "still recorded" guard
+	 * tells the truth about a file two installs of the same family share.
+	 *
+	 * @return string[] The font keys removed
+	 *
+	 * @since 7.0
+	 */
+	public function delete_entry( string $source, string $entry, bool $unlink_files = true ): array {
+		$rows = $this->rows_for_entry( $source, $entry );
+
+		$this->delete_rows( $rows, $unlink_files );
+
+		return array_keys( $rows );
+	}
+
+	/**
+	 * The shared delete path: file rows first, then the site toggles and the font row, then the unlink
+	 *
+	 * A file is only ever unlinked once nothing records it, and a crash between the steps leaves rows that point at
+	 * a file rather than a row pointing at nothing. One flush covers the whole set.
+	 *
+	 * @param array[] $fonts Rows as `all()` returns them
+	 *
+	 * @since 7.0
+	 */
+	protected function delete_rows( array $fonts, bool $unlink_files ): void {
+		global $wpdb;
+
+		if ( $fonts === [] ) {
+			return;
 		}
 
-		$wpdb->delete( $this->schema->get_font_table(), [ 'id' => $font['id'] ] );
+		$paths = [];
+
+		/* phpcs:disable WordPress.DB.DirectDatabaseQuery -- the font tables have no core API */
+		foreach ( $fonts as $font ) {
+			$paths = array_merge( $paths, array_column( $font['files'], 'path' ) );
+
+			$wpdb->delete( $this->schema->get_file_table(), [ 'font_id' => $font['id'] ] );
+
+			if ( is_multisite() ) {
+				$wpdb->delete( $this->schema->get_site_table(), [ 'font_id' => $font['id'] ] );
+			}
+
+			$wpdb->delete( $this->schema->get_font_table(), [ 'id' => $font['id'] ] );
+		}
 		/* phpcs:enable */
 
 		$this->flush();
 
-		if ( $unlink_files ) {
-			foreach ( $paths as $path ) {
-				$this->delete_file( (string) $path );
-			}
+		if ( ! $unlink_files ) {
+			return;
 		}
 
-		return true;
+		foreach ( array_unique( $paths ) as $path ) {
+			$this->delete_file( (string) $path );
+		}
 	}
 
 	/**

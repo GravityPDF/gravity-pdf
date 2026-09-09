@@ -46,6 +46,13 @@ class Catalog_Repository {
 	public const STATUS_COLUMNS = [ 'phase', 'phase_since', 'error', 'retry_after', 'missing_scripts', 'missing_since' ];
 
 	/**
+	 * The phases that mean an entry still has work outstanding
+	 *
+	 * @since 7.0
+	 */
+	public const LIVE_PHASES = [ 'queued', 'installing' ];
+
+	/**
 	 * How long a `queued` or `installing` row is believed before `claim()` treats it as a dead batch's leftover
 	 *
 	 * Long enough that a real pack install — every file refreshing `phase_since` as it starts — never trips it.
@@ -492,6 +499,54 @@ class Catalog_Repository {
 	}
 
 	/**
+	 * Write what a removal leaves on the entry's row
+	 *
+	 * `removed` is a tombstone with two jobs, and an entry needs only one of them to earn it: it stops the always
+	 * rule reinstalling what the admin deleted on purpose, and it stops a batch still holding the entry's files
+	 * putting them straight back. Any other entry is simply no longer installed — carrying a `failed` row's error
+	 * and backoff past the delete would only refuse the reinstall that usually follows it.
+	 *
+	 * One conditional UPDATE for `claim()`'s reason. The delete holds the entry lock and `claim()` deliberately
+	 * takes none, so reading the phase and then writing it would let a claim land in between, turn the tombstone
+	 * into a cleared row, and leave the batch it had just queued free to reinstall what was deleted.
+	 *
+	 * @since 7.0
+	 */
+	public function mark_removed( string $source, string $entry ): bool {
+		global $wpdb;
+
+		$table = $this->schema->get_catalog_table();
+		$live  = 'always = 1 OR phase IN ( ' . implode( ', ', array_fill( 0, count( static::LIVE_PHASES ), '%s' ) ) . ' )';
+
+		/*
+		 * `phase_since` is assigned before `phase`: MySQL evaluates a multi-column SET left to right against the
+		 * values already written, so the other order would test a `phase` this statement had just set to `removed`.
+		 */
+		/* phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.DirectDatabaseQuery -- the table name comes from Font_Schema; the placeholders the sniff cannot count through `$live` are the prepared LIVE_PHASES values */
+		$updated = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$table}
+				    SET phase_since = CASE WHEN {$live} THEN %s ELSE NULL END,
+				        phase       = CASE WHEN {$live} THEN 'removed' ELSE NULL END,
+				        error       = NULL,
+				        retry_after = NULL
+				  WHERE source = %s AND entry = %s",
+				array_merge(
+					static::LIVE_PHASES,
+					[ gmdate( 'Y-m-d H:i:s' ) ],
+					static::LIVE_PHASES,
+					[ $source, $entry ]
+				)
+			)
+		);
+		/* phpcs:enable */
+
+		$this->flush();
+
+		return $updated !== false;
+	}
+
+	/**
 	 * The coverage entries a failed install left behind, whose backoff has passed
 	 *
 	 * Candidates only — `claim()` is still what decides, so this staying slightly stale costs nothing.
@@ -579,6 +634,21 @@ class Catalog_Repository {
 	 */
 	public function is_registered( string $source ): bool {
 		return $this->sources->get( $source ) !== null;
+	}
+
+	/**
+	 * Whether queued work for an entry is still worth running
+	 *
+	 * Asked twice on the way to a download — by the queue before it runs a task, and by the installer again inside
+	 * the entry lock — because a delete or a source unregistration in between is the whole reason `removed` exists.
+	 * One rule in one place, so the two answers can never disagree.
+	 *
+	 * @since 7.0
+	 */
+	public function is_wanted( string $source, string $entry ): bool {
+		$row = $this->entry( $source, $entry );
+
+		return $row !== null && (string) ( $row['phase'] ?? '' ) !== 'removed' && $this->is_registered( $source );
 	}
 
 	/**
