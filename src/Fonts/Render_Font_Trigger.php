@@ -77,6 +77,12 @@ class Render_Font_Trigger {
 	protected $installer;
 
 	/**
+	 * @var Registry
+	 * @since 7.0
+	 */
+	protected $registry;
+
+	/**
 	 * @var Font_Lock
 	 * @since 7.0
 	 */
@@ -93,6 +99,7 @@ class Render_Font_Trigger {
 		Coverage_Resolver $resolver,
 		Install_Queue $queue,
 		Font_Installer $installer,
+		Registry $registry,
 		Font_Lock $lock,
 		LoggerInterface $log
 	) {
@@ -100,6 +107,7 @@ class Render_Font_Trigger {
 		$this->resolver  = $resolver;
 		$this->queue     = $queue;
 		$this->installer = $installer;
+		$this->registry  = $registry;
 		$this->lock      = $lock;
 		$this->log       = $log;
 	}
@@ -111,10 +119,46 @@ class Render_Font_Trigger {
 	 * @param array $entry    The submission
 	 * @param array $settings The PDF's own settings, for its headers and footers
 	 *
+	 * @return string[] The tags this render still has no font for, whatever it managed to install
+	 *
 	 * @since 7.0
 	 */
-	public function before_render( array $form, array $entry, array $settings ): void {
-		$this->install( $this->detector->detect( ...$this->strings( $form, $entry, $settings ) ), true );
+	public function before_render( array $form, array $entry, array $settings ): array {
+		$scripts = $this->detector->detect( ...$this->strings( $form, $entry, $settings ) );
+
+		if ( $scripts === [] ) {
+			return [];
+		}
+
+		$this->install( $scripts, true );
+
+		return $this->unresolved( $scripts );
+	}
+
+	/**
+	 * The tags the language map cannot answer, asked of the map itself
+	 *
+	 * Not "which entries are incomplete": a pack whose Regular face landed and whose bold has not draws this
+	 * document correctly, and asking the map is what tells the two apart. It is asked after the install, so a face
+	 * fetched a moment ago counts.
+	 *
+	 * @param string[] $scripts
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	protected function unresolved( array $scripts ): array {
+		$map = $this->registry->language_to_font();
+
+		return array_values(
+			array_filter(
+				$scripts,
+				static function ( string $tag ) use ( $map ): bool {
+					return $map->getLanguageOptions( $tag, false ) === '';
+				}
+			)
+		);
 	}
 
 	/**

@@ -647,7 +647,9 @@ class Helper_PDF {
 		 * Ahead of everything mPDF: a face that lands here is registered by the config below rather than needing
 		 * anything already built to notice it.
 		 */
-		$this->font_trigger->before_render( $this->form, $this->entry, $this->settings );
+		$adobe_cjk = $this->adobe_cjk_fallback(
+			$this->font_trigger->before_render( $this->form, $this->entry, $this->settings )
+		);
 
 		/*
 		 * mPDF consults the registry members in reverse order of registration, so this one — added after
@@ -680,6 +682,12 @@ class Helper_PDF {
 				'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
 
 				'exposeVersion'          => false,
+
+				/*
+				 * Inert on its own in the fork — `AddFont()` routes the four Adobe families whatever it says — but
+				 * true is what it means once one of them is in the language map.
+				 */
+				'useAdobeCJK'            => $adobe_cjk !== [],
 			],
 			$this->form,
 			$this->entry,
@@ -717,7 +725,7 @@ class Helper_PDF {
 
 		$this->mpdf->setLogger( $this->log );
 
-		$language_to_font->add( $registry->language_to_font() );
+		$language_to_font->add( $registry->language_to_font( $adobe_cjk ) );
 
 		/* Public properties WriteHTML() re-reads, not config keys */
 		$document_language        = $registry->get_document_language( $this->settings );
@@ -731,6 +739,27 @@ class Helper_PDF {
 		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_mpdf_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
+	}
+
+	/**
+	 * The Adobe CJK stand-in for a CJK or Korean document whose pack has not landed
+	 *
+	 * A non-embedded `CIDFontType0` the reader's own viewer draws, which beats a page of boxes in an emailed PDF.
+	 * Never for PDF/A or PDF/X, where `AddCJKFont()` throws outright: those render with the bundled faces and the
+	 * miss already recorded on the entry's catalogue row.
+	 *
+	 * @param string[] $scripts What `before_render()` could not resolve
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	protected function adobe_cjk_fallback( array $scripts ): array {
+		if ( strtolower( (string) ( $this->settings['format'] ?? 'standard' ) ) !== 'standard' ) {
+			return [];
+		}
+
+		return Registry::adobe_cjk_overlay( $scripts );
 	}
 
 	/**
