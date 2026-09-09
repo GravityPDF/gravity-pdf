@@ -96,10 +96,18 @@ class Test_Font_Health_Checks extends TestCase {
 
 	/* --- Missing_Coverage_Check --- */
 
-	protected function coverage_check(): Missing_Coverage_Check {
+	protected function uncovered(): Uncovered_Entries {
 		global $gfpdf;
 
-		return new Missing_Coverage_Check( $gfpdf->get_catalog_repository() );
+		return new Uncovered_Entries( $gfpdf->get_catalog_repository() );
+	}
+
+	protected function coverage_check(): Missing_Coverage_Check {
+		return new Missing_Coverage_Check( $this->uncovered() );
+	}
+
+	protected function downloads_check(): Font_Downloads_Check {
+		return new Font_Downloads_Check( $this->uncovered() );
 	}
 
 	protected function seed_missing( string $entry, array $overrides = [] ): void {
@@ -139,23 +147,39 @@ class Test_Font_Health_Checks extends TestCase {
 		$this->seed_missing( 'arabic' );
 
 		$issues = $this->coverage_check()->run();
-		$failed = $issues[ array_search( 'packs/japanese', $this->ids( $issues ), true ) ];
+		$failed = $issues[ (int) array_search( 'packs/japanese', $this->ids( $issues ), true ) ];
 
 		$this->assertStringContainsString( 'font_http_error', implode( ' ', $failed->get_details() ) );
 	}
 
 	/**
-	 * A site that cannot reach the origin has one problem, not eight
+	 * A site that cannot reach the origin has one problem, not eight — and it is not the form editor's problem
 	 */
 	public function test_every_entry_failing_becomes_one_issue_about_the_server() {
 		$this->seed_missing( 'japanese', [ 'phase' => 'failed', 'error' => 'font_http_error' ] );
 		$this->seed_missing( 'arabic', [ 'phase' => 'failed', 'error' => 'font_http_error' ] );
 
-		$issues = $this->coverage_check()->run();
+		$issues = $this->downloads_check()->run();
 
 		$this->assertSame( [ 'font_downloads_failing' ], $this->ids( $issues ) );
 		$this->assertStringContainsString( '2 font packs', $issues[0]->get_summary() );
 		$this->assertSame( [ 'Arabic', 'Japanese' ], $issues[0]->get_details() );
+		$this->assertSame( 'manage_options', $this->downloads_check()->get_capability() );
+
+		/* Exactly one of the two ever speaks */
+		$this->assertSame( [], $this->coverage_check()->run() );
+	}
+
+	public function test_one_entry_still_installing_leaves_the_server_out_of_it() {
+		$this->seed_missing( 'japanese', [ 'phase' => 'failed', 'error' => 'font_http_error' ] );
+		$this->seed_missing( 'arabic' );
+
+		$this->assertSame( [], $this->downloads_check()->run() );
+		$this->assertCount( 2, $this->coverage_check()->run() );
+	}
+
+	public function test_a_site_with_nothing_missing_says_nothing_about_downloads() {
+		$this->assertSame( [], $this->downloads_check()->run() );
 	}
 
 	/**
@@ -165,10 +189,7 @@ class Test_Font_Health_Checks extends TestCase {
 		$this->seed_missing( 'japanese', [ 'phase' => 'failed', 'error' => 'font_disk_full' ] );
 		$this->seed_missing( 'arabic', [ 'phase' => 'failed', 'error' => 'font_disk_full' ] );
 
-		$issues = $this->coverage_check()->run();
-
-		$this->assertSame( [ 'font_disk_full' ], $this->ids( $issues ) );
-		$this->assertSame( 'manage_options', $this->coverage_check()->get_capability() );
+		$this->assertSame( [ 'font_disk_full' ], $this->ids( $this->downloads_check()->run() ) );
 	}
 
 	/**

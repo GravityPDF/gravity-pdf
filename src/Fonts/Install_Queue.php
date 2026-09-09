@@ -79,6 +79,16 @@ class Install_Queue extends Helper_Abstract_Queue {
 	public const INLINE_CAP = 12582912;
 
 	/**
+	 * How long an entry may sit mid-install before the site is told its queue is not moving
+	 *
+	 * Well past a slow pack: every file refreshes `phase_since` as it starts, so this only trips when nothing is
+	 * running the batch at all.
+	 *
+	 * @since 7.0
+	 */
+	public const STALLED_AFTER = 15 * MINUTE_IN_SECONDS;
+
+	/**
 	 * @var Font_Repository
 	 * @since 7.0
 	 */
@@ -554,6 +564,19 @@ class Install_Queue extends Helper_Abstract_Queue {
 	 */
 	public function is_running(): bool {
 		return (bool) $this->is_process_running();
+	}
+
+	/**
+	 * Whether an install has stopped moving
+	 *
+	 * The two ways that happens — a dead cron and a blocked loopback — both leave a dispatched batch nobody picks
+	 * up, and neither reports itself. What is observable is a row that says `installing` and has not moved while
+	 * nothing is running.
+	 *
+	 * @since 7.0
+	 */
+	public function is_stalled(): bool {
+		return ! $this->is_running() && $this->catalog->stalled_entries( static::STALLED_AFTER ) !== [];
 	}
 
 	/**
