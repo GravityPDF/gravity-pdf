@@ -254,6 +254,22 @@ class Font_Sources {
 	}
 
 	/**
+	 * Split a `{source}/{entry}` id into its two halves
+	 *
+	 * The id is the abstraction every install path deals in — the queue item, the installer, the routes — so the
+	 * one place that knows it is a slash is here, next to the paths built from the same two segments.
+	 *
+	 * @return array{0: string, 1: string}
+	 *
+	 * @since 7.0
+	 */
+	public static function split( string $id ): array {
+		$parts = explode( '/', $id, 2 );
+
+		return [ (string) $parts[0], (string) ( $parts[1] ?? '' ) ];
+	}
+
+	/**
 	 * @since 7.0
 	 */
 	public static function install_path( string $source, string $entry, string $filename ): string {

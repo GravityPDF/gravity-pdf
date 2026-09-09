@@ -6,6 +6,7 @@ namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
+use GFPDF\Tests\Concerns\QueuesFontInstalls;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -26,6 +27,7 @@ class Test_Install_Status extends TestCase {
 
 	use HasCatalogRows;
 	use HasFontRows;
+	use QueuesFontInstalls;
 
 	/**
 	 * @var Registry
@@ -37,40 +39,21 @@ class Test_Install_Status extends TestCase {
 	 */
 	public $queue;
 
-	/**
-	 * @var int How many times a dispatch was attempted this test
-	 */
-	public $dispatches = 0;
-
 	public function set_up(): void {
 		parent::set_up();
 
 		global $gfpdf;
 
 		$this->registry = $gfpdf->get_font_registry();
-		$this->queue    = $gfpdf->get_install_queue();
+		$this->queue    = $this->install_queue();
 
 		$this->font_repository()->ensure_ready();
 		$this->drop_catalog_rows();
-
-		/* Cancel every dispatch before it reaches the loopback, and count it: `nudge()` is the behaviour under test */
-		$this->dispatches = 0;
-		add_filter(
-			$this->queue->get_identifier() . '_pre_dispatch',
-			function () {
-				++$this->dispatches;
-
-				return true;
-			}
-		);
+		$this->block_dispatch();
 	}
 
 	public function tear_down(): void {
-		remove_all_filters( $this->queue->get_identifier() . '_pre_dispatch' );
-
-		delete_site_transient( $this->queue->get_identifier() . '_process_lock' );
-
-		$this->queue->clear_queue();
+		$this->reset_queue();
 		$this->remove_font_rows();
 		$this->drop_catalog_rows();
 		$this->font_repository()->flush();
@@ -80,38 +63,6 @@ class Test_Install_Status extends TestCase {
 
 	protected function statuses(): array {
 		return $this->registry->get_install_statuses( $this->queue );
-	}
-
-	/**
-	 * A row of a catalogue entry, with as many files as roles named
-	 */
-	protected function install_entry_row( string $font_key, string $entry, array $overrides = [], array $roles = [ 'R' ] ): int {
-		$files = [];
-
-		foreach ( $roles as $role ) {
-			$path           = 'test-' . $font_key . '-' . strtolower( $role ) . '.ttf';
-			$files[ $role ] = [
-				'path' => $path,
-				'size' => 3,
-			];
-
-			file_put_contents( $this->font_dir() . $path, 'ttf' );
-		}
-
-		return $this->font_repository()->insert(
-			array_merge(
-				[
-					'font_key' => $font_key,
-					'label'    => ucfirst( $font_key ),
-					'source'   => 'packs',
-					'entry'    => $entry,
-					'coverage' => 1,
-					'version'  => 'fonts-v1.0.0',
-					'files'    => $files,
-				],
-				$overrides
-			)
-		);
 	}
 
 	/**
@@ -240,7 +191,7 @@ class Test_Install_Status extends TestCase {
 		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1 ] );
 		$this->set_phase( 'emoji', 'installing', Registry::STUCK_AFTER + 60 );
 
-		set_site_transient( $this->queue->get_identifier() . '_process_lock', microtime(), 60 );
+		$this->lock_queue();
 
 		/* An install that is slow is not an install that is dead */
 		$this->assertArrayNotHasKey( 'stuck', $this->statuses()['packs/emoji'] );
@@ -260,7 +211,7 @@ class Test_Install_Status extends TestCase {
 
 		$this->statuses();
 
-		$this->assertSame( 1, $this->dispatches );
+		$this->assertSame( 1, $this->dispatches() );
 	}
 
 	public function test_a_batch_that_has_only_just_been_queued_is_left_alone() {
@@ -277,7 +228,7 @@ class Test_Install_Status extends TestCase {
 
 		$this->statuses();
 
-		$this->assertSame( 0, $this->dispatches );
+		$this->assertSame( 0, $this->dispatches() );
 	}
 
 	public function test_a_processing_batch_is_never_re_dispatched() {
@@ -292,11 +243,11 @@ class Test_Install_Status extends TestCase {
 			]
 		)->save();
 
-		set_site_transient( $this->queue->get_identifier() . '_process_lock', microtime(), 60 );
+		$this->lock_queue();
 
 		$this->statuses();
 
-		$this->assertSame( 0, $this->dispatches );
+		$this->assertSame( 0, $this->dispatches() );
 	}
 
 	public function test_a_row_behind_the_catalogue_reports_an_update() {
@@ -391,15 +342,15 @@ class Test_Install_Status extends TestCase {
 			]
 		)->save();
 
-		set_site_transient( $this->queue->get_identifier() . '_process_lock', microtime(), 60 );
+		$this->lock_queue();
 
 		$this->assertFalse( $this->queue->nudge() );
-		$this->assertSame( 0, $this->dispatches );
+		$this->assertSame( 0, $this->dispatches() );
 	}
 
 	public function test_the_queue_refuses_to_nudge_when_there_is_nothing_queued() {
 		$this->assertFalse( $this->queue->nudge() );
-		$this->assertSame( 0, $this->dispatches );
+		$this->assertSame( 0, $this->dispatches() );
 	}
 
 	public function test_the_queue_nudges_an_outstanding_batch_nothing_is_processing() {
@@ -413,7 +364,7 @@ class Test_Install_Status extends TestCase {
 
 		$this->queue->nudge();
 
-		$this->assertSame( 1, $this->dispatches );
+		$this->assertSame( 1, $this->dispatches() );
 	}
 
 	public function test_an_unknown_id_reads_as_nothing_installed() {

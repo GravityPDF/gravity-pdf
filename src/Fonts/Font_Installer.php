@@ -129,15 +129,15 @@ class Font_Installer {
 	 *
 	 * @param string $id        `{source}/{entry}`
 	 * @param array  $filenames The files to fetch; empty means every file the entry's roles resolve to
-	 * @param array  $install   The row being written — `{ font_key?, label?, variants? }`, already validated by the
-	 *                          route. Empty is the entry's default row
+	 * @param array  $install   The row being written — `{ label?, variants? }`, already validated by the route.
+	 *                          Empty is the entry's default row
 	 *
 	 * @return true|WP_Error
 	 *
 	 * @since 7.0
 	 */
 	public function install( string $id, array $filenames = [], array $install = [] ) {
-		[ $source, $entry ] = $this->split( $id );
+		[ $source, $entry ] = Font_Sources::split( $id );
 
 		$resolved = $this->resolve( $source, $entry );
 		if ( is_wp_error( $resolved ) ) {
@@ -176,7 +176,7 @@ class Font_Installer {
 	 * @since 7.0
 	 */
 	public function files_for( string $id, array $install = [] ) {
-		[ $source, $entry ] = $this->split( $id );
+		[ $source, $entry ] = Font_Sources::split( $id );
 
 		$resolved = $this->resolve( $source, $entry );
 
@@ -185,6 +185,37 @@ class Font_Installer {
 		}
 
 		return array_map( 'strval', array_keys( $this->targets( $resolved['data'], $install ) ) );
+	}
+
+	/**
+	 * The filenames each of several installs of one entry resolves to, in the order given
+	 *
+	 * `files_for()` for a set. The entry is resolved — read, and for a pointer source fetched and validated — once
+	 * for the whole set rather than once per install, which is what a family installed under several keys would
+	 * otherwise pay: only `targets()` varies between them.
+	 *
+	 * @param array[] $installs
+	 *
+	 * @return array<int, string[]>|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function files_for_installs( string $id, array $installs ) {
+		[ $source, $entry ] = Font_Sources::split( $id );
+
+		$resolved = $this->resolve( $source, $entry );
+
+		if ( is_wp_error( $resolved ) ) {
+			return $resolved;
+		}
+
+		$files = [];
+
+		foreach ( $installs as $install ) {
+			$files[] = array_map( 'strval', array_keys( $this->targets( $resolved['data'], (array) $install ) ) );
+		}
+
+		return $files;
 	}
 
 	/**
@@ -673,16 +704,21 @@ class Font_Installer {
 	/**
 	 * The key a first install of a display entry takes
 	 *
-	 * The entry id by default — stable, matches the catalogue and survives a label edit — or the route's key,
-	 * derived from the label by the custom-font rule. A key held by anything else is suffixed rather than refused,
-	 * so an install never fails on a name (§4.5 Variants).
+	 * The entry id by default — stable, matches the catalogue and survives a label edit — or, when the caller chose
+	 * a name, that name reduced to a key. A key held by anything else is suffixed rather than refused, so an
+	 * install never fails on a name (§4.5 Variants).
+	 *
+	 * The derivation happens here rather than at the route because a key is install policy, and because a
+	 * pre-derived key in a queue item would outlive the request that computed it: the batch could be run days
+	 * later, against rows that have since moved.
 	 *
 	 * @since 7.0
 	 */
 	protected function new_key( array $row, array $install ): string {
-		$key = (string) ( $install['font_key'] ?? '' );
+		$label = (string) ( $install['label'] ?? '' );
+		$key   = $label !== '' ? $this->repository->derive_key( $label ) : (string) $row['entry'];
 
-		return $this->repository->unique_key( $key !== '' ? $key : (string) $row['entry'] );
+		return $this->repository->unique_key( $key );
 	}
 
 	/**
@@ -731,16 +767,5 @@ class Font_Installer {
 		$backoff  = $repeated ? static::RETRY_AFTER_MAX : static::RETRY_AFTER;
 
 		return gmdate( 'Y-m-d H:i:s', time() + $backoff + wp_rand( 0, static::RETRY_JITTER ) );
-	}
-
-	/**
-	 * @return array{0: string, 1: string}
-	 *
-	 * @since 7.0
-	 */
-	protected function split( string $id ): array {
-		$parts = explode( '/', $id, 2 );
-
-		return [ $parts[0], $parts[1] ?? '' ];
 	}
 }

@@ -65,6 +65,46 @@ trait HasFontRows {
 	}
 
 	/**
+	 * Install a font row that belongs to a catalogue entry, one real file per role named
+	 *
+	 * `install_font_row()`'s sibling for the source-installed shape: `source` / `entry` / `coverage` / `version`
+	 * are what every status, update and grouping read keys on, so a suite that fakes them by hand drifts from
+	 * `Font_Repository::insert()` the moment a column moves.
+	 *
+	 * @param string[] $roles
+	 *
+	 * @return int The new row's id
+	 */
+	protected function install_entry_row( string $font_key, string $entry, array $overrides = [], array $roles = [ 'R' ] ): int {
+		$files = [];
+
+		foreach ( $roles as $role ) {
+			$path           = 'test-' . $font_key . '-' . strtolower( $role ) . '.ttf';
+			$files[ $role ] = [
+				'path' => $path,
+				'size' => 3,
+			];
+
+			file_put_contents( $this->font_dir() . $path, 'ttf' );
+		}
+
+		return $this->font_repository()->insert(
+			array_merge(
+				[
+					'font_key' => $font_key,
+					'label'    => ucfirst( $font_key ),
+					'source'   => 'packs',
+					'entry'    => $entry,
+					'coverage' => 1,
+					'version'  => 'fonts-v1.0.0',
+					'files'    => $files,
+				],
+				$overrides
+			)
+		);
+	}
+
+	/**
 	 * Drop every row and every test font file
 	 *
 	 * Rows go first with `$unlink_files` false, because the file sweep below is what removes them — the shared

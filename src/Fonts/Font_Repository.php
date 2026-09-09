@@ -779,6 +779,32 @@ class Font_Repository {
 	}
 
 	/**
+	 * The font key a piece of text derives to
+	 *
+	 * The legacy rule first — lowercase, spaces removed — so a template written against 6.x keeps resolving, and
+	 * anything it leaves outside `KEY_PATTERN` collapses to `-` rather than vanishing, since silently deleting
+	 * characters can reduce two different names to one key. `font` is the floor: a label that is entirely
+	 * non-Latin still has to produce something `unique_key()` can suffix.
+	 *
+	 * Not `Model_Custom_Fonts::get_font_short_name()`, which is only the first line of this and is frozen: the 6.x
+	 * ids in the wild were minted by it and `Controller_Upgrade_Routines` re-derives them to match, so it cannot
+	 * start collapsing characters now.
+	 *
+	 * @since 7.0
+	 */
+	public function derive_key( string $text ): string {
+		$legacy = mb_strtolower( str_replace( ' ', '', $text ), 'UTF-8' );
+
+		if ( preg_match( static::KEY_PATTERN, $legacy ) ) {
+			return $legacy;
+		}
+
+		$collapsed = trim( strtolower( (string) preg_replace( '/[^A-Za-z0-9_\-]+/', '-', $legacy ) ), '-' );
+
+		return $collapsed !== '' ? $collapsed : 'font';
+	}
+
+	/**
 	 * Derive a free key, suffixing a taken one
 	 *
 	 * One rule everywhere: when the key is taken or reserved, append a short random suffix and log both spellings,

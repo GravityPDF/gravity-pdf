@@ -808,10 +808,22 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		);
 		$font_sources_controller->init();
 
+		$font_installs_controller = new Rest\Rest_Font_Installs(
+			$this->get_font_registry(),
+			$this->get_catalog_repository(),
+			$this->get_font_repository(),
+			$this->get_font_installer(),
+			$this->get_install_queue(),
+			$this->get_font_sources(),
+			$this->gform
+		);
+		$font_installs_controller->init();
+
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $form_setting_controller );
 		$this->singleton->add_class( $download_pdf_controller );
 		$this->singleton->add_class( $font_sources_controller );
+		$this->singleton->add_class( $font_installs_controller );
 
 		/* Log any errors for PDF endpoints */
 		$rest_request_after_callback = function ( $response, $handle, $request ) {

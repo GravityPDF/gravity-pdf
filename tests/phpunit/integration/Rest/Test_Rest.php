@@ -36,6 +36,29 @@ abstract class Test_Rest extends TestCase {
 	 */
 	protected static $editor_id;
 
+	/**
+	 * Dispatch a request against the plugin's namespace
+	 *
+	 * On the base class because every REST suite needs it and three of them had already grown their own copy.
+	 */
+	protected function rest( string $method, string $route, array $params = [] ) {
+		$request = new WP_REST_Request( $method, '/gravity-pdf/v1' . $route );
+
+		foreach ( $params as $key => $value ) {
+			$request->set_param( $key, $value );
+		}
+
+		return rest_do_request( $request );
+	}
+
+	protected function get( string $route, array $params = [] ) {
+		return $this->rest( 'GET', $route, $params );
+	}
+
+	protected function post( string $route, array $params = [] ) {
+		return $this->rest( 'POST', $route, $params );
+	}
+
 	public function set_up(): void {
 		global $gfpdf;
 

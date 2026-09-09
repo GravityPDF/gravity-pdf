@@ -135,8 +135,10 @@ class Install_Queue extends Helper_Abstract_Queue {
 	 * the same request produce one batch without either taking a lock. Everything before the claim only decides
 	 * whether there is anything left to ask for.
 	 *
-	 * @param array $request `{ entry: '{source}/{entry}', background: string[], install?: array }` — `inline` is
-	 *                       trigger 3's own concurrent fetch and is deliberately not queued here
+	 * @param array $request `{ entry: '{source}/{entry}', background: string[], install?: array, force?: bool }` —
+	 *                       `inline` is trigger 3's own concurrent fetch and is deliberately not queued here. An
+	 *                       entry installed under more than one key passes `installs` instead: one
+	 *                       `{ install, background }` pair per row, so the whole entry is claimed once
 	 * @param bool  $manual  A Font Manager install: ignores the auto-install gate, `retry_after` and `removed`
 	 *
 	 * @since 7.0
@@ -146,18 +148,35 @@ class Install_Queue extends Helper_Abstract_Queue {
 			return false;
 		}
 
-		$parts  = explode( '/', (string) ( $request['entry'] ?? '' ), 2 );
-		$source = $parts[0];
-		$entry  = $parts[1] ?? '';
+		[ $source, $entry ] = Font_Sources::split( (string) ( $request['entry'] ?? '' ) );
 
 		if ( $source === '' || $entry === '' ) {
 			return false;
 		}
 
-		$install = (array) ( $request['install'] ?? [] );
-		$pending = $this->pending_files( $source, $entry, (array) ( $request['background'] ?? [] ), $install );
+		$items = [];
+		$force = ! empty( $request['force'] );
 
-		if ( $pending === [] ) {
+		foreach ( $this->requested_installs( $request ) as $requested ) {
+			$install = (array) ( $requested['install'] ?? [] );
+			$files   = (array) ( $requested['background'] ?? [] );
+
+			foreach ( $this->pending_files( $source, $entry, $files, $force ) as $name ) {
+				$item = [
+					'source' => $source,
+					'entry'  => $entry,
+					'name'   => $name,
+				];
+
+				if ( $install !== [] ) {
+					$item['install'] = $install;
+				}
+
+				$items[] = $item;
+			}
+		}
+
+		if ( $items === [] ) {
 			return false;
 		}
 
@@ -165,17 +184,7 @@ class Install_Queue extends Helper_Abstract_Queue {
 			return false;
 		}
 
-		foreach ( $pending as $name ) {
-			$item = [
-				'source' => $source,
-				'entry'  => $entry,
-				'name'   => $name,
-			];
-
-			if ( $install !== [] ) {
-				$item['install'] = $install;
-			}
-
+		foreach ( $items as $item ) {
 			$this->push_to_queue( $item );
 		}
 
@@ -185,20 +194,51 @@ class Install_Queue extends Helper_Abstract_Queue {
 	}
 
 	/**
+	 * The installs this request asks for, in one shape
+	 *
+	 * A trigger asks for one — the entry's own row — and says so with `install` / `background`. The entry route
+	 * updating a display entry asks for every install it already has, each with its own variants and therefore its
+	 * own file list, and says so with `installs`. Both are one claim on one catalog row, which is the point.
+	 *
+	 * @return array<int, array{install?: array, background?: array}>
+	 *
+	 * @since 7.0
+	 */
+	protected function requested_installs( array $request ): array {
+		$installs = (array) ( $request['installs'] ?? [] );
+
+		if ( $installs !== [] ) {
+			return $installs;
+		}
+
+		return [
+			[
+				'install'    => (array) ( $request['install'] ?? [] ),
+				'background' => (array) ( $request['background'] ?? [] ),
+			],
+		];
+	}
+
+	/**
 	 * The files of this request that are not already on disk with a row
 	 *
-	 * Only for the entry's own install. A manual install carrying an `install` payload is a *further* install of a
-	 * display entry under its own key, so its rows are disjoint from whatever is already there and none of its
-	 * files may be dropped — the per-file skip in `Font_Installer::place()` is what makes the shared bytes free.
+	 * The default, and what every trigger wants: a trigger fires on its own, repeatedly, and must not re-claim a
+	 * pack a previous one already placed — the claim is what writes `installing`, so without the drop a fully
+	 * installed entry would churn its phase on every render.
+	 *
+	 * A caller that knows better says `force`. The install route does, on both of its jobs: an update leaves the
+	 * files at the same paths and changes only their contents, and a further install of a display entry under its
+	 * own key needs rows disjoint from whatever is already there. Neither pays for a download it does not need —
+	 * `Font_Installer::already_installed()` skips any file whose recorded hash still matches.
 	 *
 	 * @return string[]
 	 *
 	 * @since 7.0
 	 */
-	protected function pending_files( string $source, string $entry, array $files, array $install ): array {
+	protected function pending_files( string $source, string $entry, array $files, bool $force ): array {
 		$files = array_values( array_unique( array_map( 'strval', $files ) ) );
 
-		if ( $install !== [] ) {
+		if ( $force ) {
 			return $files;
 		}
 
