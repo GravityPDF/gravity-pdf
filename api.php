@@ -181,6 +181,19 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns the render-time font install trigger, which fetches what a PDF is about to draw
+	 *
+	 * @return \GFPDF\Fonts\Render_Font_Trigger
+	 *
+	 * @since 7.0
+	 */
+	public static function get_render_font_trigger() {
+		global $gfpdf;
+
+		return $gfpdf->get_render_font_trigger();
+	}
+
+	/**
 	 * Returns our miscellaneous methods (or common methods) used throughout the plugin.
 	 *
 	 * Usage:

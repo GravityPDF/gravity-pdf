@@ -6,6 +6,7 @@ use Exception;
 use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
 use GFPDF\Fonts\Registry;
+use GFPDF\Fonts\Render_Font_Trigger;
 use GFPDF_Vendor\Mpdf\Language\LanguageToFontRegistry;
 use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF\Statics\Template_Constants;
@@ -179,25 +180,33 @@ class Helper_PDF {
 	protected $log;
 
 	/**
-	 * Initialise our class
-	 *
-	 * @param array                $entry    The Gravity Form Entry to be processed
-	 * @param array                $settings The Gravity PDF Settings Array
-	 * @param Helper_Abstract_Form $gform
-	 * @param Helper_Data          $data
-	 * @param Helper_Misc          $misc
-	 * @param Helper_Templates     $templates
-	 * @param LoggerInterface      $log
-	 *
-	 * @since 4.0
-	 */
-	/**
 	 * @var Registry
 	 * @since 7.0
 	 */
 	protected $registry;
 
-	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log, ?Registry $registry = null ) {
+	/**
+	 * @var Render_Font_Trigger
+	 * @since 7.0
+	 */
+	protected $font_trigger;
+
+	/**
+	 * Initialise our class
+	 *
+	 * @param array                $entry        The Gravity Form Entry to be processed
+	 * @param array                $settings     The Gravity PDF Settings Array
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Data          $data
+	 * @param Helper_Misc          $misc
+	 * @param Helper_Templates     $templates
+	 * @param LoggerInterface      $log
+	 * @param Registry             $registry
+	 * @param Render_Font_Trigger  $font_trigger
+	 *
+	 * @since 4.0
+	 */
+	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log, ?Registry $registry = null, ?Render_Font_Trigger $font_trigger = null ) {
 
 		/* Assign our internal variables */
 		$this->entry     = $entry;
@@ -208,9 +217,10 @@ class Helper_PDF {
 		$this->templates = $templates;
 		$this->log       = $log;
 
-		/* Optional so the seven-argument signature add-ons construct keeps working; the container supplies it */
-		$this->registry = $registry ?? \GPDFAPI::get_font_registry();
-		$this->form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
+		/* Optional so the seven-argument signature add-ons construct keeps working; the container supplies both */
+		$this->registry     = $registry ?? \GPDFAPI::get_font_registry();
+		$this->font_trigger = $font_trigger ?? \GPDFAPI::get_render_font_trigger();
+		$this->form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
 
 		$this->set_path();
 		$this->set_print_dialog( ! empty( $settings['print'] ) );
@@ -285,6 +295,9 @@ class Helper_PDF {
 
 		/* Write the HTML to mPDF */
 		$this->mpdf->WriteHTML( $html );
+
+		/* The template's own text, which the entry scan could not see. Queued only — this PDF is already drawn */
+		$this->font_trigger->after_render( $html );
 	}
 
 	/**
@@ -629,6 +642,12 @@ class Helper_PDF {
 	 */
 	protected function begin_pdf() {
 		$registry = $this->registry;
+
+		/*
+		 * Ahead of everything mPDF: a face that lands here is registered by the config below rather than needing
+		 * anything already built to notice it.
+		 */
+		$this->font_trigger->before_render( $this->form, $this->entry, $this->settings );
 
 		/*
 		 * mPDF consults the registry members in reverse order of registration, so this one — added after
