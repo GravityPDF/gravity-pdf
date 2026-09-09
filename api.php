@@ -164,6 +164,23 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns the font install queue, the background work list font installs run on
+	 *
+	 * Queue an entry with `enqueue_once( [ 'entry' => '{source}/{entry}', 'background' => [ ...filenames ] ] )`;
+	 * the dedup, the auto-install gate and the per-file backoff are all inside it, so calling it more than once for
+	 * the same entry is safe and costs one conditional UPDATE.
+	 *
+	 * @return \GFPDF\Fonts\Install_Queue
+	 *
+	 * @since 7.0
+	 */
+	public static function get_install_queue() {
+		global $gfpdf;
+
+		return $gfpdf->get_install_queue();
+	}
+
+	/**
 	 * Returns our miscellaneous methods (or common methods) used throughout the plugin.
 	 *
 	 * Usage:
