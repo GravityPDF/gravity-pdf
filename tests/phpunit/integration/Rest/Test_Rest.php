@@ -59,6 +59,10 @@ abstract class Test_Rest extends TestCase {
 		return $this->rest( 'POST', $route, $params );
 	}
 
+	protected function delete( string $route, array $params = [] ) {
+		return $this->rest( 'DELETE', $route, $params );
+	}
+
 	public function set_up(): void {
 		global $gfpdf;
 

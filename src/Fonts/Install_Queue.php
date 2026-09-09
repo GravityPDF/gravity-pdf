@@ -281,14 +281,13 @@ class Install_Queue extends Helper_Abstract_Queue {
 			return false;
 		}
 
-		$row = $this->catalog->entry( $source, $entry );
-
 		/*
-		 * Re-checked here rather than trusted from enqueue time: a delete or a source unregistration between the
-		 * two drops the remaining work silently. Neither is a failure worth recording — the row would be reporting
-		 * the admin's own change back at them, and `removed` is what stops a trigger resurrecting a deleted pack.
+		 * The installer asks this again under the entry lock, and that is the gate; asking here first is what saves
+		 * a whole batch of a deleted entry one `resolve()` — an HTTPS fetch per item, for a source that points at
+		 * its entry file rather than inlining it. Neither answer is a failure worth recording on the row: it would
+		 * be reporting the admin's own change back at them.
 		 */
-		if ( $row === null || (string) ( $row['phase'] ?? '' ) === 'removed' || ! $this->catalog->is_registered( $source ) ) {
+		if ( ! $this->catalog->is_wanted( $source, $entry ) ) {
 			$this->log->notice(
 				'Skipping a queued font install that is no longer wanted',
 				[

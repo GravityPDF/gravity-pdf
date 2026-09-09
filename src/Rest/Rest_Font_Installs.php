@@ -147,6 +147,11 @@ class Rest_Font_Installs extends Rest_Font_Base {
 						],
 					],
 				],
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_entry' ],
+					'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+				],
 			]
 		);
 	}
@@ -199,7 +204,7 @@ class Rest_Font_Installs extends Rest_Font_Base {
 		 * installing it — so the status says so and the poller takes over. A family is different: the install in
 		 * flight may be a different one, under a different key, and would silently swallow this request's own.
 		 */
-		if ( ! $queued && ! $this->is_coverage( $row ) && in_array( (string) $statuses[ $id ]['phase'], Registry::LIVE_PHASES, true ) ) {
+		if ( ! $queued && ! $this->is_coverage( $row ) && in_array( (string) $statuses[ $id ]['phase'], Catalog_Repository::LIVE_PHASES, true ) ) {
 			return new WP_Error(
 				'font_install_in_progress',
 				__( 'This font is already being installed. Try again once it has finished.', 'gravity-pdf' ),
@@ -208,6 +213,36 @@ class Rest_Font_Installs extends Rest_Font_Base {
 		}
 
 		return new WP_REST_Response( $this->statuses_for( $statuses, [ $id ] ), 202 );
+	}
+
+	/**
+	 * Remove an entry's fonts, and answer with what it looks like afterwards
+	 *
+	 * Never a 404 for "not installed": the entry route is about the catalogue entry, and removing one that has no
+	 * rows is how an admin declines a language pack the always rule would otherwise keep reinstalling. The only
+	 * refusal is a file of it being downloaded at that moment, which clears itself.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function delete_entry( $request ) {
+		$row = $this->entry_row( $this->catalog, (string) $request['source'], (string) $request['entry'] );
+
+		if ( is_wp_error( $row ) ) {
+			return $row;
+		}
+
+		$id      = $this->entry_id( $row );
+		$removed = $this->installer->remove( $id );
+
+		if ( is_wp_error( $removed ) ) {
+			$removed->add_data( [ 'status' => 409 ], $removed->get_error_code() );
+
+			return $removed;
+		}
+
+		return new WP_REST_Response( (object) [ $id => $this->registry->get_install_status( $id, $this->queue ) ], 200 );
 	}
 
 	/**
