@@ -178,11 +178,16 @@ class Render_Font_Trigger {
 	 * @since 7.0
 	 */
 	protected function queue_all( array $requests ): void {
-		foreach ( $requests as $request ) {
-			unset( $request['scripts'] );
+		$this->queue->enqueue_all(
+			array_map(
+				static function ( array $request ): array {
+					unset( $request['scripts'] );
 
-			$this->queue->enqueue_once( $request );
-		}
+					return $request;
+				},
+				$requests
+			)
+		);
 	}
 
 	/**

@@ -181,6 +181,19 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns the coverage resolver, which answers which catalogue entries a site wants installed
+	 *
+	 * @return \GFPDF\Fonts\Coverage_Resolver
+	 *
+	 * @since 7.0
+	 */
+	public static function get_coverage_resolver() {
+		global $gfpdf;
+
+		return $gfpdf->get_coverage_resolver();
+	}
+
+	/**
 	 * Returns the render-time font install trigger, which fetches what a PDF is about to draw
 	 *
 	 * @return \GFPDF\Fonts\Render_Font_Trigger

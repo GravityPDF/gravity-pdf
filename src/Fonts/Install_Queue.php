@@ -159,6 +159,30 @@ class Install_Queue extends Helper_Abstract_Queue {
 	}
 
 	/**
+	 * Queue every request in a resolver's answer
+	 *
+	 * What the triggers that are not a render all do with one: each request is claimed on its own, so an entry
+	 * already in flight costs nothing and the rest still go.
+	 *
+	 * @param array[] $requests
+	 *
+	 * @return int How many entries were queued
+	 *
+	 * @since 7.0
+	 */
+	public function enqueue_all( array $requests ): int {
+		$queued = 0;
+
+		foreach ( $requests as $request ) {
+			if ( $this->enqueue_once( $request ) ) {
+				++$queued;
+			}
+		}
+
+		return $queued;
+	}
+
+	/**
 	 * Queue what a render's scripts call for, and hand back the files worth fetching before it draws
 	 *
 	 * Trigger 3's entry point. The split is the queue's to make because only it sees the file sizes the cap is

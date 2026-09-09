@@ -108,6 +108,11 @@ class Controller_Upgrade_Routines {
 
 		$sync->maybe_run();
 		$sync->seed();
+
+		/* Trigger 1, and it has to be here rather than on the install hook: there was no catalogue to resolve
+		   against until the two lines above ran. A sync that failed leaves this asking of the seed, and the first
+		   scheduled sync to succeed fires the trigger itself */
+		\GPDFAPI::get_install_queue()->enqueue_all( \GPDFAPI::get_coverage_resolver()->for_site_languages() );
 	}
 
 	/**
