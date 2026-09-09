@@ -37,14 +37,21 @@ class Coverage_Resolver {
 	protected $catalog;
 
 	/**
+	 * @var Font_Repository
+	 * @since 7.0
+	 */
+	protected $repository;
+
+	/**
 	 * @var Registry
 	 * @since 7.0
 	 */
 	protected $registry;
 
-	public function __construct( Catalog_Repository $catalog, Registry $registry ) {
-		$this->catalog  = $catalog;
-		$this->registry = $registry;
+	public function __construct( Catalog_Repository $catalog, Font_Repository $repository, Registry $registry ) {
+		$this->catalog    = $catalog;
+		$this->repository = $repository;
+		$this->registry   = $registry;
 	}
 
 	/**
@@ -82,6 +89,68 @@ class Coverage_Resolver {
 				$this->rows_for_languages( [ $this->registry->get_document_language( $pdf ) ] )
 			)
 		);
+	}
+
+	/**
+	 * The entries a rendered document's scripts call for
+	 *
+	 * Each request carries the tags that matched it, which is what makes trigger 3 a selector rather than a second
+	 * code path: the queue reads the reason and takes those scripts' Regular faces inline, and everything a
+	 * request does *not* explain — the always rule's own entries included — means all of it, in the background.
+	 *
+	 * @param string[] $scripts `Script_Detector::detect()`'s answer
+	 *
+	 * @return array[] One `Install_Queue::enqueue_once()` request per entry
+	 *
+	 * @since 7.0
+	 */
+	public function for_scripts( array $scripts ): array {
+		$matched = [];
+		$reasons = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$claimed = array_values( array_intersect( $this->csv( $row['scripts'] ?? null ), $scripts ) );
+
+			if ( $claimed === [] ) {
+				continue;
+			}
+
+			$matched[] = $row;
+
+			$reasons[ $row['source'] . '/' . $row['entry'] ] = $claimed;
+		}
+
+		return $this->requests( $matched, $reasons );
+	}
+
+	/**
+	 * Every script tag the catalogue claims and this site has no font for
+	 *
+	 * `Script_Detector`'s shortcut: with nothing left to install there is nothing worth reading a document for, so
+	 * a fully provisioned site skips the code-point walk entirely. An entry counts as installed once every key its
+	 * `font_keys` names has a row — a key short of that still has files to fetch, so its scripts stay on the list.
+	 *
+	 * @return array<string, true> Keyed for lookup
+	 *
+	 * @since 7.0
+	 */
+	public function uninstalled_scripts(): array {
+		$installed = $this->repository->all();
+		$scripts   = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$keys = $this->csv( $row['font_keys'] ?? null );
+
+			if ( $row['phase'] === 'removed' || array_diff( $keys, array_keys( $installed ) ) === [] ) {
+				continue;
+			}
+
+			foreach ( $this->csv( $row['scripts'] ?? null ) as $tag ) {
+				$scripts[ $tag ] = true;
+			}
+		}
+
+		return $scripts;
 	}
 
 	/**
@@ -143,13 +212,14 @@ class Coverage_Resolver {
 	 * A `removed` phase drops any entry, always or not — `claim()` refuses one anyway, so this only spares the
 	 * queue an entry document it would read and discard.
 	 *
-	 * @param array[] $rows
+	 * @param array[]                $rows
+	 * @param array<string, string[]> $reasons The scripts that matched an entry, where a caller has them
 	 *
 	 * @return array[]
 	 *
 	 * @since 7.0
 	 */
-	protected function requests( array $rows ): array {
+	protected function requests( array $rows, array $reasons = [] ): array {
 		$requests = [];
 
 		foreach ( array_merge( $rows, $this->always_rows() ) as $row ) {
@@ -159,6 +229,10 @@ class Coverage_Resolver {
 
 			$id              = $row['source'] . '/' . $row['entry'];
 			$requests[ $id ] = [ 'entry' => $id ];
+
+			if ( isset( $reasons[ $id ] ) ) {
+				$requests[ $id ]['scripts'] = $reasons[ $id ];
+			}
 		}
 
 		return array_values( $requests );

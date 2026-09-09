@@ -69,6 +69,16 @@ class Install_Queue extends Helper_Abstract_Queue {
 	public const INLINE_BUDGET = 20;
 
 	/**
+	 * The largest file trigger 3 will fetch inside the render request (12 MiB)
+	 *
+	 * Measured against the pack table: at this size every CJK and Korean Regular face gets an embedded first
+	 * render and only the Plane 2 supplements fall to the background.
+	 *
+	 * @since 7.0
+	 */
+	public const INLINE_CAP = 12582912;
+
+	/**
 	 * @var Font_Repository
 	 * @since 7.0
 	 */
@@ -145,25 +155,73 @@ class Install_Queue extends Helper_Abstract_Queue {
 	 * @since 7.0
 	 */
 	public function enqueue_once( array $request, bool $manual = false ): bool {
+		return $this->enqueue( $request, $manual )['queued'];
+	}
+
+	/**
+	 * Queue what a render's scripts call for, and hand back the files worth fetching before it draws
+	 *
+	 * Trigger 3's entry point. The split is the queue's to make because only it sees the file sizes the cap is
+	 * about, and only it may make it: the gate, the claim and the backoff all apply first, so a losing or
+	 * suppressed request gets an empty list and the render falls back to the bundled faces.
+	 *
+	 * @param array[] $requests `Coverage_Resolver::for_scripts()`'s answer
+	 *
+	 * @return array[] `{ source, entry, name, size }` per file to fetch in-request
+	 *
+	 * @since 7.0
+	 */
+	public function enqueue_for_render( array $requests ): array {
+		$inline = [];
+
+		foreach ( $requests as $request ) {
+			$inline = array_merge( $inline, $this->enqueue( $request, false )['inline'] );
+		}
+
+		return $inline;
+	}
+
+	/**
+	 * @return array{queued: bool, inline: array[]}
+	 *
+	 * @since 7.0
+	 */
+	protected function enqueue( array $request, bool $manual ): array {
+		$nothing = [
+			'queued' => false,
+			'inline' => [],
+		];
+
 		if ( ! $manual && ! $this->registry->auto_install_enabled() ) {
-			return false;
+			return $nothing;
 		}
 
 		[ $source, $entry ] = Font_Sources::split( (string) ( $request['entry'] ?? '' ) );
 
 		if ( $source === '' || $entry === '' ) {
-			return false;
+			return $nothing;
 		}
 
-		$items = [];
-		$force = ! empty( $request['force'] );
+		$items  = [];
+		$inline = [];
+		$force  = ! empty( $request['force'] );
+
+		/* Asked before the entry is read, so a trigger firing at an install already in flight costs one indexed row */
+		if ( ! $this->catalog->is_claimable( $source, $entry, $manual ) ) {
+			return $nothing;
+		}
 
 		if ( ! isset( $request['background'] ) && ! isset( $request['installs'] ) ) {
-			$request['background'] = $this->entry_files( $source, $entry, $force );
+			$plan = $this->entry_plan( $source, $entry, $force );
 
-			if ( $request['background'] === [] ) {
-				return false;
+			if ( $plan === [] ) {
+				return $nothing;
 			}
+
+			[ $inline, $request['background'] ] = $this->split_plan( $source, $entry, $plan, (array) ( $request['scripts'] ?? [] ) );
+
+			/* A partly installed entry reaches here, so the inline half needs the same drop the background half gets */
+			$inline = $this->pending_inline( $source, $entry, $inline, $force );
 		}
 
 		foreach ( $this->requested_installs( $request ) as $requested ) {
@@ -185,12 +243,12 @@ class Install_Queue extends Helper_Abstract_Queue {
 			}
 		}
 
-		if ( $items === [] ) {
-			return false;
+		if ( $items === [] && $inline === [] ) {
+			return $nothing;
 		}
 
 		if ( ! $this->catalog->claim( $source, $entry, $manual ) ) {
-			return false;
+			return $nothing;
 		}
 
 		foreach ( $items as $item ) {
@@ -199,22 +257,123 @@ class Install_Queue extends Helper_Abstract_Queue {
 
 		$this->flush();
 
-		return true;
+		return [
+			'queued' => true,
+			'inline' => $inline,
+		];
 	}
 
 	/**
-	 * The files an entry has, for a caller that named none
+	 * Split an entry's plan into what this render fetches now and what the batch fetches later
+	 *
+	 * A request that explains itself with scripts is trigger 3's: the faces mPDF reaches for first — every Regular
+	 * and every line-break dictionary — are worth the wait, and everything else, bold and italic included, can
+	 * arrive after this PDF (mPDF draws bold and italic from the Regular face until they do). A request with no
+	 * reason means all of it, in the background, which is what triggers 1, 2 and 4 want.
+	 *
+	 * A face over the cap is never fetched inline. It is queued like any other file and the miss recorded, so the
+	 * health check can tell the admin why this render used the bundled fallback.
+	 *
+	 * @param array<string, array{size: int, roles: array}> $plan
+	 * @param string[]                                      $scripts
+	 *
+	 * @return array{0: array[], 1: string[]}
+	 *
+	 * @since 7.0
+	 */
+	protected function split_plan( string $source, string $entry, array $plan, array $scripts ): array {
+		if ( $scripts === [] ) {
+			return [ [], array_keys( $plan ) ];
+		}
+
+		$inline     = [];
+		$background = [];
+		$over_cap   = false;
+
+		foreach ( $plan as $name => $file ) {
+			if ( ! $this->drawn_first( (array) $file['roles'] ) ) {
+				$background[] = $name;
+
+				continue;
+			}
+
+			/* A size of 0 is an entry that never declared one, and the cap cannot be applied to an unknown */
+			if ( $file['size'] <= 0 || $file['size'] > static::INLINE_CAP ) {
+				$background[] = $name;
+				$over_cap     = true;
+
+				continue;
+			}
+
+			$inline[] = [
+				'source' => $source,
+				'entry'  => $entry,
+				'name'   => (string) $name,
+				'size'   => (int) $file['size'],
+			];
+		}
+
+		if ( $over_cap ) {
+			$this->catalog->record_missing_scripts( $source, $entry, $scripts );
+		}
+
+		return [ $inline, $background ];
+	}
+
+	/**
+	 * The inline files that are not already on disk with a row
+	 *
+	 * @param array[] $inline
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	protected function pending_inline( string $source, string $entry, array $inline, bool $force ): array {
+		$pending = array_flip( $this->pending_files( $source, $entry, array_column( $inline, 'name' ), $force ) );
+
+		return array_values(
+			array_filter(
+				$inline,
+				static function ( array $file ) use ( $pending ): bool {
+					return isset( $pending[ $file['name'] ] );
+				}
+			)
+		);
+	}
+
+	/**
+	 * Whether any role this file fills is one the first render needs: a Regular face, or a line-break dictionary
+	 *
+	 * @param array $roles `{ font_key: { role: variant } }`
+	 *
+	 * @since 7.0
+	 */
+	protected function drawn_first( array $roles ): bool {
+		foreach ( $roles as $by_role ) {
+			foreach ( array_keys( (array) $by_role ) as $role ) {
+				if ( $role === 'R' || strpos( (string) $role, 'dict_' ) === 0 ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * The files an entry has and what each one is for, for a caller that named none
 	 *
 	 * The triggers name an entry and nothing else, so this is where an entry document is read — **after** the
 	 * auto-install gate: a site with auto-install off must not pay for it, and for a source that points at its
 	 * entry file rather than inlining it, reading it is an HTTPS fetch. The count check comes first for the same
 	 * reason, and answers from the cached rows alone.
 	 *
-	 * @return string[]
+	 * @return array<string, array{size: int, roles: array}>
 	 *
 	 * @since 7.0
 	 */
-	protected function entry_files( string $source, string $entry, bool $force ): array {
+	protected function entry_plan( string $source, string $entry, bool $force ): array {
 		$expected = $this->catalog->file_count( $source, $entry );
 
 		/* A 0 means the index declared no count, so it is a reason to ask rather than to assume the entry is done */
@@ -222,9 +381,9 @@ class Install_Queue extends Helper_Abstract_Queue {
 			return [];
 		}
 
-		$files = $this->installer->files_for( $source . '/' . $entry );
+		$plan = $this->installer->plan_for( $source . '/' . $entry );
 
-		return is_wp_error( $files ) ? [] : $files;
+		return is_wp_error( $plan ) ? [] : $plan;
 	}
 
 	/**

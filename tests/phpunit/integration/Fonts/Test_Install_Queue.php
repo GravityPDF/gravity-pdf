@@ -159,6 +159,182 @@ class Test_Install_Queue extends TestCase {
 		];
 	}
 
+	/**
+	 * One entry whose files fill named roles at declared sizes: what trigger 3 selects on
+	 *
+	 * @param array<string, array{0: string, 1: int}> $roles role => [ filename, declared size ]
+	 */
+	protected function seed_roles( array $roles, string $entry = 'japanese' ): void {
+		$fonts = [];
+		$files = [];
+
+		foreach ( $roles as $role => $file ) {
+			$fonts['notosansjp'][ $role ] = $file[0];
+			$files[ $file[0] ]            = [
+				'sha256'      => hash( 'sha256', $file[0] ),
+				'size'        => $file[1],
+				'remote_path' => 'fonts-v1.0.0/' . $file[0],
+			];
+		}
+
+		$this->insert_catalog_row(
+			'packs',
+			$entry,
+			[
+				'coverage'   => 1,
+				'scripts'    => 'ja',
+				'font_keys'  => 'notosansjp',
+				'files'      => count( $files ),
+				'entry_json' => (string) wp_json_encode(
+					[
+						'fonts' => $fonts,
+						'files' => $files,
+					]
+				),
+			]
+		);
+	}
+
+	/**
+	 * A render's request: the entry, and the scripts that made it ask
+	 */
+	protected function render_request( string $entry = 'japanese' ): array {
+		return [
+			'entry'   => 'packs/' . $entry,
+			'scripts' => [ 'ja' ],
+		];
+	}
+
+	public function test_a_render_takes_the_regular_face_now_and_queues_the_rest() {
+		$this->seed_roles(
+			[
+				'R' => [ 'NotoSansJP-Regular.ttf', 1024 ],
+				'B' => [ 'NotoSansJP-Bold.ttf', 2048 ],
+				'I' => [ 'NotoSansJP-Italic.ttf', 4096 ],
+			]
+		);
+
+		$inline = $this->queue->enqueue_for_render( [ $this->render_request() ] );
+
+		$this->assertSame( [ 'NotoSansJP-Regular.ttf' ], array_column( $inline, 'name' ) );
+		$this->assertSame( 1024, $inline[0]['size'] );
+		$this->assertSame( 'packs', $inline[0]['source'] );
+		$this->assertSame( 'japanese', $inline[0]['entry'] );
+
+		/* Bold and italic can arrive after this PDF: mPDF draws both from the Regular face until they do */
+		$this->assertSame(
+			[ 'NotoSansJP-Bold.ttf', 'NotoSansJP-Italic.ttf' ],
+			array_column( $this->queued(), 'name' )
+		);
+		$this->assertSame( 'queued', $this->status( 'japanese' )['phase'] );
+	}
+
+	/**
+	 * Thai, Khmer and Lao have no spaces, so without the dictionary the first render has nowhere to break a line
+	 */
+	public function test_a_line_break_dictionary_is_taken_now_as_well() {
+		$this->seed_roles(
+			[
+				'R'       => [ 'NotoSansThai-Regular.ttf', 1024 ],
+				'B'       => [ 'NotoSansThai-Bold.ttf', 2048 ],
+				'dict_th' => [ 'dict_th.txt', 512 ],
+			]
+		);
+
+		$inline = $this->queue->enqueue_for_render( [ $this->render_request() ] );
+
+		$this->assertSame( [ 'NotoSansThai-Regular.ttf', 'dict_th.txt' ], array_column( $inline, 'name' ) );
+	}
+
+	/**
+	 * Every other trigger: no reason means all of it, in the background, which is what they have always meant
+	 */
+	public function test_a_request_with_no_scripts_queues_everything_and_takes_nothing_now() {
+		$this->seed_roles(
+			[
+				'R' => [ 'NotoSansJP-Regular.ttf', 1024 ],
+				'B' => [ 'NotoSansJP-Bold.ttf', 2048 ],
+			]
+		);
+
+		$this->assertTrue( $this->queue->enqueue_once( [ 'entry' => 'packs/japanese' ] ) );
+		$this->assertCount( 2, $this->queued() );
+	}
+
+	public function test_a_face_over_the_inline_cap_is_queued_instead_and_the_miss_recorded() {
+		$this->seed_roles( [ 'R' => [ 'Sun-ExtB.ttf', Install_Queue::INLINE_CAP + 1 ] ], 'sip-ext' );
+
+		$this->assertSame( [], $this->queue->enqueue_for_render( [ $this->render_request( 'sip-ext' ) ] ) );
+		$this->assertSame( [ 'Sun-ExtB.ttf' ], array_column( $this->queued(), 'name' ) );
+
+		$status = $this->status( 'sip-ext' );
+		$this->assertSame( 'ja', $status['missing_scripts'] );
+		$this->assertNotNull( $status['missing_since'] );
+	}
+
+	/**
+	 * An entry that declares no size is an unknown, and a cap cannot be applied to one
+	 */
+	public function test_a_face_with_no_declared_size_is_queued_rather_than_fetched_now() {
+		$this->seed_roles( [ 'R' => [ 'NotoSansJP-Regular.ttf', 0 ] ] );
+
+		$this->assertSame( [], $this->queue->enqueue_for_render( [ $this->render_request() ] ) );
+		$this->assertSame( [ 'NotoSansJP-Regular.ttf' ], array_column( $this->queued(), 'name' ) );
+	}
+
+	public function test_a_render_asks_for_nothing_while_auto_install_is_off() {
+		$this->seed_roles( [ 'R' => [ 'NotoSansJP-Regular.ttf', 1024 ] ] );
+		GPDFAPI::get_options_class()->update_option( 'auto_install_fonts', 'No' );
+
+		$this->assertSame( [], $this->queue->enqueue_for_render( [ $this->render_request() ] ) );
+
+		GPDFAPI::get_options_class()->update_option( 'auto_install_fonts', 'Yes' );
+	}
+
+	/**
+	 * The second render of the same entry has an install in flight, and re-fetching its faces would double it
+	 */
+	public function test_a_second_render_while_the_install_is_in_flight_asks_for_nothing() {
+		$this->seed_roles(
+			[
+				'R' => [ 'NotoSansJP-Regular.ttf', 1024 ],
+				'B' => [ 'NotoSansJP-Bold.ttf', 2048 ],
+			]
+		);
+
+		$this->assertCount( 1, $this->queue->enqueue_for_render( [ $this->render_request() ] ) );
+		$this->assertSame( [], $this->queue->enqueue_for_render( [ $this->render_request() ] ) );
+	}
+
+	/**
+	 * A pack whose Regular face landed but whose bold did not must not pay for the Regular again
+	 */
+	public function test_a_face_already_on_disk_is_not_fetched_again() {
+		$this->seed_roles(
+			[
+				'R' => [ 'NotoSansJP-Regular.ttf', 1024 ],
+				'B' => [ 'NotoSansJP-Bold.ttf', 2048 ],
+			]
+		);
+
+		$this->install_entry_row(
+			'notosansjp',
+			'packs/japanese',
+			[
+				'files' => [
+					'R' => [
+						'path'   => 'packs/japanese/NotoSansJP-Regular.ttf',
+						'size'   => 1024,
+						'sha256' => hash( 'sha256', 'NotoSansJP-Regular.ttf' ),
+					],
+				],
+			]
+		);
+
+		$this->assertSame( [], $this->queue->enqueue_for_render( [ $this->render_request() ] ) );
+		$this->assertSame( [ 'NotoSansJP-Bold.ttf' ], array_column( $this->queued(), 'name' ) );
+	}
+
 	public function test_an_entry_is_queued_one_item_per_file_and_claimed() {
 		$names = $this->seed_pack( 3 );
 
@@ -587,13 +763,16 @@ class Test_Install_Queue extends TestCase {
 		$this->assertNull( $this->status()['error'] );
 	}
 
-	public function test_a_multi_file_entry_fetches_its_entry_file_once() {
+	/**
+	 * The pointer form: the index names a hash, and the entry itself is a separate document over HTTPS
+	 */
+	protected function seed_pointer_pack( int $count = 5 ): void {
 		$entry = [
 			'fonts' => [],
 			'files' => [],
 		];
 
-		for ( $i = 1; $i <= 5; $i++ ) {
+		for ( $i = 1; $i <= $count; $i++ ) {
 			$name = sprintf( 'Noto-%d.ttf', $i );
 			$body = sprintf( 'FONT-BYTES-%d', $i );
 
@@ -607,36 +786,82 @@ class Test_Install_Queue extends TestCase {
 
 		$json = (string) wp_json_encode( $entry );
 
-		/* The pointer form: the index names a hash, and the entry itself is a separate document */
 		$this->insert_catalog_row(
 			'packs',
 			'emoji',
 			[
 				'coverage'     => 1,
-				'files'        => 5,
+				'files'        => $count,
 				'entry_json'   => null,
 				'entry_sha256' => hash( 'sha256', $json ),
 			]
 		);
 
 		$this->mock_http( [ 'fonts.gravitypdf.com' => $json ] );
+	}
 
-		$this->assertSame( 5, count( (array) $this->installer()->files_for( 'packs/emoji' ) ) );
-
-		$entry_requests = array_filter(
-			$this->requested_urls(),
-			static function ( string $url ): bool {
-				return strpos( $url, '/entries/' ) !== false;
-			}
+	/**
+	 * @return string[] The entry-document requests made so far
+	 */
+	protected function entry_requests(): array {
+		return array_values(
+			array_filter(
+				$this->requested_urls(),
+				static function ( string $url ): bool {
+					return strpos( $url, '/entries/' ) !== false;
+				}
+			)
 		);
+	}
+
+	public function test_a_multi_file_entry_fetches_its_entry_file_once() {
+		$this->seed_pointer_pack();
+
+		$this->assertSame( 5, count( (array) $this->installer()->plan_for( 'packs/emoji' ) ) );
 
 		/* Five queued items must not mean five round trips for one unchanged ~1 KB document */
-		$this->assertCount( 1, $entry_requests );
+		$this->assertCount( 1, $this->entry_requests() );
 
-		$this->installer()->files_for( 'packs/emoji' );
-		$this->assertCount( 1, array_filter( $this->requested_urls(), static function ( string $url ): bool {
-			return strpos( $url, '/entries/' ) !== false;
-		} ) );
+		$this->installer()->plan_for( 'packs/emoji' );
+		$this->assertCount( 1, $this->entry_requests() );
+	}
+
+	/**
+	 * A trigger fires repeatedly and trigger 3 fires on the render path, so an entry already being installed has
+	 * to be refused before its document is read — which for a pointer source is an HTTPS round trip
+	 */
+	public function test_a_trigger_that_cannot_claim_never_reads_the_entry() {
+		/* A file count of its own, so the entry hashes differently from the fixture the test above memoised */
+		$this->seed_pointer_pack( 4 );
+
+		$this->assertTrue( $this->queue->enqueue_once( [ 'entry' => 'packs/emoji' ] ) );
+		$this->assertCount( 1, $this->entry_requests() );
+
+		/* A second *request*, which is the case that matters: the first one's in-memory entry memo is gone with it */
+		$this->assertFalse( $this->fresh_queue()->enqueue_once( [ 'entry' => 'packs/emoji' ] ) );
+		$this->assertCount( 1, $this->entry_requests() );
+	}
+
+	/**
+	 * The queue as the next request would build it, memos and all
+	 */
+	protected function fresh_queue(): Install_Queue {
+		global $gfpdf;
+
+		return new Install_Queue(
+			$gfpdf->get_font_repository(),
+			$this->catalog_repository(),
+			new Font_Installer(
+				$gfpdf->get_font_repository(),
+				$this->catalog_repository(),
+				$gfpdf->get_font_downloader(),
+				$gfpdf->get_font_cache_warmer(),
+				new Font_Lock(),
+				$gfpdf->log
+			),
+			$gfpdf->get_font_registry(),
+			$gfpdf->log
+		);
 	}
 
 	/**

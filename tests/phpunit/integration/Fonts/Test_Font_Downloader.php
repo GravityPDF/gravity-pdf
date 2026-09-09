@@ -115,6 +115,61 @@ class Test_Font_Downloader extends TestCase {
 	}
 
 	/**
+	 * The concurrent batch bypasses `WP_Http::request()`, so every rule that class would have applied has to be
+	 * applied by hand — and each of these refuses before a single handle is opened
+	 */
+	public function test_the_batch_refuses_a_non_https_url_before_opening_anything() {
+		$results = $this->downloader->download_multiple(
+			[
+				'one' => [
+					'url'  => 'http://fonts.example.com/v1/fonts/A.ttf',
+					'size' => 10,
+					'name' => 'A.ttf',
+				],
+			]
+		);
+
+		$this->assertWPError( $results['one'] );
+		$this->assertSame( 'font_insecure_url', $results['one']->get_error_code() );
+		$this->assertSame( [], $this->parts() );
+	}
+
+	/**
+	 * A signed root could name a loopback or private address; `wp_safe_remote_get()` would have refused it and so
+	 * does this. `WP_HTTP_BLOCK_EXTERNAL` and `WP_ACCESSIBLE_HOSTS` sit on the same arm, and are constants a test
+	 * in this process cannot set.
+	 */
+	public function test_the_batch_refuses_a_url_wordpress_itself_would_not_request() {
+		$results = $this->downloader->download_multiple(
+			[
+				'one' => [
+					'url'  => 'https://127.0.0.1/v1/fonts/A.ttf',
+					'size' => 10,
+					'name' => 'A.ttf',
+				],
+			]
+		);
+
+		$this->assertWPError( $results['one'] );
+		$this->assertSame( 'font_invalid_url', $results['one']->get_error_code() );
+		$this->assertSame( [], $this->parts() );
+	}
+
+	/**
+	 * A submitter is waiting on this one, so the filter a host raises for background patience must not reach it
+	 */
+	public function test_the_batch_does_not_take_the_background_download_timeout() {
+		add_filter( 'gfpdf_font_download_timeout', static function () {
+			return 300;
+		} );
+
+		$this->assertSame( 300, $this->downloader->get_file_timeout() );
+		$this->assertSame( 10, Font_Downloader::INLINE_TIMEOUT );
+
+		remove_all_filters( 'gfpdf_font_download_timeout' );
+	}
+
+	/**
 	 * @dataProvider provider_insecure_urls
 	 */
 	public function test_a_non_https_url_is_refused_without_a_request( string $url ) {

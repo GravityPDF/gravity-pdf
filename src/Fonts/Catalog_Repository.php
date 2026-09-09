@@ -452,6 +452,48 @@ class Catalog_Repository {
 	}
 
 	/**
+	 * Add to the scripts an entry was asked for and could not cover
+	 *
+	 * The render path's only catalogue write, and it must stay cheap and quiet: anonymous traffic reaches it, so it
+	 * writes nothing when it has nothing new to say and never invalidates the cached reads. That is also why the
+	 * current value is read straight from the table — an un-bumped write can never reach the cache, so a cached row
+	 * would show a previous render's miss as absent and every render would rewrite it.
+	 *
+	 * @param string[] $scripts
+	 *
+	 * @return bool Whether anything was written
+	 *
+	 * @since 7.0
+	 */
+	public function record_missing_scripts( string $source, string $entry, array $scripts ): bool {
+		global $wpdb;
+
+		$table = $this->schema->get_catalog_table();
+
+		/* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- table name comes from Font_Schema */
+		$current = (string) $wpdb->get_var( $wpdb->prepare( "SELECT missing_scripts FROM {$table} WHERE source = %s AND entry = %s", $source, $entry ) );
+
+		$known = $current === '' ? [] : explode( ',', $current );
+		$union = array_unique( array_merge( $known, $scripts ) );
+
+		sort( $known );
+		sort( $union );
+
+		if ( $union === $known ) {
+			return false;
+		}
+
+		$fields = [ 'missing_scripts' => implode( ',', $union ) ];
+
+		/* Stamped once, so `Missing_Coverage_Check` ages the miss from when it first happened rather than the last */
+		if ( $current === '' ) {
+			$fields['missing_since'] = gmdate( 'Y-m-d H:i:s' );
+		}
+
+		return $this->set_status( $source, $entry, $fields, false );
+	}
+
+	/**
 	 * Claim one entry for install, atomically
 	 *
 	 * One conditional UPDATE is the whole dedup: two triggers firing at once produce one push and no second lock,
@@ -471,39 +513,17 @@ class Catalog_Repository {
 	public function claim( string $source, string $entry, bool $manual = false ): bool {
 		global $wpdb;
 
-		$table = $this->schema->get_catalog_table();
-		$now   = gmdate( 'Y-m-d H:i:s' );
-		$stale = gmdate( 'Y-m-d H:i:s', time() - static::STALE_AFTER );
+		$table            = $this->schema->get_catalog_table();
+		$now              = gmdate( 'Y-m-d H:i:s' );
+		[ $where, $args ] = $this->claimable_clause( $source, $entry, $manual );
 
-		/* phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- the table name comes from Font_Schema; every value is prepared */
-		if ( $manual ) {
-			$sql = $wpdb->prepare(
-				"UPDATE {$table} SET phase = 'queued', phase_since = %s, error = NULL
-				 WHERE source = %s AND entry = %s
-				   AND ( phase IS NULL
-				      OR phase IN ( 'failed', 'removed' )
-				      OR ( phase IN ( 'queued', 'installing' ) AND phase_since < %s ) )",
-				$now,
-				$source,
-				$entry,
-				$stale
-			);
-		} else {
-			$sql = $wpdb->prepare(
-				"UPDATE {$table} SET phase = 'queued', phase_since = %s, error = NULL
-				 WHERE source = %s AND entry = %s
-				   AND ( phase IS NULL
-				      OR ( phase = 'failed' AND ( retry_after IS NULL OR retry_after < %s ) )
-				      OR ( phase IN ( 'queued', 'installing' ) AND phase_since < %s ) )",
-				$now,
-				$source,
-				$entry,
-				$now,
-				$stale
-			);
-		}
-
-		$wpdb->query( $sql );
+		/* phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders -- the table name comes from Font_Schema; the placeholders sit inside $where, which the sniff cannot see through, and every value is in $args */
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$table} SET phase = 'queued', phase_since = %s, error = NULL WHERE {$where}",
+				array_merge( [ $now ], $args )
+			)
+		);
 		/* phpcs:enable */
 
 		if ( $wpdb->rows_affected !== 1 ) {
@@ -513,6 +533,60 @@ class Catalog_Repository {
 		$this->flush();
 
 		return true;
+	}
+
+	/**
+	 * Whether `claim()` would succeed right now
+	 *
+	 * Purely an optimisation, and safe to be wrong about: the claim is still the only authority, so a race can
+	 * only cost the loser a claim it was going to lose anyway. What it buys is that a trigger firing at an entry
+	 * already being installed stops before reading the entry document — which for a source that points at its
+	 * entry file is an HTTPS fetch, and trigger 3 fires on the render path.
+	 *
+	 * @since 7.0
+	 */
+	public function is_claimable( string $source, string $entry, bool $manual = false ): bool {
+		global $wpdb;
+
+		$table            = $this->schema->get_catalog_table();
+		[ $where, $args ] = $this->claimable_clause( $source, $entry, $manual );
+
+		/* phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders -- as `claim()` above, whose WHERE clause this is */
+		return (bool) $wpdb->get_var( $wpdb->prepare( "SELECT 1 FROM {$table} WHERE {$where}", $args ) );
+		/* phpcs:enable */
+	}
+
+	/**
+	 * The one definition of a claimable entry, so the question and the act can never disagree
+	 *
+	 * A manual install ignores the backoff and resurrects a removed entry; everything else waits for both. Either
+	 * way a `queued` or `installing` row older than `STALE_AFTER` is a dead batch's leftover and claimable again.
+	 *
+	 * @return array{0: string, 1: array} The WHERE clause and its values, in order
+	 *
+	 * @since 7.0
+	 */
+	protected function claimable_clause( string $source, string $entry, bool $manual ): array {
+		$now   = gmdate( 'Y-m-d H:i:s' );
+		$stale = gmdate( 'Y-m-d H:i:s', time() - static::STALE_AFTER );
+
+		if ( $manual ) {
+			return [
+				"source = %s AND entry = %s
+				   AND ( phase IS NULL
+				      OR phase IN ( 'failed', 'removed' )
+				      OR ( phase IN ( 'queued', 'installing' ) AND phase_since < %s ) )",
+				[ $source, $entry, $stale ],
+			];
+		}
+
+		return [
+			"source = %s AND entry = %s
+			   AND ( phase IS NULL
+			      OR ( phase = 'failed' AND ( retry_after IS NULL OR retry_after < %s ) )
+			      OR ( phase IN ( 'queued', 'installing' ) AND phase_since < %s ) )",
+			[ $source, $entry, $now, $stale ],
+		];
 	}
 
 	/**

@@ -4,9 +4,14 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts;
 
+use Exception;
 use GFPDF\Helper\Helper_Data;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
+use WP_Http;
+use WP_HTTP_Proxy;
+use WpOrg\Requests\Requests;
+use WpOrg\Requests\Response;
 
 /**
  * @package     Gravity PDF
@@ -80,6 +85,18 @@ class Font_Downloader {
 	 * @since 7.0
 	 */
 	public const FILE_TIMEOUT = 45;
+
+	/**
+	 * The whole wall time trigger 3's concurrent batch gets, in seconds
+	 *
+	 * A constant rather than a filter: the `gfpdf_font_download_timeout` a host raises for background installs is
+	 * about patience nobody is waiting on, and a submitter is. Because the batch runs on curl_multi this bounds
+	 * the slowest file, not their sum, so a file that misses the window falls to the background rather than
+	 * stalling the render.
+	 *
+	 * @since 7.0
+	 */
+	public const INLINE_TIMEOUT = 10;
 
 	/**
 	 * Room left over the file's own size, so an install cannot be the thing that fills a disk
@@ -261,6 +278,164 @@ class Font_Downloader {
 				$this->unlink_part( $part );
 			}
 		}
+	}
+
+	/**
+	 * Fetch several font files at once, each verified and left in its own `.part`
+	 *
+	 * Trigger 3's batch. `Requests::request_multiple()` is the only concurrent fetch WordPress has — one curl_multi
+	 * handle, so the render waits for the slowest file rather than the sum — but it sits *below*
+	 * `WP_Http::request()`, so everything that class would have applied is applied here instead: the URL check,
+	 * the `WP_HTTP_BLOCK_EXTERNAL` / `WP_ACCESSIBLE_HOSTS` rules and the site's proxy. The `http_request_args` and
+	 * `pre_http_request` filters do not run for this batch and cannot: they are one-request shaped. Background
+	 * installs still go through `wp_safe_remote_get()` a file at a time, so a host that filters them keeps that.
+	 *
+	 * @param array[] $files Keyed however the caller likes; each `{ url, sha256, size, name, request_args? }`
+	 *
+	 * @return array<string|int, string|WP_Error> The verified `.part` path per key, in the order asked
+	 *
+	 * @since 7.0
+	 */
+	public function download_multiple( array $files ): array {
+		$results  = [];
+		$requests = [];
+		$parts    = [];
+		$http     = new WP_Http();
+
+		foreach ( $files as $key => $file ) {
+			$url  = $this->request_url( (string) ( $file['url'] ?? '' ), $file );
+			$size = (int) ( $file['size'] ?? 0 );
+
+			$error = $this->check_batch_url( $url, $http ) ?? $this->check_disk_space( $url, $size );
+
+			if ( $error !== null ) {
+				$results[ $key ] = $error;
+
+				continue;
+			}
+
+			$part = $this->part_path( (string) ( $file['name'] ?? 'font' ) );
+
+			if ( is_wp_error( $part ) ) {
+				$results[ $key ] = $part;
+
+				continue;
+			}
+
+			$parts[ $key ]    = $part;
+			$requests[ $key ] = [
+				'url'     => $url,
+				'headers' => [ 'Accept-Encoding' => 'identity' ],
+				'options' => $this->batch_options( $url, $part, $size ),
+			];
+		}
+
+		if ( count( $requests ) === 0 ) {
+			return $results;
+		}
+
+		try {
+			$responses = Requests::request_multiple( $requests );
+		} catch ( Exception $e ) {
+			$responses = [];
+		}
+
+		foreach ( $parts as $key => $part ) {
+			$results[ $key ] = $this->batch_result( $files[ $key ], $part, $responses[ $key ] ?? null );
+
+			if ( is_wp_error( $results[ $key ] ) ) {
+				$this->unlink_part( $part );
+
+				$this->log->error(
+					'Inline font download failed',
+					[
+						'url'   => (string) ( $files[ $key ]['url'] ?? '' ),
+						'error' => $results[ $key ]->get_error_message(),
+					]
+				);
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * What one response in the batch produced: the verified `.part`, or why not
+	 *
+	 * @param mixed $response A `Response`, an `Exception` Requests caught for this handle, or nothing at all
+	 *
+	 * @return string|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function batch_result( array $file, string $part, $response ) {
+		$url = (string) ( $file['url'] ?? '' );
+
+		if ( ! $response instanceof Response ) {
+			$message = $response instanceof Exception ? $response->getMessage() : 'the request did not complete';
+
+			return new WP_Error( 'font_download_failed', sprintf( 'The request for %s failed: %s', $url, $message ) );
+		}
+
+		if ( (int) $response->status_code !== 200 ) {
+			return new WP_Error( 'font_http_error', sprintf( 'The request for %s returned %d', $url, $response->status_code ) );
+		}
+
+		$error = $this->verify_file( $url, $part, $file );
+
+		return $error ?? $part;
+	}
+
+	/**
+	 * The batch's per-request options, standing in for what `WP_Http::request()` would have set
+	 *
+	 * @since 7.0
+	 */
+	protected function batch_options( string $url, string $part, int $size ): array {
+		$options = [
+			'filename'         => $part,
+			'max_bytes'        => $size > 0 ? $size : static::MAX_FILE_BYTES,
+			'follow_redirects' => false,
+			'timeout'          => static::INLINE_TIMEOUT,
+			'connect_timeout'  => static::CONNECT_TIMEOUT,
+			'verify'           => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
+			'useragent'        => $this->get_user_agent(),
+		];
+
+		$proxy = new WP_HTTP_Proxy();
+
+		if ( $proxy->is_enabled() && $proxy->send_through_proxy( $url ) ) {
+			$options['proxy'] = $proxy->host() . ':' . $proxy->port();
+
+			if ( $proxy->use_authentication() ) {
+				$options['proxy'] = [ $options['proxy'], $proxy->username(), $proxy->password() ];
+			}
+		}
+
+		return $options;
+	}
+
+	/**
+	 * `https` and whatever the site has said about outbound requests
+	 *
+	 * @since 7.0
+	 */
+	protected function check_batch_url( string $url, WP_Http $http ): ?WP_Error {
+		$error = $this->check_url( $url );
+
+		if ( $error !== null ) {
+			return $error;
+		}
+
+		if ( ! wp_http_validate_url( $url ) ) {
+			return new WP_Error( 'font_invalid_url', sprintf( '%s is not a URL WordPress will request', $url ) );
+		}
+
+		if ( $http->block_request( $url ) ) {
+			return new WP_Error( 'http_request_not_executed', sprintf( 'Requests to %s are blocked by this site', $url ) );
+		}
+
+		return null;
 	}
 
 	/**
@@ -483,7 +658,7 @@ class Font_Downloader {
 	/**
 	 * @since 7.0
 	 */
-	protected function unlink_part( string $part ): void {
+	public function unlink_part( string $part ): void {
 		if ( is_file( $part ) ) {
 			@unlink( $part ); //phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.unlink_unlink -- a temp file we own; a failure here is the hourly sweep's problem
 		}

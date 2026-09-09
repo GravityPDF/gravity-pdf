@@ -166,16 +166,17 @@ class Font_Installer {
 	}
 
 	/**
-	 * Every filename an install of this entry resolves to
+	 * Every file an install of this entry resolves to, with what the caller needs to choose between them
 	 *
-	 * What a caller with only an entry id — the hourly retry, a route — needs to enqueue per-file work, without
-	 * teaching it how `variants` and `fonts` resolve to files.
+	 * What a caller with only an entry id — the hourly retry, a route, a render — needs to enqueue per-file work,
+	 * without teaching it how `variants` and `fonts` resolve to files. The size rides along because the one caller
+	 * that selects rather than takes everything, trigger 3, selects on it: the inline cap is a size.
 	 *
-	 * @return string[]|WP_Error
+	 * @return array<string, array{size: int, roles: array}>|WP_Error `{ filename: { size, roles } }`
 	 *
 	 * @since 7.0
 	 */
-	public function files_for( string $id, array $install = [] ) {
+	public function plan_for( string $id, array $install = [] ) {
 		[ $source, $entry ] = Font_Sources::split( $id );
 
 		$resolved = $this->resolve( $source, $entry );
@@ -184,15 +185,26 @@ class Font_Installer {
 			return $resolved;
 		}
 
-		return array_map( 'strval', array_keys( $this->targets( $resolved['data'], $install ) ) );
+		$files = (array) ( $resolved['data']['files'] ?? [] );
+		$plan  = [];
+
+		foreach ( $this->targets( $resolved['data'], $install ) as $name => $roles ) {
+			$plan[ (string) $name ] = [
+				'size'  => (int) ( $files[ $name ]['size'] ?? 0 ),
+				'roles' => $roles,
+			];
+		}
+
+		return $plan;
 	}
+
 
 	/**
 	 * The filenames each of several installs of one entry resolves to, in the order given
 	 *
-	 * `files_for()` for a set. The entry is resolved — read, and for a pointer source fetched and validated — once
-	 * for the whole set rather than once per install, which is what a family installed under several keys would
-	 * otherwise pay: only `targets()` varies between them.
+	 * `plan_for()` for a set, names only. The entry is resolved — read, and for a pointer source fetched and
+	 * validated — once for the whole set rather than once per install, which is what a family installed under
+	 * several keys would otherwise pay: only `targets()` varies between them.
 	 *
 	 * @param array[] $installs
 	 *
@@ -238,6 +250,83 @@ class Font_Installer {
 		}
 
 		return $this->install_locked( $resolved, $name, $install );
+	}
+
+	/**
+	 * Fetch and install several files of several entries concurrently, in this request
+	 *
+	 * Trigger 3's half of the render: what a document needs *now*, fetched in one curl_multi batch so the
+	 * submitter waits for the slowest face rather than all of them. Everything after the fetch is the ordinary
+	 * install — the entry lock, the `is_wanted` recheck, the rows, the metrics warm — so an inline file and a
+	 * background one land identically and a half-finished pack is just a pack with files outstanding.
+	 *
+	 * @param array[] $items `{ source, entry, name }`, from `Install_Queue::enqueue_for_render()`
+	 *
+	 * @return int How many files landed
+	 *
+	 * @since 7.0
+	 */
+	public function install_inline( array $items ): int {
+		$entries  = [];
+		$requests = [];
+
+		foreach ( $items as $key => $item ) {
+			$source = (string) ( $item['source'] ?? '' );
+			$entry  = (string) ( $item['entry'] ?? '' );
+			$name   = (string) ( $item['name'] ?? '' );
+			$id     = $source . '/' . $entry;
+
+			/* Once per entry, not once per face: a pointer source charges an HTTPS round trip for each read */
+			if ( ! array_key_exists( $id, $entries ) ) {
+				$entries[ $id ] = $this->resolve( $source, $entry );
+			}
+
+			$resolved = $entries[ $id ];
+
+			if ( is_wp_error( $resolved ) ) {
+				$this->fail( $source, $entry, $resolved );
+
+				continue;
+			}
+
+			$file = (array) ( $resolved['data']['files'][ $name ] ?? [] );
+			$url  = $file === [] ? null : $this->catalog->url_for( $source, $file );
+
+			if ( $url === null ) {
+				$this->fail( $source, $entry, new WP_Error( 'font_source_unknown', sprintf( 'No URL could be built for %s/%s', $id, $name ) ) );
+
+				continue;
+			}
+
+			$requests[ $key ] = [
+				'url'          => $url,
+				'sha256'       => (string) ( $file['sha256'] ?? '' ),
+				'size'         => (int) ( $file['size'] ?? 0 ),
+				'name'         => $name,
+				'request_args' => $this->catalog->request_args( $source ),
+			];
+		}
+
+		$installed = 0;
+
+		foreach ( $this->downloader->download_multiple( $requests ) as $key => $part ) {
+			$item     = $items[ $key ];
+			$resolved = $entries[ $item['source'] . '/' . $item['entry'] ];
+
+			if ( is_wp_error( $part ) ) {
+				$this->fail( (string) $item['source'], (string) $item['entry'], $part );
+
+				continue;
+			}
+
+			$result = $this->install_locked( $resolved, (string) $item['name'], [], $part );
+
+			if ( ! is_wp_error( $result ) ) {
+				++$installed;
+			}
+		}
+
+		return $installed;
 	}
 
 	/**
@@ -329,7 +418,7 @@ class Font_Installer {
 	 *
 	 * @since 7.0
 	 */
-	protected function install_locked( array $resolved, string $name, array $install ) {
+	protected function install_locked( array $resolved, string $name, array $install, ?string $part = null ) {
 		$source = (string) $resolved['row']['source'];
 		$entry  = (string) $resolved['row']['entry'];
 
@@ -354,7 +443,7 @@ class Font_Installer {
 			}
 
 			$file = (array) $resolved['data']['files'][ $name ];
-			$path = $this->place( $source, $entry, $name, $file );
+			$path = $this->place( $source, $entry, $name, $file, $part );
 
 			if ( is_wp_error( $path ) ) {
 				return $this->fail( $source, $entry, $path );
@@ -569,34 +658,40 @@ class Font_Installer {
 	 *
 	 * @since 7.0
 	 */
-	protected function place( string $source, string $entry, string $name, array $file ) {
+	protected function place( string $source, string $entry, string $name, array $file, ?string $part = null ) {
 		$relative = Font_Sources::install_path( $source, $entry, $name );
 		$absolute = $this->repository->get_font_dir() . $relative;
 		$sha256   = (string) ( $file['sha256'] ?? '' );
 		$size     = (int) ( $file['size'] ?? 0 );
 
 		if ( $this->already_installed( $relative, $absolute, $sha256, $size ) ) {
+			if ( $part !== null ) {
+				$this->downloader->unlink_part( $part );
+			}
+
 			return $relative;
 		}
 
-		$url = $this->catalog->url_for( $source, $file );
+		if ( $part === null ) {
+			$url = $this->catalog->url_for( $source, $file );
 
-		if ( $url === null ) {
-			return new WP_Error( 'font_source_unknown', sprintf( 'No URL could be built for %s', $relative ) );
-		}
+			if ( $url === null ) {
+				return new WP_Error( 'font_source_unknown', sprintf( 'No URL could be built for %s', $relative ) );
+			}
 
-		$part = $this->downloader->download(
-			$url,
-			[
-				'sha256'       => $sha256,
-				'size'         => $size,
-				'name'         => $name,
-				'request_args' => $this->catalog->request_args( $source ),
-			]
-		);
+			$part = $this->downloader->download(
+				$url,
+				[
+					'sha256'       => $sha256,
+					'size'         => $size,
+					'name'         => $name,
+					'request_args' => $this->catalog->request_args( $source ),
+				]
+			);
 
-		if ( is_wp_error( $part ) ) {
-			return $part;
+			if ( is_wp_error( $part ) ) {
+				return $part;
+			}
 		}
 
 		if ( ! wp_mkdir_p( dirname( $absolute ) ) ) {

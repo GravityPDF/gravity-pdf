@@ -203,6 +203,24 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $coverage_resolver;
 
 	/**
+	 * What a render asks before it draws a script the site has no font for
+	 *
+	 * @var Fonts\Script_Detector
+	 *
+	 * @since 7.0
+	 */
+	public $script_detector;
+
+	/**
+	 * The install trigger that runs while a PDF is being drawn
+	 *
+	 * @var Fonts\Render_Font_Trigger
+	 *
+	 * @since 7.0
+	 */
+	public $render_font_trigger;
+
+	/**
 	 * Holds our Font_Cache_Warmer object
 	 * Parses newly installed faces so no render is the first to do it
 	 *
@@ -1188,11 +1206,45 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( $this->coverage_resolver === null ) {
 			$this->coverage_resolver = new Fonts\Coverage_Resolver(
 				$this->get_catalog_repository(),
+				$this->get_font_repository(),
 				$this->get_font_registry()
 			);
 		}
 
 		return $this->coverage_resolver;
+	}
+
+	/**
+	 * Build the script detector, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_script_detector(): Fonts\Script_Detector {
+		if ( $this->script_detector === null ) {
+			$this->script_detector = new Fonts\Script_Detector( $this->get_coverage_resolver() );
+		}
+
+		return $this->script_detector;
+	}
+
+	/**
+	 * Build the render-time install trigger, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_render_font_trigger(): Fonts\Render_Font_Trigger {
+		if ( $this->render_font_trigger === null ) {
+			$this->render_font_trigger = new Fonts\Render_Font_Trigger(
+				$this->get_script_detector(),
+				$this->get_coverage_resolver(),
+				$this->get_install_queue(),
+				$this->get_font_installer(),
+				new Fonts\Font_Lock(),
+				$this->log
+			);
+		}
+
+		return $this->render_font_trigger;
 	}
 
 	/**

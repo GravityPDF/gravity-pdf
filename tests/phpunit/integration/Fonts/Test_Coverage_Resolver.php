@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Fonts;
 
 use GFPDF\Tests\Concerns\HasCatalogRows;
+use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
 
@@ -29,6 +30,7 @@ use GPDFAPI;
 class Test_Coverage_Resolver extends TestCase {
 
 	use HasCatalogRows;
+	use HasFontRows;
 
 	/**
 	 * @var Coverage_Resolver
@@ -50,6 +52,7 @@ class Test_Coverage_Resolver extends TestCase {
 		GPDFAPI::get_options_class()->update_option( 'default_pdf_language', '' );
 
 		$this->drop_catalog_rows();
+		$this->remove_font_rows();
 
 		parent::tear_down();
 	}
@@ -180,6 +183,74 @@ class Test_Coverage_Resolver extends TestCase {
 			[ 'packs/arabic', 'packs/emoji' ],
 			$this->requested( $this->resolver->for_settings( [ 'font' => 'gfpdf-arimo' ] ) )
 		);
+	}
+
+	public function test_a_detected_script_installs_the_pack_claiming_it() {
+		$this->seed_pack( 'emoji', [ 'always' => 1 ] );
+		$this->seed_pack( 'japanese', [ 'scripts' => 'ja', 'font_keys' => 'notosansjp' ] );
+		$this->seed_pack( 'arabic', [ 'scripts' => 'und-arab', 'font_keys' => 'xbriyaz' ] );
+
+		$this->assertSame(
+			[ 'packs/japanese', 'packs/emoji' ],
+			$this->requested( $this->resolver->for_scripts( [ 'ja' ] ) )
+		);
+	}
+
+	/**
+	 * The reason is what lets the queue take the Regular faces inline; without it a request means "all of it,
+	 * in the background", which is every other trigger
+	 */
+	public function test_a_script_request_says_which_scripts_matched_and_the_always_pack_does_not() {
+		$this->seed_pack( 'emoji', [ 'always' => 1 ] );
+		$this->seed_pack( 'japanese', [ 'scripts' => 'ja,und-hani' ] );
+
+		$this->assertSame(
+			[
+				[
+					'entry'   => 'packs/japanese',
+					'scripts' => [ 'ja' ],
+				],
+				[ 'entry' => 'packs/emoji' ],
+			],
+			$this->resolver->for_scripts( [ 'ja' ] )
+		);
+	}
+
+	public function test_a_script_nothing_claims_asks_for_nothing_but_the_always_pack() {
+		$this->seed_catalogue();
+
+		$this->assertSame( [ 'packs/emoji' ], $this->requested( $this->resolver->for_scripts( [ 'und-brai' ] ) ) );
+	}
+
+	public function test_the_scripts_still_worth_looking_for_are_the_ones_no_installed_font_covers() {
+		$this->seed_pack( 'japanese', [ 'scripts' => 'ja', 'font_keys' => 'notosansjp' ] );
+		$this->seed_pack( 'arabic', [ 'scripts' => 'und-arab', 'font_keys' => 'xbriyaz' ] );
+
+		$this->assertSame(
+			[ 'und-arab' => true, 'ja' => true ],
+			$this->resolver->uninstalled_scripts()
+		);
+
+		$this->install_font_row( 'notosansjp' );
+
+		$this->assertSame( [ 'und-arab' => true ], $this->resolver->uninstalled_scripts() );
+	}
+
+	/**
+	 * A pack short of one of its keys still has files to fetch, so its scripts stay on the list
+	 */
+	public function test_a_partly_installed_pack_is_still_worth_looking_for() {
+		$this->seed_pack( 'cjk', [ 'scripts' => 'ja,ko', 'font_keys' => 'notosansjp,notosanskr' ] );
+		$this->install_font_row( 'notosansjp' );
+
+		$this->assertSame( [ 'ja' => true, 'ko' => true ], $this->resolver->uninstalled_scripts() );
+	}
+
+	public function test_a_removed_pack_is_not_worth_looking_for() {
+		$this->seed_pack( 'emoji', [ 'always' => 1, 'scripts' => 'und-zsye' ] );
+		$this->catalog_repository()->mark_removed( 'packs', 'emoji' );
+
+		$this->assertSame( [], $this->resolver->uninstalled_scripts() );
 	}
 
 	public function test_an_entry_outside_the_coverage_set_is_never_asked_for() {
