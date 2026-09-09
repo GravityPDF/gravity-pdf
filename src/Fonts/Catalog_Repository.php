@@ -46,6 +46,15 @@ class Catalog_Repository {
 	public const STATUS_COLUMNS = [ 'phase', 'phase_since', 'error', 'retry_after', 'missing_scripts', 'missing_since' ];
 
 	/**
+	 * How long a `queued` or `installing` row is believed before `claim()` treats it as a dead batch's leftover
+	 *
+	 * Long enough that a real pack install — every file refreshing `phase_since` as it starts — never trips it.
+	 *
+	 * @since 7.0
+	 */
+	public const STALE_AFTER = 30 * MINUTE_IN_SECONDS;
+
+	/**
 	 * Every column a list read selects: the index columns minus `entry_json`, plus the status columns
 	 *
 	 * Derived rather than typed out again, because a second literal list is one a new column can be left out of
@@ -365,6 +374,11 @@ class Catalog_Repository {
 	 * A single-row UPDATE naming only the status columns, so two installs writing different entries never clobber
 	 * each other and an in-flight phase survives a sync.
 	 *
+	 * `phase_since` is stamped here rather than by each caller, because every consumer of it — the poller's `stuck`
+	 * flag, `claim()`'s staleness arm, the stalled-batch notice — is asking "how long has it been in this phase",
+	 * which is only true if nothing can move `phase` without moving it. UTC, like every other time this class and
+	 * `Font_Installer` compare.
+	 *
 	 * @param array $fields Any of STATUS_COLUMNS
 	 * @param bool  $bump   Whether to invalidate cached catalog reads; false for the render path's union-only
 	 *                      `missing_scripts` write, which must not let anonymous requests churn the object cache
@@ -378,6 +392,10 @@ class Catalog_Repository {
 
 		if ( count( $data ) === 0 ) {
 			return false;
+		}
+
+		if ( array_key_exists( 'phase', $data ) && ! array_key_exists( 'phase_since', $data ) ) {
+			$data['phase_since'] = $data['phase'] === null ? null : gmdate( 'Y-m-d H:i:s' );
 		}
 
 		$updated = $wpdb->update(
@@ -407,6 +425,114 @@ class Catalog_Repository {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Claim one entry for install, atomically
+	 *
+	 * One conditional UPDATE is the whole dedup: two triggers firing at once produce one push and no second lock,
+	 * because only the statement that actually changed a row may queue work. The arms, in order — never claimed;
+	 * failed and past its backoff; and a `queued`/`installing` row whose `phase_since` has gone stale, which is
+	 * what recovers the rows of a batch whose process died.
+	 *
+	 * `removed` is deliberately absent from the background set: a pre-render trigger must not resurrect a pack the
+	 * admin deleted. A manual install may, which is the same decision as it ignoring `retry_after`.
+	 *
+	 * `retry_after` is left alone rather than cleared. The arms above have already decided it is spent, and leaving
+	 * it is what lets `Font_Installer::fail()` tell a first failure from a repeat without a counter column. Only
+	 * the `failed` arm reads it, so a stale value under `queued` is never consulted.
+	 *
+	 * @since 7.0
+	 */
+	public function claim( string $source, string $entry, bool $manual = false ): bool {
+		global $wpdb;
+
+		$table = $this->schema->get_catalog_table();
+		$now   = gmdate( 'Y-m-d H:i:s' );
+		$stale = gmdate( 'Y-m-d H:i:s', time() - static::STALE_AFTER );
+
+		/* phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- the table name comes from Font_Schema; every value is prepared */
+		if ( $manual ) {
+			$sql = $wpdb->prepare(
+				"UPDATE {$table} SET phase = 'queued', phase_since = %s, error = NULL
+				 WHERE source = %s AND entry = %s
+				   AND ( phase IS NULL
+				      OR phase IN ( 'failed', 'removed' )
+				      OR ( phase IN ( 'queued', 'installing' ) AND phase_since < %s ) )",
+				$now,
+				$source,
+				$entry,
+				$stale
+			);
+		} else {
+			$sql = $wpdb->prepare(
+				"UPDATE {$table} SET phase = 'queued', phase_since = %s, error = NULL
+				 WHERE source = %s AND entry = %s
+				   AND ( phase IS NULL
+				      OR ( phase = 'failed' AND ( retry_after IS NULL OR retry_after < %s ) )
+				      OR ( phase IN ( 'queued', 'installing' ) AND phase_since < %s ) )",
+				$now,
+				$source,
+				$entry,
+				$now,
+				$stale
+			);
+		}
+
+		$wpdb->query( $sql );
+		/* phpcs:enable */
+
+		if ( $wpdb->rows_affected !== 1 ) {
+			return false;
+		}
+
+		$this->flush();
+
+		return true;
+	}
+
+	/**
+	 * The coverage entries a failed install left behind, whose backoff has passed
+	 *
+	 * Candidates only — `claim()` is still what decides, so this staying slightly stale costs nothing.
+	 *
+	 * @return array<int, array{source: string, entry: string}>
+	 *
+	 * @since 7.0
+	 */
+	public function retryable_entries(): array {
+		global $wpdb;
+
+		$table = $this->schema->get_catalog_table();
+
+		/* phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- the table name comes from Font_Schema; the value is prepared */
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT source, entry FROM {$table} WHERE coverage = 1 AND phase = 'failed' AND ( retry_after IS NULL OR retry_after < %s ) ORDER BY position ASC, entry ASC",
+				gmdate( 'Y-m-d H:i:s' )
+			),
+			ARRAY_A
+		);
+		/* phpcs:enable */
+
+		return array_map(
+			static function ( array $row ): array {
+				return [
+					'source' => (string) $row['source'],
+					'entry'  => (string) $row['entry'],
+				];
+			},
+			(array) $rows
+		);
+	}
+
+	/**
+	 * Whether a source is still registered, so a caller can drop work rather than fail a row over the admin's own change
+	 *
+	 * @since 7.0
+	 */
+	public function is_registered( string $source ): bool {
+		return $this->sources->get( $source ) !== null;
 	}
 
 	/**

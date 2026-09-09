@@ -184,6 +184,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $font_installer;
 
 	/**
+	 * Holds our Install_Queue object
+	 * The background work list font installs run on
+	 *
+	 * @var Fonts\Install_Queue
+	 *
+	 * @since 7.0
+	 */
+	public $install_queue;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -952,7 +962,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 7.0
 	 */
 	public function load_font_catalog_handler(): void {
-		$class = new Controller\Controller_Font_Catalog( $this->get_catalog_sync(), $this->misc );
+		$class = new Controller\Controller_Font_Catalog( $this->get_catalog_sync(), $this->get_install_queue(), $this->misc );
 		$class->init();
 
 		$this->singleton->add_class( $class );
@@ -1098,6 +1108,29 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->font_installer;
+	}
+
+	/**
+	 * Build the font install queue, once
+	 *
+	 * Once, and not lazily behind a trigger: constructing it registers the `gform_max_async_task_attempts` scope
+	 * and GF's own listeners for its action, which have to exist on every request that might run a batch, not only
+	 * on the ones that queue work.
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_queue(): Fonts\Install_Queue {
+		if ( $this->install_queue === null ) {
+			$this->install_queue = new Fonts\Install_Queue(
+				$this->get_font_repository(),
+				$this->get_catalog_repository(),
+				$this->get_font_installer(),
+				$this->get_font_registry(),
+				$this->log
+			);
+		}
+
+		return $this->install_queue;
 	}
 
 	/**

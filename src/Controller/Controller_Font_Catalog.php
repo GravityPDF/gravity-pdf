@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Controller;
 
 use GFPDF\Fonts\Catalog_Sync;
+use GFPDF\Fonts\Install_Queue;
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Misc;
 
@@ -38,14 +39,21 @@ class Controller_Font_Catalog extends Helper_Abstract_Controller {
 	protected $sync;
 
 	/**
+	 * @var Install_Queue
+	 * @since 7.0
+	 */
+	protected $queue;
+
+	/**
 	 * @var Helper_Misc
 	 * @since 7.0
 	 */
 	protected $misc;
 
-	public function __construct( Catalog_Sync $sync, Helper_Misc $misc ) {
-		$this->sync = $sync;
-		$this->misc = $misc;
+	public function __construct( Catalog_Sync $sync, Install_Queue $queue, Helper_Misc $misc ) {
+		$this->sync  = $sync;
+		$this->queue = $queue;
+		$this->misc  = $misc;
 	}
 
 	/**
@@ -60,6 +68,7 @@ class Controller_Font_Catalog extends Helper_Abstract_Controller {
 	 */
 	public function add_actions(): void {
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this, 'maybe_sync' ] );
+		add_action( 'gfpdf_cleanup_tmp_dir', [ $this, 'maybe_retry_installs' ] );
 		add_action( Catalog_Sync::EVENT, [ $this->sync, 'run' ] );
 	}
 
@@ -79,5 +88,22 @@ class Controller_Font_Catalog extends Helper_Abstract_Controller {
 		}
 
 		$this->sync->maybe_run();
+	}
+
+	/**
+	 * The hourly listener's other half
+	 *
+	 * A trigger fires once, so nothing else ever re-tries a pack that failed on its own — an `emoji` install that
+	 * lost an origin blip would stay failed until something happened to ask for it again. Same primary-site
+	 * reasoning as `maybe_sync()`: the catalogue and the claim are network-global.
+	 *
+	 * @since 7.0
+	 */
+	public function maybe_retry_installs(): void {
+		if ( $this->misc->is_secondary_network_site( PDF_PLUGIN_BASENAME ) ) {
+			return;
+		}
+
+		$this->queue->maybe_retry();
 	}
 }

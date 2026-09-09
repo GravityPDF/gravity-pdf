@@ -43,6 +43,23 @@ class Font_Installer {
 	public const RETRY_AFTER = 6 * HOUR_IN_SECONDS;
 
 	/**
+	 * What the backoff becomes once an entry has failed more than once
+	 *
+	 * A host with no egress at all fails every entry every time; without an escalation it would re-batch four
+	 * times a day forever.
+	 *
+	 * @since 7.0
+	 */
+	public const RETRY_AFTER_MAX = 24 * HOUR_IN_SECONDS;
+
+	/**
+	 * The widest the retry is scattered by, either side of the backoff
+	 *
+	 * @since 7.0
+	 */
+	public const RETRY_JITTER = HOUR_IN_SECONDS;
+
+	/**
 	 * Covers one file's recheck → fetch → rename → upsert, which `gfpdf_font_download_timeout` already bounds
 	 *
 	 * @since 7.0
@@ -78,6 +95,12 @@ class Font_Installer {
 	 * @since 7.0
 	 */
 	protected $log;
+
+	/**
+	 * @var array<string, array> Entry files fetched this request, keyed by the hash of their contents
+	 * @since 7.0
+	 */
+	protected $fetched = [];
 
 	public function __construct(
 		Font_Repository $repository,
@@ -123,8 +146,6 @@ class Font_Installer {
 			return $this->fail( $source, $entry, new WP_Error( 'font_file_unknown', sprintf( 'No file of %s matches the request', $id ) ) );
 		}
 
-		$this->catalog->set_status( $source, $entry, [ 'phase' => 'installing' ] );
-
 		foreach ( array_keys( $targets ) as $name ) {
 			$result = $this->install_locked( $resolved, (string) $name, $install );
 
@@ -133,19 +154,29 @@ class Font_Installer {
 			}
 		}
 
-		$this->catalog->set_status(
-			$source,
-			$entry,
-			[
-				'phase'           => null,
-				'error'           => null,
-				'retry_after'     => null,
-				'missing_scripts' => null,
-				'missing_since'   => null,
-			]
-		);
-
 		return true;
+	}
+
+	/**
+	 * Every filename an install of this entry resolves to
+	 *
+	 * What a caller with only an entry id — the hourly retry, a route — needs to enqueue per-file work, without
+	 * teaching it how `variants` and `fonts` resolve to files.
+	 *
+	 * @return string[]|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function files_for( string $id, array $install = [] ) {
+		[ $source, $entry ] = $this->split( $id );
+
+		$resolved = $this->resolve( $source, $entry );
+
+		if ( is_wp_error( $resolved ) ) {
+			return $resolved;
+		}
+
+		return array_map( 'strval', array_keys( $this->targets( $resolved['data'], $install ) ) );
 	}
 
 	/**
@@ -182,6 +213,11 @@ class Font_Installer {
 	 * The lock stays per file, sized for one file's recheck → fetch → rename → upsert, rather than being held
 	 * across a whole pack's downloads and expiring mid-install.
 	 *
+	 * Phase is written here rather than around the loop, because this — not `install()` — is what the queue runs:
+	 * a background install would otherwise never report `installing` and never clear an earlier `failed`. Marking
+	 * each file also keeps `phase_since` moving, which is what stops `Catalog_Repository::claim()`'s staleness arm
+	 * re-claiming a pack that is genuinely still downloading.
+	 *
 	 * @return true|WP_Error
 	 *
 	 * @since 7.0
@@ -196,6 +232,8 @@ class Font_Installer {
 		}
 
 		try {
+			$this->catalog->set_status( $source, $entry, [ 'phase' => 'installing' ] );
+
 			$targets = $this->targets( $resolved['data'], $install );
 
 			if ( ! isset( $targets[ $name ] ) ) {
@@ -211,10 +249,48 @@ class Font_Installer {
 
 			$this->write_rows( $resolved, $install, $targets[ $name ], $path, $file );
 
+			if ( $this->install_complete( $resolved, $install, array_keys( $targets ) ) ) {
+				$this->catalog->set_status(
+					$source,
+					$entry,
+					[
+						'phase'           => null,
+						'error'           => null,
+						'retry_after'     => null,
+						'missing_scripts' => null,
+						'missing_since'   => null,
+					]
+				);
+			}
+
 			return true;
 		} finally {
 			$this->lock->release( $lock );
 		}
+	}
+
+	/**
+	 * Whether every file this install wanted now has a row
+	 *
+	 * The phase belongs to the entry but the work arrives one file at a time, so the last file to land is the one
+	 * that clears it — and which file that is depends on the order the queue happened to run them in.
+	 *
+	 * @param string[] $names Every filename this install resolves to
+	 *
+	 * @since 7.0
+	 */
+	protected function install_complete( array $resolved, array $install, array $names ): bool {
+		$source  = (string) $resolved['row']['source'];
+		$entry   = (string) $resolved['row']['entry'];
+		$claimed = $this->repository->claimed_filenames();
+
+		foreach ( $names as $name ) {
+			if ( ! isset( $claimed[ Font_Sources::install_path( $source, $entry, (string) $name ) ] ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -270,6 +346,16 @@ class Font_Installer {
 			return new WP_Error( 'font_entry_unknown', sprintf( '%s/%s carries neither an entry nor a hash to fetch one by', $source, $row['entry'] ) );
 		}
 
+		/*
+		 * Keyed by the hash, not by the entry id, which is what makes this safe to hold for the whole request:
+		 * a sync that changes an entry changes its hash and therefore the key, so a memo can never answer with a
+		 * superseded entry. Without it a five-file family queued as five items pays five round trips for one
+		 * unchanged ~1 KB document.
+		 */
+		if ( isset( $this->fetched[ $sha256 ] ) ) {
+			return $this->fetched[ $sha256 ];
+		}
+
 		$url = $this->catalog->entry_url( $source, $row );
 
 		if ( $url === null ) {
@@ -290,7 +376,13 @@ class Font_Installer {
 
 		$data = json_decode( $body, true );
 
-		return is_array( $data ) ? $data : new WP_Error( 'font_invalid_entry', sprintf( 'The entry file for %s/%s is not readable', $source, $row['entry'] ) );
+		if ( ! is_array( $data ) ) {
+			return new WP_Error( 'font_invalid_entry', sprintf( 'The entry file for %s/%s is not readable', $source, $row['entry'] ) );
+		}
+
+		$this->fetched[ $sha256 ] = $data;
+
+		return $data;
 	}
 
 	/**
@@ -585,11 +677,28 @@ class Font_Installer {
 			[
 				'phase'       => 'failed',
 				'error'       => $error->get_error_code(),
-				'retry_after' => gmdate( 'Y-m-d H:i:s', time() + static::RETRY_AFTER ),
+				'retry_after' => $this->retry_at( $source, $entry ),
 			]
 		);
 
 		return $error;
+	}
+
+	/**
+	 * When this entry may be re-claimed after a failure
+	 *
+	 * A row that still carries a `retry_after` has failed before — `claim()` leaves it in place precisely so this
+	 * can tell the two apart without a counter column — and escalates. The jitter is what keeps a fleet of sites
+	 * that failed together during an origin outage from retrying in lock-step and re-creating the outage.
+	 *
+	 * @since 7.0
+	 */
+	protected function retry_at( string $source, string $entry ): string {
+		$row      = $this->catalog->entry( $source, $entry );
+		$repeated = $row !== null && ( $row['retry_after'] ?? null ) !== null;
+		$backoff  = $repeated ? static::RETRY_AFTER_MAX : static::RETRY_AFTER;
+
+		return gmdate( 'Y-m-d H:i:s', time() + $backoff + wp_rand( 0, static::RETRY_JITTER ) );
 	}
 
 	/**

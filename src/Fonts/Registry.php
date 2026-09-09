@@ -127,6 +127,24 @@ class Registry {
 	}
 
 	/**
+	 * Whether a trigger may install fonts on its own
+	 *
+	 * The one conversion point for `auto_install_fonts`. It is stored `'Yes'`/`'No'` because a stored `false` would
+	 * be deleted by `update_option()` and resurrected by `get_option()`'s fallback, so the string form exists at the
+	 * storage boundary and nowhere else — every consumer deals in `true`/`false`. The constant locks the setting
+	 * (the UI disables it); the filter is the add-on hook and defers to a stored choice.
+	 *
+	 * @since 7.0
+	 */
+	public function auto_install_enabled(): bool {
+		if ( defined( 'GPDF_AUTO_INSTALL_FONTS' ) ) {
+			return (bool) GPDF_AUTO_INSTALL_FONTS;
+		}
+
+		return (bool) apply_filters( 'gfpdf_auto_install_fonts', $this->options->get_option( 'auto_install_fonts', 'Yes' ) === 'Yes' );
+	}
+
+	/**
 	 * Every mPDF config key that decides which font a run of text gets
 	 *
 	 * Kept here rather than inline in the caller because each key is load-bearing rather than a preference: the

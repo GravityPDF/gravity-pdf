@@ -3,9 +3,6 @@
 namespace GFPDF\Helper;
 
 use Exception;
-use GF_Background_Process;
-use GFCommon;
-use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -23,16 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Helper
  */
-class Helper_Pdf_Queue extends GF_Background_Process {
-
-	/**
-	 * Holds our log class
-	 *
-	 * @var LoggerInterface
-	 *
-	 * @since 5.0
-	 */
-	protected $log;
+class Helper_Pdf_Queue extends Helper_Abstract_Queue {
 
 	/**
 	 * @var string
@@ -40,39 +28,6 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	 * @since 5.0
 	 */
 	protected $action = 'gravitypdf';
-
-	/**
-	 * Restrict object instantiation when using unserialize.
-	 *
-	 * @since 2.9.7
-	 *
-	 * @var bool|array
-	 */
-	protected $allowed_batch_data_classes = false;
-
-	/**
-	 * Helper_Pdf_Queue constructor.
-	 *
-	 * @param LoggerInterface $log
-	 *
-	 * @since 4 .4
-	 */
-	public function __construct( LoggerInterface $log ) {
-		parent::__construct();
-
-		$this->log = $log;
-	}
-
-	/**
-	 * Add a getter for the stored async data
-	 *
-	 * @return array
-	 *
-	 * @since 5.0
-	 */
-	public function get_data() {
-		return $this->data;
-	}
 
 	/**
 	 * Process our PDF queue as a background process
