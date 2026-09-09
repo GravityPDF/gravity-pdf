@@ -4,7 +4,6 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts\Health;
 
-use GFPDF\Fonts\Catalog_Repository;
 use GFPDF\Helper\Health\Health_Check;
 use GFPDF\Helper\Health\Health_Issue;
 
@@ -26,8 +25,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * site has no font for produces a wrong PDF *now*, and waiting up to a day to say so would mean the admin hears
  * about it after the customer does. It costs one cached query for that, and never writes.
  *
- * When every entry it would name has failed outright it says something different — one issue about the server
- * rather than N about fonts, because a site that cannot reach the origin has one problem, not eight.
+ * When every entry it would name has failed outright it says nothing and `Font_Downloads_Check` speaks instead:
+ * a site that cannot reach the origin has one problem, not eight, and it is not a problem the person who builds
+ * the forms can fix.
  *
  * @package GFPDF\Fonts\Health
  *
@@ -36,45 +36,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Missing_Coverage_Check extends Health_Check {
 
 	/**
-	 * The issues that speak to a server administrator rather than to whoever builds the forms
-	 *
+	 * @var Uncovered_Entries
 	 * @since 7.0
 	 */
-	public const INFRASTRUCTURE = [ 'font_downloads_failing', 'font_disk_full' ];
+	protected $entries;
 
-	/**
-	 * @var Catalog_Repository
-	 * @since 7.0
-	 */
-	protected $catalog;
-
-	/**
-	 * @var Health_Issue[]|null
-	 * @since 7.0
-	 */
-	protected $issues;
-
-	public function __construct( Catalog_Repository $catalog ) {
-		$this->catalog = $catalog;
-	}
-
-	/**
-	 * Who this is for depends on what it found
-	 *
-	 * Alone among the four, because the same check answers both kinds: "install the Japanese pack" is a form
-	 * editor's job and "your server cannot reach the internet" is not, and telling a form editor the second only
-	 * teaches them to ignore the first.
-	 *
-	 * @since 7.0
-	 */
-	public function get_capability(): string {
-		foreach ( $this->run() as $issue ) {
-			if ( in_array( $issue->get_id(), static::INFRASTRUCTURE, true ) ) {
-				return 'manage_options';
-			}
-		}
-
-		return parent::get_capability();
+	public function __construct( Uncovered_Entries $entries ) {
+		$this->entries = $entries;
 	}
 
 	public function get_id(): string {
@@ -91,39 +59,11 @@ class Missing_Coverage_Check extends Health_Check {
 	 * @since 7.0
 	 */
 	public function run(): array {
-		/* Asked twice per admin page load — for the notice and for its audience — and it is a query */
-		if ( $this->issues === null ) {
-			$this->issues = $this->build();
-		}
-
-		return $this->issues;
-	}
-
-	/**
-	 * @return Health_Issue[]
-	 *
-	 * @since 7.0
-	 */
-	protected function build(): array {
-		$rows = $this->catalog->entries_missing_coverage();
-
-		if ( $rows === [] ) {
+		if ( $this->entries->all_failed() ) {
 			return [];
 		}
 
-		$failed = array_filter(
-			$rows,
-			static function ( array $row ): bool {
-				return (string) $row['phase'] === 'failed';
-			}
-		);
-
-		/* Every one of them failed, so the fonts are not the problem and eight notices about them would not help */
-		if ( count( $failed ) === count( $rows ) ) {
-			return [ $this->downloads_failing( $failed ) ];
-		}
-
-		return array_map( [ $this, 'entry_issue' ], $rows );
+		return array_map( [ $this, 'entry_issue' ], $this->entries->all() );
 	}
 
 	/**
@@ -167,61 +107,6 @@ class Missing_Coverage_Check extends Health_Check {
 			__( 'Text in those scripts renders as boxes.', 'gravity-pdf' ),
 			__( 'Install', 'gravity-pdf' ),
 			Font_Manager_Urls::entry( $id )
-		);
-	}
-
-	/**
-	 * The one issue that replaces the rest: nothing can be downloaded at all
-	 *
-	 * A full disk gets its own wording, and its own audience — an admin who reads "your server may be blocking
-	 * outbound connections" while the real answer is `df` has been sent the wrong way.
-	 *
-	 * @param array[] $rows
-	 *
-	 * @since 7.0
-	 */
-	protected function downloads_failing( array $rows ): Health_Issue {
-		$disk_full = array_filter(
-			$rows,
-			static function ( array $row ): bool {
-				return (string) $row['error'] === 'font_disk_full';
-			}
-		);
-
-		$names = array_map(
-			static function ( array $row ): string {
-				return (string) $row['label'];
-			},
-			$rows
-		);
-
-		if ( count( $disk_full ) > ( count( $rows ) / 2 ) ) {
-			return new Health_Issue(
-				'font_disk_full',
-				__( "There isn't enough free disk space to install fonts.", 'gravity-pdf' ),
-				$names,
-				__( 'Text in the scripts they cover renders as boxes.', 'gravity-pdf' ),
-				__( 'View fonts', 'gravity-pdf' ),
-				Font_Manager_Urls::manager()
-			);
-		}
-
-		return new Health_Issue(
-			'font_downloads_failing',
-			sprintf(
-				/* translators: %d: how many font packs failed to download */
-				_n(
-					'%d font pack could not be downloaded — your server may be blocking outbound connections.',
-					'%d font packs could not be downloaded — your server may be blocking outbound connections.',
-					count( $rows ),
-					'gravity-pdf'
-				),
-				count( $rows )
-			),
-			$names,
-			__( 'Text in the scripts they cover renders as boxes.', 'gravity-pdf' ),
-			__( 'View fonts', 'gravity-pdf' ),
-			Font_Manager_Urls::manager()
 		);
 	}
 }

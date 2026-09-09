@@ -473,6 +473,39 @@ class Catalog_Repository {
 	}
 
 	/**
+	 * Entries that have been mid-install for longer than they should be
+	 *
+	 * Read from our own rows rather than from the queue, because the two ways an install stops — a dead cron and a
+	 * blocked loopback — both leave the batch sitting there with nothing to say about itself. A row that says
+	 * `installing` and has not moved is the observable symptom of either.
+	 *
+	 * @param int $seconds How long counts as too long
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	public function stalled_entries( int $seconds ): array {
+		global $wpdb;
+
+		$table   = $this->schema->get_catalog_table();
+		$columns = implode( ', ', static::list_columns() );
+		$phases  = implode( ', ', array_fill( 0, count( static::LIVE_PHASES ), '%s' ) );
+
+		/* phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders -- table and column names come from this class; every value is prepared */
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT {$columns} FROM {$table} WHERE phase IN ( {$phases} ) AND phase_since < %s ORDER BY phase_since ASC",
+				array_merge( static::LIVE_PHASES, [ gmdate( 'Y-m-d H:i:s', time() - $seconds ) ] )
+			),
+			ARRAY_A
+		);
+		/* phpcs:enable */
+
+		return array_map( [ $this, 'cast_row' ], (array) $rows );
+	}
+
+	/**
 	 * Every entry a render asked for and could not cover
 	 *
 	 * `Missing_Coverage_Check`'s read, and the only one of these columns besides the write below. Uncached on

@@ -1025,6 +1025,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->get_catalog_sync(),
 			$this->get_install_queue(),
 			$this->get_coverage_resolver(),
+			new Model\Model_Actions( $this->data, $this->options, $this->notices ),
+			new View\View_Health( [] ),
+			new View\View_Actions( [] ),
 			$this->misc
 		);
 		$class->init();
@@ -1038,10 +1041,19 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 7.0
 	 */
 	public function load_health_handler(): void {
-		$class = new Controller\Controller_Health( $this->get_health_runner(), $this->misc );
+		$view = new View\View_Health( [] );
+
+		$class = new Controller\Controller_Health(
+			$this->get_health_runner(),
+			new Model\Model_Actions( $this->data, $this->options, $this->notices ),
+			$view,
+			new View\View_Actions( [] ),
+			$this->misc
+		);
 		$class->init();
 
 		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $view );
 	}
 
 	/**
@@ -1055,10 +1067,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function get_health_runner(): Helper\Health\Health_Runner {
 		if ( $this->health_runner === null ) {
 			$configured = new Fonts\Health\Configured_Fonts( $this->options );
+			$uncovered  = new Fonts\Health\Uncovered_Entries( $this->get_catalog_repository() );
 
 			$this->health_runner = new Helper\Health\Health_Runner(
 				[
-					new Fonts\Health\Missing_Coverage_Check( $this->get_catalog_repository() ),
+					new Fonts\Health\Missing_Coverage_Check( $uncovered ),
+					new Fonts\Health\Font_Downloads_Check( $uncovered ),
 					new Fonts\Health\Missing_Font_Files_Check( $this->get_font_repository(), $this->get_font_registry(), $configured ),
 					new Fonts\Health\Unregistered_Font_Check( $this->get_font_registry(), $this->get_catalog_repository(), $configured ),
 					new Fonts\Health\Catalog_Sync_Check( $this->get_catalog_sync() ),
