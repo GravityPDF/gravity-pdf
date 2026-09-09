@@ -122,7 +122,7 @@ class Catalog_Font_Adopter {
 		 * One stat rules out an entry that was never installed, which is the overwhelmingly common case: without
 		 * it every role of every font key costs a miss, and these hosts are often NFS-backed.
 		 */
-		if ( ! is_dir( $this->font_dir . $source . '/' . $entry_id ) ) {
+		if ( ! is_dir( $this->font_dir . Font_Sources::install_dir( $source, $entry_id ) ) ) {
 			return 0;
 		}
 
@@ -146,18 +146,7 @@ class Catalog_Font_Adopter {
 			}
 
 			$font_id = $this->repository->insert(
-				[
-					'font_key'    => $font_key,
-					'label'       => count( $fonts ) === 1 ? (string) $row['label'] : $font_key,
-					'source'      => $source,
-					'entry'       => $entry_id,
-					'coverage'    => 1,
-					'meta'        => Font_Sources::coverage_meta( $font_key, $entry, (array) $roles ),
-					'version'     => $row['version'] ?? null,
-					'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
-					'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
-					'files'       => $verified,
-				]
+				Font_Sources::font_row( $row, $entry, $font_key ) + [ 'files' => $verified ]
 			);
 
 			if ( $font_id > 0 ) {
@@ -199,7 +188,7 @@ class Catalog_Font_Adopter {
 				continue;
 			}
 
-			$relative = $source . '/' . $entry_id . '/' . $filename;
+			$relative = Font_Sources::install_path( $source, $entry_id, $filename );
 			$absolute = $this->font_dir . $relative;
 
 			if ( isset( $claimed[ $relative ] ) || ! is_file( $absolute ) ) {

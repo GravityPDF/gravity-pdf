@@ -240,6 +240,60 @@ class Font_Sources {
 	}
 
 	/**
+	 * Where a source's installed files live, relative to the fonts directory
+	 *
+	 * Source installs are namespaced, so a download can never overwrite a user upload or an import: those stay flat
+	 * in the fonts-dir root, and a directory cannot clash with a `.ttf`. `Font_Installer` writes here and
+	 * `Catalog_Font_Adopter` looks here, so the layout is stated once — a divergence would not error, adoption
+	 * would just silently stop finding installed files.
+	 *
+	 * @since 7.0
+	 */
+	public static function install_dir( string $source, string $entry ): string {
+		return $source . '/' . $entry . '/';
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	public static function install_path( string $source, string $entry, string $filename ): string {
+		return static::install_dir( $source, $entry ) . $filename;
+	}
+
+	/**
+	 * The font row one key of one entry describes, files aside
+	 *
+	 * The other half of the `coverage_meta()` contract: the two writers of source-installed rows —
+	 * `Catalog_Font_Adopter` for files already on disk and `Font_Installer` for files it downloads — have to agree
+	 * on every column, not just `meta`, or the same pack means different things depending on how it arrived.
+	 * The adopter adds `files`; the installer overlays `font_key` and `label` for a display entry, where the caller
+	 * chooses both.
+	 *
+	 * @param array $row   The catalog row
+	 * @param array $entry The decoded `entry` object
+	 *
+	 * @since 7.0
+	 */
+	public static function font_row( array $row, array $entry, string $font_key ): array {
+		$fonts    = (array) ( $entry['fonts'] ?? [] );
+		$roles    = (array) ( $fonts[ $font_key ] ?? [] );
+		$coverage = (int) ( $row['coverage'] ?? 0 ) === 1;
+
+		return [
+			'font_key'    => $font_key,
+			/* A multi-font pack labels each row by its key: one shared label across four CJK fonts helps nobody */
+			'label'       => count( $fonts ) === 1 ? (string) $row['label'] : $font_key,
+			'source'      => (string) $row['source'],
+			'entry'       => (string) $row['entry'],
+			'coverage'    => (int) $coverage,
+			'meta'        => $coverage ? static::coverage_meta( $font_key, $entry, $roles ) : [],
+			'version'     => $row['version'] ?? null,
+			'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
+			'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
+		];
+	}
+
+	/**
 	 * One font key's share of its entry's coverage maps
 	 *
 	 * Copied onto the font row so the registry builds every mPDF fallback array from the rows alone, without

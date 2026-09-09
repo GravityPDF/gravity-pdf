@@ -1091,7 +1091,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->font_installer = new Fonts\Font_Installer(
 				$this->get_font_repository(),
 				$this->get_catalog_repository(),
-				$this->get_font_sources(),
 				$this->get_font_downloader(),
 				new Fonts\Font_Lock(),
 				$this->log

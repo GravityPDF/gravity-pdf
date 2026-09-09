@@ -89,6 +89,17 @@ class Font_Downloader {
 	public const DISK_HEADROOM = 52428800;
 
 	/**
+	 * Where `.part` files live, under the fonts directory so the install `rename()` never crosses a filesystem
+	 *
+	 * Named here rather than spelled out at each end because `Model_PDF::cleanup_tmp_dir()` sweeps it and is the
+	 * only backstop for a `.part` a process kill orphaned — a divergence would not error, the sweep would just
+	 * quietly stop finding anything.
+	 *
+	 * @since 7.0
+	 */
+	public const TMP_DIR = '.tmp';
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
@@ -134,12 +145,7 @@ class Font_Downloader {
 			);
 		}
 
-		$request_url = $url;
-		if ( count( (array) ( $expected['request_args'] ?? [] ) ) > 0 ) {
-			$request_url = add_query_arg( $expected['request_args'], $url );
-		}
-
-		$response = $this->request( $request_url, $max_bytes );
+		$response = $this->request( $this->request_url( $url, $expected ), $max_bytes );
 
 		/* The root alone may follow exactly one redirect, and the target is re-checked as https */
 		if ( ! is_wp_error( $response ) && ( $expected['allow_redirect'] ?? false ) && $this->is_redirect( $response ) ) {
@@ -283,18 +289,38 @@ class Font_Downloader {
 	 * @since 7.0
 	 */
 	protected function request( string $url, int $max_bytes ) {
-		return wp_safe_remote_get(
-			$url,
-			[
-				/* Hard-coded: this must never become a filter a host can answer with false */
-				'sslverify'           => true,
-				'redirection'         => 0,
-				'timeout'             => static::METADATA_TIMEOUT,
-				'connect_timeout'     => static::CONNECT_TIMEOUT,
-				'limit_response_size' => $max_bytes,
-				'user-agent'          => $this->get_user_agent(),
-			]
-		);
+		return wp_safe_remote_get( $url, $this->base_args( static::METADATA_TIMEOUT, $max_bytes ) );
+	}
+
+	/**
+	 * The arguments every font request is made with, in-memory and streamed alike
+	 *
+	 * `sslverify` and `redirection` are the two that must not vary, so they are stated once rather than in each
+	 * caller — a second copy is a second place a later change has to remember.
+	 *
+	 * @since 7.0
+	 */
+	protected function base_args( int $timeout, int $max_bytes ): array {
+		return [
+			/* Hard-coded: this must never become a filter a host can answer with false */
+			'sslverify'           => true,
+			'redirection'         => 0,
+			'timeout'             => $timeout,
+			'connect_timeout'     => static::CONNECT_TIMEOUT,
+			'limit_response_size' => $max_bytes,
+			'user-agent'          => $this->get_user_agent(),
+		];
+	}
+
+	/**
+	 * The URL to actually request, carrying a third-party record's query args when it has any
+	 *
+	 * @since 7.0
+	 */
+	protected function request_url( string $url, array $expected ): string {
+		$args = (array) ( $expected['request_args'] ?? [] );
+
+		return count( $args ) > 0 ? add_query_arg( $args, $url ) : $url;
 	}
 
 	/**
@@ -339,25 +365,13 @@ class Font_Downloader {
 	 * @since 7.0
 	 */
 	protected function stream( string $url, string $part, array $expected ) {
-		$request_url = $url;
-		if ( count( (array) ( $expected['request_args'] ?? [] ) ) > 0 ) {
-			$request_url = add_query_arg( $expected['request_args'], $url );
-		}
-
 		return wp_safe_remote_get(
-			$request_url,
-			[
-				/* Hard-coded: this must never become a filter a host can answer with false */
-				'sslverify'           => true,
-				'redirection'         => 0,
-				'timeout'             => (int) ( $expected['timeout'] ?? $this->get_file_timeout() ),
-				'connect_timeout'     => static::CONNECT_TIMEOUT,
-				'limit_response_size' => static::MAX_FILE_BYTES,
-				'stream'              => true,
-				'filename'            => $part,
-				'user-agent'          => $this->get_user_agent(),
+			$this->request_url( $url, $expected ),
+			$this->base_args( (int) ( $expected['timeout'] ?? $this->get_file_timeout() ), static::MAX_FILE_BYTES ) + [
+				'stream'   => true,
+				'filename' => $part,
 				/* A TTF does not compress, and hash-of-bytes stays trivial when nothing decodes on the way in */
-				'headers'             => [ 'Accept-Encoding' => 'identity' ],
+				'headers'  => [ 'Accept-Encoding' => 'identity' ],
 			]
 		);
 	}
@@ -420,7 +434,7 @@ class Font_Downloader {
 	 * @since 7.0
 	 */
 	public function get_tmp_dir(): string {
-		return trailingslashit( $this->data->template_font_location ) . '.tmp/';
+		return trailingslashit( $this->data->template_font_location ) . static::TMP_DIR . '/';
 	}
 
 	/**

@@ -12,6 +12,7 @@ use GFPDF\Helper\Fields\Field_Products;
 use GFPDF\Helper\Helper_Abstract_Field_Products;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Fonts\Font_Downloader;
 use GFPDF\Fonts\Registry;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
@@ -1926,7 +1927,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* Only ever holds `.part` files a killed font download orphaned; a live one is minutes old, not hours */
 			[
-				'dir' => trailingslashit( $this->data->template_font_location ) . '.tmp',
+				'dir' => trailingslashit( $this->data->template_font_location ) . Font_Downloader::TMP_DIR,
 				'age' => time() - 12 * 3600, // 12 hour
 			],
 		];

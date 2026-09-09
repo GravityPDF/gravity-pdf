@@ -62,12 +62,6 @@ class Font_Installer {
 	protected $catalog;
 
 	/**
-	 * @var Font_Sources
-	 * @since 7.0
-	 */
-	protected $sources;
-
-	/**
 	 * @var Font_Downloader
 	 * @since 7.0
 	 */
@@ -88,14 +82,12 @@ class Font_Installer {
 	public function __construct(
 		Font_Repository $repository,
 		Catalog_Repository $catalog,
-		Font_Sources $sources,
 		Font_Downloader $downloader,
 		Font_Lock $lock,
 		LoggerInterface $log
 	) {
 		$this->repository = $repository;
 		$this->catalog    = $catalog;
-		$this->sources    = $sources;
 		$this->downloader = $downloader;
 		$this->lock       = $lock;
 		$this->log        = $log;
@@ -134,7 +126,7 @@ class Font_Installer {
 		$this->catalog->set_status( $source, $entry, [ 'phase' => 'installing' ] );
 
 		foreach ( array_keys( $targets ) as $name ) {
-			$result = $this->install_file( $source, $entry, (string) $name, $install );
+			$result = $this->install_locked( $resolved, (string) $name, $install );
 
 			if ( is_wp_error( $result ) ) {
 				return $result;
@@ -169,18 +161,41 @@ class Font_Installer {
 	 * @since 7.0
 	 */
 	public function install_file( string $source, string $entry, string $name, array $install = [] ) {
-		$lock = sprintf( 'entry_%s_%s', $source, $entry );
+		$resolved = $this->resolve( $source, $entry );
+
+		if ( is_wp_error( $resolved ) ) {
+			return $this->fail( $source, $entry, $resolved );
+		}
+
+		return $this->install_locked( $resolved, $name, $install );
+	}
+
+	/**
+	 * Place and record one already-resolved file, alone in its entry
+	 *
+	 * Split from `install_file()` so `install()` resolves the entry once for the whole batch instead of once per
+	 * file — a source that points at its entry files rather than inlining them, which is the reason the pointer
+	 * form exists, otherwise pays a fresh HTTPS round trip for each. The resolve is deliberately *not* cached
+	 * beyond one call: this object is a container singleton, so a memo would still be serving the old entry after
+	 * a sync updated the row.
+	 *
+	 * The lock stays per file, sized for one file's recheck → fetch → rename → upsert, rather than being held
+	 * across a whole pack's downloads and expiring mid-install.
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function install_locked( array $resolved, string $name, array $install ) {
+		$source = (string) $resolved['row']['source'];
+		$entry  = (string) $resolved['row']['entry'];
+		$lock   = sprintf( 'entry_%s_%s', $source, $entry );
 
 		if ( ! $this->lock->acquire( $lock, static::LOCK_TTL ) ) {
 			return new WP_Error( 'font_install_in_progress', sprintf( 'Another request is installing %s/%s', $source, $entry ) );
 		}
 
 		try {
-			$resolved = $this->resolve( $source, $entry );
-			if ( is_wp_error( $resolved ) ) {
-				return $this->fail( $source, $entry, $resolved );
-			}
-
 			$targets = $this->targets( $resolved['data'], $install );
 
 			if ( ! isset( $targets[ $name ] ) ) {
@@ -249,22 +264,23 @@ class Font_Installer {
 	 * @since 7.0
 	 */
 	protected function fetch_entry( string $source, array $row ) {
-		$record = $this->sources->get( $source );
 		$sha256 = (string) ( $row['entry_sha256'] ?? '' );
-
-		if ( $record === null ) {
-			return new WP_Error( 'font_source_unknown', sprintf( '%s is not a registered source', $source ) );
-		}
 
 		if ( $sha256 === '' ) {
 			return new WP_Error( 'font_entry_unknown', sprintf( '%s/%s carries neither an entry nor a hash to fetch one by', $source, $row['entry'] ) );
 		}
 
+		$url = $this->catalog->entry_url( $source, $row );
+
+		if ( $url === null ) {
+			return new WP_Error( 'font_source_unknown', sprintf( '%s is not a registered source', $source ) );
+		}
+
 		$body = $this->downloader->fetch(
-			sprintf( '%sentries/%s/%s-%s.json', $record->get_root_url(), $source, $row['entry'], $sha256 ),
+			$url,
 			[
 				'sha256'       => $sha256,
-				'request_args' => $record->get_request_args(),
+				'request_args' => $this->catalog->request_args( $source ),
 			]
 		);
 
@@ -325,7 +341,7 @@ class Font_Installer {
 	 * @since 7.0
 	 */
 	protected function place( string $source, string $entry, string $name, array $file ) {
-		$relative = $source . '/' . $entry . '/' . $name;
+		$relative = Font_Sources::install_path( $source, $entry, $name );
 		$absolute = $this->repository->get_font_dir() . $relative;
 		$sha256   = (string) ( $file['sha256'] ?? '' );
 		$size     = (int) ( $file['size'] ?? 0 );
@@ -343,9 +359,10 @@ class Font_Installer {
 		$part = $this->downloader->download(
 			$url,
 			[
-				'sha256' => $sha256,
-				'size'   => $size,
-				'name'   => $name,
+				'sha256'       => $sha256,
+				'size'         => $size,
+				'name'         => $name,
+				'request_args' => $this->catalog->request_args( $source ),
 			]
 		);
 
@@ -381,30 +398,11 @@ class Font_Installer {
 			return false;
 		}
 
-		if ( ( $this->installed_hashes()[ $relative ] ?? '' ) === $sha256 ) {
+		if ( $this->repository->recorded_hash( $relative ) === $sha256 ) {
 			return true;
 		}
 
 		return hash_equals( $sha256, (string) hash_file( 'sha256', $absolute ) );
-	}
-
-	/**
-	 * Every path a file row records, with the hash it claims
-	 *
-	 * @return array<string, string>
-	 *
-	 * @since 7.0
-	 */
-	protected function installed_hashes(): array {
-		$hashes = [];
-
-		foreach ( $this->repository->all() as $font ) {
-			foreach ( $font['files'] as $file ) {
-				$hashes[ (string) $file['path'] ] = (string) ( $file['sha256'] ?? '' );
-			}
-		}
-
-		return $hashes;
 	}
 
 	/**
@@ -419,17 +417,19 @@ class Font_Installer {
 	 */
 	protected function write_rows( array $resolved, array $install, array $targets, string $path, array $file ): void {
 		foreach ( $targets as $font_key => $roles ) {
-			$font_id = $this->upsert_font( $resolved, $install, (string) $font_key );
+			$font = $this->upsert_font( $resolved, $install, (string) $font_key );
 
-			if ( $font_id === 0 ) {
+			if ( $font['id'] === 0 ) {
 				continue;
 			}
 
+			$replaced_a_file = false;
+
 			foreach ( $roles as $role => $variant ) {
-				$replaced = $this->path_for_role( $font_id, (string) $role );
+				$replaced = $this->repository->path_for_role( $font['id'], (string) $role );
 
 				$this->repository->insert_file(
-					$font_id,
+					$font['id'],
 					(string) $role,
 					[
 						'path'    => $path,
@@ -447,55 +447,31 @@ class Font_Installer {
 				/* The file this role no longer references, gone unless another row still records it */
 				$this->repository->delete_file( $replaced );
 
+				$replaced_a_file = true;
+			}
+
+			if ( $replaced_a_file ) {
 				/*
 				 * A variants swap can put a different file of the same size behind a role, and mPDF's size +
 				 * `useOTL` comparison cannot see that. Only this branch needs it: an ordinary install has no cache
-				 * yet, and an update whose bytes changed almost always changed length too.
+				 * yet, and an update whose bytes changed almost always changed length too. Once per key rather
+				 * than per role, because the four faces of a key share one call.
 				 */
-				FlushCache::flush_font( $this->key_for_id( $font_id ) );
+				FlushCache::flush_font( $font['key'] );
 			}
 		}
-	}
-
-	/**
-	 * The path a font row's role currently records, before this install replaces it
-	 *
-	 * @since 7.0
-	 */
-	protected function path_for_role( int $font_id, string $role ): ?string {
-		foreach ( $this->repository->all() as $font ) {
-			if ( (int) $font['id'] === $font_id ) {
-				return isset( $font['files'][ $role ] ) ? (string) $font['files'][ $role ]['path'] : null;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * @since 7.0
-	 */
-	protected function key_for_id( int $font_id ): string {
-		foreach ( $this->repository->all() as $key => $font ) {
-			if ( (int) $font['id'] === $font_id ) {
-				return (string) $key;
-			}
-		}
-
-		return '';
 	}
 
 	/**
 	 * The font row for one key of one entry, created or brought up to date
 	 *
-	 * @return int The row id, or 0 when it could not be written
+	 * @return array{id: int, key: string} The row id — 0 when it could not be written — and the key it holds
 	 *
 	 * @since 7.0
 	 */
-	protected function upsert_font( array $resolved, array $install, string $font_key ): int {
-		$row   = $resolved['row'];
-		$data  = $resolved['data'];
-		$roles = (array) ( $data['fonts'][ $font_key ] ?? [] );
+	protected function upsert_font( array $resolved, array $install, string $font_key ): array {
+		$row  = $resolved['row'];
+		$data = $resolved['data'];
 
 		$coverage = (int) $row['coverage'] === 1;
 
@@ -509,62 +485,55 @@ class Font_Installer {
 				]
 			);
 
-			return 0;
+			return [
+				'id'  => 0,
+				'key' => '',
+			];
 		}
 
-		$existing = $coverage ? $this->repository->get( $font_key ) : $this->existing_install( $row, $install );
+		$font  = Font_Sources::font_row( $row, $data, $font_key );
+		$label = (string) ( $install['label'] ?? '' );
 
-		$font = [
-			'font_key'    => $this->row_key( $row, $install, $font_key, $coverage, $existing ),
-			'label'       => $this->row_label( $row, $data, $install, $font_key ),
-			'source'      => (string) $row['source'],
-			'entry'       => (string) $row['entry'],
-			'coverage'    => (int) $row['coverage'],
-			'meta'        => (int) $row['coverage'] === 1 ? Font_Sources::coverage_meta( $font_key, $data, $roles ) : [],
-			'version'     => $row['version'] ?? null,
-			'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
-			'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
-		];
+		if ( $label !== '' ) {
+			$font['label'] = $label;
+		}
+
+		/*
+		 * A coverage entry's rows *are* its `fonts` keys — the fallback maps in `meta` reference them by name, so
+		 * they are not the caller's to choose, and the key is the identity. A display entry may be installed under
+		 * more than one key, each its own row, so there the identity is the label and the key follows from it.
+		 */
+		$existing = $coverage ? $this->repository->get( $font_key ) : $this->existing_install( $row, $font['label'] );
+
+		if ( ! $coverage ) {
+			$font['font_key'] = $existing !== null ? (string) $existing['font_key'] : $this->new_key( $row, $install );
+		}
 
 		if ( $existing !== null ) {
 			$this->repository->update( (int) $existing['id'], $font );
 
-			return (int) $existing['id'];
+			return [
+				'id'  => (int) $existing['id'],
+				'key' => (string) $font['font_key'],
+			];
 		}
 
-		return $this->repository->insert( $font );
-	}
-
-	/**
-	 * The key this row takes
-	 *
-	 * A coverage entry's rows *are* its `fonts` keys — the fallback maps in `meta` reference them by name, so they
-	 * are not the caller's to choose. A display entry keeps the key its existing row already has, or derives a new
-	 * one.
-	 *
-	 * @since 7.0
-	 */
-	protected function row_key( array $row, array $install, string $font_key, bool $coverage, ?array $existing ): string {
-		if ( $coverage ) {
-			return $font_key;
-		}
-
-		return $existing !== null ? (string) $existing['font_key'] : $this->new_key( $row, $install );
+		return [
+			'id'  => $this->repository->insert( $font ),
+			'key' => (string) $font['font_key'],
+		];
 	}
 
 	/**
 	 * This install's existing row, matched on `(source, entry, label)`
 	 *
-	 * A display entry may be installed under more than one key, each install its own row, so the key cannot be the
-	 * identity — a re-install would find its own key taken and suffix a duplicate every time. The label is what the
-	 * caller actually chose, which makes a re-POST an update (§4.5 Variants).
+	 * The key cannot be the identity of a display entry's row — a re-install would find its own key taken and
+	 * suffix a duplicate every time. The label is what the caller actually chose, which makes a re-POST an update
+	 * (§4.5 Variants), and it is the label the row was written with, so the two derivations cannot drift.
 	 *
 	 * @since 7.0
 	 */
-	protected function existing_install( array $row, array $install ): ?array {
-		$label = (string) ( $install['label'] ?? '' );
-		$label = $label !== '' ? $label : (string) $row['label'];
-
+	protected function existing_install( array $row, string $label ): ?array {
 		foreach ( $this->repository->all() as $font ) {
 			if ( (string) $font['source'] === (string) $row['source']
 				&& (string) ( $font['entry'] ?? '' ) === (string) $row['entry']
@@ -590,20 +559,6 @@ class Font_Installer {
 		$key = (string) ( $install['font_key'] ?? '' );
 
 		return $this->repository->unique_key( $key !== '' ? $key : (string) $row['entry'] );
-	}
-
-	/**
-	 * @since 7.0
-	 */
-	protected function row_label( array $row, array $data, array $install, string $font_key ): string {
-		$label = (string) ( $install['label'] ?? '' );
-
-		if ( $label !== '' ) {
-			return $label;
-		}
-
-		/* A multi-font pack labels each row by its key: one shared label across four CJK fonts helps nobody */
-		return count( (array) ( $data['fonts'] ?? [] ) ) === 1 ? (string) $row['label'] : $font_key;
 	}
 
 	/**
@@ -645,6 +600,6 @@ class Font_Installer {
 	protected function split( string $id ): array {
 		$parts = explode( '/', $id, 2 );
 
-		return [ (string) ( $parts[0] ?? '' ), (string) ( $parts[1] ?? '' ) ];
+		return [ $parts[0], $parts[1] ?? '' ];
 	}
 }
