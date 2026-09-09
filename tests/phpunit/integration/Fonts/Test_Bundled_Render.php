@@ -4,9 +4,8 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts;
 
-use GFPDF\Helper\Helper_PDF;
+use GFPDF\Tests\Concerns\RendersWithMpdf;
 use GFPDF\Tests\Integration\TestCase;
-use ReflectionMethod;
 
 /**
  * @package     Gravity PDF
@@ -27,6 +26,8 @@ use ReflectionMethod;
  */
 class Test_Bundled_Render extends TestCase {
 
+	use RendersWithMpdf;
+
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
 
@@ -40,37 +41,6 @@ class Test_Bundled_Render extends TestCase {
 	public static function tear_down_after_class(): void {
 		static::cleanup_class_fixtures();
 		parent::tear_down_after_class();
-	}
-
-	/**
-	 * Build an initialised Helper_PDF with mPDF already constructed
-	 */
-	protected function mpdf_for( array $settings = [] ) {
-		global $gfpdf;
-
-		$pdf = new Helper_PDF(
-			[
-				'id'      => 1,
-				'form_id' => $this->form( 'all-form-fields' )['id'],
-			],
-			array_merge( [ 'id' => '556690c67856b' ], $settings ),
-			$gfpdf->gform,
-			$gfpdf->data,
-			$gfpdf->misc,
-			$gfpdf->templates,
-			$gfpdf->log
-		);
-
-		$method = new ReflectionMethod( Helper_PDF::class, 'begin_pdf' );
-
-		/* A no-op from 8.1, and required before it */
-		if ( PHP_VERSION_ID < 80100 ) {
-			$method->setAccessible( true );
-		}
-
-		$method->invoke( $pdf );
-
-		return $pdf->get_pdf_class();
 	}
 
 	public function test_the_font_directories_come_from_the_package_layers_bundled_first() {

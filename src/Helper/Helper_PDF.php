@@ -677,21 +677,24 @@ class Helper_PDF {
 			$config['fontDir'] = isset( $config['fontDir'] ) && $config['fontDir'] !== '' ? [ $config['fontDir'] ] : [];
 		}
 
-		$this->mpdf = new Mpdf(
-			$config,
-			new SimpleContainer(
-				apply_filters(
-					'gfpdf_mpdf_class_container',
-					[
-						'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
-					],
-					$this->form,
-					$this->entry,
-					$this->settings,
-					$this
-				)
-			)
+		$container = apply_filters(
+			'gfpdf_mpdf_class_container',
+			[
+				'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
+			],
+			$this->form,
+			$this->entry,
+			$this->settings,
+			$this
 		);
+
+		/*
+		 * Wrapped around the filter's answer rather than offered through it: a font file that has vanished is
+		 * flagged and substituted whatever an add-on returned, and an add-on's own finder still resolves the paths.
+		 */
+		$container['fontFileFinder'] = $registry->font_file_finder( $container['fontFileFinder'] ?? null );
+
+		$this->mpdf = new Mpdf( $config, new SimpleContainer( $container ) );
 
 		$this->mpdf->setLogger( $this->log );
 
