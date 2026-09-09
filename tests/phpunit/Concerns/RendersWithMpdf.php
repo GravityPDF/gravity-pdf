@@ -26,16 +26,20 @@ trait RendersWithMpdf {
 
 	/**
 	 * The `all-form-fields` fixture is a Helper_PDF constructor argument and nothing more, so a suite using this
-	 * has to have loaded it
+	 * has to have loaded it. `$entry` values matter to one caller only — the render-time install trigger scans
+	 * them — and are merged over the two keys the constructor needs.
 	 */
-	protected function mpdf_for( array $settings = [] ): Mpdf {
+	protected function mpdf_for( array $settings = [], array $entry = [] ): Mpdf {
 		global $gfpdf;
 
 		$pdf = new Helper_PDF(
-			[
-				'id'      => 1,
-				'form_id' => $this->form( 'all-form-fields' )['id'],
-			],
+			array_merge(
+				[
+					'id'      => 1,
+					'form_id' => $this->form( 'all-form-fields' )['id'],
+				],
+				$entry
+			),
 			array_merge( [ 'id' => '556690c67856b' ], $settings ),
 			$gfpdf->gform,
 			$gfpdf->data,

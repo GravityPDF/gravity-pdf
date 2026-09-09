@@ -100,6 +100,7 @@ class Test_Render_Font_Trigger extends TestCase {
 				new Font_Lock(),
 				$gfpdf->log
 			),
+			$gfpdf->get_font_registry(),
 			new Font_Lock(),
 			$gfpdf->log
 		);

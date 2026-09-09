@@ -364,8 +364,8 @@ class Registry {
 	 *
 	 * @since 7.0
 	 */
-	public function language_to_font(): Language_To_Font {
-		return new Language_To_Font( $this->effective_language_map() );
+	public function language_to_font( array $adobe_cjk = [] ): Language_To_Font {
+		return new Language_To_Font( $this->effective_language_map( $adobe_cjk ) );
 	}
 
 	/**
@@ -378,6 +378,41 @@ class Registry {
 	 *
 	 * @since 7.0
 	 */
+	/**
+	 * mPDF's four Adobe CJK families, by the tags a detector emits for them
+	 *
+	 * The last-resort route for a CJK document whose pack has not landed: mPDF writes a non-embedded
+	 * `CIDFontType0` and the reader's own viewer supplies the glyphs, which beats a page of boxes in an emailed
+	 * PDF. Traditional Chinese is `big5` and everything else Han is `gb`, matching the pack split — Simplified is
+	 * where a Han run with no better signal belongs.
+	 *
+	 * @since 7.0
+	 */
+	public const ADOBE_CJK_MAP = [
+		'zh'       => 'gb',
+		'zh-cn'    => 'gb',
+		'und-hans' => 'gb',
+		'zh-hk'    => 'big5',
+		'zh-tw'    => 'big5',
+		'und-hant' => 'big5',
+		'ja'       => 'sjis',
+		'ko'       => 'uhc',
+		'und-hang' => 'uhc',
+	];
+
+	/**
+	 * The Adobe CJK rows for the tags a render could not resolve
+	 *
+	 * @param string[] $scripts
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	public static function adobe_cjk_overlay( array $scripts ): array {
+		return array_intersect_key( static::ADOBE_CJK_MAP, array_flip( array_map( 'strtolower', $scripts ) ) );
+	}
+
 	public function default_language_map(): array {
 		$installed = [];
 
@@ -396,17 +431,23 @@ class Registry {
 	}
 
 	/**
-	 * The default map with the user's overrides applied
+	 * The default map with the Adobe CJK fallback and then the user's overrides applied
 	 *
 	 * `*` removes a code so the document font stands. An override naming a font that is not registered is dropped
 	 * rather than obeyed, or a since-deleted font would send the run into mPDF's substitution instead of the map.
+	 *
+	 * The fallback sits between the two because it is a stand-in, not a preference: an installed pack has already
+	 * been asked for by the time a caller passes one (the render only passes codes the map could not answer), and
+	 * an admin's own override still wins over a stand-in.
+	 *
+	 * @param array<string, string> $adobe_cjk Per request, from `adobe_cjk_overlay()`
 	 *
 	 * @return array<string, string>
 	 *
 	 * @since 7.0
 	 */
-	public function effective_language_map(): array {
-		$map       = $this->default_language_map();
+	public function effective_language_map( array $adobe_cjk = [] ): array {
+		$map       = array_merge( $this->default_language_map(), $adobe_cjk );
 		$overrides = $this->options->get_option( 'font_language_overrides', [] );
 
 		if ( ! is_array( $overrides ) ) {

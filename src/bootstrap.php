@@ -1244,6 +1244,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_coverage_resolver(),
 				$this->get_install_queue(),
 				$this->get_font_installer(),
+				$this->get_font_registry(),
 				new Fonts\Font_Lock(),
 				$this->log
 			);
