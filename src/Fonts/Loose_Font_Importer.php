@@ -240,32 +240,28 @@ class Loose_Font_Importer implements Font_Population_Pass {
 	/**
 	 * The key a template's `font-family` will name
 	 *
-	 * The legacy rule first — lowercase, spaces removed — so a template written against 6.x keeps resolving. A stem
-	 * that still isn't a valid key (a dot, non-ASCII) collapses to `-`, and both spellings are logged, because a
-	 * template naming the old one needs a one-word edit.
+	 * The derivation itself is `Font_Repository::derive_key()`, shared with the catalogue installs. What is this
+	 * importer's alone is the *notice*: only here was there a 6.x key in the wild to diverge from, and a template
+	 * naming the old spelling needs a one-word edit.
 	 *
 	 * @since 7.0
 	 */
 	public function derive_key( string $filename ): string {
 		$stem   = (string) preg_replace( '/\.[tT][tT][fF]$/', '', $filename );
 		$legacy = mb_strtolower( str_replace( ' ', '', $stem ), 'UTF-8' );
+		$key    = $this->repository->derive_key( $stem );
 
-		if ( preg_match( Font_Repository::KEY_PATTERN, $legacy ) ) {
-			return $legacy;
+		if ( $key !== $legacy ) {
+			$this->log->notice(
+				'A loose font file needs a different key than 6.x gave it',
+				[
+					'previous' => $legacy,
+					'current'  => $key,
+				]
+			);
 		}
 
-		$collapsed = strtolower( (string) preg_replace( '/[^A-Za-z0-9_\-]+/', '-', $legacy ) );
-		$collapsed = trim( $collapsed, '-' );
-
-		$this->log->notice(
-			'A loose font file needs a different key than 6.x gave it',
-			[
-				'previous' => $legacy,
-				'current'  => $collapsed,
-			]
-		);
-
-		return $collapsed !== '' ? $collapsed : 'font';
+		return $key;
 	}
 
 	/**

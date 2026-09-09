@@ -7,6 +7,7 @@ namespace GFPDF\Fonts;
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontFixtures;
 use GFPDF\Tests\Concerns\MocksHttpRequests;
+use GFPDF\Tests\Concerns\QueuesFontInstalls;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
 
@@ -29,6 +30,7 @@ class Test_Install_Queue extends TestCase {
 	use HasCatalogRows;
 	use HasFontFixtures;
 	use MocksHttpRequests;
+	use QueuesFontInstalls;
 
 	/**
 	 * @var Install_Queue
@@ -45,7 +47,7 @@ class Test_Install_Queue extends TestCase {
 
 		global $gfpdf;
 
-		$this->queue    = $gfpdf->get_install_queue();
+		$this->queue    = $this->install_queue();
 		$this->font_dir = $gfpdf->get_font_repository()->get_font_dir();
 
 		$gfpdf->get_font_repository()->ensure_ready();
@@ -122,24 +124,6 @@ class Test_Install_Queue extends TestCase {
 
 	protected function set_status( array $fields, string $entry = 'emoji' ): void {
 		$this->catalog_repository()->set_status( 'packs', $entry, $fields );
-	}
-
-	/**
-	 * Every item sitting in the batch store
-	 *
-	 * Not `get_data()`: GF's `save()` empties the buffer as it persists, so after a `flush()` the only place the
-	 * work exists is the store.
-	 */
-	protected function queued(): array {
-		$items = [];
-
-		foreach ( $this->queue->get_batches() as $batch ) {
-			foreach ( (array) $batch->data as $item ) {
-				$items[] = $item;
-			}
-		}
-
-		return $items;
 	}
 
 	protected function installer(): Font_Installer {
@@ -293,7 +277,7 @@ class Test_Install_Queue extends TestCase {
 		remove_filter( 'gfpdf_auto_install_fonts', '__return_false' );
 	}
 
-	public function test_a_manual_install_under_its_own_key_queues_files_that_already_have_rows() {
+	public function test_a_forcing_request_queues_files_that_already_have_rows() {
 		$names = $this->seed_pack( 1 );
 
 		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
@@ -301,15 +285,33 @@ class Test_Install_Queue extends TestCase {
 		$this->unmock_http();
 
 		/*
-		 * A further install of a display entry needs its own rows, and those are disjoint from the ones already
-		 * there — dropping the file because *some* row records it would leave the new install with nothing to do.
+		 * What the install route asks for on both of its jobs: an update leaves the file at the same path and
+		 * changes only its contents, and a further install of a display entry needs rows disjoint from the ones
+		 * already there. Dropping the file because *some* row records it would leave both with nothing to do.
 		 */
-		$request             = $this->request( $names );
-		$request['install']  = [ 'label' => 'Second Copy' ];
+		$request            = $this->request( $names );
+		$request['install'] = [ 'label' => 'Second Copy' ];
+		$request['force']   = true;
 
 		$this->assertTrue( $this->queue->enqueue_once( $request, true ) );
 		$this->assertCount( 1, $this->queued() );
 		$this->assertSame( [ 'label' => 'Second Copy' ], $this->queued()[0]['install'] );
+	}
+
+	public function test_an_install_payload_alone_no_longer_forces() {
+		$names = $this->seed_pack( 1 );
+
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $this->file_bytes( 1 ) ] );
+		$this->installer()->install_file( 'packs', 'emoji', $names[0] );
+		$this->unmock_http();
+		$this->set_status( [ 'phase' => null ] );
+
+		$request            = $this->request( $names );
+		$request['install'] = [ 'label' => 'Second Copy' ];
+
+		/* The drop is the trigger's default and `force` is the only thing that lifts it — one flag, one meaning */
+		$this->assertFalse( $this->queue->enqueue_once( $request, true ) );
+		$this->assertSame( [], $this->queued() );
 	}
 
 	public function test_running_the_queue_installs_the_file_and_clears_the_phase() {

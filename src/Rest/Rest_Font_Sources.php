@@ -8,9 +8,7 @@ use GFPDF\Fonts\Catalog_Repository;
 use GFPDF\Fonts\Catalog_Sync;
 use GFPDF\Fonts\Font_Sources;
 use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Data;
 use WP_Error;
-use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -38,17 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 7.0
  */
-class Rest_Font_Sources extends WP_REST_Controller {
-
-	/**
-	 * @since 7.0
-	 */
-	public const NAMESPACE = Helper_Data::REST_API_BASENAME . 'v1';
-
-	/**
-	 * @since 7.0
-	 */
-	public const API_BASE = '/fonts/sources';
+class Rest_Font_Sources extends Rest_Font_Base {
 
 	/**
 	 * Fixed rather than a parameter: the browser is a grid of cards, not an export
@@ -99,30 +87,11 @@ class Rest_Font_Sources extends WP_REST_Controller {
 	 */
 	protected $sync;
 
-	/**
-	 * @var Font_Sources
-	 * @since 7.0
-	 */
-	protected $sources;
-
-	/**
-	 * @var Helper_Abstract_Form
-	 * @since 7.0
-	 */
-	protected $gform;
-
 	public function __construct( Catalog_Repository $catalog, Catalog_Sync $sync, Font_Sources $sources, Helper_Abstract_Form $gform ) {
 		$this->catalog = $catalog;
 		$this->sync    = $sync;
 		$this->sources = $sources;
 		$this->gform   = $gform;
-	}
-
-	/**
-	 * @since 7.0
-	 */
-	public function init(): void {
-		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
 	}
 
 	/**
@@ -197,7 +166,7 @@ class Rest_Font_Sources extends WP_REST_Controller {
 
 		register_rest_route(
 			static::NAMESPACE,
-			static::API_BASE . '/(?P<source>[a-z0-9-]+)/(?P<entry>[a-z0-9-]+)',
+			static::ENTRY_ROUTE,
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
@@ -298,21 +267,10 @@ class Rest_Font_Sources extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	public function get_entry( $request ) {
-		$id = (string) $request['source'];
+		$row = $this->entry_row( $this->catalog, (string) $request['source'], (string) $request['entry'] );
 
-		$error = $this->check_source( $id );
-		if ( $error !== null ) {
-			return $error;
-		}
-
-		$row = $this->catalog->entry( $id, (string) $request['entry'] );
-
-		if ( $row === null ) {
-			return new WP_Error(
-				'font_entry_unknown',
-				__( 'That font is not in the catalogue.', 'gravity-pdf' ),
-				[ 'status' => 404 ]
-			);
+		if ( is_wp_error( $row ) ) {
+			return $row;
 		}
 
 		$fonts = (array) ( $row['data']['fonts'] ?? [] );
@@ -346,47 +304,6 @@ class Rest_Font_Sources extends WP_REST_Controller {
 		}
 
 		return new WP_REST_Response( [ 'up_to_date' => false ], 202 );
-	}
-
-	/**
-	 * @return true|WP_Error
-	 *
-	 * @since 7.0
-	 */
-	public function get_items_permissions_check( $request ) {
-		if ( $this->gform->has_capability( 'gravityforms_edit_forms' ) ) {
-			return true;
-		}
-
-		return new WP_Error(
-			'rest_cannot_view',
-			__( 'Sorry, you do not have access to this endpoint.', 'gravity-pdf' ),
-			[ 'status' => rest_authorization_required_code() ]
-		);
-	}
-
-	/**
-	 * @return true|WP_Error
-	 *
-	 * @since 7.0
-	 */
-	public function update_item_permissions_check( $request ) {
-		return $this->get_items_permissions_check( $request );
-	}
-
-	/**
-	 * @since 7.0
-	 */
-	protected function check_source( string $id ): ?WP_Error {
-		if ( $this->sources->get( $id ) !== null ) {
-			return null;
-		}
-
-		return new WP_Error(
-			'font_source_unknown',
-			__( 'That font source is not registered.', 'gravity-pdf' ),
-			[ 'status' => 404 ]
-		);
 	}
 
 	/**

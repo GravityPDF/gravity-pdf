@@ -434,6 +434,45 @@ class Test_Font_Installer extends TestCase {
 		$this->assertSame( (int) $font['id'], (int) $this->font( 'lato' )['id'] );
 	}
 
+	public function test_a_labelled_install_lands_under_the_key_its_label_derives() {
+		$body = $this->font_bytes();
+
+		$this->insert_catalog_row(
+			'packs',
+			'lato',
+			[
+				'label'      => 'Lato',
+				'coverage'   => 0,
+				'entry_json' => (string) wp_json_encode(
+					[
+						'fonts' => [ 'lato' => [ 'R' => 'Lato-Regular.ttf' ] ],
+						'files' => [
+							'Lato-Regular.ttf' => [
+								'sha256'      => hash( 'sha256', $body ),
+								'size'        => strlen( $body ),
+								'remote_path' => 'fonts-v1.0.0/Lato-Regular.ttf',
+							],
+						],
+					]
+				),
+			]
+		);
+
+		$this->mock_http( [ 'fonts.gravitypdf.com' => $body ] );
+
+		$this->assertTrue( $this->installer->install( 'packs/lato', [], [ 'label' => 'Lato Light Ø' ] ) );
+
+		/*
+		 * The route sends a label, never a key: derivation is install policy, and a key computed at the route
+		 * would be stale by the time a background batch ran. Non-key characters collapse rather than vanish.
+		 */
+		$font = $this->font( 'latolight' );
+
+		$this->assertNotNull( $font, 'the label has to derive a key, not fall back to the entry id' );
+		$this->assertSame( 'Lato Light Ø', $font['label'] );
+		$this->assertNull( $this->font( 'lato' ), 'the entry id is only the key when no label was chosen' );
+	}
+
 	/**
 	 * The variants path: any of a family's weights can fill any mPDF role, and changing that choice must leave no
 	 * orphan behind

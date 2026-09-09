@@ -8,7 +8,6 @@ use GFPDF\Fonts\Catalog_Sync;
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\MocksHttpRequests;
 use WP_Error;
-use WP_REST_Request;
 
 /**
  * @package     Gravity PDF
@@ -42,16 +41,6 @@ class Test_Rest_Font_Sources extends Test_Rest {
 		delete_site_option( Catalog_Sync::OPTION );
 
 		parent::tear_down();
-	}
-
-	protected function get( string $route, array $params = [] ) {
-		$request = new WP_REST_Request( 'GET', '/gravity-pdf/v1' . $route );
-
-		foreach ( $params as $key => $value ) {
-			$request->set_param( $key, $value );
-		}
-
-		return rest_do_request( $request );
 	}
 
 	protected function seed_packs(): void {
@@ -274,7 +263,7 @@ class Test_Rest_Font_Sources extends Test_Rest {
 	public function test_a_root_failure_is_a_502_and_proves_sync_is_not_shadowed() {
 		$this->mock_http( [ 'fonts.gravitypdf.com' => new WP_Error( 'http_request_failed', 'Connection timed out' ) ] );
 
-		$response = rest_do_request( new WP_REST_Request( 'POST', '/gravity-pdf/v1/fonts/sources/sync' ) );
+		$response = $this->post( '/fonts/sources/sync' );
 
 		/*
 		 * 502 rather than 404: `sync` is a reserved source id, so this is the literal route answering rather than
@@ -291,7 +280,7 @@ class Test_Rest_Font_Sources extends Test_Rest {
 		$this->mock_http( [ 'fonts.gravitypdf.com' => '{}' ] );
 
 		/* Refused before the sync is ever asked to run */
-		$this->assertSame( 401, rest_do_request( new WP_REST_Request( 'POST', '/gravity-pdf/v1/fonts/sources/sync' ) )->get_status() );
+		$this->assertSame( 401, $this->post( '/fonts/sources/sync' )->get_status() );
 		$this->assertSame( [], $this->requested_urls() );
 	}
 }
