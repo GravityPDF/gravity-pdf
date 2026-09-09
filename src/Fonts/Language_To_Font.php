@@ -56,7 +56,7 @@ class Language_To_Font implements LanguageToFontInterface {
 	 * @since 7.0
 	 */
 	public function getLanguageOptions( $mode, $adobeCJK ) {
-		foreach ( $this->candidates( (string) $mode ) as $candidate ) {
+		foreach ( static::candidates( (string) $mode ) as $candidate ) {
 			if ( isset( $this->map[ $candidate ] ) && $this->map[ $candidate ] !== '' ) {
 				return $this->map[ $candidate ];
 			}
@@ -68,11 +68,15 @@ class Language_To_Font implements LanguageToFontInterface {
 	/**
 	 * The lookups to try, most specific first
 	 *
+	 * Public and static because the install side walks the same ladder: `Coverage_Resolver` matches a locale
+	 * against the catalogue's `languages` column, and a rung the render resolves but the trigger never asked for
+	 * is a font that renders and was never installed.
+	 *
 	 * @return string[]
 	 *
 	 * @since 7.0
 	 */
-	protected function candidates( string $mode ): array {
+	public static function candidates( string $mode ): array {
 		$mode = strtolower( $mode );
 		if ( $mode === '' ) {
 			return [];
