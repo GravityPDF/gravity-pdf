@@ -301,6 +301,35 @@ class Install_Queue extends Helper_Abstract_Queue {
 	}
 
 	/**
+	 * Whether a batch is being processed right now
+	 *
+	 * GF keeps this protected, but an outstanding batch nothing is working on is exactly what the status route
+	 * means by stuck, so the question has to be askable from outside.
+	 *
+	 * @since 7.0
+	 */
+	public function is_running(): bool {
+		return (bool) $this->is_process_running();
+	}
+
+	/**
+	 * Re-dispatch an outstanding batch nothing has picked up
+	 *
+	 * The first resort behind a stalled install, riding the traffic the Font Manager's poller already generates.
+	 * Cheap to be wrong about: GF's `dispatch()` refuses a queue that is already processing or empty before it does
+	 * anything, so this is a question as much as an instruction — the return value is the answer.
+	 *
+	 * @return bool Whether a batch was dispatched
+	 *
+	 * @since 7.0
+	 */
+	public function nudge(): bool {
+		$dispatched = $this->dispatch();
+
+		return $dispatched !== false && ! is_wp_error( $dispatched );
+	}
+
+	/**
 	 * Run the outstanding batches in this request, within a budget
 	 *
 	 * The escape hatch behind the stalled-batch notice's "Run now", for a site whose cron is dead or whose loopback
@@ -313,7 +342,7 @@ class Install_Queue extends Helper_Abstract_Queue {
 	 * @since 7.0
 	 */
 	public function run_inline(): int {
-		if ( $this->is_process_running() ) {
+		if ( $this->is_running() ) {
 			return 0;
 		}
 

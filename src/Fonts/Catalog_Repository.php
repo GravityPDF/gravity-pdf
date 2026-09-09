@@ -526,6 +526,52 @@ class Catalog_Repository {
 		);
 	}
 
+
+	/**
+	 * The catalog columns a status object needs, for every entry named plus every entry mid-install
+	 *
+	 * One scan rather than a cached `entry()` per id: the Font Manager polls the status route every couple of
+	 * seconds while an install runs, and `entry()` selects `entry_json`, the one column no status object wants.
+	 * Uncached for the same reason — progress that is a request stale is progress the poller cannot see move.
+	 *
+	 * @param array<int, string> $ids The `{source}/{entry}` pairs the caller already holds font rows for
+	 *
+	 * @return array<string, array> Keyed by `{source}/{entry}`
+	 *
+	 * @since 7.0
+	 */
+	public function status_rows( array $ids = [] ): array {
+		global $wpdb;
+
+		$table   = $this->schema->get_catalog_table();
+		$columns = 'source, entry, version, notes, released, files, size, phase, phase_since, error, retry_after';
+		$ids     = array_values( array_unique( array_filter( array_map( 'strval', $ids ) ) ) );
+
+		/* phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.DirectDatabaseQuery -- the table and column names come from Font_Schema; the placeholders are interpolated because there is one per id; the route is polled, so it cannot be cached */
+		if ( $ids === [] ) {
+			$rows = $wpdb->get_results( "SELECT {$columns} FROM {$table} WHERE phase IS NOT NULL AND phase <> ''", ARRAY_A );
+		} else {
+			$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%s' ) );
+
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT {$columns} FROM {$table} WHERE ( phase IS NOT NULL AND phase <> '' ) OR CONCAT( source, '/', entry ) IN ( {$placeholders} )",
+					$ids
+				),
+				ARRAY_A
+			);
+		}
+		/* phpcs:enable */
+
+		$statuses = [];
+
+		foreach ( (array) $rows as $row ) {
+			$statuses[ $row['source'] . '/' . $row['entry'] ] = $this->cast_row( $row );
+		}
+
+		return $statuses;
+	}
+
 	/**
 	 * Whether a source is still registered, so a caller can drop work rather than fail a row over the admin's own change
 	 *
