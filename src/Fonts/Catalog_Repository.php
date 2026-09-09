@@ -430,6 +430,38 @@ class Catalog_Repository {
 	}
 
 	/**
+	 * The URL of the entry file a row points at, when it points at one
+	 *
+	 * Same rule as `url_for()` — the root comes from the registered record, never from the index — which is why it
+	 * lives here rather than in the one class that fetches entry files.
+	 *
+	 * @param array $row A catalog row carrying `entry_sha256`
+	 *
+	 * @since 7.0
+	 */
+	public function entry_url( string $source, array $row ): ?string {
+		$record = $this->sources->get( $source );
+		$sha256 = (string) ( $row['entry_sha256'] ?? '' );
+
+		if ( $record === null || $sha256 === '' ) {
+			return null;
+		}
+
+		return sprintf( '%sentries/%s/%s-%s.json', $record->get_root_url(), $source, (string) $row['entry'], $sha256 );
+	}
+
+	/**
+	 * A third-party record's query args, so every request built from its root carries them
+	 *
+	 * @since 7.0
+	 */
+	public function request_args( string $source ): array {
+		$record = $this->sources->get( $source );
+
+		return $record === null ? [] : $record->get_request_args();
+	}
+
+	/**
 	 * The preview faces for a catalog row, shaped like its `fonts` map
 	 *
 	 * @param array $fonts The decoded entry's `fonts` map, when the caller already has it. Without it only the

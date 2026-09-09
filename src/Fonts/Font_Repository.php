@@ -544,6 +544,42 @@ class Font_Repository {
 	}
 
 	/**
+	 * The path one role of one font row records, or null when it records none
+	 *
+	 * A single-row read rather than a scan of `all()`: every write flushes the memo `all()` answers from, so a
+	 * caller replacing several roles in a row would re-select both whole tables between each one.
+	 *
+	 * @since 7.0
+	 */
+	public function path_for_role( int $font_id, string $role ): ?string {
+		global $wpdb;
+
+		$file_table = $this->schema->get_file_table();
+
+		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name comes from Font_Schema */
+		$path = (string) $wpdb->get_var( $wpdb->prepare( "SELECT path FROM {$file_table} WHERE font_id = %d AND role = %s", $font_id, $role ) );
+
+		return $path !== '' ? $path : null;
+	}
+
+	/**
+	 * The hash some file row claims for a path, or '' when no row records it
+	 *
+	 * The installer's cheapest "already on disk" answer, which is why it is a single indexed read and not a
+	 * `claimed_filenames()`-shaped map: the caller has one path and wants one hash.
+	 *
+	 * @since 7.0
+	 */
+	public function recorded_hash( string $path ): string {
+		global $wpdb;
+
+		$file_table = $this->schema->get_file_table();
+
+		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name comes from Font_Schema */
+		return (string) $wpdb->get_var( $wpdb->prepare( "SELECT sha256 FROM {$file_table} WHERE path = %s LIMIT 1", $path ) );
+	}
+
+	/**
 	 * Remove one file row, then the file itself when nothing else records it
 	 *
 	 * Row first, then the unlink — the same order as `delete()`, so the "still recorded" guard sees the truth.
@@ -554,11 +590,9 @@ class Font_Repository {
 		global $wpdb;
 
 		$file_table = $this->schema->get_file_table();
+		$path       = $this->path_for_role( $font_id, $role );
 
-		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name comes from Font_Schema */
-		$path = (string) $wpdb->get_var( $wpdb->prepare( "SELECT path FROM {$file_table} WHERE font_id = %d AND role = %s", $font_id, $role ) );
-
-		if ( $path === '' ) {
+		if ( $path === null ) {
 			return false;
 		}
 
