@@ -1026,6 +1026,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( $this->font_registry === null ) {
 			$this->font_registry = new Fonts\Registry(
 				$this->get_font_repository(),
+				$this->get_catalog_repository(),
 				$this->options,
 				$this->log,
 				PDF_PLUGIN_DIR . 'fonts'

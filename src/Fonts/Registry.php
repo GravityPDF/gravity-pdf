@@ -25,8 +25,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Builds everything mPDF and the Font Manager need to know about fonts
  *
  * Both come from one read of the font tables, so what renders and what the UI lists cannot drift. Nothing here
- * touches the filesystem, and nothing constructs `Font_Sources` — its filter runs third-party code the render path
- * must not depend on.
+ * touches the filesystem, and nothing on the render path constructs `Font_Sources` — its filter runs third-party
+ * code a render must not depend on. `Catalog_Repository` is held for the install statuses alone, which only the
+ * admin surfaces ask for; no method mPDF reaches touches it.
  *
  * @package GFPDF\Fonts
  *
@@ -85,10 +86,41 @@ class Registry {
 	];
 
 	/**
+	 * The phases that mean an entry still has work outstanding
+	 *
+	 * @since 7.0
+	 */
+	public const LIVE_PHASES = [ 'queued', 'installing' ];
+
+	/**
+	 * A live entry whose phase has not moved for this long is worth re-dispatching
+	 *
+	 * Two of the poller's slowest intervals (§4.6 Store): long enough that a batch which simply has not been picked
+	 * up yet is never nudged, short enough that a dead loopback costs one poll rather than the five-minute
+	 * healthcheck.
+	 *
+	 * @since 7.0
+	 */
+	public const NUDGE_AFTER = 60;
+
+	/**
+	 * ...and this long is stuck: the UI stops polling and offers Retry
+	 *
+	 * @since 7.0
+	 */
+	public const STUCK_AFTER = 15 * MINUTE_IN_SECONDS;
+
+	/**
 	 * @var Font_Repository
 	 * @since 7.0
 	 */
 	protected $repository;
+
+	/**
+	 * @var Catalog_Repository
+	 * @since 7.0
+	 */
+	protected $catalog;
 
 	/**
 	 * @var Helper_Abstract_Options
@@ -116,11 +148,13 @@ class Registry {
 
 	public function __construct(
 		Font_Repository $repository,
+		Catalog_Repository $catalog,
 		Helper_Abstract_Options $options,
 		LoggerInterface $log,
 		string $bundled_dir
 	) {
 		$this->repository  = $repository;
+		$this->catalog     = $catalog;
 		$this->options     = $options;
 		$this->log         = $log;
 		$this->bundled_dir = trailingslashit( $bundled_dir );
@@ -482,6 +516,190 @@ class Registry {
 		}
 
 		return array_filter( $groups );
+	}
+
+	/**
+	 * The install status of every entry the Font Manager can show progress for
+	 *
+	 * One object per `{source}/{entry}` that has font rows or a phase — installed entries, entries mid-install, and
+	 * entries a failure left behind. Font rows and catalog rows only: no route, poll or health check may make this
+	 * fetch anything.
+	 *
+	 * The queue is a parameter rather than a constructor dependency because it depends on this class in turn (for
+	 * the auto-install gate), and a container cannot build a cycle.
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_statuses( Install_Queue $queue ): array {
+		$entries = $this->entry_rows();
+		$catalog = $this->catalog->status_rows( array_keys( $entries ) );
+
+		$ids = array_keys( $entries + $catalog );
+		sort( $ids );
+
+		$running  = $queue->is_running();
+		$stalled  = false;
+		$statuses = [];
+
+		foreach ( $ids as $id ) {
+			$row             = $catalog[ $id ] ?? null;
+			$statuses[ $id ] = $this->status_object( $entries[ $id ] ?? [], $row, $running );
+			$stalled         = $stalled || $this->stalled_for( $row, static::NUDGE_AFTER );
+		}
+
+		/* Before the poller gives up on it: a batch nothing has picked up is usually one dispatch away from moving */
+		if ( ! $running && $stalled ) {
+			$queue->nudge();
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * One entry's status object
+	 *
+	 * @param string $id `{source}/{entry}`
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_status( string $id, Install_Queue $queue ): array {
+		$statuses = $this->get_install_statuses( $queue );
+
+		return $statuses[ $id ] ?? $this->status_object( [], null, false );
+	}
+
+	/**
+	 * The font rows of every entry that has them, keyed by `{source}/{entry}`
+	 *
+	 * Rows a site has hidden are kept: the toggle is visibility, not installation (§4.11).
+	 *
+	 * @return array<string, array[]>
+	 *
+	 * @since 7.0
+	 */
+	protected function entry_rows(): array {
+		$entries = [];
+
+		foreach ( $this->rows() as $row ) {
+			$entry = (string) ( $row['entry'] ?? '' );
+
+			if ( $entry === '' ) {
+				continue;
+			}
+
+			$entries[ $row['source'] . '/' . $entry ][] = $row;
+		}
+
+		return $entries;
+	}
+
+	/**
+	 * Compose one status object from the rows behind it
+	 *
+	 * @param array[]    $rows    The entry's font rows
+	 * @param array|null $catalog The entry's catalog row, when it still has one
+	 * @param bool       $running Whether the install queue is processing a batch right now
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	protected function status_object( array $rows, ?array $catalog, bool $running ): array {
+		$paths = [];
+
+		foreach ( $rows as $row ) {
+			foreach ( $row['files'] as $file ) {
+				$paths[ (string) $file['path'] ] = true;
+			}
+		}
+
+		$phase  = $catalog === null ? '' : (string) $catalog['phase'];
+		$status = [
+			'phase'            => $phase === '' ? null : $phase,
+			'files_done'       => count( $paths ),
+			'installed'        => $rows !== [],
+			'update_available' => false,
+		];
+
+		foreach ( [ 'error', 'retry_after' ] as $field ) {
+			if ( $catalog !== null && (string) $catalog[ $field ] !== '' ) {
+				$status[ $field ] = (string) $catalog[ $field ];
+			}
+		}
+
+		if ( ! $running && $this->stalled_for( $catalog, static::STUCK_AFTER ) ) {
+			$status['stuck'] = true;
+		}
+
+		$update = $this->pending_update( $rows, $catalog );
+
+		if ( $update !== null ) {
+			$status['update_available'] = true;
+			$status['update']           = $update;
+		}
+
+		return $status;
+	}
+
+	/**
+	 * What the Updates screen shows for this entry, or null when it is current
+	 *
+	 * A column comparison, never a fetch: the sync writes the catalogue's version and the installer copies the
+	 * version it installed onto every row, so a difference between them is the whole test.
+	 *
+	 * @return array|null
+	 *
+	 * @since 7.0
+	 */
+	protected function pending_update( array $rows, ?array $catalog ): ?array {
+		$version = $catalog === null ? '' : (string) $catalog['version'];
+
+		if ( $rows === [] || $version === '' ) {
+			return null;
+		}
+
+		$installed = null;
+
+		foreach ( $rows as $row ) {
+			if ( (string) ( $row['version'] ?? '' ) !== $version ) {
+				$installed = (string) ( $row['version'] ?? '' );
+				break;
+			}
+		}
+
+		if ( $installed === null ) {
+			return null;
+		}
+
+		return [
+			'installed_version' => $installed,
+			'version'           => $version,
+			'notes'             => $catalog['notes'],
+			'released'          => $catalog['released'],
+			'files'             => (int) $catalog['files'],
+			'size'              => (int) $catalog['size'],
+		];
+	}
+
+	/**
+	 * Whether an entry has been in a live phase, unchanged, for longer than `$seconds`
+	 *
+	 * `phase_since` is written in UTC by every phase transition, so this never reads the site's timezone.
+	 *
+	 * @since 7.0
+	 */
+	protected function stalled_for( ?array $catalog, int $seconds ): bool {
+		if ( $catalog === null || ! in_array( (string) $catalog['phase'], static::LIVE_PHASES, true ) ) {
+			return false;
+		}
+
+		$since = $catalog['phase_since'];
+
+		return $since !== null && (int) strtotime( $since . ' UTC' ) < time() - $seconds;
 	}
 
 	/**
