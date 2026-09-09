@@ -138,7 +138,7 @@ trait PublishesFontIndexes {
 			$gfpdf->get_font_repository()->get_schema(),
 			$this->catalog_repository(),
 			$gfpdf->get_font_sources(),
-			new Font_Downloader( \GPDFAPI::get_log_class() ),
+			new Font_Downloader( \GPDFAPI::get_log_class(), \GPDFAPI::get_data_class() ),
 			new Font_Lock(),
 			\GPDFAPI::get_log_class(),
 			new Catalog_Font_Adopter( $gfpdf->get_font_repository(), $this->catalog_repository(), \GPDFAPI::get_log_class() ),

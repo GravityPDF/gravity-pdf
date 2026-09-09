@@ -1042,7 +1042,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function get_font_downloader(): Fonts\Font_Downloader {
 		if ( $this->font_downloader === null ) {
-			$this->font_downloader = new Fonts\Font_Downloader( $this->log );
+			$this->font_downloader = new Fonts\Font_Downloader( $this->log, $this->data );
 		}
 
 		return $this->font_downloader;
