@@ -57,7 +57,20 @@ class Coverage_Resolver {
 	/**
 	 * The entries a site's languages call for: the site language and every installed core translation
 	 *
-	 * WordPress locales are underscored and cased (`zh_TW`); the catalogue speaks mPDF's tags (`zh-tw`).
+	 * The whole set rather than the active one, because a PDF renders in whatever language its settings name and
+	 * an admin can switch the site's at any time — installing only the current one would leave the next render
+	 * short. WordPress locales are underscored and cased (`zh_TW`); the catalogue speaks mPDF's tags (`zh-tw`).
+	 *
+	 * @return array[] One `Install_Queue::enqueue_once()` request per entry
+	 *
+	 * @since 7.0
+	 */
+	public function for_site_languages(): array {
+		return $this->for_locales( array_unique( array_merge( [ get_locale() ], get_available_languages() ) ) );
+	}
+
+	/**
+	 * The entries a given list of WordPress locales calls for
 	 *
 	 * @param string[] $wp_locales
 	 *
@@ -76,7 +89,8 @@ class Coverage_Resolver {
 	 *
 	 * The language goes through `Registry`, so a PDF naming none still asks for the site's — `default_pdf_language`
 	 * has no trigger of its own. The font is read raw, since `get_default_font()` would filter it against the fonts
-	 * already registered, which is the key being asked for.
+	 * already registered, which is the key being asked for — but only when it is a string: the settings array
+	 * reaches this straight off the save, before anything has validated its shape.
 	 *
 	 * @return array[] One `Install_Queue::enqueue_once()` request per entry
 	 *
@@ -85,7 +99,7 @@ class Coverage_Resolver {
 	public function for_settings( array $pdf ): array {
 		return $this->requests(
 			array_merge(
-				$this->rows_for_font( (string) ( $pdf['font'] ?? '' ) ),
+				$this->rows_for_font( is_string( $pdf['font'] ?? null ) ? $pdf['font'] : '' ),
 				$this->rows_for_languages( [ $this->registry->get_document_language( $pdf ) ] )
 			)
 		);

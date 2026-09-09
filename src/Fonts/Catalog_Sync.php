@@ -228,6 +228,8 @@ class Catalog_Sync {
 			return false;
 		}
 
+		$was_synced = $this->has_synced();
+
 		try {
 			foreach ( $this->group_by_root() as $group ) {
 				$this->sync_root( $group['root_url'], $group['records'] );
@@ -236,7 +238,31 @@ class Catalog_Sync {
 			$this->lock->release( static::LOCK );
 		}
 
+		/*
+		 * The catch-up for a site whose egress was blocked when it was installed: there was no catalogue for the
+		 * install trigger to resolve against, so the first sync that does produce one fires it. Later syncs do not
+		 * — by then every trigger has had a catalogue to ask.
+		 */
+		if ( ! $was_synced && $this->has_synced() ) {
+			do_action( 'gfpdf_font_catalog_first_sync' );
+		}
+
 		return true;
+	}
+
+	/**
+	 * Whether any source has ever synced on this network
+	 *
+	 * @since 7.0
+	 */
+	public function has_synced(): bool {
+		foreach ( $this->get_records() as $record ) {
+			if ( (int) ( $record['synced'] ?? 0 ) > 0 ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

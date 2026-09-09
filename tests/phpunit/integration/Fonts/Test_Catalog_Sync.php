@@ -69,6 +69,50 @@ class Test_Catalog_Sync extends TestCase {
 		$this->assertSame( '', $record['last_error'] );
 	}
 
+	/**
+	 * The catch-up for a site whose egress was blocked when it was installed: the install trigger had no catalogue
+	 * to resolve against, so the first sync that produces one asks on its behalf. Later ones do not — by then
+	 * every trigger has had one.
+	 */
+	public function test_the_first_successful_sync_announces_itself_and_a_later_one_does_not() {
+		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
+
+		$announced = 0;
+		add_action(
+			'gfpdf_font_catalog_first_sync',
+			static function () use ( &$announced ): void {
+				++$announced;
+			}
+		);
+
+		$this->sync()->run();
+		$this->assertSame( 1, $announced );
+
+		$this->sync()->run();
+		$this->assertSame( 1, $announced );
+
+		remove_all_actions( 'gfpdf_font_catalog_first_sync' );
+	}
+
+	public function test_a_sync_that_never_lands_announces_nothing() {
+		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
+
+		$announced = 0;
+		add_action(
+			'gfpdf_font_catalog_first_sync',
+			static function () use ( &$announced ): void {
+				++$announced;
+			}
+		);
+
+		/* An empty GPDF_TRUST_KEYS refuses the root, so nothing was ever synced */
+		$this->sync( [] )->run();
+
+		$this->assertSame( 0, $announced );
+
+		remove_all_actions( 'gfpdf_font_catalog_first_sync' );
+	}
+
 	public function test_index_order_becomes_the_position_column() {
 		$this->publish( [ $this->pack_entry( 'zulu' ), $this->pack_entry( 'alpha' ) ] );
 		$this->sync()->run();

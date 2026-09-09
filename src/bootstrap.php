@@ -1011,7 +1011,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 7.0
 	 */
 	public function load_font_catalog_handler(): void {
-		$class = new Controller\Controller_Font_Catalog( $this->get_catalog_sync(), $this->get_install_queue(), $this->misc );
+		$class = new Controller\Controller_Font_Catalog(
+			$this->get_catalog_sync(),
+			$this->get_install_queue(),
+			$this->get_coverage_resolver(),
+			$this->misc
+		);
 		$class->init();
 
 		$this->singleton->add_class( $class );

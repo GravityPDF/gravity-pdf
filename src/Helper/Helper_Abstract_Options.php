@@ -601,6 +601,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$this->data->form_settings[ $form_id ] = $options;
 			}
 
+			/*
+			 * The chokepoint every save reaches — the admin form, the REST route, the API, duplicate and bulk — and
+			 * the only one that knows the write landed. Fired for a real write only: the settings screen calls this
+			 * with `$update_db` false to validate, and nothing has been chosen yet at that point.
+			 */
+			if ( $update_db && $did_update !== false ) {
+				do_action( 'gfpdf_post_update_pdf', $pdf, $form_id, $pdf_id );
+			}
+
 			return $did_update;
 		}
 
