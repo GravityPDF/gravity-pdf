@@ -61,14 +61,13 @@ if ( ! defined( 'GPDF_FONTS_URL' ) ) {
  *
  * Signing happens in the update-server repo, which owns the keypair and signs each published root as it uploads
  * it; this constant is the plugin's half of that contract and the only place the two repositories have to agree.
+ * The private half never leaves that repo's CI secrets and must never be in this repository.
  *
- * TODO(7.0): replace the placeholder with the real public key before release. The private half never leaves the
- * update-server repo's CI secrets and must never be in this repository. While the array is empty every sync of a
- * built-in source fails closed with `font_no_trust_keys`, which is the intended behaviour for an unconfigured
- * build rather than a reason to skip verification.
+ * Emptying the array does not disable verification, it fails every built-in source's sync closed with
+ * `font_no_trust_keys` — which is the intended behaviour for an unconfigured build, and a test pins it.
  */
 if ( ! defined( 'GPDF_TRUST_KEYS' ) ) {
-	define( 'GPDF_TRUST_KEYS', [] );
+	define( 'GPDF_TRUST_KEYS', [ 'RlK5tPJw0tz0dAsZHiL1zb++S1eqm9NvBwJ9b6zf8+M=' ] );
 }
 
 if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {

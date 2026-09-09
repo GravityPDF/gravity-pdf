@@ -17,11 +17,13 @@ in `Font_Schema`, `GPDF_FONTS_URL` and `GPDF_TRUST_KEYS` in `pdf.php`, `GPDFAPI:
 `MocksHttpRequests` / `HasCatalogRows` / `PublishesFontIndexes` test traits, and the matching `Router::get_*()`
 accessors.
 
-**`GPDF_TRUST_KEYS` ships as an empty array pending the real key** (see [[font-signing-keypair]] if that gets its
-own note). While it is empty every sync of a built-in source fails with `font_no_trust_keys` — verification fails
-closed and never degrades to origin trust, which a test pins. The keys are a constructor argument rather than read
-from the constant inside `Catalog_Sync`, so the suite signs its own roots with a throwaway `sodium_crypto_sign_keypair()`
-and exercises the real verification path.
+**`GPDF_TRUST_KEYS` now carries the real production public key** (`RlK5tPJw0tz0dAsZHiL1zb++S1eqm9NvBwJ9b6zf8+M=`,
+32 bytes base64, added 2026-09-09; the private half lives only in the update-server repo's CI secrets). Emptying
+the array does not disable verification — every built-in source's sync then fails closed with
+`font_no_trust_keys`, never degrading to origin trust, which a test pins. The keys are a **constructor argument**
+rather than read from the constant inside `Catalog_Sync`, so the suite signs its own roots with a throwaway
+`sodium_crypto_sign_keypair()` and exercises the real verification path; nothing in the suite depends on the
+constant's value, which is why filling it in changed no test.
 
 **`Font_Downloader` splits across 3a and 3b**, resolving §5's assignment of the whole class to 3b (3a cannot sync
 without it). Split by return type, not phase: 3a owns `fetch()`, the in-memory metadata read where the
@@ -152,8 +154,7 @@ Any test that fires `gfpdf_version_changed` to `7.0.0` now makes real HTTP unles
 `Test_Controller_Upgrade_Routines` case would have reached `fonts.gravitypdf.com`. The whole file mocks in
 `set_up()`.
 
-**What is left in 3a all waits on a real published tree**: the real `GPDF_TRUST_KEYS` (public half only — the
-private half never leaves the update-server repo's CI secrets); `build/font-index/packs.json`, the shipped seed,
+**What is left in 3a all waits on a real published tree**: `build/font-index/packs.json`, the shipped seed,
 which is a verbatim copy of the published `sources/packs-<sha>.json` and whose `files` hashes are hashes of real
 font files, so it cannot be written first; that seed's CI check; and the **merge gate, which is not ours** — 3a does
 not land until `npm run check:fonts staging` passes ten assertions against the staging bucket.
