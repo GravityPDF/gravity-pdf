@@ -36,4 +36,27 @@ class FlushCache {
 		$data = GPDFAPI::get_data_class();
 		$misc->cleanup_dir( $data->mpdf_tmp_location );
 	}
+
+	/**
+	 * Drop the metrics cache of one font key and its three styled faces
+	 *
+	 * mPDF regenerates a font's cache when the file's size or `useOTL` flag differs from the cached entry, which
+	 * covers an ordinary install or update. It cannot see a **same-size swap** — a variants change putting a
+	 * different 400-weight file behind Regular — so that one case has to say so explicitly.
+	 *
+	 * Four exact prefixes rather than one `<key>*` glob: `lato*` would take `latolight`'s cache with it, and
+	 * `flush()`'s whole-directory sweep forces every other font to re-parse (seconds, on a 17 MB CJK face).
+	 *
+	 * @since 7.0
+	 */
+	public static function flush_font( string $font_key ): void {
+		$misc = GPDFAPI::get_misc_class();
+		$data = GPDFAPI::get_data_class();
+
+		foreach ( [ '', 'B', 'I', 'BI' ] as $suffix ) {
+			foreach ( glob( trailingslashit( $data->mpdf_tmp_location ) . 'ttfontdata/' . $font_key . $suffix . '.*' ) ?: [] as $file ) {
+				$misc->unlink( $file );
+			}
+		}
+	}
 }
