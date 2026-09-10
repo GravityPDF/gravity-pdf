@@ -253,6 +253,84 @@ class Test_Coverage_Resolver extends TestCase {
 		$this->assertSame( [], $this->resolver->uninstalled_scripts() );
 	}
 
+	/**
+	 * A font the 6.x upgrade adopted, routed the way `Legacy_Font_Adopter` routes one
+	 */
+	protected function adopt_legacy( string $font_key, array $languages ): void {
+		$this->install_font_row( $font_key, [ 'source' => 'imported', 'meta' => [ 'legacy' => true, 'languages' => $languages ] ] );
+	}
+
+	public function test_a_script_a_legacy_font_answers_is_not_a_gap() {
+		$this->seed_catalogue();
+		$this->seed_pack( 'korean', [ 'languages' => 'ko', 'scripts' => 'ko', 'font_keys' => 'notosanskr' ] );
+		$this->adopt_legacy( 'unbatang', [ 'ko', 'kor' ] );
+
+		$this->assertSame( [ 'packs/emoji' ], $this->requested( $this->resolver->for_scripts( [ 'ko' ] ) ) );
+	}
+
+	public function test_a_locale_a_legacy_font_answers_downloads_nothing() {
+		$this->seed_catalogue();
+		$this->seed_pack( 'korean', [ 'languages' => 'ko', 'font_keys' => 'notosanskr' ] );
+		$this->adopt_legacy( 'unbatang', [ 'ko', 'kor' ] );
+
+		$this->assertSame( [ 'packs/emoji' ], $this->requested( $this->resolver->for_locales( [ 'ko_KR' ] ) ) );
+	}
+
+	public function test_only_a_legacy_row_counts_as_coverage() {
+		$this->seed_catalogue();
+		$this->seed_pack( 'korean', [ 'languages' => 'ko', 'font_keys' => 'notosanskr' ] );
+
+		/* A generic pack answering `ko` must not stop the Korean pack arriving to outrank it */
+		$this->install_font_row( 'open-sans', [ 'meta' => [ 'languages' => [ 'ko' ], 'generic' => true ] ] );
+
+		$this->assertContains( 'packs/korean', $this->requested( $this->resolver->for_locales( [ 'ko_KR' ] ) ) );
+	}
+
+	public function test_a_rung_more_specific_than_the_legacy_answer_still_installs() {
+		$this->seed_catalogue();
+		$this->adopt_legacy( 'sun-exta', [ 'zh' ] );
+
+		/* 6.x answered bare `zh` and nothing narrower, so Traditional is still a gap the ladder reaches first */
+		$this->assertContains( 'packs/chinese-traditional', $this->requested( $this->resolver->for_locales( [ 'zh_TW' ] ) ) );
+		$this->assertNotContains( 'packs/chinese-simplified', $this->requested( $this->resolver->for_locales( [ 'zh_CN' ] ) ) );
+	}
+
+	public function test_a_script_a_legacy_font_answers_is_not_worth_looking_for() {
+		$this->seed_pack( 'korean', [ 'languages' => 'ko', 'scripts' => 'ko', 'font_keys' => 'notosanskr' ] );
+		$this->adopt_legacy( 'unbatang', [ 'ko', 'kor' ] );
+
+		$this->assertSame( [], $this->resolver->uninstalled_scripts() );
+	}
+
+	public function test_deleting_the_legacy_font_makes_its_scripts_a_gap_again() {
+		$this->seed_pack( 'korean', [ 'languages' => 'ko', 'scripts' => 'ko', 'font_keys' => 'notosanskr' ] );
+		$this->adopt_legacy( 'unbatang', [ 'ko', 'kor' ] );
+
+		$this->font_repository()->delete( 'unbatang' );
+
+		$this->assertSame( [ 'ko' => true ], $this->resolver->uninstalled_scripts() );
+	}
+
+	public function test_the_pack_a_legacy_font_stands_in_for_is_named_once_it_is_the_only_route() {
+		$this->seed_pack( 'korean', [ 'languages' => 'ko', 'scripts' => 'ko', 'font_keys' => 'notosanskr' ] );
+		$this->adopt_legacy( 'unbatang', [ 'ko', 'kor' ] );
+
+		$covered = $this->resolver->legacy_covered_entries();
+
+		$this->assertCount( 1, $covered );
+		$this->assertSame( 'korean', $covered[0]['entry'] );
+		$this->assertSame( [ 'ko' ], $covered[0]['legacy_tags'] );
+		$this->assertSame( [ 'unbatang' ], $covered[0]['legacy_fonts'] );
+	}
+
+	public function test_a_pack_that_is_already_installed_is_not_stood_in_for() {
+		$this->seed_pack( 'korean', [ 'languages' => 'ko', 'scripts' => 'ko', 'font_keys' => 'notosanskr' ] );
+		$this->adopt_legacy( 'unbatang', [ 'ko', 'kor' ] );
+		$this->install_entry_row( 'notosanskr', 'korean' );
+
+		$this->assertSame( [], $this->resolver->legacy_covered_entries() );
+	}
+
 	public function test_an_entry_outside_the_coverage_set_is_never_asked_for() {
 		$this->seed_pack( 'popular-sans', [ 'coverage' => 0, 'font_keys' => 'roboto', 'languages' => 'en' ] );
 

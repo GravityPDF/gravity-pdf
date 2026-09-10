@@ -18,11 +18,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Which catalogue entries a site wants installed
  *
- * Reads the coverage rows' `always` / `languages` / `font_keys` columns and nothing else — no entry document, no
- * fetch, no `Font_Sources`, whose filter runs third-party code the render path must not depend on. Naming an
- * entry's files is the queue's job, after the auto-install gate.
+ * Reads the coverage rows' `always` / `languages` / `font_keys` columns and the font rows already installed — no
+ * entry document, no fetch, no `Font_Sources`, whose filter runs third-party code the render path must not depend
+ * on. Naming an entry's files is the queue's job, after the auto-install gate.
  *
  * It decides *what*, never *whether*: the gate and the dedup both live in `Install_Queue`.
+ *
+ * **The legacy rule.** A tag a font adopted from a 6.x install already answers is not a gap, so it is subtracted
+ * from every answer here and no trigger downloads a pack to redraw a script the site has rendered since 6.x. Only
+ * legacy rows count this way: a *generic* pack answering `he` must not stop `west-asian` installing, or the
+ * specific pack could never arrive to outrank it. Delete the legacy font and the tag is a gap again on the next
+ * render; every other route to the pack — the Font Manager, an explicit `POST`, a language override — is untouched.
  *
  * @package GFPDF\Fonts
  *
@@ -121,6 +127,7 @@ class Coverage_Resolver {
 	public function for_scripts( array $scripts ): array {
 		$matched = [];
 		$reasons = [];
+		$scripts = array_values( array_diff( $scripts, array_keys( $this->legacy_map() ) ) );
 
 		foreach ( $this->catalog->coverage_entries() as $row ) {
 			$claimed = array_values( array_intersect( $this->csv( $row['scripts'] ?? null ), $scripts ) );
@@ -150,6 +157,7 @@ class Coverage_Resolver {
 	 */
 	public function uninstalled_scripts(): array {
 		$installed = $this->repository->all();
+		$legacy    = $this->legacy_map();
 		$scripts   = [];
 
 		foreach ( $this->catalog->coverage_entries() as $row ) {
@@ -160,7 +168,9 @@ class Coverage_Resolver {
 			}
 
 			foreach ( $this->csv( $row['scripts'] ?? null ) as $tag ) {
-				$scripts[ $tag ] = true;
+				if ( ! isset( $legacy[ $tag ] ) ) {
+					$scripts[ $tag ] = true;
+				}
 			}
 		}
 
@@ -168,11 +178,81 @@ class Coverage_Resolver {
 	}
 
 	/**
+	 * The coverage entries a 6.x font is currently standing in for, with the tags and fonts that do it
+	 *
+	 * The legacy rule seen from the other side, for `Missing_Coverage_Check`: a tag one of these entries claims
+	 * never reaches `missing_scripts`, because it resolved, so the only way to offer the pack is to ask which
+	 * entries the adopted fonts are answering for. Entries with a row of their own are already installed and are
+	 * not on offer.
+	 *
+	 * @return array[] Coverage rows, each with `legacy_tags` and `legacy_fonts`
+	 *
+	 * @since 7.0
+	 */
+	public function legacy_covered_entries(): array {
+		$legacy = $this->legacy_map();
+
+		if ( $legacy === [] ) {
+			return [];
+		}
+
+		$installed = array_keys( $this->repository->all() );
+		$covered   = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$tags = array_values( array_intersect( $this->csv( $row['languages'] ?? null ), array_keys( $legacy ) ) );
+
+			if ( $tags === [] || $row['phase'] === 'removed' ) {
+				continue;
+			}
+
+			if ( array_intersect( $this->csv( $row['font_keys'] ?? null ), $installed ) !== [] ) {
+				continue;
+			}
+
+			$row['legacy_tags']  = $tags;
+			$row['legacy_fonts'] = array_values( array_unique( array_intersect_key( $legacy, array_flip( $tags ) ) ) );
+
+			$covered[] = $row;
+		}
+
+		return $covered;
+	}
+
+	/**
+	 * Every language tag a font adopted from a 6.x install answers, and the font that answers it
+	 *
+	 * The legacy rule's one input, read from the same `meta.languages` the registry routes with, so the tags this
+	 * treats as covered are exactly the ones a render resolves.
+	 *
+	 * @return array<string, string> Tag => font key
+	 *
+	 * @since 7.0
+	 */
+	protected function legacy_map(): array {
+		$tags = [];
+
+		foreach ( $this->repository->all() as $font_key => $row ) {
+			$meta = (array) ( $row['meta'] ?? [] );
+
+			if ( empty( $meta['legacy'] ) ) {
+				continue;
+			}
+
+			foreach ( (array) ( $meta['languages'] ?? [] ) as $tag ) {
+				$tags[ strtolower( (string) $tag ) ] = $font_key;
+			}
+		}
+
+		return $tags;
+	}
+
+	/**
 	 * The coverage entries claiming any of these language tags
 	 *
 	 * Most specific rung first, and every row claiming a rung comes back before the next rung is tried: `zh-tw`
 	 * names Traditional Chinese where bare `zh` names Simplified. The ladder is `Language_To_Font`'s, the same one
-	 * the render walks.
+	 * the render walks — including the legacy rule, which ends the walk when an adopted 6.x font answers the rung.
 	 *
 	 * @param string[] $languages
 	 *
@@ -190,9 +270,15 @@ class Coverage_Resolver {
 		}
 
 		$matched = [];
+		$legacy  = $this->legacy_map();
 
 		foreach ( array_unique( $languages ) as $language ) {
+			/* The same ladder the render walks, so whichever rung answers first decides here too */
 			foreach ( Language_To_Font::candidates( $language ) as $tag ) {
+				if ( isset( $legacy[ $tag ] ) ) {
+					break;
+				}
+
 				if ( isset( $by_tag[ $tag ] ) ) {
 					$matched = array_merge( $matched, $by_tag[ $tag ] );
 					break;

@@ -105,7 +105,9 @@ class Test_Font_Health_Checks extends TestCase {
 	}
 
 	protected function coverage_check(): Missing_Coverage_Check {
-		return new Missing_Coverage_Check( $this->uncovered() );
+		global $gfpdf;
+
+		return new Missing_Coverage_Check( $this->uncovered(), $gfpdf->get_coverage_resolver() );
 	}
 
 	protected function downloads_check(): Font_Downloads_Check {
@@ -169,6 +171,35 @@ class Test_Font_Health_Checks extends TestCase {
 		$this->assertSame( 'manage_options', $this->downloads_check()->get_capability() );
 
 		/* Exactly one of the two ever speaks */
+		$this->assertSame( [], $this->coverage_check()->run() );
+	}
+
+	public function test_a_pack_a_six_font_stands_in_for_is_offered_rather_than_reported() {
+		$this->insert_catalog_row( 'packs', 'korean', [ 'coverage' => 1, 'languages' => 'ko', 'font_keys' => 'notosanskr', 'size' => 6534676 ] );
+		$this->install_font_row( 'unbatang', [ 'source' => 'imported', 'meta' => [ 'legacy' => true, 'languages' => [ 'ko', 'kor' ] ] ] );
+
+		$issues = $this->coverage_check()->run();
+
+		$this->assertSame( [ 'legacy:packs/korean' ], $this->ids( $issues ) );
+		$this->assertStringContainsString( 'unbatang', $issues[0]->get_summary() );
+		$this->assertStringContainsString( 'previous version', $issues[0]->get_summary() );
+		$this->assertStringContainsString( 'MB', $issues[0]->get_details()[0] );
+
+		/* The wording a working site must never see */
+		$this->assertStringNotContainsString( 'boxes', $issues[0]->get_consequence() );
+	}
+
+	public function test_installing_the_pack_ends_the_offer() {
+		$this->insert_catalog_row( 'packs', 'korean', [ 'coverage' => 1, 'languages' => 'ko', 'font_keys' => 'notosanskr' ] );
+		$this->install_font_row( 'unbatang', [ 'source' => 'imported', 'meta' => [ 'legacy' => true, 'languages' => [ 'ko' ] ] ] );
+		$this->install_entry_row( 'notosanskr', 'korean' );
+
+		$this->assertSame( [], $this->coverage_check()->run() );
+	}
+
+	public function test_a_fresh_install_is_offered_nothing() {
+		$this->insert_catalog_row( 'packs', 'korean', [ 'coverage' => 1, 'languages' => 'ko', 'font_keys' => 'notosanskr' ] );
+
 		$this->assertSame( [], $this->coverage_check()->run() );
 	}
 

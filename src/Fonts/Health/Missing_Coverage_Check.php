@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts\Health;
 
+use GFPDF\Fonts\Coverage_Resolver;
 use GFPDF\Helper\Health\Health_Check;
 use GFPDF\Helper\Health\Health_Issue;
 
@@ -29,6 +30,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * a site that cannot reach the origin has one problem, not eight, and it is not a problem the person who builds
  * the forms can fix.
  *
+ * It has a softer half for upgraded sites. A script one of the fonts adopted from a 6.x install answers never
+ * reaches `missing_scripts`, because it resolved, so the pack that would render it better is invisible to the
+ * count above. Those entries are read from the legacy rows instead and offered rather than reported: the site is
+ * not broken, and 7.0 must not nag a working site into a download.
+ *
  * @package GFPDF\Fonts\Health
  *
  * @since 7.0
@@ -41,8 +47,15 @@ class Missing_Coverage_Check extends Health_Check {
 	 */
 	protected $entries;
 
-	public function __construct( Uncovered_Entries $entries ) {
-		$this->entries = $entries;
+	/**
+	 * @var Coverage_Resolver
+	 * @since 7.0
+	 */
+	protected $resolver;
+
+	public function __construct( Uncovered_Entries $entries, Coverage_Resolver $resolver ) {
+		$this->entries  = $entries;
+		$this->resolver = $resolver;
 	}
 
 	public function get_id(): string {
@@ -63,7 +76,55 @@ class Missing_Coverage_Check extends Health_Check {
 			return [];
 		}
 
-		return array_map( [ $this, 'entry_issue' ], $this->entries->all() );
+		$issues   = array_map( [ $this, 'entry_issue' ], $this->entries->all() );
+		$reported = [];
+
+		foreach ( $issues as $issue ) {
+			$reported[ $issue->get_id() ] = true;
+		}
+
+		foreach ( $this->resolver->legacy_covered_entries() as $row ) {
+			$id = $row['source'] . '/' . $row['entry'];
+
+			/* A pack a render already asked for is being waited on, not stood in for: one issue per entry is enough */
+			if ( ! isset( $reported[ $id ] ) ) {
+				$issues[] = $this->legacy_issue( $id, $row );
+			}
+		}
+
+		return $issues;
+	}
+
+	/**
+	 * The upgrade offer: a pack whose languages an adopted 6.x font is drawing today
+	 *
+	 * Informational, and dismissible like every other notice. The wording says what renders now before it says
+	 * what is available, because the admin's first question is whether something is wrong.
+	 *
+	 * @since 7.0
+	 */
+	protected function legacy_issue( string $id, array $row ): Health_Issue {
+		return new Health_Issue(
+			'legacy:' . $id,
+			sprintf(
+				/* translators: 1: a font pack's name, e.g. Korean, 2: a comma-separated list of font names */
+				__( '%1$s text renders with %2$s, kept from your previous version.', 'gravity-pdf' ),
+				(string) $row['label'],
+				implode( ', ', $row['legacy_fonts'] )
+			),
+			[
+				sprintf(
+					/* translators: 1: a font pack's name, 2: its download size, 3: a comma-separated list of language tags */
+					__( 'The "%1$s" pack (%2$s) has newer fonts for %3$s.', 'gravity-pdf' ),
+					(string) $row['label'],
+					size_format( (int) $row['size'] ),
+					implode( ', ', $row['legacy_tags'] )
+				),
+			],
+			__( 'Nothing is broken: those PDFs keep rendering exactly as they did before the upgrade.', 'gravity-pdf' ),
+			__( 'Install', 'gravity-pdf' ),
+			Font_Manager_Urls::entry( $id )
+		);
 	}
 
 	/**

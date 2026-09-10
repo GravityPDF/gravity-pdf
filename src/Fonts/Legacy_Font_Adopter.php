@@ -29,6 +29,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * upgrade. Every face is verified against the frozen manifest before it is written, so a truncated, replaced or
  * half-downloaded file produces no row rather than a phantom registration pointing at unusable bytes.
  *
+ * The row carries the map's language half as its `meta`, which is what makes the adopted font reachable rather
+ * than merely present: 6.x routed `ko` to UnBatang through mPDF's own `LanguageToFont`, a class 7.0 keeps out of
+ * the registry, so without this the file would sit on disk with nothing resolving to it. `meta.legacy` puts every
+ * such row in a tier below every pack (`Registry::precedence()`), so installing the Korean pack still moves Korean
+ * to it by the ordinary rule.
+ *
  * @package GFPDF\Fonts
  *
  * @since 7.0
@@ -77,6 +83,7 @@ class Legacy_Font_Adopter implements Font_Population_Pass {
 		$created    = 0;
 		$failed     = [];
 		$taken_keys = [];
+		$pending    = [];
 
 		foreach ( Legacy_Installer_Files::FAMILIES as $font_key => $family ) {
 			/*
@@ -93,9 +100,16 @@ class Legacy_Font_Adopter implements Font_Population_Pass {
 			$faces = $this->verified_faces( $family, $claimed, $failed );
 
 			/* Without a regular face there is no font: mPDF requires `R`, and a bold-only row would never render */
-			if ( ! isset( $faces['R'] ) ) {
-				continue;
+			if ( isset( $faces['R'] ) ) {
+				$pending[ $font_key ] = $faces;
 			}
+		}
+
+		/* `sip_ext` names another family, so nothing can be written until the whole pass knows what it adopted */
+		$registered = $taken + $pending;
+
+		foreach ( $pending as $font_key => $faces ) {
+			$family = Legacy_Installer_Files::FAMILIES[ $font_key ];
 
 			$row_id = $this->repository->insert(
 				[
@@ -105,14 +119,13 @@ class Legacy_Font_Adopter implements Font_Population_Pass {
 					'blog_id'     => $this->repository->current_blog_id(),
 					'use_otl'     => $family['use_otl'],
 					'use_kashida' => $family['use_kashida'],
+					'meta'        => $this->meta( $family, $registered ),
 					'files'       => $faces,
 				]
 			);
 
 			if ( $row_id > 0 ) {
 				++$created;
-
-				$taken[ $font_key ] = true;
 			}
 		}
 
@@ -135,14 +148,41 @@ class Legacy_Font_Adopter implements Font_Population_Pass {
 	}
 
 	/**
+	 * The `meta` that routes an adopted family, from the same frozen map its files came from
+	 *
+	 * @param array               $family     One `Legacy_Installer_Files::FAMILIES` entry
+	 * @param array<string, mixed> $registered Keyed by every font key this site will hold once the pass is done
+	 *
+	 * @return array<string, mixed>
+	 *
+	 * @since 7.0
+	 */
+	protected function meta( array $family, array $registered ): array {
+		$meta = [ 'legacy' => true ];
+
+		foreach ( [ 'languages', 'backup_subs', 'bmp', 'aliases' ] as $key ) {
+			if ( ! empty( $family[ $key ] ) ) {
+				$meta[ $key ] = $family[ $key ];
+			}
+		}
+
+		/* mPDF looks the named font up when it needs a Plane 2 glyph, so a name nothing answers to is worse than none */
+		if ( isset( $family['sip_ext'], $registered[ $family['sip_ext'] ] ) ) {
+			$meta['sip_ext'] = $family['sip_ext'];
+		}
+
+		return $meta;
+	}
+
+	/**
 	 * The faces of one family that are present, unclaimed and byte-for-byte what the installer wrote
 	 *
 	 * The manifest lists `R` first for every family, and a family without it is dropped, so a failed regular face
 	 * returns immediately rather than hashing up to three more files for a row that will not be written.
 	 *
-	 * @param array{use_otl: int, use_kashida: int, faces: array<string, array{name: string, blob: string, size: int}>} $family
-	 * @param array<string, true>                                                                                      $claimed
-	 * @param string[]                                                                                                 $failed Filenames present but not what the manifest describes, appended to
+	 * @param array               $family  One `Legacy_Installer_Files::FAMILIES` entry
+	 * @param array<string, true> $claimed
+	 * @param string[]            $failed  Filenames present but not what the manifest describes, appended to
 	 *
 	 * @return array<string, array{path: string, size: int}>
 	 *

@@ -1150,7 +1150,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			$this->health_runner = new Helper\Health\Health_Runner(
 				[
-					new Fonts\Health\Missing_Coverage_Check( $uncovered ),
+					new Fonts\Health\Missing_Coverage_Check( $uncovered, $this->get_coverage_resolver() ),
 					new Fonts\Health\Font_Downloads_Check( $uncovered ),
 					new Fonts\Health\Missing_Font_Files_Check( $this->get_font_repository(), $this->get_font_registry(), $configured ),
 					new Fonts\Health\Unregistered_Font_Check( $this->get_font_registry(), $this->get_catalog_repository(), $configured ),

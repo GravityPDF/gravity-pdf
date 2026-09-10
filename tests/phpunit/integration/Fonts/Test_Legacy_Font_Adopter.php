@@ -144,6 +144,66 @@ class Test_Legacy_Font_Adopter extends TestCase {
 		$this->assertSame( 'custom', $this->repository->get( 'dejavusans' )['source'] );
 	}
 
+	public function test_the_adopted_row_carries_the_settings_that_reached_the_font() {
+		$this->drop( 'DejaVuSansCondensed.ttf' );
+
+		$this->adopter->run();
+
+		$meta = $this->repository->get( 'dejavusanscondensed' )['meta'];
+
+		$this->assertTrue( $meta['legacy'] );
+		$this->assertTrue( $meta['backup_subs'] );
+		$this->assertTrue( $meta['bmp'] );
+		$this->assertContains( 'ru', $meta['languages'] );
+		$this->assertContains( 'und-latn', $meta['languages'] );
+
+		/* Only `sun-exta` declares one, and mPDF looks the name up, so nothing else may carry it */
+		$this->assertArrayNotHasKey( 'sip_ext', $meta );
+	}
+
+	public function test_a_family_six_never_routed_is_adopted_without_a_language() {
+		$this->drop( 'DejaVuSerifCondensed.ttf' );
+
+		$this->adopter->run();
+
+		$meta = $this->repository->get( 'dejavuserifcondensed' )['meta'];
+
+		$this->assertTrue( $meta['legacy'] );
+		$this->assertArrayNotHasKey( 'languages', $meta );
+	}
+
+	public function test_the_backup_substitution_fonts_are_sixes_own_three_in_order() {
+		$keys = array_keys( array_filter( Legacy_Installer_Files::FAMILIES, static fn( array $f ): bool => ! empty( $f['backup_subs'] ) ) );
+
+		/* mPDF walks them in this order, and they arrive in it because the map is keyed alphabetically */
+		$this->assertSame( [ 'dejavusanscondensed', 'freesans', 'sun-exta' ], $keys );
+	}
+
+	public function test_a_sip_extension_only_ever_names_a_family_the_map_can_adopt() {
+		foreach ( Legacy_Installer_Files::FAMILIES as $font_key => $family ) {
+			if ( isset( $family['sip_ext'] ) ) {
+				$this->assertArrayHasKey( $family['sip_ext'], Legacy_Installer_Files::FAMILIES, $font_key );
+			}
+		}
+	}
+
+	public function test_no_language_is_routed_to_two_families() {
+		$seen = [];
+
+		foreach ( Legacy_Installer_Files::FAMILIES as $font_key => $family ) {
+			foreach ( $family['languages'] ?? [] as $code ) {
+				$this->assertSame( strtolower( $code ), $code, $font_key );
+				$this->assertArrayNotHasKey( $code, $seen, $code );
+
+				$seen[ $code ] = $font_key;
+			}
+		}
+
+		/* 6.x's whole map less `und-mtei`, whose font — `eeyekunicode` — the installer never shipped */
+		$this->assertCount( 172, $seen );
+		$this->assertArrayNotHasKey( 'und-mtei', $seen );
+	}
+
 	public function test_every_manifest_entry_names_a_regular_face() {
 		foreach ( Legacy_Installer_Files::FAMILIES as $font_key => $family ) {
 			$this->assertArrayHasKey( 'R', $family['faces'], $font_key );
