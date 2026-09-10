@@ -112,6 +112,12 @@ class Install_Queue extends Helper_Abstract_Queue {
 	 */
 	protected $registry;
 
+	/**
+	 * @var array<string, true>|null The installed paths, for the length of one `enqueue()`
+	 * @since 7.0
+	 */
+	protected $claimed;
+
 	public function __construct(
 		Font_Repository $repository,
 		Catalog_Repository $catalog,
@@ -169,10 +175,12 @@ class Install_Queue extends Helper_Abstract_Queue {
 	}
 
 	/**
-	 * Queue every request in a resolver's answer
+	 * Queue every request in a resolver's answer, whole and in the background
 	 *
 	 * What the triggers that are not a render all do with one: each request is claimed on its own, so an entry
-	 * already in flight costs nothing and the rest still go.
+	 * already in flight costs nothing and the rest still go. A request's `scripts` is dropped here rather than by
+	 * each caller, because that reason is what makes `enqueue_for_render()` hold faces back for its own fetch —
+	 * and a caller that forgot to strip it would lose them from both halves.
 	 *
 	 * @param array[] $requests
 	 *
@@ -184,6 +192,8 @@ class Install_Queue extends Helper_Abstract_Queue {
 		$queued = 0;
 
 		foreach ( $requests as $request ) {
+			unset( $request['scripts'] );
+
 			if ( $this->enqueue_once( $request ) ) {
 				++$queued;
 			}
@@ -221,6 +231,8 @@ class Install_Queue extends Helper_Abstract_Queue {
 	 * @since 7.0
 	 */
 	protected function enqueue( array $request, bool $manual ): array {
+		$this->claimed = null;
+
 		$nothing = [
 			'queued' => false,
 			'inline' => [],
@@ -236,9 +248,10 @@ class Install_Queue extends Helper_Abstract_Queue {
 			return $nothing;
 		}
 
-		$items  = [];
-		$inline = [];
-		$force  = ! empty( $request['force'] );
+		$items         = [];
+		$inline        = [];
+		$force         = ! empty( $request['force'] );
+		$this->claimed = $this->repository->claimed_filenames();
 
 		/* Asked before the entry is read, so a trigger firing at an install already in flight costs one indexed row */
 		if ( ! $this->catalog->is_claimable( $source, $entry, $manual ) ) {
@@ -469,7 +482,8 @@ class Install_Queue extends Helper_Abstract_Queue {
 			return $files;
 		}
 
-		$claimed = $this->repository->claimed_filenames();
+		/* Walked once per enqueue rather than once per call: the read is memoised, the walk over it is not */
+		$claimed = $this->claimed ?? $this->repository->claimed_filenames();
 		$pending = [];
 
 		foreach ( $files as $name ) {

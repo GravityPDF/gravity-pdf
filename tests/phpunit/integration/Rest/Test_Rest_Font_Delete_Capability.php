@@ -52,8 +52,17 @@ class Test_Rest_Font_Delete_Capability extends Test_Rest {
 		parent::tear_down();
 	}
 
+	/**
+	 * The rule lives on the route base, where the request it is about does
+	 */
 	protected function capability_for( array $font = [] ): string {
-		return $this->font_repository()->file_delete_capability( $font );
+		$method = new \ReflectionMethod( \GFPDF\Rest\Rest_Font_Base::class, 'file_delete_capability' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		return (string) $method->invoke( GPDFAPI::get_mvc_class( 'Rest_Custom_Fonts' ), $font );
 	}
 
 	public function test_a_single_site_asks_for_nothing_more_than_editing_forms() {

@@ -211,7 +211,16 @@ class Health_Runner {
 	 * @since 7.0
 	 */
 	public static function first_seen_in( array $report, string $check_id ): array {
-		return array_map( 'intval', (array) ( $report['checks'][ $check_id ]['first_seen'] ?? [] ) );
+		return static::first_seen( (array) ( $report['checks'][ $check_id ] ?? [] ) );
+	}
+
+	/**
+	 * @return array<string, int>
+	 *
+	 * @since 7.0
+	 */
+	protected static function first_seen( array $entry ): array {
+		return array_map( 'intval', (array) ( $entry['first_seen'] ?? [] ) );
 	}
 
 	/**
@@ -222,7 +231,7 @@ class Health_Runner {
 	 * @since 7.0
 	 */
 	protected function record( array $issues, array $previous, int $now ): array {
-		$known      = array_map( 'intval', (array) ( $previous['first_seen'] ?? [] ) );
+		$known      = static::first_seen( $previous );
 		$first_seen = [];
 		$written    = [];
 

@@ -47,6 +47,23 @@ class Sequential_Font_Downloader extends Font_Downloader {
 }
 
 /**
+ * A detector that records whether anybody asked it
+ */
+class Counting_Script_Detector extends Script_Detector {
+
+	/**
+	 * @var int
+	 */
+	public $calls = 0;
+
+	public function detect( array $wanted, array $text ): array {
+		++$this->calls;
+
+		return parent::detect( $wanted, $text );
+	}
+}
+
+/**
  * What a PDF installs while it is being drawn
  *
  * @package   GFPDF\Fonts
@@ -73,6 +90,11 @@ class Test_Render_Font_Trigger extends TestCase {
 	public $downloader;
 
 	/**
+	 * @var Counting_Script_Detector
+	 */
+	public $detector;
+
+	/**
 	 * @var string
 	 */
 	public $font_dir;
@@ -88,8 +110,10 @@ class Test_Render_Font_Trigger extends TestCase {
 		$this->font_dir   = $gfpdf->get_font_repository()->get_font_dir();
 		$this->downloader = new Sequential_Font_Downloader( $gfpdf->log, $gfpdf->data );
 
+		$this->detector = new Counting_Script_Detector();
+
 		$this->trigger = new Render_Font_Trigger(
-			$gfpdf->get_script_detector(),
+			$this->detector,
 			$gfpdf->get_coverage_resolver(),
 			$this->install_queue(),
 			new Font_Installer(
@@ -190,6 +214,27 @@ class Test_Render_Font_Trigger extends TestCase {
 		/* The rest follows this PDF rather than delaying it */
 		$this->assertSame( [ 'JP-Bold.ttf' ], array_column( $this->queued(), 'name' ) );
 		$this->assertSame( 'installing', $this->status()['phase'] );
+	}
+
+	/**
+	 * The steady state, and the whole reason this is affordable on the render path: with every pack installed
+	 * there is nothing worth looking for, so the document is never read
+	 */
+	public function test_a_provisioned_site_never_reads_the_document() {
+		$this->seed_pack();
+		$this->install_font_row( 'notosansjp' );
+
+		$this->render();
+
+		$this->assertSame( 0, $this->detector->calls );
+	}
+
+	public function test_a_document_is_read_when_something_is_still_missing() {
+		$this->seed_pack();
+
+		$this->render( 'Hello world' );
+
+		$this->assertSame( 1, $this->detector->calls );
 	}
 
 	public function test_a_latin_submission_asks_the_network_for_nothing() {

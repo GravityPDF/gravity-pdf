@@ -85,6 +85,9 @@ class Test_Logger extends TestCase {
 		$handlers = $logger->getHandlers();
 		$this->assertCount( 1, $handlers );
 		$this->assertInstanceOf( 'GFPDF\Helper\Log\Option_Ring_Handler', $handlers[0] );
+
+		/* Errors only: anything below that is the verbose tier, and it is off unless the user asked for it */
+		$this->assertSame( \GFPDF_Vendor\Monolog\Logger::ERROR, $handlers[0]->getLevel() );
 	}
 
 	public function test_setup_gravityforms_logging_no_op_when_log_level_is_off() {
@@ -103,6 +106,9 @@ class Test_Logger extends TestCase {
 		$handlers = $logger->getHandlers();
 		$this->assertCount( 1, $handlers );
 		$this->assertInstanceOf( 'GFPDF\Helper\Log\Option_Ring_Handler', $handlers[0] );
+
+		/* Errors only: anything below that is the verbose tier, and it is off unless the user asked for it */
+		$this->assertSame( \GFPDF_Vendor\Monolog\Logger::ERROR, $handlers[0]->getLevel() );
 	}
 
 	/**

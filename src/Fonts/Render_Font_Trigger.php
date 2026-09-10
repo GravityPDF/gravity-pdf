@@ -124,7 +124,11 @@ class Render_Font_Trigger {
 	 * @since 7.0
 	 */
 	public function before_render( array $form, array $entry, array $settings ): array {
-		$scripts = $this->detector->detect( ...$this->strings( $form, $entry, $settings ) );
+		$scripts = $this->detect(
+			function () use ( $form, $entry, $settings ): array {
+				return $this->strings( $form, $entry, $settings );
+			}
+		);
 
 		if ( $scripts === [] ) {
 			return [];
@@ -170,7 +174,38 @@ class Render_Font_Trigger {
 	 * @since 7.0
 	 */
 	public function after_render( string $html ): void {
-		$this->install( $this->detector->detect( $html ), false );
+		$this->install(
+			$this->detect(
+				static function () use ( $html ): array {
+					return [ $html ];
+				}
+			),
+			false
+		);
+	}
+
+	/**
+	 * The scripts this document uses that the site has no font for
+	 *
+	 * The catalogue is asked first and the document is only read if it answers with something — on a provisioned
+	 * site that is the whole cost, and it is two cached reads. Collecting the strings is deferred behind a closure
+	 * for the same reason: a 200-field entry is a few hundred of them, and the usual answer is that nobody needs
+	 * to look.
+	 *
+	 * @param callable(): string[] $text
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	protected function detect( callable $text ): array {
+		$wanted = $this->resolver->uninstalled_scripts();
+
+		if ( $wanted === [] ) {
+			return [];
+		}
+
+		return $this->detector->detect( $wanted, $text() );
 	}
 
 	/**
@@ -179,14 +214,15 @@ class Render_Font_Trigger {
 	 * @since 7.0
 	 */
 	protected function install( array $scripts, bool $inline ): void {
-		if ( $scripts === [] ) {
+		/* Asked here as well as in the queue: with it off there is no point resolving the entries either */
+		if ( $scripts === [] || ! $this->registry->auto_install_enabled() ) {
 			return;
 		}
 
 		$requests = $this->resolver->for_scripts( $scripts );
 
 		if ( ! $inline || ! $this->within_budget() ) {
-			$this->queue_all( $requests );
+			$this->queue->enqueue_all( $requests );
 
 			return;
 		}
@@ -209,29 +245,6 @@ class Render_Font_Trigger {
 		} finally {
 			$this->lock->release( static::SLOT );
 		}
-	}
-
-	/**
-	 * Ask for the whole of every entry, in the background
-	 *
-	 * What a request means once its reason cannot be acted on: dropping `scripts` is what turns trigger 3's
-	 * selector back into the plain "all of it, later" the other triggers use.
-	 *
-	 * @param array[] $requests
-	 *
-	 * @since 7.0
-	 */
-	protected function queue_all( array $requests ): void {
-		$this->queue->enqueue_all(
-			array_map(
-				static function ( array $request ): array {
-					unset( $request['scripts'] );
-
-					return $request;
-				},
-				$requests
-			)
-		);
 	}
 
 	/**

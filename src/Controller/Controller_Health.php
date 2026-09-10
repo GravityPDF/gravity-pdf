@@ -47,7 +47,6 @@ class Controller_Health extends Helper_Abstract_Controller {
 	 */
 	protected $runner;
 
-
 	/**
 	 * @var Model_Actions
 	 * @since 7.0
@@ -105,8 +104,8 @@ class Controller_Health extends Helper_Abstract_Controller {
 	 * One notice route per check
 	 *
 	 * The route table is built twice on every `admin_init`, before any condition runs, so nothing here may read:
-	 * every value is either a constant or a closure. That is also why a check's capability has to be a property of
-	 * the check rather than of what it happened to find.
+	 * every value is either a constant or a closure. That is also why a check's capability and its button text
+	 * have to be properties of the check rather than of what it happened to find.
 	 *
 	 * @since 7.0
 	 */
@@ -124,7 +123,7 @@ class Controller_Health extends Helper_Abstract_Controller {
 	protected function route( Health_Check_Interface $check ): array {
 		return [
 			'action'      => 'health_' . $check->get_id(),
-			'action_text' => esc_html__( 'View the system report', 'gravity-pdf' ),
+			'action_text' => $check->get_action_text(),
 			'capability'  => $check->get_capability(),
 			'view_class'  => 'notice-warning',
 
@@ -132,7 +131,12 @@ class Controller_Health extends Helper_Abstract_Controller {
 				return $this->should_notice( $check );
 			},
 
-			'process'     => [ $this->actions, 'system_report_redirect' ],
+			/* Whatever the check has to do, then the report — which is where an admin can see whether it worked */
+			'process'     => function () use ( $check ): void {
+				$check->act();
+
+				$this->actions->system_report_redirect();
+			},
 
 			/* Against what it said, not against itself: a new problem has to raise it again */
 			'dismiss'     => function () use ( $check ): void {
@@ -191,8 +195,8 @@ class Controller_Health extends Helper_Abstract_Controller {
 	 * What the notice would show
 	 *
 	 * Asked three times per notice — for the condition, for the dismissal key and for the view — and deliberately
-	 * not memoised here: the report is an autoloaded option WordPress already caches, and the one check that
-	 * queries instead shares a collaborator that reads its rows once.
+	 * not memoised: the report is an autoloaded option WordPress already caches, and the checks that answer live
+	 * share a collaborator that reads their rows once. A memo would outlive the request on a container singleton.
 	 *
 	 * @return Health_Issue[]
 	 *

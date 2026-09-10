@@ -404,13 +404,6 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	}
 
 	/**
-	 * @param WP_REST_Request $request Untyped, as `update_item()` above
-	 *
-	 * @return void|WP_Error
-	 *
-	 * @since 6.0
-	 */
-	/**
 	 * The capability check, plus the multisite one for unlinking this row's files
 	 *
 	 * Here rather than in `delete_item()` so that `GPDFAPI::delete_pdf_font()` keeps working the way
@@ -437,6 +430,13 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 		return $this->refuse_file_delete( $font ) ?? true;
 	}
 
+	/**
+	 * @param WP_REST_Request $request Untyped, as `update_item()` above
+	 *
+	 * @return void|WP_Error
+	 *
+	 * @since 6.0
+	 */
 	public function delete_item( $request ) {
 		try {
 			$id = $request->get_param( 'id' );

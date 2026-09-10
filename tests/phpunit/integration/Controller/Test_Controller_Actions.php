@@ -58,7 +58,7 @@ class Test_Controller_Actions extends TestCase {
 		/* Everything else registers through the filter: the deprecation notice, the health checks, the queue */
 		$this->assertContains( 'deprecated_features', $actions );
 		$this->assertContains( 'health_missing_coverage', $actions );
-		$this->assertContains( 'font_install_stalled', $actions );
+		$this->assertContains( 'health_install_stalled', $actions );
 	}
 
 	/**

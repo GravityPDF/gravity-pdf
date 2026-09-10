@@ -55,7 +55,7 @@ class Test_Font_Report extends TestCase {
 		$this->install_queue()->clear_queue();
 
 		Option_Ring_Handler::clear();
-		delete_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION );
+		delete_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION . 'gravitypdf_fonts' );
 		delete_site_option( Health_Runner::OPTION );
 
 		parent::tear_down();
@@ -75,7 +75,10 @@ class Test_Font_Report extends TestCase {
 
 		$this->assertSame( 'custom: 1, packs: 1', $this->value( $items, 'installed_fonts' ) );
 		$this->assertStringContainsString( 'fonts', $this->value( $items, 'font_folder_location' ) );
-		$this->assertSame( 'Writable', $this->value( $items, 'font_folder_writable' ) );
+
+		/* Built like the Temporary Folder row it sits below: the icon in the value, the plain word in the export */
+		$this->assertStringContainsString( 'Writable', $this->value( $items, 'font_folder_writable' ) );
+		$this->assertSame( 'Writable', $items['font_folder_writable']['value_export'] );
 	}
 
 	public function test_the_fonts_section_names_every_registered_source_and_when_it_last_synced() {
@@ -92,6 +95,34 @@ class Test_Font_Report extends TestCase {
 
 	public function test_a_site_with_no_packs_says_so() {
 		$this->assertSame( 'None installed', $this->value( $this->report->fonts(), 'language_packs' ) );
+	}
+
+	/**
+	 * The report reads the same statuses the Font Manager's poller does, and must not re-dispatch anything
+	 */
+	public function test_the_report_never_dispatches_a_batch() {
+		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1 ] );
+		$this->catalog_repository()->set_status(
+			'packs',
+			'emoji',
+			[
+				'phase'       => 'queued',
+				'phase_since' => gmdate( 'Y-m-d H:i:s', time() - Install_Queue::STALLED_AFTER - 60 ),
+			]
+		);
+
+		$this->install_queue()->push_to_queue(
+			[
+				'source' => 'packs',
+				'entry'  => 'emoji',
+				'name'   => 'Noto.ttf',
+			]
+		)->save();
+
+		$this->block_dispatch();
+		$this->report->fonts();
+
+		$this->assertSame( 0, $this->dispatches() );
 	}
 
 	/**
@@ -119,7 +150,7 @@ class Test_Font_Report extends TestCase {
 	}
 
 	public function test_the_background_section_carries_the_last_loopback_failure() {
-		update_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION, 'cURL error 7', false );
+		update_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION . 'gravitypdf_fonts', 'cURL error 7', false );
 
 		$this->assertSame( 'cURL error 7', $this->value( $this->report->background_installs(), 'dispatch_error' ) );
 	}

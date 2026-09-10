@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts\Health;
 
-use GFAPI;
+use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 
 /**
@@ -38,6 +38,12 @@ class Configured_Fonts {
 	public const SETTINGS = [ 'font', 'watermark_font' ];
 
 	/**
+	 * @var Helper_Abstract_Form
+	 * @since 7.0
+	 */
+	protected $gform;
+
+	/**
 	 * @var Helper_Abstract_Options
 	 * @since 7.0
 	 */
@@ -49,7 +55,8 @@ class Configured_Fonts {
 	 */
 	protected $usage;
 
-	public function __construct( Helper_Abstract_Options $options ) {
+	public function __construct( Helper_Abstract_Form $gform, Helper_Abstract_Options $options ) {
+		$this->gform   = $gform;
 		$this->options = $options;
 	}
 
@@ -76,14 +83,9 @@ class Configured_Fonts {
 			$this->usage[ $default ][] = __( 'The site-wide default font', 'gravity-pdf' );
 		}
 
-		foreach ( (array) GFAPI::get_forms() as $form ) {
-			$pdfs = $this->options->get_form_pdfs( (int) $form['id'] );
-
-			if ( is_wp_error( $pdfs ) ) {
-				continue;
-			}
-
-			foreach ( (array) $pdfs as $pdf ) {
+		/* The PDFs are already on the form meta, so reading them back through `get_form_pdfs()` would fetch it twice */
+		foreach ( (array) $this->gform->get_forms() as $form ) {
+			foreach ( (array) ( $form['gfpdf_form_settings'] ?? [] ) as $pdf ) {
 				$this->add_pdf( (array) $form, (array) $pdf );
 			}
 		}

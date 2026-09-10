@@ -176,7 +176,7 @@ class Font_Installer {
 	 *
 	 * @since 7.0
 	 */
-	public function plan_for( string $id, array $install = [] ) {
+	public function plan_for( string $id ) {
 		[ $source, $entry ] = Font_Sources::split( $id );
 
 		$resolved = $this->resolve( $source, $entry );
@@ -188,7 +188,7 @@ class Font_Installer {
 		$files = (array) ( $resolved['data']['files'] ?? [] );
 		$plan  = [];
 
-		foreach ( $this->targets( $resolved['data'], $install ) as $name => $roles ) {
+		foreach ( $this->targets( $resolved['data'], [] ) as $name => $roles ) {
 			$plan[ (string) $name ] = [
 				'size'  => (int) ( $files[ $name ]['size'] ?? 0 ),
 				'roles' => $roles,
@@ -197,7 +197,6 @@ class Font_Installer {
 
 		return $plan;
 	}
-
 
 	/**
 	 * The filenames each of several installs of one entry resolves to, in the order given

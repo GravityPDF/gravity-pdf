@@ -60,16 +60,6 @@ class Option_Ring_Handler extends AbstractProcessingHandler {
 	protected $pending = [];
 
 	/**
-	 * Errors only by default, where Monolog's own default is everything
-	 *
-	 * @since 7.0
-	 */
-	/* phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod.Found -- the default level is the point */
-	public function __construct( int $level = MonoLogger::ERROR, bool $bubble = true ) {
-		parent::__construct( $level, $bubble );
-	}
-
-	/**
 	 * @since 7.0
 	 */
 	public static function get_errors(): array {

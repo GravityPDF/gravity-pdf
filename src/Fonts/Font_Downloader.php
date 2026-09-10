@@ -300,13 +300,12 @@ class Font_Downloader {
 		$results  = [];
 		$requests = [];
 		$parts    = [];
-		$http     = new WP_Http();
 
 		foreach ( $files as $key => $file ) {
 			$url  = $this->request_url( (string) ( $file['url'] ?? '' ), $file );
 			$size = (int) ( $file['size'] ?? 0 );
 
-			$error = $this->check_batch_url( $url, $http ) ?? $this->check_disk_space( $url, $size );
+			$error = $this->check_batch_url( $url ) ?? $this->check_disk_space( $url, $size );
 
 			if ( $error !== null ) {
 				$results[ $key ] = $error;
@@ -420,7 +419,7 @@ class Font_Downloader {
 	 *
 	 * @since 7.0
 	 */
-	protected function check_batch_url( string $url, WP_Http $http ): ?WP_Error {
+	protected function check_batch_url( string $url ): ?WP_Error {
 		$error = $this->check_url( $url );
 
 		if ( $error !== null ) {
@@ -431,7 +430,7 @@ class Font_Downloader {
 			return new WP_Error( 'font_invalid_url', sprintf( '%s is not a URL WordPress will request', $url ) );
 		}
 
-		if ( $http->block_request( $url ) ) {
+		if ( ( new WP_Http() )->block_request( $url ) ) {
 			return new WP_Error( 'http_request_not_executed', sprintf( 'Requests to %s are blocked by this site', $url ) );
 		}
 

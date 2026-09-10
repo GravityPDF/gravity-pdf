@@ -503,11 +503,6 @@ class Catalog_Sync {
 	}
 
 	/**
-	 * Every source's sync state, keyed by source id
-	 *
-	 * @since 7.0
-	 */
-	/**
 	 * The registered records, for a caller that wants to walk them
 	 *
 	 * @since 7.0
@@ -541,6 +536,8 @@ class Catalog_Sync {
 	}
 
 	/**
+	 * Every source's sync state, keyed by source id
+	 *
 	 * @since 7.0
 	 */
 	public function get_records(): array {

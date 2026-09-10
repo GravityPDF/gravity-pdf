@@ -35,6 +35,11 @@ class Test_Script_Detector extends TestCase {
 	 */
 	public $detector;
 
+	/**
+	 * @var Coverage_Resolver
+	 */
+	public $resolver;
+
 	public function set_up(): void {
 		global $gfpdf;
 
@@ -44,6 +49,14 @@ class Test_Script_Detector extends TestCase {
 		$this->drop_catalog_rows();
 
 		$this->detector = $gfpdf->get_script_detector();
+		$this->resolver = $gfpdf->get_coverage_resolver();
+	}
+
+	/**
+	 * The caller asks the catalogue what is worth looking for; this class only answers what is there
+	 */
+	protected function detect( string ...$text ): array {
+		return $this->detector->detect( $this->resolver->uninstalled_scripts(), $text );
 	}
 
 	public function tear_down(): void {
@@ -95,7 +108,7 @@ class Test_Script_Detector extends TestCase {
 	public function test_a_documents_scripts( string $text, array $expected ) {
 		$this->seed_catalogue();
 
-		$this->assertSame( $expected, $this->detector->detect( $text ) );
+		$this->assertSame( $expected, $this->detect( $text ) );
 	}
 
 	public function test_a_mixed_document_names_each_script_once() {
@@ -103,7 +116,7 @@ class Test_Script_Detector extends TestCase {
 
 		$this->assertSame(
 			[ 'ja', 'und-hans' ],
-			$this->detector->detect( 'Hello', 'ひらがな です', '漢字', 'かな' )
+			$this->detect( 'Hello', 'ひらがな です', '漢字', 'かな' )
 		);
 	}
 
@@ -121,11 +134,11 @@ class Test_Script_Detector extends TestCase {
 			]
 		);
 
-		$this->assertSame( [ 'ja' ], $this->detector->detect( 'ひらがな' ) );
+		$this->assertSame( [ 'ja' ], $this->detect( 'ひらがな' ) );
 
 		$this->install_font_row( 'notosansjp' );
 
-		$this->assertSame( [], $this->detector->detect( 'ひらがな' ) );
+		$this->assertSame( [], $this->detect( 'ひらがな' ) );
 	}
 
 	public function test_a_script_no_catalogue_entry_claims_is_not_reported() {
@@ -139,7 +152,7 @@ class Test_Script_Detector extends TestCase {
 			]
 		);
 
-		$this->assertSame( [], $this->detector->detect( 'مرحبا' ) );
+		$this->assertSame( [], $this->detect( 'مرحبا' ) );
 	}
 
 	/**
@@ -148,7 +161,7 @@ class Test_Script_Detector extends TestCase {
 	public function test_text_that_is_not_utf8_asks_for_nothing() {
 		$this->seed_catalogue();
 
-		$this->assertSame( [], $this->detector->detect( "\xC3\x28" ) );
+		$this->assertSame( [], $this->detect( "\xC3\x28" ) );
 	}
 
 	/**
@@ -160,7 +173,7 @@ class Test_Script_Detector extends TestCase {
 		$values = array_fill( 0, 200, 'The quick brown fox jumps over the lazy dog, 0123456789.' );
 
 		$start = microtime( true );
-		$this->detector->detect( ...$values );
+		$this->detect( ...$values );
 		$elapsed = ( microtime( true ) - $start ) * 1000;
 
 		$this->assertLessThan( 2, $elapsed );
