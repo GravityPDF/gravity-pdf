@@ -261,6 +261,19 @@ class Test_Catalog_Sync extends TestCase {
 		$this->assertStringContainsString( 'evil', $this->sync()->get_record( 'packs' )['last_error'] );
 	}
 
+	public function test_a_role_no_file_row_could_carry_refuses_the_whole_index() {
+		$bad = $this->pack_entry( 'evil' );
+
+		/* `Bl` for `BI`: `insert_file()` refuses it, so it must never become a row to install from (§11 D1) */
+		$bad['entry']['fonts'] = [ 'notoemoji' => [ 'R' => 'A.ttf', 'Bl' => 'A.ttf' ] ];
+
+		$this->publish( [ $this->pack_entry( 'emoji' ), $bad ] );
+		$this->sync()->run();
+
+		$this->assertSame( 0, $this->catalog_repository()->search( 'packs' )['total'] );
+		$this->assertStringContainsString( 'Bl', $this->sync()->get_record( 'packs' )['last_error'] );
+	}
+
 	public function test_an_index_whose_hash_does_not_match_the_root_is_refused() {
 		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
 

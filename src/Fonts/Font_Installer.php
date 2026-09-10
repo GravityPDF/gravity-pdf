@@ -448,7 +448,11 @@ class Font_Installer {
 				return $this->fail( $source, $entry, $path );
 			}
 
-			$this->write_rows( $resolved, $install, $targets[ $name ], $path, $file );
+			$unrecorded = $this->write_rows( $resolved, $install, $targets[ $name ], $path, $file );
+
+			if ( $unrecorded !== null ) {
+				return $this->fail( $source, $entry, $unrecorded );
+			}
 
 			if ( $this->install_complete( $resolved, $install, array_keys( $targets ) ) ) {
 				$unparseable = $this->warm( $source, $entry );
@@ -731,11 +735,18 @@ class Font_Installer {
 	 * One write, no branch on the source. An entry update rewrites `meta`, `version` and the OTL flags in the same
 	 * upsert as the file rows it replaces.
 	 *
+	 * A file row that cannot be written fails the install. `install_complete()` is satisfied only once every
+	 * downloaded file is claimed by a row, so a discarded `false` here left the entry `installing` for good —
+	 * never retried, never surfaced, and not self-healing under the Font Manager's Retry, which re-POSTs the same
+	 * install (§11 D1).
+	 *
 	 * @param array $targets `{ font_key: { role: variant } }` for this one file
+	 *
+	 * @return WP_Error|null The reason a row could not be written, or null when every one landed
 	 *
 	 * @since 7.0
 	 */
-	protected function write_rows( array $resolved, array $install, array $targets, string $path, array $file ): void {
+	protected function write_rows( array $resolved, array $install, array $targets, string $path, array $file ): ?WP_Error {
 		foreach ( $targets as $font_key => $roles ) {
 			$font = $this->upsert_font( $resolved, $install, (string) $font_key );
 
@@ -748,7 +759,7 @@ class Font_Installer {
 			foreach ( $roles as $role => $variant ) {
 				$replaced = $this->repository->path_for_role( $font['id'], (string) $role );
 
-				$this->repository->insert_file(
+				$written = $this->repository->insert_file(
 					$font['id'],
 					(string) $role,
 					[
@@ -759,6 +770,13 @@ class Font_Installer {
 						'missing' => 0,
 					]
 				);
+
+				if ( ! $written ) {
+					return new WP_Error(
+						'font_file_unrecorded',
+						sprintf( '%s could not be recorded as the "%s" of %s', $path, (string) $role, $font['key'] )
+					);
+				}
 
 				if ( $replaced === null || $replaced === $path ) {
 					continue;
@@ -780,6 +798,8 @@ class Font_Installer {
 				FlushCache::flush_font( $font['key'] );
 			}
 		}
+
+		return null;
 	}
 
 	/**

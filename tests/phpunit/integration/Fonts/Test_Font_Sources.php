@@ -41,7 +41,7 @@ class Test_Font_Sources extends TestCase {
 	 * class-load fatal that PHPUnit reports as a bare exit 255.
 	 */
 	protected function valid_entry( array $overrides = [] ): array {
-		return array_merge(
+		$entry = array_merge(
 			[
 				'fonts' => [
 					'notosanssc' => [
@@ -61,6 +61,13 @@ class Test_Font_Sources extends TestCase {
 			],
 			$overrides
 		);
+
+		/* A coverage map may only name a key the entry registers, so a swapped `fonts` takes the map with it */
+		if ( isset( $overrides['fonts'] ) && ! isset( $overrides['language_to_font'] ) ) {
+			$entry['language_to_font'] = [ 'zh' => (string) array_key_first( (array) $entry['fonts'] ) ];
+		}
+
+		return $entry;
 	}
 
 	public function test_the_packs_record_is_registered() {
@@ -187,6 +194,8 @@ class Test_Font_Sources extends TestCase {
 			'missing remote_path'         => [ [ 'files' => [ 'Ok.ttf' => [ 'sha256' => '', 'size' => 1 ] ] ] ],
 			'role names an unlisted file' => [ [ 'fonts' => [ 'ok' => [ 'R' => 'Missing.ttf' ] ] ] ],
 			'a face role naming a list'   => [ [ 'fonts' => [ 'ok' => [ 'R' => [ 'NotoSansSC-Regular.ttf' ] ] ] ] ],
+			'a typo for a face role'      => [ [ 'fonts' => [ 'ok' => [ 'Bl' => 'NotoSansSC-Regular.ttf' ] ] ] ],
+			'a role of the wrong case'    => [ [ 'fonts' => [ 'ok' => [ 'r' => 'NotoSansSC-Regular.ttf' ] ] ] ],
 			'an empty licence list'       => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'LICENSE' => [] ] ] ] ],
 			'a licence list with a hole'  => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'LICENSE' => [ 'NotoSansSC-Regular.ttf', 3 ] ] ] ] ],
 			'a licence naming no file'    => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'LICENSE' => [ 'NotoSansSC-Regular.ttf', 'Missing.txt' ] ] ] ] ],
@@ -194,6 +203,10 @@ class Test_Font_Sources extends TestCase {
 			'font key with a dot'         => [ [ 'fonts' => [ '../evil' => [ 'R' => 'NotoSansSC-Regular.ttf' ] ] ] ],
 			'invalid sip-ext target'      => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'sip-ext' => 'a/b' ] ] ] ],
 			'invalid language_to_font'    => [ [ 'language_to_font' => [ 'zh' => 'evil/key' ] ] ],
+			'a row for a key not here'    => [ [ 'language_to_font' => [ 'ko' => 'unbatang' ] ] ],
+			'a backup_subs key not here'  => [ [ 'backup_subs_fonts' => [ 'freesans' ] ] ],
+			'a bmp key not here'          => [ [ 'bmp_fonts' => [ 'dejavusans' ] ] ],
+			'a substitution key not here' => [ [ 'family_substitution' => [ 'serif_fonts' => [ 'freeserif' ] ] ] ],
 			'variant names no file'       => [ [ 'variants' => [ '300' => 'Missing.ttf' ] ] ],
 			'invalid variant id'          => [ [ 'variants' => [ 'a/b' => 'NotoSansSC-Regular.ttf' ] ] ],
 			'traversing preview'          => [ [ 'preview' => '../evil' ] ],
@@ -236,6 +249,53 @@ class Test_Font_Sources extends TestCase {
 		$this->assertSame(
 			[ 'R' => 'KhmerOS.ttf', 'LICENSE' => 'KhmerOS-LICENSE.txt' ],
 			Font_Sources::role_map( $roles )
+		);
+	}
+
+	/**
+	 * `insert_file()` refuses a role outside the vocabulary and `install_complete()` is satisfied only once every
+	 * downloaded file has a row, so a `Bl` for `BI` used to download the file and leave the entry `installing` for
+	 * good. The vocabulary is one predicate now, read here as well, so the mistake costs the source index at sync
+	 * — where a build error belongs — instead of every site that installs the pack (§11 D1)
+	 */
+	public function test_a_role_the_repository_would_refuse_is_rejected_at_sync() {
+		$entry = $this->valid_entry( [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'Bl' => 'NotoSansSC-Regular.ttf' ] ] ] );
+
+		$this->assertStringContainsString( 'Bl', (string) Font_Sources::validate_entry( $entry ) );
+
+		/* The whole vocabulary passes, including a numbered licence role the pipeline may name outright */
+		foreach ( [ 'R', 'B', 'I', 'BI', 'dict_T', 'LICENSE', 'LICENSE-2' ] as $role ) {
+			$this->assertNull(
+				Font_Sources::validate_entry( $this->valid_entry( [ 'fonts' => [ 'ok' => [ $role => 'NotoSansSC-Regular.ttf' ] ] ] ) ),
+				"role {$role} should have been accepted"
+			);
+		}
+	}
+
+	/**
+	 * All four coverage maps are consumed by inverting them per font key of the same entry
+	 * (`Font_Sources::coverage_meta()`), so a name the entry does not register produces no row at all — the pack
+	 * ships the font and nothing points at it, and nothing downstream can tell. It is how `ko` went on pointing at
+	 * `unbatang` after the pack moved to Noto Sans KR, and it is the shape of every row bug the 2026-09-10 audit
+	 * turned up, so it is refused at sync where the rest of the entry's mistakes are
+	 */
+	public function test_a_coverage_map_may_only_name_a_font_key_the_entry_registers() {
+		$reason = Font_Sources::validate_entry( $this->valid_entry( [ 'language_to_font' => [ 'ko' => 'unbatang' ] ] ) );
+
+		$this->assertIsString( $reason );
+		$this->assertStringContainsString( 'unbatang', $reason );
+		$this->assertStringContainsString( 'language_to_font', $reason );
+
+		/* And the same key, once the entry registers it, is fine */
+		$this->assertNull(
+			Font_Sources::validate_entry(
+				$this->valid_entry(
+					[
+						'fonts'            => [ 'unbatang' => [ 'R' => 'NotoSansSC-Regular.ttf' ] ],
+						'language_to_font' => [ 'ko' => 'unbatang' ],
+					]
+				)
+			)
 		);
 	}
 
