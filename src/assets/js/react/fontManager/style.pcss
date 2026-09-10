@@ -1,0 +1,970 @@
+/**
+ * Font Manager — the handoff design, ported
+ *
+ * Every rule is scoped under `.gfpdf-fm`, the class on the modal frame: the
+ * mockup's class names are generic on purpose (`.btn`, `.section`,
+ * `.font-row`) and wp-admin is full of them, so the scope is what keeps this
+ * stylesheet from reaching anything it did not draw.
+ *
+ * The tokens are WordPress's own — `@wordpress/base-styles` values, as
+ * `colors_and_type.css` recorded them — so a control borrowed from
+ * `@wordpress/components` and one drawn here agree on colour and spacing.
+ *
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       7.0
+ */
+
+.gfpdf-fm {
+	--wp-font-body:
+		-apple-system,
+		blinkmacsystemfont,
+		"Segoe UI",
+		roboto,
+		oxygen-sans,
+		ubuntu,
+		cantarell,
+		"Helvetica Neue",
+		sans-serif;
+	--wp-gray-100: #f0f0f0;
+	--wp-gray-300: #ddd;
+	--wp-gray-400: #ccc;
+	--wp-gray-600: #949494;
+	--wp-gray-700: #757575;
+	--wp-gray-900: #1e1e1e;
+	--wp-fg-secondary: #757575;
+	--wp-fg-tertiary: #949494;
+	--wp-alert-red: #cc1818;
+	--wp-alert-yellow: #f0b849;
+	--wp-alert-green: #4ab866;
+	--wp-border-subtle: #ebebeb;
+	--wp-border-default: #ddd;
+	--wp-radius-small: 2px;
+	--wp-radius-medium: 4px;
+	--wp-radius-large: 8px;
+	--wp-tint: #eaeffe;
+}
+
+/* ---------- Modal frame ---------- */
+
+.gfpdf-fm.components-modal__frame {
+	width: 100%;
+	max-width: 1000px;
+	height: calc(100vh - 64px);
+	max-height: 820px;
+	border-radius: var(--wp-radius-large);
+}
+
+.gfpdf-fm .components-modal__content {
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.gfpdf-fm-shell {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-height: 0;
+	font-family: var(--wp-font-body);
+	font-size: 13px;
+	line-height: 1.4;
+	color: var(--wp-gray-900);
+}
+
+.gfpdf-fm-snackbars {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	z-index: 100000;
+	transform: translateX(-50%);
+}
+
+/* ---------- Header ---------- */
+
+.gfpdf-fm .fm-header {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	height: 64px;
+	min-height: 64px;
+	padding: 0 24px;
+	border-bottom: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm .fm-title {
+	font-size: 18px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.gfpdf-fm .fm-count {
+	font-size: 13px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm .fm-header-spacer {
+	flex: 1;
+}
+
+.gfpdf-fm-sync {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm-sync-text {
+	white-space: nowrap;
+}
+
+/* ---------- Body ---------- */
+
+.gfpdf-fm .fm-body {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+}
+
+/* ---------- Sidebar ---------- */
+
+.gfpdf-fm .fm-sidebar {
+	display: flex;
+	flex-direction: column;
+	width: 280px;
+	min-width: 280px;
+	border-right: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm .fm-sidebar-top {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 16px;
+	border-bottom: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm .fm-list {
+	flex: 1;
+	padding: 8px 0;
+	overflow-y: auto;
+}
+
+.gfpdf-fm .fm-list-heading {
+	padding: 12px 16px 4px;
+	margin: 0;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--wp-fg-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.gfpdf-fm .fm-empty-text {
+	padding: 16px;
+	font-size: 13px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm-updates-banner.components-button {
+	justify-content: flex-start;
+	height: auto;
+	padding: 8px 12px;
+	font-size: 12px;
+	background: #fcf4e4;
+	border-radius: var(--wp-radius-small);
+}
+
+/* ---------- Font rows ---------- */
+
+.gfpdf-fm .font-row {
+	position: relative;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 10px 16px;
+	cursor: pointer;
+	border-left: 3px solid transparent;
+	transition: background 0.08s linear;
+}
+
+.gfpdf-fm .font-row:hover {
+	background: var(--wp-gray-100);
+}
+
+.gfpdf-fm .font-row.selected {
+	background: var(--wp-tint);
+	border-left-color: var(--wp-admin-theme-color);
+}
+
+.gfpdf-fm .font-row.is-dimmed {
+	opacity: 0.55;
+}
+
+.gfpdf-fm .font-row-active-bar {
+	position: absolute;
+	top: 8px;
+	bottom: 8px;
+	left: 0;
+	width: 3px;
+	background: var(--wp-admin-theme-color);
+	border-radius: 0 2px 2px 0;
+}
+
+.gfpdf-fm .font-row.selected .font-row-active-bar {
+	display: none;
+}
+
+.gfpdf-fm .font-swatch {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	min-width: 44px;
+	height: 44px;
+	font-size: 20px;
+	line-height: 1;
+	background: var(--wp-gray-100);
+	border: 1px solid var(--wp-border-default);
+	border-radius: var(--wp-radius-medium);
+}
+
+.gfpdf-fm .font-row.selected .font-swatch {
+	background: #fff;
+}
+
+.gfpdf-fm .font-meta {
+	flex: 1;
+	min-width: 0;
+}
+
+.gfpdf-fm .font-name-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	min-width: 0;
+}
+
+.gfpdf-fm .font-name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	font-size: 14px;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gfpdf-fm .font-active-tag {
+	flex-shrink: 0;
+	padding: 2px 6px;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1;
+	color: var(--wp-admin-theme-color);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	border: 1px solid var(--wp-admin-theme-color);
+	border-radius: 2px;
+}
+
+.gfpdf-fm .font-sub {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+	margin-top: 4px;
+}
+
+.gfpdf-fm .font-variants {
+	font-size: 12px;
+	line-height: 16px;
+	color: var(--wp-fg-secondary);
+}
+
+/* ---------- Chips ---------- */
+
+.gfpdf-fm-chips {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.gfpdf-fm-chip {
+	padding: 1px 6px;
+	font-size: 11px;
+	line-height: 16px;
+	color: var(--wp-gray-700);
+	background: var(--wp-gray-100);
+	border-radius: 9999px;
+}
+
+/* ---------- Detail ---------- */
+
+.gfpdf-fm .fm-detail {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-width: 0;
+	overflow-y: auto;
+}
+
+.gfpdf-fm .fm-detail-inner {
+	flex: 1;
+	padding: 32px 32px 24px;
+}
+
+.gfpdf-fm .fm-detail-header {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	margin-bottom: 24px;
+}
+
+.gfpdf-fm .fm-detail-heading {
+	min-width: 0;
+}
+
+.gfpdf-fm .fm-detail-eyebrow {
+	margin-bottom: 2px;
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm .fm-detail-title {
+	margin: 0;
+	font-size: 17px;
+	font-weight: 600;
+	letter-spacing: -0.005em;
+}
+
+.gfpdf-fm .fm-detail-header-spacer {
+	flex: 1;
+}
+
+.gfpdf-fm .active-indicator {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	height: 36px;
+	padding: 0 14px;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1;
+	color: var(--wp-admin-theme-color);
+	white-space: nowrap;
+	background: var(--wp-tint);
+	border-radius: var(--wp-radius-small);
+}
+
+.gfpdf-fm .section {
+	margin-top: 28px;
+}
+
+.gfpdf-fm .section-title {
+	margin: 0 0 4px;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.gfpdf-fm .section-desc {
+	margin: 0 0 12px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm .section-heading-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	align-items: flex-end;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+
+.gfpdf-fm-template-use {
+	margin: 6px 0 0;
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm-template-use code {
+	padding: 1px 5px;
+	font-size: 12px;
+	background: var(--wp-gray-100);
+	border-radius: var(--wp-radius-small);
+}
+
+.gfpdf-fm-template-use-previous {
+	margin-left: 8px;
+	font-style: italic;
+}
+
+/* ---------- Variant rows ---------- */
+
+.gfpdf-fm .variants {
+	overflow: hidden;
+	background: #fff;
+	border: 1px solid var(--wp-border-default);
+	border-radius: var(--wp-radius-medium);
+}
+
+.gfpdf-fm .variant-row {
+	display: flex;
+	gap: 24px;
+	align-items: center;
+	min-height: 56px;
+	padding: 14px 16px;
+	border-top: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm .variant-row:first-child {
+	border-top: none;
+}
+
+.gfpdf-fm .variant-row.missing {
+	background: #f6f7f7;
+}
+
+.gfpdf-fm .variant-row.drag-over {
+	background: var(--wp-tint);
+	box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
+}
+
+.gfpdf-fm .variant-label {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	width: 140px;
+	min-width: 140px;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.gfpdf-fm .variant-required {
+	font-size: 11px;
+	font-weight: 500;
+	color: var(--wp-alert-red);
+}
+
+.gfpdf-fm .variant-file {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	font-size: 13px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gfpdf-fm .variant-file.empty {
+	font-style: italic;
+	color: var(--wp-gray-700);
+}
+
+.gfpdf-fm .variant-actions {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}
+
+.gfpdf-fm-file-input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+/* ---------- Preview ---------- */
+
+.gfpdf-fm-preview-controls {
+	display: flex;
+	gap: 16px;
+	align-items: flex-end;
+	min-width: 320px;
+}
+
+.gfpdf-fm-preview-controls > * {
+	flex: 1;
+}
+
+.gfpdf-fm .preview-box {
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	border: 1px solid var(--wp-border-default);
+	border-radius: var(--wp-radius-medium);
+}
+
+.gfpdf-fm .preview-variant {
+	display: flex;
+	gap: 20px;
+	padding: 18px 20px;
+	border-top: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm .preview-variant:first-child {
+	border-top: none;
+}
+
+.gfpdf-fm .preview-variant-label {
+	width: 96px;
+	min-width: 96px;
+	padding-top: 2px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--wp-gray-700);
+}
+
+.gfpdf-fm .preview-variant-body {
+	flex: 1;
+	min-width: 0;
+	line-height: 1.5;
+	overflow-wrap: anywhere;
+}
+
+.gfpdf-fm .preview-variant-missing {
+	font-size: 12px;
+	font-style: italic;
+	color: var(--wp-fg-tertiary);
+}
+
+/* ---------- Footer ---------- */
+
+.gfpdf-fm .fm-actions {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 16px 32px;
+	background: #fff;
+	border-top: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm .fm-actions .spacer {
+	flex: 1;
+}
+
+/* ---------- Empty states ---------- */
+
+.gfpdf-fm .fm-empty-detail {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 16px;
+	align-items: center;
+	justify-content: center;
+	padding: 48px;
+	text-align: center;
+}
+
+.gfpdf-fm .fm-empty-glyph {
+	font-family: georgia, serif;
+	font-size: 56px;
+	line-height: 1;
+	color: var(--wp-gray-600);
+}
+
+.gfpdf-fm .fm-empty-text-lg {
+	max-width: 40ch;
+	margin: 0;
+	font-size: 14px;
+	color: var(--wp-gray-700);
+}
+
+/* ---------- Browser ---------- */
+
+.gfpdf-fm-source-switch {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 16px;
+	border-bottom: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm-browser-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: flex-end;
+	margin: 16px 0;
+}
+
+.gfpdf-fm-browser-toolbar > * {
+	flex: 1 1 160px;
+}
+
+.gfpdf-fm-browser-pager {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	margin-bottom: 12px;
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 12px;
+}
+
+.gfpdf-fm-card {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	justify-content: space-between;
+	padding: 12px;
+	border: 1px solid var(--wp-border-default);
+	border-radius: var(--wp-radius-medium);
+}
+
+.gfpdf-fm-card-open {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 0;
+	text-align: left;
+	cursor: pointer;
+	background: none;
+	border: 0;
+}
+
+.gfpdf-fm-card-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.gfpdf-fm-card-name {
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.gfpdf-fm-card-sub {
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm-card-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.gfpdf-fm-card-installed {
+	display: inline-flex;
+	gap: 4px;
+	align-items: center;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--wp-alert-green);
+}
+
+.gfpdf-fm-pagination {
+	display: flex;
+	gap: 8px;
+	justify-content: center;
+	margin-top: 20px;
+}
+
+/* ---------- Install progress ---------- */
+
+.gfpdf-fm-progress {
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm-progress.is-failed,
+.gfpdf-fm-progress.is-stuck {
+	color: var(--wp-alert-red);
+}
+
+.gfpdf-fm-progress-bar,
+.gfpdf-fm-progress-bar .components-progress-bar__track {
+	width: 96px;
+	min-width: 96px;
+	max-width: 96px;
+}
+
+/* ---------- Entry detail ---------- */
+
+.gfpdf-fm-roles {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 12px;
+}
+
+.gfpdf-fm-font-cards {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.gfpdf-fm-font-card {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
+	border: 1px solid var(--wp-border-default);
+	border-radius: var(--wp-radius-medium);
+}
+
+.gfpdf-fm-font-card-name {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.gfpdf-fm-font-card-files {
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+/* ---------- Updates ---------- */
+
+.gfpdf-fm-update-all {
+	margin-bottom: 16px;
+}
+
+.gfpdf-fm-updates {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.gfpdf-fm-update-row {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
+	border: 1px solid var(--wp-border-default);
+	border-radius: var(--wp-radius-medium);
+}
+
+.gfpdf-fm-update-name {
+	display: flex;
+	gap: 8px;
+	align-items: baseline;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.gfpdf-fm-update-source {
+	font-size: 11px;
+	font-weight: 400;
+	color: var(--wp-fg-secondary);
+}
+
+.gfpdf-fm-update-version,
+.gfpdf-fm-update-notes {
+	font-size: 12px;
+	color: var(--wp-fg-secondary);
+}
+
+/* ---------- Language settings ---------- */
+
+.gfpdf-fm-language-table {
+	max-height: 380px;
+	padding: 4px 12px;
+	margin-top: 12px;
+	overflow-y: auto;
+	border: 1px solid var(--wp-border-default);
+	border-radius: var(--wp-radius-medium);
+}
+
+.gfpdf-fm-language-heading {
+	position: sticky;
+	top: 0;
+	padding: 10px 0 6px;
+	margin: 0;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--wp-fg-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	background: #fff;
+}
+
+.gfpdf-fm-language-row {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 6px 0;
+	border-top: 1px solid var(--wp-border-subtle);
+}
+
+.gfpdf-fm-language-label {
+	display: flex;
+	flex: 1;
+	gap: 8px;
+	align-items: baseline;
+	min-width: 0;
+	font-size: 13px;
+}
+
+.gfpdf-fm-language-label code {
+	font-size: 11px;
+	color: var(--wp-fg-secondary);
+	background: none;
+}
+
+.gfpdf-fm-language-row .components-select-control {
+	width: 220px;
+}
+
+.gfpdf-fm-language-add {
+	display: flex;
+	gap: 8px;
+	align-items: flex-end;
+	margin-top: 12px;
+}
+
+/* ---------- The button beside a font dropdown ---------- */
+
+.gfpdf-manage-fonts {
+	display: inline-block;
+	margin-left: 8px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+
+	.gfpdf-fm .fm-sidebar {
+		width: 240px;
+		min-width: 240px;
+	}
+
+	.gfpdf-fm .fm-detail-inner {
+		padding: 24px 20px 20px;
+	}
+
+	.gfpdf-fm .fm-actions {
+		padding: 14px 20px;
+	}
+
+	.gfpdf-fm .variant-label {
+		width: 116px;
+		min-width: 116px;
+	}
+
+	.gfpdf-fm .preview-variant-label {
+		width: 80px;
+		min-width: 80px;
+	}
+
+	.gfpdf-fm .fm-count {
+		display: none;
+	}
+}
+
+@media (max-width: 640px) {
+
+	.gfpdf-fm.components-modal__frame {
+		width: 100%;
+		max-width: 100%;
+		height: 100vh;
+		max-height: none;
+		border-radius: 0;
+	}
+
+	.gfpdf-fm .fm-header {
+		height: 56px;
+		min-height: 56px;
+		padding: 0 12px;
+	}
+
+	.gfpdf-fm-sync-text {
+		display: none;
+	}
+
+	.gfpdf-fm .fm-sidebar {
+		width: 100%;
+		min-width: 0;
+		border-right: 0;
+	}
+
+	.gfpdf-fm .fm-body[data-mobile-view="list"] .fm-detail {
+		display: none;
+	}
+
+	.gfpdf-fm .fm-body[data-mobile-view="detail"] .fm-sidebar {
+		display: none;
+	}
+
+	.gfpdf-fm .fm-detail-inner {
+		padding: 20px 16px 16px;
+	}
+
+	.gfpdf-fm .fm-body[data-mobile-view="detail"] .fm-mobile-back {
+		display: inline-flex;
+	}
+
+	.gfpdf-fm .variant-row {
+		flex-wrap: wrap;
+		gap: 10px 14px;
+		min-height: 0;
+		padding: 12px;
+	}
+
+	.gfpdf-fm .variant-label {
+		flex-direction: row;
+		gap: 8px;
+		align-items: baseline;
+		width: 100%;
+		min-width: 0;
+	}
+
+	.gfpdf-fm .variant-file {
+		order: 2;
+		width: 100%;
+		font-size: 12px;
+	}
+
+	.gfpdf-fm .variant-actions {
+		order: 3;
+		margin-left: auto;
+	}
+
+	.gfpdf-fm .preview-variant {
+		flex-direction: column;
+		gap: 6px;
+		padding: 14px;
+	}
+
+	.gfpdf-fm .preview-variant-label {
+		width: auto;
+		min-width: 0;
+	}
+
+	.gfpdf-fm .fm-actions {
+		flex-wrap: wrap;
+		gap: 8px;
+		padding: 12px 16px;
+	}
+
+	.gfpdf-fm .fm-actions .spacer {
+		display: none;
+	}
+}
+
+/* The back link only exists on a phone; the media query above turns it on */
+.gfpdf-fm .fm-mobile-back.components-button {
+	display: none;
+}
