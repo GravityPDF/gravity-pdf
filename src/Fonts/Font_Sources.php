@@ -415,10 +415,52 @@ class Font_Sources {
 			}
 		}
 
-		/* Coverage maps point at font keys, which mPDF joins straight into its font cache path */
-		foreach ( (array) ( $entry['language_to_font'] ?? [] ) as $key ) {
-			if ( ! is_string( $key ) || preg_match( static::KEY_PATTERN, $key ) !== 1 ) {
-				return sprintf( 'language_to_font names an invalid font key "%s"', (string) $key );
+		$error = static::validate_coverage_maps( $entry );
+		if ( $error !== null ) {
+			return $error;
+		}
+
+		return null;
+	}
+
+	/**
+	 * The four maps that name font keys: every name has to be a key this entry registers
+	 *
+	 * `coverage_meta()` consumes all four by inverting them per font key of the same entry, so a name the entry
+	 * does not register is not a weaker row — it is no row at all, and nothing downstream can tell. That is how a
+	 * pack ends up shipping a font with no language pointing at it, and how a row survives the font it named being
+	 * swapped out: `ko` aimed at `unbatang` after the pack moved to `notosanskr` resolves to nothing, silently, on
+	 * every site. The keys also reach mPDF's font cache path, so they are charset-checked here as well.
+	 *
+	 * Stricter than the pipeline's own build check, which asks only that a target is a key *some* pack registers:
+	 * the runtime can honour a same-entry row and nothing else.
+	 *
+	 * @since 7.0
+	 */
+	protected static function validate_coverage_maps( array $entry ): ?string {
+		$registered = array_map( 'strval', array_keys( (array) ( $entry['fonts'] ?? [] ) ) );
+		$families   = [];
+
+		foreach ( (array) ( $entry['family_substitution'] ?? [] ) as $keys ) {
+			$families = array_merge( $families, (array) $keys );
+		}
+
+		$maps = [
+			'language_to_font'    => array_values( (array) ( $entry['language_to_font'] ?? [] ) ),
+			'family_substitution' => $families,
+			'backup_subs_fonts'   => (array) ( $entry['backup_subs_fonts'] ?? [] ),
+			'bmp_fonts'           => (array) ( $entry['bmp_fonts'] ?? [] ),
+		];
+
+		foreach ( $maps as $map => $keys ) {
+			foreach ( $keys as $key ) {
+				if ( ! is_string( $key ) || preg_match( static::KEY_PATTERN, $key ) !== 1 ) {
+					return sprintf( '%s names an invalid font key "%s"', $map, (string) $key );
+				}
+
+				if ( ! in_array( $key, $registered, true ) ) {
+					return sprintf( '%s names "%s", which the entry does not register', $map, $key );
+				}
 			}
 		}
 
@@ -519,7 +561,17 @@ class Font_Sources {
 					return sprintf( 'font "%s" role "%s" does not name a file', $font_key, (string) $role );
 				}
 
-				foreach ( $named as $filename ) {
+				foreach ( $named as $name => $filename ) {
+					/*
+					 * The role vocabulary, read from the one place that defines it. A role `insert_file()` would
+					 * refuse — `Bl` for `BI` — is a build mistake, and it belongs here, where it costs the source
+					 * index, rather than at install, where it downloads the file, writes no file row and leaves the
+					 * entry installing forever.
+					 */
+					if ( ! Font_Repository::is_valid_role( (string) $name ) ) {
+						return sprintf( 'font "%s" names the unknown role "%s"', $font_key, (string) $name );
+					}
+
 					if ( ! isset( $files[ $filename ] ) ) {
 						return sprintf( 'font "%s" role "%s" names a file the entry does not list', $font_key, (string) $role );
 					}

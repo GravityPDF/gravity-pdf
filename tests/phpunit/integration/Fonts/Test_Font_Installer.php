@@ -96,6 +96,22 @@ class Test_Font_Installer extends TestCase {
 			$overrides
 		);
 
+		/*
+		 * Every coverage map has to name a key the entry registers, so a test that swaps the fonts gets maps
+		 * pointing at what it swapped in rather than at the default pack's `notoemoji`.
+		 */
+		if ( isset( $overrides['fonts'] ) ) {
+			$first = (string) array_key_first( (array) $data['fonts'] );
+
+			if ( ! isset( $overrides['language_to_font'] ) ) {
+				$data['language_to_font'] = [ 'und-Zsye' => $first ];
+			}
+
+			if ( ! isset( $overrides['backup_subs_fonts'] ) ) {
+				$data['backup_subs_fonts'] = [ $first ];
+			}
+		}
+
 		$this->insert_catalog_row(
 			'packs',
 			$entry,
@@ -349,6 +365,48 @@ class Test_Font_Installer extends TestCase {
 		$this->assertSame( 'packs/southeast-asian/KhmerOS-LICENSE.txt', $files['LICENSE']['path'] );
 		$this->assertSame( 'packs/southeast-asian/LGPL-2.1.txt', $files['LICENSE-2']['path'] );
 		$this->assertSame( hash( 'sha256', $text ), $files['LICENSE-2']['sha256'] );
+	}
+
+	/**
+	 * `install_complete()` is satisfied only once every downloaded file is claimed by a row, so a file row that
+	 * silently fails to write leaves the entry `installing` for good: never retried, never surfaced, and not
+	 * self-healing under the Font Manager's Retry, which re-POSTs the same install. A role the vocabulary refuses
+	 * cannot get this far any more — the entry is rejected at sync — but a write can still fail underneath us, and
+	 * when it does the install has to say so (§11 D1)
+	 */
+	public function test_a_file_row_that_cannot_be_written_fails_the_install_rather_than_sticking() {
+		global $gfpdf;
+
+		$this->seed_pack();
+
+		$log        = GPDFAPI::get_log_class();
+		$repository = new class(
+			new Font_Schema( $log ),
+			new Font_Migration( GPDFAPI::get_options_class(), $log ),
+			new Font_Lock(),
+			GPDFAPI::get_misc_class(),
+			$log,
+			$gfpdf->data->template_font_location
+		) extends Font_Repository {
+			public function insert_file( int $font_id, string $role, array $file ): bool {
+				return false;
+			}
+		};
+
+		$installer = new Font_Installer(
+			$repository,
+			$gfpdf->get_catalog_repository(),
+			$gfpdf->get_font_downloader(),
+			$gfpdf->get_font_cache_warmer(),
+			new Font_Lock(),
+			$log
+		);
+
+		$result = $installer->install( 'packs/emoji' );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'font_file_unrecorded', $result->get_error_code() );
+		$this->assertSame( 'failed', $this->status()['phase'] );
 	}
 
 	public function test_an_unknown_entry_is_refused_without_a_request() {

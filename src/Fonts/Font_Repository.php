@@ -495,7 +495,7 @@ class Font_Repository {
 	public function insert_file( int $font_id, string $role, array $file ): bool {
 		global $wpdb;
 
-		if ( ! $this->is_valid_role( $role ) ) {
+		if ( ! static::is_valid_role( $role ) ) {
 			$this->log->error( 'Refusing to record a font file under an unknown role', [ 'role' => $role ] );
 
 			return false;
@@ -1116,11 +1116,16 @@ class Font_Repository {
 	}
 
 	/**
-	 * `dict_*` and `LICENSE*` are validated by prefix, consistent with `source` being free-form
+	 * Whether a file row may carry this role — the whole role vocabulary, in one predicate
+	 *
+	 * Public and static because it is read at both ends: here, where a row is written, and in
+	 * `Font_Sources::validate_fonts()`, where an entry naming a role this refuses is rejected at sync rather than
+	 * installed into a state that can never complete. A second copy of the list is what made that possible.
+	 * `dict_*` and `LICENSE*` are validated by prefix, consistent with `source` being free-form.
 	 *
 	 * @since 7.0
 	 */
-	protected function is_valid_role( string $role ): bool {
+	public static function is_valid_role( string $role ): bool {
 		return in_array( $role, static::FACE_ROLES, true )
 			|| strpos( $role, 'dict_' ) === 0
 			|| strpos( $role, static::LICENSE_ROLE ) === 0;
