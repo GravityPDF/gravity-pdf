@@ -614,8 +614,9 @@ class Font_Installer {
 	 * Filename → the font keys and roles that file fills
 	 *
 	 * A role listed in `$install['variants']` resolves through the entry's `variants` map; every other role
-	 * resolves through `fonts`. Roles that land on the same file share it on disk, which is why the map is keyed by
-	 * filename rather than by role — nothing is downloaded twice.
+	 * resolves through `fonts`, where `LICENSE` may name several files and so expands to several roles
+	 * (`Font_Sources::role_map()`). Roles that land on the same file share it on disk, which is why the map is
+	 * keyed by filename rather than by role — nothing is downloaded twice.
 	 *
 	 * @return array<string, array<string, array<string, string>>> `{ filename: { font_key: { role: variant|'' } } }`
 	 *
@@ -628,13 +629,9 @@ class Font_Installer {
 		$targets  = [];
 
 		foreach ( (array) ( $data['fonts'] ?? [] ) as $font_key => $roles ) {
-			foreach ( (array) $roles as $role => $filename ) {
-				if ( in_array( $role, Font_Sources::NON_ROLE_KEYS, true ) ) {
-					continue;
-				}
-
+			foreach ( Font_Sources::role_map( (array) $roles ) as $role => $filename ) {
 				$variant = (string) ( $chosen[ $role ] ?? '' );
-				$name    = $variant !== '' ? (string) ( $variants[ $variant ] ?? '' ) : (string) $filename;
+				$name    = $variant !== '' ? (string) ( $variants[ $variant ] ?? '' ) : $filename;
 
 				if ( $name === '' || ! isset( $files[ $name ] ) ) {
 					continue;

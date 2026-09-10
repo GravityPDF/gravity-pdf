@@ -942,7 +942,8 @@ class Catalog_Repository {
 		$faces = [];
 
 		foreach ( $fonts as $font_key => $roles ) {
-			$roles = array_diff( array_keys( (array) $roles ), Font_Sources::NON_ROLE_KEYS );
+			/* Faces, not every role: a preview of a line-break dictionary or a licence file is not a thing */
+			$roles = array_intersect( array_keys( (array) $roles ), Font_Repository::FACE_ROLES );
 
 			if ( count( $roles ) > 0 ) {
 				$faces[ (string) $font_key ] = array_values( $roles );

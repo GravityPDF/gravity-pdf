@@ -426,6 +426,55 @@ class Font_Sources {
 	}
 
 	/**
+	 * The `role => filename` pairs one entry of a font's role map expands to
+	 *
+	 * Every role names one file except `LICENSE`, which may name a list — a copyleft face ships the notice and the
+	 * full text it cites, and both have to reach the site. Each file needs a role of its own to get a file row, so
+	 * the second and later take `LICENSE-2`, `LICENSE-3`, in the entry's own order, which is hash-pinned and so
+	 * cannot shift under an installed site.
+	 *
+	 * @param string|string[] $value What the entry lists against the role
+	 *
+	 * @return array<string, string> Empty for a flag rather than a file, and for a value of the wrong shape
+	 *
+	 * @since 7.0
+	 */
+	public static function role_files( string $role, $value ): array {
+		if ( in_array( $role, static::NON_ROLE_KEYS, true ) ) {
+			return [];
+		}
+
+		if ( $role !== Font_Repository::LICENSE_ROLE ) {
+			return is_string( $value ) ? [ $role => $value ] : [];
+		}
+
+		$files = [];
+
+		foreach ( array_values( array_filter( (array) $value, 'is_string' ) ) as $index => $filename ) {
+			$files[ $index === 0 ? $role : $role . '-' . ( $index + 1 ) ] = $filename;
+		}
+
+		return $files;
+	}
+
+	/**
+	 * One font's whole role map, flattened: flags dropped, `LICENSE` lists expanded, one filename per role
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	public static function role_map( array $roles ): array {
+		$map = [];
+
+		foreach ( $roles as $role => $value ) {
+			$map += static::role_files( (string) $role, $value );
+		}
+
+		return $map;
+	}
+
+	/**
 	 * The `fonts` map: mPDF key → role → filename, with useOTL / useKashida / sip-ext beside the roles
 	 *
 	 * @param array $files The entry's own file list, so a role cannot name a file that will never be downloaded
@@ -463,8 +512,17 @@ class Font_Sources {
 					continue;
 				}
 
-				if ( ! is_string( $value ) || ! isset( $files[ $value ] ) ) {
-					return sprintf( 'font "%s" role "%s" names a file the entry does not list', $font_key, (string) $role );
+				$named = static::role_files( (string) $role, $value );
+
+				/* A `LICENSE` list drops any member that is not a filename, so a short answer is a malformed one */
+				if ( $named === [] || count( $named ) !== count( (array) $value ) ) {
+					return sprintf( 'font "%s" role "%s" does not name a file', $font_key, (string) $role );
+				}
+
+				foreach ( $named as $filename ) {
+					if ( ! isset( $files[ $filename ] ) ) {
+						return sprintf( 'font "%s" role "%s" names a file the entry does not list', $font_key, (string) $role );
+					}
 				}
 			}
 		}

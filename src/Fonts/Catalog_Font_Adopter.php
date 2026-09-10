@@ -177,11 +177,7 @@ class Catalog_Font_Adopter {
 	protected function verified_files( string $source, string $entry_id, array $roles, array $files, array $claimed, array &$failed ): array {
 		$verified = [];
 
-		foreach ( $roles as $role => $filename ) {
-			if ( in_array( $role, Font_Sources::NON_ROLE_KEYS, true ) || ! is_string( $filename ) ) {
-				continue;
-			}
-
+		foreach ( Font_Sources::role_map( $roles ) as $role => $filename ) {
 			$listed = $files[ $filename ] ?? null;
 
 			if ( ! is_array( $listed ) || ! isset( $listed['sha256'], $listed['size'] ) ) {

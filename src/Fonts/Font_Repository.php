@@ -100,6 +100,17 @@ class Font_Repository {
 	public const FACE_ROLES = [ 'R', 'B', 'I', 'BI' ];
 
 	/**
+	 * The role a licence file takes, and the prefix of the numbered roles its siblings take
+	 *
+	 * A copyleft face ships a notice *and* the full text the notice cites, so one font key can carry more than one
+	 * — and the file table is unique on `(font_id, role)`, so each needs a role of its own: `LICENSE`, `LICENSE-2`,
+	 * `LICENSE-3`. Expanded in one place, `Font_Sources::role_files()`.
+	 *
+	 * @since 7.0
+	 */
+	public const LICENSE_ROLE = 'LICENSE';
+
+	/**
 	 * What a font key may contain
 	 *
 	 * mPDF keys are plain array keys, so this is the plugin's rule rather than a format requirement. It is here,
@@ -1105,11 +1116,13 @@ class Font_Repository {
 	}
 
 	/**
-	 * `dict_*` is validated by prefix, consistent with `source` being free-form
+	 * `dict_*` and `LICENSE*` are validated by prefix, consistent with `source` being free-form
 	 *
 	 * @since 7.0
 	 */
 	protected function is_valid_role( string $role ): bool {
-		return in_array( $role, static::FACE_ROLES, true ) || strpos( $role, 'dict_' ) === 0;
+		return in_array( $role, static::FACE_ROLES, true )
+			|| strpos( $role, 'dict_' ) === 0
+			|| strpos( $role, static::LICENSE_ROLE ) === 0;
 	}
 }

@@ -139,6 +139,34 @@ class Test_Font_Adoption extends TestCase {
 		$this->assertSame( $file['size'], $row['files']['R']['size'] );
 	}
 
+	public function test_a_licence_already_on_disk_is_adopted_with_its_font() {
+		$font   = $this->place_file( 'packs', 'southeast-asian', 'KhmerOS.ttf', 'khmer-bytes' );
+		$notice = $this->place_file( 'packs', 'southeast-asian', 'KhmerOS-LICENSE.txt', 'notice' );
+		$text   = $this->place_file( 'packs', 'southeast-asian', 'LGPL-2.1.txt', 'the full text' );
+
+		$this->catalog_entry(
+			'southeast-asian',
+			[
+				'fonts' => [
+					'khmeros' => [ 'R' => 'KhmerOS.ttf', 'LICENSE' => [ 'KhmerOS-LICENSE.txt', 'LGPL-2.1.txt' ] ],
+				],
+				'files' => [
+					'KhmerOS.ttf'         => $font,
+					'KhmerOS-LICENSE.txt' => $notice,
+					'LGPL-2.1.txt'        => $text,
+				],
+			]
+		);
+
+		$this->assertSame( 1, $this->adopter()->run( 'packs' ) );
+
+		/* The offline path has to reach the same rows an install writes, licence texts included */
+		$files = $this->font_repository()->get( 'khmeros' )['files'];
+
+		$this->assertSame( 'packs/southeast-asian/KhmerOS-LICENSE.txt', $files['LICENSE']['path'] );
+		$this->assertSame( 'packs/southeast-asian/LGPL-2.1.txt', $files['LICENSE-2']['path'] );
+	}
+
 	public function test_adoption_is_idempotent() {
 		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
 

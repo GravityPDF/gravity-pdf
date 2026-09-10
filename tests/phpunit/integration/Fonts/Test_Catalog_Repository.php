@@ -244,10 +244,19 @@ class Test_Catalog_Repository extends TestCase {
 
 		$urls = $this->catalog->preview_urls(
 			$row,
-			[ 'dejavusans' => [ 'R' => 'a.ttf', 'B' => 'b.ttf', 'useOTL' => 255, 'sip-ext' => 'sun-extb' ] ]
+			[
+				'dejavusans' => [
+					'R'        => 'a.ttf',
+					'B'        => 'b.ttf',
+					'useOTL'   => 255,
+					'sip-ext'  => 'sun-extb',
+					'dict_T'   => 'linebrdictT.dat',
+					'LICENSE'  => [ 'LICENSE.txt', 'GPL-2.0.txt' ],
+				],
+			]
 		);
 
-		/* useOTL and sip-ext are not faces and have no preview */
+		/* Only the four faces render: a flag, a line-break dictionary and a licence text have no preview */
 		$this->assertSame( [ 'R', 'B' ], array_keys( $urls['dejavusans'] ) );
 	}
 

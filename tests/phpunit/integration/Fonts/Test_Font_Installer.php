@@ -296,6 +296,61 @@ class Test_Font_Installer extends TestCase {
 		$this->assertNull( $this->status( 'thai' )['phase'] );
 	}
 
+	public function test_every_licence_a_font_names_is_installed_and_recorded() {
+		$body   = $this->font_bytes();
+		$notice = 'KHMEROS-NOTICE';
+		$text   = 'LGPL-2.1-FULL-TEXT';
+
+		/* A copyleft face ships the notice and the full text it cites, so one key carries two licence files */
+		$this->seed_pack(
+			'southeast-asian',
+			[
+				'fonts' => [
+					'khmeros' => [ 'R' => 'KhmerOS.ttf', 'LICENSE' => [ 'KhmerOS-LICENSE.txt', 'LGPL-2.1.txt' ] ],
+				],
+				'files' => [
+					'KhmerOS.ttf'         => [
+						'sha256'      => hash( 'sha256', $body ),
+						'size'        => strlen( $body ),
+						'remote_path' => 'fonts-v1.0.0/KhmerOS.ttf',
+					],
+					'KhmerOS-LICENSE.txt' => [
+						'sha256'      => hash( 'sha256', $notice ),
+						'size'        => strlen( $notice ),
+						'remote_path' => 'fonts-v1.0.0/KhmerOS-LICENSE.txt',
+					],
+					'LGPL-2.1.txt'        => [
+						'sha256'      => hash( 'sha256', $text ),
+						'size'        => strlen( $text ),
+						'remote_path' => 'fonts-v1.0.0/LGPL-2.1.txt',
+					],
+				],
+			]
+		);
+
+		$this->mock_http(
+			[
+				'KhmerOS.ttf'         => $body,
+				'KhmerOS-LICENSE.txt' => $notice,
+				'LGPL-2.1.txt'        => $text,
+			]
+		);
+
+		$this->assertTrue( $this->installer->install( 'packs/southeast-asian' ) );
+
+		/* Every file downloaded needs a row, or `install_complete()` can never be satisfied and the phase sticks */
+		$this->assertNull( $this->status( 'southeast-asian' )['phase'] );
+
+		$this->assertSame( $notice, file_get_contents( $this->font_dir . 'packs/southeast-asian/KhmerOS-LICENSE.txt' ) );
+		$this->assertSame( $text, file_get_contents( $this->font_dir . 'packs/southeast-asian/LGPL-2.1.txt' ) );
+
+		$files = $this->font( 'khmeros' )['files'];
+
+		$this->assertSame( 'packs/southeast-asian/KhmerOS-LICENSE.txt', $files['LICENSE']['path'] );
+		$this->assertSame( 'packs/southeast-asian/LGPL-2.1.txt', $files['LICENSE-2']['path'] );
+		$this->assertSame( hash( 'sha256', $text ), $files['LICENSE-2']['sha256'] );
+	}
+
 	public function test_an_unknown_entry_is_refused_without_a_request() {
 		$this->mock_http( [ 'fonts.gravitypdf.com' => 'never reached' ] );
 
