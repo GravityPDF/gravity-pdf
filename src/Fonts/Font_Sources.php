@@ -67,9 +67,12 @@ class Font_Sources {
 	/**
 	 * The pack labels, translated
 	 *
-	 * Keyed `{source}/{entry}/{field}`. A pack the server adds before the plugin ships its translation falls back to
-	 * the index string, so this map never has to be complete. Entry descriptions are pipeline-generated and
-	 * translated as they are published, hence labels only for now.
+	 * Keyed `{source}/{entry}/{field}`, in the order the catalogue publishes them. A pack the server adds before the
+	 * plugin ships its translation falls back to the index string, so this map never has to be complete. Entry
+	 * descriptions are pipeline-generated and translated as they are published, hence labels only for now.
+	 *
+	 * It is nonetheless the one place a pack id is frozen plugin-side, so these seventeen have to reach a release
+	 * before the matching packs publish, and renaming one costs a release for its label.
 	 *
 	 * @return array<string, string>
 	 *
@@ -83,26 +86,23 @@ class Font_Sources {
 		}
 
 		$translations = [
-			'packs/emoji/label'               => __( 'Emoji', 'gravity-pdf' ),
-			'packs/serif-mono/label'          => __( 'Serif & Monospace', 'gravity-pdf' ),
-			'packs/popular-sans/label'        => __( 'Popular Sans Serif', 'gravity-pdf' ),
-			'packs/popular-serif/label'       => __( 'Popular Serif', 'gravity-pdf' ),
-			'packs/popular-mono/label'        => __( 'Popular Monospace', 'gravity-pdf' ),
-			'packs/popular-cursive/label'     => __( 'Popular Cursive', 'gravity-pdf' ),
-			'packs/dejavu/label'              => __( 'Extended Latin', 'gravity-pdf' ),
-			'packs/chinese-simplified/label'  => __( 'Chinese (Simplified)', 'gravity-pdf' ),
-			'packs/japanese/label'            => __( 'Japanese', 'gravity-pdf' ),
-			'packs/chinese-traditional/label' => __( 'Chinese (Traditional)', 'gravity-pdf' ),
-			'packs/cjk-ext-b/label'           => __( 'CJK Extension B', 'gravity-pdf' ),
-			'packs/indic/label'               => __( 'Indic scripts', 'gravity-pdf' ),
-			'packs/arabic/label'              => __( 'Arabic', 'gravity-pdf' ),
-			'packs/korean/label'              => __( 'Korean', 'gravity-pdf' ),
-			'packs/african/label'             => __( 'African scripts', 'gravity-pdf' ),
-			'packs/hebrew-syriac/label'       => __( 'Hebrew & Syriac', 'gravity-pdf' ),
-			'packs/southeast-asian/label'     => __( 'Southeast Asian', 'gravity-pdf' ),
-			'packs/americas/label'            => __( 'Americas', 'gravity-pdf' ),
-			'packs/ancient-scripts/label'     => __( 'Ancient scripts', 'gravity-pdf' ),
-			'packs/barcode/label'             => __( 'Barcode', 'gravity-pdf' ),
+			'packs/popular-sans/label'            => __( 'Popular Sans Serif', 'gravity-pdf' ),
+			'packs/popular-serif/label'           => __( 'Popular Serif', 'gravity-pdf' ),
+			'packs/popular-mono/label'            => __( 'Popular Monospace', 'gravity-pdf' ),
+			'packs/popular-cursive/label'         => __( 'Popular Cursive', 'gravity-pdf' ),
+			'packs/emoji/label'                   => __( 'Emoji', 'gravity-pdf' ),
+			'packs/chinese-simplified/label'      => __( 'Chinese (Simplified)', 'gravity-pdf' ),
+			'packs/japanese/label'                => __( 'Japanese', 'gravity-pdf' ),
+			'packs/chinese-traditional/label'     => __( 'Chinese (Traditional)', 'gravity-pdf' ),
+			'packs/indic/label'                   => __( 'Indic scripts', 'gravity-pdf' ),
+			'packs/arabic/label'                  => __( 'Arabic', 'gravity-pdf' ),
+			'packs/korean/label'                  => __( 'Korean', 'gravity-pdf' ),
+			'packs/african/label'                 => __( 'African scripts', 'gravity-pdf' ),
+			'packs/west-asian/label'              => __( 'West Asian', 'gravity-pdf' ),
+			'packs/southeast-asian/label'         => __( 'Southeast Asian', 'gravity-pdf' ),
+			'packs/insular-southeast-asian/label' => __( 'Insular Southeast Asian', 'gravity-pdf' ),
+			'packs/central-asian/label'           => __( 'Central Asian', 'gravity-pdf' ),
+			'packs/americas/label'                => __( 'Americas', 'gravity-pdf' ),
 		];
 
 		return $translations;

@@ -156,13 +156,51 @@ class Test_Font_Sources extends TestCase {
 	}
 
 	public function test_pack_labels_are_translated_and_unknown_entries_fall_back() {
-		$this->assertSame( 'Extended Latin', Font_Sources::translate_entry( 'packs', 'dejavu', 'label', 'DejaVu' ) );
+		$this->assertSame( 'West Asian', Font_Sources::translate_entry( 'packs', 'west-asian', 'label', 'West Asian' ) );
 
 		/* A pack the server adds before the plugin ships its translation keeps the index string */
 		$this->assertSame( 'Klingon', Font_Sources::translate_entry( 'packs', 'klingon', 'label', 'Klingon' ) );
 
 		/* Another source's values are proper nouns and pass through */
 		$this->assertSame( 'Lato', Font_Sources::translate_entry( 'google', 'lato', 'label', 'Lato' ) );
+	}
+
+	/**
+	 * The one place a pack id is frozen plugin-side, so it is pinned rather than spot-checked
+	 *
+	 * A label the plugin has not shipped degrades to the index's own English string, but an id that never reaches a
+	 * release before its pack publishes cannot be translated at all — and a stale id is dead weight nobody notices.
+	 */
+	public function test_the_pack_list_is_the_seventeen_the_catalogue_publishes() {
+		$ids = array_map(
+			static function ( string $key ): string {
+				return explode( '/', $key )[1];
+			},
+			array_keys( Font_Sources::get_translations() )
+		);
+
+		$this->assertSame(
+			[
+				'popular-sans',
+				'popular-serif',
+				'popular-mono',
+				'popular-cursive',
+				'emoji',
+				'chinese-simplified',
+				'japanese',
+				'chinese-traditional',
+				'indic',
+				'arabic',
+				'korean',
+				'african',
+				'west-asian',
+				'southeast-asian',
+				'insular-southeast-asian',
+				'central-asian',
+				'americas',
+			],
+			$ids
+		);
 	}
 
 	public function test_a_well_formed_entry_validates() {
