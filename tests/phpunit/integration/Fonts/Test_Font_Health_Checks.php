@@ -210,7 +210,7 @@ class Test_Font_Health_Checks extends TestCase {
 	}
 
 	public function test_a_font_whose_file_vanished_raises_an_issue_naming_the_pdfs_that_use_it() {
-		$this->install_entry_row( 'notosansjp', 'packs/japanese' );
+		$this->install_entry_row( 'notosansjp', 'japanese' );
 		$this->add_pdf( [ 'font' => 'notosansjp' ] );
 
 		$this->delete_font_file( 'test-notosansjp-r.ttf' );
@@ -220,6 +220,7 @@ class Test_Font_Health_Checks extends TestCase {
 		$this->assertSame( [ 'notosansjp' ], $this->ids( $issues ) );
 		$this->assertContains( 'Health → Notification', $issues[0]->get_details() );
 		$this->assertSame( 'Reinstall', $issues[0]->get_action_label() );
+		$this->assertStringContainsString( 'packs/japanese', $issues[0]->get_action_url() );
 	}
 
 	/**

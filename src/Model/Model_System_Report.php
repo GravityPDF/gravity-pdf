@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Model;
 
+use GFPDF\Fonts\Font_Report;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
@@ -95,13 +96,23 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 */
 	protected $templates;
 
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates ) {
+	/**
+	 * What the font subsystem contributes to the report
+	 *
+	 * @var Font_Report
+	 *
+	 * @since 7.0
+	 */
+	protected $fonts;
+
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates, Font_Report $fonts ) {
 		$this->options   = $options;
 		$this->data      = $data;
 		$this->log       = $log;
 		$this->misc      = $misc;
 		$this->status    = $status;
 		$this->templates = $templates;
+		$this->fonts     = $fonts;
 	}
 
 	/**
@@ -180,6 +191,24 @@ class Model_System_Report extends Helper_Abstract_Model {
 							'id'           => 'security',
 							'title'        => esc_html__( 'Security Settings', 'gravity-pdf' ),
 							'title_export' => $title_export_prefix . 'Security Settings',
+						],
+
+						[
+							'id'           => 'fonts',
+							'title'        => esc_html__( 'Fonts', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'Fonts',
+						],
+
+						[
+							'id'           => 'background_installs',
+							'title'        => esc_html__( 'Background installs', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'Background installs',
+						],
+
+						[
+							'id'           => 'health',
+							'title'        => esc_html__( 'Health check', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'Health check',
 						],
 					]
 				),
@@ -274,12 +303,6 @@ class Model_System_Report extends Helper_Abstract_Model {
 				'label'        => esc_html__( 'PDF Working Directory URL', 'gravity-pdf' ),
 				'label_export' => 'PDF Working Directory URL',
 				'value'        => $this->templates->get_template_url(),
-			],
-
-			'font_folder_location'      => [
-				'label'        => esc_html__( 'Font Folder location', 'gravity-pdf' ),
-				'label_export' => 'Font Folder location',
-				'value'        => $this->data->template_font_location,
 			],
 
 			'temp_folder_location'      => [
@@ -379,6 +402,11 @@ class Model_System_Report extends Helper_Abstract_Model {
 		];
 
 		$items = $this->apply_deprecated_report_items_filter( $items );
+
+		/* Fonts, the background work behind them and the daily health run: all read-only, none of them stat a file */
+		$items['fonts']               = $this->fonts->fonts();
+		$items['background_installs'] = $this->fonts->background_installs();
+		$items['health']              = $this->fonts->health();
 
 		return apply_filters( 'gfpdf_system_status_report_sections', $items );
 	}

@@ -64,7 +64,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		$this->assertArrayHasKey( 'pdf_working_directory', $this->get_report_section( 'directories', $system_report ) );
 		$this->assertArrayHasKey( 'pdf_working_directory_url', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'font_folder_location', $this->get_report_section( 'directories', $system_report ) );
+		$this->assertArrayHasKey( 'font_folder_location', $this->get_report_section( 'fonts', $system_report ) );
 		$this->assertArrayHasKey( 'temp_folder_location', $this->get_report_section( 'directories', $system_report ) );
 		$this->assertArrayHasKey( 'temp_folder_permission', $this->get_report_section( 'directories', $system_report ) );
 		$this->assertArrayHasKey( 'temp_folder_protected', $this->get_report_section( 'directories', $system_report ) );
@@ -131,7 +131,9 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertArrayHasKey( 'row_3', $this->get_report_section( 'security', $system_report ) );
 
 		$this->assertArrayNotHasKey( 'default_charset', $this->get_report_section( 'php', $system_report ) );
-		$this->assertCount( 4, $system_report[0]['tables'] );
+
+		/* The four the filter knows, plus the three the font subsystem adds */
+		$this->assertCount( 7, $system_report[0]['tables'] );
 	}
 
 	/**
@@ -227,7 +229,10 @@ class Test_Controller_System_Report extends TestCase {
 	public function test_system_report_has_no_deprecated_features_section_by_default() {
 		$system_report = apply_filters( 'gform_system_report', [] );
 
-		$this->assertCount( 4, $system_report[0]['tables'] );
+		$this->assertSame(
+			[ 'php', 'directories', 'global', 'security', 'fonts', 'background_installs', 'health' ],
+			array_column( $system_report[0]['tables'], 'id' )
+		);
 	}
 
 	public function test_system_report_legacy_template() {

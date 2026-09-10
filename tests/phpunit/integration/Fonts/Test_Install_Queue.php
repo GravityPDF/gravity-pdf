@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts;
 
+use GFPDF\Helper\Helper_Abstract_Queue;
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Concerns\HasFontFixtures;
@@ -62,6 +63,8 @@ class Test_Install_Queue extends TestCase {
 		$this->unmock_http();
 		$this->drop_catalog_rows();
 		$this->queue->clear_queue();
+
+		delete_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION );
 
 		foreach ( [ 'packs', 'google', 'ghost' ] as $source ) {
 			GPDFAPI::get_misc_class()->rmdir( $this->font_dir . $source );
@@ -874,6 +877,38 @@ class Test_Install_Queue extends TestCase {
 
 		$this->assertGreaterThanOrEqual( time() + $interval - 5, $at );
 		$this->assertLessThanOrEqual( time() + $interval + Font_Installer::RETRY_JITTER + 5, $at );
+	}
+
+	/**
+	 * Gravity Forms logs a failed loopback at debug and returns the error, which on a site with logging off means
+	 * a queue that never runs and nothing anywhere saying why
+	 */
+	public function test_a_loopback_that_never_comes_back_is_recorded() {
+		$this->seed_pack( 1 );
+		$this->queue->enqueue_once( [ 'entry' => 'packs/emoji' ] );
+
+		add_filter(
+			'pre_http_request',
+			static function () {
+				return new \WP_Error( 'http_request_failed', 'cURL error 7: Failed to connect' );
+			}
+		);
+
+		$this->queue->dispatch();
+
+		remove_all_filters( 'pre_http_request' );
+
+		$this->assertStringContainsString( 'cURL error 7', Helper_Abstract_Queue::get_dispatch_error() );
+	}
+
+	public function test_a_dispatch_that_lands_clears_an_earlier_failure() {
+		update_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION, 'cURL error 7', false );
+
+		$this->seed_pack( 1 );
+		$this->queue->enqueue_once( [ 'entry' => 'packs/emoji' ] );
+		$this->queue->dispatch();
+
+		$this->assertSame( '', Helper_Abstract_Queue::get_dispatch_error() );
 	}
 
 	public function test_the_queue_has_its_own_identifier_and_attempt_cap() {

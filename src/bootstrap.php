@@ -230,6 +230,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $health_runner;
 
 	/**
+	 * The font subsystem's half of the System Report
+	 *
+	 * @var Fonts\Font_Report
+	 *
+	 * @since 7.0
+	 */
+	public $font_report;
+
+	/**
 	 * Holds our Font_Cache_Warmer object
 	 * Parses newly installed faces so no render is the first to do it
 	 *
@@ -1057,6 +1066,27 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
+	 * Build the font subsystem's half of the System Report, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_report(): Fonts\Font_Report {
+		if ( $this->font_report === null ) {
+			$this->font_report = new Fonts\Font_Report(
+				$this->get_font_repository(),
+				$this->get_catalog_repository(),
+				$this->get_catalog_sync(),
+				$this->get_install_queue(),
+				$this->get_font_registry(),
+				$this->get_health_runner(),
+				$this->data
+			);
+		}
+
+		return $this->font_report;
+	}
+
+	/**
 	 * Build the health runner, once, with the checks core registers
 	 *
 	 * The checks are handed in rather than built inside it: the runner is subsystem-agnostic by design, and
@@ -1340,7 +1370,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
-		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates );
+		$model = new Model\Model_System_Report(
+			$this->options,
+			$this->data,
+			$this->log,
+			$this->misc,
+			new GFPDF_Major_Compatibility_Checks(),
+			$this->templates,
+			$this->get_font_report()
+		);
 		$class = new Controller\Controller_System_Report( $model, $view, $this->gform );
 		$class->init();
 
