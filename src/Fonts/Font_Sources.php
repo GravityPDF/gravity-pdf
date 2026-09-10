@@ -302,7 +302,7 @@ class Font_Sources {
 			'source'      => (string) $row['source'],
 			'entry'       => (string) $row['entry'],
 			'coverage'    => (int) $coverage,
-			'meta'        => $coverage ? static::coverage_meta( $font_key, $entry, $roles ) : [],
+			'meta'        => $coverage ? static::coverage_meta( $font_key, $entry, $roles, $row ) : [],
 			'version'     => $row['version'] ?? null,
 			'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
 			'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
@@ -319,10 +319,11 @@ class Font_Sources {
 	 *
 	 * @param array $entry The decoded `entry` object
 	 * @param array $roles That font key's role map, for the `sip-ext` supplement
+	 * @param array $row   The catalog row, for the `position` half of the language map's sort key
 	 *
 	 * @since 7.0
 	 */
-	public static function coverage_meta( string $font_key, array $entry, array $roles ): array {
+	public static function coverage_meta( string $font_key, array $entry, array $roles, array $row ): array {
 		$languages = [];
 		foreach ( (array) ( $entry['language_to_font'] ?? [] ) as $code => $target ) {
 			if ( $target === $font_key ) {
@@ -342,6 +343,9 @@ class Font_Sources {
 			'bmp'                 => in_array( $font_key, (array) ( $entry['bmp_fonts'] ?? [] ), true ),
 			'family_substitution' => $families,
 			'languages'           => $languages,
+			/* The language map's sort key and nothing else, copied here so precedence costs no query on the render path */
+			'generic'             => ! empty( $entry['generic'] ),
+			'position'            => (int) ( $row['position'] ?? 0 ),
 		];
 
 		if ( isset( $roles['sip-ext'] ) && is_string( $roles['sip-ext'] ) ) {

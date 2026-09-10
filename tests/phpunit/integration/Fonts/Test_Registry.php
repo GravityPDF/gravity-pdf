@@ -150,9 +150,39 @@ class Test_Registry extends TestCase {
 		$this->assertSame( 'gfpdf-arimo', $map['und-latn'] );
 	}
 
-	public function test_the_earlier_row_wins_between_installed_entries() {
-		$this->install( 'first', [ 'meta' => [ 'languages' => [ 'ko' ] ] ] );
-		$this->install( 'second', [ 'meta' => [ 'languages' => [ 'ko' ] ] ] );
+	public function provider_install_orders(): array {
+		return [
+			'the generic pack first'  => [ [ 'open-sans', 'taameydavidclm' ] ],
+			'the specific pack first' => [ [ 'taameydavidclm', 'open-sans' ] ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_install_orders
+	 */
+	public function test_a_specific_pack_outranks_a_generic_one_in_either_install_order( array $order ) {
+		$meta = [
+			'open-sans'      => [ 'languages' => [ 'he' ], 'generic' => true, 'position' => 0 ],
+			'taameydavidclm' => [ 'languages' => [ 'he' ], 'position' => 12 ],
+		];
+
+		foreach ( $order as $font_key ) {
+			$this->install( $font_key, [ 'meta' => $meta[ $font_key ] ] );
+		}
+
+		$this->assertSame( 'taameydavidclm', $this->registry->default_language_map()['he'] );
+	}
+
+	public function test_position_orders_two_rows_of_the_same_tier() {
+		$this->install( 'caveat', [ 'meta' => [ 'languages' => [ 'ru' ], 'generic' => true, 'position' => 3 ] ] );
+		$this->install( 'roboto', [ 'meta' => [ 'languages' => [ 'ru' ], 'generic' => true, 'position' => 0 ] ] );
+
+		$this->assertSame( 'roboto', $this->registry->default_language_map()['ru'] );
+	}
+
+	public function test_the_font_key_breaks_a_tie_between_two_equal_rows() {
+		$this->install( 'second', [ 'meta' => [ 'languages' => [ 'ko' ], 'position' => 5 ] ] );
+		$this->install( 'first', [ 'meta' => [ 'languages' => [ 'ko' ], 'position' => 5 ] ] );
 
 		$this->assertSame( 'first', $this->registry->default_language_map()['ko'] );
 	}

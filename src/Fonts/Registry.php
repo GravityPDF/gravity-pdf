@@ -415,8 +415,7 @@ class Registry {
 	/**
 	 * The bundled map overlaid by the installed rows
 	 *
-	 * Installed beats bundled for the same code; between installed entries the earlier row wins, which is the
-	 * catalogue's `position` order.
+	 * Installed beats bundled for the same code; between installed entries the first row in precedence order wins.
 	 *
 	 * @return array<string, string>
 	 *
@@ -425,11 +424,10 @@ class Registry {
 	public function default_language_map(): array {
 		$installed = [];
 
-		foreach ( $this->rows() as $font_key => $row ) {
+		foreach ( $this->rows_by_precedence() as $font_key => $row ) {
 			foreach ( (array) ( $row['meta']['languages'] ?? [] ) as $code ) {
 				$code = strtolower( (string) $code );
 
-				/* Earlier row wins, which is the catalogue's position order */
 				if ( $code !== '' && ! isset( $installed[ $code ] ) ) {
 					$installed[ $code ] = $font_key;
 				}
@@ -437,6 +435,45 @@ class Registry {
 		}
 
 		return array_merge( static::DEFAULT_LANGUAGE_MAP, $installed );
+	}
+
+	/**
+	 * The rows ordered `[ generic, position, font_key ]`: every language-specific pack ahead of every generic one,
+	 * each tier in the catalogue's order, and the key as a stable tiebreak
+	 *
+	 * Not the order the rows arrive in. `Font_Repository::all()` reads them by the font table's auto-increment
+	 * `id`, which is the order this site happened to install them, so two sites holding the same two packs would
+	 * otherwise resolve a code both claim — `he` is claimed by `west-asian` and by `popular-sans` — differently.
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 7.0
+	 */
+	protected function rows_by_precedence(): array {
+		$rows = $this->rows();
+
+		/* `$rows` is captured before the sort, so the comparison always reads the unsorted copy */
+		uksort(
+			$rows,
+			static function ( $a, $b ) use ( $rows ) {
+				return static::precedence( $rows[ $a ], $a ) <=> static::precedence( $rows[ $b ], $b );
+			}
+		);
+
+		return $rows;
+	}
+
+	/**
+	 * One row's sort key, read from the `meta` its source wrote (`Font_Sources::coverage_meta()`)
+	 *
+	 * @return array{0: int, 1: int, 2: string}
+	 *
+	 * @since 7.0
+	 */
+	protected static function precedence( array $row, string $font_key ): array {
+		$meta = (array) ( $row['meta'] ?? [] );
+
+		return [ empty( $meta['generic'] ) ? 0 : 1, (int) ( $meta['position'] ?? 0 ), $font_key ];
 	}
 
 	/**

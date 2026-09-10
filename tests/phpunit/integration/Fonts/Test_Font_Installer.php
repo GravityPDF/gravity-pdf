@@ -126,7 +126,7 @@ class Test_Font_Installer extends TestCase {
 
 	public function test_an_install_writes_the_file_the_row_and_its_coverage_meta() {
 		$body = $this->font_bytes();
-		$this->seed_pack( 'emoji', [], $body );
+		$this->seed_pack( 'emoji', [], $body, [ 'position' => 4 ] );
 
 		$this->assertTrue( $this->installer->install( 'packs/emoji' ) );
 
@@ -146,9 +146,34 @@ class Test_Font_Installer extends TestCase {
 		$this->assertSame( [ 'und-Zsye' ], $font['meta']['languages'] );
 		$this->assertTrue( $font['meta']['backup_subs'] );
 
+		/* And with them the language map's sort key, so precedence costs no query on the render path */
+		$this->assertFalse( $font['meta']['generic'] );
+		$this->assertSame( 4, $font['meta']['position'] );
+
 		$this->assertSame( 'packs/emoji/NotoEmoji.ttf', $font['files']['R']['path'] );
 		$this->assertSame( hash( 'sha256', $body ), $font['files']['R']['sha256'] );
 		$this->assertSame( strlen( $body ), $font['files']['R']['size'] );
+	}
+
+	public function test_a_generic_entry_marks_every_row_it_installs() {
+		$this->seed_pack(
+			'popular-sans',
+			[
+				'fonts'            => [ 'open-sans' => [ 'R' => 'NotoEmoji.ttf' ] ],
+				'language_to_font' => [ 'he' => 'open-sans' ],
+				'generic'          => true,
+			],
+			null,
+			[ 'position' => 0 ]
+		);
+
+		$this->assertTrue( $this->installer->install( 'packs/popular-sans' ) );
+
+		$font = $this->font( 'open-sans' );
+
+		/* The rows still carry the pack's language claim: `generic` decides who wins the code, not who claims it */
+		$this->assertTrue( $font['meta']['generic'] );
+		$this->assertSame( [ 'he' ], $font['meta']['languages'] );
 	}
 
 	public function test_a_successful_install_leaves_no_phase_on_the_catalog_row() {
