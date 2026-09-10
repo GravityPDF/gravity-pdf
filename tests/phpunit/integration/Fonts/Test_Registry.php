@@ -110,6 +110,17 @@ class Test_Registry extends TestCase {
 		$this->assertArrayNotHasKey( 'B', $fonts['beta'] );
 	}
 
+	public function test_a_licence_file_is_recorded_without_becoming_a_face() {
+		$id = $this->install( 'epsilon' );
+
+		/* mPDF is handed roles, so a licence text reaching `AddFont()` would throw where a font would render */
+		$this->repository->insert_file( $id, 'LICENSE', [ 'path' => 'test-epsilon-licence.txt', 'size' => 3 ] );
+
+		$fonts = $this->registry->installed_package()->getFonts();
+
+		$this->assertSame( [ 'R', 'useOTL', 'useKashida' ], array_keys( $fonts['epsilon'] ) );
+	}
+
 	public function test_a_row_with_no_readable_face_registers_nothing() {
 		$id = $this->install( 'gamma' );
 		$this->repository->set_missing( 'test-gamma.ttf', true );

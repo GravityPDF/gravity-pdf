@@ -186,6 +186,10 @@ class Test_Font_Sources extends TestCase {
 			'unknown extension'           => [ [ 'files' => [ 'Ok.php' => $file ] ] ],
 			'missing remote_path'         => [ [ 'files' => [ 'Ok.ttf' => [ 'sha256' => '', 'size' => 1 ] ] ] ],
 			'role names an unlisted file' => [ [ 'fonts' => [ 'ok' => [ 'R' => 'Missing.ttf' ] ] ] ],
+			'a face role naming a list'   => [ [ 'fonts' => [ 'ok' => [ 'R' => [ 'NotoSansSC-Regular.ttf' ] ] ] ] ],
+			'an empty licence list'       => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'LICENSE' => [] ] ] ] ],
+			'a licence list with a hole'  => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'LICENSE' => [ 'NotoSansSC-Regular.ttf', 3 ] ] ] ] ],
+			'a licence naming no file'    => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'LICENSE' => [ 'NotoSansSC-Regular.ttf', 'Missing.txt' ] ] ] ] ],
 			'font key with a slash'       => [ [ 'fonts' => [ 'ok/evil' => [ 'R' => 'NotoSansSC-Regular.ttf' ] ] ] ],
 			'font key with a dot'         => [ [ 'fonts' => [ '../evil' => [ 'R' => 'NotoSansSC-Regular.ttf' ] ] ] ],
 			'invalid sip-ext target'      => [ [ 'fonts' => [ 'ok' => [ 'R' => 'NotoSansSC-Regular.ttf', 'sip-ext' => 'a/b' ] ] ] ],
@@ -194,6 +198,45 @@ class Test_Font_Sources extends TestCase {
 			'invalid variant id'          => [ [ 'variants' => [ 'a/b' => 'NotoSansSC-Regular.ttf' ] ] ],
 			'traversing preview'          => [ [ 'preview' => '../evil' ] ],
 		];
+	}
+
+	/**
+	 * A copyleft face ships a notice *and* the full text the notice cites, so `LICENSE` is the one role that may
+	 * name a list. Each file becomes a role of its own — the file table is unique on `(font_id, role)` — numbered
+	 * in the entry's order, which is hash-pinned and so cannot shift under a site that already installed it
+	 */
+	public function test_a_licence_role_may_name_a_list_and_each_file_takes_its_own_role() {
+		$entry = [
+			'fonts' => [
+				'khmeros' => [ 'R' => 'KhmerOS.ttf', 'LICENSE' => [ 'KhmerOS-LICENSE.txt', 'LGPL-2.1.txt' ] ],
+			],
+			'files' => [
+				'KhmerOS.ttf'         => [ 'remote_path' => 'v/KhmerOS.ttf' ],
+				'KhmerOS-LICENSE.txt' => [ 'remote_path' => 'v/KhmerOS-LICENSE.txt' ],
+				'LGPL-2.1.txt'        => [ 'remote_path' => 'v/LGPL-2.1.txt' ],
+			],
+		];
+
+		$this->assertNull( Font_Sources::validate_entry( $entry ) );
+
+		$this->assertSame(
+			[
+				'R'         => 'KhmerOS.ttf',
+				'LICENSE'   => 'KhmerOS-LICENSE.txt',
+				'LICENSE-2' => 'LGPL-2.1.txt',
+			],
+			Font_Sources::role_map( $entry['fonts']['khmeros'] )
+		);
+	}
+
+	public function test_a_single_licence_file_may_be_named_without_a_list() {
+		$roles = [ 'R' => 'KhmerOS.ttf', 'LICENSE' => 'KhmerOS-LICENSE.txt', 'useOTL' => 255, 'sip-ext' => 'other' ];
+
+		/* The flags are not files and drop out here, which is what saves every caller its own exclusion list */
+		$this->assertSame(
+			[ 'R' => 'KhmerOS.ttf', 'LICENSE' => 'KhmerOS-LICENSE.txt' ],
+			Font_Sources::role_map( $roles )
+		);
 	}
 
 	public function test_a_font_key_can_never_reach_mpdfs_cache_path() {

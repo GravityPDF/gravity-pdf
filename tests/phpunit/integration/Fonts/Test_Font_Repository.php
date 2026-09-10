@@ -232,6 +232,10 @@ class Test_Font_Repository extends TestCase {
 
 		$this->assertFalse( $this->repository->insert_file( $id, 'X', [ 'path' => 'test-omicron.ttf', 'size' => 3 ] ) );
 		$this->assertTrue( $this->repository->insert_file( $id, 'dict_thai', [ 'path' => 'test-omicron.ttf', 'size' => 3 ] ) );
+
+		/* A copyleft face ships the notice and the text it cites, and the table is unique on (font_id, role) */
+		$this->assertTrue( $this->repository->insert_file( $id, 'LICENSE', [ 'path' => 'test-omicron-licence.txt', 'size' => 3 ] ) );
+		$this->assertTrue( $this->repository->insert_file( $id, 'LICENSE-2', [ 'path' => 'test-omicron-lgpl.txt', 'size' => 3 ] ) );
 	}
 
 	public function test_ensure_ready_is_a_no_op_once_the_version_is_recorded() {
