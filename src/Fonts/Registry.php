@@ -438,8 +438,12 @@ class Registry {
 	}
 
 	/**
-	 * The rows ordered `[ generic, position, font_key ]`: every language-specific pack ahead of every generic one,
-	 * each tier in the catalogue's order, and the key as a stable tiebreak
+	 * The rows ordered `[ legacy, generic, position, font_key ]`: every language-specific pack ahead of every
+	 * generic one, both ahead of everything a 6.x upgrade adopted off disk, each tier in the catalogue's order, and
+	 * the key as a stable tiebreak
+	 *
+	 * The legacy tier is last because an adopted font is what the site had, not what it asked for: installing the
+	 * Korean pack moves `ko` off its own UnBatang by the ordinary rule, with nothing to uninstall first.
 	 *
 	 * Not the order the rows arrive in. `Font_Repository::all()` reads them by the font table's auto-increment
 	 * `id`, which is the order this site happened to install them, so two sites holding the same two packs would
@@ -464,16 +468,22 @@ class Registry {
 	}
 
 	/**
-	 * One row's sort key, read from the `meta` its source wrote (`Font_Sources::coverage_meta()`)
+	 * One row's sort key, read from the `meta` its source wrote (`Font_Sources::coverage_meta()`, or
+	 * `Legacy_Font_Adopter` for the legacy tier)
 	 *
-	 * @return array{0: int, 1: int, 2: string}
+	 * @return array{0: int, 1: int, 2: int, 3: string}
 	 *
 	 * @since 7.0
 	 */
 	protected static function precedence( array $row, string $font_key ): array {
 		$meta = (array) ( $row['meta'] ?? [] );
 
-		return [ empty( $meta['generic'] ) ? 0 : 1, (int) ( $meta['position'] ?? 0 ), $font_key ];
+		return [
+			empty( $meta['legacy'] ) ? 0 : 1,
+			empty( $meta['generic'] ) ? 0 : 1,
+			(int) ( $meta['position'] ?? 0 ),
+			$font_key,
+		];
 	}
 
 	/**
@@ -861,6 +871,8 @@ class Registry {
 				static::BUNDLED_FONT,
 				'sans',
 				'sans-serif',
+				'cursive',
+				'fantasy',
 				'dejavusanscondensed',
 				'dejavusans',
 				'freesans',
@@ -895,24 +907,31 @@ class Registry {
 	}
 
 	/**
-	 * `arial` / `helvetica` resolve to the bundled font, unless a row claims the name
+	 * `arial` / `helvetica` resolve to the bundled font, plus whatever names the rows claim for themselves
 	 *
-	 * Arimo is metric-compatible with Arial, so templates written against those families keep their layout. An
-	 * upload or import may claim either key, and then it wins — the alias defers to a real font.
+	 * Arimo is metric-compatible with Arial, so templates written against those families keep their layout. The
+	 * rows' own `meta.aliases` are 6.x's `fonttrans` entries, carried by the upgrade with the fonts they name
+	 * (`ocr-b` → `ocrb`, `damase` → `mph2bdamase`), so a template written against either still resolves.
+	 *
+	 * Every alias defers to a real font: an upload or import may claim any of these keys, and then it wins.
 	 *
 	 * @return array<string, string>
 	 *
 	 * @since 7.0
 	 */
 	protected function bundled_aliases(): array {
-		$aliases = [];
+		$rows    = $this->rows();
+		$aliases = [
+			'arial'     => static::BUNDLED_FONT,
+			'helvetica' => static::BUNDLED_FONT,
+		];
 
-		foreach ( [ 'arial', 'helvetica' ] as $alias ) {
-			if ( $this->repository->get( $alias ) === null ) {
-				$aliases[ $alias ] = static::BUNDLED_FONT;
+		foreach ( $rows as $font_key => $row ) {
+			foreach ( (array) ( $row['meta']['aliases'] ?? [] ) as $alias ) {
+				$aliases[ strtolower( (string) $alias ) ] = $font_key;
 			}
 		}
 
-		return $aliases;
+		return array_diff_key( $aliases, $rows );
 	}
 }

@@ -138,6 +138,22 @@ class Test_Registry extends TestCase {
 		$this->assertContains( 'delta', $package->getFontFamilySubstitution()['serif_fonts'] );
 	}
 
+	public function test_the_backup_substitution_list_keeps_the_order_the_rows_arrive_in() {
+		foreach ( [ 'dejavusanscondensed', 'freesans', 'sun-exta' ] as $font_key ) {
+			$this->install( $font_key, [ 'meta' => [ 'legacy' => true, 'backup_subs' => true ] ] );
+		}
+
+		/* 6.x's own three, and mPDF reads the bundled pair ahead of them (see the layer order below) */
+		$this->assertSame(
+			[ 'dejavusanscondensed', 'freesans', 'sun-exta' ],
+			$this->registry->installed_package()->getBackupSubsFonts()
+		);
+		$this->assertSame(
+			[ 'gfpdf-arimo', 'gfpdf-dejavu-symbols' ],
+			$this->registry->bundled_package()->getBackupSubsFonts()
+		);
+	}
+
 	public function test_bundled_is_read_before_installed() {
 		$registry = $this->registry->build_font_registry();
 		$packages = array_values( $registry->getAll() );
@@ -196,6 +212,52 @@ class Test_Registry extends TestCase {
 		$this->install( 'first', [ 'meta' => [ 'languages' => [ 'ko' ], 'position' => 5 ] ] );
 
 		$this->assertSame( 'first', $this->registry->default_language_map()['ko'] );
+	}
+
+	/**
+	 * @dataProvider provider_install_orders_with_legacy
+	 */
+	public function test_a_pack_outranks_a_legacy_row_in_either_install_order( array $order ) {
+		$meta = [
+			'notosanskr' => [ 'languages' => [ 'ko' ], 'position' => 4 ],
+			'unbatang'   => [ 'languages' => [ 'ko' ], 'legacy' => true ],
+		];
+
+		foreach ( $order as $font_key ) {
+			$this->install( $font_key, [ 'meta' => $meta[ $font_key ] ] );
+		}
+
+		$this->assertSame( 'notosanskr', $this->registry->default_language_map()['ko'] );
+	}
+
+	public function provider_install_orders_with_legacy(): array {
+		return [
+			'the legacy row first' => [ [ 'unbatang', 'notosanskr' ] ],
+			'the pack first'       => [ [ 'notosanskr', 'unbatang' ] ],
+		];
+	}
+
+	public function test_a_legacy_row_answers_a_code_no_pack_claims() {
+		$this->install( 'unbatang', [ 'meta' => [ 'legacy' => true, 'languages' => [ 'ko', 'kor' ] ] ] );
+
+		$this->assertSame( 'unbatang', $this->registry->default_language_map()['ko'] );
+	}
+
+	public function test_a_legacy_row_takes_back_the_latin_code_it_had_in_six() {
+		$this->install( 'dejavusanscondensed', [ 'meta' => [ 'legacy' => true, 'languages' => [ 'und-latn' ] ] ] );
+
+		$this->assertSame( 'dejavusanscondensed', $this->registry->default_language_map()['und-latn'] );
+	}
+
+	public function test_deleting_a_legacy_row_returns_its_codes_to_the_bundled_map() {
+		$this->install( 'dejavusanscondensed', [ 'meta' => [ 'legacy' => true, 'languages' => [ 'und-latn', 'ru' ] ] ] );
+
+		$this->repository->delete( 'dejavusanscondensed' );
+
+		$map = $this->registry->default_language_map();
+
+		$this->assertSame( 'gfpdf-arimo', $map['und-latn'] );
+		$this->assertArrayNotHasKey( 'ru', $map );
 	}
 
 	public function test_an_override_replaces_a_mapped_font() {
@@ -295,6 +357,30 @@ class Test_Registry extends TestCase {
 		$this->install( 'arial' );
 
 		$this->assertArrayNotHasKey( 'arial', $this->registry->bundled_package()->getFontAliases() );
+	}
+
+	public function test_a_rows_own_aliases_resolve_to_it() {
+		$this->install( 'ocrb', [ 'meta' => [ 'legacy' => true, 'aliases' => [ 'ocr-b', 'ocr-b10bt' ] ] ] );
+
+		$aliases = $this->registry->bundled_package()->getFontAliases();
+
+		$this->assertSame( 'ocrb', $aliases['ocr-b'] );
+		$this->assertSame( 'ocrb', $aliases['ocr-b10bt'] );
+	}
+
+	public function test_an_alias_a_row_claims_by_name_is_dropped() {
+		$this->install( 'ocrb', [ 'meta' => [ 'legacy' => true, 'aliases' => [ 'ocr-b' ] ] ] );
+		$this->install( 'ocr-b' );
+
+		$this->assertArrayNotHasKey( 'ocr-b', $this->registry->bundled_package()->getFontAliases() );
+	}
+
+	public function test_the_generic_sans_list_carries_the_css_generic_names() {
+		$sans = $this->registry->bundled_package()->getFontFamilySubstitution()['sans_fonts'];
+
+		$this->assertSame( 'gfpdf-arimo', $sans[0] );
+		$this->assertContains( 'cursive', $sans );
+		$this->assertContains( 'fantasy', $sans );
 	}
 
 	public function test_grouped_fonts_separate_packs_from_uploads() {

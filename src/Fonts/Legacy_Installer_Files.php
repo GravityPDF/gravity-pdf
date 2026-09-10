@@ -30,6 +30,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * after the upgrade, even where 7.0's language packs ship a different face for that script. `use_otl` and
  * `use_kashida` are carried across for the same reason: they are what shaped the text in 6.x.
  *
+ * The second half of each entry is the language data 6.x never stored, because it never had to: `autoLangToFont`
+ * read `Mpdf\Language\LanguageToFont` and `useSubstitutions` read the `FontVariables` defaults, both out of the
+ * library on every render. 7.0 keeps that class out of the registry — it names keys a fresh install does not have —
+ * so the data is frozen here instead, from the fork at `70b90cc~1`, the revision the file names came from. Without
+ * it the adopted files would be registered and unreachable: `ko` would resolve to nothing and a site that rendered
+ * Korean through UnBatang would render boxes with the file still on its disk.
+ *
+ * `languages` are the codes that selected the family, `und-<script>` for the ones `fontByScript()` answered.
+ * The source map has 173 rows over 31 keys; `eeyekunicode` is the one key with no family here, which corroborates
+ * the manifest from the other side, so 172 rows over 30 keys are carried. `backup_subs` is 6.x's `backupSubsFont`
+ * (three fonts, not one), `bmp` its `BMPonly`, `sip_ext` the one `sip-ext` entry, and `aliases` the two `fonttrans`
+ * entries naming a font 6.x could actually install — the other six name fonts no site ever had.
+ *
  * Verify before adopting. `blob` is Git's object hash for the file — `sha1( "blob <size>\0" . contents )` — the
  * hash the manifest already carried, kept in preference to a fresh sha256, which could only be derived by
  * re-downloading the files today and would attest to that download rather than to what the installer shipped.
@@ -45,7 +58,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Legacy_Installer_Files {
 
 	/**
-	 * @var array<string, array{use_otl: int, use_kashida: int, faces: array<string, array{name: string, blob: string, size: int}>}>
+	 * @var array<string, array{use_otl: int, use_kashida: int, faces: array<string, array{name: string, blob: string, size: int}>, languages?: string[], backup_subs?: bool, bmp?: bool, sip_ext?: string, aliases?: string[]}>
 	 * @since 7.0
 	 */
 	public const FAMILIES = [
@@ -59,6 +72,15 @@ class Legacy_Installer_Files {
 					'size' => 800480,
 				],
 			],
+			'languages'   => [
+				'chr',
+				'cr',
+				'cre',
+				'iku',
+				'iu',
+				'oj',
+				'oji',
+			],
 		],
 		'abyssinicasil'         => [
 			'use_otl'     => 0xFF,
@@ -69,6 +91,13 @@ class Legacy_Installer_Files {
 					'blob' => 'f2215e9362fc21d2315f9057025e49bee743d84b',
 					'size' => 619012,
 				],
+			],
+			'languages'   => [
+				'am',
+				'amh',
+				'ti',
+				'tir',
+				'und-ethi',
 			],
 		],
 		'aegean'                => [
@@ -81,6 +110,16 @@ class Legacy_Installer_Files {
 					'size' => 1747560,
 				],
 			],
+			'languages'   => [
+				'phn',
+				'uga',
+				'und-cprt',
+				'und-ital',
+				'und-linb',
+				'xcr',
+				'xlc',
+				'xld',
+			],
 		],
 		'aegyptus'              => [
 			'use_otl'     => 0xFF,
@@ -92,6 +131,9 @@ class Legacy_Installer_Files {
 					'size' => 5841368,
 				],
 			],
+			'languages'   => [
+				'und-egyp',
+			],
 		],
 		'akkadian'              => [
 			'use_otl'     => 0xFF,
@@ -102,6 +144,9 @@ class Legacy_Installer_Files {
 					'blob' => '5dfb7adc44e97938883857dae84dc02b94c6e2c4',
 					'size' => 1501384,
 				],
+			],
+			'languages'   => [
+				'und-xsux',
 			],
 		],
 		'ayar'                  => [
@@ -124,6 +169,9 @@ class Legacy_Installer_Files {
 					'blob' => '658fc362fd9e4d7b454e243ff82aa51e451f4f4e',
 					'size' => 83524,
 				],
+			],
+			'languages'   => [
+				'und-talu',
 			],
 		],
 		'dejavusans'            => [
@@ -151,6 +199,17 @@ class Legacy_Installer_Files {
 					'size' => 632168,
 				],
 			],
+			'languages'   => [
+				'hy',
+				'hye',
+				'ka',
+				'kat',
+				'nqo',
+				'und-brai',
+				'und-ogam',
+				'und-tfng',
+			],
+			'bmp'         => true,
 		],
 		'dejavusanscondensed'   => [
 			'use_otl'     => 0xFF,
@@ -177,6 +236,54 @@ class Legacy_Installer_Files {
 					'size' => 621680,
 				],
 			],
+			'languages'   => [
+				'ab',
+				'abk',
+				'av',
+				'ava',
+				'ba',
+				'bak',
+				'be',
+				'bel',
+				'bg',
+				'bul',
+				'ce',
+				'che',
+				'chu',
+				'chv',
+				'cu',
+				'cv',
+				'el',
+				'ell',
+				'kaz',
+				'kir',
+				'kk',
+				'kom',
+				'kv',
+				'ky',
+				'mk',
+				'mkd',
+				'os',
+				'oss',
+				'ru',
+				'rus',
+				'sr',
+				'srp',
+				'tat',
+				'tg',
+				'tgk',
+				'tk',
+				'tt',
+				'tuk',
+				'uk',
+				'ukr',
+				'und-cyrl',
+				'und-latn',
+				'vi',
+				'vie',
+			],
+			'backup_subs' => true,
+			'bmp'         => true,
 		],
 		'dejavusansmono'        => [
 			'use_otl'     => 0xFF,
@@ -203,6 +310,7 @@ class Legacy_Installer_Files {
 					'size' => 239876,
 				],
 			],
+			'bmp'         => true,
 		],
 		'dejavuserif'           => [
 			'use_otl'     => 0,
@@ -229,6 +337,7 @@ class Legacy_Installer_Files {
 					'size' => 336884,
 				],
 			],
+			'bmp'         => true,
 		],
 		'dejavuserifcondensed'  => [
 			'use_otl'     => 0,
@@ -255,6 +364,7 @@ class Legacy_Installer_Files {
 					'size' => 335940,
 				],
 			],
+			'bmp'         => true,
 		],
 		'dhyana'                => [
 			'use_otl'     => 0xFF,
@@ -271,6 +381,10 @@ class Legacy_Installer_Files {
 					'size' => 61304,
 				],
 			],
+			'languages'   => [
+				'lao',
+				'lo',
+			],
 		],
 		'estrangeloedessa'      => [
 			'use_otl'     => 0xFF,
@@ -281,6 +395,9 @@ class Legacy_Installer_Files {
 					'blob' => '9e1fbda08ea3aec65eb2d0603ba321b77c629dab',
 					'size' => 79668,
 				],
+			],
+			'languages'   => [
+				'syr',
 			],
 		],
 		'freemono'              => [
@@ -308,6 +425,9 @@ class Legacy_Installer_Files {
 					'size' => 295360,
 				],
 			],
+			'languages'   => [
+				'und-kali',
+			],
 		],
 		'freesans'              => [
 			'use_otl'     => 0xFF,
@@ -334,6 +454,10 @@ class Legacy_Installer_Files {
 					'size' => 342488,
 				],
 			],
+			'languages'   => [
+				'vai',
+			],
+			'backup_subs' => true,
 		],
 		'freeserif'             => [
 			'use_otl'     => 0xFF,
@@ -359,6 +483,38 @@ class Legacy_Installer_Files {
 					'blob' => 'c41a9651aa8af58ca60eca67081328c648e6312e',
 					'size' => 608708,
 				],
+			],
+			'languages'   => [
+				'as',
+				'asm',
+				'ben',
+				'bh',
+				'bih',
+				'bn',
+				'bug',
+				'div',
+				'dv',
+				'got',
+				'gu',
+				'guj',
+				'hi',
+				'hin',
+				'kas',
+				'ks',
+				'mal',
+				'mar',
+				'ml',
+				'mr',
+				'ne',
+				'nep',
+				'or',
+				'ori',
+				'pa',
+				'pan',
+				'sa',
+				'san',
+				'ta',
+				'tam',
 			],
 		],
 		'garuda'                => [
@@ -386,6 +542,10 @@ class Legacy_Installer_Files {
 					'size' => 57460,
 				],
 			],
+			'languages'   => [
+				'th',
+				'tha',
+			],
 		],
 		'jomolhari'             => [
 			'use_otl'     => 0xFF,
@@ -397,6 +557,12 @@ class Legacy_Installer_Files {
 					'size' => 2269108,
 				],
 			],
+			'languages'   => [
+				'bo',
+				'bod',
+				'dz',
+				'dzo',
+			],
 		],
 		'kaputaunicode'         => [
 			'use_otl'     => 0xFF,
@@ -407,6 +573,10 @@ class Legacy_Installer_Files {
 					'blob' => 'fe0269726810dd7dc32844f16c10ffcee58a7af3',
 					'size' => 159696,
 				],
+			],
+			'languages'   => [
+				'si',
+				'sin',
 			],
 		],
 		'kfgqpcuthmantahanaskh' => [
@@ -430,6 +600,10 @@ class Legacy_Installer_Files {
 					'size' => 265988,
 				],
 			],
+			'languages'   => [
+				'khm',
+				'km',
+			],
 		],
 		'lannaalif'             => [
 			'use_otl'     => 0xFF,
@@ -440,6 +614,9 @@ class Legacy_Installer_Files {
 					'blob' => '7c20d97910fc8867e48dcebdc8abbc10ebb91913',
 					'size' => 136648,
 				],
+			],
+			'languages'   => [
+				'und-lana',
 			],
 		],
 		'lateef'                => [
@@ -452,6 +629,10 @@ class Legacy_Installer_Files {
 					'size' => 246224,
 				],
 			],
+			'languages'   => [
+				'sd',
+				'snd',
+			],
 		],
 		'lohitkannada'          => [
 			'use_otl'     => 0xFF,
@@ -462,6 +643,10 @@ class Legacy_Installer_Files {
 					'blob' => '2911ce7b67cc5511ff6997ea010b800f4c173e5c',
 					'size' => 197872,
 				],
+			],
+			'languages'   => [
+				'kan',
+				'kn',
 			],
 		],
 		'mph2bdamase'           => [
@@ -474,6 +659,17 @@ class Legacy_Installer_Files {
 					'size' => 900260,
 				],
 			],
+			'languages'   => [
+				'syl',
+				'und-dsrt',
+				'und-glag',
+				'und-khar',
+				'und-osma',
+				'und-shaw',
+			],
+			'aliases'     => [
+				'damase',
+			],
 		],
 		'ocrb'                  => [
 			'use_otl'     => 0,
@@ -484,6 +680,10 @@ class Legacy_Installer_Files {
 					'blob' => '34980b80c2b23bd2afdfe3c74cd40e1f933d523c',
 					'size' => 23112,
 				],
+			],
+			'aliases'     => [
+				'ocr-b',
+				'ocr-b10bt',
 			],
 		],
 		'padaukbook'            => [
@@ -507,6 +707,10 @@ class Legacy_Installer_Files {
 					'size' => 194268,
 				],
 			],
+			'languages'   => [
+				'te',
+				'tel',
+			],
 		],
 		'quivira'               => [
 			'use_otl'     => 0xFF,
@@ -517,6 +721,14 @@ class Legacy_Installer_Files {
 					'blob' => '531edf16cbad57f67d9033ea9d112110c21bfce8',
 					'size' => 1475236,
 				],
+			],
+			'languages'   => [
+				'bku',
+				'cop',
+				'hnn',
+				'lis',
+				'tbw',
+				'tl',
 			],
 		],
 		'sun-exta'              => [
@@ -529,6 +741,21 @@ class Legacy_Installer_Files {
 					'size' => 22993540,
 				],
 			],
+			'languages'   => [
+				'ii',
+				'iii',
+				'ja',
+				'jpn',
+				'lif',
+				'und-bopo',
+				'und-hans',
+				'und-runr',
+				'und-yiii',
+				'zh',
+				'zho',
+			],
+			'backup_subs' => true,
+			'sip_ext'     => 'sun-extb',
 		],
 		'sun-extb'              => [
 			'use_otl'     => 0,
@@ -551,6 +778,9 @@ class Legacy_Installer_Files {
 					'size' => 54000,
 				],
 			],
+			'languages'   => [
+				'su',
+			],
 		],
 		'taameydavidclm'        => [
 			'use_otl'     => 0xFF,
@@ -561,6 +791,12 @@ class Legacy_Installer_Files {
 					'blob' => '2aed6f85e2395c837ab20a4768fb1e2f6d8f2b51',
 					'size' => 96284,
 				],
+			],
+			'languages'   => [
+				'he',
+				'heb',
+				'yi',
+				'yid',
 			],
 		],
 		'taiheritagepro'        => [
@@ -573,6 +809,9 @@ class Legacy_Installer_Files {
 					'size' => 210336,
 				],
 			],
+			'languages'   => [
+				'blt',
+			],
 		],
 		'tharlon'               => [
 			'use_otl'     => 0xFF,
@@ -584,6 +823,11 @@ class Legacy_Installer_Files {
 					'size' => 353228,
 				],
 			],
+			'languages'   => [
+				'my',
+				'mya',
+				'tdd',
+			],
 		],
 		'unbatang'              => [
 			'use_otl'     => 0,
@@ -594,6 +838,10 @@ class Legacy_Installer_Files {
 					'blob' => '2e93d5f86b360e013588bcb8a5df1a72614aa2d6',
 					'size' => 6937228,
 				],
+			],
+			'languages'   => [
+				'ko',
+				'kor',
 			],
 		],
 		'xbriyaz'               => [
@@ -620,6 +868,19 @@ class Legacy_Installer_Files {
 					'blob' => '19fba7887e965c9f331479862c53ec97f4caf22e',
 					'size' => 1159500,
 				],
+			],
+			'languages'   => [
+				'ar',
+				'ara',
+				'fa',
+				'fas',
+				'ku',
+				'kur',
+				'ps',
+				'pus',
+				'und-arab',
+				'ur',
+				'urd',
 			],
 		],
 		'zawgyi-one'            => [
