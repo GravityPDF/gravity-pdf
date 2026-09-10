@@ -410,6 +410,33 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	 *
 	 * @since 6.0
 	 */
+	/**
+	 * The capability check, plus the multisite one for unlinking this row's files
+	 *
+	 * Here rather than in `delete_item()` so that `GPDFAPI::delete_pdf_font()` keeps working the way
+	 * `add_pdf_font()` does: the programmatic API calls the handler directly and answers to no user.
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function delete_item_permissions_check( $request ) {
+		$allowed = parent::delete_item_permissions_check( $request );
+
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+
+		$font = $this->model->get_font( (string) $request['id'] );
+
+		/* No row means no file to unlink, so there is nothing to permit — the handler answers for the id itself */
+		if ( $font === [] ) {
+			return true;
+		}
+
+		return $this->refuse_file_delete( $font ) ?? true;
+	}
+
 	public function delete_item( $request ) {
 		try {
 			$id = $request->get_param( 'id' );

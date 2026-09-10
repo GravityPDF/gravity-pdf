@@ -531,9 +531,7 @@ class Font_Repository {
 			return false;
 		}
 
-		$this->delete_rows( [ $font ], $unlink_files );
-
-		return true;
+		return $this->delete_rows( [ $font ], $unlink_files );
 	}
 
 	/**
@@ -551,7 +549,9 @@ class Font_Repository {
 	public function delete_entry( string $source, string $entry, bool $unlink_files = true ): array {
 		$rows = $this->rows_for_entry( $source, $entry );
 
-		$this->delete_rows( $rows, $unlink_files );
+		if ( ! $this->delete_rows( $rows, $unlink_files ) ) {
+			return [];
+		}
 
 		return array_keys( $rows );
 	}
@@ -566,11 +566,11 @@ class Font_Repository {
 	 *
 	 * @since 7.0
 	 */
-	protected function delete_rows( array $fonts, bool $unlink_files ): void {
+	protected function delete_rows( array $fonts, bool $unlink_files ): bool {
 		global $wpdb;
 
 		if ( $fonts === [] ) {
-			return;
+			return false;
 		}
 
 		$paths = [];
@@ -592,12 +592,14 @@ class Font_Repository {
 		$this->flush();
 
 		if ( ! $unlink_files ) {
-			return;
+			return true;
 		}
 
 		foreach ( array_unique( $paths ) as $path ) {
 			$this->delete_file( (string) $path );
 		}
+
+		return true;
 	}
 
 	/**
@@ -678,6 +680,56 @@ class Font_Repository {
 	 *
 	 * @since 7.0
 	 */
+	/**
+	 * Which capability unlinking a font file needs, given the row it belongs to
+	 *
+	 * Files are network-global — one copy of a pack serves every site — so on multisite removing one is a network
+	 * administrator's decision, not a tenant's. The exception is a font only the current site can see: it owns the
+	 * row, nobody else's PDFs reach it, and asking a super admin to delete it would make a per-site upload
+	 * permanent.
+	 *
+	 * Single site keeps `gravityforms_edit_forms`, which is what every font action has always been.
+	 *
+	 * Named rather than asked, and asked by the routes: a capability is a property of a request, and the same
+	 * deletes run from uninstall, from the 7.0 migration and from an install replacing a variant — none of which
+	 * has a user to ask about. The routes ask through Gravity Forms, which is what maps `gravityforms_*` onto a
+	 * role in the first place.
+	 *
+	 * @param array $font The owning row, where a caller has one
+	 *
+	 * @since 7.0
+	 */
+	public function file_delete_capability( array $font = [] ): string {
+		$capability = 'gravityforms_edit_forms';
+
+		if ( is_multisite() && ! $this->is_owned_by_current_site( $font ) ) {
+			$capability = 'manage_network_options';
+		}
+
+		/**
+		 * Who may unlink a font file
+		 *
+		 * @param string $capability
+		 * @param array  $font The owning row, or `[]` where the caller has none
+		 *
+		 * @since 7.0
+		 */
+		return (string) apply_filters( 'gfpdf_font_file_delete_capability', $capability, $font );
+	}
+
+	/**
+	 * Whether this row is one only the current site can see
+	 *
+	 * `blog_id` is the whole test: a coverage pack is always NULL, a shared row is NULL, and the visibility rule
+	 * hides an owned row from every other site. No `enabled = 1` row exists to widen that — `set_site_enabled()`
+	 * records only the hidden case — so there is nothing else to ask.
+	 *
+	 * @since 7.0
+	 */
+	protected function is_owned_by_current_site( array $font ): bool {
+		return isset( $font['blog_id'] ) && (int) $font['blog_id'] === get_current_blog_id();
+	}
+
 	public function delete_file( string $path ): bool {
 		global $wpdb;
 
