@@ -251,9 +251,9 @@ class Test_Rest_Font_Sources extends Test_Rest {
 
 	public function test_a_pack_label_is_translated_on_the_way_out() {
 		/* The stored catalogue stays byte-identical to the index; translation happens at presentation */
-		$this->insert_catalog_row( 'packs', 'dejavu', [ 'label' => 'DejaVu' ] );
+		$this->insert_catalog_row( 'packs', 'west-asian', [ 'label' => 'West-Asian' ] );
 
-		$this->assertSame( 'Extended Latin', $this->get( '/fonts/sources/packs' )->get_data()['entries'][0]['label'] );
+		$this->assertSame( 'West Asian', $this->get( '/fonts/sources/packs' )->get_data()['entries'][0]['label'] );
 	}
 
 	public function test_sync_is_a_post_only_route() {
