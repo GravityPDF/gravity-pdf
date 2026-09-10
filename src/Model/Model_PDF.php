@@ -1240,10 +1240,13 @@ class Model_PDF extends Helper_Abstract_Model {
 			return true;
 		} catch ( Exception $e ) {
 
+			/* Named, not passed: the generator holds the whole mPDF object, and a log line is not a heap dump */
 			$this->log->error(
 				'PDF Generation Error',
 				[
-					'pdf'       => $pdf_generator,
+					'form_id'   => $form['id'] ?? '',
+					'entry_id'  => $entry['id'] ?? '',
+					'pdf_id'    => $settings['id'] ?? '',
 					'exception' => $e->getMessage(),
 				]
 			);

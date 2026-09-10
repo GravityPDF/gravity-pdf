@@ -30,6 +30,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Helper_Abstract_Queue extends GF_Background_Process {
 
 	/**
+	 * Not autoloaded: read on the System Report and nowhere else
+	 *
+	 * @since 7.0
+	 */
+	public const DISPATCH_ERROR_OPTION = 'gfpdf_last_dispatch_error';
+
+	/**
 	 * Holds our log class
 	 *
 	 * @var LoggerInterface
@@ -84,5 +91,47 @@ abstract class Helper_Abstract_Queue extends GF_Background_Process {
 		}
 
 		$this->save()->dispatch_on_shutdown();
+	}
+
+	/**
+	 * Dispatch, and remember it when the loopback request does not come back
+	 *
+	 * Gravity Forms logs this at debug and returns the error, which on a site with logging off means a queue that
+	 * never runs and nothing anywhere saying why. Basic Auth, `WP_HTTP_BLOCK_EXTERNAL` and a Docker DNS that does
+	 * not resolve the site's own host all look like this.
+	 *
+	 * @return array|WP_Error|false
+	 *
+	 * @since 7.0
+	 */
+	public function dispatch() {
+		$result = parent::dispatch();
+
+		if ( is_wp_error( $result ) ) {
+			$this->log->error(
+				'Could not dispatch a background queue',
+				[
+					'queue' => $this->action,
+					'error' => $result->get_error_message(),
+				]
+			);
+
+			update_option( static::DISPATCH_ERROR_OPTION, $result->get_error_message(), false );
+
+			return $result;
+		}
+
+		delete_option( static::DISPATCH_ERROR_OPTION );
+
+		return $result;
+	}
+
+	/**
+	 * The last loopback failure, for the System Report
+	 *
+	 * @since 7.0
+	 */
+	public static function get_dispatch_error(): string {
+		return (string) get_option( static::DISPATCH_ERROR_OPTION, '' );
 	}
 }

@@ -508,6 +508,15 @@ class Catalog_Sync {
 	 * @since 7.0
 	 */
 	/**
+	 * The registered records, for a caller that wants to walk them
+	 *
+	 * @since 7.0
+	 */
+	public function get_sources(): Font_Sources {
+		return $this->sources;
+	}
+
+	/**
 	 * The registered sources whose catalogue is too old to trust, with their records
 	 *
 	 * A source that has never synced counts: a site that has never reached the origin is exactly the case worth

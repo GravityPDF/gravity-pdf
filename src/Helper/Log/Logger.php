@@ -5,7 +5,6 @@ namespace GFPDF\Helper\Log;
 use Exception;
 use GFLogging;
 use GFPDF_Vendor\Monolog\Formatter\LineFormatter;
-use GFPDF_Vendor\Monolog\Handler\NullHandler;
 use GFPDF_Vendor\Monolog\Handler\StreamHandler;
 use GFPDF_Vendor\Monolog\Logger as MonoLogger;
 use GFPDF_Vendor\Monolog\Processor\IntrospectionProcessor;
@@ -132,26 +131,30 @@ class Logger {
 	 */
 	protected function setup_logger() {
 
-		/* Setup our Gravity Forms local file logger, if enabled */
 		try {
 			$this->log = new MonoLogger( $this->slug );
 			$this->log->setTimezone( wp_timezone() );
 
+			/*
+			 * Always on. Monolog is off by default, and a site that has just failed is exactly the site with no
+			 * log of why — so errors are kept in an option whatever the settings say, and everything below error
+			 * still goes nowhere unless the user asked for it.
+			 */
+			$this->log->pushHandler( new Option_Ring_Handler( MonoLogger::ERROR ) );
+
+			/* Pushed here rather than beside the file stream, so the ring can never hold a secret either */
+			$this->log->pushProcessor( new Redact_Processor( $this->slug ) );
+
+			/* Setup our Gravity Forms local file logger, if enabled */
 			$this->setup_gravityforms_logging();
 
-			/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
-			if ( count( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
+			if ( substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
 				$this->log->pushProcessor( new IntrospectionProcessor( MonoLogger::DEBUG, [ 'MonoLogger' ] ) );
 				$this->log->pushProcessor( new MemoryPeakUsageProcessor() );
-
-				return;
 			}
 		} catch ( Exception $e ) {
 			/* do nothing */
 		}
-
-		/* Disable logging if using CLI, or if Gravity Forms logging isn't enabled */
-		$this->log->pushHandler( new NullHandler( MonoLogger::INFO ) ); /* throw logs away */
 	}
 
 	/**
@@ -207,9 +210,6 @@ class Logger {
 
 		/* Add our log file stream */
 		$this->log->pushHandler( $stream );
-
-		/* Add a redact processor to mask secrets (license keys, signed update URLs, tokens) from the log */
-		$this->log->pushProcessor( new Redact_Processor( $this->slug ) );
 	}
 
 	/**

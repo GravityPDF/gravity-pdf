@@ -84,7 +84,7 @@ class Test_Logger extends TestCase {
 
 		$handlers = $logger->getHandlers();
 		$this->assertCount( 1, $handlers );
-		$this->assertInstanceOf( 'GFPDF_Vendor\Monolog\Handler\NullHandler', $handlers[0] );
+		$this->assertInstanceOf( 'GFPDF\Helper\Log\Option_Ring_Handler', $handlers[0] );
 	}
 
 	public function test_setup_gravityforms_logging_no_op_when_log_level_is_off() {
@@ -102,7 +102,25 @@ class Test_Logger extends TestCase {
 
 		$handlers = $logger->getHandlers();
 		$this->assertCount( 1, $handlers );
-		$this->assertInstanceOf( 'GFPDF_Vendor\Monolog\Handler\NullHandler', $handlers[0] );
+		$this->assertInstanceOf( 'GFPDF\Helper\Log\Option_Ring_Handler', $handlers[0] );
+	}
+
+	/**
+	 * The ring is always on, so the processor that keeps secrets out of a log has to be too
+	 */
+	public function test_the_redact_processor_is_attached_even_with_logging_off() {
+		delete_option( 'gform_enable_logging' );
+
+		$processors = ( new Logger( 'slug', 'Name' ) )->get_logger()->getProcessors();
+
+		$this->assertNotEmpty(
+			array_filter(
+				$processors,
+				static function ( $processor ): bool {
+					return $processor instanceof \GFPDF\Helper\Log\Redact_Processor;
+				}
+			)
+		);
 	}
 
 	public function test_setup_gravityforms_logging_uses_error_level_when_log_level_is_4() {

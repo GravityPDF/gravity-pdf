@@ -113,6 +113,7 @@ class Missing_Font_Files_Check extends Health_Check {
 	 */
 	protected function issue( string $font_key, array $row, array $missing ): Health_Issue {
 		$entry = (string) ( $row['entry'] ?? '' );
+		$id    = $row['source'] . '/' . $entry;
 		$label = (string) ( $row['label'] ?? $font_key );
 
 		return new Health_Issue(
@@ -133,7 +134,7 @@ class Missing_Font_Files_Check extends Health_Check {
 			),
 			/* A downloaded font can be fetched again; one somebody uploaded can only be replaced by them */
 			$entry !== '' ? __( 'Reinstall', 'gravity-pdf' ) : __( 'Replace', 'gravity-pdf' ),
-			$entry !== '' ? Font_Manager_Urls::entry( $entry ) : Font_Manager_Urls::font( $font_key )
+			$entry !== '' ? Font_Manager_Urls::entry( $id ) : Font_Manager_Urls::font( $font_key )
 		);
 	}
 }
