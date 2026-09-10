@@ -90,6 +90,14 @@ abstract class Test_Rest extends TestCase {
 		self::$admin_id  = self::factory()->user->create( [ 'role' => 'administrator', ] );
 		self::$editor_id = self::factory()->user->create( [ 'role' => 'editor', ] );
 
+		/*
+		 * On multisite these suites mean "an administrator who can do administrator things", and font files are
+		 * network-global — removing one needs `manage_network_options`. A suite testing that boundary revokes it.
+		 */
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+
 		$this->form_id = $this->gf_factory()->form->create();
 		$this->gf_factory()->pdf->set_form_id( $this->form_id );
 

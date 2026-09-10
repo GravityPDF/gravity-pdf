@@ -97,4 +97,44 @@ abstract class Rest_Font_Base extends WP_REST_Controller {
 	public function delete_item_permissions_check( $request ) {
 		return $this->get_items_permissions_check( $request );
 	}
+
+	/**
+	 * Why this delete cannot go ahead, or null
+	 *
+	 * The multisite file-delete capability, asked here rather than in the permission callback because it is a
+	 * question about the row: a callback sees `{source, entry}` and one display entry can hold ten installs with
+	 * different owners. And asked here rather than in the repository because a capability is a property of a
+	 * request — the same deletes run from uninstall, from the 7.0 migration and from an install replacing a
+	 * variant, none of which has a user to ask about.
+	 *
+	 * @param array $font The row being removed, where the route has one; a coverage entry has none and needs none
+	 *
+	 * @since 7.0
+	 */
+	protected function refuse_file_delete( array $font = [] ): ?WP_Error {
+		if ( $this->may_delete_files( \GPDFAPI::get_font_repository()->file_delete_capability( $font ) ) ) {
+			return null;
+		}
+
+		return new WP_Error(
+			'font_delete_forbidden',
+			esc_html__( 'Font files are shared by every site on this network. Only a network administrator can remove one.', 'gravity-pdf' ),
+			[ 'status' => 403 ]
+		);
+	}
+
+	/**
+	 * Ask the right authority for the capability in hand
+	 *
+	 * Gravity Forms grants a form administrator blanket access to its own capabilities (`gform_full_access`), which
+	 * is what makes `gravityforms_edit_forms` work at all — and exactly what must not apply to a network
+	 * capability, which is not Gravity Forms' to grant.
+	 *
+	 * @since 7.0
+	 */
+	protected function may_delete_files( string $capability ): bool {
+		return strpos( $capability, 'gravityforms_' ) === 0
+			? $this->gform->has_capability( $capability )
+			: current_user_can( $capability );
+	}
 }

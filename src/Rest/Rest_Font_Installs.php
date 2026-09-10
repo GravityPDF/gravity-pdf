@@ -226,6 +226,26 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 	 *
 	 * @since 7.0
 	 */
+	/**
+	 * The capability check, plus the multisite one for unlinking a pack's files
+	 *
+	 * A coverage entry is never owned by one site, so there is no row to look at: on multisite its files are
+	 * always the network's to remove.
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function delete_item_permissions_check( $request ) {
+		$allowed = parent::delete_item_permissions_check( $request );
+
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+
+		return $this->refuse_file_delete() ?? true;
+	}
+
 	public function delete_entry( $request ) {
 		$row = $this->entry_row( $this->catalog, (string) $request['source'], (string) $request['entry'] );
 

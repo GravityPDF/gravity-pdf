@@ -203,17 +203,12 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The shared delete path for a single font file
-	 *
-	 * Replaces the controller's raw `@unlink`: it skips a path some surviving file row still records (two installs
-	 * of one entry share files) and unlinks the rest through the managed-folder guard.
-	 *
-	 * @param string $file The filename, relative to the fonts directory
+	 * One installed font's row, or `[]`
 	 *
 	 * @since 7.0
 	 */
-	public function delete_font_file( string $file ): bool {
-		return $this->repository->delete_file( basename( $file ) );
+	public function get_font( string $id ): array {
+		return (array) $this->repository->get( $id );
 	}
 
 	/**
