@@ -19,11 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Which scripts a document needs that the site cannot draw yet
+ * Which of the scripts a site still needs fonts for appear in a document
  *
- * Two cheap refusals before any real work, because this runs on every render: text the bundled faces can draw
- * entirely never reaches the walk, and neither does anything at all once every coverage entry is installed. A
- * fully provisioned Latin site therefore pays one failed PCRE pass.
+ * The caller says what is worth looking for and this says which of it is there, so a site with nothing left to
+ * install never reaches this class at all. Past that the gate is one PCRE pass per string against a class
+ * generated from the bundled faces' own cmaps, which on Latin text matches nothing.
  *
  * The vocabulary is mPDF's own — `Ucdn` for the script of a code point, `ScriptToLanguage` for the tag — so the
  * tags returned here are the same strings the catalogue's `scripts` column carries and the same ones the language
@@ -36,51 +36,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Script_Detector {
 
 	/**
-	 * @var Coverage_Resolver
-	 * @since 7.0
-	 */
-	protected $resolver;
-
-	/**
 	 * @var ScriptToLanguage
 	 * @since 7.0
 	 */
 	protected $languages;
 
-	public function __construct( Coverage_Resolver $resolver ) {
-		$this->resolver  = $resolver;
+	public function __construct() {
 		$this->languages = new ScriptToLanguage();
 	}
 
 	/**
-	 * The language tags this text needs and the site has no font for
+	 * Which of the wanted tags this text uses
 	 *
-	 * @param string ...$text Any strings the document draws — entry values, labels, header and footer settings
+	 * @param array<string, true> $wanted The tags worth looking for, from `Coverage_Resolver::uninstalled_scripts()`
+	 * @param string[]            $text   Any strings the document draws — entry values, labels, headers, footers
 	 *
 	 * @return string[] Lower-cased mPDF language tags, e.g. `ja`, `und-hans`
 	 *
 	 * @since 7.0
 	 */
-	public function detect( string ...$text ): array {
-		$characters = $this->uncovered_characters( $text );
-
-		if ( $characters === [] ) {
-			return [];
-		}
-
-		$wanted = $this->resolver->uninstalled_scripts();
-
+	public function detect( array $wanted, array $text ): array {
 		if ( $wanted === [] ) {
 			return [];
 		}
 
 		$detected = [];
 
-		foreach ( $characters as $character ) {
+		foreach ( $this->uncovered_characters( $text ) as $character ) {
 			$tag = $this->tag_for( $character );
 
-			if ( isset( $wanted[ $tag ] ) ) {
-				$detected[ $tag ] = true;
+			if ( ! isset( $wanted[ $tag ] ) ) {
+				continue;
+			}
+
+			$detected[ $tag ] = true;
+
+			/* Everything asked about is accounted for, and the rest of the document cannot change the answer */
+			if ( count( $detected ) === count( $wanted ) ) {
+				break;
 			}
 		}
 
@@ -89,9 +82,6 @@ class Script_Detector {
 
 	/**
 	 * The distinct characters none of the bundled faces can draw
-	 *
-	 * The gate, and the reason this class is affordable on the render path: one PCRE pass per string against a
-	 * class generated from those faces' own cmaps, which on Latin/Greek/Cyrillic text matches nothing.
 	 *
 	 * @param string[] $text
 	 *

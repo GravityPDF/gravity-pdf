@@ -1034,9 +1034,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->get_catalog_sync(),
 			$this->get_install_queue(),
 			$this->get_coverage_resolver(),
-			new Model\Model_Actions( $this->data, $this->options, $this->notices ),
-			new View\View_Health( [] ),
-			new View\View_Actions( [] ),
 			$this->misc
 		);
 		$class->init();
@@ -1054,9 +1051,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class = new Controller\Controller_Health(
 			$this->get_health_runner(),
-			new Model\Model_Actions( $this->data, $this->options, $this->notices ),
+			$this->singleton->get_class( 'Model_Actions' ),
 			$view,
-			new View\View_Actions( [] ),
+			$this->singleton->get_class( 'View_Actions' ),
 			$this->misc
 		);
 		$class->init();
@@ -1079,6 +1076,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_install_queue(),
 				$this->get_font_registry(),
 				$this->get_health_runner(),
+				$this->get_font_downloader(),
+				new View\View_System_Report(),
 				$this->data
 			);
 		}
@@ -1096,7 +1095,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function get_health_runner(): Helper\Health\Health_Runner {
 		if ( $this->health_runner === null ) {
-			$configured = new Fonts\Health\Configured_Fonts( $this->options );
+			$configured = new Fonts\Health\Configured_Fonts( $this->gform, $this->options );
 			$uncovered  = new Fonts\Health\Uncovered_Entries( $this->get_catalog_repository() );
 
 			$this->health_runner = new Helper\Health\Health_Runner(
@@ -1106,6 +1105,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 					new Fonts\Health\Missing_Font_Files_Check( $this->get_font_repository(), $this->get_font_registry(), $configured ),
 					new Fonts\Health\Unregistered_Font_Check( $this->get_font_registry(), $this->get_catalog_repository(), $configured ),
 					new Fonts\Health\Catalog_Sync_Check( $this->get_catalog_sync() ),
+					new Fonts\Health\Install_Stalled_Check( $this->get_install_queue(), $this->get_catalog_sync() ),
 				],
 				new Fonts\Font_Lock(),
 				$this->log
@@ -1319,7 +1319,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function get_script_detector(): Fonts\Script_Detector {
 		if ( $this->script_detector === null ) {
-			$this->script_detector = new Fonts\Script_Detector( $this->get_coverage_resolver() );
+			$this->script_detector = new Fonts\Script_Detector();
 		}
 
 		return $this->script_detector;

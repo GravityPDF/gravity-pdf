@@ -136,6 +136,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $url_signer;
 
 	/**
+	 * @var Registry
+	 * @since 7.0
+	 */
+	protected $registry;
+
+	/**
 	 * Setup our view with the needed data and classes
 	 *
 	 * @param Helper_Abstract_Form        $gform   Our abstracted Gravity Forms helper functions
@@ -149,12 +155,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	/**
-	 * @var Registry
-	 * @since 7.0
-	 */
-	protected $registry;
-
 	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Registry $registry = null ) {
 
 		/* Assign our internal variables */

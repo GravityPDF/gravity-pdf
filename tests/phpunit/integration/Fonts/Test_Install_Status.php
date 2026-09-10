@@ -61,8 +61,11 @@ class Test_Install_Status extends TestCase {
 		parent::tear_down();
 	}
 
+	/**
+	 * The poller's read, which is the one that re-dispatches: the System Report's does not
+	 */
 	protected function statuses(): array {
-		return $this->registry->get_install_statuses( $this->queue );
+		return $this->registry->get_install_statuses( $this->queue, true );
 	}
 
 	/**
@@ -212,6 +215,26 @@ class Test_Install_Status extends TestCase {
 		$this->statuses();
 
 		$this->assertSame( 1, $this->dispatches() );
+	}
+
+	/**
+	 * The System Report reads the same statuses and must not re-dispatch anything
+	 */
+	public function test_a_status_read_that_did_not_ask_dispatches_nothing() {
+		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1 ] );
+		$this->set_phase( 'emoji', 'queued', Registry::NUDGE_AFTER + 10 );
+
+		$this->queue->push_to_queue(
+			[
+				'source' => 'packs',
+				'entry'  => 'emoji',
+				'name'   => 'Noto.ttf',
+			]
+		)->save();
+
+		$this->registry->get_install_statuses( $this->queue );
+
+		$this->assertSame( 0, $this->dispatches() );
 	}
 
 	public function test_a_batch_that_has_only_just_been_queued_is_left_alone() {

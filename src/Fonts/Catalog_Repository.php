@@ -531,10 +531,9 @@ class Catalog_Repository {
 	/**
 	 * Add to the scripts an entry was asked for and could not cover
 	 *
-	 * The render path's only catalogue write, and it must stay cheap and quiet: anonymous traffic reaches it, so it
-	 * writes nothing when it has nothing new to say and never invalidates the cached reads. That is also why the
-	 * current value is read straight from the table — an un-bumped write can never reach the cache, so a cached row
-	 * would show a previous render's miss as absent and every render would rewrite it.
+	 * The render path's only catalogue write, so it writes nothing when it has nothing new to say and never
+	 * invalidates the cached reads — and reads the current value straight from the table, because a cached row
+	 * could never see an un-bumped write and every render would rewrite it.
 	 *
 	 * @param string[] $scripts
 	 *
@@ -748,7 +747,6 @@ class Catalog_Repository {
 			(array) $rows
 		);
 	}
-
 
 	/**
 	 * The catalog columns a status object needs, for every entry named plus every entry mid-install

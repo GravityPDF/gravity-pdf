@@ -5,9 +5,9 @@ declare( strict_types=1 );
 namespace GFPDF\Fonts;
 
 use GFPDF\Helper\Health\Health_Runner;
-use GFPDF\Helper\Helper_Abstract_Queue;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Log\Option_Ring_Handler;
+use GFPDF\View\View_System_Report;
 
 /**
  * @package     Gravity PDF
@@ -70,6 +70,18 @@ class Font_Report {
 	protected $health;
 
 	/**
+	 * @var Font_Downloader
+	 * @since 7.0
+	 */
+	protected $downloader;
+
+	/**
+	 * @var View_System_Report
+	 * @since 7.0
+	 */
+	protected $view;
+
+	/**
 	 * @var Helper_Data
 	 * @since 7.0
 	 */
@@ -82,6 +94,8 @@ class Font_Report {
 		Install_Queue $queue,
 		Registry $registry,
 		Health_Runner $health,
+		Font_Downloader $downloader,
+		View_System_Report $view,
 		Helper_Data $data
 	) {
 		$this->repository = $repository;
@@ -90,6 +104,8 @@ class Font_Report {
 		$this->queue      = $queue;
 		$this->registry   = $registry;
 		$this->health     = $health;
+		$this->downloader = $downloader;
+		$this->view       = $view;
 		$this->data       = $data;
 	}
 
@@ -101,10 +117,7 @@ class Font_Report {
 	public function fonts(): array {
 		return [
 			'font_folder_location' => $this->row( __( 'Font folder location', 'gravity-pdf' ), $this->data->template_font_location ),
-			'font_folder_writable' => $this->row(
-				__( 'Font folder writable', 'gravity-pdf' ),
-				wp_is_writable( $this->data->template_font_location ) ? __( 'Writable', 'gravity-pdf' ) : __( 'Not writable', 'gravity-pdf' )
-			),
+			'font_folder_writable' => $this->writable_row(),
 			'font_schema_version'  => $this->row( __( 'Font table version', 'gravity-pdf' ), (string) get_site_option( Font_Schema::VERSION_OPTION, '' ) ),
 			'installed_fonts'      => $this->row( __( 'Installed fonts', 'gravity-pdf' ), $this->fonts_by_source() ),
 			'font_sources'         => $this->row( __( 'Font sources', 'gravity-pdf' ), $this->sources() ),
@@ -119,7 +132,7 @@ class Font_Report {
 	 */
 	public function background_installs(): array {
 		$stalled  = $this->catalog->stalled_entries( Install_Queue::STALLED_AFTER );
-		$dispatch = Helper_Abstract_Queue::get_dispatch_error();
+		$dispatch = $this->queue->get_dispatch_error();
 
 		return [
 			'queue_running'  => $this->row(
@@ -205,7 +218,7 @@ class Font_Report {
 	protected function sources(): string {
 		$lines = [];
 
-		foreach ( $this->sync->get_sources()->all() as $id => $source ) {
+		foreach ( array_keys( $this->sync->get_sources()->all() ) as $id ) {
 			$record  = $this->sync->get_record( (string) $id );
 			$synced  = (int) $record['synced'];
 			$summary = $this->catalog->summary( (string) $id );
@@ -339,9 +352,26 @@ class Font_Report {
 	 * @since 7.0
 	 */
 	protected function part_count(): int {
-		$dir = trailingslashit( $this->data->template_font_location ) . Font_Downloader::TMP_DIR . '/';
+		return count( glob( $this->downloader->get_tmp_dir() . '*.part' ) ?: [] );
+	}
 
-		return count( glob( $dir . '*.part' ) ?: [] );
+	/**
+	 * Built like the Temporary Folder row it sits below, icon and export string included
+	 *
+	 * @since 7.0
+	 */
+	protected function writable_row(): array {
+		$writable = wp_is_writable( $this->data->template_font_location );
+
+		/* Gravity Forms' own strings, like the Temporary Folder row: two more translations for one word each */
+		$string = $writable ? __( 'Writable', 'gravityforms' ) : __( 'Not writable', 'gravityforms' );
+
+		return [
+			'label'        => esc_html__( 'Font Folder permissions', 'gravity-pdf' ),
+			'label_export' => 'Font Folder permissions',
+			'value'        => $string . $this->view->get_icon( $writable ),
+			'value_export' => $writable ? 'Writable' : 'Not writable',
+		];
 	}
 
 	/**

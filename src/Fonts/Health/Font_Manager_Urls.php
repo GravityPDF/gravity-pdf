@@ -31,7 +31,7 @@ class Font_Manager_Urls {
 	 * @since 7.0
 	 */
 	public static function manager(): string {
-		return admin_url( 'admin.php?page=gf_settings&subview=PDF#/fontmanager' );
+		return \GPDFAPI::get_data_class()->settings_url . '#/fontmanager';
 	}
 
 	/**

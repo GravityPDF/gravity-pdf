@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Fonts\Health\Install_Stalled_Check;
 use GFPDF\Fonts\Install_Queue;
 use GFPDF\Helper\Health\Health_Check;
 use GFPDF\Helper\Health\Health_Issue;
@@ -12,6 +13,7 @@ use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\QueuesFontInstalls;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
+use RuntimeException;
 
 /**
  * @package     Gravity PDF
@@ -197,14 +199,17 @@ class Test_Health_Notices extends TestCase {
 		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1 ] );
 		$this->catalog_repository()->set_status( 'packs', 'emoji', [ 'phase' => 'installing' ] );
 
-		$this->assertFalse( $this->shows( 'font_install_stalled' ) );
+		$this->assertFalse( $this->shows( 'health_install_stalled' ) );
 	}
 
 	public function test_an_install_that_stopped_part_way_shows_a_notice() {
 		$this->stall_an_install();
 
-		$this->assertTrue( $this->shows( 'font_install_stalled' ) );
-		$this->assertSame( 'manage_options', $this->route( 'font_install_stalled' )['capability'] );
+		$this->assertTrue( $this->shows( 'health_install_stalled' ) );
+		$this->assertSame( 'manage_options', $this->route( 'health_install_stalled' )['capability'] );
+
+		/* The one check whose remedy is a button rather than a link */
+		$this->assertSame( 'Run now', $this->route( 'health_install_stalled' )['action_text'] );
 	}
 
 	/**
@@ -214,27 +219,33 @@ class Test_Health_Notices extends TestCase {
 		$this->stall_an_install();
 		$this->lock_queue();
 
-		$this->assertFalse( $this->shows( 'font_install_stalled' ) );
+		$this->assertFalse( $this->shows( 'health_install_stalled' ) );
 	}
 
 	/**
-	 * "Not today" rather than "never": the site is still broken tomorrow
+	 * "Not today" rather than "never": the site is still broken tomorrow, and the dated issue id is what says so
 	 */
 	public function test_dismissing_the_stalled_notice_silences_it_for_the_day_only() {
 		$this->stall_an_install();
 
-		call_user_func( $this->route( 'font_install_stalled' )['dismiss'] );
+		call_user_func( $this->route( 'health_install_stalled' )['dismiss'] );
 
-		$this->assertFalse( $this->shows( 'font_install_stalled' ) );
+		$this->assertFalse( $this->shows( 'health_install_stalled' ) );
 
+		/* Never against the notice itself, or it would be silenced for good */
 		$dismissed = GPDFAPI::get_options_class()->get_option( 'action_dismissal', [] );
 
-		$this->assertArrayHasKey( 'font_install_stalled_' . gmdate( 'Y-m-d' ), $dismissed );
-		$this->assertArrayNotHasKey( 'font_install_stalled', $dismissed );
+		$this->assertArrayNotHasKey( 'health_install_stalled', $dismissed );
+
+		$this->assertSame(
+			'install_stalled_' . gmdate( 'Y-m-d' ),
+			$this->stalled_check()->notice_issues( [] )[0]->get_id()
+		);
 	}
 
 	/**
-	 * The whole point: it does the work in this request, because whatever should have done it is not running
+	 * The whole point: the button does the work in this request, because whatever should have done it is not
+	 * running. Driven through the route so the wiring between the two is covered as well.
 	 */
 	public function test_run_now_drains_the_outstanding_batch() {
 		$this->stall_an_install();
@@ -247,8 +258,35 @@ class Test_Health_Notices extends TestCase {
 		);
 		$this->install_queue()->save();
 
-		call_user_func( $this->route( 'font_install_stalled' )['process'] );
-
+		$this->assertStringContainsString( 'gf_system_status', $this->run_route( 'health_install_stalled' ) );
 		$this->assertSame( [], $this->queued() );
+	}
+
+	/**
+	 * Run a route's `process` and hand back where it tried to send the admin
+	 *
+	 * The redirect is turned into an exception because the real one calls `exit` straight after it, which would
+	 * take the test runner with it.
+	 */
+	protected function run_route( string $action ): string {
+		$redirect = static function ( string $location ): string {
+			throw new RuntimeException( $location );
+		};
+
+		add_filter( 'wp_redirect', $redirect );
+
+		try {
+			call_user_func( $this->route( $action )['process'] );
+		} catch ( RuntimeException $e ) {
+			return $e->getMessage();
+		} finally {
+			remove_filter( 'wp_redirect', $redirect );
+		}
+
+		return '';
+	}
+
+	protected function stalled_check(): Install_Stalled_Check {
+		return new Install_Stalled_Check( $this->install_queue(), GPDFAPI::get_catalog_sync() );
 	}
 }

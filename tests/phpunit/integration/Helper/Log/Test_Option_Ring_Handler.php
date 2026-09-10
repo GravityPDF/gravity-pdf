@@ -36,7 +36,7 @@ class Test_Option_Ring_Handler extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->handler = new Option_Ring_Handler();
+		$this->handler = new Option_Ring_Handler( MonoLogger::ERROR );
 
 		$this->log = new MonoLogger( 'gravity-pdf' );
 		$this->log->pushHandler( $this->handler );

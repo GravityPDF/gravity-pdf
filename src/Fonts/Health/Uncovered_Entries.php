@@ -64,7 +64,7 @@ class Uncovered_Entries {
 	 *
 	 * @since 7.0
 	 */
-	public function failed(): array {
+	protected function failed(): array {
 		return array_values(
 			array_filter(
 				$this->all(),
@@ -84,6 +84,8 @@ class Uncovered_Entries {
 	 * @since 7.0
 	 */
 	public function all_failed(): bool {
-		return $this->all() !== [] && count( $this->failed() ) === count( $this->all() );
+		$rows = $this->all();
+
+		return $rows !== [] && $this->failed() === $rows;
 	}
 }

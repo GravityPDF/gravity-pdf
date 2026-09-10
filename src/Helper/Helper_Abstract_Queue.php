@@ -30,11 +30,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Helper_Abstract_Queue extends GF_Background_Process {
 
 	/**
-	 * Not autoloaded: read on the System Report and nowhere else
+	 * Prefix of the per-queue option; not autoloaded, read on the System Report and nowhere else
+	 *
+	 * Per queue rather than per plugin: the PDF queue and the font queue fail independently, and a report row that
+	 * named the wrong one would send a support ticket the wrong way.
 	 *
 	 * @since 7.0
 	 */
-	public const DISPATCH_ERROR_OPTION = 'gfpdf_last_dispatch_error';
+	public const DISPATCH_ERROR_OPTION = 'gfpdf_last_dispatch_error_';
 
 	/**
 	 * Holds our log class
@@ -116,12 +119,15 @@ abstract class Helper_Abstract_Queue extends GF_Background_Process {
 				]
 			);
 
-			update_option( static::DISPATCH_ERROR_OPTION, $result->get_error_message(), false );
+			update_option( $this->dispatch_error_option(), $result->get_error_message(), false );
 
 			return $result;
 		}
 
-		delete_option( static::DISPATCH_ERROR_OPTION );
+		/* Guarded because `delete_option()` queries for the row first, and on a healthy site there has never been one */
+		if ( $this->get_dispatch_error() !== '' ) {
+			delete_option( $this->dispatch_error_option() );
+		}
 
 		return $result;
 	}
@@ -131,7 +137,14 @@ abstract class Helper_Abstract_Queue extends GF_Background_Process {
 	 *
 	 * @since 7.0
 	 */
-	public static function get_dispatch_error(): string {
-		return (string) get_option( static::DISPATCH_ERROR_OPTION, '' );
+	public function get_dispatch_error(): string {
+		return (string) get_option( $this->dispatch_error_option(), '' );
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	protected function dispatch_error_option(): string {
+		return static::DISPATCH_ERROR_OPTION . $this->action;
 	}
 }

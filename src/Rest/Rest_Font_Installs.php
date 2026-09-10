@@ -167,7 +167,8 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 	 * @since 7.0
 	 */
 	public function get_status( $request ) {
-		return rest_ensure_response( (object) $this->registry->get_install_statuses( $this->queue ) );
+		/* The poller, and the only caller that should re-dispatch a batch nothing has picked up */
+		return rest_ensure_response( (object) $this->registry->get_install_statuses( $this->queue, true ) );
 	}
 
 	/**
@@ -216,17 +217,6 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 	}
 
 	/**
-	 * Remove an entry's fonts, and answer with what it looks like afterwards
-	 *
-	 * Never a 404 for "not installed": the entry route is about the catalogue entry, and removing one that has no
-	 * rows is how an admin declines a language pack the always rule would otherwise keep reinstalling. The only
-	 * refusal is a file of it being downloaded at that moment, which clears itself.
-	 *
-	 * @return WP_REST_Response|WP_Error
-	 *
-	 * @since 7.0
-	 */
-	/**
 	 * The capability check, plus the multisite one for unlinking a pack's files
 	 *
 	 * A coverage entry is never owned by one site, so there is no row to look at: on multisite its files are
@@ -246,6 +236,17 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		return $this->refuse_file_delete() ?? true;
 	}
 
+	/**
+	 * Remove an entry's fonts, and answer with what it looks like afterwards
+	 *
+	 * Never a 404 for "not installed": the entry route is about the catalogue entry, and removing one that has no
+	 * rows is how an admin declines a language pack the always rule would otherwise keep reinstalling. The only
+	 * refusal is a file of it being downloaded at that moment, which clears itself.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 *
+	 * @since 7.0
+	 */
 	public function delete_entry( $request ) {
 		$row = $this->entry_row( $this->catalog, (string) $request['source'], (string) $request['entry'] );
 

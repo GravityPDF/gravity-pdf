@@ -64,7 +64,7 @@ class Test_Install_Queue extends TestCase {
 		$this->drop_catalog_rows();
 		$this->queue->clear_queue();
 
-		delete_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION );
+		delete_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION . 'gravitypdf_fonts' );
 
 		foreach ( [ 'packs', 'google', 'ghost' ] as $source ) {
 			GPDFAPI::get_misc_class()->rmdir( $this->font_dir . $source );
@@ -898,17 +898,31 @@ class Test_Install_Queue extends TestCase {
 
 		remove_all_filters( 'pre_http_request' );
 
-		$this->assertStringContainsString( 'cURL error 7', Helper_Abstract_Queue::get_dispatch_error() );
+		$this->assertStringContainsString( 'cURL error 7', $this->queue->get_dispatch_error() );
+	}
+
+	/**
+	 * The two queues fail independently, and a report row naming the wrong one sends a ticket the wrong way
+	 */
+	public function test_each_queue_records_its_own_loopback_failure() {
+		global $gfpdf;
+
+		update_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION . 'gravitypdf_fonts', 'cURL error 7', false );
+
+		$this->assertSame( 'cURL error 7', $this->queue->get_dispatch_error() );
+		$this->assertSame( '', ( new \GFPDF\Helper\Helper_Pdf_Queue( $gfpdf->log ) )->get_dispatch_error() );
+
+		delete_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION . 'gravitypdf_fonts' );
 	}
 
 	public function test_a_dispatch_that_lands_clears_an_earlier_failure() {
-		update_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION, 'cURL error 7', false );
+		update_option( Helper_Abstract_Queue::DISPATCH_ERROR_OPTION . 'gravitypdf_fonts', 'cURL error 7', false );
 
 		$this->seed_pack( 1 );
 		$this->queue->enqueue_once( [ 'entry' => 'packs/emoji' ] );
 		$this->queue->dispatch();
 
-		$this->assertSame( '', Helper_Abstract_Queue::get_dispatch_error() );
+		$this->assertSame( '', $this->queue->get_dispatch_error() );
 	}
 
 	public function test_the_queue_has_its_own_identifier_and_attempt_cap() {

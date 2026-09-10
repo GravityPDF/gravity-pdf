@@ -369,16 +369,6 @@ class Registry {
 	}
 
 	/**
-	 * The bundled map overlaid by the installed rows
-	 *
-	 * Installed beats bundled for the same code; between installed entries the earlier row wins, which is the
-	 * catalogue's `position` order.
-	 *
-	 * @return array<string, string>
-	 *
-	 * @since 7.0
-	 */
-	/**
 	 * mPDF's four Adobe CJK families, by the tags a detector emits for them
 	 *
 	 * The last-resort route for a CJK document whose pack has not landed: mPDF writes a non-embedded
@@ -401,18 +391,37 @@ class Registry {
 	];
 
 	/**
-	 * The Adobe CJK rows for the tags a render could not resolve
+	 * The Adobe CJK rows for the tags a render could not resolve, if this document may have them
 	 *
-	 * @param string[] $scripts
+	 * Refused outright for PDF/A and PDF/X, where `AddCJKFont()` throws: those render with the bundled faces and
+	 * the miss already recorded on the entry's catalogue row. The format is read here rather than by the caller so
+	 * that deciding which families cover which tags stays in one place.
+	 *
+	 * @param string[] $scripts  What the render could not resolve
+	 * @param array    $settings The PDF's settings
 	 *
 	 * @return array<string, string>
 	 *
 	 * @since 7.0
 	 */
-	public static function adobe_cjk_overlay( array $scripts ): array {
+	public function adobe_cjk_overlay( array $scripts, array $settings = [] ): array {
+		if ( strtolower( (string) ( $settings['format'] ?? 'standard' ) ) !== 'standard' ) {
+			return [];
+		}
+
 		return array_intersect_key( static::ADOBE_CJK_MAP, array_flip( array_map( 'strtolower', $scripts ) ) );
 	}
 
+	/**
+	 * The bundled map overlaid by the installed rows
+	 *
+	 * Installed beats bundled for the same code; between installed entries the earlier row wins, which is the
+	 * catalogue's `position` order.
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
 	public function default_language_map(): array {
 		$installed = [];
 
@@ -585,7 +594,7 @@ class Registry {
 	 *
 	 * @since 7.0
 	 */
-	public function get_install_statuses( Install_Queue $queue ): array {
+	public function get_install_statuses( Install_Queue $queue, bool $nudge = false ): array {
 		$entries = $this->entry_rows();
 		$catalog = $this->catalog->status_rows( array_keys( $entries ) );
 
@@ -602,8 +611,12 @@ class Registry {
 			$stalled         = $stalled || $this->stalled_for( $row, static::NUDGE_AFTER );
 		}
 
-		/* Before the poller gives up on it: a batch nothing has picked up is usually one dispatch away from moving */
-		if ( ! $running && $stalled ) {
+		/*
+		 * Before the poller gives up on it: a batch nothing has picked up is usually one dispatch away from moving.
+		 * Asked for rather than done, because the same statuses are read by the System Report, which promises not
+		 * to change the site it is describing.
+		 */
+		if ( $nudge && ! $running && $stalled ) {
 			$queue->nudge();
 		}
 
@@ -750,13 +763,6 @@ class Registry {
 	}
 
 	/**
-	 * Every key mPDF will have registered, bundled included
-	 *
-	 * @return array<string, true>
-	 *
-	 * @since 7.0
-	 */
-	/**
 	 * Whether a font key would resolve to something at render time
 	 *
 	 * The public half of `registered_keys()`, for the health check that asks about a saved setting rather than
@@ -768,6 +774,13 @@ class Registry {
 		return isset( $this->registered_keys()[ $font_key ] );
 	}
 
+	/**
+	 * Every key mPDF will have registered, bundled included
+	 *
+	 * @return array<string, true>
+	 *
+	 * @since 7.0
+	 */
 	protected function registered_keys(): array {
 		$keys = [
 			static::BUNDLED_FONT    => true,

@@ -101,18 +101,16 @@ abstract class Rest_Font_Base extends WP_REST_Controller {
 	/**
 	 * Why this delete cannot go ahead, or null
 	 *
-	 * The multisite file-delete capability, asked here rather than in the permission callback because it is a
-	 * question about the row: a callback sees `{source, entry}` and one display entry can hold ten installs with
-	 * different owners. And asked here rather than in the repository because a capability is a property of a
-	 * request — the same deletes run from uninstall, from the 7.0 migration and from an install replacing a
-	 * variant, none of which has a user to ask about.
+	 * Asked by the routes rather than by the repository: a capability is a property of a request, and the same
+	 * deletes run from uninstall, from the 7.0 migration and from an install replacing a variant — none of which
+	 * has a user to ask about.
 	 *
 	 * @param array $font The row being removed, where the route has one; a coverage entry has none and needs none
 	 *
 	 * @since 7.0
 	 */
 	protected function refuse_file_delete( array $font = [] ): ?WP_Error {
-		if ( $this->may_delete_files( \GPDFAPI::get_font_repository()->file_delete_capability( $font ) ) ) {
+		if ( $this->may_delete_files( $this->file_delete_capability( $font ) ) ) {
 			return null;
 		}
 
@@ -121,6 +119,36 @@ abstract class Rest_Font_Base extends WP_REST_Controller {
 			esc_html__( 'Font files are shared by every site on this network. Only a network administrator can remove one.', 'gravity-pdf' ),
 			[ 'status' => 403 ]
 		);
+	}
+
+	/**
+	 * Which capability unlinking this row's files needs
+	 *
+	 * Font files are network-global — one copy of a pack serves every site — so on multisite removing one is a
+	 * network administrator's decision, not a tenant's. The exception is a font only the current site can see: it
+	 * owns the row, nobody else's PDFs reach it, and asking a super admin would make a per-site upload permanent.
+	 * `blog_id` is the whole test, because `set_site_enabled()` records only the hidden case — there is no row
+	 * that widens visibility to ask about.
+	 *
+	 * Single site keeps `gravityforms_edit_forms`, which is what every font action has always been.
+	 *
+	 * @param array $font The row being removed, or `[]` where the route has none
+	 *
+	 * @since 7.0
+	 */
+	protected function file_delete_capability( array $font ): string {
+		$owned      = isset( $font['blog_id'] ) && (int) $font['blog_id'] === get_current_blog_id();
+		$capability = is_multisite() && ! $owned ? 'manage_network_options' : 'gravityforms_edit_forms';
+
+		/**
+		 * Who may unlink a font file
+		 *
+		 * @param string $capability
+		 * @param array  $font The owning row, or `[]` where the caller has none
+		 *
+		 * @since 7.0
+		 */
+		return (string) apply_filters( 'gfpdf_font_file_delete_capability', $capability, $font );
 	}
 
 	/**

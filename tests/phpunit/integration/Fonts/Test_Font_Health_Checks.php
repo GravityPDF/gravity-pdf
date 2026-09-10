@@ -72,7 +72,9 @@ class Test_Font_Health_Checks extends TestCase {
 	}
 
 	protected function configured(): Configured_Fonts {
-		return new Configured_Fonts( GPDFAPI::get_options_class() );
+		global $gfpdf;
+
+		return new Configured_Fonts( $gfpdf->gform, GPDFAPI::get_options_class() );
 	}
 
 	protected function add_pdf( array $settings ): string {

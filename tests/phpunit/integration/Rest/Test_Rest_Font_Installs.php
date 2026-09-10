@@ -130,6 +130,35 @@ class Test_Rest_Font_Installs extends Test_Rest {
 		return (array) $this->catalog_repository()->entry( 'packs', $entry );
 	}
 
+	/**
+	 * The poller is the one status read that re-dispatches: a batch nothing picked up is usually one dispatch away
+	 * from moving, and the System Report reads the same statuses without touching anything
+	 */
+	public function test_the_poller_re_dispatches_a_batch_nothing_picked_up() {
+		$this->seed_pack();
+
+		$this->catalog_repository()->set_status(
+			'packs',
+			'emoji',
+			[
+				'phase'       => 'queued',
+				'phase_since' => gmdate( 'Y-m-d H:i:s', time() - Registry::NUDGE_AFTER - 60 ),
+			]
+		);
+
+		$this->queue->push_to_queue(
+			[
+				'source' => 'packs',
+				'entry'  => 'emoji',
+				'name'   => 'Noto.ttf',
+			]
+		)->save();
+
+		$this->get( '/fonts/status' );
+
+		$this->assertSame( 1, $this->dispatches() );
+	}
+
 	public function test_the_routes_are_registered() {
 		$routes = rest_get_server()->get_routes();
 
