@@ -2,17 +2,12 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { findByTestAttr } from '../../testUtils';
 import { CloseDialog } from '../../../../../src/assets/js/react/components/Modal/CloseDialog';
-import * as utilitiesB from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont';
 
 describe('CloseDialog - CloseDialog.js', () => {
 	// Mock component props data
 	const props = {
-		getCustomFontList: jest.fn(),
-		clearAddFontMsg: jest.fn(),
 		templateList: [{}],
-		msg: { success: {}, error: {} },
 		navigate: jest.fn(),
-		pathname: '/fontmanager/',
 	};
 
 	describe('RUN LIFECYCLE METHODS', () => {
@@ -43,25 +38,6 @@ describe('CloseDialog - CloseDialog.js', () => {
 	});
 
 	describe('RUN COMPONENT METHODS', () => {
-		test("handleKeyPress() - Close font manager 'Update Font' panel first", () => {
-			// Mock update font panel DOM
-			document.body.innerHTML =
-				'<div class="update-font show">' + '</div>';
-
-			const msg = { success: { addFont: {} }, error: {} };
-			const wrapper = shallow(
-				<CloseDialog {...props} id="yes" msg={msg} />
-			);
-			const instance = wrapper.instance();
-			const toggleUpdateFont = jest.spyOn(utilitiesB, 'toggleUpdateFont');
-			const e = { key: 'Escape' };
-
-			instance.handleKeyPress(e);
-
-			expect(props.clearAddFontMsg).toHaveBeenCalledTimes(1);
-			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
-		});
-
 		test('handleKeyPress() - Close modal', () => {
 			const wrapper = shallow(<CloseDialog {...props} />);
 			const instance = wrapper.instance();

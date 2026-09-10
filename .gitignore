@@ -31,6 +31,7 @@ node_modules/*
 
 ## Plugin-specific files:
 build/assets/*
+build/font-manager/*
 
 # Unit tests
 /tmp

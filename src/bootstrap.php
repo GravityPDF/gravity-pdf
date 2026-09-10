@@ -502,6 +502,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
 
 		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'build/assets/app.bundle.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
+		wp_register_style( 'gfpdf_css_font_manager', PDF_PLUGIN_URL . 'build/font-manager/style-font-manager.css', [ 'wp-components' ], $version );
+		wp_style_add_data( 'gfpdf_css_font_manager', 'rtl', 'replace' );
 	}
 
 	/**
@@ -529,13 +531,56 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'build/assets/admin.min.js', $pdf_settings_dependencies, $version, $args );
 
 		/* add hot reloading in development */
-		$asset               = file_exists( PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php' )
-			? require PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php'
-			: [ 'dependencies' => [ 'jquery' ] ];
-		$bundle_dependencies = $asset['dependencies'] ?? [];
+		$bundle_dependencies = $this->asset_dependencies( 'build/assets/app.bundle.min.asset.php', [ 'jquery' ] );
 
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
+
+		/*
+		 * The Font Manager runs on the packages WordPress serves, so its dependencies are whatever the build
+		 * extracted rather than a hand-kept list
+		 */
+		$font_manager_dependencies = $this->asset_dependencies( 'build/font-manager/font-manager.min.asset.php' );
+
+		wp_register_script( 'gfpdf_js_font_manager', PDF_PLUGIN_URL . 'build/font-manager/font-manager.min.js', $font_manager_dependencies, $version, $args );
+		wp_set_script_translations( 'gfpdf_js_font_manager', 'gravity-pdf', PDF_PLUGIN_DIR . 'languages' );
+	}
+
+	/**
+	 * The script handles a built bundle says it needs
+	 *
+	 * @param string $path     The `.asset.php` manifest, relative to the plugin directory
+	 * @param array  $fallback What to assume when the plugin was installed without a build
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	private function asset_dependencies( $path, $fallback = [] ) {
+		$asset = file_exists( PDF_PLUGIN_DIR . $path ) ? require PDF_PLUGIN_DIR . $path : [];
+
+		return $asset['dependencies'] ?? $fallback;
+	}
+
+	/**
+	 * Whether this screen carries a font dropdown for the Font Manager to attach to
+	 *
+	 * The bundle borrows `wp-components`, which is over a megabyte of script and stylesheet WordPress would
+	 * otherwise not serve here — so it loads on the three screens that have an anchor, not on every Gravity PDF
+	 * page. The selectors it looks for are the same three `src/assets/js/react/fontManager/index.js` does.
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	private function has_font_field() {
+		/* The per-PDF Font setting: the add/edit screen, which `pid` is what distinguishes from the PDF list */
+		if ( rgget( 'page' ) === 'gf_edit_forms' ) {
+			return rgget( 'pid' ) !== '';
+		}
+
+		/* The global default font, and the Tools tab's Manage fonts button */
+		return $this->misc->is_gfpdf_settings_tab( 'general' ) || $this->misc->is_gfpdf_settings_tab( 'tools' );
 	}
 
 	/**
@@ -563,6 +608,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			/* add media uploader */
 			wp_enqueue_media();
 			wp_enqueue_script( 'gfpdf_js_entrypoint' );
+
+			if ( $this->has_font_field() ) {
+				wp_enqueue_script( 'gfpdf_js_font_manager' );
+				wp_enqueue_style( 'gfpdf_css_font_manager' );
+			}
 
 			/* Load TinyMCE styles */
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );

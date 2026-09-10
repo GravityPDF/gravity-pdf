@@ -6,13 +6,6 @@ import {
 	watchTemplateProcessing,
 	watchpostTemplateUploadProcessing,
 } from './templates';
-import {
-	watchGetCustomFontList,
-	watchAddFont,
-	watchEditFont,
-	watchDeleteFont,
-	watchGetCustomFontListSuccess,
-} from './fontManager';
 
 /**
  * @package     Gravity PDF
@@ -31,10 +24,5 @@ export default function* rootSaga() {
 		watchUpdateSelectBox(),
 		watchTemplateProcessing(),
 		watchpostTemplateUploadProcessing(),
-		watchGetCustomFontList(),
-		watchAddFont(),
-		watchEditFont(),
-		watchDeleteFont(),
-		watchGetCustomFontListSuccess(),
 	]);
 }

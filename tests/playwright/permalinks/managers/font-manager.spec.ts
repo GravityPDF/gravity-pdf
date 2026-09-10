@@ -1,13 +1,27 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
-import { test, resourcesPath } from '@self:playwright/fixtures/test';
+import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
-import * as path from 'path';
 
+/**
+ * The 7.0 Font Manager.
+ *
+ * The `/fonts` REST routes are not built yet, so this build serves them from fixtures in the browser and
+ * nothing an admin does here reaches the database. What is covered is everything that does not need the server
+ * to remember: the button, the shell, the three groups, search, the source browser, the settings panel and the
+ * two ways out. The add → search → edit → delete lifecycle, the install-progress run and the pack install come
+ * back with the REST controllers, which is the only thing that can make them assert anything true.
+ */
 test.describe('Font Manager', () => {
 	let pdf: Pdf;
 	let form: any;
+
+	const openManager = async (page: Page) => {
+		await page.locator('.gfpdf-manage-fonts').getByRole('button').click();
+
+		return page.getByRole('dialog', { name: 'Font manager' });
+	};
 
 	test.beforeEach(
 		async ({
@@ -30,13 +44,8 @@ test.describe('Font Manager', () => {
 		await pdf.navigateToNewFormPdf(form.id);
 
 		await expect(page.getByLabel('Font', { exact: true })).toBeVisible();
-		await page
-			.locator('#gfpdf-settings-field-wrapper-font-container')
-			.getByRole('button', { name: 'Manage' })
-			.click();
-		await expect(
-			page.getByRole('heading', { name: 'Font Manager', exact: true })
-		).toBeVisible();
+
+		await expect(await openManager(page)).toBeVisible();
 	});
 
 	test('should display a dropdown of default fonts option', async ({
@@ -71,133 +80,122 @@ test.describe('Font Manager', () => {
 		);
 	});
 
-	test('should display font manager error validation', async ({ page }) => {
-		await pdf.navigateToNewFormPdf(form.id);
-		await page
-			.locator('#gfpdf-settings-field-wrapper-font-container')
-			.getByRole('button', { name: 'Manage' })
-			.click();
-
-		await page
-			.getByRole('button', { name: 'Add font' })
-			.filter({ visible: true })
-			.click();
-
-		await expect(
-			page.locator('.input-label-validation-error')
-		).toBeVisible();
-		await expect(
-			page.getByText(
-				'Please choose a name contains letters and/or numbers (and a space if you want it).'
-			)
-		).toBeVisible();
-		await expect(page.locator('.drop-zone.required')).toBeVisible();
-	});
-
-	test('should successfully add, search, edit, and delete new font', async ({
+	test('should group the installed fonts, and narrow them by search', async ({
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
+
+		const manager = await openManager(page);
+
+		await expect(
+			manager.getByText('Bundled', { exact: true })
+		).toBeVisible();
+		await expect(
+			manager.getByText('Custom', { exact: true })
+		).toBeVisible();
+		await expect(manager.getByText('Language packs')).toBeVisible();
+
+		await manager.getByLabel('Search fonts').fill('brand');
+
+		await expect(manager.getByText('Brand Sans')).toBeVisible();
+		await expect(manager.getByText('Emoji')).toBeHidden();
+	});
+
+	test('should open a font for editing, and show the key a template writes', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+
+		const manager = await openManager(page);
+
+		await manager.getByText('Brand Sans').click();
+
+		await expect(manager.getByText('Edit font')).toBeVisible();
+		await expect(manager.getByText('font-family: brandsans')).toBeVisible();
+	});
+
+	test('should browse a source, filter it, and open an entry', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+
+		const manager = await openManager(page);
+
+		await manager.locator('.components-dropdown-menu__toggle').click();
 		await page
-			.locator('#gfpdf-settings-field-wrapper-font-container')
-			.getByRole('button', { name: 'Manage' })
+			.getByRole('menuitem', { name: 'Browse Google Fonts' })
 			.click();
 
-		// Add Font
-		await page
-			.locator('.add-font')
-			.getByRole('textbox', { name: 'Font Name' })
-			.fill('Roboto');
+		await expect(manager.locator('.gfpdf-fm-cards')).toBeVisible();
 
-		await page
-			.locator('#gfpdf-font-variant-regular-addFont')
-			.setInputFiles(
-				path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
-			);
+		await manager.getByLabel('Category').selectOption('monospace');
 
-		await page
-			.getByRole('button', { name: 'Add font' })
-			.filter({ visible: true })
+		await expect(
+			manager.getByText(/of 4 families · Monospace/)
+		).toBeVisible();
+
+		await manager.getByText('Roboto Mono').click();
+
+		await expect(manager.getByLabel('Bold Italic')).toBeVisible();
+	});
+
+	test('should open the language settings from the header', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+
+		const manager = await openManager(page);
+
+		await manager
+			.getByRole('button', { name: 'Language settings' })
 			.click();
 
-		await expect(page.getByText('Your font has been saved.')).toBeVisible();
-		const fontItems = page.locator('.font-list-item');
-		await expect(fontItems).toHaveCount(1);
-
-		// Search Font
-		await page.locator('#font-manager-search-box').fill('Arial');
-		await expect(fontItems).toHaveCount(0);
-		await page.locator('#font-manager-search-box').fill('Roboto');
-		await expect(fontItems).toHaveCount(1);
-
-		const updateButton = page.getByRole('button', { name: 'Update Font' });
-		await expect(updateButton).toBeDisabled();
-
-		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
-		await expect(updateButton).not.toBeDisabled();
-
-		// Cancel button
-		await page.getByRole('button', { name: 'Cancel' }).click();
-		await expect(page.locator('.update-font.show')).not.toBeVisible();
-
-		// Edit Font properly
-		await fontItems.first().click();
-		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
-		await page
-			.locator('#gfpdf-font-variant-italics-updateFont')
-			.setInputFiles(
-				path.join(resourcesPath, 'fonts', 'Roboto-RegularItalic.ttf')
-			);
-		await page
-			.locator('#gfpdf-font-variant-bold-updateFont')
-			.setInputFiles(
-				path.join(resourcesPath, 'fonts', 'Roboto-Bold.ttf')
-			);
-		await page
-			.locator('#gfpdf-font-variant-bolditalics-updateFont')
-			.setInputFiles(
-				path.join(resourcesPath, 'fonts', 'Roboto-BoldItalic.ttf')
-			);
-
-		await updateButton.click();
-		await expect(page.getByText('Your font has been saved.')).toBeVisible();
-		await expect(page.getByText('Roboto 2')).toBeVisible();
-
-		// Delete Font
-		page.on('dialog', (dialog) => dialog.accept());
-		await fontItems.locator('.dashicons-trash').click();
-		await expect(page.getByText('Font list empty.')).toBeVisible();
+		await expect(
+			manager.getByLabel('Default document language')
+		).toBeVisible();
+		await expect(manager.getByText('Bundled · Arimo')).toBeVisible();
 	});
 
 	test('should be able to close font manager popup with button', async ({
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page
-			.locator('#gfpdf-settings-field-wrapper-font-container')
-			.getByRole('button', { name: 'Manage' })
-			.click();
 
-		const popup = await page.locator('.container.theme-wrap.font-manager');
+		const manager = await openManager(page);
 
-		await expect(popup).toBeVisible();
-		await page.getByRole('button', { name: 'close', exact: true }).click();
-		await expect(popup).not.toBeVisible();
+		await expect(manager).toBeVisible();
+		await manager.getByRole('button', { name: 'Close dialog' }).click();
+		await expect(manager).toBeHidden();
 	});
 
 	test('should be able to close font manager popup with esc key', async ({
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
-		await page
-			.locator('#gfpdf-settings-field-wrapper-font-container')
-			.getByRole('button', { name: 'Manage' })
-			.click();
 
-		const popup = await page.locator('.container.theme-wrap.font-manager');
+		const manager = await openManager(page);
 
-		await expect(popup).toBeVisible();
+		await expect(manager).toBeVisible();
 		await page.keyboard.press('Escape');
-		await expect(popup).not.toBeVisible();
+		await expect(manager).toBeHidden();
+	});
+
+	test('should show one pane at a time on a phone', async ({ page }) => {
+		await page.setViewportSize({ width: 390, height: 780 });
+		await pdf.navigateToNewFormPdf(form.id);
+
+		const manager = await openManager(page);
+
+		await expect(manager.locator('.fm-sidebar')).toBeVisible();
+		await expect(manager.locator('.fm-detail')).toBeHidden();
+
+		await manager.getByText('Brand Sans').click();
+
+		await expect(manager.locator('.fm-sidebar')).toBeHidden();
+		await expect(manager.locator('.fm-detail')).toBeVisible();
+
+		await manager.getByRole('button', { name: 'Fonts' }).click();
+
+		await expect(manager.locator('.fm-sidebar')).toBeVisible();
 	});
 });

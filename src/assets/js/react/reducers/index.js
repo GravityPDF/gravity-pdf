@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux';
 import templateReducer from './templateReducer';
-import fontManagerReducer from './fontManagerReducer';
 
 /**
  * Combine our Redux reducers for use in a single store
@@ -10,5 +9,4 @@ import fontManagerReducer from './fontManagerReducer';
  */
 export default combineReducers({
 	template: templateReducer,
-	fontManager: fontManagerReducer,
 });
