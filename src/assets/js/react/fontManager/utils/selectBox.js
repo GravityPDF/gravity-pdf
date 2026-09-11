@@ -115,7 +115,7 @@ function groupsOf(fonts) {
 	return [
 		{
 			id: 'bundled',
-			label: __('Bundled', 'gravity-pdf'),
+			label: __('Bundled Fonts', 'gravity-pdf'),
 			fonts: fonts.bundled ?? [],
 		},
 		...(fonts.groups ?? []).map((group) => ({

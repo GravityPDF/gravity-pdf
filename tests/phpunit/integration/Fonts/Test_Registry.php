@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts;
 
+use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Mpdf\Ucdn;
@@ -25,6 +26,7 @@ use GPDFAPI;
  */
 class Test_Registry extends TestCase {
 
+	use HasCatalogRows;
 	use HasFontRows;
 
 	/**
@@ -54,6 +56,7 @@ class Test_Registry extends TestCase {
 
 	public function tear_down(): void {
 		$this->remove_font_rows();
+		$this->drop_catalog_rows();
 
 		$options = GPDFAPI::get_options_class();
 		$options->update_option( 'font_language_overrides', [] );
@@ -384,13 +387,111 @@ class Test_Registry extends TestCase {
 	}
 
 	public function test_grouped_fonts_separate_packs_from_uploads() {
+		$this->insert_catalog_row( 'packs', 'thai', [ 'coverage' => 1, 'label' => 'Thai' ] );
+
 		$this->install( 'mu' );
 		$this->install( 'nu', [ 'source' => 'packs', 'entry' => 'thai', 'coverage' => 1 ] );
 
-		$groups = $this->registry->get_grouped_fonts();
+		$fonts = $this->registry->get_grouped_fonts();
 
-		$this->assertSame( 'Arimo', $groups['Bundled Fonts']['gfpdf-arimo'] );
-		$this->assertArrayHasKey( 'mu', $groups['User-Defined Fonts'] );
-		$this->assertArrayHasKey( 'nu', $groups['Language Packs'] );
+		$this->assertSame( 'gfpdf-arimo', $fonts['bundled'][0]['id'] );
+		$this->assertSame( [ 'mu' ], array_column( $fonts['custom'], 'id' ) );
+
+		$this->assertCount( 1, $fonts['groups'] );
+		$this->assertSame( 'Thai', $fonts['groups'][0]['label'] );
+		$this->assertSame( 'packs', $fonts['groups'][0]['source'] );
+		$this->assertSame( [ 'nu' ], array_column( $fonts['groups'][0]['fonts'], 'id' ) );
+	}
+
+	public function test_a_catalogue_display_family_is_grouped_with_the_uploads() {
+		$this->insert_catalog_row( 'google', 'lato' );
+
+		/* An admin thinks of a font they chose and named the same way whether it came from a CDN or their desktop */
+		$this->install( 'latolight', [ 'source' => 'google', 'entry' => 'lato' ] );
+
+		$fonts = $this->registry->get_grouped_fonts();
+
+		$this->assertSame( [], $fonts['groups'] );
+		$this->assertSame( [ 'latolight' ], array_column( $fonts['custom'], 'id' ) );
+	}
+
+	public function test_the_groups_run_in_the_catalogues_order_not_the_rows() {
+		$this->insert_catalog_row( 'packs', 'korean', [ 'coverage' => 1, 'position' => 9 ] );
+		$this->insert_catalog_row( 'packs', 'arabic', [ 'coverage' => 1, 'position' => 2 ] );
+
+		$this->install( 'nanum', [ 'source' => 'packs', 'entry' => 'korean', 'coverage' => 1 ] );
+		$this->install( 'xbriyaz', [ 'source' => 'packs', 'entry' => 'arabic', 'coverage' => 1 ] );
+
+		/* The sidebar and the browser list packs in one order, and this is where that order comes from */
+		$this->assertSame( [ 'arabic', 'korean' ], array_column( $this->registry->get_grouped_fonts()['groups'], 'entry' ) );
+	}
+
+	public function test_a_pack_the_catalogue_has_dropped_keeps_its_group() {
+		$this->install( 'nanum', [ 'source' => 'packs', 'entry' => 'korean', 'coverage' => 1, 'label' => 'Nanum Gothic' ] );
+
+		$group = $this->registry->get_grouped_fonts()['groups'][0];
+
+		/* The PDFs naming it still render, so hiding it from the dropdown would be the only thing that broke */
+		$this->assertSame( 'Nanum Gothic', $group['label'] );
+		$this->assertSame( 'korean', $group['entry'] );
+		$this->assertSame( 1, $group['files'] );
+	}
+
+	public function test_a_pack_label_is_translated_on_the_way_out() {
+		$this->insert_catalog_row( 'packs', 'japanese', [ 'coverage' => 1, 'label' => 'Japanese (raw)' ] );
+		$this->install( 'notosansjp', [ 'source' => 'packs', 'entry' => 'japanese', 'coverage' => 1 ] );
+
+		$this->assertSame( 'Japanese', $this->registry->get_grouped_fonts()['groups'][0]['label'] );
+	}
+
+	public function test_every_face_carries_what_a_preview_needs() {
+		$this->install( 'mu' );
+
+		$file = $this->registry->get_grouped_fonts()['custom'][0]['files']['R'];
+
+		$this->assertSame( 'R', $file['role'] );
+		$this->assertSame( 'test-mu.ttf', $file['path'] );
+		$this->assertStringEndsWith( '/fonts/test-mu.ttf', (string) $file['url'] );
+		$this->assertSame( 0, $file['missing'] );
+
+		/* How the installer decides whether to re-fetch a file, and no business of the browser's */
+		$this->assertArrayNotHasKey( 'sha256', $file );
+	}
+
+	public function test_a_face_that_is_not_on_disk_is_given_no_url() {
+		$id = $this->install( 'mu' );
+
+		$this->repository->insert_file( $id, 'B', [ 'path' => 'test-gone.ttf', 'missing' => 1 ] );
+
+		$this->assertNull( $this->registry->get_grouped_fonts()['custom'][0]['files']['B']['url'] );
+	}
+
+	public function test_the_bundled_faces_are_served_from_the_plugin_directory() {
+		$bundled = $this->registry->get_grouped_fonts()['bundled'][0];
+
+		$this->assertSame( 'bundled', $bundled['source'] );
+		$this->assertTrue( $bundled['enabled'] );
+		$this->assertStringEndsWith( '/fonts/Arimo-Regular.ttf', (string) $bundled['files']['R']['url'] );
+		$this->assertGreaterThan( 0, $bundled['files']['BI']['size'] );
+	}
+
+	public function test_only_an_always_entry_with_nothing_installed_is_reported_missing() {
+		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1, 'always' => 1, 'size' => 943718 ] );
+		$this->insert_catalog_row( 'packs', 'indic', [ 'coverage' => 1, 'always' => 1 ] );
+		$this->insert_catalog_row( 'packs', 'thai', [ 'coverage' => 1 ] );
+
+		$this->install( 'freesans', [ 'source' => 'packs', 'entry' => 'indic', 'coverage' => 1 ] );
+
+		$this->assertSame(
+			[
+				[
+					'source' => 'packs',
+					'entry'  => 'emoji',
+					'label'  => 'Emoji',
+					'size'   => 943718,
+				],
+			],
+			$this->registry->missing_always_entries()
+		);
 	}
 }
