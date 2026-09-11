@@ -931,9 +931,33 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		 * font that cannot render. Custom fonts are rows now, so they arrive with everything else rather than
 		 * through add_custom_fonts().
 		 */
-		$fonts = \GPDFAPI::get_font_registry()->get_grouped_fonts();
+		$grouped = \GPDFAPI::get_font_registry()->get_grouped_fonts();
 
-		return apply_filters( 'gfpdf_font_list', $fonts );
+		$fonts = [ esc_html__( 'Bundled Fonts', 'gravity-pdf' ) => $this->font_choices( $grouped['bundled'] ) ];
+
+		/* One optgroup per installed pack, in the catalogue's order, which is the order the Font Manager lists them in */
+		foreach ( $grouped['groups'] as $group ) {
+			$label = (string) $group['label'];
+
+			$fonts[ $label ] = ( $fonts[ $label ] ?? [] ) + $this->font_choices( $group['fonts'] );
+		}
+
+		$fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] = $this->font_choices( $grouped['custom'] );
+
+		return apply_filters( 'gfpdf_font_list', array_filter( $fonts ) );
+	}
+
+	/**
+	 * One group's fonts as the dropdown wants them: key => name
+	 *
+	 * @param array[] $fonts
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	protected function font_choices( array $fonts ) {
+		return array_column( $fonts, 'label', 'id' );
 	}
 
 	/**

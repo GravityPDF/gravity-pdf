@@ -91,7 +91,7 @@ class Test_Rest_Custom_Fonts extends TestCase {
 
 		/* Setup our test classes */
 		$this->model      = new Model_Custom_Fonts( $gfpdf->get_font_repository() );
-		$this->controller = new Rest_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Fonts\\LocalFilesystem', 'GFPDF\\Fonts\\LocalFile' );
+		$this->controller = new Rest_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $gfpdf->get_font_registry(), $this->tmp_font_location, 'GFPDF\\Fonts\\LocalFilesystem', 'GFPDF\\Fonts\\LocalFile' );
 
 		$this->controller->init();
 
@@ -540,6 +540,7 @@ class Test_Rest_Custom_Fonts extends TestCase {
 			new Throwing_Custom_Fonts_Model( $gfpdf->get_font_repository() ),
 			$gfpdf->log,
 			$gfpdf->gform,
+			$gfpdf->get_font_registry(),
 			$this->tmp_font_location
 		);
 

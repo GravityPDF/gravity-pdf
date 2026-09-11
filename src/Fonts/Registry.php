@@ -151,6 +151,12 @@ class Registry {
 	 */
 	protected $memo;
 
+	/**
+	 * @var array{stamp: string, fonts: array}|null The grouped list this request has already built
+	 * @since 7.0
+	 */
+	protected $grouped;
+
 	public function __construct(
 		Font_Repository $repository,
 		Catalog_Repository $catalog,
@@ -607,24 +613,231 @@ class Registry {
 	/**
 	 * Every font key a PDF may name, grouped for the settings dropdown and the Font Manager
 	 *
-	 * @return array<string, array<string, string>>
+	 * Three groups, in the order both surfaces draw them: the bundled faces, one group per installed coverage
+	 * entry in the catalogue's `position` order, and everything else — uploads, imports and catalogue display
+	 * families, which an admin thinks about the same way. `GET /fonts/` adds two fields of its own on top of this
+	 * (§4.7) and the dropdown flattens it, so a label or an order can only be wrong in one place.
+	 *
+	 * @return array{bundled: array[], groups: array[], custom: array[]}
 	 *
 	 * @since 7.0
 	 */
 	public function get_grouped_fonts(): array {
-		$groups = [
-			esc_html__( 'Bundled Fonts', 'gravity-pdf' ) => [ static::BUNDLED_FONT => 'Arimo' ],
-		];
+		$stamp = $this->repository->get_last_changed() . '|' . $this->catalog->get_last_changed();
 
-		$user_defined = esc_html__( 'User-Defined Fonts', 'gravity-pdf' );
-
-		foreach ( $this->rows() as $font_key => $row ) {
-			$label = $row['coverage'] === 1 ? esc_html__( 'Language Packs', 'gravity-pdf' ) : $user_defined;
-
-			$groups[ $label ][ $font_key ] = (string) $row['label'];
+		if ( $this->grouped !== null && $this->grouped['stamp'] === $stamp ) {
+			return $this->grouped['fonts'];
 		}
 
-		return array_filter( $groups );
+		$entries = [];
+		$custom  = [];
+
+		foreach ( $this->rows() as $font_key => $row ) {
+			$entry = (string) ( $row['entry'] ?? '' );
+			$font  = $this->font_object( $font_key, $row );
+
+			if ( (int) $row['coverage'] === 1 && $entry !== '' ) {
+				$entries[ $row['source'] . '/' . $entry ][] = $font;
+				continue;
+			}
+
+			$custom[] = $font;
+		}
+
+		$fonts = [
+			'bundled' => $this->bundled_fonts(),
+			'groups'  => $this->coverage_groups( $entries ),
+			'custom'  => $custom,
+		];
+
+		$this->grouped = [
+			'stamp' => $stamp,
+			'fonts' => $fonts,
+		];
+
+		return $fonts;
+	}
+
+	/**
+	 * Every `always` entry the site has no rows for
+	 *
+	 * What the Bundled detail's notice lists (§4.6). An `always` entry with no rows is either one the admin
+	 * declined or one an install never finished, and neither is an error — the panel offers it rather than
+	 * reporting it.
+	 *
+	 * @return array[] `{ source, entry, label, size }`, in catalogue order
+	 *
+	 * @since 7.0
+	 */
+	public function missing_always_entries(): array {
+		$installed = $this->entry_rows();
+		$missing   = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$id = $row['source'] . '/' . $row['entry'];
+
+			if ( (int) $row['always'] !== 1 || isset( $installed[ $id ] ) ) {
+				continue;
+			}
+
+			$missing[] = [
+				'source' => (string) $row['source'],
+				'entry'  => (string) $row['entry'],
+				'label'  => Font_Sources::translate_entry( (string) $row['source'], (string) $row['entry'], 'label', (string) $row['label'] ),
+				'size'   => (int) $row['size'],
+			];
+		}
+
+		return $missing;
+	}
+
+	/**
+	 * One group per installed coverage entry, catalogue order first
+	 *
+	 * @param array<string, array[]> $entries Font objects keyed by `{source}/{entry}`
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	protected function coverage_groups( array $entries ): array {
+		$groups = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$id = $row['source'] . '/' . $row['entry'];
+
+			if ( ! isset( $entries[ $id ] ) ) {
+				continue;
+			}
+
+			$groups[] = [
+				'label'   => Font_Sources::translate_entry( (string) $row['source'], (string) $row['entry'], 'label', (string) $row['label'] ),
+				'source'  => (string) $row['source'],
+				'entry'   => (string) $row['entry'],
+				'files'   => (int) $row['files'],
+				'scripts' => (string) ( $row['scripts'] ?? '' ),
+				'fonts'   => $entries[ $id ],
+			];
+
+			unset( $entries[ $id ] );
+		}
+
+		/* A pack the catalogue has dropped still renders the PDFs that name it, so it keeps its group */
+		foreach ( $entries as $id => $fonts ) {
+			$pair = explode( '/', $id, 2 );
+
+			$groups[] = [
+				'label'   => (string) $fonts[0]['label'],
+				'source'  => $pair[0],
+				'entry'   => $pair[1],
+				'files'   => count( static::paths_of( $fonts ) ),
+				'scripts' => '',
+				'fonts'   => $fonts,
+			];
+		}
+
+		return $groups;
+	}
+
+	/**
+	 * The bundled faces, shaped like rows without being any
+	 *
+	 * Their URLs are plugin-directory URLs (§4.2): the files ship with the plugin, so a preview of them never
+	 * depends on the fonts directory being web-reachable.
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	protected function bundled_fonts(): array {
+		$base  = plugin_dir_url( $this->bundled_dir . 'index.php' );
+		$files = [];
+
+		foreach ( static::BUNDLED_FACES as $role => $name ) {
+			$path = $this->bundled_dir . $name;
+
+			$files[ $role ] = [
+				'role'    => $role,
+				'variant' => null,
+				'path'    => $name,
+				'url'     => $base . $name,
+				'size'    => is_file( $path ) ? (int) filesize( $path ) : 0,
+				'missing' => 0,
+			];
+		}
+
+		return [
+			[
+				'id'          => static::BUNDLED_FONT,
+				'label'       => 'Arimo',
+				'source'      => 'bundled',
+				'entry'       => null,
+				'coverage'    => 0,
+				'version'     => null,
+				'enabled'     => true,
+				'description' => __( 'Ships with Gravity PDF and covers Latin, Greek, Cyrillic and Hebrew. Metric-compatible with Arial, so a template written for Arial keeps its line breaks.', 'gravity-pdf' ),
+				'files'       => $files,
+			],
+		];
+	}
+
+	/**
+	 * One font row as both surfaces read it
+	 *
+	 * `sha256` is left behind: it is how the installer decides whether to re-fetch a file, and nothing the browser
+	 * does with a font needs it.
+	 *
+	 * @since 7.0
+	 */
+	protected function font_object( string $font_key, array $row ): array {
+		$base  = $this->repository->get_font_dir_url();
+		$files = [];
+
+		foreach ( (array) $row['files'] as $role => $file ) {
+			$path    = (string) $file['path'];
+			$missing = (int) ( $file['missing'] ?? 0 );
+
+			$files[ $role ] = [
+				'role'    => (string) $role,
+				'variant' => $file['variant'] ?? null,
+				'path'    => $path,
+				'url'     => $base === null || $missing === 1 ? null : $base . $path,
+				'size'    => (int) $file['size'],
+				'missing' => $missing,
+			];
+		}
+
+		return [
+			'id'       => $font_key,
+			'label'    => (string) $row['label'],
+			'source'   => (string) $row['source'],
+			'entry'    => $row['entry'],
+			'coverage' => (int) $row['coverage'],
+			'version'  => $row['version'],
+			'enabled'  => (bool) ( $row['enabled'] ?? true ),
+			'files'    => $files,
+		];
+	}
+
+	/**
+	 * The distinct file paths a set of font objects records
+	 *
+	 * @param array[] $fonts
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	protected static function paths_of( array $fonts ): array {
+		$paths = [];
+
+		foreach ( $fonts as $font ) {
+			foreach ( $font['files'] as $file ) {
+				$paths[ $file['path'] ] = true;
+			}
+		}
+
+		return array_keys( $paths );
 	}
 
 	/**

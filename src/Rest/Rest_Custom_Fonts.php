@@ -11,6 +11,7 @@ use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Exceptions\GravityPdfModelNotUpdatedException;
 use GFPDF\Fonts\FlushCache;
 use GFPDF\Fonts\Font_Repository;
+use GFPDF\Fonts\Registry;
 use GFPDF\Fonts\SupportsOtl;
 use GFPDF\Fonts\TtfFontValidation;
 use GFPDF\Helper\Helper_Abstract_Form;
@@ -59,6 +60,12 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	protected $log;
 
 	/**
+	 * @var Registry
+	 * @since 7.0
+	 */
+	protected $registry;
+
+	/**
 	 * @var string The absolute path to the Custom Fonts directory on the server
 	 * @since 6.0
 	 */
@@ -82,10 +89,11 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	 */
 	protected $font_keys = [ 'regular', 'italics', 'bold', 'bolditalics' ];
 
-	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
+	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, Registry $registry, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
 		$this->model         = $model;
 		$this->log           = $log;
 		$this->gform         = $gform;
+		$this->registry      = $registry;
 		$this->font_dir_path = $font_dir_path;
 
 		$this->filesystem = $filesystem;
@@ -131,7 +139,7 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_all_items' ],
+					'callback'            => [ $this, 'get_font_list' ],
 					'permission_callback' => [ $this, 'get_items_permissions_check' ],
 				],
 
@@ -226,6 +234,24 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	 */
 	public function get_all_items(): array {
 		return array_values( $this->model->get_custom_fonts() );
+	}
+
+	/**
+	 * Every font the site can name, as the Font Manager and the settings dropdown read it
+	 *
+	 * `Registry::get_grouped_fonts()` is the whole body of the response — the same read the dropdown flattens, so
+	 * the two can never disagree about a label or an order — plus two fields that belong to the request rather
+	 * than to the model: the `always` entries with nothing installed, and whether this user may unlink a file.
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_list(): array {
+		return $this->registry->get_grouped_fonts() + [
+			'missing'          => $this->registry->missing_always_entries(),
+			'can_delete_files' => $this->may_delete_files( $this->file_delete_capability( [] ) ),
+		];
 	}
 
 	/**

@@ -172,6 +172,12 @@ class Font_Repository {
 	protected $misc;
 
 	/**
+	 * @var string|null|false The fonts directory's URL, `null` when it has none, `false` before it was resolved
+	 * @since 7.0
+	 */
+	protected $font_dir_url = false;
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
@@ -1043,6 +1049,25 @@ class Font_Repository {
 	 */
 	public function get_font_dir(): string {
 		return $this->font_dir;
+	}
+
+	/**
+	 * The fonts directory as the admin's browser can reach it, or null when it cannot
+	 *
+	 * `gfpdf_font_location` may put the directory outside the web root, which is a supported choice, so a preview
+	 * that needs a local file has to be able to ask rather than assume. Resolved once per request: the conversion
+	 * walks four base paths, and a response carries one URL per face.
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_dir_url(): ?string {
+		if ( $this->font_dir_url === false ) {
+			$url = $this->misc->convert_path_to_url( $this->font_dir );
+
+			$this->font_dir_url = is_string( $url ) ? trailingslashit( $url ) : null;
+		}
+
+		return $this->font_dir_url;
 	}
 
 	/**

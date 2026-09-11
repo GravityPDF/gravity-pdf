@@ -36,7 +36,8 @@ describe('Font Manager - utils/selectBox.js', () => {
 				[...select.querySelectorAll('optgroup')].map((group) =>
 					group.getAttribute('label')
 				)
-			).toEqual(['Bundled', 'Emoji', 'User-Defined Fonts']);
+				/* The same three labels the settings page rendered server-side, so the rebuild never renames a group */
+			).toEqual(['Bundled Fonts', 'Emoji', 'User-Defined Fonts']);
 		});
 
 		test('leaves an optgroup it does not own exactly where it was', () => {
