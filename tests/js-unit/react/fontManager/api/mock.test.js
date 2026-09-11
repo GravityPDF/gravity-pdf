@@ -1,4 +1,7 @@
-import { mockMiddleware } from '../../../../../src/assets/js/react/fontManager/api/mock';
+import {
+	mockMiddleware,
+	mockOnly,
+} from '../../../../../src/assets/js/react/fontManager/api/mock';
 import {
 	FILE_TICK,
 	resetState,
@@ -262,6 +265,25 @@ describe('Font Manager - the mocked /fonts routes', () => {
 		expect(await call('/fonts/sources/sync', 'POST')).toEqual({
 			up_to_date: true,
 		});
+	});
+
+	test('a scoped mock answers its own routes and passes the rest to the site', async () => {
+		const only = mockOnly(['/fonts/settings']);
+
+		/* What the app registers: `/fonts/settings` has no REST route yet, and every other path does */
+		const settings = only(
+			{ path: '/gravity-pdf/v1/fonts/settings', method: 'GET' },
+			next
+		);
+
+		await jest.advanceTimersByTimeAsync(500);
+
+		expect((await settings).default_pdf_language).toBe('en');
+		expect(next).not.toHaveBeenCalled();
+
+		only({ path: '/gravity-pdf/v1/fonts/', method: 'GET' }, next);
+
+		expect(next).toHaveBeenCalledTimes(1);
 	});
 
 	test('an unknown /fonts path is a 404 rather than a fall-through', async () => {
