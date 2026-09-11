@@ -351,12 +351,22 @@ class Test_Font_Health_Checks extends TestCase {
 		$issues = $this->sync_check()->run();
 
 		$this->assertSame( [ 'catalog_sync' ], $this->ids( $issues ) );
-		$this->assertSame( [ 'packs: never checked' ], $issues[0]->get_details() );
+
+		/* One issue, every stale source named in it: both built-ins share a root and are checked together */
+		$this->assertSame( [ 'packs: never checked', 'google: never checked' ], $issues[0]->get_details() );
 		$this->assertSame( 'manage_options', $this->sync_check()->get_capability() );
 	}
 
-	public function test_a_source_that_synced_recently_raises_nothing() {
+	public function test_one_source_syncing_does_not_answer_for_another() {
 		update_site_option( Catalog_Sync::OPTION, [ 'packs' => [ 'synced' => time() ] ] );
+
+		$this->assertSame( [ 'google: never checked' ], $this->sync_check()->run()[0]->get_details() );
+	}
+
+	public function test_every_source_syncing_recently_raises_nothing() {
+		$synced = [ 'synced' => time() ];
+
+		update_site_option( Catalog_Sync::OPTION, [ 'packs' => $synced, 'google' => $synced ] );
 
 		$this->assertSame( [], $this->sync_check()->run() );
 	}

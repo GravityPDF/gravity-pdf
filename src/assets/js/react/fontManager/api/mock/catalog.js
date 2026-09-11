@@ -590,16 +590,14 @@ export const SOURCE_RECORDS = [
 		id: 'packs',
 		label: 'Language packs',
 		description:
-			'Curated packs of fonts covering the scripts a PDF might need. Published and signed by Gravity PDF.',
-		coverage: true,
+			'Font packs maintained by Gravity PDF, each covering the scripts of one language or region. Files are downloaded from fonts.gravitypdf.com and verified against the signed index before they are installed.',
 		entries: PACK_ENTRIES,
 	},
 	{
 		id: 'google',
 		label: 'Google Fonts',
 		description:
-			'The Google Fonts catalogue, mirrored by Gravity PDF so no request ever leaves your site for Google.',
-		coverage: false,
+			'The Google Fonts library, mirrored by Gravity PDF: choose a family and the weights you want, and only those files are downloaded. No request ever leaves your site for Google, and every file is verified against the signed index before it is installed.',
 		entries: GOOGLE_ENTRIES,
 	},
 ];

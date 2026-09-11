@@ -78,12 +78,18 @@ class Test_Rest_Font_Sources extends Test_Rest {
 
 		$data = $this->get( '/fonts/sources' )->get_data();
 
-		$this->assertCount( 1, $data );
-		$this->assertSame( 'packs', $data[0]['id'] );
+		/* Both built-ins, core's order: language packs before the Google library */
+		$this->assertSame( [ 'packs', 'google' ], wp_list_pluck( $data, 'id' ) );
+		$this->assertSame( 'Google Fonts', $data[1]['label'] );
+		$this->assertNotSame( '', $data[1]['description'] );
+
 		$this->assertSame( 'Language packs', $data[0]['label'] );
 		$this->assertNotSame( '', $data[0]['description'] );
 		$this->assertSame( 3, $data[0]['total'] );
 		$this->assertSame( 2, $data[0]['coverage'] );
+
+		/* A source the catalogue has no rows for is listed, empty, rather than hidden */
+		$this->assertSame( 0, $data[1]['total'] );
 
 		/* null rather than 0, so the UI never renders a date in 1970 */
 		$this->assertNull( $data[0]['synced'] );

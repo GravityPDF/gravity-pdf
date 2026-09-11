@@ -75,9 +75,13 @@ describe('Font Manager - the mocked /fonts routes', () => {
 		expect(sources.map((source) => source.id)).toEqual(['packs', 'google']);
 		expect(sources[0]).toMatchObject({
 			label: 'Language packs',
-			coverage: true,
 			stale: false,
 		});
+
+		/* A count, as the route returns: every pack is a coverage entry, no Google family is */
+		expect(sources[0].coverage).toBe(sources[0].total);
+		expect(sources[1].coverage).toBe(0);
+
 		expect(sources[1].stale).toBe(true);
 		expect(sources[0].filters.subsets).toEqual(expect.any(Array));
 	});

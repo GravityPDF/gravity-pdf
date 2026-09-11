@@ -339,15 +339,27 @@ class Test_Catalog_Sync extends TestCase {
 		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
 		$sync->run();
 
+		/* The published root lists `packs` alone, so `google` is still owed a sync and the pass is still due */
+		$this->assertTrue( $this->sync()->is_due(), 'a source the root never listed is still due' );
+
+		$record           = (array) get_site_option( Catalog_Sync::OPTION );
+		$record['google'] = [ 'synced' => time(), 'last_attempt' => time() ];
+
+		update_site_option( Catalog_Sync::OPTION, $record );
+
 		$this->assertFalse( $this->sync()->is_due(), 'a freshly synced source is not due' );
+
+		/* `google` stays fresh throughout, so each answer below is about `packs` and nothing else */
+		$fresh = [ 'synced' => time(), 'last_attempt' => time() ];
 
 		update_site_option(
 			Catalog_Sync::OPTION,
 			[
-				'packs' => [
+				'packs'  => [
 					'synced'       => time() - ( 60 * DAY_IN_SECONDS ),
 					'last_attempt' => time() - HOUR_IN_SECONDS,
 				],
+				'google' => $fresh,
 			]
 		);
 
@@ -356,10 +368,11 @@ class Test_Catalog_Sync extends TestCase {
 		update_site_option(
 			Catalog_Sync::OPTION,
 			[
-				'packs' => [
+				'packs'  => [
 					'synced'       => time() - ( 60 * DAY_IN_SECONDS ),
 					'last_attempt' => time() - ( 12 * HOUR_IN_SECONDS ),
 				],
+				'google' => $fresh,
 			]
 		);
 
