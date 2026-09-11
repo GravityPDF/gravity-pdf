@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { createRoot } from '@wordpress/element';
 import { dispatch, select, subscribe } from '@wordpress/data';
 import { OVERLAY_ID, STORE_NAME } from './constants';
-import { enableMockApi, isMocked } from './api';
+import { enablePendingRoutes } from './api';
 import { registerFontStore } from './store';
 import FontManager from './components/FontManager';
 import ManageFontsButton from './components/ManageFontsButton';
@@ -30,8 +30,8 @@ import './style.pcss';
  * @since 7.0
  */
 
-/* PHASE 4: the `/fonts` routes are served from fixtures in the browser. Delete this line and `./api/mock`. */
-enableMockApi();
+/* PHASE 6: `/fonts/settings` has no route yet, so the Language tab alone reads fixtures. See `./api`. */
+enablePendingRoutes();
 
 const ANCHORS = [
 	'#gfpdf-settings-field-wrapper-default_font select',
@@ -65,14 +65,6 @@ export function bootstrap() {
 	}
 
 	dispatch(STORE_NAME).setActiveFont(fontSelect.value);
-
-	/*
-	 * PHASE 4: the font list is fixtures, and writing fixtures into the settings dropdown would let a PDF be
-	 * saved against a font that does not exist. The rebuild and the sentinel land with the real routes.
-	 */
-	if (isMocked()) {
-		return;
-	}
 
 	addInstallSentinel(fontSelect, () => {
 		window.location.hash = '/fontmanager/browse';

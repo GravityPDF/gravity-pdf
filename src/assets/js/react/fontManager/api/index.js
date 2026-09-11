@@ -8,43 +8,56 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { API_ROOT } from '../constants';
-import { mockMiddleware } from './mock';
+import { mockMiddleware, mockOnly } from './mock';
 
 /**
  * Every request the Font Manager makes
  *
- * One module so the mocked routes have a single seam: `enableMockApi()` is called once at mount and nothing else
- * in the UI knows the difference. When the REST controllers land, that call and `./mock` go, and every function
- * below already speaks to the real route.
+ * One module so the fixtures have a single seam: nothing else in the UI knows which routes the site answers and
+ * which it does not. Every function below speaks to the real path either way.
  *
  * @since 7.0
  */
 
-let mocked = false;
+/**
+ * The `/fonts` routes the plugin does not serve yet
+ *
+ * `/fonts/settings` is Phase 6 (the language settings panel), so the Language tab reads fixtures while the rest of
+ * the manager talks to the site. When that route lands this array empties and the whole of `./mock` goes with it.
+ *
+ * @since 7.0
+ */
+const PENDING_ROUTES = ['/fonts/settings'];
+
+let registered = false;
 
 /**
- * Serve the `/fonts` routes from the in-browser fixtures
+ * Serve the routes the site cannot answer yet from the in-browser fixtures
+ *
+ * @since 7.0
+ */
+export function enablePendingRoutes() {
+	register(mockOnly(PENDING_ROUTES));
+}
+
+/**
+ * Serve every `/fonts` route from the fixtures
+ *
+ * The Jest suite's seam: a component test standing up REST fixtures would be testing WordPress.
  *
  * @since 7.0
  */
 export function enableMockApi() {
-	if (mocked) {
+	register(mockMiddleware);
+}
+
+function register(middleware) {
+	if (registered) {
 		return;
 	}
 
-	apiFetch.use(mockMiddleware);
-	mocked = true;
-}
-
-/**
- * Whether the font list came from fixtures rather than from the site
- *
- * @return {boolean} Whether the mocked routes are in place
- *
- * @since 7.0
- */
-export function isMocked() {
-	return mocked;
+	apiFetch.use(middleware);
+	registered = true;
 }
 
 const get = (path) => apiFetch({ path: API_ROOT + path });

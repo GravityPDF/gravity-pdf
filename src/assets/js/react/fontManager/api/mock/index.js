@@ -20,11 +20,15 @@ import {
 import { PER_PAGE } from '../../constants';
 
 /**
- * A stand-in for the `/fonts` routes, until Phase 4's REST work lands
+ * A stand-in for the `/fonts` routes that do not exist yet
  *
  * Registered as an `apiFetch` middleware, so every component and resolver calls the real path it will keep
  * calling afterwards and this file is the only thing that gets deleted. Requests to anything else fall
  * straight through.
+ *
+ * The plugin now serves all of these but `/fonts/settings`, which is Phase 6, so the app registers `mockOnly()`
+ * for that one path and the site answers the rest. The full table stays because the Jest suite runs against it:
+ * a component test that had to stand up REST fixtures would be testing WordPress.
  *
  * @since 7.0
  */
@@ -63,6 +67,23 @@ const ROUTES = [
  * @since 7.0
  */
 export function mockMiddleware(options, next) {
+	return serve(options, next, null);
+}
+
+/**
+ * A middleware that answers only the paths named, and lets the site answer everything else
+ *
+ * @param {Array} paths Route paths to serve, e.g. `['/fonts/settings']`
+ *
+ * @return {Function} An `apiFetch` middleware
+ *
+ * @since 7.0
+ */
+export function mockOnly(paths) {
+	return (options, next) => serve(options, next, paths);
+}
+
+function serve(options, next, only) {
 	const url = options.path ?? '';
 
 	if (!url.startsWith('/gravity-pdf/v1/fonts')) {
@@ -70,6 +91,11 @@ export function mockMiddleware(options, next) {
 	}
 
 	const [path, query = ''] = url.slice('/gravity-pdf/v1'.length).split('?');
+
+	if (only && !only.some((prefix) => path.startsWith(prefix))) {
+		return next(options);
+	}
+
 	const method = (options.method ?? 'GET').toUpperCase();
 
 	for (const [verb, pattern, handler] of ROUTES) {
