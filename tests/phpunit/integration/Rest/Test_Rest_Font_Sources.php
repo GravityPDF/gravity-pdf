@@ -137,7 +137,9 @@ class Test_Rest_Font_Sources extends Test_Rest {
 
 		$data = $this->get( '/fonts/sources' )->get_data()[0];
 
-		$this->assertSame( $synced, $data['synced'] );
+		/* The record counts seconds; a browser is handed a date, because that is what every other field here is */
+		$this->assertSame( gmdate( 'c', $synced ), $data['synced'] );
+		$this->assertSame( gmdate( 'c', $synced ), $data['last_attempt'] );
 		$this->assertFalse( $data['stale'] );
 		$this->assertSame( 'Connection timed out', $data['last_error'] );
 	}

@@ -659,6 +659,20 @@ class Registry {
 	}
 
 	/**
+	 * One font row, as the routes emit it
+	 *
+	 * The shape `GET /fonts/` lists, for the routes that write a single row and have to hand the store something
+	 * it can merge into that list.
+	 *
+	 * @since 7.0
+	 */
+	public function get_font( string $font_key ): ?array {
+		$row = $this->rows()[ $font_key ] ?? null;
+
+		return $row === null ? null : $this->font_object( $font_key, $row );
+	}
+
+	/**
 	 * Every `always` entry the site has no rows for
 	 *
 	 * What the Bundled detail's notice lists (§4.6). An `always` entry with no rows is either one the admin

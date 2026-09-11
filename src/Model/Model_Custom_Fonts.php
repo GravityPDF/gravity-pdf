@@ -212,6 +212,19 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Show or hide one row on the site making the request
+	 *
+	 * @since 7.0
+	 */
+	public function set_site_visibility( string $id, bool $enabled ): void {
+		$row = $this->repository->get( $id );
+
+		if ( $row !== null ) {
+			$this->repository->set_site_enabled( (int) $row['id'], get_current_blog_id(), $enabled );
+		}
+	}
+
+	/**
 	 * Checks if the ID already exists and, if so, suffixes the ID with a string until unique
 	 *
 	 * @return string The unique ID

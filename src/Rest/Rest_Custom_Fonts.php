@@ -183,6 +183,11 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 							'validate_callback' => [ $this->model, 'check_font_name_valid' ],
 						],
 
+						'enabled'     => [
+							'description' => __( 'Whether this site can choose the font. Multisite only.', 'gravity-pdf' ),
+							'type'        => 'boolean',
+						],
+
 						'regular'     => [
 							'description'       => __( 'The path to the `regular` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
 							'type'              => 'string',
@@ -255,6 +260,72 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	}
 
 	/**
+	 * One row as `GET /fonts/` lists it, so the store can merge a write into the list it already holds
+	 *
+	 * @since 7.0
+	 */
+	protected function row( string $font_key ): array {
+		return (array) $this->registry->get_font( $font_key );
+	}
+
+	/**
+	 * Why this row is not this route's to change, or null
+	 *
+	 * A font a language pack installed belongs to its entry: the pack decides which keys exist, and removing one of
+	 * them would leave an entry the catalogue calls installed rendering with a face that is gone. The entry route
+	 * takes the whole pack, which is the only unit an admin can meaningfully act on.
+	 *
+	 * @since 7.0
+	 */
+	protected function refuse_entry_row( string $font_key ): ?WP_Error {
+		$font = $this->model->get_font( $font_key );
+
+		if ( $font === [] || (int) $font['coverage'] !== 1 ) {
+			return null;
+		}
+
+		return new WP_Error(
+			'font_owned_by_entry',
+			sprintf(
+				/* translators: %s: a font pack's name, e.g. Japanese */
+				esc_html__( 'This font was installed by the "%s" pack. Remove the pack to remove the font.', 'gravity-pdf' ),
+				(string) $font['entry']
+			),
+			[ 'status' => 400 ]
+		);
+	}
+
+	/**
+	 * Apply a `{ enabled }` toggle, where the request carried one
+	 *
+	 * Visibility is per site and installation is not (§4.11), so this is the only font write multisite treats
+	 * differently — and on single site there is nothing to hide a font from, so the key is simply not offered.
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return void|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function set_visibility( string $font_key, $request ) {
+		$enabled = $request->get_param( 'enabled' );
+
+		if ( $enabled === null ) {
+			return;
+		}
+
+		if ( ! is_multisite() ) {
+			return new WP_Error(
+				'font_visibility_unsupported',
+				esc_html__( 'Fonts can only be hidden per site on a multisite network.', 'gravity-pdf' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$this->model->set_site_visibility( $font_key, (bool) $enabled );
+	}
+
+	/**
 	 * Our `Create` CRUD for custom fonts
 	 *
 	 * @return array|WP_Error
@@ -297,7 +368,7 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 
 			FlushCache::flush();
 
-			return $font;
+			return $this->row( $id );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -330,9 +401,21 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	 */
 	public function update_item( $request ) {
 		try {
-			$id = $request->get_param( 'id' );
+			$id    = (string) $request->get_param( 'id' );
+			$owned = $this->refuse_entry_row( $id );
+
+			if ( $owned !== null ) {
+				return $owned;
+			}
+
 			if ( ! $this->model->matches_custom_font_id( $id ) ) {
 				throw new GravityPdfIdException();
+			}
+
+			$visibility = $this->set_visibility( $id, $request );
+
+			if ( is_wp_error( $visibility ) ) {
+				return $visibility;
 			}
 
 			$font = $this->model->get_font_by_id( $id );
@@ -407,7 +490,7 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 
 			FlushCache::flush();
 
-			return $font;
+			return $this->row( (string) $font['id'] );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -465,7 +548,13 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	 */
 	public function delete_item( $request ) {
 		try {
-			$id = $request->get_param( 'id' );
+			$id    = (string) $request->get_param( 'id' );
+			$owned = $this->refuse_entry_row( $id );
+
+			if ( $owned !== null ) {
+				return $owned;
+			}
+
 			if ( ! $this->model->matches_custom_font_id( $id ) ) {
 				throw new GravityPdfIdException();
 			}
