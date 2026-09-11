@@ -42,9 +42,13 @@ trait HasFontRows {
 	 *
 	 * @return int The new row's id
 	 */
-	protected function install_font_row( string $font_key, array $overrides = [] ): int {
-		$path = 'test-' . $font_key . '.ttf';
-		file_put_contents( $this->font_dir() . $path, 'ttf' );
+	protected function install_font_row( string $font_key, array $overrides = [], ?string $fixture = null ): int {
+		if ( $fixture !== null ) {
+			$path = $this->drop_font_fixture( $fixture );
+		} else {
+			$path = 'test-' . $font_key . '.ttf';
+			file_put_contents( $this->font_dir() . $path, 'ttf' );
+		}
 
 		return $this->font_repository()->insert(
 			array_merge(
@@ -55,7 +59,7 @@ trait HasFontRows {
 					'files'    => [
 						'R' => [
 							'path' => $path,
-							'size' => 3,
+							'size' => filesize( $this->font_dir() . $path ),
 						],
 					],
 				],

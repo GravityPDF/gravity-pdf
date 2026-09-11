@@ -198,14 +198,14 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		}
 
 		$statuses = $this->registry->get_install_statuses( $this->queue );
-		$id       = $this->entry_id( $row );
+		$id       = Install_Requests::entry_id( $row );
 
 		/*
 		 * The claim was lost. For a language pack that is the outcome the caller wanted — something else is already
 		 * installing it — so the status says so and the poller takes over. A family is different: the install in
 		 * flight may be a different one, under a different key, and would silently swallow this request's own.
 		 */
-		if ( ! $queued && ! $this->is_coverage( $row ) && in_array( (string) $statuses[ $id ]['phase'], Catalog_Repository::LIVE_PHASES, true ) ) {
+		if ( ! $queued && ! Install_Requests::is_coverage( $row ) && in_array( (string) $statuses[ $id ]['phase'], Catalog_Repository::LIVE_PHASES, true ) ) {
 			return new WP_Error(
 				'font_install_in_progress',
 				__( 'This font is already being installed. Try again once it has finished.', 'gravity-pdf' ),
@@ -254,7 +254,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 			return $row;
 		}
 
-		$id      = $this->entry_id( $row );
+		$id      = Install_Requests::entry_id( $row );
 		$removed = $this->requests->remove( $id );
 
 		if ( is_wp_error( $removed ) ) {
@@ -320,7 +320,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		$label  = trim( $label );
 		$chosen = $label !== '' || $variants !== [];
 
-		if ( $this->is_coverage( $row ) ) {
+		if ( Install_Requests::is_coverage( $row ) ) {
 			if ( $chosen ) {
 				return new WP_Error(
 					'font_entry_owns_its_fonts',
@@ -400,19 +400,5 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 	 */
 	protected function statuses_for( array $statuses, array $ids ): object {
 		return (object) array_intersect_key( $statuses, array_flip( $ids ) );
-	}
-
-	/**
-	 * @since 7.0
-	 */
-	protected function entry_id( array $row ): string {
-		return $row['source'] . '/' . $row['entry'];
-	}
-
-	/**
-	 * @since 7.0
-	 */
-	protected function is_coverage( array $row ): bool {
-		return (int) $row['coverage'] === 1;
 	}
 }

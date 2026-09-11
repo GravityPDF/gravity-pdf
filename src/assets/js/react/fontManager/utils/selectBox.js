@@ -14,6 +14,9 @@ import { __ } from '@wordpress/i18n';
  * a group of its own — and quietly dropped that group on the next rebuild. The attribute says who owns each
  * group, so a group without it is left exactly where it was.
  *
+ * Its presence is what is load-bearing, not its value: `Helper_Abstract_Options::font_groups()` writes the same
+ * ids server-side, but neither side reads the other's.
+ *
  * @since 7.0
  */
 export const GROUP_ATTRIBUTE = 'data-gfpdf-font-group';

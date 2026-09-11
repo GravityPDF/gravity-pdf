@@ -90,4 +90,13 @@ trait QueuesFontInstalls {
 
 		return $items;
 	}
+
+	/**
+	 * The install payloads behind the queued items, in the order they were queued
+	 *
+	 * @return array[]
+	 */
+	protected function queued_installs(): array {
+		return array_column( $this->queued(), 'install' );
+	}
 }

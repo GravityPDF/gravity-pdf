@@ -347,7 +347,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 
 		$this->assertSame( 202, $this->post( '/fonts/sources/packs/lato' )->get_status() );
 
-		$labels = array_unique( array_column( array_column( $this->queued(), 'install' ), 'label' ) );
+		$labels = array_unique( array_column( $this->queued_installs(), 'label' ) );
 		sort( $labels );
 
 		/* One claim, both installs: an update that only refreshed the first row would leave the other stale */

@@ -52,24 +52,7 @@ class Test_Rest_Font_List extends Test_Rest {
 	 * a read is happy with the three bytes `install_font_row()` writes.
 	 */
 	protected function install_real_font( string $font_key, array $overrides = [] ): int {
-		$this->drop_font_fixture( 'Chewy.ttf' );
-
-		return $this->font_repository()->insert(
-			array_merge(
-				[
-					'font_key' => $font_key,
-					'label'    => ucfirst( $font_key ),
-					'source'   => 'custom',
-					'files'    => [
-						'R' => [
-							'path' => 'Chewy.ttf',
-							'size' => filesize( $this->font_dir() . 'Chewy.ttf' ),
-						],
-					],
-				],
-				$overrides
-			)
-		);
+		return $this->install_font_row( $font_key, $overrides, 'Chewy.ttf' );
 	}
 
 	/**
@@ -344,15 +327,6 @@ class Test_Rest_Font_List extends Test_Rest {
 
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertSame( 'font_has_no_styles', $response->get_data()['code'] );
-	}
-
-	/**
-	 * The installs the request handed to the queue, one per queued file
-	 *
-	 * @return array[]
-	 */
-	protected function queued_installs(): array {
-		return array_column( $this->queued(), 'install' );
 	}
 
 	/**

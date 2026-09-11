@@ -737,14 +737,12 @@ class Registry {
 		}
 
 		/* A pack the catalogue has dropped still renders the PDFs that name it, so it keeps its group */
-		foreach ( $entries as $id => $fonts ) {
-			$pair = explode( '/', $id, 2 );
-
+		foreach ( $entries as $fonts ) {
 			$groups[] = [
 				'label'   => (string) $fonts[0]['label'],
-				'source'  => $pair[0],
-				'entry'   => $pair[1],
-				'files'   => count( static::paths_of( $fonts ) ),
+				'source'  => (string) $fonts[0]['source'],
+				'entry'   => (string) $fonts[0]['entry'],
+				'files'   => count( Font_Repository::paths_for_rows( $fonts ) ),
 				'scripts' => '',
 				'fonts'   => $fonts,
 			];
@@ -831,27 +829,6 @@ class Registry {
 			'enabled'  => (bool) ( $row['enabled'] ?? true ),
 			'files'    => $files,
 		];
-	}
-
-	/**
-	 * The distinct file paths a set of font objects records
-	 *
-	 * @param array[] $fonts
-	 *
-	 * @return string[]
-	 *
-	 * @since 7.0
-	 */
-	protected static function paths_of( array $fonts ): array {
-		$paths = [];
-
-		foreach ( $fonts as $font ) {
-			foreach ( $font['files'] as $file ) {
-				$paths[ $file['path'] ] = true;
-			}
-		}
-
-		return array_keys( $paths );
 	}
 
 	/**
