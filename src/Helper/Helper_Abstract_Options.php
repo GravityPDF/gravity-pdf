@@ -239,6 +239,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						'name'               => isset( $option['name'] ) ? $option['name'] : null,
 						'size'               => isset( $option['size'] ) ? $option['size'] : null,
 						'options'            => isset( $option['options'] ) ? $option['options'] : '',
+						'optgroup_ids'       => isset( $option['optgroup_ids'] ) ? $option['optgroup_ids'] : [],
 						'std'                => isset( $option['std'] ) ? $option['std'] : '',
 						'min'                => isset( $option['min'] ) ? $option['min'] : null,
 						'max'                => isset( $option['max'] ) ? $option['max'] : null,
@@ -925,26 +926,71 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_installed_fonts() {
-		/*
-		 * 6.x hard-coded the core-font list here. 7.0 ships none of those files, so the list comes from the font
-		 * registry — the same read that decides what mPDF registers, which is what stops the dropdown offering a
-		 * font that cannot render. Custom fonts are rows now, so they arrive with everything else rather than
-		 * through add_custom_fonts().
-		 */
+		$fonts = [];
+
+		foreach ( $this->font_groups() as $group ) {
+			$fonts[ $group['label'] ] = ( $fonts[ $group['label'] ] ?? [] ) + $group['fonts'];
+		}
+
+		return apply_filters( 'gfpdf_font_list', array_filter( $fonts ) );
+	}
+
+	/**
+	 * The group each optgroup label belongs to, for `data-gfpdf-font-group`
+	 *
+	 * @return array<string, string> optgroup label => group id
+	 *
+	 * @since 7.0
+	 */
+	public function get_installed_font_groups() {
+		$ids = [];
+
+		foreach ( $this->font_groups() as $group ) {
+			$ids[ $group['label'] ] = $ids[ $group['label'] ] ?? $group['id'];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * The dropdown's groups, in order, each with the id the Font Manager knows it by
+	 *
+	 * 6.x hard-coded the core-font list here. 7.0 ships none of those files, so the list comes from the font
+	 * registry — the same read that decides what mPDF registers, which is what stops the dropdown offering a font
+	 * that cannot render. Custom fonts are rows now, so they arrive with everything else rather than through
+	 * add_custom_fonts().
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	protected function font_groups() {
 		$grouped = \GPDFAPI::get_font_registry()->get_grouped_fonts();
 
-		$fonts = [ esc_html__( 'Bundled Fonts', 'gravity-pdf' ) => $this->font_choices( $grouped['bundled'] ) ];
+		$groups = [
+			[
+				'id'    => 'bundled',
+				'label' => esc_html__( 'Bundled Fonts', 'gravity-pdf' ),
+				'fonts' => $this->font_choices( $grouped['bundled'] ),
+			],
+		];
 
 		/* One optgroup per installed pack, in the catalogue's order, which is the order the Font Manager lists them in */
 		foreach ( $grouped['groups'] as $group ) {
-			$label = (string) $group['label'];
-
-			$fonts[ $label ] = ( $fonts[ $label ] ?? [] ) + $this->font_choices( $group['fonts'] );
+			$groups[] = [
+				'id'    => $group['source'] . '/' . $group['entry'],
+				'label' => (string) $group['label'],
+				'fonts' => $this->font_choices( $group['fonts'] ),
+			];
 		}
 
-		$fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] = $this->font_choices( $grouped['custom'] );
+		$groups[] = [
+			'id'    => 'custom',
+			'label' => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
+			'fonts' => $this->font_choices( $grouped['custom'] ),
+		];
 
-		return apply_filters( 'gfpdf_font_list', array_filter( $fonts ) );
+		return $groups;
 	}
 
 	/**
@@ -1920,7 +1966,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				<?php endforeach; ?>
 		>
 
-		<?php $this->build_options_for_select( $args['options'], $value, true ); ?>
+		<?php $this->build_options_for_select( $args['options'], $value, true, $args['optgroup_ids'] ?? [] ); ?>
 
 		</select>
 
@@ -1987,12 +2033,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param array        $options       The list of options that should be displayed
 	 * @param array|string $value         The selected option
 	 * @param bool         $should_output To output or echo the content
+	 * @param array        $group_ids     optgroup label => the id to mark that group with, for groups we own
 	 *
 	 * @return string|void
 	 *
 	 * @since 4.1
 	 */
-	public function build_options_for_select( $options, $value, $should_output = false ) {
+	public function build_options_for_select( $options, $value, $should_output = false, $group_ids = [] ) {
 		if ( ! $should_output ) {
 			ob_start();
 		}
@@ -2015,7 +2062,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 				echo '<option value="' . esc_attr( $option ) . '" ' . ( strpos( $selected, 'selected' ) !== false ? 'selected="selected"' : '' ) . '>' . esc_html( $name ) . '</option>';
 			} else {
-				echo '<optgroup label="' . esc_attr( $option ) . '">';
+				$group_id = (string) ( $group_ids[ $option ] ?? '' );
+
+				echo '<optgroup label="' . esc_attr( $option ) . '"' . ( $group_id !== '' ? ' data-gfpdf-font-group="' . esc_attr( $group_id ) . '"' : '' ) . '>';
 				foreach ( $name as $op_value => $op_label ) {
 					$selected = '';
 					if ( is_array( $value ) ) {
