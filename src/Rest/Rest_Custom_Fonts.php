@@ -10,7 +10,9 @@ use GFPDF\Exceptions\GravityPdfFontNotFoundException;
 use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Exceptions\GravityPdfModelNotUpdatedException;
 use GFPDF\Fonts\FlushCache;
+use GFPDF\Fonts\Catalog_Repository;
 use GFPDF\Fonts\Font_Repository;
+use GFPDF\Fonts\Install_Requests;
 use GFPDF\Fonts\Registry;
 use GFPDF\Fonts\SupportsOtl;
 use GFPDF\Fonts\TtfFontValidation;
@@ -66,6 +68,18 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	protected $registry;
 
 	/**
+	 * @var Install_Requests
+	 * @since 7.0
+	 */
+	protected $requests;
+
+	/**
+	 * @var Catalog_Repository
+	 * @since 7.0
+	 */
+	protected $catalog;
+
+	/**
 	 * @var string The absolute path to the Custom Fonts directory on the server
 	 * @since 6.0
 	 */
@@ -89,11 +103,13 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	 */
 	protected $font_keys = [ 'regular', 'italics', 'bold', 'bolditalics' ];
 
-	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, Registry $registry, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
+	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, Registry $registry, Catalog_Repository $catalog, Install_Requests $requests, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
 		$this->model         = $model;
 		$this->log           = $log;
 		$this->gform         = $gform;
 		$this->registry      = $registry;
+		$this->catalog       = $catalog;
+		$this->requests      = $requests;
 		$this->font_dir_path = $font_dir_path;
 
 		$this->filesystem = $filesystem;
@@ -186,6 +202,11 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 						'enabled'     => [
 							'description' => __( 'Whether this site can choose the font. Multisite only.', 'gravity-pdf' ),
 							'type'        => 'boolean',
+						],
+
+						'variants'    => [
+							'description' => __( 'The styles to install for each face, for a row of a catalogue font', 'gravity-pdf' ),
+							'type'        => 'object',
 						],
 
 						'regular'     => [
@@ -293,6 +314,71 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 			),
 			[ 'status' => 400 ]
 		);
+	}
+
+	/**
+	 * Re-install one row of a catalogue font under a different set of styles
+	 *
+	 * The same upsert the entry route runs, aimed at a single row: the installer matches an install on its
+	 * `label`, so handing it this row's own label finds this row and no other, and an install of the same family
+	 * under a different name keeps the styles it was installed with. A row that came from an upload has no entry
+	 * to take styles from, so asking is a `400` rather than a silent no-op.
+	 *
+	 * @param array $variants role => style id
+	 *
+	 * @return WP_Error|array|null The status map the caller should answer with, an error, or null when the
+	 *                             request named no styles
+	 *
+	 * @since 7.0
+	 */
+	protected function install_variants( string $font_key, array $variants ) {
+		if ( $variants === [] ) {
+			return null;
+		}
+
+		$font  = $this->model->get_font( $font_key );
+		$entry = (string) ( $font['entry'] ?? '' );
+
+		if ( $entry === '' ) {
+			return new WP_Error(
+				'font_has_no_styles',
+				esc_html__( 'This font was uploaded rather than installed from a catalogue, so it has no styles to choose from.', 'gravity-pdf' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$row = $this->catalog->entry( (string) $font['source'], $entry );
+
+		if ( $row === null ) {
+			return new WP_Error(
+				'font_entry_unknown',
+				esc_html__( 'The catalogue no longer lists the font this row came from, so its styles cannot be changed.', 'gravity-pdf' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$error = $this->requests->check_variants( $row, $variants );
+
+		if ( $error !== null ) {
+			return $error;
+		}
+
+		$queued = $this->requests->queue(
+			$row,
+			[
+				[
+					'label'    => (string) $font['label'],
+					'variants' => $variants,
+				],
+			]
+		);
+
+		if ( is_wp_error( $queued ) ) {
+			return $queued;
+		}
+
+		/* The files arrive in the background, so the answer is the row as it stands plus the progress to poll */
+		return $this->row( $font_key );
 	}
 
 	/**
@@ -416,6 +502,12 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 
 			if ( is_wp_error( $visibility ) ) {
 				return $visibility;
+			}
+
+			$restyled = $this->install_variants( $id, (array) $request->get_param( 'variants' ) );
+
+			if ( $restyled !== null ) {
+				return $restyled;
 			}
 
 			$font = $this->model->get_font_by_id( $id );

@@ -5,7 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Rest;
 
 use GFPDF\Fonts\Catalog_Repository;
-use GFPDF\Fonts\Font_Installer;
+use GFPDF\Fonts\Install_Requests;
 use GFPDF\Fonts\Font_Repository;
 use GFPDF\Fonts\Font_Sources;
 use GFPDF\Fonts\Install_Queue;
@@ -70,10 +70,10 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 	protected $repository;
 
 	/**
-	 * @var Font_Installer
+	 * @var Install_Requests
 	 * @since 7.0
 	 */
-	protected $installer;
+	protected $requests;
 
 	/**
 	 * @var Install_Queue
@@ -85,7 +85,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		Registry $registry,
 		Catalog_Repository $catalog,
 		Font_Repository $repository,
-		Font_Installer $installer,
+		Install_Requests $requests,
 		Install_Queue $queue,
 		Font_Sources $sources,
 		Helper_Abstract_Form $gform
@@ -93,7 +93,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		$this->registry   = $registry;
 		$this->catalog    = $catalog;
 		$this->repository = $repository;
-		$this->installer  = $installer;
+		$this->requests   = $requests;
 		$this->queue      = $queue;
 		$this->sources    = $sources;
 		$this->gform      = $gform;
@@ -191,7 +191,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 			return $installs;
 		}
 
-		$queued = $this->queue_entry( $row, $installs );
+		$queued = $this->requests->queue( $row, $installs );
 
 		if ( is_wp_error( $queued ) ) {
 			return $queued;
@@ -255,7 +255,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		}
 
 		$id      = $this->entry_id( $row );
-		$removed = $this->installer->remove( $id );
+		$removed = $this->requests->remove( $id );
 
 		if ( is_wp_error( $removed ) ) {
 			$removed->add_data( [ 'status' => 409 ], $removed->get_error_code() );
@@ -270,7 +270,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 	 * Install every entry the catalogue has moved past
 	 *
 	 * "Update all". Each entry is the ordinary upsert of every install it already has, through the same
-	 * `queue_entry()` the entry route uses, so there is genuinely no second update path. One unreachable entry
+	 * `Install_Requests::queue()` the entry route uses, so there is genuinely no second update path. One unreachable entry
 	 * does not fail the batch: the rest still update, and its row keeps the backoff the installer gave it.
 	 *
 	 * @return WP_REST_Response
@@ -293,7 +293,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 				continue;
 			}
 
-			if ( $this->queue_entry( $row, $this->installs_on_record( $row ) ) === true ) {
+			if ( $this->requests->queue( $row, $this->requests->on_record( $row ) ) === true ) {
 				$queued[] = (string) $id;
 			}
 		}
@@ -301,46 +301,6 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		return new WP_REST_Response(
 			$this->statuses_for( $this->registry->get_install_statuses( $this->queue ), $queued ),
 			202
-		);
-	}
-
-	/**
-	 * Hand a set of installs to the queue
-	 *
-	 * @param array[] $installs
-	 *
-	 * @return bool|WP_Error Whether anything was queued, or why the entry could not be read
-	 *
-	 * @since 7.0
-	 */
-	protected function queue_entry( array $row, array $installs ) {
-		$id    = $this->entry_id( $row );
-		$files = $this->installer->files_for_installs( $id, $installs );
-
-		if ( is_wp_error( $files ) ) {
-			$files->add_data( [ 'status' => 502 ], $files->get_error_code() );
-
-			return $files;
-		}
-
-		$requests = [];
-
-		foreach ( $installs as $index => $install ) {
-			$requests[] = [
-				'install'    => $install,
-				'background' => $files[ $index ],
-			];
-		}
-
-		return $this->queue->enqueue_once(
-			[
-				'entry'    => $id,
-				'installs' => $requests,
-
-				/* An install and an update both mean "these files, whatever is already on disk" */
-				'force'    => true,
-			],
-			true
 		);
 	}
 
@@ -372,14 +332,14 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 			return [ [] ];
 		}
 
-		$error = $this->check_variants( $row, $variants );
+		$error = $this->requests->check_variants( $row, $variants );
 
 		if ( $error !== null ) {
 			return $error;
 		}
 
 		if ( ! $chosen ) {
-			return $this->installs_on_record( $row );
+			return $this->requests->on_record( $row );
 		}
 
 		$rows    = $this->repository->rows_for_entry( (string) $row['source'], (string) $row['entry'] );
@@ -398,84 +358,6 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		$install['label'] = $label;
 
 		return [ $install ];
-	}
-
-	/**
-	 * Every install an entry already holds, as the payloads that would rewrite them
-	 *
-	 * The update path, and the whole of what an empty body means. It cannot fail — the payloads are read back off
-	 * rows the installer itself wrote — which is why "Update all" can reach it without repeating any of the
-	 * validation the entry route does on a body.
-	 *
-	 * @return array[]
-	 *
-	 * @since 7.0
-	 */
-	protected function installs_on_record( array $row ): array {
-		if ( $this->is_coverage( $row ) ) {
-			return [ [] ];
-		}
-
-		$rows = $this->repository->rows_for_entry( (string) $row['source'], (string) $row['entry'] );
-
-		return $rows === [] ? [ [] ] : array_values( array_map( [ $this, 'install_for_row' ], $rows ) );
-	}
-
-	/**
-	 * One existing row, as the install that would rewrite it
-	 *
-	 * `label` is the identity the installer matches on, so this is idempotent by construction: it finds the row it
-	 * came from. The variants come off the file rows because that is where the choice was recorded.
-	 *
-	 * @since 7.0
-	 */
-	protected function install_for_row( array $font ): array {
-		$variants = [];
-
-		foreach ( (array) $font['files'] as $role => $file ) {
-			if ( in_array( (string) $role, Font_Repository::FACE_ROLES, true ) && (string) $file['variant'] !== '' ) {
-				$variants[ (string) $role ] = (string) $file['variant'];
-			}
-		}
-
-		$install = [ 'label' => (string) $font['label'] ];
-
-		if ( $variants !== [] ) {
-			$install['variants'] = $variants;
-		}
-
-		return $install;
-	}
-
-	/**
-	 * Every variant a body names has to be a role the installer fills and a style the entry publishes
-	 *
-	 * @since 7.0
-	 */
-	protected function check_variants( array $row, array $variants ): ?WP_Error {
-		if ( $variants === [] ) {
-			return null;
-		}
-
-		$styles = array_filter( array_map( 'trim', explode( ',', (string) ( $row['styles'] ?? '' ) ) ) );
-
-		foreach ( $variants as $role => $variant ) {
-			if ( in_array( (string) $role, Font_Repository::FACE_ROLES, true ) && in_array( (string) $variant, $styles, true ) ) {
-				continue;
-			}
-
-			return new WP_Error(
-				'font_variant_unknown',
-				sprintf(
-					/* translators: %s: the style the request asked for */
-					__( 'This font does not publish a %s style.', 'gravity-pdf' ),
-					(string) $variant
-				),
-				[ 'status' => 400 ]
-			);
-		}
-
-		return null;
 	}
 
 	/**
