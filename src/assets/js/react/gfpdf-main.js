@@ -8,6 +8,7 @@ import helpBootstrap from './bootstrap/helpBootstrap';
 /* Utilities */
 import { actionToolbar } from './utilities/PdfSettings/actionToolbar';
 import shortcodeButton from './utilities/PdfList/shortcodeButton';
+import previewButton from './utilities/PdfSettings/previewButton';
 import unsavedChangesWarning from './utilities/PdfSettings/unsavedChangesWarning';
 /* Sass Styling */
 import '../../scss/gfpdf-styles.scss';
@@ -94,7 +95,10 @@ $(function () {
 
 	/* Adding / Updating form PDF settings */
 	if (pdfSettingsForm) {
-		/* Initialize additional add/update buttons on PDF setting panels */
+		/* Initialize the PDF Preview button */
+		previewButton();
+
+		/* Initialize additional add/update/preview buttons on PDF setting panels */
 		actionToolbar(pdfSettingFieldSets, pdfSettingsForm);
 
 		/* Watch for unsaved changes */
