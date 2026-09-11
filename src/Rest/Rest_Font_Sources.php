@@ -205,11 +205,10 @@ class Rest_Font_Sources extends Rest_Font_Entry_Base {
 					'category' => $this->label_filters( $summary['filters']['category'] ),
 					'subsets'  => $this->label_filters( $summary['filters']['subsets'] ),
 				],
-				/* null rather than 0, so "never synced" is not a date in 1970 */
-				'synced'       => (int) $record['synced'] > 0 ? (int) $record['synced'] : null,
+				'synced'       => static::timestamp( $record['synced'] ),
 				'stale'        => Catalog_Sync::is_stale( $record ),
 				'seeded'       => (bool) $record['seeded'],
-				'last_attempt' => (int) $record['last_attempt'] > 0 ? (int) $record['last_attempt'] : null,
+				'last_attempt' => static::timestamp( $record['last_attempt'] ),
 				'last_error'   => (string) $record['last_error'],
 			];
 		}
@@ -251,7 +250,7 @@ class Rest_Font_Sources extends Rest_Font_Entry_Base {
 				'entries' => array_map( [ $this, 'prepare_row' ], $result['entries'] ),
 				'total'   => $result['total'],
 				'pages'   => $result['pages'],
-				'synced'  => (int) $record['synced'] > 0 ? (int) $record['synced'] : null,
+				'synced'  => static::timestamp( $record['synced'] ),
 			]
 		);
 	}
@@ -304,6 +303,21 @@ class Rest_Font_Sources extends Rest_Font_Entry_Base {
 		}
 
 		return new WP_REST_Response( [ 'up_to_date' => false ], 202 );
+	}
+
+	/**
+	 * One of the sync record's stamps, as a date rather than as the integer it is stored as
+	 *
+	 * The option record counts seconds because that is what comparing two syncs needs; a browser wants a date it
+	 * can pass to `Date.parse()`, and every other date on these routes is already a string. `null` rather than the
+	 * epoch, so "never synced" cannot render as a day in 1970.
+	 *
+	 * @param mixed $stamp
+	 *
+	 * @since 7.0
+	 */
+	protected static function timestamp( $stamp ): ?string {
+		return (int) $stamp > 0 ? gmdate( 'c', (int) $stamp ) : null;
 	}
 
 	/**

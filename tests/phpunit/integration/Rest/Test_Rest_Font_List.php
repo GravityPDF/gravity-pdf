@@ -42,6 +42,33 @@ class Test_Rest_Font_List extends Test_Rest {
 	}
 
 	/**
+	 * A row whose `R` face is a font mPDF can actually parse
+	 *
+	 * `POST /fonts/{id}` re-reads every face to decide `useOTL`, so a write needs a real file behind the row where
+	 * a read is happy with the three bytes `install_font_row()` writes.
+	 */
+	protected function install_real_font( string $font_key, array $overrides = [] ): int {
+		$this->drop_font_fixture( 'Chewy.ttf' );
+
+		return $this->font_repository()->insert(
+			array_merge(
+				[
+					'font_key' => $font_key,
+					'label'    => ucfirst( $font_key ),
+					'source'   => 'custom',
+					'files'    => [
+						'R' => [
+							'path' => 'Chewy.ttf',
+							'size' => filesize( $this->font_dir() . 'Chewy.ttf' ),
+						],
+					],
+				],
+				$overrides
+			)
+		);
+	}
+
+	/**
 	 * @return array The response body as an array
 	 */
 	protected function fonts(): array {
@@ -175,6 +202,77 @@ class Test_Rest_Font_List extends Test_Rest {
 		wp_set_current_user( self::$editor_id );
 
 		$this->assertSame( 403, $this->get( '/fonts' )->get_status() );
+	}
+
+	public function test_a_write_answers_with_the_row_the_listing_carries() {
+		$this->install_real_font( 'brandsans' );
+
+		$row = $this->post( '/fonts/brandsans', [ 'label' => 'House Sans' ] )->get_data();
+
+		/* The store merges this straight into the list it already holds, so it has to be the same shape */
+		$this->assertSame(
+			[ 'coverage', 'enabled', 'entry', 'files', 'id', 'label', 'source', 'version' ],
+			$this->sorted_keys( (array) $row )
+		);
+
+		$this->assertSame( 'brandsans', $row['id'] );
+		$this->assertSame( 'House Sans', $row['label'] );
+	}
+
+	public function test_a_pack_font_is_sent_back_to_the_entry_route() {
+		$this->insert_catalog_row( 'packs', 'japanese', [ 'coverage' => 1 ] );
+		$this->install_entry_row( 'notosansjp', 'japanese' );
+
+		foreach ( [ 'POST', 'DELETE' ] as $method ) {
+			$response = $this->rest( $method, '/fonts/notosansjp', [ 'label' => 'Mine' ] );
+
+			/* The pack decides which keys exist; taking one away would leave it installed and unable to render */
+			$this->assertSame( 400, $response->get_status(), $method );
+			$this->assertSame( 'font_owned_by_entry', $response->get_data()['code'], $method );
+		}
+
+		$this->assertNotNull( $this->font_repository()->get( 'notosansjp' ) );
+	}
+
+	public function test_a_display_family_install_is_this_routes_to_rename() {
+		$this->insert_catalog_row( 'google', 'lato' );
+		$this->install_real_font( 'latolight', [ 'source' => 'google', 'entry' => 'lato' ] );
+
+		$row = $this->post( '/fonts/latolight', [ 'label' => 'Lato Text' ] )->get_data();
+
+		/* The key stays, because templates reference it; only the name the admin sees changes */
+		$this->assertSame( 'latolight', $row['id'] );
+		$this->assertSame( 'Lato Text', $row['label'] );
+	}
+
+	public function test_hiding_a_font_is_refused_where_there_is_nowhere_to_hide_it() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single site only' );
+		}
+
+		$this->install_real_font( 'brandsans' );
+
+		$response = $this->post( '/fonts/brandsans', [ 'enabled' => false ] );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'font_visibility_unsupported', $response->get_data()['code'] );
+	}
+
+	public function test_hiding_a_font_leaves_it_installed_for_every_other_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite tests only' );
+		}
+
+		$this->install_real_font( 'brandsans' );
+
+		$row = $this->post( '/fonts/brandsans', [ 'enabled' => false ] )->get_data();
+
+		$this->assertFalse( $row['enabled'] );
+
+		/* Visibility, not installation: the row and its files are untouched */
+		$this->assertNotNull( $this->font_repository()->get( 'brandsans' ) );
+
+		$this->assertTrue( $this->post( '/fonts/brandsans', [ 'enabled' => true ] )->get_data()['enabled'] );
 	}
 
 	/**

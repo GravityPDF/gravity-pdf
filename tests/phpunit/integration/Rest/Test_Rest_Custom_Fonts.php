@@ -176,15 +176,20 @@ class Test_Rest_Custom_Fonts extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$font     = $response->get_data();
 
+		/* The row shape `GET /fonts/` lists, so the store can merge the upload without a second read (§4.7) */
 		$this->assertIsArray( $font );
-		$this->assertSame( 'Font', $font['font_name'] );
+		$this->assertSame( 'Font', $font['label'] );
 		$this->assertSame( 'font', $font['id'] );
-		$this->assertSame( 255, $font['useOTL'] );
-		$this->assertSame( 75, $font['useKashida'] );
-		$this->assertStringEndsWith( 'DejaVuSans.ttf', $font['regular'] );
-		$this->assertStringEndsWith( 'DejaVuSans-Bold.ttf', $font['bold'] );
-		$this->assertStringEndsWith( 'DejaVuSansCondensed.ttf', $font['italics'] );
-		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
+		$this->assertSame( 'custom', $font['source'] );
+		$this->assertSame( 'DejaVuSans.ttf', $font['files']['R']['path'] );
+		$this->assertSame( 'DejaVuSans-Bold.ttf', $font['files']['B']['path'] );
+		$this->assertSame( 'DejaVuSansCondensed.ttf', $font['files']['I']['path'] );
+		$this->assertSame( 'DejaVuSerifCondensed.ttf', $font['files']['BI']['path'] );
+
+		$row = GPDFAPI::get_font_repository()->get( 'font' );
+
+		$this->assertSame( 255, $row['use_otl'] );
+		$this->assertSame( 75, $row['use_kashida'] );
 	}
 
 	public function test_add_item_permission_failed() {
@@ -288,14 +293,17 @@ class Test_Rest_Custom_Fonts extends TestCase {
 		$font     = $response->get_data();
 
 		$this->assertIsArray( $font );
-		$this->assertSame( 'Font', $font['font_name'] );
+		$this->assertSame( 'Font', $font['label'] );
 		$this->assertSame( 'lato', $font['id'] );
-		$this->assertSame( 255, $font['useOTL'] );
-		$this->assertSame( 75, $font['useKashida'] );
-		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
-		$this->assertStringEndsWith( 'DejaVuSans-Bold.ttf', $font['bold'] );
-		$this->assertStringEndsWith( 'DejaVuSansCondensed.ttf', $font['italics'] );
-		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
+		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$/', $font['files']['R']['path'] );
+		$this->assertSame( 'DejaVuSans-Bold.ttf', $font['files']['B']['path'] );
+		$this->assertSame( 'DejaVuSansCondensed.ttf', $font['files']['I']['path'] );
+		$this->assertSame( 'DejaVuSerifCondensed.ttf', $font['files']['BI']['path'] );
+
+		$row = GPDFAPI::get_font_repository()->get( 'lato' );
+
+		$this->assertSame( 255, $row['use_otl'] );
+		$this->assertSame( 75, $row['use_kashida'] );
 
 		/* Rename label */
 		$_FILES = [];
@@ -305,14 +313,12 @@ class Test_Rest_Custom_Fonts extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$font     = $response->get_data();
 
-		$this->assertSame( 'Lato2', $font['font_name'] );
+		$this->assertSame( 'Lato2', $font['label'] );
 		$this->assertSame( 'lato', $font['id'] );
-		$this->assertSame( 255, $font['useOTL'] );
-		$this->assertSame( 75, $font['useKashida'] );
-		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
-		$this->assertStringEndsWith( 'DejaVuSans-Bold.ttf', $font['bold'] );
-		$this->assertStringEndsWith( 'DejaVuSansCondensed.ttf', $font['italics'] );
-		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
+		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$/', $font['files']['R']['path'] );
+		$this->assertSame( 'DejaVuSans-Bold.ttf', $font['files']['B']['path'] );
+		$this->assertSame( 'DejaVuSansCondensed.ttf', $font['files']['I']['path'] );
+		$this->assertSame( 'DejaVuSerifCondensed.ttf', $font['files']['BI']['path'] );
 
 		/* Delete bold/italics fonts */
 		$request->set_param( 'bold', '' );
@@ -321,14 +327,14 @@ class Test_Rest_Custom_Fonts extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$font     = $response->get_data();
 
-		$this->assertSame( 'Lato2', $font['font_name'] );
+		$this->assertSame( 'Lato2', $font['label'] );
 		$this->assertSame( 'lato', $font['id'] );
-		$this->assertSame( 255, $font['useOTL'] );
-		$this->assertSame( 75, $font['useKashida'] );
-		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
-		$this->assertSame( '', $font['bold'] );
-		$this->assertSame( '', $font['italics'] );
-		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
+		$this->assertMatchesRegularExpression( '/DejaVuSans([0-9]{5})\.ttf$/', $font['files']['R']['path'] );
+		$this->assertSame( 'DejaVuSerifCondensed.ttf', $font['files']['BI']['path'] );
+
+		/* A face the request cleared leaves no row at all, rather than a row pointing at nothing */
+		$this->assertArrayNotHasKey( 'B', $font['files'] );
+		$this->assertArrayNotHasKey( 'I', $font['files'] );
 	}
 
 	public function test_update_item_permission_failed() {
