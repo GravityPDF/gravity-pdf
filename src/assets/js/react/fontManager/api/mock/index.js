@@ -226,7 +226,8 @@ function sources() {
 			label: record.label,
 			description: record.description,
 			total: record.entries.length,
-			coverage: record.coverage,
+			/* A count, as the route returns: how many of this source's entries are language packs */
+			coverage: record.entries.filter((entry) => entry.coverage).length,
 			filters: filtersFor(record.entries),
 			synced: record_sync.synced ?? null,
 			stale: isStale(record_sync.synced),

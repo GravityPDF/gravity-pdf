@@ -206,7 +206,12 @@ class Font_Sources {
 	 * The records the plugin ships
 	 *
 	 * Both built-ins share the fonts root and send no query args: nothing on that host can read them — there is no
-	 * Worker, and R2 cannot — so args would only fragment the CDN cache per site.
+	 * Worker, and R2 cannot — so args would only fragment the CDN cache per site. Sharing the root also costs one
+	 * root request between them rather than two (§4.5).
+	 *
+	 * They differ only in what they publish. `packs` carries coverage entries — language packs a render can ask
+	 * for by script — and `google` carries display families a person picks by name. Nothing downstream branches on
+	 * which is which: the entry's own `coverage` flag decides that, one row at a time.
 	 *
 	 * @return Font_Source[]
 	 *
@@ -220,6 +225,13 @@ class Font_Sources {
 				static::get_root_url(),
 				[],
 				__( 'Font packs maintained by Gravity PDF, each covering the scripts of one language or region. Files are downloaded from fonts.gravitypdf.com and verified against the signed index before they are installed.', 'gravity-pdf' )
+			),
+			new Font_Source(
+				'google',
+				__( 'Google Fonts', 'gravity-pdf' ),
+				static::get_root_url(),
+				[],
+				__( 'The Google Fonts library, mirrored by Gravity PDF: choose a family and the weights you want, and only those files are downloaded. No request ever leaves your site for Google, and every file is verified against the signed index before it is installed.', 'gravity-pdf' )
 			),
 		];
 	}

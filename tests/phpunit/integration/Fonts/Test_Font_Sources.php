@@ -79,9 +79,39 @@ class Test_Font_Sources extends TestCase {
 		$this->assertNotSame( '', $packs->get_description() );
 	}
 
-	public function test_the_built_in_root_request_carries_no_query_args() {
+	public function test_the_google_record_is_registered() {
+		$google = $this->sources->get( 'google' );
+
+		$this->assertInstanceOf( Font_Source::class, $google );
+		$this->assertSame( 'Google Fonts', $google->get_label() );
+		$this->assertNotSame( '', $google->get_description() );
+	}
+
+	public function test_both_built_ins_share_one_root() {
+		/* Which is what makes them one root request between them rather than two */
+		$this->assertSame(
+			$this->sources->get( 'packs' )->get_root_url(),
+			$this->sources->get( 'google' )->get_root_url()
+		);
+	}
+
+	public function test_core_registers_exactly_these_two() {
+		$this->assertSame( [ 'packs', 'google' ], array_keys( $this->sources->all() ) );
+	}
+
+	/**
+	 * @dataProvider provider_built_in_ids
+	 */
+	public function test_the_built_in_root_request_carries_no_query_args( string $id ) {
 		/* A licence key must never reach the fonts host or its CDN cache key */
-		$this->assertSame( [], $this->sources->get( 'packs' )->get_request_args() );
+		$this->assertSame( [], $this->sources->get( $id )->get_request_args() );
+	}
+
+	public function provider_built_in_ids(): array {
+		return [
+			'packs'  => [ 'packs' ],
+			'google' => [ 'google' ],
+		];
 	}
 
 	public function test_the_root_url_is_trailing_slashed_and_filterable() {
