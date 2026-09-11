@@ -190,6 +190,19 @@ class Font_Sources {
 	}
 
 	/**
+	 * Forget the registered records, so the next call rebuilds them through the filter
+	 *
+	 * `all()` is asked by every route, every sync and every install, so the records are built once a request. That
+	 * memo is taken before a source registered on a late hook exists, and this is how such a source gets seen —
+	 * the counterpart every other font class already has.
+	 *
+	 * @since 7.0
+	 */
+	public function flush(): void {
+		$this->sources = null;
+	}
+
+	/**
 	 * The records the plugin ships
 	 *
 	 * Both built-ins share the fonts root and send no query args: nothing on that host can read them — there is no
