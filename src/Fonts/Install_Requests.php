@@ -49,10 +49,72 @@ class Install_Requests {
 	 */
 	protected $queue;
 
-	public function __construct( Font_Repository $repository, Font_Installer $installer, Install_Queue $queue ) {
+	/**
+	 * @var Catalog_Repository
+	 * @since 7.0
+	 */
+	protected $catalog;
+
+	public function __construct( Font_Repository $repository, Font_Installer $installer, Install_Queue $queue, Catalog_Repository $catalog ) {
 		$this->repository = $repository;
 		$this->installer  = $installer;
 		$this->queue      = $queue;
+		$this->catalog    = $catalog;
+	}
+
+	/**
+	 * Re-install one row of a display entry with the styles a request named
+	 *
+	 * The whole of what `POST /fonts/{id} { variants }` means, here rather than at the route because every step of
+	 * it — which entry the row came from, whether the entry still publishes those styles, what that costs to
+	 * download — is a catalogue question.
+	 *
+	 * @param array $font     The installed row, in `Font_Repository` shape
+	 * @param array $variants role => style id
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function queue_variants( array $font, array $variants ) {
+		$entry = (string) ( $font['entry'] ?? '' );
+
+		if ( $entry === '' ) {
+			return new WP_Error(
+				'font_has_no_styles',
+				esc_html__( 'This font was uploaded rather than installed from a catalogue, so it has no styles to choose from.', 'gravity-pdf' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$row = $this->catalog->entry( (string) $font['source'], $entry );
+
+		if ( $row === null ) {
+			return new WP_Error(
+				'font_entry_unknown',
+				esc_html__( 'The catalogue no longer lists the font this row came from, so its styles cannot be changed.', 'gravity-pdf' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$error = $this->check_variants( $row, $variants );
+
+		if ( $error !== null ) {
+			return $error;
+		}
+
+		/* The label is the identity the installer matches on, so this finds this row and leaves its siblings alone */
+		$queued = $this->queue(
+			$row,
+			[
+				[
+					'label'    => (string) $font['label'],
+					'variants' => $variants,
+				],
+			]
+		);
+
+		return is_wp_error( $queued ) ? $queued : true;
 	}
 
 	/**
@@ -122,7 +184,7 @@ class Install_Requests {
 	 * @since 7.0
 	 */
 	public function on_record( array $row ): array {
-		if ( (int) $row['coverage'] === 1 ) {
+		if ( static::is_coverage( $row ) ) {
 			return [ [] ];
 		}
 
@@ -139,7 +201,7 @@ class Install_Requests {
 	 *
 	 * @since 7.0
 	 */
-	public function for_row( array $font ): array {
+	protected function for_row( array $font ): array {
 		$variants = [];
 
 		foreach ( (array) $font['files'] as $role => $file ) {
@@ -193,5 +255,12 @@ class Install_Requests {
 	 */
 	public static function entry_id( array $row ): string {
 		return $row['source'] . '/' . $row['entry'];
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	public static function is_coverage( array $row ): bool {
+		return (int) $row['coverage'] === 1;
 	}
 }

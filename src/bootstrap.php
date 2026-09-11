@@ -1077,7 +1077,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function load_custom_font_handler(): void {
 		$model = new Model\Model_Custom_Fonts( $this->get_font_repository() );
-		$class = new Rest\Rest_Custom_Fonts( $model, $this->log, $this->gform, $this->get_font_registry(), $this->get_catalog_repository(), $this->get_install_requests(), $this->data->template_font_location );
+		$class = new Rest\Rest_Custom_Fonts( $model, $this->log, $this->gform, $this->get_font_registry(), $this->get_install_requests(), $this->data->template_font_location );
 		$class->init();
 
 		$this->singleton->add_class( $model );
@@ -1342,7 +1342,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->install_requests = new Fonts\Install_Requests(
 				$this->get_font_repository(),
 				$this->get_font_installer(),
-				$this->get_install_queue()
+				$this->get_install_queue(),
+				$this->get_catalog_repository()
 			);
 		}
 

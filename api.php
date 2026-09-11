@@ -770,7 +770,7 @@ final class GPDFAPI {
 
 		$data       = self::get_data_class();
 		$model      = new \GFPDF\Model\Model_Custom_Fonts( $gfpdf->get_font_repository() );
-		$controller = new \GFPDF\Rest\Rest_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $gfpdf->get_font_registry(), $gfpdf->get_catalog_repository(), $gfpdf->get_install_requests(), $data->template_font_location, '\GFPDF\Fonts\LocalFilesystem', '\GFPDF\Fonts\LocalFile' );
+		$controller = new \GFPDF\Rest\Rest_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $gfpdf->get_font_registry(), $gfpdf->get_install_requests(), $data->template_font_location, '\GFPDF\Fonts\LocalFilesystem', '\GFPDF\Fonts\LocalFile' );
 
 		$request = new WP_REST_Request();
 		$request->set_param( 'label', $font['font_name'] ?? '' );

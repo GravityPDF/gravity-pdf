@@ -10,7 +10,6 @@ use GFPDF\Exceptions\GravityPdfFontNotFoundException;
 use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Exceptions\GravityPdfModelNotUpdatedException;
 use GFPDF\Fonts\FlushCache;
-use GFPDF\Fonts\Catalog_Repository;
 use GFPDF\Fonts\Font_Repository;
 use GFPDF\Fonts\Install_Requests;
 use GFPDF\Fonts\Registry;
@@ -74,12 +73,6 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	protected $requests;
 
 	/**
-	 * @var Catalog_Repository
-	 * @since 7.0
-	 */
-	protected $catalog;
-
-	/**
 	 * @var string The absolute path to the Custom Fonts directory on the server
 	 * @since 6.0
 	 */
@@ -103,12 +96,11 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	 */
 	protected $font_keys = [ 'regular', 'italics', 'bold', 'bolditalics' ];
 
-	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, Registry $registry, Catalog_Repository $catalog, Install_Requests $requests, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
+	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, Registry $registry, Install_Requests $requests, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
 		$this->model         = $model;
 		$this->log           = $log;
 		$this->gform         = $gform;
 		$this->registry      = $registry;
-		$this->catalog       = $catalog;
 		$this->requests      = $requests;
 		$this->font_dir_path = $font_dir_path;
 
@@ -336,70 +328,23 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 			return null;
 		}
 
-		$font  = $this->model->get_font( $font_key );
-		$entry = (string) ( $font['entry'] ?? '' );
+		$queued = $this->requests->queue_variants( $this->model->get_font( $font_key ), $variants );
 
-		if ( $entry === '' ) {
-			return new WP_Error(
-				'font_has_no_styles',
-				esc_html__( 'This font was uploaded rather than installed from a catalogue, so it has no styles to choose from.', 'gravity-pdf' ),
-				[ 'status' => 400 ]
-			);
-		}
-
-		$row = $this->catalog->entry( (string) $font['source'], $entry );
-
-		if ( $row === null ) {
-			return new WP_Error(
-				'font_entry_unknown',
-				esc_html__( 'The catalogue no longer lists the font this row came from, so its styles cannot be changed.', 'gravity-pdf' ),
-				[ 'status' => 400 ]
-			);
-		}
-
-		$error = $this->requests->check_variants( $row, $variants );
-
-		if ( $error !== null ) {
-			return $error;
-		}
-
-		$queued = $this->requests->queue(
-			$row,
-			[
-				[
-					'label'    => (string) $font['label'],
-					'variants' => $variants,
-				],
-			]
-		);
-
-		if ( is_wp_error( $queued ) ) {
-			return $queued;
-		}
-
-		/* The files arrive in the background, so the answer is the row as it stands plus the progress to poll */
-		return $this->row( $font_key );
+		/* The files arrive in the background, so the answer is the row as it stands */
+		return is_wp_error( $queued ) ? $queued : $this->row( $font_key );
 	}
 
 	/**
-	 * Apply a `{ enabled }` toggle, where the request carried one
+	 * Show or hide one row on the site making the request
 	 *
 	 * Visibility is per site and installation is not (§4.11), so this is the only font write multisite treats
 	 * differently — and on single site there is nothing to hide a font from, so the key is simply not offered.
 	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return void|WP_Error
+	 * @return WP_Error|null Why it was refused, or `null` when it was applied
 	 *
 	 * @since 7.0
 	 */
-	protected function set_visibility( string $font_key, $request ) {
-		$enabled = $request->get_param( 'enabled' );
-
-		if ( $enabled === null ) {
-			return;
-		}
-
+	protected function set_visibility( string $font_key, bool $enabled ): ?WP_Error {
 		if ( ! is_multisite() ) {
 			return new WP_Error(
 				'font_visibility_unsupported',
@@ -408,7 +353,9 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 			);
 		}
 
-		$this->model->set_site_visibility( $font_key, (bool) $enabled );
+		$this->model->set_site_visibility( $font_key, $enabled );
+
+		return null;
 	}
 
 	/**
@@ -498,10 +445,14 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 				throw new GravityPdfIdException();
 			}
 
-			$visibility = $this->set_visibility( $id, $request );
+			$enabled = $request->get_param( 'enabled' );
 
-			if ( is_wp_error( $visibility ) ) {
-				return $visibility;
+			if ( $enabled !== null ) {
+				$refused = $this->set_visibility( $id, (bool) $enabled );
+
+				if ( $refused !== null ) {
+					return $refused;
+				}
 			}
 
 			$restyled = $this->install_variants( $id, (array) $request->get_param( 'variants' ) );

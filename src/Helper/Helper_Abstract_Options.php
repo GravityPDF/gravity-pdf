@@ -929,7 +929,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$fonts = [];
 
 		foreach ( $this->font_groups() as $group ) {
-			$fonts[ $group['label'] ] = ( $fonts[ $group['label'] ] ?? [] ) + $group['fonts'];
+			$fonts[ $group['label'] ] = ( $fonts[ $group['label'] ] ?? [] ) + $this->font_choices( $group['fonts'] );
 		}
 
 		return apply_filters( 'gfpdf_font_list', array_filter( $fonts ) );
@@ -960,6 +960,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * that cannot render. Custom fonts are rows now, so they arrive with everything else rather than through
 	 * add_custom_fonts().
 	 *
+	 * The fonts are left as the registry's objects: only `get_installed_fonts()` wants them as choices, and
+	 * `get_registered_fields()` asks for the ids alone as often as it asks for the list.
+	 *
 	 * @return array[]
 	 *
 	 * @since 7.0
@@ -971,7 +974,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			[
 				'id'    => 'bundled',
 				'label' => esc_html__( 'Bundled Fonts', 'gravity-pdf' ),
-				'fonts' => $this->font_choices( $grouped['bundled'] ),
+				'fonts' => $grouped['bundled'],
 			],
 		];
 
@@ -980,14 +983,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$groups[] = [
 				'id'    => $group['source'] . '/' . $group['entry'],
 				'label' => (string) $group['label'],
-				'fonts' => $this->font_choices( $group['fonts'] ),
+				'fonts' => $group['fonts'],
 			];
 		}
 
 		$groups[] = [
 			'id'    => 'custom',
 			'label' => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
-			'fonts' => $this->font_choices( $grouped['custom'] ),
+			'fonts' => $grouped['custom'],
 		];
 
 		return $groups;
