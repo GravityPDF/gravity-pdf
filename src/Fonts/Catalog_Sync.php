@@ -311,7 +311,11 @@ class Catalog_Sync {
 	}
 
 	/**
-	 * The Refresh button's entry point: compare the root inline and schedule the work when it differs
+	 * The Refresh button's entry point: compare every root inline and schedule the work when one differs
+	 *
+	 * A root that cannot be reached does not end the pass. Registered sources may sit on different origins — that
+	 * is what `gfpdf_font_sources` is for — and returning on the first failure would let an outage at one of them
+	 * hide every other source's updates, and skip scheduling the sync that would have taken them.
 	 *
 	 * @return array{up_to_date: bool, scheduled: bool, error?: string}
 	 *
@@ -319,6 +323,7 @@ class Catalog_Sync {
 	 */
 	public function request(): array {
 		$changed = false;
+		$error   = null;
 
 		foreach ( $this->group_by_root() as $group ) {
 			$root = $this->fetch_root( $group['root_url'], $group['records'] );
@@ -326,11 +331,14 @@ class Catalog_Sync {
 			if ( is_wp_error( $root ) ) {
 				$this->record_failure( $group['records'], $root );
 
-				return [
-					'up_to_date' => false,
-					'scheduled'  => false,
-					'error'      => $root->get_error_message(),
-				];
+				/*
+				 * One origin being unreachable says nothing about another's, so every root is asked before anything
+				 * is reported. The failure is on the record either way, which is where the sources listing and
+				 * `Catalog_Sync_Check` read it from; this only decides what Refresh itself answers.
+				 */
+				$error = $error ?? $root->get_error_message();
+
+				continue;
 			}
 
 			foreach ( $group['records'] as $record ) {
@@ -341,10 +349,16 @@ class Catalog_Sync {
 		}
 
 		if ( ! $changed ) {
-			return [
-				'up_to_date' => true,
-				'scheduled'  => false,
-			];
+			return $error === null
+				? [
+					'up_to_date' => true,
+					'scheduled'  => false,
+				]
+				: [
+					'up_to_date' => false,
+					'scheduled'  => false,
+					'error'      => $error,
+				];
 		}
 
 		/* WP-Cron de-duplicates an identical pending event, so a second Refresh does not queue a second sync */
