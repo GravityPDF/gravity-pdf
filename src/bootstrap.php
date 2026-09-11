@@ -194,6 +194,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $install_queue;
 
 	/**
+	 * Holds our Install_Requests object
+	 * What an install of a catalogue entry means, before the queue runs it
+	 *
+	 * @var Fonts\Install_Requests
+	 *
+	 * @since 7.0
+	 */
+	public $install_requests;
+
+	/**
 	 * What the install triggers ask before they queue anything
 	 *
 	 * @var Fonts\Coverage_Resolver
@@ -908,7 +918,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->get_font_registry(),
 			$this->get_catalog_repository(),
 			$this->get_font_repository(),
-			$this->get_font_installer(),
+			$this->get_install_requests(),
 			$this->get_install_queue(),
 			$this->get_font_sources(),
 			$this->gform
@@ -1067,7 +1077,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function load_custom_font_handler(): void {
 		$model = new Model\Model_Custom_Fonts( $this->get_font_repository() );
-		$class = new Rest\Rest_Custom_Fonts( $model, $this->log, $this->gform, $this->get_font_registry(), $this->data->template_font_location );
+		$class = new Rest\Rest_Custom_Fonts( $model, $this->log, $this->gform, $this->get_font_registry(), $this->get_catalog_repository(), $this->get_install_requests(), $this->data->template_font_location );
 		$class->init();
 
 		$this->singleton->add_class( $model );
@@ -1320,6 +1330,23 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->font_cache_warmer;
+	}
+
+	/**
+	 * Build the install request planner, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_requests(): Fonts\Install_Requests {
+		if ( $this->install_requests === null ) {
+			$this->install_requests = new Fonts\Install_Requests(
+				$this->get_font_repository(),
+				$this->get_font_installer(),
+				$this->get_install_queue()
+			);
+		}
+
+		return $this->install_requests;
 	}
 
 	/**

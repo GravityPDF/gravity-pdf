@@ -6,6 +6,7 @@ namespace GFPDF\Rest;
 
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
+use GFPDF\Tests\Concerns\QueuesFontInstalls;
 
 /**
  * @package     Gravity PDF
@@ -24,16 +25,19 @@ class Test_Rest_Font_List extends Test_Rest {
 
 	use HasCatalogRows;
 	use HasFontRows;
+	use QueuesFontInstalls;
 
 	public function set_up(): void {
 		parent::set_up();
 
 		$this->drop_catalog_rows();
+		$this->block_dispatch();
 
 		wp_set_current_user( self::$admin_id );
 	}
 
 	public function tear_down(): void {
+		$this->reset_queue();
 		$this->remove_font_rows();
 		$this->remove_font_files();
 		$this->drop_catalog_rows();
@@ -273,6 +277,82 @@ class Test_Rest_Font_List extends Test_Rest {
 		$this->assertNotNull( $this->font_repository()->get( 'brandsans' ) );
 
 		$this->assertTrue( $this->post( '/fonts/brandsans', [ 'enabled' => true ] )->get_data()['enabled'] );
+	}
+
+	/**
+	 * A display family whose entry document names the files each style maps to
+	 */
+	protected function seed_family(): void {
+		$this->insert_catalog_row(
+			'google',
+			'lato',
+			[
+				'label'      => 'Lato',
+				'styles'     => '300,400,700',
+				'entry_json' => (string) wp_json_encode(
+					[
+						'fonts'    => [ 'lato' => [ 'R' => 'Lato-400.ttf' ] ],
+						'variants' => [
+							'300' => 'Lato-300.ttf',
+							'400' => 'Lato-400.ttf',
+							'700' => 'Lato-700.ttf',
+						],
+						'files'    => [
+							'Lato-300.ttf' => [ 'sha256' => str_repeat( 'c', 64 ), 'size' => 10, 'remote_path' => 'v/Lato-300.ttf' ],
+							'Lato-400.ttf' => [ 'sha256' => str_repeat( 'a', 64 ), 'size' => 10, 'remote_path' => 'v/Lato-400.ttf' ],
+							'Lato-700.ttf' => [ 'sha256' => str_repeat( 'b', 64 ), 'size' => 10, 'remote_path' => 'v/Lato-700.ttf' ],
+						],
+					]
+				),
+			]
+		);
+	}
+
+	public function test_choosing_styles_re_installs_that_row_alone() {
+		$this->seed_family();
+
+		$this->install_real_font( 'latolight', [ 'source' => 'google', 'entry' => 'lato', 'label' => 'Lato Light' ] );
+		$this->install_real_font( 'latobold', [ 'source' => 'google', 'entry' => 'lato', 'label' => 'Lato Bold' ] );
+
+		$response = $this->post( '/fonts/latolight', [ 'variants' => [ 'R' => '300', 'B' => '700' ] ] );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'latolight', $response->get_data()['id'] );
+
+		/* `label` is the identity the installer matches on, so the sibling install is untouched */
+		$installs = $this->queued_installs();
+
+		$this->assertSame( [ 'Lato Light' ], array_unique( array_column( $installs, 'label' ) ) );
+		$this->assertSame( [ 'R' => '300', 'B' => '700' ], $installs[0]['variants'] );
+	}
+
+	public function test_a_style_the_entry_does_not_publish_is_refused() {
+		$this->seed_family();
+		$this->install_real_font( 'latolight', [ 'source' => 'google', 'entry' => 'lato' ] );
+
+		$response = $this->post( '/fonts/latolight', [ 'variants' => [ 'R' => '900' ] ] );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'font_variant_unknown', $response->get_data()['code'] );
+		$this->assertSame( [], $this->queued_installs() );
+	}
+
+	public function test_an_uploaded_font_has_no_styles_to_choose_from() {
+		$this->install_real_font( 'brandsans' );
+
+		$response = $this->post( '/fonts/brandsans', [ 'variants' => [ 'R' => '300' ] ] );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'font_has_no_styles', $response->get_data()['code'] );
+	}
+
+	/**
+	 * The installs the request handed to the queue, one per queued file
+	 *
+	 * @return array[]
+	 */
+	protected function queued_installs(): array {
+		return array_column( $this->queued(), 'install' );
 	}
 
 	/**
