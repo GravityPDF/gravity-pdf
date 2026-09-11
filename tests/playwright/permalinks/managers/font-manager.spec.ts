@@ -1,17 +1,19 @@
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 
 /**
  * The 7.0 Font Manager.
  *
- * The `/fonts` REST routes are not built yet, so this build serves them from fixtures in the browser and
- * nothing an admin does here reaches the database. What is covered is everything that does not need the server
- * to remember: the button, the shell, the three groups, search, the source browser, the settings panel and the
- * two ways out. The add → search → edit → delete lifecycle, the install-progress run and the pack install come
- * back with the REST controllers, which is the only thing that can make them assert anything true.
+ * Every `/fonts` route but `/fonts/settings` is served by the plugin now, so what the manager shows here is
+ * what this site actually holds: one bundled family, no packs, no custom fonts and neither catalogue
+ * downloaded. That is what the assertions below are written against — an empty group draws no heading, and a
+ * source that has never synced offers its Refresh button instead of a grid.
+ *
+ * Still uncovered, because both need fixtures this project cannot leave behind for the specs it runs beside:
+ * the add → edit → delete lifecycle of a custom font, and the install run of a catalogue entry.
  */
 test.describe('Font Manager', () => {
 	let pdf: Pdf;
@@ -22,6 +24,10 @@ test.describe('Font Manager', () => {
 
 		return page.getByRole('dialog', { name: 'Font manager' });
 	};
+
+	// The one font every site has. `.font-row` rather than the name, which the detail pane repeats once it opens
+	const bundledRow = (manager: Locator) =>
+		manager.locator('.font-row').filter({ hasText: 'Arimo' });
 
 	test.beforeEach(
 		async ({
@@ -58,7 +64,7 @@ test.describe('Font Manager', () => {
 		// 7.0 ships none of the 6.x core fonts, so the dropdown lists what the font registry actually has
 		await expect(
 			select.locator('optgroup[label="Bundled Fonts"]')
-		).toBeAttached();
+		).toHaveCount(1);
 
 		await expect(select.locator('optgroup[label="Unicode"]')).toHaveCount(
 			0
@@ -80,7 +86,7 @@ test.describe('Font Manager', () => {
 		);
 	});
 
-	test('should group the installed fonts, and narrow them by search', async ({
+	test('should list the installed fonts by group, and narrow them by search', async ({
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
@@ -90,31 +96,39 @@ test.describe('Font Manager', () => {
 		await expect(
 			manager.getByText('Bundled', { exact: true })
 		).toBeVisible();
-		await expect(
-			manager.getByText('Custom', { exact: true })
-		).toBeVisible();
-		await expect(manager.getByText('Language packs')).toBeVisible();
+		await expect(bundledRow(manager)).toBeVisible();
 
-		await manager.getByLabel('Search fonts').fill('brand');
+		// A group with no rows draws no heading, and this site has neither a custom font nor a pack
+		await expect(manager.getByText('Custom', { exact: true })).toHaveCount(
+			0
+		);
+		await expect(manager.getByText('Language packs')).toHaveCount(0);
 
-		await expect(manager.getByText('Brand Sans')).toBeVisible();
-		await expect(manager.getByText('Emoji')).toBeHidden();
+		await manager.getByLabel('Search fonts').fill('ari');
+
+		await expect(bundledRow(manager)).toBeVisible();
+
+		await manager.getByLabel('Search fonts').fill('nothing by this name');
+
+		await expect(bundledRow(manager)).toBeHidden();
+		await expect(manager.getByText('No results.')).toBeVisible();
 	});
 
-	test('should open a font for editing, and show the key a template writes', async ({
+	test('should open a bundled font, and show the key a template writes', async ({
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
 
 		const manager = await openManager(page);
 
-		await manager.getByText('Brand Sans').click();
+		await bundledRow(manager).click();
 
-		await expect(manager.getByText('Edit font')).toBeVisible();
-		await expect(manager.getByText('font-family: brandsans')).toBeVisible();
+		await expect(
+			manager.getByText('Bundled with Gravity PDF · gfpdf-arimo')
+		).toBeVisible();
 	});
 
-	test('should browse a source, filter it, and open an entry', async ({
+	test('should offer to download a catalogue that has never synced', async ({
 		page,
 	}) => {
 		await pdf.navigateToNewFormPdf(form.id);
@@ -126,17 +140,16 @@ test.describe('Font Manager', () => {
 			.getByRole('menuitem', { name: 'Browse Google Fonts' })
 			.click();
 
-		await expect(manager.locator('.gfpdf-fm-cards')).toBeVisible();
-
-		await manager.getByLabel('Category').selectOption('monospace');
-
 		await expect(
-			manager.getByText(/of 4 families · Monospace/)
+			manager.getByText(/The Google Fonts catalogue hasn.t been/)
 		).toBeVisible();
 
-		await manager.getByText('Roboto Mono').click();
-
-		await expect(manager.getByLabel('Bold Italic')).toBeVisible();
+		// The header carries a Refresh of its own, so this is the one the empty state offers
+		await expect(
+			manager
+				.locator('.fm-empty-detail')
+				.getByRole('button', { name: 'Refresh' })
+		).toBeVisible();
 	});
 
 	test('should open the language settings from the header', async ({
@@ -189,7 +202,7 @@ test.describe('Font Manager', () => {
 		await expect(manager.locator('.fm-sidebar')).toBeVisible();
 		await expect(manager.locator('.fm-detail')).toBeHidden();
 
-		await manager.getByText('Brand Sans').click();
+		await bundledRow(manager).click();
 
 		await expect(manager.locator('.fm-sidebar')).toBeHidden();
 		await expect(manager.locator('.fm-detail')).toBeVisible();
