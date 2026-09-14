@@ -1,7 +1,11 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FontManager from '../../../../../src/assets/js/react/fontManager/components/FontManager';
+import { state } from '../../../../../src/assets/js/react/fontManager/api/mock/state';
 import { renderWithStore } from '../renderWithStore';
+
+/* What the mocked server ended up holding — the only reading the panel's own state cannot fake */
+const savedFaces = (id) => state.rows.find((row) => row.id === id)?.files ?? {};
 
 const drop = (element, file) => {
 	const event = new Event('drop', { bubbles: true });
@@ -105,7 +109,7 @@ describe('Font Manager - adding and editing an uploaded font', () => {
 		expect(window.location.hash).toBe('#/fontmanager/housesans');
 	});
 
-	test('asks before replacing a file that is already there', async () => {
+	test('asks before replacing a file that is already there, then sends it', async () => {
 		const user = userEvent.setup();
 
 		renderWithStore(<FontManager onActive={jest.fn()} />, {
@@ -120,8 +124,83 @@ describe('Font Manager - adding and editing an uploaded font', () => {
 			await screen.findByRole('button', { name: 'Save changes' })
 		);
 
+		const dialog = await screen.findByRole('dialog', {
+			name: 'Save changes to font files?',
+		});
+
+		await user.click(
+			within(dialog).getByRole('button', { name: 'Save changes' })
+		);
+
+		await waitFor(() =>
+			expect(savedFaces('brandsans').B.path).toBe('BrandSans-Heavy.ttf')
+		);
+	});
+
+	/**
+	 * Removing a face is the other half of the same write, and the route spells it as the face's name present
+	 * with an empty value rather than as an absence — so it is worth one test of its own
+	 */
+	test('removes a face the admin deleted', async () => {
+		const user = userEvent.setup();
+
+		renderWithStore(<FontManager onActive={jest.fn()} />, {
+			hash: '#/fontmanager/brandsans',
+		});
+
+		await screen.findByText('Edit font');
+
+		await user.click(
+			within(variantRow('Bold Italic')).getByRole('button', {
+				name: 'Delete Bold Italic',
+			})
+		);
+
+		await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+		const dialog = await screen.findByRole('dialog', {
+			name: 'Save changes to font files?',
+		});
+
+		await user.click(
+			within(dialog).getByRole('button', { name: 'Save changes' })
+		);
+
+		await waitFor(() => expect(savedFaces('brandsans').BI).toBeUndefined());
+
+		expect(savedFaces('brandsans').R).toBeTruthy();
+	});
+
+	/**
+	 * `GET /fonts/` answers with a fresh document, so the row object changes identity on every refresh — and
+	 * the poller runs one whenever any unrelated install settles. Re-seeding the form on that took the files
+	 * the admin had just chosen with it, and they are not retypeable: they come off disk
+	 */
+	test('keeps an in-progress edit through a background refresh', async () => {
+		const { registry } = renderWithStore(
+			<FontManager onActive={jest.fn()} />,
+			{
+				hash: '#/fontmanager/brandsans',
+			}
+		);
+
+		await screen.findByText('Edit font');
+
+		drop(variantRow('Bold'), new File(['x'], 'BrandSans-Heavy.ttf'));
+
+		await waitFor(() =>
+			expect(
+				within(variantRow('Bold')).getByText('BrandSans-Heavy.ttf')
+			).toBeTruthy()
+		);
+
+		/* `act` so the re-render and any effect it triggers have both run before this is judged */
+		await act(async () => {
+			await registry.dispatch('gravity-pdf/fonts').refreshFonts();
+		});
+
 		expect(
-			await screen.findByText('Save changes to font files?')
+			within(variantRow('Bold')).getByText('BrandSans-Heavy.ttf')
 		).toBeTruthy();
 	});
 

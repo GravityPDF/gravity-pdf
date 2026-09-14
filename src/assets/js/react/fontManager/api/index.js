@@ -7,7 +7,7 @@
 
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { API_ROOT } from '../constants';
+import { API_ROOT, ROLES } from '../constants';
 import { mockMiddleware, mockOnly } from './mock';
 
 /**
@@ -90,8 +90,8 @@ export const updateAll = () => post('/updates');
 
 export const saveSettings = (body) => post('/settings', body);
 
-export const uploadFont = (body) => post('/', body);
-export const editFont = (id, body) => post(`/${id}`, body);
+export const uploadFont = (body) => writeFont('/', body);
+export const editFont = (id, body) => writeFont(`/${id}`, body);
 export const deleteFont = (id) => remove(`/${id}`);
 
 /**
@@ -115,3 +115,61 @@ export const importPackage = (file) => {
 
 	return apiFetch({ path: `${API_ROOT}/import`, method: 'POST', body });
 };
+
+/**
+ * Create or edit one custom font, as multipart when the write carries faces and as JSON when it does not
+ *
+ * `POST /fonts/` and `POST /fonts/{id}` read their `.ttf`s out of `$_FILES` — so a face has to travel as a real
+ * multipart part, which `apiFetch`'s `data` shorthand cannot do: it JSON-encodes what it is handed, and a `File`
+ * encodes to `{}`. The route then sees no files at all.
+ *
+ * Emptiness decides it, not the presence of the key: the panel sends `faces` on every save and it is empty for
+ * a rename, which has nothing to put in a multipart part. Everything else — a display row's `variants`,
+ * multisite's `enabled` toggle — keeps the JSON path, where an object and a boolean survive as themselves
+ * rather than arriving as `"[object Object]"` and `"true"`.
+ *
+ * @param {string}  path
+ * @param {Object}  body       `{ label?, enabled?, variants?, faces? }`
+ * @param {?Object} body.faces Role → a `File` to write there, or null to clear it
+ *
+ * @return {Promise<Object>} The saved row
+ *
+ * @since 7.0
+ */
+function writeFont(path, { faces, ...rest }) {
+	if (!faces || Object.keys(faces).length === 0) {
+		return post(path, rest);
+	}
+
+	return apiFetch({
+		path: API_ROOT + path,
+		method: 'POST',
+		body: facesForm(rest, faces),
+	});
+}
+
+/**
+ * One custom-font write as `FormData`, under the names the route reads
+ *
+ * A `File` against a face replaces it; `null` clears it, which the route spells as the face's name present in
+ * the body with an empty value (`Rest_Custom_Fonts::update_item()`). A face the admin did not touch is absent
+ * from both, and keeps whatever file it has.
+ *
+ * @param {Object} fields The rest of the write, which past `writeFont()` is `label` alone
+ * @param {Object} faces  Role → a `File` to write there, or null to clear it
+ *
+ * @return {FormData} The request body
+ *
+ * @since 7.0
+ */
+function facesForm(fields, faces) {
+	const form = new window.FormData();
+
+	Object.entries(fields).forEach(([key, value]) => form.append(key, value));
+
+	ROLES.filter((role) => role.id in faces).forEach((role) =>
+		form.append(role.field, faces[role.id] ?? '')
+	);
+
+	return form;
+}

@@ -17,7 +17,7 @@ import {
 	setStatus,
 	state,
 } from './state';
-import { PER_PAGE } from '../../constants';
+import { PER_PAGE, ROLES } from '../../constants';
 
 /**
  * A stand-in for the `/fonts` routes that do not exist yet
@@ -125,7 +125,12 @@ function respond(run) {
 	return new Promise((resolve, reject) => {
 		setTimeout(() => {
 			try {
-				resolve(run());
+				/*
+				 * Serialised, because a real response is a fresh document every time and handing back the
+				 * server's own objects makes the store's identity checks pass for a reason production does not
+				 * have — which hid a panel losing an in-progress edit on every background refresh
+				 */
+				resolve(JSON.parse(JSON.stringify(run())));
 			} catch (failure) {
 				reject(failure);
 			}
@@ -162,18 +167,67 @@ function fonts() {
 	};
 }
 
-function uploadFont({ data }) {
-	const key = uniqueKey(keyFromLabel(data.label ?? 'New font'));
+/**
+ * The parts of a custom-font write, however it was sent
+ *
+ * A write carrying faces is multipart and a write carrying `variants` or `enabled` is JSON, so the two arrive
+ * in different halves of the request. Faces come back under the ROLE ids the rest of the mock speaks, which is
+ * the translation `Rest_Custom_Fonts` does with `Font_Repository::LEGACY_FACE_ROLES`.
+ *
+ * @param {Object} request The matched request
+ * @param {Object} options The raw `apiFetch` options
+ *
+ * @return {Object} `{ fields, faces }`
+ *
+ * @since 7.0
+ */
+function fontWrite(request, options) {
+	if (!(options.body instanceof window.FormData)) {
+		return { fields: request.data, faces: {} };
+	}
+
+	const fields = {};
+	const faces = {};
+
+	options.body.forEach((value, name) => {
+		const role = ROLES.find((item) => item.field === name);
+
+		if (!role) {
+			fields[name] = value;
+
+			return;
+		}
+
+		/* A File replaces the face; the empty string the route reads as "clear it" */
+		faces[role.id] = value instanceof window.File ? value.name : null;
+	});
+
+	return { fields, faces };
+}
+
+function uploadFont(request, options) {
+	const { fields, faces } = fontWrite(request, options);
+
+	/* `add_item()`'s one required part, and the check that fails a write whose files never left the browser */
+	if (!faces.R) {
+		throw error(
+			'font_validation_error',
+			{ regular: 'The Regular font is required' },
+			400
+		);
+	}
+
+	const key = uniqueKey(keyFromLabel(fields.label ?? 'New font'));
 
 	const row = {
 		id: key,
-		label: data.label ?? 'New font',
+		label: fields.label ?? 'New font',
 		source: 'custom',
 		entry: null,
 		coverage: 0,
 		version: null,
 		enabled: true,
-		files: rolesToFiles(data.files ?? {}),
+		files: rolesToFiles(faces),
 	};
 
 	state.rows.push(row);
@@ -181,12 +235,15 @@ function uploadFont({ data }) {
 	return row;
 }
 
-function editFont({ params, data }) {
+function editFont(request, options) {
+	const { params } = request;
 	const row = state.rows.find((item) => item.id === params[0]);
 
 	if (!row) {
 		throw error('invalid_font_id', 'The font could not be found', 400);
 	}
+
+	const { fields: data, faces } = fontWrite(request, options);
 
 	if (data.label !== undefined) {
 		row.label = data.label;
@@ -196,9 +253,11 @@ function editFont({ params, data }) {
 		row.enabled = !!data.enabled;
 	}
 
-	if (data.files) {
-		row.files = { ...row.files, ...rolesToFiles(data.files) };
-	}
+	/* Every named face is cleared first, then the ones carrying a file are written back — `rolesToFiles()`
+	   drops the empty ones, which is the same rule the route's two passes apply */
+	Object.keys(faces).forEach((role) => delete row.files[role]);
+
+	row.files = { ...row.files, ...rolesToFiles(faces) };
 
 	if (data.variants) {
 		Object.entries(data.variants).forEach(([role, variant]) => {

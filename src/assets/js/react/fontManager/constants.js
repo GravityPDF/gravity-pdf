@@ -29,16 +29,43 @@ export const OVERLAY_ID = 'font-manager-overlay';
 /**
  * The four faces, in the order every list in the UI shows them
  *
- * `id` is the file row's `role`; `weight` and `style` are what a preview line renders at.
+ * `id` is the file row's `role`, which is what every read speaks. `field` is the 6.x name the custom-font
+ * *write* still speaks (`Font_Repository::LEGACY_FACE_ROLES`, kept because the public API and every add-on use
+ * it), so an upload names its parts `regular`/`italics`/… while the row that comes back is keyed `R`/`I`/….
+ * Both halves sit on one row here so nothing has to hold a second list to translate between them.
+ *
+ * `weight` and `style` are what a preview line renders at.
  *
  * @since 7.0
  */
 export const ROLES = [
-	{ id: 'R', label: 'Regular', weight: 400, style: 'normal', required: true },
-	{ id: 'I', label: 'Italic', weight: 400, style: 'italic', required: false },
-	{ id: 'B', label: 'Bold', weight: 700, style: 'normal', required: false },
+	{
+		id: 'R',
+		field: 'regular',
+		label: 'Regular',
+		weight: 400,
+		style: 'normal',
+		required: true,
+	},
+	{
+		id: 'I',
+		field: 'italics',
+		label: 'Italic',
+		weight: 400,
+		style: 'italic',
+		required: false,
+	},
+	{
+		id: 'B',
+		field: 'bold',
+		label: 'Bold',
+		weight: 700,
+		style: 'normal',
+		required: false,
+	},
 	{
 		id: 'BI',
+		field: 'bolditalics',
 		label: 'Bold Italic',
 		weight: 700,
 		style: 'italic',

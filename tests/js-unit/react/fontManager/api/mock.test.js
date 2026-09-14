@@ -13,16 +13,17 @@ const next = jest.fn();
 /**
  * Call one route and let its latency elapse
  *
- * @param {string}  path
- * @param {string}  method
- * @param {?Object} data
+ * @param {string}    path
+ * @param {string}    method
+ * @param {?Object}   data
+ * @param {?FormData} body   A multipart body, for the routes that read one
  *
  * @return {Promise} What the route answered
  */
-const call = async (path, method = 'GET', data) => {
+const call = async (path, method = 'GET', data, body) => {
 	/* Settle first so a rejection never sits unhandled while the fake clock is being wound forward */
 	const settled = mockMiddleware(
-		{ path: '/gravity-pdf/v1' + path, method, data },
+		{ path: '/gravity-pdf/v1' + path, method, data, body },
 		next
 	).then(
 		(value) => ({ value }),
@@ -39,6 +40,25 @@ const call = async (path, method = 'GET', data) => {
 
 	return result.value;
 };
+
+/**
+ * One multipart write, the way the custom-font routes read it
+ *
+ * A string value is a plain field — an empty one against a face is how the route spells "delete it" — and a
+ * `File` is a face to write.
+ *
+ * @param {Object} fields Name → value
+ *
+ * @return {FormData} The body
+ */
+const multipart = (fields) =>
+	Object.entries(fields).reduce((form, [name, value]) => {
+		form.append(name, value);
+
+		return form;
+	}, new window.FormData());
+
+const ttf = (name) => new File(['x'], name);
 
 describe('Font Manager - the mocked /fonts routes', () => {
 	beforeEach(() => {
@@ -205,13 +225,49 @@ describe('Font Manager - the mocked /fonts routes', () => {
 	});
 
 	test('POST /fonts/ uploads a custom row under a unique key', async () => {
-		const first = await call('/fonts/', 'POST', {
-			label: 'Brand Sans',
-			files: { R: 'BrandSans-Regular.ttf' },
-		});
+		const first = await call(
+			'/fonts/',
+			'POST',
+			undefined,
+			multipart({
+				label: 'Brand Sans',
+				regular: ttf('BrandSans-Regular.ttf'),
+			})
+		);
 
 		expect(first.id).toBe('brandsans2');
 		expect(first.source).toBe('custom');
+		expect(first.files.R.path).toBe('BrandSans-Regular.ttf');
+	});
+
+	/**
+	 * The route reads its `.ttf`s out of `$_FILES`, so a write that JSON-encoded them — which is what
+	 * `apiFetch`'s `data` shorthand does to a `File` — arrives carrying nothing at all
+	 */
+	test('POST /fonts/ refuses a write whose files never left the browser', async () => {
+		await expect(
+			call('/fonts/', 'POST', {
+				label: 'Brand Sans',
+				files: { R: 'BrandSans-Regular.ttf' },
+			})
+		).rejects.toMatchObject({ code: 'font_validation_error' });
+	});
+
+	test('POST /fonts/{id} replaces one face and clears another', async () => {
+		const row = await call(
+			'/fonts/brandsans',
+			'POST',
+			undefined,
+			multipart({
+				label: 'Brand Sans',
+				bold: ttf('BrandSans-Heavy.ttf'),
+				bolditalics: '',
+			})
+		);
+
+		expect(row.files.B.path).toBe('BrandSans-Heavy.ttf');
+		expect(row.files.BI).toBeUndefined();
+		expect(row.files.R.path).toBe('BrandSans-R.ttf');
 	});
 
 	test('POST /fonts/{id} renames without moving the key', async () => {

@@ -68,19 +68,25 @@ export default function CustomFontDetail({
 
 	const { saveFont, deleteFont } = useDispatch(STORE_NAME);
 
+	/*
+	 * Keyed on which row this is, not on the row object: `GET /fonts/` answers with a fresh document every
+	 * time, so depending on the object meant every background refresh — any unrelated install settling, and
+	 * the poller runs one — reset the form under the admin, taking the files they had just chosen with it.
+	 * What the server saved is read back in `commit()` instead, which is the only moment it can have changed.
+	 */
 	useEffect(() => {
 		setName(row?.label ?? '');
 		setFiles(filesOf(row));
 		setConfirm(null);
-	}, [row]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [row?.id]);
 
 	const nameError = name === '' && !row ? '' : validateName(name, taken);
 	const key = row?.id ?? deriveKey(name);
 	const saved = filesOf(row);
 
-	const dirty =
-		name !== (row?.label ?? '') ||
-		JSON.stringify(files) !== JSON.stringify(saved);
+	const faces = facesToWrite(saved, files);
+	const dirty = name !== (row?.label ?? '') || Object.keys(faces).length > 0;
 
 	/* A face being replaced or removed is what earns the second confirm; adding one is not destructive */
 	const destructive = ROLES.some(
@@ -109,9 +115,12 @@ export default function CustomFontDetail({
 	const commit = async () => {
 		setConfirm(null);
 
-		const written = await saveFont(row?.id ?? null, { label: name, files });
+		const written = await saveFont(row?.id ?? null, { label: name, faces });
 
 		if (written) {
+			/* What the row came back as, which is not always what was sent: a name the fonts dir already
+			   held is saved under a suffixed one */
+			setFiles(filesOf(written));
 			onDone(written.id);
 		}
 	};
@@ -180,20 +189,17 @@ export default function CustomFontDetail({
 							<FontVariantRow
 								key={role.id}
 								role={role}
-								filename={files[role.id] ?? null}
+								filename={nameOf(files[role.id])}
 								onFile={(file) =>
 									setFiles((previous) => ({
 										...previous,
-										[role.id]: file.name,
+										[role.id]: file,
 									}))
 								}
 								onDelete={() =>
-									setFiles((previous) => {
-										const next = { ...previous };
-										delete next[role.id];
-
-										return next;
-									})
+									setFiles((previous) =>
+										without(previous, role.id)
+									)
 								}
 							/>
 						))}
@@ -299,6 +305,59 @@ export default function CustomFontDetail({
 			)}
 		</section>
 	);
+}
+
+/**
+ * What the write has to say about each face: a `File` to put there, `null` to clear it, or nothing at all
+ *
+ * `files` holds a filename for a face already on the row and the `File` itself for one chosen in this session,
+ * which is the whole of the distinction — a face is replaced exactly when it holds a `File`, and cleared
+ * exactly when the row had one and it is no longer there.
+ *
+ * @param {Object} saved Role → the filename on the row
+ * @param {Object} files Role → the filename on the row, or a `File` chosen since
+ *
+ * @return {Object} Role → `File` or null, for the faces this write changes
+ *
+ * @since 7.0
+ */
+function facesToWrite(saved, files) {
+	return ROLES.reduce((faces, role) => {
+		const chosen = files[role.id];
+
+		if (chosen && typeof chosen !== 'string') {
+			faces[role.id] = chosen;
+		} else if (saved[role.id] && !chosen) {
+			faces[role.id] = null;
+		}
+
+		return faces;
+	}, {});
+}
+
+/**
+ * The filename to show for a face, whichever of the two things it is holding
+ *
+ * @param {?(string|File)} face
+ *
+ * @return {?string} The name, or null when the face is empty
+ *
+ * @since 7.0
+ */
+function nameOf(face) {
+	if (!face) {
+		return null;
+	}
+
+	return typeof face === 'string' ? face : face.name;
+}
+
+function without(map, key) {
+	const next = { ...map };
+
+	delete next[key];
+
+	return next;
 }
 
 function filesOf(row) {
