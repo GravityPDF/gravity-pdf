@@ -6,6 +6,7 @@ namespace GFPDF\Fonts;
 
 use GFPDF\Helper\Helper_Misc;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use WP_Error;
 
 /**
  * @package     Gravity PDF
@@ -683,6 +684,35 @@ class Font_Repository {
 
 		if ( $unlink_file ) {
 			$this->delete_file( $path );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Move a verified `.part` to the path a file row will record it under
+	 *
+	 * The other end of `delete_file()` and of `Font_Downloader::part_path()`: a `.part` lives in `.tmp/` at the
+	 * fonts-dir root, so this `rename()` is on one filesystem and is therefore atomic — a reader sees the old file
+	 * or the new one, never a partial. Both writers of a font file come through here, the installer with a
+	 * download and the importer with a zip member, so "nothing lands unverified" has one implementation to hold.
+	 *
+	 * @param string $path The destination, relative to the fonts directory
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function move_into_place( string $part, string $path ) {
+		$absolute = $this->font_dir . $path;
+
+		if ( ! wp_mkdir_p( dirname( $absolute ) ) ) {
+			return new WP_Error( 'font_dir_unwritable', sprintf( 'The directory for %s could not be created', $path ) );
+		}
+
+		/* phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- WP_Filesystem::move() copies and unlinks, which is exactly the non-atomic behaviour this avoids */
+		if ( ! rename( $part, $absolute ) ) {
+			return new WP_Error( 'font_rename_failed', sprintf( '%s could not be moved into place', $path ) );
 		}
 
 		return true;

@@ -184,6 +184,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $font_installer;
 
 	/**
+	 * Holds our Font_Package_Importer object
+	 * The offline half of the installer: an uploaded package, verified onto disk
+	 *
+	 * @var Fonts\Font_Package_Importer
+	 *
+	 * @since 7.0
+	 */
+	public $font_package_importer;
+
+	/**
 	 * Holds our Install_Queue object
 	 * The background work list font installs run on
 	 *
@@ -921,6 +931,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->get_install_requests(),
 			$this->get_install_queue(),
 			$this->get_font_sources(),
+			$this->get_font_package_importer(),
 			$this->gform
 		);
 		$font_installs_controller->init();
@@ -1318,6 +1329,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->font_installer;
+	}
+
+	/**
+	 * Build the offline package importer, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_package_importer(): Fonts\Font_Package_Importer {
+		if ( $this->font_package_importer === null ) {
+			$this->font_package_importer = new Fonts\Font_Package_Importer(
+				$this->get_catalog_repository(),
+				$this->get_font_installer(),
+				$this->get_font_repository(),
+				$this->get_font_downloader(),
+				new Fonts\Font_Lock(),
+				$this->log
+			);
+		}
+
+		return $this->font_package_importer;
 	}
 
 	/**

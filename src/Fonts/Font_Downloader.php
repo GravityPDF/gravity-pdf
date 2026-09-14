@@ -593,21 +593,26 @@ class Font_Downloader {
 	/**
 	 * Size first, then hash, same order and same reason as the in-memory half
 	 *
+	 * Public because the offline importer verifies a file it extracted rather than downloaded, and "is this
+	 * byte-for-byte what the entry lists" is the subsystem's security boundary — one implementation, whatever put
+	 * the bytes in the `.part`. `$subject` is a URL from every caller here and a member name from that one; it
+	 * reaches nothing but the message.
+	 *
 	 * @since 7.0
 	 */
-	protected function verify_file( string $url, string $part, array $expected ): ?WP_Error {
+	public function verify_file( string $subject, string $part, array $expected ): ?WP_Error {
 		if ( ! is_file( $part ) ) {
-			return new WP_Error( 'font_download_empty', sprintf( 'The download of %s wrote no file', $url ) );
+			return new WP_Error( 'font_download_empty', sprintf( 'The download of %s wrote no file', $subject ) );
 		}
 
 		$length = (int) filesize( $part );
 
 		if ( isset( $expected['size'] ) && $length !== (int) $expected['size'] ) {
-			return new WP_Error( 'font_size_mismatch', sprintf( 'The file at %s is %d bytes, not the %d the index lists', $url, $length, (int) $expected['size'] ) );
+			return new WP_Error( 'font_size_mismatch', sprintf( 'The file at %s is %d bytes, not the %d the index lists', $subject, $length, (int) $expected['size'] ) );
 		}
 
 		if ( isset( $expected['sha256'] ) && ! hash_equals( (string) $expected['sha256'], (string) hash_file( 'sha256', $part ) ) ) {
-			return new WP_Error( 'font_hash_mismatch', sprintf( 'The file at %s does not match the hash the index lists', $url ) );
+			return new WP_Error( 'font_hash_mismatch', sprintf( 'The file at %s does not match the hash the index lists', $subject ) );
 		}
 
 		return null;
@@ -616,11 +621,15 @@ class Font_Downloader {
 	/**
 	 * A private temp name under the fonts directory, so the later `rename()` never crosses a filesystem
 	 *
+	 * Public because a `.part` is the font subsystem's temp-file protocol rather than this class's own: it is
+	 * swept by `Model_PDF::cleanup_tmp_dir()` and renamed by `Font_Installer::place()`, and the offline importer
+	 * writes one for a file it extracts instead of downloads.
+	 *
 	 * @return string|WP_Error
 	 *
 	 * @since 7.0
 	 */
-	protected function part_path( string $name ) {
+	public function part_path( string $name ) {
 		$dir = $this->get_tmp_dir();
 
 		if ( ! wp_mkdir_p( $dir ) ) {

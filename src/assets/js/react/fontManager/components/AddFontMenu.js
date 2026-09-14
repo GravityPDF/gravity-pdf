@@ -16,8 +16,9 @@ import { plus } from '@wordpress/icons';
  * `gfpdf_font_sources` appears here with nothing in this file changing — which is the whole reason the menu
  * carries no fixed "Browse language packs" item.
  *
- * The offline zip import belongs here too and is not built: §4.7 registers no route for it, so there is
- * nothing for the item to do that would not be a promise.
+ * The offline zip import belongs here too and is not built yet. `POST /fonts/import` now answers (§4.7), so
+ * what is left is the picker: an item in all three surfaces §4.6 names, the upload itself, and the host-cap
+ * guidance an over-`upload_max_filesize` zip comes back with.
  *
  * @param {Object}        props
  * @param {Array<Object>} props.sources  The registered source records

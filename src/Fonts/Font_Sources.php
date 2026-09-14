@@ -302,6 +302,19 @@ class Font_Sources {
 	}
 
 	/**
+	 * The `Font_Lock` name guarding one entry's files and rows
+	 *
+	 * Stated once for the reason `install_dir()` is: `Font_Installer` takes this name around an install and
+	 * `Font_Package_Importer` around the extraction of an offline archive, and the two only exclude each other
+	 * while both spell it identically — a drift that would not error, it would just stop locking.
+	 *
+	 * @since 7.0
+	 */
+	public static function entry_lock( string $source, string $entry ): string {
+		return sprintf( 'entry_%s_%s', $source, $entry );
+	}
+
+	/**
 	 * The font row one key of one entry describes, files aside
 	 *
 	 * The other half of the `coverage_meta()` contract: the two writers of source-installed rows —

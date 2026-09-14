@@ -7,6 +7,7 @@ namespace GFPDF\Rest;
 use GFPDF\Fonts\Registry;
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
+use GFPDF\Tests\Concerns\HasFontPackages;
 use GFPDF\Tests\Concerns\QueuesFontInstalls;
 
 /**
@@ -24,6 +25,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 
 	use HasCatalogRows;
 	use HasFontRows;
+	use HasFontPackages;
 	use QueuesFontInstalls;
 
 	/**
@@ -46,6 +48,10 @@ class Test_Rest_Font_Installs extends Test_Rest {
 	}
 
 	public function tear_down(): void {
+		$this->remove_packages();
+
+		\GPDFAPI::get_misc_class()->rmdir( $this->font_repository()->get_font_dir() . 'packs' );
+
 		$this->reset_queue();
 		$this->remove_font_rows();
 		$this->drop_catalog_rows();
@@ -164,6 +170,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 
 		$this->assertArrayHasKey( '/gravity-pdf/v1/fonts/status', $routes );
 		$this->assertArrayHasKey( '/gravity-pdf/v1/fonts/updates', $routes );
+		$this->assertArrayHasKey( '/gravity-pdf/v1/fonts/import', $routes );
 
 		$methods = wp_list_pluck( $routes[ '/gravity-pdf/v1' . Rest_Font_Entry_Base::ENTRY_ROUTE ], 'methods' );
 
@@ -176,6 +183,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 
 		$this->assertSame( 401, $this->get( '/fonts/status' )->get_status() );
 		$this->assertSame( 401, $this->post( '/fonts/updates' )->get_status() );
+		$this->assertSame( 401, $this->post( '/fonts/import' )->get_status() );
 		$this->assertSame( 401, $this->post( '/fonts/sources/packs/emoji' )->get_status() );
 	}
 
@@ -183,6 +191,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 		wp_set_current_user( self::$editor_id );
 
 		$this->assertSame( 403, $this->get( '/fonts/status' )->get_status() );
+		$this->assertSame( 403, $this->post( '/fonts/import' )->get_status() );
 		$this->assertSame( 403, $this->post( '/fonts/sources/packs/emoji' )->get_status() );
 		$this->assertSame( 403, $this->delete( '/fonts/sources/packs/emoji' )->get_status() );
 	}
@@ -483,5 +492,59 @@ class Test_Rest_Font_Installs extends Test_Rest {
 	public function test_deleting_an_unknown_entry_is_refused() {
 		$this->assertSame( 404, $this->delete( '/fonts/sources/nope/emoji' )->get_status() );
 		$this->assertSame( 404, $this->delete( '/fonts/sources/packs/nope' )->get_status() );
+	}
+
+	/**
+	 * One pack, seeded in the catalogue and packaged the way the pipeline packages it
+	 */
+	protected function seed_package(): string {
+		$this->seed_pack( 'emoji', [ 'entry_json' => (string) wp_json_encode( $this->package_entry() ) ] );
+
+		return $this->package_archive();
+	}
+
+	protected function upload( array $file ) {
+		return $this->post( '/fonts/import', [], [ 'file' => $file ] );
+	}
+
+	/**
+	 * The offline import ends where every other install ends: a batch, and the status map the manager polls. The
+	 * archive itself is `Test_Font_Package_Importer`'s subject.
+	 */
+	public function test_an_imported_package_queues_the_same_install_a_download_would() {
+		$archive = $this->seed_package();
+
+		$response = $this->upload(
+			[
+				'name'     => 'emoji-fonts-v1.0.0.zip',
+				'tmp_name' => $archive,
+				'error'    => UPLOAD_ERR_OK,
+				'size'     => filesize( $archive ),
+			]
+		);
+
+		$this->assertSame( 202, $response->get_status() );
+		$this->assertArrayHasKey( 'packs/emoji', (array) $response->get_data() );
+
+		/* The files are already there, so what the batch has left to do is rows */
+		$this->assertFileExists( $this->font_repository()->get_font_dir() . 'packs/emoji/Noto.ttf' );
+		$this->assertSame( [ 'Noto.ttf' ], array_column( $this->queued(), 'name' ) );
+	}
+
+	public function test_an_import_with_no_upload_is_refused() {
+		$response = $this->upload( [ 'error' => UPLOAD_ERR_NO_FILE ] );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'font_package_missing', $response->get_data()['code'] );
+	}
+
+	/**
+	 * The likeliest failure of all, and the one with advice attached: nine of the 17 packs are over a 2 MB cap
+	 */
+	public function test_an_upload_over_the_host_cap_says_so() {
+		$response = $this->upload( [ 'error' => UPLOAD_ERR_INI_SIZE ] );
+
+		$this->assertSame( 413, $response->get_status() );
+		$this->assertSame( 'font_package_too_large', $response->get_data()['code'] );
 	}
 }

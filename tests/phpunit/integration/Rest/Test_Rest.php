@@ -41,11 +41,16 @@ abstract class Test_Rest extends TestCase {
 	 *
 	 * On the base class because every REST suite needs it and three of them had already grown their own copy.
 	 */
-	protected function rest( string $method, string $route, array $params = [] ) {
+	protected function rest( string $method, string $route, array $params = [], array $files = [] ) {
 		$request = new WP_REST_Request( $method, '/gravity-pdf/v1' . $route );
 
 		foreach ( $params as $key => $value ) {
 			$request->set_param( $key, $value );
+		}
+
+		/* What `WP_REST_Server` fills from `$_FILES`, which a dispatched request cannot have */
+		if ( $files !== [] ) {
+			$request->set_file_params( $files );
 		}
 
 		return rest_do_request( $request );
@@ -55,8 +60,8 @@ abstract class Test_Rest extends TestCase {
 		return $this->rest( 'GET', $route, $params );
 	}
 
-	protected function post( string $route, array $params = [] ) {
-		return $this->rest( 'POST', $route, $params );
+	protected function post( string $route, array $params = [], array $files = [] ) {
+		return $this->rest( 'POST', $route, $params, $files );
 	}
 
 	protected function delete( string $route, array $params = [] ) {

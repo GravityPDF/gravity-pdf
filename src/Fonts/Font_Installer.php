@@ -185,18 +185,16 @@ class Font_Installer {
 	 * @since 7.0
 	 */
 	public function plan_for( string $id ) {
-		[ $source, $entry ] = Font_Sources::split( $id );
+		$data = $this->entry_data( $id );
 
-		$resolved = $this->resolve( $source, $entry );
-
-		if ( is_wp_error( $resolved ) ) {
-			return $this->checked( $resolved );
+		if ( is_wp_error( $data ) ) {
+			return $data;
 		}
 
-		$files = (array) ( $resolved['data']['files'] ?? [] );
+		$files = (array) ( $data['files'] ?? [] );
 		$plan  = [];
 
-		foreach ( $this->targets( $resolved['data'], [] ) as $name => $roles ) {
+		foreach ( $this->targets( $data, [] ) as $name => $roles ) {
 			$plan[ (string) $name ] = [
 				'size'  => (int) ( $files[ $name ]['size'] ?? 0 ),
 				'roles' => $roles,
@@ -204,6 +202,43 @@ class Font_Installer {
 		}
 
 		return $plan;
+	}
+
+	/**
+	 * Every file the entry vouches for, with the size and hash to check one against
+	 *
+	 * `plan_for()`'s sibling for a caller that already holds the bytes. It answers the entry's whole `files` map
+	 * rather than what an install would fetch, because an offline archive carries every variant the entry
+	 * publishes and each of them has to be checked before it is written — including the ones this site's default
+	 * install would never have downloaded.
+	 *
+	 * @return array<string, array>|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function entry_files( string $id ) {
+		$data = $this->entry_data( $id );
+
+		return is_wp_error( $data ) ? $data : (array) ( $data['files'] ?? [] );
+	}
+
+	/**
+	 * One entry's validated document, for the readers that want it by id
+	 *
+	 * The three public readers share this rather than each calling `resolve()`, so the `checked()` routing — the
+	 * re-sync a pruned file asks for, which that method's docblock argues cannot be the one path that misses it —
+	 * is a property of the prologue instead of a convention a fourth reader has to remember.
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function entry_data( string $id ) {
+		[ $source, $entry ] = Font_Sources::split( $id );
+
+		$resolved = $this->resolve( $source, $entry );
+
+		return is_wp_error( $resolved ) ? $this->checked( $resolved ) : (array) $resolved['data'];
 	}
 
 	/**
@@ -220,18 +255,16 @@ class Font_Installer {
 	 * @since 7.0
 	 */
 	public function files_for_installs( string $id, array $installs ) {
-		[ $source, $entry ] = Font_Sources::split( $id );
+		$data = $this->entry_data( $id );
 
-		$resolved = $this->resolve( $source, $entry );
-
-		if ( is_wp_error( $resolved ) ) {
-			return $this->checked( $resolved );
+		if ( is_wp_error( $data ) ) {
+			return $data;
 		}
 
 		$files = [];
 
 		foreach ( $installs as $install ) {
-			$files[] = array_map( 'strval', array_keys( $this->targets( $resolved['data'], (array) $install ) ) );
+			$files[] = array_map( 'strval', array_keys( $this->targets( $data, (array) $install ) ) );
 		}
 
 		return $files;
@@ -337,24 +370,12 @@ class Font_Installer {
 	}
 
 	/**
-	 * Take the entry's lock, or say who is holding it
-	 *
-	 * Installing a file and removing the entry contend for one name deliberately — a file landing while the rows
-	 * are being deleted is the window this closes — and that only holds while both spell the name identically, a
-	 * drift no test could catch. Returning the error rather than a bool keeps that spelling in one place too.
-	 *
 	 * @return string|WP_Error The name to release in a `finally`
 	 *
 	 * @since 7.0
 	 */
 	protected function lock_entry( string $source, string $entry ) {
-		$lock = sprintf( 'entry_%s_%s', $source, $entry );
-
-		if ( ! $this->lock->acquire( $lock, static::LOCK_TTL ) ) {
-			return new WP_Error( 'font_install_in_progress', sprintf( 'Another request is working on %s/%s', $source, $entry ) );
-		}
-
-		return $lock;
+		return $this->lock->acquire_entry( $source, $entry, static::LOCK_TTL );
 	}
 
 	/**
@@ -572,6 +593,35 @@ class Font_Installer {
 	}
 
 	/**
+	 * Take an entry document the caller already holds, so the source is never asked for it
+	 *
+	 * `fetch_entry()`'s memo is keyed by content hash rather than by entry id precisely so a document cannot be
+	 * the wrong one: a document that does not hash to what the catalog row names is simply not the entry being
+	 * offered, and is refused here rather than stored. That makes an offer as safe as the fetch it replaces, and
+	 * it is what keeps `POST /fonts/import` working on the site the feature exists for — one that cannot fetch
+	 * anything. An offline package embeds the entry file byte for byte (§4.3 Hosting), so it always has one.
+	 *
+	 * @return bool Whether the document was the entry the row names
+	 *
+	 * @since 7.0
+	 */
+	public function offer_entry( string $sha256, string $document ): bool {
+		if ( $sha256 === '' || ! hash_equals( $sha256, hash( 'sha256', $document ) ) ) {
+			return false;
+		}
+
+		$data = json_decode( $document, true );
+
+		if ( ! is_array( $data ) ) {
+			return false;
+		}
+
+		$this->fetched[ $sha256 ] = $data;
+
+		return true;
+	}
+
+	/**
 	 * @return array|WP_Error
 	 *
 	 * @since 7.0
@@ -702,17 +752,9 @@ class Font_Installer {
 			}
 		}
 
-		if ( ! wp_mkdir_p( dirname( $absolute ) ) ) {
-			return new WP_Error( 'font_dir_unwritable', sprintf( 'The directory for %s could not be created', $relative ) );
-		}
+		$moved = $this->repository->move_into_place( $part, $relative );
 
-		/* Same filesystem as `.tmp/`, so this is atomic: a reader sees the old file or the new one, never a partial */
-		/* phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- WP_Filesystem::move() copies and unlinks, which is exactly the non-atomic behaviour this avoids */
-		if ( ! rename( $part, $absolute ) ) {
-			return new WP_Error( 'font_rename_failed', sprintf( '%s could not be moved into place', $relative ) );
-		}
-
-		return $relative;
+		return is_wp_error( $moved ) ? $moved : $relative;
 	}
 
 	/**

@@ -233,6 +233,31 @@ class Catalog_Repository {
 	}
 
 	/**
+	 * The entry whose published offline archive is named `$name`, or null
+	 *
+	 * Identity by columns, not by anything inside the archive: the pipeline names a package `{entry}-{version}.zip`
+	 * (§4.3 Hosting) and `entry` and `version` are the two columns that spell it, so this is the one read that can
+	 * answer for a display entry too — those carry a pointer rather than an inlined entry object, and matching on
+	 * the embedded `package.path` would work for the 17 packs and for nothing else.
+	 *
+	 * Uncached and unindexed on purpose. It runs once per upload, which is a hand-driven admin action, and a
+	 * `CONCAT` the optimiser cannot use an index for is a table scan of a few thousand rows against caching a read
+	 * nobody repeats. The row it names is then read through `entry()`, which is cached.
+	 *
+	 * @since 7.0
+	 */
+	public function entry_for_package( string $name ): ?array {
+		global $wpdb;
+
+		$table = $this->schema->get_catalog_table();
+
+		/* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name comes from Font_Schema; one read per upload, and entry() caches the row it names */
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT source, entry FROM {$table} WHERE CONCAT(entry, '-', version, '.zip') = %s", $name ), ARRAY_A );
+
+		return is_array( $row ) ? $this->entry( (string) $row['source'], (string) $row['entry'] ) : null;
+	}
+
+	/**
 	 * Every coverage entry across every source
 	 *
 	 * What `Coverage_Resolver` and `Script_Detector` read: `always`, `scripts` and `languages` are columns, so

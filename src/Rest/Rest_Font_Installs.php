@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Rest;
 
 use GFPDF\Fonts\Catalog_Repository;
+use GFPDF\Fonts\Font_Package_Importer;
 use GFPDF\Fonts\Install_Requests;
 use GFPDF\Fonts\Font_Repository;
 use GFPDF\Fonts\Font_Sources;
@@ -31,8 +32,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * The counterpart to `Rest_Font_Sources`, which browses the catalogue and deliberately carries no installed state.
  * Everything here is about the font tables: what is installed, what is being installed, and what a POST asks the
- * background queue to install next. Nothing on these routes fetches a font — an install is queued, never performed
- * in-request, so a pack of seventeen files cannot time out an admin screen.
+ * background queue to install next. Nothing on these routes reaches the network — an install is queued, never
+ * performed in-request, so a pack of seventeen files cannot time out an admin screen. The offline import is no
+ * exception: it writes files an upload already carried, and then queues the same install.
  *
  * Source-generic like its counterpart: a coverage entry (a language pack) and a display entry (a catalogue family)
  * differ only in whether the caller may name the rows, and that is a column on the entry.
@@ -81,6 +83,12 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 	 */
 	protected $queue;
 
+	/**
+	 * @var Font_Package_Importer
+	 * @since 7.0
+	 */
+	protected $importer;
+
 	public function __construct(
 		Registry $registry,
 		Catalog_Repository $catalog,
@@ -88,6 +96,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		Install_Requests $requests,
 		Install_Queue $queue,
 		Font_Sources $sources,
+		Font_Package_Importer $importer,
 		Helper_Abstract_Form $gform
 	) {
 		$this->registry   = $registry;
@@ -96,6 +105,7 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 		$this->requests   = $requests;
 		$this->queue      = $queue;
 		$this->sources    = $sources;
+		$this->importer   = $importer;
 		$this->gform      = $gform;
 	}
 
@@ -122,6 +132,18 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'install_updates' ],
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
+				],
+			]
+		);
+
+		register_rest_route(
+			static::NAMESPACE,
+			'/fonts/import',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'import_package' ],
 					'permission_callback' => [ $this, 'create_item_permissions_check' ],
 				],
 			]
@@ -191,6 +213,90 @@ class Rest_Font_Installs extends Rest_Font_Entry_Base {
 			return $installs;
 		}
 
+		return $this->queued( $row, $installs );
+	}
+
+	/**
+	 * Install a catalogue entry from an offline package instead of from the store
+	 *
+	 * The import writes the files and nothing else; the install that follows is the one every other trigger runs,
+	 * so it answers in the same status map the Font Manager already polls. Every file is on disk and verified by
+	 * the time the queue reaches it, so the background pass downloads nothing — which is the point, on a site that
+	 * has an archive precisely because it cannot download.
+	 *
+	 * An entry the site already holds is an update: `on_record()` rewrites the installs it has, exactly as a
+	 * re-POST of the entry route would.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function import_package( $request ) {
+		$archive = $this->uploaded_archive( $request );
+
+		if ( is_wp_error( $archive ) ) {
+			return $archive;
+		}
+
+		$row = $this->importer->import( $archive );
+
+		if ( is_wp_error( $row ) ) {
+			return $row;
+		}
+
+		return $this->queued( $row, $this->requests->on_record( $row ) );
+	}
+
+	/**
+	 * The uploaded zip's path on this server, or why there is nothing to import
+	 *
+	 * Read where PHP left it rather than moved somewhere first: the importer only ever reads it, and every byte it
+	 * writes is checked against the catalogue, so a second copy of an archive that may be 6 MB would buy nothing.
+	 *
+	 * @return string|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function uploaded_archive( $request ) {
+		$file  = (array) ( $request->get_file_params()['file'] ?? [] );
+		$error = (int) ( $file['error'] ?? UPLOAD_ERR_NO_FILE );
+
+		/*
+		 * The host's own cap, and the one failure with advice attached: nine of the seventeen packs are over 2 MB
+		 * and the largest is 6 MB, so a low `upload_max_filesize` is the likeliest reason an import never starts.
+		 */
+		if ( $error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE ) {
+			return new WP_Error(
+				'font_package_too_large',
+				esc_html__( 'The font package is larger than this server accepts as an upload. Ask your host to raise the upload limit, or copy the font files into the fonts directory over FTP instead.', 'gravity-pdf' ),
+				[ 'status' => 413 ]
+			);
+		}
+
+		if ( $error !== UPLOAD_ERR_OK || ! is_file( (string) ( $file['tmp_name'] ?? '' ) ) ) {
+			return new WP_Error(
+				'font_package_missing',
+				esc_html__( 'No font package was uploaded.', 'gravity-pdf' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		return (string) $file['tmp_name'];
+	}
+
+	/**
+	 * Hand a set of installs to the queue and answer with what the entry is now doing
+	 *
+	 * Shared by the entry route and the import because the two differ only in where the bytes came from: past this
+	 * point an import is an install of an entry whose files happen to be on disk already.
+	 *
+	 * @param array[] $installs
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	protected function queued( array $row, array $installs ) {
 		$queued = $this->requests->queue( $row, $installs );
 
 		if ( is_wp_error( $queued ) ) {
