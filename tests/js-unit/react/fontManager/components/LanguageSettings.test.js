@@ -51,6 +51,17 @@ describe('Font Manager - applyOverrides()', () => {
 			rows: [{ code: 'th', font: '*', default_font: '*' }],
 		});
 	});
+
+	test('names an added row from the labels rather than leaving it as a code', () => {
+		const rows = applyOverrides(groups, { th: '*' }, { th: 'Thai' })[2]
+			.rows;
+
+		expect(rows[0].label).toBe('Thai');
+	});
+
+	test('falls back to the code when nothing has named it', () => {
+		expect(applyOverrides(groups, { th: '*' })[2].rows[0].label).toBe('th');
+	});
 });
 
 describe('Font Manager - derive()', () => {
@@ -126,6 +137,27 @@ describe('Font Manager - the language settings panel', () => {
 
 		expect(russian.hidden).toBe(false);
 		expect(greek.hidden).toBe(true);
+	});
+
+	test('adds a language by code, and draws the new row under its own name', async () => {
+		const user = userEvent.setup();
+
+		renderWithStore(<FontManager onActive={jest.fn()} />, {
+			hash: '#/fontmanager/settings',
+		});
+
+		await screen.findByText('Bundled · Arimo');
+
+		/* Three of the options read "Japanese", so the code is what tells them apart */
+		await user.selectOptions(screen.getByLabelText('Add a language'), 'ja');
+		await user.click(screen.getByRole('button', { name: 'Add' }));
+
+		/* The label span alone: the row's select repeats the name as its own hidden label */
+		expect(
+			within(languageRow('ja')).getByText('Japanese', {
+				selector: '.gfpdf-fm-language-label',
+			})
+		).toBeTruthy();
 	});
 
 	test('locks the auto-install toggle when the constant owns it', async () => {

@@ -936,11 +936,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		);
 		$font_installs_controller->init();
 
+		$font_settings_controller = new Rest\Rest_Font_Settings( $this->get_font_registry(), $this->options, $this->gform );
+		$font_settings_controller->init();
+
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $form_setting_controller );
 		$this->singleton->add_class( $download_pdf_controller );
 		$this->singleton->add_class( $font_sources_controller );
 		$this->singleton->add_class( $font_installs_controller );
+		$this->singleton->add_class( $font_settings_controller );
 
 		/* Log any errors for PDF endpoints */
 		$rest_request_after_callback = function ( $response, $handle, $request ) {

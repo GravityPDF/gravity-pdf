@@ -74,6 +74,27 @@ class Registry {
 	public const DEFAULT_LANGUAGE_MAP = [ 'und-latn' => self::BUNDLED_FONT ];
 
 	/**
+	 * "No font": leave whatever the document is already in alone
+	 *
+	 * Not a valid font key under `Font_Repository::KEY_PATTERN`, so it can never collide with one. It is both a
+	 * value an override may carry and the `language_map()` row's answer for a code no map routes, because the
+	 * settings screen has to draw "nothing routes this" as a choice an admin can make and unmake.
+	 *
+	 * @since 7.0
+	 */
+	public const LANGUAGE_NONE = '*';
+
+	/**
+	 * The shape of a language or script tag: `ja`, `zh-hant`, `und-arab`
+	 *
+	 * Deliberately not a list of the tags this plugin can name — `labels()` is the names it can *display*, and a
+	 * site writing in a language nobody has named yet still gets a map row and the OTL forms for it.
+	 *
+	 * @since 7.0
+	 */
+	public const TAG_PATTERN = '/^[a-z]{2,3}(-[a-z0-9]{2,4}){0,2}$/';
+
+	/**
 	 * Language or script tag => the document script it implies
 	 *
 	 * Anything not listed is Latin. Replaces mPDF's `mode`, which is a composite parser with a constructor font
@@ -156,6 +177,12 @@ class Registry {
 	 * @since 7.0
 	 */
 	protected $grouped;
+
+	/**
+	 * @var array{stamp: string, map: array}|null The bundled-plus-installed map this request has already built
+	 * @since 7.0
+	 */
+	protected $languages;
 
 	public function __construct(
 		Font_Repository $repository,
@@ -430,6 +457,18 @@ class Registry {
 	 * @since 7.0
 	 */
 	public function default_language_map(): array {
+		/*
+		 * Memoised because three callers of one request build it — `effective_language_map()` on the render path,
+		 * and `language_map()` plus `prune_language_overrides()` on the settings route — and each build sorts
+		 * every installed row through `rows_by_precedence()`. The stamp is the repository's alone: this map reads
+		 * font rows and nothing else.
+		 */
+		$stamp = $this->repository->get_last_changed();
+
+		if ( $this->languages !== null && $this->languages['stamp'] === $stamp ) {
+			return $this->languages['map'];
+		}
+
 		$installed = [];
 
 		foreach ( $this->rows_by_precedence() as $font_key => $row ) {
@@ -442,7 +481,12 @@ class Registry {
 			}
 		}
 
-		return array_merge( static::DEFAULT_LANGUAGE_MAP, $installed );
+		$this->languages = [
+			'stamp' => $stamp,
+			'map'   => array_merge( static::DEFAULT_LANGUAGE_MAP, $installed ),
+		];
+
+		return $this->languages['map'];
 	}
 
 	/**
@@ -523,7 +567,7 @@ class Registry {
 		foreach ( $overrides as $code => $font_key ) {
 			$code = strtolower( (string) $code );
 
-			if ( $font_key === '*' ) {
+			if ( $font_key === static::LANGUAGE_NONE ) {
 				unset( $map[ $code ] );
 				continue;
 			}
@@ -534,6 +578,185 @@ class Registry {
 		}
 
 		return $map;
+	}
+
+	/**
+	 * The two maps as the settings screen reads them: one row per code, grouped by the font that answers for it
+	 *
+	 * Built on demand by `GET /fonts/settings` alone and never on the render path — it walks the catalogue for
+	 * labels, which the render must not. "Changed" is not a flag: it is `font !== default_font`, so there is one
+	 * fact rather than two that can disagree.
+	 *
+	 * Grouping is `get_grouped_fonts()`'s, keyed by the row's *default* font rather than its current one, so a code
+	 * moved to another font stays filed under the pack that claimed it and an admin can see what they changed it
+	 * from. Anything the default map does not route — an override-only row, and the codes a 6.x upgrade adopted
+	 * along with its own fonts — groups under "Other languages", which is also the only group whose rows can be
+	 * removed outright.
+	 *
+	 * @return array[] `[ { group, label, rows: [ { code, label, default_font, font } ] } ]`
+	 *
+	 * @since 7.0
+	 */
+	public function language_map(): array {
+		$default   = $this->default_language_map();
+		$effective = $this->effective_language_map();
+		$labels    = Language_To_Font::labels();
+		$fonts     = $this->get_grouped_fonts();
+
+		$owner  = [];
+		$groups = [
+			'bundled' => [
+				'group' => 'bundled',
+				/* translators: %s: the bundled font's name, e.g. Arimo */
+				'label' => sprintf( __( 'Bundled · %s', 'gravity-pdf' ), (string) ( $fonts['bundled'][0]['label'] ?? '' ) ),
+				'rows'  => [],
+			],
+		];
+
+		foreach ( $fonts['bundled'] as $font ) {
+			$owner[ $font['id'] ] = 'bundled';
+		}
+
+		foreach ( $fonts['groups'] as $group ) {
+			$id = $group['source'] . '/' . $group['entry'];
+
+			$groups[ $id ] = [
+				'group' => $id,
+				'label' => (string) $group['label'],
+				'rows'  => [],
+			];
+
+			foreach ( $group['fonts'] as $font ) {
+				$owner[ $font['id'] ] = $id;
+			}
+		}
+
+		$groups['other'] = [
+			'group' => 'other',
+			'label' => __( 'Other languages', 'gravity-pdf' ),
+			'rows'  => [],
+		];
+
+		foreach ( array_keys( $default + $effective ) as $code ) {
+			$code     = (string) $code;
+			$fallback = $default[ $code ] ?? static::LANGUAGE_NONE;
+
+			$groups[ $owner[ $fallback ] ?? 'other' ]['rows'][] = [
+				'code'         => $code,
+				'label'        => $labels[ $code ] ?? $code,
+				'default_font' => $fallback,
+				'font'         => $effective[ $code ] ?? static::LANGUAGE_NONE,
+			];
+		}
+
+		$map = [];
+
+		foreach ( $groups as $group ) {
+			if ( $group['rows'] === [] ) {
+				continue;
+			}
+
+			/* The codes arrive in whatever order the entries listed them, which is no order at all to read in */
+			usort(
+				$group['rows'],
+				static function ( array $a, array $b ): int {
+					return strcmp( $a['label'], $b['label'] );
+				}
+			);
+
+			$map[] = $group;
+		}
+
+		return $map;
+	}
+
+	/**
+	 * What a script name resolves to in mPDF, or null when nothing does
+	 *
+	 * The one owner of the `document_script` vocabulary. It is stored as the bare name, `LATIN`, because that is
+	 * what an admin picks from a list — `SCRIPT_` is mPDF's spelling, not theirs — but either spelling resolves,
+	 * since the option is reachable by WP-CLI and by an add-on calling `GPDFAPI::update_plugin_option()`, neither
+	 * of which passes the route that canonicalises it.
+	 *
+	 * @since 7.0
+	 */
+	public static function script_constant( string $name ): ?int {
+		$name = 'SCRIPT_' . preg_replace( '/^SCRIPT_/', '', strtoupper( trim( $name ) ) );
+
+		return defined( Ucdn::class . '::' . $name ) ? (int) constant( Ucdn::class . '::' . $name ) : null;
+	}
+
+	/**
+	 * The script names a document may be declared to be in, most common first
+	 *
+	 * Sent to the Font Manager by `GET /fonts/settings` rather than spelled again in the client: mPDF defines
+	 * around a hundred scripts and this is the shortlist worth offering, which is a judgement, not a constant of
+	 * the library — so it belongs on one side of the wire only.
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	public static function scripts(): array {
+		return [
+			'LATIN',
+			'GREEK',
+			'CYRILLIC',
+			'ARABIC',
+			'HEBREW',
+			'DEVANAGARI',
+			'BENGALI',
+			'THAI',
+			'HAN',
+			'HIRAGANA',
+			'KATAKANA',
+			'HANGUL',
+		];
+	}
+
+	/**
+	 * The overrides worth storing: the ones that change what the default map already says
+	 *
+	 * `effective_language_map()`'s write-side counterpart, and deliberately next to it — the read side obeys every
+	 * override it can, this side stores only the ones that do something, and the two share what "can" means
+	 * through `registered_keys()`. Here rather than on the route that posts them because an override map is a fact
+	 * about the language map: the upgrade routine, a repair pass and WP-CLI all have to be able to write one
+	 * without restating the rule.
+	 *
+	 * An override naming a font this site has not registered is dropped, so a since-deleted font falls through to
+	 * the default rather than being obeyed into mPDF's substitution. `LANGUAGE_NONE` survives that test, since its
+	 * whole job is to name no font — but only where it removes something, because asking for the state a code is
+	 * already in is not a setting.
+	 *
+	 * @return array<string, string> Lowercased code => font key
+	 *
+	 * @since 7.0
+	 */
+	public function prune_language_overrides( array $overrides ): array {
+		$default    = $this->default_language_map();
+		$registered = $this->registered_keys();
+		$pruned     = [];
+
+		foreach ( $overrides as $code => $font_key ) {
+			$code     = strtolower( trim( (string) $code ) );
+			$font_key = (string) $font_key;
+
+			if ( preg_match( static::TAG_PATTERN, $code ) !== 1 ) {
+				continue;
+			}
+
+			if ( $font_key !== static::LANGUAGE_NONE && ! isset( $registered[ $font_key ] ) ) {
+				continue;
+			}
+
+			if ( $font_key === ( $default[ $code ] ?? static::LANGUAGE_NONE ) ) {
+				continue;
+			}
+
+			$pruned[ $code ] = $font_key;
+		}
+
+		return $pruned;
 	}
 
 	/**
@@ -549,7 +772,7 @@ class Registry {
 	public function get_default_font( array $settings = [] ): string {
 		$registered = $this->registered_keys();
 
-		foreach ( [ $settings['font'] ?? '', $this->options->get_option( 'default_font', '' ) ] as $candidate ) {
+		foreach ( [ static::setting( $settings, 'font' ), $this->options->get_option( 'default_font', '' ) ] as $candidate ) {
 			$candidate = (string) $candidate;
 
 			if ( $candidate === '' ) {
@@ -586,9 +809,27 @@ class Registry {
 	 * @since 7.0
 	 */
 	public function get_document_language( array $settings = [] ): string {
-		$per_pdf = (string) ( $settings['pdf_language'] ?? '' );
+		$per_pdf = static::setting( $settings, 'pdf_language' );
 
 		return $per_pdf !== '' ? $per_pdf : $this->get_default_language();
+	}
+
+	/**
+	 * One PDF setting, or `''` where it is anything but a string
+	 *
+	 * A PDF's settings array reaches these readers straight off the save, where an unanswered `select` is written
+	 * as `[]` rather than `''` (`Model_Form_Settings::settings_sanitize()`), and both of the keys read here are
+	 * selects. Casting an array to a string is a warning and a nonsense value; "not set" is what it means.
+	 *
+	 * Public because `Coverage_Resolver` reads `font` raw — it wants the key the admin asked for, not the one
+	 * `get_default_font()` would fall back to — and needs the same tolerance to do it.
+	 *
+	 * @since 7.0
+	 */
+	public static function setting( array $settings, string $key ): string {
+		$value = $settings[ $key ] ?? '';
+
+		return is_string( $value ) ? $value : '';
 	}
 
 	/**
@@ -600,10 +841,10 @@ class Registry {
 	 * @since 7.0
 	 */
 	public function get_document_script( array $settings = [] ): int {
-		$override = (string) $this->options->get_option( 'document_script', '' );
+		$override = static::script_constant( (string) $this->options->get_option( 'document_script', '' ) );
 
-		if ( $override !== '' && defined( Ucdn::class . '::' . $override ) ) {
-			return (int) constant( Ucdn::class . '::' . $override );
+		if ( $override !== null ) {
+			return $override;
 		}
 
 		$language = strtolower( $this->get_document_language( $settings ) );

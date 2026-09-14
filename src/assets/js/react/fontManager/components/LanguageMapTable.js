@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { Button, SelectControl } from '@wordpress/components';
 import { memo, useMemo } from '@wordpress/element';
 import { rotateLeft, trash } from '@wordpress/icons';
+import { LANGUAGE_NONE } from '../constants';
 
 /**
  * The effective language map, one row per code
@@ -40,7 +41,7 @@ export default function LanguageMapTable({
 		() => [
 			{
 				label: __('Document font (leave as is)', 'gravity-pdf'),
-				value: '*',
+				value: LANGUAGE_NONE,
 			},
 			...fonts.map((font) => ({
 				label: font.label,

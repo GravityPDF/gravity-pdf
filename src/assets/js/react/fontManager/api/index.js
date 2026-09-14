@@ -8,55 +8,33 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { API_ROOT, ROLES } from '../constants';
-import { mockMiddleware, mockOnly } from './mock';
+import { mockMiddleware } from './mock';
 
 /**
  * Every request the Font Manager makes
  *
- * One module so the fixtures have a single seam: nothing else in the UI knows which routes the site answers and
- * which it does not. Every function below speaks to the real path either way.
+ * One module so the Jest fixtures have a single seam: no component knows whether it is talking to the site or to
+ * `./mock`, because every function below names the real path either way.
  *
  * @since 7.0
  */
-
-/**
- * The `/fonts` routes the plugin does not serve yet
- *
- * `/fonts/settings` is Phase 6 (the language settings panel), so the Language tab reads fixtures while the rest of
- * the manager talks to the site. When that route lands this array empties and the whole of `./mock` goes with it.
- *
- * @since 7.0
- */
-const PENDING_ROUTES = ['/fonts/settings'];
 
 let registered = false;
 
 /**
- * Serve the routes the site cannot answer yet from the in-browser fixtures
- *
- * @since 7.0
- */
-export function enablePendingRoutes() {
-	register(mockOnly(PENDING_ROUTES));
-}
-
-/**
  * Serve every `/fonts` route from the fixtures
  *
- * The Jest suite's seam: a component test standing up REST fixtures would be testing WordPress.
+ * The Jest suite's seam: a component test standing up REST fixtures would be testing WordPress. The flag is
+ * load-bearing — `renderWithStore()` calls this on every render, and `apiFetch` has no way to remove one.
  *
  * @since 7.0
  */
 export function enableMockApi() {
-	register(mockMiddleware);
-}
-
-function register(middleware) {
 	if (registered) {
 		return;
 	}
 
-	apiFetch.use(middleware);
+	apiFetch.use(mockMiddleware);
 	registered = true;
 }
 

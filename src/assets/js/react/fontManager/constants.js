@@ -27,6 +27,16 @@ export const API_ROOT = '/gravity-pdf/v1/fonts';
 export const OVERLAY_ID = 'font-manager-overlay';
 
 /**
+ * "No font": leave whatever the document is already in alone
+ *
+ * `Registry::LANGUAGE_NONE` on the other side of the wire, where it is also what a language row carries when
+ * nothing routes its code. Not a valid font key, so it can never collide with one.
+ *
+ * @since 7.0
+ */
+export const LANGUAGE_NONE = '*';
+
+/**
  * The four faces, in the order every list in the UI shows them
  *
  * `id` is the file row's `role`, which is what every read speaks. `field` is the 6.x name the custom-font

@@ -332,9 +332,13 @@ class Test_Registry extends TestCase {
 	public function test_the_document_script_setting_overrides_the_language() {
 		$options = GPDFAPI::get_options_class();
 		$options->update_option( 'default_pdf_language', 'en' );
-		$options->update_option( 'document_script', 'SCRIPT_THAI' );
 
-		$this->assertSame( Ucdn::SCRIPT_THAI, $this->registry->get_document_script() );
+		/* What the Font Manager stores, and what mPDF itself calls the same script */
+		foreach ( [ 'THAI', 'SCRIPT_THAI' ] as $stored ) {
+			$options->update_option( 'document_script', $stored );
+
+			$this->assertSame( Ucdn::SCRIPT_THAI, $this->registry->get_document_script(), $stored );
+		}
 	}
 
 	public function test_a_per_pdf_language_beats_the_global_one() {
@@ -493,5 +497,202 @@ class Test_Registry extends TestCase {
 			],
 			$this->registry->missing_always_entries()
 		);
+	}
+
+	/**
+	 * The settings screen's view of the map, keyed by group id
+	 *
+	 * @return array<string, array>
+	 */
+	protected function language_map(): array {
+		return array_column( $this->registry->language_map(), null, 'group' );
+	}
+
+	/**
+	 * One group's rows, keyed by language code
+	 *
+	 * @return array<string, array>
+	 */
+	protected function rows_of( string $group ): array {
+		return array_column( $this->language_map()[ $group ]['rows'] ?? [], null, 'code' );
+	}
+
+	public function test_a_fresh_site_maps_one_code_and_files_it_under_the_bundled_font() {
+		$map = $this->registry->language_map();
+
+		$this->assertCount( 1, $map );
+		$this->assertSame( 'bundled', $map[0]['group'] );
+		$this->assertSame( 'Bundled · Arimo', $map[0]['label'] );
+		$this->assertSame(
+			[
+				'code'         => 'und-latn',
+				'label'        => 'Latin script',
+				'default_font' => 'gfpdf-arimo',
+				'font'         => 'gfpdf-arimo',
+			],
+			$map[0]['rows'][0]
+		);
+	}
+
+	public function test_an_installed_packs_codes_group_under_the_pack_that_claims_them() {
+		$this->install_pack( 'japanese', 'notosansjp', [ 'ja', 'jpn' ] );
+
+		$rows = $this->rows_of( 'packs/japanese' );
+
+		$this->assertSame( [ 'ja', 'jpn' ], array_keys( $rows ) );
+		$this->assertSame( 'Japanese', $rows['ja']['label'] );
+		$this->assertSame( 'notosansjp', $rows['ja']['default_font'] );
+		$this->assertSame( 'notosansjp', $rows['ja']['font'] );
+
+		/* The pack's group label, not the font's: one label source with the sidebar (§4.4) */
+		$this->assertSame( 'Japanese', $this->language_map()['packs/japanese']['label'] );
+	}
+
+	public function test_an_override_moves_the_font_but_not_the_group() {
+		$this->install_pack( 'japanese', 'notosansjp', [ 'ja' ] );
+		$this->install( 'brandsans' );
+
+		GPDFAPI::get_options_class()->update_option( 'font_language_overrides', [ 'ja' => 'brandsans' ] );
+
+		$row = $this->rows_of( 'packs/japanese' )['ja'];
+
+		$this->assertSame( 'notosansjp', $row['default_font'] );
+		$this->assertSame( 'brandsans', $row['font'] );
+	}
+
+	public function test_a_code_overridden_to_the_sentinel_reads_as_no_font_rather_than_vanishing() {
+		$this->install_pack( 'japanese', 'notosansjp', [ 'ja' ] );
+
+		GPDFAPI::get_options_class()->update_option( 'font_language_overrides', [ 'ja' => '*' ] );
+
+		$row = $this->rows_of( 'packs/japanese' )['ja'];
+
+		$this->assertSame( 'notosansjp', $row['default_font'] );
+		$this->assertSame( '*', $row['font'] );
+	}
+
+	public function test_a_code_no_map_routes_becomes_an_other_row_with_no_default() {
+		$this->install( 'brandsans' );
+
+		GPDFAPI::get_options_class()->update_option( 'font_language_overrides', [ 'sw' => 'brandsans' ] );
+
+		$this->assertSame(
+			[
+				'code'         => 'sw',
+				'label'        => 'Swahili',
+				'default_font' => '*',
+				'font'         => 'brandsans',
+			],
+			$this->rows_of( 'other' )['sw']
+		);
+	}
+
+	public function test_the_codes_a_6x_upgrade_adopted_group_with_the_override_only_rows() {
+		$this->install( 'unbatang', [ 'source' => 'imported', 'meta' => [ 'legacy' => true, 'languages' => [ 'ko' ] ] ] );
+
+		$this->assertSame( 'unbatang', $this->rows_of( 'other' )['ko']['default_font'] );
+	}
+
+	public function test_a_code_no_label_names_falls_back_to_the_code_itself() {
+		$this->install( 'brandsans', [ 'meta' => [ 'languages' => [ 'xx-zz' ] ] ] );
+
+		$this->assertSame( 'xx-zz', $this->rows_of( 'other' )['xx-zz']['label'] );
+	}
+
+	public function test_rows_are_ordered_by_name_rather_than_by_the_order_the_entry_listed_them() {
+		$this->install_pack( 'west-asian', 'notosanssyriac', [ 'syr', 'hy', 'ka' ] );
+
+		$this->assertSame(
+			[ 'Armenian', 'Georgian', 'Syriac' ],
+			array_column( $this->language_map()['packs/west-asian']['rows'], 'label' )
+		);
+	}
+
+	public function test_a_group_with_no_codes_is_left_out_entirely() {
+		$this->install_pack( 'popular-sans', 'roboto' );
+
+		$this->assertArrayNotHasKey( 'packs/popular-sans', $this->language_map() );
+	}
+
+	public function test_an_override_naming_a_font_that_is_gone_leaves_the_row_on_its_default() {
+		$this->install_pack( 'japanese', 'notosansjp', [ 'ja' ] );
+
+		GPDFAPI::get_options_class()->update_option( 'font_language_overrides', [ 'ja' => 'deletedfont' ] );
+
+		$this->assertSame( 'notosansjp', $this->rows_of( 'packs/japanese' )['ja']['font'] );
+	}
+
+	/**
+	 * The one code set that is knowable without a catalogue: what a 6.x upgrade adopts off disk
+	 *
+	 * A pack claiming a code no label names degrades to the raw code, which is the right failure and is pinned
+	 * above. This set cannot degrade quietly, because it is frozen in the repository and can be checked.
+	 */
+	public function test_every_language_a_6x_upgrade_carries_has_a_name() {
+		$labels  = Language_To_Font::labels();
+		$unnamed = [];
+
+		foreach ( Legacy_Installer_Files::FAMILIES as $family ) {
+			foreach ( (array) ( $family['languages'] ?? [] ) as $code ) {
+				if ( ! isset( $labels[ strtolower( (string) $code ) ] ) ) {
+					$unnamed[] = $code;
+				}
+			}
+		}
+
+		$this->assertSame( [], array_values( array_unique( $unnamed ) ) );
+	}
+
+	/**
+	 * A 6.x site has years of these on disk: until 2026-09-15 `settings_sanitize()` wrote `[]` for any unanswered
+	 * select, so the readers have to survive one even though nothing writes one any more
+	 */
+	public function test_a_pdf_setting_stored_as_an_empty_array_reads_as_no_choice() {
+		$this->install( 'brandsans' );
+
+		GPDFAPI::get_options_class()->update_option( 'default_pdf_language', 'ja' );
+
+		$this->assertSame( Registry::BUNDLED_FONT, $this->registry->get_default_font( [ 'font' => [] ] ) );
+		$this->assertSame( 'ja', $this->registry->get_document_language( [ 'pdf_language' => [] ] ) );
+	}
+
+	/**
+	 * `switch_to_locale()` is how a notification email renders in the recipient's language, and it moves what
+	 * `determine_locale()` answers — driven here through the filter that function consults, since the real call
+	 * refuses a locale with no translations installed and the test environment has none
+	 */
+	public function test_the_label_table_is_rebuilt_when_the_locale_changes() {
+		$french    = static function () {
+			return 'fr_FR';
+		};
+		$translate = static function ( $translation, $text, $domain ) {
+			return $domain === 'gravity-pdf' && determine_locale() === 'fr_FR' ? 'fr:' . $text : $translation;
+		};
+
+		add_filter( 'gettext', $translate, 10, 3 );
+
+		$before = Language_To_Font::labels()['ja'];
+
+		add_filter( 'pre_determine_locale', $french );
+		$after = Language_To_Font::labels()['ja'];
+		remove_filter( 'pre_determine_locale', $french );
+
+		remove_filter( 'gettext', $translate, 10 );
+
+		/* A memo keyed on anything but the locale hands the email the site's own language instead */
+		$this->assertSame( 'Japanese', $before );
+		$this->assertSame( 'fr:Japanese', $after );
+	}
+
+	public function test_every_label_is_a_string_keyed_by_a_lowercase_code() {
+		$labels = Language_To_Font::labels();
+
+		$this->assertSame( 'Japanese', $labels['ja'] );
+		$this->assertSame( 'Han (Simplified)', $labels['und-hans'] );
+
+		foreach ( $labels as $code => $label ) {
+			$this->assertSame( strtolower( (string) $code ), (string) $code );
+			$this->assertNotSame( '', $label );
+		}
 	}
 }

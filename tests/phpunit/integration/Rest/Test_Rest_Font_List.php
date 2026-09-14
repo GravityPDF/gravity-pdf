@@ -329,15 +329,4 @@ class Test_Rest_Font_List extends Test_Rest {
 		$this->assertSame( 'font_has_no_styles', $response->get_data()['code'] );
 	}
 
-	/**
-	 * @param array $data
-	 *
-	 * @return string[]
-	 */
-	protected function sorted_keys( array $data ): array {
-		$keys = array_keys( $data );
-		sort( $keys );
-
-		return $keys;
-	}
 }

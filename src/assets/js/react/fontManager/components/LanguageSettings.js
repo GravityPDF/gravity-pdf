@@ -16,33 +16,9 @@ import {
 } from '@wordpress/components';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { STORE_NAME } from '../constants';
+import { LANGUAGE_NONE, STORE_NAME } from '../constants';
 import DetailHeader from './DetailHeader';
 import LanguageMapTable from './LanguageMapTable';
-
-/**
- * The scripts a document can be declared to be in
- *
- * mPDF's own `Ucdn::SCRIPT_*` names; the blank option is "derive it from the document language", which is what
- * every site wants until one does not.
- *
- * @since 7.0
- */
-const SCRIPTS = [
-	'',
-	'LATIN',
-	'GREEK',
-	'CYRILLIC',
-	'ARABIC',
-	'HEBREW',
-	'DEVANAGARI',
-	'BENGALI',
-	'THAI',
-	'HAN',
-	'HIRAGANA',
-	'KATAKANA',
-	'HANGUL',
-];
 
 /**
  * Advanced → Language settings
@@ -88,15 +64,24 @@ export default function LanguageSettings({ onBack }) {
 	}, [settings]);
 
 	const groups = useMemo(
-		() => applyOverrides(settings?.language_map ?? [], overrides),
+		() =>
+			applyOverrides(
+				settings?.language_map ?? [],
+				overrides,
+				settings?.labels ?? {}
+			),
 		[settings, overrides]
 	);
 
+	/*
+	 * The code is part of the option text, not a hint: mPDF keys the same language under two and three letters and
+	 * again as a script, so three of these options read "Japanese" and only the code says which row each one adds.
+	 */
 	const languages = useMemo(
 		() =>
 			Object.entries(settings?.labels ?? {}).map(([code, label]) => ({
 				value: code,
-				label,
+				label: `${label} (${code})`,
 			})),
 		[settings?.labels]
 	);
@@ -191,12 +176,19 @@ export default function LanguageSettings({ onBack }) {
 							'gravity-pdf'
 						)}
 						value={draft.document_script}
-						options={SCRIPTS.map((script) => ({
-							value: script,
-							label:
-								script ||
-								__('Derive automatically', 'gravity-pdf'),
-						}))}
+						options={[
+							{
+								value: '',
+								label: __(
+									'Derive automatically',
+									'gravity-pdf'
+								),
+							},
+							...(settings.scripts ?? []).map((script) => ({
+								value: script,
+								label: script,
+							})),
+						]}
 						onChange={(value) =>
 							setDraft({ ...draft, document_script: value })
 						}
@@ -260,7 +252,7 @@ export default function LanguageSettings({ onBack }) {
 								onClick={() => {
 									setOverrides((previous) => ({
 										...previous,
-										[adding]: '*',
+										[adding]: LANGUAGE_NONE,
 									}));
 									setAdding('');
 								}}
@@ -314,16 +306,18 @@ export default function LanguageSettings({ onBack }) {
  * Fold the unsaved edits into the map the server sent
  *
  * A code the server never listed becomes an "Other languages" row, which is how "Add a language" shows up
- * before there is anything to save.
+ * before there is anything to save. Such a row is named from the same `labels` map the select picked it out of,
+ * so it does not read as a bare code until the save round-trips it.
  *
  * @param {Array<Object>} groups
  * @param {Object}        overrides
+ * @param {Object}        labels    Code to display name, as `GET /fonts/settings` sent it
  *
  * @return {Array<Object>} The map as the table should draw it
  *
  * @since 7.0
  */
-export function applyOverrides(groups, overrides) {
+export function applyOverrides(groups, overrides, labels = {}) {
 	const known = new Set(
 		groups.flatMap((group) => group.rows.map((row) => row.code))
 	);
@@ -346,8 +340,8 @@ export function applyOverrides(groups, overrides) {
 	const other = merged.find((group) => group.group === 'other');
 	const rows = added.map((code) => ({
 		code,
-		label: code,
-		default_font: '*',
+		label: labels[code] ?? code,
+		default_font: LANGUAGE_NONE,
 		font: overrides[code],
 	}));
 

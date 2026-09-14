@@ -20,15 +20,13 @@ import {
 import { PER_PAGE, ROLES } from '../../constants';
 
 /**
- * A stand-in for the `/fonts` routes that do not exist yet
+ * A stand-in for the whole `/fonts` namespace, for the Jest suite alone
  *
- * Registered as an `apiFetch` middleware, so every component and resolver calls the real path it will keep
- * calling afterwards and this file is the only thing that gets deleted. Requests to anything else fall
- * straight through.
+ * Registered as an `apiFetch` middleware, so every component and resolver calls the real path it calls in the
+ * browser and no component knows this file exists. Requests to anything else fall straight through.
  *
- * The plugin now serves all of these but `/fonts/settings`, which is Phase 6, so the app registers `mockOnly()`
- * for that one path and the site answers the rest. The full table stays because the Jest suite runs against it:
- * a component test that had to stand up REST fixtures would be testing WordPress.
+ * The plugin now serves every route in the table — this is the test seam, not a shim: a component test that had
+ * to stand up REST fixtures would be testing WordPress.
  *
  * @since 7.0
  */
@@ -68,23 +66,6 @@ const ROUTES = [
  * @since 7.0
  */
 export function mockMiddleware(options, next) {
-	return serve(options, next, null);
-}
-
-/**
- * A middleware that answers only the paths named, and lets the site answer everything else
- *
- * @param {Array} paths Route paths to serve, e.g. `['/fonts/settings']`
- *
- * @return {Function} An `apiFetch` middleware
- *
- * @since 7.0
- */
-export function mockOnly(paths) {
-	return (options, next) => serve(options, next, paths);
-}
-
-function serve(options, next, only) {
 	const url = options.path ?? '';
 
 	if (!url.startsWith('/gravity-pdf/v1/fonts')) {
@@ -92,10 +73,6 @@ function serve(options, next, only) {
 	}
 
 	const [path, query = ''] = url.slice('/gravity-pdf/v1'.length).split('?');
-
-	if (only && !only.some((prefix) => path.startsWith(prefix))) {
-		return next(options);
-	}
 
 	const method = (options.method ?? 'GET').toUpperCase();
 
@@ -500,6 +477,7 @@ function readSettings() {
 		...state.settings,
 		language_map: languageMap(),
 		labels: LANGUAGE_LABELS,
+		scripts: SCRIPTS,
 	};
 }
 
@@ -520,6 +498,9 @@ function writeSettings({ data }) {
 }
 
 /* --- helpers --- */
+
+/* A shortlist, like `Registry::scripts()`: enough to prove the select is built from the payload */
+const SCRIPTS = ['LATIN', 'GREEK', 'CYRILLIC', 'ARABIC', 'HAN'];
 
 const LANGUAGE_LABELS = {
 	ar: 'Arabic',

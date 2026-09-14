@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import { createRoot } from '@wordpress/element';
 import { dispatch, select, subscribe } from '@wordpress/data';
 import { OVERLAY_ID, STORE_NAME } from './constants';
-import { enablePendingRoutes } from './api';
 import { registerFontStore } from './store';
 import FontManager from './components/FontManager';
 import ManageFontsButton from './components/ManageFontsButton';
@@ -29,9 +28,6 @@ import './style.pcss';
  *
  * @since 7.0
  */
-
-/* PHASE 6: `/fonts/settings` has no route yet, so the Language tab alone reads fixtures. See `./api`. */
-enablePendingRoutes();
 
 const ANCHORS = [
 	'#gfpdf-settings-field-wrapper-default_font select',

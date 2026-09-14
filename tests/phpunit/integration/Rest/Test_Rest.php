@@ -56,6 +56,18 @@ abstract class Test_Rest extends TestCase {
 		return rest_do_request( $request );
 	}
 
+	/**
+	 * A response body's keys in a fixed order, so a shape assertion does not depend on the order fields were added
+	 *
+	 * @return string[]
+	 */
+	protected function sorted_keys( array $data ): array {
+		$keys = array_keys( $data );
+		sort( $keys );
+
+		return $keys;
+	}
+
 	protected function get( string $route, array $params = [] ) {
 		return $this->rest( 'GET', $route, $params );
 	}

@@ -52,6 +52,22 @@ trait HasCatalogRows {
 	}
 
 	/**
+	 * A coverage entry with one installed font claiming the codes named
+	 *
+	 * The two halves have to agree or the entry is invisible: the catalog row is what gives the group its label
+	 * and its place in the order, the font row is what puts anything in it. Consumers must also use `HasFontRows`.
+	 *
+	 * @param string[] $languages Language and script codes the font answers for
+	 *
+	 * @return int The font row's id
+	 */
+	protected function install_pack( string $entry, string $font_key, array $languages = [], array $overrides = [] ): int {
+		$this->insert_catalog_row( 'packs', $entry, $overrides + [ 'coverage' => 1 ] );
+
+		return $this->install_entry_row( $font_key, $entry, [ 'meta' => [ 'languages' => $languages ] ] );
+	}
+
+	/**
 	 * Remove every catalog row this test wrote
 	 */
 	protected function drop_catalog_rows(): void {

@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Fonts\Language_To_Font;
 use WP_Error;
 
 /**
@@ -555,6 +556,16 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc' => __( 'Script like Arabic, Hebrew, Syriac (and many others) are written right to left.', 'gravity-pdf' ),
 						'type' => 'toggle',
 						'std'  => $this->get_option( 'default_rtl', '0' ),
+					],
+
+					'pdf_language'    => [
+						'id'      => 'pdf_language',
+						'name'    => esc_html__( 'Document Language', 'gravity-pdf' ),
+						'desc'    => __( 'What this PDF is written in. Text in any other language or script is matched to a font by the language settings in the Font Manager.', 'gravity-pdf' ),
+						'type'    => 'select',
+						'options' => [ '' => esc_html__( 'Use the global setting', 'gravity-pdf' ) ] + Language_To_Font::labels(),
+						'std'     => '',
+						'tooltip' => '<h6>' . esc_html__( 'Document Language', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Runs of text in this language are never re-tagged, so the font you chose above renders them and picks that language\'s letterforms where the font carries them.', 'gravity-pdf' ),
 					],
 
 				]

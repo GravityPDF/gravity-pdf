@@ -95,8 +95,8 @@ class Coverage_Resolver {
 	 *
 	 * The language goes through `Registry`, so a PDF naming none still asks for the site's — `default_pdf_language`
 	 * has no trigger of its own. The font is read raw, since `get_default_font()` would filter it against the fonts
-	 * already registered, which is the key being asked for — but only when it is a string: the settings array
-	 * reaches this straight off the save, before anything has validated its shape.
+	 * already registered, which is the key being asked for; `Registry::setting()` is what makes reading it raw safe
+	 * on a settings array that has not been validated yet.
 	 *
 	 * @return array[] One `Install_Queue::enqueue_once()` request per entry
 	 *
@@ -105,7 +105,7 @@ class Coverage_Resolver {
 	public function for_settings( array $pdf ): array {
 		return $this->requests(
 			array_merge(
-				$this->rows_for_font( is_string( $pdf['font'] ?? null ) ? $pdf['font'] : '' ),
+				$this->rows_for_font( Registry::setting( $pdf, 'font' ) ),
 				$this->rows_for_languages( [ $this->registry->get_document_language( $pdf ) ] )
 			)
 		);

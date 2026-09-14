@@ -9,10 +9,10 @@ import * as path from 'node:path';
 /**
  * The 7.0 Font Manager.
  *
- * Every `/fonts` route but `/fonts/settings` is served by the plugin now, so what the manager shows here is
- * what this site actually holds: one bundled family, no packs, no custom fonts and neither catalogue
- * downloaded. That is what the assertions below are written against — an empty group draws no heading, and a
- * source that has never synced offers its Refresh button instead of a grid.
+ * Every `/fonts` route is served by the plugin now, so what the manager shows here is what this site actually
+ * holds: one bundled family, no packs, no custom fonts and neither catalogue downloaded. That is what the
+ * assertions below are written against — an empty group draws no heading, and a source that has never synced
+ * offers its Refresh button instead of a grid.
  *
  * That premise is not an accident of timing: `WP_HTTP_BLOCK_EXTERNAL` in `tools/wp-env/e2e.json` is what keeps
  * the catalogues empty, since a blocked sync records `last_attempt` and never `synced`. Lift that flag and these
@@ -238,6 +238,100 @@ test.describe('Font Manager', () => {
 			manager.getByLabel('Default document language')
 		).toBeVisible();
 		await expect(manager.getByText('Bundled · Arimo')).toBeVisible();
+	});
+
+	test('should save a language override and read it back on the next visit', async ({
+		page,
+		requestUtils,
+	}) => {
+		/*
+		 * The four language keys are site-wide, so this is the one spec here that writes state the others can
+		 * see — and that a re-run would otherwise inherit from the last one. Cleared at both ends rather than
+		 * only at the end, since a run killed part-way through leaves the site dirty for the next one.
+		 */
+		const reset = () =>
+			requestUtils.rest({
+				path: '/gravity-pdf/v1/fonts/settings',
+				method: 'POST',
+				data: {
+					default_pdf_language: '',
+					document_script: '',
+					auto_install_fonts: true,
+					font_language_overrides: {},
+				},
+			});
+
+		await reset();
+		await pdf.navigateToNewFormPdf(form.id);
+
+		const open = async () => {
+			const manager = await openManager(page);
+
+			await manager
+				.getByRole('button', { name: 'Language settings' })
+				.click();
+
+			await expect(
+				manager.getByLabel('Default document language')
+			).toBeVisible();
+
+			return manager;
+		};
+
+		let manager = await open();
+
+		// `manager` is rebound after the re-open, so this has to read the current one rather than close over it
+		const row = (name: string) =>
+			manager.locator('.gfpdf-fm-language-row', { hasText: name });
+
+		// This site has no packs, so the bundled Latin row is the only one the map carries
+		await expect(row('Latin script')).toHaveCount(1);
+		await row('Latin script').getByRole('combobox').selectOption('*');
+
+		// By value: the same name is carried by three codes, and only one of them is the row this adds
+		await manager.getByLabel('Add a language').selectOption('ja');
+		await manager.getByRole('button', { name: 'Add', exact: true }).click();
+
+		await row('Japanese').getByRole('combobox').selectOption('gfpdf-arimo');
+
+		await manager
+			.getByLabel('Default document language')
+			.selectOption('ja');
+
+		await manager.getByRole('button', { name: 'Save settings' }).click();
+		// The snackbar, not the a11y live region, which carries the same words
+		await expect(
+			page.getByTestId('snackbar').getByText('Language settings saved')
+		).toBeVisible();
+
+		// A fresh page rather than a reload: the manager's store is built at mount, so only a new one re-fetches
+		await pdf.navigateToNewFormPdf(form.id);
+
+		manager = await open();
+
+		await expect(
+			manager.getByLabel('Default document language')
+		).toHaveValue('ja');
+
+		// The added row came back, which means the override was stored rather than only drawn
+		await expect(row('Japanese').getByRole('combobox')).toHaveValue(
+			'gfpdf-arimo'
+		);
+
+		// And the bundled row is still where it was, holding the sentinel rather than a font
+		await expect(row('Latin script').getByRole('combobox')).toHaveValue(
+			'*'
+		);
+
+		// Reset puts a changed row back on its default, and the button goes with the change it undid
+		const undo = row('Latin script').getByRole('button', {
+			name: 'Reset to the default',
+		});
+
+		await undo.click();
+		await expect(undo).toBeHidden();
+
+		await reset();
 	});
 
 	test('should be able to close font manager popup with button', async ({
