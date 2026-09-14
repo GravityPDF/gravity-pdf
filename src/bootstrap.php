@@ -1312,6 +1312,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_font_downloader(),
 				$this->get_font_cache_warmer(),
 				new Fonts\Font_Lock(),
+				$this->get_catalog_sync(),
 				$this->log
 			);
 		}

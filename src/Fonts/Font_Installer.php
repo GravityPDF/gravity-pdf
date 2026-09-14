@@ -97,6 +97,12 @@ class Font_Installer {
 	protected $lock;
 
 	/**
+	 * @var Catalog_Sync
+	 * @since 7.0
+	 */
+	protected $sync;
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
@@ -114,6 +120,7 @@ class Font_Installer {
 		Font_Downloader $downloader,
 		Font_Cache_Warmer $warmer,
 		Font_Lock $lock,
+		Catalog_Sync $sync,
 		LoggerInterface $log
 	) {
 		$this->repository = $repository;
@@ -121,6 +128,7 @@ class Font_Installer {
 		$this->downloader = $downloader;
 		$this->warmer     = $warmer;
 		$this->lock       = $lock;
+		$this->sync       = $sync;
 		$this->log        = $log;
 	}
 
@@ -182,7 +190,7 @@ class Font_Installer {
 		$resolved = $this->resolve( $source, $entry );
 
 		if ( is_wp_error( $resolved ) ) {
-			return $resolved;
+			return $this->checked( $resolved );
 		}
 
 		$files = (array) ( $resolved['data']['files'] ?? [] );
@@ -217,7 +225,7 @@ class Font_Installer {
 		$resolved = $this->resolve( $source, $entry );
 
 		if ( is_wp_error( $resolved ) ) {
-			return $resolved;
+			return $this->checked( $resolved );
 		}
 
 		$files = [];
@@ -933,6 +941,26 @@ class Font_Installer {
 				'retry_after' => $this->retry_at( $source, $entry ),
 			]
 		);
+
+		return $this->checked( $error );
+	}
+
+	/**
+	 * Ask the catalogue to re-sync when the store says a file this row names is gone
+	 *
+	 * Takes and returns the error so an exit can be routed through it, because `fail()` is not the only one.
+	 * `plan_for()` and `files_for_installs()` hand a resolve error straight back — and a resolve fetches the entry
+	 * file itself for any source that does not inline it, which is how `google` is built — where
+	 * `Install_Queue::files_to_queue()` turns it into an empty plan: no rows queued, no status written, nothing
+	 * logged. That is the silent wrong-font case `resync_stale()` exists for, so it cannot be the one path that
+	 * misses it.
+	 *
+	 * @since 7.0
+	 */
+	protected function checked( WP_Error $error ): WP_Error {
+		if ( $error->get_error_code() === Font_Downloader::GONE ) {
+			$this->sync->resync_stale();
+		}
 
 		return $error;
 	}

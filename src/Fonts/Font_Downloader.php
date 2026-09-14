@@ -43,6 +43,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Font_Downloader {
 
 	/**
+	 * The error code for a file the index still names but the store no longer has
+	 *
+	 * Matched by `Font_Installer::fail()`, which re-syncs the catalogue on it, so the two sides read one spelling.
+	 *
+	 * @since 7.0
+	 */
+	public const GONE = 'font_file_gone';
+
+	/**
 	 * A DROP-firewalled host has to fail the inline upgrade sync fast, so the connect timeout is well under the
 	 * overall one
 	 *
@@ -190,7 +199,7 @@ class Font_Downloader {
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		if ( $code !== 200 ) {
-			return new WP_Error( 'font_http_error', sprintf( 'The request for %s returned %d', $url, $code ) );
+			return $this->http_error( $url, $code );
 		}
 
 		$body = (string) wp_remote_retrieve_body( $response );
@@ -262,7 +271,7 @@ class Font_Downloader {
 
 			$code = (int) wp_remote_retrieve_response_code( $response );
 			if ( $code !== 200 ) {
-				return new WP_Error( 'font_http_error', sprintf( 'The request for %s returned %d', $url, $code ) );
+				return $this->http_error( $url, $code );
 			}
 
 			$error = $this->verify_file( $url, $part, $expected );
@@ -377,12 +386,31 @@ class Font_Downloader {
 		}
 
 		if ( (int) $response->status_code !== 200 ) {
-			return new WP_Error( 'font_http_error', sprintf( 'The request for %s returned %d', $url, $response->status_code ) );
+			return $this->http_error( $url, (int) $response->status_code );
 		}
 
 		$error = $this->verify_file( $url, $part, $file );
 
 		return $error ?? $part;
+	}
+
+	/**
+	 * One shape for every non-200, so the three request paths cannot disagree about what a status means
+	 *
+	 * 404 and 410 are singled out because on a content-addressed store they can only mean *gone*, never
+	 * *changed* — what that is worth is argued at `Catalog_Sync::resync_stale()`. Deliberately no `status` in the
+	 * error data: `Install_Requests::queue()` passes one through to a REST response, and a stamped 404 would
+	 * answer "no such entry" to a caller whose entry exists perfectly well.
+	 *
+	 * @since 7.0
+	 */
+	protected function http_error( string $url, int $code ): WP_Error {
+		$gone = $code === 404 || $code === 410;
+
+		return new WP_Error(
+			$gone ? static::GONE : 'font_http_error',
+			sprintf( 'The request for %s returned %d', $url, $code )
+		);
 	}
 
 	/**

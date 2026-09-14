@@ -8,6 +8,7 @@ use GFPDF\Tests\Concerns\MocksHttpRequests;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
 use WP_Error;
+use WpOrg\Requests\Response;
 
 /**
  * @package     Gravity PDF
@@ -191,13 +192,50 @@ class Test_Font_Downloader extends TestCase {
 		];
 	}
 
-	public function test_a_non_200_is_an_error() {
-		$this->mock_http( [ 'fonts.gravitypdf.com' => [ 'code' => 500, 'body' => 'nope' ] ] );
+	/**
+	 * The store carries no object lock, so a file the catalogue names can be pruned out from under a site. A 404
+	 * therefore means something a 500 does not — the catalogue is stale — and `Font_Installer` re-syncs on it.
+	 *
+	 * @dataProvider provider_store_statuses
+	 */
+	public function test_a_gone_file_is_told_apart_from_a_request_that_merely_failed( int $code, string $expected ) {
+		$this->mock_http( [ 'fonts.gravitypdf.com' => [ 'code' => $code, 'body' => '' ] ] );
 
-		$result = $this->downloader->fetch( 'https://fonts.gravitypdf.com/v1/index.json' );
+		$fetched = $this->downloader->fetch( 'https://fonts.gravitypdf.com/v1/index.json' );
 
-		$this->assertWPError( $result );
-		$this->assertSame( 'font_http_error', $result->get_error_code() );
+		$this->assertWPError( $fetched );
+		$this->assertSame( $expected, $fetched->get_error_code() );
+
+		$downloaded = $this->downloader->download( 'https://fonts.gravitypdf.com/v1/files/A.ttf', [ 'size' => 16 ] );
+
+		$this->assertWPError( $downloaded );
+		$this->assertSame( $expected, $downloaded->get_error_code() );
+	}
+
+	public function provider_store_statuses(): array {
+		return [
+			'pruned'             => [ 404, Font_Downloader::GONE ],
+			'withdrawn'          => [ 410, Font_Downloader::GONE ],
+			'the origin is down' => [ 503, 'font_http_error' ],
+		];
+	}
+
+	/**
+	 * The concurrent batch answers below `WP_Http`, so its status handling is a third code path that has to agree
+	 * with the other two — and it is the one the render path takes, where a wrong answer is silent tofu
+	 */
+	public function test_the_batch_tells_a_gone_file_apart_as_well() {
+		$downloader = new class( GPDFAPI::get_log_class(), GPDFAPI::get_data_class() ) extends Font_Downloader {
+			public function code_for( int $status ): string {
+				$response              = new Response();
+				$response->status_code = $status;
+
+				return $this->batch_result( [ 'url' => 'https://fonts.gravitypdf.com/v1/files/A.ttf' ], '', $response )->get_error_code();
+			}
+		};
+
+		$this->assertSame( Font_Downloader::GONE, $downloader->code_for( 404 ) );
+		$this->assertSame( 'font_http_error', $downloader->code_for( 503 ) );
 	}
 
 	public function test_a_transport_error_comes_back_as_is() {

@@ -59,6 +59,10 @@ class Test_Font_Installer extends TestCase {
 		$this->unmock_http();
 		$this->drop_catalog_rows();
 
+		/* `resync_stale()` holds its debounce for an hour and never releases it, so it would silence the next case */
+		( new Font_Lock() )->release( Catalog_Sync::RESYNC_LOCK );
+		wp_clear_scheduled_hook( Catalog_Sync::EVENT );
+
 		foreach ( [ 'packs', 'google' ] as $source ) {
 			GPDFAPI::get_misc_class()->rmdir( $this->font_dir . $source );
 		}
@@ -204,7 +208,7 @@ class Test_Font_Installer extends TestCase {
 	/**
 	 * @dataProvider provider_install_failures
 	 */
-	public function test_a_failed_install_records_the_code_and_a_backoff( $response, string $expected ) {
+	public function test_a_failed_install_records_the_code_and_a_backoff( $response, string $expected, bool $resync ) {
 		$this->seed_pack();
 		$this->mock_http( [ 'fonts.gravitypdf.com' => is_string( $response ) ? $this->broken_body( $response ) : $response ] );
 
@@ -219,6 +223,9 @@ class Test_Font_Installer extends TestCase {
 		$this->assertSame( $expected, $status['error'] );
 		$this->assertNotNull( $status['retry_after'], 'without a backoff every trigger would re-claim a broken entry' );
 
+		/* Only the store saying "gone" means the catalogue is wrong; bad bytes at a live URL say nothing about it */
+		$this->assertSame( $resync, wp_next_scheduled( Catalog_Sync::EVENT ) !== false );
+
 		/* Nothing half-installed: no row claims a file the disk does not have */
 		$this->assertNull( $this->font( 'notoemoji' ) );
 		$this->assertFileDoesNotExist( $this->font_dir . 'packs/emoji/NotoEmoji.ttf' );
@@ -226,10 +233,30 @@ class Test_Font_Installer extends TestCase {
 
 	public function provider_install_failures(): array {
 		return [
-			'the bytes do not match the index' => [ 'corrupt', 'font_hash_mismatch' ],
-			'the body is the wrong length'     => [ 'short', 'font_size_mismatch' ],
-			'the origin is down'               => [ [ 'body' => '', 'code' => 503 ], 'font_http_error' ],
+			'the bytes do not match the index' => [ 'corrupt', 'font_hash_mismatch', false ],
+			'the body is the wrong length'     => [ 'short', 'font_size_mismatch', false ],
+			'the origin is down'               => [ [ 'body' => '', 'code' => 503 ], 'font_http_error', false ],
+			'the file has been pruned'         => [ [ 'body' => '', 'code' => 404 ], Font_Downloader::GONE, true ],
+			'the pack has been withdrawn'      => [ [ 'body' => '', 'code' => 410 ], Font_Downloader::GONE, true ],
 		];
+	}
+
+	/**
+	 * `plan_for()` hands a resolve error back rather than going through `fail()`, and
+	 * `Install_Queue::files_to_queue()` turns that into an empty plan — no rows, no status, nothing logged. A
+	 * source that does not inline its entries, which is how `google` is built, reaches the store to resolve one,
+	 * so this is the path where a pruned entry file is most completely silent.
+	 */
+	public function test_a_pruned_entry_file_forces_a_re_sync_even_though_nothing_records_a_failure() {
+		$this->seed_pack( 'emoji', [], null, [ 'entry_json' => null, 'entry_sha256' => str_repeat( 'a', 64 ) ] );
+		$this->mock_http( [ 'fonts.gravitypdf.com' => [ 'body' => '', 'code' => 404 ] ] );
+
+		$plan = $this->installer->plan_for( 'packs/emoji' );
+
+		$this->assertWPError( $plan );
+		$this->assertSame( Font_Downloader::GONE, $plan->get_error_code() );
+		$this->assertNull( $this->status()['phase'], 'the planning path records nothing, which is the point' );
+		$this->assertNotFalse( wp_next_scheduled( Catalog_Sync::EVENT ) );
 	}
 
 	/**
@@ -399,6 +426,7 @@ class Test_Font_Installer extends TestCase {
 			$gfpdf->get_font_downloader(),
 			$gfpdf->get_font_cache_warmer(),
 			new Font_Lock(),
+			$gfpdf->get_catalog_sync(),
 			$log
 		);
 

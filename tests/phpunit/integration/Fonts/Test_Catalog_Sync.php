@@ -50,6 +50,59 @@ class Test_Catalog_Sync extends TestCase {
 		delete_site_option( Catalog_Sync::OPTION );
 		delete_site_option( Catalog_Sync::GENERATED_OPTION );
 		( new Font_Lock() )->release( Catalog_Sync::LOCK );
+
+		/* Held for an hour and never released by the code under test, so it has to be cleared between cases */
+		( new Font_Lock() )->release( Catalog_Sync::RESYNC_LOCK );
+		wp_clear_scheduled_hook( Catalog_Sync::EVENT );
+	}
+
+	/**
+	 * A file the catalogue names can be pruned from the store, and the entry then retries the same dead URL for up
+	 * to 30 days. Re-reading the index is the recovery, and the debounce is what stops it being a stampede.
+	 */
+	public function test_a_pruned_file_forces_a_sync_once_and_is_then_debounced() {
+		$this->assertTrue( $this->sync()->resync_stale() );
+		$this->assertNotFalse( wp_next_scheduled( Catalog_Sync::EVENT ) );
+
+		/*
+		 * The pending event is gone the moment cron runs, so `wp_next_scheduled()` is no floor on how often a sync
+		 * may be asked for — clearing it here is what proves the debounce and not the de-duplication.
+		 */
+		wp_clear_scheduled_hook( Catalog_Sync::EVENT );
+
+		$this->assertFalse( $this->sync()->resync_stale() );
+		$this->assertFalse( wp_next_scheduled( Catalog_Sync::EVENT ), 'a second 404 inside the window must cost the root nothing' );
+	}
+
+	/**
+	 * The lock is never released, so `Font_Lock`'s takeover-once-stale arm is the only thing that reopens the
+	 * window — ageing the option is the one way to assert the hour actually means something
+	 */
+	public function test_a_forced_sync_is_allowed_again_once_the_window_is_past() {
+		$this->assertTrue( $this->sync()->resync_stale() );
+
+		wp_clear_scheduled_hook( Catalog_Sync::EVENT );
+		update_site_option( 'gfpdf_lock_' . Catalog_Sync::RESYNC_LOCK, time() - Catalog_Sync::RESYNC_DEBOUNCE - 1 );
+
+		$this->assertTrue( $this->sync()->resync_stale() );
+		$this->assertNotFalse( wp_next_scheduled( Catalog_Sync::EVENT ) );
+	}
+
+	/**
+	 * A PDF download is a GET, and under `ALTERNATE_WP_CRON` `spawn_cron()` answers one by redirecting it — so the
+	 * forced path must queue the event and leave the spawning to core's own `shutdown` handler
+	 */
+	public function test_a_forced_sync_does_not_spawn_cron_itself() {
+		$spawned = false;
+
+		add_filter( 'cron_request', static function ( $request ) use ( &$spawned ) {
+			$spawned = true;
+
+			return $request;
+		} );
+
+		$this->assertTrue( $this->sync()->resync_stale() );
+		$this->assertFalse( $spawned, 'trigger 3 reaches this from inside a render' );
 	}
 
 	public function test_a_signed_root_populates_the_catalog() {

@@ -84,6 +84,23 @@ class Catalog_Sync {
 	public const LOCK_TTL = 300;
 
 	/**
+	 * @since 7.0
+	 */
+	public const RESYNC_LOCK = 'catalog_resync';
+
+	/**
+	 * How long a forced sync bars the next one — see `resync_stale()`
+	 *
+	 * Not `LOCK_TTL`: that guards a sync while it runs and is released the moment it ends, so it is no floor at
+	 * all on how often one may be *asked* for. An hour bounds a site to one forced root fetch however many files
+	 * of a withdrawn pack it walks, and sits well inside `Font_Installer::RETRY_AFTER`, so the retry that follows
+	 * reads a catalogue no more than an hour old.
+	 *
+	 * @since 7.0
+	 */
+	public const RESYNC_DEBOUNCE = HOUR_IN_SECONDS;
+
+	/**
 	 * What the signature covers, prepended by the verifier rather than carried in the file
 	 *
 	 * Scoping by context is what lets one key sign different kinds of artefact without a signature ever verifying
@@ -361,17 +378,68 @@ class Catalog_Sync {
 				];
 		}
 
-		/* WP-Cron de-duplicates an identical pending event, so a second Refresh does not queue a second sync */
-		if ( ! wp_next_scheduled( static::EVENT ) ) {
-			wp_schedule_single_event( time(), static::EVENT );
-		}
+		$this->schedule();
 
+		/* Refresh is an admin waiting on an answer, so this one pays the loopback to get cron moving now */
 		spawn_cron();
 
 		return [
 			'up_to_date' => false,
 			'scheduled'  => true,
 		];
+	}
+
+	/**
+	 * Sync out of turn, because the store no longer has a file the catalogue names
+	 *
+	 * The store carries no object lock, so bytes a catalogue names really can be pruned. Without this the entry
+	 * goes `failed` and retries *the same dead URL*, and nothing re-reads the index — so a site recovers only at
+	 * the next `SYNC_INTERVAL`, up to 30 days away, or when an admin presses Refresh. Nor does anyone see it: a
+	 * render falls back to the bundled faces, so the symptom is a PDF in the wrong font rather than an error,
+	 * which is quieter and worse for being quiet.
+	 *
+	 * The debounce is the whole safety argument, and `wp_next_scheduled()` is not it — a pending event is gone the
+	 * moment cron runs, and the sync's jitter spreads the *scheduled* pass rather than this one, so without
+	 * `RESYNC_LOCK` a withdrawn pack is a thundering herd on the root across the install base. The lock is taken
+	 * and never released: `Font_Lock::acquire()` hands the next caller a takeover once the TTL is past, which is
+	 * a sliding window and exactly what is wanted.
+	 *
+	 * Not a lever worth attacking, either. It re-reads a signed root and verifies it, so whoever can make fetches
+	 * fail wins some extra requests and nothing else.
+	 *
+	 * @return bool Whether this call is the one that scheduled it
+	 *
+	 * @since 7.0
+	 */
+	public function resync_stale(): bool {
+		if ( ! $this->lock->acquire( static::RESYNC_LOCK, static::RESYNC_DEBOUNCE ) ) {
+			return false;
+		}
+
+		$this->log->notice( 'Scheduling a font catalogue sync: the store no longer has a file the catalogue names' );
+
+		$this->schedule();
+
+		return true;
+	}
+
+	/**
+	 * Queue the sync event for this request
+	 *
+	 * **Deliberately does not `spawn_cron()`.** Core hooks `_wp_cron()` on `shutdown` — `wp_cron()`, itself on
+	 * `init` — and reads the due list *there*, so an event queued at `time()` is spawned at this request's
+	 * shutdown with nobody asking, off the critical path. Spawning here as well would block for up to a second
+	 * (`wp_remote_post()`'s 0.01s timeout is `ceil()`ed to 1 by the curl transport) and, under
+	 * `ALTERNATE_WP_CRON`, would `wp_redirect()` the request it was called from — which on the trigger 3 path is
+	 * a PDF mid-render. A caller that really is waiting on the answer spawns for itself; `request()` does.
+	 *
+	 * @since 7.0
+	 */
+	protected function schedule(): void {
+		/* WP-Cron de-duplicates an identical pending event, so a second caller never queues a second sync */
+		if ( ! wp_next_scheduled( static::EVENT ) ) {
+			wp_schedule_single_event( time(), static::EVENT );
+		}
 	}
 
 	/**

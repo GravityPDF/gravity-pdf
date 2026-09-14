@@ -122,6 +122,7 @@ class Test_Render_Font_Trigger extends TestCase {
 				$this->downloader,
 				$gfpdf->get_font_cache_warmer(),
 				new Font_Lock(),
+				$gfpdf->get_catalog_sync(),
 				$gfpdf->log
 			),
 			$gfpdf->get_font_registry(),
