@@ -35,6 +35,19 @@ class Test_Font_Sources extends TestCase {
 	}
 
 	/**
+	 * One `files` record: every field `validate_entry()` requires, with the digest and size overridable
+	 *
+	 * @return array{sha256: string, size: int, remote_path: string}
+	 */
+	protected function file( string $remote_path, array $overrides = [] ): array {
+		return $overrides + [
+			'sha256'      => str_repeat( 'a', 64 ),
+			'size'        => 10,
+			'remote_path' => $remote_path,
+		];
+	}
+
+	/**
 	 * A valid coverage entry, the shape `validate_entry()` accepts
 	 *
 	 * Not `entry()`: `HasGfpdfFixtures` already has one with a different signature, and overriding it is a
@@ -51,11 +64,7 @@ class Test_Font_Sources extends TestCase {
 					],
 				],
 				'files' => [
-					'NotoSansSC-Regular.ttf' => [
-						'sha256'      => str_repeat( 'a', 64 ),
-						'size'        => 10595932,
-						'remote_path' => 'fonts-v1.0.0/NotoSansSC-Regular.ttf',
-					],
+					'NotoSansSC-Regular.ttf' => $this->file( 'fonts-v1.0.0/NotoSansSC-Regular.ttf', [ 'size' => 10595932 ] ),
 				],
 				'language_to_font' => [ 'zh' => 'notosanssc' ],
 			],
@@ -245,11 +254,16 @@ class Test_Font_Sources extends TestCase {
 	}
 
 	public function provider_invalid_entries(): array {
-		$file = [
-			'sha256'      => str_repeat( 'a', 64 ),
-			'size'        => 10,
-			'remote_path' => 'fonts-v1.0.0/Ok.ttf',
-		];
+		$file = $this->file( 'fonts-v1.0.0/Ok.ttf' );
+
+		/*
+		 * A `files` override replaces the whole map, so keying one on any other name makes the base entry's role
+		 * name a file that is no longer listed — and the case then passes on *that*, whatever it meant to test.
+		 * Every case below that is about a file's own fields keys it under the name the role already uses.
+		 */
+		$listed = static function ( array $record ): array {
+			return [ 'NotoSansSC-Regular.ttf' => $record ];
+		};
 
 		return [
 			'no files'                    => [ [ 'files' => [] ] ],
@@ -260,6 +274,19 @@ class Test_Font_Sources extends TestCase {
 			'dotfile'                     => [ [ 'files' => [ '.htaccess' => $file ] ] ],
 			'unknown extension'           => [ [ 'files' => [ 'Ok.php' => $file ] ] ],
 			'missing remote_path'         => [ [ 'files' => [ 'Ok.ttf' => [ 'sha256' => '', 'size' => 1 ] ] ] ],
+			'missing sha256'              => [ [ 'files' => $listed( [ 'size' => 10, 'remote_path' => 'v/Ok.ttf' ] ) ] ],
+			'malformed sha256'            => [ [ 'files' => $listed( [ 'sha256' => str_repeat( 'g', 64 ) ] + $file ) ] ],
+			/* The store hashes with `hash()`, which is lowercase — an uppercase digest is a hand-edited index */
+			'uppercase sha256'            => [ [ 'files' => $listed( [ 'sha256' => strtoupper( str_repeat( 'a', 64 ) ) ] + $file ) ] ],
+			'sha256 that is not a string' => [ [ 'files' => $listed( [ 'sha256' => 12345 ] + $file ) ] ],
+			'missing size'                => [ [ 'files' => $listed( [ 'sha256' => str_repeat( 'a', 64 ), 'remote_path' => 'v/Ok.ttf' ] ) ] ],
+			'zero size'                   => [ [ 'files' => $listed( [ 'size' => 0 ] + $file ) ] ],
+			/* The published artefact emits an int; accepting "10" accepts a build that started stringifying */
+			'size as a string'            => [ [ 'files' => $listed( [ 'size' => '10' ] + $file ) ] ],
+			'alias of a registered key'   => [ [ 'aliases' => [ 'notosanssc' => 'notosanssc' ] ] ],
+			'alias with a slash'          => [ [ 'aliases' => [ 'a/b' => 'notosanssc' ] ] ],
+			'alias with a space'          => [ [ 'aliases' => [ 'old name' => 'notosanssc' ] ] ],
+			'alias naming no key'         => [ [ 'aliases' => [ 'oldname' => 'nosuchkey' ] ] ],
 			'role names an unlisted file' => [ [ 'fonts' => [ 'ok' => [ 'R' => 'Missing.ttf' ] ] ] ],
 			'a face role naming a list'   => [ [ 'fonts' => [ 'ok' => [ 'R' => [ 'NotoSansSC-Regular.ttf' ] ] ] ] ],
 			'a typo for a face role'      => [ [ 'fonts' => [ 'ok' => [ 'Bl' => 'NotoSansSC-Regular.ttf' ] ] ] ],
@@ -292,9 +319,9 @@ class Test_Font_Sources extends TestCase {
 				'khmeros' => [ 'R' => 'KhmerOS.ttf', 'LICENSE' => [ 'KhmerOS-LICENSE.txt', 'LGPL-2.1.txt' ] ],
 			],
 			'files' => [
-				'KhmerOS.ttf'         => [ 'remote_path' => 'v/KhmerOS.ttf' ],
-				'KhmerOS-LICENSE.txt' => [ 'remote_path' => 'v/KhmerOS-LICENSE.txt' ],
-				'LGPL-2.1.txt'        => [ 'remote_path' => 'v/LGPL-2.1.txt' ],
+				'KhmerOS.ttf'         => $this->file( 'v/KhmerOS.ttf' ),
+				'KhmerOS-LICENSE.txt' => $this->file( 'v/KhmerOS-LICENSE.txt' ),
+				'LGPL-2.1.txt'        => $this->file( 'v/LGPL-2.1.txt' ),
 			],
 		];
 
@@ -377,6 +404,74 @@ class Test_Font_Sources extends TestCase {
 		}
 	}
 
+	/**
+	 * `daibannasilbook` → `daibannasil` is a rename the 7.0 packs actually make, and `Registry::font_aliases()`
+	 * reads the inverted map back off each row
+	 */
+	public function test_an_entrys_aliases_reach_the_rows_they_name() {
+		$entry = $this->valid_entry(
+			[
+				'fonts'   => [
+					'daibannasil' => [ 'R' => 'NotoSansSC-Regular.ttf' ],
+					'notosanssc'  => [ 'R' => 'NotoSansSC-Regular.ttf' ],
+				],
+				'aliases' => [
+					'daibannasilbook' => 'daibannasil',
+					'dai-banna'       => 'daibannasil',
+					'notosanssc-old'  => 'notosanssc',
+				],
+			]
+		);
+
+		$this->assertNull( Font_Sources::validate_entry( $entry ) );
+
+		$row = [ 'source' => 'packs', 'entry' => 'southeast-asian', 'coverage' => 1, 'label' => 'SE Asian', 'position' => 3 ];
+
+		$this->assertSame(
+			[ 'daibannasilbook', 'dai-banna' ],
+			Font_Sources::font_row( $row, $entry, 'daibannasil' )['meta']['aliases']
+		);
+
+		$this->assertSame(
+			[ 'notosanssc-old' ],
+			Font_Sources::font_row( $row, $entry, 'notosanssc' )['meta']['aliases']
+		);
+	}
+
+	/**
+	 * A display family carries no coverage maps, so it gets no `meta` from `coverage_meta()` — but renaming is
+	 * something any source can do, and Google has renamed a published family before now. Filing aliases as a
+	 * coverage concern would drop a display family's rename at row-write time, after validation accepted it
+	 */
+	public function test_a_display_family_carries_its_aliases_too() {
+		$entry = [
+			'fonts'   => [ 'notosans' => [ 'R' => 'NotoSans-Regular.ttf' ] ],
+			'files'   => [ 'NotoSans-Regular.ttf' => $this->file( 'v/NotoSans-Regular.ttf' ) ],
+			'aliases' => [ 'droidsans' => 'notosans' ],
+		];
+
+		$this->assertNull( Font_Sources::validate_entry( $entry ) );
+
+		$row = [ 'source' => 'google', 'entry' => 'noto-sans', 'coverage' => 0, 'label' => 'Noto Sans' ];
+
+		$this->assertSame(
+			[ 'droidsans' ],
+			Font_Sources::font_row( $row, $entry, 'notosans' )['meta']['aliases']
+		);
+	}
+
+	/**
+	 * And a row with nothing to claim carries no key at all, rather than an empty list on all seventeen packs
+	 */
+	public function test_a_row_with_no_aliases_carries_no_alias_key() {
+		$row = [ 'source' => 'packs', 'entry' => 'emoji', 'coverage' => 1, 'label' => 'Emoji', 'position' => 1 ];
+
+		$this->assertArrayNotHasKey(
+			'aliases',
+			Font_Sources::font_row( $row, $this->valid_entry(), 'notosanssc' )['meta']
+		);
+	}
+
 	public function test_a_sip_ext_target_outside_the_entry_is_allowed() {
 		/* Sun-ExtB is its own entry, so the supplement resolves only once cjk-ext-b is installed too */
 		$this->assertNull( Font_Sources::validate_entry( $this->valid_entry() ) );
@@ -395,7 +490,7 @@ class Test_Font_Sources extends TestCase {
 				'400i' => 'Lato-Regular.ttf',
 			],
 			'files'    => [
-				'Lato-Regular.ttf' => [ 'remote_path' => 'v/Lato-Regular.ttf' ],
+				'Lato-Regular.ttf' => $this->file( 'v/Lato-Regular.ttf' ),
 			],
 		];
 

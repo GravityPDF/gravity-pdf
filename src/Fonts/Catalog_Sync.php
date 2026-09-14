@@ -498,18 +498,17 @@ class Catalog_Sync {
 		 * The caller decides what this run means. A real sync stamps `synced` and the index hash; the seed writes
 		 * rows without claiming a sync it never made, rather than stamping one and reversing it afterwards.
 		 */
-		$this->update_record(
-			$id,
-			$sync_state === null
-				? [
+		if ( $sync_state === null ) {
+			$this->verified(
+				$id,
+				[
 					'index_sha256' => $sha256,
-					'synced'       => time(),
-					'last_attempt' => time(),
-					'last_error'   => '',
 					'seeded'       => false,
 				]
-				: $sync_state
-		);
+			);
+		} else {
+			$this->update_record( $id, $sync_state );
+		}
 
 		/* Bumped after the last statement, so no reader caches the old rows under the new stamp */
 		$this->catalog->flush();
@@ -866,9 +865,20 @@ class Catalog_Sync {
 				continue;
 			}
 
-			$this->update_record( $id, [ 'last_attempt' => time() ] );
-
+			/*
+			 * Nothing to fetch, and that is a sync: `synced` answers "when did this site last confirm its
+			 * catalogue", which is the question `is_stale()` asks. Bumped only where rows are written it tracked
+			 * the *store's* last publish instead, so a quiet month past `SYNC_INTERVAL` put every site on
+			 * `RETRY_BACKOFF` and raised `Catalog_Sync_Check` against a store answering perfectly — teaching
+			 * every admin to ignore the one signal that would show a freeze attack.
+			 *
+			 * Below `source_changed()`, not above it: the changed path reaches the same stamp through
+			 * `replace_source()`, and stamping before the fetch would mark a source fresh whose index then failed
+			 * to arrive or failed to parse — which is this defect pointed the other way.
+			 */
 			if ( ! $this->source_changed( $id, $root ) ) {
+				$this->verified( $id );
+
 				continue;
 			}
 
@@ -1073,6 +1083,27 @@ class Catalog_Sync {
 		foreach ( $records as $record ) {
 			$this->fail( $record->get_id(), $error->get_error_message() );
 		}
+	}
+
+	/**
+	 * Record that this source is current as of now, and clear whatever the last attempt left behind
+	 *
+	 * `fail()`'s counterpart, and the only writer of `synced`: a source is current either because its index was
+	 * replaced or because the root says the one it holds is still the published one.
+	 *
+	 * @param array $extra Fields the caller owns, merged over this set
+	 *
+	 * @since 7.0
+	 */
+	protected function verified( string $id, array $extra = [] ): void {
+		$this->update_record(
+			$id,
+			$extra + [
+				'synced'       => time(),
+				'last_attempt' => time(),
+				'last_error'   => '',
+			]
+		);
 	}
 
 	/**

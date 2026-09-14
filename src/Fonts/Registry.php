@@ -237,7 +237,8 @@ class Registry {
 	/**
 	 * The fonts that ship inside the plugin
 	 *
-	 * A constant, not rows: they never toggle, never update and cannot be removed.
+	 * A constant, not rows: they never toggle, never update and cannot be removed. The one exception is the alias
+	 * map, which is not a per-layer fact at all — see `font_aliases()`.
 	 *
 	 * @since 7.0
 	 */
@@ -259,7 +260,7 @@ class Registry {
 			],
 			[ static::BUNDLED_FONT, static::BUNDLED_SYMBOLS ],
 			$this->generic_families(),
-			$this->bundled_aliases()
+			$this->font_aliases()
 		);
 	}
 
@@ -352,6 +353,7 @@ class Registry {
 			$fonts,
 			$backup_subs,
 			$substitution,
+			/* `font_aliases()` builds the one map both layers share */
 			[],
 			$bmp,
 			$dictionaries
@@ -1111,11 +1113,18 @@ class Registry {
 	}
 
 	/**
-	 * `arial` / `helvetica` resolve to the bundled font, plus whatever names the rows claim for themselves
+	 * Every name a document may ask for that is not itself a font, mapped to the font that answers
 	 *
-	 * Arimo is metric-compatible with Arial, so templates written against those families keep their layout. The
-	 * rows' own `meta.aliases` are 6.x's `fonttrans` entries, carried by the upgrade with the fonts they name
-	 * (`ocr-b` → `ocrb`, `damase` → `mph2bdamase`), so a template written against either still resolves.
+	 * `arial` and `helvetica` resolve to the bundled font because Arimo is metric-compatible with Arial, so
+	 * templates written against those families keep their layout. The rest the rows claim for themselves out of
+	 * `meta.aliases`: 6.x's `fonttrans` entries, carried by the upgrade with the fonts they name (`ocr-b` →
+	 * `ocrb`, `damase` → `mph2bdamase`), and a source's own renames, so a font key that changed keeps answering
+	 * to the name it was published under.
+	 *
+	 * Not a per-layer concern, the way `Package::getLanguageToFont()` is not: mPDF merges every package's map
+	 * into one `fonttrans` at construction, so which layer carries it is arbitrary — but one list has to see
+	 * every row, because that is what enforces the rule below. It rides on the bundled layer for want of a
+	 * better home, and the installed one is handed `[]`.
 	 *
 	 * Every alias defers to a real font: an upload or import may claim any of these keys, and then it wins.
 	 *
@@ -1123,7 +1132,7 @@ class Registry {
 	 *
 	 * @since 7.0
 	 */
-	protected function bundled_aliases(): array {
+	protected function font_aliases(): array {
 		$rows    = $this->rows();
 		$aliases = [
 			'arial'     => static::BUNDLED_FONT,

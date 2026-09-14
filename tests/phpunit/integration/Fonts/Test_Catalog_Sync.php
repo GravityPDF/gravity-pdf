@@ -273,6 +273,33 @@ class Test_Catalog_Sync extends TestCase {
 		} ) );
 	}
 
+	/**
+	 * Nothing to fetch is still a sync — see `sync_root()`. The site is 60 days past its last write here, and the
+	 * store has published nothing since, which is the state that used to read as stale
+	 */
+	public function test_an_unchanged_root_still_counts_as_a_sync() {
+		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
+		$this->sync()->run();
+
+		$records                          = (array) get_site_option( Catalog_Sync::OPTION );
+		$records['packs']['synced']       = time() - ( 60 * DAY_IN_SECONDS );
+		$records['packs']['last_attempt'] = time() - ( 60 * DAY_IN_SECONDS );
+		$records['packs']['last_error']   = 'Connection timed out';
+
+		update_site_option( Catalog_Sync::OPTION, $records );
+
+		$this->assertTrue( Catalog_Sync::is_stale( $this->sync()->get_record( 'packs' ) ) );
+
+		/* The same content again: the index hash matches, so no source index is fetched and no row is rewritten */
+		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
+		$this->sync()->run();
+
+		$record = $this->sync()->get_record( 'packs' );
+
+		$this->assertFalse( Catalog_Sync::is_stale( $record ), 'a verified root is a sync, whether or not it changed' );
+		$this->assertSame( '', $record['last_error'], 'a root that verifies clears the previous attempt error' );
+	}
+
 	public function test_a_changed_index_replaces_rows_and_prunes_dropped_entries() {
 		$this->publish( [ $this->pack_entry( 'emoji' ), $this->pack_entry( 'dejavu' ) ] );
 		$this->sync()->run();
@@ -341,6 +368,36 @@ class Test_Catalog_Sync extends TestCase {
 		$this->assertStringContainsString( 'hash', $this->sync()->get_record( 'packs' )['last_error'] );
 	}
 
+	/**
+	 * The root verified and named a new index; fetching or reading that index then failed. The source is not
+	 * current — `fail()` owns this pass — so the stamp has to sit *below* `source_changed()`, or a source whose
+	 * index is permanently unreadable would read fresh to `is_stale()` and be skipped by `is_due()` forever
+	 */
+	public function test_a_source_whose_index_fails_to_arrive_is_not_stamped() {
+		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
+		$this->sync()->run();
+
+		/* Dated back so the assertion can tell "left alone" from "re-stamped in the same second" */
+		$synced                     = time() - ( 40 * DAY_IN_SECONDS );
+		$records                    = (array) get_site_option( Catalog_Sync::OPTION );
+		$records['packs']['synced'] = $synced;
+
+		update_site_option( Catalog_Sync::OPTION, $records );
+
+		$this->publish(
+			[ $this->pack_entry( 'emoji', [ 'label' => 'Emoji v2' ] ) ],
+			[],
+			[ 'sources/packs-' => new WP_Error( 'http_request_failed', 'Connection timed out' ) ]
+		);
+
+		$this->sync()->run();
+
+		$record = $this->sync()->get_record( 'packs' );
+
+		$this->assertSame( $synced, $record['synced'] );
+		$this->assertStringContainsString( 'Connection timed out', $record['last_error'] );
+	}
+
 	public function test_an_index_of_the_wrong_length_is_refused_before_it_is_hashed() {
 		$this->publish( [ $this->pack_entry( 'emoji' ) ], [], [ 'sources/packs-' => '{"schema":1,"entries":[]}' ] );
 
@@ -354,10 +411,15 @@ class Test_Catalog_Sync extends TestCase {
 		$this->publish( [ $this->pack_entry( 'emoji' ), $this->pack_entry( 'dejavu' ) ] );
 		$this->sync()->run();
 
+		$synced = $this->sync()->get_record( 'packs' )['synced'];
+
 		$this->mock_http( [ 'index.json' => new WP_Error( 'http_request_failed', 'Connection timed out' ) ] );
 		$this->sync()->run();
 
 		$this->assertSame( 2, $this->catalog_repository()->search( 'packs' )['total'] );
+
+		/* A pass that reached nothing cannot make a stale catalogue look fresh */
+		$this->assertSame( $synced, $this->sync()->get_record( 'packs' )['synced'] );
 
 		$record = $this->sync()->get_record( 'packs' );
 
@@ -368,6 +430,9 @@ class Test_Catalog_Sync extends TestCase {
 	public function test_a_source_the_root_does_not_list_keeps_its_rows() {
 		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
 		$this->sync()->run();
+
+		/* `google` is registered and has never been listed: "never checked", not "checked and empty" */
+		$this->assertSame( 0, (int) $this->sync()->get_record( 'google' )['synced'] );
 
 		$this->publish( [], [ 'sources' => [] ] );
 		$this->sync()->run();

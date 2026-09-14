@@ -344,8 +344,7 @@ class Install_Queue extends Helper_Abstract_Queue {
 				continue;
 			}
 
-			/* A size of 0 is an entry that never declared one, and the cap cannot be applied to an unknown */
-			if ( $file['size'] <= 0 || $file['size'] > static::INLINE_CAP ) {
+			if ( $file['size'] > static::INLINE_CAP ) {
 				$background[] = $name;
 				$over_cap     = true;
 

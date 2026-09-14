@@ -276,13 +276,16 @@ class Test_Install_Queue extends TestCase {
 	}
 
 	/**
-	 * An entry that declares no size is an unknown, and a cap cannot be applied to one
+	 * A size is what the inline cap is applied to, so an entry declaring none used to reach here as an unknown and
+	 * get queued for the background. `validate_entry()` requires one now — the unknown is refused at sync, where a
+	 * build mistake belongs — so the render asks for nothing and queues nothing, rather than deferring a face it
+	 * could not size
 	 */
-	public function test_a_face_with_no_declared_size_is_queued_rather_than_fetched_now() {
+	public function test_a_face_with_no_declared_size_is_refused_rather_than_queued() {
 		$this->seed_roles( [ 'R' => [ 'NotoSansJP-Regular.ttf', 0 ] ] );
 
 		$this->assertSame( [], $this->queue->enqueue_for_render( [ $this->render_request() ] ) );
-		$this->assertSame( [ 'NotoSansJP-Regular.ttf' ], array_column( $this->queued(), 'name' ) );
+		$this->assertSame( [], $this->queued() );
 	}
 
 	public function test_a_render_asks_for_nothing_while_auto_install_is_off() {

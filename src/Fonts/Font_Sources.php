@@ -51,6 +51,13 @@ class Font_Sources {
 	public const FILE_EXTENSIONS = [ 'ttf', 'otf', 'txt', 'dat', 'woff2' ];
 
 	/**
+	 * A lowercase hex SHA-256 digest, the only shape `hash( 'sha256', … )` produces
+	 *
+	 * @since 7.0
+	 */
+	public const SHA256_PATTERN = '/^[a-f0-9]{64}$/';
+
+	/**
 	 * Font keys and variant ids, the one charset that may carry an underscore
 	 *
 	 * @since 7.0
@@ -332,6 +339,23 @@ class Font_Sources {
 		$fonts    = (array) ( $entry['fonts'] ?? [] );
 		$roles    = (array) ( $fonts[ $font_key ] ?? [] );
 		$coverage = (int) ( $row['coverage'] ?? 0 ) === 1;
+		$meta     = $coverage ? static::coverage_meta( $font_key, $entry, $roles, $row ) : [];
+
+		/*
+		 * The names a 6.x template may still be written against. A source renaming a font key — `daibannasilbook`
+		 * to `daibannasil` — takes `font-family: daibannasilbook` with it otherwise, and silently: mPDF resolves
+		 * an unknown family to the document font, so the PDF renders in the wrong face with no error anywhere.
+		 *
+		 * Beside `coverage_meta()` rather than inside it: the maps that one builds are mPDF's fallback arrays,
+		 * which only a coverage pack has, while a rename is something any source can do — Google has renamed a
+		 * published family before now. Gating aliases on coverage would have dropped a display family's rename at
+		 * row-write time, after validation had accepted it, which is this defect one layer down.
+		 */
+		$aliases = static::names_targeting( (array) ( $entry['aliases'] ?? [] ), $font_key );
+
+		if ( $aliases !== [] ) {
+			$meta['aliases'] = $aliases;
+		}
 
 		return [
 			'font_key'    => $font_key,
@@ -340,7 +364,7 @@ class Font_Sources {
 			'source'      => (string) $row['source'],
 			'entry'       => (string) $row['entry'],
 			'coverage'    => (int) $coverage,
-			'meta'        => $coverage ? static::coverage_meta( $font_key, $entry, $roles, $row ) : [],
+			'meta'        => $meta,
 			'version'     => $row['version'] ?? null,
 			'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
 			'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
@@ -362,12 +386,7 @@ class Font_Sources {
 	 * @since 7.0
 	 */
 	public static function coverage_meta( string $font_key, array $entry, array $roles, array $row ): array {
-		$languages = [];
-		foreach ( (array) ( $entry['language_to_font'] ?? [] ) as $code => $target ) {
-			if ( $target === $font_key ) {
-				$languages[] = (string) $code;
-			}
-		}
+		$languages = static::names_targeting( (array) ( $entry['language_to_font'] ?? [] ), $font_key );
 
 		$families = [];
 		foreach ( (array) ( $entry['family_substitution'] ?? [] ) as $family => $keys ) {
@@ -391,6 +410,20 @@ class Font_Sources {
 		}
 
 		return $meta;
+	}
+
+	/**
+	 * The names in a `name => font key` map that point at one font key
+	 *
+	 * Shared by the entry's language map and its aliases, which are the same shape read two ways. `array_keys()`
+	 * with a search value does the work; the cast is because PHP turns an all-digit JSON object key into an int.
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	protected static function names_targeting( array $map, string $font_key ): array {
+		return array_map( 'strval', array_keys( $map, $font_key, true ) );
 	}
 
 	/**
@@ -424,6 +457,20 @@ class Font_Sources {
 
 			if ( ! static::is_valid_relative_path( $file['remote_path'] ) ) {
 				return sprintf( 'remote_path "%s" escapes the files directory', $file['remote_path'] );
+			}
+
+			/*
+			 * The two fields the whole install-time security model rests on (§4.10). The runtime fails closed
+			 * without them — `hash_equals( '', … )` is false and a zero size mismatches — so leaving them
+			 * unchecked here did not open a hole; it moved a build mistake from a rejected index at sync onto a
+			 * customer's site as a `font_size_mismatch` mid-install.
+			 */
+			if ( ! isset( $file['sha256'] ) || ! is_string( $file['sha256'] ) || preg_match( static::SHA256_PATTERN, $file['sha256'] ) !== 1 ) {
+				return sprintf( 'file "%s" has no sha256 digest', $filename );
+			}
+
+			if ( ! isset( $file['size'] ) || ! is_int( $file['size'] ) || $file['size'] < 1 ) {
+				return sprintf( 'file "%s" has no positive integer size', $filename );
 			}
 		}
 
@@ -462,7 +509,7 @@ class Font_Sources {
 	}
 
 	/**
-	 * The four maps that name font keys: every name has to be a key this entry registers
+	 * The five maps that name font keys: every name has to be a key this entry registers
 	 *
 	 * `coverage_meta()` consumes all four by inverting them per font key of the same entry, so a name the entry
 	 * does not register is not a weaker row — it is no row at all, and nothing downstream can tell. That is how a
@@ -488,7 +535,24 @@ class Font_Sources {
 			'family_substitution' => $families,
 			'backup_subs_fonts'   => (array) ( $entry['backup_subs_fonts'] ?? [] ),
 			'bmp_fonts'           => (array) ( $entry['bmp_fonts'] ?? [] ),
+			'aliases'             => array_values( (array) ( $entry['aliases'] ?? [] ) ),
 		];
+
+		/*
+		 * An alias is a font-family name a document may ask for, so it is charset-checked like the keys it stands
+		 * in for. Aliasing a key the entry registers would shadow that font with itself.
+		 */
+		foreach ( array_keys( (array) ( $entry['aliases'] ?? [] ) ) as $alias ) {
+			$alias = (string) $alias;
+
+			if ( preg_match( static::KEY_PATTERN, $alias ) !== 1 ) {
+				return sprintf( 'alias "%s" is not a valid font family name', $alias );
+			}
+
+			if ( in_array( $alias, $registered, true ) ) {
+				return sprintf( 'alias "%s" is also a font key this entry registers', $alias );
+			}
+		}
 
 		foreach ( $maps as $map => $keys ) {
 			foreach ( $keys as $key ) {
