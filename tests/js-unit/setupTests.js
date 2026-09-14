@@ -1,4 +1,5 @@
 import util from 'util';
+import { configure } from '@testing-library/dom';
 import Enzyme from 'enzyme';
 import Adapter from '@cfaester/enzyme-adapter-react-18';
 import CSS from 'css.escape'; // eslint-disable-line
@@ -29,6 +30,15 @@ global.ResizeObserver =
 		unobserve() {}
 		disconnect() {}
 	};
+
+/*
+ * The Font Manager's fixtures answer on a 220 ms timer, so a pane that reads the font list, the sources and a
+ * catalogue page in sequence is already two-thirds of Testing Library's 1 s default before a worker shares a
+ * core with three others. Raised rather than waited on case by case: every timeout it caused was the clock,
+ * never the assertion. Kept under Jest's own 5 s per-test limit so a query that never resolves still fails as
+ * "unable to find an element", with the DOM, rather than as a bare test timeout.
+ */
+configure({ asyncUtilTimeout: 2500 });
 
 Enzyme.configure({
 	adapter: new Adapter(),

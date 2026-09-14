@@ -48,6 +48,7 @@ import VariantRoles from './VariantRoles';
  * @param {Function} props.navigate
  * @param {boolean}  props.hasSelect
  * @param {Function} props.onSetActive
+ * @param {Function} props.onImport    Opens the offline package dialog
  *
  * @return {JSX.Element} The panel
  *
@@ -61,6 +62,7 @@ export default function EntryDetail({
 	navigate,
 	hasSelect,
 	onSetActive,
+	onImport,
 }) {
 	const id = `${source}/${entry}`;
 
@@ -211,6 +213,14 @@ export default function EntryDetail({
 			</div>
 
 			<div className="fm-actions">
+				{/* A pack is the only thing the store publishes an archive for (§4.3 Hosting), so it is the
+				    only entry this offers — and it offers it installed too, since an update is an import */}
+				{!!catalog.coverage && (
+					<Button variant="secondary" onClick={onImport}>
+						{__('Install from file', 'gravity-pdf')}
+					</Button>
+				)}
+
 				{installed && canDeleteFiles && (
 					<Button
 						variant="secondary"

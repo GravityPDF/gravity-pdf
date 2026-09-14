@@ -1,7 +1,7 @@
 import React from 'react';
 import { RegistryProvider, createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { store as fontStore } from '../../../../src/assets/js/react/fontManager/store';
 import { enableMockApi } from '../../../../src/assets/js/react/fontManager/api';
 import { resetState } from '../../../../src/assets/js/react/fontManager/api/mock/state';
@@ -42,4 +42,21 @@ export function renderWithStore(
 		registry,
 		...render(<RegistryProvider value={registry}>{ui}</RegistryProvider>),
 	};
+}
+
+/**
+ * Open the sidebar's "+ Add new font" menu
+ *
+ * Shared because the toggle has no accessible name of its own, so reaching it means naming a class
+ * `@wordpress/components` owns — which is worth having in one place rather than in every suite that opens it.
+ * The `findByText` first is the readiness wait: the sidebar draws its groups once the font list resolves.
+ *
+ * @param {Object} user A `userEvent` session
+ */
+export async function openAddMenu(user) {
+	await screen.findByText('Bundled');
+
+	await user.click(
+		document.querySelector('.components-dropdown-menu__toggle')
+	);
 }

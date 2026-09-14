@@ -21,7 +21,7 @@ describe('Font Manager - a catalogue entry', () => {
 		open('#/fontmanager/browse/packs/korean');
 
 		await user.click(
-			await screen.findByRole('button', { name: /Install/ })
+			await screen.findByRole('button', { name: /^Install ·/ })
 		);
 
 		await waitFor(() =>

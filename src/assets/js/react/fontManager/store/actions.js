@@ -43,10 +43,11 @@ export const receiveSearch = (key, results) => ({
 });
 export const setActiveFont = (id) => ({ type: 'SET_ACTIVE_FONT', id });
 export const setBusy = (key, busy) => ({ type: 'SET_BUSY', key, busy });
-export const setError = (key, message) => ({
+export const setError = (key, message, code = '') => ({
 	type: 'SET_ERROR',
 	key,
 	message,
+	code,
 });
 
 /**
@@ -97,6 +98,36 @@ export const installEntry =
 			);
 			dispatch(refreshStatuses());
 		});
+	};
+
+/**
+ * Install an entry from an uploaded package instead of from the store
+ *
+ * Past the `202` an import is an ordinary queued install, so there is nothing to do but seed the status map and
+ * let the poller carry it, exactly as `installEntry()` does. The id comes back because the dialog closes onto
+ * that entry's page; why it failed does not, because `getError()`/`getErrorCode()` already hold it.
+ *
+ * @param {File} file The archive the admin chose
+ *
+ * @return {Promise<string>} The `{source}/{entry}` now installing, or an empty string
+ *
+ * @since 7.0
+ */
+export const importPackage =
+	(file) =>
+	async ({ dispatch }) => {
+		let id = '';
+
+		await run(dispatch, 'import', async () => {
+			const statuses = await api.importPackage(file);
+
+			dispatch(receiveStatuses(statuses));
+			dispatch(refreshStatuses());
+
+			id = Object.keys(statuses)[0] ?? '';
+		});
+
+		return id;
 	};
 
 /**
@@ -265,7 +296,8 @@ async function run(dispatch, key, write) {
 			setError(
 				key,
 				failure?.message ??
-					__('Something went wrong. Try again.', 'gravity-pdf')
+					__('Something went wrong. Try again.', 'gravity-pdf'),
+				failure?.code ?? ''
 			)
 		);
 	} finally {

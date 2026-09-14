@@ -93,3 +93,25 @@ export const saveSettings = (body) => post('/settings', body);
 export const uploadFont = (body) => post('/', body);
 export const editFont = (id, body) => post(`/${id}`, body);
 export const deleteFont = (id) => remove(`/${id}`);
+
+/**
+ * Hand one offline package to `POST /fonts/import`
+ *
+ * `body` rather than `data`: `apiFetch`'s `data` shorthand JSON-encodes what it is given and sets a JSON
+ * content type, which is neither of the things a 6 MB zip needs. A `FormData` body goes through untouched and
+ * lets the browser set the multipart boundary, so the archive arrives as an ordinary `$_FILES` entry — which is
+ * what the route reads (`file`), and what a host's own upload cap applies to.
+ *
+ * @param {File} file The archive the admin chose
+ *
+ * @return {Promise<Object>} The status map the install was queued under
+ *
+ * @since 7.0
+ */
+export const importPackage = (file) => {
+	const body = new window.FormData();
+
+	body.append('file', file);
+
+	return apiFetch({ path: `${API_ROOT}/import`, method: 'POST', body });
+};

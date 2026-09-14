@@ -48,10 +48,13 @@ describe('Font Manager - store/reducer.js', () => {
 			type: 'SET_ERROR',
 			key: 'lato',
 			message: 'nope',
+			code: 'font_entry_unknown',
 		});
 
 		expect(state.busy).toEqual({ 'packs/emoji': true });
-		expect(state.errors).toEqual({ lato: 'nope' });
+		expect(state.errors).toEqual({
+			lato: { message: 'nope', code: 'font_entry_unknown' },
+		});
 	});
 
 	test('ignores an action it does not know', () => {

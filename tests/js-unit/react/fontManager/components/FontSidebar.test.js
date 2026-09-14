@@ -1,15 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FontManager from '../../../../../src/assets/js/react/fontManager/components/FontManager';
-import { renderWithStore } from '../renderWithStore';
-
-const openAddMenu = async (user) => {
-	await screen.findByText('Bundled');
-
-	await user.click(
-		document.querySelector('.components-dropdown-menu__toggle')
-	);
-};
+import { openAddMenu, renderWithStore } from '../renderWithStore';
 
 describe('Font Manager - the sidebar', () => {
 	test('builds the browse items from the registered sources alone', async () => {

@@ -75,3 +75,14 @@ export const POLL_INTERVALS = [2000, 5000, 10000];
  * @since 7.0
  */
 export const POLL_IDLE_INTERVAL = 30000;
+
+/**
+ * The documentation page describing every way to install a font without an outbound connection
+ *
+ * The one page that describes all three offline routes, so it is what the import dialog offers an admin whose
+ * host will not take the upload at all — the case no retry of this screen can fix.
+ *
+ * @since 7.0
+ */
+export const DOCS_OFFLINE_INSTALL =
+	'https://docs.gravitypdf.com/users/installing-fonts-offline/';

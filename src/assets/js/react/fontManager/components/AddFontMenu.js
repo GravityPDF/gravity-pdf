@@ -16,20 +16,17 @@ import { plus } from '@wordpress/icons';
  * `gfpdf_font_sources` appears here with nothing in this file changing — which is the whole reason the menu
  * carries no fixed "Browse language packs" item.
  *
- * The offline zip import belongs here too and is not built yet. `POST /fonts/import` now answers (§4.7), so
- * what is left is the picker: an item in all three surfaces §4.6 names, the upload itself, and the host-cap
- * guidance an over-`upload_max_filesize` zip comes back with.
- *
  * @param {Object}        props
  * @param {Array<Object>} props.sources  The registered source records
  * @param {Function}      props.onUpload
+ * @param {Function}      props.onImport Opens the offline package dialog
  * @param {Function}      props.onBrowse Called with a source id
  *
  * @return {JSX.Element} The menu
  *
  * @since 7.0
  */
-export default function AddFontMenu({ sources, onUpload, onBrowse }) {
+export default function AddFontMenu({ sources, onUpload, onImport, onBrowse }) {
 	return (
 		<DropdownMenu
 			icon={plus}
@@ -51,6 +48,14 @@ export default function AddFontMenu({ sources, onUpload, onBrowse }) {
 							}}
 						>
 							{__('Upload font files', 'gravity-pdf')}
+						</MenuItem>
+						<MenuItem
+							onClick={() => {
+								onClose();
+								onImport();
+							}}
+						>
+							{__('Install from file', 'gravity-pdf')}
 						</MenuItem>
 					</MenuGroup>
 					<MenuGroup>

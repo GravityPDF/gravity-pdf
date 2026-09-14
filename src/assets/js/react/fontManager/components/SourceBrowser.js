@@ -35,12 +35,13 @@ import SourceInfoTip from './SourceInfoTip';
  * @param {Object}   props
  * @param {string}   props.source   The source being browsed
  * @param {Function} props.navigate
+ * @param {Function} props.onImport Opens the offline package dialog
  *
  * @return {JSX.Element} The browser
  *
  * @since 7.0
  */
-export default function SourceBrowser({ source, navigate }) {
+export default function SourceBrowser({ source, navigate, onImport }) {
 	const [term, setTerm] = useState('');
 	const [search, setSearch] = useState('');
 	const [category, setCategory] = useState('');
@@ -162,6 +163,7 @@ export default function SourceBrowser({ source, navigate }) {
 						setPage={setPage}
 						navigate={navigate}
 						onInstall={installEntry}
+						onImport={onImport}
 					/>
 				)}
 			</div>
@@ -189,6 +191,7 @@ export default function SourceBrowser({ source, navigate }) {
  * @param {Function} props.setPage
  * @param {Function} props.navigate
  * @param {Function} props.onInstall
+ * @param {Function} props.onImport
  * @return {JSX.Element} The toolbar, the pager and the cards
  *
  * @since 7.0
@@ -207,6 +210,7 @@ function Catalogue({
 	setPage,
 	navigate,
 	onInstall,
+	onImport,
 }) {
 	const filtered = category || subset;
 
@@ -278,6 +282,19 @@ function Catalogue({
 								}}
 							>
 								{__('Clear filters', 'gravity-pdf')}
+							</Button>
+						)}
+
+						{/* A source with no packs has no published archive to import, and one that has
+						    never synced has nothing to verify an archive against (§10) */}
+						{record.coverage > 0 && (
+							<Button
+								className="gfpdf-fm-browser-import"
+								variant="secondary"
+								size="compact"
+								onClick={onImport}
+							>
+								{__('Install from file', 'gravity-pdf')}
 							</Button>
 						)}
 					</div>

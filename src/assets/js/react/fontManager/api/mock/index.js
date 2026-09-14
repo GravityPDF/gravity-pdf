@@ -50,6 +50,7 @@ const ROUTES = [
 	],
 	['GET', /^\/fonts\/status\/?$/, status],
 	['POST', /^\/fonts\/updates\/?$/, updateAll],
+	['POST', /^\/fonts\/import\/?$/, importPackage],
 	['GET', /^\/fonts\/settings\/?$/, readSettings],
 	['POST', /^\/fonts\/settings\/?$/, writeSettings],
 	['POST', /^\/fonts\/([a-z0-9_-]+)\/?$/, editFont],
@@ -371,6 +372,50 @@ function removeEntry({ params }) {
 		files_done: 0,
 		error: null,
 	});
+
+	return { [id]: installStatus(id) };
+}
+
+/* --- /fonts/import --- */
+
+/* The mocked STORE's own naming rule, and the only copy of it in the front end: the plugin matches an upload
+   against the `package` column rather than rebuilding a filename, so a test hard-coding a name instead would be
+   asserting against the wrong side of that boundary */
+export const archiveName = (pack) => `${pack.entry}-fonts-v${pack.version}.zip`;
+
+function importPackage(request, options) {
+	const file = options.body?.get('file');
+
+	if (!file) {
+		throw error(
+			'font_package_missing',
+			'No font package was uploaded.',
+			400
+		);
+	}
+
+	if (file.size > state.upload_cap) {
+		throw error(
+			'font_package_too_large',
+			'The font package is larger than this server accepts as an upload. Ask your host to raise the upload limit, or copy the font files into the fonts directory over FTP instead.',
+			413
+		);
+	}
+
+	const pack = PACK_ENTRIES.find((entry) => archiveName(entry) === file.name);
+
+	if (!pack) {
+		throw error(
+			'font_entry_unknown',
+			'The font catalogue does not list this package. Sync the catalogue and try again — a site that has never synced cannot verify an import yet.',
+			404
+		);
+	}
+
+	const id = `${pack.source}/${pack.entry}`;
+
+	/* The files are on disk by now, so what follows is the ordinary install every other trigger queues */
+	runInstall(id, '', null);
 
 	return { [id]: installStatus(id) };
 }

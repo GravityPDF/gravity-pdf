@@ -31,7 +31,22 @@ export const getStatuses = (state) => state.statuses;
 export const getActiveFont = (state) => state.activeFont;
 
 export const isBusy = (state, key) => !!state.busy[key];
-export const getError = (state, key) => state.errors[key] ?? '';
+export const getError = (state, key) => state.errors[key]?.message ?? '';
+
+/**
+ * The `WP_Error` code behind `getError()`, for the few places the wording is not the whole answer
+ *
+ * An import refused because the host will not take a 6 MB upload wants different advice from one refused
+ * because the archive was the wrong version, and only the code tells them apart.
+ *
+ * @param {Object} state
+ * @param {string} key
+ *
+ * @return {string} The code, or an empty string
+ *
+ * @since 7.0
+ */
+export const getErrorCode = (state, key) => state.errors[key]?.code ?? '';
 
 const fromFonts = (derive) =>
 	createRegistrySelector((select) => (state, ...args) => {

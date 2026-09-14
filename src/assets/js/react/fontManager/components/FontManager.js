@@ -20,6 +20,7 @@ import EmptyState from './EmptyState';
 import EntryDetail from './EntryDetail';
 import FontManagerHeader from './FontManagerHeader';
 import FontSidebar from './FontSidebar';
+import ImportDialog from './ImportDialog';
 import LanguageSettings from './LanguageSettings';
 import SourceBrowser from './SourceBrowser';
 import UpdatesPanel from './UpdatesPanel';
@@ -41,6 +42,7 @@ import UpdatesPanel from './UpdatesPanel';
 export default function FontManager({ onActive = null }) {
 	const { route, navigate, close } = useHashRoute();
 	const [adding, setAdding] = useState(false);
+	const [importing, setImporting] = useState(false);
 
 	/* Selected here, not primed here: the registry selectors resolve their own reads on first use */
 	const row = useSelect(
@@ -68,6 +70,7 @@ export default function FontManager({ onActive = null }) {
 		}
 
 		setAdding(false);
+		setImporting(false);
 	}, [route]);
 
 	if (!route) {
@@ -86,6 +89,8 @@ export default function FontManager({ onActive = null }) {
 		setAdding(false);
 		navigate(paths.home());
 	};
+
+	const openImport = () => setImporting(true);
 
 	return (
 		<Modal
@@ -115,6 +120,7 @@ export default function FontManager({ onActive = null }) {
 							setAdding(true);
 							navigate(paths.home());
 						}}
+						onImport={openImport}
 					/>
 
 					{loaded &&
@@ -126,10 +132,23 @@ export default function FontManager({ onActive = null }) {
 							back,
 							setAdding,
 							setActive,
+							onImport: openImport,
 							hasSelect: !!onActive,
 						})}
 				</div>
 			</div>
+
+			{importing && (
+				<ImportDialog
+					onClose={() => setImporting(false)}
+					onInstalling={(id) => {
+						const [source, entry] = id.split('/');
+
+						setImporting(false);
+						navigate(paths.entry(source, entry));
+					}}
+				/>
+			)}
 
 			<SnackbarList
 				className="gfpdf-fm-snackbars"
@@ -148,6 +167,7 @@ function detail({
 	back,
 	setAdding,
 	setActive,
+	onImport,
 	hasSelect,
 }) {
 	const shared = {
@@ -155,6 +175,7 @@ function detail({
 		navigate,
 		hasSelect,
 		onSetActive: setActive,
+		onImport,
 	};
 
 	if (route.name === 'settings') {
@@ -167,7 +188,11 @@ function detail({
 
 	if (route.name === 'browse') {
 		return (
-			<SourceBrowser source={route.params.source} navigate={navigate} />
+			<SourceBrowser
+				source={route.params.source}
+				navigate={navigate}
+				onImport={onImport}
+			/>
 		);
 	}
 

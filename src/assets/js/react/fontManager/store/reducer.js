@@ -78,7 +78,13 @@ export function reducer(state = DEFAULT_STATE, action = {}) {
 		case 'SET_ERROR':
 			return {
 				...state,
-				errors: { ...state.errors, [action.key]: action.message },
+				errors: {
+					...state.errors,
+					[action.key]: {
+						message: action.message,
+						code: action.code ?? '',
+					},
+				},
 			};
 
 		default:

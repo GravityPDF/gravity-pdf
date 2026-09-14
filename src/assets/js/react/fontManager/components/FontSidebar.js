@@ -27,13 +27,20 @@ import SearchBox from './SearchBox';
  * @param {?Object}  props.route    The matched route, for the selected row
  * @param {Function} props.navigate
  * @param {Function} props.onUpload
+ * @param {Function} props.onImport Opens the offline package dialog
  * @param {boolean}  props.adding   Whether an unsaved upload is showing in the detail pane
  *
  * @return {JSX.Element} The sidebar
  *
  * @since 7.0
  */
-export default function FontSidebar({ route, navigate, onUpload, adding }) {
+export default function FontSidebar({
+	route,
+	navigate,
+	onUpload,
+	onImport,
+	adding,
+}) {
 	const [search, setSearch] = useState('');
 
 	const {
@@ -97,6 +104,7 @@ export default function FontSidebar({ route, navigate, onUpload, adding }) {
 				<AddFontMenu
 					sources={sources}
 					onUpload={onUpload}
+					onImport={onImport}
 					onBrowse={(id) => navigate(paths.browse(id))}
 				/>
 

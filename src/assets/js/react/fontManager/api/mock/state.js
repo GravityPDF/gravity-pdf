@@ -169,6 +169,9 @@ export function initialState() {
 		/* code → font key, the overrides the settings screen posts back */
 		overrides: {},
 
+		/* This host's `upload_max_filesize`, in bytes: what an import over it comes back as a `413` from */
+		upload_cap: 8 * 1024 * 1024,
+
 		timers: [],
 	};
 }
