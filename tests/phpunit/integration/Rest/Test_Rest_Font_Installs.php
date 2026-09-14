@@ -498,7 +498,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 	 * One pack, seeded in the catalogue and packaged the way the pipeline packages it
 	 */
 	protected function seed_package(): string {
-		$this->seed_pack( 'emoji', [ 'entry_json' => (string) wp_json_encode( $this->package_entry() ) ] );
+		$this->seed_pack( 'emoji', [ 'entry_json' => (string) wp_json_encode( $this->package_entry() ), 'package' => $this->package_name() ] );
 
 		return $this->package_archive();
 	}

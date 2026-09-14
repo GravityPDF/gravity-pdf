@@ -37,7 +37,7 @@ class Font_Schema {
 	 *
 	 * @since 7.0
 	 */
-	public const VERSION = '7.0.1';
+	public const VERSION = '7.0.2';
 
 	/**
 	 * The option holding the schema version this site last created, GF-style
@@ -369,6 +369,7 @@ class Font_Schema {
 			entry_sha256 char(64) default NULL,
 			entry_json longtext,
 			font_keys varchar(255) default NULL,
+			package varchar(255) default NULL,
 			phase varchar(16) default NULL,
 			phase_since datetime default NULL,
 			error text,

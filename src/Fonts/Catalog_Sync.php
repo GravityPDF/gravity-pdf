@@ -153,6 +153,7 @@ class Catalog_Sync {
 		'entry_sha256',
 		'entry_json',
 		'font_keys',
+		'package',
 	];
 
 	/**
@@ -981,6 +982,14 @@ class Catalog_Sync {
 			'entry_json'   => is_array( $inlined ) ? wp_json_encode( $inlined ) : null,
 			/* Mirrored so the unregistered-font check can map a missing key to its entry without decoding anything */
 			'font_keys'    => is_array( $inlined ) ? $this->csv( array_keys( (array) ( $inlined['fonts'] ?? [] ) ) ) : null,
+			/*
+			 * The offline archive's object name, taken from the row and never rebuilt from `entry`/`version`: an
+			 * import matches an uploaded package against this column, so the source owns the filename's grammar
+			 * and can change it without a coordinated plugin release. The inlined entry carries the same string
+			 * for an airgapped reader, which has the archive and no catalogue; the two are gated equal upstream,
+			 * and reading the inlined copy here as a fallback would be the second answer that lets them drift.
+			 */
+			'package'      => $this->nullable_string( $entry['package'] ?? null, 255 ),
 		];
 	}
 

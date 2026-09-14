@@ -79,15 +79,19 @@ class Test_Font_Package_Importer extends TestCase {
 		parent::tear_down();
 	}
 
-	protected function seed_pack(): void {
+	protected function seed_pack( array $overrides = [] ): void {
 		$this->insert_catalog_row(
 			'packs',
 			'emoji',
-			[
-				'coverage'   => 1,
-				'files'      => 1,
-				'entry_json' => (string) wp_json_encode( $this->package_entry() ),
-			]
+			array_merge(
+				[
+					'coverage'   => 1,
+					'files'      => 1,
+					'entry_json' => (string) wp_json_encode( $this->package_entry() ),
+					'package'    => $this->package_name(),
+				],
+				$overrides
+			)
 		);
 	}
 
@@ -242,12 +246,8 @@ class Test_Font_Package_Importer extends TestCase {
 		$entry = $this->package_entry();
 
 		$this->mock_http( [] );
-		$this->insert_catalog_row(
-			'packs',
-			'emoji',
+		$this->seed_pack(
 			[
-				'coverage'     => 1,
-				'files'        => 1,
 				'entry_json'   => null,
 				'entry_sha256' => hash( 'sha256', (string) wp_json_encode( $entry ) ),
 			]
@@ -266,21 +266,50 @@ class Test_Font_Package_Importer extends TestCase {
 	 */
 	public function test_a_pointer_entry_refuses_an_archive_describing_another_version() {
 		$this->mock_http( [] );
-		$this->insert_catalog_row(
-			'packs',
-			'emoji',
-			[
-				'coverage'     => 1,
-				'files'        => 1,
-				'entry_json'   => null,
-				'entry_sha256' => str_repeat( 'f', 64 ),
-			]
-		);
+		$this->seed_pack( [ 'entry_json' => null, 'entry_sha256' => str_repeat( 'f', 64 ) ] );
 
 		$error = $this->importer->import( $this->package_archive() );
 
 		$this->assertSame( 'font_package_invalid', $error->get_error_code() );
 		$this->assertSame( [], $this->requested_urls() );
+		$this->assertFileDoesNotExist( $this->installed() );
+	}
+
+	/**
+	 * The archive is found by the name the SOURCE published for it, not by `{entry}-{version}.zip` rebuilt here
+	 *
+	 * The spelling belongs to the pipeline, and P5b has to change it: a display family's archive needs a source
+	 * segment to stay unique in a flat `files/` prefix. A lookup that reassembled the name from two columns would
+	 * make that a coordinated release across two repositories, and would agree with the pipeline by luck until then.
+	 */
+	public function test_an_archive_is_matched_by_the_name_the_source_published_for_it() {
+		$entry                    = $this->package_entry();
+		$entry['package']['path'] = 'packs-emoji-fonts-v1.0.0.zip';
+
+		$this->seed_pack( [ 'entry_json' => (string) wp_json_encode( $entry ), 'package' => 'packs-emoji-fonts-v1.0.0.zip' ] );
+
+		$row = $this->importer->import(
+			$this->package_archive(
+				[
+					Font_Package_Importer::MANIFEST => (string) wp_json_encode( $entry ),
+					'Noto.ttf'                      => $this->font_bytes( 'DejaVuSansSymbols' ),
+				]
+			)
+		);
+
+		$this->assertSame( 'emoji', $row['entry'] );
+		$this->assertFileExists( $this->installed() );
+	}
+
+	/**
+	 * The other half: a row that published no archive cannot be reached by naming the one it would have had
+	 */
+	public function test_an_entry_the_source_published_no_archive_for_is_a_404() {
+		$this->seed_pack( [ 'package' => null ] );
+
+		$error = $this->importer->import( $this->package_archive() );
+
+		$this->assertSame( 'font_entry_unknown', $error->get_error_code() );
 		$this->assertFileDoesNotExist( $this->installed() );
 	}
 

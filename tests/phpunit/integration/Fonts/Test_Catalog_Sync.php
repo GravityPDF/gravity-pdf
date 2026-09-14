@@ -531,6 +531,23 @@ class Test_Catalog_Sync extends TestCase {
 		$this->assertSame( 'emojifont', $row['font_keys'] );
 	}
 
+	/**
+	 * The archive's name is a published column, carried across verbatim, and absent for an entry without one
+	 */
+	public function test_the_published_package_name_is_stored_as_it_was_published() {
+		$this->publish(
+			[
+				$this->pack_entry( 'emoji', [ 'package' => 'emoji-fonts-v1.0.0.zip' ] ),
+				$this->pack_entry( 'lato' ),
+			]
+		);
+		$this->sync()->run();
+
+		$this->assertSame( 'emoji-fonts-v1.0.0.zip', $this->catalog_repository()->entry( 'packs', 'emoji' )['package'] );
+		/* `''`, not null: `upsert()` binds every column as `%s`. What matters is that it matches no upload. */
+		$this->assertSame( '', $this->catalog_repository()->entry( 'packs', 'lato' )['package'] );
+	}
+
 	public function test_a_pointed_at_entry_stores_its_hash_and_no_json() {
 		$entry = $this->pack_entry( 'lato' );
 		unset( $entry['entry'] );

@@ -11,8 +11,9 @@ use ZipArchive;
  * The offline package the release pipeline publishes, built here
  *
  * One archive layout for every suite that imports one, because it is the pipeline's shape and not any one test's:
- * bare filenames at the zip root, `entry.json` beside them, and a `package.path` naming `{entry}-{version}.zip`
- * (§4.3 Hosting). A second hand-rolled copy would keep passing while the real artefact moved.
+ * bare filenames at the zip root, `entry.json` beside them, and a `package.path` naming the archive the same way
+ * the row's `package` column does (§4.3 Hosting). A second hand-rolled copy would keep passing while the real
+ * artefact moved.
  *
  * Pairs with `HasCatalogRows` for the row the import verifies against, and with `HasFontFixtures` for the bytes.
  */
@@ -42,8 +43,19 @@ trait HasFontPackages {
 					'remote_path' => 'fonts-v1.0.0/Noto.ttf',
 				],
 			],
-			'package' => [ 'path' => 'emoji-fonts-v1.0.0.zip' ],
+			'package' => [ 'path' => $this->package_name() ],
 		];
+	}
+
+	/**
+	 * The archive's object name, as the source publishes it on the row and inside the entry alike
+	 *
+	 * Stated here and read by everything else, including `package_entry()`. A seed that rebuilt
+	 * `{entry}-{version}.zip` instead would be the duplication the `package` column exists to remove — it would
+	 * keep passing after the pipeline renamed one.
+	 */
+	protected function package_name(): string {
+		return 'emoji-fonts-v1.0.0.zip';
 	}
 
 	/**

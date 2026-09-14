@@ -52,6 +52,19 @@ class Test_Catalog_Repository extends TestCase {
 		$this->insert_catalog_row( 'packs', 'barcode', [ 'label' => 'Barcode', 'position' => 2, 'coverage' => 1, 'size' => 20000 ] );
 	}
 
+	/**
+	 * A sync stores `''` for a row that published no archive, because `upsert()` binds every column as `%s`, so
+	 * those rows are real and a nameless upload must match none of them
+	 */
+	public function test_an_archive_is_found_by_the_name_its_source_published() {
+		$this->insert_catalog_row( 'packs', 'korean', [ 'coverage' => 1, 'package' => 'korean-fonts-v1.0.0.zip' ] );
+		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1, 'package' => '' ] );
+
+		$this->assertSame( 'korean', $this->catalog->entry_for_package( 'korean-fonts-v1.0.0.zip' )['entry'] );
+		$this->assertNull( $this->catalog->entry_for_package( 'emoji-fonts-v1.0.0.zip' ), 'a row that published no archive is not reachable by the name it would have had' );
+		$this->assertNull( $this->catalog->entry_for_package( '' ) );
+	}
+
 	public function test_search_returns_entries_in_index_order_not_alphabetical() {
 		$this->seed_packs();
 
