@@ -65,7 +65,15 @@ export default class GravityForms {
 
 		const form: Form = JSON.parse(formJson);
 
-		form.title = title;
+		/*
+		 * Suffixed, because Gravity Forms de-duplicates titles on create and does it in O(n²):
+		 * `maybe_increment_title()` loops candidate suffixes, and each `is_unique_title()` reads every form in
+		 * the table. Against a long-lived environment — 2,354 forms here, 391 of them one spec's title — a
+		 * single create took 28.8 s against 0.11 s for a title nothing else holds, which is under Playwright's
+		 * untunable 30 s API timeout by a second and is why `beforeEach` timed out on a different test each run.
+		 * Nothing reads a form back by title: every spec uses the id this returns.
+		 */
+		form.title = `${title} ${Date.now()}`;
 
 		return await this.requestUtils.rest({
 			method: 'POST',
