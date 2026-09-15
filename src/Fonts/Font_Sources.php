@@ -302,6 +302,18 @@ class Font_Sources {
 	}
 
 	/**
+	 * Build a `{source}/{entry}` id from its two halves
+	 *
+	 * `split()`'s inverse, and here for the same reason: the slash is this class's business, not that of the
+	 * seventeen call sites that were spelling it themselves.
+	 *
+	 * @since 7.0
+	 */
+	public static function join( string $source, string $entry ): string {
+		return $source . '/' . $entry;
+	}
+
+	/**
 	 * @since 7.0
 	 */
 	public static function install_path( string $source, string $entry, string $filename ): string {

@@ -351,7 +351,7 @@ class Font_Installer {
 
 		foreach ( $this->downloader->download_multiple( $requests ) as $key => $part ) {
 			$item     = $items[ $key ];
-			$resolved = $entries[ $item['source'] . '/' . $item['entry'] ];
+			$resolved = $entries[ Font_Sources::join( (string) $item['source'], (string) $item['entry'] ) ];
 
 			if ( is_wp_error( $part ) ) {
 				$this->fail( (string) $item['source'], (string) $item['entry'], $part );
@@ -870,7 +870,7 @@ class Font_Installer {
 			$this->log->warning(
 				'Refusing to install a coverage font under a reserved key',
 				[
-					'entry' => $row['source'] . '/' . $row['entry'],
+					'entry' => Install_Requests::entry_id( $row ),
 					'key'   => $font_key,
 				]
 			);

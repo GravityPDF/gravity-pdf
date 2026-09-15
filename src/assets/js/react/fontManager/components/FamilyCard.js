@@ -8,7 +8,7 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { update as updateIcon } from '@wordpress/icons';
-import { fileSize, filterLabel } from '../utils/format';
+import { fileSize } from '../utils/format';
 import { isInstalling } from '../utils/install';
 import FontSwatch from './FontSwatch';
 import InstallProgress from './InstallProgress';
@@ -22,16 +22,23 @@ import ScriptChips from './ScriptChips';
  * because every install is already its own row in the sidebar.
  *
  * @param {Object}   props
- * @param {Object}   props.entry     The catalogue row
- * @param {?Object}  props.status    Its status object
+ * @param {Object}   props.entry         The catalogue row
+ * @param {string}   props.categoryLabel Its category, as the route translated it
+ * @param {?Object}  props.status        Its status object
  * @param {Function} props.onOpen
- * @param {Function} props.onInstall Install, update and retry are the same post
+ * @param {Function} props.onInstall     Install, update and retry are the same post
  *
  * @return {JSX.Element} The card
  *
  * @since 7.0
  */
-export default function FamilyCard({ entry, status, onOpen, onInstall }) {
+export default function FamilyCard({
+	entry,
+	categoryLabel = '',
+	status,
+	onOpen,
+	onInstall,
+}) {
 	const installed = !!status?.installed;
 	const updatable = !!status?.update;
 	const running = isInstalling(status);
@@ -52,8 +59,8 @@ export default function FamilyCard({ entry, status, onOpen, onInstall }) {
 				<span className="gfpdf-fm-card-meta">
 					<span className="gfpdf-fm-card-name">{entry.label}</span>
 					<span className="gfpdf-fm-card-sub">
-						{entry.category && filterLabel(entry.category)}
-						{entry.category && ' · '}
+						{categoryLabel}
+						{categoryLabel && ' · '}
 						{fileSize(entry.size)}
 					</span>
 					{entry.coverage ? (

@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FontManager from '../../../../../src/assets/js/react/fontManager/components/FontManager';
-import { state } from '../../../../../src/assets/js/react/fontManager/api/mock/state';
+import { state } from '../mock/state';
 import { renderWithStore } from '../renderWithStore';
 
 const open = (hash = '#/fontmanager/browse/google', prepare = null) =>

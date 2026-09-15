@@ -54,6 +54,12 @@ class Coverage_Resolver {
 	 */
 	protected $registry;
 
+	/**
+	 * @var array{stamp: string, map: array<string, string>}|null The legacy tag map this request has already built
+	 * @since 7.0
+	 */
+	protected $legacy;
+
 	public function __construct( Catalog_Repository $catalog, Font_Repository $repository, Registry $registry ) {
 		$this->catalog    = $catalog;
 		$this->repository = $repository;
@@ -138,7 +144,7 @@ class Coverage_Resolver {
 
 			$matched[] = $row;
 
-			$reasons[ $row['source'] . '/' . $row['entry'] ] = $claimed;
+			$reasons[ Install_Requests::entry_id( $row ) ] = $claimed;
 		}
 
 		return $this->requests( $matched, $reasons );
@@ -230,6 +236,16 @@ class Coverage_Resolver {
 	 * @since 7.0
 	 */
 	protected function legacy_map(): array {
+		/*
+		 * Memoised on the repository stamp for `default_language_map()`'s reason: four callers of one request ask
+		 * for this, and a render reaches two of them per pass over the document.
+		 */
+		$stamp = $this->repository->get_last_changed();
+
+		if ( $this->legacy !== null && $this->legacy['stamp'] === $stamp ) {
+			return $this->legacy['map'];
+		}
+
 		$tags = [];
 
 		foreach ( $this->repository->all() as $font_key => $row ) {
@@ -243,6 +259,11 @@ class Coverage_Resolver {
 				$tags[ strtolower( (string) $tag ) ] = $font_key;
 			}
 		}
+
+		$this->legacy = [
+			'stamp' => $stamp,
+			'map'   => $tags,
+		];
 
 		return $tags;
 	}
@@ -327,7 +348,7 @@ class Coverage_Resolver {
 				continue;
 			}
 
-			$id              = $row['source'] . '/' . $row['entry'];
+			$id              = Install_Requests::entry_id( $row );
 			$requests[ $id ] = [ 'entry' => $id ];
 
 			if ( isset( $reasons[ $id ] ) ) {

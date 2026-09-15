@@ -41,6 +41,9 @@ export const receiveSearch = (key, results) => ({
 	key,
 	results,
 });
+
+/* A sync replaces what a source holds, so the pages cached against the old index cannot be answered from */
+export const invalidateSearches = () => ({ type: 'INVALIDATE_SEARCHES' });
 export const setActiveFont = (id) => ({ type: 'SET_ACTIVE_FONT', id });
 export const setBusy = (key, busy) => ({ type: 'SET_BUSY', key, busy });
 export const setError = (key, message, code = '') => ({
@@ -182,6 +185,7 @@ export const refreshSources =
 
 			queued = !result.up_to_date;
 
+			dispatch(invalidateSearches());
 			dispatch(receiveSources(await api.fetchSources()));
 
 			if (!queued) {
@@ -202,16 +206,6 @@ export const reloadSources =
 	async ({ dispatch }) => {
 		dispatch(receiveSources(await api.fetchSources()));
 	};
-
-/**
- * Drop the browser's cached pages
- *
- * They are keyed by term, filter and page, so browsing a catalogue of 1,800 families retains every page
- * visited. Closing the modal is the natural point to let them go.
- *
- * @since 7.0
- */
-export const invalidateSearches = () => ({ type: 'INVALIDATE_SEARCHES' });
 
 /**
  * Create or edit one custom font row

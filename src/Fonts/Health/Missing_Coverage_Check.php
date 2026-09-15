@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Fonts\Health;
 
 use GFPDF\Fonts\Coverage_Resolver;
+use GFPDF\Fonts\Install_Requests;
 use GFPDF\Helper\Health\Health_Check;
 use GFPDF\Helper\Health\Health_Issue;
 
@@ -84,7 +85,7 @@ class Missing_Coverage_Check extends Health_Check {
 		}
 
 		foreach ( $this->resolver->legacy_covered_entries() as $row ) {
-			$id = $row['source'] . '/' . $row['entry'];
+			$id = Install_Requests::entry_id( $row );
 
 			/* A pack a render already asked for is being waited on, not stood in for: one issue per entry is enough */
 			if ( ! isset( $reported[ $id ] ) ) {
@@ -142,7 +143,7 @@ class Missing_Coverage_Check extends Health_Check {
 	 * @since 7.0
 	 */
 	protected function entry_issue( array $row ): Health_Issue {
-		$id      = $row['source'] . '/' . $row['entry'];
+		$id      = Install_Requests::entry_id( $row );
 		$details = [
 			sprintf(
 				/* translators: 1: a comma-separated list of scripts, 2: how long ago the first PDF needed them */

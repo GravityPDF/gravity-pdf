@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Fonts\Health;
 
 use GFPDF\Fonts\Font_Repository;
+use GFPDF\Fonts\Font_Sources;
 use GFPDF\Fonts\Registry;
 use GFPDF\Helper\Health\Health_Check;
 use GFPDF\Helper\Health\Health_Issue;
@@ -113,7 +114,7 @@ class Missing_Font_Files_Check extends Health_Check {
 	 */
 	protected function issue( string $font_key, array $row, array $missing ): Health_Issue {
 		$entry = (string) ( $row['entry'] ?? '' );
-		$id    = $row['source'] . '/' . $entry;
+		$id    = Font_Sources::join( (string) $row['source'], (string) $entry );
 		$label = (string) ( $row['label'] ?? $font_key );
 
 		return new Health_Issue(

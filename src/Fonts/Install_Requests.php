@@ -254,7 +254,7 @@ class Install_Requests {
 	 * @since 7.0
 	 */
 	public static function entry_id( array $row ): string {
-		return $row['source'] . '/' . $row['entry'];
+		return Font_Sources::join( (string) $row['source'], (string) $row['entry'] );
 	}
 
 	/**

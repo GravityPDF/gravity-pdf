@@ -289,7 +289,7 @@ class Font_Report {
 			$lines[] = sprintf(
 				/* translators: 1: the entry id, 2: the phase it is stuck in, 3: how long it has been there */
 				__( '%1$s: %2$s for %3$s', 'gravity-pdf' ),
-				$row['source'] . '/' . $row['entry'],
+				Install_Requests::entry_id( $row ),
 				(string) $row['phase'],
 				human_time_diff( (int) strtotime( (string) $row['phase_since'] . ' UTC' ) )
 			);

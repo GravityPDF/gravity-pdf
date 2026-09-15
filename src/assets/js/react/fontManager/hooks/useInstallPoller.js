@@ -46,17 +46,33 @@ export function useInstallPoller() {
 		}
 	}, [statuses, refreshFonts]);
 
+	/*
+	 * The chain re-arms itself rather than depending on `statuses`: a read that finds nothing moving leaves the
+	 * map identical, `RECEIVE_STATUSES` returns the same state object by design, and an effect keyed on it would
+	 * never run again — stopping the poll dead on the first quiet tick, which is most of an install.
+	 */
 	useEffect(() => {
 		if (!running) {
 			return undefined;
 		}
 
 		let timer = null;
+		let stopped = false;
 
-		const read = () => {
+		const arm = () => {
+			if (stopped || document.hidden) {
+				return;
+			}
+
+			timer = setTimeout(read, interval(step.current));
+		};
+
+		const read = async () => {
 			step.current += 1;
 
-			refreshStatuses();
+			await refreshStatuses();
+
+			arm();
 		};
 
 		const onVisibilityChange = () => {
@@ -69,23 +85,23 @@ export function useInstallPoller() {
 			/* Back at the front: one read straight away, and the back-off starts again */
 			step.current = 0;
 
-			refreshStatuses();
+			read();
 		};
 
-		if (!document.hidden) {
-			timer = setTimeout(read, interval(step.current));
-		}
+		arm();
 
 		document.addEventListener('visibilitychange', onVisibilityChange);
 
 		return () => {
+			stopped = true;
+
 			clearTimeout(timer);
 			document.removeEventListener(
 				'visibilitychange',
 				onVisibilityChange
 			);
 		};
-	}, [running, statuses, refreshStatuses]);
+	}, [running, refreshStatuses]);
 }
 
 /**

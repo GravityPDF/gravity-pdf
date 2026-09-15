@@ -102,6 +102,11 @@ export default function EntryDetail({
 	const [variants, setVariants] = useState({});
 	const [confirm, setConfirm] = useState(null);
 
+	/*
+	 * Keyed on which row this is, not on the row object, for the reason `CustomFontDetail` spells out: `GET
+	 * /fonts/` answers with a fresh document every time, so any background refresh — the poller runs one
+	 * whenever an unrelated install settles — would reset the form under the admin mid-edit.
+	 */
 	useEffect(() => {
 		if (row) {
 			setLabel(row.label);
@@ -113,7 +118,8 @@ export default function EntryDetail({
 		/* An entry with no installs prefills its own name; a second install starts empty and asks for one */
 		setLabel(rows.length === 0 ? (catalog?.label ?? '') : '');
 		setVariants(defaultsFor(catalog));
-	}, [row, catalog, rows.length]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [row?.id, catalog, rows.length]);
 
 	if (catalog === null) {
 		return <DetailLoading />;

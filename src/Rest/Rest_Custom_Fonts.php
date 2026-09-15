@@ -399,8 +399,6 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			FlushCache::flush();
-
 			return $this->row( $id );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
@@ -531,7 +529,7 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			FlushCache::flush();
+			FlushCache::flush_font( (string) $font['id'] );
 
 			return $this->row( (string) $font['id'] );
 		} catch ( UploadException $e ) {
@@ -607,7 +605,7 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			FlushCache::flush();
+			FlushCache::flush_font( $id );
 
 			return;
 

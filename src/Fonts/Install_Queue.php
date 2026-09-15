@@ -248,15 +248,16 @@ class Install_Queue extends Helper_Abstract_Queue {
 			return $nothing;
 		}
 
-		$items         = [];
-		$inline        = [];
-		$force         = ! empty( $request['force'] );
-		$this->claimed = $this->repository->claimed_filenames();
+		$items  = [];
+		$inline = [];
+		$force  = ! empty( $request['force'] );
 
-		/* Asked before the entry is read, so a trigger firing at an install already in flight costs one indexed row */
+		/* Asked before anything is read, so a trigger firing at an install already in flight costs one indexed row */
 		if ( ! $this->catalog->is_claimable( $source, $entry, $manual ) ) {
 			return $nothing;
 		}
+
+		$this->claimed = $this->repository->claimed_filenames();
 
 		if ( ! isset( $request['background'] ) && ! isset( $request['installs'] ) ) {
 			$plan = $this->entry_plan( $source, $entry, $force );
@@ -559,7 +560,7 @@ class Install_Queue extends Helper_Abstract_Queue {
 		$retried = 0;
 
 		foreach ( $this->catalog->retryable_entries() as $candidate ) {
-			if ( $this->enqueue_once( [ 'entry' => $candidate['source'] . '/' . $candidate['entry'] ] ) ) {
+			if ( $this->enqueue_once( [ 'entry' => Font_Sources::join( (string) $candidate['source'], (string) $candidate['entry'] ) ] ) ) {
 				++$retried;
 			}
 		}

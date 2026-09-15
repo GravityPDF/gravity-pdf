@@ -1,9 +1,5 @@
-import { mockMiddleware } from '../../../../../src/assets/js/react/fontManager/api/mock';
-import {
-	FILE_TICK,
-	resetState,
-	state,
-} from '../../../../../src/assets/js/react/fontManager/api/mock/state';
+import { mockMiddleware } from './mock';
+import { FILE_TICK, resetState, state } from './mock/state';
 
 const next = jest.fn();
 

@@ -10,6 +10,7 @@ import { Button } from '@wordpress/components';
 import { cog, close } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../constants';
+import { paths } from '../utils/paths';
 import SyncLine from './SyncLine';
 
 /**
@@ -52,7 +53,7 @@ export default function FontManagerHeader({ navigate, onClose }) {
 			<Button
 				icon={cog}
 				label={__('Language settings', 'gravity-pdf')}
-				onClick={() => navigate('/fontmanager/settings')}
+				onClick={() => navigate(paths.settings())}
 			/>
 			<Button
 				icon={close}

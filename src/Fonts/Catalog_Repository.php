@@ -500,7 +500,7 @@ class Catalog_Repository {
 		/* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- table name comes from Font_Schema */
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT source, entry FROM {$table} WHERE FIND_IN_SET( %s, font_keys ) > 0 ORDER BY position ASC, entry ASC LIMIT 1", $font_key ), ARRAY_A );
 
-		return is_array( $row ) ? $row['source'] . '/' . $row['entry'] : null;
+		return is_array( $row ) ? Install_Requests::entry_id( $row ) : null;
 	}
 
 	/**
@@ -818,7 +818,7 @@ class Catalog_Repository {
 		$statuses = [];
 
 		foreach ( (array) $rows as $row ) {
-			$statuses[ $row['source'] . '/' . $row['entry'] ] = $this->cast_row( $row );
+			$statuses[ Install_Requests::entry_id( $row ) ] = $this->cast_row( $row );
 		}
 
 		return $statuses;

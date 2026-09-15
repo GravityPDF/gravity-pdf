@@ -45,7 +45,7 @@ class Test_Font_Migration extends TestCase {
 
 		$this->repository = $gfpdf->get_font_repository();
 		$this->font_dir   = $this->repository->get_font_dir();
-		$this->migration  = new Font_Migration( GPDFAPI::get_options_class(), GPDFAPI::get_log_class() );
+		$this->migration  = new Font_Migration( $this->repository, GPDFAPI::get_options_class(), GPDFAPI::get_log_class() );
 
 		wp_mkdir_p( $this->font_dir );
 	}
@@ -88,7 +88,7 @@ class Test_Font_Migration extends TestCase {
 			]
 		);
 
-		$this->assertSame( 1, $this->migration->from_option( $this->repository ) );
+		$this->assertSame( 1, $this->migration->run() );
 
 		$row = $this->repository->get( 'myfont' );
 
@@ -117,7 +117,7 @@ class Test_Font_Migration extends TestCase {
 
 		$before = GPDFAPI::get_options_class()->get_option( 'custom_fonts' );
 
-		$this->migration->from_option( $this->repository );
+		$this->migration->run();
 
 		$this->assertSame( $before, GPDFAPI::get_options_class()->get_option( 'custom_fonts' ) );
 	}
@@ -133,8 +133,8 @@ class Test_Font_Migration extends TestCase {
 			]
 		);
 
-		$this->assertSame( 1, $this->migration->from_option( $this->repository ) );
-		$this->assertSame( 0, $this->migration->from_option( $this->repository ) );
+		$this->assertSame( 1, $this->migration->run() );
+		$this->assertSame( 0, $this->migration->run() );
 		$this->assertCount( 1, $this->repository->all() );
 	}
 
@@ -149,7 +149,7 @@ class Test_Font_Migration extends TestCase {
 			]
 		);
 
-		$this->migration->from_option( $this->repository );
+		$this->migration->run();
 
 		$file = $this->repository->get( 'gone' )['files']['R'];
 
@@ -167,7 +167,7 @@ class Test_Font_Migration extends TestCase {
 			]
 		);
 
-		$this->assertSame( 0, $this->migration->from_option( $this->repository ) );
+		$this->assertSame( 0, $this->migration->run() );
 		$this->assertNull( $this->repository->get( 'empty' ) );
 	}
 
@@ -193,7 +193,7 @@ class Test_Font_Migration extends TestCase {
 			]
 		);
 
-		$this->assertSame( 0, $this->migration->from_option( $this->repository ) );
+		$this->assertSame( 0, $this->migration->run() );
 		$this->assertCount( 1, $this->repository->all() );
 	}
 
@@ -217,7 +217,7 @@ class Test_Font_Migration extends TestCase {
 			]
 		);
 
-		$this->assertSame( 1, $this->migration->from_option( $this->repository ) );
+		$this->assertSame( 1, $this->migration->run() );
 
 		$keys = array_keys( $this->repository->all() );
 
@@ -232,7 +232,7 @@ class Test_Font_Migration extends TestCase {
 	public function test_no_records_is_a_no_op() {
 		$this->store_legacy_fonts( [] );
 
-		$this->assertSame( 0, $this->migration->from_option( $this->repository ) );
+		$this->assertSame( 0, $this->migration->run() );
 	}
 
 	/**
@@ -261,11 +261,14 @@ class Test_Font_Migration extends TestCase {
 
 		$repository = new Font_Repository(
 			$schema,
-			new Font_Migration( GPDFAPI::get_options_class(), GPDFAPI::get_log_class() ),
 			new Font_Lock(),
 			$gfpdf->misc,
 			GPDFAPI::get_log_class(),
 			$this->font_dir
+		);
+
+		$repository->add_population_pass(
+			new Font_Migration( $repository, GPDFAPI::get_options_class(), GPDFAPI::get_log_class() )
 		);
 
 		$this->assertTrue( $repository->ensure_ready() );

@@ -130,13 +130,6 @@ class Registry {
 	public const NUDGE_AFTER = 60;
 
 	/**
-	 * ...and this long is stuck: the UI stops polling and offers Retry
-	 *
-	 * @since 7.0
-	 */
-	public const STUCK_AFTER = 15 * MINUTE_IN_SECONDS;
-
-	/**
 	 * @var Font_Repository
 	 * @since 7.0
 	 */
@@ -177,6 +170,12 @@ class Registry {
 	 * @since 7.0
 	 */
 	protected $grouped;
+
+	/**
+	 * @var array{stamp: string, keys: array<string, true>}|null The registered keys this request has already built
+	 * @since 7.0
+	 */
+	protected $registered;
 
 	/**
 	 * @var array{stamp: string, map: array}|null The bundled-plus-installed map this request has already built
@@ -618,7 +617,7 @@ class Registry {
 		}
 
 		foreach ( $fonts['groups'] as $group ) {
-			$id = $group['source'] . '/' . $group['entry'];
+			$id = Font_Sources::join( (string) $group['source'], (string) $group['entry'] );
 
 			$groups[ $id ] = [
 				'group' => $id,
@@ -880,7 +879,7 @@ class Registry {
 			$font  = $this->font_object( $font_key, $row );
 
 			if ( (int) $row['coverage'] === 1 && $entry !== '' ) {
-				$entries[ $row['source'] . '/' . $entry ][] = $font;
+				$entries[ Font_Sources::join( (string) $row['source'], (string) $entry ) ][] = $font;
 				continue;
 			}
 
@@ -931,7 +930,7 @@ class Registry {
 		$missing   = [];
 
 		foreach ( $this->catalog->coverage_entries() as $row ) {
-			$id = $row['source'] . '/' . $row['entry'];
+			$id = Install_Requests::entry_id( $row );
 
 			if ( (int) $row['always'] !== 1 || isset( $installed[ $id ] ) ) {
 				continue;
@@ -961,7 +960,7 @@ class Registry {
 		$groups = [];
 
 		foreach ( $this->catalog->coverage_entries() as $row ) {
-			$id = $row['source'] . '/' . $row['entry'];
+			$id = Install_Requests::entry_id( $row );
 
 			if ( ! isset( $entries[ $id ] ) ) {
 				continue;
@@ -1151,7 +1150,7 @@ class Registry {
 				continue;
 			}
 
-			$entries[ $row['source'] . '/' . $entry ][] = $row;
+			$entries[ Font_Sources::join( (string) $row['source'], (string) $entry ) ][] = $row;
 		}
 
 		return $entries;
@@ -1185,7 +1184,7 @@ class Registry {
 			}
 		}
 
-		if ( ! $running && $this->stalled_for( $catalog, static::STUCK_AFTER ) ) {
+		if ( ! $running && $this->stalled_for( $catalog, Install_Queue::STALLED_AFTER ) ) {
 			$status['stuck'] = true;
 		}
 
@@ -1276,6 +1275,16 @@ class Registry {
 	 * @since 7.0
 	 */
 	protected function registered_keys(): array {
+		/*
+		 * Memoised like the maps beside it: `get_default_font()` reaches this three times per PDF and
+		 * `effective_language_map()` twice more, each walking every row across all four roles.
+		 */
+		$stamp = $this->repository->get_last_changed();
+
+		if ( $this->registered !== null && $this->registered['stamp'] === $stamp ) {
+			return $this->registered['keys'];
+		}
+
 		$keys = [
 			static::BUNDLED_FONT    => true,
 			static::BUNDLED_SYMBOLS => true,
@@ -1290,6 +1299,11 @@ class Registry {
 				}
 			}
 		}
+
+		$this->registered = [
+			'stamp' => $stamp,
+			'keys'  => $keys,
+		];
 
 		return $keys;
 	}

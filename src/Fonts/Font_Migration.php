@@ -28,7 +28,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 7.0
  */
-class Font_Migration {
+class Font_Migration implements Font_Population_Pass {
+
+	/**
+	 * @var Font_Repository
+	 * @since 7.0
+	 */
+	protected $repository;
 
 	/**
 	 * @var Helper_Abstract_Options
@@ -42,9 +48,10 @@ class Font_Migration {
 	 */
 	protected $log;
 
-	public function __construct( Helper_Abstract_Options $options, LoggerInterface $log ) {
-		$this->options = $options;
-		$this->log     = $log;
+	public function __construct( Font_Repository $repository, Helper_Abstract_Options $options, LoggerInterface $log ) {
+		$this->repository = $repository;
+		$this->options    = $options;
+		$this->log        = $log;
 	}
 
 	/**
@@ -57,7 +64,9 @@ class Font_Migration {
 	 *
 	 * @since 7.0
 	 */
-	public function from_option( Font_Repository $repository ): int {
+	public function run(): int {
+		$repository = $this->repository;
+
 		$fonts = $this->options->get_option( 'custom_fonts' );
 
 		if ( ! is_array( $fonts ) || $fonts === [] ) {

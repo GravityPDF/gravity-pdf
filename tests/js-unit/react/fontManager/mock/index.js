@@ -17,7 +17,10 @@ import {
 	setStatus,
 	state,
 } from './state';
-import { PER_PAGE, ROLES } from '../../constants';
+import {
+	PER_PAGE,
+	ROLES,
+} from '../../../../../src/assets/js/react/fontManager/constants';
 
 /**
  * A stand-in for the whole `/fonts` namespace, for the Jest suite alone
@@ -583,6 +586,30 @@ function mapRow(code, defaultFont) {
 	};
 }
 
+/* What `Rest_Font_Sources::get_filter_labels()` publishes, for the ids these fixtures use */
+const FILTER_LABELS = {
+	'sans-serif': 'Sans-serif',
+	serif: 'Serif',
+	display: 'Display',
+	handwriting: 'Handwriting',
+	monospace: 'Monospace',
+	latin: 'Latin',
+	'latin-ext': 'Latin Extended',
+	greek: 'Greek',
+	cyrillic: 'Cyrillic',
+	vietnamese: 'Vietnamese',
+};
+
+function filterLabel(id) {
+	return (
+		FILTER_LABELS[id] ??
+		id
+			.split('-')
+			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+			.join(' ')
+	);
+}
+
 function filtersFor(entries) {
 	const count = (pick) =>
 		entries.reduce((totals, row) => {
@@ -596,7 +623,11 @@ function filtersFor(entries) {
 	const toList = (totals) =>
 		Object.entries(totals)
 			.sort((a, b) => b[1] - a[1])
-			.map(([id, total]) => ({ id, label: id, count: total }));
+			.map(([id, total]) => ({
+				id,
+				label: filterLabel(id),
+				count: total,
+			}));
 
 	return {
 		category: toList(count((row) => (row.category ? [row.category] : []))),

@@ -222,7 +222,6 @@ class Test_Font_Schema extends TestCase {
 		/* A fresh repository, so the plugin's own passes stay out of this and the shared one is left ready */
 		$repository = new Font_Repository(
 			$this->schema,
-			new Font_Migration( GPDFAPI::get_options_class(), GPDFAPI::get_log_class() ),
 			new Font_Lock(),
 			$gfpdf->misc,
 			GPDFAPI::get_log_class(),

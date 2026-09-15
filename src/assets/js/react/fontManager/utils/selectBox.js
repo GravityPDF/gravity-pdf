@@ -68,16 +68,20 @@ export function syncSelect(select, fonts) {
  * It is never the select's value: choosing it puts the previous one back and opens the modal. That is the
  * discoverability path for every pack, so it lives on the dropdown rather than only inside the manager.
  *
+ * The font to put back is this function's own state: it owns the `change` listener, so it sees every value the
+ * select passes through. Threading it in as an argument only created one a caller could forget.
+ *
  * @param {HTMLSelectElement} select
  * @param {Function}          onOpen
- * @param {Function}          previous The font the select held before the sentinel was chosen
  *
  * @since 7.0
  */
-export function addInstallSentinel(select, onOpen, previous) {
+export function addInstallSentinel(select, onOpen) {
 	if (!select || hasValue(select, INSTALL_SENTINEL)) {
 		return;
 	}
+
+	let previous = select.value;
 
 	const option = document.createElement('option');
 
@@ -89,10 +93,12 @@ export function addInstallSentinel(select, onOpen, previous) {
 
 	select.addEventListener('change', () => {
 		if (select.value !== INSTALL_SENTINEL) {
+			previous = select.value;
+
 			return;
 		}
 
-		select.value = previous();
+		select.value = previous;
 		onOpen();
 	});
 }

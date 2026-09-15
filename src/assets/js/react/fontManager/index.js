@@ -63,7 +63,7 @@ export function bootstrap() {
 	dispatch(STORE_NAME).setActiveFont(fontSelect.value);
 
 	addInstallSentinel(fontSelect, () => {
-		window.location.hash = '/fontmanager/browse';
+		window.location.hash = paths.browse();
 	});
 
 	watchFontList(fontSelect);

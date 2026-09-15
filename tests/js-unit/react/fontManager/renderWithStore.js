@@ -1,10 +1,26 @@
 import React from 'react';
 import { RegistryProvider, createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import apiFetch from '@wordpress/api-fetch';
 import { render, screen } from '@testing-library/react';
 import { store as fontStore } from '../../../../src/assets/js/react/fontManager/store';
-import { enableMockApi } from '../../../../src/assets/js/react/fontManager/api';
-import { resetState } from '../../../../src/assets/js/react/fontManager/api/mock/state';
+import { mockMiddleware } from './mock';
+import { resetState } from './mock/state';
+
+/*
+ * Registered once for the whole suite: `apiFetch` has no way to remove a middleware, so re-registering per
+ * render would stack a copy of the mocked server on every test.
+ */
+let registered = false;
+
+function enableMockApi() {
+	if (registered) {
+		return;
+	}
+
+	apiFetch.use(mockMiddleware);
+	registered = true;
+}
 
 /**
  * Render one panel against a registry of its own

@@ -1204,14 +1204,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			$this->font_repository = new Fonts\Font_Repository(
 				$schema,
-				new Fonts\Font_Migration( $this->options, $this->log ),
 				new Fonts\Font_Lock(),
 				$this->misc,
 				$this->log,
 				$this->data->template_font_location
 			);
 
-			/* Order matters: an installer font is adopted under its 6.x key before the importer could key it by filename */
+			/*
+			 * Order matters: 6.x records are migrated before the adopter claims an installer font under its 6.x
+			 * key, and both run before the importer could key a file by its filename.
+			 */
+			$this->font_repository->add_population_pass(
+				new Fonts\Font_Migration( $this->font_repository, $this->options, $this->log )
+			);
+
 			$this->font_repository->add_population_pass(
 				new Fonts\Legacy_Font_Adopter( $this->font_repository, $this->log )
 			);
@@ -1305,7 +1311,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_font_downloader(),
 				new Fonts\Font_Lock(),
 				$this->log,
-				new Fonts\Catalog_Font_Adopter( $this->get_font_repository(), $this->get_catalog_repository(), $this->log ),
+				new Fonts\Catalog_Font_Adopter( $this->get_font_repository(), $this->get_catalog_repository(), $this->get_font_downloader(), $this->log ),
 				defined( 'GPDF_TRUST_KEYS' ) ? (array) GPDF_TRUST_KEYS : [],
 				PDF_PLUGIN_DIR . 'build/font-index/packs.json'
 			);

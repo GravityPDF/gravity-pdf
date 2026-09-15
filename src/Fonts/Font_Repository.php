@@ -149,12 +149,6 @@ class Font_Repository {
 	protected $schema;
 
 	/**
-	 * @var Font_Migration
-	 * @since 7.0
-	 */
-	protected $migration;
-
-	/**
 	 * @var Font_Lock
 	 * @since 7.0
 	 */
@@ -204,18 +198,16 @@ class Font_Repository {
 
 	public function __construct(
 		Font_Schema $schema,
-		Font_Migration $migration,
 		Font_Lock $lock,
 		Helper_Misc $misc,
 		LoggerInterface $log,
 		string $font_dir
 	) {
-		$this->schema    = $schema;
-		$this->migration = $migration;
-		$this->lock      = $lock;
-		$this->misc      = $misc;
-		$this->log       = $log;
-		$this->font_dir  = trailingslashit( $font_dir );
+		$this->schema   = $schema;
+		$this->lock     = $lock;
+		$this->misc     = $misc;
+		$this->log      = $log;
+		$this->font_dir = trailingslashit( $font_dir );
 
 		wp_cache_add_global_groups( [ static::CACHE_GROUP ] );
 	}
@@ -265,14 +257,12 @@ class Font_Repository {
 		}
 
 		/*
-		 * The tables exist from here, and the migration reads through `all()`. Mark the repository ready first, or
+		 * The tables exist from here, and the passes read through `all()`. Mark the repository ready first, or
 		 * that read re-enters this method and runs a second, pointless dbDelta before the lock turns it back.
 		 */
 		$this->is_ready = true;
 
 		try {
-			$this->migration->from_option( $this );
-
 			foreach ( $this->passes as $pass ) {
 				$pass->run();
 			}

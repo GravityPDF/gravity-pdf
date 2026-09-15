@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Rest;
 
+use GFPDF\Fonts\Install_Queue;
 use GFPDF\Fonts\Registry;
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
@@ -450,7 +451,7 @@ class Test_Rest_Font_Installs extends Test_Rest {
 			'emoji',
 			[
 				'phase'       => 'installing',
-				'phase_since' => gmdate( 'Y-m-d H:i:s', time() - Registry::STUCK_AFTER - 60 ),
+				'phase_since' => gmdate( 'Y-m-d H:i:s', time() - Install_Queue::STALLED_AFTER - 60 ),
 			]
 		);
 

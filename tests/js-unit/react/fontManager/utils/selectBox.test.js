@@ -97,8 +97,8 @@ describe('Font Manager - utils/selectBox.js', () => {
 		test('adds the option once, however often it is asked', () => {
 			const select = build('<option value="lato">Lato</option>');
 
-			addInstallSentinel(select, jest.fn(), () => 'lato');
-			addInstallSentinel(select, jest.fn(), () => 'lato');
+			addInstallSentinel(select, jest.fn());
+			addInstallSentinel(select, jest.fn());
 
 			expect(
 				[...select.options].filter(
@@ -111,7 +111,7 @@ describe('Font Manager - utils/selectBox.js', () => {
 			const select = build('<option value="lato">Lato</option>');
 			const open = jest.fn();
 
-			addInstallSentinel(select, open, () => 'lato');
+			addInstallSentinel(select, open);
 
 			select.value = INSTALL_SENTINEL;
 			select.dispatchEvent(new Event('change'));

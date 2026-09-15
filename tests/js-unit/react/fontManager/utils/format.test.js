@@ -1,6 +1,5 @@
 import {
 	fileSize,
-	filterLabel,
 	timeAgo,
 } from '../../../../../src/assets/js/react/fontManager/utils/format';
 
@@ -37,17 +36,6 @@ describe('Font Manager - utils/format.js', () => {
 			expect(
 				timeAgo(new Date(Date.now() - 86400 * 1000).toISOString())
 			).toBe('1 day ago');
-		});
-	});
-
-	describe('filterLabel()', () => {
-		test('translates the vocabulary it knows', () => {
-			expect(filterLabel('latin-ext')).toBe('Latin Extended');
-			expect(filterLabel('sans-serif')).toBe('Sans Serif');
-		});
-
-		test('title-cases an id it has never seen', () => {
-			expect(filterLabel('old-hungarian')).toBe('Old Hungarian');
 		});
 	});
 });

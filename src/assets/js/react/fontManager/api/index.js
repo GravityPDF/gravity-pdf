@@ -8,35 +8,16 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { API_ROOT, ROLES } from '../constants';
-import { mockMiddleware } from './mock';
 
 /**
  * Every request the Font Manager makes
  *
  * One module so the Jest fixtures have a single seam: no component knows whether it is talking to the site or to
- * `./mock`, because every function below names the real path either way.
+ * the mocked server, because every function below names the real path either way. The fixtures themselves live
+ * in the test tree — a production module importing them shipped them to every admin.
  *
  * @since 7.0
  */
-
-let registered = false;
-
-/**
- * Serve every `/fonts` route from the fixtures
- *
- * The Jest suite's seam: a component test standing up REST fixtures would be testing WordPress. The flag is
- * load-bearing — `renderWithStore()` calls this on every render, and `apiFetch` has no way to remove one.
- *
- * @since 7.0
- */
-export function enableMockApi() {
-	if (registered) {
-		return;
-	}
-
-	apiFetch.use(mockMiddleware);
-	registered = true;
-}
 
 const get = (path) => apiFetch({ path: API_ROOT + path });
 const send = (method) => (path, data) =>

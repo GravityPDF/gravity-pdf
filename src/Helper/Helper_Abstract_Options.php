@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Fonts\Font_Sources;
 use GFPDF\Rest\Rest_Custom_Fonts;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Statics\Kses;
@@ -981,7 +982,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* One optgroup per installed pack, in the catalogue's order, which is the order the Font Manager lists them in */
 		foreach ( $grouped['groups'] as $group ) {
 			$groups[] = [
-				'id'    => $group['source'] . '/' . $group['entry'],
+				'id'    => Font_Sources::join( (string) $group['source'], (string) $group['entry'] ),
 				'label' => (string) $group['label'],
 				'fonts' => $group['fonts'],
 			];

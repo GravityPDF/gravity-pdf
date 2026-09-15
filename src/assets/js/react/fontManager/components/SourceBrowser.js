@@ -17,7 +17,6 @@ import { useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import { PER_PAGE, STORE_NAME } from '../constants';
-import { filterLabel } from '../utils/format';
 import { paths } from '../utils/paths';
 import DetailLoading from './DetailLoading';
 import EmptyState from './EmptyState';
@@ -212,6 +211,7 @@ function Catalogue({
 	onInstall,
 	onImport,
 }) {
+	const filterLabels = labelsOf(record.filters);
 	const filtered = category || subset;
 
 	return (
@@ -270,7 +270,13 @@ function Catalogue({
 				<>
 					<div className="gfpdf-fm-browser-pager">
 						<span>
-							{pagerText(results, page, category, subset)}
+							{pagerText(
+								results,
+								page,
+								category,
+								subset,
+								filterLabels
+							)}
 						</span>
 
 						{filtered && (
@@ -312,6 +318,7 @@ function Catalogue({
 								<FamilyCard
 									key={entry.entry}
 									entry={entry}
+									categoryLabel={filterLabels[entry.category]}
 									status={
 										statuses[
 											`${entry.source}/${entry.entry}`
@@ -387,13 +394,23 @@ function options(filters, allLabel) {
 	return [
 		{ label: allLabel, value: '' },
 		...filters.map((filter) => ({
-			label: `${filterLabel(filter.id)} (${filter.count})`,
+			label: `${filter.label} (${filter.count})`,
 			value: filter.id,
 		})),
 	];
 }
 
-function pagerText(results, page, category, subset) {
+/* The route translates every filter id it publishes, so the label of a chosen one is a lookup, not a rule */
+function labelsOf(filters) {
+	return Object.fromEntries(
+		[...filters.category, ...filters.subsets].map((filter) => [
+			filter.id,
+			filter.label,
+		])
+	);
+}
+
+function pagerText(results, page, category, subset, labels) {
 	const first = results.total === 0 ? 0 : (page - 1) * PER_PAGE + 1;
 	const last = Math.min(results.total, page * PER_PAGE);
 
@@ -410,7 +427,9 @@ function pagerText(results, page, category, subset) {
 		results.total
 	);
 
-	const active = [category, subset].filter(Boolean).map(filterLabel);
+	const active = [category, subset]
+		.filter(Boolean)
+		.map((id) => labels[id] ?? id);
 
 	return active.length ? `${showing} · ${active.join(' · ')}` : showing;
 }

@@ -409,7 +409,6 @@ class Test_Font_Installer extends TestCase {
 		$log        = GPDFAPI::get_log_class();
 		$repository = new class(
 			new Font_Schema( $log ),
-			new Font_Migration( GPDFAPI::get_options_class(), $log ),
 			new Font_Lock(),
 			GPDFAPI::get_misc_class(),
 			$log,

@@ -7,7 +7,7 @@
 
 import { __ } from '@wordpress/i18n';
 import { Button, Modal, SnackbarList } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { STORE_NAME } from '../constants';
@@ -41,6 +41,27 @@ import UpdatesPanel from './UpdatesPanel';
  */
 export default function FontManager({ onActive = null }) {
 	const { route, navigate, close } = useHashRoute();
+
+	/*
+	 * The shell is mounted on every screen carrying a font field, so nothing that costs a request may live
+	 * above this line: reading `getFonts()` or arming the poller here had the closed modal fetching the font
+	 * list and the status map on every PDF settings page load.
+	 */
+	if (!route) {
+		return null;
+	}
+
+	return (
+		<FontManagerShell
+			route={route}
+			navigate={navigate}
+			close={close}
+			onActive={onActive}
+		/>
+	);
+}
+
+function FontManagerShell({ route, navigate, close, onActive }) {
 	const [adding, setAdding] = useState(false);
 	const [importing, setImporting] = useState(false);
 
@@ -63,19 +84,6 @@ export default function FontManager({ onActive = null }) {
 	const { setActiveFont } = useDispatch(STORE_NAME);
 
 	useInstallPoller();
-
-	useEffect(() => {
-		if (route) {
-			return;
-		}
-
-		setAdding(false);
-		setImporting(false);
-	}, [route]);
-
-	if (!route) {
-		return null;
-	}
 
 	const setActive = (id) => {
 		setActiveFont(id);

@@ -1,9 +1,9 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FontManager from '../../../../../src/assets/js/react/fontManager/components/FontManager';
-import { archiveName } from '../../../../../src/assets/js/react/fontManager/api/mock';
-import { PACK_ENTRIES } from '../../../../../src/assets/js/react/fontManager/api/mock/catalog';
-import { state } from '../../../../../src/assets/js/react/fontManager/api/mock/state';
+import { archiveName } from '../mock';
+import { PACK_ENTRIES } from '../mock/catalog';
+import { state } from '../mock/state';
 import { openAddMenu, renderWithStore } from '../renderWithStore';
 
 const JAPANESE = PACK_ENTRIES.find((pack) => pack.entry === 'japanese');

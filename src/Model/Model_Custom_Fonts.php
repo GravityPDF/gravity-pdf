@@ -179,7 +179,10 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 
 		foreach ( Font_Repository::LEGACY_FACE_ROLES as $role ) {
 			if ( isset( $files[ $role ] ) ) {
-				$this->repository->insert_file( $row['id'], $role, $files[ $role ] );
+				/* A face that fails to record leaves the row with no file for it: say so rather than report success */
+				if ( ! $this->repository->insert_file( $row['id'], $role, $files[ $role ] ) ) {
+					return false;
+				}
 			} elseif ( isset( $row['files'][ $role ] ) ) {
 				$this->repository->delete_file_row( $row['id'], $role );
 			}

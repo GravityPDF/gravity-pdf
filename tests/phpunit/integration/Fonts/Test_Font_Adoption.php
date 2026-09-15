@@ -42,7 +42,9 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	protected function adopter(): Catalog_Font_Adopter {
-		return new Catalog_Font_Adopter( $this->font_repository(), $this->catalog_repository(), GPDFAPI::get_log_class() );
+		global $gfpdf;
+
+		return new Catalog_Font_Adopter( $this->font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), GPDFAPI::get_log_class() );
 	}
 
 	/**

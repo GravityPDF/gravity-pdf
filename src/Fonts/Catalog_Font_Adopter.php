@@ -47,6 +47,12 @@ class Catalog_Font_Adopter {
 	protected $catalog;
 
 	/**
+	 * @var Font_Downloader
+	 * @since 7.0
+	 */
+	protected $downloader;
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
@@ -58,9 +64,10 @@ class Catalog_Font_Adopter {
 	 */
 	protected $font_dir;
 
-	public function __construct( Font_Repository $repository, Catalog_Repository $catalog, LoggerInterface $log ) {
+	public function __construct( Font_Repository $repository, Catalog_Repository $catalog, Font_Downloader $downloader, LoggerInterface $log ) {
 		$this->repository = $repository;
 		$this->catalog    = $catalog;
+		$this->downloader = $downloader;
 		$this->log        = $log;
 		$this->font_dir   = $repository->get_font_dir();
 	}
@@ -191,8 +198,8 @@ class Catalog_Font_Adopter {
 				continue;
 			}
 
-			/* Size first, so a large file is never hashed only to be rejected on length */
-			if ( (int) filesize( $absolute ) !== (int) $listed['size'] || ! hash_equals( (string) $listed['sha256'], (string) hash_file( 'sha256', $absolute ) ) ) {
+			/* The downloader's check, so "is this byte-for-byte what the entry lists" has one implementation */
+			if ( $this->downloader->verify_file( $relative, $absolute, $listed ) !== null ) {
 				$failed[] = $relative;
 
 				if ( $role === 'R' ) {

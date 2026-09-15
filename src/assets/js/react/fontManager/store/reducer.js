@@ -57,14 +57,14 @@ export function reducer(state = DEFAULT_STATE, action = {}) {
 				entries: { ...state.entries, [action.id]: action.entry },
 			};
 
+		case 'INVALIDATE_SEARCHES':
+			return { ...state, searches: {} };
+
 		case 'RECEIVE_SEARCH':
 			return {
 				...state,
 				searches: { ...state.searches, [action.key]: action.results },
 			};
-
-		case 'INVALIDATE_SEARCHES':
-			return { ...state, searches: {} };
 
 		case 'SET_ACTIVE_FONT':
 			return { ...state, activeFont: action.id };

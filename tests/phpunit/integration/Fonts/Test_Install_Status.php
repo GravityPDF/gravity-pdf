@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Fonts;
 
+use GFPDF\Fonts\Install_Queue;
 use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\HasFontRows;
 use GFPDF\Tests\Concerns\QueuesFontInstalls;
@@ -178,7 +179,7 @@ class Test_Install_Status extends TestCase {
 
 	public function test_a_live_entry_that_has_not_moved_for_fifteen_minutes_is_stuck() {
 		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1 ] );
-		$this->set_phase( 'emoji', 'installing', Registry::STUCK_AFTER + 60 );
+		$this->set_phase( 'emoji', 'installing', Install_Queue::STALLED_AFTER + 60 );
 
 		$this->assertTrue( $this->statuses()['packs/emoji']['stuck'] );
 	}
@@ -192,7 +193,7 @@ class Test_Install_Status extends TestCase {
 
 	public function test_a_batch_being_processed_is_never_stuck() {
 		$this->insert_catalog_row( 'packs', 'emoji', [ 'coverage' => 1 ] );
-		$this->set_phase( 'emoji', 'installing', Registry::STUCK_AFTER + 60 );
+		$this->set_phase( 'emoji', 'installing', Install_Queue::STALLED_AFTER + 60 );
 
 		$this->lock_queue();
 
