@@ -239,18 +239,36 @@ class Catalog_Sync {
 	 * can follow in the same request. Returns false when another request holds the lock, which is correct in every
 	 * topology: under per-site activation each site's hourly listener may fire.
 	 *
+	 * False also when the pass reached the end with a source still in error, so a caller is told the catalogue is
+	 * not what the store published rather than reading a bare `true` over a pass that wrote nothing. Which source
+	 * and why stays in its record's `last_error`, because one boolean cannot carry S of them.
+	 *
 	 * @since 7.0
 	 */
 	public function run(): bool {
+		/*
+		 * The tables are ensured here rather than assumed, because cron is the one caller that can arrive before
+		 * any request has built them: `Font_Repository::ensure_ready()` runs on the first query of a *request*,
+		 * and a scheduled sync on a fresh install is a request that makes none. Idempotent once they exist, and
+		 * deliberately not `ensure_ready()` — the migration passes and the version stamp stay the repository's.
+		 */
+		if ( ! $this->schema->ensure() ) {
+			$this->log->error( 'Cannot sync the font catalogue: its tables are missing and could not be created' );
+
+			return false;
+		}
+
 		if ( ! $this->lock->acquire( static::LOCK, static::LOCK_TTL ) ) {
 			return false;
 		}
 
 		$was_synced = $this->has_synced();
+		$synced     = true;
 
 		try {
 			foreach ( $this->group_by_root() as $group ) {
-				$this->sync_root( $group['root_url'], $group['records'] );
+				/* Every group runs: one unreachable root must not hide another's updates (see `request()`) */
+				$synced = $this->sync_root( $group['root_url'], $group['records'] ) && $synced;
 			}
 		} finally {
 			$this->lock->release( static::LOCK );
@@ -265,7 +283,7 @@ class Catalog_Sync {
 			do_action( 'gfpdf_font_catalog_first_sync' );
 		}
 
-		return true;
+		return $synced;
 	}
 
 	/**
@@ -836,9 +854,11 @@ class Catalog_Sync {
 	/**
 	 * @param Font_Source[] $records
 	 *
+	 * @return bool Whether every record on this root ended the pass without an error
+	 *
 	 * @since 7.0
 	 */
-	protected function sync_root( string $root_url, array $records ): void {
+	protected function sync_root( string $root_url, array $records ): bool {
 		$root = $this->fetch_root( $root_url, $records );
 
 		if ( is_wp_error( $root ) ) {
@@ -852,8 +872,10 @@ class Catalog_Sync {
 
 			$this->record_failure( $records, $root );
 
-			return;
+			return false;
 		}
+
+		$synced = true;
 
 		foreach ( $records as $record ) {
 			$id = $record->get_id();
@@ -882,14 +904,18 @@ class Catalog_Sync {
 				continue;
 			}
 
-			$this->sync_source( $record, (array) $root['sources'][ $id ] );
+			$synced = $this->sync_source( $record, (array) $root['sources'][ $id ] ) && $synced;
 		}
+
+		return $synced;
 	}
 
 	/**
+	 * @return bool Whether this source's rows are now the index the root vouched for
+	 *
 	 * @since 7.0
 	 */
-	protected function sync_source( Font_Source $record, array $listing ): void {
+	protected function sync_source( Font_Source $record, array $listing ): bool {
 		$id     = $record->get_id();
 		$sha256 = (string) ( $listing['sha256'] ?? '' );
 
@@ -911,20 +937,16 @@ class Catalog_Sync {
 				]
 			);
 
-			$this->fail( $id, $body->get_error_message() );
-
-			return;
+			return $this->fail( $id, $body->get_error_message() );
 		}
 
 		$index = json_decode( $body, true );
 
 		if ( ! is_array( $index ) || ! isset( $index['entries'] ) || ! is_array( $index['entries'] ) ) {
-			$this->fail( $id, 'The source index is not readable' );
-
-			return;
+			return $this->fail( $id, 'The source index is not readable' );
 		}
 
-		$this->replace_source( $id, $index['entries'], $sha256 );
+		return $this->replace_source( $id, $index['entries'], $sha256 );
 	}
 
 	/**

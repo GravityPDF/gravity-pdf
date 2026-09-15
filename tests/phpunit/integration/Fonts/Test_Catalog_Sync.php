@@ -440,6 +440,63 @@ class Test_Catalog_Sync extends TestCase {
 		$this->assertSame( 1, $this->catalog_repository()->search( 'packs' )['total'] );
 	}
 
+	/**
+	 * `run()` is the cron callback, so its boolean is the only thing a caller that did not watch the records has
+	 * to go on. Returning true over a pass that reached the end with a source still in error tells that caller
+	 * the catalogue is the published one when it is not.
+	 */
+	public function test_a_source_that_fails_is_reported_by_the_return() {
+		$this->publish(
+			[ $this->pack_entry( 'emoji' ) ],
+			[],
+			[ 'sources/packs-' => new WP_Error( 'http_request_failed', 'Connection timed out' ) ]
+		);
+
+		$this->assertFalse( $this->sync()->run() );
+		$this->assertStringContainsString( 'Connection timed out', $this->sync()->get_record( 'packs' )['last_error'] );
+	}
+
+	/**
+	 * Cron is the one caller that can arrive before any request has built the tables: `ensure_ready()` runs on the
+	 * first query of a request, and a scheduled sync on a fresh install is a request that makes none. Without the
+	 * gate every write in the pass is a "table doesn't exist" error against a run that still called itself done.
+	 *
+	 * The tables cannot be dropped to prove this — the suite rewrites `DROP TABLE` to `DROP TEMPORARY TABLE` — so
+	 * the schema itself is the stub, which is also the narrower assertion: the pass stops before it spends a
+	 * request on a root it has nowhere to put.
+	 */
+	public function test_a_sync_that_cannot_build_its_tables_stops_before_it_fetches() {
+		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
+
+		$this->assertFalse( $this->sync_with_unbuildable_schema()->run() );
+		$this->assertSame( [], $this->requested_urls(), 'nothing is worth fetching without somewhere to put it' );
+	}
+
+	/**
+	 * A sync whose tables will not build, standing in for the fresh install cron reaches first
+	 */
+	protected function sync_with_unbuildable_schema(): Catalog_Sync {
+		global $gfpdf;
+
+		$schema = new class( \GPDFAPI::get_log_class() ) extends Font_Schema {
+			public function ensure(): bool {
+				return false;
+			}
+		};
+
+		return new Catalog_Sync(
+			$schema,
+			$this->catalog_repository(),
+			$gfpdf->get_font_sources(),
+			new Font_Downloader( \GPDFAPI::get_log_class(), \GPDFAPI::get_data_class() ),
+			new Font_Lock(),
+			\GPDFAPI::get_log_class(),
+			new Catalog_Font_Adopter( $gfpdf->get_font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), \GPDFAPI::get_log_class() ),
+			[ $this->public_key ],
+			''
+		);
+	}
+
 	public function test_a_second_runner_exits_without_touching_the_catalog() {
 		$this->publish( [ $this->pack_entry( 'emoji' ) ] );
 

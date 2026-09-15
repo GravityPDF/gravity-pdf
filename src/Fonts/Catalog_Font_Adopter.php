@@ -53,6 +53,12 @@ class Catalog_Font_Adopter {
 	protected $downloader;
 
 	/**
+	 * @var Font_Cache_Warmer
+	 * @since 7.0
+	 */
+	protected $warmer;
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
@@ -64,10 +70,11 @@ class Catalog_Font_Adopter {
 	 */
 	protected $font_dir;
 
-	public function __construct( Font_Repository $repository, Catalog_Repository $catalog, Font_Downloader $downloader, LoggerInterface $log ) {
+	public function __construct( Font_Repository $repository, Catalog_Repository $catalog, Font_Downloader $downloader, Font_Cache_Warmer $warmer, LoggerInterface $log ) {
 		$this->repository = $repository;
 		$this->catalog    = $catalog;
 		$this->downloader = $downloader;
+		$this->warmer     = $warmer;
 		$this->log        = $log;
 		$this->font_dir   = $repository->get_font_dir();
 	}
@@ -75,10 +82,16 @@ class Catalog_Font_Adopter {
 	/**
 	 * Adopt every verified file one source's coverage entries list
 	 *
-	 * Every candidate is verified — size first, then sha256 against the entry — before a row is written, so a row
-	 * never claims a hash the disk does not have. A file that fails is left alone and a real install downloads it
-	 * fresh. Idempotent: a matched file gains a row and a file with a row is skipped, so nothing is hashed twice
-	 * across runs and a second call inserts nothing.
+	 * Every candidate is verified — size first, then sha256 against the entry, then whether mPDF reads the faces
+	 * at all — before the key is kept, so a row never claims a hash the disk does not have nor a font that cannot
+	 * render. A file that fails is left alone and a real install downloads it fresh. Idempotent: a matched file
+	 * gains a row and a file with a row is skipped, so nothing is hashed twice across runs and a second call
+	 * inserts nothing.
+	 *
+	 * The hash proves the bytes are the ones the source published; it cannot prove they are a font this build of
+	 * mPDF parses. Byte-perfect faces that throw are exactly what a font-pipeline change ships, so the two checks
+	 * answer different questions and adoption needs both — otherwise it is the one way into the font tables that
+	 * skips the check every install makes.
 	 *
 	 * @return int How many font rows were created
 	 *
@@ -157,6 +170,30 @@ class Catalog_Font_Adopter {
 			);
 
 			if ( $font_id > 0 ) {
+				/*
+				 * Inserted before it is parsed because the registry mPDF is built from reads these rows: the row
+				 * is how the face becomes findable at all. A key that will not parse is taken straight back out,
+				 * so the entry is left un-adopted rather than carrying a font that kills the first render to
+				 * reach for it — the same call `Font_Installer` makes before it clears an install's phase.
+				 */
+				$unparseable = $this->warmer->warm( [ $font_key => array_keys( $verified ) ] );
+
+				if ( $unparseable !== null ) {
+					/* Rows only: the files were on disk before this ran and are not this class's to remove */
+					$this->repository->delete( $font_key, false );
+
+					$this->log->warning(
+						'Refusing to adopt a font mPDF cannot read',
+						[
+							'entry' => $source . '/' . $entry_id,
+							'font'  => $font_key,
+							'error' => $unparseable->get_error_message(),
+						]
+					);
+
+					continue;
+				}
+
 				++$created;
 
 				$taken[ $font_key ] = true;

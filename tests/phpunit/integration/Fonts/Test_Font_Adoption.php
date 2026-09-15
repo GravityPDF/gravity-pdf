@@ -44,7 +44,7 @@ class Test_Font_Adoption extends TestCase {
 	protected function adopter(): Catalog_Font_Adopter {
 		global $gfpdf;
 
-		return new Catalog_Font_Adopter( $this->font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), GPDFAPI::get_log_class() );
+		return new Catalog_Font_Adopter( $this->font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), GPDFAPI::get_log_class() );
 	}
 
 	/**
@@ -73,6 +73,24 @@ class Test_Font_Adoption extends TestCase {
 		$this->drop_catalog_rows();
 
 		parent::tear_down();
+	}
+
+	/**
+	 * The bytes of a real font face, for a fixture that has to survive being parsed
+	 *
+	 * Adoption asks mPDF to read every face before it keeps the key, so a `.ttf` holding a marker string is now
+	 * refused exactly as a corrupt download would be. The bundled Arimo faces are the obvious donors: four real
+	 * files, already in the repository, and distinct from each other so two faces of one family still differ.
+	 */
+	protected function font_bytes( string $role = 'R' ): string {
+		$faces = [
+			'R'  => 'Arimo-Regular.ttf',
+			'B'  => 'Arimo-Bold.ttf',
+			'I'  => 'Arimo-Italic.ttf',
+			'BI' => 'Arimo-BoldItalic.ttf',
+		];
+
+		return (string) file_get_contents( PDF_PLUGIN_DIR . 'fonts/' . $faces[ $role ] );
 	}
 
 	/**
@@ -117,7 +135,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_file_on_disk_becomes_an_installed_row_without_a_download() {
-		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
+		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
 
 		$this->catalog_entry(
 			'emoji',
@@ -142,7 +160,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_licence_already_on_disk_is_adopted_with_its_font() {
-		$font   = $this->place_file( 'packs', 'southeast-asian', 'KhmerOS.ttf', 'khmer-bytes' );
+		$font   = $this->place_file( 'packs', 'southeast-asian', 'KhmerOS.ttf', $this->font_bytes() );
 		$notice = $this->place_file( 'packs', 'southeast-asian', 'KhmerOS-LICENSE.txt', 'notice' );
 		$text   = $this->place_file( 'packs', 'southeast-asian', 'LGPL-2.1.txt', 'the full text' );
 
@@ -170,7 +188,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_adoption_is_idempotent() {
-		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
+		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
 
 		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
@@ -179,7 +197,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_file_whose_hash_does_not_match_gets_no_row() {
-		$file           = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
+		$file           = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
 		$file['sha256'] = str_repeat( 'f', 64 );
 
 		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
@@ -187,6 +205,20 @@ class Test_Font_Adoption extends TestCase {
 		/* A row must never claim a sha256 the disk does not have; a real install downloads it fresh instead */
 		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
 		$this->assertNull( $this->font_repository()->get( 'notoemoji' ) );
+	}
+
+	public function test_a_file_mpdf_cannot_read_is_not_adopted() {
+		/* Byte-perfect against the entry and still not a font: what a font-pipeline change ships, and what the
+		   hash cannot catch. Adoption is the one way into the font tables that used to skip the parse */
+		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'not a font, but the hash agrees' );
+
+		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
+
+		$this->assertSame( 0, $this->adopter()->run( 'packs' ) );
+		$this->assertNull( $this->font_repository()->get( 'notoemoji' ), 'the row it inserted to parse is taken back out' );
+
+		/* The file is not this class's to remove: it was on disk before the run and a real install may want it */
+		$this->assertFileExists( $this->font_dir() . 'packs/emoji/NotoEmoji-Regular.ttf' );
 	}
 
 	public function test_a_truncated_file_is_rejected_on_size_before_it_is_hashed() {
@@ -217,7 +249,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_font_without_a_verified_regular_face_is_skipped_entirely() {
-		$bold = $this->place_file( 'packs', 'dejavu', 'DejaVuSans-Bold.ttf', 'bold-bytes' );
+		$bold = $this->place_file( 'packs', 'dejavu', 'DejaVuSans-Bold.ttf', $this->font_bytes( 'B' ) );
 
 		$this->catalog_entry(
 			'dejavu',
@@ -245,8 +277,8 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_every_present_face_of_a_family_is_adopted_together() {
-		$regular = $this->place_file( 'packs', 'dejavu', 'DejaVuSans.ttf', 'regular-bytes' );
-		$bold    = $this->place_file( 'packs', 'dejavu', 'DejaVuSans-Bold.ttf', 'bold-bytes' );
+		$regular = $this->place_file( 'packs', 'dejavu', 'DejaVuSans.ttf', $this->font_bytes() );
+		$bold    = $this->place_file( 'packs', 'dejavu', 'DejaVuSans-Bold.ttf', $this->font_bytes( 'B' ) );
 
 		$this->catalog_entry(
 			'dejavu',
@@ -279,8 +311,8 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_multi_font_entry_becomes_one_row_per_key() {
-		$tinos   = $this->place_file( 'packs', 'serif-mono', 'Tinos-Regular.ttf', 'tinos' );
-		$cousine = $this->place_file( 'packs', 'serif-mono', 'Cousine-Regular.ttf', 'cousine' );
+		$tinos   = $this->place_file( 'packs', 'serif-mono', 'Tinos-Regular.ttf', $this->font_bytes() );
+		$cousine = $this->place_file( 'packs', 'serif-mono', 'Cousine-Regular.ttf', $this->font_bytes( 'I' ) );
 
 		$this->catalog_entry(
 			'serif-mono',
@@ -304,7 +336,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_single_font_entry_takes_the_entry_label() {
-		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
+		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
 
 		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ), [ 'label' => 'Emoji' ] );
 
@@ -314,7 +346,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_the_coverage_maps_are_split_onto_each_row() {
-		$sc = $this->place_file( 'packs', 'chinese-simplified', 'NotoSansSC-Regular.ttf', 'sc-bytes' );
+		$sc = $this->place_file( 'packs', 'chinese-simplified', 'NotoSansSC-Regular.ttf', $this->font_bytes() );
 
 		$this->catalog_entry(
 			'chinese-simplified',
@@ -353,7 +385,7 @@ class Test_Font_Adoption extends TestCase {
 	public function test_a_key_something_else_already_answers_to_is_left_alone() {
 		$this->install_font_row( 'notoemoji' );
 
-		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
+		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
 
 		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
@@ -364,7 +396,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_display_entry_is_never_adopted() {
-		$file = $this->place_file( 'google', 'lato', 'Lato-Regular.ttf', 'lato-bytes' );
+		$file = $this->place_file( 'google', 'lato', 'Lato-Regular.ttf', $this->font_bytes() );
 
 		$this->insert_catalog_row(
 			'google',
@@ -388,8 +420,8 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_adoption_is_scoped_to_the_replaced_source() {
-		$emoji = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
-		$other = $this->place_file( 'other', 'thing', 'Thing-Regular.ttf', 'thing-bytes' );
+		$emoji = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
+		$other = $this->place_file( 'other', 'thing', 'Thing-Regular.ttf', $this->font_bytes( 'B' ) );
 
 		$this->catalog_entry( 'emoji', $this->emoji_entry( $emoji ) );
 		$this->insert_catalog_row(
@@ -412,7 +444,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_pointed_at_entry_is_skipped() {
-		$this->place_file( 'packs', 'korean', 'NotoSansKR-Regular.ttf', 'kr-bytes' );
+		$this->place_file( 'packs', 'korean', 'NotoSansKR-Regular.ttf', $this->font_bytes() );
 
 		$this->insert_catalog_row(
 			'packs',
@@ -428,7 +460,7 @@ class Test_Font_Adoption extends TestCase {
 	}
 
 	public function test_a_file_another_row_already_claims_is_not_adopted_twice() {
-		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', 'emoji-bytes' );
+		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
 
 		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ) );
 
