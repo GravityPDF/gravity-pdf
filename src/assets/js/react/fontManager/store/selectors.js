@@ -48,6 +48,21 @@ export const getError = (state, key) => state.errors[key]?.message ?? '';
  */
 export const getErrorCode = (state, key) => state.errors[key]?.code ?? '';
 
+/**
+ * What the server said about the files a save just took, which is advice rather than a failure
+ *
+ * Keyed by the saved row's id and not by the form's, so the warnings survive the move off "new" onto the row
+ * the upload became — which is the moment the panel that shows them is re-rendered.
+ *
+ * @param {Object} state
+ * @param {string} key
+ *
+ * @return {Array<string>} The warnings, or an empty array
+ *
+ * @since 7.0
+ */
+export const getWarnings = (state, key) => state.warnings[key] ?? [];
+
 const fromFonts = (derive) =>
 	createRegistrySelector((select) => (state, ...args) => {
 		const fonts = select(STORE_NAME).getFonts();

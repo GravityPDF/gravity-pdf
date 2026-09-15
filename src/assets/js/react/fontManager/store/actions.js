@@ -52,6 +52,11 @@ export const setError = (key, message, code = '') => ({
 	message,
 	code,
 });
+export const setWarnings = (key, warnings) => ({
+	type: 'SET_WARNINGS',
+	key,
+	warnings,
+});
 
 /**
  * Re-read the font list, and the statuses that describe it
@@ -226,6 +231,14 @@ export const saveFont =
 			row = id
 				? await api.editFont(id, body)
 				: await api.uploadFont(body);
+
+			/*
+			 * Keyed on what the row was saved as rather than on what the form was called, because an upload is
+			 * filed under "new" right up until it has an id, and the panel that shows these re-reads under the
+			 * id the moment the save lands. Cleared on every save so an upload that fixed the slot it had
+			 * wrong stops being told about it.
+			 */
+			dispatch(setWarnings(row.id, row.warnings ?? []));
 
 			await dispatch(refreshFonts());
 

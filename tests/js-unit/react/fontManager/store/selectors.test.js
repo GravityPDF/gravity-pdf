@@ -172,4 +172,9 @@ describe('Font Manager - store/selectors.js', () => {
 	test('canDeleteFiles() follows the route field', () => {
 		expect(select.canDeleteFiles()).toBe(true);
 	});
+
+	test('getWarnings answers an array for a row that has none', () => {
+		/* The panel maps over this on every render, so a row nothing was said about cannot answer undefined */
+		expect(select.getWarnings('brandsans')).toEqual([]);
+	});
 });

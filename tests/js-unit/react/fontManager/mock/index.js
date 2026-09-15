@@ -212,7 +212,9 @@ function uploadFont(request, options) {
 
 	state.rows.push(row);
 
-	return row;
+	return state.uploadWarnings.length
+		? { ...row, warnings: state.uploadWarnings }
+		: row;
 }
 
 function editFont(request, options) {

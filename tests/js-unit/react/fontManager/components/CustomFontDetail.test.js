@@ -109,6 +109,70 @@ describe('Font Manager - adding and editing an uploaded font', () => {
 		expect(window.location.hash).toBe('#/fontmanager/housesans');
 	});
 
+	/**
+	 * The server reads the style bits out of each uploaded face and says so when they are not the face the slot
+	 * claims. Advice, not a refusal — the font saves either way — so it has to survive the move off the upload
+	 * form and onto the row it became, which is the only place the admin is still looking.
+	 */
+	test('shows what the server said about files that are not what their slots claim', async () => {
+		const user = userEvent.setup();
+
+		renderWithStore(<FontManager onActive={jest.fn()} />, {
+			prepare: () => {
+				state.uploadWarnings = [
+					'HouseSans-Bold.ttf was uploaded as Italic but describes itself as Bold.',
+				];
+			},
+		});
+
+		await addNewFont(user);
+		await user.type(screen.getByLabelText('Font name'), 'House Sans');
+
+		drop(variantRow('Regular'), new File(['x'], 'HouseSans-Regular.ttf'));
+
+		await waitFor(() =>
+			expect(
+				screen.getByRole('button', { name: 'Add font' })
+			).toBeEnabled()
+		);
+
+		await user.click(screen.getByRole('button', { name: 'Add font' }));
+
+		/* The save went through: this is advice about the row, not a failure to write it */
+		expect(await screen.findByText('Edit font')).toBeTruthy();
+
+		expect(
+			await screen.findByText(
+				'HouseSans-Bold.ttf was uploaded as Italic but describes itself as Bold.'
+			)
+		).toBeTruthy();
+	});
+
+	test('says nothing when the files are what their slots claim', async () => {
+		const user = userEvent.setup();
+
+		renderWithStore(<FontManager onActive={jest.fn()} />);
+
+		await addNewFont(user);
+		await user.type(screen.getByLabelText('Font name'), 'House Sans');
+
+		drop(variantRow('Regular'), new File(['x'], 'HouseSans-Regular.ttf'));
+
+		await waitFor(() =>
+			expect(
+				screen.getByRole('button', { name: 'Add font' })
+			).toBeEnabled()
+		);
+
+		await user.click(screen.getByRole('button', { name: 'Add font' }));
+
+		await screen.findByText('Edit font');
+
+		expect(
+			screen.queryByText(/check the files are the ones you meant/)
+		).toBeNull();
+	});
+
 	test('asks before replacing a file that is already there, then sends it', async () => {
 		const user = userEvent.setup();
 

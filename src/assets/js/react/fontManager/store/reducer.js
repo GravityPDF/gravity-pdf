@@ -24,6 +24,7 @@ export const DEFAULT_STATE = {
 	activeFont: '',
 	busy: {},
 	errors: {},
+	warnings: {},
 };
 
 /**
@@ -84,6 +85,15 @@ export function reducer(state = DEFAULT_STATE, action = {}) {
 						message: action.message,
 						code: action.code ?? '',
 					},
+				},
+			};
+
+		case 'SET_WARNINGS':
+			return {
+				...state,
+				warnings: {
+					...state.warnings,
+					[action.key]: action.warnings,
 				},
 			};
 

@@ -51,20 +51,22 @@ export default function CustomFontDetail({
 	const [files, setFiles] = useState(() => filesOf(row));
 	const [confirm, setConfirm] = useState(null);
 
-	const { activeFont, taken, busy, error, canDeleteFiles } = useSelect(
-		(select) => {
-			const store = select(STORE_NAME);
+	const { activeFont, taken, busy, error, warnings, canDeleteFiles } =
+		useSelect(
+			(select) => {
+				const store = select(STORE_NAME);
 
-			return {
-				activeFont: store.getActiveFont(),
-				taken: store.getTakenKeys(row?.id ?? ''),
-				busy: store.isBusy(row?.id ?? 'new'),
-				error: store.getError(row?.id ?? 'new'),
-				canDeleteFiles: store.canDeleteFiles(),
-			};
-		},
-		[row?.id]
-	);
+				return {
+					activeFont: store.getActiveFont(),
+					taken: store.getTakenKeys(row?.id ?? ''),
+					busy: store.isBusy(row?.id ?? 'new'),
+					error: store.getError(row?.id ?? 'new'),
+					warnings: store.getWarnings(row?.id ?? ''),
+					canDeleteFiles: store.canDeleteFiles(),
+				};
+			},
+			[row?.id]
+		);
 
 	const { saveFont, deleteFont } = useDispatch(STORE_NAME);
 
@@ -145,6 +147,23 @@ export default function CustomFontDetail({
 				{error && (
 					<Notice status="error" isDismissible={false}>
 						{error}
+					</Notice>
+				)}
+
+				{/* Advice about the files, not a failure: the font saved, and these are what it looks like */}
+				{warnings.length > 0 && (
+					<Notice status="warning" isDismissible={false}>
+						<p>
+							{__(
+								'The font was saved, but check the files are the ones you meant:',
+								'gravity-pdf'
+							)}
+						</p>
+						<ul className="fm-face-warnings">
+							{warnings.map((warning) => (
+								<li key={warning}>{warning}</li>
+							))}
+						</ul>
 					</Notice>
 				)}
 

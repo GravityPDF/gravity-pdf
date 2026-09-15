@@ -192,6 +192,64 @@ class Test_Rest_Custom_Fonts extends TestCase {
 		$this->assertSame( 75, $row['use_kashida'] );
 	}
 
+	/**
+	 * Nothing about a PDF says the bold file went into the italic slot: it renders upright where italics were
+	 * asked for, and the admin finds out in a document. The style bits each face carries are the only warning
+	 * available, and the write routes are the only moment worth giving it.
+	 *
+	 * This class's own fixtures are the case: a condensed sans in the italic slot and a serif in the bold-italic
+	 * one, which is two families and two styles that are not what they claim.
+	 */
+	public function test_a_slot_or_family_mismatch_comes_back_with_the_saved_row() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
+		$request->set_param( 'label', 'Mixed' );
+		$this->set_all_file_params( $request );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertNotEmpty( $font['warnings'] );
+
+		$said = implode( "\n", $font['warnings'] );
+
+		$this->assertStringContainsString( 'DejaVuSansCondensed.ttf', $said );
+		$this->assertStringContainsString( 'more than one font family', $said );
+
+		/* The font still saved: this is advice, and refusing the upload over a metadata bit would be worse */
+		$this->assertSame( 'mixed', $font['id'] );
+		$this->assertNotNull( GPDFAPI::get_font_repository()->get( 'mixed' ) );
+	}
+
+	public function test_four_faces_that_match_their_slots_say_nothing() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
+		$request->set_param( 'label', 'Tidy' );
+
+		$_FILES = [];
+		foreach ( [ 'regular' => 'Regular', 'bold' => 'Bold', 'italics' => 'Italic', 'bolditalics' => 'BoldItalic' ] as $slot => $face ) {
+			$name = 'Arimo-' . $face . '.ttf';
+			$tmp  = get_temp_dir() . $name;
+			copy( PDF_PLUGIN_DIR . 'fonts/' . $name, $tmp );
+
+			$_FILES[ $slot ] = [
+				'file'     => file_get_contents( $tmp ),
+				'name'     => $name,
+				'size'     => filesize( $tmp ),
+				'tmp_name' => $tmp,
+				'error'    => UPLOAD_ERR_OK,
+			];
+		}
+
+		$request->set_file_params( $_FILES );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame( 'tidy', $font['id'] );
+		$this->assertArrayNotHasKey( 'warnings', $font, 'a family in its own slots earns no advice' );
+	}
+
 	public function test_add_item_permission_failed() {
 		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
 		$request->set_param( 'label', 'Font' );

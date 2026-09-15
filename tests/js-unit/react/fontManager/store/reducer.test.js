@@ -22,6 +22,25 @@ describe('Font Manager - store/reducer.js', () => {
 		expect(second.statuses).toEqual({ 'packs/indic': { phase: null } });
 	});
 
+	test('keeps the advice a save came back with under the row it saved', () => {
+		let state = reducer(undefined, {
+			type: 'SET_WARNINGS',
+			key: 'housesans',
+			warnings: ['Bold.ttf was uploaded as Italic.'],
+		});
+
+		expect(state.warnings.housesans).toHaveLength(1);
+
+		/* Replaced wholesale, so an upload that fixed the slot stops being told about it */
+		state = reducer(state, {
+			type: 'SET_WARNINGS',
+			key: 'housesans',
+			warnings: [],
+		});
+
+		expect(state.warnings.housesans).toEqual([]);
+	});
+
 	test('files each entry and each search page under its own key', () => {
 		let state = reducer(undefined, {
 			type: 'RECEIVE_ENTRY',

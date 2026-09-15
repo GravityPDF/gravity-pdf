@@ -14,6 +14,7 @@ use GFPDF\Fonts\Font_Repository;
 use GFPDF\Fonts\Install_Requests;
 use GFPDF\Fonts\Registry;
 use GFPDF\Fonts\SupportsOtl;
+use GFPDF\Fonts\FontFaceAnalysis;
 use GFPDF\Fonts\TtfFontValidation;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Model\Model_Custom_Fonts;
@@ -282,6 +283,27 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 	}
 
 	/**
+	 * A saved row, plus anything about the files worth telling the administrator who saved it
+	 *
+	 * Only the two write routes answer with this. `warnings` is advice about the upload rather than part of the
+	 * font, so it is not in `row()` and never reaches a read: a warning is about the moment the files arrived,
+	 * and repeating it on every later `GET` would make it furniture.
+	 *
+	 * @param string[] $warnings
+	 *
+	 * @since 7.0
+	 */
+	protected function row_with_warnings( string $font_key, array $warnings ): array {
+		$row = $this->row( $font_key );
+
+		if ( $warnings !== [] ) {
+			$row['warnings'] = array_values( $warnings );
+		}
+
+		return $row;
+	}
+
+	/**
 	 * Why this row is not this route's to change, or null
 	 *
 	 * A font a language pack installed belongs to its entry: the pack decides which keys exist, and removing one of
@@ -382,13 +404,14 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 
 			/* Determine if font files support OTF data and auto register */
 			$supports_otl = $this->does_fonts_support_otl( $files );
+			$analysis     = new FontFaceAnalysis( $this->font_dir_path );
 
 			/* Update database */
 			$font = [
 				'font_name'   => $label,
 				'id'          => $id,
 				'useOTL'      => $supports_otl ? 0xFF : 0x00,
-				'useKashida'  => $supports_otl ? 75 : 0,
+				'useKashida'  => $supports_otl && $analysis->has_rtl( $files ) ? 75 : 0,
 				'regular'     => $this->get_absolute_font_path( $files['regular']['name'] ),
 				'italics'     => $this->get_absolute_font_path( $files['italics']['name'] ?? '' ),
 				'bold'        => $this->get_absolute_font_path( $files['bold']['name'] ?? '' ),
@@ -399,7 +422,7 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			return $this->row( $id );
+			return $this->row_with_warnings( $id, $analysis->warnings( $files ) );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -507,9 +530,11 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 			}
 
 			$supports_otl = $this->does_fonts_support_otl( $files );
+			$analysis     = new FontFaceAnalysis( $this->font_dir_path );
 
 			if ( $supports_otl ) {
-				$useKashida = $request->get_param( 'useKashida' ) ?? 75;
+				/* Only the automatic value is gated: a Kashida the request states is the admin's to state */
+				$useKashida = $request->get_param( 'useKashida' ) ?? ( $analysis->has_rtl( $files ) ? 75 : 0 );
 				if ( $useKashida !== null ) {
 					$useKashida = (int) $useKashida;
 					if ( $useKashida < 0 || $useKashida > 100 ) {
@@ -531,7 +556,7 @@ class Rest_Custom_Fonts extends Rest_Font_Base {
 
 			FlushCache::flush_font( (string) $font['id'] );
 
-			return $this->row( (string) $font['id'] );
+			return $this->row_with_warnings( (string) $font['id'], $analysis->warnings( $files ) );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );

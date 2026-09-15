@@ -91,6 +91,12 @@ export const BUNDLED = [
  */
 export function initialState() {
 	return {
+		/*
+		 * What the write routes answer with alongside the row when the files do not look like what their slots
+		 * claim. A seam rather than a simulation: the server reads the style bits out of each font, which
+		 * nothing here can do, so a test arranges the answer and asserts what the panel makes of it.
+		 */
+		uploadWarnings: [],
 		rows: [
 			{
 				id: 'notoemoji',
