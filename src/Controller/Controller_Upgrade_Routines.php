@@ -71,7 +71,7 @@ class Controller_Upgrade_Routines {
 			$this->remove_legacy_license_check_cron();
 		}
 
-		if ( version_compare( $current_version, '7.0.0', '>=' ) && version_compare( $old_version, '7.0.0', '<' ) ) {
+		if ( version_compare( $current_version, '7.0.0-alpha1', '>=' ) && version_compare( $old_version, '7.0.0-alpha1', '<' ) ) {
 			/* Idempotent, and the render path calls it anyway — but until it completes, every request re-runs
 			   dbDelta and renders from an empty font table. Doing it here closes that window on the admin request
 			   that detected the upgrade. A site that never reaches this routine still migrates on its next render */

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 6.16.0
+Version: 7.0.0-alpha1
 Description: Automatically generate highly customizable PDF documents using Gravity Forms and WordPress (canonical)
 Author: Blue Liquid Designs
 Author URI: https://blueliquiddesigns.com.au
@@ -9,7 +9,7 @@ Plugin URI: https://gravitypdf.com
 Update URI: https://gravitypdf.com
 Text Domain: gravity-pdf
 Domain Path: /languages
-Requires at least: 5.3
+Requires at least: 6.8
 Requires PHP: 7.4
 License: GPL-2.0
 License URI: https://opensource.org/licenses/gpl-2.0.php
@@ -36,7 +36,7 @@ if ( defined( 'PDF_PLUGIN_BASENAME' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '6.16.0' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '7.0.0-alpha1' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -127,7 +127,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 *
 		 * @since 4.0
 		 */
-		public $required_gf_version = '2.5';
+		public $required_gf_version = '2.9.25';
 
 		/**
 		 * The plugin's required WordPress version
@@ -136,7 +136,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 *
 		 * @since 4.0
 		 */
-		public $required_wp_version = '5.3';
+		public $required_wp_version = '6.8';
 
 		/**
 		 * The plugin's required PHP version

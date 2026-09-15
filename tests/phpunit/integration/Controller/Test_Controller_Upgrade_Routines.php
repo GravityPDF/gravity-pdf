@@ -218,6 +218,9 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 	/**
 	 * Step 2. A site has no catalogue at all until this runs, so browsing, adoption and every install path would
 	 * be looking at an empty table for up to an hour if the sync were left to the scheduled listener.
+	 *
+	 * Driven by the version the plugin declares rather than a literal, which also pins the gate against it: a
+	 * pre-release sorts below its own final version, so a gate naming `7.0.0` goes quietly dead on `7.0.0-alpha1`.
 	 */
 	public function test_7_0_0_fills_the_font_catalog_inline() {
 		global $gfpdf;
@@ -231,7 +234,7 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 		$this->assertSame( 0, $this->catalog_repository()->search( 'packs' )['total'] );
 
-		do_action( 'gfpdf_version_changed', '6.17.0', '7.0.0' );
+		do_action( 'gfpdf_version_changed', '6.17.0', PDF_EXTENDED_VERSION );
 
 		$this->assertSame( [ 'emoji', 'arabic' ], wp_list_pluck( $this->catalog_repository()->search( 'packs' )['entries'], 'entry' ) );
 		$this->assertGreaterThan( 0, $gfpdf->catalog_sync->get_record( 'packs' )['synced'] );
