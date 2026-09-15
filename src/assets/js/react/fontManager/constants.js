@@ -119,7 +119,9 @@ export const POLL_IDLE_INTERVAL = 30000;
  * The one page that describes all three offline routes, so it is what the import dialog offers an admin whose
  * host will not take the upload at all — the case no retry of this screen can fix.
  *
+ * @todo Repoint at the real page before 7.0 ships. It is not written yet, so this is a placeholder on the
+ *       documentation home rather than a URL that 404s under an admin who clicks it.
+ *
  * @since 7.0
  */
-export const DOCS_OFFLINE_INSTALL =
-	'https://docs.gravitypdf.com/users/installing-fonts-offline/';
+export const DOCS_OFFLINE_INSTALL = 'https://docs.gravitypdf.com/';
