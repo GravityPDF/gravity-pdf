@@ -91,7 +91,7 @@ class Legacy_Font_Adopter implements Font_Population_Pass {
 			 * uploaded under the same name, say. That row wins; re-keying this one would only add a font under a
 			 * name no template mentions. Checked before the faces are hashed, which is the expensive half.
 			 */
-			if ( isset( $taken[ $font_key ] ) || $this->repository->is_key_reserved( $font_key ) ) {
+			if ( isset( $taken[ $font_key ] ) || Font_Repository::is_key_reserved( $font_key ) ) {
 				$taken_keys[] = $font_key;
 
 				continue;

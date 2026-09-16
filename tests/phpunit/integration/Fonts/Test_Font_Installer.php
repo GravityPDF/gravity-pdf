@@ -436,6 +436,74 @@ class Test_Font_Installer extends TestCase {
 		$this->assertSame( 'failed', $this->status()['phase'] );
 	}
 
+	/**
+	 * D15's live gate. `resolve()` validates every entry it installs, inlined or fetched, and it holds the catalog
+	 * row — so the reserved key is caught with the flag that decides how the row is written, before a byte is
+	 * placed. The key used to pass `KEY_PATTERN`, which is a character class, and cost the site an install that
+	 * could never complete (§11 D15)
+	 */
+	public function test_a_reserved_font_key_is_refused_before_anything_is_downloaded() {
+		$this->seed_pack( 'emoji', [ 'fonts' => [ 'sans' => [ 'R' => 'NotoEmoji.ttf' ] ] ] );
+
+		$result = $this->installer->install( 'packs/emoji' );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'font_invalid_entry', $result->get_error_code() );
+		$this->assertStringContainsString( 'sans', $result->get_error_message() );
+
+		$this->assertNull( $this->font( 'sans' ) );
+		$this->assertFileDoesNotExist( $this->font_dir . 'packs/emoji/NotoEmoji.ttf' );
+	}
+
+	/**
+	 * And D15's backstop, reached past the gate above. `upsert_font()` used to log and return a zero row id that
+	 * `write_rows()` skipped over as if nothing had happened: the file placed, no row pointing at it,
+	 * `install_complete()` unsatisfiable, and the phase stuck on `installing` with no error and no `retry_after`
+	 * for the hourly retry to find. It is a `WP_Error` now, so a path that ever reaches it fails visibly instead
+	 * (§11 D15)
+	 */
+	public function test_a_reserved_font_key_that_reaches_the_writer_fails_the_install_rather_than_sticking() {
+		global $gfpdf;
+
+		$this->seed_pack( 'emoji', [ 'fonts' => [ 'sans' => [ 'R' => 'NotoEmoji.ttf' ] ] ] );
+
+		$installer = new class(
+			$gfpdf->get_font_repository(),
+			$gfpdf->get_catalog_repository(),
+			$gfpdf->get_font_downloader(),
+			$gfpdf->get_font_cache_warmer(),
+			new Font_Lock(),
+			$gfpdf->get_catalog_sync(),
+			GPDFAPI::get_log_class()
+		) extends Font_Installer {
+			/**
+			 * Everything `resolve()` does except `validate_entry()` — which is the gate being reached past
+			 */
+			protected function resolve( string $source, string $entry ) {
+				$row = $this->catalog->entry( $source, $entry );
+
+				return [
+					'row'  => $row,
+					'data' => $row['data'],
+				];
+			}
+		};
+
+		$result = $installer->install( 'packs/emoji' );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'font_key_reserved', $result->get_error_code() );
+		$this->assertNull( $this->font( 'sans' ), 'the reserved key is still nothing a pack may claim' );
+
+		$status = $this->status();
+
+		$this->assertSame( 'failed', $status['phase'] );
+		$this->assertSame( 'font_key_reserved', $status['error'] );
+
+		/* What tells the difference between a failure and a stall: the hourly retry has a date to come back on */
+		$this->assertNotNull( $status['retry_after'] );
+	}
+
 	public function test_an_unknown_entry_is_refused_without_a_request() {
 		$this->mock_http( [ 'fonts.gravitypdf.com' => 'never reached' ] );
 

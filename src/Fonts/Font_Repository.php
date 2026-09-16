@@ -842,9 +842,13 @@ class Font_Repository {
 	/**
 	 * Whether nothing may claim this key
 	 *
+	 * Public and static for the reason `is_valid_role()` is: it is read at both ends. Here, where a row is
+	 * written, and in `Font_Sources::validate_fonts()`, where a coverage entry claiming one of these keys is
+	 * rejected at sync rather than installed into a state that can never complete (§11 D15).
+	 *
 	 * @since 7.0
 	 */
-	public function is_key_reserved( string $font_key ): bool {
+	public static function is_key_reserved( string $font_key ): bool {
 		return in_array( $font_key, static::RESERVED_KEYS, true )
 			|| in_array( $font_key, static::RESERVED_ROUTE_KEYS, true );
 	}
@@ -855,7 +859,7 @@ class Font_Repository {
 	 * @since 7.0
 	 */
 	public function is_key_available( string $font_key ): bool {
-		return ! $this->is_key_reserved( $font_key ) && $this->get( $font_key ) === null;
+		return ! static::is_key_reserved( $font_key ) && $this->get( $font_key ) === null;
 	}
 
 	/**

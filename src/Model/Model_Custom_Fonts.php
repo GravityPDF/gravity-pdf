@@ -261,7 +261,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 */
 	public function matches_reserved_font_id( string $id ): bool {
 		/* One reserved list, not two: the repository owns the keys mPDF resolves before it ever reads the font map */
-		return $this->repository->is_key_reserved( $id ) || $this->matches_pdf_base_font( $id );
+		return Font_Repository::is_key_reserved( $id ) || $this->matches_pdf_base_font( $id );
 	}
 
 	/**

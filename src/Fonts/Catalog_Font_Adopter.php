@@ -154,7 +154,7 @@ class Catalog_Font_Adopter {
 		foreach ( $fonts as $font_key => $roles ) {
 			$font_key = (string) $font_key;
 
-			if ( isset( $taken[ $font_key ] ) || $this->repository->is_key_reserved( $font_key ) ) {
+			if ( isset( $taken[ $font_key ] ) || Font_Repository::is_key_reserved( $font_key ) ) {
 				continue;
 			}
 

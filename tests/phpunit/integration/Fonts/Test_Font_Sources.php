@@ -348,6 +348,55 @@ class Test_Font_Sources extends TestCase {
 	}
 
 	/**
+	 * D1's shape one layer up. `KEY_PATTERN` is a character class, so `sans` and `gfpdf-arimo` both pass it, and
+	 * `upsert_font()` refuses a coverage row under either — the pack's row would shadow a font that ships with the
+	 * plugin. Refused there, the file was already on disk with no row to claim it and the entry stayed
+	 * `installing` for good, so the entry is refused here instead, where a build mistake costs the source index
+	 * (§11 D15)
+	 */
+	public function test_a_coverage_entry_claiming_a_reserved_key_is_rejected_at_sync() {
+		foreach ( [ 'sans', 'serif', 'gfpdf-arimo', 'gb', 'sources' ] as $key ) {
+			$entry = $this->valid_entry( [ 'fonts' => [ $key => [ 'R' => 'NotoSansSC-Regular.ttf' ] ] ] );
+
+			$this->assertStringContainsString(
+				$key,
+				(string) Font_Sources::validate_entry( $entry, true ),
+				"the reserved key {$key} should have been refused"
+			);
+		}
+	}
+
+	/**
+	 * A display entry publishes a key it never installs under — `new_key()` chooses that, and `unique_key()`
+	 * already routes it off anything reserved — so refusing one here would reject an entry that installs fine
+	 */
+	public function test_a_display_entry_may_publish_a_key_a_coverage_entry_could_not() {
+		$entry = $this->valid_entry(
+			[
+				'fonts'            => [ 'serif' => [ 'R' => 'NotoSansSC-Regular.ttf' ] ],
+				'language_to_font' => [],
+			]
+		);
+
+		$this->assertNull( Font_Sources::validate_entry( $entry ) );
+	}
+
+	/**
+	 * Coverage is an *index-row* field: `Catalog_Sync::to_row()` reads it off the entry beside the document, and
+	 * the document itself never carries it. Deriving the gate from `$entry['coverage']` therefore read a key that
+	 * is never set, which is a check that silently never fires — so it is the caller's flag, the one the row is
+	 * written from and `upsert_font()` later reads, or it is nothing.
+	 */
+	public function test_the_coverage_flag_comes_from_the_caller_and_not_the_document() {
+		$entry = $this->valid_entry( [ 'fonts' => [ 'sans' => [ 'R' => 'NotoSansSC-Regular.ttf' ] ] ] );
+
+		/* A document claiming it for itself buys nothing */
+		$this->assertNull( Font_Sources::validate_entry( $entry + [ 'coverage' => true ] ) );
+
+		$this->assertIsString( Font_Sources::validate_entry( $entry, true ) );
+	}
+
+	/**
 	 * `insert_file()` refuses a role outside the vocabulary and `install_complete()` is satisfied only once every
 	 * downloaded file has a row, so a `Bl` for `BI` used to download the file and leave the entry `installing` for
 	 * good. The vocabulary is one predicate now, read here as well, so the mistake costs the source index at sync

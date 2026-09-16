@@ -445,13 +445,16 @@ class Font_Sources {
 	 * `Font_Installer` — because entry files are fetched lazily and a third-party source bypasses our pipeline: the
 	 * signed root proves provenance, not content safety.
 	 *
-	 * @param array $entry The decoded `entry` object, not the index row around it
+	 * @param array $entry    The decoded `entry` object, not the index row around it
+	 * @param bool  $coverage Whether this is a coverage entry, which only the index row and the catalog column
+	 *                        know — the document itself does not carry the flag, so the caller passes the one
+	 *                        `upsert_font()` will read rather than a second copy derived from somewhere else
 	 *
 	 * @return string|null The reason it was rejected, or null when it is valid
 	 *
 	 * @since 7.0
 	 */
-	public static function validate_entry( array $entry ): ?string {
+	public static function validate_entry( array $entry, bool $coverage = false ): ?string {
 		$files = $entry['files'] ?? [];
 
 		if ( ! is_array( $files ) || count( $files ) === 0 ) {
@@ -490,7 +493,7 @@ class Font_Sources {
 			return 'preview is not a relative path below the files directory';
 		}
 
-		$error = static::validate_fonts( $entry['fonts'] ?? [], $files );
+		$error = static::validate_fonts( $entry['fonts'] ?? [], $files, $coverage );
 		if ( $error !== null ) {
 			return $error;
 		}
@@ -633,11 +636,12 @@ class Font_Sources {
 	/**
 	 * The `fonts` map: mPDF key → role → filename, with useOTL / useKashida / sip-ext beside the roles
 	 *
-	 * @param array $files The entry's own file list, so a role cannot name a file that will never be downloaded
+	 * @param array $files    The entry's own file list, so a role cannot name a file that will never be downloaded
+	 * @param bool  $coverage Whether the entry's keys are the keys it installs under, which only a coverage entry's are
 	 *
 	 * @since 7.0
 	 */
-	protected static function validate_fonts( array $fonts, array $files ): ?string {
+	protected static function validate_fonts( array $fonts, array $files, bool $coverage ): ?string {
 		if ( count( $fonts ) === 0 ) {
 			return 'the entry registers no fonts';
 		}
@@ -648,6 +652,18 @@ class Font_Sources {
 
 			if ( preg_match( static::KEY_PATTERN, $font_key ) !== 1 ) {
 				return sprintf( 'font key "%s" is not a valid key', $font_key );
+			}
+
+			/*
+			 * `KEY_PATTERN` is a character class, so `sans` and `gfpdf-arimo` both pass it. A coverage entry
+			 * installs under the keys it publishes, and `upsert_font()` refuses a reserved one — for good reason,
+			 * since the pack's row would shadow a font that ships with the plugin — so the mistake belongs here,
+			 * where it costs the source index, and not at install, where the file lands with no row behind it.
+			 * Only coverage entries: a display entry's key is `new_key()`'s to choose, and `unique_key()` already
+			 * routes it off anything reserved, so rejecting one here would refuse an entry that installs fine.
+			 */
+			if ( $coverage && Font_Repository::is_key_reserved( $font_key ) ) {
+				return sprintf( 'font key "%s" is reserved', $font_key );
 			}
 
 			if ( ! is_array( $roles ) ) {

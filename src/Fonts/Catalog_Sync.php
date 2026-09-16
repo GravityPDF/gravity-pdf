@@ -980,10 +980,12 @@ class Catalog_Sync {
 			return new WP_Error( 'font_entry_malformed', sprintf( 'The entry id "%s" is not valid', $id ) );
 		}
 
-		$inlined = $entry['entry'] ?? null;
+		$inlined  = $entry['entry'] ?? null;
+		$coverage = empty( $entry['coverage'] ) ? 0 : 1;
 
 		if ( is_array( $inlined ) ) {
-			$invalid = Font_Sources::validate_entry( $inlined );
+			/* The flag lives out here, on the index entry, and the document inside knows nothing of it */
+			$invalid = Font_Sources::validate_entry( $inlined, $coverage === 1 );
 
 			if ( $invalid !== null ) {
 				return new WP_Error( 'font_invalid_entry', sprintf( 'Entry "%s": %s', $id, $invalid ) );
@@ -997,7 +999,7 @@ class Catalog_Sync {
 			'version'      => (string) ( $entry['version'] ?? '' ),
 			'notes'        => $this->nullable_string( $entry['notes'] ?? null, 255 ),
 			'released'     => $this->nullable_date( $entry['released'] ?? null ),
-			'coverage'     => empty( $entry['coverage'] ) ? 0 : 1,
+			'coverage'     => $coverage,
 			'position'     => $position,
 			'license'      => (string) ( $entry['license'] ?? '' ),
 			'size'         => (int) ( $entry['size'] ?? 0 ),

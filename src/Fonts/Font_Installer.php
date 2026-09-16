@@ -580,7 +580,7 @@ class Font_Installer {
 			}
 		}
 
-		$invalid = Font_Sources::validate_entry( $data );
+		$invalid = Font_Sources::validate_entry( $data, (int) $row['coverage'] === 1 );
 
 		if ( $invalid !== null ) {
 			return new WP_Error( 'font_invalid_entry', sprintf( 'Entry %s/%s: %s', $source, $entry, $invalid ) );
@@ -785,10 +785,10 @@ class Font_Installer {
 	 * One write, no branch on the source. An entry update rewrites `meta`, `version` and the OTL flags in the same
 	 * upsert as the file rows it replaces.
 	 *
-	 * A file row that cannot be written fails the install. `install_complete()` is satisfied only once every
-	 * downloaded file is claimed by a row, so a discarded `false` here left the entry `installing` for good —
-	 * never retried, never surfaced, and not self-healing under the Font Manager's Retry, which re-POSTs the same
-	 * install (§11 D1).
+	 * A row that cannot be written fails the install, the font row as much as the file row.
+	 * `install_complete()` is satisfied only once every downloaded file is claimed by a row, so a discarded
+	 * `false` here left the entry `installing` for good — never retried, never surfaced, and not self-healing
+	 * under the Font Manager's Retry, which re-POSTs the same install (§11 D1, D15).
 	 *
 	 * @param array $targets `{ font_key: { role: variant } }` for this one file
 	 *
@@ -800,8 +800,8 @@ class Font_Installer {
 		foreach ( $targets as $font_key => $roles ) {
 			$font = $this->upsert_font( $resolved, $install, (string) $font_key );
 
-			if ( $font['id'] === 0 ) {
-				continue;
+			if ( is_wp_error( $font ) ) {
+				return $font;
 			}
 
 			$replaced_a_file = false;
@@ -855,30 +855,28 @@ class Font_Installer {
 	/**
 	 * The font row for one key of one entry, created or brought up to date
 	 *
-	 * @return array{id: int, key: string} The row id — 0 when it could not be written — and the key it holds
+	 * @return array{id: int, key: string}|WP_Error The row id and the key it holds, or why no row could be written
 	 *
 	 * @since 7.0
 	 */
-	protected function upsert_font( array $resolved, array $install, string $font_key ): array {
+	protected function upsert_font( array $resolved, array $install, string $font_key ) {
 		$row  = $resolved['row'];
 		$data = $resolved['data'];
 
 		$coverage = (int) $row['coverage'] === 1;
 
-		/* A bundled key is not a pack's to take: the pack's own row would shadow a font that ships with the plugin */
-		if ( $coverage && $this->repository->is_key_reserved( $font_key ) ) {
-			$this->log->warning(
-				'Refusing to install a coverage font under a reserved key',
-				[
-					'entry' => Install_Requests::entry_id( $row ),
-					'key'   => $font_key,
-				]
+		/*
+		 * A bundled key is not a pack's to take: the pack's own row would shadow a font that ships with the
+		 * plugin. `resolve()` refuses such an entry before a byte is placed — every entry it installs is passed
+		 * through `validate_entry()` with this same flag, inlined or fetched — so nothing should reach here.
+		 * It stays because the alternative to a `WP_Error` was a zero row id `write_rows()` skipped over, and
+		 * that left the file on disk with no row to claim it and the entry `installing` for good (§11 D15).
+		 */
+		if ( $coverage && Font_Repository::is_key_reserved( $font_key ) ) {
+			return new WP_Error(
+				'font_key_reserved',
+				sprintf( '%s registers the reserved font key "%s"', Install_Requests::entry_id( $row ), $font_key )
 			);
-
-			return [
-				'id'  => 0,
-				'key' => '',
-			];
 		}
 
 		$font  = Font_Sources::font_row( $row, $data, $font_key );
@@ -908,8 +906,18 @@ class Font_Installer {
 			];
 		}
 
+		$id = $this->repository->insert( $font );
+
+		/* Same shape one row up: an insert that failed underneath us leaves the file claimed by nothing */
+		if ( $id === 0 ) {
+			return new WP_Error(
+				'font_row_unwritten',
+				sprintf( 'the font row for "%s" could not be written', (string) $font['font_key'] )
+			);
+		}
+
 		return [
-			'id'  => $this->repository->insert( $font ),
+			'id'  => $id,
 			'key' => (string) $font['font_key'],
 		];
 	}
