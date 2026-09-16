@@ -105,10 +105,20 @@ class FontFaceAnalysis {
 	/**
 	 * Whether any face carries right-to-left characters
 	 *
-	 * Gates Kashida, which is an Arabic justification feature and does nothing anywhere else. Coarse on purpose:
-	 * the flag means the cmap covers an RTL block, so a Latin family that happens to ship Hebrew answers true.
-	 * Erring that way costs a setting that will not fire; erring the other way would strip Kashida from the fonts
-	 * it exists for.
+	 * Gates Kashida. The flag is coarse — it means the cmap reaches into an RTL block, so a Latin family that
+	 * happens to ship Hebrew answers true — and that is fine, because a wrong answer here cannot cost anything.
+	 *
+	 * `Otl::shapeArabic()` is the only place kashida markers are written, and `Mpdf::GetJspacing()` only inserts
+	 * kashida where it finds one. So `useKashida` is inert by construction on text that is not Arabic, Syriac,
+	 * N'Ko or Mandaic: measured, flipping it between 0 and 75 leaves a Latin page byte-identical, on a Latin font
+	 * and on an Arabic one alike, and moves a justified RTL Arabic page by 46 bytes. Both ways of being wrong are
+	 * therefore harmless — a font covering Arabic gets Kashida and should, and one covering only Hebrew never
+	 * fires it, Hebrew not being cursive-joining.
+	 *
+	 * Which is why this reads the merged flag rather than splitting Arabic out of it. Doing that would mean
+	 * re-reading the cmap here, taking on parsing this class exists to delegate, to change a stored integer and
+	 * no rendered page. mPDF's own `pregCURSchars` starts at Hebrew and runs through Arabic, close enough to the
+	 * range behind this flag that the two are asking nearly the same question.
 	 *
 	 * @param array $files `{ slot: { name: filename } }`, as the upload path holds them
 	 *

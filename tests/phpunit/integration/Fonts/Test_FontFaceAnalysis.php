@@ -109,11 +109,12 @@ class Test_FontFaceAnalysis extends TestCase {
 
 	/**
 	 * Kashida is Arabic justification. Every OTL font used to get it, which on a font with no RTL coverage is a
-	 * setting that can never fire.
+	 * setting that can never fire — `Otl::shapeArabic()` writes the markers `GetJspacing()` needs, and nothing
+	 * else does. Across the packs installed here the gate drops it from 57 of 66.
 	 *
-	 * The flag is coarse, and Arimo is the proof: a Latin UI face that answers true because its cmap reaches
-	 * into Hebrew. It is the conservative direction — a font that needs Kashida never loses it, and one that
-	 * cannot use it usually stops being given it. Across the packs installed here that is 57 of 66.
+	 * The flag is coarse, and Arimo is the proof: a Latin UI face answering true because its cmap reaches into
+	 * Hebrew. Harmless either way, for the reason `has_rtl()` records, so this asserts the aggregation and not a
+	 * precision the flag does not claim.
 	 */
 	public function test_rtl_is_what_separates_a_font_kashida_is_for() {
 		$none = [ 'regular' => $this->place( 'DejaVuSansSymbols.ttf', 'symbols.ttf' ) ];
