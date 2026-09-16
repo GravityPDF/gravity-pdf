@@ -269,6 +269,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $font_cache_warmer;
 
 	/**
+	 * Gives a pack's rows the names the fonts themselves carry
+	 *
+	 * @var Fonts\Font_Namer
+	 *
+	 * @since 7.0
+	 */
+	public $font_namer;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -1230,6 +1239,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 					$this->data->template_font_location
 				)
 			);
+
+			/* Last: it renames rows rather than creating them, and the passes above are where some of those rows come from */
+			$this->font_repository->add_population_pass( $this->get_font_namer() );
 		}
 
 		return $this->font_repository;
@@ -1311,7 +1323,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_font_downloader(),
 				new Fonts\Font_Lock(),
 				$this->log,
-				new Fonts\Catalog_Font_Adopter( $this->get_font_repository(), $this->get_catalog_repository(), $this->get_font_downloader(), $this->get_font_cache_warmer(), $this->log ),
+				new Fonts\Catalog_Font_Adopter( $this->get_font_repository(), $this->get_catalog_repository(), $this->get_font_downloader(), $this->get_font_cache_warmer(), $this->get_font_namer(), $this->log ),
 				defined( 'GPDF_TRUST_KEYS' ) ? (array) GPDF_TRUST_KEYS : [],
 				PDF_PLUGIN_DIR . 'build/font-index/packs.json'
 			);
@@ -1334,6 +1346,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->get_font_cache_warmer(),
 				new Fonts\Font_Lock(),
 				$this->get_catalog_sync(),
+				$this->get_font_namer(),
 				$this->log
 			);
 		}
@@ -1372,6 +1385,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return $this->font_cache_warmer;
+	}
+
+	/**
+	 * Build the font namer, once
+	 *
+	 * Reached from `get_font_repository()` while that is still assembling its passes, which is safe for the reason
+	 * the passes themselves are: the repository is assigned before any of them is added.
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_namer(): Fonts\Font_Namer {
+		if ( $this->font_namer === null ) {
+			$this->font_namer = new Fonts\Font_Namer(
+				$this->get_font_repository(),
+				new Fonts\FontFaceAnalysis( $this->data->template_font_location ),
+				$this->log
+			);
+		}
+
+		return $this->font_namer;
 	}
 
 	/**

@@ -122,6 +122,7 @@ class Font_Report {
 			'installed_fonts'      => $this->row( __( 'Installed fonts', 'gravity-pdf' ), $this->fonts_by_source() ),
 			'font_sources'         => $this->row( __( 'Font sources', 'gravity-pdf' ), $this->sources() ),
 			'language_packs'       => $this->row( __( 'Language packs', 'gravity-pdf' ), $this->packs() ),
+			'unrouted_claims'      => $this->row( __( 'Languages claimed but not routed', 'gravity-pdf' ), $this->unrouted_claims() ),
 		];
 	}
 
@@ -275,6 +276,54 @@ class Font_Report {
 		}
 
 		return $lines === [] ? __( 'None installed', 'gravity-pdf' ) : implode( "\n", $lines );
+	}
+
+	/**
+	 * Packs installed here that claim a language none of their own rows answers
+	 *
+	 * `Catalog_Sync` warns when such an index is synced; this asks the same question of what is installed now, for
+	 * a ticket describing a PDF rather than a log. Rows and columns, both already cached; an entry with no rows
+	 * here is not installed, which is not a fault.
+	 *
+	 * @since 7.0
+	 */
+	protected function unrouted_claims(): string {
+		$lines = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$source    = (string) $row['source'];
+			$entry     = (string) $row['entry'];
+			$installed = $this->repository->rows_for_entry( $source, $entry );
+
+			if ( $installed === [] ) {
+				continue;
+			}
+
+			$routes = [];
+			$exempt = [];
+
+			foreach ( $installed as $font ) {
+				$routes = array_merge( $routes, (array) ( $font['meta']['languages'] ?? [] ) );
+				$exempt = array_merge( $exempt, (array) ( $font['meta']['unrouted'] ?? [] ) );
+			}
+
+			/*
+			 * The claim is refreshed by every sync and the row's copy of the exemption is not, so the document
+			 * wins where the catalogue has one — a republish that claims a tag and exempts it in the same breath
+			 * would otherwise be reported until someone re-installed the entry. An entry the index only points at
+			 * has no document, and the row's copy is what answers for it.
+			 */
+			$published = $this->catalog->entry( $source, $entry );
+			$exempt    = $published['data']['unrouted'] ?? $exempt;
+
+			$unrouted = Language_To_Font::unrouted_claims( $row, $routes, $exempt );
+
+			if ( $unrouted !== [] ) {
+				$lines[] = Install_Requests::entry_id( $row ) . ': ' . implode( ', ', $unrouted );
+			}
+		}
+
+		return $lines === [] ? __( 'None', 'gravity-pdf' ) : implode( "\n", $lines );
 	}
 
 	/**

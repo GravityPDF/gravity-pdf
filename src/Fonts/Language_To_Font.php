@@ -381,6 +381,71 @@ class Language_To_Font implements LanguageToFontInterface {
 	}
 
 	/**
+	 * What a coverage pack claims to cover and cannot answer, exemptions aside
+	 *
+	 * A pack's row claims the languages it is installed *for* and its entry's `language_to_font` is what those
+	 * claims resolve *through*. The two are published separately and nothing on a site compared them, so a claim
+	 * with no route installed the right pack and drew the wrong font: `chinese-traditional` claimed `zh-tw`,
+	 * routed nothing, and `zh-tw` widens to the `zh` Simplified holds (§11 D22). The gate belongs in the build
+	 * that publishes both halves; this is the late net, for an index already out and for a third-party source.
+	 *
+	 * A claim may also mean to have no route — `central-asian` withholds one for `mn`, whose tag doubles as a
+	 * language — and a pack that declares that is not reporting a decision already taken.
+	 *
+	 * Here because `candidates()` is the whole of what "can answer" means, and both askers would otherwise spell
+	 * the claim set themselves.
+	 *
+	 * @param array             $claim  The claiming row: `scripts`, `languages` and `always`, as columns or as lists
+	 * @param array|string      $routes The tags the pack's own map routes, in whatever case they were published
+	 * @param array|string|null $exempt The tags it has declared it means not to route
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	public static function unrouted_claims( array $claim, $routes, $exempt = null ): array {
+		/* An `always` pack is installed for every site and needs no route: `emoji` reaches text through backup-subs */
+		if ( ! empty( $claim['always'] ) ) {
+			return [];
+		}
+
+		$routes  = static::tags( $routes );
+		$exempt  = static::tags( $exempt );
+		$claimed = array_merge(
+			static::tags( $claim['scripts'] ?? null ),
+			static::tags( $claim['languages'] ?? null )
+		);
+
+		$unrouted = [];
+
+		foreach ( $claimed as $tag ) {
+			if ( ! in_array( $tag, $exempt, true ) && array_intersect( static::candidates( $tag ), $routes ) === [] ) {
+				$unrouted[] = $tag;
+			}
+		}
+
+		return $unrouted;
+	}
+
+	/**
+	 * A list of tags, however it was written down
+	 *
+	 * The same tags arrive as a published array, as a comma-separated catalog column and as a row's stored `meta`,
+	 * and every one of them is case-insensitive.
+	 *
+	 * @param array|string|null $value
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	public static function tags( $value ): array {
+		$tags = is_array( $value ) ? $value : explode( ',', (string) $value );
+
+		return array_values( array_filter( array_map( 'strtolower', array_map( 'strval', $tags ) ) ) );
+	}
+
+	/**
 	 * Map a WordPress locale to an mPDF language tag
 	 *
 	 * Nothing cleverer than a case fold and a separator swap: `ja_JP` → `ja-jp`, `zh_CN` → `zh-cn`. mPDF's own
@@ -431,5 +496,28 @@ class Language_To_Font implements LanguageToFontInterface {
 		$cache[ $locale ] = $labels;
 
 		return $labels;
+	}
+
+	/**
+	 * The name to show for one tag, from the first rung of the ladder the label table has a name for
+	 *
+	 * `labels()` names bare languages and scripts; WordPress deals in regional locales and has no `en` at all — an
+	 * untouched install's `get_locale()` is `en_US`, so the derived default is `en-us` and the select was showing
+	 * the raw code (§11 D21). The ladder already answers it: `en-us` takes English's name, `pt-br` Portuguese's.
+	 *
+	 * The tag itself is the last answer, for a code saved by hand or by WP-CLI that no rung names.
+	 *
+	 * @since 7.0
+	 */
+	public static function label_for( string $code ): string {
+		$labels = static::labels();
+
+		foreach ( static::candidates( $code ) as $candidate ) {
+			if ( isset( $labels[ $candidate ] ) ) {
+				return (string) $labels[ $candidate ];
+			}
+		}
+
+		return $code;
 	}
 }

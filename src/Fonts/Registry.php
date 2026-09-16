@@ -599,7 +599,6 @@ class Registry {
 	public function language_map(): array {
 		$default   = $this->default_language_map();
 		$effective = $this->effective_language_map();
-		$labels    = Language_To_Font::labels();
 		$fonts     = $this->get_grouped_fonts();
 
 		$owner  = [];
@@ -642,7 +641,8 @@ class Registry {
 
 			$groups[ $owner[ $fallback ] ?? 'other' ]['rows'][] = [
 				'code'         => $code,
-				'label'        => $labels[ $code ] ?? $code,
+				/* Through the ladder, like the select above it: the row shows the code beside the name regardless */
+				'label'        => Language_To_Font::label_for( $code ),
 				'default_font' => $fallback,
 				'font'         => $effective[ $code ] ?? static::LANGUAGE_NONE,
 			];

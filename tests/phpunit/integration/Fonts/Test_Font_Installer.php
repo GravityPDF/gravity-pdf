@@ -426,6 +426,7 @@ class Test_Font_Installer extends TestCase {
 			$gfpdf->get_font_cache_warmer(),
 			new Font_Lock(),
 			$gfpdf->get_catalog_sync(),
+			$gfpdf->get_font_namer(),
 			$log
 		);
 
@@ -474,6 +475,7 @@ class Test_Font_Installer extends TestCase {
 			$gfpdf->get_font_cache_warmer(),
 			new Font_Lock(),
 			$gfpdf->get_catalog_sync(),
+			$gfpdf->get_font_namer(),
 			GPDFAPI::get_log_class()
 		) extends Font_Installer {
 			/**
@@ -596,8 +598,8 @@ class Test_Font_Installer extends TestCase {
 		/* Roles landing on one file share it on disk: keying the work by filename is what makes that free */
 		$this->assertCount( 1, $this->requested_urls() );
 
-		/* A shared label across two CJK fonts helps nobody, so each row is labelled by its key */
-		$this->assertSame( 'notosanssc', $this->font( 'notosanssc' )['label'] );
+		/* A shared label across two CJK fonts helps nobody, so each row takes the name its own file carries */
+		$this->assertSame( 'DejaVu Sans', $this->font( 'notosanssc' )['label'], 'the fixture bytes are DejaVu Sans, whatever the file is called' );
 	}
 
 	public function test_only_the_named_files_are_installed() {

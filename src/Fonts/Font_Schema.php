@@ -30,14 +30,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Font_Schema {
 
 	/**
-	 * Bump whenever the table definitions below change, or a MIGRATIONS entry is added
+	 * Bump whenever the table definitions below change, a MIGRATIONS entry is added, or a population pass is
 	 *
 	 * A schema version, not the plugin's: `is_current()` short-circuits `ensure()`, so a site holding the previous
-	 * value would never run dbDelta for a newly added table.
+	 * value would never run dbDelta for a newly added table — nor, through `Font_Repository::ensure_ready()`, a
+	 * newly added pass.
 	 *
 	 * @since 7.0
 	 */
-	public const VERSION = '7.0.2';
+	public const VERSION = '7.0.3';
 
 	/**
 	 * The option holding the schema version this site last created, GF-style

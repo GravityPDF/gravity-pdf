@@ -990,6 +990,10 @@ class Catalog_Sync {
 			if ( $invalid !== null ) {
 				return new WP_Error( 'font_invalid_entry', sprintf( 'Entry "%s": %s', $id, $invalid ) );
 			}
+
+			if ( $coverage === 1 ) {
+				$this->warn_unrouted( $source, $id, $entry, $inlined );
+			}
 		}
 
 		return [
@@ -1025,6 +1029,40 @@ class Catalog_Sync {
 			 */
 			'package'      => $this->nullable_string( $entry['package'] ?? null, 255 ),
 		];
+	}
+
+	/**
+	 * Say so when a pack claims a language nothing in its own map can answer
+	 *
+	 * A log line, never a refusal, unlike everything else this method checks: the pack installs, and a template
+	 * naming its font renders correctly — it is the documents naming none that are drawn in the wrong one.
+	 * `Language_To_Font::unrouted_claims()` holds why that happens.
+	 *
+	 * Only what the index inlines: one warning per publish is the point, not one per site per install.
+	 *
+	 * @param array $entry   The index entry, which is where the claim columns live
+	 * @param array $inlined The entry document, which is where the routes live
+	 *
+	 * @since 7.0
+	 */
+	protected function warn_unrouted( string $source, string $id, array $entry, array $inlined ): void {
+		$unrouted = Language_To_Font::unrouted_claims(
+			$entry,
+			array_keys( (array) ( $inlined['language_to_font'] ?? [] ) ),
+			$inlined['unrouted'] ?? null
+		);
+
+		if ( $unrouted === [] ) {
+			return;
+		}
+
+		$this->log->warning(
+			'A font pack claims languages its own map does not route',
+			[
+				'entry'    => Font_Sources::join( $source, $id ),
+				'unrouted' => $unrouted,
+			]
+		);
 	}
 
 	/**
@@ -1234,7 +1272,8 @@ class Catalog_Sync {
 			return null;
 		}
 
-		return $limit === null ? $value : substr( $value, 0, $limit );
+		/* By character, like `Font_Sources::display_name()`: these columns count characters, and a byte cut lands mid-sequence */
+		return $limit === null ? $value : mb_substr( $value, 0, $limit );
 	}
 
 	/**

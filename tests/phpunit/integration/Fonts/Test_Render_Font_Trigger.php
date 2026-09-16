@@ -107,6 +107,9 @@ class Test_Render_Font_Trigger extends TestCase {
 		$gfpdf->get_font_repository()->ensure_ready();
 		$this->drop_catalog_rows();
 
+		/* `within_budget()` measures from here; unset, it measures from the PHPUnit process and a full run skips the fetch */
+		$_SERVER['REQUEST_TIME_FLOAT'] = microtime( true );
+
 		$this->font_dir   = $gfpdf->get_font_repository()->get_font_dir();
 		$this->downloader = new Sequential_Font_Downloader( $gfpdf->log, $gfpdf->data );
 
@@ -123,6 +126,7 @@ class Test_Render_Font_Trigger extends TestCase {
 				$gfpdf->get_font_cache_warmer(),
 				new Font_Lock(),
 				$gfpdf->get_catalog_sync(),
+				$gfpdf->get_font_namer(),
 				$gfpdf->log
 			),
 			$gfpdf->get_font_registry(),

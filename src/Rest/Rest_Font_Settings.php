@@ -107,10 +107,12 @@ class Rest_Font_Settings extends Rest_Font_Base {
 		$language = $this->registry->get_default_language();
 		$labels   = Language_To_Font::labels();
 
-		/* A locale the table has no name for still has to be the select's selected option rather than silently the first */
-		if ( ! isset( $labels[ $language ] ) ) {
-			$labels[ $language ] = $language;
-		}
+		/*
+		 * The table names bare languages, scripts and the two Chinese regional codes a pack claims, so every other
+		 * regional locale takes the name of the rung above it and an unnamed code shows as itself — either way the
+		 * selected option is the code that is stored rather than, silently, the first in the list.
+		 */
+		$labels[ $language ] = Language_To_Font::label_for( $language );
 
 		return rest_ensure_response(
 			[

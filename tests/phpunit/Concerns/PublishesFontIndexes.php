@@ -8,6 +8,7 @@ use GFPDF\Fonts\Catalog_Font_Adopter;
 use GFPDF\Fonts\Catalog_Sync;
 use GFPDF\Fonts\Font_Downloader;
 use GFPDF\Fonts\Font_Lock;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * Build and serve a signed font root plus the source index it names.
@@ -129,10 +130,13 @@ trait PublishesFontIndexes {
 	/**
 	 * A sync wired to this test's throwaway key rather than the build's `GPDF_TRUST_KEYS`
 	 *
-	 * @param array|null $trust_keys Pass `[]` to assert the fail-closed path
+	 * @param array|null           $trust_keys Pass `[]` to assert the fail-closed path
+	 * @param LoggerInterface|null $log        Pass one carrying a `TestHandler` to read back what a sync said
 	 */
-	protected function sync( ?array $trust_keys = null, string $seed_file = '' ): Catalog_Sync {
+	protected function sync( ?array $trust_keys = null, string $seed_file = '', ?LoggerInterface $log = null ): Catalog_Sync {
 		global $gfpdf;
+
+		$log = $log ?? \GPDFAPI::get_log_class();
 
 		return new Catalog_Sync(
 			$gfpdf->get_font_repository()->get_schema(),
@@ -140,8 +144,8 @@ trait PublishesFontIndexes {
 			$gfpdf->get_font_sources(),
 			new Font_Downloader( \GPDFAPI::get_log_class(), \GPDFAPI::get_data_class() ),
 			new Font_Lock(),
-			\GPDFAPI::get_log_class(),
-			new Catalog_Font_Adopter( $gfpdf->get_font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), \GPDFAPI::get_log_class() ),
+			$log,
+			new Catalog_Font_Adopter( $gfpdf->get_font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), $gfpdf->get_font_namer(), \GPDFAPI::get_log_class() ),
 			$trust_keys === null ? [ $this->public_key ] : $trust_keys,
 			$seed_file
 		);

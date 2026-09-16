@@ -104,6 +104,17 @@ class Test_Rest_Font_Settings extends Test_Rest {
 		$this->assertSame( 'en-us', $this->settings()['default_pdf_language'] );
 	}
 
+	/**
+	 * The select shows a name for every other option, and `en_US` is what an untouched WordPress install reports,
+	 * so the raw code was what most sites in the world saw here (§11 D21)
+	 */
+	public function test_the_locale_derived_default_is_offered_by_name() {
+		$settings = $this->settings();
+
+		$this->assertSame( 'en-us', $settings['default_pdf_language'] );
+		$this->assertSame( 'English', ( (array) $settings['labels'] )['en-us'] );
+	}
+
 	public function test_the_overrides_are_not_sent_back_because_the_rows_already_carry_them() {
 		$this->install_pack( 'japanese', 'notosansjp', [ 'ja' ] );
 		$this->install_font_row( 'brandsans' );

@@ -44,7 +44,7 @@ class Test_Font_Adoption extends TestCase {
 	protected function adopter(): Catalog_Font_Adopter {
 		global $gfpdf;
 
-		return new Catalog_Font_Adopter( $this->font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), GPDFAPI::get_log_class() );
+		return new Catalog_Font_Adopter( $this->font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), $gfpdf->get_font_namer(), GPDFAPI::get_log_class() );
 	}
 
 	/**
@@ -330,19 +330,35 @@ class Test_Font_Adoption extends TestCase {
 
 		$this->assertSame( 2, $this->adopter()->run( 'packs' ) );
 
-		/* Sharing source and entry is what groups them; the label falls back to the key rather than repeating */
-		$this->assertSame( 'tinos', $this->font_repository()->get( 'tinos' )['label'] );
+		/* Sharing source and entry is what groups them; each row is named by its own file, not by the pack */
+		$this->assertSame( 'Arimo', $this->font_repository()->get( 'tinos' )['label'], 'the fixture bytes are Arimo, whatever the file is called' );
 		$this->assertSame( 'serif-mono', $this->font_repository()->get( 'cousine' )['entry'] );
 	}
 
-	public function test_a_single_font_entry_takes_the_entry_label() {
+	/* The pack's name is the option's optgroup, so a row repeating it says nothing the screen has not said */
+	public function test_even_a_single_font_entry_is_named_by_its_file_rather_than_by_the_pack() {
 		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
 
 		$this->catalog_entry( 'emoji', $this->emoji_entry( $file ), [ 'label' => 'Emoji' ] );
 
 		$this->adopter()->run( 'packs' );
 
-		$this->assertSame( 'Emoji', $this->font_repository()->get( 'notoemoji' )['label'] );
+		$this->assertSame( 'Arimo', $this->font_repository()->get( 'notoemoji' )['label'] );
+	}
+
+	public function test_a_name_the_entry_publishes_outranks_the_one_the_file_carries() {
+		$file = $this->place_file( 'packs', 'emoji', 'NotoEmoji-Regular.ttf', $this->font_bytes() );
+
+		$this->catalog_entry(
+			'emoji',
+			$this->emoji_entry( $file, [ 'names' => [ 'notoemoji' => 'Noto Emoji' ] ] ),
+			[ 'label' => 'Emoji' ]
+		);
+
+		$this->adopter()->run( 'packs' );
+
+		/* The pipeline read `METADATA.pb` and asserted it at build time; the file's own `name` table is the fallback */
+		$this->assertSame( 'Noto Emoji', $this->font_repository()->get( 'notoemoji' )['label'] );
 	}
 
 	public function test_the_coverage_maps_are_split_onto_each_row() {

@@ -358,6 +358,62 @@ class Test_Registry extends TestCase {
 		$this->assertSame( 'en', Language_To_Font::locale_to_language( 'en' ) );
 	}
 
+	/**
+	 * WordPress has no `en` locale — the Site Language option stores `''` for English (United States) and
+	 * `get_locale()` turns that into `en_US` — so `en-us` is the default path, not an edge case (§11 D21)
+	 */
+	public function test_a_regional_locale_is_named_by_the_language_above_it() {
+		$this->assertSame( 'English', Language_To_Font::label_for( 'en-us' ) );
+		$this->assertSame( 'Portuguese', Language_To_Font::label_for( 'pt-br' ) );
+
+		/* A tag the table names outright is its own answer, regional or not, and a script tag is reached the same way */
+		$this->assertSame( 'Chinese (Taiwan)', Language_To_Font::label_for( 'zh-tw' ) );
+		$this->assertSame( 'Japanese', Language_To_Font::label_for( 'ja' ) );
+		$this->assertSame( 'Han (Simplified)', Language_To_Font::label_for( 'zh-Hans' ) );
+	}
+
+	public function test_a_code_no_rung_names_is_shown_as_itself() {
+		$this->assertSame( 'qqq-zz', Language_To_Font::label_for( 'qqq-zz' ) );
+		$this->assertSame( '', Language_To_Font::label_for( '' ) );
+	}
+
+	/**
+	 * The claim is what installs a pack and the map is what a render resolves through, and nothing on a site
+	 * compares them: `chinese-traditional` claims `zh-tw`, routes nothing, and `zh-tw` widens to Simplified's
+	 * `zh` (§11 D22)
+	 */
+	public function test_a_claim_no_route_answers_is_reported() {
+		$this->assertSame(
+			[ 'zh-hk', 'zh-tw' ],
+			Language_To_Font::unrouted_claims( [ 'languages' => 'zh-hk,zh-tw' ], [] )
+		);
+
+		/* Most specific first: a regional claim is answered by the bare language it widens to, and by its script */
+		$this->assertSame( [], Language_To_Font::unrouted_claims( [ 'languages' => [ 'zh-tw' ] ], [ 'zh' ] ) );
+		$this->assertSame( [], Language_To_Font::unrouted_claims( [ 'languages' => [ 'zh-hant' ] ], [ 'und-Hant' ] ) );
+
+		$this->assertSame(
+			[ 'ko' ],
+			Language_To_Font::unrouted_claims( [ 'scripts' => [ 'ja' ], 'languages' => [ 'ko' ] ], [ 'ja', 'jpn' ] )
+		);
+	}
+
+	/* `central-asian` withholds a route for `mn` on purpose, whose tag doubles as a language, and says so */
+	public function test_a_claim_the_pack_declares_it_will_not_route_is_not_reported() {
+		$claim = [ 'scripts' => 'mn,und-Yiii' ];
+
+		$this->assertSame( [ 'mn' ], Language_To_Font::unrouted_claims( $claim, [ 'und-Yiii' ] ) );
+		$this->assertSame( [], Language_To_Font::unrouted_claims( $claim, [ 'und-Yiii' ], [ 'mn' ] ) );
+	}
+
+	/* An `always` pack routes nothing by design: `emoji` reaches text through backup-subs, not the language map */
+	public function test_an_always_pack_claims_without_routing_by_design() {
+		$this->assertSame(
+			[],
+			Language_To_Font::unrouted_claims( [ 'scripts' => 'und-zsye', 'always' => 1 ], [] )
+		);
+	}
+
 	public function test_the_alias_defers_to_a_row_claiming_the_name() {
 		$this->assertSame( 'gfpdf-arimo', $this->registry->bundled_package()->getFontAliases()['arial'] );
 

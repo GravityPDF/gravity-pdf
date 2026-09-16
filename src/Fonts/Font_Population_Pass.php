@@ -16,11 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * A one-shot pass that turns something already on the site into font rows
+ * A one-shot pass that turns something already on the site into font rows, or brings the rows it finds up to date
  *
  * `Font_Repository::ensure_ready()` runs these in the order they were added, once per site, inside the migration
  * lock. Each is responsible for claiming what it owns, so a later pass never re-registers a file an earlier one
- * took.
+ * took — and one that reads rows rather than writing them runs after the passes that write them.
  *
  * @package GFPDF\Fonts
  *
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 interface Font_Population_Pass {
 
 	/**
-	 * @return int How many rows the pass created
+	 * @return int How many rows the pass wrote
 	 *
 	 * @since 7.0
 	 */

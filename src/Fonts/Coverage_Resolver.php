@@ -379,8 +379,6 @@ class Coverage_Resolver {
 	 * @since 7.0
 	 */
 	protected function csv( ?string $value ): array {
-		$value = (string) $value;
-
-		return $value === '' ? [] : array_filter( explode( ',', strtolower( $value ) ) );
+		return Language_To_Font::tags( $value );
 	}
 }

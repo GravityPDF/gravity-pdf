@@ -456,6 +456,47 @@ class Font_Repository {
 	}
 
 	/**
+	 * Rename rows, flushing once
+	 *
+	 * `update()` flushes per call, which is right for one row and wrong for `Font_Namer`'s backfill of sixty: each
+	 * flush moves the stamp `all()` caches under, so every read in between re-runs both `SELECT *`s and orphans a
+	 * blob holding every font and file row.
+	 *
+	 * @param array<int, string> $labels `row id => label`
+	 *
+	 * @return int How many rows were renamed
+	 *
+	 * @since 7.0
+	 */
+	public function update_labels( array $labels ): int {
+		global $wpdb;
+
+		$table   = $this->schema->get_font_table();
+		$now     = current_time( 'mysql' );
+		$written = 0;
+
+		foreach ( $labels as $font_id => $label ) {
+			/* phpcs:ignore WordPress.DB.DirectDatabaseQuery -- the font tables have no core API */
+			$updated = $wpdb->update(
+				$table,
+				[
+					'label'   => (string) $label,
+					'updated' => $now,
+				],
+				[ 'id' => (int) $font_id ]
+			);
+
+			$written += $updated !== false ? 1 : 0;
+		}
+
+		if ( $written > 0 ) {
+			$this->flush();
+		}
+
+		return $written;
+	}
+
+	/**
 	 * Turn a 6.x-shaped record's face paths into file rows
 	 *
 	 * 6.x stored absolute paths, which break on every site move; the rows keep the basename and the directory comes

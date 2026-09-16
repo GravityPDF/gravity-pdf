@@ -59,6 +59,12 @@ class Catalog_Font_Adopter {
 	protected $warmer;
 
 	/**
+	 * @var Font_Namer
+	 * @since 7.0
+	 */
+	protected $namer;
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
@@ -70,11 +76,12 @@ class Catalog_Font_Adopter {
 	 */
 	protected $font_dir;
 
-	public function __construct( Font_Repository $repository, Catalog_Repository $catalog, Font_Downloader $downloader, Font_Cache_Warmer $warmer, LoggerInterface $log ) {
+	public function __construct( Font_Repository $repository, Catalog_Repository $catalog, Font_Downloader $downloader, Font_Cache_Warmer $warmer, Font_Namer $namer, LoggerInterface $log ) {
 		$this->repository = $repository;
 		$this->catalog    = $catalog;
 		$this->downloader = $downloader;
 		$this->warmer     = $warmer;
+		$this->namer      = $namer;
 		$this->log        = $log;
 		$this->font_dir   = $repository->get_font_dir();
 	}
@@ -165,9 +172,18 @@ class Catalog_Font_Adopter {
 				continue;
 			}
 
-			$font_id = $this->repository->insert(
-				Font_Sources::font_row( $row, $entry, $font_key ) + [ 'files' => $verified ]
-			);
+			$font = Font_Sources::font_row( $row, $entry, $font_key ) + [ 'files' => $verified ];
+
+			/*
+			 * Named before the insert, because this writes each row once and has the file in hand — the
+			 * installer defers only because its own row is rewritten per file. A published name outranks the
+			 * file's and is on the row already (§11 D20).
+			 */
+			if ( Font_Sources::published_name( $entry, $font_key ) === '' ) {
+				$font['label'] = $this->namer->name_for( $verified['R']['path'], (string) $font['label'] );
+			}
+
+			$font_id = $this->repository->insert( $font );
 
 			if ( $font_id > 0 ) {
 				/*

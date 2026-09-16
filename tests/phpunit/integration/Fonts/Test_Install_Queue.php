@@ -864,6 +864,7 @@ class Test_Install_Queue extends TestCase {
 				$gfpdf->get_font_cache_warmer(),
 				new Font_Lock(),
 				$gfpdf->get_catalog_sync(),
+				$gfpdf->get_font_namer(),
 				$gfpdf->log
 			),
 			$gfpdf->get_font_registry(),

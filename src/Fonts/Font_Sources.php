@@ -369,10 +369,21 @@ class Font_Sources {
 			$meta['aliases'] = $aliases;
 		}
 
+		/*
+		 * Four rungs, each a fallback for the one under it (§11 D20): the name the entry publishes, which the
+		 * pipeline read out of the font's own `METADATA.pb`; the family the file reports, which `Font_Namer`
+		 * writes after the install because nothing here has a file; the entry's own label, where it registers a
+		 * single font and the two therefore mean the same thing; and the key, which is what 61 of 66 rows were
+		 * showing. Rung 1 is for coverage entries only — `existing_install()` matches a display row on
+		 * `(source, entry, label)`, so a name appearing in a later version of the entry would make the next
+		 * re-install miss the row it is updating. Such an entry registers one font, so rung 3 already names it.
+		 */
+		$published = $coverage ? static::published_name( $entry, $font_key ) : '';
+		$fallback  = count( $fonts ) === 1 ? (string) $row['label'] : $font_key;
+
 		return [
 			'font_key'    => $font_key,
-			/* A multi-font pack labels each row by its key: one shared label across four CJK fonts helps nobody */
-			'label'       => count( $fonts ) === 1 ? (string) $row['label'] : $font_key,
+			'label'       => $published !== '' ? $published : $fallback,
 			'source'      => (string) $row['source'],
 			'entry'       => (string) $row['entry'],
 			'coverage'    => (int) $coverage,
@@ -381,6 +392,39 @@ class Font_Sources {
 			'use_otl'     => (int) ( $roles['useOTL'] ?? 0 ),
 			'use_kashida' => (int) ( $roles['useKashida'] ?? 0 ),
 		];
+	}
+
+	/**
+	 * The name an entry publishes for one of its keys, if it published one
+	 *
+	 * Rung 1, asked twice — here and by `Font_Namer`, which leaves such a row alone — so both ask the same way.
+	 *
+	 * @param array $entry The decoded `entry` object
+	 *
+	 * @since 7.0
+	 */
+	public static function published_name( array $entry, string $font_key ): string {
+		$names = (array) ( $entry['names'] ?? [] );
+
+		return static::display_name( $names[ $font_key ] ?? null );
+	}
+
+	/**
+	 * A font name from outside the plugin, reduced to something a `label` column can hold and a screen can show
+	 *
+	 * Both callers read a string somebody else wrote: a third-party index entry, and a font file's `name` table.
+	 *
+	 * @param mixed $value
+	 *
+	 * @since 7.0
+	 */
+	public static function display_name( $value ): string {
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+
+		/* `label` is varchar(255), and the cut is by character because the column counts them, not bytes */
+		return mb_substr( sanitize_text_field( $value ), 0, 255 );
 	}
 
 	/**
@@ -419,6 +463,13 @@ class Font_Sources {
 
 		if ( isset( $roles['sip-ext'] ) && is_string( $roles['sip-ext'] ) ) {
 			$meta['sip_ext'] = $roles['sip-ext'];
+		}
+
+		/* On the row for the reason `languages` is: an entry the index only points at has no document to read */
+		$unrouted = Language_To_Font::tags( $entry['unrouted'] ?? null );
+
+		if ( $unrouted !== [] ) {
+			$meta['unrouted'] = $unrouted;
 		}
 
 		return $meta;

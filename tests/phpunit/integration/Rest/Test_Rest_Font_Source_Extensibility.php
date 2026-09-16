@@ -257,6 +257,7 @@ class Test_Rest_Font_Source_Extensibility extends Test_Rest {
 			$gfpdf->get_font_cache_warmer(),
 			new Font_Lock(),
 			$gfpdf->get_catalog_sync(),
+			$gfpdf->get_font_namer(),
 			GPDFAPI::get_log_class()
 		);
 	}

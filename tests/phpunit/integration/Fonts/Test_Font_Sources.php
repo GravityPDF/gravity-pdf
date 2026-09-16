@@ -510,6 +510,57 @@ class Test_Font_Sources extends TestCase {
 	}
 
 	/**
+	 * The only rung this class can reach: the file's own family is written after the install, by `Font_Namer`
+	 */
+	public function test_a_published_name_is_what_a_coverage_row_is_labelled() {
+		$entry = $this->valid_entry(
+			[
+				'fonts' => [
+					'notosanssc' => [ 'R' => 'NotoSansSC-Regular.ttf' ],
+					'notosanstc' => [ 'R' => 'NotoSansSC-Regular.ttf' ],
+				],
+				'names' => [ 'notosanssc' => 'Noto Sans SC' ],
+			]
+		);
+
+		$row = [ 'source' => 'packs', 'entry' => 'chinese', 'coverage' => 1, 'label' => 'Chinese', 'position' => 5 ];
+
+		$this->assertSame( 'Noto Sans SC', Font_Sources::font_row( $row, $entry, 'notosanssc' )['label'] );
+
+		/* A key the map does not name is where it always was: a pack of four faces cannot label them all "Chinese" */
+		$this->assertSame( 'notosanstc', Font_Sources::font_row( $row, $entry, 'notosanstc' )['label'] );
+	}
+
+	public function test_an_entry_registering_one_font_still_falls_back_to_its_own_label() {
+		$row = [ 'source' => 'packs', 'entry' => 'emoji', 'coverage' => 1, 'label' => 'Emoji', 'position' => 1 ];
+
+		$this->assertSame( 'Emoji', Font_Sources::font_row( $row, $this->valid_entry(), 'notosanssc' )['label'] );
+	}
+
+	/**
+	 * `existing_install()` matches a display row on `(source, entry, label)`, so a name appearing in a later
+	 * version of the entry would make the next re-install miss it and suffix a duplicate key
+	 */
+	public function test_a_display_entry_ignores_a_published_name() {
+		$entry = [
+			'fonts' => [ 'notosans' => [ 'R' => 'NotoSans-Regular.ttf' ] ],
+			'files' => [ 'NotoSans-Regular.ttf' => $this->file( 'v/NotoSans-Regular.ttf' ) ],
+			'names' => [ 'notosans' => 'Noto Sans Renamed' ],
+		];
+
+		$row = [ 'source' => 'google', 'entry' => 'noto-sans', 'coverage' => 0, 'label' => 'Noto Sans' ];
+
+		$this->assertSame( 'Noto Sans', Font_Sources::font_row( $row, $entry, 'notosans' )['label'] );
+	}
+
+	/* An index entry is a third party's string, and it reaches a `varchar(255)` column and an admin's screen */
+	public function test_a_published_name_is_reduced_to_a_plain_line_of_text() {
+		$this->assertSame( 'Noto Sans SC', Font_Sources::display_name( "  Noto <b>Sans</b> SC\n " ) );
+		$this->assertSame( 255, mb_strlen( Font_Sources::display_name( str_repeat( 'ほ', 300 ) ) ) );
+		$this->assertSame( '', Font_Sources::display_name( [ 'Noto Sans SC' ] ) );
+	}
+
+	/**
 	 * And a row with nothing to claim carries no key at all, rather than an empty list on all seventeen packs
 	 */
 	public function test_a_row_with_no_aliases_carries_no_alias_key() {

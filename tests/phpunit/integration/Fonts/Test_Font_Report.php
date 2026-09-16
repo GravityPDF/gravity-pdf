@@ -93,6 +93,47 @@ class Test_Font_Report extends TestCase {
 		$this->assertStringContainsString( 'packs/japanese: 1 of 4 files', $this->value( $this->report->fonts(), 'language_packs' ) );
 	}
 
+	/* The symptom is a PDF in the wrong face with nothing logged, so a ticket needs it asked of this site (§11 D22) */
+	public function test_the_fonts_section_names_a_pack_claiming_a_language_none_of_its_rows_answers() {
+		$this->install_pack( 'chinese-traditional', 'notosanstc', [], [ 'languages' => 'zh-hk,zh-tw' ] );
+
+		$this->assertSame( 'packs/chinese-traditional: zh-hk, zh-tw', $this->value( $this->report->fonts(), 'unrouted_claims' ) );
+	}
+
+	public function test_a_pack_whose_rows_answer_its_claims_is_not_named() {
+		$this->install_pack( 'chinese-simplified', 'notosanssc', [ 'zh', 'und-hans' ], [ 'languages' => 'zh,zh-cn' ] );
+
+		/* An `always` pack claims a script and routes nothing by design: `emoji` reaches text through backup-subs */
+		$this->install_pack( 'emoji', 'notoemoji', [], [ 'always' => 1, 'scripts' => 'und-zsye' ] );
+
+		$this->assertSame( 'None', $this->value( $this->report->fonts(), 'unrouted_claims' ) );
+	}
+
+	/**
+	 * `central-asian` withholds a route for `mn` on purpose — the tag doubles as a language, and routing it would
+	 * drag every Cyrillic-locale Mongolian document to a vertical face — and says so on its rows
+	 */
+	public function test_a_claim_the_pack_declares_it_will_not_route_is_not_named() {
+		$this->install_pack( 'central-asian', 'notosansyi', [ 'und-Yiii' ], [ 'scripts' => 'mn,und-Yiii' ] );
+
+		$this->install_entry_row(
+			'notosansmongolian',
+			'central-asian',
+			[ 'meta' => [ 'unrouted' => [ 'mn' ] ] ]
+		);
+
+		$this->assertSame( 'None', $this->value( $this->report->fonts(), 'unrouted_claims' ) );
+	}
+
+	/**
+	 * An uninstalled pack has no rows to route with, and a pack nobody installed is not drawing anything wrong
+	 */
+	public function test_a_pack_that_is_not_installed_is_not_named() {
+		$this->insert_catalog_row( 'packs', 'chinese-traditional', [ 'coverage' => 1, 'languages' => 'zh-tw' ] );
+
+		$this->assertSame( 'None', $this->value( $this->report->fonts(), 'unrouted_claims' ) );
+	}
+
 	public function test_a_site_with_no_packs_says_so() {
 		$this->assertSame( 'None installed', $this->value( $this->report->fonts(), 'language_packs' ) );
 	}

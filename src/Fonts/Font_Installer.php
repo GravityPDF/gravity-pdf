@@ -103,6 +103,12 @@ class Font_Installer {
 	protected $sync;
 
 	/**
+	 * @var Font_Namer
+	 * @since 7.0
+	 */
+	protected $namer;
+
+	/**
 	 * @var LoggerInterface
 	 * @since 7.0
 	 */
@@ -121,6 +127,7 @@ class Font_Installer {
 		Font_Cache_Warmer $warmer,
 		Font_Lock $lock,
 		Catalog_Sync $sync,
+		Font_Namer $namer,
 		LoggerInterface $log
 	) {
 		$this->repository = $repository;
@@ -129,6 +136,7 @@ class Font_Installer {
 		$this->warmer     = $warmer;
 		$this->lock       = $lock;
 		$this->sync       = $sync;
+		$this->namer      = $namer;
 		$this->log        = $log;
 	}
 
@@ -489,6 +497,9 @@ class Font_Installer {
 				if ( $unparseable !== null ) {
 					return $this->fail( $source, $entry, $unparseable );
 				}
+
+				/* Here and not in `write_rows()`: that rewrites `label` per file, so an earlier name loses to the next */
+				$this->namer->name_entry( $source, $entry, (array) $resolved['data'] );
 
 				$this->catalog->set_status(
 					$source,

@@ -8,6 +8,8 @@ use GFPDF\Tests\Concerns\HasCatalogRows;
 use GFPDF\Tests\Concerns\MocksHttpRequests;
 use GFPDF\Tests\Concerns\PublishesFontIndexes;
 use GFPDF\Tests\Integration\TestCase;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger as MonoLogger;
 use WP_Error;
 
 /**
@@ -473,6 +475,54 @@ class Test_Catalog_Sync extends TestCase {
 	}
 
 	/**
+	 * Such a pack installs and then draws every document in whichever pack claims the rung its claim widens to:
+	 * `chinese-traditional` claimed `zh-tw`, routed nothing, and Simplified holds `zh` (§11 D22)
+	 */
+	public function test_a_pack_claiming_a_language_it_cannot_route_is_said_out_loud() {
+		$handler = new TestHandler();
+		$log     = new MonoLogger( 'gravity-pdf' );
+
+		$log->pushHandler( $handler );
+
+		$this->publish(
+			[
+				$this->pack_entry(
+					'chinese-traditional',
+					[
+						'scripts'   => [],
+						'languages' => [ 'zh-hk', 'zh-tw' ],
+					]
+				),
+			]
+		);
+
+		$this->assertTrue( $this->sync( null, '', $log )->run() );
+
+		/* The real method: `hasWarningThatContains()` resolves the level through an unprefixed `constant()` */
+		$this->assertTrue( $handler->hasRecordThatContains( 'does not route', MonoLogger::WARNING ) );
+
+		/* Said, never refused, unlike everything else validation finds: the pack installs and works when named */
+		$this->assertNotNull( $this->catalog_repository()->entry( 'packs', 'chinese-traditional' ) );
+	}
+
+	public function test_a_pack_whose_map_answers_its_claims_is_not_complained_about() {
+		$handler = new TestHandler();
+		$log     = new MonoLogger( 'gravity-pdf' );
+
+		$log->pushHandler( $handler );
+
+		$entry                             = $this->pack_entry( 'chinese-simplified', [ 'scripts' => [], 'languages' => [ 'zh-cn' ] ] );
+		$entry['entry']['language_to_font'] = [ 'zh' => 'chinese-simplifiedfont' ];
+
+		$this->publish( [ $entry ] );
+
+		$this->assertTrue( $this->sync( null, '', $log )->run() );
+
+		/* Most specific first, so a `zh-cn` claim is answered by the `zh` route it widens to */
+		$this->assertFalse( $handler->hasRecordThatContains( 'does not route', MonoLogger::WARNING ) );
+	}
+
+	/**
 	 * A sync whose tables will not build, standing in for the fresh install cron reaches first
 	 */
 	protected function sync_with_unbuildable_schema(): Catalog_Sync {
@@ -491,7 +541,7 @@ class Test_Catalog_Sync extends TestCase {
 			new Font_Downloader( \GPDFAPI::get_log_class(), \GPDFAPI::get_data_class() ),
 			new Font_Lock(),
 			\GPDFAPI::get_log_class(),
-			new Catalog_Font_Adopter( $gfpdf->get_font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), \GPDFAPI::get_log_class() ),
+			new Catalog_Font_Adopter( $gfpdf->get_font_repository(), $this->catalog_repository(), $gfpdf->get_font_downloader(), $gfpdf->get_font_cache_warmer(), $gfpdf->get_font_namer(), \GPDFAPI::get_log_class() ),
 			[ $this->public_key ],
 			''
 		);
