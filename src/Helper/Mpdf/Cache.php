@@ -17,13 +17,10 @@ class Cache extends MpdfCache {
 	 * @return bool
 	 *
 	 * @since 6.13.0
+	 * @since 6.17.1 A directory another request created first counts as created
 	 */
 	protected function createDirectory( $basePath ) {
-		if ( ! wp_mkdir_p( $basePath ) ) {
-			return false;
-		}
-
-		return true;
+		return wp_mkdir_p( $basePath ) || is_dir( $basePath );
 	}
 
 	/**
