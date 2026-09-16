@@ -1290,10 +1290,25 @@ class Test_PDF extends WP_UnitTestCase {
 			'mpdf/test2' => time() - 3600,
 			'mpdf/test3' => time() - ( 25 * 3600 ),
 
+			'mpdf/mpdf/_tempImg'                       => time() - 3601,
+			'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' => time() - ( 2 * DAY_IN_SECONDS ),
+			'mpdf/mpdf/ttfontdata/dejavusans.cw.dat'   => time() - WEEK_IN_SECONDS - 60,
+			'1234556690c67856b/document.pdf'           => time() - ( 13 * 3600 ),
 		];
+
+		$directories = [ 'mpdf/mpdf/ttfontdata', 'mpdf/mpdf', 'mpdf', '1234556690c67856b' ];
+
+		foreach ( $directories as $directory ) {
+			wp_mkdir_p( $tmp . $directory );
+		}
 
 		foreach ( $files as $file => $modified ) {
 			touch( $tmp . $file, $modified );
+		}
+
+		/* Age the directories last, as creating their files refreshed them */
+		foreach ( $directories as $directory ) {
+			touch( $tmp . $directory, time() - ( 25 * 3600 ) );
 		}
 
 		/* Run our cleanup function and test the out put */
@@ -1312,9 +1327,20 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertFileExists( $tmp . 'mpdf/test2' );
 		$this->assertFileDoesNotExist( $tmp . 'mpdf/test3' );
 
+		/* mPDF's cache folders stay while their files expire, and font metrics are kept for a week */
+		$this->assertDirectoryExists( $tmp . 'mpdf/mpdf/ttfontdata' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/_tempImg' );
+		$this->assertFileExists( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.cw.dat' );
+		$this->assertFileDoesNotExist( $tmp . '1234556690c67856b/document.pdf' );
+
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
 			@unlink( $tmp . $file );
+		}
+
+		foreach ( $directories as $directory ) {
+			@rmdir( $tmp . $directory );
 		}
 	}
 
