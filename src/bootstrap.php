@@ -114,6 +114,161 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $templates;
 
 	/**
+	 * Holds our Font_Repository object
+	 * The single reader and writer of the font tables
+	 *
+	 * @var Fonts\Font_Repository
+	 *
+	 * @since 7.0
+	 */
+	public $font_repository;
+
+	/**
+	 * Holds our font Registry object
+	 * Builds what mPDF registers and what the Font Manager lists, from one read of the font tables
+	 *
+	 * @var Fonts\Registry
+	 *
+	 * @since 7.0
+	 */
+	public $font_registry;
+
+	/**
+	 * Holds our Font_Sources object
+	 * The registered sources an entry can be installed from
+	 *
+	 * @var Fonts\Font_Sources
+	 *
+	 * @since 7.0
+	 */
+	public $font_sources;
+
+	/**
+	 * Holds our Catalog_Repository object
+	 * The single reader of the catalog table: what is installable, never what is installed
+	 *
+	 * @var Fonts\Catalog_Repository
+	 *
+	 * @since 7.0
+	 */
+	public $catalog_repository;
+
+	/**
+	 * Holds our Font_Downloader object
+	 * Every outbound request the font system makes
+	 *
+	 * @var Fonts\Font_Downloader
+	 *
+	 * @since 7.0
+	 */
+	public $font_downloader;
+
+	/**
+	 * Holds our Catalog_Sync object
+	 * The single writer of the catalog table's index columns
+	 *
+	 * @var Fonts\Catalog_Sync
+	 *
+	 * @since 7.0
+	 */
+	public $catalog_sync;
+
+	/**
+	 * Holds our Font_Installer object
+	 * The one path from a catalog entry to font rows and files on disk
+	 *
+	 * @var Fonts\Font_Installer
+	 *
+	 * @since 7.0
+	 */
+	public $font_installer;
+
+	/**
+	 * Holds our Font_Package_Importer object
+	 * The offline half of the installer: an uploaded package, verified onto disk
+	 *
+	 * @var Fonts\Font_Package_Importer
+	 *
+	 * @since 7.0
+	 */
+	public $font_package_importer;
+
+	/**
+	 * Holds our Install_Queue object
+	 * The background work list font installs run on
+	 *
+	 * @var Fonts\Install_Queue
+	 *
+	 * @since 7.0
+	 */
+	public $install_queue;
+
+	/**
+	 * Holds our Install_Requests object
+	 * What an install of a catalogue entry means, before the queue runs it
+	 *
+	 * @var Fonts\Install_Requests
+	 *
+	 * @since 7.0
+	 */
+	public $install_requests;
+
+	/**
+	 * What the install triggers ask before they queue anything
+	 *
+	 * @var Fonts\Coverage_Resolver
+	 *
+	 * @since 7.0
+	 */
+	public $coverage_resolver;
+
+	/**
+	 * What a render asks before it draws a script the site has no font for
+	 *
+	 * @var Fonts\Script_Detector
+	 *
+	 * @since 7.0
+	 */
+	public $script_detector;
+
+	/**
+	 * The install trigger that runs while a PDF is being drawn
+	 *
+	 * @var Fonts\Render_Font_Trigger
+	 *
+	 * @since 7.0
+	 */
+	public $render_font_trigger;
+
+	/**
+	 * What asks the site's health checks, daily
+	 *
+	 * @var Helper\Health\Health_Runner
+	 *
+	 * @since 7.0
+	 */
+	public $health_runner;
+
+	/**
+	 * The font subsystem's half of the System Report
+	 *
+	 * @var Fonts\Font_Report
+	 *
+	 * @since 7.0
+	 */
+	public $font_report;
+
+	/**
+	 * Holds our Font_Cache_Warmer object
+	 * Parses newly installed faces so no render is the first to do it
+	 *
+	 * @var Fonts\Font_Cache_Warmer
+	 *
+	 * @since 7.0
+	 */
+	public $font_cache_warmer;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -206,8 +361,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->mergetags();
 		$this->actions();
 		$this->template_manager();
-		$this->load_core_font_handler();
 		$this->load_custom_font_handler();
+		$this->load_font_catalog_handler();
+		$this->load_health_handler();
 		$this->load_debug();
 		$this->check_system_status();
 		$this->export();
@@ -244,6 +400,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
 		add_action( 'admin_init', [ $this, 'setup_settings_fields' ], 1 );
+
+		/* The font tables are network-global, so a deleted site leaves only its visibility rows behind */
+		add_action( 'wp_uninitialize_site', [ $this, 'remove_site_font_visibility' ] );
+	}
+
+	/**
+	 * Drop a deleted site's font visibility rows
+	 *
+	 * @param \WP_Site $site
+	 *
+	 * @since 7.0
+	 */
+	public function remove_site_font_visibility( $site ) {
+		$this->get_font_repository()->delete_site_rows( (int) $site->blog_id );
 	}
 
 	/**
@@ -352,6 +522,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
 
 		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'build/assets/app.bundle.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
+		wp_register_style( 'gfpdf_css_font_manager', PDF_PLUGIN_URL . 'build/font-manager/style-font-manager.css', [ 'wp-components' ], $version );
+		wp_style_add_data( 'gfpdf_css_font_manager', 'rtl', 'replace' );
 	}
 
 	/**
@@ -379,13 +551,56 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'build/assets/admin.min.js', $pdf_settings_dependencies, $version, $args );
 
 		/* add hot reloading in development */
-		$asset               = file_exists( PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php' )
-			? require PDF_PLUGIN_DIR . 'build/assets/app.bundle.min.asset.php'
-			: [ 'dependencies' => [ 'jquery' ] ];
-		$bundle_dependencies = $asset['dependencies'] ?? [];
+		$bundle_dependencies = $this->asset_dependencies( 'build/assets/app.bundle.min.asset.php', [ 'jquery' ] );
 
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'build/assets/app.bundle.min.js', $bundle_dependencies, $version, $args );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'build/assets/gfpdf-entries.min.js', [ 'jquery' ], $version, $args );
+
+		/*
+		 * The Font Manager runs on the packages WordPress serves, so its dependencies are whatever the build
+		 * extracted rather than a hand-kept list
+		 */
+		$font_manager_dependencies = $this->asset_dependencies( 'build/font-manager/font-manager.min.asset.php' );
+
+		wp_register_script( 'gfpdf_js_font_manager', PDF_PLUGIN_URL . 'build/font-manager/font-manager.min.js', $font_manager_dependencies, $version, $args );
+		wp_set_script_translations( 'gfpdf_js_font_manager', 'gravity-pdf', PDF_PLUGIN_DIR . 'languages' );
+	}
+
+	/**
+	 * The script handles a built bundle says it needs
+	 *
+	 * @param string $path     The `.asset.php` manifest, relative to the plugin directory
+	 * @param array  $fallback What to assume when the plugin was installed without a build
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	private function asset_dependencies( $path, $fallback = [] ) {
+		$asset = file_exists( PDF_PLUGIN_DIR . $path ) ? require PDF_PLUGIN_DIR . $path : [];
+
+		return $asset['dependencies'] ?? $fallback;
+	}
+
+	/**
+	 * Whether this screen carries a font dropdown for the Font Manager to attach to
+	 *
+	 * The bundle borrows `wp-components`, which is over a megabyte of script and stylesheet WordPress would
+	 * otherwise not serve here — so it loads on the three screens that have an anchor, not on every Gravity PDF
+	 * page. The selectors it looks for are the same three `src/assets/js/react/fontManager/index.js` does.
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	private function has_font_field() {
+		/* The per-PDF Font setting: the add/edit screen, which `pid` is what distinguishes from the PDF list */
+		if ( rgget( 'page' ) === 'gf_edit_forms' ) {
+			return rgget( 'pid' ) !== '';
+		}
+
+		/* The global default font, and the Tools tab's Manage fonts button */
+		return $this->misc->is_gfpdf_settings_tab( 'general' ) || $this->misc->is_gfpdf_settings_tab( 'tools' );
 	}
 
 	/**
@@ -413,6 +628,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			/* add media uploader */
 			wp_enqueue_media();
 			wp_enqueue_script( 'gfpdf_js_entrypoint' );
+
+			if ( $this->has_font_field() ) {
+				wp_enqueue_script( 'gfpdf_js_font_manager' );
+				wp_enqueue_style( 'gfpdf_css_font_manager' );
+			}
 
 			/* Load TinyMCE styles */
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
@@ -696,9 +916,35 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$download_pdf_controller = new Rest\Rest_Download_Pdf( $this->gform, new Helper\Helper_Url_Signer() );
 		$download_pdf_controller->init();
 
+		$font_sources_controller = new Rest\Rest_Font_Sources(
+			$this->get_catalog_repository(),
+			$this->get_catalog_sync(),
+			$this->get_font_sources(),
+			$this->gform
+		);
+		$font_sources_controller->init();
+
+		$font_installs_controller = new Rest\Rest_Font_Installs(
+			$this->get_font_registry(),
+			$this->get_catalog_repository(),
+			$this->get_font_repository(),
+			$this->get_install_requests(),
+			$this->get_install_queue(),
+			$this->get_font_sources(),
+			$this->get_font_package_importer(),
+			$this->gform
+		);
+		$font_installs_controller->init();
+
+		$font_settings_controller = new Rest\Rest_Font_Settings( $this->get_font_registry(), $this->options, $this->gform );
+		$font_settings_controller->init();
+
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $form_setting_controller );
 		$this->singleton->add_class( $download_pdf_controller );
+		$this->singleton->add_class( $font_sources_controller );
+		$this->singleton->add_class( $font_installs_controller );
+		$this->singleton->add_class( $font_settings_controller );
 
 		/* Log any errors for PDF endpoints */
 		$rest_request_after_callback = function ( $response, $handle, $request ) {
@@ -840,31 +1086,384 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Initialise our core font AJAX handler
-	 *
-	 * @return void
+	 * Initialise our custom font handler
 	 * @since 5.0
 	 *
 	 */
-	public function load_core_font_handler() {
-		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
+	public function load_custom_font_handler(): void {
+		$model = new Model\Model_Custom_Fonts( $this->get_font_repository() );
+		$class = new Rest\Rest_Custom_Fonts( $model, $this->log, $this->gform, $this->get_font_registry(), $this->get_install_requests(), $this->data->template_font_location );
+		$class->init();
+
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Arm the catalog sync triggers
+	 *
+	 * @since 7.0
+	 */
+	public function load_font_catalog_handler(): void {
+		$class = new Controller\Controller_Font_Catalog(
+			$this->get_catalog_sync(),
+			$this->get_install_queue(),
+			$this->get_coverage_resolver(),
+			$this->misc
+		);
 		$class->init();
 
 		$this->singleton->add_class( $class );
 	}
 
 	/**
-	 * Initialise our custom font handler
-	 * @since 5.0
+	 * Arm the daily health run
 	 *
+	 * @since 7.0
 	 */
-	public function load_custom_font_handler(): void {
-		$model = new Model\Model_Custom_Fonts( $this->options );
-		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
+	public function load_health_handler(): void {
+		$view = new View\View_Health( [] );
+
+		$class = new Controller\Controller_Health(
+			$this->get_health_runner(),
+			$this->singleton->get_class( 'Model_Actions' ),
+			$view,
+			$this->singleton->get_class( 'View_Actions' ),
+			$this->misc
+		);
 		$class->init();
 
-		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $view );
+	}
+
+	/**
+	 * Build the font subsystem's half of the System Report, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_report(): Fonts\Font_Report {
+		if ( $this->font_report === null ) {
+			$this->font_report = new Fonts\Font_Report(
+				$this->get_font_repository(),
+				$this->get_catalog_repository(),
+				$this->get_catalog_sync(),
+				$this->get_install_queue(),
+				$this->get_font_registry(),
+				$this->get_health_runner(),
+				$this->get_font_downloader(),
+				new View\View_System_Report(),
+				$this->data
+			);
+		}
+
+		return $this->font_report;
+	}
+
+	/**
+	 * Build the health runner, once, with the checks core registers
+	 *
+	 * The checks are handed in rather than built inside it: the runner is subsystem-agnostic by design, and
+	 * `gfpdf_health_checks` is how everything else — add-ons, and any future core check — joins them.
+	 *
+	 * @since 7.0
+	 */
+	public function get_health_runner(): Helper\Health\Health_Runner {
+		if ( $this->health_runner === null ) {
+			$configured = new Fonts\Health\Configured_Fonts( $this->gform, $this->options );
+			$uncovered  = new Fonts\Health\Uncovered_Entries( $this->get_catalog_repository() );
+
+			$this->health_runner = new Helper\Health\Health_Runner(
+				[
+					new Fonts\Health\Missing_Coverage_Check( $uncovered, $this->get_coverage_resolver() ),
+					new Fonts\Health\Font_Downloads_Check( $uncovered ),
+					new Fonts\Health\Missing_Font_Files_Check( $this->get_font_repository(), $this->get_font_registry(), $configured ),
+					new Fonts\Health\Unregistered_Font_Check( $this->get_font_registry(), $this->get_catalog_repository(), $configured ),
+					new Fonts\Health\Catalog_Sync_Check( $this->get_catalog_sync() ),
+					new Fonts\Health\Install_Stalled_Check( $this->get_install_queue(), $this->get_catalog_sync() ),
+				],
+				new Fonts\Font_Lock(),
+				$this->log
+			);
+		}
+
+		return $this->health_runner;
+	}
+
+	/**
+	 * Build the font repository, once
+	 *
+	 * Deferred rather than built in init() because it needs `template_font_location`, which
+	 * `Controller_Install::setup_defaults()` sets.
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_repository(): Fonts\Font_Repository {
+		if ( $this->font_repository === null ) {
+			$schema = new Fonts\Font_Schema( $this->log );
+
+			$this->font_repository = new Fonts\Font_Repository(
+				$schema,
+				new Fonts\Font_Lock(),
+				$this->misc,
+				$this->log,
+				$this->data->template_font_location
+			);
+
+			/*
+			 * Order matters: 6.x records are migrated before the adopter claims an installer font under its 6.x
+			 * key, and both run before the importer could key a file by its filename.
+			 */
+			$this->font_repository->add_population_pass(
+				new Fonts\Font_Migration( $this->font_repository, $this->options, $this->log )
+			);
+
+			$this->font_repository->add_population_pass(
+				new Fonts\Legacy_Font_Adopter( $this->font_repository, $this->log )
+			);
+
+			$this->font_repository->add_population_pass(
+				new Fonts\Loose_Font_Importer(
+					$this->font_repository,
+					new Fonts\SupportsOtl( $this->data->template_font_location ),
+					$this->log,
+					$this->data->template_font_location
+				)
+			);
+		}
+
+		return $this->font_repository;
+	}
+
+	/**
+	 * Build the font registry, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_registry(): Fonts\Registry {
+		if ( $this->font_registry === null ) {
+			$this->font_registry = new Fonts\Registry(
+				$this->get_font_repository(),
+				$this->get_catalog_repository(),
+				$this->options,
+				$this->log,
+				PDF_PLUGIN_DIR . 'fonts'
+			);
+		}
+
+		return $this->font_registry;
+	}
+
+	/**
+	 * Build the registered font sources, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_sources(): Fonts\Font_Sources {
+		if ( $this->font_sources === null ) {
+			$this->font_sources = new Fonts\Font_Sources( $this->log );
+		}
+
+		return $this->font_sources;
+	}
+
+	/**
+	 * Build the catalog repository, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_catalog_repository(): Fonts\Catalog_Repository {
+		if ( $this->catalog_repository === null ) {
+			$this->catalog_repository = new Fonts\Catalog_Repository(
+				$this->get_font_repository()->get_schema(),
+				$this->get_font_sources(),
+				$this->log
+			);
+		}
+
+		return $this->catalog_repository;
+	}
+
+	/**
+	 * Build the font downloader, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_downloader(): Fonts\Font_Downloader {
+		if ( $this->font_downloader === null ) {
+			$this->font_downloader = new Fonts\Font_Downloader( $this->log, $this->data );
+		}
+
+		return $this->font_downloader;
+	}
+
+	/**
+	 * Build the catalog sync, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_catalog_sync(): Fonts\Catalog_Sync {
+		if ( $this->catalog_sync === null ) {
+			$this->catalog_sync = new Fonts\Catalog_Sync(
+				$this->get_font_repository()->get_schema(),
+				$this->get_catalog_repository(),
+				$this->get_font_sources(),
+				$this->get_font_downloader(),
+				new Fonts\Font_Lock(),
+				$this->log,
+				new Fonts\Catalog_Font_Adopter( $this->get_font_repository(), $this->get_catalog_repository(), $this->get_font_downloader(), $this->get_font_cache_warmer(), $this->log ),
+				defined( 'GPDF_TRUST_KEYS' ) ? (array) GPDF_TRUST_KEYS : [],
+				PDF_PLUGIN_DIR . 'build/font-index/packs.json'
+			);
+		}
+
+		return $this->catalog_sync;
+	}
+
+	/**
+	 * Build the font installer, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_installer(): Fonts\Font_Installer {
+		if ( $this->font_installer === null ) {
+			$this->font_installer = new Fonts\Font_Installer(
+				$this->get_font_repository(),
+				$this->get_catalog_repository(),
+				$this->get_font_downloader(),
+				$this->get_font_cache_warmer(),
+				new Fonts\Font_Lock(),
+				$this->get_catalog_sync(),
+				$this->log
+			);
+		}
+
+		return $this->font_installer;
+	}
+
+	/**
+	 * Build the offline package importer, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_package_importer(): Fonts\Font_Package_Importer {
+		if ( $this->font_package_importer === null ) {
+			$this->font_package_importer = new Fonts\Font_Package_Importer(
+				$this->get_catalog_repository(),
+				$this->get_font_installer(),
+				$this->get_font_repository(),
+				$this->get_font_downloader(),
+				new Fonts\Font_Lock(),
+				$this->log
+			);
+		}
+
+		return $this->font_package_importer;
+	}
+
+	/**
+	 * Build the font cache warmer, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_cache_warmer(): Fonts\Font_Cache_Warmer {
+		if ( $this->font_cache_warmer === null ) {
+			$this->font_cache_warmer = new Fonts\Font_Cache_Warmer( $this->get_font_registry(), $this->data, $this->log );
+		}
+
+		return $this->font_cache_warmer;
+	}
+
+	/**
+	 * Build the install request planner, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_requests(): Fonts\Install_Requests {
+		if ( $this->install_requests === null ) {
+			$this->install_requests = new Fonts\Install_Requests(
+				$this->get_font_repository(),
+				$this->get_font_installer(),
+				$this->get_install_queue(),
+				$this->get_catalog_repository()
+			);
+		}
+
+		return $this->install_requests;
+	}
+
+	/**
+	 * Build the font install queue, once
+	 *
+	 * Once, and not lazily behind a trigger: constructing it registers the `gform_max_async_task_attempts` scope
+	 * and GF's own listeners for its action, which have to exist on every request that might run a batch, not only
+	 * on the ones that queue work.
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_queue(): Fonts\Install_Queue {
+		if ( $this->install_queue === null ) {
+			$this->install_queue = new Fonts\Install_Queue(
+				$this->get_font_repository(),
+				$this->get_catalog_repository(),
+				$this->get_font_installer(),
+				$this->get_font_registry(),
+				$this->log
+			);
+		}
+
+		return $this->install_queue;
+	}
+
+	/**
+	 * Build the coverage resolver, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_coverage_resolver(): Fonts\Coverage_Resolver {
+		if ( $this->coverage_resolver === null ) {
+			$this->coverage_resolver = new Fonts\Coverage_Resolver(
+				$this->get_catalog_repository(),
+				$this->get_font_repository(),
+				$this->get_font_registry()
+			);
+		}
+
+		return $this->coverage_resolver;
+	}
+
+	/**
+	 * Build the script detector, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_script_detector(): Fonts\Script_Detector {
+		if ( $this->script_detector === null ) {
+			$this->script_detector = new Fonts\Script_Detector();
+		}
+
+		return $this->script_detector;
+	}
+
+	/**
+	 * Build the render-time install trigger, once
+	 *
+	 * @since 7.0
+	 */
+	public function get_render_font_trigger(): Fonts\Render_Font_Trigger {
+		if ( $this->render_font_trigger === null ) {
+			$this->render_font_trigger = new Fonts\Render_Font_Trigger(
+				$this->get_script_detector(),
+				$this->get_coverage_resolver(),
+				$this->get_install_queue(),
+				$this->get_font_installer(),
+				$this->get_font_registry(),
+				new Fonts\Font_Lock(),
+				$this->log
+			);
+		}
+
+		return $this->render_font_trigger;
 	}
 
 	/**
@@ -891,7 +1490,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
-		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates );
+		$model = new Model\Model_System_Report(
+			$this->options,
+			$this->data,
+			$this->log,
+			$this->misc,
+			new GFPDF_Major_Compatibility_Checks(),
+			$this->templates,
+			$this->get_font_report()
+		);
 		$class = new Controller\Controller_System_Report( $model, $view, $this->gform );
 		$class->init();
 

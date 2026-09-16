@@ -435,7 +435,18 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			 */
 			foreach ( $settings[ $s ] as $key => $value ) {
 				switch ( $value['type'] ) {
+					/*
+					 * A single-value select that was not answered is an empty string, not an empty array: every
+					 * reader of these keys treats them as strings, and an `[]` reaching one is a `TypeError` under
+					 * PHP 8 (`strtoupper( $settings['pdf_size'] )`) or a `font-family: Array` in the stylesheet.
+					 * `multiple` is still an array, which is the one case core has none of and a template may.
+					 */
 					case 'select':
+						if ( ! isset( $input[ $key ] ) ) {
+							$input[ $key ] = empty( $value['multiple'] ) ? '' : [];
+						}
+						break;
+
 					case 'multicheck':
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = [];

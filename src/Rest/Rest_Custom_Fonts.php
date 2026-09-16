@@ -1,0 +1,775 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace GFPDF\Rest;
+
+use Exception;
+use GFPDF\Exceptions\GravityPdfDatabaseUpdateException;
+use GFPDF\Exceptions\GravityPdfFontNotFoundException;
+use GFPDF\Exceptions\GravityPdfIdException;
+use GFPDF\Exceptions\GravityPdfModelNotUpdatedException;
+use GFPDF\Fonts\FlushCache;
+use GFPDF\Fonts\Font_Repository;
+use GFPDF\Fonts\Install_Requests;
+use GFPDF\Fonts\Registry;
+use GFPDF\Fonts\SupportsOtl;
+use GFPDF\Fonts\FontFaceAnalysis;
+use GFPDF\Fonts\TtfFontValidation;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
+use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use WP_Error;
+use WP_REST_Request;
+use WP_REST_Server;
+
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
+/* Exit if accessed directly */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Upload, edit and delete a font of the site's own
+ *
+ * A font row, not a catalogue entry: `custom` and `imported` rows have no source and nothing to install, so this
+ * addresses them by their mPDF key alone. It shares `Rest_Font_Base` with the catalogue routes for the capability
+ * and nothing else.
+ *
+ * @package GFPDF\Rest
+ *
+ * @since 6.0
+ */
+class Rest_Custom_Fonts extends Rest_Font_Base {
+
+	/**
+	 * @var Model_Custom_Fonts
+	 * @since 6.0
+	 */
+	protected $model;
+
+	/**
+	 * @var LoggerInterface
+	 * @since 6.0
+	 */
+	protected $log;
+
+	/**
+	 * @var Registry
+	 * @since 7.0
+	 */
+	protected $registry;
+
+	/**
+	 * @var Install_Requests
+	 * @since 7.0
+	 */
+	protected $requests;
+
+	/**
+	 * @var string The absolute path to the Custom Fonts directory on the server
+	 * @since 6.0
+	 */
+	protected $font_dir_path;
+
+	/**
+	 * @var string
+	 * @since 6.0
+	 */
+	protected $filesystem;
+
+	/**
+	 * @var string
+	 * @since 6.0
+	 */
+	protected $file;
+
+	/**
+	 * @var string[] List of the standard font keys used when saving settings
+	 * @since 6.0
+	 */
+	protected $font_keys = [ 'regular', 'italics', 'bold', 'bolditalics' ];
+
+	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, Registry $registry, Install_Requests $requests, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
+		$this->model         = $model;
+		$this->log           = $log;
+		$this->gform         = $gform;
+		$this->registry      = $registry;
+		$this->requests      = $requests;
+		$this->font_dir_path = $font_dir_path;
+
+		$this->filesystem = $filesystem;
+		$this->file       = $file;
+	}
+
+	/**
+	 * The `{id}` route, with the literal `/fonts/…` words it must not swallow excluded up front
+	 *
+	 * Built from `Font_Repository`'s two constants rather than spelled here: the charset is the font-key charset,
+	 * `_` included — an imported `Open_Sans.ttf` keys as `open_sans`, and a route narrower than the key rule is how
+	 * those rows became unaddressable in the first place. WordPress anchors the whole pattern, so excluding the bare
+	 * word is enough; a longer path can never reach a one-segment route.
+	 *
+	 * @since 7.0
+	 */
+	public static function id_route(): string {
+		return sprintf(
+			'/fonts/(?!(?:%s)$)(?P<id>[%s]+)',
+			implode( '|', Font_Repository::RESERVED_ROUTE_KEYS ),
+			Font_Repository::KEY_CHARS
+		);
+	}
+
+	/**
+	 * @deprecated 7.0 Renamed `register_routes()`, which is what `WP_REST_Controller` calls it
+	 *
+	 * @since 6.0
+	 */
+	public function register_endpoints(): void {
+		$this->register_routes();
+	}
+
+	/**
+	 * Register the Font CRUD REST API endpoints
+	 *
+	 * @since 7.0
+	 */
+	public function register_routes() {
+		register_rest_route(
+			static::NAMESPACE,
+			'/fonts/',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_font_list' ],
+					'permission_callback' => [ $this, 'get_items_permissions_check' ],
+				],
+
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'add_item' ],
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
+					'args'                => [
+						'label' => [
+							'description'       => __( 'The font label used for the object', 'gravity-pdf' ),
+							'type'              => 'string',
+							'required'          => true,
+							'validate_callback' => [ $this->model, 'check_font_name_valid' ],
+						],
+					],
+				],
+			]
+		);
+
+		register_rest_route(
+			static::NAMESPACE,
+			static::id_route(),
+			[
+				'args' => [
+					'id' => [
+						'description'       => __( 'Unique identifier for the object.', 'default' ),
+						'type'              => 'string',
+						'validate_callback' => [ $this->model, 'check_font_id_valid' ],
+						'required'          => true,
+					],
+				],
+
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'update_item' ],
+					'permission_callback' => [ $this, 'update_item_permissions_check' ],
+					'args'                => [
+						'label'       => [
+							'description'       => __( 'The font label used for the object', 'gravity-pdf' ),
+							'type'              => 'string',
+							'validate_callback' => [ $this->model, 'check_font_name_valid' ],
+						],
+
+						'enabled'     => [
+							'description' => __( 'Whether this site can choose the font. Multisite only.', 'gravity-pdf' ),
+							'type'        => 'boolean',
+						],
+
+						'variants'    => [
+							'description' => __( 'The styles to install for each face, for a row of a catalogue font', 'gravity-pdf' ),
+							'type'        => 'object',
+						],
+
+						'regular'     => [
+							'description'       => __( 'The path to the `regular` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
+							'type'              => 'string',
+							'validate_callback' => [ $this, 'check_empty_string' ],
+						],
+
+						'italics'     => [
+							'description'       => __( 'The path to the `italics` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
+							'type'              => 'string',
+							'validate_callback' => [ $this, 'check_empty_string' ],
+						],
+
+						'bold'        => [
+							'description'       => __( 'The path to the `bold` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
+							'type'              => 'string',
+							'validate_callback' => [ $this, 'check_empty_string' ],
+						],
+
+						'bolditalics' => [
+							'description'       => __( 'The path to the `bolditalics` font file. Pass empty value if it should be deleted', 'gravity-pdf' ),
+							'type'              => 'string',
+							'validate_callback' => [ $this, 'check_empty_string' ],
+						],
+					],
+				],
+
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_item' ],
+					'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+				],
+			]
+		);
+	}
+
+	/**
+	 * @return string[]
+	 *
+	 * @since 6.0
+	 */
+	public function get_font_keys(): array {
+		return $this->font_keys;
+	}
+
+	/**
+	 * Get a numerical array of all custom installed fonts
+	 *
+	 * @since 6.0
+	 */
+	public function get_all_items(): array {
+		return array_values( $this->model->get_custom_fonts() );
+	}
+
+	/**
+	 * Every font the site can name, as the Font Manager and the settings dropdown read it
+	 *
+	 * `Registry::get_grouped_fonts()` is the whole body of the response — the same read the dropdown flattens, so
+	 * the two can never disagree about a label or an order — plus two fields that belong to the request rather
+	 * than to the model: the `always` entries with nothing installed, and whether this user may unlink a file.
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	public function get_font_list(): array {
+		return $this->registry->get_grouped_fonts() + [
+			'missing'          => $this->registry->missing_always_entries(),
+			'can_delete_files' => $this->may_delete_files( $this->file_delete_capability( [] ) ),
+		];
+	}
+
+	/**
+	 * One row as `GET /fonts/` lists it, so the store can merge a write into the list it already holds
+	 *
+	 * @since 7.0
+	 */
+	protected function row( string $font_key ): array {
+		return (array) $this->registry->get_font( $font_key );
+	}
+
+	/**
+	 * A saved row, plus anything about the files worth telling the administrator who saved it
+	 *
+	 * Only the two write routes answer with this. `warnings` is advice about the upload rather than part of the
+	 * font, so it is not in `row()` and never reaches a read: a warning is about the moment the files arrived,
+	 * and repeating it on every later `GET` would make it furniture.
+	 *
+	 * @param string[] $warnings
+	 *
+	 * @since 7.0
+	 */
+	protected function row_with_warnings( string $font_key, array $warnings ): array {
+		$row = $this->row( $font_key );
+
+		if ( $warnings !== [] ) {
+			$row['warnings'] = array_values( $warnings );
+		}
+
+		return $row;
+	}
+
+	/**
+	 * Why this row is not this route's to change, or null
+	 *
+	 * A font a language pack installed belongs to its entry: the pack decides which keys exist, and removing one of
+	 * them would leave an entry the catalogue calls installed rendering with a face that is gone. The entry route
+	 * takes the whole pack, which is the only unit an admin can meaningfully act on.
+	 *
+	 * @since 7.0
+	 */
+	protected function refuse_entry_row( string $font_key ): ?WP_Error {
+		$font = $this->model->get_font( $font_key );
+
+		if ( $font === [] || (int) $font['coverage'] !== 1 ) {
+			return null;
+		}
+
+		return new WP_Error(
+			'font_owned_by_entry',
+			sprintf(
+				/* translators: %s: a font pack's name, e.g. Japanese */
+				esc_html__( 'This font was installed by the "%s" pack. Remove the pack to remove the font.', 'gravity-pdf' ),
+				(string) $font['entry']
+			),
+			[ 'status' => 400 ]
+		);
+	}
+
+	/**
+	 * Re-install one row of a catalogue font under a different set of styles
+	 *
+	 * The same upsert the entry route runs, aimed at a single row: the installer matches an install on its
+	 * `label`, so handing it this row's own label finds this row and no other, and an install of the same family
+	 * under a different name keeps the styles it was installed with. A row that came from an upload has no entry
+	 * to take styles from, so asking is a `400` rather than a silent no-op.
+	 *
+	 * @param array $variants role => style id
+	 *
+	 * @return WP_Error|array|null The status map the caller should answer with, an error, or null when the
+	 *                             request named no styles
+	 *
+	 * @since 7.0
+	 */
+	protected function install_variants( string $font_key, array $variants ) {
+		if ( $variants === [] ) {
+			return null;
+		}
+
+		$queued = $this->requests->queue_variants( $this->model->get_font( $font_key ), $variants );
+
+		/* The files arrive in the background, so the answer is the row as it stands */
+		return is_wp_error( $queued ) ? $queued : $this->row( $font_key );
+	}
+
+	/**
+	 * Show or hide one row on the site making the request
+	 *
+	 * Visibility is per site and installation is not (§4.11), so this is the only font write multisite treats
+	 * differently — and on single site there is nothing to hide a font from, so the key is simply not offered.
+	 *
+	 * @return WP_Error|null Why it was refused, or `null` when it was applied
+	 *
+	 * @since 7.0
+	 */
+	protected function set_visibility( string $font_key, bool $enabled ): ?WP_Error {
+		if ( ! is_multisite() ) {
+			return new WP_Error(
+				'font_visibility_unsupported',
+				esc_html__( 'Fonts can only be hidden per site on a multisite network.', 'gravity-pdf' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$this->model->set_site_visibility( $font_key, $enabled );
+
+		return null;
+	}
+
+	/**
+	 * Our `Create` CRUD for custom fonts
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 6.0
+	 */
+	public function add_item( WP_REST_Request $request ) {
+		try {
+			$label = $request->get_param( 'label' );
+			$id    = $this->model->get_unique_id( $this->model->get_font_short_name( $label ) );
+
+			/* Handle uploads */
+			$files = $this->get_uploaded_font_files( $request );
+
+			/* Ensure the regular font file has been uploaded (required field) */
+			if ( ! isset( $files['regular'] ) ) {
+				throw new UploadException( wp_json_encode( [ 'regular' => __( 'The Regular font is required', 'gravity-pdf' ) ] ) );
+			}
+
+			$files = $this->move_fonts_to_font_dir( $files );
+
+			/* Determine if font files support OTF data and auto register */
+			$supports_otl = $this->does_fonts_support_otl( $files );
+			$analysis     = new FontFaceAnalysis( $this->font_dir_path );
+
+			/* Update database */
+			$font = [
+				'font_name'   => $label,
+				'id'          => $id,
+				'useOTL'      => $supports_otl ? 0xFF : 0x00,
+				'useKashida'  => $supports_otl && $analysis->has_rtl( $files ) ? 75 : 0,
+				'regular'     => $this->get_absolute_font_path( $files['regular']['name'] ),
+				'italics'     => $this->get_absolute_font_path( $files['italics']['name'] ?? '' ),
+				'bold'        => $this->get_absolute_font_path( $files['bold']['name'] ?? '' ),
+				'bolditalics' => $this->get_absolute_font_path( $files['bolditalics']['name'] ?? '' ),
+			];
+
+			if ( ! $this->model->add_font( $font ) ) {
+				throw new GravityPdfDatabaseUpdateException();
+			}
+
+			return $this->row_with_warnings( $id, $analysis->warnings( $files ) );
+		} catch ( UploadException $e ) {
+			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
+			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
+		} catch ( GravityPdfFontNotFoundException $e ) {
+			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
+			return new WP_Error( 'font_file_gone_missing', $message, [ 'status' => 500 ] );
+		} catch ( GravityPdfDatabaseUpdateException $e ) {
+			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfIdException $e ) {
+			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 400 ] );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'unknown_error', $e->getMessage(), [ 'status' => 500 ] );
+		} finally {
+			if ( isset( $e ) ) {
+				$this->log->error( $e->getMessage() );
+			}
+		}
+	}
+
+	/**
+	 * Our `Update` CRUD for custom fonts
+	 *
+	 * This endpoint acts like a PATCH request, and data that isn't passed won't be updated
+	 *
+	 * @param WP_REST_Request $request Untyped: `WP_REST_Controller` declares it so, and narrowing is a fatal
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 6.0
+	 */
+	public function update_item( $request ) {
+		try {
+			$id    = (string) $request->get_param( 'id' );
+			$owned = $this->refuse_entry_row( $id );
+
+			if ( $owned !== null ) {
+				return $owned;
+			}
+
+			if ( ! $this->model->matches_custom_font_id( $id ) ) {
+				throw new GravityPdfIdException();
+			}
+
+			$enabled = $request->get_param( 'enabled' );
+
+			if ( $enabled !== null ) {
+				$refused = $this->set_visibility( $id, (bool) $enabled );
+
+				if ( $refused !== null ) {
+					return $refused;
+				}
+			}
+
+			$restyled = $this->install_variants( $id, (array) $request->get_param( 'variants' ) );
+
+			if ( $restyled !== null ) {
+				return $restyled;
+			}
+
+			$font = $this->model->get_font_by_id( $id );
+
+			$label = $request->get_param( 'label' );
+			if ( ! empty( $label ) ) {
+				$font['font_name'] = $label;
+			}
+
+			/*
+			 * Clear any font faces the request asked to remove. The files go with the rows in `update_font()`:
+			 * unlinking here would run before the row is gone, and the shared delete path skips a path a
+			 * surviving row still records.
+			 */
+			$params = $request->get_body_params();
+			foreach ( $this->font_keys as $font_id ) {
+				if ( ! isset( $params[ $font_id ] ) || empty( $font[ $font_id ] ) ) {
+					continue;
+				}
+
+				$font[ $font_id ] = '';
+			}
+
+			/*
+			 * Handle newly-uploaded files
+			 * If we are to replace an existing font we will need to delete it first and then update the $font key
+			 */
+			$files = $this->get_uploaded_font_files( $request );
+			if ( count( $files ) > 0 ) {
+				$files = $this->move_fonts_to_font_dir( $files );
+				foreach ( $files as $font_id => $file ) {
+					$font[ $font_id ] = $this->get_absolute_font_path( $file['name'] );
+				}
+			}
+
+			/*
+			 * Run all fonts through the OTL check again
+			 */
+			$files = [];
+			foreach ( $this->font_keys as $font_id ) {
+				if ( empty( $font[ $font_id ] ) ) {
+					continue;
+				}
+
+				$files[ $font_id ] = [
+					'name' => basename( $font[ $font_id ] ),
+				];
+			}
+
+			$supports_otl = $this->does_fonts_support_otl( $files );
+			$analysis     = new FontFaceAnalysis( $this->font_dir_path );
+
+			if ( $supports_otl ) {
+				/* Only the automatic value is gated: a Kashida the request states is the admin's to state */
+				$useKashida = $request->get_param( 'useKashida' ) ?? ( $analysis->has_rtl( $files ) ? 75 : 0 );
+				if ( $useKashida !== null ) {
+					$useKashida = (int) $useKashida;
+					if ( $useKashida < 0 || $useKashida > 100 ) {
+						throw new \InvalidArgumentException( __( 'Kashida needs to be a value between 0-100', 'gravity-pdf' ) );
+					}
+				}
+
+				$font['useOTL']     = 0xFF;
+				$font['useKashida'] = $useKashida;
+			} else {
+				$font['useOTL']     = 0x00;
+				$font['useKashida'] = 0;
+			}
+
+			/* Update database, if needed */
+			if ( $this->model->get_font_by_id( $font['id'] ) !== $font && ! $this->model->update_font( $font ) ) {
+				throw new GravityPdfDatabaseUpdateException();
+			}
+
+			FlushCache::flush_font( (string) $font['id'] );
+
+			return $this->row_with_warnings( (string) $font['id'], $analysis->warnings( $files ) );
+		} catch ( UploadException $e ) {
+			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
+			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
+		} catch ( GravityPdfFontNotFoundException $e ) {
+			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
+			return new WP_Error( 'font_file_gone_missing', $message, [ 'status' => 500 ] );
+		} catch ( GravityPdfModelNotUpdatedException $e ) {
+			return new WP_Error( 'no_changes_found', '', [ 'status' => 400 ] );
+		} catch ( GravityPdfDatabaseUpdateException $e ) {
+			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfIdException $e ) {
+			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 400 ] );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'unknown_error', $e->getMessage(), [ 'status' => 500 ] );
+		} finally {
+			if ( isset( $e ) ) {
+				$this->log->error( $e->getMessage() );
+			}
+		}
+	}
+
+	/**
+	 * The capability check, plus the multisite one for unlinking this row's files
+	 *
+	 * Here rather than in `delete_item()` so that `GPDFAPI::delete_pdf_font()` keeps working the way
+	 * `add_pdf_font()` does: the programmatic API calls the handler directly and answers to no user.
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 7.0
+	 */
+	public function delete_item_permissions_check( $request ) {
+		$allowed = parent::delete_item_permissions_check( $request );
+
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+
+		$font = $this->model->get_font( (string) $request['id'] );
+
+		/* No row means no file to unlink, so there is nothing to permit — the handler answers for the id itself */
+		if ( $font === [] ) {
+			return true;
+		}
+
+		return $this->refuse_file_delete( $font ) ?? true;
+	}
+
+	/**
+	 * @param WP_REST_Request $request Untyped, as `update_item()` above
+	 *
+	 * @return void|WP_Error
+	 *
+	 * @since 6.0
+	 */
+	public function delete_item( $request ) {
+		try {
+			$id    = (string) $request->get_param( 'id' );
+			$owned = $this->refuse_entry_row( $id );
+
+			if ( $owned !== null ) {
+				return $owned;
+			}
+
+			if ( ! $this->model->matches_custom_font_id( $id ) ) {
+				throw new GravityPdfIdException();
+			}
+
+			/* Removes the rows, then the files no surviving row records */
+			if ( ! $this->model->delete_font( $id ) ) {
+				throw new GravityPdfDatabaseUpdateException();
+			}
+
+			FlushCache::flush_font( $id );
+
+			return;
+
+		} catch ( GravityPdfDatabaseUpdateException $e ) {
+			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfIdException $e ) {
+			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 400 ] );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'unknown_error', $e->getMessage(), [ 'status' => 500 ] );
+		} finally {
+			if ( isset( $e ) ) {
+				$this->log->error( $e->getMessage() );
+			}
+		}
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public function get_absolute_font_path( string $name ): string {
+		return ! empty( $name ) ? $this->font_dir_path . $name : '';
+	}
+
+	/**
+	 * Return any uploaded file details with a key matching the `font_keys`
+	 *
+	 * @since 6.0
+	 */
+	protected function get_uploaded_font_files( WP_REST_Request $request ): array {
+		return array_filter(
+			$request->get_file_params(),
+			function ( $id ) {
+				return in_array( $id, $this->font_keys, true );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
+	}
+
+	/**
+	 * Validate font files and move from tmp to custom font directory
+	 *
+	 * @param array $files Accepts array returned by self::get_uploaded_font_files()
+	 *
+	 * @return array New font file details (may include a renamed font file)
+	 *
+	 * @since 6.0
+	 */
+	protected function move_fonts_to_font_dir( array $files ): array {
+		$storage = new $this->filesystem( $this->font_dir_path );
+		$errors  = [];
+
+		foreach ( $files as $id => $file ) {
+			$file = new $this->file( $id, $storage );
+
+			/* Add validation checks */
+			$file->addValidations(
+				[
+					new Extension( 'ttf' ),
+					new TtfFontValidation(),
+				]
+			);
+
+			/* Give file a unique name, if already exists */
+			while ( is_file( $this->font_dir_path . $file->getNameWithExtension() ) ) {
+				$file->setName( $file->getName() . substr( (string) time(), -5 ) );
+				$files[ $id ]['name'] = $file->getNameWithExtension();
+			}
+
+			/* Do validation and move to the font directory */
+			try {
+				$file->upload();
+			} catch ( UploadException $e ) {
+				$errors[ $id ] = __( 'The upload is not a valid TTF file', 'gravity-pdf' );
+			}
+		}
+
+		if ( count( $errors ) > 0 ) {
+			throw new UploadException( wp_json_encode( $errors ) );
+		}
+
+		return $files;
+	}
+
+	/**
+	 * A validation callback for the REST API
+	 *
+	 * @since 6.0
+	 */
+	public function check_empty_string( string $input ): bool {
+		return empty( $input );
+	}
+
+	/**
+	 * Logs the refusal, which the catalogue routes carry no logger to do
+	 *
+	 * @return true|WP_Error
+	 *
+	 * @since 6.0
+	 */
+	public function get_items_permissions_check( $request ) {
+		$allowed = parent::get_items_permissions_check( $request );
+
+		if ( is_wp_error( $allowed ) ) {
+			$this->log->warning( 'Permission denied: user does not have "gravityforms_edit_forms" capabilities' );
+		}
+
+		return $allowed;
+	}
+
+	/**
+	 * Checks through all the font files for OTL support
+	 *
+	 * @param array $files Accepts array returned by self::get_uploaded_font_files()
+	 *
+	 * @return bool If supported for all fonts return true, false otherwise.
+	 */
+	protected function does_fonts_support_otl( array $files ): bool {
+		$otl    = new SupportsOtl( $this->font_dir_path );
+		$errors = [];
+
+		$supports_otl = true;
+
+		foreach ( $files as $id => $file ) {
+			if ( ! isset( $file['name'] ) || ! is_file( $this->font_dir_path . $file['name'] ) ) {
+				/* translators: %s: font filename */
+				$errors[ $id ] = sprintf( __( 'Cannot find %s.', 'gravity-pdf' ), $file['name'] );
+				continue;
+			}
+
+			if ( ! $otl->supports_otl( $file['name'] ) ) {
+				$supports_otl = false;
+				break;
+			}
+		}
+
+		if ( count( $errors ) > 0 ) {
+			throw new GravityPdfFontNotFoundException( wp_json_encode( $errors ) );
+		}
+
+		return $supports_otl;
+	}
+}

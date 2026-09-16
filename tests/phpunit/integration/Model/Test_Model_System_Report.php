@@ -37,7 +37,7 @@ class Test_Model_System_Report extends TestCase {
 		parent::set_up();
 
 		/* Setup our test classes */
-		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks, new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ) );
+		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks, new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ), $gfpdf->get_font_report() );
 
 		add_filter( 'pre_http_request', [ $this, 'get_public_dir_api_response' ] );
 	}
@@ -67,9 +67,9 @@ class Test_Model_System_Report extends TestCase {
 		$this->assertArrayHasKey( 'title_export', $structure );
 		$this->assertArrayHasKey( 'tables', $structure );
 
-		/* One section per deprecation group in use, then the four the report has always had */
+		/* One section per deprecation group in use, then the four the report has always had, then the font ones */
 		$this->assertSame(
-			[ 'unsupported', 'php', 'directories', 'global', 'security' ],
+			[ 'unsupported', 'php', 'directories', 'global', 'security', 'fonts', 'background_installs', 'health' ],
 			array_column( $structure['tables'], 'id' )
 		);
 	}

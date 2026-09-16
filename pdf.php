@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 6.16.0
+Version: 7.0.0-alpha1
 Description: Automatically generate highly customizable PDF documents using Gravity Forms and WordPress (canonical)
 Author: Blue Liquid Designs
 Author URI: https://blueliquiddesigns.com.au
@@ -9,7 +9,7 @@ Plugin URI: https://gravitypdf.com
 Update URI: https://gravitypdf.com
 Text Domain: gravity-pdf
 Domain Path: /languages
-Requires at least: 5.3
+Requires at least: 6.8
 Requires PHP: 7.4
 License: GPL-2.0
 License URI: https://opensource.org/licenses/gpl-2.0.php
@@ -36,7 +36,7 @@ if ( defined( 'PDF_PLUGIN_BASENAME' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '6.16.0' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '7.0.0-alpha1' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -45,6 +45,29 @@ define( 'GPDF_PLUGIN_FILE', __FILE__ );
 /* Allow wp-config.php to point licensing/update requests at a staging endpoint */
 if ( ! defined( 'GPDF_API_URL' ) ) {
 	define( 'GPDF_API_URL', 'https://api.gravitypdf.com' );
+}
+
+/* The fonts root, a second hostname beside the API: sync, installs and previews are all this one origin */
+if ( ! defined( 'GPDF_FONTS_URL' ) ) {
+	define( 'GPDF_FONTS_URL', 'https://fonts.gravitypdf.com/v1/' );
+}
+
+/*
+ * ed25519 public keys the font root's signature is checked against, base64, newest first.
+ *
+ * The signed artefact is a context prefix plus the raw bytes of `index.json`, so one key can serve other signed
+ * distribution later without a signature ever verifying across purposes. Rotation ships old + new together and
+ * drops the old in a later release.
+ *
+ * Signing happens in the update-server repo, which owns the keypair and signs each published root as it uploads
+ * it; this constant is the plugin's half of that contract and the only place the two repositories have to agree.
+ * The private half never leaves that repo's CI secrets and must never be in this repository.
+ *
+ * Emptying the array does not disable verification, it fails every built-in source's sync closed with
+ * `font_no_trust_keys` — which is the intended behaviour for an unconfigured build, and a test pins it.
+ */
+if ( ! defined( 'GPDF_TRUST_KEYS' ) ) {
+	define( 'GPDF_TRUST_KEYS', [ 'RlK5tPJw0tz0dAsZHiL1zb++S1eqm9NvBwJ9b6zf8+M=' ] );
 }
 
 if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
@@ -104,7 +127,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 *
 		 * @since 4.0
 		 */
-		public $required_gf_version = '2.5';
+		public $required_gf_version = '2.9.25';
 
 		/**
 		 * The plugin's required WordPress version
@@ -113,7 +136,7 @@ if ( ! class_exists( 'GFPDF_Major_Compatibility_Checks' ) ) {
 		 *
 		 * @since 4.0
 		 */
-		public $required_wp_version = '5.3';
+		public $required_wp_version = '6.8';
 
 		/**
 		 * The plugin's required PHP version

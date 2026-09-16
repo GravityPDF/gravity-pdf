@@ -49,16 +49,4 @@ class Test_View_Actions extends TestCase {
 		$this->assertStringContainsString( 'Dismiss Notice', $html );
 	}
 
-	public function test_core_font_concatenates_notice_and_disabled_buttons() {
-		$html = $this->view->core_font( 'install_core_fonts', 'Install Now' );
-
-		$this->assertStringContainsString( 'Core PDF fonts', $html );
-		$this->assertStringContainsString( 'Install Now', $html );
-		$this->assertStringNotContainsString( 'Dismiss Notice', $html );
-		$this->assertLessThan(
-			strpos( $html, 'Install Now' ),
-			strpos( $html, 'Core PDF fonts' ),
-			'Notice should appear before the action buttons'
-		);
-	}
 }

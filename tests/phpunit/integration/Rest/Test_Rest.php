@@ -36,6 +36,50 @@ abstract class Test_Rest extends TestCase {
 	 */
 	protected static $editor_id;
 
+	/**
+	 * Dispatch a request against the plugin's namespace
+	 *
+	 * On the base class because every REST suite needs it and three of them had already grown their own copy.
+	 */
+	protected function rest( string $method, string $route, array $params = [], array $files = [] ) {
+		$request = new WP_REST_Request( $method, '/gravity-pdf/v1' . $route );
+
+		foreach ( $params as $key => $value ) {
+			$request->set_param( $key, $value );
+		}
+
+		/* What `WP_REST_Server` fills from `$_FILES`, which a dispatched request cannot have */
+		if ( $files !== [] ) {
+			$request->set_file_params( $files );
+		}
+
+		return rest_do_request( $request );
+	}
+
+	/**
+	 * A response body's keys in a fixed order, so a shape assertion does not depend on the order fields were added
+	 *
+	 * @return string[]
+	 */
+	protected function sorted_keys( array $data ): array {
+		$keys = array_keys( $data );
+		sort( $keys );
+
+		return $keys;
+	}
+
+	protected function get( string $route, array $params = [] ) {
+		return $this->rest( 'GET', $route, $params );
+	}
+
+	protected function post( string $route, array $params = [], array $files = [] ) {
+		return $this->rest( 'POST', $route, $params, $files );
+	}
+
+	protected function delete( string $route, array $params = [] ) {
+		return $this->rest( 'DELETE', $route, $params );
+	}
+
 	public function set_up(): void {
 		global $gfpdf;
 
@@ -62,6 +106,14 @@ abstract class Test_Rest extends TestCase {
 
 		self::$admin_id  = self::factory()->user->create( [ 'role' => 'administrator', ] );
 		self::$editor_id = self::factory()->user->create( [ 'role' => 'editor', ] );
+
+		/*
+		 * On multisite these suites mean "an administrator who can do administrator things", and font files are
+		 * network-global — removing one needs `manage_network_options`. A suite testing that boundary revokes it.
+		 */
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
 
 		$this->form_id = $this->gf_factory()->form->create();
 		$this->gf_factory()->pdf->set_form_id( $this->form_id );

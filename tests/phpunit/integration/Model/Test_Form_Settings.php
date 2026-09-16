@@ -471,6 +471,23 @@ class Test_Form_Settings extends TestCase {
 	 *
 	 * @since 4.0
 	 */
+	/**
+	 * A single-value select nobody answered is `''`, not `[]`
+	 *
+	 * `[]` is what every reader of these keys chokes on — `strtoupper( $settings['pdf_size'] )` is a `TypeError`
+	 * under PHP 8, and the stylesheet writes `font-family: Array`. A `multicheck` still wants an array, which is
+	 * what makes this a per-type rule rather than a blanket one.
+	 */
+	public function test_an_unanswered_select_is_stored_as_a_string_and_a_multicheck_as_an_array() {
+		$values = $this->model->settings_sanitize( [ 'name' => 'Unanswered' ] );
+
+		foreach ( [ 'template', 'pdf_size', 'orientation', 'font', 'pdf_language' ] as $key ) {
+			$this->assertSame( '', $values[ $key ], $key );
+		}
+
+		$this->assertSame( [], $values['notification'] );
+	}
+
 	public function test_settings_sanitize() {
 		/* remove validation filter on settings */
 		remove_all_filters( 'gfpdf_form_settings' );

@@ -15,7 +15,7 @@ use GFPDF\Tests\Integration\TestCase;
 /**
  * Class Test_FlushCache
  *
- * @package GFPDF\Helper\Fonts
+ * @package GFPDF\Fonts
  *
  * @group   helper
  * @group   fields

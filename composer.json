@@ -24,6 +24,11 @@
     },
 
     {
+      "type": "vcs",
+      "url": "https://github.com/GravityPDF/mpdf"
+    },
+
+    {
       "type": "composer",
       "url": "https://composer.gravity.io",
       "only": [
@@ -33,7 +38,7 @@
   ],
   "require": {
     "php": ">=7.4",
-    "mpdf/mpdf": "dev-development",
+    "mpdf/mpdf": "dev-gravitypdf",
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",

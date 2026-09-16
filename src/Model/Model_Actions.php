@@ -8,7 +8,6 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Statics\Deprecation;
-use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -138,35 +137,6 @@ class Model_Actions extends Helper_Abstract_Model {
 		}
 
 		$this->options->update_option( 'action_dismissal', $dismissed_notices );
-	}
-
-	/**
-	 * Check if one of the core fonts exists in the fonts directory
-	 *
-	 * @return bool
-	 *
-	 * @since 5.0
-	 */
-	public function core_font_condition() {
-
-		$misc = GPDFAPI::get_misc_class();
-
-		/* Check if one of the core fonts already exists */
-		if ( ! is_file( $this->data->template_font_location . 'DejaVuSansCondensed.ttf' ) && ! $misc->is_gfpdf_settings_tab( 'tools' ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Redirect user to our font installer tool
-	 *
-	 * @since 5.0
-	 */
-	public function core_font_redirect() {
-		wp_safe_redirect( admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=tools#/downloadCoreFonts' ) );
-		exit;
 	}
 
 	/**

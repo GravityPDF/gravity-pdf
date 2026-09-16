@@ -45,6 +45,15 @@ class Test_Autoloader extends TestCase {
 		return [
 			[ 'GFPDF\Controller\Controller_Actions' ],
 			[ 'Controller_Activation' ],
+
+			/* Names 6.x shipped, kept alive by the lazy alias autoloader after 7.0 moved the classes */
+			[ 'GFPDF\Controller\Controller_Custom_Fonts' ],
+			[ 'GFPDF\Helper\Fonts\FlushCache' ],
+			[ 'GFPDF\Helper\Fonts\LocalFile' ],
+			[ 'GFPDF\Helper\Fonts\LocalFilesystem' ],
+			[ 'GFPDF\Helper\Fonts\SupportsOtl' ],
+			[ 'GFPDF\Helper\Fonts\TtfFontValidation' ],
+
 			[ 'GFPDF\Controller\Controller_Form_Settings' ],
 			[ 'GFPDF\Controller\Controller_Install' ],
 			[ 'GFPDF\Controller\Controller_PDF' ],

@@ -1,0 +1,1405 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace GFPDF\Fonts;
+
+use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF_Vendor\Mpdf\Fonts\FontRegistry;
+use GFPDF_Vendor\Mpdf\Language\LanguageToFontRegistry;
+use GFPDF_Vendor\Mpdf\Ucdn;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
+
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
+/* Exit if accessed directly */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Builds everything mPDF and the Font Manager need to know about fonts
+ *
+ * Both come from one read of the font tables, so what renders and what the UI lists cannot drift. Nothing here
+ * touches the filesystem, and nothing on the render path constructs `Font_Sources` — its filter runs third-party
+ * code a render must not depend on. `Catalog_Repository` is held for the install statuses alone, which only the
+ * admin surfaces ask for; no method mPDF reaches touches it.
+ *
+ * @package GFPDF\Fonts
+ *
+ * @since 7.0
+ */
+class Registry {
+
+	/**
+	 * The bundled font keys, which no catalogue entry may claim
+	 *
+	 * @since 7.0
+	 */
+	public const BUNDLED_FONT = 'gfpdf-arimo';
+
+	/**
+	 * Substitution-only: never offered as a document font
+	 *
+	 * @since 7.0
+	 */
+	public const BUNDLED_SYMBOLS = 'gfpdf-dejavu-symbols';
+
+	/**
+	 * The bundled font's four faces, which are also what a missing file is substituted with
+	 *
+	 * @since 7.0
+	 */
+	public const BUNDLED_FACES = [
+		'R'  => 'Arimo-Regular.ttf',
+		'B'  => 'Arimo-Bold.ttf',
+		'I'  => 'Arimo-Italic.ttf',
+		'BI' => 'Arimo-BoldItalic.ttf',
+	];
+
+	/**
+	 * The bundled map, before the installed rows overlay it
+	 *
+	 * Just Latin. This row is what sends Latin text inside a `zh` or `ar` document to Arimo rather than the pack
+	 * font's Latin glyphs. Latin-*language* rows are deliberately absent — an explicit `lang` attribute would flip
+	 * words out of the chosen font mid-paragraph — as are Greek, Cyrillic, Hebrew, Armenian and Georgian, which
+	 * mPDF happily scavenges per glyph from `backupSubsFont`.
+	 *
+	 * @since 7.0
+	 */
+	public const DEFAULT_LANGUAGE_MAP = [ 'und-latn' => self::BUNDLED_FONT ];
+
+	/**
+	 * "No font": leave whatever the document is already in alone
+	 *
+	 * Not a valid font key under `Font_Repository::KEY_PATTERN`, so it can never collide with one. It is both a
+	 * value an override may carry and the `language_map()` row's answer for a code no map routes, because the
+	 * settings screen has to draw "nothing routes this" as a choice an admin can make and unmake.
+	 *
+	 * @since 7.0
+	 */
+	public const LANGUAGE_NONE = '*';
+
+	/**
+	 * The shape of a language or script tag: `ja`, `zh-hant`, `und-arab`
+	 *
+	 * Deliberately not a list of the tags this plugin can name — `labels()` is the names it can *display*, and a
+	 * site writing in a language nobody has named yet still gets a map row and the OTL forms for it.
+	 *
+	 * @since 7.0
+	 */
+	public const TAG_PATTERN = '/^[a-z]{2,3}(-[a-z0-9]{2,4}){0,2}$/';
+
+	/**
+	 * Language or script tag => the document script it implies
+	 *
+	 * Anything not listed is Latin. Replaces mPDF's `mode`, which is a composite parser with a constructor font
+	 * lookup nothing may rely on.
+	 *
+	 * @since 7.0
+	 */
+	public const LANGUAGE_TO_SCRIPT = [
+		'ja' => Ucdn::SCRIPT_HAN,
+		'zh' => Ucdn::SCRIPT_HAN,
+		'ko' => Ucdn::SCRIPT_HANGUL,
+		'ar' => Ucdn::SCRIPT_ARABIC,
+		'fa' => Ucdn::SCRIPT_ARABIC,
+		'ur' => Ucdn::SCRIPT_ARABIC,
+		'ps' => Ucdn::SCRIPT_ARABIC,
+		'sd' => Ucdn::SCRIPT_ARABIC,
+		'hi' => Ucdn::SCRIPT_DEVANAGARI,
+		'mr' => Ucdn::SCRIPT_DEVANAGARI,
+		'ne' => Ucdn::SCRIPT_DEVANAGARI,
+		'th' => Ucdn::SCRIPT_THAI,
+		'he' => Ucdn::SCRIPT_HEBREW,
+	];
+
+	/**
+	 * A live entry whose phase has not moved for this long is worth re-dispatching
+	 *
+	 * Two of the poller's slowest intervals (§4.6 Store): long enough that a batch which simply has not been picked
+	 * up yet is never nudged, short enough that a dead loopback costs one poll rather than the five-minute
+	 * healthcheck.
+	 *
+	 * @since 7.0
+	 */
+	public const NUDGE_AFTER = 60;
+
+	/**
+	 * @var Font_Repository
+	 * @since 7.0
+	 */
+	protected $repository;
+
+	/**
+	 * @var Catalog_Repository
+	 * @since 7.0
+	 */
+	protected $catalog;
+
+	/**
+	 * @var Helper_Abstract_Options
+	 * @since 7.0
+	 */
+	protected $options;
+
+	/**
+	 * @var LoggerInterface
+	 * @since 7.0
+	 */
+	protected $log;
+
+	/**
+	 * @var string Absolute path to the plugin's bundled fonts directory
+	 * @since 7.0
+	 */
+	protected $bundled_dir;
+
+	/**
+	 * @var array{stamp: string, package: Package}|null The installed layer this request has already built
+	 * @since 7.0
+	 */
+	protected $memo;
+
+	/**
+	 * @var array{stamp: string, fonts: array}|null The grouped list this request has already built
+	 * @since 7.0
+	 */
+	protected $grouped;
+
+	/**
+	 * @var array{stamp: string, keys: array<string, true>}|null The registered keys this request has already built
+	 * @since 7.0
+	 */
+	protected $registered;
+
+	/**
+	 * @var array{stamp: string, map: array}|null The bundled-plus-installed map this request has already built
+	 * @since 7.0
+	 */
+	protected $languages;
+
+	public function __construct(
+		Font_Repository $repository,
+		Catalog_Repository $catalog,
+		Helper_Abstract_Options $options,
+		LoggerInterface $log,
+		string $bundled_dir
+	) {
+		$this->repository  = $repository;
+		$this->catalog     = $catalog;
+		$this->options     = $options;
+		$this->log         = $log;
+		$this->bundled_dir = trailingslashit( $bundled_dir );
+	}
+
+	/**
+	 * Whether a trigger may install fonts on its own
+	 *
+	 * The one conversion point for `auto_install_fonts`. It is stored `'Yes'`/`'No'` because a stored `false` would
+	 * be deleted by `update_option()` and resurrected by `get_option()`'s fallback, so the string form exists at the
+	 * storage boundary and nowhere else — every consumer deals in `true`/`false`. The constant locks the setting
+	 * (the UI disables it); the filter is the add-on hook and defers to a stored choice.
+	 *
+	 * @since 7.0
+	 */
+	public function auto_install_enabled(): bool {
+		if ( defined( 'GPDF_AUTO_INSTALL_FONTS' ) ) {
+			return (bool) GPDF_AUTO_INSTALL_FONTS;
+		}
+
+		return (bool) apply_filters( 'gfpdf_auto_install_fonts', $this->options->get_option( 'auto_install_fonts', 'Yes' ) === 'Yes' );
+	}
+
+	/**
+	 * Every mPDF config key that decides which font a run of text gets
+	 *
+	 * Kept here rather than inline in the caller because each key is load-bearing rather than a preference: the
+	 * registry decides how fonts resolve, so anything constructing mPDF takes this set whole and merges its own
+	 * per-document keys on top.
+	 *
+	 * @param LanguageToFontRegistry $language_to_font Handed in so the caller can keep adding to it after mPDF is built
+	 *
+	 * @since 7.0
+	 */
+	public function mpdf_font_config( LanguageToFontRegistry $language_to_font ): array {
+		return [
+			'fontRegistry'     => $this->build_font_registry(),
+			/* Left empty: each package layer appends its own directory, bundled first */
+			'fontDir'          => [],
+			'fontdata'         => apply_filters( 'mpdf_font_data', [] ),
+			'languageToFont'   => $language_to_font,
+
+			/*
+			 * A 7.0 requirement rather than a preference: mPDF never substitutes Arabic or Indic glyphs, so a lang
+			 * tag on the run is the only route to a font for those scripts, and this is what supplies the tag.
+			 */
+			'autoScriptToLang' => true,
+			/* No Latin-language rows in the map, so nothing flips words out of the chosen font mid-paragraph */
+			'autoVietnamese'   => false,
+			/* Arimo carries no legacy kern table, so GPOS kerning is its only route to it */
+			'useKerning'       => true,
+			'autoLangToFont'   => true,
+			'useSubstitutions' => true,
+		];
+	}
+
+	/**
+	 * The registry handed to mPDF as `fontRegistry`
+	 *
+	 * Installed is added first and bundled second, because `add()` prepends and mPDF reads the result in that
+	 * order: the bundled layer is read first, so its keys and its `backupSubsFont` entries sort ahead of the rows'.
+	 *
+	 * @since 7.0
+	 */
+	public function build_font_registry(): FontRegistry {
+		return new FontRegistry( [ $this->installed_package(), $this->bundled_package() ] );
+	}
+
+	/**
+	 * The fonts that ship inside the plugin
+	 *
+	 * A constant, not rows: they never toggle, never update and cannot be removed. The one exception is the alias
+	 * map, which is not a per-layer fact at all — see `font_aliases()`.
+	 *
+	 * @since 7.0
+	 */
+	public function bundled_package(): Package {
+		return new Package(
+			'gfpdf-bundled',
+			untrailingslashit( $this->bundled_dir ),
+			[
+				/* useOTL is load-bearing: the faces carry no legacy kern table, so GPOS is their only route to kerning */
+				static::BUNDLED_FONT    => static::BUNDLED_FACES + [
+					'useOTL'     => 0xFF,
+					'useKashida' => 0,
+				],
+				static::BUNDLED_SYMBOLS => [
+					'R'          => 'DejaVuSansSymbols.ttf',
+					'useOTL'     => 0,
+					'useKashida' => 0,
+				],
+			],
+			[ static::BUNDLED_FONT, static::BUNDLED_SYMBOLS ],
+			$this->generic_families(),
+			$this->font_aliases()
+		);
+	}
+
+	/**
+	 * The `fontFileFinder` mPDF resolves out of the container, in place of the one it would build itself
+	 *
+	 * @param object|null $inner A finder already in the container, which the returned one wraps rather than replaces
+	 *
+	 * @since 7.0
+	 */
+	public function font_file_finder( $inner = null ): Font_File_Finder {
+		return new Font_File_Finder( $this->repository, static::BUNDLED_FACES, $this->log, $inner );
+	}
+
+	/**
+	 * Every font row, whatever installed it
+	 *
+	 * Faces flagged `missing` are left out, so no fallback list ever names a file mPDF cannot load. Neither this
+	 * nor the bundled layer touches the disk.
+	 *
+	 * @since 7.0
+	 */
+	public function installed_package(): Package {
+		$last_changed = $this->repository->get_last_changed();
+
+		/*
+		 * One begin_pdf() reaches this through build_font_registry(), get_default_font() and the language map, and
+		 * a single PDF reaches it again through set_watermark_font() and the template styles. Building it once a
+		 * request matters most to queue and bulk jobs, which render many PDFs before the stamp can change.
+		 */
+		if ( $this->memo !== null && $this->memo['stamp'] === $last_changed ) {
+			return $this->memo['package'];
+		}
+
+		$rows = $this->rows();
+
+		$fonts        = [];
+		$backup_subs  = [];
+		$bmp          = [];
+		$substitution = [];
+		$dictionaries = [];
+
+		foreach ( $rows as $font_key => $row ) {
+			$faces = [];
+
+			foreach ( Font_Repository::FACE_ROLES as $role ) {
+				if ( isset( $row['files'][ $role ] ) && (int) $row['files'][ $role ]['missing'] === 0 ) {
+					$faces[ $role ] = $row['files'][ $role ]['path'];
+				}
+			}
+
+			/* A partially installed entry is a normal state, but a row with no readable face registers nothing */
+			if ( $faces === [] ) {
+				continue;
+			}
+
+			$faces['useOTL']     = (int) $row['use_otl'];
+			$faces['useKashida'] = (int) $row['use_kashida'];
+
+			$meta = $row['meta'];
+
+			if ( ! empty( $meta['sip_ext'] ) ) {
+				$faces['sip-ext'] = (string) $meta['sip_ext'];
+			}
+
+			$fonts[ $font_key ] = $faces;
+
+			if ( ! empty( $meta['backup_subs'] ) ) {
+				$backup_subs[] = $font_key;
+			}
+
+			if ( ! empty( $meta['bmp'] ) ) {
+				$bmp[] = $font_key;
+			}
+
+			foreach ( (array) ( $meta['family_substitution'] ?? [] ) as $family ) {
+				$substitution[ $family ][] = $font_key;
+			}
+
+			foreach ( $row['files'] as $role => $file ) {
+				if ( strpos( (string) $role, 'dict_' ) === 0 && (int) $file['missing'] === 0 ) {
+					$dictionaries[ substr( (string) $role, 5 ) ] = $this->repository->get_font_dir() . $file['path'];
+				}
+			}
+		}
+
+		$package = new Package(
+			'gfpdf-installed',
+			untrailingslashit( $this->repository->get_font_dir() ),
+			$fonts,
+			$backup_subs,
+			$substitution,
+			/* `font_aliases()` builds the one map both layers share */
+			[],
+			$bmp,
+			$dictionaries
+		);
+
+		$this->memo = [
+			'stamp'   => $last_changed,
+			'package' => $package,
+		];
+
+		return $package;
+	}
+
+	/**
+	 * The one effective language map, as mPDF consumes it
+	 *
+	 * @since 7.0
+	 */
+	public function language_to_font( array $adobe_cjk = [] ): Language_To_Font {
+		return new Language_To_Font( $this->effective_language_map( $adobe_cjk ) );
+	}
+
+	/**
+	 * mPDF's four Adobe CJK families, by the tags a detector emits for them
+	 *
+	 * The last-resort route for a CJK document whose pack has not landed: mPDF writes a non-embedded
+	 * `CIDFontType0` and the reader's own viewer supplies the glyphs, which beats a page of boxes in an emailed
+	 * PDF. Traditional Chinese is `big5` and everything else Han is `gb`, matching the pack split — Simplified is
+	 * where a Han run with no better signal belongs.
+	 *
+	 * @since 7.0
+	 */
+	public const ADOBE_CJK_MAP = [
+		'zh'       => 'gb',
+		'zh-cn'    => 'gb',
+		'und-hans' => 'gb',
+		'zh-hk'    => 'big5',
+		'zh-tw'    => 'big5',
+		'und-hant' => 'big5',
+		'ja'       => 'sjis',
+		'ko'       => 'uhc',
+		'und-hang' => 'uhc',
+	];
+
+	/**
+	 * The Adobe CJK rows for the tags a render could not resolve, if this document may have them
+	 *
+	 * Refused outright for PDF/A and PDF/X, where `AddCJKFont()` throws: those render with the bundled faces and
+	 * the miss already recorded on the entry's catalogue row. The format is read here rather than by the caller so
+	 * that deciding which families cover which tags stays in one place.
+	 *
+	 * @param string[] $scripts  What the render could not resolve
+	 * @param array    $settings The PDF's settings
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	public function adobe_cjk_overlay( array $scripts, array $settings = [] ): array {
+		if ( strtolower( (string) ( $settings['format'] ?? 'standard' ) ) !== 'standard' ) {
+			return [];
+		}
+
+		return array_intersect_key( static::ADOBE_CJK_MAP, array_flip( array_map( 'strtolower', $scripts ) ) );
+	}
+
+	/**
+	 * The bundled map overlaid by the installed rows
+	 *
+	 * Installed beats bundled for the same code; between installed entries the first row in precedence order wins.
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	public function default_language_map(): array {
+		/*
+		 * Memoised because three callers of one request build it — `effective_language_map()` on the render path,
+		 * and `language_map()` plus `prune_language_overrides()` on the settings route — and each build sorts
+		 * every installed row through `rows_by_precedence()`. The stamp is the repository's alone: this map reads
+		 * font rows and nothing else.
+		 */
+		$stamp = $this->repository->get_last_changed();
+
+		if ( $this->languages !== null && $this->languages['stamp'] === $stamp ) {
+			return $this->languages['map'];
+		}
+
+		$installed = [];
+
+		foreach ( $this->rows_by_precedence() as $font_key => $row ) {
+			foreach ( (array) ( $row['meta']['languages'] ?? [] ) as $code ) {
+				$code = strtolower( (string) $code );
+
+				if ( $code !== '' && ! isset( $installed[ $code ] ) ) {
+					$installed[ $code ] = $font_key;
+				}
+			}
+		}
+
+		$this->languages = [
+			'stamp' => $stamp,
+			'map'   => array_merge( static::DEFAULT_LANGUAGE_MAP, $installed ),
+		];
+
+		return $this->languages['map'];
+	}
+
+	/**
+	 * The rows ordered `[ legacy, generic, position, font_key ]`: every language-specific pack ahead of every
+	 * generic one, both ahead of everything a 6.x upgrade adopted off disk, each tier in the catalogue's order, and
+	 * the key as a stable tiebreak
+	 *
+	 * The legacy tier is last because an adopted font is what the site had, not what it asked for: installing the
+	 * Korean pack moves `ko` off its own UnBatang by the ordinary rule, with nothing to uninstall first.
+	 *
+	 * Not the order the rows arrive in. `Font_Repository::all()` reads them by the font table's auto-increment
+	 * `id`, which is the order this site happened to install them, so two sites holding the same two packs would
+	 * otherwise resolve a code both claim — `he` is claimed by `west-asian` and by `popular-sans` — differently.
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 7.0
+	 */
+	protected function rows_by_precedence(): array {
+		$rows = $this->rows();
+
+		/* `$rows` is captured before the sort, so the comparison always reads the unsorted copy */
+		uksort(
+			$rows,
+			static function ( $a, $b ) use ( $rows ) {
+				return static::precedence( $rows[ $a ], $a ) <=> static::precedence( $rows[ $b ], $b );
+			}
+		);
+
+		return $rows;
+	}
+
+	/**
+	 * One row's sort key, read from the `meta` its source wrote (`Font_Sources::coverage_meta()`, or
+	 * `Legacy_Font_Adopter` for the legacy tier)
+	 *
+	 * @return array{0: int, 1: int, 2: int, 3: string}
+	 *
+	 * @since 7.0
+	 */
+	protected static function precedence( array $row, string $font_key ): array {
+		$meta = (array) ( $row['meta'] ?? [] );
+
+		return [
+			empty( $meta['legacy'] ) ? 0 : 1,
+			empty( $meta['generic'] ) ? 0 : 1,
+			(int) ( $meta['position'] ?? 0 ),
+			$font_key,
+		];
+	}
+
+	/**
+	 * The default map with the Adobe CJK fallback and then the user's overrides applied
+	 *
+	 * `*` removes a code so the document font stands. An override naming a font that is not registered is dropped
+	 * rather than obeyed, or a since-deleted font would send the run into mPDF's substitution instead of the map.
+	 *
+	 * The fallback sits between the two because it is a stand-in, not a preference: an installed pack has already
+	 * been asked for by the time a caller passes one (the render only passes codes the map could not answer), and
+	 * an admin's own override still wins over a stand-in.
+	 *
+	 * @param array<string, string> $adobe_cjk Per request, from `adobe_cjk_overlay()`
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	public function effective_language_map( array $adobe_cjk = [] ): array {
+		$map       = array_merge( $this->default_language_map(), $adobe_cjk );
+		$overrides = $this->options->get_option( 'font_language_overrides', [] );
+
+		if ( ! is_array( $overrides ) ) {
+			return $map;
+		}
+
+		$registered = $this->registered_keys();
+
+		foreach ( $overrides as $code => $font_key ) {
+			$code = strtolower( (string) $code );
+
+			if ( $font_key === static::LANGUAGE_NONE ) {
+				unset( $map[ $code ] );
+				continue;
+			}
+
+			if ( isset( $registered[ $font_key ] ) ) {
+				$map[ $code ] = (string) $font_key;
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * The two maps as the settings screen reads them: one row per code, grouped by the font that answers for it
+	 *
+	 * Built on demand by `GET /fonts/settings` alone and never on the render path — it walks the catalogue for
+	 * labels, which the render must not. "Changed" is not a flag: it is `font !== default_font`, so there is one
+	 * fact rather than two that can disagree.
+	 *
+	 * Grouping is `get_grouped_fonts()`'s, keyed by the row's *default* font rather than its current one, so a code
+	 * moved to another font stays filed under the pack that claimed it and an admin can see what they changed it
+	 * from. Anything the default map does not route — an override-only row, and the codes a 6.x upgrade adopted
+	 * along with its own fonts — groups under "Other languages", which is also the only group whose rows can be
+	 * removed outright.
+	 *
+	 * @return array[] `[ { group, label, rows: [ { code, label, default_font, font } ] } ]`
+	 *
+	 * @since 7.0
+	 */
+	public function language_map(): array {
+		$default   = $this->default_language_map();
+		$effective = $this->effective_language_map();
+		$labels    = Language_To_Font::labels();
+		$fonts     = $this->get_grouped_fonts();
+
+		$owner  = [];
+		$groups = [
+			'bundled' => [
+				'group' => 'bundled',
+				/* translators: %s: the bundled font's name, e.g. Arimo */
+				'label' => sprintf( __( 'Bundled · %s', 'gravity-pdf' ), (string) ( $fonts['bundled'][0]['label'] ?? '' ) ),
+				'rows'  => [],
+			],
+		];
+
+		foreach ( $fonts['bundled'] as $font ) {
+			$owner[ $font['id'] ] = 'bundled';
+		}
+
+		foreach ( $fonts['groups'] as $group ) {
+			$id = Font_Sources::join( (string) $group['source'], (string) $group['entry'] );
+
+			$groups[ $id ] = [
+				'group' => $id,
+				'label' => (string) $group['label'],
+				'rows'  => [],
+			];
+
+			foreach ( $group['fonts'] as $font ) {
+				$owner[ $font['id'] ] = $id;
+			}
+		}
+
+		$groups['other'] = [
+			'group' => 'other',
+			'label' => __( 'Other languages', 'gravity-pdf' ),
+			'rows'  => [],
+		];
+
+		foreach ( array_keys( $default + $effective ) as $code ) {
+			$code     = (string) $code;
+			$fallback = $default[ $code ] ?? static::LANGUAGE_NONE;
+
+			$groups[ $owner[ $fallback ] ?? 'other' ]['rows'][] = [
+				'code'         => $code,
+				'label'        => $labels[ $code ] ?? $code,
+				'default_font' => $fallback,
+				'font'         => $effective[ $code ] ?? static::LANGUAGE_NONE,
+			];
+		}
+
+		$map = [];
+
+		foreach ( $groups as $group ) {
+			if ( $group['rows'] === [] ) {
+				continue;
+			}
+
+			/* The codes arrive in whatever order the entries listed them, which is no order at all to read in */
+			usort(
+				$group['rows'],
+				static function ( array $a, array $b ): int {
+					return strcmp( $a['label'], $b['label'] );
+				}
+			);
+
+			$map[] = $group;
+		}
+
+		return $map;
+	}
+
+	/**
+	 * What a script name resolves to in mPDF, or null when nothing does
+	 *
+	 * The one owner of the `document_script` vocabulary. It is stored as the bare name, `LATIN`, because that is
+	 * what an admin picks from a list — `SCRIPT_` is mPDF's spelling, not theirs — but either spelling resolves,
+	 * since the option is reachable by WP-CLI and by an add-on calling `GPDFAPI::update_plugin_option()`, neither
+	 * of which passes the route that canonicalises it.
+	 *
+	 * @since 7.0
+	 */
+	public static function script_constant( string $name ): ?int {
+		$name = 'SCRIPT_' . preg_replace( '/^SCRIPT_/', '', strtoupper( trim( $name ) ) );
+
+		return defined( Ucdn::class . '::' . $name ) ? (int) constant( Ucdn::class . '::' . $name ) : null;
+	}
+
+	/**
+	 * The script names a document may be declared to be in, most common first
+	 *
+	 * Sent to the Font Manager by `GET /fonts/settings` rather than spelled again in the client: mPDF defines
+	 * around a hundred scripts and this is the shortlist worth offering, which is a judgement, not a constant of
+	 * the library — so it belongs on one side of the wire only.
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	public static function scripts(): array {
+		return [
+			'LATIN',
+			'GREEK',
+			'CYRILLIC',
+			'ARABIC',
+			'HEBREW',
+			'DEVANAGARI',
+			'BENGALI',
+			'THAI',
+			'HAN',
+			'HIRAGANA',
+			'KATAKANA',
+			'HANGUL',
+		];
+	}
+
+	/**
+	 * The overrides worth storing: the ones that change what the default map already says
+	 *
+	 * `effective_language_map()`'s write-side counterpart, and deliberately next to it — the read side obeys every
+	 * override it can, this side stores only the ones that do something, and the two share what "can" means
+	 * through `registered_keys()`. Here rather than on the route that posts them because an override map is a fact
+	 * about the language map: the upgrade routine, a repair pass and WP-CLI all have to be able to write one
+	 * without restating the rule.
+	 *
+	 * An override naming a font this site has not registered is dropped, so a since-deleted font falls through to
+	 * the default rather than being obeyed into mPDF's substitution. `LANGUAGE_NONE` survives that test, since its
+	 * whole job is to name no font — but only where it removes something, because asking for the state a code is
+	 * already in is not a setting.
+	 *
+	 * @return array<string, string> Lowercased code => font key
+	 *
+	 * @since 7.0
+	 */
+	public function prune_language_overrides( array $overrides ): array {
+		$default    = $this->default_language_map();
+		$registered = $this->registered_keys();
+		$pruned     = [];
+
+		foreach ( $overrides as $code => $font_key ) {
+			$code     = strtolower( trim( (string) $code ) );
+			$font_key = (string) $font_key;
+
+			if ( preg_match( static::TAG_PATTERN, $code ) !== 1 ) {
+				continue;
+			}
+
+			if ( $font_key !== static::LANGUAGE_NONE && ! isset( $registered[ $font_key ] ) ) {
+				continue;
+			}
+
+			if ( $font_key === ( $default[ $code ] ?? static::LANGUAGE_NONE ) ) {
+				continue;
+			}
+
+			$pruned[ $code ] = $font_key;
+		}
+
+		return $pruned;
+	}
+
+	/**
+	 * The font a PDF renders in
+	 *
+	 * Validated against what is actually registered, never derived from a list position: a saved font that is no
+	 * longer installed falls back rather than rendering as whatever happened to register first.
+	 *
+	 * @param array $settings The PDF's settings
+	 *
+	 * @since 7.0
+	 */
+	public function get_default_font( array $settings = [] ): string {
+		$registered = $this->registered_keys();
+
+		foreach ( [ static::setting( $settings, 'font' ), $this->options->get_option( 'default_font', '' ) ] as $candidate ) {
+			$candidate = (string) $candidate;
+
+			if ( $candidate === '' ) {
+				continue;
+			}
+
+			if ( isset( $registered[ $candidate ] ) ) {
+				return $candidate;
+			}
+
+			$this->log->warning( 'The selected font is not installed, falling back to the bundled font', [ 'font' => $candidate ] );
+		}
+
+		/* Nothing was ever chosen: let the language map answer for the document's language before giving up */
+		$mapped = $this->language_to_font()->getLanguageOptions( $this->get_default_language(), false );
+
+		return $mapped !== '' && isset( $registered[ $mapped ] ) ? $mapped : static::BUNDLED_FONT;
+	}
+
+	/**
+	 * The site-wide document language, from the setting or the WordPress locale
+	 *
+	 * @since 7.0
+	 */
+	public function get_default_language(): string {
+		$saved = (string) $this->options->get_option( 'default_pdf_language', '' );
+
+		return $saved !== '' ? $saved : Language_To_Font::locale_to_language( get_locale() );
+	}
+
+	/**
+	 * The language a given PDF renders in
+	 *
+	 * @since 7.0
+	 */
+	public function get_document_language( array $settings = [] ): string {
+		$per_pdf = static::setting( $settings, 'pdf_language' );
+
+		return $per_pdf !== '' ? $per_pdf : $this->get_default_language();
+	}
+
+	/**
+	 * One PDF setting, or `''` where it is anything but a string
+	 *
+	 * A PDF's settings array reaches these readers straight off the save, where an unanswered `select` is written
+	 * as `[]` rather than `''` (`Model_Form_Settings::settings_sanitize()`), and both of the keys read here are
+	 * selects. Casting an array to a string is a warning and a nonsense value; "not set" is what it means.
+	 *
+	 * Public because `Coverage_Resolver` reads `font` raw — it wants the key the admin asked for, not the one
+	 * `get_default_font()` would fall back to — and needs the same tolerance to do it.
+	 *
+	 * @since 7.0
+	 */
+	public static function setting( array $settings, string $key ): string {
+		$value = $settings[ $key ] ?? '';
+
+		return is_string( $value ) ? $value : '';
+	}
+
+	/**
+	 * The document's base script, as `baseScript`
+	 *
+	 * Runs in this script are never tagged and inherit the document language, so the chosen font stands and OTL
+	 * `locl` picks that language's forms in fonts that carry them.
+	 *
+	 * @since 7.0
+	 */
+	public function get_document_script( array $settings = [] ): int {
+		$override = static::script_constant( (string) $this->options->get_option( 'document_script', '' ) );
+
+		if ( $override !== null ) {
+			return $override;
+		}
+
+		$language = strtolower( $this->get_document_language( $settings ) );
+		$primary  = explode( '-', $language )[0];
+
+		return static::LANGUAGE_TO_SCRIPT[ $primary ] ?? Ucdn::SCRIPT_LATIN;
+	}
+
+	/**
+	 * Every font key a PDF may name, grouped for the settings dropdown and the Font Manager
+	 *
+	 * Three groups, in the order both surfaces draw them: the bundled faces, one group per installed coverage
+	 * entry in the catalogue's `position` order, and everything else — uploads, imports and catalogue display
+	 * families, which an admin thinks about the same way. `GET /fonts/` adds two fields of its own on top of this
+	 * (§4.7) and the dropdown flattens it, so a label or an order can only be wrong in one place.
+	 *
+	 * @return array{bundled: array[], groups: array[], custom: array[]}
+	 *
+	 * @since 7.0
+	 */
+	public function get_grouped_fonts(): array {
+		$stamp = $this->repository->get_last_changed() . '|' . $this->catalog->get_last_changed();
+
+		if ( $this->grouped !== null && $this->grouped['stamp'] === $stamp ) {
+			return $this->grouped['fonts'];
+		}
+
+		$entries = [];
+		$custom  = [];
+
+		foreach ( $this->rows() as $font_key => $row ) {
+			$entry = (string) ( $row['entry'] ?? '' );
+			$font  = $this->font_object( $font_key, $row );
+
+			if ( (int) $row['coverage'] === 1 && $entry !== '' ) {
+				$entries[ Font_Sources::join( (string) $row['source'], (string) $entry ) ][] = $font;
+				continue;
+			}
+
+			$custom[] = $font;
+		}
+
+		$fonts = [
+			'bundled' => $this->bundled_fonts(),
+			'groups'  => $this->coverage_groups( $entries ),
+			'custom'  => $custom,
+		];
+
+		$this->grouped = [
+			'stamp' => $stamp,
+			'fonts' => $fonts,
+		];
+
+		return $fonts;
+	}
+
+	/**
+	 * One font row, as the routes emit it
+	 *
+	 * The shape `GET /fonts/` lists, for the routes that write a single row and have to hand the store something
+	 * it can merge into that list.
+	 *
+	 * @since 7.0
+	 */
+	public function get_font( string $font_key ): ?array {
+		$row = $this->rows()[ $font_key ] ?? null;
+
+		return $row === null ? null : $this->font_object( $font_key, $row );
+	}
+
+	/**
+	 * Every `always` entry the site has no rows for
+	 *
+	 * What the Bundled detail's notice lists (§4.6). An `always` entry with no rows is either one the admin
+	 * declined or one an install never finished, and neither is an error — the panel offers it rather than
+	 * reporting it.
+	 *
+	 * @return array[] `{ source, entry, label, size }`, in catalogue order
+	 *
+	 * @since 7.0
+	 */
+	public function missing_always_entries(): array {
+		$installed = $this->entry_rows();
+		$missing   = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$id = Install_Requests::entry_id( $row );
+
+			if ( (int) $row['always'] !== 1 || isset( $installed[ $id ] ) ) {
+				continue;
+			}
+
+			$missing[] = [
+				'source' => (string) $row['source'],
+				'entry'  => (string) $row['entry'],
+				'label'  => Font_Sources::translate_entry( (string) $row['source'], (string) $row['entry'], 'label', (string) $row['label'] ),
+				'size'   => (int) $row['size'],
+			];
+		}
+
+		return $missing;
+	}
+
+	/**
+	 * One group per installed coverage entry, catalogue order first
+	 *
+	 * @param array<string, array[]> $entries Font objects keyed by `{source}/{entry}`
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	protected function coverage_groups( array $entries ): array {
+		$groups = [];
+
+		foreach ( $this->catalog->coverage_entries() as $row ) {
+			$id = Install_Requests::entry_id( $row );
+
+			if ( ! isset( $entries[ $id ] ) ) {
+				continue;
+			}
+
+			$groups[] = [
+				'label'   => Font_Sources::translate_entry( (string) $row['source'], (string) $row['entry'], 'label', (string) $row['label'] ),
+				'source'  => (string) $row['source'],
+				'entry'   => (string) $row['entry'],
+				'files'   => (int) $row['files'],
+				'scripts' => (string) ( $row['scripts'] ?? '' ),
+				'fonts'   => $entries[ $id ],
+			];
+
+			unset( $entries[ $id ] );
+		}
+
+		/* A pack the catalogue has dropped still renders the PDFs that name it, so it keeps its group */
+		foreach ( $entries as $fonts ) {
+			$groups[] = [
+				'label'   => (string) $fonts[0]['label'],
+				'source'  => (string) $fonts[0]['source'],
+				'entry'   => (string) $fonts[0]['entry'],
+				'files'   => count( Font_Repository::paths_for_rows( $fonts ) ),
+				'scripts' => '',
+				'fonts'   => $fonts,
+			];
+		}
+
+		return $groups;
+	}
+
+	/**
+	 * The bundled faces, shaped like rows without being any
+	 *
+	 * Their URLs are plugin-directory URLs (§4.2): the files ship with the plugin, so a preview of them never
+	 * depends on the fonts directory being web-reachable.
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	protected function bundled_fonts(): array {
+		$base  = plugin_dir_url( $this->bundled_dir . 'index.php' );
+		$files = [];
+
+		foreach ( static::BUNDLED_FACES as $role => $name ) {
+			$path = $this->bundled_dir . $name;
+
+			$files[ $role ] = [
+				'role'    => $role,
+				'variant' => null,
+				'path'    => $name,
+				'url'     => $base . $name,
+				'size'    => is_file( $path ) ? (int) filesize( $path ) : 0,
+				'missing' => 0,
+			];
+		}
+
+		return [
+			[
+				'id'          => static::BUNDLED_FONT,
+				'label'       => 'Arimo',
+				'source'      => 'bundled',
+				'entry'       => null,
+				'coverage'    => 0,
+				'version'     => null,
+				'enabled'     => true,
+				'description' => __( 'Ships with Gravity PDF and covers Latin, Greek, Cyrillic and Hebrew. Metric-compatible with Arial, so a template written for Arial keeps its line breaks.', 'gravity-pdf' ),
+				'files'       => $files,
+			],
+		];
+	}
+
+	/**
+	 * One font row as both surfaces read it
+	 *
+	 * `sha256` is left behind: it is how the installer decides whether to re-fetch a file, and nothing the browser
+	 * does with a font needs it.
+	 *
+	 * @since 7.0
+	 */
+	protected function font_object( string $font_key, array $row ): array {
+		$base  = $this->repository->get_font_dir_url();
+		$files = [];
+
+		foreach ( (array) $row['files'] as $role => $file ) {
+			$path    = (string) $file['path'];
+			$missing = (int) ( $file['missing'] ?? 0 );
+
+			$files[ $role ] = [
+				'role'    => (string) $role,
+				'variant' => $file['variant'] ?? null,
+				'path'    => $path,
+				'url'     => $base === null || $missing === 1 ? null : $base . $path,
+				'size'    => (int) $file['size'],
+				'missing' => $missing,
+			];
+		}
+
+		return [
+			'id'       => $font_key,
+			'label'    => (string) $row['label'],
+			'source'   => (string) $row['source'],
+			'entry'    => $row['entry'],
+			'coverage' => (int) $row['coverage'],
+			'version'  => $row['version'],
+			'enabled'  => (bool) ( $row['enabled'] ?? true ),
+			'files'    => $files,
+		];
+	}
+
+	/**
+	 * The install status of every entry the Font Manager can show progress for
+	 *
+	 * One object per `{source}/{entry}` that has font rows or a phase — installed entries, entries mid-install, and
+	 * entries a failure left behind. Font rows and catalog rows only: no route, poll or health check may make this
+	 * fetch anything.
+	 *
+	 * The queue is a parameter rather than a constructor dependency because it depends on this class in turn (for
+	 * the auto-install gate), and a container cannot build a cycle.
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_statuses( Install_Queue $queue, bool $nudge = false ): array {
+		$entries = $this->entry_rows();
+		$catalog = $this->catalog->status_rows( array_keys( $entries ) );
+
+		$ids = array_keys( $entries + $catalog );
+		sort( $ids );
+
+		$running  = $queue->is_running();
+		$stalled  = false;
+		$statuses = [];
+
+		foreach ( $ids as $id ) {
+			$row             = $catalog[ $id ] ?? null;
+			$statuses[ $id ] = $this->status_object( $entries[ $id ] ?? [], $row, $running );
+			$stalled         = $stalled || $this->stalled_for( $row, static::NUDGE_AFTER );
+		}
+
+		/*
+		 * Before the poller gives up on it: a batch nothing has picked up is usually one dispatch away from moving.
+		 * Asked for rather than done, because the same statuses are read by the System Report, which promises not
+		 * to change the site it is describing.
+		 */
+		if ( $nudge && ! $running && $stalled ) {
+			$queue->nudge();
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * One entry's status object
+	 *
+	 * @param string $id `{source}/{entry}`
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	public function get_install_status( string $id, Install_Queue $queue ): array {
+		$statuses = $this->get_install_statuses( $queue );
+
+		return $statuses[ $id ] ?? $this->status_object( [], null, false );
+	}
+
+	/**
+	 * The font rows of every entry that has them, keyed by `{source}/{entry}`
+	 *
+	 * Rows a site has hidden are kept: the toggle is visibility, not installation (§4.11).
+	 *
+	 * @return array<string, array[]>
+	 *
+	 * @since 7.0
+	 */
+	protected function entry_rows(): array {
+		$entries = [];
+
+		foreach ( $this->rows() as $row ) {
+			$entry = (string) ( $row['entry'] ?? '' );
+
+			if ( $entry === '' ) {
+				continue;
+			}
+
+			$entries[ Font_Sources::join( (string) $row['source'], (string) $entry ) ][] = $row;
+		}
+
+		return $entries;
+	}
+
+	/**
+	 * Compose one status object from the rows behind it
+	 *
+	 * @param array[]    $rows    The entry's font rows
+	 * @param array|null $catalog The entry's catalog row, when it still has one
+	 * @param bool       $running Whether the install queue is processing a batch right now
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	protected function status_object( array $rows, ?array $catalog, bool $running ): array {
+		$paths = Font_Repository::paths_for_rows( $rows );
+
+		$phase  = $catalog === null ? '' : (string) $catalog['phase'];
+		$status = [
+			'phase'            => $phase === '' ? null : $phase,
+			'files_done'       => count( $paths ),
+			'installed'        => $rows !== [],
+			'update_available' => false,
+		];
+
+		foreach ( [ 'error', 'retry_after' ] as $field ) {
+			if ( $catalog !== null && (string) $catalog[ $field ] !== '' ) {
+				$status[ $field ] = (string) $catalog[ $field ];
+			}
+		}
+
+		if ( ! $running && $this->stalled_for( $catalog, Install_Queue::STALLED_AFTER ) ) {
+			$status['stuck'] = true;
+		}
+
+		$update = $this->pending_update( $rows, $catalog );
+
+		if ( $update !== null ) {
+			$status['update_available'] = true;
+			$status['update']           = $update;
+		}
+
+		return $status;
+	}
+
+	/**
+	 * What the Updates screen shows for this entry, or null when it is current
+	 *
+	 * A column comparison, never a fetch: the sync writes the catalogue's version and the installer copies the
+	 * version it installed onto every row, so a difference between them is the whole test.
+	 *
+	 * @return array|null
+	 *
+	 * @since 7.0
+	 */
+	protected function pending_update( array $rows, ?array $catalog ): ?array {
+		$version = $catalog === null ? '' : (string) $catalog['version'];
+
+		if ( $rows === [] || $version === '' ) {
+			return null;
+		}
+
+		$installed = null;
+
+		foreach ( $rows as $row ) {
+			if ( (string) ( $row['version'] ?? '' ) !== $version ) {
+				$installed = (string) ( $row['version'] ?? '' );
+				break;
+			}
+		}
+
+		if ( $installed === null ) {
+			return null;
+		}
+
+		return [
+			'installed_version' => $installed,
+			'version'           => $version,
+			'notes'             => $catalog['notes'],
+			'released'          => $catalog['released'],
+			'files'             => (int) $catalog['files'],
+			'size'              => (int) $catalog['size'],
+		];
+	}
+
+	/**
+	 * Whether an entry has been in a live phase, unchanged, for longer than `$seconds`
+	 *
+	 * `phase_since` is written in UTC by every phase transition, so this never reads the site's timezone.
+	 *
+	 * @since 7.0
+	 */
+	protected function stalled_for( ?array $catalog, int $seconds ): bool {
+		if ( $catalog === null || ! in_array( (string) $catalog['phase'], Catalog_Repository::LIVE_PHASES, true ) ) {
+			return false;
+		}
+
+		$since = $catalog['phase_since'];
+
+		return $since !== null && (int) strtotime( $since . ' UTC' ) < time() - $seconds;
+	}
+
+	/**
+	 * Whether a font key would resolve to something at render time
+	 *
+	 * The public half of `registered_keys()`, for the health check that asks about a saved setting rather than
+	 * about a row: a font whose only face is flagged missing is not registered, however present its row is.
+	 *
+	 * @since 7.0
+	 */
+	public function is_registered( string $font_key ): bool {
+		return isset( $this->registered_keys()[ $font_key ] );
+	}
+
+	/**
+	 * Every key mPDF will have registered, bundled included
+	 *
+	 * @return array<string, true>
+	 *
+	 * @since 7.0
+	 */
+	protected function registered_keys(): array {
+		/*
+		 * Memoised like the maps beside it: `get_default_font()` reaches this three times per PDF and
+		 * `effective_language_map()` twice more, each walking every row across all four roles.
+		 */
+		$stamp = $this->repository->get_last_changed();
+
+		if ( $this->registered !== null && $this->registered['stamp'] === $stamp ) {
+			return $this->registered['keys'];
+		}
+
+		$keys = [
+			static::BUNDLED_FONT    => true,
+			static::BUNDLED_SYMBOLS => true,
+		];
+
+		/* Read from the rows rather than the built layer: the fallback arrays it also assembles are not needed here */
+		foreach ( $this->rows() as $font_key => $row ) {
+			foreach ( Font_Repository::FACE_ROLES as $role ) {
+				if ( isset( $row['files'][ $role ] ) && (int) $row['files'][ $role ]['missing'] === 0 ) {
+					$keys[ $font_key ] = true;
+					break;
+				}
+			}
+		}
+
+		$this->registered = [
+			'stamp' => $stamp,
+			'keys'  => $keys,
+		];
+
+		return $keys;
+	}
+
+	/**
+	 * The rows, read once per request
+	 *
+	 * @since 7.0
+	 */
+	protected function rows(): array {
+		return $this->repository->all();
+	}
+
+	/**
+	 * The canonical generic-family lists
+	 *
+	 * mPDF walks these for the first *available* key, so `sans` is always Arimo, and `serif` / `mono` become a real
+	 * serif or monospace as soon as a pack carrying one is installed. Rows and config append after these; nothing
+	 * prepends.
+	 *
+	 * @since 7.0
+	 */
+	protected function generic_families(): array {
+		return [
+			'sans_fonts'  => [
+				static::BUNDLED_FONT,
+				'sans',
+				'sans-serif',
+				'cursive',
+				'fantasy',
+				'dejavusanscondensed',
+				'dejavusans',
+				'freesans',
+				'xbriyaz',
+				'garuda',
+				'arial',
+				'helvetica',
+				'liberationsans',
+			],
+			'serif_fonts' => [
+				'serif',
+				'tinos',
+				'times',
+				'timesnewroman',
+				'dejavuserifcondensed',
+				'dejavuserif',
+				'freeserif',
+				static::BUNDLED_FONT,
+			],
+			'mono_fonts'  => [
+				'mono',
+				'monospace',
+				'cousine',
+				'courier',
+				'couriernew',
+				'dejavusansmono',
+				'freemono',
+				'ocrb',
+				static::BUNDLED_FONT,
+			],
+		];
+	}
+
+	/**
+	 * Every name a document may ask for that is not itself a font, mapped to the font that answers
+	 *
+	 * `arial` and `helvetica` resolve to the bundled font because Arimo is metric-compatible with Arial, so
+	 * templates written against those families keep their layout. The rest the rows claim for themselves out of
+	 * `meta.aliases`: 6.x's `fonttrans` entries, carried by the upgrade with the fonts they name (`ocr-b` →
+	 * `ocrb`, `damase` → `mph2bdamase`), and a source's own renames, so a font key that changed keeps answering
+	 * to the name it was published under.
+	 *
+	 * Not a per-layer concern, the way `Package::getLanguageToFont()` is not: mPDF merges every package's map
+	 * into one `fonttrans` at construction, so which layer carries it is arbitrary — but one list has to see
+	 * every row, because that is what enforces the rule below. It rides on the bundled layer for want of a
+	 * better home, and the installed one is handed `[]`.
+	 *
+	 * Every alias defers to a real font: an upload or import may claim any of these keys, and then it wins.
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	protected function font_aliases(): array {
+		$rows    = $this->rows();
+		$aliases = [
+			'arial'     => static::BUNDLED_FONT,
+			'helvetica' => static::BUNDLED_FONT,
+		];
+
+		foreach ( $rows as $font_key => $row ) {
+			foreach ( (array) ( $row['meta']['aliases'] ?? [] ) as $alias ) {
+				$aliases[ strtolower( (string) $alias ) ] = $font_key;
+			}
+		}
+
+		return array_diff_key( $aliases, $rows );
+	}
+}

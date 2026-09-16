@@ -1,11 +1,6 @@
 /* Dependencies */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-/* Redux actions */
-import { clearAddFontMsg } from '../../actions/fontManager';
-/* Utilities */
-import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
 /**
  * @package     Gravity PDF
@@ -26,12 +21,8 @@ export class CloseDialog extends Component {
 	 * @since 6.0
 	 */
 	static propTypes = {
-		id: PropTypes.string,
 		closeRoute: PropTypes.string,
-		clearAddFontMsg: PropTypes.func.isRequired,
-		msg: PropTypes.object.isRequired,
 		navigate: PropTypes.func.isRequired,
-		pathname: PropTypes.string.isRequired,
 	};
 
 	/**
@@ -61,25 +52,6 @@ export class CloseDialog extends Component {
 	 * @since 6.0
 	 */
 	handleKeyPress = (e) => {
-		const {
-			id,
-			navigate,
-			pathname,
-			clearAddFontMsg: clear,
-			msg: { success, error },
-		} = this.props;
-
-		/* Close font manager 'Update Font' column first */
-		if (e.key === 'Escape' && id) {
-			/* Remove previous msg */
-			if ((success && success.addFont) || (error && error.addFont)) {
-				clear();
-			}
-
-			return toggleUpdateFont(navigate, '', pathname);
-		}
-
-		/* Close modal */
 		if (
 			e.key === 'Escape' &&
 			(e.target.className !== 'wp-filter-search' || e.target.value === '')
@@ -118,28 +90,4 @@ export class CloseDialog extends Component {
 	}
 }
 
-/**
- * Map redux state to props
- *
- * @param { Object } state
- * @param { Object } state.template
- * @param { Object } state.fontManager
- *
- * @return {{
- *  msg: object
- * }} Redux data
- *
- * @since 6.0
- */
-const mapStateToProps = (state) => ({
-	msg: state.fontManager.msg,
-});
-
-/**
- * Connect and dispatch redux actions as props
- *
- * @since 6.0
- */
-export default connect(mapStateToProps, {
-	clearAddFontMsg,
-})(CloseDialog);
+export default CloseDialog;

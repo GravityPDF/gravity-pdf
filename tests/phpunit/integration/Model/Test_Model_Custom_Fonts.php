@@ -30,15 +30,22 @@ class Test_Model_Custom_Fonts extends TestCase {
 	public $model;
 
 	public function set_up(): void {
+		global $gfpdf;
 
 		parent::set_up();
 
-		$this->model = new Model_Custom_Fonts( GPDFAPI::get_options_class() );
+		$this->model = new Model_Custom_Fonts( $gfpdf->get_font_repository() );
 	}
 
 	public function tear_down(): void {
+		global $gfpdf;
+
 		$options = GPDFAPI::get_options_class();
 		$options->update_option( 'custom_fonts', [] );
+
+		foreach ( array_keys( $gfpdf->get_font_repository()->all() ) as $font_key ) {
+			$gfpdf->get_font_repository()->delete( $font_key, false );
+		}
 
 		parent::tear_down();
 	}
@@ -122,25 +129,25 @@ class Test_Model_Custom_Fonts extends TestCase {
 		$this->model->add_font(
 			[
 				'id'   => 'font1',
-				'name' => 'Font',
+				'font_name' => 'Font',
 			]
 		);
 
 		$font = $this->model->get_font_by_id( 'font1' );
-		$this->assertSame( 'Font', $font['name'] );
+		$this->assertSame( 'Font', $font['font_name'] );
 
-		$font['name'] = 'New Font';
+		$font['font_name'] = 'New Font';
 
 		$this->model->update_font( $font );
 		$font = $this->model->get_font_by_id( 'font1' );
-		$this->assertSame( 'New Font', $font['name'] );
+		$this->assertSame( 'New Font', $font['font_name'] );
 	}
 
 	public function test_delete_font_success() {
 		$this->model->add_font(
 			[
 				'id'   => 'font1',
-				'name' => 'Font',
+				'font_name' => 'Font',
 			]
 		);
 
@@ -161,7 +168,7 @@ class Test_Model_Custom_Fonts extends TestCase {
 		$this->assertSame( 'myuniqueid', $this->model->get_unique_id( 'myuniqueid' ) );
 		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'arial' ), $this->model->get_unique_id( 'arial' ) );
 		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'symbol' ), $this->model->get_unique_id( 'symbol' ) );
-		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'dejavusans' ), $this->model->get_unique_id( 'dejavusans' ) );
+		$this->assertMatchesRegularExpression( sprintf( '/%s([0-9]{5})/', 'gfpdf-arimo' ), $this->model->get_unique_id( 'gfpdf-arimo' ) );
 
 		$this->assertSame( 'font1', $this->model->get_unique_id( 'font1' ) );
 		$this->model->add_font(
@@ -188,7 +195,7 @@ class Test_Model_Custom_Fonts extends TestCase {
 			[ false, 'times' ],
 			[ false, 'ctimes' ],
 			[ false, 'chelvetica' ],
-			[ false, 'dejavusans' ],
+			[ false, 'gfpdf-arimo' ],
 			[ true, 'dejavusans1' ],
 		];
 	}

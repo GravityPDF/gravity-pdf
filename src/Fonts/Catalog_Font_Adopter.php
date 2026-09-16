@@ -1,0 +1,258 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace GFPDF\Fonts;
+
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
+
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
+/* Exit if accessed directly */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Turns a coverage entry's files that are already on disk into installed rows
+ *
+ * Two things reach this: a site that ran the 6.x core font installer, and a site where someone placed a pack's
+ * files by hand — the offline install path, and why the shipped seed index matters. The installer itself has no
+ * "already on disk" branch; this is that branch, in one place, for every source.
+ *
+ * Sibling of `Legacy_Font_Adopter`, and deliberately **not** a `Font_Population_Pass`: those run once per site
+ * inside `ensure_ready()`, gated on the schema version, while this runs after every sync that replaces a source
+ * carrying coverage entries and is expected to find nothing most times.
+ *
+ * @package GFPDF\Fonts
+ *
+ * @since 7.0
+ */
+class Catalog_Font_Adopter {
+
+	/**
+	 * @var Font_Repository
+	 * @since 7.0
+	 */
+	protected $repository;
+
+	/**
+	 * @var Catalog_Repository
+	 * @since 7.0
+	 */
+	protected $catalog;
+
+	/**
+	 * @var Font_Downloader
+	 * @since 7.0
+	 */
+	protected $downloader;
+
+	/**
+	 * @var Font_Cache_Warmer
+	 * @since 7.0
+	 */
+	protected $warmer;
+
+	/**
+	 * @var LoggerInterface
+	 * @since 7.0
+	 */
+	protected $log;
+
+	/**
+	 * @var string
+	 * @since 7.0
+	 */
+	protected $font_dir;
+
+	public function __construct( Font_Repository $repository, Catalog_Repository $catalog, Font_Downloader $downloader, Font_Cache_Warmer $warmer, LoggerInterface $log ) {
+		$this->repository = $repository;
+		$this->catalog    = $catalog;
+		$this->downloader = $downloader;
+		$this->warmer     = $warmer;
+		$this->log        = $log;
+		$this->font_dir   = $repository->get_font_dir();
+	}
+
+	/**
+	 * Adopt every verified file one source's coverage entries list
+	 *
+	 * Every candidate is verified — size first, then sha256 against the entry, then whether mPDF reads the faces
+	 * at all — before the key is kept, so a row never claims a hash the disk does not have nor a font that cannot
+	 * render. A file that fails is left alone and a real install downloads it fresh. Idempotent: a matched file
+	 * gains a row and a file with a row is skipped, so nothing is hashed twice across runs and a second call
+	 * inserts nothing.
+	 *
+	 * The hash proves the bytes are the ones the source published; it cannot prove they are a font this build of
+	 * mPDF parses. Byte-perfect faces that throw are exactly what a font-pipeline change ships, so the two checks
+	 * answer different questions and adoption needs both — otherwise it is the one way into the font tables that
+	 * skips the check every install makes.
+	 *
+	 * @return int How many font rows were created
+	 *
+	 * @since 7.0
+	 */
+	public function run( string $source ): int {
+		$this->repository->ensure_ready();
+
+		$claimed = $this->repository->claimed_filenames();
+		$taken   = array_flip( array_keys( $this->repository->all() ) );
+		$created = 0;
+		$failed  = [];
+
+		foreach ( $this->catalog->coverage_entries_for_adoption( $source ) as $row ) {
+			$created += $this->adopt_entry( $row, $claimed, $taken, $failed );
+		}
+
+		if ( $created > 0 || $failed !== [] ) {
+			$this->log->notice(
+				'Adopted font files already on disk',
+				[
+					'source'       => $source,
+					'adopted'      => $created,
+					'failed_check' => $failed,
+				]
+			);
+		}
+
+		return $created;
+	}
+
+	/**
+	 * Adopt every font key of one entry whose faces are present and verified
+	 *
+	 * @param array               $row     A catalog row carrying its decoded `data`
+	 * @param array<string, true> $claimed Filenames some file row already records
+	 * @param array<string, true> $taken   Font keys already in use, kept current in memory because each insert
+	 *                                     flushes the cache the answer would otherwise come from
+	 * @param string[]            $failed  Files present but not what the entry describes, appended to
+	 *
+	 * @since 7.0
+	 */
+	protected function adopt_entry( array $row, array &$claimed, array &$taken, array &$failed ): int {
+		$source   = (string) $row['source'];
+		$entry_id = (string) $row['entry'];
+
+		/*
+		 * One stat rules out an entry that was never installed, which is the overwhelmingly common case: without
+		 * it every role of every font key costs a miss, and these hosts are often NFS-backed.
+		 */
+		if ( ! is_dir( $this->font_dir . Font_Sources::install_dir( $source, $entry_id ) ) ) {
+			return 0;
+		}
+
+		$entry   = (array) $row['data'];
+		$files   = (array) ( $entry['files'] ?? [] );
+		$fonts   = (array) ( $entry['fonts'] ?? [] );
+		$created = 0;
+
+		foreach ( $fonts as $font_key => $roles ) {
+			$font_key = (string) $font_key;
+
+			if ( isset( $taken[ $font_key ] ) || $this->repository->is_key_reserved( $font_key ) ) {
+				continue;
+			}
+
+			$verified = $this->verified_files( $source, $entry_id, (array) $roles, $files, $claimed, $failed );
+
+			/* mPDF needs a regular face; a bold-only row would never render */
+			if ( ! isset( $verified['R'] ) ) {
+				continue;
+			}
+
+			$font_id = $this->repository->insert(
+				Font_Sources::font_row( $row, $entry, $font_key ) + [ 'files' => $verified ]
+			);
+
+			if ( $font_id > 0 ) {
+				/*
+				 * Inserted before it is parsed because the registry mPDF is built from reads these rows: the row
+				 * is how the face becomes findable at all. A key that will not parse is taken straight back out,
+				 * so the entry is left un-adopted rather than carrying a font that kills the first render to
+				 * reach for it — the same call `Font_Installer` makes before it clears an install's phase.
+				 */
+				$unparseable = $this->warmer->warm( [ $font_key => array_keys( $verified ) ] );
+
+				if ( $unparseable !== null ) {
+					/* Rows only: the files were on disk before this ran and are not this class's to remove */
+					$this->repository->delete( $font_key, false );
+
+					$this->log->warning(
+						'Refusing to adopt a font mPDF cannot read',
+						[
+							'entry' => $source . '/' . $entry_id,
+							'font'  => $font_key,
+							'error' => $unparseable->get_error_message(),
+						]
+					);
+
+					continue;
+				}
+
+				++$created;
+
+				$taken[ $font_key ] = true;
+
+				foreach ( $verified as $file ) {
+					$claimed[ $file['path'] ] = true;
+				}
+			}
+		}
+
+		return $created;
+	}
+
+	/**
+	 * The faces of one font key that are on disk, unclaimed and byte-for-byte what the entry lists
+	 *
+	 * A source's files live under `{source}/{entry}/`, so adoption looks where an install would have written them
+	 * — which is also where a hand-placed file has to go. The 6.x installer's flat files are `Legacy_Font_Adopter`'s
+	 * job and are already rows by the time this runs.
+	 *
+	 * @return array<string, array{path: string, size: int, sha256: string}>
+	 *
+	 * @since 7.0
+	 */
+	protected function verified_files( string $source, string $entry_id, array $roles, array $files, array $claimed, array &$failed ): array {
+		$verified = [];
+
+		foreach ( Font_Sources::role_map( $roles ) as $role => $filename ) {
+			$listed = $files[ $filename ] ?? null;
+
+			if ( ! is_array( $listed ) || ! isset( $listed['sha256'], $listed['size'] ) ) {
+				continue;
+			}
+
+			$relative = Font_Sources::install_path( $source, $entry_id, $filename );
+			$absolute = $this->font_dir . $relative;
+
+			if ( isset( $claimed[ $relative ] ) || ! is_file( $absolute ) ) {
+				continue;
+			}
+
+			/* The downloader's check, so "is this byte-for-byte what the entry lists" has one implementation */
+			if ( $this->downloader->verify_file( $relative, $absolute, $listed ) !== null ) {
+				$failed[] = $relative;
+
+				if ( $role === 'R' ) {
+					return [];
+				}
+
+				continue;
+			}
+
+			$verified[ (string) $role ] = [
+				'path'   => $relative,
+				'size'   => (int) $listed['size'],
+				'sha256' => (string) $listed['sha256'],
+			];
+		}
+
+		return $verified;
+	}
+}
