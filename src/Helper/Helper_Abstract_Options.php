@@ -2,7 +2,8 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Controller\Controller_Custom_Fonts;
+use GFPDF\Fonts\Font_Sources;
+use GFPDF\Rest\Rest_Custom_Fonts;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Statics\Kses;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -239,6 +240,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						'name'               => isset( $option['name'] ) ? $option['name'] : null,
 						'size'               => isset( $option['size'] ) ? $option['size'] : null,
 						'options'            => isset( $option['options'] ) ? $option['options'] : '',
+						'optgroup_ids'       => isset( $option['optgroup_ids'] ) ? $option['optgroup_ids'] : [],
 						'std'                => isset( $option['std'] ) ? $option['std'] : '',
 						'min'                => isset( $option['min'] ) ? $option['min'] : null,
 						'max'                => isset( $option['max'] ) ? $option['max'] : null,
@@ -601,6 +603,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$this->data->form_settings[ $form_id ] = $options;
 			}
 
+			/*
+			 * The chokepoint every save reaches — the admin form, the REST route, the API, duplicate and bulk — and
+			 * the only one that knows the write landed. Fired for a real write only: the settings screen calls this
+			 * with `$update_db` false to validate, and nothing has been chosen yet at that point.
+			 */
+			if ( $update_db && $did_update !== false ) {
+				do_action( 'gfpdf_post_update_pdf', $pdf, $form_id, $pdf_id );
+			}
+
 			return $did_update;
 		}
 
@@ -916,66 +927,87 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_installed_fonts() {
-		$fonts = [
-			esc_html__( 'Unicode', 'gravity-pdf' ) => [
-				'dejavusanscondensed'  => 'Dejavu Sans Condensed',
-				'dejavusans'           => 'Dejavu Sans',
-				'dejavuserifcondensed' => 'Dejavu Serif Condensed',
-				'dejavuserif'          => 'Dejavu Serif',
-				'dejavusansmono'       => 'Dejavu Sans Mono',
+		$fonts = [];
 
-				'freesans'             => 'Free Sans',
-				'freeserif'            => 'Free Serif',
-				'freemono'             => 'Free Mono',
+		foreach ( $this->font_groups() as $group ) {
+			$fonts[ $group['label'] ] = ( $fonts[ $group['label'] ] ?? [] ) + $this->font_choices( $group['fonts'] );
+		}
 
-				'mph2bdamase'          => 'MPH 2B Damase',
-			],
+		return apply_filters( 'gfpdf_font_list', array_filter( $fonts ) );
+	}
 
-			esc_html__( 'Indic', 'gravity-pdf' )   => [
-				'lohitkannada' => 'Lohit Kannada',
-				'pothana2000'  => 'Pothana2000',
-			],
+	/**
+	 * The group each optgroup label belongs to, for `data-gfpdf-font-group`
+	 *
+	 * @return array<string, string> optgroup label => group id
+	 *
+	 * @since 7.0
+	 */
+	public function get_installed_font_groups() {
+		$ids = [];
 
-			esc_html__( 'Arabic', 'gravity-pdf' )  => [
-				'xbriyaz'               => 'XB Riyaz',
-				'lateef'                => 'Lateef',
-				'kfgqpcuthmantahanaskh' => 'Bahif Uthman Taha',
-			],
+		foreach ( $this->font_groups() as $group ) {
+			$ids[ $group['label'] ] = $ids[ $group['label'] ] ?? $group['id'];
+		}
 
-			esc_html__( 'Chinese, Japanese, Korean', 'gravity-pdf' ) => [
-				'sun-exta' => 'Sun Ext',
-				'unbatang' => 'Un Batang (Korean)',
-			],
+		return $ids;
+	}
 
-			esc_html__( 'Other', 'gravity-pdf' )   => [
-				'estrangeloedessa' => 'Estrangelo Edessa (Syriac)',
-				'kaputaunicode'    => 'Kaputa (Sinhala)',
-				'abyssinicasil'    => 'Abyssinica SIL (Ethiopic)',
-				'aboriginalsans'   => 'Aboriginal Sans (Cherokee / Canadian)',
-				'jomolhari'        => 'Jomolhari (Tibetan)',
-				'sundaneseunicode' => 'Sundanese (Sundanese)',
-				'taiheritagepro'   => 'Tai Heritage Pro (Tai Viet)',
-				'aegyptus'         => 'Aegyptus (Egyptian Hieroglyphs)',
-				'akkadian'         => 'Akkadian (Cuneiform)',
-				'aegean'           => 'Aegean (Greek)',
-				'quivira'          => 'Quivira (Greek)',
-				'eeyekunicode'     => 'Eeyek (Meetei Mayek)',
-				'lannaalif'        => 'Lanna Alif (Tai Tham)',
-				'daibannasilbook'  => 'Dai Banna SIL (New Tai Lue)',
-				'garuda'           => 'Garuda (Thai)',
-				'khmeros'          => 'Khmer OS (Khmer)',
-				'dhyana'           => 'Dhyana (Lao)',
-				'tharlon'          => 'TharLon (Myanmar / Burmese)',
-				'padaukbook'       => 'Padauk Book (Myanmar / Burmese)',
-				'zawgyi-one'       => 'Zawgyi One (Myanmar / Burmese)',
-				'ayar'             => 'Ayar Myanmar (Myanmar / Burmese)',
-				'taameydavidclm'   => 'Taamey David CLM (Hebrew)',
+	/**
+	 * The dropdown's groups, in order, each with the id the Font Manager knows it by
+	 *
+	 * 6.x hard-coded the core-font list here. 7.0 ships none of those files, so the list comes from the font
+	 * registry — the same read that decides what mPDF registers, which is what stops the dropdown offering a font
+	 * that cannot render. Custom fonts are rows now, so they arrive with everything else rather than through
+	 * add_custom_fonts().
+	 *
+	 * The fonts are left as the registry's objects: only `get_installed_fonts()` wants them as choices, and
+	 * `get_registered_fields()` asks for the ids alone as often as it asks for the list.
+	 *
+	 * @return array[]
+	 *
+	 * @since 7.0
+	 */
+	protected function font_groups() {
+		$grouped = \GPDFAPI::get_font_registry()->get_grouped_fonts();
+
+		$groups = [
+			[
+				'id'    => 'bundled',
+				'label' => esc_html__( 'Bundled Fonts', 'gravity-pdf' ),
+				'fonts' => $grouped['bundled'],
 			],
 		];
 
-		$fonts = $this->add_custom_fonts( $fonts );
+		/* One optgroup per installed pack, in the catalogue's order, which is the order the Font Manager lists them in */
+		foreach ( $grouped['groups'] as $group ) {
+			$groups[] = [
+				'id'    => Font_Sources::join( (string) $group['source'], (string) $group['entry'] ),
+				'label' => (string) $group['label'],
+				'fonts' => $group['fonts'],
+			];
+		}
 
-		return apply_filters( 'gfpdf_font_list', $fonts );
+		$groups[] = [
+			'id'    => 'custom',
+			'label' => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
+			'fonts' => $grouped['custom'],
+		];
+
+		return $groups;
+	}
+
+	/**
+	 * One group's fonts as the dropdown wants them: key => name
+	 *
+	 * @param array[] $fonts
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 7.0
+	 */
+	protected function font_choices( array $fonts ) {
+		return array_column( $fonts, 'label', 'id' );
 	}
 
 	/**
@@ -1015,8 +1047,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_custom_fonts() {
-		/** @var Controller_Custom_Fonts $custom_font_controller */
-		$custom_font_controller = \GPDFAPI::get_mvc_class( 'Controller_Custom_Fonts' );
+		/** @var Rest_Custom_Fonts $custom_font_controller */
+		$custom_font_controller = \GPDFAPI::get_mvc_class( 'Rest_Custom_Fonts' );
 
 		return $custom_font_controller->get_all_items();
 	}
@@ -1938,7 +1970,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				<?php endforeach; ?>
 		>
 
-		<?php $this->build_options_for_select( $args['options'], $value, true ); ?>
+		<?php $this->build_options_for_select( $args['options'], $value, true, $args['optgroup_ids'] ?? [] ); ?>
 
 		</select>
 
@@ -2005,12 +2037,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param array        $options       The list of options that should be displayed
 	 * @param array|string $value         The selected option
 	 * @param bool         $should_output To output or echo the content
+	 * @param array        $group_ids     optgroup label => the id to mark that group with, for groups we own
 	 *
 	 * @return string|void
 	 *
 	 * @since 4.1
 	 */
-	public function build_options_for_select( $options, $value, $should_output = false ) {
+	public function build_options_for_select( $options, $value, $should_output = false, $group_ids = [] ) {
 		if ( ! $should_output ) {
 			ob_start();
 		}
@@ -2033,7 +2066,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 				echo '<option value="' . esc_attr( $option ) . '" ' . ( strpos( $selected, 'selected' ) !== false ? 'selected="selected"' : '' ) . '>' . esc_html( $name ) . '</option>';
 			} else {
-				echo '<optgroup label="' . esc_attr( $option ) . '">';
+				$group_id = (string) ( $group_ids[ $option ] ?? '' );
+
+				echo '<optgroup label="' . esc_attr( $option ) . '"' . ( $group_id !== '' ? ' data-gfpdf-font-group="' . esc_attr( $group_id ) . '"' : '' ) . '>';
 				foreach ( $name as $op_value => $op_label ) {
 					$selected = '';
 					if ( is_array( $value ) ) {

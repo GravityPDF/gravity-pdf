@@ -178,6 +178,26 @@ class Test_Pre_Checks extends TestCase {
 	}
 
 	/**
+	 * The floors 7.0 declares, pinned in both places that declare them
+	 *
+	 * @since 7.0
+	 */
+	public function test_the_declared_floors_agree_with_the_plugin_header() {
+		$header = get_plugin_data( PDF_PLUGIN_DIR . 'pdf.php', false, false );
+
+		$this->assertSame( '6.8', $this->gravitypdf->required_wp_version );
+		$this->assertSame( '6.8', $header['RequiresWP'] );
+
+		$this->assertSame( '7.4', $this->gravitypdf->required_php_version );
+		$this->assertSame( '7.4', $header['RequiresPHP'] );
+
+		/* No header field of its own, so the property is the only statement of it */
+		$this->assertSame( '2.9.25', $this->gravitypdf->required_gf_version );
+
+		$this->assertSame( PDF_EXTENDED_VERSION, $header['Version'] );
+	}
+
+	/**
 	 * A data provider for any tests that need to check PHP memory
 	 *
 	 * @return array Our test data

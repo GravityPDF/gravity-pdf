@@ -41,6 +41,121 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		}
 	}
 
+	/**
+	 * How many times composing something builds the Gravity PDF settings fields
+	 *
+	 * `get_registered_fields()` has no return the caller can count, so this rides the first filter it applies.
+	 */
+	protected function fields_built( callable $composer ): int {
+		$built = 0;
+		$count = static function ( $fields ) use ( &$built ) {
+			$built++;
+
+			return $fields;
+		};
+
+		add_filter( 'gfpdf_settings_general_defaults', $count, 999 );
+		$composer();
+		remove_filter( 'gfpdf_settings_general_defaults', $count, 999 );
+
+		return $built;
+	}
+
+	/**
+	 * `rest_api_init` fires for every REST request the site serves, in any namespace, so composing the item schema
+	 * there built every settings field on each one — the font dropdown and its three queries, ~252 translated
+	 * language names — for `GET /download/{entry}/{pdf}` and for every REST request any other plugin on the site
+	 * makes. Measured at ~6.6 ms of work none of them read (§11 D16).
+	 */
+	public function test_registering_the_routes_does_not_build_the_settings_fields() {
+		$api = $this->controller();
+
+		$this->assertSame( 0, $this->fields_built( [ $api, 'register_routes_cheaply' ] ) );
+
+		/* Asked for it directly, it still answers in full — the deferral is scoped to registration */
+		$this->assertSame( 1, $this->fields_built( [ $api, 'get_item_schema' ] ) );
+	}
+
+	/**
+	 * The template enum rides with it: a `FilesystemIterator` walk of the template directories, on a request that
+	 * may never name a template
+	 */
+	public function test_registering_the_routes_does_not_walk_the_template_directories() {
+		$api   = $this->controller();
+		$walks = 0;
+		$count = static function ( $templates ) use ( &$walks ) {
+			$walks++;
+
+			return $templates;
+		};
+
+		add_filter( 'gfpdf_template_list', $count, 999 );
+		$api->register_routes_cheaply();
+		$before = $walks;
+
+		$api->register_routes();
+		remove_filter( 'gfpdf_template_list', $count, 999 );
+
+		$this->assertSame( 0, $before );
+		$this->assertGreaterThan( 0, $walks, 'registering in full still builds the enum' );
+	}
+
+	/**
+	 * The requests that read the schema are our own routes and either index that publishes their args. Everything
+	 * else leaves the routes as registration wrote them, which is reachable and validated by every other `args`
+	 * entry — only the args that cost something are deferred.
+	 */
+	public function test_only_a_request_that_reads_the_item_schema_builds_it() {
+		$routes = [
+			'/wp/v2/types'                             => 0,
+			'/wp/v2'                                   => 0,
+			'/gravity-pdf/v1/download/1/aaaaaaaaaaaaa' => 0,
+			'/gravity-pdf/v1/form/' . $this->form_id   => 1,
+			'/gravity-pdf/v1'                          => 1,
+			'/'                                        => 1,
+		];
+
+		foreach ( $routes as $route => $expected ) {
+			$api = $this->controller();
+			$api->register_routes_cheaply();
+
+			$built = $this->fields_built(
+				static function () use ( $api, $route ) {
+					$api->maybe_set_template_schema( null, rest_get_server(), new WP_REST_Request( 'GET', $route ) );
+				}
+			);
+
+			$this->assertSame( $expected, $built, "{$route} built the settings fields {$built} time(s)" );
+		}
+	}
+
+	/**
+	 * One hook, one build. The schema used to be composed at registration and then thrown away and rebuilt by the
+	 * pre-dispatch pass that swaps in the template's, so the requests that actually read it paid for it twice.
+	 */
+	public function test_a_request_to_our_own_routes_builds_the_settings_fields_once() {
+		$api = $this->controller();
+		$api->register_routes_cheaply();
+
+		$built = $this->fields_built(
+			function () use ( $api ) {
+				$api->maybe_set_template_schema( null, rest_get_server(), new WP_REST_Request( 'GET', '/gravity-pdf/v1/form/' . $this->form_id ) );
+			}
+		);
+
+		$this->assertSame( 1, $built );
+	}
+
+	/**
+	 * A controller of its own, not the router's: the deferral is per-request state and the router's instance has
+	 * already served every case above this one.
+	 */
+	protected function controller(): Rest_Form_Settings {
+		global $gfpdf;
+
+		return new Rest_Form_Settings( $gfpdf->options, $gfpdf->gform, $gfpdf->misc, $gfpdf->templates );
+	}
+
 	public function test_context_param() {
 		wp_set_current_user( self::$admin_id );
 
@@ -265,7 +380,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 			'pdf_size'                          => 'custom',
 			'custom_pdf_size'                   => [ '150', '300', 'millimeters' ],
 			'orientation'                       => 'landscape',
-			'font'                              => 'dejavusans',
+			'font'                              => 'gfpdf-arimo',
 			'font_size'                         => 12,
 			'font_colour'                       => '#929292',
 			'format'                            => 'PDFA1B',
@@ -425,7 +540,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 				'unit'   => 'mm',
 			],
 			'orientation'      => 'landscape',
-			'font'             => 'dejavusans',
+			'font'             => 'gfpdf-arimo',
 			'font_size'        => 12,
 			'font_colour'      => '#929292',
 			'format'           => 'PDFA1B',

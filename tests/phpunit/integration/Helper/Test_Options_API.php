@@ -727,12 +727,49 @@ class Test_Options_API extends TestCase {
 
 		$fonts = $this->options->get_installed_fonts();
 
-		$this->assertArrayHasKey( 'Unicode', $fonts );
-		$this->assertArrayHasKey( 'Indic', $fonts );
-		$this->assertArrayHasKey( 'Arabic', $fonts );
-		$this->assertArrayHasKey( 'Other', $fonts );
+		/* 7.0 ships none of the 6.x core fonts, so the list is whatever the registry has: the bundled font, plus rows */
+		$this->assertArrayHasKey( 'Bundled Fonts', $fonts );
+		$this->assertSame( 'Arimo', $fonts['Bundled Fonts']['gfpdf-arimo'] );
 
-		$this->assertTrue( isset( $fonts['Unicode']['dejavusans'] ) );
+		$this->add_custom_font_rows( [ [ 'id' => 'listed', 'font_name' => 'Listed Font' ] ] );
+
+		$this->assertSame( 'Listed Font', $this->options->get_installed_fonts()['User-Defined Fonts']['listed'] );
+	}
+
+	/**
+	 * The font dropdown marks the optgroups the Font Manager rebuilds, and leaves everybody else's alone
+	 *
+	 * `syncSelect()` removes every optgroup carrying the attribute and writes the list again. Without the marker on
+	 * the server's own groups it has nothing to replace, so the rebuild leaves a second "Bundled Fonts" beside the
+	 * rendered one.
+	 *
+	 * @since 7.0
+	 */
+	public function test_font_select_marks_the_groups_the_font_manager_rebuilds() {
+		global $wp_settings_fields;
+
+		$this->add_custom_font_rows( [ [ 'id' => 'marked', 'font_name' => 'Marked Font' ] ] );
+
+		/* Registered rather than read straight off get_registered_fields(): add_settings_field() copies a fixed list
+		of keys, and a key missing from it reaches no screen */
+		$fields = $this->options->get_registered_fields();
+		$this->options->register_settings( [ 'form_settings_appearance' => $fields['form_settings_appearance'] ] );
+
+		$group = 'gfpdf_settings_form_settings_appearance';
+
+		ob_start();
+		$this->options->select_callback(
+			$wp_settings_fields[ $group ][ $group ]['gfpdf_settings[font]']['args'] + [ 'value' => 'gfpdf-arimo' ]
+		);
+		$markup = ob_get_clean();
+
+		$this->assertStringContainsString( '<optgroup label="Bundled Fonts" data-gfpdf-font-group="bundled">', $markup );
+		$this->assertStringContainsString( '<optgroup label="User-Defined Fonts" data-gfpdf-font-group="custom">', $markup );
+
+		ob_start();
+		$this->options->build_options_for_select( [ 'Core' => [ 'zadani' => 'Zadani' ] ], 'zadani', true );
+
+		$this->assertStringContainsString( '<optgroup label="Core">', ob_get_clean() );
 	}
 
 	/**
@@ -753,7 +790,7 @@ class Test_Options_API extends TestCase {
 			],
 		];
 
-		$this->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		$existing_fonts = [
 			'Unicode' => [
@@ -789,7 +826,7 @@ class Test_Options_API extends TestCase {
 			],
 		];
 
-		$this->options->update_option( 'custom_fonts', $fonts );
+		$this->add_custom_font_rows( $fonts );
 
 		$get_fonts = $this->options->get_custom_fonts();
 

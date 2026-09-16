@@ -1,11 +1,44 @@
 import util from 'util';
+import { configure } from '@testing-library/dom';
 import Enzyme from 'enzyme';
 import Adapter from '@cfaester/enzyme-adapter-react-18';
 import CSS from 'css.escape'; // eslint-disable-line
+import '@testing-library/jest-dom';
 
 Object.defineProperty(global, 'TextEncoder', {
 	value: util.TextEncoder,
 });
+
+// jsdom ships neither, and @wordpress/components reaches for both on mount
+window.matchMedia =
+	window.matchMedia ||
+	((query) => ({
+		matches: false,
+		media: query,
+		onchange: null,
+		addListener: () => {},
+		removeListener: () => {},
+		addEventListener: () => {},
+		removeEventListener: () => {},
+		dispatchEvent: () => false,
+	}));
+
+global.ResizeObserver =
+	global.ResizeObserver ||
+	class {
+		observe() {}
+		unobserve() {}
+		disconnect() {}
+	};
+
+/*
+ * The Font Manager's fixtures answer on a 220 ms timer, so a pane that reads the font list, the sources and a
+ * catalogue page in sequence is already two-thirds of Testing Library's 1 s default before a worker shares a
+ * core with three others. Raised rather than waited on case by case: every timeout it caused was the clock,
+ * never the assertion. Kept under Jest's own 5 s per-test limit so a query that never resolves still fails as
+ * "unable to find an element", with the DOM, rather than as a bare test timeout.
+ */
+configure({ asyncUtilTimeout: 2500 });
 
 Enzyme.configure({
 	adapter: new Adapter(),
@@ -16,39 +49,15 @@ Enzyme.configure({
 window.GFPDF = {
 	templateList: [{ id: 'zadani' }, { id: 'rubix' }, { id: 'focus-gravity' }],
 	activeTemplate: '',
-	coreFontItemPendingMessage: '%s',
-	coreFontItemSuccessMessage: '%s',
-	coreFontItemErrorMessage: '%s',
 	noResultText:
 		"It doesn't look like there are any topics related to your issue.",
-	coreFontGithubError: 'Could not download Core Font list. Try again.',
 	getSearchResultError: 'An error occurred. Please try again',
 	licenseDeactivationError:
 		'An error occurred and your license key may not have been correctly deactivated. Login to your GravityPDF.com account and check if your site has been unlinked from the key.',
 	userCapabilities: { administrator: true },
-	// Font manager component
-	fontListInstalledFonts: 'Installed Fonts',
-	fontListRegular: 'Regular',
-	fontListItalics: 'Italics',
-	fontListBold: 'Bold',
-	fontListBoldItalics: 'Bold Italics',
-	fontManagerAddTitle: 'Add Font',
-	fontManagerUpdateTitle: 'Update Font',
-	fontListRegularRequired: 'Regular',
-	searchResultEmpty: 'No fonts matching your search found.',
-	fontListEmpty: 'Font list empty.',
-	fontManagerFontFilesLabel: 'Font Files',
-	fontManagerTemplateTooltipLabel: 'View template usage',
-	addUpdateFontSuccess: 'Your font has been saved.',
-	addFatalError: 'A problem occurred. Reload the page and try again.',
-	fontFileInvalid:
-		'Font file(s) are malformed and cannot be used with Gravity PDF',
 	manage: 'Advanced',
 	closeDialog: 'Close dialog',
 	searchBoxResetTitle: 'Clear search.',
-	fontManagerTitle: 'Font Manager',
-	fontUserDefinedGroup: 'User-Defined Fonts',
-	fontManagerRequiredLabel: '(required)',
 };
 
 window.gfpdf_migration_multisite_ids = [];

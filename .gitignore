@@ -31,6 +31,7 @@ node_modules/*
 
 ## Plugin-specific files:
 build/assets/*
+build/font-manager/*
 
 # Unit tests
 /tmp
@@ -43,6 +44,10 @@ build/assets/*
 /screenshots
 /artifacts
 /tests/playwright/artifacts
+
+# Playwright's checked-in fixtures: a personal global `*.zip` rule would otherwise hide them from `git add`,
+# and a fixture missing from a commit only shows up as a red CI run.
+!/tools/playwright/data/**/*.zip
 
 # Others
 _notes

@@ -78,6 +78,14 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	protected $templates;
 
 	/**
+	 * Whether the routes are being registered for a request that may never read their args
+	 *
+	 * @var bool
+	 * @since 7.0
+	 */
+	protected $defer_expensive_args = false;
+
+	/**
 	 * @param Helper_Options_Fields $options
 	 * @param Helper_Form $gform
 	 * @param Helper_Misc $misc
@@ -97,8 +105,44 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	public function init() {
-		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
-		add_filter( 'rest_pre_dispatch', [ $this, 'maybe_set_template_schema' ], 10, 3 );
+		add_action( 'rest_api_init', [ $this, 'register_routes_cheaply' ] );
+
+		/*
+		 * Ahead of core's `rest_handle_options_request`, which answers a preflight out of the registered args and
+		 * would otherwise publish the cheap ones `rest_api_init` left behind. Core adds that at priority 10 during
+		 * `rest_api_init`, so this would win the tie on insertion order anyway — 5 says so rather than relying on it.
+		 */
+		add_filter( 'rest_pre_dispatch', [ $this, 'maybe_set_template_schema' ], 5, 3 );
+	}
+
+	/**
+	 * Register the routes, leaving the args that cost something until a request asks for them
+	 *
+	 * `rest_api_init` fires for **every** REST request the site serves, in any namespace, and composing the item
+	 * schema there means building every Gravity PDF settings field on each one — the font dropdown, and the three
+	 * queries behind `Registry::get_grouped_fonts()`, and the ~252 translated language names. Measured at ~6.6 ms
+	 * on `GET /download/{entry}/{pdf}` and on every REST request any other plugin on the site makes (§11 D16).
+	 * The `template` enum is deferred with it: a `FilesystemIterator` walk of the template directories, and the
+	 * same argument applies to it.
+	 *
+	 * Nothing reads a route's args between registration and `rest_pre_dispatch`, and re-registering there is
+	 * already how `maybe_set_template_schema()` swaps in a template's schema, so the work moves to the requests
+	 * that use it and the rest pay nothing. The one path that would read them earlier is core's batch controller,
+	 * which validates every sub-request before firing `rest_pre_dispatch` for it — no route here sets
+	 * `allow_batch`, and one that did would have to register in full.
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public function register_routes_cheaply() {
+		$this->defer_expensive_args = true;
+
+		try {
+			$this->register_routes();
+		} finally {
+			$this->defer_expensive_args = false;
+		}
 	}
 
 	/**
@@ -235,7 +279,8 @@ class Rest_Form_Settings extends WP_REST_Controller {
 						'description' => __( 'A PDF template installed on the website.', 'gravity-pdf' ),
 						'type'        => 'string',
 						'required'    => true,
-						'enum'        => $this->misc->flatten_array( $this->templates->get_all_templates_by_group() ),
+						/* An empty enum is no constraint rather than an impossible one, and deferred args are never dispatched against */
+						'enum'        => $this->defer_expensive_args ? [] : $this->misc->flatten_array( $this->templates->get_all_templates_by_group() ),
 					],
 
 					'context'  => $this->get_context_param( [ 'default' => 'edit' ] ),
@@ -263,13 +308,22 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	public function maybe_set_template_schema( $results, $server, $request ) {
+		$path = (string) $request->get_route();
+
 		/* Look for current endpoints */
-		if ( strpos( $request->get_route(), '/' . static::get_route_basepath() ) !== 0 ) {
+		if ( strpos( $path, '/' . static::get_route_basepath() ) !== 0 ) {
+			/*
+			 * Either index publishes our args, so it wants what `register_routes_cheaply()` deferred — and none of
+			 * the template work below, which is about a request that names a form.
+			 */
+			if ( $path === '/' || $path === '/' . static::NAMESPACE ) {
+				$this->register_routes();
+			}
+
 			return $results;
 		}
 
 		/* Match request to handler and set the URL params (which is normally done after this hook) */
-		$path = $request->get_route();
 		foreach ( static::$endpoints as $route ) {
 			$match = preg_match( '@^/' . static::NAMESPACE . $route . '$@i', $path, $matches );
 
@@ -917,6 +971,17 @@ class Rest_Form_Settings extends WP_REST_Controller {
 				],
 			],
 		];
+
+		/*
+		 * The guard sits here rather than at each `args` entry because the settings fields have more than one door
+		 * into them: `get_endpoint_args_for_item_schema()` is the obvious one, and core's `get_context_param()`
+		 * composes the whole schema too, just to derive the `context` enum. Deferred, the base properties are
+		 * answered and nothing is memoised, so the next caller — `maybe_set_template_schema()`, a dispatch, the
+		 * index — gets the real thing.
+		 */
+		if ( $this->defer_expensive_args ) {
+			return $this->add_additional_fields_schema( $schema );
+		}
 
 		$all_gravitypdf_settings = $this->options->get_registered_fields();
 

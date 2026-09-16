@@ -60,31 +60,6 @@ $stub = static function ( $return, $req, $url ) {
 		];
 	}
 
-	/* Handle Core Font Installer */
-	if ( strpos( $url, '/GravityPDF/mpdf-core-fonts/master/' ) !== false ) {
-		/* Throw error */
-		if ( substr( $url, - 4 ) === '.txt' ) {
-			return [
-				'headers'  => [],
-				'body'     => '',
-				'response' => [ 'code' => 404 ],
-				'cookies'  => [],
-				'filename' => '',
-			];
-		}
-
-		return [
-			'headers'  => [],
-			'body'     => '',
-			'response' => [
-				'code'    => 200,
-				'message' => 'OK',
-			],
-			'cookies'  => [],
-			'filename' => '',
-		];
-	}
-
 	return $return;
 };
 

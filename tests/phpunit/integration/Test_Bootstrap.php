@@ -203,6 +203,9 @@ class Test_Bootstrap extends TestCase {
 	/**
 	 * Check the logger is setting up correctly
 	 *
+	 * With Gravity Forms logging off, the error ring is the only handler: everything below error goes nowhere,
+	 * and an error is kept whether or not anyone predicted the failure.
+	 *
 	 * @since 4.0
 	 */
 	public function test_setup_logger() {
@@ -210,7 +213,7 @@ class Test_Bootstrap extends TestCase {
 		$logger = $this->loader->log->getHandlers();
 
 		$this->assertCount( 1, $logger );
-		$this->assertInstanceOf( 'GFPDF_Vendor\Monolog\Handler\NullHandler', $logger[0] );
+		$this->assertInstanceOf( 'GFPDF\Helper\Log\Option_Ring_Handler', $logger[0] );
 	}
 
 	/**

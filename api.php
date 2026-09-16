@@ -118,6 +118,95 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns the font registry, which builds what mPDF registers and what the Font Manager lists
+	 *
+	 * @return \GFPDF\Fonts\Registry
+	 *
+	 * @since 7.0
+	 */
+	public static function get_font_registry() {
+		global $gfpdf;
+
+		return $gfpdf->get_font_registry();
+	}
+
+	/**
+	 * Returns the font repository, the read/write path to the font tables
+	 *
+	 * The lower-level companion to `get_font_registry()`: rows in, rows out, with none of the mPDF or Font Manager
+	 * shaping. Add-ons that only want to list or add fonts should keep using `get_pdf_fonts()` / `add_pdf_font()`.
+	 *
+	 * @return \GFPDF\Fonts\Font_Repository
+	 *
+	 * @since 7.0
+	 */
+	public static function get_font_repository() {
+		global $gfpdf;
+
+		return $gfpdf->get_font_repository();
+	}
+
+	/**
+	 * Returns the font catalog sync, the single writer of the catalog table's index columns
+	 *
+	 * The catalogue refreshes itself on a schedule, so an add-on registering a `gfpdf_font_sources` record does not
+	 * need this. It is here for the two callers that cannot wait for that schedule: the install/upgrade routine,
+	 * which has no catalogue at all until it runs, and anything offering a manual refresh.
+	 *
+	 * @return \GFPDF\Fonts\Catalog_Sync
+	 *
+	 * @since 7.0
+	 */
+	public static function get_catalog_sync() {
+		global $gfpdf;
+
+		return $gfpdf->get_catalog_sync();
+	}
+
+	/**
+	 * Returns the font install queue, the background work list font installs run on
+	 *
+	 * Queue an entry with `enqueue_once( [ 'entry' => '{source}/{entry}', 'background' => [ ...filenames ] ] )`;
+	 * the dedup, the auto-install gate and the per-file backoff are all inside it, so calling it more than once for
+	 * the same entry is safe and costs one conditional UPDATE.
+	 *
+	 * @return \GFPDF\Fonts\Install_Queue
+	 *
+	 * @since 7.0
+	 */
+	public static function get_install_queue() {
+		global $gfpdf;
+
+		return $gfpdf->get_install_queue();
+	}
+
+	/**
+	 * Returns the coverage resolver, which answers which catalogue entries a site wants installed
+	 *
+	 * @return \GFPDF\Fonts\Coverage_Resolver
+	 *
+	 * @since 7.0
+	 */
+	public static function get_coverage_resolver() {
+		global $gfpdf;
+
+		return $gfpdf->get_coverage_resolver();
+	}
+
+	/**
+	 * Returns the render-time font install trigger, which fetches what a PDF is about to draw
+	 *
+	 * @return \GFPDF\Fonts\Render_Font_Trigger
+	 *
+	 * @since 7.0
+	 */
+	public static function get_render_font_trigger() {
+		global $gfpdf;
+
+		return $gfpdf->get_render_font_trigger();
+	}
+
+	/**
 	 * Returns our miscellaneous methods (or common methods) used throughout the plugin.
 	 *
 	 * Usage:
@@ -677,9 +766,11 @@ final class GPDFAPI {
 		$files_backup = $_FILES;
 		$_FILES       = [];
 
+		global $gfpdf;
+
 		$data       = self::get_data_class();
-		$model      = new \GFPDF\Model\Model_Custom_Fonts( self::get_options_class() );
-		$controller = new \GFPDF\Controller\Controller_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Helper\Fonts\LocalFilesystem', '\GFPDF\Helper\Fonts\LocalFile' );
+		$model      = new \GFPDF\Model\Model_Custom_Fonts( $gfpdf->get_font_repository() );
+		$controller = new \GFPDF\Rest\Rest_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $gfpdf->get_font_registry(), $gfpdf->get_install_requests(), $data->template_font_location, '\GFPDF\Fonts\LocalFilesystem', '\GFPDF\Fonts\LocalFile' );
 
 		$request = new WP_REST_Request();
 		$request->set_param( 'label', $font['font_name'] ?? '' );
@@ -728,8 +819,8 @@ final class GPDFAPI {
 		$request = new WP_REST_Request();
 		$request->set_param( 'id', $font_id );
 
-		/** @var \GFPDF\Controller\Controller_Custom_Fonts $controller */
-		$controller = self::get_mvc_class( 'Controller_Custom_Fonts' );
+		/** @var \GFPDF\Rest\Rest_Custom_Fonts $controller */
+		$controller = self::get_mvc_class( 'Rest_Custom_Fonts' );
 
 		$response = $controller->delete_item( $request );
 		if ( is_wp_error( $response ) ) {

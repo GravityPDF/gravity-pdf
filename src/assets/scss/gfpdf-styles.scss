@@ -5,10 +5,6 @@
 @use "Component/alert";
 @use "Component/button";
 @use "Component/color-picker";
-@use "Component/core-fonts";
-@use "Component/FontManager/font-manager";
-@use "Component/FontManager/footer";
-@use "Component/FontManager/font-manager-skeleton";
 @use "Component/HelpTab/help-tab";
 @use "Component/gf-settings-containers";
 @use "Component/license";
@@ -37,7 +33,6 @@
 @use "MediaQueries/min-1200";
 
 /* RTL Components */
-@use "RTL/Component/FontManager/rtl-font-manager";
 @use "RTL/Component/TemplateManager/rtl-template-manager";
 @use "RTL/Component/rtl-spinner";
 @use "RTL/Component/rtl-upload";
@@ -50,5 +45,3 @@
 @use "RTL/Pages/rtl-pdf-settings";
 
 /* RTL Media queries */
-@use "RTL/MediaQueries/rtl-min-961";
-@use "RTL/MediaQueries/rtl-min-1200";

@@ -1,0 +1,164 @@
+<?php
+
+declare(strict_types=1);
+
+namespace GFPDF\Tests\Concerns;
+
+use GFPDF\Fonts\Font_Repository;
+
+/**
+ * Font-table fixtures: install rows, then take them and their files away again.
+ *
+ * The rows outlive nothing — the WP test transaction rolls the tables back — but the *files* are real, and
+ * `Font_Repository` memoises per instance, so a suite that writes rows has to clean both.
+ */
+trait HasFontRows {
+
+	/**
+	 * The shared repository the plugin itself uses
+	 */
+	protected function font_repository(): Font_Repository {
+		global $gfpdf;
+
+		return $gfpdf->get_font_repository();
+	}
+
+	/**
+	 * Absolute path to the uploads fonts directory, created if missing
+	 */
+	protected function font_dir(): string {
+		$font_dir = $this->font_repository()->get_font_dir();
+
+		wp_mkdir_p( $font_dir );
+
+		return $font_dir;
+	}
+
+	/**
+	 * Install a font row backed by a real file
+	 *
+	 * @param string $font_key  The mPDF key
+	 * @param array  $overrides Any column the default row should not use
+	 *
+	 * @return int The new row's id
+	 */
+	protected function install_font_row( string $font_key, array $overrides = [], ?string $fixture = null ): int {
+		if ( $fixture !== null ) {
+			$path = $this->drop_font_fixture( $fixture );
+		} else {
+			$path = 'test-' . $font_key . '.ttf';
+			file_put_contents( $this->font_dir() . $path, 'ttf' );
+		}
+
+		return $this->font_repository()->insert(
+			array_merge(
+				[
+					'font_key' => $font_key,
+					'label'    => ucfirst( $font_key ),
+					'source'   => 'custom',
+					'files'    => [
+						'R' => [
+							'path' => $path,
+							'size' => filesize( $this->font_dir() . $path ),
+						],
+					],
+				],
+				$overrides
+			)
+		);
+	}
+
+	/**
+	 * Install a font row that belongs to a catalogue entry, one real file per role named
+	 *
+	 * `install_font_row()`'s sibling for the source-installed shape: `source` / `entry` / `coverage` / `version`
+	 * are what every status, update and grouping read keys on, so a suite that fakes them by hand drifts from
+	 * `Font_Repository::insert()` the moment a column moves.
+	 *
+	 * @param string[] $roles
+	 *
+	 * @return int The new row's id
+	 */
+	protected function install_entry_row( string $font_key, string $entry, array $overrides = [], array $roles = [ 'R' ] ): int {
+		$files = [];
+
+		foreach ( $roles as $role ) {
+			$path           = 'test-' . $font_key . '-' . strtolower( $role ) . '.ttf';
+			$files[ $role ] = [
+				'path' => $path,
+				'size' => 3,
+			];
+
+			file_put_contents( $this->font_dir() . $path, 'ttf' );
+		}
+
+		return $this->font_repository()->insert(
+			array_merge(
+				[
+					'font_key' => $font_key,
+					'label'    => ucfirst( $font_key ),
+					'source'   => 'packs',
+					'entry'    => $entry,
+					'coverage' => 1,
+					'version'  => 'fonts-v1.0.0',
+					'files'    => $files,
+				],
+				$overrides
+			)
+		);
+	}
+
+	/**
+	 * One file row of an installed font, by role
+	 *
+	 * @return array The `gravitypdf_font_file` row as `Font_Repository::all()` decodes it
+	 */
+	protected function file_row( string $font_key, string $role = 'R' ): array {
+		return $this->font_repository()->get( $font_key )['files'][ $role ];
+	}
+
+	/**
+	 * Drop every row and every test font file
+	 *
+	 * Rows go first with `$unlink_files` false, because the file sweep below is what removes them — the shared
+	 * delete path would otherwise skip any file a surviving row still records.
+	 */
+	protected function remove_font_rows(): void {
+		$repository = $this->font_repository();
+
+		foreach ( array_keys( $repository->all() ) as $font_key ) {
+			$repository->delete( $font_key, false );
+		}
+
+		foreach ( glob( $this->font_dir() . 'test-*.ttf' ) ?: [] as $file ) {
+			unlink( $file );
+		}
+	}
+
+	/**
+	 * Empty the fonts directory
+	 *
+	 * For suites that drop files under real font names rather than the `test-` prefix `remove_font_rows()` sweeps.
+	 */
+	protected function remove_font_files(): void {
+		foreach ( glob( $this->font_dir() . '*' ) ?: [] as $file ) {
+			if ( is_file( $file ) ) {
+				unlink( $file );
+			}
+		}
+	}
+
+	/**
+	 * Copy one of the repo's real font fixtures into the fonts directory
+	 *
+	 * @param string      $filename What to call it once it is there
+	 * @param string|null $source   Which fixture to copy, defaulting to the one named
+	 *
+	 * @return string The filename, so a caller can pass it straight on
+	 */
+	protected function drop_font_fixture( string $filename, ?string $source = null ): string {
+		copy( PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/' . ( $source ?? $filename ), $this->font_dir() . $filename );
+
+		return $filename;
+	}
+}

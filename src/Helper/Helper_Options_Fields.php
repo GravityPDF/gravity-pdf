@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Fonts\Language_To_Font;
 use WP_Error;
 
 /**
@@ -86,13 +87,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					],
 
 					'default_font'            => [
-						'id'      => 'default_font',
-						'name'    => esc_html__( 'Default Font', 'gravity-pdf' ),
-						'desc'    => __( 'Set the default font type used in PDFs. Choose an existing font or install your own.', 'gravity-pdf' ),
-						'type'    => 'select',
-						'options' => $this->get_installed_fonts(),
-						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-pdf' ),
-						'class'   => 'gfpdf-font-manager',
+						'id'           => 'default_font',
+						'name'         => esc_html__( 'Default Font', 'gravity-pdf' ),
+						'desc'         => __( 'Set the default font type used in PDFs. Choose an existing font or install your own.', 'gravity-pdf' ),
+						'type'         => 'select',
+						'options'      => $this->get_installed_fonts(),
+						'optgroup_ids' => $this->get_installed_font_groups(),
+						'tooltip'      => '<h6>' . esc_html__( 'Fonts', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with a font that covers Latin, Greek and Cyrillic. Want to use a specific font type? Add it with the Font Manager.', 'gravity-pdf' ),
+						'class'        => 'gfpdf-font-manager',
 					],
 
 					'default_pdf_size'        => [
@@ -235,15 +237,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'tools'                           => apply_filters(
 				'gfpdf_settings_tools',
 				[
-					'install_core_fonts' => [
-						'id'   => 'install_core_fonts',
-						'name' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
-						'desc' => esc_html__( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-pdf' ) . ' <a href="https://docs.gravitypdf.com/users/core-pdf-fonts">' . esc_html__( 'Get more info.', 'gravity-pdf' ) . '</a>',
-						'type' => 'button',
-						'std'  => __( 'Download Core Fonts', 'gravity-pdf' ),
-					],
-
-					'manage_fonts'       => [
+					'manage_fonts' => [
 						'id'   => 'manage_fonts',
 						'name' => esc_html__( 'Fonts', 'gravity-pdf' ),
 						/* translators: 1: Opening <code> tag, 2: Closing </code> tag */
@@ -525,13 +519,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					],
 
 					'font'            => [
-						'id'      => 'font',
-						'name'    => esc_html__( 'Font', 'gravity-pdf' ),
-						'type'    => 'select',
-						'options' => $this->get_installed_fonts(),
-						'std'     => $this->get_option( 'default_font', 'dejavusanscondensed' ),
-						'desc'    => __( 'Set the primary font used in PDFs. You can also install your own.', 'gravity-pdf' ),
-						'class'   => 'gfpdf_font_type gfpdf-font-manager',
+						'id'           => 'font',
+						'name'         => esc_html__( 'Font', 'gravity-pdf' ),
+						'type'         => 'select',
+						'options'      => $this->get_installed_fonts(),
+						'optgroup_ids' => $this->get_installed_font_groups(),
+						'std'          => \GPDFAPI::get_font_registry()->get_default_font(),
+						'desc'         => __( 'Set the primary font used in PDFs. You can also install your own.', 'gravity-pdf' ),
+						'class'        => 'gfpdf_font_type gfpdf-font-manager',
 					],
 
 					'font_size'       => [
@@ -561,6 +556,16 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc' => __( 'Script like Arabic, Hebrew, Syriac (and many others) are written right to left.', 'gravity-pdf' ),
 						'type' => 'toggle',
 						'std'  => $this->get_option( 'default_rtl', '0' ),
+					],
+
+					'pdf_language'    => [
+						'id'      => 'pdf_language',
+						'name'    => esc_html__( 'Document Language', 'gravity-pdf' ),
+						'desc'    => __( 'What this PDF is written in. Text in any other language or script is matched to a font by the language settings in the Font Manager.', 'gravity-pdf' ),
+						'type'    => 'select',
+						'options' => [ '' => esc_html__( 'Use the global setting', 'gravity-pdf' ) ] + Language_To_Font::labels(),
+						'std'     => '',
+						'tooltip' => '<h6>' . esc_html__( 'Document Language', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Runs of text in this language are never re-tagged, so the font you chose above renders them and picks that language\'s letterforms where the font carries them.', 'gravity-pdf' ),
 					],
 
 				]

@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Controller_Save_Core_Fonts
+ * Class Controller_Pdf_Queue
  *
  * @package GFPDF\Controller
  *

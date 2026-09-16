@@ -50,16 +50,29 @@ class Test_Controller_Actions extends TestCase {
 	}
 
 	public function test_get_routes_includes_default_routes() {
-		$routes = $this->controller->get_routes();
+		$actions = array_column( $this->controller->get_routes(), 'action' );
 
-		/* The core font install, plus the one notice covering every deprecated feature at once */
-		$this->assertCount( 2, $routes );
+		/* 7.0 bundles the fonts it needs, so the core-font install nag is gone */
+		$this->assertNotContains( 'install_core_fonts', $actions );
 
-		$this->assertSame( 'install_core_fonts', $routes[0]['action'] );
-		$this->assertSame( 'gravityforms_edit_settings', $routes[0]['capability'] );
-		$this->assertIsCallable( $routes[0]['condition'] );
-		$this->assertIsCallable( $routes[0]['process'] );
-		$this->assertIsCallable( $routes[0]['view'] );
+		/* Everything else registers through the filter: the deprecation notice, the health checks, the queue */
+		$this->assertContains( 'deprecated_features', $actions );
+		$this->assertContains( 'health_missing_coverage', $actions );
+		$this->assertContains( 'health_install_stalled', $actions );
+	}
+
+	/**
+	 * The route table is built twice on every `admin_init`, before any condition runs
+	 */
+	public function test_building_the_route_table_queries_nothing() {
+		global $wpdb;
+
+		$this->controller->get_routes();
+
+		$before = $wpdb->num_queries;
+		$this->controller->get_routes();
+
+		$this->assertSame( $before, $wpdb->num_queries );
 	}
 
 	public function test_every_deprecated_feature_shares_one_route() {
