@@ -618,19 +618,19 @@ class Model_Settings extends Helper_Abstract_Model {
 						'slug'     => $addon->get_slug(),
 					]
 				);
-
-				continue;
+			} else {
+				$addon->update_license_status_from_response(
+					$addon->get_license_key(),
+					[
+						'response' => [ 'code' => 200 ],
+						'body'     => wp_json_encode( $addon_response ),
+					],
+					true
+				);
 			}
 
-			$addon->update_license_status_from_response(
-				$addon->get_license_key(),
-				[
-					'response' => [ 'code' => 200 ],
-					'body'     => wp_json_encode( $addon_response ),
-				],
-				true
-			);
-
+			/* Runs whether or not the status changed — a cloned site keeps returning the same `site_inactive` */
+			$addon->sync_license_activation_url();
 		}
 
 		return true;

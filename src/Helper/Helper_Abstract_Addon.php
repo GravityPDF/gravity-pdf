@@ -420,12 +420,14 @@ abstract class Helper_Abstract_Addon {
 	 */
 	public function get_default_api_params() {
 		return [
-			'version'   => $this->get_version(),
-			'license'   => $this->get_license_key(),
-			'item_name' => $this->get_short_name(),
-			'item_id'   => $this->get_edd_download_id(),
-			'author'    => $this->get_author(),
-			'beta'      => false,
+			'version'     => $this->get_version(),
+			'license'     => $this->get_license_key(),
+			'item_name'   => $this->get_short_name(),
+			'item_id'     => $this->get_edd_download_id(),
+			'author'      => $this->get_author(),
+			'beta'        => false,
+			'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
+			'url'         => home_url(),
 		];
 	}
 
@@ -468,9 +470,8 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		$key_changed = $hardcoded_license !== $this->license_key;
-		$is_active   = in_array( $this->get_license_status(), [ 'active', 'valid' ], true );
 
-		if ( ! $key_changed && $is_active ) {
+		if ( ! $key_changed && $this->is_license_active() ) {
 			return;
 		}
 
@@ -480,11 +481,7 @@ abstract class Helper_Abstract_Addon {
 			return;
 		}
 
-		$this->activate_license( $hardcoded_license, true );
-
-		if ( ! in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) ) {
-			set_transient( $backoff, 1, 3 * HOUR_IN_SECONDS );
-		}
+		$this->activate_license_with_backoff( $hardcoded_license, $backoff, 3 * HOUR_IN_SECONDS );
 	}
 
 	/**
@@ -745,7 +742,8 @@ abstract class Helper_Abstract_Addon {
 		unset(
 			$settings[ "license_$slug" ],
 			$settings[ "license_{$slug}_status" ],
-			$settings[ "license_{$slug}_message" ]
+			$settings[ "license_{$slug}_message" ],
+			$settings[ "license_{$slug}_url" ]
 		);
 
 		wp_clear_scheduled_hook( 'gfpdf_' . $slug . '_license_check' );
@@ -817,6 +815,28 @@ abstract class Helper_Abstract_Addon {
 	 */
 	final public function get_license_message() {
 		return $this->license_key_message;
+	}
+
+	/**
+	 * Whether the store has confirmed the current add-on license key
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.1
+	 */
+	final public function is_license_active() {
+		return in_array( $this->get_license_status(), [ 'active', 'valid' ], true );
+	}
+
+	/**
+	 * The site URL the license key was last confirmed active for, normalized for comparison with home_url()
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.1
+	 */
+	private function get_license_activation_url() {
+		return untrailingslashit( (string) $this->options->get_option( 'license_' . $this->get_slug() . '_url', '' ) );
 	}
 
 	/**
@@ -925,13 +945,16 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		if ( isset( $license_check->license ) && $license_check->license === 'valid' ) {
-			/* License is still valid, do nothing */
+			$this->sync_license_activation_url();
 
 			return true;
 		}
 
 		/* License status has changed. Update database */
-		return $this->update_license_status_from_response( $this->get_license_key(), $response, true );
+		$this->update_license_status_from_response( $this->get_license_key(), $response, true );
+		$this->sync_license_activation_url();
+
+		return $this->is_license_active();
 	}
 
 	/**
@@ -1054,7 +1077,7 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		$edd_id = $this->get_edd_download_id();
-		if ( in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) || empty( $edd_id ) ) {
+		if ( $this->is_license_active() || empty( $edd_id ) ) {
 			return;
 		}
 
@@ -1146,6 +1169,98 @@ abstract class Helper_Abstract_Addon {
 		do_action( 'gfpdf_addon_post_license_activation', $response, $this, $use_database );
 
 		return $this->get_license_info();
+	}
+
+	/**
+	 * Reconcile the site URL the license key is activated for with this site's URL
+	 *
+	 * Run after a license check. An active license proves the key is activated for the current URL, so that URL is
+	 * recorded. `inactive` / `site_inactive` against a *different* recorded URL means the site was cloned or moved —
+	 * production copied to staging, say — and the key is still activated for the old URL, so activate it for this one;
+	 * the same URL on record means the customer deactivated the site from their account.
+	 *
+	 * @return bool Whether the license key was re-activated for this site
+	 *
+	 * @since 6.17.1
+	 */
+	public function sync_license_activation_url() {
+		$recorded = $this->get_license_activation_url();
+		$current  = untrailingslashit( home_url() );
+
+		if ( $this->is_license_active() ) {
+			if ( $recorded !== $current ) {
+				$this->record_license_activation_url();
+			}
+
+			return false;
+		}
+
+		/* Only a key the store still holds an activation for can be moved to this site */
+		if ( ! in_array( $this->get_license_status(), [ 'inactive', 'site_inactive' ], true ) ) {
+			return false;
+		}
+
+		/* Nothing on record (a key last activated before 6.17.1) is not evidence the URL changed */
+		if ( $recorded === '' || $recorded === $current ) {
+			return false;
+		}
+
+		/* Back off so a key that can't activate here — an over-limit domain migration — doesn't retry every check */
+		$backoff = 'gfpdf_license_url_change_' . $this->get_slug();
+		if ( get_transient( $backoff ) ) {
+			return false;
+		}
+
+		$this->log->notice(
+			'Site URL has changed since the license key was activated. Re-activating.',
+			[
+				'slug'          => $this->get_slug(),
+				'activated_for' => $recorded,
+				'site_url'      => $current,
+			]
+		);
+
+		if ( ! $this->activate_license_with_backoff( $this->get_license_key(), $backoff, WEEK_IN_SECONDS ) ) {
+			return false;
+		}
+
+		$this->record_license_activation_url();
+
+		return true;
+	}
+
+	/**
+	 * Activate the license key, suppressing the next attempt for $ttl if the store rejects it
+	 *
+	 * @param string $license_key
+	 * @param string $backoff Transient that suppresses the next attempt
+	 * @param int    $ttl How long the suppression lasts
+	 *
+	 * @return bool Whether the license is now active
+	 *
+	 * @since 6.17.1
+	 */
+	private function activate_license_with_backoff( $license_key, $backoff, $ttl ) {
+		$this->activate_license( $license_key, true );
+
+		if ( $this->is_license_active() ) {
+			return true;
+		}
+
+		set_transient( $backoff, 1, $ttl );
+
+		return false;
+	}
+
+	/**
+	 * Record the site URL the license key is activated for
+	 *
+	 * @return void
+	 *
+	 * @since 6.17.1
+	 */
+	private function record_license_activation_url() {
+		$this->options->update_option( 'license_' . $this->get_slug() . '_url', home_url() );
 	}
 
 	/**
