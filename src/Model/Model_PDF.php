@@ -1969,27 +1969,25 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function cleanup_tmp_dir() {
 
-		$config = [
-			/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
-			[
-				'dir' => $this->data->mpdf_tmp_location,
-				'age' => time() - 3600, // 1 hour
-			],
+		$mpdf_tmp_location = $this->data->mpdf_tmp_location;
+		$mpdf_font_cache   = $mpdf_tmp_location . '/mpdf/ttfontdata/';
 
-			[
-				'dir' => $this->data->template_tmp_location,
-				'age' => time() - 12 * 3600, // 12 hour
-			],
-		];
+		/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
+		$directories = [ $this->data->template_tmp_location ];
+		if ( strpos( $mpdf_tmp_location, $this->data->template_tmp_location ) !== 0 ) {
+			$directories[] = $mpdf_tmp_location;
+		}
 
-		foreach ( $config as $item ) {
-			if ( ! is_dir( $item['dir'] ) ) {
+		$now = time();
+
+		foreach ( $directories as $dir ) {
+			if ( ! is_dir( $dir ) ) {
 				continue;
 			}
 
 			try {
 				$directory_list = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator( $item['dir'], RecursiveDirectoryIterator::SKIP_DOTS ),
+					new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
 					RecursiveIteratorIterator::CHILD_FIRST
 				);
 
@@ -1998,17 +1996,32 @@ class Model_PDF extends Helper_Abstract_Model {
 						continue;
 					}
 
-					if ( $file->isReadable() && $file->getMTime() < $item['age'] ) {
+					$path    = $file->getPathname();
+					$is_mpdf = strpos( $path . '/', $mpdf_tmp_location . '/' ) === 0;
+
+					/* Concurrent PDFs share mPDF's cache folders and it recreates them non-atomically, so only files expire */
+					if ( $is_mpdf && $file->isDir() ) {
+						continue;
+					}
+
+					if ( strpos( $path, $mpdf_font_cache ) === 0 ) {
+						/* Font metrics only go stale when a font changes, and FlushCache clears them then */
+						$max_age = WEEK_IN_SECONDS;
+					} else {
+						$max_age = $is_mpdf ? HOUR_IN_SECONDS : 12 * HOUR_IN_SECONDS;
+					}
+
+					if ( $file->isReadable() && $file->getMTime() < $now - $max_age ) {
 						( $file->isDir() ) ?
-							$this->misc->rmdir( $file->getPathName() ) :
-							@unlink( $file->getPathName() ); //phpcs:ignore
+							$this->misc->rmdir( $path ) :
+							@unlink( $path ); //phpcs:ignore
 					}
 				}
 			} catch ( Exception $e ) {
 				$this->log->error(
 					'Filesystem Delete Error',
 					[
-						'dir'       => $item['dir'],
+						'dir'       => $dir,
 						'exception' => $e->getMessage(),
 					]
 				);
