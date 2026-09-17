@@ -1035,6 +1035,11 @@ class Test_EDD_SL_Plugin_Updater extends WP_UnitTestCase {
 
 		$this->assertSame( '0.2', $result->new_version );
 		$this->assertSame( 'https://store.com/download/licensed-123', $result->package );
+		$this->assertSame( 'https://store.com/download/licensed-123', $result->download_link );
+
+		$this->class->init();
+		$details = apply_filters( 'plugins_api', false, 'plugin_information', (object) [ 'slug' => 'test-plugin' ] );
+		$this->assertSame( 'https://store.com/download/licensed-123', $details->download_link );
 	}
 
 	public function providerSiteWithoutUsablePackage() {
