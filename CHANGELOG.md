@@ -6,6 +6,9 @@
 * 🎉 Feature: Add an entry note if a PDF for an email notification fails to generate
 * 🐞 Bug: Fix intermittent "Temporary files directory is not writable" error
 * 🐞 Bug: Stop the scheduled cleanup deleting temporary folders still in use
+* 🐞 Bug: Ensure staging and development sites are excluded from the license activation count
+* 🐞 Bug: Stop offering an update when the license key isn't activated for the current domain
+* 🐞 Bug: On Multisite, offer an update in the "new version" popup when a subsite has an active license
 * 🧹 Housekeeping: Make PDF error logs concise
 
 ### 6.17.0
