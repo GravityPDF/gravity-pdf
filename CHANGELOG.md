@@ -2,6 +2,12 @@
 
 ## Gravity PDF
 
+### 6.17.1
+* 🎉 Feature: Add an entry note if a PDF for an email notification fails to generate
+* 🐞 Bug: Fix intermittent "Temporary files directory is not writable" error
+* 🐞 Bug: Stop the scheduled cleanup deleting temporary folders still in use
+* 🧹 Housekeeping: Make PDF error logs concise
+
 ### 6.17.0
 * 🎉 Feature: Add a legacy features alert to Site Health and System Status reports
 * 🐞 Bug: Fix fatal error during update checks when the plugin requirements not met
