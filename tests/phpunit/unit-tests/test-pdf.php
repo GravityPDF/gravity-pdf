@@ -14,6 +14,8 @@ use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\View\View_PDF;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger;
 use GPDFAPI;
 use ReflectionMethod;
 use WP_Error;
@@ -1093,6 +1095,58 @@ class Test_PDF extends WP_UnitTestCase {
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		$this->assertArrayNotHasKey( 'attachments', $notifications );
+	}
+
+	/**
+	 * A PDF that fails to generate is noted on the entry, and logged without dumping the generator
+	 *
+	 * @since 6.17.1
+	 */
+	public function test_notifications_notes_a_pdf_that_failed_to_attach() {
+		global $gfpdf;
+
+		$results                     = $this->create_form_and_entries();
+		$entry                       = $results['entry'];
+		$form                        = $results['form'];
+		$form['gfpdf_form_settings'] = [ $form['gfpdf_form_settings']['556690c67856b'] ];
+		$notification                = $form['notifications']['54bca349732b8'];
+
+		$break_template = function ( $settings ) {
+			$settings['template'] = 'doesntexist';
+
+			return $settings;
+		};
+
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+		add_filter( 'gfpdf_pdf_config', $break_template );
+
+		$notifications = $this->model->notifications( $notification, $form, $entry );
+
+		remove_filter( 'gfpdf_pdf_config', $break_template );
+		$gfpdf->log->popHandler();
+
+		$this->assertSame( [], $notifications['attachments'] );
+
+		$this->assertTrue(
+			$handler->hasRecordThatPasses(
+				function ( $record ) use ( $entry ) {
+					return $record['message'] === 'PDF Generation Error' && $record['context']['entry_id'] === $entry['id'] && ! isset( $record['context']['pdf'] );
+				},
+				Logger::ERROR
+			)
+		);
+
+		$notes = GFAPI::get_notes(
+			[
+				'entry_id'  => $entry['id'],
+				'note_type' => 'gravity-pdf',
+				'sub_type'  => 'error',
+			]
+		);
+
+		$this->assertCount( 1, $notes );
+		$this->assertStringContainsString( '"' . esc_html( $notification['name'] ) . '" notification', $notes[0]->value );
 	}
 
 	/**

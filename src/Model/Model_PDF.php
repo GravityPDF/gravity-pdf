@@ -1100,7 +1100,9 @@ class Model_PDF extends Helper_Abstract_Model {
 					$filename = $this->generate_and_save_pdf( $entry, $settings );
 					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
 
-					if ( ! is_wp_error( $filename ) ) {
+					if ( is_wp_error( $filename ) ) {
+						$this->add_attachment_failure_note( $entry, $settings, $notifications );
+					} else {
 						$notifications['attachments'][] = $filename;
 					}
 				}
@@ -1116,6 +1118,30 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return $notifications;
+	}
+
+	/**
+	 * Record on the entry that a PDF was left off a notification, which is otherwise sent without it
+	 *
+	 * @param array $entry        The Gravity Forms entry
+	 * @param array $settings     The Gravity PDF settings
+	 * @param array $notification The Gravity Forms notification
+	 *
+	 * @since 6.17.1
+	 */
+	protected function add_attachment_failure_note( $entry, $settings, $notification ) {
+		if ( empty( $entry['id'] ) ) {
+			return;
+		}
+
+		$note = sprintf(
+			/* translators: 1: PDF name, 2: Notification name */
+			__( 'The PDF "%1$s" could not be generated and was not attached to the "%2$s" notification.', 'gravity-pdf' ),
+			esc_html( $settings['name'] ?? '' ),
+			esc_html( $notification['name'] ?? $notification['id'] ?? '' )
+		);
+
+		GFFormsModel::add_note( $entry['id'], 0, 'Gravity PDF', $note, 'gravity-pdf', 'error' );
 	}
 
 	/**
@@ -1258,8 +1284,14 @@ class Model_PDF extends Helper_Abstract_Model {
 				$this->log->error(
 					'PDF Generation Error',
 					[
-						'pdf'       => $pdf,
+						'form_id'   => $form['id'],
+						'entry_id'  => $entry['id'],
+						'pdf_id'    => $settings['id'],
+						'template'  => $settings['template'],
+						'path'      => $pdf->get_full_pdf_path(),
 						'exception' => $e->getMessage(),
+						'file'      => $e->getFile(),
+						'line'      => $e->getLine(),
 					]
 				);
 
