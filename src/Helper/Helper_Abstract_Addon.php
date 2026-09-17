@@ -420,12 +420,13 @@ abstract class Helper_Abstract_Addon {
 	 */
 	public function get_default_api_params() {
 		return [
-			'version'   => $this->get_version(),
-			'license'   => $this->get_license_key(),
-			'item_name' => $this->get_short_name(),
-			'item_id'   => $this->get_edd_download_id(),
-			'author'    => $this->get_author(),
-			'beta'      => false,
+			'version'     => $this->get_version(),
+			'license'     => $this->get_license_key(),
+			'item_name'   => $this->get_short_name(),
+			'item_id'     => $this->get_edd_download_id(),
+			'author'      => $this->get_author(),
+			'beta'        => false,
+			'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
 		];
 	}
 

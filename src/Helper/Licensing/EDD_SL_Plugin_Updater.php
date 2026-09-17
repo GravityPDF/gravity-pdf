@@ -49,6 +49,7 @@ class EDD_SL_Plugin_Updater {
 		'disabled',
 		'missing',
 		'invalid',
+		'inactive',
 		'site_inactive',
 		'item_name_mismatch',
 		'invalid_item_id',
@@ -620,6 +621,7 @@ class EDD_SL_Plugin_Updater {
 			'beta'        => $this->beta,
 			'php_version' => phpversion(),
 			'wp_version'  => get_bloginfo( 'version' ),
+			'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
 		];
 	}
 
@@ -731,6 +733,12 @@ class EDD_SL_Plugin_Updater {
 	 * @return void
 	 */
 	public function set_version_info_cache( $value = '', $cache_key = '' ) {
+
+		/* An unentitled license can get a package URL that errors; blank it (and the modal's download_link) so a Multisite site borrows the network package */
+		if ( is_object( $value ) && in_array( $this->license_status, self::UNENTITLED_LICENSE_STATUSES, true ) ) {
+			$value->package       = '';
+			$value->download_link = '';
+		}
 
 		/* Let cache be skipped when plugin not active on current multisite */
 		if ( $this->is_non_active_multisite() ) {

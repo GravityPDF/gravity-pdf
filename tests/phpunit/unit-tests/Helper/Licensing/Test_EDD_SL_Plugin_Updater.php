@@ -456,6 +456,10 @@ class Test_EDD_SL_Plugin_Updater extends WP_UnitTestCase {
 		$this->assertSame( 'zxy987', $params['license'] );
 	}
 
+	public function test_get_version_api_params_sends_environment_type() {
+		$this->assertSame( wp_get_environment_type(), $this->class->get_version_api_params()['environment'] );
+	}
+
 	public function test_get_plugin_file() {
 		$this->assertSame( 'test-plugin/test-plugin.php', $this->class->get_plugin_file() );
 	}
@@ -1002,7 +1006,10 @@ class Test_EDD_SL_Plugin_Updater extends WP_UnitTestCase {
 		$this->assertFalse( get_site_option( $this->class->get_network_cache_key() ) );
 	}
 
-	public function test_get_repo_api_data_borrows_network_package_when_site_unlicensed() {
+	/**
+	 * @dataProvider providerSiteWithoutUsablePackage
+	 */
+	public function test_get_repo_api_data_borrows_network_package_when_site_unlicensed( $status, $package ) {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Multisite tests only' );
 		}
@@ -1016,16 +1023,63 @@ class Test_EDD_SL_Plugin_Updater extends WP_UnitTestCase {
 			[ 'timeout' => strtotime( '+3 hours' ), 'value' => wp_json_encode( $network ) ]
 		);
 
-		/* This site sees the update but has no package of its own (missing/invalid license) */
+		/* This site sees the update but has no usable package of its own */
+		$this->class->set_license_status( $status );
+
 		$local              = new \stdClass();
 		$local->new_version = '0.2';
-		$local->package     = '';
+		$local->package     = $package;
 		$this->class->set_version_info_cache( $local );
 
 		$result = $this->class->get_repo_api_data();
 
 		$this->assertSame( '0.2', $result->new_version );
 		$this->assertSame( 'https://store.com/download/licensed-123', $result->package );
+	}
+
+	public function providerSiteWithoutUsablePackage() {
+		return [
+			'no package (missing/invalid license)'  => [ 'invalid', '' ],
+			/* A valid key not activated for this domain gets a package URL from the store, but it 401s */
+			'dead package (key not activated here)'  => [ 'site_inactive', 'https://store.com/download/site-inactive-123' ],
+		];
+	}
+
+	/**
+	 * @dataProvider providerUnentitledLicenseStatus
+	 */
+	public function test_set_version_info_cache_drops_unentitled_package( $status ) {
+		$this->class->set_license_status( $status );
+
+		$response                = new \stdClass();
+		$response->new_version   = '0.2';
+		$response->package       = 'https://store.com/download/dead-123';
+		$response->download_link = 'https://store.com/download/dead-123';
+		$this->class->set_version_info_cache( $response );
+
+		$cached = $this->class->get_cached_version_info();
+		$this->assertSame( '0.2', $cached->new_version );
+		$this->assertSame( '', $cached->package );
+		$this->assertSame( '', $cached->download_link );
+	}
+
+	/**
+	 * @dataProvider providerLicenseStatusWithoutVerdict
+	 */
+	public function test_set_version_info_cache_keeps_package_without_a_license_verdict( $status ) {
+		$this->class->set_license_status( $status );
+
+		$response              = new \stdClass();
+		$response->new_version = '0.2';
+		$response->package     = 'https://store.com/download/123';
+		$this->class->set_version_info_cache( $response );
+
+		$this->assertSame( 'https://store.com/download/123', $this->class->get_cached_version_info()->package );
+	}
+
+	/* No status (the core plugin), an entitled license, or a failed/throttled check */
+	public function providerLicenseStatusWithoutVerdict() {
+		return [ [ '' ], [ 'valid' ], [ 'active' ], [ 'error' ], [ 'rate_limit' ] ];
 	}
 
 	public function test_set_version_info_cache_network_ttl_outlives_per_site() {
@@ -1133,6 +1187,7 @@ class Test_EDD_SL_Plugin_Updater extends WP_UnitTestCase {
 			[ 'disabled' ],
 			[ 'missing' ],
 			[ 'invalid' ],
+			[ 'inactive' ],
 			[ 'site_inactive' ],
 			[ 'item_name_mismatch' ],
 			[ 'invalid_item_id' ],

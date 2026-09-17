@@ -185,6 +185,7 @@ class Helper_Data {
 			'disabled'            => sprintf( __( 'This license key has been cancelled (most likely due to a refund request). %1$sPlease consider purchasing a new license%2$s.', 'gravity-pdf' ), '<a href="%s">', '</a>' ),
 			'missing'             => __( 'This license key is invalid. Please check your key has been entered correctly.', 'gravity-pdf' ),
 			'invalid'             => __( 'The license key is invalid. Please check your key has been entered correctly.', 'gravity-pdf' ),
+			'inactive'            => __( 'This license key is not active. Please check your account or contact support.', 'gravity-pdf' ),
 			'site_inactive'       => __( 'Your license key is valid but does not match your current domain. This usually occurs if your domain URL changes. Please resave the settings to activate the license for this website.', 'gravity-pdf' ),
 			'item_name_mismatch'  => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-pdf' ), $addon_name ),
 			'invalid_item_id'     => sprintf( __( 'This license key is not valid for %s. Please check your key is for this product.', 'gravity-pdf' ), $addon_name ),

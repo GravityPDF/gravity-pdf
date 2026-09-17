@@ -351,6 +351,47 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'This license key has been cancelled', $this->addon->get_license_message() );
 
 		remove_filter( 'pre_http_request', $api_response );
+
+		/* Test with an inactive license */
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [ 'license' => 'inactive' ] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$this->assertFalse( $this->addon->schedule_license_check() );
+		$this->assertSame( 'This license key is not active. Please check your account or contact support.', $this->addon->get_license_message() );
+
+		remove_filter( 'pre_http_request', $api_response );
+		$this->addon->delete_license_info();
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_license_api_requests_send_environment_type() {
+		$body         = [];
+		$api_response = function ( $pre, $args ) use ( &$body ) {
+			$body = $args['body'];
+
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [ 'license' => 'valid' ] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response, 10, 2 );
+
+		$this->addon->update_license_info( [ 'license' => '12345', 'status' => 'active' ] );
+		$this->addon->schedule_license_check();
+
+		$this->assertSame( 'check_license', $body['edd_action'] );
+		$this->assertSame( wp_get_environment_type(), $body['environment'] );
+
+		remove_filter( 'pre_http_request', $api_response );
 		$this->addon->delete_license_info();
 	}
 
