@@ -363,7 +363,7 @@ class Test_Addon extends WP_UnitTestCase {
 		add_filter( 'pre_http_request', $api_response );
 
 		$this->assertFalse( $this->addon->schedule_license_check() );
-		$this->assertSame( 'This license key is not active. Please check your account or contact support.', $this->addon->get_license_message() );
+		$this->assertSame( 'Your license key is valid but is not activated on any website. This usually occurs if the site was removed from your account. Please resave the settings to activate the license for this website.', $this->addon->get_license_message() );
 
 		remove_filter( 'pre_http_request', $api_response );
 		$this->addon->delete_license_info();
@@ -392,6 +392,82 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->assertSame( wp_get_environment_type(), $body['environment'] );
 
 		remove_filter( 'pre_http_request', $api_response );
+		$this->addon->delete_license_info();
+	}
+
+	/**
+	 * Run a license check against a stubbed store, and return the request bodies it sent
+	 *
+	 * @param string $check_status The status the store reports for the check
+	 * @param string $recorded_url The URL the license is recorded as activated for
+	 *
+	 * @return array
+	 *
+	 * @since 6.17.1
+	 */
+	protected function run_license_check( $check_status, $recorded_url ) {
+		$requests     = [];
+		$api_response = function ( $pre, $args ) use ( &$requests, $check_status ) {
+			$requests[] = $args['body'];
+
+			/* Only a re-activation can move the key to this site, so only it comes back valid */
+			$license = $args['body']['edd_action'] === 'activate_license' ? 'valid' : $check_status;
+
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [ 'license' => $license ] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response, 10, 2 );
+
+		$this->addon->update_license_info( [ 'license' => '12345', 'status' => 'active' ] );
+		GPDFAPI::get_options_class()->update_option( 'license_' . $this->addon->get_slug() . '_url', $recorded_url );
+
+		$this->addon->schedule_license_check();
+
+		remove_filter( 'pre_http_request', $api_response );
+
+		return $requests;
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_license_check_records_the_activated_site_url() {
+		$this->run_license_check( 'valid', '' );
+
+		$this->assertSame( home_url(), GPDFAPI::get_options_class()->get_option( 'license_' . $this->addon->get_slug() . '_url' ) );
+
+		$this->addon->delete_license_info();
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_license_check_reactivates_the_key_when_the_site_url_changes() {
+		/* Pose as a site cloned from https://production.example.com */
+		$requests = $this->run_license_check( 'site_inactive', 'https://production.example.com' );
+
+		$this->assertCount( 2, $requests );
+		$this->assertSame( 'activate_license', $requests[1]['edd_action'] );
+		$this->assertSame( home_url(), $requests[1]['url'] );
+		$this->assertSame( 'valid', $this->addon->get_license_status() );
+		$this->assertSame( home_url(), GPDFAPI::get_options_class()->get_option( 'license_' . $this->addon->get_slug() . '_url' ) );
+
+		$this->addon->delete_license_info();
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_license_check_leaves_a_deactivated_key_alone_on_the_same_site_url() {
+		/* Same site, so the key was deactivated from the customer's account — re-activating would undo that */
+		$requests = $this->run_license_check( 'inactive', home_url() );
+
+		$this->assertCount( 1, $requests );
+		$this->assertSame( 'inactive', $this->addon->get_license_status() );
+
 		$this->addon->delete_license_info();
 	}
 
