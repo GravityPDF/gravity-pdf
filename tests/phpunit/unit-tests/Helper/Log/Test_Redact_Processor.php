@@ -149,7 +149,7 @@ class Test_Redact_Processor extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertSame( 'package https://store.com/download/file.zip?', $context['response'] );
+		$this->assertSame( 'package https://store.com/download/file.zip?signature=[redacted]', $context['response'] );
 		$this->assertSame( 'license [redacted] rejected', $context['body'] );
 	}
 
@@ -172,6 +172,7 @@ class Test_Redact_Processor extends WP_UnitTestCase {
 	public function provider_message_patterns() {
 		return [
 			'hex license'  => [ 'License 098f6bcd4621d373cade4e832627b4f6 rejected', 'License [redacted] rejected' ],
+			'hex signature' => [ 'signature=' . str_repeat( 'e9f0bc97', 8 ) . '&expires=1790044992', 'signature=[redacted]&expires=1790044992' ],
 			'bearer token' => [ 'Auth failed: Bearer abc.def.ghi', 'Auth failed: [redacted]' ],
 			'google oauth' => [ 'token ya29.a0AfB_xyz-123 expired', 'token [redacted] expired' ],
 			'stripe key'   => [ 'using sk_4eC39HqLyjWDarjtT1zdp7dc', 'using [redacted]' ],
@@ -180,13 +181,41 @@ class Test_Redact_Processor extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Signed-link secrets live in the query string, so keep the path and drop everything after the ?.
+	 * Signed-link secrets live in query-string values, so mask those and keep the path and argument names.
 	 */
-	public function test_blanks_url_query_strings() {
+	public function test_masks_url_query_values_in_messages() {
 		$this->assertSame(
-			'Download failed https://example.com/file.zip?',
+			'Download failed https://example.com/file.zip?token=[redacted]&exp=[redacted]',
 			$this->processor()->message( 'Download failed https://example.com/file.zip?token=secret&exp=123' )
 		);
+	}
+
+	/**
+	 * @dataProvider provider_url_query_values
+	 */
+	public function test_masks_url_query_values( $value, $expected ) {
+		$context = $this->processor()->context( [ 'request_uri' => $value ] );
+
+		$this->assertSame( $expected, $context['request_uri'] );
+	}
+
+	public function provider_url_query_values() {
+		$signature = str_repeat( 'e9f0bc97', 8 );
+
+		return [
+			'root-relative'       => [ "/pdf/632a486a7e7a8/2160/download/?expires=1790044992&signature=$signature", '/pdf/632a486a7e7a8/2160/download/?expires=1790044992&signature=[redacted]' ],
+			'plain permalinks'    => [ "https://example.com/?gpdf=1&pid=632a486a7e7a8&lid=2160&action=download&print=1&signature=$signature", 'https://example.com/?gpdf=1&pid=632a486a7e7a8&lid=2160&action=download&print=1&signature=[redacted]' ],
+			'protocol-relative'   => [ "//example.com/pdf/1/2/?signature=$signature", '//example.com/pdf/1/2/?signature=[redacted]' ],
+			'mid-sentence'        => [ "Requested /pdf/1/2/?signature=$signature", 'Requested /pdf/1/2/?signature=[redacted]' ],
+			'quoted'              => [ "url=\"/pdf/1/2/?signature=$signature\"", 'url="/pdf/1/2/?signature=[redacted]' ],
+			'unknown secret name' => [ '/file.zip?X-Amz-Signature=abc&X-Amz-Credential=def', '/file.zip?X-Amz-Signature=[redacted]&X-Amz-Credential=[redacted]' ],
+			'safe name any case'  => [ '/?PID=632a486a7e7a8&Lid=2160', '/?PID=632a486a7e7a8&Lid=2160' ],
+			'value with no name'  => [ '/file.zip?abc123secret', '/file.zip?[redacted]' ],
+			'empty value'         => [ '/file.zip?token=&pid=1', '/file.zip?token=&pid=1' ],
+			'escaped separators'  => [ '/?gpdf=1&#038;pid=abc&amp;token=secret', '/?gpdf=1&#038;pid=abc&amp;token=[redacted]' ],
+			'empty query'         => [ '/pdf/1/2/?', '/pdf/1/2/?' ],
+			'plain question'      => [ 'Is the /tmp folder writable? No', 'Is the /tmp folder writable? No' ],
+		];
 	}
 
 	/**
