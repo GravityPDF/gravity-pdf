@@ -9,6 +9,8 @@ use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\View\View_PDF;
 use GFPDF_Core_Model;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Mpdf\Log\Context as LogContext;
 use GPDFAPI;
 use WP_UnitTestCase;
 
@@ -188,8 +190,37 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$pdf_generator->set_filename( 'Unit Testing' );
 
 		/* Generate the PDF and verify it was successful */
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' ); /* an earlier test may have left this PDF on disk */
+
 		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
 		$this->assertFileExists( $pdf_generator->get_full_pdf_path() );
+
+		remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		$gfpdf->log->notice( 'After generation' );
+		$gfpdf->log->popHandler();
+
+		/* mPDF's statistics name the PDF they came from, and nothing logged afterwards does */
+		$ids        = [
+			'form_id'  => $entry['form_id'],
+			'entry_id' => $entry['id'],
+			'pdf_id'   => $settings['id'],
+		];
+		$records    = $handler->getRecords();
+		$statistics = array_filter(
+			$records,
+			function ( $record ) {
+				return ( $record['context']['context'] ?? '' ) === LogContext::STATISTICS;
+			}
+		);
+
+		$this->assertNotEmpty( $statistics );
+		foreach ( $statistics as $record ) {
+			$this->assertSame( $ids, array_intersect_key( $record['context'], $ids ) );
+		}
+
+		$this->assertArrayNotHasKey( 'pdf_id', end( $records )['context'] );
 	}
 
 	/**

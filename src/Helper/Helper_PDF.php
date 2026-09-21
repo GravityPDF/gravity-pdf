@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Helper\Log\Context_Logger;
 use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Deprecation;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
@@ -677,7 +678,17 @@ class Helper_PDF {
 			)
 		);
 
-		$this->mpdf->setLogger( $this->log );
+		/* Tag everything mPDF logs, from remote fetches to its statistics, with the PDF it belongs to */
+		$this->mpdf->setLogger(
+			new Context_Logger(
+				$this->log,
+				[
+					'form_id'  => $this->entry['form_id'],
+					'entry_id' => $this->entry['id'],
+					'pdf_id'   => $this->settings['id'],
+				]
+			)
+		);
 
 		/**
 		 * Allow $mpdf object class to be modified
