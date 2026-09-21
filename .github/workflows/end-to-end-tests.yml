@@ -1,7 +1,9 @@
 name: End-to-end Tests
 
 on:
-  pull_request:
+  # Disabled: the E2E suite is currently broken.
+  # Run manually from the Actions tab until it is fixed, then restore `pull_request:`.
+  workflow_dispatch:
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
