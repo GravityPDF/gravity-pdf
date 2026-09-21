@@ -404,9 +404,10 @@ class Test_Model_Settings extends WP_UnitTestCase {
 		$this->assertSame( 'retry', get_transient( 'gfpdf_license_url_change_my-custom-plugin' ) );
 		$this->assertEqualsWithDelta( time() + 3 * HOUR_IN_SECONDS, wp_next_scheduled( 'gfpdf_bulk_license_check' ), 60 );
 
-		/* The retry reaches the store again, and this time it answers */
+		/* The retry reaches the store again, and this time it answers, clearing the earlier attempt */
 		$this->assertCount( 1, $this->run_bulk_license_check( 'site_inactive', 'https://production.example.com' ) );
 		$this->assertSame( 'valid', $this->addon->get_license_status() );
+		$this->assertFalse( get_transient( 'gfpdf_license_url_change_my-custom-plugin' ) );
 	}
 
 	public function provider_activation_responses_without_a_verdict() {

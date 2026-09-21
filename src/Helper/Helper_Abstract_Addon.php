@@ -1273,8 +1273,10 @@ abstract class Helper_Abstract_Addon {
 
 		do_action( 'gfpdf_addon_post_license_activation', $response, $this, true );
 
-		/* The store refused */
-		if ( ! $this->is_license_active() ) {
+		/* Clear an earlier no-verdict attempt, or back off a week if the store refused */
+		if ( $this->is_license_active() ) {
+			delete_transient( $backoff );
+		} else {
 			set_transient( $backoff, 'blocked', WEEK_IN_SECONDS );
 		}
 
