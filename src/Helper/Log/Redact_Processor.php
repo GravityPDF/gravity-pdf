@@ -26,10 +26,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *  - Pattern-based message redaction. The message is a free-form sprintf-baked string with no key to match on, so a
  *    secret interpolated into it ("License $key rejected", a signed URL in an error, a Bearer token echoed from an
  *    HTTP failure) is invisible to key redaction. So the message body is regex-scrubbed: license/hex shapes,
- *    bearer/OAuth/secret-key tokens, and URL query strings (which carry signed-link secrets) are masked.
+ *    bearer/OAuth/secret-key tokens, and URL query-string values (which carry signed-link secrets) are masked.
  *  - Keyed, recursive context redaction. A default deny-key set covers what the plugin actually emits, recursing into
  *    nested arrays and objects so ['response']['headers']['authorization'] is caught. String leaves under non-deny
- *    keys are additionally scrub()'d (URL-query blanking + secret patterns), so a raw non-JSON API body or
+ *    keys are additionally scrub()'d (URL-query masking + secret patterns), so a raw non-JSON API body or
  *    string-encoded request body stored under a benign key ('response'/'body') can't leak a signed URL or echoed key.
  *    The gfpdf_logging_redact_keys filter (passed the logger slug) may only add keys (merged over the defaults so a
  *    host can't weaken them).
@@ -44,6 +44,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Redact_Processor implements ProcessorInterface {
 
 	private const REPLACEMENT = '[redacted]';
+
+	/* Query arguments whose values are logged: they hold no secret, and name the PDF a plain-permalink link points to */
+	private const SAFE_QUERY_ARGS = [ 'gpdf', 'pid', 'lid', 'action', 'print', 'expires' ];
 
 	/* Bound recursion so a circular or pathologically-deep context graph can't exhaust the stack (DoS). */
 	private const MAX_DEPTH = 10;
@@ -73,7 +76,7 @@ class Redact_Processor implements ProcessorInterface {
 	 * @var list<string>
 	 */
 	private const PATTERNS = [
-		'/\b[0-9a-f]{28,40}\b/i', // 28/32/40-hex license / signature shapes
+		'/\b[0-9a-f]{28,128}\b/i', // 28–128 hex: license keys, and HMAC signatures such as a signed PDF link's 64-hex
 		'/Bearer\s+\S+/i',        // bearer tokens
 		'/ya29\.[\w\-]+/',        // Google OAuth access tokens
 		'/sk_[A-Za-z0-9]+/',      // Stripe-style secret keys
@@ -132,21 +135,58 @@ class Redact_Processor implements ProcessorInterface {
 	}
 
 	/**
-	 * Mask secrets in a string: blank URL query strings (signed update/storage links carry secrets there — keep the
-	 * path, drop ?…) then apply the token/hex patterns.
+	 * Mask secrets in a string: mask URL query-string values (signed update/storage links carry secrets there — keep
+	 * the path and argument names) then apply the token/hex patterns.
 	 *
 	 * @param string $value
 	 *
 	 * @return string
 	 *
 	 * @since 6.16.0
-	 * @since 6.17.1 Also blanks root/protocol-relative path query strings
+	 * @since 6.17.1 Covers root/protocol-relative paths, and keeps argument names and SAFE_QUERY_ARGS values
 	 */
 	private function scrub( string $value ): string {
 		/* A token holding a / before its first ? is a URL or path; match only from a token's start so a long run stays linear */
-		$value = (string) preg_replace( '#(?<!\S)(?=[^\s?]*/)([^\s?]*+)\?\S*#', '$1?', $value );
+		$value = (string) preg_replace_callback(
+			'#(?<!\S)(?=[^\s?]*/)([^\s?]*+)\?(\S*)#',
+			function ( array $url ): string {
+				return $url[1] . '?' . $this->mask_query_values( $url[2] );
+			},
+			$value
+		);
 
 		return (string) preg_replace( self::PATTERNS, self::REPLACEMENT, $value );
+	}
+
+	/**
+	 * Mask each query argument's value unless the argument is in SAFE_QUERY_ARGS, failing closed on a secret the list
+	 * does not know by name (X-Amz-Signature, token, key, …).
+	 *
+	 * @param string $query The query string, without its ?
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.1
+	 */
+	private function mask_query_values( string $query ): string {
+		/* Split on & as well as the &amp; and &#038; an escaped URL uses, keeping each separator */
+		$parts = (array) preg_split( '/(&(?:amp;|#0?38;)?)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE );
+
+		foreach ( $parts as $i => $part ) {
+			if ( $i % 2 === 1 || $part === '' ) {
+				continue;
+			}
+
+			$pair = explode( '=', $part, 2 );
+
+			if ( ! isset( $pair[1] ) ) {
+				$parts[ $i ] = self::REPLACEMENT;
+			} elseif ( $pair[1] !== '' && ! in_array( strtolower( $pair[0] ), self::SAFE_QUERY_ARGS, true ) ) {
+				$parts[ $i ] = $pair[0] . '=' . self::REPLACEMENT;
+			}
+		}
+
+		return implode( '', $parts );
 	}
 
 	/**
