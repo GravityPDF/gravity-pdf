@@ -140,9 +140,11 @@ class Redact_Processor implements ProcessorInterface {
 	 * @return string
 	 *
 	 * @since 6.16.0
+	 * @since 6.17.1 Also blanks root/protocol-relative path query strings
 	 */
 	private function scrub( string $value ): string {
-		$value = (string) preg_replace( '#(https?://[^\s?]+)\?\S*#i', '$1?', $value );
+		/* A token holding a / before its first ? is a URL or path; match only from a token's start so a long run stays linear */
+		$value = (string) preg_replace( '#(?<!\S)(?=[^\s?]*/)([^\s?]*+)\?\S*#', '$1?', $value );
 
 		return (string) preg_replace( self::PATTERNS, self::REPLACEMENT, $value );
 	}

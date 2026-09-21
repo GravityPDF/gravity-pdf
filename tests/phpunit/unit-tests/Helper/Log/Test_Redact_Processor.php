@@ -190,6 +190,29 @@ class Test_Redact_Processor extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A request URI has no scheme, but its query string can still carry a signed PDF link's signature.
+	 *
+	 * @dataProvider provider_relative_url_query_strings
+	 */
+	public function test_blanks_relative_url_query_strings( $value, $expected ) {
+		$context = $this->processor()->context( [ 'request_uri' => $value ] );
+
+		$this->assertSame( $expected, $context['request_uri'] );
+	}
+
+	public function provider_relative_url_query_strings() {
+		$signature = str_repeat( 'e9f0bc97', 8 );
+
+		return [
+			'root-relative'     => [ "/pdf/632a486a7e7a8/2160/download/?expires=1790044992&signature=$signature", '/pdf/632a486a7e7a8/2160/download/?' ],
+			'protocol-relative' => [ "//example.com/pdf/1/2/?signature=$signature", '//example.com/pdf/1/2/?' ],
+			'mid-sentence'      => [ "Requested /pdf/1/2/?signature=$signature", 'Requested /pdf/1/2/?' ],
+			'quoted'            => [ "url=\"/pdf/1/2/?signature=$signature\"", 'url="/pdf/1/2/?' ],
+			'plain question'    => [ 'Is the /tmp folder writable? No', 'Is the /tmp folder writable? No' ],
+		];
+	}
+
+	/**
 	 * A newline in message data must not be able to forge a second log line.
 	 */
 	public function test_collapses_line_breaks() {
