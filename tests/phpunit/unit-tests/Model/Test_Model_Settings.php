@@ -80,6 +80,8 @@ class Test_Model_Settings extends WP_UnitTestCase {
 
 		$this->addon->init();
 		$this->addon1->init();
+
+		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
 	}
 
 	public function tear_down() {
@@ -271,6 +273,186 @@ class Test_Model_Settings extends WP_UnitTestCase {
 		$this->assertSame( 'valid', $this->addon1->get_license_status() );
 
 		remove_filter( 'pre_http_request', $api_response );
+	}
+
+	/**
+	 * Run a bulk license check against a stubbed store, and return the activation requests it sent
+	 *
+	 * @since 6.17.1
+	 */
+	protected function run_bulk_license_check( $check_status, $recorded_url, $activation = [ 'license' => 'valid' ] ) {
+		do_action( 'init' );
+
+		$this->addon->update_license_info(
+			[
+				'license' => 'abc123',
+				'status'  => $check_status,
+				'message' => 'Last verdict from the store',
+			],
+			true
+		);
+		\GPDFAPI::get_options_class()->update_option( 'license_my-custom-plugin_url', $recorded_url );
+		$this->addon1->update_license_info( [ 'license' => 'def456', 'status' => 'valid' ] );
+
+		$activations  = [];
+		$api_response = function ( $pre, $args ) use ( &$activations, $check_status, $activation ) {
+			if ( $args['body']['edd_action'] === 'activate_license' ) {
+				$activations[] = $args['body'];
+
+				if ( is_wp_error( $activation ) || isset( $activation['response'] ) ) {
+					return $activation;
+				}
+
+				return [
+					'response' => [ 'code' => 200 ],
+					'body'     => json_encode( $activation ),
+				];
+			}
+
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode(
+					[
+						[
+							'item_id' => 5,
+							'license' => $check_status,
+						],
+						[
+							'item_id' => 10,
+							'license' => 'valid',
+						],
+					]
+				),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response, 10, 2 );
+		$this->model->licensing_bulk_license_check();
+		remove_filter( 'pre_http_request', $api_response );
+
+		return $activations;
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_licensing_bulk_license_check_reactivates_the_key_when_the_site_url_changes() {
+		$activations = $this->run_bulk_license_check( 'site_inactive', 'https://production.example.com' );
+
+		$this->assertCount( 1, $activations );
+		$this->assertSame( home_url(), $activations[0]['url'] );
+		$this->assertSame( 'valid', $this->addon->get_license_status() );
+		$this->assertSame( home_url(), \GPDFAPI::get_options_class()->get_option( 'license_my-custom-plugin_url' ) );
+	}
+
+	/**
+	 * Only an `inactive` / `site_inactive` key recorded against a different URL is moved to this site. The same URL on
+	 * record is a deliberate deactivation, and nothing on record (a key activated before 6.17.1) is no evidence of a move.
+	 *
+	 * @dataProvider provider_licenses_that_are_not_reactivated
+	 *
+	 * @since 6.17.1
+	 */
+	public function test_licensing_bulk_license_check_leaves_other_licenses_alone( $status, $recorded_url ) {
+		$this->assertCount( 0, $this->run_bulk_license_check( $status, $recorded_url ?? home_url() ) );
+		$this->assertSame( $status, $this->addon->get_license_status() );
+	}
+
+	public function provider_licenses_that_are_not_reactivated() {
+		return [
+			'expired'             => [ 'expired', 'https://production.example.com' ],
+			'no activations left' => [ 'no_activations_left', 'https://production.example.com' ],
+			'no URL on record'    => [ 'site_inactive', '' ],
+			'same URL on record'  => [ 'inactive', null ],
+		];
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_licensing_bulk_license_check_backs_off_for_a_week_when_the_store_refuses() {
+		$activations = $this->run_bulk_license_check( 'site_inactive', 'https://production.example.com', [ 'license' => 'invalid', 'error' => 'no_activations_left' ] );
+
+		$this->assertCount( 1, $activations );
+		$this->assertSame( 'no_activations_left', $this->addon->get_license_status() );
+		$this->assertSame( 'https://production.example.com', \GPDFAPI::get_options_class()->get_option( 'license_my-custom-plugin_url' ) );
+
+		$this->assertSame( 'blocked', get_transient( 'gfpdf_license_url_change_my-custom-plugin' ) );
+		$timeout = (int) get_option( '_transient_timeout_gfpdf_license_url_change_my-custom-plugin' );
+		$this->assertEqualsWithDelta( time() + WEEK_IN_SECONDS, $timeout, 60 );
+		$this->assertGreaterThan( time() + DAY_IN_SECONDS, wp_next_scheduled( 'gfpdf_bulk_license_check' ), 'No early retry after a refusal' );
+
+		/* The store flips the status back on the next check, and the backoff keeps it from trying again */
+		$this->assertCount( 0, $this->run_bulk_license_check( 'site_inactive', 'https://production.example.com' ) );
+	}
+
+	/**
+	 * A failed request is no verdict on the license, so nothing is saved and the check retries in a few hours
+	 *
+	 * @dataProvider provider_activation_responses_without_a_verdict
+	 *
+	 * @since 6.17.1
+	 */
+	public function test_licensing_bulk_license_check_retries_soon_when_the_store_gives_no_verdict( $activation ) {
+		$this->assertCount( 1, $this->run_bulk_license_check( 'site_inactive', 'https://production.example.com', $activation ) );
+
+		$this->addon->get_license_info( true );
+		$this->assertSame( 'site_inactive', $this->addon->get_license_status() );
+		$this->assertSame( 'Last verdict from the store', $this->addon->get_license_message() );
+		$this->assertSame( 'https://production.example.com', \GPDFAPI::get_options_class()->get_option( 'license_my-custom-plugin_url' ) );
+
+		$this->assertSame( 'retry', get_transient( 'gfpdf_license_url_change_my-custom-plugin' ) );
+		$this->assertEqualsWithDelta( time() + 3 * HOUR_IN_SECONDS, wp_next_scheduled( 'gfpdf_bulk_license_check' ), 60 );
+
+		/* The retry reaches the store again, and this time it answers, clearing the earlier attempt */
+		$this->assertCount( 1, $this->run_bulk_license_check( 'site_inactive', 'https://production.example.com' ) );
+		$this->assertSame( 'valid', $this->addon->get_license_status() );
+		$this->assertFalse( get_transient( 'gfpdf_license_url_change_my-custom-plugin' ) );
+	}
+
+	public function provider_activation_responses_without_a_verdict() {
+		return [
+			'network error' => [ $this->timeout() ],
+			'rate limited'  => [
+				[
+					'response' => [ 'code' => 429 ],
+					'body'     => '',
+				],
+			],
+		];
+	}
+
+	/**
+	 * A store that keeps failing is retried once soon, then weekly like a refusal, keeping its last verdict
+	 *
+	 * @since 6.17.1
+	 */
+	public function test_licensing_bulk_license_check_backs_off_after_a_second_request_with_no_verdict() {
+		$this->run_bulk_license_check( 'site_inactive', 'https://production.example.com', $this->timeout() );
+
+		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
+		$this->assertCount( 1, $this->run_bulk_license_check( 'site_inactive', 'https://production.example.com', $this->timeout() ) );
+
+		$this->assertSame( 'site_inactive', $this->addon->get_license_status() );
+		$this->assertSame( 'blocked', get_transient( 'gfpdf_license_url_change_my-custom-plugin' ) );
+		$this->assertEqualsWithDelta( time() + WEEK_IN_SECONDS, (int) get_option( '_transient_timeout_gfpdf_license_url_change_my-custom-plugin' ), 60 );
+		$this->assertGreaterThan( time() + DAY_IN_SECONDS, wp_next_scheduled( 'gfpdf_bulk_license_check' ), 'No early retry the second time' );
+	}
+
+	protected function timeout() {
+		return new \WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' );
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_licensing_bulk_license_check_keeps_an_earlier_retry() {
+		$sooner = time() + HOUR_IN_SECONDS;
+		wp_schedule_single_event( $sooner, 'gfpdf_bulk_license_check' );
+
+		$this->run_bulk_license_check( 'site_inactive', 'https://production.example.com', $this->timeout() );
+
+		$this->assertSame( $sooner, wp_next_scheduled( 'gfpdf_bulk_license_check' ) );
 	}
 
 	public function test_licensing_bulk_license_check_no_addons() {

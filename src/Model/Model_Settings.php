@@ -596,7 +596,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+			$this->schedule_bulk_license_check_retry();
 
 			return false;
 		}
@@ -611,7 +611,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				[ 'response' => $license_check ?? substr( $body, 0, 500 ) ]
 			);
 
-			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+			$this->schedule_bulk_license_check_retry();
 
 			return false;
 		}
@@ -645,10 +645,28 @@ class Model_Settings extends Helper_Abstract_Model {
 			}
 
 			/* Runs whether or not the status changed — a cloned site keeps returning the same `site_inactive` */
-			$addon->sync_license_activation_url();
+			if ( $addon->sync_license_activation_url() ) {
+				$this->schedule_bulk_license_check_retry();
+			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Run the bulk license check again in a few hours, unless one is already due sooner
+	 *
+	 * @return void
+	 *
+	 * @since 6.17.1
+	 */
+	protected function schedule_bulk_license_check_retry() {
+		$retry = strtotime( '+3 hour' );
+		$next  = wp_next_scheduled( 'gfpdf_bulk_license_check' );
+
+		if ( ! $next || $next > $retry ) {
+			wp_schedule_single_event( $retry, 'gfpdf_bulk_license_check' );
+		}
 	}
 
 	/**
