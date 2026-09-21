@@ -10,14 +10,15 @@ if [[ -f ".env" ]]; then
 fi
 
 # Install Gravity PDF Dependencies
-composer install
-composer run prefix
+composer install || exit 1
+composer run prefix || exit 1
 
 # Start local environment
+# Abort on failure, else every later step reports the confusing "service is not running" instead
 if [[ $PHP_ENABLE_XDEBUG ]]; then
-  npm run wp-env start -- --upgrade --xdebug=debug,coverage
+  npm run wp-env start -- --upgrade --xdebug=debug,coverage || exit 1
 else
-    npm run wp-env start -- --upgrade
+    npm run wp-env start -- --upgrade || exit 1
 fi
 
 echo "Install Gravity Forms..."
