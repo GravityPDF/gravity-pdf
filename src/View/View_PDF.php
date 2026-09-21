@@ -352,11 +352,13 @@ class View_PDF extends Helper_Abstract_View {
 			$this->log->error(
 				'PDF Generation Error',
 				[
-					'field'     => $field,
-					'entry'     => $entry,
-					'config'    => $config,
-					'form_id'   => $form['id'],
-					'exception' => $e->getMessage(),
+					'form_id'    => $form['id'],
+					'entry_id'   => $entry['id'] ?? 0,
+					'field_id'   => $field->id,
+					'field_type' => $field->type,
+					'exception'  => $e->getMessage(),
+					'file'       => $e->getFile(),
+					'line'       => $e->getLine(),
 				]
 			);
 		}

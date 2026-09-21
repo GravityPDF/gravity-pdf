@@ -15,7 +15,11 @@ use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\Statics\Cache;
+use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger;
+use GFPDF_Vendor\Mpdf\Log\Context as LogContext;
 use GPDFAPI;
 use ReflectionMethod;
 use WP_Error;
@@ -149,6 +153,7 @@ class Test_PDF extends TestCase {
 		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 
 		$this->assertSame( 9999, has_filter( 'gform_notification', [ $this->model, 'notifications' ] ) );
+		$this->assertSame( 10, has_filter( 'gform_notes_avatar', [ Notes::class, 'note_avatar' ] ) );
 
 		$this->assertSame(
 			10,
@@ -1057,6 +1062,62 @@ class Test_PDF extends TestCase {
 	}
 
 	/**
+	 * A PDF that fails to generate is noted on the entry, and logged without dumping the generator
+	 *
+	 * @since 6.17.1
+	 */
+	public function test_notifications_notes_a_pdf_that_failed_to_attach() {
+		global $gfpdf;
+
+		$results                     = $this->form_and_entry();
+		$entry                       = $results['entry'];
+		$form                        = $results['form'];
+		$form['gfpdf_form_settings'] = [ $form['gfpdf_form_settings']['556690c67856b'] ];
+		$notification                = $form['notifications']['54bca349732b8'];
+
+		$break_template = function ( $settings ) {
+			$settings['template'] = 'doesntexist';
+
+			return $settings;
+		};
+
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+		add_filter( 'gfpdf_pdf_config', $break_template );
+
+		$notifications = $this->model->notifications( $notification, $form, $entry );
+
+		remove_filter( 'gfpdf_pdf_config', $break_template );
+		$gfpdf->log->popHandler();
+
+		$this->assertSame( [], $notifications['attachments'] );
+
+		$this->assertTrue(
+			$handler->hasRecordThatPasses(
+				function ( $record ) use ( $entry ) {
+					return $record['message'] === 'PDF Generation Error' && $record['context']['entry_id'] === $entry['id'] && ! isset( $record['context']['pdf'] );
+				},
+				Logger::ERROR
+			)
+		);
+
+		$notes = GFAPI::get_notes(
+			[
+				'entry_id'  => $entry['id'],
+				'note_type' => Notes::NOTE_TYPE,
+				'sub_type'  => 'error',
+			]
+		);
+
+		$this->assertCount( 1, $notes );
+		$this->assertSame( $notification['name'] . ' (ID: ' . $notification['id'] . ')', $notes[0]->user_name );
+		$this->assertStringContainsString( 'not attached to this notification.', $notes[0]->value );
+
+		$pdf_url = admin_url( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=' . $form['id'] . '&pid=556690c67856b' );
+		$this->assertStringContainsString( '<a href="' . esc_url( $pdf_url ) . '">My First PDF Template (copy)</a>', $notes[0]->value );
+	}
+
+	/**
 	 * Check if our PDF exists on disk
 	 *
 	 * @since 4.0
@@ -1265,10 +1326,25 @@ class Test_PDF extends TestCase {
 			'mpdf/test2' => time() - 3590,
 			'mpdf/test3' => time() - ( 25 * 3600 ),
 
+			'mpdf/mpdf/_tempImg'                       => time() - 3601,
+			'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' => time() - ( 2 * DAY_IN_SECONDS ),
+			'mpdf/mpdf/ttfontdata/dejavusans.cw.dat'   => time() - WEEK_IN_SECONDS - 60,
+			'1234556690c67856b/document.pdf'           => time() - ( 13 * 3600 ),
 		];
+
+		$directories = [ 'mpdf/mpdf/ttfontdata', 'mpdf/mpdf', 'mpdf', '1234556690c67856b' ];
+
+		foreach ( $directories as $directory ) {
+			wp_mkdir_p( $tmp . $directory );
+		}
 
 		foreach ( $files as $file => $modified ) {
 			touch( $tmp . $file, (int) $modified );
+		}
+
+		/* Age the directories last, as creating their files refreshed them */
+		foreach ( $directories as $directory ) {
+			touch( $tmp . $directory, time() - ( 25 * 3600 ) );
 		}
 
 		/* Run our cleanup function and test the output */
@@ -1287,9 +1363,20 @@ class Test_PDF extends TestCase {
 		$this->assertFileExists( $tmp . 'mpdf/test2' );
 		$this->assertFileDoesNotExist( $tmp . 'mpdf/test3' );
 
+		/* mPDF's cache folders stay while their files expire, and font metrics are kept for a week */
+		$this->assertDirectoryExists( $tmp . 'mpdf/mpdf/ttfontdata' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/_tempImg' );
+		$this->assertFileExists( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.cw.dat' );
+		$this->assertFileDoesNotExist( $tmp . '1234556690c67856b/document.pdf' );
+
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
 			@unlink( $tmp . $file );
+		}
+
+		foreach ( $directories as $directory ) {
+			@rmdir( $tmp . $directory );
 		}
 	}
 
@@ -1916,8 +2003,37 @@ class Test_PDF extends TestCase {
 		$pdf_generator->set_filename( 'Unit Testing' );
 
 		/* Generate the PDF and verify it was successful */
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' ); /* an earlier test may have left this PDF on disk */
+
 		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
 		$this->assertFileExists( $pdf_generator->get_full_pdf_path() );
+
+		remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		$gfpdf->log->notice( 'After generation' );
+		$gfpdf->log->popHandler();
+
+		/* mPDF's statistics name the PDF they came from, and nothing logged afterwards does */
+		$ids        = [
+			'form_id'  => $entry['form_id'],
+			'entry_id' => $entry['id'],
+			'pdf_id'   => $settings['id'],
+		];
+		$records    = $handler->getRecords();
+		$statistics = array_filter(
+			$records,
+			function ( $record ) {
+				return ( $record['context']['context'] ?? '' ) === LogContext::STATISTICS;
+			}
+		);
+
+		$this->assertNotEmpty( $statistics );
+		foreach ( $statistics as $record ) {
+			$this->assertSame( $ids, array_intersect_key( $record['context'], $ids ) );
+		}
+
+		$this->assertArrayNotHasKey( 'pdf_id', end( $records )['context'] );
 	}
 
 	/**

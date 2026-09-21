@@ -12,6 +12,7 @@ use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Debug;
+use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -187,6 +188,8 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		/* Gravity Forms PDF Attachments */
 		add_filter( 'gform_notification', [ $this->model, 'notifications' ], 9999, 3 );
+
+		add_filter( 'gform_notes_avatar', [ Notes::class, 'note_avatar' ], 10, 2 );
 
 		/* Change mPDF settings */
 		add_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] );

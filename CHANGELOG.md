@@ -36,6 +36,17 @@
 * 💻 Developer: Every class that lost a method in 7.0 uses the new `Helper_Trait_Removed_Methods`, so calling one of those methods emits a `_deprecated_function()` notice and returns `null` rather than ending the request with an "undefined method" fatal. The views report the same thing through `_doing_it_wrong()`, from the `__call()` they already had. It is a report, not a shim: the method does nothing, a filter callback routed through it hands back `null` in place of the value it was given, and `is_callable()` now answers true for any name on these classes — so the call still has to go
 * 🧹 Housekeeping: The version 3 detections added in 6.17 move from Deprecated Features to Unsupported Features, so the System Status and Site Health reports list them under their own heading and the admin notice is shown as an error rather than a warning
 
+### 6.17.1
+* 🔒 Security: Redact relative signed PDF URLs in log files
+* 🧹 Housekeeping: Condense info saved to in log files when generating PDFs
+* 🧹 Housekeeping: Add an entry note if a PDF fails to generate when sending an email notification
+* 🧹 Housekeeping: Try auto-reactivate a license key when the site URL changes
+* 🐞 Bug: Fix intermittent "Temporary files directory is not writable" error
+* 🐞 Bug: Stop the scheduled cleanup deleting temporary folders still in use
+* 🐞 Bug: Exclude staging and development sites from license activation count
+* 🐞 Bug: Stop offering an extension update if the license key isn't activated for the current domain
+* 🐞 Bug: On Multisite, offer an update in the "new version" popup when a subsite has an active license
+
 ### 6.17.0
 * 🎉 Feature: Add a legacy features alert to Site Health and System Status reports
 * 🐞 Bug: Fix fatal error during update checks when the plugin requirements not met

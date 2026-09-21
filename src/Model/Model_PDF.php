@@ -24,6 +24,7 @@ use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
+use GFPDF\Statics\Notes;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GFQuiz;
@@ -1083,7 +1084,9 @@ class Model_PDF extends Helper_Abstract_Model {
 					$filename = $this->generate_and_save_pdf( $entry, $settings );
 					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
 
-					if ( ! is_wp_error( $filename ) ) {
+					if ( is_wp_error( $filename ) ) {
+						$this->add_attachment_failure_note( $entry, $settings, $notifications );
+					} else {
 						$notifications['attachments'][] = $filename;
 					}
 				}
@@ -1099,6 +1102,39 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return $notifications;
+	}
+
+	/**
+	 * Record on the entry that a PDF was left off a notification, which is otherwise sent without it
+	 *
+	 * @param array $entry        The Gravity Forms entry
+	 * @param array $settings     The Gravity PDF settings
+	 * @param array $notification The Gravity Forms notification
+	 *
+	 * @since 6.17.1
+	 */
+	protected function add_attachment_failure_note( $entry, $settings, $notification ) {
+		if ( empty( $entry['id'] ) ) {
+			return;
+		}
+
+		$pdf_url = admin_url( sprintf( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=%d&pid=%s', $entry['form_id'], $settings['id'] ) );
+
+		$note = sprintf(
+			/* translators: %s: PDF name linked to its settings */
+			__( 'The PDF %s could not be generated and was not attached to this notification.', 'gravity-pdf' ),
+			'<a href="' . esc_url( $pdf_url ) . '">' . esc_html( $settings['name'] ) . '</a>'
+		);
+
+		/* Author the note as Gravity Forms does its own notification notes, so the two sit together */
+		$author = sprintf(
+			/* translators: 1: Notification name, 2: Notification ID */
+			__( '%1$s (ID: %2$s)', 'gravity-pdf' ),
+			$notification['name'],
+			$notification['id']
+		);
+
+		Notes::add_entry_note( $entry['id'], $note, 'error', $author );
 	}
 
 	/**
@@ -1232,8 +1268,14 @@ class Model_PDF extends Helper_Abstract_Model {
 			$this->log->error(
 				'PDF Generation Error',
 				[
-					'pdf'       => $pdf_generator,
+					'form_id'   => $form['id'],
+					'entry_id'  => $entry['id'],
+					'pdf_id'    => $settings['id'],
+					'template'  => $settings['template'],
+					'path'      => $pdf_generator->get_full_pdf_path(),
 					'exception' => $e->getMessage(),
+					'file'      => $e->getFile(),
+					'line'      => $e->getLine(),
 				]
 			);
 
@@ -1902,27 +1944,25 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function cleanup_tmp_dir() {
 
-		$config = [
-			/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
-			[
-				'dir' => $this->data->mpdf_tmp_location,
-				'age' => time() - 3600, // 1 hour
-			],
+		$mpdf_tmp_location = $this->data->mpdf_tmp_location;
+		$mpdf_font_cache   = $mpdf_tmp_location . '/mpdf/ttfontdata/';
 
-			[
-				'dir' => $this->data->template_tmp_location,
-				'age' => time() - 12 * 3600, // 12 hour
-			],
-		];
+		/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
+		$directories = [ $this->data->template_tmp_location ];
+		if ( strpos( $mpdf_tmp_location, $this->data->template_tmp_location ) !== 0 ) {
+			$directories[] = $mpdf_tmp_location;
+		}
 
-		foreach ( $config as $item ) {
-			if ( ! is_dir( $item['dir'] ) ) {
+		$now = time();
+
+		foreach ( $directories as $dir ) {
+			if ( ! is_dir( $dir ) ) {
 				continue;
 			}
 
 			try {
 				$directory_list = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator( $item['dir'], RecursiveDirectoryIterator::SKIP_DOTS ),
+					new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
 					RecursiveIteratorIterator::CHILD_FIRST
 				);
 
@@ -1931,17 +1971,32 @@ class Model_PDF extends Helper_Abstract_Model {
 						continue;
 					}
 
-					if ( $file->isReadable() && $file->getMTime() < $item['age'] ) {
+					$path    = $file->getPathname();
+					$is_mpdf = strpos( $path . '/', $mpdf_tmp_location . '/' ) === 0;
+
+					/* Concurrent PDFs share mPDF's cache folders and it recreates them non-atomically, so only files expire */
+					if ( $is_mpdf && $file->isDir() ) {
+						continue;
+					}
+
+					if ( strpos( $path, $mpdf_font_cache ) === 0 ) {
+						/* Font metrics only go stale when a font changes, and FlushCache clears them then */
+						$max_age = WEEK_IN_SECONDS;
+					} else {
+						$max_age = $is_mpdf ? HOUR_IN_SECONDS : 12 * HOUR_IN_SECONDS;
+					}
+
+					if ( $file->isReadable() && $file->getMTime() < $now - $max_age ) {
 						( $file->isDir() ) ?
-							$this->misc->rmdir( $file->getPathName() ) :
-							@unlink( $file->getPathName() ); //phpcs:ignore
+							$this->misc->rmdir( $path ) :
+							@unlink( $path ); //phpcs:ignore
 					}
 				}
 			} catch ( Exception $e ) {
 				$this->log->error(
 					'Filesystem Delete Error',
 					[
-						'dir'       => $item['dir'],
+						'dir'       => $dir,
 						'exception' => $e->getMessage(),
 					]
 				);
