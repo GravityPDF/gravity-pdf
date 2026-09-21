@@ -3,13 +3,15 @@
 ## Gravity PDF
 
 ### 6.17.1
-* 🎉 Feature: Add an entry note if a PDF for an email notification fails to generate
+* 🔒 Security: Redact relative signed PDF URLs in log files
+* 🧹 Housekeeping: Condense info saved to in log files when generating PDFs
+* 🧹 Housekeeping: Add an entry note if a PDF fails to generate when sending an email notification
+* 🧹 Housekeeping: Try auto-reactivate a license key when the site URL changes
 * 🐞 Bug: Fix intermittent "Temporary files directory is not writable" error
 * 🐞 Bug: Stop the scheduled cleanup deleting temporary folders still in use
-* 🐞 Bug: Ensure staging and development sites are excluded from the license activation count
-* 🐞 Bug: Stop offering an update when the license key isn't activated for the current domain
+* 🐞 Bug: Exclude staging and development sites from license activation count
+* 🐞 Bug: Stop offering an extension update if the license key isn't activated for the current domain
 * 🐞 Bug: On Multisite, offer an update in the "new version" popup when a subsite has an active license
-* 🧹 Housekeeping: Make PDF error logs concise
 
 ### 6.17.0
 * 🎉 Feature: Add a legacy features alert to Site Health and System Status reports
