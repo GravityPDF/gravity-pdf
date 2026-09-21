@@ -266,6 +266,13 @@ class Model_Settings extends Helper_Abstract_Model {
 				'type'  => 'hidden',
 				'class' => 'gfpdf-hidden',
 			];
+
+			/* Registered so maybe_active_licenses() can write it; the posted value is always discarded */
+			$fields[ 'license_' . $slug . '_url' ] = [
+				'id'    => 'license_' . $slug . '_url',
+				'type'  => 'hidden',
+				'class' => 'gfpdf-hidden',
+			];
 		}
 
 		return $fields;
@@ -301,6 +308,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			if ( trim( $input[ $option_key ] ) === '' ) {
 				$input[ $option_key . '_message' ] = '';
 				$input[ $option_key . '_status' ]  = '';
+				$input[ $option_key . '_url' ]     = '';
 
 				/* Sync the in-memory copy too, else get_license_status() returns the stale prior value this request */
 				$addon->update_license_info(
@@ -325,6 +333,9 @@ class Model_Settings extends Helper_Abstract_Model {
 				$input[ $option_key ] = $settings[ $option_key ];
 			}
 
+			/* Only an activation below can move the record; a stale valid status on a clone is not proof */
+			$input[ $option_key . '_url' ] = $addon->get_license_activation_url();
+
 			/* Run license activation if a new key was submitted, or the existing key isn't valid */
 			if (
 				! in_array( $input[ $option_key . '_status' ] ?? '', [ 'active', 'valid' ], true ) ||
@@ -334,6 +345,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				$input[ $option_key . '_message' ] = $results['message'];
 				$input[ $option_key . '_status' ]  = $results['status'];
+
+				/* The activation is only written to the database once this save completes, so record it here too */
+				$input[ $option_key . '_url' ] = $addon->resolve_license_activation_url();
 			}
 		}
 
@@ -347,6 +361,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			$input[ $option_key ]              = $addon->get_license_key();
 			$input[ $option_key . '_message' ] = $addon->get_license_message();
 			$input[ $option_key . '_status' ]  = $addon->get_license_status();
+			$input[ $option_key . '_url' ]     = $addon->get_license_activation_url();
 		}
 
 		return $input;
@@ -586,7 +601,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+			$this->schedule_bulk_license_check_retry();
 
 			return false;
 		}
@@ -601,7 +616,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				[ 'response' => $license_check ?? substr( $body, 0, 500 ) ]
 			);
 
-			wp_schedule_single_event( strtotime( '+3 hour' ), 'gfpdf_bulk_license_check' );
+			$this->schedule_bulk_license_check_retry();
 
 			return false;
 		}
@@ -623,22 +638,40 @@ class Model_Settings extends Helper_Abstract_Model {
 						'slug'     => $addon->get_slug(),
 					]
 				);
-
-				continue;
+			} else {
+				$addon->update_license_status_from_response(
+					$addon->get_license_key(),
+					[
+						'response' => [ 'code' => 200 ],
+						'body'     => wp_json_encode( $addon_response ),
+					],
+					true
+				);
 			}
 
-			$addon->update_license_status_from_response(
-				$addon->get_license_key(),
-				[
-					'response' => [ 'code' => 200 ],
-					'body'     => wp_json_encode( $addon_response ),
-				],
-				true
-			);
-
+			/* Runs whether or not the status changed — a cloned site keeps returning the same `site_inactive` */
+			if ( $addon->sync_license_activation_url() ) {
+				$this->schedule_bulk_license_check_retry();
+			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Run the bulk license check again in a few hours, unless one is already due sooner
+	 *
+	 * @return void
+	 *
+	 * @since 6.17.1
+	 */
+	protected function schedule_bulk_license_check_retry() {
+		$retry = strtotime( '+3 hour' );
+		$next  = wp_next_scheduled( 'gfpdf_bulk_license_check' );
+
+		if ( ! $next || $next > $retry ) {
+			wp_schedule_single_event( $retry, 'gfpdf_bulk_license_check' );
+		}
 	}
 
 	/**

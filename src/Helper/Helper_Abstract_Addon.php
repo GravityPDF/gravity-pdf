@@ -420,12 +420,14 @@ abstract class Helper_Abstract_Addon {
 	 */
 	public function get_default_api_params() {
 		return [
-			'version'   => $this->get_version(),
-			'license'   => $this->get_license_key(),
-			'item_name' => $this->get_short_name(),
-			'item_id'   => $this->get_edd_download_id(),
-			'author'    => $this->get_author(),
-			'beta'      => false,
+			'version'     => $this->get_version(),
+			'license'     => $this->get_license_key(),
+			'item_name'   => $this->get_short_name(),
+			'item_id'     => $this->get_edd_download_id(),
+			'author'      => $this->get_author(),
+			'beta'        => false,
+			'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
+			'url'         => home_url(),
 		];
 	}
 
@@ -468,9 +470,8 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		$key_changed = $hardcoded_license !== $this->license_key;
-		$is_active   = in_array( $this->get_license_status(), [ 'active', 'valid' ], true );
 
-		if ( ! $key_changed && $is_active ) {
+		if ( ! $key_changed && $this->is_license_active() ) {
 			return;
 		}
 
@@ -481,8 +482,7 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		$this->activate_license( $hardcoded_license, true );
-
-		if ( ! in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) ) {
+		if ( ! $this->is_license_active() ) {
 			set_transient( $backoff, 1, 3 * HOUR_IN_SECONDS );
 		}
 	}
@@ -705,6 +705,9 @@ abstract class Helper_Abstract_Addon {
 		$settings[ "license_{$slug}_status" ]  = $this->get_license_status();
 		$settings[ "license_{$slug}_message" ] = $this->get_license_message();
 
+		/* The store only reports active/valid for the URL the request declared, so this is proof of the activation */
+		$settings[ "license_{$slug}_url" ] = $this->resolve_license_activation_url();
+
 		$this->log->notice( 'Update plugin license details', $license_info );
 
 		$this->options->update_settings( $settings );
@@ -745,7 +748,8 @@ abstract class Helper_Abstract_Addon {
 		unset(
 			$settings[ "license_$slug" ],
 			$settings[ "license_{$slug}_status" ],
-			$settings[ "license_{$slug}_message" ]
+			$settings[ "license_{$slug}_message" ],
+			$settings[ "license_{$slug}_url" ]
 		);
 
 		wp_clear_scheduled_hook( 'gfpdf_' . $slug . '_license_check' );
@@ -817,6 +821,39 @@ abstract class Helper_Abstract_Addon {
 	 */
 	final public function get_license_message() {
 		return $this->license_key_message;
+	}
+
+	/**
+	 * Whether the store has confirmed the current add-on license key
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.1
+	 */
+	final public function is_license_active() {
+		return in_array( $this->get_license_status(), [ 'active', 'valid' ], true );
+	}
+
+	/**
+	 * The site URL the license key was last confirmed active for, normalized for comparison with home_url()
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.1
+	 */
+	public function get_license_activation_url() {
+		return untrailingslashit( (string) $this->options->get_option( 'license_' . $this->get_slug() . '_url', '' ) );
+	}
+
+	/**
+	 * The URL to record now: this site once the store has confirmed the key for it, otherwise what is already on record
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.1
+	 */
+	public function resolve_license_activation_url() {
+		return $this->is_license_active() ? home_url() : $this->get_license_activation_url();
 	}
 
 	/**
@@ -925,13 +962,16 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		if ( isset( $license_check->license ) && $license_check->license === 'valid' ) {
-			/* License is still valid, do nothing */
+			$this->sync_license_activation_url();
 
 			return true;
 		}
 
 		/* License status has changed. Update database */
-		return $this->update_license_status_from_response( $this->get_license_key(), $response, true );
+		$this->update_license_status_from_response( $this->get_license_key(), $response, true );
+		$this->sync_license_activation_url();
+
+		return $this->is_license_active();
 	}
 
 	/**
@@ -946,16 +986,11 @@ abstract class Helper_Abstract_Addon {
 	 * @since 6.16.0
 	 */
 	public function update_license_status_from_response( $license_key, $response, $use_database = false ) {
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( is_wp_error( $response ) || $response_code !== 200 ) {
-			$license_data = new \stdClass();
+		$license_data = $this->parse_license_response( $response ) ?? new \stdClass();
 
-			/* handle rate limiting */
-			if ( $response_code === 429 ) {
-				$license_data->error = 'rate_limit';
-			}
-		} else {
-			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+		/* handle rate limiting */
+		if ( wp_remote_retrieve_response_code( $response ) === 429 ) {
+			$license_data->error = 'rate_limit';
 		}
 
 		$possible_responses = $this->data->addon_license_responses( $this->get_name() );
@@ -1054,7 +1089,7 @@ abstract class Helper_Abstract_Addon {
 		}
 
 		$edd_id = $this->get_edd_download_id();
-		if ( in_array( $this->get_license_status(), [ 'active', 'valid' ], true ) || empty( $edd_id ) ) {
+		if ( $this->is_license_active() || empty( $edd_id ) ) {
 			return;
 		}
 
@@ -1128,7 +1163,26 @@ abstract class Helper_Abstract_Addon {
 			$license_key = $this->get_license_key();
 		}
 
-		$response = wp_remote_post(
+		$response = $this->request_license_activation( $license_key );
+
+		$this->update_license_status_from_response( $license_key, $response, $use_database );
+
+		do_action( 'gfpdf_addon_post_license_activation', $response, $this, $use_database );
+
+		return $this->get_license_info();
+	}
+
+	/**
+	 * Ask the store to activate the license key for this site
+	 *
+	 * @param string $license_key
+	 *
+	 * @return array|\WP_Error
+	 *
+	 * @since 6.17.1
+	 */
+	private function request_license_activation( $license_key ) {
+		return wp_remote_post(
 			$this->data->store_url,
 			[
 				'timeout' => 15,
@@ -1141,12 +1195,123 @@ abstract class Helper_Abstract_Addon {
 				),
 			]
 		);
+	}
 
-		$this->update_license_status_from_response( $license_key, $response, $use_database );
+	/**
+	 * Reconcile the site URL the license key is activated for with this site's URL
+	 *
+	 * Run after a license check. An active license proves the key is activated for the current URL, so that URL is
+	 * recorded. `inactive` / `site_inactive` against a *different* recorded URL means the site was cloned or moved —
+	 * production copied to staging, say — and the key is still activated for the old URL, so activate it for this one;
+	 * the same URL on record means the customer deactivated the site from their account.
+	 *
+	 * @return bool Whether the store gave no verdict, so the license check should run again soon
+	 *
+	 * @since 6.17.1
+	 */
+	public function sync_license_activation_url() {
+		$recorded = $this->get_license_activation_url();
+		$current  = untrailingslashit( home_url() );
 
-		do_action( 'gfpdf_addon_post_license_activation', $response, $this, $use_database );
+		if ( $this->is_license_active() ) {
+			if ( $recorded !== $current ) {
+				$this->record_license_activation_url();
+			}
 
-		return $this->get_license_info();
+			return false;
+		}
+
+		/* Only a key the store still holds an activation for can be moved to this site */
+		if ( ! in_array( $this->get_license_status(), [ 'inactive', 'site_inactive' ], true ) ) {
+			return false;
+		}
+
+		/* Nothing on record (a key last activated before 6.17.1) is not evidence the URL changed */
+		if ( $recorded === '' || $recorded === $current ) {
+			return false;
+		}
+
+		/* Back off so a key that can't activate here — an over-limit domain migration — doesn't retry every check */
+		$backoff = 'gfpdf_license_url_change_' . $this->get_slug();
+		$attempt = get_transient( $backoff );
+		if ( $attempt === 'blocked' ) {
+			return false;
+		}
+
+		$this->log->notice(
+			'Site URL has changed since the license key was activated. Re-activating.',
+			[
+				'slug'          => $this->get_slug(),
+				'activated_for' => $recorded,
+				'site_url'      => $current,
+			]
+		);
+
+		$license_key = $this->get_license_key();
+		$response    = $this->request_license_activation( $license_key );
+
+		/* A failed request is no verdict on the license, so save nothing and retry once soon before backing off */
+		if ( $this->parse_license_response( $response ) === null ) {
+			if ( $attempt === 'retry' ) {
+				set_transient( $backoff, 'blocked', WEEK_IN_SECONDS );
+
+				return false;
+			}
+
+			set_transient( $backoff, 'retry', DAY_IN_SECONDS );
+
+			$this->log->warning(
+				'Could not reach the licensing server to re-activate the license key. Retrying soon.',
+				[ 'slug' => $this->get_slug() ]
+			);
+
+			return true;
+		}
+
+		/* A successful activation records the URL itself, via update_license_info() */
+		/* A successful activation records the URL itself, via update_license_info() */
+		$this->update_license_status_from_response( $license_key, $response, true );
+
+		do_action( 'gfpdf_addon_post_license_activation', $response, $this, true );
+
+		/* Clear an earlier no-verdict attempt, or back off a week if the store refused */
+		if ( $this->is_license_active() ) {
+			delete_transient( $backoff );
+		} else {
+			set_transient( $backoff, 'blocked', WEEK_IN_SECONDS );
+		}
+
+		return false;
+	}
+
+	/**
+	 * The store's answer to a license request, or null when the request failed and the store gave no verdict
+	 *
+	 * @param array|\WP_Error $response
+	 *
+	 * @return \stdClass|null
+	 *
+	 * @since 6.17.1
+	 */
+	private function parse_license_response( $response ) {
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return null;
+		}
+
+		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+
+		return empty( $license_data->license ) && empty( $license_data->error ) ? null : $license_data;
+	}
+
+	/**
+	 * Record the site URL the license key is activated for
+	 *
+	 * @return void
+	 *
+	 * @since 6.17.1
+	 */
+	private function record_license_activation_url() {
+		$this->options->update_option( 'license_' . $this->get_slug() . '_url', home_url() );
 	}
 
 	/**
