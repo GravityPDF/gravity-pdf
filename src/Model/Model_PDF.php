@@ -24,6 +24,7 @@ use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Statics\Deprecation_V3;
+use GFPDF\Statics\Notes;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GFQuiz;
@@ -1134,14 +1135,23 @@ class Model_PDF extends Helper_Abstract_Model {
 			return;
 		}
 
+		$pdf_url = admin_url( sprintf( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=%d&pid=%s', $entry['form_id'], $settings['id'] ) );
+
 		$note = sprintf(
-			/* translators: 1: PDF name, 2: Notification name */
-			__( 'The PDF "%1$s" could not be generated and was not attached to the "%2$s" notification.', 'gravity-pdf' ),
-			esc_html( $settings['name'] ?? '' ),
-			esc_html( $notification['name'] ?? $notification['id'] ?? '' )
+			/* translators: %s: PDF name linked to its settings */
+			__( 'The PDF %s could not be generated and was not attached to this notification.', 'gravity-pdf' ),
+			'<a href="' . esc_url( $pdf_url ) . '">' . esc_html( $settings['name'] ) . '</a>'
 		);
 
-		GFFormsModel::add_note( $entry['id'], 0, 'Gravity PDF', $note, 'gravity-pdf', 'error' );
+		/* Author the note as Gravity Forms does its own notification notes, so the two sit together */
+		$author = sprintf(
+			/* translators: 1: Notification name, 2: Notification ID */
+			__( '%1$s (ID: %2$s)', 'gravity-pdf' ),
+			$notification['name'],
+			$notification['id']
+		);
+
+		Notes::add_entry_note( $entry['id'], $note, 'error', $author );
 	}
 
 	/**

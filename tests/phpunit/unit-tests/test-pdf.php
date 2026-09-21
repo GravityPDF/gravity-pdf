@@ -13,6 +13,7 @@ use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
+use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -154,6 +155,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 
 		$this->assertSame( 9999, has_filter( 'gform_notification', [ $this->model, 'notifications' ] ) );
+		$this->assertSame( 10, has_filter( 'gform_notes_avatar', [ Notes::class, 'note_avatar' ] ) );
 
 		$this->assertSame(
 			10,
@@ -1140,13 +1142,17 @@ class Test_PDF extends WP_UnitTestCase {
 		$notes = GFAPI::get_notes(
 			[
 				'entry_id'  => $entry['id'],
-				'note_type' => 'gravity-pdf',
+				'note_type' => Notes::NOTE_TYPE,
 				'sub_type'  => 'error',
 			]
 		);
 
 		$this->assertCount( 1, $notes );
-		$this->assertStringContainsString( '"' . esc_html( $notification['name'] ) . '" notification', $notes[0]->value );
+		$this->assertSame( $notification['name'] . ' (ID: ' . $notification['id'] . ')', $notes[0]->user_name );
+		$this->assertStringContainsString( 'not attached to this notification.', $notes[0]->value );
+
+		$pdf_url = admin_url( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=' . $form['id'] . '&pid=556690c67856b' );
+		$this->assertStringContainsString( '<a href="' . esc_url( $pdf_url ) . '">My First PDF Template (copy)</a>', $notes[0]->value );
 	}
 
 	/**

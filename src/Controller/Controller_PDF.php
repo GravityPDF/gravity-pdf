@@ -12,6 +12,7 @@ use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Deprecation_V3;
+use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
 use Psr\Log\LoggerInterface;
 
@@ -208,6 +209,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			9999,
 			3
 		); /* ensure Gravity PDF is one of the last filters to be applied */
+
+		add_filter( 'gform_notes_avatar', [ Notes::class, 'note_avatar' ], 10, 2 );
 
 		/* Change mPDF settings */
 		add_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] );
