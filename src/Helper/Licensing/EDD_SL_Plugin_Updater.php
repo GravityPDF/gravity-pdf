@@ -49,6 +49,7 @@ class EDD_SL_Plugin_Updater {
 		'disabled',
 		'missing',
 		'invalid',
+		'inactive',
 		'site_inactive',
 		'item_name_mismatch',
 		'invalid_item_id',
@@ -177,7 +178,8 @@ class EDD_SL_Plugin_Updater {
 			&& ! empty( $version_info->new_version )
 			&& version_compare( $network->new_version ?? '', $version_info->new_version, '>=' )
 		) {
-			$version_info->package = $network->package;
+			$version_info->package       = $network->package;
+			$version_info->download_link = $network->package;
 		}
 
 		return $version_info;
@@ -410,18 +412,10 @@ class EDD_SL_Plugin_Updater {
 			return $_data;
 		}
 
-		// Get the transient where we store the api request for this plugin for 24 hours
-		$edd_api_request_transient = $this->get_cached_version_info();
-
-		//If we have no transient-saved value, run the API (which caches a successful response internally) and return it too right now.
-		if ( empty( $edd_api_request_transient ) ) {
-			$api_response = $this->get_version_info();
-
-			if ( false !== $api_response ) {
-				$_data = $api_response;
-			}
-		} else {
-			$_data = $edd_api_request_transient;
+		/* Same source as the update row: the details modal only shows its install/update button when download_link is set */
+		$api_response = $this->get_repo_api_data();
+		if ( false !== $api_response ) {
+			$_data = $api_response;
 		}
 
 		// $_data stays false when get_version_info() bails (API down, backoff, secondary site) — assigning to a bool fatals on PHP 8.
@@ -620,6 +614,7 @@ class EDD_SL_Plugin_Updater {
 			'beta'        => $this->beta,
 			'php_version' => phpversion(),
 			'wp_version'  => get_bloginfo( 'version' ),
+			'environment' => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
 		];
 	}
 
@@ -731,6 +726,12 @@ class EDD_SL_Plugin_Updater {
 	 * @return void
 	 */
 	public function set_version_info_cache( $value = '', $cache_key = '' ) {
+
+		/* An unentitled license can get a package URL that errors; blank it (and the modal's download_link) so a Multisite site borrows the network package */
+		if ( is_object( $value ) && in_array( $this->license_status, self::UNENTITLED_LICENSE_STATUSES, true ) ) {
+			$value->package       = '';
+			$value->download_link = '';
+		}
 
 		/* Let cache be skipped when plugin not active on current multisite */
 		if ( $this->is_non_active_multisite() ) {

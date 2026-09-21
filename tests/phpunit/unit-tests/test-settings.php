@@ -384,10 +384,68 @@ class Test_Settings extends WP_UnitTestCase {
 
 		$gfpdf->data->addon = [];
 
-		$this->assertCount( 6, $results );
+		$this->assertCount( 8, $results );
 		$this->assertArrayHasKey( 'license_my-custom-plugin', $results );
 		$this->assertArrayHasKey( 'license_my-custom-plugin_message', $results );
 		$this->assertArrayHasKey( 'license_my-custom-plugin_status', $results );
+		$this->assertArrayHasKey( 'license_my-custom-plugin_url', $results );
+	}
+
+	/**
+	 * @since 6.17.1
+	 */
+	public function test_maybe_active_licenses_records_the_activated_site_url() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [ 'license' => 'valid' ] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		/* The first save activates the key, so the URL it was activated for is recorded alongside the status */
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_my-custom-plugin'         => 'user license key',
+				'license_my-custom-plugin_message' => '',
+				'license_my-custom-plugin_status'  => '',
+			]
+		);
+
+		remove_filter( 'pre_http_request', $api_response );
+
+		$this->assertSame( 'valid', $results['license_my-custom-plugin_status'] );
+		$this->assertSame( home_url(), $results['license_my-custom-plugin_url'] );
+
+		/* An unrelated save of a key that is already valid runs no activation, so the record stands. Posing as a
+		   clone of production: overwriting the record here would hide the move from the license check. */
+		$settings                                  = $gfpdf->options->get_settings();
+		$settings['license_my-custom-plugin']      = 'user license key';
+		$settings['license_my-custom-plugin_url']  = 'https://production.example.com';
+		$gfpdf->options->update_settings( $settings );
+
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_my-custom-plugin'         => 'user license key',
+				'license_my-custom-plugin_message' => 'message',
+				'license_my-custom-plugin_status'  => 'valid',
+				'license_my-custom-plugin_url'     => home_url(),
+			]
+		);
+
+		$this->assertSame( 'https://production.example.com', $results['license_my-custom-plugin_url'] );
+
+		/* Clearing the key drops the record with it */
+		$results = $this->model->maybe_active_licenses( [ 'license_my-custom-plugin' => '' ] );
+
+		$this->assertSame( '', $results['license_my-custom-plugin_url'] );
+
+		$gfpdf->data->addon = [];
 	}
 
 	/**
