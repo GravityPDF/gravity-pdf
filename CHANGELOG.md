@@ -2,6 +2,10 @@
 
 ## Gravity PDF
 
+### 6.17.2
+* 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
+* 💻 Developer: Add a `country_code` key to Address fields in `$form_data`
+
 ### 6.17.1
 * 🔒 Security: Redact relative signed PDF URLs in log files
 * 🧹 Housekeeping: Condense info saved to in log files when generating PDFs
