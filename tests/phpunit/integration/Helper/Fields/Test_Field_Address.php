@@ -67,6 +67,49 @@ class Test_Field_Address extends TestCase {
 		$this->assertSame( 'Australia', $value['country'] );
 	}
 
+	public function provider_country() {
+		return [
+			'ISO code (Gravity Forms 3.0.3+)' => [ 'AU', 'Australia', 'AU' ],
+			'country name (legacy)'           => [ 'Australia', 'Australia', 'AU' ],
+			'unknown country'                 => [ 'Atlantis', 'Atlantis', '' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_country
+	 */
+	public function test_value_resolves_country_name_and_code( $stored, $expected_country, $expected_code ) {
+		$form     = $this->form( 'all-form-fields' );
+		$gf_field = new GF_Field_Address( $this->field_from_fixture( 'address' ) );
+
+		$entry = [
+			'id'      => 0,
+			'form_id' => $form['id'],
+			'15.6'    => $stored,
+		];
+
+		$value = ( new Field_Address( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->value();
+
+		$this->assertSame( $expected_country, $value['country'] );
+		$this->assertSame( $expected_code, $value['country_code'] );
+	}
+
+	public function test_html_renders_country_name_for_country_code() {
+		$form     = $this->form( 'all-form-fields' );
+		$gf_field = new GF_Field_Address( $this->field_from_fixture( 'address' ) );
+
+		$entry = [
+			'id'      => 0,
+			'form_id' => $form['id'],
+			'15.3'    => 'Townsville',
+			'15.6'    => 'AU',
+		];
+
+		$pdf_field = new Field_Address( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+
+		$this->assertStringContainsString( 'Townsville<br />Australia', $pdf_field->html() );
+	}
+
 	public function test_is_empty_when_all_inputs_blank() {
 		$form     = $this->form( 'all-form-fields' );
 		$gf_field = new GF_Field_Address( $this->field_from_fixture( 'address' ) );

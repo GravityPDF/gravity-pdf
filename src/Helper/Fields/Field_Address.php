@@ -153,14 +153,22 @@ class Field_Address extends Helper_Abstract_Fields {
 			$value[ $this->field->id . '.1' ] = $value; /* set to the street value */
 		}
 
+		/* Gravity Forms 3.0.3+ stores the ISO 3166-1 alpha-2 code, while earlier versions stored the country name */
+		$country      = trim( (string) rgget( $this->field->id . '.6', $value ) );
+		$country_code = $this->field->get_country_code( $country );
+		if ( method_exists( $this->field, 'get_country_name' ) && $this->field->is_country_code( $country ) ) {
+			$country = $this->field->get_country_name( $country );
+		}
+
 		$this->cache(
 			[
-				'street'  => esc_html( rgget( $this->field->id . '.1', $value ) ),
-				'street2' => esc_html( rgget( $this->field->id . '.2', $value ) ),
-				'city'    => esc_html( rgget( $this->field->id . '.3', $value ) ),
-				'state'   => esc_html( rgget( $this->field->id . '.4', $value ) ),
-				'zip'     => esc_html( rgget( $this->field->id . '.5', $value ) ),
-				'country' => esc_html( rgget( $this->field->id . '.6', $value ) ),
+				'street'       => esc_html( rgget( $this->field->id . '.1', $value ) ),
+				'street2'      => esc_html( rgget( $this->field->id . '.2', $value ) ),
+				'city'         => esc_html( rgget( $this->field->id . '.3', $value ) ),
+				'state'        => esc_html( rgget( $this->field->id . '.4', $value ) ),
+				'zip'          => esc_html( rgget( $this->field->id . '.5', $value ) ),
+				'country'      => esc_html( $country ),
+				'country_code' => esc_html( $country_code ),
 			]
 		);
 
