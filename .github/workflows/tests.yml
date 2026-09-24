@@ -438,11 +438,16 @@ jobs:
 
       - name: Install playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
-      - name: Install playwright system deps (cache hit)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+      # The runner image already ships most of Playwright's list (only fonts are missing). `install-deps` always runs
+      # `apt-get update` and upgrades libglib (~5s ldconfig trigger); install just the gaps, updating only if lists are stale.
+      - name: Install playwright system deps
+        run: |
+          pkgs=$(npx playwright install-deps --dry-run chromium | grep -oP 'install -y --no-install-recommends \K[^"]+' || true)
+          [ -n "$pkgs" ] || { echo "::error::Could not parse the package list from 'playwright install-deps --dry-run'."; exit 1; }
+          apt_install() { sudo NEEDRESTART_SUSPEND=1 apt-get install -y --no-install-recommends --no-upgrade $pkgs; }
+          apt_install || { sudo apt-get update && apt_install; }
 
       # No restore-keys: the work-dir embeds the downloaded WordPress core, so restoring it across a
       # core-version bump (the key hashes the config) leaves wp-env with a stale WP that silently fails
