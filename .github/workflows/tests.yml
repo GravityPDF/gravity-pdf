@@ -34,31 +34,7 @@ jobs:
     name: Prebuild shared caches
     needs: check_for_run_tests_label_in_pr
     runs-on: ubuntu-latest
-    outputs:
-      chromatic-enabled: ${{ steps.chromatic-gate.outputs.enabled }}
     steps:
-      - name: Decide whether Chromatic runs this push
-        id: chromatic-gate
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_DRAFT: ${{ github.event.pull_request.draft }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-        run: |
-          enabled=true
-          reason=enabled
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-              if [ "$PR_DRAFT" = "true" ]; then
-                  enabled=false; reason=draft
-              elif printf '%s' "$PR_TITLE" | grep -qiwE 'wip'; then
-                  enabled=false; reason='WIP in title'
-              elif printf '%s' "$PR_BODY"  | grep -qiwE 'wip'; then
-                  enabled=false; reason='WIP in body'
-              fi
-          fi
-          echo "[chromatic-gate] enabled=$enabled ($reason)"
-          echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -376,10 +352,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v6
-        env:
-          CHROMATIC_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
-          CHROMATIC_SHA: ${{ github.event.pull_request.head.sha || github.ref }}
-          CHROMATIC_SLUG: ${{ github.repository }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -486,14 +458,20 @@ jobs:
         run: yarn test:e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
-          # '0' no-ops @chromatic-com/playwright's takeSnapshot — saves ~20–40% wall-clock when Chromatic is off.
-          CHROMATIC: ${{ needs.prebuild.outputs.chromatic-enabled == 'true' && '1' || '0' }}
+
+      # One tarball per shard uploads far faster than a folder of PNGs. mkdir covers a shard that took no snapshots.
+      - name: Pack visual-regression shots
+        if: success()
+        run: |
+          mkdir -p tmp/visual/current
+          tar -C tmp/visual -cf "$RUNNER_TEMP/visual-shots-${{ matrix.shard }}.tar" current
 
       - uses: actions/upload-artifact@v6
-        if: success() && needs.prebuild.outputs.chromatic-enabled == 'true'
+        if: success()
         with:
-          name: test-results-shard-${{ matrix.shard }}
-          path: ./tmp/artifacts/test-results
+          name: visual-shots-${{ matrix.shard }}
+          path: ${{ runner.temp }}/visual-shots-${{ matrix.shard }}.tar
+          compression-level: 0
 
       - name: Dump log files on failure
         if: failure()
@@ -508,11 +486,11 @@ jobs:
 
   notify:
     name: Notify on weekly run
-    needs: [ test-js, test-php, e2e-playwright ]
+    needs: [ test-js, test-php, e2e-playwright, visual-regression ]
     if: ${{ always() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     env:
-      HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
+      HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success' && needs.visual-regression.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
     steps:
       - name: Post Slack notification for weekly run
         uses: slackapi/slack-github-action@v3
@@ -532,53 +510,86 @@ jobs:
                     JavaScript: ${{ needs.test-js.result }}
                     PHPUnit: ${{ needs.test-php.result }}
                     E2E (Playwright): ${{ needs.e2e-playwright.result }}
+                    Visual regression: ${{ needs.visual-regression.result }}
 
                     <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>
 
-  chromatic:
-    name: Run Chromatic
-    needs: [ prebuild, e2e-playwright ]
-    if: needs.prebuild.outputs.chromatic-enabled == 'true'
+  # Lost Pixel (OSS, custom-shots mode) diffs every shard's shots against tests/playwright/visual-baselines. With the
+  # `update-visual-baselines` label (plus `run-tests`) it instead refreshes the baselines from this run's shots and
+  # commits them to the PR branch with [skip ci]. Needs every shard green, so a refresh never drops a shot.
+  visual-regression:
+    name: Visual regression
+    needs: e2e-playwright
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      UPDATE_BASELINES: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'update-visual-baselines') }}
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          ref: ${{ env.UPDATE_BASELINES == 'true' && github.head_ref || '' }}
 
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
 
       - name: Restore node_modules
-        id: nm-cache
         uses: actions/cache/restore@v5
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+          fail-on-cache-miss: true
 
-      - name: Install JS Dependencies
-        if: steps.nm-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
-
-      # Every shard writes the same chromatic-archives/** filenames, so `merge-multiple: true` races parallel writes
-      # and Chromatic fails with "Unexpected non-whitespace character after JSON…". Per-shard subdirs + serial merge.
-      - name: Download Playwright test results from all shards
+      - name: Download visual-regression shots from all shards
         uses: actions/download-artifact@v8
         with:
-          pattern: test-results-shard-*
-          path: ./shard-artifacts
+          pattern: visual-shots-*
+          path: ${{ runner.temp }}/visual-shots
+          merge-multiple: true
 
-      - name: Merge shard artifacts serially
+      # Shot filenames are unique across shards, so every tarball unpacks into the one folder
+      - name: Unpack shots
         run: |
-          mkdir -p ./test-results
-          for shard_dir in ./shard-artifacts/test-results-shard-*/; do
-            cp -R "${shard_dir}." ./test-results/
-          done
+          mkdir -p tmp/visual/current
+          for f in "$RUNNER_TEMP"/visual-shots/*.tar; do tar -xf "$f" -C tmp/visual; done
+          echo "Merged $(find tmp/visual/current -name '*.png' | wc -l) shots"
 
-      - name: Run Chromatic
-        uses: chromaui/action@latest
+      # Fails on any shot that drifted past the threshold or has no baseline yet
+      - name: Compare against committed baselines
+        if: env.UPDATE_BASELINES != 'true'
+        run: yarn visual:compare
+
+      - name: Upload visual diffs on failure
+        if: failure() && env.UPDATE_BASELINES != 'true'
+        uses: actions/upload-artifact@v6
         with:
-          playwright: true
-          autoAcceptChanges: "development"
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          name: visual-regression-diffs
+          path: |
+            tmp/visual/difference
+            tmp/visual/current
+          if-no-files-found: ignore
+
+      # A full replace also drops baselines whose shot no longer exists; the prune then restores the noise-only rewrites
+      - name: Refresh baselines from this run's shots
+        if: env.UPDATE_BASELINES == 'true'
+        run: |
+          rm -f tests/playwright/visual-baselines/*.png
+          mkdir -p tests/playwright/visual-baselines
+          cp tmp/visual/current/*.png tests/playwright/visual-baselines/
+          yarn visual:prune
+
+      - name: Commit refreshed baselines to the PR branch
+        if: env.UPDATE_BASELINES == 'true'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add tests/playwright/visual-baselines
+          if git diff --cached --quiet; then
+            echo "Baselines already up to date."
+          else
+            git commit -m "test(visual): refresh Lost Pixel baselines [skip ci]"
+            git push origin "HEAD:$HEAD_REF"
+          fi

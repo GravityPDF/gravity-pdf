@@ -52,7 +52,10 @@ test.describe('Multiple PDF', () => {
 		await page.locator('.has-row-actions').first().hover();
 		await pdfLink.hover();
 
-		await snapshot(page, testinfo);
+		await snapshot(page, testinfo, [
+			page.locator('.has-row-actions').first(),
+			page.locator('.gform-form-toolbar__submenu:visible'),
+		]);
 
 		await pdf.downloadAndVerifyPdf(
 			page.getByRole('link', { name: 'Multiple #2' }),
@@ -74,6 +77,10 @@ test.describe('Multiple PDF', () => {
 			page.getByLabel('View or download Multiple #2.pdf')
 		).toBeAttached();
 
-		await snapshot(page, testinfo);
+		await snapshot(
+			page,
+			testinfo,
+			page.locator('#gfpdf-entry-details-list')
+		);
 	});
 });

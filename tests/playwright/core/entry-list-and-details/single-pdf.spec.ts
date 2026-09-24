@@ -49,7 +49,11 @@ test.describe('Single PDF', () => {
 		const pdfLink = page.getByRole('link', { name: 'View PDF' });
 		await page.locator('.has-row-actions').first().hover();
 
-		await snapshot(page, testinfo);
+		await snapshot(
+			page,
+			testinfo,
+			page.locator('.has-row-actions').first()
+		);
 		await pdf.downloadAndVerifyPdf(pdfLink, 'Single #1.pdf');
 	});
 

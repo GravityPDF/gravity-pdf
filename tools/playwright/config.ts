@@ -36,19 +36,9 @@ const config = defineConfig({
 		},
 	],
 
-	expect: {
-		toHaveScreenshot: { maxDiffPixelRatio: 0.1 },
-	},
-
 	use: {
 		...baseConfig.use,
 		baseURL: undefined,
-		disableAutoSnapshot: true,
-		ignoreSelectors: [
-			'#wpadminbar',
-			'#adminmenumain',
-			'#gform-form-toolbar',
-		],
 	},
 
 	projects: [
