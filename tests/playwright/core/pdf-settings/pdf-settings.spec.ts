@@ -64,7 +64,11 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.page.waitForTimeout(1000);
 			await pdf.switchToCodeEditor();
-			await snapshot(pdf.page, testinfo);
+			await snapshot(
+				pdf.page,
+				testinfo,
+				pdf.page.locator('#gfpdf-settings-field-wrapper-filename')
+			);
 		});
 
 		test('Notifications', async () => {
@@ -119,7 +123,11 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.page.waitForTimeout(1000);
 			await pdf.switchToCodeEditor();
-			await snapshot(pdf.page, testinfo);
+			await snapshot(
+				pdf.page,
+				testinfo,
+				pdf.page.locator('#gfpdf-settings-field-wrapper-conditional')
+			);
 
 			// Entry 1: Radio = "Second Choice" → PDF hidden by conditional logic
 			const entry1 = await pdf.createEntry({
@@ -184,7 +192,13 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.page.waitForTimeout(1000);
 			await pdf.switchToCodeEditor();
-			await snapshot(pdf.page, testinfo);
+			await snapshot(pdf.page, testinfo, [
+				pdf.page.locator('#gfpdf-settings-field-wrapper-pdf_size'),
+				pdf.page.locator(
+					'#gfpdf-settings-field-wrapper-custom_pdf_size'
+				),
+				pdf.page.locator('#gfpdf-settings-field-wrapper-orientation'),
+			]);
 		});
 
 		test('Color Picker', async ({}, testinfo) => {
@@ -208,7 +222,11 @@ test.describe('Form PDF Settings', () => {
 
 			await pdf.switchToCodeEditor();
 			await colorPicker.click();
-			await snapshot(pdf.page, testinfo);
+			await snapshot(
+				pdf.page,
+				testinfo,
+				pdf.page.locator('#gfpdf-settings-field-wrapper-font_colour')
+			);
 		});
 
 		test('Reverse Text RTL', async () => {
@@ -260,7 +278,27 @@ test.describe('Form PDF Settings', () => {
 			);
 
 			await pdf.switchToCodeEditor();
-			await snapshot(pdf.page, testinfo);
+
+			// The editors hold the attachment ID and upload month, which vary between runs, and each takes its height from
+			// the visual editor at the moment it was switched, which depends on whether the inserted image had loaded.
+			// Mask the content (asserted above) and pin the height.
+			const editors = pdf.page.locator(
+				'#gfpdf-settings-field-wrapper-header textarea, #gfpdf-settings-field-wrapper-first_header textarea'
+			);
+			await editors.evaluateAll((textareas) =>
+				textareas.forEach((el) => (el.style.height = '120px'))
+			);
+			await snapshot(
+				pdf.page,
+				testinfo,
+				[
+					pdf.page.locator('#gfpdf-settings-field-wrapper-header'),
+					pdf.page.locator(
+						'#gfpdf-settings-field-wrapper-first_header'
+					),
+				],
+				{ mask: [editors] }
+			);
 		});
 
 		test('Show Empty Fields', async () => {
@@ -382,7 +420,11 @@ test.describe('Form PDF Settings', () => {
 				.click();
 
 			await pdf.switchToCodeEditor();
-			await snapshot(pdf.page, testinfo);
+			await snapshot(
+				pdf.page,
+				testinfo,
+				pdf.page.locator('#gfpdf-fieldset-gfpdf_form_settings_advanced')
+			);
 		});
 
 		test('Public Access', async () => {

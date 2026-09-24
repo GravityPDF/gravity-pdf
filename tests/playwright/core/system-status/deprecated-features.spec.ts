@@ -15,7 +15,7 @@ import {
 	setLegacyDownloadUrl,
 	useLegacyTemplateOnForm,
 } from '@self:playwright/utils/deprecation';
-import { isolateForSnapshot, snapshot } from '@self:playwright/utils/snapshot';
+import { snapshot } from '@self:playwright/utils/snapshot';
 
 test.describe('Deprecated Features', () => {
 	// The signals are site-wide, so the tests share one set-up and run in order. Keeping the rest of the suite out
@@ -116,10 +116,9 @@ test.describe('Deprecated Features', () => {
 			'gfpdf_legacy_templates has 1 listener'
 		);
 
-		await isolateForSnapshot(page, [unsupported]);
 		await maskFormIds(page);
 
-		await snapshot(page, testinfo);
+		await snapshot(page, testinfo, unsupported);
 	});
 
 	test('should report the detected features in Site Health', async ({
@@ -165,10 +164,9 @@ test.describe('Deprecated Features', () => {
 			})
 		).toBeVisible();
 
-		await isolateForSnapshot(page, [heading, panel]);
 		await maskFormIds(page);
 
-		await snapshot(page, testinfo);
+		await snapshot(page, testinfo, [heading, panel]);
 	});
 
 	test('should include the detected features in the Site Health Info tab', async ({
@@ -215,10 +213,9 @@ test.describe('Deprecated Features', () => {
 		);
 		await expect(unsupported).toContainText('gfpdf_rtl has 1 listener');
 
-		await isolateForSnapshot(page, [unsupportedHeading, unsupported]);
 		await maskFormIds(page);
 
-		await snapshot(page, testinfo);
+		await snapshot(page, testinfo, [unsupportedHeading, unsupported]);
 	});
 
 	test('should raise one dismissible notice covering every detected feature', async ({
@@ -265,8 +262,6 @@ test.describe('Deprecated Features', () => {
 			notice.getByRole('button', { name: 'Dismiss Notice' })
 		).toBeVisible();
 
-		await isolateForSnapshot(page, [notice]);
-
-		await snapshot(page, testinfo);
+		await snapshot(page, testinfo, notice);
 	});
 });

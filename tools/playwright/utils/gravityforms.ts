@@ -16,7 +16,7 @@ type Entry = {
 };
 
 /**
- * A `date_created` for entries whose creation date ends up in a Chromatic snapshot
+ * A `date_created` for entries whose creation date ends up in a visual snapshot
  *
  * Gravity Forms stamps a new entry with the current UTC time and the entry list renders it to the minute, so a
  * snapshot of that screen differs on every run no matter how long the test waits. GFAPI takes this verbatim when

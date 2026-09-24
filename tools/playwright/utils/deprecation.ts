@@ -127,7 +127,7 @@ export async function setLegacyDownloadUrl(
 /**
  * Swap the detected form ID for a fixed one wherever the page renders it
  *
- * The ID belongs to a form the run creates, so it differs between environments and would churn the Chromatic
+ * The ID belongs to a form the run creates, so it differs between environments and would churn the visual
  * baseline of every surface that names it. A constant keeps the layout identical too, which masking the region
  * alone would not — a second digit would still shift the text that follows.
  * @param page

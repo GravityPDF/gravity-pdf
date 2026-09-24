@@ -22,7 +22,7 @@ test.describe('[gravitypdf] Shortcode', () => {
 		const pdfId = await pdf.createPdf(form.id, pdfLabel);
 		await pdf.copyDownloadShortcodeToClipboard(form.id, pdfId);
 
-		await snapshot(page, testinfo);
+		await snapshot(page, testinfo, page.locator(`#gfpdf-${pdfId}`));
 
 		// Add a new PDF and paste into the Label
 		await pdf.navigateToNewFormPdf(form.id);

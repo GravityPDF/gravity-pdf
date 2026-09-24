@@ -110,7 +110,13 @@ test.describe('License Tab', () => {
 			await page.locator('[name="submit"]').click();
 
 			await page.waitForTimeout(1000);
-			await snapshot(page, testinfo);
+			await snapshot(
+				page,
+				testinfo,
+				page.locator(
+					'#gfpdf-fieldset-license_gravity-pdf-example-plugin'
+				)
+			);
 
 			await page
 				.getByRole('button', { name: 'Deactivate License' })

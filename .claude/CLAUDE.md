@@ -55,9 +55,15 @@ E2E tests live in `tests/playwright/` and run against a single wp-env instance o
 
 Filters only narrow the projects you name: a project pulled in as a `dependency` runs in full regardless of `--grep` or a file filter. So a bare `yarn test:e2e -- <filter>` still runs everything, while `npx playwright test --config=tools/playwright/config.ts --project=core <filter>` runs just that slice plus `setup-core`. `--no-deps` isolates a project completely, but skipping `setup-core` leaves no storage state, so anything using `requestUtils` fails on auth.
 
-In CI, Playwright is sharded 4-ways via `--shard=N/4` (see `.github/workflows/playwright-e2e.yml`); each shard runs all setup projects against its own wp-env instance and executes its slice of the consumer projects' tests.
+In CI, Playwright is sharded 4-ways via `--shard=N/4` (see the `e2e-playwright` job in `.github/workflows/tests.yml`); each shard runs all setup projects against its own wp-env instance and executes its slice of the consumer projects' tests.
 
 Artifacts (screenshots, traces) are written to `tmp/artifacts/`.
+
+#### Visual regression (Lost Pixel)
+
+`snapshot(page, testinfo, targets)` in `tools/playwright/utils/snapshot.ts` waits for the page to settle, then writes a PNG of just the area the `targets` locators cover (the section under test, not the whole page) to `tmp/visual/current/`, named `<project>-<spec>-<test title>.png`. Capture is on in CI and off locally; set `VISUAL=1` or `VISUAL=0` to override. In CI each shard uploads its shots, and the `visual-regression` job runs `yarn visual:compare`, which diffs them against the baselines committed in `tests/playwright/visual-baselines/`. The job fails on more than 1% drift or on a shot with no baseline, and uploads the diffs as `visual-regression-diffs`.
+
+Baselines only hold on the Linux CI runner, because macOS anti-aliasing differs, so never commit PNGs captured locally. To accept a visual change or seed new shots, add the `update-visual-baselines` label to the PR alongside `run-tests`. The `visual-regression` job then replaces the baselines with that run's shots, reverts any that changed only by capture noise (`yarn visual:prune`) and pushes a `[skip ci]` commit to the branch. After that, remove the label and re-run the workflow to confirm the compare is green.
 
 ### Environment
 

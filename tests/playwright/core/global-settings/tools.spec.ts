@@ -59,13 +59,17 @@ test.describe('Tools Tab', () => {
 				.getByRole('button', { name: 'Download Core Fonts' })
 				.click();
 
-			await expect(
-				page.locator('.gfpdf-core-font-status-success', {
-					hasText: 'ALL CORE FONTS SUCCESSFULLY INSTALLED',
-				})
-			).toBeVisible({ timeout: 60000 });
+			const status = page.locator('.gfpdf-core-font-status-success', {
+				hasText: 'ALL CORE FONTS SUCCESSFULLY INSTALLED',
+			});
+			await expect(status).toBeVisible({ timeout: 60000 });
 
-			await snapshot(page, testinfo);
+			// Down to the status line only: five workers download in parallel, so the per-font log below it is unordered
+			const fieldset = page.locator('#gfpdf-fieldset-install_core_fonts');
+			await snapshot(page, testinfo, [
+				fieldset.locator('legend'),
+				status,
+			]);
 		});
 
 		test('should return download core fonts error/failed response', async ({
