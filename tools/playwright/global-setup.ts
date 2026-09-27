@@ -4,26 +4,15 @@ import { wpCli } from '@self:playwright/utils/wp-cli';
 setup('setup', async ({ request }, testInfo) => {
 	const storageStatePath = testInfo.project.metadata
 		.storageStatePath as string;
-	const permalinkStructure = testInfo.project.metadata
-		.permalinkStructure as string;
 
 	process.env.WP_BASE_URL = testInfo.project.use.baseURL as string;
 	process.env.STORAGE_STATE_PATH = storageStatePath;
 
-	// Both setup projects share one wp-env instance on port 8702;
-	// flip the permalink structure here so each project group runs against
-	// its required URL scheme. Batched into one `bash -c` to keep the
-	// docker-exec round-trip count to one. `|| true` on the .htaccess
-	// removal makes it best-effort: a cached wp-env work-dir can restore
-	// the file with a UID the cli container can't write over, and a stale
-	// .htaccess doesn't affect plain-permalink tests anyway (URLs hit
-	// `?p=N` and skip rewriting).
-	const flush =
-		permalinkStructure === ''
-			? '(rm -f /var/www/html/.htaccess || true)'
-			: 'wp rewrite flush --hard';
+	// Pretty permalinks keep their rewrite rules and .htaccess in place for the project that uses them. The other
+	// asks for plain ones per request (see tools/mu-plugins), so both run against the site at once
 	wpCli(
-		`wp option update permalink_structure '${permalinkStructure}' && ${flush}`
+		"wp option update permalink_structure '/%postname%/'",
+		'wp rewrite flush --hard'
 	);
 
 	const { RequestUtils } =

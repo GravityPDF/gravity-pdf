@@ -101,11 +101,14 @@ test.describe('Font Manager', () => {
 			.getByRole('button', { name: 'Manage' })
 			.click();
 
+		// Fonts are site-wide and the other project runs this test too, so it works on a font of its own
+		const fontName = `Roboto ${Date.now()}`;
+
 		// Add Font
 		await page
 			.locator('.add-font')
 			.getByRole('textbox', { name: 'Font Name' })
-			.fill('Roboto');
+			.fill(fontName);
 
 		await page
 			.locator('#gfpdf-font-variant-regular-addFont')
@@ -120,18 +123,21 @@ test.describe('Font Manager', () => {
 
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
 		const fontItems = page.locator('.font-list-item');
-		await expect(fontItems).toHaveCount(1);
+		const font = fontItems.filter({ hasText: fontName });
+		await expect(font).toHaveCount(1);
 
 		// Search Font
 		await page.locator('#font-manager-search-box').fill('Arial');
 		await expect(fontItems).toHaveCount(0);
-		await page.locator('#font-manager-search-box').fill('Roboto');
+		await page.locator('#font-manager-search-box').fill(fontName);
 		await expect(fontItems).toHaveCount(1);
 
 		const updateButton = page.getByRole('button', { name: 'Update Font' });
 		await expect(updateButton).toBeDisabled();
 
-		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
+		await page
+			.locator('#gfpdf-update-font-name-input')
+			.fill(`${fontName} Edited`);
 		await expect(updateButton).not.toBeDisabled();
 
 		// Cancel button
@@ -139,8 +145,10 @@ test.describe('Font Manager', () => {
 		await expect(page.locator('.update-font.show')).not.toBeVisible();
 
 		// Edit Font properly
-		await fontItems.first().click();
-		await page.locator('#gfpdf-update-font-name-input').fill('Roboto 2');
+		await font.click();
+		await page
+			.locator('#gfpdf-update-font-name-input')
+			.fill(`${fontName} Edited`);
 		await page
 			.locator('#gfpdf-font-variant-italics-updateFont')
 			.setInputFiles(
@@ -159,12 +167,12 @@ test.describe('Font Manager', () => {
 
 		await updateButton.click();
 		await expect(page.getByText('Your font has been saved.')).toBeVisible();
-		await expect(page.getByText('Roboto 2')).toBeVisible();
+		await expect(page.getByText(`${fontName} Edited`)).toBeVisible();
 
 		// Delete Font
 		page.on('dialog', (dialog) => dialog.accept());
-		await fontItems.locator('.dashicons-trash').click();
-		await expect(page.getByText('Font list empty.')).toBeVisible();
+		await font.locator('.dashicons-trash').click();
+		await expect(font).toHaveCount(0);
 	});
 
 	test('should be able to close font manager popup with button', async ({

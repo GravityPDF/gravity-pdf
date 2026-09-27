@@ -5,10 +5,10 @@ process.env.WP_ARTIFACTS_PATH = path.join(process.cwd(), 'tmp/artifacts');
 
 import baseConfig = require('@wordpress/scripts/config/playwright.config.js');
 
-// Specs whose fixtures change state the whole site can see. The deprecation notice renders on every admin page
-// the other snapshots are taken on, so `fullyParallel` running these beside them puts a notice in an unrelated
-// baseline. They get a project to themselves, ordered into the chain below so nothing else is in flight.
-const ISOLATED = /core\/system-status\/.*(test|spec)\.(js|ts|mjs)/;
+const STORAGE_STATE_PATH = path.join(
+	process.cwd(),
+	'tmp/artifacts/storage-states/e2e.json'
+);
 
 const config = defineConfig({
 	...baseConfig,
@@ -39,6 +39,9 @@ const config = defineConfig({
 	use: {
 		...baseConfig.use,
 		baseURL: undefined,
+		// Recording a trace for every test costs a third of a short test's run time. CI retries a failure, so
+		// tracing the retry still leaves one to debug from.
+		trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
 	},
 
 	projects: [
@@ -50,13 +53,7 @@ const config = defineConfig({
 				baseURL: 'http://localhost:8702',
 				storageState: { cookies: [], origins: [] },
 			},
-			metadata: {
-				storageStatePath: path.join(
-					process.cwd(),
-					'tmp/artifacts/storage-states/e2e.json'
-				),
-				permalinkStructure: '',
-			},
+			metadata: { storageStatePath: STORAGE_STATE_PATH },
 		},
 
 		{
@@ -64,62 +61,24 @@ const config = defineConfig({
 			dependencies: ['setup-core'],
 			testDir: path.join(process.cwd(), 'tests/playwright'),
 			testMatch: /(core|permalinks)\/.*(test|spec).(js|ts|mjs)/,
-			testIgnore: ISOLATED,
 			use: {
 				...devices['Desktop Chrome'],
 				baseURL: 'http://localhost:8702',
-				storageState: path.join(
-					process.cwd(),
-					'tmp/artifacts/storage-states/e2e.json'
-				),
-			},
-		},
-
-		{
-			name: 'core-isolated',
-			dependencies: ['core'],
-			testDir: path.join(process.cwd(), 'tests/playwright'),
-			testMatch: ISOLATED,
-			use: {
-				...devices['Desktop Chrome'],
-				baseURL: 'http://localhost:8702',
-				storageState: path.join(
-					process.cwd(),
-					'tmp/artifacts/storage-states/e2e.json'
-				),
-			},
-		},
-
-		{
-			name: 'setup-core-with-permalinks',
-			dependencies: ['core-isolated'],
-			testDir: path.join(process.cwd(), 'tools/playwright'),
-			testMatch: /.*global-setup\.ts/,
-			use: {
-				baseURL: 'http://localhost:8702',
-				storageState: { cookies: [], origins: [] },
-			},
-			metadata: {
-				storageStatePath: path.join(
-					process.cwd(),
-					'tmp/artifacts/storage-states/e2e-permalinks.json'
-				),
-				permalinkStructure: '/%postname%/',
+				storageState: STORAGE_STATE_PATH,
+				// The site runs on pretty permalinks; this project's requests see plain ones (see tools/mu-plugins)
+				extraHTTPHeaders: { 'X-GPDF-E2E-Permalinks': 'plain' },
 			},
 		},
 
 		{
 			name: 'core-with-permalinks',
-			dependencies: ['setup-core-with-permalinks'],
+			dependencies: ['setup-core'],
 			testDir: path.join(process.cwd(), 'tests/playwright'),
 			testMatch: /permalinks\/.*(test|spec).(js|ts|mjs)/,
 			use: {
 				...devices['Desktop Chrome'],
 				baseURL: 'http://localhost:8702',
-				storageState: path.join(
-					process.cwd(),
-					'tmp/artifacts/storage-states/e2e-permalinks.json'
-				),
+				storageState: STORAGE_STATE_PATH,
 			},
 		},
 	],

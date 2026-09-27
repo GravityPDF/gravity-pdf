@@ -116,24 +116,44 @@ export async function snapshot(
 		return;
 	}
 
+	const frame = [targets].flat();
+
+	// Edges and text are painted on whole pixels from wherever the frame lands, so its offset within a pixel decides
+	// how they come out: content above that is a fraction of a pixel taller moves an edge inside an otherwise
+	// identical frame. Nudging the page down onto a pixel boundary takes that out of the shot.
+	const top = Math.min(...(await pageBoxes(frame)).map((box) => box.top));
+	await setPageOffset(page, Math.ceil(top) - top);
+
 	await page.screenshot({
 		path: path.join(VISUAL_SHOTS_DIR, shotName(testinfo)),
 		fullPage: true,
-		clip: await pageArea(page, [targets].flat()),
+		clip: await pageArea(frame),
 		animations: 'disabled',
 		caret: 'hide',
 		mask,
 		style: HIDE_FIXED_CHROME,
 	});
+
+	await setPageOffset(page, 0);
 }
 
 /**
- * The smallest whole-pixel rectangle, in page coordinates, that covers every target
+ * Push the whole page down by `offset` pixels
  * @param page
+ * @param offset
+ */
+async function setPageOffset(page: Page, offset: number) {
+	await page.evaluate((px) => {
+		document.documentElement.style.marginTop = px ? `${px}px` : '';
+	}, offset);
+}
+
+/**
+ * Each target's box, in page coordinates
  * @param targets
  */
-async function pageArea(page: Page, targets: Locator[]) {
-	const boxes = await Promise.all(
+async function pageBoxes(targets: Locator[]) {
+	return await Promise.all(
 		targets.map((target) =>
 			target.evaluate((el) => {
 				const box = el.getBoundingClientRect();
@@ -147,6 +167,14 @@ async function pageArea(page: Page, targets: Locator[]) {
 			})
 		)
 	);
+}
+
+/**
+ * The smallest whole-pixel rectangle, in page coordinates, that covers every target
+ * @param targets
+ */
+async function pageArea(targets: Locator[]) {
+	const boxes = await pageBoxes(targets);
 
 	const x = Math.floor(Math.min(...boxes.map((box) => box.left)));
 	const y = Math.floor(Math.min(...boxes.map((box) => box.top)));

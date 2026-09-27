@@ -2,6 +2,7 @@ import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import { withConfirmation } from '@self:playwright/utils/gravityforms';
 
 test.describe('[gravitypdf] Shortcode', () => {
 	test('Text confirmation', async ({
@@ -15,20 +16,13 @@ test.describe('[gravitypdf] Shortcode', () => {
 	}) => {
 		const pdf = new Pdf(requestUtils, admin, page);
 
-		// setup form and PDF
+		// setup form, PDF and default confirmation
 		const form = await pdf.createForm('Text Confirmation');
-		const pdfId = await pdf.createPdf(
+		const pdfId = await pdf.addPdf(form.id, 'Text Confirmation Document');
+		await pdf.updateForm(
 			form.id,
-			'Text Confirmation Document'
+			withConfirmation({ message: `[gravitypdf id="${pdfId}"]` })
 		);
-
-		// setup default confirmation
-		await pdf.navigateToFormConfirmation(form.id);
-		await pdf.setRichTextContent(
-			'#gform_setting_message',
-			`[gravitypdf id="${pdfId}"]`
-		);
-		await pdf.submitForm();
 
 		// preview and submit form
 		await pdf.navigateToFormPreview(form.id);

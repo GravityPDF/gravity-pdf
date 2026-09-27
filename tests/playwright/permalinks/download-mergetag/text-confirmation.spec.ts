@@ -17,9 +17,7 @@ test.describe('{Label:pdf:[id]} Merge Tag', () => {
 
 		// setup form and PDF
 		const form = await pdf.createForm('Text Confirmation Mergetag');
-		await pdf.navigateToFormPreview(form.id);
-		await pdf.submitForm();
-		await pdf.createPdf(form.id, 'Text Confirmation Mergetag Document');
+		await pdf.addPdf(form.id, 'Text Confirmation Mergetag Document');
 
 		// setup default confirmation
 		await pdf.navigateToFormConfirmation(form.id);

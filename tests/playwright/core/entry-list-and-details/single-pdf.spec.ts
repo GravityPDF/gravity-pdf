@@ -20,13 +20,10 @@ test.describe('Single PDF', () => {
 			page: Page;
 			admin: Admin;
 		}) => {
-			// setup form
+			// setup form and PDF, left on the default "View" Entry View action
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Single PDF');
-
-			// setup PDF
-			await pdf.setGlobalPdfSetting('View', true);
-			await pdf.createPdf(form.id, 'Single #1');
+			await pdf.addPdf(form.id, 'Single #1');
 
 			// create entry
 			entry = await pdf.createEntry({

@@ -24,13 +24,10 @@ test.describe('Form PDF Settings', () => {
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Form PDF Settings');
 
-			// Reset TinyMCE to default to the Visual tab
 			await pdf.navigateToNewFormPdf(form.id);
-			for (const button of await page
-				.getByRole('button', { name: /^Visual$/ })
-				.all()) {
-				await button.click();
-			}
+
+			// The editors initialise in the background, and a field filled meanwhile can lose its text to one
+			await pdf.waitForVisualEditors();
 		}
 	);
 
@@ -44,7 +41,7 @@ test.describe('Form PDF Settings', () => {
 		});
 
 		test('Filename', async ({}, testinfo) => {
-			await pdf.createPdf(form.id, 'Filename');
+			await pdf.saveNewPdf('Filename');
 
 			const filename = pdf.page.getByRole('textbox', {
 				name: 'Filename',
@@ -81,7 +78,8 @@ test.describe('Form PDF Settings', () => {
 			// Add another Notification
 			await pdf.addNotification(form.id, 'User Notification');
 
-			await pdf.createPdf(form.id, 'PDF Notification');
+			await pdf.navigateToNewFormPdf(form.id);
+			await pdf.saveNewPdf('PDF Notification');
 			await expect(elements).toHaveCount(2);
 
 			await pdf.page
@@ -98,7 +96,7 @@ test.describe('Form PDF Settings', () => {
 		});
 
 		test('Conditional Logic', async ({}, testinfo) => {
-			await pdf.createPdf(form.id, 'Conditional Logic');
+			await pdf.saveNewPdf('Conditional Logic');
 
 			await pdf.page
 				.getByRole('checkbox', {
@@ -171,7 +169,7 @@ test.describe('Form PDF Settings', () => {
 
 	test.describe('Appearance', () => {
 		test('Paper', async ({}, testinfo) => {
-			await pdf.createPdf(form.id, 'Paper');
+			await pdf.saveNewPdf('Paper');
 
 			await pdf.selectField('Paper Size', 'CUSTOM');
 
@@ -202,7 +200,7 @@ test.describe('Form PDF Settings', () => {
 		});
 
 		test('Color Picker', async ({}, testinfo) => {
-			await pdf.createPdf(form.id, 'Color Picker');
+			await pdf.saveNewPdf('Color Picker');
 
 			const colorPicker = pdf.page
 				.getByRole('button', { name: 'Select Color' })
@@ -239,7 +237,7 @@ test.describe('Form PDF Settings', () => {
 		});
 
 		test('Background Image / File Upload', async () => {
-			await pdf.createPdf(form.id, 'File Upload');
+			await pdf.saveNewPdf('File Upload');
 
 			await pdf.page.getByRole('button', { name: 'Upload File' }).click();
 			await pdf.page.getByRole('tab', { name: 'Upload files' }).click();
@@ -261,7 +259,7 @@ test.describe('Form PDF Settings', () => {
 
 	test.describe('Template', () => {
 		test('Rich Text Editor / Header / Footer', async ({}, testinfo) => {
-			await pdf.createPdf(form.id, 'Rich Text Editor');
+			await pdf.saveNewPdf('Rich Text Editor');
 
 			await pdf.checkRichTextEditor(
 				pdf.page.locator('#gfpdf-settings-field-wrapper-header')
@@ -358,7 +356,7 @@ test.describe('Form PDF Settings', () => {
 
 	test.describe('Advanced', () => {
 		test('PDF Security', async ({}, testinfo) => {
-			await pdf.createPdf(form.id, 'PDF Security');
+			await pdf.saveNewPdf('PDF Security');
 
 			await expect(
 				pdf.page.getByRole('textbox', { name: 'Password' })
