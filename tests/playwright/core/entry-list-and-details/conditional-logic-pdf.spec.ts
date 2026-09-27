@@ -20,19 +20,19 @@ test.describe('Conditional PDF', () => {
 			page: Page;
 			admin: Admin;
 		}) => {
-			// setup form and inactive PDF
+			// setup form and a PDF shown only when the first field is "First Choice"
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Conditional PDF');
-
-			// setup PDF with conditional logic
-			const pdfId = await pdf.createPdf(form.id, 'Conditional PDF');
-			await page
-				.getByRole('checkbox', {
-					name: 'Enable conditional logic',
-					exact: true,
-				})
-				.check();
-			await pdf.addOrUpdatePdf();
+			await pdf.addPdf(form.id, 'Conditional PDF', {
+				conditional: true,
+				conditionalLogic: {
+					actionType: 'show',
+					logicType: 'all',
+					rules: [
+						{ fieldId: '1', operator: 'is', value: 'First Choice' },
+					],
+				},
+			});
 
 			// create entry
 			entry1 = await pdf.createEntry({ form_id: form.id });

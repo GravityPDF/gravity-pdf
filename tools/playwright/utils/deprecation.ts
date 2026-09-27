@@ -1,127 +1,99 @@
 import type { Page } from '@playwright/test';
 import type Pdf from '@self:playwright/utils/gravitypdf';
 import { wpCli } from '@self:playwright/utils/wp-cli';
+import { withConfirmation } from '@self:playwright/utils/gravityforms';
 
 const FILTER_LISTENER_OPTION = 'gfpdf_e2e_deprecated_filter';
 
-/**
+/*
  * Attach a third-party listener to a deprecated filter, one of the signals the System Report and Site Health
  * surfaces detect.
  *
  * A browser can't hook a filter on its own, so an mu-plugin adds one whenever this option is set. The other
- * signals are the templates installLegacyTemplates() writes, and a legacy download URL on a form.
+ * signals are the templates below, and a legacy download URL on a form.
  */
-export function recordDeprecatedUsage() {
-	wpCli(`wp option update ${FILTER_LISTENER_OPTION} 1`);
-}
-
-/**
- * Stop recording the deprecated usage, so the rest of the suite runs against a site without it
- */
-export function clearDeprecatedUsage() {
-	wpCli(`wp option delete ${FILTER_LISTENER_OPTION}`);
-}
+const RECORD_DEPRECATED_USAGE = `wp option update ${FILTER_LISTENER_OPTION} 1`;
+const CLEAR_DEPRECATED_USAGE = `wp option delete ${FILTER_LISTENER_OPTION}`;
 
 const LEGACY_TEMPLATE_ID = 'e2e-legacy';
 const LEGACY_TEMPLATE = `${LEGACY_TEMPLATE_ID}.php`;
 const BUSINESS_PLUS_TEMPLATE = 'e2e-business-plus.php';
 
-/**
+/*
  * Install one legacy template of each kind
  *
  * A v3 template is one carrying no file headers. What separates the two kinds is whether the file hands itself to
  * the Advanced Templating add-on, which only a Business Plus (Tier 2) template does.
  */
-export function installLegacyTemplates() {
-	wpCli(
-		`wp eval 'file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${LEGACY_TEMPLATE}\\", \\"<?php // a plain v3 template\\" ); file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${BUSINESS_PLUS_TEMPLATE}\\", \\"<?php gfpdfe_business_plus::initilise();\\" );'`
-	);
-}
-
-/**
- * Remove them again, so the rest of the suite doesn't see them in the template list
- */
-export function removeLegacyTemplates() {
-	wpCli(
-		`wp eval '@unlink( GPDFAPI::get_data_class()->template_location . \\"${LEGACY_TEMPLATE}\\" ); @unlink( GPDFAPI::get_data_class()->template_location . \\"${BUSINESS_PLUS_TEMPLATE}\\" );'`
-	);
-}
+const INSTALL_LEGACY_TEMPLATES = `wp eval 'file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${LEGACY_TEMPLATE}\\", \\"<?php // a plain v3 template\\" ); file_put_contents( GPDFAPI::get_data_class()->template_location . \\"${BUSINESS_PLUS_TEMPLATE}\\", \\"<?php gfpdfe_business_plus::initilise();\\" );'`;
+const REMOVE_LEGACY_TEMPLATES = `wp eval '@unlink( GPDFAPI::get_data_class()->template_location . \\"${LEGACY_TEMPLATE}\\" ); @unlink( GPDFAPI::get_data_class()->template_location . \\"${BUSINESS_PLUS_TEMPLATE}\\" );'`;
 
 const LEGACY_TEMPLATE_PDF = 'e2elegacypdf';
 
-/**
+/*
  * Configure a PDF on the form that renders through the legacy template
  *
  * The reports name a legacy template by the forms it is configured on, which is what the PDF puts on the record.
- * @param formId
  */
-export function useLegacyTemplateOnForm(formId: number) {
-	wpCli(
-		`wp eval 'GPDFAPI::add_pdf( ${formId}, [ \\"id\\" => \\"${LEGACY_TEMPLATE_PDF}\\", \\"name\\" => \\"Legacy Template\\", \\"filename\\" => \\"legacy\\", \\"template\\" => \\"${LEGACY_TEMPLATE_ID}\\" ] );'`
-	);
-}
+const addLegacyTemplatePdf = (formId: number) =>
+	`wp eval 'GPDFAPI::add_pdf( ${formId}, [ \\"id\\" => \\"${LEGACY_TEMPLATE_PDF}\\", \\"name\\" => \\"Legacy Template\\", \\"filename\\" => \\"legacy\\", \\"template\\" => \\"${LEGACY_TEMPLATE_ID}\\" ] );'`;
 
-/**
- * Take it off again, so the form is left as the rest of the suite expects to find it
- * @param formId
- */
-export function removeLegacyTemplateFromForm(formId: number) {
-	wpCli(
-		`wp eval 'GPDFAPI::delete_pdf( ${formId}, \\"${LEGACY_TEMPLATE_PDF}\\" );'`
-	);
-}
-
-/**
- * Roll the recorded plugin version back, so the next admin page load takes a fresh detection
+/*
+ * Take a detection now, which the admin notices then read
  *
- * The admin notices read what the last detection recorded rather than detecting on every page load, and a release
- * is when that record is taken — `check_install_status()` runs on `wp_loaded`, ahead of the notices themselves. The
- * version has to differ from PDF_EXTENDED_VERSION for that to fire, so this is well below any release.
+ * The plugin takes one on a version change; running it here keeps that change, and the upgrade routines it sets off
+ * on whichever admin page loads next, out of the specs running alongside.
  */
-export function refreshDeprecatedDetection() {
-	wpCli('wp option update gfpdf_current_version 6.0.0');
-}
+const RUN_DEPRECATED_DETECTION = `wp eval '\\GFPDF\\Statics\\Deprecation::refresh_signals();'`;
 
-/**
+/*
  * Empty the record the notices read
  *
  * Cleanup can't wait for the next admin page load to re-detect: the notice renders from the stale record on
  * whichever page loads first, which for a full-page snapshot elsewhere in the suite means an unrelated baseline.
  */
-export function clearDeprecatedDetection() {
+const CLEAR_DEPRECATED_DETECTION = `wp eval 'GPDFAPI::get_options_class()->update_option( \\"deprecated_features\\", [] );'`;
+
+/**
+ * Plant every server-side signal the detection looks for, with the legacy template configured on `formId`, and detect
+ * them
+ * @param formId
+ */
+export function installDeprecatedUsage(formId: number) {
 	wpCli(
-		`wp eval 'GPDFAPI::get_options_class()->update_option( \\"deprecated_features\\", [] );'`
+		RECORD_DEPRECATED_USAGE,
+		INSTALL_LEGACY_TEMPLATES,
+		addLegacyTemplatePdf(formId),
+		RUN_DEPRECATED_DETECTION
 	);
 }
 
 /**
- * Set the form's confirmation to one that hands out a legacy `?gf_pdf=1` download URL, or a plain one that doesn't
+ * Take the site-wide ones away again and empty the detection record. The form's own go with the form.
+ */
+export function removeDeprecatedUsage() {
+	wpCli(
+		CLEAR_DEPRECATED_USAGE,
+		REMOVE_LEGACY_TEMPLATES,
+		CLEAR_DEPRECATED_DETECTION
+	);
+}
+
+/**
+ * Set the form's confirmation to one that hands out a legacy `?gf_pdf=1` download URL
  *
  * The detector searches the stored form for the URL rather than waiting for someone to follow one, so the
  * confirmation alone is enough to trip it.
  * @param pdf
  * @param formId
- * @param inUse
  */
-export async function setLegacyDownloadUrl(
-	pdf: Pdf,
-	formId: number,
-	inUse: boolean
-) {
-	const message = inUse
-		? `<a href="/?gf_pdf=1&fid=${formId}&lid=1&template=zadani.php">Download PDF</a>`
-		: 'Thanks for contacting us! We will get in touch with you shortly.';
-
-	await pdf.updateForm(formId, {
-		confirmations: [
-			{
-				id: 'bbb222bbb222b',
-				name: 'Default Confirmation',
-				type: 'message',
-				message,
-			},
-		],
-	});
+export async function setLegacyDownloadUrl(pdf: Pdf, formId: number) {
+	await pdf.updateForm(
+		formId,
+		withConfirmation({
+			message: `<a href="/?gf_pdf=1&fid=${formId}&lid=1&template=zadani.php">Download PDF</a>`,
+		})
+	);
 }
 
 /**

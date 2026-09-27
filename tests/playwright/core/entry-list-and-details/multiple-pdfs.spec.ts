@@ -21,14 +21,11 @@ test.describe('Multiple PDF', () => {
 			page: Page;
 			admin: Admin;
 		}) => {
-			// setup form
+			// setup form and PDFs
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Multiple PDF');
-
-			// setup PDF
-			for (let i = 1; i <= 2; i++) {
-				await pdf.createPdf(form.id, `Multiple #${i}`);
-			}
+			await pdf.addPdf(form.id, 'Multiple #1');
+			await pdf.addPdf(form.id, 'Multiple #2');
 
 			// create entry
 			entry = await pdf.createEntry({

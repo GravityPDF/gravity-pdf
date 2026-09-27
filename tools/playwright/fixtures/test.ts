@@ -10,6 +10,16 @@ export const test = wpTests.extend({
 		await page.route('**://*.gravatar.com/**', (route) => route.abort());
 
 		await use(page);
+
+		// A `target="_blank"` link to a PDF leaves a viewer tab open, which the failure screenshot taken at teardown
+		// can't capture: it stalls 5 s on every test that opens one, pass or fail
+		await Promise.all(
+			page
+				.context()
+				.pages()
+				.filter((other) => other !== page)
+				.map((other) => other.close())
+		);
 	},
 });
 

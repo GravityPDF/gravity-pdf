@@ -4,11 +4,14 @@ import { execSync } from 'node:child_process';
 const CLI_TIMEOUT = 120_000;
 
 /**
- * Run one or more WP-CLI commands in the e2e wp-env container
+ * Run one or more WP-CLI commands in the e2e wp-env container, stopping at the first that fails
  *
- * Batch with `&&` rather than calling this twice, so a docker-exec round trip is paid once.
+ * Pass every command to one call rather than calling this twice: each call pays a `wp-env run` round trip.
+ * @param commands
  */
-export function wpCli(command: string) {
+export function wpCli(...commands: string[]) {
+	const command = commands.join(' && ');
+
 	try {
 		execSync(`yarn wp-env:e2e run cli bash -c "${command}"`, {
 			stdio: ['ignore', 'pipe', 'pipe'],

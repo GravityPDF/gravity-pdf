@@ -23,39 +23,20 @@ test.describe('Advanced Template Checks', () => {
 		}
 	);
 
-	test('should successfully saved toggled switch value for active and inactive template', async ({
-		page,
-	}) => {
-		await pdf.navigateToFormPdfList(form.id);
-		const pdfId = await pdf.createPdf(form.id, 'Toggle Test');
+	test('should successfully saved toggled switch value for active and inactive template', async () => {
+		const pdfId = await pdf.addPdf(form.id, 'Toggle Test');
 
 		await pdf.navigateToFormPdfList(form.id);
-		const toggle = page
-			.locator(`#gfpdf-${pdfId}`)
-			.locator('button.gform-status-indicator');
-
-		// Toggle off
-		await toggle.click();
-		await expect(toggle).toHaveAttribute('data-status', 'inactive');
-
-		// Toggle on
-		await toggle.click();
-		await expect(toggle).toHaveAttribute('data-status', 'active');
+		await pdf.togglePdf(pdfId, 'inactive');
+		await pdf.togglePdf(pdfId, 'active');
 	});
 
 	test('should check that "View PDF" link is hidden when template is inactive', async ({
 		page,
 	}) => {
-		await pdf.navigateToFormPdfList(form.id);
-		const pdfId = await pdf.createPdf(form.id, 'Inactive Test');
+		await pdf.addPdf(form.id, 'Inactive Test', { active: false });
 
-		await pdf.navigateToFormPdfList(form.id);
-		const toggle = page
-			.locator(`#gfpdf-${pdfId}`)
-			.locator('button.gform-status-indicator');
-		await toggle.click();
-
-		const entry = await pdf.createEntry({ form_id: form.id });
+		await pdf.createEntry({ form_id: form.id });
 		await pdf.navigateToEntryList(form.id);
 
 		// WP 7.1 renders the primary column as <th scope="row">; match on the class only
@@ -68,19 +49,17 @@ test.describe('Advanced Template Checks', () => {
 	test('should check that "View PDF" link is hidden when conditional logic fails', async ({
 		page,
 	}) => {
-		await pdf.navigateToFormPdfList(form.id);
-		const pdfId = await pdf.createPdf(form.id, 'Conditional Test');
-
-		await pdf.navigateToFormPdf(form.id, pdfId);
-		await page
-			.getByRole('checkbox', {
-				name: 'Enable conditional logic',
-				exact: true,
-			})
-			.check();
-
-		await page.locator('#gfpdf_rule_value_0').selectOption('Third Choice');
-		await pdf.addOrUpdatePdf();
+		// shown only for "Third Choice", which the entry doesn't have
+		await pdf.addPdf(form.id, 'Conditional Test', {
+			conditional: true,
+			conditionalLogic: {
+				actionType: 'show',
+				logicType: 'all',
+				rules: [
+					{ fieldId: '1', operator: 'is', value: 'Third Choice' },
+				],
+			},
+		});
 
 		await pdf.createEntry({ form_id: form.id });
 		await pdf.navigateToEntryList(form.id);
@@ -90,8 +69,7 @@ test.describe('Advanced Template Checks', () => {
 	});
 
 	test('should successfully duplicate existing PDF', async ({ page }) => {
-		await pdf.navigateToFormPdfList(form.id);
-		await pdf.createPdf(form.id, 'Source PDF');
+		await pdf.addPdf(form.id, 'Source PDF');
 
 		await pdf.navigateToFormPdfList(form.id);
 		await page.locator('.name').first().hover();

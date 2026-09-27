@@ -4,53 +4,42 @@ import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import {
-	clearDeprecatedDetection,
-	clearDeprecatedUsage,
-	installLegacyTemplates,
+	installDeprecatedUsage,
 	maskFormIds,
-	recordDeprecatedUsage,
-	refreshDeprecatedDetection,
-	removeLegacyTemplates,
-	removeLegacyTemplateFromForm,
+	removeDeprecatedUsage,
 	setLegacyDownloadUrl,
-	useLegacyTemplateOnForm,
 } from '@self:playwright/utils/deprecation';
 import { snapshot } from '@self:playwright/utils/snapshot';
 
 test.describe('Deprecated Features', () => {
-	// The signals are site-wide, so the tests share one set-up and run in order. Keeping the rest of the suite out
-	// while they are installed is the `core-isolated` project's job, since serial mode only orders this file.
+	// The signals are site-wide, so the tests share one set-up and run in order
 	test.describe.configure({ mode: 'serial' });
+
+	// Only requests carrying this see the notices the signals raise, which keeps them out of the other specs running
+	// alongside (see tools/mu-plugins)
+	test.beforeEach(async ({ page }: { page: Page }) => {
+		await page.setExtraHTTPHeaders({ 'X-GPDF-E2E-Deprecations': 'yes' });
+	});
 
 	let pdf: Pdf;
 	let formId: number;
 
 	test.beforeAll(async ({ requestUtils }: { requestUtils: RequestUtils }) => {
-		recordDeprecatedUsage();
-		installLegacyTemplates();
-
 		// createForm only touches requestUtils, the one fixture a beforeAll hook can take
 		pdf = new Pdf(requestUtils, undefined!, undefined!);
 
 		const form: any = await pdf.createForm('Legacy Download URL');
 		formId = form.id;
 
-		await setLegacyDownloadUrl(pdf, formId, true);
-		useLegacyTemplateOnForm(formId);
-
-		refreshDeprecatedDetection();
+		await setLegacyDownloadUrl(pdf, formId);
+		installDeprecatedUsage(formId);
 	});
 
 	test.afterAll(async () => {
-		clearDeprecatedUsage();
-		removeLegacyTemplates();
-		removeLegacyTemplateFromForm(formId);
+		// The form carries two of the signals, and forms outlive the run
+		await pdf.deleteForm(formId);
 
-		// Leave the site as we found it: the form carries one of the signals, and forms outlive the run
-		await setLegacyDownloadUrl(pdf, formId, false);
-
-		// Leave the notices nothing to report, so the permalink pass runs against a site without them
-		clearDeprecatedDetection();
+		removeDeprecatedUsage();
 	});
 
 	test('should list each detected feature in the system report', async ({

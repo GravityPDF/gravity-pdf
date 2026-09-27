@@ -48,14 +48,15 @@ yarn test:e2e            # Run all Playwright tests (headless)
 yarn test:e2e:debug      # Open Playwright UI for interactive debugging
 ```
 
-E2E tests live in `tests/playwright/` and run against a single wp-env instance on port 8702. Permalink mode is flipped per Playwright project group via `tools/playwright/global-setup.ts` (which shells out to `wp-env run cli wp option update permalink_structure`):
-- `core` project — runs `core/*` and `permalinks/*` tests under plain permalinks, less whatever `core-isolated` claims.
-- `core-isolated` project — specs whose fixtures change site-wide state the rest of the suite can observe (currently `core/system-status/*`, which raises an admin notice on every page the other snapshots are taken on). Depends on `core`, so nothing else is in flight while their state is live. `test.describe.configure({ mode: 'serial' })` only orders a single file and is not enough on its own.
-- `core-with-permalinks` project — re-runs `permalinks/*` tests under `/%postname%/` permalinks. Depends on `core-isolated` so it runs serially after the plain-permalink pass completes.
+E2E tests live in `tests/playwright/` and run against a single wp-env instance on port 8702, in one Playwright invocation with every test in parallel (`fullyParallel`, 4 workers). The `setup-core` project (`tools/playwright/global-setup.ts`) logs in and puts the site on `/%postname%/` permalinks, then:
+- `core` project — runs `core/*` and `permalinks/*` tests, sending `X-GPDF-E2E-Permalinks: plain` so its requests see plain permalinks.
+- `core-with-permalinks` project — re-runs `permalinks/*` tests on the site's pretty permalinks.
 
-Filters only narrow the projects you name: a project pulled in as a `dependency` runs in full regardless of `--grep` or a file filter. So a bare `yarn test:e2e -- <filter>` still runs everything, while `npx playwright test --config=tools/playwright/config.ts --project=core <filter>` runs just that slice plus `setup-core`. `--no-deps` isolates a project completely, but skipping `setup-core` leaves no storage state, so anything using `requestUtils` fails on auth.
+Tests share the site, so they must not change what the others can see. Seed with unique names (`createForm()` suffixes titles), and scope site-wide state to a test's own requests with the `X-GPDF-E2E-*` headers that `tools/mu-plugins/gravitypdf.php` reads (`page.setExtraHTTPHeaders()`), rather than saving a global setting: Debug Mode and the deprecation notices work this way. `test.describe.configure({ mode: 'serial' })` only orders a single file.
 
-In CI, Playwright is sharded 4-ways via `--shard=N/4` (see the `e2e-playwright` job in `.github/workflows/tests.yml`); each shard runs all setup projects against its own wp-env instance and executes its slice of the consumer projects' tests.
+Seed what a test isn't about over REST rather than through the admin UI: `pdf.addPdf(formId, name, settings)` posts to the plugin's own `/gravity-pdf/v1/form/{id}` endpoint (which fills in the defaults), and `pdf.updateForm(formId, withConfirmation({...}))` sets the default confirmation. Keep the UI where it's under test, or where saving it runs plugin code (a redirect confirmation's shortcode gains `entry`/`raw` as it saves). Specs that neither depend on permalinks nor can share the site with a copy of themselves (e.g. `core/managers/template-manager.spec.ts`, which uploads a fixed template over admin-ajax) belong under `core/`, not `permalinks/`.
+
+In CI, Playwright is sharded 4-ways via `yarn test:e2e -- --shard=N/4` (see the `e2e-playwright` job in `.github/workflows/tests.yml`), each shard against its own wp-env instance. CI records a trace on the first retry rather than on every test (the trace alone was a third of a short test's run time); locally a trace is kept for any failure. `--no-deps` skips the setup project, which leaves no storage state, so anything using `requestUtils` fails on auth.
 
 Artifacts (screenshots, traces) are written to `tmp/artifacts/`.
 

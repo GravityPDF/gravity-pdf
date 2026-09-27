@@ -33,7 +33,7 @@ test.describe('PDF Security and Access Policies', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		const pdfId = await pdf.createPdf(form.id, 'Accessible PDF');
+		const pdfId = await pdf.addPdf(form.id, 'Accessible PDF');
 		const entry = await pdf.createEntry({
 			form_id: form.id,
 		});
@@ -55,7 +55,7 @@ test.describe('PDF Security and Access Policies', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		const pdfId = await pdf.createPdf(form.id, 'Restricted PDF');
+		const pdfId = await pdf.addPdf(form.id, 'Restricted PDF');
 		const entry = await pdf.createEntry({
 			form_id: form.id,
 			ip: '10.0.0.1',
@@ -87,12 +87,9 @@ test.describe('PDF Security and Access Policies', () => {
 			password: '123456',
 		});
 
-		await pdf.navigateToNewFormPdf(form.id);
-		const pdfId = await pdf.createPdf(form.id, 'Restrict Owner');
-
-		await pdf.navigateToFormPdf(form.id, pdfId);
-		await pdf.checkField('Restrict Owner', true);
-		await pdf.addOrUpdatePdf();
+		const pdfId = await pdf.addPdf(form.id, 'Restrict Owner', {
+			restrict_owner: true,
+		});
 
 		const entry = await pdf.createEntry({
 			form_id: form.id,
@@ -130,12 +127,9 @@ test.describe('PDF Security and Access Policies', () => {
 			password: userPass,
 		});
 
-		await pdf.navigateToNewFormPdf(form.id);
-		const pdfId = await pdf.createPdf(form.id, 'Restrict Owner');
-
-		await pdf.navigateToFormPdf(form.id, pdfId);
-		await pdf.checkField('Restrict Owner', true);
-		await pdf.addOrUpdatePdf();
+		const pdfId = await pdf.addPdf(form.id, 'Restrict Owner', {
+			restrict_owner: true,
+		});
 
 		const entry = await pdf.createEntry({
 			form_id: form.id,
@@ -159,12 +153,9 @@ test.describe('PDF Security and Access Policies', () => {
 		page: Page;
 		admin: Admin;
 	}) => {
-		await pdf.navigateToNewFormPdf(form.id);
-		const pdfId = await pdf.createPdf(form.id, 'Public PDF');
-
-		await pdf.navigateToFormPdf(form.id, pdfId);
-		await pdf.checkField('Enable Public Access', true);
-		await pdf.addOrUpdatePdf();
+		const pdfId = await pdf.addPdf(form.id, 'Public PDF', {
+			public_access: true,
+		});
 
 		const entry = await pdf.createEntry({ form_id: form.id });
 

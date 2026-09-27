@@ -53,7 +53,8 @@ $addon = static function () {
 
 add_action( 'init', $addon, 20 );
 
-/* The deprecation notices are under test, so only the core-font one stays suppressed for E2E runs */
+/* The deprecation notices are under test (scoped to the requests asking for them, below), so only the core-font one
+   stays suppressed for E2E runs */
 remove_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
 
 add_filter(
@@ -86,5 +87,42 @@ add_action(
 
 		add_filter( 'gfpdf_rtl', $passthrough );
 		add_filter( 'gfpdf_legacy_templates', $passthrough );
+	}
+);
+
+/* Site-wide state a test needs, scoped to the requests that send the matching `X-GPDF-E2E-*` header, so the specs
+   needing it run in parallel with the rest instead of changing the site under them. Playwright adds the header to
+   every request a page makes, downloads and redirects included */
+$gfpdf_e2e_header = static function ( string $name ): string {
+	return sanitize_key( wp_unslash( $_SERVER[ 'HTTP_X_GPDF_E2E_' . strtoupper( $name ) ] ?? '' ) );
+};
+
+/* The site is set up on pretty permalinks, which keeps their rewrite rules and .htaccess in place for the requests
+   that need them. Plain permalinks don't read either */
+if ( $gfpdf_e2e_header( 'permalinks' ) === 'plain' ) {
+	add_filter( 'pre_option_permalink_structure', '__return_empty_string' );
+}
+
+if ( $gfpdf_e2e_header( 'debug_mode' ) === 'yes' ) {
+	add_filter(
+		'gfpdf_get_option_debug_mode',
+		static function () {
+			return 'Yes';
+		}
+	);
+}
+
+/* The deprecated features spec plants its signals site-wide, and the notice they raise would otherwise appear on
+   every admin page the other specs take snapshots of */
+if ( $gfpdf_e2e_header( 'deprecations' ) !== 'yes' ) {
+	add_filter( 'gfpdf_get_option_deprecated_features', '__return_empty_array' );
+}
+
+/* The editors open on the Visual tab whatever the last test left them on. WordPress remembers the tab per user, and
+   every test shares the one admin */
+add_filter(
+	'wp_default_editor',
+	static function () {
+		return 'tinymce';
 	}
 );

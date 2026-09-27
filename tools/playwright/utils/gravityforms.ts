@@ -25,6 +25,18 @@ type Entry = {
  */
 export const FIXED_ENTRY_DATE = '2020-01-01 00:00:00';
 
+/**
+ * An `updateForm()` patch merging `confirmation` into the form's default confirmation
+ * @param confirmation
+ */
+export function withConfirmation(confirmation: object) {
+	return (form: any) => ({
+		confirmations: Object.values(form.confirmations).map((existing: any) =>
+			existing.isDefault ? { ...existing, ...confirmation } : existing
+		),
+	});
+}
+
 export default class GravityForms {
 	protected requestUtils: RequestUtils;
 	protected admin: Admin;
@@ -42,10 +54,13 @@ export default class GravityForms {
 	/**
 	 * Merge `patch` into a form over the REST API
 	 *
-	 * The endpoint replaces the whole form, so the current one is read back first. Used for settings the admin UI
-	 * doesn't offer, and for those it does when the point of the test is elsewhere.
+	 * The endpoint replaces the whole form, so the current one is read back first; pass a function to build the patch
+	 * from it. Used for settings the admin UI doesn't offer, and for those it does when the point of the test is
+	 * elsewhere.
+	 * @param formId
+	 * @param patch
 	 */
-	async updateForm(formId: number, patch: object) {
+	async updateForm(formId: number, patch: object | ((form: any) => object)) {
 		const form: object = await this.requestUtils.rest({
 			path: `/gf/v2/forms/${formId}`,
 		});
@@ -53,7 +68,10 @@ export default class GravityForms {
 		return await this.requestUtils.rest({
 			method: 'PUT',
 			path: `/gf/v2/forms/${formId}`,
-			data: { ...form, ...patch },
+			data: {
+				...form,
+				...(typeof patch === 'function' ? patch(form) : patch),
+			},
 		});
 	}
 
@@ -79,6 +97,14 @@ export default class GravityForms {
 			method: 'POST',
 			path: `/gf/v2/forms`,
 			data: { ...form },
+		});
+	}
+
+	async deleteForm(formId: number) {
+		await this.requestUtils.rest({
+			method: 'DELETE',
+			path: `/gf/v2/forms/${formId}`,
+			params: { force: 1 },
 		});
 	}
 
@@ -214,13 +240,10 @@ export default class GravityForms {
 		expect(await textbox.inputValue()).toEqual(content);
 	}
 
-	async switchToCodeEditor() {
-		// The Code tab hands off to WordPress' `switchEditor()`, which calls `editor.hide()` and copies the
-		// TinyMCE iframe's height onto the textarea it reveals. Both need an initialised editor: clicking early
-		// throws out of `hide()` before the class swap below it, leaving the editor in visual mode with its
-		// textarea still hidden, and the height it copies is whatever the iframe had reached by then — which is
-		// what moves the box between snapshots. The images inside count too, since they are what the editor
-		// sizes itself around.
+	/**
+	 * Wait for every visible visual editor to initialise, with the images inside it loaded
+	 */
+	async waitForVisualEditors() {
 		await this.page.waitForFunction(
 			() => {
 				const tinymce = (window as any).tinymce;
@@ -251,6 +274,16 @@ export default class GravityForms {
 			undefined,
 			{ timeout: 15000 }
 		);
+	}
+
+	async switchToCodeEditor() {
+		// The Code tab hands off to WordPress' `switchEditor()`, which calls `editor.hide()` and copies the
+		// TinyMCE iframe's height onto the textarea it reveals. Both need an initialised editor: clicking early
+		// throws out of `hide()` before the class swap below it, leaving the editor in visual mode with its
+		// textarea still hidden, and the height it copies is whatever the iframe had reached by then — which is
+		// what moves the box between snapshots. The images inside count too, since they are what the editor
+		// sizes itself around.
+		await this.waitForVisualEditors();
 
 		for (const button of await this.page
 			.locator('.wp-editor-tabs')

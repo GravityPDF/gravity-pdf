@@ -22,12 +22,7 @@ test.describe('Inactive PDF', () => {
 			// setup form and inactive PDF
 			pdf = new Pdf(requestUtils, admin, page);
 			form = await pdf.createForm('Inactive PDF');
-
-			const pdfId = await pdf.createPdf(form.id, 'Inactive PDF');
-			await pdf.navigateToFormPdfList(form.id);
-			await page
-				.getByRole('button', { name: 'Active', exact: true })
-				.click();
+			await pdf.addPdf(form.id, 'Inactive PDF', { active: false });
 
 			// create entry
 			entry = await pdf.createEntry({ form_id: form.id });
@@ -48,7 +43,7 @@ test.describe('Inactive PDF', () => {
 			page.getByRole('link', { name: 'View PDF' })
 		).not.toBeAttached();
 
-		await pdf.createPdf(form.id, 'Active PDF');
+		await pdf.addPdf(form.id, 'Active PDF');
 
 		await pdf.navigateToEntryList(form.id);
 		await expect(
@@ -73,7 +68,7 @@ test.describe('Inactive PDF', () => {
 			page.getByRole('link', { name: 'Download', exact: true })
 		).not.toBeAttached();
 
-		await pdf.createPdf(form.id, 'Active PDF');
+		await pdf.addPdf(form.id, 'Active PDF');
 
 		await pdf.navigateToEntryDetail(entry.form_id, entry.id);
 		await expect(

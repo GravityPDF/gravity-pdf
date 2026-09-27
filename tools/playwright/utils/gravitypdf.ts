@@ -5,30 +5,23 @@ import { URL } from 'node:url';
 import GravityForms from '@self:playwright/utils/gravityforms';
 
 export default class Pdf extends GravityForms {
-	async navigateToGlobalPdfSettings() {
-		await this.admin.visitAdminPage(
-			'admin.php',
-			'page=gf_settings&subview=PDF'
-		);
-	}
+	/**
+	 * Add a PDF to a form over the plugin's REST API, returning its ID
+	 *
+	 * The endpoint fills in every setting left out with its default, as the admin UI does. Seeding a PDF the test
+	 * isn't about this way costs one request, where the UI costs a few page loads.
+	 * @param formId
+	 * @param name     also used as the filename
+	 * @param settings any to change, e.g. `{ active: false }`
+	 */
+	async addPdf(formId: number, name: string, settings: object = {}) {
+		const pdf: { id: string } = await this.requestUtils.rest({
+			method: 'POST',
+			path: `/gravity-pdf/v1/form/${formId}`,
+			data: { name, filename: name, template: 'zadani', ...settings },
+		});
 
-	async setGlobalPdfSetting(label: string, value: any) {
-		await this.navigateToGlobalPdfSettings();
-
-		const setting = this.page.getByLabel(label).first();
-
-		switch (await setting.getAttribute('type')) {
-			case 'checkbox':
-				// eslint-disable-next-line no-unused-expressions
-				value ? await setting.check() : await setting.uncheck();
-				break;
-
-			case 'radio':
-				// eslint-disable-next-line no-unused-expressions
-				value ? await setting.check() : await setting.uncheck();
-		}
-
-		await this.page.getByRole('button', { name: 'Save Settings' }).click();
+		return pdf.id;
 	}
 
 	async fillField(label: string, value: string) {
@@ -53,8 +46,27 @@ export default class Pdf extends GravityForms {
 		await this.navigateToFormSettingsById(formId, 'PDF');
 	}
 
-	async createPdf(formId: number, label: string) {
-		await this.navigateToNewFormPdf(formId);
+	/**
+	 * Flip a PDF's active state from the PDF list that is open, and wait for it to save
+	 * @param pdfId
+	 * @param expected the state the PDF should end up in
+	 */
+	async togglePdf(pdfId: string, expected: 'active' | 'inactive') {
+		const toggle = this.page
+			.locator(`#gfpdf-${pdfId}`)
+			.locator('button.gform-status-indicator');
+
+		await toggle.click();
+
+		// The state saves over AJAX, and the status only flips once it has
+		await expect(toggle).toHaveAttribute('data-status', expected);
+	}
+
+	/**
+	 * Save the new-PDF form that is already open, returning the ID of the PDF it creates
+	 * @param label
+	 */
+	async saveNewPdf(label: string) {
 		await this.page.getByLabel('Label').fill(label);
 		await this.page.getByLabel('Filename').fill(label);
 		await this.addOrUpdatePdf();
@@ -83,11 +95,8 @@ export default class Pdf extends GravityForms {
 	}
 
 	async navigateToNewFormPdf(formId: number) {
-		await this.navigateToFormPdfList(formId);
-		await this.page.getByRole('link', { name: 'Add new PDF' }).click();
-		await expect(
-			this.page.getByRole('button', { name: 'Manage PDF Templates' })
-		).toBeVisible({ timeout: 30000 });
+		// What the list's "Add new PDF" link points at, without loading the list first
+		await this.navigateToFormPdf(formId, '0');
 	}
 
 	async navigateToFormPdf(formId: number, pdfId: string) {
