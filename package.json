@@ -43,7 +43,6 @@
     "filenamify": "^6.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "jest-enzyme": "^7.1.2",
     "jquery": "^3.6.0",
     "lost-pixel": "^3.22.0",
     "pixelmatch": "^5.3.0",
@@ -86,6 +85,7 @@
     "i10n:translate": "potomatic --output-dir=./languages --po-file-prefix=gravity-pdf- --pot-file-path=./languages/gravity-pdf.pot --use-dictionary --dictionary-path=./tools/potomatic/dictionaries --target-languages=es_ES,fr_FR,de_DE,de_DE-formal,it_IT,nl_NL,ru_RU,zh_CN"
   },
   "resolutions": {
-    "cheerio": "1.0.0-rc.10"
+    "cheerio": "1.0.0-rc.10",
+    "qs": "^6.16.0"
   }
 }
