@@ -2,6 +2,9 @@
 
 ## Gravity PDF
 
+### 6.17.3
+* 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
+
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
 * 💻 Developer: Add a `country_code` key to Address fields in `$form_data`
