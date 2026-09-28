@@ -948,6 +948,19 @@ class Test_Options_API extends TestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_sanitize_logged_out_timeout() {
+		$field = $this->options->get_registered_fields()['general_security']['logged_out_timeout'];
+
+		$this->assertSame( 20, $this->options->sanitize_number_field( '', 'logged_out_timeout', [], $field ) );
+		$this->assertSame( 1, $this->options->sanitize_number_field( '0', 'logged_out_timeout', [], $field ) );
+
+		/* A field without a default still saves 0 */
+		$this->assertSame( 0, $this->options->sanitize_number_field( '' ) );
+	}
+
+	/**
 	 * Test the paper size sanitization function
 	 *
 	 * @param array $expected
