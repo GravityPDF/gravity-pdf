@@ -137,21 +137,16 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$value = $this->get_value();
 		$files = [];
 
-		if ( ! empty( $value ) ) {
-			$paths = $this->field->multipleFiles ? json_decode( $value, true ) : [ $value ];
-
-			if ( is_array( $paths ) && count( $paths ) > 0 ) {
-				foreach ( $paths as $path ) {
-					if ( ! is_string( $path ) ) {
-						continue;
-					}
-
-					$files[] = esc_url( $path );
-				}
+		/* Older single-file entries store a plain URL, everything else a JSON array (incl. GF 2.10+ single-file fields) */
+		foreach ( (array) \GFCommon::maybe_decode_json( $this->get_value() ) as $path ) {
+			/* esc_url() turns non-URLs into a bogus http:// link, so skip them */
+			if ( ! is_string( $path ) || ! preg_match( '~^https?://[^/?#]~i', $path ) ) {
+				continue;
 			}
+
+			$files[] = esc_url( $path );
 		}
 
 		$this->cache( $files );
