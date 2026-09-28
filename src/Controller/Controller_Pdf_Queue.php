@@ -480,15 +480,15 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Create a fresh queue in case it needs to be used again this request
+	 * Empty the queue in case it needs to be used again this request
 	 *
 	 * @return void
 	 *
 	 * @since 6.11.0
 	 */
 	public function reset_queue() {
-		/* Create a fresh queue in case the queue needs to be used again */
-		$this->queue                    = new Helper_Pdf_Queue( $this->log );
+		/* Older Gravity Forms versions don't empty the queue when saving it */
+		$this->queue->data( [] );
 		$this->form_async_notifications = [];
 	}
 }

@@ -5,7 +5,6 @@ declare( strict_types=1 );
 namespace GFPDF\Model;
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Controller\Controller_Uninstaller;
-use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_Install;
 use GFPDF\Tests\Integration\TestCase;
 
@@ -68,7 +67,7 @@ class Test_Installer extends TestCase {
 		$uninstaller = Controller_Uninstaller::get_instance();
 
 		/* Setup our test classes */
-		$this->model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), $uninstaller->model );
+		$this->model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $uninstaller->model );
 
 		$this->controller = new Controller_Install( $this->model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 		$this->controller->init();
