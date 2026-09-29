@@ -4,6 +4,9 @@
 
 ### 6.17.3
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
+* 🐞 Bug: Stop a failed global settings save from erasing all saved settings
+* 🐞 Bug: Keep the entered values on the global settings page after a failed save when a Gravity PDF extension is active
+* 🐞 Bug: Stop another plugin's settings errors from blocking the global settings save
 
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
