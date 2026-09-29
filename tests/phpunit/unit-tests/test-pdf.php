@@ -85,6 +85,15 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->controller->init();
 	}
 
+	public function tear_down() {
+		parent::tear_down();
+
+		/* Creating a subsite dirties process globals WP_UnitTestCase won't roll back; reset so later tests aren't polluted */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
+	}
+
 	/**
 	 * Create our testing data
 	 *
@@ -597,6 +606,13 @@ class Test_PDF extends WP_UnitTestCase {
 		$results = $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] );
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'timeout_expired', $results->get_error_code() );
+
+		/* A filtered timeout of 0 expires at once */
+		add_filter( 'gfpdf_get_option_logged_out_timeout', '__return_zero' );
+		$results = $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] );
+		remove_filter( 'gfpdf_get_option_logged_out_timeout', '__return_zero' );
+
+		$this->assertInstanceOf( \WP_Error::class, $results );
 
 		/* Test we get a auth redirect */
 		$entry['created_by'] = 5;

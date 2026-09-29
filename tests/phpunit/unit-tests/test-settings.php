@@ -162,7 +162,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertEquals(
 			10,
 			has_filter(
-				'gravitypdf_settings_navigation',
+				'gfpdf_settings_navigation',
 				[
 					$this->controller,
 					'disable_tools_on_view_cap',
@@ -268,25 +268,14 @@ class Test_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_disable_tools_on_view_cap() {
+		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
+		$this->assertNotContains( 'tools', $tabs );
 
-		$nav = [
-			10  => 'General',
-			100 => 'Tools',
-		];
-
-		/* Ensure tools tab isn't present when permissions aren't set */
-		$results = $this->controller->disable_tools_on_view_cap( $nav );
-		$this->assertTrue( ! isset( $results[100] ) );
-
-		/* Setup appropriate permissions and recheck */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
-		$results = $this->controller->disable_tools_on_view_cap( $nav );
-		$this->assertTrue( isset( $results[100] ) );
-
-		wp_set_current_user( 0 );
+		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
+		$this->assertContains( 'tools', $tabs );
 	}
 
 	/**
@@ -446,6 +435,39 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertSame( '', $results['license_my-custom-plugin_url'] );
 
 		$gfpdf->data->addon = [];
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_license_tab_save_keeps_message_links_and_encoded_url() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$settings                                 = $gfpdf->options->get_settings();
+		$settings['license_my-custom-plugin_url'] = 'https://example.com/%E6%97%A5';
+		$gfpdf->options->update_settings( $settings );
+
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [ 'error' => 'revoked' ] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$_POST['_wp_http_referer'] = '/wp-admin/admin.php?page=gf_settings&subview=PDF&tab=license';
+		$_POST['option_page']      = 'gfpdf_settings';
+
+		$results = $gfpdf->options->settings_sanitize( [ 'license_my-custom-plugin' => 'user license key' ] );
+
+		remove_filter( 'pre_http_request', $api_response );
+		$gfpdf->data->addon = [];
+
+		$this->assertStringContainsString( '<a href=', $results['license_my-custom-plugin_message'] );
+		$this->assertSame( 'https://example.com/%E6%97%A5', $results['license_my-custom-plugin_url'] );
 	}
 
 	/**
