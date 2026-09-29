@@ -473,45 +473,41 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* get the global PDF settings */
 				$timeout = (int) $this->options->get_option( 'logged_out_timeout', '20' );
 
-				/* if '0' there is no timeout, or if the logged out restrictions are enabled we'll ignore this */
-				if ( $timeout !== 0 ) {
+				$timeout_stamp   = 60 * $timeout; /* 60 seconds multiplied by number of minutes */
+				$entry_created   = strtotime( $entry['date_created'] ); /* get entry timestamp */
+				$timeout_expires = $entry_created + $timeout_stamp; /* get the timeout expiry based on the entry created time */
+				$current_time    = time();
 
-					$timeout_stamp   = 60 * $timeout; /* 60 seconds multiplied by number of minutes */
-					$entry_created   = strtotime( $entry['date_created'] ); /* get entry timestamp */
-					$timeout_expires = $entry_created + $timeout_stamp; /* get the timeout expiry based on the entry created time */
-					$current_time    = time();
+				/* compare our two timestamps and throw error if outside the timeout */
+				if ( $current_time > $timeout_expires ) {
 
-					/* compare our two timestamps and throw error if outside the timeout */
-					if ( $current_time > $timeout_expires ) {
+					/* if there is no user account assigned to this entry throw error */
+					if ( empty( $entry['created_by'] ) ) {
+						$this->log->notice(
+							'Logged Out Timeout Expired. Showing Error Message.',
+							[
+								'entry_id'        => $entry['id'],
+								'settings_id'     => $settings['id'],
+								'current_time'    => $current_time,
+								'timeout_expires' => $timeout_expires,
+							]
+						);
 
-						/* if there is no user account assigned to this entry throw error */
-						if ( empty( $entry['created_by'] ) ) {
-							$this->log->notice(
-								'Logged Out Timeout Expired. Showing Error Message.',
-								[
-									'entry_id'        => $entry['id'],
-									'settings_id'     => $settings['id'],
-									'current_time'    => $current_time,
-									'timeout_expires' => $timeout_expires,
-								]
-							);
+						return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-pdf' ) );
+					} else {
 
-							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-pdf' ) );
-						} else {
+						$this->log->notice(
+							'Logged Out Timeout Expired but user assigned to the entry. Redirecting to Login.',
+							[
+								'entry_id'        => $entry['id'],
+								'settings_id'     => $settings['id'],
+								'current_time'    => $current_time,
+								'timeout_expires' => $timeout_expires,
+							]
+						);
 
-							$this->log->notice(
-								'Logged Out Timeout Expired but user assigned to the entry. Redirecting to Login.',
-								[
-									'entry_id'        => $entry['id'],
-									'settings_id'     => $settings['id'],
-									'current_time'    => $current_time,
-									'timeout_expires' => $timeout_expires,
-								]
-							);
-
-							/* prompt to login */
-							auth_redirect();
-						}
+						/* prompt to login */
+						auth_redirect();
 					}
 				}
 			}
