@@ -598,6 +598,13 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'timeout_expired', $results->get_error_code() );
 
+		/* A filtered timeout of 0 expires at once */
+		add_filter( 'gfpdf_get_option_logged_out_timeout', '__return_zero' );
+		$results = $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '', ] );
+		remove_filter( 'gfpdf_get_option_logged_out_timeout', '__return_zero' );
+
+		$this->assertInstanceOf( \WP_Error::class, $results );
+
 		/* Test we get a auth redirect */
 		$entry['created_by'] = 5;
 

@@ -119,4 +119,21 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
 	}
+
+	public function test_6_17_3_removes_a_logged_out_timeout_below_one_minute() {
+		$settings = $this->options->get_settings();
+
+		foreach ( [ 0, '-5' ] as $timeout ) {
+			$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => $timeout ] ) );
+			do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+			$this->assertArrayNotHasKey( 'logged_out_timeout', get_option( 'gfpdf_settings' ) );
+		}
+
+		/* A real timeout is left alone */
+		$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => '33' ] ) );
+		do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+		$this->assertSame( '33', get_option( 'gfpdf_settings' )['logged_out_timeout'] );
+
+		$this->options->update_settings( $settings );
+	}
 }

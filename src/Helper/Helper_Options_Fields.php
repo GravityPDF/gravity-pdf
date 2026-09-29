@@ -169,11 +169,12 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'logged_out_timeout'     => [
 						'id'      => 'logged_out_timeout',
 						'name'    => esc_html__( 'Logged Out Timeout', 'gravity-pdf' ),
-						'desc'    => sprintf( esc_html__( 'Limit how long a %1$slogged out%2$s users has direct access to the PDF after completing the form. Set to 0 to disable time limit (not recommended).', 'gravity-pdf' ), '<em>', '</em>' ),
+						'desc'    => sprintf( esc_html__( 'Limit how long a %1$slogged out%2$s users has direct access to the PDF after completing the form.', 'gravity-pdf' ), '<em>', '</em>' ),
 						'desc2'   => esc_html__( 'minutes', 'gravity-pdf' ),
 						'type'    => 'number',
 						'size'    => 'small',
 						'std'     => 20,
+						'min'     => 1,
 						'tooltip' => '<h6>' . esc_html__( 'Logged Out Timeout', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Logged out users can view PDFs when their IP matches the one assigned to the Gravity Form entry. Because IP addresses can change, a time-based restriction also applies.', 'gravity-pdf' ),
 					],
 

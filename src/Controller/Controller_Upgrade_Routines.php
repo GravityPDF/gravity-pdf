@@ -66,6 +66,10 @@ class Controller_Upgrade_Routines {
 			$this->remove_legacy_license_check_cron();
 		}
 
+		if ( version_compare( $current_version, '6.17.3', '>=' ) && version_compare( $old_version, '6.17.3', '<' ) ) {
+			$this->remove_logged_out_timeout_below_minimum();
+		}
+
 		/* Deliberately ungated: every release is a chance for a new round of removals to arrive. Runs last, so it
 		   reflects the routines above */
 		$this->record_deprecated_functionality();
@@ -82,6 +86,19 @@ class Controller_Upgrade_Routines {
 	 */
 	public function record_deprecated_functionality(): void {
 		Deprecation::refresh_signals();
+	}
+
+	/**
+	 * Remove a saved Logged Out Timeout below the new 1-minute minimum, so it reads as the 20-minute default
+	 *
+	 * @since 6.17.3
+	 */
+	protected function remove_logged_out_timeout_below_minimum(): void {
+		$settings = get_option( 'gfpdf_settings', [] );
+
+		if ( isset( $settings['logged_out_timeout'] ) && (int) $settings['logged_out_timeout'] < 1 ) {
+			$this->options->delete_option( 'logged_out_timeout' );
+		}
 	}
 
 	/**
