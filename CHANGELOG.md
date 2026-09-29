@@ -4,6 +4,7 @@
 
 ### 6.17.3
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
+* 🐞 Bug: Hide the Tools tab from users who can view but not edit the PDF settings
 
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
