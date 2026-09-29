@@ -10,7 +10,6 @@
 * 🐞 Bug: Stop a failed global settings save from erasing all saved settings
 * 🐞 Bug: Keep the entered values on the global settings page after a failed save when a Gravity PDF extension is active
 * 🐞 Bug: Stop another plugin's settings errors from blocking the global settings save
-* 🐞 Bug: Save a number setting's default value when the field is left blank
 * 🐞 Bug: Hide the Tools tab from users who can view but not edit the PDF settings
 * 🐞 Bug: Keep the value returned by the `gfpdf_settings_sanitize` filter when saving the global settings
 * 💻 Developer: Global settings fields can set a `sanitize_callback` to replace the default sanitizing
