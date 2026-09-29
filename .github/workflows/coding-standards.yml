@@ -43,7 +43,7 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          composer install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
+          bash tools/ci/composer-retry.sh install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
 
       - name: Log PHPCS debug information
