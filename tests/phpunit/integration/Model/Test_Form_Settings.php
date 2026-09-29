@@ -534,8 +534,9 @@ class Test_Form_Settings extends TestCase {
 
 		$values = $this->model->settings_sanitize( $input );
 
+		/* Font Size and Image DPI fall back to their defaults */
 		foreach ( $values as $k => $v ) {
-			$this->assertContains( $v, [ 'global input value', 0, 1 ] );
+			$this->assertContains( $v, [ 'global input value', 10, 96 ] );
 		}
 
 		remove_all_filters( 'gfpdf_form_settings_sanitize' );
