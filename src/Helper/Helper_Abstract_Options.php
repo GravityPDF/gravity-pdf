@@ -100,6 +100,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	private $settings = [];
 
 	/**
+	 * Holds a failed save's submitted values for the settings form to redisplay
+	 *
+	 * @var array|null
+	 *
+	 * @since 6.17.3
+	 */
+	private $submitted_settings;
+
+	/**
 	 * Holds the Gravity Form PDF Settings
 	 *
 	 * @var array
@@ -174,15 +183,18 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	}
 
 	/**
-	 * Load the plugin's settings, or a failed save's submitted values on a PDF settings page
+	 * Load the plugin's settings, plus a failed save's submitted values on a PDF settings page
 	 *
 	 * @return  void
 	 * @since 4.0
+	 * @since 6.17.3 A failed save's submitted values go to the settings form, not get_option()
 	 *
 	 */
 	public function set_plugin_settings() {
-		/* assign our settings */
-		$this->settings = $this->get_settings( true );
+		$this->settings = $this->get_settings();
+
+		/* Kept out of $settings so a later write in the request neither drops nor saves them */
+		$this->submitted_settings = $this->pull_submitted_settings() ?? $this->submitted_settings;
 	}
 
 	/**
@@ -297,42 +309,42 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * Retrieves all plugin settings
 	 *
-	 * @param bool $use_submitted Consume and return a failed save's submitted values on a PDF settings page
-	 *
 	 * @return array GFPDF settings
 	 * @since 4.0
-	 * @since 6.17.3 Only returns a failed save's submitted values when `$use_submitted` is true
+	 * @since 6.17.3 No longer returns a failed save's submitted values on a PDF settings page
 	 *
 	 */
-	public function get_settings( $use_submitted = false ) {
-
-		$is_temp = false;
-
-		if ( $use_submitted && $this->misc->is_gfpdf_page() ) {
-
-			/*
-			 * We are storing temporary settings in a transient when validation fails.
-			 * This allows us to keep track of the updated fields without updating main settings in the DB
-			 *
-			 * We'll check if the transient exists and use it, otherwise get the main plugin settings from the options table
-			 */
-			$tmp_settings = get_transient( 'gfpdf_settings_user_data' );
-			$is_temp      = $tmp_settings !== false;
-
-			if ( $is_temp ) {
-				delete_transient( 'gfpdf_settings_user_data' );
-			}
-		}
-
-		$settings = $is_temp ? (array) $tmp_settings : get_option( 'gfpdf_settings', [] );
-
+	public function get_settings() {
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_settings/ for more details about this filter */
-		$settings = apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
+		$settings = apply_filters( 'gfpdf_get_settings', get_option( 'gfpdf_settings', [] ), false );
 
 		/* Ensure $settings is an array and has not been corrupted somehow */
-		$settings = is_array( $settings ) ? $settings : [];
+		return is_array( $settings ) ? $settings : [];
+	}
 
-		return $settings;
+	/**
+	 * Take a failed save's submitted values, which a transient holds so the settings form can redisplay them
+	 *
+	 * @return array|null The submitted values, or null when none are waiting on a PDF settings page
+	 *
+	 * @since 6.17.3
+	 */
+	private function pull_submitted_settings(): ?array {
+		if ( ! $this->misc->is_gfpdf_page() ) {
+			return null;
+		}
+
+		$submitted = get_transient( 'gfpdf_settings_user_data' );
+		if ( $submitted === false ) {
+			return null;
+		}
+
+		delete_transient( 'gfpdf_settings_user_data' );
+
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_settings/ for more details about this filter */
+		$submitted = apply_filters( 'gfpdf_get_settings', (array) $submitted, true );
+
+		return is_array( $submitted ) ? $submitted : [];
 	}
 
 	/**
@@ -1370,8 +1382,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $args['value'];
 		}
 
-		/* Get our global Gravity PDF Settings */
-		$options = $this->settings;
+		/* Get our global Gravity PDF Settings, or what a failed save submitted */
+		$options = $this->submitted_settings ?? $this->settings;
 
 		/* Get our PDF GF settings (if any) */
 		$pdf_form_settings = $this->get_form_settings();

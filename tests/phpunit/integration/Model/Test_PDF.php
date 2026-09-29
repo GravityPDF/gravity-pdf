@@ -93,7 +93,7 @@ class Test_PDF extends TestCase {
 
 		/*
 		 * Clear state that other tests leak and that interferes with the signed URL middleware:
-		 *  - $_GET[page/subview] flips is_gfpdf_page() true, which makes get_settings() consult the transient.
+		 *  - $_GET[page/subview] flips is_gfpdf_page() true, which makes set_plugin_settings() consult the transient.
 		 *  - The gfpdf_settings_user_data transient is cleared by the base TestCase::set_up().
 		 *  - $wp_settings_errors carrying over derails update_settings()'s sanitize branching.
 		 *  - Re-sync the in-memory cache with the DB. Older Test_Uninstaller runs wiped the gfpdf_settings

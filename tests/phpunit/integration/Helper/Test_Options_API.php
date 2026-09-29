@@ -103,41 +103,32 @@ class Test_Options_API extends TestCase {
 		$this->assertSame( 'millimeters', $settings['default_custom_pdf_size'][2] );
 
 		$this->assertSame( 'gravityforms_create_form', $settings['admin_capabilities'][0] );
-
-		/**
-		 * Check our transient user data is loaded
-		 * Used in settings_sanitize() when there are errors the user has to fix
-		 */
-		set_transient( 'gfpdf_settings_user_data', [ 'testing' ], 30 );
-
-		set_current_screen( 'dashboard' );
-		$_GET['page'] = 'gfpdf-';
-
-		$this->assertSame( [ 'testing' ], $this->options->get_settings( true ) );
 	}
 
 	/**
 	 * @since 6.17.3
 	 */
-	public function test_settings_page_redisplays_a_failed_save_after_other_reads() {
+	public function test_settings_page_redisplays_a_failed_save_after_other_reads_and_writes() {
 		set_transient( 'gfpdf_settings_user_data', array_merge( $this->options->get_settings(), [ 'default_font_size' => 17 ] ), 30 );
 
 		set_current_screen( 'dashboard' );
 		$_GET['page']    = 'gf_settings';
 		$_GET['subview'] = 'PDF';
 
+		/* A separate instance, so the submitted values don't outlive this test */
+		$options = clone $this->options;
+
 		/* An add-on reading its license info on load gets what's saved, and leaves the submitted values alone */
-		$this->assertArrayNotHasKey( 'default_font_size', $this->options->get_settings() );
+		$this->assertArrayNotHasKey( 'default_font_size', $options->get_settings() );
 
-		$this->options->set_plugin_settings();
-		$font_size = $this->options->get_option( 'default_font_size' );
-		$user_data = get_transient( 'gfpdf_settings_user_data' );
+		$options->set_plugin_settings();
+		$this->assertFalse( get_transient( 'gfpdf_settings_user_data' ) );
 
-		unset( $_GET['page'], $_GET['subview'] );
-		$this->options->set_plugin_settings();
+		/* An add-on writing its license info after the settings load */
+		$options->update_settings( $options->get_settings() );
 
-		$this->assertSame( 17, $font_size );
-		$this->assertFalse( $user_data );
+		$this->assertSame( '17', $options->get_form_value( [ 'id' => 'default_font_size' ] ) );
+		$this->assertFalse( $options->get_option( 'default_font_size' ) );
 	}
 
 	/**
