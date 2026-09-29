@@ -389,8 +389,8 @@ class Test_Controller_Pdf_Queue extends TestCase {
 
 		/*
 		 * Wipe state that other tests leak and that quietly breaks settings_sanitize:
-		 *  - $wp_settings_errors: prior add_settings_error calls flip update_settings into the empty-output branch (line 1188).
-		 *  - gfpdf_settings_user_data transient + $_GET keys: trigger get_settings to return transient instead of DB.
+		 *  - $wp_settings_errors: prior add_settings_error calls send update_settings down the error branch, which saves nothing.
+		 *  - gfpdf_settings_user_data transient + $_GET keys: trigger set_plugin_settings() to load the transient instead of the DB.
 		 */
 		$wp_settings_errors = [];
 		delete_transient( 'gfpdf_settings_user_data' );
