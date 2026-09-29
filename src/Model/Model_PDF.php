@@ -1299,79 +1299,89 @@ class Model_PDF extends Helper_Abstract_Model {
 		$settings = $pdf_generator->get_settings();
 		$form     = $pdf_generator->get_form();
 
-		/* Fires only when the PDF is generated, and not when a cached PDF is reused */
-		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf_generator );
-
-		/*
-		 * Load our arguments that should be accessed by our PDF template
-		 */
-		$args = $this->templates->get_template_arguments(
-			$form,
-			$this->misc->get_fields_sorted_by_id( $form['id'] ),
-			$entry,
-			$this->get_form_data( $entry ),
-			$settings,
-			$this->templates->get_config_class( $settings['template'] )
-		);
-
-		/* Add backwards compatibility support */
-		$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
-		$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
-
-		Helper_Render_Health::begin();
-
 		try {
+			/* Fires only when the PDF is generated, and not when a cached PDF is reused */
+			do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf_generator );
 
-			/* Initialise our PDF helper class */
-			$pdf_generator->init();
-			$pdf_generator->set_template();
-			$pdf_generator->set_output_type( 'save' );
+			/*
+			 * Load our arguments that should be accessed by our PDF template
+			 */
+			$args = $this->templates->get_template_arguments(
+				$form,
+				$this->misc->get_fields_sorted_by_id( $form['id'] ),
+				$entry,
+				$this->get_form_data( $entry ),
+				$settings,
+				$this->templates->get_config_class( $settings['template'] )
+			);
 
-			/* Render the PDF template HTML */
-			$pdf_generator->render_html( $args );
+			/* Add backwards compatibility support */
+			$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
+			$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
 
-			$pdf = $pdf_generator->generate();
+			Helper_Render_Health::begin();
 
+			try {
+
+				/* Initialise our PDF helper class */
+				$pdf_generator->init();
+				$pdf_generator->set_template();
+				$pdf_generator->set_output_type( 'save' );
+
+				/* Render the PDF template HTML */
+				$pdf_generator->render_html( $args );
+
+				$pdf = $pdf_generator->generate();
+
+				/**
+				 * Whether the PDF is missing content that could render on another attempt, so it isn't cached
+				 *
+				 * @param bool $degraded True when a remote request timed out, or failed with a DNS error, 408, 429 or 5xx
+				 *
+				 * @since 7.0
+				 */
+				if ( $pdf_generator->is_cache_path() && apply_filters( 'gfpdf_render_degraded', Helper_Render_Health::is_degraded(), $form, $entry, $settings, $pdf_generator ) ) {
+					$pdf_generator->set_path( Cache::get_uncached_path() );
+					$cache_status = 'degraded';
+				}
+
+				/* Generate and save the PDF */
+				$pdf_generator->save_pdf( $pdf );
+
+				/* Fires only when the PDF is generated, and not when a cached PDF is reused */
+				do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf_generator );
+
+				$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = $cache_status;
+
+				return true;
+			} catch ( Exception $e ) {
+
+				$this->log->error(
+					'PDF Generation Error',
+					[
+						'form_id'   => $form['id'],
+						'entry_id'  => $entry['id'],
+						'pdf_id'    => $settings['id'],
+						'template'  => $settings['template'],
+						'path'      => $pdf_generator->get_full_pdf_path(),
+						'exception' => $e->getMessage(),
+						'file'      => $e->getFile(),
+						'line'      => $e->getLine(),
+					]
+				);
+
+				return false;
+			} finally {
+				Helper_Render_Health::end();
+			}
+		} finally {
 			/**
-			 * Whether the PDF is missing content that could render on another attempt, so it isn't cached
-			 *
-			 * @param bool $degraded True when a remote request timed out, or failed with a DNS error, 408, 429 or 5xx
+			 * Fires when a render that fired `gfpdf_pre_pdf_generation` ends, even when it fails or throws, so anything
+			 * added on that action can be removed
 			 *
 			 * @since 7.0
 			 */
-			if ( $pdf_generator->is_cache_path() && apply_filters( 'gfpdf_render_degraded', Helper_Render_Health::is_degraded(), $form, $entry, $settings, $pdf_generator ) ) {
-				$pdf_generator->set_path( Cache::get_uncached_path() );
-				$cache_status = 'degraded';
-			}
-
-			/* Generate and save the PDF */
-			$pdf_generator->save_pdf( $pdf );
-
-			/* Fires only when the PDF is generated, and not when a cached PDF is reused */
-			do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf_generator );
-
-			$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = $cache_status;
-
-			return true;
-		} catch ( Exception $e ) {
-
-			$this->log->error(
-				'PDF Generation Error',
-				[
-					'form_id'   => $form['id'],
-					'entry_id'  => $entry['id'],
-					'pdf_id'    => $settings['id'],
-					'template'  => $settings['template'],
-					'path'      => $pdf_generator->get_full_pdf_path(),
-					'exception' => $e->getMessage(),
-					'file'      => $e->getFile(),
-					'line'      => $e->getLine(),
-				]
-			);
-
-			return false;
-		} finally {
-			Helper_Render_Health::end();
+			do_action( 'gfpdf_pdf_generation_end', $form, $entry, $settings, $pdf_generator );
 		}
 	}
 
