@@ -5,7 +5,7 @@
 ### 6.17.3
 * 🧹 Housekeeping: Set a 1 minute minimum for the Logged Out Timeout, and remove the "0 to disable" option, which never worked
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
-* 🐞 Bug: Save a number setting's default value when the field is left blank
+* 🐞 Bug: Save a number setting's default value when the field is left blank or isn't a number
 
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
