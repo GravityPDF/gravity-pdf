@@ -402,14 +402,8 @@ class Test_Controller_Pdf_Queue extends TestCase {
 	public function test_queue_cleanup() {
 		global $gfpdf, $wp_settings_errors;
 
-		/*
-		 * Wipe state that other tests leak and that quietly breaks settings_sanitize:
-		 *  - $wp_settings_errors: prior add_settings_error calls send update_settings down the error branch, which saves nothing.
-		 *  - gfpdf_settings_user_data transient + $_GET keys: trigger set_plugin_settings() to load the transient instead of the DB.
-		 */
+		/* Errors other tests add send update_settings() down the error branch, which saves nothing */
 		$wp_settings_errors = [];
-		delete_transient( 'gfpdf_settings_user_data' );
-		unset( $_GET['page'], $_GET['subview'] );
 
 		/* Seed gfpdf_settings deterministically and reload the in-memory cache. */
 		update_option( 'gfpdf_settings', [ 'background_processing' => 'No' ] );
