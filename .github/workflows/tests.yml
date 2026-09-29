@@ -87,7 +87,7 @@ jobs:
 
       - name: Install Composer dependencies (post-install-cmd also runs php-scoper + yarn install + yarn build)
         if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
-        run: composer install --no-progress --no-ansi --no-interaction
+        run: bash tools/ci/composer-retry.sh install --no-progress --no-ansi --no-interaction
 
       # Save only on success() — one composer install produces all three artifacts, so a partway failure
       # could cache incomplete state.
@@ -134,11 +134,10 @@ jobs:
 
       # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently re-installing.
       - name: Restore node_modules
-        uses: actions/cache/restore@v5
+        uses: ./.github/actions/restore-cache
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
-          fail-on-cache-miss: true
 
       - name: Run Jest tests
         run: yarn test:js:coverage
@@ -226,20 +225,18 @@ jobs:
       # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently
       # re-installing per matrix cell.
       - name: Restore Composer vendor
-        uses: actions/cache/restore@v5
+        uses: ./.github/actions/restore-cache
         with:
           path: |
             vendor
             vendor_prefixed
           key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
-          fail-on-cache-miss: true
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v5
+        uses: ./.github/actions/restore-cache
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
-          fail-on-cache-miss: true
 
       # No restore-keys: the work-dir embeds the downloaded WordPress core, so restoring it across a
       # core-version bump (the key hashes the config) leaves wp-env with a stale WP that silently fails
@@ -258,7 +255,7 @@ jobs:
       - name: Pre-download WordPress core
         run: |
           url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/integration.json)
-          curl -fsSL "$url" -o "$RUNNER_TEMP/wp-core.zip"
+          curl -fsSL --retry 4 "$url" -o "$RUNNER_TEMP/wp-core.zip"
           unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
           echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
 
@@ -377,27 +374,24 @@ jobs:
       # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently
       # re-installing per shard.
       - name: Restore Composer vendor
-        uses: actions/cache/restore@v5
+        uses: ./.github/actions/restore-cache
         with:
           path: |
             vendor
             vendor_prefixed
           key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
-          fail-on-cache-miss: true
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v5
+        uses: ./.github/actions/restore-cache
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
-          fail-on-cache-miss: true
 
       - name: Restore build assets
-        uses: actions/cache/restore@v5
+        uses: ./.github/actions/restore-cache
         with:
           path: build/assets
           key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
-          fail-on-cache-miss: true
 
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -436,7 +430,7 @@ jobs:
       - name: Pre-download WordPress core
         run: |
           url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/e2e.json)
-          curl -fsSL "$url" -o "$RUNNER_TEMP/wp-core.zip"
+          curl -fsSL --retry 4 "$url" -o "$RUNNER_TEMP/wp-core.zip"
           unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
           echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
 
@@ -535,11 +529,10 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v5
+        uses: ./.github/actions/restore-cache
         with:
           path: node_modules
           key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
-          fail-on-cache-miss: true
 
       - name: Download visual-regression shots from all shards
         uses: actions/download-artifact@v8

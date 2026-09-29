@@ -115,6 +115,7 @@ Legacy jQuery code coexists with the React app; they are separate bundles and do
 - **PHP tests**: `tests/phpunit/` mirrors `src/` structure. Extends `WP_UnitTestCase`. Mock data in `tests/phpunit/unit-tests/Mocks/`.
 - **JS tests**: `tests/js-unit/` mirrors React source structure. Uses Jest + Enzyme. Coverage threshold: 75% (branches/functions/lines/statements).
 - **E2E tests (Playwright)**: `yarn test:e2e` — config at `tools/playwright/config.ts`. Use `yarn test:e2e:debug` for the interactive UI mode.
+- **CI retries**: a cache download that times out is reported as a plain miss, so test cells restore the prebuild-warmed caches through `.github/actions/restore-cache`, which retries once before failing. Composer never retries a 429 from composer.gravity.io, so CI runs it through `tools/ci/composer-retry.sh`.
 
 ## Key Constraints
 

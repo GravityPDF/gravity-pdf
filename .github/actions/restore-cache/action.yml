@@ -1,0 +1,38 @@
+name: Restore cache
+description: >-
+  actions/cache/restore for an entry the prebuild job warmed: retried once when
+  nothing is restored, since a download that times out or aborts is reported as
+  a plain miss, then fails the job.
+
+inputs:
+  path:
+    required: true
+  key:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Restore
+      id: restore
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ inputs.key }}
+
+    # A failed extract can leave a partial tree that would pass for a restore.
+    # Unquoted so a multi-line path splits into its entries.
+    - name: Clear failed restore
+      if: steps.restore.outputs.cache-matched-key == ''
+      shell: bash
+      env:
+        CACHE_PATH: ${{ inputs.path }}
+      run: rm -rf $CACHE_PATH && sleep 3
+
+    - name: Retry restore
+      if: steps.restore.outputs.cache-matched-key == ''
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ inputs.key }}
+        fail-on-cache-miss: true

@@ -55,7 +55,7 @@ jobs:
       # --no-scripts skips post-update-cmd (php-scoper prefix); vendor_prefixed/ isn't committed so the rebuild is wasted work.
       - name: Update target Composer packages
         run: |
-          composer update \
+          bash tools/ci/composer-retry.sh update \
             gravity/gravityforms \
             --with-all-dependencies \
             --no-progress --no-ansi --no-interaction --no-scripts
