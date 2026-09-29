@@ -3,6 +3,7 @@
 ## Gravity PDF
 
 ### 6.17.3
+* 🧹 Housekeeping: Create the background processing queue once per request, instead of up to four times
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
 
 ### 6.17.2
