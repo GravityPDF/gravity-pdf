@@ -21,7 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Cache {
 
 	/**
-	 * Get the unique directory path for the current PDF
+	 * Entry properties that don't change a PDF. Also the default `gfpdf_cache_hash_ignored_entry_meta` list.
+	 *
+	 * @since 7.0
+	 */
+	const IGNORED_ENTRY_META = [ 'is_read', 'is_starred', 'is_approved', 'status', 'source_url', 'user_agent' ];
+
+	/**
+	 * Get the unique directory path for the current PDF: `{cache}/e{entry}/p{pdf}-{hash}/`
 	 *
 	 * @param array $form         The form object
 	 * @param array $entry        The entry object
@@ -33,8 +40,26 @@ class Cache {
 	 */
 	public static function get_path( $form, $entry, $pdf_settings ) {
 		$hash = static::get_hash( $form, $entry, $pdf_settings );
+		if ( $hash === false ) {
+			return false;
+		}
 
-		return $hash === false ? false : static::get_basepath() . $hash . '/';
+		$pdf_id = preg_replace( '/[^A-Za-z0-9_-]/', '', (string) ( $pdf_settings['id'] ?? '' ) );
+
+		return static::create_dir( static::get_entry_dir( $entry['id'] ?? 0 ) ) . 'p' . $pdf_id . '-' . $hash . '/';
+	}
+
+	/**
+	 * The directory holding every cached PDF for an entry, on the current site
+	 *
+	 * @param int $entry_id
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	public static function get_entry_dir( $entry_id ) {
+		return static::get_root() . 'e' . (int) $entry_id . '/';
 	}
 
 	/**
@@ -285,7 +310,10 @@ class Cache {
 	 * @since 7.0
 	 */
 	public static function get_lock_file( $path ) {
-		return static::create_dir( static::get_basepath() . 'locks/' ) . basename( $path ) . '.lock';
+		$root = static::get_root();
+		$name = strpos( $path, $root ) === 0 ? substr( $path, strlen( $root ) ) : basename( $path );
+
+		return static::create_dir( $root . 'locks/' ) . str_replace( '/', '-', trim( $name, '/' ) ) . '.lock';
 	}
 
 	/**
@@ -327,16 +355,29 @@ class Cache {
 	 * @since 7.0.0
 	 */
 	protected static function get_basepath( $type = 'cache' ) {
+		return static::create_dir( static::get_root( $type ) );
+	}
+
+	/**
+	 * Get the current blog's cache (or uncached) directory, without creating it
+	 *
+	 * @param string $type Either "cache" or "uncached"
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	public static function get_root( $type = 'cache' ) {
 		$base_path = \GPDFAPI::get_data_class()->template_tmp_location;
 		if ( is_multisite() ) {
 			$base_path .= get_current_blog_id();
 		}
 
-		return static::create_dir( trailingslashit( $base_path ) . $type . '/' );
+		return trailingslashit( $base_path ) . $type . '/';
 	}
 
 	/**
-	 * Create a directory with a blank index.html, if it doesn't exist
+	 * Create a directory, and any missing parents, each with a blank index.html
 	 *
 	 * @param string $path
 	 *
@@ -345,9 +386,23 @@ class Cache {
 	 * @since 7.0
 	 */
 	protected static function create_dir( $path ) {
+		if ( is_dir( $path ) ) {
+			return $path;
+		}
+
+		/* Every directory made gets one, not only the last */
+		$missing = [];
+		$dir     = $path;
+		while ( ! is_dir( $dir ) && dirname( $dir ) !== rtrim( $dir, '/' ) ) {
+			$missing[] = $dir;
+			$dir       = trailingslashit( dirname( $dir ) );
+		}
+
 		/* Another request may create the directory first */
-		if ( ! is_dir( $path ) && ( wp_mkdir_p( $path ) || is_dir( $path ) ) ) {
-			file_put_contents( $path . 'index.html', '' );
+		if ( wp_mkdir_p( $path ) || is_dir( $path ) ) {
+			foreach ( $missing as $dir ) {
+				file_put_contents( $dir . 'index.html', '' );
+			}
 		}
 
 		return $path;
@@ -395,7 +450,7 @@ class Cache {
 		/*
 		 * Ignore specific entry meta that is considered unimportant to PDFs
 		 */
-		$ignored_entry_meta = apply_filters( 'gfpdf_cache_hash_ignored_entry_meta', [ 'is_read', 'is_starred', 'is_approved', 'status', 'source_url', 'user_agent' ], $form, $entry, $pdf_settings );
+		$ignored_entry_meta = apply_filters( 'gfpdf_cache_hash_ignored_entry_meta', static::IGNORED_ENTRY_META, $form, $entry, $pdf_settings );
 		foreach ( $ignored_entry_meta as $meta ) {
 			unset( $entry[ $meta ] );
 		}
@@ -472,7 +527,7 @@ class Cache {
 			return false;
 		}
 
-		return sprintf( '%s-%s', static::get_hash_prefix( $form, $entry, $pdf_settings ), wp_hash( $json ) );
+		return wp_hash( $json );
 	}
 
 	/**
@@ -523,26 +578,5 @@ class Cache {
 		$options['currency'] = class_exists( '\GFCommon' ) ? \GFCommon::get_currency() : '';
 
 		return $options;
-	}
-
-	/**
-	 * Gets the easily-identifiable prefix to add before the hash
-	 *
-	 * @param array $form         The form object
-	 * @param array $entry        The entry object
-	 * @param array $pdf_settings The PDF object/settings
-	 *
-	 * @return string
-	 *
-	 * @since 7.0
-	 */
-	protected static function get_hash_prefix( $form, $entry, $pdf_settings ) {
-		return sprintf(
-			's%1$d-f%2$d-e%3$d-p%4$s',
-			get_current_blog_id(),
-			$form['id'] ?? 0,
-			$entry['id'] ?? 0,
-			$pdf_settings['id'] ?? '',
-		);
 	}
 }

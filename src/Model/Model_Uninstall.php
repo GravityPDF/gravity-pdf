@@ -164,6 +164,10 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
+		delete_option( 'gfpdf_cache_generation' );
+		delete_option( 'gfpdf_cache_form_generation' );
+		delete_option( Model_Pdf_Cache::SWEEP_STATE_OPTION );
+		delete_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION );
 		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
@@ -188,6 +192,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	 */
 	public function remove_plugin_network_options() {
 		global $wpdb;
+
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
 
 		/* delete_network_option() rather than delete_site_option(), which would narrow the sweep to the current
 		   network and strand rows belonging to the others sharing this sitemeta table */

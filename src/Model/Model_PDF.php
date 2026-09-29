@@ -35,6 +35,7 @@ use GFQuiz;
 use GFResults;
 use GP_Populate_Anything_Live_Merge_Tags;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use WP_Error;
@@ -2033,22 +2034,52 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Clean-up the tmp directory/ies
 	 *
+	 * The PDF cache has its own sweep (see Model_Pdf_Cache::run_scheduled_sweep()), so every `{tmp}/[{blog}/]cache/` is skipped
+	 *
 	 * @return void
 	 *
 	 * @since 4.0
+	 * @since 7.0 Skips the PDF cache, keeps one-off PDFs for an hour, and walks a network's shared tree once an hour
 	 */
 	public function cleanup_tmp_dir() {
 
+		/* Every site in a network shares the tmp tree and runs this hourly */
+		if ( is_multisite() ) {
+			if ( get_site_transient( 'gfpdf_cleanup_tmp_dir' ) ) {
+				return;
+			}
+
+			set_site_transient( 'gfpdf_cleanup_tmp_dir', 1, HOUR_IN_SECONDS - 5 * MINUTE_IN_SECONDS );
+		}
+
+		$tmp_location      = $this->data->template_tmp_location;
 		$mpdf_tmp_location = $this->data->mpdf_tmp_location;
 		$mpdf_font_cache   = $mpdf_tmp_location . '/mpdf/ttfontdata/';
 
+		/**
+		 * How long a PDF that isn't cached (e.g. the cache is off) is kept on disk, in seconds
+		 *
+		 * @param int $max_age
+		 *
+		 * @since 7.0
+		 */
+		$uncached_max_age = max( 0, (int) apply_filters( 'gfpdf_uncached_pdf_max_age', HOUR_IN_SECONDS ) );
+
 		/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
-		$directories = [ $this->data->template_tmp_location ];
-		if ( strpos( $mpdf_tmp_location, $this->data->template_tmp_location ) !== 0 ) {
+		$directories = [ $tmp_location ];
+		if ( strpos( $mpdf_tmp_location, $tmp_location ) !== 0 ) {
 			$directories[] = $mpdf_tmp_location;
 		}
 
 		$now = time();
+
+		/* Relative to the tmp location, or '' outside it */
+		$get_relative_path = function ( $path ) use ( $tmp_location ) {
+			return strpos( $path, $tmp_location ) === 0 ? substr( $path, strlen( $tmp_location ) ) : '';
+		};
+
+		/* A network site's folder, and the folder holding one-off PDFs */
+		$kept_dirs = is_multisite() ? '#^\d+(/uncached)?$#' : '#^uncached$#';
 
 		foreach ( $directories as $dir ) {
 			if ( ! is_dir( $dir ) ) {
@@ -2057,7 +2088,12 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			try {
 				$directory_list = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
+					new RecursiveCallbackFilterIterator(
+						new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
+						function ( $file ) use ( $get_relative_path ) {
+							return ! preg_match( '#^(\d+/)?cache$#', $get_relative_path( $file->getPathname() ) );
+						}
+					),
 					RecursiveIteratorIterator::CHILD_FIRST
 				);
 
@@ -2066,19 +2102,29 @@ class Model_PDF extends Helper_Abstract_Model {
 						continue;
 					}
 
-					$path    = $file->getPathname();
-					$is_mpdf = strpos( $path . '/', $mpdf_tmp_location . '/' ) === 0;
+					$path     = $file->getPathname();
+					$relative = $get_relative_path( $path );
+					$is_mpdf  = strpos( $path . '/', $mpdf_tmp_location . '/' ) === 0;
 
 					/* Concurrent PDFs share mPDF's cache folders and it recreates them non-atomically, so only files expire */
 					if ( $is_mpdf && $file->isDir() ) {
 						continue;
 					}
 
+					if ( $file->isDir() && preg_match( $kept_dirs, $relative ) ) {
+						continue;
+					}
+
 					if ( strpos( $path, $mpdf_font_cache ) === 0 ) {
 						/* Font metrics only go stale when a font changes, and FlushCache clears them then */
 						$max_age = WEEK_IN_SECONDS;
+					} elseif ( $is_mpdf ) {
+						$max_age = HOUR_IN_SECONDS;
+					} elseif ( preg_match( '#^(\d+/)?uncached/#', $relative ) ) {
+						$max_age = $uncached_max_age;
 					} else {
-						$max_age = $is_mpdf ? HOUR_IN_SECONDS : 12 * HOUR_IN_SECONDS;
+						/* Includes the staging folders other plugins render into, e.g. PDF for GravityView */
+						$max_age = 12 * HOUR_IN_SECONDS;
 					}
 
 					if ( $file->isReadable() && $file->getMTime() < $now - $max_age ) {

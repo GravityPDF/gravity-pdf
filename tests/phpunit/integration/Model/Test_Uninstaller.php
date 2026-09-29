@@ -7,7 +7,9 @@ use Exception;
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Controller\Controller_Uninstaller;
 use GFPDF\Model\Model_Install;
+use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_Uninstall;
+use GFPDF\Statics\Cache;
 use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Tests\Integration\TestCase;
 
@@ -182,6 +184,11 @@ class Test_Uninstaller extends TestCase {
 		update_option( 'gpdf_sl_abc_123', true );
 		update_option( 'gpdf_sl_failed_123', true );
 
+		Cache::bump_generation();
+		Cache::bump_form_generation( 1 );
+		update_option( Model_Pdf_Cache::SWEEP_STATE_OPTION, [ 'last_slice_at' => time() ], false );
+		update_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION, '1', false );
+
 		$this->assertArrayHasKey( 'deprecated_features', get_option( 'gfpdf_settings' ) );
 		$this->assertNotFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
 		$this->assertArrayHasKey( 'action_dismissal', get_option( 'gfpdf_settings' ) );
@@ -201,6 +208,10 @@ class Test_Uninstaller extends TestCase {
 		$this->assertFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
 		$this->assertFalse( get_option( 'gpdf_sl_abc_123' ) );
 		$this->assertFalse( get_option( 'gpdf_sl_failed_123' ) );
+		$this->assertFalse( get_option( 'gfpdf_cache_generation' ) );
+		$this->assertFalse( get_option( 'gfpdf_cache_form_generation' ) );
+		$this->assertFalse( get_option( Model_Pdf_Cache::SWEEP_STATE_OPTION ) );
+		$this->assertFalse( get_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -212,11 +223,13 @@ class Test_Uninstaller extends TestCase {
 
 		update_site_option( 'gpdf_sl_net_abc123', [ 'timeout' => time(), 'value' => '{}' ] );
 		$this->assertNotFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
+		set_site_transient( 'gfpdf_cleanup_tmp_dir', 1 );
 
 		$this->model->remove_plugin_network_options();
 
 		/* No cache flush here on purpose — the uninstall must invalidate what it deletes */
 		$this->assertFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
+		$this->assertFalse( get_site_transient( 'gfpdf_cleanup_tmp_dir' ) );
 	}
 
 	/**

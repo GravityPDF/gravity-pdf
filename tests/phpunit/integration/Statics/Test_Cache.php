@@ -73,8 +73,17 @@ class Test_Cache extends TestCase {
 		$hash1 = Cache::get_hash( $form, $entry, $pdf_settings );
 		$path  = Cache::get_path( $form, $entry, $pdf_settings );
 
-		$this->assertStringEndsWith( '/' . $hash1 . '/', $path );
+		$this->assertStringEndsWith( '/cache/e' . $entry['id'] . '/p' . $pdf_settings['id'] . '-' . $hash1 . '/', $path );
 		$this->assertStringStartsWith( ABSPATH, $path );
+		$this->assertFileExists( dirname( $path ) . '/index.html', 'Entry directory names are guessable' );
+	}
+
+	public function test_lock_files_are_unique_to_the_entry_and_key() {
+		$root = dirname( Cache::get_lock_file( 'x' ), 2 ) . '/';
+
+		$this->assertNotSame( Cache::get_lock_file( $root . 'e1/pabc-123/' ), Cache::get_lock_file( $root . 'e2/pabc-123/' ) );
+		$this->assertNotSame( Cache::get_lock_file( $root . 'e1/pabc-123/' ), Cache::get_lock_file( $root . 'e1/pdef-123/' ) );
+		$this->assertSame( $root . 'locks/e1-pabc-123.lock', Cache::get_lock_file( $root . 'e1/pabc-123/' ) );
 	}
 
 	public function test_get_hash_is_false_when_the_key_cannot_be_encoded() {

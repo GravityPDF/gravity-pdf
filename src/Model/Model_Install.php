@@ -35,6 +35,13 @@ class Model_Install extends Helper_Abstract_Model {
 	use Helper_Trait_Removed_Methods;
 
 	/**
+	 * Denies web access to the tmp folder on Apache 2.2 and 2.4, and turns off directory listings
+	 *
+	 * @since 7.0
+	 */
+	const TMP_HTACCESS = "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n\tOrder allow,deny\n\tDeny from all\n</IfModule>\nOptions -Indexes\n";
+
+	/**
 	 * Holds our log class
 	 *
 	 * @var LoggerInterface
@@ -298,13 +305,33 @@ class Model_Install extends Helper_Abstract_Model {
 		}
 
 		/* create deny htaccess file to prevent direct access to files */
-		if (
-			is_dir( $this->data->template_tmp_location ) &&
-			! is_file( $this->data->template_tmp_location . '.htaccess' )
-		) {
+		if ( self::write_tmp_htaccess( $this->data->template_tmp_location ) ) {
 			$this->log->notice( 'Create Apache .htaccess Security file' );
-			file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
 		}
+	}
+
+	/**
+	 * Write the tmp folder's .htaccess if it's missing
+	 *
+	 * @param string $tmp_location
+	 * @param bool   $replace_legacy Also replace the original `deny from all`, which Apache 2.4 ignores without
+	 *                               mod_access_compat. A customised file is always left alone.
+	 *
+	 * @return bool Whether it was written
+	 *
+	 * @since 7.0
+	 */
+	public static function write_tmp_htaccess( $tmp_location, $replace_legacy = false ) {
+		$file = $tmp_location . '.htaccess';
+		if ( ! is_dir( $tmp_location ) ) {
+			return false;
+		}
+
+		if ( is_file( $file ) && ! ( $replace_legacy && trim( (string) file_get_contents( $file ) ) === 'deny from all' ) ) { //phpcs:ignore
+			return false;
+		}
+
+		return file_put_contents( $file, self::TMP_HTACCESS ) !== false;
 	}
 
 	/**

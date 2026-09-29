@@ -24,6 +24,7 @@ class Test_Controller_Activation extends TestCase {
 		 * for the wrong reason on a stale leftover).
 		 */
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+		wp_clear_scheduled_hook( 'gfpdf_cache_sweep' );
 		wp_clear_scheduled_hook( 'gfpdf_network_update_check' );
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
 
@@ -34,12 +35,14 @@ class Test_Controller_Activation extends TestCase {
 		wp_schedule_event( time() + 100, 'daily', 'gfpdf_cleanup_tmp_dir' );
 		wp_schedule_event( time() + 100, 'daily', 'gfpdf_network_update_check' );
 		wp_schedule_event( time() + 100, 'daily', 'gfpdf_bulk_license_check' );
+		wp_schedule_single_event( time() + 100, 'gfpdf_cache_sweep' );
 
 		Controller_Activation::deactivation();
 
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) );
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_network_update_check' ) );
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_bulk_license_check' ) );
+		$this->assertFalse( wp_next_scheduled( 'gfpdf_cache_sweep' ) );
 	}
 
 	public function test_deactivation_removes_plugin_rewrite_rules() {

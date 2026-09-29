@@ -11,7 +11,6 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_PDF;
-use GFPDF\Statics\Cache;
 use GFPDF\Statics\Debug;
 use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
@@ -138,10 +137,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		/* Scheduled clean-up actions */
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
-
-		/* Saving a setting that changes PDFs moves every cache key. WP fires only the add hook on a first save */
-		add_action( 'update_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ], 10, 2 );
-		add_action( 'add_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ], 10, 2 );
 
 		/* Remove legacy Gravity Perk Population Anything Support */
 		if ( class_exists( '\GPPA_Compatibility_GravityPDF' ) ) {

@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Integration\TestCase;
@@ -63,6 +64,31 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		do_action( 'gfpdf_plugin_installed' );
 
 		$this->assertSame( [ 'legacy_endpoint' ], Deprecation::get_detected_features() );
+	}
+
+	public function test_7_0_0_hardens_the_tmp_htaccess() {
+		$file     = \GPDFAPI::get_data_class()->template_tmp_location . '.htaccess';
+		$original = is_file( $file ) ? file_get_contents( $file ) : null;
+
+		try {
+			file_put_contents( $file, "deny from all\n" );
+			do_action( 'gfpdf_version_changed', '6.17.3', '7.0.0' );
+			$this->assertStringEqualsFile( $file, Model_Install::TMP_HTACCESS );
+
+			file_put_contents( $file, 'Require ip 127.0.0.1' );
+			do_action( 'gfpdf_version_changed', '6.17.3', '7.0.0' );
+			$this->assertStringEqualsFile( $file, 'Require ip 127.0.0.1', 'A customised file is left alone' );
+
+			unlink( $file );
+			do_action( 'gfpdf_version_changed', '6.17.3', '7.0.0' );
+			$this->assertStringEqualsFile( $file, Model_Install::TMP_HTACCESS );
+
+			file_put_contents( $file, 'deny from all' );
+			do_action( 'gfpdf_version_changed', '7.0.0', '7.0.1' );
+			$this->assertStringEqualsFile( $file, 'deny from all', 'Only the upgrade to 7.0 replaces it' );
+		} finally {
+			$original === null ? @unlink( $file ) : file_put_contents( $file, $original );
+		}
 	}
 
 	public function test_6_0_0_background_process_upgrade_routine() {

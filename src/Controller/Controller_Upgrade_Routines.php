@@ -5,6 +5,7 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
 
 /**
@@ -73,6 +74,10 @@ class Controller_Upgrade_Routines {
 
 		if ( version_compare( $current_version, '6.17.3', '>=' ) && version_compare( $old_version, '6.17.3', '<' ) ) {
 			$this->remove_logged_out_timeout_below_minimum();
+		}
+
+		if ( version_compare( $current_version, '7.0.0-beta1', '>=' ) && version_compare( $old_version, '7.0.0-beta1', '<' ) ) {
+			Model_Install::write_tmp_htaccess( $this->data->template_tmp_location, true );
 		}
 
 		/* Deliberately ungated: every release is a chance for a new round of removals to arrive. Runs last, so it

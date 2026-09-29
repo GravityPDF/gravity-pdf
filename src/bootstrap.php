@@ -204,6 +204,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->gf_form_settings();
 		$this->rest_api();
 		$this->pdf();
+		$this->pdf_cache();
 		$this->shortcodes();
 		$this->mergetags();
 		$this->actions();
@@ -764,6 +765,23 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $view );
 		$this->singleton->add_class( $async_notifications );
+	}
+
+	/**
+	 * Purge and sweep the PDF cache
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public function pdf_cache() {
+		$model = new Model\Model_Pdf_Cache( $this->log, $this->data, $this->misc );
+
+		$class = new Controller\Controller_Pdf_Cache( $model );
+		$class->init();
+
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
 	}
 
 	/**

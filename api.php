@@ -538,6 +538,22 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Delete an entry's cached PDFs on the current site, e.g. after changing data its PDFs show that isn't in the entry
+	 *
+	 * Does the same as `do_action( 'gfpdf_invalidate_entry', $entry_id )`. To stop serving every cached PDF of a form,
+	 * use `do_action( 'gfpdf_invalidate_form', $form_id )`.
+	 *
+	 * @param int $entry_id The Gravity Form entry ID
+	 *
+	 * @return bool False when the cached PDFs couldn't be deleted
+	 *
+	 * @since 7.0
+	 */
+	public static function purge_pdf_cache( $entry_id ) {
+		return self::get_mvc_class( 'Model_Pdf_Cache' )->purge_entry( $entry_id );
+	}
+
+	/**
 	 * Generates the current entry's HTML product table
 	 *
 	 * See https://docs.gravitypdf.com/v6/developers/api/product_table/ for more information about this method
