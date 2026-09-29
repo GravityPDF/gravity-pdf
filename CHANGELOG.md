@@ -4,6 +4,7 @@
 
 ### 6.17.3
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
+* 🐞 Bug: Hide the Tools tab from users who can view but not edit the PDF settings
 * 🐞 Bug: Keep the value returned by the `gfpdf_settings_sanitize` filter when saving the global settings
 * 💻 Developer: Global settings fields can set a `sanitize_callback` to replace the default sanitizing
 
