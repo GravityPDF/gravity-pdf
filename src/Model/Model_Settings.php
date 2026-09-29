@@ -256,9 +256,10 @@ class Model_Settings extends Helper_Abstract_Model {
 			];
 
 			$fields[ 'license_' . $slug . '_message' ] = [
-				'id'    => 'license_' . $slug . '_message',
-				'type'  => 'hidden',
-				'class' => 'gfpdf-hidden',
+				'id'                => 'license_' . $slug . '_message',
+				'type'              => 'hidden',
+				'class'             => 'gfpdf-hidden',
+				'sanitize_callback' => 'wp_kses_post',
 			];
 
 			$fields[ 'license_' . $slug . '_status' ] = [
@@ -269,9 +270,10 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			/* Registered so maybe_active_licenses() can write it; the posted value is always discarded */
 			$fields[ 'license_' . $slug . '_url' ] = [
-				'id'    => 'license_' . $slug . '_url',
-				'type'  => 'hidden',
-				'class' => 'gfpdf-hidden',
+				'id'                => 'license_' . $slug . '_url',
+				'type'              => 'hidden',
+				'class'             => 'gfpdf-hidden',
+				'sanitize_callback' => 'esc_url_raw',
 			];
 		}
 

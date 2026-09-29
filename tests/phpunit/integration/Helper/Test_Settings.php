@@ -420,6 +420,39 @@ class Test_Settings extends TestCase {
 	}
 
 	/**
+	 * @since 7.0
+	 */
+	public function test_license_tab_save_keeps_message_links_and_encoded_url() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$settings                                 = $gfpdf->options->get_settings();
+		$settings['license_my-custom-plugin_url'] = 'https://example.com/%E6%97%A5';
+		$gfpdf->options->update_settings( $settings );
+
+		$api_response = function() {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [ 'error' => 'revoked' ] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $api_response );
+
+		$_POST['_wp_http_referer'] = '/wp-admin/admin.php?page=gf_settings&subview=PDF&tab=license';
+		$_POST['option_page']      = 'gfpdf_settings';
+
+		$results = $gfpdf->options->settings_sanitize( [ 'license_my-custom-plugin' => 'user license key' ] );
+
+		remove_filter( 'pre_http_request', $api_response );
+		$gfpdf->data->addon = [];
+
+		$this->assertStringContainsString( '<a href=', $results['license_my-custom-plugin_message'] );
+		$this->assertSame( 'https://example.com/%E6%97%A5', $results['license_my-custom-plugin_url'] );
+	}
+
+	/**
 	 * @since 4.2
 	 */
 	public function test_maybe_activate_licenses() {
