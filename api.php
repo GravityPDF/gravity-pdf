@@ -492,17 +492,25 @@ final class GPDFAPI {
 	/**
 	 * Generate a PDF, save it to disk, and return the absolute path to the document
 	 *
+	 * The PDF is cached, so the path is shared: notifications, other create_pdf() calls and people viewing the PDF are
+	 * handed the same file. It stays on disk until at least the cache duration (12 hours by default) plus a grace
+	 * period (1 hour, filter `gfpdf_cache_sweep_grace`) have passed. A PDF that can't be cached, e.g. the cache is off
+	 * or a remote image failed to load, goes to a one-off folder that's deleted after an hour. Copy the file before
+	 * changing, moving or deleting it.
+	 *
+	 * The `gfpdf_pre_pdf_generation`, `gfpdf_post_pdf_generation` and `gfpdf_post_save_pdf` actions fire only when the
+	 * PDF is generated, not when a cached PDF is returned.
+	 *
 	 * See https://docs.gravitypdf.com/v6/developers/api/create_pdf/ for more information about this method
 	 *
 	 * @param int    $entry_id     The Gravity Form entry ID
 	 * @param string $pdf_id       The Gravity PDF ID number (the pid number in the URL when viewing a setting in the admin area)
-	 * @param bool   $bypass_cache Force a new PDF to be generated
+	 * @param bool   $bypass_cache Generate the PDF again, even when a cached PDF is current
 	 *
 	 * @return string|WP_Error   Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
-	 * @since 7.0 PDFs are cached on disk for 12 hours, and a new one is generated when the form, entry, PDF settings or
-	 *        template change. Re-running the method returns the cached PDF if it exists, unless $bypass_cache = true
+	 * @since 7.0 PDFs are cached on disk and reused until the form, entry, PDF settings, template or fonts change
 	 */
 	public static function create_pdf( $entry_id, $pdf_id, $bypass_cache = false ) {
 

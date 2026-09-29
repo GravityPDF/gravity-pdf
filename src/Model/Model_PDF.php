@@ -190,7 +190,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param integer $lid    The Gravity Form Entry ID
 	 * @param string  $action Whether the PDF should be viewed or downloaded
 	 *
-	 * @return WP_Error
+	 * @return WP_Error|void An error when the PDF can't be generated or sent; otherwise the PDF is sent and the request ends
 	 * @since 4.0
 	 * @since 7.0 View/Download PDF creation workflow standardized with Save PDF workflow
 	 */
@@ -288,7 +288,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$settings['print'] = true;
 		}
 
-		$path_to_pdf = $this->generate_and_save_pdf( $entry, $settings );
+		$path_to_pdf = $this->generate_and_save_pdf( $entry, $settings, $action );
 
 		/* Send error upstream for logging and output */
 		if ( is_wp_error( $path_to_pdf ) ) {
@@ -297,7 +297,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		do_action( 'gfpdf_post_view_or_download_pdf', $path_to_pdf, $form, $entry, $settings, $action );
 
-		$this->send_pdf_to_browser( $path_to_pdf, $action );
+		return $this->send_pdf_to_browser( $path_to_pdf, $action );
 	}
 
 	/**
@@ -1193,17 +1193,19 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Generate and save the PDF to disk
 	 *
-	 * @param array $entry        The Gravity Forms entry (from \GFAPI::get_entry)
-	 * @param array $pdf_settings The Gravity PDF settings (from GPDFAPI::get_pdf())
+	 * @param array  $entry        The Gravity Forms entry (from \GFAPI::get_entry)
+	 * @param array  $pdf_settings The Gravity PDF settings (from GPDFAPI::get_pdf())
+	 * @param string $context      Why the PDF is generated: "save", or "view" / "download" when it's generated to stream
+	 *                             to the browser, which doesn't fire `gfpdf_post_save_pdf`
 	 *
 	 * @return string|WP_Error  Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
-	 * @since 7.0 The view/download endpoints route through this method
+	 * @since 7.0 The view/download endpoints route through this method, and the $context parameter was added
 	 *
 	 * @see \GPDFAPI::create_pdf() We recommend third-party developers use the API to generate PDFs
 	 */
-	public function generate_and_save_pdf( $entry, $pdf_settings ) {
+	public function generate_and_save_pdf( $entry, $pdf_settings, $context = 'save' ) {
 
 		$form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 		$entry        = apply_filters( 'gfpdf_current_entry_object', $entry, $form, $pdf_settings, __FUNCTION__ );
@@ -1215,6 +1217,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdf_generator = new Helper_PDF( $entry, $pdf_settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
 		$pdf_generator->set_filename( $filename );
 		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
+		$pdf_generator->set_render_context( $context );
 
 		if ( ! $this->process_and_save_pdf( $pdf_generator ) ) {
 			return new WP_Error( 'pdf_generation_failure', esc_html__( 'There was a problem creating the PDF', 'gravity-pdf' ) );
@@ -1296,6 +1299,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$settings = $pdf_generator->get_settings();
 		$form     = $pdf_generator->get_form();
 
+		/* Fires only when the PDF is generated, and not when a cached PDF is reused */
 		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf_generator );
 
 		/*
@@ -1343,6 +1347,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* Generate and save the PDF */
 			$pdf_generator->save_pdf( $pdf );
 
+			/* Fires only when the PDF is generated, and not when a cached PDF is reused */
 			do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf_generator );
 
 			$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = $cache_status;
@@ -2008,14 +2013,23 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Trigger Post PDF Generation Action
 	 *
+	 * The `gfpdf_post_save_pdf` actions fire when a PDF is generated to be saved: on form submission, for notifications,
+	 * and from GPDFAPI::create_pdf(). They don't fire when a cached PDF is reused, or when a PDF is generated to be
+	 * viewed or downloaded. The PDF is a shared cache file, so listeners should copy it before changing or moving it.
+	 *
 	 * @param array      $form     The Gravity Form
 	 * @param array      $entry    The Gravity Form Entry
 	 * @param array      $settings The Gravity PDF Settings
 	 * @param Helper_PDF $pdf      The Helper_PDF object
 	 *
 	 * @since 5.2
+	 * @since 7.0 Skipped for PDFs generated to be viewed or downloaded
 	 */
 	public function trigger_post_save_pdf( $form, $entry, $settings, $pdf ) {
+		if ( $pdf->get_render_context() !== 'save' ) {
+			return;
+		}
+
 		$pdf_path = $pdf->get_full_pdf_path();
 
 		if ( is_file( $pdf_path ) ) {
@@ -2601,9 +2615,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Send a PDF file to the browser
 	 *
 	 * In debug mode an X-GPDF-Cache header reports how the cache served the PDF generated for this request.
+	 * A browser whose copy is current (If-None-Match, or If-Modified-Since) gets a 304 Not Modified.
 	 *
 	 * @param string $path_to_pdf Absolute path to PDF on disk
 	 * @param string $action Either "view" or "download"
+	 *
+	 * @return WP_Error|void An error when the headers were already sent; otherwise the PDF is sent and the request ends
 	 *
 	 * @since 7.0
 	 */
@@ -2626,13 +2643,31 @@ class Model_PDF extends Helper_Abstract_Model {
 			ob_end_clean();
 		}
 
-		/* Send the PDF to the client */
-		header( 'Content-Type: application/pdf' );
-
 		$cache_status = $this->get_cache_status( $path_to_pdf );
 		if ( $cache_status !== null && Debug::is_enabled() ) {
 			header( 'X-GPDF-Cache: ' . $cache_status );
 		}
+
+		/* Set appropriate headers for local browser caching. Another request may have just replaced the PDF. */
+		clearstatcache( true, $path_to_pdf );
+		$last_modified_time = (int) filemtime( $path_to_pdf );
+		$size               = (int) filesize( $path_to_pdf );
+		$etag               = $this->get_pdf_etag( $path_to_pdf, $last_modified_time, $size );
+
+		header( sprintf( 'Last-Modified: %s GMT', gmdate( 'D, d M Y H:i:s', $last_modified_time ) ) );
+		header( sprintf( 'ETag: %s', $etag ) );
+		header( 'Cache-Control: no-cache, private' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		/* Tell client they can display the PDF from the local cache if it is still current */
+		if ( $this->is_pdf_not_modified( $etag, $last_modified_time ) ) {
+			status_header( 304 );
+			exit;
+		}
+
+		/* Send the PDF to the client */
+		header( 'Content-Type: application/pdf' );
 
 		/*
 		 * Set the filename, supporting the new utf-8 syntax + backwards compatibility
@@ -2646,9 +2681,9 @@ class Model_PDF extends Helper_Abstract_Model {
 			)
 		);
 
-		/* only add the length if the server is not using compression */
-		if ( empty( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ) {
-			header( sprintf( 'Content-Length: %d', filesize( $path_to_pdf ) ) );
+		/* PHP's own compression doesn't correct the length, while server-level compression replaces or removes it */
+		if ( ! $this->is_zlib_output_compression_on( (string) ini_get( 'zlib.output_compression' ) ) ) {
+			header( sprintf( 'Content-Length: %d', $size ) );
 		}
 
 		/* Tell client to download the file */
@@ -2657,24 +2692,71 @@ class Model_PDF extends Helper_Abstract_Model {
 			header( 'Content-Transfer-Encoding: binary' );
 		}
 
-		/* Set appropriate headers for local browser caching */
-		$last_modified_time = filemtime( $path_to_pdf );
-		$etag               = md5( $path_to_pdf ); /* the file path includes a unique hash that automatically changes when a PDF does */
-
-		header( sprintf( 'Last-Modified: %s GMT', gmdate( 'D, d M Y H:i:s', $last_modified_time ) ) );
-		header( sprintf( 'Etag: %s', $etag ) );
-		header( 'Cache-Control: no-cache, private' );
-		header( 'Pragma: no-cache' );
-		header( 'Expires: 0' );
-
-		/* Tell client they can display the PDF from the local cache if it is still current */
-		if ( ! empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag ) {
-			header( 'HTTP/1.1 304 Not Modified' );
-			exit;
-		}
-
 		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- streaming PDF response. */
 
 		exit;
+	}
+
+	/**
+	 * Get a quoted ETag for a PDF on disk. It changes when the PDF is generated again at the same path.
+	 *
+	 * @param string $path_to_pdf        Absolute path to PDF on disk
+	 * @param int    $last_modified_time The PDF's modification time
+	 * @param int    $size               The PDF's size in bytes
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	protected function get_pdf_etag( $path_to_pdf, $last_modified_time, $size ) {
+		return sprintf( '"%s-%x-%x"', md5( $path_to_pdf ), $last_modified_time, $size );
+	}
+
+	/**
+	 * Whether the browser's copy of the PDF is current, going by the request's If-None-Match header or, when that's
+	 * missing, its If-Modified-Since header
+	 *
+	 * @param string $etag               The PDF's quoted ETag
+	 * @param int    $last_modified_time The PDF's modification time
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected function is_pdf_not_modified( $etag, $last_modified_time ) {
+		if ( ! in_array( $_SERVER['REQUEST_METHOD'] ?? 'GET', [ 'GET', 'HEAD' ], true ) ) {
+			return false;
+		}
+
+		$if_none_match = trim( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ?? '' ) );
+		if ( $if_none_match !== '' ) {
+			if ( $if_none_match === '*' ) {
+				return true;
+			}
+
+			/* A weak comparison, because compressing proxies turn the ETag into a weak W/"…" */
+			preg_match_all( '/(?:W\/)?("[^"]*")/', $if_none_match, $matches );
+
+			return in_array( $etag, $matches[1], true );
+		}
+
+		$if_modified_since = strtotime( wp_unslash( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '' ) );
+
+		return $if_modified_since !== false && $if_modified_since <= time() && $last_modified_time <= $if_modified_since;
+	}
+
+	/**
+	 * Whether PHP compresses its output, from the `zlib.output_compression` setting: "On", "Off" or a buffer size
+	 *
+	 * @param string $setting
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected function is_zlib_output_compression_on( $setting ) {
+		$setting = strtolower( trim( $setting ) );
+
+		return $setting === 'on' || (int) $setting > 0;
 	}
 }

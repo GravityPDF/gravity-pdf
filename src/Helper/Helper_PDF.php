@@ -140,6 +140,15 @@ class Helper_PDF {
 	protected $is_cache_disabled = false;
 
 	/**
+	 * Why the PDF is generated: "save" (the default), or "view" / "download" when it's generated to stream to the browser
+	 *
+	 * @var string
+	 *
+	 * @since 7.0
+	 */
+	protected $render_context = 'save';
+
+	/**
 	 * Whether to force the print dialog when the PDF is opened
 	 *
 	 * @var boolean
@@ -661,6 +670,28 @@ class Helper_PDF {
 	 */
 	public function is_cache_disabled() {
 		return $this->is_cache_disabled;
+	}
+
+	/**
+	 * Set why the PDF is generated
+	 *
+	 * @param string $context "save", or "view" / "download" when the PDF is generated to stream to the browser
+	 *
+	 * @since 7.0
+	 */
+	public function set_render_context( $context ) {
+		$this->render_context = (string) $context;
+	}
+
+	/**
+	 * Get why the PDF is generated: "save" (the default), or "view" / "download" when it streams to the browser
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	public function get_render_context() {
+		return $this->render_context;
 	}
 
 	/**

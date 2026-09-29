@@ -2347,4 +2347,160 @@ class Test_PDF extends TestCase {
 		$this->assertInstanceOf( \WP_Error::class, $error );
 		$this->assertSame( $after_success, did_action( 'gfpdf_post_save_pdf' ), 'gfpdf_post_save_pdf should not fire on failed generation' );
 	}
+
+	public function test_trigger_post_save_pdf_skips_pdfs_generated_to_view_or_download() {
+		global $gfpdf;
+
+		$results = $this->form_and_entry();
+		$pdf     = new Helper_PDF( $results['entry'], $results['form']['gfpdf_form_settings']['555ad84787d7e'], $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf->set_path( $gfpdf->data->template_tmp_location . 'post-save-context/' );
+		$pdf->set_filename( 'post-save' );
+
+		wp_mkdir_p( $pdf->get_path() );
+		file_put_contents( $pdf->get_full_pdf_path(), '%PDF' );
+
+		$this->assertSame( 'save', $pdf->get_render_context() );
+
+		try {
+			foreach ( [ 'view' => 0, 'download' => 0, 'save' => 1 ] as $context => $expected ) {
+				$pdf->set_render_context( $context );
+				$saves = did_action( 'gfpdf_post_save_pdf' );
+
+				$this->model->trigger_post_save_pdf( $results['form'], $results['entry'], $pdf->get_settings(), $pdf );
+
+				$this->assertSame( $saves + $expected, did_action( 'gfpdf_post_save_pdf' ), $context );
+			}
+		} finally {
+			$gfpdf->misc->rmdir( $pdf->get_path() );
+		}
+	}
+
+	/**
+	 * @group slow
+	 */
+	public function test_process_pdf_returns_the_error_when_the_pdf_cannot_be_sent() {
+		if ( ! headers_sent() ) {
+			$this->markTestSkipped( 'The PDF would be streamed and end the test run' );
+		}
+
+		$results = $this->form_and_entry();
+
+		remove_all_filters( 'gfpdf_pdf_middleware' );
+		$template = function ( $settings ) {
+			$settings['template'] = 'zadani';
+
+			return $settings;
+		};
+		add_filter( 'gfpdf_current_pdf_settings_object', $template );
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+
+		try {
+			$generations = did_action( 'gfpdf_post_pdf_generation' );
+			$saves       = did_action( 'gfpdf_post_save_pdf' );
+
+			$error = $this->model->process_pdf( '555ad84787d7e', $results['entry']['id'], 'download' );
+
+			$this->assertWPError( $error );
+			$this->assertSame( 'headers_sent', $error->get_error_code() );
+			$this->assertGreaterThan( $generations, did_action( 'gfpdf_post_pdf_generation' ) );
+			$this->assertSame( $saves, did_action( 'gfpdf_post_save_pdf' ) );
+		} finally {
+			remove_filter( 'gfpdf_current_pdf_settings_object', $template );
+			remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+			$this->gfpdf()->singleton->get_class( 'Model_Pdf_Cache' )->purge_entry( $results['entry']['id'] );
+		}
+	}
+
+	public function test_pdf_etag_changes_when_the_pdf_is_generated_again() {
+		$path = '/tmp/cache/e1/p1-abc/document.pdf';
+		$etag = $this->invoke_model( 'get_pdf_etag', $path, 1000000, 100 );
+
+		$this->assertMatchesRegularExpression( '/^"[^"]+"$/', $etag );
+		$this->assertSame( $etag, $this->invoke_model( 'get_pdf_etag', $path, 1000000, 100 ) );
+		$this->assertNotSame( $etag, $this->invoke_model( 'get_pdf_etag', $path, 1000001, 100 ), 'A new modification time changes the ETag' );
+		$this->assertNotSame( $etag, $this->invoke_model( 'get_pdf_etag', $path, 1000000, 101 ), 'A new size changes the ETag' );
+		$this->assertNotSame( $etag, $this->invoke_model( 'get_pdf_etag', '/tmp/cache/e1/p1-def/document.pdf', 1000000, 100 ), 'A new cache key changes the ETag' );
+	}
+
+	/**
+	 * @dataProvider provider_is_pdf_not_modified
+	 */
+	public function test_is_pdf_not_modified( $expected, $server ) {
+		$original = $_SERVER;
+		unset( $_SERVER['HTTP_IF_NONE_MATCH'], $_SERVER['HTTP_IF_MODIFIED_SINCE'] );
+		$_SERVER['REQUEST_METHOD'] = 'GET';
+		$_SERVER                   = array_merge( $_SERVER, $server );
+
+		try {
+			$this->assertSame( $expected, $this->invoke_model( 'is_pdf_not_modified', '"abc-1-2"', 1000000000 ) );
+		} finally {
+			$_SERVER = $original;
+		}
+	}
+
+	public function provider_is_pdf_not_modified(): array {
+		$modified = 'Sun, 09 Sep 2001 01:46:40 GMT';
+
+		return [
+			'no conditional headers'                => [ false, [] ],
+			'matching ETag'                         => [ true, [ 'HTTP_IF_NONE_MATCH' => '"abc-1-2"' ] ],
+			'weak matching ETag'                    => [ true, [ 'HTTP_IF_NONE_MATCH' => 'W/"abc-1-2"' ] ],
+			'matching ETag in a list'               => [ true, [ 'HTTP_IF_NONE_MATCH' => '"old", W/"abc-1-2" , "other"' ] ],
+			'wildcard'                              => [ true, [ 'HTTP_IF_NONE_MATCH' => '*' ] ],
+			'unquoted ETag'                         => [ false, [ 'HTTP_IF_NONE_MATCH' => 'abc-1-2' ] ],
+			'other ETag'                            => [ false, [ 'HTTP_IF_NONE_MATCH' => '"abc-1-3"' ] ],
+			'If-None-Match wins over a current date' => [
+				false,
+				[
+					'HTTP_IF_NONE_MATCH'     => '"abc-1-3"',
+					'HTTP_IF_MODIFIED_SINCE' => $modified,
+				],
+			],
+			'modified at that date'                 => [ true, [ 'HTTP_IF_MODIFIED_SINCE' => $modified ] ],
+			'modified before that date'             => [ true, [ 'HTTP_IF_MODIFIED_SINCE' => 'Sun, 09 Sep 2001 01:46:41 GMT' ] ],
+			'modified after that date'              => [ false, [ 'HTTP_IF_MODIFIED_SINCE' => 'Sun, 09 Sep 2001 01:46:39 GMT' ] ],
+			'date in the future'                    => [ false, [ 'HTTP_IF_MODIFIED_SINCE' => gmdate( 'D, d M Y H:i:s', time() + DAY_IN_SECONDS ) . ' GMT' ] ],
+			'unparsable date'                       => [ false, [ 'HTTP_IF_MODIFIED_SINCE' => 'yesterday-ish' ] ],
+			'not a GET request'                     => [
+				false,
+				[
+					'REQUEST_METHOD'     => 'POST',
+					'HTTP_IF_NONE_MATCH' => '"abc-1-2"',
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_is_zlib_output_compression_on
+	 */
+	public function test_is_zlib_output_compression_on( $expected, $setting ) {
+		$this->assertSame( $expected, $this->invoke_model( 'is_zlib_output_compression_on', $setting ) );
+	}
+
+	public function provider_is_zlib_output_compression_on(): array {
+		return [
+			'unset'       => [ false, '' ],
+			'zero'        => [ false, '0' ],
+			'off'         => [ false, 'Off' ],
+			'one'         => [ true, '1' ],
+			'on'          => [ true, 'On' ],
+			'buffer size' => [ true, '4096' ],
+		];
+	}
+
+	/**
+	 * @param string $method A protected Model_PDF method
+	 * @param mixed  ...$args
+	 *
+	 * @return mixed
+	 */
+	private function invoke_model( $method, ...$args ) {
+		$reflection = new ReflectionMethod( Model_PDF::class, $method );
+		if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+			$reflection->setAccessible( true );
+		}
+
+		return $reflection->invoke( $this->model, ...$args );
+	}
 }

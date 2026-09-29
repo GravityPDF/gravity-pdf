@@ -202,6 +202,42 @@ class Test_Rest_Download_Pdf extends Test_Rest {
 		$_SERVER = $original_server;
 	}
 
+	/**
+	 * @group slow
+	 */
+	public function test_download_item_does_not_fire_post_save_pdf() {
+		if ( ! headers_sent() ) {
+			$this->markTestSkipped( 'The PDF would be streamed and end the test run' );
+		}
+
+		$pdf_id   = $this->gf_factory()->pdf->create();
+		$entry_id = $this->gf_factory()->entry->create( [ 'form_id' => $this->form_id ] );
+
+		$request = new WP_REST_Request( 'GET', $this->get_download_route( $entry_id, $pdf_id ) );
+		$request->set_url_params( [
+			'entry' => $entry_id,
+			'pdf'   => $pdf_id,
+		] );
+
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+
+		try {
+			$generations = did_action( 'gfpdf_post_pdf_generation' );
+			$saves       = did_action( 'gfpdf_post_save_pdf' );
+
+			$error = $this->api->download_item( $request );
+
+			/* Headers were sent by the test runner, so the PDF is generated but can't be streamed */
+			$this->assertWPError( $error );
+			$this->assertSame( 'headers_sent', $error->get_error_code() );
+			$this->assertGreaterThan( $generations, did_action( 'gfpdf_post_pdf_generation' ) );
+			$this->assertSame( $saves, did_action( 'gfpdf_post_save_pdf' ) );
+		} finally {
+			remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+			$this->gfpdf()->singleton->get_class( 'Model_Pdf_Cache' )->purge_entry( $entry_id );
+		}
+	}
+
 	public function test_get_item_with_invalid_entry() {
 		$pdf_id = $this->gf_factory()->pdf->create();
 

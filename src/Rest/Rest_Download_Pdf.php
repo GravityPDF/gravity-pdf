@@ -207,7 +207,7 @@ class Rest_Download_Pdf {
 	 * @since 7.0
 	 */
 	public function download_item( $request ) {
-		$path_to_pdf = $this->generate_pdf( $request );
+		$path_to_pdf = $this->generate_pdf( $request, 'download' );
 
 		if ( is_wp_error( $path_to_pdf ) ) {
 			return $path_to_pdf;
@@ -223,13 +223,19 @@ class Rest_Download_Pdf {
 	 * Generate and save the entry's PDF, returning its path or a 500 error
 	 *
 	 * @param WP_REST_Request $request
+	 * @param string          $context "save", or "download" when the PDF streams to the browser
 	 *
 	 * @return string|WP_Error
 	 *
 	 * @since 7.0
 	 */
-	protected function generate_pdf( $request ) {
-		$path_to_pdf = \GPDFAPI::create_pdf( $request->get_param( 'entry' ), $request->get_param( 'pdf' ) );
+	protected function generate_pdf( $request, $context = 'save' ) {
+		$entry = $this->gform->get_entry( $request->get_param( 'entry' ) );
+		$pdf   = GPDFAPI::get_pdf( $entry['form_id'], $request->get_param( 'pdf' ) );
+
+		/** @var Model_PDF $model_pdf */
+		$model_pdf   = GPDFAPI::get_pdf_class( 'model' );
+		$path_to_pdf = $model_pdf->generate_and_save_pdf( $entry, $pdf, $context );
 
 		if ( is_wp_error( $path_to_pdf ) ) {
 			/*

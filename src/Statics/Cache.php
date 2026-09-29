@@ -14,7 +14,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Manages the directory structure for the temporary PDF cache
+ * Where cached PDFs are stored and how they're keyed. Model_Pdf_Cache purges them and runs the background sweep.
+ *
+ * A cached PDF is reused until something in its key changes (see get_hash()) or the cache duration runs out. The key
+ * includes the modification time of the template and its config file, but not of the partials, stylesheets or images
+ * the template includes. While developing a template, add `?cache=0` to the PDF URL (needs Debug Mode or a
+ * non-production environment, and the `gravityforms_logging` capability) or turn off Cache PDFs under
+ * Forms > Settings > PDF > Settings.
+ *
+ * On hosts with several web servers, keep `gfpdf_tmp_location` on storage they all share. On disk local to each server,
+ * deleting an entry's PDFs, and the background sweep, only reach the server they run on. A changed entry, form or
+ * setting, or a cleared cache, still stops every server serving old PDFs, because the key comes from the database.
  *
  * @since 7.0.0
  */
@@ -512,8 +522,8 @@ class Cache {
 		}
 
 		/**
-		 * Add to the data that keys a cached PDF, e.g. an add-on's version or data its fields render from another source.
-		 * Nested values must be in a stable order.
+		 * Add to the data that keys a cached PDF, e.g. an add-on's version, data its fields render from another source, or
+		 * the modification time of a partial or stylesheet a template includes. Nested values must be in a stable order.
 		 *
 		 * @param array $extra
 		 * @param array $form
