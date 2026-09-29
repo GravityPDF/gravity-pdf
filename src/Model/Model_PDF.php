@@ -25,6 +25,7 @@ use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
+use GFPDF\Statics\Debug;
 use GFPDF\Statics\Notes;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
@@ -143,6 +144,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $async_notifications;
 
 	/**
+	 * @var array Cache statuses of the PDFs generated this request, keyed by path. See get_cache_status()
+	 *
+	 * @since 7.0
+	 */
+	protected $cache_statuses = [];
+
+	/**
 	 * Setup our view with the needed data and classes
 	 *
 	 * @param Helper_Abstract_Form        $gform   Our abstracted Gravity Forms helper functions
@@ -216,8 +224,8 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/*
-		 * Prior to 6.12 this action was saved to the PDF settings, passed to Helper_PDF, and used to
-		 * stream the document to the client correctly. Since 6.12, we no longer need to pass this value
+		 * Prior to 7.0 this action was saved to the PDF settings, passed to Helper_PDF, and used to
+		 * stream the document to the client correctly. Since 7.0, we no longer need to pass this value
 		 * to the underlying PDF generator. For backwards compatibility we've included this in case any
 		 * user-land code makes use of it in their custom middleware.
 		 */
@@ -257,7 +265,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/*
 		 * Normalize the PDF action
-		 * The PDF cache introduced in 6.12 relies on a hash generated from the form, entry, and pdf settings
+		 * The PDF cache introduced in 7.0 relies on a hash generated from the form, entry, and pdf settings
 		 * To prevent cache misses we need to ensure we don't unnecessarily modify the settings array
 		 */
 		unset( $settings['pdf_action'] );
@@ -1222,6 +1230,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 4.0
+	 * @since 7.0 Records the cache outcome, see get_cache_status()
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf_generator ) {
 
@@ -1234,6 +1243,8 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* If cached PDF already exists then return early */
 		if ( ! $pdf_override && $this->does_pdf_exist( $pdf_generator ) ) {
+			$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = 'hit';
+
 			return true;
 		}
 
@@ -1275,6 +1286,8 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf_generator );
 
+			$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = $pdf_override ? 'bypass' : 'miss';
+
 			return true;
 		} catch ( Exception $e ) {
 
@@ -1304,14 +1317,23 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return boolean
 	 *
 	 * @since  4.0
+	 * @since  7.0 A cached PDF must be non-empty and within the cache TTL. An explicit path only needs to exist.
 	 */
 	public function does_pdf_exist( Helper_PDF $pdf_generator ) {
+		return $pdf_generator->pdf_exists();
+	}
 
-		if ( is_file( $pdf_generator->get_full_pdf_path() ) ) {
-			return true;
-		}
-
-		return false;
+	/**
+	 * How the cache served a PDF generated this request: "hit", "miss" or "bypass"
+	 *
+	 * @param string $path_to_pdf Absolute path to the PDF
+	 *
+	 * @return string|null Null when this request hasn't generated a PDF at that path
+	 *
+	 * @since 7.0
+	 */
+	public function get_cache_status( $path_to_pdf ) {
+		return $this->cache_statuses[ $path_to_pdf ] ?? null;
 	}
 
 	/**
@@ -2472,6 +2494,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Send a PDF file to the browser
 	 *
+	 * In debug mode an X-GPDF-Cache header reports how the cache served the PDF generated for this request.
+	 *
 	 * @param string $path_to_pdf Absolute path to PDF on disk
 	 * @param string $action Either "view" or "download"
 	 *
@@ -2498,6 +2522,11 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Send the PDF to the client */
 		header( 'Content-Type: application/pdf' );
+
+		$cache_status = $this->get_cache_status( $path_to_pdf );
+		if ( $cache_status !== null && Debug::is_enabled() ) {
+			header( 'X-GPDF-Cache: ' . $cache_status );
+		}
 
 		/*
 		 * Set the filename, supporting the new utf-8 syntax + backwards compatibility

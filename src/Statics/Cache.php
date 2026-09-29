@@ -21,53 +21,81 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Cache {
 
 	/**
-	 * @var string|null Holds the cache directory path
-	 * @since 7.0.0
-	 */
-	protected static $template_tmp_location = null;
-
-	/**
 	 * Get the unique directory path for the current PDF
 	 *
 	 * @param array $form         The form object
 	 * @param array $entry        The entry object
 	 * @param array $pdf_settings The PDF object/settings
 	 *
-	 * @return string
+	 * @return string|false False when the cache key can't be built
 	 *
 	 * @since 7.0.0
 	 */
 	public static function get_path( $form, $entry, $pdf_settings ) {
-		return static::get_basepath() . static::get_hash( $form, $entry, $pdf_settings ) . '/';
+		$hash = static::get_hash( $form, $entry, $pdf_settings );
+
+		return $hash === false ? false : static::get_basepath() . $hash . '/';
 	}
 
 	/**
-	 * Get and set the cache directory basepath
+	 * Get a new, unique directory path for a PDF that must not be reused by another request
+	 *
+	 * @return string
+	 *
+	 * @since 7.0.0
+	 */
+	public static function get_uncached_path() {
+		return static::get_basepath( 'uncached' ) . bin2hex( random_bytes( 16 ) ) . '/';
+	}
+
+	/**
+	 * How long a cached PDF can be served for, in seconds
+	 *
+	 * @return int
+	 *
+	 * @since 7.0.0
+	 */
+	public static function get_ttl() {
+		return 12 * HOUR_IN_SECONDS;
+	}
+
+	/**
+	 * Check a cached PDF can be served: a non-empty file written within the TTL
+	 *
+	 * @param string $file Absolute path to the PDF
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0.0
+	 */
+	public static function is_hit( $file ) {
+		return is_file( $file ) && filesize( $file ) > 0 && filemtime( $file ) > time() - static::get_ttl();
+	}
+
+	/**
+	 * Get and create the current blog's cache (or uncached) directory
+	 *
+	 * Not memoised, so a switch_to_blog() never reuses another blog's tree
+	 *
+	 * @param string $type Either "cache" or "uncached"
 	 *
 	 * @return string
 	 * @since 7.0.0
 	 */
-	protected static function get_basepath() {
-		if ( static::$template_tmp_location !== null ) {
-			return static::$template_tmp_location;
-		}
-
-		$data      = \GPDFAPI::get_data_class();
-		$base_path = $data->template_tmp_location;
+	protected static function get_basepath( $type = 'cache' ) {
+		$base_path = \GPDFAPI::get_data_class()->template_tmp_location;
 		if ( is_multisite() ) {
 			$base_path .= get_current_blog_id();
 		}
 
-		static::$template_tmp_location = trailingslashit( $base_path ) . 'cache/';
+		$path = trailingslashit( $base_path ) . $type . '/';
 
-		/* Create directory on disk if it does not exist */
-		if ( ! is_dir( static::$template_tmp_location ) ) {
-			if ( wp_mkdir_p( static::$template_tmp_location ) ) {
-				file_put_contents( static::$template_tmp_location . 'index.html', '' );
-			}
+		/* Another request may create the directory first */
+		if ( ! is_dir( $path ) && ( wp_mkdir_p( $path ) || is_dir( $path ) ) ) {
+			file_put_contents( $path . 'index.html', '' );
 		}
 
-		return static::$template_tmp_location;
+		return $path;
 	}
 
 	/**
@@ -77,11 +105,11 @@ class Cache {
 	 * @param array $entry        The entry object
 	 * @param array $pdf_settings The PDF object/settings
 	 *
-	 * @return string
+	 * @return string|false False when the data can't be encoded, so no key would tell two renders apart
 	 *
 	 * @internal if $form, $entry, $pdf_settings, user ID, site ID, or template files are changed a new hash and PDF will be generated
 	 *
-	 * @since    6.12.0
+	 * @since    7.0.0
 	 */
 	public static function get_hash( $form, $entry, $pdf_settings ) {
 
@@ -117,9 +145,9 @@ class Cache {
 			unset( $entry[ $meta ] );
 		}
 
-		/* Add last modified date of template files to hash */
+		/* Key the template that renders, which a `?template=` override can change */
 		$template    = \GPDFAPI::get_templates_class();
-		$template_id = $pdf_settings['template'] ?? '';
+		$template_id = $template->get_requested_template_id( $pdf_settings['template'] ?? '' );
 
 		try {
 			$template_path       = $template->get_template_path_by_id( $template_id );
@@ -145,6 +173,7 @@ class Cache {
 				'fields'                => $form['fields'],
 				'entry'                 => $entry,
 				'pdf_settings'          => $pdf_settings,
+				'template'              => $template_id,
 				'template_last_updated' => $template_timestamps,
 			],
 			$form,
@@ -152,11 +181,23 @@ class Cache {
 			$pdf_settings
 		);
 
-		/* Generate the hash based on that unique data */
-		$hash_prefix = static::get_hash_prefix( $form, $entry, $pdf_settings );
-		$hash        = wp_hash( wp_json_encode( $unique_array ) );
+		/* e.g. INF or NAN in a field property. Hashing the failed encode would give every viewer the same key */
+		$json = wp_json_encode( $unique_array );
+		if ( $json === false ) {
+			\GPDFAPI::get_log_class()->warning(
+				'The PDF cache key could not be built, so this PDF will not be cached',
+				[
+					'form_id'    => $form['id'] ?? 0,
+					'entry_id'   => $entry['id'] ?? 0,
+					'pdf_id'     => $pdf_settings['id'] ?? '',
+					'json_error' => json_last_error_msg(),
+				]
+			);
 
-		return sprintf( '%s-%s', $hash_prefix, $hash );
+			return false;
+		}
+
+		return sprintf( '%s-%s', static::get_hash_prefix( $form, $entry, $pdf_settings ), wp_hash( $json ) );
 	}
 
 	/**
