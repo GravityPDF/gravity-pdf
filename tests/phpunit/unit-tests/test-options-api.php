@@ -841,6 +841,18 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_settings_sanitize_keeps_the_general_filter_result() {
+		$_POST['_wp_http_referer'] = '?tab=general';
+		$_POST['option_page']      = 'gfpdf_settings';
+
+		$updated_settings = $this->options->settings_sanitize( [ 'default_font_colour' => '<b>#333333</b>' ] );
+
+		$this->assertSame( '#333333', $updated_settings['default_font_colour'] );
+	}
+
+	/**
 	 * Test the trim sanitization function
 	 *
 	 * @param string $expected
