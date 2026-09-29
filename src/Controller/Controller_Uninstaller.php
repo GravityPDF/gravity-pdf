@@ -8,7 +8,6 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Form;
-use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_Uninstall;
 use GFPDF\View\View_Uninstaller;
 
@@ -51,7 +50,7 @@ class Controller_Uninstaller extends Helper_Abstract_Controller {
 			$gform = \GPDFAPI::get_form_class();
 
 			self::$instance = new self(
-				new Model_Uninstall( $gform, $log, \GPDFAPI::get_data_class(), \GPDFAPI::get_misc_class(), \GPDFAPI::get_notice_class(), new Helper_Pdf_Queue( $log ) ),
+				new Model_Uninstall( $gform, $log, \GPDFAPI::get_data_class(), \GPDFAPI::get_misc_class(), \GPDFAPI::get_notice_class(), \GPDFAPI::get_mvc_class( 'Helper_Pdf_Queue' ) ),
 				new View_Uninstaller(),
 				$gform
 			);

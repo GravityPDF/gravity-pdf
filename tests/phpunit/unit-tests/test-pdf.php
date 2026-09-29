@@ -85,6 +85,15 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->controller->init();
 	}
 
+	public function tear_down() {
+		parent::tear_down();
+
+		/* Creating a subsite dirties process globals WP_UnitTestCase won't roll back; reset so later tests aren't polluted */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
+	}
+
 	/**
 	 * Create our testing data
 	 *
