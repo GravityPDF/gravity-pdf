@@ -9,7 +9,6 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
-use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -75,13 +74,6 @@ class Model_Install extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
-	 * @var Helper_Pdf_Queue
-	 *
-	 * @since 5.0
-	 */
-	protected $queue;
-
-	/**
 	 * @var Model_Uninstall
 	 *
 	 * @since 6.0
@@ -95,18 +87,16 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @param Helper_Data          $data    Our plugin data store
 	 * @param Helper_Misc          $misc    Our miscellaneous class
 	 * @param Helper_Notices       $notices Our notice class used to queue admin messages and errors
-	 * @param Helper_Pdf_Queue     $queue
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Pdf_Queue $queue, Model_Uninstall $uninstall ) {
+	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Model_Uninstall $uninstall ) {
 
 		/* Assign our internal variables */
 		$this->log       = $log;
 		$this->data      = $data;
 		$this->misc      = $misc;
 		$this->notices   = $notices;
-		$this->queue     = $queue;
 		$this->uninstall = $uninstall;
 	}
 

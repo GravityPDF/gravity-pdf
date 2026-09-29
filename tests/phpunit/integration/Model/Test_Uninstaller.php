@@ -6,7 +6,6 @@ namespace GFPDF\Model;
 use Exception;
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Controller\Controller_Uninstaller;
-use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Uninstall;
 use GFPDF\Statics\Deprecation_V3;
@@ -112,7 +111,7 @@ class Test_Uninstaller extends TestCase {
 
 		/** @var Controller_Install $installer */
 		global $gfpdf;
-		$installer_model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), $this->model );
+		$installer_model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $this->model );
 		$installer       = new Controller_Install( $installer_model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 
 		/* Force install_plugin() to run even when a prior test left $data->is_installed=true after wiping the DB option */
@@ -161,7 +160,7 @@ class Test_Uninstaller extends TestCase {
 
 		/** @var Controller_Install $installer */
 		global $gfpdf;
-		$installer_model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), $this->model );
+		$installer_model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $this->model );
 		$installer       = new Controller_Install( $installer_model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 
 		/* Force install_plugin() to run even when a prior test left $data->is_installed=true after wiping the DB option */
