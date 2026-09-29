@@ -166,7 +166,7 @@ class Test_Settings extends TestCase {
 		$this->assertSame(
 			10,
 			has_filter(
-				'gravitypdf_settings_navigation',
+				'gfpdf_settings_navigation',
 				[
 					$this->controller,
 					'disable_tools_on_view_cap',
@@ -270,25 +270,14 @@ class Test_Settings extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_disable_tools_on_view_cap() {
+		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
+		$this->assertNotContains( 'tools', $tabs );
 
-		$nav = [
-			10  => 'General',
-			100 => 'Tools',
-		];
-
-		/* Ensure tools tab isn't present when permissions aren't set */
-		$results = $this->controller->disable_tools_on_view_cap( $nav );
-		$this->assertArrayNotHasKey( 100, $results );
-
-		/* Setup appropriate permissions and recheck */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
-		$results = $this->controller->disable_tools_on_view_cap( $nav );
-		$this->assertTrue( isset( $results[100] ) );
-
-		wp_set_current_user( 0 );
+		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
+		$this->assertContains( 'tools', $tabs );
 	}
 
 	/**

@@ -27,6 +27,9 @@ class Test_View_Settings extends TestCase {
 
 		parent::set_up();
 
+		/* The Tools tab needs the edit settings capability */
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+
 		$this->data        = new Helper_Data();
 		$this->data->addon = [];
 
