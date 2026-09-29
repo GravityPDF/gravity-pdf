@@ -73,6 +73,98 @@ class Cache {
 	}
 
 	/**
+	 * Take the lock for a cache key, so only one request renders it while the others wait for the result
+	 *
+	 * Waits up to 10 seconds (filter `gfpdf_cache_lock_wait`). Returns null when the lock times out or the filesystem
+	 * doesn't support locking, and the caller renders unprotected rather than holding up the request.
+	 *
+	 * @param string $path The cache directory from get_path()
+	 *
+	 * @return resource|null Pass to unlock()
+	 *
+	 * @since 7.0
+	 */
+	public static function lock( $path ) {
+		$file = static::get_lock_file( $path );
+		$fp   = @fopen( $file, 'c' ); //phpcs:ignore
+		if ( $fp === false ) {
+			\GPDFAPI::get_log_class()->warning( 'Could not open the PDF cache lock', [ 'file' => $file ] );
+
+			return null;
+		}
+
+		$deadline = microtime( true ) + max( 0, (float) apply_filters( 'gfpdf_cache_lock_wait', 10, $path ) );
+
+		while ( true ) {
+			$wouldblock = 0;
+			if ( static::try_lock( $fp, $wouldblock ) ) {
+				/* Keeps the tmp cleanup from reaping a lock in use */
+				@touch( $file ); //phpcs:ignore
+
+				return $fp;
+			}
+
+			/* Anything but contention means this filesystem can't lock (some NFS mounts), so don't wait for it */
+			if ( ! $wouldblock ) {
+				\GPDFAPI::get_log_class()->warning( 'The PDF cache lock is not supported on this filesystem', [ 'file' => $file ] );
+				break;
+			}
+
+			if ( microtime( true ) >= $deadline ) {
+				\GPDFAPI::get_log_class()->notice( 'Timed out waiting for another request to generate the PDF', [ 'file' => $file ] );
+				break;
+			}
+
+			usleep( 100000 );
+		}
+
+		fclose( $fp );
+
+		return null;
+	}
+
+	/**
+	 * Get the lock file for a cache key, in a directory outside every key's own
+	 *
+	 * @param string $path The cache directory from get_path()
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	public static function get_lock_file( $path ) {
+		return static::create_dir( static::get_basepath() . 'locks/' ) . basename( $path ) . '.lock';
+	}
+
+	/**
+	 * @param resource $fp
+	 * @param int      $wouldblock Set to 1 when another process holds the lock
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected static function try_lock( $fp, &$wouldblock ) {
+		return flock( $fp, LOCK_EX | LOCK_NB, $wouldblock );
+	}
+
+	/**
+	 * Release a lock taken by lock()
+	 *
+	 * @param resource|null $lock
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public static function unlock( $lock ) {
+		if ( is_resource( $lock ) ) {
+			flock( $lock, LOCK_UN );
+			fclose( $lock );
+		}
+	}
+
+	/**
 	 * Get and create the current blog's cache (or uncached) directory
 	 *
 	 * Not memoised, so a switch_to_blog() never reuses another blog's tree
@@ -88,8 +180,19 @@ class Cache {
 			$base_path .= get_current_blog_id();
 		}
 
-		$path = trailingslashit( $base_path ) . $type . '/';
+		return static::create_dir( trailingslashit( $base_path ) . $type . '/' );
+	}
 
+	/**
+	 * Create a directory with a blank index.html, if it doesn't exist
+	 *
+	 * @param string $path
+	 *
+	 * @return string The path
+	 *
+	 * @since 7.0
+	 */
+	protected static function create_dir( $path ) {
 		/* Another request may create the directory first */
 		if ( ! is_dir( $path ) && ( wp_mkdir_p( $path ) || is_dir( $path ) ) ) {
 			file_put_contents( $path . 'index.html', '' );

@@ -23,8 +23,10 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF;
+use GFPDF\Helper\Helper_Render_Health;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
+use GFPDF\Statics\Cache;
 use GFPDF\Statics\Debug;
 use GFPDF\Statics\Notes;
 use GFPDF_Vendor\Mpdf\Mpdf;
@@ -1230,7 +1232,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 4.0
-	 * @since 7.0 Records the cache outcome, see get_cache_status()
+	 * @since 7.0 Records the cache outcome (see get_cache_status()), and concurrent misses for one PDF render it once
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf_generator ) {
 
@@ -1247,6 +1249,41 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			return true;
 		}
+
+		/* A bypass render doesn't wait: the atomic rename in save_pdf() already makes its write safe */
+		if ( $pdf_override || ! $pdf_generator->is_cache_path() ) {
+			return $this->render_and_save_pdf( $pdf_generator, $pdf_override );
+		}
+
+		$lock = Cache::lock( $pdf_generator->get_path() );
+
+		try {
+			/* Another request may have written the PDF while this one waited, and rename() swapped the inode */
+			clearstatcache( true, $pdf_generator->get_full_pdf_path() );
+			if ( $this->does_pdf_exist( $pdf_generator ) ) {
+				$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = 'hit';
+
+				return true;
+			}
+
+			return $this->render_and_save_pdf( $pdf_generator, false );
+		} finally {
+			Cache::unlock( $lock );
+		}
+	}
+
+	/**
+	 * Render the PDF and save it to disk. A degraded render of a cached PDF, e.g. a remote image timed out, is saved to
+	 * a one-off path instead, so the next request renders it again.
+	 *
+	 * @param Helper_PDF $pdf_generator
+	 * @param bool       $pdf_override Whether the cache was bypassed
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected function render_and_save_pdf( Helper_PDF $pdf_generator, $pdf_override ) {
 
 		/* Get required parameters */
 		$entry    = $pdf_generator->get_entry();
@@ -1271,6 +1308,8 @@ class Model_PDF extends Helper_Abstract_Model {
 		$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
 		$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
 
+		Helper_Render_Health::begin();
+
 		try {
 
 			/* Initialise our PDF helper class */
@@ -1281,12 +1320,27 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* Render the PDF template HTML */
 			$pdf_generator->render_html( $args );
 
+			$pdf          = $pdf_generator->generate();
+			$cache_status = $pdf_override ? 'bypass' : 'miss';
+
+			/**
+			 * Whether the PDF is missing content that could render on another attempt, so it isn't cached
+			 *
+			 * @param bool $degraded True when a remote request timed out, or failed with a DNS error, 408, 429 or 5xx
+			 *
+			 * @since 7.0
+			 */
+			if ( $pdf_generator->is_cache_path() && apply_filters( 'gfpdf_render_degraded', Helper_Render_Health::is_degraded(), $form, $entry, $settings, $pdf_generator ) ) {
+				$pdf_generator->set_path( Cache::get_uncached_path() );
+				$cache_status = 'degraded';
+			}
+
 			/* Generate and save the PDF */
-			$pdf_generator->save_pdf( $pdf_generator->generate() );
+			$pdf_generator->save_pdf( $pdf );
 
 			do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf_generator );
 
-			$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = $pdf_override ? 'bypass' : 'miss';
+			$this->cache_statuses[ $pdf_generator->get_full_pdf_path() ] = $cache_status;
 
 			return true;
 		} catch ( Exception $e ) {
@@ -1306,6 +1360,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			);
 
 			return false;
+		} finally {
+			Helper_Render_Health::end();
 		}
 	}
 
@@ -1324,7 +1380,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * How the cache served a PDF generated this request: "hit", "miss" or "bypass"
+	 * How the cache served a PDF generated this request: "hit", "miss", "bypass" or "degraded"
 	 *
 	 * @param string $path_to_pdf Absolute path to the PDF
 	 *
