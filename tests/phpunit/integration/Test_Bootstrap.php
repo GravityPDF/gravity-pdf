@@ -351,4 +351,20 @@ class Test_Bootstrap extends TestCase {
 		global $wp_settings_errors;
 		$wp_settings_errors = [];
 	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_add_admin_messages_shows_a_non_error_notice_as_a_notice() {
+		global $wp_settings_errors;
+
+		$this->loader->notices->clear();
+		add_settings_error( 'gfpdf-notices', 'info-code', 'An add-on notice', 'info' );
+
+		$this->loader->add_admin_messages();
+		$wp_settings_errors = [];
+
+		$this->assertFalse( $this->loader->notices->has_error() );
+		$this->assertTrue( $this->loader->notices->has_notice() );
+	}
 }
