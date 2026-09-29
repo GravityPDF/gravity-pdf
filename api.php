@@ -513,19 +513,23 @@ final class GPDFAPI {
 	 *        `gfpdf_post_save_api_pdf` fires instead of `gfpdf_post_save_pdf`
 	 */
 	public static function create_pdf( $entry_id, $pdf_id, $bypass_cache = false ) {
-		if ( $bypass_cache ) {
-			add_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
-		}
-
-		/** @var \GFPDF\Model\Model_PDF $pdf */
-		$pdf         = self::get_mvc_class( 'Model_PDF' );
-		$path_to_pdf = $pdf->save_pdf_by_id( $entry_id, $pdf_id, 'api' );
+		/* A callback of this call's own, so removing it never takes away a caller's bypass */
+		$bypass = static function () {
+			return true;
+		};
 
 		if ( $bypass_cache ) {
-			remove_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
+			add_filter( 'gfpdf_override_pdf_bypass', $bypass, 9999 );
 		}
 
-		return $path_to_pdf;
+		try {
+			/** @var \GFPDF\Model\Model_PDF $pdf */
+			$pdf = self::get_mvc_class( 'Model_PDF' );
+
+			return $pdf->save_pdf_by_id( $entry_id, $pdf_id, 'api' );
+		} finally {
+			remove_filter( 'gfpdf_override_pdf_bypass', $bypass, 9999 );
+		}
 	}
 
 	/**

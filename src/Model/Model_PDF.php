@@ -1305,6 +1305,35 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 7.0
 	 */
 	protected function render_and_save_pdf( Helper_PDF $pdf_generator, $cache_status ) {
+		try {
+			return $this->render_pdf( $pdf_generator, $cache_status );
+		} finally {
+			/**
+			 * Fires when a render that fired `gfpdf_pre_pdf_generation` ends, even when it fails or throws, so anything
+			 * added on that action can be removed. A successful render fires `gfpdf_post_pdf_generation` first.
+			 *
+			 * @param array      $form
+			 * @param array      $entry
+			 * @param array      $settings
+			 * @param Helper_PDF $pdf_generator
+			 *
+			 * @since 7.0
+			 */
+			do_action( 'gfpdf_pdf_generation_end', $pdf_generator->get_form(), $pdf_generator->get_entry(), $pdf_generator->get_settings(), $pdf_generator );
+		}
+	}
+
+	/**
+	 * The render behind render_and_save_pdf(), which fires `gfpdf_pdf_generation_end` when this returns or throws
+	 *
+	 * @param Helper_PDF $pdf_generator
+	 * @param string     $cache_status
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected function render_pdf( Helper_PDF $pdf_generator, $cache_status ) {
 
 		/* Get required parameters */
 		$entry    = $pdf_generator->get_entry();
