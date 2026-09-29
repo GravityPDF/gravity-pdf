@@ -251,6 +251,8 @@ class Helper_Data {
 				'updateSuccess'                        => esc_html__( 'Successfully Updated', 'gravity-pdf' ),
 				'deleteSuccess'                        => esc_html__( 'Successfully Deleted', 'gravity-pdf' ),
 				'licenseDeactivationError'             => esc_html__( 'An error occurred and your license key may not have been correctly deactivated. Login to your GravityPDF.com account and check if your site has been unlinked from the key.', 'gravity-pdf' ),
+				'clearPdfCache'                        => esc_html__( 'Clear PDF Cache', 'gravity-pdf' ),
+				'clearPdfCacheError'                   => esc_html__( 'The PDF cache could not be cleared. Reload the page and try again.', 'gravity-pdf' ),
 				'no'                                   => esc_html__( 'No', 'gravity-pdf' ),
 				'yes'                                  => esc_html__( 'Yes', 'gravity-pdf' ),
 				'standard'                             => esc_html__( 'Standard', 'gravity-pdf' ),

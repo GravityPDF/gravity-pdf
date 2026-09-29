@@ -1234,7 +1234,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 * @since 7.0 Records the cache outcome (see get_cache_status()), concurrent misses for one PDF render it once, and
-	 *            "disabled" is recorded when the cache is off
+	 *            "disabled" is recorded when the cache is off ("bypass" when the cache is also bypassed)
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf_generator ) {
 
@@ -1253,7 +1253,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		if ( $pdf_generator->is_cache_disabled() ) {
-			return $this->render_and_save_pdf( $pdf_generator, 'disabled' );
+			return $this->render_and_save_pdf( $pdf_generator, $pdf_override ? 'bypass' : 'disabled' );
 		}
 
 		/* A bypass render doesn't wait: the atomic rename in save_pdf() already makes its write safe */

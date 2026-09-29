@@ -1,0 +1,15 @@
+@use '../base';
+
+#tab_PDF {
+  .gfpdf-clear-pdf-cache-notice {
+    margin-top: 0.5rem;
+
+    &.success {
+      color: base.$success-color;
+    }
+
+    &.error {
+      color: base.$error-color;
+    }
+  }
+}

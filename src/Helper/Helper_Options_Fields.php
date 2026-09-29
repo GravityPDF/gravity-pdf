@@ -216,6 +216,12 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				]
 			),
 
+			/* @since 7.0 */
+			'general_cache'                   => apply_filters(
+				'gfpdf_settings_general_cache',
+				$this->get_cache_fields()
+			),
+
 			/* Extension Settings */
 			'extensions'                      => apply_filters(
 				'gfpdf_settings_extensions',
@@ -690,6 +696,48 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_registered_fields/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
+	}
+
+	/**
+	 * The PDF Cache settings. The Clear PDF Cache button is added by JavaScript, for users who can edit settings.
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	protected function get_cache_fields() {
+		$fields = [
+			'cache_pdfs' => [
+				'id'   => 'cache_pdfs',
+				'name' => esc_html__( 'Cache PDFs', 'gravity-pdf' ),
+				'desc' => __( 'Reuse a generated PDF until its entry, form, PDF settings, template or fonts change, or the cache duration runs out. Turn this off while troubleshooting a template.', 'gravity-pdf' ),
+				'type' => 'toggle',
+				'std'  => 'Yes',
+			],
+		];
+
+		if ( $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+			$fields['clear_pdf_cache'] = [
+				'id'   => 'clear_pdf_cache',
+				'name' => esc_html__( 'Clear PDF Cache', 'gravity-pdf' ),
+				'desc' => '<div class="gform-settings-description gform-kitchen-sink">' . esc_html__( 'Stop serving every cached PDF, so each one is generated again the next time it is needed. The old files are removed in the background.', 'gravity-pdf' ) . '</div>',
+				'type' => 'descriptive_text',
+			];
+		}
+
+		$fields['cache_duration'] = [
+			'id'    => 'cache_duration',
+			'name'  => esc_html__( 'Cache Duration', 'gravity-pdf' ),
+			'desc'  => __( 'How long a cached PDF is reused before it is generated again. Cached PDFs hold entry data, so a shorter duration keeps less personal data on disk. Date merge tags and changes to a user profile show in a cached PDF once the duration runs out.', 'gravity-pdf' ),
+			'desc2' => esc_html__( 'hours', 'gravity-pdf' ),
+			'type'  => 'number',
+			'size'  => 'small',
+			'std'   => 12,
+			'min'   => 1,
+			'max'   => 168,
+		];
+
+		return $fields;
 	}
 
 	/**
