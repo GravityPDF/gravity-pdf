@@ -68,6 +68,9 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		/* run parent method */
 		parent::set_up();
 
+		/* Gravity Forms turns Background Notifications on for new installs, which leaves the notifications to it */
+		update_option( 'gform_enable_async_notifications', false );
+
 		/* Setup our test classes */
 		$this->queue = new Helper_Pdf_Queue( $gfpdf->log );
 		$model_pdf   = $gfpdf->singleton->get_class( 'Model_PDF' );
@@ -282,6 +285,18 @@ class Test_Controller_Pdf_Queue extends TestCase {
 			)
 		);
 
+		/* And if Gravity Forms' Background Notifications setting is on */
+		remove_filter( 'gform_is_asynchronous_notifications_enabled', '__return_true' );
+		update_option( 'gform_enable_async_notifications', true );
+
+		$this->assertFalse(
+			$this->controller->maybe_disable_submission_notifications(
+				false,
+				$form['notifications']['54bca349732b8'],
+				$form,
+				$entry
+			)
+		);
 	}
 
 	/**

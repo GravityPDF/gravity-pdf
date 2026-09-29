@@ -1125,6 +1125,45 @@ class Test_PDF extends TestCase {
 	}
 
 	/**
+	 * A PDF attached to a Gravity Forms background notification is generated as the entry's author
+	 *
+	 * @since 6.17.3
+	 */
+	public function test_background_notification_pdf_is_generated_as_the_entry_author() {
+		$author_id = self::factory()->user->create();
+		$results   = $this->form_and_entry();
+		$form      = GPDFAPI::get_form_class()->get_form( $results['form']['id'] );
+		$entry     = $results['entry'];
+
+		$form['gfpdf_form_settings'] = [ '556690c67856b' => $form['gfpdf_form_settings']['556690c67856b'] ];
+		$entry['created_by']         = (string) $author_id;
+
+		/* The author's PDF already exists, so it's attached without being generated again */
+		wp_set_current_user( $author_id );
+		$authors_pdf = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] ) . "test-{$form['id']}.pdf";
+		wp_set_current_user( 0 );
+
+		wp_mkdir_p( dirname( $authors_pdf ) );
+		touch( $authors_pdf );
+
+		$render_user_ids = [];
+		$record_user     = function () use ( &$render_user_ids ) {
+			$render_user_ids[] = get_current_user_id();
+		};
+
+		do_action( 'gform_pre_process_async_notifications' );
+		add_action( 'gfpdf_pre_generate_and_save_pdf', $record_user );
+		$attachments = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry )['attachments'];
+		remove_action( 'gfpdf_pre_generate_and_save_pdf', $record_user );
+
+		unlink( $authors_pdf );
+
+		$this->assertSame( [ $authors_pdf ], $attachments );
+		$this->assertSame( [ $author_id ], $render_user_ids );
+		$this->assertSame( 0, get_current_user_id() );
+	}
+
+	/**
 	 * Check if our PDF exists on disk
 	 *
 	 * @since 4.0

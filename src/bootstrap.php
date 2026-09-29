@@ -732,6 +732,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function pdf() {
 
+		$async_notifications = new Helper\Helper_Async_Notifications();
+		$async_notifications->init();
+
 		$model = new Model\Model_PDF(
 			$this->gform,
 			$this->log,
@@ -740,7 +743,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->misc,
 			$this->notices,
 			$this->templates,
-			new Helper\Helper_Url_Signer()
+			new Helper\Helper_Url_Signer(),
+			$async_notifications
 		);
 
 		$view = new View\View_PDF(
@@ -760,6 +764,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $view );
+		$this->singleton->add_class( $async_notifications );
 	}
 
 	/**
