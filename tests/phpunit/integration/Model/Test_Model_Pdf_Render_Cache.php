@@ -220,6 +220,33 @@ class Test_Model_Pdf_Render_Cache extends TestCase {
 		$this->assertSame( 'miss', $this->model->get_cache_status( $path ) );
 	}
 
+	public function test_with_the_cache_off_every_request_renders_to_a_one_off_path() {
+		$cached     = $this->generator();
+		$cache_file = $cached->get_full_pdf_path();
+		wp_mkdir_p( $cached->get_path() );
+		file_put_contents( $cache_file, '%PDF-1.4 cached before the cache was turned off' );
+
+		add_filter( 'gfpdf_enable_pdf_cache', '__return_false' );
+
+		$pdf = $this->generator( $cached->get_settings() );
+		$this->assertFalse( $pdf->is_cache_path() );
+		$this->assertTrue( $this->model->process_and_save_pdf( $pdf ) );
+
+		$served = $pdf->get_full_pdf_path();
+		$this->assertStringContainsString( '/uncached/', $served );
+		$this->assertSame( 1, $this->renders );
+		$this->assertSame( 'disabled', $this->model->get_cache_status( $served ) );
+		$this->assertSame( '%PDF-1.4 cached before the cache was turned off', file_get_contents( $cache_file ) );
+
+		/* An explicit path is written where the caller asked */
+		$explicit = $this->generator();
+		$explicit->set_path( $this->gfpdf()->data->template_tmp_location . 'explicit-' . uniqid() );
+
+		$path = $explicit->get_full_pdf_path();
+		$this->assertTrue( $this->model->process_and_save_pdf( $explicit ) );
+		$this->assertSame( 'miss', $this->model->get_cache_status( $path ) );
+	}
+
 	public function test_a_nested_render_keeps_the_outer_render_flag() {
 		$outer  = $this->generator();
 		$inner  = $this->generator();

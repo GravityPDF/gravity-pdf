@@ -56,7 +56,159 @@ class Cache {
 	 * @since 7.0.0
 	 */
 	public static function get_ttl() {
-		return 12 * HOUR_IN_SECONDS;
+		/**
+		 * How long a cached PDF can be served for, in seconds. At least 1.
+		 *
+		 * @param int $ttl
+		 *
+		 * @since 7.0
+		 */
+		return max( 1, (int) apply_filters( 'gfpdf_cache_ttl', 12 * HOUR_IN_SECONDS ) );
+	}
+
+	/**
+	 * Whether a PDF is cached. When it isn't, every request renders it to a one-off path.
+	 *
+	 * @param array $form         The form object
+	 * @param array $entry        The entry object
+	 * @param array $pdf_settings The PDF object/settings
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public static function is_enabled( $form, $entry, $pdf_settings ) {
+		/**
+		 * @param bool  $enabled
+		 * @param array $form
+		 * @param array $entry
+		 * @param array $pdf_settings
+		 *
+		 * @since 7.0
+		 */
+		return (bool) apply_filters( 'gfpdf_enable_pdf_cache', true, $form, $entry, $pdf_settings );
+	}
+
+	/**
+	 * The site-wide cache generation. Bumping it moves every cache key, so nothing cached before is served again.
+	 *
+	 * @return int
+	 *
+	 * @since 7.0
+	 */
+	public static function get_generation() {
+		return (int) get_option( 'gfpdf_cache_generation', 0 );
+	}
+
+	/**
+	 * Stop serving everything cached on the current site
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public static function bump_generation() {
+		update_option( 'gfpdf_cache_generation', static::get_generation() + 1, false );
+	}
+
+	/**
+	 * @param int $form_id
+	 *
+	 * @return int
+	 *
+	 * @since 7.0
+	 */
+	public static function get_form_generation( $form_id ) {
+		$generations = get_option( 'gfpdf_cache_form_generation', [] );
+
+		return is_array( $generations ) ? (int) ( $generations[ (int) $form_id ] ?? 0 ) : 0;
+	}
+
+	/**
+	 * Stop serving everything cached for one form
+	 *
+	 * @param int $form_id
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public static function bump_form_generation( $form_id ) {
+		$generations = get_option( 'gfpdf_cache_form_generation', [] );
+		$generations = is_array( $generations ) ? $generations : [];
+
+		$generations[ (int) $form_id ] = (int) ( $generations[ (int) $form_id ] ?? 0 ) + 1;
+
+		update_option( 'gfpdf_cache_form_generation', $generations, false );
+	}
+
+	/**
+	 * Bump the cache generation when a Gravity PDF setting that can change a PDF is saved
+	 *
+	 * Also hooked to `add_option_gfpdf_settings`, which passes the option name in place of the old settings, so every key
+	 * counts as changed. Settings a render never reads, or only reads before generation
+	 * (access checks), are ignored, as are the licence and notice state saved in the background.
+	 *
+	 * @param array|string $old_settings
+	 * @param array        $new_settings
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public static function maybe_bump_generation( $old_settings, $new_settings ) {
+		$old_settings = is_array( $old_settings ) ? $old_settings : [];
+		$new_settings = is_array( $new_settings ) ? $new_settings : [];
+
+		/**
+		 * Settings that don't change a generated PDF, so saving them doesn't clear the cache. Accepts glob patterns.
+		 *
+		 * @param string[] $ignored
+		 *
+		 * @since 7.0
+		 */
+		$ignored = (array) apply_filters(
+			'gfpdf_cache_generation_ignored_settings',
+			[
+				'logged_out_timeout',
+				'admin_capabilities',
+				'default_restrict_owner',
+				'default_action',
+				'background_processing',
+				'license_*',
+				'action_dismissal',
+				'deprecated_features',
+				'signed_secret_token',
+				'cache_duration',
+				'clear_pdf_cache',
+			]
+		);
+
+		foreach ( array_keys( $old_settings + $new_settings ) as $key ) {
+			if ( ( $old_settings[ $key ] ?? null ) !== ( $new_settings[ $key ] ?? null ) && ! static::is_ignored_setting( (string) $key, $ignored ) ) {
+				static::bump_generation();
+
+				return;
+			}
+		}
+	}
+
+	/**
+	 * @param string   $key
+	 * @param string[] $ignored Setting keys, or glob patterns
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected static function is_ignored_setting( $key, $ignored ) {
+		foreach ( $ignored as $pattern ) {
+			if ( fnmatch( (string) $pattern, $key ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -210,7 +362,7 @@ class Cache {
 	 *
 	 * @return string|false False when the data can't be encoded, so no key would tell two renders apart
 	 *
-	 * @internal if $form, $entry, $pdf_settings, user ID, site ID, or template files are changed a new hash and PDF will be generated
+	 * @internal a change to any component of the key generates a new hash and PDF
 	 *
 	 * @since    7.0.0
 	 */
@@ -267,22 +419,42 @@ class Cache {
 			/* do nothing */
 		}
 
-		/* Build an array of unique data relevant to the current PDF */
-		$unique_array = apply_filters(
-			'gfpdf_cache_hash_array',
-			[
-				'site_id'               => get_current_blog_id(),
-				'user_id'               => get_current_user_id(),
-				'fields'                => $form['fields'],
-				'entry'                 => $entry,
-				'pdf_settings'          => $pdf_settings,
-				'template'              => $template_id,
-				'template_last_updated' => $template_timestamps,
-			],
-			$form,
-			$entry,
-			$pdf_settings
-		);
+		/**
+		 * Add to the data that keys a cached PDF, e.g. an add-on's version or data its fields render from another source.
+		 * Nested values must be in a stable order.
+		 *
+		 * @param array $extra
+		 * @param array $form
+		 * @param array $entry
+		 * @param array $pdf_settings
+		 *
+		 * @since 7.0
+		 */
+		$extra = apply_filters( 'gfpdf_cache_hash_extra', [], $form, $entry, $pdf_settings );
+		$extra = is_array( $extra ) ? $extra : [];
+		ksort( $extra );
+
+		$user  = wp_get_current_user();
+		$roles = array_values( (array) $user->roles );
+		sort( $roles );
+
+		/* Viewer identity sits outside the filter, so no listener can remove it */
+		$unique_array = [
+			'version'               => [ PDF_EXTENDED_VERSION, class_exists( '\GFForms' ) ? \GFForms::$version : '' ],
+			'generation'            => static::get_generation(),
+			'form_generation'       => static::get_form_generation( $form['id'] ?? 0 ),
+			'options'               => static::get_hash_options(),
+			'form'                  => static::get_hash_form( $form, $entry, $pdf_settings ),
+			'entry'                 => $entry,
+			'pdf_settings'          => $pdf_settings,
+			'template'              => $template_id,
+			'template_last_updated' => $template_timestamps,
+			'extra'                 => $extra,
+			'site_id'               => get_current_blog_id(),
+			'user_id'               => $user->ID,
+			'roles'                 => $roles,
+			'locale'                => determine_locale(),
+		];
 
 		/* e.g. INF or NAN in a field property. Hashing the failed encode would give every viewer the same key */
 		$json = wp_json_encode( $unique_array );
@@ -301,6 +473,56 @@ class Cache {
 		}
 
 		return sprintf( '%s-%s', static::get_hash_prefix( $form, $entry, $pdf_settings ), wp_hash( $json ) );
+	}
+
+	/**
+	 * The form, without the parts a PDF doesn't render
+	 *
+	 * @param array $form         The form object
+	 * @param array $entry        The entry object
+	 * @param array $pdf_settings The PDF object/settings
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	protected static function get_hash_form( $form, $entry, $pdf_settings ) {
+		/**
+		 * Top-level form keys that don't change a PDF, so editing them doesn't change its cache key. The PDF being
+		 * rendered is keyed from its own settings, so `gfpdf_form_settings` is ignored too.
+		 *
+		 * @param string[] $ignored
+		 * @param array    $form
+		 * @param array    $entry
+		 * @param array    $pdf_settings
+		 *
+		 * @since 7.0
+		 */
+		$ignored_form_keys = apply_filters( 'gfpdf_cache_hash_ignored_form_keys', [ 'notifications', 'confirmations', 'confirmation', 'date_created', 'is_active', 'is_trash', 'page_instance', 'gfpdf_form_settings' ], $form, $entry, $pdf_settings );
+		foreach ( (array) $ignored_form_keys as $key ) {
+			unset( $form[ $key ] );
+		}
+
+		return $form;
+	}
+
+	/**
+	 * Site options a render reads outside Gravity PDF's own settings
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	protected static function get_hash_options() {
+		$options = [];
+		foreach ( [ 'blogname', 'admin_email', 'home', 'siteurl', 'date_format', 'time_format', 'timezone_string', 'gmt_offset', 'gform_upload_page_slug' ] as $option ) {
+			$options[ $option ] = get_option( $option );
+		}
+
+		/* Gravity Forms' fallback for an entry saved without a currency */
+		$options['currency'] = class_exists( '\GFCommon' ) ? \GFCommon::get_currency() : '';
+
+		return $options;
 	}
 
 	/**

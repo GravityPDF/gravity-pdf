@@ -112,6 +112,17 @@ if ( $gfpdf_e2e_header( 'debug_mode' ) === 'yes' ) {
 	);
 }
 
+/* Other specs save settings and fonts, which move every PDF's cache key */
+$gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
+if ( $gfpdf_e2e_cache_generation !== '' ) {
+	add_filter(
+		'pre_option_gfpdf_cache_generation',
+		static function () use ( $gfpdf_e2e_cache_generation ) {
+			return (int) $gfpdf_e2e_cache_generation;
+		}
+	);
+}
+
 /* The deprecated features spec plants its signals site-wide, and the notice they raise would otherwise appear on
    every admin page the other specs take snapshots of */
 if ( $gfpdf_e2e_header( 'deprecations' ) !== 'yes' ) {

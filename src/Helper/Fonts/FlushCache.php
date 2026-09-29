@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Fonts;
 
+use GFPDF\Statics\Cache;
 use GPDFAPI;
 
 /**
@@ -27,13 +28,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class FlushCache {
 
 	/**
-	 * Deletes the mPDF tmp directory
+	 * Deletes the mPDF tmp directory, and stops serving PDFs cached with the old fonts
 	 *
 	 * @since 6.0
+	 * @since 7.0 Bumps the PDF cache generation
 	 */
 	public static function flush(): void {
 		$misc = GPDFAPI::get_misc_class();
 		$data = GPDFAPI::get_data_class();
 		$misc->cleanup_dir( $data->mpdf_tmp_location );
+
+		Cache::bump_generation();
 	}
 }

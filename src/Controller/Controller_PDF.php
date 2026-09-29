@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Statics\Cache;
 use GFPDF\Statics\Debug;
 use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
@@ -138,6 +139,10 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		/* Scheduled clean-up actions */
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
 
+		/* Saving a setting that changes PDFs moves every cache key. WP fires only the add hook on a first save */
+		add_action( 'update_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ], 10, 2 );
+		add_action( 'add_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ], 10, 2 );
+
 		/* Remove legacy Gravity Perk Population Anything Support */
 		if ( class_exists( '\GPPA_Compatibility_GravityPDF' ) ) {
 			$gp_pdf_compat = \GPPA_Compatibility_GravityPDF::get_instance();
@@ -148,11 +153,11 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		/* Gravity Wiz Nested Forms support */
 		if ( function_exists( 'gp_nested_forms' ) ) {
-			$included_nested_forms_in_cache_hash = function ( $data, $form, $entry, $pdf_settings ) {
-				return $this->included_nested_forms_in_cache_hash( $data, $form, $entry, $pdf_settings );
+			$included_nested_forms_in_cache_hash = function ( $extra, $form, $entry, $pdf_settings ) {
+				return $this->included_nested_forms_in_cache_hash( $extra, $form, $entry, $pdf_settings );
 			};
 
-			add_filter( 'gfpdf_cache_hash_array', $included_nested_forms_in_cache_hash, 10, 4 );
+			add_filter( 'gfpdf_cache_hash_extra', $included_nested_forms_in_cache_hash, 10, 4 );
 		}
 
 		/* Add Legal Signature support */
@@ -469,7 +474,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 * If Nested Form fields are included in the form, include the child entries in the cache hash.
 	 * This will auto-invalidate the parent PDF when the child entry is modified
 	 *
-	 * @param array $data Data to hash
+	 * @param array $extra Extra data to hash
 	 * @param array $form Form object
 	 * @param array $entry Entry object
 	 * @param array $pdf_settings PDF object
@@ -478,24 +483,24 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	 *
 	 * @since 7.0
 	 */
-	protected function included_nested_forms_in_cache_hash( $data, $form, $entry, $pdf_settings ) {
+	protected function included_nested_forms_in_cache_hash( $extra, $form, $entry, $pdf_settings ) {
 		if ( empty( $entry['id'] ) ) {
-			return $data;
+			return $extra;
 		}
 
 		if ( ! class_exists( '\GPNF_Entry' ) ) {
-			return $data;
+			return $extra;
 		}
 
 		$parent_entry  = new \GPNF_Entry( $entry );
 		$child_entries = $parent_entry->get_child_entries();
 
 		if ( empty( $child_entries ) ) {
-			return $data;
+			return $extra;
 		}
 
-		$data['nested_form_entries'] = $child_entries;
+		$extra['nested_form_entries'] = $child_entries;
 
-		return $data;
+		return $extra;
 	}
 }

@@ -131,6 +131,15 @@ class Helper_PDF {
 	protected $is_cache_path = false;
 
 	/**
+	 * Whether the cache is off for this PDF (filter `gfpdf_enable_pdf_cache`), so set_path() chose a one-off path
+	 *
+	 * @var bool
+	 *
+	 * @since 7.0
+	 */
+	protected $is_cache_disabled = false;
+
+	/**
 	 * Whether to force the print dialog when the PDF is opened
 	 *
 	 * @var boolean
@@ -615,13 +624,16 @@ class Helper_PDF {
 	 * @return void
 	 *
 	 * @since 4.0
-	 * @since 7.0 An empty path uses the PDF cache, or a one-off path when the cache key can't be built
+	 * @since 7.0 An empty path uses the PDF cache, or a one-off path when the cache is off or the key can't be built
 	 */
 	public function set_path( $path = '' ) {
-		$this->is_cache_path = false;
+		$this->is_cache_path     = false;
+		$this->is_cache_disabled = false;
 
 		if ( empty( $path ) ) {
-			$path                = Cache::get_path( $this->form, $this->entry, $this->settings );
+			$this->is_cache_disabled = ! Cache::is_enabled( $this->form, $this->entry, $this->settings );
+
+			$path                = $this->is_cache_disabled ? false : Cache::get_path( $this->form, $this->entry, $this->settings );
 			$this->is_cache_path = $path !== false;
 			$path                = $path ?: Cache::get_uncached_path();
 		}
@@ -638,6 +650,17 @@ class Helper_PDF {
 	 */
 	public function is_cache_path() {
 		return $this->is_cache_path;
+	}
+
+	/**
+	 * Whether the cache is off for this PDF, so set_path() chose a one-off path
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function is_cache_disabled() {
+		return $this->is_cache_disabled;
 	}
 
 	/**
