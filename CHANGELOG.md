@@ -3,6 +3,7 @@
 ## Gravity PDF
 
 ### 6.17.3
+* 🧹 Housekeeping: Create the background processing queue once per request, instead of up to four times
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
 * 🐞 Bug: Hide the Tools tab from users who can view but not edit the PDF settings
 * 🐞 Bug: Keep the value returned by the `gfpdf_settings_sanitize` filter when saving the global settings

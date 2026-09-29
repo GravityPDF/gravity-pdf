@@ -118,6 +118,20 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_pdf_queue_is_built_once() {
+		$action = 'wp_ajax_' . $this->loader->singleton->get_class( 'Helper_Pdf_Queue' )->get_identifier();
+		remove_all_actions( $action );
+
+		$loader = new Router();
+		$loader->init();
+		$loader->async_pdfs();
+
+		$this->assertCount( 1, $GLOBALS['wp_filter'][ $action ]->callbacks[10] );
+	}
+
+	/**
 	 * Test that any Gravity PDF scripts are automatically loading when GF is in no conflict mode
 	 *
 	 * @since 4.0
