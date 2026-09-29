@@ -918,12 +918,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Detect any Gravity PDF messages and add to our notice system
 	 *
 	 * @since 6.0
+	 * @since 6.17.3 Only an error shows as an error, matching what fails a settings save
 	 */
 	public function add_admin_messages() {
 		$messages = get_settings_errors( 'gfpdf-notices' );
 
 		foreach ( $messages as $message ) {
-			if ( $message['type'] !== 'updated' ) {
+			if ( $message['type'] === 'error' ) {
 				$this->notices->add_error( $message['message'] );
 			} else {
 				$this->notices->add_notice( $message['message'] );

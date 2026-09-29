@@ -1095,6 +1095,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @since 6.17.3 Returns the saved settings when validation fails, rather than an empty array
+	 * @since 6.17.3 Only an error fails the save, not another notice
 	 *
 	 */
 	public function settings_sanitize( $input = [] ) {
@@ -1180,16 +1181,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 		}
 
-		/* Only our own errors fail the save, not ones other plugins add during the request */
-		$settings_errors = get_settings_errors( 'gfpdf-notices' );
-		if ( count( $settings_errors ) === 0 ) {
-			/* Merge our new settings with the existing */
-			$output = array_merge( $gfpdf_options, $input );
-			add_settings_error( 'gfpdf-notices', '', esc_html__( 'Settings updated.', 'gravity-pdf' ), 'updated' );
-		} elseif ( count( $settings_errors ) === 1 && $settings_errors[0]['type'] === 'updated' ) {
-			/* Merge our new settings with the existing, but without the update message (prevents saving issue) */
-			$output = array_merge( $gfpdf_options, $input );
-		} else {
+		/* Only an error in gfpdf-notices fails the save, not another notice type or another plugin's error */
+		$notices = get_settings_errors( 'gfpdf-notices' );
+		if ( in_array( 'error', wp_list_pluck( $notices, 'type' ), true ) ) {
 			/* error is thrown. store the user data in a transient so fields are remembered */
 			set_transient( 'gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30 );
 
@@ -1197,7 +1191,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return get_option( 'gfpdf_settings' );
 		}
 
-		return $output;
+		/* Add once: a first-ever save is sanitized twice (update_option() falls through to add_option()) */
+		if ( ! in_array( 'settings_updated', wp_list_pluck( $notices, 'code' ), true ) ) {
+			add_settings_error( 'gfpdf-notices', 'settings_updated', esc_html__( 'Settings updated.', 'gravity-pdf' ), 'updated' );
+		}
+
+		return array_merge( $gfpdf_options, $input );
 	}
 
 	/**
