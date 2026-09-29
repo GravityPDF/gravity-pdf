@@ -415,6 +415,10 @@ class Test_Controller_Pdf_Queue extends TestCase {
 
 		$queue = new Helper_Pdf_Queue( $gfpdf->log );
 
+		/** @var Helper_Abstract_Options $options */
+		$options = $gfpdf->options;
+		$options->update_option( 'background_processing', 'Yes' );
+
 		/* Create queue and verify  */
 		$queue->push_to_queue( 'item1' )->save();
 		$queue->push_to_queue( 'item2' )->save();
@@ -422,10 +426,6 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		$this->assertCount( 2, $queue->get_batches() );
 
 		/* Toggle the settings and verify */
-		/** @var Helper_Abstract_Options $options */
-		$options = $gfpdf->options;
-
-		$options->update_option( 'background_processing', 'Yes' );
 		$options->update_settings( [ 'background_processing' => 'No' ] );
 
 		$this->assertCount( 0, $queue->get_batches() );
@@ -437,6 +437,14 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		$this->assertCount( 2, $queue->get_batches() );
 
 		$options->update_settings( [ 'background_processing' => 'No' ] );
+		$this->assertCount( 2, $queue->get_batches() );
+
+		/* A toggle in a save that fails validation isn't saved, so the queue remains */
+		add_settings_error( 'gfpdf-notices', 'invalid', 'Invalid' );
+		$options->update_settings( [ 'background_processing' => 'Yes' ] );
+		$wp_settings_errors = [];
+
+		$this->assertSame( 'No', get_option( 'gfpdf_settings' )['background_processing'] );
 		$this->assertCount( 2, $queue->get_batches() );
 	}
 }
