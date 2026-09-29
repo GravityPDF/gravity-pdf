@@ -233,6 +233,7 @@ class Test_Model_PDF extends TestCase {
 		$form = [ 'id' => 42 ];
 		$entry = [ 'id' => 1 ];
 
+		update_option( 'gform_enable_async_notifications', false );
 		$this->assertFalse( $this->model->is_gform_asynchronous_notifications_enabled( [], $form, $entry ) );
 
 		add_filter( 'gform_is_asynchronous_notifications_enabled', '__return_true' );
@@ -242,6 +243,10 @@ class Test_Model_PDF extends TestCase {
 		add_filter( 'gform_is_asynchronous_notifications_enabled_42', '__return_true' );
 		$this->assertTrue( $this->model->is_gform_asynchronous_notifications_enabled( [], $form, $entry ) );
 		remove_filter( 'gform_is_asynchronous_notifications_enabled_42', '__return_true' );
+
+		/* Follows Gravity Forms' Background Notifications setting when unfiltered */
+		update_option( 'gform_enable_async_notifications', true );
+		$this->assertTrue( $this->model->is_gform_asynchronous_notifications_enabled( [], $form, $entry ) );
 	}
 
 	public function test_can_user_view_pdf_with_capabilities_returns_false_for_anonymous() {

@@ -14,6 +14,7 @@ use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Helper\Helper_Async_Notifications;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Field_Pdf_Config;
@@ -135,6 +136,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $url_signer;
 
 	/**
+	 * @var Helper_Async_Notifications
+	 *
+	 * @since 6.17.3
+	 */
+	protected $async_notifications;
+
+	/**
 	 * Setup our view with the needed data and classes
 	 *
 	 * @param Helper_Abstract_Form        $gform   Our abstracted Gravity Forms helper functions
@@ -145,20 +153,23 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param Helper_Notices              $notices Our notice class used to queue admin messages and errors
 	 * @param Helper_Templates            $templates
 	 * @param Helper_Interface_Url_Signer $url_signer
+	 * @param Helper_Async_Notifications|null $async_notifications
 	 *
 	 * @since 4.0
+	 * @since 6.17.3 Takes the Gravity Forms background notifications helper
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Helper_Async_Notifications $async_notifications = null ) {
 
 		/* Assign our internal variables */
-		$this->gform      = $gform;
-		$this->log        = $log;
-		$this->options    = $options;
-		$this->data       = $data;
-		$this->misc       = $misc;
-		$this->notices    = $notices;
-		$this->templates  = $templates;
-		$this->url_signer = $url_signer;
+		$this->gform               = $gform;
+		$this->log                 = $log;
+		$this->options             = $options;
+		$this->data                = $data;
+		$this->misc                = $misc;
+		$this->notices             = $notices;
+		$this->templates           = $templates;
+		$this->url_signer          = $url_signer;
+		$this->async_notifications = $async_notifications ?? new Helper_Async_Notifications();
 	}
 
 	/**
@@ -1081,7 +1092,13 @@ class Model_PDF extends Helper_Abstract_Model {
 
 					/* Generate our PDF */
 					do_action( 'gfpdf_pre_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
-					$filename = $this->generate_and_save_pdf( $entry, $settings );
+					$filename = $this->async_notifications->render_as_sender(
+						$notifications,
+						$entry,
+						function () use ( $entry, $settings ) {
+							return $this->generate_and_save_pdf( $entry, $settings );
+						}
+					);
 					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
 
 					if ( is_wp_error( $filename ) ) {
@@ -2012,22 +2029,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param array $entry         The entry being processed.
 	 * @param array $data          An array of data which can be used in the notifications via the generic {object:property} merge tag. Defaults to empty array.
 	 *
-	 * @return string
+	 * @return bool
 	 *
 	 * @since 6.11.0
+	 * @since 6.17.3 Asks Gravity Forms, which defaults to its Background Notifications setting in 2.10+
 	 *
 	 * @see   https://docs.gravityforms.com/gform_is_asynchronous_notifications_enabled/
 	 */
 	public function is_gform_asynchronous_notifications_enabled( $notifications, $form, $entry, $data = [] ) {
-		return gf_apply_filters(
-			[ 'gform_is_asynchronous_notifications_enabled', $form['id'] ],
-			false,
-			'form_submission',
-			$notifications,
-			$form,
-			$entry,
-			$data
-		);
+		return $this->async_notifications->is_enabled( $notifications, $form, $entry, $data );
 	}
 
 	/**
