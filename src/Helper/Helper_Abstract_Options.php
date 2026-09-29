@@ -1219,8 +1219,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return string $input Sanitized value
 	 * @since 4.0
 	 * @since 6.11 Force minimum and maximum values
+	 * @since 6.17.3 A blank value saves the field's default
 	 */
 	public function sanitize_number_field( $value, $key = '', $input = [], $settings = [] ) {
+		if ( $value === '' && isset( $settings['std'] ) ) {
+			return $settings['std'];
+		}
+
 		if ( ! is_numeric( $value ) ) {
 			return 0;
 		}
