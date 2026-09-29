@@ -934,6 +934,28 @@ class Test_Options_API extends TestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_settings_save_ignores_non_error_notices() {
+		global $wp_settings_errors;
+
+		$_POST['_wp_http_referer'] = '/wp-admin/admin.php?page=gf_settings&subview=PDF&tab=general';
+		$_POST['option_page']      = 'gfpdf_settings';
+
+		add_settings_error( 'gfpdf-notices', 'addon-info', 'An add-on notice', 'info' );
+		add_settings_error( 'gfpdf-notices', 'addon-updated', 'An add-on update', 'updated' );
+
+		/* Sanitized twice, as a first-ever save is */
+		$this->options->settings_sanitize( [ 'default_pdf_size' => 'A5' ] );
+		$updated_settings   = $this->options->settings_sanitize( [ 'default_pdf_size' => 'A5' ] );
+		$codes              = wp_list_pluck( get_settings_errors( 'gfpdf-notices' ), 'code' );
+		$wp_settings_errors = [];
+
+		$this->assertSame( 'A5', $updated_settings['default_pdf_size'] );
+		$this->assertSame( [ 'addon-info', 'addon-updated', 'settings_updated' ], $codes );
+	}
+
+	/**
 	 * Test the trim sanitization function
 	 *
 	 * @param string $expected
