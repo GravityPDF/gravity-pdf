@@ -9,6 +9,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Statics\Cache;
 use GFPDF\Statics\Deprecation;
 use GFPDF\View\View_System_Report;
 use GFPDF_Major_Compatibility_Checks;
@@ -95,13 +96,25 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 */
 	protected $templates;
 
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates ) {
+	/**
+	 * @var Model_Pdf_Cache
+	 *
+	 * @since 7.0
+	 */
+	protected $pdf_cache;
+
+	/**
+	 * @since 6.0
+	 * @since 7.0 Added `$pdf_cache`
+	 */
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates, Model_Pdf_Cache $pdf_cache ) {
 		$this->options   = $options;
 		$this->data      = $data;
 		$this->log       = $log;
 		$this->misc      = $misc;
 		$this->status    = $status;
 		$this->templates = $templates;
+		$this->pdf_cache = $pdf_cache;
 	}
 
 	/**
@@ -180,6 +193,12 @@ class Model_System_Report extends Helper_Abstract_Model {
 							'id'           => 'security',
 							'title'        => esc_html__( 'Security Settings', 'gravity-pdf' ),
 							'title_export' => $title_export_prefix . 'Security Settings',
+						],
+
+						[
+							'id'           => 'cache',
+							'title'        => esc_html__( 'PDF Cache', 'gravity-pdf' ),
+							'title_export' => $title_export_prefix . 'PDF Cache',
 						],
 					]
 				),
@@ -378,9 +397,98 @@ class Model_System_Report extends Helper_Abstract_Model {
 			],
 		];
 
+		$items['cache'] = $this->get_cache_items();
+
 		$items = $this->apply_deprecated_report_items_filter( $items );
 
 		return apply_filters( 'gfpdf_system_status_report_sections', $items );
+	}
+
+	/**
+	 * The PDF Cache rows. They read the sweep's saved state, so the report never walks the cache.
+	 *
+	 * @since 7.0
+	 */
+	protected function get_cache_items(): array {
+		$view    = $this->getController()->view;
+		$enabled = Cache::is_enabled_by_setting();
+		$ttl     = Cache::get_ttl();
+		$state   = $this->pdf_cache->get_sweep_state();
+
+		$items = [
+			'pdf_cache'      => [
+				'label'        => esc_html__( 'PDF Cache', 'gravity-pdf' ),
+				'label_export' => 'PDF Cache',
+				'value'        => $enabled ? $view->get_icon( true ) : esc_html__( 'Off', 'gravity-pdf' ),
+				'value_export' => $enabled ? 'Yes' : 'No',
+			],
+
+			'cache_duration' => [
+				'label'        => esc_html__( 'Cache Duration', 'gravity-pdf' ),
+				'label_export' => 'Cache Duration',
+				'value'        => esc_html( human_time_diff( 0, $ttl ) ),
+				'value_export' => round( $ttl / HOUR_IN_SECONDS, 2 ) . ' hour(s)',
+			],
+
+			'cache_cleanup'  => [
+				'label'        => esc_html__( 'Last Cache Cleanup', 'gravity-pdf' ),
+				'label_export' => 'Last Cache Cleanup',
+				'value'        => esc_html__( 'Never', 'gravity-pdf' ),
+				'value_export' => 'Never',
+			],
+		];
+
+		$pass = $state['last_pass'];
+		if ( $state['last_complete_at'] > 0 && $pass !== [] ) {
+
+			$items['cache_cleanup']['value'] = esc_html(
+				sprintf(
+					/* translators: 1: How long ago, e.g. "2 hours", 2: Number of files, 3: Their size, e.g. "4 MB", 4: Number of files, 5: Their size */
+					__( '%1$s ago. Removed %2$d file(s) (%3$s) and kept %4$d (%5$s).', 'gravity-pdf' ),
+					human_time_diff( $state['last_complete_at'] ),
+					$pass['files_reaped'],
+					size_format( $pass['bytes_reaped'] ),
+					$pass['files_left'],
+					size_format( $pass['bytes_left'] )
+				)
+			);
+
+			$items['cache_cleanup']['value_export'] = sprintf(
+				'%1$s. Removed %2$d file(s) (%3$d bytes) and kept %4$d (%5$d bytes).',
+				gmdate( 'Y-m-d H:i:s', $state['last_complete_at'] ) . ' UTC',
+				$pass['files_reaped'],
+				$pass['bytes_reaped'],
+				$pass['files_left'],
+				$pass['bytes_left']
+			);
+		}
+
+		if ( $this->is_cache_cleanup_stalled() ) {
+			$message = __( 'WP-Cron does not appear to be running, so expired PDFs are not being removed from the cache.', 'gravity-pdf' );
+
+			$items['cache_cleanup']['is_valid']                  = false;
+			$items['cache_cleanup']['validation_message']        = esc_html( $message );
+			$items['cache_cleanup']['validation_message_export'] = $message;
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Whether the cache holds PDFs but WP-Cron isn't removing the expired ones
+	 *
+	 * The last *complete* cleanup isn't checked, because a quiet site can go days without needing one
+	 *
+	 * @since 7.0
+	 */
+	public function is_cache_cleanup_stalled(): bool {
+		$last_slice_at = $this->pdf_cache->get_sweep_state()['last_slice_at'];
+
+		/* A missed sweep, or an hourly cleanup more than an hour late */
+		$next    = wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' );
+		$overdue = ( $last_slice_at > 0 && $last_slice_at < time() - DAY_IN_SECONDS ) || ( $next !== false && $next < time() - HOUR_IN_SECONDS );
+
+		return $overdue && $this->pdf_cache->has_cached_pdfs();
 	}
 
 	/**

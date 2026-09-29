@@ -170,6 +170,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 * Add AJAX Action Endpoints
 		 */
 		add_action( 'wp_ajax_gfpdf_deactivate_license', [ $this->model, 'process_license_deactivation' ] );
+		add_action( 'wp_ajax_gfpdf_clear_pdf_cache', [ $this->model, 'process_clear_pdf_cache' ] );
 
 		/* Schedule License Check for all add-ons */
 		add_action(
@@ -221,6 +222,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* Register add-ons for licensing page */
 		add_filter( 'gfpdf_settings_licenses', [ $this->model, 'register_addons_for_licensing' ] );
 		add_filter( 'gfpdf_settings_license_sanitize', [ $this->model, 'maybe_active_licenses' ] );
+		add_filter( 'gfpdf_settings_general_sanitize', [ $this->model, 'save_pdf_cache_off' ] );
 		add_filter( 'gpdf_sl_plugin_updater_api_params', [ $this->model, 'licensing_bulk_get_version_api_params' ] );
 		add_filter( 'gpdf_sl_plugin_updater_api_response', [ $this->model, 'licensing_bulk_get_version_api_response' ], 10, 3 );
 	}

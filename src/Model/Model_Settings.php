@@ -117,6 +117,13 @@ class Model_Settings extends Helper_Abstract_Model {
 	protected $templates;
 
 	/**
+	 * @var Model_Pdf_Cache
+	 *
+	 * @since 7.0
+	 */
+	protected $pdf_cache;
+
+	/**
 	 * Set up our dependencies
 	 *
 	 * @param Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
@@ -126,10 +133,12 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @param Helper_Data             $data    Our plugin data store
 	 * @param Helper_Misc             $misc    Our miscellaneous class
 	 * @param Helper_Templates        $templates
+	 * @param Model_Pdf_Cache         $pdf_cache
 	 *
 	 * @since 4.0
+	 * @since 7.0 Added `$pdf_cache`
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, Model_Pdf_Cache $pdf_cache ) {
 
 		/* Assign our internal variables */
 		$this->gform     = $gform;
@@ -139,6 +148,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$this->data      = $data;
 		$this->misc      = $misc;
 		$this->templates = $templates;
+		$this->pdf_cache = $pdf_cache;
 	}
 
 	/**
@@ -448,6 +458,40 @@ class Model_Settings extends Helper_Abstract_Model {
 				'extra'   => $extra,
 			]
 		);
+
+		wp_die();
+	}
+
+	/**
+	 * Save an unchecked PDF Cache toggle as "No". It posts nothing, and an empty setting reads as its default, "Yes".
+	 *
+	 * @param array $input The $_POST data provided by the Settings API
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	public function save_pdf_cache_off( $input ) {
+		$input['pdf_cache'] = $input['pdf_cache'] ?? 'No';
+
+		return $input;
+	}
+
+	/**
+	 * An AJAX endpoint that stops the cached PDFs being served, and deletes them in the background
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public function process_clear_pdf_cache() {
+		$this->misc->handle_ajax_authentication( 'Clear PDF Cache', 'gravityforms_edit_settings' );
+
+		$this->pdf_cache->purge_all();
+
+		$this->log->notice( 'AJAX – Cleared the PDF cache' );
+
+		echo wp_json_encode( [ 'success' => esc_html__( 'PDF cache cleared.', 'gravity-pdf' ) ] );
 
 		wp_die();
 	}

@@ -200,11 +200,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Load modules */
 		$this->installer();
 		$this->upgrade_routine();
+		$this->pdf_cache(); /* Before the settings and System Report models, which are given its model */
 		$this->gf_settings();
 		$this->gf_form_settings();
 		$this->rest_api();
 		$this->pdf();
-		$this->pdf_cache();
 		$this->shortcodes();
 		$this->mergetags();
 		$this->actions();
@@ -627,7 +627,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->options,
 			$this->data,
 			$this->misc,
-			$this->templates
+			$this->templates,
+			$this->singleton->get_class( 'Model_Pdf_Cache' )
 		);
 
 		$view = new View\View_Settings(
@@ -916,7 +917,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
-		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates );
+		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates, $this->singleton->get_class( 'Model_Pdf_Cache' ) );
 		$class = new Controller\Controller_System_Report( $model, $view, $this->gform );
 		$class->init();
 

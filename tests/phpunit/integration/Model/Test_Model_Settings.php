@@ -47,7 +47,7 @@ class Test_Model_Settings extends TestCase {
 
 		parent::set_up();
 
-		$this->model = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		$this->model = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->singleton->get_class( 'Model_Pdf_Cache' ) );
 
 		$this->addon = new ModelSettingsAddon(
 			'my-custom-plugin',
