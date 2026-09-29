@@ -98,6 +98,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	private $settings = [];
 
 	/**
+	 * Holds a failed save's submitted values for the settings form to redisplay
+	 *
+	 * @var array|null
+	 *
+	 * @since 6.17.3
+	 */
+	private $submitted_settings;
+
+	/**
 	 * Holds the Gravity Form PDF Settings
 	 *
 	 * @var array
@@ -172,14 +181,18 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	}
 
 	/**
-	 * Load the plugin's settings, or a failed save's submitted values on a PDF settings page
+	 * Load the plugin's settings, plus a failed save's submitted values on a PDF settings page
 	 *
 	 * @return  void
 	 * @since 4.0
+	 * @since 6.17.3 A failed save's submitted values go to the settings form, not get_option()
 	 *
 	 */
 	public function set_plugin_settings() {
-		$this->settings = $this->pull_submitted_settings() ?? $this->get_settings();
+		$this->settings = $this->get_settings();
+
+		/* Kept out of $settings so a later write in the request neither drops nor saves them */
+		$this->submitted_settings = $this->pull_submitted_settings() ?? $this->submitted_settings;
 	}
 
 	/**
@@ -1389,8 +1402,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $args['value'];
 		}
 
-		/* Get our global Gravity PDF Settings */
-		$options = $this->settings;
+		/* Get our global Gravity PDF Settings, or what a failed save submitted */
+		$options = $this->submitted_settings ?? $this->settings;
 
 		/* Get our PDF GF settings (if any) */
 		$pdf_form_settings = $this->get_form_settings();
