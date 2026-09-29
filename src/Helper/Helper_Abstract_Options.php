@@ -172,15 +172,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	}
 
 	/**
-	 * Get the plugin's settings from the database
+	 * Load the plugin's settings, or a failed save's submitted values on a PDF settings page
 	 *
 	 * @return  void
 	 * @since 4.0
 	 *
 	 */
 	public function set_plugin_settings() {
-		/* assign our settings */
-		$this->settings = $this->get_settings();
+		$this->settings = $this->pull_submitted_settings() ?? $this->get_settings();
 	}
 
 	/**
@@ -297,37 +296,40 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return array GFPDF settings
 	 * @since 4.0
+	 * @since 6.17.3 No longer returns a failed save's submitted values on a PDF settings page
 	 *
 	 */
 	public function get_settings() {
-
-		$is_temp = false;
-
-		if ( $this->misc->is_gfpdf_page() ) {
-
-			/*
-			 * We are storing temporary settings in a transient when validation fails.
-			 * This allows us to keep track of the updated fields without updating main settings in the DB
-			 *
-			 * We'll check if the transient exists and use it, otherwise get the main plugin settings from the options table
-			 */
-			$tmp_settings = get_transient( 'gfpdf_settings_user_data' );
-			$is_temp      = $tmp_settings !== false;
-
-			if ( $is_temp ) {
-				delete_transient( 'gfpdf_settings_user_data' );
-			}
-		}
-
-		$settings = $is_temp ? (array) $tmp_settings : get_option( 'gfpdf_settings', [] );
-
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_settings/ for more details about this filter */
-		$settings = apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
+		$settings = apply_filters( 'gfpdf_get_settings', get_option( 'gfpdf_settings', [] ), false );
 
 		/* Ensure $settings is an array and has not been corrupted somehow */
-		$settings = is_array( $settings ) ? $settings : [];
+		return is_array( $settings ) ? $settings : [];
+	}
 
-		return $settings;
+	/**
+	 * Take a failed save's submitted values, which a transient holds so the settings form can redisplay them
+	 *
+	 * @return array|null The submitted values, or null when none are waiting on a PDF settings page
+	 *
+	 * @since 6.17.3
+	 */
+	private function pull_submitted_settings(): ?array {
+		if ( ! $this->misc->is_gfpdf_page() ) {
+			return null;
+		}
+
+		$submitted = get_transient( 'gfpdf_settings_user_data' );
+		if ( $submitted === false ) {
+			return null;
+		}
+
+		delete_transient( 'gfpdf_settings_user_data' );
+
+		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_settings/ for more details about this filter */
+		$submitted = apply_filters( 'gfpdf_get_settings', (array) $submitted, true );
+
+		return is_array( $submitted ) ? $submitted : [];
 	}
 
 	/**
@@ -1089,9 +1091,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param array $input The value inputted in the field
 	 *
-	 * @return array $input Sanitized value
+	 * @return array|false Sanitized settings, or the saved settings when validation fails
 	 *
 	 * @since 4.0
+	 * @since 6.17.3 Returns the saved settings when validation fails, rather than an empty array
 	 *
 	 */
 	public function settings_sanitize( $input = [] ) {
@@ -1149,7 +1152,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* Loop through each setting being saved and pass it through a sanitization filter */
-		foreach ( $input as $key => $value ) {
+		foreach ( array_keys( $input ) as $key ) {
 
 			/* Check if the input is apart of our whitelist, otherwise remove */
 			if ( ! isset( $settings[ $key ] ) ) {
@@ -1173,23 +1176,25 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				 *
 				 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
 				 */
-				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[ $key ] );
+				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $key ] );
 			}
 		}
 
-		$settings_errors = get_settings_errors();
+		/* Only our own errors fail the save, not ones other plugins add during the request */
+		$settings_errors = get_settings_errors( 'gfpdf-notices' );
 		if ( count( $settings_errors ) === 0 ) {
 			/* Merge our new settings with the existing */
 			$output = array_merge( $gfpdf_options, $input );
 			add_settings_error( 'gfpdf-notices', '', esc_html__( 'Settings updated.', 'gravity-pdf' ), 'updated' );
-		} elseif ( count( $settings_errors ) === 1 && $settings_errors[0]['setting'] === 'gfpdf-notices' && $settings_errors[0]['type'] === 'updated' ) {
+		} elseif ( count( $settings_errors ) === 1 && $settings_errors[0]['type'] === 'updated' ) {
 			/* Merge our new settings with the existing, but without the update message (prevents saving issue) */
 			$output = array_merge( $gfpdf_options, $input );
 		} else {
 			/* error is thrown. store the user data in a transient so fields are remembered */
 			set_transient( 'gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30 );
 
-			return [];
+			/* Hand back what's already saved so update_option() leaves the database alone */
+			return get_option( 'gfpdf_settings' );
 		}
 
 		return $output;
@@ -1222,6 +1227,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 6.17.3 A blank or non-numeric value saves the field's default (or 0), then the min/max apply
 	 */
 	public function sanitize_number_field( $value, $key = '', $input = [], $settings = [] ) {
+		if ( $value === '' && isset( $settings['std'] ) ) {
+			return $settings['std'];
+		}
+
 		if ( ! is_numeric( $value ) ) {
 			$value = is_numeric( $settings['std'] ?? null ) ? $settings['std'] : 0;
 		}
@@ -1270,9 +1279,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return string|array $input Sanitized value
 	 * @since 4.0
+	 * @since 6.17.3 A field's top-level `sanitize_callback( $value )` replaces the type-based sanitizing
 	 *
 	 */
 	public function sanitize_all_fields( $value, $key, $input, $settings ) {
+
+		if ( isset( $settings['sanitize_callback'] ) ) {
+			return call_user_func( $settings['sanitize_callback'], $value );
+		}
 
 		if ( ! isset( $settings['type'] ) ) {
 			$settings['type'] = '';

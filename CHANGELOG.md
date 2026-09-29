@@ -3,9 +3,17 @@
 ## Gravity PDF
 
 ### 6.17.3
-* 🧹 Housekeeping: Set a 1 minute minimum for the Logged Out Timeout, and remove the "0 to disable" option, which never worked
-* 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
+* 🧹 Housekeeping: Set a 1 minute minimum for the Logged Out Timeout
+* 🧹 Housekeeping: Create the background processing queue once per request
 * 🐞 Bug: Save a number setting's default value when the field is left blank or isn't a number
+* 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
+* 🐞 Bug: Stop a failed global settings save from erasing all saved settings
+* 🐞 Bug: Keep the entered values on the global settings page after a failed save when a Gravity PDF extension is active
+* 🐞 Bug: Stop another plugin's settings errors from blocking the global settings save
+* 🐞 Bug: Save a number setting's default value when the field is left blank
+* 🐞 Bug: Hide the Tools tab from users who can view but not edit the PDF settings
+* 🐞 Bug: Keep the value returned by the `gfpdf_settings_sanitize` filter when saving the global settings
+* 💻 Developer: Global settings fields can set a `sanitize_callback` to replace the default sanitizing
 
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+

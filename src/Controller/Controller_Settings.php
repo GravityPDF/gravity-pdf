@@ -216,7 +216,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* change capability needed to edit settings page */
 		add_filter( 'option_page_capability_gfpdf_settings', [ $this, 'edit_options_cap' ] );
-		add_filter( 'gravitypdf_settings_navigation', [ $this, 'disable_tools_on_view_cap' ] );
+		add_filter( 'gfpdf_settings_navigation', [ $this, 'disable_tools_on_view_cap' ] );
 
 		/* Register add-ons for licensing page */
 		add_filter( 'gfpdf_settings_licenses', [ $this->model, 'register_addons_for_licensing' ] );

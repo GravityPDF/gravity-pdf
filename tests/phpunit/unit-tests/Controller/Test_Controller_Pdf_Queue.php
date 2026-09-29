@@ -44,6 +44,14 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	public $queue_mock;
 
 	/**
+	 * The tasks the mocked queue last saved
+	 *
+	 * @var array
+	 * @since 6.17.3
+	 */
+	public $saved_tasks = [];
+
+	/**
 	 * The WP Unit Test Set up function
 	 *
 	 * @since 5.0
@@ -64,7 +72,13 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 								 ->getMock();
 
 		$this->queue_mock->method( 'save' )
-						 ->willReturn( $this->queue_mock );
+						 ->willReturnCallback(
+							 function () {
+								 $this->saved_tasks = $this->queue_mock->get_data();
+
+								 return $this->queue_mock;
+							 }
+						 );
 
 		$this->controller = new Controller_Pdf_Queue( $this->queue_mock, $model_pdf, $gfpdf->log, $gfpdf->gform );
 	}
@@ -271,6 +285,16 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_dispatch_queue_empties_the_queue() {
+		$this->queue_mock->push_to_queue( [ 'task' ] );
+		$this->controller->dispatch_queue();
+
+		$this->assertSame( [], $this->queue_mock->get_data() );
+	}
+
+	/**
 	 * Test the form submission queue works as expected
 	 *
 	 * @since 5.0
@@ -317,7 +341,7 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 
 		$this->controller->queue_dispatch_resend_notification_tasks();
 
-		$queue = $this->queue_mock->get_data();
+		$queue = $this->saved_tasks;
 
 		$this->assertCount( 28, $queue );
 

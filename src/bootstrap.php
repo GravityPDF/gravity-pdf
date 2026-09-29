@@ -222,6 +222,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Setup our Singleton object */
 		$this->singleton = new Helper_Singleton();
 
+		/* One queue per request: each instance registers its own AJAX, cron and uninstall hooks */
+		$this->singleton->add_class( new Helper\Helper_Pdf_Queue( $this->log ) );
+
 		/* Load modules */
 		$this->installer();
 		$this->upgrade_routine();
@@ -603,7 +606,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$uninstaller->init();
 		$this->singleton->add_class( $uninstaller );
 
-		$model = new Model\Model_Install( $this->log, $this->data, $this->misc, $this->notices, new Helper\Helper_Pdf_Queue( $this->log ), $uninstaller->model );
+		$model = new Model\Model_Install( $this->log, $this->data, $this->misc, $this->notices, $this->singleton->get_class( 'Helper_Pdf_Queue' ), $uninstaller->model );
 		$class = new Controller\Controller_Install( $model, $this->gform, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 
@@ -936,7 +939,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	public function async_pdfs() {
-		$queue     = new Helper\Helper_Pdf_Queue( $this->log );
+		$queue     = $this->singleton->get_class( 'Helper_Pdf_Queue' );
 		$model_pdf = $this->singleton->get_class( 'Model_PDF' );
 		$class     = new Controller\Controller_Pdf_Queue( $queue, $model_pdf, $this->log, $this->gform );
 
@@ -944,7 +947,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$class->init();
 		}
 
-		$this->singleton->add_class( $queue );
 		$this->singleton->add_class( $class );
 
 		/**
