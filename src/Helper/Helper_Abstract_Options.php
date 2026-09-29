@@ -1221,10 +1221,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param array $input All user fields
 	 * @param array $settings The field settings
 	 *
-	 * @return string $input Sanitized value
+	 * @return int|float Sanitized value
 	 * @since 4.0
 	 * @since 6.11 Force minimum and maximum values
-	 * @since 6.17.3 A blank value saves the field's default
+	 * @since 6.17.3 A blank or non-numeric value saves the field's default (or 0), then the min/max apply
 	 */
 	public function sanitize_number_field( $value, $key = '', $input = [], $settings = [] ) {
 		if ( $value === '' && isset( $settings['std'] ) ) {
@@ -1232,7 +1232,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		if ( ! is_numeric( $value ) ) {
-			return 0;
+			$value = is_numeric( $settings['std'] ?? null ) ? $settings['std'] : 0;
 		}
 
 		/* force PHP to convert string to int or float, depending on input */
