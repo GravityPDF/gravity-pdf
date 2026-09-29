@@ -1149,7 +1149,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* Loop through each setting being saved and pass it through a sanitization filter */
-		foreach ( $input as $key => $value ) {
+		foreach ( array_keys( $input ) as $key ) {
 
 			/* Check if the input is apart of our whitelist, otherwise remove */
 			if ( ! isset( $settings[ $key ] ) ) {
@@ -1173,7 +1173,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				 *
 				 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_sanitize/ for more details about this filter
 				 */
-				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[ $key ] );
+				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $key ] );
 			}
 		}
 
@@ -1269,9 +1269,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return string|array $input Sanitized value
 	 * @since 4.0
+	 * @since 6.17.3 A field's top-level `sanitize_callback( $value )` replaces the type-based sanitizing
 	 *
 	 */
 	public function sanitize_all_fields( $value, $key, $input, $settings ) {
+
+		if ( isset( $settings['sanitize_callback'] ) ) {
+			return call_user_func( $settings['sanitize_callback'], $value );
+		}
 
 		if ( ! isset( $settings['type'] ) ) {
 			$settings['type'] = '';
