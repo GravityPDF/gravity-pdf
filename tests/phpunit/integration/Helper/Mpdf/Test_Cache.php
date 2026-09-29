@@ -17,18 +17,29 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Cache extends TestCase {
 
+	/** @var string Unique per test, so a leftover another user owns in the sticky /tmp can't fail a later run */
+	private $basepath;
+
+	public function set_up(): void {
+		parent::set_up();
+		$this->basepath = trailingslashit( sys_get_temp_dir() ) . uniqid( 'gfpdf-mpdf-cache-' ) . '/';
+	}
+
+	public function tear_down(): void {
+		@rmdir( $this->basepath . 'tmp' );
+		@rmdir( $this->basepath . 'mpdf' );
+		@rmdir( $this->basepath );
+		parent::tear_down();
+	}
+
 	/**
 	 * Verify the cache directory inherits the parent directory permissions
 	 *
 	 * @dataProvider provider_createDirectory
 	 */
 	public function test_createDirectory( $permission ) {
-		$basepath     = sys_get_temp_dir() . '/mpdf-cache/';
+		$basepath     = $this->basepath;
 		$tmp_basepath = $basepath . 'tmp/';
-
-		/* ensure we have a clean slate */
-		@rmdir( $tmp_basepath );
-		@rmdir( $basepath );
 
 		/* Create the base directory with the correct permissions */
 		mkdir( $basepath );
@@ -57,9 +68,8 @@ class Test_Cache extends TestCase {
 	 * @since 6.17.1
 	 */
 	public function test_createDirectory_accepts_a_directory_created_concurrently() {
-		$basepath = sys_get_temp_dir() . '/mpdf-cache-race';
+		$basepath = untrailingslashit( $this->basepath );
 
-		@rmdir( $basepath . '/mpdf' );
 		wp_mkdir_p( $basepath );
 
 		stream_wrapper_register( Concurrent_Mkdir_Stream::SCHEME, Concurrent_Mkdir_Stream::class );
@@ -72,9 +82,6 @@ class Test_Cache extends TestCase {
 
 		$this->assertInstanceOf( Cache::class, $cache );
 		$this->assertDirectoryExists( $basepath . '/mpdf' );
-
-		@rmdir( $basepath . '/mpdf' );
-		@rmdir( $basepath );
 	}
 }
 

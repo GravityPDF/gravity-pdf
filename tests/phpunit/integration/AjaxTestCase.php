@@ -30,6 +30,11 @@ abstract class AjaxTestCase extends WP_Ajax_UnitTestCase {
 		delete_transient( 'gfpdf_settings_user_data' );
 	}
 
+	public function tear_down(): void {
+		$this->remove_pdf_cache();
+		parent::tear_down();
+	}
+
 	public static function tear_down_after_class(): void {
 		static::cleanup_class_fixtures();
 		parent::tear_down_after_class();
