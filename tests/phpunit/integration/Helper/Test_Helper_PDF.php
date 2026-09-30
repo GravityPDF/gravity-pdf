@@ -192,6 +192,72 @@ class Test_Helper_PDF extends TestCase {
 		}
 	}
 
+	public function test_save_pdf_leaves_no_temporary_file(): void {
+		$this->use_scratch_path( 'atomic' );
+
+		$path = $this->pdf->save_pdf( '%PDF-1.4 body' );
+
+		try {
+			$this->assertSame( '%PDF-1.4 body', file_get_contents( $path ) );
+			$this->assertSame( [], glob( $this->pdf->get_path() . '*.tmp' ) );
+		} finally {
+			$this->gfpdf()->misc->rmdir( $this->pdf->get_path() );
+		}
+	}
+
+	public function test_save_pdf_rejects_empty_output(): void {
+		$this->use_scratch_path( 'empty' );
+
+		try {
+			$this->pdf->save_pdf( '' );
+			$this->fail( 'An empty PDF should not be saved' );
+		} catch ( Exception $e ) {
+			$this->assertFileDoesNotExist( $this->pdf->get_full_pdf_path() );
+		}
+	}
+
+	public function test_save_pdf_removes_the_temporary_file_when_the_rename_fails(): void {
+		$this->use_scratch_path( 'blocked' );
+
+		/* A non-empty directory where the PDF should go makes the rename fail */
+		wp_mkdir_p( $this->pdf->get_full_pdf_path() . '/child' );
+
+		try {
+			$this->pdf->save_pdf( '%PDF-1.4 body' );
+			$this->fail( 'A failed rename should throw' );
+		} catch ( Exception $e ) {
+			$this->assertStringContainsString( 'Could not save PDF', $e->getMessage() );
+			$this->assertSame( [], glob( $this->pdf->get_path() . '*.tmp' ) );
+		} finally {
+			$this->gfpdf()->misc->rmdir( $this->pdf->get_path() );
+		}
+	}
+
+	public function test_is_cache_path(): void {
+		$this->assertTrue( $this->pdf->is_cache_path() );
+		$this->assertStringContainsString( '/cache/', $this->pdf->get_path() );
+
+		$this->pdf->set_path( get_temp_dir() );
+		$this->assertFalse( $this->pdf->is_cache_path() );
+
+		$this->pdf->set_path();
+		$this->assertTrue( $this->pdf->is_cache_path() );
+	}
+
+	public function test_set_path_uses_a_one_off_path_when_the_cache_key_cannot_be_built(): void {
+		global $gfpdf;
+
+		$settings              = $this->pdf->get_settings();
+		$settings['font_size'] = INF;
+
+		$pdf1 = new Helper_PDF( $this->pdf->get_entry(), $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf2 = new Helper_PDF( $this->pdf->get_entry(), $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+
+		$this->assertFalse( $pdf1->is_cache_path() );
+		$this->assertStringContainsString( '/uncached/', $pdf1->get_path() );
+		$this->assertNotSame( $pdf1->get_path(), $pdf2->get_path() );
+	}
+
 	public function test_set_creator_overrides_default_value(): void {
 		$this->pdf->set_output_type( 'SAVE' );
 		$this->pdf->init();
@@ -199,6 +265,11 @@ class Test_Helper_PDF extends TestCase {
 		$this->pdf->set_creator( 'Custom Creator' );
 
 		$this->assertSame( 'Custom Creator', $this->mpdf_property()->creator );
+	}
+
+	private function use_scratch_path( string $filename ): void {
+		$this->pdf->set_path( $this->gfpdf()->data->template_tmp_location . 'test-save-' . uniqid() );
+		$this->pdf->set_filename( $filename );
 	}
 
 	private function mpdf_property() {

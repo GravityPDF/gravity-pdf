@@ -1183,14 +1183,25 @@ class Test_PDF extends TestCase {
 			$gfpdf->templates,
 			$gfpdf->log
 		);
-		$pdf->set_path( '/tmp/' );
 		$pdf->set_filename( 'unittest' );
 
-		/* Check that PDF exists */
-		touch( '/tmp/unittest.pdf' );
+		/* A cached PDF must pass Cache::is_hit() */
+		$file = $pdf->get_full_pdf_path();
+		wp_mkdir_p( $pdf->get_path() );
+
+		try {
+			touch( $file );
+			$this->assertFalse( $this->model->does_pdf_exist( $pdf ), 'an empty cached PDF is a miss' );
+		} finally {
+			$gfpdf->misc->rmdir( $pdf->get_path() );
+		}
+
+		/* An explicit path only needs the file to exist */
+		$pdf->set_path( '/tmp/' );
+
+		touch( '/tmp/unittest.pdf', time() - Cache::get_ttl() - 1 );
 		$this->assertTrue( $this->model->does_pdf_exist( $pdf ) );
 
-		/* Check that PDF does not exist */
 		unlink( '/tmp/unittest.pdf' );
 		$this->assertFalse( $this->model->does_pdf_exist( $pdf ) );
 	}
@@ -2080,6 +2091,43 @@ class Test_PDF extends TestCase {
 		}
 
 		$this->assertArrayNotHasKey( 'pdf_id', end( $records )['context'] );
+	}
+
+	/**
+	 * @group slow
+	 */
+	public function test_process_and_save_pdf_records_the_cache_status() {
+		global $gfpdf;
+
+		$results              = $this->form_and_entry();
+		$settings             = $results['form']['gfpdf_form_settings']['555ad84787d7e'];
+		$settings['template'] = 'zadani';
+
+		$pdf_generator = new Helper_PDF( $results['entry'], $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf_generator->set_filename( 'Cache Status' );
+		@unlink( $pdf_generator->get_full_pdf_path() );
+
+		$path = $pdf_generator->get_full_pdf_path();
+
+		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
+		$this->assertSame( 'miss', $this->model->get_cache_status( $path ) );
+
+		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
+		$this->assertSame( 'hit', $this->model->get_cache_status( $path ) );
+
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		try {
+			$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
+			$this->assertSame( 'bypass', $this->model->get_cache_status( $path ) );
+		} finally {
+			remove_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		}
+
+		$settings['template'] = 'doesntexist';
+		$failing_generator    = new Helper_PDF( $results['entry'], $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+
+		$this->assertFalse( $this->model->process_and_save_pdf( $failing_generator ) );
+		$this->assertNull( $this->model->get_cache_status( $failing_generator->get_full_pdf_path() ) );
 	}
 
 	/**

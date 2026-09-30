@@ -122,6 +122,15 @@ class Helper_PDF {
 	protected $path;
 
 	/**
+	 * Whether the path was built from the PDF cache key rather than set explicitly
+	 *
+	 * @var bool
+	 *
+	 * @since 7.0
+	 */
+	protected $is_cache_path = false;
+
+	/**
 	 * Whether to force the print dialog when the PDF is opened
 	 *
 	 * @var boolean
@@ -332,24 +341,44 @@ class Helper_PDF {
 	 * @throws Exception
 	 *
 	 * @since  4.0
+	 * @since  7.0 The PDF is written to a temporary file and renamed into place
 	 */
 	public function save_pdf( $raw_pdf_string ) {
+		$file = $this->path . $this->filename;
 
-		/* create our path */
+		if ( ! is_string( $raw_pdf_string ) || $raw_pdf_string === '' ) {
+			throw new Exception( sprintf( 'Could not save PDF, the generated document is empty: %s', esc_html( $file ) ) );
+		}
+
+		/* create our path, which another request may create first */
 		if ( ! is_dir( $this->path ) ) {
-			if ( ! wp_mkdir_p( $this->path ) ) {
+			if ( ! wp_mkdir_p( $this->path ) && ! is_dir( $this->path ) ) {
 				throw new Exception( sprintf( 'Could not create directory: %s', esc_html( $this->path ) ) );
 			}
 
 			file_put_contents( $this->path . 'index.html', '' );
 		}
 
-		/* save our PDF */
-		if ( ! file_put_contents( $this->path . $this->filename, $raw_pdf_string ) ) {
-			throw new Exception( sprintf( 'Could not save PDF: %s', esc_html( $this->path . $this->filename ) ) );
+		/* Written beside the PDF and renamed into place, so no reader ever sees a partial file */
+		$tmp_file = $file . '.' . bin2hex( random_bytes( 8 ) ) . '.tmp';
+
+		if ( file_put_contents( $tmp_file, $raw_pdf_string ) === false ) {
+			@unlink( $tmp_file ); //phpcs:ignore
+			throw new Exception( sprintf( 'Could not save PDF: %s', esc_html( $file ) ) );
 		}
 
-		return $this->path . $this->filename;
+		if ( ! @rename( $tmp_file, $file ) ) { //phpcs:ignore
+			@unlink( $tmp_file ); //phpcs:ignore
+
+			/* On Windows, renaming over a PDF another request is streaming fails. That request's copy will do */
+			clearstatcache( true, $file );
+
+			if ( ! $this->pdf_exists() ) {
+				throw new Exception( sprintf( 'Could not save PDF: %s', esc_html( $file ) ) );
+			}
+		}
+
+		return $file;
 	}
 
 	/**
@@ -581,19 +610,48 @@ class Helper_PDF {
 	/**
 	 * Sets the path the PDF should be saved to
 	 *
-	 * @param string $path
+	 * @param string $path Leave empty to use the PDF cache
 	 *
 	 * @return void
 	 *
 	 * @since 4.0
+	 * @since 7.0 An empty path uses the PDF cache, or a one-off path when the cache key can't be built
 	 */
 	public function set_path( $path = '' ) {
+		$this->is_cache_path = false;
 
 		if ( empty( $path ) ) {
-			$path = Cache::get_path( $this->form, $this->entry, $this->settings );
+			$path                = Cache::get_path( $this->form, $this->entry, $this->settings );
+			$this->is_cache_path = $path !== false;
+			$path                = $path ?: Cache::get_uncached_path();
 		}
 
 		$this->path = trailingslashit( $path );
+	}
+
+	/**
+	 * Whether the PDF path was built from the cache key, rather than being an explicit path passed to set_path()
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function is_cache_path() {
+		return $this->is_cache_path;
+	}
+
+	/**
+	 * Check the PDF on disk can be served. A cached PDF must be non-empty and within the cache TTL, while a PDF at an
+	 * explicit path only needs to exist.
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function pdf_exists() {
+		$file = $this->get_full_pdf_path();
+
+		return $this->is_cache_path ? Cache::is_hit( $file ) : is_file( $file );
 	}
 
 	/**
