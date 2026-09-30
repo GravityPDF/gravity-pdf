@@ -184,7 +184,7 @@ class Test_Installer extends TestCase {
 		$this->assertDirectoryExists( $gfpdf->data->template_tmp_location );
 		$this->assertDirectoryExists( $gfpdf->data->mpdf_tmp_location );
 
-		$this->assertFileExists( $gfpdf->data->template_tmp_location . '.htaccess' );
+		$this->assertStringEqualsFile( $gfpdf->data->template_tmp_location . '.htaccess', Model_Install::TMP_HTACCESS );
 		$this->assertFileExists( $gfpdf->data->template_tmp_location . 'index.html' );
 		$this->assertFileExists( $gfpdf->data->template_font_location . 'index.html' );
 		$this->assertFileExists( $gfpdf->data->template_location . 'index.html' );

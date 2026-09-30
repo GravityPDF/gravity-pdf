@@ -70,6 +70,7 @@ class Controller_Activation {
 
 		/* Remove our scheduled tasks */
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+		wp_clear_scheduled_hook( 'gfpdf_cache_sweep' );
 		wp_clear_scheduled_hook( 'gfpdf_network_update_check' );
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
 

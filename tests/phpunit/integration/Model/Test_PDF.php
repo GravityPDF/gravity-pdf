@@ -1362,7 +1362,10 @@ class Test_PDF extends TestCase {
 	public function test_cleanup_tmp_dir() {
 		global $gfpdf;
 
-		$tmp = $gfpdf->data->template_tmp_location;
+		$tmp  = $gfpdf->data->template_tmp_location;
+		$site = is_multisite() ? get_current_blog_id() . '/' : '';
+
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
 
 		wp_mkdir_p( $gfpdf->data->template_location );
 		wp_mkdir_p( $gfpdf->data->mpdf_tmp_location );
@@ -1387,13 +1390,23 @@ class Test_PDF extends TestCase {
 			'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' => time() - ( 2 * DAY_IN_SECONDS ),
 			'mpdf/mpdf/ttfontdata/dejavusans.cw.dat'   => time() - WEEK_IN_SECONDS - 60,
 			'1234556690c67856b/document.pdf'           => time() - ( 13 * 3600 ),
+			'a234556690c67856b/document.pdf'           => time() - ( 11 * 3600 ),
+
+			/* The PDF cache has its own sweep */
+			$site . 'cache/e1/pabc-123/document.pdf'   => time() - ( 25 * 3600 ),
+			$site . 'uncached/old/document.pdf'        => time() - 3601,
+			$site . 'uncached/new/document.pdf'        => time() - 1800,
 		];
 
-		$directories = [ 'mpdf/mpdf/ttfontdata', 'mpdf/mpdf', 'mpdf', '1234556690c67856b' ];
+		$directories = [ 'mpdf/mpdf/ttfontdata', 'mpdf/mpdf', 'mpdf', '1234556690c67856b', $site . 'cache/e1/pabc-123', $site . 'cache/e1', $site . 'cache', $site . 'uncached/old', $site . 'uncached', rtrim( $site, '/' ) ];
+		$directories = array_filter( $directories );
 
 		foreach ( $directories as $directory ) {
 			wp_mkdir_p( $tmp . $directory );
 		}
+
+		wp_mkdir_p( $tmp . 'a234556690c67856b' );
+		wp_mkdir_p( $tmp . $site . 'uncached/new' );
 
 		foreach ( $files as $file => $modified ) {
 			touch( $tmp . $file, (int) $modified );
@@ -1403,6 +1416,8 @@ class Test_PDF extends TestCase {
 		foreach ( $directories as $directory ) {
 			touch( $tmp . $directory, time() - ( 25 * 3600 ) );
 		}
+
+		touch( $tmp . $site . 'uncached/new', time() - 1800 );
 
 		/* Run our cleanup function and test the output */
 		$this->model->cleanup_tmp_dir();
@@ -1426,6 +1441,12 @@ class Test_PDF extends TestCase {
 		$this->assertFileExists( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' );
 		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.cw.dat' );
 		$this->assertFileDoesNotExist( $tmp . '1234556690c67856b/document.pdf' );
+		$this->assertFileExists( $tmp . 'a234556690c67856b/document.pdf' );
+
+		$this->assertFileExists( $tmp . $site . 'cache/e1/pabc-123/document.pdf' );
+		$this->assertFileDoesNotExist( $tmp . $site . 'uncached/old/document.pdf' );
+		$this->assertFileExists( $tmp . $site . 'uncached/new/document.pdf' );
+		$this->assertDirectoryExists( $tmp . $site . 'uncached' );
 
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
@@ -1435,6 +1456,64 @@ class Test_PDF extends TestCase {
 		foreach ( $directories as $directory ) {
 			@rmdir( $tmp . $directory );
 		}
+
+		@rmdir( $tmp . 'a234556690c67856b' );
+		@rmdir( $tmp . $site . 'uncached/new' );
+	}
+
+	public function test_cleanup_tmp_dir_uncached_max_age_is_filterable() {
+		global $gfpdf;
+
+		$dir = $gfpdf->data->template_tmp_location . ( is_multisite() ? get_current_blog_id() . '/' : '' ) . 'uncached/filtered/';
+		wp_mkdir_p( $dir );
+		touch( $dir . 'document.pdf', time() - 600 );
+
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
+		add_filter(
+			'gfpdf_uncached_pdf_max_age',
+			function () {
+				return 300;
+			}
+		);
+
+		$this->model->cleanup_tmp_dir();
+
+		$this->assertFileDoesNotExist( $dir . 'document.pdf' );
+		@rmdir( $dir );
+	}
+
+	public function test_cleanup_tmp_dir_walks_a_network_once_an_hour() {
+		global $gfpdf;
+
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Not running multisite tests' );
+		}
+
+		$file = $gfpdf->data->template_tmp_location . 'network-walk.txt';
+
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
+		$this->model->cleanup_tmp_dir();
+
+		touch( $file, time() - DAY_IN_SECONDS );
+
+		switch_to_blog( self::factory()->blog->create() );
+		try {
+			$this->model->cleanup_tmp_dir();
+		} finally {
+			restore_current_blog();
+
+			/* A subsite leaves these behind */
+			global $wp_settings_errors, $wp_rewrite;
+			$wp_settings_errors = [];
+			$wp_rewrite->init();
+		}
+
+		$this->assertFileExists( $file, 'Another site in the network walked the tree within the hour' );
+
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
+		$this->model->cleanup_tmp_dir();
+
+		$this->assertFileDoesNotExist( $file );
 	}
 
 	/**
