@@ -20,7 +20,10 @@ test.describe('PDF Cache Header', () => {
 		const entry = await pdf.createEntry({ form_id: form.id });
 
 		const url = `/?gpdf=1&pid=${pdfId}&lid=${entry.id}`;
-		const headers = { 'X-GPDF-E2E-Debug-Mode': 'yes' };
+		const headers = {
+			'X-GPDF-E2E-Debug-Mode': 'yes',
+			'X-GPDF-E2E-Cache-Generation': '1',
+		};
 
 		const miss = await page.request.get(url, { headers });
 		expect(miss.headers()['content-type']).toBe('application/pdf');

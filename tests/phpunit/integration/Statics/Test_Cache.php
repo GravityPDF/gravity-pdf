@@ -258,6 +258,299 @@ class Test_Cache extends TestCase {
 		$this->assertLessThan( 1, microtime( true ) - $started );
 	}
 
+	/**
+	 * @dataProvider provider_key_components
+	 */
+	public function test_each_key_component_moves_the_key( callable $change ) {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		list( $form, $entry, $pdf_settings ) = $this->key_inputs();
+
+		$baseline = Cache::get_hash( $form, $entry, $pdf_settings );
+		$this->assertSame( $baseline, Cache::get_hash( $form, $entry, $pdf_settings ), 'Identical inputs give an identical key' );
+
+		$restore = $change( $form, $entry, $pdf_settings );
+
+		try {
+			$this->assertNotSame( $baseline, Cache::get_hash( $form, $entry, $pdf_settings ) );
+		} finally {
+			if ( is_callable( $restore ) ) {
+				$restore();
+			}
+		}
+	}
+
+	public function provider_key_components(): array {
+		return [
+			'entry value'              => [
+				function ( &$form, &$entry ) {
+					$entry['1'] = 'Changed';
+				},
+			],
+			'PDF settings'             => [
+				function ( &$form, &$entry, &$pdf_settings ) {
+					$pdf_settings['font_size'] = 20;
+				},
+			],
+			'form title'               => [
+				function ( &$form ) {
+					$form['title'] .= ' changed';
+				},
+			],
+			'add-on settings on form'  => [
+				function ( &$form ) {
+					$form['gravityformsquiz'] = [ 'grades' => 'letter' ];
+				},
+			],
+			'field'                    => [
+				function ( &$form ) {
+					$form['fields'][0]        = clone $form['fields'][0];
+					$form['fields'][0]->label = 'Changed';
+				},
+			],
+			'Gravity Forms version'    => [
+				function () {
+					$version            = \GFForms::$version;
+					\GFForms::$version .= '.1';
+
+					return function () use ( $version ) {
+						\GFForms::$version = $version;
+					};
+				},
+			],
+			'generation'               => [
+				function () {
+					Cache::bump_generation();
+				},
+			],
+			'form generation'          => [
+				function ( &$form ) {
+					Cache::bump_form_generation( $form['id'] );
+				},
+			],
+			'date format'              => [
+				function () {
+					update_option( 'date_format', 'd/m/Y' );
+				},
+			],
+			'timezone'                 => [
+				function () {
+					update_option( 'timezone_string', 'Australia/Sydney' );
+				},
+			],
+			'site title'               => [
+				function () {
+					update_option( 'blogname', 'Changed' );
+				},
+			],
+			'Gravity Forms currency'   => [
+				function () {
+					update_option( 'rg_gforms_currency', 'EUR' );
+				},
+			],
+			'user'                     => [
+				function () {
+					wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+				},
+			],
+			'roles'                    => [
+				function () {
+					wp_get_current_user()->set_role( 'author' );
+				},
+			],
+			'locale'                   => [
+				function () {
+					add_filter(
+						'pre_determine_locale',
+						function () {
+							return 'fr_FR';
+						}
+					);
+				},
+			],
+			'extra'                    => [
+				function () {
+					add_filter(
+						'gfpdf_cache_hash_extra',
+						function ( $extra ) {
+							$extra['my_addon'] = '1.2.3';
+
+							return $extra;
+						}
+					);
+				},
+			],
+		];
+	}
+
+	public function test_extra_cannot_remove_the_viewer() {
+		list( $form, $entry, $pdf_settings ) = $this->key_inputs();
+
+		add_filter(
+			'gfpdf_cache_hash_extra',
+			function () {
+				return [
+					'user_id' => 0,
+					'roles'   => [],
+				];
+			}
+		);
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$admin_hash = Cache::get_hash( $form, $entry, $pdf_settings );
+
+		wp_set_current_user( 0 );
+		$this->assertNotSame( $admin_hash, Cache::get_hash( $form, $entry, $pdf_settings ) );
+	}
+
+	public function test_extra_is_order_independent() {
+		list( $form, $entry, $pdf_settings ) = $this->key_inputs();
+
+		$add = function ( $key ) {
+			return function ( $extra ) use ( $key ) {
+				$extra[ $key ] = $key;
+
+				return $extra;
+			};
+		};
+
+		add_filter( 'gfpdf_cache_hash_extra', $add( 'a' ) );
+		add_filter( 'gfpdf_cache_hash_extra', $add( 'b' ) );
+		$hash = Cache::get_hash( $form, $entry, $pdf_settings );
+
+		remove_all_filters( 'gfpdf_cache_hash_extra' );
+		add_filter( 'gfpdf_cache_hash_extra', $add( 'b' ) );
+		add_filter( 'gfpdf_cache_hash_extra', $add( 'a' ) );
+
+		$this->assertSame( $hash, Cache::get_hash( $form, $entry, $pdf_settings ) );
+	}
+
+	public function test_ignored_entry_meta_and_form_keys_do_not_move_the_key() {
+		list( $form, $entry, $pdf_settings ) = $this->key_inputs();
+
+		$baseline = Cache::get_hash( $form, $entry, $pdf_settings );
+
+		$entry['is_read']    = 1;
+		$entry['is_starred'] = 1;
+		$entry['status']     = 'trash';
+
+		$form['notifications']    = [ 'abc' => [ 'name' => 'Changed' ] ];
+		$form['confirmations']    = [ 'abc' => [ 'name' => 'Changed' ] ];
+		$form['date_created']     = '2001-01-01 00:00:00';
+		$form['is_active']        = '0';
+		$form['is_trash']         = '1';
+		$form['confirmation']     = [ 'type' => 'message' ];
+		$form['page_instance']    = 2;
+		$form['gfpdf_form_settings']['another-pdf'] = [ 'name' => 'Another PDF' ];
+
+		$this->assertSame( $baseline, Cache::get_hash( $form, $entry, $pdf_settings ) );
+
+		add_filter(
+			'gfpdf_cache_hash_ignored_form_keys',
+			function ( $keys ) {
+				$keys[] = 'title';
+
+				return $keys;
+			}
+		);
+
+		$baseline      = Cache::get_hash( $form, $entry, $pdf_settings );
+		$form['title'] = 'Changed';
+		$this->assertSame( $baseline, Cache::get_hash( $form, $entry, $pdf_settings ) );
+	}
+
+	public function test_bumping_a_form_generation_only_moves_that_form() {
+		list( $form, $entry, $pdf_settings ) = $this->key_inputs();
+
+		$other_form       = $form;
+		$other_form['id'] = $form['id'] + 1000;
+
+		$form_hash  = Cache::get_hash( $form, $entry, $pdf_settings );
+		$other_hash = Cache::get_hash( $other_form, $entry, $pdf_settings );
+
+		Cache::bump_form_generation( $form['id'] );
+
+		$this->assertNotSame( $form_hash, Cache::get_hash( $form, $entry, $pdf_settings ) );
+		$this->assertSame( $other_hash, Cache::get_hash( $other_form, $entry, $pdf_settings ) );
+	}
+
+	public function test_saving_settings_bumps_the_generation_unless_every_change_is_ignored() {
+		$generation = Cache::get_generation();
+
+		\GPDFAPI::update_plugin_option( 'license_gravity-pdf-core-booster_status', 'active' );
+		\GPDFAPI::update_plugin_option( 'action_dismissal', [ 'review' => 'review' ] );
+		\GPDFAPI::update_plugin_option( 'signed_secret_token', 'token' );
+		$this->assertSame( $generation, Cache::get_generation(), 'Only ignored settings changed' );
+
+		\GPDFAPI::update_plugin_option( 'default_font_size', '14' );
+		$this->assertSame( $generation + 1, Cache::get_generation() );
+
+		\GPDFAPI::delete_plugin_option( 'default_font_size' );
+		$this->assertSame( $generation + 2, Cache::get_generation(), 'Removing a setting counts as a change' );
+
+		add_filter(
+			'gfpdf_cache_generation_ignored_settings',
+			function ( $ignored ) {
+				$ignored[] = 'my_addon_*';
+
+				return $ignored;
+			}
+		);
+
+		\GPDFAPI::update_plugin_option( 'my_addon_setting', 'Yes' );
+		$this->assertSame( $generation + 2, Cache::get_generation() );
+	}
+
+	public function test_the_first_settings_save_bumps_the_generation() {
+		delete_option( 'gfpdf_settings' );
+		$generation = Cache::get_generation();
+
+		add_option( 'gfpdf_settings', [ 'signed_secret_token' => 'token' ] );
+		$this->assertSame( $generation, Cache::get_generation(), 'Only ignored settings were added' );
+
+		delete_option( 'gfpdf_settings' );
+		update_option( 'gfpdf_settings', [ 'default_font' => 'dejavusans' ] );
+		$this->assertSame( $generation + 1, Cache::get_generation() );
+	}
+
+	public function test_generation_options_are_not_autoloaded() {
+		Cache::bump_generation();
+		Cache::bump_form_generation( 1 );
+
+		$autoloaded = wp_load_alloptions();
+		$this->assertArrayNotHasKey( 'gfpdf_cache_generation', $autoloaded );
+		$this->assertArrayNotHasKey( 'gfpdf_cache_form_generation', $autoloaded );
+	}
+
+	public function test_ttl_is_filterable_and_at_least_one_second() {
+		add_filter(
+			'gfpdf_cache_ttl',
+			function () {
+				return 60;
+			}
+		);
+
+		$this->assertSame( 60, Cache::get_ttl() );
+
+		add_filter( 'gfpdf_cache_ttl', '__return_zero', 20 );
+		$this->assertSame( 1, Cache::get_ttl() );
+	}
+
+	public function test_is_enabled_is_filterable() {
+		list( $form, $entry, $pdf_settings ) = $this->key_inputs();
+
+		$this->assertTrue( Cache::is_enabled( $form, $entry, $pdf_settings ) );
+
+		add_filter( 'gfpdf_enable_pdf_cache', '__return_false' );
+		$this->assertFalse( Cache::is_enabled( $form, $entry, $pdf_settings ) );
+	}
+
+	private function key_inputs(): array {
+		$results = $this->form_and_entry();
+
+		return [ $results['form'], $results['entry'], $results['form']['gfpdf_form_settings']['555ad84787d7e'] ];
+	}
+
 	private function key_path(): string {
 		$this->use_lockable_tmp_location();
 

@@ -1232,7 +1232,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 4.0
-	 * @since 7.0 Records the cache outcome (see get_cache_status()), and concurrent misses for one PDF render it once
+	 * @since 7.0 Records the cache outcome (see get_cache_status()), concurrent misses for one PDF render it once, and
+	 *            "disabled" is recorded when the cache is off
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf_generator ) {
 
@@ -1250,9 +1251,13 @@ class Model_PDF extends Helper_Abstract_Model {
 			return true;
 		}
 
+		if ( $pdf_generator->is_cache_disabled() ) {
+			return $this->render_and_save_pdf( $pdf_generator, 'disabled' );
+		}
+
 		/* A bypass render doesn't wait: the atomic rename in save_pdf() already makes its write safe */
 		if ( $pdf_override || ! $pdf_generator->is_cache_path() ) {
-			return $this->render_and_save_pdf( $pdf_generator, $pdf_override );
+			return $this->render_and_save_pdf( $pdf_generator, $pdf_override ? 'bypass' : 'miss' );
 		}
 
 		$lock = Cache::lock( $pdf_generator->get_path() );
@@ -1266,7 +1271,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				return true;
 			}
 
-			return $this->render_and_save_pdf( $pdf_generator, false );
+			return $this->render_and_save_pdf( $pdf_generator, 'miss' );
 		} finally {
 			Cache::unlock( $lock );
 		}
@@ -1277,13 +1282,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * a one-off path instead, so the next request renders it again.
 	 *
 	 * @param Helper_PDF $pdf_generator
-	 * @param bool       $pdf_override Whether the cache was bypassed
+	 * @param string     $cache_status The status to record unless the render is degraded: "miss", "bypass" or "disabled"
 	 *
 	 * @return bool
 	 *
 	 * @since 7.0
 	 */
-	protected function render_and_save_pdf( Helper_PDF $pdf_generator, $pdf_override ) {
+	protected function render_and_save_pdf( Helper_PDF $pdf_generator, $cache_status ) {
 
 		/* Get required parameters */
 		$entry    = $pdf_generator->get_entry();
@@ -1320,8 +1325,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* Render the PDF template HTML */
 			$pdf_generator->render_html( $args );
 
-			$pdf          = $pdf_generator->generate();
-			$cache_status = $pdf_override ? 'bypass' : 'miss';
+			$pdf = $pdf_generator->generate();
 
 			/**
 			 * Whether the PDF is missing content that could render on another attempt, so it isn't cached
@@ -1380,7 +1384,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * How the cache served a PDF generated this request: "hit", "miss", "bypass" or "degraded"
+	 * How the cache served a PDF generated this request: "hit", "miss", "bypass", "degraded" or "disabled"
 	 *
 	 * @param string $path_to_pdf Absolute path to the PDF
 	 *

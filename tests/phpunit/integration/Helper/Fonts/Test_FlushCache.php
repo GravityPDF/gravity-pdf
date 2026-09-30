@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Fonts;
 
+use GFPDF\Statics\Cache;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -31,8 +32,11 @@ class Test_FlushCache extends TestCase {
 		touch( $file );
 		$this->assertFileExists( $file );
 
+		$generation = Cache::get_generation();
+
 		FlushCache::flush();
 
 		$this->assertFileDoesNotExist( $file );
+		$this->assertSame( $generation + 1, Cache::get_generation(), 'PDFs cached with the old fonts are no longer served' );
 	}
 }
