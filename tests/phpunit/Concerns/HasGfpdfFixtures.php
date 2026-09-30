@@ -180,6 +180,20 @@ trait HasGfpdfFixtures {
 		}
 	}
 
+	/** Deletes every site's cached and one-off (`uncached/`) PDFs, so no test sees what an earlier one rendered */
+	protected function remove_pdf_cache() {
+		$tmp   = $this->gfpdf()->data->template_tmp_location;
+		$roots = array_merge( [ $tmp ], glob( $tmp . '[0-9]*', GLOB_ONLYDIR | GLOB_MARK ) ?: [] );
+
+		foreach ( $roots as $root ) {
+			foreach ( [ 'cache', 'uncached' ] as $dir ) {
+				if ( is_dir( $root . $dir ) ) {
+					$this->gfpdf()->misc->rmdir( $root . $dir );
+				}
+			}
+		}
+	}
+
 	/**
 	 * Returns the Gravity PDF Router (DI container).
 	 *
