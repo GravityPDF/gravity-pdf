@@ -6,8 +6,8 @@ use GFAPI;
 use GFCommon;
 use GFForms;
 use GFFormsModel;
-use GFPDF\Statics\Acting_User;
 use WP_Error;
+use WP_User;
 
 /**
  * @package     Gravity PDF
@@ -203,23 +203,27 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * Check if the user has the capability passed
 	 *
 	 * @param string|array $capability
-	 * @param integer|null $user_id
+	 * @param integer|null $user_id    Check this user instead of the current one
 	 *
 	 * @return boolean            True if successful, false if failed
 	 *
 	 * @since 4.0
 	 */
 	public function has_capability( $capability, $user_id = null ) {
-		if ( $user_id === null ) {
+		if ( $user_id === null || (int) $user_id === get_current_user_id() ) {
 			return GFCommon::current_user_can_any( $capability );
 		}
 
-		return Acting_User::run(
-			$user_id,
-			function () use ( $capability ) {
-				return GFCommon::current_user_can_any( $capability );
+		/* GFCommon::current_user_can_any() for another user, without switching to them */
+		$user = new WP_User( (int) $user_id );
+
+		foreach ( array_merge( (array) $capability, [ 'gform_full_access' ] ) as $cap ) {
+			if ( user_can( $user, $cap ) ) {
+				return true;
 			}
-		);
+		}
+
+		return false;
 	}
 
 	/**
