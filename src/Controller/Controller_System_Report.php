@@ -101,7 +101,22 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 			'test'  => [ $this, 'deprecated_features_test' ],
 		];
 
+		$tests['direct']['gravity_pdf_cache_cleanup'] = [
+			'label' => esc_html__( 'Gravity PDF cache cleanup', 'gravity-pdf' ),
+			'test'  => [ $this, 'cache_cleanup_test' ],
+		];
+
 		return $tests;
+	}
+
+	/**
+	 * Run the PDF cache cleanup Site Health test
+	 *
+	 * @return array
+	 * @since 7.0
+	 */
+	public function cache_cleanup_test() {
+		return $this->view->get_cache_cleanup_test( $this->model->is_cache_cleanup_stalled() );
 	}
 
 	/**

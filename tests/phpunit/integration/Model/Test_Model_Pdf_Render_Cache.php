@@ -247,6 +247,37 @@ class Test_Model_Pdf_Render_Cache extends TestCase {
 		$this->assertSame( 'miss', $this->model->get_cache_status( $path ) );
 	}
 
+	public function test_cache_0_renders_a_fresh_pdf_without_reading_or_writing_the_cache() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$results  = $this->form_and_entry();
+		$settings = $this->generator()->get_settings();
+
+		$cached = $this->model->generate_and_save_pdf( $results['entry'], $settings );
+		$this->assertSame( 'miss', $this->model->get_cache_status( $cached ) );
+
+		$_GET['cache'] = '0';
+		do_action( 'gfpdf_view_or_download_pdf', $results['form'], $results['entry'], $settings );
+
+		$fresh = $this->model->generate_and_save_pdf( $results['entry'], $settings );
+
+		$this->assertStringContainsString( '/uncached/', $fresh );
+		$this->assertSame( 'bypass', $this->model->get_cache_status( $fresh ) );
+		$this->assertSame( 2, $this->renders );
+	}
+
+	public function test_cache_0_needs_the_logging_capability() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+
+		$results = $this->form_and_entry();
+
+		$_GET['cache'] = '0';
+		do_action( 'gfpdf_view_or_download_pdf', $results['form'], $results['entry'], $this->generator()->get_settings() );
+
+		$this->assertFalse( has_filter( 'gfpdf_override_pdf_bypass' ) );
+		$this->assertFalse( has_filter( 'gfpdf_enable_pdf_cache' ) );
+	}
+
 	public function test_a_nested_render_keeps_the_outer_render_flag() {
 		$outer  = $this->generator();
 		$inner  = $this->generator();

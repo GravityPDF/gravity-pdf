@@ -216,6 +216,12 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				]
 			),
 
+			/* @since 7.0 */
+			'general_cache'                   => apply_filters(
+				'gfpdf_settings_general_cache',
+				$this->get_cache_fields()
+			),
+
 			/* Extension Settings */
 			'extensions'                      => apply_filters(
 				'gfpdf_settings_extensions',
@@ -690,6 +696,42 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_registered_fields/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
+	}
+
+	/**
+	 * The PDF Cache settings. JavaScript adds the Clear Cache button beside the toggle, for users who can edit settings.
+	 *
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	protected function get_cache_fields() {
+		return [
+			'pdf_cache'      => [
+				'id'      => 'pdf_cache',
+				'name'    => esc_html__( 'PDF Cache', 'gravity-pdf' ),
+				'desc'    => __( 'Speed up repeat downloads by serving already-generated PDFs from disk.', 'gravity-pdf' ),
+				/* Rendered right after the switch, so it shows and hides with it */
+				'desc2'   => $this->gform->has_capability( 'gravityforms_edit_settings' ) ? '<span class="gfpdf-clear-pdf-cache"></span>' : '',
+				'type'    => 'toggle',
+				'std'     => 'Yes',
+				'class'   => 'gform-settings-panel--full',
+				'tooltip' => '<h6>' . esc_html__( 'PDF Cache', 'gravity-pdf' ) . '</h6>' . esc_html__( 'A cached PDF is regenerated automatically when its entry, form, PDF settings, template or fonts change, and deleted when its entry is deleted. Turn the cache off while troubleshooting a template.', 'gravity-pdf' ),
+			],
+
+			'cache_duration' => [
+				'id'    => 'cache_duration',
+				'name'  => esc_html__( 'Cache Duration', 'gravity-pdf' ),
+				'desc'  => __( 'How long a cached PDF is kept before being deleted.', 'gravity-pdf' ),
+				'desc2' => esc_html__( 'hours', 'gravity-pdf' ),
+				'type'  => 'number',
+				'size'  => 'small',
+				'std'   => 12,
+				'min'   => 1,
+				'max'   => 168,
+				'class' => 'gform-settings-panel--full',
+			],
+		];
 	}
 
 	/**

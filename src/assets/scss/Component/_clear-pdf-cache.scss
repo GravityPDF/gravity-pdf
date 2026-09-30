@@ -1,0 +1,22 @@
+@use '../base';
+
+#tab_PDF {
+  .gfpdf-clear-pdf-cache {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-inline-start: 1rem;
+    vertical-align: middle;
+  }
+
+  .gfpdf-clear-pdf-cache-notice {
+    &.success {
+      color: base.$success-color;
+    }
+
+    &.error {
+      color: base.$error-color;
+    }
+  }
+}

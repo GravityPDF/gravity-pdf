@@ -81,14 +81,36 @@ class Cache {
 	 * @since 7.0.0
 	 */
 	public static function get_ttl() {
+		$hours = static::get_setting( 'cache_duration', 0 );
+		$hours = is_numeric( $hours ) && $hours > 0 ? (float) $hours : 12;
+
 		/**
 		 * How long a cached PDF can be served for, in seconds. At least 1.
 		 *
-		 * @param int $ttl
+		 * @param int $ttl Defaults to the Cache Duration setting
 		 *
 		 * @since 7.0
 		 */
-		return max( 1, (int) apply_filters( 'gfpdf_cache_ttl', 12 * HOUR_IN_SECONDS ) );
+		return max( 1, (int) apply_filters( 'gfpdf_cache_ttl', (int) round( $hours * HOUR_IN_SECONDS ) ) );
+	}
+
+	/**
+	 * Read one of the current site's Gravity PDF settings
+	 *
+	 * The options class holds the settings of the site it loaded on, so a sweep run under switch_to_blog() would read
+	 * the wrong site's
+	 *
+	 * @param string $key
+	 * @param mixed  $fallback Returned when the setting is empty
+	 *
+	 * @return mixed
+	 *
+	 * @since 7.0
+	 */
+	protected static function get_setting( $key, $fallback ) {
+		$settings = get_option( 'gfpdf_settings', [] );
+
+		return is_array( $settings ) && ! empty( $settings[ $key ] ) ? $settings[ $key ] : $fallback;
 	}
 
 	/**
@@ -104,14 +126,29 @@ class Cache {
 	 */
 	public static function is_enabled( $form, $entry, $pdf_settings ) {
 		/**
-		 * @param bool  $enabled
+		 * @param bool  $enabled Defaults to the PDF Cache setting
 		 * @param array $form
 		 * @param array $entry
 		 * @param array $pdf_settings
 		 *
 		 * @since 7.0
 		 */
-		return (bool) apply_filters( 'gfpdf_enable_pdf_cache', true, $form, $entry, $pdf_settings );
+		return (bool) apply_filters( 'gfpdf_enable_pdf_cache', static::is_enabled_by_setting(), $form, $entry, $pdf_settings );
+	}
+
+	/**
+	 * Whether the PDF Cache setting is on. It's on until it's saved as "No".
+	 *
+	 * @param array|null $settings Gravity PDF's settings. Defaults to the current site's.
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public static function is_enabled_by_setting( $settings = null ) {
+		$settings = $settings ?? get_option( 'gfpdf_settings', [] );
+
+		return ! is_array( $settings ) || empty( $settings['pdf_cache'] ) || $settings['pdf_cache'] === 'Yes';
 	}
 
 	/**

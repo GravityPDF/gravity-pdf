@@ -324,6 +324,12 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		if ( rgget( 'html' ) && Debug::is_enabled_and_can_view() ) {
 			add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
 		}
+
+		/* ?cache=0 renders a fresh PDF to a one-off path, without reading or writing the cache */
+		if ( rgget( 'cache' ) === '0' && Debug::is_enabled_and_can_view() ) {
+			add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+			add_filter( 'gfpdf_enable_pdf_cache', '__return_false', 1000 );
+		}
 	}
 
 	/**

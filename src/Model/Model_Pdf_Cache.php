@@ -140,7 +140,6 @@ class Model_Pdf_Cache extends Helper_Abstract_Model {
 				'deprecated_features',
 				'signed_secret_token',
 				'cache_duration',
-				'clear_pdf_cache',
 			]
 		);
 
@@ -213,6 +212,25 @@ class Model_Pdf_Cache extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Delete the cached PDFs in the background when the PDF Cache setting is turned off
+	 *
+	 * Also hooked to `add_option_gfpdf_settings`, which passes the option name in place of the old settings
+	 *
+	 * @param array|string $old_settings
+	 * @param array        $new_settings
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public function maybe_request_purge( $old_settings, $new_settings ) {
+		/* The add hook's option name reads as on */
+		if ( Cache::is_enabled_by_setting( (array) $old_settings ) && ! Cache::is_enabled_by_setting( (array) $new_settings ) ) {
+			$this->request_purge();
+		}
+	}
+
+	/**
 	 * The current site's sweep progress, and the results of its last complete pass
 	 *
 	 * @return array{mode: string, cursor: string, pass_started: int, pass: array, last_slice_at: int, last_complete_at: int, last_pass: array, fallback: bool, purge_request: string}
@@ -254,6 +272,35 @@ class Model_Pdf_Cache extends Helper_Abstract_Model {
 		}
 
 		return $state;
+	}
+
+	/**
+	 * Whether the current site's cache holds any entry's PDFs. Reads the cache root only, never the whole tree.
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function has_cached_pdfs() {
+		$dir = @opendir( Cache::get_root() ); //phpcs:ignore
+		if ( $dir === false ) {
+			return false;
+		}
+
+		try {
+			$name = readdir( $dir );
+			while ( $name !== false ) {
+				if ( preg_match( '/^e\d+$/', $name ) ) {
+					return true;
+				}
+
+				$name = readdir( $dir );
+			}
+
+			return false;
+		} finally {
+			closedir( $dir );
+		}
 	}
 
 	/**
