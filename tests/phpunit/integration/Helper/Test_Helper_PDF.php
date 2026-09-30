@@ -6,6 +6,8 @@ namespace GFPDF\Helper;
 
 use Exception;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
+use GFPDF\Tests\Concerns\SpawnsPhpProcesses;
+use GFPDF\Tests\Concerns\UsesLockableTmpLocation;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -15,6 +17,8 @@ use GFPDF\Tests\Integration\TestCase;
 class Test_Helper_PDF extends TestCase {
 
 	use CreatesLegacyTemplates;
+	use SpawnsPhpProcesses;
+	use UsesLockableTmpLocation;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -56,6 +60,12 @@ class Test_Helper_PDF extends TestCase {
 			$gfpdf->templates,
 			$gfpdf->log
 		);
+	}
+
+	public function tear_down(): void {
+		$this->restore_tmp_location();
+
+		parent::tear_down();
 	}
 
 	public function test_set_and_get_output_type(): void {
@@ -228,6 +238,77 @@ class Test_Helper_PDF extends TestCase {
 		} catch ( Exception $e ) {
 			$this->assertStringContainsString( 'Could not save PDF', $e->getMessage() );
 			$this->assertSame( [], glob( $this->pdf->get_path() . '*.tmp' ) );
+		} finally {
+			$this->gfpdf()->misc->rmdir( $this->pdf->get_path() );
+		}
+	}
+
+	/**
+	 * @group slow
+	 */
+	public function test_a_concurrent_writer_never_leaves_a_torn_pdf(): void {
+		$this->use_lockable_tmp_location();
+		$this->use_scratch_path( 'rival-writers' );
+
+		$mine   = '%PDF-' . str_repeat( 'A', 2 * MB_IN_BYTES );
+		$theirs = $this->pdf->save_pdf( '%PDF-' . str_repeat( 'B', 3 * MB_IN_BYTES ) ) . '.source';
+		rename( $this->pdf->get_full_pdf_path(), $theirs );
+
+		/* The same stage-and-rename save_pdf() does */
+		$script = '$end = microtime( true ) + $argv[3];'
+			. 'while ( microtime( true ) < $end ) {'
+			. '$tmp = $argv[1] . "." . uniqid( "", true ) . ".tmp";'
+			. 'if ( copy( $argv[2], $tmp ) ) { rename( $tmp, $argv[1] ); } elseif ( is_file( $tmp ) ) { unlink( $tmp ); }'
+			. '}';
+
+		try {
+			$writer = $this->spawn_php( $script, [ $this->pdf->get_full_pdf_path(), $theirs, '1' ] );
+			$end    = microtime( true ) + 1;
+
+			while ( microtime( true ) < $end ) {
+				$this->pdf->save_pdf( $mine );
+			}
+
+			proc_close( $writer );
+
+			$this->assertContains( md5_file( $this->pdf->get_full_pdf_path() ), [ md5( $mine ), md5_file( $theirs ) ] );
+			$this->assertSame( [], glob( $this->pdf->get_path() . '*.tmp' ) );
+		} finally {
+			$this->gfpdf()->misc->rmdir( $this->pdf->get_path() );
+		}
+	}
+
+	/**
+	 * @group slow
+	 */
+	public function test_a_reader_never_sees_a_partial_pdf(): void {
+		$this->use_lockable_tmp_location();
+		$this->use_scratch_path( 'read-during-write' );
+
+		$pdfs   = [ '%PDF-' . str_repeat( 'A', 2 * MB_IN_BYTES ), '%PDF-' . str_repeat( 'B', 3 * MB_IN_BYTES ) ];
+		$file   = $this->pdf->save_pdf( $pdfs[0] );
+		$result = $this->pdf->get_path() . 'reads.txt';
+
+		$script = '$end = microtime( true ) + $argv[2]; $good = 0; $bad = 0;'
+			. 'while ( microtime( true ) < $end ) {'
+			. '$pdf = @file_get_contents( $argv[1] ); if ( $pdf === false ) { continue; }'
+			. 'in_array( md5( $pdf ), [ $argv[3], $argv[4] ], true ) ? $good++ : $bad++;'
+			. '}'
+			. 'file_put_contents( $argv[5], "$good $bad" );';
+
+		try {
+			$reader = $this->spawn_php( $script, [ $file, '1', md5( $pdfs[0] ), md5( $pdfs[1] ), $result ] );
+
+			for ( $i = 1; proc_get_status( $reader )['running']; $i++ ) {
+				$this->pdf->save_pdf( $pdfs[ $i % 2 ] );
+			}
+
+			proc_close( $reader );
+
+			[ $good, $bad ] = array_map( 'intval', explode( ' ', (string) file_get_contents( $result ) ) );
+
+			$this->assertSame( 0, $bad, 'A read came back part-written' );
+			$this->assertGreaterThan( 50, $good, 'Too few reads landed to say anything about the race' );
 		} finally {
 			$this->gfpdf()->misc->rmdir( $this->pdf->get_path() );
 		}
