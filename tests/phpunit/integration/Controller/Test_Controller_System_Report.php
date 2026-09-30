@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
@@ -131,7 +132,8 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertArrayHasKey( 'row_3', $this->get_report_section( 'security', $system_report ) );
 
 		$this->assertArrayNotHasKey( 'default_charset', $this->get_report_section( 'php', $system_report ) );
-		$this->assertCount( 4, $system_report[0]['tables'] );
+		$this->assertArrayNotHasKey( 'orphan_row', $this->get_report_section( 'cache', $system_report ) );
+		$this->assertCount( 5, $system_report[0]['tables'] );
 	}
 
 	/**
@@ -227,7 +229,7 @@ class Test_Controller_System_Report extends TestCase {
 	public function test_system_report_has_no_deprecated_features_section_by_default() {
 		$system_report = apply_filters( 'gform_system_report', [] );
 
-		$this->assertCount( 4, $system_report[0]['tables'] );
+		$this->assertCount( 5, $system_report[0]['tables'] );
 	}
 
 	public function test_system_report_legacy_template() {
@@ -447,5 +449,71 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertStringContainsString( 'Gravity PDF Environment', $system_report[0]['title'] );
 
 		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::SECTION_ANCHOR, Model_System_Report::get_report_url() );
+	}
+
+	public function test_system_report_pdf_cache() {
+		$this->gfpdf()->options->update_option( 'cache_pdfs', 'No' );
+		$this->gfpdf()->options->update_option( 'cache_duration', 6 );
+
+		$items = $this->get_report_section( 'cache' );
+
+		$this->assertSame( 'No', $items['cache_pdfs']['value_export'] );
+		$this->assertSame( '6 hour(s)', $items['cache_duration']['value_export'] );
+		$this->assertSame( 'Never', $items['cache_cleanup']['value_export'] );
+		$this->assertArrayNotHasKey( 'is_valid', $items['cache_cleanup'] );
+
+		update_option(
+			Model_Pdf_Cache::SWEEP_STATE_OPTION,
+			[
+				'last_slice_at'    => time(),
+				'last_complete_at' => time() - HOUR_IN_SECONDS,
+				'last_pass'        => [
+					'mode'         => 'expire',
+					'started'      => time() - HOUR_IN_SECONDS,
+					'files_reaped' => 3,
+					'bytes_reaped' => 3072,
+					'files_left'   => 2,
+					'bytes_left'   => 2048,
+				],
+			]
+		);
+
+		$items = $this->get_report_section( 'cache' );
+
+		$this->assertStringContainsString( 'Removed 3 file(s) (3072 bytes) and kept 2 (2048 bytes)', $items['cache_cleanup']['value_export'] );
+		$this->assertStringContainsString( '1 hour ago. Removed 3 file(s) (3 KB) and kept 2 (2 KB).', $items['cache_cleanup']['value'] );
+	}
+
+	public function test_the_pdf_cache_row_and_site_health_warn_when_cron_is_not_cleaning_the_cache() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$test = apply_filters( 'site_status_tests', [ 'direct' => [] ] )['direct']['gravity_pdf_cache_cleanup']['test'];
+
+		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+		wp_schedule_event( time() - 2 * HOUR_IN_SECONDS, 'hourly', 'gfpdf_cleanup_tmp_dir' );
+		update_option( Model_Pdf_Cache::SWEEP_STATE_OPTION, [ 'last_slice_at' => time() - 2 * DAY_IN_SECONDS ] );
+
+		/* Nothing cached, nothing to warn about */
+		$this->assertArrayNotHasKey( 'is_valid', $this->get_report_section( 'cache' )['cache_cleanup'] );
+		$this->assertSame( 'good', call_user_func( $test )['status'] );
+
+		$entry_dir = $this->gfpdf()->data->template_tmp_location . ( is_multisite() ? get_current_blog_id() . '/' : '' ) . 'cache/e999999/';
+		wp_mkdir_p( $entry_dir );
+
+		try {
+			$this->assertFalse( $this->get_report_section( 'cache' )['cache_cleanup']['is_valid'] );
+			$this->assertSame( 'recommended', call_user_func( $test )['status'] );
+
+			/* A sweep ran recently, but the hourly event is overdue */
+			update_option( Model_Pdf_Cache::SWEEP_STATE_OPTION, [ 'last_slice_at' => time() ] );
+			$this->assertSame( 'recommended', call_user_func( $test )['status'] );
+
+			wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'gfpdf_cleanup_tmp_dir' );
+			$this->assertArrayNotHasKey( 'is_valid', $this->get_report_section( 'cache' )['cache_cleanup'] );
+			$this->assertSame( 'good', call_user_func( $test )['status'] );
+		} finally {
+			rmdir( $entry_dir );
+		}
 	}
 }

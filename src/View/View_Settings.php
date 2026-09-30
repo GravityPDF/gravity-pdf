@@ -255,6 +255,19 @@ class View_Settings extends Helper_Abstract_View {
 			'content_class' => 'gform_settings_form',
 		];
 
+		/* Open by default, so the Clear PDF Cache button isn't hidden */
+		$sections[] = [
+			'id'               => 'gfpdf_settings_general_cache',
+			'width'            => 'full',
+			'collapsible'      => true,
+			'collapsible-open' => true,
+			'title'            => __( 'PDF Cache', 'gravity-pdf' ),
+			'callback'         => static function () use ( $markup ) {
+				$markup->output_settings_fields( 'gfpdf_settings_general_cache', $markup::ENABLE_PANEL_TITLE );
+			},
+			'content_class'    => 'gform_settings_form',
+		];
+
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
 			'callback' => static function () use ( $markup, $sections ) {

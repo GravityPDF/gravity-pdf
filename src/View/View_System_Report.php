@@ -415,10 +415,7 @@ class View_System_Report extends Helper_Abstract_View {
 		$result = [
 			'label'       => esc_html__( 'Your PDFs are ready for the next Gravity PDF release', 'gravity-pdf' ),
 			'status'      => 'good',
-			'badge'       => [
-				'label' => esc_html__( 'Gravity PDF', 'gravity-pdf' ),
-				'color' => 'blue',
-			],
+			'badge'       => $this->get_site_health_badge(),
 			'description' => '<p>' . esc_html__( 'Nothing on this site uses Gravity PDF functionality that is scheduled for removal.', 'gravity-pdf' ) . '</p>',
 			'actions'     => '',
 			'test'        => 'gravity_pdf_deprecated_features',
@@ -453,9 +450,57 @@ class View_System_Report extends Helper_Abstract_View {
 			}
 		}
 
-		$result['actions'] = '<p><a href="' . esc_url( Model_System_Report::get_report_url() ) . '">' . esc_html__( 'View the Gravity Forms system report', 'gravity-pdf' ) . '</a></p>';
+		$result['actions'] = $this->get_report_link_action();
 
 		return $result;
+	}
+
+	/**
+	 * Build the Site Health result for the PDF cache cleanup
+	 *
+	 * @param bool $stalled Whether the cache holds PDFs but WP-Cron isn't removing the expired ones
+	 *
+	 * @since 7.0
+	 */
+	public function get_cache_cleanup_test( bool $stalled ): array {
+		$result = [
+			'label'       => esc_html__( 'Expired PDFs are being removed from the Gravity PDF cache', 'gravity-pdf' ),
+			'status'      => 'good',
+			'badge'       => $this->get_site_health_badge(),
+			'description' => '<p>' . esc_html__( 'Gravity PDF caches generated PDFs, and removes them with WP-Cron once the cache duration runs out.', 'gravity-pdf' ) . '</p>',
+			'actions'     => '',
+			'test'        => 'gravity_pdf_cache_cleanup',
+		];
+
+		if ( ! $stalled ) {
+			return $result;
+		}
+
+		$result['status']       = 'recommended';
+		$result['label']        = esc_html__( 'Expired PDFs are not being removed from the Gravity PDF cache', 'gravity-pdf' );
+		$result['description'] .= '<p>' . esc_html__( 'WP-Cron does not appear to be running, so cached PDFs, and the entry data they hold, stay on disk after they expire. Check with your web host that WP-Cron, or a system cron that replaces it, runs on this site.', 'gravity-pdf' ) . '</p>';
+		$result['actions']      = $this->get_report_link_action();
+
+		return $result;
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	protected function get_site_health_badge(): array {
+		return [
+			'label' => esc_html__( 'Gravity PDF', 'gravity-pdf' ),
+			'color' => 'blue',
+		];
+	}
+
+	/**
+	 * A Site Health action linking to Gravity PDF's section of the system report
+	 *
+	 * @since 7.0
+	 */
+	protected function get_report_link_action(): string {
+		return '<p><a href="' . esc_url( Model_System_Report::get_report_url() ) . '">' . esc_html__( 'View the Gravity Forms system report', 'gravity-pdf' ) . '</a></p>';
 	}
 
 	/**

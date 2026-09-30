@@ -73,6 +73,10 @@ class Controller_Pdf_Cache extends Helper_Abstract_Controller implements Helper_
 		/* Saving a setting that changes PDFs moves every cache key. WP fires only the add hook on a first save */
 		add_action( 'update_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ], 10, 2 );
 		add_action( 'add_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ], 10, 2 );
+
+		/* Turning the cache off also deletes what it holds */
+		add_action( 'update_option_gfpdf_settings', [ $this->model, 'maybe_request_purge' ], 10, 2 );
+		add_action( 'add_option_gfpdf_settings', [ $this->model, 'maybe_request_purge' ], 10, 2 );
 	}
 
 	/**
