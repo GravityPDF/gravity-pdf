@@ -1401,6 +1401,9 @@ class Test_PDF extends TestCase {
 		$directories = [ 'mpdf/mpdf/ttfontdata', 'mpdf/mpdf', 'mpdf', '1234556690c67856b', $site . 'cache/e1/pabc-123', $site . 'cache/e1', $site . 'cache', $site . 'uncached/old', $site . 'uncached', rtrim( $site, '/' ) ];
 		$directories = array_filter( $directories );
 
+		/* Made as a render makes it, with its index.html */
+		Cache::get_uncached_path();
+
 		foreach ( $directories as $directory ) {
 			wp_mkdir_p( $tmp . $directory );
 		}
@@ -1461,10 +1464,18 @@ class Test_PDF extends TestCase {
 		@rmdir( $tmp . $site . 'uncached/new' );
 	}
 
-	public function test_cleanup_tmp_dir_uncached_max_age_is_filterable() {
-		global $gfpdf;
+	public function test_cleanup_tmp_dir_keeps_the_uncached_folders_index() {
+		$index = dirname( Cache::get_uncached_path() ) . '/index.html';
+		touch( $index, time() - WEEK_IN_SECONDS );
 
-		$dir = $gfpdf->data->template_tmp_location . ( is_multisite() ? get_current_blog_id() . '/' : '' ) . 'uncached/filtered/';
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
+		$this->model->cleanup_tmp_dir();
+
+		$this->assertFileExists( $index );
+	}
+
+	public function test_cleanup_tmp_dir_uncached_max_age_is_filterable() {
+		$dir = dirname( Cache::get_uncached_path() ) . '/filtered/';
 		wp_mkdir_p( $dir );
 		touch( $dir . 'document.pdf', time() - 600 );
 
