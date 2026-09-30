@@ -92,8 +92,8 @@ class Test_Controller_Pdf_Cache extends TestCase {
 		$this->assertSame( 10, has_action( 'gfpdf_invalidate_entry', [ $this->model, 'purge_entry' ] ) );
 		$this->assertSame( 10, has_action( 'gfpdf_invalidate_form', [ Cache::class, 'bump_form_generation' ] ) );
 		$this->assertSame( 10, has_action( 'wp_uninitialize_site', [ $this->model, 'delete_site' ] ) );
-		$this->assertSame( 10, has_action( 'update_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ] ) );
-		$this->assertSame( 10, has_action( 'add_option_gfpdf_settings', [ Cache::class, 'maybe_bump_generation' ] ) );
+		$this->assertSame( 10, has_action( 'update_option_gfpdf_settings', [ $this->model, 'maybe_bump_generation' ] ) );
+		$this->assertSame( 10, has_action( 'add_option_gfpdf_settings', [ $this->model, 'maybe_bump_generation' ] ) );
 	}
 
 	public function test_deleting_an_entry_purges_its_pdfs() {

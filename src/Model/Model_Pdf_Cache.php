@@ -103,6 +103,75 @@ class Model_Pdf_Cache extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Bump the cache generation when a Gravity PDF setting that can change a PDF is saved
+	 *
+	 * Also hooked to `add_option_gfpdf_settings`, which passes the option name in place of the old settings, so every key
+	 * counts as changed. Settings a render never reads, or only reads before generation
+	 * (access checks), are ignored, as are the licence and notice state saved in the background.
+	 *
+	 * @param array|string $old_settings
+	 * @param array        $new_settings
+	 *
+	 * @return void
+	 *
+	 * @since 7.0
+	 */
+	public function maybe_bump_generation( $old_settings, $new_settings ) {
+		$old_settings = is_array( $old_settings ) ? $old_settings : [];
+		$new_settings = is_array( $new_settings ) ? $new_settings : [];
+
+		/**
+		 * Settings that don't change a generated PDF, so saving them doesn't clear the cache. Accepts glob patterns.
+		 *
+		 * @param string[] $ignored
+		 *
+		 * @since 7.0
+		 */
+		$ignored = (array) apply_filters(
+			'gfpdf_cache_generation_ignored_settings',
+			[
+				'logged_out_timeout',
+				'admin_capabilities',
+				'default_restrict_owner',
+				'default_action',
+				'background_processing',
+				'license_*',
+				'action_dismissal',
+				'deprecated_features',
+				'signed_secret_token',
+				'cache_duration',
+				'clear_pdf_cache',
+			]
+		);
+
+		foreach ( array_keys( $old_settings + $new_settings ) as $key ) {
+			if ( ( $old_settings[ $key ] ?? null ) !== ( $new_settings[ $key ] ?? null ) && ! $this->is_ignored_setting( (string) $key, $ignored ) ) {
+				Cache::bump_generation();
+
+				return;
+			}
+		}
+	}
+
+	/**
+	 * @param string   $key
+	 * @param string[] $ignored Setting keys, or glob patterns
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected function is_ignored_setting( $key, $ignored ) {
+		foreach ( $ignored as $pattern ) {
+			if ( fnmatch( (string) $pattern, $key ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Delete a network site's cached and one-off PDFs when the site is deleted
 	 *
 	 * @param \WP_Site $site
@@ -450,7 +519,11 @@ class Model_Pdf_Cache extends Helper_Abstract_Model {
 			array_diff( (array) @scandir( $dir ), [ '.', '..', 'index.html' ] ) === [] //phpcs:ignore
 		) {
 			@unlink( $dir . 'index.html' ); //phpcs:ignore
-			@rmdir( $dir ); //phpcs:ignore
+
+			/* A render wrote into it since the listing, so it stays and needs its index back */
+			if ( ! @rmdir( $dir ) ) { //phpcs:ignore
+				@file_put_contents( $dir . 'index.html', '' ); //phpcs:ignore
+			}
 		}
 
 		return false;
