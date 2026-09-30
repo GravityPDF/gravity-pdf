@@ -7,8 +7,10 @@ namespace GFPDF\Model;
 use GF_UnitTest_Factory;
 use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
+use GFPDF\Statics\Acting_User;
 use GFPDF\View\View_PDF;
 use GFPDF\Tests\Integration\TestCase;
+use WP_User;
 
 /**
  * @package     Gravity PDF
@@ -275,6 +277,91 @@ class Test_Model_PDF extends TestCase {
 		$this->assertTrue( $this->model->can_user_view_pdf_with_capabilities() );
 
 		$gfpdf->options->delete_option( 'admin_capabilities' );
+	}
+
+	public static function provider_permission_check_users() {
+		return [
+			'administrator'        => [ 'administrator', [], true ],
+			'editor'               => [ 'editor', [], false ],
+			'editor, allowed role' => [ 'editor', [], true, [ 'edit_posts' ] ],
+			'custom capability'    => [ 'subscriber', [ 'gravityforms_view_entries' ], true ],
+			'subscriber'           => [ 'subscriber', [], false ],
+			'gform_full_access'    => [ 'subscriber', [ 'gform_full_access' ], true ],
+			'logged out'           => [ null, [], false ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_permission_check_users
+	 */
+	public function test_can_user_view_pdf_with_capabilities_for_a_given_user_matches_switching_to_them( $role, $caps, $expected, $admin_capabilities = [] ) {
+		global $gfpdf;
+
+		$user_id = 0;
+		if ( $role !== null ) {
+			$user_id = $this->factory->user->create( [ 'role' => $role ] );
+			$user    = new WP_User( $user_id );
+			foreach ( $caps as $cap ) {
+				$user->add_cap( $cap );
+			}
+		}
+
+		if ( $admin_capabilities ) {
+			$gfpdf->options->update_option( 'admin_capabilities', $admin_capabilities );
+		}
+
+		$this->assert_given_user_check_matches_switching( $expected, $user_id );
+
+		$gfpdf->options->delete_option( 'admin_capabilities' );
+	}
+
+	public function test_can_user_view_pdf_with_capabilities_for_a_super_admin_matches_switching_to_them() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Not running multisite tests' );
+		}
+
+		$user_id = $this->factory->user->create( [ 'role' => '' ] );
+		grant_super_admin( $user_id );
+
+		$this->assert_given_user_check_matches_switching( true, $user_id );
+	}
+
+	private function assert_given_user_check_matches_switching( $expected, $user_id ) {
+		$switched = Acting_User::run(
+			$user_id,
+			function () {
+				return $this->model->can_user_view_pdf_with_capabilities();
+			}
+		);
+		$this->assertSame( $expected, $switched );
+
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+		$this->assertSame( $expected, $this->model->can_user_view_pdf_with_capabilities( $user_id ) );
+	}
+
+	public function test_can_user_view_pdf_with_capabilities_checks_a_given_user_without_switching_to_them() {
+		$admin      = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$subscriber = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+
+		wp_set_current_user( $subscriber );
+		$switches = did_action( 'set_current_user' );
+
+		$this->assertTrue( $this->model->can_user_view_pdf_with_capabilities( $admin ) );
+		$this->assertFalse( $this->model->can_user_view_pdf_with_capabilities( $subscriber ) );
+		$this->assertFalse( $this->model->can_user_view_pdf_with_capabilities( 0 ) );
+
+		$this->assertSame( $switches, did_action( 'set_current_user' ) );
+		$this->assertSame( $subscriber, get_current_user_id() );
+	}
+
+	public function test_can_user_view_pdf_with_capabilities_denies_everyone_when_no_capabilities_are_allowed() {
+		$admin = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $admin );
+		add_filter( 'gfpdf_get_option_admin_capabilities', '__return_empty_array' );
+
+		$this->assertFalse( $this->model->can_user_view_pdf_with_capabilities() );
+		$this->assertFalse( $this->model->can_user_view_pdf_with_capabilities( $admin ) );
+		$this->assertFalse( $this->model->can_user_view_pdf_with_capabilities( 0 ) );
 	}
 
 	public function test_get_quiz_results_returns_empty_when_form_has_no_quiz_field() {

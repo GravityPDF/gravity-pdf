@@ -677,7 +677,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check if the logged in user has permission to view the PDF
+	 * Check if the logged in user, or the given user, has permission to view the PDF
 	 *
 	 * @param int|null $user_id
 	 *
@@ -688,16 +688,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function can_user_view_pdf_with_capabilities( $user_id = null ) {
 		$admin_permissions = $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] );
 
-		/* loop through permissions and check if the current user has any of those capabilities */
-		$can_user_view_pdf = false;
-		foreach ( $admin_permissions as $permission ) {
-			if ( $this->gform->has_capability( $permission, $user_id ) ) {
-				$can_user_view_pdf = true;
-				break;
-			}
-		}
-
-		return $can_user_view_pdf;
+		/* An empty list grants nobody access, not even users with gform_full_access */
+		return ! empty( $admin_permissions ) && $this->gform->has_capability( $admin_permissions, $user_id );
 	}
 
 	/**
