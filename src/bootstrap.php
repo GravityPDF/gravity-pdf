@@ -13,7 +13,6 @@ use GFPDF\Helper\Helper_Singleton;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF_Core;
 use GFPDF_Major_Compatibility_Checks;
-use GPDFAPI;
 use Gravity_Forms\Gravity_Forms\Async\GF_Background_Process;
 use Psr\Log\LoggerInterface;
 
@@ -951,26 +950,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $class );
 
 		/**
-		 * Clear our any items in the queue when the feature is toggled on/off
+		 * Clear out any items in the queue when the feature is toggled on/off
 		 *
 		 * Needs to be outside the controller class so it works when the feature is toggled on and off.
 		 *
-		 * @param string $new_value The value being saved for the Background Processing setting
+		 * @param array $old_value The saved settings before the update
+		 * @param array $new_value The saved settings after the update
 		 *
 		 * @since 6.12.6
+		 * @since 6.17.3 Runs once the settings are saved, so a save that fails validation keeps the queue
 		 */
-		$gfpdf_settings_sanitize = function ( $new_value, $key ) use ( $queue ) {
-			if ( $key === 'background_processing' ) {
-				$current_value = GPDFAPI::get_plugin_option( 'background_processing' );
-				if ( $current_value !== $new_value ) {
-					$queue->clear_queue();
-				}
-			}
+		$clear_queue_on_toggle = function ( $old_value, $new_value ) use ( $queue ) {
+			$was_enabled = ( $old_value['background_processing'] ?? '' ) === 'Yes';
+			$is_enabled  = ( $new_value['background_processing'] ?? '' ) === 'Yes';
 
-			return $new_value;
+			if ( $was_enabled !== $is_enabled ) {
+				$queue->clear_queue();
+			}
 		};
 
-		add_filter( 'gfpdf_settings_sanitize', $gfpdf_settings_sanitize, 10, 2 );
+		add_action( 'update_option_gfpdf_settings', $clear_queue_on_toggle, 10, 2 );
 	}
 
 	/**

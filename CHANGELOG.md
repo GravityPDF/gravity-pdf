@@ -7,6 +7,7 @@
 * 🧹 Housekeeping: Create the background processing queue once per request
 * 🐞 Bug: Save a number setting's default value when the field is left blank or isn't a number
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
+* 🐞 Bug: Keep queued background PDFs when a global settings save that turns Background Processing on or off fails
 * 🐞 Bug: Stop a failed global settings save from erasing all saved settings
 * 🐞 Bug: Keep the entered values on the global settings page after a failed save when a Gravity PDF extension is active or updates its license
 * 🐞 Bug: Stop another plugin's settings errors from blocking the global settings save
