@@ -44,16 +44,19 @@ class Queue_Callbacks {
 		$log = GPDFAPI::get_log_class();
 
 		/* Masquerade as the user ID who scheduled the queue so caching and the {user} merge tag works correctly */
-		$backup_user_id = get_current_user_id();
-		wp_set_current_user( $user_id );
+		$pdf = Acting_User::run(
+			$user_id,
+			function () use ( $entry_id, $pdf_id ) {
+				/* For performance, only generate the PDF if it does not currently exist on disk */
+				add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
 
-		/* For performance, only generate the PDF if it does not currently exist on disk */
-		add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
-		$pdf = GPDFAPI::create_pdf( $entry_id, $pdf_id );
-		remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
-
-		/* Reset existing user */
-		wp_set_current_user( $backup_user_id );
+				try {
+					return GPDFAPI::create_pdf( $entry_id, $pdf_id );
+				} finally {
+					remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
+				}
+			}
+		);
 
 		if ( is_wp_error( $pdf ) ) {
 			$log->error(
@@ -107,12 +110,11 @@ class Queue_Callbacks {
 		}
 
 		/* Masquerade as the user ID who scheduled the queue so caching and the {user} merge tag works correctly */
-		$backup_user_id = get_current_user_id();
-		wp_set_current_user( $user_id );
-
-		GFCommon::send_notification( $notification, $form, $entry );
-
-		/* Reset existing user */
-		wp_set_current_user( $backup_user_id );
+		Acting_User::run(
+			$user_id,
+			function () use ( $notification, $form, $entry ) {
+				GFCommon::send_notification( $notification, $form, $entry );
+			}
+		);
 	}
 }
