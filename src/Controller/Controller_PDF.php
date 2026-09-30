@@ -69,6 +69,15 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	protected $misc;
 
 	/**
+	 * Object ID of the Helper_PDF whose render added the pre-render hooks, so a nested render leaves them in place
+	 *
+	 * @var int|null
+	 *
+	 * @since 7.0
+	 */
+	protected $pre_pdf_hooks_render;
+
+	/**
 	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param Helper_Abstract_Model|Model_PDF $model Our PDF Model the controller will manage
@@ -117,8 +126,9 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ], 1 ); /* new PDF endpoint */
 
 		/* Set up pre- and post-generation PDF hooks */
-		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ] );
-		add_action( 'gfpdf_post_pdf_generation', [ $this, 'remove_pre_pdf_hooks' ] );
+		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ], 10, 4 );
+		add_action( 'gfpdf_post_pdf_generation', [ $this, 'remove_pre_pdf_hooks' ], 10, 4 );
+		add_action( 'gfpdf_pdf_generation_end', [ $this, 'remove_pre_pdf_hooks' ], 10, 4 );
 
 		/* Set up pre generation hooks when streaming PDF to the browser */
 		$add_pre_view_or_download_pdf_hooks = function ( $form, $entry, $settings ) {
@@ -273,9 +283,19 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	}
 
 	/**
+	 * @param array|null      $form
+	 * @param array|null      $entry
+	 * @param array|null      $settings
+	 * @param Helper_PDF|null $pdf_generator The render adding the hooks
+	 *
 	 * @since 5.1.1
+	 * @since 7.0 Accepts the render's arguments
 	 */
-	public function add_pre_pdf_hooks() {
+	public function add_pre_pdf_hooks( $form = null, $entry = null, $settings = null, $pdf_generator = null ) {
+		if ( $this->pre_pdf_hooks_render === null && $pdf_generator instanceof Helper_PDF ) {
+			$this->pre_pdf_hooks_render = spl_object_id( $pdf_generator );
+		}
+
 		add_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		add_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
 
@@ -286,9 +306,23 @@ class Controller_PDF extends Helper_Abstract_Controller {
 	}
 
 	/**
+	 * Only the render that added the hooks removes them. Called without a render, it removes them unconditionally.
+	 *
+	 * @param array|null      $form
+	 * @param array|null      $entry
+	 * @param array|null      $settings
+	 * @param Helper_PDF|null $pdf_generator The render that ended
+	 *
 	 * @since 5.1.1
+	 * @since 7.0 Accepts the render's arguments, and a nested render leaves the hooks in place
 	 */
-	public function remove_pre_pdf_hooks() {
+	public function remove_pre_pdf_hooks( $form = null, $entry = null, $settings = null, $pdf_generator = null ) {
+		if ( $this->pre_pdf_hooks_render !== null && $pdf_generator instanceof Helper_PDF && spl_object_id( $pdf_generator ) !== $this->pre_pdf_hooks_render ) {
+			return;
+		}
+
+		$this->pre_pdf_hooks_render = null;
+
 		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
 

@@ -4,12 +4,16 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use Error;
 use Exception;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF\View\View_PDF;
+use GPDFAPI;
 use ReflectionMethod;
+use Throwable;
+use WP_Error;
 
 /**
  * Characterization tests for Controller_PDF — pin observable behaviour as a
@@ -112,6 +116,56 @@ class Test_Controller_PDF extends TestCase {
 		$this->assertFalse( has_filter( 'safe_style_css', [ $this->controller->view, 'allow_pdf_css' ] ) );
 	}
 
+	/**
+	 * @dataProvider provider_render_failures
+	 */
+	public function test_a_render_that_throws_removes_its_pre_render_hooks( string $exception_class ) {
+		$attached = null;
+
+		add_action(
+			'gfpdf_pre_pdf_generation_initilise',
+			function () use ( $exception_class, &$attached ) {
+				$attached = $this->pre_render_hooks_attached();
+
+				throw new $exception_class( 'Render failed' );
+			}
+		);
+
+		try {
+			$this->assertInstanceOf( WP_Error::class, $this->create_pdf() );
+		} catch ( Throwable $e ) {
+			$this->assertInstanceOf( $exception_class, $e );
+		}
+
+		$this->assertTrue( $attached );
+		$this->assertFalse( $this->pre_render_hooks_attached() );
+	}
+
+	public function provider_render_failures(): array {
+		return [
+			'caught and logged'   => [ Exception::class ],
+			'reaches the caller' => [ Error::class ],
+		];
+	}
+
+	public function test_a_nested_render_keeps_the_outer_renders_pre_render_hooks() {
+		$after_nested = null;
+		$nest         = function () use ( &$nest, &$after_nested ) {
+			remove_action( 'gfpdf_pre_pdf_generation_initilise', $nest );
+
+			$this->assertIsString( $this->create_pdf() );
+			$after_nested = $this->pre_render_hooks_attached();
+
+			throw new Exception( 'Skip rendering the outer PDF' );
+		};
+
+		add_action( 'gfpdf_pre_pdf_generation_initilise', $nest );
+
+		$this->assertInstanceOf( WP_Error::class, $this->create_pdf() );
+		$this->assertTrue( $after_nested );
+		$this->assertFalse( $this->pre_render_hooks_attached() );
+	}
+
 	public function test_prevent_index_defines_donotcachepage_constant() {
 		$this->controller->prevent_index();
 
@@ -202,5 +256,28 @@ class Test_Controller_PDF extends TestCase {
 			$ref->setAccessible( true );
 		}
 		return $ref->invokeArgs( $this->controller, $args );
+	}
+
+	/**
+	 * @return string|WP_Error
+	 */
+	private function create_pdf() {
+		add_filter(
+			'gfpdf_pdf_config',
+			function ( $settings ) {
+				$settings['template'] = 'zadani';
+
+				return $settings;
+			}
+		);
+
+		return GPDFAPI::create_pdf( $this->form_and_entry()['entry']['id'], '555ad84787d7e', true );
+	}
+
+	private function pre_render_hooks_attached(): bool {
+		$view = GPDFAPI::get_mvc_class( 'View_PDF' );
+
+		return has_filter( 'wp_kses_allowed_html', [ $view, 'allow_pdf_html' ] ) !== false
+			&& has_filter( 'safe_style_css', [ $view, 'allow_pdf_css' ] ) !== false;
 	}
 }

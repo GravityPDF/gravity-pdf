@@ -530,19 +530,23 @@ final class GPDFAPI {
 			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-pdf' ) );
 		}
 
-		if ( $bypass_cache ) {
-			add_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
-		}
-
-		/** @var \GFPDF\Model\Model_PDF $pdf */
-		$pdf         = self::get_mvc_class( 'Model_PDF' );
-		$path_to_pdf = $pdf->generate_and_save_pdf( $entry, $setting );
+		/* A callback of this call's own, so removing it never takes away a caller's bypass */
+		$bypass = static function () {
+			return true;
+		};
 
 		if ( $bypass_cache ) {
-			remove_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
+			add_filter( 'gfpdf_override_pdf_bypass', $bypass, 9999 );
 		}
 
-		return $path_to_pdf;
+		try {
+			/** @var \GFPDF\Model\Model_PDF $pdf */
+			$pdf = self::get_mvc_class( 'Model_PDF' );
+
+			return $pdf->generate_and_save_pdf( $entry, $setting );
+		} finally {
+			remove_filter( 'gfpdf_override_pdf_bypass', $bypass, 9999 );
+		}
 	}
 
 	/**
