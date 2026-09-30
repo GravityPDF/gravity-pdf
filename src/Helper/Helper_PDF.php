@@ -140,6 +140,15 @@ class Helper_PDF {
 	protected $is_cache_disabled = false;
 
 	/**
+	 * Whether this render skips a cached PDF and generates it again, before `gfpdf_override_pdf_bypass` runs
+	 *
+	 * @var bool
+	 *
+	 * @since 7.0
+	 */
+	protected $cache_bypass = false;
+
+	/**
 	 * Why the PDF is generated: "save" (the default), or "view" / "download" when it's generated to stream to the browser
 	 *
 	 * @var string
@@ -692,6 +701,28 @@ class Helper_PDF {
 	 */
 	public function get_render_context() {
 		return $this->render_context;
+	}
+
+	/**
+	 * Set whether this render skips a cached PDF. PDFs its template generates still use the cache.
+	 *
+	 * @param bool $bypass
+	 *
+	 * @since 7.0
+	 */
+	public function set_cache_bypass( $bypass ) {
+		$this->cache_bypass = (bool) $bypass;
+	}
+
+	/**
+	 * Whether this render skips a cached PDF
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function get_cache_bypass() {
+		return $this->cache_bypass;
 	}
 
 	/**

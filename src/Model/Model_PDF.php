@@ -1189,15 +1189,18 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param array  $pdf_settings The Gravity PDF settings (from GPDFAPI::get_pdf())
 	 * @param string $context      Why the PDF is generated: "save", or "view" / "download" when it's generated to stream
 	 *                             to the browser, which doesn't fire `gfpdf_post_save_pdf`
+	 * @param bool   $bypass_cache Generate the PDF again, even when a cached PDF is current. PDFs its template generates
+	 *                             still use the cache.
 	 *
 	 * @return string|WP_Error  Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
-	 * @since 7.0 The view/download endpoints route through this method, and the $context parameter was added
+	 * @since 7.0 The view/download endpoints route through this method, and the $context and $bypass_cache parameters
+	 *            were added
 	 *
 	 * @see \GPDFAPI::create_pdf() We recommend third-party developers use the API to generate PDFs
 	 */
-	public function generate_and_save_pdf( $entry, $pdf_settings, $context = 'save' ) {
+	public function generate_and_save_pdf( $entry, $pdf_settings, $context = 'save', $bypass_cache = false ) {
 
 		$form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 		$entry        = apply_filters( 'gfpdf_current_entry_object', $entry, $form, $pdf_settings, __FUNCTION__ );
@@ -1208,6 +1211,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$pdf_generator = new Helper_PDF( $entry, $pdf_settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
 		$pdf_generator->set_filename( $filename );
+		$pdf_generator->set_cache_bypass( $bypass_cache );
 		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
 		$pdf_generator->set_render_context( $context );
 
@@ -1236,9 +1240,13 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_override_pdf_bypass/ for usage
 		 *
+		 * @param bool       $bypass        Whether this render skips a cached PDF (Helper_PDF::get_cache_bypass())
+		 * @param Helper_PDF $pdf_generator
+		 *
 		 * @since 4.2
+		 * @since 7.0 $bypass starts at the render's own choice, e.g. true for GPDFAPI::create_pdf( …, true )
 		 */
-		$pdf_override = apply_filters( 'gfpdf_override_pdf_bypass', false, $pdf_generator );
+		$pdf_override = (bool) apply_filters( 'gfpdf_override_pdf_bypass', $pdf_generator->get_cache_bypass(), $pdf_generator );
 
 		/* If cached PDF already exists then return early */
 		if ( ! $pdf_override && $this->does_pdf_exist( $pdf_generator ) ) {

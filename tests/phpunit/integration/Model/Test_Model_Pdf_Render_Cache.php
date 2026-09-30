@@ -266,6 +266,36 @@ class Test_Model_Pdf_Render_Cache extends TestCase {
 		$this->assertSame( 2, $this->renders );
 	}
 
+	public function test_cache_0_leaves_pdfs_the_template_generates_to_the_cache() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$results         = $this->form_and_entry();
+		$settings        = $this->generator()->get_settings();
+		$nested_settings = array_merge(
+			$results['form']['gfpdf_form_settings']['556690c67856b'],
+			[ 'render_cache_test' => uniqid( '', true ) ]
+		);
+		$this->model->generate_and_save_pdf( $results['entry'], $nested_settings );
+
+		$nested_status = null;
+		$nest          = function () use ( &$nest, &$nested_status, $results, $nested_settings ) {
+			remove_action( 'gfpdf_pre_pdf_generation', $nest );
+
+			$nested        = $this->model->generate_and_save_pdf( $results['entry'], $nested_settings );
+			$nested_status = $this->model->get_cache_status( $nested );
+		};
+
+		$_GET['cache'] = '0';
+		do_action( 'gfpdf_view_or_download_pdf', $results['form'], $results['entry'], $settings );
+		add_action( 'gfpdf_pre_pdf_generation', $nest );
+
+		$fresh = $this->model->generate_and_save_pdf( $results['entry'], $settings, 'view' );
+
+		$this->assertStringContainsString( '/uncached/', $fresh );
+		$this->assertSame( 'bypass', $this->model->get_cache_status( $fresh ) );
+		$this->assertSame( 'hit', $nested_status );
+	}
+
 	public function test_cache_0_needs_the_logging_capability() {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
@@ -274,6 +304,7 @@ class Test_Model_Pdf_Render_Cache extends TestCase {
 		$_GET['cache'] = '0';
 		do_action( 'gfpdf_view_or_download_pdf', $results['form'], $results['entry'], $this->generator()->get_settings() );
 
+		$this->assertFalse( has_filter( 'gfpdf_pdf_generator_pre_processing' ) );
 		$this->assertFalse( has_filter( 'gfpdf_override_pdf_bypass' ) );
 		$this->assertFalse( has_filter( 'gfpdf_enable_pdf_cache' ) );
 	}
