@@ -63,7 +63,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * Load Addon Mocks.
 	 *
 	 * Stubs for add-on classes that aren't installed in the test environment
-	 * (Zapier, Chained Selects, Gravity Perks Nested Forms) so tests exercising
+	 * (Zapier, Chained Selects, Gravity Perks Nested Forms and Populate Anything) so tests exercising
 	 * those integration code paths can run.
 	 *
 	 * @since 6.3
@@ -72,6 +72,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once __DIR__ . '/Mocks/zapier-mock.php';
 		require_once __DIR__ . '/Mocks/gf-chained-field-select-mock.php';
 		require_once __DIR__ . '/Mocks/gp-field-nested-form-mock.php';
+		require_once __DIR__ . '/Mocks/gp-populate-anything-mock.php';
 	}
 
 	/**
