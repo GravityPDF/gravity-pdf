@@ -6,6 +6,7 @@ use GFAPI;
 use GFCommon;
 use GFForms;
 use GFFormsModel;
+use GFPDF\Statics\Acting_User;
 use WP_Error;
 
 /**
@@ -209,21 +210,16 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * @since 4.0
 	 */
 	public function has_capability( $capability, $user_id = null ) {
-
-		/* Override current user */
-		if ( $user_id !== null ) {
-			$current_user = wp_get_current_user();
-			wp_set_current_user( $user_id );
+		if ( $user_id === null ) {
+			return GFCommon::current_user_can_any( $capability );
 		}
 
-		$has_capability = GFCommon::current_user_can_any( $capability );
-
-		/* Restore current user */
-		if ( $user_id !== null ) {
-			wp_set_current_user( $current_user->ID );
-		}
-
-		return $has_capability;
+		return Acting_User::run(
+			$user_id,
+			function () use ( $capability ) {
+				return GFCommon::current_user_can_any( $capability );
+			}
+		);
 	}
 
 	/**

@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use GFForms;
+use GFPDF\Statics\Acting_User;
 use Gravity_Forms\Gravity_Forms\Async\GF_Background_Process_Service_Provider;
 use Gravity_Forms\Gravity_Forms\Async\GF_Notifications_Processor;
 
@@ -112,14 +113,7 @@ class Helper_Async_Notifications implements Helper_Interface_Filters {
 			return $render();
 		}
 
-		$previous_user_id = get_current_user_id();
-		wp_set_current_user( $this->get_resent_by( $notification ) ?? (int) ( $entry['created_by'] ?? 0 ) );
-
-		try {
-			return $render();
-		} finally {
-			wp_set_current_user( $previous_user_id );
-		}
+		return Acting_User::run( $this->get_resent_by( $notification ) ?? $entry['created_by'] ?? 0, $render );
 	}
 
 	/**

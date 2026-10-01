@@ -288,6 +288,22 @@ class Test_Gravity_Forms extends TestCase {
 		wp_set_current_user( 0 );
 	}
 
+	public function test_has_capability_checks_the_given_user_and_restores_the_current_one() {
+		global $gfpdf;
+
+		$admin      = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$subscriber = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+
+		wp_set_current_user( $subscriber );
+		$this->assertTrue( $gfpdf->gform->has_capability( 'gravityforms_edit_settings', $admin ) );
+		$this->assertSame( $subscriber, get_current_user_id() );
+
+		wp_set_current_user( $admin );
+		$this->assertFalse( $gfpdf->gform->has_capability( 'gravityforms_edit_settings', $subscriber ) );
+		$this->assertFalse( $gfpdf->gform->has_capability( 'gravityforms_edit_settings', 0 ) );
+		$this->assertSame( $admin, get_current_user_id() );
+	}
+
 	/**
 	 * Check that RGFormsModel::get_form_meta() method works as expected
 	 *
