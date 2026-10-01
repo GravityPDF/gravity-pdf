@@ -2518,20 +2518,31 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$gp = GP_Populate_Anything_Live_Merge_Tags::get_instance();
 
+		/* Populate Anything replaces merge tags too, so stop this handler running again inside it */
 		$this->disable_gp_populate_anything();
-		$text = $gp->replace_live_merge_tags_static( $text, $form, $entry );
-		$this->enable_gp_populate_anything();
 
-		return $text;
+		/* A callback of this call's own, so removing it never takes away a site's own filter */
+		$allow_all = static function () {
+			return true;
+		};
+
+		add_filter( 'gppa_allow_all_lmts', $allow_all );
+
+		try {
+			return $gp->replace_live_merge_tags_static( $text, $form, $entry );
+		} finally {
+			remove_filter( 'gppa_allow_all_lmts', $allow_all );
+			$this->enable_gp_populate_anything();
+		}
 	}
 
 	/**
 	 * At the end of the PDF generation, remove filter to replace merge tags for Gravity Perk Populate Anything
 	 *
 	 * @since 5.3
+	 * @since 7.0 No longer leaves every live merge tag allowed for the rest of the request
 	 */
 	public function disable_gp_populate_anything() {
-		add_filter( 'gppa_allow_all_lmts', '__return_true' );
 		remove_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ] );
 	}
 
@@ -2541,7 +2552,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 5.3
 	 */
 	public function enable_gp_populate_anything() {
-		remove_filter( 'gppa_allow_all_lmts', '__return_true' );
 		add_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ], 10, 3 );
 	}
 

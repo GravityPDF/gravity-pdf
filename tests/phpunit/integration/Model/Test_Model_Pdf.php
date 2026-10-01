@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Model;
 
+use Exception;
 use GF_UnitTest_Factory;
 use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
@@ -341,5 +342,64 @@ class Test_Model_PDF extends TestCase {
 		remove_filter( 'gfpdf_disable_global_addon_data', '__return_true' );
 
 		$this->assertSame( [], $data );
+	}
+
+	/**
+	 * @dataProvider provider_gp_populate_anything_replacements
+	 */
+	public function test_process_gp_populate_anything_allows_every_live_merge_tag_only_while_replacing( bool $throws, string $expected ) {
+		$handler = [ $this->model, 'process_gp_populate_anything' ];
+		$during  = [];
+
+		add_filter(
+			'gfpdf_mock_gppa_replace_live_merge_tags',
+			function ( $text ) use ( $handler, $throws, &$during ) {
+				$during = [
+					'allow_all' => apply_filters( 'gppa_allow_all_lmts', false ),
+					'handler'   => has_filter( 'gform_pre_replace_merge_tags', $handler ),
+				];
+
+				if ( $throws ) {
+					throw new Exception( 'Replacement failed' );
+				}
+
+				return $text . ' replaced';
+			}
+		);
+
+		$this->model->enable_gp_populate_anything();
+
+		try {
+			$result = $this->model->process_gp_populate_anything( 'Text', [], [] );
+		} catch ( Exception $e ) {
+			$result = $e->getMessage();
+		}
+
+		$this->assertSame( $expected, $result );
+		$this->assertSame(
+			[
+				'allow_all' => true,
+				'handler'   => false,
+			],
+			$during
+		);
+		$this->assertFalse( has_filter( 'gppa_allow_all_lmts' ) );
+		$this->assertSame( 10, has_filter( 'gform_pre_replace_merge_tags', $handler ) );
+	}
+
+	public function provider_gp_populate_anything_replacements(): array {
+		return [
+			'replaced' => [ false, 'Text replaced' ],
+			'throws'   => [ true, 'Replacement failed' ],
+		];
+	}
+
+	public function test_gp_populate_anything_toggles_leave_the_live_merge_tag_whitelist_alone() {
+		$this->model->disable_gp_populate_anything();
+		$this->assertFalse( has_filter( 'gppa_allow_all_lmts' ) );
+
+		add_filter( 'gppa_allow_all_lmts', '__return_true' );
+		$this->model->enable_gp_populate_anything();
+		$this->assertSame( 10, has_filter( 'gppa_allow_all_lmts', '__return_true' ) );
 	}
 }
