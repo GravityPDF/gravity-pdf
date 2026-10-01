@@ -233,7 +233,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @since 6.13.5 Move queue dispatch to self::queue_async_form_submission_dispatch()
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
-		$this->queue_async_tasks( $form, $entry );
+		$this->queue_async_tasks( $form, $entry, true );
 	}
 
 	/**
@@ -269,7 +269,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 					continue;
 				}
 
-				$this->queue_async_form_submission_tasks( $entry, $form );
+				$this->queue_async_tasks( $form, $entry );
 			}
 		}
 
@@ -281,14 +281,16 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 *
 	 * @param array $form
 	 * @param array $entry
+	 * @param bool  $is_submission Whether the form was just submitted, as opposed to notifications being resent
 	 *
 	 * @return void
 	 *
 	 * @since 6.11.0
+	 * @since 7.0 Added $is_submission
 	 */
-	public function queue_async_tasks( $form, $entry ) {
+	public function queue_async_tasks( $form, $entry, $is_submission = false ) {
 		$notifications = $this->form_async_notifications[ $form['id'] ][ $entry['id'] ] ?? [];
-		$tasks         = $this->get_queue_tasks( $entry, $form, $notifications );
+		$tasks         = $this->get_queue_tasks( $entry, $form, $notifications, $is_submission );
 
 		/* Push each task individually for forwards compatibility with new Background Processing update */
 		foreach ( $tasks as $task ) {
@@ -321,19 +323,20 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @param array $entry
 	 * @param array $form
 	 * @param array $notifications
+	 * @param bool  $is_submission Whether the form was just submitted, as opposed to notifications being resent
 	 *
 	 * @return array
 	 * @since 5.0
-	 *
+	 * @since 7.0 Added $is_submission
 	 */
-	protected function get_queue_tasks( $entry, $form, $notifications = [] ) {
+	protected function get_queue_tasks( $entry, $form, $notifications = [], $is_submission = false ) {
 		/* Check if the PDF should be generated  */
 		$pdfs = $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'] ?? [], $entry );
 
 		$queue_data = apply_filters( 'gfpdf_queue_initialise', [], $entry, $form );
 
 		if ( count( $pdfs ) > 0 ) {
-			$pdf_queue_data          = $this->queue_pdfs( $notifications, $pdfs, $form, $entry );
+			$pdf_queue_data          = $this->queue_pdfs( $notifications, $pdfs, $form, $entry, $is_submission );
 			$notification_queue_data = $this->queue_notifications( $notifications, $pdfs, $form, $entry );
 
 			$queue_data = array_merge( $queue_data, $pdf_queue_data, $notification_queue_data );
@@ -358,12 +361,14 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 	 * @param array $pdfs
 	 * @param array $form
 	 * @param array $entry
+	 * @param bool  $is_submission Whether the form was just submitted, as opposed to notifications being resent
 	 *
 	 * @return array
 	 *
 	 * @since 5.0
+	 * @since 7.0 Added $is_submission
 	 */
-	protected function queue_pdfs( $notifications, $pdfs, $form, $entry ) {
+	protected function queue_pdfs( $notifications, $pdfs, $form, $entry, $is_submission = false ) {
 		$queue_data = apply_filters( 'gfpdf_queue_pre_pdf_creation', [], $entry, $form );
 
 		foreach ( $pdfs as $pdf ) {
@@ -375,6 +380,11 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller {
 
 			/* Check if we need to save the PDF due to a filter */
 			if ( $this->model_pdf->maybe_always_save_pdf( $pdf, $form['id'] ) ) {
+				/* Only a form submission, not a resent notification, fires the `gfpdf_post_save_pdf` actions */
+				if ( $is_submission ) {
+					$pdf_queue_data['args'][] = 'submission';
+				}
+
 				$queue_data[] = $pdf_queue_data;
 				continue;
 			}

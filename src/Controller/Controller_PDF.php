@@ -133,7 +133,6 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		/* Add hooks to save PDF to disk, or run right after a PDF is saved to disk */
 		add_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ], 10, 2 );
-		add_action( 'gfpdf_post_pdf_generation', [ $this->model, 'trigger_post_save_pdf' ], 10, 4 );
 
 		/* Scheduled clean-up actions */
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );

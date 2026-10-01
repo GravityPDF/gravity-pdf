@@ -2240,10 +2240,20 @@ class Test_PDF extends TestCase {
 		$path = Cache::get_path( $form, $entry, $form['gfpdf_form_settings']['556690c67856b'] );
 		$file = "test-{$form['id']}.pdf";
 
+		$saves        = did_action( 'gfpdf_post_save_pdf' );
+		$legacy_saves = did_action( 'gfpdf_post_pdf_save' );
 		$this->model->maybe_save_pdf( $entry, $form );
+		$fired = did_action( 'gfpdf_post_save_pdf' ) - $saves;
 
 		/* Check the results are successful */
 		$this->assertFileExists( $path . $file );
+		$this->assertGreaterThan( 0, $fired );
+		$this->assertSame( $fired, did_action( 'gfpdf_post_pdf_save' ) - $legacy_saves );
+
+		/* A cached PDF still fires the save actions, e.g. when a notification generated it earlier in the submission */
+		$saves = did_action( 'gfpdf_post_save_pdf' );
+		$this->model->maybe_save_pdf( $entry, $form );
+		$this->assertSame( $fired, did_action( 'gfpdf_post_save_pdf' ) - $saves );
 
 		/* Clean up */
 		unlink( $path . $file );
@@ -2271,6 +2281,10 @@ class Test_PDF extends TestCase {
 		add_filter( 'gfpdf_post_save_pdf', '__return_true' );
 		$this->assertTrue( $this->model->maybe_always_save_pdf( $settings ) );
 		remove_filter( 'gfpdf_post_save_pdf', '__return_true' );
+
+		add_action( 'gfpdf_post_pdf_save', '__return_true' );
+		$this->assertTrue( $this->model->maybe_always_save_pdf( $settings ) );
+		remove_action( 'gfpdf_post_pdf_save', '__return_true' );
 	}
 
 	/**
@@ -2335,8 +2349,7 @@ class Test_PDF extends TestCase {
 		$settings             = $gfpdf->options->get_pdf( $fid, $pid );
 		$settings['template'] = 'zadani';
 
-		/* did_action() is cumulative and set_up's controller init doubles the listener; assert deltas. */
-		$baseline = did_action( 'gfpdf_post_save_pdf' );
+		$saves = did_action( 'gfpdf_post_save_pdf' );
 
 		/* Generate our PDF and verify it worked correctly */
 		$filename = $this->model->generate_and_save_pdf( $entry, $settings );
@@ -2347,8 +2360,7 @@ class Test_PDF extends TestCase {
 			unlink( $filename );
 		}
 
-		$after_success = did_action( 'gfpdf_post_save_pdf' );
-		$this->assertGreaterThan( $baseline, $after_success, 'gfpdf_post_save_pdf should fire on successful generation' );
+		$this->assertSame( $saves, did_action( 'gfpdf_post_save_pdf' ), 'Only a form submission fires gfpdf_post_save_pdf' );
 
 		$settings['template'] = 'doesntexist';
 
@@ -2356,6 +2368,53 @@ class Test_PDF extends TestCase {
 		$error = $this->model->generate_and_save_pdf( $entry, $settings );
 
 		$this->assertInstanceOf( \WP_Error::class, $error );
+	}
+
+	/**
+	 * @group slow
+	 */
+	public function test_save_pdf_and_do_action_fires_the_action_and_its_form_variant() {
+		global $gfpdf;
+
+		$results  = $this->form_and_entry();
+		$entry    = $results['entry'];
+		$form_id  = $results['form']['id'];
+		$settings = $gfpdf->options->get_pdf( $form_id, '555ad84787d7e' );
+		$actions  = [
+			'gfpdf_post_save_pdf'              => [],
+			'gfpdf_post_save_notification_pdf' => [ [ 'id' => 'notification' ] ],
+		];
+
+		$settings['template'] = 'zadani';
+		add_filter(
+			'gfpdf_current_pdf_settings_object',
+			function ( $settings ) {
+				return array_merge( $settings, [ 'filtered' => true ] );
+			}
+		);
+
+		$fired = [];
+		add_action(
+			'all',
+			function ( $hook, ...$args ) use ( &$fired ) {
+				if ( strpos( $hook, 'gfpdf_post_save_' ) === 0 ) {
+					$fired[ $hook ] = $args;
+				}
+			}
+		);
+
+		/* The first render is a cache miss and the second a hit: the action fires either way */
+		foreach ( $actions as $action => $extra_args ) {
+			$fired = [];
+			$path  = $this->invoke_model( 'save_pdf_and_do_action', $entry, $settings, $action, ...$extra_args );
+
+			$this->assertSame( [ $action, $action . '_' . $form_id ], array_keys( $fired ) );
+			$this->assertSame( [ $path, basename( $path ) ], array_slice( $fired[ $action ], 0, 2 ) );
+			$this->assertTrue( $fired[ $action ][2]['filtered'] );
+			$this->assertSame( $entry['id'], $fired[ $action ][3]['id'] );
+			$this->assertSame( $form_id, $fired[ $action ][4]['id'] );
+			$this->assertSame( $extra_args, array_slice( $fired[ $action ], 5 ) );
+		}
 	}
 
 	/**
@@ -2376,10 +2435,15 @@ class Test_PDF extends TestCase {
 			}
 		);
 
+		$generations = did_action( 'gfpdf_post_pdf_generation' );
+		$saves       = did_action( 'gfpdf_post_save_pdf' );
+
 		$error = $this->model->process_pdf( '555ad84787d7e', $results['entry']['id'], 'download' );
 
 		$this->assertWPError( $error );
 		$this->assertSame( 'headers_sent', $error->get_error_code() );
+		$this->assertGreaterThan( $generations, did_action( 'gfpdf_post_pdf_generation' ) );
+		$this->assertSame( $saves, did_action( 'gfpdf_post_save_pdf' ) );
 	}
 
 	/**

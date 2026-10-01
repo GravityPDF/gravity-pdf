@@ -1102,8 +1102,8 @@ class Model_PDF extends Helper_Abstract_Model {
 					$filename = $this->async_notifications->render_as_sender(
 						$notifications,
 						$entry,
-						function () use ( $entry, $settings ) {
-							return $this->generate_and_save_pdf( $entry, $settings );
+						function () use ( $entry, $settings, $notifications ) {
+							return $this->save_pdf_and_do_action( $entry, $settings, 'gfpdf_post_save_notification_pdf', $notifications );
 						}
 					);
 					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
@@ -1204,10 +1204,25 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @see \GPDFAPI::create_pdf() We recommend third-party developers use the API to generate PDFs
 	 */
 	public function generate_and_save_pdf( $entry, $pdf_settings ) {
+		$pdf_generator = $this->run_pdf_generator( $entry, $pdf_settings );
 
-		$form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
-		$entry        = apply_filters( 'gfpdf_current_entry_object', $entry, $form, $pdf_settings, __FUNCTION__ );
-		$pdf_settings = apply_filters( 'gfpdf_current_pdf_settings_object', $pdf_settings, $form, $entry, __FUNCTION__ );
+		return is_wp_error( $pdf_generator ) ? $pdf_generator : $pdf_generator->get_full_pdf_path();
+	}
+
+	/**
+	 * Generate and save the PDF to disk, or reuse the cached PDF
+	 *
+	 * @param array $entry        The Gravity Forms entry
+	 * @param array $pdf_settings The Gravity PDF settings
+	 *
+	 * @return Helper_PDF|WP_Error The PDF's generator, which holds the filtered entry, form and settings
+	 *
+	 * @since 7.0
+	 */
+	protected function run_pdf_generator( $entry, $pdf_settings ) {
+		$form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'generate_and_save_pdf' );
+		$entry        = apply_filters( 'gfpdf_current_entry_object', $entry, $form, $pdf_settings, 'generate_and_save_pdf' );
+		$pdf_settings = apply_filters( 'gfpdf_current_pdf_settings_object', $pdf_settings, $form, $entry, 'generate_and_save_pdf' );
 		$filename     = $this->get_pdf_name( $pdf_settings, $entry );
 
 		do_action( 'gfpdf_pre_generate_and_save_pdf', $form, $entry, $pdf_settings );
@@ -1222,7 +1237,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		do_action( 'gfpdf_post_generate_and_save_pdf', $form, $entry, $pdf_settings );
 
-		return $pdf_generator->get_full_pdf_path();
+		return $pdf_generator;
 	}
 
 	/**
@@ -1949,7 +1964,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Creates a PDF on every submission, except when the PDF is already created during the notification hook
+	 * Save the PDFs that should always be saved on form submission (see maybe_always_save_pdf())
 	 *
 	 * @param array $entry The GF Entry Details
 	 * @param array $form  The Gravity Form
@@ -1958,6 +1973,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @throws Exception
 	 * @since 4.0
+	 * @since 7.0 Fires `gfpdf_post_save_pdf` itself, even when a notification already generated the PDF this submission
 	 */
 	public function maybe_save_pdf( $entry, $form ) {
 
@@ -1974,9 +1990,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			foreach ( $pdfs as $pdf ) {
 				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
 
-				/* Only generate if the PDF wasn't created during the notification process */
 				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings, $entry['form_id'] ) ) {
-					$this->generate_and_save_pdf( $entry, $settings );
+					$this->save_submission_pdf( $entry, $settings );
 				}
 			}
 		}
@@ -1992,7 +2007,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function maybe_always_save_pdf( array $settings, int $form_id = 0 ): bool {
 
-		$save = has_filter( 'gfpdf_post_save_pdf' ) || has_filter( 'gfpdf_post_save_pdf_' . $form_id );
+		$save = has_filter( 'gfpdf_post_save_pdf' )
+			|| has_filter( 'gfpdf_post_save_pdf_' . $form_id )
+			|| has_filter( 'gfpdf_post_pdf_save' );
 
 		/* Legacy / Backwards compatible */
 		if ( strtolower( $settings['save'] ?? '' ) === 'yes' ) {
@@ -2006,29 +2023,78 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Trigger Post PDF Generation Action
+	 * Generate and save a PDF, then fire a post-save action and its `_{form_id}` variant, even when the PDF was cached
 	 *
-	 * @param array      $form     The Gravity Form
-	 * @param array      $entry    The Gravity Form Entry
-	 * @param array      $settings The Gravity PDF Settings
-	 * @param Helper_PDF $pdf      The Helper_PDF object
+	 * @param array  $entry         The Gravity Forms entry
+	 * @param array  $settings      The Gravity PDF settings
+	 * @param string $action        The post-save action to fire, e.g. `gfpdf_post_save_pdf`
+	 * @param mixed  ...$extra_args Passed to the action after the PDF path, filename, settings, entry and form
 	 *
-	 * @since 5.2
+	 * @return string|WP_Error The full path to the PDF, or a WP_Error on failure
+	 *
+	 * @since 7.0
 	 */
-	public function trigger_post_save_pdf( $form, $entry, $settings, $pdf ) {
-		$pdf_path = $pdf->get_full_pdf_path();
-
-		if ( is_file( $pdf_path ) ) {
-			/* Add appropriate filters so developers can access the PDF when it is generated */
-			$form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
-			$filename = basename( $pdf_path );
-
-			do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
-
-			/* See https://docs.gravitypdf.com/developers/actions/gfpdf_post_save_pdf for more details about these actions */
-			do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
-			do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
+	protected function save_pdf_and_do_action( $entry, $settings, $action, ...$extra_args ) {
+		$pdf = $this->run_pdf_generator( $entry, $settings );
+		if ( is_wp_error( $pdf ) ) {
+			return $pdf;
 		}
+
+		$path = $pdf->get_full_pdf_path();
+		$form = $pdf->get_form();
+		$args = array_merge( [ $path, basename( $path ), $pdf->get_settings(), $pdf->get_entry(), $form ], $extra_args );
+
+		/* See https://docs.gravitypdf.com/developers/actions/gfpdf_post_save_pdf for more details about these actions */
+		do_action( $action, ...$args );
+		do_action( $action . '_' . $form['id'], ...$args );
+
+		return $path;
+	}
+
+	/**
+	 * Generate and save a PDF for a form submission, then fire `gfpdf_post_save_pdf` and the legacy `gfpdf_post_pdf_save`
+	 *
+	 * @param array $entry    The Gravity Forms entry
+	 * @param array $settings The Gravity PDF settings
+	 *
+	 * @return string|WP_Error The full path to the PDF, or a WP_Error on failure
+	 *
+	 * @since 7.0
+	 */
+	protected function save_submission_pdf( $entry, $settings ) {
+		$path = $this->save_pdf_and_do_action( $entry, $settings, 'gfpdf_post_save_pdf' );
+		if ( ! is_wp_error( $path ) ) {
+			do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $path ); /* Backwards compatibility */
+		}
+
+		return $path;
+	}
+
+	/**
+	 * Generate and save an entry's PDF by ID, then fire the post-save action for its context
+	 *
+	 * @param int    $entry_id The Gravity Forms entry ID
+	 * @param string $pdf_id   The Gravity PDF ID
+	 * @param string $context  "submission" fires `gfpdf_post_save_pdf`, and anything else `gfpdf_post_save_api_pdf`
+	 *
+	 * @return string|WP_Error The full path to the PDF, or a WP_Error on failure
+	 *
+	 * @since 7.0
+	 */
+	public function save_pdf_by_id( $entry_id, $pdf_id, $context ) {
+		$entry = $this->gform->get_entry( $entry_id );
+		if ( is_wp_error( $entry ) ) {
+			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-pdf' ) );
+		}
+
+		$settings = $this->options->get_pdf( $entry['form_id'], $pdf_id );
+		if ( is_wp_error( $settings ) ) {
+			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-pdf' ) );
+		}
+
+		return $context === 'submission'
+			? $this->save_submission_pdf( $entry, $settings )
+			: $this->save_pdf_and_do_action( $entry, $settings, 'gfpdf_post_save_api_pdf' );
 	}
 
 	/**

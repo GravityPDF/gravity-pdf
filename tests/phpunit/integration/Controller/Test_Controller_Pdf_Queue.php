@@ -338,6 +338,28 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		$this->assertStringContainsString( "send-notification-$prefix", $queue[3][0]['id'] );
 	}
 
+	public function test_only_a_form_submission_queues_pdfs_that_fire_the_save_actions() {
+		$results = $this->form_and_entry();
+
+		/* A listener makes every PDF one that is always saved */
+		add_action( 'gfpdf_post_save_pdf', '__return_null' );
+
+		$this->controller->queue_async_tasks( $results['form'], $results['entry'] );
+		$resent = $this->queue_mock->get_data();
+		$this->controller->dispatch_queue();
+
+		$this->controller->queue_async_form_submission_tasks( $results['entry'], $results['form'] );
+		$submitted = $this->queue_mock->get_data();
+
+		$this->assertNotEmpty( $resent );
+		$this->assertSameSize( $resent, $submitted );
+
+		foreach ( $submitted as $i => $task ) {
+			$this->assertCount( 3, $resent[ $i ][0]['args'] );
+			$this->assertSame( 'submission', $task[0]['args'][3] );
+		}
+	}
+
 	/**
 	 * Test the resend notification queue works as expected
 	 *

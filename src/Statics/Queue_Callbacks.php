@@ -35,21 +35,26 @@ class Queue_Callbacks {
 	 *  @param int    $entry_id Entry ID to process
 	 *  @param string $pdf_id   PDF ID to process
 	 *  @param int    $user_id  User ID who triggered the queue
+	 *  @param string $context  Why the PDF is saved: "submission" or "api". See Model_PDF::save_pdf_by_id().
 	 *
 	 * @throws Exception
 	 *
 	 * @since 5.0
+	 * @since 7.0 Added $context
 	 */
-	public static function create_pdf( $entry_id, $pdf_id, $user_id = 0 ) {
+	public static function create_pdf( $entry_id, $pdf_id, $user_id = 0, $context = 'api' ) {
 		$log = GPDFAPI::get_log_class();
 
 		/* Masquerade as the user ID who scheduled the queue so caching and the {user} merge tag works correctly */
 		$backup_user_id = get_current_user_id();
 		wp_set_current_user( $user_id );
 
+		/** @var \GFPDF\Model\Model_PDF $model_pdf */
+		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
+
 		/* For performance, only generate the PDF if it does not currently exist on disk */
 		add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
-		$pdf = GPDFAPI::create_pdf( $entry_id, $pdf_id );
+		$pdf = $model_pdf->save_pdf_by_id( $entry_id, $pdf_id, $context );
 		remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
 
 		/* Reset existing user */

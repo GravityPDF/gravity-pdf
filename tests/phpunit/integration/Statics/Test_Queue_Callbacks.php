@@ -17,11 +17,47 @@ class Test_Queue_Callbacks extends TestCase {
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
 		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
+		static::copy_test_fonts();
+	}
+
+	public static function tear_down_after_class(): void {
+		static::remove_test_fonts();
+		parent::tear_down_after_class();
 	}
 
 	public function test_create_pdf_throws_when_generation_returns_wp_error() {
 		$this->expectException( Exception::class );
 		Queue_Callbacks::create_pdf( 0, '' );
+	}
+
+	/**
+	 * @group slow
+	 */
+	public function test_create_pdf_fires_the_save_action_for_its_context() {
+		$entry_id = $this->form_and_entry()['entry']['id'];
+		$fired    = [];
+
+		add_filter(
+			'gfpdf_pdf_config',
+			function ( $settings ) {
+				return array_merge( $settings, [ 'template' => 'zadani' ] );
+			}
+		);
+
+		foreach ( [ 'gfpdf_post_save_pdf', 'gfpdf_post_pdf_save', 'gfpdf_post_save_api_pdf' ] as $action ) {
+			add_action(
+				$action,
+				function () use ( $action, &$fired ) {
+					$fired[] = $action;
+				}
+			);
+		}
+
+		Queue_Callbacks::create_pdf( $entry_id, '555ad84787d7e', 0 );
+		$this->assertSame( [ 'gfpdf_post_save_api_pdf' ], $fired );
+
+		Queue_Callbacks::create_pdf( $entry_id, '555ad84787d7e', 0, 'submission' );
+		$this->assertSame( [ 'gfpdf_post_save_api_pdf', 'gfpdf_post_save_pdf', 'gfpdf_post_pdf_save' ], $fired );
 	}
 
 	public function test_create_pdf_restores_previous_user_after_run() {
