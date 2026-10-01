@@ -128,10 +128,17 @@ class Test_Rest_Download_Pdf extends Test_Rest {
 
 		wp_set_current_user( self::$admin_id );
 
+		$saves     = did_action( 'gfpdf_post_save_pdf' );
+		$api_saves = did_action( 'gfpdf_post_save_api_pdf' );
+
 		$request  = new WP_REST_Request( 'POST', $this->get_download_route( $entry_id, $pdf_id ) );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
+
+		/* A PDF generated over REST isn't one saved on form submission */
+		$this->assertSame( $saves, did_action( 'gfpdf_post_save_pdf' ) );
+		$this->assertSame( $api_saves + 1, did_action( 'gfpdf_post_save_api_pdf' ) );
 
 		$data = $response->get_data();
 		$this->assertArrayHasKey( 'filename', $data );

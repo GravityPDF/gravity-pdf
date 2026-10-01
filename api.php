@@ -497,8 +497,8 @@ final class GPDFAPI {
 	 * cache is off or a remote image failed to load, goes to a one-off folder that's cleaned up soon after. Copy the
 	 * file before changing, moving or deleting it.
 	 *
-	 * The `gfpdf_pre_pdf_generation`, `gfpdf_post_pdf_generation` and `gfpdf_post_save_pdf` actions fire only when the
-	 * PDF is generated, not when a cached PDF is returned.
+	 * The `gfpdf_pre_pdf_generation` and `gfpdf_post_pdf_generation` actions fire only when the PDF is generated, while
+	 * `gfpdf_post_save_api_pdf` fires on every call.
 	 *
 	 * See https://docs.gravitypdf.com/v6/developers/api/create_pdf/ for more information about this method
 	 *
@@ -509,33 +509,17 @@ final class GPDFAPI {
 	 * @return string|WP_Error   Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
-	 * @since 7.0 PDFs are cached on disk and reused until the form, entry, PDF settings, template or fonts change
+	 * @since 7.0 PDFs are cached on disk and reused until the form, entry, PDF settings, template or fonts change, and
+	 *        `gfpdf_post_save_api_pdf` fires instead of `gfpdf_post_save_pdf`
 	 */
 	public static function create_pdf( $entry_id, $pdf_id, $bypass_cache = false ) {
-
-		$form_class = self::get_form_class();
-
-		/* Get our entry */
-		$entry = $form_class->get_entry( $entry_id );
-
-		if ( is_wp_error( $entry ) ) {
-			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-pdf' ) );
-		}
-
-		/* Get our settings */
-		$setting = self::get_pdf( $entry['form_id'], $pdf_id );
-
-		if ( is_wp_error( $setting ) ) {
-			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-pdf' ) );
-		}
-
 		if ( $bypass_cache ) {
 			add_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
 		}
 
 		/** @var \GFPDF\Model\Model_PDF $pdf */
 		$pdf         = self::get_mvc_class( 'Model_PDF' );
-		$path_to_pdf = $pdf->generate_and_save_pdf( $entry, $setting );
+		$path_to_pdf = $pdf->save_pdf_by_id( $entry_id, $pdf_id, 'api' );
 
 		if ( $bypass_cache ) {
 			remove_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
