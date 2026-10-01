@@ -190,7 +190,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param integer $lid    The Gravity Form Entry ID
 	 * @param string  $action Whether the PDF should be viewed or downloaded
 	 *
-	 * @return WP_Error
+	 * @return WP_Error|void An error when the PDF can't be generated or sent. Otherwise the request ends.
 	 * @since 4.0
 	 * @since 7.0 View/Download PDF creation workflow standardized with Save PDF workflow
 	 */
@@ -297,7 +297,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		do_action( 'gfpdf_post_view_or_download_pdf', $path_to_pdf, $form, $entry, $settings, $action );
 
-		$this->send_pdf_to_browser( $path_to_pdf, $action );
+		return $this->send_pdf_to_browser( $path_to_pdf, $action );
 	}
 
 	/**
@@ -2601,9 +2601,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Send a PDF file to the browser
 	 *
 	 * In debug mode an X-GPDF-Cache header reports how the cache served the PDF generated for this request.
+	 * A browser whose copy is current (If-None-Match, or If-Modified-Since) gets a 304 Not Modified.
 	 *
 	 * @param string $path_to_pdf Absolute path to PDF on disk
 	 * @param string $action Either "view" or "download"
+	 *
+	 * @return WP_Error|void An error when the headers were already sent. Otherwise the request ends.
 	 *
 	 * @since 7.0
 	 */
@@ -2626,13 +2629,33 @@ class Model_PDF extends Helper_Abstract_Model {
 			ob_end_clean();
 		}
 
-		/* Send the PDF to the client */
-		header( 'Content-Type: application/pdf' );
-
 		$cache_status = $this->get_cache_status( $path_to_pdf );
 		if ( $cache_status !== null && Debug::is_enabled() ) {
 			header( 'X-GPDF-Cache: ' . $cache_status );
 		}
+
+		/* Set appropriate headers for local browser caching. Another request may have just replaced the PDF. */
+		clearstatcache( true, $path_to_pdf );
+		$last_modified_time = (int) filemtime( $path_to_pdf );
+		$size               = (int) filesize( $path_to_pdf );
+
+		/* The path holds the cache key, and the time and size change when the PDF is generated again at that path */
+		$etag = sprintf( '"%s-%x-%x"', md5( $path_to_pdf ), $last_modified_time, $size );
+
+		header( sprintf( 'Last-Modified: %s GMT', gmdate( 'D, d M Y H:i:s', $last_modified_time ) ) );
+		header( sprintf( 'ETag: %s', $etag ) );
+		header( 'Cache-Control: no-cache, private' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		/* Tell client they can display the PDF from the local cache if it is still current */
+		if ( $this->is_pdf_not_modified( $etag, $last_modified_time ) ) {
+			status_header( 304 );
+			exit;
+		}
+
+		/* Send the PDF to the client */
+		header( 'Content-Type: application/pdf' );
 
 		/*
 		 * Set the filename, supporting the new utf-8 syntax + backwards compatibility
@@ -2646,10 +2669,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			)
 		);
 
-		/* only add the length if the server is not using compression */
-		if ( empty( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ) {
-			header( sprintf( 'Content-Length: %d', filesize( $path_to_pdf ) ) );
-		}
+		/* Closing the buffers above turned off PHP's own compression, and server-level compression corrects the length */
+		header( sprintf( 'Content-Length: %d', $size ) );
 
 		/* Tell client to download the file */
 		if ( $action !== 'view' ) {
@@ -2657,24 +2678,37 @@ class Model_PDF extends Helper_Abstract_Model {
 			header( 'Content-Transfer-Encoding: binary' );
 		}
 
-		/* Set appropriate headers for local browser caching */
-		$last_modified_time = filemtime( $path_to_pdf );
-		$etag               = md5( $path_to_pdf ); /* the file path includes a unique hash that automatically changes when a PDF does */
-
-		header( sprintf( 'Last-Modified: %s GMT', gmdate( 'D, d M Y H:i:s', $last_modified_time ) ) );
-		header( sprintf( 'Etag: %s', $etag ) );
-		header( 'Cache-Control: no-cache, private' );
-		header( 'Pragma: no-cache' );
-		header( 'Expires: 0' );
-
-		/* Tell client they can display the PDF from the local cache if it is still current */
-		if ( ! empty( $_SERVER['HTTP_IF_NONE_MATCH'] ) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag ) {
-			header( 'HTTP/1.1 304 Not Modified' );
-			exit;
-		}
-
 		readfile( $path_to_pdf ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- streaming PDF response. */
 
 		exit;
+	}
+
+	/**
+	 * Whether the browser's copy of the PDF is current, going by the request's If-None-Match header or, when that's
+	 * missing, its If-Modified-Since header
+	 *
+	 * @param string $etag               The PDF's quoted ETag
+	 * @param int    $last_modified_time The PDF's modification time
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	protected function is_pdf_not_modified( $etag, $last_modified_time ) {
+		if ( ! in_array( $_SERVER['REQUEST_METHOD'] ?? 'GET', [ 'GET', 'HEAD' ], true ) ) {
+			return false;
+		}
+
+		$if_none_match = trim( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ?? '' ) );
+		if ( $if_none_match !== '' ) {
+			/* A weak comparison, because compressing proxies turn the ETag into a weak W/"…" */
+			preg_match_all( '/(?:W\/)?("[^"]*")/', $if_none_match, $matches );
+
+			return $if_none_match === '*' || in_array( $etag, $matches[1], true );
+		}
+
+		$if_modified_since = strtotime( wp_unslash( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '' ) );
+
+		return $if_modified_since !== false && $if_modified_since <= time() && $last_modified_time <= $if_modified_since;
 	}
 }

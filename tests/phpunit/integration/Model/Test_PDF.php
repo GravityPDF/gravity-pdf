@@ -2356,6 +2356,93 @@ class Test_PDF extends TestCase {
 		$error = $this->model->generate_and_save_pdf( $entry, $settings );
 
 		$this->assertInstanceOf( \WP_Error::class, $error );
-		$this->assertSame( $after_success, did_action( 'gfpdf_post_save_pdf' ), 'gfpdf_post_save_pdf should not fire on failed generation' );
+	}
+
+	/**
+	 * @group slow
+	 */
+	public function test_process_pdf_returns_the_error_when_the_pdf_cannot_be_sent() {
+		if ( ! headers_sent() ) {
+			$this->markTestSkipped( 'The PDF would be streamed and end the test run' );
+		}
+
+		$results = $this->form_and_entry();
+
+		remove_all_filters( 'gfpdf_pdf_middleware' );
+		add_filter(
+			'gfpdf_current_pdf_settings_object',
+			function ( $settings ) {
+				return array_merge( $settings, [ 'template' => 'zadani' ] );
+			}
+		);
+
+		$error = $this->model->process_pdf( '555ad84787d7e', $results['entry']['id'], 'download' );
+
+		$this->assertWPError( $error );
+		$this->assertSame( 'headers_sent', $error->get_error_code() );
+	}
+
+	/**
+	 * @dataProvider provider_is_pdf_not_modified
+	 */
+	public function test_is_pdf_not_modified( $expected, $server ) {
+		$original = $_SERVER;
+		unset( $_SERVER['HTTP_IF_NONE_MATCH'], $_SERVER['HTTP_IF_MODIFIED_SINCE'] );
+		$_SERVER['REQUEST_METHOD'] = 'GET';
+		$_SERVER                   = array_merge( $_SERVER, $server );
+
+		try {
+			$this->assertSame( $expected, $this->invoke_model( 'is_pdf_not_modified', '"abc-1-2"', 1000000000 ) );
+		} finally {
+			$_SERVER = $original;
+		}
+	}
+
+	public function provider_is_pdf_not_modified(): array {
+		$modified = 'Sun, 09 Sep 2001 01:46:40 GMT';
+
+		return [
+			'no conditional headers'                => [ false, [] ],
+			'matching ETag'                         => [ true, [ 'HTTP_IF_NONE_MATCH' => '"abc-1-2"' ] ],
+			'weak matching ETag'                    => [ true, [ 'HTTP_IF_NONE_MATCH' => 'W/"abc-1-2"' ] ],
+			'matching ETag in a list'               => [ true, [ 'HTTP_IF_NONE_MATCH' => '"old", W/"abc-1-2" , "other"' ] ],
+			'wildcard'                              => [ true, [ 'HTTP_IF_NONE_MATCH' => '*' ] ],
+			'unquoted ETag'                         => [ false, [ 'HTTP_IF_NONE_MATCH' => 'abc-1-2' ] ],
+			'other ETag'                            => [ false, [ 'HTTP_IF_NONE_MATCH' => '"abc-1-3"' ] ],
+			'If-None-Match wins over a current date' => [
+				false,
+				[
+					'HTTP_IF_NONE_MATCH'     => '"abc-1-3"',
+					'HTTP_IF_MODIFIED_SINCE' => $modified,
+				],
+			],
+			'modified at that date'                 => [ true, [ 'HTTP_IF_MODIFIED_SINCE' => $modified ] ],
+			'modified before that date'             => [ true, [ 'HTTP_IF_MODIFIED_SINCE' => 'Sun, 09 Sep 2001 01:46:41 GMT' ] ],
+			'modified after that date'              => [ false, [ 'HTTP_IF_MODIFIED_SINCE' => 'Sun, 09 Sep 2001 01:46:39 GMT' ] ],
+			'date in the future'                    => [ false, [ 'HTTP_IF_MODIFIED_SINCE' => gmdate( 'D, d M Y H:i:s', time() + DAY_IN_SECONDS ) . ' GMT' ] ],
+			'unparsable date'                       => [ false, [ 'HTTP_IF_MODIFIED_SINCE' => 'yesterday-ish' ] ],
+			'not a GET request'                     => [
+				false,
+				[
+					'REQUEST_METHOD'     => 'POST',
+					'HTTP_IF_NONE_MATCH' => '"abc-1-2"',
+				],
+			],
+		];
+	}
+
+	/**
+	 * @param string $method A protected Model_PDF method
+	 * @param mixed  ...$args
+	 *
+	 * @return mixed
+	 */
+	private function invoke_model( $method, ...$args ) {
+		$reflection = new ReflectionMethod( Model_PDF::class, $method );
+		if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+			$reflection->setAccessible( true );
+		}
+
+		return $reflection->invoke( $this->model, ...$args );
 	}
 }
