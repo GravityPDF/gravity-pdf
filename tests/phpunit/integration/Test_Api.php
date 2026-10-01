@@ -398,6 +398,44 @@ class Test_API extends TestCase {
 		$this->assertSame( 9999, has_filter( 'gfpdf_override_pdf_bypass', '__return_true' ) );
 	}
 
+	public function test_create_pdf_bypasses_the_cache_for_its_own_render_only() {
+		$entry_id = $this->form_and_entry()['entry']['id'];
+		$run      = uniqid( '', true );
+		add_filter(
+			'gfpdf_cache_hash_extra',
+			static function ( $extra ) use ( $run ) {
+				$extra['api_test'] = $run;
+
+				return $extra;
+			}
+		);
+		add_filter(
+			'gfpdf_pdf_config',
+			static function ( $settings ) {
+				$settings['template'] = 'zadani';
+
+				return $settings;
+			}
+		);
+
+		/** @var \GFPDF\Model\Model_PDF $model */
+		$model = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		GPDFAPI::create_pdf( $entry_id, '556690c67856b' );
+
+		$nested_status = null;
+		$nest          = static function () use ( &$nest, &$nested_status, $entry_id, $model ) {
+			remove_action( 'gfpdf_pre_pdf_generation', $nest );
+
+			$nested_status = $model->get_cache_status( GPDFAPI::create_pdf( $entry_id, '556690c67856b' ) );
+		};
+		add_action( 'gfpdf_pre_pdf_generation', $nest );
+
+		$outer = GPDFAPI::create_pdf( $entry_id, '555ad84787d7e', true );
+
+		$this->assertSame( 'hit', $nested_status );
+		$this->assertSame( 'bypass', $model->get_cache_status( $outer ) );
+	}
+
 	/**
 	 * @since 5.0
 	 */

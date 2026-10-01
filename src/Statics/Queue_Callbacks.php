@@ -47,14 +47,7 @@ class Queue_Callbacks {
 		$pdf = Acting_User::run(
 			$user_id,
 			function () use ( $entry_id, $pdf_id ) {
-				/* For performance, only generate the PDF if it does not currently exist on disk */
-				add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
-
-				try {
-					return GPDFAPI::create_pdf( $entry_id, $pdf_id );
-				} finally {
-					remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
-				}
+				return GPDFAPI::create_pdf( $entry_id, $pdf_id );
 			}
 		);
 

@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Statics\Cache;
 use GFPDF\Statics\Debug;
 use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
@@ -352,18 +353,47 @@ class Controller_PDF extends Helper_Abstract_Controller {
 		}
 
 		/*
-		 * Support ?html=1 helper parameter
+		 * Support ?html=1 helper parameter, which renders a fresh PDF
 		 * See https://docs.gravitypdf.com/v6/developers/helper-parameters#html1
+		 *
+		 * ?cache=0 renders a fresh PDF to a one-off path, without reading or writing the cache
 		 */
-		if ( rgget( 'html' ) && Debug::is_enabled_and_can_view() ) {
-			add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		$uncached = rgget( 'cache' ) === '0';
+		if ( ( rgget( 'html' ) || $uncached ) && Debug::is_enabled_and_can_view() ) {
+			$this->bypass_cache_for( $entry['id'], $settings['id'], $uncached );
 		}
+	}
 
-		/* ?cache=0 renders a fresh PDF to a one-off path, without reading or writing the cache */
-		if ( rgget( 'cache' ) === '0' && Debug::is_enabled_and_can_view() ) {
-			add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
-			add_filter( 'gfpdf_enable_pdf_cache', '__return_false', 1000 );
-		}
+	/**
+	 * Skip the cache for the next render of this PDF only, so PDFs its template generates still use the cache
+	 *
+	 * @param int    $entry_id
+	 * @param string $pdf_id
+	 * @param bool   $uncached Render to a one-off path, so the fresh PDF doesn't replace the cached one
+	 *
+	 * @since 7.0
+	 */
+	protected function bypass_cache_for( $entry_id, $pdf_id, $uncached ) {
+		$bypass = function ( $pdf_generator ) use ( &$bypass, $entry_id, $pdf_id, $uncached ) {
+			$is_requested_pdf = (int) $pdf_generator->get_entry()['id'] === (int) $entry_id
+				&& (string) $pdf_generator->get_settings()['id'] === (string) $pdf_id;
+
+			if ( ! $is_requested_pdf ) {
+				return $pdf_generator;
+			}
+
+			remove_filter( 'gfpdf_pdf_generator_pre_processing', $bypass, 1 );
+
+			$pdf_generator->set_cache_bypass( true );
+			if ( $uncached ) {
+				$pdf_generator->set_path( Cache::get_uncached_path() );
+			}
+
+			return $pdf_generator;
+		};
+
+		/* Early, so a listener's own set_path() still decides where the PDF is written */
+		add_filter( 'gfpdf_pdf_generator_pre_processing', $bypass, 1 );
 	}
 
 	/**
