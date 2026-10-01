@@ -6,6 +6,8 @@ namespace GFPDF\Tests\Integration;
 
 use GFPDF\Model\Model_Settings;
 use GPDFAPI;
+use RuntimeException;
+use WP_Error;
 
 /**
  * Test Gravity PDF Helper Misc Functionality
@@ -363,6 +365,37 @@ class Test_API extends TestCase {
 
 		unlink( $filename );
 
+	}
+
+	public function test_create_pdf_removes_its_cache_bypass_when_generation_throws() {
+		add_action(
+			'gfpdf_pre_generate_and_save_pdf',
+			function () {
+				throw new RuntimeException( 'Generation failed' );
+			}
+		);
+
+		try {
+			GPDFAPI::create_pdf( $this->form_and_entry()['entry']['id'], '555ad84787d7e', true );
+			$this->fail( 'The exception should reach the caller' );
+		} catch ( RuntimeException $e ) {
+			$this->assertSame( 'Generation failed', $e->getMessage() );
+		}
+
+		$this->assertFalse( has_filter( 'gfpdf_override_pdf_bypass' ) );
+	}
+
+	public function test_create_pdf_keeps_a_callers_cache_bypass() {
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true', 9999 );
+		add_action(
+			'gfpdf_pre_pdf_generation_initilise',
+			function () {
+				throw new RuntimeException( 'Render failed' );
+			}
+		);
+
+		$this->assertInstanceOf( WP_Error::class, GPDFAPI::create_pdf( $this->form_and_entry()['entry']['id'], '555ad84787d7e', true ) );
+		$this->assertSame( 9999, has_filter( 'gfpdf_override_pdf_bypass', '__return_true' ) );
 	}
 
 	/**
