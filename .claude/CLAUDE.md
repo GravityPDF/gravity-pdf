@@ -36,6 +36,7 @@ yarn test:php                           # Run PHPUnit in Docker
 yarn test:php -- --filter TestClassName # Run single test class
 yarn test:php -- --filter testMethod    # Run single test method
 yarn test:php:multisite                 # Run multisite PHPUnit tests
+yarn test:php:snapshots                 # Rewrite tests/phpunit/snapshots/ after a deliberate API change
 composer lint                           # PHPCS check
 composer lint:fix                       # PHPCS auto-fix
 ```
