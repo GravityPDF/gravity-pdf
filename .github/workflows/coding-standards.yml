@@ -52,6 +52,51 @@ jobs:
       - name: Run PHP compatibility tests
         run: composer run phpcs:compatibility .
 
+  phpstan:
+    name: PHP static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # The Tests workflow's prebuild job saves this entry; on a miss, build it here without saving.
+      - name: Restore Composer vendor
+        id: vendor-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            vendor
+            vendor_prefixed
+          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
+
+      # 8.3 because php-scoper requires PHP 8.2+. PHPStan still analyses against composer.json's 7.4 platform.
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          tools: composer
+
+      - name: Add auth details for private composer packages
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
+        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+
+      - name: Install Composer dependencies
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
+        run: |
+          bash tools/ci/composer-retry.sh install --prefer-dist --no-progress --no-ansi --no-interaction --no-scripts
+          composer prefix
+
+      - name: Restore PHPStan result cache
+        uses: actions/cache@v5
+        with:
+          path: tmp/phpstan
+          key: phpstan-${{ runner.os }}-${{ github.sha }}
+          restore-keys: phpstan-${{ runner.os }}-
+
+      # The baseline may only shrink: a new finding fails, and so does a baseline entry that no longer matches.
+      - name: Run PHPStan
+        run: composer phpstan -- --no-progress --error-format=github
+
   jshint:
     name: JavaScript coding standards
     runs-on: ubuntu-latest
