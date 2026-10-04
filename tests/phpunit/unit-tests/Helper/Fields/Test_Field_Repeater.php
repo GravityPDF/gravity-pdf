@@ -106,4 +106,23 @@ class Test_Field_Repeater extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'id="repeater-999-field-15-1"', $html );
 		$this->assertStringContainsString( 'id="repeater-999-field-15-12"', $html );
 	}
+
+	public function test_container_class_filter_receives_form_entry_and_config() {
+		$calls    = [];
+		$listener = function ( $container, $form, $entry, $config ) use ( &$calls ) {
+			$calls[] = [ $form['id'], $entry['id'], $config ];
+
+			return $container;
+		};
+		add_filter( 'gfpdf_field_container_class', $listener, 10, 4 );
+
+		$config = [ 'meta' => [ 'empty' => true ] ];
+		$this->pdf_field->set_pdf_config( $config );
+		$this->pdf_field->html();
+
+		$this->assertNotEmpty( $calls );
+		foreach ( $calls as $call ) {
+			$this->assertSame( [ $this->form['id'], $this->entry['id'], $config ], $call );
+		}
+	}
 }
