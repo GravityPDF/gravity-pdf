@@ -1,0 +1,710 @@
+<style>
+	@page {
+		margin: 10mm;
+
+	
+	
+			background-color: #FFF;
+	
+		}
+
+	@page :first {
+	
+		}
+
+	body, th, td, li, a {
+		color: #333;
+		font-size: 9pt;
+		font-family: dejavusans, sans-serif;
+	}
+
+	.header-footer-img {
+		width: auto !important;
+		max-height: 25mm;
+	}
+
+	/* List Field Styles */
+		.gfield_list {
+		border-collapse: collapse;
+		border: 1px solid #000;
+		border-color: #c3c3c3;
+		margin: 2px 0 6px;
+		padding: 0;
+		width: 100%;
+	}
+
+	.gfield_list th {
+		text-align: left;
+		background-color: #ebebeb;
+		border: 1px solid #000;
+		border-color: #c3c3c3;
+		font-weight: bold;
+		padding: 6px 10px;
+	}
+
+	.gfield_list td {
+		padding: 6px 10px;
+		border: 1px solid #000;
+		border-color: #c3c3c3;
+	}
+
+	
+	/* Product Field Styles */
+		table.entry-products th {
+		background-color: #ebebeb;
+		border-bottom: 1px solid #000;
+		border-right: 1px solid #000;
+		border-bottom-color: #c3c3c3;
+		border-right-color: #c3c3c3;
+	}
+
+	table.entry-products td.textcenter, table.entry-products th.textcenter {
+		text-align: center;
+	}
+
+	table.entry-products .entry-products-col2 {
+		width: 10%;
+	}
+
+	table.entry-products .entry-products-col3 {
+		width: 19%;
+	}
+
+	table.entry-products .entry-products-col4 {
+		width: 19%;
+	}
+
+	table.entry-products {
+		border: 1px solid #000;
+		border-color: #c3c3c3;
+		margin: 5px 0 3px;
+	}
+
+	table.entry-products td {
+		border-bottom: 1px solid #000;
+		border-right: 1px solid #000;
+		border-bottom-color: #c3c3c3;
+		border-right-color: #c3c3c3;
+		padding: 7px 7px 8px;
+		vertical-align: top;
+	}
+
+	table.entry-products td.emptycell {
+		background-color: #ebebeb;
+	}
+
+	table.entry-products td.totals {
+		font-weight: bold;
+		padding-bottom: 8px;
+		padding-top: 7px;
+	}
+
+	table.entry-products td.totals,
+	table.entry-products .textright {
+		text-align: right;
+	}
+
+	
+	/* Add Basic Table Support */
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		overflow: wrap;
+	}
+
+	td, th {
+		vertical-align: middle;
+	}
+
+	/* Page break */
+	.pagebreak {
+		page-break-before: always;
+	}
+
+	/* Consent Field */
+	.consent-text {
+		font-size: 85%;
+	}
+
+	.consent-text a,
+	.consent-text li,
+	.consent-text td,
+	.consent-text th {
+		font-size: 100%;
+	}
+
+	.consent-tick {
+		font-size: 150%;
+	}
+
+	/* Repeater */
+	.gfpdf-repeater,
+	.gfpdf-form {
+		margin-bottom: 1.5%;
+	}
+
+	.repeater-container {
+		margin: 1% 0;
+		padding-left: 2%;
+		border-left: 1px solid #000;
+	}
+
+	/* Chained Select */
+	.gfpdf-chainedselect td:nth-child(1) {
+		width: 30%;
+	}
+
+	/* Rich Text Paragraph */
+	.gfpdf-textarea .value p {
+	  margin-top: 0;
+	}
+
+	/* Quiz image */
+	.gf-quiz-img {
+	  width: 20px;
+	}
+</style>
+<!-- Include styles needed for the PDF -->
+<style>
+
+	/* Handle Gravity Forms CSS Ready Classes */
+	.row-separator {
+		clear: both;
+		padding: 1.25mm 0;
+	}
+
+	/* Handle GF2.5+ Columns */
+	.grid {
+		float: left;
+	}
+
+	.grid .inner-container {
+		width: 95%;
+	}
+
+	.grid-3 {
+		width: 25%;
+	}
+
+	.grid-4 {
+		width: 33.33%;
+	}
+
+	.grid-5 {
+		width: 41.66%;
+	}
+
+	.grid-6 {
+		width: 50%;
+	}
+
+	.grid-7 {
+		width: 58.33%;
+	}
+
+	.grid-8 {
+		width: 66.66%;
+	}
+
+	.grid-9 {
+		width: 75%
+	}
+
+	.grid-10 {
+		width: 83.33%;
+	}
+
+	.grid-11 {
+		width: 91.66%;
+	}
+
+	.grid-12,
+	.grid-12 .inner-container {
+		width: 100%;
+	}
+
+	/* Handle Legacy Columns */
+	.gf_left_half,
+	.gf_left_third, .gf_middle_third,
+	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter,
+	.gf_list_2col li, .gf_list_3col li, .gf_list_4col li, .gf_list_5col li {
+		float: left;
+	}
+
+	.gf_right_half,
+	.gf_right_third,
+	.gf_fourth_quarter {
+		float: right;
+	}
+
+	.gf_left_half, .gf_right_half,
+	.gf_list_2col li {
+		width: 49%;
+	}
+
+	.gf_left_third, .gf_middle_third, .gf_right_third,
+	.gf_list_3col li {
+		width: 32.3%;
+	}
+
+	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
+		width: 24%;
+	}
+
+	.gf_list_4col li {
+		width: 24%;
+	}
+
+	.gf_list_5col li {
+		width: 19%;
+	}
+
+	.gf_left_half, .gf_right_half {
+		padding-right: 1%;
+	}
+
+	.gf_left_third, .gf_middle_third, .gf_right_third {
+		padding-right: 1.505%;
+	}
+
+	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
+		padding-right: 1.333%;
+	}
+
+	.gf_right_half, .gf_right_third, .gf_fourth_quarter {
+		padding-right: 0;
+	}
+
+	/* Don't double float the list items if already floated (mPDF does not support this ) */
+	.gf_left_half li, .gf_right_half li,
+	.gf_left_third li, .gf_middle_third li, .gf_right_third li {
+		width: 100% !important;
+		float: none !important;
+	}
+
+	/*
+	 * Headings
+	 */
+	h3 {
+		margin: 1.5mm 0 0.5mm;
+		padding: 0;
+	}
+
+	/*
+	 * Quiz Style Support
+	 */
+	.gquiz-field {
+		color: #666;
+	}
+
+	.gquiz-correct-choice {
+		font-weight: bold;
+		color: black;
+	}
+
+	.gf-quiz-img {
+		padding-left: 5px !important;
+		vertical-align: middle;
+	}
+
+	/*
+	 * Survey Style Support
+	 */
+	.gsurvey-likert-choice-label {
+		padding: 4px;
+	}
+
+	.gsurvey-likert-choice, .gsurvey-likert-choice-label {
+		text-align: center;
+	}
+
+	/*
+	 * Terms of Service (Gravity Perks) Support
+	 */
+	.terms-of-service-agreement {
+		padding-top: 2px;
+		font-weight: bold;
+	}
+
+	.terms-of-service-tick {
+		font-size: 150%;
+	}
+
+	/*
+	 * List Support
+	 */
+	ul, ol {
+		margin: 0;
+		padding-left: 1mm;
+		padding-right: 1mm;
+	}
+
+	li {
+		margin: 0;
+		padding: 0;
+		list-style-position: inside;
+	}
+
+	/*
+	 * Header / Footer
+	 */
+	.alignleft {
+		float: left;
+	}
+
+	.alignright {
+		float: right;
+	}
+
+	.aligncenter {
+		text-align: center;
+	}
+
+	p.alignleft {
+		text-align: left;
+		float: none;
+	}
+
+	p.alignright {
+		text-align: right;
+		float: none;
+	}
+
+	/*
+	 * Independant Template Styles
+	 */
+	.row-separator .gfpdf-field {
+		margin-bottom: 10px;
+	}
+
+	#form_title {
+		margin: 0;
+		font-size: 150%;
+	}
+
+	.product-field-title {
+		margin: 0;
+	}
+
+	.gfpdf-field .label {
+		padding-bottom: 5px;
+	}
+
+	.gfpdf-field .value {
+
+	}
+
+	.gfield_list th, table.entry-products td.emptycell, table.entry-products th {
+		background: none;
+	}
+
+</style>
+
+<!-- Output our HTML markup -->
+
+		<div id="container">
+			
+			<div class="row-separator odd">
+  <div id="field-2" class="gfpdf-field gfpdf-textarea class1 class2">
+					<div class="inner-container"><div class="label"><strong>Paragraph Text</strong></div><div class="value">My paragraph text response over...<br />
+<br />
+Multiple lines.</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-3" class="gfpdf-field gfpdf-select ">
+					<div class="inner-container"><div class="label"><strong>Drop Down</strong></div><div class="value">Option 3</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-4" class="gfpdf-field gfpdf-multiselect ">
+					<div class="inner-container"><div class="label"><strong>Multi Select Box</strong></div><div class="value"><ul class="bulleted multiselect"><li id="field-4-option-1">Multi Select Second Choice</li><li id="field-4-option-2">Third Choice</li></ul></div></div></div>
+</div><div class="row-separator even">
+  <div id="field-5" class="gfpdf-field gfpdf-number ">
+					<div class="inner-container"><div class="label"><strong>Number</strong></div><div class="value">50032145</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-6" class="gfpdf-field gfpdf-checkbox ">
+					<div class="inner-container"><div class="label"><strong>Checkbox</strong></div><div class="value"><ul class="bulleted checkbox"><li id="field-6-option-1">Checkbox Choice 2 Text</li><li id="field-6-option-2">Checkbox Choice 3 Text</li></ul></div></div></div>
+</div><div class="row-separator even">
+  <div id="field-7" class="gfpdf-field gfpdf-radio ">
+					<div class="inner-container"><div class="label"><strong>Radio Button</strong></div><div class="value">Radio Second Choice Name</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-8" class="gfpdf-field gfpdf-hidden ">
+					<div class="inner-container"><div class="label"><strong>Hidden Field</strong></div><div class="value">hidden field value</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-10" class="gfpdf-section-title gfpdf-field ">
+    <h3>Section Break</h3>
+  </div>
+</div><div class="row-separator odd">
+  <div id="field-11" class="gfpdf-field gfpdf-name ">
+					<div class="inner-container"><div class="label"><strong>Name</strong></div><div class="value">Mr. Jake Middle Jackson MD</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-12" class="gfpdf-field gfpdf-date ">
+					<div class="inner-container"><div class="label"><strong>Date</strong></div><div class="value">01/01/2015</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-13" class="gfpdf-field gfpdf-time ">
+					<div class="inner-container"><div class="label"><strong>Time</strong></div><div class="value">10:30 am</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-14" class="gfpdf-field gfpdf-phone ">
+					<div class="inner-container"><div class="label"><strong>Phone</strong></div><div class="value">(555) 678-1210</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-15" class="gfpdf-field gfpdf-address ">
+					<div class="inner-container"><div class="label"><strong>Address</strong></div><div class="value">12 Address St<br />Line 2<br />Cityville, Statesman 5000<br />Chad</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-16" class="gfpdf-field gfpdf-website ">
+					<div class="inner-container"><div class="label"><strong>Website</strong></div><div class="value"><a href="https://gravitypdf.com" target="_blank">https://gravitypdf.com</a></div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-17" class="gfpdf-field gfpdf-email ">
+					<div class="inner-container"><div class="label"><strong>Email</strong></div><div class="value"><a href="mailto:support@gravitypdf.com">support@gravitypdf.com</a></div></div></div>
+</div><div class="row-separator even">
+  <div id="field-18" class="gfpdf-field gfpdf-fileupload ">
+					<div class="inner-container"><div class="label"><strong>File</strong></div><div class="value"><ul class="bulleted fileupload"><li id="field-18-option-1"><a href="http://example.org/index.php?gf-download=2015%2F01%2Fgravityforms-export-2015-01-14.xml&amp;form-id={form_id}&amp;field-id=18&amp;hash={hash}">gravityforms-export-2015-01-14.xml</a></li></ul></div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-19" class="gfpdf-field gfpdf-fileupload ">
+					<div class="inner-container"><div class="label"><strong>File</strong></div><div class="value"><ul class="bulleted fileupload"><li id="field-19-option-1"><a href="http://example.org/index.php?gf-download=2015%2F01%2FCPC-JAKE.docx&amp;form-id={form_id}&amp;field-id=19&amp;hash={hash}">CPC-JAKE.docx</a></li><li id="field-19-option-2"><a href="http://example.org/index.php?gf-download=2015%2F01%2FTent-Cards.pdf&amp;form-id={form_id}&amp;field-id=19&amp;hash={hash}">Tent-Cards.pdf</a></li></ul></div></div></div>
+</div><div class="row-separator even">
+  <div id="field-20" class="gfpdf-field gfpdf-list ">
+					<div class="inner-container"><div class="label"><strong>Basic List</strong></div><div class="value">
+		<table autosize="1" class="gfield_list">
+
+			<!-- Loop through the column names and output in a header (if using the advanced list) -->
+			
+			<!-- Loop through each row -->
+			<tbody class="contents">
+							<tr>
+					<!-- handle the basic list -->
+											<td>List Item Response 1</td>
+										</tr>
+							<tr>
+					<!-- handle the basic list -->
+											<td>List Item Response 2</td>
+										</tr>
+							<tr>
+					<!-- handle the basic list -->
+											<td>List Item Response 3</td>
+										</tr>
+						</tbody>
+
+		</table>
+
+		</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-21" class="gfpdf-field gfpdf-list ">
+					<div class="inner-container"><div class="label"><strong>Extended List</strong></div><div class="value">
+		<table autosize="1" class="gfield_list">
+
+			<!-- Loop through the column names and output in a header (if using the advanced list) -->
+							<tbody class="head">
+				<tr>
+											<th>
+							Column 1						</th>
+											<th>
+							Column 2						</th>
+											<th>
+							Column 3						</th>
+									</tr>
+				</tbody>
+			
+			<!-- Loop through each row -->
+			<tbody class="contents">
+							<tr>
+					<!-- handle the basic list -->
+											<!-- handle the advanced list -->
+												<td>
+							List Response Col 1						</td>
+											<td>
+							List Response Col 2						</td>
+											<td>
+							List Response Col 3						</td>
+														</tr>
+							<tr>
+					<!-- handle the basic list -->
+											<!-- handle the advanced list -->
+												<td>
+							List Response #2 Col 1						</td>
+											<td>
+							List Response #2 Col 2						</td>
+											<td>
+							List Response #2 Col 3						</td>
+														</tr>
+						</tbody>
+
+		</table>
+
+		</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-22" class="gfpdf-field gfpdf-select gfpdf-poll ">
+					<div class="inner-container"><div class="label"><strong>Poll Field - Drop Down</strong></div><div class="value">Poll Dropdown - First Choice</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-23" class="gfpdf-field gfpdf-radio gfpdf-poll ">
+					<div class="inner-container"><div class="label"><strong>Poll Field - Radio Buttons</strong></div><div class="value">Poll Radio - Second Choice</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-41" class="gfpdf-field gfpdf-checkbox gfpdf-poll ">
+					<div class="inner-container"><div class="label"><strong>Poll Field - Checkboxes</strong></div><div class="value"><ul class="bulleted checkbox"><li id="field-41-option-1">Poll Check First Choice</li><li id="field-41-option-2">Poll Check Second Choice</li><li id="field-41-option-3">Poll Check Third Choice</li></ul></div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-24" class="gfpdf-field gfpdf-select gfpdf-quiz ">
+					<div class="inner-container"><div class="label"><strong>Quiz Dropdown</strong></div><div class="value"> </div></div></div>
+</div><div class="row-separator even">
+  <div id="field-42" class="gfpdf-field gfpdf-radio gfpdf-quiz ">
+					<div class="inner-container"><div class="label"><strong>Quiz Radio</strong></div><div class="value"> </div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-43" class="gfpdf-field gfpdf-checkbox gfpdf-quiz ">
+					<div class="inner-container"><div class="label"><strong>Quiz Checkbox</strong></div><div class="value"> </div></div></div>
+</div><div class="row-separator even">
+  <div id="field-26" class="gfpdf-field gfpdf-likert gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Likert Survey Field</strong></div><div class="value">glikertcol2636762f85</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-27" class="gfpdf-field gfpdf-likert gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Likert Survey Field Extended</strong></div><div class="value"> </div></div></div>
+</div><div class="row-separator even">
+  <div id="field-44" class="gfpdf-field gfpdf-rank gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Rank Survey Field</strong></div><div class="value">grank44902be0db,grank447f27daf1,grank440c3f3227,grank44ef548e7b,grank444f7bdfe0</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-45" class="gfpdf-field gfpdf-rating gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Rating Survey Field</strong></div><div class="value">grating45c8a62ee6</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-46" class="gfpdf-field gfpdf-radio gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Radio Survey Field</strong></div><div class="value">Survay Radio - First Choice</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-47" class="gfpdf-field gfpdf-checkbox gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Checkbox Survey Field</strong></div><div class="value"><ul class="bulleted checkbox"><li id="field-47-option-1">Check - First Choice</li><li id="field-47-option-2">Check - Second Choice</li></ul></div></div></div>
+</div><div class="row-separator even">
+  <div id="field-48" class="gfpdf-field gfpdf-text gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Single Line Survey Field</strong></div><div class="value">Survey Field Single Line Response</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-49" class="gfpdf-field gfpdf-textarea gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>Paragraph Survey Field</strong></div><div class="value">Paragraph survey field response...</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-50" class="gfpdf-field gfpdf-select gfpdf-survey ">
+					<div class="inner-container"><div class="label"><strong>DropDown Survey Field</strong></div><div class="value">DropDown - Second Choice</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-28" class="gfpdf-field gfpdf-post_title ">
+					<div class="inner-container"><div class="label"><strong>Post Title</strong></div><div class="value">My Post Title</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-29" class="gfpdf-field gfpdf-post_excerpt ">
+					<div class="inner-container"><div class="label"><strong>Post Excerpt</strong></div><div class="value">My Post Excerpt</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-30" class="gfpdf-field gfpdf-post_tags ">
+					<div class="inner-container"><div class="label"><strong>Post Tags</strong></div><div class="value">tag1, tag2, tag3</div></div></div>
+</div><div class="row-separator even">
+  <div id="field-31" class="gfpdf-field gfpdf-select gfpdf-post_category ">
+					<div class="inner-container"><div class="label"><strong>Post Category</strong></div><div class="value">Test Category 2</div></div></div>
+</div><div class="row-separator odd">
+  <div id="field-32" class="gfpdf-field gfpdf-post_image ">
+					<div class="inner-container"><div class="label"><strong>Post Image</strong></div><div class="value"><a href="http://example.org/index.php?gf-download=2015%2F01%2Fone1-500x381.jpg&amp;form-id={form_id}&amp;field-id=32&amp;hash={hash}" target="_blank"><img width="150" src="{uploads}/2015/01/one1-500x381.jpg" /></a><div class="gfpdf-post-image-title">Post Image Title</div><div class="gfpdf-post-image-caption">Post Image caption</div><div class="gfpdf-post-image-description">Post Image Description</div></div></div></div>
+</div><div class="row-separator even">
+  <div id="field-33" class="gfpdf-field gfpdf-text gfpdf-post_custom_field ">
+					<div class="inner-container"><div class="label"><strong>Post Custom Field</strong></div><div class="value">post_custom_field</div></div></div>
+</div>
+		<div class="row-separator products-title-container">
+			<h3 class="product-field-title gfpdf-field">
+				Order			</h3>
+		</div>
+
+		<div class="row-separator products-container">
+			<div class="gfpdf-field gfpdf-products">
+				<div class="inner-container">
+					<table class="entry-products" autosize="1">
+						<tbody class="head">
+						<tr>
+							<th class="entry-products-col1">
+								Product							</th>
+
+							<th class="textcenter entry-products-col2">
+								Qty							</th>
+							<th class="entry-products-col3">
+								Unit Price							</th>
+							<th class="entry-products-col4">
+								Price							</th>
+						</tr>
+						</tbody>
+
+						<tbody class="contents">
+													<tr>
+								<td>
+									<div class="product_name">
+										Product Basic									</div>
+
+																			<ul class="product_options">
+																							<li>Product Options for Basic Product: Option 2</li>
+																					</ul>
+																	</td>
+								<td class="textcenter">3</td>
+								<td class="textright">$60.00</td>
+								<td class="textright">$180.00</td>
+							</tr>
+													<tr>
+								<td>
+									<div class="product_name">
+										DD - Second Choice									</div>
+
+																	</td>
+								<td class="textcenter">1</td>
+								<td class="textright">$10.00</td>
+								<td class="textright">$10.00</td>
+							</tr>
+													<tr>
+								<td>
+									<div class="product_name">
+										Radio - Second Choice									</div>
+
+																	</td>
+								<td class="textcenter">1</td>
+								<td class="textright">$10.00</td>
+								<td class="textright">$10.00</td>
+							</tr>
+													<tr>
+								<td>
+									<div class="product_name">
+										User Defined Price									</div>
+
+																	</td>
+								<td class="textcenter">1</td>
+								<td class="textright">$30.00</td>
+								<td class="textright">$30.00</td>
+							</tr>
+													<tr>
+								<td>
+									<div class="product_name">
+										Hidden Price									</div>
+
+																	</td>
+								<td class="textcenter">6</td>
+								<td class="textright">$50.00</td>
+								<td class="textright">$300.00</td>
+							</tr>
+													<tr>
+								<td>
+									<div class="product_name">
+										Calculation Price									</div>
+
+																			<ul class="product_options">
+																							<li>Option for Calculation Price: Cal - Option 1</li>
+																							<li>Option for Calculation Price: Cal - Option 2</li>
+																					</ul>
+																	</td>
+								<td class="textcenter">5</td>
+								<td class="textright">$60.05</td>
+								<td class="textright">$300.25</td>
+							</tr>
+						
+																					<tr>
+									<td rowspan="3" class="emptycell"></td>
+									<td colspan="2" class="subtotal totals">Subtotal</td>
+									<td class="subtotal_amount totals">$830.25</td>
+								</tr>
+								<tr>
+									<td colspan="2" class="shipping totals">Shipping (Regular)</td>
+									<td class="shipping_amount totals">$30.00</td>
+								</tr>
+							
+							<tr>
+								
+								<td colspan="2" class="grandtotal totals">Total</td>
+								<td class="grandtotal_amount totals">$860.25</td>
+							</tr>
+
+												</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		
+					</div>

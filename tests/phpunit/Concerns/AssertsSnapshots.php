@@ -13,6 +13,7 @@ trait AssertsSnapshots {
 		$file = dirname( __DIR__ ) . '/snapshots/' . $name;
 
 		if ( getenv( 'GPDF_UPDATE_SNAPSHOTS' ) ) {
+			wp_mkdir_p( dirname( $file ) );
 			file_put_contents( $file, $actual ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		}
 

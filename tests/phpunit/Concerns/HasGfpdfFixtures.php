@@ -180,6 +180,31 @@ trait HasGfpdfFixtures {
 		}
 	}
 
+	/**
+	 * The all-form-fields entries name form 1's upload folder, and Gravity Forms only signs files in the form's own
+	 * folder. Call from set_up_before_class() after load_fixtures().
+	 */
+	protected static function point_uploads_at_fixture_form() {
+		$form_id = self::$fixture_caches[ static::class ]['forms']['all-form-fields']['id'];
+		$slug    = '1-' . wp_hash( 1 );
+		$replace = $form_id . '-' . wp_hash( $form_id );
+
+		/* Matching the bare folder name also covers the escaped slashes in a multi-file field's JSON */
+		foreach ( self::$fixture_caches[ static::class ]['entries']['all-form-fields'] as $i => $entry ) {
+			$updated = false;
+			foreach ( $entry as $field_id => $value ) {
+				if ( is_string( $value ) && strpos( $value, $slug ) !== false ) {
+					$entry[ $field_id ] = str_replace( $slug, $replace, $value );
+					$updated            = true;
+				}
+			}
+			if ( $updated ) {
+				\GFAPI::update_entry( $entry );
+				self::$fixture_caches[ static::class ]['entries']['all-form-fields'][ $i ] = $entry;
+			}
+		}
+	}
+
 	/** Deletes every site's cached and one-off (`uncached/`) PDFs, so no test sees what an earlier one rendered */
 	protected function remove_pdf_cache() {
 		$tmp   = $this->gfpdf()->data->template_tmp_location;
