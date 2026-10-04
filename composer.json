@@ -9,6 +9,7 @@
     "release": "bash ./tools/release/build.sh",
     "translate": "bash ./tools/potomatic/translate.sh",
     "prefix": "bash ./tools/php-scoper/prefix.sh",
+    "rector": "bash ./tools/rector/rector.sh --dry-run",
     "post-install-cmd": [
       "@composer prefix",
       "yarn install --frozen-lockfile && yarn build"

@@ -17,6 +17,7 @@
 vendor/*
 vendor_prefixed/*
 tools/php-scoper/vendor/*
+tools/rector/vendor/*
 
 ### Packages ###
 node_modules/*

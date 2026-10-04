@@ -1,0 +1,11 @@
+{
+  "name": "gravitypdf/rector-toolchain",
+  "description": "Isolated Rector install. Kept out of the plugin's own dependency tree so its PHPStan copy cannot clash with the plugin's, and so the Pro toolchain can replace it by deleting this folder.",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "rector/rector": "^2.0"
+  },
+  "config": {
+    "preferred-install": "dist"
+  }
+}
