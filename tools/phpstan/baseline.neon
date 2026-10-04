@@ -1,0 +1,2203 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot call method purge_entry\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../api.php
+
+		-
+			message: '#^Method GPDFAPI\:\:product_table\(\) never returns void so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../api.php
+
+		-
+			message: '#^Method GPDFAPI\:\:update_plugin_option\(\) never returns WP_Error so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../api.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$default$#'
+			identifier: parameter.notFound
+			count: 1
+			path: ../../api.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../api.php
+
+		-
+			message: '#^Parameter \#3 \$pdf of method GFPDF\\Helper\\Helper_Abstract_Options\:\:update_pdf\(\) expects bool\|int\|string, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../api.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''\\\\GFCommon'' and ''remove_dismissible…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../gravity-pdf-updater.php
+
+		-
+			message: '#^Method GFPDF_Major_Compatibility_Checks\:\:check_mb_string_regex\(\) should return bool but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../../pdf.php
+
+		-
+			message: '#^Method GFPDF_Major_Compatibility_Checks\:\:convert_ini_memory\(\) should return int but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../pdf.php
+
+		-
+			message: '#^Method GFPDF_Major_Compatibility_Checks\:\:get_ram\(\) should return int but returns float\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../pdf.php
+
+		-
+			message: '#^Property GFPDF_Major_Compatibility_Checks\:\:\$basename is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../../pdf.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between int and ''\-1'' will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../../pdf.php
+
+		-
+			message: '#^Found usage of constant DOING_AJAX\. Use wp_doing_ajax\(\) instead\.$#'
+			identifier: phpstanWP.wpConstant.fetch
+			count: 1
+			path: ../../src/Controller/Controller_Actions.php
+
+		-
+			message: '#^Method GFPDF\\Controller\\Controller_Actions\:\:route_notices\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: ../../src/Controller/Controller_Actions.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_Actions\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_Actions.php
+
+		-
+			message: '#^Method Controller_Activation\:\:deactivation\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: ../../src/Controller/Controller_Activation.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between mixed and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: ../../src/Controller/Controller_Custom_Fonts.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Controller/Controller_Debug.php
+
+		-
+			message: '#^Offset ''id'' on non\-empty\-array on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../src/Controller/Controller_Export_Entries.php
+
+		-
+			message: '#^Access to an undefined property GFPDF\\Helper\\Helper_Data\:\:\$tiny_mce_editor_settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../../src/Controller/Controller_Form_Settings.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Controller/Controller_Form_Settings.php
+
+		-
+			message: '#^Callback expects 1 parameter, \$accepted_args is set to 2\.$#'
+			identifier: arguments.count
+			count: 1
+			path: ../../src/Controller/Controller_Form_Settings.php
+
+		-
+			message: '#^Method GFPDF\\Controller\\Controller_Form_Settings\:\:display_page\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: ../../src/Controller/Controller_Form_Settings.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_Form_Settings\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_Form_Settings.php
+
+		-
+			message: '#^Found usage of constant DOING_AJAX\. Use wp_doing_ajax\(\) instead\.$#'
+			identifier: phpstanWP.wpConstant.fetch
+			count: 1
+			path: ../../src/Controller/Controller_Install.php
+
+		-
+			message: '#^Method GFPDF\\Controller\\Controller_Install\:\:check_install_status\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: ../../src/Controller/Controller_Install.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_Install\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_Install.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Controller/Controller_PDF.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''GWConditionalLogicD…'' and ''convert_conditional…'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../../src/Controller/Controller_PDF.php
+
+		-
+			message: '#^Call to static method convert_conditional_logic_date_field_values\(\) on an unknown class GWConditionalLogicDateFields\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Controller/Controller_PDF.php
+
+		-
+			message: '#^Method GFPDF\\Controller\\Controller_PDF\:\:process_pdf_endpoint\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: ../../src/Controller/Controller_PDF.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_PDF\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_PDF.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_PDF\:\:\$model \(GFPDF\\Model\\Model_PDF\) does not accept GFPDF\\Helper\\Helper_Abstract_Model\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_PDF.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_PDF\:\:\$view \(GFPDF\\View\\View_PDF\) does not accept GFPDF\\Helper\\Helper_Abstract_View\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_PDF.php
+
+		-
+			message: '#^Action callback returns bool but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: ../../src/Controller/Controller_Pdf_Cache.php
+
+		-
+			message: '#^Parameter \#2 \$context of method GFPDF_Vendor\\Psr\\Log\\LoggerInterface\:\:error\(\) expects array\<mixed\>, \(int\|string\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Controller/Controller_Pdf_Queue.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_Settings\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_Settings.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 3
+			path: ../../src/Controller/Controller_System_Report.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_System_Report\:\:\$model \(GFPDF\\Model\\Model_System_Report\) does not accept GFPDF\\Helper\\Helper_Abstract_Model\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_System_Report.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_System_Report\:\:\$view \(GFPDF\\View\\View_System_Report\) does not accept GFPDF\\Helper\\Helper_Abstract_View\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_System_Report.php
+
+		-
+			message: '#^Property GFPDF\\Controller\\Controller_Uninstaller\:\:\$model \(GFPDF\\Model\\Model_Uninstall\) does not accept GFPDF\\Helper\\Helper_Abstract_Model\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Controller/Controller_Uninstaller.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<int, array\<string, array\<string, array\{schedule\: string\|false, args\: array\<mixed\>, interval\?\: int\<0, max\>\}\>\>\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Controller/Controller_Upgrade_Routines.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Controller/Controller_Upgrade_Routines.php
+
+		-
+			message: '#^Cannot call method get_pdf_display_list\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Controller/Controller_Webhooks.php
+
+		-
+			message: '#^Call to static method get_instance\(\) on an unknown class GF_Zapier\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Controller/Controller_Zapier.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Address.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 7
+			path: ../../src/Helper/Fields/Field_Address.php
+
+		-
+			message: '#^Cannot access property \$inputs on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Address.php
+
+		-
+			message: '#^Cannot call method get_country_code\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Address.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Chainedselect.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Chainedselect.php
+
+		-
+			message: '#^Cannot call method get_value_entry_detail\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Chainedselect.php
+
+		-
+			message: '#^Class GF_Chained_Field_Select not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Fields/Field_Chainedselect.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Checkbox.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 9
+			path: ../../src/Helper/Fields/Field_Checkbox.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Consent.php
+
+		-
+			message: '#^Cannot access property \$descriptionPlacement on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Consent.php
+
+		-
+			message: '#^Cannot call method get_field_description_from_revision\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Consent.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Coupon.php
+
+		-
+			message: '#^Cannot call method get_value_export\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Coupon.php
+
+		-
+			message: '#^Class GF_Field_Coupon not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Fields/Field_Coupon.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Creditcard.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Creditcard.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Date.php
+
+		-
+			message: '#^Cannot access property \$dateFormat on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Date.php
+
+		-
+			message: '#^Cannot call method get_value_entry_detail\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Default.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Discount.php
+
+		-
+			message: '#^Offset ''name'' on non\-empty\-array in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: ../../src/Helper/Fields/Field_Discount.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Email.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Fg_Ls_Consent.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Fg_Ls_Signature.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Fileupload.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Fileupload.php
+
+		-
+			message: '#^Cannot call method get_download_url\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Fileupload.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Form.php
+
+		-
+			message: '#^Cannot access property \$gpnfForm on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Form.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: ../../src/Helper/Fields/Field_Form.php
+
+		-
+			message: '#^Cannot call method get_field_class\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Form.php
+
+		-
+			message: '#^Class GP_Field_Nested_Form not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Fields/Field_Form.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Fields/Field_Form.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Hidden.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Html.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Html.php
+
+		-
+			message: '#^Cannot access property \$choices on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Likert.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Likert.php
+
+		-
+			message: '#^Cannot access property \$inputs on array\|object\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: ../../src/Helper/Fields/Field_Likert.php
+
+		-
+			message: '#^Cannot call method get_value_entry_detail\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Likert.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_List.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_List.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: ../../src/Helper/Fields/Field_List.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Multiselect.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 9
+			path: ../../src/Helper/Fields/Field_Multiselect.php
+
+		-
+			message: '#^Cannot access property \$storageType on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Multiselect.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Name.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Name.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 5
+			path: ../../src/Helper/Fields/Field_Name.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Number.php
+
+		-
+			message: '#^Cannot access property \$numberFormat on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Number.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Option.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Option.php
+
+		-
+			message: '#^Cannot access property \$inputType on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Option.php
+
+		-
+			message: '#^Cannot access property \$productField on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Option.php
+
+		-
+			message: '#^Cannot access property \$content on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Page.php
+
+		-
+			message: '#^Cannot access property \$pageNumber on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Page.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Phone.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Phone.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Phone.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Poll.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: ../../src/Helper/Fields/Field_Post_Category.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<1, max\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: ../../src/Helper/Fields/Field_Post_Category.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Post_Content.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Post_Excerpt.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Post_Image.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: ../../src/Helper/Fields/Field_Post_Image.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<string\> in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 2
+			path: ../../src/Helper/Fields/Field_Post_Image.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Post_Tags.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Post_Tags.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Post_Title.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Product.php
+
+		-
+			message: '#^Cannot call method get_input_type\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Product.php
+
+		-
+			message: '#^Offset ''price'' on non\-empty\-array in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: ../../src/Helper/Fields/Field_Product.php
+
+		-
+			message: '#^Cannot access property \$productField on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Quantity.php
+
+		-
+			message: '#^Cannot access property \$choices on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Quiz.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: ../../src/Helper/Fields/Field_Quiz.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../../src/Helper/Fields/Field_Quiz.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Radio.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: ../../src/Helper/Fields/Field_Radio.php
+
+		-
+			message: '#^Cannot access property \$choices on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Rank.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Rank.php
+
+		-
+			message: '#^Cannot call method get_value_entry_detail\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Rank.php
+
+		-
+			message: '#^Cannot access property \$choices on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Rating.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Rating.php
+
+		-
+			message: '#^Cannot call method get_value_entry_detail\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Rating.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Repeater.php
+
+		-
+			message: '#^Cannot access property \$fields on array\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Repeater.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: ../../src/Helper/Fields/Field_Repeater.php
+
+		-
+			message: '#^Cannot call method get_field_class\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Repeater.php
+
+		-
+			message: '#^Parameter \#3 \$field of method GFPDF\\Helper\\Fields\\Field_Repeater\:\:get_repeater_form_data\(\) expects array, GF_Field_Repeater given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Fields/Field_Repeater.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Section.php
+
+		-
+			message: '#^Cannot access property \$cssClass on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Section.php
+
+		-
+			message: '#^Cannot access property \$description on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Section.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: ../../src/Helper/Fields/Field_Section.php
+
+		-
+			message: '#^Cannot access property \$label on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Section.php
+
+		-
+			message: '#^Cannot call method get_field_class\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Section.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Select.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: ../../src/Helper/Fields/Field_Select.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Signature.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(integer The original image width divided by 3\)\: Unexpected token "The", expected variable at offset 203 on line 6$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/Helper/Fields/Field_Signature.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(integer The original image width\)\: Unexpected token "The", expected variable at offset 262 on line 7$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/Helper/Fields/Field_Signature.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Fields/Field_Signature.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<string\> in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 3
+			path: ../../src/Helper/Fields/Field_Slim_Post.php
+
+		-
+			message: '#^Cannot access property \$choices on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Survey.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Survey.php
+
+		-
+			message: '#^Cannot access property \$inputType on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Survey.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Tax.php
+
+		-
+			message: '#^Offset ''name'' on non\-empty\-array in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: ../../src/Helper/Fields/Field_Tax.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Text.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Textarea.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Time.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Tos.php
+
+		-
+			message: '#^Cannot access property \$gwtermsofservice_terms on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Tos.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Fields/Field_Tos.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Fields/Field_Website.php
+
+		-
+			message: '#^Instanceof between GFPDF\\Helper\\Helper_Abstract_Addon and GFPDF\\Helper\\Helper_Abstract_Addon will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Addon.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Addon.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Addon.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_Abstract_Addon\:\:\$plugin_updater \(GFPDF\\Helper\\Licensing\\EDD_SL_Plugin_Updater\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Addon.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Field_Products.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Call to function is_null\(\) with array will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Cannot access property \$cssClass on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Cannot access property \$id on array\|object\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Cannot access property \$label on array\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Cannot access property \$type on array\|object\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Cannot call method get_input_type\(\) on array\|object\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_Abstract_Fields\:\:\$cached_results \(array\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_Abstract_Fields\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields.php
+
+		-
+			message: '#^Access to property \$inputType on an unknown class GFPDF\\Helper\\Fields\\GF_Field\.$#'
+			identifier: class.notFound
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Fields_Input_Type.php
+
+		-
+			message: '#^Instantiated class GFPDF\\Helper\\Field_Default not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields_Input_Type.php
+
+		-
+			message: '#^Parameter \$field of method GFPDF\\Helper\\Helper_Abstract_Fields_Input_Type\:\:__construct\(\) has invalid type GFPDF\\Helper\\Fields\\GF_Field\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Fields_Input_Type.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Call to function is_array\(\) with int\<min, \-1\>\|int\<1, max\>\|non\-falsy\-string\|true will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 5
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 3
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_Abstract_Options\:\:\$form_settings is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_Abstract_Options\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Result of \|\| is always true\.$#'
+			identifier: booleanOr.alwaysTrue
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between \*NEVER\* and 0 will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Options.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 3
+			path: ../../src/Helper/Helper_Abstract_Pdf_Shortcode.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Pdf_Shortcode.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with array will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 2
+			path: ../../src/Helper/Helper_Abstract_Pdf_Shortcode.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with array\|string will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Pdf_Shortcode.php
+
+		-
+			message: '#^Parameter \#3 \$value of method GFPDF\\Helper\\Helper_Abstract_Pdf_Shortcode\:\:add_shortcode_attr\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_Pdf_Shortcode.php
+
+		-
+			message: '#^Method GFPDF\\Helper\\Helper_Abstract_View\:\:load\(\) should return string\|WP_Error but returns true\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../src/Helper/Helper_Abstract_View.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Gravity_Forms\\\\Gravity_Forms\\\\Async\\\\GF_Notifications_Processor'' and ''is_enabled'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Helper_Async_Notifications.php
+
+		-
+			message: '#^Parameter \#3 \$default of function rgars expects string\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Helper_Data.php
+
+		-
+			message: '#^Method GFPDF\\Helper\\Helper_Field_Container_Gf25\:\:get_field_width\(\) should return int but returns float\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../src/Helper/Helper_Field_Container_Gf25.php
+
+		-
+			message: '#^Parameter \#1 \$field \(GF_Field\) of method GFPDF\\Helper\\Helper_Field_Container_Gf25\:\:get_field_width\(\) should be compatible with parameter \$classes \(string\) of method GFPDF\\Helper\\Helper_Field_Container\:\:get_field_width\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: ../../src/Helper/Helper_Field_Container_Gf25.php
+
+		-
+			message: '#^Parameter \#1 \$field \(GF_Field\) of method GFPDF\\Helper\\Helper_Field_Container_Gf25\:\:increment_width\(\) should be compatible with parameter \$classes \(string\) of method GFPDF\\Helper\\Helper_Field_Container\:\:increment_width\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: ../../src/Helper/Helper_Field_Container_Gf25.php
+
+		-
+			message: '#^Parameter \#1 \$field of static method GFFormDisplay\:\:get_row_spacer\(\) expects array, GF_Field given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Helper_Field_Container_Gf25.php
+
+		-
+			message: '#^Return type \(void\) of method GFPDF\\Helper\\Helper_Field_Container_Void\:\:does_fit_in_row\(\) should be compatible with return type \(bool\) of method GFPDF\\Helper\\Helper_Field_Container\:\:does_fit_in_row\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: ../../src/Helper/Helper_Field_Container_Void.php
+
+		-
+			message: '#^Cannot access property \$date_created on bool\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Helper_Form.php
+
+		-
+			message: '#^Cannot access property \$is_active on bool\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Helper_Form.php
+
+		-
+			message: '#^Cannot access property \$is_trash on bool\|object\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: ../../src/Helper/Helper_Form.php
+
+		-
+			message: '#^Constant WP_CONTENT_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../src/Helper/Helper_Misc.php
+
+		-
+			message: '#^Found usage of constant WP_CONTENT_URL\. Use content_url\(\) instead\.$#'
+			identifier: phpstanWP.wpConstant.fetch
+			count: 3
+			path: ../../src/Helper/Helper_Misc.php
+
+		-
+			message: '#^Parameter \#1 \$array \(non\-empty\-list\<list\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: ../../src/Helper/Helper_Misc.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_Misc\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Helper/Helper_Misc.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Helper_Options_Fields.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../src/Helper/Helper_Options_Fields.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: ../../src/Helper/Helper_Options_Fields.php
+
+		-
+			message: '#^Call to function is_bool\(\) with bool will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Helper_PDF.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Helper_PDF.php
+
+		-
+			message: '#^Method GFPDF\\Helper\\Helper_PDF\:\:generate\(\) should return string but returns false\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../src/Helper/Helper_PDF.php
+
+		-
+			message: '#^Parameter \#2 \$container of class GFPDF\\Helper\\Mpdf\\Mpdf constructor expects Mpdf\\Container\\ContainerInterface\|null, GFPDF_Vendor\\Mpdf\\Container\\SimpleContainer given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Helper_PDF.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_PDF\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Helper/Helper_PDF.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 4
+			path: ../../src/Helper/Helper_PDF_List_Table.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_PDF_List_Table\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Helper/Helper_PDF_List_Table.php
+
+		-
+			message: '#^PHPDoc tag @throws with type GFPDF_Vendor\\QueryPath\\QueryPath\\Exception is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: ../../src/Helper/Helper_QueryPath.php
+
+		-
+			message: '#^Comparison operation "\>" between 20 and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: ../../src/Helper/Helper_Templates.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Helper_Templates.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Helper_Templates\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Helper/Helper_Templates.php
+
+		-
+			message: '#^Variable \$cache_name might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../src/Helper/Helper_Templates.php
+
+		-
+			message: '#^Trait GFPDF\\Helper\\Helper_Trait_Logger is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: ../../src/Helper/Helper_Trait_Logger.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<string\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../src/Helper/Helper_Url_Signer.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^Call to function is_object\(\) with stdClass will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^Call to function is_object\(\) with string will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 2
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^One or more @param tags has an invalid name or invalid syntax\.$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(array  \$this       \-\>api_data    The array of data set up in the class constructor\.\)\: Unexpected token "\$this", expected variable at offset 151 on line 5$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^PHPDoc tag @param has invalid value \(string \$this       \-\>plugin_file The full path and filename of the file\.\)\: Unexpected token "\$this", expected variable at offset 247 on line 6$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^Parameter \#1 \$value of method GFPDF\\Helper\\Licensing\\EDD_SL_Plugin_Updater\:\:set_version_info_cache\(\) expects string, stdClass given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 2
+			path: ../../src/Helper/Licensing/EDD_SL_Plugin_Updater.php
+
+		-
+			message: '#^Call to an undefined method GFPDF_Vendor\\Psr\\Log\\LoggerInterface\:\:getHandlers\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../../src/Helper/Log/Logger.php
+
+		-
+			message: '#^Call to an undefined method GFPDF_Vendor\\Psr\\Log\\LoggerInterface\:\:pushHandler\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: ../../src/Helper/Log/Logger.php
+
+		-
+			message: '#^Call to an undefined method GFPDF_Vendor\\Psr\\Log\\LoggerInterface\:\:pushProcessor\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: ../../src/Helper/Log/Logger.php
+
+		-
+			message: '#^Parameter \#1 \$level of class GFPDF_Vendor\\Monolog\\Handler\\NullHandler constructor expects ''alert''\|''critical''\|''debug''\|''emergency''\|''error''\|''info''\|''notice''\|''warning''\|GFPDF_Vendor\\Monolog\\Handler\\Level\|GFPDF_Vendor\\Monolog\\Handler\\LevelName, 200 given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Log/Logger.php
+
+		-
+			message: '#^Parameter \#1 \$level of class GFPDF_Vendor\\Monolog\\Processor\\IntrospectionProcessor constructor expects ''alert''\|''critical''\|''debug''\|''emergency''\|''error''\|''info''\|''notice''\|''warning''\|GFPDF_Vendor\\Monolog\\Processor\\Level\|GFPDF_Vendor\\Monolog\\Processor\\LevelName, 100 given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Log/Logger.php
+
+		-
+			message: '#^Parameter \#2 \$level of class GFPDF_Vendor\\Monolog\\Handler\\StreamHandler constructor expects ''alert''\|''critical''\|''debug''\|''emergency''\|''error''\|''info''\|''notice''\|''warning''\|GFPDF_Vendor\\Monolog\\Handler\\Level\|GFPDF_Vendor\\Monolog\\Handler\\LevelName, 100\|400 given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Helper/Log/Logger.php
+
+		-
+			message: '#^Property GFPDF\\Helper\\Log\\Logger\:\:\$log \(GFPDF_Vendor\\Psr\\Log\\LoggerInterface\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: ../../src/Helper/Log/Logger.php
+
+		-
+			message: '#^Return type \(array\) of method GFPDF\\Helper\\Log\\Redact_Processor\:\:__invoke\(\) should be compatible with return type \(GFPDF_Vendor\\Monolog\\Processor\\Record\) of method GFPDF_Vendor\\Monolog\\Processor\\ProcessorInterface\:\:__invoke\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: ../../src/Helper/Log/Redact_Processor.php
+
+		-
+			message: '#^Parameter \#2 \$crop_x \(null\) of method GFPDF\\Helper\\Mpdf\\Mpdf\:\:importPage\(\) should be compatible with parameter \$box \(string\) of method GFPDF_Vendor\\Mpdf\\Mpdf\:\:importPage\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: ../../src/Helper/Mpdf/Mpdf.php
+
+		-
+			message: '#^Parameter \#3 \$crop_y \(null\) of method GFPDF\\Helper\\Mpdf\\Mpdf\:\:importPage\(\) should be compatible with parameter \$groupXObject \(bool\) of method GFPDF_Vendor\\Mpdf\\Mpdf\:\:importPage\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: ../../src/Helper/Mpdf/Mpdf.php
+
+		-
+			message: '#^Call to method debug\(\) on an unknown class Psr\\Log\\LoggerInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Mpdf/Request.php
+
+		-
+			message: '#^Call to method log\(\) on an unknown class Psr\\Log\\LoggerInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Mpdf/Request.php
+
+		-
+			message: '#^Call to method warning\(\) on an unknown class Psr\\Log\\LoggerInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Helper/Mpdf/Request.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between null and GFPDF_Vendor\\Psr\\Http\\Message\\UriInterface will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../../src/Helper/Mpdf/Request.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../src/Model/Model_Actions.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Actions\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Actions.php
+
+		-
+			message: '#^Parameter \#2 \$value of method GFPDF\\Helper\\Helper_Abstract_Options\:\:update_option\(\) expects bool\|int\|string, array given\.$#'
+			identifier: argument.type
+			count: 3
+			path: ../../src/Model/Model_Custom_Fonts.php
+
+		-
+			message: '#^Call to an undefined method GFPDF\\Helper\\Helper_Misc\:\:add_error\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Call to function is_array\(\) with string will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 2
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Parameter \#1 \$array \(\*NEVER\*\) to function array_filter contains falsy values only, the result will always be an empty array\.$#'
+			identifier: arrayFilter.alwaysEmpty
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Parameter \#3 \$pdf of method GFPDF\\Helper\\Helper_Abstract_Options\:\:update_pdf\(\) expects bool\|int\|string, array given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Form_Settings\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Form_Settings\:\:\$notices \(GFPDF\\Helper\\Helper_Misc\) does not accept GFPDF\\Helper\\Helper_Notices\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Form_Settings\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Result of \|\| is always true\.$#'
+			identifier: booleanOr.alwaysTrue
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between 0 and \*NEVER\* will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: ../../src/Model/Model_Form_Settings.php
+
+		-
+			message: '#^Found usage of constant DOING_AJAX\. Use wp_doing_ajax\(\) instead\.$#'
+			identifier: phpstanWP.wpConstant.fetch
+			count: 1
+			path: ../../src/Model/Model_Install.php
+
+		-
+			message: '#^Method GFPDF\\Model\\Model_Install\:\:create_folder_structures\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: ../../src/Model/Model_Install.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<string\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../src/Model/Model_Mergetags.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of function strpos expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_Mergetags.php
+
+		-
+			message: '#^Parameter \#1 \$pid of method GFPDF\\Model\\Model_PDF\:\:get_pdf_url\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_Mergetags.php
+
+		-
+			message: '#^Parameter \#1 \$text of method GFPDF\\Helper\\Helper_Form\:\:process_tags\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_Mergetags.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Mergetags\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Mergetags.php
+
+		-
+			message: '#^Result of \|\| is always false\.$#'
+			identifier: booleanOr.alwaysFalse
+			count: 1
+			path: ../../src/Model/Model_Mergetags.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between array and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: ../../src/Model/Model_Mergetags.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''\\\\GP_Populate…'' and ''populate_form'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''\\\\GP_Populate…'' and ''replace_live_merge…'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Call to static method get_instance\(\) on an unknown class GP_Populate_Anything_Live_Merge_Tags\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Constant FG_LEGALSIGNING_PLUGIN_BASENAME not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Expected 5 @param tags, found 1\.$#'
+			identifier: paramTag.count
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Function gp_populate_anything not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^PHPDoc tag @method has invalid value \(Controller_PDF getController\)\: Unexpected token "\\n ", expected ''\('' at offset 116 on line 8$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array\<int, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_PDF\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_PDF\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_PDF.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: ../../src/Model/Model_Pdf_Cache.php
+
+		-
+			message: '#^Parameter \#1 \$value of method GFPDF\\Helper\\Licensing\\EDD_SL_Plugin_Updater\:\:set_version_info_cache\(\) expects string, stdClass\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_Settings.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Settings\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Settings.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Settings\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Settings.php
+
+		-
+			message: '#^Variable \$addon in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../../src/Model/Model_Settings.php
+
+		-
+			message: '#^Cannot call method get_pdf_url\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Model/Model_Shortcodes.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_Shortcodes.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array\<int, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Model/Model_System_Report.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 8
+			path: ../../src/Model/Model_System_Report.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Model/Model_Templates.php
+
+		-
+			message: '#^Parameter \#1 \$new_blog_id of function switch_to_blog expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../src/Model/Model_Uninstall.php
+
+		-
+			message: '#^Property GFPDF\\Model\\Model_Uninstall\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/Model/Model_Uninstall.php
+
+		-
+			message: '#^Access to an undefined property GFPDF\\Rest\\Rest_Form_Settings\:\:\$schema\.$#'
+			identifier: property.notFound
+			count: 3
+			path: ../../src/Rest/Rest_Form_Settings.php
+
+		-
+			message: '#^Call to an undefined method GFPDF\\Rest\\Rest_Form_Settings\:\:get_fields_for_response\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../../src/Rest/Rest_Form_Settings.php
+
+		-
+			message: '#^Method GFPDF\\Rest\\Rest_Form_Settings\:\:prepare_item_for_database\(\) should return array but returns WP_Error\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../src/Rest/Rest_Form_Settings.php
+
+		-
+			message: '#^Parameter \#2 \$pdf_id of static method GPDFAPI\:\:get_pdf\(\) expects string, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Rest/Rest_Form_Settings.php
+
+		-
+			message: '#^Return type \(array\) of method GFPDF\\Rest\\Rest_Form_Settings\:\:prepare_item_for_database\(\) should be compatible with return type \(object\) of method WP_REST_Controller\:\:prepare_item_for_database\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: ../../src/Rest/Rest_Form_Settings.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Statics/Cache.php
+
+		-
+			message: '#^Expression "\$field\-\>enablePrice" on a separate line does not do anything\.$#'
+			identifier: expr.resultUnused
+			count: 1
+			path: ../../src/Statics/Cache.php
+
+		-
+			message: '#^Expression "\$field\-\>form_id" on a separate line does not do anything\.$#'
+			identifier: expr.resultUnused
+			count: 1
+			path: ../../src/Statics/Cache.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Statics/Debug.php
+
+		-
+			message: '#^Offset ''function'' on array\{function\: callable\(\)\: mixed, accepted_args\: int\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../src/Statics/Deprecation.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Statics/Deprecation.php
+
+		-
+			message: '#^Parameter \#2 \$value of method GFPDF\\Helper\\Helper_Abstract_Options\:\:update_option\(\) expects bool\|int\|string, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Statics/Deprecation.php
+
+		-
+			message: '#^Parameter \#2 \$value of method GFPDF\\Helper\\Helper_Abstract_Options\:\:update_option\(\) expects bool\|int\|string, list\<\(int\|string\)\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Statics/Deprecation.php
+
+		-
+			message: '#^Property WP_Hook\:\:\$callbacks \(array\<int, array\<string, array\<string, \(callable\)\|int\>\>\>\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: ../../src/Statics/Deprecation.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between GFPDF_Vendor\\Psr\\Log\\LoggerInterface and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../../src/Statics/Deprecation.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Statics/Kses.php
+
+		-
+			message: '#^Parameter \#6 \$sub_type of static method GFFormsModel\:\:add_note\(\) expects null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/Statics/Notes.php
+
+		-
+			message: '#^Cannot call method save_pdf_by_id\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/Statics/Queue_Callbacks.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$pdf_id$#'
+			identifier: parameter.notFound
+			count: 1
+			path: ../../src/Statics/Queue_Callbacks.php
+
+		-
+			message: '#^Call to an undefined method GFPDF\\Helper\\Helper_Abstract_Model\:\:get_field_class\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../../src/View/View_PDF.php
+
+		-
+			message: '#^Method GFPDF\\View\\View_PDF\:\:process_html_structure\(\) should return string but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../src/View/View_PDF.php
+
+		-
+			message: '#^PHPDoc tag @method has invalid value \(Controller_PDF getController\)\: Unexpected token "\\n ", expected ''\('' at offset 113 on line 8$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/View_PDF.php
+
+		-
+			message: '#^Property GFPDF\\View\\View_PDF\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/View/View_PDF.php
+
+		-
+			message: '#^Property GFPDF\\View\\View_Settings\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/View/View_Settings.php
+
+		-
+			message: '#^Property GFPDF\\View\\View_Settings\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../../src/View/View_Settings.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/Actions/action_buttons.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 5
+			path: ../../src/View/html/Actions/action_buttons.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/Actions/deprecated_features.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../src/View/html/Actions/deprecated_features.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/FormSettings/add_edit.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/View/html/FormSettings/add_edit.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 9
+			path: ../../src/View/html/FormSettings/add_edit.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/FormSettings/list.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 4
+			path: ../../src/View/html/FormSettings/list.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: ../../src/View/html/GravityForms/fieldset.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/GravityForms/settings_field.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 12
+			path: ../../src/View/html/GravityForms/settings_field.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$entry    array\)\: Unexpected token "\$entry", expected type at offset 69 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/PDF/core_template_styles.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$form     array\)\: Unexpected token "\$form", expected type at offset 42 on line 3$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/PDF/core_template_styles.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$settings array\)\: Unexpected token "\$settings", expected type at offset 15 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/PDF/core_template_styles.php
+
+		-
+			message: '#^Variable \$entry might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: ../../src/View/html/PDF/core_template_styles.php
+
+		-
+			message: '#^Variable \$form might not be defined\.$#'
+			identifier: variable.undefined
+			count: 4
+			path: ../../src/View/html/PDF/core_template_styles.php
+
+		-
+			message: '#^Variable \$gfpdf might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: ../../src/View/html/PDF/core_template_styles.php
+
+		-
+			message: '#^Variable \$settings might not be defined\.$#'
+			identifier: variable.undefined
+			count: 4
+			path: ../../src/View/html/PDF/core_template_styles.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/PDF/entry_detailed_pdf.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 7
+			path: ../../src/View/html/PDF/entry_detailed_pdf.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/PDF/entry_list_pdf_multiple.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: ../../src/View/html/PDF/entry_list_pdf_multiple.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/PDF/entry_list_pdf_single.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 5
+			path: ../../src/View/html/PDF/entry_list_pdf_single.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$form array\)\: Unexpected token "\$form", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/PDF/form_title.php
+
+		-
+			message: '#^Variable \$form might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../src/View/html/PDF/form_title.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/View/html/Settings/extensions.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../src/View/html/Settings/extensions.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/View/html/Settings/general.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../src/View/html/Settings/general.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../../src/View/html/Settings/licence.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/Settings/sub_menu.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 4
+			path: ../../src/View/html/Settings/sub_menu.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/View/html/Settings/tools.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/View/html/Shortcodes/gravitypdf.php
+
+		-
+			message: '#^Variable \$args might not be defined\.$#'
+			identifier: variable.undefined
+			count: 5
+			path: ../../src/View/html/Shortcodes/gravitypdf.php
+
+		-
+			message: '#^Action callback returns 4\.0 but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: ../../src/bootstrap.php
+
+		-
+			message: '#^Binary operation "\.\=" between array and '' gfpdf\-page'' results in an error\.$#'
+			identifier: assignOp.invalid
+			count: 1
+			path: ../../src/bootstrap.php
+
+		-
+			message: '#^Cannot call method clear_queue\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: ../../src/bootstrap.php
+
+		-
+			message: '#^Method GFPDF\\Router\:\:init_settings_api\(\) should return float but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: ../../src/bootstrap.php
+
+		-
+			message: '#^Method GFPDF\\Router\:\:setup_settings_fields\(\) should return float but return statement is missing\.$#'
+			identifier: return.missing
+			count: 2
+			path: ../../src/bootstrap.php
+
+		-
+			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../src/bootstrap.php

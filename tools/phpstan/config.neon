@@ -1,0 +1,22 @@
+# Legacy code starts at level 5; tools/phpstan/baseline.neon holds the accepted findings and may only shrink.
+includes:
+	- baseline.neon
+parameters:
+	level: 5
+	tmpDir: ../../tmp/phpstan
+	paths:
+		- ../../pdf.php
+		- ../../api.php
+		- ../../gravity-pdf-updater.php
+		- ../../src
+	bootstrapFiles:
+		- constants.php
+	dynamicConstantNames:
+		- PDF_PLUGIN_DIR
+		- PDF_PLUGIN_URL
+		- PDF_PLUGIN_BASENAME
+		- GPDF_PLUGIN_FILE
+	scanFiles:
+		- gravityforms.php
+	scanDirectories:
+		- ../../vendor/gravity/gravityforms
