@@ -140,6 +140,15 @@ class Helper_PDF {
 	protected $is_cache_disabled = false;
 
 	/**
+	 * Whether this render skips a cached PDF and generates it again, before `gfpdf_override_pdf_bypass` runs
+	 *
+	 * @var bool
+	 *
+	 * @since 7.0
+	 */
+	protected $cache_bypass = false;
+
+	/**
 	 * Whether to force the print dialog when the PDF is opened
 	 *
 	 * @var boolean
@@ -661,6 +670,28 @@ class Helper_PDF {
 	 */
 	public function is_cache_disabled() {
 		return $this->is_cache_disabled;
+	}
+
+	/**
+	 * Set whether this render skips a cached PDF. PDFs its template generates still use the cache.
+	 *
+	 * @param bool $bypass
+	 *
+	 * @since 7.0
+	 */
+	public function set_cache_bypass( $bypass ) {
+		$this->cache_bypass = (bool) $bypass;
+	}
+
+	/**
+	 * Whether this render skips a cached PDF
+	 *
+	 * @return bool
+	 *
+	 * @since 7.0
+	 */
+	public function get_cache_bypass() {
+		return $this->cache_bypass;
 	}
 
 	/**

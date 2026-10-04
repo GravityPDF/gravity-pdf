@@ -677,7 +677,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check if the logged in user has permission to view the PDF
+	 * Check if the logged in user, or the given user, has permission to view the PDF
 	 *
 	 * @param int|null $user_id
 	 *
@@ -688,16 +688,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function can_user_view_pdf_with_capabilities( $user_id = null ) {
 		$admin_permissions = $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] );
 
-		/* loop through permissions and check if the current user has any of those capabilities */
-		$can_user_view_pdf = false;
-		foreach ( $admin_permissions as $permission ) {
-			if ( $this->gform->has_capability( $permission, $user_id ) ) {
-				$can_user_view_pdf = true;
-				break;
-			}
-		}
-
-		return $can_user_view_pdf;
+		/* An empty list grants nobody access, not even users with gform_full_access */
+		return ! empty( $admin_permissions ) && $this->gform->has_capability( $admin_permissions, $user_id );
 	}
 
 	/**
@@ -1103,7 +1095,7 @@ class Model_PDF extends Helper_Abstract_Model {
 						$notifications,
 						$entry,
 						function () use ( $entry, $settings, $notifications ) {
-							return $this->save_pdf_and_do_action( $entry, $settings, 'gfpdf_post_save_notification_pdf', $notifications );
+							return $this->save_pdf_and_do_action( $entry, $settings, 'gfpdf_post_save_notification_pdf', [ $notifications ] );
 						}
 					);
 					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
@@ -1195,16 +1187,18 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @param array $entry        The Gravity Forms entry (from \GFAPI::get_entry)
 	 * @param array $pdf_settings The Gravity PDF settings (from GPDFAPI::get_pdf())
+	 * @param bool  $bypass_cache Generate the PDF again, even when a cached PDF is current. PDFs its template generates
+	 *                            still use the cache.
 	 *
 	 * @return string|WP_Error  Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
-	 * @since 7.0 The view/download endpoints route through this method
+	 * @since 7.0 The view/download endpoints route through this method, and the $bypass_cache parameter was added
 	 *
 	 * @see \GPDFAPI::create_pdf() We recommend third-party developers use the API to generate PDFs
 	 */
-	public function generate_and_save_pdf( $entry, $pdf_settings ) {
-		$pdf_generator = $this->run_pdf_generator( $entry, $pdf_settings );
+	public function generate_and_save_pdf( $entry, $pdf_settings, $bypass_cache = false ) {
+		$pdf_generator = $this->run_pdf_generator( $entry, $pdf_settings, $bypass_cache );
 
 		return is_wp_error( $pdf_generator ) ? $pdf_generator : $pdf_generator->get_full_pdf_path();
 	}
@@ -1214,12 +1208,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @param array $entry        The Gravity Forms entry
 	 * @param array $pdf_settings The Gravity PDF settings
+	 * @param bool  $bypass_cache Generate the PDF again, even when a cached PDF is current
 	 *
 	 * @return Helper_PDF|WP_Error The PDF's generator, which holds the filtered entry, form and settings
 	 *
 	 * @since 7.0
 	 */
-	protected function run_pdf_generator( $entry, $pdf_settings ) {
+	protected function run_pdf_generator( $entry, $pdf_settings, $bypass_cache = false ) {
 		$form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'generate_and_save_pdf' );
 		$entry        = apply_filters( 'gfpdf_current_entry_object', $entry, $form, $pdf_settings, 'generate_and_save_pdf' );
 		$pdf_settings = apply_filters( 'gfpdf_current_pdf_settings_object', $pdf_settings, $form, $entry, 'generate_and_save_pdf' );
@@ -1229,6 +1224,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$pdf_generator = new Helper_PDF( $entry, $pdf_settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
 		$pdf_generator->set_filename( $filename );
+		$pdf_generator->set_cache_bypass( $bypass_cache );
 		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
 
 		if ( ! $this->process_and_save_pdf( $pdf_generator ) ) {
@@ -1256,9 +1252,13 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * See https://docs.gravitypdf.com/developers/filters/gfpdf_override_pdf_bypass/ for usage
 		 *
+		 * @param bool       $bypass        Whether this render skips a cached PDF (Helper_PDF::get_cache_bypass())
+		 * @param Helper_PDF $pdf_generator
+		 *
 		 * @since 4.2
+		 * @since 7.0 $bypass starts at the render's own choice, e.g. true for GPDFAPI::create_pdf( …, true )
 		 */
-		$pdf_override = apply_filters( 'gfpdf_override_pdf_bypass', false, $pdf_generator );
+		$pdf_override = (bool) apply_filters( 'gfpdf_override_pdf_bypass', $pdf_generator->get_cache_bypass(), $pdf_generator );
 
 		/* If cached PDF already exists then return early */
 		if ( ! $pdf_override && $this->does_pdf_exist( $pdf_generator ) ) {
@@ -2056,15 +2056,16 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @param array  $entry         The Gravity Forms entry
 	 * @param array  $settings      The Gravity PDF settings
-	 * @param string $action        The post-save action to fire, e.g. `gfpdf_post_save_pdf`
-	 * @param mixed  ...$extra_args Passed to the action after the PDF path, filename, settings, entry and form
+	 * @param string $action       The post-save action to fire, e.g. `gfpdf_post_save_pdf`
+	 * @param array  $extra_args   Passed to the action after the PDF path, filename, settings, entry and form
+	 * @param bool   $bypass_cache Generate the PDF again, even when a cached PDF is current
 	 *
 	 * @return string|WP_Error The full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 7.0
 	 */
-	protected function save_pdf_and_do_action( $entry, $settings, $action, ...$extra_args ) {
-		$pdf = $this->run_pdf_generator( $entry, $settings );
+	protected function save_pdf_and_do_action( $entry, $settings, $action, $extra_args = [], $bypass_cache = false ) {
+		$pdf = $this->run_pdf_generator( $entry, $settings, $bypass_cache );
 		if ( is_wp_error( $pdf ) ) {
 			return $pdf;
 		}
@@ -2102,15 +2103,16 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Generate and save an entry's PDF by ID, then fire the post-save action for its context
 	 *
-	 * @param int    $entry_id The Gravity Forms entry ID
-	 * @param string $pdf_id   The Gravity PDF ID
-	 * @param string $context  "submission" fires `gfpdf_post_save_pdf`, and anything else `gfpdf_post_save_api_pdf`
+	 * @param int    $entry_id     The Gravity Forms entry ID
+	 * @param string $pdf_id       The Gravity PDF ID
+	 * @param string $context      "submission" fires `gfpdf_post_save_pdf`, and anything else `gfpdf_post_save_api_pdf`
+	 * @param bool   $bypass_cache Generate the PDF again, even when a cached PDF is current. Ignored for "submission".
 	 *
 	 * @return string|WP_Error The full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 7.0
 	 */
-	public function save_pdf_by_id( $entry_id, $pdf_id, $context ) {
+	public function save_pdf_by_id( $entry_id, $pdf_id, $context, $bypass_cache = false ) {
 		$entry = $this->gform->get_entry( $entry_id );
 		if ( is_wp_error( $entry ) ) {
 			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-pdf' ) );
@@ -2123,7 +2125,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		return $context === 'submission'
 			? $this->save_submission_pdf( $entry, $settings )
-			: $this->save_pdf_and_do_action( $entry, $settings, 'gfpdf_post_save_api_pdf' );
+			: $this->save_pdf_and_do_action( $entry, $settings, 'gfpdf_post_save_api_pdf', [], $bypass_cache );
 	}
 
 	/**
