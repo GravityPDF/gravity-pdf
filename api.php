@@ -504,7 +504,8 @@ final class GPDFAPI {
 	 *
 	 * @param int    $entry_id     The Gravity Form entry ID
 	 * @param string $pdf_id       The Gravity PDF ID number (the pid number in the URL when viewing a setting in the admin area)
-	 * @param bool   $bypass_cache Generate the PDF again, even when a cached PDF is current
+	 * @param bool   $bypass_cache Generate the PDF again, even when a cached PDF is current. PDFs its template
+	 *                             generates still use the cache.
 	 *
 	 * @return string|WP_Error   Return the full path to the PDF, or a WP_Error on failure
 	 *
@@ -513,23 +514,10 @@ final class GPDFAPI {
 	 *        `gfpdf_post_save_api_pdf` fires instead of `gfpdf_post_save_pdf`
 	 */
 	public static function create_pdf( $entry_id, $pdf_id, $bypass_cache = false ) {
-		/* A callback of this call's own, so removing it never takes away a caller's bypass */
-		$bypass = static function () {
-			return true;
-		};
+		/** @var \GFPDF\Model\Model_PDF $pdf */
+		$pdf = self::get_mvc_class( 'Model_PDF' );
 
-		if ( $bypass_cache ) {
-			add_filter( 'gfpdf_override_pdf_bypass', $bypass, 9999 );
-		}
-
-		try {
-			/** @var \GFPDF\Model\Model_PDF $pdf */
-			$pdf = self::get_mvc_class( 'Model_PDF' );
-
-			return $pdf->save_pdf_by_id( $entry_id, $pdf_id, 'api' );
-		} finally {
-			remove_filter( 'gfpdf_override_pdf_bypass', $bypass, 9999 );
-		}
+		return $pdf->save_pdf_by_id( $entry_id, $pdf_id, 'api', $bypass_cache );
 	}
 
 	/**

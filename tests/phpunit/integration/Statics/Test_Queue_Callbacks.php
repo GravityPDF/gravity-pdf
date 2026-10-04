@@ -5,7 +5,10 @@ declare( strict_types=1 );
 namespace GFPDF\Statics;
 
 use Exception;
+use GFPDF\Helper\Helper_PDF;
+use GFPDF\Model\Model_PDF;
 use GFPDF\Tests\Integration\TestCase;
+use GPDFAPI;
 
 /**
  * @package GFPDF\Statics
@@ -13,6 +16,10 @@ use GFPDF\Tests\Integration\TestCase;
  * @group   statics
  */
 class Test_Queue_Callbacks extends TestCase {
+
+	const PDF_ID = '556690c67856b';
+
+	const NESTED_PDF_ID = 'fawf90c678523b';
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -23,6 +30,30 @@ class Test_Queue_Callbacks extends TestCase {
 	public static function tear_down_after_class(): void {
 		static::remove_test_fonts();
 		parent::tear_down_after_class();
+	}
+
+	public function set_up(): void {
+		parent::set_up();
+
+		/* A cache key of this test's own, so PDFs cached by earlier tests aren't reused */
+		$run = uniqid( '', true );
+		add_filter(
+			'gfpdf_cache_hash_extra',
+			static function ( $extra ) use ( $run ) {
+				$extra['queue_callbacks_test'] = $run;
+
+				return $extra;
+			}
+		);
+
+		add_filter(
+			'gfpdf_pdf_config',
+			static function ( $settings ) {
+				$settings['template'] = 'zadani';
+
+				return $settings;
+			}
+		);
 	}
 
 	public function test_create_pdf_throws_when_generation_returns_wp_error() {
@@ -36,13 +67,6 @@ class Test_Queue_Callbacks extends TestCase {
 	public function test_create_pdf_fires_the_save_action_for_its_context() {
 		$entry_id = $this->form_and_entry()['entry']['id'];
 		$fired    = [];
-
-		add_filter(
-			'gfpdf_pdf_config',
-			function ( $settings ) {
-				return array_merge( $settings, [ 'template' => 'zadani' ] );
-			}
-		);
 
 		foreach ( [ 'gfpdf_post_save_pdf', 'gfpdf_post_pdf_save', 'gfpdf_post_save_api_pdf' ] as $action ) {
 			add_action(
@@ -74,18 +98,16 @@ class Test_Queue_Callbacks extends TestCase {
 		$this->assertSame( $original, get_current_user_id(), 'previous user must be restored even on failure' );
 	}
 
-	public function test_create_pdf_restores_the_user_and_bypass_filter_when_generation_throws() {
+	public function test_create_pdf_restores_the_user_when_generation_throws() {
 		$original   = self::factory()->user->create( [ 'role' => 'administrator' ] );
 		$masquerade = self::factory()->user->create();
 		wp_set_current_user( $original );
 
-		$seen_user     = null;
-		$bypass_filter = null;
-		add_action(
-			'gfpdf_pre_generate_and_save_pdf',
-			static function () use ( &$seen_user, &$bypass_filter ) {
-				$seen_user     = get_current_user_id();
-				$bypass_filter = has_filter( 'gfpdf_override_pdf_bypass', '__return_false' );
+		$seen = [];
+		add_filter(
+			'gfpdf_pdf_generator_pre_processing',
+			static function ( Helper_PDF $pdf_generator ) use ( &$seen ) {
+				$seen = [ get_current_user_id(), $pdf_generator->get_cache_bypass() ];
 
 				throw new Exception( 'Generation failed' );
 			}
@@ -98,10 +120,76 @@ class Test_Queue_Callbacks extends TestCase {
 			$this->assertSame( 'Generation failed', $e->getMessage() );
 		}
 
-		$this->assertSame( $masquerade, $seen_user );
-		$this->assertNotFalse( $bypass_filter );
+		$this->assertSame( [ $masquerade, false ], $seen );
 		$this->assertSame( $original, get_current_user_id() );
-		$this->assertFalse( has_filter( 'gfpdf_override_pdf_bypass', '__return_false' ) );
+	}
+
+	public function test_create_pdf_keeps_a_callers_bypass_override() {
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
+		$entry_id = $this->entry( 'all-form-fields' )['id'];
+
+		Queue_Callbacks::create_pdf( $entry_id, self::PDF_ID );
+		$this->assertSame( 20, has_filter( 'gfpdf_override_pdf_bypass', '__return_false' ) );
+
+		add_action(
+			'gfpdf_pre_generate_and_save_pdf',
+			static function () {
+				throw new Exception( 'Generation failed' );
+			}
+		);
+
+		try {
+			Queue_Callbacks::create_pdf( $entry_id, self::PDF_ID );
+			$this->fail( 'The exception was swallowed' );
+		} catch ( Exception $e ) {
+			$this->assertSame( 'Generation failed', $e->getMessage() );
+		}
+
+		$this->assertSame( 20, has_filter( 'gfpdf_override_pdf_bypass', '__return_false' ) );
+	}
+
+	public function test_a_bypass_listener_applies_to_every_render() {
+		$entry    = $this->entry( 'all-form-fields' );
+		$settings = GPDFAPI::get_pdf( $entry['form_id'], self::PDF_ID );
+
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+
+		$path = $this->model()->generate_and_save_pdf( $entry, $settings );
+		$this->assertSame( 'bypass', $this->model()->get_cache_status( $path ), 'View' );
+
+		Queue_Callbacks::create_pdf( $entry['id'], self::PDF_ID );
+		$this->assertSame( 'bypass', $this->model()->get_cache_status( $path ), 'Background render' );
+
+		$this->assertSame( $path, GPDFAPI::create_pdf( $entry['id'], self::PDF_ID ) );
+		$this->assertSame( 'bypass', $this->model()->get_cache_status( $path ), 'GPDFAPI::create_pdf()' );
+	}
+
+	public function test_a_template_can_bypass_the_cache_for_a_pdf_it_generates_in_a_background_render() {
+		$entry_id = $this->entry( 'all-form-fields' )['id'];
+
+		add_filter(
+			'gfpdf_override_pdf_bypass',
+			static function ( $bypass, Helper_PDF $pdf_generator ) {
+				return $bypass || $pdf_generator->get_settings()['id'] === self::NESTED_PDF_ID;
+			},
+			10,
+			2
+		);
+
+		$outer  = '';
+		$nested = '';
+		$nest   = static function ( $form, $entry, $settings, $pdf_generator ) use ( &$nest, &$outer, &$nested, $entry_id ) {
+			remove_action( 'gfpdf_pre_pdf_generation', $nest );
+
+			$outer  = $pdf_generator->get_full_pdf_path();
+			$nested = GPDFAPI::create_pdf( $entry_id, self::NESTED_PDF_ID );
+		};
+		add_action( 'gfpdf_pre_pdf_generation', $nest, 10, 4 );
+
+		Queue_Callbacks::create_pdf( $entry_id, self::PDF_ID );
+
+		$this->assertSame( 'miss', $this->model()->get_cache_status( $outer ) );
+		$this->assertSame( 'bypass', $this->model()->get_cache_status( $nested ) );
 	}
 
 	public function test_send_notification_throws_when_form_missing() {
@@ -176,5 +264,9 @@ class Test_Queue_Callbacks extends TestCase {
 
 		$this->assertSame( $masquerade, $seen );
 		$this->assertSame( $original, get_current_user_id() );
+	}
+
+	private function model(): Model_PDF {
+		return GPDFAPI::get_mvc_class( 'Model_PDF' );
 	}
 }

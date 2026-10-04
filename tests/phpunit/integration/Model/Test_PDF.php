@@ -2406,7 +2406,7 @@ class Test_PDF extends TestCase {
 		/* The first render is a cache miss and the second a hit: the action fires either way */
 		foreach ( $actions as $action => $extra_args ) {
 			$fired = [];
-			$path  = $this->invoke_model( 'save_pdf_and_do_action', $entry, $settings, $action, ...$extra_args );
+			$path  = $this->invoke_model( 'save_pdf_and_do_action', $entry, $settings, $action, $extra_args );
 
 			$this->assertSame( [ $action, $action . '_' . $form_id ], array_keys( $fired ) );
 			$this->assertSame( [ $path, basename( $path ) ], array_slice( $fired[ $action ], 0, 2 ) );
