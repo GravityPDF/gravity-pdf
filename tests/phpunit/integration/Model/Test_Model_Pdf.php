@@ -489,4 +489,90 @@ class Test_Model_PDF extends TestCase {
 		$this->model->enable_gp_populate_anything();
 		$this->assertSame( 10, has_filter( 'gppa_allow_all_lmts', '__return_true' ) );
 	}
+
+	public function test_register_page_fields_leaves_a_single_page_form_alone() {
+		$form = [
+			'id'         => 1,
+			'fields'     => [],
+			'pagination' => null,
+		];
+
+		$this->assertSame( $form, $this->model->register_page_fields( $form ) );
+	}
+
+	public function test_register_page_fields_adds_the_first_page_and_names_every_page() {
+		$form = [
+			'id'                => 5,
+			'firstPageCssClass' => 'intro-page',
+			'pagination'        => [ 'pages' => [ 'Introduction', 'Details' ] ],
+			'fields'            => [
+				new \GF_Field_Text( [ 'id' => 1, 'formId' => 5, 'pageNumber' => 1 ] ),
+				new \GF_Field_Page( [ 'id' => 2, 'formId' => 5, 'pageNumber' => 2 ] ),
+				new \GF_Field_Text( [ 'id' => 3, 'formId' => 5, 'pageNumber' => 2 ] ),
+			],
+		];
+
+		$fields = $this->model->register_page_fields( $form )['fields'];
+
+		$this->assertCount( 4, $fields );
+		$this->assertInstanceOf( \GF_Field_Page::class, $fields[0] );
+		$this->assertSame( [ 0, 5, 1, 'intro-page' ], [ $fields[0]->id, $fields[0]->formId, $fields[0]->pageNumber, $fields[0]->cssClass ] );
+		$this->assertSame( [ 'Page 1', 'Introduction' ], [ $fields[0]->label, $fields[0]->content ] );
+		$this->assertSame( [ 'Page 2', 'Details' ], [ $fields[2]->label, $fields[2]->content ] );
+		$this->assertSame( [ 1, 2, 3 ], [ $fields[1]->id, $fields[2]->id, $fields[3]->id ] );
+	}
+
+	public function test_register_page_fields_leaves_a_page_without_pagination_text_empty() {
+		$form = [
+			'id'         => 5,
+			'pagination' => [ 'pages' => [ 'Only the first' ] ],
+			'fields'     => [ new \GF_Field_Page( [ 'id' => 2, 'formId' => 5, 'pageNumber' => 2 ] ) ],
+		];
+
+		$fields = $this->model->register_page_fields( $form )['fields'];
+
+		$this->assertSame( '', $fields[0]->cssClass );
+		$this->assertSame( [ 'Page 2', '' ], [ $fields[1]->label, $fields[1]->content ] );
+	}
+
+	public function test_legal_signing_fonts_are_registered_with_mpdf() {
+		/* A real install's fonts would be globbed too, and its folder must not be touched */
+		if ( defined( 'FG_LEGALSIGNING_PLUGIN_BASENAME' ) ) {
+			$this->markTestSkipped( 'Legal Signing is loaded' );
+		}
+
+		/* The integration only switches on with FG_LEGALSIGNING_VERSION, so this constant alone changes nothing else */
+		define( 'FG_LEGALSIGNING_PLUGIN_BASENAME', 'gfpdf-test-legalsigning/legalsigning.php' );
+
+		$fonts = WP_PLUGIN_DIR . '/' . dirname( FG_LEGALSIGNING_PLUGIN_BASENAME ) . '/dist/fonts/';
+		wp_mkdir_p( $fonts );
+		touch( $fonts . 'Signature.ttf' );
+		touch( $fonts . 'Cursive.TTF' );
+		touch( $fonts . 'readme.txt' );
+
+		try {
+			$this->assertSame(
+				[ 'fontDir' => [ '/existing/', $fonts ] ],
+				$this->model->register_legal_signing_font_path_with_mpdf( [ 'fontDir' => [ '/existing/' ] ] )
+			);
+			$this->assertSame( [ 'fontDir' => [ $fonts ] ], $this->model->register_legal_signing_font_path_with_mpdf( [] ) );
+
+			$registered = $this->model->register_legal_signing_fonts_with_mpdf( [ 'signature' => [ 'R' => 'mine.ttf' ] ] );
+			ksort( $registered );
+
+			/* An existing font ID wins, and the ID is the lower-cased file name */
+			$this->assertSame(
+				[
+					'cursive'   => [ 'R' => 'Cursive.TTF' ],
+					'signature' => [ 'R' => 'mine.ttf' ],
+				],
+				$registered
+			);
+		} finally {
+			array_map( 'unlink', glob( $fonts . '*' ) );
+			rmdir( $fonts );
+			rmdir( dirname( $fonts ) );
+			rmdir( dirname( $fonts, 2 ) );
+		}
+	}
 }
