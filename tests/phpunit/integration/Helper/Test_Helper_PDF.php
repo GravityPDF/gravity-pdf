@@ -348,6 +348,16 @@ class Test_Helper_PDF extends TestCase {
 		$this->assertSame( 'Custom Creator', $this->mpdf_property()->creator );
 	}
 
+	public function test_get_pdf_class_returns_the_mpdf_instance_set_js_writes_to(): void {
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( $this->mpdf_property(), $this->pdf->get_pdf_class() );
+
+		$this->pdf->set_JS( 'this.print();' );
+		$this->assertSame( 'this.print();', $this->mpdf_property()->js );
+	}
+
 	private function use_scratch_path( string $filename ): void {
 		$this->pdf->set_path( $this->gfpdf()->data->template_tmp_location . 'test-save-' . uniqid() );
 		$this->pdf->set_filename( $filename );
