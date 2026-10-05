@@ -119,4 +119,28 @@ class Test_Helper_Misc_Pages extends TestCase {
 		$minified_html = $this->minify( $html );
 		$this->assertSame( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"/></p>', $minified_html );
 	}
+
+	public function test_convert_path_to_url_keeps_slash_after_home_url() {
+		$this->assertSame( home_url( '/wp-includes/file.js' ), $this->misc->convert_path_to_url( ABSPATH . 'wp-includes/file.js' ) );
+		$this->assertSame( home_url( '/' ), $this->misc->convert_path_to_url( ABSPATH ) );
+		$this->assertSame( home_url( '/' ), $this->misc->convert_path_to_url( untrailingslashit( ABSPATH ) ) );
+	}
+
+	public function test_convert_path_to_url_keeps_slash_after_site_url() {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
+		$script_filename = $_SERVER['SCRIPT_FILENAME'] ?? null;
+
+		/* WordPress in its own directory, so the home path doesn't contain ABSPATH */
+		add_filter( 'pre_option_siteurl', fn() => 'http://example.org/wp' );
+		$_SERVER['SCRIPT_FILENAME'] = '/srv/site/wp/index.php';
+
+		try {
+			$this->assertSame( '/srv/site/', get_home_path() );
+			$this->assertSame( 'http://example.org/wp/wp-includes/file.js', $this->misc->convert_path_to_url( ABSPATH . 'wp-includes/file.js' ) );
+			$this->assertSame( 'http://example.org/wp/', $this->misc->convert_path_to_url( untrailingslashit( ABSPATH ) ) );
+		} finally {
+			$_SERVER['SCRIPT_FILENAME'] = $script_filename;
+		}
+	}
 }
