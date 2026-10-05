@@ -301,6 +301,13 @@ jobs:
             --do-not-cache-result --verbose \
             --coverage-clover=/var/www/html/wp-content/plugins/gravity-pdf/tmp/coverage/report-xml/php-coverage-multisite.xml
 
+      - name: Check coverage against the per-directory floor
+        if: ${{ matrix.report }}
+        run: |
+          php tools/phpunit/coverage-baseline.php --floor=tools/phpunit/coverage-floor.json \
+            tmp/coverage/report-xml/php-coverage1.xml \
+            tmp/coverage/report-xml/php-coverage-multisite.xml
+
       - name: Upload PHPUnit JUnit timings
         uses: actions/upload-artifact@v6
         if: always()

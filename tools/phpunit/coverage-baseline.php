@@ -2,7 +2,10 @@
 /**
  * Print a per-`src/`-subdir coverage breakdown from PHPUnit Clover XML.
  *
- * Usage: php tools/phpunit/coverage-baseline.php [<clover.xml> ...]
+ * Usage: php tools/phpunit/coverage-baseline.php [--floor=<json>] [--write-floor=<json>] [<clover.xml> ...]
+ *
+ * --floor fails (exit 1) when a bucket's statement coverage drops more than 0.5 points below the committed floor,
+ * which absorbs line-level differences between PHP versions. --write-floor records the current numbers.
  *
  * Accepts one or more Clover paths. Multiple paths are union-merged
  * per-line so the breakdown reflects coverage from both single-site
@@ -32,7 +35,8 @@ function bucket_for( $path ) {
 	return $parts[0];
 }
 
-$paths = array_slice( $argv, 1 );
+$options = getopt( '', [ 'floor:', 'write-floor:' ], $rest );
+$paths   = array_slice( $argv, $rest );
 if ( empty( $paths ) ) {
 	$paths = [ 'tmp/coverage/report-xml/baseline.xml' ];
 }
@@ -112,3 +116,41 @@ printf(
 	$pct( $overall['covst'], $overall['st'] ),
 	$pct( $overall['covel'], $overall['el'] )
 );
+
+$current = [];
+foreach ( $buckets as $name => $d ) {
+	$current[ $name ] = floor( $pct( $d['covst'], $d['st'] ) * 10 ) / 10;
+}
+
+if ( isset( $options['write-floor'] ) ) {
+	file_put_contents( $options['write-floor'], json_encode( $current, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "\n" );
+	echo "\nWrote {$options['write-floor']}\n";
+}
+
+if ( isset( $options['floor'] ) ) {
+	$floors = json_decode( (string) file_get_contents( $options['floor'] ), true );
+	$failed = false;
+
+	echo "\n";
+	foreach ( $floors as $name => $floor ) {
+		if ( ! isset( $current[ $name ] ) ) {
+			continue;
+		}
+
+		if ( $current[ $name ] < $floor - 0.5 ) {
+			printf( "::error::%s statement coverage fell to %.1f%%, below its %.1f%% floor\n", $name, $current[ $name ], $floor );
+			$failed = true;
+		}
+	}
+
+	foreach ( array_diff_key( $current, $floors ) as $name => $value ) {
+		printf( "%s has no floor yet (%.1f%%); add it with --write-floor\n", $name, $value );
+	}
+
+	if ( $failed ) {
+		echo "Raise coverage, or lower the floor in {$options['floor']} deliberately.\n";
+		exit( 1 );
+	}
+
+	echo "Coverage is within 0.5 points of every floor in {$options['floor']}\n";
+}

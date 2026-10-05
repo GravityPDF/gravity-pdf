@@ -1,0 +1,17 @@
+{
+    "Controller": 88.4,
+    "Exceptions": 50,
+    "Helper": 86.7,
+    "Helper/Fields": 85.3,
+    "Helper/Fonts": 82,
+    "Helper/Licensing": 94.8,
+    "Helper/Log": 90.7,
+    "Helper/Mpdf": 95.8,
+    "Model": 89.2,
+    "Plugin root": 75,
+    "Rest": 91.1,
+    "Statics": 96.9,
+    "View": 69.3,
+    "src/ root": 90.7,
+    "templates": 32.6
+}
