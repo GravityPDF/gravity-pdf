@@ -219,6 +219,15 @@ The 11 classes under `src/Exceptions/` are covered by a single
 `integration/Exceptions/Test_Exception_Hierarchy.php` smoke test, not 11
 individual files.
 
+## Snapshots
+
+Tests in the `snapshot` group compare a generated text file with one committed
+under `tests/phpunit/snapshots/`, using `\GFPDF\Tests\Concerns\AssertsSnapshots`.
+They guard what add-ons depend on: `Test_Public_Api_Contract` records the
+signatures of `GPDFAPI`, the core classes add-ons use, and the `get_mvc_class()`
+keys. A failure prints the diff. If the change is deliberate, rewrite the files
+with `yarn test:php:snapshots` and commit them, so the change shows in the PR.
+
 ## Running
 
 ```bash
@@ -227,4 +236,5 @@ yarn test:php                         # full suite
 yarn test:php -- --filter Test_Cache  # single class
 yarn test:php -- --group statics      # group
 yarn test:php:multisite               # WP multisite mode
+yarn test:php:snapshots               # rewrite tests/phpunit/snapshots/
 ```

@@ -1,0 +1,888 @@
+class GFPDF\Helper\Fields\Field_Checkbox extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function value()
+
+class GFPDF\Helper\Fields\Field_Form extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function get_repeater_html($form, $entry)
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function value()
+
+class GFPDF\Helper\Fields\Field_Multiselect extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function value()
+
+class GFPDF\Helper\Fields\Field_Option extends GFPDF\Helper\Helper_Abstract_Field_Products implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    protected $products
+    protected function set_form_data($name, $value)
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_option_html($options, $html = '')
+    public function get_pdf_config()
+    public function get_products()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function set_products(GFPDF\Helper\Fields\Field_Products $products)
+    public function value()
+
+class GFPDF\Helper\Fields\Field_Product extends GFPDF\Helper\Helper_Abstract_Field_Products implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    protected $products
+    protected function set_form_data($name, $value)
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function get_products()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function set_products(GFPDF\Helper\Fields\Field_Products $products)
+    public function value()
+
+class GFPDF\Helper\Fields\Field_Radio extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    protected function is_user_defined_value($value)
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function value()
+
+class GFPDF\Helper\Fields\Field_Select extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function value()
+
+class GFPDF\Helper\Fields\Field_Shipping extends GFPDF\Helper\Helper_Abstract_Field_Products implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    protected $products
+    protected function set_form_data($name, $value)
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function get_products()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function set_products(GFPDF\Helper\Fields\Field_Products $products)
+    public function value()
+
+abstract class GFPDF\Helper\Helper_Abstract_Addon
+    final protected function get_addon_settings_ids(bool $include_prefix = true): array
+    final public function get_addon_documentation_slug()
+    final public function get_addon_setting_value(string $name, $fallback = '')
+    final public function get_addon_settings_values(): array
+    final public function get_author()
+    final public function get_edd_download_id()
+    final public function get_license_key()
+    final public function get_license_key_from_constant()
+    final public function get_license_message()
+    final public function get_license_status()
+    final public function get_main_plugin_file()
+    final public function get_name()
+    final public function get_slug()
+    final public function get_version()
+    final public function has_license_auto_activated()
+    final public function has_license_auto_deactivated()
+    final public function is_license_active()
+    final public function is_license_admin_managed()
+    final public function maybe_schedule_license_check()
+    final public function register_addon_fields($settings)
+    final public function set_addon_documentation_slug($slug)
+    final public function set_edd_download_id($id)
+    protected $addon_documentation_slug
+    protected $addon_path_main_plugin_file
+    protected $author
+    protected $data
+    protected $edd_id
+    protected $license_auto_activated
+    protected $license_auto_deactivated
+    protected $license_key
+    protected $license_key_message
+    protected $license_key_status
+    protected $log
+    protected $name
+    protected $notices
+    protected $options
+    protected $plugin_updater
+    protected $slug
+    protected $use_settings_prefix
+    protected $version
+    protected function central_plugin_updater()
+    protected function maybe_activate_hardcoded_license()
+    protected function register_addon()
+    public $singleton
+    public function __construct($addon_slug, $addon_name, $author, $version, $path_to_main_plugin_file, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Options_Fields $options, GFPDF\Helper\Helper_Singleton $singleton, GFPDF\Helper\Helper_Logger $log, GFPDF\Helper\Helper_Notices $notices)
+    public function activate_license($license_key = '', $use_database = false)
+    public function deactivate_license()
+    public function delete_license_info()
+    public function enable_settings_prefix(): void
+    public function flush_update_cache()
+    public function get_addon_settings_defaults(): array
+    public function get_addon_settings_key(): string
+    public function get_default_api_params()
+    public function get_license_activation_url()
+    public function get_license_info($use_database = false)
+    public function get_plugin_updater()
+    public function get_short_name()
+    public function init($classes = [])
+    public function license_registration()
+    public function maybe_auto_activate_license($response, $addon, $use_database = false)
+    public function maybe_auto_deactivate_license($response, $addon)
+    public function plugin_row_meta($links, $file)
+    public function plugin_updater()
+    public function resolve_license_activation_url()
+    public function schedule_license_check()
+    public function sync_license_activation_url()
+    public function update_license_info($license_info, $use_database = false)
+    public function update_license_status_from_response($license_key, $response, $use_database = false)
+
+abstract class GFPDF\Helper\Helper_Abstract_Config_Settings implements GFPDF\Helper\Helper_Interface_Config_Settings
+    protected $settings
+    public function get_settings(): array
+    public function set_settings(array $settings)
+
+abstract class GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    abstract public function value()
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    protected $cached_results
+    protected $pdf_config
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function html($value = '', $show_label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+
+abstract class GFPDF\Helper\Helper_Abstract_Pdf_Shortcode extends GFPDF\Helper\Helper_Abstract_Model
+    abstract public function process($attributes)
+    const SHORTCODE = ''
+    final public function getController()
+    final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
+    protected $gform
+    protected $log
+    protected $misc
+    protected $options
+    protected $url_signer
+    protected function add_entry_id_to_shortcode($text, $entry_id)
+    protected function get_entry_id_if_empty($entry_id)
+    protected function get_pdf_config($entry_id, $pdf_id)
+    public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer)
+    public function add_shortcode_attr($code, $attr, $value)
+    public function get_shortcode_information($shortcode, $text)
+    public function gravitypdf_confirmation($confirmation, $form, $entry)
+    public function gravitypdf_gravityview_custom($html)
+    public function gravitypdf_notification($notification, $form, $entry)
+    public function gravitypdf_process_during_merge_tag_replacement($html, $form, $entry)
+    public function gravitypdf_redirect_confirmation($form)
+    public function gravitypdf_redirect_confirmation_shortcode_processing($confirmation, $form, $entry)
+
+interface GFPDF\Helper\Helper_Interface_Actions
+    abstract public function add_actions()
+
+interface GFPDF\Helper\Helper_Interface_Config
+    abstract public function configuration()
+
+interface GFPDF\Helper\Helper_Interface_Extension_Settings
+    abstract public function get_global_addon_fields()
+
+interface GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    abstract public function get_pdf_config()
+    abstract public function set_pdf_config($config)
+
+interface GFPDF\Helper\Helper_Interface_Filters
+    abstract public function add_filters()
+
+interface GFPDF\Helper\Helper_Interface_Setup_TearDown
+    abstract public function setUp()
+    abstract public function tearDown()
+
+trait GFPDF\Helper\Helper_Trait_Logger
+    protected $logger
+    public function get_logger()
+    public function set_logger(GFPDF_Vendor\Psr\Log\LoggerInterface $log)
+
+class GFPDF\Helper\Mpdf\Mpdf extends GFPDF_Vendor\Mpdf\Mpdf implements GFPDF_Vendor\Psr\Log\LoggerAwareInterface
+    public function AddPage($orientation = '', $condition = '', $resetpagenum = '', $pagenumstyle = '', $suppress = '', $mgl = '', $mgr = '', $mgt = '', $mgb = '', $mgh = '', $mgf = '', $ohname = '', $ehname = '', $ofname = '', $efname = '', $ohvalue = 0, $ehvalue = 0, $ofvalue = 0, $efvalue = 0, $pagesel = '', $newformat = '')
+    public function SetImportUse()
+    public function WriteHTML($html, $mode = GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true)
+    public function importPage($pageNumber = 1, $crop_x = null, $crop_y = null, $crop_w = 0, $crop_h = 0, $boxName = 'CropBox')
+    public function useTemplate($tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false)
+
+final class GPDFAPI
+    public static function add_pdf($form_id, $settings = [])
+    public static function add_pdf_font($font)
+    public static function add_plugin_option($key, $value)
+    public static function create_pdf($entry_id, $pdf_id, $bypass_cache = false)
+    public static function delete_pdf($form_id, $pdf_id)
+    public static function delete_pdf_font($font_id)
+    public static function delete_plugin_option($key)
+    public static function get_data_class()
+    public static function get_entry_pdfs($entry_id)
+    public static function get_form_class()
+    public static function get_form_data($entry_id)
+    public static function get_form_pdfs($form_id)
+    public static function get_log_class()
+    public static function get_misc_class()
+    public static function get_mvc_class($class_name)
+    public static function get_notice_class()
+    public static function get_options_class()
+    public static function get_pdf($form_id, $pdf_id)
+    public static function get_pdf_class($type = 'view')
+    public static function get_pdf_filename($entry_id, $pdf_id, bool $include_extension = false)
+    public static function get_pdf_fonts()
+    public static function get_plugin_option($key, $default_value = '')
+    public static function get_plugin_settings()
+    public static function get_templates_class()
+    public static function likert_table($entry, $field_id, $should_return = false)
+    public static function product_table($entry, $should_return = false)
+    public static function purge_pdf_cache($entry_id)
+    public static function update_pdf($form_id, $pdf_id, $settings = [])
+    public static function update_plugin_option($key, $value)
+
+class GFPDF\Controller\Controller_Shortcodes extends GFPDF\Helper\Helper_Abstract_Controller implements GFPDF\Helper\Helper_Interface_Filters
+    public $model
+    public $view
+    public function __construct(GFPDF\Helper\Helper_Abstract_Model $model, GFPDF\Helper\Helper_Abstract_View $view, GFPDF_Vendor\Psr\Log\LoggerInterface $log)
+    public function add_filters()
+    public function add_shortcodes()
+    public function init()
+
+class GFPDF\Exceptions\GravityPdfException extends Exception implements Throwable
+
+class GFPDF\Exceptions\GravityPdfShortcodeEntryIdException extends GFPDF\Exceptions\GravityPdfException implements Throwable
+
+class GFPDF\Exceptions\GravityPdfShortcodePdfConditionalLogicFailedException extends GFPDF\Exceptions\GravityPdfException implements Throwable
+
+class GFPDF\Exceptions\GravityPdfShortcodePdfConfigNotFoundException extends GFPDF\Exceptions\GravityPdfException implements Throwable
+
+class GFPDF\Exceptions\GravityPdfShortcodePdfInactiveException extends GFPDF\Exceptions\GravityPdfException implements Throwable
+
+class GFPDF\Helper\Fields\Field_Products extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    final public function cache($value = null)
+    final public function disable_output(): void
+    final public function enable_output(): void
+    final public function get_label()
+    final public function get_output(): bool
+    final public function get_value()
+    final public function has_cache()
+    final public function remove_cache()
+    public $entry
+    public $field
+    public $fieldObject
+    public $form
+    public $gform
+    public $misc
+    public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
+    public function encode_tags($value)
+    public function form_data()
+    public function get_field_classes(): string
+    public function get_pdf_config()
+    public function html($value = '', $label = true)
+    public function is_empty()
+    public function set_pdf_config($config)
+    public function value()
+
+abstract class GFPDF\Helper\Helper_Abstract_Options implements GFPDF\Helper\Helper_Interface_Filters
+    abstract public function get_registered_fields()
+    public function __call($name, $arguments)
+    public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Helper\Helper_Templates $templates)
+    public function add_custom_fonts($fonts = [])
+    public function add_filters()
+    public function add_pdf($form_id, $pdf = [])
+    public function build_options_for_select($options, $value, $should_output = false)
+    public function button_callback($args)
+    public function checkbox_callback($args)
+    public function color_callback($args)
+    public function conditional_logic_callback($args)
+    public function create_toggle_input($toggle, $html, $value)
+    public function delete_option($key = '')
+    public function delete_pdf($form_id, $pdf_id)
+    public function descriptive_text_callback($args)
+    public function end_toggle_input()
+    public function get_capabilities()
+    public function get_custom_fonts()
+    public function get_font_short_name($name): string
+    public function get_form_pdfs($form_id)
+    public function get_form_settings()
+    public function get_form_value($args = [])
+    public function get_installed_fonts()
+    public function get_option($key = '', $fallback = false)
+    public function get_paper_size()
+    public function get_pdf($form_id, $pdf_id)
+    public function get_privilages()
+    public function get_settings()
+    public function hidden_callback($args)
+    public function hook_callback($args)
+    public function init()
+    public function license_callback($args)
+    public function maybe_add_missing_options($options, $value)
+    public function missing_callback($args)
+    public function multicheck_callback($args)
+    public function number_callback($args)
+    public function paper_size_callback($args)
+    public function password_callback($args)
+    public function radio_callback($args)
+    public function register_settings($fields = [])
+    public function rich_editor_callback($args)
+    public function sanitize_all_fields($value, $key, $input, $settings)
+    public function sanitize_number_field($value, $key = '', $input = [], $settings = [])
+    public function sanitize_paper_size($input)
+    public function sanitize_required_field($value, $key, $input, $settings)
+    public function sanitize_trim_field($input)
+    public function select_callback($args)
+    public function set_plugin_settings()
+    public function settings_sanitize($input = [])
+    public function start_toggle_input($toggle, $value, $element_id = '')
+    public function text_callback($args)
+    public function textarea_callback($args)
+    public function toggle_callback($args)
+    public function update_option($key = '', $value = false)
+    public function update_pdf($form_id, $pdf_id, $pdf = '', $update_db = true, $filters = true)
+    public function update_registered_field($group_id, $setting_id, $option_id, $option_value)
+    public function update_settings($new_settings)
+    public function upload_callback($args)
+    public static function __callStatic($name, $arguments)
+
+class GFPDF\Helper\Helper_Data
+    const REST_API_BASENAME = 'gravity-pdf/'
+    public function &__get($name)
+    public function __isset($name)
+    public function __set($name, $value)
+    public function __unset($name)
+    public function add_addon(GFPDF\Helper\Helper_Abstract_Addon $addon_class)
+    public function addon_license_responses($addon_name)
+    public function get_conditional_logic_options($form): array
+    public function get_localised_script_data(GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Templates $templates)
+    public function init()
+    public function set_addon_details()
+    public function set_plugin_titles()
+
+class GFPDF\Helper\Helper_Form extends GFPDF\Helper\Helper_Abstract_Form
+    public function add_form($form)
+    public function delete_form($form_id)
+    public function get_capabilities()
+    public function get_entries($form_ids, $search_criteria = [], $sorting = null, $paging = null)
+    public function get_entry($entry_id)
+    public function get_form($form_id)
+    public function get_forms()
+    public function get_plugin_path()
+    public function get_plugin_url()
+    public function get_version()
+    public function has_capability($capability, $user_id = null)
+    public function process_tags($text, $form, $entry)
+    public function update_entry($entry)
+    public function update_form($form)
+
+class GFPDF\Helper\Helper_Logger extends GFPDF\Helper\Log\Logger
+    public function __construct($slug, $name)
+    public function get_logger()
+    public function register_logger_with_gf($loggers)
+
+class GFPDF\Helper\Helper_Misc
+    public function __call($name, $arguments)
+    public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Data $data)
+    public function array_unshift_assoc($array_to_update, $key, $val)
+    public function change_brightness($hexcolor, $diff)
+    public function cleanup_dir($path)
+    public function conditional_logic_passes($settings, $entry)
+    public function convert_path_to_url($path)
+    public function convert_url_to_path($url)
+    public function copyr($source, $destination)
+    public function evaluate_conditional_logic($logic, $entry)
+    public function fix_header_footer($html)
+    public function fix_header_footer_images($html)
+    public function flatten_array(array $items, $type = 'keys')
+    public function get_background_and_border_contrast($background_hex)
+    public function get_contrast($hexcolor)
+    public function get_field_class($type)
+    public function get_fields_sorted_by_id($form_id)
+    public function get_file_with_extension($name, $extension = '.php')
+    public function get_upload_details()
+    public function handle_ajax_authentication($endpoint_desc, $capability = 'gravityforms_edit_settings', $nonce_name = 'gfpdf_ajax_nonce')
+    public function in_array($needle, $haystack, $strict = true)
+    public function is_gfpdf_page()
+    public function is_gfpdf_settings_tab($name)
+    public function is_secondary_network_site($plugin_basename)
+    public function relative_path($path, $replace = '')
+    public function remove_extension_from_string($text, $type = '.pdf')
+    public function rmdir($dir, bool $delete_top_level_dir = true)
+    public function strip_invalid_characters($name)
+    public static function __callStatic($name, $arguments)
+
+class GFPDF\Helper\Helper_Mpdf extends GFPDF\Helper\Mpdf\Mpdf implements GFPDF_Vendor\Psr\Log\LoggerAwareInterface
+    public function AddPage($orientation = '', $condition = '', $resetpagenum = '', $pagenumstyle = '', $suppress = '', $mgl = '', $mgr = '', $mgt = '', $mgb = '', $mgh = '', $mgf = '', $ohname = '', $ehname = '', $ofname = '', $efname = '', $ohvalue = 0, $ehvalue = 0, $ofvalue = 0, $efvalue = 0, $pagesel = '', $newformat = '')
+    public function SetImportUse()
+    public function WriteHTML($html, $mode = GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true)
+    public function importPage($pageNumber = 1, $crop_x = null, $crop_y = null, $crop_w = 0, $crop_h = 0, $boxName = 'CropBox')
+    public function useTemplate($tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false)
+
+class GFPDF\Helper\Helper_Notices implements GFPDF\Helper\Helper_Interface_Actions
+    public function __call($name, $arguments)
+    public function add_actions(): void
+    public function add_error($error, $css_class = '')
+    public function add_notice($notice, $css_class = ''): void
+    public function can_display_notice_on_this_page()
+    public function clear(string $type = 'all'): void
+    public function has_error(): bool
+    public function has_notice(): bool
+    public function init(): void
+    public function process(): void
+    public static function __callStatic($name, $arguments)
+
+class GFPDF\Helper\Helper_PDF
+    public function __construct($entry, $settings, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Templates $templates, GFPDF_Vendor\Psr\Log\LoggerInterface $log)
+    public function generate()
+    public function get_cache_bypass()
+    public function get_entry()
+    public function get_filename()
+    public function get_form()
+    public function get_full_pdf_path()
+    public function get_output_type()
+    public function get_path()
+    public function get_pdf_class()
+    public function get_settings()
+    public function get_template_path()
+    public function init()
+    public function is_cache_disabled()
+    public function is_cache_path()
+    public function pdf_exists()
+    public function render_html($args = [], $html = '')
+    public function save_pdf($raw_pdf_string)
+    public function set_JS($js)
+    public function set_cache_bypass($bypass)
+    public function set_creator($text = '')
+    public function set_display_mode($mode = 'fullpage', $layout = 'continuous')
+    public function set_filename($filename)
+    public function set_output_type($type)
+    public function set_path($path = '')
+    public function set_print_dialog($show_print_dialog = true)
+    public function set_template()
+
+class GFPDF\Helper\Helper_Singleton
+    public function add_class($class_object)
+    public function get_class($name)
+
+class GFPDF\Helper\Helper_Templates
+    public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Abstract_Form $gform)
+    public function flush_template_transient_cache()
+    public function get_all_template_info()
+    public function get_all_templates()
+    public function get_all_templates_by_group()
+    public function get_all_templates_in_folder($folder)
+    public function get_config_class($template_id)
+    public function get_config_class_name($file)
+    public function get_config_path_by_id($template_id, $include_core = true)
+    public function get_core_pdf_templates()
+    public function get_requested_template_id($template_id)
+    public function get_template_arguments($form, $fields, $entry, $form_data, $settings, $config, $legacy_ids = [])
+    public function get_template_files_by_id($template_id)
+    public function get_template_header_details()
+    public function get_template_image($template, $type = 'url', $include_core = true)
+    public function get_template_info_by_id($template_id)
+    public function get_template_info_by_path($template_path, $cache_name = '', $cache_time = 604800)
+    public function get_template_path()
+    public function get_template_path_by_id($template_id, $include_core = true)
+    public function get_template_url()
+    public function get_unfiltered_template_list()
+    public function human_readable_template_name($name)
+    public function is_legacy_template(array $info): bool
+    public function is_template_compatible($required_version)
+    public function load_template_config_file($file)
+    public function maybe_add_template_compatibility_notice($template_name, $required_version)
+
+class GFPDF\Helper\Helper_Url_Signer implements GFPDF\Helper\Helper_Interface_Url_Signer
+    public function sign($url, $expiration)
+    public function verify($url)
+    public function verify_current_request()
+
+class GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater
+    public function __construct($_api_url, $_plugin_file, $_api_data = null)
+    public function check_update($_transient_data)
+    public function convert_object_to_array($data)
+    public function delete_network_version_info_cache()
+    public function delete_transient_plugin_info()
+    public function delete_version_info_cache($cache_key = '')
+    public function get_active_plugins()
+    public function get_cache_key()
+    public function get_cached_version_info($cache_key = '')
+    public function get_network_cache_key()
+    public function get_network_cached_version_info()
+    public function get_plugin_file()
+    public function get_repo_api_data()
+    public function get_slug()
+    public function get_tested_version($version_info)
+    public function get_update_transient_data()
+    public function get_version_api_params()
+    public function get_version_from_remote()
+    public function get_version_info()
+    public function init()
+    public function log_failed_request()
+    public function normalize_api_collection($data)
+    public function plugins_api_filter($_data, $_action = '', $_args = null)
+    public function request_recently_failed()
+    public function set_license_key($license_key)
+    public function set_license_status($license_status)
+    public function set_version_info_cache($value = '', $cache_key = '')
+    public function show_changelog()
+    public function show_update_notification($file, $plugin)
+    public function standardize_api_response($response)
+    public function verify_ssl()
+
+class GFPDF\Model\Model_Form_Settings extends GFPDF\Helper\Helper_Abstract_Model
+    final public function getController()
+    final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
+    public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Helper\Helper_Templates $templates)
+    public function add_form_settings_menu($tabs)
+    public function change_state_pdf_setting()
+    public function check_custom_size_error_highlighting($skip, $field, $input)
+    public function decode_json($value, $key)
+    public function delete_gf_pdf_setting()
+    public function duplicate_gf_pdf_setting()
+    public function get_template_name_from_current_page()
+    public function parse_filename_extension($value, $key)
+    public function process_list_view($form_id)
+    public function process_submission($form_id, $pdf_id)
+    public function register_custom_appearance_settings($settings)
+    public function register_notifications($notifications)
+    public function register_template_group($settings)
+    public function render_template_fields()
+    public function settings_sanitize($input = [])
+    public function setup_core_custom_appearance_settings(array $settings, GFPDF\Helper\Helper_Interface_Config $config_class, array $template_settings)
+    public function setup_custom_appearance_settings($config_class, $settings = [])
+    public function show_edit_view($form_id, $pdf_id)
+    public function validation_error($fields)
+
+class GFPDF\Model\Model_Install extends GFPDF\Helper\Helper_Abstract_Model
+    const TMP_HTACCESS = '<IfModule mod_authz_core.c> Require all denied </IfModule> <IfModule !mod_authz_core.c> Order allow,deny Deny from all </IfModule> Options -Indexes '
+    final public function getController()
+    final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
+    public function __call($name, $arguments)
+    public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Model\Model_Uninstall $uninstall)
+    public function create_folder_structures()
+    public function get_permalink_regex()
+    public function get_settings_url()
+    public function get_working_directory()
+    public function install_plugin()
+    public function is_installed()
+    public function maybe_flush_rewrite_rules($regex)
+    public function redirect_to_plugins_page()
+    public function register_rewrite_rules()
+    public function register_rewrite_tags($tags)
+    public function setup_multisite_template_location()
+    public function setup_template_location()
+    public static function __callStatic($name, $arguments)
+    public static function write_tmp_htaccess($tmp_location, $replace_legacy = false)
+
+class GFPDF\Model\Model_PDF extends GFPDF\Helper\Helper_Abstract_Model
+    final public function getController()
+    final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
+    public function __call($name, $arguments)
+    public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Helper\Helper_Templates $templates, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer, ?GFPDF\Helper\Helper_Async_Notifications $async_notifications = null)
+    public function add_unregistered_fonts_to_mPDF($fonts)
+    public function can_user_view_pdf_with_capabilities($user_id = null)
+    public function check_field_exists($type, $form)
+    public function cleanup_tmp_dir()
+    public function disable_gp_populate_anything()
+    public function does_pdf_exist(GFPDF\Helper\Helper_PDF $pdf_generator)
+    public function enable_gp_populate_anything()
+    public function field_middle_blacklist($action, $field, $entry, $form, $config, $products, $blacklisted)
+    public function field_middle_conditional_fields($action, $field, $entry, $form, $config)
+    public function field_middle_exclude($action, $field, $entry, $form, $config)
+    public function field_middle_html_fields($action, $field, $entry, $form, $config)
+    public function field_middle_page($action, $field, $entry, $form, $config)
+    public function field_middle_product_fields($action, $field, $entry, $form, $config)
+    public function generate_and_save_pdf($entry, $pdf_settings, $bypass_cache = false)
+    public function get_active_pdfs($pdfs, $entry)
+    public function get_cache_status($path_to_pdf)
+    public function get_field_class($field, $form, $entry, GFPDF\Helper\Fields\Field_Products $products, $config = [])
+    public function get_form_data($entry)
+    public function get_form_data_meta($form, $entry)
+    public function get_pdf_display_list($entry)
+    public function get_pdf_name($settings, $entry)
+    public function get_pdf_url($pid, $id, $download = false, $should_print = false, $esc = true)
+    public function get_poll_results($form, $entry)
+    public function get_quiz_overall_data($form, $fields)
+    public function get_quiz_results($form, $entry)
+    public function get_survey_results($form, $entry)
+    public function gp_populate_anything_hydrate_form($form, $entry)
+    public function is_current_pdf_owner($entry, $type = 'all')
+    public function is_gform_asynchronous_notifications_enabled($notifications, $form, $entry, $data = [])
+    public function maybe_always_save_pdf(array $settings, int $form_id = 0): bool
+    public function maybe_attach_to_notification($notification, $settings, $entry = [], $form = [])
+    public function maybe_save_pdf($entry, $form)
+    public function middle_active($action, $entry, $settings)
+    public function middle_auth_logged_out_user($action, $entry, $settings)
+    public function middle_conditional($action, $entry, $settings)
+    public function middle_logged_out_timeout($action, $entry, $settings)
+    public function middle_owner_restriction($action, $entry, $settings)
+    public function middle_public_access($action, $entry, $settings)
+    public function middle_signed_url_access($action, $entry, $settings)
+    public function middle_user_capability($action, $entry, $settings)
+    public function notifications($notifications, $form, $entry)
+    public function preprocess_template_arguments($args)
+    public function process_and_save_pdf(GFPDF\Helper\Helper_PDF $pdf_generator)
+    public function process_gp_populate_anything($text, $form, $entry)
+    public function process_pdf($pid, $lid, $action = 'view')
+    public function register_custom_font_data_with_mPDF($fonts)
+    public function register_legal_signing_font_path_with_mpdf($config)
+    public function register_legal_signing_fonts_with_mpdf($fonts)
+    public function register_page_fields($form)
+    public function register_pdf_meta_box($meta_boxes, $entry, $form)
+    public function replace_key($array_to_modify, $key, $replacement_key)
+    public function save_pdf_by_id($entry_id, $pdf_id, $context, $bypass_cache = false)
+    public function send_pdf_to_browser($path_to_pdf, $action = 'view')
+    public function set_watermark_font($mpdf, $form, $entry, $settings)
+    public function view_pdf_entry_detail($args)
+    public function view_pdf_entry_list($form_id, $field_id, $value, $entry)
+    public function view_pdf_gravityflow_inbox($form, $entry, $current_step, $args)
+    public static function __callStatic($name, $arguments)
+
+class GFPDF\Model\Model_Shortcodes extends GFPDF\Helper\Helper_Abstract_Pdf_Shortcode
+    const SHORTCODE = 'gravitypdf'
+    final public function getController()
+    final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
+    public function __call($name, $arguments)
+    public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer)
+    public function add_shortcode_attr($code, $attr, $value)
+    public function get_shortcode_information($shortcode, $text)
+    public function gravitypdf_confirmation($confirmation, $form, $entry)
+    public function gravitypdf_gravityview_custom($html)
+    public function gravitypdf_notification($notification, $form, $entry)
+    public function gravitypdf_process_during_merge_tag_replacement($html, $form, $entry)
+    public function gravitypdf_redirect_confirmation($form)
+    public function gravitypdf_redirect_confirmation_shortcode_processing($confirmation, $form, $entry)
+    public function process($attributes)
+    public static function __callStatic($name, $arguments)
+
+class GFPDF\Router implements GFPDF\Helper\Helper_Interface_Actions, GFPDF\Helper\Helper_Interface_Filters
+    public $data
+    public $gform
+    public $log
+    public $misc
+    public $notices
+    public $options
+    public $singleton
+    public $templates
+    public function __call($name, $arguments)
+    public function actions()
+    public function add_actions()
+    public function add_admin_messages()
+    public function add_body_class($classes)
+    public function add_filters()
+    public function async_pdfs()
+    public function auto_noconflict_scripts($items)
+    public function auto_noconflict_styles($items)
+    public function check_system_status()
+    public function export(): void
+    public function get_config_data($form_id)
+    public function get_default_config_data($form_id)
+    public function gf_form_settings()
+    public function gf_settings()
+    public function init()
+    public function init_settings_api()
+    public function installer()
+    public function load_admin_assets()
+    public function load_core_font_handler()
+    public function load_custom_font_handler(): void
+    public function load_debug()
+    public function mergetags()
+    public function pdf()
+    public function pdf_cache()
+    public function plugin_action_links($links)
+    public function plugin_row_meta($links, $file)
+    public function register_assets()
+    public function rest_api()
+    public function setup_settings_fields()
+    public function shortcodes()
+    public function template_manager()
+    public function tinymce_styles($mce_init)
+    public function upgrade_routine(): void
+    public function webhooks(): void
+    public function zapier(): void
+    public static function __callStatic($name, $arguments)
+    public static function initialise_plugin()
+
+class GFPDF\Statics\Kses
+    public static function get_allowed_pdf_protocols($protocols = null)
+    public static function get_allowed_pdf_styles($styles)
+    public static function get_allowed_pdf_tags($tags = null)
+    public static function output($html): void
+    public static function parse($html)
