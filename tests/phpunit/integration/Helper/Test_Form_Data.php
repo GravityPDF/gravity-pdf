@@ -38,11 +38,7 @@ class Test_Form_Data extends TestCase {
 			[ 'all-form-fields', 'repeater-consent-form', 'repeater-empty-form' ]
 		);
 
-		// The all-form-fields entry JSON hardcodes upload URLs against form_id=1's
-		// upload directory (gravity_forms/1-<wp_hash(1)>/…). Rewrite each entry's
-		// file/post-image fields to point at the per-class form's upload dir so
-		// test_upload_field and test_post_fields resolve secured URLs correctly.
-		static::rewrite_upload_paths_for_all_form_fields();
+		static::point_uploads_at_fixture_form();
 
 		/* number-fields is only used by test_field_number_currency; one shared form is fine. */
 		$number_fields_json          = json_decode(
@@ -69,28 +65,6 @@ class Test_Form_Data extends TestCase {
 		parent::tear_down();
 	}
 
-	private static function rewrite_upload_paths_for_all_form_fields() {
-		$form_id = self::$fixture_caches[ static::class ]['forms']['all-form-fields']['id'];
-		$slug    = '1-' . wp_hash( 1 );
-		$replace = $form_id . '-' . wp_hash( $form_id );
-
-		// Multi-file fields store a JSON-encoded array of URLs (with escaped slashes),
-		// so str_replace needs to match the bare slug — that covers both `gravity_forms/<slug>`
-		// and `gravity_forms\/<slug>` without coupling to either escape form.
-		foreach ( self::$fixture_caches[ static::class ]['entries']['all-form-fields'] as $i => $entry ) {
-			$updated = false;
-			foreach ( $entry as $field_id => $value ) {
-				if ( is_string( $value ) && strpos( $value, $slug ) !== false ) {
-					$entry[ $field_id ] = str_replace( $slug, $replace, $value );
-					$updated            = true;
-				}
-			}
-			if ( $updated ) {
-				\GFAPI::update_entry( $entry );
-				self::$fixture_caches[ static::class ]['entries']['all-form-fields'][ $i ] = $entry;
-			}
-		}
-	}
 	/**
 	 * The Gravity Form
 	 *
