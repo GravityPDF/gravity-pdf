@@ -226,7 +226,9 @@ under `tests/phpunit/snapshots/`, using `\GFPDF\Tests\Concerns\AssertsSnapshots`
 They guard what add-ons depend on: `Test_Public_Api_Contract` records the
 signatures of `GPDFAPI`, the core classes add-ons use, and the `get_mvc_class()`
 keys, and `Test_Hook_Inventory` lists every hook the plugin fires with its
-argument count. A failure prints the diff. If the change is deliberate, rewrite the files
+argument count, and `Test_Hook_Registrations` lists the middleware callbacks the
+docs show developers unhooking. A failure prints the diff. If the change is
+deliberate, rewrite the files
 with `yarn test:php:snapshots` and commit them, so the change shows in the PR.
 
 ## Running

@@ -55,6 +55,14 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
 
+		/* What was hooked once WordPress and the plugin finished booting, before any test adds or removes a callback */
+		$GLOBALS['gfpdf_tests_booted_hooks'] = array_map(
+			static function ( WP_Hook $hook ): array {
+				return $hook->callbacks;
+			},
+			$GLOBALS['wp_filter']
+		);
+
 		/* Load Mocks */
 		$this->mocks();
 	}
