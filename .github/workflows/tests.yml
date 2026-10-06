@@ -478,13 +478,79 @@ jobs:
           name: failure-artifacts-shard-${{ matrix.shard }}
           path: tmp/artifacts
 
+  addon-smoke:
+    name: Add-on smoke test
+    needs: prebuild
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure environment variables
+        run: |
+          echo "PHP_FPM_UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "PHP_FPM_GID=$(id -g)" >> "$GITHUB_ENV"
+
+      - name: Use Google's Docker Hub mirror to avoid rate limits
+        run: |
+          echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Restore Composer vendor
+        uses: ./.github/actions/restore-cache
+        with:
+          path: |
+            vendor
+            vendor_prefixed
+          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
+
+      - name: Restore node_modules
+        uses: ./.github/actions/restore-cache
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+
+      - name: Restore build assets
+        uses: ./.github/actions/restore-cache
+        with:
+          path: build/assets
+          key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
+
+      - name: Pre-download WordPress core
+        run: |
+          url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/e2e.json)
+          curl -fsSL --retry 4 "$url" -o "$RUNNER_TEMP/wp-core.zip"
+          unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
+          echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
+
+      - name: Download the released add-ons
+        run: bash tools/ci/addons/download.sh
+        env:
+          GPDF_ADDON_LICENSE: ${{ secrets.GPDF_ADDON_LICENSE }}
+
+      - name: Boot every add-on and load the main pages
+        run: bash tools/ci/addons/smoke.sh
+
+      - name: Upload the debug log on failure
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: addon-smoke-debug-log
+          path: tmp/addons/debug.log
+
   notify:
     name: Notify on weekly run
-    needs: [ test-js, test-php, e2e-playwright, visual-regression ]
+    needs: [ test-js, test-php, e2e-playwright, visual-regression, addon-smoke ]
     if: ${{ always() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     env:
-      HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success' && needs.visual-regression.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
+      HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success' && needs.visual-regression.result == 'success' && needs.addon-smoke.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
     steps:
       - name: Post Slack notification for weekly run
         uses: slackapi/slack-github-action@v3

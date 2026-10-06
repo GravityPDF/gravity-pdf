@@ -1,7 +1,7 @@
 <?php
 
-/* Only run on test site and excluded from production build */
-if ( ! defined( 'TEST_SUITE' ) || ! TEST_SUITE ) {
+/* Only run on test site and excluded from production build. GPDF_REPORT_DEPRECATIONS keeps deprecations visible */
+if ( ! defined( 'TEST_SUITE' ) || ! TEST_SUITE || ( defined( 'GPDF_REPORT_DEPRECATIONS' ) && GPDF_REPORT_DEPRECATIONS ) ) {
 	return;
 }
 

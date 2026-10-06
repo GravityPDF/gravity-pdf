@@ -66,6 +66,7 @@
     "wp-env": "WP_ENV_PORT=8700 wp-env --config=./tools/wp-env/development.json",
     "wp-env:integration": "WP_ENV_PORT=8701 wp-env --config=./tools/wp-env/integration.json",
     "wp-env:e2e": "WP_ENV_PORT=8702 wp-env --config=./tools/wp-env/e2e.json",
+    "wp-env:addons": "WP_ENV_PORT=8703 wp-env --config=./tmp/addons/wp-env.json",
     "test:php": "yarn wp-env:integration run wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tools/phpunit/config.xml",
     "test:php:snapshots": "yarn wp-env:integration run wordpress env GPDF_UPDATE_SNAPSHOTS=1 /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tools/phpunit/config.xml --group snapshot",
     "test:php:multisite": "yarn wp-env:integration run wordpress env PHP_IDE_CONFIG=serverName=localhost /var/www/html/wp-content/plugins/gravity-pdf/vendor/bin/phpunit -- -c /var/www/html/wp-content/plugins/gravity-pdf/tools/phpunit/config-multisite.xml",
