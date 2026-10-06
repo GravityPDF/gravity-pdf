@@ -7,6 +7,7 @@ use GFAPI;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Integration\TestCase;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
 
 /**
  * Test Gravity PDF Options API Class
@@ -181,6 +182,34 @@ class Test_Options_API extends TestCase {
 		$this->assertSame( 'My First PDF Template', $results['name'] );
 		$this->assertSame( 'Gravity Forms Style', $results['template'] );
 		$this->assertContains( 'Admin Notification', $results['notification'] );
+	}
+
+	public function test_get_form_settings_reads_a_posted_form_and_pdf_id() {
+		$form = GFAPI::get_form( $this->form_id );
+		$pid  = key( $form['gfpdf_form_settings'] );
+
+		$_POST['id']           = $this->form_id;
+		$_POST['gform_pdf_id'] = $pid;
+
+		$this->assertSame( $form['gfpdf_form_settings'][ $pid ]['name'], $this->options->get_form_settings()['name'] );
+	}
+
+	public function test_get_form_settings_logs_and_returns_nothing_for_an_unknown_pdf() {
+		global $gfpdf;
+
+		$_GET['id']  = $this->form_id;
+		$_GET['pid'] = 'missing-pdf';
+
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+
+		try {
+			$this->assertSame( [], $this->options->get_form_settings() );
+		} finally {
+			$gfpdf->log->popHandler();
+		}
+
+		$this->assertTrue( $handler->hasRecord( 'Settings Retrieval Error', 'error' ) );
 	}
 
 	/**
