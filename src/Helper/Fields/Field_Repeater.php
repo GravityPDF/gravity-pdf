@@ -191,7 +191,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$is_top_level = $field === $this->field;
 
 		$container = new Helper_Field_Container();
-		$container = apply_filters( 'gfpdf_field_container_class', $container );
+		$container = apply_filters( 'gfpdf_field_container_class', $container, $this->form, $this->entry, $this->get_pdf_config() );
 
 		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );

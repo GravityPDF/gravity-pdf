@@ -14,6 +14,7 @@
 * 🐞 Bug: Hide the Tools tab from users who can view but not edit the PDF settings
 * 🐞 Bug: Keep the value returned by the `gfpdf_settings_sanitize` filter when saving the global settings
 * 🐞 Bug: Stop a Gravity PDF extension's info and success notices from blocking the global settings save or showing as errors
+* 🐞 Bug: Pass the form, entry and PDF config to the `gfpdf_field_container_class` filter for Repeater and Nested Form fields, as it already is for the rest of the PDF
 * 💻 Developer: Global settings fields can set a `sanitize_callback` to replace the default sanitizing
 
 ### 6.17.2

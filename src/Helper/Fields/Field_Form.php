@@ -113,9 +113,6 @@ class Field_Form extends Helper_Abstract_Fields {
 	public function get_repeater_html( $form, $entry ) {
 		ob_start();
 
-		$container = ! \GFCommon::is_legacy_markup_enabled( $form['id'] ) ? new Helper_Field_Container_Gf25() : new Helper_Field_Container();
-		$container = apply_filters( 'gfpdf_field_container_class', $container );
-
 		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 
@@ -127,6 +124,9 @@ class Field_Form extends Helper_Abstract_Fields {
 		if ( isset( $config['meta'] ) ) {
 			$config['meta']['individual_products'] = true;
 		}
+
+		$container = ! \GFCommon::is_legacy_markup_enabled( $form['id'] ) ? new Helper_Field_Container_Gf25() : new Helper_Field_Container();
+		$container = apply_filters( 'gfpdf_field_container_class', $container, $form, $entry, $config );
 
 		/* Ensure the field outputs the HTML and can be reset to the original value */
 		$output_already_enabled = $this->get_output();

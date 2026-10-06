@@ -61,6 +61,28 @@ namespace GFPDF\Helper\Fields {
 			$this->assertStringContainsString( 'id="nested-field-41-option-1-1"', $html );
 		}
 
+		public function test_container_class_filter_receives_nested_form_entry_and_config() {
+			$calls    = [];
+			$listener = function ( $container, $form, $entry, $config ) use ( &$calls ) {
+				$calls[] = [ $form['id'], $entry['id'], $config ];
+
+				return $container;
+			};
+			add_filter( 'gfpdf_field_container_class', $listener, 10, 4 );
+
+			$this->pdf_field->set_pdf_config( [ 'meta' => [ 'empty' => true ] ] );
+			$this->pdf_field->html();
+
+			$expected_config = [ 'meta' => [ 'empty' => true, 'individual_products' => true ] ];
+			$expected        = array_map(
+				function ( $entry ) use ( $expected_config ) {
+					return [ $this->form['id'], $entry['id'], $expected_config ];
+				},
+				$GLOBALS['GFPDF_Test']->entries['all-form-fields']
+			);
+
+			$this->assertSame( $expected, $calls );
+		}
 	}
 }
 
