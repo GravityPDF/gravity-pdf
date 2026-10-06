@@ -153,19 +153,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* Add submenu via a hook */
 		add_action( 'gfpdf_settings_sub_menu', [ $this->view, 'sub_menu' ] );
 
-		/**
-		 * Display the uninstaller if use has the correct permissions
-		 *
-		 * If not a multisite any user with the GF uninstaller permission can remove it (usually just admins)
-		 *
-		 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
-		 */
-		if ( ( ! is_multisite() && $this->gform->has_capability( 'gravityforms_uninstall' ) ) ||
-			 ( is_multisite() && is_super_admin() )
-		) {
-			add_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ], 5 );
-		}
-
 		/*
 		 * Add AJAX Action Endpoints
 		 */
