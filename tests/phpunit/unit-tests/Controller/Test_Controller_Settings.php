@@ -111,6 +111,20 @@ class Test_Controller_Settings extends WP_UnitTestCase {
 		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
 	}
 
+	/* The Tools tab hooked a View_Settings::uninstaller() template that no longer exists */
+	public function test_tools_tab_hooks_no_missing_view_for_uninstall_capable_user() {
+		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		get_userdata( $admin )->add_cap( 'gravityforms_uninstall' );
+		if ( is_multisite() ) {
+			grant_super_admin( $admin );
+		}
+		wp_set_current_user( $admin );
+
+		$this->controller->add_actions();
+
+		$this->assertFalse( has_action( 'gfpdf_post_tools_settings_page', [ $this->controller->view, 'uninstaller' ] ) );
+	}
+
 	/*
 	 * maybe_schedule_network_update_check() runs on every request via after_setup_theme, including the frontend and
 	 * WP-Cron, where wp-admin/includes/plugin.php (which defines is_plugin_active_for_network()) isn't loaded. That
