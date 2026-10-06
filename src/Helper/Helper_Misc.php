@@ -714,18 +714,21 @@ class Helper_Misc {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		/* If that didn't work let's try the home path instead */
-		$try_url = str_replace( get_home_path(), home_url(), $path );
+		/* If that didn't work let's try the home path, then the ABSPATH, instead */
+		$roots = [
+			[ get_home_path(), home_url() ],
+			[ ABSPATH, site_url() ],
+		];
 
-		if ( $try_url !== $path ) {
-			return $try_url;
-		}
+		foreach ( $roots as [ $root_path, $root_url ] ) {
+			/* Both paths end in a slash, so the URLs must too. Treat the root without its slash as the root itself. */
+			$root_path = trailingslashit( $root_path );
+			$try_path  = untrailingslashit( $root_path ) === $path ? $root_path : $path;
+			$try_url   = str_replace( $root_path, trailingslashit( $root_url ), $try_path );
 
-		/* If that didn't work let's try the ABSPATH instead */
-		$try_url = str_replace( ABSPATH, site_url(), $path );
-
-		if ( $try_url !== $path ) {
-			return $try_url;
+			if ( $try_url !== $try_path ) {
+				return $try_url;
+			}
 		}
 
 		/* If we are here we couldn't locate the file */
