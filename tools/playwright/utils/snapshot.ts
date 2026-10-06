@@ -47,6 +47,11 @@ export async function snapshot(
 	await page
 		.waitForFunction(
 			() => {
+				// Scripts that run on load (jQuery ready included) can still move the layout after it first holds still
+				if (document.readyState !== 'complete') {
+					return false;
+				}
+
 				const state = ((window as any).gfpdfSettle ??= {
 					hash: NaN,
 					held: 0,
