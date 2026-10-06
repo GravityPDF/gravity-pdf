@@ -107,9 +107,11 @@ test.describe('License Tab', () => {
 				);
 			await input.clear();
 			await input.fill('987654321');
-			await page.locator('[name="submit"]').click();
+			await Promise.all([
+				page.waitForURL(/settings-updated=true/),
+				page.locator('[name="submit"]').click(),
+			]);
 
-			await page.waitForTimeout(1000);
 			await snapshot(
 				page,
 				testinfo,
