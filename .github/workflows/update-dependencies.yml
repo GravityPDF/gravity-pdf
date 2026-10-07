@@ -1,8 +1,10 @@
 name: Update Dependencies
 
 on:
-  schedule:
-    - cron: "0 6 * * 1" # Weekly on Monday at 06:00 UTC
+  # Not `schedule:` — GitHub ran it up to 8h late. Cronicle
+  # (CT 115, https://cron.blueliquiddesigns.com) dispatches it on time instead,
+  # at the UTC time below. Change the time there, not here.
+  #   cron "0 6 * * 1" (UTC) — Weekly on Monday at 06:00 UTC
   workflow_dispatch:
 
 permissions:

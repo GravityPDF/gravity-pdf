@@ -4,8 +4,10 @@ on:
   workflow_dispatch:
   pull_request:
     types: [ opened, reopened, synchronize, labeled ]
-  schedule:
-    - cron: "0 20 * * 0,2,4" # Mon/Wed/Fri 6am Sydney AEST (7am during AEDT)
+  # Not `schedule:` — GitHub ran it 2-4h late and skipped whole days. Cronicle
+  # (CT 115, https://cron.blueliquiddesigns.com) dispatches it on time instead,
+  # at the UTC time below. Change the time there, not here.
+  #   cron "0 20 * * 0,2,4" (UTC) — Mon/Wed/Fri 6am Sydney AEST (7am during AEDT)
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
@@ -156,7 +158,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # PRs run a tightened floor/ceiling matrix for fast feedback; cron runs the full matrix down to the
+        # PRs run a tightened floor/ceiling matrix for fast feedback; scheduled runs get the full matrix down to the
         # composer.json floor. The run-tests-php-all label forces the full matrix on a PR — applied post-open,
         # so the labeled event re-runs this workflow with a payload that carries the label.
         php: ${{ fromJSON((github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests-php-all')) && '["7.4","8.5"]' || '["7.4","8.0","8.1","8.2","8.3","8.4","8.5"]') }}
