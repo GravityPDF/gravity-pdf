@@ -5,6 +5,7 @@ namespace GFPDF\Helper;
 use Exception;
 use GF_Field;
 use GFFormsModel;
+use GFPDF\Model\Model_Signed_Url_Trust;
 use GFPDF\Statics\Kses;
 
 /**
@@ -314,13 +315,13 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 
 		/*
 		 * Prevent shortcodes and merge tags being processed from user input fields
-		 * We'll allow them in administrative fields (not hidden fields) and HTML and Section fields
+		 * We'll allow them in HTML and Section fields, and administrative fields still holding their default value
 		 *
 		 * @since 4.2 Skipping Administrative fields was added
+		 * @since 6.17.3 Only when the administrative field holds its default value, as submitters can POST any value
 		 */
 		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
-		if ( ( empty( $this->field->visibility ) || $this->field->visibility !== 'administrative' ) &&
-			 ! in_array( $this->field->type, $skip_fields, true ) ) {
+		if ( ! in_array( $this->field->type, $skip_fields, true ) && ! $this->is_trusted_value() ) {
 			$value = $this->encode_tags( $value );
 		}
 
@@ -384,6 +385,58 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
 
 		return str_replace( $find, $converted, $value );
+	}
+
+	/**
+	 * Whether the field's value came from a form editor rather than a submitter
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	protected function is_trusted_value() {
+		$trust = $this->get_signed_url_trust();
+
+		return $trust !== null && $trust->is_trusted_field_value( $this->field, $this->entry );
+	}
+
+	/**
+	 * Process merge tags in the field's value, trusting the PDF merge tags and shortcodes in it only when a form editor set it
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	protected function process_value_tags( $value ) {
+		if ( $this->is_trusted_value() ) {
+			return $this->gform->process_tags( $value, $this->form, $this->entry );
+		}
+
+		$trust = $this->get_signed_url_trust();
+		if ( $trust === null ) {
+			return $value;
+		}
+
+		return $trust->run_untrusted(
+			function () use ( $value ) {
+				return $this->gform->process_tags( $value, $this->form, $this->entry );
+			}
+		);
+	}
+
+	/**
+	 * The shared signing trust registry, or null before the plugin has registered it
+	 *
+	 * @return Model_Signed_Url_Trust|null
+	 *
+	 * @since 6.17.3
+	 */
+	protected function get_signed_url_trust() {
+		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+
+		return $trust instanceof Model_Signed_Url_Trust ? $trust : null;
 	}
 
 	/**

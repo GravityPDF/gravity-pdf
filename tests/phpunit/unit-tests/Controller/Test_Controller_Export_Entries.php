@@ -19,6 +19,13 @@ use WP_UnitTestCase;
  * @group   export
  */
 class Test_Controller_Export_Entries extends WP_UnitTestCase {
+	public function set_up() {
+		parent::set_up();
+
+		/* Signing grants are request-scoped, so give each test a fresh registry */
+		$GLOBALS['gfpdf']->singleton->add_class( new \GFPDF\Model\Model_Signed_Url_Trust() );
+	}
+
 	public function test_add_pdfs_to_export_fields() {
 		$form = apply_filters( 'gform_export_fields', $GLOBALS['GFPDF_Test']->form['all-form-fields'] );
 
@@ -59,5 +66,24 @@ class Test_Controller_Export_Entries extends WP_UnitTestCase {
 		$field_id = 'gpdf_555ad84787d7e';
 		$value    = 'item';
 		$this->assertSame( $value, apply_filters( 'gform_export_field_value', $value, $form_id, $field_id, [] ) );
+	}
+
+	public function test_signed_export_url_is_signed_only_for_the_exported_entry() {
+		wp_set_current_user( 0 );
+		$form_id  = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
+		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$field_id = 'gpdf_556690c67856b';
+
+		$entry_id = $entry['id'];
+		$signed   = function ( $shortcode ) use ( &$entry_id ) {
+			return sprintf( '[gravitypdf id="556690c67856b" entry="%d" raw="1" signed="1"]', $entry_id );
+		};
+		add_filter( 'gfpdf_export_pdf_shortcode', $signed );
+
+		$this->assertStringContainsString( 'signature=', apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
+
+		/* The trust is only for the exported entry, not one a filter swaps in */
+		$entry_id = \GFAPI::add_entry( [ 'form_id' => $form_id ] );
+		$this->assertStringNotContainsString( 'signature=', apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
 	}
 }

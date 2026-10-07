@@ -2,6 +2,8 @@
 
 namespace GFPDF\Controller;
 
+use GFPDF\Model\Model_Shortcodes;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -19,6 +21,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\Controller
  */
 class Controller_Export_Entries {
+
+	/**
+	 * @var Model_Shortcodes
+	 *
+	 * @since 6.17.3
+	 */
+	protected $shortcodes;
+
+	/**
+	 * @param Model_Shortcodes|null $shortcodes Optional for backwards compatibility; defaults to the plugin's instance
+	 *
+	 * @since 6.17.3
+	 */
+	public function __construct( ?Model_Shortcodes $shortcodes = null ) {
+		$this->shortcodes = $shortcodes ?? \GPDFAPI::get_mvc_class( 'Model_Shortcodes' );
+	}
 
 	/**
 	 * @since 6.0
@@ -89,6 +107,6 @@ class Controller_Export_Entries {
 			$entry
 		);
 
-		return do_shortcode( $shortcode );
+		return $this->shortcodes->do_trusted_shortcode( $shortcode, $entry['id'] );
 	}
 }

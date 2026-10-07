@@ -28,10 +28,15 @@ class Test_Controller_Zapier extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->controller = new Controller_Zapier();
+		/* Signing grants are request-scoped, so give each test a fresh registry */
+		$GLOBALS['gfpdf']->singleton->add_class( new \GFPDF\Model\Model_Signed_Url_Trust() );
+
+		$this->controller = new Controller_Zapier( \GPDFAPI::get_mvc_class( 'Model_Shortcodes' ) );
 	}
 
 	public function test_add_zapier_support_active_pdfs() {
+		/* Zapier runs as the submitter, so its signed links rely on the entry being trusted */
+		wp_set_current_user( 0 );
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$body  = $this->controller->add_zapier_support( [], [], $entry );
 

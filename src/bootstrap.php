@@ -230,6 +230,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->gf_settings();
 		$this->gf_form_settings();
 		$this->pdf();
+		$this->singleton->add_class( new Model\Model_Signed_Url_Trust() ); /* Before the shortcode and merge tag models, which share it */
 		$this->shortcodes();
 		$this->mergetags();
 		$this->actions();
@@ -887,7 +888,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 6.0
 	 */
 	public function export(): void {
-		$class = new Controller\Controller_Export_Entries();
+		$class = new Controller\Controller_Export_Entries( $this->singleton->get_class( 'Model_Shortcodes' ) );
 		$class->init();
 
 		$this->singleton->add_class( $class );
@@ -907,7 +908,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 6.3
 	 */
 	public function zapier(): void {
-		$class = new Controller\Controller_Zapier();
+		$class = new Controller\Controller_Zapier( $this->singleton->get_class( 'Model_Shortcodes' ) );
 		$class->init();
 
 		$this->singleton->add_class( $class );

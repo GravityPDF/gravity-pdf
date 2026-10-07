@@ -81,7 +81,7 @@ class Test_Model_PDF extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Error', apply_filters( 'gfpdf_pdf_middleware', false, $entry, $pdf ) );
 
 		// pass
-		$url                    = do_shortcode( sprintf( '[gravitypdf id="%s" entry="%d" raw="1" signed="1"]', $pdf['id'], $entry['id'] ) );
+		$url                    = ( new Helper_Url_Signer() )->sign( $this->model->get_pdf_url( $pdf['id'], $entry['id'], true ), '' );
 		$_SERVER['HTTP_HOST']   = str_replace( [ 'http://', 'http://' ], '', home_url() );
 		$_GET['expires']        = '';
 		$_GET['signature']      = '';
@@ -173,5 +173,23 @@ class Test_Model_PDF extends WP_UnitTestCase {
 
 	}
 
+	public function test_can_user_view_entry_by_capability_or_ownership() {
+		$admin      = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$owner      = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		$subscriber = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		$entry      = [ 'created_by' => (string) $owner ];
 
+		$this->assertTrue( $this->model->can_user_view_entry( $entry, [], $admin ) );
+		$this->assertTrue( $this->model->can_user_view_entry( $entry, [], $owner ) );
+		$this->assertFalse( $this->model->can_user_view_entry( $entry, [ 'restrict_owner' => 'Yes' ], $owner ) );
+		$this->assertTrue( $this->model->can_user_view_entry( $entry, [ 'restrict_owner' => 'Yes' ], $admin ) );
+		$this->assertFalse( $this->model->can_user_view_entry( $entry, [], $subscriber ) );
+		$this->assertFalse( $this->model->can_user_view_entry( [ 'created_by' => '' ], [], 0 ) );
+
+		/* Defaults to the current user */
+		wp_set_current_user( $owner );
+		$this->assertTrue( $this->model->can_user_view_entry( $entry, [] ) );
+		wp_set_current_user( 0 );
+		$this->assertFalse( $this->model->can_user_view_entry( $entry, [] ) );
+	}
 }

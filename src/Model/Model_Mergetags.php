@@ -29,6 +29,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Mergetags extends Helper_Abstract_Model {
 
 	/**
+	 * Matches {NAME:pdf:ID:MODIFIERS}
+	 *
+	 * @since 6.17.3
+	 */
+	const PDF_MERGETAG_REGEX = '/{.*?:pdf:([0-9A-Za-z]*)?:?(.*?)?}/';
+
+	/**
 	 * @var Model_PDF
 	 *
 	 * @since 4.1
@@ -152,7 +159,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		/* Match our PDF merge tags */
-		$results = preg_match_all( '/{.*?:pdf:([0-9A-Za-z]*)?:?(.*?)?}/', $text, $matches, PREG_SET_ORDER );
+		$results = preg_match_all( static::PDF_MERGETAG_REGEX, $text, $matches, PREG_SET_ORDER );
 
 		/* Verify we have a match */
 		if ( $results ) {
@@ -175,6 +182,9 @@ class Model_Mergetags extends Helper_Abstract_Model {
 					$text = str_replace( $tag[0], '', $text );
 					continue;
 				}
+
+				/* Use up the tag's trust now, so an invalid tag can't leave it for a later one */
+				$trusted = $this->get_trust()->consume( $this->get_trust_key( $entry, $tag[0] ) );
 
 				/* Get the PDF configuration */
 				$config = $this->options->get_pdf( $form['id'], $tag[1] );
@@ -228,8 +238,10 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 					switch ( $modifier[0] ?? '' ) {
 						case 'signed':
-							$expires = trim( $modifier[1] ?? '' );
-							$url     = $this->url_signer->sign( $url, $expires );
+							/* Sign trusted tags, or when the user can view the PDF anyway */
+							if ( $trusted || $this->pdf->can_user_view_entry( $entry, $config ) ) {
+								$url = $this->url_signer->sign( $url, trim( $modifier[1] ?? '' ) );
+							}
 							break;
 
 						default:
@@ -247,6 +259,51 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		return $text;
+	}
+
+	/**
+	 * Trust the PDF merge tags in text before Gravity Forms merges in any field values
+	 *
+	 * @param mixed $text  The filtered text, which another callback may have changed to a non-string
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function mark_trusted_pdf_mergetags( $text, $form, $entry ) {
+		if ( ! is_string( $text ) || empty( $entry['id'] ) || strpos( $text, ':pdf:' ) === false || $this->get_trust()->is_untrusted() ) {
+			return $text;
+		}
+
+		preg_match_all( static::PDF_MERGETAG_REGEX, $text, $matches );
+		foreach ( $matches[0] as $tag ) {
+			$this->get_trust()->grant( $this->get_trust_key( $entry, $tag ) );
+		}
+
+		return $text;
+	}
+
+	/**
+	 * @param array  $entry
+	 * @param string $tag The full PDF merge tag
+	 *
+	 * @return string The key a trusted merge tag is granted and used up by
+	 *
+	 * @since 6.17.3
+	 */
+	protected function get_trust_key( $entry, $tag ) {
+		return 'tag:' . (int) ( $entry['id'] ?? 0 ) . '|' . $tag;
+	}
+
+	/**
+	 * @return Model_Signed_Url_Trust
+	 *
+	 * @since 6.17.3
+	 */
+	protected function get_trust() {
+		return \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
 	}
 
 	/**
