@@ -84,4 +84,18 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 			)
 		);
 	});
+
+	test('keeps the tags in field values encoded through the render', async () => {
+		const entry: any = await pdf.createEntry({
+			form_id: form.id,
+			'6': `<a href="[gravitypdf id=${pdfId}]">Link</a>`,
+			'16': `Posted [gravitypdf id="${pdfId}" raw="1"]`,
+		});
+
+		const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
+
+		expect(html).toMatch(/href="[^"]*%5Bgravitypdf/);
+		expect(html).toContain('Posted &#091;gravitypdf');
+		expect(html).not.toMatch(/\[gravitypdf/);
+	});
 });

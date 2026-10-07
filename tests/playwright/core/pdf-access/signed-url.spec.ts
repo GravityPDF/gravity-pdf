@@ -136,4 +136,36 @@ test.describe('Signed PDF URLs', () => {
 		);
 		await expect(page.locator('#mergetag-url')).toContainText('signature=');
 	});
+
+	test('does not sign a shortcode or merge tag in a field value', async ({
+		requestUtils,
+		page,
+		admin,
+	}: {
+		requestUtils: RequestUtils;
+		page: Page;
+		admin: Admin;
+	}) => {
+		const formPage = await requestUtils.createPage({
+			title: 'Signed URL submitter',
+			content: `[gravityform id="${form.id}" ajax="false"]`,
+			status: 'publish',
+		});
+
+		await admin.context.clearCookies();
+		await page.goto(formPage.link);
+		await page
+			.locator(`#input_${form.id}_5`)
+			.fill(`${shortcode(entry.id)} {PDF:pdf:${pdfId}:signed}`);
+		await pdf.submitForm();
+		await expect(page.locator('.gform_confirmation_message')).toBeVisible();
+
+		// the submitter's own PDF, as an administrator sees it
+		const submitted = await pdf.getLatestEntry(form.id);
+		const html = await pdf.getPdfDebugOutput(pdfId, submitted.id);
+
+		expect(html).toContain('&#091;gravitypdf');
+		expect(html).toContain('&#123;PDF:pdf:');
+		expect(html).not.toContain('signature=');
+	});
 });

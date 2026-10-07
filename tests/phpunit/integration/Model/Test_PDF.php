@@ -1749,6 +1749,42 @@ class Test_PDF extends TestCase {
 		$this->assertStringContainsString( '<td class="grandtotal_amount totals">', $html );
 	}
 
+	public function test_html_structure_keeps_user_tags_encoded() {
+		$form_id = $this->gf_factory()->form->create(
+			[],
+			[
+				'title'         => 'Encoding',
+				'markupVersion' => 2,
+				'fields'        => [
+					new \GF_Field_Text( [ 'id' => 1, 'label' => 'Text' ] ),
+					new \GF_Field_Textarea( [ 'id' => 2, 'label' => 'Rich Text', 'useRichTextEditor' => true ] ),
+					new \GF_Field_HTML( [ 'id' => 3, 'label' => 'Html', 'content' => 'Form ID: {form_id}' ] ),
+				],
+			]
+		);
+
+		$entry_id = $this->gf_factory()->entry->create(
+			[
+				'form_id' => $form_id,
+				'1'       => '[gravitypdf id="1"] {all_fields}',
+				'2'       => '<a href="[gravitypdf id=1]" title="{all_fields}">[gravitypdf id="1"]</a>',
+			]
+		);
+
+		$entry = \GFAPI::get_entry( $entry_id );
+		$html  = $this->view->process_html_structure( $entry, $this->model, [ 'meta' => [ 'echo' => false, 'html_field' => true ] ] );
+
+		/* As the gfpdf_pdf_html_output filter does: the form editor's tags are processed, the submitter's aren't */
+		$html = do_shortcode( \GPDFAPI::get_form_class()->process_tags( $html, \GFAPI::get_form( $form_id ), $entry ) );
+
+		$this->assertStringContainsString( "Form ID: $form_id", $html );
+		$this->assertStringContainsString( '&#091;gravitypdf', $html );
+		$this->assertStringContainsString( '&#123;all_fields&#125;', $html );
+		$this->assertStringContainsString( '%5Bgravitypdf%20id=1%5D', $html );
+		$this->assertStringNotContainsString( '[', $html );
+		$this->assertStringNotContainsString( '{', $html );
+	}
+
 	/**
 	 * @since 4.2
 	 */
