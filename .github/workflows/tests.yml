@@ -4,8 +4,10 @@ on:
   workflow_dispatch:
   pull_request:
     types: [ opened, reopened, synchronize, labeled ]
-  schedule:
-    - cron: "0 20 * * 0,2,4" # Mon/Wed/Fri 6am Sydney AEST (7am during AEDT)
+  # Not `schedule:` — GitHub ran it 2-4h late and skipped whole days. Cronicle
+  # (CT 115, https://cron.blueliquiddesigns.com) dispatches it on time instead,
+  # at the UTC time below. Change the time there, not here.
+  #   cron "0 20 * * *" (UTC) — daily, 6am Sydney AEST (7am during AEDT)
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
@@ -156,7 +158,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # PRs run a tightened floor/ceiling matrix for fast feedback; cron runs the full matrix down to the
+        # PRs run a tightened floor/ceiling matrix for fast feedback; scheduled runs get the full matrix down to the
         # composer.json floor. The run-tests-php-all label forces the full matrix on a PR — applied post-open,
         # so the labeled event re-runs this workflow with a payload that carries the label.
         php: ${{ fromJSON((github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests-php-all')) && '["7.4","8.5"]' || '["7.4","8.0","8.1","8.2","8.3","8.4","8.5"]') }}
@@ -552,14 +554,14 @@ jobs:
           path: tmp/addons/debug.log
 
   notify:
-    name: Notify on weekly run
+    name: Notify on scheduled run
     needs: [ test-js, test-php, e2e-playwright, visual-regression, addon-smoke ]
     if: ${{ always() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     env:
       HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success' && needs.visual-regression.result == 'success' && needs.addon-smoke.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
     steps:
-      - name: Post Slack notification for weekly run
+      - name: Post Slack notification for scheduled run
         uses: slackapi/slack-github-action@v3
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
