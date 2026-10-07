@@ -136,4 +136,32 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 
 		$this->options->update_settings( $settings );
 	}
+
+	public function test_6_17_3_removes_the_nested_mpdf_cache() {
+		$data   = \GPDFAPI::get_data_class();
+		$cache  = $data->mpdf_tmp_location . '/mpdf';
+		$nested = $cache . '/mpdf/ttfontdata';
+
+		wp_mkdir_p( $nested );
+		touch( $nested . '/dejavusans.mtx.json' );
+
+		do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+
+		$this->assertDirectoryDoesNotExist( $cache . '/mpdf' );
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+	}
+
+	/**
+	 * An install fires the version change too, as no version has been recorded yet
+	 */
+	public function test_a_version_change_creates_the_mpdf_cache_folders() {
+		$cache = \GPDFAPI::get_data_class()->mpdf_tmp_location . '/mpdf';
+
+		wp_mkdir_p( $cache );
+		\GPDFAPI::get_misc_class()->rmdir( $cache );
+
+		do_action( 'gfpdf_version_changed', '6.17.3', '6.17.4' );
+
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+	}
 }

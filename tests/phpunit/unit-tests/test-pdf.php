@@ -1349,7 +1349,6 @@ class Test_PDF extends WP_UnitTestCase {
 		$tmp = $gfpdf->data->template_tmp_location;
 
 		wp_mkdir_p( $gfpdf->data->template_location );
-		wp_mkdir_p( $gfpdf->data->mpdf_tmp_location );
 
 		/* Create our files to test */
 		$files = [
@@ -1366,13 +1365,12 @@ class Test_PDF extends WP_UnitTestCase {
 			'mpdf/test2' => time() - 3600,
 			'mpdf/test3' => time() - ( 25 * 3600 ),
 
-			'mpdf/mpdf/_tempImg'                       => time() - 3601,
-			'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' => time() - ( 2 * DAY_IN_SECONDS ),
-			'mpdf/mpdf/ttfontdata/dejavusans.cw.dat'   => time() - WEEK_IN_SECONDS - 60,
-			'1234556690c67856b/document.pdf'           => time() - ( 13 * 3600 ),
+			'mpdf/ttfontdata/dejavusans.mtx.json' => time() - ( 2 * DAY_IN_SECONDS ),
+			'mpdf/ttfontdata/dejavusans.cw.dat'   => time() - WEEK_IN_SECONDS - 60,
+			'1234556690c67856b/document.pdf'      => time() - ( 13 * 3600 ),
 		];
 
-		$directories = [ 'mpdf/mpdf/ttfontdata', 'mpdf/mpdf', 'mpdf', '1234556690c67856b' ];
+		$directories = [ 'mpdf/ttfontdata', 'mpdf', '1234556690c67856b', 'f00d1234556690c67' ];
 
 		foreach ( $directories as $directory ) {
 			wp_mkdir_p( $tmp . $directory );
@@ -1404,11 +1402,14 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertFileDoesNotExist( $tmp . 'mpdf/test3' );
 
 		/* mPDF's cache folders stay while their files expire, and font metrics are kept for a week */
-		$this->assertDirectoryExists( $tmp . 'mpdf/mpdf/ttfontdata' );
-		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/_tempImg' );
-		$this->assertFileExists( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' );
-		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.cw.dat' );
+		$this->assertDirectoryExists( $tmp . 'mpdf/ttfontdata' );
+		$this->assertFileExists( $tmp . 'mpdf/ttfontdata/dejavusans.mtx.json' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/ttfontdata/dejavusans.cw.dat' );
+
 		$this->assertFileDoesNotExist( $tmp . '1234556690c67856b/document.pdf' );
+
+		/* mPDF's tempDir is the tmp folder itself, but only its cache folder is treated as mPDF's */
+		$this->assertDirectoryDoesNotExist( $tmp . 'f00d1234556690c67' );
 
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
@@ -1418,6 +1419,25 @@ class Test_PDF extends WP_UnitTestCase {
 		foreach ( $directories as $directory ) {
 			@rmdir( $tmp . $directory );
 		}
+	}
+
+	/**
+	 * The cleanup puts back mPDF's cache folders, so no render has to race another to create them
+	 *
+	 * @since 6.17.3
+	 */
+	public function test_cleanup_tmp_dir_recreates_the_mpdf_cache_folders() {
+		global $gfpdf;
+
+		$cache = $gfpdf->data->mpdf_tmp_location . '/mpdf';
+
+		wp_mkdir_p( $cache );
+		$gfpdf->misc->rmdir( $cache );
+		$this->assertDirectoryDoesNotExist( $cache );
+
+		$this->model->cleanup_tmp_dir();
+
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
 	}
 
 	/**

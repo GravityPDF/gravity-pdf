@@ -153,6 +153,17 @@ class Test_Installer extends WP_UnitTestCase {
 	}
 
 	/**
+	 * mPDF's tempDir is the tmp folder, and mPDF adds the mpdf folder its cache lives in
+	 *
+	 * @since 6.17.3
+	 */
+	public function test_mpdf_tmp_location() {
+		global $gfpdf;
+
+		$this->assertSame( untrailingslashit( $gfpdf->data->template_tmp_location ), $gfpdf->data->mpdf_tmp_location );
+	}
+
+	/**
 	 * Check our folder structure is created as expected
 	 *
 	 * @since 4.0

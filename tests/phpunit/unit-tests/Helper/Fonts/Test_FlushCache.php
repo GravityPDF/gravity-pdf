@@ -23,14 +23,24 @@ use WP_UnitTestCase;
 class Test_FlushCache extends WP_UnitTestCase {
 
 	public function test_flush_cache() {
-		$data = \GPDFAPI::get_data_class();
-		$file = $data->mpdf_tmp_location . '/test';
+		$data  = \GPDFAPI::get_data_class();
+		$cache = $data->mpdf_tmp_location . '/mpdf';
 
-		touch( $file );
-		$this->assertFileExists( $file );
+		wp_mkdir_p( $cache . '/ttfontdata' );
+		touch( $cache . '/test' );
+		touch( $cache . '/ttfontdata/dejavusans.mtx.json' );
+
+		/* Shares mPDF's tempDir, but isn't mPDF's cache */
+		$pdf = $data->template_tmp_location . 'flush-cache-test.pdf';
+		touch( $pdf );
 
 		FlushCache::flush();
 
-		$this->assertFileDoesNotExist( $file );
+		$this->assertFileDoesNotExist( $cache . '/test' );
+		$this->assertFileDoesNotExist( $cache . '/ttfontdata/dejavusans.mtx.json' );
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+		$this->assertFileExists( $pdf );
+
+		unlink( $pdf );
 	}
 }
