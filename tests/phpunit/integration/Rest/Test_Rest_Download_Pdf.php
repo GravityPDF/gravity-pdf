@@ -117,6 +117,13 @@ class Test_Rest_Download_Pdf extends Test_Rest {
 		\GPDFAPI::update_pdf( $this->form_id, $pdf_id, $pdf );
 
 		$this->assertSame( false, $this->api->get_item_permissions_check( $request ) );
+
+		/* An entry that doesn't exist has no owner */
+		$request->set_url_params( [
+			'entry' => 999999,
+			'pdf'   => $pdf_id,
+		] );
+		$this->assertSame( false, $this->api->get_item_permissions_check( $request ) );
 	}
 
 	/**

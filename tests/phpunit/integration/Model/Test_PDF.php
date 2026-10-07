@@ -338,7 +338,7 @@ class Test_PDF extends TestCase {
 		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 
 		/* Generate a signed URL and verify it validates */
-		$url = do_shortcode( '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" raw="1" signed="1"]' );
+		$url = ( new Helper_Url_Signer() )->sign( $this->model->get_pdf_url( '556690c67856b', $entry['id'], true ), '' );
 		$options->set_plugin_settings();
 		$_GET['expires']        = '';
 		$_GET['signature']      = '';
@@ -381,7 +381,7 @@ class Test_PDF extends TestCase {
 			$options = GPDFAPI::get_options_class();
 			$options->set_plugin_settings();
 
-			$url = do_shortcode( '[gravitypdf id="556690c67856b" entry="' . $entry_id . '" raw="1" signed="1"]' );
+			$url = ( new Helper_Url_Signer() )->sign( $this->model->get_pdf_url( '556690c67856b', $entry_id, true ), '' );
 
 			$_GET['expires']   = '';
 			$_GET['signature'] = '';

@@ -36,4 +36,27 @@ class Test_Field_Textarea extends TestCase {
 		$value = $pdf_field->html();
 		$this->assertStringContainsString('<div class="a b c d e f g h">Hi <ul id="list"><li>Item 1</li><li class="1 2 3 4 5 6 7 8">Item 2</li><li>Item 3</li></ul></div><p class="a b c">My paragraph</p>', str_replace( [ "\n", "\t" ], '', $value ) );
 	}
+
+	public function test_administrative_value_is_encoded_unless_it_is_the_default() {
+		$field = new GF_Field_Textarea( [
+			'id'           => 1,
+			'visibility'   => 'administrative',
+			'defaultValue' => '[gravitypdf id=abc]',
+		] );
+
+		$html = function ( $field, $value ) {
+			$entry = [ 'id' => 0, 'form_id' => 0, '1' => $value ];
+
+			return ( new Field_Textarea( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->html();
+		};
+
+		$this->assertStringContainsString( '[gravitypdf id=abc]', $html( $field, '[gravitypdf id=abc]' ) );
+
+		$posted = $html( $field, '[gravitypdf id=xyz]' );
+		$this->assertStringContainsString( 'gravitypdf id=xyz', $posted );
+		$this->assertStringNotContainsString( '[gravitypdf id=xyz]', $posted );
+
+		$field->visibility = 'visible';
+		$this->assertStringNotContainsString( '[gravitypdf id=abc]', $html( $field, '[gravitypdf id=abc]' ) );
+	}
 }

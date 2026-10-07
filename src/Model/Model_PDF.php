@@ -658,17 +658,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_user_capability( $action, $entry, $settings ) {
 
 		if ( ! is_wp_error( $action ) ) {
-			/* check if the user is logged in but is not the current owner */
-			$owner_restriction = $settings['restrict_owner'] ?? 'No';
-
-			if (
-				is_user_logged_in() &&
-				! $this->can_user_view_pdf_with_capabilities() &&
-				(
-					$owner_restriction === 'Yes' ||
-					$this->is_current_pdf_owner( $entry, 'logged_in' ) === false
-				)
-			) {
+			if ( is_user_logged_in() && ! $this->can_user_view_entry( $entry, $settings ) ) {
 				return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-pdf' ) );
 			}
 		}
@@ -690,6 +680,32 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* An empty list grants nobody access, not even users with gform_full_access */
 		return ! empty( $admin_permissions ) && $this->gform->has_capability( $admin_permissions, $user_id );
+	}
+
+	/**
+	 * Check if the logged in user, or the given user, may view an entry's PDF via capabilities or entry ownership
+	 *
+	 * @param array    $entry    The Gravity Forms Entry
+	 * @param array    $settings The Gravity PDF Settings for the PDF being accessed
+	 * @param int|null $user_id  Defaults to the current user
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	public function can_user_view_entry( $entry, $settings, $user_id = null ) {
+		$user_id = $user_id === null ? get_current_user_id() : (int) $user_id;
+		if ( $user_id === 0 ) {
+			return false;
+		}
+
+		if ( $this->can_user_view_pdf_with_capabilities( $user_id ) ) {
+			return true;
+		}
+
+		$is_owner_restricted = $settings['restrict_owner'] ?? 'No';
+
+		return $is_owner_restricted !== 'Yes' && (int) ( $entry['created_by'] ?? 0 ) === $user_id;
 	}
 
 	/**

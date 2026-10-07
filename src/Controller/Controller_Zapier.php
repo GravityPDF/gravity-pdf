@@ -2,6 +2,8 @@
 
 namespace GFPDF\Controller;
 
+use GFPDF\Model\Model_Shortcodes;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -19,6 +21,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\Controller
  */
 class Controller_Zapier {
+
+	/**
+	 * @var Model_Shortcodes
+	 *
+	 * @since 6.17.3
+	 */
+	protected $shortcodes;
+
+	/**
+	 * @param Model_Shortcodes $shortcodes
+	 *
+	 * @since 6.17.3
+	 */
+	public function __construct( Model_Shortcodes $shortcodes ) {
+		$this->shortcodes = $shortcodes;
+	}
 
 	/**
 	 * @since 6.3
@@ -46,11 +64,19 @@ class Controller_Zapier {
 			return $body;
 		}
 
+		$urls = [
+			' PDF URL'                  => '',
+			' PDF URL - SIGNED 1 WEEK'  => ' signed="1" expires="+1 week"',
+			' PDF URL - SIGNED 1 MONTH' => ' signed="1" expires="+1 month"',
+			' PDF URL - SIGNED 1 YEAR'  => ' signed="1" expires="+1 year"',
+		];
+
 		foreach ( $pdfs as $pdf ) {
-			$body[ $zapier->get_body_key( $body, $pdf['name'] . ' PDF URL' ) ]                  = do_shortcode( sprintf( '[gravitypdf id="%2$s" entry="%1$d" raw="1"]', $entry['id'], $pdf['id'] ) );
-			$body[ $zapier->get_body_key( $body, $pdf['name'] . ' PDF URL - SIGNED 1 WEEK' ) ]  = do_shortcode( sprintf( '[gravitypdf id="%2$s" entry="%1$d" raw="1" signed="1" expires="+1 week"]', $entry['id'], $pdf['id'] ) );
-			$body[ $zapier->get_body_key( $body, $pdf['name'] . ' PDF URL - SIGNED 1 MONTH' ) ] = do_shortcode( sprintf( '[gravitypdf id="%2$s" entry="%1$d" raw="1" signed="1" expires="+1 month"]', $entry['id'], $pdf['id'] ) );
-			$body[ $zapier->get_body_key( $body, $pdf['name'] . ' PDF URL - SIGNED 1 YEAR' ) ]  = do_shortcode( sprintf( '[gravitypdf id="%2$s" entry="%1$d" raw="1" signed="1" expires="+1 year"]', $entry['id'], $pdf['id'] ) );
+			foreach ( $urls as $label => $signed ) {
+				$shortcode = sprintf( '[gravitypdf id="%2$s" entry="%1$d" raw="1"%3$s]', $entry['id'], $pdf['id'], $signed );
+
+				$body[ $zapier->get_body_key( $body, $pdf['name'] . $label ) ] = $this->shortcodes->do_trusted_shortcode( $shortcode, $entry['id'] );
+			}
 		}
 
 		return $body;

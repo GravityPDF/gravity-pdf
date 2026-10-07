@@ -24,6 +24,25 @@ export default class Pdf extends GravityForms {
 		return pdf.id;
 	}
 
+	/**
+	 * A PDF's HTML (?html=1) or $form_data (?data=1), as an administrator with Debug Mode on for the request
+	 * @param pdfId
+	 * @param entryId
+	 * @param helper
+	 */
+	async getPdfDebugOutput(
+		pdfId: string,
+		entryId: number,
+		helper: 'html' | 'data' = 'html'
+	) {
+		const response = await this.requestUtils.request.get(
+			`/?gpdf=1&pid=${pdfId}&lid=${entryId}&${helper}=1`,
+			{ headers: { 'X-GPDF-E2E-Debug-Mode': 'yes' } }
+		);
+
+		return await response.text();
+	}
+
 	async fillField(label: string, value: string) {
 		await this.page.getByLabel(label).fill(value);
 	}

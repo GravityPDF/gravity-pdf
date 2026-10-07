@@ -35,10 +35,12 @@ class Test_Controller_Zapier extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->controller = new Controller_Zapier();
+		$this->controller = new Controller_Zapier( \GPDFAPI::get_mvc_class( 'Model_Shortcodes' ) );
 	}
 
 	public function test_add_zapier_support_active_pdfs() {
+		/* Zapier runs as the submitter, so its signed links rely on the entry being trusted */
+		wp_set_current_user( 0 );
 		$entry = $this->entry( 'all-form-fields' );
 		$body  = $this->controller->add_zapier_support( [], [], $entry );
 

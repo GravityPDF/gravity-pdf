@@ -69,6 +69,11 @@ class Test_Shortcodes extends TestCase {
 		/* run parent method */
 		parent::set_up();
 
+		/* Unhook the plugin's own instance, or both would grant trust for each shortcode and only one would use it */
+		$plugin_model = \GPDFAPI::get_mvc_class( 'Model_Shortcodes' );
+		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'gravitypdf_process_during_merge_tag_replacement' ] );
+		remove_filter( 'gform_replace_merge_tags', [ $plugin_model, 'gravitypdf_trust_administrative_field_shortcodes' ] );
+
 		/* Setup our test classes */
 		$this->model = new Model_Shortcodes( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->misc, new Helper_Url_Signer() );
 		$this->view  = new View_Shortcodes( [] );
@@ -326,6 +331,181 @@ class Test_Shortcodes extends TestCase {
 	}
 
 	/**
+	 * Request a raw signed URL for an entry
+	 */
+	private function process_signed( $entry_id ) {
+		return $this->model->process(
+			[
+				'entry'  => $entry_id,
+				'id'     => '556690c67856b',
+				'signed' => '1',
+				'raw'    => '1',
+			]
+		);
+	}
+
+	public function test_signed_url_needs_a_trusted_entry_when_logged_out() {
+		$entry = $this->entry( 'all-form-fields' );
+		wp_set_current_user( 0 );
+
+		$url = $this->process_signed( $entry['id'] );
+		$this->assertStringContainsString( "lid={$entry['id']}", $url );
+		$this->assertStringNotContainsString( 'signature=', $url );
+		$this->assertStringNotContainsString( 'expires=', $url );
+
+		/* Each mark allows a single shortcode run */
+		$this->model->mark_entry_as_trusted( $entry['id'] );
+		$this->model->mark_entry_as_trusted( $entry['id'] );
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		/* An unsigned shortcode uses up the trust too */
+		$this->model->mark_entry_as_trusted( $entry['id'] );
+		$this->model->process( [ 'entry' => $entry['id'], 'id' => '556690c67856b' ] );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+	}
+
+	public function test_do_trusted_shortcode_does_not_leave_the_entry_trusted() {
+		$entry     = $this->entry( 'all-form-fields' );
+		$shortcode = sprintf( '[gravitypdf id="556690c67856b" entry="%d" signed="1" raw="1"]', $entry['id'] );
+		wp_set_current_user( 0 );
+
+		$this->assertStringContainsString( 'signature=', $this->model->do_trusted_shortcode( $shortcode, $entry['id'] ) );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		/* Trust left unused because the shortcode was never run is removed too */
+		$this->model->do_trusted_shortcode( 'No shortcode', $entry['id'] );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		/* Prior trust survives */
+		$this->model->mark_entry_as_trusted( $entry['id'] );
+		$this->model->do_trusted_shortcode( $shortcode, $entry['id'] );
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+	}
+
+	public function test_signed_url_needs_a_user_who_can_view_the_entry() {
+		$entry       = $this->entry( 'all-form-fields' );
+		$contributor = $this->factory->user->create( [ 'role' => 'contributor' ] );
+		$owner       = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+
+		wp_set_current_user( $contributor );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		\GFAPI::update_entry_property( $entry['id'], 'created_by', $owner );
+		wp_set_current_user( $owner );
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		wp_set_current_user( 0 );
+	}
+
+	public function test_signed_url_not_given_to_an_owner_the_pdf_restricts() {
+		$entry = $this->entry( 'all-form-fields' );
+		$owner = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		\GFAPI::update_entry_property( $entry['id'], 'created_by', $owner );
+		wp_set_current_user( $owner );
+
+		$pdf                   = \GPDFAPI::get_pdf( $entry['form_id'], '556690c67856b' );
+		$pdf['restrict_owner'] = 'Yes';
+		\GPDFAPI::update_pdf( $entry['form_id'], '556690c67856b', $pdf );
+
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		$pdf['restrict_owner'] = 'No';
+		\GPDFAPI::update_pdf( $entry['form_id'], '556690c67856b', $pdf );
+
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+	}
+
+	public function test_signing_user_can_be_filtered() {
+		$entry = $this->entry( 'all-form-fields' );
+		$admin = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( 0 );
+
+		$as_admin = function () use ( $admin ) {
+			return $admin;
+		};
+
+		add_filter( 'gfpdf_shortcode_signing_user_id', $as_admin );
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+		remove_filter( 'gfpdf_shortcode_signing_user_id', $as_admin );
+
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+	}
+
+	public function test_signed_url_in_post_content_is_authorised_by_the_post_author() {
+		$entry       = $this->entry( 'all-form-fields' );
+		$admin       = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$contributor = $this->factory->user->create( [ 'role' => 'contributor' ] );
+		$shortcode   = sprintf( '[gravitypdf id="556690c67856b" entry="%d" signed="1" raw="1"]', $entry['id'] );
+
+		/* An admin's published link works for anonymous visitors */
+		wp_set_current_user( 0 );
+		$GLOBALS['post'] = $this->factory->post->create_and_get( [ 'post_author' => $admin ] );
+		$this->assertStringContainsString( 'signature=', apply_filters( 'the_content', $shortcode ) );
+
+		/* A post author who can't view the entry gets no signature, whoever is viewing */
+		wp_set_current_user( $admin );
+		$GLOBALS['post'] = $this->factory->post->create_and_get( [ 'post_author' => $contributor ] );
+		$this->assertStringNotContainsString( 'signature=', apply_filters( 'the_content', $shortcode ) );
+
+		unset( $GLOBALS['post'] );
+		wp_set_current_user( 0 );
+	}
+
+	public function test_injected_entry_id_is_trusted() {
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
+		wp_set_current_user( 0 );
+
+		/* Neither text without the shortcode, nor a shortcode with an explicit entry, trusts the entry */
+		$this->model->gravitypdf_process_during_merge_tag_replacement( 'No shortcode', $form, $entry );
+		$this->model->gravitypdf_process_during_merge_tag_replacement( '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '"]', $form, $entry );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		/* Nor does a shortcode in user-submitted content */
+		$shortcode = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->run_untrusted(
+			function () use ( $form, $entry ) {
+				return \GFCommon::replace_variables( '[gravitypdf id="556690c67856b" signed="1" raw="1"]', $form, $entry );
+			}
+		);
+		$this->assertStringNotContainsString( 'entry=', $shortcode );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+
+		$this->model->gravitypdf_process_during_merge_tag_replacement( '[gravitypdf id="556690c67856b" signed="1"]', $form, $entry );
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
+	}
+
+	public function test_shortcode_in_an_administrative_field_is_trusted_only_as_its_default() {
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
+		wp_set_current_user( 0 );
+
+		foreach ( $form['fields'] as $field ) {
+			if ( $field->type === 'text' ) {
+				break;
+			}
+		}
+
+		/* As in a PDF, where html() leaves a trusted administrative value raw and the whole document has its tags processed */
+		$shortcode           = '[gravitypdf id=556690c67856b entry=' . $entry['id'] . ' signed=1 raw=1]';
+		$field->visibility   = 'administrative';
+		$entry[ $field->id ] = $shortcode;
+		$render              = function ( $default ) use ( $form, $entry, $field, $shortcode ) {
+			$field->defaultValue = $default;
+
+			/* Gravity Forms skips merge tag filters on text without a brace, which PDF HTML always has in its CSS */
+			return do_shortcode( \GFCommon::replace_variables( '<style>p{}</style>' . $shortcode, $form, $entry ) );
+		};
+
+		$this->assertStringContainsString( 'signature=', $render( $shortcode ) );
+
+		/* A value other than the default isn't trusted */
+		$this->assertStringNotContainsString( 'signature=', $render( '' ) );
+	}
+
+	/**
 	 * Test we're correctly handling the Gravity Forms text confirmation method and including the entry ID
 	 *
 	 * @since 4.0
@@ -460,6 +640,8 @@ class Test_Shortcodes extends TestCase {
 	 * @since 5.1
 	 */
 	public function test_gravitypdf_redirect_confirmation_shortcode_processing() {
+		/* The confirmation is trusted, so its link is signed for a logged-out submitter */
+		wp_set_current_user( 0 );
 
 		$form                        = $this->form( 'all-form-fields' );
 		$form['confirmation']        = $form['confirmations']['54bca34973cdd'];

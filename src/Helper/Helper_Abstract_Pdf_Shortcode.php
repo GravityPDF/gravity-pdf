@@ -98,6 +98,107 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	abstract public function process( $attributes );
 
 	/**
+	 * Allow the next shortcode run for an entry ID resolved from a trusted server-side context to be signed
+	 *
+	 * @param int $entry_id
+	 *
+	 * @return void
+	 *
+	 * @since 6.17.3
+	 */
+	public function mark_entry_as_trusted( $entry_id ) {
+		$this->get_trust()->grant( 'entry:' . (int) $entry_id );
+	}
+
+	/**
+	 * Use up one trusted shortcode run for the entry
+	 *
+	 * @param int $entry_id
+	 *
+	 * @return bool Whether the entry was trusted
+	 *
+	 * @since 6.17.3
+	 */
+	protected function consume_trusted_entry( $entry_id ) {
+		return $this->get_trust()->consume( 'entry:' . (int) $entry_id );
+	}
+
+	/**
+	 * Run a shortcode the plugin built for a trusted entry, without leaving the entry trusted afterwards
+	 *
+	 * @param string $shortcode
+	 * @param int    $entry_id
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	public function do_trusted_shortcode( $shortcode, $entry_id ) {
+		return $this->get_trust()->run_granted(
+			'entry:' . (int) $entry_id,
+			function () use ( $shortcode ) {
+				return do_shortcode( $shortcode );
+			}
+		);
+	}
+
+	/**
+	 * Trust the shortcodes in merged text that came from an administrative field still holding its default value
+	 *
+	 * @param mixed $text  The filtered text, which another callback may have changed to a non-string
+	 * @param mixed $form  The form passed to the filter, which may not be an array
+	 * @param array $entry
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function gravitypdf_trust_administrative_field_shortcodes( $text, $form, $entry ) {
+		if ( ! is_string( $text ) || empty( $entry['id'] ) || ! is_array( $form ) || $this->get_trust()->is_untrusted() || ! has_shortcode( $text, static::SHORTCODE ) ) {
+			return $text;
+		}
+
+		$trusted = [];
+		foreach ( $this->get_trust()->get_trusted_field_values( $form, $entry ) as $value ) {
+			foreach ( $this->get_shortcode_information( static::SHORTCODE, $value ) as $shortcode ) {
+				$trusted[] = $shortcode['shortcode'];
+			}
+		}
+
+		if ( empty( $trusted ) ) {
+			return $text;
+		}
+
+		/* PDF field values are HTML-escaped, so compare decoded shortcodes */
+		foreach ( $this->get_shortcode_information( static::SHORTCODE, $text ) as $shortcode ) {
+			if ( ! in_array( wp_specialchars_decode( $shortcode['shortcode'], ENT_QUOTES ), $trusted, true ) ) {
+				continue;
+			}
+
+			if ( isset( $shortcode['attr']['entry'] ) ) {
+				$this->mark_entry_as_trusted( $shortcode['attr']['entry'] );
+				continue;
+			}
+
+			$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $entry['id'] );
+			$text          = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $text );
+
+			$this->mark_entry_as_trusted( $entry['id'] );
+		}
+
+		return $text;
+	}
+
+	/**
+	 * @return \GFPDF\Model\Model_Signed_Url_Trust
+	 *
+	 * @since 6.17.3
+	 */
+	protected function get_trust() {
+		return GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+	}
+
+	/**
 	 * Try get the Entry ID from specific $_GET keys
 	 *
 	 * @param int $entry_id
@@ -168,6 +269,11 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_process_during_merge_tag_replacement( $html, $form, $entry ) {
 		if ( ! is_array( $entry ) || empty( $entry['id'] ) || ! is_string( $html ) ) {
+			return $html;
+		}
+
+		/* User-submitted content mustn't get a trusted entry ID */
+		if ( $this->get_trust()->is_untrusted() ) {
 			return $html;
 		}
 
@@ -257,6 +363,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 					/* get the new shortcode information and update confirmation message */
 					$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $entry_id );
 					$text          = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $text );
+
+					$this->mark_entry_as_trusted( $entry_id );
 				}
 			}
 		}
@@ -379,7 +487,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 				$confirmation = [ 'redirect' => '' ];
 
 				foreach ( $shortcode_information as $shortcode ) {
-					$url = do_shortcode( str_replace( '{entry_id}', $entry['id'], $shortcode['shortcode'] ) );
+					$url = $this->do_trusted_shortcode( str_replace( '{entry_id}', $entry['id'], $shortcode['shortcode'] ), $entry['id'] );
 
 					/* Add Query string parameters if they exist (but not with signed URLs) */
 					$has_query_string = strrpos( $form['confirmation']['url'], '?' );

@@ -59,6 +59,7 @@ class Controller_Mergetags extends Helper_Abstract_Controller implements Helper_
 	 *
 	 */
 	public function add_filters() {
+		add_filter( 'gform_pre_replace_merge_tags', [ $this->model, 'mark_trusted_pdf_mergetags' ], 10, 3 );
 		add_filter( 'gform_replace_merge_tags', [ $this->model, 'process_pdf_mergetags' ], 10, 4 );
 		add_filter( 'gform_custom_merge_tags', [ $this->model, 'add_pdf_mergetags' ], 10, 2 );
 
