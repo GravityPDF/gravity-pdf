@@ -321,8 +321,8 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		 * @since 6.17.3 Only when the administrative field holds its default value, as submitters can POST any value
 		 */
 		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
-		if ( ! in_array( $this->field->type, $skip_fields, true ) && ! $this->is_trusted_value() ) {
-			$value = $this->encode_tags( $value );
+		if ( ! in_array( $this->field->type, $skip_fields, true ) ) {
+			$value = $this->is_trusted_value() ? $this->decode_shortcode_quotes( $value ) : $this->encode_tags( $value );
 		}
 
 		/* Backwards compat */
@@ -381,10 +381,51 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 4.0
 	 */
 	public function encode_tags( $value ) {
-		$find      = [ '[', ']', '{', '}' ];
-		$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
+		$find  = [ '[', ']', '{', '}' ];
+		$value = (string) $value;
+		if ( strpbrk( $value, '[]{}' ) === false ) {
+			return $value;
+		}
 
-		return str_replace( $find, $converted, $value );
+		/* Kses rebuilds attribute values, so URL-encode the tags there */
+		if ( strpos( $value, '<' ) !== false && class_exists( '\WP_HTML_Tag_Processor' ) ) {
+			$processor = new \WP_HTML_Tag_Processor( $value );
+			while ( $processor->next_tag() ) {
+				foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+					$attribute = $processor->get_attribute( $name );
+					if ( is_string( $attribute ) && strpbrk( $attribute, '[]{}' ) !== false ) {
+						$processor->set_attribute( $name, str_replace( $find, [ '%5B', '%5D', '%7B', '%7D' ], $attribute ) );
+					}
+				}
+			}
+
+			$value = $processor->get_updated_html();
+		}
+
+		return str_replace( $find, [ '&#91;', '&#93;', '&#123;', '&#125;' ], $value );
+	}
+
+	/**
+	 * Restore the quotes the field's escaping encoded in a trusted value's shortcodes, so their attributes still parse
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	protected function decode_shortcode_quotes( $value ) {
+		if ( strpos( $value, '[' ) === false ) {
+			return $value;
+		}
+
+		return preg_replace_callback(
+			'/' . get_shortcode_regex() . '/',
+			function ( $shortcode ) {
+				return str_replace( [ '&quot;', '&#039;', '&#39;' ], [ '"', "'", "'" ], $shortcode[0] );
+			},
+			$value
+		);
 	}
 
 	/**
