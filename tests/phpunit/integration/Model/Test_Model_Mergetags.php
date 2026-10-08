@@ -70,6 +70,8 @@ class Test_Model_Mergetags extends TestCase {
 	public function test_pdf_mergetag_without_an_entry_is_kept_only_while_resolving_defaults() {
 		$tag = '{Label:pdf:556690c67856b}';
 
+		/* An unmatched stop can't go below zero */
+		$this->model->stop_resolving_administrative_defaults();
 		$this->assertSame( 'PDF: ', $this->model->process_pdf_mergetags( "PDF: $tag", false, false, false ) );
 
 		$this->assertSame( 7, $this->model->start_resolving_administrative_defaults( 7 ) );
@@ -102,7 +104,6 @@ class Test_Model_Mergetags extends TestCase {
 
 		$this->assertTrue( $result['is_valid'] );
 		$this->assertSame( $tags, \GFAPI::get_entry( $result['entry_id'] )['2'] );
-		$this->assertFalse( GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->is_resolving_defaults() );
 	}
 
 	/**

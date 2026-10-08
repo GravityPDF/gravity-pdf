@@ -78,6 +78,13 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	protected $url_signer;
 
 	/**
+	 * Above zero while Gravity Forms saves an entry, so PDF merge tags in administrative field defaults are kept for later
+	 *
+	 * @var int
+	 */
+	private $resolving_defaults_depth = 0;
+
+	/**
 	 * Model_Mergetags constructor.
 	 *
 	 * @param Helper_Abstract_Options $options
@@ -159,7 +166,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		/* Leave the tags in an administrative field's default for when there's an entry */
-		if ( ( $form === false || $entry === false ) && $this->get_trust()->is_resolving_defaults() ) {
+		if ( ( $form === false || $entry === false ) && $this->resolving_defaults_depth > 0 ) {
 			return $text;
 		}
 
@@ -276,7 +283,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * @since 6.17.3
 	 */
 	public function start_resolving_administrative_defaults( $entry_id ) {
-		$this->get_trust()->start_resolving_defaults();
+		++$this->resolving_defaults_depth;
 
 		return $entry_id;
 	}
@@ -287,7 +294,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * @since 6.17.3
 	 */
 	public function stop_resolving_administrative_defaults() {
-		$this->get_trust()->stop_resolving_defaults();
+		$this->resolving_defaults_depth = max( 0, $this->resolving_defaults_depth - 1 );
 	}
 
 	/**
