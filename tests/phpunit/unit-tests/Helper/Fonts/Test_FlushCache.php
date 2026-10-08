@@ -36,11 +36,41 @@ class Test_FlushCache extends WP_UnitTestCase {
 
 		FlushCache::flush();
 
-		$this->assertFileDoesNotExist( $cache . '/test' );
+		/* A PDF being generated keeps its temp files */
+		$this->assertFileExists( $cache . '/test' );
 		$this->assertFileDoesNotExist( $cache . '/ttfontdata/dejavusans.mtx.json' );
 		$this->assertDirectoryExists( $cache . '/ttfontdata' );
 		$this->assertFileExists( $pdf );
 
 		unlink( $pdf );
+		unlink( $cache . '/test' );
+	}
+
+	/**
+	 * A font change only deletes that font's data, so other fonts don't need rebuilding
+	 *
+	 * @since 6.17.3
+	 */
+	public function test_flush_cache_for_one_font() {
+		$font_data = \GPDFAPI::get_data_class()->mpdf_tmp_location . '/mpdf/ttfontdata/';
+		wp_mkdir_p( $font_data );
+
+		$deleted = [ 'roboto.mtx.json', 'robotoB.cw.dat', 'robotoI.gid.dat', 'robotoBI.GSUBGPOStables.dat', 'roboto.GSUB.arab.DFLT.json' ];
+		$kept    = [ 'robotomono.mtx.json', 'robotomonoB.cw.dat', 'dejavusans.mtx.json', 'roboto' ];
+
+		foreach ( array_merge( $deleted, $kept ) as $file ) {
+			touch( $font_data . $file );
+		}
+
+		FlushCache::flush( 'roboto' );
+
+		foreach ( $deleted as $file ) {
+			$this->assertFileDoesNotExist( $font_data . $file );
+		}
+
+		foreach ( $kept as $file ) {
+			$this->assertFileExists( $font_data . $file );
+			unlink( $font_data . $file );
+		}
 	}
 }
