@@ -457,4 +457,41 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		unlink( $filename );
 	}
+
+	public function test_render_html_runs_with_the_pdf_entry_as_the_signing_context() {
+		global $gfpdf;
+
+		$results              = $this->create_form_and_entries();
+		$settings             = $results['form']['gfpdf_form_settings']['555ad84787d7e'];
+		$settings['template'] = 'zadani';
+
+		$pdf = new Helper_PDF(
+			$results['entry'],
+			$settings,
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
+
+		$trust    = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+		$entry_id = null;
+		$capture  = function ( $html ) use ( $trust, &$entry_id ) {
+			$entry_id = $trust->get_rendering_entry_id();
+
+			return $html;
+		};
+
+		$pdf->init();
+		$pdf->set_template();
+		$pdf->set_output_type( 'SAVE' );
+
+		add_filter( 'gfpdf_pdf_html_output', $capture );
+		$pdf->render_html( [ 'settings' => $pdf->get_settings() ], '<p>Body</p>' );
+		remove_filter( 'gfpdf_pdf_html_output', $capture );
+
+		$this->assertSame( (int) $pdf->get_entry()['id'], $entry_id );
+		$this->assertSame( 0, $trust->get_rendering_entry_id() );
+	}
 }

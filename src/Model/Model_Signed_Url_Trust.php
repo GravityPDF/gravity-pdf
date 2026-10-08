@@ -16,8 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Tracks which [gravitypdf] shortcodes and PDF merge tags may be signed without checking the user can view the entry,
- * because they came from content the plugin or a form editor wrote rather than a submitter
+ * Tracks which PDF merge tags may be signed without checking the user can view the entry, because they came from
+ * content the plugin or a form editor wrote rather than a submitter, and whether a PDF is being rendered or
+ * user-submitted content processed
  *
  * @since 6.17.3
  */
@@ -38,6 +39,14 @@ class Model_Signed_Url_Trust {
 	 * @since 6.17.3
 	 */
 	protected $untrusted_depth = 0;
+
+	/**
+	 * The entries whose PDFs are being rendered, innermost last
+	 *
+	 * @var int[]
+	 * @since 6.17.3
+	 */
+	protected $rendering_entry_ids = [];
 
 	/**
 	 * @param string $key
@@ -72,32 +81,6 @@ class Model_Signed_Url_Trust {
 	}
 
 	/**
-	 * Run the callback with one grant, which is removed afterwards if the callback didn't use it
-	 *
-	 * @param string   $key
-	 * @param callable $callback
-	 *
-	 * @return mixed The callback's return value
-	 *
-	 * @since 6.17.3
-	 */
-	public function run_granted( $key, callable $callback ) {
-		$before = $this->grants[ $key ] ?? 0;
-
-		$this->grant( $key );
-
-		try {
-			return $callback();
-		} finally {
-			if ( $before > 0 ) {
-				$this->grants[ $key ] = $before;
-			} else {
-				unset( $this->grants[ $key ] );
-			}
-		}
-	}
-
-	/**
 	 * Run the callback without granting trust to anything it processes
 	 *
 	 * @param callable $callback
@@ -126,35 +109,106 @@ class Model_Signed_Url_Trust {
 	}
 
 	/**
-	 * Whether an administrative field holds its default value, which only a form editor can set. A value that differs from
-	 * the default is never trusted.
+	 * Run the callback while rendering an entry's PDF, or merging its field content, which mixes what form editors and
+	 * submitters wrote
 	 *
-	 * @param \GF_Field|mixed $field
-	 * @param array|mixed     $entry
+	 * @param int      $entry_id
+	 * @param callable $callback
+	 *
+	 * @return mixed The callback's return value
+	 *
+	 * @since 6.17.3
+	 */
+	public function run_rendering_pdf( $entry_id, callable $callback ) {
+		$this->rendering_entry_ids[] = (int) $entry_id;
+
+		try {
+			return $callback();
+		} finally {
+			array_pop( $this->rendering_entry_ids );
+		}
+	}
+
+	/**
+	 * @return bool Whether a PDF is being rendered
+	 *
+	 * @since 6.17.3
+	 */
+	public function is_rendering_pdf() {
+		return ! empty( $this->rendering_entry_ids );
+	}
+
+	/**
+	 * @return int The entry whose PDF is being rendered, or 0 when there isn't one
+	 *
+	 * @since 6.17.3
+	 */
+	public function get_rendering_entry_id() {
+		return (int) end( $this->rendering_entry_ids );
+	}
+
+	/**
+	 * The signing `token` that lets a signed shortcode naming an entry sign, even inside a PDF
+	 *
+	 * @param string     $shortcode The shortcode's name
+	 * @param string     $pdf_id
+	 * @param int|string $entry_id
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	public function get_shortcode_signing_token( $shortcode, $pdf_id, $entry_id ) {
+		return substr( hash_hmac( 'sha256', $shortcode . '|' . $pdf_id . '|' . (int) $entry_id, wp_salt( 'auth' ) ), 0, 32 );
+	}
+
+	/**
+	 * Whether a shortcode's `token` matches its PDF and entry
+	 *
+	 * @param mixed      $token     The shortcode's `token` attribute
+	 * @param string     $shortcode The shortcode's name
+	 * @param string     $pdf_id
+	 * @param int|string $entry_id
 	 *
 	 * @return bool
 	 *
 	 * @since 6.17.3
 	 */
-	public function is_trusted_field_value( $field, $entry ) {
-		if ( ! $field instanceof \GF_Field || ! $field->is_administrative() || ! is_array( $entry ) ) {
-			return false;
-		}
-
-		$inputs    = $field->get_entry_inputs();
-		$input_ids = is_array( $inputs ) ? wp_list_pluck( $inputs, 'id' ) : [ $field->id ];
-
-		foreach ( $input_ids as $input_id ) {
-			if ( (string) ( $entry[ (string) $input_id ] ?? '' ) !== (string) GFFormsModel::get_default_value( $field, $input_id ) ) {
-				return false;
-			}
-		}
-
-		return true;
+	public function is_valid_shortcode_signing_token( $token, $shortcode, $pdf_id, $entry_id ) {
+		return is_string( $token ) && $token !== '' && hash_equals( $this->get_shortcode_signing_token( $shortcode, $pdf_id, $entry_id ), $token );
 	}
 
 	/**
-	 * The entry's administrative field values that match their defaults and hold a shortcode or merge tag
+	 * The shortcodes and merge tags in an administrative field's default. Gravity Forms resolves some on save and leaves
+	 * others for later, so each is trusted on its own.
+	 *
+	 * @param \GF_Field|mixed $field
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.17.3
+	 */
+	public function get_default_tags( $field ) {
+		if ( ! $field instanceof \GF_Field || ! $field->is_administrative() ) {
+			return [];
+		}
+
+		$inputs   = is_array( $field->inputs ) ? $field->inputs : [];
+		$defaults = array_merge( [ $field->defaultValue ], array_column( $inputs, 'defaultValue' ) );
+		$regex    = '/' . get_shortcode_regex() . '|\{[^{}]+\}/';
+
+		$tags = [];
+		foreach ( $defaults as $default ) {
+			if ( is_string( $default ) && strpbrk( $default, '[{' ) !== false && preg_match_all( $regex, $default, $matches ) ) {
+				array_push( $tags, ...$matches[0] );
+			}
+		}
+
+		return array_values( array_unique( $tags ) );
+	}
+
+	/**
+	 * The default tags the entry's administrative fields still hold
 	 *
 	 * @param array $form
 	 * @param array $entry
@@ -163,26 +217,24 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @since 6.17.3
 	 */
-	public function get_trusted_field_values( $form, $entry ) {
-		$values = [];
+	public function get_trusted_field_tags( $form, $entry ) {
+		$trusted = [];
 		foreach ( $form['fields'] ?? [] as $field ) {
-			if ( ! $field instanceof \GF_Field || ! $field->is_administrative() ) {
-				continue;
-			}
+			$tags = $this->get_default_tags( $field );
 
-			/* Check the tags first, as the trust check recomputes the field's default */
-			$tagged = array_filter(
-				(array) GFFormsModel::get_lead_field_value( $entry, $field ),
-				function ( $value ) {
-					return is_string( $value ) && strpbrk( $value, '[]{}' ) !== false;
+			foreach ( $tags ? (array) GFFormsModel::get_lead_field_value( $entry, $field ) : [] as $value ) {
+				if ( ! is_string( $value ) ) {
+					continue;
 				}
-			);
 
-			if ( $tagged && $this->is_trusted_field_value( $field, $entry ) ) {
-				$values = array_merge( $values, array_values( $tagged ) );
+				foreach ( $tags as $tag ) {
+					if ( strpos( $value, $tag ) !== false ) {
+						$trusted[] = $tag;
+					}
+				}
 			}
 		}
 
-		return $values;
+		return array_values( array_unique( $trusted ) );
 	}
 }

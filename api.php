@@ -752,4 +752,57 @@ final class GPDFAPI {
 
 		return $pdf_model->get_form_data( $entry );
 	}
+
+	/**
+	 * Get the URL to an entry's PDF, if the PDF is active and its conditional logic passes
+	 * It doesn't check whether anyone may view it. A signed URL opens the PDF for whoever has it until it expires.
+	 *
+	 * @param int    $entry_id The Gravity Form entry ID
+	 * @param string $pdf_id   The Gravity PDF ID
+	 * @param array  $args     {
+	 *     @type bool   $download Download instead of viewing, like the shortcode's type="download". Default false.
+	 *     @type bool   $print    Open the print dialog when the PDF is viewed. Default false.
+	 *     @type bool   $signed   Sign the URL, so it opens without logging in. Default false.
+	 *     @type string $expires  How long a signed URL lasts, e.g. "1 week". Default the Logged Out Timeout setting.
+	 * }
+	 *
+	 * @return string|WP_Error The unescaped URL, or a WP_Error on failure: invalid_entry, invalid_pdf_setting, inactive or
+	 *                         conditional_logic
+	 *
+	 * @since 6.17.3
+	 */
+	public static function get_pdf_url( $entry_id, $pdf_id, $args = [] ) {
+		$entry = self::get_form_class()->get_entry( $entry_id );
+		if ( is_wp_error( $entry ) ) {
+			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-pdf' ) );
+		}
+
+		$settings = self::get_pdf( $entry['form_id'], $pdf_id );
+		if ( is_wp_error( $settings ) ) {
+			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-pdf' ) );
+		}
+
+		/** @var \GFPDF\Model\Model_PDF $pdf_model */
+		$pdf_model = self::get_mvc_class( 'Model_PDF' );
+
+		/* The same checks the PDF viewer runs, so a link isn't made to a PDF that won't open */
+		$available = $pdf_model->middle_conditional( $pdf_model->middle_active( true, $entry, $settings ), $entry, $settings );
+		if ( is_wp_error( $available ) ) {
+			return $available;
+		}
+
+		$args = wp_parse_args(
+			$args,
+			[
+				'download' => false,
+				'print'    => false,
+				'signed'   => false,
+				'expires'  => '',
+			]
+		);
+
+		$url = $pdf_model->get_pdf_url( $pdf_id, $entry_id, $args['download'], $args['print'] );
+
+		return $args['signed'] ? ( new \GFPDF\Helper\Helper_Url_Signer() )->sign( $url, $args['expires'] ) : $url;
+	}
 }

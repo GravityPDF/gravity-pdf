@@ -82,7 +82,7 @@ class Test_Controller_Export_Entries extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'signature=', apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
 
-		/* The trust is only for the exported entry, not one a filter swaps in */
+		/* Only the exported entry is vouched for, not one a filter swaps in */
 		$entry_id = \GFAPI::add_entry( [ 'form_id' => $form_id ] );
 		$this->assertStringNotContainsString( 'signature=', apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
 	}
