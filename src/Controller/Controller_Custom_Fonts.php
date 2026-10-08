@@ -248,7 +248,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			FlushCache::flush();
+			FlushCache::flush( $font['id'] );
 
 			return $font;
 		} catch ( UploadException $e ) {
@@ -353,7 +353,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			FlushCache::flush();
+			FlushCache::flush( $font['id'] );
 
 			return $font;
 		} catch ( UploadException $e ) {
@@ -406,7 +406,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			FlushCache::flush();
+			FlushCache::flush( $id );
 
 			return;
 
