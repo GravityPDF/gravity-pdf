@@ -52,8 +52,8 @@ class Test_Controller_Actions extends TestCase {
 	public function test_get_routes_includes_default_routes() {
 		$routes = $this->controller->get_routes();
 
-		/* The core font install, plus the one notice covering every deprecated feature at once */
-		$this->assertCount( 2, $routes );
+		/* The core font install, the unwritable folders notice, and the one notice covering every deprecated feature */
+		$this->assertCount( 3, $routes );
 
 		$this->assertSame( 'install_core_fonts', $routes[0]['action'] );
 		$this->assertSame( 'gravityforms_edit_settings', $routes[0]['capability'] );

@@ -142,6 +142,18 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 					'view'        => [ $this->view, 'core_font' ],
 					'capability'  => 'gravityforms_edit_settings',
 				],
+				[
+					'action'      => 'unwritable_folders',
+					'action_text' => esc_html__( 'View the system report', 'gravity-pdf' ),
+					'condition'   => [ $this->model, 'has_unwritable_folders' ],
+					'process'     => [ $this->model, 'system_report_redirect' ],
+					'dismiss'     => [ $this->model, 'dismiss_unwritable_folders' ],
+					'view'        => function ( $action, $button_text ) {
+						return $this->view->unwritable_folders( $this->model->get_undismissed_unwritable_folders(), $action, $button_text );
+					},
+					'view_class'  => 'notice-error',
+					'capability'  => 'gravityforms_view_settings',
+				],
 			],
 			$this->get_deprecated_feature_routes()
 		);
