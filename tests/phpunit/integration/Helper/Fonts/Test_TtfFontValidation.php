@@ -41,14 +41,28 @@ class Test_TtfFontValidation extends TestCase {
 		$validation->validate( $file_info );
 	}
 
-	public function test_validate_passes_for_valid_ttf(): void {
-		$font_path = ABSPATH . '../vendor/wp-phpunit/wp-phpunit/data/fonts/OpenSans-Regular.ttf';
+	public function test_validate_throws_when_mpdfs_cache_cant_be_created(): void {
+		$data     = \GPDFAPI::get_data_class();
+		$original = $data->mpdf_tmp_location;
 
-		if ( ! file_exists( $font_path ) ) {
-			$this->markTestSkipped( 'OpenSans-Regular.ttf fixture not present; cannot exercise the valid-font path.' );
+		/* A folder can't be created inside a file */
+		$file              = tempnam( sys_get_temp_dir(), 'gfpdf_ttf_' );
+		$this->tmp_files[] = $file;
+
+		$data->mpdf_tmp_location = $file;
+
+		try {
+			( new TtfFontValidation() )->validate( new FileInfo( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/DejaVuSans.ttf', 'DejaVuSans.ttf' ) );
+			$this->fail( 'Expected an UploadException' );
+		} catch ( UploadException $e ) {
+			$this->assertSame( 'Unknown error occurred.', $e->getMessage() );
+		} finally {
+			$data->mpdf_tmp_location = $original;
 		}
+	}
 
-		$file_info  = new FileInfo( $font_path, 'OpenSans-Regular.ttf' );
+	public function test_validate_passes_for_valid_ttf(): void {
+		$file_info  = new FileInfo( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/DejaVuSans.ttf', 'DejaVuSans.ttf' );
 		$validation = new TtfFontValidation();
 
 		$this->expectNotToPerformAssertions();

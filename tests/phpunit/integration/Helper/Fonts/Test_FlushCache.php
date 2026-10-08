@@ -24,19 +24,27 @@ use GFPDF\Tests\Integration\TestCase;
 class Test_FlushCache extends TestCase {
 
 	public function test_flush_cache() {
-		$data = \GPDFAPI::get_data_class();
-		wp_mkdir_p( $data->mpdf_tmp_location );
+		$data  = \GPDFAPI::get_data_class();
+		$cache = $data->mpdf_tmp_location . '/mpdf';
 
-		$file = $data->mpdf_tmp_location . '/test';
+		wp_mkdir_p( $cache . '/ttfontdata' );
+		touch( $cache . '/test' );
+		touch( $cache . '/ttfontdata/dejavusans.mtx.json' );
 
-		touch( $file );
-		$this->assertFileExists( $file );
+		/* Shares mPDF's tempDir, but isn't mPDF's cache */
+		$pdf = $data->template_tmp_location . 'flush-cache-test.pdf';
+		touch( $pdf );
 
 		$generation = Cache::get_generation();
 
 		FlushCache::flush();
 
-		$this->assertFileDoesNotExist( $file );
+		$this->assertFileDoesNotExist( $cache . '/test' );
+		$this->assertFileDoesNotExist( $cache . '/ttfontdata/dejavusans.mtx.json' );
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+		$this->assertFileExists( $pdf );
 		$this->assertSame( $generation + 1, Cache::get_generation(), 'PDFs cached with the old fonts are no longer served' );
+
+		unlink( $pdf );
 	}
 }
