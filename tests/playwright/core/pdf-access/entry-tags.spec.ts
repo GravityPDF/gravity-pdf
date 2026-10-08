@@ -144,4 +144,27 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		// the administrative field's default is left for the template to process
 		expect(formData).toContain(adminDefault);
 	});
+
+	test('caps how long a signed PDF link lasts', async () => {
+		const longDefault = `[gravitypdf id="${pdfId}" signed="1" expires="+100 years" raw="1"]`;
+		await pdf.updateForm(form.id, (current: any) => ({
+			fields: current.fields.map((field: any) =>
+				field.id === 16
+					? { ...field, defaultValue: longDefault }
+					: field
+			),
+		}));
+
+		const entry: any = await pdf.createEntry({
+			form_id: form.id,
+			'16': longDefault,
+		});
+
+		const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
+		const expires = Number(html.match(/expires=(\d+)/)?.[1]);
+		const year = 366 * 24 * 60 * 60;
+
+		expect(expires).toBeGreaterThan(Date.now() / 1000);
+		expect(expires).toBeLessThanOrEqual(Date.now() / 1000 + year);
+	});
 });

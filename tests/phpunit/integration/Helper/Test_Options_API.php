@@ -1083,6 +1083,9 @@ class Test_Options_API extends TestCase {
 		$this->assertSame( 1, $this->options->sanitize_number_field( '0', 'logged_out_timeout', [], $field ) );
 		$this->assertSame( 20, $this->options->sanitize_number_field( ' ', 'logged_out_timeout', [], $field ) );
 		$this->assertSame( 20, $this->options->sanitize_number_field( [ '5' ], 'logged_out_timeout', [], $field ) );
+		$max = Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX;
+		$this->assertSame( $max, $this->options->sanitize_number_field( (string) ( $max + 1 ), 'logged_out_timeout', [], $field ) );
+		$this->assertSame( $max, $this->options->sanitize_number_field( (string) $max, 'logged_out_timeout', [], $field ) );
 
 		/* A field without a default still saves 0 */
 		$this->assertSame( 0, $this->options->sanitize_number_field( '' ) );

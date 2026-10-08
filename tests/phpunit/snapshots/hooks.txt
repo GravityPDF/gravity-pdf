@@ -224,6 +224,7 @@ filter gfpdf_settings_tools 1
 filter gfpdf_shortcode_signing_user_id 3
 filter gfpdf_show_field_value 3
 filter gfpdf_signature_width 2
+filter gfpdf_signed_url_max_expiration 3
 filter gfpdf_skip_encode_mergetags_on_fields 4
 filter gfpdf_skip_highlight_errors 3
 filter gfpdf_skip_pdf_html_render 3
