@@ -133,6 +133,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
+		delete_option( 'gfpdf_unwritable_folders' );
 		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */

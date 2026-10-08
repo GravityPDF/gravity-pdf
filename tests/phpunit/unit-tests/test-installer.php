@@ -4,6 +4,7 @@ namespace GFPDF\Tests;
 
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Controller\Controller_Uninstaller;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_Install;
 use WP_UnitTestCase;
@@ -71,6 +72,8 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->assertEquals( 9999, has_action( 'wp_loaded', [ $this->controller, 'check_install_status' ] ) );
 
 		$this->assertEquals( 10, has_action( 'init', [ $this->model, 'register_rewrite_rules' ] ) );
+		$this->assertEquals( 10, has_action( 'gfpdf_version_changed', [ $this->model, 'check_folder_permissions' ] ) );
+		$this->assertEquals( 10, has_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'check_folder_permissions' ] ) );
 	}
 
 	/**
@@ -247,6 +250,42 @@ class Test_Installer extends WP_UnitTestCase {
 		remove_all_filters( 'gfpdf_font_location' );
 
 		$this->model->setup_template_location();
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_check_folder_permissions() {
+		global $gfpdf;
+
+		$font_location = $gfpdf->data->template_font_location;
+
+		$misc = $this->getMockBuilder( Helper_Misc::class )
+			->setConstructorArgs( [ $gfpdf->log, $gfpdf->gform, $gfpdf->data ] )
+			->onlyMethods( [ 'is_directory_writable' ] )
+			->getMock();
+
+		$misc->method( 'is_directory_writable' )->willReturnCallback(
+			function( $dir ) use ( $font_location ) {
+				return $dir !== $font_location;
+			}
+		);
+
+		$model = new Model_Install( $gfpdf->log, $gfpdf->data, $misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), Controller_Uninstaller::get_instance()->model );
+		/* Make sure the folders exist, as only existing folders are tested */
+		$model->create_folder_structures();
+		$gfpdf->notices->clear();
+
+		$model->check_folder_permissions();
+		$this->assertSame( [ $font_location ], get_option( 'gfpdf_unwritable_folders' ) );
+
+		/* Requests show the stored result, without writing to the folders */
+		$misc->expects( $this->never() )->method( 'is_directory_writable' );
+		$model->create_folder_structures();
+		$this->assertTrue( $gfpdf->notices->has_error() );
+
+		$gfpdf->notices->clear();
+		delete_option( 'gfpdf_unwritable_folders' );
 	}
 
 	/**

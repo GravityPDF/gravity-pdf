@@ -245,22 +245,13 @@ class Model_Install extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Create the appropriate folder structure automatically
-	 * The upload directory should have all appropriate permissions to allow this kind of manipulation
-	 * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropriate folder
+	 * The folders Gravity PDF needs to write to
 	 *
-	 * @return void
-	 * @since 4.0
+	 * @return string[]
 	 *
+	 * @since 6.17.3
 	 */
-	public function create_folder_structures() {
-
-		/* don't create the folder structure if an AJAX or REST API request */
-		if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-			return null;
-		}
-
-		/* add folders that need to be checked */
+	protected function get_folders(): array {
 		$folders = array_merge(
 			[
 				$this->data->template_location,
@@ -274,10 +265,57 @@ class Model_Install extends Helper_Abstract_Model {
 		}
 
 		/* allow other plugins to add their own folders which should be checked */
-		$folders = apply_filters( 'gfpdf_installer_create_folders', $folders );
+		return apply_filters( 'gfpdf_installer_create_folders', $folders );
+	}
+
+	/**
+	 * Test writing to each folder, and store the ones that fail for create_folder_structures() to show a notice about.
+	 * Run on install, upgrade and the tmp cleanup cron, not on every request.
+	 *
+	 * @return void
+	 *
+	 * @since 6.17.3
+	 */
+	public function check_folder_permissions(): void {
+		$unwritable = [];
+
+		foreach ( $this->get_folders() as $dir ) {
+			if ( is_dir( $dir ) && ! $this->misc->is_directory_writable( $dir ) ) {
+				$this->log->error(
+					'Failed Write Permissions Check.',
+					[
+						'dir' => $dir,
+					]
+				);
+
+				$unwritable[] = $dir;
+			}
+		}
+
+		update_option( 'gfpdf_unwritable_folders', $unwritable, true );
+	}
+
+	/**
+	 * Create the appropriate folder structure automatically
+	 * The upload directory should have all appropriate permissions to allow this kind of manipulation
+	 * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropriate folder
+	 *
+	 * @return void
+	 * @since 4.0
+	 * @since 6.17.3 The write permission notice comes from check_folder_permissions()
+	 *
+	 */
+	public function create_folder_structures() {
+
+		/* don't create the folder structure if an AJAX or REST API request */
+		if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return null;
+		}
+
+		$unwritable = (array) get_option( 'gfpdf_unwritable_folders', [] );
 
 		/* create the required folder structure, or throw error */
-		foreach ( $folders as $dir ) {
+		foreach ( $this->get_folders() as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				if ( ! wp_mkdir_p( $dir ) ) {
 					$this->log->error(
@@ -289,15 +327,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
-			} elseif ( ! wp_is_writable( $dir ) ) {
-				/* test the directory is currently writable by the web server, otherwise throw an error */
-				$this->log->error(
-					'Failed Write Permissions Check.',
-					[
-						'dir' => $dir,
-					]
-				);
-
+			} elseif ( in_array( $dir, $unwritable, true ) ) {
 				$this->notices->add_error( sprintf( esc_html__( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 			}
 		}
