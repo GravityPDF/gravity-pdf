@@ -39,20 +39,41 @@ class Test_Model_Signed_Url_Trust extends TestCase {
 		$this->assertFalse( $this->trust->consume( 'a' ) );
 	}
 
-	public function test_run_granted_removes_an_unused_grant_and_keeps_earlier_ones() {
-		$this->assertSame( 'x', $this->trust->run_granted( 'a', function () { return 'x'; } ) );
-		$this->assertFalse( $this->trust->consume( 'a' ) );
-
-		$this->trust->grant( 'a' );
-		$this->trust->run_granted( 'a', function () { return $this->trust->consume( 'a' ); } );
-		$this->assertTrue( $this->trust->consume( 'a' ) );
-		$this->assertFalse( $this->trust->consume( 'a' ) );
-	}
-
 	public function test_run_untrusted() {
 		$this->assertFalse( $this->trust->is_untrusted() );
 		$this->assertTrue( $this->trust->run_untrusted( [ $this->trust, 'is_untrusted' ] ) );
 		$this->assertFalse( $this->trust->is_untrusted() );
+	}
+
+	public function test_rendering_pdf() {
+		$this->assertFalse( $this->trust->is_rendering_pdf() );
+		$this->assertSame( 0, $this->trust->get_rendering_entry_id() );
+
+		/* An entry without an ID, such as a preview's, still renders as a PDF */
+		$this->assertTrue( $this->trust->run_rendering_pdf( 0, [ $this->trust, 'is_rendering_pdf' ] ) );
+
+		$this->trust->run_rendering_pdf(
+			5,
+			function () {
+				$this->assertSame( 6, $this->trust->run_rendering_pdf( 6, [ $this->trust, 'get_rendering_entry_id' ] ) );
+				$this->assertSame( 5, $this->trust->get_rendering_entry_id() );
+			}
+		);
+
+		/* The context ends even when rendering fails */
+		try {
+			$this->trust->run_rendering_pdf(
+				5,
+				function () {
+					throw new \Exception( 'Failed' );
+				}
+			);
+			$this->fail( 'Expected the exception' );
+		} catch ( \Exception $e ) {
+			$this->assertSame( 'Failed', $e->getMessage() );
+		}
+
+		$this->assertSame( 0, $this->trust->get_rendering_entry_id() );
 	}
 
 	public function test_only_the_tags_in_an_administrative_default_are_trusted() {

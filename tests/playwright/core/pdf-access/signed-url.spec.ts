@@ -117,7 +117,7 @@ test.describe('Signed PDF URLs', () => {
 			form.id,
 			withConfirmation({
 				type: 'message',
-				message: `<code id="shortcode-url">${shortcode()}</code><code id="mergetag-url">{PDF:pdf:${pdfId}:signed}</code>`,
+				message: `<code id="shortcode-url">${shortcode()}</code><code id="mergetag-url">{PDF:pdf:${pdfId}:signed}</code><code id="named-url">${shortcode(entry.id)}</code>`,
 			})
 		);
 
@@ -135,6 +135,12 @@ test.describe('Signed PDF URLs', () => {
 			'signature='
 		);
 		await expect(page.locator('#mergetag-url')).toContainText('signature=');
+
+		// one naming another entry, which the visitor can't view
+		const named = await page.locator('#named-url').innerText();
+		expect(named).toContain(`lid=${entry.id}&`);
+		expect(named).toContain('signature=');
+		await pdf.gotoPdfAndVerify(named, 'Signed URL.pdf');
 	});
 
 	test('does not sign a shortcode or merge tag in a field value', async ({

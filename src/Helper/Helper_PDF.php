@@ -8,11 +8,13 @@ use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF\Helper\Mpdf\Mpdf;
+use GFPDF\Model\Model_Signed_Url_Trust;
 use GFPDF\Statics\Template_Constants;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -292,14 +294,21 @@ class Helper_PDF {
 			return;
 		}
 
-		/* Load in our PHP template */
-		if ( empty( $html ) ) {
-			$html = $this->load_html( $args );
-		}
+		$render = function () use ( $args, $html, $form ) {
+			/* Load in our PHP template */
+			if ( empty( $html ) ) {
+				$html = $this->load_html( $args );
+			}
 
-		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
-		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
-		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
+			/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
+			$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
+
+			return apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
+		};
+
+		/* The template and its shortcodes run with the PDF's entry as the signing context */
+		$trust = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+		$html  = $trust instanceof Model_Signed_Url_Trust ? $trust->run_rendering_pdf( $this->entry['id'] ?? 0, $render ) : $render();
 
 		/* Write the HTML to mPDF */
 		$this->mpdf->WriteHTML( $html );

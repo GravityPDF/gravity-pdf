@@ -8,6 +8,7 @@ test.describe('PDF shortcodes and merge tags in form fields', () => {
 	let pdf: Pdf;
 	let form: any;
 	let pdfId: string;
+	let other: any;
 	let formPage: any;
 
 	test.beforeEach(
@@ -26,23 +27,37 @@ test.describe('PDF shortcodes and merge tags in form fields', () => {
 				show_html: true,
 			});
 
+			// from another IP, so an anonymous visitor can only reach its PDF with a signed URL
+			other = await pdf.createEntry({ form_id: form.id, ip: '10.0.0.1' });
+
+			const shortcodes = (prefix: string) =>
+				`${prefix}-current=[gravitypdf id="${pdfId}" signed="1" raw="1"]\n` +
+				`${prefix}-named=[gravitypdf id="${pdfId}" entry="${other.id}" signed="1" raw="1"]`;
+
 			await pdf.updateForm(form.id, (current: any) => ({
 				fields: [
 					...current.fields,
 					{
+						id: 52,
+						formId: form.id,
+						type: 'section',
+						label: `Section [gravitypdf id=${pdfId} entry=${other.id} signed=1 raw=1]`,
+					},
+					{
 						id: 50,
 						formId: form.id,
 						type: 'textarea',
-						label: 'Administrative',
+						// unquoted, as a label merged with {Field:50:label} has its quotes escaped
+						label: `Administrative [gravitypdf id=${pdfId} entry=${other.id} signed=1 raw=1]`,
 						visibility: 'administrative',
-						defaultValue: `admin-tag={PDF:pdf:${pdfId}:signed}`,
+						defaultValue: `${shortcodes('admin')}\nadmin-tag={PDF:pdf:${pdfId}:signed}`,
 					},
 					{
 						id: 51,
 						formId: form.id,
 						type: 'html',
 						label: 'Block',
-						content: `<p id="html-tag">{PDF:pdf:${pdfId}}</p>`,
+						content: `<p id="html-tag">{PDF:pdf:${pdfId}}</p>\n${shortcodes('html')}\nhtml-label={Administrative:50:label}`,
 					},
 				],
 			}));
@@ -102,5 +117,53 @@ test.describe('PDF shortcodes and merge tags in form fields', () => {
 
 		await expect(page.locator('#html-tag')).toBeAttached();
 		await expect(page.locator('#html-tag')).toHaveText('');
+	});
+
+	test('signs a shortcode without an entry for the entry the PDF is for', async ({
+		page,
+	}: {
+		page: Page;
+	}) => {
+		const { entry, html } = await submit(page);
+
+		for (const name of ['admin-current', 'html-current']) {
+			const link = url(html, name);
+			expect(link).toContain(`/${entry.id}/`);
+			expect(link).toContain('signature=');
+		}
+
+		await pdf.gotoPdfAndVerify(
+			url(html, 'html-current'),
+			'Form Field Tags.pdf'
+		);
+	});
+
+	test('does not sign a shortcode that names an entry', async ({
+		page,
+	}: {
+		page: Page;
+	}) => {
+		const { html } = await submit(page);
+
+		// in field content, a field label, a label a merge tag adds and a section title; not even with an administrator
+		// rendering the PDF
+		const links = [
+			...html.matchAll(
+				new RegExp(
+					`[^\\s<>"=]+/pdf/${pdfId}/${other.id}/[^\\s<>"]*`,
+					'g'
+				)
+			),
+		].map((match) => match[0]);
+
+		expect(links).toHaveLength(5);
+		for (const link of links) {
+			expect(link).not.toContain('signature=');
+		}
+
+		await page.goto(url(html, 'html-named'));
+		await expect(
+			page.getByRole('button', { name: 'Log In' })
+		).toBeVisible();
 	});
 });
