@@ -857,7 +857,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Create a PDF Link based on the current PDF settings and entry
 	 *
-	 * @param integer $pid          The PDF Form Settings ID
+	 * @param string  $pid          The PDF Form Settings ID
 	 * @param integer $id           The Gravity Form entry ID
 	 * @param boolean $download     Whether the PDF should be downloaded or not
 	 * @param boolean $should_print Whether we should mark the PDF to be printed

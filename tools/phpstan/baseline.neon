@@ -1627,12 +1627,6 @@ parameters:
 			path: ../../src/Model/Model_Mergetags.php
 
 		-
-			message: '#^Parameter \#1 \$pid of method GFPDF\\Model\\Model_PDF\:\:get_pdf_url\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Model/Model_Mergetags.php
-
-		-
 			message: '#^Parameter \#1 \$text of method GFPDF\\Helper\\Helper_Form\:\:process_tags\(\) expects string, int given\.$#'
 			identifier: argument.type
 			count: 1
