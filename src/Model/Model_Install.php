@@ -196,8 +196,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_tmp_location = trailingslashit( apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ) ); /* encouraged to move this to a directory not accessible via the web */
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_mpdf_tmp_location/ for more details about this filter */
-		$mpdf_tmp_path                 = $this->data->template_tmp_location . 'mpdf';
-		$this->data->mpdf_tmp_location = untrailingslashit( apply_filters( 'gfpdf_mpdf_tmp_location', $mpdf_tmp_path ) );
+		$this->data->mpdf_tmp_location = untrailingslashit( apply_filters( 'gfpdf_mpdf_tmp_location', $this->data->template_tmp_location ) );
 	}
 
 	/**
@@ -257,12 +256,13 @@ class Model_Install extends Helper_Abstract_Model {
 		}
 
 		/* add folders that need to be checked */
-		$folders = [
-			$this->data->template_location,
-			$this->data->template_font_location,
-			$this->data->template_tmp_location,
-			$this->data->mpdf_tmp_location,
-		];
+		$folders = array_merge(
+			[
+				$this->data->template_location,
+				$this->data->template_font_location,
+			],
+			$this->misc->get_tmp_locations()
+		);
 
 		if ( is_multisite() ) {
 			$folders[] = $this->data->multisite_template_location;

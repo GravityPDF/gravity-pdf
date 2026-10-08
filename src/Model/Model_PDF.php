@@ -2157,6 +2157,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return void
 	 *
 	 * @since 4.0
+	 * @since 6.17.3 Recreates mPDF's cache folders afterwards
 	 * @since 7.0 Skips the PDF cache, keeps one-off PDFs for an hour, and walks a network's shared tree once an hour
 	 */
 	public function cleanup_tmp_dir() {
@@ -2170,9 +2171,9 @@ class Model_PDF extends Helper_Abstract_Model {
 			set_site_transient( 'gfpdf_cleanup_tmp_dir', 1, HOUR_IN_SECONDS - 5 * MINUTE_IN_SECONDS );
 		}
 
-		$tmp_location      = $this->data->template_tmp_location;
-		$mpdf_tmp_location = $this->data->mpdf_tmp_location;
-		$mpdf_font_cache   = $mpdf_tmp_location . '/mpdf/ttfontdata/';
+		$tmp_location    = $this->data->template_tmp_location;
+		$mpdf_cache      = $this->data->mpdf_tmp_location . '/mpdf';
+		$mpdf_font_cache = $mpdf_cache . '/ttfontdata/';
 
 		/**
 		 * How long a PDF that isn't cached (e.g. the cache is off) is kept on disk, in seconds
@@ -2182,12 +2183,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * @since 7.0
 		 */
 		$uncached_max_age = max( 0, (int) apply_filters( 'gfpdf_uncached_pdf_max_age', HOUR_IN_SECONDS ) );
-
-		/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
-		$directories = [ $tmp_location ];
-		if ( strpos( $mpdf_tmp_location, $tmp_location ) !== 0 ) {
-			$directories[] = $mpdf_tmp_location;
-		}
 
 		$now = time();
 
@@ -2199,7 +2194,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* A network site's folder, and the folder holding one-off PDFs */
 		$kept_dirs = is_multisite() ? '#^\d+(/uncached)?$#' : '#^uncached$#';
 
-		foreach ( $directories as $dir ) {
+		foreach ( $this->misc->get_tmp_locations() as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				continue;
 			}
@@ -2222,7 +2217,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 					$path     = $file->getPathname();
 					$relative = $get_relative_path( $path );
-					$is_mpdf  = strpos( $path . '/', $mpdf_tmp_location . '/' ) === 0;
+					$is_mpdf  = strpos( $path . '/', $mpdf_cache . '/' ) === 0;
 
 					/* Concurrent PDFs share mPDF's cache folders and it recreates them non-atomically, so only files expire */
 					if ( $is_mpdf && $file->isDir() ) {
@@ -2261,6 +2256,8 @@ class Model_PDF extends Helper_Abstract_Model {
 				);
 			}
 		}
+
+		$this->misc->create_mpdf_cache_folders();
 	}
 
 	/**

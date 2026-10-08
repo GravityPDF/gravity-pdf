@@ -635,6 +635,7 @@ class GFPDF\Helper\Helper_Misc
     public function convert_path_to_url($path)
     public function convert_url_to_path($url)
     public function copyr($source, $destination)
+    public function create_mpdf_cache_folders(): void
     public function evaluate_conditional_logic($logic, $entry)
     public function fix_header_footer($html)
     public function fix_header_footer_images($html)
@@ -644,6 +645,7 @@ class GFPDF\Helper\Helper_Misc
     public function get_field_class($type)
     public function get_fields_sorted_by_id($form_id)
     public function get_file_with_extension($name, $extension = '.php')
+    public function get_tmp_locations(): array
     public function get_upload_details()
     public function handle_ajax_authentication($endpoint_desc, $capability = 'gravityforms_edit_settings', $nonce_name = 'gfpdf_ajax_nonce')
     public function in_array($needle, $haystack, $strict = true)
