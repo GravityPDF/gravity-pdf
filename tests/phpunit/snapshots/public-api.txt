@@ -804,11 +804,12 @@ class GFPDF\Model\Model_Form_Settings extends GFPDF\Helper\Helper_Abstract_Model
 
 class GFPDF\Model\Model_Install extends GFPDF\Helper\Helper_Abstract_Model
     const TMP_HTACCESS = '<IfModule mod_authz_core.c> Require all denied </IfModule> <IfModule !mod_authz_core.c> Order allow,deny Deny from all </IfModule> Options -Indexes '
+    const UNWRITABLE_FOLDERS = 'gfpdf_unwritable_folders'
     final public function getController()
     final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
     public function __call($name, $arguments)
     public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Model\Model_Uninstall $uninstall)
-    public function check_folder_permissions(): void
+    public function check_folder_permissions(): array
     public function create_folder_structures()
     public function get_permalink_regex()
     public function get_settings_url()

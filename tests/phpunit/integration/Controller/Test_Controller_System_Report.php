@@ -4,12 +4,16 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Helper\Helper_Templates;
+use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Integration\TestCase;
+use GFPDF\View\View_System_Report;
+use GFPDF_Major_Compatibility_Checks;
 
 /**
  * @package     Gravity PDF
@@ -69,6 +73,7 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertArrayHasKey( 'temp_folder_location', $this->get_report_section( 'directories', $system_report ) );
 		$this->assertArrayHasKey( 'temp_folder_permission', $this->get_report_section( 'directories', $system_report ) );
 		$this->assertArrayHasKey( 'temp_folder_protected', $this->get_report_section( 'directories', $system_report ) );
+		$this->assertArrayHasKey( 'folder_permissions', $this->get_report_section( 'directories', $system_report ) );
 		$this->assertArrayHasKey( 'mpdf_temp_folder_location', $this->get_report_section( 'directories', $system_report ) );
 
 		$this->assertArrayHasKey( 'pdf_entry_list_action', $this->get_report_section( 'global', $system_report ) );
@@ -198,6 +203,39 @@ class Test_Controller_System_Report extends TestCase {
 		remove_filter( 'gfpdf_system_status_report_sections', $callback );
 
 		$this->assertArrayHasKey( 'third_party_row', $this->get_report_section( 'directories', $system_report ) );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_folder_permissions_tests_the_folders_when_the_report_is_built() {
+		$gfpdf = $this->gfpdf();
+
+		/* A folder that failed the last check, and has been fixed since */
+		update_option( Model_Install::UNWRITABLE_FOLDERS, [ '/srv/fixed-since/' => time() ] );
+
+		$row = $this->get_report_section( 'directories' )['folder_permissions'];
+		$this->assertSame( 'Writable', $row['value_export'] );
+		$this->assertSame( [], get_option( Model_Install::UNWRITABLE_FOLDERS ) );
+
+		$dir = $gfpdf->data->template_tmp_location;
+
+		$failing = $this->getMockBuilder( Model_Install::class )
+			->disableOriginalConstructor()
+			->onlyMethods( [ 'check_folder_permissions' ] )
+			->getMock();
+		$failing->method( 'check_folder_permissions' )->willReturn( [ $dir ] );
+
+		$model      = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks(), new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ), $gfpdf->singleton->get_class( 'Model_Pdf_Cache' ), $failing );
+		$controller = new Controller_System_Report( $model, new View_System_Report(), $gfpdf->gform );
+
+		$directories = $this->get_report_section( 'directories', $controller->system_report( [] ) );
+		$row         = $directories['folder_permissions'];
+
+		/* The mPDF tmp folder sits in the PDF tmp folder, so its row reads the same result */
+		$this->assertSame( 'Not writable', $directories['temp_folder_permission']['value_export'] );
+		$this->assertSame( 'Not writable: ' . $dir, $row['value_export'] );
+		$this->assertStringContainsString( 'Not writable', $row['value'] );
 	}
 
 	/**

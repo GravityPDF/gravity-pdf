@@ -37,7 +37,7 @@ class Test_Model_System_Report extends TestCase {
 		parent::set_up();
 
 		/* Setup our test classes */
-		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks, new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ), $gfpdf->singleton->get_class( 'Model_Pdf_Cache' ) );
+		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks, new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ), $gfpdf->singleton->get_class( 'Model_Pdf_Cache' ), $gfpdf->singleton->get_class( 'Model_Install' ) );
 
 		add_filter( 'pre_http_request', [ $this, 'get_public_dir_api_response' ] );
 	}

@@ -4,6 +4,7 @@ namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Statics\Deprecation;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -110,6 +111,25 @@ class View_Actions extends Helper_Abstract_View {
 			false
 		);
 
+		$html .= $this->get_action_buttons( $type, $button_text );
+
+		return $html;
+	}
+
+	/**
+	 * Load the notice for the folders Gravity PDF can't write to
+	 *
+	 * @param string[] $folders     The folders' absolute paths
+	 * @param string   $type        The action ID
+	 * @param string   $button_text The primary button text
+	 *
+	 * @return string The notice HTML
+	 * @since 6.17.3
+	 */
+	public function unwritable_folders( array $folders, string $type, string $button_text ): string {
+		$misc = GPDFAPI::get_misc_class();
+
+		$html  = $this->load( 'unwritable_folders', [ 'folders' => array_map( [ $misc, 'relative_path' ], $folders ) ], false );
 		$html .= $this->get_action_buttons( $type, $button_text );
 
 		return $html;
