@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div style="font-size:15px; line-height: 25px" role="alert" aria-live="polite">
 
 	<strong>
-		<?php esc_html_e( 'Gravity PDF does not have write permission to these directories. Contact your web hosting provider to fix the issue.', 'gravity-pdf' ); ?>
+		<?php esc_html_e( 'Gravity PDF cannot create or write to these directories. Contact your web hosting provider to fix the issue.', 'gravity-pdf' ); ?>
 	</strong>
 
 	<?php /* Bullets are set per-item: Gravity Forms resets `ul li` to none, and wp_kses_post() drops the `list-style` shorthand */ ?>
