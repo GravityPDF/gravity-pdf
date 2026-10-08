@@ -539,9 +539,10 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 	/**
 	 * @since 6.0
+	 * @since 6.17.3 Tests by writing a file, as is_writable() can call a writable network share read-only
 	 */
 	protected function is_temporary_folder_writable(): array {
-		$is_writable = wp_is_writable( $this->data->mpdf_tmp_location );
+		$is_writable = $this->misc->is_directory_writable( $this->data->mpdf_tmp_location );
 
 		$string = $is_writable ? __( 'Writable', 'gravityforms' ) : __( 'Not writable', 'gravityforms' );
 		$icon   = $this->getController()->view->get_icon( $is_writable );

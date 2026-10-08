@@ -808,6 +808,18 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertSame( [ $data->template_tmp_location, '/srv/pdf-tmp' ], $locations );
 	}
 
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_is_directory_writable() {
+		$tmp = \GPDFAPI::get_data_class()->template_tmp_location;
+
+		$this->assertTrue( $this->misc->is_directory_writable( $tmp ) );
+		$this->assertSame( [], glob( $tmp . '.gfpdf-write-test-*' ) );
+
+		$this->assertFalse( $this->misc->is_directory_writable( $tmp . 'does-not-exist' ) );
+	}
+
 	public function test_rmdir() {
 		/* Create our test data */
 		$data = \GPDFAPI::get_data_class();
