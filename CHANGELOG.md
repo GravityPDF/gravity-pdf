@@ -19,6 +19,7 @@
 * 🐞 Bug: Keep the slash between the site URL and the path when converting a file under the site root, but outside the uploads and wp-content folders, to a URL
 * 🐞 Bug: Fix the "Temporary files directory is not writable" error on network storage, and create mPDF's cache folders before a PDF needs them
 * 🐞 Bug: Stop the "does not have write permission" admin notice and the System Report reporting a writable network storage folder as not writable
+* 🧹 Housekeeping: The "does not have write permission" notice can now be dismissed for a week, comes back sooner if the problem goes away and returns, and shows to users who can view the PDF settings. The System Status report tests the folders each time it's viewed
 * 🐞 Bug: Adding, editing or deleting a font now clears only that font's cached data, instead of every font's and the temporary files of PDFs being generated at the time
 * 💻 Developer: Global settings fields can set a `sanitize_callback` to replace the default sanitizing
 * 💻 Developer: mPDF's cache moves from `tmp/mpdf/mpdf` to `tmp/mpdf`, as the default `gfpdf_mpdf_tmp_location` is now the PDF tmp folder

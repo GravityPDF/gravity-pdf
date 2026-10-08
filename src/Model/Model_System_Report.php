@@ -12,6 +12,7 @@ use GFPDF\Helper\Helper_Templates;
 use GFPDF\Statics\Deprecation;
 use GFPDF\View\View_System_Report;
 use GFPDF_Major_Compatibility_Checks;
+use GPDFAPI;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -227,7 +228,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$memory                 = $this->get_memory_limit();
 		$allow_url_fopen        = $this->get_allow_url_fopen();
 		$temp_folder_protected  = $this->check_temp_folder_permission();
-		$temp_folder_permission = $this->is_temporary_folder_writable();
+		$unwritable_folders     = GPDFAPI::get_mvc_class( 'Model_Install' )->check_folder_permissions();
+		$temp_folder_permission = $this->is_temporary_folder_writable( $unwritable_folders );
 
 		/* Keyed by group, which is what the matching report sections are named after */
 		foreach ( Deprecation::group_signals( Deprecation::refresh_signals() ) as $group => $signals ) {
@@ -294,6 +296,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 				'value'        => $temp_folder_permission['value'],
 				'value_export' => $temp_folder_permission['value_export'],
 			],
+
+			'folder_permissions'        => $this->get_folder_permissions( $unwritable_folders ),
 
 			'temp_folder_protected'     => [
 				'label'        => esc_html__( 'Temporary Folder protected', 'gravity-pdf' ),
@@ -539,10 +543,19 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 	/**
 	 * @since 6.0
-	 * @since 6.17.3 Tests by writing a file, as is_writable() can call a writable network share read-only
+	 * @since 6.17.3 Reads the folder check, which tests by writing a file, as is_writable() can call a writable
+	 *               network share read-only
 	 */
-	protected function is_temporary_folder_writable(): array {
-		$is_writable = $this->misc->is_directory_writable( $this->data->mpdf_tmp_location );
+	protected function is_temporary_folder_writable( array $unwritable_folders ): array {
+		$mpdf_tmp    = trailingslashit( $this->data->mpdf_tmp_location );
+		$is_writable = true;
+
+		/* The folder check covers the mPDF tmp folder, or the PDF tmp folder it sits in */
+		foreach ( $unwritable_folders as $dir ) {
+			if ( strpos( $mpdf_tmp, trailingslashit( $dir ) ) === 0 ) {
+				$is_writable = false;
+			}
+		}
 
 		$string = $is_writable ? __( 'Writable', 'gravityforms' ) : __( 'Not writable', 'gravityforms' );
 		$icon   = $this->getController()->view->get_icon( $is_writable );
@@ -550,6 +563,25 @@ class Model_System_Report extends Helper_Abstract_Model {
 		return [
 			'value'        => $string . $icon,
 			'value_export' => $is_writable ? 'Writable' : 'Not writable',
+		];
+	}
+
+	/**
+	 * The folders the check made for this report couldn't write to. Running it here also clears a fixed folder from the
+	 * admin notice
+	 *
+	 * @param string[] $folders
+	 *
+	 * @since 6.17.3
+	 */
+	protected function get_folder_permissions( array $folders ): array {
+		$relative = array_map( [ $this->misc, 'relative_path' ], $folders );
+
+		return [
+			'label'        => esc_html__( 'Folder permissions', 'gravity-pdf' ),
+			'label_export' => 'Folder permissions',
+			'value'        => $this->getController()->view->get_folder_permissions( $relative ),
+			'value_export' => $folders === [] ? 'Writable' : 'Not writable: ' . implode( ', ', $folders ),
 		];
 	}
 

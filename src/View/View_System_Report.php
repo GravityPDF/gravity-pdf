@@ -117,6 +117,22 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
+	 * @param string[] $folders The folders that can't be written to, relative to the site
+	 *
+	 * @since 6.17.3
+	 */
+	public function get_folder_permissions( array $folders ): string {
+		$writable = $folders === [];
+		$output   = ( $writable ? esc_html__( 'Writable', 'gravity-pdf' ) : esc_html__( 'Not writable', 'gravity-pdf' ) ) . ' ' . $this->get_icon( $writable );
+
+		foreach ( $folders as $folder ) {
+			$output .= '<br /><code>' . esc_html( $folder ) . '</code>';
+		}
+
+		return $output;
+	}
+
+	/**
 	 * Prepare message for outdated template file(s)
 	 *
 	 * @param string $path The path to the outdated PDF template file

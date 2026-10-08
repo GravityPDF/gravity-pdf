@@ -34,6 +34,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Install extends Helper_Abstract_Model {
 
 	/**
+	 * The option check_folder_permissions() stores the folders it couldn't write to in, each with when it started failing
+	 *
+	 * @since 6.17.3
+	 */
+	const UNWRITABLE_FOLDERS = 'gfpdf_unwritable_folders';
+
+	/**
 	 * Holds our log class
 	 *
 	 * @var LoggerInterface
@@ -269,14 +276,15 @@ class Model_Install extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Test writing to each folder, and store the ones that fail for create_folder_structures() to show a notice about.
-	 * Run on install, upgrade and the tmp cleanup cron, not on every request.
+	 * Test writing to each folder, and store the ones that fail for the dismissible notice in Controller_Actions.
+	 * Run on install, upgrade, the tmp cleanup cron and the system report, not on every request.
 	 *
-	 * @return void
+	 * @return string[] The folders that can't be written to
 	 *
 	 * @since 6.17.3
 	 */
-	public function check_folder_permissions(): void {
+	public function check_folder_permissions(): array {
+		$previous   = (array) get_option( self::UNWRITABLE_FOLDERS, [] );
 		$unwritable = [];
 
 		foreach ( $this->get_folders() as $dir ) {
@@ -288,11 +296,14 @@ class Model_Install extends Helper_Abstract_Model {
 					]
 				);
 
-				$unwritable[] = $dir;
+				/* Keep when it started failing, so a dismissal of this run of failures still holds */
+				$unwritable[ $dir ] = $previous[ $dir ] ?? time();
 			}
 		}
 
-		update_option( 'gfpdf_unwritable_folders', $unwritable, true );
+		update_option( self::UNWRITABLE_FOLDERS, $unwritable, true );
+
+		return array_keys( $unwritable );
 	}
 
 	/**
@@ -302,7 +313,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 * @since 4.0
-	 * @since 6.17.3 The write permission notice comes from check_folder_permissions()
+	 * @since 6.17.3 The write permission notice moved to Controller_Actions
 	 *
 	 */
 	public function create_folder_structures() {
@@ -312,23 +323,17 @@ class Model_Install extends Helper_Abstract_Model {
 			return null;
 		}
 
-		$unwritable = (array) get_option( 'gfpdf_unwritable_folders', [] );
-
 		/* create the required folder structure, or throw error */
 		foreach ( $this->get_folders() as $dir ) {
-			if ( ! is_dir( $dir ) ) {
-				if ( ! wp_mkdir_p( $dir ) ) {
-					$this->log->error(
-						'Failed Creating Folder Structure',
-						[
-							'dir' => $dir,
-						]
-					);
+			if ( ! is_dir( $dir ) && ! wp_mkdir_p( $dir ) ) {
+				$this->log->error(
+					'Failed Creating Folder Structure',
+					[
+						'dir' => $dir,
+					]
+				);
 
-					$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
-				}
-			} elseif ( in_array( $dir, $unwritable, true ) ) {
-				$this->notices->add_error( sprintf( esc_html__( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
+				$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 			}
 		}
 

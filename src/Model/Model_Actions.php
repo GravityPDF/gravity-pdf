@@ -38,6 +38,20 @@ class Model_Actions extends Helper_Abstract_Model {
 	const DEPRECATED_FEATURE_DISMISSAL = 'deprecated_feature_';
 
 	/**
+	 * The prefix each unwritable folder's dismissal is recorded under in `action_dismissal`
+	 *
+	 * @since 6.17.3
+	 */
+	const UNWRITABLE_FOLDER_DISMISSAL = 'unwritable_folder_';
+
+	/**
+	 * How long dismissing the unwritable folders notice hides a folder that keeps failing
+	 *
+	 * @since 6.17.3
+	 */
+	const UNWRITABLE_FOLDER_SNOOZE = WEEK_IN_SECONDS;
+
+	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
@@ -87,21 +101,27 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Check if the current notice has already been dismissed
 	 *
-	 * @param string $type The current notice ID
+	 * @param string $type  The current notice ID
+	 * @param int    $since Only count a dismissal made at or after this time
+	 * @param int    $ttl   Only count a dismissal made in the last $ttl seconds
 	 *
 	 * @return boolean       True if dismissed, false otherwise
 	 *
 	 * @since 4.0
+	 * @since 6.17.3 Added $since and $ttl
 	 */
-	public function is_notice_already_dismissed( $type ) {
+	public function is_notice_already_dismissed( $type, int $since = 0, int $ttl = 0 ) {
 
 		$dismissed_notices = $this->options->get_option( 'action_dismissal', [] );
 
-		if ( isset( $dismissed_notices[ $type ] ) ) {
-			return true;
+		if ( ! isset( $dismissed_notices[ $type ] ) ) {
+			return false;
 		}
 
-		return false;
+		/* Dismissals before 6.17.3 recorded the notice ID rather than when */
+		$dismissed_at = is_int( $dismissed_notices[ $type ] ) ? $dismissed_notices[ $type ] : 0;
+
+		return $dismissed_at >= $since && ( $ttl === 0 || $dismissed_at >= time() - $ttl );
 	}
 
 	/**
@@ -134,7 +154,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		$dismissed_notices = $this->options->get_option( 'action_dismissal', [] );
 
 		foreach ( $types as $type ) {
-			$dismissed_notices[ $type ] = $type;
+			$dismissed_notices[ $type ] = time();
 		}
 
 		$this->options->update_option( 'action_dismissal', $dismissed_notices );
@@ -234,6 +254,50 @@ class Model_Actions extends Helper_Abstract_Model {
 				$this->get_undismissed_deprecated_features()
 			)
 		);
+	}
+
+	/**
+	 * The folders the last Model_Install::check_folder_permissions() couldn't write to, less the ones dismissed
+	 *
+	 * @return string[]
+	 * @since 6.17.3
+	 */
+	public function get_undismissed_unwritable_folders(): array {
+		$folders = [];
+
+		/* A dismissal only covers the failure it was made during, and only for a week */
+		foreach ( (array) get_option( Model_Install::UNWRITABLE_FOLDERS, [] ) as $dir => $failing_since ) {
+			if ( ! $this->is_notice_already_dismissed( $this->get_unwritable_folder_dismissal( $dir ), (int) $failing_since, static::UNWRITABLE_FOLDER_SNOOZE ) ) {
+				$folders[] = $dir;
+			}
+		}
+
+		return $folders;
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function has_unwritable_folders(): bool {
+		return $this->get_undismissed_unwritable_folders() !== [];
+	}
+
+	/**
+	 * Dismiss each folder the notice was listing, until a week passes or the folder recovers and fails again
+	 *
+	 * @since 6.17.3
+	 */
+	public function dismiss_unwritable_folders(): void {
+		$this->dismiss_notices( array_map( [ $this, 'get_unwritable_folder_dismissal' ], $this->get_undismissed_unwritable_folders() ) );
+	}
+
+	/**
+	 * The ID a folder's dismissal is recorded under in `action_dismissal`
+	 *
+	 * @since 6.17.3
+	 */
+	protected function get_unwritable_folder_dismissal( string $dir ): string {
+		return static::UNWRITABLE_FOLDER_DISMISSAL . md5( $dir );
 	}
 
 	/**
