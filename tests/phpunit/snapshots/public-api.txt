@@ -405,7 +405,7 @@ abstract class GFPDF\Helper\Helper_Abstract_Pdf_Shortcode extends GFPDF\Helper\H
     protected $options
     protected $url_signer
     protected function add_entry_id_to_shortcode($text, $entry_id)
-    protected function consume_trusted_entry($entry_id)
+    protected function add_shortcode_signing_token($code)
     protected function get_entry_id_if_empty($entry_id)
     protected function get_pdf_config($entry_id, $pdf_id)
     protected function get_trust()
@@ -413,6 +413,7 @@ abstract class GFPDF\Helper\Helper_Abstract_Pdf_Shortcode extends GFPDF\Helper\H
     public function add_shortcode_attr($code, $attr, $value)
     public function do_trusted_shortcode($shortcode, $entry_id)
     public function get_shortcode_information($shortcode, $text)
+    public function get_shortcode_signing_token($pdf_id, $entry_id)
     public function gravitypdf_confirmation($confirmation, $form, $entry)
     public function gravitypdf_gravityview_custom($html)
     public function gravitypdf_notification($notification, $form, $entry)
@@ -420,7 +421,6 @@ abstract class GFPDF\Helper\Helper_Abstract_Pdf_Shortcode extends GFPDF\Helper\H
     public function gravitypdf_redirect_confirmation($form)
     public function gravitypdf_redirect_confirmation_shortcode_processing($confirmation, $form, $entry)
     public function gravitypdf_trust_administrative_field_shortcodes($text, $form, $entry)
-    public function mark_entry_as_trusted($entry_id)
 
 interface GFPDF\Helper\Helper_Interface_Actions
     abstract public function add_actions()
@@ -894,6 +894,7 @@ class GFPDF\Model\Model_Shortcodes extends GFPDF\Helper\Helper_Abstract_Pdf_Shor
     public function add_shortcode_attr($code, $attr, $value)
     public function do_trusted_shortcode($shortcode, $entry_id)
     public function get_shortcode_information($shortcode, $text)
+    public function get_shortcode_signing_token($pdf_id, $entry_id)
     public function gravitypdf_confirmation($confirmation, $form, $entry)
     public function gravitypdf_gravityview_custom($html)
     public function gravitypdf_notification($notification, $form, $entry)
@@ -901,7 +902,6 @@ class GFPDF\Model\Model_Shortcodes extends GFPDF\Helper\Helper_Abstract_Pdf_Shor
     public function gravitypdf_redirect_confirmation($form)
     public function gravitypdf_redirect_confirmation_shortcode_processing($confirmation, $form, $entry)
     public function gravitypdf_trust_administrative_field_shortcodes($text, $form, $entry)
-    public function mark_entry_as_trusted($entry_id)
     public function process($attributes)
     public static function __callStatic($name, $arguments)
 

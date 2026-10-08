@@ -16,8 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Tracks which [gravitypdf] shortcodes and PDF merge tags may be signed without checking the user can view the entry,
- * because they came from content the plugin or a form editor wrote rather than a submitter
+ * Tracks which PDF merge tags may be signed without checking the user can view the entry, because they came from
+ * content the plugin or a form editor wrote rather than a submitter, and whether a PDF is being rendered or
+ * user-submitted content processed
  *
  * @since 6.17.3
  */
@@ -38,6 +39,14 @@ class Model_Signed_Url_Trust {
 	 * @since 6.17.3
 	 */
 	protected $untrusted_depth = 0;
+
+	/**
+	 * The entries whose PDFs are being rendered, innermost last
+	 *
+	 * @var int[]
+	 * @since 6.17.3
+	 */
+	protected $rendering_entry_ids = [];
 
 	/**
 	 * @param string $key
@@ -72,32 +81,6 @@ class Model_Signed_Url_Trust {
 	}
 
 	/**
-	 * Run the callback with one grant, which is removed afterwards if the callback didn't use it
-	 *
-	 * @param string   $key
-	 * @param callable $callback
-	 *
-	 * @return mixed The callback's return value
-	 *
-	 * @since 6.17.3
-	 */
-	public function run_granted( $key, callable $callback ) {
-		$before = $this->grants[ $key ] ?? 0;
-
-		$this->grant( $key );
-
-		try {
-			return $callback();
-		} finally {
-			if ( $before > 0 ) {
-				$this->grants[ $key ] = $before;
-			} else {
-				unset( $this->grants[ $key ] );
-			}
-		}
-	}
-
-	/**
 	 * Run the callback without granting trust to anything it processes
 	 *
 	 * @param callable $callback
@@ -123,6 +106,45 @@ class Model_Signed_Url_Trust {
 	 */
 	public function is_untrusted() {
 		return $this->untrusted_depth > 0;
+	}
+
+	/**
+	 * Run the callback while rendering an entry's PDF, or merging its field content, which mixes what form editors and
+	 * submitters wrote
+	 *
+	 * @param int      $entry_id
+	 * @param callable $callback
+	 *
+	 * @return mixed The callback's return value
+	 *
+	 * @since 6.17.3
+	 */
+	public function run_rendering_pdf( $entry_id, callable $callback ) {
+		$this->rendering_entry_ids[] = (int) $entry_id;
+
+		try {
+			return $callback();
+		} finally {
+			array_pop( $this->rendering_entry_ids );
+		}
+	}
+
+	/**
+	 * @return bool Whether a PDF is being rendered
+	 *
+	 * @since 6.17.3
+	 */
+	public function is_rendering_pdf() {
+		return ! empty( $this->rendering_entry_ids );
+	}
+
+	/**
+	 * @return int The entry whose PDF is being rendered, or 0 when there isn't one
+	 *
+	 * @since 6.17.3
+	 */
+	public function get_rendering_entry_id() {
+		return (int) end( $this->rendering_entry_ids );
 	}
 
 	/**

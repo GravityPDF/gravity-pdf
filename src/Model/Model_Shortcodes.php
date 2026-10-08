@@ -66,6 +66,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 				'entry'   => '',
 				'print'   => '',
 				'raw'     => '',
+				'token'   => '',
 			],
 			$attributes,
 			static::SHORTCODE
@@ -78,9 +79,6 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			$original_entry_id   = $attributes['entry'];
 			$attributes['entry'] = $this->get_entry_id_if_empty( $original_entry_id );
 
-			/* Use up the entry's trust now, so a shortcode that fails validation can't leave it for a later one */
-			$trusted = ! empty( $original_entry_id ) && $this->consume_trusted_entry( $attributes['entry'] );
-
 			/* Do PDF validation */
 			$settings = $this->get_pdf_config( $attributes['entry'], $attributes['id'] );
 
@@ -91,11 +89,11 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 			/* Sign the URL to allow direct access to the PDF until it expires (only for an entry ID set on the shortcode) */
-			if ( ! empty( $attributes['signed'] ) && ! empty( $original_entry_id ) && ( $trusted || $this->can_sign_url( $attributes['entry'], $settings ) ) ) {
+			if ( ! empty( $attributes['signed'] ) && ! empty( $original_entry_id ) && $this->can_sign_shortcode( $attributes, $settings ) ) {
 				$attributes['url'] = $this->url_signer->sign( $attributes['url'], $attributes['expires'] );
 			}
 
-			$this->log->notice( 'Generating Shortcode Markup', [ 'attr' => $attributes ] );
+			$this->log->notice( 'Generating Shortcode Markup', [ 'attr' => array_diff_key( $attributes, [ 'token' => '' ] ) ] );
 
 			if ( $raw ) {
 				return $attributes['url'];
@@ -117,7 +115,30 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	}
 
 	/**
-	 * Only sign an untrusted entry the shortcode's author can view
+	 * Whether the shortcode's entry can be signed
+	 *
+	 * @param array $attributes
+	 * @param array $settings   The PDF settings
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	protected function can_sign_shortcode( $attributes, $settings ) {
+		if ( is_string( $attributes['token'] ) && $attributes['token'] !== '' && hash_equals( $this->get_shortcode_signing_token( $attributes['id'], $attributes['entry'] ), $attributes['token'] ) ) {
+			return true;
+		}
+
+		/* Inside a PDF, only the PDF's own entry signs without a signature */
+		if ( $this->get_trust()->is_rendering_pdf() ) {
+			return (int) $attributes['entry'] === $this->get_trust()->get_rendering_entry_id();
+		}
+
+		return $this->can_sign_url( $attributes['entry'], $settings );
+	}
+
+	/**
+	 * Without a valid `token`, only sign an entry the shortcode's author can view
 	 *
 	 * @param int   $entry_id
 	 * @param array $settings The PDF settings
