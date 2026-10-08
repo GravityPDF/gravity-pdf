@@ -78,6 +78,13 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	protected $url_signer;
 
 	/**
+	 * Above zero while Gravity Forms saves an entry, so PDF merge tags in administrative field defaults are kept for later
+	 *
+	 * @var int
+	 */
+	private $resolving_defaults_depth = 0;
+
+	/**
 	 * Model_Mergetags constructor.
 	 *
 	 * @param Helper_Abstract_Options $options
@@ -142,10 +149,10 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * Replace the Gravity PDF merge tag ({NAME:pdf:ID}) with the associated PDF URL
 	 *
-	 * @param string $text       The string to convert
-	 * @param array  $form       The Gravity Form array
-	 * @param array  $entry      The Gravity Forms entry array
-	 * @param bool   $url_encode Whether to encode the URL or not
+	 * @param string      $text       The string to convert
+	 * @param array|false $form       The Gravity Form array
+	 * @param array|false $entry      The Gravity Forms entry array, or false before the entry exists
+	 * @param bool        $url_encode Whether to encode the URL or not
 	 *
 	 * @return string
 	 *
@@ -155,6 +162,11 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 		/* Check if there are any PDF merge tags to process, otherwise exit early */
 		if ( strpos( $text, ':pdf:' ) === false ) {
+			return $text;
+		}
+
+		/* Leave the tags in an administrative field's default for when there's an entry */
+		if ( ( $form === false || $entry === false ) && $this->resolving_defaults_depth > 0 ) {
 			return $text;
 		}
 
@@ -259,6 +271,30 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		return $text;
+	}
+
+	/**
+	 * Keep PDF merge tags in administrative field defaults while Gravity Forms saves the entry
+	 *
+	 * @param mixed $entry_id The filtered entry ID, returned unchanged
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function start_resolving_administrative_defaults( $entry_id ) {
+		++$this->resolving_defaults_depth;
+
+		return $entry_id;
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @since 6.17.3
+	 */
+	public function stop_resolving_administrative_defaults() {
+		$this->resolving_defaults_depth = max( 0, $this->resolving_defaults_depth - 1 );
 	}
 
 	/**

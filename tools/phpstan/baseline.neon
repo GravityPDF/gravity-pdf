@@ -1645,18 +1645,6 @@ parameters:
 			path: ../../src/Model/Model_Mergetags.php
 
 		-
-			message: '#^Result of \|\| is always false\.$#'
-			identifier: booleanOr.alwaysFalse
-			count: 1
-			path: ../../src/Model/Model_Mergetags.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between array and false will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 2
-			path: ../../src/Model/Model_Mergetags.php
-
-		-
 			message: '#^Call to function method_exists\(\) with ''\\\\GP_Populate…'' and ''populate_form'' will always evaluate to false\.$#'
 			identifier: function.impossibleType
 			count: 1
