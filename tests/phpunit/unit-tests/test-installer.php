@@ -277,15 +277,18 @@ class Test_Installer extends WP_UnitTestCase {
 		$gfpdf->notices->clear();
 
 		$model->check_folder_permissions();
-		$this->assertSame( [ $font_location ], get_option( 'gfpdf_unwritable_folders' ) );
+		$this->assertSame( [ $font_location ], array_keys( get_option( Model_Install::UNWRITABLE_FOLDERS ) ) );
 
-		/* Requests show the stored result, without writing to the folders */
+		/* A folder that keeps failing keeps the time it started failing */
+		update_option( Model_Install::UNWRITABLE_FOLDERS, [ $font_location => 1000 ] );
+		$model->check_folder_permissions();
+		$this->assertSame( [ $font_location => 1000 ], get_option( Model_Install::UNWRITABLE_FOLDERS ) );
+
+		/* Requests don't write to the folders */
 		$misc->expects( $this->never() )->method( 'is_directory_writable' );
 		$model->create_folder_structures();
-		$this->assertTrue( $gfpdf->notices->has_error() );
 
-		$gfpdf->notices->clear();
-		delete_option( 'gfpdf_unwritable_folders' );
+		delete_option( Model_Install::UNWRITABLE_FOLDERS );
 	}
 
 	/**

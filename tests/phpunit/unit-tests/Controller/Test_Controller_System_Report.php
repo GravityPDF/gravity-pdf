@@ -2,6 +2,7 @@
 
 namespace GFPDF\Controller;
 
+use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
@@ -55,6 +56,7 @@ class Test_Controller_System_Report extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'temp_folder_location', $directories );
 		$this->assertArrayHasKey( 'temp_folder_permission', $directories );
 		$this->assertArrayHasKey( 'temp_folder_protected', $directories );
+		$this->assertArrayHasKey( 'folder_permissions', $directories );
 		$this->assertArrayHasKey( 'mpdf_temp_folder_location', $directories );
 
 		$this->assertArrayHasKey( 'pdf_entry_list_action', $global );
@@ -189,6 +191,42 @@ class Test_Controller_System_Report extends WP_UnitTestCase {
 		$system_report = apply_filters( 'gform_system_report', [] );
 
 		$this->assertCount( 4, $system_report[0]['tables'] );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_folder_permissions_tests_the_folders_when_the_report_is_built() {
+		global $gfpdf;
+
+		/* A folder that failed the last check, and has been fixed since */
+		update_option( Model_Install::UNWRITABLE_FOLDERS, [ '/srv/fixed-since/' => time() ] );
+
+		$row = $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) )['folder_permissions'];
+		$this->assertSame( 'Writable', $row['value_export'] );
+		$this->assertSame( [], get_option( Model_Install::UNWRITABLE_FOLDERS ) );
+
+		$dir       = \GPDFAPI::get_data_class()->template_tmp_location;
+		$installer = $gfpdf->singleton->get_class( 'Model_Install' );
+
+		/* The registry keys classes by their short name, so the mock takes the installer's place */
+		$failing = $this->getMockBuilder( Model_Install::class )
+			->disableOriginalConstructor()
+			->setMockClassName( 'Model_Install' )
+			->onlyMethods( [ 'check_folder_permissions' ] )
+			->getMock();
+		$failing->method( 'check_folder_permissions' )->willReturn( [ $dir ] );
+		$gfpdf->singleton->add_class( $failing );
+
+		$directories = $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) );
+
+		$gfpdf->singleton->add_class( $installer );
+		$row = $directories['folder_permissions'];
+
+		/* The mPDF tmp folder sits in the PDF tmp folder, so its row reads the same result */
+		$this->assertSame( 'Not writable', $directories['temp_folder_permission']['value_export'] );
+		$this->assertSame( 'Not writable: ' . $dir, $row['value_export'] );
+		$this->assertStringContainsString( 'Not writable', $row['value'] );
 	}
 
 	public function test_site_health_test_is_registered() {
