@@ -40,6 +40,14 @@ class Model_Signed_Url_Trust {
 	protected $untrusted_depth = 0;
 
 	/**
+	 * Above zero while administrative field defaults are resolved, so their PDF merge tags are kept for later
+	 *
+	 * @var int
+	 * @since 6.17.3
+	 */
+	protected $resolving_defaults_depth = 0;
+
+	/**
 	 * @param string $key
 	 *
 	 * @return void
@@ -123,6 +131,33 @@ class Model_Signed_Url_Trust {
 	 */
 	public function is_untrusted() {
 		return $this->untrusted_depth > 0;
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @since 6.17.3
+	 */
+	public function start_resolving_defaults() {
+		++$this->resolving_defaults_depth;
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @since 6.17.3
+	 */
+	public function stop_resolving_defaults() {
+		$this->resolving_defaults_depth = max( 0, $this->resolving_defaults_depth - 1 );
+	}
+
+	/**
+	 * @return bool Whether administrative field defaults are being resolved
+	 *
+	 * @since 6.17.3
+	 */
+	public function is_resolving_defaults() {
+		return $this->resolving_defaults_depth > 0;
 	}
 
 	/**

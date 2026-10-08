@@ -63,6 +63,45 @@ class Test_Model_Mergetags extends TestCase {
 	public function test_filters() {
 		$this->assertSame( 10, has_filter( 'gform_replace_merge_tags', [ $this->model, 'process_pdf_mergetags' ] ) );
 		$this->assertSame( 10, has_filter( 'gform_custom_merge_tags', [ $this->model, 'add_pdf_mergetags' ] ) );
+		$this->assertSame( 9999, has_filter( 'gform_entry_id_pre_save_lead', [ $this->model, 'start_resolving_administrative_defaults' ] ) );
+		$this->assertSame( 1, has_action( 'gform_entry_created', [ $this->model, 'stop_resolving_administrative_defaults' ] ) );
+	}
+
+	public function test_pdf_mergetag_without_an_entry_is_kept_only_while_resolving_defaults() {
+		$tag = '{Label:pdf:556690c67856b}';
+
+		$this->assertSame( 'PDF: ', $this->model->process_pdf_mergetags( "PDF: $tag", false, false, false ) );
+
+		$this->assertSame( 7, $this->model->start_resolving_administrative_defaults( 7 ) );
+		$this->assertSame( "PDF: $tag", $this->model->process_pdf_mergetags( "PDF: $tag", false, false, false ) );
+
+		$this->model->stop_resolving_administrative_defaults();
+		$this->assertSame( 'PDF: ', $this->model->process_pdf_mergetags( "PDF: $tag", false, false, false ) );
+	}
+
+	public function test_submitted_entry_keeps_pdf_mergetags_in_an_administrative_default() {
+		$form_id = \GFAPI::add_form(
+			[
+				'title'  => 'Administrative Default',
+				'fields' => [
+					[ 'id' => 1, 'type' => 'text', 'label' => 'Name' ],
+					[ 'id' => 2, 'type' => 'textarea', 'label' => 'Links', 'visibility' => 'administrative', 'defaultValue' => '' ],
+				],
+			]
+		);
+
+		$pdf_id = $this->gf_factory()->pdf->set_form_id( $form_id )->create();
+		$tags   = "{Document:pdf:$pdf_id}\n{Document:pdf:$pdf_id:signed}";
+
+		$form                           = \GFAPI::get_form( $form_id );
+		$form['fields'][1]->defaultValue = $tags;
+		\GFAPI::update_form( $form );
+
+		$result = \GFAPI::submit_form( $form_id, [ 'input_1' => 'Jake' ] );
+
+		$this->assertTrue( $result['is_valid'] );
+		$this->assertSame( $tags, \GFAPI::get_entry( $result['entry_id'] )['2'] );
+		$this->assertFalse( GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->is_resolving_defaults() );
 	}
 
 	/**

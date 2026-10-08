@@ -55,6 +55,15 @@ class Test_Model_Signed_Url_Trust extends TestCase {
 		$this->assertFalse( $this->trust->is_untrusted() );
 	}
 
+	public function test_resolving_defaults() {
+		/* An unmatched stop can't go below zero */
+		$this->trust->stop_resolving_defaults();
+		$this->trust->start_resolving_defaults();
+		$this->assertTrue( $this->trust->is_resolving_defaults() );
+		$this->trust->stop_resolving_defaults();
+		$this->assertFalse( $this->trust->is_resolving_defaults() );
+	}
+
 	public function test_only_the_tags_in_an_administrative_default_are_trusted() {
 		$field = new GF_Field_Text( [ 'id' => 1, 'visibility' => 'administrative', 'defaultValue' => 'Hi {Name:1} [gravitypdf id="1" text="{entry_id}"] {user:display_name}' ] );
 

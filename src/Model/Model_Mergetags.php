@@ -158,6 +158,11 @@ class Model_Mergetags extends Helper_Abstract_Model {
 			return $text;
 		}
 
+		/* Leave the tags in an administrative field's default for when there's an entry */
+		if ( ( $form === false || $entry === false ) && $this->get_trust()->is_resolving_defaults() ) {
+			return $text;
+		}
+
 		/* Match our PDF merge tags */
 		$results = preg_match_all( static::PDF_MERGETAG_REGEX, $text, $matches, PREG_SET_ORDER );
 
@@ -259,6 +264,30 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		return $text;
+	}
+
+	/**
+	 * Keep PDF merge tags in administrative field defaults while Gravity Forms saves the entry
+	 *
+	 * @param mixed $entry_id The filtered entry ID, returned unchanged
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function start_resolving_administrative_defaults( $entry_id ) {
+		$this->get_trust()->start_resolving_defaults();
+
+		return $entry_id;
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @since 6.17.3
+	 */
+	public function stop_resolving_administrative_defaults() {
+		$this->get_trust()->stop_resolving_defaults();
 	}
 
 	/**

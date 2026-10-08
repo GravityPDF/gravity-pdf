@@ -63,6 +63,10 @@ class Controller_Mergetags extends Helper_Abstract_Controller implements Helper_
 		add_filter( 'gform_replace_merge_tags', [ $this->model, 'process_pdf_mergetags' ], 10, 4 );
 		add_filter( 'gform_custom_merge_tags', [ $this->model, 'add_pdf_mergetags' ], 10, 2 );
 
+		/* Gravity Forms saves a submitted entry between these hooks (GravityView Edit Entry skips them) */
+		add_filter( 'gform_entry_id_pre_save_lead', [ $this->model, 'start_resolving_administrative_defaults' ], 9999 );
+		add_action( 'gform_entry_created', [ $this->model, 'stop_resolving_administrative_defaults' ], 1 );
+
 		add_filter( 'gform_field_map_choices', [ $this->model, 'add_field_map_choices' ], 10, 4 );
 		add_filter( 'gform_addon_field_value', [ $this->model, 'process_field_value' ], 10, 4 );
 		add_filter( 'gform_mailchimp_field_value', [ $this->model, 'process_field_value_mailchimp' ], 10, 4 );
