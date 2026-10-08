@@ -80,12 +80,13 @@ class Test_Model_Mergetags extends TestCase {
 	}
 
 	public function test_submitted_entry_keeps_pdf_mergetags_in_an_administrative_default() {
-		$form_id = \GFAPI::add_form(
+		$form_id = $this->gf_factory()->form->create(
+			[],
 			[
 				'title'  => 'Administrative Default',
 				'fields' => [
-					[ 'id' => 1, 'type' => 'text', 'label' => 'Name' ],
-					[ 'id' => 2, 'type' => 'textarea', 'label' => 'Links', 'visibility' => 'administrative', 'defaultValue' => '' ],
+					new \GF_Field_Text( [ 'id' => 1, 'label' => 'Name' ] ),
+					new \GF_Field_Textarea( [ 'id' => 2, 'label' => 'Links', 'visibility' => 'administrative' ] ),
 				],
 			]
 		);

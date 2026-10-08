@@ -142,10 +142,10 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * Replace the Gravity PDF merge tag ({NAME:pdf:ID}) with the associated PDF URL
 	 *
-	 * @param string $text       The string to convert
-	 * @param array  $form       The Gravity Form array
-	 * @param array  $entry      The Gravity Forms entry array
-	 * @param bool   $url_encode Whether to encode the URL or not
+	 * @param string      $text       The string to convert
+	 * @param array|false $form       The Gravity Form array
+	 * @param array|false $entry      The Gravity Forms entry array, or false before the entry exists
+	 * @param bool        $url_encode Whether to encode the URL or not
 	 *
 	 * @return string
 	 *
