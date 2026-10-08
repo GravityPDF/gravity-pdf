@@ -257,7 +257,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The folders the last Model_Install::check_folder_permissions() couldn't write to, less the ones dismissed
+	 * The folders the last Model_Install::create_folder_structures() couldn't create or write to, less the ones dismissed
 	 *
 	 * @return string[]
 	 * @since 6.17.3

@@ -213,9 +213,9 @@ class Test_Controller_System_Report extends WP_UnitTestCase {
 		$failing = $this->getMockBuilder( Model_Install::class )
 			->disableOriginalConstructor()
 			->setMockClassName( 'Model_Install' )
-			->onlyMethods( [ 'check_folder_permissions' ] )
+			->onlyMethods( [ 'create_folder_structures' ] )
 			->getMock();
-		$failing->method( 'check_folder_permissions' )->willReturn( [ $dir ] );
+		$failing->method( 'create_folder_structures' )->willReturn( [ $dir ] );
 		$gfpdf->singleton->add_class( $failing );
 
 		$directories = $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) );

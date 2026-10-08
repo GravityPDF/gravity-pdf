@@ -106,6 +106,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Validate uploaded file */
 		try {
+			$this->misc->create_folder( $this->data->template_tmp_location );
 			$storage  = new FileSystem( $this->data->template_tmp_location );
 			$file     = new File( 'template', $storage );
 			$zip_path = $this->move_template_to_tmp_dir( $file );

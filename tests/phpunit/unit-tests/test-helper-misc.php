@@ -820,6 +820,30 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertFalse( $this->misc->is_directory_writable( $tmp . 'does-not-exist' ) );
 	}
 
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_create_folder_protects_a_recreated_tmp_folder() {
+		$tmp = \GPDFAPI::get_data_class()->template_tmp_location;
+
+		$this->misc->rmdir( $tmp );
+
+		$this->assertTrue( $this->misc->create_folder( $tmp . 'f00d1234/' ) );
+		$this->assertDirectoryExists( $tmp . 'f00d1234' );
+		$this->assertFileExists( $tmp . '.htaccess' );
+		$this->assertFileExists( $tmp . 'index.html' );
+
+		$this->assertFalse( $this->misc->create_folder( $tmp . '.htaccess/sub' ) );
+
+		/* A folder that already existed is left to the installer */
+		wp_delete_file( $tmp . '.htaccess' );
+		$this->assertTrue( $this->misc->create_folder( $tmp . 'f00d1234/' ) );
+		$this->assertFileDoesNotExist( $tmp . '.htaccess' );
+
+		$this->misc->protect_tmp_folder();
+		$this->misc->rmdir( $tmp . 'f00d1234' );
+	}
+
 	public function test_rmdir() {
 		/* Create our test data */
 		$data = \GPDFAPI::get_data_class();

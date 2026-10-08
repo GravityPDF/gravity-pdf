@@ -346,10 +346,8 @@ class Helper_PDF {
 	public function save_pdf( $raw_pdf_string ) {
 
 		/* create our path */
-		if ( ! is_dir( $this->path ) ) {
-			if ( ! wp_mkdir_p( $this->path ) ) {
-				throw new Exception( sprintf( 'Could not create directory: %s', esc_html( $this->path ) ) );
-			}
+		if ( ! $this->misc->create_folder( $this->path ) ) {
+			throw new Exception( sprintf( 'Could not create directory: %s', esc_html( $this->path ) ) );
 		}
 
 		/* save our PDF */
