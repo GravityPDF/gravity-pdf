@@ -2,7 +2,6 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
@@ -83,8 +82,7 @@ class Controller_Upgrade_Routines {
 
 		if ( version_compare( $current_version, '6.17.3', '>=' ) && version_compare( $old_version, '6.17.3', '<' ) ) {
 			$this->fix_logged_out_timeout_out_of_range();
-			/* Empties tmp/mpdf, taking the cache mPDF kept a folder deeper before its tempDir became the tmp folder */
-			FlushCache::flush();
+			$this->remove_nested_mpdf_cache();
 		}
 
 		if ( version_compare( $current_version, '7.0.0-beta1', '>=' ) && version_compare( $old_version, '7.0.0-beta1', '<' ) ) {
@@ -129,6 +127,19 @@ class Controller_Upgrade_Routines {
 			$this->options->delete_option( 'logged_out_timeout' );
 		} elseif ( (int) $settings['logged_out_timeout'] > Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX ) {
 			$this->options->update_option( 'logged_out_timeout', Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX );
+		}
+	}
+
+	/**
+	 * Remove the cache mPDF kept a folder deeper, at tmp/mpdf/mpdf, before its tempDir became the tmp folder
+	 *
+	 * @since 6.17.3
+	 */
+	protected function remove_nested_mpdf_cache(): void {
+		$nested_cache = $this->data->mpdf_tmp_location . '/mpdf/mpdf';
+
+		if ( is_dir( $nested_cache ) ) {
+			$this->misc->rmdir( $nested_cache );
 		}
 	}
 
