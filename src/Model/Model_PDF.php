@@ -860,7 +860,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Create a PDF Link based on the current PDF settings and entry
 	 *
-	 * @param integer $pid          The PDF Form Settings ID
+	 * @param string  $pid          The PDF Form Settings ID
 	 * @param integer $id           The Gravity Form entry ID
 	 * @param boolean $download     Whether the PDF should be downloaded or not
 	 * @param boolean $should_print Whether we should mark the PDF to be printed
@@ -1353,6 +1353,18 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function get_form_data( $entry ) {
+
+		/* Field content is merged as it would be inside the PDF, so a shortcode in it isn't vouched for */
+		/** @var Model_Signed_Url_Trust $trust */
+		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+		if ( ! $trust->is_rendering_pdf() ) {
+			return $trust->run_rendering_pdf(
+				$entry['id'] ?? 0,
+				function () use ( $entry ) {
+					return $this->get_form_data( $entry );
+				}
+			);
+		}
 
 		$entry = apply_filters( 'gfpdf_entry_pre_form_data', $entry );
 

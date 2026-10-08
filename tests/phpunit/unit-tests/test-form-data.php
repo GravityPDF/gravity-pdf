@@ -1655,4 +1655,24 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertNotTrue( $repeater->maybe_show_section_title( true, $repeater->field, [ 'test.url', 'test2.url' ] ) );
 
 	}
+
+	public function test_html_block_cannot_vouch_for_an_entry_it_names() {
+		$set_content = function ( $form ) {
+			foreach ( $form['fields'] as $i => $field ) {
+				if ( (int) $field->id === 9 ) {
+					$form['fields'][ $i ]          = clone $field;
+					$form['fields'][ $i ]->content = '[gravitypdf id="abc" entry="5" signed="1"]';
+				}
+			}
+
+			return $form;
+		};
+
+		add_filter( 'gfpdf_current_form_object', $set_content );
+		$data = \GPDFAPI::get_form_data( $this->entries[0]['id'] );
+		remove_filter( 'gfpdf_current_form_object', $set_content );
+
+		$this->assertSame( '[gravitypdf id="abc" entry="5" signed="1"]', trim( $data['html_id'][9] ) );
+		$this->assertFalse( \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->is_rendering_pdf() );
+	}
 }

@@ -78,6 +78,13 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	protected $url_signer;
 
 	/**
+	 * Above zero while Gravity Forms saves an entry, so PDF merge tags in administrative field defaults are kept for later
+	 *
+	 * @var int
+	 */
+	private $resolving_defaults_depth = 0;
+
+	/**
 	 * Model_Mergetags constructor.
 	 *
 	 * @param Helper_Abstract_Options $options
@@ -142,10 +149,10 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * Replace the Gravity PDF merge tag ({NAME:pdf:ID}) with the associated PDF URL
 	 *
-	 * @param string $text       The string to convert
-	 * @param array  $form       The Gravity Form array
-	 * @param array  $entry      The Gravity Forms entry array
-	 * @param bool   $url_encode Whether to encode the URL or not
+	 * @param string      $text       The string to convert
+	 * @param array|false $form       The Gravity Form array
+	 * @param array|false $entry      The Gravity Forms entry array, or false before the entry exists
+	 * @param bool        $url_encode Whether to encode the URL or not
 	 *
 	 * @return string
 	 *
@@ -155,6 +162,11 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 		/* Check if there are any PDF merge tags to process, otherwise exit early */
 		if ( strpos( $text, ':pdf:' ) === false ) {
+			return $text;
+		}
+
+		/* Leave the tags in an administrative field's default for when there's an entry */
+		if ( ( $form === false || $entry === false ) && $this->resolving_defaults_depth > 0 ) {
 			return $text;
 		}
 
@@ -262,7 +274,39 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Keep PDF merge tags in administrative field defaults while Gravity Forms saves the entry
+	 *
+	 * @internal Hooked to gform_entry_id_pre_save_lead
+	 *
+	 * @param mixed $entry_id The filtered entry ID, returned unchanged
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function start_resolving_administrative_defaults( $entry_id ) {
+		++$this->resolving_defaults_depth;
+
+		return $entry_id;
+	}
+
+	/**
+	 * Stop keeping PDF merge tags once the entry is saved
+	 *
+	 * @internal Hooked to gform_entry_created
+	 *
+	 * @return void
+	 *
+	 * @since 6.17.3
+	 */
+	public function stop_resolving_administrative_defaults() {
+		$this->resolving_defaults_depth = max( 0, $this->resolving_defaults_depth - 1 );
+	}
+
+	/**
 	 * Trust the PDF merge tags in text before Gravity Forms merges in any field values
+	 *
+	 * @internal Hooked to gform_pre_replace_merge_tags
 	 *
 	 * @param mixed $text  The filtered text, which another callback may have changed to a non-string
 	 * @param array $form
@@ -293,7 +337,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 *
 	 * @since 6.17.3
 	 */
-	protected function get_trust_key( $entry, $tag ) {
+	private function get_trust_key( $entry, $tag ) {
 		return 'tag:' . (int) ( $entry['id'] ?? 0 ) . '|' . $tag;
 	}
 
@@ -302,7 +346,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 *
 	 * @since 6.17.3
 	 */
-	protected function get_trust() {
+	private function get_trust() {
 		return \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
 	}
 

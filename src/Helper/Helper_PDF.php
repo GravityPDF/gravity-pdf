@@ -8,11 +8,13 @@ use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Deprecation;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF\Helper\Mpdf\Mpdf;
+use GFPDF\Model\Model_Signed_Url_Trust;
 use GFPDF\Statics\Deprecation_V3;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
 use Psr\Log\LoggerInterface;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -262,18 +264,26 @@ class Helper_PDF {
 			return;
 		}
 
-		/* Load in our PHP template */
-		if ( empty( $html ) ) {
-			$html = $this->load_html( $args );
-		}
+		$render = function () use ( $args, $html, $form ) {
+			/* Load in our PHP template */
+			if ( empty( $html ) ) {
+				$html = $this->load_html( $args );
+			}
 
-		/* Apply our filters */
-		$html = Deprecation::apply_filters( 'gfpdfe_pdf_template', [ $html, $form['id'], $this->entry['id'], $args['settings'] ] );
-		$html = Deprecation::apply_filters( 'gfpdfe_pdf_template_' . $form['id'], [ $html, $this->entry['id'], $args['settings'] ], 'gfpdf_pdf_html_output_' . $form['id'] );
+			/* Apply our filters */
+			$html = Deprecation::apply_filters( 'gfpdfe_pdf_template', [ $html, $form['id'], $this->entry['id'], $args['settings'] ] );
+			$html = Deprecation::apply_filters( 'gfpdfe_pdf_template_' . $form['id'], [ $html, $this->entry['id'], $args['settings'] ], 'gfpdf_pdf_html_output_' . $form['id'] );
 
-		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
-		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
-		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
+			/* See https://docs.gravitypdf.com/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
+			$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
+
+			return apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
+		};
+
+		/* The template and its shortcodes run with the PDF's entry as the signing context */
+		/** @var Model_Signed_Url_Trust $trust */
+		$trust = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+		$html  = $trust->run_rendering_pdf( $this->entry['id'] ?? 0, $render );
 
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );

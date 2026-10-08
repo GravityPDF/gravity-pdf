@@ -3,6 +3,7 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Model\Model_Settings;
+use GFPDF\Tests\Concerns\UsesFactory;
 use GPDFAPI;
 use WP_UnitTestCase;
 
@@ -22,6 +23,7 @@ use WP_UnitTestCase;
  * @group api
  */
 class Test_API extends WP_UnitTestCase {
+	use UsesFactory;
 
 	/**
 	 * Check the correct class is returned
@@ -349,5 +351,43 @@ class Test_API extends WP_UnitTestCase {
 		$invalid_pdf = GPDFAPI::get_pdf_filename( $entry_id, 'does-not-exist' );
 		$this->assertInstanceOf( \WP_Error::class, $invalid_pdf );
 		$this->assertSame( 'invalid_pdf_setting', $invalid_pdf->get_error_code() );
+	}
+
+	public function test_get_pdf_url() {
+		$entry_id = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0]['id'];
+		$pdf      = GPDFAPI::get_mvc_class( 'Model_PDF' );
+
+		$this->assertSame( $pdf->get_pdf_url( '556690c67856b', $entry_id ), GPDFAPI::get_pdf_url( $entry_id, '556690c67856b' ) );
+		$this->assertSame( $pdf->get_pdf_url( '556690c67856b', $entry_id, true, true ), GPDFAPI::get_pdf_url( $entry_id, '556690c67856b', [ 'download' => true, 'print' => true ] ) );
+
+		/* A signed URL expires after the Logged Out Timeout, or when asked */
+		$signed = GPDFAPI::get_pdf_url( $entry_id, '556690c67856b', [ 'signed' => true ] );
+		$this->assertStringStartsWith( $pdf->get_pdf_url( '556690c67856b', $entry_id ), $signed );
+		$this->assertStringContainsString( 'signature=', $signed );
+
+		$week = GPDFAPI::get_pdf_url( $entry_id, '556690c67856b', [ 'signed' => true, 'expires' => '1 week' ] );
+		parse_str( (string) wp_parse_url( $week, PHP_URL_QUERY ), $query );
+		$this->assertEqualsWithDelta( strtotime( '+1 week' ), (int) $query['expires'], 60 );
+
+		$this->assertSame( 'invalid_entry', GPDFAPI::get_pdf_url( 0, '556690c67856b' )->get_error_code() );
+		$this->assertSame( 'invalid_pdf_setting', GPDFAPI::get_pdf_url( $entry_id, 'does-not-exist' )->get_error_code() );
+	}
+
+	public function test_get_pdf_url_needs_an_available_pdf() {
+		$form_id  = $this->gf_factory()->form->create( [], [ 'title' => 'Available PDF', 'fields' => [ new \GF_Field_Text( [ 'id' => 1, 'label' => 'Name' ] ) ] ] );
+		$entry_id = $this->gf_factory()->entry->create( [ 'form_id' => $form_id, '1' => 'Jake' ] );
+		$rule     = function ( $value ) {
+			return [
+				'actionType' => 'show',
+				'logicType'  => 'all',
+				'rules'      => [ [ 'fieldId' => '1', 'operator' => 'is', 'value' => $value ] ],
+			];
+		};
+
+		$pdfs = $this->gf_factory()->pdf->set_form_id( $form_id );
+
+		$this->assertSame( 'inactive', GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'active' => false ] ) )->get_error_code() );
+		$this->assertSame( 'conditional_logic', GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'conditionalLogic' => $rule( 'Someone else' ) ] ) )->get_error_code() );
+		$this->assertIsString( GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'conditionalLogic' => $rule( 'Jake' ) ] ) ) );
 	}
 }

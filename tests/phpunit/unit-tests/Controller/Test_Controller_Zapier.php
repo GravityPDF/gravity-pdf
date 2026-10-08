@@ -35,7 +35,7 @@ class Test_Controller_Zapier extends WP_UnitTestCase {
 	}
 
 	public function test_add_zapier_support_active_pdfs() {
-		/* Zapier runs as the submitter, so its signed links rely on the entry being trusted */
+		/* Zapier runs as the submitter, so its signed links rely on the signing `token` do_trusted_shortcode() adds */
 		wp_set_current_user( 0 );
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$body  = $this->controller->add_zapier_support( [], [], $entry );

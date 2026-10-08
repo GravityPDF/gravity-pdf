@@ -5,6 +5,7 @@ namespace GFPDF\Model;
 use GFPDF\Controller\Controller_Mergetags;
 use GFPDF\Controller\Controller_Shortcodes;
 use GFPDF\Helper\Helper_Url_Signer;
+use GFPDF\Tests\Concerns\UsesFactory;
 use GPDFAPI;
 use WP_UnitTestCase;
 
@@ -23,6 +24,7 @@ use WP_UnitTestCase;
  * @group     tags
  */
 class Test_Model_Mergetags extends WP_UnitTestCase {
+	use UsesFactory;
 
 	/**
 	 * @var Controller_Shortcodes
@@ -59,6 +61,47 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 	public function test_filters() {
 		$this->assertEquals( 10, has_filter( 'gform_replace_merge_tags', [ $this->model, 'process_pdf_mergetags' ] ) );
 		$this->assertEquals( 10, has_filter( 'gform_custom_merge_tags', [ $this->model, 'add_pdf_mergetags' ] ) );
+		$this->assertSame( 9999, has_filter( 'gform_entry_id_pre_save_lead', [ $this->model, 'start_resolving_administrative_defaults' ] ) );
+		$this->assertSame( 1, has_action( 'gform_entry_created', [ $this->model, 'stop_resolving_administrative_defaults' ] ) );
+	}
+
+	public function test_pdf_mergetag_without_an_entry_is_kept_only_while_resolving_defaults() {
+		$tag = '{Label:pdf:556690c67856b}';
+
+		/* An unmatched stop can't go below zero */
+		$this->model->stop_resolving_administrative_defaults();
+		$this->assertSame( 'PDF: ', $this->model->process_pdf_mergetags( "PDF: $tag", false, false, false ) );
+
+		$this->assertSame( 7, $this->model->start_resolving_administrative_defaults( 7 ) );
+		$this->assertSame( "PDF: $tag", $this->model->process_pdf_mergetags( "PDF: $tag", false, false, false ) );
+
+		$this->model->stop_resolving_administrative_defaults();
+		$this->assertSame( 'PDF: ', $this->model->process_pdf_mergetags( "PDF: $tag", false, false, false ) );
+	}
+
+	public function test_submitted_entry_keeps_pdf_mergetags_in_an_administrative_default() {
+		$form_id = $this->gf_factory()->form->create(
+			[],
+			[
+				'title'  => 'Administrative Default',
+				'fields' => [
+					new \GF_Field_Text( [ 'id' => 1, 'label' => 'Name' ] ),
+					new \GF_Field_Textarea( [ 'id' => 2, 'label' => 'Links', 'visibility' => 'administrative' ] ),
+				],
+			]
+		);
+
+		$pdf_id = $this->gf_factory()->pdf->set_form_id( $form_id )->create();
+		$tags   = "{Document:pdf:$pdf_id}\n{Document:pdf:$pdf_id:signed}";
+
+		$form                           = \GFAPI::get_form( $form_id );
+		$form['fields'][1]->defaultValue = $tags;
+		\GFAPI::update_form( $form );
+
+		$result = \GFAPI::submit_form( $form_id, [ 'input_1' => 'Jake' ] );
+
+		$this->assertTrue( $result['is_valid'] );
+		$this->assertSame( $tags, \GFAPI::get_entry( $result['entry_id'] )['2'] );
 	}
 
 	/**
