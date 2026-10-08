@@ -4,6 +4,7 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Model\Model_Install;
@@ -37,9 +38,15 @@ class Controller_Upgrade_Routines {
 	 */
 	protected $data;
 
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data ) {
+	/**
+	 * @var Helper_Misc
+	 */
+	protected $misc;
+
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
 		$this->options = $options;
 		$this->data    = $data;
+		$this->misc    = $misc;
 	}
 
 	/**
@@ -73,13 +80,18 @@ class Controller_Upgrade_Routines {
 			$this->remove_legacy_license_check_cron();
 		}
 
-		if ( version_compare( $current_version, '6.17.3', '>=' ) && version_compare( $old_version, '6.17.3', '<' ) ) {
+		if ( version_compare( $current_version, '6.18.0', '>=' ) && version_compare( $old_version, '6.18.0', '<' ) ) {
 			$this->fix_logged_out_timeout_out_of_range();
+			/* Empties tmp/mpdf, taking the cache mPDF kept a folder deeper before its tempDir became the tmp folder */
+			$this->misc->cleanup_dir( $this->misc->get_mpdf_cache_location() );
 		}
 
 		if ( version_compare( $current_version, '7.0.0-beta1', '>=' ) && version_compare( $old_version, '7.0.0-beta1', '<' ) ) {
 			Model_Install::write_tmp_htaccess( $this->data->template_tmp_location, true );
 		}
+
+		/* Ungated, so every install and release has mPDF's cache folders in place before the first render */
+		$this->misc->create_mpdf_cache_folders();
 
 		/* Deliberately ungated: every release is a chance for a new round of removals to arrive. Runs last, so it
 		   reflects the routines above */
@@ -103,7 +115,7 @@ class Controller_Upgrade_Routines {
 	 * Remove a saved Logged Out Timeout below the new 1-minute minimum, so it reads as the 20-minute default, and cap
 	 * one above the new 1-week maximum
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function fix_logged_out_timeout_out_of_range(): void {
 		$settings = get_option( 'gfpdf_settings', [] );
@@ -162,14 +174,7 @@ class Controller_Upgrade_Routines {
 	 * @since 6.13.2
 	 */
 	protected function fix_tmp_folder_permissions() {
-		$folders = [ $this->data->template_tmp_location ];
-
-		/* If the mPDF tmp directory is moved outside the GPDF tmp directory, fix the folder permissions separately */
-		if ( strpos( $this->data->mpdf_tmp_location, $this->data->template_tmp_location ) !== 0 ) {
-			$folders[] = $this->data->mpdf_tmp_location;
-		}
-
-		foreach ( $folders as $folder ) {
+		foreach ( $this->misc->get_tmp_locations() as $folder ) {
 			/* Try get the folder permission from the parent directory */
 			$folder_perms = 0755;
 

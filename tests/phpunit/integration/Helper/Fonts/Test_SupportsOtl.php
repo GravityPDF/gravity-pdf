@@ -27,18 +27,9 @@ class Test_SupportsOtl extends TestCase {
 
 	/**
 	 * SupportsOtl::supports_otl() returns true for a known-good TTF.
-	 *
-	 * Uses the TTF bundled with Gravity Forms inside the test vendor directory.
 	 */
 	public function test_supports_otl_returns_true_for_valid_ttf(): void {
-		$wp_phpunit_font = ABSPATH . '../vendor/wp-phpunit/wp-phpunit/data/fonts/';
-		$font_file       = 'OpenSans-Regular.ttf';
-
-		if ( ! file_exists( $wp_phpunit_font . $font_file ) ) {
-			$this->markTestSkipped( 'OpenSans-Regular.ttf test fixture not present; cannot exercise the truthy path.' );
-		}
-
-		$checker = new SupportsOtl( $wp_phpunit_font );
-		$this->assertTrue( $checker->supports_otl( $font_file ) );
+		$checker = new SupportsOtl( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' );
+		$this->assertTrue( $checker->supports_otl( 'DejaVuSans.ttf' ) );
 	}
 }
