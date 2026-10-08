@@ -406,6 +406,19 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	}
 
 	/**
+	 * Allow the HTML and merge tags a form editor put in a choice's escaped text
+	 *
+	 * @param string $text
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	protected function parse_choice_text( $text ) {
+		return Kses::parse( $this->gform->process_tags( wp_specialchars_decode( $text, ENT_QUOTES ), $this->form, $this->entry ) );
+	}
+
+	/**
 	 * Restore the quotes the field's escaping encoded in a trusted value's shortcodes, so their attributes still parse
 	 *
 	 * @param string $value
@@ -442,7 +455,33 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	}
 
 	/**
-	 * Process merge tags in the field's value, trusting the PDF merge tags and shortcodes in it only when a form editor set it
+	 * Whether a value is one of the field's choices
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	protected function is_choice_value( $value ) {
+		if ( ! $this->field instanceof GF_Field ) {
+			return false;
+		}
+
+		foreach ( $this->field->choices ?: [] as $choice ) {
+			/* Gravity Forms saves a choice's value sanitised, so match either form */
+			$choice = (string) ( $choice['value'] ?? '' );
+			if ( in_array( (string) $value, [ $choice, wp_kses_post( $choice ) ], true ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Process merge tags in a value a form editor set. A submitter's value is left as is, unless the
+	 * `gfpdf_field_process_merge_tags` filter opts in, and its PDF merge tags and shortcodes are never trusted.
 	 *
 	 * @param string $value
 	 *
@@ -451,20 +490,20 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 6.17.3
 	 */
 	protected function process_value_tags( $value ) {
-		if ( $this->is_trusted_value() ) {
+		$process = function () use ( $value ) {
 			return $this->gform->process_tags( $value, $this->form, $this->entry );
+		};
+
+		if ( $this->is_trusted_value() ) {
+			return $process();
 		}
 
 		$trust = $this->get_signed_url_trust();
-		if ( $trust === null ) {
+		if ( $trust === null || ! apply_filters( 'gfpdf_field_process_merge_tags', false, $this->field, $this->entry, $this->form ) ) {
 			return $value;
 		}
 
-		return $trust->run_untrusted(
-			function () use ( $value ) {
-				return $this->gform->process_tags( $value, $this->form, $this->entry );
-			}
-		);
+		return $trust->run_untrusted( $process );
 	}
 
 	/**
