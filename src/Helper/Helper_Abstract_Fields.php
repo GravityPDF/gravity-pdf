@@ -474,13 +474,8 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 6.17.3
 	 */
 	private function get_encoded_default_tags() {
-		$trust = $this->get_signed_url_trust();
-		if ( $trust === null ) {
-			return [];
-		}
-
 		$map = [];
-		foreach ( $trust->get_default_tags( $this->field ) as $tag ) {
+		foreach ( $this->get_signed_url_trust()->get_default_tags( $this->field ) as $tag ) {
 			$escaped = esc_html( $tag );
 
 			$map[ $this->encode_tags( $escaped ) ] = $this->decode_shortcode_quotes( $escaped );
@@ -530,11 +525,6 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 6.17.3
 	 */
 	protected function process_value_tags( $value ) {
-		$trust = $this->get_signed_url_trust();
-		if ( $trust === null ) {
-			return $value;
-		}
-
 		$default_tags = $this->get_encoded_default_tags();
 		if ( $default_tags ) {
 			return $this->gform->process_tags( strtr( $this->encode_tags( $value ), $default_tags ), $this->form, $this->entry );
@@ -544,7 +534,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			return $value;
 		}
 
-		return $trust->run_untrusted(
+		return $this->get_signed_url_trust()->run_untrusted(
 			function () use ( $value ) {
 				return $this->gform->process_tags( $value, $this->form, $this->entry );
 			}
@@ -552,16 +542,12 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	}
 
 	/**
-	 * The shared signing trust registry, or null before the plugin has registered it
-	 *
-	 * @return Model_Signed_Url_Trust|null
+	 * @return Model_Signed_Url_Trust
 	 *
 	 * @since 6.17.3
 	 */
 	private function get_signed_url_trust() {
-		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
-
-		return $trust instanceof Model_Signed_Url_Trust ? $trust : null;
+		return \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
 	}
 
 	/**
