@@ -307,8 +307,9 @@ class Helper_PDF {
 		};
 
 		/* The template and its shortcodes run with the PDF's entry as the signing context */
+		/** @var Model_Signed_Url_Trust $trust */
 		$trust = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
-		$html  = $trust instanceof Model_Signed_Url_Trust ? $trust->run_rendering_pdf( $this->entry['id'] ?? 0, $render ) : $render();
+		$html  = $trust->run_rendering_pdf( $this->entry['id'] ?? 0, $render );
 
 		/* Write the HTML to mPDF */
 		$this->mpdf->WriteHTML( $html );

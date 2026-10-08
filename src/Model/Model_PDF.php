@@ -1470,8 +1470,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_form_data( $entry ) {
 
 		/* Field content is merged as it would be inside the PDF, so a shortcode in it isn't vouched for */
+		/** @var Model_Signed_Url_Trust $trust */
 		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
-		if ( $trust instanceof Model_Signed_Url_Trust && ! $trust->is_rendering_pdf() ) {
+		if ( ! $trust->is_rendering_pdf() ) {
 			return $trust->run_rendering_pdf(
 				$entry['id'] ?? 0,
 				function () use ( $entry ) {
