@@ -507,6 +507,28 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Check a directory can be written to by creating a file in it, as is_writable() can call a writable network share read-only
+	 *
+	 * @param string $dir
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	public function is_directory_writable( string $dir ): bool {
+		$file = trailingslashit( $dir ) . '.gfpdf-write-test-' . wp_generate_password( 12, false );
+
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		if ( @file_put_contents( $file, '' ) === false ) {
+			return false;
+		}
+
+		wp_delete_file( $file );
+
+		return true;
+	}
+
+	/**
 	 * This function recursively copies all files and folders under a given directory
 	 * equivalent to Bash: cp -R $dir
 	 *

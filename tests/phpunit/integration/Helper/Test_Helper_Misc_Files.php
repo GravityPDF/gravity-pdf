@@ -115,6 +115,18 @@ class Test_Helper_Misc_Files extends TestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_is_directory_writable() {
+		wp_mkdir_p( $this->tmp );
+
+		$this->assertTrue( $this->misc->is_directory_writable( $this->tmp ) );
+		$this->assertSame( [], glob( $this->tmp . '.gfpdf-write-test-*' ) );
+
+		$this->assertFalse( $this->misc->is_directory_writable( $this->tmp . 'does-not-exist' ) );
+	}
+
+	/**
 	 * @dataProvider provider_convert_path_to_url
 	 *
 	 * @param string|false $expected

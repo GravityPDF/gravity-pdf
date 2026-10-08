@@ -649,6 +649,7 @@ class GFPDF\Helper\Helper_Misc
     public function get_upload_details()
     public function handle_ajax_authentication($endpoint_desc, $capability = 'gravityforms_edit_settings', $nonce_name = 'gfpdf_ajax_nonce')
     public function in_array($needle, $haystack, $strict = true)
+    public function is_directory_writable(string $dir): bool
     public function is_gfpdf_page()
     public function is_gfpdf_settings_tab($name)
     public function is_secondary_network_site($plugin_basename)
@@ -807,6 +808,7 @@ class GFPDF\Model\Model_Install extends GFPDF\Helper\Helper_Abstract_Model
     final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
     public function __call($name, $arguments)
     public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Model\Model_Uninstall $uninstall)
+    public function check_folder_permissions(): void
     public function create_folder_structures()
     public function get_permalink_regex()
     public function get_settings_url()
