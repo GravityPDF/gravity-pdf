@@ -1388,6 +1388,11 @@ class Model_PDF extends Helper_Abstract_Model {
 		$survey = $this->get_survey_results( $form, $entry );
 		$poll   = $this->get_poll_results( $form, $entry );
 
+		/* Encode the user agent and source URL like field values */
+		foreach ( $form_meta['misc'] ?? [] as $key => $value ) {
+			$form_meta['misc'][ $key ] = is_string( $value ) ? $products->encode_tags( $value ) : $value;
+		}
+
 		/* Merge in the meta data and survey, quiz and poll data */
 		$data = array_replace_recursive( $data, $form_meta, $quiz, $survey, $poll );
 
@@ -1413,14 +1418,14 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* Get our field object */
 				$class = $this->get_field_class( $field, $form, $entry, $products );
 
-				/* Merge in the field object form_data() results */
-				$data = array_replace_recursive( $data, $class->form_data() );
+				/* Merge in the field object form_data() results, with user-input tags encoded as in its HTML */
+				$data = array_replace_recursive( $data, $class->encode_value_tags( $class->form_data() ) );
 			}
 		}
 
 		/* Load our product array if products exist */
 		if ( ! $products->is_empty() ) {
-			$data = array_replace_recursive( $data, $products->form_data() );
+			$data = array_replace_recursive( $data, $products->encode_value_tags( $products->form_data() ) );
 		}
 
 		/* Re-order the array keys to make it more readable */

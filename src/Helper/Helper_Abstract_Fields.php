@@ -312,18 +312,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 */
 	public function html( $value = '', $show_label = true ) {
-
-		/*
-		 * Prevent shortcodes and merge tags being processed from user input fields
-		 * We'll allow them in HTML and Section fields, and administrative fields still holding their default value
-		 *
-		 * @since 4.2 Skipping Administrative fields was added
-		 * @since 6.17.3 Only when the administrative field holds its default value, as submitters can POST any value
-		 */
-		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
-		if ( ! in_array( $this->field->type, $skip_fields, true ) ) {
-			$value = $this->is_trusted_value() ? $this->decode_shortcode_quotes( $value ) : $this->encode_tags( $value );
-		}
+		$value = $this->encode_value_tags( $value );
 
 		/* Backwards compat */
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'] ?? 0, $this->form['id'] ?? 0 );
@@ -403,6 +392,43 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		}
 
 		return str_replace( $find, [ '&#91;', '&#93;', '&#123;', '&#125;' ], $value );
+	}
+
+	/**
+	 * Prevent shortcodes and merge tags being processed from user input fields, in the field's HTML and form data.
+	 * We'll allow them in HTML and Section fields, and administrative fields still holding their default value.
+	 *
+	 * @param mixed $value A value, or an array of them
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function encode_value_tags( $value ) {
+		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
+		if ( in_array( $this->field->type, $skip_fields, true ) ) {
+			return $value;
+		}
+
+		$encode = null;
+		$walk   = function ( &$item ) use ( &$encode ) {
+			/* Only check trust, which recomputes an administrative field's default, for a value holding a tag */
+			if ( ! is_string( $item ) || strpbrk( $item, '[]{}' ) === false ) {
+				return;
+			}
+
+			$encode = $encode ?? ( $this->is_trusted_value() ? [ $this, 'decode_shortcode_quotes' ] : [ $this, 'encode_tags' ] );
+			$item   = $encode( $item );
+		};
+
+		if ( is_array( $value ) ) {
+			array_walk_recursive( $value, $walk );
+		} else {
+			$value = (string) $value;
+			$walk( $value );
+		}
+
+		return $value;
 	}
 
 	/**
