@@ -505,4 +505,22 @@ class Test_API extends TestCase {
 		$this->assertSame( 'invalid_entry', GPDFAPI::get_pdf_url( 0, '556690c67856b' )->get_error_code() );
 		$this->assertSame( 'invalid_pdf_setting', GPDFAPI::get_pdf_url( $entry_id, 'does-not-exist' )->get_error_code() );
 	}
+
+	public function test_get_pdf_url_needs_an_available_pdf() {
+		$form_id  = $this->gf_factory()->form->create( [], [ 'title' => 'Available PDF', 'fields' => [ new \GF_Field_Text( [ 'id' => 1, 'label' => 'Name' ] ) ] ] );
+		$entry_id = $this->gf_factory()->entry->create( [ 'form_id' => $form_id, '1' => 'Jake' ] );
+		$rule     = function ( $value ) {
+			return [
+				'actionType' => 'show',
+				'logicType'  => 'all',
+				'rules'      => [ [ 'fieldId' => '1', 'operator' => 'is', 'value' => $value ] ],
+			];
+		};
+
+		$pdfs = $this->gf_factory()->pdf->set_form_id( $form_id );
+
+		$this->assertSame( 'inactive', GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'active' => false ] ) )->get_error_code() );
+		$this->assertSame( 'conditional_logic', GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'conditionalLogic' => $rule( 'Someone else' ) ] ) )->get_error_code() );
+		$this->assertIsString( GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'conditionalLogic' => $rule( 'Jake' ) ] ) ) );
+	}
 }
