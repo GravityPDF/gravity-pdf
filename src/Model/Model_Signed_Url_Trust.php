@@ -126,35 +126,36 @@ class Model_Signed_Url_Trust {
 	}
 
 	/**
-	 * Whether an administrative field holds its default value, which only a form editor can set. A value that differs from
-	 * the default is never trusted.
+	 * The shortcodes and merge tags in an administrative field's default. Gravity Forms resolves some on save and leaves
+	 * others for later, so each is trusted on its own.
 	 *
 	 * @param \GF_Field|mixed $field
-	 * @param array|mixed     $entry
 	 *
-	 * @return bool
+	 * @return string[]
 	 *
 	 * @since 6.17.3
 	 */
-	public function is_trusted_field_value( $field, $entry ) {
-		if ( ! $field instanceof \GF_Field || ! $field->is_administrative() || ! is_array( $entry ) ) {
-			return false;
+	public function get_default_tags( $field ) {
+		if ( ! $field instanceof \GF_Field || ! $field->is_administrative() ) {
+			return [];
 		}
 
-		$inputs    = $field->get_entry_inputs();
-		$input_ids = is_array( $inputs ) ? wp_list_pluck( $inputs, 'id' ) : [ $field->id ];
+		$inputs   = is_array( $field->inputs ) ? $field->inputs : [];
+		$defaults = array_merge( [ $field->defaultValue ], array_column( $inputs, 'defaultValue' ) );
+		$regex    = '/' . get_shortcode_regex() . '|\{[^{}]+\}/';
 
-		foreach ( $input_ids as $input_id ) {
-			if ( (string) ( $entry[ (string) $input_id ] ?? '' ) !== (string) GFFormsModel::get_default_value( $field, $input_id ) ) {
-				return false;
+		$tags = [];
+		foreach ( $defaults as $default ) {
+			if ( is_string( $default ) && strpbrk( $default, '[{' ) !== false && preg_match_all( $regex, $default, $matches ) ) {
+				array_push( $tags, ...$matches[0] );
 			}
 		}
 
-		return true;
+		return array_values( array_unique( $tags ) );
 	}
 
 	/**
-	 * The entry's administrative field values that match their defaults and hold a shortcode or merge tag
+	 * The default tags the entry's administrative fields still hold
 	 *
 	 * @param array $form
 	 * @param array $entry
@@ -163,26 +164,24 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @since 6.17.3
 	 */
-	public function get_trusted_field_values( $form, $entry ) {
-		$values = [];
+	public function get_trusted_field_tags( $form, $entry ) {
+		$trusted = [];
 		foreach ( $form['fields'] ?? [] as $field ) {
-			if ( ! $field instanceof \GF_Field || ! $field->is_administrative() ) {
-				continue;
-			}
+			$tags = $this->get_default_tags( $field );
 
-			/* Check the tags first, as the trust check recomputes the field's default */
-			$tagged = array_filter(
-				(array) GFFormsModel::get_lead_field_value( $entry, $field ),
-				function ( $value ) {
-					return is_string( $value ) && strpbrk( $value, '[]{}' ) !== false;
+			foreach ( $tags ? (array) GFFormsModel::get_lead_field_value( $entry, $field ) : [] as $value ) {
+				if ( ! is_string( $value ) ) {
+					continue;
 				}
-			);
 
-			if ( $tagged && $this->is_trusted_field_value( $field, $entry ) ) {
-				$values = array_merge( $values, array_values( $tagged ) );
+				foreach ( $tags as $tag ) {
+					if ( strpos( $value, $tag ) !== false ) {
+						$trusted[] = $tag;
+					}
+				}
 			}
 		}
 
-		return $values;
+		return array_values( array_unique( $trusted ) );
 	}
 }

@@ -1817,7 +1817,7 @@ class Test_PDF extends TestCase {
 		$this->assertSame( 'https://example.org/?a=&#123;ip&#125;', $data['misc']['source_url'] );
 		$this->assertSame( [ '&#91;row&#93;' ], $data['list'][3] ?? null );
 
-		/* An administrative field holding its default is trusted, as in html() */
+		/* An administrative field's default tags are trusted, as in html() */
 		$this->assertSame( $default, $data['field'][2] );
 	}
 

@@ -143,7 +143,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Trust the shortcodes in merged text that came from an administrative field still holding its default value
+	 * Trust the shortcodes in merged text that a form editor put in an administrative field's default value
 	 *
 	 * @param mixed $text  The filtered text, which another callback may have changed to a non-string
 	 * @param mixed $form  The form passed to the filter, which may not be an array
@@ -159,8 +159,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		}
 
 		$trusted = [];
-		foreach ( $this->get_trust()->get_trusted_field_values( $form, $entry ) as $value ) {
-			foreach ( $this->get_shortcode_information( static::SHORTCODE, $value ) as $shortcode ) {
+		foreach ( $this->get_trust()->get_trusted_field_tags( $form, $entry ) as $tag ) {
+			foreach ( $this->get_shortcode_information( static::SHORTCODE, $tag ) as $shortcode ) {
 				$trusted[] = $shortcode['shortcode'];
 			}
 		}
