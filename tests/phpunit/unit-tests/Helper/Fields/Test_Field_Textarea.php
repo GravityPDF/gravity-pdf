@@ -82,9 +82,9 @@ class Test_Field_Textarea extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'Form {form_id}', $value() );
 
-		add_filter( 'gfpdf_field_process_merge_tags', '__return_true' );
+		add_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 		$this->assertStringContainsString( "Form $form", $value() );
-		remove_filter( 'gfpdf_field_process_merge_tags', '__return_true' );
+		remove_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 
 		$field->visibility   = 'administrative';
 		$field->defaultValue = 'Form {form_id}';
@@ -100,9 +100,9 @@ class Test_Field_Textarea extends WP_UnitTestCase {
 
 		$entry['999'] = '{Label:pdf:556690c67856b:signed}';
 
-		add_filter( 'gfpdf_field_process_merge_tags', '__return_true' );
+		add_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 		$value = ( new Field_Textarea( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->value();
-		remove_filter( 'gfpdf_field_process_merge_tags', '__return_true' );
+		remove_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 
 		$this->assertStringContainsString( 'pid=556690c67856b', $value );
 		$this->assertStringNotContainsString( 'signature=', $value );
