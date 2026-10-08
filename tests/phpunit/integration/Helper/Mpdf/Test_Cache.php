@@ -83,6 +83,24 @@ class Test_Cache extends TestCase {
 		$this->assertInstanceOf( Cache::class, $cache );
 		$this->assertDirectoryExists( $basepath . '/mpdf' );
 	}
+
+	/**
+	 * The plugin's idea of where mPDF's cache lives matches where mPDF puts it
+	 *
+	 * @since 6.17.3
+	 */
+	public function test_mpdf_keeps_its_cache_in_the_mpdf_folder_of_its_tempdir() {
+		$data  = \GPDFAPI::get_data_class();
+		$cache = $data->mpdf_tmp_location . '/mpdf';
+
+		wp_mkdir_p( $cache );
+		\GPDFAPI::get_misc_class()->rmdir( $cache );
+
+		new \GFPDF\Helper\Helper_Mpdf( [ 'mode' => 'c', 'tempDir' => $data->mpdf_tmp_location ] );
+
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+		$this->assertDirectoryDoesNotExist( $cache . '/mpdf' );
+	}
 }
 
 /**
