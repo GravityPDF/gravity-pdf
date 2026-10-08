@@ -40,6 +40,36 @@ class Test_Url_Signer extends WP_UnitTestCase {
 		$this->assertTrue( $signer->verify( $signer->sign( $url, '+ 1 year' ) ) );
 	}
 
+	public function test_signed_url_expiry_is_capped() {
+		$signer  = new Helper_Url_Signer();
+		$expires = function ( $expiration ) use ( $signer ) {
+			wp_parse_str( wp_parse_url( $signer->sign( 'https://test.com/', $expiration ), PHP_URL_QUERY ), $query );
+
+			return (int) $query['expires'];
+		};
+
+		$year = strtotime( '+1 year' );
+		$this->assertEqualsWithDelta( $year, $expires( '+1 year' ), 5 );
+		$this->assertEqualsWithDelta( $year, $expires( '+100 years' ), 5 );
+		$this->assertEqualsWithDelta( strtotime( '+1 week' ), $expires( '+1 week' ), 5 );
+
+		/* The cap can be raised, and a capped URL still verifies */
+		$this->assertTrue( $signer->verify( $signer->sign( 'https://test.com/', '+100 years' ) ) );
+
+		$filter = function () {
+			return '+2 years';
+		};
+		add_filter( 'gfpdf_signed_url_max_expiration', $filter );
+		$this->assertEqualsWithDelta( strtotime( '+2 years' ), $expires( '+100 years' ), 5 );
+
+		remove_filter( 'gfpdf_signed_url_max_expiration', $filter );
+
+		/* An invalid cap falls back to a year rather than leaving the URL uncapped */
+		add_filter( 'gfpdf_signed_url_max_expiration', '__return_empty_string' );
+		$this->assertEqualsWithDelta( $year, $expires( '+100 years' ), 5 );
+		remove_filter( 'gfpdf_signed_url_max_expiration', '__return_empty_string' );
+	}
+
 	public function provider_sign_and_verify() {
 		return [
 			[ 'https://test.com' ],
