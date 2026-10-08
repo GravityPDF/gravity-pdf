@@ -396,7 +396,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 
 	/**
 	 * Prevent shortcodes and merge tags being processed from user input fields, in the field's HTML and form data.
-	 * We'll allow them in HTML and Section fields, and administrative fields still holding their default value.
+	 * We'll allow them in HTML and Section fields, and the ones in an administrative field's default value.
 	 *
 	 * @param mixed $value A value, or an array of them
 	 *
@@ -410,15 +410,12 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			return $value;
 		}
 
-		$encode = null;
-		$walk   = function ( &$item ) use ( &$encode ) {
-			/* Only check trust, which recomputes an administrative field's default, for a value holding a tag */
-			if ( ! is_string( $item ) || strpbrk( $item, '[]{}' ) === false ) {
-				return;
+		$default_tags = null;
+		$walk         = function ( &$item ) use ( &$default_tags ) {
+			if ( is_string( $item ) && strpbrk( $item, '[]{}' ) !== false ) {
+				$default_tags = $default_tags ?? $this->get_encoded_default_tags();
+				$item         = strtr( $this->encode_tags( $item ), $default_tags );
 			}
-
-			$encode = $encode ?? ( $this->is_trusted_value() ? [ $this, 'decode_shortcode_quotes' ] : [ $this, 'encode_tags' ] );
-			$item   = $encode( $item );
 		};
 
 		if ( is_array( $value ) ) {
@@ -445,7 +442,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	}
 
 	/**
-	 * Restore the quotes the field's escaping encoded in a trusted value's shortcodes, so their attributes still parse
+	 * Restore the quotes the field's escaping encoded in trusted shortcodes, so their attributes still parse
 	 *
 	 * @param string $value
 	 *
@@ -468,16 +465,30 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	}
 
 	/**
-	 * Whether the field's value came from a form editor rather than a submitter
+	 * Map the encoded copies of the tags in an administrative field's default back to the tags, so they're processed
 	 *
-	 * @return bool
+	 * @return array<string,string>
 	 *
 	 * @since 6.17.3
 	 */
-	protected function is_trusted_value() {
+	protected function get_encoded_default_tags() {
 		$trust = $this->get_signed_url_trust();
+		if ( $trust === null ) {
+			return [];
+		}
 
-		return $trust !== null && $trust->is_trusted_field_value( $this->field, $this->entry );
+		$map = [];
+		foreach ( $trust->get_default_tags( $this->field ) as $tag ) {
+			$escaped = esc_html( $tag );
+
+			$map[ $this->encode_tags( $escaped ) ] = $this->decode_shortcode_quotes( $escaped );
+			$map[ $this->encode_tags( $tag ) ]     = $tag;
+
+			/* As encode_tags() encodes them in an HTML attribute */
+			$map[ str_replace( [ '[', ']', '{', '}' ], [ '%5B', '%5D', '%7B', '%7D' ], $tag ) ] = $tag;
+		}
+
+		return $map;
 	}
 
 	/**
@@ -506,8 +517,9 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	}
 
 	/**
-	 * Process merge tags in a value a form editor set. A submitter's value is left as is, unless the
-	 * `gfpdf_field_process_merge_tags` filter opts in, and its PDF merge tags and shortcodes are never trusted.
+	 * Process the tags in an administrative field's default, and encode the rest of its tags. Any other field's value is
+	 * left as is, unless the `gfpdf_field_process_merge_tags` filter opts in, and its PDF merge tags and shortcodes are
+	 * never trusted.
 	 *
 	 * @param string $value
 	 *
@@ -516,20 +528,25 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 6.17.3
 	 */
 	protected function process_value_tags( $value ) {
-		$process = function () use ( $value ) {
-			return $this->gform->process_tags( $value, $this->form, $this->entry );
-		};
-
-		if ( $this->is_trusted_value() ) {
-			return $process();
-		}
-
 		$trust = $this->get_signed_url_trust();
-		if ( $trust === null || ! apply_filters( 'gfpdf_field_process_merge_tags', false, $this->field, $this->entry, $this->form ) ) {
+		if ( $trust === null ) {
 			return $value;
 		}
 
-		return $trust->run_untrusted( $process );
+		$default_tags = $this->get_encoded_default_tags();
+		if ( $default_tags ) {
+			return $this->gform->process_tags( strtr( $this->encode_tags( $value ), $default_tags ), $this->form, $this->entry );
+		}
+
+		if ( ! apply_filters( 'gfpdf_field_process_merge_tags', false, $this->field, $this->entry, $this->form ) ) {
+			return $value;
+		}
+
+		return $trust->run_untrusted(
+			function () use ( $value ) {
+				return $this->gform->process_tags( $value, $this->form, $this->entry );
+			}
+		);
 	}
 
 	/**

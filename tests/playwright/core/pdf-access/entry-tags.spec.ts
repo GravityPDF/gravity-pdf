@@ -85,6 +85,35 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		);
 	});
 
+	test('signs the PDF link in an administrative field default whose other tags resolved on save', async () => {
+		await pdf.updateForm(form.id, (current: any) => ({
+			fields: current.fields.map((field: any) =>
+				field.id === 16
+					? {
+							...field,
+							defaultValue: `Saved by {user:display_name} ${adminDefault}`,
+						}
+					: field
+			),
+		}));
+
+		// a shortcode that isn't in the default stays encoded
+		const entry: any = await pdf.createEntry({
+			form_id: form.id,
+			'16': `Saved by Visitor ${adminDefault} [gravitypdf id="${pdfId}" raw="1"]`,
+		});
+
+		const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
+
+		expect(html).toContain('Saved by Visitor');
+		expect(html).toMatch(
+			new RegExp(
+				`${pdfId}.*${entry.id}.*signature=|${entry.id}.*${pdfId}.*signature=`
+			)
+		);
+		expect(html).toContain('&#091;gravitypdf');
+	});
+
 	test('keeps the tags in field values encoded through the render', async () => {
 		const entry: any = await pdf.createEntry({
 			form_id: form.id,

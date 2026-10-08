@@ -477,7 +477,7 @@ class Test_Shortcodes extends TestCase {
 		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'] ) );
 	}
 
-	public function test_shortcode_in_an_administrative_field_is_trusted_only_as_its_default() {
+	public function test_shortcode_in_an_administrative_field_is_trusted_only_from_its_default() {
 		$form  = $this->form( 'all-form-fields' );
 		$entry = $this->entry( 'all-form-fields' );
 		wp_set_current_user( 0 );
@@ -488,7 +488,7 @@ class Test_Shortcodes extends TestCase {
 			}
 		}
 
-		/* As in a PDF, where html() leaves a trusted administrative value raw and the whole document has its tags processed */
+		/* As in a PDF, where html() leaves a default's tags raw and the whole document has its tags processed */
 		$shortcode           = '[gravitypdf id=556690c67856b entry=' . $entry['id'] . ' signed=1 raw=1]';
 		$field->visibility   = 'administrative';
 		$entry[ $field->id ] = $shortcode;
@@ -501,8 +501,12 @@ class Test_Shortcodes extends TestCase {
 
 		$this->assertStringContainsString( 'signature=', $render( $shortcode ) );
 
-		/* A value other than the default isn't trusted */
+		/* The rest of the value needn't match the default */
+		$this->assertStringContainsString( 'signature=', $render( '{user:display_name} ' . $shortcode ) );
+
+		/* A shortcode that isn't in the default isn't trusted */
 		$this->assertStringNotContainsString( 'signature=', $render( '' ) );
+		$this->assertStringNotContainsString( 'signature=', $render( '[gravitypdf id=556690c67856b signed=1 raw=1]' ) );
 	}
 
 	/**

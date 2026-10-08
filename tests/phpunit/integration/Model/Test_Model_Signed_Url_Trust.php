@@ -55,53 +55,45 @@ class Test_Model_Signed_Url_Trust extends TestCase {
 		$this->assertFalse( $this->trust->is_untrusted() );
 	}
 
-	public function test_only_an_administrative_field_holding_its_default_is_trusted() {
-		$field = new GF_Field_Text( [ 'id' => 1, 'visibility' => 'administrative', 'defaultValue' => 'default' ] );
+	public function test_only_the_tags_in_an_administrative_default_are_trusted() {
+		$field = new GF_Field_Text( [ 'id' => 1, 'visibility' => 'administrative', 'defaultValue' => 'Hi {Name:1} [gravitypdf id="1" text="{entry_id}"] {user:display_name}' ] );
 
-		$this->assertTrue( $this->trust->is_trusted_field_value( $field, [ '1' => 'default' ] ) );
-		$this->assertFalse( $this->trust->is_trusted_field_value( $field, [ '1' => 'posted' ] ) );
+		/* A shortcode is kept whole, with the merge tags in it */
+		$this->assertSame( [ '{Name:1}', '[gravitypdf id="1" text="{entry_id}"]', '{user:display_name}' ], $this->trust->get_default_tags( $field ) );
 
-		$field->visibility = 'visible';
-		$this->assertFalse( $this->trust->is_trusted_field_value( $field, [ '1' => 'default' ] ) );
+		$field->defaultValue = 'No tags';
+		$this->assertSame( [], $this->trust->get_default_tags( $field ) );
+
+		$field->defaultValue = '[gravitypdf id="1"]';
+		$field->visibility   = 'visible';
+		$this->assertSame( [], $this->trust->get_default_tags( $field ) );
+		$this->assertSame( [], $this->trust->get_default_tags( null ) );
 	}
 
-	public function test_every_input_of_an_administrative_field_must_hold_its_default() {
+	public function test_every_input_default_of_an_administrative_field_is_read() {
 		$field = new GF_Field_Name( [
 			'id'         => 2,
 			'visibility' => 'administrative',
 			'inputs'     => [
-				[ 'id' => '2.3', 'defaultValue' => '[First]' ],
-				[ 'id' => '2.6', 'defaultValue' => 'Last' ],
+				[ 'id' => '2.3', 'defaultValue' => '[gravitypdf id="1"] [unregistered]' ],
+				[ 'id' => '2.6', 'defaultValue' => 'Last {ip}' ],
+				[ 'id' => '2.8' ],
 			],
 		] );
 
-		$this->assertTrue( $this->trust->is_trusted_field_value( $field, [ '2.3' => '[First]', '2.6' => 'Last' ] ) );
-		$this->assertFalse( $this->trust->is_trusted_field_value( $field, [ '2.3' => '[First]', '2.6' => 'Posted' ] ) );
-
-		$form = [ 'fields' => [ $field ] ];
-
-		/* Only the values holding a tag are returned */
-		$this->assertSame( [ '[First]' ], $this->trust->get_trusted_field_values( $form, [ '2.3' => '[First]', '2.6' => 'Last' ] ) );
-		$this->assertSame( [], $this->trust->get_trusted_field_values( $form, [ '2.3' => '[First]', '2.6' => 'Posted' ] ) );
+		/* Only a registered shortcode is a tag */
+		$this->assertSame( [ '[gravitypdf id="1"]', '{ip}' ], $this->trust->get_default_tags( $field ) );
 	}
 
-	public function test_a_default_is_recomputed_for_the_current_request() {
-		$field = new GF_Field_Text( [ 'id' => 1, 'visibility' => 'administrative', 'defaultValue' => '[gravitypdf id="1"] {Name:1}' ] );
+	public function test_the_default_tags_an_entry_still_holds_are_trusted() {
+		$field = new GF_Field_Text( [ 'id' => 1, 'visibility' => 'administrative', 'defaultValue' => '{user:display_name} [gravitypdf id="1"] {Name:1}' ] );
+		$form  = [ 'fields' => [ $field ] ];
 
-		/* Tags Gravity Forms leaves for later match the default whoever renders the PDF */
-		$this->assertTrue( $this->trust->is_trusted_field_value( $field, [ '1' => '[gravitypdf id="1"] {Name:1}' ] ) );
+		/* {user:display_name} resolved on save */
+		$this->assertSame( [ '[gravitypdf id="1"]', '{Name:1}' ], $this->trust->get_trusted_field_tags( $form, [ '1' => 'Jake [gravitypdf id="1"] {Name:1}' ] ) );
 
-		/* Gravity Forms resolves request tags like {user:...} as the entry saves, and again for the comparison */
-		$field->defaultValue = '{user:display_name} [gravitypdf id="1"]';
-		$saved_by            = $this->factory->user->create( [ 'display_name' => 'Saved By' ] );
-		$rendered_by         = $this->factory->user->create( [ 'display_name' => 'Rendered By' ] );
-		$entry               = [ '1' => 'Saved By [gravitypdf id="1"]' ];
-
-		wp_set_current_user( $saved_by );
-		$this->assertTrue( $this->trust->is_trusted_field_value( $field, $entry ) );
-
-		/* So the value is untrusted when the PDF renders for someone else */
-		wp_set_current_user( $rendered_by );
-		$this->assertFalse( $this->trust->is_trusted_field_value( $field, $entry ) );
+		/* A tag that isn't in the default never is */
+		$this->assertSame( [ '{Name:1}' ], $this->trust->get_trusted_field_tags( $form, [ '1' => '[gravitypdf id="1" entry="5" signed="1"] {Name:1}' ] ) );
+		$this->assertSame( [], $this->trust->get_trusted_field_tags( $form, [ '1' => '' ] ) );
 	}
 }
