@@ -109,7 +109,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	public function do_trusted_shortcode( $shortcode, $entry_id ) {
 		foreach ( $this->get_shortcode_information( static::SHORTCODE, $shortcode ) as $code ) {
-			$new_code = (int) ( $code['attr']['entry'] ?? 0 ) === (int) $entry_id ? $this->add_shortcode_auth( $code ) : $code;
+			$new_code = (int) ( $code['attr']['entry'] ?? 0 ) === (int) $entry_id ? $this->add_shortcode_signing_token( $code ) : $code;
 			if ( $new_code['shortcode'] !== $code['shortcode'] ) {
 				$shortcode = str_replace( $code['shortcode'], $new_code['shortcode'], $shortcode );
 			}
@@ -119,7 +119,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Add the entry, and outside a PDF an `auth` signature, to shortcodes in merged text that a form editor put in an
+	 * Add the entry, and outside a PDF a signing `token`, to shortcodes in merged text that a form editor put in an
 	 * administrative field's default value
 	 *
 	 * @param mixed $text  The filtered text, which another callback may have changed to a non-string
@@ -244,7 +244,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			return $html;
 		}
 
-		/* User-submitted content mustn't get an injected entry ID or `auth` signature */
+		/* User-submitted content mustn't get an injected entry ID or signing `token` */
 		if ( $this->get_trust()->is_untrusted() ) {
 			return $html;
 		}
@@ -315,7 +315,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check for the shortcode and add the entry ID to it, and an `auth` signature to a signed one outside a PDF
+	 * Check for the shortcode and add the entry ID to it, and a signing `token` to a signed one outside a PDF
 	 *
 	 * @param string $text     The text to search
 	 * @param int    $entry_id The entry ID to add to our shortcode
@@ -336,7 +336,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			}
 
 			if ( $vouch ) {
-				$new_shortcode = $this->add_shortcode_auth( $new_shortcode );
+				$new_shortcode = $this->add_shortcode_signing_token( $new_shortcode );
 			}
 
 			if ( $new_shortcode['shortcode'] !== $shortcode['shortcode'] ) {
@@ -356,7 +356,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @since 6.17.3
 	 */
-	protected function add_shortcode_auth( $code ) {
+	protected function add_shortcode_signing_token( $code ) {
 		$entry_id = (string) ( $code['attr']['entry'] ?? '' );
 
 		/* An entry set by a merge tag isn't known until the tags are replaced */
@@ -364,11 +364,11 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			return $code;
 		}
 
-		return $this->add_shortcode_attr( $code, 'auth', $this->get_shortcode_auth( $code['attr']['id'], $entry_id ) );
+		return $this->add_shortcode_attr( $code, 'token', $this->get_shortcode_signing_token( $code['attr']['id'], $entry_id ) );
 	}
 
 	/**
-	 * The `auth` signature for a shortcode's PDF and entry. PDF templates can add it to a shortcode that signs another
+	 * The signing `token` for a shortcode's PDF and entry. PDF templates can add it to a shortcode that signs another
 	 * entry's PDF.
 	 *
 	 * @param string     $pdf_id
@@ -378,7 +378,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @since 6.17.3
 	 */
-	public function get_shortcode_auth( $pdf_id, $entry_id ) {
+	public function get_shortcode_signing_token( $pdf_id, $entry_id ) {
 		return substr( hash_hmac( 'sha256', static::SHORTCODE . '|' . $pdf_id . '|' . (int) $entry_id, wp_salt( 'auth' ) ), 0, 32 );
 	}
 

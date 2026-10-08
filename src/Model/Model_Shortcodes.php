@@ -66,7 +66,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 				'entry'   => '',
 				'print'   => '',
 				'raw'     => '',
-				'auth'    => '',
+				'token'   => '',
 			],
 			$attributes,
 			static::SHORTCODE
@@ -93,7 +93,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 				$attributes['url'] = $this->url_signer->sign( $attributes['url'], $attributes['expires'] );
 			}
 
-			$this->log->notice( 'Generating Shortcode Markup', [ 'attr' => array_diff_key( $attributes, [ 'auth' => '' ] ) ] );
+			$this->log->notice( 'Generating Shortcode Markup', [ 'attr' => array_diff_key( $attributes, [ 'token' => '' ] ) ] );
 
 			if ( $raw ) {
 				return $attributes['url'];
@@ -125,7 +125,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	 * @since 6.17.3
 	 */
 	protected function can_sign_shortcode( $attributes, $settings ) {
-		if ( is_string( $attributes['auth'] ) && $attributes['auth'] !== '' && hash_equals( $this->get_shortcode_auth( $attributes['id'], $attributes['entry'] ), $attributes['auth'] ) ) {
+		if ( is_string( $attributes['token'] ) && $attributes['token'] !== '' && hash_equals( $this->get_shortcode_signing_token( $attributes['id'], $attributes['entry'] ), $attributes['token'] ) ) {
 			return true;
 		}
 
@@ -138,7 +138,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	}
 
 	/**
-	 * Without a valid `auth`, only sign an entry the shortcode's author can view
+	 * Without a valid `token`, only sign an entry the shortcode's author can view
 	 *
 	 * @param int   $entry_id
 	 * @param array $settings The PDF settings

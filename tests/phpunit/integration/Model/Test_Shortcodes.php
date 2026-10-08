@@ -354,10 +354,10 @@ class Test_Shortcodes extends TestCase {
 		$this->assertStringNotContainsString( 'expires=', $url );
 
 		/* A signature for the PDF and entry can be used again */
-		$auth = [ 'auth' => $this->model->get_shortcode_auth( '556690c67856b', $entry['id'] ) ];
-		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'], $auth ) );
-		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'], $auth ) );
-		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'], [ 'auth' => 'forged' ] ) );
+		$token = [ 'token' => $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] ) ];
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'], $token ) );
+		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'], $token ) );
+		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'], [ 'token' => 'forged' ] ) );
 	}
 
 	public function test_do_trusted_shortcode_vouches_only_for_its_entry() {
@@ -532,12 +532,12 @@ class Test_Shortcodes extends TestCase {
 
 		/* As in a notification, which signs for a visitor who can't view the entry */
 		$text = $this->model->gravitypdf_process_during_merge_tag_replacement( $named, $form, $entry );
-		$this->assertStringContainsString( ' auth="' . $this->model->get_shortcode_auth( '556690c67856b', $entry['id'] ) . '"', $text );
+		$this->assertStringContainsString( ' token="' . $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] ) . '"', $text );
 		$this->assertStringContainsString( 'signature=', do_shortcode( $text ) );
 
 		/* An injected entry is vouched for, while a forged signature is replaced */
-		$text = $this->model->gravitypdf_process_during_merge_tag_replacement( '[gravitypdf id="556690c67856b" signed="1" auth="forged"]', $form, $entry );
-		$this->assertSame( '[gravitypdf id="556690c67856b" signed="1" auth="' . $this->model->get_shortcode_auth( '556690c67856b', $entry['id'] ) . '" entry="' . $entry['id'] . '"]', $text );
+		$text = $this->model->gravitypdf_process_during_merge_tag_replacement( '[gravitypdf id="556690c67856b" signed="1" token="forged"]', $form, $entry );
+		$this->assertSame( '[gravitypdf id="556690c67856b" signed="1" token="' . $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] ) . '" entry="' . $entry['id'] . '"]', $text );
 
 		/* Not without `signed`, nor an entry a merge tag sets, nor in user-submitted content or text merged inside a PDF */
 		$unsigned = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '"]';
@@ -556,7 +556,7 @@ class Test_Shortcodes extends TestCase {
 	public function test_signed_shortcode_inside_a_pdf_needs_its_own_entry_or_a_signature() {
 		$entry  = $this->entry( 'all-form-fields' );
 		$trust  = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
-		$auth   = $this->model->get_shortcode_auth( '556690c67856b', $entry['id'] );
+		$token   = $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] );
 		$admin  = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$render = function ( $pdf_entry_id, $attributes = [] ) use ( $trust, $entry ) {
 			return $trust->run_rendering_pdf(
@@ -574,16 +574,16 @@ class Test_Shortcodes extends TestCase {
 		/* Another entry doesn't, even for an administrator, unless it has a valid signature */
 		wp_set_current_user( $admin );
 		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000 ) );
-		$this->assertStringContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'auth' => $auth ] ) );
+		$this->assertStringContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => $token ] ) );
 
 		wp_set_current_user( 0 );
-		$this->assertStringContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'auth' => $auth ] ) );
-		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'auth' => 'forged' ] ) );
-		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'auth' => [ $auth ] ] ) );
+		$this->assertStringContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => $token ] ) );
+		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => 'forged' ] ) );
+		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => [ $token ] ] ) );
 
 		/* A signature is for one PDF and entry */
-		$this->assertNotSame( $auth, $this->model->get_shortcode_auth( '556690c67856c', $entry['id'] ) );
-		$this->assertNotSame( $auth, $this->model->get_shortcode_auth( '556690c67856b', $entry['id'] + 1 ) );
+		$this->assertNotSame( $token, $this->model->get_shortcode_signing_token( '556690c67856c', $entry['id'] ) );
+		$this->assertNotSame( $token, $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] + 1 ) );
 	}
 
 	/**
