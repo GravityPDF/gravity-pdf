@@ -131,11 +131,15 @@ class Test_Uninstaller extends TestCase {
 		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );
 		$this->assertFalse( get_option( 'gfpdf_current_version' ) );
 
-		/* Reinstall */
+		/* Reinstall: the version change creates the folders */
 		$installer->setup_defaults();
+		$installer->check_install_status();
 
 		/* Verify the install works correctly */
 		$this->assertDirectoryExists( $gfpdf->data->template_location );
+
+		/* The install's options roll back with the test, so don't leave the in-memory flag ahead of them */
+		$gfpdf->data->is_installed = false;
 
 		wp_set_current_user( 0 );
 	}

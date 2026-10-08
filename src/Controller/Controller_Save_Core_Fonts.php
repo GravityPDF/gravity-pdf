@@ -170,6 +170,8 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
+		$this->misc->create_folder( $this->data->template_font_location );
+
 		$res = wp_remote_get(
 			$matching_fonts[0]['download_url'],
 			[

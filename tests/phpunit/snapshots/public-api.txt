@@ -635,6 +635,7 @@ class GFPDF\Helper\Helper_Misc
     public function convert_path_to_url($path)
     public function convert_url_to_path($url)
     public function copyr($source, $destination)
+    public function create_folder(string $dir): bool
     public function create_mpdf_cache_folders(): void
     public function evaluate_conditional_logic($logic, $entry)
     public function fix_header_footer($html)
@@ -653,6 +654,7 @@ class GFPDF\Helper\Helper_Misc
     public function is_gfpdf_page()
     public function is_gfpdf_settings_tab($name)
     public function is_secondary_network_site($plugin_basename)
+    public function protect_tmp_folder(): void
     public function relative_path($path, $replace = '')
     public function remove_extension_from_string($text, $type = '.pdf')
     public function rmdir($dir, bool $delete_top_level_dir = true)
@@ -809,8 +811,7 @@ class GFPDF\Model\Model_Install extends GFPDF\Helper\Helper_Abstract_Model
     final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
     public function __call($name, $arguments)
     public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Model\Model_Uninstall $uninstall)
-    public function check_folder_permissions(): array
-    public function create_folder_structures()
+    public function create_folder_structures(): array
     public function get_permalink_regex()
     public function get_settings_url()
     public function get_working_directory()
