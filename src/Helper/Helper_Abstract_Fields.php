@@ -515,8 +515,8 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 
 	/**
 	 * Process the tags in an administrative field's default, and encode the rest of its tags. Any other field's value is
-	 * left as is, unless the `gfpdf_field_process_merge_tags` filter opts in, and its PDF merge tags and shortcodes are
-	 * never trusted.
+	 * left as is, unless the `gfpdf_process_merge_tags_in_submitted_rich_text` filter opts in, and its PDF merge tags and
+	 * shortcodes are never trusted.
 	 *
 	 * @param string $value
 	 *
@@ -530,7 +530,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			return $this->gform->process_tags( strtr( $this->encode_tags( $value ), $default_tags ), $this->form, $this->entry );
 		}
 
-		if ( ! apply_filters( 'gfpdf_field_process_merge_tags', false, $this->field, $this->entry, $this->form ) ) {
+		if ( ! apply_filters( 'gfpdf_process_merge_tags_in_submitted_rich_text', false, $this->field, $this->entry, $this->form ) ) {
 			return $value;
 		}
 

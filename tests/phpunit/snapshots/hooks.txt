@@ -131,7 +131,6 @@ filter gfpdf_field_is_empty_value_instead_of_label 6
 filter gfpdf_field_label 3
 filter gfpdf_field_middleware 7
 filter gfpdf_field_page_name_html 3
-filter gfpdf_field_process_merge_tags 4
 filter gfpdf_field_product_value 6
 filter gfpdf_field_section_break_html 8
 filter gfpdf_field_value 5
@@ -201,6 +200,7 @@ filter gfpdf_pdf_middleware 3
 filter gfpdf_pre_html_browser_output 5
 filter gfpdf_preprocess_template_arguments 1
 filter gfpdf_privilages_list 1
+filter gfpdf_process_merge_tags_in_submitted_rich_text 4
 filter gfpdf_queue_initialise 3
 filter gfpdf_queue_post_notifications 3
 filter gfpdf_queue_post_pdf_creation 3

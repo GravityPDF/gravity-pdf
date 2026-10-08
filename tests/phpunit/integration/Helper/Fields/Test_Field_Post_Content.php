@@ -52,8 +52,8 @@ class Test_Field_Post_Content extends TestCase {
 
 		$this->assertStringContainsString( 'Form {form_id}', $value() );
 
-		add_filter( 'gfpdf_field_process_merge_tags', '__return_true' );
+		add_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 		$this->assertStringContainsString( "Form $form_id", $value() );
-		remove_filter( 'gfpdf_field_process_merge_tags', '__return_true' );
+		remove_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 	}
 }
