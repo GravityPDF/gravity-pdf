@@ -133,6 +133,10 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	public function add_actions() {
 		add_action( 'wp_loaded', [ $this, 'check_install_status' ], 9999 );
 
+		/* Test writing to the folders occasionally, rather than on every request */
+		add_action( 'gfpdf_version_changed', [ $this->model, 'check_folder_permissions' ] );
+		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'check_folder_permissions' ] );
+
 		/* rewrite endpoints */
 		add_action( 'init', [ $this->model, 'register_rewrite_rules' ] );
 	}
