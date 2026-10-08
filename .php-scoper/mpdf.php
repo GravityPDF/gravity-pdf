@@ -62,6 +62,11 @@ return [
 				$content = str_replace( "$prefix\\\\</t\\\\1", '</t\\\\1', $content );
 			}
 
+			/* is_writable() can report a writable network share as read-only, so trust the directory existing */
+			if ( substr( $filePath, -strlen( 'mpdf/mpdf/src/Cache.php' ) ) === 'mpdf/mpdf/src/Cache.php' ) {
+				$content = preg_replace( '#!\s*\\\\?is_writable\(\$basePath\)\s*\|\|\s*#', '', $content );
+			}
+
 			if ( basename( $filePath ) === 'ServiceFactory.php' ) {
 				$content = str_replace( "new \\$prefix\\Mpdf\\Cache(", 'new \GFPDF\Helper\Mpdf\Cache(', $content );
 			}

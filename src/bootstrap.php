@@ -621,7 +621,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 6.0
 	 */
 	public function upgrade_routine(): void {
-		$class = new Controller\Controller_Upgrade_Routines( $this->options, $this->data );
+		$class = new Controller\Controller_Upgrade_Routines( $this->options, $this->data, $this->misc );
 		$class->init();
 
 		$this->singleton->add_class( $class );

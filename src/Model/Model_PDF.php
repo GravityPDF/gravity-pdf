@@ -2004,21 +2004,16 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return void
 	 *
 	 * @since 4.0
+	 * @since 6.17.3 Recreates mPDF's cache folders afterwards
 	 */
 	public function cleanup_tmp_dir() {
 
-		$mpdf_tmp_location = $this->data->mpdf_tmp_location;
-		$mpdf_font_cache   = $mpdf_tmp_location . '/mpdf/ttfontdata/';
-
-		/* the mPDF tmp directory is usually inside the template tmp directory, but can be moved via a filter */
-		$directories = [ $this->data->template_tmp_location ];
-		if ( strpos( $mpdf_tmp_location, $this->data->template_tmp_location ) !== 0 ) {
-			$directories[] = $mpdf_tmp_location;
-		}
+		$mpdf_cache      = $this->data->mpdf_tmp_location . '/mpdf';
+		$mpdf_font_cache = $mpdf_cache . '/ttfontdata/';
 
 		$now = time();
 
-		foreach ( $directories as $dir ) {
+		foreach ( $this->misc->get_tmp_locations() as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				continue;
 			}
@@ -2035,7 +2030,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					}
 
 					$path    = $file->getPathname();
-					$is_mpdf = strpos( $path . '/', $mpdf_tmp_location . '/' ) === 0;
+					$is_mpdf = strpos( $path . '/', $mpdf_cache . '/' ) === 0;
 
 					/* Concurrent PDFs share mPDF's cache folders and it recreates them non-atomically, so only files expire */
 					if ( $is_mpdf && $file->isDir() ) {
@@ -2065,6 +2060,8 @@ class Model_PDF extends Helper_Abstract_Model {
 				);
 			}
 		}
+
+		$this->misc->create_mpdf_cache_folders();
 	}
 
 	/**

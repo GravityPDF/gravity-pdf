@@ -476,6 +476,36 @@ class Helper_Misc {
 	}
 
 	/**
+	 * The tmp folder, plus mPDF's tempDir when a filter has moved it outside
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.17.3
+	 */
+	public function get_tmp_locations(): array {
+		$locations = [ $this->data->template_tmp_location ];
+
+		if ( strpos( trailingslashit( $this->data->mpdf_tmp_location ), $this->data->template_tmp_location ) !== 0 ) {
+			$locations[] = $this->data->mpdf_tmp_location;
+		}
+
+		return $locations;
+	}
+
+	/**
+	 * Create mPDF's cache folders ahead of a render, so concurrent PDFs don't race to create them
+	 *
+	 * @since 6.17.3
+	 */
+	public function create_mpdf_cache_folders(): void {
+		$dir = $this->data->mpdf_tmp_location . '/mpdf/ttfontdata';
+
+		if ( ! wp_mkdir_p( $dir ) && ! is_dir( $dir ) ) {
+			$this->log->error( 'Failed Creating Folder Structure', [ 'dir' => $dir ] );
+		}
+	}
+
+	/**
 	 * This function recursively copies all files and folders under a given directory
 	 * equivalent to Bash: cp -R $dir
 	 *
