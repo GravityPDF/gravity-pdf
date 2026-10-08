@@ -3,30 +3,34 @@
 ## Gravity PDF
 
 ### 6.17.3
-* 🔒 Security: Check the user can view the entry before signing a PDF URL, and cap how long a signed PDF URL and the Logged Out Timeout last
-* 🧹 Housekeeping: Set a 1 minute minimum for the Logged Out Timeout
+* 🔒 Security: Only sign PDF URLs when the shortcode or merge tag comes from a trusted source
+* 🔒 Security: Cap signed PDF URLs at 1 year and the Logged Out Timeout at 1 week
+* 🧹 Housekeeping: Stop checking for the existence of Gravity PDF folders on every page load
 * 🧹 Housekeeping: Create the background processing queue once per request
-* 🧹 Housekeeping: Create Gravity PDF's folders on install, upgrade and the twice-daily tmp cleanup, instead of on every request, and fold the "problem creating the directory" error into the dismissible folder notice
+* 🧹 Housekeeping: Only flush a font from the cache when it's added, edited or deleted
+* 🧹 Housekeeping: Make the folder permission error dismissible (for a week)
+* 🧹 Housekeeping: Check Gravity PDF folder permissions on the System Status report page
+* 🧹 Housekeeping: Set a 1-minute minimum for the Logged Out Timeout
 * 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed in PDFs
-* 🐞 Bug: Save a number setting's default value when the field is left blank or isn't a number
-* 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
-* 🐞 Bug: Keep queued background PDFs when a global settings save that turns Background Processing on or off fails
-* 🐞 Bug: Stop a failed global settings save from erasing all saved settings
-* 🐞 Bug: Keep the entered values on the global settings page after a failed save when a Gravity PDF extension is active or updates its license
-* 🐞 Bug: Stop another plugin's settings errors from blocking the global settings save
-* 🐞 Bug: Hide the Tools tab from users who can view but not edit the PDF settings
-* 🐞 Bug: Keep the value returned by the `gfpdf_settings_sanitize` filter when saving the global settings
-* 🐞 Bug: Stop a Gravity PDF extension's info and success notices from blocking the global settings save or showing as errors
-* 🐞 Bug: Pass the form, entry and PDF config to the `gfpdf_field_container_class` filter for Repeater and Nested Form fields, as it already is for the rest of the PDF
-* 🐞 Bug: Stop the Tools tab hooking the removed uninstaller view for users who can uninstall Gravity PDF
-* 🐞 Bug: Keep the slash between the site URL and the path when converting a file under the site root, but outside the uploads and wp-content folders, to a URL
-* 🐞 Bug: Fix the "Temporary files directory is not writable" error on network storage, and create mPDF's cache folders before a PDF needs them
-* 🐞 Bug: Stop the "does not have write permission" admin notice and the System Report reporting a writable network storage folder as not writable
-* 🧹 Housekeeping: The "does not have write permission" notice can now be dismissed for a week, comes back sooner if the problem goes away and returns, and shows to users who can view the PDF settings. The System Status report tests the folders each time it's viewed
-* 🐞 Bug: Adding, editing or deleting a font now clears only that font's cached data, instead of every font's and the temporary files of PDFs being generated at the time
-* 💻 Developer: Global settings fields can set a `sanitize_callback` to replace the default sanitizing
-* 💻 Developer: Folders added with the `gfpdf_installer_create_folders` filter are created on install, upgrade and the twice-daily tmp cleanup, rather than on every request
-* 💻 Developer: mPDF's cache moves from `tmp/mpdf/mpdf` to `tmp/mpdf`, as the default `gfpdf_mpdf_tmp_location` is now the PDF tmp folder
+* 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
+* 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
+* 🐞 Bug: Fix an edge case where a failed global settings save would reset all global PDF settings
+* 🐞 Bug: Fix regression where a failed global settings save discarded the entered values
+* 🐞 Bug: Fix the global settings save silently failing because of another plugin's error or an extension's notice
+* 🐞 Bug: Only clear the background PDF queue once a change to Background Processing is saved
+* 🐞 Bug: Use the default when a number setting is left blank
+* 🐞 Bug: Hide the Tools tab from users who can't use it
+* 🐞 Bug: Fix missing slash when converting a path under the site root to a URL
+* 💻 Developer: `$form_data` field values now encode shortcode and merge tag characters (`[ ] { }`) so they aren't processed
+* 💻 Developer: A `gfpdf_get_option_logged_out_timeout` filter returning 0 now expires IP-based logged-out access immediately, instead of turning off the Logged Out Timeout
+* 💻 Developer: The default `gfpdf_mpdf_tmp_location` is now the PDF tmp folder, which moves mPDF's cache from `tmp/mpdf/mpdf` to `tmp/mpdf`
+* 💻 Developer: Folders added with the `gfpdf_installer_create_folders` filter are now created on install, upgrade and the twice-daily cleanup, not every request
+* 💻 Developer: Fix the `gfpdf_settings_sanitize` filter result being discarded when saving the global settings
+* 💻 Developer: Add a `sanitize_callback` option to global settings fields
+* 💻 Developer: Pass the form, entry and PDF config to the `gfpdf_field_container_class` filter for Repeater and Nested Form fields
+* 💻 Developer: Add `gfpdf_signed_url_max_expiration` filter to change the 1-year cap on signed PDF URLs
+* 💻 Developer: Add `gfpdf_process_merge_tags_in_submitted_rich_text` filter to opt submitted rich-text Textarea and Post Content values back into merge tag processing
+* 💻 Developer: Add `gfpdf_shortcode_signing_user_id` filter to change which user's entry access is checked when signing `[gravitypdf]` URLs
 
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
