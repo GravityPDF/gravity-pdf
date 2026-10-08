@@ -9,8 +9,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-21 04:06+0000\n"
-"PO-Revision-Date: 2026-09-02 04:30+0000\n"
+"POT-Creation-Date: 2026-10-08T04:58:12+00:00\n"
+"PO-Revision-Date: 2026-10-08T05:00:19+00:00\n"
 "X-Generator: Poedit 3.5\n"
 "X-Domain: gravity-pdf\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -25,8 +25,10 @@ msgstr ""
 
 #: pdf.php:3
 #: src/Helper/Helper_Data.php:147
-#: src/Model/Model_PDF.php:994
-#: src/View/View_System_Report.php:414
+#: src/Model/Model_PDF.php:1007
+#: src/Statics/Notes.php:66
+#: src/View/View_System_Report.php:431
+#: src/View/View_System_Report.php:531
 #. Plugin Name of the plugin
 msgid "Gravity PDF"
 msgstr "Gravity PDF"
@@ -82,8 +84,8 @@ msgstr ""
 "GPDFAPI::update_plugin_option"
 
 #: api.php:662
-#: src/Helper/Helper_Abstract_Options.php:1002
-#: src/Helper/Helper_Data.php:300
+#: src/Helper/Helper_Abstract_Options.php:1017
+#: src/Helper/Helper_Data.php:301
 #: src/Model/Model_Custom_Fonts.php:238
 msgid "User-Defined Fonts"
 msgstr "Door de gebruiker gedefinieerde lettertypen"
@@ -190,62 +192,63 @@ msgstr ""
 "De Gravity PDF plugin heeft een nieuw thuis! Om updates direct van "
 "GravityPDF.com te krijgen %1$smoet je de plugin eenmalig downloaden%2$s."
 
-#: src/bootstrap.php:308
+#: src/bootstrap.php:311
 msgid "View Gravity PDF Settings"
 msgstr "Zwaartekracht PDF-instellingen weergeven"
 
-#: src/bootstrap.php:308
+#: src/bootstrap.php:311
 #: src/View/View_Settings.php:176
 msgid "Settings"
 msgstr "Instellingen"
 
-#: src/bootstrap.php:328
+#: src/bootstrap.php:331
 msgid "View Gravity PDF Documentation"
 msgstr "Bekijk PDF-documentatie over zwaartekracht"
 
-#: src/bootstrap.php:328
-#: src/Helper/Helper_Abstract_Addon.php:1103
+#: src/bootstrap.php:331
+#: src/Helper/Helper_Abstract_Addon.php:1138
 msgid "Docs"
 msgstr "Documentatie"
 
-#: src/bootstrap.php:329
-#: src/Helper/Helper_Abstract_Addon.php:1106
+#: src/bootstrap.php:332
+#: src/Helper/Helper_Abstract_Addon.php:1141
 msgid "Get Help and Support"
 msgstr "Krijg Hulp en Ondersteuning"
 
-#: src/bootstrap.php:329
-#: src/Helper/Helper_Abstract_Addon.php:1106
+#: src/bootstrap.php:332
+#: src/Helper/Helper_Abstract_Addon.php:1141
 msgid "Support"
 msgstr "Ondersteuning"
 
-#: src/bootstrap.php:330
+#: src/bootstrap.php:333
 msgid "View Gravity PDF Extensions Shop"
 msgstr "Bekijk zwaartekracht PDF-uitbreidingen Shop"
 
-#: src/bootstrap.php:330
+#: src/bootstrap.php:333
 #: src/View/View_Settings.php:210
 msgid "Extensions"
 msgstr "Extensies"
 
-#: src/bootstrap.php:331
+#: src/bootstrap.php:334
 msgid "View Gravity PDF Template Shop"
 msgstr "Bekijk zwaartekracht PDF sjablonen winkel"
 
-#: src/bootstrap.php:331
-#: src/Helper/Helper_Options_Fields.php:72
+#: src/bootstrap.php:334
+#: src/Helper/Helper_Options_Fields.php:81
 msgid "Templates"
 msgstr "Templates"
 
 #: src/Controller/Controller_Actions.php:139
-#: src/Helper/Helper_Options_Fields.php:224
+#: src/Helper/Helper_Options_Fields.php:235
 msgid "Install Core Fonts"
 msgstr "Kernlettertypen installeren"
 
-#: src/Controller/Controller_Actions.php:172
+#: src/Controller/Controller_Actions.php:147
+#: src/Controller/Controller_Actions.php:184
 msgid "View the system report"
 msgstr "Bekijk het systeemrapport"
 
-#: src/Controller/Controller_Actions.php:269
+#: src/Controller/Controller_Actions.php:281
 #: src/Model/Model_Form_Settings.php:171
 #: src/Model/Model_Form_Settings.php:208
 #: src/Model/Model_Form_Settings.php:330
@@ -253,18 +256,18 @@ msgstr "Bekijk het systeemrapport"
 msgid "You do not have permission to access this page"
 msgstr "Je hebt geen toestemming om deze pagina te bekijken"
 
-#: src/Controller/Controller_Actions.php:276
+#: src/Controller/Controller_Actions.php:288
 msgid "There was a problem processing the action. Please try again."
 msgstr ""
 "Er is een probleem opgetreden bij het verwerken van de actie. Probeer het "
 "opnieuw."
 
-#: src/Controller/Controller_Custom_Fonts.php:121
-#: src/Controller/Controller_Custom_Fonts.php:150
+#: src/Controller/Controller_Custom_Fonts.php:122
+#: src/Controller/Controller_Custom_Fonts.php:151
 msgid "The font label used for the object"
 msgstr "Het lettertype dat wordt gebruikt voor het object"
 
-#: src/Controller/Controller_Custom_Fonts.php:156
+#: src/Controller/Controller_Custom_Fonts.php:157
 msgid ""
 "The path to the `regular` font file. Pass empty value if it should be "
 "deleted"
@@ -272,7 +275,7 @@ msgstr ""
 "Het pad naar het `gewone` lettertypebestand. Geef een lege waarde door als "
 "het verwijderd moet worden"
 
-#: src/Controller/Controller_Custom_Fonts.php:162
+#: src/Controller/Controller_Custom_Fonts.php:163
 msgid ""
 "The path to the `italics` font file. Pass empty value if it should be "
 "deleted"
@@ -280,13 +283,13 @@ msgstr ""
 "Het pad naar het `italics` lettertypebestand. Geef een lege waarde door als "
 "het verwijderd moet worden"
 
-#: src/Controller/Controller_Custom_Fonts.php:168
+#: src/Controller/Controller_Custom_Fonts.php:169
 msgid "The path to the `bold` font file. Pass empty value if it should be deleted"
 msgstr ""
 "Het pad naar het `bold` lettertypebestand. Geef een lege waarde door als "
 "het verwijderd moet worden"
 
-#: src/Controller/Controller_Custom_Fonts.php:174
+#: src/Controller/Controller_Custom_Fonts.php:175
 msgid ""
 "The path to the `bolditalics` font file. Pass empty value if it should be "
 "deleted"
@@ -294,30 +297,30 @@ msgstr ""
 "Het pad naar het `bolditalics` lettertypebestand. Geef een lege waarde door "
 "als het verwijderd moet worden"
 
-#: src/Controller/Controller_Custom_Fonts.php:225
+#: src/Controller/Controller_Custom_Fonts.php:226
 msgid "The Regular font is required"
 msgstr "Het lettertype Regular is vereist"
 
-#: src/Controller/Controller_Custom_Fonts.php:338
+#: src/Controller/Controller_Custom_Fonts.php:339
 msgid "Kashida needs to be a value between 0-100"
 msgstr "Kashida moet een waarde zijn tussen 0-100"
 
-#: src/Controller/Controller_Custom_Fonts.php:480
+#: src/Controller/Controller_Custom_Fonts.php:483
 msgid "The upload is not a valid TTF file"
 msgstr "De upload is geen geldig TTF-bestand"
 
-#: src/Controller/Controller_Custom_Fonts.php:546
+#: src/Controller/Controller_Custom_Fonts.php:549
 #, php-format
 msgid "Cannot find %s."
 msgstr "Kan %s niet vinden."
 
-#: src/Controller/Controller_Export_Entries.php:54
+#: src/Controller/Controller_Export_Entries.php:72
 #, php-format
 msgid "PDF: %s"
 msgstr "PDF: %s"
 
-#: src/Controller/Controller_PDF.php:430
-#: src/View/View_PDF.php:246
+#: src/Controller/Controller_PDF.php:433
+#: src/View/View_PDF.php:250
 msgid "There was a problem generating your PDF"
 msgstr "Er is een probleem opgetreden bij het genereren van uw PDF"
 
@@ -342,11 +345,11 @@ msgstr "Verzending (%s)"
 msgid "Not accepted"
 msgstr "Not accepted"
 
-#: src/Helper/Helper_Abstract_Addon.php:985
+#: src/Helper/Helper_Abstract_Addon.php:1020
 msgid "an unknown date"
 msgstr "een onbekende datum"
 
-#: src/Helper/Helper_Abstract_Addon.php:1068
+#: src/Helper/Helper_Abstract_Addon.php:1103
 #, php-format
 msgid ""
 "%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades "
@@ -356,297 +359,297 @@ msgstr ""
 "automatische upgrades en ondersteuning. Licentiesleutel nodig? %4$sKoop er "
 "nu een%5$s."
 
-#: src/Helper/Helper_Abstract_Addon.php:1103
+#: src/Helper/Helper_Abstract_Addon.php:1138
 msgid "View plugin Documentation"
 msgstr "Bekijk plugin documentatie"
 
-#: src/Helper/Helper_Abstract_Options.php:396
-#: src/Helper/Helper_Abstract_Options.php:415
+#: src/Helper/Helper_Abstract_Options.php:411
+#: src/Helper/Helper_Abstract_Options.php:430
 msgid "You must pass in a valid form ID"
 msgstr "Je moet een geldig formulier-ID invoeren"
 
-#: src/Helper/Helper_Abstract_Options.php:457
+#: src/Helper/Helper_Abstract_Options.php:472
 msgid "You must pass in a valid PDF ID"
 msgstr "U moet een geldig PDF-ID doorgeven"
 
-#: src/Helper/Helper_Abstract_Options.php:842
+#: src/Helper/Helper_Abstract_Options.php:857
 msgid "Common Sizes"
 msgstr "Gangbare maten"
 
-#: src/Helper/Helper_Abstract_Options.php:843
+#: src/Helper/Helper_Abstract_Options.php:858
 msgid "A4 (210 x 297mm)"
 msgstr "A4 (210 x 297 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:844
+#: src/Helper/Helper_Abstract_Options.php:859
 msgid "Letter (8.5 x 11in)"
 msgstr "Letter (8,5 x 11in)"
 
-#: src/Helper/Helper_Abstract_Options.php:845
+#: src/Helper/Helper_Abstract_Options.php:860
 msgid "Legal (8.5 x 14in)"
 msgstr "Legal (8,5 x 14in)"
 
-#: src/Helper/Helper_Abstract_Options.php:846
+#: src/Helper/Helper_Abstract_Options.php:861
 msgid "Ledger / Tabloid (11 x 17in)"
 msgstr "Grootboek / tabloid (11 x 17in)"
 
-#: src/Helper/Helper_Abstract_Options.php:847
+#: src/Helper/Helper_Abstract_Options.php:862
 msgid "Executive (7 x 10in)"
 msgstr "Executive (7 x 10in)"
 
-#: src/Helper/Helper_Abstract_Options.php:848
-#: src/Helper/Helper_Options_Fields.php:96
-#: src/Helper/Helper_Options_Fields.php:321
+#: src/Helper/Helper_Abstract_Options.php:863
+#: src/Helper/Helper_Options_Fields.php:105
+#: src/Helper/Helper_Options_Fields.php:332
 msgid "Custom Paper Size"
 msgstr "Aangepast papierformaat"
 
-#: src/Helper/Helper_Abstract_Options.php:851
+#: src/Helper/Helper_Abstract_Options.php:866
 msgid "\"A\" Sizes"
 msgstr "\"A-maten"
 
-#: src/Helper/Helper_Abstract_Options.php:852
+#: src/Helper/Helper_Abstract_Options.php:867
 msgid "A0 (841 x 1189mm)"
 msgstr "A0 (841 x 1189 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:853
+#: src/Helper/Helper_Abstract_Options.php:868
 msgid "A1 (594 x 841mm)"
 msgstr "A1 (594 x 841 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:854
+#: src/Helper/Helper_Abstract_Options.php:869
 msgid "A2 (420 x 594mm)"
 msgstr "A2 (420 x 594 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:855
+#: src/Helper/Helper_Abstract_Options.php:870
 msgid "A3 (297 x 420mm)"
 msgstr "A3 (297 x 420 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:856
+#: src/Helper/Helper_Abstract_Options.php:871
 msgid "A5 (148 x 210mm)"
 msgstr "A5 (148 x 210 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:857
+#: src/Helper/Helper_Abstract_Options.php:872
 msgid "A6 (105 x 148mm)"
 msgstr "A6 (105 x 148 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:858
+#: src/Helper/Helper_Abstract_Options.php:873
 msgid "A7 (74 x 105mm)"
 msgstr "A7 (74 x 105 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:859
+#: src/Helper/Helper_Abstract_Options.php:874
 msgid "A8 (52 x 74mm)"
 msgstr "A8 (52 x 74 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:860
+#: src/Helper/Helper_Abstract_Options.php:875
 msgid "A9 (37 x 52mm)"
 msgstr "A9 (37 x 52 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:861
+#: src/Helper/Helper_Abstract_Options.php:876
 msgid "A10 (26 x 37mm)"
 msgstr "A10 (26 x 37 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:864
+#: src/Helper/Helper_Abstract_Options.php:879
 msgid "\"B\" Sizes"
 msgstr "\"B-maten"
 
-#: src/Helper/Helper_Abstract_Options.php:865
+#: src/Helper/Helper_Abstract_Options.php:880
 msgid "B0 (1414 x 1000mm)"
 msgstr "B0 (1414 x 1000 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:866
+#: src/Helper/Helper_Abstract_Options.php:881
 msgid "B1 (1000 x 707mm)"
 msgstr "B1 (1000 x 707 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:867
+#: src/Helper/Helper_Abstract_Options.php:882
 msgid "B2 (707 x 500mm)"
 msgstr "B2 (707 x 500 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:868
+#: src/Helper/Helper_Abstract_Options.php:883
 msgid "B3 (500 x 353mm)"
 msgstr "B3 (500 x 353 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:869
+#: src/Helper/Helper_Abstract_Options.php:884
 msgid "B4 (353 x 250mm)"
 msgstr "B4 (353 x 250 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:870
+#: src/Helper/Helper_Abstract_Options.php:885
 msgid "B5 (250 x 176mm)"
 msgstr "B5 (250 x 176 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:871
+#: src/Helper/Helper_Abstract_Options.php:886
 msgid "B6 (176 x 125mm)"
 msgstr "B6 (176 x 125 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:872
+#: src/Helper/Helper_Abstract_Options.php:887
 msgid "B7 (125 x 88mm)"
 msgstr "B7 (125 x 88 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:873
+#: src/Helper/Helper_Abstract_Options.php:888
 msgid "B8 (88 x 62mm)"
 msgstr "B8 (88 x 62 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:874
+#: src/Helper/Helper_Abstract_Options.php:889
 msgid "B9 (62 x 44mm)"
 msgstr "B9 (62 x 44mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:875
+#: src/Helper/Helper_Abstract_Options.php:890
 msgid "B10 (44 x 31mm)"
 msgstr "B10 (44 x 31mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:878
+#: src/Helper/Helper_Abstract_Options.php:893
 msgid "\"C\" Sizes"
 msgstr "\"C-maten"
 
-#: src/Helper/Helper_Abstract_Options.php:879
+#: src/Helper/Helper_Abstract_Options.php:894
 msgid "C0 (1297 x 917mm)"
 msgstr "C0 (1297 x 917 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:880
+#: src/Helper/Helper_Abstract_Options.php:895
 msgid "C1 (917 x 648mm)"
 msgstr "C1 (917 x 648 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:881
+#: src/Helper/Helper_Abstract_Options.php:896
 msgid "C2 (648 x 458mm)"
 msgstr "C2 (648 x 458 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:882
+#: src/Helper/Helper_Abstract_Options.php:897
 msgid "C3 (458 x 324mm)"
 msgstr "C3 (458 x 324 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:883
+#: src/Helper/Helper_Abstract_Options.php:898
 msgid "C4 (324 x 229mm)"
 msgstr "C4 (324 x 229 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:884
+#: src/Helper/Helper_Abstract_Options.php:899
 msgid "C5 (229 x 162mm)"
 msgstr "C5 (229 x 162 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:885
+#: src/Helper/Helper_Abstract_Options.php:900
 msgid "C6 (162 x 114mm)"
 msgstr "C6 (162 x 114mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:886
+#: src/Helper/Helper_Abstract_Options.php:901
 msgid "C7 (114 x 81mm)"
 msgstr "C7 (114 x 81 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:887
+#: src/Helper/Helper_Abstract_Options.php:902
 msgid "C8 (81 x 57mm)"
 msgstr "C8 (81 x 57 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:888
+#: src/Helper/Helper_Abstract_Options.php:903
 msgid "C9 (57 x 40mm)"
 msgstr "C9 (57 x 40mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:889
+#: src/Helper/Helper_Abstract_Options.php:904
 msgid "C10 (40 x 28mm)"
 msgstr "C10 (40 x 28 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:892
+#: src/Helper/Helper_Abstract_Options.php:907
 msgid "\"RA\" and \"SRA\" Sizes"
 msgstr "\"Maten \"RA\" en \"SRA"
 
-#: src/Helper/Helper_Abstract_Options.php:893
+#: src/Helper/Helper_Abstract_Options.php:908
 msgid "RA0 (860 x 1220mm)"
 msgstr "RA0 (860 x 1220 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:894
+#: src/Helper/Helper_Abstract_Options.php:909
 msgid "RA1 (610 x 860mm)"
 msgstr "RA1 (610 x 860 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:895
+#: src/Helper/Helper_Abstract_Options.php:910
 msgid "RA2 (430 x 610mm)"
 msgstr "RA2 (430 x 610 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:896
+#: src/Helper/Helper_Abstract_Options.php:911
 msgid "RA3 (305 x 430mm)"
 msgstr "RA3 (305 x 430 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:897
+#: src/Helper/Helper_Abstract_Options.php:912
 msgid "RA4 (215 x 305mm)"
 msgstr "RA4 (215 x 305 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:898
+#: src/Helper/Helper_Abstract_Options.php:913
 msgid "SRA0 (900 x 1280mm)"
 msgstr "SRA0 (900 x 1280 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:899
+#: src/Helper/Helper_Abstract_Options.php:914
 msgid "SRA1 (640 x 900mm)"
 msgstr "SRA1 (640 x 900 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:900
+#: src/Helper/Helper_Abstract_Options.php:915
 msgid "SRA2 (450 x 640mm)"
 msgstr "SRA2 (450 x 640 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:901
+#: src/Helper/Helper_Abstract_Options.php:916
 msgid "SRA3 (320 x 450mm)"
 msgstr "SRA3 (320 x 450 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:902
+#: src/Helper/Helper_Abstract_Options.php:917
 msgid "SRA4 (225 x 320mm)"
 msgstr "SRA4 (225 x 320 mm)"
 
-#: src/Helper/Helper_Abstract_Options.php:918
+#: src/Helper/Helper_Abstract_Options.php:933
 msgid "Unicode"
 msgstr "Unicode"
 
-#: src/Helper/Helper_Abstract_Options.php:932
+#: src/Helper/Helper_Abstract_Options.php:947
 msgid "Indic"
 msgstr "Indicatie"
 
-#: src/Helper/Helper_Abstract_Options.php:937
+#: src/Helper/Helper_Abstract_Options.php:952
 msgid "Arabic"
 msgstr "Arabisch"
 
-#: src/Helper/Helper_Abstract_Options.php:943
+#: src/Helper/Helper_Abstract_Options.php:958
 msgid "Chinese, Japanese, Korean"
 msgstr "Chinees, Japans, Koreaans"
 
-#: src/Helper/Helper_Abstract_Options.php:948
+#: src/Helper/Helper_Abstract_Options.php:963
 msgid "Other"
 msgstr "Andere"
 
-#: src/Helper/Helper_Abstract_Options.php:1059
+#: src/Helper/Helper_Abstract_Options.php:1074
 msgid "Could not find Gravity PDF Font"
 msgstr "Zwaartekracht PDF-lettertype niet gevonden"
 
-#: src/Helper/Helper_Abstract_Options.php:1071
+#: src/Helper/Helper_Abstract_Options.php:1086
 #: src/Helper/Helper_PDF_List_Table.php:301
 msgid "Copy"
 msgstr "Kopiëren"
 
-#: src/Helper/Helper_Abstract_Options.php:1072
+#: src/Helper/Helper_Abstract_Options.php:1087
 msgid "Print - Low Resolution"
 msgstr "Afdrukken - lage resolutie"
 
-#: src/Helper/Helper_Abstract_Options.php:1073
+#: src/Helper/Helper_Abstract_Options.php:1088
 msgid "Print - High Resolution"
 msgstr "Afdrukken - hoge resolutie"
 
-#: src/Helper/Helper_Abstract_Options.php:1074
+#: src/Helper/Helper_Abstract_Options.php:1089
 msgid "Modify"
 msgstr "Bewerken"
 
-#: src/Helper/Helper_Abstract_Options.php:1075
+#: src/Helper/Helper_Abstract_Options.php:1090
 msgid "Annotate"
 msgstr "Annoteer"
 
-#: src/Helper/Helper_Abstract_Options.php:1076
+#: src/Helper/Helper_Abstract_Options.php:1091
 msgid "Fill Forms"
 msgstr "Formulieren vullen"
 
-#: src/Helper/Helper_Abstract_Options.php:1077
+#: src/Helper/Helper_Abstract_Options.php:1092
 msgid "Extract"
 msgstr "Uitpakken"
 
-#: src/Helper/Helper_Abstract_Options.php:1078
+#: src/Helper/Helper_Abstract_Options.php:1093
 msgid "Assemble"
 msgstr "Zet  in elkaar"
 
-#: src/Helper/Helper_Abstract_Options.php:1184
+#: src/Helper/Helper_Abstract_Options.php:1209
 msgid "Settings updated."
 msgstr "Instellingen bijgewerkt."
 
-#: src/Helper/Helper_Abstract_Options.php:1340
-#: src/Helper/Helper_Abstract_Options.php:1348
-#: src/Helper/Helper_Abstract_Options.php:1356
+#: src/Helper/Helper_Abstract_Options.php:1363
+#: src/Helper/Helper_Abstract_Options.php:1371
+#: src/Helper/Helper_Abstract_Options.php:1379
 msgid ""
 "PDF Settings could not be saved. Please enter all required information "
 "below."
@@ -654,49 +657,49 @@ msgstr ""
 "PDF-instellingen konden niet worden opgeslagen. Voer hieronder alle "
 "vereiste informatie in."
 
-#: src/Helper/Helper_Abstract_Options.php:1723
+#: src/Helper/Helper_Abstract_Options.php:1746
 msgid "License key set by the site administrator."
 msgstr "Licentiesleutel ingesteld door de sitebeheerder."
 
-#: src/Helper/Helper_Abstract_Options.php:1724
+#: src/Helper/Helper_Abstract_Options.php:1747
 msgid "Learn more."
 msgstr "Meer informatie."
 
-#: src/Helper/Helper_Abstract_Options.php:1744
+#: src/Helper/Helper_Abstract_Options.php:1767
 #, php-format
 msgid "%s license key"
 msgstr "%s licentiesleutel"
 
-#: src/Helper/Helper_Abstract_Options.php:1762
+#: src/Helper/Helper_Abstract_Options.php:1785
 msgid "Deactivate License"
 msgstr "Deactiveer licentie"
 
-#: src/Helper/Helper_Abstract_Options.php:2127
-#: src/Helper/Helper_Abstract_Options.php:2128
+#: src/Helper/Helper_Abstract_Options.php:2150
+#: src/Helper/Helper_Abstract_Options.php:2151
 msgid "Select Media"
 msgstr "Selecteer afbeeldingen"
 
-#: src/Helper/Helper_Abstract_Options.php:2129
+#: src/Helper/Helper_Abstract_Options.php:2152
 msgid "Upload File"
 msgstr "Bestand uploaden"
 
-#: src/Helper/Helper_Abstract_Options.php:2369
+#: src/Helper/Helper_Abstract_Options.php:2392
 msgid "Width"
 msgstr "Breedte"
 
-#: src/Helper/Helper_Abstract_Options.php:2381
+#: src/Helper/Helper_Abstract_Options.php:2404
 msgid "Height"
 msgstr "Hoogte"
 
-#: src/Helper/Helper_Abstract_Options.php:2398
+#: src/Helper/Helper_Abstract_Options.php:2421
 msgid "mm"
 msgstr "mm"
 
-#: src/Helper/Helper_Abstract_Options.php:2399
+#: src/Helper/Helper_Abstract_Options.php:2422
 msgid "inches"
 msgstr "inches"
 
-#: src/Helper/Helper_Abstract_Options.php:2467
+#: src/Helper/Helper_Abstract_Options.php:2490
 #, php-format
 msgid "The callback used for the %s setting is missing."
 msgstr "De callback gebruikt voor de %s instelling ontbreekt."
@@ -712,7 +715,7 @@ msgid "Cannot find file %s"
 msgstr "Kan bestand niet vinden %s"
 
 #: src/Helper/Helper_Data.php:146
-#: src/Model/Model_Mergetags.php:125
+#: src/Model/Model_Mergetags.php:132
 msgid "PDF"
 msgstr "PDF"
 
@@ -758,6 +761,16 @@ msgstr ""
 
 #: src/Helper/Helper_Data.php:188
 msgid ""
+"Your license key is valid but is not activated on any website. This usually "
+"occurs if the site was removed from your account. Please resave the "
+"settings to activate the license for this website."
+msgstr ""
+"Uw licentiesleutel is geldig, maar is op geen enkele website geactiveerd. "
+"Dit gebeurt meestal als de site uit uw account is verwijderd. Sla de "
+"instellingen opnieuw op om de licentie voor deze website te activeren."
+
+#: src/Helper/Helper_Data.php:189
+msgid ""
 "Your license key is valid but does not match your current domain. This "
 "usually occurs if your domain URL changes. Please resave the settings to "
 "activate the license for this website."
@@ -766,8 +779,8 @@ msgstr ""
 "Dit gebeurt meestal als je domein URL verandert. Sla de instellingen "
 "opnieuw op om de licentie voor deze website te activeren."
 
-#: src/Helper/Helper_Data.php:189
 #: src/Helper/Helper_Data.php:190
+#: src/Helper/Helper_Data.php:191
 #, php-format
 msgid ""
 "This license key is not valid for %s. Please check your key is for this "
@@ -776,7 +789,7 @@ msgstr ""
 "Deze licentiesleutel is niet geldig voor %s. Controleer of uw sleutel voor "
 "dit product is."
 
-#: src/Helper/Helper_Data.php:191
+#: src/Helper/Helper_Data.php:192
 #, php-format
 msgid ""
 "This license key has reached its activation limit. %1$sPlease upgrade your "
@@ -785,71 +798,71 @@ msgstr ""
 "Deze licentiesleutel heeft zijn activeringslimiet bereikt. %1$sUpgrade je "
 "licentie om de sitelimiet te verhogen (je betaalt alleen het verschil)%2$s."
 
-#: src/Helper/Helper_Data.php:192
 #: src/Helper/Helper_Data.php:193
 #: src/Helper/Helper_Data.php:194
+#: src/Helper/Helper_Data.php:195
 msgid "An unknown error occurred while checking the license."
 msgstr "Er is een onbekende fout opgetreden bij het controleren van de licentie."
 
-#: src/Helper/Helper_Data.php:195
+#: src/Helper/Helper_Data.php:196
 msgid "The licensing server is temporarily unavailable."
 msgstr "De licentieserver is tijdelijk niet beschikbaar."
 
-#: src/Helper/Helper_Data.php:233
+#: src/Helper/Helper_Data.php:234
 msgid "Loading..."
 msgstr "Laden…"
 
-#: src/Helper/Helper_Data.php:234
+#: src/Helper/Helper_Data.php:235
 msgid "Continue"
 msgstr "Doorgaan"
 
-#: src/Helper/Helper_Data.php:235
+#: src/Helper/Helper_Data.php:236
 msgid "Uninstall"
 msgstr "Deinstallatie"
 
-#: src/Helper/Helper_Data.php:236
+#: src/Helper/Helper_Data.php:237
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/Helper/Helper_Data.php:237
+#: src/Helper/Helper_Data.php:238
 #: src/Helper/Helper_PDF_List_Table.php:367
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: src/Helper/Helper_Data.php:238
+#: src/Helper/Helper_Data.php:239
 #: src/Helper/Helper_PDF_List_Table.php:221
 #: src/Model/Model_Form_Settings.php:924
 msgid "Active"
 msgstr "Actief"
 
-#: src/Helper/Helper_Data.php:239
+#: src/Helper/Helper_Data.php:240
 #: src/Helper/Helper_PDF_List_Table.php:224
 #: src/Model/Model_Form_Settings.php:874
 #: src/Model/Model_Form_Settings.php:924
 msgid "Inactive"
 msgstr "Inactief"
 
-#: src/Helper/Helper_Data.php:240
+#: src/Helper/Helper_Data.php:241
 msgid "this PDF if"
 msgstr "dieses PDF wenn"
 
-#: src/Helper/Helper_Data.php:241
+#: src/Helper/Helper_Data.php:242
 msgid "Enable"
 msgstr "Inschakelen"
 
-#: src/Helper/Helper_Data.php:242
+#: src/Helper/Helper_Data.php:243
 msgid "Disable"
 msgstr "Uitschakelen"
 
-#: src/Helper/Helper_Data.php:243
+#: src/Helper/Helper_Data.php:244
 msgid "Successfully Updated"
 msgstr "Succesvol bijgewerkt"
 
-#: src/Helper/Helper_Data.php:244
+#: src/Helper/Helper_Data.php:245
 msgid "Successfully Deleted"
 msgstr "Succesvol verwijderd"
 
-#: src/Helper/Helper_Data.php:245
+#: src/Helper/Helper_Data.php:246
 msgid ""
 "An error occurred and your license key may not have been correctly "
 "deactivated. Login to your GravityPDF.com account and check if your site "
@@ -859,102 +872,102 @@ msgstr ""
 "gedeactiveerd. Log in op uw GravityPDF.com-account en controleer of uw site "
 "is losgekoppeld van de sleutel."
 
-#: src/Helper/Helper_Data.php:246
+#: src/Helper/Helper_Data.php:247
 msgid "No"
 msgstr "Nee"
 
-#: src/Helper/Helper_Data.php:247
+#: src/Helper/Helper_Data.php:248
 msgid "Yes"
 msgstr "Ja"
 
-#: src/Helper/Helper_Data.php:248
+#: src/Helper/Helper_Data.php:249
 msgid "Standard"
 msgstr "Standaard"
 
-#: src/Helper/Helper_Data.php:249
+#: src/Helper/Helper_Data.php:250
 #: src/View/View_Form_Settings.php:78
 msgid "Advanced"
 msgstr "Geavanceerd"
 
-#: src/Helper/Helper_Data.php:250
+#: src/Helper/Helper_Data.php:251
 msgid "Manage"
 msgstr "Beheren"
 
-#: src/Helper/Helper_Data.php:251
+#: src/Helper/Helper_Data.php:252
 msgid "Details"
 msgstr "Details"
 
-#: src/Helper/Helper_Data.php:252
+#: src/Helper/Helper_Data.php:253
 msgid "Select"
 msgstr "Selecteer"
 
-#: src/Helper/Helper_Data.php:253
+#: src/Helper/Helper_Data.php:254
 msgid "Version"
 msgstr "Versie"
 
-#: src/Helper/Helper_Data.php:254
+#: src/Helper/Helper_Data.php:255
 msgid "Group"
 msgstr "Groep"
 
-#: src/Helper/Helper_Data.php:255
+#: src/Helper/Helper_Data.php:256
 msgid "Tags"
 msgstr "Tags"
 
-#: src/Helper/Helper_Data.php:257
-#: src/Helper/Helper_Options_Fields.php:257
+#: src/Helper/Helper_Data.php:258
+#: src/Helper/Helper_Options_Fields.php:268
 #: src/Helper/Helper_PDF_List_Table.php:98
 #: src/View/View_Form_Settings.php:66
 msgid "Template"
 msgstr "Sjabloon"
 
-#: src/Helper/Helper_Data.php:258
+#: src/Helper/Helper_Data.php:259
 msgid "Manage PDF Templates"
 msgstr "PDF-sjablonen beheren"
 
-#: src/Helper/Helper_Data.php:259
+#: src/Helper/Helper_Data.php:260
 msgid "Add New Template"
 msgstr "Nieuw sjabloon toevoegen"
 
-#: src/Helper/Helper_Data.php:260
+#: src/Helper/Helper_Data.php:261
 msgid "This form doesn't have any PDFs."
 msgstr "Dit formulier heeft geen PDF's."
 
-#: src/Helper/Helper_Data.php:261
+#: src/Helper/Helper_Data.php:262
 msgid "Let's go create one"
 msgstr "Laten we er een maken"
 
-#: src/Helper/Helper_Data.php:262
+#: src/Helper/Helper_Data.php:263
 msgid "Installed PDFs"
 msgstr "Geïnstalleerde PDF's"
 
-#: src/Helper/Helper_Data.php:263
+#: src/Helper/Helper_Data.php:264
 msgid "Search Installed Templates"
 msgstr "Geïnstalleerde sjablonen zoeken"
 
-#: src/Helper/Helper_Data.php:265
+#: src/Helper/Helper_Data.php:266
 msgid "Search the Gravity PDF Knowledgebase..."
 msgstr "Doorzoek de Gravity PDF-kennisbank..."
 
-#: src/Helper/Helper_Data.php:266
+#: src/Helper/Helper_Data.php:267
 msgid "Gravity PDF Documentation"
 msgstr "PDF-documentatie voor zwaartekracht"
 
-#: src/Helper/Helper_Data.php:267
+#: src/Helper/Helper_Data.php:268
 msgid "It doesn't look like there are any topics related to your issue."
 msgstr ""
 "Het ziet er niet naar uit dat er onderwerpen zijn met betrekking tot jouw "
 "probleem."
 
-#: src/Helper/Helper_Data.php:268
+#: src/Helper/Helper_Data.php:269
 msgid "An error occurred. Please try again"
 msgstr "Er is een fout opgetreden. Probeer het opnieuw"
 
-#: src/Helper/Helper_Data.php:270
+#: src/Helper/Helper_Data.php:271
 #, php-format
 msgid "Requires Gravity PDF v%s"
 msgstr "Vereist zwaartekracht-PDF v%s"
 
-#: src/Helper/Helper_Data.php:271
+#: src/Helper/Helper_Data.php:272
 #, php-format
 msgid ""
 "This PDF template is not compatible with your version of Gravity PDF. This "
@@ -963,49 +976,49 @@ msgstr ""
 "Deze PDF-sjabloon is niet compatibel met uw versie van Gravity PDF. Deze "
 "sjabloon vereist Gravity PDF v%s."
 
-#: src/Helper/Helper_Data.php:272
+#: src/Helper/Helper_Data.php:273
 msgid "Template Details"
 msgstr "Template Details"
 
-#: src/Helper/Helper_Data.php:273
+#: src/Helper/Helper_Data.php:274
 msgid "Current Template"
 msgstr "Huidige sjabloon"
 
-#: src/Helper/Helper_Data.php:274
+#: src/Helper/Helper_Data.php:275
 msgid "Show previous template"
 msgstr "Toon vorige sjabloon"
 
-#: src/Helper/Helper_Data.php:275
+#: src/Helper/Helper_Data.php:276
 msgid "Show next template"
 msgstr "Volgende sjabloon weergeven"
 
-#: src/Helper/Helper_Data.php:276
+#: src/Helper/Helper_Data.php:277
 msgid "Upload is not a valid template. Upload a .zip file."
 msgstr "Upload is geen geldige sjabloon. Upload een .zip-bestand."
 
-#: src/Helper/Helper_Data.php:277
+#: src/Helper/Helper_Data.php:278
 msgid "Upload exceeds the 10MB limit."
 msgstr "Uploaden overschrijdt de limiet van 10 MB."
 
-#: src/Helper/Helper_Data.php:278
+#: src/Helper/Helper_Data.php:279
 msgid "Template successfully installed"
 msgstr "Sjabloon succesvol geïnstalleerd"
 
-#: src/Helper/Helper_Data.php:279
+#: src/Helper/Helper_Data.php:280
 msgid "Template successfully updated"
 msgstr "Sjabloon succesvol bijgewerkt"
 
-#: src/Helper/Helper_Data.php:280
+#: src/Helper/Helper_Data.php:281
 msgid "PDF Template(s) Successfully Installed / Updated"
 msgstr "PDF-sjabloon(s) succesvol geïnstalleerd / bijgewerkt"
 
-#: src/Helper/Helper_Data.php:281
+#: src/Helper/Helper_Data.php:282
 msgid "There was a problem with the upload. Reload the page and try again."
 msgstr ""
 "Er is een probleem opgetreden bij het uploaden. Herlaad de pagina en "
 "probeer het opnieuw."
 
-#: src/Helper/Helper_Data.php:282
+#: src/Helper/Helper_Data.php:283
 #, php-format
 msgid ""
 "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, "
@@ -1014,11 +1027,11 @@ msgstr ""
 "Wilt u deze PDF-sjabloon echt verwijderen?%sKlik op 'Annuleren' om terug te "
 "gaan, op 'OK' om het verwijderen te bevestigen."
 
-#: src/Helper/Helper_Data.php:283
+#: src/Helper/Helper_Data.php:284
 msgid "Could not delete template."
 msgstr "Kan sjabloon niet verwijderen."
 
-#: src/Helper/Helper_Data.php:284
+#: src/Helper/Helper_Data.php:285
 msgid ""
 "If you have a PDF template in .zip format you may install it here. You can "
 "also update an existing PDF template (this will override any changes you "
@@ -1028,92 +1041,92 @@ msgstr ""
 "kunt ook een bestaande PDF-sjabloon bijwerken (wijzigingen die u hebt "
 "aangebracht worden dan overschreven)."
 
-#: src/Helper/Helper_Data.php:286
+#: src/Helper/Helper_Data.php:287
 msgid "ALL CORE FONTS SUCCESSFULLY INSTALLED"
 msgstr "ALLE KERNLETTERTYPEN MET SUCCES GEÏNSTALLEERD"
 
-#: src/Helper/Helper_Data.php:287
+#: src/Helper/Helper_Data.php:288
 #, php-format
 msgid "%s CORE FONT(S) DID NOT INSTALL CORRECTLY"
 msgstr "%s KERNLETTERTYPE(S) NIET GOED GEÏNSTALLEERD"
 
-#: src/Helper/Helper_Data.php:288
+#: src/Helper/Helper_Data.php:289
 msgid "Could not download Core Font list. Try again."
 msgstr "Core Font-lijst kon niet worden gedownload. Probeer het opnieuw."
 
-#: src/Helper/Helper_Data.php:289
+#: src/Helper/Helper_Data.php:290
 #, php-format
 msgid "Downloading %s..."
 msgstr "Downloaden %s..."
 
-#: src/Helper/Helper_Data.php:290
+#: src/Helper/Helper_Data.php:291
 #, php-format
 msgid "Completed installation of %s"
 msgstr "Installatie voltooid van %s"
 
-#: src/Helper/Helper_Data.php:291
+#: src/Helper/Helper_Data.php:292
 #, php-format
 msgid "Failed installation of %s"
 msgstr "Mislukte installatie van %s"
 
-#: src/Helper/Helper_Data.php:292
+#: src/Helper/Helper_Data.php:293
 msgid "Fonts remaining:"
 msgstr "Resterende lettertypen:"
 
-#: src/Helper/Helper_Data.php:293
+#: src/Helper/Helper_Data.php:294
 msgid "Retry Failed Downloads?"
 msgstr "Mislukte downloads opnieuw proberen?"
 
-#: src/Helper/Helper_Data.php:294
+#: src/Helper/Helper_Data.php:295
 msgid "Core font installation"
 msgstr "Installatie kernlettertype"
 
-#: src/Helper/Helper_Data.php:297
+#: src/Helper/Helper_Data.php:298
 msgid "Font Manager"
 msgstr "Lettertypebeheerder"
 
-#: src/Helper/Helper_Data.php:298
+#: src/Helper/Helper_Data.php:299
 msgid "Search installed fonts"
 msgstr "Geïnstalleerde lettertypen zoeken"
 
-#: src/Helper/Helper_Data.php:299
+#: src/Helper/Helper_Data.php:300
 msgid "Installed Fonts"
 msgstr "Geïnstalleerde lettertypen"
 
-#: src/Helper/Helper_Data.php:301
+#: src/Helper/Helper_Data.php:302
 msgid "Regular"
 msgstr "Standaard"
 
-#: src/Helper/Helper_Data.php:302
+#: src/Helper/Helper_Data.php:303
 #, php-format
 msgid "Regular %1$s(required)%2$s"
 msgstr "Regelmatig %1$s(verplicht)%2$s"
 
-#: src/Helper/Helper_Data.php:303
+#: src/Helper/Helper_Data.php:304
 msgid "Italics"
 msgstr "Cursief"
 
-#: src/Helper/Helper_Data.php:304
+#: src/Helper/Helper_Data.php:305
 msgid "Bold"
 msgstr "Vet"
 
-#: src/Helper/Helper_Data.php:305
+#: src/Helper/Helper_Data.php:306
 msgid "Bold Italics"
 msgstr "Vetgedrukt Cursief"
 
-#: src/Helper/Helper_Data.php:306
+#: src/Helper/Helper_Data.php:307
 msgid "Add Font"
 msgstr "Lettertype toevoegen"
 
-#: src/Helper/Helper_Data.php:307
+#: src/Helper/Helper_Data.php:308
 msgid "Update Font"
 msgstr "Update het lettertype"
 
-#: src/Helper/Helper_Data.php:308
+#: src/Helper/Helper_Data.php:309
 msgid "Install new fonts for use in your PDF documents."
 msgstr "Installeer nieuwe lettertypes voor gebruik in uw PDF-documenten."
 
-#: src/Helper/Helper_Data.php:309
+#: src/Helper/Helper_Data.php:310
 msgid ""
 "Once saved, PDFs configured to use this font will have your changes applied "
 "automatically for newly-generated documents."
@@ -1122,26 +1135,26 @@ msgstr ""
 "nieuw gegenereerde documenten in PDF's die zijn geconfigureerd om dit "
 "lettertype te gebruiken."
 
-#: src/Helper/Helper_Data.php:310
+#: src/Helper/Helper_Data.php:311
 #, php-format
 msgid "Font Name %1$s(required)%2$s"
 msgstr "Lettertype naam %1$s(verplicht)%2$s"
 
-#: src/Helper/Helper_Data.php:311
+#: src/Helper/Helper_Data.php:312
 msgid "The font name can only contain letters, numbers and spaces."
 msgstr "De naam van het lettertype kan alleen letters, cijfers en spaties bevatten."
 
-#: src/Helper/Helper_Data.php:312
+#: src/Helper/Helper_Data.php:313
 msgid ""
 "Please choose a name contains letters and/or numbers (and a space if you "
 "want it)."
 msgstr "Kies een naam met letters en/of cijfers (en een spatie als je dat wilt)."
 
-#: src/Helper/Helper_Data.php:313
+#: src/Helper/Helper_Data.php:314
 msgid "Font Files"
 msgstr "Lettertype Bestanden"
 
-#: src/Helper/Helper_Data.php:314
+#: src/Helper/Helper_Data.php:315
 msgid ""
 "Select or drag and drop your .ttf font file for the variants below. Only "
 "the Regular type is required."
@@ -1149,23 +1162,23 @@ msgstr ""
 "Selecteer of sleep je .ttf lettertypebestand voor de onderstaande "
 "varianten. Alleen het type Regular is vereist."
 
-#: src/Helper/Helper_Data.php:315
+#: src/Helper/Helper_Data.php:316
 msgid "Add a .ttf font file."
 msgstr "Voeg een .ttf lettertypebestand toe."
 
-#: src/Helper/Helper_Data.php:316
+#: src/Helper/Helper_Data.php:317
 msgid "View template usage"
 msgstr "Sjabloongebruik bekijken"
 
-#: src/Helper/Helper_Data.php:317
+#: src/Helper/Helper_Data.php:318
 msgid "← Cancel"
 msgstr "← Annuleren"
 
-#: src/Helper/Helper_Data.php:318
+#: src/Helper/Helper_Data.php:319
 msgid "Are you sure you want to delete this font?"
 msgstr "Weet je zeker dat je dit lettertype wilt verwijderen?"
 
-#: src/Helper/Helper_Data.php:319
+#: src/Helper/Helper_Data.php:320
 #, php-format
 msgid ""
 "Add this snippet %1$sin a custom template%3$s to selectively set the font "
@@ -1177,35 +1190,35 @@ msgstr ""
 "toepassen op de hele PDF, %2$sgebruik dan de Font instelling%3$s bij het "
 "configureren van de PDF op het formulier."
 
-#: src/Helper/Helper_Data.php:320
+#: src/Helper/Helper_Data.php:321
 msgid "Update font"
 msgstr "Lettertype bijwerken"
 
-#: src/Helper/Helper_Data.php:321
+#: src/Helper/Helper_Data.php:322
 msgid "Select font"
 msgstr "Slecteer lettertype"
 
-#: src/Helper/Helper_Data.php:322
+#: src/Helper/Helper_Data.php:323
 msgid "Delete font"
 msgstr "Lettertype verwijderen"
 
-#: src/Helper/Helper_Data.php:325
+#: src/Helper/Helper_Data.php:326
 msgid "Font list empty."
 msgstr "Lijst met lettertypen is leeg."
 
-#: src/Helper/Helper_Data.php:326
+#: src/Helper/Helper_Data.php:327
 msgid "No fonts matching your search found."
 msgstr "Geen lettertypen gevonden die aan je zoekopdracht voldoen."
 
-#: src/Helper/Helper_Data.php:327
+#: src/Helper/Helper_Data.php:328
 msgid "Clear Search."
 msgstr "Duidelijk zoeken."
 
-#: src/Helper/Helper_Data.php:328
+#: src/Helper/Helper_Data.php:329
 msgid "Your font has been saved."
 msgstr "Je lettertype is opgeslagen."
 
-#: src/Helper/Helper_Data.php:329
+#: src/Helper/Helper_Data.php:330
 #, php-format
 msgid ""
 "%1$sThe action could not be completed.%2$s Resolve the highlighted issues "
@@ -1214,13 +1227,13 @@ msgstr ""
 "%1$sDe actie kon niet worden voltooid.%2$s Los de gemarkeerde problemen "
 "hierboven op en probeer het opnieuw."
 
-#: src/Helper/Helper_Data.php:330
+#: src/Helper/Helper_Data.php:331
 msgid "A problem occurred. Reload the page and try again."
 msgstr ""
 "Er heeft zich een probleem voorgedaan. Laad de pagina opnieuw en probeer "
 "het opnieuw."
 
-#: src/Helper/Helper_Data.php:331
+#: src/Helper/Helper_Data.php:332
 #, php-format
 msgid ""
 "%1$sFont file(s) missing from the server.%2$s Please upload the font(s) "
@@ -1229,14 +1242,14 @@ msgstr ""
 "%1$sFont bestand(en) ontbreekt (ontbreken) op de server.%2$s Upload de "
 "font(s) opnieuw en sla dan op."
 
-#: src/Helper/Helper_Data.php:332
+#: src/Helper/Helper_Data.php:333
 #, php-format
 msgid "%1$sFont file(s) are malformed%2$s and cannot be used with Gravity PDF."
 msgstr ""
 "%1$sFont bestand(en) zijn misvormd%2$s en kunnen niet gebruikt worden met "
 "Gravity PDF."
 
-#: src/Helper/Helper_Data.php:334
+#: src/Helper/Helper_Data.php:335
 msgid ""
 "Warning! ALL Gravity PDF data, including templates, will be deleted. This "
 "cannot be undone. 'OK' to delete, 'Cancel' to stop."
@@ -1245,41 +1258,41 @@ msgstr ""
 "verwijderd. Dit kan niet ongedaan worden gemaakt. oK' om te verwijderen, "
 "'Annuleren' om te stoppen."
 
-#: src/Helper/Helper_Data.php:335
+#: src/Helper/Helper_Data.php:336
 msgid "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete."
 msgstr ""
 "WAARSCHUWING: U staat op het punt deze PDF te verwijderen. 'Annuleren' om "
 "te stoppen, 'OK' om te verwijderen."
 
-#: src/Helper/Helper_Data.php:338
+#: src/Helper/Helper_Data.php:339
 msgid "Search the Gravity PDF Documentation..."
 msgstr "Doorzoek de PDF-documentatie van Gravity..."
 
-#: src/Helper/Helper_Data.php:339
+#: src/Helper/Helper_Data.php:340
 msgid "Submit your search query."
 msgstr "Geef uw zoekopdracht op."
 
-#: src/Helper/Helper_Data.php:340
+#: src/Helper/Helper_Data.php:341
 msgid "Clear your search query."
 msgstr "Wis je zoekopdracht."
 
-#: src/Helper/Helper_Data.php:498
+#: src/Helper/Helper_Data.php:499
 msgid "Approved"
 msgstr "Goedgekeurd"
 
-#: src/Helper/Helper_Data.php:499
+#: src/Helper/Helper_Data.php:500
 msgid "Disapproved"
 msgstr "Niet goedgekeurd"
 
-#: src/Helper/Helper_Data.php:500
+#: src/Helper/Helper_Data.php:501
 msgid "Unapproved"
 msgstr "Afgekeurd"
 
-#: src/Helper/Helper_Options_Fields.php:67
+#: src/Helper/Helper_Options_Fields.php:76
 msgid "Default Template"
 msgstr "Standaard Template"
 
-#: src/Helper/Helper_Options_Fields.php:68
+#: src/Helper/Helper_Options_Fields.php:77
 #, php-format
 msgid ""
 "Choose an existing template or purchased more %1$sfrom our template "
@@ -1290,7 +1303,7 @@ msgstr ""
 "Je kunt ook %3$sje eigen sjabloon bouwen%4$s of %5$sons inhuren%6$s om een "
 "oplossing op maat te maken."
 
-#: src/Helper/Helper_Options_Fields.php:72
+#: src/Helper/Helper_Options_Fields.php:81
 #, php-format
 msgid ""
 "Gravity PDF comes with %1$sfour completely-free and highly customizable "
@@ -1303,11 +1316,11 @@ msgstr ""
 "ons inhuren om bestaande PDF's te integreren of, met een beetje technische "
 "kennis, je eigen PDF's bouwen."
 
-#: src/Helper/Helper_Options_Fields.php:77
+#: src/Helper/Helper_Options_Fields.php:86
 msgid "Default Font"
 msgstr "Standaard Font"
 
-#: src/Helper/Helper_Options_Fields.php:78
+#: src/Helper/Helper_Options_Fields.php:87
 msgid ""
 "Set the default font type used in PDFs. Choose an existing font or install "
 "your own."
@@ -1315,12 +1328,12 @@ msgstr ""
 "Het standaardlettertype instellen dat in PDF's wordt gebruikt. Kies een "
 "bestaand lettertype of installeer je eigen lettertype."
 
-#: src/Helper/Helper_Options_Fields.php:81
-#: src/Helper/Helper_Options_Fields.php:232
+#: src/Helper/Helper_Options_Fields.php:90
+#: src/Helper/Helper_Options_Fields.php:243
 msgid "Fonts"
 msgstr "Lettertypen"
 
-#: src/Helper/Helper_Options_Fields.php:81
+#: src/Helper/Helper_Options_Fields.php:90
 msgid ""
 "Gravity PDF comes bundled with fonts for most languages world-wide. Want to "
 "use a specific font type? Use the font installer (found in the Tools tab)."
@@ -1329,36 +1342,36 @@ msgstr ""
 "Wil je een specifiek lettertype gebruiken? Gebruik het "
 "lettertype-installatieprogramma (te vinden in het tabblad Extra)."
 
-#: src/Helper/Helper_Options_Fields.php:87
+#: src/Helper/Helper_Options_Fields.php:96
 msgid "Default Paper Size"
 msgstr "Standaard papierformaat"
 
-#: src/Helper/Helper_Options_Fields.php:88
+#: src/Helper/Helper_Options_Fields.php:97
 msgid "Set the default paper size used when generating PDFs."
 msgstr ""
 "Het standaard papierformaat instellen dat wordt gebruikt bij het genereren "
 "van PDF's."
 
-#: src/Helper/Helper_Options_Fields.php:97
-#: src/Helper/Helper_Options_Fields.php:322
+#: src/Helper/Helper_Options_Fields.php:106
+#: src/Helper/Helper_Options_Fields.php:333
 msgid "Control the exact paper size. Can be set in millimeters or inches."
 msgstr ""
 "Controleer het exacte papierformaat. Kan worden ingesteld in millimeters of "
 "inches."
 
-#: src/Helper/Helper_Options_Fields.php:104
-#: src/Helper/Helper_Options_Fields.php:108
-#: src/Helper/Helper_Options_Fields.php:374
+#: src/Helper/Helper_Options_Fields.php:113
+#: src/Helper/Helper_Options_Fields.php:117
+#: src/Helper/Helper_Options_Fields.php:385
 msgid "Reverse Text (RTL)"
 msgstr "Omgekeerde tekst (RTL)"
 
-#: src/Helper/Helper_Options_Fields.php:105
+#: src/Helper/Helper_Options_Fields.php:114
 msgid "Script like Arabic and Hebrew are written right to left."
 msgstr ""
 "Schriften zoals Arabisch en Hebreeuws worden van rechts naar links "
 "geschreven."
 
-#: src/Helper/Helper_Options_Fields.php:108
+#: src/Helper/Helper_Options_Fields.php:117
 msgid ""
 "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, "
 "Tifinar, Urdu or other RTL languages."
@@ -1366,27 +1379,27 @@ msgstr ""
 "Schakel RTL in als je in het Arabisch, Hebreeuws, Syrisch, N'ko, Thaana, "
 "Tifinar, Urdu of andere RTL-talen schrijft."
 
-#: src/Helper/Helper_Options_Fields.php:113
+#: src/Helper/Helper_Options_Fields.php:122
 msgid "Default Font Size"
 msgstr "Standaard lettergrootte"
 
-#: src/Helper/Helper_Options_Fields.php:114
+#: src/Helper/Helper_Options_Fields.php:123
 msgid "Set the default font size used in PDFs."
 msgstr "De standaard lettergrootte instellen die in PDF's wordt gebruikt."
 
-#: src/Helper/Helper_Options_Fields.php:124
+#: src/Helper/Helper_Options_Fields.php:133
 msgid "Default Font Color"
 msgstr "Standaard tekstkleur"
 
-#: src/Helper/Helper_Options_Fields.php:127
+#: src/Helper/Helper_Options_Fields.php:136
 msgid "Set the default font color used in PDFs."
 msgstr "De standaard letterkleur instellen die in PDF's wordt gebruikt."
 
-#: src/Helper/Helper_Options_Fields.php:137
+#: src/Helper/Helper_Options_Fields.php:146
 msgid "Entry View"
 msgstr "Toegangszicht"
 
-#: src/Helper/Helper_Options_Fields.php:138
+#: src/Helper/Helper_Options_Fields.php:147
 #, php-format
 msgid ""
 "Select the default action used when accessing a PDF from the %1$sGravity "
@@ -1395,24 +1408,24 @@ msgstr ""
 "Selecteer de standaardactie die wordt gebruikt bij het openen van een PDF "
 "vanuit de %1$sGravity Forms invoerlijst%2$s pagina."
 
-#: src/Helper/Helper_Options_Fields.php:141
-#: src/Model/Model_System_Report.php:323
+#: src/Helper/Helper_Options_Fields.php:150
+#: src/Model/Model_System_Report.php:349
 #: src/View/html/PDF/entry_detailed_pdf.php:35
 msgid "View"
 msgstr "Bekijk"
 
-#: src/Helper/Helper_Options_Fields.php:142
-#: src/Model/Model_System_Report.php:323
+#: src/Helper/Helper_Options_Fields.php:151
+#: src/Model/Model_System_Report.php:349
 #: src/View/html/PDF/entry_detailed_pdf.php:36
 msgid "Download"
 msgstr "Download"
 
-#: src/Helper/Helper_Options_Fields.php:149
-#: src/Model/Model_System_Report.php:328
+#: src/Helper/Helper_Options_Fields.php:158
+#: src/Model/Model_System_Report.php:354
 msgid "Background Processing"
 msgstr "Achtergrondverwerking"
 
-#: src/Helper/Helper_Options_Fields.php:150
+#: src/Helper/Helper_Options_Fields.php:159
 #, php-format
 msgid ""
 "When enable, form submission and resending notifications with PDFs are "
@@ -1423,12 +1436,12 @@ msgstr ""
 "opnieuw verzenden van meldingen met PDF's afgehandeld in een "
 "achtergrondtaak. %1$sVereist dat Achtergrondtaken zijn ingeschakeld%2$s."
 
-#: src/Helper/Helper_Options_Fields.php:157
-#: src/Model/Model_System_Report.php:335
+#: src/Helper/Helper_Options_Fields.php:166
+#: src/Model/Model_System_Report.php:361
 msgid "Debug Mode"
 msgstr "Debug modus"
 
-#: src/Helper/Helper_Options_Fields.php:160
+#: src/Helper/Helper_Options_Fields.php:169
 msgid ""
 "When enabled, debug information will be displayed on-screen for core "
 "features."
@@ -1436,27 +1449,26 @@ msgstr ""
 "Als deze optie is ingeschakeld, wordt er debug-informatie op het scherm "
 "weergegeven voor kernfuncties."
 
-#: src/Helper/Helper_Options_Fields.php:171
-#: src/Helper/Helper_Options_Fields.php:177
-#: src/Model/Model_System_Report.php:351
+#: src/Helper/Helper_Options_Fields.php:180
+#: src/Helper/Helper_Options_Fields.php:188
+#: src/Model/Model_System_Report.php:377
 msgid "Logged Out Timeout"
 msgstr "Uitgelogd Time-out"
 
-#: src/Helper/Helper_Options_Fields.php:172
+#: src/Helper/Helper_Options_Fields.php:181
 #, php-format
 msgid ""
 "Limit how long a %1$slogged out%2$s users has direct access to the PDF "
-"after completing the form. Set to 0 to disable time limit (not recommended)."
+"after completing the form."
 msgstr ""
 "Beperk hoe lang een %1$suitgelogde%2$s gebruiker directe toegang heeft tot "
-"de PDF na het invullen van het formulier. Stel in op 0 om de tijdslimiet "
-"uit te schakelen (niet aanbevolen)."
+"de PDF na het invullen van het formulier."
 
-#: src/Helper/Helper_Options_Fields.php:173
+#: src/Helper/Helper_Options_Fields.php:182
 msgid "minutes"
 msgstr "minuten"
 
-#: src/Helper/Helper_Options_Fields.php:177
+#: src/Helper/Helper_Options_Fields.php:188
 msgid ""
 "Logged out users can view PDFs when their IP matches the one assigned to "
 "the Gravity Form entry. Because IP addresses can change, a time-based "
@@ -1466,11 +1478,11 @@ msgstr ""
 "IP dat is toegewezen aan de Gravity Form-invoer. Omdat IP-adressen kunnen "
 "veranderen, geldt er ook een tijdsbeperking."
 
-#: src/Helper/Helper_Options_Fields.php:182
+#: src/Helper/Helper_Options_Fields.php:193
 msgid "Default Owner Restrictions"
 msgstr "Standaardbeperkingen voor eigenaars"
 
-#: src/Helper/Helper_Options_Fields.php:183
+#: src/Helper/Helper_Options_Fields.php:194
 msgid ""
 "Set the default PDF owner permissions. When enabled, the original entry "
 "owner will NOT be able to view the PDFs (unless they have a User "
@@ -1480,12 +1492,12 @@ msgstr ""
 "ingeschakeld, kan de oorspronkelijke eigenaar van de invoer de PDF's NIET "
 "bekijken (tenzij hij beschikt over een gebruikersbeperking)."
 
-#: src/Helper/Helper_Options_Fields.php:186
-#: src/Helper/Helper_Options_Fields.php:480
+#: src/Helper/Helper_Options_Fields.php:197
+#: src/Helper/Helper_Options_Fields.php:491
 msgid "Restrict Owner"
 msgstr "Eigenaar beperken"
 
-#: src/Helper/Helper_Options_Fields.php:186
+#: src/Helper/Helper_Options_Fields.php:197
 msgid ""
 "Enable this setting if your PDFs should not be viewable by the end user. "
 "This can be set on a per-PDF basis."
@@ -1493,12 +1505,12 @@ msgstr ""
 "Schakel deze instelling in als uw PDF's niet door de eindgebruiker mogen "
 "worden bekeken. Dit kan per PDF worden ingesteld."
 
-#: src/Helper/Helper_Options_Fields.php:191
-#: src/Helper/Helper_Options_Fields.php:197
+#: src/Helper/Helper_Options_Fields.php:202
+#: src/Helper/Helper_Options_Fields.php:208
 msgid "User Restriction"
 msgstr "Gebruikersbeperking"
 
-#: src/Helper/Helper_Options_Fields.php:193
+#: src/Helper/Helper_Options_Fields.php:204
 msgid ""
 "Restrict PDF access to users with any of these capabilities. The "
 "Administrator Role always has full access."
@@ -1506,7 +1518,7 @@ msgstr ""
 "Beperk de PDF-toegang tot gebruikers met een van deze mogelijkheden. De "
 "beheerdersrol heeft altijd volledige toegang."
 
-#: src/Helper/Helper_Options_Fields.php:197
+#: src/Helper/Helper_Options_Fields.php:208
 msgid ""
 "Only logged in users with any selected capability can view generated PDFs "
 "they don't have ownership of. Ownership refers to an end user who completed "
@@ -1517,7 +1529,7 @@ msgstr ""
 "verwijst naar een eindgebruiker die het originele Gravity Formulier heeft "
 "ingevuld."
 
-#: src/Helper/Helper_Options_Fields.php:225
+#: src/Helper/Helper_Options_Fields.php:236
 msgid ""
 "Automatically install the core fonts needed to generate PDF documents. This "
 "action only needs to be run once, as the fonts are preserved during plugin "
@@ -1527,16 +1539,16 @@ msgstr ""
 "te genereren. Deze actie hoeft maar één keer uitgevoerd te worden, "
 "aangezien de lettertypes bewaard blijven tijdens plugin-updates."
 
-#: src/Helper/Helper_Options_Fields.php:225
+#: src/Helper/Helper_Options_Fields.php:236
 #: src/View/html/Actions/core_font.php:29
 msgid "Get more info."
 msgstr "Meer informatie."
 
-#: src/Helper/Helper_Options_Fields.php:227
+#: src/Helper/Helper_Options_Fields.php:238
 msgid "Download Core Fonts"
 msgstr "Kernlettertypen downloaden"
 
-#: src/Helper/Helper_Options_Fields.php:233
+#: src/Helper/Helper_Options_Fields.php:244
 #, php-format
 msgid ""
 "Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font "
@@ -1545,12 +1557,12 @@ msgstr ""
 "Installeer aangepaste lettertypes voor gebruik in uw PDF-documenten. Alleen "
 "%1$s.ttf%2$s lettertypebestanden worden ondersteund."
 
-#: src/Helper/Helper_Options_Fields.php:249
+#: src/Helper/Helper_Options_Fields.php:260
 #: src/Helper/Helper_PDF_List_Table.php:97
 msgid "Label"
 msgstr "Label"
 
-#: src/Helper/Helper_Options_Fields.php:252
+#: src/Helper/Helper_Options_Fields.php:263
 msgid ""
 "Add a descriptive label to help you  differentiate between multiple PDF "
 "settings."
@@ -1558,7 +1570,7 @@ msgstr ""
 "Voeg een beschrijvend label toe om u te helpen onderscheid te maken tussen "
 "meerdere PDF-instellingen."
 
-#: src/Helper/Helper_Options_Fields.php:258
+#: src/Helper/Helper_Options_Fields.php:269
 #, php-format
 msgid ""
 "Templates control the overall look and feel of the PDFs, and additional "
@@ -1571,12 +1583,12 @@ msgstr ""
 "digitaliseren en automatiseren, %2$sgebruikt u onze PDF-service op "
 "maat%4$s. Ontwikkelaars kunnen ook %3$shun eigen sjablonen maken%4$s."
 
-#: src/Helper/Helper_Options_Fields.php:267
+#: src/Helper/Helper_Options_Fields.php:278
 #: src/Helper/Helper_PDF_List_Table.php:99
 msgid "Notifications"
 msgstr "Meldingen"
 
-#: src/Helper/Helper_Options_Fields.php:268
+#: src/Helper/Helper_Options_Fields.php:279
 #, php-format
 msgid ""
 "Send the PDF as an email attachment for the selected notification(s). "
@@ -1589,15 +1601,15 @@ msgstr ""
 "Als alternatief, %2$sgebruik de [gravitypdf] shortcode%3$s rechtstreeks in "
 "uw Kennisgeving bericht."
 
-#: src/Helper/Helper_Options_Fields.php:271
+#: src/Helper/Helper_Options_Fields.php:282
 msgid "Choose a Notification"
 msgstr "Een melding kiezen"
 
-#: src/Helper/Helper_Options_Fields.php:276
+#: src/Helper/Helper_Options_Fields.php:287
 msgid "Filename"
 msgstr "Bestandsnaam"
 
-#: src/Helper/Helper_Options_Fields.php:278
+#: src/Helper/Helper_Options_Fields.php:289
 #, php-format
 msgid ""
 "Set the filename for the generated PDF (excluding the .pdf extension). "
@@ -1608,15 +1620,15 @@ msgstr ""
 "Mergetags worden ondersteund en ongeldige tekens %s worden automatisch "
 "geconverteerd naar een underscore."
 
-#: src/Helper/Helper_Options_Fields.php:285
+#: src/Helper/Helper_Options_Fields.php:296
 msgid "Conditional Logic"
 msgstr "Conditionele logica"
 
-#: src/Helper/Helper_Options_Fields.php:287
+#: src/Helper/Helper_Options_Fields.php:298
 msgid "Enable conditional logic"
 msgstr "Voorwaardelijke logica inschakelen"
 
-#: src/Helper/Helper_Options_Fields.php:290
+#: src/Helper/Helper_Options_Fields.php:301
 msgid ""
 "Add rules to dynamically enable or disable the PDF. When disabled, PDFs do "
 "not show up in the admin area, cannot be viewed, and will not be attached "
@@ -1626,53 +1638,53 @@ msgstr ""
 "zijn uitgeschakeld, worden ze niet weergegeven in het beheergebied, kunnen "
 "ze niet worden bekeken en worden ze niet gekoppeld aan meldingen."
 
-#: src/Helper/Helper_Options_Fields.php:311
+#: src/Helper/Helper_Options_Fields.php:322
 msgid "Paper Size"
 msgstr "Papierformaat"
 
-#: src/Helper/Helper_Options_Fields.php:312
+#: src/Helper/Helper_Options_Fields.php:323
 msgid "Set the paper size used when generating PDFs."
 msgstr "Stel het papierformaat in dat wordt gebruikt bij het genereren van PDF's."
 
-#: src/Helper/Helper_Options_Fields.php:332
+#: src/Helper/Helper_Options_Fields.php:343
 msgid "Paper Orientation"
 msgstr "Papierstand"
 
-#: src/Helper/Helper_Options_Fields.php:335
+#: src/Helper/Helper_Options_Fields.php:346
 msgid "Portrait"
 msgstr "Staand"
 
-#: src/Helper/Helper_Options_Fields.php:336
+#: src/Helper/Helper_Options_Fields.php:347
 msgid "Landscape"
 msgstr "Liggend"
 
-#: src/Helper/Helper_Options_Fields.php:343
+#: src/Helper/Helper_Options_Fields.php:354
 msgid "Font"
 msgstr "Lettertype"
 
-#: src/Helper/Helper_Options_Fields.php:347
+#: src/Helper/Helper_Options_Fields.php:358
 msgid "Set the primary font used in PDFs. You can also install your own."
 msgstr ""
 "Het primaire lettertype instellen dat in PDF's wordt gebruikt. Je kunt ook "
 "je eigen lettertype installeren."
 
-#: src/Helper/Helper_Options_Fields.php:353
+#: src/Helper/Helper_Options_Fields.php:364
 msgid "Font Size"
 msgstr "Lettergrootte"
 
-#: src/Helper/Helper_Options_Fields.php:354
+#: src/Helper/Helper_Options_Fields.php:365
 msgid "Set the font size to use in the PDF."
 msgstr "Stel de lettergrootte in die in de PDF moet worden gebruikt."
 
-#: src/Helper/Helper_Options_Fields.php:365
+#: src/Helper/Helper_Options_Fields.php:376
 msgid "Font Color"
 msgstr "Lettertype kleur"
 
-#: src/Helper/Helper_Options_Fields.php:368
+#: src/Helper/Helper_Options_Fields.php:379
 msgid "Set the font color to use in the PDF."
 msgstr "Stel de kleur van het lettertype in dat in de PDF moet worden gebruikt."
 
-#: src/Helper/Helper_Options_Fields.php:375
+#: src/Helper/Helper_Options_Fields.php:386
 msgid ""
 "Script like Arabic, Hebrew, Syriac (and many others) are written right to "
 "left."
@@ -1680,12 +1692,12 @@ msgstr ""
 "Schriften zoals Arabisch, Hebreeuws, Syrisch (en vele andere) worden van "
 "rechts naar links geschreven."
 
-#: src/Helper/Helper_Options_Fields.php:405
+#: src/Helper/Helper_Options_Fields.php:416
 #: src/templates/config/focus-gravity.php:91
 msgid "Format"
 msgstr "Formaat"
 
-#: src/Helper/Helper_Options_Fields.php:406
+#: src/Helper/Helper_Options_Fields.php:417
 msgid ""
 "Generate a document adhering to the selected PDF format. Watermarks, "
 "alpha-transparency, and PDF Security are automatically disabled when using "
@@ -1695,21 +1707,21 @@ msgstr ""
 "Watermerken, alfatransparantie en PDF-beveiliging worden automatisch "
 "uitgeschakeld wanneer de indelingen PDF/A-1b of PDF/X-1a worden gebruikt."
 
-#: src/Helper/Helper_Options_Fields.php:418
+#: src/Helper/Helper_Options_Fields.php:429
 msgid "Enable PDF Security"
 msgstr "PDF-beveiliging inschakelen"
 
-#: src/Helper/Helper_Options_Fields.php:419
+#: src/Helper/Helper_Options_Fields.php:430
 msgid "Password protect generated PDFs, and/or restrict user capabilities."
 msgstr ""
 "Bescherm gegenereerde PDF's met een wachtwoord en/of beperk de "
 "mogelijkheden voor gebruikers."
 
-#: src/Helper/Helper_Options_Fields.php:425
+#: src/Helper/Helper_Options_Fields.php:436
 msgid "Password"
 msgstr "Wachtwoord"
 
-#: src/Helper/Helper_Options_Fields.php:427
+#: src/Helper/Helper_Options_Fields.php:438
 msgid ""
 "Password protect the PDF, or leave blank to disable. Mergetags are "
 "supported."
@@ -1717,11 +1729,11 @@ msgstr ""
 "Bescherm de PDF met een wachtwoord of laat leeg om uit te schakelen. "
 "Mergetags worden ondersteund."
 
-#: src/Helper/Helper_Options_Fields.php:433
+#: src/Helper/Helper_Options_Fields.php:444
 msgid "Privileges"
 msgstr "Rechten"
 
-#: src/Helper/Helper_Options_Fields.php:434
+#: src/Helper/Helper_Options_Fields.php:445
 msgid ""
 "Deselect privileges to restrict end user capabilities in the PDF. "
 "Privileges are trivial to bypass and are only suitable to specify your "
@@ -1732,15 +1744,15 @@ msgstr ""
 "om je intenties aan de gebruiker te specificeren (en niet als "
 "toegangscontrole of beveiliging)."
 
-#: src/Helper/Helper_Options_Fields.php:447
+#: src/Helper/Helper_Options_Fields.php:458
 msgid "Select End User PDF Privileges"
 msgstr "PDF-privileges eindgebruiker selecteren"
 
-#: src/Helper/Helper_Options_Fields.php:458
+#: src/Helper/Helper_Options_Fields.php:469
 msgid "Image DPI"
 msgstr "Afbeelding DPI"
 
-#: src/Helper/Helper_Options_Fields.php:462
+#: src/Helper/Helper_Options_Fields.php:473
 msgid ""
 "Control the image DPI (dots per inch) in PDFs. Set to 300 when "
 "professionally printing document."
@@ -1748,11 +1760,11 @@ msgstr ""
 "Bepaal de DPI (dots per inch) van de afbeelding in PDF's. Stel in op 300 "
 "wanneer je een document professioneel afdrukt."
 
-#: src/Helper/Helper_Options_Fields.php:473
+#: src/Helper/Helper_Options_Fields.php:484
 msgid "Enable Public Access"
 msgstr "Publieke toegang mogelijk maken"
 
-#: src/Helper/Helper_Options_Fields.php:475
+#: src/Helper/Helper_Options_Fields.php:486
 #, php-format
 msgid ""
 "When public access is on all security protocols are disabled and %3$sanyone "
@@ -1764,7 +1776,7 @@ msgstr ""
 "formulierinvoer bekijken%4$s. Voor een betere beveiliging %1$s gebruikt u "
 "in plaats daarvan de functie ondertekende PDF-urls%2$s."
 
-#: src/Helper/Helper_Options_Fields.php:481
+#: src/Helper/Helper_Options_Fields.php:492
 #, php-format
 msgid ""
 "When enabled, the original entry owner will NOT be able to view the PDFs. "
@@ -1774,11 +1786,11 @@ msgstr ""
 "invoer de PDF's NIET bekijken. Deze instelling wordt overschreven "
 "%1$swanneer u ondertekende PDF-urls%2$s gebruikt."
 
-#: src/Helper/Helper_Options_Fields.php:518
+#: src/Helper/Helper_Options_Fields.php:530
 msgid "Enable Advanced Templating"
 msgstr "Geavanceerde sjablonen inschakelen"
 
-#: src/Helper/Helper_Options_Fields.php:519
+#: src/Helper/Helper_Options_Fields.php:531
 msgid ""
 "A legacy setting used that enables a template to be treated as PHP, with "
 "direct access to the PDF engine."
@@ -1786,11 +1798,11 @@ msgstr ""
 "Een verouderde instelling waarmee een sjabloon als PHP kan worden "
 "behandeld, met directe toegang tot de PDF-engine."
 
-#: src/Helper/Helper_Options_Fields.php:551
+#: src/Helper/Helper_Options_Fields.php:563
 msgid "Master Password"
 msgstr "Hoofdwachtwoord"
 
-#: src/Helper/Helper_Options_Fields.php:553
+#: src/Helper/Helper_Options_Fields.php:565
 msgid ""
 "Set the PDF Owner Password which is used to prevent the PDF privileges "
 "being changed."
@@ -1798,19 +1810,19 @@ msgstr ""
 "Stel het PDF Owner Password in om te voorkomen dat de PDF-rechten worden "
 "gewijzigd."
 
-#: src/Helper/Helper_Options_Fields.php:572
+#: src/Helper/Helper_Options_Fields.php:584
 msgid "Show Form Title"
 msgstr "Formuliertitel weergeven"
 
-#: src/Helper/Helper_Options_Fields.php:573
+#: src/Helper/Helper_Options_Fields.php:585
 msgid "Display the form title at the beginning of the PDF."
 msgstr "De titel van het formulier aan het begin van de PDF weergeven."
 
-#: src/Helper/Helper_Options_Fields.php:592
+#: src/Helper/Helper_Options_Fields.php:604
 msgid "Show Page Names"
 msgstr "Paginanamen tonen"
 
-#: src/Helper/Helper_Options_Fields.php:593
+#: src/Helper/Helper_Options_Fields.php:605
 #, php-format
 msgid ""
 "Display form page names on the PDF. Requires the use of the %1$sPage Break "
@@ -1819,27 +1831,27 @@ msgstr ""
 "Namen van formulierpagina's in de PDF weergeven. Vereist het gebruik van "
 "het veld %1$sPagina-einde%2$s."
 
-#: src/Helper/Helper_Options_Fields.php:611
+#: src/Helper/Helper_Options_Fields.php:623
 msgid "Show HTML Fields"
 msgstr "HTML-velden weergeven"
 
-#: src/Helper/Helper_Options_Fields.php:612
+#: src/Helper/Helper_Options_Fields.php:624
 msgid "Display HTML fields in the PDF."
 msgstr "HTML-velden in de PDF weergeven."
 
-#: src/Helper/Helper_Options_Fields.php:630
+#: src/Helper/Helper_Options_Fields.php:642
 msgid "Show Section Break Description"
 msgstr "Beschrijving van secties tonen"
 
-#: src/Helper/Helper_Options_Fields.php:631
+#: src/Helper/Helper_Options_Fields.php:643
 msgid "Display the Section Break field description in the PDF."
 msgstr "Geef de beschrijving van het sectie-eindeveld in de PDF weer."
 
-#: src/Helper/Helper_Options_Fields.php:649
+#: src/Helper/Helper_Options_Fields.php:661
 msgid "Enable Conditional Logic"
 msgstr "Voorwaardelijke logica inschakelen"
 
-#: src/Helper/Helper_Options_Fields.php:650
+#: src/Helper/Helper_Options_Fields.php:662
 msgid ""
 "When enabled the PDF will adhere to the form field conditional logic and "
 "show/hide fields."
@@ -1847,19 +1859,19 @@ msgstr ""
 "Als deze optie is ingeschakeld, houdt de PDF zich aan de voorwaardelijke "
 "logica van het formulierveld en worden de velden getoond/verbergt."
 
-#: src/Helper/Helper_Options_Fields.php:669
+#: src/Helper/Helper_Options_Fields.php:681
 msgid "Show Empty Fields"
 msgstr "Lege velden weergeven"
 
-#: src/Helper/Helper_Options_Fields.php:670
+#: src/Helper/Helper_Options_Fields.php:682
 msgid "Display Empty fields in the PDF."
 msgstr "Lege velden in de PDF weergeven."
 
-#: src/Helper/Helper_Options_Fields.php:688
+#: src/Helper/Helper_Options_Fields.php:700
 msgid "Header"
 msgstr "Header"
 
-#: src/Helper/Helper_Options_Fields.php:691
+#: src/Helper/Helper_Options_Fields.php:703
 #, php-format
 msgid ""
 "The header is included at the top of each page. For simple columns %1$stry "
@@ -1868,23 +1880,23 @@ msgstr ""
 "De koptekst staat bovenaan elke pagina. Probeer voor eenvoudige kolommen "
 "%1$sdit HTML-tabelfragment%2$s."
 
-#: src/Helper/Helper_Options_Fields.php:709
+#: src/Helper/Helper_Options_Fields.php:721
 msgid "First Page Header"
 msgstr "Eerste pagina koptekst"
 
-#: src/Helper/Helper_Options_Fields.php:712
+#: src/Helper/Helper_Options_Fields.php:724
 msgid "Override the header on the first page of the PDF."
 msgstr "De koptekst op de eerste pagina van de PDF overschrijven."
 
-#: src/Helper/Helper_Options_Fields.php:714
+#: src/Helper/Helper_Options_Fields.php:726
 msgid "Use different header on first page of PDF?"
 msgstr "Andere koptekst gebruiken op eerste pagina van PDF?"
 
-#: src/Helper/Helper_Options_Fields.php:731
+#: src/Helper/Helper_Options_Fields.php:743
 msgid "Footer"
 msgstr "Footer"
 
-#: src/Helper/Helper_Options_Fields.php:734
+#: src/Helper/Helper_Options_Fields.php:746
 #, php-format
 msgid ""
 "The footer is included at the bottom of every page. For simple text footers "
@@ -1898,31 +1910,31 @@ msgstr ""
 "speciale %3$s{PAGENO}%4$s en %3$s{nbpg}%4$s tags om paginanummering weer te "
 "geven. "
 
-#: src/Helper/Helper_Options_Fields.php:752
+#: src/Helper/Helper_Options_Fields.php:764
 msgid "First Page Footer"
 msgstr "Voettekst eerste pagina"
 
-#: src/Helper/Helper_Options_Fields.php:755
+#: src/Helper/Helper_Options_Fields.php:767
 msgid "Override the footer on the first page of the PDF."
 msgstr "De voettekst op de eerste pagina van de PDF overschrijven."
 
-#: src/Helper/Helper_Options_Fields.php:757
+#: src/Helper/Helper_Options_Fields.php:769
 msgid "Use different footer on first page of PDF?"
 msgstr "Andere voettekst gebruiken op eerste pagina van PDF?"
 
-#: src/Helper/Helper_Options_Fields.php:774
+#: src/Helper/Helper_Options_Fields.php:786
 msgid "Background Color"
 msgstr "Achtergrondkleur"
 
-#: src/Helper/Helper_Options_Fields.php:777
+#: src/Helper/Helper_Options_Fields.php:789
 msgid "Set the background color for all pages."
 msgstr "Stel de achtergrondkleur in voor alle pagina's."
 
-#: src/Helper/Helper_Options_Fields.php:794
+#: src/Helper/Helper_Options_Fields.php:806
 msgid "Background Image"
 msgstr "Achtergrond afbeelding"
 
-#: src/Helper/Helper_Options_Fields.php:796
+#: src/Helper/Helper_Options_Fields.php:808
 msgid ""
 "The background image is included on all pages. For optimal results, use an "
 "image the same dimensions as the paper size and run it through an image "
@@ -1933,7 +1945,7 @@ msgstr ""
 "papierformaat en laat je deze voor het uploaden door een "
 "afbeeldingsoptimalisatieprogramma lopen."
 
-#: src/Helper/Helper_PDF.php:399
+#: src/Helper/Helper_PDF.php:398
 #, php-format
 msgid ""
 "The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the "
@@ -1942,7 +1954,7 @@ msgstr ""
 "De PDF-sjabloon %1$s vereist de Gravity PDF-versie %2$s. Upgrade naar de "
 "nieuwste versie."
 
-#: src/Helper/Helper_PDF.php:939
+#: src/Helper/Helper_PDF.php:948
 msgid ""
 "This method has been removed because mPDF no longer supports setting the "
 "image DPI after the class is initialised."
@@ -2024,37 +2036,37 @@ msgstr "PDF zwaartekracht vereist"
 msgid "Legacy"
 msgstr "Legacy"
 
-#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:314
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:316
 #. translators: the plugin name.
 #, php-format
 msgid "There is a new version of %1$s available."
 msgstr "De installatie van %1$s is mislukt."
 
-#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:320
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:322
 msgid "Contact your network administrator to install the update."
 msgstr "Neem contact op met de netwerkbeheerder om de update te installeren."
 
-#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:326
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:328
 #. translators: 1. opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate.
 #, php-format
 msgid "%1$sView version %2$s details%3$s."
 msgstr "%1$sBekijk de details van %3$sversie%2$s."
 
-#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:344
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:346
 #. translators: 1: Opening <a> tag, 2: Version number, 3: Closing </a> tag, 4: Opening <a> tag, 5: Closing </a> tag
 #, php-format
 msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
 msgstr "%1$sBekijk de details van %3$sversie%2$s of %4$supdate nu%5$s."
 
-#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:364
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:366
 msgid "Update now."
 msgstr "Nu bijwerken."
 
-#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:582
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:576
 msgid "You do not have permission to install plugin updates"
 msgstr "U heeft onvoldoende rechten om deze plug-in te installeren"
 
-#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:582
+#: src/Helper/Licensing/EDD_SL_Plugin_Updater.php:576
 msgid "Error"
 msgstr "Fout"
 
@@ -2092,75 +2104,71 @@ msgstr "PDF succesvol verwijderd."
 msgid "PDF successfully duplicated."
 msgstr "PDF succesvol gedupliceerd."
 
-#: src/Model/Model_Install.php:290
-#, php-format
-msgid ""
-"There was a problem creating the %s directory. Ensure you have write "
-"permissions to your uploads folder."
-msgstr ""
-"Er is een probleem opgetreden bij het aanmaken van de map %s. Zorg ervoor "
-"dat je schrijfrechten hebt voor je uploads map."
-
-#: src/Model/Model_Install.php:301
-#, php-format
-msgid ""
-"Gravity PDF does not have write permission to the %s directory. Contact "
-"your web hosting provider to fix the issue."
-msgstr ""
-"Gravity PDF heeft geen schrijfrechten voor de %s map. Neem contact op met "
-"uw webhostingprovider om het probleem op te lossen."
-
-#: src/Model/Model_Mergetags.php:292
+#: src/Model/Model_Mergetags.php:349
 msgid "Signed (+1 week)"
 msgstr "Ondertekend (+1 week)"
 
-#: src/Model/Model_Mergetags.php:301
+#: src/Model/Model_Mergetags.php:358
 msgid "Signed (+1 month)"
 msgstr "Ondertekend (+1 maand)"
 
-#: src/Model/Model_Mergetags.php:310
+#: src/Model/Model_Mergetags.php:367
 msgid "Signed (+1 year)"
 msgstr "Ondertekend (+1 jaar)"
 
-#: src/Model/Model_Mergetags.php:321
+#: src/Model/Model_Mergetags.php:378
 msgid "PDF URLs"
 msgstr "PDF URL's"
 
-#: src/Model/Model_PDF.php:401
+#: src/Model/Model_PDF.php:402
 msgid "The PDF configuration is not currently active."
 msgstr "De PDF-configuratie is momenteel niet actief."
 
-#: src/Model/Model_PDF.php:423
+#: src/Model/Model_PDF.php:424
 msgid "PDF conditional logic requirements have not been met."
 msgstr "Er is niet voldaan aan de vereisten voor voorwaardelijke PDF-logica."
 
-#: src/Model/Model_PDF.php:512
+#: src/Model/Model_PDF.php:510
 msgid "Your PDF is no longer accessible."
 msgstr "Uw PDF is niet langer toegankelijk."
 
-#: src/Model/Model_PDF.php:631
-#: src/Model/Model_PDF.php:667
+#: src/Model/Model_PDF.php:628
+#: src/Model/Model_PDF.php:654
 msgid "You do not have access to view this PDF."
 msgstr "Je hebt geen toegang om deze PDF te bekijken."
 
-#: src/Model/Model_PDF.php:1031
+#: src/Model/Model_PDF.php:1044
 msgid "PDFs"
 msgstr "PDFen"
 
-#: src/Model/Model_PDF.php:1174
+#: src/Model/Model_PDF.php:1154
+#. translators: %s: PDF name linked to its settings
+#, php-format
+msgid "The PDF %s could not be generated and was not attached to this notification."
+msgstr ""
+"De PDF %s kon niet worden gegenereerd en is niet aan deze melding "
+"toegevoegd."
+
+#: src/Model/Model_PDF.php:1161
+#. translators: 1: Notification name, 2: Notification ID
+#, php-format
+msgid "%1$s (ID: %2$s)"
+msgstr "%1$s (ID: %2$s)"
+
+#: src/Model/Model_PDF.php:1222
 msgid "The PDF could not be saved."
 msgstr "De PDF kon niet worden opgeslagen."
 
-#: src/Model/Model_PDF.php:2229
+#: src/Model/Model_PDF.php:2298
 msgid "Could not find PDF configuration requested"
 msgstr "De gevraagde PDF-configuratie kon niet worden gevonden"
 
-#: src/Model/Model_PDF.php:2554
+#: src/Model/Model_PDF.php:2623
 #, php-format
 msgid "Page %d"
 msgstr "Pagina %d"
 
-#: src/Model/Model_Settings.php:378
+#: src/Model/Model_Settings.php:395
 #, php-format
 msgid ""
 "An unknown error occurred, and your license key may not have been correctly "
@@ -2171,7 +2179,7 @@ msgstr ""
 "correct gedeactiveerd. %1$sLog in op uw GravityPDF.com account%2$s en "
 "controleer of uw site ontkoppeld is van de sleutel."
 
-#: src/Model/Model_Settings.php:395
+#: src/Model/Model_Settings.php:412
 #, php-format
 msgid ""
 "An API error occurred and your license key may not have been correctly "
@@ -2182,79 +2190,79 @@ msgstr ""
 "correct gedeactiveerd. %1$sLog in op uw GravityPDF.com-account%2$s en "
 "controleer of uw site is losgekoppeld van de sleutel."
 
-#: src/Model/Model_Settings.php:420
+#: src/Model/Model_Settings.php:437
 msgid "License key deactivated."
 msgstr "Licentiesleutel gedeactiveerd."
 
-#: src/Model/Model_Settings.php:421
+#: src/Model/Model_Settings.php:438
 msgid "Access Pass license key deactivated."
 msgstr "Access Pass-licentiesleutel gedeactiveerd."
 
-#: src/Model/Model_System_Report.php:143
+#: src/Model/Model_System_Report.php:156
 msgid "Gravity PDF Environment"
 msgstr "Zwaartekracht PDF Milieu"
 
-#: src/Model/Model_System_Report.php:150
+#: src/Model/Model_System_Report.php:164
 msgid "PHP"
 msgstr "PHP"
 
-#: src/Model/Model_System_Report.php:156
+#: src/Model/Model_System_Report.php:170
 msgid "Directories and Permissions"
 msgstr "Mappen en machtigingen"
 
-#: src/Model/Model_System_Report.php:162
+#: src/Model/Model_System_Report.php:176
 msgid "Global Settings"
 msgstr "Algemene Instellingen"
 
-#: src/Model/Model_System_Report.php:168
+#: src/Model/Model_System_Report.php:182
 msgid "Security Settings"
 msgstr "Veiligheidsinstellingen"
 
-#: src/Model/Model_System_Report.php:218
+#: src/Model/Model_System_Report.php:242
 msgid "WP Memory"
 msgstr "WP Geheugen"
 
-#: src/Model/Model_System_Report.php:231
+#: src/Model/Model_System_Report.php:255
 msgid "Default Charset"
 msgstr "Standaard tekenset"
 
-#: src/Model/Model_System_Report.php:237
+#: src/Model/Model_System_Report.php:261
 msgid "Internal Encoding"
 msgstr "Interne codering"
 
-#: src/Model/Model_System_Report.php:246
+#: src/Model/Model_System_Report.php:270
 msgid "PDF Working Directory"
 msgstr "PDF Werkmap"
 
-#: src/Model/Model_System_Report.php:252
+#: src/Model/Model_System_Report.php:276
 msgid "PDF Working Directory URL"
 msgstr "URL werkmap PDF"
 
-#: src/Model/Model_System_Report.php:258
+#: src/Model/Model_System_Report.php:282
 msgid "Font Folder location"
 msgstr "Locatie lettertype map"
 
-#: src/Model/Model_System_Report.php:264
+#: src/Model/Model_System_Report.php:288
 msgid "Temporary Folder location"
 msgstr "Locatie tijdelijke map"
 
-#: src/Model/Model_System_Report.php:270
+#: src/Model/Model_System_Report.php:294
 msgid "Temporary Folder permissions"
 msgstr "Machtigingen voor tijdelijke mappen"
 
-#: src/Model/Model_System_Report.php:277
+#: src/Model/Model_System_Report.php:303
 msgid "Temporary Folder protected"
 msgstr "Tijdelijke map beschermd"
 
-#: src/Model/Model_System_Report.php:284
+#: src/Model/Model_System_Report.php:310
 msgid "mPDF Temporary location"
 msgstr "mPDF Tijdelijke locatie"
 
-#: src/Model/Model_System_Report.php:294
+#: src/Model/Model_System_Report.php:320
 msgid "Outdated Templates"
 msgstr "Verouderde sjablonen"
 
-#: src/Model/Model_System_Report.php:305
+#: src/Model/Model_System_Report.php:331
 #, php-format
 msgid ""
 "In order to get updates direct from GravityPDF.com %1$syou need to perform "
@@ -2263,36 +2271,40 @@ msgstr ""
 "Om updates direct van GravityPDF.com te krijgen %1$smoet je de plugin "
 "eenmalig downloaden%2$s."
 
-#: src/Model/Model_System_Report.php:314
+#: src/Model/Model_System_Report.php:340
 msgid "Canonical Release"
 msgstr "Canonieke uitgave"
 
-#: src/Model/Model_System_Report.php:321
+#: src/Model/Model_System_Report.php:347
 msgid "PDF Entry List Action"
 msgstr "PDF invoerlijst actie"
 
-#: src/Model/Model_System_Report.php:330
-#: src/Model/Model_System_Report.php:337
+#: src/Model/Model_System_Report.php:356
+#: src/Model/Model_System_Report.php:363
 msgid "Off"
 msgstr "Uit"
 
-#: src/Model/Model_System_Report.php:345
+#: src/Model/Model_System_Report.php:371
 msgid "User Restrictions"
 msgstr "Gebruikersbeperkingen"
 
-#: src/Model/Model_System_Report.php:353
+#: src/Model/Model_System_Report.php:379
 msgid "minute(s)"
 msgstr "minuut(en)"
 
-#: src/Model/Model_System_Report.php:388
+#: src/Model/Model_System_Report.php:414
 msgid "The report sections are keyed by name rather than by position."
 msgstr "De rapportsecties worden gesleuteld op naam in plaats van op positie."
 
-#: src/Model/Model_Templates.php:365
+#: src/Model/Model_System_Report.php:581
+msgid "Folder permissions"
+msgstr "Mapmachtigingen"
+
+#: src/Model/Model_Templates.php:366
 msgid "No valid PDF template found in Zip archive."
 msgstr "Geen geldige PDF-sjabloon gevonden in Zip-archief."
 
-#: src/Model/Model_Templates.php:386
+#: src/Model/Model_Templates.php:387
 #, php-format
 msgid ""
 "The filename %s contains invalid characters. Only alphanumeric, hyphen, and "
@@ -2301,12 +2313,12 @@ msgstr ""
 "De bestandsnaam %s bevat ongeldige tekens. Alleen alfanumerieke tekens, "
 "koppeltekens en underscore zijn toegestaan."
 
-#: src/Model/Model_Templates.php:400
+#: src/Model/Model_Templates.php:401
 #, php-format
 msgid "The PHP file %s is not a valid PDF Template."
 msgstr "Het PHP-bestand %s is geen geldige PDF-sjabloon."
 
-#: src/Model/Model_Uninstall.php:195
+#: src/Model/Model_Uninstall.php:196
 #, php-format
 msgid ""
 "There was a problem removing the Gravity Form \"%s\" PDF configuration. Try "
@@ -2315,7 +2327,7 @@ msgstr ""
 "Er was een probleem met het verwijderen van de Gravity Form \"%s\" PDF "
 "configuratie. Probeer handmatig verwijderen."
 
-#: src/Model/Model_Uninstall.php:230
+#: src/Model/Model_Uninstall.php:231
 #, php-format
 msgid "There was a problem removing the %s directory. Clean up manually via (S)FTP."
 msgstr ""
@@ -2334,35 +2346,35 @@ msgstr "%s wordt niet langer ondersteund."
 msgid "Support for %1$s will be removed in Gravity PDF %2$s."
 msgstr "Ondersteuning voor %1$s wordt verwijderd in Gravity PDF %2$s."
 
-#: src/Statics/Deprecation.php:330
+#: src/Statics/Deprecation.php:336
 #. translators: %s: The Gravity PDF version the filter is removed in
 #, php-format
 msgid "This filter is removed in Gravity PDF %s."
 msgstr "Dit filter is verwijderd in Gravity PDF %s."
 
-#: src/Statics/Deprecation_V3.php:133
+#: src/Statics/Deprecation_V3.php:136
 msgid "Legacy Templates"
 msgstr "Legacy Templates"
 
-#: src/Statics/Deprecation_V3.php:141
-msgid "Business Plus Templates"
-msgstr "Business Plus Templates"
+#: src/Statics/Deprecation_V3.php:144
+msgid "Business Plus / Tier 2 Templates"
+msgstr "Business Plus / Tier 2 Templates"
 
-#: src/Statics/Deprecation_V3.php:149
+#: src/Statics/Deprecation_V3.php:152
 msgid "Legacy Download URLs"
 msgstr "Legacy Download URLs"
 
-#: src/Statics/Deprecation_V3.php:155
+#: src/Statics/Deprecation_V3.php:158
 #. translators: %s: The Gravity PDF version the feature is removed in
 #, php-format
 msgid "Support for legacy download URLs will be removed in Gravity PDF %s."
 msgstr "Ondersteuning voor legacy download-URL's wordt verwijderd in Gravity PDF %s."
 
-#: src/Statics/Deprecation_V3.php:159
+#: src/Statics/Deprecation_V3.php:162
 msgid "Actions and Filters"
 msgstr "Acties en Filters"
 
-#: src/Statics/Deprecation_V3.php:166
+#: src/Statics/Deprecation_V3.php:169
 #. translators: %s: The Gravity PDF version the hooks are removed in
 #, php-format
 msgid "Code on this site uses Gravity PDF hooks that are removed in version %s."
@@ -2440,18 +2452,34 @@ msgstr ""
 msgid "This site uses deprecated Gravity PDF functionality:"
 msgstr "Deze site gebruikt verouderde Gravity PDF functionaliteit:"
 
-#: src/View/html/Actions/deprecated_features.php:31
-#: src/View/View_System_Report.php:458
+#: src/View/html/Actions/deprecated_features.php:32
+#: src/View/View_System_Report.php:476
 msgid "Learn how to upgrade"
 msgstr "Leer hoe te upgraden"
 
-#: src/View/html/Actions/deprecated_features.php:36
+#: src/View/html/Actions/deprecated_features.php:37
 msgid ""
 "Dismissing this notice hides the items above. Anything found later is "
 "reported again."
 msgstr ""
 "Het negeren van deze melding verbergt de bovenstaande items. Alles wat "
 "later wordt gevonden, wordt opnieuw gerapporteerd."
+
+#: src/View/html/Actions/unwritable_folders.php:24
+msgid ""
+"Gravity PDF cannot create or write to these directories. Contact your web "
+"hosting provider to fix the issue."
+msgstr ""
+"Gravity PDF kan deze mappen niet aanmaken of er niet naar schrijven. Neem "
+"contact op met uw webhostingprovider om het probleem op te lossen."
+
+#: src/View/html/Actions/unwritable_folders.php:34
+msgid ""
+"Dismissing this notice hides the directories above. Any found later are "
+"reported again."
+msgstr ""
+"Als u deze melding sluit, worden de bovenstaande mappen verborgen. Mappen "
+"die later worden gevonden, worden opnieuw gemeld."
 
 #: src/View/html/FormSettings/add_edit.php:62
 #: src/View/html/Settings/general.php:50
@@ -2629,11 +2657,11 @@ msgstr ""
 "melding van het formulier om een downloadlink voor PDF-bestanden weer te "
 "geven. %1$sMeer informatie%2$s."
 
-#: src/View/View_System_Report.php:77
+#: src/View/View_System_Report.php:78
 msgid "Unlimited"
 msgstr "Onbeperkt"
 
-#: src/View/View_System_Report.php:84
+#: src/View/View_System_Report.php:85
 #, php-format
 msgid ""
 "We strongly recommend you have at least 128MB of available WP Memory (RAM) "
@@ -2643,7 +2671,7 @@ msgstr ""
 "(RAM) toe te wijzen aan uw website. %1$sOntdek hoe u deze limiet kunt "
 "verhogen%2$s."
 
-#: src/View/View_System_Report.php:97
+#: src/View/View_System_Report.php:98
 #, php-format
 msgid ""
 "We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s "
@@ -2652,7 +2680,7 @@ msgstr ""
 "We hebben gedetecteerd dat de PHP runtime configuratie-instelling "
 "%1$sallow_url_fopen%2$s is uitgeschakeld."
 
-#: src/View/View_System_Report.php:98
+#: src/View/View_System_Report.php:99
 msgid ""
 "You may notice image display issues in your PDFs. Contact your web hosting "
 "provider for assistance enabling this feature."
@@ -2661,7 +2689,7 @@ msgstr ""
 "Neem contact op met uw webhostingprovider voor hulp bij het inschakelen van "
 "deze functie."
 
-#: src/View/View_System_Report.php:111
+#: src/View/View_System_Report.php:112
 #, php-format
 msgid ""
 "We've detected the PDFs saved in Gravity PDF's %1$stmp%2$s directory can be "
@@ -2670,7 +2698,7 @@ msgstr ""
 "We hebben ontdekt dat de PDF's die zijn opgeslagen in de map %1$stmp%2$s "
 "van Gravity PDF openbaar toegankelijk zijn."
 
-#: src/View/View_System_Report.php:112
+#: src/View/View_System_Report.php:113
 #, php-format
 msgid ""
 "We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the "
@@ -2679,22 +2707,30 @@ msgstr ""
 "We raden u aan ons %1$sgfpdf_tmp_location%2$s filter te gebruiken om %3$sde "
 "map buiten uw openbare websitemap te plaatsen%4$s."
 
-#: src/View/View_System_Report.php:128
+#: src/View/View_System_Report.php:126
+msgid "Writable"
+msgstr "Schrijfbaar"
+
+#: src/View/View_System_Report.php:126
+msgid "Not writable"
+msgstr "Niet schrijfbaar"
+
+#: src/View/View_System_Report.php:145
 #, php-format
 msgid "%1$s version %2$s is out of date. The core version is %3$s"
 msgstr "%1$s versie %2$s is verouderd. De hoofdversie is %3$s"
 
-#: src/View/View_System_Report.php:146
+#: src/View/View_System_Report.php:163
 msgid "Learn how to update"
 msgstr "Leer hoe te updaten"
 
-#: src/View/View_System_Report.php:237
+#: src/View/View_System_Report.php:254
 #. translators: %1$s: The template file name
 #, php-format
 msgid "%1$s (not configured on a form)"
 msgstr "%1$s (niet geconfigureerd op een formulier)"
 
-#: src/View/View_System_Report.php:240
+#: src/View/View_System_Report.php:257
 #. translators: 1: The template file name, 2: Comma separated list of form IDs
 #, php-format
 msgid "%1$s (form ID %2$s)"
@@ -2702,13 +2738,13 @@ msgid_plural "%1$s (form IDs %2$s)"
 msgstr[0] "%1$s (formulier ID %2$s)"
 msgstr[1] "%1$s (formulier IDs %2$s)"
 
-#: src/View/View_System_Report.php:266
+#: src/View/View_System_Report.php:283
 #. translators: %s: Comma separated list of form IDs
 #, php-format
 msgid "In use on form ID %s"
 msgstr "In gebruik op formulier ID %s"
 
-#: src/View/View_System_Report.php:308
+#: src/View/View_System_Report.php:325
 #. translators: 1: Filter name, 2: Number of callbacks attached to it
 #, php-format
 msgid "%1$s has %2$d listener"
@@ -2716,11 +2752,11 @@ msgid_plural "%1$s has %2$d listeners"
 msgstr[0] "%1$s heeft %2$d luisteraar"
 msgstr[1] "%1$s heeft %2$d luisteraars"
 
-#: src/View/View_System_Report.php:385
+#: src/View/View_System_Report.php:402
 msgid "Unsupported"
 msgstr "Niet ondersteund"
 
-#: src/View/View_System_Report.php:386
+#: src/View/View_System_Report.php:403
 msgid ""
 "These features have been removed and any Gravity PDF document that relied "
 "on them will stop working."
@@ -2728,11 +2764,11 @@ msgstr ""
 "Deze functies zijn verwijderd en elk Gravity PDF-document dat hierop "
 "vertrouwde, zal niet meer werken."
 
-#: src/View/View_System_Report.php:390
+#: src/View/View_System_Report.php:407
 msgid "Deprecated"
 msgstr "Verouderd"
 
-#: src/View/View_System_Report.php:391
+#: src/View/View_System_Report.php:408
 msgid ""
 "Legacy functionality that will be removed in an upcoming release. It's "
 "important to fix each item to keep your PDFs working correctly."
@@ -2740,49 +2776,40 @@ msgstr ""
 "Legacy functionaliteit die in een toekomstige release wordt verwijderd. Het "
 "is belangrijk om elk item te repareren om uw PDF's correct te laten werken."
 
-#: src/View/View_System_Report.php:411
+#: src/View/View_System_Report.php:428
 msgid "Your PDFs are ready for the next Gravity PDF release"
 msgstr "Uw PDF's zijn klaar voor de volgende Gravity PDF release"
 
-#: src/View/View_System_Report.php:417
+#: src/View/View_System_Report.php:434
 msgid ""
-"Nothing on this site relies on Gravity PDF functionality that is scheduled "
-"for removal, so there is nothing to do."
+"Nothing on this site uses Gravity PDF functionality that is scheduled for "
+"removal."
 msgstr ""
-"Op deze site is niets afhankelijk van Gravity PDF-functionaliteit die "
-"gepland staat voor verwijdering, dus er hoeft niets te worden gedaan."
+"Niets op deze site gebruikt Gravity PDF-functionaliteit die gepland staat "
+"voor verwijdering."
 
-#: src/View/View_System_Report.php:427
+#: src/View/View_System_Report.php:444
 msgid "Your site uses Gravity PDF functionality that is scheduled for removal"
 msgstr ""
 "Uw site gebruikt Gravity PDF-functionaliteit die gepland staat voor "
 "verwijdering"
 
-#: src/View/View_System_Report.php:429
-msgid ""
-"Update each item below before the release that removes it, so the PDFs that "
-"rely on it will continue working. Each one links to instructions to upgrade."
-msgstr ""
-"Werk elk item hieronder bij voordat de release die het verwijdert uitkomt, "
-"zodat de PDF's die ervan afhankelijk zijn blijven werken. Elk item bevat "
-"een link naar instructies voor het upgraden."
-
-#: src/View/View_System_Report.php:444
+#: src/View/View_System_Report.php:462
 msgid "View the Gravity Forms system report"
 msgstr "Bekijk het Gravity Forms-systeemrapport"
 
-#: src/View/View_System_Report.php:493
+#: src/View/View_System_Report.php:513
 #. translators: %s: The group name, as get_deprecated_groups() gives it
 #, php-format
 msgid "%s functionality"
 msgstr "%s-functionaliteit"
 
-#: src/View/View_System_Report.php:494
+#: src/View/View_System_Report.php:514
 msgid "None detected"
 msgstr "Geen gedetecteerd"
 
-#: src/View/View_System_Report.php:500
+#: src/View/View_System_Report.php:522
 #. translators: %s: The group name, as get_deprecated_groups() gives it
 #, php-format
-msgid "Gravity PDF - %s Functionality"
-msgstr "Gravity PDF - %s Functionaliteit"
+msgid "%s Features"
+msgstr "%s-functies"
