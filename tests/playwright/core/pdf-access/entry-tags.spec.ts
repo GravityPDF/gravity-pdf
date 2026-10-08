@@ -98,4 +98,33 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		expect(html).toContain('Posted &#091;gravitypdf');
 		expect(html).not.toMatch(/\[gravitypdf/);
 	});
+
+	test('processes merge tags only in values the form editor set', async () => {
+		const ip = '10.9.8.7';
+		const entry: any = await pdf.createEntry({
+			form_id: form.id,
+			ip,
+			'1': '{ip}',
+			'2.1': '{ip}',
+			'6': `<p>{ip}</p><p>{PDF:pdf:${pdfId}:signed}</p>`,
+		});
+
+		expect(entry.ip).toBe(ip);
+
+		let html = await pdf.getPdfDebugOutput(pdfId, entry.id);
+
+		expect(html).toContain(`Form ID: ${form.id}`);
+		expect(html).toContain('&#123;ip&#125;');
+		expect(html).not.toContain(ip);
+		expect(html).not.toContain('signature=');
+
+		const chosen: any = await pdf.createEntry({
+			form_id: form.id,
+			'1': 'First Choice',
+		});
+
+		html = await pdf.getPdfDebugOutput(pdfId, chosen.id);
+
+		expect(html).toContain(`First <strong>Choice</strong> ${form.id}`);
+	});
 });

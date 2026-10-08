@@ -131,6 +131,7 @@ filter gfpdf_field_is_empty_value_instead_of_label 6
 filter gfpdf_field_label 3
 filter gfpdf_field_middleware 7
 filter gfpdf_field_page_name_html 3
+filter gfpdf_field_process_merge_tags 4
 filter gfpdf_field_product_value 6
 filter gfpdf_field_section_break_html 8
 filter gfpdf_field_value 5
