@@ -28,18 +28,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 class FlushCache {
 
 	/**
-	 * Empties mPDF's cache and recreates its folders, and stops serving PDFs cached with the old fonts
+	 * Deletes mPDF's font data, which goes stale when a font changes, and stops serving PDFs cached with the old fonts
+	 *
+	 * @param string $font_id Only delete this font's data. Leave empty to delete every font's
 	 *
 	 * @since 6.0
-	 * @since 6.17.3 Empties mPDF's cache folder rather than its tempDir, and recreates the folders
+	 * @since 6.17.3 Deletes only font data, leaving PDFs being generated their temp files, and accepts a font ID
 	 * @since 7.0 Bumps the PDF cache generation
 	 */
-	public static function flush(): void {
-		$misc = GPDFAPI::get_misc_class();
-		$data = GPDFAPI::get_data_class();
-		$misc->cleanup_dir( $data->mpdf_tmp_location . '/mpdf' );
-		$misc->create_mpdf_cache_folders();
+	public static function flush( string $font_id = '' ): void {
+		$misc      = GPDFAPI::get_misc_class();
+		$font_data = GPDFAPI::get_data_class()->mpdf_tmp_location . '/mpdf/ttfontdata';
 
+		$misc->create_mpdf_cache_folders();
 		Cache::bump_generation();
+
+		if ( $font_id === '' ) {
+			$misc->cleanup_dir( $font_data );
+
+			return;
+		}
+
+		/* mPDF names a font's files after its ID plus the style: roboto.mtx.json, robotoB.cw.dat, robotoBI.gid.dat */
+		$pattern = '/^' . preg_quote( $font_id, '/' ) . '(B|I|BI)?\./';
+
+		foreach ( scandir( $font_data ) ?: [] as $file ) {
+			if ( preg_match( $pattern, $file ) ) {
+				wp_delete_file( $font_data . '/' . $file );
+			}
+		}
 	}
 }
