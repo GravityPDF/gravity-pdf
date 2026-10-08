@@ -760,4 +760,22 @@ final class GPDFAPI {
 
 		return $pdf_model->get_form_data( $entry );
 	}
+
+	/**
+	 * The `token` attribute a PDF template adds to a signed [gravitypdf] shortcode that names another entry, so the
+	 * shortcode still signs inside the PDF
+	 *
+	 * @param string     $pdf_id
+	 * @param int|string $entry_id
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	public static function get_shortcode_signing_token( $pdf_id, $entry_id ) {
+		/** @var \GFPDF\Model\Model_Signed_Url_Trust $trust */
+		$trust = self::get_mvc_class( 'Model_Signed_Url_Trust' );
+
+		return $trust->get_shortcode_signing_token( \GFPDF\Model\Model_Shortcodes::SHORTCODE, $pdf_id, $entry_id );
+	}
 }

@@ -354,7 +354,7 @@ class Test_Shortcodes extends TestCase {
 		$this->assertStringNotContainsString( 'expires=', $url );
 
 		/* A signature for the PDF and entry can be used again */
-		$token = [ 'token' => $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] ) ];
+		$token = [ 'token' => \GPDFAPI::get_shortcode_signing_token( '556690c67856b', $entry['id'] ) ];
 		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'], $token ) );
 		$this->assertStringContainsString( 'signature=', $this->process_signed( $entry['id'], $token ) );
 		$this->assertStringNotContainsString( 'signature=', $this->process_signed( $entry['id'], [ 'token' => 'forged' ] ) );
@@ -532,12 +532,12 @@ class Test_Shortcodes extends TestCase {
 
 		/* As in a notification, which signs for a visitor who can't view the entry */
 		$text = $this->model->gravitypdf_process_during_merge_tag_replacement( $named, $form, $entry );
-		$this->assertStringContainsString( ' token="' . $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] ) . '"', $text );
+		$this->assertStringContainsString( ' token="' . \GPDFAPI::get_shortcode_signing_token( '556690c67856b', $entry['id'] ) . '"', $text );
 		$this->assertStringContainsString( 'signature=', do_shortcode( $text ) );
 
 		/* An injected entry is vouched for, while a forged signature is replaced */
 		$text = $this->model->gravitypdf_process_during_merge_tag_replacement( '[gravitypdf id="556690c67856b" signed="1" token="forged"]', $form, $entry );
-		$this->assertSame( '[gravitypdf id="556690c67856b" signed="1" token="' . $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] ) . '" entry="' . $entry['id'] . '"]', $text );
+		$this->assertSame( '[gravitypdf id="556690c67856b" signed="1" token="' . \GPDFAPI::get_shortcode_signing_token( '556690c67856b', $entry['id'] ) . '" entry="' . $entry['id'] . '"]', $text );
 
 		/* Not without `signed`, nor an entry a merge tag sets, nor in user-submitted content or text merged inside a PDF */
 		$unsigned = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '"]';
@@ -556,7 +556,7 @@ class Test_Shortcodes extends TestCase {
 	public function test_signed_shortcode_inside_a_pdf_needs_its_own_entry_or_a_signature() {
 		$entry  = $this->entry( 'all-form-fields' );
 		$trust  = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
-		$token   = $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] );
+		$token   = \GPDFAPI::get_shortcode_signing_token( '556690c67856b', $entry['id'] );
 		$admin  = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$render = function ( $pdf_entry_id, $attributes = [] ) use ( $trust, $entry ) {
 			return $trust->run_rendering_pdf(
@@ -582,8 +582,8 @@ class Test_Shortcodes extends TestCase {
 		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => [ $token ] ] ) );
 
 		/* A signature is for one PDF and entry */
-		$this->assertNotSame( $token, $this->model->get_shortcode_signing_token( '556690c67856c', $entry['id'] ) );
-		$this->assertNotSame( $token, $this->model->get_shortcode_signing_token( '556690c67856b', $entry['id'] + 1 ) );
+		$this->assertNotSame( $token, \GPDFAPI::get_shortcode_signing_token( '556690c67856c', $entry['id'] ) );
+		$this->assertNotSame( $token, \GPDFAPI::get_shortcode_signing_token( '556690c67856b', $entry['id'] + 1 ) );
 	}
 
 	/**

@@ -450,7 +450,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @since 6.17.3
 	 */
-	protected function decode_shortcode_quotes( $value ) {
+	private function decode_shortcode_quotes( $value ) {
 		if ( strpos( $value, '[' ) === false ) {
 			return $value;
 		}
@@ -471,7 +471,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @since 6.17.3
 	 */
-	protected function get_encoded_default_tags() {
+	private function get_encoded_default_tags() {
 		$trust = $this->get_signed_url_trust();
 		if ( $trust === null ) {
 			return [];
@@ -556,7 +556,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @since 6.17.3
 	 */
-	protected function get_signed_url_trust() {
+	private function get_signed_url_trust() {
 		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
 
 		return $trust instanceof Model_Signed_Url_Trust ? $trust : null;

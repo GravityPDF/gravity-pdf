@@ -100,6 +100,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	/**
 	 * Run a shortcode the plugin built, vouching for the ones that name the entry
 	 *
+	 * @internal
+	 *
 	 * @param string $shortcode
 	 * @param int    $entry_id
 	 *
@@ -121,6 +123,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	/**
 	 * Add the entry, and outside a PDF a signing `token`, to shortcodes in merged text that a form editor put in an
 	 * administrative field's default value
+	 *
+	 * @internal Hooked to gform_replace_merge_tags
 	 *
 	 * @param mixed $text  The filtered text, which another callback may have changed to a non-string
 	 * @param mixed $form  The form passed to the filter, which may not be an array
@@ -356,7 +360,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @since 6.17.3
 	 */
-	protected function add_shortcode_signing_token( $code ) {
+	private function add_shortcode_signing_token( $code ) {
 		$entry_id = (string) ( $code['attr']['entry'] ?? '' );
 
 		/* An entry set by a merge tag isn't known until the tags are replaced */
@@ -364,22 +368,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			return $code;
 		}
 
-		return $this->add_shortcode_attr( $code, 'token', $this->get_shortcode_signing_token( $code['attr']['id'], $entry_id ) );
-	}
-
-	/**
-	 * The signing `token` for a shortcode's PDF and entry. PDF templates can add it to a shortcode that signs another
-	 * entry's PDF.
-	 *
-	 * @param string     $pdf_id
-	 * @param int|string $entry_id
-	 *
-	 * @return string
-	 *
-	 * @since 6.17.3
-	 */
-	public function get_shortcode_signing_token( $pdf_id, $entry_id ) {
-		return substr( hash_hmac( 'sha256', static::SHORTCODE . '|' . $pdf_id . '|' . (int) $entry_id, wp_salt( 'auth' ) ), 0, 32 );
+		return $this->add_shortcode_attr( $code, 'token', $this->get_trust()->get_shortcode_signing_token( static::SHORTCODE, $code['attr']['id'], $entry_id ) );
 	}
 
 	/**

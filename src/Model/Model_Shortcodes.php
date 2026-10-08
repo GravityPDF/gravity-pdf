@@ -124,8 +124,8 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	 *
 	 * @since 6.17.3
 	 */
-	protected function can_sign_shortcode( $attributes, $settings ) {
-		if ( is_string( $attributes['token'] ) && $attributes['token'] !== '' && hash_equals( $this->get_shortcode_signing_token( $attributes['id'], $attributes['entry'] ), $attributes['token'] ) ) {
+	private function can_sign_shortcode( $attributes, $settings ) {
+		if ( $this->get_trust()->is_valid_shortcode_signing_token( $attributes['token'], static::SHORTCODE, $attributes['id'], $attributes['entry'] ) ) {
 			return true;
 		}
 
@@ -147,7 +147,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	 *
 	 * @since 6.17.3
 	 */
-	protected function can_sign_url( $entry_id, $settings ) {
+	private function can_sign_url( $entry_id, $settings ) {
 		/* In post content the author is the post's author, not whoever is viewing it */
 		$post    = doing_filter( 'the_content' ) ? get_post() : null;
 		$user_id = (int) apply_filters( 'gfpdf_shortcode_signing_user_id', $post ? $post->post_author : get_current_user_id(), $entry_id, $settings );

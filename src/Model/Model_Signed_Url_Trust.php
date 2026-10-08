@@ -148,6 +148,35 @@ class Model_Signed_Url_Trust {
 	}
 
 	/**
+	 * The signing `token` that lets a signed shortcode naming an entry sign, even inside a PDF
+	 *
+	 * @param string     $shortcode The shortcode's name
+	 * @param string     $pdf_id
+	 * @param int|string $entry_id
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	public function get_shortcode_signing_token( $shortcode, $pdf_id, $entry_id ) {
+		return substr( hash_hmac( 'sha256', $shortcode . '|' . $pdf_id . '|' . (int) $entry_id, wp_salt( 'auth' ) ), 0, 32 );
+	}
+
+	/**
+	 * @param mixed      $token      The shortcode's `token` attribute
+	 * @param string     $shortcode The shortcode's name
+	 * @param string     $pdf_id
+	 * @param int|string $entry_id
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	public function is_valid_shortcode_signing_token( $token, $shortcode, $pdf_id, $entry_id ) {
+		return is_string( $token ) && $token !== '' && hash_equals( $this->get_shortcode_signing_token( $shortcode, $pdf_id, $entry_id ), $token );
+	}
+
+	/**
 	 * The shortcodes and merge tags in an administrative field's default. Gravity Forms resolves some on save and leaves
 	 * others for later, so each is trusted on its own.
 	 *
