@@ -102,7 +102,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 				}
 
 				$class     = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products, $this->get_pdf_config() );
-				$form_data = $class->form_data();
+				$form_data = $class->encode_value_tags( $class->form_data() );
 
 				if ( isset( $form_data['field'] ) ) {
 					$data = array_replace_recursive( $data, [ $id => $form_data['field'] ] );
@@ -125,6 +125,19 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Each sub-field encodes its own HTML and form data by its own rules, so there's nothing left to encode
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function encode_value_tags( $value ) {
+		return $value;
 	}
 
 	/**

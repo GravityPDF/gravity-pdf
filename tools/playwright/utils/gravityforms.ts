@@ -13,6 +13,8 @@ type Entry = {
 	created_by?: number;
 	ip?: string;
 	date_created?: string;
+	user_agent?: string;
+	[input: string]: unknown;
 };
 
 /**
@@ -114,6 +116,14 @@ export default class GravityForms {
 			path: `/gf/v2/entries`,
 			data: { ...entry },
 		});
+	}
+
+	async getLatestEntry(formId: number) {
+		const { entries }: { entries: any[] } = await this.requestUtils.rest({
+			path: `/gf/v2/forms/${formId}/entries`,
+		});
+
+		return entries[0];
 	}
 
 	async getFormIdByName(name: string): Promise<number> {

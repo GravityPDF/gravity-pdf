@@ -78,8 +78,11 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			$original_entry_id   = $attributes['entry'];
 			$attributes['entry'] = $this->get_entry_id_if_empty( $original_entry_id );
 
+			/* Use up the entry's trust now, so a shortcode that fails validation can't leave it for a later one */
+			$trusted = ! empty( $original_entry_id ) && $this->consume_trusted_entry( $attributes['entry'] );
+
 			/* Do PDF validation */
-			$this->get_pdf_config( $attributes['entry'], $attributes['id'] );
+			$settings = $this->get_pdf_config( $attributes['entry'], $attributes['id'] );
 
 			$pdf               = GPDFAPI::get_mvc_class( 'Model_PDF' );
 			$download          = $attributes['type'] === 'download';
@@ -87,8 +90,8 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			$raw               = ! empty( $attributes['raw'] );
 			$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
-			/* Sign the URL to allow direct access to the PDF until it expires */
-			if ( ! empty( $attributes['signed'] ) && ! empty( $original_entry_id ) ) {
+			/* Sign the URL to allow direct access to the PDF until it expires (only for an entry ID set on the shortcode) */
+			if ( ! empty( $attributes['signed'] ) && ! empty( $original_entry_id ) && ( $trusted || $this->can_sign_url( $attributes['entry'], $settings ) ) ) {
 				$attributes['url'] = $this->url_signer->sign( $attributes['url'], $attributes['expires'] );
 			}
 
@@ -111,5 +114,27 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 		} catch ( Exception $e ) {
 			return $has_view_permissions ? $e->getMessage() : '';
 		}
+	}
+
+	/**
+	 * Only sign an untrusted entry the shortcode's author can view
+	 *
+	 * @param int   $entry_id
+	 * @param array $settings The PDF settings
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	protected function can_sign_url( $entry_id, $settings ) {
+		/* In post content the author is the post's author, not whoever is viewing it */
+		$post    = doing_filter( 'the_content' ) ? get_post() : null;
+		$user_id = (int) apply_filters( 'gfpdf_shortcode_signing_user_id', $post ? $post->post_author : get_current_user_id(), $entry_id, $settings );
+
+		/** @var Model_PDF $model_pdf */
+		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
+
+		/* Capabilities don't need the entry, so only load it to check ownership */
+		return $model_pdf->can_user_view_pdf_with_capabilities( $user_id ) || $model_pdf->can_user_view_entry( $this->gform->get_entry( $entry_id ), $settings, $user_id );
 	}
 }

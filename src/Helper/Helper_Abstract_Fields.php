@@ -5,6 +5,7 @@ namespace GFPDF\Helper;
 use Exception;
 use GF_Field;
 use GFFormsModel;
+use GFPDF\Model\Model_Signed_Url_Trust;
 use GFPDF\Statics\Kses;
 
 /**
@@ -311,18 +312,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 */
 	public function html( $value = '', $show_label = true ) {
-
-		/*
-		 * Prevent shortcodes and merge tags being processed from user input fields
-		 * We'll allow them in administrative fields (not hidden fields) and HTML and Section fields
-		 *
-		 * @since 4.2 Skipping Administrative fields was added
-		 */
-		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
-		if ( ( empty( $this->field->visibility ) || $this->field->visibility !== 'administrative' ) &&
-			 ! in_array( $this->field->type, $skip_fields, true ) ) {
-			$value = $this->encode_tags( $value );
-		}
+		$value = $this->encode_value_tags( $value );
 
 		/* Backwards compat */
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'] ?? 0, $this->form['id'] ?? 0 );
@@ -380,10 +370,179 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 4.0
 	 */
 	public function encode_tags( $value ) {
-		$find      = [ '[', ']', '{', '}' ];
-		$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
+		$find  = [ '[', ']', '{', '}' ];
+		$value = (string) $value;
+		if ( strpbrk( $value, '[]{}' ) === false ) {
+			return $value;
+		}
 
-		return str_replace( $find, $converted, $value ?? '' );
+		/* Kses rebuilds attribute values, so URL-encode the tags there */
+		if ( strpos( $value, '<' ) !== false && class_exists( '\WP_HTML_Tag_Processor' ) ) {
+			$processor = new \WP_HTML_Tag_Processor( $value );
+			while ( $processor->next_tag() ) {
+				foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+					$attribute = $processor->get_attribute( $name );
+					if ( is_string( $attribute ) && strpbrk( $attribute, '[]{}' ) !== false ) {
+						$processor->set_attribute( $name, str_replace( $find, [ '%5B', '%5D', '%7B', '%7D' ], $attribute ) );
+					}
+				}
+			}
+
+			$value = $processor->get_updated_html();
+		}
+
+		return str_replace( $find, [ '&#91;', '&#93;', '&#123;', '&#125;' ], $value );
+	}
+
+	/**
+	 * Prevent shortcodes and merge tags being processed from user input fields, in the field's HTML and form data.
+	 * We'll allow them in HTML and Section fields, and administrative fields still holding their default value.
+	 *
+	 * @param mixed $value A value, or an array of them
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.17.3
+	 */
+	public function encode_value_tags( $value ) {
+		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
+		if ( in_array( $this->field->type, $skip_fields, true ) ) {
+			return $value;
+		}
+
+		$encode = null;
+		$walk   = function ( &$item ) use ( &$encode ) {
+			/* Only check trust, which recomputes an administrative field's default, for a value holding a tag */
+			if ( ! is_string( $item ) || strpbrk( $item, '[]{}' ) === false ) {
+				return;
+			}
+
+			$encode = $encode ?? ( $this->is_trusted_value() ? [ $this, 'decode_shortcode_quotes' ] : [ $this, 'encode_tags' ] );
+			$item   = $encode( $item );
+		};
+
+		if ( is_array( $value ) ) {
+			array_walk_recursive( $value, $walk );
+		} else {
+			$value = (string) $value;
+			$walk( $value );
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Allow the HTML and merge tags a form editor put in a choice's escaped text
+	 *
+	 * @param string $text
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	protected function parse_choice_text( $text ) {
+		return Kses::parse( $this->gform->process_tags( wp_specialchars_decode( $text, ENT_QUOTES ), $this->form, $this->entry ) );
+	}
+
+	/**
+	 * Restore the quotes the field's escaping encoded in a trusted value's shortcodes, so their attributes still parse
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	protected function decode_shortcode_quotes( $value ) {
+		if ( strpos( $value, '[' ) === false ) {
+			return $value;
+		}
+
+		return preg_replace_callback(
+			'/' . get_shortcode_regex() . '/',
+			function ( $shortcode ) {
+				return str_replace( [ '&quot;', '&#039;', '&#39;' ], [ '"', "'", "'" ], $shortcode[0] );
+			},
+			$value
+		);
+	}
+
+	/**
+	 * Whether the field's value came from a form editor rather than a submitter
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	protected function is_trusted_value() {
+		$trust = $this->get_signed_url_trust();
+
+		return $trust !== null && $trust->is_trusted_field_value( $this->field, $this->entry );
+	}
+
+	/**
+	 * Whether a value is one of the field's choices
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	protected function is_choice_value( $value ) {
+		if ( ! $this->field instanceof GF_Field ) {
+			return false;
+		}
+
+		foreach ( $this->field->choices ?: [] as $choice ) {
+			/* Gravity Forms saves a choice's value sanitised, so match either form */
+			$choice = (string) ( $choice['value'] ?? '' );
+			if ( in_array( (string) $value, [ $choice, wp_kses_post( $choice ) ], true ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Process merge tags in a value a form editor set. A submitter's value is left as is, unless the
+	 * `gfpdf_field_process_merge_tags` filter opts in, and its PDF merge tags and shortcodes are never trusted.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 *
+	 * @since 6.17.3
+	 */
+	protected function process_value_tags( $value ) {
+		$process = function () use ( $value ) {
+			return $this->gform->process_tags( $value, $this->form, $this->entry );
+		};
+
+		if ( $this->is_trusted_value() ) {
+			return $process();
+		}
+
+		$trust = $this->get_signed_url_trust();
+		if ( $trust === null || ! apply_filters( 'gfpdf_field_process_merge_tags', false, $this->field, $this->entry, $this->form ) ) {
+			return $value;
+		}
+
+		return $trust->run_untrusted( $process );
+	}
+
+	/**
+	 * The shared signing trust registry, or null before the plugin has registered it
+	 *
+	 * @return Model_Signed_Url_Trust|null
+	 *
+	 * @since 6.17.3
+	 */
+	protected function get_signed_url_trust() {
+		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+
+		return $trust instanceof Model_Signed_Url_Trust ? $trust : null;
 	}
 
 	/**

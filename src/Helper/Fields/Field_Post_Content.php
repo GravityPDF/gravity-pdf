@@ -82,7 +82,7 @@ class Field_Post_Content extends Helper_Abstract_Fields {
 
 		if ( isset( $this->field->useRichTextEditor ) && true === $this->field->useRichTextEditor ) {
 			$html = Kses::parse(
-				$this->gform->process_tags( $value, $this->form, $this->entry )
+				$this->process_value_tags( $value )
 			);
 		} else {
 			$html = nl2br( esc_html( $value ) );

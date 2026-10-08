@@ -17,6 +17,9 @@ abstract class TestCase extends WP_UnitTestCase {
 		parent::set_up();
 		$this->gfpdf()->data->form_settings = [];
 
+		/* Signing grants are request-scoped, so give each test a fresh registry */
+		$this->gfpdf()->singleton->add_class( new \GFPDF\Model\Model_Signed_Url_Trust() );
+
 		/*
 		 * The gfpdf_settings_user_data transient is written by Test_Options_API
 		 * and a few others. Single-site relies on the WP test transaction to

@@ -341,24 +341,21 @@ class Rest_Download_Pdf {
 	 * @return bool
 	 */
 	public function get_item_permissions_check( $request ) {
-		/* Check if the current user has appropriate capability to view document */
 		/** @var Model_PDF $model_pdf */
 		$model_pdf = \GPDFAPI::get_pdf_class( 'model' );
+
 		if ( $model_pdf->can_user_view_pdf_with_capabilities() ) {
 			return true;
 		}
 
-		/* check if the current user is the owner and owner access is not disabled in the PDF settings */
 		$entry = $this->gform->get_entry( $request->get_param( 'entry' ) );
-		$pdf   = \GPDFAPI::get_pdf( $entry['form_id'] ?? 0, $request->get_param( 'pdf' ) );
-
-		$user_id             = get_current_user_id();
-		$is_owner_restricted = $pdf['restrict_owner'] ?? 'No';
-		if ( $user_id > 0 && $is_owner_restricted !== 'Yes' && (int) $entry['created_by'] === $user_id ) {
-			return true;
+		if ( is_wp_error( $entry ) ) {
+			return false;
 		}
 
-		return false;
+		$pdf = \GPDFAPI::get_pdf( $entry['form_id'], $request->get_param( 'pdf' ) );
+
+		return $model_pdf->can_user_view_entry( $entry, is_wp_error( $pdf ) ? [] : $pdf );
 	}
 
 	/**

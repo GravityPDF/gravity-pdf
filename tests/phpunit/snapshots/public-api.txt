@@ -9,6 +9,12 @@ class GFPDF\Helper\Fields\Field_Checkbox extends GFPDF\Helper\Helper_Abstract_Fi
     final public function remove_cache()
     protected $cached_results
     protected $pdf_config
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     public $entry
     public $field
     public $fieldObject
@@ -17,6 +23,7 @@ class GFPDF\Helper\Fields\Field_Checkbox extends GFPDF\Helper\Helper_Abstract_Fi
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -36,6 +43,12 @@ class GFPDF\Helper\Fields\Field_Form extends GFPDF\Helper\Helper_Abstract_Fields
     final public function remove_cache()
     protected $cached_results
     protected $pdf_config
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     public $entry
     public $field
     public $fieldObject
@@ -44,6 +57,7 @@ class GFPDF\Helper\Fields\Field_Form extends GFPDF\Helper\Helper_Abstract_Fields
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -64,6 +78,12 @@ class GFPDF\Helper\Fields\Field_Multiselect extends GFPDF\Helper\Helper_Abstract
     final public function remove_cache()
     protected $cached_results
     protected $pdf_config
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     public $entry
     public $field
     public $fieldObject
@@ -72,6 +92,7 @@ class GFPDF\Helper\Fields\Field_Multiselect extends GFPDF\Helper\Helper_Abstract
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -92,6 +113,12 @@ class GFPDF\Helper\Fields\Field_Option extends GFPDF\Helper\Helper_Abstract_Fiel
     protected $cached_results
     protected $pdf_config
     protected $products
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     protected function set_form_data($name, $value)
     public $entry
     public $field
@@ -101,6 +128,7 @@ class GFPDF\Helper\Fields\Field_Option extends GFPDF\Helper\Helper_Abstract_Fiel
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_option_html($options, $html = '')
@@ -124,6 +152,12 @@ class GFPDF\Helper\Fields\Field_Product extends GFPDF\Helper\Helper_Abstract_Fie
     protected $cached_results
     protected $pdf_config
     protected $products
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     protected function set_form_data($name, $value)
     public $entry
     public $field
@@ -133,6 +167,7 @@ class GFPDF\Helper\Fields\Field_Product extends GFPDF\Helper\Helper_Abstract_Fie
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -154,7 +189,13 @@ class GFPDF\Helper\Fields\Field_Radio extends GFPDF\Helper\Helper_Abstract_Field
     final public function remove_cache()
     protected $cached_results
     protected $pdf_config
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
     protected function is_user_defined_value($value)
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     public $entry
     public $field
     public $fieldObject
@@ -163,6 +204,7 @@ class GFPDF\Helper\Fields\Field_Radio extends GFPDF\Helper\Helper_Abstract_Field
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -182,6 +224,12 @@ class GFPDF\Helper\Fields\Field_Select extends GFPDF\Helper\Helper_Abstract_Fiel
     final public function remove_cache()
     protected $cached_results
     protected $pdf_config
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     public $entry
     public $field
     public $fieldObject
@@ -190,6 +238,7 @@ class GFPDF\Helper\Fields\Field_Select extends GFPDF\Helper\Helper_Abstract_Fiel
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -210,6 +259,12 @@ class GFPDF\Helper\Fields\Field_Shipping extends GFPDF\Helper\Helper_Abstract_Fi
     protected $cached_results
     protected $pdf_config
     protected $products
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     protected function set_form_data($name, $value)
     public $entry
     public $field
@@ -219,6 +274,7 @@ class GFPDF\Helper\Fields\Field_Shipping extends GFPDF\Helper\Helper_Abstract_Fi
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -316,6 +372,12 @@ abstract class GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helpe
     final public function remove_cache()
     protected $cached_results
     protected $pdf_config
+    protected function decode_shortcode_quotes($value)
+    protected function get_signed_url_trust()
+    protected function is_choice_value($value)
+    protected function is_trusted_value()
+    protected function parse_choice_text($text)
+    protected function process_value_tags($value)
     public $entry
     public $field
     public $fieldObject
@@ -324,6 +386,7 @@ abstract class GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helpe
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -342,10 +405,13 @@ abstract class GFPDF\Helper\Helper_Abstract_Pdf_Shortcode extends GFPDF\Helper\H
     protected $options
     protected $url_signer
     protected function add_entry_id_to_shortcode($text, $entry_id)
+    protected function consume_trusted_entry($entry_id)
     protected function get_entry_id_if_empty($entry_id)
     protected function get_pdf_config($entry_id, $pdf_id)
+    protected function get_trust()
     public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer)
     public function add_shortcode_attr($code, $attr, $value)
+    public function do_trusted_shortcode($shortcode, $entry_id)
     public function get_shortcode_information($shortcode, $text)
     public function gravitypdf_confirmation($confirmation, $form, $entry)
     public function gravitypdf_gravityview_custom($html)
@@ -353,6 +419,8 @@ abstract class GFPDF\Helper\Helper_Abstract_Pdf_Shortcode extends GFPDF\Helper\H
     public function gravitypdf_process_during_merge_tag_replacement($html, $form, $entry)
     public function gravitypdf_redirect_confirmation($form)
     public function gravitypdf_redirect_confirmation_shortcode_processing($confirmation, $form, $entry)
+    public function gravitypdf_trust_administrative_field_shortcodes($text, $form, $entry)
+    public function mark_entry_as_trusted($entry_id)
 
 interface GFPDF\Helper\Helper_Interface_Actions
     abstract public function add_actions()
@@ -452,6 +520,7 @@ class GFPDF\Helper\Fields\Field_Products extends GFPDF\Helper\Helper_Abstract_Fi
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -757,6 +826,7 @@ class GFPDF\Model\Model_PDF extends GFPDF\Helper\Helper_Abstract_Model
     public function __call($name, $arguments)
     public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Helper\Helper_Templates $templates, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer, ?GFPDF\Helper\Helper_Async_Notifications $async_notifications = null)
     public function add_unregistered_fonts_to_mPDF($fonts)
+    public function can_user_view_entry($entry, $settings, $user_id = null)
     public function can_user_view_pdf_with_capabilities($user_id = null)
     public function check_field_exists($type, $form)
     public function cleanup_tmp_dir()
@@ -822,6 +892,7 @@ class GFPDF\Model\Model_Shortcodes extends GFPDF\Helper\Helper_Abstract_Pdf_Shor
     public function __call($name, $arguments)
     public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer)
     public function add_shortcode_attr($code, $attr, $value)
+    public function do_trusted_shortcode($shortcode, $entry_id)
     public function get_shortcode_information($shortcode, $text)
     public function gravitypdf_confirmation($confirmation, $form, $entry)
     public function gravitypdf_gravityview_custom($html)
@@ -829,6 +900,8 @@ class GFPDF\Model\Model_Shortcodes extends GFPDF\Helper\Helper_Abstract_Pdf_Shor
     public function gravitypdf_process_during_merge_tag_replacement($html, $form, $entry)
     public function gravitypdf_redirect_confirmation($form)
     public function gravitypdf_redirect_confirmation_shortcode_processing($confirmation, $form, $entry)
+    public function gravitypdf_trust_administrative_field_shortcodes($text, $form, $entry)
+    public function mark_entry_as_trusted($entry_id)
     public function process($attributes)
     public static function __callStatic($name, $arguments)
 

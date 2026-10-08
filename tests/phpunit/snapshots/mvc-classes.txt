@@ -28,6 +28,7 @@ Model_PDF => GFPDF\Model\Model_PDF
 Model_Pdf_Cache => GFPDF\Model\Model_Pdf_Cache
 Model_Settings => GFPDF\Model\Model_Settings
 Model_Shortcodes => GFPDF\Model\Model_Shortcodes
+Model_Signed_Url_Trust => GFPDF\Model\Model_Signed_Url_Trust
 Model_System_Report => GFPDF\Model\Model_System_Report
 Model_Templates => GFPDF\Model\Model_Templates
 Rest_Download_Pdf => GFPDF\Rest\Rest_Download_Pdf

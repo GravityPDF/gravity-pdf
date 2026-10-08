@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
@@ -194,7 +195,7 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
 	}
 
-	public function test_6_17_3_removes_a_logged_out_timeout_below_one_minute() {
+	public function test_6_17_3_fixes_a_logged_out_timeout_out_of_range() {
 		$settings = $this->options->get_settings();
 
 		foreach ( [ 0, '-5' ] as $timeout ) {
@@ -203,10 +204,17 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 			$this->assertArrayNotHasKey( 'logged_out_timeout', get_option( 'gfpdf_settings' ) );
 		}
 
-		/* A real timeout is left alone */
-		$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => '33' ] ) );
+		/* One over a week is capped at a week */
+		$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => '525600' ] ) );
 		do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
-		$this->assertSame( '33', get_option( 'gfpdf_settings' )['logged_out_timeout'] );
+		$this->assertSame( Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX, get_option( 'gfpdf_settings' )['logged_out_timeout'] );
+
+		/* A real timeout is left alone */
+		foreach ( [ '33', (string) Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX ] as $timeout ) {
+			$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => $timeout ] ) );
+			do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+			$this->assertSame( $timeout, get_option( 'gfpdf_settings' )['logged_out_timeout'] );
+		}
 
 		$this->options->update_settings( $settings );
 	}

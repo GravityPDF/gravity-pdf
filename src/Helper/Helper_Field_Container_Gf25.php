@@ -119,10 +119,14 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 			$row_html = ob_get_clean();
 
 			try {
+				/* Hide & from the parser so entities come back as written */
+				$amp = 'gfpdfamp' . bin2hex( random_bytes( 8 ) );
+
 				$qp       = new Helper_QueryPath();
-				$row_html = $qp->html5( $row_html, '.grid:last-of-type .inner-container' )
+				$row_html = $qp->html5( str_replace( '&', $amp, $row_html ), '.grid:last-of-type .inner-container' )
 						->css( 'width', '100%' )
 						->top( 'html' )->innerHTML();
+				$row_html = str_replace( $amp, '&', $row_html );
 			} catch ( \Exception $e ) {
 
 			}

@@ -8,7 +8,6 @@ use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -151,10 +150,13 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 
 		foreach ( $value as $key => $item ) {
 			$label = esc_html( GFCommon::selection_display( $item, $this->field, '', true ) );
-			$label = Kses::parse( $this->gform->process_tags( wp_specialchars_decode( $label, ENT_QUOTES ), $this->form, $this->entry ) );
-
 			$value = esc_html( GFCommon::selection_display( $item, $this->field ) );
-			$value = Kses::parse( $this->gform->process_tags( wp_specialchars_decode( $value, ENT_QUOTES ), $this->form, $this->entry ) );
+
+			/* Allow HTML and merge tags only in the choices the form editor set */
+			if ( $this->is_choice_value( $item ) ) {
+				$label = $this->parse_choice_text( $label );
+				$value = $this->parse_choice_text( $value );
+			}
 
 			$items[] = [
 				'value' => $value,

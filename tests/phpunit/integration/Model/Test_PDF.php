@@ -338,7 +338,7 @@ class Test_PDF extends TestCase {
 		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 
 		/* Generate a signed URL and verify it validates */
-		$url = do_shortcode( '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" raw="1" signed="1"]' );
+		$url = ( new Helper_Url_Signer() )->sign( $this->model->get_pdf_url( '556690c67856b', $entry['id'], true ), '' );
 		$options->set_plugin_settings();
 		$_GET['expires']        = '';
 		$_GET['signature']      = '';
@@ -381,7 +381,7 @@ class Test_PDF extends TestCase {
 			$options = GPDFAPI::get_options_class();
 			$options->set_plugin_settings();
 
-			$url = do_shortcode( '[gravitypdf id="556690c67856b" entry="' . $entry_id . '" raw="1" signed="1"]' );
+			$url = ( new Helper_Url_Signer() )->sign( $this->model->get_pdf_url( '556690c67856b', $entry_id, true ), '' );
 
 			$_GET['expires']   = '';
 			$_GET['signature'] = '';
@@ -1747,6 +1747,78 @@ class Test_PDF extends TestCase {
 		$html = ob_get_clean();
 
 		$this->assertStringContainsString( '<td class="grandtotal_amount totals">', $html );
+	}
+
+	public function test_html_structure_keeps_user_tags_encoded() {
+		$form_id = $this->gf_factory()->form->create(
+			[],
+			[
+				'title'         => 'Encoding',
+				'markupVersion' => 2,
+				'fields'        => [
+					new \GF_Field_Text( [ 'id' => 1, 'label' => 'Text' ] ),
+					new \GF_Field_Textarea( [ 'id' => 2, 'label' => 'Rich Text', 'useRichTextEditor' => true ] ),
+					new \GF_Field_HTML( [ 'id' => 3, 'label' => 'Html', 'content' => 'Form ID: {form_id}' ] ),
+				],
+			]
+		);
+
+		$entry_id = $this->gf_factory()->entry->create(
+			[
+				'form_id' => $form_id,
+				'1'       => '[gravitypdf id="1"] {all_fields}',
+				'2'       => '<a href="[gravitypdf id=1]" title="{all_fields}">[gravitypdf id="1"]</a>',
+			]
+		);
+
+		$entry = \GFAPI::get_entry( $entry_id );
+		$html  = $this->view->process_html_structure( $entry, $this->model, [ 'meta' => [ 'echo' => false, 'html_field' => true ] ] );
+
+		/* As the gfpdf_pdf_html_output filter does: the form editor's tags are processed, the submitter's aren't */
+		$html = do_shortcode( \GPDFAPI::get_form_class()->process_tags( $html, \GFAPI::get_form( $form_id ), $entry ) );
+
+		$this->assertStringContainsString( "Form ID: $form_id", $html );
+		$this->assertStringContainsString( '&#091;gravitypdf', $html );
+		$this->assertStringContainsString( '&#123;all_fields&#125;', $html );
+		$this->assertStringContainsString( '%5Bgravitypdf%20id=1%5D', $html );
+		$this->assertStringNotContainsString( '[', $html );
+		$this->assertStringNotContainsString( '{', $html );
+	}
+
+	public function test_form_data_keeps_user_tags_encoded() {
+		$default = '[gravitypdf id="1"] {entry_id}';
+		$form_id = $this->gf_factory()->form->create(
+			[],
+			[
+				'title'  => 'Form Data Encoding',
+				'fields' => [
+					new \GF_Field_Text( [ 'id' => 1, 'label' => 'Text' ] ),
+					new \GF_Field_Text( [ 'id' => 2, 'label' => 'Admin', 'visibility' => 'administrative', 'defaultValue' => $default ] ),
+					new \GF_Field_List( [ 'id' => 3, 'label' => 'List' ] ),
+				],
+			]
+		);
+
+		$entry_id = $this->gf_factory()->entry->create(
+			[
+				'form_id'    => $form_id,
+				'1'          => '[gravitypdf id="1"] {all_fields}',
+				'2'          => $default,
+				'3'          => serialize( [ '[row]' ] ),
+				'user_agent' => '[gravitypdf id="1"]',
+				'source_url' => 'https://example.org/?a={ip}',
+			]
+		);
+
+		$data = $this->model->get_form_data( \GFAPI::get_entry( $entry_id ) );
+
+		$this->assertSame( '&#91;gravitypdf id=&quot;1&quot;&#93; &#123;all_fields&#125;', $data['field'][1] );
+		$this->assertSame( '&#91;gravitypdf id="1"&#93;', $data['misc']['user_agent'] );
+		$this->assertSame( 'https://example.org/?a=&#123;ip&#125;', $data['misc']['source_url'] );
+		$this->assertSame( [ '&#91;row&#93;' ], $data['list'][3] ?? null );
+
+		/* An administrative field holding its default is trusted, as in html() */
+		$this->assertSame( $default, $data['field'][2] );
 	}
 
 	/**
