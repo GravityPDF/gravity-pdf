@@ -113,7 +113,7 @@ class Field_Textarea extends Helper_Abstract_Fields {
 		if ( ! empty( $this->field->useRichTextEditor ) ) {
 			$html = Kses::parse(
 				wpautop(
-					$this->gform->process_tags( $value, $this->form, $this->entry )
+					$this->process_value_tags( $value )
 				)
 			);
 		} else {

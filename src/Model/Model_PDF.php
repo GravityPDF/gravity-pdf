@@ -650,17 +650,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_user_capability( $action, $entry, $settings ) {
 
 		if ( ! is_wp_error( $action ) ) {
-			/* check if the user is logged in but is not the current owner */
-			$owner_restriction = $settings['restrict_owner'] ?? 'No';
-
-			if (
-				is_user_logged_in() &&
-				! $this->can_user_view_pdf_with_capabilities() &&
-				(
-					$owner_restriction === 'Yes' ||
-					$this->is_current_pdf_owner( $entry, 'logged_in' ) === false
-				)
-			) {
+			if ( is_user_logged_in() && ! $this->can_user_view_entry( $entry, $settings ) ) {
 				return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-pdf' ) );
 			}
 		}
@@ -690,6 +680,32 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return $can_user_view_pdf;
+	}
+
+	/**
+	 * Check if the logged in user, or the given user, may view an entry's PDF via capabilities or entry ownership
+	 *
+	 * @param array    $entry    The Gravity Forms Entry
+	 * @param array    $settings The Gravity PDF Settings for the PDF being accessed
+	 * @param int|null $user_id  Defaults to the current user
+	 *
+	 * @return bool
+	 *
+	 * @since 6.17.3
+	 */
+	public function can_user_view_entry( $entry, $settings, $user_id = null ) {
+		$user_id = $user_id === null ? get_current_user_id() : (int) $user_id;
+		if ( $user_id === 0 ) {
+			return false;
+		}
+
+		if ( $this->can_user_view_pdf_with_capabilities( $user_id ) ) {
+			return true;
+		}
+
+		$is_owner_restricted = $settings['restrict_owner'] ?? 'No';
+
+		return $is_owner_restricted !== 'Yes' && (int) ( $entry['created_by'] ?? 0 ) === $user_id;
 	}
 
 	/**
@@ -1372,6 +1388,11 @@ class Model_PDF extends Helper_Abstract_Model {
 		$survey = $this->get_survey_results( $form, $entry );
 		$poll   = $this->get_poll_results( $form, $entry );
 
+		/* Encode the user agent and source URL like field values */
+		foreach ( $form_meta['misc'] ?? [] as $key => $value ) {
+			$form_meta['misc'][ $key ] = is_string( $value ) ? $products->encode_tags( $value ) : $value;
+		}
+
 		/* Merge in the meta data and survey, quiz and poll data */
 		$data = array_replace_recursive( $data, $form_meta, $quiz, $survey, $poll );
 
@@ -1397,14 +1418,14 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* Get our field object */
 				$class = $this->get_field_class( $field, $form, $entry, $products );
 
-				/* Merge in the field object form_data() results */
-				$data = array_replace_recursive( $data, $class->form_data() );
+				/* Merge in the field object form_data() results, with user-input tags encoded as in its HTML */
+				$data = array_replace_recursive( $data, $class->encode_value_tags( $class->form_data() ) );
 			}
 		}
 
 		/* Load our product array if products exist */
 		if ( ! $products->is_empty() ) {
-			$data = array_replace_recursive( $data, $products->form_data() );
+			$data = array_replace_recursive( $data, $products->encode_value_tags( $products->form_data() ) );
 		}
 
 		/* Re-order the array keys to make it more readable */

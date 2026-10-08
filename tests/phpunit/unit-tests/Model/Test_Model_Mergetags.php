@@ -39,6 +39,14 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 
 		parent::set_up();
 
+		/* Signing grants are request-scoped, so give each test a fresh registry */
+		$GLOBALS['gfpdf']->singleton->add_class( new \GFPDF\Model\Model_Signed_Url_Trust() );
+
+		/* Unhook the plugin's own instance, or both would grant trust for each tag and only one would use it */
+		$plugin_model = GPDFAPI::get_mvc_class( 'Model_Mergetags' );
+		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'mark_trusted_pdf_mergetags' ] );
+		remove_filter( 'gform_replace_merge_tags', [ $plugin_model, 'process_pdf_mergetags' ] );
+
 		/* Setup our test classes */
 		$this->model      = new Model_Mergetags( $gfpdf->options, GPDFAPI::get_mvc_class( 'Model_PDF' ), $gfpdf->log, $gfpdf->misc, new Helper_Url_Signer() );
 		$this->controller = new Controller_Mergetags( $this->model );
@@ -350,6 +358,7 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
+		$this->model->mark_trusted_pdf_mergetags( $text, $form, $entry );
 		$results = $this->model->process_pdf_mergetags( $text, $form, $entry, false );
 
 		$this->assertStringContainsString( '&signature=', $results );
@@ -381,6 +390,7 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
+		$this->model->mark_trusted_pdf_mergetags( $text, $form, $entry );
 		$results = $this->model->process_pdf_mergetags( $text, $form, $entry, false );
 
 		$this->assertStringContainsString( 'signature=', $results );
@@ -418,6 +428,66 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 			[ '{Label:pdf:556690c67856b:signed,5 months:print:download}' ],
 			[ '{Label:pdf:556690c67856b:signed,5 months:download:print}' ],
 		];
+	}
+
+	public function test_signed_pdf_mergetag_needs_trust_or_a_user_who_can_view_it() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$tag   = '{Label:pdf:556690c67856b:signed}';
+		wp_set_current_user( 0 );
+
+		$this->assertStringNotContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
+
+		/* Each trusted tag signs once */
+		$this->model->mark_trusted_pdf_mergetags( $tag, $form, $entry );
+		$this->assertStringContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
+		$this->assertStringNotContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
+
+		/* Trust is per entry */
+		$this->model->mark_trusted_pdf_mergetags( $tag, $form, [ 'id' => $entry['id'] + 1 ] );
+		$this->assertStringNotContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
+
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+		$this->assertStringContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
+
+		wp_set_current_user( 0 );
+	}
+
+	public function test_signed_pdf_mergetag_in_a_field_value_is_not_trusted() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$tag   = '{Label:pdf:556690c67856b:signed}';
+		wp_set_current_user( 0 );
+
+		$this->assertStringContainsString( 'signature=', \GFCommon::replace_variables( $tag, $form, $entry ) );
+
+		/* A tag in a field value isn't trusted */
+		$field               = $this->get_text_field( $form );
+		$entry[ $field->id ] = $tag;
+		foreach ( [ 'standard' => '{all_fields}', 'administrative' => '{all_fields:admin}' ] as $visibility => $all_fields ) {
+			$field->visibility = $visibility;
+
+			$output = \GFCommon::replace_variables( $all_fields, $form, $entry );
+			$this->assertStringContainsString( 'pid=556690c67856b', $output );
+			$this->assertStringNotContainsString( 'signature=', $output );
+		}
+
+		$untrusted = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->run_untrusted(
+			function () use ( $tag, $form, $entry ) {
+				return \GFCommon::replace_variables( $tag, $form, $entry );
+			}
+		);
+		$this->assertStringNotContainsString( 'signature=', $untrusted );
+	}
+
+	private function get_text_field( $form ) {
+		foreach ( $form['fields'] as $field ) {
+			if ( $field->type === 'text' ) {
+				return $field;
+			}
+		}
+
+		$this->fail( 'No text field in the form' );
 	}
 
 	public function test_add_field_map_choices() {

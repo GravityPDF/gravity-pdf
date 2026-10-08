@@ -70,4 +70,33 @@ class Test_Field_Radio extends WP_UnitTestCase {
 		$this->assertSame( '', $form_data['field'][ $this->gf_field->id ] );
 		$this->assertSame( 'Radio Fourth Choice Label', $form_data['field'][ $this->gf_field->id . '_name' ] );
 	}
+
+	public function test_merge_tags_only_processed_in_choices() {
+		$form_id = ( new \GF_UnitTest_Factory() )->form->create( [], [ 'title' => 'Radio Tags', 'fields' => [ new \GF_Field_Radio( [
+			'id'      => 1,
+			'choices' => [ [ 'text' => 'Choice {form_id}', 'value' => 'a' ] ],
+		] ) ] ] );
+
+		$value = function ( $posted ) use ( $form_id ) {
+			$entry = [ 'id' => 0, 'form_id' => $form_id, '1' => $posted ];
+
+			return ( new Field_Radio( \GFAPI::get_form( $form_id )['fields'][0], $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->value()['label'];
+		};
+
+		$this->assertSame( "Choice $form_id", $value( 'a' ) );
+		$this->assertSame( 'Posted {form_id}', $value( 'Posted {form_id}' ) );
+	}
+
+	public function test_other_choice_value_is_not_processed() {
+		$form_id = ( new \GF_UnitTest_Factory() )->form->create( [], [ 'title' => 'Radio Other', 'fields' => [ new \GF_Field_Radio( [
+			'id'                => 1,
+			'enableOtherChoice' => true,
+			'choices'           => [ [ 'text' => 'A', 'value' => 'a' ] ],
+		] ) ] ] );
+
+		$entry = [ 'id' => 0, 'form_id' => $form_id, '1' => '<b>{form_id}</b>' ];
+		$value = ( new Field_Radio( \GFAPI::get_form( $form_id )['fields'][0], $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->value();
+
+		$this->assertSame( '&lt;b&gt;{form_id}&lt;/b&gt;', $value['label'] );
+	}
 }

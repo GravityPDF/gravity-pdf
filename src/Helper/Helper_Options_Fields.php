@@ -23,6 +23,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_Interface_Filters {
 
 	/**
+	 * The longest Logged Out Timeout, in minutes (1 week)
+	 *
+	 * @internal
+	 *
+	 * @since 6.17.3
+	 */
+	public const LOGGED_OUT_TIMEOUT_MAX = 10080;
+
+	/**
 	 * Add our filters
 	 *
 	 * @return void
@@ -175,6 +184,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'size'    => 'small',
 						'std'     => 20,
 						'min'     => 1,
+						'max'     => self::LOGGED_OUT_TIMEOUT_MAX,
 						'tooltip' => '<h6>' . esc_html__( 'Logged Out Timeout', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Logged out users can view PDFs when their IP matches the one assigned to the Gravity Form entry. Because IP addresses can change, a time-based restriction also applies.', 'gravity-pdf' ),
 					],
 

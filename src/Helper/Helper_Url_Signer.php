@@ -73,7 +73,17 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 			$date = new DateTime();
 			$log->notice( 'PDF URL signing date: ' . $date->format( DateTime::W3C ), [ 'url' => $url ] );
 
+			/* A signed URL can't be revoked short of rotating the secret, so cap how long one lives */
+			$max_expiration = (string) apply_filters( 'gfpdf_signed_url_max_expiration', '1 year', $url, $expiration );
+			$max_expiration = strtotime( $max_expiration ) !== false ? $max_expiration : '1 year';
+			$max_timeout    = ( clone $date )->modify( $max_expiration );
+
 			$timeout = $date->modify( $expiration );
+			if ( $timeout > $max_timeout ) {
+				$log->notice( 'PDF URL signing period capped at ' . $max_expiration, [ 'url' => $url ] );
+				$timeout = $max_timeout;
+			}
+
 			$log->notice( 'PDF URL signing expiration date: ' . $timeout->format( DateTime::W3C ), [ 'url' => $url ] );
 
 			/* Normalize URL to fix vendor error parsing invalid URL params */

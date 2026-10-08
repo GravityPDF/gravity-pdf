@@ -5,6 +5,7 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Statics\Deprecation;
 
@@ -74,7 +75,7 @@ class Controller_Upgrade_Routines {
 		}
 
 		if ( version_compare( $current_version, '6.17.3', '>=' ) && version_compare( $old_version, '6.17.3', '<' ) ) {
-			$this->remove_logged_out_timeout_below_minimum();
+			$this->fix_logged_out_timeout_out_of_range();
 			$this->remove_nested_mpdf_cache();
 		}
 
@@ -100,15 +101,22 @@ class Controller_Upgrade_Routines {
 	}
 
 	/**
-	 * Remove a saved Logged Out Timeout below the new 1-minute minimum, so it reads as the 20-minute default
+	 * Remove a saved Logged Out Timeout below the new 1-minute minimum, so it reads as the 20-minute default, and cap
+	 * one above the new 1-week maximum
 	 *
 	 * @since 6.17.3
 	 */
-	protected function remove_logged_out_timeout_below_minimum(): void {
+	protected function fix_logged_out_timeout_out_of_range(): void {
 		$settings = get_option( 'gfpdf_settings', [] );
 
-		if ( isset( $settings['logged_out_timeout'] ) && (int) $settings['logged_out_timeout'] < 1 ) {
+		if ( ! isset( $settings['logged_out_timeout'] ) ) {
+			return;
+		}
+
+		if ( (int) $settings['logged_out_timeout'] < 1 ) {
 			$this->options->delete_option( 'logged_out_timeout' );
+		} elseif ( (int) $settings['logged_out_timeout'] > Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX ) {
+			$this->options->update_option( 'logged_out_timeout', Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX );
 		}
 	}
 

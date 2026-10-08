@@ -3,9 +3,11 @@
 ## Gravity PDF
 
 ### 6.17.3
+* 🔒 Security: Check the user can view the entry before signing a PDF URL, and cap how long a signed PDF URL and the Logged Out Timeout last
 * 🧹 Housekeeping: Set a 1 minute minimum for the Logged Out Timeout
 * 🧹 Housekeeping: Create the background processing queue once per request
 * 🧹 Housekeeping: Create Gravity PDF's folders on install, upgrade and the twice-daily tmp cleanup, instead of on every request, and fold the "problem creating the directory" error into the dismissible folder notice
+* 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed in PDFs
 * 🐞 Bug: Save a number setting's default value when the field is left blank or isn't a number
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
 * 🐞 Bug: Keep queued background PDFs when a global settings save that turns Background Processing on or off fails

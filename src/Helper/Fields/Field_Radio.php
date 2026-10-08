@@ -8,7 +8,6 @@ use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Statics\Kses;
 
 /**
  * @package     Gravity PDF
@@ -70,7 +69,7 @@ class Field_Radio extends Helper_Abstract_Fields {
 
 	/**
 	 * Checks if the selected Radio button value is defined by the site owner (standard radio options)
-	 * or by the end user (through the "other" option).
+	 * or by the end user (through the "other" option, or any value that isn't one of the choices).
 	 *
 	 * @param string $value The user-selected radio button value
 	 *
@@ -79,20 +78,7 @@ class Field_Radio extends Helper_Abstract_Fields {
 	 * @since 4.0.1
 	 */
 	protected function is_user_defined_value( $value ) {
-
-		/* Check if the field has the "Other" choice enabled */
-		if ( ! isset( $this->field->enableOtherChoice ) || true !== $this->field->enableOtherChoice ) {
-			return false;
-		}
-
-		/* Loop through the values and check if we have a match */
-		foreach ( $this->field->choices as $item ) {
-			if ( wp_specialchars_decode( $value, ENT_QUOTES ) === $item['value'] ) {
-				return false;
-			}
-		}
-
-		return true;
+		return ! $this->is_choice_value( wp_specialchars_decode( $value, ENT_QUOTES ) );
 	}
 
 	/**
@@ -153,10 +139,10 @@ class Field_Radio extends Helper_Abstract_Fields {
 		$label = esc_html( GFCommon::selection_display( $this->get_value(), $this->field, '', true ) );
 		$value = esc_html( GFCommon::selection_display( $this->get_value(), $this->field ) );
 
-		/* Allow HTML if the radio value isn't the "other" option */
+		/* Allow HTML and merge tags only in the choices the form editor set */
 		if ( ! $this->is_user_defined_value( $value ) ) {
-			$value = Kses::parse( $this->gform->process_tags( wp_specialchars_decode( $value, ENT_QUOTES ), $this->form, $this->entry ) );
-			$label = Kses::parse( $this->gform->process_tags( wp_specialchars_decode( $label, ENT_QUOTES ), $this->form, $this->entry ) );
+			$value = $this->parse_choice_text( $value );
+			$label = $this->parse_choice_text( $label );
 		}
 
 		/* return value / label as an array */
