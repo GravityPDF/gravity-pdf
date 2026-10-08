@@ -100,7 +100,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	/**
 	 * Run a shortcode the plugin built, vouching for the ones that name the entry
 	 *
-	 * @internal
+	 * @internal Used by the Zapier and entry export integrations
 	 *
 	 * @param string $shortcode
 	 * @param int    $entry_id
@@ -170,7 +170,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @since 6.17.3
 	 */
-	protected function get_trust() {
+	private function get_trust() {
 		return GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
 	}
 

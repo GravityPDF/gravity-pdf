@@ -163,7 +163,9 @@ class Model_Signed_Url_Trust {
 	}
 
 	/**
-	 * @param mixed      $token      The shortcode's `token` attribute
+	 * Whether a shortcode's `token` matches its PDF and entry
+	 *
+	 * @param mixed      $token     The shortcode's `token` attribute
 	 * @param string     $shortcode The shortcode's name
 	 * @param string     $pdf_id
 	 * @param int|string $entry_id

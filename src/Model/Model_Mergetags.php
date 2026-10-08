@@ -291,6 +291,8 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Stop keeping PDF merge tags once the entry is saved
+	 *
 	 * @internal Hooked to gform_entry_created
 	 *
 	 * @return void

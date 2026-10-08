@@ -158,4 +158,13 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 		/* Capabilities don't need the entry, so only load it to check ownership */
 		return $model_pdf->can_user_view_pdf_with_capabilities( $user_id ) || $model_pdf->can_user_view_entry( $this->gform->get_entry( $entry_id ), $settings, $user_id );
 	}
+
+	/**
+	 * @return Model_Signed_Url_Trust
+	 *
+	 * @since 6.17.3
+	 */
+	private function get_trust() {
+		return GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+	}
 }

@@ -398,6 +398,8 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * Prevent shortcodes and merge tags being processed from user input fields, in the field's HTML and form data.
 	 * We'll allow them in HTML and Section fields, and the ones in an administrative field's default value.
 	 *
+	 * @internal Called while building the PDF's field HTML and $form_data
+	 *
 	 * @param mixed $value A value, or an array of them
 	 *
 	 * @return mixed
