@@ -131,4 +131,24 @@ class Test_Field_Repeater extends TestCase {
 			$this->assertSame( [ $this->form['id'], $this->entry['id'], $config ], $call );
 		}
 	}
+
+	public function test_form_data_encodes_each_sub_field_by_its_own_rules() {
+		$repeater = new \GF_Field_Repeater( [
+			'id'     => 1,
+			'label'  => 'Repeater',
+			'fields' => [
+				new \GF_Field_Text( [ 'id' => 2, 'label' => 'Text' ] ),
+				new \GF_Field_HTML( [ 'id' => 3, 'label' => 'Html', 'content' => '{form_id}' ] ),
+			],
+		] );
+
+		$form_id = $this->gf_factory()->form->create( [], [ 'title' => 'Repeater Tags', 'fields' => [ $repeater ] ] );
+		$entry   = [ 'id' => 0, 'form_id' => $form_id, '1' => [ [ '2' => '[gravitypdf id=1]' ] ] ];
+		$field   = \GFAPI::get_form( $form_id )['fields'][0];
+
+		$data = ( new Field_Repeater( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() ) )->form_data()['repeater'][1][0];
+
+		$this->assertSame( '&#91;gravitypdf id=1&#93;', $data[2] );
+		$this->assertStringContainsString( (string) $form_id, $data[3] );
+	}
 }

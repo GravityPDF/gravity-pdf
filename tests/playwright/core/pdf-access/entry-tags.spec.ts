@@ -127,4 +127,21 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 
 		expect(html).toContain(`First <strong>Choice</strong> ${form.id}`);
 	});
+
+	test('encodes the tags in $form_data like the PDF HTML', async () => {
+		const entry: any = await pdf.createEntry({
+			form_id: form.id,
+			'5': `[gravitypdf id="${pdfId}" raw="1"]`,
+			'16': adminDefault,
+			user_agent: `[gravitypdf id="${pdfId}" raw="1"]`,
+		});
+
+		const formData = await pdf.getPdfDebugOutput(pdfId, entry.id, 'data');
+
+		expect(formData).toContain('&#91;gravitypdf');
+		expect(formData).not.toMatch(/\[gravitypdf id="\d+" raw="1"\]/);
+
+		// the administrative field's default is left for the template to process
+		expect(formData).toContain(adminDefault);
+	});
 });

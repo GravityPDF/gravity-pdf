@@ -1785,6 +1785,42 @@ class Test_PDF extends TestCase {
 		$this->assertStringNotContainsString( '{', $html );
 	}
 
+	public function test_form_data_keeps_user_tags_encoded() {
+		$default = '[gravitypdf id="1"] {entry_id}';
+		$form_id = $this->gf_factory()->form->create(
+			[],
+			[
+				'title'  => 'Form Data Encoding',
+				'fields' => [
+					new \GF_Field_Text( [ 'id' => 1, 'label' => 'Text' ] ),
+					new \GF_Field_Text( [ 'id' => 2, 'label' => 'Admin', 'visibility' => 'administrative', 'defaultValue' => $default ] ),
+					new \GF_Field_List( [ 'id' => 3, 'label' => 'List' ] ),
+				],
+			]
+		);
+
+		$entry_id = $this->gf_factory()->entry->create(
+			[
+				'form_id'    => $form_id,
+				'1'          => '[gravitypdf id="1"] {all_fields}',
+				'2'          => $default,
+				'3'          => serialize( [ '[row]' ] ),
+				'user_agent' => '[gravitypdf id="1"]',
+				'source_url' => 'https://example.org/?a={ip}',
+			]
+		);
+
+		$data = $this->model->get_form_data( \GFAPI::get_entry( $entry_id ) );
+
+		$this->assertSame( '&#91;gravitypdf id=&quot;1&quot;&#93; &#123;all_fields&#125;', $data['field'][1] );
+		$this->assertSame( '&#91;gravitypdf id="1"&#93;', $data['misc']['user_agent'] );
+		$this->assertSame( 'https://example.org/?a=&#123;ip&#125;', $data['misc']['source_url'] );
+		$this->assertSame( [ '&#91;row&#93;' ], $data['list'][3] ?? null );
+
+		/* An administrative field holding its default is trusted, as in html() */
+		$this->assertSame( $default, $data['field'][2] );
+	}
+
 	/**
 	 * @since 4.2
 	 */

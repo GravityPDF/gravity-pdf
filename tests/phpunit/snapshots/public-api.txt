@@ -23,6 +23,7 @@ class GFPDF\Helper\Fields\Field_Checkbox extends GFPDF\Helper\Helper_Abstract_Fi
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -56,6 +57,7 @@ class GFPDF\Helper\Fields\Field_Form extends GFPDF\Helper\Helper_Abstract_Fields
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -90,6 +92,7 @@ class GFPDF\Helper\Fields\Field_Multiselect extends GFPDF\Helper\Helper_Abstract
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -125,6 +128,7 @@ class GFPDF\Helper\Fields\Field_Option extends GFPDF\Helper\Helper_Abstract_Fiel
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_option_html($options, $html = '')
@@ -163,6 +167,7 @@ class GFPDF\Helper\Fields\Field_Product extends GFPDF\Helper\Helper_Abstract_Fie
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -199,6 +204,7 @@ class GFPDF\Helper\Fields\Field_Radio extends GFPDF\Helper\Helper_Abstract_Field
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -232,6 +238,7 @@ class GFPDF\Helper\Fields\Field_Select extends GFPDF\Helper\Helper_Abstract_Fiel
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -267,6 +274,7 @@ class GFPDF\Helper\Fields\Field_Shipping extends GFPDF\Helper\Helper_Abstract_Fi
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -378,6 +386,7 @@ abstract class GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helpe
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
@@ -511,6 +520,7 @@ class GFPDF\Helper\Fields\Field_Products extends GFPDF\Helper\Helper_Abstract_Fi
     public $misc
     public function __construct($field, $entry, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Misc $misc)
     public function encode_tags($value)
+    public function encode_value_tags($value)
     public function form_data()
     public function get_field_classes(): string
     public function get_pdf_config()
