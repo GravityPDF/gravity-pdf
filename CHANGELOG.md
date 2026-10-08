@@ -5,6 +5,7 @@
 ### 6.17.3
 * 🧹 Housekeeping: Set a 1 minute minimum for the Logged Out Timeout
 * 🧹 Housekeeping: Create the background processing queue once per request
+* 🧹 Housekeeping: Create Gravity PDF's folders on install, upgrade and the twice-daily tmp cleanup, instead of on every request, and fold the "problem creating the directory" error into the dismissible folder notice
 * 🐞 Bug: Save a number setting's default value when the field is left blank or isn't a number
 * 🐞 Bug: Show single File Upload fields added in Gravity Forms 2.10+ in PDFs
 * 🐞 Bug: Keep queued background PDFs when a global settings save that turns Background Processing on or off fails
@@ -22,6 +23,7 @@
 * 🧹 Housekeeping: The "does not have write permission" notice can now be dismissed for a week, comes back sooner if the problem goes away and returns, and shows to users who can view the PDF settings. The System Status report tests the folders each time it's viewed
 * 🐞 Bug: Adding, editing or deleting a font now clears only that font's cached data, instead of every font's and the temporary files of PDFs being generated at the time
 * 💻 Developer: Global settings fields can set a `sanitize_callback` to replace the default sanitizing
+* 💻 Developer: Folders added with the `gfpdf_installer_create_folders` filter are created on install, upgrade and the twice-daily tmp cleanup, rather than on every request
 * 💻 Developer: mPDF's cache moves from `tmp/mpdf/mpdf` to `tmp/mpdf`, as the default `gfpdf_mpdf_tmp_location` is now the PDF tmp folder
 
 ### 6.17.2

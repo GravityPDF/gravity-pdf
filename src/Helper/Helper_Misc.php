@@ -498,10 +498,54 @@ class Helper_Misc {
 	 * @since 6.17.3
 	 */
 	public function create_mpdf_cache_folders(): void {
-		$dir = $this->data->mpdf_tmp_location . '/mpdf/ttfontdata';
+		$this->create_folder( $this->data->mpdf_tmp_location . '/mpdf/ttfontdata' );
+	}
+
+	/**
+	 * Create a folder Gravity PDF writes to, which the installer only does on install, upgrade and cron
+	 *
+	 * @param string $dir
+	 *
+	 * @return bool False if the folder couldn't be created
+	 *
+	 * @since 6.17.3
+	 */
+	public function create_folder( string $dir ): bool {
+		$existed = is_dir( $dir );
 
 		if ( ! wp_mkdir_p( $dir ) && ! is_dir( $dir ) ) {
 			$this->log->error( 'Failed Creating Folder Structure', [ 'dir' => $dir ] );
+
+			return false;
+		}
+
+		/* A tmp folder recreated between installer runs needs its web access protection back straight away */
+		if ( ! $existed && strpos( trailingslashit( $dir ), $this->data->template_tmp_location ) === 0 ) {
+			$this->protect_tmp_folder();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Stop the web server listing or serving the PDF tmp folder
+	 *
+	 * @since 6.17.3
+	 */
+	public function protect_tmp_folder(): void {
+		$tmp = $this->data->template_tmp_location;
+
+		if ( ! is_dir( $tmp ) ) {
+			return;
+		}
+
+		if ( ! is_file( $tmp . 'index.html' ) ) {
+			GFCommon::recursive_add_index_file( $tmp );
+		}
+
+		if ( ! is_file( $tmp . '.htaccess' ) ) {
+			$this->log->notice( 'Create Apache .htaccess Security file' );
+			file_put_contents( $tmp . '.htaccess', 'deny from all' );
 		}
 	}
 

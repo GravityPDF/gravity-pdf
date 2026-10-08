@@ -153,6 +153,25 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
 	}
 
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_add_item_recreates_a_missing_font_folder() {
+		global $gfpdf;
+
+		wp_set_current_user( $this->admin_user );
+		$gfpdf->misc->rmdir( $this->tmp_font_location );
+
+		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
+		$request->set_param( 'label', 'Font' );
+		$this->set_all_file_params( $request );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame( 'font', $font['id'] ?? null );
+		$this->assertFileExists( $this->tmp_font_location . 'DejaVuSans.ttf' );
+	}
+
 	public function test_add_item_permission_failed() {
 		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
 		$request->set_param( 'label', 'Font' );

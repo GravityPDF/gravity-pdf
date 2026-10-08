@@ -72,8 +72,22 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->assertEquals( 9999, has_action( 'wp_loaded', [ $this->controller, 'check_install_status' ] ) );
 
 		$this->assertEquals( 10, has_action( 'init', [ $this->model, 'register_rewrite_rules' ] ) );
-		$this->assertEquals( 10, has_action( 'gfpdf_version_changed', [ $this->model, 'check_folder_permissions' ] ) );
-		$this->assertEquals( 10, has_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'check_folder_permissions' ] ) );
+		$this->assertEquals( 5, has_action( 'gfpdf_version_changed', [ $this->model, 'create_folder_structures' ] ) );
+		$this->assertEquals( 10, has_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'create_folder_structures' ] ) );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_setup_defaults_leaves_the_folders_to_the_installer() {
+		global $gfpdf;
+
+		$gfpdf->misc->rmdir( $gfpdf->data->template_location );
+
+		$this->controller->setup_defaults();
+		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );
+
+		$this->model->create_folder_structures();
 	}
 
 	/**
@@ -255,15 +269,22 @@ class Test_Installer extends WP_UnitTestCase {
 	/**
 	 * @since 6.17.3
 	 */
-	public function test_check_folder_permissions() {
+	public function test_create_folder_structures_stores_the_folders_it_cant_create_or_write_to() {
 		global $gfpdf;
 
 		$font_location = $gfpdf->data->template_font_location;
+		$missing       = '/srv/gravity-pdf-addon/';
 
 		$misc = $this->getMockBuilder( Helper_Misc::class )
 			->setConstructorArgs( [ $gfpdf->log, $gfpdf->gform, $gfpdf->data ] )
-			->onlyMethods( [ 'is_directory_writable' ] )
+			->onlyMethods( [ 'create_folder', 'is_directory_writable' ] )
 			->getMock();
+
+		$misc->method( 'create_folder' )->willReturnCallback(
+			function( $dir ) use ( $missing ) {
+				return $dir !== $missing;
+			}
+		);
 
 		$misc->method( 'is_directory_writable' )->willReturnCallback(
 			function( $dir ) use ( $font_location ) {
@@ -271,22 +292,25 @@ class Test_Installer extends WP_UnitTestCase {
 			}
 		);
 
-		$model = new Model_Install( $gfpdf->log, $gfpdf->data, $misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), Controller_Uninstaller::get_instance()->model );
-		/* Make sure the folders exist, as only existing folders are tested */
-		$model->create_folder_structures();
-		$gfpdf->notices->clear();
+		$add_folder = function( $folders ) use ( $missing ) {
+			$folders[] = $missing;
 
-		$model->check_folder_permissions();
-		$this->assertSame( [ $font_location ], array_keys( get_option( Model_Install::UNWRITABLE_FOLDERS ) ) );
+			return $folders;
+		};
+
+		add_filter( 'gfpdf_installer_create_folders', $add_folder );
+
+		$model = new Model_Install( $gfpdf->log, $gfpdf->data, $misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), Controller_Uninstaller::get_instance()->model );
+		$model->create_folder_structures();
+
+		remove_filter( 'gfpdf_installer_create_folders', $add_folder );
+
+		$this->assertSame( [ $font_location, $missing ], array_keys( get_option( Model_Install::UNWRITABLE_FOLDERS ) ) );
 
 		/* A folder that keeps failing keeps the time it started failing */
 		update_option( Model_Install::UNWRITABLE_FOLDERS, [ $font_location => 1000 ] );
-		$model->check_folder_permissions();
-		$this->assertSame( [ $font_location => 1000 ], get_option( Model_Install::UNWRITABLE_FOLDERS ) );
-
-		/* Requests don't write to the folders */
-		$misc->expects( $this->never() )->method( 'is_directory_writable' );
 		$model->create_folder_structures();
+		$this->assertSame( [ $font_location => 1000 ], get_option( Model_Install::UNWRITABLE_FOLDERS ) );
 
 		delete_option( Model_Install::UNWRITABLE_FOLDERS );
 	}
