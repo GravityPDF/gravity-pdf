@@ -368,13 +368,8 @@ class Helper_PDF {
 			throw new Exception( sprintf( 'Could not save PDF, the generated document is empty: %s', esc_html( $file ) ) );
 		}
 
-		/* create our path, which another request may create first */
-		if ( ! is_dir( $this->path ) ) {
-			if ( ! wp_mkdir_p( $this->path ) && ! is_dir( $this->path ) ) {
-				throw new Exception( sprintf( 'Could not create directory: %s', esc_html( $this->path ) ) );
-			}
-
-			file_put_contents( $this->path . 'index.html', '' );
+		if ( ! $this->misc->create_folder( $this->path ) ) {
+			throw new Exception( sprintf( 'Could not create directory: %s', esc_html( $this->path ) ) );
 		}
 
 		/* Written beside the PDF and renamed into place, so no reader ever sees a partial file */

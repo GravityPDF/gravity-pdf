@@ -222,9 +222,9 @@ class Test_Controller_System_Report extends TestCase {
 
 		$failing = $this->getMockBuilder( Model_Install::class )
 			->disableOriginalConstructor()
-			->onlyMethods( [ 'check_folder_permissions' ] )
+			->onlyMethods( [ 'create_folder_structures' ] )
 			->getMock();
-		$failing->method( 'check_folder_permissions' )->willReturn( [ $dir ] );
+		$failing->method( 'create_folder_structures' )->willReturn( [ $dir ] );
 
 		$model      = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks(), new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ), $gfpdf->singleton->get_class( 'Model_Pdf_Cache' ), $failing );
 		$controller = new Controller_System_Report( $model, new View_System_Report(), $gfpdf->gform );

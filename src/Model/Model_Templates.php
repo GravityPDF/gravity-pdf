@@ -106,6 +106,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Validate uploaded file */
 		try {
+			$this->misc->create_folder( $this->data->template_tmp_location );
 			$storage  = new FileSystem( $this->data->template_tmp_location );
 			$file     = new File( 'template', $storage );
 			$zip_path = $this->move_template_to_tmp_dir( $file );
@@ -152,6 +153,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$unzipped_dir_name = $this->get_unzipped_dir_name( $zip_path );
 		$template_path     = $this->templates->get_template_path();
 
+		$this->misc->create_folder( $template_path );
 		$results = $this->misc->copyr( $unzipped_dir_name, $template_path );
 
 		/* Get the template headers now all the files are in the right location */

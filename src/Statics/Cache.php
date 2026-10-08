@@ -363,24 +363,7 @@ class Cache {
 	 * @since 7.0
 	 */
 	protected static function create_dir( $path ) {
-		if ( is_dir( $path ) ) {
-			return $path;
-		}
-
-		/* Every directory made gets one, not only the last */
-		$missing = [];
-		$dir     = $path;
-		while ( ! is_dir( $dir ) && dirname( $dir ) !== rtrim( $dir, '/' ) ) {
-			$missing[] = $dir;
-			$dir       = trailingslashit( dirname( $dir ) );
-		}
-
-		/* Another request may create the directory first */
-		if ( wp_mkdir_p( $path ) || is_dir( $path ) ) {
-			foreach ( $missing as $dir ) {
-				file_put_contents( $dir . 'index.html', '' );
-			}
-		}
+		\GPDFAPI::get_misc_class()->create_folder( $path );
 
 		return $path;
 	}

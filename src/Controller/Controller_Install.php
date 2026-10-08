@@ -133,9 +133,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	public function add_actions() {
 		add_action( 'wp_loaded', [ $this, 'check_install_status' ], 9999 );
 
-		/* Test writing to the folders occasionally, rather than on every request */
-		add_action( 'gfpdf_version_changed', [ $this->model, 'check_folder_permissions' ] );
-		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'check_folder_permissions' ] );
+		/* Create and test the folders on install, upgrade (before the upgrade routines) and the tmp cron, not every request */
+		add_action( 'gfpdf_version_changed', [ $this->model, 'create_folder_structures' ], 5 );
+		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'create_folder_structures' ] );
 
 		/* rewrite endpoints */
 		add_action( 'init', [ $this->model, 'register_rewrite_rules' ] );
@@ -177,7 +177,6 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 
 		$this->model->setup_template_location();
 		$this->model->setup_multisite_template_location();
-		$this->model->create_folder_structures();
 	}
 
 	/**
