@@ -7,6 +7,7 @@ use GFPDF\Controller\Controller_Pdf_Queue;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Statics\Queue_Callbacks;
+use GFPDF\Tests\Concerns\CreatesPdfHelper;
 use WP_UnitTestCase;
 
 /**
@@ -24,6 +25,8 @@ use WP_UnitTestCase;
  * @group queue
  */
 class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
+
+	use CreatesPdfHelper;
 
 	/**
 	 * @var Controller_Pdf_Queue
@@ -389,7 +392,7 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 		$entry   = $results['entry'];
 		$form    = $results['form'];
 
-		$path = $gfpdf->data->template_tmp_location . $entry['form_id'] . $entry['id'] . '556690c67856b/';
+		$path = $this->get_pdf_helper( $entry, $form['gfpdf_form_settings']['556690c67856b'] )->get_path();
 		wp_mkdir_p( $path );
 		$test_file = $path . 'file';
 		touch( $test_file );

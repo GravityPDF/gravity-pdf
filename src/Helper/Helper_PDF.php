@@ -604,8 +604,14 @@ class Helper_PDF {
 	public function set_path( $path = '' ) {
 
 		if ( empty( $path ) ) {
-			/* build our PDF path location */
-			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . $this->settings['id'] . '/';
+			/* Separators keep form/entry ids apart; the blog id stops sites colliding in the shared network tmp folder */
+			$path = $this->data->template_tmp_location . sprintf(
+				'%d-%d-%d-%s/',
+				get_current_blog_id(),
+				$this->entry['form_id'],
+				$this->entry['id'],
+				sanitize_html_class( (string) $this->settings['id'] )
+			);
 		} elseif ( substr( $path, -1 ) !== '/' ) {
 			/* ensure the path ends with a forward slash */
 			$path .= '/';

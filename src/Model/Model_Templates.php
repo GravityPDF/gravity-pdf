@@ -3,6 +3,7 @@
 namespace GFPDF\Model;
 
 use Exception;
+use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
@@ -74,23 +75,69 @@ class Model_Templates extends Helper_Abstract_Model {
 	 */
 	protected $misc;
 
+	/**
+	 * @var Helper_Abstract_Form
+	 *
+	 * @since 6.18.0
+	 */
+	protected $gform;
 
 	/**
 	 * Model_Templates constructor.
 	 *
-	 * @param Helper_Templates $templates
-	 * @param LoggerInterface  $log
-	 * @param Helper_Data      $data
-	 * @param Helper_Misc      $misc
+	 * @param Helper_Templates          $templates
+	 * @param LoggerInterface           $log
+	 * @param Helper_Data               $data
+	 * @param Helper_Misc               $misc
+	 * @param Helper_Abstract_Form|null $gform Defaults to GPDFAPI::get_form_class() for add-on BC
 	 *
 	 * @since 4.1
 	 */
-	public function __construct( Helper_Templates $templates, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( Helper_Templates $templates, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, ?Helper_Abstract_Form $gform = null ) {
 		/* Assign our internal variables */
 		$this->templates = $templates;
 		$this->data      = $data;
 		$this->log       = $log;
 		$this->misc      = $misc;
+		$this->gform     = $gform ?? GPDFAPI::get_form_class();
+	}
+
+	/**
+	 * Check if the current user can upload or delete PDF templates (which contain executable PHP)
+	 *
+	 * @return bool
+	 *
+	 * @since 6.18.0
+	 */
+	public function current_user_can_manage_templates(): bool {
+		/* upload_plugins maps to do_not_allow under DISALLOW_FILE_MODS, and to super admin only on multisite */
+		$allowed = current_user_can( 'upload_plugins' ) && $this->gform->has_capability( 'gravityforms_edit_settings' );
+
+		return (bool) apply_filters( 'gfpdf_current_user_can_manage_templates', $allowed );
+	}
+
+	/**
+	 * Stop the AJAX request if the current user cannot manage PDF templates
+	 *
+	 * @param string $endpoint_desc
+	 *
+	 * @since 6.18.0
+	 */
+	protected function verify_user_can_manage_templates( $endpoint_desc ) {
+		if ( $this->current_user_can_manage_templates() ) {
+			return;
+		}
+
+		$this->log->critical(
+			'Lack of User Capabilities',
+			[
+				'type'              => $endpoint_desc,
+				'user'              => wp_get_current_user(),
+				'capability_needed' => 'upload_plugins',
+			]
+		);
+
+		wp_die( '403', 403 );
 	}
 
 	/**
@@ -103,6 +150,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	public function ajax_process_uploaded_template() {
 
 		$this->misc->handle_ajax_authentication( 'Process Uploaded Template Zip Package' );
+		$this->verify_user_can_manage_templates( 'Process Uploaded Template Zip Package' );
 
 		/* Validate uploaded file */
 		try {
@@ -220,6 +268,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	public function ajax_process_delete_template() {
 
 		$this->misc->handle_ajax_authentication( 'Delete PDF Template' );
+		$this->verify_user_can_manage_templates( 'Delete PDF Template' );
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		$template_id = sanitize_html_class( $_POST['id'] ?? '' );
