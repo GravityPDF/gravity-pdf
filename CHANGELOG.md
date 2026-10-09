@@ -37,7 +37,7 @@
 * 🧹 Housekeeping: The version 3 detections added in 6.17 move from Deprecated Features to Unsupported Features, so the System Status and Site Health reports list them under their own heading and the admin notice is shown as an error rather than a warning
 
 ### 6.18.0
-* 🎉 Feature: Install several PDF templates at once
+* 🎉 Feature: Install several PDF template zips at once
 * 🎉 Feature: Drop template zips anywhere in the Template Manager
 * 🎉 Feature: Install template zips that have the templates inside a folder
 * 🔒 Security: Upgrade the bundled upload library to 4.0
