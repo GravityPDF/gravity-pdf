@@ -23,6 +23,7 @@
 * 🐞 Bug: Hide the Tools tab from users who can't use it
 * 🐞 Bug: Fix missing slash when converting a path under the site root to a URL
 * 🐞 Bug: Keep PDF merge tags in an administrative field's Default Value when the entry is saved
+* 🐞 Bug: Fix PHP deprecation notices when a field value or PDF setting is empty
 * 🐞 Bug: Fix PHP deprecation notice for empty rich text Paragraph fields
 * 🐞 Bug: Don't add debug errors to raw PDF URLs
 * 🐞 Bug: Delete PDFs sent with Gravity Forms background notifications

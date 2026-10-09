@@ -335,7 +335,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 		}
 
 		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
-		if ( strlen( trim( $value ) ) === 0 ) {
+		if ( strlen( trim( (string) $value ) ) === 0 ) {
 			$value = '&nbsp;';
 		}
 

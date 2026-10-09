@@ -988,7 +988,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_pdf_format() {
-		switch ( strtolower( $this->settings['format'] ) ) {
+		switch ( strtolower( $this->settings['format'] ?? '' ) ) {
 			case 'pdfa1b':
 				$this->mpdf->PDFA     = true;
 				$this->mpdf->PDFAauto = true;
@@ -1010,7 +1010,7 @@ class Helper_PDF {
 	 */
 	protected function set_pdf_security() {
 		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
-		if ( strtolower( $this->settings['format'] ) === 'standard' && strtolower( $this->settings['security'] ) === 'yes' ) {
+		if ( strtolower( $this->settings['format'] ?? '' ) === 'standard' && strtolower( $this->settings['security'] ?? '' ) === 'yes' ) {
 
 			$password        = ( isset( $this->settings['password'] ) ) ? wp_specialchars_decode( $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ), ENT_QUOTES ) : '';
 			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : [];
