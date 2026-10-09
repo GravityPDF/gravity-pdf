@@ -76,7 +76,7 @@ export function * templateUploadProcessing (action) {
 
     yield put(templateUploadProcessingSuccess(response.body, filename))
   } catch (error) {
-    yield put(templateUploadProcessingFailed({ message: '' }, filename))
+    yield put(templateUploadProcessingFailed({ message: error.message }, filename))
   }
 }
 

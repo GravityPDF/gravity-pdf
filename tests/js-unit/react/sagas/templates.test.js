@@ -123,9 +123,9 @@ describe('Sagas - templates', () => {
       const gen = templateUploadProcessing(newaction)
       gen.next()
 
-      expect(gen.throw({ error: 'network failure' }).value).toEqual(put({
+      expect(gen.throw({ message: 'network failure' }).value).toEqual(put({
         type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-        payload: { message: '', filename: 'test' }
+        payload: { message: 'network failure', filename: 'test' }
       }))
     })
   })
