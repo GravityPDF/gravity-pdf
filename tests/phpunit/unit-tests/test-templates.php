@@ -115,6 +115,39 @@ class Test_Templates extends WP_UnitTestCase {
 				]
 			)
 		);
+
+		$this->assertEquals( 10, has_filter( 'gfpdf_localised_script_array', [ $this->controller, 'add_localised_script_data' ] ) );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_current_user_can_manage_templates() {
+		$this->assertFalse( $this->model->current_user_can_manage_templates() );
+
+		/* Gravity Forms settings access alone is not enough */
+		$user_id = $this->factory->user->create( [ 'role' => 'editor' ] );
+		get_userdata( $user_id )->add_cap( 'gravityforms_edit_settings' );
+		wp_set_current_user( $user_id );
+
+		$this->assertFalse( $this->model->current_user_can_manage_templates() );
+		$this->assertFalse( $this->controller->add_localised_script_data( [] )['canManageTemplates'] );
+
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $user_id );
+		if ( is_multisite() ) {
+			$this->assertFalse( $this->model->current_user_can_manage_templates() );
+			grant_super_admin( $user_id );
+		}
+
+		$this->assertTrue( $this->model->current_user_can_manage_templates() );
+		$this->assertTrue( $this->controller->add_localised_script_data( [] )['canManageTemplates'] );
+
+		add_filter( 'file_mod_allowed', '__return_false' );
+		$this->assertFalse( $this->model->current_user_can_manage_templates() );
+
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+		$this->assertTrue( $this->model->current_user_can_manage_templates() );
 	}
 
 	/**

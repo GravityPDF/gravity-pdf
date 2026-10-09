@@ -55,4 +55,12 @@ describe('Template - TemplateList.js', () => {
   test('renders <TemplateUploader /> component', () => {
     expect(wrapper.find('Connect(TemplateUploader)').length).toBe(1)
   })
+
+  test('hides <TemplateUploader /> when the user cannot manage templates', () => {
+    GFPDF.canManageTemplates = false
+    const newWrapper = shallow(<TemplateList templates={templates} />)
+    GFPDF.canManageTemplates = true
+
+    expect(newWrapper.find('Connect(TemplateUploader)').length).toBe(0)
+  })
 })

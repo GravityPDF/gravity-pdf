@@ -50,7 +50,7 @@ export class TemplateList extends Component {
    * @since 4.1
    */
   render () {
-    const hasUserPrivs = GFPDF.userCapabilities.administrator || GFPDF.userCapabilities.gravityforms_edit_settings || false
+    const hasUserPrivs = GFPDF.canManageTemplates
 
     return (
       <TemplateContainer
