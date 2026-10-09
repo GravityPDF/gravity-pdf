@@ -192,4 +192,20 @@ class Test_Notices extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( $form, $html );
 	}
+
+	public function test_process_on_gravity_forms_page() {
+		$_GET['page'] = 'gf_edit_forms';
+
+		$this->notices->add_notice( 'My First Notice' );
+		$this->notices->add_error( 'My First Error' );
+
+		ob_start();
+		$this->notices->process();
+		$html = ob_get_clean();
+
+		unset( $_GET['page'] );
+
+		$this->assertStringContainsString( '<div class="notice gf-notice updated notice-success">', $html );
+		$this->assertStringContainsString( '<div class="notice gf-notice error">', $html );
+	}
 }

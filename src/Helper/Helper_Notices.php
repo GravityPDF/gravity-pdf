@@ -193,9 +193,9 @@ class Helper_Notices implements Helper_Interface_Actions {
 		$state   = strpos( $css_class, 'notice-' ) === false ? $default_state : '';
 		$classes = trim( $state . ' ' . $css_class );
 
-		/* Add specific classes on Gravity Forms page so the notice displays correctly */
+		/* gf-notice keeps it hidden until WP moves it into #gf-admin-notices-wrapper, so it doesn't paint then jump */
 		if ( class_exists( 'GFForms' ) && \GFForms::is_gravity_page() ) {
-			$classes  = 'notice gf-notice gform-settings__wrapper ' . $classes;
+			$classes  = 'notice gf-notice ' . $classes;
 			$classes .= $state === 'updated' ? ' notice-success' : '';
 		} else {
 			$classes = 'notice ' . $classes;
