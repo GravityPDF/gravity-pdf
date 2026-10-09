@@ -84,8 +84,8 @@ describe('Template - TemplateUploader.js', () => {
 
     test('queues the uploads before reporting the rejected files', () => {
       const calls = []
-      postTemplateUploadProcessingMock.mockImplementation(() => calls.push('upload'))
-      templateUploadRejectedMock.mockImplementation(() => calls.push('rejected'))
+      postTemplateUploadProcessingMock.mockImplementationOnce(() => calls.push('upload'))
+      templateUploadRejectedMock.mockImplementationOnce(() => calls.push('rejected'))
 
       wrapper = setupUploader()
       wrapper.instance().handleOndrop(
@@ -101,9 +101,6 @@ describe('Template - TemplateUploader.js', () => {
         { filename: 'not-a-template.txt', message: 'notZip' },
         { filename: 'huge.zip', message: 'tooBig' }
       ])
-
-      postTemplateUploadProcessingMock.mockReset()
-      templateUploadRejectedMock.mockReset()
     })
 
     test('ignores an empty drop', () => {

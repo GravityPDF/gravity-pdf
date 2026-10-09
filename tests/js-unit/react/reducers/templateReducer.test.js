@@ -216,6 +216,13 @@ describe('Reducers - templateReducer', () => {
 
       expect(newState.templateUploads).toEqual([expect.objectContaining({ id: 2, status: 'pending' })])
     })
+
+    test('closing the Template Manager with nothing finished leaves the state alone', () => {
+      const state = post(initialState, 1)
+
+      expect(reducer(state, { type: CLEAR_FINISHED_TEMPLATE_UPLOADS })).toBe(state)
+      expect(reducer(state, { type: DISMISS_TEMPLATE_UPLOAD_SUCCESS })).toBe(state)
+    })
   })
 
   describe('Check state gets returned when no actions match', () => {
