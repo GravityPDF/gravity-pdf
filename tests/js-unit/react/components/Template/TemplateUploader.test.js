@@ -19,13 +19,14 @@ describe('Template - TemplateUploader.js', () => {
 	let wrapper;
 	let component;
 	const postTemplateUploadProcessingMock = jest.fn();
-	const clearTemplateUploadProcessingMock = jest.fn();
+	const templateUploadRejectedMock = jest.fn();
+	const dismissTemplateUploadSuccessMock = jest.fn();
 
 	const uploaderProps = (props = {}) => ({
 		postTemplateUploadProcessing: postTemplateUploadProcessingMock,
-		clearTemplateUploadProcessing: clearTemplateUploadProcessingMock,
-		templateUploadTotal: 0,
-		templateUploadResults: [],
+		templateUploadRejected: templateUploadRejectedMock,
+		dismissTemplateUploadSuccess: dismissTemplateUploadSuccessMock,
+		templateUploads: [],
 		...props,
 	});
 
@@ -48,20 +49,15 @@ describe('Template - TemplateUploader.js', () => {
 		};
 		const dispatch = jest.fn();
 
-		test('has access to the upload batch state', () => {
-			wrapper = setup({
-				template: {
-					templateUploadTotal: 2,
-					templateUploadResults: [
-						{ filename: 'one.zip', success: true, templates: [] },
-					],
-				},
-			});
+		test('has access to the upload batch', () => {
+			const templateUploads = [
+				{ id: 1, filename: 'one.zip', status: 'pending' },
+			];
+			wrapper = setup({ template: { templateUploads } });
 
-			expect(wrapper.instance().props.templateUploadTotal).toBe(2);
-			expect(wrapper.instance().props.templateUploadResults).toEqual([
-				{ filename: 'one.zip', success: true, templates: [] },
-			]);
+			expect(wrapper.instance().props.templateUploads).toEqual(
+				templateUploads
+			);
 		});
 
 		test('check for mapDispatchToProps postTemplateUploadProcessing()', () => {
@@ -72,17 +68,26 @@ describe('Template - TemplateUploader.js', () => {
 			);
 		});
 
-		test('check for mapDispatchToProps clearTemplateUploadProcessing()', () => {
-			mapDispatchToProps(dispatch).clearTemplateUploadProcessing();
+		test('check for mapDispatchToProps templateUploadRejected()', () => {
+			mapDispatchToProps(dispatch).templateUploadRejected([]);
 
 			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'CLEAR_TEMPLATE_UPLOAD_PROCESSING',
+				type: 'TEMPLATE_UPLOAD_REJECTED',
+				payload: [],
+			});
+		});
+
+		test('check for mapDispatchToProps dismissTemplateUploadSuccess()', () => {
+			mapDispatchToProps(dispatch).dismissTemplateUploadSuccess();
+
+			expect(dispatch.mock.calls[0][0]).toEqual({
+				type: 'DISMISS_TEMPLATE_UPLOAD_SUCCESS',
 			});
 		});
 	});
 
 	describe('handleOndrop()', () => {
-		test('starts a new batch and uploads every zip that was dropped', () => {
+		test('uploads every zip that was dropped', () => {
 			wrapper = setupUploader();
 			wrapper
 				.instance()
@@ -92,12 +97,19 @@ describe('Template - TemplateUploader.js', () => {
 					file('gpdf-flow-2.0.0.zip'),
 				]);
 
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1);
-			expect(wrapper.state('rejections')).toEqual([]);
 			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(3);
+			expect(templateUploadRejectedMock.mock.calls.length).toBe(0);
 		});
 
-		test('reports each rejected file and uploads the rest', () => {
+		test('queues the uploads before reporting the rejected files', () => {
+			const calls = [];
+			postTemplateUploadProcessingMock.mockImplementation(() =>
+				calls.push('upload')
+			);
+			templateUploadRejectedMock.mockImplementation(() =>
+				calls.push('rejected')
+			);
+
 			wrapper = setupUploader();
 			wrapper.instance().handleOndrop(
 				[file('gpdf-cellulose-1.4.0.zip')],
@@ -113,11 +125,14 @@ describe('Template - TemplateUploader.js', () => {
 				]
 			);
 
-			expect(wrapper.state('rejections')).toEqual([
+			expect(calls).toEqual(['upload', 'rejected']);
+			expect(templateUploadRejectedMock.mock.calls[0][0]).toEqual([
 				{ filename: 'not-a-template.txt', message: 'notZip' },
 				{ filename: 'huge.zip', message: 'tooBig' },
 			]);
-			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(1);
+
+			postTemplateUploadProcessingMock.mockReset();
+			templateUploadRejectedMock.mockReset();
 		});
 
 		test('ignores an empty drop', () => {
@@ -125,98 +140,43 @@ describe('Template - TemplateUploader.js', () => {
 			wrapper.instance().handleOndrop([], []);
 
 			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(0);
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(0);
-		});
-
-		test('a drop during an upload joins the batch in flight', () => {
-			wrapper = setupUploader({ templateUploadTotal: 1 });
-			wrapper.setState({
-				rejections: [{ filename: 'a.txt', message: 'notZip' }],
-			});
-			wrapper.instance().handleOndrop(
-				[file('two.zip')],
-				[
-					{
-						file: file('b.txt'),
-						errors: [{ code: 'file-invalid-type' }],
-					},
-				]
-			);
-
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(0);
-			expect(wrapper.state('rejections').length).toBe(2);
-			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(1);
+			expect(templateUploadRejectedMock.mock.calls.length).toBe(0);
 		});
 	});
 
 	describe('Upload status', () => {
 		test('keeps the progress notice up until every upload in the batch reports back', () => {
 			wrapper = setupUploader({
-				templateUploadTotal: 2,
-				templateUploadResults: [
-					{ success: true, filename: 'one.zip', templates: [] },
+				templateUploads: [
+					{ id: 1, filename: 'one.zip', status: 'success' },
+					{ id: 2, filename: 'two.zip', status: 'pending' },
 				],
 			});
 
 			expect(wrapper.instance().isUploading).toBe(true);
 
 			wrapper.setProps({
-				templateUploadResults: [
-					{ success: true, filename: 'one.zip', templates: [] },
-					{ success: true, filename: 'two.zip', templates: [] },
+				templateUploads: [
+					{ id: 1, filename: 'one.zip', status: 'success' },
+					{ id: 2, filename: 'two.zip', status: 'success' },
 				],
 			});
 
 			expect(wrapper.instance().isUploading).toBe(false);
 		});
 
-		test('still reports success when the last zip in the batch fails, alongside its error', () => {
+		test('reports success alongside the errors in the batch', () => {
 			wrapper = setupUploader({
-				templateUploadTotal: 2,
-				templateUploadResults: [
-					{ success: true, filename: 'one.zip', templates: [] },
-					{ success: false, filename: 'two.zip', message: 'boom' },
+				templateUploads: [
+					{ id: 1, filename: 'one.zip', status: 'success' },
+					{
+						id: 2,
+						filename: 'two.zip',
+						status: 'failed',
+						message: 'boom',
+					},
+					{ filename: 'a.txt', status: 'failed', message: 'notZip' },
 				],
-			});
-
-			const errors = statusMessages(
-				wrapper,
-				'component-stateError-showMessage'
-			);
-
-			expect(errors.length).toBe(1);
-			expect(errors.prop('text')).toBe('two.zip: boom');
-			expect(
-				statusMessages(wrapper, 'component-stateMessage-showMessage')
-					.length
-			).toBe(1);
-		});
-
-		test('falls back to the generic error when the server gave no reason', () => {
-			wrapper = setupUploader({
-				templateUploadTotal: 1,
-				templateUploadResults: [
-					{ success: false, filename: 'one.zip', message: '' },
-				],
-			});
-
-			expect(
-				statusMessages(
-					wrapper,
-					'component-stateError-showMessage'
-				).prop('text')
-			).toBe('one.zip: genericError');
-		});
-
-		test('lists the rejected files before the failed uploads', () => {
-			wrapper = setupUploader({
-				templateUploadTotal: 1,
-				templateUploadResults: [
-					{ success: false, filename: 'one.zip', message: 'boom' },
-				],
-			});
-			wrapper.setState({
-				rejections: [{ filename: 'a.txt', message: 'notZip' }],
 			});
 
 			const errors = statusMessages(
@@ -225,42 +185,33 @@ describe('Template - TemplateUploader.js', () => {
 			);
 
 			expect(errors.map((error) => error.prop('text'))).toEqual([
+				'two.zip: boom',
 				'a.txt: notZip',
-				'one.zip: boom',
 			]);
+			expect(
+				statusMessages(wrapper, 'component-stateMessage-showMessage')
+					.length
+			).toBe(1);
 		});
 
-		test('removeMessage() hides the success message', () => {
+		test('dismisses the success message through the store', () => {
 			wrapper = setupUploader({
-				templateUploadTotal: 1,
-				templateUploadResults: [
-					{ success: true, filename: 'one.zip', templates: [] },
+				templateUploads: [
+					{ id: 1, filename: 'one.zip', status: 'success' },
 				],
 			});
-			wrapper.instance().removeMessage();
+
+			statusMessages(wrapper, 'component-stateMessage-showMessage').prop(
+				'dismissableCallback'
+			)();
+
+			expect(dismissTemplateUploadSuccessMock.mock.calls.length).toBe(1);
+		});
+
+		test('renders nothing without a batch', () => {
+			wrapper = setupUploader();
 
 			expect(wrapper.instance().renderStatus()).toBe(null);
-		});
-	});
-
-	describe('componentWillUnmount()', () => {
-		test('clears a finished batch', () => {
-			wrapper = setupUploader({
-				templateUploadTotal: 1,
-				templateUploadResults: [
-					{ success: true, filename: 'one.zip', templates: [] },
-				],
-			});
-			wrapper.instance().componentWillUnmount();
-
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1);
-		});
-
-		test('leaves a batch in flight alone', () => {
-			wrapper = setupUploader({ templateUploadTotal: 1 });
-			wrapper.instance().componentWillUnmount();
-
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(0);
 		});
 	});
 
@@ -283,7 +234,13 @@ describe('Template - TemplateUploader.js', () => {
 
 	test('renders the upload progress notice while a batch is in flight', () => {
 		wrapper = mount(
-			<TemplateUploader {...uploaderProps({ templateUploadTotal: 1 })} />
+			<TemplateUploader
+				{...uploaderProps({
+					templateUploads: [
+						{ id: 1, filename: 'one.zip', status: 'pending' },
+					],
+				})}
+			/>
 		);
 
 		expect(

@@ -9,8 +9,11 @@ import { TemplateUploaderContext } from './TemplateUploaderContext';
 /* Redux actions */
 import {
 	postTemplateUploadProcessing,
-	clearTemplateUploadProcessing,
+	templateUploadRejected,
+	dismissTemplateUploadSuccess,
 } from '../../actions/templates';
+
+const maxSize = parseInt(GFPDF.templateUploadMaxSize, 10);
 
 /**
  * Handles the uploading of new PDF templates to the server
@@ -35,44 +38,22 @@ export class TemplateUploader extends Component {
 	static propTypes = {
 		children: PropTypes.node,
 		postTemplateUploadProcessing: PropTypes.func,
-		clearTemplateUploadProcessing: PropTypes.func,
-		templateUploadTotal: PropTypes.number,
-		templateUploadResults: PropTypes.array,
+		templateUploadRejected: PropTypes.func,
+		dismissTemplateUploadSuccess: PropTypes.func,
+		templateUploads: PropTypes.array,
 	};
 
 	/**
-	 * The files react-dropzone rejected in this batch, and whether the success message was dismissed
-	 *
-	 * @since 4.1
-	 */
-	state = {
-		rejections: [],
-		dismissed: false,
-	};
-
-	/**
-	 * Whether the current batch of uploads is still in flight
+	 * Whether any zip in the batch is still uploading
 	 *
 	 * @return { boolean } True until every zip in the batch has reported back
 	 *
 	 * @since 6.18.0
 	 */
 	get isUploading() {
-		return (
-			this.props.templateUploadResults.length <
-			this.props.templateUploadTotal
+		return this.props.templateUploads.some(
+			(upload) => upload.status === 'pending'
 		);
-	}
-
-	/**
-	 * Clear a finished batch, so its messages don't show again when the Template Manager is reopened
-	 *
-	 * @since 6.18.0
-	 */
-	componentWillUnmount() {
-		if (!this.isUploading) {
-			this.props.clearTemplateUploadProcessing();
-		}
 	}
 
 	/**
@@ -84,40 +65,22 @@ export class TemplateUploader extends Component {
 	 * @since 4.1
 	 */
 	handleOndrop = (acceptedFiles, fileRejections = []) => {
-		if (acceptedFiles.length === 0 && fileRejections.length === 0) {
-			return;
-		}
-
-		const rejections = fileRejections.map(({ file, errors }) => ({
-			filename: file.name,
-			message:
-				errors[0].code === 'file-too-large'
-					? GFPDF.uploadInvalidExceedsFileSizeLimit
-					: GFPDF.uploadInvalidNotZipFile,
-		}));
-
-		/* A drop during an upload joins the batch in flight */
-		if (this.isUploading) {
-			this.setState((prevState) => ({
-				rejections: [...prevState.rejections, ...rejections],
-			}));
-		} else {
-			this.props.clearTemplateUploadProcessing();
-			this.setState({ rejections, dismissed: false });
-		}
-
+		/* Queue the uploads first, so the rejections join their batch */
 		acceptedFiles.forEach((file) =>
 			this.props.postTemplateUploadProcessing(file, file.name)
 		);
-	};
 
-	/**
-	 * Hide the success message once it's dismissed or times out
-	 *
-	 * @since 4.1
-	 */
-	removeMessage = () => {
-		this.setState({ dismissed: true });
+		if (fileRejections.length > 0) {
+			this.props.templateUploadRejected(
+				fileRejections.map(({ file, errors }) => ({
+					filename: file.name,
+					message:
+						errors[0].code === 'file-too-large'
+							? GFPDF.uploadInvalidExceedsFileSizeLimit
+							: GFPDF.uploadInvalidNotZipFile,
+				}))
+			);
+		}
 	};
 
 	/**
@@ -126,21 +89,13 @@ export class TemplateUploader extends Component {
 	 * @since 6.18.0
 	 */
 	renderStatus() {
-		const results = this.props.templateUploadResults;
-		const uploading = this.isUploading;
-		const showSuccess =
-			!this.state.dismissed && results.some((result) => result.success);
-		const errors = [
-			...this.state.rejections,
-			...results
-				.filter((result) => !result.success)
-				.map((result) => ({
-					filename: result.filename,
-					message: result.message || GFPDF.problemWithTheUpload,
-				})),
-		];
+		const uploads = this.props.templateUploads;
+		const errors = uploads.filter((upload) => upload.status === 'failed');
+		const showSuccess = uploads.some(
+			(upload) => upload.status === 'success'
+		);
 
-		if (!uploading && errors.length === 0 && !showSuccess) {
+		if (!this.isUploading && errors.length === 0 && !showSuccess) {
 			return null;
 		}
 
@@ -149,7 +104,7 @@ export class TemplateUploader extends Component {
 				data-test="component-templateUploaderStatus"
 				className="gfpdf-dropzone-status"
 			>
-				{uploading && (
+				{this.isUploading && (
 					<ShowMessage text={GFPDF.templateUploadInProgress} />
 				)}
 
@@ -167,7 +122,9 @@ export class TemplateUploader extends Component {
 						data-test="component-stateMessage-showMessage"
 						text={GFPDF.templateSuccessfullyInstalledUpdated}
 						dismissable
-						dismissableCallback={this.removeMessage}
+						dismissableCallback={
+							this.props.dismissTemplateUploadSuccess
+						}
 					/>
 				)}
 			</div>
@@ -183,7 +140,7 @@ export class TemplateUploader extends Component {
 				data-test="component-dropzone"
 				onDrop={this.handleOndrop}
 				accept={{ 'application/zip': ['.zip'] }}
-				maxSize={parseInt(GFPDF.templateUploadMaxSize, 10)}
+				maxSize={maxSize}
 				noClick
 				noKeyboard
 			>
@@ -227,17 +184,13 @@ export class TemplateUploader extends Component {
  * @param { Object } state
  * @param { Object } state.template
  *
- * @return {{
- * templateUploadTotal: number,
- * templateUploadResults: Array<Object>
- * }} mapped state
+ * @return {{ templateUploads: Array<Object> }} mapped state
  *
  * @since 5.2
  */
 const mapStateToProps = (state) => {
 	return {
-		templateUploadTotal: state.template.templateUploadTotal,
-		templateUploadResults: state.template.templateUploadResults,
+		templateUploads: state.template.templateUploads,
 	};
 };
 
@@ -247,8 +200,9 @@ const mapStateToProps = (state) => {
  * @param { Function } dispatch Redux dispatcher
  *
  * @return {{
- * 	postTemplateUploadProcessing: Function
- * 	clearTemplateUploadProcessing: Function
+ * 	postTemplateUploadProcessing: Function,
+ * 	templateUploadRejected: Function,
+ * 	dismissTemplateUploadSuccess: Function
  * 	}} mappedDispatch
  *
  * @since 4.1
@@ -259,8 +213,12 @@ export const mapDispatchToProps = (dispatch) => {
 			dispatch(postTemplateUploadProcessing(file, filename));
 		},
 
-		clearTemplateUploadProcessing: () => {
-			dispatch(clearTemplateUploadProcessing());
+		templateUploadRejected: (rejections) => {
+			dispatch(templateUploadRejected(rejections));
+		},
+
+		dismissTemplateUploadSuccess: () => {
+			dispatch(dismissTemplateUploadSuccess());
 		},
 	};
 };

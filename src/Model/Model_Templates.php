@@ -124,7 +124,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Unzip and check the PDF templates look valid */
 		try {
-			$templates = $this->unzip_and_verify_templates( $zip_path );
+			$found = $this->unzip_and_verify_templates( $zip_path );
 		} catch ( Exception $e ) {
 			$this->cleanup_template_files( $zip_path );
 
@@ -149,14 +149,14 @@ class Model_Templates extends Helper_Abstract_Model {
 		}
 
 		/* Copy all the files to the active PDF working directory */
-		$unzipped_dir_name = trailingslashit( dirname( $templates[0] ) );
+		$unzipped_dir_name = $found['dir'];
 		$template_path     = $this->templates->get_template_path();
 
 		$results = $this->misc->copyr( $unzipped_dir_name, $template_path );
 
 		/* Get the template headers now all the files are in the right location */
 		$this->templates->flush_template_transient_cache();
-		$headers = $this->get_template_info( $templates );
+		$headers = $this->get_template_info( $found['templates'] );
 
 		/* Fix template path */
 		$headers = array_map(
@@ -336,7 +336,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	 *
 	 * @param string $zip_path The full path to the zip file
 	 *
-	 * @return string[] The full paths to the PDF templates
+	 * @return array{dir: string, templates: string[]} The directory the PDF templates sit in, and their full paths
 	 *
 	 * @throws Exception Thrown if a PDF template file isn't valid
 	 *
@@ -357,15 +357,15 @@ class Model_Templates extends Helper_Abstract_Model {
 		/* Check unzipped templates for a valid v4 header, or v3 string pattern.
 		   Avoid glob() here — it can return a stale (empty) listing when called
 		   immediately after unzip_file() writes via the WP_Filesystem abstraction */
-		$files = $this->templates->get_templates_in_extracted_zip( $dir );
+		$found = $this->templates->get_templates_in_extracted_zip( $dir );
 
-		if ( count( $files ) === 0 ) {
+		if ( count( $found['templates'] ) === 0 ) {
 			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );
 		}
 
-		$this->check_for_valid_pdf_templates( $files );
+		$this->check_for_valid_pdf_templates( $found['templates'] );
 
-		return $files;
+		return $found;
 	}
 
 	/**

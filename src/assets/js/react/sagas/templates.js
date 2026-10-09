@@ -1,16 +1,7 @@
 /* Dependencies */
-import {
-	takeLatest,
-	actionChannel,
-	take,
-	call,
-	put,
-	select,
-} from 'redux-saga/effects';
+import { takeLatest, actionChannel, take, call, put } from 'redux-saga/effects';
 /* Redux action types & actions */
 import {
-	addTemplate,
-	updateTemplateParam,
 	updateSelectBoxSuccess,
 	updateSelectBoxFailed,
 	templateProcessingSuccess,
@@ -73,7 +64,7 @@ export function* templateProcessing(action) {
  * @since 5.2
  */
 export function* templateUploadProcessing(action) {
-	const { file, filename } = action.payload;
+	const { file, filename, id } = action.payload;
 	let message;
 
 	try {
@@ -84,8 +75,9 @@ export function* templateUploadProcessing(action) {
 		);
 
 		if (response.ok && Array.isArray(response.body?.templates)) {
-			yield* addTemplatesToList(response.body.templates);
-			yield put(templateUploadProcessingSuccess(response.body, filename));
+			yield put(
+				templateUploadProcessingSuccess(id, response.body.templates)
+			);
 			return;
 		}
 
@@ -95,40 +87,11 @@ export function* templateUploadProcessing(action) {
 	}
 
 	yield put(
-		templateUploadProcessingFailed({ message: message || '' }, filename)
+		templateUploadProcessingFailed(
+			id,
+			message || GFPDF.problemWithTheUpload
+		)
 	);
-}
-
-/**
- * Add newly-installed templates to the list, and flag the ones that were already there as updated
- *
- * @param {Array<Object>} templates
- *
- * @since 6.18.0
- */
-export function* addTemplatesToList(templates) {
-	const list = yield select((state) => state.template.list);
-
-	for (const template of templates) {
-		if (list.some((item) => item.id === template.id)) {
-			yield put(
-				updateTemplateParam(
-					template.id,
-					'message',
-					GFPDF.templateSuccessfullyUpdated
-				)
-			);
-		} else {
-			/* `new` sorts it to the end of the list */
-			yield put(
-				addTemplate({
-					...template,
-					new: true,
-					message: GFPDF.templateSuccessfullyInstalled,
-				})
-			);
-		}
-	}
 }
 
 /**
@@ -150,7 +113,7 @@ export function* watchTemplateProcessing() {
 }
 
 /**
- * Watcher Saga watchTemplateProcessing for templateUploadProcessing()
+ * Watcher Saga watchpostTemplateUploadProcessing for templateUploadProcessing()
  *
  * Uploads one zip at a time, so a large drop doesn't tie up every PHP worker
  *

@@ -7,11 +7,8 @@ import {
 	updateSelectBox,
 	templateProcessing,
 	templateUploadProcessing,
-	addTemplatesToList,
 } from '../../../../src/assets/js/react/sagas/templates';
 import {
-	ADD_TEMPLATE,
-	UPDATE_TEMPLATE_PARAM,
 	UPDATE_SELECT_BOX,
 	UPDATE_SELECT_BOX_FAILED,
 	TEMPLATE_PROCESSING,
@@ -96,58 +93,31 @@ describe('Sagas - templates', () => {
 		});
 	});
 
-	describe('addTemplatesToList()', () => {
-		test('should add new templates and flag existing ones as updated', () => {
-			const gen = addTemplatesToList([
-				{ id: 'cellulose' },
-				{ id: 'rubix' },
-			]);
-
-			gen.next();
-
-			expect(gen.next([{ id: 'rubix' }]).value).toEqual(
-				put({
-					type: ADD_TEMPLATE,
-					template: {
-						id: 'cellulose',
-						new: true,
-						message: GFPDF.templateSuccessfullyInstalled,
-					},
-				})
-			);
-			expect(gen.next().value).toEqual(
-				put({
-					type: UPDATE_TEMPLATE_PARAM,
-					id: 'rubix',
-					name: 'message',
-					value: GFPDF.templateSuccessfullyUpdated,
-				})
-			);
-			expect(gen.next().done).toBe(true);
-		});
-	});
-
 	describe('templateUploadProcessing()', () => {
+		const action = {
+			payload: { file: { data: 'test' }, filename: 'test', id: 7 },
+		};
+
+		const failedWith = (message) =>
+			put({
+				type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
+				payload: { id: 7, message },
+			});
+
 		test('should check that saga asks to call the API for templateUploadProcessing', () => {
-			const newaction = {
-				payload: { file: { data: 'test' }, filename: 'test' },
-			};
-			const gen = templateUploadProcessing(newaction);
+			const gen = templateUploadProcessing(action);
 
 			expect(gen.next().value).toEqual(
 				call(
 					api.apiPostTemplateUploadProcessing,
-					newaction.payload.file,
-					newaction.payload.filename
+					action.payload.file,
+					action.payload.filename
 				)
 			);
 		});
 
 		test('should route to failed when the API responds with a non-ok status', () => {
-			const newaction = {
-				payload: { file: { data: 'test' }, filename: 'test' },
-			};
-			const gen = templateUploadProcessing(newaction);
+			const gen = templateUploadProcessing(action);
 			gen.next();
 
 			const response = {
@@ -155,19 +125,11 @@ describe('Sagas - templates', () => {
 				status: 400,
 				body: { error: 'invalid zip' },
 			};
-			expect(gen.next(response).value).toEqual(
-				put({
-					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-					payload: { message: 'invalid zip', filename: 'test' },
-				})
-			);
+			expect(gen.next(response).value).toEqual(failedWith('invalid zip'));
 		});
 
 		test('should route to success when the API responds with ok and a templates array', () => {
-			const newaction = {
-				payload: { file: { data: 'test' }, filename: 'test' },
-			};
-			const gen = templateUploadProcessing(newaction);
+			const gen = templateUploadProcessing(action);
 			gen.next();
 
 			const response = {
@@ -176,46 +138,31 @@ describe('Sagas - templates', () => {
 				body: { templates: [{ id: 'foo' }] },
 			};
 
-			/* addTemplatesToList() reads the list, then flags the template as updated */
-			gen.next(response);
-			gen.next([{ id: 'foo' }]);
-
-			expect(gen.next().value).toEqual(
+			expect(gen.next(response).value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
-					payload: { ...response.body, filename: 'test' },
+					payload: { id: 7, templates: [{ id: 'foo' }] },
 				})
 			);
+			expect(gen.next().done).toBe(true);
 		});
 
-		test('should route to failed when the API response is missing a templates array', () => {
-			const newaction = {
-				payload: { file: { data: 'test' }, filename: 'test' },
-			};
-			const gen = templateUploadProcessing(newaction);
+		test('should fall back to the generic error when the API response is missing a templates array', () => {
+			const gen = templateUploadProcessing(action);
 			gen.next();
 
 			const response = { ok: true, status: 200, body: 400 };
 			expect(gen.next(response).value).toEqual(
-				put({
-					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-					payload: { message: '', filename: 'test' },
-				})
+				failedWith(GFPDF.problemWithTheUpload)
 			);
 		});
 
 		test('should route to failed when the fetch itself throws', () => {
-			const newaction = {
-				payload: { file: { data: 'test' }, filename: 'test' },
-			};
-			const gen = templateUploadProcessing(newaction);
+			const gen = templateUploadProcessing(action);
 			gen.next();
 
 			expect(gen.throw({ message: 'network failure' }).value).toEqual(
-				put({
-					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-					payload: { message: 'network failure', filename: 'test' },
-				})
+				failedWith('network failure')
 			);
 		});
 	});

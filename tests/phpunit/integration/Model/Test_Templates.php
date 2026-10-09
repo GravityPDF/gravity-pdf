@@ -331,8 +331,13 @@ class Test_Templates extends TestCase {
 		);
 
 		try {
+			$dir = $this->model->get_unzipped_dir_name( $zip ) . 'my-template/';
+
 			$this->assertSame(
-				[ $this->model->get_unzipped_dir_name( $zip ) . 'my-template/zadani.php' ],
+				[
+					'dir'       => $dir,
+					'templates' => [ $dir . 'zadani.php' ],
+				],
 				$this->model->unzip_and_verify_templates( $zip )
 			);
 		} finally {
@@ -362,7 +367,7 @@ class Test_Templates extends TestCase {
 			$dir = $this->model->get_unzipped_dir_name( $zip );
 			unzip_file( $zip, $dir );
 
-			$templates = $gfpdf->templates->get_templates_in_extracted_zip( $dir );
+			$templates = $gfpdf->templates->get_templates_in_extracted_zip( $dir )['templates'];
 			sort( $templates );
 
 			$this->assertSame( array_map( fn( $path ) => $dir . $path, $expected ), $templates );

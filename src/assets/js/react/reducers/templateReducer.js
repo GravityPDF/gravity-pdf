@@ -12,7 +12,8 @@ import {
 	POST_TEMPLATE_UPLOAD_PROCESSING,
 	TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 	TEMPLATE_UPLOAD_PROCESSING_FAILED,
-	CLEAR_TEMPLATE_UPLOAD_PROCESSING,
+	TEMPLATE_UPLOAD_REJECTED,
+	DISMISS_TEMPLATE_UPLOAD_SUCCESS,
 } from '../actions/templates';
 
 /**
@@ -26,22 +27,21 @@ import {
  */
 
 /**
- * @typedef { Object } TemplateUploadResult
- * @property { boolean }       success   - whether the zip was installed
- * @property { string }        filename  - the zip the result belongs to
- * @property { Array<Object> } templates - the installed templates (successful uploads only)
- * @property { string }        message   - the reason for the failure (failed uploads only)
+ * @typedef { Object } TemplateUpload
+ * @property { number } [id]      - identifies a zip sent to the server
+ * @property { string } filename  - the file uploaded
+ * @property { string } status    - pending, success or failed
+ * @property { string } [message] - why it failed
  */
 
 /**
  * @typedef { Object } TemplateReducerState
- * @property { Array<Object> }               list                  - list of GFPDF prebuilt templates
- * @property { Object }                      activeTemplate        - current template used
- * @property { string }                      search                - filter keyword value
- * @property { string }                      updateSelectBoxText   - state of select box text
- * @property { string }                      templateProcessing    - state of template processed
- * @property { number }                      templateUploadTotal   - zips in the current upload batch
- * @property { Array<TemplateUploadResult> } templateUploadResults - results of the current upload batch
+ * @property { Array<Object> }         list                - list of GFPDF prebuilt templates
+ * @property { Object }                activeTemplate      - current template used
+ * @property { string }                search              - filter keyword value
+ * @property { string }                updateSelectBoxText - state of select box text
+ * @property { string }                templateProcessing  - state of template processed
+ * @property { Array<TemplateUpload> } templateUploads     - the current batch of uploads
  */
 
 /**
@@ -57,8 +57,65 @@ export const initialState = {
 	search: '',
 	updateSelectBoxText: '',
 	templateProcessing: '',
-	templateUploadTotal: 0,
-	templateUploadResults: [],
+	templateUploads: [],
+};
+
+/**
+ * The uploads a new file joins: the batch in flight, or a fresh one once every upload has reported back
+ *
+ * @param { Array<TemplateUpload> } uploads
+ *
+ * @return { Array<TemplateUpload> } The batch to add to
+ *
+ * @since 6.18.0
+ */
+const currentBatch = (uploads) =>
+	uploads.some((upload) => upload.status === 'pending') ? uploads : [];
+
+/**
+ * Update one upload in the batch
+ *
+ * @param { Array<TemplateUpload> } uploads
+ * @param { number }                id
+ * @param { Object }                changes
+ *
+ * @return { Array<TemplateUpload> } The updated batch
+ *
+ * @since 6.18.0
+ */
+const updateUpload = (uploads, id, changes) =>
+	uploads.map((upload) =>
+		upload.id === id ? { ...upload, ...changes } : upload
+	);
+
+/**
+ * Add newly-installed templates to the list, and flag the ones that were already there as updated
+ *
+ * @param { Array<Object> } list
+ * @param { Array<Object> } templates
+ *
+ * @return { Array<Object> } The updated list
+ *
+ * @since 6.18.0
+ */
+const mergeInstalledTemplates = (list, templates) => {
+	const installed = templates.filter(
+		(template) => !list.some((item) => item.id === template.id)
+	);
+
+	return [
+		...list.map((item) =>
+			templates.some((template) => template.id === item.id)
+				? { ...item, message: GFPDF.templateSuccessfullyUpdated }
+				: item
+		),
+		/* `new` sorts them to the end of the list */
+		...installed.map((template) => ({
+			...template,
+			new: true,
+			message: GFPDF.templateSuccessfullyInstalled,
+		})),
+	];
 };
 
 /**
@@ -182,28 +239,40 @@ export default function (state = initialState, action) {
 			};
 
 		/**
-		 * Count a zip into the current upload batch
+		 * Add a zip to the upload batch
 		 *
 		 * @since 6.18.0
 		 */
 		case POST_TEMPLATE_UPLOAD_PROCESSING:
 			return {
 				...state,
-				templateUploadTotal: state.templateUploadTotal + 1,
+				templateUploads: [
+					...currentBatch(state.templateUploads),
+					{
+						id: action.payload.id,
+						filename: action.payload.filename,
+						status: 'pending',
+					},
+				],
 			};
 
 		/**
-		 * Record an installed zip
+		 * Record an installed zip and add its templates to the list
 		 *
 		 * @since 5.2
 		 */
 		case TEMPLATE_UPLOAD_PROCESSING_SUCCESS:
 			return {
 				...state,
-				templateUploadResults: [
-					...state.templateUploadResults,
-					{ ...action.payload, success: true },
-				],
+				list: mergeInstalledTemplates(
+					state.list,
+					action.payload.templates
+				),
+				templateUploads: updateUpload(
+					state.templateUploads,
+					action.payload.id,
+					{ status: 'success' }
+				),
 			};
 
 		/**
@@ -214,22 +283,41 @@ export default function (state = initialState, action) {
 		case TEMPLATE_UPLOAD_PROCESSING_FAILED:
 			return {
 				...state,
-				templateUploadResults: [
-					...state.templateUploadResults,
-					{ ...action.payload, success: false },
+				templateUploads: updateUpload(
+					state.templateUploads,
+					action.payload.id,
+					{ status: 'failed', message: action.payload.message }
+				),
+			};
+
+		/**
+		 * Record the files refused before upload
+		 *
+		 * @since 6.18.0
+		 */
+		case TEMPLATE_UPLOAD_REJECTED:
+			return {
+				...state,
+				templateUploads: [
+					...currentBatch(state.templateUploads),
+					...action.payload.map((rejection) => ({
+						...rejection,
+						status: 'failed',
+					})),
 				],
 			};
 
 		/**
-		 * Clear/reset the current upload batch
+		 * Drop the installed zips from the batch, which hides the success message
 		 *
-		 * @since 5.2
+		 * @since 6.18.0
 		 */
-		case CLEAR_TEMPLATE_UPLOAD_PROCESSING:
+		case DISMISS_TEMPLATE_UPLOAD_SUCCESS:
 			return {
 				...state,
-				templateUploadTotal: 0,
-				templateUploadResults: [],
+				templateUploads: state.templateUploads.filter(
+					(upload) => upload.status !== 'success'
+				),
 			};
 	}
 

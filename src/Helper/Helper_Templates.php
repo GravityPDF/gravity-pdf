@@ -527,7 +527,7 @@ class Helper_Templates {
 		$templates = [];
 
 		foreach ( $this->list_folder( $folder ) as $item ) {
-			if ( ! $item->isDir() && $item->getExtension() === 'php' ) {
+			if ( $this->is_template_file( $item ) ) {
 				$templates[] = $item->getPathname();
 			}
 		}
@@ -557,7 +557,7 @@ class Helper_Templates {
 	 *
 	 * @param string $dir The directory the zip was extracted to
 	 *
-	 * @return string[] The full paths to the PDF templates, which all sit in one directory
+	 * @return array{dir: string, templates: string[]} The directory the templates sit in, and their full paths
 	 *
 	 * @since 6.18.0
 	 */
@@ -567,23 +567,41 @@ class Helper_Templates {
 			$subdirectories = [];
 
 			foreach ( $this->list_folder( $dir ) as $item ) {
-				if ( ! $item->isDir() ) {
-					if ( $item->getExtension() === 'php' ) {
-						$templates[] = $item->getPathname();
-					}
-				} elseif ( $item->getFilename()[0] !== '.' ) {
+				if ( $this->is_template_file( $item ) ) {
+					$templates[] = $item->getPathname();
+				} elseif ( $item->isDir() && $item->getFilename()[0] !== '.' ) {
 					/* Hidden directories are tooling leftovers (.git, .idea), not the template we're looking for */
 					$subdirectories[] = $item->getPathname();
 				}
 			}
 
-			/* Anything other than a single wrapper directory is ambiguous, so look no further */
-			if ( count( $templates ) > 0 || count( $subdirectories ) !== 1 || $depth === self::MAX_NESTED_DIRECTORIES ) {
-				return $templates;
+			if ( count( $templates ) > 0 ) {
+				break;
+			}
+
+			/* Only a lone wrapper directory is unambiguous */
+			if ( count( $subdirectories ) !== 1 || $depth === self::MAX_NESTED_DIRECTORIES ) {
+				break;
 			}
 
 			$dir = $subdirectories[0];
 		}
+
+		return [
+			'dir'       => trailingslashit( $dir ),
+			'templates' => $templates,
+		];
+	}
+
+	/**
+	 * @param \SplFileInfo $item
+	 *
+	 * @return bool
+	 *
+	 * @since 6.18.0
+	 */
+	private function is_template_file( $item ) {
+		return ! $item->isDir() && $item->getExtension() === 'php';
 	}
 
 	/**
