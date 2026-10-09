@@ -36,7 +36,8 @@ describe('Template - TemplateUploader.js', () => {
 	const statusMessages = (uploader, testAttr) =>
 		findByTestAttr(shallow(uploader.instance().renderStatus()), testAttr);
 
-	beforeEach(() => jest.clearAllMocks());
+	// Also drops implementations a test sets, which jest.config's clearMocks keeps
+	beforeEach(() => jest.resetAllMocks());
 
 	describe('Check for redux properties', () => {
 		const setup = (state = {}) => {
@@ -130,9 +131,6 @@ describe('Template - TemplateUploader.js', () => {
 				{ filename: 'not-a-template.txt', message: 'notZip' },
 				{ filename: 'huge.zip', message: 'tooBig' },
 			]);
-
-			postTemplateUploadProcessingMock.mockReset();
-			templateUploadRejectedMock.mockReset();
 		});
 
 		test('ignores an empty drop', () => {
