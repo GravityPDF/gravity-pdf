@@ -146,6 +146,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		add_action( 'gform_after_submission', $maybe_cleanup_after_form_submission, 9999, 2 );
 		add_action( 'gform_after_update_entry', [ $this->model, 'cleanup_pdf_after_submission' ], 9999, 2 );
+		add_action( 'gform_post_process_async_notifications', [ $this->model, 'cleanup_pdf_after_async_notifications' ], 9999, 4 );
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
 
 		/* Add Gravity Perk Population Anything Support */
