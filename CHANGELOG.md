@@ -24,6 +24,9 @@
 * 🐞 Bug: Fix missing slash when converting a path under the site root to a URL
 * 🐞 Bug: Keep PDF merge tags in an administrative field's Default Value when the entry is saved
 * 🐞 Bug: Fix PHP deprecation notices when a field value or PDF setting is empty
+* 🐞 Bug: Fix PHP deprecation notice for empty rich text Paragraph fields
+* 🐞 Bug: Don't add debug errors to raw PDF URLs
+* 🐞 Bug: Delete PDFs sent with Gravity Forms background notifications
 * 🐞 Bug: Stop different entries sharing a temporary PDF folder
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
 * 💻 Developer: `$form_data` field values now encode shortcode and merge tag characters (`[ ] { }`) so they aren't processed

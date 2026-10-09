@@ -2121,6 +2121,25 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Remove PDFs attached to Gravity Forms background notifications once they've been sent
+	 *
+	 * @since 6.18.0
+	 *
+	 * @param string $event
+	 * @param array  $notifications
+	 * @param array  $form
+	 * @param array  $entry
+	 */
+	public function cleanup_pdf_after_async_notifications( $event, $notifications, $form, $entry ) {
+		/* The background processing queue owns clean-up when enabled */
+		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' || empty( $entry['id'] ) ) {
+			return;
+		}
+
+		$this->cleanup_pdf( $entry, $form );
+	}
+
+	/**
 	 * Remove the generated PDF from the server to save disk space
 	 *
 	 * @param array $entry The GF Entry Data
