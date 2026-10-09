@@ -20,6 +20,8 @@ export const TEMPLATE_UPLOAD_PROCESSING_FAILED =
 export const TEMPLATE_UPLOAD_REJECTED = 'TEMPLATE_UPLOAD_REJECTED';
 export const DISMISS_TEMPLATE_UPLOAD_SUCCESS =
 	'DISMISS_TEMPLATE_UPLOAD_SUCCESS';
+export const CLEAR_FINISHED_TEMPLATE_UPLOADS =
+	'CLEAR_FINISHED_TEMPLATE_UPLOADS';
 
 /**
  * Redux Actions - payloads of information that send data from your application to your store
@@ -303,5 +305,18 @@ export const templateUploadRejected = (rejections) => {
 export const dismissTemplateUploadSuccess = () => {
 	return {
 		type: DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+	};
+};
+
+/**
+ * Fires to drop every upload that has reported back, so a closed Template Manager reopens without old results
+ *
+ * @return {{ type: string }} action object
+ *
+ * @since 6.18.0
+ */
+export const clearFinishedTemplateUploads = () => {
+	return {
+		type: CLEAR_FINISHED_TEMPLATE_UPLOADS,
 	};
 };

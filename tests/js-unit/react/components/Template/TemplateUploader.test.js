@@ -194,6 +194,20 @@ describe('Template - TemplateUploader.js', () => {
 			).toBe(1);
 		});
 
+		test('holds the success message until every zip has reported back', () => {
+			wrapper = setupUploader({
+				templateUploads: [
+					{ id: 1, filename: 'one.zip', status: 'success' },
+					{ id: 2, filename: 'two.zip', status: 'pending' },
+				],
+			});
+
+			expect(
+				statusMessages(wrapper, 'component-stateMessage-showMessage')
+					.length
+			).toBe(0);
+		});
+
 		test('dismisses the success message through the store', () => {
 			wrapper = setupUploader({
 				templateUploads: [

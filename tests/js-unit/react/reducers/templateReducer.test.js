@@ -13,6 +13,7 @@ import {
 	TEMPLATE_UPLOAD_PROCESSING_FAILED,
 	TEMPLATE_UPLOAD_REJECTED,
 	DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+	CLEAR_FINISHED_TEMPLATE_UPLOADS,
 } from '../../../../src/assets/js/react/actions/templates';
 import reducer, {
 	initialState,
@@ -269,6 +270,18 @@ describe('Reducers - templateReducer', () => {
 
 			expect(newState.templateUploads).toEqual([
 				{ filename: 'b.txt', message: 'notZip', status: 'failed' },
+			]);
+		});
+
+		test('closing the Template Manager keeps only the uploads in flight', () => {
+			newState = reject(succeed(post(initialState, 1), 1), 'a.txt');
+			newState = post(newState, 2);
+			newState = reducer(newState, {
+				type: CLEAR_FINISHED_TEMPLATE_UPLOADS,
+			});
+
+			expect(newState.templateUploads).toEqual([
+				expect.objectContaining({ id: 2, status: 'pending' }),
 			]);
 		});
 	});

@@ -33,6 +33,8 @@ import {
 	TEMPLATE_UPLOAD_REJECTED,
 	dismissTemplateUploadSuccess,
 	DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+	clearFinishedTemplateUploads,
+	CLEAR_FINISHED_TEMPLATE_UPLOADS,
 } from '../../../../src/assets/js/react/actions/templates';
 
 describe('Actions - templates', () => {
@@ -163,5 +165,11 @@ describe('Actions - templates', () => {
 		results = dismissTemplateUploadSuccess();
 
 		expect(results.type).toEqual(DISMISS_TEMPLATE_UPLOAD_SUCCESS);
+	});
+
+	test('clearFinishedTemplateUploads - check if it returns the correct action', () => {
+		results = clearFinishedTemplateUploads();
+
+		expect(results.type).toEqual(CLEAR_FINISHED_TEMPLATE_UPLOADS);
 	});
 });

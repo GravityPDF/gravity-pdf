@@ -91,9 +91,10 @@ export class TemplateUploader extends Component {
 	renderStatus() {
 		const uploads = this.props.templateUploads;
 		const errors = uploads.filter((upload) => upload.status === 'failed');
-		const showSuccess = uploads.some(
-			(upload) => upload.status === 'success'
-		);
+		/* Held until the batch finishes, so a dismissed message can't be brought back by a later zip */
+		const showSuccess =
+			!this.isUploading &&
+			uploads.some((upload) => upload.status === 'success');
 
 		if (!this.isUploading && errors.length === 0 && !showSuccess) {
 			return null;

@@ -14,6 +14,7 @@ import {
 	TEMPLATE_UPLOAD_PROCESSING_FAILED,
 	TEMPLATE_UPLOAD_REJECTED,
 	DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+	CLEAR_FINISHED_TEMPLATE_UPLOADS,
 } from '../actions/templates';
 
 /**
@@ -317,6 +318,19 @@ export default function (state = initialState, action) {
 				...state,
 				templateUploads: state.templateUploads.filter(
 					(upload) => upload.status !== 'success'
+				),
+			};
+
+		/**
+		 * Keep only the uploads still in flight
+		 *
+		 * @since 6.18.0
+		 */
+		case CLEAR_FINISHED_TEMPLATE_UPLOADS:
+			return {
+				...state,
+				templateUploads: state.templateUploads.filter(
+					(upload) => upload.status === 'pending'
 				),
 			};
 	}
