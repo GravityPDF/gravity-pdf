@@ -37,6 +37,27 @@ class Test_Field_Textarea extends WP_UnitTestCase {
 		$this->assertStringContainsString('<div class="a b c d e f g h">Hi <ul id="list"><li>Item 1</li><li class="1 2 3 4 5 6 7 8">Item 2</li><li>Item 3</li></ul></div><p class="a b c">My paragraph</p>', str_replace( [ "\n", "\t" ], '', $value ) );
 	}
 
+	public function test_empty_rich_text_value_raises_no_deprecation() {
+		$field = new GF_Field_Textarea( [ 'id' => 1, 'useRichTextEditor' => true ] );
+		$entry = [ 'id' => 0, 'form_id' => 0, '1' => '' ];
+
+		$deprecations = [];
+		set_error_handler( function ( $errno, $errstr ) use ( &$deprecations ) {
+			$deprecations[] = $errstr;
+
+			return true;
+		}, E_DEPRECATED );
+
+		try {
+			/* An empty value parses to no elements, so QueryPath returns a null class */
+			( new Field_Textarea( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->html();
+		} finally {
+			restore_error_handler();
+		}
+
+		$this->assertSame( [], $deprecations );
+	}
+
 	public function test_administrative_value_is_encoded_unless_it_is_the_default() {
 		$field = new GF_Field_Textarea( [
 			'id'           => 1,
