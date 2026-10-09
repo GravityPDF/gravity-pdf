@@ -19,6 +19,7 @@ window.GFPDF = {
   getSearchResultError: 'An error occurred. Please try again',
   licenseDeactivationError: 'An error occurred and your license key may not have been correctly deactivated. Login to your GravityPDF.com account and check if your site has been unlinked from the key.',
   userCapabilities: { administrator: true },
+  canManageTemplates: true,
   // Font manager component
   fontListInstalledFonts: 'Installed Fonts',
   fontListRegular: 'Regular',
