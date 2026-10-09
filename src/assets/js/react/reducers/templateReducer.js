@@ -9,9 +9,12 @@ import {
   TEMPLATE_PROCESSING_SUCCESS,
   TEMPLATE_PROCESSING_FAILED,
   CLEAR_TEMPLATE_PROCESSING,
+  POST_TEMPLATE_UPLOAD_PROCESSING,
   TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
   TEMPLATE_UPLOAD_PROCESSING_FAILED,
-  CLEAR_TEMPLATE_UPLOAD_PROCESSING
+  TEMPLATE_UPLOAD_REJECTED,
+  DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+  CLEAR_FINISHED_TEMPLATE_UPLOADS
 } from '../actions/templates'
 
 /**
@@ -37,7 +40,57 @@ export const initialState = {
   search: '',
   updateSelectBoxText: '',
   templateProcessing: '',
-  templateUploadResults: []
+  templateUploads: []
+}
+
+/**
+ * The uploads a new file joins: the batch in flight, or a fresh one once every upload has reported back
+ *
+ * Each upload is `{ id, filename, status, message }`, where status is pending, success or failed
+ *
+ * @param {Array} uploads
+ *
+ * @returns {Array} The batch to add to
+ *
+ * @since 6.18.0
+ */
+const currentBatch = (uploads) => uploads.some((upload) => upload.status === 'pending') ? uploads : []
+
+/**
+ * Update one upload in the batch
+ *
+ * @param {Array} uploads
+ * @param {number} id
+ * @param {Object} changes
+ *
+ * @returns {Array} The updated batch
+ *
+ * @since 6.18.0
+ */
+const updateUpload = (uploads, id, changes) =>
+  uploads.map((upload) => upload.id === id ? { ...upload, ...changes } : upload)
+
+/**
+ * Add newly-installed templates to the list, and flag the ones that were already there as updated
+ *
+ * @param {Array} list
+ * @param {Array} templates
+ *
+ * @returns {Array} The updated list
+ *
+ * @since 6.18.0
+ */
+const mergeInstalledTemplates = (list, templates) => {
+  const installed = templates.filter((template) => !list.some((item) => item.id === template.id))
+
+  return [
+    ...list.map((item) => templates.some((template) => template.id === item.id)
+      ? { ...item, message: GFPDF.templateSuccessfullyUpdated }
+      : item
+    ),
+    /* `new` sorts them to the end of the list */
+    ...installed.map((template) => ({ ...template, new: true, message: GFPDF.templateSuccessfullyInstalled }))
+  ]
 }
 
 /**
@@ -161,14 +214,29 @@ export default function (state = initialState, action) {
       }
 
     /**
-     * Record an installed zip. Appended, not replaced, so results landing in one render can't overwrite each other
+     * Add a zip to the upload batch
+     *
+     * @since 6.18.0
+     */
+    case POST_TEMPLATE_UPLOAD_PROCESSING:
+      return {
+        ...state,
+        templateUploads: [
+          ...currentBatch(state.templateUploads),
+          { id: action.payload.id, filename: action.payload.filename, status: 'pending' }
+        ]
+      }
+
+    /**
+     * Record an installed zip and add its templates to the list
      *
      * @since 5.2
      */
     case TEMPLATE_UPLOAD_PROCESSING_SUCCESS:
       return {
         ...state,
-        templateUploadResults: [...state.templateUploadResults, { ...action.payload, success: true }]
+        list: mergeInstalledTemplates(state.list, action.payload.templates),
+        templateUploads: updateUpload(state.templateUploads, action.payload.id, { status: 'success' })
       }
 
     /**
@@ -179,18 +247,47 @@ export default function (state = initialState, action) {
     case TEMPLATE_UPLOAD_PROCESSING_FAILED:
       return {
         ...state,
-        templateUploadResults: [...state.templateUploadResults, { ...action.payload, success: false }]
+        templateUploads: updateUpload(
+          state.templateUploads,
+          action.payload.id,
+          { status: 'failed', message: action.payload.message }
+        )
       }
 
     /**
-     * Clear/reset the results of the current upload batch
+     * Record the files refused before upload
      *
-     * @since 5.2
+     * @since 6.18.0
      */
-    case CLEAR_TEMPLATE_UPLOAD_PROCESSING:
+    case TEMPLATE_UPLOAD_REJECTED:
       return {
         ...state,
-        templateUploadResults: []
+        templateUploads: [
+          ...currentBatch(state.templateUploads),
+          ...action.payload.map((rejection) => ({ ...rejection, status: 'failed' }))
+        ]
+      }
+
+    /**
+     * Drop the installed zips from the batch, which hides the success message
+     *
+     * @since 6.18.0
+     */
+    case DISMISS_TEMPLATE_UPLOAD_SUCCESS:
+      return {
+        ...state,
+        templateUploads: state.templateUploads.filter((upload) => upload.status !== 'success')
+      }
+
+    /**
+     * Keep only the uploads still in flight
+     *
+     * @since 6.18.0
+     */
+    case CLEAR_FINISHED_TEMPLATE_UPLOADS:
+      return {
+        ...state,
+        templateUploads: state.templateUploads.filter((upload) => upload.status === 'pending')
       }
   }
 

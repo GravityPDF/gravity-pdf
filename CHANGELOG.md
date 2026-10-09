@@ -17,6 +17,7 @@
 * 🧹 Housekeeping: Check Gravity PDF folder permissions on the System Status report page
 * 🧹 Housekeeping: Set a 1-minute minimum for the Logged Out Timeout
 * 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
+* 🧹 Housekeeping: Upload template zips one at a time, wait for every zip to finish before showing the success message, and clear the results when the Template Manager closes
 * 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed in PDFs
 * 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
 * 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
