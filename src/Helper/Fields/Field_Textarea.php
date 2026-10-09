@@ -87,7 +87,11 @@ class Field_Textarea extends Helper_Abstract_Fields {
 			$this->strip_extra_classes_from_dom( $child_dom );
 		}
 
-		$classes     = $dom->attr( 'class' );
+		$classes = (string) $dom->attr( 'class' );
+		if ( $classes === '' ) {
+			return;
+		}
+
 		$class_array = explode( ' ', $classes );
 		if ( count( $class_array ) > 8 ) {
 			$class_array = array_slice( $class_array, 0, 8 );
