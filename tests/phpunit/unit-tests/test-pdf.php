@@ -143,6 +143,7 @@ class Test_PDF extends WP_UnitTestCase {
 				]
 			)
 		);
+		$this->assertSame( 9999, has_action( 'gform_post_process_async_notifications', [ $this->model, 'cleanup_pdf_after_async_notifications' ] ) );
 		$this->assertSame( 10, has_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] ) );
 	}
 
@@ -1462,6 +1463,62 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->model->cleanup_pdf( $entry, $form );
 
 		$this->assertFileDoesNotExist( $file );
+	}
+
+	/** Create a placeholder PDF in each active PDF's tmp folder */
+	private function create_tmp_pdfs( $entry, $form ) {
+		global $gfpdf;
+
+		$files = [];
+		foreach ( $this->model->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) as $pdf ) {
+			$file = ( new Helper_PDF( $entry, $pdf, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log ) )->get_path() . 'test.pdf';
+
+			wp_mkdir_p( dirname( $file ) );
+			touch( $file );
+
+			$files[] = $file;
+		}
+
+		$this->assertNotEmpty( $files );
+
+		return $files;
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_cleanup_pdf_after_async_notifications() {
+		$results = $this->create_form_and_entries();
+		$files   = $this->create_tmp_pdfs( $results['entry'], $results['form'] );
+
+		do_action( 'gform_post_process_async_notifications', 'form_submission', [ 'abc' ], $results['form'], $results['entry'], [] );
+
+		foreach ( $files as $file ) {
+			$this->assertDirectoryDoesNotExist( dirname( $file ) );
+		}
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_cleanup_pdf_after_async_notifications_skipped_for_background_processing() {
+		global $gfpdf;
+
+		$results = $this->create_form_and_entries();
+		$files   = $this->create_tmp_pdfs( $results['entry'], $results['form'] );
+
+		$gfpdf->options->update_option( 'background_processing', 'Yes' );
+		try {
+			$this->model->cleanup_pdf_after_async_notifications( 'form_submission', [ 'abc' ], $results['form'], $results['entry'] );
+		} finally {
+			$gfpdf->options->update_option( 'background_processing', 'No' );
+		}
+
+		foreach ( $files as $file ) {
+			$this->assertFileExists( $file );
+		}
+
+		$this->model->cleanup_pdf( $results['entry'], $results['form'] );
 	}
 
 	/**
