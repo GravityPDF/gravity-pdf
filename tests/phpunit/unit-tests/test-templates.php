@@ -179,6 +179,22 @@ class Test_Templates extends WP_UnitTestCase {
 
 		$this->assertEquals( 'File validation failed', $e->getMessage() );
 
+		/* A font wearing a .zip extension: the extension is allowed, the contents are not */
+		$test_file = $gfpdf->data->template_location . 'disguised.zip';
+		copy( __DIR__ . '/fonts/DejaVuSans.ttf', $test_file );
+
+		$_FILES['template']['name']     = 'disguised.zip';
+		$_FILES['template']['tmp_name'] = $test_file;
+
+		try {
+			$this->model->move_template_to_tmp_dir( $this->getFileStub() );
+			unlink( $test_file );
+			$this->fail( 'Expected the disguised font to be refused.' );
+		} catch ( UploadException $e ) {
+			unlink( $test_file );
+			$this->assertSame( 'File validation failed', $e->getMessage() );
+		}
+
 		/* Setup a valid zip */
 		$test_file = $gfpdf->data->template_location . 'test-archive.zip';
 

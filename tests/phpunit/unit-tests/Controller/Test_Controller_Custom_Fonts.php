@@ -6,7 +6,12 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
+use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
+use GFPDF_Vendor\GravityPdf\Upload\File;
+use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
 use GPDFAPI;
+use ReflectionMethod;
 use WP_REST_Request;
 use WP_UnitTestCase;
 
@@ -232,6 +237,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'The upload is not a valid TTF file', $response->get_data()['message']['regular'] );
 
 		/* TTF file masquerading as a JSON file */
 		$test_file = __DIR__ . '/../fonts/DejaVuSans.ttf';
@@ -251,6 +257,62 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 400, $response->get_status() );
+	}
+
+	/**
+	 * @dataProvider provider_add_item_upload_error_message
+	 */
+	public function test_add_item_upload_error_message( int $upload_error, string $expected ) {
+		wp_set_current_user( $this->admin_user );
+
+		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
+		$request->set_param( 'label', 'Font' );
+
+		$_FILES = [
+			'regular' => [
+				'name'     => 'DejaVuSans.ttf',
+				'size'     => 0,
+				'tmp_name' => '',
+				'error'    => $upload_error,
+			],
+		];
+
+		$request->set_file_params( $_FILES );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertStringContainsString( $expected, $response->get_data()['message']['regular'] );
+	}
+
+	public function provider_add_item_upload_error_message(): array {
+		return [
+			'over upload_max_filesize' => [ UPLOAD_ERR_INI_SIZE, 'larger than the' ],
+			'over MAX_FILE_SIZE'       => [ UPLOAD_ERR_FORM_SIZE, 'larger than the' ],
+			'partial transfer'         => [ UPLOAD_ERR_PARTIAL, 'could not be saved' ],
+			'no tmp dir'               => [ UPLOAD_ERR_NO_TMP_DIR, 'could not be saved' ],
+			'disk write failed'        => [ UPLOAD_ERR_CANT_WRITE, 'could not be saved' ],
+		];
+	}
+
+	public function test_upload_error_message_for_a_storage_failure() {
+		$_FILES = [
+			'regular' => [
+				'name'     => 'DejaVuSans.ttf',
+				'tmp_name' => $this->test_fonts[0],
+				'error'    => UPLOAD_ERR_OK,
+			],
+		];
+
+		$method = new ReflectionMethod( $this->controller, 'get_upload_error_message' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$file  = new File( 'regular', new FileSystem( $this->tmp_font_location ) );
+		$error = new UploadException( 'File could not be moved to final destination.', null, ErrorCode::MOVE_FAILED );
+
+		$this->assertStringContainsString( 'could not be saved', $method->invoke( $this->controller, $file, $error ) );
 	}
 
 	public function test_update_item_success() {

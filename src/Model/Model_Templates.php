@@ -11,7 +11,7 @@ use GFPDF\Helper\Helper_Templates;
 use GFPDF_Vendor\GravityPdf\Upload\File;
 use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
-use GFPDF_Vendor\GravityPdf\Upload\Validation\Mimetype;
+use GFPDF_Vendor\GravityPdf\Upload\Validation\FileType;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Size;
 use GPDFAPI;
 use Psr\Log\LoggerInterface;
@@ -352,21 +352,15 @@ class Model_Templates extends Helper_Abstract_Model {
 		/* Validate our uploaded file and move to the PDF tmp directory for further processing */
 		$file->setName( uniqid() );
 
+		/* FileType sniffs the contents with fileinfo; fall back to an extension-only check without it */
 		$file->addValidations(
 			[
-				new Extension( 'zip' ),
 				new Size( '10240K' ), /* allow 10MB upload – accounts for fonts, PDF and PHP files */
+				extension_loaded( 'fileinfo' )
+					? new FileType( 'zip', [ 'application/zip', 'application/octet-stream' ] )
+					: new Extension( 'zip' ),
 			]
 		);
-
-		/* Do a check to ensure fileinfo is loaded. It should be loaded by default but in some cases this isn't so */
-		if ( extension_loaded( 'fileinfo' ) ) {
-			$file->addValidations(
-				[
-					new Mimetype( [ 'application/zip', 'application/octet-stream' ] ),
-				]
-			);
-		}
 
 		$file->upload();
 
