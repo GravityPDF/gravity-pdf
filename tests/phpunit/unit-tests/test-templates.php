@@ -6,6 +6,7 @@ use Exception;
 use GFPDF\Controller\Controller_Templates;
 use GFPDF\Helper\Fonts\LocalFile;
 use GFPDF\Helper\Fonts\LocalFilesystem;
+use GFPDF\Helper\Helper_Templates;
 use GFPDF\Model\Model_Templates;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use WP_UnitTestCase;
@@ -351,6 +352,162 @@ class Test_Templates extends WP_UnitTestCase {
 			$gfpdf->misc->rmdir( $test_dir );
 			$gfpdf->templates->flush_template_transient_cache();
 		}
+	}
+
+	/**
+	 * Re-zipping a folder Safari auto-extracted nests the templates a directory deep
+	 *
+	 * @since 6.18.0
+	 */
+	public function test_unzip_and_verify_templates_handles_rezipped_folder() {
+		global $gfpdf;
+
+		$gfpdf->templates->flush_template_transient_cache();
+
+		$zip = $this->make_zip(
+			[
+				'my-template/zadani.php'      => PDF_PLUGIN_DIR . 'src/templates/zadani.php',
+				'my-template/images/logo.txt' => 'not a template',
+			]
+		);
+
+		try {
+			$dir = $this->model->unzip_and_verify_templates( $zip );
+
+			$this->assertSame( $this->model->get_unzipped_dir_name( $zip ) . 'my-template/', $dir );
+			$this->assertFileExists( $dir . 'zadani.php' );
+		} finally {
+			@unlink( $zip ); /* phpcs:ignore */
+			$gfpdf->misc->rmdir( $this->model->get_unzipped_dir_name( $zip ) );
+			$gfpdf->templates->flush_template_transient_cache();
+		}
+	}
+
+	/**
+	 * @param string $expected  Path relative to the extracted directory
+	 * @param array  $entries   Zip contents
+	 *
+	 * @since        6.18.0
+	 *
+	 * @dataProvider provider_get_template_root_dir
+	 */
+	public function test_get_template_root_dir( string $expected, array $entries ) {
+		global $gfpdf;
+
+		$zip = $this->make_zip( $entries );
+
+		$direct = function () {
+			return 'direct';
+		};
+
+		add_filter( 'filesystem_method', $direct );
+		WP_Filesystem();
+
+		try {
+			$dir = $this->model->get_unzipped_dir_name( $zip );
+			unzip_file( $zip, $dir );
+
+			$this->assertSame( $dir . $expected, $gfpdf->templates->get_template_root_dir( $dir ) );
+		} finally {
+			remove_filter( 'filesystem_method', $direct );
+			@unlink( $zip ); /* phpcs:ignore */
+			$gfpdf->misc->rmdir( $this->model->get_unzipped_dir_name( $zip ) );
+		}
+	}
+
+	/**
+	 * @return array
+	 *
+	 * @since 6.18.0
+	 */
+	public function provider_get_template_root_dir(): array {
+		$zadani = PDF_PLUGIN_DIR . 'src/templates/zadani.php';
+
+		return [
+			'templates at the top level'      => [
+				'',
+				[ 'zadani.php' => $zadani ],
+			],
+
+			'wrapped in a single folder'      => [
+				'my-template/',
+				[ 'my-template/zadani.php' => $zadani ],
+			],
+
+			/* A Finder-compressed folder — unzip_file() drops the root __MACOSX, leaving one wrapper */
+			'macOS-compressed folder'         => [
+				'my-template/',
+				[
+					'my-template/zadani.php'            => $zadani,
+					'__MACOSX/my-template/._zadani.php' => 'apple double',
+				],
+			],
+
+			'wrapped twice'                   => [
+				'outer/inner/',
+				[ 'outer/inner/zadani.php' => $zadani ],
+			],
+
+			'hidden folders are skipped'      => [
+				'my-template/',
+				[
+					'my-template/zadani.php' => $zadani,
+					'.git/HEAD'              => 'ref: refs/heads/main',
+				],
+			],
+
+			'ambiguous, so left alone'        => [
+				'',
+				[
+					'one/zadani.php' => $zadani,
+					'two/rubix.php'  => PDF_PLUGIN_DIR . 'src/templates/rubix.php',
+				],
+			],
+
+			'assets only, so left alone'      => [
+				'images/',
+				[ 'images/logo.txt' => 'not a template' ],
+			],
+		];
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_get_max_upload_size() {
+		$limit = function ( $bytes ) {
+			return function () use ( $bytes ) {
+				return $bytes;
+			};
+		};
+
+		/* Never offer to accept more than the server itself will */
+		add_filter( 'upload_size_limit', $tiny = $limit( MB_IN_BYTES ) );
+		$this->assertSame( MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
+		remove_filter( 'upload_size_limit', $tiny );
+
+		add_filter( 'upload_size_limit', $huge = $limit( 512 * MB_IN_BYTES ) );
+		$this->assertSame( 32 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
+		remove_filter( 'upload_size_limit', $huge );
+
+		add_filter( 'gfpdf_template_max_upload_size', $override = $limit( 5 * MB_IN_BYTES ) );
+		$this->assertSame( 5 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
+		remove_filter( 'gfpdf_template_max_upload_size', $override );
+	}
+
+	/** Build a zip at a unique tmp path; entries map archive-name => file path (added via addFile) or raw content string (addFromString). */
+	private function make_zip( array $entries ): string {
+		global $gfpdf;
+
+		$path = $gfpdf->data->template_tmp_location . uniqid( 'gfpdf-test-', true ) . '.zip';
+		$zip  = new ZipArchive();
+		$zip->open( $path, ZipArchive::CREATE );
+		foreach ( $entries as $name => $source ) {
+			is_file( $source ) ? $zip->addFile( $source, $name ) : $zip->addFromString( $name, $source );
+		}
+		$zip->close();
+
+		return $path;
 	}
 
 	/**

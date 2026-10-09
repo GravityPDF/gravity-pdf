@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { call, put, takeLatest, takeEvery } from 'redux-saga/effects'
 import {
   watchUpdateSelectBox,
   watchTemplateProcessing,
@@ -69,8 +69,8 @@ describe('Sagas - templates', () => {
   describe('watchpostTemplateUploadProcessing()', () => {
     const gen = watchpostTemplateUploadProcessing()
 
-    test('should check the watcher to loads up the templateUploadProcessing function and call POST_TEMPLATE_UPLOAD_PROCESSING action', () => {
-      expect(gen.next().value).toEqual(takeLatest(POST_TEMPLATE_UPLOAD_PROCESSING, templateUploadProcessing))
+    test('should take every POST_TEMPLATE_UPLOAD_PROCESSING action so multi-file drops all upload', () => {
+      expect(gen.next().value).toEqual(takeEvery(POST_TEMPLATE_UPLOAD_PROCESSING, templateUploadProcessing))
     })
   })
 
@@ -90,7 +90,7 @@ describe('Sagas - templates', () => {
       const response = { ok: true, status: 200, body: { templates: [{ id: 'foo' }] } }
       expect(gen.next(response).value).toEqual(put({
         type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
-        payload: response
+        payload: { ...response.body, filename: 'test' }
       }))
     })
 
@@ -102,7 +102,7 @@ describe('Sagas - templates', () => {
       const response = { ok: false, status: 400, body: { error: 'invalid zip' } }
       expect(gen.next(response).value).toEqual(put({
         type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-        payload: response
+        payload: { message: 'invalid zip', filename: 'test' }
       }))
     })
 
@@ -114,7 +114,7 @@ describe('Sagas - templates', () => {
       const response = { ok: true, status: 200, body: 400 }
       expect(gen.next(response).value).toEqual(put({
         type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-        payload: response
+        payload: { message: '', filename: 'test' }
       }))
     })
 
@@ -123,9 +123,9 @@ describe('Sagas - templates', () => {
       const gen = templateUploadProcessing(newaction)
       gen.next()
 
-      expect(gen.throw({ error: 'network failure' }).value).toEqual(put({
+      expect(gen.throw({ message: 'network failure' }).value).toEqual(put({
         type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-        payload: { ok: false, body: null }
+        payload: { message: 'network failure', filename: 'test' }
       }))
     })
   })

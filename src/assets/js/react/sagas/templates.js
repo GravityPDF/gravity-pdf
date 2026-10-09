@@ -1,5 +1,5 @@
 /* Dependencies */
-import { takeLatest, call, put } from 'redux-saga/effects'
+import { takeLatest, takeEvery, call, put } from 'redux-saga/effects'
 /* Redux action types & actions */
 import {
   updateSelectBoxSuccess,
@@ -60,17 +60,23 @@ export function * templateProcessing (action) {
  * @since 5.2
  */
 export function * templateUploadProcessing (action) {
+  const { file, filename } = action.payload
+
   try {
-    const response = yield call(apiPostTemplateUploadProcessing, action.payload.file, action.payload.filename)
+    const response = yield call(apiPostTemplateUploadProcessing, file, filename)
 
     if (!response.ok || !response.body || !Array.isArray(response.body.templates)) {
-      yield put(templateUploadProcessingFailed(response))
+      const message = response.body && typeof response.body === 'object' && response.body.error
+        ? response.body.error
+        : ''
+
+      yield put(templateUploadProcessingFailed({ message }, filename))
       return
     }
 
-    yield put(templateUploadProcessingSuccess(response))
+    yield put(templateUploadProcessingSuccess(response.body, filename))
   } catch (error) {
-    yield put(templateUploadProcessingFailed({ ok: false, body: null }))
+    yield put(templateUploadProcessingFailed({ message: error.message }, filename))
   }
 }
 
@@ -95,8 +101,10 @@ export function * watchTemplateProcessing () {
 /**
  * Watcher Saga watchTemplateProcessing for templateUploadProcessing()
  *
+ * Uses takeEvery so every zip in a multi-file drop is uploaded — takeLatest cancelled all but the last
+ *
  * @since 5.2
  */
 export function * watchpostTemplateUploadProcessing () {
-  yield takeLatest(POST_TEMPLATE_UPLOAD_PROCESSING, templateUploadProcessing)
+  yield takeEvery(POST_TEMPLATE_UPLOAD_PROCESSING, templateUploadProcessing)
 }

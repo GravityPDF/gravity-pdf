@@ -3,6 +3,9 @@
 ## Gravity PDF
 
 ### 6.18.0
+* 🎉 Feature: Install several PDF template zips at once
+* 🎉 Feature: Drop template zips anywhere in the Template Manager
+* 🎉 Feature: Install template zips that have the templates inside a folder
 * 🔒 Security: Only sign PDF URLs when the shortcode or merge tag comes from a trusted source
 * 🔒 Security: Cap signed PDF URLs at 1 year and the Logged Out Timeout at 1 week
 * 🔒 Security: Restrict PDF template uploads to users who can install plugins
@@ -13,6 +16,7 @@
 * 🧹 Housekeeping: Make the folder permission error dismissible (for a week)
 * 🧹 Housekeeping: Check Gravity PDF folder permissions on the System Status report page
 * 🧹 Housekeeping: Set a 1-minute minimum for the Logged Out Timeout
+* 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
 * 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed in PDFs
 * 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
 * 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
@@ -40,6 +44,7 @@
 * 💻 Developer: Add `gfpdf_signed_url_max_expiration` filter to change the 1-year cap on signed PDF URLs
 * 💻 Developer: Add `gfpdf_process_merge_tags_in_submitted_rich_text` filter to opt submitted rich-text Textarea and Post Content values back into merge tag processing
 * 💻 Developer: Add `gfpdf_shortcode_signing_user_id` filter to change which user's entry access is checked when signing `[gravitypdf]` URLs
+* 💻 Developer: Add the `gfpdf_template_max_upload_size` filter
 
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
