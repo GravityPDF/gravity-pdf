@@ -9,6 +9,7 @@ import {
 	TEMPLATE_PROCESSING_SUCCESS,
 	TEMPLATE_PROCESSING_FAILED,
 	CLEAR_TEMPLATE_PROCESSING,
+	POST_TEMPLATE_UPLOAD_PROCESSING,
 	TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 	TEMPLATE_UPLOAD_PROCESSING_FAILED,
 	CLEAR_TEMPLATE_UPLOAD_PROCESSING,
@@ -39,6 +40,7 @@ import {
  * @property { string }                      search                - filter keyword value
  * @property { string }                      updateSelectBoxText   - state of select box text
  * @property { string }                      templateProcessing    - state of template processed
+ * @property { number }                      templateUploadTotal   - zips in the current upload batch
  * @property { Array<TemplateUploadResult> } templateUploadResults - results of the current upload batch
  */
 
@@ -55,6 +57,7 @@ export const initialState = {
 	search: '',
 	updateSelectBoxText: '',
 	templateProcessing: '',
+	templateUploadTotal: 0,
 	templateUploadResults: [],
 };
 
@@ -179,7 +182,18 @@ export default function (state = initialState, action) {
 			};
 
 		/**
-		 * Record an installed zip. Appended, not replaced, so results landing in one render can't overwrite each other
+		 * Count a zip into the current upload batch
+		 *
+		 * @since 6.18.0
+		 */
+		case POST_TEMPLATE_UPLOAD_PROCESSING:
+			return {
+				...state,
+				templateUploadTotal: state.templateUploadTotal + 1,
+			};
+
+		/**
+		 * Record an installed zip
 		 *
 		 * @since 5.2
 		 */
@@ -207,13 +221,14 @@ export default function (state = initialState, action) {
 			};
 
 		/**
-		 * Clear/reset the results of the current upload batch
+		 * Clear/reset the current upload batch
 		 *
 		 * @since 5.2
 		 */
 		case CLEAR_TEMPLATE_UPLOAD_PROCESSING:
 			return {
 				...state,
+				templateUploadTotal: 0,
 				templateUploadResults: [],
 			};
 	}

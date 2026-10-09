@@ -1759,12 +1759,6 @@ parameters:
 			path: ../../src/Model/Model_System_Report.php
 
 		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../src/Model/Model_Templates.php
-
-		-
 			message: '#^Parameter \#1 \$new_blog_id of function switch_to_blog expects int, string given\.$#'
 			identifier: argument.type
 			count: 2

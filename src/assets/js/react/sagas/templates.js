@@ -1,7 +1,16 @@
 /* Dependencies */
-import { takeLatest, takeEvery, call, put } from 'redux-saga/effects';
+import {
+	takeLatest,
+	actionChannel,
+	take,
+	call,
+	put,
+	select,
+} from 'redux-saga/effects';
 /* Redux action types & actions */
 import {
+	addTemplate,
+	updateTemplateParam,
 	updateSelectBoxSuccess,
 	updateSelectBoxFailed,
 	templateProcessingSuccess,
@@ -65,6 +74,7 @@ export function* templateProcessing(action) {
  */
 export function* templateUploadProcessing(action) {
 	const { file, filename } = action.payload;
+	let message;
 
 	try {
 		const response = yield call(
@@ -73,37 +83,51 @@ export function* templateUploadProcessing(action) {
 			filename
 		);
 
-		if (
-			!response.ok ||
-			!response.body ||
-			!Array.isArray(response.body.templates)
-		) {
-			yield put(
-				templateUploadProcessingFailed(
-					{
-						message:
-							response.body &&
-							typeof response.body === 'object' &&
-							response.body.error
-								? response.body.error
-								: '',
-					},
-					filename
-				)
-			);
+		if (response.ok && Array.isArray(response.body?.templates)) {
+			yield* addTemplatesToList(response.body.templates);
+			yield put(templateUploadProcessingSuccess(response.body, filename));
 			return;
 		}
 
-		yield put(templateUploadProcessingSuccess(response.body, filename));
+		message = response.body?.error;
 	} catch (error) {
-		yield put(
-			templateUploadProcessingFailed(
-				{
-					message: error.message,
-				},
-				filename
-			)
-		);
+		message = error.message;
+	}
+
+	yield put(
+		templateUploadProcessingFailed({ message: message || '' }, filename)
+	);
+}
+
+/**
+ * Add newly-installed templates to the list, and flag the ones that were already there as updated
+ *
+ * @param {Array<Object>} templates
+ *
+ * @since 6.18.0
+ */
+export function* addTemplatesToList(templates) {
+	const list = yield select((state) => state.template.list);
+
+	for (const template of templates) {
+		if (list.some((item) => item.id === template.id)) {
+			yield put(
+				updateTemplateParam(
+					template.id,
+					'message',
+					GFPDF.templateSuccessfullyUpdated
+				)
+			);
+		} else {
+			/* `new` sorts it to the end of the list */
+			yield put(
+				addTemplate({
+					...template,
+					new: true,
+					message: GFPDF.templateSuccessfullyInstalled,
+				})
+			);
+		}
 	}
 }
 
@@ -128,10 +152,14 @@ export function* watchTemplateProcessing() {
 /**
  * Watcher Saga watchTemplateProcessing for templateUploadProcessing()
  *
- * Uses takeEvery so every zip in a multi-file drop is uploaded — takeLatest cancelled all but the last
+ * Uploads one zip at a time, so a large drop doesn't tie up every PHP worker
  *
  * @since 5.2
  */
 export function* watchpostTemplateUploadProcessing() {
-	yield takeEvery(POST_TEMPLATE_UPLOAD_PROCESSING, templateUploadProcessing);
+	const uploads = yield actionChannel(POST_TEMPLATE_UPLOAD_PROCESSING);
+
+	while (true) {
+		yield call(templateUploadProcessing, yield take(uploads));
+	}
 }

@@ -1,4 +1,5 @@
-import { call, put, takeLatest, takeEvery } from 'redux-saga/effects';
+import { channel } from 'redux-saga';
+import { actionChannel, call, put, take, takeLatest } from 'redux-saga/effects';
 import {
 	watchUpdateSelectBox,
 	watchTemplateProcessing,
@@ -6,8 +7,11 @@ import {
 	updateSelectBox,
 	templateProcessing,
 	templateUploadProcessing,
+	addTemplatesToList,
 } from '../../../../src/assets/js/react/sagas/templates';
 import {
+	ADD_TEMPLATE,
+	UPDATE_TEMPLATE_PARAM,
 	UPDATE_SELECT_BOX,
 	UPDATE_SELECT_BOX_FAILED,
 	TEMPLATE_PROCESSING,
@@ -76,15 +80,50 @@ describe('Sagas - templates', () => {
 	});
 
 	describe('watchpostTemplateUploadProcessing()', () => {
-		const gen = watchpostTemplateUploadProcessing();
+		test('should queue every POST_TEMPLATE_UPLOAD_PROCESSING action and upload them one at a time', () => {
+			const gen = watchpostTemplateUploadProcessing();
+			const uploads = channel();
+			const action = { payload: { file: {}, filename: 'one.zip' } };
 
-		test('should take every POST_TEMPLATE_UPLOAD_PROCESSING action so multi-file drops all upload', () => {
 			expect(gen.next().value).toEqual(
-				takeEvery(
-					POST_TEMPLATE_UPLOAD_PROCESSING,
-					templateUploadProcessing
-				)
+				actionChannel(POST_TEMPLATE_UPLOAD_PROCESSING)
 			);
+			expect(gen.next(uploads).value).toEqual(take(uploads));
+			expect(gen.next(action).value).toEqual(
+				call(templateUploadProcessing, action)
+			);
+			expect(gen.next().value).toEqual(take(uploads));
+		});
+	});
+
+	describe('addTemplatesToList()', () => {
+		test('should add new templates and flag existing ones as updated', () => {
+			const gen = addTemplatesToList([
+				{ id: 'cellulose' },
+				{ id: 'rubix' },
+			]);
+
+			gen.next();
+
+			expect(gen.next([{ id: 'rubix' }]).value).toEqual(
+				put({
+					type: ADD_TEMPLATE,
+					template: {
+						id: 'cellulose',
+						new: true,
+						message: GFPDF.templateSuccessfullyInstalled,
+					},
+				})
+			);
+			expect(gen.next().value).toEqual(
+				put({
+					type: UPDATE_TEMPLATE_PARAM,
+					id: 'rubix',
+					name: 'message',
+					value: GFPDF.templateSuccessfullyUpdated,
+				})
+			);
+			expect(gen.next().done).toBe(true);
 		});
 	});
 
@@ -136,7 +175,12 @@ describe('Sagas - templates', () => {
 				status: 200,
 				body: { templates: [{ id: 'foo' }] },
 			};
-			expect(gen.next(response).value).toEqual(
+
+			/* addTemplatesToList() reads the list, then flags the template as updated */
+			gen.next(response);
+			gen.next([{ id: 'foo' }]);
+
+			expect(gen.next().value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 					payload: { ...response.body, filename: 'test' },

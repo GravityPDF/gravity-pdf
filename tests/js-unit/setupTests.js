@@ -26,6 +26,16 @@ window.GFPDF = {
 	licenseDeactivationError:
 		'An error occurred and your license key may not have been correctly deactivated. Login to your GravityPDF.com account and check if your site has been unlinked from the key.',
 	userCapabilities: { administrator: true },
+	// Template uploader
+	problemWithTheUpload: 'genericError',
+	uploadInvalidNotZipFile: 'notZip',
+	uploadInvalidExceedsFileSizeLimit: 'tooBig',
+	templateSuccessfullyInstalled: 'installed',
+	templateSuccessfullyUpdated: 'updated',
+	templateSuccessfullyInstalledUpdated: 'successText',
+	templateUploadDropzone: 'dropzoneText',
+	templateUploadInProgress: 'uploading',
+	templateUploadMaxSize: '1000',
 	// Font manager component
 	fontListInstalledFonts: 'Installed Fonts',
 	fontListRegular: 'Regular',

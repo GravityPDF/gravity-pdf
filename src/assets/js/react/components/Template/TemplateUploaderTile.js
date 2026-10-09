@@ -26,7 +26,7 @@ const TemplateUploaderTile = ({
 	addTemplateText,
 	templateInstallInstructions,
 }) => {
-	const { open, ajax } = useContext(TemplateUploaderContext);
+	const { open, isUploading } = useContext(TemplateUploaderContext);
 
 	const handleClick = (e) => {
 		e.preventDefault();
@@ -40,7 +40,7 @@ const TemplateUploaderTile = ({
 		>
 			<a
 				href="#/template"
-				className={ajax ? 'doing-ajax' : ''}
+				className={isUploading ? 'doing-ajax' : ''}
 				onClick={handleClick}
 				aria-labelledby="gfpdf-template-install-instructions"
 			>

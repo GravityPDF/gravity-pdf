@@ -8,6 +8,7 @@ import {
 	TEMPLATE_PROCESSING_SUCCESS,
 	TEMPLATE_PROCESSING_FAILED,
 	CLEAR_TEMPLATE_PROCESSING,
+	POST_TEMPLATE_UPLOAD_PROCESSING,
 	TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 	TEMPLATE_UPLOAD_PROCESSING_FAILED,
 	CLEAR_TEMPLATE_UPLOAD_PROCESSING,
@@ -181,8 +182,22 @@ describe('Reducers - templateReducer', () => {
 		});
 	});
 
+	describe('POST_TEMPLATE_UPLOAD_PROCESSING', () => {
+		test('counts each zip into the batch', () => {
+			newState = reducer(initialState, {
+				type: POST_TEMPLATE_UPLOAD_PROCESSING,
+			});
+
+			newState = reducer(newState, {
+				type: POST_TEMPLATE_UPLOAD_PROCESSING,
+			});
+
+			expect(newState.templateUploadTotal).toBe(2);
+		});
+	});
+
 	describe('TEMPLATE_UPLOAD_PROCESSING_SUCCESS', () => {
-		test('appends each result so concurrent uploads do not overwrite each other', () => {
+		test('appends each result', () => {
 			newState = reducer(initialState, {
 				type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 				payload: { filename: 'one.zip', templates: [] },
@@ -222,6 +237,10 @@ describe('Reducers - templateReducer', () => {
 	describe('CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
 		test('check the correct state gets returned when this action runs', () => {
 			newState = reducer(initialState, {
+				type: POST_TEMPLATE_UPLOAD_PROCESSING,
+			});
+
+			newState = reducer(newState, {
 				type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 				payload: { filename: 'one.zip', templates: [] },
 			});
@@ -230,6 +249,7 @@ describe('Reducers - templateReducer', () => {
 				type: CLEAR_TEMPLATE_UPLOAD_PROCESSING,
 			});
 
+			expect(newState.templateUploadTotal).toBe(0);
 			expect(newState.templateUploadResults).toEqual([]);
 
 			newState = reducer(newState, {

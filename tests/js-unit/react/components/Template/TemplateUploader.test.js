@@ -19,20 +19,21 @@ describe('Template - TemplateUploader.js', () => {
 	let wrapper;
 	let component;
 	const postTemplateUploadProcessingMock = jest.fn();
-	const addNewTemplateMock = jest.fn();
 	const clearTemplateUploadProcessingMock = jest.fn();
-	const updateTemplateParamMock = jest.fn();
+
+	const uploaderProps = (props = {}) => ({
+		postTemplateUploadProcessing: postTemplateUploadProcessingMock,
+		clearTemplateUploadProcessing: clearTemplateUploadProcessingMock,
+		templateUploadTotal: 0,
+		templateUploadResults: [],
+		...props,
+	});
 
 	const setupUploader = (props = {}) =>
-		shallow(
-			<TemplateUploader
-				postTemplateUploadProcessing={postTemplateUploadProcessingMock}
-				clearTemplateUploadProcessing={
-					clearTemplateUploadProcessingMock
-				}
-				{...props}
-			/>
-		);
+		shallow(<TemplateUploader {...uploaderProps(props)} />);
+
+	const statusMessages = (uploader, testAttr) =>
+		findByTestAttr(shallow(uploader.instance().renderStatus()), testAttr);
 
 	beforeEach(() => jest.clearAllMocks());
 
@@ -47,42 +48,20 @@ describe('Template - TemplateUploader.js', () => {
 		};
 		const dispatch = jest.fn();
 
-		test('has access to `list` state', () => {
-			wrapper = setup();
-			const templatesProp = wrapper.instance().props.templates;
-
-			expect(templatesProp).toBeInstanceOf(Array);
-		});
-
-		test('has access to `templateUploadResults` state', () => {
+		test('has access to the upload batch state', () => {
 			wrapper = setup({
 				template: {
+					templateUploadTotal: 2,
 					templateUploadResults: [
 						{ filename: 'one.zip', success: true, templates: [] },
 					],
 				},
 			});
-			const results = wrapper.instance().props.templateUploadResults;
 
-			expect(results).toEqual([
+			expect(wrapper.instance().props.templateUploadTotal).toBe(2);
+			expect(wrapper.instance().props.templateUploadResults).toEqual([
 				{ filename: 'one.zip', success: true, templates: [] },
 			]);
-		});
-
-		test('check for mapDispatchToProps addNewTemplate()', () => {
-			mapDispatchToProps(dispatch).addNewTemplate();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'ADD_TEMPLATE',
-			});
-		});
-
-		test('check for mapDispatchToProps updateTemplateParam()', () => {
-			mapDispatchToProps(dispatch).updateTemplateParam();
-
-			expect(dispatch.mock.calls[0][0]).toEqual({
-				type: 'UPDATE_TEMPLATE_PARAM',
-			});
 		});
 
 		test('check for mapDispatchToProps postTemplateUploadProcessing()', () => {
@@ -102,8 +81,8 @@ describe('Template - TemplateUploader.js', () => {
 		});
 	});
 
-	describe('Component functions', () => {
-		test('handleOndrop() - uploads every zip that was dropped', () => {
+	describe('handleOndrop()', () => {
+		test('starts a new batch and uploads every zip that was dropped', () => {
 			wrapper = setupUploader();
 			wrapper
 				.instance()
@@ -113,18 +92,13 @@ describe('Template - TemplateUploader.js', () => {
 					file('gpdf-flow-2.0.0.zip'),
 				]);
 
-			expect(wrapper.instance().isUploading).toBe(true);
-			expect(wrapper.state('total')).toBe(3);
-			expect(wrapper.state('completed')).toBe(0);
-			expect(wrapper.state('errors')).toEqual([]);
+			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1);
+			expect(wrapper.state('rejections')).toEqual([]);
 			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(3);
 		});
 
-		test('handleOndrop() - reports each rejected file and uploads the rest', () => {
-			wrapper = setupUploader({
-				filenameErrorText: 'notZip',
-				filesizeErrorText: 'tooBig',
-			});
+		test('reports each rejected file and uploads the rest', () => {
+			wrapper = setupUploader();
 			wrapper.instance().handleOndrop(
 				[file('gpdf-cellulose-1.4.0.zip')],
 				[
@@ -139,205 +113,166 @@ describe('Template - TemplateUploader.js', () => {
 				]
 			);
 
-			expect(wrapper.state('errors')).toEqual([
+			expect(wrapper.state('rejections')).toEqual([
 				{ filename: 'not-a-template.txt', message: 'notZip' },
 				{ filename: 'huge.zip', message: 'tooBig' },
 			]);
-			expect(wrapper.state('total')).toBe(1);
 			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(1);
 		});
 
-		test('handleOndrop() - ignores an empty drop', () => {
+		test('ignores an empty drop', () => {
 			wrapper = setupUploader();
 			wrapper.instance().handleOndrop([], []);
 
-			expect(wrapper.instance().isUploading).toBe(false);
 			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(0);
 			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(0);
 		});
 
-		test('handleOndrop() - a drop during an upload joins the batch in flight', () => {
-			wrapper = setupUploader();
-			wrapper.instance().handleOndrop([file('one.zip')]);
-			wrapper.instance().handleOndrop([file('two.zip')]);
-
-			expect(wrapper.state('total')).toBe(2);
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1);
-			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(2);
-		});
-
-		test('addTemplatesToStore() - adds new templates and flags existing ones as updated', () => {
-			const templates = [
-				{ template: 'Blank Slate', id: 'blank-slate' },
-				{ template: 'Rubix', id: 'rubix' },
-			];
-
-			wrapper = setupUploader({
-				templates,
-				addNewTemplate: addNewTemplateMock,
-				updateTemplateParam: updateTemplateParamMock,
-				installSuccessText: 'installed',
-				installUpdatedText: 'updated',
+		test('a drop during an upload joins the batch in flight', () => {
+			wrapper = setupUploader({ templateUploadTotal: 1 });
+			wrapper.setState({
+				rejections: [{ filename: 'a.txt', message: 'notZip' }],
 			});
-
-			wrapper.instance().addTemplatesToStore([
-				{ template: 'Cellulose', id: 'gpdf-cellulose' },
-				{ template: 'Rubix', id: 'rubix' },
-			]);
-
-			expect(addNewTemplateMock.mock.calls.length).toBe(1);
-			expect(addNewTemplateMock.mock.calls[0][0].message).toBe(
-				'installed'
+			wrapper.instance().handleOndrop(
+				[file('two.zip')],
+				[
+					{
+						file: file('b.txt'),
+						errors: [{ code: 'file-invalid-type' }],
+					},
+				]
 			);
-			expect(updateTemplateParamMock.mock.calls[0]).toEqual([
-				'rubix',
-				'message',
-				'updated',
-			]);
-		});
 
-		test('removeMessage() - Remove message from state once the timeout has finished', () => {
-			wrapper = setupUploader();
-			wrapper.setState({ showSuccess: true });
-			wrapper.instance().removeMessage();
-
-			expect(wrapper.state('showSuccess')).toBe(false);
+			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(0);
+			expect(wrapper.state('rejections').length).toBe(2);
+			expect(postTemplateUploadProcessingMock.mock.calls.length).toBe(1);
 		});
 	});
 
-	describe('Run Lifecycle methods', () => {
-		const templates = [{ template: 'Rubix', id: 'rubix' }];
-
-		const setupBatch = (total, props = {}) => {
-			const uploader = setupUploader({
-				templates,
-				addNewTemplate: addNewTemplateMock,
-				updateTemplateParam: updateTemplateParamMock,
-				templateSuccessfullyInstalledUpdated: 'successText',
-				genericUploadErrorText: 'genericError',
-				templateUploadResults: [],
-				...props,
+	describe('Upload status', () => {
+		test('keeps the progress notice up until every upload in the batch reports back', () => {
+			wrapper = setupUploader({
+				templateUploadTotal: 2,
+				templateUploadResults: [
+					{ success: true, filename: 'one.zip', templates: [] },
+				],
 			});
 
-			uploader.setState({ total, completed: 0 });
-
-			return uploader;
-		};
-
-		/* The shallow renderer doesn't run lifecycle hooks, so drive componentDidUpdate ourselves */
-		const applyResults = (uploader, results) => {
-			const prevProps = { ...uploader.instance().props };
-			uploader.setProps({ templateUploadResults: results });
-			uploader.instance().componentDidUpdate(prevProps);
-		};
-
-		test('componentDidUpdate() - keeps the spinner up until every upload in the batch reports back', () => {
-			wrapper = setupBatch(2);
-
-			applyResults(wrapper, [
-				{
-					success: true,
-					filename: 'one.zip',
-					templates: [{ template: 'Cellulose', id: 'cellulose' }],
-				},
-			]);
-
-			expect(wrapper.state('completed')).toBe(1);
 			expect(wrapper.instance().isUploading).toBe(true);
-			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(0);
 
-			applyResults(wrapper, [
-				{
-					success: true,
-					filename: 'one.zip',
-					templates: [{ template: 'Cellulose', id: 'cellulose' }],
-				},
-				{
-					success: true,
-					filename: 'two.zip',
-					templates: [{ template: 'Flow', id: 'flow' }],
-				},
-			]);
+			wrapper.setProps({
+				templateUploadResults: [
+					{ success: true, filename: 'one.zip', templates: [] },
+					{ success: true, filename: 'two.zip', templates: [] },
+				],
+			});
 
-			expect(wrapper.state('completed')).toBe(2);
 			expect(wrapper.instance().isUploading).toBe(false);
-			expect(wrapper.state('showSuccess')).toBe(true);
-			expect(addNewTemplateMock.mock.calls.length).toBe(2);
+		});
+
+		test('still reports success when the last zip in the batch fails, alongside its error', () => {
+			wrapper = setupUploader({
+				templateUploadTotal: 2,
+				templateUploadResults: [
+					{ success: true, filename: 'one.zip', templates: [] },
+					{ success: false, filename: 'two.zip', message: 'boom' },
+				],
+			});
+
+			const errors = statusMessages(
+				wrapper,
+				'component-stateError-showMessage'
+			);
+
+			expect(errors.length).toBe(1);
+			expect(errors.prop('text')).toBe('two.zip: boom');
+			expect(
+				statusMessages(wrapper, 'component-stateMessage-showMessage')
+					.length
+			).toBe(1);
+		});
+
+		test('falls back to the generic error when the server gave no reason', () => {
+			wrapper = setupUploader({
+				templateUploadTotal: 1,
+				templateUploadResults: [
+					{ success: false, filename: 'one.zip', message: '' },
+				],
+			});
+
+			expect(
+				statusMessages(
+					wrapper,
+					'component-stateError-showMessage'
+				).prop('text')
+			).toBe('one.zip: genericError');
+		});
+
+		test('lists the rejected files before the failed uploads', () => {
+			wrapper = setupUploader({
+				templateUploadTotal: 1,
+				templateUploadResults: [
+					{ success: false, filename: 'one.zip', message: 'boom' },
+				],
+			});
+			wrapper.setState({
+				rejections: [{ filename: 'a.txt', message: 'notZip' }],
+			});
+
+			const errors = statusMessages(
+				wrapper,
+				'component-stateError-showMessage'
+			);
+
+			expect(errors.map((error) => error.prop('text'))).toEqual([
+				'a.txt: notZip',
+				'one.zip: boom',
+			]);
+		});
+
+		test('removeMessage() hides the success message', () => {
+			wrapper = setupUploader({
+				templateUploadTotal: 1,
+				templateUploadResults: [
+					{ success: true, filename: 'one.zip', templates: [] },
+				],
+			});
+			wrapper.instance().removeMessage();
+
+			expect(wrapper.instance().renderStatus()).toBe(null);
+		});
+	});
+
+	describe('componentWillUnmount()', () => {
+		test('clears a finished batch', () => {
+			wrapper = setupUploader({
+				templateUploadTotal: 1,
+				templateUploadResults: [
+					{ success: true, filename: 'one.zip', templates: [] },
+				],
+			});
+			wrapper.instance().componentWillUnmount();
+
 			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(1);
 		});
 
-		test('componentDidUpdate() - handles several results landing in the same render', () => {
-			wrapper = setupBatch(2);
+		test('leaves a batch in flight alone', () => {
+			wrapper = setupUploader({ templateUploadTotal: 1 });
+			wrapper.instance().componentWillUnmount();
 
-			applyResults(wrapper, [
-				{ success: true, filename: 'one.zip', templates: [] },
-				{ success: false, filename: 'two.zip', message: 'boom' },
-			]);
-
-			expect(wrapper.state('completed')).toBe(2);
-			expect(wrapper.instance().isUploading).toBe(false);
-			expect(wrapper.state('errors')).toEqual([
-				{ filename: 'two.zip', message: 'boom' },
-			]);
-			expect(wrapper.state('showSuccess')).toBe(true);
-		});
-
-		test('componentDidUpdate() - still reports success when the last zip in the batch fails', () => {
-			wrapper = setupBatch(2);
-
-			applyResults(wrapper, [
-				{
-					success: true,
-					filename: 'one.zip',
-					templates: [{ template: 'Cellulose', id: 'cellulose' }],
-				},
-			]);
-
-			applyResults(wrapper, [
-				{ success: true, filename: 'one.zip', templates: [] },
-				{ success: false, filename: 'two.zip', message: 'boom' },
-			]);
-
-			expect(wrapper.state('showSuccess')).toBe(true);
-			expect(wrapper.state('errors')).toEqual([
-				{ filename: 'two.zip', message: 'boom' },
-			]);
-		});
-
-		test('componentDidUpdate() - falls back to the generic error when the server gave no reason', () => {
-			wrapper = setupBatch(1);
-
-			applyResults(wrapper, [
-				{ success: false, filename: 'one.zip', message: '' },
-			]);
-
-			expect(wrapper.state('errors')).toEqual([
-				{ filename: 'one.zip', message: 'genericError' },
-			]);
-			expect(wrapper.state('showSuccess')).toBe(false);
-			expect(wrapper.instance().isUploading).toBe(false);
-		});
-
-		test('componentDidUpdate() - ignores the store being cleared', () => {
-			wrapper = setupBatch(1);
-			wrapper.setState({ completed: 1 });
-
-			applyResults(wrapper, []);
-
-			expect(wrapper.state('completed')).toBe(1);
-			expect(addNewTemplateMock.mock.calls.length).toBe(0);
+			expect(clearTemplateUploadProcessingMock.mock.calls.length).toBe(0);
 		});
 	});
 
 	test('renders <TemplateUploader /> component', () => {
-		wrapper = shallow(<TemplateUploader />);
+		wrapper = setupUploader();
 		component = findByTestAttr(wrapper, 'component-dropzone');
 
 		expect(component.length).toBe(1);
 	});
 
 	test('has react-dropzone reject anything but a zip within the size limit', () => {
-		wrapper = shallow(<TemplateUploader maxFileSize={1000} />);
+		wrapper = setupUploader();
 		component = findByTestAttr(wrapper, 'component-dropzone');
 
 		expect(component.prop('accept')).toEqual({
@@ -346,25 +281,10 @@ describe('Template - TemplateUploader.js', () => {
 		expect(component.prop('maxSize')).toBe(1000);
 	});
 
-	test('renders <ShowMessage /> component for each error in state.errors', async () => {
-		wrapper = mount(<TemplateUploader />);
-		React.act(() =>
-			wrapper.setState({
-				errors: [
-					{ filename: 'one.zip', message: 'errorText' },
-					{ filename: 'two.zip', message: 'errorText' },
-				],
-			})
+	test('renders the upload progress notice while a batch is in flight', () => {
+		wrapper = mount(
+			<TemplateUploader {...uploaderProps({ templateUploadTotal: 1 })} />
 		);
-		component = findByTestAttr(wrapper, 'component-stateError-showMessage');
-
-		expect(component.length).toBe(2);
-		expect(component.first().prop('text')).toBe('one.zip: errorText');
-	});
-
-	test('renders the upload progress notice while a batch is in flight', async () => {
-		wrapper = mount(<TemplateUploader uploadInProgressText="uploading" />);
-		React.act(() => wrapper.setState({ total: 1, completed: 0 }));
 
 		expect(
 			findByTestAttr(wrapper, 'component-templateUploaderStatus').text()

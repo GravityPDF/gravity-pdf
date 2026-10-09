@@ -47,33 +47,11 @@ export const Routes = () => (
 						<TemplateList
 							templateDetailsText={GFPDF.templateDetails}
 							templateHeaderText={GFPDF.installedPdfs}
-							genericUploadErrorText={GFPDF.problemWithTheUpload}
 							activateText={GFPDF.select}
 							addTemplateText={GFPDF.addNewTemplate}
-							filenameErrorText={GFPDF.uploadInvalidNotZipFile}
-							filesizeErrorText={
-								GFPDF.uploadInvalidExceedsFileSizeLimit
-							}
-							installSuccessText={
-								GFPDF.templateSuccessfullyInstalled
-							}
-							installUpdatedText={
-								GFPDF.templateSuccessfullyUpdated
-							}
-							templateSuccessfullyInstalledUpdated={
-								GFPDF.templateSuccessfullyInstalledUpdated
-							}
 							templateInstallInstructions={
 								GFPDF.templateInstallInstructions
 							}
-							dropzoneText={GFPDF.templateUploadDropzone}
-							uploadInProgressText={
-								GFPDF.templateUploadInProgress
-							}
-							maxFileSize={parseInt(
-								GFPDF.templateUploadMaxSize,
-								10
-							)}
 						/>
 					}
 				/>

@@ -244,9 +244,9 @@ export const postTemplateUploadProcessing = (file, filename) => {
  * @return {{ type: string, payload: Object }} action object
  *
  * @since 5.2
- * @since 6.18.0 Added the `filename` parameter so concurrent uploads can be told apart
+ * @since 6.18.0 Added `filename`
  */
-export const templateUploadProcessingSuccess = (response, filename = '') => {
+export const templateUploadProcessingSuccess = (response, filename) => {
 	return {
 		type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
 		payload: { ...response, filename },
@@ -262,9 +262,9 @@ export const templateUploadProcessingSuccess = (response, filename = '') => {
  * @return {{ type: string, payload: Object }} action object
  *
  * @since 5.2
- * @since 6.18.0 Added the `filename` parameter so concurrent uploads can be told apart
+ * @since 6.18.0 Added `filename`
  */
-export const templateUploadProcessingFailed = (error, filename = '') => {
+export const templateUploadProcessingFailed = (error, filename) => {
 	return {
 		type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
 		payload: { ...error, filename },
