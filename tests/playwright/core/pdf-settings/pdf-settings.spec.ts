@@ -5,6 +5,10 @@ import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import * as path from 'node:path';
 import { snapshot } from '@self:playwright/utils/snapshot';
+import {
+	expectNoticeInPlace,
+	watchNoticePlacement,
+} from '@self:playwright/utils/notices';
 
 test.describe('Form PDF Settings', () => {
 	let pdf = null;
@@ -30,6 +34,44 @@ test.describe('Form PDF Settings', () => {
 			await pdf.waitForVisualEditors();
 		}
 	);
+
+	test.describe('Notices', () => {
+		test('should show the saved notice in place', async ({
+			page,
+		}, testinfo) => {
+			// A new PDF redirects to its own URL once saved, which drops the notice; an update keeps it
+			const pdfId = await pdf.addPdf(form.id, `Notice ${form.id}`);
+			await pdf.navigateToFormPdf(form.id, pdfId);
+			await pdf.waitForVisualEditors();
+			await watchNoticePlacement(page);
+			await pdf.addOrUpdatePdf();
+
+			await expectNoticeInPlace(page, 'PDF saved successfully.');
+
+			// Frame the notice through the first section heading so a styling change shows in the diff
+			await snapshot(page, testinfo, [
+				page.locator('#gf-admin-notices-wrapper'),
+				page.locator(
+					'#gfpdf-fieldset-gfpdf_form_settings_general > legend'
+				),
+			]);
+		});
+
+		test('should show the failed save notice in place', async ({
+			page,
+		}) => {
+			await watchNoticePlacement(page);
+
+			// The browser would stop a blank Label before the server could reject it
+			await page
+				.locator('#gfpdf_pdf_form')
+				.evaluate((el: HTMLFormElement) => (el.noValidate = true));
+			await pdf.fillField('Label', '');
+			await pdf.addOrUpdatePdf();
+
+			await expectNoticeInPlace(page, 'PDF could not be saved.');
+		});
+	});
 
 	test.describe('General', () => {
 		test('Label', async () => {

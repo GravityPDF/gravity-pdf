@@ -3,6 +3,10 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import { snapshot } from '@self:playwright/utils/snapshot';
+import {
+	expectNoticeInPlace,
+	watchNoticePlacement,
+} from '@self:playwright/utils/notices';
 
 const openGeneralTab = (admin: Admin) =>
 	admin.visitAdminPage(
@@ -14,6 +18,21 @@ const cacheSection = (page: Page) =>
 	page.locator('#gfpdf-fieldset-gfpdf_settings_general_cache');
 
 test.describe('Settings Tab', () => {
+	test('should show the saved notice in place', async ({
+		page,
+		admin,
+	}: {
+		page: Page;
+		admin: Admin;
+	}) => {
+		await openGeneralTab(admin);
+		await watchNoticePlacement(page);
+
+		await page.getByRole('button', { name: 'Save Settings' }).click();
+
+		await expectNoticeInPlace(page, 'Settings updated.');
+	});
+
 	test.describe('PDF Cache', () => {
 		test('should show Clear Cache beside the toggle only while the cache is on', async ({
 			page,
