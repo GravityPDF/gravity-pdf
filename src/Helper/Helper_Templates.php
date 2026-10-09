@@ -561,7 +561,7 @@ class Helper_Templates {
 	public function get_template_root_dir( $dir ) {
 		$dir = trailingslashit( $dir );
 
-		for ( $depth = 0; $depth < static::MAX_NESTED_DIRECTORIES; $depth++ ) {
+		for ( $depth = 0; $depth < self::MAX_NESTED_DIRECTORIES; $depth++ ) {
 			if ( count( $this->get_all_templates_in_folder( $dir ) ) > 0 ) {
 				return $dir;
 			}
