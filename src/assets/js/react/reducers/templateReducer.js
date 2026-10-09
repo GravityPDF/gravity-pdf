@@ -16,6 +16,8 @@ import {
 	DISMISS_TEMPLATE_UPLOAD_SUCCESS,
 	CLEAR_FINISHED_TEMPLATE_UPLOADS,
 } from '../actions/templates';
+/* Utilities */
+import { hasPendingUpload } from '../utilities/Template/hasPendingUpload';
 
 /**
  * Our Redux Template Reducer that take the objects returned from our Redux Template Actions
@@ -70,8 +72,25 @@ export const initialState = {
  *
  * @since 6.18.0
  */
-const currentBatch = (uploads) =>
-	uploads.some((upload) => upload.status === 'pending') ? uploads : [];
+const currentBatch = (uploads) => (hasPendingUpload(uploads) ? uploads : []);
+
+/**
+ * Keep the uploads that pass the check, returning the same state when none are dropped
+ *
+ * @param { TemplateReducerState } state
+ * @param { Function }             keep  Called with each upload
+ *
+ * @return { TemplateReducerState } The new state
+ *
+ * @since 6.18.0
+ */
+const keepUploads = (state, keep) => {
+	const templateUploads = state.templateUploads.filter(keep);
+
+	return templateUploads.length === state.templateUploads.length
+		? state
+		: { ...state, templateUploads };
+};
 
 /**
  * Update one upload in the batch
@@ -314,12 +333,7 @@ export default function (state = initialState, action) {
 		 * @since 6.18.0
 		 */
 		case DISMISS_TEMPLATE_UPLOAD_SUCCESS:
-			return {
-				...state,
-				templateUploads: state.templateUploads.filter(
-					(upload) => upload.status !== 'success'
-				),
-			};
+			return keepUploads(state, (upload) => upload.status !== 'success');
 
 		/**
 		 * Keep only the uploads still in flight
@@ -327,12 +341,7 @@ export default function (state = initialState, action) {
 		 * @since 6.18.0
 		 */
 		case CLEAR_FINISHED_TEMPLATE_UPLOADS:
-			return {
-				...state,
-				templateUploads: state.templateUploads.filter(
-					(upload) => upload.status === 'pending'
-				),
-			};
+			return keepUploads(state, (upload) => upload.status === 'pending');
 	}
 
 	/* None of these actions fired so return state */

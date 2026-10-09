@@ -103,10 +103,10 @@ describe('Template - TemplateUploader.js', () => {
 
 		test('queues the uploads before reporting the rejected files', () => {
 			const calls = [];
-			postTemplateUploadProcessingMock.mockImplementation(() =>
+			postTemplateUploadProcessingMock.mockImplementationOnce(() =>
 				calls.push('upload')
 			);
-			templateUploadRejectedMock.mockImplementation(() =>
+			templateUploadRejectedMock.mockImplementationOnce(() =>
 				calls.push('rejected')
 			);
 
@@ -130,9 +130,6 @@ describe('Template - TemplateUploader.js', () => {
 				{ filename: 'not-a-template.txt', message: 'notZip' },
 				{ filename: 'huge.zip', message: 'tooBig' },
 			]);
-
-			postTemplateUploadProcessingMock.mockReset();
-			templateUploadRejectedMock.mockReset();
 		});
 
 		test('ignores an empty drop', () => {
