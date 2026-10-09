@@ -7,6 +7,7 @@ use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Tests\Concerns\CreatesPdfHelper;
 use GFPDF\View\View_PDF;
 use GFPDF_Core_Model;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
@@ -31,6 +32,8 @@ use WP_UnitTestCase;
  * @group slow-pdf-processes
  */
 class Test_Slow_PDF_Processes extends WP_UnitTestCase {
+
+	use CreatesPdfHelper;
 
 	/**
 	 * Our Settings Controller
@@ -236,7 +239,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
 		$form    = $results['form'];
-		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/test-{$form['id']}.pdf";
+		$file    = $this->get_pdf_helper( $entry, $form['gfpdf_form_settings']['556690c67856b'] )->get_path() . "test-{$form['id']}.pdf";
 
 		$this->model->maybe_save_pdf( $entry, $form );
 
@@ -446,7 +449,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$entry   = $results['entry'];
 		$form    = $results['form'];
 
-		$filename = $gfpdf->data->template_tmp_location . "11556690c67856b/test-{$form['id']}.pdf";
+		$filename = $this->get_pdf_helper( $entry, $form['gfpdf_form_settings']['556690c67856b'] )->get_path() . "test-{$form['id']}.pdf";
 
 		if ( is_file( $filename ) ) {
 			unlink( $filename );
