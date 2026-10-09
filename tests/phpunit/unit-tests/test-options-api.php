@@ -97,7 +97,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_settings_page_redisplays_a_failed_save_after_other_reads_and_writes() {
 		set_transient( 'gfpdf_settings_user_data', array_merge( $this->options->get_settings(), [ 'default_font_size' => 17 ] ), 30 );
@@ -822,7 +822,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_failed_settings_save_keeps_the_saved_settings() {
 		global $wp_settings_errors;
@@ -862,7 +862,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_settings_save_ignores_other_plugins_settings_errors() {
 		global $wp_settings_errors;
@@ -879,7 +879,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_settings_save_ignores_non_error_notices() {
 		global $wp_settings_errors;
@@ -935,7 +935,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_settings_sanitize_keeps_the_general_filter_result() {
 		$_POST['_wp_http_referer'] = '?tab=general';
@@ -1046,7 +1046,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_sanitize_logged_out_timeout() {
 		$field = $this->options->get_registered_fields()['general_security']['logged_out_timeout'];

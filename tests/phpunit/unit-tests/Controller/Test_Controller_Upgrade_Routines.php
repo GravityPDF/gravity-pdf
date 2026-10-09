@@ -121,31 +121,31 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
 	}
 
-	public function test_6_17_3_fixes_a_logged_out_timeout_out_of_range() {
+	public function test_6_18_0_fixes_a_logged_out_timeout_out_of_range() {
 		$settings = $this->options->get_settings();
 
 		foreach ( [ 0, '-5' ] as $timeout ) {
 			$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => $timeout ] ) );
-			do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+			do_action( 'gfpdf_version_changed', '6.17.2', '6.18.0' );
 			$this->assertArrayNotHasKey( 'logged_out_timeout', get_option( 'gfpdf_settings' ) );
 		}
 
 		/* One over a week is capped at a week */
 		$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => '525600' ] ) );
-		do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+		do_action( 'gfpdf_version_changed', '6.17.2', '6.18.0' );
 		$this->assertSame( Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX, get_option( 'gfpdf_settings' )['logged_out_timeout'] );
 
 		/* A real timeout is left alone */
 		foreach ( [ '33', (string) Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX ] as $timeout ) {
 			$this->options->update_settings( array_merge( $settings, [ 'logged_out_timeout' => $timeout ] ) );
-			do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+			do_action( 'gfpdf_version_changed', '6.17.2', '6.18.0' );
 			$this->assertSame( $timeout, get_option( 'gfpdf_settings' )['logged_out_timeout'] );
 		}
 
 		$this->options->update_settings( $settings );
 	}
 
-	public function test_6_17_3_removes_the_nested_mpdf_cache() {
+	public function test_6_18_0_removes_the_nested_mpdf_cache() {
 		$data   = \GPDFAPI::get_data_class();
 		$cache  = $data->mpdf_tmp_location . '/mpdf';
 		$nested = $cache . '/mpdf/ttfontdata';
@@ -153,7 +153,7 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 		wp_mkdir_p( $nested );
 		touch( $nested . '/dejavusans.mtx.json' );
 
-		do_action( 'gfpdf_version_changed', '6.17.2', '6.17.3' );
+		do_action( 'gfpdf_version_changed', '6.17.2', '6.18.0' );
 
 		$this->assertDirectoryDoesNotExist( $cache . '/mpdf' );
 		$this->assertDirectoryExists( $cache . '/ttfontdata' );
@@ -168,7 +168,7 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 		wp_mkdir_p( $cache );
 		\GPDFAPI::get_misc_class()->rmdir( $cache );
 
-		do_action( 'gfpdf_version_changed', '6.17.3', '6.17.4' );
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.18.1' );
 
 		$this->assertDirectoryExists( $cache . '/ttfontdata' );
 	}

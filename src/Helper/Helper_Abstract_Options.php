@@ -102,7 +102,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @var array|null
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private $submitted_settings;
 
@@ -185,7 +185,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return  void
 	 * @since 4.0
-	 * @since 6.17.3 A failed save's submitted values go to the settings form, not get_option()
+	 * @since 6.18.0 A failed save's submitted values go to the settings form, not get_option()
 	 *
 	 */
 	public function set_plugin_settings() {
@@ -309,7 +309,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return array GFPDF settings
 	 * @since 4.0
-	 * @since 6.17.3 No longer returns a failed save's submitted values on a PDF settings page
+	 * @since 6.18.0 No longer returns a failed save's submitted values on a PDF settings page
 	 *
 	 */
 	public function get_settings() {
@@ -325,7 +325,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return array|null The submitted values, or null when none are waiting on a PDF settings page
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function pull_submitted_settings(): ?array {
 		if ( ! $this->misc->is_gfpdf_page() ) {
@@ -1107,8 +1107,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return array|false Sanitized settings, or the saved settings when validation fails
 	 *
 	 * @since 4.0
-	 * @since 6.17.3 Returns the saved settings when validation fails, rather than an empty array
-	 * @since 6.17.3 Only an error fails the save, not another notice
+	 * @since 6.18.0 Returns the saved settings when validation fails, rather than an empty array
+	 * @since 6.18.0 Only an error fails the save, not another notice
 	 *
 	 */
 	public function settings_sanitize( $input = [] ) {
@@ -1236,7 +1236,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return int|float Sanitized value
 	 * @since 4.0
 	 * @since 6.11 Force minimum and maximum values
-	 * @since 6.17.3 A blank or non-numeric value saves the field's default (or 0), then the min/max apply
+	 * @since 6.18.0 A blank or non-numeric value saves the field's default (or 0), then the min/max apply
 	 */
 	public function sanitize_number_field( $value, $key = '', $input = [], $settings = [] ) {
 		if ( ! is_numeric( $value ) ) {
@@ -1287,7 +1287,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return string|array $input Sanitized value
 	 * @since 4.0
-	 * @since 6.17.3 A field's top-level `sanitize_callback( $value )` replaces the type-based sanitizing
+	 * @since 6.18.0 A field's top-level `sanitize_callback( $value )` replaces the type-based sanitizing
 	 *
 	 */
 	public function sanitize_all_fields( $value, $key, $input, $settings ) {

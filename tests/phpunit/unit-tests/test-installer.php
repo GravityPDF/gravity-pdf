@@ -77,7 +77,7 @@ class Test_Installer extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_setup_defaults_leaves_the_folders_to_the_installer() {
 		global $gfpdf;
@@ -172,7 +172,7 @@ class Test_Installer extends WP_UnitTestCase {
 	/**
 	 * mPDF's tempDir is the tmp folder, and mPDF adds the mpdf folder its cache lives in
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_mpdf_tmp_location() {
 		global $gfpdf;
@@ -267,7 +267,7 @@ class Test_Installer extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_create_folder_structures_stores_the_folders_it_cant_create_or_write_to() {
 		global $gfpdf;

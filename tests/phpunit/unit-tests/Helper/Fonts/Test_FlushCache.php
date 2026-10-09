@@ -49,7 +49,7 @@ class Test_FlushCache extends WP_UnitTestCase {
 	/**
 	 * A font change only deletes that font's data, so other fonts don't need rebuilding
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_flush_cache_for_one_font() {
 		$font_data = \GPDFAPI::get_data_class()->mpdf_tmp_location . '/mpdf/ttfontdata/';

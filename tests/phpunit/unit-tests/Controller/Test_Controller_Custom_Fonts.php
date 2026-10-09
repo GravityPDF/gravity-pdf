@@ -154,7 +154,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_add_item_recreates_a_missing_font_folder() {
 		global $gfpdf;

@@ -769,7 +769,7 @@ final class GPDFAPI {
 	 * @return string|WP_Error The unescaped URL, or a WP_Error on failure: invalid_entry, invalid_pdf_setting, inactive or
 	 *                         conditional_logic
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public static function get_pdf_url( $entry_id, $pdf_id, $args = [] ) {
 		$entry = self::get_form_class()->get_entry( $entry_id );

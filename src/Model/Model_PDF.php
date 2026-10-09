@@ -691,7 +691,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function can_user_view_entry( $entry, $settings, $user_id = null ) {
 		$user_id = $user_id === null ? get_current_user_id() : (int) $user_id;
@@ -2037,7 +2037,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return void
 	 *
 	 * @since 4.0
-	 * @since 6.17.3 Recreates mPDF's cache folders afterwards
+	 * @since 6.18.0 Recreates mPDF's cache folders afterwards
 	 */
 	public function cleanup_tmp_dir() {
 

@@ -918,7 +918,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Detect any Gravity PDF messages and add to our notice system
 	 *
 	 * @since 6.0
-	 * @since 6.17.3 Only an error shows as an error, matching what fails a settings save
+	 * @since 6.18.0 Only an error shows as an error, matching what fails a settings save
 	 */
 	public function add_admin_messages() {
 		$messages = get_settings_errors( 'gfpdf-notices' );
@@ -959,7 +959,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		 * @param array $new_value The saved settings after the update
 		 *
 		 * @since 6.12.6
-		 * @since 6.17.3 Runs once the settings are saved, so a save that fails validation keeps the queue
+		 * @since 6.18.0 Runs once the settings are saved, so a save that fails validation keeps the queue
 		 */
 		$clear_queue_on_toggle = function ( $old_value, $new_value ) use ( $queue ) {
 			$was_enabled = ( $old_value['background_processing'] ?? '' ) === 'Yes';

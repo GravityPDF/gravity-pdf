@@ -1424,7 +1424,7 @@ class Test_PDF extends WP_UnitTestCase {
 	/**
 	 * The cleanup puts back mPDF's cache folders, so no render has to race another to create them
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_cleanup_tmp_dir_recreates_the_mpdf_cache_folders() {
 		global $gfpdf;

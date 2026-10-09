@@ -543,7 +543,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 	/**
 	 * @since 6.0
-	 * @since 6.17.3 Reads the folder check, which tests by writing a file, as is_writable() can call a writable
+	 * @since 6.18.0 Reads the folder check, which tests by writing a file, as is_writable() can call a writable
 	 *               network share read-only
 	 */
 	protected function is_temporary_folder_writable( array $unwritable_folders ): array {
@@ -572,7 +572,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 *
 	 * @param string[] $folders
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function get_folder_permissions( array $folders ): array {
 		$relative = array_map( [ $this->misc, 'relative_path' ], $folders );

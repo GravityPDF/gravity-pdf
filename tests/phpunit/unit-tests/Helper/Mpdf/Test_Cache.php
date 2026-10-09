@@ -80,7 +80,7 @@ class Test_Cache extends WP_UnitTestCase {
 	/**
 	 * is_writable() can call a writable network share read-only, so the directory existing is enough
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_a_directory_reported_read_only_still_gets_a_cache() {
 		$basepath = sys_get_temp_dir() . '/mpdf-cache-read-only';
@@ -105,7 +105,7 @@ class Test_Cache extends WP_UnitTestCase {
 	/**
 	 * The plugin's idea of where mPDF's cache lives matches where mPDF puts it
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_mpdf_keeps_its_cache_in_the_mpdf_folder_of_its_tempdir() {
 		$data  = \GPDFAPI::get_data_class();

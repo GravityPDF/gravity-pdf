@@ -2,7 +2,7 @@
 
 ## Gravity PDF
 
-### 6.17.3
+### 6.18.0
 * 🔒 Security: Only sign PDF URLs when the shortcode or merge tag comes from a trusted source
 * 🔒 Security: Cap signed PDF URLs at 1 year and the Logged Out Timeout at 1 week
 * 🧹 Housekeeping: Stop checking for the existence of Gravity PDF folders on every page load

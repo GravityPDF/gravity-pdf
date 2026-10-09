@@ -404,7 +404,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @return mixed
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function encode_value_tags( $value ) {
 		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
@@ -437,7 +437,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @return string
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function parse_choice_text( $text ) {
 		return Kses::parse( $this->gform->process_tags( wp_specialchars_decode( $text, ENT_QUOTES ), $this->form, $this->entry ) );
@@ -450,7 +450,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @return string
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function decode_shortcode_quotes( $value ) {
 		if ( strpos( $value, '[' ) === false ) {
@@ -471,7 +471,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @return array<string,string>
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function get_encoded_default_tags() {
 		$map = [];
@@ -495,7 +495,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function is_choice_value( $value ) {
 		if ( ! $this->field instanceof GF_Field ) {
@@ -522,7 +522,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 *
 	 * @return string
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function process_value_tags( $value ) {
 		$default_tags = $this->get_encoded_default_tags();
@@ -544,7 +544,7 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	/**
 	 * @return Model_Signed_Url_Trust
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function get_signed_url_trust() {
 		return \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );

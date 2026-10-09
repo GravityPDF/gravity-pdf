@@ -769,7 +769,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_create_mpdf_cache_folders() {
 		$cache = \GPDFAPI::get_data_class()->mpdf_tmp_location . '/mpdf';
@@ -790,7 +790,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_get_tmp_locations() {
 		$data = \GPDFAPI::get_data_class();
@@ -809,7 +809,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_is_directory_writable() {
 		$tmp = \GPDFAPI::get_data_class()->template_tmp_location;
@@ -821,7 +821,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_create_folder_protects_a_recreated_tmp_folder() {
 		$tmp = \GPDFAPI::get_data_class()->template_tmp_location;

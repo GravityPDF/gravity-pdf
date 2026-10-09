@@ -480,7 +480,7 @@ class Helper_Misc {
 	 *
 	 * @return string[]
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function get_tmp_locations(): array {
 		$locations = [ $this->data->template_tmp_location ];
@@ -495,7 +495,7 @@ class Helper_Misc {
 	/**
 	 * Create mPDF's cache folders ahead of a render, so concurrent PDFs don't race to create them
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function create_mpdf_cache_folders(): void {
 		$this->create_folder( $this->data->mpdf_tmp_location . '/mpdf/ttfontdata' );
@@ -508,7 +508,7 @@ class Helper_Misc {
 	 *
 	 * @return bool False if the folder couldn't be created
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function create_folder( string $dir ): bool {
 		$existed = is_dir( $dir );
@@ -530,7 +530,7 @@ class Helper_Misc {
 	/**
 	 * Stop the web server listing or serving the PDF tmp folder
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function protect_tmp_folder(): void {
 		$tmp = $this->data->template_tmp_location;
@@ -556,7 +556,7 @@ class Helper_Misc {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function is_directory_writable( string $dir ): bool {
 		$file = trailingslashit( $dir ) . '.gfpdf-write-test-' . wp_generate_password( 12, false );

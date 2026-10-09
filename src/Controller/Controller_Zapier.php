@@ -25,14 +25,14 @@ class Controller_Zapier {
 	/**
 	 * @var Model_Shortcodes
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected $shortcodes;
 
 	/**
 	 * @param Model_Shortcodes|null $shortcodes Optional for backwards compatibility; defaults to the plugin's instance
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function __construct( ?Model_Shortcodes $shortcodes = null ) {
 		$this->shortcodes = $shortcodes ?? \GPDFAPI::get_mvc_class( 'Model_Shortcodes' );
