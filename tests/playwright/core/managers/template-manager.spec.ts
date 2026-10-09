@@ -242,6 +242,33 @@ test.describe('Template Manager', () => {
 		await snapshot(page, testinfo, status);
 	});
 
+	test('should clear the upload status when the Template Manager is reopened', async ({
+		page,
+	}) => {
+		await openTemplateManagerShowingRubix(page);
+
+		await page
+			.locator('.gfpdf-template-dropzone input[type="file"]')
+			.setInputFiles({
+				name: 'not-a-template.txt',
+				mimeType: 'text/plain',
+				buffer: Buffer.from('not a template'),
+			});
+
+		const status = page.locator('.gfpdf-dropzone-status');
+		await expect(status.locator('.notice.error')).toHaveCount(1);
+
+		await page.getByRole('button', { name: 'close', exact: true }).click();
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
+
+		await expect(
+			page.getByRole('heading', { name: 'Installed PDFs' })
+		).toBeVisible();
+		await expect(status).toBeHidden();
+	});
+
 	test('should show the details of a template', async ({
 		page,
 	}, testinfo) => {

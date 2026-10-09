@@ -3,7 +3,6 @@
   "private": true,
   "dependencies": {
     "algoliasearch": "^5.35.0",
-    "classnames": "^2.3.1",
     "history": "^5.3.0",
     "lodash.debounce": "^4.0.8",
     "object-to-formdata": "^4.4.2",

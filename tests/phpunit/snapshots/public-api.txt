@@ -701,8 +701,8 @@ class GFPDF\Helper\Helper_Templates
     public function get_template_info_by_path($template_path, $cache_name = '', $cache_time = 604800)
     public function get_template_path()
     public function get_template_path_by_id($template_id, $include_core = true)
-    public function get_template_root_dir($dir)
     public function get_template_url()
+    public function get_templates_in_extracted_zip($dir)
     public function get_unfiltered_template_list()
     public function human_readable_template_name($name)
     public function is_legacy_template(array $info): bool

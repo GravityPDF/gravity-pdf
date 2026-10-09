@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { Routes as Switch, Route } from 'react-router-dom';
 /* Components */
-import Empty from '../components/Empty';
+import TemplateManagerClosed from '../components/Template/TemplateManagerClosed';
 import CustomHashRouter from '../components/CustomHashRouter';
 import withRouterHooks from '../utilities/withRouterHooks';
 const TemplateList = lazy(() => import('../components/Template/TemplateList'));
@@ -32,7 +32,7 @@ const TemplateSingle = lazy(
  *
  * /template/ (../components/TemplateList)
  * /template/:id (../components/TemplateSingle)
- * All other routes (../components/Empty)
+ * All other routes (../components/Template/TemplateManagerClosed)
  *
  * @since 4.1
  */
@@ -47,33 +47,11 @@ export const Routes = () => (
 						<TemplateList
 							templateDetailsText={GFPDF.templateDetails}
 							templateHeaderText={GFPDF.installedPdfs}
-							genericUploadErrorText={GFPDF.problemWithTheUpload}
 							activateText={GFPDF.select}
 							addTemplateText={GFPDF.addNewTemplate}
-							filenameErrorText={GFPDF.uploadInvalidNotZipFile}
-							filesizeErrorText={
-								GFPDF.uploadInvalidExceedsFileSizeLimit
-							}
-							installSuccessText={
-								GFPDF.templateSuccessfullyInstalled
-							}
-							installUpdatedText={
-								GFPDF.templateSuccessfullyUpdated
-							}
-							templateSuccessfullyInstalledUpdated={
-								GFPDF.templateSuccessfullyInstalledUpdated
-							}
 							templateInstallInstructions={
 								GFPDF.templateInstallInstructions
 							}
-							dropzoneText={GFPDF.templateUploadDropzone}
-							uploadInProgressText={
-								GFPDF.templateUploadInProgress
-							}
-							maxFileSize={parseInt(
-								GFPDF.templateUploadMaxSize,
-								10
-							)}
 						/>
 					}
 				/>
@@ -103,7 +81,7 @@ export const Routes = () => (
 						/>
 					}
 				/>
-				<Route path="*" element={<Empty />} />
+				<Route path="*" element={<TemplateManagerClosed />} />
 			</Switch>
 		</CustomHashRouter>
 	</Suspense>

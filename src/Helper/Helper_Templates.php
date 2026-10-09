@@ -524,12 +524,15 @@ class Helper_Templates {
 	 * @return array
 	 */
 	public function get_all_templates_in_folder( $folder ) {
-		return $this->list_folder(
-			$folder,
-			function ( $current ) {
-				return ! $current->isDir() && $current->getExtension() === 'php';
+		$templates = [];
+
+		foreach ( $this->list_folder( $folder ) as $item ) {
+			if ( $this->is_template_file( $item ) ) {
+				$templates[] = $item->getPathname();
 			}
-		);
+		}
+
+		return $templates;
 	}
 
 	/**
@@ -548,62 +551,71 @@ class Helper_Templates {
 	}
 
 	/**
-	 * Find the directory holding the PDF templates inside an extracted zip
+	 * Find the PDF templates inside an extracted zip
 	 *
 	 * Re-zipping a folder Safari auto-extracted nests the templates, so descend through single-directory wrappers.
 	 *
 	 * @param string $dir The directory the zip was extracted to
 	 *
-	 * @return string The directory containing the PDF templates, with a trailing slash
+	 * @return array{dir: string, templates: string[]} The directory the templates sit in, and their full paths
 	 *
 	 * @since 6.18.0
 	 */
-	public function get_template_root_dir( $dir ) {
-		$dir = trailingslashit( $dir );
+	public function get_templates_in_extracted_zip( $dir ) {
+		for ( $depth = 0; ; $depth++ ) {
+			$templates      = [];
+			$subdirectories = [];
 
-		for ( $depth = 0; $depth < self::MAX_NESTED_DIRECTORIES; $depth++ ) {
-			if ( count( $this->get_all_templates_in_folder( $dir ) ) > 0 ) {
-				return $dir;
-			}
-
-			/* Hidden directories are tooling leftovers (.git, .idea), not the template we're looking for */
-			$subdirectories = $this->list_folder(
-				$dir,
-				function ( $current ) {
-					return $current->isDir() && $current->getFilename()[0] !== '.';
+			foreach ( $this->list_folder( $dir ) as $item ) {
+				if ( $this->is_template_file( $item ) ) {
+					$templates[] = $item->getPathname();
+				} elseif ( $item->isDir() && $item->getFilename()[0] !== '.' ) {
+					/* Hidden directories are tooling leftovers (.git, .idea), not the template we're looking for */
+					$subdirectories[] = $item->getPathname();
 				}
-			);
-
-			/* Anything other than a single wrapper directory is ambiguous, so leave the path alone */
-			if ( count( $subdirectories ) !== 1 ) {
-				return $dir;
 			}
 
-			$dir = trailingslashit( $subdirectories[0] );
+			if ( count( $templates ) > 0 ) {
+				break;
+			}
+
+			/* Only a lone wrapper directory is unambiguous */
+			if ( count( $subdirectories ) !== 1 || $depth === self::MAX_NESTED_DIRECTORIES ) {
+				break;
+			}
+
+			$dir = $subdirectories[0];
 		}
 
-		return $dir;
+		return [
+			'dir'       => trailingslashit( $dir ),
+			'templates' => $templates,
+		];
 	}
 
 	/**
-	 * Get the full paths of everything in a folder that matches a filter
+	 * @param \SplFileInfo $item
 	 *
-	 * @param string   $folder
-	 * @param callable $filter Receives a SplFileInfo and returns whether to include it
-	 *
-	 * @return string[]
+	 * @return bool
 	 *
 	 * @since 6.18.0
 	 */
-	protected function list_folder( $folder, callable $filter ) {
+	private function is_template_file( $item ) {
+		return ! $item->isDir() && $item->getExtension() === 'php';
+	}
+
+	/**
+	 * Get everything in a folder
+	 *
+	 * @param string $folder
+	 *
+	 * @return \SplFileInfo[]
+	 *
+	 * @since 6.18.0
+	 */
+	protected function list_folder( $folder ) {
 		try {
-			$matches = [];
-
-			foreach ( new \CallbackFilterIterator( new \FilesystemIterator( $folder ), $filter ) as $item ) {
-				$matches[] = $item->getPathname();
-			}
-
-			return $matches;
+			return iterator_to_array( new \FilesystemIterator( $folder ), false );
 		} catch ( \Exception $e ) {
 			$this->log->error( $e->getMessage() );
 

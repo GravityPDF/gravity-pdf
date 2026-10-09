@@ -17,8 +17,11 @@ export const TEMPLATE_UPLOAD_PROCESSING_SUCCESS =
 	'TEMPLATE_UPLOAD_PROCESSING_SUCCESS';
 export const TEMPLATE_UPLOAD_PROCESSING_FAILED =
 	'TEMPLATE_UPLOAD_PROCESSING_FAILED';
-export const CLEAR_TEMPLATE_UPLOAD_PROCESSING =
-	'CLEAR_TEMPLATE_UPLOAD_PROCESSING';
+export const TEMPLATE_UPLOAD_REJECTED = 'TEMPLATE_UPLOAD_REJECTED';
+export const DISMISS_TEMPLATE_UPLOAD_SUCCESS =
+	'DISMISS_TEMPLATE_UPLOAD_SUCCESS';
+export const CLEAR_FINISHED_TEMPLATE_UPLOADS =
+	'CLEAR_FINISHED_TEMPLATE_UPLOADS';
 
 /**
  * Redux Actions - payloads of information that send data from your application to your store
@@ -215,15 +218,19 @@ export const clearTemplateProcessing = () => {
 	};
 };
 
+/* Identifies each upload, so its result updates the right entry */
+let uploadId = 0;
+
 /**
  * Fires request template to our endpoint for processing
  *
  * @param { Object } file
  * @param { string } filename
  *
- * @return {{ type: string, payload: { file: Object, filename: string } }} action object
+ * @return {{ type: string, payload: { file: Object, filename: string, id: number } }} action object
  *
  * @since 5.2
+ * @since 6.18.0 Added `id`
  */
 export const postTemplateUploadProcessing = (file, filename) => {
 	return {
@@ -231,55 +238,85 @@ export const postTemplateUploadProcessing = (file, filename) => {
 		payload: {
 			file,
 			filename,
+			id: ++uploadId,
 		},
 	};
 };
 
 /**
- * Fires request template to our endpoint for processing
+ * Fires when a zip's templates are installed
  *
- * @param { Object } response
- * @param { string } filename The zip the response belongs to
+ * @param { number }        id        The upload the templates came from
+ * @param { Array<Object> } templates The installed templates
  *
- * @return {{ type: string, payload: Object }} action object
+ * @return {{ type: string, payload: { id: number, templates: Array<Object> } }} action object
  *
  * @since 5.2
- * @since 6.18.0 Added the `filename` parameter so concurrent uploads can be told apart
+ * @since 6.18.0 Takes the upload `id` and its templates
  */
-export const templateUploadProcessingSuccess = (response, filename = '') => {
+export const templateUploadProcessingSuccess = (id, templates) => {
 	return {
 		type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
-		payload: { ...response, filename },
+		payload: { id, templates },
 	};
 };
 
 /**
- * Fires Update/Show error
+ * Fires when a zip fails to install
  *
- * @param { Object } error
- * @param { string } filename The zip the error belongs to
+ * @param { number } id      The upload that failed
+ * @param { string } message Why it failed
  *
- * @return {{ type: string, payload: Object }} action object
+ * @return {{ type: string, payload: { id: number, message: string } }} action object
  *
  * @since 5.2
- * @since 6.18.0 Added the `filename` parameter so concurrent uploads can be told apart
+ * @since 6.18.0 Takes the upload `id` and a message
  */
-export const templateUploadProcessingFailed = (error, filename = '') => {
+export const templateUploadProcessingFailed = (id, message) => {
 	return {
 		type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-		payload: { ...error, filename },
+		payload: { id, message },
 	};
 };
 
 /**
- * Fires to clear/reset the results of the current batch of template uploads
+ * Fires for the files the file picker or drop refused before upload
+ *
+ * @param { Array<{ filename: string, message: string }> } rejections
+ *
+ * @return {{ type: string, payload: Array<Object> }} action object
+ *
+ * @since 6.18.0
+ */
+export const templateUploadRejected = (rejections) => {
+	return {
+		type: TEMPLATE_UPLOAD_REJECTED,
+		payload: rejections,
+	};
+};
+
+/**
+ * Fires to hide the success message for the current batch of uploads
  *
  * @return {{ type: string }} action object
  *
- * @since 5.2
+ * @since 6.18.0
  */
-export const clearTemplateUploadProcessing = () => {
+export const dismissTemplateUploadSuccess = () => {
 	return {
-		type: CLEAR_TEMPLATE_UPLOAD_PROCESSING,
+		type: DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+	};
+};
+
+/**
+ * Fires to drop every upload that has reported back, so a closed Template Manager reopens without old results
+ *
+ * @return {{ type: string }} action object
+ *
+ * @since 6.18.0
+ */
+export const clearFinishedTemplateUploads = () => {
+	return {
+		type: CLEAR_FINISHED_TEMPLATE_UPLOADS,
 	};
 };

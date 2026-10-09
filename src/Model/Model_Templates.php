@@ -124,7 +124,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Unzip and check the PDF templates look valid */
 		try {
-			$unzipped_dir_name = $this->unzip_and_verify_templates( $zip_path );
+			$found = $this->unzip_and_verify_templates( $zip_path );
 		} catch ( Exception $e ) {
 			$this->cleanup_template_files( $zip_path );
 
@@ -149,13 +149,14 @@ class Model_Templates extends Helper_Abstract_Model {
 		}
 
 		/* Copy all the files to the active PDF working directory */
-		$template_path = $this->templates->get_template_path();
+		$unzipped_dir_name = $found['dir'];
+		$template_path     = $this->templates->get_template_path();
 
 		$results = $this->misc->copyr( $unzipped_dir_name, $template_path );
 
 		/* Get the template headers now all the files are in the right location */
 		$this->templates->flush_template_transient_cache();
-		$headers = $this->get_template_info( $this->templates->get_all_templates_in_folder( $unzipped_dir_name ) );
+		$headers = $this->get_template_info( $found['templates'] );
 
 		/* Fix template path */
 		$headers = array_map(
@@ -335,12 +336,12 @@ class Model_Templates extends Helper_Abstract_Model {
 	 *
 	 * @param string $zip_path The full path to the zip file
 	 *
-	 * @return string The directory the PDF templates were found in
+	 * @return array{dir: string, templates: string[]} The directory the PDF templates sit in, and their full paths
 	 *
 	 * @throws Exception Thrown if a PDF template file isn't valid
 	 *
 	 * @since 4.1
-	 * @since 6.18.0 Returns the directory the PDF templates were found in
+	 * @since 6.18.0 Looks inside wrapper folders
 	 */
 	public function unzip_and_verify_templates( $zip_path ) {
 		$this->enable_wp_filesystem();
@@ -353,20 +354,18 @@ class Model_Templates extends Helper_Abstract_Model {
 			throw new Exception( esc_html( $results->get_error_message() ) );
 		}
 
-		$dir = $this->templates->get_template_root_dir( $dir );
-
 		/* Check unzipped templates for a valid v4 header, or v3 string pattern.
 		   Avoid glob() here — it can return a stale (empty) listing when called
 		   immediately after unzip_file() writes via the WP_Filesystem abstraction */
-		$files = $this->templates->get_all_templates_in_folder( $dir );
+		$found = $this->templates->get_templates_in_extracted_zip( $dir );
 
-		if ( ! is_array( $files ) || count( $files ) === 0 ) {
+		if ( count( $found['templates'] ) === 0 ) {
 			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );
 		}
 
-		$this->check_for_valid_pdf_templates( $files );
+		$this->check_for_valid_pdf_templates( $found['templates'] );
 
-		return $dir;
+		return $found;
 	}
 
 	/**
