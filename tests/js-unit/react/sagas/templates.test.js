@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest, takeEvery } from 'redux-saga/effects';
 import {
 	watchUpdateSelectBox,
 	watchTemplateProcessing,
@@ -78,9 +78,9 @@ describe('Sagas - templates', () => {
 	describe('watchpostTemplateUploadProcessing()', () => {
 		const gen = watchpostTemplateUploadProcessing();
 
-		test('should check the watcher to loads up the templateUploadProcessing function and call POST_TEMPLATE_UPLOAD_PROCESSING action', () => {
+		test('should take every POST_TEMPLATE_UPLOAD_PROCESSING action so multi-file drops all upload', () => {
 			expect(gen.next().value).toEqual(
-				takeLatest(
+				takeEvery(
 					POST_TEMPLATE_UPLOAD_PROCESSING,
 					templateUploadProcessing
 				)
@@ -119,7 +119,7 @@ describe('Sagas - templates', () => {
 			expect(gen.next(response).value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-					payload: { message: 'invalid zip' },
+					payload: { message: 'invalid zip', filename: 'test' },
 				})
 			);
 		});
@@ -139,7 +139,7 @@ describe('Sagas - templates', () => {
 			expect(gen.next(response).value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
-					payload: response.body,
+					payload: { ...response.body, filename: 'test' },
 				})
 			);
 		});
@@ -155,7 +155,7 @@ describe('Sagas - templates', () => {
 			expect(gen.next(response).value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-					payload: { message: '' },
+					payload: { message: '', filename: 'test' },
 				})
 			);
 		});
@@ -170,7 +170,7 @@ describe('Sagas - templates', () => {
 			expect(gen.throw({ message: 'network failure' }).value).toEqual(
 				put({
 					type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-					payload: { message: 'network failure' },
+					payload: { message: 'network failure', filename: 'test' },
 				})
 			);
 		});

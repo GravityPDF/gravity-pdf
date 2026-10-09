@@ -28,6 +28,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Templates {
 
 	/**
+	 * The largest PDF template zip we'll accept, in bytes
+	 *
+	 * @since 6.18.0
+	 */
+	public const MAX_UPLOAD_SIZE = 32 * MB_IN_BYTES;
+
+	/**
+	 * How many nested wrapper directories we'll look through to find the PDF templates
+	 *
+	 * @since 6.18.0
+	 */
+	private const MAX_NESTED_DIRECTORIES = 3;
+
+	/**
 	 * Holds our log class
 	 *
 	 * @var LoggerInterface
@@ -510,23 +524,89 @@ class Helper_Templates {
 	 * @return array
 	 */
 	public function get_all_templates_in_folder( $folder ) {
-		try {
-			$dir   = new \FilesystemIterator( $folder );
-			$files = new \CallbackFilterIterator(
+		return $this->list_folder(
+			$folder,
+			function ( $current ) {
+				return ! $current->isDir() && $current->getExtension() === 'php';
+			}
+		);
+	}
+
+	/**
+	 * The maximum size, in bytes, of a PDF template zip we'll accept
+	 *
+	 * Clamped to the server's limit: PHP discards an oversized POST, which then fails as a bad nonce, not a size error.
+	 *
+	 * @return int
+	 *
+	 * @since 6.18.0
+	 */
+	public static function get_max_upload_size() {
+		$max_size = min( static::MAX_UPLOAD_SIZE, wp_max_upload_size() ?: static::MAX_UPLOAD_SIZE );
+
+		return (int) apply_filters( 'gfpdf_template_max_upload_size', $max_size );
+	}
+
+	/**
+	 * Find the directory holding the PDF templates inside an extracted zip
+	 *
+	 * Re-zipping a folder Safari auto-extracted nests the templates, so descend through single-directory wrappers.
+	 *
+	 * @param string $dir The directory the zip was extracted to
+	 *
+	 * @return string The directory containing the PDF templates, with a trailing slash
+	 *
+	 * @since 6.18.0
+	 */
+	public function get_template_root_dir( $dir ) {
+		$dir = trailingslashit( $dir );
+
+		for ( $depth = 0; $depth < self::MAX_NESTED_DIRECTORIES; $depth++ ) {
+			if ( count( $this->get_all_templates_in_folder( $dir ) ) > 0 ) {
+				return $dir;
+			}
+
+			/* Hidden directories are tooling leftovers (.git, .idea), not the template we're looking for */
+			$subdirectories = $this->list_folder(
 				$dir,
 				function ( $current ) {
-					return ! $current->isDir() && $current->getExtension() === 'php';
+					return $current->isDir() && $current->getFilename()[0] !== '.';
 				}
 			);
 
-			$templates = [];
-			foreach ( $files as $file ) {
-				$templates[] = $file->getPathname();
+			/* Anything other than a single wrapper directory is ambiguous, so leave the path alone */
+			if ( count( $subdirectories ) !== 1 ) {
+				return $dir;
 			}
 
-			return $templates;
+			$dir = trailingslashit( $subdirectories[0] );
+		}
+
+		return $dir;
+	}
+
+	/**
+	 * Get the full paths of everything in a folder that matches a filter
+	 *
+	 * @param string   $folder
+	 * @param callable $filter Receives a SplFileInfo and returns whether to include it
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.18.0
+	 */
+	protected function list_folder( $folder, callable $filter ) {
+		try {
+			$matches = [];
+
+			foreach ( new \CallbackFilterIterator( new \FilesystemIterator( $folder ), $filter ) as $item ) {
+				$matches[] = $item->getPathname();
+			}
+
+			return $matches;
 		} catch ( \Exception $e ) {
 			$this->log->error( $e->getMessage() );
+
 			return [];
 		}
 	}
