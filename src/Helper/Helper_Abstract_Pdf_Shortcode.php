@@ -107,7 +107,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @return string
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function do_trusted_shortcode( $shortcode, $entry_id ) {
 		foreach ( $this->get_shortcode_information( static::SHORTCODE, $shortcode ) as $code ) {
@@ -132,7 +132,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @return mixed
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function gravitypdf_trust_administrative_field_shortcodes( $text, $form, $entry ) {
 		if ( ! is_string( $text ) || empty( $entry['id'] ) || ! is_array( $form ) || $this->get_trust()->is_untrusted() || ! has_shortcode( $text, static::SHORTCODE ) ) {
@@ -168,7 +168,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	/**
 	 * @return \GFPDF\Model\Model_Signed_Url_Trust
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function get_trust() {
 		return GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
@@ -358,7 +358,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @return array
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function add_shortcode_signing_token( $code ) {
 		$entry_id = (string) ( $code['attr']['entry'] ?? '' );

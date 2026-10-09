@@ -47,7 +47,7 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	 * The tasks the mocked queue last saved
 	 *
 	 * @var array
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public $saved_tasks = [];
 
@@ -285,7 +285,7 @@ class Test_Controller_Pdf_Queue extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_dispatch_queue_empties_the_queue() {
 		$this->queue_mock->push_to_queue( [ 'task' ] );

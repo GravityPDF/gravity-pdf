@@ -40,14 +40,14 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * The prefix each unwritable folder's dismissal is recorded under in `action_dismissal`
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	const UNWRITABLE_FOLDER_DISMISSAL = 'unwritable_folder_';
 
 	/**
 	 * How long dismissing the unwritable folders notice hides a folder that keeps failing
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	const UNWRITABLE_FOLDER_SNOOZE = WEEK_IN_SECONDS;
 
@@ -108,7 +108,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @return boolean       True if dismissed, false otherwise
 	 *
 	 * @since 4.0
-	 * @since 6.17.3 Added $since and $ttl
+	 * @since 6.18.0 Added $since and $ttl
 	 */
 	public function is_notice_already_dismissed( $type, int $since = 0, int $ttl = 0 ) {
 
@@ -118,7 +118,7 @@ class Model_Actions extends Helper_Abstract_Model {
 			return false;
 		}
 
-		/* Dismissals before 6.17.3 recorded the notice ID rather than when */
+		/* Dismissals before 6.18.0 recorded the notice ID rather than when */
 		$dismissed_at = is_int( $dismissed_notices[ $type ] ) ? $dismissed_notices[ $type ] : 0;
 
 		return $dismissed_at >= $since && ( $ttl === 0 || $dismissed_at >= time() - $ttl );
@@ -260,7 +260,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * The folders the last Model_Install::create_folder_structures() couldn't create or write to, less the ones dismissed
 	 *
 	 * @return string[]
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function get_undismissed_unwritable_folders(): array {
 		$folders = [];
@@ -276,7 +276,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function has_unwritable_folders(): bool {
 		return $this->get_undismissed_unwritable_folders() !== [];
@@ -285,7 +285,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Dismiss each folder the notice was listing, until a week passes or the folder recovers and fails again
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function dismiss_unwritable_folders(): void {
 		$this->dismiss_notices( array_map( [ $this, 'get_unwritable_folder_dismissal' ], $this->get_undismissed_unwritable_folders() ) );
@@ -294,7 +294,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * The ID a folder's dismissal is recorded under in `action_dismissal`
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function get_unwritable_folder_dismissal( string $dir ): string {
 		return static::UNWRITABLE_FOLDER_DISMISSAL . md5( $dir );

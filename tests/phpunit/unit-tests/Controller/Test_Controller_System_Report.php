@@ -194,7 +194,7 @@ class Test_Controller_System_Report extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_folder_permissions_tests_the_folders_when_the_report_is_built() {
 		global $gfpdf;

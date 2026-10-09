@@ -116,7 +116,7 @@ class View_Actions extends Helper_Abstract_View {
 	 * @param string   $button_text The primary button text
 	 *
 	 * @return string The notice HTML
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function unwritable_folders( array $folders, string $type, string $button_text ): string {
 		$misc = GPDFAPI::get_misc_class();

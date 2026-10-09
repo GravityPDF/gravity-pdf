@@ -438,7 +438,7 @@ class Test_Settings extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_license_tab_save_keeps_message_links_and_encoded_url() {
 		global $gfpdf;

@@ -411,14 +411,14 @@ class Test_Actions extends WP_UnitTestCase {
 		$this->assertFalse( $this->model->is_notice_already_dismissed( $type, time() + 10 ) );
 		$this->assertTrue( $this->model->is_notice_already_dismissed( $type, 0, HOUR_IN_SECONDS ) );
 
-		/* Dismissals before 6.17.3 hold the notice ID: still dismissed, but too old for a time limit */
+		/* Dismissals before 6.18.0 hold the notice ID: still dismissed, but too old for a time limit */
 		$gfpdf->options->update_option( 'action_dismissal', [ $type => $type ] );
 		$this->assertTrue( $this->model->is_notice_already_dismissed( $type ) );
 		$this->assertFalse( $this->model->is_notice_already_dismissed( $type, 0, HOUR_IN_SECONDS ) );
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_unwritable_folders_notice() {
 		$tmp   = \GPDFAPI::get_data_class()->template_tmp_location;
@@ -448,7 +448,7 @@ class Test_Actions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_unwritable_folders_notice_returns_a_week_after_its_dismissal() {
 		global $gfpdf;

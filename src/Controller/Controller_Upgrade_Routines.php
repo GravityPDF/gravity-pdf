@@ -74,7 +74,7 @@ class Controller_Upgrade_Routines {
 			$this->remove_legacy_license_check_cron();
 		}
 
-		if ( version_compare( $current_version, '6.17.3', '>=' ) && version_compare( $old_version, '6.17.3', '<' ) ) {
+		if ( version_compare( $current_version, '6.18.0', '>=' ) && version_compare( $old_version, '6.18.0', '<' ) ) {
 			$this->fix_logged_out_timeout_out_of_range();
 			$this->remove_nested_mpdf_cache();
 		}
@@ -104,7 +104,7 @@ class Controller_Upgrade_Routines {
 	 * Remove a saved Logged Out Timeout below the new 1-minute minimum, so it reads as the 20-minute default, and cap
 	 * one above the new 1-week maximum
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function fix_logged_out_timeout_out_of_range(): void {
 		$settings = get_option( 'gfpdf_settings', [] );
@@ -123,7 +123,7 @@ class Controller_Upgrade_Routines {
 	/**
 	 * Remove the cache mPDF kept a folder deeper, at tmp/mpdf/mpdf, before its tempDir became the tmp folder
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function remove_nested_mpdf_cache(): void {
 		$nested_cache = $this->data->mpdf_tmp_location . '/mpdf/mpdf';

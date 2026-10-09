@@ -118,7 +118,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_pdf_queue_is_built_once() {
 		$action = 'wp_ajax_' . $this->loader->singleton->get_class( 'Helper_Pdf_Queue' )->get_identifier();
@@ -279,7 +279,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_add_admin_messages_shows_a_non_error_notice_as_a_notice() {
 		global $wp_settings_errors;

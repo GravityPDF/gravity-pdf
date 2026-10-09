@@ -36,7 +36,7 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * The option create_folder_structures() stores the folders it couldn't create or write to in, each with when it started failing
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	const UNWRITABLE_FOLDERS = 'gfpdf_unwritable_folders';
 
@@ -256,7 +256,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 *
 	 * @return string[]
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function get_folders(): array {
 		$folders = array_merge(
@@ -282,7 +282,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 *
 	 * @return string[] The folders that can't be created or written to
 	 * @since 4.0
-	 * @since 6.17.3 Runs on install, upgrade, the tmp cleanup cron and the system report rather than every request,
+	 * @since 6.18.0 Runs on install, upgrade, the tmp cleanup cron and the system report rather than every request,
 	 *               tests writing to each folder, and stores the ones it can't create or write to for the dismissible
 	 *               notice in Controller_Actions
 	 *

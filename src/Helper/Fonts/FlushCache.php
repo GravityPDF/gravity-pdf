@@ -32,7 +32,7 @@ class FlushCache {
 	 * @param string $font_id Only delete this font's data. Leave empty to delete every font's
 	 *
 	 * @since 6.0
-	 * @since 6.17.3 Deletes only font data, leaving PDFs being generated their temp files, and accepts a font ID
+	 * @since 6.18.0 Deletes only font data, leaving PDFs being generated their temp files, and accepts a font ID
 	 */
 	public static function flush( string $font_id = '' ): void {
 		$misc      = GPDFAPI::get_misc_class();

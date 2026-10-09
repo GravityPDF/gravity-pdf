@@ -119,7 +119,7 @@ class View_System_Report extends Helper_Abstract_View {
 	/**
 	 * @param string[] $folders The folders that can't be written to, relative to the site
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function get_folder_permissions( array $folders ): string {
 		$writable = $folders === [];
