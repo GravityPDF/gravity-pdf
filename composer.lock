@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c8c123c0b4b04cf79444297a42ece7f",
+    "content-hash": "53042bd71fd635f67c2a54ee802a3112",
     "packages": [
         {
             "name": "gravitypdf/querypath",
@@ -72,7 +72,7 @@
         },
         {
             "name": "gravitypdf/upload",
-            "version": "dev-main",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GravityPDF/Upload.git",
@@ -99,7 +99,6 @@
             "suggest": {
                 "ext-mbstring": "Truncates sanitized filenames on a character boundary and guarantees they are valid UTF-8"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -5131,7 +5130,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "gravitypdf/upload": 20,
         "mpdf/mpdf": 20,
         "roave/security-advisories": 20
     },
