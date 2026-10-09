@@ -23,7 +23,7 @@ import { TemplateUploaderContext } from './TemplateUploaderContext'
  * @since 6.18.0
  */
 const TemplateUploaderTile = ({ addTemplateText, templateInstallInstructions }) => {
-  const { open, ajax } = useContext(TemplateUploaderContext)
+  const { open, isUploading } = useContext(TemplateUploaderContext)
 
   const handleClick = (e) => {
     e.preventDefault()
@@ -34,7 +34,7 @@ const TemplateUploaderTile = ({ addTemplateText, templateInstallInstructions }) 
     <div data-test='component-templateUploaderTile' className='theme add-new-theme gfpdf-dropzone'>
       <a
         href='#/template'
-        className={ajax ? 'doing-ajax' : ''}
+        className={isUploading ? 'doing-ajax' : ''}
         onClick={handleClick}
         aria-labelledby='gfpdf-template-install-instructions'
       >

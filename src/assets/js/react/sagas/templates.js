@@ -1,5 +1,5 @@
 /* Dependencies */
-import { takeLatest, takeEvery, call, put } from 'redux-saga/effects'
+import { takeLatest, actionChannel, take, call, put } from 'redux-saga/effects'
 /* Redux action types & actions */
 import {
   updateSelectBoxSuccess,
@@ -60,24 +60,23 @@ export function * templateProcessing (action) {
  * @since 5.2
  */
 export function * templateUploadProcessing (action) {
-  const { file, filename } = action.payload
+  const { file, filename, id } = action.payload
+  let message
 
   try {
     const response = yield call(apiPostTemplateUploadProcessing, file, filename)
 
-    if (!response.ok || !response.body || !Array.isArray(response.body.templates)) {
-      const message = response.body && typeof response.body === 'object' && response.body.error
-        ? response.body.error
-        : ''
-
-      yield put(templateUploadProcessingFailed({ message }, filename))
+    if (response.ok && Array.isArray(response.body?.templates)) {
+      yield put(templateUploadProcessingSuccess(id, response.body.templates))
       return
     }
 
-    yield put(templateUploadProcessingSuccess(response.body, filename))
+    message = response.body?.error
   } catch (error) {
-    yield put(templateUploadProcessingFailed({ message: error.message }, filename))
+    message = error.message
   }
+
+  yield put(templateUploadProcessingFailed(id, message || GFPDF.problemWithTheUpload))
 }
 
 /**
@@ -99,12 +98,16 @@ export function * watchTemplateProcessing () {
 }
 
 /**
- * Watcher Saga watchTemplateProcessing for templateUploadProcessing()
+ * Watcher Saga watchpostTemplateUploadProcessing for templateUploadProcessing()
  *
- * Uses takeEvery so every zip in a multi-file drop is uploaded — takeLatest cancelled all but the last
+ * Uploads one zip at a time, so a large drop doesn't tie up every PHP worker
  *
  * @since 5.2
  */
 export function * watchpostTemplateUploadProcessing () {
-  yield takeEvery(POST_TEMPLATE_UPLOAD_PROCESSING, templateUploadProcessing)
+  const uploads = yield actionChannel(POST_TEMPLATE_UPLOAD_PROCESSING)
+
+  while (true) {
+    yield call(templateUploadProcessing, yield take(uploads))
+  }
 }

@@ -189,11 +189,11 @@ class Test_Templates extends WP_UnitTestCase {
 
 		try {
 			$this->model->move_template_to_tmp_dir( $this->getFileStub() );
-			unlink( $test_file );
 			$this->fail( 'Expected the disguised font to be refused.' );
 		} catch ( UploadException $e ) {
-			unlink( $test_file );
 			$this->assertSame( 'File validation failed', $e->getMessage() );
+		} finally {
+			unlink( $test_file );
 		}
 
 		/* Setup a valid zip */
@@ -372,10 +372,15 @@ class Test_Templates extends WP_UnitTestCase {
 		);
 
 		try {
-			$dir = $this->model->unzip_and_verify_templates( $zip );
+			$dir = $this->model->get_unzipped_dir_name( $zip ) . 'my-template/';
 
-			$this->assertSame( $this->model->get_unzipped_dir_name( $zip ) . 'my-template/', $dir );
-			$this->assertFileExists( $dir . 'zadani.php' );
+			$this->assertSame(
+				[
+					'dir'       => $dir,
+					'templates' => [ $dir . 'zadani.php' ],
+				],
+				$this->model->unzip_and_verify_templates( $zip )
+			);
 		} finally {
 			@unlink( $zip ); /* phpcs:ignore */
 			$gfpdf->misc->rmdir( $this->model->get_unzipped_dir_name( $zip ) );
@@ -384,14 +389,14 @@ class Test_Templates extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @param string $expected  Path relative to the extracted directory
-	 * @param array  $entries   Zip contents
+	 * @param string[] $expected Template paths relative to the extracted directory
+	 * @param array    $entries  Zip contents
 	 *
 	 * @since        6.18.0
 	 *
-	 * @dataProvider provider_get_template_root_dir
+	 * @dataProvider provider_get_templates_in_extracted_zip
 	 */
-	public function test_get_template_root_dir( string $expected, array $entries ) {
+	public function test_get_templates_in_extracted_zip( array $expected, array $entries ) {
 		global $gfpdf;
 
 		$zip = $this->make_zip( $entries );
@@ -407,7 +412,18 @@ class Test_Templates extends WP_UnitTestCase {
 			$dir = $this->model->get_unzipped_dir_name( $zip );
 			unzip_file( $zip, $dir );
 
-			$this->assertSame( $dir . $expected, $gfpdf->templates->get_template_root_dir( $dir ) );
+			$templates = $gfpdf->templates->get_templates_in_extracted_zip( $dir )['templates'];
+			sort( $templates );
+
+			$this->assertSame(
+				array_map(
+					function ( $path ) use ( $dir ) {
+						return $dir . $path;
+					},
+					$expected
+				),
+				$templates
+			);
 		} finally {
 			remove_filter( 'filesystem_method', $direct );
 			@unlink( $zip ); /* phpcs:ignore */
@@ -420,52 +436,62 @@ class Test_Templates extends WP_UnitTestCase {
 	 *
 	 * @since 6.18.0
 	 */
-	public function provider_get_template_root_dir(): array {
+	public function provider_get_templates_in_extracted_zip(): array {
 		$zadani = PDF_PLUGIN_DIR . 'src/templates/zadani.php';
+		$rubix  = PDF_PLUGIN_DIR . 'src/templates/rubix.php';
 
 		return [
-			'templates at the top level'      => [
-				'',
-				[ 'zadani.php' => $zadani ],
+			'templates at the top level' => [
+				[ 'rubix.php', 'zadani.php' ],
+				[
+					'zadani.php'      => $zadani,
+					'rubix.php'       => $rubix,
+					'images/logo.txt' => 'not a template',
+				],
 			],
 
-			'wrapped in a single folder'      => [
-				'my-template/',
+			'wrapped in a single folder' => [
+				[ 'my-template/zadani.php' ],
 				[ 'my-template/zadani.php' => $zadani ],
 			],
 
 			/* A Finder-compressed folder — unzip_file() drops the root __MACOSX, leaving one wrapper */
-			'macOS-compressed folder'         => [
-				'my-template/',
+			'macOS-compressed folder'    => [
+				[ 'my-template/zadani.php' ],
 				[
 					'my-template/zadani.php'            => $zadani,
 					'__MACOSX/my-template/._zadani.php' => 'apple double',
 				],
 			],
 
-			'wrapped twice'                   => [
-				'outer/inner/',
-				[ 'outer/inner/zadani.php' => $zadani ],
+			'wrapped three times'        => [
+				[ 'a/b/c/zadani.php' ],
+				[ 'a/b/c/zadani.php' => $zadani ],
 			],
 
-			'hidden folders are skipped'      => [
-				'my-template/',
+			'wrapped too deep'           => [
+				[],
+				[ 'a/b/c/d/zadani.php' => $zadani ],
+			],
+
+			'hidden folders are skipped' => [
+				[ 'my-template/zadani.php' ],
 				[
 					'my-template/zadani.php' => $zadani,
 					'.git/HEAD'              => 'ref: refs/heads/main',
 				],
 			],
 
-			'ambiguous, so left alone'        => [
-				'',
+			'ambiguous'                  => [
+				[],
 				[
 					'one/zadani.php' => $zadani,
-					'two/rubix.php'  => PDF_PLUGIN_DIR . 'src/templates/rubix.php',
+					'two/rubix.php'  => $rubix,
 				],
 			],
 
-			'assets only, so left alone'      => [
-				'images/',
+			'assets only'                => [
+				[],
 				[ 'images/logo.txt' => 'not a template' ],
 			],
 		];
@@ -495,7 +521,7 @@ class Test_Templates extends WP_UnitTestCase {
 		remove_filter( 'gfpdf_template_max_upload_size', $override );
 	}
 
-	/** Build a zip at a unique tmp path; entries map archive-name => file path (added via addFile) or raw content string (addFromString). */
+	/** Build a zip at a unique tmp path; each entry maps an archive name to a file path or raw contents */
 	private function make_zip( array $entries ): string {
 		global $gfpdf;
 
