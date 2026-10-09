@@ -493,7 +493,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	/**
 	 * Get a user-facing reason the font upload was refused
 	 *
-	 * @since 7.0
+	 * @since 6.18.0
 	 */
 	protected function get_upload_error_message( File $file, UploadException $e ): string {
 		$codes = array_column( $file->getErrorDetails(), 'code' );

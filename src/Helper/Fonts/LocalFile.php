@@ -23,7 +23,7 @@ class LocalFile extends File {
 	/**
 	 * Bypass the is_uploaded_file() check for files that didn't arrive via a POST
 	 *
-	 * @since 7.0
+	 * @since 6.18.0
 	 */
 	public function __construct( string $key, StorageInterface $storage ) {
 		parent::__construct( $key, $storage );
