@@ -18,7 +18,9 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
+use GFPDF_Vendor\GravityPdf\Upload\File;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
@@ -477,7 +479,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			try {
 				$file->upload();
 			} catch ( UploadException $e ) {
-				$errors[ $id ] = __( 'The upload is not a valid TTF file', 'gravity-pdf' );
+				$errors[ $id ] = $this->get_upload_error_message( $file, $e );
 			}
 		}
 
@@ -486,6 +488,35 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		}
 
 		return $files;
+	}
+
+	/**
+	 * Get a user-facing reason the font upload was refused
+	 *
+	 * @since 6.18.0
+	 */
+	protected function get_upload_error_message( File $file, UploadException $e ): string {
+		$codes = array_column( $file->getErrorDetails(), 'code' );
+
+		if ( array_intersect( $codes, [ ErrorCode::INI_SIZE, ErrorCode::FORM_SIZE ] ) ) {
+			/* translators: %s: the maximum upload size, e.g. 8 MB */
+			return sprintf( __( 'The font file is larger than the %s upload limit', 'gravity-pdf' ), size_format( wp_max_upload_size() ) );
+		}
+
+		$transfer_failures = [
+			ErrorCode::PARTIAL,
+			ErrorCode::NO_TMP_DIR,
+			ErrorCode::CANT_WRITE,
+			ErrorCode::EXTENSION_STOPPED,
+			ErrorCode::UNKNOWN_TRANSFER_ERROR,
+		];
+
+		/* Storage failures aren't recorded as error details; they only reach us as the thrown code */
+		if ( array_intersect( $codes, $transfer_failures ) || $e->getErrorCode() !== ErrorCode::VALIDATION_FAILED ) {
+			return __( 'The font file could not be saved. Ask your web host to check the PHP upload settings', 'gravity-pdf' );
+		}
+
+		return __( 'The upload is not a valid TTF file', 'gravity-pdf' );
 	}
 
 	/**
