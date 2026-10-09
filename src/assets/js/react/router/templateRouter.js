@@ -42,8 +42,6 @@ export const Routes = () => (
           render={(props) => (
             <TemplateList
               {...props}
-              ajaxUrl={GFPDF.ajaxUrl}
-              ajaxNonce={GFPDF.ajaxNonce}
               templateDetailsText={GFPDF.templateDetails}
               templateHeaderText={GFPDF.installedPdfs}
               genericUploadErrorText={GFPDF.problemWithTheUpload}
@@ -55,6 +53,9 @@ export const Routes = () => (
               installUpdatedText={GFPDF.templateSuccessfullyUpdated}
               templateSuccessfullyInstalledUpdated={GFPDF.templateSuccessfullyInstalledUpdated}
               templateInstallInstructions={GFPDF.templateInstallInstructions}
+              dropzoneText={GFPDF.templateUploadDropzone}
+              uploadInProgressText={GFPDF.templateUploadInProgress}
+              maxFileSize={parseInt(GFPDF.templateUploadMaxSize, 10)}
             />
           )}
         />

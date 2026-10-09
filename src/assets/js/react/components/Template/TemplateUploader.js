@@ -2,10 +2,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import classNames from 'classnames'
 import Dropzone from 'react-dropzone'
 /* Components */
 import ShowMessage from '../ShowMessage'
+import { TemplateUploaderContext } from './TemplateUploaderContext'
 /* Redux actions */
 import {
   addTemplate,
@@ -16,6 +16,8 @@ import {
 
 /**
  * Handles the uploading of new PDF templates to the server
+ *
+ * Wraps the whole Template Manager so a zip can be dropped anywhere, and shares the file picker via context
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -33,149 +35,158 @@ export class TemplateUploader extends Component {
    * @since 4.1
    */
   static propTypes = {
+    children: PropTypes.node,
     genericUploadErrorText: PropTypes.string,
-    addTemplateText: PropTypes.string,
     filenameErrorText: PropTypes.string,
     filesizeErrorText: PropTypes.string,
     installSuccessText: PropTypes.string,
     installUpdatedText: PropTypes.string,
     templateSuccessfullyInstalledUpdated: PropTypes.string,
-    templateInstallInstructions: PropTypes.string,
+    dropzoneText: PropTypes.string,
+    uploadInProgressText: PropTypes.string,
+    maxFileSize: PropTypes.number,
     addNewTemplate: PropTypes.func,
     updateTemplateParam: PropTypes.func,
     postTemplateUploadProcessing: PropTypes.func,
     clearTemplateUploadProcessing: PropTypes.func,
     templates: PropTypes.array,
-    templateUploadProcessingSuccess: PropTypes.object,
-    templateUploadProcessingError: PropTypes.object
+    templateUploadResults: PropTypes.array
   }
 
   /**
-   * Setup internal component state that doesn't need to be in Redux
-   *
-   * @returns {{ajax: boolean, error: string, message: string}}
+   * @since 6.18.0
+   */
+  static defaultProps = {
+    templateUploadResults: []
+  }
+
+  /**
+   * `total` and `completed` track the in-flight batch, so each result in the Redux store is drained once
    *
    * @since 4.1
    */
   state = {
-    ajax: false,
-    error: '',
-    message: ''
+    errors: [],
+    showSuccess: false,
+    total: 0,
+    completed: 0
   }
 
   /**
-   * If component did update, fires appropriate function based on Redux store data
+   * Whether the current batch of uploads is still in flight
+   *
+   * @returns {boolean} True until every file dispatched by handleOndrop() has reported back
+   *
+   * @since 6.18.0
+   */
+  get isUploading () {
+    return this.state.completed < this.state.total
+  }
+
+  /**
+   * Drain any upload results that arrived since the last render
    *
    * @param {Object} prevProps
    *
    * @since 4.1
    */
   componentDidUpdate (prevProps) {
-    const { templateUploadProcessingSuccess, templateUploadProcessingError } = this.props
+    const { templateUploadResults } = this.props
 
-    if (
-      prevProps.templateUploadProcessingSuccess !== templateUploadProcessingSuccess &&
-      Object.keys(templateUploadProcessingSuccess).length > 0
-    ) {
-      this.ajaxSuccess(templateUploadProcessingSuccess)
+    if (prevProps.templateUploadResults === templateUploadResults) {
+      return
     }
 
-    if (
-      prevProps.templateUploadProcessingError !== templateUploadProcessingError &&
-      Object.keys(templateUploadProcessingError).length > 0
-    ) {
-      this.ajaxFailed(templateUploadProcessingError)
+    const fresh = templateUploadResults.slice(this.state.completed)
+
+    if (fresh.length > 0) {
+      this.processResults(fresh)
     }
   }
 
   /**
-   * Manages the template file upload
+   * Upload the accepted zips and report the files react-dropzone rejected
    *
-   * @param {array} acceptedFiles The array of uploaded files we should send to the server
+   * @param {Array} acceptedFiles
+   * @param {Array} fileRejections
    *
    * @since 4.1
    */
-  handleOndrop = (acceptedFiles) => {
-    /* Handle file upload and pass in an nonce!!! */
-    if (acceptedFiles instanceof Array && acceptedFiles.length > 0) {
-      acceptedFiles.forEach((file) => {
-        const filename = file.name
-
-        /* Do validation */
-        if (!this.checkFilename(filename) || !this.checkFilesize(file.size)) {
-          return
-        }
-
-        /* Add our loader */
-        this.setState({
-          ajax: true,
-          error: '',
-          message: ''
-        })
-
-        /* POST the PDF template to our endpoint for processing */
-        this.props.postTemplateUploadProcessing(file, filename)
-      })
+  handleOndrop = (acceptedFiles, fileRejections = []) => {
+    if (acceptedFiles.length === 0 && fileRejections.length === 0) {
+      return
     }
-  }
 
-  /**
-   * Checks if the uploaded file has a .zip extension
-   * We do this instead of mime type checking as it doesn't work in all browsers
-   *
-   * @param {string} name
-   *
-   * @returns {boolean}
-   *
-   * @since 4.1
-   */
-  checkFilename = (name) => {
-    if (name.substr(name.length - 4) !== '.zip') {
-      /* Tell use about incorrect file type */
+    const errors = fileRejections.map(({ file, errors: reasons }) => ({
+      filename: file.name,
+      message: reasons[0].code === 'file-too-large' ? this.props.filesizeErrorText : this.props.filenameErrorText
+    }))
+
+    /* A drop during an upload joins the batch in flight; clearing the store would lose its results */
+    if (this.isUploading) {
+      this.setState((prevState) => ({
+        errors: [...prevState.errors, ...errors],
+        total: prevState.total + acceptedFiles.length
+      }))
+    } else {
+      this.props.clearTemplateUploadProcessing()
+
       this.setState({
-        error: this.props.filenameErrorText
+        errors,
+        showSuccess: false,
+        total: acceptedFiles.length,
+        completed: 0
       })
-
-      return false
     }
 
-    return true
+    acceptedFiles.forEach((file) => this.props.postTemplateUploadProcessing(file, file.name))
   }
 
   /**
-   * Checks if the file size is larger than 5MB
+   * Apply a batch of upload results to our Redux store and the on-screen messages
    *
-   * @param {int} size File size in bytes
+   * @param {Array} results
    *
-   * @returns {boolean}
-   *
-   * @since 4.1
+   * @since 6.18.0
    */
-  checkFilesize = (size) => {
-    /* Check the file is no larger than 10MB (convert from bytes to KB) */
-    if (size / 1024 > 10240) {
-      /* Tell use about incorrect file type */
-      this.setState({
-        error: this.props.filesizeErrorText
+  processResults = (results) => {
+    const errors = []
+
+    results.forEach((result) => {
+      if (result.success) {
+        this.addTemplatesToStore(result.templates)
+        return
+      }
+
+      errors.push({
+        filename: result.filename,
+        message: result.message || this.props.genericUploadErrorText
       })
+    })
 
-      return false
+    const completed = this.state.completed + results.length
+
+    /* Latch the success message on, so a later failure in the batch can't hide it */
+    this.setState({
+      completed,
+      errors: [...this.state.errors, ...errors],
+      showSuccess: this.state.showSuccess || results.some((result) => result.success)
+    })
+
+    if (completed >= this.state.total) {
+      this.props.clearTemplateUploadProcessing()
     }
-
-    return true
   }
 
   /**
    * Update our Redux store with the new PDF template details
-   * If our upload AJAX call to the server passed this function gets fired
    *
-   * @param {Object} response
+   * @param {Array} templates
    *
    * @since 4.1
    */
-  ajaxSuccess = (response) => {
-    /* Update our Redux Store with the new template(s) */
-    response.body.templates.forEach((template) => {
+  addTemplatesToStore = (templates) => {
+    templates.forEach((template) => {
       /* Check if template already in the list before adding to our store */
       const matched = this.props.templates.find((item) => {
         return (item.id === template.id)
@@ -189,36 +200,6 @@ export class TemplateUploader extends Component {
         this.props.updateTemplateParam(template.id, 'message', this.props.installUpdatedText)
       }
     })
-
-    /* Mark as success and stop AJAX spinner */
-    this.setState({
-      ajax: false,
-      message: this.props.templateSuccessfullyInstalledUpdated
-    })
-
-    /* Clean/Reset our Redux Store state for templateUploadProcessing */
-    this.props.clearTemplateUploadProcessing()
-  }
-
-  /**
-   * Show any errors to the user when AJAX request fails for any reason
-   *
-   * @param {Object} error
-   *
-   * @since 4.1
-   */
-  ajaxFailed = (response) => {
-    const message = response && response.body && typeof response.body === 'object' && response.body.error
-      ? response.body.error
-      : this.props.genericUploadErrorText
-
-    this.setState({
-      error: message,
-      ajax: false
-    })
-
-    /* Clean/Reset our Redux Store state for templateUploadProcessing */
-    this.props.clearTemplateUploadProcessing()
   }
 
   /**
@@ -228,64 +209,84 @@ export class TemplateUploader extends Component {
    */
   removeMessage = () => {
     this.setState({
-      message: ''
+      showSuccess: false
     })
+  }
+
+  /**
+   * Upload progress, errors and success, pinned to the foot of the modal so they show wherever the list is scrolled
+   *
+   * @since 6.18.0
+   */
+  renderStatus () {
+    const { errors, showSuccess } = this.state
+    const uploading = this.isUploading
+
+    if (!uploading && errors.length === 0 && !showSuccess) {
+      return null
+    }
+
+    return (
+      <div data-test='component-templateUploaderStatus' className='gfpdf-dropzone-status'>
+        {uploading && <ShowMessage text={this.props.uploadInProgressText} />}
+
+        {errors.map((error, index) => (
+          <ShowMessage
+            data-test='component-stateError-showMessage'
+            key={`${error.filename}-${index}`}
+            text={`${error.filename}: ${error.message}`}
+            error
+          />
+        ))}
+
+        {showSuccess && (
+          <ShowMessage
+            data-test='component-stateMessage-showMessage'
+            text={this.props.templateSuccessfullyInstalledUpdated}
+            dismissable
+            dismissableCallback={this.removeMessage}
+          />
+        )}
+      </div>
+    )
   }
 
   /**
    * @since 4.1
    */
   render () {
+    const { children, dropzoneText, maxFileSize } = this.props
+
     return (
-      <div
-        data-test='component-templateUploader'
-        className='theme add-new-theme gfpdf-dropzone'
+      <Dropzone
+        data-test='component-dropzone'
+        onDrop={this.handleOndrop}
+        accept={{ 'application/zip': ['.zip'] }}
+        maxSize={maxFileSize}
+        noClick
+        noKeyboard
       >
-        <Dropzone
-          data-test='component-dropzone'
-          onDrop={this.handleOndrop}
-        >
-          {({ getRootProps, getInputProps, isDragActive }) => {
-            return (
-              <div
-                {...getRootProps()}
-                className={classNames('dropzone', { 'dropzone--isActive': isDragActive })}
-              >
-                <input {...getInputProps()} />
-                <a href='#/template' className={this.state.ajax ? 'doing-ajax' : ''} aria-labelledby='gfpdf-template-install-instructions'>
+        {({ getRootProps, getInputProps, isDragActive, open }) => (
+          <div {...getRootProps({ className: 'gfpdf-template-dropzone' })}>
+            <input {...getInputProps()} />
 
-                  <div className='theme-screenshot'><span /></div>
+            <TemplateUploaderContext.Provider value={{ open, ajax: this.isUploading }}>
+              {children}
+            </TemplateUploaderContext.Provider>
 
-                  {this.state.error !== ''
-                    ? (
-                      <ShowMessage
-                        data-test='component-stateError-showMessage'
-                        text={this.state.error}
-                        error
-                      />
-                      )
-                    : null}
-                  {this.state.message !== ''
-                    ? (
-                      <ShowMessage
-                        data-test='component-stateMessage-showMessage'
-                        text={this.state.message}
-                        dismissable
-                        dismissableCallback={this.removeMessage}
-                      />
-                      )
-                    : null}
+            {this.renderStatus()}
 
-                  <h2 className='theme-name'>{this.props.addTemplateText}</h2>
-                </a>
-                <div className='gfpdf-template-install-instructions' id='gfpdf-template-install-instructions'>
-                  {this.props.templateInstallInstructions}
+            {isDragActive && (
+              <div data-test='component-dropzoneOverlay' className='gfpdf-dropzone-overlay'>
+                <div className='gfpdf-dropzone-overlay__message'>
+                  <span className='dashicons dashicons-upload' />
+                  <p>{dropzoneText}</p>
                 </div>
               </div>
-            )
-          }}
-        </Dropzone>
-      </div>
+            )}
+          </div>
+        )}
+      </Dropzone>
     )
   }
 }
@@ -294,15 +295,14 @@ export class TemplateUploader extends Component {
  * Map Redux state to props
  *
  * @param state
- * @returns {{templates: Array, templateUploadProcessingSuccess: Object, templateUploadProcessingError: Object}}
+ * @returns {{templates: Array, templateUploadResults: Array}}
  *
  * @since 5.2
  */
 const mapStateToProps = (state) => {
   return {
     templates: state.template.list,
-    templateUploadProcessingSuccess: state.template.templateUploadProcessingSuccess,
-    templateUploadProcessingError: state.template.templateUploadProcessingError
+    templateUploadResults: state.template.templateUploadResults
   }
 }
 

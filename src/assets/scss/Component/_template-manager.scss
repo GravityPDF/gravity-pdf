@@ -1,5 +1,17 @@
 @use '../base';
 
+/* Shared by the notices inline in the template list and the ones in the upload status toast */
+%gfpdf-template-notice {
+  border-color: base.$success-color;
+
+  &.error {
+    border-color: base.$error-color;
+    color: #000;
+    margin: 0;
+    padding: 1px 12px;
+  }
+}
+
 #tab_PDF {
   #gfpdf_settings\[template\], #gfpdf_settings\[default_template\] {
     margin: 0 0.2rem 0.2rem 0;
@@ -80,7 +92,6 @@
           animation: gfpdfspin 1s infinite linear;
         }
 
-        &.gfpdf-dropzone-active .doing-ajax span:after,
         .doing-ajax:hover span:after,
         .doing-ajax:focus span:after {
           color: #FFF;
@@ -88,26 +99,75 @@
         }
       }
 
-      .gfpdf-dropzone {
-        .dropzone {
-          .gfpdf-template-install-instructions {
-            font-size: 85%;
-            text-align: center;
-            margin-top: 5px;
-          }
-        }
+      .gfpdf-dropzone .gfpdf-template-install-instructions {
+        font-size: 85%;
+        text-align: center;
+        margin-top: 5px;
       }
 
       .notice {
-        border-color: base.$success-color;
-
-        &.error {
-          border-color: base.$error-color;
-          color: #000;
-          margin: 0;
-          padding: 1px 12px;
-        }
+        @extend %gfpdf-template-notice;
       }
+    }
+  }
+}
+
+/* The whole Template Manager doubles as a drop target for new template zips */
+.theme-overlay {
+  .gfpdf-dropzone-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10001; /* Over .theme-wrap, which core puts at 10000 */
+    display: flex;
+    background: rgba(0, 0, 0, 0.75);
+    pointer-events: none;
+
+    &__message {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 20px;
+      border: 4px dashed #FFF;
+      border-radius: 8px;
+      color: #FFF;
+      text-align: center;
+
+      .dashicons {
+        width: 48px;
+        height: 48px;
+        font-size: 48px;
+      }
+
+      p {
+        margin: 10px 0 0;
+        font-size: 18px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  /* Toast at the foot of the modal, so results are seen wherever the template list is scrolled to */
+  .gfpdf-dropzone-status {
+    position: fixed;
+    bottom: 5%;
+    left: 50%;
+    z-index: 10002;
+    width: 400px;
+    max-width: 90%;
+    transform: translateX(-50%);
+
+    .notice {
+      @extend %gfpdf-template-notice;
+
+      margin: 0 0 5px;
+      padding: 1px 12px;
+      background: #FFF;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
   }
 }

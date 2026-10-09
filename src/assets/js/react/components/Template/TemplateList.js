@@ -8,6 +8,7 @@ import TemplateListItem from './TemplateListItem'
 import TemplateSearch from './TemplateSearch'
 import TemplateHeaderTitle from './TemplateHeaderTitle'
 import TemplateUploader from './TemplateUploader'
+import TemplateUploaderTile from './TemplateUploaderTile'
 /* Selectors */
 import getTemplates from '../../selectors/getTemplates'
 
@@ -34,8 +35,6 @@ export class TemplateList extends Component {
     templates: PropTypes.array,
     templateDetailsText: PropTypes.string,
     activateText: PropTypes.string,
-    ajaxUrl: PropTypes.string,
-    ajaxNonce: PropTypes.string,
     addTemplateText: PropTypes.string,
     genericUploadErrorText: PropTypes.string,
     filenameErrorText: PropTypes.string,
@@ -43,7 +42,10 @@ export class TemplateList extends Component {
     installSuccessText: PropTypes.string,
     installUpdatedText: PropTypes.string,
     templateSuccessfullyInstalledUpdated: PropTypes.string,
-    templateInstallInstructions: PropTypes.string
+    templateInstallInstructions: PropTypes.string,
+    dropzoneText: PropTypes.string,
+    uploadInProgressText: PropTypes.string,
+    maxFileSize: PropTypes.number
   }
 
   /**
@@ -52,7 +54,7 @@ export class TemplateList extends Component {
   render () {
     const hasUserPrivs = GFPDF.canManageTemplates
 
-    return (
+    const templateManager = (
       <TemplateContainer
         data-test='component-templateList'
         header={
@@ -81,23 +83,36 @@ export class TemplateList extends Component {
 
           {
             hasUserPrivs &&
-              <TemplateUploader
-                data-test='component-templateUploader'
-                ajaxUrl={this.props.ajaxUrl}
-                ajaxNonce={this.props.ajaxNonce}
+              <TemplateUploaderTile
+                data-test='component-templateUploaderTile'
                 addTemplateText={this.props.addTemplateText}
-                genericUploadErrorText={this.props.genericUploadErrorText}
-                filenameErrorText={this.props.filenameErrorText}
-                filesizeErrorText={this.props.filesizeErrorText}
-                installSuccessText={this.props.installSuccessText}
-                installUpdatedText={this.props.installUpdatedText}
-                templateSuccessfullyInstalledUpdated={this.props.templateSuccessfullyInstalledUpdated}
                 templateInstallInstructions={this.props.templateInstallInstructions}
               />
           }
 
         </div>
       </TemplateContainer>
+    )
+
+    if (!hasUserPrivs) {
+      return templateManager
+    }
+
+    return (
+      <TemplateUploader
+        data-test='component-templateUploader'
+        genericUploadErrorText={this.props.genericUploadErrorText}
+        filenameErrorText={this.props.filenameErrorText}
+        filesizeErrorText={this.props.filesizeErrorText}
+        installSuccessText={this.props.installSuccessText}
+        installUpdatedText={this.props.installUpdatedText}
+        templateSuccessfullyInstalledUpdated={this.props.templateSuccessfullyInstalledUpdated}
+        dropzoneText={this.props.dropzoneText}
+        uploadInProgressText={this.props.uploadInProgressText}
+        maxFileSize={this.props.maxFileSize}
+      >
+        {templateManager}
+      </TemplateUploader>
     )
   }
 }

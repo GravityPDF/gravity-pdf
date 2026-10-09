@@ -18,7 +18,7 @@ class TemplateManager {
     this.themeName = Selector('.theme-name')
     this.themeSelectButton = Selector('a').withText('Select')
     this.themeDetailsLink = Selector('span').withText('Template Details')
-    this.dropZoneBox = Selector('.dropzone')
+    this.dropZoneBox = Selector('.gfpdf-template-dropzone')
     this.installationMessage = Selector('div')
     this.focusGravityTemplateDetails = Selector('.theme-wrap').find('div').withAttribute('data-slug', 'focus-gravity').withText('Template Details')
     this.focusGravityTemplate = Selector('div').find('[class^="theme-name"]').withText('Focus Gravity')

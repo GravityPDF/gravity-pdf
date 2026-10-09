@@ -37,8 +37,7 @@ export const initialState = {
   search: '',
   updateSelectBoxText: '',
   templateProcessing: '',
-  templateUploadProcessingSuccess: {},
-  templateUploadProcessingError: {}
+  templateUploadResults: []
 }
 
 /**
@@ -162,37 +161,36 @@ export default function (state = initialState, action) {
       }
 
     /**
-     * Update with the new PDF template details
+     * Record an installed zip. Appended, not replaced, so results landing in one render can't overwrite each other
      *
      * @since 5.2
      */
     case TEMPLATE_UPLOAD_PROCESSING_SUCCESS:
       return {
         ...state,
-        templateUploadProcessingSuccess: action.payload
+        templateUploadResults: [...state.templateUploadResults, { ...action.payload, success: true }]
       }
 
     /**
-     * Update/Show error
+     * Record a zip that failed to install
      *
      * @since 5.2
      */
     case TEMPLATE_UPLOAD_PROCESSING_FAILED:
       return {
         ...state,
-        templateUploadProcessingError: action.payload
+        templateUploadResults: [...state.templateUploadResults, { ...action.payload, success: false }]
       }
 
     /**
-     * Clear/reset state of templateUploadProcessingSuccess & templateUploadProcessingError
+     * Clear/reset the results of the current upload batch
      *
      * @since 5.2
      */
     case CLEAR_TEMPLATE_UPLOAD_PROCESSING:
       return {
         ...state,
-        templateUploadProcessingSuccess: {},
-        templateUploadProcessingError: {}
+        templateUploadResults: []
       }
   }
 
