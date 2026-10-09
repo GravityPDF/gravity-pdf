@@ -47,11 +47,31 @@ class Test_Controller_Export_Entries extends WP_UnitTestCase {
 		$this->assertSame( $value, apply_filters( 'gform_export_field_value', $value, 1, '', [] ) );
 	}
 
-	public function test_get_export_field_empty_pdf_value_if_failed_conditional_logic() {
-		$form_id  = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
-		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
-		$field_id = 'gpdf_555ad84787d7e';
-		$this->assertEmpty( apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
+	/**
+	 * @dataProvider provider_export_field_pdf_error
+	 */
+	public function test_get_export_field_empty_pdf_value_if_error( $pdf_id, $debug ) {
+		$options  = $GLOBALS['gfpdf']->options;
+		$original = $options->get_option( 'debug_mode', 'No' );
+		$options->update_option( 'debug_mode', $debug );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$form_id = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
+		$entry   = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$value   = apply_filters( 'gform_export_field_value', 'item', $form_id, 'gpdf_' . $pdf_id, $entry );
+
+		$options->update_option( 'debug_mode', $original );
+
+		$this->assertSame( '', $value );
+	}
+
+	public function provider_export_field_pdf_error() {
+		return [
+			'failed conditional logic'            => [ '555ad84787d7e', 'No' ],
+			'failed conditional logic, debug on' => [ '555ad84787d7e', 'Yes' ],
+			'inactive PDF, debug on'              => [ '556690c8d7f82', 'Yes' ],
+			'invalid PDF, debug on'               => [ 'abc123', 'Yes' ],
+		];
 	}
 
 	public function test_get_export_field_pdf_value() {
