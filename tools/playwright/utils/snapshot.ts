@@ -23,7 +23,8 @@ const STABLE_LAYOUT_BUDGET_MS = 5000;
  * Hold until the page stops moving, then screenshot the area `targets` cover for Lost Pixel to diff against the
  * committed baseline. Pass every element the shot should frame: an accordion heading and its panel are siblings, so
  * framing only one drops the other. Framing the section under test keeps unrelated admin UI out of the baseline.
- * `mask` paints over content inside the frame that legitimately differs between runs.
+ * `mask` paints over content inside the frame that legitimately differs between runs. A frame inside a
+ * `position: fixed` layer, such as a modal, is shot from the viewport: a full-page capture misplaces that layer.
  *
  * Whatever is mid-flight when the screenshot is taken is what gets baselined. Three things on these screens land
  * after the interaction that triggered them: WordPress relocates admin notices to sit after `.wp-header-end` on
@@ -37,6 +38,8 @@ const STABLE_LAYOUT_BUDGET_MS = 5000;
  * @param page
  * @param testinfo
  * @param targets
+ * @param options
+ * @param options.mask
  */
 export async function snapshot(
 	page: Page,
@@ -122,24 +125,41 @@ export async function snapshot(
 	}
 
 	const frame = [targets].flat();
+	const fixed = await frame[0].evaluate((el) => {
+		for (let node: Element | null = el; node; node = node.parentElement) {
+			if (getComputedStyle(node).position === 'fixed') {
+				return true;
+			}
+		}
 
-	// Edges and text are painted on whole pixels from wherever the frame lands, so its offset within a pixel decides
-	// how they come out: content above that is a fraction of a pixel taller moves an edge inside an otherwise
-	// identical frame. Nudging the page down onto a pixel boundary takes that out of the shot.
-	const top = Math.min(...(await pageBoxes(frame)).map((box) => box.top));
-	await setPageOffset(page, Math.ceil(top) - top);
+		return false;
+	});
+
+	if (fixed) {
+		// The clip has to sit within the viewport, and a fixed layer often scrolls inside itself. The pixel nudge below
+		// moves the page, not a fixed layer, so it doesn't apply.
+		await frame[0].scrollIntoViewIfNeeded();
+	} else {
+		// Edges and text are painted on whole pixels from wherever the frame lands, so its offset within a pixel
+		// decides how they come out: content above that is a fraction of a pixel taller moves an edge inside an
+		// otherwise identical frame. Nudging the page down onto a pixel boundary takes that out of the shot.
+		const top = Math.min(...(await pageBoxes(frame)).map((box) => box.top));
+		await setPageOffset(page, Math.ceil(top) - top);
+	}
 
 	await page.screenshot({
 		path: path.join(VISUAL_SHOTS_DIR, shotName(testinfo)),
-		fullPage: true,
-		clip: await pageArea(frame),
+		fullPage: !fixed,
+		clip: await pageArea(frame, !fixed),
 		animations: 'disabled',
 		caret: 'hide',
 		mask,
 		style: HIDE_FIXED_CHROME,
 	});
 
-	await setPageOffset(page, 0);
+	if (!fixed) {
+		await setPageOffset(page, 0);
+	}
 }
 
 /**
@@ -154,32 +174,36 @@ async function setPageOffset(page: Page, offset: number) {
 }
 
 /**
- * Each target's box, in page coordinates
+ * Each target's box, in page coordinates, or in viewport coordinates when `inPage` is false
  * @param targets
+ * @param inPage
  */
-async function pageBoxes(targets: Locator[]) {
+async function pageBoxes(targets: Locator[], inPage = true) {
 	return await Promise.all(
 		targets.map((target) =>
-			target.evaluate((el) => {
+			target.evaluate((el, offset) => {
 				const box = el.getBoundingClientRect();
+				const x = offset ? window.scrollX : 0;
+				const y = offset ? window.scrollY : 0;
 
 				return {
-					left: box.left + window.scrollX,
-					top: box.top + window.scrollY,
-					right: box.right + window.scrollX,
-					bottom: box.bottom + window.scrollY,
+					left: box.left + x,
+					top: box.top + y,
+					right: box.right + x,
+					bottom: box.bottom + y,
 				};
-			})
+			}, inPage)
 		)
 	);
 }
 
 /**
- * The smallest whole-pixel rectangle, in page coordinates, that covers every target
+ * The smallest whole-pixel rectangle that covers every target, in the coordinates `pageBoxes` uses
  * @param targets
+ * @param inPage
  */
-async function pageArea(targets: Locator[]) {
-	const boxes = await pageBoxes(targets);
+async function pageArea(targets: Locator[], inPage = true) {
+	const boxes = await pageBoxes(targets, inPage);
 
 	const x = Math.floor(Math.min(...boxes.map((box) => box.left)));
 	const y = Math.floor(Math.min(...boxes.map((box) => box.top)));
