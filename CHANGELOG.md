@@ -35,12 +35,14 @@
 * 🐛 Bug: A new PDF starts on the bundled default template when the site's Default Template setting points at one that can no longer be selected. The dead value is still shown on the Global Settings screen, which is where it can be corrected, but it is no longer handed to every PDF created after the upgrade
 * 💻 Developer: Every class that lost a method in 7.0 uses the new `Helper_Trait_Removed_Methods`, so calling one of those methods emits a `_deprecated_function()` notice and returns `null` rather than ending the request with an "undefined method" fatal. The views report the same thing through `_doing_it_wrong()`, from the `__call()` they already had. It is a report, not a shim: the method does nothing, a filter callback routed through it hands back `null` in place of the value it was given, and `is_callable()` now answers true for any name on these classes — so the call still has to go
 * 🧹 Housekeeping: The version 3 detections added in 6.17 move from Deprecated Features to Unsupported Features, so the System Status and Site Health reports list them under their own heading and the admin notice is shown as an error rather than a warning
-* 🎉 Feature: Install multiple PDF templates at once by selecting or dropping several zip files together
-* 🎉 Feature: Drop PDF template zip files anywhere in the Template Manager window to install them
-* 🎉 Feature: Accept PDF template zips with the templates nested inside a folder, which is what you get when re-zipping a Safari download
-* 🔒 Security: Harden PDF template and custom font uploads by upgrading the bundled upload library to 4.0
-* 🧹 Housekeeping: Raise the PDF template upload limit from 10MB to 32MB, capped by the server's own upload limit
-* 💻 Developer: Add `gfpdf_template_max_upload_size` filter to change the maximum PDF template zip size
+
+### 6.18.0
+* 🎉 Feature: Install several PDF templates at once
+* 🎉 Feature: Drop template zips anywhere in the Template Manager
+* 🎉 Feature: Install template zips that have the templates inside a folder
+* 🔒 Security: Upgrade the bundled upload library to 4.0
+* 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
+* 💻 Developer: Add the `gfpdf_template_max_upload_size` filter
 
 ### 6.17.1
 * 🔒 Security: Redact relative signed PDF URLs in log files
