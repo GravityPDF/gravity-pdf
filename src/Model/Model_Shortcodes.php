@@ -66,9 +66,6 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	public function process( $attributes ) {
 		$controller = $this->getController();
 
-		$shortcode_error_messages_enabled = $this->options->get_option( 'debug_mode', 'No' ) === 'Yes';
-		$has_view_permissions             = $shortcode_error_messages_enabled && $this->gform->has_capability( 'gravityforms_view_entries' );
-
 		/* merge in any missing defaults */
 		$attributes = shortcode_atts(
 			[
@@ -91,6 +88,10 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
 
+		/* Raw output is used as a URL, so never show error messages in it */
+		$raw                  = ! empty( $attributes['raw'] );
+		$has_view_permissions = ! $raw && $this->options->get_option( 'debug_mode', 'No' ) === 'Yes' && $this->gform->has_capability( 'gravityforms_view_entries' );
+
 		try {
 			$original_entry_id   = $attributes['entry'];
 			$attributes['entry'] = $this->get_entry_id_if_empty( $original_entry_id );
@@ -101,7 +102,6 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			$pdf               = GPDFAPI::get_mvc_class( 'Model_PDF' );
 			$download          = $attributes['type'] === 'download';
 			$print             = ! empty( $attributes['print'] );
-			$raw               = ! empty( $attributes['raw'] );
 			$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 			/* Sign the URL to allow direct access to the PDF until it expires (only for an entry ID set on the shortcode) */

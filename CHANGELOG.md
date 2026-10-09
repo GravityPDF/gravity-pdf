@@ -23,6 +23,7 @@
 * 🐞 Bug: Hide the Tools tab from users who can't use it
 * 🐞 Bug: Fix missing slash when converting a path under the site root to a URL
 * 🐞 Bug: Keep PDF merge tags in an administrative field's Default Value when the entry is saved
+* 🐞 Bug: Don't add debug errors to raw PDF URLs
 * 🐞 Bug: Delete PDFs sent with Gravity Forms background notifications
 * 🐞 Bug: Stop different entries sharing a temporary PDF folder
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
