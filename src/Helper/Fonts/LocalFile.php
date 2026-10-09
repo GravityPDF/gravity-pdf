@@ -4,8 +4,9 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Fonts;
 
-use GFPDF_Vendor\GravityPdf\Upload\Exception;
 use GFPDF_Vendor\GravityPdf\Upload\File;
+use GFPDF_Vendor\GravityPdf\Upload\FileInfo;
+use GFPDF_Vendor\GravityPdf\Upload\StorageInterface;
 
 /**
  * @package     Gravity PDF
@@ -20,23 +21,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class LocalFile extends File {
 	/**
-	 * @return bool
-	 * @throws \Exception
+	 * Bypass the is_uploaded_file() check for files that didn't arrive via a POST
 	 *
-	 * @since 6.4
+	 * @since 7.0
 	 */
-	public function isValid(): bool {
-		foreach ( $this->objects as $fileInfo ) {
-			$this->applyCallback( 'beforeValidationCallback', $fileInfo );
-			foreach ( $this->validations as $validation ) {
-				try {
-					$validation->validate( $fileInfo );
-				} catch ( Exception $e ) {
-					$this->errors[] = \sprintf( '%s: %s', $fileInfo->getNameWithExtension(), $e->getMessage() );
+	public function __construct( string $key, StorageInterface $storage ) {
+		parent::__construct( $key, $storage );
+
+		foreach ( $this->objects as $index => $file_info ) {
+			$path = $file_info->getPathname();
+			$name = $file_info->getNameWithExtension();
+
+			$this->objects[ $index ] = new class( $path, $name ) extends FileInfo {
+				public function isUploadedFile(): bool {
+					return true;
 				}
-			}
-			$this->applyCallback( 'afterValidationCallback', $fileInfo );
+			};
 		}
-		return empty( $this->errors );
 	}
 }

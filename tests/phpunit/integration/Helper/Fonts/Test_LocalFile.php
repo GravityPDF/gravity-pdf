@@ -31,7 +31,7 @@ class Test_LocalFile extends TestCase {
 	}
 
 	/**
-	 * LocalFile::isValid() returns true when no validations are attached.
+	 * isValid() on a LocalFile returns true when no validations are attached.
 	 */
 	public function test_is_valid_with_no_validations_returns_true(): void {
 		$this->tmp_file = tempnam( sys_get_temp_dir(), 'gfpdf_test_' ) . '.ttf';
@@ -50,7 +50,7 @@ class Test_LocalFile extends TestCase {
 	}
 
 	/**
-	 * LocalFile::isValid() collects errors from failing validations and returns false.
+	 * isValid() on a LocalFile collects errors from failing validations and returns false.
 	 */
 	public function test_is_valid_returns_false_and_collects_error_when_validation_fails(): void {
 		$this->tmp_file = tempnam( sys_get_temp_dir(), 'gfpdf_test_' ) . '.ttf';
@@ -87,7 +87,7 @@ class Test_LocalFile extends TestCase {
 	}
 
 	/**
-	 * LocalFile::isValid() returns true when all validations pass.
+	 * isValid() on a LocalFile returns true when all validations pass.
 	 */
 	public function test_is_valid_returns_true_when_all_validations_pass(): void {
 		$this->tmp_file = tempnam( sys_get_temp_dir(), 'gfpdf_test_' ) . '.ttf';
