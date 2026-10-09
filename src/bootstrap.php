@@ -813,7 +813,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function template_manager() {
 
-		$model = new Model\Model_Templates( $this->templates, $this->log, $this->data, $this->misc );
+		$model = new Model\Model_Templates( $this->templates, $this->log, $this->data, $this->misc, $this->gform );
 
 		$class = new Controller\Controller_Templates( $model );
 		$class->init();

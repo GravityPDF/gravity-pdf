@@ -60,5 +60,22 @@ class Controller_Templates extends Helper_Abstract_Controller implements Helper_
 		add_action( 'wp_ajax_gfpdf_upload_template', [ $this->model, 'ajax_process_uploaded_template' ] );
 		add_action( 'wp_ajax_gfpdf_delete_template', [ $this->model, 'ajax_process_delete_template' ] );
 		add_action( 'wp_ajax_gfpdf_get_template_options', [ $this->model, 'ajax_process_build_template_options_html' ] );
+
+		add_filter( 'gfpdf_localised_script_array', [ $this, 'add_localised_script_data' ] );
+	}
+
+	/**
+	 * Tell the template manager UI if the upload and delete actions should be shown
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 *
+	 * @since 6.18.0
+	 */
+	public function add_localised_script_data( $data ) {
+		$data['canManageTemplates'] = $this->model->current_user_can_manage_templates();
+
+		return $data;
 	}
 }
