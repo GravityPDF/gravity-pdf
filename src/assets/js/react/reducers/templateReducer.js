@@ -17,7 +17,7 @@ import {
   CLEAR_FINISHED_TEMPLATE_UPLOADS
 } from '../actions/templates'
 /* Utilities */
-import { hasPendingUpload } from '../utilities/Template/hasPendingUpload'
+import { hasPendingUpload, isPendingUpload } from '../utilities/Template/hasPendingUpload'
 
 /**
  * Our Redux Template Reducer that take the objects returned from our Redux Template Actions
@@ -300,7 +300,7 @@ export default function (state = initialState, action) {
      * @since 6.18.0
      */
     case CLEAR_FINISHED_TEMPLATE_UPLOADS:
-      return keepUploads(state, (upload) => upload.status === 'pending')
+      return keepUploads(state, isPendingUpload)
   }
 
   /* None of these actions fired so return state */
