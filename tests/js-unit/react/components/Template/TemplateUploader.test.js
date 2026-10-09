@@ -36,7 +36,8 @@ describe('Template - TemplateUploader.js', () => {
 	const statusMessages = (uploader, testAttr) =>
 		findByTestAttr(shallow(uploader.instance().renderStatus()), testAttr);
 
-	beforeEach(() => jest.clearAllMocks());
+	// Also drops implementations a test sets, which jest.config's clearMocks keeps
+	beforeEach(() => jest.resetAllMocks());
 
 	describe('Check for redux properties', () => {
 		const setup = (state = {}) => {
@@ -103,10 +104,10 @@ describe('Template - TemplateUploader.js', () => {
 
 		test('queues the uploads before reporting the rejected files', () => {
 			const calls = [];
-			postTemplateUploadProcessingMock.mockImplementationOnce(() =>
+			postTemplateUploadProcessingMock.mockImplementation(() =>
 				calls.push('upload')
 			);
-			templateUploadRejectedMock.mockImplementationOnce(() =>
+			templateUploadRejectedMock.mockImplementation(() =>
 				calls.push('rejected')
 			);
 
