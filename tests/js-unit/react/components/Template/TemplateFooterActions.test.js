@@ -67,4 +67,21 @@ describe('Template - TemplateFooterActions.js', () => {
 
     expect(wrapper.find('TemplateDeleteButton').length).toBe(1)
   })
+
+  test('hides <TemplateDeleteButton /> when the user cannot manage templates', () => {
+    const template = {
+      compatible: true,
+      path: '/'
+    }
+    const selector = 'withRouter(Connect(TemplateDeleteButton))'
+    const render = () => shallow(<TemplateFooterActions template={template} isActiveTemplate={false} pdfWorkingDirPath={'/'} />)
+
+    expect(render().find(selector).length).toBe(1)
+
+    GFPDF.canManageTemplates = false
+    wrapper = render()
+    GFPDF.canManageTemplates = true
+
+    expect(wrapper.find(selector).length).toBe(0)
+  })
 })

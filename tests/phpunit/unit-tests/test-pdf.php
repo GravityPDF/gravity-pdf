@@ -14,6 +14,7 @@ use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\Statics\Notes;
+use GFPDF\Tests\Concerns\CreatesPdfHelper;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -38,6 +39,8 @@ use WP_UnitTestCase;
  * @group pdf
  */
 class Test_PDF extends WP_UnitTestCase {
+
+	use CreatesPdfHelper;
 
 	/**
 	 * Our Settings Controller
@@ -143,6 +146,7 @@ class Test_PDF extends WP_UnitTestCase {
 				]
 			)
 		);
+		$this->assertSame( 9999, has_action( 'gform_post_process_async_notifications', [ $this->model, 'cleanup_pdf_after_async_notifications' ] ) );
 		$this->assertSame( 10, has_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] ) );
 	}
 
@@ -1092,9 +1096,8 @@ class Test_PDF extends WP_UnitTestCase {
 		$form['gfpdf_form_settings'] = [ $form['gfpdf_form_settings']['556690c67856b'] ];
 
 		/* Create PDF file so it isn't recreated */
-		$folder = $form['id'] . $entry['id'] . '556690c67856b';
-		$path   = $gfpdf->data->template_tmp_location . "$folder/";
-		$file   = "test-{$form['id']}.pdf";
+		$path = $this->get_pdf_helper( $entry, $form['gfpdf_form_settings'][0] )->get_path();
+		$file = "test-{$form['id']}.pdf";
 
 		wp_mkdir_p( $path );
 		touch( $path . $file );
@@ -1102,7 +1105,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		/* Check the results are successful */
-		$this->assertStringContainsString( "PDF_EXTENDED_TEMPLATES/tmp/$folder/$file", $notifications['attachments'][0] );
+		$this->assertSame( $path . $file, $notifications['attachments'][0] );
 
 		/* Clean up */
 		unlink( $notifications['attachments'][0] );
@@ -1113,6 +1116,36 @@ class Test_PDF extends WP_UnitTestCase {
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		$this->assertArrayNotHasKey( 'attachments', $notifications );
+	}
+
+	/**
+	 * A PDF in the pre-6.18 `{form}{entry}{pdf}` folder belongs to whichever entry's ids run together the same way
+	 *
+	 * @since 6.18.0
+	 */
+	public function test_notifications_do_not_attach_another_entrys_pdf() {
+		global $gfpdf;
+
+		$results                     = $this->create_form_and_entries();
+		$entry                       = $results['entry'];
+		$form                        = $results['form'];
+		$form['gfpdf_form_settings'] = [ $form['gfpdf_form_settings']['556690c67856b'] ];
+		$file                        = "test-{$form['id']}.pdf";
+
+		$other = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/";
+		$path  = $this->get_pdf_helper( $entry, $form['gfpdf_form_settings'][0] )->get_path();
+		wp_mkdir_p( $other );
+		wp_mkdir_p( $path );
+		file_put_contents( $other . $file, 'another entry' );
+		file_put_contents( $path . $file, 'this entry' );
+
+		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
+
+		$this->assertSame( [ $path . $file ], $notifications['attachments'] );
+		$this->assertSame( 'another entry', file_get_contents( $other . $file ) );
+
+		$gfpdf->misc->rmdir( $other );
+		$gfpdf->misc->rmdir( $path );
 	}
 
 	/**
@@ -1201,6 +1234,60 @@ class Test_PDF extends WP_UnitTestCase {
 		/* Check that PDF does not exist */
 		unlink( '/tmp/unittest.pdf' );
 		$this->assertFalse( $this->model->does_pdf_exist( $pdf ) );
+	}
+
+	/**
+	 * Form/entry ids that ran together in the pre-6.18 `{form}{entry}{pdf}` folder name
+	 */
+	public function provider_colliding_ids() {
+		return [
+			'form 1 / entry 4463 vs form 14 / entry 463' => [ [ 1, 4463 ], [ 14, 463 ] ],
+			'form 12 / entry 3 vs form 1 / entry 23'     => [ [ 12, 3 ], [ 1, 23 ] ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_colliding_ids
+	 *
+	 * @since 6.18.0
+	 */
+	public function test_tmp_path_keeps_ids_apart( $a, $b ) {
+		global $gfpdf;
+
+		$settings = [ 'id' => '556690c67856b' ];
+		$path_a   = $this->get_pdf_helper( [ 'form_id' => $a[0], 'id' => $a[1] ], $settings )->get_path();
+		$path_b   = $this->get_pdf_helper( [ 'form_id' => $b[0], 'id' => $b[1] ], $settings )->get_path();
+
+		$blog_id = get_current_blog_id();
+		$this->assertSame( $gfpdf->data->template_tmp_location . "$blog_id-{$a[0]}-{$a[1]}-556690c67856b/", $path_a );
+		$this->assertSame( $gfpdf->data->template_tmp_location . "$blog_id-{$b[0]}-{$b[1]}-556690c67856b/", $path_b );
+	}
+
+	/**
+	 * Sites share the network tmp folder, so the same form/entry/PDF ids on two blogs need different paths
+	 *
+	 * @since 6.18.0
+	 */
+	public function test_tmp_path_is_site_aware() {
+		global $gfpdf;
+
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Not running multisite tests' );
+		}
+
+		$entry    = [ 'form_id' => 1, 'id' => 1 ];
+		$settings = [ 'id' => '556690c67856b' ];
+		$blog_a   = get_current_blog_id();
+		$blog_b   = $this->factory()->blog->create();
+		$path_a   = $this->get_pdf_helper( $entry, $settings )->get_path();
+
+		switch_to_blog( $blog_b );
+		$path_b = $this->get_pdf_helper( $entry, $settings )->get_path();
+		restore_current_blog();
+
+		$tmp = $gfpdf->data->template_tmp_location;
+		$this->assertSame( $tmp . "$blog_a-1-1-556690c67856b/", $path_a );
+		$this->assertSame( $tmp . "$blog_b-1-1-556690c67856b/", $path_b );
 	}
 
 	/**
@@ -1452,7 +1539,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
 		$form    = $results['form'];
-		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}556690c67856b/test-{$form['id']}.pdf";
+		$file    = $this->get_pdf_helper( $entry, $form['gfpdf_form_settings']['556690c67856b'] )->get_path() . "test-{$form['id']}.pdf";
 
 		wp_mkdir_p( dirname( $file ) );
 		touch( $file );
@@ -1462,6 +1549,62 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->model->cleanup_pdf( $entry, $form );
 
 		$this->assertFileDoesNotExist( $file );
+	}
+
+	/** Create a placeholder PDF in each active PDF's tmp folder */
+	private function create_tmp_pdfs( $entry, $form ) {
+		global $gfpdf;
+
+		$files = [];
+		foreach ( $this->model->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) as $pdf ) {
+			$file = ( new Helper_PDF( $entry, $pdf, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log ) )->get_path() . 'test.pdf';
+
+			wp_mkdir_p( dirname( $file ) );
+			touch( $file );
+
+			$files[] = $file;
+		}
+
+		$this->assertNotEmpty( $files );
+
+		return $files;
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_cleanup_pdf_after_async_notifications() {
+		$results = $this->create_form_and_entries();
+		$files   = $this->create_tmp_pdfs( $results['entry'], $results['form'] );
+
+		do_action( 'gform_post_process_async_notifications', 'form_submission', [ 'abc' ], $results['form'], $results['entry'], [] );
+
+		foreach ( $files as $file ) {
+			$this->assertDirectoryDoesNotExist( dirname( $file ) );
+		}
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_cleanup_pdf_after_async_notifications_skipped_for_background_processing() {
+		global $gfpdf;
+
+		$results = $this->create_form_and_entries();
+		$files   = $this->create_tmp_pdfs( $results['entry'], $results['form'] );
+
+		$gfpdf->options->update_option( 'background_processing', 'Yes' );
+		try {
+			$this->model->cleanup_pdf_after_async_notifications( 'form_submission', [ 'abc' ], $results['form'], $results['entry'] );
+		} finally {
+			$gfpdf->options->update_option( 'background_processing', 'No' );
+		}
+
+		foreach ( $files as $file ) {
+			$this->assertFileExists( $file );
+		}
+
+		$this->model->cleanup_pdf( $results['entry'], $results['form'] );
 	}
 
 	/**
