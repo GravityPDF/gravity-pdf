@@ -6,6 +6,8 @@ import Dropzone from 'react-dropzone';
 /* Components */
 import ShowMessage from '../ShowMessage';
 import { TemplateUploaderContext } from './TemplateUploaderContext';
+/* Utilities */
+import { hasPendingUpload } from '../../utilities/Template/hasPendingUpload';
 /* Redux actions */
 import {
 	postTemplateUploadProcessing,
@@ -51,9 +53,7 @@ export class TemplateUploader extends Component {
 	 * @since 6.18.0
 	 */
 	get isUploading() {
-		return this.props.templateUploads.some(
-			(upload) => upload.status === 'pending'
-		);
+		return hasPendingUpload(this.props.templateUploads);
 	}
 
 	/**
