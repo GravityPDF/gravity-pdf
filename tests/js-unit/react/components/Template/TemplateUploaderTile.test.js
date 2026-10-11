@@ -6,7 +6,7 @@ import { TemplateUploaderContext } from '../../../../../src/assets/js/react/comp
 
 describe('Template - TemplateUploaderTile.js', () => {
   const setup = (context = {}) => mount(
-    <TemplateUploaderContext.Provider value={{ open: jest.fn(), ajax: false, ...context }}>
+    <TemplateUploaderContext.Provider value={{ open: jest.fn(), isUploading: false, ...context }}>
       <TemplateUploaderTile addTemplateText='Add New Template' templateInstallInstructions='instructions' />
     </TemplateUploaderContext.Provider>
   )
@@ -31,7 +31,7 @@ describe('Template - TemplateUploaderTile.js', () => {
   })
 
   test('shows the spinner while an upload is in flight', () => {
-    expect(setup({ ajax: true }).find('a').hasClass('doing-ajax')).toBe(true)
+    expect(setup({ isUploading: true }).find('a').hasClass('doing-ajax')).toBe(true)
     expect(setup().find('a').hasClass('doing-ajax')).toBe(false)
   })
 })

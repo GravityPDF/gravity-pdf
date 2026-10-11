@@ -29,8 +29,12 @@ import {
   TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
   templateUploadProcessingFailed,
   TEMPLATE_UPLOAD_PROCESSING_FAILED,
-  clearTemplateUploadProcessing,
-  CLEAR_TEMPLATE_UPLOAD_PROCESSING
+  templateUploadRejected,
+  TEMPLATE_UPLOAD_REJECTED,
+  dismissTemplateUploadSuccess,
+  DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+  clearFinishedTemplateUploads,
+  CLEAR_FINISHED_TEMPLATE_UPLOADS
 } from '../../../../src/assets/js/react/actions/templates'
 
 describe('Actions - templates', () => {
@@ -128,27 +132,40 @@ describe('Actions - templates', () => {
     expect(results.type).toEqual(POST_TEMPLATE_UPLOAD_PROCESSING)
     expect(results.payload.file).toEqual({ data: 'text' })
     expect(results.payload.filename).toEqual('filename')
+    expect(postTemplateUploadProcessing(data.file, data.filename).payload.id).not.toBe(results.payload.id)
   })
 
   test('templateUploadProcessingSuccess - check if it returns the correct action', () => {
-    data = { success: { data: 'success' } }
-    results = templateUploadProcessingSuccess(data, 'template.zip')
+    results = templateUploadProcessingSuccess(1, [{ id: 'rubix' }])
 
     expect(results.type).toEqual(TEMPLATE_UPLOAD_PROCESSING_SUCCESS)
-    expect(results.payload).toEqual({ success: { data: 'success' }, filename: 'template.zip' })
+    expect(results.payload).toEqual({ id: 1, templates: [{ id: 'rubix' }] })
   })
 
   test('templateUploadProcessingFailed - check if it returns the correct action', () => {
-    data = { error: { error: 'error' } }
-    results = templateUploadProcessingFailed(data, 'template.zip')
+    results = templateUploadProcessingFailed(1, 'error')
 
     expect(results.type).toEqual(TEMPLATE_UPLOAD_PROCESSING_FAILED)
-    expect(results.payload).toEqual({ error: { error: 'error' }, filename: 'template.zip' })
+    expect(results.payload).toEqual({ id: 1, message: 'error' })
   })
 
-  test('clearTemplateUploadProcessing - check if it returns the correct action', () => {
-    results = clearTemplateUploadProcessing()
+  test('templateUploadRejected - check if it returns the correct action', () => {
+    data = [{ filename: 'a.txt', message: 'notZip' }]
+    results = templateUploadRejected(data)
 
-    expect(results.type).toEqual(CLEAR_TEMPLATE_UPLOAD_PROCESSING)
+    expect(results.type).toEqual(TEMPLATE_UPLOAD_REJECTED)
+    expect(results.payload).toEqual(data)
+  })
+
+  test('dismissTemplateUploadSuccess - check if it returns the correct action', () => {
+    results = dismissTemplateUploadSuccess()
+
+    expect(results.type).toEqual(DISMISS_TEMPLATE_UPLOAD_SUCCESS)
+  })
+
+  test('clearFinishedTemplateUploads - check if it returns the correct action', () => {
+    results = clearFinishedTemplateUploads()
+
+    expect(results.type).toEqual(CLEAR_FINISHED_TEMPLATE_UPLOADS)
   })
 })

@@ -36,16 +36,7 @@ export class TemplateList extends Component {
     templateDetailsText: PropTypes.string,
     activateText: PropTypes.string,
     addTemplateText: PropTypes.string,
-    genericUploadErrorText: PropTypes.string,
-    filenameErrorText: PropTypes.string,
-    filesizeErrorText: PropTypes.string,
-    installSuccessText: PropTypes.string,
-    installUpdatedText: PropTypes.string,
-    templateSuccessfullyInstalledUpdated: PropTypes.string,
-    templateInstallInstructions: PropTypes.string,
-    dropzoneText: PropTypes.string,
-    uploadInProgressText: PropTypes.string,
-    maxFileSize: PropTypes.number
+    templateInstallInstructions: PropTypes.string
   }
 
   /**
@@ -99,18 +90,7 @@ export class TemplateList extends Component {
     }
 
     return (
-      <TemplateUploader
-        data-test='component-templateUploader'
-        genericUploadErrorText={this.props.genericUploadErrorText}
-        filenameErrorText={this.props.filenameErrorText}
-        filesizeErrorText={this.props.filesizeErrorText}
-        installSuccessText={this.props.installSuccessText}
-        installUpdatedText={this.props.installUpdatedText}
-        templateSuccessfullyInstalledUpdated={this.props.templateSuccessfullyInstalledUpdated}
-        dropzoneText={this.props.dropzoneText}
-        uploadInProgressText={this.props.uploadInProgressText}
-        maxFileSize={this.props.maxFileSize}
-      >
+      <TemplateUploader data-test='component-templateUploader'>
         {templateManager}
       </TemplateUploader>
     )

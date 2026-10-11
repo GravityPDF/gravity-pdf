@@ -8,9 +8,12 @@ import {
   TEMPLATE_PROCESSING_SUCCESS,
   TEMPLATE_PROCESSING_FAILED,
   CLEAR_TEMPLATE_PROCESSING,
+  POST_TEMPLATE_UPLOAD_PROCESSING,
   TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
   TEMPLATE_UPLOAD_PROCESSING_FAILED,
-  CLEAR_TEMPLATE_UPLOAD_PROCESSING
+  TEMPLATE_UPLOAD_REJECTED,
+  DISMISS_TEMPLATE_UPLOAD_SUCCESS,
+  CLEAR_FINISHED_TEMPLATE_UPLOADS
 } from '../../../../src/assets/js/react/actions/templates'
 import reducer, { initialState } from '../../../../src/assets/js/react/reducers/templateReducer'
 
@@ -140,43 +143,85 @@ describe('Reducers - templateReducer', () => {
     })
   })
 
-  describe('TEMPLATE_UPLOAD_PROCESSING_SUCCESS', () => {
+  describe('Template uploads', () => {
+    const post = (state, id) => reducer(state, {
+      type: POST_TEMPLATE_UPLOAD_PROCESSING,
+      payload: { file: {}, filename: `${id}.zip`, id }
+    })
 
-    test('appends each result so concurrent uploads do not overwrite each other', () => {
-      newState = reducer(initialState, { type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: { filename: 'one.zip', templates: [] } })
-      newState = reducer(newState, { type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: { filename: 'two.zip', templates: [] } })
+    const reject = (state, filename) => reducer(state, {
+      type: TEMPLATE_UPLOAD_REJECTED,
+      payload: [{ filename, message: 'notZip' }]
+    })
 
-      expect(newState.templateUploadResults).toEqual([
-        { filename: 'one.zip', templates: [], success: true },
-        { filename: 'two.zip', templates: [], success: true }
+    const succeed = (state, id, templates = []) => reducer(state, {
+      type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
+      payload: { id, templates }
+    })
+
+    test('a drop during an upload joins the batch in flight', () => {
+      newState = reject(post(post(initialState, 1), 2), 'a.txt')
+
+      expect(newState.templateUploads).toEqual([
+        { id: 1, filename: '1.zip', status: 'pending' },
+        { id: 2, filename: '2.zip', status: 'pending' },
+        { filename: 'a.txt', message: 'notZip', status: 'failed' }
       ])
     })
-  })
 
-  describe('TEMPLATE_UPLOAD_PROCESSING_FAILED', () => {
+    test('records each result against its upload', () => {
+      newState = post(post(initialState, 1), 2)
+      newState = reducer(newState, { type: TEMPLATE_UPLOAD_PROCESSING_FAILED, payload: { id: 2, message: 'error' } })
+      newState = succeed(newState, 1)
 
-    test('appends each result alongside any successful uploads', () => {
-      newState = reducer(initialState, { type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: { filename: 'one.zip', templates: [] } })
-      newState = reducer(newState, { type: TEMPLATE_UPLOAD_PROCESSING_FAILED, payload: { filename: 'two.zip', message: 'error' } })
-
-      expect(newState.templateUploadResults).toEqual([
-        { filename: 'one.zip', templates: [], success: true },
-        { filename: 'two.zip', message: 'error', success: false }
+      expect(newState.templateUploads).toEqual([
+        { id: 1, filename: '1.zip', status: 'success' },
+        { id: 2, filename: '2.zip', status: 'failed', message: 'error' }
       ])
     })
-  })
 
-  describe('CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
+    test('starts a new batch once every upload has reported back', () => {
+      newState = succeed(post(initialState, 1), 1)
 
-    test('check the correct state gets returned when this action runs', () => {
-      newState = reducer(initialState, { type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: { filename: 'one.zip', templates: [] } })
-      newState = reducer(newState, { type: CLEAR_TEMPLATE_UPLOAD_PROCESSING })
+      expect(post(newState, 2).templateUploads).toEqual([{ id: 2, filename: '2.zip', status: 'pending' }])
+      expect(reject(newState, 'a.txt').templateUploads).toEqual([
+        { filename: 'a.txt', message: 'notZip', status: 'failed' }
+      ])
+    })
 
-      expect(newState.templateUploadResults).toEqual([])
+    test('adds installed templates to the list and flags existing ones as updated', () => {
+      const state = { ...initialState, list: [{ id: 'rubix' }] }
 
-      newState = reducer(newState, { type: CLEAR_TEMPLATE_UPLOAD_PROCESSING })
+      newState = succeed(post(state, 1), 1, [{ id: 'cellulose' }, { id: 'rubix' }])
 
-      expect(newState.templateUploadResults).toEqual([])
+      expect(newState.list).toEqual([
+        { id: 'rubix', message: 'updated' },
+        { id: 'cellulose', new: true, message: 'installed' }
+      ])
+    })
+
+    test('dismissing the success message drops the installed zips', () => {
+      newState = reject(succeed(post(initialState, 1), 1), 'a.txt')
+      newState = reject(post(newState, 2), 'b.txt')
+      newState = succeed(newState, 2)
+      newState = reducer(newState, { type: DISMISS_TEMPLATE_UPLOAD_SUCCESS })
+
+      expect(newState.templateUploads).toEqual([{ filename: 'b.txt', message: 'notZip', status: 'failed' }])
+    })
+
+    test('closing the Template Manager keeps only the uploads in flight', () => {
+      newState = reject(succeed(post(initialState, 1), 1), 'a.txt')
+      newState = post(newState, 2)
+      newState = reducer(newState, { type: CLEAR_FINISHED_TEMPLATE_UPLOADS })
+
+      expect(newState.templateUploads).toEqual([expect.objectContaining({ id: 2, status: 'pending' })])
+    })
+
+    test('closing the Template Manager with nothing finished leaves the state alone', () => {
+      const state = post(initialState, 1)
+
+      expect(reducer(state, { type: CLEAR_FINISHED_TEMPLATE_UPLOADS })).toBe(state)
+      expect(reducer(state, { type: DISMISS_TEMPLATE_UPLOAD_SUCCESS })).toBe(state)
     })
   })
 
