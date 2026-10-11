@@ -556,6 +556,34 @@ class Test_Templates extends WP_UnitTestCase {
 		$this->assertEquals( 'Zadani', $info[0]['template'] );
 	}
 
+	public function test_check_for_valid_pdf_templates_requires_developer_toolkit() {
+		global $gfpdf;
+
+		$template = $gfpdf->data->template_tmp_location . 'toolkit-template.php';
+		file_put_contents( $template, "<?php\n/*\n * Template Name: Toolkit Template\n * Group: Toolkit\n * Toolkit: true\n */\n" );
+
+		try {
+			$this->model->check_for_valid_pdf_templates( [ $template ] );
+			$this->fail( 'Expected the Toolkit template to be rejected' );
+		} catch ( Exception $e ) {
+			$this->assertStringContainsString( 'requires the Gravity PDF Developer Toolkit', $e->getMessage() );
+		}
+
+		$add_toolkit_header = function ( $headers ) {
+			$headers['toolkit'] = 'Toolkit';
+
+			return $headers;
+		};
+
+		add_filter( 'gfpdf_template_header_details', $add_toolkit_header );
+		try {
+			$this->model->check_for_valid_pdf_templates( [ $template ] );
+		} finally {
+			remove_filter( 'gfpdf_template_header_details', $add_toolkit_header );
+			unlink( $template );
+		}
+	}
+
 	/**
 	 * Check our unzipped directory is correctly cleaned up
 	 *
