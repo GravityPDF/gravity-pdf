@@ -26,6 +26,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 
 	/**
+	 * @var Helper_Abstract_Options
+	 *
+	 * @since 6.18.0
+	 */
+	protected $options;
+
+	/**
+	 * @param Helper_Abstract_Options|null $options Defaults to Gravity PDF's settings
+	 *
+	 * @since 6.18.0
+	 */
+	public function __construct( ?Helper_Abstract_Options $options = null ) {
+		$this->options = $options ?? GPDFAPI::get_options_class();
+	}
+
+	/**
 	 * Sign a URL with a secret token
 	 *
 	 * @param string $url
@@ -46,18 +62,18 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 			]
 		);
 
-		$secret_key = GPDFAPI::get_plugin_option( 'signed_secret_token', '' );
+		$secret_key = $this->options->get_option( 'signed_secret_token', '' );
 
 		/* If no secret key exists, generate it */
 		if ( empty( $secret_key ) ) {
 			$secret_key = $this->generate_secret_key();
-			GPDFAPI::update_plugin_option( 'signed_secret_token', $secret_key );
+			$this->options->update_option( 'signed_secret_token', $secret_key );
 		}
 
 		/* If the secret key is ever corrupted, create a new one */
 		if ( ! is_string( $secret_key ) || strlen( $secret_key ) !== 64 ) {
 			$secret_key = $this->generate_secret_key();
-			GPDFAPI::update_plugin_option( 'signed_secret_token', $secret_key );
+			$this->options->update_option( 'signed_secret_token', $secret_key );
 		}
 
 		try {
@@ -65,7 +81,7 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 
 			/* Use default timeout if no expiration passed, or expiration is invalid */
 			if ( empty( $expiration ) || (bool) strtotime( $expiration ) === false ) {
-				$expiration = ( (int) GPDFAPI::get_plugin_option( 'logged_out_timeout', '20' ) ) . ' minutes';
+				$expiration = $this->options->get_logged_out_timeout() . ' minutes';
 			}
 
 			$log->notice( 'PDF URL signing period: ' . $expiration, [ 'url' => $url ] );
@@ -165,7 +181,7 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 	 * @since 6.14.2
 	 */
 	protected function validate( $url ) {
-		$secret_key = GPDFAPI::get_plugin_option( 'signed_secret_token', '' );
+		$secret_key = $this->options->get_option( 'signed_secret_token', '' );
 
 		try {
 			$url_signer = new Helper_Sha256_Url_Signer( $secret_key );

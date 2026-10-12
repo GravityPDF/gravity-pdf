@@ -5,7 +5,6 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
@@ -125,8 +124,8 @@ class Controller_Upgrade_Routines {
 
 		if ( (int) $settings['logged_out_timeout'] < 1 ) {
 			$this->options->delete_option( 'logged_out_timeout' );
-		} elseif ( (int) $settings['logged_out_timeout'] > Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX ) {
-			$this->options->update_option( 'logged_out_timeout', Helper_Options_Fields::LOGGED_OUT_TIMEOUT_MAX );
+		} elseif ( (int) $settings['logged_out_timeout'] > Helper_Abstract_Options::LOGGED_OUT_TIMEOUT_MAX ) {
+			$this->options->update_option( 'logged_out_timeout', Helper_Abstract_Options::LOGGED_OUT_TIMEOUT_MAX );
 		}
 	}
 

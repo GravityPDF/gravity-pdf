@@ -33,6 +33,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	use Helper_Trait_Removed_Methods;
 
 	/**
+	 * The longest Logged Out Timeout, in minutes (1 week)
+	 *
+	 * @internal
+	 *
+	 * @since 6.18.0
+	 */
+	public const LOGGED_OUT_TIMEOUT_MAX = 10080;
+
+	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var Helper_Form
@@ -699,7 +708,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * Looks to see if the specified setting exists, returns default if not
 	 *
 	 * @param string $key      The options key to get
-	 * @param bool   $fallback The default option value if the key isn't found
+	 * @param mixed  $fallback The default option value if the key isn't found
 	 *
 	 * @return mixed
 	 * @since 4.0
@@ -716,6 +725,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value = apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $fallback );
 
 		return $value;
+	}
+
+	/**
+	 * The Logged Out Timeout, in minutes, capped at a week as a value saved outside the settings form can be longer
+	 *
+	 * @return int
+	 *
+	 * @internal
+	 *
+	 * @since 6.18.0
+	 */
+	public function get_logged_out_timeout(): int {
+		return min( (int) $this->get_option( 'logged_out_timeout', '20' ), self::LOGGED_OUT_TIMEOUT_MAX );
 	}
 
 	/**

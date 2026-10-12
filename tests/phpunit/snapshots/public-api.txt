@@ -505,6 +505,7 @@ class GFPDF\Helper\Fields\Field_Products extends GFPDF\Helper\Helper_Abstract_Fi
 
 abstract class GFPDF\Helper\Helper_Abstract_Options implements GFPDF\Helper\Helper_Interface_Filters
     abstract public function get_registered_fields()
+    const LOGGED_OUT_TIMEOUT_MAX = 10080
     public function __call($name, $arguments)
     public function __construct(GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Helper\Helper_Templates $templates)
     public function add_custom_fonts($fonts = [])
@@ -527,6 +528,7 @@ abstract class GFPDF\Helper\Helper_Abstract_Options implements GFPDF\Helper\Help
     public function get_form_settings()
     public function get_form_value($args = [])
     public function get_installed_fonts()
+    public function get_logged_out_timeout(): int
     public function get_option($key = '', $fallback = false)
     public function get_paper_size()
     public function get_pdf($form_id, $pdf_id)
@@ -721,6 +723,7 @@ class GFPDF\Helper\Helper_Templates
     public static function get_max_upload_size()
 
 class GFPDF\Helper\Helper_Url_Signer implements GFPDF\Helper\Helper_Interface_Url_Signer
+    public function __construct(?GFPDF\Helper\Helper_Abstract_Options $options = null)
     public function sign($url, $expiration)
     public function verify($url)
     public function verify_current_request()
