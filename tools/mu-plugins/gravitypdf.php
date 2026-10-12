@@ -215,6 +215,18 @@ if ( $gfpdf_e2e_header( 'unwritable_folders' ) === 'yes' ) {
 	);
 }
 
+/* Adds an extension's warning to a settings save, for the spec checking its colour */
+if ( $gfpdf_e2e_header( 'settings_warning' ) === 'yes' ) {
+	add_filter(
+		'pre_update_option_gfpdf_settings',
+		static function ( $value ) {
+			add_settings_error( 'gfpdf-notices', 'e2e-warning', 'An extension warning', 'warning' );
+
+			return $value;
+		}
+	);
+}
+
 /* The editors open on the Visual tab whatever the last test left them on. WordPress remembers the tab per user, and
    every test shares the one admin */
 add_filter(

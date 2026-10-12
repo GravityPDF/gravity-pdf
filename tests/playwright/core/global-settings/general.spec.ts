@@ -33,6 +33,33 @@ test.describe('Settings Tab', () => {
 		await expectNoticeInPlace(page, 'Settings updated.');
 	});
 
+	test("should keep the colour of an extension's warning on save", async ({
+		page,
+		admin,
+	}: {
+		page: Page;
+		admin: Admin;
+	}, testinfo) => {
+		await page.setExtraHTTPHeaders({
+			'X-GPDF-E2E-Settings-Warning': 'yes',
+		});
+		await openGeneralTab(admin);
+
+		await page.getByRole('button', { name: 'Save Settings' }).click();
+
+		const warning = page.locator('.gf-notice.notice-warning', {
+			hasText: 'An extension warning',
+		});
+		const success = page.locator('.gf-notice.notice-success', {
+			hasText: 'Settings updated.',
+		});
+
+		await expect(warning).toBeVisible();
+		await expect(success).toBeVisible();
+
+		await snapshot(page, testinfo, [warning, success]);
+	});
+
 	test.describe('PDF Cache', () => {
 		test('should show Clear Cache beside the toggle only while the cache is on', async ({
 			page,
