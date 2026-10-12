@@ -82,4 +82,29 @@ describe('Template - TemplateFooterActions.js', () => {
 
 		expect(wrapper.find('TemplateDeleteButton').length).toBe(1);
 	});
+
+	test('hides <TemplateDeleteButton /> when the user cannot manage templates', () => {
+		const mockStore = configureMockStore();
+		const store = mockStore({ template: { templateProcessing: '' } });
+		const template = {
+			compatible: true,
+			path: '/',
+		};
+
+		GFPDF.canManageTemplates = false;
+		wrapper = mount(
+			<Provider store={store}>
+				<MemoryRouter>
+					<TemplateFooterActions
+						template={template}
+						isActiveTemplate={false}
+						pdfWorkingDirPath="/"
+					/>
+				</MemoryRouter>
+			</Provider>
+		);
+		GFPDF.canManageTemplates = true;
+
+		expect(wrapper.find('TemplateDeleteButton').length).toBe(0);
+	});
 });

@@ -41,6 +41,7 @@
 * 🎉 Feature: Drop template zips anywhere in the Template Manager
 * 🎉 Feature: Install template zips that have the templates inside a folder
 * 🔒 Security: Upgrade the bundled upload library to 4.0
+* 🔒 Security: Restrict PDF template uploads to users who can install plugins
 * 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
 * 💻 Developer: Add the `gfpdf_template_max_upload_size` filter
 
