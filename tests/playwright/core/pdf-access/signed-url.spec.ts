@@ -4,7 +4,10 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
-import { withConfirmation } from '@self:playwright/utils/gravityforms';
+import {
+	withConfirmation,
+	withNotification,
+} from '@self:playwright/utils/gravityforms';
 
 test.describe('Signed PDF URLs', () => {
 	let pdf: Pdf;
@@ -31,7 +34,7 @@ test.describe('Signed PDF URLs', () => {
 		}
 	);
 
-	const shortcode = (entryId?: number) =>
+	const shortcode = (entryId?: number | string) =>
 		`[gravitypdf id="${pdfId}"${entryId ? ` entry="${entryId}"` : ''} signed="1" raw="1"]`;
 
 	test('signs the link an administrator publishes', async ({
@@ -141,6 +144,33 @@ test.describe('Signed PDF URLs', () => {
 		expect(named).toContain(`lid=${entry.id}&`);
 		expect(named).toContain('signature=');
 		await pdf.gotoPdfAndVerify(named, 'Signed URL.pdf');
+	});
+
+	test('signs the links in a background notification', async ({
+		admin,
+	}: {
+		admin: Admin;
+	}) => {
+		await pdf.updateForm(
+			form.id,
+			withNotification(
+				`<code>Entry {entry_id}: {PDF:pdf:${pdfId}:signed}</code><code>${shortcode('{entry_id}')}</code>`
+			)
+		);
+
+		const mail = pdf.sendBackgroundNotifications(form.id, entry.id);
+		const urls = [
+			...mail.matchAll(/<code>(?:Entry \d+: )?(.+?)<\/code>/g),
+		].map(([, url]) => url.replace(/&(#038|amp);/g, '&'));
+
+		expect(mail).toContain(`Entry ${entry.id}: `);
+		expect(urls).toHaveLength(2);
+		for (const url of urls) {
+			expect(url).toContain('signature=');
+		}
+
+		await admin.context.clearCookies();
+		await pdf.gotoPdfAndVerify(urls[1], 'Signed URL.pdf');
 	});
 
 	test('does not sign a shortcode or merge tag in a field value', async ({
