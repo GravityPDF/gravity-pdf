@@ -85,6 +85,30 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		);
 	});
 
+	test('signs the PDF link in a rich text administrative field default', async () => {
+		await pdf.updateForm(form.id, (current: any) => ({
+			fields: current.fields.map((field: any) =>
+				field.id === 16
+					? { ...field, type: 'textarea', useRichTextEditor: true }
+					: field
+			),
+		}));
+
+		const entry: any = await pdf.createEntry({
+			form_id: form.id,
+			'16': adminDefault,
+		});
+
+		const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
+
+		expect(html).toMatch(
+			new RegExp(
+				`${pdfId}.*${entry.id}.*signature=|${entry.id}.*${pdfId}.*signature=`
+			)
+		);
+		expect(html).not.toContain('&#091;gravitypdf');
+	});
+
 	test('signs the PDF link in an administrative field default whose other tags resolved on save', async () => {
 		await pdf.updateForm(form.id, (current: any) => ({
 			fields: current.fields.map((field: any) =>
