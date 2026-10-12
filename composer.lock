@@ -1476,7 +1476,8 @@
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
             },
-            "type": "wordpress-plugin"
+            "type": "wordpress-plugin",
+            "time": "2026-10-01T15:12:21+00:00"
         },
         {
             "name": "nikic/php-parser",
