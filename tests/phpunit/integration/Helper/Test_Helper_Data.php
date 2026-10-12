@@ -172,6 +172,11 @@ class Test_Helper_Data extends TestCase {
 		/* The React Template Manager compares this against each template path to decide if it can be deleted */
 		$working_dir = is_multisite() ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
 		$this->assertSame( $working_dir, $localised_data['pdfWorkingDir'] );
+
+		/* The Template Manager refuses a larger file before it's sent, so it must match what the server accepts */
+		add_filter( 'gfpdf_template_max_upload_size', fn() => 3 * MB_IN_BYTES );
+		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->gform, $gfpdf->templates );
+		$this->assertSame( 3 * MB_IN_BYTES, $localised_data['templateUploadMaxSize'] );
 	}
 
 	public function test_get_conditional_logic_options() {

@@ -124,6 +124,16 @@ if ( $gfpdf_e2e_header( 'toolkit' ) === 'active' ) {
 	);
 }
 
+/* Stands in for a multisite network's media upload limit, which mustn't cap PDF template uploads */
+if ( $gfpdf_e2e_header( 'media_upload_limit' ) === 'tiny' ) {
+	add_filter(
+		'upload_size_limit',
+		static function () {
+			return KB_IN_BYTES;
+		}
+	);
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {
