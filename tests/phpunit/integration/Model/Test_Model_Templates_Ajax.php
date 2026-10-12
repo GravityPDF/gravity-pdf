@@ -143,6 +143,16 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 	/**
 	 * @since 6.18.0
 	 */
+	public function test_ajax_template_endpoints_follow_the_capability_filter() {
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'editor' ] ) );
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+
+		$this->assertSame( '400', $this->get_template_endpoint_response_code( 'gfpdf_upload_template' ) );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
 	public function test_ajax_template_endpoints_blocked_when_file_mods_disallowed() {
 		$this->_setRole( 'administrator' );
 		$this->maybe_grant_super_admin();

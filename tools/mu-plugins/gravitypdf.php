@@ -137,3 +137,8 @@ add_filter(
 		return 'tinymce';
 	}
 );
+
+/* The Template Manager spec lets a user without the default capabilities manage templates */
+if ( $gfpdf_e2e_header( 'manage_templates' ) === 'yes' ) {
+	add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+}
