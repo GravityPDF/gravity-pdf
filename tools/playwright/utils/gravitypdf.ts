@@ -3,6 +3,7 @@ import type { Locator } from '@playwright/test';
 import type { Readable } from 'stream';
 import { URL } from 'node:url';
 import GravityForms from '@self:playwright/utils/gravityforms';
+import { wpCli } from '@self:playwright/utils/wp-cli';
 
 export default class Pdf extends GravityForms {
 	/**
@@ -41,6 +42,27 @@ export default class Pdf extends GravityForms {
 		);
 
 		return await response.text();
+	}
+
+	/**
+	 * Put a font metrics file in mPDF's cache at `tmp/{folder}`, age the folder by a day and run the tmp cleanup with
+	 * mPDF filtered into it, returning whether the file is kept. The folder is removed afterwards.
+	 * @param folder
+	 */
+	cleanupKeepsMpdfCache(folder: string) {
+		return /^kept$/m.test(
+			wpCli(
+				`wp --exec='WP_CLI::add_wp_hook( \\"gfpdf_mpdf_tmp_location\\", fn() => trailingslashit( func_get_arg( 0 ) ) . \\"${folder}\\" );' eval '${[
+					'define( \\"E2E_FONT\\", GPDFAPI::get_data_class()->mpdf_tmp_location . \\"/mpdf/ttfontdata/e2e.mtx.json\\" );',
+					'wp_mkdir_p( dirname( E2E_FONT ) );',
+					'file_put_contents( E2E_FONT, \\"{}\\" );',
+					'touch( GPDFAPI::get_data_class()->mpdf_tmp_location, time() - DAY_IN_SECONDS );',
+					'GPDFAPI::get_mvc_class( \\"Model_PDF\\" )->cleanup_tmp_dir();',
+					'echo PHP_EOL, file_exists( E2E_FONT ) ? \\"kept\\" : \\"deleted\\", PHP_EOL;',
+					'GPDFAPI::get_misc_class()->rmdir( GPDFAPI::get_data_class()->mpdf_tmp_location );',
+				].join(' ')}'`
+			)
+		);
 	}
 
 	async fillField(label: string, value: string) {

@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process';
 const CLI_TIMEOUT = 120_000;
 
 /**
- * Run one or more WP-CLI commands in the e2e wp-env container, stopping at the first that fails
+ * Run one or more WP-CLI commands in the e2e wp-env container, stopping at the first that fails, and return their output
  *
  * Pass every command to one call rather than calling this twice: each call pays a `wp-env run` round trip.
  * @param commands
@@ -13,10 +13,10 @@ export function wpCli(...commands: string[]) {
 	const command = commands.join(' && ');
 
 	try {
-		execSync(`yarn wp-env:e2e run cli bash -c "${command}"`, {
+		return execSync(`yarn wp-env:e2e run cli bash -c "${command}"`, {
 			stdio: ['ignore', 'pipe', 'pipe'],
 			timeout: CLI_TIMEOUT,
-		});
+		}).toString();
 	} catch (err) {
 		const e = err as { stderr?: Buffer; stdout?: Buffer; status?: number };
 

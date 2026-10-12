@@ -2172,7 +2172,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		$tmp_location    = $this->data->template_tmp_location;
-		$mpdf_cache      = $this->data->mpdf_tmp_location . '/mpdf';
+		$mpdf_cache      = wp_normalize_path( $this->data->mpdf_tmp_location . '/mpdf' );
 		$mpdf_font_cache = $mpdf_cache . '/ttfontdata/';
 
 		/**
@@ -2215,12 +2215,12 @@ class Model_PDF extends Helper_Abstract_Model {
 						continue;
 					}
 
-					$path     = $file->getPathname();
+					$path     = wp_normalize_path( $file->getPathname() );
 					$relative = $get_relative_path( $path );
 					$is_mpdf  = strpos( $path . '/', $mpdf_cache . '/' ) === 0;
 
-					/* Concurrent PDFs share mPDF's cache folders and it recreates them non-atomically, so only files expire */
-					if ( $is_mpdf && $file->isDir() ) {
+					/* Concurrent PDFs share mPDF's cache folders, and any folder holding them, so only files expire */
+					if ( $file->isDir() && ( $is_mpdf || strpos( $mpdf_cache, $path . '/' ) === 0 ) ) {
 						continue;
 					}
 
