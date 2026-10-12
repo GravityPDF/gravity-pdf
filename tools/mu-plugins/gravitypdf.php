@@ -134,6 +134,11 @@ if ( $gfpdf_e2e_header( 'media_upload_limit' ) === 'tiny' ) {
 	);
 }
 
+/* The Template Manager spec grants a user without the default capabilities access to templates */
+if ( $gfpdf_e2e_header( 'manage_templates' ) === 'yes' ) {
+	add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {
