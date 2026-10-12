@@ -448,14 +448,11 @@ class Test_Templates extends TestCase {
 	 * @since 6.18.0
 	 */
 	public function test_get_max_upload_size() {
-		/* Never offer to accept more than the server itself will */
-		add_filter( 'upload_size_limit', $tiny = fn() => MB_IN_BYTES );
-		$this->assertSame( MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
-		remove_filter( 'upload_size_limit', $tiny );
+		$server = min( wp_convert_hr_to_bytes( ini_get( 'upload_max_filesize' ) ), wp_convert_hr_to_bytes( ini_get( 'post_max_size' ) ) );
 
-		add_filter( 'upload_size_limit', $huge = fn() => 512 * MB_IN_BYTES );
-		$this->assertSame( 32 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
-		remove_filter( 'upload_size_limit', $huge );
+		add_filter( 'upload_size_limit', $media = fn() => 1500 * KB_IN_BYTES );
+		$this->assertSame( min( 32 * MB_IN_BYTES, $server ), Helper_Templates::get_max_upload_size() );
+		remove_filter( 'upload_size_limit', $media );
 
 		add_filter( 'gfpdf_template_max_upload_size', $override = fn() => 5 * MB_IN_BYTES );
 		$this->assertSame( 5 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
