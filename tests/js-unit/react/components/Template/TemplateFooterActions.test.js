@@ -61,25 +61,34 @@ describe('Template - TemplateFooterActions.js', () => {
 		).toBe(true);
 	});
 
-	test('renders <TemplateDeleteButton /> component', () => {
-		const mockStore = configureMockStore();
-		const store = mockStore({ template: { templateProcessing: '' } });
-		const template = {
-			compatible: true,
-			path: '/',
-		};
-		wrapper = mount(
-			<Provider store={store}>
-				<MemoryRouter>
-					<TemplateFooterActions
-						template={template}
-						isActiveTemplate={false}
-						pdfWorkingDirPath="/"
-					/>
-				</MemoryRouter>
-			</Provider>
-		);
+	test.each([
+		[true, 1],
+		[false, 0],
+	])(
+		'renders <TemplateDeleteButton /> only when the user can manage templates (%s)',
+		(canManageTemplates, count) => {
+			const mockStore = configureMockStore();
+			const store = mockStore({ template: { templateProcessing: '' } });
+			const template = {
+				compatible: true,
+				path: '/',
+			};
 
-		expect(wrapper.find('TemplateDeleteButton').length).toBe(1);
-	});
+			GFPDF.canManageTemplates = canManageTemplates;
+			wrapper = mount(
+				<Provider store={store}>
+					<MemoryRouter>
+						<TemplateFooterActions
+							template={template}
+							isActiveTemplate={false}
+							pdfWorkingDirPath="/"
+						/>
+					</MemoryRouter>
+				</Provider>
+			);
+			GFPDF.canManageTemplates = true;
+
+			expect(wrapper.find('TemplateDeleteButton').length).toBe(count);
+		}
+	);
 });
