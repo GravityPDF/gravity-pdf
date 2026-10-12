@@ -237,4 +237,38 @@ class Model_Signed_Url_Trust {
 
 		return array_values( array_unique( $trusted ) );
 	}
+
+	/**
+	 * Whether a tag is in a value the user submitted, rather than an administrative field's default
+	 *
+	 * @param string $tag
+	 * @param array  $form
+	 * @param array  $entry
+	 *
+	 * @return bool
+	 *
+	 * @since 6.18.0
+	 */
+	public function is_submitted_tag( $tag, $form, $entry ) {
+		foreach ( $form['fields'] ?? [] as $field ) {
+			if ( in_array( $tag, $this->get_default_tags( $field ), true ) ) {
+				continue;
+			}
+
+			$found = false;
+			$value = (array) GFFormsModel::get_lead_field_value( $entry, $field );
+			array_walk_recursive(
+				$value,
+				function ( $item ) use ( $tag, &$found ) {
+					$found = $found || ( is_string( $item ) && strpos( $item, $tag ) !== false );
+				}
+			);
+
+			if ( $found ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

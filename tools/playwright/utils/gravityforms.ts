@@ -162,6 +162,17 @@ export default class GravityForms {
 		);
 	}
 
+	/**
+	 * Resend an entry's notifications as an administrator, with background notifications off, and return them
+	 * @param formId
+	 * @param entryId
+	 */
+	resendNotifications(formId: number, entryId: number) {
+		return wpCli(
+			`wp --user=admin eval '${PRINT_MAIL} add_filter( \\"gform_is_asynchronous_notifications_enabled\\", \\"__return_false\\" ); GFAPI::send_notifications( GFAPI::get_form( ${formId} ), GFAPI::get_entry( ${entryId} ) );'`
+		);
+	}
+
 	async getFormIdByName(name: string): Promise<number> {
 		await this.navigateToFormList();
 		const search = this.page.getByRole('searchbox');

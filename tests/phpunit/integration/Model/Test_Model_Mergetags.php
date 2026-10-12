@@ -527,6 +527,19 @@ class Test_Model_Mergetags extends TestCase {
 			}
 		);
 		$this->assertStringNotContainsString( 'signature=', $untrusted );
+
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+		$field->visibility = 'standard';
+		$this->assertStringNotContainsString( 'signature=', \GFCommon::replace_variables( '{all_fields}', $form, $entry ) );
+		$this->assertStringNotContainsString(
+			'signature=',
+			GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->run_untrusted(
+				function () use ( $tag, $form, $entry ) {
+					return \GFCommon::replace_variables( $tag, $form, $entry );
+				}
+			)
+		);
+		wp_set_current_user( 0 );
 	}
 
 	public function test_signed_pdf_mergetag_after_another_merge_tag_is_signed() {

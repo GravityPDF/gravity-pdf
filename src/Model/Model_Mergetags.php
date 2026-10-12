@@ -250,8 +250,9 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 					switch ( $modifier[0] ?? '' ) {
 						case 'signed':
-							/* Sign trusted tags, or when the user can view the PDF anyway */
-							if ( $trusted || $this->pdf->can_user_view_entry( $entry, $config ) ) {
+							/* Sign trusted tags, or when the user can view the PDF anyway, unless the tag came from the user */
+							$from_user = $this->get_trust()->is_untrusted() || $this->get_trust()->is_submitted_tag( $tag[0], $form, $entry );
+							if ( $trusted || ( ! $from_user && $this->pdf->can_user_view_entry( $entry, $config ) ) ) {
 								$url = $this->url_signer->sign( $url, trim( $modifier[1] ?? '' ) );
 							}
 							break;
