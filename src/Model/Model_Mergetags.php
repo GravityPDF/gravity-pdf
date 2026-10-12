@@ -29,11 +29,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Mergetags extends Helper_Abstract_Model {
 
 	/**
-	 * Matches {NAME:pdf:ID:MODIFIERS}
+	 * Matches {NAME:pdf:ID:MODIFIERS}, without running into another tag's braces
 	 *
 	 * @since 6.17.3
 	 */
-	const PDF_MERGETAG_REGEX = '/{.*?:pdf:([0-9A-Za-z]*)?:?(.*?)?}/';
+	const PDF_MERGETAG_REGEX = '/{[^{}]*?:pdf:([0-9A-Za-z]*)?:?([^{}]*)}/';
 
 	/**
 	 * @var Model_PDF

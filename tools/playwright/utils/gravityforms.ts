@@ -2,6 +2,7 @@ import { readFile } from 'fs/promises';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
+import { wpCli } from '@self:playwright/utils/wp-cli';
 
 type Form = {
 	id: number;
@@ -38,6 +39,30 @@ export function withConfirmation(confirmation: object) {
 		),
 	});
 }
+
+/**
+ * An `updateForm()` patch replacing the form's notifications with one sent on submission
+ * @param message
+ */
+export function withNotification(message: string) {
+	return {
+		notifications: {
+			e2e: {
+				id: 'e2e',
+				name: 'E2E',
+				isActive: true,
+				event: 'form_submission',
+				toType: 'email',
+				to: 'recipient@example.com',
+				subject: 'E2E',
+				message,
+			},
+		},
+	};
+}
+
+/* For `wp eval`: print each mail's message instead of sending it */
+const PRINT_MAIL = `add_filter( \\"pre_wp_mail\\", fn() => print_r( func_get_arg( 1 )[\\"message\\"] ), 10, 2 );`;
 
 export default class GravityForms {
 	protected requestUtils: RequestUtils;
@@ -124,6 +149,17 @@ export default class GravityForms {
 		});
 
 		return entries[0];
+	}
+
+	/**
+	 * Send an entry's notifications through Gravity Forms' background queue and return them instead of mailing them
+	 * @param formId
+	 * @param entryId
+	 */
+	sendBackgroundNotifications(formId: number, entryId: number) {
+		return wpCli(
+			`wp eval '${PRINT_MAIL} add_filter( \\"gform_is_asynchronous_notifications_enabled\\", \\"__return_true\\" ); add_filter( \\"wp_gf_notifications_processor_wp_die\\", \\"__return_false\\" ); GFAPI::send_notifications( GFAPI::get_form( ${formId} ), GFAPI::get_entry( ${entryId} ) ); do_action( \\"wp_gf_notifications_processor_cron\\" );'`
+		);
 	}
 
 	async getFormIdByName(name: string): Promise<number> {

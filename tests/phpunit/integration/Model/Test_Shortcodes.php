@@ -543,8 +543,13 @@ class Test_Shortcodes extends TestCase {
 		$unsigned = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '"]';
 		$this->assertSame( $unsigned, $this->model->gravitypdf_process_during_merge_tag_replacement( $unsigned, $form, $entry ) );
 
-		$tagged = '[gravitypdf id="556690c67856b" entry="{entry_id}" signed="1"]';
+		$tagged = '[gravitypdf id="556690c67856b" entry="{Number:3}" signed="1"]';
 		$this->assertSame( $tagged, $this->model->gravitypdf_process_during_merge_tag_replacement( $tagged, $form, $entry ) );
+
+		$entry_id_tag = '[gravitypdf id="556690c67856b" entry="{entry_id}" signed="1" raw="1"]';
+		$text         = $this->model->gravitypdf_process_during_merge_tag_replacement( $entry_id_tag, $form, $entry );
+		$this->assertStringContainsString( 'entry="' . $entry['id'] . '"', $text );
+		$this->assertStringContainsString( 'signature=', do_shortcode( $text ) );
 
 		$process = function () use ( $named, $form, $entry ) {
 			return $this->model->gravitypdf_process_during_merge_tag_replacement( $named, $form, $entry );
