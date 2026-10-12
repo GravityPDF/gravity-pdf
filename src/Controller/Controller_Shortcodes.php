@@ -80,8 +80,11 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	public function add_filters() {
 		add_filter( 'gform_admin_pre_render', [ $this->model, 'gravitypdf_redirect_confirmation' ] );
 		add_filter( 'gform_confirmation', [ $this->model, 'gravitypdf_redirect_confirmation_shortcode_processing' ], 10, 3 );
-		add_filter( 'gform_pre_replace_merge_tags', [ $this->model, 'gravitypdf_process_during_merge_tag_replacement' ], 10, 3 );
+		add_filter( 'gform_pre_replace_merge_tags', [ $this->model, 'gravitypdf_process_during_merge_tag_replacement' ], PHP_INT_MIN, 3 );
+		add_filter( 'gform_pre_replace_merge_tags', [ $this->model, 'gravitypdf_stamp_written_shortcodes' ], PHP_INT_MIN );
+		add_filter( 'gform_pre_replace_merge_tags', [ $this->model, 'gravitypdf_disarm_if_no_merge_tags_left' ], PHP_INT_MAX );
 		add_filter( 'gform_replace_merge_tags', [ $this->model, 'gravitypdf_trust_administrative_field_shortcodes' ], 10, 3 );
+		add_filter( 'gform_replace_merge_tags', [ $this->model, 'gravitypdf_disarm_merged_shortcodes' ], PHP_INT_MAX );
 
 		/* Basic GravityView Support */
 		add_filter( 'gravityview/fields/custom/content_before', [ $this->model, 'gravitypdf_gravityview_custom' ], 10 );

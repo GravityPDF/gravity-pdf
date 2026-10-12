@@ -48,7 +48,7 @@ class Test_Model_Mergetags extends TestCase {
 
 		/* Unhook the plugin's own instance, or both would grant trust for each tag and only one would use it */
 		$plugin_model = GPDFAPI::get_mvc_class( 'Model_Mergetags' );
-		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'mark_trusted_pdf_mergetags' ] );
+		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'mark_trusted_pdf_mergetags' ], PHP_INT_MIN );
 		remove_filter( 'gform_replace_merge_tags', [ $plugin_model, 'process_pdf_mergetags' ] );
 
 		/* Setup our test classes */
@@ -61,6 +61,7 @@ class Test_Model_Mergetags extends TestCase {
 	 * Test the appropriate filters are set up
 	 */
 	public function test_filters() {
+		$this->assertSame( PHP_INT_MIN, has_filter( 'gform_pre_replace_merge_tags', [ $this->model, 'mark_trusted_pdf_mergetags' ] ) );
 		$this->assertSame( 10, has_filter( 'gform_replace_merge_tags', [ $this->model, 'process_pdf_mergetags' ] ) );
 		$this->assertSame( 10, has_filter( 'gform_custom_merge_tags', [ $this->model, 'add_pdf_mergetags' ] ) );
 		$this->assertSame( 9999, has_filter( 'gform_entry_id_pre_save_lead', [ $this->model, 'start_resolving_administrative_defaults' ] ) );
@@ -94,7 +95,7 @@ class Test_Model_Mergetags extends TestCase {
 		);
 
 		$pdf_id = $this->gf_factory()->pdf->set_form_id( $form_id )->create();
-		$tags   = "{Document:pdf:$pdf_id}\n{Document:pdf:$pdf_id:signed}";
+		$tags   = "{Document:pdf:$pdf_id}\n{Document:pdf:$pdf_id:signed}\n[gravitypdf id=\"$pdf_id\" signed=\"1\" raw=\"1\"]";
 
 		$form                           = \GFAPI::get_form( $form_id );
 		$form['fields'][1]->defaultValue = $tags;
@@ -479,7 +480,7 @@ class Test_Model_Mergetags extends TestCase {
 		];
 	}
 
-	public function test_signed_pdf_mergetag_needs_trust_or_a_user_who_can_view_it() {
+	public function test_signed_pdf_mergetag_needs_trust() {
 		$form  = $this->form( 'all-form-fields' );
 		$entry = $this->entry( 'all-form-fields' );
 		$tag   = '{Label:pdf:556690c67856b:signed}';
@@ -493,7 +494,31 @@ class Test_Model_Mergetags extends TestCase {
 		$this->assertStringNotContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
 
 		/* Trust is per entry */
-		$this->model->mark_trusted_pdf_mergetags( $tag, $form, [ 'id' => $entry['id'] + 1 ] );
+		$other = array_merge( $entry, [ 'id' => $entry['id'] + 1 ] );
+		$this->model->mark_trusted_pdf_mergetags( $tag, $form, $other );
+		$this->assertStringNotContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
+		$this->assertStringContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $other, false ) );
+
+		/* Not even for a user who can view the entry */
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+		$this->assertStringNotContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
+
+		wp_set_current_user( 0 );
+	}
+
+	public function test_signed_pdf_mergetag_in_an_administrative_default_needs_a_user_who_can_view_it() {
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
+		$tag   = '{Label:pdf:556690c67856b:signed}';
+
+		/* A copy, as the form's fields are shared with the other tests */
+		$field               = clone $this->get_text_field( $form );
+		$field->visibility   = 'administrative';
+		$field->defaultValue = $tag;
+		$form['fields']      = [ $field ];
+		$entry[ $field->id ] = $tag;
+
+		wp_set_current_user( 0 );
 		$this->assertStringNotContainsString( 'signature=', $this->model->process_pdf_mergetags( $tag, $form, $entry, false ) );
 
 		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
@@ -502,7 +527,7 @@ class Test_Model_Mergetags extends TestCase {
 		wp_set_current_user( 0 );
 	}
 
-	public function test_signed_pdf_mergetag_in_a_field_value_is_not_trusted() {
+	public function test_signed_pdf_mergetag_in_a_merged_value_is_not_trusted() {
 		$form  = $this->form( 'all-form-fields' );
 		$entry = $this->entry( 'all-form-fields' );
 		$tag   = '{Label:pdf:556690c67856b:signed}';
@@ -510,23 +535,30 @@ class Test_Model_Mergetags extends TestCase {
 
 		$this->assertStringContainsString( 'signature=', \GFCommon::replace_variables( $tag, $form, $entry ) );
 
-		/* A tag in a field value isn't trusted */
+		/* A tag in a field value or the user agent isn't trusted, even when an administrator who can view the entry sends it */
 		$field               = $this->get_text_field( $form );
 		$entry[ $field->id ] = $tag;
-		foreach ( [ 'standard' => '{all_fields}', 'administrative' => '{all_fields:admin}' ] as $visibility => $all_fields ) {
-			$field->visibility = $visibility;
+		$entry['user_agent'] = '{Label:pdf:556690c67856b:signed,2 years}';
+		foreach ( [ 0, $this->factory->user->create( [ 'role' => 'administrator' ] ) ] as $user_id ) {
+			wp_set_current_user( $user_id );
 
-			$output = \GFCommon::replace_variables( $all_fields, $form, $entry );
-			$this->assertStringContainsString( 'pid=556690c67856b', $output );
-			$this->assertStringNotContainsString( 'signature=', $output );
+			foreach ( [ 'standard' => '{all_fields}', 'administrative' => '{all_fields:admin}' ] as $visibility => $all_fields ) {
+				$field->visibility = $visibility;
+
+				$output = \GFCommon::replace_variables( "$all_fields {user_agent}", $form, $entry );
+				$this->assertSame( 2, substr_count( $output, 'pid=556690c67856b' ) );
+				$this->assertStringNotContainsString( 'signature=', $output );
+			}
+
+			$untrusted = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->run_untrusted(
+				function () use ( $tag, $form, $entry ) {
+					return \GFCommon::replace_variables( $tag, $form, $entry );
+				}
+			);
+			$this->assertStringNotContainsString( 'signature=', $untrusted );
 		}
 
-		$untrusted = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->run_untrusted(
-			function () use ( $tag, $form, $entry ) {
-				return \GFCommon::replace_variables( $tag, $form, $entry );
-			}
-		);
-		$this->assertStringNotContainsString( 'signature=', $untrusted );
+		wp_set_current_user( 0 );
 	}
 
 	public function test_signed_pdf_mergetag_after_another_merge_tag_is_signed() {
