@@ -70,20 +70,38 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		}
 	);
 
-	test('signs the PDF link in an administrative field default', async () => {
-		const entry: any = await pdf.createEntry({
-			form_id: form.id,
-			'16': adminDefault,
-		});
-
-		const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
-
-		expect(html).toMatch(
-			new RegExp(
-				`${pdfId}.*${entry.id}.*signature=|${entry.id}.*${pdfId}.*signature=`
-			)
+	const signedLink = (entryId: number) =>
+		new RegExp(
+			`${pdfId}.*${entryId}.*signature=|${entryId}.*${pdfId}.*signature=`
 		);
-	});
+
+	for (const [name, overrides] of [
+		['an administrative field default', {}],
+		[
+			'a rich text administrative field default',
+			{ type: 'textarea', useRichTextEditor: true },
+		],
+	] as const) {
+		test(`signs the PDF link in ${name}`, async () => {
+			if (Object.keys(overrides).length) {
+				await pdf.updateForm(form.id, (current: any) => ({
+					fields: current.fields.map((field: any) =>
+						field.id === 16 ? { ...field, ...overrides } : field
+					),
+				}));
+			}
+
+			const entry: any = await pdf.createEntry({
+				form_id: form.id,
+				'16': adminDefault,
+			});
+
+			const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
+
+			expect(html).toMatch(signedLink(entry.id));
+			expect(html).not.toContain('&#091;gravitypdf');
+		});
+	}
 
 	test('signs the PDF link in an administrative field default whose other tags resolved on save', async () => {
 		await pdf.updateForm(form.id, (current: any) => ({
@@ -106,11 +124,7 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
 
 		expect(html).toContain('Saved by Visitor');
-		expect(html).toMatch(
-			new RegExp(
-				`${pdfId}.*${entry.id}.*signature=|${entry.id}.*${pdfId}.*signature=`
-			)
-		);
+		expect(html).toMatch(signedLink(entry.id));
 		expect(html).toContain('&#091;gravitypdf');
 	});
 
