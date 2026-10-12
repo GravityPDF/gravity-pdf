@@ -970,7 +970,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			if ( $message['type'] === 'error' ) {
 				$this->notices->add_error( $message['message'] );
 			} else {
-				$this->notices->add_notice( $message['message'] );
+				/* A warning or info keeps its colour, anything else shows as a success */
+				$this->notices->add_notice( $message['message'], in_array( $message['type'], [ 'warning', 'info' ], true ) ? 'notice-' . $message['type'] : '' );
 			}
 		}
 	}
