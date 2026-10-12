@@ -334,8 +334,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		foreach ( $this->get_shortcode_information( static::SHORTCODE, $text ) as $shortcode ) {
 			$new_shortcode = $shortcode;
 
-			/* if the user hasn't explicitly defined an entry to display... */
-			if ( ! isset( $shortcode['attr']['entry'] ) ) {
+			/* if the user hasn't explicitly defined an entry to display, or used {entry_id} for this one... */
+			if ( ! isset( $shortcode['attr']['entry'] ) || $shortcode['attr']['entry'] === '{entry_id}' ) {
 				$new_shortcode = $this->add_shortcode_attr( $new_shortcode, 'entry', $entry_id );
 			}
 
