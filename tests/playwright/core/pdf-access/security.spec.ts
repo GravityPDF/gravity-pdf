@@ -71,6 +71,42 @@ test.describe('PDF Security and Access Policies', () => {
 		).toBeVisible();
 	});
 
+	test('should cap the logged out timeout at a week', async ({
+		page,
+		admin,
+	}: {
+		page: Page;
+		admin: Admin;
+	}) => {
+		const pdfId = await pdf.addPdf(form.id, 'Timeout PDF');
+		const [recent, old] = await Promise.all(
+			[6, 8].map((days) =>
+				pdf.createEntry({
+					form_id: form.id,
+					date_created: new Date(Date.now() - days * 86400000)
+						.toISOString()
+						.slice(0, 19)
+						.replace('T', ' '),
+				})
+			)
+		);
+
+		await admin.context.clearCookies();
+		await page.setExtraHTTPHeaders({
+			'X-GPDF-E2E-Logged-Out-Timeout': '525600',
+		});
+
+		await pdf.gotoPdfAndVerify(
+			`/?gpdf=1&pid=${pdfId}&lid=${recent.id}`,
+			'Timeout PDF.pdf'
+		);
+
+		await page.goto(`/?gpdf=1&pid=${pdfId}&lid=${old.id}`);
+		await expect(
+			page.getByRole('button', { name: 'Log In' })
+		).toBeVisible();
+	});
+
 	test('should show error if "Restrict Owner" is enabled and visiting as that user', async ({
 		requestUtils,
 		page,
