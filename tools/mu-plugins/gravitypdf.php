@@ -112,6 +112,17 @@ if ( $gfpdf_e2e_header( 'debug_mode' ) === 'yes' ) {
 	);
 }
 
+/* The tmp cleanup spec gives mPDF a folder of its own inside tmp/ */
+$gfpdf_e2e_mpdf_tmp_location = $gfpdf_e2e_header( 'mpdf_tmp_location' );
+if ( $gfpdf_e2e_mpdf_tmp_location !== '' ) {
+	add_filter(
+		'gfpdf_mpdf_tmp_location',
+		static function ( $path ) use ( $gfpdf_e2e_mpdf_tmp_location ) {
+			return trailingslashit( $path ) . $gfpdf_e2e_mpdf_tmp_location;
+		}
+	);
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {

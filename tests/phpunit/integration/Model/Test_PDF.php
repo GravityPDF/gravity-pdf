@@ -1485,6 +1485,27 @@ class Test_PDF extends TestCase {
 		$this->assertDirectoryExists( $cache . '/ttfontdata' );
 	}
 
+	public function test_cleanup_tmp_dir_keeps_a_filtered_mpdf_folder_inside_tmp() {
+		global $gfpdf;
+
+		$saved                          = $gfpdf->data->mpdf_tmp_location;
+		$gfpdf->data->mpdf_tmp_location = $gfpdf->data->template_tmp_location . 'mpdf';
+		$cache                          = $gfpdf->data->mpdf_tmp_location . '/mpdf/ttfontdata/';
+
+		wp_mkdir_p( $cache );
+		touch( $cache . 'font.mtx.json' );
+		touch( $gfpdf->data->mpdf_tmp_location, time() - DAY_IN_SECONDS );
+
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
+		$this->model->cleanup_tmp_dir();
+		$kept = file_exists( $cache . 'font.mtx.json' );
+
+		$gfpdf->misc->rmdir( $gfpdf->data->mpdf_tmp_location . '/mpdf' );
+		$gfpdf->data->mpdf_tmp_location = $saved;
+
+		$this->assertTrue( $kept );
+	}
+
 	public function test_cleanup_tmp_dir_keeps_the_uncached_folders_index() {
 		$index = dirname( Cache::get_uncached_path() ) . '/index.html';
 		touch( $index, time() - WEEK_IN_SECONDS );
