@@ -529,6 +529,17 @@ class Test_Model_Mergetags extends TestCase {
 		$this->assertStringNotContainsString( 'signature=', $untrusted );
 	}
 
+	public function test_signed_pdf_mergetag_after_another_merge_tag_is_signed() {
+		$form  = $this->form( 'all-form-fields' );
+		$entry = $this->entry( 'all-form-fields' );
+		wp_set_current_user( 0 );
+
+		$output = \GFCommon::replace_variables( 'Entry {entry_id}: {Label:pdf:556690c67856b:signed}', $form, $entry );
+
+		$this->assertStringStartsWith( 'Entry ' . $entry['id'] . ': http', $output );
+		$this->assertStringContainsString( 'signature=', $output );
+	}
+
 	private function get_text_field( $form ) {
 		foreach ( $form['fields'] as $field ) {
 			if ( $field->type === 'text' ) {
