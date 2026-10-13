@@ -114,6 +114,7 @@ filter gfpdf_current_entry_object 4
 filter gfpdf_current_form_object 3
 filter gfpdf_current_pdf_configuration 3
 filter gfpdf_current_pdf_settings_object 4
+filter gfpdf_current_user_can_manage_templates 1
 filter gfpdf_disable_global_addon_data 4
 filter gfpdf_disable_product_table 5
 filter gfpdf_empty_display_setting 1
