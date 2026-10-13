@@ -129,6 +129,18 @@ if ( $gfpdf_e2e_header( 'deprecations' ) !== 'yes' ) {
 	add_filter( 'gfpdf_get_option_deprecated_features', '__return_empty_array' );
 }
 
+/* An extension's warning on a settings save, for the spec checking how it shows */
+if ( $gfpdf_e2e_header( 'settings_warning' ) === 'yes' ) {
+	add_filter(
+		'pre_update_option_gfpdf_settings',
+		static function ( $value ) {
+			add_settings_error( 'gfpdf-notices', 'e2e-warning', 'An extension warning', 'warning' );
+
+			return $value;
+		}
+	);
+}
+
 /* The editors open on the Visual tab whatever the last test left them on. WordPress remembers the tab per user, and
    every test shares the one admin */
 add_filter(
