@@ -75,6 +75,17 @@ class Test_Field_Textarea extends TestCase {
 		$this->assertStringContainsString( '&quot;Hi&quot; [gravitypdf id="abc" text=\'dl\']', $html );
 	}
 
+	public function test_rich_text_administrative_default_shortcode_survives_its_entry_being_added() {
+		$default = '[gravitypdf id="abc"]';
+		$form    = $this->gf_factory()->form->create( [], [ 'title' => 'Rich Default', 'fields' => [ new GF_Field_Textarea( [ 'id' => 1, 'useRichTextEditor' => true, 'visibility' => 'administrative', 'defaultValue' => $default ] ) ] ] );
+		$field   = \GFAPI::get_form( $form )['fields'][0];
+		$entry   = [ 'id' => 5, 'form_id' => $form, '1' => $default ];
+
+		$html = ( new Field_Textarea( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->html();
+
+		$this->assertStringContainsString( '[gravitypdf id="abc" entry="5"]', $html );
+	}
+
 	public function test_rich_text_merge_tags_only_processed_when_trusted_or_opted_in() {
 		$form  = $this->gf_factory()->form->create( [], [ 'title' => 'Merge Tags', 'fields' => [ new GF_Field_Textarea( [ 'id' => 1, 'useRichTextEditor' => true ] ) ] ] );
 		$field = \GFAPI::get_form( $form )['fields'][0];

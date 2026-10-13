@@ -5,6 +5,7 @@ namespace GFPDF\Helper;
 use Exception;
 use GF_Field;
 use GFFormsModel;
+use GFPDF\Model\Model_Shortcodes;
 use GFPDF\Model\Model_Signed_Url_Trust;
 use GFPDF\Statics\Kses;
 
@@ -474,15 +475,20 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 6.17.3
 	 */
 	private function get_encoded_default_tags() {
-		$map = [];
-		foreach ( $this->get_signed_url_trust()->get_default_tags( $this->field ) as $tag ) {
-			$escaped = esc_html( $tag );
+		/** @var Model_Shortcodes $shortcodes */
+		$shortcodes = \GPDFAPI::get_mvc_class( 'Model_Shortcodes' );
+		$map        = [];
+		foreach ( $this->get_signed_url_trust()->get_default_tags( $this->field ) as $default ) {
+			/* process_value_tags() adds the entry to a default shortcode, so match that version too */
+			foreach ( array_unique( [ $default, $shortcodes->add_entry_id_to_shortcode( $default, $this->entry['id'] ?? 0 ) ] ) as $tag ) {
+				$escaped = esc_html( $tag );
 
-			$map[ $this->encode_tags( $escaped ) ] = $this->decode_shortcode_quotes( $escaped );
-			$map[ $this->encode_tags( $tag ) ]     = $tag;
+				$map[ $this->encode_tags( $escaped ) ] = $this->decode_shortcode_quotes( $escaped );
+				$map[ $this->encode_tags( $tag ) ]     = $tag;
 
-			/* As encode_tags() encodes them in an HTML attribute */
-			$map[ str_replace( [ '[', ']', '{', '}' ], [ '%5B', '%5D', '%7B', '%7D' ], $tag ) ] = $tag;
+				/* As encode_tags() encodes them in an HTML attribute */
+				$map[ str_replace( [ '[', ']', '{', '}' ], [ '%5B', '%5D', '%7B', '%7D' ], $tag ) ] = $tag;
+			}
 		}
 
 		return $map;

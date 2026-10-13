@@ -327,8 +327,9 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @return string
 	 *
 	 * @since 4.0
+	 * @since 6.18.0 Public, so a field can match its default shortcode once the entry is added
 	 */
-	protected function add_entry_id_to_shortcode( $text, $entry_id ) {
+	public function add_entry_id_to_shortcode( $text, $entry_id ) {
 		$vouch = ! $this->get_trust()->is_rendering_pdf();
 
 		foreach ( $this->get_shortcode_information( static::SHORTCODE, $text ) as $shortcode ) {
