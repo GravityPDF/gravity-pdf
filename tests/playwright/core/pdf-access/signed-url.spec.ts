@@ -204,4 +204,25 @@ test.describe('Signed PDF URLs', () => {
 		expect(html).toContain('&#123;PDF:pdf:');
 		expect(html).not.toContain('signature=');
 	});
+
+	test('does not sign a merge tag in a field value when an administrator resends the notification', async () => {
+		const submitted = await pdf.createEntry({
+			form_id: form.id,
+			ip: '10.0.0.1',
+			5: `{PDF:pdf:${pdfId}:signed,1 year}`,
+		});
+		await pdf.updateForm(
+			form.id,
+			withNotification(
+				`<code>{PDF:pdf:${pdfId}:signed}</code>{all_fields}`
+			)
+		);
+
+		const mail = pdf.resendNotifications(form.id, submitted.id);
+
+		expect(
+			mail.match(new RegExp(`/pdf/${pdfId}/${submitted.id}/`, 'g'))
+		).toHaveLength(2);
+		expect(mail.match(/signature=/g)).toHaveLength(1);
+	});
 });
