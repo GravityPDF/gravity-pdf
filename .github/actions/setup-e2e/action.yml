@@ -1,0 +1,140 @@
+name: Set up a wp-env job
+description: >-
+  The shared setup for a job that boots wp-env: Docker, PHP + Node, the
+  plugin's dependencies, Playwright and a pre-downloaded WordPress core. Run it
+  after actions/checkout.
+
+inputs:
+  php-version:
+    description: PHP for the runner; empty skips setup-php.
+    default: ''
+  php-coverage:
+    description: setup-php's `coverage`; empty leaves its default.
+    default: ''
+  node-cache:
+    description: setup-node's `cache` (e.g. yarn); empty disables it.
+    default: ''
+  dependencies:
+    description: >-
+      `prebuild` restores the caches tests.yml's prebuild job warmed; `install`
+      runs composer (no scripts) + yarn, for a checkout whose built assets come
+      from elsewhere.
+    default: prebuild
+  build-assets:
+    description: With `prebuild`, also restore build/assets.
+    default: 'true'
+  gf-license:
+    description: Gravity Forms licence for composer.gravity.io; `install` only.
+    default: ''
+  playwright:
+    description: Install Chromium and its system dependencies.
+    default: 'true'
+  wp-env-config:
+    description: The wp-env config whose WordPress core is pre-downloaded.
+    default: tools/wp-env/e2e.json
+
+runs:
+  using: composite
+  steps:
+    - name: Configure environment variables
+      shell: bash
+      run: |
+        echo "PHP_FPM_UID=$(id -u)" >> "$GITHUB_ENV"
+        echo "PHP_FPM_GID=$(id -g)" >> "$GITHUB_ENV"
+
+    # Route Docker Hub pulls through Google's unauthenticated mirror — parallel cells got silently
+    # rate-limited on docker.io (manifested as wp-env "Done in 13s" with no containers actually running).
+    - name: Use Google's Docker Hub mirror to avoid rate limits
+      shell: bash
+      run: |
+        echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
+        sudo systemctl restart docker
+
+    - name: Setup PHP
+      if: inputs.php-version != ''
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        coverage: ${{ inputs.php-coverage }}
+
+    - name: Setup Node JS
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: '.nvmrc'
+        cache: ${{ inputs.node-cache }}
+
+    # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently
+    # re-installing per cell.
+    - name: Restore Composer vendor
+      if: inputs.dependencies == 'prebuild'
+      uses: ./.github/actions/restore-cache
+      with:
+        path: |
+          vendor
+          vendor_prefixed
+        key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
+
+    - name: Restore node_modules
+      if: inputs.dependencies == 'prebuild'
+      uses: ./.github/actions/restore-cache
+      with:
+        path: node_modules
+        key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
+
+    - name: Restore build assets
+      if: inputs.dependencies == 'prebuild' && inputs.build-assets == 'true'
+      uses: ./.github/actions/restore-cache
+      with:
+        path: build/assets
+        key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
+
+    # GF + test tooling only; --no-scripts skips the scoping and asset build.
+    - name: Install dependencies
+      if: inputs.dependencies == 'install'
+      shell: bash
+      env:
+        GF_LICENSE: ${{ inputs.gf-license }}
+      run: |
+        composer config http-basic.composer.gravity.io "$GF_LICENSE" http://localhost
+        bash tools/ci/composer-retry.sh install --no-scripts --no-progress --no-ansi --no-interaction
+        yarn install --frozen-lockfile
+
+    - name: Cache Playwright browsers
+      if: inputs.playwright == 'true'
+      id: playwright-cache
+      uses: actions/cache@v5
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          playwright-${{ runner.os }}-
+
+    - name: Install playwright browsers
+      if: inputs.playwright == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npx playwright install chromium
+
+    # The runner image already ships most of Playwright's list (only fonts are missing). `install-deps` always runs
+    # `apt-get update` and upgrades libglib (~5s ldconfig trigger); install just the gaps, updating only if lists are stale.
+    - name: Install playwright system deps
+      if: inputs.playwright == 'true'
+      shell: bash
+      run: |
+        pkgs=$(npx playwright install-deps --dry-run chromium | grep -oP 'install -y --no-install-recommends \K[^"]+' || true)
+        [ -n "$pkgs" ] || { echo "::error::Could not parse the package list from 'playwright install-deps --dry-run'."; exit 1; }
+        # shellcheck disable=SC2086 # $pkgs is a word list.
+        apt_install() { sudo NEEDRESTART_SUSPEND=1 apt-get install -y --no-install-recommends --no-upgrade $pkgs; }
+        apt_install || { sudo apt-get update && apt_install; }
+
+    # Pre-fetch the pinned WordPress core so wp-env's start has nothing to download. Its in-start core
+    # fetch silently aborts provisioning on the CI runners (only the DB container comes up); pointing
+    # WP_ENV_CORE at a local directory sidesteps that. URL is derived from the config's pin to stay single-source.
+    - name: Pre-download WordPress core
+      shell: bash
+      env:
+        WP_ENV_CONFIG: ${{ inputs.wp-env-config }}
+      run: |
+        url=$(node tools/wp-env/wp-version.mjs download-url "$WP_ENV_CONFIG")
+        curl -fsSL --retry 4 "$url" -o "$RUNNER_TEMP/wp-core.zip"
+        unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
+        echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"

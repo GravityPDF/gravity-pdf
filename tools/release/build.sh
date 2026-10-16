@@ -12,6 +12,20 @@ if [ $# -lt 1 ]; then
 	exit 1
 fi
 
+# Everything the build shells out to, checked up front rather than halfway through.
+for tool in git tar yarn composer php jq zip; do
+	if ! command -v "$tool" > /dev/null 2>&1; then
+		echo "FAIL: $0 needs '$tool' on PATH" >&2
+		exit 1
+	fi
+done
+
+# The package dir is a git archive with no auth.json, so hand the checkout's to composer.
+if [ -z "${COMPOSER_AUTH:-}" ] && [ -f auth.json ]; then
+	COMPOSER_AUTH="$(cat auth.json)"
+	export COMPOSER_AUTH
+fi
+
 VERSION=$1
 TMP_DIR="./tmp/package/"
 PACKAGE_DIR="${TMP_DIR}${VERSION}"
@@ -30,7 +44,7 @@ tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm -f ${PAC
 
 # Run Build
 yarn install --frozen-lockfile --cwd ${PACKAGE_DIR}
-yarn i10n
+# No i18n step: languages/ ships as committed (refresh it with `composer translate`).
 yarn --cwd ${PACKAGE_DIR} build
 
 # Install all dependencies (including dev)

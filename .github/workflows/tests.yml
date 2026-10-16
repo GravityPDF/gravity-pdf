@@ -179,18 +179,6 @@ jobs:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
     steps:
-      - name: Configure environment variables
-        run: |
-          echo "PHP_FPM_UID=$(id -u)" >> $GITHUB_ENV
-          echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
-
-      # Route Docker Hub pulls through Google's unauthenticated mirror — parallel matrix cells got silently
-      # rate-limited on docker.io (manifested as wp-env "Done in 13s" with no containers actually running).
-      - name: Use Google's Docker Hub mirror to avoid rate limits
-        run: |
-          echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -203,15 +191,13 @@ jobs:
             exit 1
           fi
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Set up the job
+        uses: ./.github/actions/setup-e2e
         with:
           php-version: ${{ matrix.php }}
-
-      - name: Setup Node JS
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
+          build-assets: false
+          playwright: false
+          wp-env-config: tools/wp-env/integration.json
 
       - name: Log debug information
         run: |
@@ -224,22 +210,6 @@ jobs:
           php -i
           locale -a
 
-      # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently
-      # re-installing per matrix cell.
-      - name: Restore Composer vendor
-        uses: ./.github/actions/restore-cache
-        with:
-          path: |
-            vendor
-            vendor_prefixed
-          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
-
-      - name: Restore node_modules
-        uses: ./.github/actions/restore-cache
-        with:
-          path: node_modules
-          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
-
       # No restore-keys: the work-dir embeds the downloaded WordPress core, so restoring it across a
       # core-version bump (the key hashes the config) leaves wp-env with a stale WP that silently fails
       # to start. A clean miss re-downloads the pinned version instead.
@@ -250,16 +220,6 @@ jobs:
             ~/wp-env
             ~/.wp-env
           key: wp-env-integration-v2-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('tools/wp-env/integration.json', 'composer.lock') }}
-
-      # Pre-fetch the pinned WordPress core so wp-env's start has nothing to download. Its in-start core
-      # fetch silently aborts provisioning on the CI runners (only the DB container comes up); pointing
-      # WP_ENV_CORE at a local directory sidesteps that. URL is derived from the config's pin to stay single-source.
-      - name: Pre-download WordPress core
-        run: |
-          url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/integration.json)
-          curl -fsSL --retry 4 "$url" -o "$RUNNER_TEMP/wp-core.zip"
-          unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
-          echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ ! matrix.report }}
@@ -344,30 +304,13 @@ jobs:
         shard: [ 1, 2, 3, 4 ]
 
     steps:
-      - name: Configure environment variables
-        run: |
-          echo "PHP_FPM_UID=$(id -u)" >> $GITHUB_ENV
-          echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
-
-      # Route Docker Hub pulls through Google's unauthenticated mirror — the 4 parallel shards got silently
-      # rate-limited on docker.io (manifested as wp-env "Done in 13s" with no containers actually running).
-      - name: Use Google's Docker Hub mirror to avoid rate limits
-        run: |
-          echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Set up the job
+        uses: ./.github/actions/setup-e2e
         with:
           php-version: 7.4
-
-      - name: Setup Node JS
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
 
       - name: Log debug information
         run: |
@@ -380,50 +323,6 @@ jobs:
           php -i
           locale -a
 
-      # Primed by prebuild — a miss here means prebuild itself broke, so fail loudly rather than silently
-      # re-installing per shard.
-      - name: Restore Composer vendor
-        uses: ./.github/actions/restore-cache
-        with:
-          path: |
-            vendor
-            vendor_prefixed
-          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
-
-      - name: Restore node_modules
-        uses: ./.github/actions/restore-cache
-        with:
-          path: node_modules
-          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
-
-      - name: Restore build assets
-        uses: ./.github/actions/restore-cache
-        with:
-          path: build/assets
-          key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      - name: Install playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      # The runner image already ships most of Playwright's list (only fonts are missing). `install-deps` always runs
-      # `apt-get update` and upgrades libglib (~5s ldconfig trigger); install just the gaps, updating only if lists are stale.
-      - name: Install playwright system deps
-        run: |
-          pkgs=$(npx playwright install-deps --dry-run chromium | grep -oP 'install -y --no-install-recommends \K[^"]+' || true)
-          [ -n "$pkgs" ] || { echo "::error::Could not parse the package list from 'playwright install-deps --dry-run'."; exit 1; }
-          apt_install() { sudo NEEDRESTART_SUSPEND=1 apt-get install -y --no-install-recommends --no-upgrade $pkgs; }
-          apt_install || { sudo apt-get update && apt_install; }
-
       # No restore-keys: the work-dir embeds the downloaded WordPress core, so restoring it across a
       # core-version bump (the key hashes the config) leaves wp-env with a stale WP that silently fails
       # to start. A clean miss re-downloads the pinned version instead.
@@ -434,14 +333,6 @@ jobs:
             ~/wp-env
             ~/.wp-env
           key: wp-env-e2e-v2-${{ runner.os }}-${{ hashFiles('tools/wp-env/e2e.json', 'composer.lock') }}
-
-      # See the integration job: pre-fetch core so wp-env's start has nothing to download.
-      - name: Pre-download WordPress core
-        run: |
-          url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/e2e.json)
-          curl -fsSL --retry 4 "$url" -o "$RUNNER_TEMP/wp-core.zip"
-          unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
-          echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
 
       - name: Install / Setup Gravity PDF + WordPress
         run: yarn wp-env:e2e start
@@ -493,50 +384,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configure environment variables
-        run: |
-          echo "PHP_FPM_UID=$(id -u)" >> "$GITHUB_ENV"
-          echo "PHP_FPM_GID=$(id -g)" >> "$GITHUB_ENV"
-
-      - name: Use Google's Docker Hub mirror to avoid rate limits
-        run: |
-          echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup Node JS
-        uses: actions/setup-node@v6
+      - name: Set up the job
+        uses: ./.github/actions/setup-e2e
         with:
-          node-version-file: '.nvmrc'
-
-      - name: Restore Composer vendor
-        uses: ./.github/actions/restore-cache
-        with:
-          path: |
-            vendor
-            vendor_prefixed
-          key: vendor-${{ runner.os }}-${{ hashFiles('composer.lock', 'tools/php-scoper/**') }}
-
-      - name: Restore node_modules
-        uses: ./.github/actions/restore-cache
-        with:
-          path: node_modules
-          key: nm-${{ runner.os }}-${{ hashFiles('yarn.lock', '.nvmrc') }}
-
-      - name: Restore build assets
-        uses: ./.github/actions/restore-cache
-        with:
-          path: build/assets
-          key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
-
-      - name: Pre-download WordPress core
-        run: |
-          url=$(node tools/wp-env/wp-version.mjs download-url tools/wp-env/e2e.json)
-          curl -fsSL --retry 4 "$url" -o "$RUNNER_TEMP/wp-core.zip"
-          unzip -q "$RUNNER_TEMP/wp-core.zip" -d "$RUNNER_TEMP/wp-core"
-          echo "WP_ENV_CORE=$RUNNER_TEMP/wp-core/wordpress" >> "$GITHUB_ENV"
+          playwright: false
 
       - name: Download the released add-ons
         run: bash tools/ci/addons/download.sh
