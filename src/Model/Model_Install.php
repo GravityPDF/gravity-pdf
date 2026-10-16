@@ -42,7 +42,8 @@ class Model_Install extends Helper_Abstract_Model {
 	const TMP_HTACCESS = "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n\tOrder allow,deny\n\tDeny from all\n</IfModule>\nOptions -Indexes\n";
 
 	/**
-	 * The option check_folder_permissions() stores the folders it couldn't write to in, each with when it started failing
+	 * The option create_folder_structures() stores the folders it couldn't create or write to in, each with when it
+	 * started failing
 	 *
 	 * @since 6.17.3
 	 */
@@ -271,19 +272,25 @@ class Model_Install extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Test writing to each folder, and store the ones that fail for the dismissible notice in Controller_Actions.
-	 * Run on install, upgrade, the tmp cleanup cron and the system report, not on every request.
+	 * Create the appropriate folder structure automatically
+	 * The upload directory should have all appropriate permissions to allow this kind of manipulation
+	 * but devs who tap into the gfpdf_template_location filter will need to ensure we can write to the appropriate folder
 	 *
-	 * @return string[] The folders that can't be written to
+	 * @return string[] The folders that can't be created or written to
+	 * @since 4.0
+	 * @since 6.17.3 Runs on install, upgrade, the tmp cleanup cron and the system report rather than every request,
+	 *               tests writing to each folder, and stores the ones it can't create or write to for the dismissible
+	 *               notice in Controller_Actions
 	 *
-	 * @since 6.17.3
 	 */
-	public function check_folder_permissions(): array {
+	public function create_folder_structures(): array {
 		$previous   = (array) get_option( self::UNWRITABLE_FOLDERS, [] );
 		$unwritable = [];
 
 		foreach ( $this->get_folders() as $dir ) {
-			if ( is_dir( $dir ) && ! $this->misc->is_directory_writable( $dir ) ) {
+			$failed = ! $this->misc->create_folder( $dir );
+
+			if ( ! $failed && ! $this->misc->is_directory_writable( $dir ) ) {
 				$this->log->error(
 					'Failed Write Permissions Check.',
 					[
@@ -291,57 +298,27 @@ class Model_Install extends Helper_Abstract_Model {
 					]
 				);
 
-				/* Keep when it started failing, so a dismissal of this run of failures still holds */
+				$failed = true;
+			}
+
+			/* Keep when it started failing, so a dismissal of this run of failures still holds */
+			if ( $failed ) {
 				$unwritable[ $dir ] = $previous[ $dir ] ?? time();
+				continue;
+			}
+
+			/* create_folder() only indexes the folders it makes, so restore a missing index in an existing one */
+			$index = trailingslashit( $dir ) . 'index.html';
+			if ( ! is_file( $index ) ) {
+				file_put_contents( $index, '' );
 			}
 		}
 
 		update_option( self::UNWRITABLE_FOLDERS, $unwritable, true );
 
+		$this->misc->protect_tmp_folder();
+
 		return array_keys( $unwritable );
-	}
-
-	/**
-	 * Create the appropriate folder structure automatically
-	 * The upload directory should have all appropriate permissions to allow this kind of manipulation
-	 * but devs who tap into the gfpdf_template_location filter will need to ensure we can write to the appropriate folder
-	 *
-	 * @return void
-	 * @since 4.0
-	 * @since 6.17.3 The write permission notice moved to Controller_Actions
-	 *
-	 */
-	public function create_folder_structures() {
-
-		/* don't create the folder structure if an AJAX or REST API request */
-		if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-			return null;
-		}
-
-		/* create the required folder structure, or throw error */
-		foreach ( $this->get_folders() as $dir ) {
-			if ( ! is_dir( $dir ) && ! wp_mkdir_p( $dir ) ) {
-				$this->log->error(
-					'Failed Creating Folder Structure',
-					[
-						'dir' => $dir,
-					]
-				);
-
-				/* translators: %s: directory path wrapped in <code> tags */
-				$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-pdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
-			}
-
-			/* create blank index file in all folders to prevent web servers listing the entire directory */
-			if ( ! is_file( trailingslashit( $dir ) . 'index.html' ) ) {
-				file_put_contents( trailingslashit( $dir ) . 'index.html', '' );
-			}
-		}
-
-		/* create deny htaccess file to prevent direct access to files */
-		if ( self::write_tmp_htaccess( $this->data->template_tmp_location ) ) {
-			$this->log->notice( 'Create Apache .htaccess Security file' );
-		}
 	}
 
 	/**

@@ -127,6 +127,65 @@ class Test_Helper_Misc_Files extends TestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_create_folder_adds_an_index_to_every_folder_it_makes() {
+		file_put_contents( $this->tmp . '../blocker', '' );
+
+		$this->assertTrue( $this->misc->create_folder( $this->tmp . 'a/b' ) );
+		$this->assertDirectoryExists( $this->tmp . 'a/b' );
+		$this->assertFileExists( $this->tmp . 'index.html' );
+		$this->assertFileExists( $this->tmp . 'a/index.html' );
+		$this->assertFileExists( $this->tmp . 'a/b/index.html' );
+
+		/* An existing folder is left alone */
+		wp_delete_file( $this->tmp . 'a/b/index.html' );
+		$this->assertTrue( $this->misc->create_folder( $this->tmp . 'a/b/' ) );
+		$this->assertFileDoesNotExist( $this->tmp . 'a/b/index.html' );
+
+		$this->assertFalse( $this->misc->create_folder( $this->tmp . '../blocker/sub' ) );
+		wp_delete_file( $this->tmp . '../blocker' );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_create_folder_protects_a_recreated_tmp_folder() {
+		$tmp = \GPDFAPI::get_data_class()->template_tmp_location;
+
+		$this->misc->rmdir( $tmp );
+
+		$this->assertTrue( $this->misc->create_folder( $tmp . 'f00d1234/' ) );
+		$this->assertDirectoryExists( $tmp . 'f00d1234' );
+		$this->assertFileExists( $tmp . 'index.html' );
+		$this->assertStringEqualsFile( $tmp . '.htaccess', \GFPDF\Model\Model_Install::TMP_HTACCESS );
+
+		/* A folder that already existed is left to the installer */
+		wp_delete_file( $tmp . '.htaccess' );
+		$this->assertTrue( $this->misc->create_folder( $tmp . 'f00d1234/' ) );
+		$this->assertFileDoesNotExist( $tmp . '.htaccess' );
+
+		$this->misc->protect_tmp_folder();
+		$this->assertFileExists( $tmp . '.htaccess' );
+		$this->misc->rmdir( $tmp . 'f00d1234' );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_create_folder_protects_a_tmp_folder_recreated_as_a_parent() {
+		$tmp = \GPDFAPI::get_data_class()->template_tmp_location;
+
+		$this->misc->rmdir( $tmp );
+
+		$this->assertTrue( $this->misc->create_folder( $tmp . 'mpdf/ttfontdata' ) );
+		$this->assertDirectoryExists( $tmp . 'mpdf/ttfontdata' );
+		$this->assertFileExists( $tmp . 'index.html' );
+		$this->assertFileExists( $tmp . 'mpdf/index.html' );
+		$this->assertStringEqualsFile( $tmp . '.htaccess', \GFPDF\Model\Model_Install::TMP_HTACCESS );
+	}
+
+	/**
 	 * @dataProvider provider_convert_path_to_url
 	 *
 	 * @param string|false $expected

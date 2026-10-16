@@ -5,6 +5,7 @@ namespace GFPDF\Helper;
 use DOMElement;
 use Exception;
 use GFCommon;
+use GFPDF\Model\Model_Install;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -499,10 +500,60 @@ class Helper_Misc {
 	 * @since 6.17.3
 	 */
 	public function create_mpdf_cache_folders(): void {
-		$dir = $this->data->mpdf_tmp_location . '/mpdf/ttfontdata';
+		$this->create_folder( $this->data->mpdf_tmp_location . '/mpdf/ttfontdata' );
+	}
 
+	/**
+	 * Create a folder Gravity PDF writes to, which the installer only does on install, upgrade and cron
+	 *
+	 * Every folder it makes gets a blank index.html, and a recreated tmp folder gets its web access protection back.
+	 *
+	 * @param string $dir
+	 *
+	 * @return bool False if the folder couldn't be created
+	 *
+	 * @since 6.17.3
+	 */
+	public function create_folder( string $dir ): bool {
+		$dir = trailingslashit( $dir );
+		if ( is_dir( $dir ) ) {
+			return true;
+		}
+
+		$missing = [];
+		$parent  = $dir;
+		while ( ! is_dir( $parent ) && dirname( $parent ) !== rtrim( $parent, '/' ) ) {
+			$missing[] = $parent;
+			$parent    = trailingslashit( dirname( $parent ) );
+		}
+
+		/* Another request may create it first */
 		if ( ! wp_mkdir_p( $dir ) && ! is_dir( $dir ) ) {
 			$this->log->error( 'Failed Creating Folder Structure', [ 'dir' => $dir ] );
+
+			return false;
+		}
+
+		foreach ( $missing as $made ) {
+			file_put_contents( $made . 'index.html', '' );
+		}
+
+		/* A tmp folder recreated between installer runs needs its web access protection back straight away */
+		if ( in_array( $this->data->template_tmp_location, $missing, true ) ) {
+			$this->protect_tmp_folder();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Stop the web server serving the PDF tmp folder
+	 *
+	 * @since 6.17.3
+	 */
+	public function protect_tmp_folder(): void {
+		if ( Model_Install::write_tmp_htaccess( $this->data->template_tmp_location ) ) {
+			$this->log->notice( 'Create Apache .htaccess Security file' );
 		}
 	}
 
