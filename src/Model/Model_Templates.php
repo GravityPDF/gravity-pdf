@@ -376,8 +376,11 @@ class Model_Templates extends Helper_Abstract_Model {
 	 * @throws Exception Thrown if file found not to be valid
 	 *
 	 * @since 4.1
+	 * @since 7.0 Rejects Developer Toolkit templates when the Toolkit isn't active
 	 */
 	public function check_for_valid_pdf_templates( $files = [] ) {
+		$toolkit_active = isset( $this->templates->get_template_header_details()['toolkit'] );
+
 		foreach ( $files as $file ) {
 
 			$basename = wp_basename( $file );
@@ -401,6 +404,12 @@ class Model_Templates extends Helper_Abstract_Model {
 					/* translators: %s: filename */
 					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-pdf' ), esc_html( $basename ) ) );
 				}
+			}
+
+			/* The Developer Toolkit registers the "Toolkit" header, so its templates can't run without it */
+			if ( ! $toolkit_active && get_file_data( $file, [ 'toolkit' => 'Toolkit' ] )['toolkit'] === 'true' ) {
+				/* translators: %s: filename */
+				throw new Exception( sprintf( esc_html__( 'The PDF Template %s requires the Gravity PDF Developer Toolkit plugin. Install and activate the plugin, then try again.', 'gravity-pdf' ), esc_html( $basename ) ) );
 			}
 		}
 	}
