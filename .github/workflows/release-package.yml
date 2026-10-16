@@ -1,0 +1,139 @@
+name: Release Package
+
+# Builds the zip and runs core E2E on it; called by deployment.yml, or dispatch to dry-run.
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version to build (x.y.z).
+        required: true
+        type: string
+    outputs:
+      tag:
+        description: The version that was built.
+        value: ${{ jobs.build.outputs.tag }}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to name the zip (x.y.z). Defaults to the plugin header's.
+        required: false
+        type: string
+
+# Not github.workflow: under workflow_call that is the caller's name, and
+# sharing its group would deadlock the two.
+concurrency:
+  group: release-package-${{ inputs.version || github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # 8.3 because the release build runs php-scoper, which requires PHP 8.2+. composer.json pins
+      # the platform to 7.4, so the packaged dependencies are unaffected by the runtime version.
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          coverage: none
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      # build.sh hands this auth.json to the package dir's composer install (Gravity Forms).
+      - name: Add auth details for private composer packages
+        run: composer config http-basic.composer.gravity.io "$GF_LICENSE" http://localhost
+        env:
+          GF_LICENSE: ${{ secrets.GF_LICENSE }}
+
+      # The given version, or the plugin header's.
+      - name: Resolve version
+        id: tag
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="${INPUT_VERSION:-$(sed -n 's/^Version: *//p' pdf.php)}"
+          if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+(\.[0-9]+)?'; then
+            echo "Version '$version' is not a valid x.y.z version" >&2
+            exit 1
+          fi
+          echo "tag=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Gravity PDF Build
+        run: bash ./tools/release/build.sh "$SOURCE_TAG"
+        env:
+          SOURCE_TAG: ${{ steps.tag.outputs.tag }}
+
+      # The E2E and release jobs run on other runners, so hand the zip on.
+      - name: Upload package
+        uses: actions/upload-artifact@v6
+        with:
+          name: release-package
+          path: tmp/package/gravity-pdf-*.zip
+          if-no-files-found: error
+
+  # Core E2E with the zip mounted as the plugin, so packaging gaps fail before release.
+  e2e-package:
+    name: Playwright E2E on the zip
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # The zip already has the scoped vendor and built assets; this is GF + test tooling.
+      - name: Set up the job
+        uses: ./.github/actions/setup-e2e
+        with:
+          php-version: 8.3
+          php-coverage: none
+          node-cache: yarn
+          dependencies: install
+          gf-license: ${{ secrets.GF_LICENSE }}
+
+      - name: Download package
+        uses: actions/download-artifact@v7
+        with:
+          name: release-package
+          path: tmp/package
+
+      - name: Unpack the package
+        run: bash ./tools/release/prepare-e2e-package.sh "tmp/package/gravity-pdf-$SOURCE_TAG.zip"
+        env:
+          SOURCE_TAG: ${{ needs.build.outputs.tag }}
+
+      - name: Install / Setup Gravity PDF + WordPress
+        run: yarn wp-env:e2e start
+
+      - name: Run the tests
+        timeout-minutes: 25
+        # Every project (plain + pretty permalinks), as tests.yml.
+        run: yarn test:e2e
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
+          # tests.yml owns the visual diff; the baselines are compared there.
+          VISUAL: '0'
+
+      # The plugin mount, and so WP_DEBUG_LOG, is the unpacked package.
+      - name: Dump log files on failure
+        if: failure()
+        run: yarn wp-env:e2e run wordpress "cp" "-r" "/var/www/html/wp-content/uploads/gravity_forms/logs/" "/var/www/html/wp-content/plugins/gravity-pdf/tmp/logs"
+
+      - name: Upload artifacts on failure
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: failure-artifacts-e2e-package
+          path: |
+            tmp/artifacts
+            tmp/e2e-package/gravity-pdf/tmp

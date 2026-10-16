@@ -117,6 +117,8 @@ Legacy jQuery code coexists with the React app; they are separate bundles and do
 - **JS tests**: `tests/js-unit/` mirrors React source structure. Uses Jest + Enzyme. Coverage threshold: 75% (branches/functions/lines/statements).
 - **E2E tests (Playwright)**: `yarn test:e2e` — config at `tools/playwright/config.ts`. Use `yarn test:e2e:debug` for the interactive UI mode.
 - **CI retries**: a cache download that times out is reported as a plain miss, so test cells restore the prebuild-warmed caches through `.github/actions/restore-cache`, which retries once before failing. Composer never retries a 429 from composer.gravity.io, so CI runs it through `tools/ci/composer-retry.sh`.
+- **CI setup**: every wp-env job (PHPUnit, E2E shards, add-on smoke, the release zip's E2E) sets up through `.github/actions/setup-e2e` (Docker mirror, PHP/Node, prebuild caches or a `--no-scripts` install, Playwright, pre-downloaded WP core).
+- **Release**: `deployment.yml` (tag push / manual dispatch) → `release-package.yml` (also manual dispatch, to check a branch's zip without publishing): `build.sh` (needs only the checkout's `auth.json` for Gravity Forms; it does not touch `languages/`, which ships as committed — refresh it with `composer translate`) → `core` + `core-with-permalinks` E2E on the zip → `deployment.yml` publishes the GitHub prerelease. `tools/release/prepare-e2e-package.sh <zip>` unpacks it and writes `tools/wp-env/e2e.override.json` to mount it in place of the working tree (locally too; delete the override and restart wp-env to go back).
 
 ## Key Constraints
 
