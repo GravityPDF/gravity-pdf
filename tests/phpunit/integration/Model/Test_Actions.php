@@ -300,11 +300,71 @@ class Test_Actions extends TestCase {
 	 * @since 4.0
 	 */
 	public function test_is_notice_already_dismissed() {
+		global $gfpdf;
+
 		$type = 'review_plugin';
 
 		$this->assertFalse( $this->model->is_notice_already_dismissed( $type ) );
 		$this->model->dismiss_notice( $type );
 		$this->assertTrue( $this->model->is_notice_already_dismissed( $type ) );
+
+		/* A dismissal can be limited to one made since a given time, and to a set period */
+		$this->assertFalse( $this->model->is_notice_already_dismissed( $type, time() + 10 ) );
+		$this->assertTrue( $this->model->is_notice_already_dismissed( $type, 0, HOUR_IN_SECONDS ) );
+
+		/* Dismissals before 6.17.3 hold the notice ID: still dismissed, but too old for a time limit */
+		$gfpdf->options->update_option( 'action_dismissal', [ $type => $type ] );
+		$this->assertTrue( $this->model->is_notice_already_dismissed( $type ) );
+		$this->assertFalse( $this->model->is_notice_already_dismissed( $type, 0, HOUR_IN_SECONDS ) );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_unwritable_folders_notice() {
+		$tmp   = \GPDFAPI::get_data_class()->template_tmp_location;
+		$since = time() - HOUR_IN_SECONDS;
+
+		update_option( Model_Install::UNWRITABLE_FOLDERS, [ $tmp . 'unwritable-a' => $since, $tmp . 'unwritable-b' => $since ] );
+
+		$route = array_column( $this->controller->get_routes(), null, 'action' )['unwritable_folders'];
+		$this->assertTrue( call_user_func( $route['condition'] ) );
+
+		$html = call_user_func( $route['view'], $route['action'], $route['action_text'] );
+		$this->assertStringContainsString( 'unwritable-a', $html );
+		$this->assertStringContainsString( 'name="gfpdf-dismiss-notice"', $html );
+
+		call_user_func( $route['dismiss'] );
+		$this->assertFalse( call_user_func( $route['condition'] ) );
+
+		/* A folder that fails after the dismissal raises the notice again, listing only that folder */
+		update_option( Model_Install::UNWRITABLE_FOLDERS, [ $tmp . 'unwritable-a' => $since, $tmp . 'unwritable-c' => $since ] );
+		$this->assertSame( [ $tmp . 'unwritable-c' ], $this->model->get_undismissed_unwritable_folders() );
+
+		/* So does a dismissed folder that recovered and has failed again since */
+		update_option( Model_Install::UNWRITABLE_FOLDERS, [ $tmp . 'unwritable-a' => time() + 1 ] );
+		$this->assertSame( [ $tmp . 'unwritable-a' ], $this->model->get_undismissed_unwritable_folders() );
+
+		delete_option( Model_Install::UNWRITABLE_FOLDERS );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_unwritable_folders_notice_returns_a_week_after_its_dismissal() {
+		global $gfpdf;
+
+		$dir = \GPDFAPI::get_data_class()->template_tmp_location . 'unwritable-a';
+
+		update_option( Model_Install::UNWRITABLE_FOLDERS, [ $dir => time() - MONTH_IN_SECONDS ] );
+		$this->model->dismiss_unwritable_folders();
+		$this->assertSame( [], $this->model->get_undismissed_unwritable_folders() );
+
+		$key = Model_Actions::UNWRITABLE_FOLDER_DISMISSAL . md5( $dir );
+		$gfpdf->options->update_option( 'action_dismissal', [ $key => time() - Model_Actions::UNWRITABLE_FOLDER_SNOOZE - 1 ] );
+		$this->assertSame( [ $dir ], $this->model->get_undismissed_unwritable_folders() );
+
+		delete_option( Model_Install::UNWRITABLE_FOLDERS );
 	}
 
 	/**

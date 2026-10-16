@@ -164,7 +164,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_is_installed' );
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
-		delete_option( 'gfpdf_unwritable_folders' );
+		delete_option( Model_Install::UNWRITABLE_FOLDERS );
 		delete_option( 'gfpdf_cache_generation' );
 		delete_option( 'gfpdf_cache_form_generation' );
 		delete_option( Model_Pdf_Cache::SWEEP_STATE_OPTION );
