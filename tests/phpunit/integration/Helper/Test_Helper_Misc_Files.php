@@ -75,6 +75,46 @@ class Test_Helper_Misc_Files extends TestCase {
 	}
 
 	/**
+	 * @since 6.17.3
+	 */
+	public function test_create_mpdf_cache_folders() {
+		$cache = \GPDFAPI::get_data_class()->mpdf_tmp_location . '/mpdf';
+
+		wp_mkdir_p( $cache );
+		$this->misc->rmdir( $cache );
+		$this->assertDirectoryDoesNotExist( $cache );
+
+		$this->misc->create_mpdf_cache_folders();
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+
+		/* Folders that already exist are left as they are */
+		touch( $cache . '/ttfontdata/dejavusans.mtx.json' );
+		$this->misc->create_mpdf_cache_folders();
+		$this->assertFileExists( $cache . '/ttfontdata/dejavusans.mtx.json' );
+
+		unlink( $cache . '/ttfontdata/dejavusans.mtx.json' );
+	}
+
+	/**
+	 * @since 6.17.3
+	 */
+	public function test_get_tmp_locations() {
+		$data = \GPDFAPI::get_data_class();
+
+		/* mPDF's tempDir is the tmp folder by default, so it isn't listed twice */
+		$this->assertSame( [ $data->template_tmp_location ], $this->misc->get_tmp_locations() );
+
+		$mpdf_tmp_location       = $data->mpdf_tmp_location;
+		$data->mpdf_tmp_location = '/srv/pdf-tmp';
+
+		$locations = $this->misc->get_tmp_locations();
+
+		$data->mpdf_tmp_location = $mpdf_tmp_location;
+
+		$this->assertSame( [ $data->template_tmp_location, '/srv/pdf-tmp' ], $locations );
+	}
+
+	/**
 	 * @dataProvider provider_convert_path_to_url
 	 *
 	 * @param string|false $expected

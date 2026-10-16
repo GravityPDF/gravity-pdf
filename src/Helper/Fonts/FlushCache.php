@@ -28,15 +28,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 class FlushCache {
 
 	/**
-	 * Deletes the mPDF tmp directory, and stops serving PDFs cached with the old fonts
+	 * Empties mPDF's cache and recreates its folders, and stops serving PDFs cached with the old fonts
 	 *
 	 * @since 6.0
+	 * @since 6.17.3 Empties mPDF's cache folder rather than its tempDir, and recreates the folders
 	 * @since 7.0 Bumps the PDF cache generation
 	 */
 	public static function flush(): void {
 		$misc = GPDFAPI::get_misc_class();
 		$data = GPDFAPI::get_data_class();
-		$misc->cleanup_dir( $data->mpdf_tmp_location );
+		$misc->cleanup_dir( $data->mpdf_tmp_location . '/mpdf' );
+		$misc->create_mpdf_cache_folders();
 
 		Cache::bump_generation();
 	}

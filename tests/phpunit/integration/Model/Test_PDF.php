@@ -1368,7 +1368,6 @@ class Test_PDF extends TestCase {
 		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
 
 		wp_mkdir_p( $gfpdf->data->template_location );
-		wp_mkdir_p( $gfpdf->data->mpdf_tmp_location );
 
 		/* Create our files to test */
 		$files = [
@@ -1386,11 +1385,10 @@ class Test_PDF extends TestCase {
 			'mpdf/test2' => time() - 3590,
 			'mpdf/test3' => time() - ( 25 * 3600 ),
 
-			'mpdf/mpdf/_tempImg'                       => time() - 3601,
-			'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' => time() - ( 2 * DAY_IN_SECONDS ),
-			'mpdf/mpdf/ttfontdata/dejavusans.cw.dat'   => time() - WEEK_IN_SECONDS - 60,
-			'1234556690c67856b/document.pdf'           => time() - ( 13 * 3600 ),
-			'a234556690c67856b/document.pdf'           => time() - ( 11 * 3600 ),
+			'mpdf/ttfontdata/dejavusans.mtx.json' => time() - ( 2 * DAY_IN_SECONDS ),
+			'mpdf/ttfontdata/dejavusans.cw.dat'   => time() - WEEK_IN_SECONDS - 60,
+			'1234556690c67856b/document.pdf'      => time() - ( 13 * 3600 ),
+			'a234556690c67856b/document.pdf'      => time() - ( 11 * 3600 ),
 
 			/* The PDF cache has its own sweep */
 			$site . 'cache/e1/pabc-123/document.pdf'   => time() - ( 25 * 3600 ),
@@ -1398,7 +1396,7 @@ class Test_PDF extends TestCase {
 			$site . 'uncached/new/document.pdf'        => time() - 1800,
 		];
 
-		$directories = [ 'mpdf/mpdf/ttfontdata', 'mpdf/mpdf', 'mpdf', '1234556690c67856b', $site . 'cache/e1/pabc-123', $site . 'cache/e1', $site . 'cache', $site . 'uncached/old', $site . 'uncached', rtrim( $site, '/' ) ];
+		$directories = [ 'mpdf/ttfontdata', 'mpdf', '1234556690c67856b', 'f00d1234556690c67', $site . 'cache/e1/pabc-123', $site . 'cache/e1', $site . 'cache', $site . 'uncached/old', $site . 'uncached', rtrim( $site, '/' ) ];
 		$directories = array_filter( $directories );
 
 		/* Made as a render makes it, with its index.html */
@@ -1439,12 +1437,15 @@ class Test_PDF extends TestCase {
 		$this->assertFileDoesNotExist( $tmp . 'mpdf/test3' );
 
 		/* mPDF's cache folders stay while their files expire, and font metrics are kept for a week */
-		$this->assertDirectoryExists( $tmp . 'mpdf/mpdf/ttfontdata' );
-		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/_tempImg' );
-		$this->assertFileExists( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.mtx.json' );
-		$this->assertFileDoesNotExist( $tmp . 'mpdf/mpdf/ttfontdata/dejavusans.cw.dat' );
+		$this->assertDirectoryExists( $tmp . 'mpdf/ttfontdata' );
+		$this->assertFileExists( $tmp . 'mpdf/ttfontdata/dejavusans.mtx.json' );
+		$this->assertFileDoesNotExist( $tmp . 'mpdf/ttfontdata/dejavusans.cw.dat' );
+
 		$this->assertFileDoesNotExist( $tmp . '1234556690c67856b/document.pdf' );
 		$this->assertFileExists( $tmp . 'a234556690c67856b/document.pdf' );
+
+		/* mPDF's tempDir is the tmp folder itself, but only its cache folder is treated as mPDF's */
+		$this->assertDirectoryDoesNotExist( $tmp . 'f00d1234556690c67' );
 
 		$this->assertFileExists( $tmp . $site . 'cache/e1/pabc-123/document.pdf' );
 		$this->assertFileDoesNotExist( $tmp . $site . 'uncached/old/document.pdf' );
@@ -1462,6 +1463,26 @@ class Test_PDF extends TestCase {
 
 		@rmdir( $tmp . 'a234556690c67856b' );
 		@rmdir( $tmp . $site . 'uncached/new' );
+	}
+
+	/**
+	 * The cleanup puts back mPDF's cache folders, so no render has to race another to create them
+	 *
+	 * @since 6.17.3
+	 */
+	public function test_cleanup_tmp_dir_recreates_the_mpdf_cache_folders() {
+		global $gfpdf;
+
+		$cache = $gfpdf->data->mpdf_tmp_location . '/mpdf';
+
+		wp_mkdir_p( $cache );
+		$gfpdf->misc->rmdir( $cache );
+		$this->assertDirectoryDoesNotExist( $cache );
+
+		delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
+		$this->model->cleanup_tmp_dir();
+
+		$this->assertDirectoryExists( $cache . '/ttfontdata' );
 	}
 
 	public function test_cleanup_tmp_dir_keeps_the_uncached_folders_index() {
