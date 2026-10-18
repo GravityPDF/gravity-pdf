@@ -529,11 +529,7 @@ class Test_Templates extends TestCase {
 			$this->assertStringContainsString( 'requires the Gravity PDF Developer Toolkit', $e->getMessage() );
 		}
 
-		$add_toolkit_header = function ( $headers ) {
-			$headers['toolkit'] = 'Toolkit';
-
-			return $headers;
-		};
+		$add_toolkit_header = fn( $headers ) => $headers + [ 'toolkit' => 'Toolkit' ];
 
 		add_filter( 'gfpdf_template_header_details', $add_toolkit_header );
 		try {

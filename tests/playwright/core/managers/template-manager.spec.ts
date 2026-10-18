@@ -242,6 +242,45 @@ test.describe('Template Manager', () => {
 		await snapshot(page, testinfo, status);
 	});
 
+	test('should only install a Developer Toolkit template when the Toolkit is active', async ({
+		page,
+	}) => {
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
+
+		const upload = page.locator(
+			'.gfpdf-template-dropzone input[type="file"]'
+		);
+		const toolkitZip = path.join(
+			resourcesPath,
+			'template',
+			'toolkit-sample.zip'
+		);
+		const template = page.locator('.theme[data-slug="toolkit-sample"]');
+
+		await upload.setInputFiles(toolkitZip);
+
+		await expect(
+			page.locator('.gfpdf-dropzone-status .notice.error')
+		).toContainText('requires the Gravity PDF Developer Toolkit plugin');
+		await expect(template).toHaveCount(0);
+
+		// Picking the same file again fires no change event until the input is cleared
+		await page.setExtraHTTPHeaders({ 'X-GPDF-E2E-Toolkit': 'active' });
+		await upload.setInputFiles([]);
+		await upload.setInputFiles(toolkitZip);
+
+		await expect(template).toBeVisible();
+
+		// Leave the shared site without it
+		await template.locator('.more-details').click();
+		page.on('dialog', (dialog) => dialog.accept());
+		await page.getByRole('button', { name: 'Delete Template' }).click();
+		await expect(template).toHaveCount(0);
+	});
+
 	test('should clear the upload status when the Template Manager is reopened', async ({
 		page,
 	}) => {
