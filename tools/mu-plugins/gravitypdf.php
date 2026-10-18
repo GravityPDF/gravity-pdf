@@ -112,6 +112,18 @@ if ( $gfpdf_e2e_header( 'debug_mode' ) === 'yes' ) {
 	);
 }
 
+/* Stands in for the Developer Toolkit, which registers the "Toolkit" template header */
+if ( $gfpdf_e2e_header( 'toolkit' ) === 'active' ) {
+	add_filter(
+		'gfpdf_template_header_details',
+		static function ( $headers ) {
+			$headers['toolkit'] = 'Toolkit';
+
+			return $headers;
+		}
+	);
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {
