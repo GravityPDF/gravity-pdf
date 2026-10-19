@@ -353,7 +353,7 @@ class Test_Bootstrap extends TestCase {
 	}
 
 	/**
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_add_admin_messages_shows_a_non_error_notice_as_a_notice() {
 		global $wp_settings_errors;

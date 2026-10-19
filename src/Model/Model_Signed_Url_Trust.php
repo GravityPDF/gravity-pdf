@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * content the plugin or a form editor wrote rather than a submitter, and whether a PDF is being rendered or
  * user-submitted content processed
  *
- * @since 6.17.3
+ * @since 6.18.0
  */
 class Model_Signed_Url_Trust {
 
@@ -28,7 +28,7 @@ class Model_Signed_Url_Trust {
 	 * Single-use signing grants, keyed by what was granted, with the uses remaining
 	 *
 	 * @var array<string,int>
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected $grants = [];
 
@@ -36,7 +36,7 @@ class Model_Signed_Url_Trust {
 	 * Above zero while processing user-submitted content, which can't be granted trust
 	 *
 	 * @var int
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected $untrusted_depth = 0;
 
@@ -44,7 +44,7 @@ class Model_Signed_Url_Trust {
 	 * The entries whose PDFs are being rendered, innermost last
 	 *
 	 * @var int[]
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected $rendering_entry_ids = [];
 
@@ -61,7 +61,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return void
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function grant( $key ) {
 		$this->grants[ $key ] = ( $this->grants[ $key ] ?? 0 ) + 1;
@@ -74,7 +74,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return bool Whether a grant existed
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function consume( $key ) {
 		if ( empty( $this->grants[ $key ] ) ) {
@@ -95,7 +95,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return mixed The callback's return value
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function run_untrusted( callable $callback ) {
 		++$this->untrusted_depth;
@@ -110,7 +110,7 @@ class Model_Signed_Url_Trust {
 	/**
 	 * @return bool Whether user-submitted content is being processed
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function is_untrusted() {
 		return $this->untrusted_depth > 0;
@@ -125,7 +125,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return mixed The callback's return value
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function run_rendering_pdf( $entry_id, callable $callback ) {
 		$this->rendering_entry_ids[] = (int) $entry_id;
@@ -167,7 +167,7 @@ class Model_Signed_Url_Trust {
 	/**
 	 * @return bool Whether a PDF is being rendered
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function is_rendering_pdf() {
 		return ! empty( $this->rendering_entry_ids );
@@ -176,7 +176,7 @@ class Model_Signed_Url_Trust {
 	/**
 	 * @return int The entry whose PDF is being rendered, or 0 when there isn't one
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function get_rendering_entry_id() {
 		return (int) end( $this->rendering_entry_ids );
@@ -191,7 +191,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return string
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function get_shortcode_signing_token( $shortcode, $pdf_id, $entry_id ) {
 		return substr( hash_hmac( 'sha256', $shortcode . '|' . $pdf_id . '|' . (int) $entry_id, wp_salt( 'auth' ) ), 0, 32 );
@@ -207,7 +207,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function is_valid_shortcode_signing_token( $token, $shortcode, $pdf_id, $entry_id ) {
 		return is_string( $token ) && $token !== '' && hash_equals( $this->get_shortcode_signing_token( $shortcode, $pdf_id, $entry_id ), $token );
@@ -221,7 +221,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return string[]
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function get_default_tags( $field ) {
 		if ( ! $field instanceof \GF_Field || ! $field->is_administrative() ) {
@@ -250,7 +250,7 @@ class Model_Signed_Url_Trust {
 	 *
 	 * @return string[]
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function get_trusted_field_tags( $form, $entry ) {
 		$trusted = [];

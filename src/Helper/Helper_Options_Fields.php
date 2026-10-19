@@ -27,7 +27,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 *
 	 * @internal
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public const LOGGED_OUT_TIMEOUT_MAX = 10080;
 

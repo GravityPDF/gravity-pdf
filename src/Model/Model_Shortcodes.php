@@ -122,7 +122,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function can_sign_shortcode( $attributes, $settings ) {
 		if ( $this->get_trust()->is_valid_shortcode_signing_token( $attributes['token'], static::SHORTCODE, $attributes['id'], $attributes['entry'] ) ) {
@@ -145,7 +145,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function can_sign_url( $entry_id, $settings ) {
 		/* In post content the author is the post's author, not whoever is viewing it */
@@ -162,7 +162,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	/**
 	 * @return Model_Signed_Url_Trust
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function get_trust() {
 		return GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
