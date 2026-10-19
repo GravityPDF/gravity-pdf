@@ -501,24 +501,63 @@ class Test_Templates extends WP_UnitTestCase {
 	 * @since 6.18.0
 	 */
 	public function test_get_max_upload_size() {
-		$limit = function ( $bytes ) {
-			return function () use ( $bytes ) {
-				return $bytes;
-			};
-		};
+		$this->assertLessThanOrEqual( Helper_Templates::MAX_UPLOAD_SIZE, Helper_Templates::get_max_upload_size() );
 
-		/* Never offer to accept more than the server itself will */
-		add_filter( 'upload_size_limit', $tiny = $limit( MB_IN_BYTES ) );
-		$this->assertSame( MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
-		remove_filter( 'upload_size_limit', $tiny );
-
-		add_filter( 'upload_size_limit', $huge = $limit( 512 * MB_IN_BYTES ) );
-		$this->assertSame( 32 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
-		remove_filter( 'upload_size_limit', $huge );
-
-		add_filter( 'gfpdf_template_max_upload_size', $override = $limit( 5 * MB_IN_BYTES ) );
+		add_filter( 'gfpdf_template_max_upload_size', $this->limit( 5 * MB_IN_BYTES ) );
 		$this->assertSame( 5 * MB_IN_BYTES, Helper_Templates::get_max_upload_size() );
-		remove_filter( 'gfpdf_template_max_upload_size', $override );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_get_max_upload_size_ignores_network_media_limit() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		/* Network Settings → Max upload file size, in KB */
+		update_site_option( 'fileupload_maxk', 1 );
+		$this->assertSame( KB_IN_BYTES, wp_max_upload_size() );
+
+		$this->assertGreaterThan( KB_IN_BYTES, Helper_Templates::get_max_upload_size() );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_move_template_to_tmp_dir_size_limit() {
+		/* Random hex compresses to about half, so the zip is well over 1 KB (raw bytes can hold a NUL, which is_file() rejects) */
+		$test_file          = $this->make_zip( [ 'padding' => bin2hex( random_bytes( 10 * KB_IN_BYTES ) ) ] );
+		$_FILES['template'] = [
+			'name'     => 'sized.zip',
+			'tmp_name' => $test_file,
+			'error'    => UPLOAD_ERR_OK,
+		];
+
+		/* The media upload limit doesn't apply */
+		add_filter( 'upload_size_limit', $this->limit( KB_IN_BYTES ) );
+		$path = $this->model->move_template_to_tmp_dir( $this->getFileStub() );
+		$this->assertFileExists( $path );
+		unlink( $path );
+
+		/* The template one does */
+		add_filter( 'gfpdf_template_max_upload_size', $this->limit( KB_IN_BYTES ) );
+		$file = $this->getFileStub();
+		try {
+			$this->model->move_template_to_tmp_dir( $file );
+			$this->fail( 'Expected the oversized zip to be refused.' );
+		} catch ( UploadException $e ) {
+			$this->assertStringContainsString( 'File size is too large', implode( "\n", $file->getErrors() ) );
+		} finally {
+			unlink( $test_file );
+		}
+	}
+
+	/** A filter callback returning $bytes */
+	private function limit( int $bytes ): callable {
+		return function () use ( $bytes ) {
+			return $bytes;
+		};
 	}
 
 	/** Build a zip at a unique tmp path; each entry maps an archive name to a file path or raw contents */

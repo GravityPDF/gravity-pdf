@@ -5,6 +5,7 @@ namespace GFPDF\Helper;
 use Exception;
 use GFPDF\Statics\Deprecation;
 use GPDFAPI;
+use GFPDF\Statics\Upload_Size;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
@@ -541,7 +542,8 @@ class Helper_Templates {
 	 * @since 6.18.0
 	 */
 	public static function get_max_upload_size() {
-		$max_size = min( static::MAX_UPLOAD_SIZE, wp_max_upload_size() ?: static::MAX_UPLOAD_SIZE );
+		$server_size = Upload_Size::get_php_limit();
+		$max_size    = min( static::MAX_UPLOAD_SIZE, $server_size ?: static::MAX_UPLOAD_SIZE );
 
 		return (int) apply_filters( 'gfpdf_template_max_upload_size', $max_size );
 	}

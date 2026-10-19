@@ -162,6 +162,16 @@ class Test_Helper_Data extends WP_UnitTestCase {
 		foreach ( $required_keys as $key ) {
 			$this->assertArrayHasKey( $key, $localised_data );
 		}
+
+		/* The Template Manager refuses a larger file before it's sent, so it must match what the server accepts */
+		add_filter(
+			'gfpdf_template_max_upload_size',
+			function () {
+				return 3 * MB_IN_BYTES;
+			}
+		);
+		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->gform );
+		$this->assertSame( 3 * MB_IN_BYTES, $localised_data['templateUploadMaxSize'] );
 	}
 
 	public function test_get_conditional_logic_options() {
