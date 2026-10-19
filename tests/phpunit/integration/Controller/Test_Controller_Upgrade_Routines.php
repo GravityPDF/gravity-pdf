@@ -73,15 +73,15 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 		try {
 			file_put_contents( $file, "deny from all\n" );
-			do_action( 'gfpdf_version_changed', '6.17.3', '7.0.0' );
+			do_action( 'gfpdf_version_changed', '6.18.0', '7.0.0' );
 			$this->assertStringEqualsFile( $file, Model_Install::TMP_HTACCESS );
 
 			file_put_contents( $file, 'Require ip 127.0.0.1' );
-			do_action( 'gfpdf_version_changed', '6.17.3', '7.0.0' );
+			do_action( 'gfpdf_version_changed', '6.18.0', '7.0.0' );
 			$this->assertStringEqualsFile( $file, 'Require ip 127.0.0.1', 'A customised file is left alone' );
 
 			unlink( $file );
-			do_action( 'gfpdf_version_changed', '6.17.3', '7.0.0' );
+			do_action( 'gfpdf_version_changed', '6.18.0', '7.0.0' );
 			$this->assertStringEqualsFile( $file, Model_Install::TMP_HTACCESS );
 
 			file_put_contents( $file, 'deny from all' );
