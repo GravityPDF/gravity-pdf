@@ -204,4 +204,29 @@ test.describe('Signed PDF URLs', () => {
 		expect(html).toContain('&#123;PDF:pdf:');
 		expect(html).not.toContain('signature=');
 	});
+
+	test('does not sign or run what a submitter planted when an administrator resends the notification', async () => {
+		const submitted = await pdf.createEntry({
+			form_id: form.id,
+			ip: '10.0.0.1',
+			user_agent: `{PDF:pdf:${pdfId}:signed,2 years} ${shortcode(entry.id)}`,
+			5: `{PDF:pdf:${pdfId}:signed,1 year}`,
+		});
+		await pdf.updateForm(
+			form.id,
+			withNotification(
+				`<code>{PDF:pdf:${pdfId}:signed}</code>{all_fields}{user_agent}`
+			)
+		);
+
+		const mail = pdf.resendNotifications(form.id, submitted.id);
+
+		expect(
+			mail.match(new RegExp(`/pdf/${pdfId}/${submitted.id}/`, 'g'))
+		).toHaveLength(3);
+		expect(mail).toContain(
+			`&#x5b;gravitypdf id="${pdfId}" entry="${entry.id}"`
+		);
+		expect(mail.match(/signature=/g)).toHaveLength(1);
+	});
 });

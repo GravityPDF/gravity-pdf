@@ -61,8 +61,9 @@ export function withNotification(message: string) {
 	};
 }
 
-/* For `wp eval`: print each mail's message instead of sending it */
-const PRINT_MAIL = `add_filter( \\"pre_wp_mail\\", fn() => print_r( func_get_arg( 1 )[\\"message\\"] ), 10, 2 );`;
+/* For `wp eval`: send an entry's notifications, printing each mail's message instead of sending it */
+const sendNotifications = (formId: number, entryId: number) =>
+	`add_filter( \\"pre_wp_mail\\", fn() => print_r( func_get_arg( 1 )[\\"message\\"] ), 10, 2 ); GFAPI::send_notifications( GFAPI::get_form( ${formId} ), GFAPI::get_entry( ${entryId} ) );`;
 
 export default class GravityForms {
 	protected requestUtils: RequestUtils;
@@ -158,7 +159,18 @@ export default class GravityForms {
 	 */
 	sendBackgroundNotifications(formId: number, entryId: number) {
 		return wpCli(
-			`wp eval '${PRINT_MAIL} add_filter( \\"gform_is_asynchronous_notifications_enabled\\", \\"__return_true\\" ); add_filter( \\"wp_gf_notifications_processor_wp_die\\", \\"__return_false\\" ); GFAPI::send_notifications( GFAPI::get_form( ${formId} ), GFAPI::get_entry( ${entryId} ) ); do_action( \\"wp_gf_notifications_processor_cron\\" );'`
+			`wp eval 'add_filter( \\"gform_is_asynchronous_notifications_enabled\\", \\"__return_true\\" ); add_filter( \\"wp_gf_notifications_processor_wp_die\\", \\"__return_false\\" ); ${sendNotifications(formId, entryId)} do_action( \\"wp_gf_notifications_processor_cron\\" );'`
+		);
+	}
+
+	/**
+	 * Resend an entry's notifications as an administrator, with background notifications off, and return them
+	 * @param formId
+	 * @param entryId
+	 */
+	resendNotifications(formId: number, entryId: number) {
+		return wpCli(
+			`wp --user=admin eval 'add_filter( \\"gform_is_asynchronous_notifications_enabled\\", \\"__return_false\\" ); ${sendNotifications(formId, entryId)}'`
 		);
 	}
 

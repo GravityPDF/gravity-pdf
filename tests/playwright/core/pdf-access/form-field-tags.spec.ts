@@ -145,8 +145,7 @@ test.describe('PDF shortcodes and merge tags in form fields', () => {
 	}) => {
 		const { html } = await submit(page);
 
-		// in field content, a field label, a label a merge tag adds and a section title; not even with an administrator
-		// rendering the PDF
+		// in field content, a field label and a section title; not even with an administrator rendering the PDF
 		const links = [
 			...html.matchAll(
 				new RegExp(
@@ -156,10 +155,15 @@ test.describe('PDF shortcodes and merge tags in form fields', () => {
 			),
 		].map((match) => match[0]);
 
-		expect(links).toHaveLength(5);
+		expect(links).toHaveLength(4);
 		for (const link of links) {
 			expect(link).not.toContain('signature=');
 		}
+
+		// a label a merge tag adds is printed, not run
+		expect(html).toContain(
+			`html-label=Administrative &#x5b;gravitypdf id=${pdfId}`
+		);
 
 		await page.goto(url(html, 'html-named'));
 		await expect(
