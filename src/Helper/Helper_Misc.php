@@ -493,12 +493,21 @@ class Helper_Misc {
 	}
 
 	/**
+	 * mPDF's cache folder, which mPDF keeps in an mpdf folder of its tempDir
+	 *
+	 * @since 6.18.0
+	 */
+	public function get_mpdf_cache_location(): string {
+		return $this->data->mpdf_tmp_location . '/mpdf';
+	}
+
+	/**
 	 * Create mPDF's cache folders ahead of a render, so concurrent PDFs don't race to create them
 	 *
 	 * @since 6.18.0
 	 */
 	public function create_mpdf_cache_folders(): void {
-		$this->create_folder( $this->data->mpdf_tmp_location . '/mpdf/ttfontdata' );
+		$this->create_folder( $this->get_mpdf_cache_location() . '/ttfontdata' );
 	}
 
 	/**

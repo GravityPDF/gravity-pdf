@@ -36,7 +36,7 @@ class FlushCache {
 	 */
 	public static function flush( string $font_id = '' ): void {
 		$misc      = GPDFAPI::get_misc_class();
-		$font_data = GPDFAPI::get_data_class()->mpdf_tmp_location . '/mpdf/ttfontdata';
+		$font_data = $misc->get_mpdf_cache_location() . '/ttfontdata';
 
 		$misc->create_mpdf_cache_folders();
 

@@ -2041,7 +2041,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function cleanup_tmp_dir() {
 
-		$mpdf_cache      = $this->data->mpdf_tmp_location . '/mpdf';
+		$mpdf_cache      = $this->misc->get_mpdf_cache_location();
 		$mpdf_font_cache = $mpdf_cache . '/ttfontdata/';
 
 		$now = time();
