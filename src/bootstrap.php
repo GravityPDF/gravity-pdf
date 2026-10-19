@@ -721,7 +721,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->misc,
 			$this->notices,
 			$this->templates,
-			new Helper\Helper_Url_Signer()
+			new Helper\Helper_Url_Signer( $this->options )
 		);
 
 		$view = new View\View_PDF(
@@ -752,7 +752,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function shortcodes() {
 
-		$model = new Model\Model_Shortcodes( $this->gform, $this->log, $this->options, $this->misc, new Helper\Helper_Url_Signer() );
+		$model = new Model\Model_Shortcodes( $this->gform, $this->log, $this->options, $this->misc, new Helper\Helper_Url_Signer( $this->options ) );
 		$view  = new View\View_Shortcodes( [] );
 
 		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );
@@ -773,7 +773,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function mergetags() {
 
-		$model = new Model\Model_Mergetags( $this->options, $this->singleton->get_class( 'Model_PDF' ), $this->log, $this->misc, new Helper\Helper_Url_Signer() );
+		$model = new Model\Model_Mergetags( $this->options, $this->singleton->get_class( 'Model_PDF' ), $this->log, $this->misc, new Helper\Helper_Url_Signer( $this->options ) );
 
 		$class = new Controller\Controller_Mergetags( $model );
 		$class->init();

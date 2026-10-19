@@ -484,8 +484,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* only check if PDF timed out if our logged out restriction is not 'Yes' and the user is not logged in */
 			if ( ! is_user_logged_in() && $this->is_current_pdf_owner( $entry, 'logged_out' ) === true ) {
-				/* get the global PDF settings */
-				$timeout = (int) $this->options->get_option( 'logged_out_timeout', '20' );
+				$timeout = $this->options->get_logged_out_timeout();
 
 				$timeout_stamp   = 60 * $timeout; /* 60 seconds multiplied by number of minutes */
 				$entry_created   = strtotime( $entry['date_created'] ); /* get entry timestamp */

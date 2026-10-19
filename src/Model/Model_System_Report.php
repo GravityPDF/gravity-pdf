@@ -366,6 +366,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 		];
 
 		/* Security Settings */
+		$logged_out_timeout = $this->options->get_logged_out_timeout();
+
 		$items['security'] = [
 			'user_restrictions'  => [
 				'label'        => esc_html__( 'User Restrictions', 'gravity-pdf' ),
@@ -376,8 +378,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 			'logged_out_timeout' => [
 				'label'        => esc_html__( 'Logged Out Timeout', 'gravity-pdf' ),
 				'label_export' => 'Logged Out Timeout',
-				'value'        => $this->options->get_option( 'logged_out_timeout', '20' ) . ' ' . esc_html__( 'minute(s)', 'gravity-pdf' ),
-				'value_export' => $this->options->get_option( 'logged_out_timeout', '20' ) . ' minutes(s)',
+				'value'        => $logged_out_timeout . ' ' . esc_html__( 'minute(s)', 'gravity-pdf' ),
+				'value_export' => $logged_out_timeout . ' minutes(s)',
 			],
 		];
 
