@@ -30,6 +30,7 @@
 * 🐞 Bug: Keep PDF merge tags in an administrative field's Default Value when the entry is saved
 * 🐞 Bug: Fix a `[gravitypdf]` shortcode in a rich text administrative field's Default Value showing as text in the PDF
 * 🐞 Bug: Refuse to install Developer Toolkit templates in the Template Manager until the Toolkit plugin is active
+* 🐞 Bug: Don't cap PDF template uploads at a multisite network's media upload limit
 * 🐞 Bug: Fix PHP deprecation notices when a field value or PDF setting is empty
 * 🐞 Bug: Fix PHP deprecation notice for empty rich text Paragraph fields
 * 🐞 Bug: Don't add debug errors to raw PDF URLs
