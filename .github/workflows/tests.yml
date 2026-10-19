@@ -3,14 +3,17 @@ name: Tests
 on:
   workflow_dispatch:
   pull_request:
-    types: [ opened, reopened, synchronize, labeled ]
+    # No `opened`: a PR opened with run-tests fires `labeled` too, and the two runs would cancel each other
+    types: [ reopened, synchronize, labeled ]
   # Not `schedule:` — GitHub ran it 2-4h late and skipped whole days. Cronicle
   # (CT 115, https://cron.blueliquiddesigns.com) dispatches it on time instead,
   # at the UTC time below. Change the time there, not here.
   #   cron "0 20 * * *" (UTC) — daily, 6am Sydney AEST (7am during AEDT)
 
+# Any label fires `labeled`, but only these change what the run does (same list as the label check's `if`). Another
+# label gets a group of its own, so it can't cancel the run in progress, and the label check skips it
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event.action == 'labeled' && ! contains(fromJSON('["run-tests","run-tests-php-all","update-visual-baselines"]'), github.event.label.name) && github.run_id || github.head_ref || github.sha }}
   cancel-in-progress: true
 
 env:
@@ -19,10 +22,11 @@ env:
 jobs:
   check_for_run_tests_label_in_pr:
     name: Should workflow run?
+    # Same label list as `concurrency.group`
+    if: ${{ github.event.action != 'labeled' || contains(fromJSON('["run-tests","run-tests-php-all","update-visual-baselines"]'), github.event.label.name) }}
     runs-on: ubuntu-latest
     steps:
-      # pull_request:opened can fire before labels are applied (empty webhook payload labels[]) —
-      # read live labels via gh-api; runner spin-up absorbs the propagation window.
+      # Read live labels via gh-api: the event payload can predate labels added alongside the trigger
       - name: Check for run-tests label
         if: ${{ github.event_name == 'pull_request' }}
         env:

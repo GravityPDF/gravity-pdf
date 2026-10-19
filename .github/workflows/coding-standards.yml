@@ -2,13 +2,12 @@ name: Coding Standards
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize, labeled ]
+    # No `opened`: a PR opened with run-tests fires `labeled` too, and the two runs would cancel each other
+    types: [ reopened, synchronize, labeled ]
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# A label other than run-tests gets a group of its own, so it can't cancel the run in progress
 concurrency:
-  # The concurrency group contains the workflow name and the branch name for pull requests
-  # or the commit hash for any other events.
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event.action == 'labeled' && github.event.label.name != 'run-tests' && github.run_id || github.head_ref || github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -17,7 +16,7 @@ jobs:
     name: Should workflow run?
     runs-on: ubuntu-latest
     steps:
-      - if: ${{ github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests') }}
+      - if: ${{ github.event_name == 'pull_request' && (! contains(github.event.pull_request.labels.*.name, 'run-tests') || github.event.action == 'labeled' && github.event.label.name != 'run-tests') }}
         uses: action-pack/cancel@v1
 
   phpcs:
