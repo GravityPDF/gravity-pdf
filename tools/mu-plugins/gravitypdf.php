@@ -145,6 +145,17 @@ if ( $gfpdf_e2e_cache_generation !== '' ) {
 	);
 }
 
+/* The logged out timeout is a global setting, so the spec testing its cap asks for one per request */
+$gfpdf_e2e_logged_out_timeout = $gfpdf_e2e_header( 'logged_out_timeout' );
+if ( $gfpdf_e2e_logged_out_timeout !== '' ) {
+	add_filter(
+		'gfpdf_get_option_logged_out_timeout',
+		static function () use ( $gfpdf_e2e_logged_out_timeout ) {
+			return (int) $gfpdf_e2e_logged_out_timeout;
+		}
+	);
+}
+
 /* The deprecated features spec plants its signals site-wide, and the notice they raise would otherwise appear on
    every admin page the other specs take snapshots of */
 if ( $gfpdf_e2e_header( 'deprecations' ) !== 'yes' ) {

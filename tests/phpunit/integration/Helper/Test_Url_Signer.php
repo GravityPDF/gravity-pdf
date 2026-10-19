@@ -71,6 +71,21 @@ class Test_Url_Signer extends TestCase {
 		remove_filter( 'gfpdf_signed_url_max_expiration', '__return_empty_string' );
 	}
 
+	public function test_signed_url_defaults_to_the_capped_logged_out_timeout() {
+		$signer  = new Helper_Url_Signer();
+		$expires = function () use ( $signer ) {
+			wp_parse_str( wp_parse_url( $signer->sign( 'https://test.com/', '' ), PHP_URL_QUERY ), $query );
+
+			return (int) $query['expires'];
+		};
+
+		$this->assertEqualsWithDelta( strtotime( '+20 minutes' ), $expires(), 5 );
+
+		/* A value saved outside the settings form can be over a week */
+		add_filter( 'gfpdf_get_option_logged_out_timeout', fn() => 525600 );
+		$this->assertEqualsWithDelta( strtotime( '+1 week' ), $expires(), 5 );
+	}
+
 	public function provider_sign_and_verify(): array {
 		return [
 			[ 'https://test.com' ],

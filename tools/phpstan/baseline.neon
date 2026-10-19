@@ -25,12 +25,6 @@ parameters:
 			path: ../../api.php
 
 		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../api.php
-
-		-
 			message: '#^Parameter \#3 \$pdf of method GFPDF\\Helper\\Helper_Abstract_Options\:\:update_pdf\(\) expects bool\|int\|string, array given\.$#'
 			identifier: argument.type
 			count: 1
@@ -101,12 +95,6 @@ parameters:
 			identifier: notIdentical.alwaysTrue
 			count: 1
 			path: ../../src/Controller/Controller_Custom_Fonts.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Controller/Controller_Debug.php
 
 		-
 			message: '#^Offset ''id'' on non\-empty\-array on left side of \?\? always exists and is not nullable\.$#'
@@ -249,12 +237,6 @@ parameters:
 		-
 			message: '#^Call to function is_array\(\) with array\<int, array\<string, array\<string, array\{schedule\: string\|false, args\: array\<mixed\>, interval\?\: int\<0, max\>\}\>\>\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../src/Controller/Controller_Upgrade_Routines.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../../src/Controller/Controller_Upgrade_Routines.php
 
@@ -991,12 +973,6 @@ parameters:
 			path: ../../src/Helper/Helper_Abstract_Addon.php
 
 		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Helper/Helper_Abstract_Addon.php
-
-		-
 			message: '#^Property GFPDF\\Helper\\Helper_Abstract_Addon\:\:\$plugin_updater \(GFPDF\\Helper\\Licensing\\EDD_SL_Plugin_Updater\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 2
@@ -1267,24 +1243,6 @@ parameters:
 			path: ../../src/Helper/Helper_Misc.php
 
 		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Helper/Helper_Options_Fields.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../../src/Helper/Helper_Options_Fields.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 6
-			path: ../../src/Helper/Helper_Options_Fields.php
-
-		-
 			message: '#^Call to function is_bool\(\) with bool will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -1335,12 +1293,6 @@ parameters:
 		-
 			message: '#^Comparison operation "\>" between 20 and 0 is always true\.$#'
 			identifier: greater.alwaysTrue
-			count: 1
-			path: ../../src/Helper/Helper_Templates.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../../src/Helper/Helper_Templates.php
 
@@ -1507,12 +1459,6 @@ parameters:
 			path: ../../src/Helper/Mpdf/Request.php
 
 		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../../src/Model/Model_Actions.php
-
-		-
 			message: '#^Property GFPDF\\Model\\Model_Actions\:\:\$options \(GFPDF\\Helper\\Helper_Options_Fields\) does not accept GFPDF\\Helper\\Helper_Abstract_Options\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -1551,12 +1497,6 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$array \(\*NEVER\*\) to function array_filter contains falsy values only, the result will always be an empty array\.$#'
 			identifier: arrayFilter.alwaysEmpty
-			count: 1
-			path: ../../src/Model/Model_Form_Settings.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../../src/Model/Model_Form_Settings.php
 
@@ -1669,18 +1609,6 @@ parameters:
 			path: ../../src/Model/Model_PDF.php
 
 		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array\<int, string\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Model/Model_PDF.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 3
-			path: ../../src/Model/Model_PDF.php
-
-		-
 			message: '#^Property GFPDF\\Model\\Model_PDF\:\:\$gform \(GFPDF\\Helper\\Helper_Form\) does not accept GFPDF\\Helper\\Helper_Abstract_Form\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -1727,24 +1655,6 @@ parameters:
 			identifier: method.nonObject
 			count: 1
 			path: ../../src/Model/Model_Shortcodes.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Model/Model_Shortcodes.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array\<int, string\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Model/Model_System_Report.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 8
-			path: ../../src/Model/Model_System_Report.php
 
 		-
 			message: '#^Parameter \#1 \$new_blog_id of function switch_to_blog expects int, string given\.$#'
@@ -1807,20 +1717,8 @@ parameters:
 			path: ../../src/Statics/Cache.php
 
 		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Statics/Debug.php
-
-		-
 			message: '#^Offset ''function'' on array\{function\: callable\(\)\: mixed, accepted_args\: int\} on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
-			count: 1
-			path: ../../src/Statics/Deprecation.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, array given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../../src/Statics/Deprecation.php
 
@@ -2158,10 +2056,4 @@ parameters:
 			message: '#^Method GFPDF\\Router\:\:setup_settings_fields\(\) should return float but return statement is missing\.$#'
 			identifier: return.missing
 			count: 2
-			path: ../../src/bootstrap.php
-
-		-
-			message: '#^Parameter \#2 \$fallback of method GFPDF\\Helper\\Helper_Abstract_Options\:\:get_option\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 1
 			path: ../../src/bootstrap.php
