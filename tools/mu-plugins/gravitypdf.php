@@ -141,6 +141,59 @@ if ( $gfpdf_e2e_header( 'deprecations' ) !== 'yes' ) {
 	add_filter( 'gfpdf_get_option_deprecated_features', '__return_empty_array' );
 }
 
+/* Adds a folder the write check fails on. Its failures and dismissals are kept in options of their own, as the other
+   specs' system reports and settings saves overwrite the shared ones */
+if ( $gfpdf_e2e_header( 'unwritable_folders' ) === 'yes' ) {
+	add_filter(
+		'gfpdf_installer_create_folders',
+		static function ( $folders ) {
+			/* Outside the bind mounts, so the mode holds. wp-env never runs PHP as root. Matches the spec's READ_ONLY_FOLDER */
+			$dir = '/tmp/gfpdf-e2e-read-only/';
+			if ( ! is_dir( $dir ) ) {
+				mkdir( $dir, 0555 );
+			}
+
+			$folders[] = $dir;
+
+			return $folders;
+		}
+	);
+
+	add_filter(
+		'pre_option_gfpdf_unwritable_folders',
+		static function () {
+			return get_option( 'gfpdf_e2e_unwritable_folders', [] );
+		}
+	);
+
+	add_filter(
+		'pre_update_option_gfpdf_unwritable_folders',
+		static function ( $value, $old_value ) {
+			update_option( 'gfpdf_e2e_unwritable_folders', $value );
+
+			return $old_value;
+		},
+		10,
+		2
+	);
+
+	add_filter(
+		'gfpdf_get_option_action_dismissal',
+		static function () {
+			return get_option( 'gfpdf_e2e_action_dismissal', [] );
+		}
+	);
+
+	add_filter(
+		'gfpdf_update_option_action_dismissal',
+		static function ( $value ) {
+			update_option( 'gfpdf_e2e_action_dismissal', $value );
+
+			return $value;
+		}
+	);
+}
+
 /* The editors open on the Visual tab whatever the last test left them on. WordPress remembers the tab per user, and
    every test shares the one admin */
 add_filter(
