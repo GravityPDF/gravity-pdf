@@ -115,13 +115,19 @@ runs:
       run: npx playwright install chromium
 
     # The runner image already ships most of Playwright's list (only fonts are missing). `install-deps` always runs
-    # `apt-get update` and upgrades libglib (~5s ldconfig trigger); install just the gaps, updating only if lists are stale.
+    # `apt-get update` and upgrades libglib (~5s ldconfig trigger); install just the gaps `--dry-run` lists (it exits 1
+    # when there are any), updating only if lists are stale.
     - name: Install playwright system deps
       if: inputs.playwright == 'true'
       shell: bash
       run: |
-        pkgs=$(npx playwright install-deps --dry-run chromium | grep -oP 'install -y --no-install-recommends \K[^"]+' || true)
-        [ -n "$pkgs" ] || { echo "::error::Could not parse the package list from 'playwright install-deps --dry-run'."; exit 1; }
+        missing() { npx playwright install-deps --dry-run chromium || true; }
+        out=$(missing)
+        grep -q '^All system dependencies are installed' <<< "$out" && exit 0
+        grep -q '^Missing system dependencies' <<< "$out" || { sudo apt-get update; out=$(missing); }
+        grep -q '^All system dependencies are installed' <<< "$out" && exit 0
+        pkgs=$(sed -n '/^Missing system dependencies/,$s/^  \([^ ]\+\)$/\1/p' <<< "$out")
+        [ -n "$pkgs" ] || { echo "$out"; echo "::error::Could not parse the package list from 'playwright install-deps --dry-run'."; exit 1; }
         # shellcheck disable=SC2086 # $pkgs is a word list.
         apt_install() { sudo NEEDRESTART_SUSPEND=1 apt-get install -y --no-install-recommends --no-upgrade $pkgs; }
         apt_install || { sudo apt-get update && apt_install; }
