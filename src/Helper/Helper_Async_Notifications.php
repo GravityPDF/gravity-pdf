@@ -21,14 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Gravity Forms background (async) notifications and resends
  *
- * @since 6.17.3
+ * @since 6.18.0
  */
 class Helper_Async_Notifications implements Helper_Interface_Filters {
 
 	/**
 	 * Register the helper's hooks
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function init(): void {
 		$this->add_filters();
@@ -37,7 +37,7 @@ class Helper_Async_Notifications implements Helper_Interface_Filters {
 	/**
 	 * Tag notifications resent from the admin area with the user resending them
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function add_filters(): void {
 		add_filter( 'gform_before_resend_notifications', [ $this, 'record_resend' ] );
@@ -50,7 +50,7 @@ class Helper_Async_Notifications implements Helper_Interface_Filters {
 	 *
 	 * @return array
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function record_resend( $form ) {
 		/* Signed, so a notification saved on a form can't pick who its PDFs render as */
@@ -73,7 +73,7 @@ class Helper_Async_Notifications implements Helper_Interface_Filters {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 *
 	 * @see   https://docs.gravityforms.com/gform_is_asynchronous_notifications_enabled/
 	 */
@@ -105,7 +105,7 @@ class Helper_Async_Notifications implements Helper_Interface_Filters {
 	 *
 	 * @return mixed What `$render` returns
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function render_as_sender( $notification, $entry, callable $render ) {
 		/* Gravity Forms fires these around each background task; elsewhere the current user is kept */
@@ -123,7 +123,7 @@ class Helper_Async_Notifications implements Helper_Interface_Filters {
 	 *
 	 * @return int|null The user who resent the notification, or null without a valid, unexpired signature
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function get_resent_by( $notification ) {
 		$resend = $notification['gfpdf_resend'] ?? '';
@@ -144,7 +144,7 @@ class Helper_Async_Notifications implements Helper_Interface_Filters {
 	 *
 	 * @return string
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected function sign( int $user_id, int $expires ): string {
 		return "$user_id|$expires|" . wp_hash( "gfpdf_resend|$user_id|$expires" );

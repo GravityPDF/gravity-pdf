@@ -142,7 +142,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * @var Helper_Async_Notifications
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	protected $async_notifications;
 
@@ -167,7 +167,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param Helper_Async_Notifications|null $async_notifications
 	 *
 	 * @since 4.0
-	 * @since 6.17.3 Takes the Gravity Forms background notifications helper
+	 * @since 6.18.0 Takes the Gravity Forms background notifications helper
 	 */
 	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Helper_Async_Notifications $async_notifications = null ) {
 
@@ -691,7 +691,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return bool
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function can_user_view_entry( $entry, $settings, $user_id = null ) {
 		$user_id = $user_id === null ? get_current_user_id() : (int) $user_id;
@@ -2286,7 +2286,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return bool
 	 *
 	 * @since 6.11.0
-	 * @since 6.17.3 Asks Gravity Forms, which defaults to its Background Notifications setting in 2.10+
+	 * @since 6.18.0 Asks Gravity Forms, which defaults to its Background Notifications setting in 2.10+
 	 *
 	 * @see   https://docs.gravityforms.com/gform_is_asynchronous_notifications_enabled/
 	 */

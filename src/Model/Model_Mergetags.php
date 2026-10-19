@@ -31,7 +31,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * Matches {NAME:pdf:ID:MODIFIERS}, without running into another tag's braces
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	const PDF_MERGETAG_REGEX = '/{[^{}]*?:pdf:([0-9A-Za-z]*)?:?([^{}]*)}/';
 
@@ -276,7 +276,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 *
 	 * @return mixed
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function start_resolving_administrative_defaults( $entry_id ) {
 		$this->get_trust()->start_resolving_administrative_defaults();
@@ -291,7 +291,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function stop_resolving_administrative_defaults() {
 		$this->get_trust()->stop_resolving_administrative_defaults();
@@ -308,7 +308,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 *
 	 * @return mixed
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function mark_trusted_pdf_mergetags( $text, $form, $entry ) {
 		if ( ! is_string( $text ) || empty( $entry['id'] ) || strpos( $text, ':pdf:' ) === false || $this->get_trust()->is_untrusted() ) {
@@ -329,7 +329,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 *
 	 * @return string The key a trusted merge tag is granted and used up by
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function get_trust_key( $entry, $tag ) {
 		return 'tag:' . (int) ( $entry['id'] ?? 0 ) . '|' . $tag;
@@ -338,7 +338,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * @return Model_Signed_Url_Trust
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	private function get_trust() {
 		return \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );

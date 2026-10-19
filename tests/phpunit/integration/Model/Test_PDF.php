@@ -1127,7 +1127,7 @@ class Test_PDF extends TestCase {
 	/**
 	 * A PDF attached to a Gravity Forms background notification is generated as the entry's author
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function test_background_notification_pdf_is_generated_as_the_entry_author() {
 		$author_id = self::factory()->user->create();

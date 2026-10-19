@@ -134,7 +134,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 *
 	 * @return mixed
 	 *
-	 * @since 6.17.3
+	 * @since 6.18.0
 	 */
 	public function encode_value_tags( $value ) {
 		return $value;
