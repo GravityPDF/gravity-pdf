@@ -29,11 +29,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Mergetags extends Helper_Abstract_Model {
 
 	/**
-	 * Matches {NAME:pdf:ID:MODIFIERS}
+	 * Matches {NAME:pdf:ID:MODIFIERS}, without running into another tag's braces
 	 *
 	 * @since 6.18.0
 	 */
-	const PDF_MERGETAG_REGEX = '/{.*?:pdf:([0-9A-Za-z]*)?:?(.*?)?}/';
+	const PDF_MERGETAG_REGEX = '/{[^{}]*?:pdf:([0-9A-Za-z]*)?:?([^{}]*)}/';
 
 	/**
 	 * @var Model_PDF
@@ -76,13 +76,6 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	protected $url_signer;
-
-	/**
-	 * Above zero while Gravity Forms saves an entry, so PDF merge tags in administrative field defaults are kept for later
-	 *
-	 * @var int
-	 */
-	private $resolving_defaults_depth = 0;
 
 	/**
 	 * Model_Mergetags constructor.
@@ -166,7 +159,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		/* Leave the tags in an administrative field's default for when there's an entry */
-		if ( ( $form === false || $entry === false ) && $this->resolving_defaults_depth > 0 ) {
+		if ( ( $form === false || $entry === false ) && $this->get_trust()->is_resolving_administrative_defaults() ) {
 			return $text;
 		}
 
@@ -250,8 +243,9 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 					switch ( $modifier[0] ?? '' ) {
 						case 'signed':
-							/* Sign trusted tags, or when the user can view the PDF anyway */
-							if ( $trusted || $this->pdf->can_user_view_entry( $entry, $config ) ) {
+							/* Sign trusted tags, or an administrative default the user can view, never one a merge tag added */
+							$trust = $this->get_trust();
+							if ( $trusted || ( ! $trust->is_untrusted() && $this->pdf->can_user_view_entry( $entry, $config ) && in_array( $tag[0], $trust->get_trusted_field_tags( $form, $entry ), true ) ) ) {
 								$url = $this->url_signer->sign( $url, trim( $modifier[1] ?? '' ) );
 							}
 							break;
@@ -285,7 +279,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * @since 6.18.0
 	 */
 	public function start_resolving_administrative_defaults( $entry_id ) {
-		++$this->resolving_defaults_depth;
+		$this->get_trust()->start_resolving_administrative_defaults();
 
 		return $entry_id;
 	}
@@ -300,13 +294,13 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * @since 6.18.0
 	 */
 	public function stop_resolving_administrative_defaults() {
-		$this->resolving_defaults_depth = max( 0, $this->resolving_defaults_depth - 1 );
+		$this->get_trust()->stop_resolving_administrative_defaults();
 	}
 
 	/**
 	 * Trust the PDF merge tags in text before Gravity Forms merges in any field values
 	 *
-	 * @internal Hooked to gform_pre_replace_merge_tags
+	 * @internal Hooked first to gform_pre_replace_merge_tags, as other plugins merge in values on it
 	 *
 	 * @param mixed $text  The filtered text, which another callback may have changed to a non-string
 	 * @param array $form

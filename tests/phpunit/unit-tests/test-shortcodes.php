@@ -68,8 +68,11 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Unhook the plugin's own instance, so it doesn't rewrite the text before the model under test sees it */
 		$plugin_model = \GPDFAPI::get_mvc_class( 'Model_Shortcodes' );
-		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'gravitypdf_process_during_merge_tag_replacement' ] );
+		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'gravitypdf_process_during_merge_tag_replacement' ], PHP_INT_MIN );
+		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'gravitypdf_stamp_written_shortcodes' ], PHP_INT_MIN );
+		remove_filter( 'gform_pre_replace_merge_tags', [ $plugin_model, 'gravitypdf_disarm_if_no_merge_tags_left' ], PHP_INT_MAX );
 		remove_filter( 'gform_replace_merge_tags', [ $plugin_model, 'gravitypdf_trust_administrative_field_shortcodes' ] );
+		remove_filter( 'gform_replace_merge_tags', [ $plugin_model, 'gravitypdf_disarm_merged_shortcodes' ], PHP_INT_MAX );
 
 		/* Setup our test classes */
 		$this->model = new Model_Shortcodes( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->misc, new Helper_Url_Signer() );
@@ -562,14 +565,70 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$unsigned = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '"]';
 		$this->assertSame( $unsigned, $this->model->gravitypdf_process_during_merge_tag_replacement( $unsigned, $form, $entry ) );
 
-		$tagged = '[gravitypdf id="556690c67856b" entry="{entry_id}" signed="1"]';
+		$tagged = '[gravitypdf id="556690c67856b" entry="{Number:3}" signed="1"]';
 		$this->assertSame( $tagged, $this->model->gravitypdf_process_during_merge_tag_replacement( $tagged, $form, $entry ) );
+
+		$entry_id_tag = '[gravitypdf id="556690c67856b" entry="{entry_id}" signed="1" raw="1"]';
+		$text         = $this->model->gravitypdf_process_during_merge_tag_replacement( $entry_id_tag, $form, $entry );
+		$this->assertStringContainsString( 'entry="' . $entry['id'] . '"', $text );
+		$this->assertStringContainsString( 'signature=', do_shortcode( $text ) );
 
 		$process = function () use ( $named, $form, $entry ) {
 			return $this->model->gravitypdf_process_during_merge_tag_replacement( $named, $form, $entry );
 		};
 		$this->assertSame( $named, $trust->run_untrusted( $process ) );
 		$this->assertSame( $named, $trust->run_rendering_pdf( $entry['id'], $process ) );
+	}
+
+	public function test_shortcode_a_merge_tag_adds_is_printed_not_run() {
+		$form                = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry               = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$shortcode           = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" raw="1"]';
+		$escaped             = '&#x5b;' . substr( $shortcode, 1 );
+		$entry['user_agent'] = $shortcode;
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+
+		/* As in a notification an administrator resends */
+		$text = \GFCommon::replace_variables( "$shortcode {user_agent}", $form, $entry, false, false, false );
+		$this->assertSame( "$shortcode $escaped", $text );
+		$this->assertSame( 1, substr_count( do_shortcode( $text ), 'pid=556690c67856b' ) );
+
+		/* Added on the pre hook, where Gravity Forms returns early with no merge tags left */
+		$add = function ( $text ) use ( $shortcode ) {
+			return $text . $shortcode;
+		};
+		add_filter( 'gform_pre_replace_merge_tags', $add );
+		$this->assertSame( "$shortcode $escaped", \GFCommon::replace_variables( "$shortcode ", $form, $entry ) );
+		remove_filter( 'gform_pre_replace_merge_tags', $add );
+
+		/* Not while an administrative default is saved, nor when Gravity Forms resolves a default value */
+		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
+		$trust->start_resolving_administrative_defaults();
+		$this->assertSame( "$shortcode $shortcode", \GFCommon::replace_variables( "$shortcode {user_agent}", $form, $entry, false, false, false ) );
+		$trust->stop_resolving_administrative_defaults();
+
+		$this->assertSame( $shortcode, \GFCommon::replace_variables_prepopulate( $shortcode ) );
+
+		wp_set_current_user( 0 );
+	}
+
+	public function test_written_shortcode_whose_entry_a_merge_tag_sets_is_unsigned() {
+		$form                = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry               = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry['user_agent'] = (string) $entry['id'];
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+
+		$text = \GFCommon::replace_variables( '[gravitypdf id="556690c67856b" entry="{user_agent}" signed="1" raw="1"]', $form, $entry, false, false, false );
+		$this->assertSame( '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" signed="" raw="1"]', $text );
+		$this->assertStringNotContainsString( 'signature=', do_shortcode( $text ) );
+
+		/* Unless it was vouched for */
+		$named = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" signed="1" raw="1"]';
+		$text  = \GFCommon::replace_variables( $this->model->gravitypdf_process_during_merge_tag_replacement( $named, $form, $entry ), $form, $entry );
+		$this->assertStringContainsString( 'signature=', do_shortcode( $text ) );
+		$this->assertStringNotContainsString( 'gpdf_written', $text );
+
+		wp_set_current_user( 0 );
 	}
 
 	public function test_signed_shortcode_inside_a_pdf_needs_its_own_entry_or_a_signature() {
@@ -698,6 +757,11 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$this->assertEquals( ' id="1231241221" text="View PDF" type="download"', $results['attr_raw'] );
 		$this->assertEquals( 'download', $results['attr']['type'] );
 
+		/* An unquoted or single-quoted value */
+		$code    = $this->model->get_shortcode_information( 'gravitypdf', "[gravitypdf id=1 SIGNED=1 text='a b']" )[0];
+		$results = $this->model->add_shortcode_attr( $this->model->add_shortcode_attr( $code, 'signed', '' ), 'text', 'c' );
+		$this->assertSame( '[gravitypdf id=1 signed="" text="c"]', $results['shortcode'] );
+
 		$results = $this->model->add_shortcode_attr( $code3, 'entry', '{entry_id}' );
 		$this->assertEquals( '[gravitypdf id="78454" classes="my-custom-class" entry="{entry_id}"]', $results['shortcode'] );
 		$this->assertEquals( ' id="78454" classes="my-custom-class" entry="{entry_id}"', $results['attr_raw'] );
@@ -772,6 +836,11 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$content = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/shortcode-data.json' ) ), true );
 
 		$this->assertCount( 0, $this->model->get_shortcode_information( 'gravitypdf', [] ) );
+
+		/* Nested and escaped matches; an unregistered tag is ignored */
+		$found = $this->model->get_shortcode_information( 'gravitypdf', '[caption][gravitypdf id="1"][/caption] [[gravitypdf id="2"]]' );
+		$this->assertSame( [ '[gravitypdf id="1"]', '[[gravitypdf id="2"]]' ], array_column( $found, 'shortcode' ) );
+		$this->assertCount( 0, $this->model->get_shortcode_information( 'gpdf_unregistered', '[gpdf_unregistered]' ) );
 
 		$shortcodes = $this->model->get_shortcode_information( 'gravitypdf', $content );
 
