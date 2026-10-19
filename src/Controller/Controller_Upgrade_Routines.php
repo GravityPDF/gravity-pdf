@@ -126,7 +126,7 @@ class Controller_Upgrade_Routines {
 	 * @since 6.18.0
 	 */
 	protected function remove_nested_mpdf_cache(): void {
-		$nested_cache = $this->data->mpdf_tmp_location . '/mpdf/mpdf';
+		$nested_cache = $this->misc->get_mpdf_cache_location() . '/mpdf';
 
 		if ( is_dir( $nested_cache ) ) {
 			$this->misc->rmdir( $nested_cache );
