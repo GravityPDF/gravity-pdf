@@ -38,6 +38,29 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	const SHORTCODE = '';
 
 	/**
+	 * Marks a shortcode written in the text, rather than added by a merge tag. Lower case, as WordPress parses it
+	 *
+	 * @since 6.18.0
+	 */
+	private const WRITTEN_ATTR = 'gpdf_written';
+
+	/**
+	 * The per-request value of {@see WRITTEN_ATTR}
+	 *
+	 * @var string
+	 * @since 6.18.0
+	 */
+	private static $written_stamp = '';
+
+	/**
+	 * The merge tag replacements in progress that stamped their text
+	 *
+	 * @var int
+	 * @since 6.18.0
+	 */
+	private $replacing_depth = 0;
+
+	/**
 	 * @var Helper_Abstract_Form
 	 * @since 5.2
 	 */
@@ -135,7 +158,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @since 6.18.0
 	 */
 	public function gravitypdf_trust_administrative_field_shortcodes( $text, $form, $entry ) {
-		if ( ! is_string( $text ) || empty( $entry['id'] ) || ! is_array( $form ) || $this->get_trust()->is_untrusted() || ! has_shortcode( $text, static::SHORTCODE ) ) {
+		if ( ! is_string( $text ) || strpos( $text, '[' . static::SHORTCODE ) === false || empty( $entry['id'] ) || ! is_array( $form ) || $this->get_trust()->is_untrusted() ) {
 			return $text;
 		}
 
@@ -159,10 +182,159 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 				continue;
 			}
 
-			$text = str_replace( $shortcode['shortcode'], $this->add_entry_id_to_shortcode( $decoded, $entry['id'] ), $text );
+			$text = str_replace( $shortcode['shortcode'], $this->stamp_written_shortcodes( $this->add_entry_id_to_shortcode( $decoded, $entry['id'] ) ), $text );
 		}
 
 		return $text;
+	}
+
+	/**
+	 * Stamp the shortcodes written in the text, before any merge tag is replaced
+	 *
+	 * @internal Hooked first to gform_pre_replace_merge_tags
+	 *
+	 * @param mixed $text The filtered text, which another callback may have changed to a non-string
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.18.0
+	 */
+	public function gravitypdf_stamp_written_shortcodes( $text ) {
+		++$this->replacing_depth;
+
+		return $this->stamp_written_shortcodes( $text );
+	}
+
+	/**
+	 * GFCommon::replace_variables() returns before gform_replace_merge_tags when no merge tags are left, so disarm here
+	 *
+	 * @internal Hooked last to gform_pre_replace_merge_tags
+	 *
+	 * @param mixed $text
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.18.0
+	 */
+	public function gravitypdf_disarm_if_no_merge_tags_left( $text ) {
+		return ! is_string( $text ) || strpos( $text, '{' ) === false ? $this->gravitypdf_disarm_merged_shortcodes( $text ) : $text;
+	}
+
+	/**
+	 * Escape the shortcodes a merge tag added, so they're printed rather than run, and remove the stamps from the written
+	 * ones, unsigning any whose entry a merge tag set
+	 *
+	 * @internal Hooked last to gform_replace_merge_tags
+	 *
+	 * @param mixed $text The filtered text, which another callback may have changed to a non-string
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.18.0
+	 */
+	public function gravitypdf_disarm_merged_shortcodes( $text ) {
+		/* Gravity Forms also fires the hook when it resolves default values, which the stamping hook didn't see */
+		if ( $this->replacing_depth < 1 ) {
+			return $text;
+		}
+
+		--$this->replacing_depth;
+
+		if ( ! $this->guards_shortcodes( $text ) ) {
+			return $text;
+		}
+
+		$trust = $this->get_trust();
+		$stamp = ' ' . self::WRITTEN_ATTR . '="' . $this->get_written_stamp() . '"'; /* As add_shortcode_attr() writes it */
+
+		/* In one pass, as a written shortcode can match a merged one once its stamp is removed */
+		$replacements = [];
+		foreach ( $this->get_live_shortcodes( $text ) as $code => $shortcode ) {
+			$attr = $shortcode['attr'];
+
+			/* Not `&#91;`, which do_shortcode() turns back into a `[` a later pass would run */
+			if ( ( $attr[ self::WRITTEN_ATTR ] ?? '' ) !== $this->get_written_stamp() ) {
+				$this->log->notice( 'Escaped a [gravitypdf] shortcode a merge tag added', [ 'shortcode' => $code ] );
+				$replacements[ $code ] = '&#x5b;' . substr( $code, 1 );
+				continue;
+			}
+
+			/* Inside a PDF only its own entry signs */
+			if ( ! empty( $attr['signed'] ) && ! $trust->is_rendering_pdf() && ! $trust->is_valid_shortcode_signing_token( $attr['token'] ?? '', static::SHORTCODE, $attr['id'] ?? '', $attr['entry'] ?? '' ) ) {
+				$shortcode = $this->add_shortcode_attr( $shortcode, 'signed', '' );
+			}
+
+			$replacements[ $code ] = str_replace( $stamp, '', $shortcode['shortcode'] );
+		}
+
+		return strtr( $text, $replacements );
+	}
+
+	/**
+	 * Separate from the hook, so vouching for an administrative default doesn't count as a replacement
+	 *
+	 * @param mixed $text
+	 *
+	 * @return mixed
+	 *
+	 * @since 6.18.0
+	 */
+	private function stamp_written_shortcodes( $text ) {
+		if ( ! $this->guards_shortcodes( $text ) ) {
+			return $text;
+		}
+
+		$replacements = [];
+		foreach ( $this->get_live_shortcodes( $text ) as $code => $shortcode ) {
+			$replacements[ $code ] = $this->add_shortcode_attr( $shortcode, self::WRITTEN_ATTR, $this->get_written_stamp() )['shortcode'];
+		}
+
+		return strtr( $text, $replacements );
+	}
+
+	/**
+	 * Whether the text has shortcodes to stamp or disarm. Not while Gravity Forms saves administrative defaults, which
+	 * are merged again with their entry.
+	 *
+	 * @param mixed $text
+	 *
+	 * @return bool
+	 *
+	 * @since 6.18.0
+	 */
+	private function guards_shortcodes( $text ) {
+		return is_string( $text ) && strpos( $text, '[' . static::SHORTCODE ) !== false && ! $this->get_trust()->is_resolving_administrative_defaults();
+	}
+
+	/**
+	 * @param string $text
+	 *
+	 * @return array[] The shortcodes WordPress runs, without the `[[gravitypdf]]` it prints, keyed by their text
+	 *
+	 * @since 6.18.0
+	 */
+	private function get_live_shortcodes( $text ) {
+		$live = [];
+		foreach ( $this->get_shortcode_information( static::SHORTCODE, $text ) as $shortcode ) {
+			if ( strpos( $shortcode['shortcode'], '[[' ) !== 0 ) {
+				$live[ $shortcode['shortcode'] ] = $shortcode;
+			}
+		}
+
+		return $live;
+	}
+
+	/**
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	private function get_written_stamp() {
+		if ( self::$written_stamp === '' ) {
+			self::$written_stamp = wp_generate_password( 20, false );
+		}
+
+		return self::$written_stamp;
 	}
 
 	/**
@@ -334,8 +506,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		foreach ( $this->get_shortcode_information( static::SHORTCODE, $text ) as $shortcode ) {
 			$new_shortcode = $shortcode;
 
-			/* if the user hasn't explicitly defined an entry to display... */
-			if ( ! isset( $shortcode['attr']['entry'] ) ) {
+			/* if the user hasn't explicitly defined an entry to display, or used {entry_id} for this one... */
+			if ( ! isset( $shortcode['attr']['entry'] ) || $shortcode['attr']['entry'] === '{entry_id}' ) {
 				$new_shortcode = $this->add_shortcode_attr( $new_shortcode, 'entry', $entry_id );
 			}
 
@@ -399,10 +571,10 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 
 			$code['attr_raw'] = $raw_attr;
 
-		} else { /* replace the current attribute */
-			$pattern           = $attr . '="(.+?)"';
-			$code['shortcode'] = preg_replace( "/$pattern/si", $attr . '="' . $value . '"', $code['shortcode'] );
-			$code['attr_raw']  = preg_replace( "/$pattern/si", $attr . '="' . $value . '"', $code['attr_raw'] );
+		} else { /* replace the current attribute, however it's quoted */
+			$pattern           = '/(?<=\s)' . preg_quote( $attr, '/' ) . '\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s"\'\]]+)/i';
+			$code['shortcode'] = preg_replace( $pattern, $attr . '="' . $value . '"', $code['shortcode'] );
+			$code['attr_raw']  = preg_replace( $pattern, $attr . '="' . $value . '"', $code['attr_raw'] );
 		}
 
 		/* Update the actual attribute */
@@ -532,25 +704,21 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			return $shortcodes;
 		}
 
-		if ( has_shortcode( $text, $shortcode ) ) {
-			/* our shortcode exists so parse the shortcode data and return an easy-to-use array */
-			preg_match_all( '/' . get_shortcode_regex( [ $shortcode ] ) . '/', $text, $matches, PREG_SET_ORDER );
+		/* Cheaper than has_shortcode(), which regex-scans for every registered shortcode */
+		if ( ! shortcode_exists( $shortcode ) || strpos( $text, '[' . $shortcode ) === false ) {
+			return $shortcodes;
+		}
 
-			if ( empty( $matches ) ) {
-				return $shortcodes;
-			}
+		preg_match_all( '/' . get_shortcode_regex( [ $shortcode ] ) . '/', $text, $matches, PREG_SET_ORDER );
 
-			foreach ( $matches as $item ) {
-				if ( $shortcode === $item[2] ) {
-					$attr = shortcode_parse_atts( $item[3] );
+		foreach ( $matches as $item ) {
+			$attr = shortcode_parse_atts( $item[3] );
 
-					$shortcodes[] = [
-						'shortcode' => $item[0],
-						'attr_raw'  => $item[3],
-						'attr'      => is_array( $attr ) ? $attr : [],
-					];
-				}
-			}
+			$shortcodes[] = [
+				'shortcode' => $item[0],
+				'attr_raw'  => $item[3],
+				'attr'      => is_array( $attr ) ? $attr : [],
+			];
 		}
 
 		return $shortcodes;

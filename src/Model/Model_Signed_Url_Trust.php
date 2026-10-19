@@ -49,6 +49,14 @@ class Model_Signed_Url_Trust {
 	protected $rendering_entry_ids = [];
 
 	/**
+	 * Above zero while Gravity Forms saves an entry, resolving administrative field defaults that are merged again later
+	 *
+	 * @var int
+	 * @since 6.18.0
+	 */
+	protected $resolving_defaults_depth = 0;
+
+	/**
 	 * @param string $key
 	 *
 	 * @return void
@@ -127,6 +135,33 @@ class Model_Signed_Url_Trust {
 		} finally {
 			array_pop( $this->rendering_entry_ids );
 		}
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @since 6.18.0
+	 */
+	public function start_resolving_administrative_defaults() {
+		++$this->resolving_defaults_depth;
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @since 6.18.0
+	 */
+	public function stop_resolving_administrative_defaults() {
+		$this->resolving_defaults_depth = max( 0, $this->resolving_defaults_depth - 1 );
+	}
+
+	/**
+	 * @return bool Whether Gravity Forms is resolving administrative field defaults while it saves an entry
+	 *
+	 * @since 6.18.0
+	 */
+	public function is_resolving_administrative_defaults() {
+		return $this->resolving_defaults_depth > 0;
 	}
 
 	/**
