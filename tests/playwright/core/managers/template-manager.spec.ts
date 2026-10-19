@@ -242,6 +242,30 @@ test.describe('Template Manager', () => {
 		await snapshot(page, testinfo, status);
 	});
 
+	test('should install a template zip over the media upload limit', async ({
+		page,
+	}) => {
+		// Set before the page loads: the browser checks the size against the limit the page is given
+		await page.setExtraHTTPHeaders({
+			'X-GPDF-E2E-Media-Upload-Limit': 'tiny',
+		});
+		await pdf.navigateToNewFormPdf(form.id);
+		await page
+			.getByRole('button', { name: 'Manage PDF Templates' })
+			.click();
+
+		// About 6 KB, over the 1 KB limit
+		await page
+			.locator('.gfpdf-template-dropzone input[type="file"]')
+			.setInputFiles(
+				path.join(resourcesPath, 'template', 'media-limit-sample.zip')
+			);
+
+		await expect(
+			page.locator('.theme[data-slug="media-limit-sample"]')
+		).toBeVisible();
+	});
+
 	test('should only install a Developer Toolkit template when the Toolkit is active', async ({
 		page,
 	}) => {
