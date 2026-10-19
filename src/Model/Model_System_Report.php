@@ -246,9 +246,9 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$items                  = [];
 		$memory                 = $this->get_memory_limit();
 		$allow_url_fopen        = $this->get_allow_url_fopen();
-		$temp_folder_protected  = $this->check_temp_folder_permission();
 		$install                = GPDFAPI::get_mvc_class( 'Model_Install' );
-		$unwritable_folders     = $install instanceof Model_Install ? $install->check_folder_permissions() : [];
+		$unwritable_folders     = $install instanceof Model_Install ? $install->create_folder_structures() : [];
+		$temp_folder_protected  = $this->check_temp_folder_permission();
 		$temp_folder_permission = $this->is_temporary_folder_writable( $unwritable_folders );
 
 		/* Keyed by group, which is what the matching report sections are named after */
