@@ -86,6 +86,17 @@ class Test_Field_Textarea extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '[gravitypdf id=abc]', $html( $field, '[gravitypdf id=abc]' ) );
 	}
 
+	public function test_rich_text_administrative_default_shortcode_is_left_for_the_pdf_to_run() {
+		$default = '[gravitypdf id="abc"]';
+		$field   = new GF_Field_Textarea( [ 'id' => 1, 'useRichTextEditor' => true, 'visibility' => 'administrative', 'defaultValue' => $default ] );
+		$entry   = [ 'id' => 5, 'form_id' => 0, '1' => $default ];
+
+		$html = ( new Field_Textarea( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->html();
+
+		$this->assertStringContainsString( $default, $html );
+		$this->assertStringNotContainsString( 'entry=', $html );
+	}
+
 	public function test_administrative_default_keeps_shortcode_quotes() {
 		$default = '"Hi" [gravitypdf id="abc" text=\'dl\']';
 		$field   = new GF_Field_Textarea( [ 'id' => 1, 'visibility' => 'administrative', 'defaultValue' => $default ] );
