@@ -288,6 +288,58 @@ class Test_Helper_Templates extends TestCase {
 	}
 
 	/**
+	 * @since 6.18.0
+	 */
+	public function test_template_files_to_delete_leave_add_on_template_folders_alone() {
+		global $gfpdf;
+
+		$addon = $gfpdf->data->template_location . 'addon/';
+		wp_mkdir_p( $addon . 'config' );
+		wp_mkdir_p( $addon . 'images' );
+		touch( $addon . 'addon-only.php' );
+		touch( $addon . 'config/shared.php' );
+		touch( $addon . 'images/shared.png' );
+		touch( $gfpdf->data->template_location . 'shared.php' );
+
+		add_filter(
+			'gfpdf_fallback_template_path_by_id',
+			function ( $path, $template_id ) use ( $addon ) {
+				return $template_id === 'addon-only' ? $addon . 'addon-only.php' : $path;
+			},
+			10,
+			2
+		);
+
+		add_filter(
+			'gfpdf_template_config_paths',
+			function ( $paths ) use ( $addon ) {
+				$paths[] = $addon . 'config/';
+
+				return $paths;
+			}
+		);
+
+		add_filter(
+			'gfpdf_template_image_paths',
+			function ( $paths ) use ( $addon ) {
+				$paths['https://example.org/addon/images/'] = $addon . 'images/';
+
+				return $paths;
+			}
+		);
+
+		$this->assertSame( $addon . 'addon-only.php', $this->templates->get_template_path_by_id( 'addon-only' ) );
+		$this->assertSame( [ realpath( $gfpdf->data->template_location . 'shared.php' ) ], $this->templates->get_template_files_by_id( 'shared' ) );
+
+		try {
+			$this->templates->get_template_files_by_id( 'addon-only' );
+			$this->fail( 'Expected Exception for a template only in an add-on folder was not thrown.' );
+		} catch ( Exception $e ) {
+			$this->assertSame( 'Could not find PDF template file', $e->getMessage() );
+		}
+	}
+
+	/**
 	 * Check we get all the correct files
 	 *
 	 * Tests get_template_path_by_id(), get_config_path_by_id() and get_template_image()
