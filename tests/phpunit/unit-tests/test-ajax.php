@@ -465,32 +465,43 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Run a template AJAX endpoint and return the wp_die() message
+	 * Run a template AJAX endpoint and return its response
 	 *
 	 * @param string $action
+	 * @param bool   $with_nonce
 	 *
 	 * @return string
 	 *
 	 * @since 6.18.0
 	 */
-	private function get_template_endpoint_response_code( $action ) {
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+	private function get_template_endpoint_response_code( $action, $with_nonce = true ) {
+		if ( $with_nonce ) {
+			$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+		}
 
 		try {
 			$this->_handleAjax( $action );
 		} catch ( WPAjaxDieStopException $e ) {
 			return $e->getMessage();
+		} catch ( WPAjaxDieContinueException $e ) {
+			$response = $this->_last_response;
+			unset( $this->_last_response );
+
+			return $response;
 		}
 
 		return '';
 	}
 
 	/**
-	 * Check the template upload/delete endpoints return 403 and leave the template alone
+	 * Check both template endpoints refuse the request and leave the template alone
+	 *
+	 * @param string $code
+	 * @param bool   $with_nonce
 	 *
 	 * @since 6.18.0
 	 */
-	private function assert_template_endpoints_forbidden() {
+	private function assert_template_endpoints_forbidden( $code = '403', $with_nonce = true ) {
 		global $gfpdf;
 
 		$file = $gfpdf->data->template_location . 'zadani.php';
@@ -498,8 +509,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		$_POST['id'] = 'zadani';
 
-		$this->assertSame( '403', $this->get_template_endpoint_response_code( 'gfpdf_upload_template' ) );
-		$this->assertSame( '403', $this->get_template_endpoint_response_code( 'gfpdf_delete_template' ) );
+		$this->assertSame( $code, $this->get_template_endpoint_response_code( 'gfpdf_upload_template', $with_nonce ) );
+		$this->assertSame( $code, $this->get_template_endpoint_response_code( 'gfpdf_delete_template', $with_nonce ) );
 		$this->assertFileExists( $file );
 
 		unlink( $file );
@@ -518,6 +529,46 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
 
 		$this->assertSame( '400', $this->get_template_endpoint_response_code( 'gfpdf_upload_template' ) );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_template_endpoints_follow_the_capability_filter() {
+		global $gfpdf;
+
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'editor' ] ) );
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+
+		$file = $gfpdf->data->template_location . 'zadani.php';
+		touch( $file );
+
+		$_POST['id'] = 'zadani';
+
+		$this->assertSame( '400', $this->get_template_endpoint_response_code( 'gfpdf_upload_template' ) );
+		$this->assertSame( 'true', $this->get_template_endpoint_response_code( 'gfpdf_delete_template' ) );
+		$this->assertFileDoesNotExist( $file );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_template_endpoints_check_nonce_when_filter_grants_access() {
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'editor' ] ) );
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+
+		$this->assert_template_endpoints_forbidden( '401', false );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_template_endpoints_filter_can_deny_administrator() {
+		$this->_setRole( 'administrator' );
+		$this->maybe_grant_super_admin();
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_false' );
+
+		$this->assert_template_endpoints_forbidden();
 	}
 
 	/**
