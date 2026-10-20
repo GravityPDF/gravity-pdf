@@ -15,6 +15,7 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 
 	public function test_ajax_process_uploaded_template() {
 		$this->_setRole( 'administrator' );
+		$this->maybe_grant_super_admin();
 
 		try {
 			$this->_handleAjax( 'gfpdf_upload_template' );
@@ -37,6 +38,7 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 		global $gfpdf;
 
 		$this->_setRole( 'administrator' );
+		$this->maybe_grant_super_admin();
 
 		try {
 			$this->_handleAjax( 'gfpdf_delete_template' );
@@ -69,6 +71,64 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 			$this->assertTrue( $response );
 			$this->assertFileDoesNotExist( $file );
 		}
+	}
+
+	/**
+	 * Grant the current user super admin on multisite so they can manage PDF templates
+	 *
+	 * @since 6.18.0
+	 */
+	private function maybe_grant_super_admin() {
+		if ( is_multisite() ) {
+			grant_super_admin( get_current_user_id() );
+		}
+	}
+
+	/**
+	 * Run a template AJAX endpoint and return the wp_die() message
+	 *
+	 * @param string $action
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	private function get_ajax_die_message( $action ) {
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+
+		try {
+			$this->_handleAjax( $action );
+		} catch ( WPAjaxDieStopException $e ) {
+			return $e->getMessage();
+		}
+
+		return '';
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_template_endpoints_require_upload_plugins() {
+		global $gfpdf;
+
+		$user_id = $this->factory->user->create( [ 'role' => 'editor' ] );
+		get_userdata( $user_id )->add_cap( 'gravityforms_edit_settings' );
+		wp_set_current_user( $user_id );
+
+		$file = $gfpdf->data->template_location . 'zadani.php';
+		touch( $file );
+
+		$_POST['id'] = 'zadani';
+
+		$this->assertSame( '403', $this->get_ajax_die_message( 'gfpdf_upload_template' ) );
+		$this->assertSame( '403', $this->get_ajax_die_message( 'gfpdf_delete_template' ) );
+		$this->assertFileExists( $file );
+
+		unlink( $file );
+
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+
+		$this->assertSame( '400', $this->get_ajax_die_message( 'gfpdf_upload_template' ) );
 	}
 
 	public function test_ajax_process_build_template_options_html() {
