@@ -87,4 +87,13 @@ class Test_Controller_Export_Entries extends TestCase {
 		$entry_id = $this->gf_factory()->entry->create( [ 'form_id' => $form_id ] );
 		$this->assertStringNotContainsString( 'signature=', apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
 	}
+
+	public function test_export_field_id_cannot_add_shortcode_attributes() {
+		wp_set_current_user( 0 );
+		$form_id  = $this->form( 'all-form-fields' )['id'];
+		$entry    = $this->entry( 'all-form-fields' );
+		$field_id = 'gpdf_556690c67856b" signed="1';
+
+		$this->assertStringNotContainsString( 'signature=', apply_filters( 'gform_export_field_value', 'item', $form_id, $field_id, $entry ) );
+	}
 }

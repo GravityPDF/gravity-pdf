@@ -94,7 +94,8 @@ class Controller_Export_Entries {
 			return $value;
 		}
 
-		$pdf_id = substr( $field_id, 5 );
+		/* The field ID comes from the export request, so it mustn't add attributes to the trusted shortcode */
+		$pdf_id = sanitize_html_class( substr( $field_id, 5 ) );
 
 		$shortcode = apply_filters(
 			'gfpdf_export_pdf_shortcode',
