@@ -341,17 +341,29 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return null;
 		}
 
-		$submitted = get_transient( 'gfpdf_settings_user_data' );
+		$transient = $this->get_submitted_settings_transient();
+		$submitted = get_transient( $transient );
 		if ( $submitted === false ) {
 			return null;
 		}
 
-		delete_transient( 'gfpdf_settings_user_data' );
+		delete_transient( $transient );
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_get_settings/ for more details about this filter */
 		$submitted = apply_filters( 'gfpdf_get_settings', (array) $submitted, true );
 
 		return is_array( $submitted ) ? $submitted : [];
+	}
+
+	/**
+	 * The transient holding the current user's failed settings save, so it only comes back for them
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	private function get_submitted_settings_transient(): string {
+		return 'gfpdf_settings_user_data_' . get_current_user_id();
 	}
 
 	/**
@@ -1220,7 +1232,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$notices = get_settings_errors( 'gfpdf-notices' );
 		if ( in_array( 'error', wp_list_pluck( $notices, 'type' ), true ) ) {
 			/* error is thrown. store the user data in a transient so fields are remembered */
-			set_transient( 'gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30 );
+			set_transient( $this->get_submitted_settings_transient(), array_merge( $gfpdf_options, $input ), 30 );
 
 			/* Hand back what's already saved so update_option() leaves the database alone */
 			return get_option( 'gfpdf_settings' );
