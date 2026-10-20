@@ -591,6 +591,27 @@ class Test_PDF extends WP_UnitTestCase {
 		wp_set_current_user( 0 );
 	}
 
+	public function test_middle_logged_out_timeout_is_capped_at_a_week() {
+		$entry = [
+			'id'           => 0,
+			'date_created' => gmdate( 'Y-m-d H:i:s', strtotime( '-8 days' ) ),
+			'ip'           => '197.64.12.40',
+		];
+
+		wp_set_current_user( 0 );
+		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
+		$timeout                = function () {
+			return 525600;
+		};
+		add_filter( 'gfpdf_get_option_logged_out_timeout', $timeout );
+
+		$results = $this->model->middle_logged_out_timeout( true, $entry, [ 'id' => '' ] );
+		remove_filter( 'gfpdf_get_option_logged_out_timeout', $timeout );
+		unset( $_SERVER['REMOTE_ADDR'] );
+
+		$this->assertInstanceOf( \WP_Error::class, $results );
+	}
+
 	/**
 	 * Check if our logged out timeout restrictions are being applied correctly
 	 *
