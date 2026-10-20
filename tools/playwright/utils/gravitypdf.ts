@@ -43,6 +43,19 @@ export default class Pdf extends GravityForms {
 		return await response.text();
 	}
 
+	/**
+	 * The $form_data the ?data=1 view shows, as text the browser decodes from its escaped <pre>
+	 * @param pdfId
+	 * @param entryId
+	 */
+	async getPdfFormData(pdfId: string, entryId: number) {
+		await this.page.setContent(
+			await this.getPdfDebugOutput(pdfId, entryId, 'data')
+		);
+
+		return await this.page.locator('pre').textContent();
+	}
+
 	async fillField(label: string, value: string) {
 		await this.page.getByLabel(label).fill(value);
 	}
