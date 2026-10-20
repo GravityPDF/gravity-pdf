@@ -60,7 +60,7 @@ class Test_Model_PDF extends TestCase {
 		 *    makes the IP-match middleware decide the wrong way.
 		 *  - $_GET[expires/signature]: signed-URL middleware fires when these are present.
 		 *  - $_GET[page/subview]: flip is_gfpdf_page() and replace the cached secret on reload.
-		 *  - gfpdf_settings_user_data transient is cleared by the base TestCase::set_up().
+		 *  - gfpdf_settings_user_data_{user ID} transient is cleared by the base TestCase::set_up().
 		 */
 		unset(
 			$_SERVER['HTTP_X_FORWARDED_FOR'],

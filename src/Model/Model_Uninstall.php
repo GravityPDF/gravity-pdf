@@ -149,7 +149,16 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	 * @since 6.15.0
 	 */
 	public function remove_plugin_transients() {
-		delete_transient( 'gfpdf_settings_user_data' );
+		global $wpdb;
+
+		/* Every user's failed settings save, and the pre-6.18 site-wide one, deleted one by one so WordPress drops its cached copies */
+		$keys = $wpdb->get_col(
+			$wpdb->prepare( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s", $wpdb->esc_like( '_transient_gfpdf_settings_user_data' ) . '%' )
+		);
+
+		foreach ( $keys as $key ) {
+			delete_transient( substr( $key, strlen( '_transient_' ) ) );
+		}
 
 		$templates = \GPDFAPI::get_templates_class();
 		$templates->flush_template_transient_cache();

@@ -27,7 +27,7 @@ abstract class AjaxTestCase extends WP_Ajax_UnitTestCase {
 		remove_action( 'admin_init', '_maybe_update_themes' );
 
 		$this->gfpdf()->data->form_settings = [];
-		delete_transient( 'gfpdf_settings_user_data' );
+		delete_transient( 'gfpdf_settings_user_data_' . get_current_user_id() );
 	}
 
 	public function tear_down(): void {
