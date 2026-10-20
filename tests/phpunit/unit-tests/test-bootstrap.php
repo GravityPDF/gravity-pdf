@@ -293,4 +293,26 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$this->assertFalse( $this->loader->notices->has_error() );
 		$this->assertTrue( $this->loader->notices->has_notice() );
 	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_admin_messages_keeps_a_warning_notice_colour() {
+		global $wp_settings_errors;
+
+		$this->loader->notices->clear();
+		add_settings_error( 'gfpdf-notices', 'warning-code', 'An add-on warning', 'warning' );
+
+		$this->loader->add_admin_messages();
+		$wp_settings_errors = [];
+
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+		set_current_screen( 'dashboard' );
+
+		ob_start();
+		$this->loader->notices->process();
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( '<div class="notice notice-warning">', $html );
+	}
 }

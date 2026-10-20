@@ -23,6 +23,7 @@
 * 🐞 Bug: Fix an edge case where a failed global settings save would reset all global PDF settings
 * 🐞 Bug: Fix regression where a failed global settings save discarded the entered values
 * 🐞 Bug: Fix the global settings save silently failing because of another plugin's error or an extension's notice
+* 🐞 Bug: Show an extension's warning on a settings save as a warning
 * 🐞 Bug: Only clear the background PDF queue once a change to Background Processing is saved
 * 🐞 Bug: Use the default when a number setting is left blank
 * 🐞 Bug: Hide the Tools tab from users who can't use it
