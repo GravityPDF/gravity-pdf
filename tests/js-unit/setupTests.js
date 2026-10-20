@@ -27,6 +27,7 @@ window.GFPDF = {
 		'An error occurred and your license key may not have been correctly deactivated. Login to your GravityPDF.com account and check if your site has been unlinked from the key.',
 	userCapabilities: { administrator: true },
 	canManageTemplates: true,
+	templateManageNotice: '',
 	// Template uploader
 	problemWithTheUpload: 'genericError',
 	uploadInvalidNotZipFile: 'notZip',

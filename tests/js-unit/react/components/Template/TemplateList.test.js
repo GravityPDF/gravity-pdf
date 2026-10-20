@@ -81,4 +81,36 @@ describe('Template - TemplateList.js', () => {
 			findByTestAttr(restricted, 'component-templateUploaderTile').length
 		).toBe(0);
 	});
+
+	test('explains why template management is off when the site rules it out', () => {
+		expect(
+			findByTestAttr(wrapper, 'component-templateManageNotice').length
+		).toBe(0);
+
+		GFPDF.templateManageNotice = 'File changes are disabled';
+		const restricted = shallow(<TemplateList templates={templates} />);
+		GFPDF.templateManageNotice = '';
+
+		const notice = findByTestAttr(
+			restricted,
+			'component-templateManageNotice'
+		);
+		expect(notice.prop('text')).toBe('File changes are disabled');
+		expect(notice.prop('warning')).toBe(true);
+	});
+
+	test('keeps the uploader tile, disabled, when a notice says why it is off', () => {
+		GFPDF.canManageTemplates = false;
+		GFPDF.templateManageNotice = 'File changes are disabled';
+		const restricted = shallow(<TemplateList templates={templates} />);
+		GFPDF.canManageTemplates = true;
+		GFPDF.templateManageNotice = '';
+
+		expect(restricted.find('Connect(TemplateUploader)').length).toBe(0);
+		expect(
+			findByTestAttr(restricted, 'component-templateUploaderTile').prop(
+				'disabled'
+			)
+		).toBe(true);
+	});
 });

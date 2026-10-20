@@ -158,6 +158,15 @@ describe('Template - TemplateDeleteButton.js', () => {
 			expect(wrapper.find('button').text()).toBe('Delete');
 		});
 
+		test('disables the button', () => {
+			expect(wrapper.find('button').prop('disabled')).toBeUndefined();
+			expect(
+				shallow(<TemplateDeleteButton buttonText="Delete" disabled />)
+					.find('button')
+					.prop('disabled')
+			).toBe(true);
+		});
+
 		test('check button click', () => {
 			window.confirm = jest.fn().mockImplementation(() => true);
 			wrapper = shallow(

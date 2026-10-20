@@ -174,6 +174,38 @@ class Test_Templates extends TestCase {
 	}
 
 	/**
+	 * @since 6.18.0
+	 */
+	public function test_get_manage_templates_notice() {
+		add_filter( 'file_mod_allowed', '__return_false' );
+		$this->assertSame( '', $this->model->get_manage_templates_notice() );
+
+		/* An editor with Gravity Forms settings access was never allowed, so file mods aren't the reason */
+		$user_id = $this->factory->user->create( [ 'role' => 'editor' ] );
+		get_userdata( $user_id )->add_cap( 'gravityforms_edit_settings' );
+		wp_set_current_user( $user_id );
+		$this->assertSame( '', $this->model->get_manage_templates_notice() );
+
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $user_id );
+		$this->assertStringContainsString( 'disabled on this server', $this->model->get_manage_templates_notice() );
+		$this->assertStringContainsString( 'disabled on this server', $this->controller->add_localised_script_data( [] )['templateManageNotice'] );
+
+		remove_filter( 'file_mod_allowed', '__return_false' );
+		if ( is_multisite() ) {
+			$this->assertStringContainsString( 'network administrator', $this->model->get_manage_templates_notice() );
+			grant_super_admin( $user_id );
+		}
+
+		$this->assertSame( '', $this->model->get_manage_templates_notice() );
+
+		/* Nothing to explain once the filter grants access */
+		add_filter( 'file_mod_allowed', '__return_false' );
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
+		$this->assertSame( '', $this->model->get_manage_templates_notice() );
+	}
+
+	/**
 	 * Test we correctly move a file using
 	 *
 	 * @since 4.1

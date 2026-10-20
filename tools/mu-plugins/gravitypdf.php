@@ -139,6 +139,11 @@ if ( $gfpdf_e2e_header( 'manage_templates' ) === 'yes' ) {
 	add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
 }
 
+/* Stands in for DISALLOW_FILE_MODS, which can't be defined per request */
+if ( $gfpdf_e2e_header( 'file_mods' ) === 'disallowed' ) {
+	add_filter( 'file_mod_allowed', '__return_false' );
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {

@@ -62,11 +62,12 @@ describe('Template - TemplateFooterActions.js', () => {
 	});
 
 	test.each([
-		[true, 1],
-		[false, 0],
+		[true, '', [false]],
+		[false, '', []],
+		[false, 'File changes are disabled', [true]],
 	])(
-		'renders <TemplateDeleteButton /> only when the user can manage templates (%s)',
-		(canManageTemplates, count) => {
+		'renders <TemplateDeleteButton /> when the user can manage templates (%s), disabled when a notice says why not (%s)',
+		(canManageTemplates, notice, disabled) => {
 			const mockStore = configureMockStore();
 			const store = mockStore({ template: { templateProcessing: '' } });
 			const template = {
@@ -75,6 +76,7 @@ describe('Template - TemplateFooterActions.js', () => {
 			};
 
 			GFPDF.canManageTemplates = canManageTemplates;
+			GFPDF.templateManageNotice = notice;
 			wrapper = mount(
 				<Provider store={store}>
 					<MemoryRouter>
@@ -87,8 +89,13 @@ describe('Template - TemplateFooterActions.js', () => {
 				</Provider>
 			);
 			GFPDF.canManageTemplates = true;
+			GFPDF.templateManageNotice = '';
 
-			expect(wrapper.find('TemplateDeleteButton').length).toBe(count);
+			expect(
+				wrapper
+					.find('TemplateDeleteButton')
+					.map((button) => button.prop('disabled'))
+			).toEqual(disabled);
 		}
 	);
 });

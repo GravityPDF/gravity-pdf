@@ -65,7 +65,7 @@ class Controller_Templates extends Helper_Abstract_Controller implements Helper_
 	}
 
 	/**
-	 * Tell the template manager UI if the upload and delete actions should be shown
+	 * Tell the template manager UI if the upload and delete actions should be shown, and why not
 	 *
 	 * @param array $data
 	 *
@@ -74,7 +74,8 @@ class Controller_Templates extends Helper_Abstract_Controller implements Helper_
 	 * @since 6.18.0
 	 */
 	public function add_localised_script_data( $data ) {
-		$data['canManageTemplates'] = $this->model->current_user_can_manage_templates();
+		$data['canManageTemplates']   = $this->model->current_user_can_manage_templates();
+		$data['templateManageNotice'] = $this->model->get_manage_templates_notice();
 
 		return $data;
 	}

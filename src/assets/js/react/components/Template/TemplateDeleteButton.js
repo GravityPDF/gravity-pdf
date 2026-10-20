@@ -41,6 +41,7 @@ export class TemplateDeleteButton extends Component {
 		buttonText: PropTypes.string,
 		templateConfirmDeleteText: PropTypes.string,
 		templateDeleteErrorText: PropTypes.string,
+		disabled: PropTypes.bool,
 	};
 
 	/**
@@ -116,6 +117,7 @@ export class TemplateDeleteButton extends Component {
 				data-test="component-templateDeleteButton"
 				type="button"
 				onClick={callback}
+				disabled={this.props.disabled}
 				className="button button-secondary delete-theme ed_button"
 				aria-label={this.props.buttonText + ' ' + GFPDF.template}
 			>
