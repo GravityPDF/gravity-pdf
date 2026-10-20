@@ -1610,6 +1610,39 @@ class Test_PDF extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A gfpdf_mpdf_tmp_location filter can point inside tmp/, and the folder holding mPDF's cache isn't deleted
+	 *
+	 * @since 6.18.0
+	 */
+	public function test_cleanup_tmp_dir_keeps_a_filtered_mpdf_folder_inside_tmp() {
+		global $gfpdf;
+
+		$installer = GPDFAPI::get_mvc_class( 'Model_Install' );
+		$filter    = function ( $path ) {
+			return trailingslashit( $path ) . 'mpdf';
+		};
+
+		add_filter( 'gfpdf_mpdf_tmp_location', $filter );
+		$installer->setup_template_location();
+
+		$cache = $gfpdf->misc->get_mpdf_cache_location() . '/ttfontdata/';
+
+		try {
+			wp_mkdir_p( $cache );
+			touch( $cache . 'font.mtx.json' );
+			touch( $gfpdf->data->mpdf_tmp_location, time() - DAY_IN_SECONDS );
+
+			$this->model->cleanup_tmp_dir();
+
+			$this->assertFileExists( $cache . 'font.mtx.json' );
+		} finally {
+			$gfpdf->misc->rmdir( $gfpdf->data->mpdf_tmp_location );
+			remove_filter( 'gfpdf_mpdf_tmp_location', $filter );
+			$installer->setup_template_location();
+		}
+	}
+
+	/**
 	 * Check that our PDF is cleaned up after the Gravity Forms entry save process
 	 *
 	 * @since 4.0

@@ -2040,7 +2040,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function cleanup_tmp_dir() {
 
-		$mpdf_cache      = $this->misc->get_mpdf_cache_location();
+		$mpdf_cache      = wp_normalize_path( $this->misc->get_mpdf_cache_location() );
 		$mpdf_font_cache = $mpdf_cache . '/ttfontdata/';
 
 		$now = time();
@@ -2061,15 +2061,16 @@ class Model_PDF extends Helper_Abstract_Model {
 						continue;
 					}
 
-					$path    = $file->getPathname();
-					$is_mpdf = strpos( $path . '/', $mpdf_cache . '/' ) === 0;
+					$path       = $file->getPathname();
+					$normalised = wp_normalize_path( $path ) . '/';
+					$is_mpdf    = strpos( $normalised, $mpdf_cache . '/' ) === 0;
 
-					/* Concurrent PDFs share mPDF's cache folders and it recreates them non-atomically, so only files expire */
-					if ( $is_mpdf && $file->isDir() ) {
+					/* Concurrent PDFs share mPDF's cache folders, and any folder holding them, so only files expire */
+					if ( $file->isDir() && ( $is_mpdf || strpos( $mpdf_cache, $normalised ) === 0 ) ) {
 						continue;
 					}
 
-					if ( strpos( $path, $mpdf_font_cache ) === 0 ) {
+					if ( strpos( $normalised, $mpdf_font_cache ) === 0 ) {
 						/* Font metrics only go stale when a font changes, and FlushCache clears them then */
 						$max_age = WEEK_IN_SECONDS;
 					} else {
