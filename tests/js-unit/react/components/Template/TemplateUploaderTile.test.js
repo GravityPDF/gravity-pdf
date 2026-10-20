@@ -5,7 +5,7 @@ import TemplateUploaderTile from '../../../../../src/assets/js/react/components/
 import { TemplateUploaderContext } from '../../../../../src/assets/js/react/components/Template/TemplateUploaderContext';
 
 describe('Template - TemplateUploaderTile.js', () => {
-	const setup = (context = {}) =>
+	const setup = (context = {}, disabled = false) =>
 		mount(
 			<TemplateUploaderContext.Provider
 				value={{ open: jest.fn(), isUploading: false, ...context }}
@@ -13,6 +13,7 @@ describe('Template - TemplateUploaderTile.js', () => {
 				<TemplateUploaderTile
 					addTemplateText="Add New Template"
 					templateInstallInstructions="instructions"
+					disabled={disabled}
 				/>
 			</TemplateUploaderContext.Provider>
 		);
@@ -38,6 +39,22 @@ describe('Template - TemplateUploaderTile.js', () => {
 
 		expect(open).toHaveBeenCalledTimes(1);
 		expect(preventDefault).toHaveBeenCalledTimes(1);
+	});
+
+	test('does nothing when disabled', () => {
+		const open = jest.fn();
+		const wrapper = setup({ open }, true);
+		const link = wrapper.find('a');
+
+		link.simulate('click');
+
+		expect(open).not.toHaveBeenCalled();
+		expect(link.prop('aria-disabled')).toBe(true);
+		expect(
+			findByTestAttr(wrapper, 'component-templateUploaderTile').hasClass(
+				'disabled'
+			)
+		).toBe(true);
 	});
 
 	test('shows the spinner while an upload is in flight', () => {

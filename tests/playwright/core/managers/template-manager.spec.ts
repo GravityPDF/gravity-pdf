@@ -41,6 +41,20 @@ test.describe('Template Manager', () => {
 		return templateManager;
 	};
 
+	const dragZipOverBackdrop = async (page: Page) => {
+		await page.locator('.theme-backdrop').dispatchEvent('dragenter', {
+			dataTransfer: await page.evaluateHandle(() => {
+				const dataTransfer = new DataTransfer();
+				dataTransfer.items.add(
+					new File(['zip'], 'template.zip', {
+						type: 'application/zip',
+					})
+				);
+				return dataTransfer;
+			}),
+		});
+	};
+
 	test('should display "Template" field and open Template Manager', async ({
 		page,
 	}, testinfo) => {
@@ -231,6 +245,30 @@ test.describe('Template Manager', () => {
 		).toBeVisible();
 	});
 
+	test('should explain why templates cannot be uploaded or deleted when file changes are disabled', async ({
+		page,
+	}, testinfo) => {
+		await page.setExtraHTTPHeaders({
+			'X-GPDF-E2E-File-Mods': 'disallowed',
+		});
+		const templateManager = await openTemplateManagerShowingRubix(page);
+
+		await expect(
+			templateManager.getByText(
+				'Uploading and deleting templates has been disabled on this server.'
+			)
+		).toBeVisible();
+		await expect(
+			templateManager.locator('.add-new-theme a')
+		).toHaveAttribute('aria-disabled', 'true');
+
+		await snapshot(page, testinfo, templateManager);
+
+		await dragZipOverBackdrop(page);
+		await expect(page.locator('.gfpdf-template-dropzone')).toHaveCount(0);
+		await expect(page.locator('.gfpdf-dropzone-overlay')).toBeHidden();
+	});
+
 	test('should treat the whole Template Manager window as a drop target', async ({
 		page,
 	}, testinfo) => {
@@ -239,18 +277,8 @@ test.describe('Template Manager', () => {
 		const overlay = page.locator('.gfpdf-dropzone-overlay');
 		await expect(overlay).toBeHidden();
 
-		// Drag a zip over the backdrop, which sits well outside the old "Add New Template" tile
-		await page.locator('.theme-backdrop').dispatchEvent('dragenter', {
-			dataTransfer: await page.evaluateHandle(() => {
-				const dataTransfer = new DataTransfer();
-				dataTransfer.items.add(
-					new File(['zip'], 'template.zip', {
-						type: 'application/zip',
-					})
-				);
-				return dataTransfer;
-			}),
-		});
+		// The backdrop sits well outside the old "Add New Template" tile
+		await dragZipOverBackdrop(page);
 
 		await expect(overlay).toBeVisible();
 
