@@ -134,6 +134,15 @@ class Test_Templates extends WP_UnitTestCase {
 		$this->assertFalse( $this->model->current_user_can_manage_templates() );
 		$this->assertFalse( $this->controller->add_localised_script_data( [] )['canManageTemplates'] );
 
+		/* Nor is installing plugins (only a super admin can on multisite, and they have every capability) */
+		if ( ! is_multisite() ) {
+			$user_id = $this->factory->user->create( [ 'role' => 'editor' ] );
+			get_userdata( $user_id )->add_cap( 'install_plugins' );
+			wp_set_current_user( $user_id );
+
+			$this->assertFalse( $this->model->current_user_can_manage_templates() );
+		}
+
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		wp_set_current_user( $user_id );
 		if ( is_multisite() ) {
@@ -143,6 +152,10 @@ class Test_Templates extends WP_UnitTestCase {
 
 		$this->assertTrue( $this->model->current_user_can_manage_templates() );
 		$this->assertTrue( $this->controller->add_localised_script_data( [] )['canManageTemplates'] );
+
+		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_false' );
+		$this->assertFalse( $this->model->current_user_can_manage_templates() );
+		remove_filter( 'gfpdf_current_user_can_manage_templates', '__return_false' );
 
 		add_filter( 'file_mod_allowed', '__return_false' );
 		$this->assertFalse( $this->model->current_user_can_manage_templates() );
