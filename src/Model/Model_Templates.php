@@ -149,7 +149,8 @@ class Model_Templates extends Helper_Abstract_Model {
 	 */
 	public function ajax_process_uploaded_template() {
 
-		$this->misc->handle_ajax_authentication( 'Process Uploaded Template Zip Package' );
+		/* Capabilities are checked by verify_user_can_manage_templates(), so its filter can grant access */
+		$this->misc->handle_ajax_authentication( 'Process Uploaded Template Zip Package', false );
 		$this->verify_user_can_manage_templates( 'Process Uploaded Template Zip Package' );
 
 		/* Validate uploaded file */
@@ -269,7 +270,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	 */
 	public function ajax_process_delete_template() {
 
-		$this->misc->handle_ajax_authentication( 'Delete PDF Template' );
+		$this->misc->handle_ajax_authentication( 'Delete PDF Template', false );
 		$this->verify_user_can_manage_templates( 'Delete PDF Template' );
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
