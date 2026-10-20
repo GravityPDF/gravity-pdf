@@ -172,16 +172,23 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 
 		$this->misc->create_folder( $this->data->template_font_location );
 
+		$font_path = $this->data->template_font_location . $matching_fonts[0]['name'];
+
 		$res = wp_remote_get(
 			$matching_fonts[0]['download_url'],
 			[
 				'timeout'  => 60,
 				'stream'   => true,
-				'filename' => $this->data->template_font_location . $matching_fonts[0]['name'],
+				'filename' => $font_path,
 			]
 		);
 
 		$res_code = wp_remote_retrieve_response_code( $res );
+
+		/* A failed download still leaves the file it streamed into, which would hide the install notice */
+		if ( is_wp_error( $res ) || $res_code !== 200 ) {
+			wp_delete_file( $font_path );
+		}
 
 		/* Check for errors and log them to file */
 		if ( is_wp_error( $res ) ) {

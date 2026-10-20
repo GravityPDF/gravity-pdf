@@ -37,6 +37,7 @@
 * 🐞 Bug: Fix PHP deprecation notice for empty rich text Paragraph fields
 * 🐞 Bug: Don't add debug errors to raw PDF URLs
 * 🐞 Bug: Delete PDFs sent with Gravity Forms background notifications
+* 🐞 Bug: Delete a core font that failed to download, instead of leaving a broken font file in its place
 * 🐞 Bug: Stop different entries sharing a temporary PDF folder
 * 🐞 Bug: Stop admin notices jumping down the page on Gravity Forms pages
 * 🐞 Bug: Keep the cleanup to mPDF's own files when the `gfpdf_mpdf_tmp_location` filter is used
