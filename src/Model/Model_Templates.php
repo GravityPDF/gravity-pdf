@@ -6,6 +6,7 @@ use Exception;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Interface_Setup_TearDown;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF_Vendor\GravityPdf\Upload\File;
@@ -325,17 +326,32 @@ class Model_Templates extends Helper_Abstract_Model {
 	 * @since 4.1
 	 */
 	public function delete_template( $template_id ) {
-		$files  = $this->templates->get_template_files_by_id( $template_id );
-		$config = $this->templates->get_config_class( $template_id );
+		$files = $this->templates->get_template_files_by_id( $template_id );
 
-		/* Check if the PDF config implements our Setup/TearDown interface and run the tear down */
-		if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ), true ) ) {
+		/* Only tear down the working folder's own config, never a core or add-on config sharing the ID */
+		try {
+			$config = $this->templates->load_template_config_file( $this->templates->get_config_path_by_id( $template_id, false ) );
+		} catch ( Exception $e ) {
+			$config = null;
+		}
+
+		if ( $config instanceof Helper_Interface_Setup_TearDown ) {
 			$config->tearDown();
 		}
 
-		/* Remove the PDF template files */
+		/* Remove the PDF template files, but never anything outside a PDF working folder */
+		$folders = array_map( 'trailingslashit', array_filter( array_map( 'realpath', [ $this->data->template_location, $this->templates->get_template_path() ] ) ) );
 		foreach ( $files as $file ) {
-			@unlink( $file ); //phpcs:ignore
+			$in_working_folder = array_filter(
+				$folders,
+				function ( $folder ) use ( $file ) {
+					return strpos( $file, $folder ) === 0;
+				}
+			);
+
+			if ( $in_working_folder ) {
+				@unlink( $file ); //phpcs:ignore
+			}
 		}
 	}
 
