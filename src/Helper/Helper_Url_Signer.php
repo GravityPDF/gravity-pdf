@@ -89,9 +89,7 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 			$date = new DateTime();
 			$log->notice( 'PDF URL signing date: ' . $date->format( DateTime::W3C ), [ 'url' => $url ] );
 
-			/* A signed URL can't be revoked short of rotating the secret, so cap how long one lives */
-			$max_expiration = (string) apply_filters( 'gfpdf_signed_url_max_expiration', '1 year', $url, $expiration );
-			$max_expiration = strtotime( $max_expiration ) !== false ? $max_expiration : '1 year';
+			$max_expiration = $this->get_max_expiration( $url, $expiration );
 			$max_timeout    = ( clone $date )->modify( $max_expiration );
 
 			$timeout = $date->modify( $expiration );
@@ -184,41 +182,75 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 		$secret_key = $this->options->get_option( 'signed_secret_token', '' );
 
 		try {
-			$url_signer = new Helper_Sha256_Url_Signer( $secret_key );
+			/* URLs signed before the cap, or under a higher one, are rejected once they outlive the current cap */
+			$url_signer = new Helper_Sha256_Url_Signer( $secret_key, strtotime( $this->get_max_expiration( $url, '' ) ) );
 
-			/* Do legacy URL checks */
-			if ( $url_signer->validate( $url ) ) {
-				return true;
-			}
-
-			if ( $url_signer->validate( rawurldecode( $url ) ) ) {
-				return true;
-			}
-
-			/* Swap the protocol and test again. We use strtr for simultaneous replacement to avoid the sequential swap pitfall. */
-			$protocols = [
-				'https://' => 'http://',
-				'http://'  => 'https://',
-			];
-
-			if ( $url_signer->validate( strtr( $url, $protocols ) ) ) {
-				return true;
-			}
-
-			/* Strip the trailing slash right before the url param and test again */
-			$trailing_slash = [
-				'/?' => '?',
-				'?'  => '/?',
-			];
-
-			if ( $url_signer->validate( strtr( $url, $trailing_slash ) ) ) {
-				return true;
+			foreach ( [ $url, rawurldecode( $url ), $this->get_protocol_swapped_url( $url ), $this->get_trailing_slash_swapped_url( $url ) ] as $candidate ) {
+				if ( $url_signer->validate( $candidate ) ) {
+					return true;
+				}
 			}
 		} catch ( Exception $e ) {
 			// do nothing
 		}
 
 		return false;
+	}
+
+	/**
+	 * Swap http:// and https://
+	 *
+	 * @param string $url
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	private function get_protocol_swapped_url( $url ) {
+		/* strtr() swaps both ways at once, avoiding the sequential swap pitfall */
+		return strtr(
+			$url,
+			[
+				'https://' => 'http://',
+				'http://'  => 'https://',
+			]
+		);
+	}
+
+	/**
+	 * Swap the trailing slash right before the url param on or off
+	 *
+	 * @param string $url
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	private function get_trailing_slash_swapped_url( $url ) {
+		return strtr(
+			$url,
+			[
+				'/?' => '?',
+				'?'  => '/?',
+			]
+		);
+	}
+
+	/**
+	 * Get the longest a signed URL can live, as a relative date
+	 *
+	 * @param string $url
+	 * @param string $expiration The requested expiration
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	protected function get_max_expiration( $url, $expiration ) {
+		/* A signed URL can't be revoked short of rotating the secret, so cap how long one lives */
+		$max_expiration = (string) apply_filters( 'gfpdf_signed_url_max_expiration', '1 year', $url, $expiration );
+
+		return strtotime( $max_expiration ) !== false ? $max_expiration : '1 year';
 	}
 
 	/**

@@ -71,6 +71,27 @@ class Test_Url_Signer extends TestCase {
 		remove_filter( 'gfpdf_signed_url_max_expiration', '__return_empty_string' );
 	}
 
+	public function test_url_signed_past_the_cap_does_not_verify() {
+		$signer = new Helper_Url_Signer();
+		$signer->sign( 'https://test.com/', '+1 day' ); // creates the secret
+
+		$url_signer = new \GFPDF\Helper\Helper_Sha256_Url_Signer( \GPDFAPI::get_plugin_option( 'signed_secret_token' ) );
+		$signed     = $url_signer->sign( 'https://test.com/?p=123', ( new \DateTime() )->modify( '+10 years' ) );
+
+		$this->assertFalse( $signer->verify( $signed ) );
+
+		/* The cap applies to whichever form of the URL the signature matched */
+		[ $base, $query ] = explode( '?', $signed, 2 );
+		$encoded          = $base . '?' . rawurlencode( $query );
+		$this->assertFalse( $signer->verify( $encoded ) );
+
+		$filter = fn() => '+20 years';
+		add_filter( 'gfpdf_signed_url_max_expiration', $filter );
+		$this->assertTrue( $signer->verify( $signed ) );
+		$this->assertTrue( $signer->verify( $encoded ) );
+		remove_filter( 'gfpdf_signed_url_max_expiration', $filter );
+	}
+
 	public function test_signed_url_defaults_to_the_capped_logged_out_timeout() {
 		$signer  = new Helper_Url_Signer();
 		$expires = function () use ( $signer ) {
