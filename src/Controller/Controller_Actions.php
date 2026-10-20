@@ -273,8 +273,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 					$this->log->critical(
 						'Lack of User Capabilities.',
 						[
-							'user'      => wp_get_current_user(),
-							'user_meta' => get_user_meta( get_current_user_id() ),
+							'user' => get_current_user_id(),
 						]
 					);
 

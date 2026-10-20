@@ -63,6 +63,8 @@ class Redact_Processor implements ProcessorInterface {
 		'refresh_token',
 		'authorization',
 		'password',
+		'user_pass',
+		'user_activation_key',
 		'secret',
 		'token',
 		'cookie',
