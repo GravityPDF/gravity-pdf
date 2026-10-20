@@ -23,6 +23,38 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Sha256_Url_Signer extends BaseUrlSigner {
 
 	/**
+	 * @var int|null
+	 *
+	 * @since 6.18.0
+	 */
+	protected $max_timestamp;
+
+	/**
+	 * @param string   $signature_key
+	 * @param int|null $max_timestamp URLs expiring after this are rejected, even with a valid signature
+	 *
+	 * @since 6.18.0
+	 */
+	public function __construct( $signature_key, $max_timestamp = null ) {
+		parent::__construct( $signature_key );
+
+		$this->max_timestamp = $max_timestamp;
+	}
+
+	/**
+	 * Check the timestamp is in the future, and no later than the cap
+	 *
+	 * @param int $timestamp
+	 *
+	 * @return bool
+	 *
+	 * @since 6.18.0
+	 */
+	protected function isFuture( $timestamp ) {
+		return parent::isFuture( $timestamp ) && ( $this->max_timestamp === null || (int) $timestamp <= $this->max_timestamp );
+	}
+
+	/**
 	 * Generate a token to identify the secure action.
 	 *
 	 * @param string $url
