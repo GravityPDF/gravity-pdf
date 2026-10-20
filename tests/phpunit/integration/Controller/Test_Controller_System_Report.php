@@ -215,7 +215,37 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertSame( 'Writable', $row['value_export'] );
 		$this->assertSame( [], get_option( Model_Install::UNWRITABLE_FOLDERS ) );
 
-		$dir       = $gfpdf->data->template_tmp_location;
+		$dir         = $gfpdf->data->template_tmp_location;
+		$directories = $this->get_directories_with_unwritable( [ $dir ] );
+		$row         = $directories['folder_permissions'];
+
+		$this->assertSame( 'Not writable', $directories['temp_folder_permission']['value_export'] );
+		$this->assertSame( 'Not writable: ' . $dir, $row['value_export'] );
+		$this->assertStringContainsString( 'Not writable', $row['value'] );
+	}
+
+	public function test_temp_folder_permission_reads_an_mpdf_cache_outside_tmp() {
+		$gfpdf = $this->gfpdf();
+		$saved = $gfpdf->data->mpdf_tmp_location;
+
+		$gfpdf->data->mpdf_tmp_location = '/srv/pdf-tmp';
+
+		try {
+			$row = $this->get_directories_with_unwritable( [ '/srv/pdf-tmp/mpdf' ] )['temp_folder_permission'];
+		} finally {
+			$gfpdf->data->mpdf_tmp_location = $saved;
+		}
+
+		$this->assertSame( 'Not writable', $row['value_export'] );
+	}
+
+	/**
+	 * Get the Directories section with the folder check failing for the given folders
+	 *
+	 * @param string[] $folders
+	 */
+	protected function get_directories_with_unwritable( array $folders ): array {
+		$gfpdf     = $this->gfpdf();
 		$installer = $gfpdf->singleton->get_class( 'Model_Install' );
 
 		/* The registry keys classes by their short name, so the mock takes the installer's place */
@@ -224,18 +254,14 @@ class Test_Controller_System_Report extends TestCase {
 			->setMockClassName( 'Model_Install' )
 			->onlyMethods( [ 'create_folder_structures' ] )
 			->getMock();
-		$failing->method( 'create_folder_structures' )->willReturn( [ $dir ] );
+		$failing->method( 'create_folder_structures' )->willReturn( $folders );
 		$gfpdf->singleton->add_class( $failing );
 
-		$directories = $this->get_report_section( 'directories' );
-
-		$gfpdf->singleton->add_class( $installer );
-		$row = $directories['folder_permissions'];
-
-		/* The mPDF tmp folder sits in the PDF tmp folder, so its row reads the same result */
-		$this->assertSame( 'Not writable', $directories['temp_folder_permission']['value_export'] );
-		$this->assertSame( 'Not writable: ' . $dir, $row['value_export'] );
-		$this->assertStringContainsString( 'Not writable', $row['value'] );
+		try {
+			return $this->get_report_section( 'directories' );
+		} finally {
+			$gfpdf->singleton->add_class( $installer );
+		}
 	}
 
 	/**

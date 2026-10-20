@@ -659,16 +659,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 *               network share read-only
 	 */
 	protected function is_temporary_folder_writable( array $unwritable_folders ): array {
-		$mpdf_tmp    = trailingslashit( $this->data->mpdf_tmp_location );
-		$is_writable = true;
-
-		/* The folder check covers the mPDF tmp folder, or the PDF tmp folder it sits in */
-		foreach ( $unwritable_folders as $dir ) {
-			if ( strpos( $mpdf_tmp, trailingslashit( $dir ) ) === 0 ) {
-				$is_writable = false;
-				break;
-			}
-		}
+		$is_writable = array_intersect( $this->misc->get_tmp_locations(), $unwritable_folders ) === [];
 
 		$string = $is_writable ? __( 'Writable', 'gravityforms' ) : __( 'Not writable', 'gravityforms' );
 		$icon   = $this->getController()->view->get_icon( $is_writable );

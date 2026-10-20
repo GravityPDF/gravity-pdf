@@ -373,16 +373,7 @@ class Helper_Misc {
 		/*
 		 * Do not allow directories outside the folders managed by Gravity PDF to be deleted
 		 */
-		$folders = [
-			$this->data->template_location,
-			$this->data->template_font_location,
-			$this->data->template_tmp_location,
-			$this->data->mpdf_tmp_location,
-		];
-
-		if ( is_multisite() ) {
-			$folders[] = $this->data->multisite_template_location;
-		}
+		$folders = $this->get_managed_folders();
 
 		/* Verify $dir is a real path on the current file system */
 		$path_to_test = realpath( $dir );
@@ -478,17 +469,42 @@ class Helper_Misc {
 	}
 
 	/**
-	 * The tmp folder, plus mPDF's tempDir when a filter has moved it outside
+	 * The folders Gravity PDF writes to, and so may delete from
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.18.0
+	 */
+	public function get_managed_folders(): array {
+		$folders = array_merge(
+			[
+				$this->data->template_location,
+				$this->data->template_font_location,
+			],
+			$this->get_tmp_locations()
+		);
+
+		if ( is_multisite() ) {
+			$folders[] = $this->data->multisite_template_location;
+		}
+
+		return $folders;
+	}
+
+	/**
+	 * The tmp folder, plus mPDF's cache when a filter has moved it outside. mPDF only writes to the cache, so the rest of a
+	 * filtered folder (which may be shared, like /tmp) is left alone
 	 *
 	 * @return string[]
 	 *
 	 * @since 6.18.0
 	 */
 	public function get_tmp_locations(): array {
-		$locations = [ $this->data->template_tmp_location ];
+		$locations  = [ $this->data->template_tmp_location ];
+		$mpdf_cache = $this->get_mpdf_cache_location();
 
-		if ( strpos( trailingslashit( $this->data->mpdf_tmp_location ), $this->data->template_tmp_location ) !== 0 ) {
-			$locations[] = $this->data->mpdf_tmp_location;
+		if ( strpos( wp_normalize_path( trailingslashit( $mpdf_cache ) ), wp_normalize_path( $this->data->template_tmp_location ) ) !== 0 ) {
+			$locations[] = $mpdf_cache;
 		}
 
 		return $locations;
