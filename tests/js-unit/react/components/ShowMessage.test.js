@@ -72,6 +72,12 @@ describe('Components - ShowMessage.js', () => {
       expect(component.hasClass('notice inline error')).toEqual(true)
     })
 
+    test('renders a warning <ShowMessage /> component', () => {
+      wrapper = shallow(<ShowMessage text='text' warning />)
+
+      expect(findByTestAttr(wrapper, 'component-showMessage').hasClass('notice inline notice-warning')).toEqual(true)
+    })
+
     test('renders <ShowMessage /> component with an empty <div />', () => {
       wrapper = shallow(<ShowMessage text='text' />)
       wrapper.setState({ visible: false })

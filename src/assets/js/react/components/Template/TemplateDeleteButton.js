@@ -36,7 +36,8 @@ export class TemplateDeleteButton extends Component {
     history: PropTypes.object,
     buttonText: PropTypes.string,
     templateConfirmDeleteText: PropTypes.string,
-    templateDeleteErrorText: PropTypes.string
+    templateDeleteErrorText: PropTypes.string,
+    disabled: PropTypes.bool
   }
 
   /**
@@ -94,18 +95,32 @@ export class TemplateDeleteButton extends Component {
   }
 
   /**
+   * A link can't be disabled, so swallow the click instead
+   *
+   * @param {Object} e Event
+   *
+   * @since 6.18.0
+   */
+  ignoreClick = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  /**
    * @since 4.1
    */
   render () {
+    const { disabled } = this.props
     const callback = (this.props.callbackFunction) ? this.props.callbackFunction : this.deleteTemplate
 
     return (
       <a
         data-test='component-templateDeleteButton'
-        onClick={callback}
+        onClick={disabled ? this.ignoreClick : callback}
+        aria-disabled={disabled || undefined}
         href='#'
         tabIndex='150'
-        className='button button-secondary delete-theme ed_button'
+        className={'button button-secondary delete-theme ed_button' + (disabled ? ' disabled' : '')}
         aria-label={this.props.buttonText + ' ' + GFPDF.template}
       >
         {this.props.buttonText}

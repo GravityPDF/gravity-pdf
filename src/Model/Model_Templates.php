@@ -117,6 +117,30 @@ class Model_Templates extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Explain to a site admin why they cannot upload or delete PDF templates
+	 *
+	 * @return string Empty if not applicable
+	 *
+	 * @since 6.18.0
+	 */
+	public function get_manage_templates_notice(): string {
+		/* manage_options ignores file mods, so it finds the admins who would otherwise be allowed */
+		if ( $this->current_user_can_manage_templates() || ! current_user_can( 'manage_options' ) || ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+			return '';
+		}
+
+		if ( ! wp_is_file_mod_allowed( 'install_plugins' ) ) {
+			return esc_html__( 'Uploading and deleting templates has been disabled on this server.', 'gravity-pdf' );
+		}
+
+		if ( is_multisite() && ! is_super_admin() ) {
+			return esc_html__( 'Only a network administrator can upload or delete templates.', 'gravity-pdf' );
+		}
+
+		return '';
+	}
+
+	/**
 	 * Stop the AJAX request if the current user cannot manage PDF templates
 	 *
 	 * @param string $endpoint_desc

@@ -19,23 +19,27 @@ import { TemplateUploaderContext } from './TemplateUploaderContext'
  * @param {Object} props
  * @param {string} props.addTemplateText
  * @param {string} props.templateInstallInstructions
+ * @param {boolean} props.disabled
  *
  * @since 6.18.0
  */
-const TemplateUploaderTile = ({ addTemplateText, templateInstallInstructions }) => {
+const TemplateUploaderTile = ({ addTemplateText, templateInstallInstructions, disabled }) => {
   const { open, isUploading } = useContext(TemplateUploaderContext)
 
   const handleClick = (e) => {
     e.preventDefault()
-    open()
+    if (!disabled) {
+      open()
+    }
   }
 
   return (
-    <div data-test='component-templateUploaderTile' className='theme add-new-theme gfpdf-dropzone'>
+    <div data-test='component-templateUploaderTile' className={'theme add-new-theme gfpdf-dropzone' + (disabled ? ' disabled' : '')}>
       <a
         href='#/template'
         className={isUploading ? 'doing-ajax' : ''}
         onClick={handleClick}
+        aria-disabled={disabled || undefined}
         aria-labelledby='gfpdf-template-install-instructions'
       >
         <div className='theme-screenshot'><span /></div>
@@ -52,7 +56,8 @@ const TemplateUploaderTile = ({ addTemplateText, templateInstallInstructions }) 
 
 TemplateUploaderTile.propTypes = {
   addTemplateText: PropTypes.string,
-  templateInstallInstructions: PropTypes.string
+  templateInstallInstructions: PropTypes.string,
+  disabled: PropTypes.bool
 }
 
 export default TemplateUploaderTile

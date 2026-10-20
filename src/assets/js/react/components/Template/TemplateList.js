@@ -9,6 +9,7 @@ import TemplateSearch from './TemplateSearch'
 import TemplateHeaderTitle from './TemplateHeaderTitle'
 import TemplateUploader from './TemplateUploader'
 import TemplateUploaderTile from './TemplateUploaderTile'
+import ShowMessage from '../ShowMessage'
 /* Selectors */
 import getTemplates from '../../selectors/getTemplates'
 
@@ -56,6 +57,13 @@ export class TemplateList extends Component {
         }
         closeRoute='/'
       >
+        {GFPDF.templateManageNotice && (
+          <ShowMessage
+            data-test='component-templateManageNotice'
+            text={GFPDF.templateManageNotice}
+            warning
+          />
+        )}
         <TemplateSearch data-test='component-templateSearch' />
         <div role='listbox'>
           {
@@ -73,9 +81,10 @@ export class TemplateList extends Component {
           }
 
           {
-            hasUserPrivs &&
+            (hasUserPrivs || GFPDF.templateManageNotice) &&
               <TemplateUploaderTile
                 data-test='component-templateUploaderTile'
+                disabled={!hasUserPrivs}
                 addTemplateText={this.props.addTemplateText}
                 templateInstallInstructions={this.props.templateInstallInstructions}
               />
