@@ -622,6 +622,7 @@ class GFPDF\Helper\Helper_Misc
     public function get_field_class($type)
     public function get_fields_sorted_by_id($form_id)
     public function get_file_with_extension($name, $extension = '.php')
+    public function get_managed_folders(): array
     public function get_mpdf_cache_location(): string
     public function get_tmp_locations(): array
     public function get_upload_details()

@@ -1531,6 +1531,37 @@ class Test_PDF extends TestCase {
 		}
 	}
 
+	public function test_cleanup_tmp_dir_leaves_the_rest_of_a_filtered_mpdf_folder_outside_tmp() {
+		global $gfpdf;
+
+		$installer = GPDFAPI::get_mvc_class( 'Model_Install' );
+		$folder    = get_temp_dir() . 'gfpdf-shared-' . wp_generate_password( 8, false );
+		$filter    = function () use ( $folder ) {
+			return $folder;
+		};
+
+		add_filter( 'gfpdf_mpdf_tmp_location', $filter );
+		$installer->setup_template_location();
+
+		try {
+			wp_mkdir_p( $folder . '/other-app' );
+			touch( $folder . '/other-app/file.txt', time() - DAY_IN_SECONDS );
+			touch( $folder . '/other-app', time() - DAY_IN_SECONDS );
+
+			delete_site_transient( 'gfpdf_cleanup_tmp_dir' );
+			$this->model->cleanup_tmp_dir();
+
+			$this->assertFileExists( $folder . '/other-app/file.txt' );
+		} finally {
+			$gfpdf->misc->rmdir( $gfpdf->misc->get_mpdf_cache_location() );
+			@unlink( $folder . '/other-app/file.txt' ); //phpcs:ignore
+			@rmdir( $folder . '/other-app' ); //phpcs:ignore
+			@rmdir( $folder ); //phpcs:ignore
+			remove_filter( 'gfpdf_mpdf_tmp_location', $filter );
+			$installer->setup_template_location();
+		}
+	}
+
 	public function test_cleanup_tmp_dir_keeps_the_uncached_folders_index() {
 		$index = dirname( Cache::get_uncached_path() ) . '/index.html';
 		touch( $index, time() - WEEK_IN_SECONDS );
