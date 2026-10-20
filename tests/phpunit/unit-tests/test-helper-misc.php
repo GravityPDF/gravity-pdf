@@ -801,11 +801,50 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$mpdf_tmp_location       = $data->mpdf_tmp_location;
 		$data->mpdf_tmp_location = '/srv/pdf-tmp';
 
-		$locations = $this->misc->get_tmp_locations();
+		$outside = $this->misc->get_tmp_locations();
+
+		/* Only the cache is mPDF's, so a parent of tmp/ lists the cache beside it, not the parent */
+		$data->mpdf_tmp_location = dirname( $data->template_tmp_location );
+
+		$parent = $this->misc->get_tmp_locations();
+
+		/* A Windows-style path to tmp/ is still inside it */
+		$data->mpdf_tmp_location = str_replace( '/', '\\', $data->template_tmp_location ) . 'mpdf';
+
+		$windows = $this->misc->get_tmp_locations();
 
 		$data->mpdf_tmp_location = $mpdf_tmp_location;
 
-		$this->assertSame( [ $data->template_tmp_location, '/srv/pdf-tmp' ], $locations );
+		$this->assertSame( [ $data->template_tmp_location, '/srv/pdf-tmp/mpdf' ], $outside );
+		$this->assertSame( [ $data->template_tmp_location, dirname( $data->template_tmp_location ) . '/mpdf' ], $parent );
+		$this->assertSame( [ $data->template_tmp_location ], $windows );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_rmdir_only_deletes_the_mpdf_cache_of_a_folder_outside_tmp() {
+		$data   = \GPDFAPI::get_data_class();
+		$saved  = $data->mpdf_tmp_location;
+		$folder = get_temp_dir() . 'gfpdf-mpdf-' . wp_generate_password( 8, false );
+
+		wp_mkdir_p( $folder . '/mpdf/ttfontdata' );
+		wp_mkdir_p( $folder . '/other-app' );
+		$data->mpdf_tmp_location = $folder;
+
+		try {
+			$this->assertInstanceOf( \WP_Error::class, $this->misc->rmdir( $folder . '/other-app' ) );
+			$this->assertDirectoryExists( $folder . '/other-app' );
+
+			$this->assertTrue( $this->misc->rmdir( $folder . '/mpdf/ttfontdata' ) );
+			$this->assertDirectoryDoesNotExist( $folder . '/mpdf/ttfontdata' );
+		} finally {
+			$data->mpdf_tmp_location = $saved;
+			@rmdir( $folder . '/other-app' ); //phpcs:ignore
+			@rmdir( $folder . '/mpdf/ttfontdata' ); //phpcs:ignore
+			@rmdir( $folder . '/mpdf' ); //phpcs:ignore
+			@rmdir( $folder ); //phpcs:ignore
+		}
 	}
 
 	/**

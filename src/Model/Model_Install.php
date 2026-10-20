@@ -259,20 +259,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 6.18.0
 	 */
 	protected function get_folders(): array {
-		$folders = array_merge(
-			[
-				$this->data->template_location,
-				$this->data->template_font_location,
-			],
-			$this->misc->get_tmp_locations()
-		);
-
-		if ( is_multisite() ) {
-			$folders[] = $this->data->multisite_template_location;
-		}
-
 		/* allow other plugins to add their own folders which should be checked */
-		return apply_filters( 'gfpdf_installer_create_folders', $folders );
+		return apply_filters( 'gfpdf_installer_create_folders', $this->misc->get_managed_folders() );
 	}
 
 	/**
