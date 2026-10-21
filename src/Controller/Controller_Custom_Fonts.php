@@ -21,6 +21,7 @@ use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\File;
+use GFPDF_Vendor\GravityPdf\Upload\Filename;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
 use GPDFAPI;
 use Psr\Log\LoggerInterface;
@@ -216,6 +217,8 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 * @since 6.0
 	 */
 	public function add_item( WP_REST_Request $request ) {
+		$uncommitted_files = [];
+
 		try {
 			$label = $request->get_param( 'label' );
 			$id    = $this->model->get_unique_id( $this->model->get_font_short_name( $label ) );
@@ -228,7 +231,8 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new UploadException( wp_json_encode( [ 'regular' => __( 'The Regular font is required', 'gravity-pdf' ) ] ) );
 			}
 
-			$files = $this->move_fonts_to_font_dir( $files );
+			$files             = $this->move_fonts_to_font_dir( $files );
+			$uncommitted_files = array_column( $files, 'name' );
 
 			/* Determine if font files support OTF data and auto register */
 			$supports_otl = $this->does_fonts_support_otl( $files );
@@ -249,6 +253,8 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
+			$uncommitted_files = [];
+
 			FlushCache::flush( $font['id'] );
 
 			return $font;
@@ -268,6 +274,9 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			if ( isset( $e ) ) {
 				$this->log->error( $e->getMessage() );
 			}
+
+			/* Don't leave the uploaded files behind when the font isn't saved */
+			array_map( [ $this, 'delete_font_file' ], $uncommitted_files );
 		}
 	}
 
@@ -281,6 +290,8 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 * @since 6.0
 	 */
 	public function update_item( WP_REST_Request $request ) {
+		$uncommitted_files = [];
+
 		try {
 			$id = $request->get_param( 'id' );
 			if ( ! $this->model->matches_custom_font_id( $id ) ) {
@@ -294,25 +305,29 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				$font['font_name'] = $label;
 			}
 
-			/* Delete any font files needed (any font key passed as a body param) */
+			/* Files the font stops using (styles removed or replaced), deleted only once the change is saved */
+			$unused_files = [];
+
 			$params = $request->get_body_params();
 			foreach ( $this->font_keys as $font_id ) {
 				if ( ! isset( $params[ $font_id ] ) || empty( $font[ $font_id ] ) ) {
 					continue;
 				}
 
-				$this->delete_font_file( basename( $font[ $font_id ] ) );
+				$unused_files[]   = basename( $font[ $font_id ] );
 				$font[ $font_id ] = '';
 			}
 
-			/*
-			 * Handle newly-uploaded files
-			 * If we are to replace an existing font we will need to delete it first and then update the $font key
-			 */
 			$files = $this->get_uploaded_font_files( $request );
 			if ( count( $files ) > 0 ) {
-				$files = $this->move_fonts_to_font_dir( $files );
+				$files             = $this->move_fonts_to_font_dir( $files );
+				$uncommitted_files = array_column( $files, 'name' );
+
 				foreach ( $files as $font_id => $file ) {
+					if ( ! empty( $font[ $font_id ] ) ) {
+						$unused_files[] = basename( $font[ $font_id ] );
+					}
+
 					$font[ $font_id ] = $this->get_absolute_font_path( $file['name'] );
 				}
 			}
@@ -354,6 +369,11 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new GravityPdfDatabaseUpdateException();
 			}
 
+			/* Not one an upload was just saved under, which happens when the old file had gone missing */
+			array_map( [ $this, 'delete_font_file' ], array_diff( $unused_files, $uncommitted_files ) );
+
+			$uncommitted_files = [];
+
 			FlushCache::flush( $font['id'] );
 
 			return $font;
@@ -375,6 +395,9 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			if ( isset( $e ) ) {
 				$this->log->error( $e->getMessage() );
 			}
+
+			/* Don't leave the uploaded files behind when the font isn't saved */
+			array_map( [ $this, 'delete_font_file' ], $uncommitted_files );
 		}
 	}
 
@@ -459,6 +482,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		GPDFAPI::get_misc_class()->create_folder( $this->font_dir_path );
 
 		$storage = new $this->filesystem( $this->font_dir_path );
+		$uploads = [];
 		$errors  = [];
 
 		foreach ( $files as $id => $file ) {
@@ -472,25 +496,63 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				]
 			);
 
-			/* Give file a unique name, if already exists */
-			while ( is_file( $this->font_dir_path . $file->getNameWithExtension() ) ) {
-				$file->setName( $file->getName() . substr( (string) time(), -5 ) );
-				$files[ $id ]['name'] = $file->getNameWithExtension();
+			/* Check every style before saving any, so a rejected one leaves nothing behind */
+			if ( ! $file->isValid() ) {
+				$errors[ $id ] = $this->get_upload_error_message( $file );
 			}
 
-			/* Do validation and move to the font directory */
-			try {
-				$file->upload();
-			} catch ( UploadException $e ) {
-				$errors[ $id ] = $this->get_upload_error_message( $file, $e );
-			}
+			$uploads[ $id ] = $file;
 		}
 
 		if ( count( $errors ) > 0 ) {
 			throw new UploadException( wp_json_encode( $errors ) );
 		}
 
+		$saved = [];
+		foreach ( $uploads as $id => $file ) {
+			try {
+				$this->upload_with_unique_name( $file );
+			} catch ( UploadException $e ) {
+				array_map( [ $this, 'delete_font_file' ], $saved );
+
+				throw new UploadException( wp_json_encode( [ $id => $this->get_upload_error_message( $file, $e->getErrorCode() ) ] ) );
+			}
+
+			/* The upload library rewrites characters like dots and brackets, so keep the name it saved under */
+			$files[ $id ]['name'] = basename( current( $file->getUploadedLocators() ) );
+			$saved[]              = $files[ $id ]['name'];
+		}
+
 		return $files;
+	}
+
+	/**
+	 * Save the font, adding a number to its name if the name is taken
+	 *
+	 * The library claims the name as it writes, so a clash only shows up as its DESTINATION_EXISTS error
+	 *
+	 * @throws UploadException
+	 *
+	 * @since 6.18.0
+	 */
+	protected function upload_with_unique_name( File $file ): void {
+		$name = $file->getName();
+
+		for ( $attempt = 1; ; $attempt++ ) {
+			try {
+				$file->upload();
+
+				return;
+			} catch ( UploadException $e ) {
+				if ( $e->getErrorCode() !== ErrorCode::DESTINATION_EXISTS || $attempt === 10 ) {
+					throw $e;
+				}
+			}
+
+			/* Leaves room for the dot, extension and number, which the library would otherwise cut off the end */
+			$base = mb_strcut( $name, 0, Filename::MAX_LENGTH - strlen( $file->getExtension() ) - 6, 'UTF-8' );
+			$file->setName( $base . wp_rand( 10000, 99999 ) );
+		}
 	}
 
 	/**
@@ -498,7 +560,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 *
 	 * @since 6.18.0
 	 */
-	protected function get_upload_error_message( File $file, UploadException $e ): string {
+	protected function get_upload_error_message( File $file, string $error_code = ErrorCode::VALIDATION_FAILED ): string {
 		$codes = array_column( $file->getErrorDetails(), 'code' );
 
 		if ( array_intersect( $codes, [ ErrorCode::INI_SIZE, ErrorCode::FORM_SIZE ] ) ) {
@@ -515,7 +577,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		];
 
 		/* Storage failures aren't recorded as error details; they only reach us as the thrown code */
-		if ( array_intersect( $codes, $transfer_failures ) || $e->getErrorCode() !== ErrorCode::VALIDATION_FAILED ) {
+		if ( array_intersect( $codes, $transfer_failures ) || $error_code !== ErrorCode::VALIDATION_FAILED ) {
 			return __( 'The font file could not be saved. Ask your web host to check the PHP upload settings', 'gravity-pdf' );
 		}
 
