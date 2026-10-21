@@ -16,7 +16,7 @@ use WP_Error;
  */
 class Test_Controller_Save_Core_Fonts extends TestCase {
 
-	private const FONT = 'Aegean.otf';
+	private const FONT = 'DejaVuSerifCondensed.ttf';
 
 	/**
 	 * @var Controller_Save_Core_Fonts
@@ -85,6 +85,35 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		];
 	}
 
+	/**
+	 * @dataProvider provider_unexpected_download
+	 */
+	public function test_download_that_does_not_match_the_font_list_is_removed( callable $change ) {
+		$font = $this->stream_font_with_response( $this->http_response( 200 ) );
+
+		$handle = fopen( $font, 'r+' );
+		$change( $handle );
+		fclose( $handle );
+
+		$this->assertFalse( $this->invoke_download() );
+		$this->assertFileDoesNotExist( $font );
+	}
+
+	public function provider_unexpected_download(): array {
+		return [
+			'truncated' => [
+				function ( $handle ) {
+					ftruncate( $handle, 1024 );
+				},
+			],
+			'same size' => [
+				function ( $handle ) {
+					fwrite( $handle, 'x' );
+				},
+			],
+		];
+	}
+
 	public function test_unapproved_font_leaves_existing_files_alone() {
 		$font = $this->seed_font();
 
@@ -102,7 +131,7 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 
 		$font = $gfpdf->data->template_font_location . self::FONT;
 		wp_mkdir_p( $gfpdf->data->template_font_location );
-		file_put_contents( $font, 'partial' );
+		copy( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . self::FONT, $font );
 
 		return $font;
 	}
