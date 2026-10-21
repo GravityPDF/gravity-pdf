@@ -69,6 +69,26 @@ class Test_Redact_Processor extends TestCase {
 	}
 
 	/**
+	 * A user object logged as context keeps its login but loses its password hash and reset key.
+	 */
+	public function test_redacts_user_password_hash() {
+		$user = new \WP_User(
+			(object) [
+				'ID'                  => 7,
+				'user_login'          => 'probe',
+				'user_pass'           => '$wp$2y$10$abcdefghijklmnopqrstuv',
+				'user_activation_key' => '1700000000:$generic$abcdef',
+			]
+		);
+
+		$context = $this->processor()->context( [ 'user' => $user ] );
+
+		$this->assertSame( '[redacted]', $context['user']['data']['user_pass'] );
+		$this->assertSame( '[redacted]', $context['user']['data']['user_activation_key'] );
+		$this->assertSame( 'probe', $context['user']['data']['user_login'] );
+	}
+
+	/**
 	 * A circular reference must not recurse forever — the depth cap replaces the value instead of exhausting the stack.
 	 */
 	public function test_caps_recursion_on_circular_references() {

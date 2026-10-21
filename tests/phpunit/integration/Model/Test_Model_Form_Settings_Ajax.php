@@ -6,6 +6,8 @@ namespace GFPDF\Model;
 
 use GFAPI;
 use GFPDF\Tests\Integration\AjaxTestCase;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger as MonoLogger;
 use WPAjaxDieContinueException;
 use WPAjaxDieStopException;
 
@@ -221,5 +223,43 @@ class Test_Model_Form_Settings_Ajax extends AjaxTestCase {
 		unset( $gfpdf->data->form_settings );
 		$pdf = $gfpdf->options->get_pdf( $this->form_id, $this->pid );
 		$this->assertInstanceOf( \WP_Error::class, $pdf );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_authentication_logs_only_the_refused_user_id() {
+		global $gfpdf;
+
+		$user_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		wp_set_current_user( $user_id );
+
+		$_POST['fid']   = $this->form_id;
+		$_POST['pid']   = $this->pid;
+		$_POST['nonce'] = wp_create_nonce( "gfpdf_delete_nonce_{$this->form_id}_{$this->pid}" );
+
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+
+		try {
+			$this->_handleAjax( 'gfpdf_list_delete' );
+			$this->fail( 'Expected WPAjaxDieStopException (401) was not thrown.' );
+		} catch ( WPAjaxDieStopException $e ) {
+			$this->assertSame( '401', $e->getMessage() );
+		} finally {
+			$gfpdf->log->popHandler();
+		}
+
+		$this->assertTrue(
+			$handler->hasRecordThatPasses(
+				function ( $record ) use ( $user_id ) {
+					return $record['context'] === [
+						'user'              => $user_id,
+						'capability_needed' => 'gravityforms_edit_forms',
+					];
+				},
+				MonoLogger::CRITICAL
+			)
+		);
 	}
 }

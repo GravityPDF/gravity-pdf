@@ -156,7 +156,7 @@ class Model_Templates extends Helper_Abstract_Model {
 			'Lack of User Capabilities',
 			[
 				'type'              => $endpoint_desc,
-				'user'              => wp_get_current_user(),
+				'user'              => get_current_user_id(),
 				'capability_needed' => 'upload_plugins',
 			]
 		);

@@ -5,6 +5,8 @@ declare( strict_types=1 );
 namespace GFPDF\Model;
 
 use GFPDF\Tests\Integration\AjaxTestCase;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger as MonoLogger;
 use WPAjaxDieContinueException;
 use WPAjaxDieStopException;
 
@@ -154,6 +156,36 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 		wp_set_current_user( $user_id );
 
 		$this->assert_template_endpoints_deny( '403' );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_template_endpoints_log_only_the_refused_user_id() {
+		global $gfpdf;
+
+		$user_id = $this->factory->user->create( [ 'role' => 'editor' ] );
+		wp_set_current_user( $user_id );
+
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+		$code = $this->get_ajax_response( 'gfpdf_upload_template' );
+		$gfpdf->log->popHandler();
+
+		$this->assertSame( '403', $code );
+
+		$this->assertTrue(
+			$handler->hasRecordThatPasses(
+				function ( $record ) use ( $user_id ) {
+					return $record['context'] === [
+						'type'              => 'Process Uploaded Template Zip Package',
+						'user'              => $user_id,
+						'capability_needed' => 'upload_plugins',
+					];
+				},
+				MonoLogger::CRITICAL
+			)
+		);
 	}
 
 	/**
