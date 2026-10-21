@@ -45,6 +45,8 @@
 * 🐞 Bug: Stop different entries sharing a temporary PDF folder
 * 🐞 Bug: Stop admin notices jumping down the page on Gravity Forms pages
 * 🐞 Bug: Keep the cleanup to mPDF's own files when the `gfpdf_mpdf_tmp_location` filter is used
+* 🐞 Bug: Fix custom font uploads when the filename has dots or brackets
+* 🐞 Bug: Clean up the font files a failed custom font save leaves behind
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
 * 💻 Developer: `$form_data` field values now encode shortcode and merge tag characters (`[ ] { }`) so they aren't processed
 * 💻 Developer: A `gfpdf_get_option_logged_out_timeout` filter returning 0 now expires IP-based logged-out access immediately, instead of turning off the Logged Out Timeout
