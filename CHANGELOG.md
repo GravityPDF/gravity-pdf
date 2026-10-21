@@ -26,6 +26,7 @@
 * 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
 * 🐞 Bug: Fix an edge case where a failed global settings save would reset all global PDF settings
 * 🐞 Bug: Fix regression where a failed global settings save discarded the entered values
+* 🐞 Bug: Only show a failed global settings save's values to the user who made it
 * 🐞 Bug: Fix the global settings save silently failing because of another plugin's error or an extension's notice
 * 🐞 Bug: Show an extension's warning on a settings save as a warning
 * 🐞 Bug: Only clear the background PDF queue once a change to Background Processing is saved

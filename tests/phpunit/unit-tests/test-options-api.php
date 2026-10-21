@@ -100,7 +100,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 6.18.0
 	 */
 	public function test_settings_page_redisplays_a_failed_save_after_other_reads_and_writes() {
-		set_transient( 'gfpdf_settings_user_data', array_merge( $this->options->get_settings(), [ 'default_font_size' => 17 ] ), 30 );
+		set_transient( 'gfpdf_settings_user_data_' . get_current_user_id(), array_merge( $this->options->get_settings(), [ 'default_font_size' => 17 ] ), 30 );
 
 		set_current_screen( 'dashboard' );
 		$_GET['page']    = 'gf_settings';
@@ -113,7 +113,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'default_font_size', $options->get_settings() );
 
 		$options->set_plugin_settings();
-		$this->assertFalse( get_transient( 'gfpdf_settings_user_data' ) );
+		$this->assertFalse( get_transient( 'gfpdf_settings_user_data_' . get_current_user_id() ) );
 
 		/* An add-on writing its license info after the settings load */
 		$options->update_settings( $options->get_settings() );
@@ -827,6 +827,59 @@ class Test_Options_API extends WP_UnitTestCase {
 	public function test_failed_settings_save_keeps_the_saved_settings() {
 		global $wp_settings_errors;
 
+		$this->fail_settings_saves();
+
+		$saved = get_option( 'gfpdf_settings' );
+		update_option( 'gfpdf_settings', [ 'default_pdf_size' => 'A5' ] );
+
+		$this->assertSame( $saved, get_option( 'gfpdf_settings' ) );
+		$this->assertSame( 'A5', get_transient( 'gfpdf_settings_user_data_' . get_current_user_id() )['default_pdf_size'] );
+
+		/* A site with no settings yet doesn't get an empty array saved */
+		$wp_settings_errors = [];
+		delete_option( 'gfpdf_settings' );
+		update_option( 'gfpdf_settings', [ 'default_pdf_size' => 'A5' ] );
+
+		$this->assertFalse( get_option( 'gfpdf_settings' ) );
+
+		$wp_settings_errors = [];
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_failed_settings_save_only_redisplays_for_the_user_who_made_it() {
+		global $wp_settings_errors;
+
+		$admin   = $this->factory->user->create();
+		$another = $this->factory->user->create();
+
+		$this->fail_settings_saves();
+
+		wp_set_current_user( $admin );
+		update_option( 'gfpdf_settings', [ 'default_pdf_size' => 'A5' ] );
+
+		set_current_screen( 'dashboard' );
+		$_GET['page']    = 'gf_settings';
+		$_GET['subview'] = 'PDF';
+
+		wp_set_current_user( $another );
+		$options = clone $this->options;
+		$options->set_plugin_settings();
+		$this->assertSame( 'custom', $options->get_form_value( [ 'id' => 'default_pdf_size' ] ) );
+
+		wp_set_current_user( $admin );
+		$options = clone $this->options;
+		$options->set_plugin_settings();
+		$this->assertSame( 'A5', $options->get_form_value( [ 'id' => 'default_pdf_size' ] ) );
+
+		$wp_settings_errors = [];
+	}
+
+	/**
+	 * Post the general settings with an empty required field, so the save fails
+	 */
+	private function fail_settings_saves() {
 		$_POST['_wp_http_referer'] = '/wp-admin/admin.php?page=gf_settings&subview=PDF&tab=general';
 		$_POST['option_page']      = 'gfpdf_settings';
 
@@ -844,21 +897,6 @@ class Test_Options_API extends WP_UnitTestCase {
 		);
 
 		add_filter( 'sanitize_option_gfpdf_settings', [ $this->options, 'settings_sanitize' ] );
-
-		$saved = get_option( 'gfpdf_settings' );
-		update_option( 'gfpdf_settings', [ 'default_pdf_size' => 'A5' ] );
-
-		$this->assertSame( $saved, get_option( 'gfpdf_settings' ) );
-		$this->assertSame( 'A5', get_transient( 'gfpdf_settings_user_data' )['default_pdf_size'] );
-
-		/* A site with no settings yet doesn't get an empty array saved */
-		$wp_settings_errors = [];
-		delete_option( 'gfpdf_settings' );
-		update_option( 'gfpdf_settings', [ 'default_pdf_size' => 'A5' ] );
-
-		$this->assertFalse( get_option( 'gfpdf_settings' ) );
-
-		$wp_settings_errors = [];
 	}
 
 	/**
