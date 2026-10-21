@@ -36,6 +36,7 @@ export class ShowMessage extends Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
     error: PropTypes.bool,
+    warning: PropTypes.bool,
     delay: PropTypes.number,
     dismissable: PropTypes.bool,
     dismissableCallback: PropTypes.func
@@ -139,12 +140,16 @@ export class ShowMessage extends Component {
    * @since 4.1
    */
   render () {
-    const { text, error } = this.props
+    const { text, error, warning } = this.props
 
     let classes = 'notice inline'
 
     if (error) {
       classes = classes + ' error'
+    }
+
+    if (warning) {
+      classes = classes + ' notice-warning'
     }
 
     return this.state.visible

@@ -4,6 +4,10 @@
 %gfpdf-template-notice {
   border-color: base.$success-color;
 
+  &.notice-warning {
+    border-color: base.$warning-color;
+  }
+
   &.error {
     border-color: base.$error-color;
     color: #000;
@@ -33,9 +37,25 @@
 
     /* Container section */
     #gfpdf-template-container {
+      /* Gravity Forms forces .inline to inline-block, which shrinks the notice to its text; match the search box instead */
+      > .notice {
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 0;
+      }
+
       .theme {
         .theme-author {
           display: block;
+        }
+
+        &.add-new-theme.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+
+          a {
+            pointer-events: none;
+          }
         }
 
         .more-details {

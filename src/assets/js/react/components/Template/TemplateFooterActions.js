@@ -70,10 +70,11 @@ export class TemplateFooterActions extends Component {
             )
           : null}
 
-        {!this.props.isActiveTemplate && this.notCoreTemplate(template) && GFPDF.canManageTemplates
+        {!this.props.isActiveTemplate && this.notCoreTemplate(template) && (GFPDF.canManageTemplates || GFPDF.templateManageNotice)
           ? (
             <TemplateDeleteButton
               template={template}
+              disabled={!GFPDF.canManageTemplates}
               ajaxUrl={this.props.ajaxUrl}
               ajaxNonce={this.props.ajaxNonce}
               buttonText={this.props.templateDeleteText}

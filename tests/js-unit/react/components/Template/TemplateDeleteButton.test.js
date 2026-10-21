@@ -144,6 +144,20 @@ describe('Template - TemplateDeleteButton.js', () => {
       expect(wrapper.find('a').text()).toBe('Delete')
     })
 
+    test('disables the link', () => {
+      const ignored = shallow(<TemplateDeleteButton buttonText='Delete' disabled />).find('a')
+      const event = { preventDefault: jest.fn(), stopPropagation: jest.fn() }
+      window.confirm = jest.fn()
+
+      ignored.simulate('click', event)
+
+      expect(wrapper.find('a').prop('aria-disabled')).toBeUndefined()
+      expect(ignored.prop('aria-disabled')).toBe(true)
+      expect(ignored.hasClass('disabled')).toBe(true)
+      expect(event.preventDefault).toHaveBeenCalled()
+      expect(window.confirm).not.toHaveBeenCalled()
+    })
+
     test('check button click', () => {
       window.confirm = jest.fn().mockImplementation(() => true)
       wrapper = shallow(

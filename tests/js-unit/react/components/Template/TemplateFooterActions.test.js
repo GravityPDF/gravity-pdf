@@ -84,4 +84,23 @@ describe('Template - TemplateFooterActions.js', () => {
 
     expect(wrapper.find(selector).length).toBe(0)
   })
+
+  test('disables <TemplateDeleteButton /> when a notice says why the user cannot manage templates', () => {
+    const template = {
+      compatible: true,
+      path: '/'
+    }
+    const selector = 'withRouter(Connect(TemplateDeleteButton))'
+    const render = () => shallow(<TemplateFooterActions template={template} isActiveTemplate={false} pdfWorkingDirPath={'/'} />)
+
+    expect(render().find(selector).prop('disabled')).toBe(false)
+
+    GFPDF.canManageTemplates = false
+    GFPDF.templateManageNotice = 'File changes are disabled'
+    wrapper = render()
+    GFPDF.canManageTemplates = true
+    GFPDF.templateManageNotice = ''
+
+    expect(wrapper.find(selector).prop('disabled')).toBe(true)
+  })
 })
