@@ -58,13 +58,6 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	protected $misc;
 
 	/**
-	 * @var string
-	 *
-	 * @since 5.0
-	 */
-	protected $github_repo = 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/';
-
-	/**
 	 * Set up our dependencies
 	 *
 	 * @param LoggerInterface $log  Our logger class
@@ -163,13 +156,6 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
-		/* Extra check to verify the download URL points to the correct repo */
-		if ( strpos( $matching_fonts[0]['download_url'], $this->github_repo ) !== 0 ) {
-			$this->log->error( 'Core font list is corrupted' );
-
-			return false;
-		}
-
 		$this->misc->create_folder( $this->data->template_font_location );
 
 		$font_path = $this->data->template_font_location . $matching_fonts[0]['name'];
@@ -215,8 +201,48 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
+		if ( ! $this->is_expected_file( $font_path, (int) $matching_fonts[0]['size'], $matching_fonts[0]['sha'] ) ) {
+			wp_delete_file( $font_path );
+
+			$this->log->error(
+				'Core Font Verification Failed',
+				[
+					'name' => $matching_fonts[0]['name'],
+					'size' => $matching_fonts[0]['size'],
+					'sha'  => $matching_fonts[0]['sha'],
+				]
+			);
+
+			return false;
+		}
+
 		/* If we got here, the call was successful */
 
 		return true;
+	}
+
+	/**
+	 * Check a downloaded file against the size and git blob SHA-1 GitHub lists for it in core-fonts.json
+	 *
+	 * @param string $file
+	 * @param int    $size
+	 * @param string $sha
+	 *
+	 * @return bool
+	 *
+	 * @since 6.18.0
+	 */
+	protected function is_expected_file( $file, $size, $sha ) {
+		clearstatcache( true, $file );
+
+		if ( ! is_file( $file ) || filesize( $file ) !== $size ) {
+			return false;
+		}
+
+		$hash = hash_init( 'sha1' );
+		hash_update( $hash, 'blob ' . $size . "\0" );
+		hash_update_file( $hash, $file );
+
+		return hash_equals( $sha, hash_final( $hash ) );
 	}
 }
