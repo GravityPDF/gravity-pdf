@@ -4,6 +4,8 @@ import type { Readable } from 'stream';
 import { URL } from 'node:url';
 import GravityForms from '@self:playwright/utils/gravityforms';
 
+export type FontUpload = { name: string; mimeType: string; buffer: Buffer };
+
 export default class Pdf extends GravityForms {
 	/**
 	 * Add a PDF to a form over the plugin's REST API, returning its ID
@@ -22,6 +24,44 @@ export default class Pdf extends GravityForms {
 		});
 
 		return pdf.id;
+	}
+
+	/**
+	 * Add a custom font over the plugin's REST API
+	 * @param label
+	 * @param files each font style (regular, bold, italics, bolditalics) mapped to the file uploaded for it
+	 */
+	async addFont(label: string, files: Record<string, FontUpload>) {
+		await this.requestUtils.rest({
+			method: 'POST',
+			path: '/gravity-pdf/v1/fonts',
+			multipart: { label, ...files },
+		});
+	}
+
+	/**
+	 * Delete the custom fonts with these names over the plugin's REST API, along with their files
+	 * @param names
+	 */
+	async deleteFonts(names: string[]) {
+		if (!names.length) {
+			return;
+		}
+
+		const fonts: { id: string; font_name: string }[] =
+			await this.requestUtils.rest({ path: '/gravity-pdf/v1/fonts' });
+
+		// The delete endpoint answers with an empty body, which rest() can't parse, so it's sent as a plain request
+		const { rootURL, nonce } = this.requestUtils.storageState!;
+
+		for (const font of fonts.filter((f) => names.includes(f.font_name))) {
+			const response = await this.requestUtils.request.delete(
+				`${rootURL}gravity-pdf/v1/fonts/${font.id}`,
+				{ headers: { 'X-WP-Nonce': nonce } }
+			);
+
+			expect(response.ok()).toBe(true);
+		}
 	}
 
 	/**

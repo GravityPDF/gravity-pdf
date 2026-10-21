@@ -36,6 +36,15 @@ class TtfFontValidation implements ValidationInterface {
 	protected $message = 'Invalid ttf font file: %s';
 
 	/**
+	 * Files that already passed, so validating again before the upload doesn't parse the font a second time
+	 *
+	 * @var bool[] Keyed by the file's path
+	 *
+	 * @since 6.18.0
+	 */
+	protected $valid = [];
+
+	/**
 	 * Validate the uploaded file is a valid, readable, TTF font file
 	 *
 	 * @param FileInfoInterface $file
@@ -45,6 +54,10 @@ class TtfFontValidation implements ValidationInterface {
 	 * @since 6.0
 	 */
 	public function validate( FileInfoInterface $file ): void {
+		if ( isset( $this->valid[ $file->getPathname() ] ) ) {
+			return;
+		}
+
 		try {
 			$ttf = new TTFontFile( new FontCache( new Cache( \GPDFAPI::get_misc_class()->get_mpdf_cache_location() ) ), apply_filters( 'gpdf_mpdf_font_descriptor', 'win' ) );
 			$ttf->getMetrics( $file->getPathname(), $file->getName() );
@@ -52,6 +65,8 @@ class TtfFontValidation implements ValidationInterface {
 			if ( empty( $ttf->familyName ) ) {
 				throw new UploadException( 'Not a valid font file.' );
 			}
+
+			$this->valid[ $file->getPathname() ] = true;
 		} catch ( FontException $e ) {
 			throw new UploadException( 'Not a valid font file.' );
 		} catch ( MpdfException $e ) {

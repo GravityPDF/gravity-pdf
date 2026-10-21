@@ -4,11 +4,15 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Exceptions\GravityPdfFontNotFoundException;
+use GFPDF\Helper\Fonts\LocalFile;
+use GFPDF\Helper\Fonts\LocalFilesystem;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\File;
+use GFPDF_Vendor\GravityPdf\Upload\FileInfoInterface;
 use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
 use GPDFAPI;
 use ReflectionMethod;
@@ -30,6 +34,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group   fonts
  */
 class Test_Controller_Custom_Fonts extends TestCase {
+
+	const NOT_A_FONT = PDF_PLUGIN_DIR . '/tools/phpunit/data/forms/all-form-fields.json';
 
 	/**
 	 * @var Controller_Custom_Fonts
@@ -150,8 +156,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 	public function test_add_item_success() {
 		wp_set_current_user( $this->admin_user );
 
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
-		$request->set_param( 'label', 'Font' );
+		$request = $this->new_font_request();
 		$this->set_all_file_params( $request );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -177,8 +182,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		wp_set_current_user( $this->admin_user );
 		$gfpdf->misc->rmdir( $this->tmp_font_location );
 
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
-		$request->set_param( 'label', 'Font' );
+		$request = $this->new_font_request();
 		$this->set_all_file_params( $request );
 
 		$font = rest_get_server()->dispatch( $request )->get_data();
@@ -188,9 +192,249 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertFileExists( $this->tmp_font_location . 'index.html' );
 	}
 
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_keeps_the_filename_the_upload_library_saves() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_font_files(
+			$request,
+			[
+				'regular' => [ 'DejaVu.Sans.TTF', self::$test_fonts[0] ],
+				'bold'    => [ 'DejaVuSans (Bold).ttf', self::$test_fonts[1] ],
+			]
+		);
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame( $this->tmp_font_location . 'DejaVu-Sans.ttf', $font['regular'] );
+		$this->assertSame( $this->tmp_font_location . 'DejaVuSans -Bold.ttf', $font['bold'] );
+		$this->assertFileExists( $font['regular'] );
+		$this->assertFileExists( $font['bold'] );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_saves_styles_uploaded_under_the_same_filename() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_font_files(
+			$request,
+			[
+				'regular' => [ 'Font.ttf', self::$test_fonts[0] ],
+				'bold'    => [ 'Font.ttf', self::$test_fonts[1] ],
+			]
+		);
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame( $this->tmp_font_location . 'Font.ttf', $font['regular'] );
+		$this->assertMatchesRegularExpression( '/Font[0-9]{5}\.ttf$/', $font['bold'] );
+		$this->assertFileExists( $font['bold'] );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_saves_under_a_free_name_when_a_folder_has_the_name() {
+		wp_set_current_user( $this->admin_user );
+		mkdir( $this->tmp_font_location . 'Font.ttf' );
+
+		$request = $this->new_font_request();
+		$this->set_font_files( $request, [ 'regular' => [ 'Font.ttf', self::$test_fonts[0] ] ] );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertMatchesRegularExpression( '/Font[0-9]{5}\.ttf$/', $font['regular'] );
+		$this->assertFileExists( $font['regular'] );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_saves_a_taken_name_at_the_length_limit() {
+		wp_set_current_user( $this->admin_user );
+
+		/* The longest name the library keeps alongside .ttf */
+		$name = str_repeat( 'a', 251 ) . '.ttf';
+
+		$request = $this->new_font_request();
+		$this->set_font_files(
+			$request,
+			[
+				'regular' => [ $name, self::$test_fonts[0] ],
+				'bold'    => [ $name, self::$test_fonts[1] ],
+			]
+		);
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame( $this->tmp_font_location . $name, $font['regular'] );
+		$this->assertMatchesRegularExpression( '/\/a{246}[0-9]{5}\.ttf$/', $font['bold'] );
+		$this->assertFileExists( $font['bold'] );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_stops_retrying_when_every_name_is_taken() {
+		global $gfpdf;
+
+		wp_set_current_user( $this->admin_user );
+
+		$filesystem = get_class(
+			new class( $this->tmp_font_location ) extends LocalFilesystem {
+				public static $attempts = 0;
+
+				protected function reserveDestination( string $destinationFile, FileInfoInterface $fileInfo ): void {
+					++self::$attempts;
+
+					throw new UploadException( 'Taken', $fileInfo, ErrorCode::DESTINATION_EXISTS );
+				}
+			}
+		);
+
+		$controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, $filesystem, LocalFile::class );
+
+		$request = $this->new_font_request();
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', self::$test_fonts[0] ] ] );
+
+		$error = $controller->add_item( $request );
+
+		$this->assertSame( 10, $filesystem::$attempts );
+		$this->assertStringContainsString( 'could not be saved', $error->get_error_message( 'font_validation_error' )['regular'] );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_reports_every_rejected_style() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_font_files(
+			$request,
+			[
+				'regular' => [ 'DejaVuSans.ttf', self::NOT_A_FONT ],
+				'bold'    => [ 'DejaVuSans-Bold.ttf', self::NOT_A_FONT ],
+			]
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( [ 'regular', 'bold' ], array_keys( $response->get_data()['message'] ) );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_saves_nothing_when_a_style_is_rejected() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_font_files(
+			$request,
+			[
+				'regular' => [ 'DejaVuSans.ttf', self::$test_fonts[0] ],
+				'bold'    => [ 'DejaVuSans-Bold.ttf', self::NOT_A_FONT ],
+			]
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( [ 'bold' => 'The upload is not a valid TTF file' ], $response->get_data()['message'] );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'DejaVuSans.ttf' );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_removes_the_saved_styles_when_storing_another_fails() {
+		global $gfpdf;
+
+		wp_set_current_user( $this->admin_user );
+
+		/* Storage fails on the second style */
+		$filesystem = get_class(
+			new class( $this->tmp_font_location ) extends LocalFilesystem {
+				public static $moves = 0;
+
+				protected function moveUploadedFile( string $source, string $destination ): bool {
+					return ++self::$moves === 1 && parent::moveUploadedFile( $source, $destination );
+				}
+			}
+		);
+
+		$controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, $filesystem, LocalFile::class );
+
+		$request = $this->new_font_request();
+		$this->set_font_files(
+			$request,
+			[
+				'regular' => [ 'DejaVuSans.ttf', self::$test_fonts[0] ],
+				'bold'    => [ 'DejaVuSans-Bold.ttf', self::$test_fonts[1] ],
+			]
+		);
+
+		$error = $controller->add_item( $request );
+
+		$this->assertSame( 'font_validation_error', $error->get_error_code() );
+		$this->assertStringContainsString( 'could not be saved', $error->get_error_message( 'font_validation_error' )['bold'] );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'DejaVuSans.ttf' );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'DejaVuSans-Bold.ttf' );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_removes_the_uploaded_files_when_a_font_file_goes_missing() {
+		global $gfpdf;
+
+		wp_set_current_user( $this->admin_user );
+
+		$controller = new class( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, LocalFilesystem::class, LocalFile::class ) extends Controller_Custom_Fonts {
+			protected function does_fonts_support_otl( array $files ): bool {
+				throw new GravityPdfFontNotFoundException( '{}' );
+			}
+		};
+
+		$request = $this->new_font_request();
+		$this->set_all_file_params( $request );
+
+		$error = $controller->add_item( $request );
+
+		$this->assertSame( 'font_file_gone_missing', $error->get_error_code() );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'DejaVuSans.ttf' );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'DejaVuSerifCondensed.ttf' );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_add_item_removes_the_uploaded_files_when_the_font_is_not_saved() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_all_file_params( $request );
+
+		$this->block_settings_update();
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 500, $response->get_status() );
+		$this->assertSame( 'database_error', $response->get_data()['code'] );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'DejaVuSans.ttf' );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'DejaVuSerifCondensed.ttf' );
+	}
+
 	public function test_add_item_permission_failed() {
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
-		$request->set_param( 'label', 'Font' );
+		$request = $this->new_font_request();
 		$this->set_all_file_params( $request );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -227,23 +471,10 @@ class Test_Controller_Custom_Fonts extends TestCase {
 	public function test_add_item_font_validation_failed() {
 		wp_set_current_user( $this->admin_user );
 
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
-		$request->set_param( 'label', 'Font' );
+		$request = $this->new_font_request();
 
 		/* JSON file masquerading as a ttf file */
-		$test_file = PDF_PLUGIN_DIR . '/tools/phpunit/data/forms/all-form-fields.json';
-
-		$_FILES = [
-			'regular' => [
-				'file'     => file_get_contents( $test_file ),
-				'name'     => 'DejaVuSans.ttf',
-				'size'     => filesize( $test_file ),
-				'tmp_name' => $test_file,
-				'error'    => UPLOAD_ERR_OK,
-			],
-		];
-
-		$request->set_file_params( $_FILES );
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', self::NOT_A_FONT ] ] );
 
 		$response = rest_get_server()->dispatch( $request );
 
@@ -251,19 +482,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertSame( 'The upload is not a valid TTF file', $response->get_data()['message']['regular'] );
 
 		/* TTF file masquerading as a JSON file */
-		$test_file = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/DejaVuSans.ttf';
-
-		$_FILES = [
-			'regular' => [
-				'file'     => file_get_contents( $test_file ),
-				'name'     => 'DejaVuSans.json',
-				'size'     => filesize( $test_file ),
-				'tmp_name' => $test_file,
-				'error'    => UPLOAD_ERR_OK,
-			],
-		];
-
-		$request->set_file_params( $_FILES );
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.json', self::$test_fonts[0] ] ] );
 
 		$response = rest_get_server()->dispatch( $request );
 
@@ -276,19 +495,8 @@ class Test_Controller_Custom_Fonts extends TestCase {
 	public function test_add_item_upload_error_message( int $upload_error, string $expected ) {
 		wp_set_current_user( $this->admin_user );
 
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
-		$request->set_param( 'label', 'Font' );
-
-		$_FILES = [
-			'regular' => [
-				'name'     => 'DejaVuSans.ttf',
-				'size'     => 0,
-				'tmp_name' => '',
-				'error'    => $upload_error,
-			],
-		];
-
-		$request->set_file_params( $_FILES );
+		$request = $this->new_font_request();
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', '', $upload_error ] ] );
 
 		$response = rest_get_server()->dispatch( $request );
 
@@ -320,10 +528,9 @@ class Test_Controller_Custom_Fonts extends TestCase {
 			$method->setAccessible( true );
 		}
 
-		$file  = new File( 'regular', new FileSystem( $this->tmp_font_location ) );
-		$error = new UploadException( 'File could not be moved to final destination.', null, ErrorCode::MOVE_FAILED );
+		$file = new File( 'regular', new FileSystem( $this->tmp_font_location ) );
 
-		$this->assertStringContainsString( 'could not be saved', $method->invoke( $this->controller, $file, $error ) );
+		$this->assertStringContainsString( 'could not be saved', $method->invoke( $this->controller, $file, ErrorCode::MOVE_FAILED ) );
 	}
 
 	public function test_update_item_success() {
@@ -338,7 +545,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		wp_set_current_user( $this->admin_user );
 
 		/* Replace with new Font files and label */
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
+		$request = $this->update_font_request( 'lato' );
 		$request->set_param( 'label', 'Font' );
 		$this->set_all_file_params( $request );
 
@@ -389,6 +596,100 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
 	}
 
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_update_item_deletes_the_files_it_replaces_or_removes() {
+		wp_set_current_user( $this->admin_user );
+		$font = $this->add_font_with_all_styles();
+
+		$request = $this->update_font_request( $font['id'] );
+		$request->set_param( 'bold', '' );
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', self::$test_fonts[0] ] ] );
+
+		$updated = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame( '', $updated['bold'] );
+		$this->assertNotSame( $font['regular'], $updated['regular'] );
+		$this->assertFileExists( $updated['regular'] );
+		$this->assertFileDoesNotExist( $font['regular'] );
+		$this->assertFileDoesNotExist( $font['bold'] );
+		$this->assertFileExists( $font['italics'] );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_update_item_keeps_the_font_when_an_upload_is_rejected() {
+		wp_set_current_user( $this->admin_user );
+		$font = $this->add_font_with_all_styles();
+
+		$request = $this->update_font_request( $font['id'] );
+		$request->set_param( 'bold', '' );
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', self::NOT_A_FONT ] ] );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( $font, $this->model->get_font_by_id( $font['id'] ) );
+		$this->assertFileExists( $font['regular'] );
+		$this->assertFileExists( $font['bold'] );
+	}
+
+	/**
+	 * @dataProvider provider_update_item_failure
+	 *
+	 * @since 6.18.0
+	 */
+	public function test_update_item_keeps_the_font_as_it_was_when_it_is_not_saved( string $failure ) {
+		wp_set_current_user( $this->admin_user );
+		$font = $this->add_font_with_all_styles();
+
+		$request = $this->update_font_request( $font['id'] );
+		$request->set_param( 'bold', '' );
+		$this->set_font_files( $request, [ 'regular' => [ 'Replacement.ttf', self::$test_fonts[0] ] ] );
+
+		if ( $failure === 'database' ) {
+			$this->block_settings_update();
+		} else {
+			$request->set_param( 'useKashida', 200 );
+		}
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 500, $response->get_status() );
+		$this->assertSame( $font, $this->model->get_font_by_id( $font['id'] ) );
+		$this->assertFileExists( $font['regular'] );
+		$this->assertFileExists( $font['bold'] );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . 'Replacement.ttf' );
+	}
+
+	public function provider_update_item_failure(): array {
+		return [
+			'database save fails'           => [ 'database' ],
+			'invalid Kashida after the move' => [ 'kashida' ],
+		];
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_update_item_keeps_an_upload_saved_under_the_name_of_a_missing_file() {
+		wp_set_current_user( $this->admin_user );
+		$font = $this->add_font_with_all_styles();
+
+		/* The new upload takes the free name of the file the font is replacing */
+		unlink( $font['regular'] );
+
+		$request = $this->update_font_request( $font['id'] );
+		$this->set_font_files( $request, [ 'regular' => [ basename( $font['regular'] ), self::$test_fonts[0] ] ] );
+
+		$updated = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame( $font['regular'], $updated['regular'] );
+		$this->assertFileExists( $updated['regular'] );
+	}
+
 	public function test_update_item_permission_failed() {
 		GPDFAPI::add_pdf_font(
 			[
@@ -397,7 +698,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 			]
 		);
 
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
+		$request = $this->update_font_request( 'lato' );
 		$request->set_param( 'label', 'Font' );
 		$this->set_all_file_params( $request );
 
@@ -417,7 +718,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		wp_set_current_user( $this->admin_user );
 
 		/* Test with an invalid label */
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
+		$request = $this->update_font_request( 'lato' );
 		$request->set_param( 'label', 'Font-Name' );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -429,7 +730,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		wp_set_current_user( $this->admin_user );
 
 		/* Test with an invalid label */
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
+		$request = $this->update_font_request( 'lato' );
 		$request->set_param( 'label', 'Font Name' );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -447,41 +748,17 @@ class Test_Controller_Custom_Fonts extends TestCase {
 
 		wp_set_current_user( $this->admin_user );
 
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
+		$request = $this->update_font_request( 'lato' );
 
 		/* JSON file masquerading as a ttf file */
-		$test_file = PDF_PLUGIN_DIR . '/tools/phpunit/data/forms/all-form-fields.json';
-
-		$_FILES = [
-			'regular' => [
-				'file'     => file_get_contents( $test_file ),
-				'name'     => 'DejaVuSans.ttf',
-				'size'     => filesize( $test_file ),
-				'tmp_name' => $test_file,
-				'error'    => UPLOAD_ERR_OK,
-			],
-		];
-
-		$request->set_file_params( $_FILES );
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', self::NOT_A_FONT ] ] );
 
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 400, $response->get_status() );
 
 		/* TTF file masquerading as a JSON file */
-		$test_file = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/DejaVuSans.ttf';
-
-		$_FILES = [
-			'regular' => [
-				'file'     => file_get_contents( $test_file ),
-				'name'     => 'DejaVuSans.json',
-				'size'     => filesize( $test_file ),
-				'tmp_name' => $test_file,
-				'error'    => UPLOAD_ERR_OK,
-			],
-		];
-
-		$request->set_file_params( $_FILES );
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.json', self::$test_fonts[0] ] ] );
 
 		$response = rest_get_server()->dispatch( $request );
 
@@ -492,8 +769,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		wp_set_current_user( $this->admin_user );
 
 		/* Create font */
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
-		$request->set_param( 'label', 'Font' );
+		$request = $this->new_font_request();
 		$this->set_all_file_params( $request );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -540,41 +816,66 @@ class Test_Controller_Custom_Fonts extends TestCase {
 	}
 
 	protected function set_all_file_params( WP_REST_Request $request ) {
-		$_FILES = [
-			'regular'     => [
-				'file'     => file_get_contents( self::$test_fonts[0] ),
-				'name'     => 'DejaVuSans.ttf',
-				'size'     => filesize( self::$test_fonts[0] ),
-				'tmp_name' => self::$test_fonts[0],
-				'error'    => UPLOAD_ERR_OK,
-			],
+		$this->set_font_files(
+			$request,
+			[
+				'regular'     => [ 'DejaVuSans.ttf', self::$test_fonts[0] ],
+				'bold'        => [ 'DejaVuSans-Bold.ttf', self::$test_fonts[1] ],
+				'italics'     => [ 'DejaVuSansCondensed.ttf', self::$test_fonts[2] ],
+				'bolditalics' => [ 'DejaVuSerifCondensed.ttf', self::$test_fonts[3] ],
+			]
+		);
+	}
 
-			'bold'        => [
-				'file'     => file_get_contents( self::$test_fonts[1] ),
-				'name'     => 'DejaVuSans-Bold.ttf',
-				'size'     => filesize( self::$test_fonts[1] ),
-				'tmp_name' => self::$test_fonts[1],
-				'error'    => UPLOAD_ERR_OK,
-			],
+	protected function new_font_request(): WP_REST_Request {
+		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
+		$request->set_param( 'label', 'Font' );
 
-			'italics'     => [
-				'file'     => file_get_contents( self::$test_fonts[2] ),
-				'name'     => 'DejaVuSansCondensed.ttf',
-				'size'     => filesize( self::$test_fonts[2] ),
-				'tmp_name' => self::$test_fonts[2],
-				'error'    => UPLOAD_ERR_OK,
-			],
+		return $request;
+	}
 
-			'bolditalics' => [
-				'file'     => file_get_contents( self::$test_fonts[3] ),
-				'name'     => 'DejaVuSerifCondensed.ttf',
-				'size'     => filesize( self::$test_fonts[3] ),
-				'tmp_name' => self::$test_fonts[3],
-				'error'    => UPLOAD_ERR_OK,
-			],
-		];
+	protected function update_font_request( string $id ): WP_REST_Request {
+		return new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $id );
+	}
+
+	/**
+	 * @param array $files Each font style mapped to the [ filename, path, upload error (optional) ] uploaded for it
+	 */
+	protected function set_font_files( WP_REST_Request $request, array $files ) {
+		$_FILES = array_map(
+			function ( array $file ): array {
+				$error = $file[2] ?? UPLOAD_ERR_OK;
+
+				return [
+					'name'     => $file[0],
+					'size'     => $error === UPLOAD_ERR_OK ? filesize( $file[1] ) : 0,
+					'tmp_name' => $file[1],
+					'error'    => $error,
+				];
+			},
+			$files
+		);
 
 		$request->set_file_params( $_FILES );
+	}
+
+	protected function add_font_with_all_styles(): array {
+		$request = $this->new_font_request();
+		$this->set_all_file_params( $request );
+
+		return rest_get_server()->dispatch( $request )->get_data();
+	}
+
+	/* Make the next settings save report a failure */
+	protected function block_settings_update() {
+		add_filter(
+			'pre_update_option_gfpdf_settings',
+			function ( $value, $old_value ) {
+				return $old_value;
+			},
+			10,
+			2
+		);
 	}
 
 	public function test_get_absolute_font_path() {

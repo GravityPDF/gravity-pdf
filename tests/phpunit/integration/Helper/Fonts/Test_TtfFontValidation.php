@@ -30,9 +30,8 @@ class Test_TtfFontValidation extends TestCase {
 	}
 
 	public function test_validate_throws_for_non_ttf_content(): void {
-		$tmp = tempnam( sys_get_temp_dir(), 'gfpdf_ttf_' ) . '.ttf';
+		$tmp = $this->tmp_ttf();
 		file_put_contents( $tmp, 'not a real ttf' );
-		$this->tmp_files[] = $tmp;
 
 		$file_info  = new FileInfo( $tmp, 'bad.ttf' );
 		$validation = new TtfFontValidation();
@@ -67,5 +66,33 @@ class Test_TtfFontValidation extends TestCase {
 
 		$this->expectNotToPerformAssertions();
 		$validation->validate( $file_info );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_validate_does_not_parse_a_file_that_already_passed(): void {
+		$tmp = $this->tmp_ttf();
+		copy( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/DejaVuSans.ttf', $tmp );
+
+		$file_info  = new FileInfo( $tmp, 'DejaVuSans.ttf' );
+		$validation = new TtfFontValidation();
+		$validation->validate( $file_info );
+
+		/* Parsing it again would fail now it's no longer a font */
+		file_put_contents( $tmp, 'not a real ttf' );
+		$validation->validate( $file_info );
+
+		$this->expectException( UploadException::class );
+		( new TtfFontValidation() )->validate( $file_info );
+	}
+
+	/* A .ttf path in the temp folder, cleaned up along with the empty file tempnam() reserves it beside */
+	private function tmp_ttf(): string {
+		$base              = tempnam( sys_get_temp_dir(), 'gfpdf_ttf_' );
+		$this->tmp_files[] = $base;
+		$this->tmp_files[] = $base . '.ttf';
+
+		return $base . '.ttf';
 	}
 }
