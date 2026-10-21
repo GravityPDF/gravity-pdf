@@ -6,6 +6,7 @@ namespace GFPDF\Controller;
 
 use GFPDF\Tests\Integration\TestCase;
 use ReflectionMethod;
+use WP_Error;
 
 /**
  * @package GFPDF\Controller
@@ -14,6 +15,8 @@ use ReflectionMethod;
  * @group   core-fonts
  */
 class Test_Controller_Save_Core_Fonts extends TestCase {
+
+	private const FONT = 'Aegean.otf';
 
 	/**
 	 * @var Controller_Save_Core_Fonts
@@ -29,7 +32,10 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 	}
 
 	public function tear_down(): void {
+		global $gfpdf;
+
 		unset( $_POST['font_name'] );
+		wp_delete_file( $gfpdf->data->template_font_location . self::FONT );
 
 		parent::tear_down();
 	}
@@ -52,6 +58,74 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		$_POST['font_name'] = 'NotARealFont.ttf';
 
 		$this->assertFalse( $this->invoke_download() );
+	}
+
+	public function test_successful_download_keeps_the_font() {
+		$font = $this->stream_font_with_response( $this->http_response( 200 ) );
+
+		$this->assertTrue( $this->invoke_download() );
+		$this->assertFileExists( $font );
+	}
+
+	/**
+	 * @dataProvider provider_failed_download
+	 */
+	public function test_failed_download_removes_the_partly_written_font( $response ) {
+		$font = $this->stream_font_with_response( $response );
+
+		$this->assertFalse( $this->invoke_download() );
+		$this->assertFileDoesNotExist( $font );
+	}
+
+	public function provider_failed_download(): array {
+		return [
+			'request error' => [ new WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' ) ],
+			'rate limited'  => [ $this->http_response( 429 ) ],
+			'server error'  => [ $this->http_response( 500 ) ],
+		];
+	}
+
+	public function test_unapproved_font_leaves_existing_files_alone() {
+		$font = $this->seed_font();
+
+		$_POST['font_name'] = '../' . self::FONT;
+
+		$this->assertFalse( $this->invoke_download() );
+		$this->assertFileExists( $font );
+	}
+
+	/**
+	 * Writes the font as WordPress does before a streamed request
+	 */
+	private function seed_font(): string {
+		global $gfpdf;
+
+		$font = $gfpdf->data->template_font_location . self::FONT;
+		wp_mkdir_p( $gfpdf->data->template_font_location );
+		file_put_contents( $font, 'partial' );
+
+		return $font;
+	}
+
+	private function stream_font_with_response( $response ): string {
+		$_POST['font_name'] = self::FONT;
+		add_filter(
+			'pre_http_request',
+			static function () use ( $response ) {
+				return $response;
+			}
+		);
+
+		return $this->seed_font();
+	}
+
+	private function http_response( int $code ): array {
+		return [
+			'headers'  => [],
+			'body'     => '',
+			'response' => [ 'code' => $code ],
+			'cookies'  => [],
+		];
 	}
 
 	private function invoke_download() {
