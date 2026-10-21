@@ -310,7 +310,7 @@ class Helper_Templates {
 	 * Get the PDF template path by the template name
 	 *
 	 * @param string  $template_id  The PDF template name/ID
-	 * @param boolean $include_core Whether to check in the core plugin template folder
+	 * @param boolean $include_core Whether to check in the core plugin and add-on template folders
 	 *
 	 * @return string The full path to the matching template
 	 *
@@ -338,7 +338,8 @@ class Helper_Templates {
 			return $path_to_test;
 		}
 
-		$fallback_template = apply_filters( 'gfpdf_fallback_template_path_by_id', false, $template_id );
+		/* Check if template found in add-on template folders (searched alongside core) */
+		$fallback_template = $include_core ? apply_filters( 'gfpdf_fallback_template_path_by_id', false, $template_id ) : false;
 		if ( is_string( $fallback_template ) ) {
 			return $fallback_template;
 		}
@@ -650,9 +651,8 @@ class Helper_Templates {
 
 		if ( $include_core ) {
 			$config_paths[] = PDF_PLUGIN_DIR . 'src/templates/config/';
+			$config_paths   = apply_filters( 'gfpdf_template_config_paths', $config_paths );
 		}
-
-		$config_paths = apply_filters( 'gfpdf_template_config_paths', $config_paths );
 
 		foreach ( $config_paths as $path ) {
 			$file = realpath( $path . $template_id . '.php' );
@@ -797,7 +797,7 @@ class Helper_Templates {
 	 *
 	 * @param string $template     The template name to look for
 	 * @param string $type         Either 'url' or 'path'
-	 * @param bool   $include_core Whether to include the core PDF templates
+	 * @param bool   $include_core Whether to include the core and add-on PDF templates
 	 *
 	 * @return string Full URL to image
 	 *
@@ -816,9 +816,8 @@ class Helper_Templates {
 
 		if ( $include_core ) {
 			$image_paths[ PDF_PLUGIN_URL . 'src/templates/images/' ] = PDF_PLUGIN_DIR . 'src/templates/images/';
+			$image_paths = apply_filters( 'gfpdf_template_image_paths', $image_paths );
 		}
-
-		$image_paths = apply_filters( 'gfpdf_template_image_paths', $image_paths );
 
 		/* Check if our image exists in one of our directories and return the URL */
 		$template .= '.png';

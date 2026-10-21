@@ -673,6 +673,68 @@ class Test_Templates extends TestCase {
 	}
 
 	/**
+	 * @since 6.18.0
+	 */
+	public function test_delete_template_skips_add_on_config_tear_down() {
+		global $gfpdf;
+
+		$template_id = 'phpunit-addon-teardown';
+		$addon       = $gfpdf->data->template_location . 'addon/';
+		$marker      = $addon . 'torn-down';
+
+		wp_mkdir_p( $addon . 'config' );
+		file_put_contents(
+			$addon . 'config/' . $template_id . '.php',
+			"<?php\nnamespace GFPDF\Templates\Config;\nclass Phpunit_Addon_Teardown implements \GFPDF\Helper\Helper_Interface_Setup_TearDown {\n\tpublic function setUp() {}\n\tpublic function tearDown() { touch( '$marker' ); }\n}\n"
+		);
+		touch( $gfpdf->data->template_location . $template_id . '.php' );
+
+		add_filter(
+			'gfpdf_template_config_paths',
+			function ( $paths ) use ( $addon ) {
+				$paths[] = $addon . 'config/';
+
+				return $paths;
+			}
+		);
+
+		try {
+			$this->model->delete_template( $template_id );
+
+			$this->assertFileDoesNotExist( $gfpdf->data->template_location . $template_id . '.php' );
+			$this->assertFileExists( $addon . 'config/' . $template_id . '.php' );
+			$this->assertFileDoesNotExist( $marker );
+		} finally {
+			$gfpdf->misc->rmdir( $addon );
+			@unlink( $gfpdf->data->template_location . $template_id . '.php' ); //phpcs:ignore
+		}
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_delete_template_never_unlinks_outside_the_working_folder() {
+		global $gfpdf;
+
+		$outside = get_temp_dir() . 'phpunit-outside-working-folder.php';
+		touch( $outside );
+
+		$templates = $this->getMockBuilder( Helper_Templates::class )
+			->setConstructorArgs( [ $gfpdf->log, $gfpdf->data, $gfpdf->gform ] )
+			->onlyMethods( [ 'get_template_files_by_id' ] )
+			->getMock();
+		$templates->method( 'get_template_files_by_id' )->willReturn( [ $outside ] );
+
+		try {
+			( new Model_Templates( $templates, $gfpdf->log, $gfpdf->data, $gfpdf->misc ) )->delete_template( 'outside' );
+
+			$this->assertFileExists( $outside );
+		} finally {
+			@unlink( $outside ); //phpcs:ignore
+		}
+	}
+
+	/**
 	 * Check our unzipped directory is correctly cleaned up
 	 *
 	 * @since 4.1
