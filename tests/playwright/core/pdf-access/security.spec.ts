@@ -202,4 +202,25 @@ test.describe('PDF Security and Access Policies', () => {
 			'Public PDF.pdf'
 		);
 	});
+
+	test('should show markup in the entry as text in the ?data=1 view', async ({
+		page,
+	}: {
+		page: Page;
+	}) => {
+		const pdfId = await pdf.addPdf(form.id, 'Form Data PDF');
+		const entry = await pdf.createEntry({
+			form_id: form.id,
+			source_url:
+				'http://example.org/?x=<b id="gpdf-data-probe">probe</b>',
+		});
+
+		await page.setExtraHTTPHeaders({ 'X-GPDF-E2E-Debug-Mode': 'yes' });
+		await page.goto(`/?gpdf=1&pid=${pdfId}&lid=${entry.id}&data=1`);
+
+		await expect(page.locator('pre')).toContainText(
+			'<b id="gpdf-data-probe">probe</b>'
+		);
+		await expect(page.locator('#gpdf-data-probe')).toHaveCount(0);
+	});
 });

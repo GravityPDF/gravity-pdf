@@ -179,7 +179,7 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 			user_agent: `[gravitypdf id="${pdfId}" raw="1"]`,
 		});
 
-		const formData = await pdf.getPdfDebugOutput(pdfId, entry.id, 'data');
+		const formData = await pdf.getPdfFormData(pdfId, entry.id);
 
 		expect(formData).toContain('&#91;gravitypdf');
 		expect(formData).not.toMatch(/\[gravitypdf id="\d+" raw="1"\]/);
