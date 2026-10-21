@@ -691,9 +691,10 @@ class View_PDF extends Helper_Abstract_View {
 			return;
 		}
 
+		/* esc_textarea() double-encodes, so the values show exactly as stored, entities included */
 		print '<pre>';
 		/* phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r */
-		print_r( $form_data );
+		print esc_textarea( print_r( $form_data, true ) );
 		print '</pre>';
 
 		exit;
