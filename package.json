@@ -85,7 +85,7 @@
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
-    "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
+    "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/?ref=v1.0.0 core-fonts.json",
     "build:dev": "cross-env NODE_ENV=development webpack --watch",
     "build:production": "cross-env NODE_ENV=production webpack",
     "wp-env": "wp-env",

@@ -813,6 +813,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	public function test_ajax_save_core_font() {
+		global $gfpdf;
+
 		/* set up our post data and role */
 		$this->_setRole( 'administrator' );
 
@@ -839,16 +841,19 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->_last_response = '';
 
 		/* Test that a core font API download request gets made */
-		$_POST['font_name'] = 'Aegean.otf';
+		$font               = 'DejaVuSerifCondensed.ttf';
+		$_POST['font_name'] = $font;
 
-		$api_response = function() {
+		$api_response = function( $pre, $args ) use ( $font ) {
+			copy( __DIR__ . '/fonts/' . $font, $args['filename'] );
+
 			return [
 				'response' => [ 'code' => 200 ],
 				'body'     => '',
 			];
 		};
 
-		add_filter( 'pre_http_request', $api_response );
+		add_filter( 'pre_http_request', $api_response, 10, 2 );
 
 		try {
 			$this->_handleAjax( 'gfpdf_save_core_font' );
@@ -857,6 +862,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		}
 
 		remove_filter( 'pre_http_request', $api_response );
+		wp_delete_file( $gfpdf->data->template_font_location . $font );
 
 		$this->assertTrue( json_decode( $this->_last_response ) );
 	}
