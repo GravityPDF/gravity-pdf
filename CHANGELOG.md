@@ -12,6 +12,7 @@
 * 🔒 Security: Upgrade the bundled upload library to 4.0
 * 🔒 Security: Harden PDF links in entry exports
 * 🔒 Security: Escape the ?data=1 debug output
+* 🔒 Security: Redact user records in log files
 * 🧹 Housekeeping: Stop checking for the existence of Gravity PDF folders on every page load
 * 🧹 Housekeeping: Create the background processing queue once per request
 * 🧹 Housekeeping: Only flush a font from the cache when it's added, edited or deleted

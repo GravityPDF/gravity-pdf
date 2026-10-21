@@ -7,6 +7,8 @@ use GFPDF\Helper\Helper_Abstract_Addon;
 use GFPDF\Helper\Helper_Logger;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Singleton;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger as MonoLogger;
 use WP_Ajax_UnitTestCase;
 use WPAjaxDieContinueException;
 use WPAjaxDieStopException;
@@ -366,6 +368,44 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_authentication_logs_only_the_refused_user_id() {
+		global $gfpdf;
+
+		$user_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		wp_set_current_user( $user_id );
+
+		$_POST['fid']   = $this->form_id;
+		$_POST['pid']   = $this->pid;
+		$_POST['nonce'] = wp_create_nonce( "gfpdf_delete_nonce_{$this->form_id}_{$this->pid}" );
+
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+
+		try {
+			$this->_handleAjax( 'gfpdf_list_delete' );
+			$this->fail( 'Expected WPAjaxDieStopException (401) was not thrown.' );
+		} catch ( WPAjaxDieStopException $e ) {
+			$this->assertSame( '401', $e->getMessage() );
+		} finally {
+			$gfpdf->log->popHandler();
+		}
+
+		$this->assertTrue(
+			$handler->hasRecordThatPasses(
+				function ( $record ) use ( $user_id ) {
+					return $record['context'] === [
+						'user'              => $user_id,
+						'capability_needed' => 'gravityforms_edit_forms',
+					];
+				},
+				MonoLogger::CRITICAL
+			)
+		);
+	}
+
+	/**
 	 * Testing Model_Templates.php wp_ajax_gfpdf_upload_template
 	 *
 	 * Because this AJAX endpoint is suppose to have a zip file POSTed,
@@ -529,6 +569,35 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
 
 		$this->assertSame( '400', $this->get_template_endpoint_response_code( 'gfpdf_upload_template' ) );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_ajax_template_endpoints_log_only_the_refused_user_id() {
+		global $gfpdf;
+
+		$user_id = $this->factory->user->create( [ 'role' => 'editor' ] );
+		wp_set_current_user( $user_id );
+
+		$handler = new TestHandler();
+		$gfpdf->log->pushHandler( $handler );
+		$code = $this->get_template_endpoint_response_code( 'gfpdf_upload_template' );
+		$gfpdf->log->popHandler();
+
+		$this->assertSame( '403', $code );
+		$this->assertTrue(
+			$handler->hasRecordThatPasses(
+				function ( $record ) use ( $user_id ) {
+					return $record['context'] === [
+						'type'              => 'Process Uploaded Template Zip Package',
+						'user'              => $user_id,
+						'capability_needed' => 'upload_plugins',
+					];
+				},
+				MonoLogger::CRITICAL
+			)
+		);
 	}
 
 	/**
