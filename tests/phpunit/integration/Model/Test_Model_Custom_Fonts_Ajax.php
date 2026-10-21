@@ -35,16 +35,19 @@ class Test_Model_Custom_Fonts_Ajax extends AjaxTestCase {
 
 		$this->_last_response = '';
 
-		$_POST['font_name'] = 'Aegean.otf';
+		$font               = 'DejaVuSerifCondensed.ttf';
+		$_POST['font_name'] = $font;
 
-		$api_response = function () {
+		$api_response = function ( $pre, $args ) use ( $font ) {
+			copy( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . $font, $args['filename'] );
+
 			return [
 				'response' => [ 'code' => 200 ],
 				'body'     => '',
 			];
 		};
 
-		add_filter( 'pre_http_request', $api_response );
+		add_filter( 'pre_http_request', $api_response, 10, 2 );
 
 		try {
 			$this->_handleAjax( 'gfpdf_save_core_font' );
@@ -54,5 +57,6 @@ class Test_Model_Custom_Fonts_Ajax extends AjaxTestCase {
 		}
 
 		remove_filter( 'pre_http_request', $api_response );
+		wp_delete_file( $this->gfpdf()->data->template_font_location . $font );
 	}
 }
