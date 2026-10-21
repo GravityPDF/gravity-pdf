@@ -271,13 +271,21 @@ class Test_Uninstaller extends TestCase {
 	}
 
 	public function test_remove_plugin_transients_clears_settings_user_data_transient() {
-		set_transient( 'gfpdf_settings_user_data', [ 'key' => 'value' ], HOUR_IN_SECONDS );
+		$transients = [
+			'gfpdf_settings_user_data_' . get_current_user_id(),
+			'gfpdf_settings_user_data_999',
+			'gfpdf_settings_user_data',
+		];
 
-		$this->assertNotFalse( get_transient( 'gfpdf_settings_user_data' ) );
+		foreach ( $transients as $transient ) {
+			set_transient( $transient, [ 'key' => 'value' ], HOUR_IN_SECONDS );
+		}
 
 		$this->model->remove_plugin_transients();
 
-		$this->assertFalse( get_transient( 'gfpdf_settings_user_data' ) );
+		foreach ( $transients as $transient ) {
+			$this->assertFalse( get_transient( $transient ), $transient );
+		}
 	}
 
 	public function test_deactivate_plugin_defaults_basename_when_empty() {
