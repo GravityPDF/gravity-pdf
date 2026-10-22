@@ -1162,7 +1162,7 @@ class Test_Options_API extends WP_UnitTestCase {
 			[
 				'rich_editor',
 				'<strong>Test</strong> <script>console.log("test");</script>',
-				'<strong>Test</strong> console.log("test");',
+				'<strong>Test</strong> ',
 			],
 
 			[

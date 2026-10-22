@@ -105,6 +105,23 @@ class Test_Kses extends WP_UnitTestCase {
 			[ '', "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\X1C\x1D\x1E\x1F" ],
 			[ 'hello world. WORDPRESS KSES./', "\x1Fh\x1Ee\x1Dl\x1Cl\x1Bo\x1A \x19w\x18o\x17r\x16l\x15d\x14.\x13 \x12W\x11O\x10R\x0FD\x0EP\x0CR\x0BE\x08S\x07S\x06 \x05K\x04S\X03E\x02S\x01.\x00/" ],
 			[ 'This <div style="float:left"> is more of a concern.', 'This <div style="float:\\0left"> is more of a concern.' ],
+			[ '<p>a</p><p>b</p>', '<p>a</p><script>if ( x < 1 ) { y(); }</script><p>b</p>' ],
+			[ '<p>a</p><p>b</p>', "<p>a</p><SCRIPT type=\"text/javascript\">\njQuery( function() {\n\ty();\n} );\n</Script ><p>b</p>" ],
+			[ '<p>a</p><p>b</p><p>c</p>', '<p>a</p><script src="https://example.com/a.js"></script><p>b</p><script>z();</script><p>c</p>' ],
+			[ 'Fallback', '<noscript>Fallback</noscript>' ],
 		];
+	}
+
+	public function test_parse_keeps_content_when_script_regex_fails() {
+		$limit = ini_get( 'pcre.backtrack_limit' );
+		ini_set( 'pcre.backtrack_limit', '1000' );
+
+		$script = str_repeat( 'y();', 5000 );
+
+		try {
+			$this->assertSame( "<p>a</p>$script<p>b</p>", Kses::parse( "<p>a</p><script>$script</script><p>b</p>" ) );
+		} finally {
+			ini_set( 'pcre.backtrack_limit', $limit );
+		}
 	}
 }

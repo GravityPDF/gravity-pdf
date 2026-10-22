@@ -2611,6 +2611,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/\<table autosize="1"\>\<\/table\>/', $html );
 		$this->assertMatchesRegularExpression( '/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html );
 		$this->assertMatchesRegularExpression( '/\<barcode code="04210000526" type="UPCE" \/\>/', $html );
+		$this->assertSame( '<p>a</p>', wp_kses_post( '<p>a</p><script>y();</script>' ) );
 
 		do_action(
 			'gfpdf_post_pdf_generation',
@@ -2637,6 +2638,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertDoesNotMatchRegularExpression( '/\<table autosize="1"\>\<\/table\>/', $html );
 		$this->assertDoesNotMatchRegularExpression( '/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html );
 		$this->assertDoesNotMatchRegularExpression( '/\<barcode code="04210000526" type="UPCE" \/\>/', $html );
+		$this->assertSame( '<p>a</p>y();', wp_kses_post( '<p>a</p><script>y();</script>' ) );
 
 	}
 }
