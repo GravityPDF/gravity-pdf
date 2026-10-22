@@ -643,6 +643,9 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function begin_pdf() {
+		/* A deleted tmp folder is recreated with its protection, before mPDF makes it without */
+		$this->misc->create_mpdf_cache_folders();
+
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
 		$this->mpdf = new Mpdf(
