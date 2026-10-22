@@ -8,6 +8,7 @@ use Error;
 use Exception;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Statics\Kses;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF\View\View_PDF;
 use GPDFAPI;
@@ -105,6 +106,7 @@ class Test_Controller_PDF extends TestCase {
 
 		$this->assertNotFalse( has_filter( 'wp_kses_allowed_html' ) );
 		$this->assertNotFalse( has_filter( 'safe_style_css' ) );
+		$this->assertNotFalse( has_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] ) );
 	}
 
 	public function test_remove_pre_pdf_hooks_unregisters_kses_filters() {
@@ -113,6 +115,15 @@ class Test_Controller_PDF extends TestCase {
 
 		$this->assertFalse( has_filter( 'wp_kses_allowed_html', [ $this->controller->view, 'allow_pdf_html' ] ) );
 		$this->assertFalse( has_filter( 'safe_style_css', [ $this->controller->view, 'allow_pdf_css' ] ) );
+		$this->assertFalse( has_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] ) );
+	}
+
+	public function test_pre_pdf_hooks_strip_scripts_from_wp_kses_post() {
+		$this->controller->add_pre_pdf_hooks();
+		$html = wp_kses_post( '<p>a</p><script>y();</script>' );
+		$this->controller->remove_pre_pdf_hooks();
+
+		$this->assertSame( '<p>a</p>', $html );
 	}
 
 	/**
