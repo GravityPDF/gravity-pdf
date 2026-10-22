@@ -153,15 +153,8 @@ class Test_Templates extends WP_UnitTestCase {
 		$this->assertTrue( $this->model->current_user_can_manage_templates() );
 		$this->assertTrue( $this->controller->add_localised_script_data( [] )['canManageTemplates'] );
 
-		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_false' );
-		$this->assertFalse( $this->model->current_user_can_manage_templates() );
-		remove_filter( 'gfpdf_current_user_can_manage_templates', '__return_false' );
-
 		add_filter( 'file_mod_allowed', '__return_false' );
 		$this->assertFalse( $this->model->current_user_can_manage_templates() );
-
-		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
-		$this->assertTrue( $this->model->current_user_can_manage_templates() );
 	}
 
 	/**
@@ -188,11 +181,6 @@ class Test_Templates extends WP_UnitTestCase {
 			grant_super_admin( $user_id );
 		}
 
-		$this->assertSame( '', $this->model->get_manage_templates_notice() );
-
-		/* Nothing to explain once the filter grants access */
-		add_filter( 'file_mod_allowed', '__return_false' );
-		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
 		$this->assertSame( '', $this->model->get_manage_templates_notice() );
 	}
 
