@@ -9,6 +9,7 @@ use GFPDF\Helper\Fonts\LocalFile;
 use GFPDF\Helper\Fonts\LocalFilesystem;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Statics\Upload_Size;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\File;
@@ -484,6 +485,14 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 	public function test_add_item_upload_error_message( int $upload_error, string $expected ) {
 		wp_set_current_user( $this->admin_user );
 
+		/* A lower media limit, like a multisite network's Max upload file size, isn't the one PHP refused the file at */
+		add_filter(
+			'upload_size_limit',
+			function () {
+				return KB_IN_BYTES;
+			}
+		);
+
 		$request = $this->new_font_request();
 		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', '', $upload_error ] ] );
 
@@ -494,9 +503,11 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 	}
 
 	public function provider_add_item_upload_error_message(): array {
+		$too_large = sprintf( 'The font file is larger than the %s upload limit', size_format( Upload_Size::get_php_limit() ) );
+
 		return [
-			'over upload_max_filesize' => [ UPLOAD_ERR_INI_SIZE, 'larger than the' ],
-			'over MAX_FILE_SIZE'       => [ UPLOAD_ERR_FORM_SIZE, 'larger than the' ],
+			'over upload_max_filesize' => [ UPLOAD_ERR_INI_SIZE, $too_large ],
+			'over MAX_FILE_SIZE'       => [ UPLOAD_ERR_FORM_SIZE, $too_large ],
 			'partial transfer'         => [ UPLOAD_ERR_PARTIAL, 'could not be saved' ],
 			'no tmp dir'               => [ UPLOAD_ERR_NO_TMP_DIR, 'could not be saved' ],
 			'disk write failed'        => [ UPLOAD_ERR_CANT_WRITE, 'could not be saved' ],
