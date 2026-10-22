@@ -58,7 +58,7 @@ class Kses {
 	 *
 	 * @return string
 	 *
-	 * @since 7.0
+	 * @since 6.18.0
 	 */
 	public static function strip_scripts( $html ) {
 		$html = (string) $html;
