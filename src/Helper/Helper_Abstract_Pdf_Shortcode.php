@@ -259,7 +259,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 				continue;
 			}
 
-			/* Inside a PDF only its own entry signs */
+			/* Inside a PDF only the entries it shows sign */
 			if ( ! empty( $attr['signed'] ) && ! $trust->is_rendering_pdf() && ! $trust->is_valid_shortcode_signing_token( $attr['token'] ?? '', static::SHORTCODE, $attr['id'] ?? '', $attr['entry'] ?? '' ) ) {
 				$shortcode = $this->add_shortcode_attr( $shortcode, 'signed', '' );
 			}

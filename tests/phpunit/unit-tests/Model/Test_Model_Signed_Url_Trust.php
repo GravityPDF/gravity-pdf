@@ -47,7 +47,7 @@ class Test_Model_Signed_Url_Trust extends WP_UnitTestCase {
 
 	public function test_rendering_pdf() {
 		$this->assertFalse( $this->trust->is_rendering_pdf() );
-		$this->assertSame( 0, $this->trust->get_rendering_entry_id() );
+		$this->assertFalse( $this->trust->is_rendering_entry( 5 ) );
 
 		/* An entry without an ID, such as a preview's, still renders as a PDF */
 		$this->assertTrue( $this->trust->run_rendering_pdf( 0, [ $this->trust, 'is_rendering_pdf' ] ) );
@@ -55,8 +55,14 @@ class Test_Model_Signed_Url_Trust extends WP_UnitTestCase {
 		$this->trust->run_rendering_pdf(
 			5,
 			function () {
-				$this->assertSame( 6, $this->trust->run_rendering_pdf( 6, [ $this->trust, 'get_rendering_entry_id' ] ) );
-				$this->assertSame( 5, $this->trust->get_rendering_entry_id() );
+				$this->trust->run_rendering_pdf(
+					6,
+					function () {
+						$this->assertTrue( $this->trust->is_rendering_entry( 6 ) );
+						$this->assertFalse( $this->trust->is_rendering_entry( 5 ) );
+					}
+				);
+				$this->assertTrue( $this->trust->is_rendering_entry( 5 ) );
 			}
 		);
 
@@ -73,7 +79,60 @@ class Test_Model_Signed_Url_Trust extends WP_UnitTestCase {
 			$this->assertSame( 'Failed', $e->getMessage() );
 		}
 
-		$this->assertSame( 0, $this->trust->get_rendering_entry_id() );
+		$this->assertFalse( $this->trust->is_rendering_pdf() );
+	}
+
+	public function test_a_pdf_of_several_entries_renders_each_of_them() {
+		$this->assertFalse( $this->trust->is_rendering_entry( 16 ) );
+
+		$this->trust->run_rendering_pdf(
+			'17, 16,15',
+			function () {
+				$this->assertTrue( $this->trust->is_rendering_entry( 16 ) );
+				$this->assertTrue( $this->trust->is_rendering_entry( '15' ) );
+				$this->assertFalse( $this->trust->is_rendering_entry( 18 ) );
+			}
+		);
+
+		$this->assertFalse( $this->trust->is_rendering_entry( 16 ) );
+	}
+
+	public function test_a_pdf_of_several_entries_renders_no_others() {
+		$this->trust->run_rendering_pdf(
+			'17,16,15',
+			function () {
+				/* Matched by whole ID, so not by a digit of one or by what casts to nothing */
+				foreach ( [ 1, '1', 7, 171, -16, 0, '', 'abc' ] as $entry_id ) {
+					$this->assertFalse( $this->trust->is_rendering_entry( $entry_id ), var_export( $entry_id, true ) );
+				}
+
+				/* A PDF rendered inside it only shows its own entry */
+				$this->trust->run_rendering_pdf(
+					18,
+					function () {
+						$this->assertTrue( $this->trust->is_rendering_entry( 18 ) );
+						$this->assertFalse( $this->trust->is_rendering_entry( 16 ) );
+					}
+				);
+
+				$this->assertTrue( $this->trust->is_rendering_entry( 16 ) );
+				$this->assertFalse( $this->trust->is_rendering_entry( 18 ) );
+			}
+		);
+
+		try {
+			$this->trust->run_rendering_pdf(
+				'17,16',
+				function () {
+					throw new \Exception( 'Failed' );
+				}
+			);
+		} catch ( \Exception $e ) {
+			$this->assertSame( 'Failed', $e->getMessage() );
+		}
+
+		$this->assertFalse( $this->trust->is_rendering_pdf() );
+		$this->assertFalse( $this->trust->is_rendering_entry( 16 ) );
 	}
 
 	public function test_only_the_tags_in_an_administrative_default_are_trusted() {

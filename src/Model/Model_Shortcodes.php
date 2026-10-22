@@ -145,9 +145,9 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			return true;
 		}
 
-		/* Inside a PDF, only the PDF's own entry signs without a signature */
+		/* Inside a PDF, only the entries the PDF shows sign without a signature */
 		if ( $this->get_trust()->is_rendering_pdf() ) {
-			return (int) $attributes['entry'] === $this->get_trust()->get_rendering_entry_id();
+			return $this->get_trust()->is_rendering_entry( $attributes['entry'] );
 		}
 
 		return $this->can_sign_url( $attributes['entry'], $settings );

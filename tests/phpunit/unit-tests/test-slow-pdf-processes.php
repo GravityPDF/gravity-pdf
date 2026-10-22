@@ -479,9 +479,9 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		);
 
 		$trust    = GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
-		$entry_id = null;
-		$capture  = function ( $html ) use ( $trust, &$entry_id ) {
-			$entry_id = $trust->get_rendering_entry_id();
+		$rendering = null;
+		$capture   = function ( $html ) use ( $trust, $pdf, &$rendering ) {
+			$rendering = $trust->is_rendering_entry( $pdf->get_entry()['id'] );
 
 			return $html;
 		};
@@ -494,7 +494,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$pdf->render_html( [ 'settings' => $pdf->get_settings() ], '<p>Body</p>' );
 		remove_filter( 'gfpdf_pdf_html_output', $capture );
 
-		$this->assertSame( (int) $pdf->get_entry()['id'], $entry_id );
-		$this->assertSame( 0, $trust->get_rendering_entry_id() );
+		$this->assertTrue( $rendering );
+		$this->assertFalse( $trust->is_rendering_pdf() );
 	}
 }
