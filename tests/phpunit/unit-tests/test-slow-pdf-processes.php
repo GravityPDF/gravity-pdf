@@ -497,4 +497,31 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$this->assertTrue( $rendering );
 		$this->assertFalse( $trust->is_rendering_pdf() );
 	}
+
+	public function test_init_recreates_a_deleted_tmp_folder_with_its_protection() {
+		global $gfpdf;
+
+		$results = $this->create_form_and_entries();
+		$pdf     = $this->get_pdf_helper( $results['entry'], $results['form']['gfpdf_form_settings']['555ad84787d7e'] );
+
+		/* A tmp folder that doesn't exist yet stands in for one deleted since the last cleanup */
+		$original_tmp      = $gfpdf->data->template_tmp_location;
+		$original_mpdf_tmp = $gfpdf->data->mpdf_tmp_location;
+		$tmp               = get_temp_dir() . 'gfpdf-tmp-' . uniqid() . '/';
+
+		$gfpdf->data->template_tmp_location = $tmp;
+		$gfpdf->data->mpdf_tmp_location     = untrailingslashit( $tmp );
+
+		try {
+			$pdf->init();
+
+			$this->assertFileExists( $tmp . '.htaccess' );
+			$this->assertFileExists( $tmp . 'index.html' );
+			$this->assertFileExists( $tmp . 'mpdf/ttfontdata/index.html' );
+		} finally {
+			$gfpdf->misc->rmdir( $tmp );
+			$gfpdf->data->template_tmp_location = $original_tmp;
+			$gfpdf->data->mpdf_tmp_location     = $original_mpdf_tmp;
+		}
+	}
 }
