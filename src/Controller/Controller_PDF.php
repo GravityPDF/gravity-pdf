@@ -12,6 +12,7 @@ use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Deprecation_V3;
+use GFPDF\Statics\Kses;
 use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
 use Psr\Log\LoggerInterface;
@@ -357,6 +358,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function add_pre_pdf_hooks() {
 		add_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		add_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+		add_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] );
 	}
 
 	/**
@@ -365,6 +367,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function remove_pre_pdf_hooks() {
 		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+		remove_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] );
 	}
 
 	/**
