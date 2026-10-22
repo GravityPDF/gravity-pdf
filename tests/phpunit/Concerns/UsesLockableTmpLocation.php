@@ -13,11 +13,15 @@ trait UsesLockableTmpLocation {
 	/** @var string|null */
 	private $original_tmp_location;
 
+	/** @var string|null */
+	private $original_mpdf_tmp_location;
+
 	protected function use_lockable_tmp_location(): void {
 		$data = \GPDFAPI::get_data_class();
 
-		$this->original_tmp_location = $this->original_tmp_location ?? $data->template_tmp_location;
-		$data->template_tmp_location = trailingslashit( get_temp_dir() ) . 'gfpdf-tmp-' . uniqid() . '/';
+		$this->original_tmp_location      = $this->original_tmp_location ?? $data->template_tmp_location;
+		$this->original_mpdf_tmp_location = $this->original_mpdf_tmp_location ?? $data->mpdf_tmp_location;
+		$data->template_tmp_location      = trailingslashit( get_temp_dir() ) . 'gfpdf-tmp-' . uniqid() . '/';
 	}
 
 	protected function restore_tmp_location(): void {
@@ -30,7 +34,9 @@ trait UsesLockableTmpLocation {
 			\GPDFAPI::get_misc_class()->rmdir( $data->template_tmp_location );
 		}
 
-		$data->template_tmp_location = $this->original_tmp_location;
-		$this->original_tmp_location = null;
+		$data->template_tmp_location      = $this->original_tmp_location;
+		$data->mpdf_tmp_location          = $this->original_mpdf_tmp_location;
+		$this->original_tmp_location      = null;
+		$this->original_mpdf_tmp_location = null;
 	}
 }
