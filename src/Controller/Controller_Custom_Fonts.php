@@ -18,6 +18,7 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Statics\Upload_Size;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\File;
@@ -565,7 +566,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 		if ( array_intersect( $codes, [ ErrorCode::INI_SIZE, ErrorCode::FORM_SIZE ] ) ) {
 			/* translators: %s: the maximum upload size, e.g. 8 MB */
-			return sprintf( __( 'The font file is larger than the %s upload limit', 'gravity-pdf' ), size_format( wp_max_upload_size() ) );
+			return sprintf( __( 'The font file is larger than the %s upload limit', 'gravity-pdf' ), size_format( Upload_Size::get_php_limit() ) );
 		}
 
 		$transfer_failures = [
