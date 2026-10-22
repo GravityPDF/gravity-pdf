@@ -949,3 +949,4 @@ class GFPDF\Statics\Kses
     public static function get_allowed_pdf_tags($tags = null)
     public static function output($html): void
     public static function parse($html)
+    public static function strip_scripts($html)

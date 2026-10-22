@@ -44,11 +44,27 @@ class Kses {
 	public static function parse( $html ) {
 		add_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
-		$html = wp_kses( (string) $html, self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
+		$html = wp_kses( self::strip_scripts( (string) $html ), self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
 
 		remove_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
 		return $html;
+	}
+
+	/**
+	 * Remove each <script> element along with its code. wp_kses() only strips the tags, and mPDF would print the code as text.
+	 *
+	 * @param string $html
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	public static function strip_scripts( $html ) {
+		$html = (string) $html;
+
+		/* preg_replace() returns null when a large script hits pcre.backtrack_limit; keep the content */
+		return preg_replace( '#<script\b[^>]*>.*?</script\s*>#is', '', $html ) ?? $html;
 	}
 
 	/**

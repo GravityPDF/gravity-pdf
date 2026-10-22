@@ -13,6 +13,7 @@ use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Cache;
 use GFPDF\Statics\Debug;
+use GFPDF\Statics\Kses;
 use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -295,6 +296,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		add_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		add_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+		add_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] );
 
 		/* Gravity Wiz Populate Anything support */
 		if ( function_exists( 'gp_populate_anything' ) ) {
@@ -319,6 +321,7 @@ class Controller_PDF extends Helper_Abstract_Controller {
 
 		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+		remove_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] );
 
 		/* Gravity Wiz Populate Anything support */
 		if ( function_exists( 'gp_populate_anything' ) ) {
