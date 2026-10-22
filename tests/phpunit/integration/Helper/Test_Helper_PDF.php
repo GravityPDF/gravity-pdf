@@ -173,6 +173,22 @@ class Test_Helper_PDF extends TestCase {
 		$this->assertInstanceOf( \GFPDF\Helper\Mpdf\Mpdf::class, $this->mpdf_property() );
 	}
 
+	public function test_init_recreates_a_deleted_tmp_folder_with_its_protection(): void {
+		$data = $this->gfpdf()->data;
+
+		/* A tmp folder that doesn't exist yet stands in for one deleted since the last cleanup */
+		$this->use_lockable_tmp_location();
+		$tmp                     = $data->template_tmp_location;
+		$data->mpdf_tmp_location = untrailingslashit( $tmp );
+
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertFileExists( $tmp . '.htaccess' );
+		$this->assertFileExists( $tmp . 'index.html' );
+		$this->assertFileExists( $tmp . 'mpdf/ttfontdata/index.html' );
+	}
+
 	public function test_generate_returns_pdf_binary_for_save_output(): void {
 		$this->pdf->set_output_type( 'SAVE' );
 		$this->pdf->init();
