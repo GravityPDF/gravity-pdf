@@ -630,19 +630,62 @@ class Test_Shortcodes extends TestCase {
 		wp_set_current_user( 0 );
 		$this->assertStringContainsString( 'signature=', $render( $entry['id'] ) );
 
+		/* So does each entry of a PDF of several, like a GravityView directory, but no other */
+		$this->assertStringContainsString( 'signature=', $render( $entry['id'] . ',' . ( $entry['id'] + 1000 ) ) );
+		$this->assertStringContainsString( 'signature=', $render( ( $entry['id'] + 1000 ) . ',' . $entry['id'] ) );
+		$this->assertStringNotContainsString( 'signature=', $render( ( $entry['id'] + 1000 ) . ',' . ( $entry['id'] + 2000 ) ) );
+
 		/* Another entry doesn't, even for an administrator, unless it has a valid signature */
 		wp_set_current_user( $admin );
 		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000 ) );
+		$this->assertStringNotContainsString( 'signature=', $render( ( $entry['id'] + 1000 ) . ',' . ( $entry['id'] + 2000 ) ) );
 		$this->assertStringContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => $token ] ) );
 
 		wp_set_current_user( 0 );
 		$this->assertStringContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => $token ] ) );
 		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => 'forged' ] ) );
 		$this->assertStringNotContainsString( 'signature=', $render( $entry['id'] + 1000, [ 'token' => [ $token ] ] ) );
+		$this->assertStringContainsString( 'signature=', $render( ( $entry['id'] + 1000 ) . ',' . ( $entry['id'] + 2000 ), [ 'token' => $token ] ) );
+		$this->assertStringNotContainsString( 'signature=', $render( ( $entry['id'] + 1000 ) . ',' . ( $entry['id'] + 2000 ), [ 'token' => 'forged' ] ) );
 
 		/* A signature is for one PDF and entry */
 		$this->assertNotSame( $token, $this->signing_token( '556690c67856c', $entry['id'] ) );
 		$this->assertNotSame( $token, $this->signing_token( '556690c67856b', $entry['id'] + 1 ) );
+	}
+
+	public function test_pdf_of_several_entries_signs_only_the_written_links_to_its_entries() {
+		$form  = $this->form( 'all-form-fields' );
+		$rows  = [ $this->entry( 'all-form-fields', 0 ), $this->entry( 'all-form-fields', 1 ) ];
+		$other = $this->entry( 'all-form-fields', 2 );
+		$link  = function ( $entry_id ) {
+			return '[gravitypdf id="556690c67856b" entry="' . $entry_id . '" signed="1" raw="1"]';
+		};
+
+		/* The synthetic entry PDF for GravityView renders a directory from, with a submitter's link to another row */
+		$directory               = $rows[0];
+		$directory['id']         = $rows[0]['id'] . ',' . $rows[1]['id'];
+		$directory['user_agent'] = $link( $rows[1]['id'] );
+
+		/* As Controller_PDF's gfpdf_pdf_html_output filters run the template */
+		wp_set_current_user( 0 );
+		$html = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' )->run_rendering_pdf(
+			$directory['id'],
+			function () use ( $form, $directory, $link, $rows, $other ) {
+				$html = implode( '|', [ $link( $rows[0]['id'] ), $link( $rows[1]['id'] ), $link( $other['id'] ), '{user_agent}' ] );
+
+				return do_shortcode( \GPDFAPI::get_form_class()->process_tags( $html, $form, $directory ) );
+			}
+		);
+
+		[ $first, $second, $outside, $planted ] = explode( '|', $html );
+		$this->assertStringContainsString( "lid={$rows[0]['id']}", $first );
+		$this->assertStringContainsString( 'signature=', $first );
+		$this->assertStringContainsString( "lid={$rows[1]['id']}", $second );
+		$this->assertStringContainsString( 'signature=', $second );
+		$this->assertStringContainsString( "lid={$other['id']}", $outside );
+		$this->assertStringNotContainsString( 'signature=', $outside );
+		$this->assertStringStartsWith( '&#x5b;gravitypdf', $planted );
+		$this->assertStringNotContainsString( 'signature=', $planted );
 	}
 
 	/**

@@ -41,9 +41,9 @@ class Model_Signed_Url_Trust {
 	protected $untrusted_depth = 0;
 
 	/**
-	 * The entries whose PDFs are being rendered, innermost last
+	 * The entries each PDF being rendered shows, innermost last
 	 *
-	 * @var int[]
+	 * @var int[][]
 	 * @since 6.18.0
 	 */
 	protected $rendering_entry_ids = [];
@@ -120,15 +120,15 @@ class Model_Signed_Url_Trust {
 	 * Run the callback while rendering an entry's PDF, or merging its field content, which mixes what form editors and
 	 * submitters wrote
 	 *
-	 * @param int      $entry_id
-	 * @param callable $callback
+	 * @param int|string $entry_id The entry, or a comma-separated list for a PDF of several, like a GravityView directory
+	 * @param callable   $callback
 	 *
 	 * @return mixed The callback's return value
 	 *
 	 * @since 6.18.0
 	 */
 	public function run_rendering_pdf( $entry_id, callable $callback ) {
-		$this->rendering_entry_ids[] = (int) $entry_id;
+		$this->rendering_entry_ids[] = wp_parse_id_list( $entry_id );
 
 		try {
 			return $callback();
@@ -174,12 +174,14 @@ class Model_Signed_Url_Trust {
 	}
 
 	/**
-	 * @return int The entry whose PDF is being rendered, or 0 when there isn't one
+	 * @param int|string $entry_id
+	 *
+	 * @return bool Whether the PDF being rendered shows the entry
 	 *
 	 * @since 6.18.0
 	 */
-	public function get_rendering_entry_id() {
-		return (int) end( $this->rendering_entry_ids );
+	public function is_rendering_entry( $entry_id ) {
+		return in_array( (int) $entry_id, end( $this->rendering_entry_ids ) ?: [], true );
 	}
 
 	/**

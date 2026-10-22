@@ -187,9 +187,10 @@ class Test_Helper_PDF extends TestCase {
 
 	public function test_render_html_runs_with_the_pdf_entry_as_the_signing_context(): void {
 		$trust    = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
-		$entry_id = null;
-		$capture  = function ( $html ) use ( $trust, &$entry_id ) {
-			$entry_id = $trust->get_rendering_entry_id();
+		$entry_id  = (int) $this->pdf->get_entry()['id'];
+		$rendering = null;
+		$capture   = function ( $html ) use ( $trust, $entry_id, &$rendering ) {
+			$rendering = $trust->is_rendering_entry( $entry_id );
 
 			return $html;
 		};
@@ -201,8 +202,8 @@ class Test_Helper_PDF extends TestCase {
 		$this->pdf->render_html( [ 'settings' => $this->pdf->get_settings() ], '<p>Body</p>' );
 		remove_filter( 'gfpdf_pdf_html_output', $capture );
 
-		$this->assertSame( (int) $this->pdf->get_entry()['id'], $entry_id );
-		$this->assertSame( 0, $trust->get_rendering_entry_id() );
+		$this->assertTrue( $rendering );
+		$this->assertFalse( $trust->is_rendering_pdf() );
 	}
 
 	public function test_save_pdf_writes_binary_to_disk_at_expected_path(): void {
