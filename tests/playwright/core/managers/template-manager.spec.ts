@@ -1,11 +1,9 @@
-import * as crypto from 'node:crypto';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import { snapshot } from '@self:playwright/utils/snapshot';
-import { wpCli } from '@self:playwright/utils/wp-cli';
 import * as path from 'path';
 
 test.describe('Template Manager', () => {
@@ -199,49 +197,6 @@ test.describe('Template Manager', () => {
 
 		await expect(
 			page.locator('.theme[data-slug="rezipped-sample"]')
-		).toBeVisible();
-	});
-
-	test('should let a user the capability filter allows upload a template', async ({
-		requestUtils,
-		page,
-		admin,
-	}: {
-		requestUtils: RequestUtils;
-		page: Page;
-		admin: Admin;
-	}) => {
-		const username = crypto.randomBytes(10).toString('hex');
-		const password = crypto.randomBytes(10).toString('hex');
-		const user = await requestUtils.createUser({
-			username,
-			email: `${username}@example.com`,
-			password,
-			roles: ['editor'],
-		});
-		wpCli(`wp user add-cap ${user.id} gravityforms_edit_forms`);
-
-		await admin.context.clearCookies();
-		await page.setExtraHTTPHeaders({
-			'X-GPDF-E2E-Manage-Templates': 'yes',
-		});
-		await page.goto('/wp-login.php');
-		await page.getByLabel('Username or Email Address').fill(username);
-		await page.getByLabel('Password', { exact: true }).fill(password);
-		await page.getByRole('button', { name: 'Log In' }).click();
-
-		await pdf.navigateToNewFormPdf(form.id);
-		await page
-			.getByRole('button', { name: 'Manage PDF Templates' })
-			.click();
-		await page
-			.locator('.gfpdf-template-dropzone input[type="file"]')
-			.setInputFiles(
-				path.join(resourcesPath, 'template', 'capability-sample.zip')
-			);
-
-		await expect(
-			page.locator('.theme[data-slug="capability-sample"]')
 		).toBeVisible();
 	});
 

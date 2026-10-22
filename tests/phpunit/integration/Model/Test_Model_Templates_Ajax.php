@@ -88,16 +88,13 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 	 * Run a template AJAX endpoint and return its response
 	 *
 	 * @param string $action
-	 * @param bool   $with_nonce
 	 *
 	 * @return string
 	 *
 	 * @since 6.18.0
 	 */
-	private function get_ajax_response( $action, $with_nonce = true ) {
-		if ( $with_nonce ) {
-			$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
-		}
+	private function get_ajax_response( $action ) {
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
 
 		try {
 			$this->_handleAjax( $action );
@@ -134,16 +131,13 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 	/**
 	 * Check both template endpoints refuse the request and leave the template alone
 	 *
-	 * @param string $code
-	 * @param bool   $with_nonce
-	 *
 	 * @since 6.18.0
 	 */
-	private function assert_template_endpoints_deny( $code, $with_nonce = true ) {
+	private function assert_template_endpoints_deny() {
 		$file = $this->create_deletable_template();
 
-		$this->assertSame( $code, $this->get_ajax_response( 'gfpdf_upload_template', $with_nonce ) );
-		$this->assertSame( $code, $this->get_ajax_response( 'gfpdf_delete_template', $with_nonce ) );
+		$this->assertSame( '403', $this->get_ajax_response( 'gfpdf_upload_template' ) );
+		$this->assertSame( '403', $this->get_ajax_response( 'gfpdf_delete_template' ) );
 		$this->assertFileExists( $file );
 	}
 
@@ -155,7 +149,7 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 		get_userdata( $user_id )->add_cap( 'gravityforms_edit_settings' );
 		wp_set_current_user( $user_id );
 
-		$this->assert_template_endpoints_deny( '403' );
+		$this->assert_template_endpoints_deny();
 	}
 
 	/**
@@ -186,41 +180,6 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 				MonoLogger::CRITICAL
 			)
 		);
-	}
-
-	/**
-	 * @since 6.18.0
-	 */
-	public function test_ajax_template_endpoints_filter_can_deny_administrator() {
-		$this->_setRole( 'administrator' );
-		$this->maybe_grant_super_admin();
-		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_false' );
-
-		$this->assert_template_endpoints_deny( '403' );
-	}
-
-	/**
-	 * @since 6.18.0
-	 */
-	public function test_ajax_template_endpoints_follow_the_capability_filter() {
-		wp_set_current_user( $this->factory->user->create( [ 'role' => 'editor' ] ) );
-		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
-
-		$file = $this->create_deletable_template();
-
-		$this->assertSame( '400', $this->get_ajax_response( 'gfpdf_upload_template' ) );
-		$this->assertSame( 'true', $this->get_ajax_response( 'gfpdf_delete_template' ) );
-		$this->assertFileDoesNotExist( $file );
-	}
-
-	/**
-	 * @since 6.18.0
-	 */
-	public function test_ajax_template_endpoints_check_nonce_when_filter_grants_access() {
-		wp_set_current_user( $this->factory->user->create( [ 'role' => 'editor' ] ) );
-		add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
-
-		$this->assert_template_endpoints_deny( '401', false );
 	}
 
 	public function test_ajax_process_build_template_options_html() {

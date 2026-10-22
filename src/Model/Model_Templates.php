@@ -112,9 +112,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	 */
 	public function current_user_can_manage_templates(): bool {
 		/* upload_plugins maps to do_not_allow under DISALLOW_FILE_MODS, and to super admin only on multisite */
-		$allowed = current_user_can( 'upload_plugins' ) && $this->gform->has_capability( 'gravityforms_edit_settings' );
-
-		return (bool) apply_filters( 'gfpdf_current_user_can_manage_templates', $allowed );
+		return current_user_can( 'upload_plugins' ) && $this->gform->has_capability( 'gravityforms_edit_settings' );
 	}
 
 	/**

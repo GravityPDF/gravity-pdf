@@ -134,11 +134,6 @@ if ( $gfpdf_e2e_header( 'media_upload_limit' ) === 'tiny' ) {
 	);
 }
 
-/* The Template Manager spec grants a user without the default capabilities access to templates */
-if ( $gfpdf_e2e_header( 'manage_templates' ) === 'yes' ) {
-	add_filter( 'gfpdf_current_user_can_manage_templates', '__return_true' );
-}
-
 /* Stands in for DISALLOW_FILE_MODS, which can't be defined per request */
 if ( $gfpdf_e2e_header( 'file_mods' ) === 'disallowed' ) {
 	add_filter( 'file_mod_allowed', '__return_false' );
