@@ -612,6 +612,60 @@ class Test_Shortcode extends WP_UnitTestCase {
 		wp_set_current_user( 0 );
 	}
 
+	public function test_shortcode_a_merge_tag_adds_reads_as_text_in_a_plain_text_notification() {
+		$form                = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry               = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$planted             = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" signed="1" raw="1"]';
+		$entry['user_agent'] = $planted;
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+
+		$sent    = [];
+		$capture = function ( $email, $format ) use ( &$sent ) {
+			$sent[ $format ]      = $email;
+			$email['abort_email'] = true;
+
+			return $email;
+		};
+		add_filter( 'gform_pre_send_email', $capture, 10, 2 );
+
+		foreach ( [ 'text', 'html' ] as $format ) {
+			\GFCommon::send_notification(
+				[
+					'id'                => 'plain-text-' . $format,
+					'name'              => 'Plain text',
+					'toType'            => 'email',
+					'to'                => 'recipient@example.com',
+					'from'              => 'sender@example.com',
+					'subject'           => 'Subject {user_agent}',
+					'message'           => '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" raw="1"] {user_agent}',
+					'message_format'    => $format,
+					'disableAutoformat' => true,
+				],
+				$form,
+				$entry
+			);
+		}
+
+		remove_filter( 'gform_pre_send_email', $capture );
+		wp_set_current_user( 0 );
+
+		/* The written shortcode runs in both, while the merged one is printed and stays inert in any later pass */
+		foreach ( $sent as $email ) {
+			$this->assertStringNotContainsString( 'signature=', do_shortcode( $email['message'] ) );
+			$this->assertSame( 1, substr_count( do_shortcode( $email['message'] ), 'pid=556690c67856b' ) );
+			$this->assertStringNotContainsString( 'pid=', do_shortcode( $email['subject'] ) );
+		}
+
+		/* A plain-text recipient reads the shortcode, rather than an HTML entity */
+		$readable = substr( $planted, 1 );
+		$this->assertStringContainsString( "[\u{200B}$readable", $sent['text']['message'] );
+		$this->assertSame( "Subject [\u{200B}$readable", $sent['text']['subject'] );
+		$this->assertSame( "Subject [\u{200B}$readable", $sent['html']['subject'] );
+
+		/* HTML still escapes it as an entity */
+		$this->assertStringContainsString( "&#x5b;$readable", $sent['html']['message'] );
+	}
+
 	public function test_written_shortcode_whose_entry_a_merge_tag_sets_is_unsigned() {
 		$form                = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry               = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
