@@ -6,6 +6,7 @@ use GFCommon;
 use GFForms;
 use GFFormsModel;
 use PDF_Common;
+use RuntimeException;
 use RGFormsModel;
 use WP_UnitTestCase;
 use WP_User;
@@ -278,6 +279,57 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		$this->assertTrue( $gfpdf->gform->has_capability( 'gravityforms_edit_settings' ) );
 
 		wp_set_current_user( 0 );
+	}
+
+	public function test_has_capability_checks_the_given_user_and_restores_the_current_one() {
+		global $gfpdf;
+
+		$admin      = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$subscriber = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+
+		wp_set_current_user( $subscriber );
+		$this->assertTrue( $gfpdf->gform->has_capability( 'gravityforms_edit_settings', $admin ) );
+		$this->assertSame( $subscriber, get_current_user_id() );
+
+		wp_set_current_user( $admin );
+		$this->assertFalse( $gfpdf->gform->has_capability( 'gravityforms_edit_settings', $subscriber ) );
+		$this->assertFalse( $gfpdf->gform->has_capability( 'gravityforms_edit_settings', 0 ) );
+		$this->assertSame( $admin, get_current_user_id() );
+	}
+
+	public function test_has_capability_restores_the_current_user_when_a_capability_check_throws() {
+		global $gfpdf;
+
+		$admin      = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$subscriber = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		$seen       = null;
+
+		add_filter(
+			'user_has_cap',
+			static function ( $allcaps, $caps, $args ) use ( &$seen ) {
+				if ( $args[0] !== 'gravityforms_edit_settings' ) {
+					return $allcaps;
+				}
+
+				$seen = get_current_user_id();
+
+				throw new RuntimeException( 'Capability check failed' );
+			},
+			10,
+			3
+		);
+
+		wp_set_current_user( $admin );
+
+		try {
+			$gfpdf->gform->has_capability( 'gravityforms_edit_settings', $subscriber );
+			$this->fail( 'The exception was swallowed' );
+		} catch ( RuntimeException $e ) {
+			$this->assertSame( 'Capability check failed', $e->getMessage() );
+		}
+
+		$this->assertSame( $subscriber, $seen );
+		$this->assertSame( $admin, get_current_user_id() );
 	}
 
 	/**
