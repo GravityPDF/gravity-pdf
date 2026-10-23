@@ -92,7 +92,8 @@ PHP;
 		$file = tempnam( get_temp_dir(), 'gfpdf' );
 		file_put_contents( $file, $script );
 
-		exec( escapeshellarg( PHP_BINARY ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $output );
+		/* XDEBUG_MODE beats any ini setting, so an inherited step-debug config can't print warnings into the output */
+		exec( 'XDEBUG_MODE=off ' . escapeshellarg( PHP_BINARY ) . ' ' . escapeshellarg( $file ) . ' 2>&1', $output );
 		unlink( $file );
 
 		return implode( "\n", $output );
