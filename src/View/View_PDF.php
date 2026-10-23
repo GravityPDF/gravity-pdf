@@ -165,89 +165,94 @@ class View_PDF extends Helper_Abstract_View {
 
 		$this->fix_wp_external_links_plugin_conflict();
 
-		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
-
-		/**
-		 * Load our arguments that should be accessed by our PDF template
-		 *
-		 * @var array
-		 */
-		$args = $this->templates->get_template_arguments(
-			$form,
-			$this->misc->get_fields_sorted_by_id( $form['id'] ),
-			$entry,
-			$model->get_form_data( $entry ),
-			$settings,
-			$this->templates->get_config_class( $settings['template'] ),
-			$this->misc->get_legacy_ids( $entry['id'], $settings )
-		);
-
-		/* Show $form_data array if requested */
-		$this->maybe_view_form_data( $args['form_data'] ?? [] );
-
-		/* Enable Multicurrency support */
-		$this->misc->maybe_add_multicurrency_support();
-
 		try {
+			do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
 
-			/* Initialise our PDF helper class */
-			$pdf->init();
-			$pdf->set_template();
-
-			/* Set display type and allow user to override the behaviour */
-			$settings['pdf_action'] = Deprecation::apply_filters( 'gfpdfe_pdf_output_type', [ $settings['pdf_action'] ] );
-			if ( $settings['pdf_action'] === 'download' ) {
-				$pdf->set_output_type( 'download' );
-			}
-
-			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-			if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
-
-				/* Check if we should process this document using our legacy system */
-				if ( $model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
-					return;
-				}
-			}
-
-			/* Determine if we should show the print dialog box */
-			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
-			if ( isset( $_GET['print'] ) ) {
-				$pdf->set_print_dialog();
-			}
-
-			/* Render the PDF template HTML */
-			$pdf->render_html( $args );
-
-			/* Generate PDF */
-			$pdf->generate();
-
-		} catch ( Exception $e ) {
-
-			$this->log->error(
-				'PDF Generation Error',
-				[
-					'form_id'   => $form['id'],
-					'entry_id'  => $entry['id'],
-					'pdf_id'    => $settings['id'],
-					'template'  => $settings['template'],
-					'exception' => $e->getMessage(),
-					'file'      => $e->getFile(),
-					'line'      => $e->getLine(),
-				]
+			/**
+			 * Load our arguments that should be accessed by our PDF template
+			 *
+			 * @var array
+			 */
+			$args = $this->templates->get_template_arguments(
+				$form,
+				$this->misc->get_fields_sorted_by_id( $form['id'] ),
+				$entry,
+				$model->get_form_data( $entry ),
+				$settings,
+				$this->templates->get_config_class( $settings['template'] ),
+				$this->misc->get_legacy_ids( $entry['id'], $settings )
 			);
 
-			if ( $this->gform->has_capability( 'gravityforms_view_entries' ) ) {
-				$message = sprintf(
-					'%s in %s on line %s',
-					$e->getMessage(),
-					$e->getFile(),
-					$e->getLine()
+			/* Show $form_data array if requested */
+			$this->maybe_view_form_data( $args['form_data'] ?? [] );
+
+			/* Enable Multicurrency support */
+			$this->misc->maybe_add_multicurrency_support();
+
+			try {
+
+				/* Initialise our PDF helper class */
+				$pdf->init();
+				$pdf->set_template();
+
+				/* Set display type and allow user to override the behaviour */
+				$settings['pdf_action'] = Deprecation::apply_filters( 'gfpdfe_pdf_output_type', [ $settings['pdf_action'] ] );
+				if ( $settings['pdf_action'] === 'download' ) {
+					$pdf->set_output_type( 'download' );
+				}
+
+				/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
+				if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
+
+					/* Check if we should process this document using our legacy system */
+					if ( $model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
+						return;
+					}
+				}
+
+				/* Determine if we should show the print dialog box */
+				/* phpcs:ignore WordPress.Security.NonceVerification.Recommended */
+				if ( isset( $_GET['print'] ) ) {
+					$pdf->set_print_dialog();
+				}
+
+				/* Render the PDF template HTML */
+				$pdf->render_html( $args );
+
+				/* Generate PDF */
+				$pdf->generate();
+
+			} catch ( Exception $e ) {
+
+				$this->log->error(
+					'PDF Generation Error',
+					[
+						'form_id'   => $form['id'],
+						'entry_id'  => $entry['id'],
+						'pdf_id'    => $settings['id'],
+						'template'  => $settings['template'],
+						'exception' => $e->getMessage(),
+						'file'      => $e->getFile(),
+						'line'      => $e->getLine(),
+					]
 				);
 
-				wp_die( esc_html( $message ) );
-			}
+				if ( $this->gform->has_capability( 'gravityforms_view_entries' ) ) {
+					$message = sprintf(
+						'%s in %s on line %s',
+						$e->getMessage(),
+						$e->getFile(),
+						$e->getLine()
+					);
 
-			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-pdf' ) );
+					wp_die( esc_html( $message ) );
+				}
+
+				wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-pdf' ) );
+			}
+		} finally {
+			/* See Model_PDF::process_and_save_pdf() */
+			do_action( 'gfpdf_pdf_generation_end', $form, $entry, $settings, $pdf );
 		}
 	}
 

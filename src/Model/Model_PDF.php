@@ -1254,73 +1254,106 @@ class Model_PDF extends Helper_Abstract_Model {
 			$settings = $pdf->get_settings();
 			$form     = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
 
-			do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
-
-			/**
-			 * Load our arguments that should be accessed by our PDF template
-			 *
-			 * @var array
-			 */
-			$args = $this->templates->get_template_arguments(
-				$form,
-				$this->misc->get_fields_sorted_by_id( $form['id'] ),
-				$entry,
-				$this->get_form_data( $entry ),
-				$settings,
-				$this->templates->get_config_class( $settings['template'] ),
-				$this->misc->get_legacy_ids( $entry['id'], $settings )
-			);
-
-			/* Add backwards compatibility support */
-			$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
-			$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
-
 			try {
-
-				/* Initialise our PDF helper class */
-				$pdf->init();
-				$pdf->set_template();
-				$pdf->set_output_type( 'save' );
-
-				/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-				if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
-
-					/* Check if we should process this document using our legacy system */
-					if ( $this->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
-						return true;
-					}
-				}
-
-				/* Render the PDF template HTML */
-				$pdf->render_html( $args );
-
-				/* Generate and save the PDF */
-				$pdf->save_pdf( $pdf->generate() );
-
-				do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf );
-
-				return true;
-			} catch ( Exception $e ) {
-
-				$this->log->error(
-					'PDF Generation Error',
-					[
-						'form_id'   => $form['id'],
-						'entry_id'  => $entry['id'],
-						'pdf_id'    => $settings['id'],
-						'template'  => $settings['template'],
-						'path'      => $pdf->get_full_pdf_path(),
-						'exception' => $e->getMessage(),
-						'file'      => $e->getFile(),
-						'line'      => $e->getLine(),
-					]
-				);
-
-				return false;
+				return $this->render_pdf( $pdf, $form );
+			} finally {
+				/**
+				 * Fires when a render that fired `gfpdf_pre_pdf_generation` ends, even when it fails or throws, so anything
+				 * added on that action can be removed. A successful save fires `gfpdf_post_pdf_generation` first. Also fired by
+				 * View_PDF::generate_pdf(), unless the request exits after sending the PDF to the browser.
+				 *
+				 * @param array      $form
+				 * @param array      $entry
+				 * @param array      $settings
+				 * @param Helper_PDF $pdf
+				 *
+				 * @since 6.18.0
+				 */
+				do_action( 'gfpdf_pdf_generation_end', $form, $entry, $settings, $pdf );
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * The render behind process_and_save_pdf(), which fires `gfpdf_pdf_generation_end` when this returns or throws
+	 *
+	 * @param Helper_PDF $pdf
+	 * @param array      $form
+	 *
+	 * @return boolean
+	 *
+	 * @since 6.18.0
+	 */
+	protected function render_pdf( Helper_PDF $pdf, $form ) {
+		$entry    = $pdf->get_entry();
+		$settings = $pdf->get_settings();
+
+		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
+
+		/**
+		 * Load our arguments that should be accessed by our PDF template
+		 *
+		 * @var array
+		 */
+		$args = $this->templates->get_template_arguments(
+			$form,
+			$this->misc->get_fields_sorted_by_id( $form['id'] ),
+			$entry,
+			$this->get_form_data( $entry ),
+			$settings,
+			$this->templates->get_config_class( $settings['template'] ),
+			$this->misc->get_legacy_ids( $entry['id'], $settings )
+		);
+
+		/* Add backwards compatibility support */
+		$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
+		$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
+
+		try {
+
+			/* Initialise our PDF helper class */
+			$pdf->init();
+			$pdf->set_template();
+			$pdf->set_output_type( 'save' );
+
+			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
+			if ( Deprecation_V3::is_advanced_template_pdf( $settings ) ) {
+
+				/* Check if we should process this document using our legacy system */
+				if ( $this->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
+					return true;
+				}
+			}
+
+			/* Render the PDF template HTML */
+			$pdf->render_html( $args );
+
+			/* Generate and save the PDF */
+			$pdf->save_pdf( $pdf->generate() );
+
+			do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf );
+
+			return true;
+		} catch ( Exception $e ) {
+
+			$this->log->error(
+				'PDF Generation Error',
+				[
+					'form_id'   => $form['id'],
+					'entry_id'  => $entry['id'],
+					'pdf_id'    => $settings['id'],
+					'template'  => $settings['template'],
+					'path'      => $pdf->get_full_pdf_path(),
+					'exception' => $e->getMessage(),
+					'file'      => $e->getFile(),
+					'line'      => $e->getLine(),
+				]
+			);
+
+			return false;
+		}
 	}
 
 	/**
