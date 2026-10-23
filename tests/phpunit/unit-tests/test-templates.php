@@ -4,11 +4,14 @@ namespace GFPDF\Tests;
 
 use Exception;
 use GFPDF\Controller\Controller_Templates;
+use GFPDF\Exceptions\GravityPdfNotATemplateException;
 use GFPDF\Helper\Fonts\LocalFile;
 use GFPDF\Helper\Fonts\LocalFilesystem;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Model\Model_Templates;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
+use GFPDF_Vendor\GravityPdf\Upload\File;
+use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
 use WP_UnitTestCase;
 use ZipArchive;
 
@@ -203,8 +206,9 @@ class Test_Templates extends WP_UnitTestCase {
 		];
 
 		/* Check the validation works */
+		$file = $this->getFileStub();
 		try {
-			$this->model->move_template_to_tmp_dir( $this->getFileStub() );
+			$this->model->move_template_to_tmp_dir( $file );
 		} catch ( UploadException $e ) {
 			//do nothing
 		}
@@ -212,6 +216,7 @@ class Test_Templates extends WP_UnitTestCase {
 		unlink( $test_file );
 
 		$this->assertEquals( 'File validation failed', $e->getMessage() );
+		$this->assertSame( 'Upload is not a valid template. Upload a .zip file.', $this->model->get_upload_error_message( $file ) );
 
 		/* A font wearing a .zip extension: the extension is allowed, the contents are not */
 		$test_file = $gfpdf->data->template_location . 'disguised.zip';
@@ -220,11 +225,13 @@ class Test_Templates extends WP_UnitTestCase {
 		$_FILES['template']['name']     = 'disguised.zip';
 		$_FILES['template']['tmp_name'] = $test_file;
 
+		$file = $this->getFileStub();
 		try {
-			$this->model->move_template_to_tmp_dir( $this->getFileStub() );
+			$this->model->move_template_to_tmp_dir( $file );
 			$this->fail( 'Expected the disguised font to be refused.' );
 		} catch ( UploadException $e ) {
 			$this->assertSame( 'File validation failed', $e->getMessage() );
+			$this->assertSame( 'Upload is not a valid template. Upload a .zip file.', $this->model->get_upload_error_message( $file ) );
 		} finally {
 			unlink( $test_file );
 		}
@@ -343,6 +350,7 @@ class Test_Templates extends WP_UnitTestCase {
 			}
 
 			$this->assertEquals( 'No valid PDF template found in Zip archive.', $e->getMessage() );
+			$this->assertInstanceOf( GravityPdfNotATemplateException::class, $e );
 			unset( $e );
 
 			unlink( $test_file );
@@ -378,6 +386,7 @@ class Test_Templates extends WP_UnitTestCase {
 			}
 
 			$this->assertStringContainsString( 'contains invalid characters.', $e->getMessage() );
+			$this->assertNotInstanceOf( GravityPdfNotATemplateException::class, $e );
 		} finally {
 			if ( file_exists( $test_file ) ) {
 				unlink( $test_file );
@@ -581,8 +590,33 @@ class Test_Templates extends WP_UnitTestCase {
 			$this->fail( 'Expected the oversized zip to be refused.' );
 		} catch ( UploadException $e ) {
 			$this->assertStringContainsString( 'File size is too large', implode( "\n", $file->getErrors() ) );
+			$this->assertSame( 'Upload exceeds the 1 KB limit.', $this->model->get_upload_error_message( $file ) );
 		} finally {
 			unlink( $test_file );
+		}
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_get_upload_error_message_ignores_failures_not_down_to_the_file() {
+		global $gfpdf;
+
+		$_FILES['template'] = [
+			'name'     => 'test-archive.zip',
+			'tmp_name' => $this->make_zip( [ 'tmp' => '' ] ),
+			'error'    => UPLOAD_ERR_OK,
+		];
+
+		/* Not uploaded through PHP */
+		$file = new File( 'template', new FileSystem( $gfpdf->data->template_tmp_location ) );
+		try {
+			$this->model->move_template_to_tmp_dir( $file );
+			$this->fail( 'Expected a file not uploaded through PHP to be refused.' );
+		} catch ( UploadException $e ) {
+			$this->assertSame( '', $this->model->get_upload_error_message( $file ) );
+		} finally {
+			unlink( $_FILES['template']['tmp_name'] );
 		}
 	}
 
@@ -626,6 +660,26 @@ class Test_Templates extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'version', $info[0] );
 		$this->assertArrayHasKey( 'version', $info[1] );
 		$this->assertEquals( 'Zadani', $info[0]['template'] );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_check_for_valid_pdf_templates_flags_a_php_file_that_is_not_a_template() {
+		global $gfpdf;
+
+		$file = $gfpdf->data->template_tmp_location . 'not-a-template-' . uniqid() . '.php';
+		file_put_contents( $file, "<?php\necho 'hello';\n" );
+
+		try {
+			$this->model->check_for_valid_pdf_templates( [ $file ] );
+			$this->fail( 'Expected the PHP file to be rejected' );
+		} catch ( Exception $e ) {
+			$this->assertStringContainsString( 'is not a valid PDF Template', $e->getMessage() );
+			$this->assertInstanceOf( GravityPdfNotATemplateException::class, $e );
+		} finally {
+			unlink( $file );
+		}
 	}
 
 	public function test_check_for_valid_pdf_templates_requires_developer_toolkit() {

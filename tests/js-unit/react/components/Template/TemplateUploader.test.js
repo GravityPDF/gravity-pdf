@@ -149,6 +149,20 @@ describe('Template - TemplateUploader.js', () => {
       expect(statusMessages(wrapper, 'component-stateMessage-showMessage').length).toBe(1)
     })
 
+    test('links to the template docs when a zip has no PDF template', () => {
+      wrapper = setupUploader({
+        templateUploads: [
+          { id: 1, filename: 'one.zip', status: 'failed', message: 'boom', docs: true },
+          { id: 2, filename: 'two.zip', status: 'failed', message: 'boom', docs: false }
+        ]
+      })
+
+      const errors = statusMessages(wrapper, 'component-stateError-showMessage')
+
+      expect(errors.at(0).find('TemplateDocsLink').length).toBe(1)
+      expect(errors.at(1).find('TemplateDocsLink').length).toBe(0)
+    })
+
     test('holds the success message until every zip has reported back', () => {
       wrapper = setupUploader({
         templateUploads: [

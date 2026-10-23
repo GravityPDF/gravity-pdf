@@ -35,6 +35,7 @@ export class ShowMessage extends Component {
    */
   static propTypes = {
     text: PropTypes.string.isRequired,
+    children: PropTypes.node,
     error: PropTypes.bool,
     warning: PropTypes.bool,
     delay: PropTypes.number,
@@ -140,7 +141,7 @@ export class ShowMessage extends Component {
    * @since 4.1
    */
   render () {
-    const { text, error, warning } = this.props
+    const { text, children, error, warning } = this.props
 
     let classes = 'notice inline'
 
@@ -159,7 +160,7 @@ export class ShowMessage extends Component {
           ref={message => (this._message = message)}
           className={classes}
         >
-          <p>{text}</p>
+          <p>{text}{children && <> {children}</>}</p>
         </div>
         )
       : <div />
