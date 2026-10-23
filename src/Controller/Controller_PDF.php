@@ -10,6 +10,7 @@ use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_PDF;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Statics\Kses;
@@ -63,6 +64,15 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * @since 4.0
 	 */
 	protected $misc;
+
+	/**
+	 * The render that added the pre-render hooks, so a nested render leaves them in place
+	 *
+	 * @var Helper_PDF|null
+	 *
+	 * @since 6.18.0
+	 */
+	protected $pre_pdf_hooks_render;
 
 	/**
 	 * Setup our class by injecting all our dependencies
@@ -123,8 +133,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ], 1 ); /* new PDF endpoint */
 
 		/* Allow custom PDF tags / CSS */
-		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ] );
-		add_action( 'gfpdf_post_pdf_generation', [ $this, 'remove_pre_pdf_hooks' ] );
+		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ], 10, 4 );
+		add_action( 'gfpdf_post_pdf_generation', [ $this, 'remove_pre_pdf_hooks' ], 10, 4 );
+		add_action( 'gfpdf_pdf_generation_end', [ $this, 'remove_pre_pdf_hooks' ], 10, 4 );
 
 		/* Display PDF links in Gravity Forms Admin Area */
 		add_action( 'gform_entries_first_column_actions', [ $this->model, 'view_pdf_entry_list' ], 10, 4 );
@@ -154,6 +165,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( function_exists( 'gp_populate_anything' ) ) {
 			add_action( 'gfpdf_pre_pdf_generation', [ $this->model, 'enable_gp_populate_anything' ] );
 			add_action( 'gfpdf_pre_pdf_generation_output', [ $this->model, 'disable_gp_populate_anything' ] );
+			add_action( 'gfpdf_pdf_generation_end', [ $this->model, 'disable_gp_populate_anything' ] );
 
 			/* register preferred hydration method */
 			add_filter( 'gfpdf_current_form_object', [ $this->model, 'gp_populate_anything_hydrate_form' ], 5, 2 );
@@ -353,18 +365,36 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	}
 
 	/**
+	 * @param Helper_PDF|null $pdf_generator The render adding the hooks
+	 *
 	 * @since 5.1.1
+	 * @since 6.18.0 Accepts the render's arguments
 	 */
-	public function add_pre_pdf_hooks() {
+	public function add_pre_pdf_hooks( $form = null, $entry = null, $settings = null, $pdf_generator = null ) {
+		if ( $this->pre_pdf_hooks_render === null && $pdf_generator instanceof Helper_PDF ) {
+			$this->pre_pdf_hooks_render = $pdf_generator;
+		}
+
 		add_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		add_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
 		add_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] );
 	}
 
 	/**
+	 * Only the render that added the hooks removes them. Called without a render, it removes them unconditionally.
+	 *
+	 * @param Helper_PDF|null $pdf_generator The render that ended
+	 *
 	 * @since 5.1.1
+	 * @since 6.18.0 Accepts the render's arguments, and a nested render leaves the hooks in place
 	 */
-	public function remove_pre_pdf_hooks() {
+	public function remove_pre_pdf_hooks( $form = null, $entry = null, $settings = null, $pdf_generator = null ) {
+		if ( $this->pre_pdf_hooks_render !== null && $pdf_generator instanceof Helper_PDF && $pdf_generator !== $this->pre_pdf_hooks_render ) {
+			return;
+		}
+
+		$this->pre_pdf_hooks_render = null;
+
 		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
 		remove_filter( 'pre_kses', [ Kses::class, 'strip_scripts' ] );

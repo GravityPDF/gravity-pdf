@@ -43,8 +43,12 @@ class Queue_Callbacks {
 
 		/* For performance, only generate the PDF if it does not currently exist on disk */
 		add_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
-		$pdf = GPDFAPI::create_pdf( $entry_id, $pdf_id );
-		remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
+
+		try {
+			$pdf = GPDFAPI::create_pdf( $entry_id, $pdf_id );
+		} finally {
+			remove_filter( 'gfpdf_override_pdf_bypass', '__return_false', 20 );
+		}
 
 		if ( is_wp_error( $pdf ) ) {
 			$log->error(
