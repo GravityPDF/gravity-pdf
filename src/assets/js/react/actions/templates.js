@@ -259,18 +259,19 @@ export const templateUploadProcessingSuccess = (id, templates) => {
 /**
  * Fires when a zip fails to install
  *
- * @param  {number} id      The upload that failed
- * @param  {string} message Why it failed
+ * @param  {number}  id      The upload that failed
+ * @param  {string}  message Why it failed
+ * @param  {boolean} docs    Whether to link to the docs on creating a template
  *
- * @returns {{type, payload: { id: number, message: string }}}
+ * @returns {{type, payload: { id: number, message: string, docs: boolean }}}
  *
  * @since 5.2
- * @since 6.18.0 Takes the upload `id` and a message
+ * @since 6.18.0 Takes the upload `id`, a message and the docs flag
  */
-export const templateUploadProcessingFailed = (id, message) => {
+export const templateUploadProcessingFailed = (id, message, docs = false) => {
   return {
     type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-    payload: { id, message }
+    payload: { id, message, docs }
   }
 }
 

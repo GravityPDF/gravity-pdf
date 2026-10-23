@@ -268,7 +268,7 @@ export default function (state = initialState, action) {
         templateUploads: updateUpload(
           state.templateUploads,
           action.payload.id,
-          { status: 'failed', message: action.payload.message }
+          { status: 'failed', message: action.payload.message, docs: action.payload.docs }
         )
       }
 

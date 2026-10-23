@@ -21,6 +21,7 @@
 * 🧹 Housekeeping: Check Gravity PDF folder permissions on the System Status report page
 * 🧹 Housekeeping: Set a 1-minute minimum for the Logged Out Timeout
 * 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
+* 🧹 Housekeeping: Link to the custom template docs from the Template Manager
 * 🧹 Housekeeping: Explain in the Template Manager why an admin can't upload or delete templates
 * 🧹 Housekeeping: Scope the bundled PSR-Log library and only load it globally for older add-ons that need it
 * 🧹 Housekeeping: Update PHP and JavaScript dependencies
@@ -41,6 +42,7 @@
 * 🐞 Bug: Refuse to install Developer Toolkit templates in the Template Manager until the Toolkit plugin is active
 * 🐞 Bug: Prevent the Template Manager deleting add-on PDF templates
 * 🐞 Bug: Don't cap PDF template uploads at a multisite network's media upload limit
+* 🐞 Bug: Explain why a PDF template upload was refused when the file isn't a zip or is too large
 * 🐞 Bug: Fix PHP deprecation notices when a field value or PDF setting is empty
 * 🐞 Bug: Fix PHP deprecation notice for empty rich text Paragraph fields
 * 🐞 Bug: Don't add debug errors to raw PDF URLs

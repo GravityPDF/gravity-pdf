@@ -146,7 +146,7 @@ describe('Actions - templates', () => {
     results = templateUploadProcessingFailed(1, 'error')
 
     expect(results.type).toEqual(TEMPLATE_UPLOAD_PROCESSING_FAILED)
-    expect(results.payload).toEqual({ id: 1, message: 'error' })
+    expect(results.payload).toEqual({ id: 1, message: 'error', docs: false })
   })
 
   test('templateUploadRejected - check if it returns the correct action', () => {
