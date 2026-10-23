@@ -52,6 +52,7 @@
 * 🐞 Bug: Fix custom font uploads when the filename has dots or brackets
 * 🐞 Bug: Clean up the font files a failed custom font save leaves behind
 * 🐞 Bug: Show the correct upload limit when a custom font file is too large
+* 🐞 Bug: Clear the Font Manager's malformed font error once the bad font file is replaced or removed
 * 🐞 Bug: Stop the code inside `<script>` elements showing as text in the PDF
 * 🐞 Bug: Fix plain-text notifications showing `&#x5b;gravitypdf]` instead of `[gravitypdf]`
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed

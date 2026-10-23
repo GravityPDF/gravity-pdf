@@ -213,7 +213,27 @@ describe('Reducers - fontManagerReducer.js', () => {
         payload: 'italics'
       })
 
-      expect(state.msg.error.addFont).toEqual({})
+      expect(state.msg.error).toEqual({})
+    })
+
+    test('clears the malformed font message once the last variant error is removed', () => {
+      const error = { addFont: { regular: 'Invalid file' }, fontValidationError: 'malformed', deleteFont: 'error' }
+      const initialstate = { msg: { error } }
+
+      state = reducer(initialstate, { type: DELETE_VARIANT_ERROR, payload: 'regular' })
+
+      expect(state.msg.error).toEqual({ deleteFont: 'error' })
+      expect(error.addFont).toEqual({ regular: 'Invalid file' })
+    })
+
+    test('keeps the malformed font message while another variant error remains', () => {
+      const initialstate = {
+        msg: { error: { addFont: { regular: 'Invalid file', bold: 'Invalid file' }, fontValidationError: 'malformed' } }
+      }
+
+      state = reducer(initialstate, { type: DELETE_VARIANT_ERROR, payload: 'regular' })
+
+      expect(state.msg.error).toEqual({ addFont: { bold: 'Invalid file' }, fontValidationError: 'malformed' })
     })
   })
 
@@ -303,7 +323,17 @@ describe('Reducers - fontManagerReducer.js', () => {
         payload: 'regular'
       })
 
-      expect(state.msg.error.addFont).toEqual({})
+      expect(state.msg.error).toEqual({})
+    })
+
+    test('clears the malformed font message without mutating the previous state', () => {
+      const error = { addFont: { regular: 'Invalid file' }, fontValidationError: 'malformed' }
+      const initialstate = { msg: { error } }
+
+      state = reducer(initialstate, { type: CLEAR_DROPZONE_ERROR, payload: 'regular' })
+
+      expect(state.msg.error).toEqual({})
+      expect(error).toEqual({ addFont: { regular: 'Invalid file' }, fontValidationError: 'malformed' })
     })
   })
 
