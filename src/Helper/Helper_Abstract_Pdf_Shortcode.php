@@ -210,14 +210,15 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @internal Hooked last to gform_pre_replace_merge_tags
 	 *
-	 * @param mixed $text
+	 * @param mixed  $text
+	 * @param string $format The merge tag format, `text` or `html`. The hook's other arguments are passed along
 	 *
 	 * @return mixed
 	 *
 	 * @since 6.18.0
 	 */
-	public function gravitypdf_disarm_if_no_merge_tags_left( $text ) {
-		return ! is_string( $text ) || strpos( $text, '{' ) === false ? $this->gravitypdf_disarm_merged_shortcodes( $text ) : $text;
+	public function gravitypdf_disarm_if_no_merge_tags_left( $text, $form = null, $entry = null, $url_encode = false, $esc_html = false, $nl2br = false, $format = 'html' ) {
+		return ! is_string( $text ) || strpos( $text, '{' ) === false ? $this->gravitypdf_disarm_merged_shortcodes( $text, $form, $entry, $url_encode, $esc_html, $nl2br, $format ) : $text;
 	}
 
 	/**
@@ -226,13 +227,14 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 *
 	 * @internal Hooked last to gform_replace_merge_tags
 	 *
-	 * @param mixed $text The filtered text, which another callback may have changed to a non-string
+	 * @param mixed  $text   The filtered text, which another callback may have changed to a non-string
+	 * @param string $format The merge tag format, `text` or `html`. The hook's other arguments are unused
 	 *
 	 * @return mixed
 	 *
 	 * @since 6.18.0
 	 */
-	public function gravitypdf_disarm_merged_shortcodes( $text ) {
+	public function gravitypdf_disarm_merged_shortcodes( $text, $form = null, $entry = null, $url_encode = false, $esc_html = false, $nl2br = false, $format = 'html' ) {
 		/* Gravity Forms also fires the hook when it resolves default values, which the stamping hook didn't see */
 		if ( $this->replacing_depth < 1 ) {
 			return $text;
@@ -247,15 +249,17 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		$trust = $this->get_trust();
 		$stamp = ' ' . self::WRITTEN_ATTR . '="' . $this->get_written_stamp() . '"'; /* As add_shortcode_attr() writes it */
 
+		/* Plain text prints an entity as is, so a zero-width space stops the `[` parsing. Not `&#91;`, which do_shortcode() decodes */
+		$escape = $format === 'text' ? "[\u{200B}" : '&#x5b;';
+
 		/* In one pass, as a written shortcode can match a merged one once its stamp is removed */
 		$replacements = [];
 		foreach ( $this->get_live_shortcodes( $text ) as $code => $shortcode ) {
 			$attr = $shortcode['attr'];
 
-			/* Not `&#91;`, which do_shortcode() turns back into a `[` a later pass would run */
 			if ( ( $attr[ self::WRITTEN_ATTR ] ?? '' ) !== $this->get_written_stamp() ) {
 				$this->log->notice( 'Escaped a [gravitypdf] shortcode a merge tag added', [ 'shortcode' => $code ] );
-				$replacements[ $code ] = '&#x5b;' . substr( $code, 1 );
+				$replacements[ $code ] = $escape . substr( $code, 1 );
 				continue;
 			}
 
