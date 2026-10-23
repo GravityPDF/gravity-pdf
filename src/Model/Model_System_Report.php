@@ -13,7 +13,7 @@ use GFPDF\Statics\Deprecation;
 use GFPDF\View\View_System_Report;
 use GFPDF_Major_Compatibility_Checks;
 use GPDFAPI;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

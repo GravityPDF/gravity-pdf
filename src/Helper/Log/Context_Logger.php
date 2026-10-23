@@ -2,8 +2,8 @@
 
 namespace GFPDF\Helper\Log;
 
-use Psr\Log\AbstractLogger;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\AbstractLogger;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -49,8 +49,6 @@ class Context_Logger extends AbstractLogger {
 	}
 
 	/**
-	 * Untyped $message and a void return keep this compatible with psr/log v1, v2 and v3
-	 *
 	 * @since 6.17.1
 	 */
 	public function log( $level, $message, array $context = [] ): void {
