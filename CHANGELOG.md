@@ -35,6 +35,7 @@
 * 🐞 Bug: Only clear the background PDF queue once a change to Background Processing is saved
 * 🐞 Bug: Use the default when a number setting is left blank
 * 🐞 Bug: Hide the Tools tab from users who can't use it
+* 🐞 Bug: Switch back to the current user when checking another user's PDF capabilities fails
 * 🐞 Bug: Fix missing slash when converting a path under the site root to a URL
 * 🐞 Bug: Keep PDF merge tags in an administrative field's Default Value when the entry is saved
 * 🐞 Bug: Fix a `[gravitypdf]` shortcode in a rich text administrative field's Default Value showing as text in the PDF
