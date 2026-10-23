@@ -209,21 +209,19 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * @since 4.0
 	 */
 	public function has_capability( $capability, $user_id = null ) {
-
-		/* Override current user */
-		if ( $user_id !== null ) {
-			$current_user = wp_get_current_user();
-			wp_set_current_user( $user_id );
+		if ( $user_id === null ) {
+			return GFCommon::current_user_can_any( $capability );
 		}
 
-		$has_capability = GFCommon::current_user_can_any( $capability );
+		/* Restore the current user even if a capability filter throws */
+		$previous_user_id = get_current_user_id();
+		wp_set_current_user( $user_id );
 
-		/* Restore current user */
-		if ( $user_id !== null ) {
-			wp_set_current_user( $current_user->ID );
+		try {
+			return GFCommon::current_user_can_any( $capability );
+		} finally {
+			wp_set_current_user( $previous_user_id );
 		}
-
-		return $has_capability;
 	}
 
 	/**
