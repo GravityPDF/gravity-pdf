@@ -23,6 +23,7 @@
 * 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
 * 🧹 Housekeeping: Explain in the Template Manager why an admin can't upload or delete templates
 * 🧹 Housekeeping: Scope the bundled PSR-Log library and only load it globally for older add-ons that need it
+* 🧹 Housekeeping: Update PHP and JavaScript dependencies
 * 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed
 * 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
 * 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
