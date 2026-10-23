@@ -12,7 +12,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF_Major_Compatibility_Checks;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

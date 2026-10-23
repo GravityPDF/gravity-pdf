@@ -42,8 +42,4 @@ return [
 			return $content;
 		},
 	],
-
-	'whitelist' => [
-		'Psr\*',
-	],
 ];

@@ -22,6 +22,7 @@
 * 🧹 Housekeeping: Set a 1-minute minimum for the Logged Out Timeout
 * 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
 * 🧹 Housekeeping: Explain in the Template Manager why an admin can't upload or delete templates
+* 🧹 Housekeeping: Scope the bundled PSR-Log library and only load it globally for older add-ons that need it
 * 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed
 * 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
 * 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
@@ -64,6 +65,7 @@
 * 💻 Developer: Add `gfpdf_process_merge_tags_in_submitted_rich_text` filter to opt submitted rich-text Textarea and Post Content values back into merge tag processing
 * 💻 Developer: Add `gfpdf_shortcode_signing_user_id` filter to change which user's entry access is checked when signing `[gravitypdf]` URLs
 * 💻 Developer: Add the `gfpdf_template_max_upload_size` filter
+* 💻 Developer: Add `gfpdf_alias_global_psr_log` filter to load the bundled PSR-Log library into the global `Psr\Log` namespace
 
 ### 6.17.2
 * 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+

@@ -6,7 +6,7 @@ use Exception;
 use GFPDF\Statics\Deprecation;
 use GPDFAPI;
 use GFPDF\Statics\Upload_Size;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use stdClass;
 
 /**

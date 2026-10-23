@@ -11,7 +11,7 @@ use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Model\Model_Actions;
 use GFPDF\View\View_Actions;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

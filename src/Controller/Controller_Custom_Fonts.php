@@ -25,7 +25,7 @@ use GFPDF_Vendor\GravityPdf\Upload\File;
 use GFPDF_Vendor\GravityPdf\Upload\Filename;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
 use GPDFAPI;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;

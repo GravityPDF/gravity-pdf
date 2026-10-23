@@ -13,7 +13,7 @@ use GFPDF\Statics\Deprecation_V3;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use GFPDF_Vendor\Mpdf\Container\SimpleContainer;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use GPDFAPI;
 
 /**

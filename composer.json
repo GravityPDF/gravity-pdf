@@ -43,9 +43,7 @@
   },
   "autoload": {
     "psr-4": {
-      "GFPDF\\": "src/",
-      "Psr\\Http\\Message\\": "vendor/psr/http-message/src",
-      "Psr\\Log\\": "vendor/psr/log/Psr/Log"
+      "GFPDF\\": "src/"
     },
     "classmap": [
       "vendor_prefixed/"

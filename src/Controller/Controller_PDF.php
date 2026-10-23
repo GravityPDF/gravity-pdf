@@ -15,7 +15,7 @@ use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Statics\Kses;
 use GFPDF\Statics\Notes;
 use GFPDF\View\View_PDF;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

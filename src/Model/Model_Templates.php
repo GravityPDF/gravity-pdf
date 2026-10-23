@@ -15,7 +15,7 @@ use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\FileType;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Size;
 use GPDFAPI;
-use Psr\Log\LoggerInterface;
+use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
