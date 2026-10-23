@@ -5,6 +5,8 @@ namespace GFPDF\Tests;
 use GFPDF\Model\Model_Settings;
 use GFPDF\Tests\Concerns\UsesFactory;
 use GPDFAPI;
+use RuntimeException;
+use WP_Error;
 use WP_UnitTestCase;
 
 /**
@@ -389,5 +391,36 @@ class Test_API extends WP_UnitTestCase {
 		$this->assertSame( 'inactive', GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'active' => false ] ) )->get_error_code() );
 		$this->assertSame( 'conditional_logic', GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'conditionalLogic' => $rule( 'Someone else' ) ] ) )->get_error_code() );
 		$this->assertIsString( GPDFAPI::get_pdf_url( $entry_id, $pdfs->create( [ 'conditionalLogic' => $rule( 'Jake' ) ] ) ) );
+	}
+
+	public function test_create_pdf_removes_its_bypass_when_generation_throws() {
+		add_action(
+			'gfpdf_pre_generate_and_save_pdf',
+			function () {
+				throw new RuntimeException( 'Generation failed' );
+			}
+		);
+
+		try {
+			GPDFAPI::create_pdf( $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0]['id'], '555ad84787d7e' );
+			$this->fail( 'The exception should reach the caller' );
+		} catch ( RuntimeException $e ) {
+			$this->assertSame( 'Generation failed', $e->getMessage() );
+		}
+
+		$this->assertFalse( has_filter( 'gfpdf_override_pdf_bypass' ) );
+	}
+
+	public function test_create_pdf_keeps_a_callers_bypass() {
+		add_filter( 'gfpdf_override_pdf_bypass', '__return_true' );
+		add_action(
+			'gfpdf_pre_pdf_generation_initilise',
+			function () {
+				throw new RuntimeException( 'Render failed' );
+			}
+		);
+
+		$this->assertInstanceOf( WP_Error::class, GPDFAPI::create_pdf( $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0]['id'], '555ad84787d7e' ) );
+		$this->assertSame( 10, has_filter( 'gfpdf_override_pdf_bypass', '__return_true' ) );
 	}
 }
