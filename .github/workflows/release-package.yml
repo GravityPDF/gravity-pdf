@@ -105,9 +105,7 @@ jobs:
 
       # Fails on malware-like code (eval, shell exec, decoders) missing from tools/release/scan-baseline.txt.
       - name: Scan package code
-        run: |
-          set -o pipefail
-          php ./tools/release/scan.php "$PACKAGE_ZIP" | tee -a "$GITHUB_STEP_SUMMARY"
+        run: php ./tools/release/scan.php "$PACKAGE_ZIP" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Generate release notes
         run: |

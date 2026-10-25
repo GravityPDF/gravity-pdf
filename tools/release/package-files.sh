@@ -7,6 +7,8 @@ PACKAGE_EXCLUDE=(src/assets/js src/assets/scss)
 PACKAGE_REQUIRED=(pdf.php api.php vendor/autoload.php vendor/composer/installed.json vendor_prefixed/mpdf build/assets)
 # Build output inside PACKAGE_FILES; verify.sh fails unless everything else matches the commit's blobs exactly.
 PACKAGE_BUILT=(build/assets vendor vendor_prefixed)
+# PHP in these is flagged by scan.php.
+PACKAGE_ASSETS=(build src/assets)
 
 is_package_file() {
 	[[ " ${PACKAGE_FILES[*]} " == *" $1 "* ]]
