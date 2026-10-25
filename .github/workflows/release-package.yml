@@ -75,7 +75,7 @@ jobs:
 
       # Before the build, so a drifted lock or a vulnerable shipped package fails fast.
       - name: Audit dependencies
-        run: bash ./tools/release/audit-dependencies.sh >> "$GITHUB_STEP_SUMMARY"
+        run: bash ./tools/release/audit-dependencies.sh | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Gravity PDF Build
         run: bash ./tools/release/build.sh "$SOURCE_TAG"

@@ -4,20 +4,21 @@
 # Dev/build-only advisories are reported, never fatal. Prints a Markdown report; failures also go to stderr.
 set -uo pipefail
 
-scoper_dir="tools/php-scoper"
+source "$(dirname "$0")/package-files.sh"
+
 # composer audit fetches advisories, so it gets the 429 retry.
 audit=(bash tools/ci/composer-retry.sh audit --locked --abandoned=report)
 fail=0
 
-# $1 = label, $2 = fatal (1) or report-only (0), rest = the command.
+# check <label> fatal|report <command...>; returns the command's status.
 check() {
-	local label="$1" fatal="$2" output
+	local label="$1" mode="$2" output
 	shift 2
 	if output=$("$@" 2>&1); then
 		echo "- ${label}: ok"
-		return
+		return 0
 	fi
-	if [ "${fatal}" -eq 1 ]; then
+	if [ "${mode}" = fatal ]; then
 		echo "FAIL: ${label}" >&2
 		echo "${output}" >&2
 		echo "- **${label}: FAIL**"
@@ -26,19 +27,26 @@ check() {
 		echo "- ${label}: advisories found (report-only)"
 	fi
 	printf '\n  <details><summary>Output</summary>\n\n%s\n%s\n%s\n\n  </details>\n' '```' "${output}" '```'
+	return 1
 }
 
 echo "### Dependency audit"
 echo
 
-check "composer.lock matches composer.json" 1 composer validate --check-lock --no-check-publish
-check "${scoper_dir}/composer.lock matches its composer.json" 1 \
-	composer validate --check-lock --no-check-publish --working-dir "${scoper_dir}"
-check "Composer, shipped packages" 1 "${audit[@]}" --no-dev
-check "Composer, all packages (incl. dev)" 0 "${audit[@]}"
-check "Composer, php-scoper toolchain" 0 "${audit[@]}" --working-dir "${scoper_dir}"
+check "composer.lock matches composer.json" fatal composer validate --check-lock --no-check-publish
+for dir in "${BUILD_COMPOSER_DIRS[@]}"; do
+	check "${dir}/composer.lock matches its composer.json" fatal \
+		composer validate --check-lock --no-check-publish --working-dir "${dir}"
+done
+# A clean full audit covers the shipped subset, saving a second advisory fetch.
+if ! check "Composer, all packages (incl. dev)" report "${audit[@]}"; then
+	check "Composer, shipped packages" fatal "${audit[@]}" --no-dev
+fi
+for dir in "${BUILD_COMPOSER_DIRS[@]}"; do
+	check "Composer, ${dir} toolchain" report "${audit[@]}" --working-dir "${dir}"
+done
 # yarn.lock drift is caught by build.sh's --frozen-lockfile install.
-check "Yarn, shipped packages" 1 yarn audit --groups dependencies --summary
-check "Yarn, dev packages" 0 yarn audit --groups devDependencies --summary
+check "Yarn, shipped packages" fatal yarn audit --groups dependencies --summary
+check "Yarn, dev packages" report yarn audit --groups devDependencies --summary
 
 exit "${fail}"
