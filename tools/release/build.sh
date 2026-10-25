@@ -58,13 +58,12 @@ PLUGIN_DIR="$PACKAGE_DIR" bash ./tools/php-scoper/cleanup.sh
 source "$(dirname "$0")/package-files.sh"
 shopt -s dotglob nullglob
 for path in "${PACKAGE_DIR}"/*; do
-	[[ " ${PACKAGE_FILES[*]} " == *" $(basename "${path}") "* ]] || rm -Rf "${path}"
+	is_package_file "$(basename "${path}")" || rm -Rf "${path}"
 done
 shopt -u dotglob nullglob
-
-# Sources only; build/assets holds the compiled output.
-rm -f -R "${PACKAGE_DIR}/src/assets/js"
-rm -f -R "${PACKAGE_DIR}/src/assets/scss"
+for path in "${PACKAGE_EXCLUDE[@]}"; do
+	rm -Rf "${PACKAGE_DIR:?}/${path}"
+done
 
 cd "${PACKAGE_DIR}/../"
 
