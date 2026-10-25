@@ -52,13 +52,13 @@ runs:
 
     - name: Setup PHP
       if: inputs.php-version != ''
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
       with:
         php-version: ${{ inputs.php-version }}
         coverage: ${{ inputs.php-coverage }}
 
     - name: Setup Node JS
-      uses: actions/setup-node@v6
+      uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
       with:
         node-version-file: '.nvmrc'
         cache: ${{ inputs.node-cache }}
@@ -102,7 +102,7 @@ runs:
     - name: Cache Playwright browsers
       if: inputs.playwright == 'true'
       id: playwright-cache
-      uses: actions/cache@v5
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
       with:
         path: ~/.cache/ms-playwright
         key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}

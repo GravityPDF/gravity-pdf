@@ -15,6 +15,10 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.version || github.ref_name }}
 
+# Read-only default; only the release job writes.
+permissions:
+  contents: read
+
 jobs:
   package:
     uses: ./.github/workflows/release-package.yml
@@ -26,15 +30,17 @@ jobs:
   release:
     needs: package
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download package
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: release-package
           path: tmp/package
 
       - name: Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           # Explicit so a dispatch creates the version tag instead of targeting the branch ref.
           tag_name: ${{ needs.package.outputs.tag }}
