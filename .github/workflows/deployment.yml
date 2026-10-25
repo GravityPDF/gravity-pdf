@@ -34,12 +34,13 @@ jobs:
           path: tmp/package
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           # Explicit so a dispatch creates the version tag instead of targeting the branch ref.
           tag_name: ${{ needs.package.outputs.tag }}
           target_commitish: ${{ github.sha }}
           files: ./tmp/package/gravity-pdf-*.zip
+          body_path: ./tmp/package/release-notes.md
           generate_release_notes: true
           append_body: true
           prerelease: true

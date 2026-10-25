@@ -54,38 +54,16 @@ composer install --prefer-dist --working-dir ${PACKAGE_DIR}
 # Run vendor cleanup - Ensures that there's no dev dependencies on production
 PLUGIN_DIR="$PACKAGE_DIR" bash ./tools/php-scoper/cleanup.sh
 
-# Cleanup Node JS
-rm -f -R ${PACKAGE_DIR}/node_modules
-
-# Cleanup additional build files
-FILES=(
-"composer.json"
-"composer.lock"
-"package.json"
-"yarn.lock"
-".gitignore"
-".stylelintrc.json"
-"webpack.config.js"
-".nvmrc"
-".env.example"
-"tsconfig.json"
-".browserslistrc"
-".eslintignore"
-".eslintrc.js"
-".gitattributes"
-"babel.config.js"
-"jest.config.js"
-)
-
-echo "$PWD"
-for i in "${FILES[@]}"
-do
-    rm -f "${PACKAGE_DIR}/${i}"
+# Allowlist the top level, so new tooling or config can't leak into the zip.
+source "$(dirname "$0")/package-files.sh"
+shopt -s dotglob nullglob
+for path in "${PACKAGE_DIR}"/*; do
+	is_package_file "$(basename "${path}")" || rm -Rf "${path}"
 done
-
-rm -f -R "${PACKAGE_DIR}/tmp"
-rm -f -R "${PACKAGE_DIR}/tools"
-rm -f -R "${PACKAGE_DIR}/.claude"
+shopt -u dotglob nullglob
+for path in "${PACKAGE_EXCLUDE[@]}"; do
+	rm -Rf "${PACKAGE_DIR:?}/${path}"
+done
 
 cd "${PACKAGE_DIR}/../"
 
