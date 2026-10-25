@@ -12,7 +12,6 @@ zip="$1"
 version="$2"
 
 source "$(dirname "$0")/package-files.sh"
-REQUIRED=(pdf.php api.php vendor/autoload.php vendor/composer/installed.json vendor_prefixed/mpdf "${PACKAGE_ASSETS}")
 
 if [ ! -s "${zip}" ]; then
 	echo "FAIL: ${zip} is missing or empty" >&2
@@ -22,6 +21,10 @@ fi
 entries=$(unzip -Z1 "${zip}")
 fail=0
 
+has_entry() {
+	grep -q "^gravity-pdf/$1\(/\|$\)" <<<"${entries}"
+}
+
 top=$(cut -d/ -f1 <<<"${entries}" | sort -u)
 if [ "${top}" != "gravity-pdf" ]; then
 	echo "FAIL: expected a single gravity-pdf/ folder at the top of the zip, found: ${top//$'\n'/ }" >&2
@@ -29,15 +32,18 @@ if [ "${top}" != "gravity-pdf" ]; then
 fi
 
 for entry in $(awk -F/ 'NF > 1 && $2 != "" { print $2 }' <<<"${entries}" | sort -u); do
-	[[ " ${PACKAGE_FILES[*]} " == *" ${entry} "* ]] || { echo "FAIL: unexpected top-level entry '${entry}'" >&2; fail=1; }
+	is_package_file "${entry}" || { echo "FAIL: unexpected top-level entry '${entry}'" >&2; fail=1; }
 done
 
-for path in "${REQUIRED[@]}"; do
-	grep -q "^gravity-pdf/${path}\(/\|$\)" <<<"${entries}" || { echo "FAIL: missing ${path}" >&2; fail=1; }
+for path in "${PACKAGE_REQUIRED[@]}"; do
+	has_entry "${path}" || { echo "FAIL: missing ${path}" >&2; fail=1; }
+done
+
+for path in "${PACKAGE_EXCLUDE[@]}"; do
+	! has_entry "${path}" || { echo "FAIL: ${path} should have been removed" >&2; fail=1; }
 done
 
 # Catches a tag pushed before the version bump.
-
 pdf_php=$(unzip -p "${zip}" gravity-pdf/pdf.php)
 header=$(sed -n 's/^Version: *//p' <<<"${pdf_php}")
 constant=$(sed -n "s/^define( 'PDF_EXTENDED_VERSION', '\([^']*\)' );.*/\1/p" <<<"${pdf_php}")

@@ -17,11 +17,10 @@ size=$(wc -c < "${zip}")
 
 prev_tag=""
 prev_size=""
-if tags=$(gh api "repos/${repo}/releases" --paginate --jq '.[] | select(.draft or .prerelease | not) | .tag_name' 2>/dev/null); then
-	prev_tag=$(printf '%s\n%s\n' "${tags}" "${version}" | sort -V -u | awk -v v="${version}" '$0 == v { print prev; exit } { prev = $0 }')
-fi
-if [ -n "${prev_tag}" ]; then
-	prev_size=$(gh api "repos/${repo}/releases/tags/${prev_tag}" --jq '[.assets[] | select(.name | test("^gravity-pdf-.*\\.zip$")) | .size] | first // ""' 2>/dev/null || true)
+# One "tag<TAB>zip size" row per full release.
+if rows=$(gh api "repos/${repo}/releases?per_page=100" --paginate --jq '.[] | select(.draft or .prerelease | not) | [.tag_name, ([.assets[] | select(.name | test("^gravity-pdf-.*\\.zip$")) | .size] | first // "")] | @tsv' 2>/dev/null); then
+	prev_tag=$(printf '%s\n%s\n' "$(cut -f1 <<<"${rows}")" "${version}" | sort -V -u | awk -v v="${version}" '$0 == v { print prev; exit } { prev = $0 }')
+	prev_size=$(awk -F'\t' -v t="${prev_tag}" '$1 == t { print $2; exit }' <<<"${rows}")
 fi
 
 mb() {

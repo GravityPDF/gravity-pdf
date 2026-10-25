@@ -37,13 +37,12 @@ PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
 source "$(dirname "$0")/../tools/release/package-files.sh"
 shopt -s dotglob nullglob
 for path in "${PACKAGE_DIR}"/*; do
-	[[ " ${PACKAGE_FILES[*]} " == *" $(basename "${path}") "* ]] || rm -Rf "${path}"
+	is_package_file "$(basename "${path}")" || rm -Rf "${path}"
 done
 shopt -u dotglob nullglob
-
-rm -f "${PACKAGE_DIR}/vendor_prefixed/.gitkeep"
-rm -f -R "${PACKAGE_DIR}/src/assets/scss"
-rm -f -R "${PACKAGE_DIR}/src/assets/js"
+for path in "${PACKAGE_EXCLUDE[@]}"; do
+	rm -Rf "${PACKAGE_DIR:?}/${path}"
+done
 
 # Generate language files
 cd "${PACKAGE_DIR}"
