@@ -67,19 +67,34 @@ jobs:
             exit 1
           fi
           echo "tag=$version" >> "$GITHUB_OUTPUT"
+          echo "SOURCE_TAG=$version" >> "$GITHUB_ENV"
 
       - name: Gravity PDF Build
         run: bash ./tools/release/build.sh "$SOURCE_TAG"
+
+      - name: Verify package
+        run: bash ./tools/release/verify.sh "tmp/package/gravity-pdf-$SOURCE_TAG.zip" "$SOURCE_TAG"
+
+      - name: Generate release notes
+        run: |
+          {
+            bash ./tools/release/changelog-notes.sh "$SOURCE_TAG"
+            bash ./tools/release/compare-release-size.sh "tmp/package/gravity-pdf-$SOURCE_TAG.zip" "$SOURCE_TAG"
+          } | tee tmp/package/release-notes.md >> "$GITHUB_STEP_SUMMARY"
         env:
-          SOURCE_TAG: ${{ steps.tag.outputs.tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # The E2E and release jobs run on other runners, so hand the zip on.
       - name: Upload package
         uses: actions/upload-artifact@v6
         with:
           name: release-package
-          path: tmp/package/gravity-pdf-*.zip
+          path: |
+            tmp/package/gravity-pdf-*.zip
+            tmp/package/release-notes.md
           if-no-files-found: error
+          # The zip is already compressed.
+          compression-level: 0
 
   # Core E2E with the zip mounted as the plugin, so packaging gaps fail before release.
   e2e-package:
