@@ -8,7 +8,7 @@
 * 🎉 Feature: Install template zips that have the templates inside a folder
 * 🔒 Security: Only sign PDF URLs when the shortcode or merge tag comes from a trusted source
 * 🔒 Security: Cap signed PDF URLs at 1 year and the Logged Out Timeout at 1 week
-* 🔒 Security: Restrict PDF template uploads to users who can install plugins
+* 🔒 Security: Restrict PDF template uploads and deletes to users who can install plugins
 * 🔒 Security: Upgrade the bundled upload library to 4.0
 * 🔒 Security: Harden PDF links in entry exports
 * 🔒 Security: Escape the ?data=1 debug output
@@ -42,7 +42,6 @@
 * 🐞 Bug: Fix a `[gravitypdf]` shortcode in a rich text administrative field's Default Value showing as text in the PDF
 * 🐞 Bug: Refuse to install Developer Toolkit templates in the Template Manager until the Toolkit plugin is active
 * 🐞 Bug: Prevent the Template Manager deleting add-on PDF templates
-* 🐞 Bug: Don't cap PDF template uploads at a multisite network's media upload limit
 * 🐞 Bug: Explain why a PDF template upload was refused when the file isn't a zip or is too large
 * 🐞 Bug: Fix PHP deprecation notices when a field value or PDF setting is empty
 * 🐞 Bug: Fix PHP deprecation notice for empty rich text Paragraph fields
@@ -57,7 +56,6 @@
 * 🐞 Bug: Show the correct upload limit when a custom font file is too large
 * 🐞 Bug: Clear the Font Manager's malformed font error once the bad font file is replaced or removed
 * 🐞 Bug: Stop the code inside `<script>` elements showing as text in the PDF
-* 🐞 Bug: Fix plain-text notifications showing `&#x5b;gravitypdf]` instead of `[gravitypdf]`
 * 🐞 Bug: Don't leave PDF generation filters attached when a PDF fails to generate
 * 🐞 Bug: Stop bypassing Populate Anything's live merge tag whitelist after a PDF is generated
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
