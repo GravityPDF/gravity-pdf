@@ -4,50 +4,43 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build and publish (e.g. 6.18.0). A tag of this name is created at the checked-out commit.
+        required: true
+        type: string
+
+# One run per version, so a re-pushed tag can't race the publish.
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.version || github.ref_name }}
 
 jobs:
-  pdf-build:
+  package:
+    uses: ./.github/workflows/release-package.yml
+    with:
+      # The pushed tag, or the dispatch input.
+      version: ${{ inputs.version || github.ref_name }}
+    secrets: inherit
+
+  release:
+    needs: package
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Download package
+        uses: actions/download-artifact@v4
         with:
-          php-version: 7.4
-          coverage: none
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get tag
-        id: tag
-        uses: devops-actions/action-get-tag@v1.0.2
-
-      - name: Setup Node JS
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-
-      - name: General debug information
-        run: |
-          npm --version
-          node --version
-          yarn --version
-          curl --version
-          git --version
-          php --version
-          composer --version        
-
-      - name: Gravity PDF Build
-        run: bash ./bin/build.sh $SOURCE_TAG
-        env:
-          SOURCE_TAG: ${{steps.tag.outputs.tag}}
+          name: release-package
+          path: tmp/package
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
+          # Explicit so a dispatch creates the version tag instead of targeting the branch ref.
+          tag_name: ${{ needs.package.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           files: ./tmp/package/gravity-pdf-*.zip
+          body_path: ./tmp/package/release-notes.md
           generate_release_notes: true
           append_body: true
           prerelease: true

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Fail fast so a broken step can't still zip a partial plugin. No -u: BRANCH is intentionally unset below.
+set -eo pipefail
+
 echo $0 $1
 
 if [ $# -lt 1 ]; then
@@ -12,6 +15,9 @@ TMP_DIR="./tmp/package/"
 PACKAGE_DIR="${TMP_DIR}${VERSION}"
 WORKING_DIR=$PWD
 PACKAGE_NAME="gravity-pdf"
+
+# Ensure a fresh build
+rm -f -r "${PACKAGE_DIR}"
 
 # Create the working directory
 mkdir -p ${PACKAGE_DIR}
@@ -27,35 +33,16 @@ composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${P
 
 PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
 
-# Cleanup Node JS
-rm -f -R ${PACKAGE_DIR}/node_modules
-
-# Cleanup additional build files
-FILES=(
-"${PACKAGE_DIR}/composer.json"
-"${PACKAGE_DIR}/composer.lock"
-"${PACKAGE_DIR}/package.json"
-"${PACKAGE_DIR}/yarn.lock"
-"${PACKAGE_DIR}/.babelrc"
-"${PACKAGE_DIR}/webpack.config.js"
-"${PACKAGE_DIR}/php-scoper.phar"
-"${PACKAGE_DIR}/vendor_prefixed/.gitkeep"
-"${PACKAGE_DIR}/.nvmrc"
-"${PACKAGE_DIR}/.wp-env.json"
-"${PACKAGE_DIR}/.testcaferc.js"
-"${PACKAGE_DIR}/.browserslistrc"
-)
-
-for i in "${FILES[@]}"
-do
-    rm -f ${i}
+# Allowlist the top level, so new tooling or config can't leak into the zip.
+source "$(dirname "$0")/../tools/release/package-files.sh"
+shopt -s dotglob nullglob
+for path in "${PACKAGE_DIR}"/*; do
+	is_package_file "$(basename "${path}")" || rm -Rf "${path}"
 done
-
-rm -f -R "${PACKAGE_DIR}/src/assets/scss"
-rm -f -R "${PACKAGE_DIR}/src/assets/js"
-rm -f -R "${PACKAGE_DIR}/bin"
-rm -f -R "${PACKAGE_DIR}/.php-scoper"
-rm -f -R "${PACKAGE_DIR}/webpack-configs"
+shopt -u dotglob nullglob
+for path in "${PACKAGE_EXCLUDE[@]}"; do
+	rm -Rf "${PACKAGE_DIR:?}/${path}"
+done
 
 # Generate language files
 cd "${PACKAGE_DIR}"
