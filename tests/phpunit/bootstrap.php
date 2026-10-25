@@ -92,6 +92,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 */
 	public function mocks() {
 		require_once 'unit-tests/Mocks/zapier-mock.php';
+		require_once 'unit-tests/Mocks/gp-populate-anything-mock.php';
 	}
 
 	/**
