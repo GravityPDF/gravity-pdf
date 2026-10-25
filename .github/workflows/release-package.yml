@@ -1,0 +1,87 @@
+name: Release Package
+
+# Builds and verifies the zip; called by deployment.yml, or dispatch to dry-run.
+# No E2E on the zip here: this branch's E2E suite is disabled (see end-to-end-tests.yml).
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version to build (x.y.z).
+        required: true
+        type: string
+    outputs:
+      tag:
+        description: The version that was built.
+        value: ${{ jobs.build.outputs.tag }}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to name the zip (x.y.z). Defaults to the plugin header's.
+        required: false
+        type: string
+
+# Not github.workflow: under workflow_call that is the caller's name, and sharing its group would deadlock the two.
+concurrency:
+  group: release-package-${{ inputs.version || github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          coverage: none
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node JS
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      # The given version, or the plugin header's.
+      - name: Resolve version
+        id: tag
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="${INPUT_VERSION:-$(sed -n 's/^Version: *//p' pdf.php)}"
+          if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+(\.[0-9]+)?'; then
+            echo "Version '$version' is not a valid x.y.z version" >&2
+            exit 1
+          fi
+          echo "tag=$version" >> "$GITHUB_OUTPUT"
+          echo "SOURCE_TAG=$version" >> "$GITHUB_ENV"
+
+      - name: Gravity PDF Build
+        run: bash ./bin/build.sh "$SOURCE_TAG"
+
+      - name: Verify package
+        run: bash ./tools/release/verify.sh "tmp/package/gravity-pdf-$SOURCE_TAG.zip" "$SOURCE_TAG"
+
+      - name: Generate release notes
+        run: |
+          {
+            bash ./tools/release/changelog-notes.sh "$SOURCE_TAG"
+            bash ./tools/release/compare-release-size.sh "tmp/package/gravity-pdf-$SOURCE_TAG.zip" "$SOURCE_TAG"
+          } | tee tmp/package/release-notes.md >> "$GITHUB_STEP_SUMMARY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # The release job runs on another runner, so hand the zip on.
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-package
+          path: |
+            tmp/package/gravity-pdf-*.zip
+            tmp/package/release-notes.md
+          if-no-files-found: error
+          # The zip is already compressed.
