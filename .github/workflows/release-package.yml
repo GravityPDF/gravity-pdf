@@ -50,7 +50,7 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          # No cache: it's shared with branch workflows, so a poisoned entry would feed the shipped zip.
 
       # build.sh hands this auth.json to the package dir's composer install (Gravity Forms).
       - name: Add auth details for private composer packages
@@ -78,7 +78,7 @@ jobs:
 
       # Unverified until the verify job passes it on as release-package.
       - name: Upload build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: package-build
           path: ${{ env.PACKAGE_ZIP }}
@@ -95,10 +95,10 @@ jobs:
       PACKAGE_ZIP: tmp/package/gravity-pdf-${{ needs.build.outputs.tag }}.zip
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Download build
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: package-build
           path: tmp/package
