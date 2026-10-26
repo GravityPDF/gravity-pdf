@@ -66,6 +66,13 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 
 		/* Mark as the end of this row if Gravity Forms would insert a spacer */
 		if ( ! empty( $field->layoutSpacerGridColumnSpan ) ) {
+			/* Before Gravity Forms 2.8.2 (no get_row_spacer()), every field with a spacer value got a spacer */
+			if ( ! method_exists( '\GFFormDisplay', 'get_row_spacer' ) ) {
+				$this->end_of_row = true;
+
+				return;
+			}
+
 			$gform = \GPDFAPI::get_form_class();
 			$form  = $gform->get_form( $field->form_id );
 
