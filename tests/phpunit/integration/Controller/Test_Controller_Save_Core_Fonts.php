@@ -18,6 +18,10 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 
 	private const FONT = 'DejaVuSerifCondensed.ttf';
 
+	private const DOWNLOAD = self::FONT . '.part';
+
+	private const FIXTURE = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . self::FONT;
+
 	/**
 	 * @var Controller_Save_Core_Fonts
 	 */
@@ -32,10 +36,9 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 	}
 
 	public function tear_down(): void {
-		global $gfpdf;
-
 		unset( $_POST['font_name'] );
-		wp_delete_file( $gfpdf->data->template_font_location . self::FONT );
+		wp_delete_file( $this->font_path() );
+		wp_delete_file( $this->font_path( self::DOWNLOAD ) );
 
 		parent::tear_down();
 	}
@@ -61,20 +64,30 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 	}
 
 	public function test_successful_download_keeps_the_font() {
-		$font = $this->stream_font_with_response( $this->http_response( 200 ) );
+		$download = $this->stream_font_with_response( $this->http_response( 200 ) );
 
 		$this->assertTrue( $this->invoke_download() );
-		$this->assertFileExists( $font );
+		$this->assertFileExists( $this->font_path() );
+		$this->assertFileDoesNotExist( $download );
+	}
+
+	public function test_successful_download_replaces_the_installed_font() {
+		file_put_contents( $this->seed_font(), 'old' );
+		$this->stream_font_with_response( $this->http_response( 200 ) );
+
+		$this->assertTrue( $this->invoke_download() );
+		$this->assertFileEquals( self::FIXTURE, $this->font_path() );
 	}
 
 	/**
 	 * @dataProvider provider_failed_download
 	 */
-	public function test_failed_download_removes_the_partly_written_font( $response ) {
-		$font = $this->stream_font_with_response( $response );
+	public function test_failed_download_removes_the_partial_download( $response ) {
+		$download = $this->stream_font_with_response( $response );
 
 		$this->assertFalse( $this->invoke_download() );
-		$this->assertFileDoesNotExist( $font );
+		$this->assertFileDoesNotExist( $download );
+		$this->assertFileDoesNotExist( $this->font_path() );
 	}
 
 	public function provider_failed_download(): array {
@@ -89,14 +102,15 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 	 * @dataProvider provider_unexpected_download
 	 */
 	public function test_download_that_does_not_match_the_font_list_is_removed( callable $change ) {
-		$font = $this->stream_font_with_response( $this->http_response( 200 ) );
+		$download = $this->stream_font_with_response( $this->http_response( 200 ) );
 
-		$handle = fopen( $font, 'r+' );
+		$handle = fopen( $download, 'r+' );
 		$change( $handle );
 		fclose( $handle );
 
 		$this->assertFalse( $this->invoke_download() );
-		$this->assertFileDoesNotExist( $font );
+		$this->assertFileDoesNotExist( $download );
+		$this->assertFileDoesNotExist( $this->font_path() );
 	}
 
 	public function provider_unexpected_download(): array {
@@ -114,6 +128,21 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		];
 	}
 
+	public function test_blocked_request_keeps_the_installed_font() {
+		$font = $this->seed_font();
+
+		$_POST['font_name'] = self::FONT;
+		add_filter(
+			'pre_http_request',
+			static function () {
+				return new WP_Error( 'http_request_not_executed', 'User has blocked requests through HTTP.' );
+			}
+		);
+
+		$this->assertFalse( $this->invoke_download() );
+		$this->assertFileExists( $font );
+	}
+
 	public function test_unapproved_font_leaves_existing_files_alone() {
 		$font = $this->seed_font();
 
@@ -123,15 +152,21 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		$this->assertFileExists( $font );
 	}
 
-	/**
-	 * Writes the font as WordPress does before a streamed request
-	 */
-	private function seed_font(): string {
+	private function font_path( string $name = self::FONT ): string {
 		global $gfpdf;
 
-		$font = $gfpdf->data->template_font_location . self::FONT;
+		return $gfpdf->data->template_font_location . $name;
+	}
+
+	/**
+	 * Writes the font to the font folder, as installed or as WordPress streams a download
+	 */
+	private function seed_font( string $name = self::FONT ): string {
+		global $gfpdf;
+
+		$font = $this->font_path( $name );
 		wp_mkdir_p( $gfpdf->data->template_font_location );
-		copy( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . self::FONT, $font );
+		copy( self::FIXTURE, $font );
 
 		return $font;
 	}
@@ -145,7 +180,7 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 			}
 		);
 
-		return $this->seed_font();
+		return $this->seed_font( self::DOWNLOAD );
 	}
 
 	private function http_response( int $code ): array {
