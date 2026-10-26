@@ -94,8 +94,8 @@ class Field_Tos extends Helper_Abstract_Fields {
 				$this->gform->process_tags( $this->field->gwtermsofservice_terms, $this->form, $this->entry )
 			)
 		);
-		$html  = "
-			<div class='terms-of-service-text'>$terms</div>
+		$html = "
+			<div class='terms-of-service-text'>$terms</div>			
 		";
 
 		foreach ( $this->agreements() as $agreement ) {
@@ -110,34 +110,41 @@ class Field_Tos extends Helper_Abstract_Fields {
 	}
 
 	/**
-	 * Include every accepted agreement alongside the standard keys, which keep the first one
+	 * Add every accepted agreement to the standard keys
 	 *
 	 * @return array
 	 *
-	 * @since 7.0
+	 * @since 6.18.0
 	 */
 	public function form_data() {
 		$data       = parent::form_data();
-		$label      = $this->get_label();
 		$field_id   = (int) $this->field->id;
 		$agreements = $this->agreements();
 
-		$data['field'][ $field_id . '.' . $label . '_agreements' ] = $agreements;
-		$data['field'][ $field_id . '_agreements' ]                = $agreements;
-		$data['field'][ $label . '_agreements' ]                   = $agreements;
+		$data['field'][ $field_id . '.' . $this->get_label() . '_agreements' ] = $agreements;
+		$data['field'][ $field_id . '_agreements' ]                            = $agreements;
 
 		return $data;
 	}
 
 	/**
-	 * Get the first accepted agreement
+	 * Get the standard GF value of this field
 	 *
-	 * @return string
+	 * @return string|array
 	 *
 	 * @since 4.0
 	 */
 	public function value() {
-		return $this->agreements()[0] ?? '';
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
+
+		$value_array = $this->get_value();
+		$value       = esc_html( $value_array[ $this->field->id . '.1' ] );
+
+		$this->cache( $value );
+
+		return $this->cache();
 	}
 
 	/**
@@ -145,18 +152,19 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 *
 	 * @return string[]
 	 *
-	 * @since 7.0
+	 * @since 6.18.0
 	 */
-	public function agreements(): array {
+	private function agreements() {
 		if ( $this->agreements === null ) {
-			$values = array_filter(
-				(array) $this->get_value(),
-				function ( $value ) {
-					return is_string( $value ) && trim( $value ) !== '';
-				}
-			);
+			$values           = (array) $this->get_value();
+			$this->agreements = [];
 
-			$this->agreements = array_map( 'esc_html', array_values( $values ) );
+			foreach ( (array) $this->field->inputs as $input ) {
+				$value = $values[ (string) $input['id'] ] ?? '';
+				if ( is_string( $value ) && trim( $value ) !== '' ) {
+					$this->agreements[] = esc_html( $value );
+				}
+			}
 		}
 
 		return $this->agreements;
@@ -168,9 +176,9 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 *
 	 * @return string
 	 *
-	 * @since 7.0
+	 * @since 6.18.0
 	 */
-	protected function get_agreement_markup( string $tick, string $label ): string {
+	private function get_agreement_markup( $tick, $label ) {
 		return "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>$tick</span> $label</div>";
 	}
 }

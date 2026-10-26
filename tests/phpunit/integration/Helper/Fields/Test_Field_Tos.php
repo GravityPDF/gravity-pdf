@@ -85,20 +85,44 @@ class Test_Field_Tos extends TestCase {
 		$this->assertStringContainsString( '&#10006;', $pdf_field->html() );
 	}
 
-	public function test_agreements_are_escaped() {
-		$this->assertSame( [ '&lt;b&gt;Agree&lt;/b&gt;' ], $this->make_tos_field( [ '<b>Agree</b>' ] )->agreements() );
+	public function test_html_single_agreement_markup_is_unchanged() {
+		$expected = "<div id=\"field-1\" class=\"gfpdf-field gfpdf-tos \">\n" .
+			"\t\t\t\t\t<div class=\"inner-container\"><div class=\"label\"><strong>Terms</strong></div><div class=\"value\">\n" .
+			"\t\t\t<div class=\"terms-of-service-text\"><p>Please agree to our terms.</p>\n" .
+			"</div>\t\t\t\n" .
+			"\t\t<div class=\"terms-of-service-agreement\"><span class=\"terms-of-service-tick\" style=\"font-family:dejavusans,sans-serif\">&#10004;</span> I agree</div></div></div></div>";
+
+		$this->assertSame( $expected, $this->make_tos_field( 'I agree' )->html() );
 	}
 
 	public function test_form_data_includes_every_accepted_agreement() {
-		$data = $this->make_tos_field( [ 'First agreement', '', 'Third agreement' ] )->form_data()['field'];
+		$data = $this->make_tos_field( [ 'First agreement', '', '<b>Third</b>' ] )->form_data()['field'];
 
 		$this->assertSame( 'First agreement', $data[1] );
 		$this->assertSame( 'First agreement', $data['1.Terms'] );
 		$this->assertSame( 'First agreement', $data['Terms'] );
 
-		$expected = [ 'First agreement', 'Third agreement' ];
+		$expected = [ 'First agreement', '&lt;b&gt;Third&lt;/b&gt;' ];
 		$this->assertSame( $expected, $data['1_agreements'] );
 		$this->assertSame( $expected, $data['1.Terms_agreements'] );
-		$this->assertSame( $expected, $data['Terms_agreements'] );
+		$this->assertArrayNotHasKey( 'Terms_agreements', $data );
+	}
+
+	public function test_form_data_standard_keys_keep_first_input_value() {
+		$data = $this->make_tos_field( [ '', 'Second agreement' ] )->form_data()['field'];
+
+		$this->assertSame( '', $data[1] );
+		$this->assertSame( [ 'Second agreement' ], $data['1_agreements'] );
+	}
+
+	public function test_agreements_ignore_values_outside_the_field_inputs() {
+		add_filter(
+			'gfpdf_field_value',
+			function ( $value ) {
+				return $value + [ '1.9' => 'Not a checkbox' ];
+			}
+		);
+
+		$this->assertSame( [ 'I agree' ], $this->make_tos_field( 'I agree' )->form_data()['field']['1_agreements'] );
 	}
 }
