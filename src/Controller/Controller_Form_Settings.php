@@ -303,9 +303,14 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		}
 
 		/* Multi-file uploads are stored as JSON (an empty list is "[]"), so compare against the individual file URLs */
-		$field = \GFAPI::get_field( $form, $target );
-		if ( $field instanceof \GF_Field_FileUpload ) {
-			return $field->to_array( $source_value );
+		if ( \GFAPI::get_field( $form, $target ) instanceof \GF_Field_FileUpload ) {
+			if ( empty( $source_value ) ) {
+				return [];
+			}
+
+			$files = json_decode( $source_value, true );
+
+			return is_array( $files ) ? $files : [ $source_value ];
 		}
 
 		$keys = array_keys( $this->data->get_conditional_logic_options( $form ) );

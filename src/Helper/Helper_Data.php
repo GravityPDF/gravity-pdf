@@ -585,7 +585,17 @@ class Helper_Data {
 			],
 		];
 
-		$fields = \GFAPI::get_fields_by_type( $form, array_keys( $post_submission_conditional_logic_field_types ) );
+		/* Include field types built on the File Upload field, e.g. Image Hopper */
+		$file_upload_types = array_keys(
+			array_filter(
+				\GF_Fields::get_all(),
+				function ( $field ) {
+					return $field instanceof \GF_Field_FileUpload;
+				}
+			)
+		);
+
+		$fields = \GFAPI::get_fields_by_type( $form, array_merge( array_keys( $post_submission_conditional_logic_field_types ), $file_upload_types ) );
 
 		foreach ( $fields as $field ) {
 			$options[ $field->id ] = array_merge(
@@ -593,7 +603,7 @@ class Helper_Data {
 					'label' => $field->label,
 					'value' => $field->id,
 				],
-				$post_submission_conditional_logic_field_types[ $field->type ]
+				$post_submission_conditional_logic_field_types[ $field->type ] ?? $post_submission_conditional_logic_field_types['fileupload']
 			);
 		}
 
