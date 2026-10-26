@@ -366,10 +366,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	private function register_scripts() {
-		global $wp_version;
-
 		$version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : PDF_EXTENDED_VERSION;
-		$args    = version_compare( $wp_version, '6.3.0', '>=' ) ? [ 'strategy' => 'defer' ] : true;
+		$args    = [ 'strategy' => 'defer' ];
 
 		$pdf_settings_dependencies = [
 			'jquery-ui-tooltip',
