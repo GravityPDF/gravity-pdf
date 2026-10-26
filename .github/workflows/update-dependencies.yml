@@ -123,11 +123,13 @@ jobs:
             run-tests
           delete-branch: true
 
-      # GITHUB_TOKEN's PR events don't fire tests.yml, but a workflow_dispatch does (as the nightly: full PHP matrix, no
-      # coverage comments); its checks show on the PR's head commit
-      - name: Run tests on the PR branch
+      # GITHUB_TOKEN's PR events don't fire tests.yml or coding-standards.yml, but workflow_dispatch does, and the checks
+      # show on the PR's head commit. tests.yml runs as the nightly does: full PHP matrix, no coverage comments
+      - name: Run tests and coding standards on the PR branch
         if: ${{ contains(fromJSON('["created","updated"]'), steps.cpr.outputs.pull-request-operation) }}
         env:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ steps.cpr.outputs.pull-request-branch }}
-        run: gh workflow run tests.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
+        run: |
+          gh workflow run tests.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
+          gh workflow run coding-standards.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
