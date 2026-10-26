@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.action == 'labeled' && github.event.label.name != 'run-tests' && github.run_id || github.head_ref || github.sha }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   # The jobs below need the run-tests label and skip without it
   check_for_run_tests_label_in_pr:
@@ -17,6 +20,8 @@ jobs:
     # Same label as `concurrency.group`
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'run-tests' }}
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     steps:
       # Read live labels via gh-api: the event payload can predate labels added alongside the trigger
       - name: Check for run-tests label
@@ -44,10 +49,9 @@ jobs:
           php --version
           composer --version
 
-      - name: Add auth details for private composer packages
-        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
-
       - name: Install Composer dependencies
+        env:
+          COMPOSER_AUTH: '{"http-basic":{"composer.gravity.io":{"username":"${{ secrets.GF_LICENSE }}","password":"http://localhost"}}}'
         run: |
           bash tools/ci/composer-retry.sh install --prefer-dist --no-suggest --no-progress --no-ansi --no-interaction --no-scripts
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
@@ -83,15 +87,15 @@ jobs:
           php-version: 8.3
           tools: composer
 
-      - name: Add auth details for private composer packages
-        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
-        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
-
       - name: Install Composer dependencies
         if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
-        run: |
-          bash tools/ci/composer-retry.sh install --prefer-dist --no-progress --no-ansi --no-interaction --no-scripts
-          composer prefix
+        env:
+          COMPOSER_AUTH: '{"http-basic":{"composer.gravity.io":{"username":"${{ secrets.GF_LICENSE }}","password":"http://localhost"}}}'
+        run: bash tools/ci/composer-retry.sh install --prefer-dist --no-progress --no-ansi --no-interaction --no-scripts
+
+      - name: Prefix vendor
+        if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
+        run: composer prefix
 
       - name: Restore PHPStan result cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

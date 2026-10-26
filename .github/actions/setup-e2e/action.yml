@@ -89,15 +89,17 @@ runs:
         key: build-${{ runner.os }}-${{ hashFiles('src/assets/**', 'yarn.lock', '.nvmrc', 'package.json', 'babel.config.js', '.browserslistrc') }}
 
     # GF + test tooling only; --no-scripts skips the scoping and asset build.
-    - name: Install dependencies
+    - name: Install Composer dependencies
       if: inputs.dependencies == 'install'
       shell: bash
       env:
-        GF_LICENSE: ${{ inputs.gf-license }}
-      run: |
-        composer config http-basic.composer.gravity.io "$GF_LICENSE" http://localhost
-        bash tools/ci/composer-retry.sh install --no-scripts --no-progress --no-ansi --no-interaction
-        yarn install --frozen-lockfile
+        COMPOSER_AUTH: '{"http-basic":{"composer.gravity.io":{"username":"${{ inputs.gf-license }}","password":"http://localhost"}}}'
+      run: bash tools/ci/composer-retry.sh install --no-scripts --no-progress --no-ansi --no-interaction
+
+    - name: Install Node dependencies
+      if: inputs.dependencies == 'install'
+      shell: bash
+      run: yarn install --frozen-lockfile
 
     - name: Cache Playwright browsers
       if: inputs.playwright == 'true'
