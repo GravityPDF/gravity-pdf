@@ -20,6 +20,8 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 
 	private const DOWNLOAD = self::FONT . '.part';
 
+	private const FIXTURE = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . self::FONT;
+
 	/**
 	 * @var Controller_Save_Core_Fonts
 	 */
@@ -34,11 +36,9 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 	}
 
 	public function tear_down(): void {
-		global $gfpdf;
-
 		unset( $_POST['font_name'] );
-		wp_delete_file( $gfpdf->data->template_font_location . self::FONT );
-		wp_delete_file( $gfpdf->data->template_font_location . self::DOWNLOAD );
+		wp_delete_file( $this->font_path() );
+		wp_delete_file( $this->font_path( self::DOWNLOAD ) );
 
 		parent::tear_down();
 	}
@@ -76,13 +76,13 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		$this->stream_font_with_response( $this->http_response( 200 ) );
 
 		$this->assertTrue( $this->invoke_download() );
-		$this->assertFileEquals( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . self::FONT, $this->font_path() );
+		$this->assertFileEquals( self::FIXTURE, $this->font_path() );
 	}
 
 	/**
 	 * @dataProvider provider_failed_download
 	 */
-	public function test_failed_download_removes_the_partly_written_font( $response ) {
+	public function test_failed_download_removes_the_partial_download( $response ) {
 		$download = $this->stream_font_with_response( $response );
 
 		$this->assertFalse( $this->invoke_download() );
@@ -166,7 +166,7 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 
 		$font = $this->font_path( $name );
 		wp_mkdir_p( $gfpdf->data->template_font_location );
-		copy( PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . self::FONT, $font );
+		copy( self::FIXTURE, $font );
 
 		return $font;
 	}

@@ -197,7 +197,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			$this->log->error(
 				'Core Font API Response Failed',
 				[
-					'response_code' => wp_remote_retrieve_response_code( $res ),
+					'response_code' => $res_code,
 				]
 			);
 
