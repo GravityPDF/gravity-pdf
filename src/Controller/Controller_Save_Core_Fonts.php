@@ -160,20 +160,23 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 
 		$font_path = $this->data->template_font_location . $matching_fonts[0]['name'];
 
+		/* Download beside the font, so a blocked or failed request leaves any installed copy alone */
+		$download_path = $font_path . '.part';
+
 		$res = wp_remote_get(
 			$matching_fonts[0]['download_url'],
 			[
 				'timeout'  => 60,
 				'stream'   => true,
-				'filename' => $font_path,
+				'filename' => $download_path,
 			]
 		);
 
 		$res_code = wp_remote_retrieve_response_code( $res );
 
-		/* A failed download still leaves the file it streamed into, which would hide the install notice */
+		/* A failed download still leaves the file it streamed into */
 		if ( is_wp_error( $res ) || $res_code !== 200 ) {
-			wp_delete_file( $font_path );
+			wp_delete_file( $download_path );
 		}
 
 		/* Check for errors and log them to file */
@@ -201,8 +204,8 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
-		if ( ! $this->is_expected_file( $font_path, (int) $matching_fonts[0]['size'], $matching_fonts[0]['sha'] ) ) {
-			wp_delete_file( $font_path );
+		if ( ! $this->is_expected_file( $download_path, (int) $matching_fonts[0]['size'], $matching_fonts[0]['sha'] ) ) {
+			wp_delete_file( $download_path );
 
 			$this->log->error(
 				'Core Font Verification Failed',
@@ -210,6 +213,19 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 					'name' => $matching_fonts[0]['name'],
 					'size' => $matching_fonts[0]['size'],
 					'sha'  => $matching_fonts[0]['sha'],
+				]
+			);
+
+			return false;
+		}
+
+		if ( ! @rename( $download_path, $font_path ) ) { // phpcs:ignore
+			wp_delete_file( $download_path );
+
+			$this->log->error(
+				'Core Font Move Failed',
+				[
+					'name' => $matching_fonts[0]['name'],
 				]
 			);
 
