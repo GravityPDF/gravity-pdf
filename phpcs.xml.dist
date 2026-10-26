@@ -106,6 +106,7 @@
     <exclude-pattern>/vendor/*</exclude-pattern>
     <exclude-pattern>/vendor_prefixed/*</exclude-pattern>
     <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/tools/*</exclude-pattern>
     <exclude-pattern>/.php-scoper/*</exclude-pattern>
     <exclude-pattern>/.claude/*</exclude-pattern>
 </ruleset>

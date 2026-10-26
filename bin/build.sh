@@ -27,7 +27,7 @@ git archive HEAD ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
 tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm -f ${PACKAGE_DIR}/package.tar.gz
 
 # Run Composer
-yarn install --cwd ${PACKAGE_DIR}
+yarn install --frozen-lockfile --cwd ${PACKAGE_DIR}
 yarn --cwd ${PACKAGE_DIR} build:production
 composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
 
