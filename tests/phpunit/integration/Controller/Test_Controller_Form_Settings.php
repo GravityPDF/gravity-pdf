@@ -155,4 +155,73 @@ class Test_Controller_Form_Settings extends TestCase {
 
 		$this->assertSame( 'original', $result );
 	}
+
+	public function test_conditional_logic_options_include_file_upload_fields() {
+		global $gfpdf;
+
+		$form = \GFAPI::get_form( $this->file_upload_form_id() );
+
+		$options = $gfpdf->data->get_conditional_logic_options( $form );
+
+		foreach ( [ 1, 2 ] as $field_id ) {
+			$this->assertSame( $field_id, $options[ $field_id ]['value'] );
+			$this->assertSame( [ 'is' => 'is', 'isnot' => 'isNot' ], $options[ $field_id ]['operators'] );
+			$this->assertSame( [ '' ], array_column( $options[ $field_id ]['choices'], 'value' ) );
+		}
+
+		$this->assertSame( 'Single', $options[1]['label'] );
+	}
+
+	/**
+	 * @dataProvider provider_file_upload_conditional_logic
+	 */
+	public function test_file_upload_conditional_logic( $field_id, $value, $has_file ) {
+		global $gfpdf;
+
+		$entry = [
+			'id'      => 1,
+			'form_id' => $this->file_upload_form_id(),
+			'1'       => '',
+			'2'       => '',
+		];
+
+		$entry[ $field_id ] = $value;
+
+		foreach ( [ 'is' => ! $has_file, 'isnot' => $has_file ] as $operator => $expected ) {
+			$settings = [
+				'conditionalLogic' => [
+					'actionType' => 'show',
+					'logicType'  => 'all',
+					'rules'      => [ [ 'fieldId' => (string) $field_id, 'operator' => $operator, 'value' => '' ] ],
+				],
+			];
+
+			$this->assertSame( $expected, $gfpdf->misc->conditional_logic_passes( $settings, $entry ), $operator );
+		}
+	}
+
+	public function provider_file_upload_conditional_logic() {
+		$url = 'https://example.com/wp-content/uploads/gravity_forms/1/file.pdf';
+
+		return [
+			'single, no file'        => [ 1, '', false ],
+			'single, file'           => [ 1, $url, true ],
+			'multi, no file'         => [ 2, '', false ],
+			'multi, empty JSON list' => [ 2, '[]', false ],
+			'multi, files'           => [ 2, wp_json_encode( [ $url, $url ] ), true ],
+		];
+	}
+
+	private function file_upload_form_id(): int {
+		return (int) $this->gf_factory()->form->create(
+			[],
+			[
+				'title'  => 'File Upload Conditional Logic',
+				'fields' => [
+					new \GF_Field_FileUpload( [ 'id' => 1, 'label' => 'Single' ] ),
+					new \GF_Field_FileUpload( [ 'id' => 2, 'label' => 'Multi', 'multipleFiles' => true ] ),
+				],
+			]
+		);
+	}
 }

@@ -282,7 +282,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	}
 
 	/**
-	 * Process entry meta conditional logic rules
+	 * Process entry meta and File Upload conditional logic rules
 	 *
 	 * @param int|string $source_value The value of the rule’s configured field ID, entry meta, or custom property.
 	 * @param array      $rule         The GF current rule object https://docs.gravityforms.com/conditional-logic-object/#rule
@@ -290,16 +290,27 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @param array      $logic        The GF conditional logic object https://docs.gravityforms.com/conditional-logic-object/
 	 * @param array|null $entry        The entry currently being processed, if available.
 	 *
-	 * @return int|string
+	 * @return int|string|array
 	 *
 	 * @since 6.9.0
 	 */
 	public function conditional_logic_set_rule_source_value( $source_value, $rule, $form, $logic, $entry ) {
 
-		$keys   = array_keys( $this->data->get_conditional_logic_options( $form ) );
 		$target = $rule['fieldId'] ?? null;
 
-		if ( ! $entry || ! in_array( $target, $keys, true ) ) {
+		if ( ! $entry ) {
+			return $source_value;
+		}
+
+		/* Multi-file uploads are stored as JSON (an empty list is "[]"), so compare against the individual file URLs */
+		$field = \GFAPI::get_field( $form, $target );
+		if ( $field instanceof \GF_Field_FileUpload ) {
+			return $field->to_array( $source_value );
+		}
+
+		$keys = array_keys( $this->data->get_conditional_logic_options( $form ) );
+
+		if ( ! in_array( $target, $keys, true ) ) {
 			return $source_value;
 		}
 

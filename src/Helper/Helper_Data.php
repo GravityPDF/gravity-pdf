@@ -556,9 +556,10 @@ class Helper_Data {
 			}
 		}
 
-		/* Gravity Wiz Unique ID perk */
+		/* Fields GF doesn't offer in conditional logic, but which have a value once the entry is saved */
 		$post_submission_conditional_logic_field_types = [
-			'uid' => [
+			/* Gravity Wiz Unique ID perk */
+			'uid'        => [
 				'operators' => [
 					'is'          => 'is',
 					'isnot'       => 'isNot',
@@ -569,16 +570,31 @@ class Helper_Data {
 					'ends_with'   => 'endsWith',
 				],
 			],
+
+			'fileupload' => [
+				'operators' => [
+					'is'    => 'is',
+					'isnot' => 'isNot',
+				],
+				'choices'   => [
+					[
+						'text'  => esc_html__( 'Empty', 'gravity-pdf' ),
+						'value' => '',
+					],
+				],
+			],
 		];
 
 		$fields = \GFAPI::get_fields_by_type( $form, array_keys( $post_submission_conditional_logic_field_types ) );
 
 		foreach ( $fields as $field ) {
-			$options[ $field->id ] = [
-				'label'     => $field->label,
-				'value'     => $field->id,
-				'operators' => rgars( $post_submission_conditional_logic_field_types, $field->type . '/operators', [] ),
-			];
+			$options[ $field->id ] = array_merge(
+				[
+					'label' => $field->label,
+					'value' => $field->id,
+				],
+				$post_submission_conditional_logic_field_types[ $field->type ]
+			);
 		}
 
 		return $options;
