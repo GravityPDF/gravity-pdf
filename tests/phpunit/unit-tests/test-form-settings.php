@@ -844,4 +844,114 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 	}
 
+	public function test_conditional_logic_options_include_file_upload_fields() {
+		global $gfpdf;
+
+		$form = \GFAPI::get_form( $this->file_upload_form_id() );
+
+		$options = $gfpdf->data->get_conditional_logic_options( $form );
+
+		foreach ( [ 1, 2 ] as $field_id ) {
+			$this->assertSame( $field_id, $options[ $field_id ]['value'] );
+			$this->assertSame( [ 'is' => 'is', 'isnot' => 'isNot' ], $options[ $field_id ]['operators'] );
+			$this->assertSame( [ '' ], array_column( $options[ $field_id ]['choices'], 'value' ) );
+		}
+
+		$this->assertSame( 'Single', $options[1]['label'] );
+	}
+
+	public function test_conditional_logic_options_include_fields_extending_file_upload() {
+		global $gfpdf;
+
+		if ( ! \GF_Fields::exists( 'gfpdf_test_upload' ) ) {
+			\GF_Fields::register( new Test_File_Upload_Subclass() );
+		}
+
+		$form_id = (int) \GFAPI::add_form(
+			[
+				'title'  => 'File Upload Subclass Conditional Logic',
+				'fields' => [ [ 'id' => 1, 'type' => 'gfpdf_test_upload', 'label' => 'Image Hopper' ] ],
+			]
+		);
+
+		$options = $gfpdf->data->get_conditional_logic_options( \GFAPI::get_form( $form_id ) );
+
+		$this->assertSame( 'Image Hopper', $options[1]['label'] );
+		$this->assertSame( [ 'is' => 'is', 'isnot' => 'isNot' ], $options[1]['operators'] );
+	}
+
+	/**
+	 * @dataProvider provider_file_upload_conditional_logic
+	 */
+	public function test_file_upload_conditional_logic( $field_id, $value, $has_file ) {
+		global $gfpdf;
+
+		$entry = [
+			'id'      => 1,
+			'form_id' => $this->file_upload_form_id(),
+			'1'       => '',
+			'2'       => '',
+		];
+
+		$entry[ $field_id ] = $value;
+
+		foreach ( [ 'is' => ! $has_file, 'isnot' => $has_file ] as $operator => $expected ) {
+			$settings = [
+				'conditionalLogic' => [
+					'actionType' => 'show',
+					'logicType'  => 'all',
+					'rules'      => [ [ 'fieldId' => (string) $field_id, 'operator' => $operator, 'value' => '' ] ],
+				],
+			];
+
+			$this->assertSame( $expected, $gfpdf->misc->conditional_logic_passes( $settings, $entry ), $operator );
+		}
+	}
+
+	public function test_conditional_logic_set_rule_source_value_lists_file_upload_urls() {
+		$form  = \GFAPI::get_form( $this->file_upload_form_id() );
+		$entry = [ 'id' => 1 ];
+		$url   = 'https://example.com/file.pdf';
+
+		foreach (
+			[
+				[ '1', '', [] ],
+				[ '1', $url, [ $url ] ],
+				[ '2', '[]', [] ],
+				[ '2', wp_json_encode( [ $url ] ), [ $url ] ],
+				[ '2', [ $url ], [ $url ] ],
+			] as [ $field_id, $value, $expected ]
+		) {
+			$rule = [ 'fieldId' => $field_id ];
+			$this->assertSame( $expected, $this->controller->conditional_logic_set_rule_source_value( $value, $rule, $form, [], $entry ) );
+		}
+	}
+
+	public function provider_file_upload_conditional_logic() {
+		$url = 'https://example.com/wp-content/uploads/gravity_forms/1/file.pdf';
+
+		return [
+			'single, no file'        => [ 1, '', false ],
+			'single, file'           => [ 1, $url, true ],
+			'multi, no file'         => [ 2, '', false ],
+			'multi, empty JSON list' => [ 2, '[]', false ],
+			'multi, files'           => [ 2, wp_json_encode( [ $url, $url ] ), true ],
+		];
+	}
+
+	private function file_upload_form_id(): int {
+		return (int) \GFAPI::add_form(
+			[
+				'title'  => 'File Upload Conditional Logic',
+				'fields' => [
+					new \GF_Field_FileUpload( [ 'id' => 1, 'label' => 'Single' ] ),
+					new \GF_Field_FileUpload( [ 'id' => 2, 'label' => 'Multi', 'multipleFiles' => true ] ),
+				],
+			]
+		);
+	}
+}
+
+class Test_File_Upload_Subclass extends \GF_Field_FileUpload {
+	public $type = 'gfpdf_test_upload';
 }
