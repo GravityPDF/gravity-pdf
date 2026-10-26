@@ -1,6 +1,5 @@
 /* Dependencies */
-import { composeWithDevTools } from '@redux-devtools/extension';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 /* Root Saga */
 import rootSaga from '../sagas';
@@ -21,8 +20,9 @@ const sagaMiddleware = createSagaMiddleware();
 export const middlewares = [sagaMiddleware];
 const middlewareEnhancer = applyMiddleware(...middlewares);
 const enhancers = [middlewareEnhancer];
-/* Initialize Redux dev tools */
-const composedEnhancers = composeWithDevTools(...enhancers);
+/* Initialize Redux dev tools when the browser extension is installed */
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composedEnhancers = composeEnhancers(...enhancers);
 /* Create our store and enable composedEnhancers */
 const store = createStore(reducers, composedEnhancers);
 
