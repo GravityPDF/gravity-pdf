@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -64,12 +64,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # The Tests workflow's prebuild job saves this entry; on a miss, build it here without saving.
       - name: Restore Composer vendor
         id: vendor-cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: |
             vendor
@@ -94,7 +94,7 @@ jobs:
           composer prefix
 
       - name: Restore PHPStan result cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: tmp/phpstan
           key: phpstan-${{ runner.os }}-${{ github.sha }}
@@ -110,10 +110,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node JS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
 
