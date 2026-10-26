@@ -12,6 +12,7 @@ vendor/psr/log/README.md	php-tag-in-non-php	-	1
 vendor_prefixed/gravitypdf/querypath/src/Helpers/QueryFilters.php	create_function	a13c6c2cf9f5	1	$function = create_function('$index, $item', $fn);
 vendor_prefixed/gravitypdf/querypath/src/Helpers/QueryFilters.php	create_function	abb76203bf08	1	$fn = create_function('$index, &$item', $lambda);
 vendor_prefixed/masterminds/html5/src/HTML5/Entities.php	long-line	-	2	public static $byName = array('Aacute' => 'Á', 'Aacut' => 'Á', 'aacute' => 'á', 'aacut' => 'á', 'Abreve' => 'Ă', 'abreve' => 'ă', 'ac' => '∾', 'acd' => '∿', ...
+vendor_prefixed/masterminds/html5/src/HTML5/Parser/Tokenizer.php	sink-name	832b261c9f78	1	if (('PUBLIC' == $pub || 'SYSTEM' == $pub) && $white > 0) {
 vendor_prefixed/masterminds/html5/src/HTML5/Serializer/HTML5Entities.php	long-line	-	1	public static $map = array(' ' => '&Tab;', "\n" => '&NewLine;', '!' => '&excl;', '"' => '&quot;', '#' => '&num;', '$' => '&dollar;', '%' => '&percnt;', '&' =...
 vendor_prefixed/monolog/src/Monolog/Handler/ProcessHandler.php	proc_open	f925ba9c112e	1	$this->process = proc_open($this->command, static::DESCRIPTOR_SPEC, $this->pipes, $this->cwd);
 vendor_prefixed/monolog/src/Monolog/Processor/GitProcessor.php	shell_exec	4099b407c4c4	1	$branches = shell_exec('git branch -v --no-abbrev');
