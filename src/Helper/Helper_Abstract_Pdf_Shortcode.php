@@ -612,8 +612,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 				]
 			);
 
-			/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-			$url = stripslashes_deep( $_POST['_gform_setting_url'] );
+			/* phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- shortcode parsed below */
+			$url = wp_unslash( $_POST['_gform_setting_url'] ?? '' );
 
 			/* check if our shortcode exists and convert it to a URL */
 			$shortcode_information = $this->get_shortcode_information( static::SHORTCODE, $url );

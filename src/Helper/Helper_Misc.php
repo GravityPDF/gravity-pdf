@@ -86,14 +86,11 @@ class Helper_Misc {
 			return false;
 		}
 
-		$page    = $_GET['page'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$subview = $_GET['subview'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		/* sanitize_text_field() turns an array into '' */
+		$page    = sanitize_text_field( wp_unslash( $_GET['page'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$subview = sanitize_text_field( wp_unslash( $_GET['subview'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( empty( $page ) && empty( $subview ) ) {
-			return false;
-		}
-
-		if ( ! is_string( $page ) || ! is_string( $subview ) ) {
 			return false;
 		}
 
@@ -1090,7 +1087,7 @@ class Helper_Misc {
 
 		/* Validate Endpoint */
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', $nonce_name ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), $nonce_name ) ) {
 
 			$this->log->warning( 'Nonce Verification Failed' );
 

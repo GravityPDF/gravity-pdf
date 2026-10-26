@@ -349,8 +349,10 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( isset( $_GET['expires'] ) && isset( $_GET['signature'] ) && isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
 			try {
 				$protocol = isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-				$domain   = $_SERVER['HTTP_HOST'];
-				$request  = $_SERVER['REQUEST_URI'];
+				/* phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() below */
+				$domain  = wp_unslash( $_SERVER['HTTP_HOST'] );
+				$request = wp_unslash( $_SERVER['REQUEST_URI'] );
+				/* phpcs:enable */
 
 				$url = esc_url_raw( $protocol . $domain . $request );
 
@@ -565,7 +567,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( $type === 'all' || $type === 'logged_out' ) {
 			$user_ip   = filter_var( GFFormsModel::get_ip(), FILTER_VALIDATE_IP );
-			$server_ip = filter_var( $_SERVER['SERVER_ADDR'] ?? '127.0.0.1', FILTER_VALIDATE_IP );
+			$server_ip = filter_var( wp_unslash( $_SERVER['SERVER_ADDR'] ?? '127.0.0.1' ), FILTER_VALIDATE_IP );
 			$entry_ip  = filter_var( $entry['ip'], FILTER_VALIDATE_IP );
 
 			/* check if the user IP matches the entry IP */
@@ -2836,7 +2838,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			return false;
 		}
 
-		$if_none_match = trim( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ?? '' ) );
+		$if_none_match = sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ?? '' ) );
 		if ( $if_none_match !== '' ) {
 			/* A weak comparison, because compressing proxies turn the ETag into a weak W/"…" */
 			preg_match_all( '/(?:W\/)?("[^"]*")/', $if_none_match, $matches );
@@ -2844,7 +2846,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			return $if_none_match === '*' || in_array( $etag, $matches[1], true );
 		}
 
-		$if_modified_since = strtotime( wp_unslash( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '' ) );
+		$if_modified_since = strtotime( sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '' ) ) );
 
 		return $if_modified_since !== false && $if_modified_since <= time() && $last_modified_time <= $if_modified_since;
 	}

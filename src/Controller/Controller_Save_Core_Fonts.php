@@ -133,12 +133,14 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
+		$font_name = sanitize_text_field( wp_unslash( $_POST['font_name'] ?? '' ) );
+
 		/* Look for a file in the font list with a matching name */
 		$matching_fonts = array_filter(
 			$core_font_list,
-			function ( $item ) {
-				/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-				return $item['name'] === ( $_POST['font_name'] ?? '' );
+			function ( $item ) use ( $font_name ) {
+				return $item['name'] === $font_name;
 			}
 		);
 
@@ -148,8 +150,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			$this->log->error(
 				'Core Font not on the approved list',
 				[
-					/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-					'name' => ( $_POST['font_name'] ?? '' ),
+					'name' => $font_name,
 				]
 			);
 
