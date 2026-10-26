@@ -2,7 +2,6 @@
   "name": "gravity-pdf",
   "private": true,
   "dependencies": {
-    "@redux-devtools/extension": "^3.3.0",
     "algoliasearch": "^5.35.0",
     "history": "^5.3.0",
     "lodash.debounce": "^4.0.8",
