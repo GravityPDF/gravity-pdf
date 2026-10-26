@@ -9,6 +9,8 @@ PACKAGE_REQUIRED=(pdf.php api.php vendor/autoload.php vendor/composer/installed.
 PACKAGE_BUILT=(build/assets vendor vendor_prefixed)
 # PHP in these is flagged by scan.php.
 PACKAGE_ASSETS=(build src/assets)
+# Build-only composer projects with their own lock; audit-dependencies.sh validates and reports on them.
+BUILD_COMPOSER_DIRS=(tools/php-scoper)
 
 is_package_file() {
 	[[ " ${PACKAGE_FILES[*]} " == *" $1 "* ]]
