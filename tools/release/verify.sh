@@ -63,6 +63,34 @@ if [ "$(unzip -p "${zip}" gravity-pdf/vendor/composer/installed.json 2>/dev/null
 	fail=1
 fi
 
+# Everything not built must match the commit byte for byte, so a compromised build step can't alter source.
+unpacked=$(mktemp -d)
+trap 'rm -rf "${unpacked}"' EXIT
+unzip -q "${zip}" -d "${unpacked}"
+
+files=$(sed -n 's|^gravity-pdf/\(.*[^/]\)$|\1|p' <<<"${entries}")
+expected=$(git ls-tree -r --format='%(objectname)%x09%(path)' HEAD -- "${PACKAGE_FILES[@]}")
+shipped=$(paste <(cd "${unpacked}/gravity-pdf" && git hash-object --no-filters --stdin-paths <<<"${files}") - <<<"${files}")
+
+source_errors=$(awk -F '\t' -v skip="${PACKAGE_EXCLUDE[*]} ${PACKAGE_BUILT[*]}" '
+	BEGIN { n = split(skip, skips, " ") }
+	function skipped(path, i) {
+		for (i = 1; i <= n; i++) if (path == skips[i] || index(path, skips[i] "/") == 1) return 1
+		return 0
+	}
+	$2 == "" || skipped($2) { next }
+	NR == FNR { want[$2] = $1; next }
+	!($2 in want) { print "FAIL: " $2 " is in the zip but not in git"; next }
+	want[$2] != $1 { print "FAIL: " $2 " differs from git" }
+	{ delete want[$2] }
+	END { for (path in want) print "FAIL: " path " is in git but missing from the zip" }
+' <(printf '%s\n' "${expected}") <(printf '%s\n' "${shipped}"))
+
+if [ -n "${source_errors}" ]; then
+	sort >&2 <<<"${source_errors}"
+	fail=1
+fi
+
 [ "${fail}" -eq 0 ] || exit 1
 
-echo "OK: ${zip} is a gravity-pdf ${version} package with no dev files or dependencies"
+echo "OK: ${zip} is a gravity-pdf ${version} package with no dev files or dependencies, and its source matches $(git rev-parse --short HEAD)"
