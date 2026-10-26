@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -26,7 +26,7 @@ jobs:
           tools: composer
 
       - name: Setup Node JS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
 
@@ -101,7 +101,7 @@ jobs:
       # WORKFLOW_PAT (not GITHUB_TOKEN) so the PR's events fire tests.yml — GITHUB_TOKEN-attributed events are suppressed to prevent recursion.
       # add-paths restricts the commit to lock + wp-env configs so a dirty vendor/ on the runner can't leak in.
       - name: Open pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.WORKFLOW_PAT }}
           branch: chore/weekly-deps-update
