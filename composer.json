@@ -22,11 +22,15 @@
     {
       "type": "vcs",
       "url": "https://github.com/GravityPDF/url-signer"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/GravityPDF/mpdf"
     }
   ],
   "require": {
     "php": ">=7.3",
-    "mpdf/mpdf": "dev-development",
+    "mpdf/mpdf": "dev-gravitypdf-v6",
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",

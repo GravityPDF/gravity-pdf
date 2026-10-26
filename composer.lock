@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "26cbd9dc205997fbb82a90a536552680",
+    "content-hash": "2caa705a0f01e90910ba1e56b4b3b900",
     "packages": [
         {
             "name": "gravitypdf/querypath",
@@ -560,16 +560,16 @@
         },
         {
             "name": "mpdf/mpdf",
-            "version": "dev-development",
+            "version": "dev-gravitypdf-v6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mpdf/mpdf.git",
-                "reference": "a981bb7b9e31bb17775a21efae612bb4bb50012e"
+                "url": "https://github.com/GravityPDF/mpdf.git",
+                "reference": "2a88146a72a3e911b523d031bd37fee0f76e2ffd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mpdf/mpdf/zipball/a981bb7b9e31bb17775a21efae612bb4bb50012e",
-                "reference": "a981bb7b9e31bb17775a21efae612bb4bb50012e",
+                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/2a88146a72a3e911b523d031bd37fee0f76e2ffd",
+                "reference": "2a88146a72a3e911b523d031bd37fee0f76e2ffd",
                 "shasum": ""
             },
             "require": {
@@ -597,17 +597,42 @@
                 "ext-xml": "Needed mainly for SVG manipulation",
                 "ext-zlib": "Needed for compression of embedded resources, such as fonts"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
-                "files": [
-                    "src/functions.php"
-                ],
                 "psr-4": {
                     "Mpdf\\": "src/"
-                }
+                },
+                "files": [
+                    "src/functions.php"
+                ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Mpdf\\": "tests/Mpdf",
+                    "Snapshots\\": "tests/Snapshots",
+                    "Issues\\": "tests/Issues"
+                },
+                "files": [
+                    "src/functions-dev.php"
+                ]
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "php -r \"chmod('./tmp', 0777);\""
+                ],
+                "cs": [
+                    "@php vendor/bin/phpcs --report-width=160 --standard=ruleset.xml --severity=1 --warning-severity=0 --extensions=php src utils tests"
+                ],
+                "cs:fix": [
+                    "@php vendor/bin/phpcbf --standard=ruleset.xml --extensions=php src utils tests"
+                ],
+                "test": [
+                    "@php vendor/bin/phpunit"
+                ],
+                "coverage": [
+                    "@php vendor/bin/phpunit --coverage-text"
+                ]
+            },
             "license": [
                 "GPL-2.0-only"
             ],
@@ -629,17 +654,17 @@
                 "utf-8"
             ],
             "support": {
-                "docs": "https://mpdf.github.io",
                 "issues": "https://github.com/mpdf/mpdf/issues",
-                "source": "https://github.com/mpdf/mpdf"
+                "source": "https://github.com/mpdf/mpdf",
+                "docs": "https://mpdf.github.io"
             },
             "funding": [
                 {
-                    "url": "https://www.paypal.me/mpdf",
-                    "type": "custom"
+                    "type": "custom",
+                    "url": "https://www.paypal.me/mpdf"
                 }
             ],
-            "time": "2026-10-13T09:42:55+00:00"
+            "time": "2026-10-26T04:41:57+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",

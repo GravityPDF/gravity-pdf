@@ -24,6 +24,7 @@
 * 🧹 Housekeeping: Link to the custom template docs from the Template Manager
 * 🧹 Housekeeping: Explain in the Template Manager why an admin can't upload or delete templates
 * 🧹 Housekeeping: Scope the bundled PSR-Log library and only load it globally for older add-ons that need it
+* 🧹 Housekeeping: Speed up long PDFs built from rows of floated elements
 * 🧹 Housekeeping: Update PHP and JavaScript dependencies
 * 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed
 * 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
