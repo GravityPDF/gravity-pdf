@@ -64,6 +64,10 @@ jobs:
           echo "SOURCE_TAG=$version" >> "$GITHUB_ENV"
           echo "PACKAGE_ZIP=tmp/package/gravity-pdf-$version.zip" >> "$GITHUB_ENV"
 
+      # Before the build, so a drifted lock or a vulnerable shipped package fails fast.
+      - name: Audit dependencies
+        run: bash ./tools/release/audit-dependencies.sh | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Gravity PDF Build
         run: bash ./bin/build.sh "$SOURCE_TAG"
 
