@@ -20,12 +20,6 @@ for tool in git tar yarn composer php jq zip; do
 	fi
 done
 
-# The package dir is a git archive with no auth.json, so hand the checkout's to composer.
-if [ -z "${COMPOSER_AUTH:-}" ] && [ -f auth.json ]; then
-	COMPOSER_AUTH="$(cat auth.json)"
-	export COMPOSER_AUTH
-fi
-
 VERSION=$1
 TMP_DIR="./tmp/package/"
 PACKAGE_DIR="${TMP_DIR}${VERSION}"
@@ -47,9 +41,10 @@ yarn install --frozen-lockfile --cwd ${PACKAGE_DIR}
 # No i18n step: languages/ ships as committed (refresh it with `composer translate`).
 yarn --cwd ${PACKAGE_DIR} build
 
-# Install all dependencies (including dev)
-# Prefix will run as post-install command script - Requires php-scoper from dev dependencies
-composer install --prefer-dist --working-dir ${PACKAGE_DIR}
+# Production packages only: php-scoper is its own composer project and only scopes these, and no Gravity Forms licence
+# is needed. post-install-cmd's yarn install + build already ran above, so only the prefix runs.
+composer install --prefer-dist --no-dev --no-scripts --working-dir ${PACKAGE_DIR}
+composer prefix --working-dir ${PACKAGE_DIR}
 
 # Run vendor cleanup - Ensures that there's no dev dependencies on production
 PLUGIN_DIR="$PACKAGE_DIR" bash ./tools/php-scoper/cleanup.sh

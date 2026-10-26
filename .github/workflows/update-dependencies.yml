@@ -15,6 +15,8 @@ jobs:
   update-deps:
     name: Bump WordPress core + Composer packages
     runs-on: ubuntu-latest
+    # Holds WORKFLOW_PAT and only allows the development branch.
+    environment: development
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -29,9 +31,6 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
-
-      - name: Add auth details for private composer packages
-        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
 
       # Pins the newest WordPress release, or its release candidate when one is in flight.
       - name: Resolve target WordPress version
@@ -56,6 +55,8 @@ jobs:
 
       # --no-scripts skips post-update-cmd (php-scoper prefix); vendor_prefixed/ isn't committed so the rebuild is wasted work.
       - name: Update target Composer packages
+        env:
+          COMPOSER_AUTH: '{"http-basic":{"composer.gravity.io":{"username":"${{ secrets.GF_LICENSE }}","password":"http://localhost"}}}'
         run: |
           bash tools/ci/composer-retry.sh update \
             gravity/gravityforms \

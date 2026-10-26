@@ -16,8 +16,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.action == 'labeled' && ! contains(fromJSON('["run-tests","run-tests-php-all","update-visual-baselines"]'), github.event.label.name) && github.run_id || github.head_ref || github.sha }}
   cancel-in-progress: true
 
-env:
-  GF_LICENSE: ${{ secrets.GF_LICENSE }}
+# Read-only default; jobs that comment or push ask for more.
+permissions:
+  contents: read
 
 jobs:
   check_for_run_tests_label_in_pr:
@@ -25,6 +26,8 @@ jobs:
     # Same label list as `concurrency.group`
     if: ${{ github.event.action != 'labeled' || contains(fromJSON('["run-tests","run-tests-php-all","update-visual-baselines"]'), github.event.label.name) }}
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     steps:
       # Read live labels via gh-api: the event payload can predate labels added alongside the trigger
       - name: Check for run-tests label
@@ -34,8 +37,8 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name' | grep -qx 'run-tests'
 
-  # composer.json's post-install-cmd chains `composer prefix` + `yarn install && yarn build`, so one composer install
-  # here primes vendor/, vendor_prefixed/, node_modules/, and build/assets/ for every downstream matrix.
+  # composer.json's post-install-cmd chains `composer prefix` + `yarn install && yarn build`, so composer install plus
+  # that script here primes vendor/, vendor_prefixed/, node_modules/, and build/assets/ for every downstream matrix.
   prebuild:
     name: Prebuild shared caches
     needs: check_for_run_tests_label_in_pr
@@ -87,15 +90,18 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - name: Add auth details for private composer packages
+      # The licence is only in this step's env, not an auth.json, so post-install-cmd below doesn't get it in its env.
+      - name: Install Composer dependencies
         if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
-        run: composer config http-basic.composer.gravity.io ${{ secrets.GF_LICENSE }} http://localhost
+        env:
+          COMPOSER_AUTH: '{"http-basic":{"composer.gravity.io":{"username":"${{ secrets.GF_LICENSE }}","password":"http://localhost"}}}'
+        run: bash tools/ci/composer-retry.sh install --no-scripts --no-progress --no-ansi --no-interaction
 
-      - name: Install Composer dependencies (post-install-cmd also runs php-scoper + yarn install + yarn build)
+      - name: Run post-install-cmd (php-scoper + yarn install + yarn build)
         if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' || steps.nm-cache.outputs.cache-hit != 'true' || steps.build-cache.outputs.cache-hit != 'true' }}
-        run: bash tools/ci/composer-retry.sh install --no-progress --no-ansi --no-interaction
+        run: composer run-script post-install-cmd
 
-      # Save only on success() — one composer install produces all three artifacts, so a partway failure
+      # Save only on success() — install + post-install-cmd produce all three artifacts, so a partway failure
       # could cache incomplete state.
       - name: Save Composer vendor
         if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
@@ -124,6 +130,10 @@ jobs:
     name: JavaScript Tests
     needs: prebuild
     runs-on: ubuntu-latest
+    # The coverage comment.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -159,6 +169,10 @@ jobs:
     name: PHPUnit ${{ matrix.php }}${{ matrix.report && ' coverage' || '' }} on ${{ matrix.os }}
     needs: prebuild
     runs-on: ${{ matrix.os }}
+    # The coverage comment.
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -414,8 +428,11 @@ jobs:
   notify:
     name: Notify on scheduled run
     needs: [ test-js, test-php, e2e-playwright, visual-regression, addon-smoke ]
-    if: ${{ always() && github.event_name != 'pull_request' }}
+    # The environment only allows development, so a dispatch on another branch skips rather than fails.
+    if: ${{ always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/development' }}
     runs-on: ubuntu-latest
+    # Holds SLACK_WEBHOOK_URL.
+    environment: development
     env:
       HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success' && needs.visual-regression.result == 'success' && needs.addon-smoke.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
     steps:
