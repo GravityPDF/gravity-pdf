@@ -26,6 +26,7 @@
 * 🧹 Housekeeping: Scope the bundled PSR-Log library and only load it globally for older add-ons that need it
 * 🧹 Housekeeping: Speed up long PDFs built from rows of floated elements
 * 🧹 Housekeeping: Update PHP and JavaScript dependencies
+* 🧹 Housekeeping: Remove the redux-devtools-extension package
 * 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed
 * 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
 * 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
