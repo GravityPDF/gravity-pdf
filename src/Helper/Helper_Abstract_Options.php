@@ -1130,7 +1130,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $input;
 		}
 
-		/* phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each value used is sanitized below */
+		/* phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized per key below */
 		parse_str( wp_unslash( $_POST['_wp_http_referer'] ), $referrer );
 
 		$all_settings = $this->get_registered_fields();

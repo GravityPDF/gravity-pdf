@@ -2838,7 +2838,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			return false;
 		}
 
-		$if_none_match = trim( sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ?? '' ) ) );
+		$if_none_match = sanitize_text_field( wp_unslash( $_SERVER['HTTP_IF_NONE_MATCH'] ?? '' ) );
 		if ( $if_none_match !== '' ) {
 			/* A weak comparison, because compressing proxies turn the ETag into a weak W/"…" */
 			preg_match_all( '/(?:W\/)?("[^"]*")/', $if_none_match, $matches );
