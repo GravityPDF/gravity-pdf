@@ -5,13 +5,13 @@
 
 const SINKS        = [ 'assert', 'create_function', 'shell_exec', 'system', 'passthru', 'exec', 'popen', 'proc_open', 'pcntl_exec' ];
 const DECODERS     = [ 'base64_decode', 'gzinflate', 'gzuncompress', 'gzdecode', 'str_rot13', 'hex2bin', 'convert_uudecode' ];
-// Build a string a decoder would show up in, e.g. a function name assembled from pieces; counted as decode, never chained.
+// Assemble a hidden name or payload; counted as decode (so `decode` also means built), never chained.
 const BUILDERS     = [ 'strrev', 'chr', 'str_replace', 'rawurldecode', 'urldecode', 'pack' ];
 const SUPERGLOBALS = [ '$_GET', '$_POST', '$_REQUEST', '$_COOKIE', '$_SERVER', '$_FILES' ];
 const IGNORABLE    = [ T_COMMENT, T_DOC_COMMENT, T_WHITESPACE ];
 const SKIPPED      = [ ...IGNORABLE, T_INLINE_HTML, T_OPEN_TAG, T_CLOSE_TAG ];
 // Reported on their own.
-const STANDALONE   = [ 'eval', 'backtick', 'decode-chain', 'blob', 'sink-name', ...SINKS ];
+const STANDALONE   = [ 'eval', 'backtick', 'decode-chain', 'blob', ...SINKS ];
 // Weak signals, reported only in these pairs; they're also labelled whenever a standalone rule fires.
 const PAIRS        = [ [ 'variable-call', 'decode' ], [ 'include', 'superglobal' ] ];
 const PHP_EXT      = '/\.(php\d?|phtml|pht|phar|inc)$/i';
@@ -132,6 +132,7 @@ function scan_php( array &$hits, string $path, string $code ): void {
 	$decode_depth = null;
 	$decoded      = [];
 	$blob         = 0;
+	$joined       = 0;
 	$tokens       = token_get_all( $code );
 
 	foreach ( $tokens as $i => $token ) {
@@ -181,18 +182,18 @@ function scan_php( array &$hits, string $path, string $code ): void {
 			$statement['decode'] = true;
 		} elseif ( $is_function && in_array( $name, BUILDERS, true ) ) {
 			$statement['decode'] = true;
-		} elseif ( $value === '.' && $prev === T_CONSTANT_ENCAPSED_STRING && ( $tokens[ next_significant( $tokens, $i ) ][0] ?? null ) === T_CONSTANT_ENCAPSED_STRING ) {
-			// Literals glued together, e.g. "sys" . "tem".
-			$statement['decode'] = true;
 		}
 
 		if ( $id === T_CONSTANT_ENCAPSED_STRING || $id === T_ENCAPSED_AND_WHITESPACE ) {
 			$literal = $id === T_CONSTANT_ENCAPSED_STRING ? substr( $value, 1, -1 ) : $value;
-			// A sink named as a string is a callback, e.g. call_user_func('system', ...) or new ReflectionFunction('exec').
-			if ( in_array( strtolower( $literal ), SINKS, true ) ) {
-				$statement['sink-name'] = true;
+			$callee  = strtolower( $literal );
+			// Naming a function is calling it, e.g. call_user_func('system', ...) or `$f = 'base64_decode'; $f(...)`.
+			if ( in_array( $callee, SINKS, true ) ) {
+				$statement[ $callee ] = true;
 			}
-			if ( $value[0] !== "'" && preg_match( '/\\\\(x[0-9a-f]{2}|[0-7]{3})/i', $literal ) ) {
+			// Literals glued together, e.g. "sys" . "tem", or a hex/octal-escaped name.
+			$escaped = ! ( $id === T_CONSTANT_ENCAPSED_STRING && $value[0] === "'" ) && preg_match( '/\\\\(x[0-9a-f]{2}|[0-7]{3})/i', $literal );
+			if ( ++$joined > 1 || $escaped || in_array( $callee, DECODERS, true ) ) {
 				$statement['decode'] = true;
 			}
 			// Summed over literals joined by `.`, so a payload split into pieces still counts; heredocs arrive as one.
@@ -201,7 +202,8 @@ function scan_php( array &$hits, string $path, string $code ): void {
 				$statement['blob'] = true;
 			}
 		} elseif ( $value !== '.' && ! in_array( $id, [ T_START_HEREDOC, T_END_HEREDOC ], true ) ) {
-			$blob = 0;
+			$blob   = 0;
+			$joined = 0;
 		}
 
 		if ( in_array( $value, [ ';', '{', '}' ], true ) ) {
