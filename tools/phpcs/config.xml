@@ -58,6 +58,14 @@
 
     <rule ref="Generic.Files.ByteOrderMark"/>
 
+    <!-- WordPress-Extra leaves these out -->
+    <rule ref="WordPress.Security.ValidatedSanitizedInput">
+        <exclude-pattern>/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.DB.DirectDatabaseQuery">
+        <exclude-pattern>/tests/*</exclude-pattern>
+    </rule>
+
     <!-- pdf.php loads these before it checks the plugin's minimum requirements, so GPDFAPI may not exist yet -->
     <rule ref="./GravityPDF/Sniffs/EarlyLoad/GPDFAPIUsageSniff.php">
         <include-pattern>/pdf\.php</include-pattern>

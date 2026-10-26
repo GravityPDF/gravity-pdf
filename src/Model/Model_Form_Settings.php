@@ -246,7 +246,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$label           = esc_html__( 'Add PDF', 'gravity-pdf' );
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		if ( ( $_POST['submit'] ?? '' ) === $update_pdf_text || ( ! is_wp_error( $pdf ) && ! isset( $pdf['status'] ) ) ) {
+		if ( sanitize_text_field( wp_unslash( $_POST['submit'] ?? '' ) ) === $update_pdf_text || ( ! is_wp_error( $pdf ) && ! isset( $pdf['status'] ) ) ) {
 			/* Redirect to update PDF URL if new PDF has been successfully saved */
 			if ( rgget( 'pid' ) !== $pdf_id ) {
 				wp_safe_redirect( esc_url_raw( add_query_arg( [ 'pid' => $pdf_id ] ) ) );
@@ -638,7 +638,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				$template = $pdf['template'];
 			} elseif ( ! empty( $_POST['gfpdf_settings']['template'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				/* in the middle of creating a new PDF, and not yet saved in the DB. Grab from POST data */
-				$template = sanitize_html_class( $_POST['gfpdf_settings']['template'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$template = sanitize_html_class( wp_unslash( $_POST['gfpdf_settings']['template'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
 		}
 
@@ -786,7 +786,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
 		$fid = isset( $_POST['fid'] ) ? (int) $_POST['fid'] : 0;
-		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( $_POST['pid'] ) : '';
+		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( wp_unslash( $_POST['pid'] ) ) : '';
 		/* phpcs:enable */
 
 		$nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
@@ -838,7 +838,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
 		$fid = isset( $_POST['fid'] ) ? (int) $_POST['fid'] : 0;
-		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( $_POST['pid'] ) : '';
+		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( wp_unslash( $_POST['pid'] ) ) : '';
 		/* phpcs:enable */
 
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
@@ -906,7 +906,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
 		$fid = isset( $_POST['fid'] ) ? (int) $_POST['fid'] : 0;
-		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( $_POST['pid'] ) : '';
+		$pid = isset( $_POST['pid'] ) ? sanitize_html_class( wp_unslash( $_POST['pid'] ) ) : '';
 		/* phpcs:enable */
 
 		$nonce_id = "gfpdf_state_nonce_{$fid}_{$pid}";
@@ -966,8 +966,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->misc->handle_ajax_authentication( 'Render Template Custom Fields', 'gravityforms_edit_forms' );
 
 		/* phpcs:disable WordPress.Security.NonceVerification.Missing */
-		$template = sanitize_html_class( $_POST['template'] ?? '' );
-		$type     = sanitize_html_class( $_POST['type'] ?? '' );
+		$template = sanitize_html_class( wp_unslash( $_POST['template'] ?? '' ) );
+		$type     = sanitize_html_class( wp_unslash( $_POST['type'] ?? '' ) );
 		/* phpcs:enable */
 
 		$class    = $this->templates->get_config_class( $template );

@@ -395,7 +395,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/** @var Helper_Abstract_Addon $addon */
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		$addon = $this->data->addon[ ( $_POST['addon_name'] ?? '' ) ] ?? false;
+		$addon = $this->data->addon[ sanitize_text_field( wp_unslash( $_POST['addon_name'] ?? '' ) ) ] ?? false;
 
 		/* Check add-on currently installed */
 		if ( empty( $addon ) ) {

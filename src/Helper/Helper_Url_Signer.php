@@ -163,8 +163,10 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 	 */
 	public function verify_current_request() {
 		$protocol = isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-		$domain   = isset( $_SERVER['HTTP_HOST'] ) ? wp_unslash( $_SERVER['HTTP_HOST'] ) : '';
-		$request  = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		/* phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() below */
+		$domain  = isset( $_SERVER['HTTP_HOST'] ) ? wp_unslash( $_SERVER['HTTP_HOST'] ) : '';
+		$request = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		/* phpcs:enable */
 
 		return $this->verify( esc_url_raw( $protocol . $domain . $request ) );
 	}

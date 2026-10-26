@@ -297,7 +297,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$this->verify_user_can_manage_templates( 'Delete PDF Template' );
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		$template_id = sanitize_html_class( $_POST['id'] ?? '' );
+		$template_id = sanitize_html_class( wp_unslash( $_POST['id'] ?? '' ) );
 
 		/* Get all the necessary PDF template files to delete */
 		try {

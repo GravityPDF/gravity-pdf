@@ -227,6 +227,7 @@ class Controller_Upgrade_Routines {
 		global $wpdb;
 
 		/* Delete via the API: a stale autoloaded row left in the cache is the cost this routine exists to remove */
+		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery */
 		$keys = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s AND option_value LIKE %s",

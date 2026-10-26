@@ -152,6 +152,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		global $wpdb;
 
 		/* Every user's failed settings save, and the pre-6.18 site-wide one, deleted one by one so WordPress drops its cached copies */
+		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery */
 		$keys = $wpdb->get_col(
 			$wpdb->prepare( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s", $wpdb->esc_like( '_transient_gfpdf_settings_user_data' ) . '%' )
 		);
@@ -183,6 +184,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
 		global $wpdb;
 
+		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery */
 		$keys = $wpdb->get_col(
 			$wpdb->prepare( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s", $wpdb->esc_like( 'gpdf_sl_' ) . '%' )
 		);
@@ -207,6 +209,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 		/* delete_network_option() rather than delete_site_option(), which would narrow the sweep to the current
 		   network and strand rows belonging to the others sharing this sitemeta table */
+		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery */
 		$rows = $wpdb->get_results(
 			$wpdb->prepare( "SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s", $wpdb->esc_like( 'gpdf_sl_net_' ) . '%' )
 		);
