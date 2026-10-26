@@ -62,6 +62,7 @@
 * 🐞 Bug: Don't leave PDF generation filters attached when a PDF fails to generate
 * 🐞 Bug: Stop bypassing Populate Anything's live merge tag whitelist after a PDF is generated
 * 🐞 Bug: Use the form's description placement for Consent fields set to "Use Form Setting"
+* 🐞 Bug: Show every accepted agreement for Gravity Wiz Terms of Service fields with more than one checkbox
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
 * 💻 Developer: `$form_data` field values now encode shortcode and merge tag characters (`[ ] { }`) so they aren't processed
 * 💻 Developer: A `gfpdf_get_option_logged_out_timeout` filter returning 0 now expires IP-based logged-out access immediately, instead of turning off the Logged Out Timeout
