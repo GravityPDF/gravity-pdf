@@ -1171,6 +1171,12 @@ parameters:
 			path: ../../src/Helper/Helper_Data.php
 
 		-
+			message: '#^Call to function method_exists\(\) with ''\\\\GFFormDisplay'' and ''get_row_spacer'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../src/Helper/Helper_Field_Container_Gf25.php
+
+		-
 			message: '#^Method GFPDF\\Helper\\Helper_Field_Container_Gf25\:\:get_field_width\(\) should return int but returns float\.$#'
 			identifier: return.type
 			count: 1
