@@ -94,6 +94,10 @@ jobs:
       - name: Verify package
         run: bash ./tools/release/verify.sh "$PACKAGE_ZIP" "$SOURCE_TAG"
 
+      # Fails on malware-like code (eval, shell exec, decoders) missing from tools/release/scan-baseline.txt.
+      - name: Scan package code
+        run: php ./tools/release/scan.php "$PACKAGE_ZIP" | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Generate release notes
         run: |
           {
