@@ -94,7 +94,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 				$this->gform->process_tags( $this->field->gwtermsofservice_terms, $this->form, $this->entry )
 			)
 		);
-		$html = "
+		$html  = "
 			<div class='terms-of-service-text'>$terms</div>			
 		";
 
