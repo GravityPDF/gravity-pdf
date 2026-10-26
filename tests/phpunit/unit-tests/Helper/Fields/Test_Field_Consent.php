@@ -93,4 +93,41 @@ class Test_Field_Consent extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'consent-accepted-label', $this->pdf_field->html() );
 	}
+
+	/**
+	 * @dataProvider provider_description_placement
+	 */
+	public function test_description_placement( $field_placement, $form_placement, $expected ) {
+		$this->gf_field->description          = 'Consent description';
+		$this->gf_field->descriptionPlacement = $field_placement;
+
+		$form                         = $this->form;
+		$form['descriptionPlacement'] = $form_placement;
+		add_filter( 'gfpdf_current_form_object', fn() => $form );
+
+		$entry = [
+			'form_id'                  => $this->form['id'],
+			'id'                       => '0',
+			$this->gf_field->id . '.1' => '1',
+			$this->gf_field->id . '.2' => '',
+			$this->gf_field->id . '.3' => '',
+		];
+
+		$pdf_field = new Field_Consent( $this->gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$html      = $pdf_field->html();
+
+		$this->assertSame( $expected, $pdf_field->value()['placement'] );
+		$description_first = strpos( $html, 'consent-text' ) < strpos( $html, 'consent-accepted-label' );
+		$this->assertSame( $expected === 'above', $description_first );
+	}
+
+	public function provider_description_placement() {
+		return [
+			'inherits form above'     => [ '', 'above', 'above' ],
+			'inherits form below'     => [ '', 'below', 'below' ],
+			'field overrides form'    => [ 'below', 'above', 'below' ],
+			'field above, form unset' => [ 'above', '', 'above' ],
+			'neither set'             => [ '', '', '' ],
+		];
+	}
 }
