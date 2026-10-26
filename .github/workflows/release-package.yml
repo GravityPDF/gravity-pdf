@@ -114,9 +114,9 @@ jobs:
       - name: Scan package code
         run: php ./tools/release/scan.php "$PACKAGE_ZIP" | tee -a "$GITHUB_STEP_SUMMARY"
 
-      # Of the zip that just passed the gates. Filename only, so `sha256sum -c SHA256SUMS` works beside the download.
+      # Of the zip that just passed the gates, named like the R2 sidecars. Filename only, so `sha256sum -c` works beside it.
       - name: Write checksum
-        run: cd "$(dirname "$PACKAGE_ZIP")" && sha256sum "$(basename "$PACKAGE_ZIP")" > SHA256SUMS
+        run: cd "$(dirname "$PACKAGE_ZIP")" && f="$(basename "$PACKAGE_ZIP")" && sha256sum "$f" > "$f.sha256"
 
       - name: Generate release notes
         run: |
@@ -137,7 +137,7 @@ jobs:
           path: |
             ${{ env.PACKAGE_ZIP }}
             tmp/package/release-notes.md
-            tmp/package/SHA256SUMS
+            ${{ env.PACKAGE_ZIP }}.sha256
           if-no-files-found: error
           compression-level: 0
 
