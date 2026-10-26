@@ -343,14 +343,15 @@ class Model_Templates extends Helper_Abstract_Model {
 			$config->tearDown();
 		}
 
-		/* Remove the PDF template files, but never anything outside a PDF working folder (normalised, as realpath() returns backslashes on Windows) */
-		$folders = array_map( 'trailingslashit', array_map( 'wp_normalize_path', array_filter( array_map( 'realpath', [ $this->data->template_location, $this->templates->get_template_path() ] ) ) ) );
+		/* Remove the PDF template files, but never anything outside a PDF working folder (normalised so Windows paths match) */
+		$folders = array_filter( array_map( 'realpath', [ $this->data->template_location, $this->templates->get_template_path() ] ) );
+		$folders = array_map( 'trailingslashit', array_map( 'wp_normalize_path', $folders ) );
 		foreach ( $files as $file ) {
-			$file              = wp_normalize_path( $file );
+			$path              = wp_normalize_path( $file );
 			$in_working_folder = array_filter(
 				$folders,
-				function ( $folder ) use ( $file ) {
-					return strpos( $file, $folder ) === 0;
+				function ( $folder ) use ( $path ) {
+					return strpos( $path, $folder ) === 0;
 				}
 			);
 
