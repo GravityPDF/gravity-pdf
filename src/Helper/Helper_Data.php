@@ -534,9 +534,10 @@ class Helper_Data {
 			}
 		}
 
-		/* Gravity Wiz Unique ID perk */
+		/* Fields GF doesn't offer in conditional logic, but which have a value once the entry is saved */
 		$post_submission_conditional_logic_field_types = [
-			'uid' => [
+			/* Gravity Wiz Unique ID perk */
+			'uid'        => [
 				'operators' => [
 					'is'          => 'is',
 					'isnot'       => 'isNot',
@@ -547,16 +548,41 @@ class Helper_Data {
 					'ends_with'   => 'endsWith',
 				],
 			],
+
+			'fileupload' => [
+				'operators' => [
+					'is'    => 'is',
+					'isnot' => 'isNot',
+				],
+				'choices'   => [
+					[
+						'text'  => esc_html__( 'Empty', 'gravity-pdf' ),
+						'value' => '',
+					],
+				],
+			],
 		];
 
-		$fields = \GFAPI::get_fields_by_type( $form, array_keys( $post_submission_conditional_logic_field_types ) );
+		/* Include field types built on the File Upload field, e.g. Image Hopper */
+		$file_upload_types = array_keys(
+			array_filter(
+				\GF_Fields::get_all(),
+				function ( $field ) {
+					return $field instanceof \GF_Field_FileUpload;
+				}
+			)
+		);
+
+		$fields = \GFAPI::get_fields_by_type( $form, array_merge( array_keys( $post_submission_conditional_logic_field_types ), $file_upload_types ) );
 
 		foreach ( $fields as $field ) {
-			$options[ $field->id ] = [
-				'label'     => $field->label,
-				'value'     => $field->id,
-				'operators' => rgars( $post_submission_conditional_logic_field_types, $field->type . '/operators', [] ),
-			];
+			$options[ $field->id ] = array_merge(
+				[
+					'label' => $field->label,
+					'value' => $field->id,
+				],
+				$post_submission_conditional_logic_field_types[ $field->type ] ?? $post_submission_conditional_logic_field_types['fileupload']
+			);
 		}
 
 		return $options;

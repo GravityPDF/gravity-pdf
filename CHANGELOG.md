@@ -6,6 +6,7 @@
 * 🎉 Feature: Install several PDF template zips at once
 * 🎉 Feature: Drop template zips anywhere in the Template Manager
 * 🎉 Feature: Install template zips that have the templates inside a folder
+* 🎉 Feature: Use File Upload fields in PDF conditional logic, including fields built on them like Image Hopper
 * 🔒 Security: Only sign PDF URLs when the shortcode or merge tag comes from a trusted source
 * 🔒 Security: Cap signed PDF URLs at 1 year and the Logged Out Timeout at 1 week
 * 🔒 Security: Restrict PDF template uploads and deletes to users who can install plugins
