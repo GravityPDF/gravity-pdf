@@ -232,6 +232,7 @@ class Test_Controller_Form_Settings extends TestCase {
 				[ '1', $url, [ $url ] ],
 				[ '2', '[]', [] ],
 				[ '2', wp_json_encode( [ $url ] ), [ $url ] ],
+				[ '2', [ $url ], [ $url ] ],
 			] as [ $field_id, $value, $expected ]
 		) {
 			$rule = [ 'fieldId' => $field_id ];

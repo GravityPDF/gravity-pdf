@@ -284,11 +284,11 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Process entry meta and File Upload conditional logic rules
 	 *
-	 * @param int|string $source_value The value of the rule’s configured field ID, entry meta, or custom property.
-	 * @param array      $rule         The GF current rule object https://docs.gravityforms.com/conditional-logic-object/#rule
-	 * @param array      $form
-	 * @param array      $logic        The GF conditional logic object https://docs.gravityforms.com/conditional-logic-object/
-	 * @param array|null $entry        The entry currently being processed, if available.
+	 * @param int|string|array $source_value The value of the rule’s configured field ID, entry meta, or custom property.
+	 * @param array            $rule         The GF current rule object https://docs.gravityforms.com/conditional-logic-object/#rule
+	 * @param array            $form
+	 * @param array            $logic        The GF conditional logic object https://docs.gravityforms.com/conditional-logic-object/
+	 * @param array|null       $entry        The entry currently being processed, if available.
 	 *
 	 * @return int|string|array
 	 *
@@ -306,6 +306,11 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		if ( \GFAPI::get_field( $form, $target ) instanceof \GF_Field_FileUpload ) {
 			if ( empty( $source_value ) ) {
 				return [];
+			}
+
+			/* Another gform_rule_source_value callback may have already converted it */
+			if ( is_array( $source_value ) ) {
+				return $source_value;
 			}
 
 			$files = json_decode( $source_value, true );
