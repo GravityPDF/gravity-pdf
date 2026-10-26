@@ -12,8 +12,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
   cancel-in-progress: true
 
-env:
-  GF_LICENSE: ${{ secrets.GF_LICENSE }}
+permissions:
+  contents: read
 
 jobs:
   # Runs the end-to-end test suite.
@@ -89,11 +89,13 @@ jobs:
       - name: Build Gravity PDF
         run: yarn build:production
 
+      # Only the install steps get GF_LICENSE: bin/install.sh passes it to `wp gf install`.
       - name: Install / Setup Gravity PDF + WordPress
         run: |
           yarn env:install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GF_LICENSE: ${{ secrets.GF_LICENSE }}
 
       - name: Run E2E tests
         run: yarn test:e2e:headless
