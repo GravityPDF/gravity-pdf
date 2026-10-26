@@ -1,6 +1,8 @@
 name: Coding Standards
 
 on:
+  # update-dependencies.yml dispatches this on the weekly deps PR
+  workflow_dispatch:
   pull_request:
     # No `opened`: a PR opened with run-tests fires `labeled` too, and the two runs would cancel each other
     types: [ reopened, synchronize, labeled ]
@@ -25,6 +27,7 @@ jobs:
     steps:
       # Read live labels via gh-api: the event payload can predate labels added alongside the trigger
       - name: Check for run-tests label
+        if: ${{ github.event_name == 'pull_request' }}
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
