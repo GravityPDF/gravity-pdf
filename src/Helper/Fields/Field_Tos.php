@@ -28,6 +28,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Field_Tos extends Helper_Abstract_Fields {
 
 	/**
+	 * @var string[]|null
+	 */
+	private $agreements;
+
+	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
 	 * @param object               $field The GF_Field_* Object
@@ -69,7 +74,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 *
 	 */
 	public function is_field_empty() {
-		return parent::is_empty();
+		return $this->agreements() === [];
 	}
 
 	/**
@@ -89,39 +94,83 @@ class Field_Tos extends Helper_Abstract_Fields {
 				$this->gform->process_tags( $this->field->gwtermsofservice_terms, $this->form, $this->entry )
 			)
 		);
-		$value = $this->value();
-
-		$html = "
-			<div class='terms-of-service-text'>$terms</div>			
+		$html  = "
+			<div class='terms-of-service-text'>$terms</div>
 		";
 
-		if ( ! $this->is_field_empty() ) {
-			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10004;</span> $value</div>";
-		} else {
-			$not_accepted_text = __( 'Not accepted', 'gravity-pdf' );
-			$html             .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10006;</span> $not_accepted_text</div>";
+		foreach ( $this->agreements() as $agreement ) {
+			$html .= $this->get_agreement_markup( '&#10004;', $agreement );
+		}
+
+		if ( $this->is_field_empty() ) {
+			$html .= $this->get_agreement_markup( '&#10006;', __( 'Not accepted', 'gravity-pdf' ) );
 		}
 
 		return parent::html( $html );
 	}
 
 	/**
-	 * Get the standard GF value of this field
+	 * Include every accepted agreement alongside the standard keys, which keep the first one
 	 *
-	 * @return string|array
+	 * @return array
+	 *
+	 * @since 7.0
+	 */
+	public function form_data() {
+		$data       = parent::form_data();
+		$label      = $this->get_label();
+		$field_id   = (int) $this->field->id;
+		$agreements = $this->agreements();
+
+		$data['field'][ $field_id . '.' . $label . '_agreements' ] = $agreements;
+		$data['field'][ $field_id . '_agreements' ]                = $agreements;
+		$data['field'][ $label . '_agreements' ]                   = $agreements;
+
+		return $data;
+	}
+
+	/**
+	 * Get the first accepted agreement
+	 *
+	 * @return string
 	 *
 	 * @since 4.0
 	 */
 	public function value() {
-		if ( $this->has_cache() ) {
-			return $this->cache();
+		return $this->agreements()[0] ?? '';
+	}
+
+	/**
+	 * Get every accepted agreement, as the Gravity Wiz perk supports more than one checkbox per field
+	 *
+	 * @return string[]
+	 *
+	 * @since 7.0
+	 */
+	public function agreements(): array {
+		if ( $this->agreements === null ) {
+			$values = array_filter(
+				(array) $this->get_value(),
+				function ( $value ) {
+					return is_string( $value ) && trim( $value ) !== '';
+				}
+			);
+
+			$this->agreements = array_map( 'esc_html', array_values( $values ) );
 		}
 
-		$value_array = $this->get_value();
-		$value       = esc_html( $value_array[ $this->field->id . '.1' ] );
+		return $this->agreements;
+	}
 
-		$this->cache( $value );
-
-		return $this->cache();
+	/**
+	 * @param string $tick  The tick or cross HTML entity
+	 * @param string $label Escaped agreement text
+	 *
+	 * @return string
+	 *
+	 * @since 7.0
+	 */
+	protected function get_agreement_markup( string $tick, string $label ): string {
+		return "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>$tick</span> $label</div>";
 	}
 }
