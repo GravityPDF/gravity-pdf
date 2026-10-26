@@ -105,7 +105,8 @@ class Field_Consent extends Helper_Abstract_Fields {
 					$this->gform->process_tags( $this->field->get_field_description_from_revision( $value[2] ), $this->form, $this->entry )
 				)
 			),
-			'placement'   => $this->field->descriptionPlacement,
+			/* An empty field setting means "Use Form Setting" */
+			'placement'   => $this->field->descriptionPlacement ?: ( $this->form['descriptionPlacement'] ?? '' ),
 		];
 
 		$this->cache( $consent );
