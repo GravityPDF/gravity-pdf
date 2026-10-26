@@ -24,6 +24,9 @@ on:
 concurrency:
   group: release-package-${{ inputs.version || github.ref_name }}
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,12 +34,12 @@ jobs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       # 8.3 because the release build runs php-scoper, which requires PHP 8.2+. composer.json pins
       # the platform to 7.4, so the packaged dependencies are unaffected by the runtime version.
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: 8.3
           coverage: none
@@ -44,10 +47,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node JS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          # No cache: it's shared with branch workflows, so a poisoned entry would feed the shipped zip.
 
       # build.sh hands this auth.json to the package dir's composer install (Gravity Forms).
       - name: Add auth details for private composer packages
@@ -75,7 +78,7 @@ jobs:
 
       # Unverified until the verify job passes it on as release-package.
       - name: Upload build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: package-build
           path: ${{ env.PACKAGE_ZIP }}
@@ -92,10 +95,10 @@ jobs:
       PACKAGE_ZIP: tmp/package/gravity-pdf-${{ needs.build.outputs.tag }}.zip
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Download build
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: package-build
           path: tmp/package
@@ -124,7 +127,7 @@ jobs:
 
       # The E2E and release jobs run on other runners, so hand the verified zip on.
       - name: Upload package
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: release-package
           path: |
@@ -144,7 +147,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       # The zip already has the scoped vendor and built assets; this is GF + test tooling.
       - name: Set up the job
@@ -157,7 +160,7 @@ jobs:
           gf-license: ${{ secrets.GF_LICENSE }}
 
       - name: Download package
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: release-package
           path: tmp/package
@@ -183,7 +186,7 @@ jobs:
         run: yarn wp-env:e2e run wordpress "cp" "-r" "/var/www/html/wp-content/uploads/gravity_forms/logs/" "/var/www/html/wp-content/plugins/gravity-pdf/tmp/logs"
 
       - name: Upload artifacts on failure
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: failure-artifacts-e2e-package

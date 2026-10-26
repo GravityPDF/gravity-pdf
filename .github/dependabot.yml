@@ -1,0 +1,16 @@
+version: 2
+updates:
+  # Every workflow's actions; composite actions aren't scanned from / so need their own entry.
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/*
+    schedule:
+      interval: weekly
+    # Lets a compromised release get yanked before it is proposed.
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns:
+          - '*'
