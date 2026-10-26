@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Prints copy/paste commands to verify the download, reading the hash from the SHA256SUMS beside <zip>.
+# Prints copy/paste commands to verify the download, reading the hash from <zip>.sha256.
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
@@ -9,7 +9,7 @@ if [ $# -lt 1 ]; then
 fi
 
 zip="$(basename "$1")"
-hash=$(cut -d' ' -f1 "$(dirname "$1")/SHA256SUMS")
+hash=$(cut -d' ' -f1 "$1.sha256")
 
 echo "### Verify the download"
 echo

@@ -47,7 +47,7 @@ jobs:
           target_commitish: ${{ github.sha }}
           files: |
             ./tmp/package/gravity-pdf-*.zip
-            ./tmp/package/SHA256SUMS
+            ./tmp/package/gravity-pdf-*.zip.sha256
           fail_on_unmatched_files: true
           body_path: ./tmp/package/release-notes.md
           generate_release_notes: true
