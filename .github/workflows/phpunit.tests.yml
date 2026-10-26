@@ -10,8 +10,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
   cancel-in-progress: true
 
-env:
-  GF_LICENSE: ${{ secrets.GF_LICENSE }}
+permissions:
+  contents: read
 
 jobs:
   # Runs the PHPUnit tests for WordPress.
@@ -106,12 +106,14 @@ jobs:
         run: |
           yarn
 
+      # Only the install steps get GF_LICENSE: bin/install.sh passes it to `wp gf install`.
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ ! matrix.report }}
         run: |
           yarn env:install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GF_LICENSE: ${{ secrets.GF_LICENSE }}
 
       - name: Install / Setup Gravity PDF + WordPress
         if: ${{ matrix.report }}
@@ -119,6 +121,7 @@ jobs:
           PHP_ENABLE_XDEBUG=true yarn env:install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GF_LICENSE: ${{ secrets.GF_LICENSE }}
 
       - name: Run PHPUnit tests
         if: ${{ ! matrix.multisite }}
