@@ -52,12 +52,6 @@ jobs:
           node-version-file: '.nvmrc'
           # No cache: it's shared with branch workflows, so a poisoned entry would feed the shipped zip.
 
-      # build.sh hands this auth.json to the package dir's composer install (Gravity Forms).
-      - name: Add auth details for private composer packages
-        run: composer config http-basic.composer.gravity.io "$GF_LICENSE" http://localhost
-        env:
-          GF_LICENSE: ${{ secrets.GF_LICENSE }}
-
       # The given version, or the plugin header's.
       - name: Resolve version
         id: tag

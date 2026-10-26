@@ -1189,12 +1189,6 @@ parameters:
 			path: ../../src/Helper/Helper_Field_Container_Gf25.php
 
 		-
-			message: '#^Parameter \#1 \$field of static method GFFormDisplay\:\:get_row_spacer\(\) expects array, GF_Field given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/Helper/Helper_Field_Container_Gf25.php
-
-		-
 			message: '#^Return type \(void\) of method GFPDF\\Helper\\Helper_Field_Container_Void\:\:does_fit_in_row\(\) should be compatible with return type \(bool\) of method GFPDF\\Helper\\Helper_Field_Container\:\:does_fit_in_row\(\)$#'
 			identifier: method.childReturnType
 			count: 1
