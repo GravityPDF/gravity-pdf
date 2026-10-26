@@ -951,6 +951,12 @@ parameters:
 		-
 			message: '#^Cannot access property \$id on array\|object\.$#'
 			identifier: property.nonObject
+			count: 2
+			path: ../../src/Helper/Fields/Field_Tos.php
+
+		-
+			message: '#^Cannot access property \$inputs on array\|object\.$#'
+			identifier: property.nonObject
 			count: 1
 			path: ../../src/Helper/Fields/Field_Tos.php
 
