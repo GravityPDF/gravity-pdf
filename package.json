@@ -16,7 +16,6 @@
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
     "redux": "^4.2.1",
-    "redux-devtools-extension": "^2.13.9",
     "redux-saga": "^1.5.1",
     "redux-watch": "^1.2.0",
     "reselect": "^4.1.8",
