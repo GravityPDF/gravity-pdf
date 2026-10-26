@@ -8,18 +8,22 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   update-deps:
     name: Bump WordPress core + Composer packages
     runs-on: ubuntu-latest
-    # Holds WORKFLOW_PAT and only allows the development branch.
-    environment: development
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
     steps:
+      # create-pull-request brings its own credentials, so composer and node never see a write token in .git/config
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
@@ -99,12 +103,11 @@ jobs:
             echo "BODY_EOF"
           } >> "$GITHUB_OUTPUT"
 
-      # WORKFLOW_PAT (not GITHUB_TOKEN) so the PR's events fire tests.yml — GITHUB_TOKEN-attributed events are suppressed to prevent recursion.
       # add-paths restricts the commit to lock + wp-env configs so a dirty vendor/ on the runner can't leak in.
       - name: Open pull request
+        id: cpr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
-          token: ${{ secrets.WORKFLOW_PAT }}
           branch: chore/weekly-deps-update
           base: development
           add-paths: |
@@ -119,3 +122,12 @@ jobs:
             dependencies
             run-tests
           delete-branch: true
+
+      # GITHUB_TOKEN's PR events don't fire tests.yml, but a workflow_dispatch does (as the nightly: full PHP matrix, no
+      # coverage comments); its checks show on the PR's head commit
+      - name: Run tests on the PR branch
+        if: ${{ contains(fromJSON('["created","updated"]'), steps.cpr.outputs.pull-request-operation) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.cpr.outputs.pull-request-branch }}
+        run: gh workflow run tests.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
