@@ -40,6 +40,7 @@ jobs:
           path: tmp/package
 
       - name: Release
+        id: release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           # Explicit so a dispatch creates the version tag instead of targeting the branch ref.
@@ -53,3 +54,11 @@ jobs:
           generate_release_notes: true
           append_body: true
           prerelease: true
+          # Immutable releases reject uploads once published, so attach the assets to a draft first.
+          draft: true
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ steps.release.outputs.id }}
+        run: gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" -F draft=false --jq '.html_url'
