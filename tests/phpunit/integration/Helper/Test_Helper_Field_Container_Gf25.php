@@ -76,4 +76,25 @@ class Test_Helper_Field_Container_Gf25 extends TestCase {
 
 		ob_end_clean();
 	}
+
+	public function test_spacer_ends_the_row() {
+		$form_id = \GFAPI::add_form(
+			[
+				'title'         => 'Spacer',
+				'markupVersion' => 2,
+				'fields'        => [
+					[ 'id' => 1, 'type' => 'text', 'layoutGroupId' => 'a', 'layoutGridColumnSpan' => 4, 'layoutSpacerGridColumnSpan' => 8 ],
+					[ 'id' => 2, 'type' => 'text', 'layoutGroupId' => 'b', 'layoutGridColumnSpan' => 4 ],
+				],
+			]
+		);
+
+		ob_start();
+		foreach ( \GFAPI::get_form( $form_id )['fields'] as $field ) {
+			$this->class->generate( $field );
+		}
+		$this->class->close();
+
+		$this->assertSame( 2, substr_count( ob_get_clean(), 'row-separator' ) );
+	}
 }
