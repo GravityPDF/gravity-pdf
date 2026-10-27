@@ -74,7 +74,7 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 			}
 
 			$gform = \GPDFAPI::get_form_class();
-			$form  = $gform->get_form( $field->form_id );
+			$form  = $gform->get_form( $field->formId );
 
 			if ( isset( $form['fields'] ) && ! empty( \GFFormDisplay::get_row_spacer( $field, $form ) ) ) {
 				$this->end_of_row = true;
