@@ -78,7 +78,8 @@ class Test_Helper_Field_Container_Gf25 extends TestCase {
 	}
 
 	public function test_spacer_ends_the_row() {
-		$form_id = \GFAPI::add_form(
+		$form_id = $this->gf_factory()->form->create(
+			[],
 			[
 				'title'         => 'Spacer',
 				'markupVersion' => 2,
