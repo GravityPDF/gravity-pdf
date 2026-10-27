@@ -2036,7 +2036,12 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
 	}
 
-	public function test_html_structure_keeps_user_tags_encoded() {
+	/**
+	 * @dataProvider provider_kses_parsers
+	 */
+	public function test_html_structure_keeps_user_tags_encoded( $legacy ) {
+		add_filter( 'wp_kses_force_legacy_parser', $legacy ? '__return_true' : '__return_false' );
+
 		$factory = new \GF_UnitTest_Factory();
 		$form_id = $factory->form->create(
 			[],
@@ -2054,7 +2059,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$entry_id = $factory->entry->create(
 			[
 				'form_id' => $form_id,
-				'1'       => '[gravitypdf id="1"] {all_fields}',
+				'1'       => '[gravitypdf id="1"] {all_fields} {Text:1}',
 				'2'       => '<a href="[gravitypdf id=1]" title="{all_fields}">[gravitypdf id="1"]</a>',
 			]
 		);
@@ -2066,11 +2071,15 @@ class Test_PDF extends WP_UnitTestCase {
 		$html = do_shortcode( \GPDFAPI::get_form_class()->process_tags( $html, \GFAPI::get_form( $form_id ), $entry ) );
 
 		$this->assertStringContainsString( "Form ID: $form_id", $html );
-		$this->assertStringContainsString( '&#091;gravitypdf', $html );
-		$this->assertStringContainsString( '&#123;all_fields&#125;', $html );
+		$this->assertStringContainsString( "[\u{2060}gravitypdf", $html );
+		$this->assertStringContainsString( "{\u{2060}all_fields}", $html );
+		$this->assertStringContainsString( "{\u{2060}Text:\u{2060}1}", $html );
 		$this->assertStringContainsString( '%5Bgravitypdf%20id=1%5D', $html );
-		$this->assertStringNotContainsString( '[', $html );
-		$this->assertStringNotContainsString( '{', $html );
+		$this->assertDoesNotMatchRegularExpression( '/[\[{](?!\x{2060})/u', $html );
+	}
+
+	public function provider_kses_parsers() {
+		return [ [ true ], [ false ] ];
 	}
 
 	public function test_form_data_keeps_user_tags_encoded() {
@@ -2101,10 +2110,10 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$data = $this->model->get_form_data( \GFAPI::get_entry( $entry_id ) );
 
-		$this->assertSame( '&#91;gravitypdf id=&quot;1&quot;&#93; &#123;all_fields&#125;', $data['field'][1] );
-		$this->assertSame( '&#91;gravitypdf id="1"&#93;', $data['misc']['user_agent'] );
-		$this->assertSame( 'https://example.org/?a=&#123;ip&#125;', $data['misc']['source_url'] );
-		$this->assertSame( [ '&#91;row&#93;' ], $data['list'][3] ?? null );
+		$this->assertSame( "[\u{2060}gravitypdf id=&quot;1&quot;] {\u{2060}all_fields}", $data['field'][1] );
+		$this->assertSame( "[\u{2060}gravitypdf id=\"1\"]", $data['misc']['user_agent'] );
+		$this->assertSame( "https:\u{2060}//example.org/?a={\u{2060}ip}", $data['misc']['source_url'] );
+		$this->assertSame( [ "[\u{2060}row]" ], $data['list'][3] ?? null );
 
 		/* An administrative field's default tags are trusted, as in html() */
 		$this->assertSame( $default, $data['field'][2] );

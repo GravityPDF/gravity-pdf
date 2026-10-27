@@ -391,7 +391,20 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			$value = $processor->get_updated_html();
 		}
 
-		return str_replace( $find, [ '&#91;', '&#93;', '&#123;', '&#125;' ], $value );
+		/* A word joiner after [ { and : stops shortcodes and merge tags matching, and kses keeps it, unlike &#91; on WordPress 7.2 */
+		$joiners = [
+			'[' => "[\u{2060}",
+			'{' => "{\u{2060}",
+			':' => ":\u{2060}",
+		];
+		$parts   = preg_split( '/(<[^>]*>)/', $value, -1, PREG_SPLIT_DELIM_CAPTURE ) ?: [ $value ];
+
+		foreach ( $parts as $i => $part ) {
+			/* Text only, as the odd parts are tags. Once only, so a value encoded twice still matches the trusted tags put back later */
+			$parts[ $i ] = $i % 2 ? $part : strtr( strtr( $part, array_flip( $joiners ) ), $joiners );
+		}
+
+		return implode( '', $parts );
 	}
 
 	/**

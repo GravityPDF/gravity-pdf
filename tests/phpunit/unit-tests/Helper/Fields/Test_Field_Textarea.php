@@ -80,7 +80,7 @@ class Test_Field_Textarea extends WP_UnitTestCase {
 		/* Default tags are kept wherever they appear */
 		$field->defaultValue = '{user:display_name} [gravitypdf id=abc]';
 		$mixed               = $html( $field, 'Jake [gravitypdf id=abc] [gravitypdf id=xyz] {all_fields}' );
-		$this->assertStringContainsString( 'Jake [gravitypdf id=abc] &#091;gravitypdf id=xyz&#093; &#123;all_fields&#125;', $mixed );
+		$this->assertStringContainsString( "Jake [gravitypdf id=abc] [\u{2060}gravitypdf id=xyz] {\u{2060}all_fields}", $mixed );
 
 		$field->visibility = 'visible';
 		$this->assertStringNotContainsString( '[gravitypdf id=abc]', $html( $field, '[gravitypdf id=abc]' ) );
@@ -131,7 +131,7 @@ class Test_Field_Textarea extends WP_UnitTestCase {
 		$field->defaultValue = '{form_id} {user:display_name}';
 		$this->assertStringContainsString( "Form $form", $value() );
 		$field->defaultValue = '{entry_id}';
-		$this->assertStringContainsString( 'Form &#123;form_id&#125;', $value() );
+		$this->assertStringContainsString( "Form {\u{2060}form_id}", $value() );
 	}
 
 	public function test_opted_in_merge_tags_never_sign_a_pdf_url() {

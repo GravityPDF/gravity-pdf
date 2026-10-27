@@ -124,14 +124,4 @@ class Test_Kses extends WP_UnitTestCase {
 			ini_set( 'pcre.backtrack_limit', $limit );
 		}
 	}
-
-	public function test_parse_keeps_encoded_tag_characters() {
-		add_filter( 'wp_kses_force_legacy_parser', '__return_false' );
-
-		$html = Kses::parse( '<div>&#91;gravitypdf id=&quot;1&quot;&#93; &#123;admin_email&#125;</div>' );
-
-		$this->assertStringNotContainsString( '[gravitypdf', $html );
-		$this->assertStringNotContainsString( '{admin_email}', $html );
-		$this->assertFalse( apply_filters( 'wp_kses_force_legacy_parser', false ) );
-	}
 }
