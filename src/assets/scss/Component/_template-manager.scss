@@ -53,7 +53,7 @@
           opacity: 0.5;
           cursor: not-allowed;
 
-          a {
+          > a {
             pointer-events: none;
           }
         }
@@ -123,6 +123,16 @@
         font-size: 85%;
         text-align: center;
         margin-top: 5px;
+
+        /* Undo core's `.theme.add-new-theme a` tile styles, meant only for the "Add New Template" link */
+        a {
+          display: inline;
+          text-decoration: underline;
+
+          &::after {
+            content: none;
+          }
+        }
       }
 
       .notice {
