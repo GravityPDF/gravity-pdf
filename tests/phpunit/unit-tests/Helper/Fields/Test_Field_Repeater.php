@@ -142,7 +142,7 @@ class Test_Field_Repeater extends WP_UnitTestCase {
 
 		$data = ( new Field_Repeater( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() ) )->form_data()['repeater'][1][0];
 
-		$this->assertSame( "[\u{2060}gravitypdf id=1]", $data[2] );
+		$this->assertSame( "[\u{FEFF}gravitypdf id=1]", $data[2] );
 		$this->assertStringContainsString( (string) $form_id, $data[3] );
 	}
 }

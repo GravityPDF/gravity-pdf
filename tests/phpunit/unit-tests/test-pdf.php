@@ -2060,7 +2060,7 @@ class Test_PDF extends WP_UnitTestCase {
 			[
 				'form_id' => $form_id,
 				'1'       => '[gravitypdf id="1"] {all_fields} {Text:1}',
-				'2'       => '<a href="[gravitypdf id=1]" title="{all_fields}">[gravitypdf id="1"]</a>',
+				'2'       => '<a href="[gravitypdf id=1]" title="{all_fields}">[gravitypdf id="1"]</a> I <3 {admin_email} >_<',
 			]
 		);
 
@@ -2071,11 +2071,12 @@ class Test_PDF extends WP_UnitTestCase {
 		$html = do_shortcode( \GPDFAPI::get_form_class()->process_tags( $html, \GFAPI::get_form( $form_id ), $entry ) );
 
 		$this->assertStringContainsString( "Form ID: $form_id", $html );
-		$this->assertStringContainsString( "[\u{2060}gravitypdf", $html );
-		$this->assertStringContainsString( "{\u{2060}all_fields}", $html );
-		$this->assertStringContainsString( "{\u{2060}Text:\u{2060}1}", $html );
+		$this->assertStringContainsString( "[\u{FEFF}gravitypdf", $html );
+		$this->assertStringContainsString( "{\u{FEFF}all_fields}", $html );
+		$this->assertStringContainsString( "{\u{FEFF}Text:\u{FEFF}1}", $html );
 		$this->assertStringContainsString( '%5Bgravitypdf%20id=1%5D', $html );
-		$this->assertDoesNotMatchRegularExpression( '/[\[{](?!\x{2060})/u', $html );
+		$this->assertStringNotContainsString( get_option( 'admin_email' ), $html );
+		$this->assertDoesNotMatchRegularExpression( '/[\[{](?!\x{FEFF})/u', $html );
 	}
 
 	public function provider_kses_parsers() {
@@ -2110,10 +2111,10 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$data = $this->model->get_form_data( \GFAPI::get_entry( $entry_id ) );
 
-		$this->assertSame( "[\u{2060}gravitypdf id=&quot;1&quot;] {\u{2060}all_fields}", $data['field'][1] );
-		$this->assertSame( "[\u{2060}gravitypdf id=\"1\"]", $data['misc']['user_agent'] );
-		$this->assertSame( "https:\u{2060}//example.org/?a={\u{2060}ip}", $data['misc']['source_url'] );
-		$this->assertSame( [ "[\u{2060}row]" ], $data['list'][3] ?? null );
+		$this->assertSame( "[\u{FEFF}gravitypdf id=&quot;1&quot;] {\u{FEFF}all_fields}", $data['field'][1] );
+		$this->assertSame( "[\u{FEFF}gravitypdf id=\"1\"]", $data['misc']['user_agent'] );
+		$this->assertSame( "https:\u{FEFF}//example.org/?a={\u{FEFF}ip}", $data['misc']['source_url'] );
+		$this->assertSame( [ "[\u{FEFF}row]" ], $data['list'][3] ?? null );
 
 		/* An administrative field's default tags are trusted, as in html() */
 		$this->assertSame( $default, $data['field'][2] );
