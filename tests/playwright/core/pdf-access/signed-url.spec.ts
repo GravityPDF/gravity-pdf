@@ -200,8 +200,8 @@ test.describe('Signed PDF URLs', () => {
 		const submitted = await pdf.getLatestEntry(form.id);
 		const html = await pdf.getPdfDebugOutput(pdfId, submitted.id);
 
-		expect(html).toContain('&#091;gravitypdf');
-		expect(html).toContain('&#123;PDF:pdf:');
+		expect(html).toContain('[\uFEFFgravitypdf');
+		expect(html).toContain('{\uFEFFPDF:\uFEFFpdf:');
 		expect(html).not.toContain('signature=');
 	});
 

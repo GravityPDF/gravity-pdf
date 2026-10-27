@@ -37,6 +37,50 @@ class Test_Field_Textarea extends TestCase {
 		$this->assertStringContainsString('<div class="a b c d e f g h">Hi <ul id="list"><li>Item 1</li><li class="1 2 3 4 5 6 7 8">Item 2</li><li>Item 3</li></ul></div><p class="a b c">My paragraph</p>', str_replace( [ "\n", "\t" ], '', $value ) );
 	}
 
+	/**
+	 * @dataProvider provider_encode_tags
+	 */
+	public function test_encode_tags( $value, $expected ) {
+		$pdf_field = new Field_Textarea( new GF_Field_Textarea( [ 'id' => 1 ] ), [ 'id' => 0, 'form_id' => 0 ], \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+
+		$this->assertSame( $expected, $pdf_field->encode_tags( $value ) );
+		$this->assertSame( $expected, $pdf_field->encode_tags( $expected ), 'Encoding twice changes nothing' );
+
+		/* No merge tag matches after kses: Gravity PDF's, or Gravity Forms' field tag from GFCommon::replace_variables() */
+		$parsed = \GFPDF\Statics\Kses::parse( $expected );
+		$this->assertSame( 0, preg_match( \GFPDF\Model\Model_Mergetags::PDF_MERGETAG_REGEX, $parsed ) );
+		$this->assertSame( 0, preg_match( '/{[^{]*?:(\d+(\.\w+)?)(:(.*?))?}/mi', $parsed ) );
+	}
+
+	public function provider_encode_tags() {
+		return [
+			'no tags'                    => [ 'https://example.org/ <b>Bold</b>', 'https://example.org/ <b>Bold</b>' ],
+			'text'                       => [ '[gravitypdf id="1"] {Text:1}', "[\u{FEFF}gravitypdf id=\"1\"] {\u{FEFF}Text:\u{FEFF}1}" ],
+			'text that looks like a tag' => [ 'I <3 {admin_email} >_<', "I <3 {\u{FEFF}admin_email} >_<" ],
+			'attribute name'             => [ '<b {Text:1}>', "<b {\u{FEFF}Text:\u{FEFF}1}>" ],
+			'attribute values'           => [ '<a href="https://example.org/?a=[b]" title="{all_fields}">[c]</a>', "<a href=\"https://example.org/?a=%5Bb%5D\" title=\"%7Ball_fields%7D\">[\u{FEFF}c]</a>" ],
+			'attribute containing >'     => [ '<a title="1>0" href="https://example.org/">{c}</a>', "<a title=\"1>0\" href=\"https://example.org/\">{\u{FEFF}c}</a>" ],
+			'tag ending in an attribute' => [ '{x <b title=":3:pdf:abc">}', "{\u{FEFF}x <b title=\":\u{FEFF}3:\u{FEFF}pdf:\u{FEFF}abc\">}" ],
+			'tag ending in a URL'        => [ '{x <a href="https://example.org/:3:pdf:abc">}', "{\u{FEFF}x <a href=\"https://example.org/%3A3%3Apdf%3Aabc\">}" ],
+			'tag ending in a style'      => [ '{x <b style="color:red:3:pdf:abc">}', "{\u{FEFF}x <b style=\"color:\u{FEFF}red:\u{FEFF}3:\u{FEFF}pdf:\u{FEFF}abc\">}" ],
+			'tag ending in a property'   => [ '{x <b style="color:3:y">}', "{\u{FEFF}x <b style=\"color:\u{FEFF}3:\u{FEFF}y\">}" ],
+			'style declarations'         => [ '{c} <b style="color: red; text-align:center">', "{\u{FEFF}c} <b style=\"color: red; text-align:center\">" ],
+		];
+	}
+
+	public function test_default_tags_are_restored_in_attributes() {
+		$field = new GF_Field_Textarea( [
+			'id'           => 1,
+			'visibility'   => 'administrative',
+			'defaultValue' => '{user:display_name}',
+		] );
+
+		$pdf_field = new Field_Textarea( $field, [ 'id' => 0, 'form_id' => 0 ], \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
+		$value     = '<a href="https://example.org/?u={user:display_name}" title="{user:display_name}">{all_fields}</a>';
+
+		$this->assertSame( "<a href=\"https://example.org/?u={user:display_name}\" title=\"{user:display_name}\">{\u{FEFF}all_fields}</a>", $pdf_field->encode_value_tags( $value ) );
+	}
+
 	public function test_administrative_value_is_encoded_unless_it_is_the_default() {
 		$field = new GF_Field_Textarea( [
 			'id'           => 1,
@@ -59,7 +103,7 @@ class Test_Field_Textarea extends TestCase {
 		/* Default tags are kept wherever they appear */
 		$field->defaultValue = '{user:display_name} [gravitypdf id=abc]';
 		$mixed               = $html( $field, 'Jake [gravitypdf id=abc] [gravitypdf id=xyz] {all_fields}' );
-		$this->assertStringContainsString( 'Jake [gravitypdf id=abc] &#091;gravitypdf id=xyz&#093; &#123;all_fields&#125;', $mixed );
+		$this->assertStringContainsString( "Jake [gravitypdf id=abc] [\u{FEFF}gravitypdf id=xyz] {\u{FEFF}all_fields}", $mixed );
 
 		$field->visibility = 'visible';
 		$this->assertStringNotContainsString( '[gravitypdf id=abc]', $html( $field, '[gravitypdf id=abc]' ) );
@@ -111,7 +155,7 @@ class Test_Field_Textarea extends TestCase {
 		$field->defaultValue = '{form_id} {user:display_name}';
 		$this->assertStringContainsString( "Form $form", $value() );
 		$field->defaultValue = '{entry_id}';
-		$this->assertStringContainsString( 'Form &#123;form_id&#125;', $value() );
+		$this->assertStringContainsString( "Form {\u{FEFF}form_id}", $value() );
 	}
 
 	public function test_opted_in_merge_tags_never_sign_a_pdf_url() {

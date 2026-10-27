@@ -28,6 +28,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Config {
 
 	/**
+	 * How encode_tags() stops shortcodes and merge tags matching in text
+	 *
+	 * @since 6.18.0
+	 */
+	private const TAG_JOINERS = [
+		'[' => "[\u{FEFF}",
+		'{' => "{\u{FEFF}",
+		':' => ":\u{FEFF}",
+	];
+
+	/**
+	 * How encode_tags() stops them matching in HTML attributes
+	 *
+	 * @since 6.18.0
+	 */
+	private const URL_ENCODED_TAGS = [
+		'[' => '%5B',
+		']' => '%5D',
+		'{' => '%7B',
+		'}' => '%7D',
+	];
+
+	/**
 	 * Contains the field array
 	 *
 	 * @var array|object
@@ -370,11 +393,13 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 	 * @since 4.0
 	 */
 	public function encode_tags( $value ) {
-		$find  = [ '[', ']', '{', '}' ];
 		$value = (string) $value;
 		if ( strpbrk( $value, '[]{}' ) === false ) {
 			return $value;
 		}
+
+		/* A zero-width no-break space stops tags matching, and mPDF strips it. Added once only, so trusted defaults still match */
+		$value = strtr( strtr( $value, array_flip( self::TAG_JOINERS ) ), self::TAG_JOINERS );
 
 		/* Kses rebuilds attribute values, so URL-encode the tags there */
 		if ( strpos( $value, '<' ) !== false && class_exists( '\WP_HTML_Tag_Processor' ) ) {
@@ -382,8 +407,8 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			while ( $processor->next_tag() ) {
 				foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
 					$attribute = $processor->get_attribute( $name );
-					if ( is_string( $attribute ) && strpbrk( $attribute, '[]{}' ) !== false ) {
-						$processor->set_attribute( $name, str_replace( $find, [ '%5B', '%5D', '%7B', '%7D' ], $attribute ) );
+					if ( is_string( $attribute ) && strpos( $attribute, "\u{FEFF}" ) !== false ) {
+						$processor->set_attribute( $name, $this->encode_attribute_tags( $name, str_replace( "\u{FEFF}", '', $attribute ) ) );
 					}
 				}
 			}
@@ -391,7 +416,42 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			$value = $processor->get_updated_html();
 		}
 
-		return str_replace( $find, [ '&#91;', '&#93;', '&#123;', '&#125;' ], $value );
+		return $value;
+	}
+
+	/**
+	 * URL-encode an attribute's tags, and stop a merge tag in the text ending on one of its colons
+	 *
+	 * @param string $name  The lowercase attribute name
+	 * @param string $value The attribute value
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	private function encode_attribute_tags( $name, $value ) {
+		$value = strtr( $value, self::URL_ENCODED_TAGS );
+		$colon = [ ':' => self::TAG_JOINERS[':'] ];
+
+		/* A URL keeps its scheme */
+		if ( in_array( $name, wp_kses_uri_attributes(), true ) ) {
+			return preg_replace( '/^[a-z][a-z0-9+.-]*:(*SKIP)(*F)|:/i', '%3A', $value ) ?? '';
+		}
+
+		/* A style property keeps its colon when it's the declaration's only one */
+		if ( $name === 'style' ) {
+			return implode(
+				';',
+				array_map(
+					function ( $declaration ) use ( $colon ) {
+						return substr_count( $declaration, ':' ) > 1 ? strtr( $declaration, $colon ) : $declaration;
+					},
+					explode( ';', $value )
+				)
+			);
+		}
+
+		return strtr( $value, $colon );
 	}
 
 	/**
@@ -481,8 +541,10 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			$map[ $this->encode_tags( $escaped ) ] = $this->decode_shortcode_quotes( $escaped );
 			$map[ $this->encode_tags( $tag ) ]     = $tag;
 
-			/* As encode_tags() encodes them in an HTML attribute */
-			$map[ str_replace( [ '[', ']', '{', '}' ], [ '%5B', '%5D', '%7B', '%7D' ], $tag ) ] = $tag;
+			/* As encode_tags() encodes them in a URL attribute, and in any other */
+			foreach ( [ 'href', 'title' ] as $attribute ) {
+				$map[ $this->encode_attribute_tags( $attribute, $tag ) ] = $tag;
+			}
 		}
 
 		return $map;
