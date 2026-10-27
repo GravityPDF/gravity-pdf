@@ -67,7 +67,7 @@
 * 🐞 Bug: Use the form's description placement for Consent fields set to "Use Form Setting"
 * 🐞 Bug: Show every accepted agreement for Gravity Wiz Terms of Service fields with more than one checkbox
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
-* 💻 Developer: `$form_data` field values now encode shortcode and merge tag characters (`[ ] { }`) so they aren't processed
+* 💻 Developer: Submitted `$form_data` values with `[ ] { }` now get U+FEFF after each `[`, `{` and `:`, except HTML/Section fields and administrative defaults
 * 💻 Developer: A `gfpdf_get_option_logged_out_timeout` filter returning 0 now expires IP-based logged-out access immediately, instead of turning off the Logged Out Timeout
 * 💻 Developer: The default `gfpdf_mpdf_tmp_location` is now the PDF tmp folder, which moves mPDF's cache from `tmp/mpdf/mpdf` to `tmp/mpdf`
 * 💻 Developer: Folders added with the `gfpdf_installer_create_folders` filter are now created on install, upgrade and the twice-daily cleanup, not every request
