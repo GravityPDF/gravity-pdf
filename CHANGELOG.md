@@ -15,7 +15,6 @@
 * 🔒 Security: Escape the ?data=1 debug output
 * 🔒 Security: Redact user records in log files
 * 🔒 Security: Harden core font installer
-* 🔒 Security: Stop submitted shortcodes and merge tags being processed in PDFs on WordPress 7.2
 * 🧹 Housekeeping: Stop checking for the existence of Gravity PDF folders on every page load
 * 🧹 Housekeeping: Create the background processing queue once per request
 * 🧹 Housekeeping: Only flush a font from the cache when it's added, edited or deleted
@@ -67,7 +66,7 @@
 * 🐞 Bug: Use the form's description placement for Consent fields set to "Use Form Setting"
 * 🐞 Bug: Show every accepted agreement for Gravity Wiz Terms of Service fields with more than one checkbox
 * 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
-* 💻 Developer: `$form_data` values that contain `[ ] { }` now have an invisible zero-width no-break space (U+FEFF) after each `[`, `{` and `:` so their shortcodes and merge tags aren't processed
+* 💻 Developer: `$form_data` values containing `[ ] { }` now get a zero-width no-break space (U+FEFF) after each `[`, `{` and `:` to stop shortcode and merge tag processing
 * 💻 Developer: A `gfpdf_get_option_logged_out_timeout` filter returning 0 now expires IP-based logged-out access immediately, instead of turning off the Logged Out Timeout
 * 💻 Developer: The default `gfpdf_mpdf_tmp_location` is now the PDF tmp folder, which moves mPDF's cache from `tmp/mpdf/mpdf` to `tmp/mpdf`
 * 💻 Developer: Folders added with the `gfpdf_installer_create_folders` filter are now created on install, upgrade and the twice-daily cleanup, not every request
