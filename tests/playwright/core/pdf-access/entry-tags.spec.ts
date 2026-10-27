@@ -99,7 +99,7 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 			const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
 
 			expect(html).toMatch(signedLink(entry.id));
-			expect(html).not.toContain('&#091;gravitypdf');
+			expect(html).not.toContain('[\uFEFFgravitypdf');
 		});
 	}
 
@@ -125,7 +125,7 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 
 		expect(html).toContain('Saved by Visitor');
 		expect(html).toMatch(signedLink(entry.id));
-		expect(html).toContain('&#091;gravitypdf');
+		expect(html).toContain('[\uFEFFgravitypdf');
 	});
 
 	test('keeps the tags in field values encoded through the render', async () => {
@@ -138,7 +138,7 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		const html = await pdf.getPdfDebugOutput(pdfId, entry.id);
 
 		expect(html).toMatch(/href="[^"]*%5Bgravitypdf/);
-		expect(html).toContain('Posted &#091;gravitypdf');
+		expect(html).toContain('Posted [\uFEFFgravitypdf');
 		expect(html).not.toMatch(/\[gravitypdf/);
 	});
 
@@ -157,7 +157,7 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 		let html = await pdf.getPdfDebugOutput(pdfId, entry.id);
 
 		expect(html).toContain(`Form ID: ${form.id}`);
-		expect(html).toContain('&#123;ip&#125;');
+		expect(html).toContain('{\uFEFFip}');
 		expect(html).not.toContain(ip);
 		expect(html).not.toContain('signature=');
 
@@ -181,7 +181,7 @@ test.describe('Shortcodes and merge tags in entry values', () => {
 
 		const formData = await pdf.getPdfFormData(pdfId, entry.id);
 
-		expect(formData).toContain('&#91;gravitypdf');
+		expect(formData).toContain('[\uFEFFgravitypdf');
 		expect(formData).not.toMatch(/\[gravitypdf id="\d+" raw="1"\]/);
 
 		// the administrative field's default is left for the template to process
