@@ -44,8 +44,12 @@ class Kses {
 	public static function parse( $html ) {
 		add_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
+		/* WordPress 7.2's HTML API kses decodes the &#91; &#123; entities that stop submitted tags being processed */
+		add_filter( 'wp_kses_force_legacy_parser', '__return_true', 99 );
+
 		$html = wp_kses( self::strip_scripts( (string) $html ), self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
 
+		remove_filter( 'wp_kses_force_legacy_parser', '__return_true', 99 );
 		remove_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
 		return $html;
