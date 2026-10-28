@@ -387,6 +387,8 @@ class Model_Templates extends Helper_Abstract_Model {
 	 *
 	 * @return string The full path of the final resting place of the uploaded zip file
 	 *
+	 * @throws Exception If the zip fails validation or can't be moved
+	 *
 	 * @since 4.1
 	 */
 	public function move_template_to_tmp_dir( File $file ) {
