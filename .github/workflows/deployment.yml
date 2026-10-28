@@ -49,6 +49,7 @@ jobs:
           files: |
             ./tmp/package/gravity-pdf-*.zip
             ./tmp/package/gravity-pdf-*.zip.sha256
+            ./tmp/package/gravity-pdf-*.zip.sha1
           fail_on_unmatched_files: true
           body_path: ./tmp/package/release-notes.md
           generate_release_notes: true
