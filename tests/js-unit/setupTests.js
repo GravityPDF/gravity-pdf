@@ -38,6 +38,7 @@ window.GFPDF = {
 	templateUploadDropzone: 'dropzoneText',
 	templateUploadInProgress: 'uploading',
 	templateUploadMaxSize: '1000',
+	templateDocsLink: 'docsLink',
 	// Font manager component
 	fontListInstalledFonts: 'Installed Fonts',
 	fontListRegular: 'Regular',

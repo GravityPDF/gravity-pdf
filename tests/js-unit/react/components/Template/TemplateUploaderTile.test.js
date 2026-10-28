@@ -5,6 +5,8 @@ import TemplateUploaderTile from '../../../../../src/assets/js/react/components/
 import { TemplateUploaderContext } from '../../../../../src/assets/js/react/components/Template/TemplateUploaderContext';
 
 describe('Template - TemplateUploaderTile.js', () => {
+	const tileLink = (wrapper) => wrapper.find('a[href="#/template"]');
+
 	const setup = (context = {}, disabled = false) =>
 		mount(
 			<TemplateUploaderContext.Provider
@@ -27,7 +29,10 @@ describe('Template - TemplateUploaderTile.js', () => {
 		expect(wrapper.find('h2.theme-name').text()).toBe('Add New Template');
 		expect(
 			wrapper.find('.gfpdf-template-install-instructions').text()
-		).toBe('instructions');
+		).toBe('instructions docsLink');
+		expect(
+			findByTestAttr(wrapper, 'component-templateDocsLink').prop('href')
+		).toBe('https://docs.gravitypdf.com/developers/start-customising/');
 	});
 
 	test('opens the file picker owned by <TemplateUploader /> instead of following the link', () => {
@@ -35,7 +40,7 @@ describe('Template - TemplateUploaderTile.js', () => {
 		const preventDefault = jest.fn();
 		const wrapper = setup({ open });
 
-		wrapper.find('a').simulate('click', { preventDefault });
+		tileLink(wrapper).simulate('click', { preventDefault });
 
 		expect(open).toHaveBeenCalledTimes(1);
 		expect(preventDefault).toHaveBeenCalledTimes(1);
@@ -44,7 +49,7 @@ describe('Template - TemplateUploaderTile.js', () => {
 	test('does nothing when disabled', () => {
 		const open = jest.fn();
 		const wrapper = setup({ open }, true);
-		const link = wrapper.find('a');
+		const link = tileLink(wrapper);
 
 		link.simulate('click');
 
@@ -59,8 +64,8 @@ describe('Template - TemplateUploaderTile.js', () => {
 
 	test('shows the spinner while an upload is in flight', () => {
 		expect(
-			setup({ isUploading: true }).find('a').hasClass('doing-ajax')
+			tileLink(setup({ isUploading: true })).hasClass('doing-ajax')
 		).toBe(true);
-		expect(setup().find('a').hasClass('doing-ajax')).toBe(false);
+		expect(tileLink(setup()).hasClass('doing-ajax')).toBe(false);
 	});
 });

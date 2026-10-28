@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Helper\Fields;
 
 use GF_Field_Textarea;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -35,6 +36,27 @@ class Test_Field_Textarea extends TestCase {
 
 		$value = $pdf_field->html();
 		$this->assertStringContainsString('<div class="a b c d e f g h">Hi <ul id="list"><li>Item 1</li><li class="1 2 3 4 5 6 7 8">Item 2</li><li>Item 3</li></ul></div><p class="a b c">My paragraph</p>', str_replace( [ "\n", "\t" ], '', $value ) );
+	}
+
+	public function test_empty_rich_text_value_raises_no_deprecation() {
+		$field = new GF_Field_Textarea( [ 'id' => 1, 'useRichTextEditor' => true ] );
+		$entry = [ 'id' => 0, 'form_id' => 0, '1' => '' ];
+
+		$deprecations = [];
+		set_error_handler( function ( $errno, $errstr ) use ( &$deprecations ) {
+			$deprecations[] = $errstr;
+
+			return true;
+		}, E_DEPRECATED );
+
+		try {
+			/* An empty value parses to no elements, so QueryPath returns a null class */
+			( new Field_Textarea( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->html();
+		} finally {
+			restore_error_handler();
+		}
+
+		$this->assertSame( [], $deprecations );
 	}
 
 	/**
@@ -131,7 +153,7 @@ class Test_Field_Textarea extends TestCase {
 		$this->assertStringNotContainsString( 'entry=', $html );
 	}
 
-	public function test_rich_text_merge_tags_only_processed_when_trusted_or_opted_in() {
+	public function test_rich_text_merge_tags_processed_when_trusted_or_enabled() {
 		$form  = $this->gf_factory()->form->create( [], [ 'title' => 'Merge Tags', 'fields' => [ new GF_Field_Textarea( [ 'id' => 1, 'useRichTextEditor' => true ] ) ] ] );
 		$field = \GFAPI::get_form( $form )['fields'][0];
 
@@ -146,6 +168,15 @@ class Test_Field_Textarea extends TestCase {
 		add_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 		$this->assertStringContainsString( "Form $form", $value() );
 		remove_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
+
+		/* A site upgraded from before 6.18.0 keeps processing them, unless the filter opts out */
+		update_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
+		$this->assertStringContainsString( "Form $form", $value() );
+
+		add_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_false' );
+		$this->assertStringContainsString( 'Form {form_id}', $value() );
+		remove_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_false' );
+		delete_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS );
 
 		$field->visibility   = 'administrative';
 		$field->defaultValue = 'Form {form_id}';

@@ -257,10 +257,6 @@ export class FontManagerBody extends Component {
 
 		/* Remove addFont error */
 		if (error && error.addFont) {
-			const forValue = `gfpdf-font-variant-${key}`;
-			const dropZone = document.querySelector(`div[for=${forValue}]`);
-
-			dropZone.classList.remove('error');
 			/* Call redux action clearDropzoneError() */
 			clearDropzoneError(key);
 		}

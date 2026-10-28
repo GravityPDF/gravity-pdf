@@ -554,6 +554,29 @@ class Helper_Templates {
 	}
 
 	/**
+	 * The message shown when an upload is over get_max_upload_size(), in the browser or by the server
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	public static function get_upload_too_large_message() {
+		/* translators: %s: the maximum upload size e.g. "32 MB" */
+		return sprintf( __( 'Upload exceeds the %s limit.', 'gravity-pdf' ), size_format( static::get_max_upload_size() ) );
+	}
+
+	/**
+	 * The message shown when an upload isn't a zip, in the browser or by the server
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.0
+	 */
+	public static function get_upload_not_zip_message() {
+		return __( 'Upload is not a valid template. Upload a .zip file.', 'gravity-pdf' );
+	}
+
+	/**
 	 * Find the PDF templates inside an extracted zip
 	 *
 	 * Re-zipping a folder Safari auto-extracted nests the templates, so descend through single-directory wrappers.

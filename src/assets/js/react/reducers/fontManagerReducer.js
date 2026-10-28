@@ -30,6 +30,7 @@ import {
 	reduceFontFileName,
 	checkFontListIncludes,
 	clearMsg,
+	removeVariantError,
 } from '../utilities/FontManager/fontManagerReducer';
 
 /**
@@ -293,21 +294,6 @@ export default function (state = initialState, action) {
 			};
 
 		/**
-		 * Process DELETE_VARIANT_ERROR
-		 *
-		 * @since 6.0
-		 */
-		case DELETE_VARIANT_ERROR: {
-			const addFont = { ...state.msg.error.addFont };
-			delete addFont[payload];
-
-			return {
-				...state,
-				msg: { error: { ...state.msg.error, addFont } },
-			};
-		}
-
-		/**
 		 * Process DELETE_FONT
 		 *
 		 * @since 6.0
@@ -386,21 +372,19 @@ export default function (state = initialState, action) {
 			};
 
 		/**
-		 * Process CLEAR_DROPZONE_ERROR
+		 * Process DELETE_VARIANT_ERROR & CLEAR_DROPZONE_ERROR
 		 *
 		 * @since 6.0
 		 */
-		case CLEAR_DROPZONE_ERROR: {
-			const addFont = state.msg.error.addFont;
-			if (typeof addFont === 'object') {
-				delete addFont[payload];
-			}
-
+		case DELETE_VARIANT_ERROR:
+		case CLEAR_DROPZONE_ERROR:
 			return {
 				...state,
-				msg: { ...state.msg, error: { ...state.msg.error, addFont } },
+				msg: {
+					...state.msg,
+					error: removeVariantError(state.msg.error, payload),
+				},
 			};
-		}
 
 		/**
 		 * Process RESET_SEARCH_RESULT

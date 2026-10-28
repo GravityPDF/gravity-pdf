@@ -334,6 +334,28 @@ class Test_Shortcodes extends TestCase {
 	}
 
 	/**
+	 * @dataProvider provider_raw_shortcode_error
+	 */
+	public function test_raw_shortcode_never_outputs_errors( $pdf_id ) {
+		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
+
+		$attributes = [
+			'id'    => $pdf_id,
+			'entry' => $this->entry( 'all-form-fields' )['id'],
+		];
+
+		$this->assertStringContainsString( '<pre class="gravitypdf-error">', $this->model->process( $attributes ) );
+		$this->assertSame( '', $this->model->process( $attributes + [ 'raw' => '1' ] ) );
+	}
+
+	public function provider_raw_shortcode_error() {
+		return [
+			'failed conditional logic' => [ '555ad84787d7e' ],
+			'inactive PDF'             => [ '556690c8d7f82' ],
+		];
+	}
+
+	/**
 	 * Request a raw signed URL for an entry
 	 */
 	private function process_signed( $entry_id, array $attributes = [] ) {

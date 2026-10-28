@@ -287,9 +287,8 @@ class Helper_Data {
 				'currentTemplate'                      => esc_html__( 'Current Template', 'gravity-pdf' ),
 				'showPreviousTemplate'                 => esc_html__( 'Show previous template', 'gravity-pdf' ),
 				'showNextTemplate'                     => esc_html__( 'Show next template', 'gravity-pdf' ),
-				'uploadInvalidNotZipFile'              => esc_html__( 'Upload is not a valid template. Upload a .zip file.', 'gravity-pdf' ),
-				/* translators: %s: the maximum upload size e.g. "32 MB" */
-				'uploadInvalidExceedsFileSizeLimit'    => sprintf( esc_html__( 'Upload exceeds the %s limit.', 'gravity-pdf' ), size_format( $max_upload_size ) ),
+				'uploadInvalidNotZipFile'              => esc_html( Helper_Templates::get_upload_not_zip_message() ),
+				'uploadInvalidExceedsFileSizeLimit'    => esc_html( Helper_Templates::get_upload_too_large_message() ),
 				'templateUploadMaxSize'                => $max_upload_size,
 				'templateUploadDropzone'               => esc_html__( 'Drop PDF template .zip files anywhere to install', 'gravity-pdf' ),
 				'templateUploadInProgress'             => esc_html__( 'Installing PDF template(s)...', 'gravity-pdf' ),
@@ -300,7 +299,8 @@ class Helper_Data {
 				/* translators: %s: newline characters separating the two sentences */
 				'doYouWantToDeleteTemplate'            => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-pdf' ), "\n\n" ),
 				'couldNotDeleteTemplate'               => esc_html__( 'Could not delete template.', 'gravity-pdf' ),
-				'templateInstallInstructions'          => esc_html__( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-pdf' ),
+				'templateInstallInstructions'          => esc_html__( 'Upload a template zip. An existing template will be overridden.', 'gravity-pdf' ),
+				'templateDocsLink'                     => esc_html__( 'Learn to create your own template.', 'gravity-pdf' ),
 
 				'coreFontSuccess'                      => esc_html__( 'ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-pdf' ),
 				/* translators: %s: number of fonts that failed to install */

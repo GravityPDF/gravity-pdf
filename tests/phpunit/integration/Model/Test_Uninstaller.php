@@ -6,6 +6,7 @@ namespace GFPDF\Model;
 use Exception;
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Controller\Controller_Uninstaller;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_Uninstall;
@@ -187,6 +188,7 @@ class Test_Uninstaller extends TestCase {
 
 		update_option( 'gpdf_sl_abc_123', true );
 		update_option( 'gpdf_sl_failed_123', true );
+		update_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
 
 		Cache::bump_generation();
 		Cache::bump_form_generation( 1 );
@@ -216,6 +218,7 @@ class Test_Uninstaller extends TestCase {
 		$this->assertFalse( get_option( 'gfpdf_cache_form_generation' ) );
 		$this->assertFalse( get_option( Model_Pdf_Cache::SWEEP_STATE_OPTION ) );
 		$this->assertFalse( get_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION ) );
+		$this->assertFalse( get_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -226,6 +229,7 @@ class Test_Uninstaller extends TestCase {
 		}
 
 		update_site_option( 'gpdf_sl_net_abc123', [ 'timeout' => time(), 'value' => '{}' ] );
+		update_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
 		$this->assertNotFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
 		set_site_transient( 'gfpdf_cleanup_tmp_dir', 1 );
 
@@ -233,6 +237,7 @@ class Test_Uninstaller extends TestCase {
 
 		/* No cache flush here on purpose — the uninstall must invalidate what it deletes */
 		$this->assertFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
+		$this->assertFalse( get_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ) );
 		$this->assertFalse( get_site_transient( 'gfpdf_cleanup_tmp_dir' ) );
 	}
 

@@ -115,3 +115,30 @@ export function clearMsg(payload) {
 
 	return msg;
 }
+
+/**
+ * Remove one font variant's error from the redux store "msg.error" state without mutating it. Once no variant
+ * errors remain, the malformed font file message goes too.
+ *
+ * @param { Object } error
+ * @param { string } key
+ *
+ * @return { Object } error
+ *
+ * @since 6.18.0
+ */
+export function removeVariantError(error = {}, key) {
+	if (typeof error.addFont !== 'object') {
+		return error;
+	}
+
+	const { [key]: removed, ...addFont } = error.addFont;
+
+	if (Object.keys(addFont).length > 0) {
+		return { ...error, addFont };
+	}
+
+	const { addFont: cleared, fontValidationError, ...rest } = error;
+
+	return rest;
+}

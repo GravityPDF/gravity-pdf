@@ -5,6 +5,7 @@
          cacheResultFile="../../tmp/phpunit/phpunit.result.cache"
          colors="true"
          beStrictAboutOutputDuringTests="true"
+         convertDeprecationsToExceptions="true"
 >
     <php>
         <const name="WP_TESTS_MULTISITE" value="1"/>

@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 /* Components */
 import { TemplateUploaderContext } from './TemplateUploaderContext';
+import TemplateDocsLink from './TemplateDocsLink';
 
 /**
  * The "Add New Template" tile, which opens the file picker owned by <TemplateUploader />
@@ -49,7 +50,7 @@ const TemplateUploaderTile = ({
 				className={isUploading ? 'doing-ajax' : ''}
 				onClick={handleClick}
 				aria-disabled={disabled || undefined}
-				aria-labelledby="gfpdf-template-install-instructions"
+				aria-describedby="gfpdf-template-install-instructions"
 			>
 				<div className="theme-screenshot">
 					<span />
@@ -62,7 +63,7 @@ const TemplateUploaderTile = ({
 				className="gfpdf-template-install-instructions"
 				id="gfpdf-template-install-instructions"
 			>
-				{templateInstallInstructions}
+				{templateInstallInstructions} <TemplateDocsLink />
 			</div>
 		</div>
 	);

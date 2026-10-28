@@ -4,6 +4,7 @@ import {
 	reduceFontFileName,
 	checkFontListIncludes,
 	clearMsg,
+	removeVariantError,
 } from '../../../../../src/assets/js/react/utilities/FontManager/fontManagerReducer';
 
 describe('Utilities/FontManager - fontManagerReducer.js', () => {
@@ -68,5 +69,28 @@ describe('Utilities/FontManager - fontManagerReducer.js', () => {
 			error: { addFont: 'error' },
 		};
 		expect(clearMsg(msg)).toEqual({ error: {} });
+	});
+
+	test('removeVariantError()', () => {
+		const error = {
+			addFont: { regular: 'a', bold: 'b' },
+			fontValidationError: 'malformed',
+		};
+
+		expect(removeVariantError(error, 'regular')).toEqual({
+			addFont: { bold: 'b' },
+			fontValidationError: 'malformed',
+		});
+		expect(
+			removeVariantError(
+				{ addFont: { bold: 'b' }, fontValidationError: 'malformed' },
+				'bold'
+			)
+		).toEqual({});
+		expect(removeVariantError({ addFont: 'error' }, 'bold')).toEqual({
+			addFont: 'error',
+		});
+		expect(removeVariantError(undefined, 'bold')).toEqual({});
+		expect(error.addFont).toEqual({ regular: 'a', bold: 'b' });
 	});
 });
