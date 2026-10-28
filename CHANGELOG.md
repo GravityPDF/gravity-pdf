@@ -75,7 +75,7 @@
 * 💻 Developer: Add a `sanitize_callback` option to global settings fields
 * 💻 Developer: Pass the form, entry and PDF config to the `gfpdf_field_container_class` filter for Repeater and Nested Form fields
 * 💻 Developer: Add `gfpdf_signed_url_max_expiration` filter to change the 1-year cap on signed PDF URLs
-* 💻 Developer: Add `gfpdf_process_merge_tags_in_submitted_rich_text` filter to opt submitted rich-text Textarea and Post Content values back into merge tag processing
+* 💻 Developer: Add `gfpdf_process_merge_tags_in_submitted_rich_text` filter to toggle merge tags in submitted rich-text Textarea and Post Content values. Off by default.
 * 💻 Developer: Add `gfpdf_shortcode_signing_user_id` filter to change which user's entry access is checked when signing `[gravitypdf]` URLs
 * 💻 Developer: Add the `gfpdf_template_max_upload_size` filter
 * 💻 Developer: Add `gfpdf_alias_global_psr_log` filter to load the bundled PSR-Log library into the global `Psr\Log` namespace

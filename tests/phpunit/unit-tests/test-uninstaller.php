@@ -5,6 +5,7 @@ namespace GFPDF\Tests;
 use Exception;
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Controller\Controller_Uninstaller;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Uninstall;
@@ -149,6 +150,7 @@ class Test_Uninstaller extends WP_UnitTestCase {
 
 		update_option( 'gpdf_sl_abc_123', true );
 		update_option( 'gpdf_sl_failed_123', true );
+		update_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
 
 		$this->assertArrayHasKey( 'deprecated_features', get_option( 'gfpdf_settings' ) );
 		$this->assertNotFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
@@ -169,6 +171,7 @@ class Test_Uninstaller extends WP_UnitTestCase {
 		$this->assertFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
 		$this->assertFalse( get_option( 'gpdf_sl_abc_123' ) );
 		$this->assertFalse( get_option( 'gpdf_sl_failed_123' ) );
+		$this->assertFalse( get_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -184,12 +187,14 @@ class Test_Uninstaller extends WP_UnitTestCase {
 		}
 
 		update_site_option( 'gpdf_sl_net_abc123', [ 'timeout' => time(), 'value' => '{}' ] );
+		update_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
 		$this->assertNotFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
 
 		$this->model->remove_plugin_network_options();
 
 		/* No cache flush here on purpose — the uninstall must invalidate what it deletes */
 		$this->assertFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
+		$this->assertFalse( get_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ) );
 	}
 
 	/**

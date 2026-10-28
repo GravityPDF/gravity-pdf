@@ -6,6 +6,7 @@ namespace GFPDF\Helper\Fields;
 
 use GF_Field_Post_Content;
 use GF_UnitTest_Factory;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use WP_UnitTestCase;
 
 /**
@@ -20,7 +21,7 @@ use WP_UnitTestCase;
  */
 class Test_Field_Post_Content extends WP_UnitTestCase {
 
-	public function test_rich_text_merge_tags_only_processed_when_opted_in() {
+	public function test_rich_text_merge_tags_processed_when_enabled() {
 		$form_id  = ( new GF_UnitTest_Factory() )->form->create( [], [ 'title' => 'Post Content Tags', 'fields' => [ new GF_Field_Post_Content( [ 'id' => 1, 'useRichTextEditor' => true ] ) ] ] );
 		$gf_field = \GFAPI::get_form( $form_id )['fields'][0];
 		$entry    = [ 'id' => 0, 'form_id' => $form_id, '1' => 'Form {form_id}' ];
@@ -34,5 +35,10 @@ class Test_Field_Post_Content extends WP_UnitTestCase {
 		add_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
 		$this->assertStringContainsString( "Form $form_id", $value() );
 		remove_filter( 'gfpdf_process_merge_tags_in_submitted_rich_text', '__return_true' );
+
+		/* A site upgraded from before 6.18.0 processes them */
+		update_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
+		$this->assertStringContainsString( "Form $form_id", $value() );
+		delete_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS );
 	}
 }

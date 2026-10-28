@@ -2,6 +2,7 @@
 
 namespace GFPDF\Model;
 
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
@@ -134,6 +135,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
 		delete_option( Model_Install::UNWRITABLE_FOLDERS );
+		delete_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ); /* A Multisite keeps it in sitemeta */
 		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
@@ -149,10 +151,12 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Remove the network-shared license package cache stored in sitemeta on a Multisite
+	 * Remove the network options stored in sitemeta on a Multisite: license package caches and the rich text merge
+	 * tags flag
 	 *
-	 * Every extension keeps its own entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all are
-	 * network-scoped rather than per-site, so one wildcard pass clears them without walking the site list.
+	 * Every extension keeps its own license cache entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all
+	 * are network-scoped rather than per-site, so one pass clears them, and the flag's exact key, without walking the
+	 * site list.
 	 *
 	 * @since 6.16.0
 	 */
@@ -162,7 +166,11 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* delete_network_option() rather than delete_site_option(), which would narrow the sweep to the current
 		   network and strand rows belonging to the others sharing this sitemeta table */
 		$rows = $wpdb->get_results(
-			$wpdb->prepare( "SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s", $wpdb->esc_like( 'gpdf_sl_net_' ) . '%' )
+			$wpdb->prepare(
+				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key = %s",
+				$wpdb->esc_like( 'gpdf_sl_net_' ) . '%',
+				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS
+			)
 		);
 
 		foreach ( $rows as $row ) {

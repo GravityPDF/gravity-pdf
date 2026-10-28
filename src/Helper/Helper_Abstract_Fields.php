@@ -28,6 +28,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Config {
 
 	/**
+	 * The network option that keeps processing submitted rich text merge tags on sites upgraded from before 6.18.0
+	 *
+	 * @since 6.18.0
+	 */
+	public const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags';
+
+	/**
 	 * How encode_tags() stops shortcodes and merge tags matching in text
 	 *
 	 * @since 6.18.0
@@ -577,8 +584,9 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 
 	/**
 	 * Process the merge tags in an administrative field's default, and encode the rest of its tags. Any other field's
-	 * value is left as is, unless the `gfpdf_process_merge_tags_in_submitted_rich_text` filter opts in, and its PDF merge
-	 * tags and shortcodes are never trusted.
+	 * value is left as is, unless the site was upgraded from before 6.18.0 or the
+	 * `gfpdf_process_merge_tags_in_submitted_rich_text` filter opts in, and its PDF merge tags and shortcodes are never
+	 * trusted.
 	 *
 	 * @param string $value
 	 *
@@ -599,7 +607,8 @@ abstract class Helper_Abstract_Fields implements Helper_Interface_Field_Pdf_Conf
 			return $this->gform->process_tags( strtr( $this->encode_tags( $value ), $default_tags ), $this->form, $this->entry );
 		}
 
-		if ( ! apply_filters( 'gfpdf_process_merge_tags_in_submitted_rich_text', false, $this->field, $this->entry, $this->form ) ) {
+		$process = (bool) get_site_option( self::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS );
+		if ( ! apply_filters( 'gfpdf_process_merge_tags_in_submitted_rich_text', $process, $this->field, $this->entry, $this->form ) ) {
 			return $value;
 		}
 
