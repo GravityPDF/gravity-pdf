@@ -433,7 +433,7 @@ class GFPDF\Helper\Mpdf\Mpdf extends GFPDF_Vendor\Mpdf\Mpdf implements GFPDF_Ven
     public function AddPage($orientation = '', $condition = '', $resetpagenum = '', $pagenumstyle = '', $suppress = '', $mgl = '', $mgr = '', $mgt = '', $mgb = '', $mgh = '', $mgf = '', $ohname = '', $ehname = '', $ofname = '', $efname = '', $ohvalue = 0, $ehvalue = 0, $ofvalue = 0, $efvalue = 0, $pagesel = '', $newformat = '')
     public function SetImportUse()
     public function WriteHTML($html, $mode = GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true)
-    public function importPage($pageNumber = 1, $crop_x = null, $crop_y = null, $crop_w = 0, $crop_h = 0, $boxName = 'CropBox')
+    public function importPage($pageNumber = 1, $box = 'CropBox', $groupXObject = true, $importExternalLinks = true, ...$legacy)
     public function useTemplate($tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false)
 
 final class GPDFAPI
@@ -653,7 +653,7 @@ class GFPDF\Helper\Helper_Mpdf extends GFPDF\Helper\Mpdf\Mpdf implements GFPDF_V
     public function AddPage($orientation = '', $condition = '', $resetpagenum = '', $pagenumstyle = '', $suppress = '', $mgl = '', $mgr = '', $mgt = '', $mgb = '', $mgh = '', $mgf = '', $ohname = '', $ehname = '', $ofname = '', $efname = '', $ohvalue = 0, $ehvalue = 0, $ofvalue = 0, $efvalue = 0, $pagesel = '', $newformat = '')
     public function SetImportUse()
     public function WriteHTML($html, $mode = GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true)
-    public function importPage($pageNumber = 1, $crop_x = null, $crop_y = null, $crop_w = 0, $crop_h = 0, $boxName = 'CropBox')
+    public function importPage($pageNumber = 1, $box = 'CropBox', $groupXObject = true, $importExternalLinks = true, ...$legacy)
     public function useTemplate($tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false)
 
 class GFPDF\Helper\Helper_Notices implements GFPDF\Helper\Helper_Interface_Actions

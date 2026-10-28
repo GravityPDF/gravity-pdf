@@ -1424,18 +1424,6 @@ parameters:
 			path: ../../src/Helper/Log/Redact_Processor.php
 
 		-
-			message: '#^Parameter \#2 \$crop_x \(null\) of method GFPDF\\Helper\\Mpdf\\Mpdf\:\:importPage\(\) should be compatible with parameter \$box \(string\) of method GFPDF_Vendor\\Mpdf\\Mpdf\:\:importPage\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: ../../src/Helper/Mpdf/Mpdf.php
-
-		-
-			message: '#^Parameter \#3 \$crop_y \(null\) of method GFPDF\\Helper\\Mpdf\\Mpdf\:\:importPage\(\) should be compatible with parameter \$groupXObject \(bool\) of method GFPDF_Vendor\\Mpdf\\Mpdf\:\:importPage\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: ../../src/Helper/Mpdf/Mpdf.php
-
-		-
 			message: '#^Call to method debug\(\) on an unknown class Psr\\Log\\LoggerInterface\.$#'
 			identifier: class.notFound
 			count: 1

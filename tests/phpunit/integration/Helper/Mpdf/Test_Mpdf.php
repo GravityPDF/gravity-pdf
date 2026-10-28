@@ -169,6 +169,39 @@ class Test_Mpdf extends TestCase {
 	}
 
 	/**
+	 * @dataProvider provider_import_page_arguments
+	 *
+	 * @since 7.0
+	 */
+	public function test_import_page_passes_mpdfs_arguments_or_the_mpdf_7_ones_on( $args, $expected ) {
+		$pdf = new class( $this->get_config() ) extends Mpdf {
+			public $imported;
+
+			public function fpdiImportPage( $pageNumber, $box = 'CropBox', $groupXObject = true, $importExternalLinks = false ) {
+				$this->imported = [ $pageNumber, $box, $groupXObject, $importExternalLinks ];
+
+				return 'page';
+			}
+		};
+
+		$this->assertSame( 'page', $pdf->importPage( ...$args ) );
+		$this->assertSame( $expected, $pdf->imported );
+	}
+
+	public function provider_import_page_arguments() {
+		return [
+			'defaults'                 => [ [ 1 ], [ 1, 'CropBox', true, true ] ],
+			'mPDF box'                 => [ [ 2, 'MediaBox' ], [ 2, 'MediaBox', true, true ] ],
+			'mPDF box with a slash'    => [ [ 2, '/MediaBox' ], [ 2, 'MediaBox', true, true ] ],
+			'mPDF flags'               => [ [ 1, 'TrimBox', false, false ], [ 1, 'TrimBox', false, false ] ],
+			'mPDF 7 box'               => [ [ 1, null, null, 0, 0, '/MediaBox' ], [ 1, 'MediaBox', true, true ] ],
+			'mPDF 7 without a box'     => [ [ 1, null, null, 0, 0 ], [ 1, 'CropBox', true, true ] ],
+			'mPDF 7 with crop numbers' => [ [ 3, 10, 20, 30, 40, 'BleedBox' ], [ 3, 'BleedBox', true, true ] ],
+			'mPDF 7 crop numbers only' => [ [ 1, 0, 0 ], [ 1, 'CropBox', true, true ] ],
+		];
+	}
+
+	/**
 	 * The call every pre-1.0.3 Business Plus template makes, which reached strtoupper() as an array and, on PHP 8,
 	 * ended the request with a TypeError
 	 *

@@ -61,12 +61,17 @@ class Mpdf extends MpdfCore {
 	}
 
 	/**
-	 * @param int    $pageNumber The page number.
-	 * @param null   $crop_x     mPDF 8.0 removed this parameter
-	 * @param null   $crop_y     mPDF 8.0 removed this parameter
-	 * @param int    $crop_w     mPDF 8.0 removed this parameter
-	 * @param int    $crop_h     mPDF 8.0 removed this parameter
-	 * @param string $boxName    The page boundary to import.
+	 * Imports a page, taking mPDF's own arguments or the mPDF 7 ones legacy templates pass
+	 *
+	 * mPDF 7 took `( $pageNumber, $crop_x, $crop_y, $crop_w, $crop_h, $boxName )`. A second argument that isn't a
+	 * string, or more than four arguments, is that form: the crop values are dropped, as mPDF 8 removed them, and
+	 * `$boxName` is used.
+	 *
+	 * @param int         $pageNumber          The page number.
+	 * @param mixed       $box                 The page boundary to import, or the mPDF 7 `$crop_x`.
+	 * @param bool|null   $groupXObject        Define the form XObject as a group XObject to support transparency.
+	 * @param bool|int    $importExternalLinks Import the page's external links.
+	 * @param mixed       ...$legacy           The mPDF 7 `$crop_h` and `$boxName`.
 	 *
 	 * @return string A unique string identifying the imported page.
 	 * @throws CrossReferenceException
@@ -74,16 +79,21 @@ class Mpdf extends MpdfCore {
 	 * @throws PdfTypeException
 	 *
 	 * @since 5.2
+	 * @since 7.0 Takes mPDF's own arguments too
 	 */
-	public function importPage( $pageNumber = 1, $crop_x = null, $crop_y = null, $crop_w = 0, $crop_h = 0, $boxName = 'CropBox' ) {
-		/* mPDF 8.0 no longer needs the box name with `/` included */
-		if ( $boxName[0] === '/' ) {
-			$boxName = substr( $boxName, 1 );
+	public function importPage( $pageNumber = 1, $box = 'CropBox', $groupXObject = true, $importExternalLinks = true, ...$legacy ) {
+		if ( ! is_string( $box ) || count( $legacy ) > 0 ) {
+			$box                 = $legacy[1] ?? 'CropBox';
+			$groupXObject        = true;
+			$importExternalLinks = true;
 		}
 
-		/* The signature of this method has changed */
+		/* mPDF 8.0 no longer needs the box name with `/` included */
+		if ( $box[0] === '/' ) {
+			$box = substr( $box, 1 );
+		}
 
-		return parent::importPage( $pageNumber, $boxName );
+		return parent::importPage( $pageNumber, $box, $groupXObject, $importExternalLinks );
 	}
 
 	/**
