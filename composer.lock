@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53042bd71fd635f67c2a54ee802a3112",
+    "content-hash": "71ace4c25866fd0f9bacc909d772a23b",
     "packages": [
         {
             "name": "gravitypdf/querypath",
@@ -563,16 +563,16 @@
         },
         {
             "name": "mpdf/mpdf",
-            "version": "dev-development",
+            "version": "dev-gravitypdf-v6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mpdf/mpdf.git",
-                "reference": "389e19e726f8aea750ddb6f6817c3dbf6cd5440c"
+                "url": "https://github.com/GravityPDF/mpdf.git",
+                "reference": "e7f7b2a8b37e8c01413235aad7edeca1008efec6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mpdf/mpdf/zipball/389e19e726f8aea750ddb6f6817c3dbf6cd5440c",
-                "reference": "389e19e726f8aea750ddb6f6817c3dbf6cd5440c",
+                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/e7f7b2a8b37e8c01413235aad7edeca1008efec6",
+                "reference": "e7f7b2a8b37e8c01413235aad7edeca1008efec6",
                 "shasum": ""
             },
             "require": {
@@ -582,7 +582,7 @@
                 "mpdf/psr-log-aware-trait": "^2.0 || ^3.0",
                 "myclabs/deep-copy": "^1.7",
                 "paragonie/random_compat": "^1.4|^2.0|^9.99.99",
-                "php": "^5.6 || ^7.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "php": "^5.6 || ^7.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0",
                 "psr/http-message": "^1.0 || ^2.0",
                 "psr/log": "^1.0 || ^2.0 || ^3.0",
                 "setasign/fpdi": "^2.1"
@@ -600,17 +600,42 @@
                 "ext-xml": "Needed mainly for SVG manipulation",
                 "ext-zlib": "Needed for compression of embedded resources, such as fonts"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
-                "files": [
-                    "src/functions.php"
-                ],
                 "psr-4": {
                     "Mpdf\\": "src/"
-                }
+                },
+                "files": [
+                    "src/functions.php"
+                ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Mpdf\\": "tests/Mpdf",
+                    "Snapshots\\": "tests/Snapshots",
+                    "Issues\\": "tests/Issues"
+                },
+                "files": [
+                    "src/functions-dev.php"
+                ]
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "php -r \"chmod('./tmp', 0777);\""
+                ],
+                "cs": [
+                    "@php vendor/bin/phpcs --report-width=160 --standard=ruleset.xml --severity=1 --warning-severity=0 --extensions=php src utils tests"
+                ],
+                "cs:fix": [
+                    "@php vendor/bin/phpcbf --standard=ruleset.xml --extensions=php src utils tests"
+                ],
+                "test": [
+                    "@php vendor/bin/phpunit"
+                ],
+                "coverage": [
+                    "@php vendor/bin/phpunit --coverage-text"
+                ]
+            },
             "license": [
                 "GPL-2.0-only"
             ],
@@ -632,17 +657,17 @@
                 "utf-8"
             ],
             "support": {
-                "docs": "https://mpdf.github.io",
                 "issues": "https://github.com/mpdf/mpdf/issues",
-                "source": "https://github.com/mpdf/mpdf"
+                "source": "https://github.com/mpdf/mpdf",
+                "docs": "https://mpdf.github.io"
             },
             "funding": [
                 {
-                    "url": "https://www.paypal.me/mpdf",
-                    "type": "custom"
+                    "type": "custom",
+                    "url": "https://www.paypal.me/mpdf"
                 }
             ],
-            "time": "2026-06-11T13:03:42+00:00"
+            "time": "2026-10-26T05:21:29+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",
