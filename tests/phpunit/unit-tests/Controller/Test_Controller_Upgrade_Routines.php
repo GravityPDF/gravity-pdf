@@ -2,6 +2,7 @@
 
 namespace GFPDF\Controller;
 
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
@@ -157,6 +158,17 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 
 		$this->assertDirectoryDoesNotExist( $cache . '/mpdf' );
 		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+	}
+
+	public function test_6_18_0_keeps_processing_submitted_rich_text_merge_tags_when_upgrading() {
+		$option = Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS;
+
+		/* An install fires the version change with no previous version */
+		do_action( 'gfpdf_version_changed', false, '6.18.0' );
+		$this->assertFalse( get_site_option( $option ) );
+
+		do_action( 'gfpdf_version_changed', '6.17.2', '6.18.0' );
+		$this->assertTrue( get_site_option( $option ) );
 	}
 
 	/**

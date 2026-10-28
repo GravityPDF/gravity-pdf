@@ -2,6 +2,7 @@
 
 namespace GFPDF\Controller;
 
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
@@ -73,9 +74,10 @@ class Controller_Upgrade_Routines {
 			$this->remove_legacy_license_check_cron();
 		}
 
-		if ( version_compare( $current_version, '6.18.0', '>=' ) && version_compare( $old_version, '6.18.0', '<' ) ) {
+		if ( $old_version !== '' && version_compare( $current_version, '6.18.0', '>=' ) && version_compare( $old_version, '6.18.0', '<' ) ) {
 			$this->fix_logged_out_timeout_out_of_range();
 			$this->remove_nested_mpdf_cache();
+			$this->keep_processing_submitted_rich_text_merge_tags();
 		}
 
 		/* Ungated, so every install and release has mPDF's cache folders in place before the first render */
@@ -117,6 +119,16 @@ class Controller_Upgrade_Routines {
 		} elseif ( (int) $settings['logged_out_timeout'] > Helper_Abstract_Options::LOGGED_OUT_TIMEOUT_MAX ) {
 			$this->options->update_option( 'logged_out_timeout', Helper_Abstract_Options::LOGGED_OUT_TIMEOUT_MAX );
 		}
+	}
+
+	/**
+	 * Keep processing the merge tags submitted in rich text fields on a site upgraded from an earlier version. Stored
+	 * network-wide, so every subsite on a Multisite keeps them
+	 *
+	 * @since 6.18.0
+	 */
+	protected function keep_processing_submitted_rich_text_merge_tags(): void {
+		update_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
 	}
 
 	/**
