@@ -3,12 +3,14 @@
 namespace GFPDF\Model;
 
 use Exception;
+use GFPDF\Exceptions\GravityPdfNotATemplateException;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Setup_TearDown;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\File;
 use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
 use GFPDF_Vendor\GravityPdf\Upload\Validation\Extension;
@@ -177,6 +179,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$this->verify_user_can_manage_templates( 'Process Uploaded Template Zip Package' );
 
 		/* Validate uploaded file */
+		$file = null;
 		try {
 			$this->misc->create_folder( $this->data->template_tmp_location );
 			$storage  = new FileSystem( $this->data->template_tmp_location );
@@ -190,6 +193,11 @@ class Model_Templates extends Helper_Abstract_Model {
 					'error' => $e->getMessage(),
 				]
 			);
+
+			$message = $file ? $this->get_upload_error_message( $file ) : '';
+			if ( $message !== '' ) {
+				wp_send_json( [ 'error' => $message ], 400 );
+			}
 
 			/* Bad Request */
 			wp_die( '400', 400 );
@@ -209,14 +217,11 @@ class Model_Templates extends Helper_Abstract_Model {
 				]
 			);
 
-			/* Bad Response */
-			header( 'Content-Type: application/json' );
-			wp_die(
-				wp_json_encode(
-					[
-						'error' => $e->getMessage(),
-					]
-				),
+			wp_send_json(
+				[
+					'error' => $e->getMessage(),
+					'docs'  => $e instanceof GravityPdfNotATemplateException,
+				],
 				400
 			);
 		}
@@ -382,6 +387,8 @@ class Model_Templates extends Helper_Abstract_Model {
 	 *
 	 * @return string The full path of the final resting place of the uploaded zip file
 	 *
+	 * @throws Exception If the zip fails validation or can't be moved
+	 *
 	 * @since 4.1
 	 */
 	public function move_template_to_tmp_dir( File $file ) {
@@ -401,6 +408,29 @@ class Model_Templates extends Helper_Abstract_Model {
 		$file->upload();
 
 		return $this->data->template_tmp_location . $file->getNameWithExtension();
+	}
+
+	/**
+	 * Get a message to show the user when the uploaded file fails validation
+	 *
+	 * @param File $file A file that failed move_template_to_tmp_dir()
+	 *
+	 * @return string Empty when the failure isn't down to the file itself
+	 *
+	 * @since 6.18.0
+	 */
+	public function get_upload_error_message( File $file ): string {
+		$codes = array_column( $file->getErrorDetails(), 'code' );
+
+		if ( array_intersect( $codes, [ ErrorCode::INI_SIZE, ErrorCode::FORM_SIZE, ErrorCode::SIZE_TOO_LARGE ] ) ) {
+			return Helper_Templates::get_upload_too_large_message();
+		}
+
+		if ( array_intersect( $codes, [ ErrorCode::EXTENSION_NOT_ALLOWED, ErrorCode::FILE_CONTENTS_MISMATCH ] ) ) {
+			return Helper_Templates::get_upload_not_zip_message();
+		}
+
+		return '';
 	}
 
 	/**
@@ -445,7 +475,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$found = $this->templates->get_templates_in_extracted_zip( $dir );
 
 		if ( count( $found['templates'] ) === 0 ) {
-			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );
+			throw new GravityPdfNotATemplateException( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-pdf' ) );
 		}
 
 		$this->check_for_valid_pdf_templates( $found['templates'] );
@@ -487,7 +517,7 @@ class Model_Templates extends Helper_Abstract_Model {
 				/* Check the first 8kiB contains the string RGForms or GFForms, which signifies our v3 templates */
 				if ( strpos( $file_data, 'RGForms' ) === false && strpos( $file_data, 'GFForms' ) === false ) {
 					/* translators: %s: filename */
-					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-pdf' ), esc_html( $basename ) ) );
+					throw new GravityPdfNotATemplateException( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-pdf' ), esc_html( $basename ) ) );
 				}
 			}
 

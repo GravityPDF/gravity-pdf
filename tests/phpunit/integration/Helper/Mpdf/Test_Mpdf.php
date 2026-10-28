@@ -13,13 +13,15 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Mpdf extends TestCase {
 
+	protected function get_config(): array {
+		return [
+			'mode'    => 'c',
+			'tempDir' => sys_get_temp_dir(),
+		];
+	}
+
 	protected function get_pdf(): Mpdf {
-		return new Mpdf(
-			[
-				'mode'    => 'c',
-				'tempDir' => sys_get_temp_dir(),
-			]
-		);
+		return new Mpdf( $this->get_config() );
 	}
 
 	public function test_extends_mpdf_core() {
@@ -31,6 +33,55 @@ class Test_Mpdf extends TestCase {
 		);
 
 		$this->assertInstanceOf( MpdfCore::class, $pdf );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_floats_buried_by_a_new_float_are_dropped() {
+		$pdf = $this->get_pdf();
+		$this->write_floated_rows( $pdf, 50 );
+
+		$this->assertCount( 3, $pdf->floatDivs );
+	}
+
+	/**
+	 * @since 6.18.0
+	 */
+	public function test_dropping_buried_floats_leaves_the_pages_unchanged() {
+		$pruned = $this->get_pdf();
+		$this->write_floated_rows( $pruned, 50 );
+
+		$unpruned = new class( $this->get_config() ) extends Mpdf {
+			public function addFloatDiv( array $floatDiv ) {
+				$this->floatDivs[] = $floatDiv;
+			}
+		};
+		$this->write_floated_rows( $unpruned, 50 );
+
+		$this->assertSame( $unpruned->page, $pruned->page );
+		$this->assertSame( $unpruned->pages, $pruned->pages );
+	}
+
+	/**
+	 * Writes cleared rows of three floated cells, one WriteHTML() call per row, as PDF for GravityView does
+	 */
+	private function write_floated_rows( Mpdf $pdf, int $rows ): void {
+		$pdf->WriteHTML( '<div style="clear: both;">Head</div>', HTMLParserMode::HTML_BODY, true, false );
+
+		for ( $i = 1; $i <= $rows; $i++ ) {
+			$pdf->WriteHTML(
+				sprintf(
+					'<div style="clear: both;"><div style="float: left; width: 30%%;">Row %1$d, left</div><div style="float: left; width: 30%%;">Row %1$d, middle</div><div style="float: left; width: 30%%;">Row %1$d, right</div></div>',
+					$i
+				),
+				HTMLParserMode::HTML_BODY,
+				false,
+				false
+			);
+		}
+
+		$pdf->WriteHTML( '<div style="clear: both;">Foot</div>', HTMLParserMode::HTML_BODY, false, true );
 	}
 
 	public function test_set_import_use_exists_for_back_compat() {
@@ -115,6 +166,39 @@ class Test_Mpdf extends TestCase {
 		$this->assertSame( $size['height'], $size['h'] );
 
 		$this->rrmdir( $tempDir );
+	}
+
+	/**
+	 * @dataProvider provider_import_page_arguments
+	 *
+	 * @since 7.0
+	 */
+	public function test_import_page_passes_mpdfs_arguments_or_the_mpdf_7_ones_on( $args, $expected ) {
+		$pdf = new class( $this->get_config() ) extends Mpdf {
+			public $imported;
+
+			public function fpdiImportPage( $pageNumber, $box = 'CropBox', $groupXObject = true, $importExternalLinks = false ) {
+				$this->imported = [ $pageNumber, $box, $groupXObject, $importExternalLinks ];
+
+				return 'page';
+			}
+		};
+
+		$this->assertSame( 'page', $pdf->importPage( ...$args ) );
+		$this->assertSame( $expected, $pdf->imported );
+	}
+
+	public function provider_import_page_arguments() {
+		return [
+			'defaults'                 => [ [ 1 ], [ 1, 'CropBox', true, true ] ],
+			'mPDF box'                 => [ [ 2, 'MediaBox' ], [ 2, 'MediaBox', true, true ] ],
+			'mPDF box with a slash'    => [ [ 2, '/MediaBox' ], [ 2, 'MediaBox', true, true ] ],
+			'mPDF flags'               => [ [ 1, 'TrimBox', false, false ], [ 1, 'TrimBox', false, false ] ],
+			'mPDF 7 box'               => [ [ 1, null, null, 0, 0, '/MediaBox' ], [ 1, 'MediaBox', true, true ] ],
+			'mPDF 7 without a box'     => [ [ 1, null, null, 0, 0 ], [ 1, 'CropBox', true, true ] ],
+			'mPDF 7 with crop numbers' => [ [ 3, 10, 20, 30, 40, 'BleedBox' ], [ 3, 'BleedBox', true, true ] ],
+			'mPDF 7 crop numbers only' => [ [ 1, 0, 0 ], [ 1, 'CropBox', true, true ] ],
+		];
 	}
 
 	/**

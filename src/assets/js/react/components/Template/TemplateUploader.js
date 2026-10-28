@@ -6,6 +6,7 @@ import Dropzone from 'react-dropzone';
 /* Components */
 import ShowMessage from '../ShowMessage';
 import { TemplateUploaderContext } from './TemplateUploaderContext';
+import TemplateDocsLink from './TemplateDocsLink';
 /* Utilities */
 import { hasPendingUpload } from '../../utilities/Template/hasPendingUpload';
 /* Redux actions */
@@ -115,7 +116,9 @@ export class TemplateUploader extends Component {
 						key={`${error.filename}-${index}`}
 						text={`${error.filename}: ${error.message}`}
 						error
-					/>
+					>
+						{error.docs && <TemplateDocsLink />}
+					</ShowMessage>
 				))}
 
 				{showSuccess && (

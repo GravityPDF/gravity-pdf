@@ -1,4 +1,5 @@
 class GFPDF\Helper\Fields\Field_Checkbox extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -30,6 +31,7 @@ class GFPDF\Helper\Fields\Field_Checkbox extends GFPDF\Helper\Helper_Abstract_Fi
     public function value()
 
 class GFPDF\Helper\Fields\Field_Form extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -62,6 +64,7 @@ class GFPDF\Helper\Fields\Field_Form extends GFPDF\Helper\Helper_Abstract_Fields
     public function value()
 
 class GFPDF\Helper\Fields\Field_Multiselect extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -93,6 +96,7 @@ class GFPDF\Helper\Fields\Field_Multiselect extends GFPDF\Helper\Helper_Abstract
     public function value()
 
 class GFPDF\Helper\Fields\Field_Option extends GFPDF\Helper\Helper_Abstract_Field_Products implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -129,6 +133,7 @@ class GFPDF\Helper\Fields\Field_Option extends GFPDF\Helper\Helper_Abstract_Fiel
     public function value()
 
 class GFPDF\Helper\Fields\Field_Product extends GFPDF\Helper\Helper_Abstract_Field_Products implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -164,6 +169,7 @@ class GFPDF\Helper\Fields\Field_Product extends GFPDF\Helper\Helper_Abstract_Fie
     public function value()
 
 class GFPDF\Helper\Fields\Field_Radio extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -196,6 +202,7 @@ class GFPDF\Helper\Fields\Field_Radio extends GFPDF\Helper\Helper_Abstract_Field
     public function value()
 
 class GFPDF\Helper\Fields\Field_Select extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -227,6 +234,7 @@ class GFPDF\Helper\Fields\Field_Select extends GFPDF\Helper\Helper_Abstract_Fiel
     public function value()
 
 class GFPDF\Helper\Fields\Field_Shipping extends GFPDF\Helper\Helper_Abstract_Field_Products implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -338,6 +346,7 @@ abstract class GFPDF\Helper\Helper_Abstract_Config_Settings implements GFPDF\Hel
 
 abstract class GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
     abstract public function value()
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -424,7 +433,7 @@ class GFPDF\Helper\Mpdf\Mpdf extends GFPDF_Vendor\Mpdf\Mpdf implements GFPDF_Ven
     public function AddPage($orientation = '', $condition = '', $resetpagenum = '', $pagenumstyle = '', $suppress = '', $mgl = '', $mgr = '', $mgt = '', $mgb = '', $mgh = '', $mgf = '', $ohname = '', $ehname = '', $ofname = '', $efname = '', $ohvalue = 0, $ehvalue = 0, $ofvalue = 0, $efvalue = 0, $pagesel = '', $newformat = '')
     public function SetImportUse()
     public function WriteHTML($html, $mode = GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true)
-    public function importPage($pageNumber = 1, $crop_x = null, $crop_y = null, $crop_w = 0, $crop_h = 0, $boxName = 'CropBox')
+    public function importPage($pageNumber = 1, $box = 'CropBox', $groupXObject = true, $importExternalLinks = true, ...$legacy)
     public function useTemplate($tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false)
 
 final class GPDFAPI
@@ -478,6 +487,7 @@ class GFPDF\Exceptions\GravityPdfShortcodePdfConfigNotFoundException extends GFP
 class GFPDF\Exceptions\GravityPdfShortcodePdfInactiveException extends GFPDF\Exceptions\GravityPdfException implements Throwable
 
 class GFPDF\Helper\Fields\Field_Products extends GFPDF\Helper\Helper_Abstract_Fields implements GFPDF\Helper\Helper_Interface_Field_Pdf_Config
+    const PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS = 'gfpdf_process_submitted_rich_text_merge_tags'
     final public function cache($value = null)
     final public function disable_output(): void
     final public function enable_output(): void
@@ -643,7 +653,7 @@ class GFPDF\Helper\Helper_Mpdf extends GFPDF\Helper\Mpdf\Mpdf implements GFPDF_V
     public function AddPage($orientation = '', $condition = '', $resetpagenum = '', $pagenumstyle = '', $suppress = '', $mgl = '', $mgr = '', $mgt = '', $mgb = '', $mgh = '', $mgf = '', $ohname = '', $ehname = '', $ofname = '', $efname = '', $ohvalue = 0, $ehvalue = 0, $ofvalue = 0, $efvalue = 0, $pagesel = '', $newformat = '')
     public function SetImportUse()
     public function WriteHTML($html, $mode = GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true)
-    public function importPage($pageNumber = 1, $crop_x = null, $crop_y = null, $crop_w = 0, $crop_h = 0, $boxName = 'CropBox')
+    public function importPage($pageNumber = 1, $box = 'CropBox', $groupXObject = true, $importExternalLinks = true, ...$legacy)
     public function useTemplate($tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false)
 
 class GFPDF\Helper\Helper_Notices implements GFPDF\Helper\Helper_Interface_Actions
@@ -722,6 +732,8 @@ class GFPDF\Helper\Helper_Templates
     public function load_template_config_file($file)
     public function maybe_add_template_compatibility_notice($template_name, $required_version)
     public static function get_max_upload_size()
+    public static function get_upload_not_zip_message()
+    public static function get_upload_too_large_message()
 
 class GFPDF\Helper\Helper_Url_Signer implements GFPDF\Helper\Helper_Interface_Url_Signer
     public function __construct(?GFPDF\Helper\Helper_Abstract_Options $options = null)

@@ -87,6 +87,20 @@ describe('Components - ShowMessage.js', () => {
 			).toEqual(true);
 		});
 
+		test('renders its children after the text', () => {
+			wrapper = shallow(
+				<ShowMessage text="text">
+					<a href="#docs">docs</a>
+				</ShowMessage>
+			);
+
+			expect(
+				findByTestAttr(wrapper, 'component-showMessage')
+					.find('p')
+					.html()
+			).toBe('<p>text <a href="#docs">docs</a></p>');
+		});
+
 		test('renders <ShowMessage /> component with an empty <div />', () => {
 			wrapper = shallow(<ShowMessage text="text" />);
 			wrapper.setState({ visible: false });

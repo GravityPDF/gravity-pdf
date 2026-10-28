@@ -98,10 +98,10 @@ describe('Sagas - templates', () => {
 			payload: { file: { data: 'test' }, filename: 'test', id: 7 },
 		};
 
-		const failedWith = (message) =>
+		const failedWith = (message, docs = false) =>
 			put({
 				type: TEMPLATE_UPLOAD_PROCESSING_FAILED,
-				payload: { id: 7, message },
+				payload: { id: 7, message, docs },
 			});
 
 		test('should check that saga asks to call the API for templateUploadProcessing', () => {
@@ -145,6 +145,20 @@ describe('Sagas - templates', () => {
 				})
 			);
 			expect(gen.next().done).toBe(true);
+		});
+
+		test('should pass on the docs flag when the zip has no PDF template', () => {
+			const gen = templateUploadProcessing(action);
+			gen.next();
+
+			const response = {
+				ok: false,
+				status: 400,
+				body: { error: 'not a template', docs: true },
+			};
+			expect(gen.next(response).value).toEqual(
+				failedWith('not a template', true)
+			);
 		});
 
 		test('should fall back to the generic error when the API response is missing a templates array', () => {

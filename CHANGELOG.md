@@ -40,9 +40,83 @@
 * 🎉 Feature: Install several PDF template zips at once
 * 🎉 Feature: Drop template zips anywhere in the Template Manager
 * 🎉 Feature: Install template zips that have the templates inside a folder
+* 🎉 Feature: Use File Upload fields in PDF conditional logic, including fields built on them like Image Hopper
+* 🔒 Security: Only sign PDF URLs when the shortcode or merge tag comes from a trusted source
+* 🔒 Security: Cap signed PDF URLs at 1 year and the Logged Out Timeout at 1 week
+* 🔒 Security: Restrict PDF template uploads and deletes to users who can install plugins
 * 🔒 Security: Upgrade the bundled upload library to 4.0
+* 🔒 Security: Harden PDF links in entry exports
+* 🔒 Security: Escape the ?data=1 debug output
+* 🔒 Security: Redact user records in log files
+* 🔒 Security: Harden core font installer
+* 🧹 Housekeeping: Stop checking for the existence of Gravity PDF folders on every page load
+* 🧹 Housekeeping: Create the background processing queue once per request
+* 🧹 Housekeeping: Only flush a font from the cache when it's added, edited or deleted
+* 🧹 Housekeeping: Make the folder permission error dismissible (for a week)
+* 🧹 Housekeeping: Check Gravity PDF folder permissions on the System Status report page
+* 🧹 Housekeeping: Set a 1-minute minimum for the Logged Out Timeout
 * 🧹 Housekeeping: Raise the PDF template upload limit to 32MB, or the server's limit if lower
+* 🧹 Housekeeping: Link to the custom template docs from the Template Manager
+* 🧹 Housekeeping: Explain in the Template Manager why an admin can't upload or delete templates
+* 🧹 Housekeeping: Scope the bundled PSR-Log library and only load it globally for older add-ons that need it
+* 🧹 Housekeeping: Speed up long PDFs built from rows of floated elements
+* 🧹 Housekeeping: Update PHP and JavaScript dependencies
+* 🧹 Housekeeping: Remove the redux-devtools-extension package
+* 🐞 Bug: Fix regression where shortcodes and merge tags in submitted field values were processed
+* 🐞 Bug: Correctly display single File Upload field entries saved on Gravity Forms 2.10+
+* 🐞 Bug: Fix a filesystem race condition and permission checks on network storage that could prevent PDFs being generated or show a false permissions notice
+* 🐞 Bug: Fix an edge case where a failed global settings save would reset all global PDF settings
+* 🐞 Bug: Fix regression where a failed global settings save discarded the entered values
+* 🐞 Bug: Only show a failed global settings save's values to the user who made it
+* 🐞 Bug: Fix the global settings save silently failing because of another plugin's error or an extension's notice
+* 🐞 Bug: Show an extension's warning on a settings save as a warning
+* 🐞 Bug: Only clear the background PDF queue once a change to Background Processing is saved
+* 🐞 Bug: Use the default when a number setting is left blank
+* 🐞 Bug: Hide the Tools tab from users who can't use it
+* 🐞 Bug: Switch back to the current user when checking another user's PDF capabilities fails
+* 🐞 Bug: Fix missing slash when converting a path under the site root to a URL
+* 🐞 Bug: Keep PDF merge tags in an administrative field's Default Value when the entry is saved
+* 🐞 Bug: Fix a `[gravitypdf]` shortcode in a rich text administrative field's Default Value showing as text in the PDF
+* 🐞 Bug: Refuse to install Developer Toolkit templates in the Template Manager until the Toolkit plugin is active
+* 🐞 Bug: Prevent the Template Manager deleting add-on PDF templates
+* 🐞 Bug: Let the Template Manager delete PDF templates on Windows servers
+* 🐞 Bug: Explain why a PDF template upload was refused when the file isn't a zip or is too large
+* 🐞 Bug: Fix PHP deprecation notices when a field value or PDF setting is empty
+* 🐞 Bug: Fix PHP deprecation notice for empty rich text Paragraph fields
+* 🐞 Bug: Don't add debug errors to raw PDF URLs
+* 🐞 Bug: Delete PDFs sent with Gravity Forms background notifications
+* 🐞 Bug: Keep the installed core font when a download fails, instead of replacing it with a broken font file
+* 🐞 Bug: Stop different entries sharing a temporary PDF folder
+* 🐞 Bug: Stop admin notices jumping down the page on Gravity Forms pages
+* 🐞 Bug: Keep the cleanup to mPDF's own files when the `gfpdf_mpdf_tmp_location` filter is used
+* 🐞 Bug: Fix custom font uploads when the filename has dots or brackets
+* 🐞 Bug: Clean up the font files a failed custom font save leaves behind
+* 🐞 Bug: Show the correct upload limit when a custom font file is too large
+* 🐞 Bug: Clear the Font Manager's malformed font error once the bad font file is replaced or removed
+* 🐞 Bug: Stop the code inside `<script>` elements showing as text in the PDF
+* 🐞 Bug: Don't leave PDF generation filters attached when a PDF fails to generate
+* 🐞 Bug: Stop bypassing Populate Anything's live merge tag whitelist after a PDF is generated
+* 🐞 Bug: Stop PDFs crashing on Gravity Forms before 2.8.2 when a field leaves a gap in its row
+* 🐞 Bug: Stop the next field moving into the gap a field leaves at the end of its row
+* 🐞 Bug: Use the form's description placement for Consent fields set to "Use Form Setting"
+* 🐞 Bug: Show every accepted agreement for Gravity Wiz Terms of Service fields with more than one checkbox
+* 💻 Developer: Add `GPDFAPI::get_pdf_url()` to get the URL to an entry's PDF, optionally signed
+* 💻 Developer: Submitted `$form_data` values with `[ ] { }` now get U+FEFF after each `[`, `{` and `:`, except HTML/Section fields and administrative defaults
+* 💻 Developer: A `gfpdf_get_option_logged_out_timeout` filter returning 0 now expires IP-based logged-out access immediately, instead of turning off the Logged Out Timeout
+* 💻 Developer: The default `gfpdf_mpdf_tmp_location` is now the PDF tmp folder, which moves mPDF's cache from `tmp/mpdf/mpdf` to `tmp/mpdf`
+* 💻 Developer: Folders added with the `gfpdf_installer_create_folders` filter are now created on install, upgrade and the twice-daily cleanup, not every request
+* 💻 Developer: Fix the `gfpdf_settings_sanitize` filter result being discarded when saving the global settings
+* 💻 Developer: Add a `sanitize_callback` option to global settings fields
+* 💻 Developer: Pass the form, entry and PDF config to the `gfpdf_field_container_class` filter for Repeater and Nested Form fields
+* 💻 Developer: Add `gfpdf_signed_url_max_expiration` filter to change the 1-year cap on signed PDF URLs
+* 💻 Developer: Add `gfpdf_process_merge_tags_in_submitted_rich_text` filter to toggle merge tags in submitted rich-text Textarea and Post Content values. Off for new installs.
+* 💻 Developer: Add `gfpdf_shortcode_signing_user_id` filter to change which user's entry access is checked when signing `[gravitypdf]` URLs
 * 💻 Developer: Add the `gfpdf_template_max_upload_size` filter
+* 💻 Developer: Add `gfpdf_alias_global_psr_log` filter to load the bundled PSR-Log library into the global `Psr\Log` namespace
+
+### 6.17.2
+* 🐞 Bug: Show the full country name for Address fields instead of the ISO code on Gravity Forms 3.0.3+
+* 💻 Developer: Add a `country_code` key to Address fields in `$form_data`
 
 ### 6.17.1
 * 🔒 Security: Redact relative signed PDF URLs in log files

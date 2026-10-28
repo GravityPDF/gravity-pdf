@@ -5,6 +5,7 @@
          cacheResultFile="../../tmp/phpunit/phpunit.result.cache"
          colors="true"
          beStrictAboutOutputDuringTests="true"
+         convertDeprecationsToExceptions="true"
 >
     <testsuites>
         <testsuite name="integration">

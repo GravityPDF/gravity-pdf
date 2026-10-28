@@ -214,7 +214,7 @@ test.describe('Template Manager', () => {
 			)
 		).toBeVisible();
 		await expect(
-			templateManager.locator('.add-new-theme a')
+			templateManager.locator('.add-new-theme > a')
 		).toHaveAttribute('aria-disabled', 'true');
 
 		await snapshot(page, testinfo, templateManager);

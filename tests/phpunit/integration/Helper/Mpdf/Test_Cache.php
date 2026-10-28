@@ -85,6 +85,31 @@ class Test_Cache extends TestCase {
 	}
 
 	/**
+	 * is_writable() can call a writable network share read-only, so the directory existing is enough
+	 *
+	 * @since 6.18.0
+	 */
+	public function test_a_directory_reported_read_only_still_gets_a_cache() {
+		$basepath = sys_get_temp_dir() . '/mpdf-cache-read-only';
+		wp_mkdir_p( $basepath );
+
+		stream_wrapper_register( Read_Only_Stat_Stream::SCHEME, Read_Only_Stat_Stream::class );
+
+		try {
+			$path = Read_Only_Stat_Stream::SCHEME . '://' . $basepath;
+			$this->assertFalse( is_writable( $path ) );
+
+			$cache = new Cache( $path );
+		} finally {
+			stream_wrapper_unregister( Read_Only_Stat_Stream::SCHEME );
+		}
+
+		$this->assertInstanceOf( Cache::class, $cache );
+
+		@rmdir( $basepath );
+	}
+
+	/**
 	 * The plugin's idea of where mPDF's cache lives matches where mPDF puts it
 	 *
 	 * @since 6.18.0
@@ -122,5 +147,27 @@ class Concurrent_Mkdir_Stream {
 		mkdir( substr( $path, strlen( self::SCHEME ) + 3 ), $mode, true );
 
 		return false;
+	}
+}
+
+/**
+ * Maps SCHEME://path onto the local filesystem, reporting every path read-only as a network share can
+ */
+class Read_Only_Stat_Stream {
+
+	const SCHEME = 'gpdf-read-only-stat';
+
+	/** @var resource|null */
+	public $context;
+
+	public function url_stat( $path, $flags ) {
+		$stat = @stat( substr( $path, strlen( self::SCHEME ) + 3 ) );
+
+		if ( $stat ) {
+			$stat['mode'] &= ~0222;
+			$stat[2]       = $stat['mode'];
+		}
+
+		return $stat;
 	}
 }

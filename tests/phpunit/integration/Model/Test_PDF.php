@@ -20,8 +20,10 @@ use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
 use GFPDF_Vendor\Mpdf\Log\Context as LogContext;
+use GFPDF_Vendor\Mpdf\Mpdf;
 use GPDFAPI;
 use ReflectionMethod;
+use ReflectionProperty;
 use WP_Error;
 use GFPDF\Tests\Integration\TestCase;
 
@@ -1252,6 +1254,65 @@ class Test_PDF extends TestCase {
 
 		$pdf->set_output_type( 'save' );
 		$this->assertSame( 'SAVE', $pdf->get_output_type() );
+	}
+
+	public function provider_incomplete_format_settings() {
+		return [
+			'missing format'   => [ [ 'id' => '556690c67856b', 'security' => 'Yes' ] ],
+			'missing security' => [ [ 'id' => '556690c67856b', 'format' => 'Standard' ] ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_incomplete_format_settings
+	 */
+	public function test_incomplete_format_settings_raise_no_errors( $settings ) {
+		global $gfpdf;
+
+		$pdf = new Helper_PDF(
+			[
+				'id'      => 1,
+				'form_id' => $this->form( 'all-form-fields' )['id'],
+			],
+			$settings,
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
+
+		$mpdf = $this->createMock( Mpdf::class );
+		$mpdf->expects( $this->never() )->method( 'SetProtection' );
+
+		$property = new ReflectionProperty( Helper_PDF::class, 'mpdf' );
+		if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+			$property->setAccessible( true );
+		}
+		$property->setValue( $pdf, $mpdf );
+
+		$errors = [];
+		set_error_handler( function ( $errno, $errstr ) use ( &$errors ) {
+			$errors[] = $errstr;
+
+			return true;
+		}, E_DEPRECATED | E_WARNING );
+
+		try {
+			foreach ( [ 'set_pdf_format', 'set_pdf_security' ] as $name ) {
+				$method = new ReflectionMethod( Helper_PDF::class, $name );
+				if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+					$method->setAccessible( true );
+				}
+				$method->invoke( $pdf );
+			}
+		} finally {
+			restore_error_handler();
+		}
+
+		$this->assertSame( [], $errors );
+		$this->assertEmpty( $mpdf->PDFA );
+		$this->assertEmpty( $mpdf->PDFX );
 	}
 
 	/**

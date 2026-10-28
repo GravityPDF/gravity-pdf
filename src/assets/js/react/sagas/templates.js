@@ -66,6 +66,7 @@ export function* templateProcessing(action) {
 export function* templateUploadProcessing(action) {
 	const { file, filename, id } = action.payload;
 	let message;
+	let docs;
 
 	try {
 		const response = yield call(
@@ -82,6 +83,7 @@ export function* templateUploadProcessing(action) {
 		}
 
 		message = response.body?.error;
+		docs = response.body?.docs === true;
 	} catch (error) {
 		message = error.message;
 	}
@@ -89,7 +91,8 @@ export function* templateUploadProcessing(action) {
 	yield put(
 		templateUploadProcessingFailed(
 			id,
-			message || GFPDF.problemWithTheUpload
+			message || GFPDF.problemWithTheUpload,
+			docs
 		)
 	);
 }
