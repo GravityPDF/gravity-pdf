@@ -109,8 +109,12 @@ jobs:
         run: php ./tools/release/scan.php "$PACKAGE_ZIP" | tee -a "$GITHUB_STEP_SUMMARY"
 
       # Of the zip that just passed the gates, named like the R2 sidecars. Filename only, so `sha256sum -c` works beside it.
-      - name: Write checksum
-        run: cd "$(dirname "$PACKAGE_ZIP")" && f="$(basename "$PACKAGE_ZIP")" && sha256sum "$f" > "$f.sha256"
+      # SHA-1 is what Composer's dist `shasum` takes.
+      - name: Write checksums
+        run: |
+          cd "$(dirname "$PACKAGE_ZIP")" && f="$(basename "$PACKAGE_ZIP")"
+          sha256sum "$f" > "$f.sha256"
+          sha1sum "$f" > "$f.sha1"
 
       - name: Generate release notes
         run: |
@@ -132,6 +136,7 @@ jobs:
             ${{ env.PACKAGE_ZIP }}
             tmp/package/release-notes.md
             ${{ env.PACKAGE_ZIP }}.sha256
+            ${{ env.PACKAGE_ZIP }}.sha1
           if-no-files-found: error
           compression-level: 0
 
