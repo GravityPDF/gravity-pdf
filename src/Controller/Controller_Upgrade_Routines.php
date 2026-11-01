@@ -55,6 +55,7 @@ class Controller_Upgrade_Routines {
 	public function init(): void {
 		add_action( 'gfpdf_version_changed', [ $this, 'maybe_run_upgrade' ], 10, 2 );
 		add_action( 'gfpdf_plugin_installed', [ $this, 'record_deprecated_functionality' ] );
+		add_action( 'gfpdf_plugin_installed', [ $this, 'set_new_install_default_font' ] );
 	}
 
 	/**
@@ -86,6 +87,11 @@ class Controller_Upgrade_Routines {
 			$this->keep_processing_submitted_rich_text_merge_tags();
 		}
 
+		/* A site upgraded from before Arimo was the default keeps DejaVu Sans Condensed, even if it never saved one */
+		if ( $old_version !== '' && version_compare( $old_version, '6.19.0', '<' ) ) {
+			$this->save_unset_default_font( 'dejavusanscondensed' );
+		}
+
 		if ( version_compare( $current_version, '7.0.0-beta1', '>=' ) && version_compare( $old_version, '7.0.0-beta1', '<' ) ) {
 			Model_Install::write_tmp_htaccess( $this->data->template_tmp_location, true );
 		}
@@ -109,6 +115,25 @@ class Controller_Upgrade_Routines {
 	 */
 	public function record_deprecated_functionality(): void {
 		Deprecation::refresh_signals();
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function set_new_install_default_font(): void {
+		$this->save_unset_default_font( 'arimo' );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected function save_unset_default_font( string $font ): void {
+		/* The raw option, since get_option() would fall back to the field's Arimo default */
+		$settings = get_option( 'gfpdf_settings', [] );
+
+		if ( ! isset( $settings['default_font'] ) ) {
+			$this->options->update_option( 'default_font', $font );
+		}
 	}
 
 	/**

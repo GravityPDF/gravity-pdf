@@ -247,6 +247,41 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		$this->assertTrue( get_site_option( $option ) );
 	}
 
+	public function test_a_new_install_defaults_to_arimo() {
+		$this->options->delete_option( 'default_font' );
+
+		do_action( 'gfpdf_plugin_installed' );
+		do_action( 'gfpdf_version_changed', '', '6.19.0' );
+
+		$this->assertSame( 'arimo', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_an_install_keeps_a_saved_default_font() {
+		$this->options->update_option( 'default_font', 'freeserif' );
+
+		do_action( 'gfpdf_plugin_installed' );
+
+		$this->assertSame( 'freeserif', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_an_upgrade_keeps_the_saved_default_font() {
+		$this->options->update_option( 'default_font', 'freeserif' );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertSame( 'freeserif', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_an_upgrade_saves_the_old_default_font_when_none_was_saved() {
+		$this->options->delete_option( 'default_font' );
+
+		do_action( 'gfpdf_version_changed', '6.19.0', '6.19.1' );
+		$this->assertArrayNotHasKey( 'default_font', get_option( 'gfpdf_settings', [] ) );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+		$this->assertSame( 'dejavusanscondensed', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
 	/**
 	 * An install fires the version change too, as no version has been recorded yet
 	 */

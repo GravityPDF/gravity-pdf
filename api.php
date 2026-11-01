@@ -672,6 +672,12 @@ final class GPDFAPI {
 			return true;
 		}
 
+		/* A font source already provides it */
+		$font_sources = self::get_mvc_class( 'Model_Font_Sources' );
+		if ( $font_sources && $font_sources->is_family_key( self::get_options_class()->get_font_short_name( (string) $font_name ) ) ) {
+			return true;
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- synthetic $_FILES built from $font arg, not a form post.
 		$files_backup = $_FILES;
 		$_FILES       = [];

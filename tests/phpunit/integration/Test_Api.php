@@ -294,6 +294,21 @@ class Test_API extends TestCase {
 		GPDFAPI::delete_pdf_font( 'test' );
 	}
 
+	public function test_add_pdf_font_is_a_no_op_for_a_font_source_family() {
+		$font = [
+			'font_name' => 'Arimo',
+			'regular'   => PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf',
+		];
+
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+		$this->assertSame( [], GPDFAPI::get_options_class()->get_custom_fonts() );
+		$this->assertFileDoesNotExist( GPDFAPI::get_data_class()->template_font_location . 'Chewy.ttf' );
+
+		$font['font_name'] = 'Free Sans';
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+		$this->assertSame( [], GPDFAPI::get_options_class()->get_custom_fonts() );
+	}
+
 	/**
 	 * Test we can correctly delete the font
 	 *
