@@ -227,8 +227,9 @@ They guard what add-ons depend on: `Test_Public_Api_Contract` records the
 signatures of `GPDFAPI`, the core classes add-ons use, and the `get_mvc_class()`
 keys, and `Test_Hook_Inventory` lists every hook the plugin fires with its
 argument count, `Test_Hook_Registrations` lists the middleware callbacks the docs
-show developers unhooking, and `Test_Core_Template_Output` keeps the HTML each
-core template hands to mPDF. A failure prints the diff. If the change is
+show developers unhooking, `Test_Core_Template_Output` keeps the HTML each
+core template hands to mPDF, and `Test_Font_Rendering` records the fonts a
+rendered PDF embeds and the file each one came from. A failure prints the diff. If the change is
 deliberate, rewrite the files with `yarn test:php:snapshots` and commit them, so
 the change shows in the PR.
 
