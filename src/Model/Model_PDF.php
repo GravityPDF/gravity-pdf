@@ -39,6 +39,7 @@ use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use WP_Error;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -2547,17 +2548,28 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Set the watermark font to the current PDF font
 	 *
-	 * @param Mpdf  $mpdf
-	 * @param array $form
-	 * @param array $entry
-	 * @param array $settings
+	 * @param Mpdf|mixed $mpdf  What gfpdf_mpdf_init_class has been given so far
+	 * @param array      $form
+	 * @param array      $entry
+	 * @param array      $settings
 	 *
-	 * @return Mpdf
+	 * @return Mpdf|mixed
 	 *
 	 * @since 5.0
+	 * @since 6.19.0 Falls back to the default font, then Arimo, when a font isn't registered
 	 */
 	public function set_watermark_font( $mpdf, $form, $entry, $settings ) {
-		$mpdf->watermark_font = $settings['watermark_font'] ?? $settings['font'] ?? $this->options->get_option( 'default_font', 'dejavusanscondensed' );
+		/* An earlier gfpdf_mpdf_init_class callback may not have returned the mPDF object */
+		if ( ! is_object( $mpdf ) ) {
+			return $mpdf;
+		}
+
+		$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$fonts        = [ $settings['watermark_font'] ?? '', $settings['font'] ?? '' ];
+
+		$mpdf->watermark_font = $font_sources instanceof Model_Font_Sources
+			? $font_sources->get_default_font( $fonts, is_array( $mpdf->fontdata ?? null ) ? $mpdf->fontdata : null )
+			: Model_Font_Sources::ARIMO;
 
 		return $mpdf;
 	}

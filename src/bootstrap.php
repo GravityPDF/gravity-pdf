@@ -894,7 +894,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Register the fonts Gravity PDF provides
+	 * Register the fonts Gravity PDF provides, and their downloader
 	 *
 	 * @since 6.19.0
 	 */
@@ -905,6 +905,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
+		$this->singleton->add_class( new Model\Model_Core_Font_Downloader( $model, $this->data, $this->options, $this->misc, $this->log ) );
 	}
 
 	/**

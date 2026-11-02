@@ -7,6 +7,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
 
@@ -121,7 +122,7 @@ class Controller_Upgrade_Routines {
 	 * @since 6.19.0
 	 */
 	public function set_new_install_default_font(): void {
-		$this->save_unset_default_font( 'arimo' );
+		$this->save_unset_default_font( Model_Font_Sources::ARIMO );
 	}
 
 	/**

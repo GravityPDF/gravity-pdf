@@ -21,6 +21,7 @@ Controller_Zapier => GFPDF\Controller\Controller_Zapier
 Helper_Async_Notifications => GFPDF\Helper\Helper_Async_Notifications
 Helper_Pdf_Queue => GFPDF\Helper\Helper_Pdf_Queue
 Model_Actions => GFPDF\Model\Model_Actions
+Model_Core_Font_Downloader => GFPDF\Model\Model_Core_Font_Downloader
 Model_Custom_Fonts => GFPDF\Model\Model_Custom_Fonts
 Model_Font_Sources => GFPDF\Model\Model_Font_Sources
 Model_Form_Settings => GFPDF\Model\Model_Form_Settings

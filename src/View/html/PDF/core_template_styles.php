@@ -11,6 +11,7 @@
 
 /* Exit if accessed directly */
 
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Statics\Kses;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,7 +25,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @global $gfpdf
  */
 
-$font        = $settings['font'] ?? 'DejavuSansCondensed';
+$pdf_font     = $settings['font'] ?? '';
+$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+$font         = $font_sources instanceof Model_Font_Sources ? $font_sources->get_default_font( [ $pdf_font ] ) : Model_Font_Sources::ARIMO;
+
+/* A registered PDF font keeps its own spelling */
+if ( is_string( $pdf_font ) && strtolower( $pdf_font ) === $font ) {
+	$font = $pdf_font;
+}
+
 $font_colour = $settings['font_colour'] ?? '#333';
 $font_size   = $settings['font_size'] ?? '9';
 

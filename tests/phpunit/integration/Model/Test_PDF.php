@@ -16,6 +16,7 @@ use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\Statics\Cache;
 use GFPDF\Statics\Notes;
+use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -43,6 +44,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group pdf
  */
 class Test_PDF extends TestCase {
+
+	use UnregistersMvcClasses;
 
 	/**
 	 * Our Settings Controller
@@ -113,6 +116,88 @@ class Test_PDF extends TestCase {
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 		$this->controller->init();
+	}
+
+	/**
+	 * @dataProvider provider_watermark_font
+	 */
+	public function test_set_watermark_font( array $settings, string $global_font, string $expected, bool $with_fontdata = true ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () use ( $global_font ) {
+				return $global_font;
+			}
+		);
+
+		$mpdf = new \stdClass();
+		if ( $with_fontdata ) {
+			$mpdf->fontdata = apply_filters( 'mpdf_font_data', ( new \GFPDF_Vendor\Mpdf\Config\FontVariables() )->getDefaults()['fontdata'] );
+		}
+
+		$this->assertSame( $expected, $this->model->set_watermark_font( $mpdf, [], [], $settings )->watermark_font );
+	}
+
+	/**
+	 * @dataProvider provider_not_mpdf
+	 *
+	 * @param mixed $mpdf
+	 */
+	public function test_set_watermark_font_passes_on_what_isnt_mpdf( $mpdf ) {
+		$this->assertSame( $mpdf, $this->model->set_watermark_font( $mpdf, [], [], [ 'font' => 'dejavusans' ] ) );
+	}
+
+	public function provider_not_mpdf(): array {
+		return [
+			'null'     => [ null ],
+			'false'    => [ false ],
+			'a string' => [ 'mpdf' ],
+		];
+	}
+
+	public function test_fonts_fall_back_to_arimo_without_the_font_sources() {
+		$data = $this->form_and_entry();
+
+		[ $watermark, $styles ] = $this->without_mvc_class(
+			'Model_Font_Sources',
+			function () use ( $data ) {
+				$mpdf = $this->model->set_watermark_font( new \stdClass(), [], [], [ 'font' => 'dejavusans' ] );
+
+				ob_start();
+				$this->view->core_template_styles( [ 'settings' => [ 'font' => 'dejavusans' ], 'form' => $data['form'], 'entry' => $data['entry'] ] );
+
+				return [ $mpdf->watermark_font, ob_get_clean() ];
+			}
+		);
+
+		$this->assertSame( 'arimo', $watermark );
+		$this->assertStringContainsString( 'font-family: arimo, sans-serif;', $styles );
+	}
+
+	public function test_set_watermark_font_skips_non_string_fonts() {
+		$mpdf           = new \stdClass();
+		$mpdf->fontdata = apply_filters( 'mpdf_font_data', ( new \GFPDF_Vendor\Mpdf\Config\FontVariables() )->getDefaults()['fontdata'] );
+
+		$settings = [
+			'watermark_font' => [ 'freeserif' ],
+			'font'           => 12,
+		];
+
+		$this->assertSame( 'arimo', $this->model->set_watermark_font( $mpdf, [], [], $settings )->watermark_font );
+	}
+
+	public function provider_watermark_font(): array {
+		return [
+			'the watermark font'                       => [ [ 'watermark_font' => 'freeserif', 'font' => 'dejavusans' ], 'dejavusanscondensed', 'freeserif' ],
+			'an mPDF alias as the watermark font'      => [ [ 'watermark_font' => 'Helvetica', 'font' => 'dejavusans' ], 'dejavusanscondensed', 'helvetica' ],
+			'an unregistered alias as the watermark'   => [ [ 'watermark_font' => 'comic', 'font' => 'dejavusans' ], 'dejavusanscondensed', 'dejavusans' ],
+			'the PDF font with no watermark font'      => [ [ 'font' => 'dejavusans' ], 'dejavusanscondensed', 'dejavusans' ],
+			'the PDF font for an unknown watermark'    => [ [ 'watermark_font' => 'notafont', 'font' => 'DejaVuSans' ], 'dejavusanscondensed', 'dejavusans' ],
+			'the default font for unknown PDF fonts'   => [ [ 'watermark_font' => 'notafont', 'font' => 'deletedcustomfont' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'the default font for empty PDF fonts'     => [ [ 'watermark_font' => '', 'font' => '' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'Arimo when no font is registered'         => [ [ 'watermark_font' => 'notafont', 'font' => 'notafont' ], 'notafont', 'arimo' ],
+			'Arimo with nothing set'                   => [ [], '', 'arimo' ],
+			'the registered fonts without mPDF\'s data' => [ [ 'watermark_font' => 'freeserif' ], '', 'freeserif', false ],
+		];
 	}
 
 	/**
@@ -2225,6 +2310,47 @@ class Test_PDF extends TestCase {
 		/* Test non-related array */
 		$results = $this->model->preprocess_template_arguments( [ 'other_array' ] );
 		$this->assertSame( 'other_array', $results[0] );
+	}
+
+	/**
+	 * @dataProvider provider_core_template_font
+	 *
+	 * @param mixed $font The PDF's font setting, or null for none
+	 */
+	public function test_core_template_font( $font, string $global_font, string $expected ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () use ( $global_font ) {
+				return $global_font;
+			}
+		);
+
+		$data     = $this->form_and_entry();
+		$settings = $font === null ? [] : [ 'font' => $font ];
+
+		ob_start();
+		$this->view->core_template_styles( [ 'settings' => $settings, 'form' => $data['form'], 'entry' => $data['entry'] ] );
+		$results = ob_get_clean();
+
+		$this->assertStringContainsString( "font-family: $expected, sans-serif;", $results );
+	}
+
+	public function provider_core_template_font(): array {
+		return [
+			'a registered PDF font'                   => [ 'dejavusans', 'dejavusanscondensed', 'dejavusans' ],
+			'a registered PDF font keeps its case'    => [ 'DejaVuSans', 'dejavusanscondensed', 'DejaVuSans' ],
+			'an mPDF sans-serif name keeps its case'  => [ 'Arial', 'dejavusanscondensed', 'Arial' ],
+			'an mPDF alias to a registered font'      => [ 'OCR-B', 'dejavusanscondensed', 'OCR-B' ],
+			'an mPDF alias to a font of a kind'       => [ 'times', 'dejavusanscondensed', 'times' ],
+			'an mPDF alias to an unregistered font'   => [ 'comic', 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'an unknown PDF font'                     => [ 'notafont', 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'a deleted custom font'                   => [ 'deletedcustomfont', 'freeserif', 'freeserif' ],
+			'an empty PDF font'                       => [ '', 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'no PDF font'                             => [ null, 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'a non-string PDF font'                   => [ [ 'dejavusans' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'no PDF font and an unknown default font' => [ null, 'notafont', 'arimo' ],
+			'nothing registered'                      => [ 'notafont', '', 'arimo' ],
+		];
 	}
 
 	/**

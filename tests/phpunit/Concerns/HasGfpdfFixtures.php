@@ -165,6 +165,7 @@ trait HasGfpdfFixtures {
 	/** Call from set_up_before_class(); pair with remove_test_fonts() in tear_down_after_class(). */
 	protected static function copy_test_fonts() {
 		global $gfpdf;
+		wp_mkdir_p( $gfpdf->data->template_font_location );
 		foreach ( self::$render_fonts as $font ) {
 			@copy(
 				PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . $font,

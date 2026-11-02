@@ -170,6 +170,16 @@ class Test_Request extends TestCase {
 		$this->assertSame( [], $this->requested );
 	}
 
+	public function test_a_home_url_on_a_refused_port_is_rejected_not_a_failure() {
+		$url      = set_url_scheme( home_url( '/image.png' ), 'http' );
+		$url      = str_replace( '://' . wp_parse_url( $url, PHP_URL_HOST ), '://' . wp_parse_url( $url, PHP_URL_HOST ) . ':8443', $url );
+		$response = $this->request()->sendRequest( new Payload( 'GET', $url ) );
+
+		$this->assertSame( '', (string) $response->getBody() );
+		$this->assertSame( [], $this->requested );
+		$this->assertFalse( Helper_Render_Health::is_degraded() );
+	}
+
 	public function test_one_failure_is_a_blip() {
 		$request = $this->request();
 

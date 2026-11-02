@@ -121,7 +121,24 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		require_once $this->plugin_dir . '/pdf.php';
 
+		add_filter( 'pre_http_request', [ $this, 'block_font_downloads' ], PHP_INT_MAX, 3 );
+
 		error_reporting( $previous_error_level );
+	}
+
+	/**
+	 * Fail a test that downloads a font it hasn't served
+	 *
+	 * @since 6.19.0
+	 */
+	public function block_font_downloads( $preempt, $args, $url ) {
+		if ( $preempt !== false || wp_parse_url( $url, PHP_URL_HOST ) !== 'raw.githubusercontent.com' ) {
+			return $preempt;
+		}
+
+		_doing_it_wrong( 'pre_http_request', esc_html( 'Serve this font download in the test: ' . $url ), '6.19.0' );
+
+		return new WP_Error( 'gfpdf_tests_unserved_download', 'Font downloads must be served by the test' );
 	}
 
 }

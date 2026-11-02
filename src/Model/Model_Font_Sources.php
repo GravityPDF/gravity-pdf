@@ -8,6 +8,7 @@ use Exception;
 use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use GPDFAPI;
@@ -46,6 +47,13 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	const SYMBOLS_FONT = 'gfpdf-dejavu-symbols';
+
+	/**
+	 * The bundled Arimo, the default font for new installs and the last fallback
+	 *
+	 * @since 6.19.0
+	 */
+	const ARIMO = 'arimo';
 
 	/**
 	 * @var Helper_Data
@@ -105,6 +113,135 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		return false;
+	}
+
+	/**
+	 * The bundled Arimo Regular path
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_fallback_file(): string {
+		$bundled = $this->get_sources()['bundled'];
+
+		return $bundled['dir'] . $bundled['families'][ self::ARIMO ]['R'];
+	}
+
+	/**
+	 * The first registered font given, else the default font, else Arimo (never mPDF's serif)
+	 *
+	 * @param mixed[]    $fonts    Font keys in order of preference, e.g. the PDF's font
+	 * @param array|null $fontdata mPDF font data, or null for the registered fonts
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_default_font( array $fonts = [], ?array $fontdata = null ): string {
+		$fontdata = $fontdata ?? apply_filters( 'mpdf_font_data', ( new FontVariables() )->getDefaults()['fontdata'] );
+		$fontdata = is_array( $fontdata ) ? $fontdata : [];
+		$fonts[]  = GPDFAPI::get_options_class()->get_option( 'default_font', '' );
+
+		foreach ( $fonts as $font ) {
+			$font = is_string( $font ) ? strtolower( $font ) : '';
+			if ( $font !== '' && $this->mpdf_can_resolve( $font, $fontdata ) ) {
+				return $font;
+			}
+		}
+
+		return self::ARIMO;
+	}
+
+	/**
+	 * Whether mPDF finds a font for the name as SetFont() does: its alias, then the font, then another of its kind
+	 * (e.g. `arial` becomes the first registered sans-serif font)
+	 *
+	 * @since 6.19.0
+	 */
+	protected function mpdf_can_resolve( string $font, array $fontdata ): bool {
+		$defaults = ( new FontVariables() )->getDefaults();
+		$font     = $defaults['fonttrans'][ $font ] ?? $font;
+
+		if ( $this->is_registered( $font, $fontdata ) ) {
+			return true;
+		}
+
+		foreach ( [ 'sans_fonts', 'serif_fonts', 'mono_fonts' ] as $kind ) {
+			if ( ! in_array( $font, $defaults[ $kind ], true ) ) {
+				continue;
+			}
+
+			foreach ( $defaults[ $kind ] as $similar ) {
+				if ( $this->is_registered( $similar, $fontdata ) ) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected function is_registered( string $font, array $fontdata ): bool {
+		return is_string( $fontdata[ $font ]['R'] ?? null );
+	}
+
+	/**
+	 * A source's manifest, keyed by file name
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function read_manifest( string $path ): array {
+		if ( $path === '' ) {
+			return [];
+		}
+
+		$entries = is_readable( $path ) ? json_decode( (string) file_get_contents( $path ), true ) : null; /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
+		if ( ! is_array( $entries ) ) {
+			$this->log->error( 'Font manifest is missing or invalid', [ 'manifest' => $path ] );
+
+			return [];
+		}
+
+		$manifest = [];
+		foreach ( $entries as $entry ) {
+			if ( $this->is_manifest_entry( $entry ) ) {
+				$manifest[ $entry['name'] ] = [
+					'url'  => $entry['download_url'],
+					'size' => $entry['size'],
+					'sha'  => $entry['sha'],
+				];
+			}
+		}
+
+		if ( count( $manifest ) !== count( $entries ) ) {
+			$this->log->warning(
+				'Font manifest entries skipped as invalid',
+				[
+					'manifest' => $path,
+					'skipped'  => count( $entries ) - count( $manifest ),
+				]
+			);
+		}
+
+		return $manifest;
+	}
+
+	/**
+	 * A plain file name, an https:// URL, and a git blob SHA-1 with a positive size
+	 *
+	 * @param mixed $entry
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_manifest_entry( $entry ): bool {
+		return is_array( $entry )
+			&& is_string( $entry['name'] ?? null ) && $entry['name'] !== '' && basename( $entry['name'] ) === $entry['name']
+			&& is_string( $entry['download_url'] ?? null ) && strpos( $entry['download_url'], 'https://' ) === 0
+			&& $this->is_blob_entry( $entry['sha'] ?? null, $entry['size'] ?? null );
 	}
 
 	/**
@@ -304,7 +441,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			'dir'      => PDF_PLUGIN_DIR . 'fonts/',
 			'group'    => esc_html__( 'Unicode', 'gravity-pdf' ),
 			'families' => [
-				'arimo'            => [
+				self::ARIMO        => [
 					'name'   => 'Arimo',
 					'R'      => 'GravityPDF-Arimo-Regular.ttf',
 					'B'      => 'GravityPDF-Arimo-Bold.ttf',
@@ -349,20 +486,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected function get_known_files( array $source ): array {
 		$known = [];
 
-		$manifest = [];
-		if ( ! empty( $source['manifest'] ) ) {
-			$json     = is_readable( $source['manifest'] ) ? file_get_contents( $source['manifest'] ) : false; /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
-			$manifest = json_decode( (string) $json, true );
-
-			if ( ! is_array( $manifest ) ) {
-				$this->log->warning( 'Font source manifest missing or invalid', [ 'manifest' => $source['manifest'] ] );
-			}
-		}
-
-		foreach ( is_array( $manifest ) ? $manifest : [] as $file ) {
-			if ( is_array( $file ) && $this->is_blob_entry( $file['sha'] ?? null, $file['size'] ?? null ) ) {
-				$known[ $file['size'] ][] = $file['sha'];
-			}
+		foreach ( $this->read_manifest( (string) ( $source['manifest'] ?? '' ) ) as $file ) {
+			$known[ $file['size'] ][] = $file['sha'];
 		}
 
 		$legacy = is_array( $source['legacy'] ?? null ) ? $source['legacy'] : [];
@@ -408,24 +533,11 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			}
 
 			$size = (int) filesize( $path );
-			if ( ! isset( $known[ $size ] ) || ! in_array( $this->get_git_blob_sha1( $path, $size ), $known[ $size ], true ) ) {
+			if ( ! isset( $known[ $size ] ) || ! in_array( Git_Blob::sha1( $path, $size ), $known[ $size ], true ) ) {
 				return false;
 			}
 		}
 
 		return true;
-	}
-
-	/**
-	 * The hash GitHub lists for a file, as `git hash-object` computes it
-	 *
-	 * @since 6.19.0
-	 */
-	protected function get_git_blob_sha1( string $path, int $size ): string {
-		$hash = hash_init( 'sha1' );
-		hash_update( $hash, 'blob ' . $size . "\0" );
-		hash_update_file( $hash, $path );
-
-		return hash_final( $hash );
 	}
 }

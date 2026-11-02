@@ -8,6 +8,8 @@ use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF\Helper\Mpdf\Mpdf;
+use GFPDF\Model\Model_Core_Font_Downloader;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Signed_Url_Trust;
 use GFPDF\Statics\Template_Constants;
 use GFPDF_Vendor\Mpdf\MpdfException;
@@ -739,54 +741,62 @@ class Helper_PDF {
 		/* A deleted tmp folder is recreated with its protection, before mPDF makes it without */
 		$this->misc->create_mpdf_cache_folders();
 
-		$default_font_config = ( new FontVariables() )->getDefaults();
+		$fontdata = apply_filters( 'mpdf_font_data', ( new FontVariables() )->getDefaults()['fontdata'] );
 
-		$this->mpdf = new Mpdf(
-			apply_filters(
-				'gfpdf_mpdf_class_config',
-				[
-					'fontDir'                => [ $this->data->template_font_location ],
-					'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
-					'tempDir'                => $this->data->mpdf_tmp_location,
+		$default_font = Model_Font_Sources::ARIMO;
+		$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		if ( $font_sources instanceof Model_Font_Sources ) {
+			$default_font = $font_sources->get_default_font( [ $this->settings['font'] ?? '' ], is_array( $fontdata ) ? $fontdata : [] );
+		}
 
-					'allow_output_buffering' => true,
-					'autoLangToFont'         => true,
-					'useSubstitutions'       => true,
-					'ignore_invalid_utf8'    => true,
-					'setAutoTopMargin'       => 'stretch',
-					'setAutoBottomMargin'    => 'stretch',
-					'enableImports'          => true,
-					'use_kwt'                => true,
-					'keepColumns'            => true,
-					'biDirectional'          => true,
-					'showWatermarkText'      => true,
-					'showWatermarkImage'     => true,
+		$defaults = [
+			'fontDir'                => [ $this->data->template_font_location ],
+			'fontdata'               => $fontdata,
+			'default_font'           => $default_font,
+			'tempDir'                => $this->data->mpdf_tmp_location,
 
-					'format'                 => $this->paper_size,
-					'orientation'            => $this->orientation,
+			'allow_output_buffering' => true,
+			'autoLangToFont'         => true,
+			'useSubstitutions'       => true,
+			'ignore_invalid_utf8'    => true,
+			'setAutoTopMargin'       => 'stretch',
+			'setAutoBottomMargin'    => 'stretch',
+			'enableImports'          => true,
+			'use_kwt'                => true,
+			'keepColumns'            => true,
+			'biDirectional'          => true,
+			'showWatermarkText'      => true,
+			'showWatermarkImage'     => true,
 
-					'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
+			'format'                 => $this->paper_size,
+			'orientation'            => $this->orientation,
 
-					'exposeVersion'          => false,
-				],
-				$this->form,
-				$this->entry,
-				$this->settings,
-				$this
-			),
-			new SimpleContainer(
-				apply_filters(
-					'gfpdf_mpdf_class_container',
-					[
-						'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
-					],
-					$this->form,
-					$this->entry,
-					$this->settings,
-					$this
-				)
-			)
-		);
+			'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
+
+			'exposeVersion'          => false,
+		];
+
+		$config = apply_filters( 'gfpdf_mpdf_class_config', $defaults, $this->form, $this->entry, $this->settings, $this );
+		if ( ! is_array( $config ) ) {
+			$this->log->error( 'The gfpdf_mpdf_class_config filter did not return an array, so it was ignored' );
+			$config = $defaults;
+		}
+
+		$services = [ 'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ) ];
+
+		/* Built from the filtered config so it searches every font directory */
+		$downloader = GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
+		if ( $downloader instanceof Model_Core_Font_Downloader ) {
+			$services['fontFileFinder'] = $downloader->get_font_file_finder( $config );
+		}
+
+		$container = apply_filters( 'gfpdf_mpdf_class_container', $services, $this->form, $this->entry, $this->settings, $this );
+		if ( ! is_array( $container ) ) {
+			$this->log->error( 'The gfpdf_mpdf_class_container filter did not return an array, so it was ignored' );
+			$container = $services;
+		}
+
+		$this->mpdf = new Mpdf( $config, new SimpleContainer( $container ) );
 
 		/* Tag everything mPDF logs, from remote fetches to its statistics, with the PDF it belongs to */
 		$this->mpdf->setLogger(

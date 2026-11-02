@@ -1,0 +1,2 @@
+BaseFont: Arimo-Regular
+garuda: GravityPDF-Arimo-Regular.ttf ดวสัี

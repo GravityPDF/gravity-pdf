@@ -8,9 +8,9 @@ use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Integration\TestCase;
-use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
+use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GPDFAPI;
 
 /**
@@ -71,6 +71,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->remove_font_fixtures();
 		delete_option( Model_Font_Sources::OPTION );
 		wp_delete_file( $this->manifest_path() );
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
 		parent::tear_down();
 	}
@@ -196,6 +197,184 @@ class Test_Model_Font_Sources extends TestCase {
 
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavusanscondensed' );
 		$this->assertSame( 'dejavusanscondensed', GPDFAPI::get_options_class()->get_form_value( $field ) );
+	}
+
+	/**
+	 * @dataProvider provider_default_font
+	 *
+	 * @param mixed[] $fonts
+	 * @param mixed   $global_font The default font setting, as the gfpdf_get_option filter returns it
+	 */
+	public function test_get_default_font( array $fonts, $global_font, string $expected ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () use ( $global_font ) {
+				return $global_font;
+			}
+		);
+
+		$fontdata = $this->model->register_font_data( ( new FontVariables() )->getDefaults()['fontdata'] );
+
+		$this->assertSame( $expected, $this->model->get_default_font( $fonts, $fontdata ) );
+	}
+
+	public function provider_default_font(): array {
+		return [
+			'the PDF font'                           => [ [ 'dejavusans' ], 'dejavusanscondensed', 'dejavusans' ],
+			'the PDF font in another case'           => [ [ 'DejaVuSans' ], 'dejavusanscondensed', 'dejavusans' ],
+			'the first registered font given'        => [ [ 'notafont', 'freeserif' ], 'dejavusanscondensed', 'freeserif' ],
+			'an mPDF sans-serif name'                => [ [ 'Arial' ], 'dejavusanscondensed', 'arial' ],
+			'a generic family'                       => [ [ 'monospace' ], 'dejavusanscondensed', 'monospace' ],
+			'an mPDF alias to a registered font'     => [ [ 'OCR-B' ], 'dejavusanscondensed', 'ocr-b' ],
+			'an mPDF alias to a font of a kind'      => [ [ 'times' ], 'dejavusanscondensed', 'times' ],
+			'an mPDF alias to an unregistered font'  => [ [ 'comic' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'an mPDF alias as the default font'      => [ [], 'Courier', 'courier' ],
+			'the default font with no PDF font'      => [ [], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'the default font in another case'       => [ [], 'DejaVuSansCondensed', 'dejavusanscondensed' ],
+			'the default font for an empty PDF font' => [ [ '' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'the default font for an unknown font'   => [ [ 'notafont' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'the default font for a non-string font' => [ [ [ 'dejavusans' ], null, 12 ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'Arimo for an unknown default font'      => [ [ 'notafont' ], 'deletedcustomfont', 'arimo' ],
+			'Arimo for an empty default font'        => [ [ 'notafont' ], '', 'arimo' ],
+			'Arimo for a non-string default font'    => [ [], [ 'dejavusans' ], 'arimo' ],
+			'Arimo with nothing set'                 => [ [], false, 'arimo' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_unusable_font_data
+	 */
+	public function test_get_default_font_skips_unusable_font_data( array $fontdata ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () {
+				return 'dejavusanscondensed';
+			}
+		);
+
+		$this->assertSame( 'arimo', $this->model->get_default_font( [ 'dejavusans', 'arial' ], $fontdata ) );
+	}
+
+	public function provider_unusable_font_data(): array {
+		return [
+			'no font data'           => [ [] ],
+			'no font of the kind'    => [ [ 'arial' => 'x', 'dejavusans' => [] ] ],
+			'a string entry'         => [ [ 'dejavusans' => 'DejaVuSans.ttf', 'dejavusanscondensed' => 'x' ] ],
+			'no regular file'        => [ [ 'dejavusans' => [ 'B' => 'DejaVuSans-Bold.ttf' ], 'dejavusanscondensed' => [] ] ],
+			'a non-string regular'   => [ [ 'dejavusans' => [ 'R' => [ 'x' ] ], 'dejavusanscondensed' => [ 'R' => null ] ] ],
+		];
+	}
+
+	public function test_get_default_font_ignores_font_data_a_filter_broke() {
+		add_filter( 'mpdf_font_data', '__return_false', 99 );
+
+		$this->assertSame( 'arimo', $this->model->get_default_font( [ 'dejavusans' ] ) );
+	}
+
+	public function test_read_manifest_reads_the_core_manifest() {
+		$manifest = $this->model->read_manifest( PDF_PLUGIN_DIR . 'build/payload/core-fonts.json' );
+
+		$this->assertCount( 82, $manifest );
+		$this->assertSame( 334040, $manifest['DejaVuSerifCondensed.ttf']['size'] );
+	}
+
+	/**
+	 * @dataProvider provider_unreadable_manifest
+	 */
+	public function test_read_manifest_logs_a_missing_or_invalid_manifest( ?string $contents ) {
+		[ $model, $log ] = $this->model_with_log();
+		$path            = get_temp_dir() . 'gfpdf-manifest-' . wp_generate_password( 6, false ) . '.json';
+		if ( $contents !== null ) {
+			file_put_contents( $path, $contents );
+		}
+
+		try {
+			$this->assertSame( [], $model->read_manifest( $path ) );
+			$this->assertTrue(
+				$log->hasRecordThatPasses(
+					static function ( $record ) {
+						return $record['message'] === 'Font manifest is missing or invalid';
+					},
+					Logger::ERROR
+				)
+			);
+		} finally {
+			wp_delete_file( $path );
+		}
+	}
+
+	public function provider_unreadable_manifest(): array {
+		return [
+			'missing'      => [ null ],
+			'empty'        => [ '' ],
+			'invalid JSON' => [ '{"name":' ],
+			'a scalar'     => [ '"core-fonts"' ],
+		];
+	}
+
+	public function test_read_manifest_skips_invalid_entries() {
+		[ $model, $log ] = $this->model_with_log();
+		$valid           = [
+			'name'         => 'Font.ttf',
+			'download_url' => 'https://example.com/Font.ttf',
+			'size'         => 100,
+			'sha'          => str_repeat( 'a', 40 ),
+		];
+		$entries         = [
+			$valid,
+			'not an entry',
+			array_merge( $valid, [ 'name' => '../Font.ttf' ] ),
+			array_merge( $valid, [ 'name' => '' ] ),
+			array_merge( $valid, [ 'name' => [ 'Font.ttf' ] ] ),
+			array_merge( $valid, [ 'download_url' => 'http://example.com/Font.ttf' ] ),
+			array_merge( $valid, [ 'download_url' => null ] ),
+			array_merge( $valid, [ 'size' => 0 ] ),
+			array_merge( $valid, [ 'size' => 'big' ] ),
+			array_merge( $valid, [ 'sha' => 'abc' ] ),
+			array_diff_key( $valid, [ 'sha' => true ] ),
+		];
+		$path            = get_temp_dir() . 'gfpdf-manifest-' . wp_generate_password( 6, false ) . '.json';
+		file_put_contents( $path, wp_json_encode( $entries ) );
+
+		try {
+			$this->assertSame(
+				[
+					'Font.ttf' => [
+						'url'  => 'https://example.com/Font.ttf',
+						'size' => 100,
+						'sha'  => str_repeat( 'a', 40 ),
+					],
+				],
+				$model->read_manifest( $path )
+			);
+			$this->assertTrue(
+				$log->hasRecordThatPasses(
+					static function ( $record ) {
+						return $record['message'] === 'Font manifest entries skipped as invalid' && $record['context']['skipped'] === 10;
+					},
+					Logger::WARNING
+				)
+			);
+		} finally {
+			wp_delete_file( $path );
+		}
+	}
+
+	/**
+	 * @return array{0: Model_Font_Sources, 1: TestHandler}
+	 */
+	private function model_with_log(): array {
+		$log = new TestHandler();
+
+		return [ new Model_Font_Sources( GPDFAPI::get_data_class(), $this->custom_fonts, new Logger( 'test', [ $log ] ) ), $log ];
+	}
+
+	public function test_get_default_font_checks_the_registered_fonts_by_default() {
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->add_record( 'chewy', [ 'regular' => 'Chewy.ttf' ] );
+
+		$this->assertSame( 'chewy', $this->model->get_default_font( [ 'chewy' ] ) );
+		$this->assertSame( 'arimo', $this->model->get_default_font( [ 'deletedcustomfont' ] ) );
 	}
 
 	public function test_adopt_records_removes_a_record_matching_the_manifest() {
@@ -466,7 +645,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->add_record( 'dejavusanscondensed', [ 'regular' => 'DejaVuSansCondensed.ttf' ] );
 
 		$this->assertSame( $adopted, $model->adopt_records( 'core' ) );
-		$this->assertSame( $warns, $this->log->hasRecordThatContains( 'Font source manifest missing or invalid', Logger::WARNING ) );
+		$this->assertSame( $warns, $this->log->hasRecordThatContains( 'Font manifest is missing or invalid', Logger::ERROR ) );
 	}
 
 	public function data_bad_manifests(): array {
@@ -479,6 +658,10 @@ class Test_Model_Font_Sources extends TestCase {
 			5,
 			[ 'size' => $size ],
 			[ 'sha' => $sha ],
+			[
+				'sha'  => $sha,
+				'size' => $size,
+			],
 			[
 				'sha'  => [ $sha ],
 				'size' => $size,
@@ -494,8 +677,10 @@ class Test_Model_Font_Sources extends TestCase {
 		];
 
 		$valid = [
-			'sha'  => $sha,
-			'size' => $size,
+			'name'         => 'DejaVuSansCondensed.ttf',
+			'download_url' => 'https://example.com/DejaVuSansCondensed.ttf',
+			'sha'          => $sha,
+			'size'         => $size,
 		];
 
 		return [
@@ -513,8 +698,10 @@ class Test_Model_Font_Sources extends TestCase {
 			wp_json_encode(
 				[
 					[
-						'sha'  => self::EMPTY_BLOB,
-						'size' => 0,
+						'name'         => 'Empty.ttf',
+						'download_url' => 'https://example.com/Empty.ttf',
+						'sha'          => self::EMPTY_BLOB,
+						'size'         => 0,
 					],
 				]
 			)
