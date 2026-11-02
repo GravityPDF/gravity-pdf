@@ -2,11 +2,13 @@ import type { Locator, Page, TestInfo } from '@playwright/test';
 import * as path from 'node:path';
 import { config as lostPixel } from '../../lost-pixel/lostpixel.config';
 
-const VISUAL_SHOTS_DIR = path.resolve(lostPixel.customShots.currentShotsPath);
+export const VISUAL_SHOTS_DIR = path.resolve(
+	lostPixel.customShots.currentShotsPath
+);
 
 // VISUAL=1 forces visual snapshots on, VISUAL=0 off, otherwise they follow CI. Only the screenshot is gated; the
 // settle wait before it always runs, so turning capture off never changes what the surrounding test asserts.
-const visualEnabled =
+export const visualEnabled =
 	process.env.VISUAL === '1' ||
 	(process.env.VISUAL !== '0' && !!process.env.CI);
 
@@ -220,14 +222,20 @@ async function pageArea(targets: Locator[], inPage = true) {
  * A stable, unique PNG name: Lost Pixel keys each shot by filename. The project is part of it because the permalink
  * specs run under two projects.
  * @param testinfo
+ * @param suffix   tells apart several shots from one test
  */
-function shotName(testinfo: TestInfo) {
+export function shotName(testinfo: TestInfo, suffix = '') {
 	const spec = path
 		.relative(process.cwd(), testinfo.file)
 		.replace(/^tests\/playwright\//, '')
 		.replace(/\.(spec|test)\.[cm]?[jt]s$/, '');
 
-	const slug = [testinfo.project.name, spec, ...testinfo.titlePath.slice(1)]
+	const slug = [
+		testinfo.project.name,
+		spec,
+		...testinfo.titlePath.slice(1),
+		suffix,
+	]
 		.join('-')
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
