@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Tests\Concerns;
 
 use GFPDF\Helper\Fonts\FlushCache;
+use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Model\Model_Font_Sources;
 use GPDFAPI;
 
@@ -62,11 +63,8 @@ trait CopiesFontFixtures {
 	/**
 	 * A model whose bundled source accepts the fixture as a legacy Arimo copy
 	 */
-	protected function get_model_with_legacy( string $fixture ): Model_Font_Sources {
-		$path = $this->font_fixture( $fixture );
-		$size = (int) filesize( $path );
-
-		$model = new class( GPDFAPI::get_data_class(), GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), GPDFAPI::get_log_class() ) extends Model_Font_Sources {
+	protected function get_model_with_legacy( string $fixture, ?Model_Custom_Fonts $custom_fonts = null ): Model_Font_Sources {
+		$model = new class( GPDFAPI::get_data_class(), $custom_fonts ?? GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), GPDFAPI::get_log_class() ) extends Model_Font_Sources {
 			/** @var array<string, int> */
 			public $legacy = [];
 
@@ -75,9 +73,19 @@ trait CopiesFontFixtures {
 			}
 		};
 
-		$model->legacy = [ sha1( 'blob ' . $size . "\0" . file_get_contents( $path ) ) => $size ];
+		$model->legacy = $this->fixture_blob( $fixture );
 
 		return $model;
+	}
+
+	/**
+	 * @return array<string, int> The fixture's git blob SHA-1 => size
+	 */
+	protected function fixture_blob( string $fixture ): array {
+		$path = $this->font_fixture( $fixture );
+		$size = (int) filesize( $path );
+
+		return [ sha1( 'blob ' . $size . "\0" . file_get_contents( $path ) ) => $size ];
 	}
 
 	/**

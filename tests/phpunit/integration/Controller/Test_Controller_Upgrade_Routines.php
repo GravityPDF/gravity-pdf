@@ -282,6 +282,37 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		$this->assertSame( 'dejavusanscondensed', get_option( 'gfpdf_settings' )['default_font'] );
 	}
 
+	public function test_an_empty_default_font_counts_as_unsaved() {
+		update_option( 'gfpdf_settings', [ 'default_font' => '' ] );
+		do_action( 'gfpdf_plugin_installed' );
+		$this->assertSame( 'arimo', get_option( 'gfpdf_settings' )['default_font'] );
+
+		update_option( 'gfpdf_settings', [ 'default_font' => '' ] );
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+		$this->assertSame( 'dejavusanscondensed', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	/**
+	 * @dataProvider data_corrupt_settings
+	 *
+	 * @param mixed $settings
+	 */
+	public function test_the_default_font_save_leaves_corrupt_settings_alone( $settings ) {
+		update_option( 'gfpdf_settings', $settings );
+
+		do_action( 'gfpdf_plugin_installed' );
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertSame( $settings, get_option( 'gfpdf_settings' ) );
+	}
+
+	public function data_corrupt_settings(): array {
+		return [
+			'string'  => [ 'corrupt' ],
+			'integer' => [ '5' ],
+		];
+	}
+
 	/**
 	 * An install fires the version change too, as no version has been recorded yet
 	 */

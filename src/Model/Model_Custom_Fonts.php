@@ -70,6 +70,11 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 
 		$font_list = [];
 		foreach ( $fonts as $font ) {
+			/* A corrupt entry would otherwise fatal the font sources check on admin_init */
+			if ( ! is_array( $font ) ) {
+				continue;
+			}
+
 			/* Set defaults for all the non-required fields */
 			$font['italics']     = $font['italics'] ?? '';
 			$font['bold']        = $font['bold'] ?? '';

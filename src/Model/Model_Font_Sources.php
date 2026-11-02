@@ -135,8 +135,15 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function register_font_directories( $config ): array {
-		$config            = is_array( $config ) ? $config : [];
-		$config['fontDir'] = (array) ( $config['fontDir'] ?? [] );
+		$config = is_array( $config ) ? $config : [];
+		$dirs   = $config['fontDir'] ?? [];
+
+		/* mPDF takes one folder as a string */
+		if ( ! is_array( $dirs ) ) {
+			$dirs = is_string( $dirs ) && $dirs !== '' ? [ $dirs ] : [];
+		}
+
+		$config['fontDir'] = $dirs;
 
 		foreach ( $this->get_sources() as $source ) {
 			if ( ! empty( $source['dir'] ) && ! in_array( $source['dir'], $config['fontDir'], true ) ) {
@@ -150,11 +157,12 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	/**
 	 * Prepend each source's listed families to its font list group, skipping any a custom font overrides
 	 *
-	 * @param array $fonts The font list, grouped by label
+	 * @param mixed $fonts The font list, grouped by label
 	 *
 	 * @since 6.19.0
 	 */
-	public function add_font_list_groups( array $fonts ): array {
+	public function add_font_list_groups( $fonts ): array {
+		$fonts        = is_array( $fonts ) ? $fonts : [];
 		$custom_fonts = $this->custom_fonts->get_custom_fonts();
 
 		foreach ( $this->get_sources() as $source ) {
@@ -169,7 +177,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 				}
 			}
 
-			$fonts[ $source['group'] ] = $list + ( $fonts[ $source['group'] ] ?? [] );
+			$group                     = $fonts[ $source['group'] ] ?? [];
+			$fonts[ $source['group'] ] = $list + ( is_array( $group ) ? $group : [] );
 		}
 
 		return $fonts;
@@ -257,27 +266,31 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function remove_record( string $id ): bool {
-		if ( ! is_multisite() ) {
-			return GPDFAPI::delete_pdf_font( $id ) === true;
-		}
+		$removed = false;
+		$error   = '';
 
 		try {
-			if ( ! $this->custom_fonts->delete_font( $id ) ) {
-				return false;
+			if ( ! is_multisite() ) {
+				$removed = GPDFAPI::delete_pdf_font( $id ) === true;
+			} elseif ( $this->custom_fonts->delete_font( $id ) ) {
+				FlushCache::flush( $id );
+				$removed = true;
 			}
 		} catch ( Exception $e ) {
+			$error = $e->getMessage();
+		}
+
+		if ( ! $removed ) {
 			$this->log->error(
 				'Could not remove a custom font record replaced by a font source',
 				[
 					'font'      => $id,
-					'exception' => $e->getMessage(),
+					'exception' => $error,
 				]
 			);
 
 			return false;
 		}
-
-		FlushCache::flush( $id );
 
 		return true;
 	}
@@ -337,24 +350,39 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		$known = [];
 
 		$manifest = [];
-		if ( ! empty( $source['manifest'] ) && is_readable( $source['manifest'] ) ) {
-			$manifest = json_decode( (string) file_get_contents( $source['manifest'] ), true ); /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
+		if ( ! empty( $source['manifest'] ) ) {
+			$json     = is_readable( $source['manifest'] ) ? file_get_contents( $source['manifest'] ) : false; /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
+			$manifest = json_decode( (string) $json, true );
+
+			if ( ! is_array( $manifest ) ) {
+				$this->log->warning( 'Font source manifest missing or invalid', [ 'manifest' => $source['manifest'] ] );
+			}
 		}
 
 		foreach ( is_array( $manifest ) ? $manifest : [] as $file ) {
-			if ( isset( $file['size'], $file['sha'] ) ) {
-				$known[ (int) $file['size'] ][] = (string) $file['sha'];
+			if ( is_array( $file ) && $this->is_blob_entry( $file['sha'] ?? null, $file['size'] ?? null ) ) {
+				$known[ $file['size'] ][] = $file['sha'];
 			}
 		}
 
 		$legacy = is_array( $source['legacy'] ?? null ) ? $source['legacy'] : [];
 		foreach ( $legacy as $sha => $size ) {
-			if ( is_string( $sha ) && preg_match( '/^[0-9a-f]{40}$/', $sha ) && is_int( $size ) && $size > 0 ) {
+			if ( $this->is_blob_entry( $sha, $size ) ) {
 				$known[ $size ][] = $sha;
 			}
 		}
 
 		return $known;
+	}
+
+	/**
+	 * @param mixed $sha
+	 * @param mixed $size
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_blob_entry( $sha, $size ): bool {
+		return is_string( $sha ) && preg_match( '/^[0-9a-f]{40}$/', $sha ) && is_int( $size ) && $size > 0;
 	}
 
 	/**
@@ -369,9 +397,13 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		foreach ( $files as $file ) {
+			if ( ! is_string( $file ) ) {
+				return false;
+			}
+
 			/* mPDF finds a font by its file name in the fonts folder, so check the copy there */
 			$path = $this->data->template_font_location . basename( $file );
-			if ( ! is_file( $path ) ) {
+			if ( ! is_file( $path ) || ! is_readable( $path ) ) {
 				return false;
 			}
 

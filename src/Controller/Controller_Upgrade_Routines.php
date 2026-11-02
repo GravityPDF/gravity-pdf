@@ -131,7 +131,13 @@ class Controller_Upgrade_Routines {
 		/* The raw option, since get_option() would fall back to the field's Arimo default */
 		$settings = get_option( 'gfpdf_settings', [] );
 
-		if ( ! isset( $settings['default_font'] ) ) {
+		/* update_option() would fatal writing into corrupt settings, which read as empty anyway */
+		if ( ! is_array( $settings ) ) {
+			return;
+		}
+
+		/* An empty font counts as unset: PDFs fall back to DejaVu Sans Condensed while the settings screen shows Arimo */
+		if ( empty( $settings['default_font'] ) ) {
 			$this->options->update_option( 'default_font', $font );
 		}
 	}

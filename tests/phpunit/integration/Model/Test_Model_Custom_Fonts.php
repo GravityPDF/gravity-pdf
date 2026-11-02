@@ -105,6 +105,12 @@ class Test_Model_Custom_Fonts extends TestCase {
 		$this->assertCount( 3, $this->model->get_custom_fonts() );
 	}
 
+	public function test_get_custom_fonts_skips_corrupt_entries() {
+		GPDFAPI::get_options_class()->update_option( 'custom_fonts', [ 'corrupt', 5, null, [ 'id' => 'font1' ] ] );
+
+		$this->assertSame( [ 'font1' ], array_keys( $this->model->get_custom_fonts() ) );
+	}
+
 	public function test_get_font_by_id_success() {
 		$this->model->add_font( [ 'id' => 'font1' ] );
 
