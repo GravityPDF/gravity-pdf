@@ -30,8 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The fonts Gravity PDF provides: the bundled Arimo and DejaVu symbol faces, and mPDF's core fonts
  *
  * A source has `families` (mPDF font data, plus an optional `name` and `listed`), and optionally a bundled `dir`, a
- * `manifest` of its downloadable files, a font list `group` and `legacy` (git blob SHA-1 => size of other copies of
- * its files, which adopt_records() accepts).
+ * `manifest` of its downloadable files, a font list `group`, and `legacy` (git blob SHA-1 => size) or a
+ * `legacy_manifest` of other copies of its files, which adopt_records() accepts.
  *
  * @since 6.19.0
  */
@@ -124,6 +124,14 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected $manifests = [];
+
+	/**
+	 * Each source's legacy manifest by ID, once get_legacy_manifest() reads it
+	 *
+	 * @var array<string, array<string, array{url: string, size: int, sha: string}>>
+	 * @since 6.19.0
+	 */
+	protected $legacy_manifests = [];
 
 	/**
 	 * @since 6.19.0
@@ -433,6 +441,21 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * A source's older copies of its files, keyed by file name, read once
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_legacy_manifest( string $id ): array {
+		if ( ! isset( $this->legacy_manifests[ $id ] ) ) {
+			$this->legacy_manifests[ $id ] = $this->read_manifest_file( $this->get_sources()[ $id ]['legacy_manifest'] ?? '' );
+		}
+
+		return $this->legacy_manifests[ $id ];
+	}
+
+	/**
 	 * A source's downloadable files, keyed by file name, read once
 	 *
 	 * @return array<string, array{url: string, size: int, sha: string}>
@@ -569,7 +592,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			return [];
 		}
 
-		$known   = $this->get_known_files( $source );
+		$known   = $this->get_known_files( $source, $this->get_legacy_manifest( $source_id ) );
 		$records = array_intersect_key( $this->custom_fonts->get_custom_fonts(), $source['families'] );
 
 		/* A source with no known copies can't vouch for any file */
@@ -690,8 +713,10 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	protected function get_core_source(): array {
 		return [
-			'families' => $this->get_mpdf_defaults()['fontdata'],
-			'manifest' => PDF_PLUGIN_DIR . 'fonts/core-fonts.php',
+			'families'        => $this->get_mpdf_defaults()['fontdata'],
+			'manifest'        => PDF_PLUGIN_DIR . 'fonts/core-fonts.php',
+			/* The files the removed Core Font installer downloaded, before the core fonts were dehinted */
+			'legacy_manifest' => PDF_PLUGIN_DIR . 'fonts/core-fonts-v1.0.0.php',
 		];
 	}
 
@@ -703,7 +728,19 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function read_manifest( array $source ): array {
-		$path = $source['manifest'] ?? '';
+		return $this->read_manifest_file( $source['manifest'] ?? '' );
+	}
+
+	/**
+	 * A manifest file's entries, keyed by file name, skipping malformed ones
+	 *
+	 * @param mixed $path
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function read_manifest_file( $path ): array {
 		if ( ! is_string( $path ) || $path === '' ) {
 			return [];
 		}
@@ -752,16 +789,18 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * A source's manifest and `legacy` git blob SHA-1s, keyed by file size
+	 * A source's manifest, legacy manifest and `legacy` git blob SHA-1s, keyed by file size
 	 *
 	 * @return array<int, string[]>
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_known_files( array $source ): array {
+	protected function get_known_files( array $source, array $legacy_manifest ): array {
 		$known = [];
-		foreach ( $this->read_manifest( $source ) as $file ) {
-			$known[ $file['size'] ][] = $file['sha'];
+		foreach ( [ $this->read_manifest( $source ), $legacy_manifest ] as $manifest ) {
+			foreach ( $manifest as $file ) {
+				$known[ $file['size'] ][] = $file['sha'];
+			}
 		}
 
 		foreach ( $source['legacy'] ?? [] as $sha => $size ) {

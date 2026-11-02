@@ -45,10 +45,13 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->downloader = $this->new_downloader();
 		$this->tmp_files  = $this->get_tmp_files();
+
+		/* Only prune() reads it */
+		$this->set_installer_manifest();
 	}
 
 	public function tear_down(): void {
-		wp_delete_file( $this->font_path() );
+		wp_delete_file( $this->font_path( self::FONT ) );
 		$this->remove_font_fixtures();
 		$this->delete_font_failures();
 		delete_transient( Model_Font_Downloader::SYNC_REMAINING );
@@ -62,13 +65,13 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->serve_font_downloads();
 
 		$this->assertTrue( $this->downloader->download( self::FONT ) );
-		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path() );
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/' . self::FONT ], $this->requested );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/' . self::FONT ], $this->requested );
 		$this->assertNoStrayTmpFiles();
 	}
 
 	public function test_download_skips_a_font_already_in_the_fonts_folder() {
-		copy( $this->font_fixture( self::FONT ), $this->font_path() );
+		copy( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
 		$this->serve_font_downloads();
 
 		$this->assertTrue( $this->downloader->download( self::FONT ) );
@@ -100,7 +103,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->serve_font_downloads( $response );
 
 		$this->assertFalse( $this->downloader->download( self::FONT ) );
-		$this->assertFileDoesNotExist( $this->font_path() );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
 		$this->assertNoStrayTmpFiles();
 	}
 
@@ -121,7 +124,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->serve_font_downloads( null, $change );
 
 		$this->assertFalse( $this->downloader->download( self::FONT ) );
-		$this->assertFileDoesNotExist( $this->font_path() );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
 		$this->assertNoStrayTmpFiles();
 		$this->assertCount( 1, $this->log_messages( 'Font Verification Failed' ) );
 	}
@@ -148,7 +151,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 	public function test_a_failed_move_removes_the_download() {
 		/* A folder in the font's place makes rename() fail */
-		mkdir( $this->font_path() );
+		mkdir( $this->font_path( self::FONT ) );
 		$this->serve_font_downloads();
 
 		try {
@@ -156,7 +159,7 @@ class Test_Model_Font_Downloader extends TestCase {
 			$this->assertNoStrayTmpFiles();
 			$this->assertCount( 1, $this->log_messages( 'Font Move Failed' ) );
 		} finally {
-			rmdir( $this->font_path() );
+			rmdir( $this->font_path( self::FONT ) );
 		}
 	}
 
@@ -165,7 +168,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->serve_font_downloads();
 
 		$this->assertFalse( $downloader->download( self::FONT ) );
-		$this->assertFileDoesNotExist( $this->font_path() );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
 		$this->assertNoStrayTmpFiles();
 		$this->assertCount( 1, $this->log_messages( 'Font Move Failed' ) );
 	}
@@ -175,7 +178,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->serve_font_downloads();
 
 		$this->assertFalse( $downloader->download( self::FONT ) );
-		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path() );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
 	}
 
 	/**
@@ -359,6 +362,148 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [], $this->requested );
 	}
 
+	public function test_prune_removes_unmodified_core_fonts_and_licences() {
+		$this->set_installer_manifest( array_combine( static::$core_fixtures, static::$core_fixtures ) + [ 'DejaVuinfo.txt' => 'chewy-LICENSE.txt' ] );
+		$this->copy_fixture( 'chewy-LICENSE.txt', 'DejaVuinfo.txt' );
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		$this->copy_fixture( 'DejaVuSans-Bold.ttf' );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf' );
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->change_font( 'DejaVuSans-Bold.ttf', 'same size, other bytes' );
+		file_put_contents( $this->font_path( 'DejaVuSansCondensed.ttf' ), 'a longer file', FILE_APPEND );
+
+		$removed = $this->downloader->prune( [ 'DejaVuSans.ttf', 'NotOnDisk.ttf' ] );
+
+		$this->assertEqualsCanonicalizing( [ self::FONT, 'DejaVuinfo.txt' ], $removed );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuinfo.txt' ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSans.ttf' ), 'Kept' );
+		$this->assertFileExists( $this->font_path( 'DejaVuSans-Bold.ttf' ), 'Modified, same size' );
+		$this->assertFileExists( $this->font_path( 'DejaVuSansCondensed.ttf' ), 'Modified, other size' );
+		$this->assertFileExists( $this->font_path( 'Chewy.ttf' ), 'Not a core font' );
+
+		$summary = array_values( $this->log_messages( 'Core Font cleanup complete' ) );
+		$this->assertCount( 1, $summary );
+		$this->assertSame(
+			[
+				'removed' => 2,
+				'bytes'   => (int) filesize( $this->font_fixture( self::FONT ) ) + (int) filesize( $this->font_fixture( 'chewy-LICENSE.txt' ) ),
+			],
+			$summary[0]['context']
+		);
+	}
+
+	public function test_prune_never_hashes_kept_files_or_those_of_another_size() {
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		$this->copy_fixture( 'DejaVuSans-Bold.ttf' );
+		file_put_contents( $this->font_path( 'DejaVuSans.ttf' ), 'resized', FILE_APPEND );
+
+		$downloader = new class( ...$this->downloader_args() ) extends Model_Font_Downloader {
+			/** @var string[] */
+			public $hashed = [];
+
+			protected function is_unmodified( string $path, array $entry ): bool {
+				$this->hashed[] = basename( $path );
+
+				return parent::is_unmodified( $path, $entry );
+			}
+		};
+
+		$this->assertSame( [ 'DejaVuSans-Bold.ttf' ], $downloader->prune( [ self::FONT ] ) );
+		$this->assertSame( [ 'DejaVuSans-Bold.ttf' ], $downloader->hashed );
+	}
+
+	public function test_prune_deletes_nothing_without_a_manifest() {
+		$this->set_installer_manifest( [] );
+		$this->copy_fixture( self::FONT );
+
+		$this->assertSame( [], $this->downloader->prune( [] ) );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+		$this->assertCount( 1, $this->log_messages( 'Core Font cleanup skipped as the font manifest could not be read' ) );
+	}
+
+	public function test_prune_keeps_the_fonts_downloads_are_turned_off_for() {
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		add_filter(
+			'gfpdf_auto_install_fonts',
+			static function ( $download, $file ) {
+				return $file !== self::FONT;
+			},
+			10,
+			2
+		);
+
+		$this->assertSame( [ 'DejaVuSans.ttf' ], $this->downloader->prune( [] ) );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+
+		$kept = array_values( $this->log_messages( 'Core Font cleanup kept the fonts that downloads are turned off for' ) );
+		$this->assertSame( [ 'files' => [ self::FONT ] ], $kept[0]['context'] );
+
+		/* Turned off for every font, nothing goes */
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false', 20 );
+		$this->assertSame( [], $this->downloader->prune( [] ) );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+	}
+
+	public function test_prune_logs_a_font_it_could_not_delete() {
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		$font = $this->font_path( self::FONT );
+		add_filter(
+			'wp_delete_file',
+			static function ( $file ) use ( $font ) {
+				return $file === $font ? '' : $file;
+			}
+		);
+
+		$this->assertSame( [ 'DejaVuSans.ttf' ], $this->downloader->prune( [] ) );
+		$this->assertFileExists( $font );
+		$this->assertCount( 1, $this->log_messages( 'Core Font could not be removed' ) );
+	}
+
+	public function test_prune_without_a_fonts_folder_removes_nothing() {
+		$data     = GPDFAPI::get_data_class();
+		$original = $data->template_font_location;
+
+		try {
+			$data->template_font_location = '/tmp/gpdf-missing-fonts-' . uniqid() . '/';
+
+			$this->assertSame( [], $this->downloader->prune( [] ) );
+			$this->assertCount( 1, $this->log_messages( 'Core Font cleanup complete' ) );
+		} finally {
+			$data->template_font_location = $original;
+		}
+	}
+
+	/**
+	 * A deliberate trade-off: a Font Manager record pointing at a core font's file loses it, and mPDF downloads it
+	 * again by name when the font is next used
+	 */
+	public function test_a_custom_font_copying_a_core_font_is_downloaded_again_after_prune() {
+		$this->copy_fixture( self::FONT );
+		$this->add_record( 'serif-copy', [ 'regular' => self::FONT ] );
+
+		$this->assertSame( [ self::FONT ], $this->downloader->prune( [] ) );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
+
+		$this->serve_font_downloads();
+		$fontdata = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_font_data( true );
+		$finder   = $this->downloader->get_font_file_finder(
+			[
+				'fontDir'  => [ GPDFAPI::get_data_class()->template_font_location ],
+				'fontdata' => $fontdata,
+			]
+		);
+
+		$this->assertSame( self::FONT, $fontdata['serif-copy']['R'] );
+		$this->assertSame( $this->font_path( self::FONT ), $finder->findFontFile( $fontdata['serif-copy']['R'] ) );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
+		$this->assertCount( 1, $this->requested );
+	}
+
 	public function test_schedule_sync_queues_one_event_without_arguments() {
 		$this->downloader->schedule_sync();
 		$this->downloader->schedule_sync();
@@ -385,7 +530,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->new_downloader()->sync();
 
 		$this->assertContains( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_manifest()[ self::FONT ]['url'], $this->requested );
-		$this->assertFileExists( $this->font_path() );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
 	}
 
 	public function test_sync_skips_files_already_on_disk() {
@@ -417,7 +562,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$downloader->sync();
 
 		$this->assertCount( 2, $this->requested );
-		$this->assertFileExists( $this->font_path() );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
 		$this->assertFalse( get_transient( Model_Font_Downloader::SYNC_REMAINING ) );
 		$this->assertSame( [], $this->get_scheduled_args() );
 	}
@@ -457,7 +602,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		/* NotAFixture.ttf isn't on the manifest, and FreeSans.ttf has no fixture so fails verification */
 		$this->seamed_sync( [ 'NotAFixture.ttf', 'FreeSans.ttf', self::FONT ] )->sync();
 
-		$this->assertFileExists( $this->font_path() );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
 		$this->assertCount( 2, $this->requested );
 
 		/* The one event is FreeSans's retry */
@@ -552,7 +697,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		/* Minutes later, inside the back-off */
 		$this->seamed_sync( [] )->sync();
 
-		$this->assertFileExists( $this->font_path() );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
 		$this->assertEmpty( $this->get_font_failures() );
 		$this->assertFalse( $this->get_back_off( self::FONT ) );
 		$this->assertSame( [], $this->get_scheduled() );
@@ -866,10 +1011,12 @@ class Test_Model_Font_Downloader extends TestCase {
 	}
 
 	/**
-	 * Where the test font downloads to
+	 * Overwrite the start of a font in the fonts folder, keeping its size
 	 */
-	private function font_path(): string {
-		return GPDFAPI::get_data_class()->template_font_location . self::FONT;
+	private function change_font( string $file, string $bytes ): void {
+		$handle = fopen( $this->font_path( $file ), 'r+' );
+		fwrite( $handle, $bytes );
+		fclose( $handle );
 	}
 
 	/**

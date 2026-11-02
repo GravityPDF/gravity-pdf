@@ -223,7 +223,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 	/**
 	 * Remove the network options stored in sitemeta on a Multisite: license package caches, the rich text merge
-	 * tags flag, the failed font downloads and their back-offs
+	 * tags flag, the failed font downloads and their back-offs, and the 6.19 core font prune flag
 	 *
 	 * Every extension keeps its own license cache entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all
 	 * are network-scoped rather than per-site, so one pass clears them, and the flag's exact key, without walking the
@@ -241,12 +241,13 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key IN ( %s, %s )",
+				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key IN ( %s, %s, %s )",
 				$wpdb->esc_like( 'gpdf_sl_net_' ) . '%',
 				$wpdb->esc_like( '_site_transient_' . Model_Font_Downloader::BACK_OFF_KEY ) . '%',
 				$wpdb->esc_like( '_site_transient_timeout_' . Model_Font_Downloader::BACK_OFF_KEY ) . '%',
 				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS,
-				Model_Font_Downloader::FAILURES
+				Model_Font_Downloader::FAILURES,
+				Model_Font_Downloader::PRUNED
 			)
 		);
 
