@@ -1,0 +1,5 @@
+BaseFont: Arimo-Bold, Arimo-BoldItalic, Arimo-Italic, Arimo-Regular
+arimo: gfpdf-Arimo-Regular.ttf
+arimoB: gfpdf-Arimo-Bold.ttf
+arimoBI: gfpdf-Arimo-BoldItalic.ttf
+arimoI: gfpdf-Arimo-Italic.ttf

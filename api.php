@@ -667,8 +667,17 @@ final class GPDFAPI {
 		$font_name              = $font['font_name'] ?? '';
 		$user_defined_font_list = $installed_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-pdf' ) ] ?? [];
 
+		/* The controller needs a string name, and fails validation on an empty one */
+		$font_name = is_scalar( $font_name ) ? (string) $font_name : '';
+
 		/* Font with same name already exists */
 		if ( in_array( $font_name, $user_defined_font_list, true ) ) {
+			return true;
+		}
+
+		/* A font source already provides it */
+		$font_sources = self::get_mvc_class( 'Model_Font_Sources' );
+		if ( $font_sources instanceof \GFPDF\Model\Model_Font_Sources && $font_sources->is_family_key( self::get_options_class()->get_font_short_name( $font_name ) ) ) {
 			return true;
 		}
 
@@ -681,7 +690,7 @@ final class GPDFAPI {
 		$controller = new \GFPDF\Controller\Controller_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Helper\Fonts\LocalFilesystem', '\GFPDF\Helper\Fonts\LocalFile' );
 
 		$request = new WP_REST_Request();
-		$request->set_param( 'label', $font['font_name'] ?? '' );
+		$request->set_param( 'label', $font_name );
 
 		foreach ( $controller->get_font_keys() as $id ) {
 			if ( isset( $font[ $id ] ) && is_file( $font[ $id ] ) ) {
@@ -727,8 +736,12 @@ final class GPDFAPI {
 		$request = new WP_REST_Request();
 		$request->set_param( 'id', $font_id );
 
-		/** @var \GFPDF\Controller\Controller_Custom_Fonts $controller */
 		$controller = self::get_mvc_class( 'Controller_Custom_Fonts' );
+
+		/* An add-on may have unhooked it */
+		if ( ! $controller instanceof \GFPDF\Controller\Controller_Custom_Fonts ) {
+			return new WP_Error( 'invalid_controller', '', [ 'status' => 500 ] );
+		}
 
 		$response = $controller->delete_item( $request );
 		if ( is_wp_error( $response ) ) {

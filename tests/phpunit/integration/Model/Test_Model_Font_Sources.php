@@ -1,0 +1,564 @@
+<?php
+
+declare( strict_types=1 );
+
+namespace GFPDF\Model;
+
+use GFPDF\Exceptions\GravityPdfIdException;
+use GFPDF\Tests\Concerns\CopiesFontFixtures;
+use GFPDF\Tests\Concerns\UnregistersMvcClasses;
+use GFPDF\Tests\Integration\TestCase;
+use GFPDF_Vendor\Mpdf\Config\FontVariables;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger;
+use GPDFAPI;
+
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2026, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ */
+
+/**
+ * @group model
+ * @group fonts
+ */
+class Test_Model_Font_Sources extends TestCase {
+
+	use CopiesFontFixtures;
+	use UnregistersMvcClasses;
+
+	/**
+	 * @var Model_Font_Sources
+	 */
+	protected $model;
+
+	/**
+	 * @var Model_Custom_Fonts
+	 */
+	protected $custom_fonts;
+
+	/**
+	 * @var string
+	 */
+	protected $font_dir;
+
+	/**
+	 * @var TestHandler
+	 */
+	protected $log;
+
+	public function set_up(): void {
+		parent::set_up();
+
+		$this->model        = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$this->custom_fonts = GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+		$this->font_dir     = GPDFAPI::get_data_class()->template_font_location;
+
+		wp_mkdir_p( $this->font_dir );
+
+		$this->log = new TestHandler();
+		GPDFAPI::get_log_class()->pushHandler( $this->log );
+	}
+
+	public function tear_down(): void {
+		GPDFAPI::get_log_class()->popHandler();
+		$this->remove_font_fixtures();
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+
+		parent::tear_down();
+	}
+
+	public function test_the_bundled_and_core_sources_are_registered() {
+		$sources = $this->model->get_sources();
+
+		$this->assertSame( [ 'bundled', 'core' ], array_keys( $sources ) );
+		$this->assertSame( $this->core_fontdata(), $sources['core']['families'] );
+
+		$arimo = $sources['bundled']['families']['arimo'];
+		foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
+			$this->assertFileExists( $sources['bundled']['dir'] . $arimo[ $style ] );
+		}
+
+		$this->assertFileExists( $sources['bundled']['dir'] . $sources['bundled']['families']['gfpdf-dejavu-symbols']['R'] );
+
+		$this->assertTrue( $this->model->is_family_key( 'arimo' ) );
+		$this->assertTrue( $this->model->is_family_key( 'gfpdf-dejavu-symbols' ) );
+		$this->assertTrue( $this->model->is_family_key( 'dejavusanscondensed' ) );
+		$this->assertFalse( $this->model->is_family_key( 'chewy' ) );
+	}
+
+	public function test_the_bundled_legacy_hashes_are_sha1_to_size() {
+		foreach ( $this->model->get_sources()['bundled']['legacy'] as $sha => $size ) {
+			$this->assertMatchesRegularExpression( '/^[0-9a-f]{40}$/', $sha );
+			$this->assertIsInt( $size );
+		}
+	}
+
+	public function test_mpdf_font_data_registers_arimo_before_custom_fonts() {
+		$this->assertSame( 5, has_filter( 'mpdf_font_data', [ $this->model, 'register_font_data' ] ) );
+
+		$fonts = apply_filters( 'mpdf_font_data', $this->core_fontdata() );
+
+		$this->assertSame(
+			[
+				'R'      => 'gfpdf-Arimo-Regular.ttf',
+				'B'      => 'gfpdf-Arimo-Bold.ttf',
+				'I'      => 'gfpdf-Arimo-Italic.ttf',
+				'BI'     => 'gfpdf-Arimo-BoldItalic.ttf',
+				'useOTL' => 0xFF,
+			],
+			$fonts['arimo']
+		);
+
+		$this->add_record( 'arimo', [ 'regular' => 'Chewy.ttf' ] );
+		$fonts = apply_filters( 'mpdf_font_data', $this->core_fontdata() );
+
+		$this->assertSame( 'Chewy.ttf', $fonts['arimo']['R'] );
+		$this->assertArrayNotHasKey( 'B', $fonts['arimo'] );
+	}
+
+	public function test_mpdf_font_data_leaves_fonts_already_registered() {
+		$fonts = $this->model->register_font_data( [ 'arimo' => [ 'R' => 'Other.ttf' ] ] );
+
+		$this->assertSame( [ 'R' => 'Other.ttf' ], $fonts['arimo'] );
+	}
+
+	public function test_the_bundled_dir_is_appended_to_font_dir() {
+		$this->assertNotFalse( has_filter( 'gfpdf_mpdf_class_config', [ $this->model, 'register_font_directories' ] ) );
+
+		$bundled = PDF_PLUGIN_DIR . 'fonts/';
+		$config  = $this->model->register_font_directories( [ 'fontDir' => [ $this->font_dir ] ] );
+
+		$this->assertSame( [ $this->font_dir, $bundled ], $config['fontDir'] );
+		$this->assertSame( [ $this->font_dir, $bundled ], $this->model->register_font_directories( $config )['fontDir'] );
+		$this->assertSame( [ '/fonts/', $bundled ], $this->model->register_font_directories( [ 'fontDir' => '/fonts/' ] )['fontDir'] );
+	}
+
+	public function test_mpdf_renders_the_bundled_arimo() {
+		$mpdf = new \GFPDF\Helper\Mpdf\Mpdf(
+			apply_filters(
+				'gfpdf_mpdf_class_config',
+				[
+					'fontDir'      => [ get_temp_dir() . 'gfpdf-no-fonts/' ],
+					'fontdata'     => apply_filters( 'mpdf_font_data', $this->core_fontdata() ),
+					'tempDir'      => get_temp_dir(),
+					'default_font' => 'arimo',
+				],
+				[],
+				[],
+				[],
+				null
+			)
+		);
+
+		$mpdf->WriteHTML( '<p style="font-family: arimo"><b>Bold</b> <i>Italic</i> <b><i>Both</i></b> Regular</p>' );
+		$pdf = $mpdf->Output( '', 'S' );
+
+		foreach ( [ 'Arimo-Regular', 'Arimo-Bold', 'Arimo-Italic', 'Arimo-BoldItalic' ] as $face ) {
+			$this->assertStringContainsString( '+' . $face, $pdf );
+		}
+	}
+
+	public function test_arimo_is_listed_first_in_the_unicode_group() {
+		$this->assertSame( 5, has_filter( 'gfpdf_font_list', [ $this->model, 'add_font_list_groups' ] ) );
+
+		$fonts = GPDFAPI::get_pdf_fonts();
+
+		$this->assertSame( 'arimo', array_key_first( $fonts['Unicode'] ) );
+		$this->assertSame( 'Arimo', $fonts['Unicode']['arimo'] );
+		$this->assertSame( 'Dejavu Sans Condensed', $fonts['Unicode']['dejavusanscondensed'] );
+
+		/* Substitution only */
+		foreach ( $fonts as $group ) {
+			$this->assertArrayNotHasKey( 'gfpdf-dejavu-symbols', $group );
+		}
+	}
+
+	public function test_a_custom_font_with_a_source_key_is_listed_once() {
+		$this->add_record( 'arimo', [ 'regular' => 'Chewy.ttf' ] );
+
+		$fonts = GPDFAPI::get_pdf_fonts();
+
+		$this->assertArrayNotHasKey( 'arimo', $fonts['Unicode'] );
+		$this->assertSame( 'arimo', $fonts['User-Defined Fonts']['arimo'] );
+	}
+
+	public function test_the_arimo_default_is_only_for_unsaved_settings() {
+		$field = GPDFAPI::get_options_class()->get_registered_fields()['general_defaults']['default_font'];
+		$this->assertSame( 'arimo', $field['std'] );
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavusanscondensed' );
+		$this->assertSame( 'dejavusanscondensed', GPDFAPI::get_options_class()->get_form_value( $field ) );
+	}
+
+	/**
+	 * @dataProvider provider_default_font
+	 *
+	 * @param mixed[] $fonts
+	 * @param mixed   $global_font The default font setting, as the gfpdf_get_option filter returns it
+	 */
+	public function test_get_default_font( array $fonts, $global_font, string $expected ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () use ( $global_font ) {
+				return $global_font;
+			}
+		);
+
+		$fontdata = $this->model->register_font_data( $this->core_fontdata() );
+
+		$this->assertSame( $expected, $this->model->get_default_font( $fonts, $fontdata ) );
+	}
+
+	public function provider_default_font(): array {
+		return [
+			'the PDF font'                           => [ [ 'dejavusans' ], 'dejavusanscondensed', 'dejavusans' ],
+			'the PDF font in another case'           => [ [ 'DejaVuSans' ], 'dejavusanscondensed', 'dejavusans' ],
+			'the first registered font given'        => [ [ 'notafont', 'freeserif' ], 'dejavusanscondensed', 'freeserif' ],
+			'an mPDF sans-serif name'                => [ [ 'Arial' ], 'dejavusanscondensed', 'arial' ],
+			'a generic family'                       => [ [ 'monospace' ], 'dejavusanscondensed', 'monospace' ],
+			'an mPDF alias to a registered font'     => [ [ 'OCR-B' ], 'dejavusanscondensed', 'ocr-b' ],
+			'an mPDF alias to a font of a kind'      => [ [ 'times' ], 'dejavusanscondensed', 'times' ],
+			'an mPDF alias to an unregistered font'  => [ [ 'comic' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'an mPDF alias as the default font'      => [ [], 'Courier', 'courier' ],
+			'the default font with no PDF font'      => [ [], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'the default font in another case'       => [ [], 'DejaVuSansCondensed', 'dejavusanscondensed' ],
+			'the default font for an empty PDF font' => [ [ '' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'the default font for an unknown font'   => [ [ 'notafont' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'the default font for a non-string font' => [ [ [ 'dejavusans' ], null, 12 ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'Arimo for an unknown default font'      => [ [ 'notafont' ], 'deletedcustomfont', 'arimo' ],
+			'Arimo for an empty default font'        => [ [ 'notafont' ], '', 'arimo' ],
+			'Arimo for a non-string default font'    => [ [], [ 'dejavusans' ], 'arimo' ],
+			'Arimo with nothing set'                 => [ [], false, 'arimo' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_unusable_font_data
+	 */
+	public function test_get_default_font_skips_unusable_font_data( array $fontdata ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () {
+				return 'dejavusanscondensed';
+			}
+		);
+
+		$this->assertSame( 'arimo', $this->model->get_default_font( [ 'dejavusans', 'arial' ], $fontdata ) );
+	}
+
+	public function provider_unusable_font_data(): array {
+		return [
+			'no font data'           => [ [] ],
+			'no font of the kind'    => [ [ 'arial' => 'x', 'dejavusans' => [] ] ],
+			'a string entry'         => [ [ 'dejavusans' => 'DejaVuSans.ttf', 'dejavusanscondensed' => 'x' ] ],
+			'no regular file'        => [ [ 'dejavusans' => [ 'B' => 'DejaVuSans-Bold.ttf' ], 'dejavusanscondensed' => [] ] ],
+			'a non-string regular'   => [ [ 'dejavusans' => [ 'R' => [ 'x' ] ], 'dejavusanscondensed' => [ 'R' => null ] ] ],
+		];
+	}
+
+	public function test_mpdf_starts_in_the_pdfs_font() {
+		$this->assertSame( 5, has_filter( 'gfpdf_mpdf_class_config', [ $this->model, 'set_default_font' ] ) );
+
+		$fontdata = $this->model->register_font_data( $this->core_fontdata() );
+		$config   = $this->model->set_default_font( [ 'fontdata' => $fontdata ], [], [], [ 'font' => 'dejavusans' ] );
+
+		$this->assertSame( 'dejavusans', $config['default_font'] );
+		$this->assertSame( $fontdata, $config['fontdata'] );
+	}
+
+	/**
+	 * @dataProvider provider_junk_default_font_config
+	 *
+	 * @param mixed $config
+	 * @param mixed $settings
+	 */
+	public function test_mpdf_starts_in_arimo_for_a_junk_config_or_settings( $config, $settings ) {
+		$this->assertSame( 'arimo', $this->model->set_default_font( $config, [], [], $settings )['default_font'] );
+	}
+
+	public function provider_junk_default_font_config(): array {
+		$fontdata = [ 'fontdata' => [ 'dejavusans' => [ 'R' => 'DejaVuSans.ttf' ] ] ];
+
+		return [
+			'a string config'      => [ 'config', [ 'font' => 'dejavusans' ] ],
+			'no font data'         => [ [], [ 'font' => 'dejavusans' ] ],
+			'string font data'     => [ [ 'fontdata' => 'fonts' ], [ 'font' => 'dejavusans' ] ],
+			'string settings'      => [ $fontdata, 'settings' ],
+			'a non-string font'    => [ $fontdata, [ 'font' => [ 'dejavusans' ] ] ],
+			'an unregistered font' => [ $fontdata, [ 'font' => 'notafont' ] ],
+		];
+	}
+
+	public function test_adopt_records_removes_a_record_matching_legacy_hashes() {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular85274.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular85274.ttf' ] );
+
+		$this->assertSame( [ 'arimo' ], $model->adopt_records( 'bundled' ) );
+		$this->assertSame( [], $this->custom_fonts->get_custom_fonts() );
+		$this->assertSame( is_multisite(), is_file( $this->font_dir . 'Arimo-Regular85274.ttf' ) );
+	}
+
+	public function test_adopt_records_keeps_an_edited_record() {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->add_record(
+			'arimo',
+			[
+				'regular' => 'Chewy.ttf',
+				'bold'    => 'DejaVuSerifCondensed.ttf',
+			]
+		);
+
+		$this->assertSame( [], $model->adopt_records( 'bundled' ) );
+		$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
+		$this->assertFileExists( $this->font_dir . 'Chewy.ttf' );
+	}
+
+	public function test_adopt_records_keeps_a_record_whose_file_differs_at_the_same_size() {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$path  = $this->font_dir . 'Arimo-Regular.ttf';
+		$bytes       = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$bytes[-1]   = $bytes[-1] === 'x' ? 'y' : 'x';
+		file_put_contents( $path, $bytes ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+
+		$this->assertSame( [], $model->adopt_records( 'bundled' ) );
+		$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
+	}
+
+	public function test_adopt_records_keeps_a_record_with_a_missing_file() {
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-missing.ttf' ] );
+
+		$this->assertSame( [], $this->model->adopt_records( 'bundled' ) );
+		$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
+	}
+
+	public function test_adopt_records_keeps_a_record_with_no_files() {
+		$this->add_record( 'arimo', [] );
+
+		$this->assertSame( [], $this->model->adopt_records( 'bundled' ) );
+	}
+
+	public function test_adopt_records_ignores_records_with_other_keys() {
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->add_record( 'mychewy', [ 'regular' => 'Chewy.ttf' ] );
+
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$this->assertSame( [], $model->adopt_records( 'bundled' ) );
+		$this->assertSame( [], $model->adopt_records( 'unknown' ) );
+		$this->assertArrayHasKey( 'mychewy', $this->custom_fonts->get_custom_fonts() );
+	}
+
+	public function test_a_source_with_no_known_copies_adopts_nothing() {
+		$model         = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$model->legacy = [];
+
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$this->assertSame( [], $model->adopt_records( 'bundled' ) );
+		$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
+	}
+
+	/**
+	 * @dataProvider data_junk_filter_values
+	 *
+	 * @param mixed $value
+	 */
+	public function test_mpdf_font_data_accepts_junk( $value ) {
+		$this->assertArrayHasKey( 'arimo', $this->model->register_font_data( $value ) );
+	}
+
+	/**
+	 * @dataProvider data_junk_filter_values
+	 *
+	 * @param mixed $value
+	 */
+	public function test_the_bundled_dir_is_added_to_a_junk_config( $value ) {
+		$this->assertSame( [ PDF_PLUGIN_DIR . 'fonts/' ], $this->model->register_font_directories( $value )['fontDir'] );
+		$this->assertSame( [ PDF_PLUGIN_DIR . 'fonts/' ], $this->model->register_font_directories( [ 'fontDir' => $value ] )['fontDir'] );
+	}
+
+	/**
+	 * @dataProvider data_junk_filter_values
+	 *
+	 * @param mixed $value
+	 */
+	public function test_the_font_list_accepts_junk( $value ) {
+		$this->assertSame( [ 'Unicode' => [ 'arimo' => 'Arimo' ] ], $this->model->add_font_list_groups( $value ) );
+
+		$fonts = $this->model->add_font_list_groups(
+			[
+				'Unicode' => $value,
+				'Other'   => [ 'garuda' => 'Garuda' ],
+			]
+		);
+		$this->assertSame( [ 'arimo' => 'Arimo' ], $fonts['Unicode'] );
+		$this->assertSame( [ 'garuda' => 'Garuda' ], $fonts['Other'] );
+	}
+
+	public function data_junk_filter_values(): array {
+		return [
+			'null'   => [ null ],
+			'false'  => [ false ],
+			'string' => [ '' ],
+			'int'    => [ 0 ],
+		];
+	}
+
+	/**
+	 * @dataProvider data_non_string_paths
+	 *
+	 * @param mixed $path
+	 */
+	public function test_adopt_records_keeps_a_record_with_a_non_string_path( $path ) {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+
+		GPDFAPI::get_options_class()->update_option(
+			'custom_fonts',
+			[
+				[
+					'id'        => 'arimo',
+					'font_name' => 'arimo',
+					'regular'   => $this->font_dir . 'Arimo-Regular.ttf',
+					'bold'      => $path,
+				],
+			]
+		);
+		$this->recorded_fonts[] = 'arimo';
+
+		$this->assertSame( [], $model->adopt_records( 'bundled' ) );
+		$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
+	}
+
+	public function data_non_string_paths(): array {
+		return [
+			'array' => [ [ 'Arimo-Regular.ttf' ] ],
+			'int'   => [ 5 ],
+			'true'  => [ true ],
+		];
+	}
+
+	public function test_adopt_records_keeps_a_record_with_an_unreadable_file() {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$path = $this->font_dir . 'Arimo-Regular.ttf';
+		chmod( $path, 0000 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+
+		try {
+			if ( is_readable( $path ) ) {
+				$this->markTestSkipped( 'Running as root, so every file is readable' );
+			}
+
+			$this->assertSame( [], $model->adopt_records( 'bundled' ) );
+			$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
+		} finally {
+			chmod( $path, 0644 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+		}
+	}
+
+	public function test_adopt_records_logs_a_record_it_could_not_remove() {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$keep = function ( $value, $old_value ) {
+			return $old_value;
+		};
+		add_filter( 'pre_update_option_gfpdf_settings', $keep, 10, 2 );
+		$adopted = $model->adopt_records( 'bundled' );
+		remove_filter( 'pre_update_option_gfpdf_settings', $keep );
+
+		$this->assert_record_kept( $adopted );
+	}
+
+	public function test_adopt_records_keeps_the_record_when_the_custom_fonts_controller_is_unhooked() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Multisite removes the record through the model' );
+		}
+
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$adopted = $this->without_mvc_class(
+			'Controller_Custom_Fonts',
+			function () use ( $model ) {
+				return $model->adopt_records( 'bundled' );
+			}
+		);
+
+		$this->assert_record_kept( $adopted );
+		$this->assertFileExists( $this->font_dir . 'Arimo-Regular.ttf' );
+	}
+
+	public function test_adopt_records_logs_a_record_removed_elsewhere_on_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Single site removes the record through the API' );
+		}
+
+		$custom_fonts = new class( GPDFAPI::get_options_class() ) extends Model_Custom_Fonts {
+			public function delete_font( string $id ): bool {
+				throw new GravityPdfIdException();
+			}
+		};
+
+		$model = $this->get_model_with_legacy( 'Chewy.ttf', $custom_fonts );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$this->assert_record_kept( $model->adopt_records( 'bundled' ) );
+	}
+
+	public function test_adopt_records_moves_on_after_an_error_removing_a_record() {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Symbols.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+		$this->add_record( 'gfpdf-dejavu-symbols', [ 'regular' => 'Symbols.ttf' ] );
+
+		$thrown = false;
+		$throw_once = function ( $value ) use ( &$thrown ) {
+			if ( $thrown ) {
+				return $value;
+			}
+
+			$thrown = true;
+			throw new \TypeError( 'Broken' );
+		};
+		add_filter( 'pre_update_option_gfpdf_settings', $throw_once );
+
+		try {
+			$adopted = $model->adopt_records( 'bundled' );
+		} finally {
+			remove_filter( 'pre_update_option_gfpdf_settings', $throw_once );
+		}
+
+		$this->assertSame( [ 'gfpdf-dejavu-symbols' ], $adopted );
+		$this->assert_record_kept( [] );
+	}
+
+	/**
+	 * Assert adoption removed nothing because removing the record failed and was logged as an error
+	 */
+	protected function assert_record_kept( array $adopted ): void {
+		$this->assertSame( [], $adopted );
+		$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
+		$this->assertTrue( $this->log->hasRecordThatContains( 'Could not remove a custom font record replaced by a font source', Logger::ERROR ) );
+	}
+
+	protected function core_fontdata(): array {
+		return ( new FontVariables() )->getDefaults()['fontdata'];
+	}
+}

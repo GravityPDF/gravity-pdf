@@ -1,0 +1,2 @@
+BaseFont: Arimo-Regular
+arimo: gfpdf-Arimo-Regular.ttf

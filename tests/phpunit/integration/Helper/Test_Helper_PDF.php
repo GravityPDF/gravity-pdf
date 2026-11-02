@@ -173,6 +173,32 @@ class Test_Helper_PDF extends TestCase {
 		$this->assertInstanceOf( \GFPDF\Helper\Mpdf\Mpdf::class, $this->mpdf_property() );
 	}
 
+	public function test_mpdf_starts_in_the_pdfs_font(): void {
+		$config  = [];
+		$capture = static function ( $mpdf_config ) use ( &$config ) {
+			$config = $mpdf_config;
+
+			return $mpdf_config;
+		};
+		add_filter( 'gfpdf_mpdf_class_config', $capture, PHP_INT_MAX );
+
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( 'dejavusans', $config['default_font'] );
+		$this->assertSame( 'dejavusans', $this->mpdf_property()->default_font );
+	}
+
+	public function test_mpdf_renders_arimo_from_the_bundled_faces() {
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$mpdf = $this->mpdf_property();
+		$mpdf->WriteHTML( '<p style="font-family: arimo">Arimo</p>' );
+
+		$this->assertSame( 'gfpdf-Arimo-Regular.ttf', basename( $mpdf->fonts['arimo']['ttffile'] ) );
+	}
+
 	public function test_init_recreates_a_deleted_tmp_folder_with_its_protection(): void {
 		$data = $this->gfpdf()->data;
 

@@ -103,13 +103,27 @@ export default class GravityForms {
 		});
 	}
 
-	async createForm(title: string, type: string = 'standard.json') {
+	/**
+	 * Create a form from a fixture over REST, returning it
+	 * @param title
+	 * @param type  the fixture in data/forms
+	 * @param patch merged into the fixture before it is saved, as `updateForm()` takes it
+	 */
+	async createForm(
+		title: string,
+		type: string = 'standard.json',
+		patch: object | ((form: any) => object) = {}
+	) {
 		const formJson: string = await readFile(
 			__dirname + '/../data/forms/' + type,
 			'utf8'
 		);
 
-		const form: Form = JSON.parse(formJson);
+		const fixture: Form = JSON.parse(formJson);
+		const form: Form = {
+			...fixture,
+			...(typeof patch === 'function' ? patch(fixture) : patch),
+		};
 
 		/*
 		 * Suffixed, because Gravity Forms de-duplicates titles on create and does it in O(n²):

@@ -938,6 +938,7 @@ class GFPDF\Router implements GFPDF\Helper\Helper_Interface_Actions, GFPDF\Helpe
     public function load_core_font_handler()
     public function load_custom_font_handler(): void
     public function load_debug()
+    public function load_font_sources(): void
     public function mergetags()
     public function pdf()
     public function pdf_cache()
