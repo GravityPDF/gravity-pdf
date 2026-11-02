@@ -71,7 +71,10 @@ class Test_Model_Font_Sources extends TestCase {
 			$this->assertFileExists( $sources['bundled']['dir'] . $arimo[ $style ] );
 		}
 
+		$this->assertFileExists( $sources['bundled']['dir'] . $sources['bundled']['families']['gfpdf-dejavu-symbols']['R'] );
+
 		$this->assertTrue( $this->model->is_family_key( 'arimo' ) );
+		$this->assertTrue( $this->model->is_family_key( 'gfpdf-dejavu-symbols' ) );
 		$this->assertTrue( $this->model->is_family_key( 'dejavusanscondensed' ) );
 		$this->assertFalse( $this->model->is_family_key( 'chewy' ) );
 	}
@@ -156,6 +159,11 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertSame( 'arimo', array_key_first( $fonts['Unicode'] ) );
 		$this->assertSame( 'Arimo', $fonts['Unicode']['arimo'] );
 		$this->assertSame( 'Dejavu Sans Condensed', $fonts['Unicode']['dejavusanscondensed'] );
+
+		/* Substitution only */
+		foreach ( $fonts as $group ) {
+			$this->assertArrayNotHasKey( 'gfpdf-dejavu-symbols', $group );
+		}
 	}
 
 	public function test_a_custom_font_with_a_source_key_is_listed_once() {

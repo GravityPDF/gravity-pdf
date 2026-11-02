@@ -179,6 +179,6 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 * @since 6.18.0
 	 */
 	private function get_agreement_markup( $tick, $label ) {
-		return "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>$tick</span> $label</div>";
+		return "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:gfpdf-dejavu-symbols,sans-serif;'>$tick</span> $label</div>";
 	}
 }

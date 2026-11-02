@@ -43,3 +43,18 @@ font.save(sys.argv[2])
 ```
 
 fontTools stamps the save time into the `head` table, so a rebuild matches these files in size but not byte for byte.
+
+## DejaVu Sans symbols (`gfpdf-dejavu-symbols`)
+
+The symbols Arimo lacks: the arrows, maths, technical, enclosed, box-drawing, geometric, misc-symbol and dingbat
+blocks, including the ✔ and ✖ the Consent and Terms of Service fields draw. It is only used to fill in characters, so
+it isn't offered as a font in the settings.
+
+Source: `DejaVuSans.ttf` version 2.34 from mPDF's `ttfonts/` (git blob `9d40c325694b3bfb8cdd4c0146ad44379d5c4ade`,
+the same file the core fonts provide). Licence: Bitstream Vera and Arev (`LICENSE-DejaVu.txt`); a modified copy
+must not be named "Bitstream" or "Vera". Subset with fontTools 4.59.2 (1,108 glyphs):
+
+```
+python3 -I -m fontTools.subset DejaVuSans.ttf --unicodes=U+2190-23FF,U+2460-27BF,U+2B00-2BFF \
+  --layout-features='*' --notdef-outline --output-file=GravityPDF-DejaVuSansSymbols.ttf
+```

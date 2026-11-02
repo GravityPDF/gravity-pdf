@@ -26,8 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * The fonts Gravity PDF provides: the bundled Arimo faces and mPDF's core fonts
  *
- * A source has a `version` and `families` (mPDF font data plus an optional `name`), and optionally a bundled `dir`, a
- * `manifest`, a font list `group` and `legacy` (git blob SHA-1 => size of other copies of its files).
+ * A source has a `version` and `families` (mPDF font data, plus a `name` on those its font list `group` shows), and
+ * optionally a bundled `dir`, a `manifest`, a `group` and `legacy` (git blob SHA-1 => size of other copies).
  *
  * @since 6.19.0
  */
@@ -141,7 +141,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Prepend each source's families to its font list group, skipping any a custom font overrides
+	 * Prepend each source's named families to its font list group, skipping any a custom font overrides
 	 *
 	 * @param array $fonts The font list, grouped by label
 	 *
@@ -157,8 +157,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 
 			$list = [];
 			foreach ( $source['families'] as $key => $family ) {
-				if ( ! isset( $custom_fonts[ $key ] ) ) {
-					$list[ $key ] = $family['name'] ?? $key;
+				if ( isset( $family['name'] ) && ! isset( $custom_fonts[ $key ] ) ) {
+					$list[ $key ] = $family['name'];
 				}
 			}
 
@@ -284,13 +284,18 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			'dir'      => PDF_PLUGIN_DIR . 'fonts/',
 			'group'    => esc_html__( 'Unicode', 'gravity-pdf' ),
 			'families' => [
-				'arimo' => [
+				'arimo'                => [
 					'name'   => 'Arimo',
 					'R'      => 'GravityPDF-Arimo-Regular.ttf',
 					'B'      => 'GravityPDF-Arimo-Bold.ttf',
 					'I'      => 'GravityPDF-Arimo-Italic.ttf',
 					'BI'     => 'GravityPDF-Arimo-BoldItalic.ttf',
 					'useOTL' => 0xFF,
+				],
+				/* Substitution only, for the symbols Arimo lacks */
+				'gfpdf-dejavu-symbols' => [
+					'R'      => 'GravityPDF-DejaVuSansSymbols.ttf',
+					'useOTL' => 0,
 				],
 			],
 			/* The Arimo copies premium templates install */

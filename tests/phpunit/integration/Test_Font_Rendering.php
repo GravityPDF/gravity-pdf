@@ -61,6 +61,13 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertRenderMatchesSnapshot( 'arimo-substitution', '<p style="font-family: arimo">Agree ✔ Decline ✖</p>' );
 	}
 
+	public function test_consent_ticks_render_from_the_bundled_symbols(): void {
+		$this->assertRenderMatchesSnapshot(
+			'consent-ticks',
+			'<p style="font-family: arimo"><span style="font-family:gfpdf-dejavu-symbols,sans-serif;">&#10004;</span> Agree <span style="font-family:gfpdf-dejavu-symbols,sans-serif;">&#10006;</span> Decline</p>'
+		);
+	}
+
 	public function test_a_core_font_renders_from_the_fonts_folder(): void {
 		$this->assertRenderMatchesSnapshot( 'core-font', '<p style="font-family: dejavusans">Regular <b>Bold</b></p>' );
 	}
