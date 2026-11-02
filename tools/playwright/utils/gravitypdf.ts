@@ -65,6 +65,37 @@ export default class Pdf extends GravityForms {
 	}
 
 	/**
+	 * A PDF's URL with plain permalinks, which work on either permalink structure
+	 * @param pdfId
+	 * @param entryId
+	 */
+	pdfUrl(pdfId: string, entryId: number) {
+		return `/?gpdf=1&pid=${pdfId}&lid=${entryId}`;
+	}
+
+	/**
+	 * A generated PDF, as an administrator
+	 * @param pdfId
+	 * @param entryId
+	 * @param headers e.g. `X-GPDF-E2E-*` ones
+	 */
+	async getPdfBody(
+		pdfId: string,
+		entryId: number,
+		headers: Record<string, string> = {}
+	) {
+		const response = await this.requestUtils.request.get(
+			this.pdfUrl(pdfId, entryId),
+			{ headers }
+		);
+
+		expect(response.status(), await response.text()).toBe(200);
+		expect(response.headers()['content-type']).toBe('application/pdf');
+
+		return await response.body();
+	}
+
+	/**
 	 * A PDF's HTML (?html=1) or $form_data (?data=1), as an administrator with Debug Mode on for the request
 	 * @param pdfId
 	 * @param entryId
@@ -76,7 +107,7 @@ export default class Pdf extends GravityForms {
 		helper: 'html' | 'data' = 'html'
 	) {
 		const response = await this.requestUtils.request.get(
-			`/?gpdf=1&pid=${pdfId}&lid=${entryId}&${helper}=1`,
+			`${this.pdfUrl(pdfId, entryId)}&${helper}=1`,
 			{ headers: { 'X-GPDF-E2E-Debug-Mode': 'yes' } }
 		);
 

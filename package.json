@@ -44,6 +44,8 @@
     "jest-environment-jsdom": "^29.7.0",
     "jquery": "^3.6.0",
     "lost-pixel": "^3.22.0",
+    "pdf-to-png-converter": "~4.0.0",
+    "pdfjs-dist": "~5.7.284",
     "pixelmatch": "^5.3.0",
     "pngjs": "^7.0.0",
     "potomatic": "^1.0.1",

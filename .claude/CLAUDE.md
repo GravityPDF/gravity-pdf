@@ -67,6 +67,10 @@ Artifacts (screenshots, traces) are written to `tmp/artifacts/`.
 
 Baselines only hold on the Linux CI runner, because macOS anti-aliasing differs, so never commit PNGs captured locally. To accept a visual change or seed new shots, add the `update-visual-baselines` label to the PR alongside `run-tests`. The `visual-regression` job then replaces the baselines with that run's shots, reverts any that changed only by capture noise (`yarn visual:prune`) and pushes a `[skip ci]` commit to the branch. To confirm the compare is green, remove the label and push a new commit that doesn't say `[skip ci]` (e.g. fold the baseline commit into the PR's commit and force-push). Re-running the workflow won't do: a re-run replays the original event, label included, so it refreshes the baselines again rather than comparing.
 
+#### PDF snapshots
+
+`tests/playwright/core/pdf-templates/templates.spec.ts` renders each core template's variants. `pdfSnapshot()` compares each PDF's text with `__snapshots__/*.txt` beside the spec and writes every page as a PNG for Lost Pixel, so page baselines follow the label flow above. Text snapshots are OS-independent: refresh them with `yarn test:e2e tests/playwright/core/pdf-templates --update-snapshots`. E2E renders with core fonts only (`tools/mu-plugins/mpdf.php`), so RTL and PDF/A aren't covered.
+
 ### Environment
 
 ```bash

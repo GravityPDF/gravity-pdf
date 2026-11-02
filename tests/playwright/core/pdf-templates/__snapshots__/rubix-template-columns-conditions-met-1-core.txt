@@ -1,0 +1,115 @@
+--- Page 1 of 2 (595x842pt) ---
+TEMPLATE SNAPSHOT COLUMNS
+Before the page break
+Show the optional fields?
+Show
+Half with a legacy class
+Value 10
+Half with a legacy class
+Value 11
+Row 3 text 12
+Value 12
+Row 3 text 13
+Value 13
+Row 3 text 14
+Value 14
+Row 4 text 15
+Value 15
+Row 4 text 16
+Value 16
+Row 5 text 17
+Value 17
+Row 5 text 18
+Value 18
+Row 6 text 19
+Value 19
+Row 6 text 20
+Value 20
+Row 6 text 21
+Value 21
+Row 6 text 22
+Value 22
+Row 7 text 23
+Value 23
+Row 7 text 24
+Value 24
+Row 8 text 25
+Value 25
+Row 8 text 26
+Value 26
+Third with a gap after it
+Value 28
+Row 10 text 29
+Value 29
+Row 10 text 30
+Value 30
+Row 10 text 31
+Value 31
+Row 11 text 62
+Value 62
+Row 11 text 63
+Value 63
+Row 12 text 64
+Value 64
+Row 12 text 65
+Value 65
+Row 13 text 66
+Value 66
+Section between columns
+Section description
+HTML field 33 in a column
+Row 15 text 34
+Value 34
+
+--- Page 2 of 2 (595x842pt) ---
+Row 16 text 35
+Value 35
+Row 16 text 36
+Value 36
+After the page break
+Row 18 text 38
+Value 38
+Row 18 text 39
+Value 39
+Hidden first third
+Value 40
+Row 19 text 41
+Value 41
+Row 19 text 42
+Value 42
+Row 20 text 43
+Value 43
+Hidden middle third
+Value 44
+Row 20 text 45
+Value 45
+Row 21 text 46
+Value 46
+Row 21 text 47
+Value 47
+Hidden last third
+Value 48
+Hidden row half
+Value 49
+Hidden row half
+Value 50
+Row 23 text 51
+Value 51
+Hidden half ending the row
+Value 52
+Row 24 text 53
+Value 53
+Row 24 text 54
+Value 54
+Hidden third with a gap after it
+Value 55
+Row 26 text 56
+Value 56
+Row 26 text 57
+Value 57
+Row 26 text 58
+Value 58
+Row 27 text 59
+Value 59
+Full width
+Value 61

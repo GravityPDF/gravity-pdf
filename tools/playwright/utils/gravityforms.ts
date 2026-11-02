@@ -109,8 +109,15 @@ export default class GravityForms {
 			'utf8'
 		);
 
-		const form: Form = JSON.parse(formJson);
+		return await this.addForm(title, JSON.parse(formJson));
+	}
 
+	/**
+	 * Create a form from a form object over the REST API
+	 * @param title
+	 * @param form
+	 */
+	async addForm(title: string, form: object): Promise<Form> {
 		/*
 		 * Suffixed, because Gravity Forms de-duplicates titles on create and does it in O(n²):
 		 * `maybe_increment_title()` loops candidate suffixes, and each `is_unique_title()` reads every form in
@@ -119,12 +126,10 @@ export default class GravityForms {
 		 * untunable 30 s API timeout by a second and is why `beforeEach` timed out on a different test each run.
 		 * Nothing reads a form back by title: every spec uses the id this returns.
 		 */
-		form.title = `${title} ${Date.now()}`;
-
 		return await this.requestUtils.rest({
 			method: 'POST',
 			path: `/gf/v2/forms`,
-			data: { ...form },
+			data: { ...form, title: `${title} ${Date.now()}` },
 		});
 	}
 

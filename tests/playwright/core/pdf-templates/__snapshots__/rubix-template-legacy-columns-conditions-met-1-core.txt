@@ -1,0 +1,85 @@
+--- Page 1 of 2 (595x842pt) ---
+TEMPLATE SNAPSHOT LEGACY COLUMNS
+Before the page break
+Show the optional fields?
+Show
+Row 2 text 10
+Value 10
+Row 2 text 11
+Value 11
+Row 3 text 12
+Value 12
+Row 3 text 13
+Value 13
+Row 3 text 14
+Value 14
+Row 4 text 15
+Value 15
+Row 4 text 16
+Value 16
+Row 4 text 17
+Value 17
+Row 4 text 18
+Value 18
+Row 5 text 19
+Value 19
+Row 5 text 20
+Value 20
+Third, then a half
+Value 22
+Row 6 text 23
+Value 23
+Third that overflows the row
+Value 24
+Full width
+Value 25
+Section between columns
+Section description
+Half before an HTML field
+Value 28
+HTML field 27 in a column
+Half after an HTML field
+Value 29
+Row 10 text 30
+Value 30
+
+--- Page 2 of 2 (595x842pt) ---
+Half with the pagebreak class
+Value 31
+After the page break
+Row 12 text 33
+Value 33
+Row 12 text 34
+Value 34
+Hidden first third
+Value 35
+Row 13 text 36
+Value 36
+Row 13 text 37
+Value 37
+Row 14 text 38
+Value 38
+Hidden middle third
+Value 39
+Row 14 text 40
+Value 40
+Row 15 text 41
+Value 41
+Row 15 text 42
+Value 42
+Hidden last third
+Value 43
+Hidden row half
+Value 44
+Hidden row half
+Value 45
+Row 17 text 46
+Value 46
+Hidden half ending the row
+Value 47
+Row 18 text 48
+Value 48
+Row 18 text 49
+Value 49
+Row 19 text 50
+Value 50

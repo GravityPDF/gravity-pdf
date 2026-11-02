@@ -150,6 +150,19 @@ if ( $gfpdf_e2e_cache_generation !== '' ) {
 	);
 }
 
+/* Sets the form title for the request, so PDFs print a stable title */
+$gfpdf_e2e_form_title = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_GPDF_E2E_FORM_TITLE'] ?? '' ) );
+if ( $gfpdf_e2e_form_title !== '' ) {
+	add_filter(
+		'gform_form_post_get_meta',
+		static function ( $form ) use ( $gfpdf_e2e_form_title ) {
+			$form['title'] = $gfpdf_e2e_form_title;
+
+			return $form;
+		}
+	);
+}
+
 /* The logged out timeout is a global setting, so the spec testing its cap asks for one per request */
 $gfpdf_e2e_logged_out_timeout = $gfpdf_e2e_header( 'logged_out_timeout' );
 if ( $gfpdf_e2e_logged_out_timeout !== '' ) {

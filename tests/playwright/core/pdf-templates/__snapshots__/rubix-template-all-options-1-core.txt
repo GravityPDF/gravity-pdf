@@ -1,0 +1,130 @@
+--- Page 1 of 5 (612x792pt) ---
+First page header for Template Snapshot All Fields, submitted 1 January 2020
+First page footer, page 1 of 5
+TEMPLATE SNAPSHOT ALL FIELDS
+Your Details
+Visible Single Line Text
+Visible text response
+Paragraph Text
+My paragraph text response over...
+Multiple lines.
+Rich Text Paragraph
+Rich text with bold and italic.
+1. One
+2. Two
+Drop Down
+Option 3
+Multi Select Box
+Multi Select Second Choice
+Third Choice
+Number
+50032145
+Checkbox
+Checkbox Choice 2 Text
+Checkbox Choice 3 Text
+Radio Button
+Radio Second Choice Name
+Hidden Field
+hidden field value
+This is a HTML block
+
+--- Page 2 of 5 (612x792pt) ---
+Header on later pages for Jake Jackson
+Footer on later pages, page 2 of 5
+HTML with bold, italic and a link.
+First item
+Second item
+Section Break
+Section Break Description
+Empty Text
+Administrative Text
+Administrative response
+Contact and Uploads
+Name
+Mr. Jake Middle Jackson MD
+Date
+01/01/2015
+Time
+10:30 am
+Phone
+(555) 678-1210
+Website
+https://gravitypdf.com
+Email
+support@gravitypdf.com
+Address
+12 Address St
+Line 2
+Cityville, Statesman 5000
+Chad
+Second Section Break
+Second section description
+File
+gravityforms-export-2015-01-14.xml
+File
+
+--- Page 3 of 5 (612x792pt) ---
+Header on later pages for Jake Jackson
+Footer on later pages, page 3 of 5
+Basic List
+List Item Response 1
+List Item Response 2
+List Item Response 3
+Extended List
+Column 1 Column 2 Column 3
+List Response Col 1 List Response Col 2 List Response Col 3
+List Response #2 Col 1 List Response #2 Col 2 List Response #2 Col 3
+Consent
+4 I agree to the privacy policy
+Consent description shown under the checkbox.
+Image Choice
+Image Two
+Multiple Choice
+Multi One
+Multi Three
+Post Title
+My Post Title
+Post Excerpt
+My Post Excerpt
+Post Body
+The post body response.
+Post Tags
+tag1, tag2, tag3
+Post Category
+Test Category 2
+Post Image
+
+--- Page 4 of 5 (612x792pt) ---
+Header on later pages for Jake Jackson
+Footer on later pages, page 4 of 5
+Post Image Title
+Post Image caption
+Post Image Description
+Post Custom Field
+post_custom_field
+Post Custom Field
+Post Custom Field
+Your Order
+
+--- Page 5 of 5 (612x792pt) ---
+Header on later pages for Jake Jackson
+Footer on later pages, page 5 of 5
+Credit Card
+Visa
+XXXXXXXXXXXX1111
+Order
+Product Qty Unit Price Price
+Product Basic
+- Product Options for Basic Product: Option 2
+3 $60.00 $180.00
+DD - Second Choice 1 $10.00 $10.00
+Radio - Second Choice 1 $10.00 $10.00
+User Defined Price 1 $30.00 $30.00
+Hidden Price 6 $50.00 $300.00
+Calculation Price
+- Option for Calculation Price: Cal - Option 1
+- Option for Calculation Price: Cal - Option 2
+5 $60.05 $300.25
+Subtotal $830.25
+Shipping (Regular) $30.00
+Total $860.25
