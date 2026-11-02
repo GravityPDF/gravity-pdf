@@ -7,6 +7,7 @@ use GF_Field_Consent;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Statics\Kses;
 
 /**
@@ -125,7 +126,8 @@ class Field_Consent extends Helper_Abstract_Fields {
 	 */
 	protected function get_consented_markup( $label ) {
 		return sprintf(
-			'<span class="consent-tick consent-accepted" style="font-family:gfpdf-dejavu-symbols,sans-serif;">&#10004;</span> <span class="consent-label consent-accepted-label">%s</span>',
+			'<span class="consent-tick consent-accepted" style="font-family:%s,sans-serif;">&#10004;</span> <span class="consent-label consent-accepted-label">%s</span>',
+			Model_Font_Sources::SYMBOLS_FONT,
 			$label
 		);
 	}
@@ -139,7 +141,8 @@ class Field_Consent extends Helper_Abstract_Fields {
 	 */
 	protected function get_non_consent_markup() {
 		return sprintf(
-			'<span class="consent-tick consent-not-accepted" style="font-family:gfpdf-dejavu-symbols,sans-serif;">&#10006;</span> <span class="consent-label consent-not-accepted-label">%s</span>',
+			'<span class="consent-tick consent-not-accepted" style="font-family:%s,sans-serif;">&#10006;</span> <span class="consent-label consent-not-accepted-label">%s</span>',
+			Model_Font_Sources::SYMBOLS_FONT,
 			__( 'Consent not given.', 'gravity-pdf' )
 		);
 	}

@@ -64,7 +64,7 @@ class Controller_Font_Sources extends Helper_Abstract_Controller implements Help
 	 * @since 6.19.0
 	 */
 	public function add_filters() {
-		/* Before the custom fonts, at 10, so a custom font with the same ID overrides a source's */
+		/* Priority 5, so a custom font (10) with the same ID overrides a source's */
 		add_filter( 'mpdf_font_data', [ $this->model, 'register_font_data' ], 5 );
 		add_filter( 'gfpdf_mpdf_class_config', [ $this->model, 'register_font_directories' ] );
 		add_filter( 'gfpdf_font_list', [ $this->model, 'add_font_list_groups' ], 5 );

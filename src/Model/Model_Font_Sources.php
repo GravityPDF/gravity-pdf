@@ -26,8 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * The fonts Gravity PDF provides: the bundled Arimo faces and mPDF's core fonts
  *
- * A source has a `version` and `families` (mPDF font data, plus a `name` on those its font list `group` shows), and
- * optionally a bundled `dir`, a `manifest`, a `group` and `legacy` (git blob SHA-1 => size of other copies).
+ * A source has a `version` and `families` (mPDF font data, plus an optional `name` and `listed`), and optionally a
+ * bundled `dir`, a `manifest`, a font list `group` and `legacy` (git blob SHA-1 => size of other copies).
  *
  * @since 6.19.0
  */
@@ -39,6 +39,13 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	const OPTION = 'gfpdf_font_sources';
+
+	/**
+	 * The bundled DejaVu Sans subset that draws the symbols Arimo lacks
+	 *
+	 * @since 6.19.0
+	 */
+	const SYMBOLS_FONT = 'gfpdf-dejavu-symbols';
 
 	/**
 	 * @var Helper_Data
@@ -103,7 +110,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	/**
 	 * Register each source's families with mPDF, keeping any font already registered
 	 *
-	 * @param array $fonts mPDF font data
+	 * @param mixed $fonts mPDF font data
 	 *
 	 * @since 6.19.0
 	 */
@@ -113,7 +120,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		foreach ( $this->get_sources() as $source ) {
 			foreach ( $source['families'] as $key => $family ) {
 				if ( ! isset( $fonts[ $key ] ) ) {
-					unset( $family['name'] );
+					unset( $family['name'], $family['listed'] );
 					$fonts[ $key ] = $family;
 				}
 			}
@@ -123,7 +130,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @param array $config mPDF config
+	 * @param mixed $config mPDF config
 	 *
 	 * @since 6.19.0
 	 */
@@ -141,7 +148,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Prepend each source's named families to its font list group, skipping any a custom font overrides
+	 * Prepend each source's listed families to its font list group, skipping any a custom font overrides
 	 *
 	 * @param array $fonts The font list, grouped by label
 	 *
@@ -157,8 +164,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 
 			$list = [];
 			foreach ( $source['families'] as $key => $family ) {
-				if ( isset( $family['name'] ) && ! isset( $custom_fonts[ $key ] ) ) {
-					$list[ $key ] = $family['name'];
+				if ( ( $family['listed'] ?? true ) && ! isset( $custom_fonts[ $key ] ) ) {
+					$list[ $key ] = $family['name'] ?? $key;
 				}
 			}
 
@@ -199,8 +206,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Remove the custom font records a source now serves: keyed by one of its families, with every file a known copy.
-	 * A record with any other file was edited, so it stays and keeps overriding.
+	 * Remove the custom font records a source now serves (keyed by one of its families, every file a known copy).
+	 * Edited records stay and keep overriding.
 	 *
 	 * @return string[] The IDs of the records removed
 	 *
@@ -284,7 +291,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			'dir'      => PDF_PLUGIN_DIR . 'fonts/',
 			'group'    => esc_html__( 'Unicode', 'gravity-pdf' ),
 			'families' => [
-				'arimo'                => [
+				'arimo'            => [
 					'name'   => 'Arimo',
 					'R'      => 'GravityPDF-Arimo-Regular.ttf',
 					'B'      => 'GravityPDF-Arimo-Bold.ttf',
@@ -292,10 +299,10 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 					'BI'     => 'GravityPDF-Arimo-BoldItalic.ttf',
 					'useOTL' => 0xFF,
 				],
-				/* Substitution only, for the symbols Arimo lacks */
-				'gfpdf-dejavu-symbols' => [
+				self::SYMBOLS_FONT => [
 					'R'      => 'GravityPDF-DejaVuSansSymbols.ttf',
 					'useOTL' => 0,
+					'listed' => false,
 				],
 			],
 			/* The Arimo copies premium templates install */

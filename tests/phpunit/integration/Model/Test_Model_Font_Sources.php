@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Model;
 
+use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GPDFAPI;
@@ -20,7 +21,7 @@ use GPDFAPI;
  */
 class Test_Model_Font_Sources extends TestCase {
 
-	const FIXTURES = PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/';
+	use CopiesFontFixtures;
 
 	/**
 	 * @var Model_Font_Sources
@@ -37,11 +38,6 @@ class Test_Model_Font_Sources extends TestCase {
 	 */
 	protected $font_dir;
 
-	/**
-	 * @var string[]
-	 */
-	protected $copied = [];
-
 	public function set_up(): void {
 		parent::set_up();
 
@@ -53,8 +49,7 @@ class Test_Model_Font_Sources extends TestCase {
 	}
 
 	public function tear_down(): void {
-		array_map( 'wp_delete_file', $this->copied );
-		GPDFAPI::delete_plugin_option( 'custom_fonts' );
+		$this->remove_font_fixtures();
 		delete_option( Model_Font_Sources::OPTION );
 
 		parent::tear_down();
@@ -297,55 +292,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertSame( [], $this->custom_fonts->get_custom_fonts() );
 	}
 
-	/**
-	 * A model whose bundled source accepts the fixture as a legacy Arimo copy
-	 */
-	protected function get_model_with_legacy( string $fixture ): Model_Font_Sources {
-		$path = self::FIXTURES . $fixture;
-		$size = (int) filesize( $path );
-		$sha  = sha1( 'blob ' . $size . "\0" . file_get_contents( $path ) );
-
-		return new class( GPDFAPI::get_data_class(), $this->custom_fonts, GPDFAPI::get_log_class(), [ $sha => $size ] ) extends Model_Font_Sources {
-			protected $legacy;
-
-			public function __construct( $data, $custom_fonts, $log, array $legacy ) {
-				parent::__construct( $data, $custom_fonts, $log );
-				$this->legacy = $legacy;
-			}
-
-			protected function get_bundled_source(): array {
-				return array_merge( parent::get_bundled_source(), [ 'legacy' => $this->legacy ] );
-			}
-		};
-	}
-
 	protected function core_fontdata(): array {
 		return ( new FontVariables() )->getDefaults()['fontdata'];
-	}
-
-	protected function copy_fixture( string $fixture, string $name = '' ): void {
-		$target = $this->font_dir . ( $name !== '' ? $name : $fixture );
-		copy( self::FIXTURES . $fixture, $target );
-		$this->copied[] = $target;
-	}
-
-	/**
-	 * Save a custom font record as a template's setUp() would, bypassing the unique ID rule
-	 */
-	protected function add_record( string $id, array $files ): void {
-		$font = [
-			'id'          => $id,
-			'font_name'   => $id,
-			'regular'     => '',
-			'italics'     => '',
-			'bold'        => '',
-			'bolditalics' => '',
-		];
-
-		foreach ( $files as $style => $file ) {
-			$font[ $style ] = $this->font_dir . $file;
-		}
-
-		$this->custom_fonts->add_font( $font );
 	}
 }

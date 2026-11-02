@@ -4,10 +4,8 @@ declare( strict_types=1 );
 
 namespace GFPDF\Tests\Integration;
 
-use GFPDF\Helper\Fonts\FlushCache;
-use GFPDF\Model\Model_Custom_Fonts;
-use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Tests\Concerns\AssertsSnapshots;
+use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GPDFAPI;
 use RuntimeException;
@@ -22,13 +20,7 @@ use WP_Error;
 class Test_Font_Rendering extends TestCase {
 
 	use AssertsSnapshots;
-
-	const FIXTURES = PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/';
-
-	/**
-	 * @var string[]
-	 */
-	protected $copied = [];
+	use CopiesFontFixtures;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -43,9 +35,7 @@ class Test_Font_Rendering extends TestCase {
 	}
 
 	public function tear_down(): void {
-		array_map( 'wp_delete_file', $this->copied );
-		GPDFAPI::delete_plugin_option( 'custom_fonts' );
-		FlushCache::flush( 'arimo' );
+		$this->remove_font_fixtures();
 
 		parent::tear_down();
 	}
@@ -74,22 +64,19 @@ class Test_Font_Rendering extends TestCase {
 
 	public function test_a_custom_font_overrides_the_bundled_arimo(): void {
 		$this->copy_fixture( 'Chewy.ttf' );
-		$this->add_record( 'arimo', 'Chewy.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Chewy.ttf' ] );
 
 		$this->assertRenderMatchesSnapshot( 'custom-arimo', '<p style="font-family: arimo">Custom</p>' );
 	}
 
 	public function test_an_adopted_template_arimo_record_renders_the_bundled_faces(): void {
 		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
-		$this->add_record( 'arimo', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
 
 		$this->assertSame( [ 'arimo' ], $this->get_model_with_legacy( 'Chewy.ttf' )->adopt_records( 'bundled' ) );
 		$this->assertRenderMatchesSnapshot( 'adopted-arimo', '<p style="font-family: arimo">Adopted</p>' );
 	}
 
-	/**
-	 * Render the HTML through the PDF pipeline and compare its fonts with the snapshot
-	 */
 	protected function assertRenderMatchesSnapshot( string $name, string $html ): void {
 		$this->assertMatchesSnapshot( "fonts/$name.txt", $this->describe_fonts( $this->render( $html ) ) );
 	}
@@ -168,52 +155,5 @@ class Test_Font_Rendering extends TestCase {
 		sort( $lines );
 
 		return implode( "\n", $lines ) . "\n";
-	}
-
-	/**
-	 * A model whose bundled source accepts the fixture as a legacy Arimo copy
-	 */
-	protected function get_model_with_legacy( string $fixture ): Model_Font_Sources {
-		$path = self::FIXTURES . $fixture;
-		$size = (int) filesize( $path );
-		$sha  = sha1( 'blob ' . $size . "\0" . file_get_contents( $path ) );
-
-		return new class( GPDFAPI::get_data_class(), GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), GPDFAPI::get_log_class(), [ $sha => $size ] ) extends Model_Font_Sources {
-			protected $legacy;
-
-			public function __construct( $data, Model_Custom_Fonts $custom_fonts, $log, array $legacy ) {
-				parent::__construct( $data, $custom_fonts, $log );
-				$this->legacy = $legacy;
-			}
-
-			protected function get_bundled_source(): array {
-				return array_merge( parent::get_bundled_source(), [ 'legacy' => $this->legacy ] );
-			}
-		};
-	}
-
-	protected function copy_fixture( string $fixture, string $name = '' ): void {
-		$target = GPDFAPI::get_data_class()->template_font_location . ( $name !== '' ? $name : $fixture );
-		copy( self::FIXTURES . $fixture, $target );
-		$this->copied[] = $target;
-	}
-
-	/**
-	 * Save a custom font record as a template's setUp() would, bypassing the unique ID rule, and flush its metrics as
-	 * saving one in Font Manager does
-	 */
-	protected function add_record( string $id, string $regular ): void {
-		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->add_font(
-			[
-				'id'          => $id,
-				'font_name'   => $id,
-				'regular'     => GPDFAPI::get_data_class()->template_font_location . $regular,
-				'italics'     => '',
-				'bold'        => '',
-				'bolditalics' => '',
-			]
-		);
-
-		FlushCache::flush( $id );
 	}
 }

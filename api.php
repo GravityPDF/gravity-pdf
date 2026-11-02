@@ -674,7 +674,8 @@ final class GPDFAPI {
 
 		/* A font source already provides it */
 		$font_sources = self::get_mvc_class( 'Model_Font_Sources' );
-		if ( $font_sources && $font_sources->is_family_key( self::get_options_class()->get_font_short_name( (string) $font_name ) ) ) {
+		$short_name   = self::get_options_class()->get_font_short_name( (string) $font_name );
+		if ( $font_sources instanceof \GFPDF\Model\Model_Font_Sources && $font_sources->is_family_key( $short_name ) ) {
 			return true;
 		}
 

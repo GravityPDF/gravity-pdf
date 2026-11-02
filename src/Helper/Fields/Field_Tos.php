@@ -7,6 +7,7 @@ use GF_Field_Checkbox;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Statics\Kses;
 
 /**
@@ -179,6 +180,8 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 * @since 6.18.0
 	 */
 	private function get_agreement_markup( $tick, $label ) {
-		return "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:gfpdf-dejavu-symbols,sans-serif;'>$tick</span> $label</div>";
+		$font = Model_Font_Sources::SYMBOLS_FONT;
+
+		return "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:$font,sans-serif;'>$tick</span> $label</div>";
 	}
 }
