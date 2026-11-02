@@ -27,7 +27,6 @@ class Test_View_Settings extends TestCase {
 
 		parent::set_up();
 
-		/* The Tools tab needs the edit settings capability */
 		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
 
 		$this->data        = new Helper_Data();
@@ -51,12 +50,11 @@ class Test_View_Settings extends TestCase {
 		parent::tear_down();
 	}
 
-	public function test_get_available_tabs_returns_settings_tools_help_by_default() {
+	public function test_get_available_tabs_returns_settings_help_by_default() {
 		$tabs = $this->view->get_available_tabs();
 
-		$this->assertSame( [ 5, 100, 120 ], array_keys( $tabs ) );
+		$this->assertSame( [ 5, 120 ], array_keys( $tabs ) );
 		$this->assertSame( 'general', $tabs[5]['id'] );
-		$this->assertSame( 'tools', $tabs[100]['id'] );
 		$this->assertSame( 'help', $tabs[120]['id'] );
 	}
 
@@ -109,7 +107,7 @@ class Test_View_Settings extends TestCase {
 
 		$tabs = $this->view->get_available_tabs();
 
-		$this->assertSame( [ 5, 10, 20, 100, 120 ], array_keys( $tabs ) );
+		$this->assertSame( [ 5, 10, 20, 120 ], array_keys( $tabs ) );
 	}
 
 	public function test_get_available_tabs_applies_navigation_filter() {

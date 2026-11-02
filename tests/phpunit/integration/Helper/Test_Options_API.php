@@ -280,7 +280,7 @@ class Test_Options_API extends TestCase {
 		$this->assertTrue( isset( $items['general_security'] ) );
 		$this->assertTrue( isset( $items['extensions'] ) );
 		$this->assertTrue( isset( $items['licenses'] ) );
-		$this->assertTrue( isset( $items['tools'] ) );
+		$this->assertArrayNotHasKey( 'tools', $items );
 		$this->assertTrue( isset( $items['form_settings'] ) );
 		$this->assertTrue( isset( $items['form_settings_appearance'] ) );
 		$this->assertTrue( isset( $items['form_settings_advanced'] ) );
@@ -315,13 +315,6 @@ class Test_Options_API extends TestCase {
 		);
 
 		add_filter(
-			'gfpdf_settings_tools',
-			function( $array ) {
-				return 'Tools Settings';
-			}
-		);
-
-		add_filter(
 			'gfpdf_form_settings',
 			function( $array ) {
 				return 'PDF Form Settings';
@@ -349,7 +342,6 @@ class Test_Options_API extends TestCase {
 		$this->assertSame( 'General Security Settings', $items['general_security'] );
 		$this->assertSame( 'Extension Settings', $items['extensions'] );
 		$this->assertSame( 'License Settings', $items['licenses'] );
-		$this->assertSame( 'Tools Settings', $items['tools'] );
 		$this->assertSame( 'PDF Form Settings', $items['form_settings'] );
 		$this->assertSame( 'PDF Form Settings Appearance', $items['form_settings_appearance'] );
 		$this->assertSame( 'PDF Form Settings Advanced', $items['form_settings_advanced'] );
@@ -359,7 +351,6 @@ class Test_Options_API extends TestCase {
 		remove_all_filters( 'gfpdf_settings_general_security' );
 		remove_all_filters( 'gfpdf_settings_extensions' );
 		remove_all_filters( 'gfpdf_settings_licenses' );
-		remove_all_filters( 'gfpdf_settings_tools' );
 		remove_all_filters( 'gfpdf_form_settings' );
 		remove_all_filters( 'gfpdf_form_settings_appearance' );
 		remove_all_filters( 'gfpdf_form_settings_advanced' );

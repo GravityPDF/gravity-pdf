@@ -1135,7 +1135,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$all_settings = $this->get_registered_fields();
 		$tab          = sanitize_key( $referrer['tab'] ?? 'general' );
-		$settings     = ( ! empty( $all_settings[ $tab ] ) && $tab !== 'tools' ) ? $all_settings[ $tab ] : [];
+		$settings     = $all_settings[ $tab ] ?? [];
 
 		/*
 		 * Get all setting types

@@ -52,7 +52,7 @@ pages=(
   "/wp-admin/plugins.php"
   "/wp-admin/admin.php?page=gf_settings&subview=PDF"
   "/wp-admin/admin.php?page=gf_settings&subview=PDF&tab=license"
-  "/wp-admin/admin.php?page=gf_settings&subview=PDF&tab=tools"
+  "/wp-admin/admin.php?page=gf_settings&subview=PDF&tab=help"
   "/wp-admin/admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=$form"
   "/wp-admin/admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=$form&pid=$pid"
   "/wp-admin/admin.php?page=gf_entries&id=$form"

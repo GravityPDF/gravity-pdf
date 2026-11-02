@@ -59,9 +59,6 @@ $(function () {
 	const fmGeneralSettingsTab = document.querySelector(
 		'#gfpdf-settings-field-wrapper-default_font select'
 	);
-	const fmToolsTab = document.querySelector(
-		'#gfpdf-settings-field-wrapper-manage_fonts'
-	);
 	const fmPdfSettings = document.querySelector(
 		'#gfpdf-settings-field-wrapper-font select'
 	);
@@ -74,11 +71,6 @@ $(function () {
 	/* Initialize font manager under general settings tab */
 	if (fmGeneralSettingsTab !== null) {
 		fontManagerBootstrap(fmGeneralSettingsTab);
-	}
-
-	/* Initialize font manager under tools tab  */
-	if (fmToolsTab !== null) {
-		fontManagerBootstrap(fmToolsTab, '-prevent-button-reset');
 	}
 
 	/* Initialize font manager under PDF settings */

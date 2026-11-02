@@ -64,6 +64,7 @@ class Deprecation {
 	protected static function get_providers(): array {
 		return [
 			Deprecation_V3::class,
+			Deprecation_Tools_Tab::class,
 		];
 	}
 

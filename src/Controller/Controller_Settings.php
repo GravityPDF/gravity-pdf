@@ -13,6 +13,7 @@ use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -35,6 +36,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Controller_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+
+	use Helper_Trait_Removed_Methods;
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected static function get_removed_methods(): array {
+		return [
+			'disable_tools_on_view_cap' => '6.19.0',
+		];
+	}
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -153,6 +165,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* Add submenu via a hook */
 		add_action( 'gfpdf_settings_sub_menu', [ $this->view, 'sub_menu' ] );
 
+		add_action( 'admin_init', [ $this, 'redirect_tools_tab' ] );
+
 		/*
 		 * Add AJAX Action Endpoints
 		 */
@@ -204,7 +218,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* change capability needed to edit settings page */
 		add_filter( 'option_page_capability_gfpdf_settings', [ $this, 'edit_options_cap' ] );
-		add_filter( 'gfpdf_settings_navigation', [ $this, 'disable_tools_on_view_cap' ] );
 
 		/* Register add-ons for licensing page */
 		add_filter( 'gfpdf_settings_licenses', [ $this->model, 'register_addons_for_licensing' ] );
@@ -229,10 +242,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		switch ( $page ) {
 			case 'general':
 				$this->view->general();
-				break;
-
-			case 'tools':
-				$this->view->tools();
 				break;
 
 			case 'license':
@@ -277,23 +286,17 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	}
 
 	/**
-	 * Return our custom capability
+	 * Send links to the removed Tools tab, such as bookmarks and old docs, to the General tab
 	 *
-	 * @param array $nav The existing settings navigation
-	 *
-	 * @return array
-	 * @since 4.0
-	 *
+	 * @since 6.19.0
 	 */
-	public function disable_tools_on_view_cap( $nav ) {
-
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			$this->log->notice( 'Lack of User Capabilities' );
-
-			unset( $nav[100] ); /* remove tools tab */
+	public function redirect_tools_tab() {
+		if ( ! $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
+			return;
 		}
 
-		return $nav;
+		wp_safe_redirect( add_query_arg( 'tab', 'general', $this->data->settings_url ) );
+		exit;
 	}
 
 	/**

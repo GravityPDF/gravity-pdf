@@ -118,30 +118,91 @@ class Test_Controller_Settings extends TestCase {
 		remove_filter( 'pre_site_option_active_sitewide_plugins', $network_plugins );
 	}
 
-	/* The Tools tab hooked a View_Settings::uninstaller() template that no longer exists, so __call() flagged it */
-	public function test_tools_tab_hooks_no_missing_view_for_uninstall_capable_user() {
-		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
-		get_userdata( $admin )->add_cap( 'gravityforms_uninstall' );
-		if ( is_multisite() ) {
-			grant_super_admin( $admin );
-		}
-		wp_set_current_user( $admin );
+	/**
+	 * Run the Tools tab redirect for a request, returning where it sent the user or null when it let the page load
+	 */
+	protected function get_tools_tab_redirect( array $query, bool $admin = true ): ?string {
+		$_GET = $query;
+		set_current_screen( $admin ? 'dashboard' : 'front' );
 
-		$incorrect_usage = [];
-		$capture         = static function ( $function_name ) use ( &$incorrect_usage ) {
-			$incorrect_usage[] = $function_name;
+		$location = null;
+		$capture  = static function ( $url ) use ( &$location ) {
+			$location = $url;
+
+			throw new \RuntimeException( 'redirected' );
 		};
-		add_action( 'doing_it_wrong_run', $capture );
 
+		add_filter( 'wp_redirect', $capture );
+
+		try {
+			$this->controller->redirect_tools_tab();
+		} catch ( \RuntimeException $e ) {
+			$this->assertSame( 'redirected', $e->getMessage() );
+		} finally {
+			remove_filter( 'wp_redirect', $capture );
+			set_current_screen( 'front' );
+		}
+
+		return $location;
+	}
+
+	public function test_the_tools_tab_redirect_is_registered() {
 		$this->controller->add_actions();
 
-		ob_start();
-		do_action( 'gfpdf_post_tools_settings_page' );
-		ob_end_clean();
+		$this->assertSame( 10, has_action( 'admin_init', [ $this->controller, 'redirect_tools_tab' ] ) );
+	}
 
-		remove_action( 'doing_it_wrong_run', $capture );
+	public function provider_tools_tab_links(): array {
+		return [
+			'tools tab'       => [ [ 'tab' => 'tools' ] ],
+			'mixed case'      => [ [ 'tab' => 'Tools' ] ],
+			'lowercase PDF'   => [ [ 'subview' => 'pdf', 'tab' => 'tools' ] ],
+			'other query args' => [ [ 'tab' => 'tools', 'foo' => 'bar' ] ],
+		];
+	}
 
-		$this->assertSame( [], $incorrect_usage );
+	/**
+	 * @dataProvider provider_tools_tab_links
+	 */
+	public function test_a_tools_tab_link_redirects_to_the_general_tab( array $query ) {
+		$query += [
+			'page'    => 'gf_settings',
+			'subview' => 'PDF',
+		];
+
+		$this->assertSame( admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=general' ), $this->get_tools_tab_redirect( $query ) );
+	}
+
+	public function provider_untouched_pages(): array {
+		$settings = [
+			'page'    => 'gf_settings',
+			'subview' => 'PDF',
+		];
+
+		return [
+			'general tab'           => [ $settings + [ 'tab' => 'general' ] ],
+			'default tab'           => [ $settings ],
+			'tab as an array'       => [ $settings + [ 'tab' => [ 'tools' ] ] ],
+			'another settings page' => [ [ 'page' => 'gf_settings', 'subview' => 'gravityformsuserregistration', 'tab' => 'tools' ] ],
+			'not a settings page'   => [ [ 'page' => 'gf_entries', 'tab' => 'tools' ] ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_untouched_pages
+	 */
+	public function test_other_pages_are_not_redirected( array $query ) {
+		$this->assertNull( $this->get_tools_tab_redirect( $query ) );
+	}
+
+	public function test_the_front_end_is_not_redirected() {
+		$query = [
+			'page'    => 'gf_settings',
+			'subview' => 'PDF',
+			'tab'     => 'tools',
+		];
+
+		$this->assertNull( $this->get_tools_tab_redirect( $query, false ) );
 	}
 
 	/*

@@ -160,11 +160,6 @@ class View_Settings extends Helper_Abstract_View {
 				'id'   => 'general',
 			],
 
-			100 => [
-				'name' => esc_html__( 'Tools', 'gravity-pdf' ),
-				'id'   => 'tools',
-			],
-
 			120 => [
 				'name' => esc_html__( 'Help', 'gravity-pdf' ),
 				'id'   => 'help',
@@ -407,39 +402,6 @@ class View_Settings extends Helper_Abstract_View {
 
 		/* load the system status view */
 		$this->load( 'help', $vars );
-	}
-
-	/**
-	 * Pull the tools details and show
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	public function tools() {
-
-		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			$this->log->warning( 'Lack of User Capabilities.' );
-
-			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-pdf' ) );
-		}
-
-		$markup             = new View_GravityForm_Settings_Markup();
-		$template_directory = $this->templates->get_template_path();
-		$sections           = $markup->do_settings_fields_as_individual_fieldset( 'gfpdf_settings_tools' );
-
-		$vars = [
-			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),
-			'template_files'                => $this->templates->get_core_pdf_templates(),
-			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
-			'callback'                      => static function () use ( $markup, $sections ) {
-				$markup->do_settings_sections( $sections, true );
-			},
-		];
-
-		/* load the system status view */
-		$this->load( 'tools', $vars );
 	}
 
 	/**
