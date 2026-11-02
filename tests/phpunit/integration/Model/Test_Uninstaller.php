@@ -12,6 +12,7 @@ use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_Uninstall;
 use GFPDF\Statics\Cache;
 use GFPDF\Statics\Deprecation_V3;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -30,6 +31,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group uninstaller
  */
 class Test_Uninstaller extends TestCase {
+
+	use RecordsFontFailures;
 
 	/**
 	 * Our Controller
@@ -125,8 +128,13 @@ class Test_Uninstaller extends TestCase {
 		$this->assertDirectoryExists( $gfpdf->data->template_location );
 		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
 
+		/* A failed download left its back-off */
+		$this->set_back_off( 'Garuda.ttf' );
+
 		/* Uninstall */
 		$this->model->uninstall_plugin();
+
+		$this->assertFalse( $this->get_back_off( 'Garuda.ttf' ) );
 
 		/* Check software was uninstalled */
 		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );

@@ -6,17 +6,17 @@ if [[ -z "$1" ]]; then
 fi
 
 if [[ -z "$2" ]]; then
-	echo "Missing output filename " 1>&2
+	echo "Missing output path" 1>&2
 	exit 1
 fi
 
-# Ensure the payload folder exists
-mkdir -p build/payload
+# Ensure the output folder exists
+mkdir -p "$(dirname "$2")"
 
 # Basic Authentication
 # $3 is a username/password combo
 if [[ -z "$3" ]]; then
-	curl -f -L $1 -o build/payload/$2
+	curl -f -L "$1" -o "$2"
 else
-  curl -f -u "$3" -L $1 -o build/payload/$2
+  curl -f -u "$3" -L "$1" -o "$2"
 fi

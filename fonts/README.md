@@ -58,3 +58,10 @@ must not be named "Bitstream" or "Vera". Subset with fontTools 4.59.2 (1,108 gly
 python3 -I -m fontTools.subset DejaVuSans.ttf --unicodes=U+2190-23FF,U+2460-27BF,U+2B00-2BFF \
   --layout-features='*' --notdef-outline --output-file=gfpdf-DejaVuSansSymbols.ttf
 ```
+
+## Core font manifest (`core-fonts.json`, `core-fonts.php`)
+
+Not fonts: the name, download URL, size and git blob SHA-1 of each mPDF core font, which PDFs download when they need
+one. `yarn prebuild:core-fonts` fetches the JSON from the GitHub contents API and writes the PHP array from it with
+`tools/release/php-payload.php`; the plugin reads the PHP, the Core Font installer the JSON. Don't edit either by
+hand.

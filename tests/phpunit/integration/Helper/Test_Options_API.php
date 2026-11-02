@@ -1627,4 +1627,51 @@ class Test_Options_API extends TestCase {
 
 		$this->assertSame( 'zadani', $settings['form_settings']['template']['std'] );
 	}
+
+	/**
+	 * @dataProvider provider_pdf_font_default
+	 */
+	public function test_the_pdf_font_setting_defaults_to_the_registered_default_font( string $saved, string $expected ) {
+		if ( $saved !== '' ) {
+			$this->options->update_option( 'default_font', $saved );
+		}
+
+		try {
+			$this->assertSame( $expected, $this->options->get_registered_fields()['form_settings_appearance']['font']['std'] );
+		} finally {
+			$this->options->delete_option( 'default_font' );
+		}
+	}
+
+	/**
+	 * @dataProvider provider_filtered_default_font
+	 *
+	 * @param mixed $filtered
+	 */
+	public function test_the_pdf_font_setting_ignores_a_default_font_a_filter_broke( $filtered ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () use ( $filtered ) {
+				return $filtered;
+			}
+		);
+
+		$this->assertSame( 'arimo', $this->options->get_registered_fields()['form_settings_appearance']['font']['std'] );
+	}
+
+	public function provider_filtered_default_font(): array {
+		return [
+			'an array' => [ [ 'dejavusans' ] ],
+			'null'     => [ null ],
+			'a number' => [ 3 ],
+		];
+	}
+
+	public function provider_pdf_font_default(): array {
+		return [
+			'a saved default font'          => [ 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'an unknown saved default font' => [ 'deletedcustomfont', 'arimo' ],
+			'no saved default font'         => [ '', 'arimo' ],
+		];
+	}
 }

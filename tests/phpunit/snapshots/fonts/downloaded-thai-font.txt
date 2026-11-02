@@ -1,0 +1,2 @@
+BaseFont: DejaVuSerifCondensed
+garuda: Garuda.ttf

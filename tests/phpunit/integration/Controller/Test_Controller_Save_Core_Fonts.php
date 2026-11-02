@@ -4,11 +4,15 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Model\Model_Font_Downloader;
+use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Integration\TestCase;
+use GPDFAPI;
 use ReflectionMethod;
-use WP_Error;
 
 /**
+ * The downloads themselves are tested in Test_Model_Font_Downloader
+ *
  * @package GFPDF\Controller
  *
  * @group   controller
@@ -16,29 +20,37 @@ use WP_Error;
  */
 class Test_Controller_Save_Core_Fonts extends TestCase {
 
-	private const FONT = 'DejaVuSerifCondensed.ttf';
-
-	private const DOWNLOAD = self::FONT . '.part';
-
-	private const FIXTURE = PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/' . self::FONT;
+	use UnregistersMvcClasses;
 
 	/**
 	 * @var Controller_Save_Core_Fonts
 	 */
 	private $controller;
 
-	public function set_up(): void {
-		global $gfpdf;
+	/**
+	 * @var Model_Font_Downloader&object{downloads: array<int, array{0: string, 1: bool}>}
+	 */
+	private $downloader;
 
+	public function set_up(): void {
 		parent::set_up();
 
-		$this->controller = new Controller_Save_Core_Fonts( $gfpdf->log, $gfpdf->data, $gfpdf->misc );
+		$this->downloader = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_log_class() ) extends Model_Font_Downloader {
+			/** @var array<int, array{0: string, 1: bool}> The files the controller asked for, and whether it forced them */
+			public $downloads = [];
+
+			public function download( string $file, bool $force = false ): bool {
+				$this->downloads[] = [ $file, $force ];
+
+				return $file === 'DejaVuSerifCondensed.ttf';
+			}
+		};
+
+		$this->controller = new Controller_Save_Core_Fonts( GPDFAPI::get_log_class(), GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), $this->downloader );
 	}
 
 	public function tear_down(): void {
 		unset( $_POST['font_name'] );
-		wp_delete_file( $this->font_path() );
-		wp_delete_file( $this->font_path( self::DOWNLOAD ) );
 
 		parent::tear_down();
 	}
@@ -51,145 +63,47 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		$this->assertNotFalse( has_action( 'wp_ajax_gfpdf_save_core_font', [ $this->controller, 'save_core_font' ] ) );
 	}
 
-	public function test_download_returns_false_when_font_name_missing() {
-		unset( $_POST['font_name'] );
+	public function test_download_forces_the_requested_font_so_a_corrupt_copy_is_replaced() {
+		$_POST['font_name'] = 'DejaVuSerifCondensed.ttf';
 
-		$this->assertFalse( $this->invoke_download() );
+		$this->assertTrue( $this->invoke_download() );
+		$this->assertSame( [ [ 'DejaVuSerifCondensed.ttf', true ] ], $this->downloader->downloads );
 	}
 
-	public function test_download_returns_false_when_font_name_not_on_approved_list() {
+	public function test_download_returns_the_downloaders_failure() {
 		$_POST['font_name'] = 'NotARealFont.ttf';
 
 		$this->assertFalse( $this->invoke_download() );
 	}
 
-	public function test_successful_download_keeps_the_font() {
-		$download = $this->stream_font_with_response( $this->http_response( 200 ) );
-
-		$this->assertTrue( $this->invoke_download() );
-		$this->assertFileExists( $this->font_path() );
-		$this->assertFileDoesNotExist( $download );
-	}
-
-	public function test_successful_download_replaces_the_installed_font() {
-		file_put_contents( $this->seed_font(), 'old' );
-		$this->stream_font_with_response( $this->http_response( 200 ) );
-
-		$this->assertTrue( $this->invoke_download() );
-		$this->assertFileEquals( self::FIXTURE, $this->font_path() );
-	}
-
-	/**
-	 * @dataProvider provider_failed_download
-	 */
-	public function test_failed_download_removes_the_partial_download( $response ) {
-		$download = $this->stream_font_with_response( $response );
+	public function test_download_with_no_font_name_asks_for_nothing_named() {
+		unset( $_POST['font_name'] );
 
 		$this->assertFalse( $this->invoke_download() );
-		$this->assertFileDoesNotExist( $download );
-		$this->assertFileDoesNotExist( $this->font_path() );
+		$this->assertSame( [ [ '', true ] ], $this->downloader->downloads );
 	}
 
-	public function provider_failed_download(): array {
-		return [
-			'request error' => [ new WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' ) ],
-			'rate limited'  => [ $this->http_response( 429 ) ],
-			'server error'  => [ $this->http_response( 500 ) ],
-		];
-	}
-
-	/**
-	 * @dataProvider provider_unexpected_download
-	 */
-	public function test_download_that_does_not_match_the_font_list_is_removed( callable $change ) {
-		$download = $this->stream_font_with_response( $this->http_response( 200 ) );
-
-		$handle = fopen( $download, 'r+' );
-		$change( $handle );
-		fclose( $handle );
+	public function test_a_font_name_that_is_not_a_string_asks_for_nothing_named() {
+		$_POST['font_name'] = [ 'DejaVuSerifCondensed.ttf' ];
 
 		$this->assertFalse( $this->invoke_download() );
-		$this->assertFileDoesNotExist( $download );
-		$this->assertFileDoesNotExist( $this->font_path() );
+		$this->assertSame( [ [ '', true ] ], $this->downloader->downloads );
 	}
 
-	public function provider_unexpected_download(): array {
-		return [
-			'truncated' => [
-				function ( $handle ) {
-					ftruncate( $handle, 1024 );
-				},
-			],
-			'same size' => [
-				function ( $handle ) {
-					fwrite( $handle, 'x' );
-				},
-			],
-		];
-	}
+	public function test_without_a_downloader_it_uses_the_registered_one() {
+		$this->controller   = new Controller_Save_Core_Fonts( GPDFAPI::get_log_class(), GPDFAPI::get_data_class(), GPDFAPI::get_misc_class() );
+		$_POST['font_name'] = 'DejaVuSerifCondensed.ttf';
 
-	public function test_blocked_request_keeps_the_installed_font() {
-		$font = $this->seed_font();
-
-		$_POST['font_name'] = self::FONT;
-		add_filter(
-			'pre_http_request',
-			static function () {
-				return new WP_Error( 'http_request_not_executed', 'User has blocked requests through HTTP.' );
+		$downloaded = $this->with_mvc_class(
+			'Model_Font_Downloader',
+			$this->downloader,
+			function () {
+				return $this->invoke_download();
 			}
 		);
 
-		$this->assertFalse( $this->invoke_download() );
-		$this->assertFileExists( $font );
-	}
-
-	public function test_unapproved_font_leaves_existing_files_alone() {
-		$font = $this->seed_font();
-
-		$_POST['font_name'] = '../' . self::FONT;
-
-		$this->assertFalse( $this->invoke_download() );
-		$this->assertFileExists( $font );
-	}
-
-	private function font_path( string $name = self::FONT ): string {
-		global $gfpdf;
-
-		return $gfpdf->data->template_font_location . $name;
-	}
-
-	/**
-	 * Writes the font to the font folder, as installed or as WordPress streams a download
-	 */
-	private function seed_font( string $name = self::FONT ): string {
-		global $gfpdf;
-
-		$font = $this->font_path( $name );
-		wp_mkdir_p( $gfpdf->data->template_font_location );
-		copy( self::FIXTURE, $font );
-
-		return $font;
-	}
-
-	private function stream_font_with_response( $response ): string {
-		$_POST['font_name'] = self::FONT;
-		add_filter(
-			'pre_http_request',
-			static function () use ( $response ) {
-				return $response;
-			}
-		);
-
-		return $this->seed_font( self::DOWNLOAD );
-	}
-
-	private function http_response( int $code ): array {
-		return [
-			'headers'  => [],
-			'body'     => '',
-			'response' => [ 'code' => $code ],
-			'cookies'  => [],
-		];
+		$this->assertTrue( $downloaded );
+		$this->assertSame( [ [ 'DejaVuSerifCondensed.ttf', true ] ], $this->downloader->downloads );
 	}
 
 	private function invoke_download() {
@@ -197,6 +111,7 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		if ( PHP_VERSION_ID < 80100 ) {
 			$ref->setAccessible( true );
 		}
+
 		return $ref->invoke( $this->controller );
 	}
 }

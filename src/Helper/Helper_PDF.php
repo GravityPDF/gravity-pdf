@@ -8,6 +8,7 @@ use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF\Helper\Mpdf\Mpdf;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Signed_Url_Trust;
 use GFPDF\Statics\Template_Constants;
 use GFPDF_Vendor\Mpdf\MpdfException;
@@ -208,35 +209,54 @@ class Helper_PDF {
 	protected $log;
 
 	/**
+	 * @var Model_Font_Downloader|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $downloader;
+
+	/**
 	 * Initialise our class
 	 *
-	 * @param array                $entry    The Gravity Form Entry to be processed
-	 * @param array                $settings The Gravity PDF Settings Array
-	 * @param Helper_Abstract_Form $gform
-	 * @param Helper_Data          $data
-	 * @param Helper_Misc          $misc
-	 * @param Helper_Templates     $templates
-	 * @param LoggerInterface      $log
+	 * @param array                      $entry      The Gravity Form Entry to be processed
+	 * @param array                      $settings   The Gravity PDF Settings Array
+	 * @param Helper_Abstract_Form       $gform
+	 * @param Helper_Data                $data
+	 * @param Helper_Misc                $misc
+	 * @param Helper_Templates           $templates
+	 * @param LoggerInterface            $log
+	 * @param Model_Font_Downloader|null $downloader Defaults to the registered downloader
 	 *
 	 * @since 4.0
+	 * @since 6.19.0 Takes the font downloader
 	 */
-	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log ) {
+	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log, ?Model_Font_Downloader $downloader = null ) {
 
 		/* Assign our internal variables */
-		$this->entry     = $entry;
-		$this->settings  = $settings;
-		$this->gform     = $gform;
-		$this->data      = $data;
-		$this->misc      = $misc;
-		$this->templates = $templates;
-		$this->log       = $log;
-		$this->form      = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
+		$this->entry      = $entry;
+		$this->settings   = $settings;
+		$this->gform      = $gform;
+		$this->data       = $data;
+		$this->misc       = $misc;
+		$this->templates  = $templates;
+		$this->log        = $log;
+		$this->downloader = $downloader;
+		$this->form       = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
 
 		$this->set_path();
 		$this->set_print_dialog( ! empty( $settings['print'] ) );
 
 		/* The earliest point common to every render path, and the only scope the v3 template constants exist in */
 		Template_Constants::maybe_define( $data, $templates );
+	}
+
+	/**
+	 * The injected downloader, else the registered one
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloader(): Model_Font_Downloader {
+		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
 	}
 
 	/**
@@ -739,54 +759,51 @@ class Helper_PDF {
 		/* A deleted tmp folder is recreated with its protection, before mPDF makes it without */
 		$this->misc->create_mpdf_cache_folders();
 
-		$default_font_config = ( new FontVariables() )->getDefaults();
+		$defaults = [
+			'fontDir'                => [ $this->data->template_font_location ],
+			'fontdata'               => apply_filters( 'mpdf_font_data', ( new FontVariables() )->getDefaults()['fontdata'] ),
+			'tempDir'                => $this->data->mpdf_tmp_location,
 
-		$this->mpdf = new Mpdf(
-			apply_filters(
-				'gfpdf_mpdf_class_config',
-				[
-					'fontDir'                => [ $this->data->template_font_location ],
-					'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
-					'tempDir'                => $this->data->mpdf_tmp_location,
+			'allow_output_buffering' => true,
+			'autoLangToFont'         => true,
+			'useSubstitutions'       => true,
+			'ignore_invalid_utf8'    => true,
+			'setAutoTopMargin'       => 'stretch',
+			'setAutoBottomMargin'    => 'stretch',
+			'enableImports'          => true,
+			'use_kwt'                => true,
+			'keepColumns'            => true,
+			'biDirectional'          => true,
+			'showWatermarkText'      => true,
+			'showWatermarkImage'     => true,
 
-					'allow_output_buffering' => true,
-					'autoLangToFont'         => true,
-					'useSubstitutions'       => true,
-					'ignore_invalid_utf8'    => true,
-					'setAutoTopMargin'       => 'stretch',
-					'setAutoBottomMargin'    => 'stretch',
-					'enableImports'          => true,
-					'use_kwt'                => true,
-					'keepColumns'            => true,
-					'biDirectional'          => true,
-					'showWatermarkText'      => true,
-					'showWatermarkImage'     => true,
+			'format'                 => $this->paper_size,
+			'orientation'            => $this->orientation,
 
-					'format'                 => $this->paper_size,
-					'orientation'            => $this->orientation,
+			'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
 
-					'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
+			'exposeVersion'          => false,
+		];
 
-					'exposeVersion'          => false,
-				],
-				$this->form,
-				$this->entry,
-				$this->settings,
-				$this
-			),
-			new SimpleContainer(
-				apply_filters(
-					'gfpdf_mpdf_class_container',
-					[
-						'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
-					],
-					$this->form,
-					$this->entry,
-					$this->settings,
-					$this
-				)
-			)
-		);
+		$config = apply_filters( 'gfpdf_mpdf_class_config', $defaults, $this->form, $this->entry, $this->settings, $this );
+		if ( ! is_array( $config ) ) {
+			$this->log->error( 'The gfpdf_mpdf_class_config filter did not return an array, so it was ignored' );
+			$config = $defaults;
+		}
+
+		$services = [
+			'httpClient'     => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
+			/* Built from the filtered config so it searches every font directory */
+			'fontFileFinder' => $this->get_downloader()->get_font_file_finder( $config ),
+		];
+
+		$container = apply_filters( 'gfpdf_mpdf_class_container', $services, $this->form, $this->entry, $this->settings, $this );
+		if ( ! is_array( $container ) ) {
+			$this->log->error( 'The gfpdf_mpdf_class_container filter did not return an array, so it was ignored' );
+			$container = $services;
+		}
+
+		$this->mpdf = new Mpdf( $config, new SimpleContainer( $container ) );
 
 		/* Tag everything mPDF logs, from remote fetches to its statistics, with the PDF it belongs to */
 		$this->mpdf->setLogger(

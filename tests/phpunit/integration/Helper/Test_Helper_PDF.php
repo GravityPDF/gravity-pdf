@@ -5,10 +5,18 @@ declare( strict_types=1 );
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Tests\Concerns\AccessesPrivateState;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Concerns\SpawnsPhpProcesses;
 use GFPDF\Tests\Concerns\UsesLockableTmpLocation;
+use GFPDF\Helper\Mpdf\On_Demand_Font_File_Finder;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Tests\Integration\TestCase;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger;
+use GFPDF_Vendor\Mpdf\Fonts\FontFileFinder;
+use GFPDF_Vendor\Mpdf\Mpdf as MpdfCore;
+use GPDFAPI;
 
 /**
  * @group   helper
@@ -16,6 +24,7 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Helper_PDF extends TestCase {
 
+	use AccessesPrivateState;
 	use CreatesLegacyTemplates;
 	use SpawnsPhpProcesses;
 	use UsesLockableTmpLocation;
@@ -170,7 +179,102 @@ class Test_Helper_PDF extends TestCase {
 
 		$this->pdf->init();
 
-		$this->assertInstanceOf( \GFPDF\Helper\Mpdf\Mpdf::class, $this->mpdf_property() );
+		$this->assertInstanceOf( \GFPDF\Helper\Mpdf\Mpdf::class, $this->pdf->get_pdf_class() );
+	}
+
+	public function test_mpdf_finds_fonts_with_the_on_demand_finder() {
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$finder = $this->get_private( $this->pdf->get_pdf_class(), 'fontFileFinder', MpdfCore::class );
+
+		$this->assertInstanceOf( On_Demand_Font_File_Finder::class, $finder );
+		$this->assertSame( 'DejaVuSans.ttf', $this->get_private( $finder, 'default_font_file' ) );
+
+		/* The bundled fonts' directory arrives through gfpdf_mpdf_class_config */
+		$this->assertSame(
+			[ GPDFAPI::get_data_class()->template_font_location, PDF_PLUGIN_DIR . 'fonts/' ],
+			$this->get_private( $finder, 'directories', FontFileFinder::class )
+		);
+	}
+
+	/**
+	 * @dataProvider provider_broken_mpdf_filters
+	 *
+	 * @param mixed $junk
+	 */
+	public function test_a_filter_that_breaks_the_mpdf_config_or_container_is_ignored( string $filter, $junk ) {
+		global $gfpdf;
+
+		$return_junk = static function () use ( $junk ) {
+			return $junk;
+		};
+		add_filter( $filter, $return_junk, PHP_INT_MAX );
+
+		$log = new TestHandler();
+		$gfpdf->log->pushHandler( $log );
+		try {
+			$this->pdf->set_output_type( 'SAVE' );
+			$this->pdf->init();
+		} finally {
+			$gfpdf->log->popHandler();
+		}
+
+		$this->assertInstanceOf( On_Demand_Font_File_Finder::class, $this->get_private( $this->pdf->get_pdf_class(), 'fontFileFinder', MpdfCore::class ) );
+		$this->assertTrue(
+			$log->hasRecordThatPasses(
+				static function ( $record ) use ( $filter ) {
+					return $record['message'] === "The $filter filter did not return an array, so it was ignored";
+				},
+				Logger::ERROR
+			)
+		);
+	}
+
+	public function provider_broken_mpdf_filters(): array {
+		return [
+			'config: null'      => [ 'gfpdf_mpdf_class_config', null ],
+			'config: a string'  => [ 'gfpdf_mpdf_class_config', 'config' ],
+			'container: false'  => [ 'gfpdf_mpdf_class_container', false ],
+			'container: object' => [ 'gfpdf_mpdf_class_container', new \stdClass() ],
+		];
+	}
+
+	public function test_mpdf_finds_fonts_with_the_injected_downloader() {
+		global $gfpdf;
+
+		$finder     = null;
+		$downloader = $this->createMock( Model_Font_Downloader::class );
+		$downloader->expects( $this->once() )
+			->method( 'get_font_file_finder' )
+			->willReturnCallback(
+				function ( array $config ) use ( $downloader, &$finder ) {
+					$finder = new On_Demand_Font_File_Finder( $config['fontDir'], $downloader, '' );
+
+					return $finder;
+				}
+			);
+
+		$pdf = new Helper_PDF( $this->entry( 'gravityform-1' ), $this->get_private( $this->pdf, 'settings' ), $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log, $downloader );
+		$pdf->set_output_type( 'SAVE' );
+		$pdf->init();
+
+		$this->assertSame( $finder, $this->get_private( $pdf->get_pdf_class(), 'fontFileFinder', MpdfCore::class ) );
+	}
+
+	public function test_an_add_on_can_replace_the_font_finder() {
+		$finder  = new FontFileFinder( [ GPDFAPI::get_data_class()->template_font_location ] );
+		$replace = static function ( $services ) use ( $finder ) {
+			$services['fontFileFinder'] = $finder;
+
+			return $services;
+		};
+		add_filter( 'gfpdf_mpdf_class_container', $replace );
+
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( $finder, $this->get_private( $this->pdf->get_pdf_class(), 'fontFileFinder', MpdfCore::class ) );
 	}
 
 	public function test_mpdf_starts_in_the_pdfs_font(): void {
@@ -186,14 +290,14 @@ class Test_Helper_PDF extends TestCase {
 		$this->pdf->init();
 
 		$this->assertSame( 'dejavusans', $config['default_font'] );
-		$this->assertSame( 'dejavusans', $this->mpdf_property()->default_font );
+		$this->assertSame( 'dejavusans', $this->pdf->get_pdf_class()->default_font );
 	}
 
 	public function test_mpdf_renders_arimo_from_the_bundled_faces() {
 		$this->pdf->set_output_type( 'SAVE' );
 		$this->pdf->init();
 
-		$mpdf = $this->mpdf_property();
+		$mpdf = $this->pdf->get_pdf_class();
 		$mpdf->WriteHTML( '<p style="font-family: arimo">Arimo</p>' );
 
 		$this->assertSame( 'gfpdf-Arimo-Regular.ttf', basename( $mpdf->fonts['arimo']['ttffile'] ) );
@@ -408,29 +512,21 @@ class Test_Helper_PDF extends TestCase {
 
 		$this->pdf->set_creator( 'Custom Creator' );
 
-		$this->assertSame( 'Custom Creator', $this->mpdf_property()->creator );
+		$this->assertSame( 'Custom Creator', $this->pdf->get_pdf_class()->creator );
 	}
 
 	public function test_get_pdf_class_returns_the_mpdf_instance_set_js_writes_to(): void {
 		$this->pdf->set_output_type( 'SAVE' );
 		$this->pdf->init();
 
-		$this->assertSame( $this->mpdf_property(), $this->pdf->get_pdf_class() );
+		$this->assertSame( $this->get_private( $this->pdf, 'mpdf' ), $this->pdf->get_pdf_class() );
 
 		$this->pdf->set_JS( 'this.print();' );
-		$this->assertSame( 'this.print();', $this->mpdf_property()->js );
+		$this->assertSame( 'this.print();', $this->pdf->get_pdf_class()->js );
 	}
 
 	private function use_scratch_path( string $filename ): void {
 		$this->pdf->set_path( $this->gfpdf()->data->template_tmp_location . 'test-save-' . uniqid() );
 		$this->pdf->set_filename( $filename );
-	}
-
-	private function mpdf_property() {
-		$ref = new \ReflectionProperty( $this->pdf, 'mpdf' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$ref->setAccessible( true );
-		}
-		return $ref->getValue( $this->pdf );
 	}
 }

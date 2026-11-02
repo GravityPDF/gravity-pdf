@@ -208,6 +208,9 @@ directory. Use `HasGfpdfFixtures::copy_test_fonts()` /  `remove_test_fonts()`
 from `set_up_before_class()` / `tear_down_after_class()`. See `Model/Test_PDF.php`
 and `Controller/Test_Controller_PDF.php` for usage.
 
+A render that misses a font downloads it from `raw.githubusercontent.com`. The bootstrap blocks those requests
+and fails the test, so serve the fixture with `CopiesFontFixtures::serve_font_downloads()`.
+
 ## The "test if non-trivial" rule
 
 Skip a `Test_*.php` for a class that is:

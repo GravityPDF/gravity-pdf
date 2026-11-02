@@ -326,10 +326,12 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		];
 	}
 
-	public function test_6_19_0_adopts_a_template_arimo_record() {
+	public function test_6_19_0_adopts_template_arimo_and_core_font_records() {
 		wp_mkdir_p( \GPDFAPI::get_data_class()->template_font_location );
 		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
 		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf', 'DejaVuSansCondensed85274.ttf' );
+		$this->add_record( 'dejavusanscondensed', [ 'regular' => 'DejaVuSansCondensed85274.ttf' ] );
 
 		$log = new TestHandler();
 		\GPDFAPI::get_log_class()->pushHandler( $log );
@@ -348,7 +350,7 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 			\GPDFAPI::get_log_class()->popHandler();
 		}
 
-		$this->assertArrayNotHasKey( 'arimo', \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->get_custom_fonts() );
+		$this->assertSame( [], \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->get_custom_fonts() );
 		$this->assertFalse( $log->hasRecordThatContains( 'Could not remove a custom font record', Logger::ERROR ) );
 	}
 
