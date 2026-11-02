@@ -47,7 +47,6 @@ class Test_Font_Rendering extends TestCase {
 		static::copy_test_fonts();
 
 		$this->delete_font_failures();
-		wp_clear_scheduled_hook( Model_Core_Font_Downloader::RETRY_EVENT );
 		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
@@ -135,11 +134,11 @@ class Test_Font_Rendering extends TestCase {
 	}
 
 	public function test_a_render_with_its_fonts_on_disk_does_not_load_the_manifest(): void {
-		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' ), 'manifest', null );
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'manifest', null );
 
 		$this->render( '<p style="font-family: dejavusans">Regular <b>Bold</b></p>' );
 
-		$this->assertNull( $this->get_private( GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' ), 'manifest' ) );
+		$this->assertNull( $this->get_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'manifest' ) );
 	}
 
 	public function test_a_missing_core_font_downloads_while_rendering(): void {

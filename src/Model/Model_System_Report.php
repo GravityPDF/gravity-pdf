@@ -241,9 +241,9 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function get_core_fonts_installed(): array {
-		$downloader = GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
-		$counts     = [];
-		foreach ( $downloader instanceof Model_Core_Font_Downloader ? $downloader->get_installed_counts() : [] as $source => $count ) {
+		$required_fonts = GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
+		$counts         = [];
+		foreach ( $required_fonts instanceof Model_Required_Fonts ? $required_fonts->get_installed_counts() : [] as $source => $count ) {
 			$counts[] = $count['manifest']
 				? sprintf( '%s: %d of %d required files installed', $source, $count['installed'], $count['total'] )
 				: sprintf( '%s: manifest missing', $source );

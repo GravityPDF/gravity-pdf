@@ -94,6 +94,22 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $language_font_keys;
 
 	/**
+	 * Each manifest read this request, by path
+	 *
+	 * @var array<string, array<string, array{url: string, size: int, sha: string}>>
+	 * @since 6.19.0
+	 */
+	protected $manifests = [];
+
+	/**
+	 * Every source's downloadable files, keyed by file name
+	 *
+	 * @var array<string, array{url: string, size: int, sha: string}>|null
+	 * @since 6.19.0
+	 */
+	protected $manifest;
+
+	/**
 	 * @since 6.19.0
 	 */
 	public function __construct( Helper_Data $data, Model_Custom_Fonts $custom_fonts, LoggerInterface $log ) {
@@ -266,7 +282,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		$fonts    = array_merge( [ self::SYMBOLS_FONT, 'dejavusanscondensed', 'freesans' ], $this->get_language_font_keys() );
 
 		$sun_exta = $fontdata['sun-exta']['R'] ?? '';
-		if ( is_string( $sun_exta ) && $sun_exta !== '' && is_file( $this->data->template_font_location . $sun_exta ) ) {
+		if ( is_string( $sun_exta ) && $sun_exta !== '' && $this->is_downloaded( $sun_exta ) ) {
 			$fonts[] = 'sun-exta';
 		}
 
@@ -291,6 +307,61 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		if ( $path === '' ) {
 			return [];
 		}
+
+		if ( ! isset( $this->manifests[ $path ] ) ) {
+			$this->manifests[ $path ] = $this->parse_manifest( $path );
+		}
+
+		return $this->manifests[ $path ];
+	}
+
+	/**
+	 * Downloadable files across all sources, keyed by file name, loaded only when a file is needed
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_manifest(): array {
+		if ( $this->manifest === null ) {
+			$this->manifest = [];
+			foreach ( $this->get_sources() as $source ) {
+				$this->manifest += $this->read_manifest( (string) ( $source['manifest'] ?? '' ) );
+			}
+		}
+
+		return $this->manifest;
+	}
+
+	/**
+	 * Whether a file is a font on the manifest, not one of its licence files
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_core_font_file( string $file ): bool {
+		return isset( $this->get_manifest()[ $file ] ) && in_array( strtolower( pathinfo( $file, PATHINFO_EXTENSION ) ), [ 'ttf', 'otf' ], true );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function get_font_path( string $file ): string {
+		return $this->data->template_font_location . $file;
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function is_downloaded( string $file ): bool {
+		return is_file( $this->get_font_path( $file ) );
+	}
+
+	/**
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function parse_manifest( string $path ): array {
 
 		$entries = is_readable( $path ) ? json_decode( (string) file_get_contents( $path ), true ) : null; /* phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
 		if ( ! is_array( $entries ) ) {

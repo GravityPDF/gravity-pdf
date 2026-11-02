@@ -5,7 +5,9 @@ declare( strict_types=1 );
 namespace GFPDF\Helper\Mpdf;
 
 use GFPDF\Model\Model_Core_Font_Downloader;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Mpdf\Fonts\FontFileFinder;
@@ -21,6 +23,7 @@ use ReflectionProperty;
 class Test_On_Demand_Font_File_Finder extends TestCase {
 
 	use CopiesFontFixtures;
+	use RecordsFontFailures;
 
 	private const FONT = 'DejaVuSerifCondensed.ttf';
 
@@ -32,6 +35,11 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 	private $downloader;
 
 	/**
+	 * @var Model_Font_Sources
+	 */
+	private $sources;
+
+	/**
 	 * @var string
 	 */
 	private $font_dir;
@@ -40,7 +48,8 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 		parent::set_up();
 
 		$this->font_dir   = GPDFAPI::get_data_class()->template_font_location;
-		$this->downloader = new Model_Core_Font_Downloader( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger() );
+		$this->sources    = new Model_Font_Sources( GPDFAPI::get_data_class(), GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), new NullLogger() );
+		$this->downloader = new Model_Core_Font_Downloader( $this->sources, GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger(), GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ) );
 		wp_mkdir_p( $this->font_dir );
 	}
 
@@ -48,9 +57,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 		wp_delete_file( $this->font_dir . self::FONT );
 		wp_delete_file( $this->font_dir . self::DEFAULT_FONT );
 		$this->remove_font_fixtures();
-		delete_site_option( Model_Core_Font_Downloader::FAILURES );
-		delete_option( Model_Core_Font_Downloader::FAILURES );
-		wp_clear_scheduled_hook( Model_Core_Font_Downloader::RETRY_EVENT );
+		$this->delete_font_failures();
 		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
@@ -63,7 +70,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 
 		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->finder()->findFontFile( self::FONT ) );
 		$this->assertSame( [], $this->requested );
-		$this->assertNull( $this->get_property( $this->downloader, 'manifest' ) );
+		$this->assertNull( $this->get_property( $this->sources, 'manifest' ) );
 	}
 
 	public function test_a_missing_core_font_is_downloaded() {
@@ -164,7 +171,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 	}
 
 	public function test_a_failed_download_throws_when_the_bundled_fallback_is_missing_too() {
-		$downloader = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger() ) extends Model_Core_Font_Downloader {
+		$downloader = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger(), GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ) ) extends Model_Core_Font_Downloader {
 			public function get_fallback_file(): string {
 				return '';
 			}

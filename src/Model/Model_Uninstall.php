@@ -121,7 +121,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* Removes background processes */
 		$this->queue->clear_scheduled_events();
 		wp_clear_scheduled_hook( Model_Core_Font_Downloader::SYNC_EVENT );
-		wp_clear_scheduled_hook( Model_Core_Font_Downloader::RETRY_EVENT );
+
 		$this->queue->clear_queue( true );
 		$this->queue->unlock_process();
 
@@ -154,10 +154,15 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	public function remove_plugin_transients() {
 		global $wpdb;
 
-		/* Every user's failed settings save, and the pre-6.18 site-wide one, deleted one by one so WordPress drops its cached copies */
+		/* Every user's failed settings save (and the pre-6.18 site-wide one) and each font download's back-off, deleted one
+		   by one so WordPress drops its cached copies and their timeouts */
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
 		$keys = $wpdb->get_col(
-			$wpdb->prepare( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s", $wpdb->esc_like( '_transient_gfpdf_settings_user_data' ) . '%' )
+			$wpdb->prepare(
+				"SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s OR option_name LIKE %s",
+				$wpdb->esc_like( '_transient_gfpdf_settings_user_data' ) . '%',
+				$wpdb->esc_like( '_transient_' . Model_Core_Font_Downloader::BACK_OFF_KEY ) . '%'
+			)
 		);
 
 		foreach ( $keys as $key ) {
@@ -203,7 +208,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 	/**
 	 * Remove the network options stored in sitemeta on a Multisite: license package caches, the rich text merge
-	 * tags flag and the failed core font downloads
+	 * tags flag, the failed core font downloads and their back-offs
 	 *
 	 * Every extension keeps its own license cache entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all
 	 * are network-scoped rather than per-site, so one pass clears them, and the flag's exact key, without walking the
@@ -221,8 +226,10 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key IN ( %s, %s )",
+				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key IN ( %s, %s )",
 				$wpdb->esc_like( 'gpdf_sl_net_' ) . '%',
+				$wpdb->esc_like( '_site_transient_' . Model_Core_Font_Downloader::BACK_OFF_KEY ) . '%',
+				$wpdb->esc_like( '_site_transient_timeout_' . Model_Core_Font_Downloader::BACK_OFF_KEY ) . '%',
 				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS,
 				Model_Core_Font_Downloader::FAILURES
 			)
