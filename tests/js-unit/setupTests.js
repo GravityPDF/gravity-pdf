@@ -16,12 +16,8 @@ Enzyme.configure({
 window.GFPDF = {
 	templateList: [{ id: 'zadani' }, { id: 'rubix' }, { id: 'focus-gravity' }],
 	activeTemplate: '',
-	coreFontItemPendingMessage: '%s',
-	coreFontItemSuccessMessage: '%s',
-	coreFontItemErrorMessage: '%s',
 	noResultText:
 		"It doesn't look like there are any topics related to your issue.",
-	coreFontGithubError: 'Could not download Core Font list. Try again.',
 	getSearchResultError: 'An error occurred. Please try again',
 	licenseDeactivationError:
 		'An error occurred and your license key may not have been correctly deactivated. Login to your GravityPDF.com account and check if your site has been unlinked from the key.',

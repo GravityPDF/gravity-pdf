@@ -6,7 +6,6 @@ import {
 	watchTemplateProcessing,
 	watchpostTemplateUploadProcessing,
 } from './templates';
-import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts';
 import {
 	watchGetCustomFontList,
 	watchAddFont,
@@ -32,8 +31,6 @@ export default function* rootSaga() {
 		watchUpdateSelectBox(),
 		watchTemplateProcessing(),
 		watchpostTemplateUploadProcessing(),
-		watchGetFilesFromGitHub(),
-		watchDownloadFonts(),
 		watchGetCustomFontList(),
 		watchAddFont(),
 		watchEditFont(),

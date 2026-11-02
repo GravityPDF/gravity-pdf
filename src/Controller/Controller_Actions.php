@@ -135,14 +135,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		$routes = array_merge(
 			[
 				[
-					'action'      => 'install_core_fonts',
-					'action_text' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
-					'condition'   => [ $this->model, 'core_font_condition' ],
-					'process'     => [ $this->model, 'core_font_redirect' ],
-					'view'        => [ $this->view, 'core_font' ],
-					'capability'  => 'gravityforms_edit_settings',
-				],
-				[
 					'action'      => 'unwritable_folders',
 					'action_text' => esc_html__( 'View the system report', 'gravity-pdf' ),
 					'condition'   => [ $this->model, 'has_unwritable_folders' ],

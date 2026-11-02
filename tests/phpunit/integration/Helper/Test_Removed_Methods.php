@@ -14,7 +14,7 @@ use GFPDF\Tests\Integration\TestCase;
  */
 
 /**
- * Test the classes that lost methods in 7.0 report the call instead of ending the request
+ * Test the classes that lost methods report the call instead of ending the request
  *
  * @since 7.0
  * @group removed-methods
@@ -22,7 +22,14 @@ use GFPDF\Tests\Integration\TestCase;
 class Test_Removed_Methods extends TestCase {
 
 	/**
-	 * Every class 7.0 removed a method from
+	 * The release each removed method reported, keyed by its name
+	 *
+	 * @var array<string, string>
+	 */
+	private $deprecated_versions = [];
+
+	/**
+	 * Every class that has had a method removed
 	 *
 	 * The views are absent on purpose. Helper_Abstract_View::__call() is final and already routes an unknown method to
 	 * a same-named template, so a removed view method reports through _doing_it_wrong() from there instead — covered by
@@ -37,10 +44,12 @@ class Test_Removed_Methods extends TestCase {
 			[ \GFPDF\Controller\Controller_Install::class ],
 			[ \GFPDF\Controller\Controller_PDF::class ],
 			[ \GFPDF\Controller\Controller_Pdf_Queue::class ],
+			[ \GFPDF\Controller\Controller_Save_Core_Fonts::class ],
 			[ Helper_Abstract_Options::class ],
 			[ Helper_Misc::class ],
 			[ Helper_Notices::class ],
 			[ Helper_Options_Fields::class ],
+			[ \GFPDF\Model\Model_Actions::class ],
 			[ \GFPDF\Model\Model_Install::class ],
 			[ \GFPDF\Model\Model_PDF::class ],
 			[ \GFPDF\Model\Model_Settings::class ],
@@ -65,7 +74,7 @@ class Test_Removed_Methods extends TestCase {
 			$traits = array_merge( $traits, class_uses( $ancestor ) );
 		}
 
-		$message = $class . ' no longer reports calls to the methods 7.0 removed';
+		$message = $class . ' no longer reports calls to its removed methods';
 
 		$this->assertContains( Helper_Trait_Removed_Methods::class, $traits, $message );
 	}
@@ -95,7 +104,7 @@ class Test_Removed_Methods extends TestCase {
 	/**
 	 * A class that loses methods in more than one release names the right one for each
 	 *
-	 * Nothing declares a map yet, since 7.0 is the first round, so the contract is proved on a fixture instead.
+	 * Proved on a fixture, as the real maps don't leave a method out to fall back to 7.0.
 	 *
 	 * @since 7.0
 	 */
@@ -103,16 +112,7 @@ class Test_Removed_Methods extends TestCase {
 		$this->setExpectedDeprecated( Multi_Release_Removals::class . '::removed_later' );
 		$this->setExpectedDeprecated( Multi_Release_Removals::class . '::removed_in_seven' );
 
-		$versions = [];
-
-		add_action(
-			'deprecated_function_run',
-			function ( $function_name, $replacement, $version ) use ( &$versions ) {
-				$versions[ $function_name ] = $version;
-			},
-			10,
-			3
-		);
+		$this->record_deprecated_versions();
 
 		$class = new Multi_Release_Removals();
 
@@ -120,8 +120,68 @@ class Test_Removed_Methods extends TestCase {
 		$class->removed_in_seven();
 
 		/* The declared method names its own release; anything left out falls back to the first round */
-		$this->assertSame( '8.0', $versions[ Multi_Release_Removals::class . '::removed_later' ] );
-		$this->assertSame( '7.0', $versions[ Multi_Release_Removals::class . '::removed_in_seven' ] );
+		$this->assertSame( '8.0', $this->deprecated_versions[ Multi_Release_Removals::class . '::removed_later' ] );
+		$this->assertSame( '7.0', $this->deprecated_versions[ Multi_Release_Removals::class . '::removed_in_seven' ] );
+	}
+
+	/**
+	 * The Core Font installer went in 6.19.0
+	 *
+	 * @since 6.19.0
+	 */
+	public function test_the_core_font_installer_methods_report_6_19() {
+		$this->setExpectedDeprecated( \GFPDF\Router::class . '::load_core_font_handler' );
+		$this->setExpectedDeprecated( \GFPDF\Model\Model_Actions::class . '::core_font_condition' );
+		$this->setExpectedDeprecated( \GFPDF\Model\Model_Actions::class . '::core_font_redirect' );
+
+		$this->record_deprecated_versions();
+
+		$this->assertNull( $this->gfpdf()->load_core_font_handler() );
+
+		$actions = \GPDFAPI::get_mvc_class( 'Model_Actions' );
+		$this->assertNull( $actions->core_font_condition() );
+		$this->assertNull( $actions->core_font_redirect() );
+
+		$this->assertSame( [ '6.19.0' ], array_values( array_unique( $this->deprecated_versions ) ) );
+		$this->assertCount( 3, $this->deprecated_versions );
+	}
+
+	/**
+	 * The installer's controller stays as an inert stub, so building or calling it reports instead of ending the request
+	 *
+	 * @since 6.19.0
+	 */
+	public function test_the_core_font_controller_is_an_inert_stub() {
+		$class_name = \GFPDF\Controller\Controller_Save_Core_Fonts::class;
+
+		$this->setExpectedDeprecated( $class_name );
+		$this->setExpectedDeprecated( $class_name . '::save_core_font' );
+
+		$this->record_deprecated_versions();
+
+		$gfpdf      = $this->gfpdf();
+		$controller = new $class_name( $gfpdf->log, $gfpdf->data, $gfpdf->misc );
+		$controller->init();
+
+		$this->assertFalse( has_action( 'wp_ajax_gfpdf_save_core_font' ) );
+		$this->assertNull( $controller->save_core_font() );
+		$this->assertSame( [ $class_name . '::save_core_font' => '6.19.0' ], $this->deprecated_versions );
+	}
+
+	/**
+	 * Collect the release each removed method reports into $deprecated_versions
+	 *
+	 * @since 6.19.0
+	 */
+	private function record_deprecated_versions(): void {
+		add_action(
+			'deprecated_function_run',
+			function ( $function_name, $replacement, $version ) {
+				$this->deprecated_versions[ $function_name ] = $version;
+			},
+			10,
+			3
+		);
 	}
 }
 

@@ -28,8 +28,8 @@ trait Helper_Trait_Removed_Methods {
 	/**
 	 * The methods this class has lost, mapped to the release each one went in
 	 *
-	 * Only worth declaring once a class has lost methods in more than one release. Anything left out is reported as
-	 * 7.0, the round of removals this trait was introduced for.
+	 * Declare every method removed in a release other than 7.0. Anything left out is reported as 7.0, the round of
+	 * removals this trait was introduced for.
 	 *
 	 * @return array<string, string>
 	 *

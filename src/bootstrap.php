@@ -45,6 +45,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	use Helper_Trait_Removed_Methods;
 
 	/**
+	 * @since 6.19.0
+	 */
+	protected static function get_removed_methods(): array {
+		return [ 'load_core_font_handler' => '6.19.0' ];
+	}
+
+	/**
 	 * Holds our log class
 	 *
 	 * @var LoggerInterface
@@ -210,7 +217,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->mergetags();
 		$this->actions();
 		$this->template_manager();
-		$this->load_core_font_handler();
 		$this->load_custom_font_handler();
 		$this->load_font_sources();
 		$this->load_debug();
@@ -863,20 +869,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
-	}
-
-	/**
-	 * Initialise our core font AJAX handler
-	 *
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function load_core_font_handler() {
-		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
-		$class->init();
-
-		$this->singleton->add_class( $class );
 	}
 
 	/**

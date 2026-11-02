@@ -10,7 +10,6 @@ Controller_Mergetags => GFPDF\Controller\Controller_Mergetags
 Controller_PDF => GFPDF\Controller\Controller_PDF
 Controller_Pdf_Cache => GFPDF\Controller\Controller_Pdf_Cache
 Controller_Pdf_Queue => GFPDF\Controller\Controller_Pdf_Queue
-Controller_Save_Core_Fonts => GFPDF\Controller\Controller_Save_Core_Fonts
 Controller_Settings => GFPDF\Controller\Controller_Settings
 Controller_Shortcodes => GFPDF\Controller\Controller_Shortcodes
 Controller_System_Report => GFPDF\Controller\Controller_System_Report

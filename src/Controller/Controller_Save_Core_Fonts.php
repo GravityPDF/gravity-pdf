@@ -6,9 +6,9 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Model\Model_Font_Downloader;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
-use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -22,16 +22,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Controller_Save_Core_Fonts
+ * The Core Font installer's AJAX endpoint, removed in 6.19.0 now core fonts download on their own
+ *
+ * Kept as an inert stub so a third party building or calling it gets a deprecation notice instead of a fatal error.
+ * It registers no hooks.
  *
  * @package GFPDF\Controller
  *
- * @since   5.0
+ * @since      5.0
+ * @deprecated 6.19.0 Core fonts download in the background, or when a PDF needs them (Model_Font_Downloader)
  */
 class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements Helper_Interface_Actions {
 
+	use Helper_Trait_Removed_Methods;
+
 	/**
-	 * Holds our log class
+	 * @since 6.19.0
+	 */
+	protected static function get_removed_methods(): array {
+		return [
+			'save_core_font'         => '6.19.0',
+			'download_and_save_font' => '6.19.0',
+			'get_downloader'         => '6.19.0',
+		];
+	}
+
+	/**
+	 * Kept for subclasses that read them
 	 *
 	 * @var LoggerInterface
 	 *
@@ -40,9 +57,6 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	protected $log;
 
 	/**
-	 * Holds our Helper_Data object
-	 * which we can autoload with any data needed
-	 *
 	 * @var Helper_Data
 	 *
 	 * @since 5.0
@@ -50,9 +64,6 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	protected $data;
 
 	/**
-	 * Holds our Helper_Misc object
-	 * Makes it easy to access common methods throughout the plugin
-	 *
 	 * @var Helper_Misc
 	 *
 	 * @since 5.0
@@ -67,18 +78,17 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	protected $downloader;
 
 	/**
-	 * Set up our dependencies
-	 *
-	 * @param LoggerInterface            $log        Our logger class
-	 * @param Helper_Data                $data       Our plugin data store
-	 * @param Helper_Misc                $misc       Our miscellaneous class
-	 * @param Model_Font_Downloader|null $downloader Defaults to the registered downloader
+	 * @param LoggerInterface            $log
+	 * @param Helper_Data                $data
+	 * @param Helper_Misc                $misc
+	 * @param Model_Font_Downloader|null $downloader
 	 *
 	 * @since 5.0
-	 * @since 6.19.0 Takes the font downloader
+	 * @since 6.19.0 Deprecated
 	 */
 	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, ?Model_Font_Downloader $downloader = null ) {
-		/* Assign our internal variables */
+		_deprecated_class( static::class, '6.19.0' );
+
 		$this->log        = $log;
 		$this->data       = $data;
 		$this->misc       = $misc;
@@ -86,67 +96,14 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	}
 
 	/**
-	 * Initialise our class defaults
-	 *
-	 * @return void
 	 * @since 5.0
-	 *
+	 * @since 6.19.0 Does nothing
 	 */
-	public function init() {
-		$this->add_actions();
-	}
+	public function init() {}
 
 	/**
-	 * Apply any actions needed for the welcome page
-	 *
-	 * @return void
 	 * @since 5.0
-	 *
+	 * @since 6.19.0 Does nothing: the `wp_ajax_gfpdf_save_core_font` endpoint is gone
 	 */
-	public function add_actions() {
-		/* Register our AJAX event */
-		add_action( 'wp_ajax_gfpdf_save_core_font', [ $this, 'save_core_font' ] );
-	}
-
-	/**
-	 * An AJAX endpoint that handles authentication and downloading the core font
-	 *
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function save_core_font() {
-		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Save Core Font', 'gravityforms_edit_settings' );
-
-		$results = $this->download_and_save_font();
-
-		/* Return results */
-		header( 'Content-Type: application/json' );
-		echo wp_json_encode( $results );
-		wp_die();
-	}
-
-	/**
-	 * Download the requested core font, replacing any copy already on disk
-	 *
-	 * @return bool
-	 * @since 5.0
-	 * @since 6.19.0 Uses the font downloader
-	 */
-	protected function download_and_save_font() {
-		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		$font_name = sanitize_text_field( wp_unslash( $_POST['font_name'] ?? '' ) );
-
-		return $this->get_downloader()->download( $font_name, true );
-	}
-
-	/**
-	 * The injected downloader, else the registered one, which bootstrap builds after this controller
-	 *
-	 * @since 6.19.0
-	 */
-	protected function get_downloader(): Model_Font_Downloader {
-		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
-	}
+	public function add_actions() {}
 }

@@ -34,7 +34,7 @@ test.describe('Core Fonts', () => {
 			name: /^Substitution Fonts/,
 		});
 
-		// Every core font download fails on this site, and the forms the other specs create decide how many are required
+		// Core font downloads are off on this site (see tools/mu-plugins), and the forms the other specs create decide how many are required
 		await expect(installed).toContainText(
 			/core: 0 of \d+ required files installed/
 		);

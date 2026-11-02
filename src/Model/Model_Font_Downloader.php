@@ -236,14 +236,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Download a file on the manifest into the fonts folder, skipped if it's there unless forced
-	 *
-	 * @param string $file  A file name on the manifest
-	 * @param bool   $force Replace a copy already in the fonts folder
+	 * Download a file on the manifest into the fonts folder, skipped if it's there
 	 *
 	 * @since 6.19.0
 	 */
-	public function download( string $file, bool $force = false ): bool {
+	public function download( string $file ): bool {
 		$manifest = $this->font_sources->get_manifest();
 
 		if ( ! isset( $manifest[ $file ] ) ) {
@@ -253,7 +250,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		}
 
 		$font_path = $this->get_font_path( $file );
-		if ( ! $force && is_file( $font_path ) ) {
+		if ( is_file( $font_path ) ) {
 			return true;
 		}
 
