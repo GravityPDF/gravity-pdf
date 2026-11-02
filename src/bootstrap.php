@@ -906,11 +906,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
 
-		$downloader = new Model\Model_Core_Font_Downloader( $model, $this->data, $this->options, $this->misc, $this->log );
-		$class      = new Controller\Controller_Core_Font_Downloader( $downloader );
+		$required_fonts = new Model\Model_Required_Fonts( $model, $this->options );
+		$downloader     = new Model\Model_Core_Font_Downloader( $model, $this->data, $this->options, $this->misc, $this->log, $required_fonts );
+		$class          = new Controller\Controller_Core_Font_Downloader( $downloader, $required_fonts );
 		$class->init();
 
 		$this->singleton->add_class( $downloader );
+		$this->singleton->add_class( $required_fonts );
 		$this->singleton->add_class( $class );
 	}
 

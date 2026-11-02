@@ -30,6 +30,7 @@ Model_Install => GFPDF\Model\Model_Install
 Model_Mergetags => GFPDF\Model\Model_Mergetags
 Model_PDF => GFPDF\Model\Model_PDF
 Model_Pdf_Cache => GFPDF\Model\Model_Pdf_Cache
+Model_Required_Fonts => GFPDF\Model\Model_Required_Fonts
 Model_Settings => GFPDF\Model\Model_Settings
 Model_Shortcodes => GFPDF\Model\Model_Shortcodes
 Model_Signed_Url_Trust => GFPDF\Model\Model_Signed_Url_Trust

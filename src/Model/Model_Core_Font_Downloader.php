@@ -11,7 +11,6 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Mpdf\On_Demand_Font_File_Finder;
 use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
-use GFFormsModel;
 
 /**
  * @package     Gravity PDF
@@ -32,23 +31,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 
 	/**
-	 * Failed downloads by file; a recent one skips the network until the back-off ends
+	 * Failed files awaiting their one retry, and those that gave up, which the admin notice lists
 	 *
 	 * @since 6.19.0
 	 */
 	const FAILURES = 'gfpdf_core_font_failures';
 
 	/**
-	 * @since 6.19.0
-	 */
-	const BACK_OFF = 15 * MINUTE_IN_SECONDS;
-
-	/**
-	 * Cron event that retries the downloads that failed once
+	 * Prefix of the per-file transient holding when a download last failed, which skips the network until it expires
 	 *
 	 * @since 6.19.0
 	 */
-	const RETRY_EVENT = 'gfpdf_retry_core_font_downloads';
+	const BACK_OFF_KEY = 'gfpdf_core_font_backoff_';
+
+	/**
+	 * @since 6.19.0
+	 */
+	const BACK_OFF = 15 * MINUTE_IN_SECONDS;
 
 	/**
 	 * Upper bound of the random delay before the retry
@@ -58,7 +57,7 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	const RETRY_JITTER = 5 * MINUTE_IN_SECONDS;
 
 	/**
-	 * Cron event that downloads the required fonts
+	 * Cron event that downloads the required fonts and runs the retries that are due
 	 *
 	 * @since 6.19.0
 	 */
@@ -109,24 +108,18 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
-	 * @var array<string, array{url: string, size: int, sha: string}>|null
-	 * @since 6.19.0
-	 */
-	protected $manifest;
-
-	/**
-	 * A file's last failure and, once its retry also failed, when it gave up (else 0)
+	 * When each failed file's retry is due (else 0) and, once the retry also failed, when it gave up (else 0)
 	 *
-	 * @var array<string, array{time: int, gave_up: int}>|null
+	 * @var array<string, array{retry_at: int, gave_up: int}>|null
 	 * @since 6.19.0
 	 */
 	protected $failures;
 
 	/**
-	 * @var string[]|null
+	 * @var Model_Required_Fonts
 	 * @since 6.19.0
 	 */
-	protected $selected_font_keys;
+	protected $required_fonts;
 
 	/**
 	 * @var float
@@ -141,22 +134,23 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	protected $retry_jitter = self::RETRY_JITTER;
 
 	/**
-	 * Set while the retry runs, so the back-off doesn't skip the files it retries
+	 * Set while the sync runs, which schedules its own next run once it's done
 	 *
 	 * @var bool
 	 * @since 6.19.0
 	 */
-	protected $retrying = false;
+	protected $syncing = false;
 
 	/**
 	 * @since 6.19.0
 	 */
-	public function __construct( Model_Font_Sources $font_sources, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, LoggerInterface $log ) {
-		$this->font_sources = $font_sources;
-		$this->data         = $data;
-		$this->options      = $options;
-		$this->misc         = $misc;
-		$this->log          = $log;
+	public function __construct( Model_Font_Sources $font_sources, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, LoggerInterface $log, Model_Required_Fonts $required_fonts ) {
+		$this->font_sources   = $font_sources;
+		$this->data           = $data;
+		$this->options        = $options;
+		$this->misc           = $misc;
+		$this->log            = $log;
+		$this->required_fonts = $required_fonts;
 	}
 
 	/**
@@ -179,7 +173,7 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_font_path( string $file ): string {
-		return $this->data->template_font_location . $file;
+		return $this->font_sources->get_font_path( $file );
 	}
 
 	/**
@@ -211,23 +205,14 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_manifest(): array {
-		if ( $this->manifest === null ) {
-			$this->manifest = [];
-			foreach ( $this->font_sources->get_sources() as $source ) {
-				$this->manifest += $this->font_sources->read_manifest( (string) ( $source['manifest'] ?? '' ) );
-			}
-		}
-
-		return $this->manifest;
+		return $this->font_sources->get_manifest();
 	}
 
 	/**
-	 * Whether a file is a font on the manifest, not one of its licence files
-	 *
 	 * @since 6.19.0
 	 */
 	public function is_core_font_file( string $file ): bool {
-		return isset( $this->get_manifest()[ $file ] ) && in_array( strtolower( pathinfo( $file, PATHINFO_EXTENSION ) ), [ 'ttf', 'otf' ], true );
+		return $this->font_sources->is_core_font_file( $file );
 	}
 
 	/**
@@ -263,7 +248,7 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 			return false;
 		}
 
-		if ( ! $this->retrying && $this->is_backing_off( $file ) ) {
+		if ( $this->is_backing_off( $file ) ) {
 			return false;
 		}
 
@@ -276,34 +261,6 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 		$this->clear_failure( $file );
 
 		return true;
-	}
-
-	/**
-	 * Retry each file that has failed once, rescheduling when the time budget runs out
-	 *
-	 * @since 6.19.0
-	 */
-	public function retry_failed(): void {
-		$files = array_keys(
-			array_filter(
-				$this->get_failures(),
-				static function ( array $failure ): bool {
-					return $failure['gave_up'] === 0;
-				}
-			)
-		);
-
-		/* The back-off would skip a file that failed minutes ago */
-		$this->retrying = true;
-		try {
-			$left = $this->each_within_budget( $files, [ $this, 'download' ] );
-		} finally {
-			$this->retrying = false;
-		}
-
-		if ( $left !== [] ) {
-			$this->schedule_once( self::RETRY_EVENT, time(), 'Core Font download retry could not be scheduled' );
-		}
 	}
 
 	/**
@@ -325,148 +282,21 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Forget the failures and font selections read this request
+	 * Forget the failures read this request
 	 *
 	 * @since 6.19.0
 	 */
 	public function flush(): void {
-		$this->failures           = null;
-		$this->selected_font_keys = null;
+		$this->failures = null;
 	}
 
 	/**
-	 * A font key's files on the core manifest (none for bundled and custom fonts)
-	 *
-	 * @return string[]
+	 * The transient key of a file's back-off
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_font_files( string $key ): array {
-		$family = $this->font_sources->get_font_data()[ $this->normalise_font( $key ) ] ?? null;
-
-		$files = [];
-		foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
-			$file = is_array( $family ) ? ( $family[ $style ] ?? '' ) : '';
-			if ( is_string( $file ) && $file !== '' && $this->is_core_font_file( $file ) ) {
-				$files[] = $file;
-			}
-		}
-
-		return array_values( array_unique( $files ) );
-	}
-
-	/**
-	 * Files that should be on disk: default, language, required-source and PDF-selected fonts
-	 *
-	 * @return string[]
-	 *
-	 * @since 6.19.0
-	 */
-	public function get_required_font_files(): array {
-		$keys = array_merge(
-			[ $this->normalise_font( $this->options->get_option( 'default_font', '' ) ) ],
-			$this->font_sources->get_language_font_keys(),
-			$this->get_selected_font_keys()
-		);
-
-		$files = [];
-		foreach ( array_unique( $keys ) as $key ) {
-			$files = array_merge( $files, $this->get_font_files( $key ) );
-		}
-
-		foreach ( $this->font_sources->get_sources() as $source ) {
-			if ( ! empty( $source['required'] ) ) {
-				$files = array_merge( $files, array_keys( $this->font_sources->read_manifest( (string) ( $source['manifest'] ?? '' ) ) ) );
-			}
-		}
-
-		return array_values( array_unique( $files ) );
-	}
-
-	/**
-	 * The registered fonts among a PDF's settings, so template font pickers count too
-	 *
-	 * @param array $pdf PDF settings
-	 *
-	 * @return string[]
-	 *
-	 * @since 6.19.0
-	 */
-	protected function get_pdf_fonts( array $pdf ): array {
-		$fontdata = $this->font_sources->get_font_data();
-		$fonts    = [];
-
-		foreach ( $pdf as $value ) {
-			$font = $this->normalise_font( $value );
-			if ( $font !== '' && isset( $fontdata[ $font ] ) ) {
-				$fonts[] = $font;
-			}
-		}
-
-		return array_values( array_unique( $fonts ) );
-	}
-
-	/**
-	 * Whether any font a PDF's settings name has downloadable files missing
-	 *
-	 * @param array $pdf PDF settings
-	 *
-	 * @since 6.19.0
-	 */
-	public function pdf_needs_download( array $pdf ): bool {
-		foreach ( $this->get_pdf_fonts( $pdf ) as $font ) {
-			if ( $this->needs_download( $font ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Whether any of a font's downloadable files is missing from the fonts folder
-	 *
-	 * @param mixed $font A font key
-	 *
-	 * @since 6.19.0
-	 */
-	public function needs_download( $font ): bool {
-		foreach ( $this->get_font_files( $this->normalise_font( $font ) ) as $file ) {
-			if ( ! $this->is_downloaded( $file ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Installed required font files per downloadable source, and whether its manifest could be read
-	 *
-	 * @return array<string, array{installed: int, total: int, manifest: bool}>
-	 *
-	 * @since 6.19.0
-	 */
-	public function get_installed_counts(): array {
-		$required = $this->get_required_font_files();
-		$counts   = [];
-
-		foreach ( $this->font_sources->get_sources() as $id => $source ) {
-			if ( empty( $source['manifest'] ) ) {
-				continue;
-			}
-
-			$manifest = $this->font_sources->read_manifest( (string) $source['manifest'] );
-			$files    = array_intersect( $required, array_keys( $manifest ) );
-
-			$counts[ (string) $id ] = [
-				'installed' => count( array_filter( $files, [ $this, 'is_downloaded' ] ) ),
-				'total'     => count( $files ),
-				'manifest'  => count( $manifest ) > 0,
-			];
-		}
-
-		return $counts;
+	public static function back_off_key( string $file ): string {
+		return self::BACK_OFF_KEY . md5( $file );
 	}
 
 	/**
@@ -478,47 +308,66 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 		/* The trigger may have changed the required set */
 		delete_transient( self::SYNC_REMAINING );
 
-		$this->queue_sync();
+		$this->schedule_by( time() );
 	}
 
 	/**
-	 * Download the missing required files, rescheduling when the time budget runs out
+	 * Run the retries that are due, then download the missing required files, rescheduling when the time budget runs
+	 * out or a retry is still to come
 	 *
 	 * @since 6.19.0
 	 */
 	public function sync(): void {
-		$missing = $this->get_sync_files();
+		$due     = $this->get_retries()[0];
+		$missing = array_diff( $this->get_sync_files(), $due );
 		delete_transient( self::SYNC_REMAINING );
 
-		$remaining = $this->each_within_budget( $missing, [ $this, 'download' ] );
-		if ( $remaining !== [] ) {
-			$this->log->notice( 'Core Font sync paused until its next run', [ 'remaining' => count( $remaining ) ] );
+		/* The back-off would skip a file that failed minutes ago */
+		array_map( [ $this, 'delete_back_off' ], $due );
 
-			set_transient( self::SYNC_REMAINING, $remaining, DAY_IN_SECONDS );
-			$this->queue_sync();
+		$this->syncing = true;
+		$left          = $this->download_within_budget( array_merge( $due, $missing ) );
+		$this->syncing = false;
+
+		/* Includes the retries this run's first failures added */
+		[ $still_due, $next ] = $this->get_retries();
+
+		if ( $left !== [] ) {
+			$this->log->notice( 'Core Font sync paused until its next run', [ 'remaining' => count( $left ) ] );
+			set_transient( self::SYNC_REMAINING, array_values( array_diff( $left, $due ) ), DAY_IN_SECONDS );
+		}
+
+		if ( $left !== [] || $still_due !== [] ) {
+			$next = time();
+		}
+
+		if ( $next > 0 ) {
+			$this->schedule_by( $next );
 		}
 	}
 
 	/**
-	 * @since 6.19.0
-	 */
-	protected function queue_sync(): void {
-		$this->schedule_once( self::SYNC_EVENT, time(), 'Core Font sync could not be scheduled' );
-	}
-
-	/**
-	 * Schedule a single event unless one is queued, logging the warning if WordPress refuses it
+	 * Have the sync run by the time given: queue it, or move one queued later forward. Never two, never later.
 	 *
 	 * @since 6.19.0
 	 */
-	protected function schedule_once( string $event, int $at, string $warning ): void {
-		if ( wp_next_scheduled( $event ) === false && wp_schedule_single_event( $at, $event ) !== true ) {
-			$this->log->warning( $warning );
+	protected function schedule_by( int $at ): void {
+		$next = wp_next_scheduled( self::SYNC_EVENT );
+		if ( $next !== false && $next <= $at ) {
+			return;
+		}
+
+		if ( $next !== false ) {
+			wp_unschedule_event( $next, self::SYNC_EVENT );
+		}
+
+		if ( wp_schedule_single_event( $at, self::SYNC_EVENT ) !== true ) {
+			$this->log->warning( 'Core Font sync could not be scheduled' );
 		}
 	}
 
 	/**
-	 * Run $action on each file until the time budget runs out
+	 * Download each file until the time budget runs out
 	 *
 	 * @param string[] $files
 	 *
@@ -526,7 +375,7 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	 *
 	 * @since 6.19.0
 	 */
-	protected function each_within_budget( array $files, callable $action ): array {
+	protected function download_within_budget( array $files ): array {
 		$files    = array_values( $files );
 		$deadline = microtime( true ) + $this->sync_budget;
 
@@ -536,7 +385,7 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 				return array_slice( $files, $i );
 			}
 
-			$action( $file );
+			$this->download( $file );
 		}
 
 		return [];
@@ -551,60 +400,55 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function get_sync_files(): array {
 		$remaining = get_transient( self::SYNC_REMAINING );
-		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->get_required_font_files();
+		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->get_required_files();
 
 		return array_values(
 			array_filter(
 				$files,
 				function ( $file ) {
-					return ! $this->is_downloaded( $file );
+					return ! $this->font_sources->is_downloaded( $file );
 				}
 			)
 		);
 	}
 
 	/**
-	 * @since 6.19.0
-	 */
-	protected function is_downloaded( string $file ): bool {
-		return is_file( $this->get_font_path( $file ) );
-	}
-
-	/**
-	 * @param mixed $font
-	 *
-	 * @since 6.19.0
-	 */
-	protected function normalise_font( $font ): string {
-		return is_string( $font ) ? strtolower( trim( $font ) ) : '';
-	}
-
-	/**
-	 * The fonts selected in every form's PDFs
-	 *
 	 * @return string[]
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_selected_font_keys(): array {
-		if ( $this->selected_font_keys === null ) {
-			$keys     = [];
-			$form_ids = GFFormsModel::get_form_ids( true, false );
+	protected function get_required_files(): array {
+		return $this->required_fonts->get_required_font_files();
+	}
 
-			/* One query for every active form */
-			foreach ( count( $form_ids ) > 0 ? GFFormsModel::get_form_meta_by_id( $form_ids ) : [] as $form ) {
-				$pdfs = is_array( $form ) && is_array( $form['gfpdf_form_settings'] ?? null ) ? $form['gfpdf_form_settings'] : [];
-				foreach ( $pdfs as $pdf ) {
-					if ( is_array( $pdf ) ) {
-						$keys = array_merge( $keys, $this->get_pdf_fonts( $pdf ) );
-					}
-				}
+	/**
+	 * The files whose one retry is due, and when the next one still to come is (or 0). A due file already on disk,
+	 * copied in by hand, no longer needs its retry.
+	 *
+	 * @return array{0: string[], 1: int}
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_retries(): array {
+		$due  = [];
+		$next = 0;
+
+		foreach ( $this->get_failures() as $file => $failure ) {
+			$file = (string) $file;
+			if ( $failure['gave_up'] > 0 ) {
+				continue;
 			}
 
-			$this->selected_font_keys = array_values( array_unique( $keys ) );
+			if ( $failure['retry_at'] > time() ) {
+				$next = $next === 0 ? $failure['retry_at'] : min( $next, $failure['retry_at'] );
+			} elseif ( $this->font_sources->is_downloaded( $file ) ) {
+				$this->clear_failure( $file );
+			} else {
+				$due[] = $file;
+			}
 		}
 
-		return $this->selected_font_keys;
+		return [ $due, $next ];
 	}
 
 	/**
@@ -714,8 +558,8 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function is_backing_off( string $file ): bool {
-		$failure = $this->get_failures()[ $file ] ?? null;
-		if ( $failure === null || $failure['time'] <= time() - self::BACK_OFF ) {
+		/* The transient expires with the back-off, so any value means the file failed recently */
+		if ( $this->get_network_transient( self::back_off_key( $file ) ) === false ) {
 			return false;
 		}
 
@@ -725,29 +569,41 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The first failure schedules one retry; the retry's failure gives up and raises the admin notice
+	 * Back off, then: the first failure schedules one retry; the retry's failure gives up and raises the admin notice
 	 *
 	 * @since 6.19.0
 	 */
 	protected function record_failure( string $file ): void {
-		$failures = $this->get_failures();
-		$gave_up  = $failures[ $file ]['gave_up'] ?? null;
+		$this->set_network_transient( self::back_off_key( $file ), time(), self::BACK_OFF );
 
-		if ( $gave_up === 0 ) {
-			/* First give-up time, which notice dismissals are compared against */
-			$gave_up = time();
-			$this->log->error( 'Core Font download failed again, and won\'t be retried automatically', [ 'name' => $file ] );
+		$failures = $this->get_failures();
+		$failure  = $failures[ $file ] ?? null;
+
+		if ( $failure === null ) {
+			$failures[ $file ] = [
+				'retry_at' => time() + wp_rand( 0, $this->retry_jitter ),
+				'gave_up'  => 0,
+			];
+
+			$this->save_failures( $failures );
+
+			/* The sync schedules once, when it's done */
+			if ( ! $this->syncing ) {
+				$this->schedule_by( $failures[ $file ]['retry_at'] );
+			}
+
+			return;
 		}
 
-		$failures[ $file ] = [
-			'time'    => time(),
-			'gave_up' => $gave_up ?? 0,
-		];
+		if ( $failure['gave_up'] === 0 ) {
+			/* First give-up time, which notice dismissals are compared against */
+			$failures[ $file ] = [
+				'retry_at' => 0,
+				'gave_up'  => time(),
+			];
 
-		$this->save_failures( $failures );
-
-		if ( $gave_up === null ) {
-			$this->schedule_retry();
+			$this->save_failures( $failures );
+			$this->log->error( 'Core Font download failed again, and won\'t be retried automatically', [ 'name' => $file ] );
 		}
 	}
 
@@ -757,15 +613,48 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	protected function clear_failure( string $file ): void {
 		$failures = $this->get_failures();
 		if ( isset( $failures[ $file ] ) ) {
+			$this->delete_back_off( $file );
 			unset( $failures[ $file ] );
 			$this->save_failures( $failures );
 		}
 	}
 
 	/**
+	 * @since 6.19.0
+	 */
+	protected function delete_back_off( string $file ): void {
+		$this->delete_network_transient( self::back_off_key( $file ) );
+	}
+
+	/**
+	 * @return mixed
+	 *
+	 * @since 6.19.0
+	 */
+	private function get_network_transient( string $key ) {
+		return is_multisite() ? get_site_transient( $key ) : get_transient( $key );
+	}
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @since 6.19.0
+	 */
+	private function set_network_transient( string $key, $value, int $expiration ): void {
+		is_multisite() ? set_site_transient( $key, $value, $expiration ) : set_transient( $key, $value, $expiration );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	private function delete_network_transient( string $key ): void {
+		is_multisite() ? delete_site_transient( $key ) : delete_transient( $key );
+	}
+
+	/**
 	 * Network-wide like the fonts folder; a single site's isn't autoloaded
 	 *
-	 * @param array<string, array{time: int, gave_up: int}> $failures
+	 * @param array<string, array{retry_at: int, gave_up: int}> $failures
 	 *
 	 * @since 6.19.0
 	 */
@@ -782,18 +671,9 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * One retry a random few minutes out, so sites don't retry in step
-	 *
-	 * @since 6.19.0
-	 */
-	protected function schedule_retry(): void {
-		$this->schedule_once( self::RETRY_EVENT, time() + wp_rand( 0, $this->retry_jitter ), 'Core Font download retry could not be scheduled' );
-	}
-
-	/**
 	 * Failures by file, read once per request
 	 *
-	 * @return array<string, array{time: int, gave_up: int}>
+	 * @return array<string, array{retry_at: int, gave_up: int}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -803,14 +683,16 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 
 			$stored = is_multisite() ? get_site_option( self::FAILURES, [] ) : get_option( self::FAILURES, [] );
 			foreach ( is_array( $stored ) ? $stored : [] as $file => $failure ) {
-				if ( ! is_string( $file ) || ! is_array( $failure ) || ! is_int( $failure['time'] ?? null ) ) {
-					continue;
-				}
+				$retry_at = is_array( $failure ) && is_int( $failure['retry_at'] ?? null ) ? $failure['retry_at'] : 0;
+				$gave_up  = is_array( $failure ) && is_int( $failure['gave_up'] ?? null ) ? $failure['gave_up'] : 0;
 
-				$this->failures[ $file ] = [
-					'time'    => $failure['time'],
-					'gave_up' => is_int( $failure['gave_up'] ?? null ) ? $failure['gave_up'] : 0,
-				];
+				/* An entry with neither is waiting on nothing */
+				if ( is_string( $file ) && ( $retry_at > 0 || $gave_up > 0 ) ) {
+					$this->failures[ $file ] = [
+						'retry_at' => $gave_up > 0 ? 0 : $retry_at,
+						'gave_up'  => $gave_up,
+					];
+				}
 			}
 		}
 

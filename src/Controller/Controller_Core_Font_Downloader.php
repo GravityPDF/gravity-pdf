@@ -7,6 +7,7 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Model\Model_Core_Font_Downloader;
+use GFPDF\Model\Model_Required_Fonts;
 
 /**
  * @package     Gravity PDF
@@ -20,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Queues the background font sync on triggers that change the required fonts, and runs it and its retries
+ * Queues the background font sync on triggers that change the required fonts, and runs it
  *
  * @since 6.19.0
  */
@@ -33,8 +34,16 @@ class Controller_Core_Font_Downloader extends Helper_Abstract_Controller impleme
 	 */
 	public $model;
 
-	public function __construct( Model_Core_Font_Downloader $model ) {
-		$this->model = $model;
+	/**
+	 * @var Model_Required_Fonts
+	 *
+	 * @since 6.19.0
+	 */
+	protected $required_fonts;
+
+	public function __construct( Model_Core_Font_Downloader $model, Model_Required_Fonts $required_fonts ) {
+		$this->model          = $model;
+		$this->required_fonts = $required_fonts;
 		$this->model->setController( $this );
 	}
 
@@ -54,7 +63,6 @@ class Controller_Core_Font_Downloader extends Helper_Abstract_Controller impleme
 	 */
 	public function add_actions() {
 		add_action( Model_Core_Font_Downloader::SYNC_EVENT, [ $this->model, 'sync' ] );
-		add_action( Model_Core_Font_Downloader::RETRY_EVENT, [ $this->model, 'retry_failed' ] );
 
 		foreach ( [ 'gfpdf_plugin_installed', 'gfpdf_version_changed', 'gfpdf_font_sources_changed' ] as $hook ) {
 			add_action( $hook, [ $this->model, 'schedule_sync' ] );
@@ -100,7 +108,7 @@ class Controller_Core_Font_Downloader extends Helper_Abstract_Controller impleme
 	 * @since 6.19.0
 	 */
 	public function maybe_sync_default_font( $unused, $settings ): void {
-		if ( is_array( $settings ) && $this->model->needs_download( $settings['default_font'] ?? '' ) ) {
+		if ( is_array( $settings ) && $this->required_fonts->needs_download( $settings['default_font'] ?? '' ) ) {
 			$this->model->schedule_sync();
 		}
 	}
@@ -113,7 +121,7 @@ class Controller_Core_Font_Downloader extends Helper_Abstract_Controller impleme
 	 * @since 6.19.0
 	 */
 	public function maybe_sync_pdf_fonts( $pdf ): void {
-		if ( is_array( $pdf ) && $this->model->pdf_needs_download( $pdf ) ) {
+		if ( is_array( $pdf ) && $this->required_fonts->pdf_needs_download( $pdf ) ) {
 			$this->model->schedule_sync();
 		}
 	}

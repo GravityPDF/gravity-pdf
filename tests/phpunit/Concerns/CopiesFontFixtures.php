@@ -6,7 +6,6 @@ namespace GFPDF\Tests\Concerns;
 
 use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Model\Model_Custom_Fonts;
-use GFPDF\Model\Model_Core_Font_Downloader;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Statics\Git_Blob;
 use GPDFAPI;
@@ -144,9 +143,8 @@ trait CopiesFontFixtures {
 	 * Serve a fixture as a manifest file, with a manifest entry matching the fixture so the plugin's downloader verifies it
 	 */
 	protected function serve_fixture_as( string $fixture, string $file ): void {
-		$downloader = GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
-		$manifest   = $downloader->get_manifest();
-		$blob       = $this->fixture_blob( $fixture );
+		$manifest = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_manifest();
+		$blob     = $this->fixture_blob( $fixture );
 
 		$manifest[ $file ] = [
 			'url'  => $manifest[ $file ]['url'] ?? 'https://example.com/' . $file,
@@ -154,20 +152,20 @@ trait CopiesFontFixtures {
 			'sha'  => (string) key( $blob ),
 		];
 
-		$this->set_downloader_manifest( $manifest );
+		$this->set_shared_manifest( $manifest );
 		$this->served_as[ $file ] = $fixture;
 	}
 
 	/**
 	 * @param array|null $manifest Null to load the real manifest again
 	 */
-	private function set_downloader_manifest( ?array $manifest ): void {
-		$property = new ReflectionProperty( Model_Core_Font_Downloader::class, 'manifest' );
+	private function set_shared_manifest( ?array $manifest ): void {
+		$property = new ReflectionProperty( Model_Font_Sources::class, 'manifest' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$property->setAccessible( true );
 		}
 
-		$property->setValue( GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' ), $manifest );
+		$property->setValue( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), $manifest );
 	}
 
 	protected function fail_font_downloads(): void {
@@ -193,6 +191,7 @@ trait CopiesFontFixtures {
 		GPDFAPI::delete_plugin_option( 'custom_fonts' );
 		array_map( [ FlushCache::class, 'flush' ], array_unique( $this->recorded_fonts ) );
 		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
+		GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->flush();
 
 		/* A download or its fallback caches metrics under every font key the render asked for, substitutes included */
 		if ( $this->requested !== [] ) {
@@ -200,7 +199,7 @@ trait CopiesFontFixtures {
 		}
 
 		if ( $this->served_as !== [] ) {
-			$this->set_downloader_manifest( null );
+			$this->set_shared_manifest( null );
 		}
 
 		$this->copied_fonts   = [];

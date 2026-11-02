@@ -315,6 +315,32 @@ class Test_Model_Font_Sources extends TestCase {
 		];
 	}
 
+	public function test_a_manifest_is_read_and_logged_once() {
+		[ $model, $log ] = $this->model_with_log();
+		$path            = get_temp_dir() . 'gfpdf-manifest-' . wp_generate_password( 6, false ) . '.json';
+
+		$this->assertSame( [], $model->read_manifest( $path ) );
+		file_put_contents( $path, wp_json_encode( [] ) );
+
+		try {
+			$this->assertSame( [], $model->read_manifest( $path ) );
+			$this->assertCount( 1, $log->getRecords() );
+		} finally {
+			wp_delete_file( $path );
+		}
+	}
+
+	public function test_the_manifest_merges_every_source_once() {
+		$model    = $this->stub_font_sources();
+		$manifest = $model->get_manifest();
+
+		$this->assertArrayHasKey( 'DejaVuSerifCondensed.ttf', $manifest );
+		$this->assertTrue( $model->is_core_font_file( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFalse( $model->is_core_font_file( 'DejaVuinfo.txt' ) );
+		$this->assertSame( GPDFAPI::get_data_class()->template_font_location . 'Garuda.ttf', $model->get_font_path( 'Garuda.ttf' ) );
+		$this->assertFalse( $model->is_downloaded( 'Garuda.ttf' ) );
+	}
+
 	public function test_read_manifest_skips_invalid_entries() {
 		[ $model, $log ] = $this->model_with_log();
 		$valid           = [

@@ -108,19 +108,19 @@ class Test_Controller_System_Report extends TestCase {
 	private function report_with_font_sources( \GFPDF\Model\Model_Font_Sources $sources ): array {
 		$singleton  = $GLOBALS['gfpdf']->singleton;
 		$registered = $this->get_private( $singleton, 'classes' );
-		$downloader = \GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
-		$original   = $this->get_private( $downloader, 'font_sources' );
+		$required   = \GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
+		$original   = $this->get_private( $required, 'font_sources' );
 
 		/* The System Report reads both through the plugin's shared instances */
-		$this->set_private( $downloader, 'font_sources', $sources, \GFPDF\Model\Model_Core_Font_Downloader::class );
+		$this->set_private( $required, 'font_sources', $sources );
 		$this->set_private( $singleton, 'classes', array_merge( $registered, [ 'Model_Font_Sources' => $sources ] ) );
-		$downloader->flush();
+		$required->flush();
 		try {
 			return $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) );
 		} finally {
-			$this->set_private( $downloader, 'font_sources', $original, \GFPDF\Model\Model_Core_Font_Downloader::class );
+			$this->set_private( $required, 'font_sources', $original );
 			$this->set_private( $singleton, 'classes', $registered );
-			$downloader->flush();
+			$required->flush();
 		}
 	}
 
