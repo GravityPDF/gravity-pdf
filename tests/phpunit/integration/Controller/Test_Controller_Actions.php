@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Controller;
 
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\ResetsDetectedFeatures;
 use GFPDF\Tests\Integration\TestCase;
 
@@ -17,6 +18,7 @@ use GFPDF\Tests\Integration\TestCase;
 class Test_Controller_Actions extends TestCase {
 
 	use CreatesLegacyDownloadUrls;
+	use RecordsFontFailures;
 	use ResetsDetectedFeatures;
 
 	/**
@@ -36,6 +38,7 @@ class Test_Controller_Actions extends TestCase {
 
 	public function tear_down(): void {
 		unset( $_POST['gfpdf_action'], $_POST['gfpdf-dismiss-notice'], $_GET['page'] );
+		$this->delete_font_failures();
 
 		parent::tear_down();
 	}
@@ -52,8 +55,8 @@ class Test_Controller_Actions extends TestCase {
 	public function test_get_routes_includes_default_routes() {
 		$routes = $this->controller->get_routes();
 
-		/* The core font install, the unwritable folders notice, and the one notice covering every deprecated feature */
-		$this->assertCount( 3, $routes );
+		/* The core font install, the unwritable folders and failed core fonts notices, and the one notice covering every deprecated feature */
+		$this->assertCount( 4, $routes );
 
 		$this->assertSame( 'install_core_fonts', $routes[0]['action'] );
 		$this->assertSame( 'gravityforms_edit_settings', $routes[0]['capability'] );
@@ -200,6 +203,103 @@ class Test_Controller_Actions extends TestCase {
 		$pagenow = $original;
 		set_current_screen( 'dashboard' );
 		$gfpdf->notices->clear();
+	}
+
+	public function test_the_failed_core_fonts_route() {
+		$route = array_column( $this->controller->get_routes(), null, 'action' )['failed_core_fonts'];
+
+		$this->assertSame( 'gravityforms_edit_settings', $route['capability'] );
+		$this->assertSame( 'notice-warning', $route['view_class'] );
+		$this->assertIsCallable( $route['condition'] );
+		$this->assertIsCallable( $route['dismiss'] );
+	}
+
+	public function test_fonts_that_failed_after_their_retry_raise_a_notice_until_dismissed() {
+		$this->with_screen(
+			'administrator',
+			function () {
+				global $gfpdf;
+
+				$model = $gfpdf->singleton->get_class( 'Model_Actions' );
+
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() - 10 ), 'FreeSans.ttf' => $this->failure() ] );
+				$html = $this->render_notices();
+				$this->assertStringContainsString( 'Gravity PDF could not download these fonts. Until they are installed, PDFs use a fallback font in their place', $html );
+				$this->assertStringContainsString( '<code>Garuda.ttf</code>', $html );
+				$this->assertStringNotContainsString( 'FreeSans.ttf', $html );
+				$this->assertStringContainsString( 'https://docs.gravitypdf.com/users/core-pdf-fonts', $html );
+
+				$model->dismiss_failed_core_fonts();
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+
+				/* A font that fails later raises it again, for that font alone */
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() - 10 ), 'FreeSans.ttf' => $this->failure( time() + 1 ) ] );
+				$this->assertSame( [ 'FreeSans.ttf' ], $model->get_undismissed_failed_core_fonts() );
+
+				/* A font that downloads leaves the notice, which goes once none are left */
+				$this->set_font_failures( [] );
+				$this->assertFalse( $model->has_failed_core_fonts() );
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+			}
+		);
+	}
+
+	public function test_the_failed_core_fonts_notice_needs_the_settings_capability() {
+		$this->with_screen(
+			'editor',
+			function () {
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+			}
+		);
+	}
+
+	/**
+	 * The fonts folder serves the whole network, so the network admin sees the notice too
+	 */
+	public function test_the_failed_core_fonts_notice_shows_in_network_admin() {
+		$this->with_screen(
+			'administrator',
+			function () {
+				global $gfpdf;
+
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+				$gfpdf->notices->clear();
+				$this->controller->route_notices();
+
+				$this->assertTrue( is_network_admin() );
+				$this->assertTrue( $gfpdf->notices->has_notice() );
+			},
+			'index.php-network'
+		);
+	}
+
+	/**
+	 * Run $test as a new user with the role, on the admin screen given, then restore the screen and the notices
+	 */
+	private function with_screen( string $role, callable $test, string $screen = 'dashboard' ): void {
+		global $gfpdf, $pagenow;
+
+		$user_id = self::factory()->user->create( [ 'role' => $role ] );
+		if ( is_multisite() && $role === 'administrator' ) {
+			grant_super_admin( $user_id );
+		}
+		wp_set_current_user( $user_id );
+
+		$original = $pagenow;
+		$pagenow  = 'index.php';
+		set_current_screen( $screen );
+
+		try {
+			$test();
+		} finally {
+			$pagenow = $original;
+			set_current_screen( 'dashboard' );
+			$gfpdf->notices->clear();
+		}
 	}
 
 	/**

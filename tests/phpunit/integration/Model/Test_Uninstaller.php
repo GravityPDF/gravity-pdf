@@ -12,6 +12,7 @@ use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_Uninstall;
 use GFPDF\Statics\Cache;
 use GFPDF\Statics\Deprecation_V3;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -30,6 +31,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group uninstaller
  */
 class Test_Uninstaller extends TestCase {
+
+	use RecordsFontFailures;
 
 	/**
 	 * Our Controller
@@ -125,8 +128,19 @@ class Test_Uninstaller extends TestCase {
 		$this->assertDirectoryExists( $gfpdf->data->template_location );
 		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
 
+		/* Install queued the font sync, and a failed download its retry */
+		$this->assertNotFalse( wp_next_scheduled( Model_Core_Font_Downloader::SYNC_EVENT ) );
+		wp_schedule_single_event( time() + 100, Model_Core_Font_Downloader::RETRY_EVENT );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
+		set_transient( Model_Core_Font_Downloader::SYNC_REMAINING, [ 'Garuda.ttf' ], DAY_IN_SECONDS );
+
 		/* Uninstall */
 		$this->model->uninstall_plugin();
+
+		$this->assertFalse( wp_next_scheduled( Model_Core_Font_Downloader::SYNC_EVENT ) );
+		$this->assertFalse( wp_next_scheduled( Model_Core_Font_Downloader::RETRY_EVENT ) );
+		$this->assertFalse( $this->get_font_failures() );
+		$this->assertFalse( get_transient( Model_Core_Font_Downloader::SYNC_REMAINING ) );
 
 		/* Check software was uninstalled */
 		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );

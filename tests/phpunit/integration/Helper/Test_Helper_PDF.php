@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Helper;
 
 use Exception;
+use GFPDF\Tests\Concerns\AccessesPrivateState;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Concerns\SpawnsPhpProcesses;
 use GFPDF\Tests\Concerns\UnregistersMvcClasses;
@@ -23,6 +24,7 @@ use GPDFAPI;
  */
 class Test_Helper_PDF extends TestCase {
 
+	use AccessesPrivateState;
 	use CreatesLegacyTemplates;
 	use SpawnsPhpProcesses;
 	use UsesLockableTmpLocation;
@@ -252,6 +254,29 @@ class Test_Helper_PDF extends TestCase {
 
 		$this->assertSame( FontFileFinder::class, get_class( $this->get_private( $this->mpdf_property(), 'fontFileFinder', MpdfCore::class ) ) );
 		$this->assertSame( 'arimo', $this->mpdf_property()->default_font );
+	}
+
+	public function test_mpdf_substitutes_from_the_symbols_dejavu_and_freesans_but_not_sun_exta() {
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans' ], $this->mpdf_property()->backupSubsFont );
+	}
+
+	public function test_a_substitution_list_from_the_config_filter_is_kept() {
+		add_filter(
+			'gfpdf_mpdf_class_config',
+			static function ( $config ) {
+				$config['backupSubsFont'] = [ 'freeserif' ];
+
+				return $config;
+			}
+		);
+
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( [ 'freeserif' ], $this->mpdf_property()->backupSubsFont );
 	}
 
 	public function test_an_add_on_can_replace_the_font_finder() {
@@ -510,18 +535,6 @@ class Test_Helper_PDF extends TestCase {
 	private function use_scratch_path( string $filename ): void {
 		$this->pdf->set_path( $this->gfpdf()->data->template_tmp_location . 'test-save-' . uniqid() );
 		$this->pdf->set_filename( $filename );
-	}
-
-	/**
-	 * @return mixed
-	 */
-	private function get_private( object $object, string $name, string $class = '' ) {
-		$ref = new \ReflectionProperty( $class !== '' ? $class : get_class( $object ), $name );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$ref->setAccessible( true );
-		}
-
-		return $ref->getValue( $object );
 	}
 
 	private function mpdf_property() {

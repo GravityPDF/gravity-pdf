@@ -73,6 +73,9 @@ class Controller_Activation {
 		wp_clear_scheduled_hook( 'gfpdf_cache_sweep' );
 		wp_clear_scheduled_hook( 'gfpdf_network_update_check' );
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
+		/* Model_Core_Font_Downloader's SYNC_EVENT and RETRY_EVENT, as the autoloader isn't loaded when the checks fail */
+		wp_clear_scheduled_hook( 'gfpdf_download_core_fonts' );
+		wp_clear_scheduled_hook( 'gfpdf_retry_core_font_downloads' );
 
 		/* Flush caches */
 		$templates = \GPDFAPI::get_templates_class();

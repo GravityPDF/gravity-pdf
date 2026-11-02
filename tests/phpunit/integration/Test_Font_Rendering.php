@@ -6,13 +6,14 @@ namespace GFPDF\Tests\Integration;
 
 use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Model\Model_Core_Font_Downloader;
+use GFPDF\Tests\Concerns\AccessesPrivateState;
 use GFPDF\Tests\Concerns\AssertsSnapshots;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GPDFAPI;
-use ReflectionProperty;
 use RuntimeException;
 use WP_Error;
 
@@ -24,7 +25,9 @@ use WP_Error;
  */
 class Test_Font_Rendering extends TestCase {
 
+	use AccessesPrivateState;
 	use AssertsSnapshots;
+	use RecordsFontFailures;
 	use CopiesFontFixtures;
 
 	public static function set_up_before_class(): void {
@@ -43,8 +46,8 @@ class Test_Font_Rendering extends TestCase {
 		$this->remove_font_fixtures();
 		static::copy_test_fonts();
 
-		delete_transient( Model_Core_Font_Downloader::FAILURES );
-		$this->set_downloader_state( 'failures', null );
+		$this->delete_font_failures();
+		wp_clear_scheduled_hook( Model_Core_Font_Downloader::RETRY_EVENT );
 		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
@@ -60,6 +63,49 @@ class Test_Font_Rendering extends TestCase {
 
 	public function test_characters_arimo_lacks_are_substituted(): void {
 		$this->assertRenderMatchesSnapshot( 'arimo-substitution', '<p style="font-family: arimo">Agree ✔ Decline ✖</p>' );
+	}
+
+	public function test_symbols_arimo_lacks_render_from_the_bundled_subset_without_a_download(): void {
+		$this->empty_fonts_folder();
+		$this->serve_font_downloads();
+
+		$this->assertRenderMatchesSnapshot( 'symbols-substitution', '<p style="font-family: arimo">Next ⇒ ┏━┓</p>', [ 'font' => 'arimo' ] );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_an_emoji_and_cjk_on_an_english_site_do_not_download_sun_exta(): void {
+		$this->empty_fonts_folder();
+
+		/* Cached metrics change which substitutes mPDF loads */
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Smile 😀 日本</p>', [ 'font' => 'arimo' ] );
+		$this->assertMatchesSnapshot( 'fonts/emoji-cjk-without-sun-exta.txt', $this->describe_fonts( $render ) );
+		$this->assertNotContains( 'sun-exta', $render['mpdf']->backupSubsFont );
+		$this->assertArrayNotHasKey( 'sun-exta', $render['mpdf']->fonts );
+
+		/* FreeSans has no fixture, so it fails verification and falls back to Arimo */
+		$this->assertSame(
+			[
+				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/DejaVuSansCondensed.ttf',
+				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/FreeSans.ttf',
+			],
+			$this->requested
+		);
+	}
+
+	public function test_sun_exta_on_disk_is_substituted_from_without_a_download(): void {
+		/* Sun-ExtA's font data needs no OpenType tables, so any fixture stands in; Chewy has no CJK */
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		FlushCache::flush();
+		$this->fail_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Smile 😀 日本</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertSame( 'sun-exta', array_slice( $render['mpdf']->backupSubsFont, -1 )[0] );
+		$this->assertSame( 'Sun-ExtA.ttf', basename( $render['mpdf']->fonts['sun-exta']['ttffile'] ?? '' ) );
+		$this->assertStringNotContainsString( 'Sun-ExtA', implode( ',', $this->requested ) );
 	}
 
 	public function test_consent_ticks_render_from_the_bundled_symbols(): void {
@@ -89,11 +135,11 @@ class Test_Font_Rendering extends TestCase {
 	}
 
 	public function test_a_render_with_its_fonts_on_disk_does_not_load_the_manifest(): void {
-		$this->set_downloader_state( 'manifest', null );
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' ), 'manifest', null );
 
 		$this->render( '<p style="font-family: dejavusans">Regular <b>Bold</b></p>' );
 
-		$this->assertNull( $this->get_downloader_state( 'manifest' ) );
+		$this->assertNull( $this->get_private( GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' ), 'manifest' ) );
 	}
 
 	public function test_a_missing_core_font_downloads_while_rendering(): void {
@@ -107,13 +153,12 @@ class Test_Font_Rendering extends TestCase {
 		/* DejaVu Serif Condensed has the OpenType tables Garuda's font data needs, but no Thai */
 		$this->assertRenderMatchesSnapshot( 'downloaded-thai-font', '<p lang="th">สวัสดี</p>', [ 'font' => 'arimo' ] );
 
-		/* mPDF starts in Arimo, so only the Thai font downloads, then the substitutes for the glyphs it lacks */
+		/* mPDF starts in Arimo, so only the Thai font downloads, then the substitutes for the glyphs it lacks, never Sun-ExtA */
 		$this->assertSame(
 			[
 				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/Garuda.ttf',
 				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/DejaVuSansCondensed.ttf',
 				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/FreeSans.ttf',
-				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/Sun-ExtA.ttf',
 			],
 			$this->requested
 		);
@@ -219,32 +264,6 @@ class Test_Font_Rendering extends TestCase {
 	 */
 	protected function empty_fonts_folder(): void {
 		static::remove_test_fonts();
-	}
-
-	/**
-	 * @return mixed
-	 */
-	protected function get_downloader_state( string $name ) {
-		$property = new ReflectionProperty( Model_Core_Font_Downloader::class, $name );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$property->setAccessible( true );
-		}
-
-		return $property->getValue( GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' ) );
-	}
-
-	/**
-	 * The shared downloader remembers this request's failures, so reset it between tests
-	 *
-	 * @param mixed $value
-	 */
-	protected function set_downloader_state( string $name, $value ): void {
-		$property = new ReflectionProperty( Model_Core_Font_Downloader::class, $name );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$property->setAccessible( true );
-		}
-
-		$property->setValue( GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' ), $value );
 	}
 
 	/**

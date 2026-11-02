@@ -741,18 +741,24 @@ class Helper_PDF {
 		/* A deleted tmp folder is recreated with its protection, before mPDF makes it without */
 		$this->misc->create_mpdf_cache_folders();
 
-		$fontdata = apply_filters( 'mpdf_font_data', ( new FontVariables() )->getDefaults()['fontdata'] );
+		/* Filtered for each PDF, so fonts registered since the last one are included */
+		$default_font_config = ( new FontVariables() )->getDefaults();
+		$fontdata            = apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] );
+		$fontdata            = is_array( $fontdata ) ? $fontdata : [];
 
-		$default_font = Model_Font_Sources::ARIMO;
-		$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$default_font       = Model_Font_Sources::ARIMO;
+		$substitution_fonts = $default_font_config['backupSubsFont'];
+		$font_sources       = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 		if ( $font_sources instanceof Model_Font_Sources ) {
-			$default_font = $font_sources->get_default_font( [ $this->settings['font'] ?? '' ], is_array( $fontdata ) ? $fontdata : [] );
+			$default_font       = $font_sources->get_default_font( [ $this->settings['font'] ?? '' ], $fontdata );
+			$substitution_fonts = $font_sources->get_substitution_fonts( $fontdata );
 		}
 
 		$defaults = [
 			'fontDir'                => [ $this->data->template_font_location ],
 			'fontdata'               => $fontdata,
 			'default_font'           => $default_font,
+			'backupSubsFont'         => $substitution_fonts,
 			'tempDir'                => $this->data->mpdf_tmp_location,
 
 			'allow_output_buffering' => true,

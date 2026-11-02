@@ -13,6 +13,7 @@ action gfpdf_entry_detail_post_pdf_name_markup 2
 action gfpdf_entry_detail_pre_markup 1
 action gfpdf_entry_detail_pre_pdf_links_markup 2
 action gfpdf_entry_detail_pre_pdf_name_markup 2
+action gfpdf_font_sources_changed 0
 action gfpdf_form_settings_rest_after_insert_pdf 3
 action gfpdf_form_settings_rest_after_update_pdf 3
 action gfpdf_form_settings_rest_delete_pdf 3
@@ -39,6 +40,7 @@ action gfpdf_post_save_pdf 5
 action gfpdf_post_save_pdf_{form_id} 5
 action gfpdf_post_tools_settings_page 0
 action gfpdf_post_uninstall_plugin 0
+action gfpdf_post_update_pdf 3
 action gfpdf_post_view_or_download_pdf 5
 action gfpdf_pre_generate_and_save_pdf 3
 action gfpdf_pre_generate_and_save_pdf_notification 4

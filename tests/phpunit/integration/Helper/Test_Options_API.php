@@ -453,6 +453,27 @@ class Test_Options_API extends TestCase {
 		$this->assertSame( 'default-template', $pdf['template'] );
 	}
 
+	public function test_a_pdf_saved_to_the_database_fires_an_action() {
+		$fired = [];
+		add_action(
+			'gfpdf_post_update_pdf',
+			static function ( ...$args ) use ( &$fired ) {
+				$fired[] = $args;
+			},
+			10,
+			3
+		);
+
+		$pid = '555ad84787d7e';
+		$pdf = array_merge( $this->options->get_pdf( $this->form_id, $pid ), [ 'name' => 'Saved' ] );
+
+		$this->options->update_pdf( $this->form_id, $pid, $pdf, false );
+		$this->assertSame( [], $fired );
+
+		$this->assertTrue( $this->options->update_pdf( $this->form_id, $pid, $pdf ) );
+		$this->assertSame( [ [ $pdf, $this->form_id, $pid ] ], $fired );
+	}
+
 	/**
 	 * Test we can make changes to individual PDF settings
 	 *

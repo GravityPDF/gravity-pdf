@@ -236,6 +236,43 @@ class Model_System_Report extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Installed required font files per downloadable source
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_core_fonts_installed(): array {
+		$downloader = GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
+		$counts     = [];
+		foreach ( $downloader instanceof Model_Core_Font_Downloader ? $downloader->get_installed_counts() : [] as $source => $count ) {
+			$counts[] = $count['manifest']
+				? sprintf( '%s: %d of %d required files installed', $source, $count['installed'], $count['total'] )
+				: sprintf( '%s: manifest missing', $source );
+		}
+
+		return [
+			'label'        => esc_html__( 'Core Fonts installed', 'gravity-pdf' ),
+			'label_export' => 'Core Fonts installed',
+			'value'        => esc_html( implode( ', ', $counts ) ),
+		];
+	}
+
+	/**
+	 * Fonts mPDF falls back to, in order, for characters the PDF's font lacks
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_substitution_fonts(): array {
+		$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$fonts        = $font_sources instanceof Model_Font_Sources ? $font_sources->get_substitution_fonts() : [];
+
+		return [
+			'label'        => esc_html__( 'Substitution Fonts', 'gravity-pdf' ),
+			'label_export' => 'Substitution Fonts',
+			'value'        => esc_html( implode( ', ', $fonts ) ),
+		];
+	}
+
+	/**
 	 * Get array report structure of Gravity PDF System Report
 	 *
 	 * @return array
@@ -303,6 +340,9 @@ class Model_System_Report extends Helper_Abstract_Model {
 				'label_export' => 'Font Folder location',
 				'value'        => $this->data->template_font_location,
 			],
+
+			'core_fonts_installed'      => $this->get_core_fonts_installed(),
+			'substitution_fonts'        => $this->get_substitution_fonts(),
 
 			'temp_folder_location'      => [
 				'label'        => esc_html__( 'Temporary Folder location', 'gravity-pdf' ),

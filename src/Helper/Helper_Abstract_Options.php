@@ -631,6 +631,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 				/* Update the database, if able */
 				$did_update = $this->gform->update_form( $form );
+
+				if ( $did_update === true ) {
+					/**
+					 * Fires after a PDF's settings are saved to the database
+					 *
+					 * @param array  $pdf     The PDF settings saved
+					 * @param int    $form_id The Gravity Forms form ID
+					 * @param string $pdf_id  The PDF ID
+					 *
+					 * @since 6.19.0
+					 */
+					do_action( 'gfpdf_post_update_pdf', $pdf, $form_id, $pdf_id );
+				}
 			}
 
 			if ( ! $update_db || $did_update !== false ) {

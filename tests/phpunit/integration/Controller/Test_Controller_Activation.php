@@ -27,6 +27,8 @@ class Test_Controller_Activation extends TestCase {
 		wp_clear_scheduled_hook( 'gfpdf_cache_sweep' );
 		wp_clear_scheduled_hook( 'gfpdf_network_update_check' );
 		wp_clear_scheduled_hook( 'gfpdf_bulk_license_check' );
+		wp_clear_scheduled_hook( \GFPDF\Model\Model_Core_Font_Downloader::SYNC_EVENT );
+		wp_clear_scheduled_hook( \GFPDF\Model\Model_Core_Font_Downloader::RETRY_EVENT );
 
 		parent::tear_down();
 	}
@@ -36,6 +38,8 @@ class Test_Controller_Activation extends TestCase {
 		wp_schedule_event( time() + 100, 'daily', 'gfpdf_network_update_check' );
 		wp_schedule_event( time() + 100, 'daily', 'gfpdf_bulk_license_check' );
 		wp_schedule_single_event( time() + 100, 'gfpdf_cache_sweep' );
+		wp_schedule_single_event( time() + 100, \GFPDF\Model\Model_Core_Font_Downloader::SYNC_EVENT );
+		wp_schedule_single_event( time() + 100, \GFPDF\Model\Model_Core_Font_Downloader::RETRY_EVENT );
 
 		Controller_Activation::deactivation();
 
@@ -43,6 +47,8 @@ class Test_Controller_Activation extends TestCase {
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_network_update_check' ) );
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_bulk_license_check' ) );
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_cache_sweep' ) );
+		$this->assertFalse( wp_next_scheduled( \GFPDF\Model\Model_Core_Font_Downloader::SYNC_EVENT ) );
+		$this->assertFalse( wp_next_scheduled( \GFPDF\Model\Model_Core_Font_Downloader::RETRY_EVENT ) );
 	}
 
 	public function test_deactivation_removes_plugin_rewrite_rules() {

@@ -8,8 +8,10 @@ use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
+use GFPDF\Tests\Concerns\AccessesPrivateState;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
+use GFPDF\Tests\Concerns\StubsFontSources;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -28,8 +30,10 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Controller_System_Report extends TestCase {
 
+	use AccessesPrivateState;
 	use CreatesLegacyDownloadUrls;
 	use CreatesLegacyTemplates;
+	use StubsFontSources;
 
 	public function set_up(): void {
 		parent::set_up();
@@ -79,6 +83,45 @@ class Test_Controller_System_Report extends TestCase {
 
 		$this->assertArrayHasKey( 'user_restrictions', $this->get_report_section( 'security', $system_report ) );
 		$this->assertArrayHasKey( 'logged_out_timeout', $this->get_report_section( 'security', $system_report ) );
+	}
+
+	public function test_system_report_lists_the_required_fonts_installed_and_the_substitution_fonts() {
+		\GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
+		$this->set_languages( [ 'th' ] );
+
+		$directories = $this->report_with_font_sources( $this->stub_font_sources() );
+
+		$this->assertSame( 'core: 0 of 4 required files installed', $directories['core_fonts_installed']['value'] );
+		$this->assertSame( 'Core Fonts installed', $directories['core_fonts_installed']['label_export'] );
+		$this->assertSame( 'gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda', $directories['substitution_fonts']['value'] );
+	}
+
+	public function test_system_report_flags_a_missing_core_font_manifest() {
+		$directories = $this->report_with_font_sources( $this->font_sources_without_a_manifest() );
+
+		$this->assertSame( 'core: manifest missing', $directories['core_fonts_installed']['value'] );
+	}
+
+	/**
+	 * The report's directories section, built with the font sources given
+	 */
+	private function report_with_font_sources( \GFPDF\Model\Model_Font_Sources $sources ): array {
+		$singleton  = $GLOBALS['gfpdf']->singleton;
+		$registered = $this->get_private( $singleton, 'classes' );
+		$downloader = \GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
+		$original   = $this->get_private( $downloader, 'font_sources' );
+
+		/* The System Report reads both through the plugin's shared instances */
+		$this->set_private( $downloader, 'font_sources', $sources, \GFPDF\Model\Model_Core_Font_Downloader::class );
+		$this->set_private( $singleton, 'classes', array_merge( $registered, [ 'Model_Font_Sources' => $sources ] ) );
+		$downloader->flush();
+		try {
+			return $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) );
+		} finally {
+			$this->set_private( $downloader, 'font_sources', $original, \GFPDF\Model\Model_Core_Font_Downloader::class );
+			$this->set_private( $singleton, 'classes', $registered );
+			$downloader->flush();
+		}
 	}
 
 	public function test_system_report_outdated_template() {

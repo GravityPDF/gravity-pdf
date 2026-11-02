@@ -10,6 +10,8 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
+use GFPDF_Vendor\Mpdf\Language\LanguageToFont;
+use GFPDF_Vendor\Mpdf\Language\LanguageToFontInterface;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use GPDFAPI;
 
@@ -80,6 +82,18 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $sources;
 
 	/**
+	 * @var array|null
+	 * @since 6.19.0
+	 */
+	protected $font_data;
+
+	/**
+	 * @var string[]|null
+	 * @since 6.19.0
+	 */
+	protected $language_font_keys;
+
+	/**
 	 * @since 6.19.0
 	 */
 	public function __construct( Helper_Data $data, Model_Custom_Fonts $custom_fonts, LoggerInterface $log ) {
@@ -135,8 +149,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_default_font( array $fonts = [], ?array $fontdata = null ): string {
-		$fontdata = $fontdata ?? apply_filters( 'mpdf_font_data', ( new FontVariables() )->getDefaults()['fontdata'] );
-		$fontdata = is_array( $fontdata ) ? $fontdata : [];
+		$fontdata = $fontdata ?? $this->get_font_data();
 		$fonts[]  = GPDFAPI::get_options_class()->get_option( 'default_font', '' );
 
 		foreach ( $fonts as $font ) {
@@ -185,6 +198,86 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	protected function is_registered( string $font, array $fontdata ): bool {
 		return is_string( $fontdata[ $font ]['R'] ?? null );
+	}
+
+	/**
+	 * mPDF's font data with every registered font, read once per request
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_font_data(): array {
+		if ( $this->font_data === null ) {
+			$fontdata        = apply_filters( 'mpdf_font_data', ( new FontVariables() )->getDefaults()['fontdata'] );
+			$this->font_data = is_array( $fontdata ) ? $fontdata : [];
+		}
+
+		return $this->font_data;
+	}
+
+	/**
+	 * Forget the font data and language fonts read this request
+	 *
+	 * @since 6.19.0
+	 */
+	public function flush(): void {
+		$this->font_data          = null;
+		$this->language_font_keys = null;
+	}
+
+	/**
+	 * The mPDF font keys for the installed languages and the locale
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_language_font_keys(): array {
+		if ( $this->language_font_keys === null ) {
+			$mapper  = $this->get_language_mapper();
+			$locales = array_filter( array_merge( (array) get_available_languages(), [ get_locale() ] ), 'is_string' );
+			$keys    = [];
+
+			foreach ( array_unique( $locales ) as $locale ) {
+				/* Adobe CJK fonts are off in Gravity PDF's config */
+				$options = $mapper->getLanguageOptions( str_replace( '_', '-', $locale ), false );
+				$key     = is_array( $options ) && is_string( $options[1] ?? null ) ? $options[1] : '';
+				if ( $key !== '' ) {
+					$keys[] = $key;
+				}
+			}
+
+			$this->language_font_keys = array_values( array_unique( $keys ) );
+		}
+
+		return $this->language_font_keys;
+	}
+
+	/**
+	 * mPDF's backupSubsFont. Sun-ExtA is added only once it's on disk, as mPDF's own list would download 22.9 MB for one emoji.
+	 *
+	 * @param array|null $fontdata mPDF font data, or null for the registered fonts
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_substitution_fonts( ?array $fontdata = null ): array {
+		$fontdata = $fontdata ?? $this->get_font_data();
+		$fonts    = array_merge( [ self::SYMBOLS_FONT, 'dejavusanscondensed', 'freesans' ], $this->get_language_font_keys() );
+
+		$sun_exta = $fontdata['sun-exta']['R'] ?? '';
+		if ( is_string( $sun_exta ) && $sun_exta !== '' && is_file( $this->data->template_font_location . $sun_exta ) ) {
+			$fonts[] = 'sun-exta';
+		}
+
+		$fonts = array_filter(
+			array_unique( $fonts ),
+			function ( $key ) use ( $fontdata ) {
+				return isset( $fontdata[ $key ] );
+			}
+		);
+
+		return array_values( $fonts );
 	}
 
 	/**
@@ -349,6 +442,13 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		update_option( self::OPTION, $versions );
+
+		/**
+		 * Fires once a font source is added or changes version, after its custom font records are adopted
+		 *
+		 * @since 6.19.0
+		 */
+		do_action( 'gfpdf_font_sources_changed' );
 	}
 
 	/**
@@ -430,6 +530,13 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected function get_language_mapper(): LanguageToFontInterface {
+		return new LanguageToFont();
 	}
 
 	/**

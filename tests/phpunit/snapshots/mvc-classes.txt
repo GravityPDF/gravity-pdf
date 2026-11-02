@@ -1,4 +1,5 @@
 Controller_Actions => GFPDF\Controller\Controller_Actions
+Controller_Core_Font_Downloader => GFPDF\Controller\Controller_Core_Font_Downloader
 Controller_Custom_Fonts => GFPDF\Controller\Controller_Custom_Fonts
 Controller_Debug => GFPDF\Controller\Controller_Debug
 Controller_Export_Entries => GFPDF\Controller\Controller_Export_Entries

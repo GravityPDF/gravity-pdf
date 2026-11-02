@@ -48,7 +48,9 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 		wp_delete_file( $this->font_dir . self::FONT );
 		wp_delete_file( $this->font_dir . self::DEFAULT_FONT );
 		$this->remove_font_fixtures();
-		delete_transient( Model_Core_Font_Downloader::FAILURES );
+		delete_site_option( Model_Core_Font_Downloader::FAILURES );
+		delete_option( Model_Core_Font_Downloader::FAILURES );
+		wp_clear_scheduled_hook( Model_Core_Font_Downloader::RETRY_EVENT );
 		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 

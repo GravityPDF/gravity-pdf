@@ -71,6 +71,7 @@ trait CopiesFontFixtures {
 
 		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->add_font( $font );
 		FlushCache::flush( $id );
+		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
 		$this->recorded_fonts[] = $id;
 	}
 
@@ -191,6 +192,7 @@ trait CopiesFontFixtures {
 		array_map( 'wp_delete_file', $this->copied_fonts );
 		GPDFAPI::delete_plugin_option( 'custom_fonts' );
 		array_map( [ FlushCache::class, 'flush' ], array_unique( $this->recorded_fonts ) );
+		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
 
 		/* A download or its fallback caches metrics under every font key the render asked for, substitutes included */
 		if ( $this->requested !== [] ) {

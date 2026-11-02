@@ -45,6 +45,21 @@ class Model_Actions extends Helper_Abstract_Model {
 	const UNWRITABLE_FOLDER_DISMISSAL = 'unwritable_folder_';
 
 	/**
+	 * The prefix each failed core font's dismissal is recorded under in `action_dismissal`
+	 *
+	 * @since 6.19.0
+	 */
+	const FAILED_CORE_FONT_DISMISSAL = 'failed_core_font_';
+
+	/**
+	 * The failed files the notice list was last built for, and that list
+	 *
+	 * @var array{failed: array<string, int>, files: string[]}|null
+	 * @since 6.19.0
+	 */
+	protected $failed_core_fonts;
+
+	/**
 	 * How long dismissing the unwritable folders notice hides a folder that keeps failing
 	 *
 	 * @since 6.18.0
@@ -292,6 +307,61 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	protected function get_unwritable_folder_dismissal( string $dir ): string {
 		return static::UNWRITABLE_FOLDER_DISMISSAL . md5( $dir );
+	}
+
+	/**
+	 * The core fonts that failed to download after their retry, less the ones dismissed since
+	 *
+	 * @return string[]
+	 * @since 6.19.0
+	 */
+	public function get_undismissed_failed_core_fonts(): array {
+		$downloader = GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
+		$failed     = $downloader instanceof Model_Core_Font_Downloader ? $downloader->get_failed_files() : [];
+
+		/* Built for the condition, the view and the dismissal, so worked out once for the same failures */
+		if ( $this->failed_core_fonts === null || $this->failed_core_fonts['failed'] !== $failed ) {
+			$files = [];
+			foreach ( $failed as $file => $gave_up ) {
+				/* A dismissal covers only the failure it followed */
+				if ( ! $this->is_notice_already_dismissed( $this->get_failed_core_font_dismissal( $file ), $gave_up ) ) {
+					$files[] = $file;
+				}
+			}
+
+			$this->failed_core_fonts = [
+				'failed' => $failed,
+				'files'  => $files,
+			];
+		}
+
+		return $this->failed_core_fonts['files'];
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function has_failed_core_fonts(): bool {
+		return $this->get_undismissed_failed_core_fonts() !== [];
+	}
+
+	/**
+	 * Dismiss each listed font; one that fails later raises the notice again
+	 *
+	 * @since 6.19.0
+	 */
+	public function dismiss_failed_core_fonts(): void {
+		$this->dismiss_notices( array_map( [ $this, 'get_failed_core_font_dismissal' ], $this->get_undismissed_failed_core_fonts() ) );
+		$this->failed_core_fonts = null;
+	}
+
+	/**
+	 * The ID a failed core font's dismissal is recorded under in `action_dismissal`
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_failed_core_font_dismissal( string $file ): string {
+		return static::FAILED_CORE_FONT_DISMISSAL . md5( $file );
 	}
 
 	/**

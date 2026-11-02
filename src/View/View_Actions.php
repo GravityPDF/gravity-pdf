@@ -134,4 +134,17 @@ class View_Actions extends Helper_Abstract_View {
 
 		return $html;
 	}
+
+	/**
+	 * The notice listing the core fonts that couldn't be downloaded
+	 *
+	 * @param string[] $files       The font file names
+	 * @param string   $type        The action ID
+	 * @param string   $button_text The primary button text
+	 *
+	 * @since 6.19.0
+	 */
+	public function failed_core_fonts( array $files, string $type, string $button_text ): string {
+		return $this->load( 'failed_core_fonts', [ 'files' => $files ], false ) . $this->get_action_buttons( $type, $button_text );
+	}
 }
