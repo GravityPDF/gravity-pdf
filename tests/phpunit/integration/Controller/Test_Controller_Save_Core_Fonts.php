@@ -5,7 +5,6 @@ declare( strict_types=1 );
 namespace GFPDF\Controller;
 
 use GFPDF\Model\Model_Core_Font_Downloader;
-use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
 use ReflectionMethod;
@@ -20,8 +19,6 @@ use ReflectionProperty;
  * @group   core-fonts
  */
 class Test_Controller_Save_Core_Fonts extends TestCase {
-
-	use UnregistersMvcClasses;
 
 	/**
 	 * @var Controller_Save_Core_Fonts
@@ -115,26 +112,10 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		$this->assertSame( [ [ 'DejaVuSerifCondensed.ttf', true ] ], $this->downloader->downloads );
 	}
 
-	public function test_without_any_downloader_the_download_fails() {
-		$controller         = new Controller_Save_Core_Fonts( GPDFAPI::get_log_class(), GPDFAPI::get_data_class(), GPDFAPI::get_misc_class() );
-		$_POST['font_name'] = 'DejaVuSerifCondensed.ttf';
-
-		$this->assertFalse(
-			$this->without_mvc_class(
-				'Model_Core_Font_Downloader',
-				function () use ( $controller ) {
-					$this->controller = $controller;
-
-					return $this->invoke_download();
-				}
-			)
-		);
-	}
-
 	/**
 	 * Swap the singleton's downloader for this test; tear_down() puts the original back
 	 */
-	private function set_registered_downloader( ?Model_Core_Font_Downloader $downloader ): void {
+	private function set_registered_downloader( Model_Core_Font_Downloader $downloader ): void {
 		global $gfpdf;
 
 		$classes = new ReflectionProperty( get_class( $gfpdf->singleton ), 'classes' );
@@ -146,7 +127,7 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 		$this->registered = $this->registered ?? $registered;
 
 		$registered['Model_Core_Font_Downloader'] = $downloader;
-		$classes->setValue( $gfpdf->singleton, array_filter( $registered ) );
+		$classes->setValue( $gfpdf->singleton, $registered );
 	}
 
 	private function invoke_download() {

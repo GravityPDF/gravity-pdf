@@ -5,10 +5,12 @@ declare( strict_types=1 );
 namespace GFPDF\Helper;
 use GFAPI;
 use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Model\Model_Font_Sources;
+use GFPDF\Tests\Concerns\AccessesPrivateState;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
-use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GPDFAPI;
 
 /**
  * Test Gravity PDF Options API Class
@@ -27,8 +29,8 @@ use GFPDF_Vendor\Monolog\Handler\TestHandler;
  */
 class Test_Options_API extends TestCase {
 
+	use AccessesPrivateState;
 	use CreatesLegacyTemplates;
-	use UnregistersMvcClasses;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -1682,16 +1684,14 @@ class Test_Options_API extends TestCase {
 		$this->assertSame( 'arimo', $this->options->get_registered_fields()['form_settings_appearance']['font']['std'] );
 	}
 
-	public function test_the_pdf_font_setting_defaults_to_arimo_without_the_font_sources() {
-		$this->options->update_option( 'default_font', 'dejavusanscondensed' );
+	public function test_the_pdf_font_setting_asks_injected_font_sources() {
+		$font_sources = $this->createMock( Model_Font_Sources::class );
+		$font_sources->expects( $this->once() )->method( 'get_default_font' )->willReturn( 'freeserif' );
 
-		try {
-			$fields = $this->without_mvc_class( 'Model_Font_Sources', [ $this->options, 'get_registered_fields' ] );
-		} finally {
-			$this->options->delete_option( 'default_font' );
-		}
+		$options = new Helper_Options_Fields( GPDFAPI::get_log_class(), GPDFAPI::get_form_class(), GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class(), GPDFAPI::get_templates_class() );
+		$this->set_private( $options, 'font_sources', $font_sources );
 
-		$this->assertSame( 'arimo', $fields['form_settings_appearance']['font']['std'] );
+		$this->assertSame( 'freeserif', $options->get_registered_fields()['form_settings_appearance']['font']['std'] );
 	}
 
 	public function provider_filtered_default_font(): array {

@@ -61,7 +61,7 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	 *
 	 * @since 6.19.0
 	 */
-	const SYNC_EVENT = 'gfpdf_download_core_fonts';
+	const SYNC_EVENT = 'gfpdf_core_font_sync';
 
 	/**
 	 * The files a paused sync run left for the next one
@@ -216,6 +216,37 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Whether fonts may be downloaded, e.g. not on hosts that block outbound requests: the constant, else the filter
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_auto_install_enabled( string $file ): bool {
+		$locked = $this->get_auto_install_constant();
+		if ( $locked !== null ) {
+			return $locked;
+		}
+
+		/**
+		 * Filter whether a core font may be downloaded. The GPDF_AUTO_INSTALL_FONTS constant overrides it.
+		 *
+		 * @param bool   $download Whether to download the file
+		 * @param string $file     The file name
+		 *
+		 * @since 6.19.0
+		 */
+		return (bool) apply_filters( 'gfpdf_auto_install_fonts', true, $file );
+	}
+
+	/**
+	 * GPDF_AUTO_INSTALL_FONTS as a bool, or null when it isn't defined
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_auto_install_constant(): ?bool {
+		return defined( 'GPDF_AUTO_INSTALL_FONTS' ) ? (bool) constant( 'GPDF_AUTO_INSTALL_FONTS' ) : null;
+	}
+
+	/**
 	 * Download a file on the manifest into the fonts folder, skipped if it's there unless forced
 	 *
 	 * @param bool $force Replace a copy already in the fonts folder
@@ -236,15 +267,7 @@ class Model_Core_Font_Downloader extends Helper_Abstract_Model {
 			return true;
 		}
 
-		/**
-		 * Filter whether a core font may be downloaded, e.g. on hosts that block outbound requests
-		 *
-		 * @param bool   $download Whether to download the file
-		 * @param string $file     The file name
-		 *
-		 * @since 6.19.0
-		 */
-		if ( ! apply_filters( 'gfpdf_core_font_download', true, $file ) ) {
+		if ( ! $this->is_auto_install_enabled( $file ) ) {
 			return false;
 		}
 

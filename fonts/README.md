@@ -10,14 +10,14 @@ Upstream: <https://github.com/googlefonts/arimo> `fonts/ttf/`, version 1.33, com
 `4a6255f269916ae7ad3fc2706b0935e7621396b8`. Licence: SIL Open Font License 1.1 (`OFL-Arimo.txt`), no Reserved Font
 Name.
 
-The files are prefixed `GravityPDF-` so they never collide with the `Arimo-*.ttf` copies premium templates put in the
+The files are prefixed `gfpdf-` so they never collide with the `Arimo-*.ttf` copies premium templates put in the
 PDF fonts folder.
 
 The four faces are **dehinted**: TrueType hinting is stripped and nothing else changes, which takes a third off the
 file size and off every PDF that embeds them. Run once per face with fontTools 4.59.2:
 
 ```
-python3 -I dehint.py Arimo-Regular.ttf GravityPDF-Arimo-Regular.ttf
+python3 -I dehint.py Arimo-Regular.ttf gfpdf-Arimo-Regular.ttf
 ```
 
 ```python
@@ -56,5 +56,5 @@ must not be named "Bitstream" or "Vera". Subset with fontTools 4.59.2 (1,108 gly
 
 ```
 python3 -I -m fontTools.subset DejaVuSans.ttf --unicodes=U+2190-23FF,U+2460-27BF,U+2B00-2BFF \
-  --layout-features='*' --notdef-outline --output-file=GravityPDF-DejaVuSansSymbols.ttf
+  --layout-features='*' --notdef-outline --output-file=gfpdf-DejaVuSansSymbols.ttf
 ```

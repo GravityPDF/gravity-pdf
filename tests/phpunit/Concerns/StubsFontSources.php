@@ -68,6 +68,18 @@ trait StubsFontSources {
 	}
 
 	/**
+	 * A language mapper that answers every locale with the same options
+	 *
+	 * @param mixed $options What getLanguageOptions() returns
+	 */
+	protected function stub_language_mapper( $options ): LanguageToFontInterface {
+		$mapper = $this->createMock( LanguageToFontInterface::class );
+		$mapper->method( 'getLanguageOptions' )->willReturn( $options );
+
+		return $mapper;
+	}
+
+	/**
 	 * Font sources whose core manifest can't be read
 	 */
 	protected function font_sources_without_a_manifest(): Model_Font_Sources {

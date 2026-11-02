@@ -1,2 +1,2 @@
 BaseFont: Arimo-Regular
-arimo: GravityPDF-Arimo-Regular.ttf
+arimo: gfpdf-Arimo-Regular.ttf

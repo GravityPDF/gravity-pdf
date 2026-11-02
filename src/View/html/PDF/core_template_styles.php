@@ -25,7 +25,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @global $gfpdf
  */
 
-$pdf_font     = $settings['font'] ?? '';
+$pdf_font = $settings['font'] ?? '';
+
+/* Templates include this file directly, so there's nothing to inject the font sources into */
 $font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 $font         = $font_sources instanceof Model_Font_Sources ? $font_sources->get_default_font( [ $pdf_font ] ) : Model_Font_Sources::ARIMO;
 

@@ -154,23 +154,35 @@ class Test_PDF extends TestCase {
 		];
 	}
 
-	public function test_fonts_fall_back_to_arimo_without_the_font_sources() {
+	public function test_the_core_styles_fall_back_to_arimo_without_the_font_sources() {
 		$data = $this->form_and_entry();
 
-		[ $watermark, $styles ] = $this->without_mvc_class(
+		$styles = $this->without_mvc_class(
 			'Model_Font_Sources',
 			function () use ( $data ) {
-				$mpdf = $this->model->set_watermark_font( new \stdClass(), [], [], [ 'font' => 'dejavusans' ] );
-
 				ob_start();
 				$this->view->core_template_styles( [ 'settings' => [ 'font' => 'dejavusans' ], 'form' => $data['form'], 'entry' => $data['entry'] ] );
 
-				return [ $mpdf->watermark_font, ob_get_clean() ];
+				return ob_get_clean();
 			}
 		);
 
-		$this->assertSame( 'arimo', $watermark );
 		$this->assertStringContainsString( 'font-family: arimo, sans-serif;', $styles );
+	}
+
+	public function test_set_watermark_font_asks_injected_font_sources() {
+		global $gfpdf;
+
+		$font_sources = $this->createMock( Model_Font_Sources::class );
+		$font_sources->expects( $this->once() )
+			->method( 'get_default_font' )
+			->with( [ 'freeserif', 'dejavusans' ], null )
+			->willReturn( 'freeserif' );
+
+		$model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer(), null, $font_sources );
+		$mpdf  = $model->set_watermark_font( new \stdClass(), [], [], [ 'watermark_font' => 'freeserif', 'font' => 'dejavusans' ] );
+
+		$this->assertSame( 'freeserif', $mpdf->watermark_font );
 	}
 
 	public function test_set_watermark_font_skips_non_string_fonts() {
@@ -2350,6 +2362,7 @@ class Test_PDF extends TestCase {
 			'a non-string PDF font'                   => [ [ 'dejavusans' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
 			'no PDF font and an unknown default font' => [ null, 'notafont', 'arimo' ],
 			'nothing registered'                      => [ 'notafont', '', 'arimo' ],
+			'the bundled Arimo'                       => [ 'arimo', 'dejavusanscondensed', 'arimo' ],
 		];
 	}
 

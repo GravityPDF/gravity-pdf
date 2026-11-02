@@ -79,6 +79,16 @@ class Test_Uninstaller extends TestCase {
 		parent::tear_down_after_class();
 	}
 
+	public function tear_down(): void {
+		global $wp_settings_errors, $wp_rewrite;
+
+		/* A subsite leaves these behind, which WP_UnitTestCase doesn't roll back */
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
+
+		parent::tear_down();
+	}
+
 	public function set_up(): void {
 		parent::set_up();
 
@@ -134,8 +144,21 @@ class Test_Uninstaller extends TestCase {
 		$this->set_back_off( 'Garuda.ttf' );
 		set_transient( Model_Core_Font_Downloader::SYNC_REMAINING, [ 'Garuda.ttf' ], DAY_IN_SECONDS );
 
+		/* Each site records its font source versions */
+		update_option( Model_Font_Sources::OPTION, [ 'bundled' => '1.0.0' ] );
+		$subsite = is_multisite() ? self::factory()->blog->create() : 0;
+		if ( $subsite ) {
+			update_blog_option( $subsite, Model_Font_Sources::OPTION, [ 'bundled' => '1.0.0' ] );
+		}
+
 		/* Uninstall */
 		$this->model->uninstall_plugin();
+
+		$this->assertFalse( get_option( Model_Font_Sources::OPTION ) );
+		if ( $subsite ) {
+			$this->assertFalse( get_blog_option( $subsite, Model_Font_Sources::OPTION ) );
+			wp_delete_site( $subsite );
+		}
 
 		$this->assertFalse( wp_next_scheduled( Model_Core_Font_Downloader::SYNC_EVENT ) );
 		$this->assertFalse( $this->get_font_failures() );
@@ -208,6 +231,7 @@ class Test_Uninstaller extends TestCase {
 		Cache::bump_form_generation( 1 );
 		update_option( Model_Pdf_Cache::SWEEP_STATE_OPTION, [ 'last_slice_at' => time() ], false );
 		update_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION, '1', false );
+		update_option( Model_Font_Sources::OPTION, [ 'bundled' => '1.0.0', 'core' => '1.0.0' ] );
 
 		$this->assertArrayHasKey( 'deprecated_features', get_option( 'gfpdf_settings' ) );
 		$this->assertNotFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
@@ -233,6 +257,7 @@ class Test_Uninstaller extends TestCase {
 		$this->assertFalse( get_option( Model_Pdf_Cache::SWEEP_STATE_OPTION ) );
 		$this->assertFalse( get_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION ) );
 		$this->assertFalse( get_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ) );
+		$this->assertFalse( get_option( Model_Font_Sources::OPTION ) );
 
 		wp_set_current_user( 0 );
 	}

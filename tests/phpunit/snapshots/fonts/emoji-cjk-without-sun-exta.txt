@@ -1,2 +1,2 @@
 BaseFont: Arimo-Regular
-arimo: GravityPDF-Arimo-Regular.ttf 日本😀
+arimo: gfpdf-Arimo-Regular.ttf 日本😀

@@ -7,7 +7,6 @@ namespace GFPDF\Model;
 use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\UnregistersMvcClasses;
-use GFPDF\Tests\Concerns\FakeLanguageToFont;
 use GFPDF\Tests\Concerns\StubsFontSources;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
@@ -112,10 +111,10 @@ class Test_Model_Font_Sources extends TestCase {
 
 		$this->assertSame(
 			[
-				'R'      => 'GravityPDF-Arimo-Regular.ttf',
-				'B'      => 'GravityPDF-Arimo-Bold.ttf',
-				'I'      => 'GravityPDF-Arimo-Italic.ttf',
-				'BI'     => 'GravityPDF-Arimo-BoldItalic.ttf',
+				'R'      => 'gfpdf-Arimo-Regular.ttf',
+				'B'      => 'gfpdf-Arimo-Bold.ttf',
+				'I'      => 'gfpdf-Arimo-Italic.ttf',
+				'BI'     => 'gfpdf-Arimo-BoldItalic.ttf',
 				'useOTL' => 0xFF,
 			],
 			$fonts['arimo']
@@ -596,7 +595,7 @@ class Test_Model_Font_Sources extends TestCase {
 	public function test_unexpected_language_options_map_to_no_font( $options ) {
 		$this->set_languages( [ 'th' ] );
 
-		$this->assertSame( [], $this->stub_font_sources( null, new FakeLanguageToFont( $options ) )->get_language_font_keys() );
+		$this->assertSame( [], $this->stub_font_sources( null, $this->stub_language_mapper( $options ) )->get_language_font_keys() );
 	}
 
 	public function provider_odd_language_options(): array {
@@ -611,7 +610,7 @@ class Test_Model_Font_Sources extends TestCase {
 	public function test_a_mapped_font_is_a_language_font() {
 		$this->set_languages( [ 'th' ] );
 
-		$this->assertSame( [ 'garuda' ], $this->stub_font_sources( null, new FakeLanguageToFont( [ false, 'garuda' ] ) )->get_language_font_keys() );
+		$this->assertSame( [ 'garuda' ], $this->stub_font_sources( null, $this->stub_language_mapper( [ false, 'garuda' ] ) )->get_language_font_keys() );
 	}
 
 	/**
@@ -628,12 +627,12 @@ class Test_Model_Font_Sources extends TestCase {
 
 	public function provider_substitution_fonts(): array {
 		return [
-			'English'                             => [ [], false, [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans' ] ],
-			'Thai'                                => [ [ 'th' ], false, [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda' ] ],
-			'Japanese'                            => [ [ 'ja' ], false, [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta' ] ],
-			'Chinese'                             => [ [ 'zh_TW' ], false, [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta' ] ],
-			'English, Sun-ExtA on disk'           => [ [], true, [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta' ] ],
-			'Japanese and Thai, Sun-ExtA on disk' => [ [ 'ja', 'th' ], true, [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta', 'garuda' ] ],
+			'English'                             => [ [], false, [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans' ] ],
+			'Thai'                                => [ [ 'th' ], false, [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda' ] ],
+			'Japanese'                            => [ [ 'ja' ], false, [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta' ] ],
+			'Chinese'                             => [ [ 'zh_TW' ], false, [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta' ] ],
+			'English, Sun-ExtA on disk'           => [ [], true, [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta' ] ],
+			'Japanese and Thai, Sun-ExtA on disk' => [ [ 'ja', 'th' ], true, [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'sun-exta', 'garuda' ] ],
 		];
 	}
 
@@ -641,7 +640,42 @@ class Test_Model_Font_Sources extends TestCase {
 		$fontdata = $this->model->get_font_data();
 		unset( $fontdata['freesans'] );
 
-		$this->assertSame( [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed' ], $this->stub_font_sources()->get_substitution_fonts( $fontdata ) );
+		$this->assertSame( [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed' ], $this->stub_font_sources()->get_substitution_fonts( $fontdata ) );
+	}
+
+	public function test_the_substitution_fonts_leave_out_the_pdfs_font() {
+		$model = $this->stub_font_sources();
+
+		$this->assertSame( [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans' ], $model->get_substitution_fonts( null, 'arimo' ) );
+		$this->assertSame( [ 'arimo', 'gfpdf-dejavu-symbols', 'freesans' ], $model->get_substitution_fonts( null, 'dejavusanscondensed' ) );
+		$this->assertSame( [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans' ], $model->get_substitution_fonts( null, 'freeserif' ) );
+	}
+
+	public function test_fresh_font_data_is_filtered_again_and_kept() {
+		$runs   = 0;
+		$filter = static function ( $fonts ) use ( &$runs ) {
+			$runs++;
+			$fonts['gfpdf-test-run'] = [ 'R' => $runs . '.ttf' ];
+
+			return $fonts;
+		};
+		add_filter( 'mpdf_font_data', $filter );
+
+		$model = $this->stub_font_sources();
+		$model->get_font_data();
+
+		$this->assertSame( '2.ttf', $model->get_font_data( true )['gfpdf-test-run']['R'] );
+		$this->assertSame( '2.ttf', $model->get_font_data()['gfpdf-test-run']['R'] );
+		$this->assertSame( 2, $runs );
+	}
+
+	public function test_fresh_font_data_a_filter_broke_is_no_fonts() {
+		$model = $this->stub_font_sources();
+		$this->assertNotSame( [], $model->get_font_data() );
+
+		add_filter( 'mpdf_font_data', '__return_false', PHP_INT_MAX );
+
+		$this->assertSame( [], $model->get_font_data( true ) );
 	}
 
 	public function test_the_font_data_is_filtered_once_until_flushed() {

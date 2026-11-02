@@ -115,7 +115,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 	public function test_a_failed_download_falls_back_to_arimo_when_the_default_font_is_missing() {
 		$this->fail_font_downloads();
 
-		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/GravityPDF-Arimo-Regular.ttf', $this->finder()->findFontFile( self::FONT ) );
+		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->finder()->findFontFile( self::FONT ) );
 	}
 
 	public function test_a_failed_download_throws_in_debug_mode() {
@@ -132,7 +132,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 	public function test_an_empty_default_font_falls_back_to_arimo() {
 		$this->fail_font_downloads();
 
-		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/GravityPDF-Arimo-Regular.ttf', $this->finder( '' )->findFontFile( self::FONT ) );
+		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->finder( '' )->findFontFile( self::FONT ) );
 	}
 
 	/**
@@ -207,7 +207,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 
 	public function test_the_downloader_answers_the_finders_miss_path() {
 		$this->assertSame( $this->font_dir . self::FONT, $this->downloader->get_font_path( self::FONT ) );
-		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/GravityPDF-Arimo-Regular.ttf', $this->downloader->get_fallback_file() );
+		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->downloader->get_fallback_file() );
 		$this->assertFalse( $this->downloader->is_debug_mode() );
 
 		GPDFAPI::get_options_class()->update_option( 'debug_mode', 'Yes' );

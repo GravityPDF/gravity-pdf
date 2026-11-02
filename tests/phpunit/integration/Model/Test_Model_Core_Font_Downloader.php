@@ -74,7 +74,7 @@ class Test_Model_Core_Font_Downloader extends TestCase {
 		$this->assertTrue( $this->downloader->is_core_font_file( self::FONT ) );
 		$this->assertTrue( $this->downloader->is_core_font_file( 'Aegean.otf' ) );
 		$this->assertFalse( $this->downloader->is_core_font_file( 'DejaVuinfo.txt' ) );
-		$this->assertFalse( $this->downloader->is_core_font_file( 'GravityPDF-Arimo-Regular.ttf' ) );
+		$this->assertFalse( $this->downloader->is_core_font_file( 'gfpdf-Arimo-Regular.ttf' ) );
 		$this->assertFalse( $this->downloader->is_core_font_file( '../' . self::FONT ) );
 	}
 
@@ -258,7 +258,7 @@ class Test_Model_Core_Font_Downloader extends TestCase {
 	public function test_a_missing_bundled_fallback_is_logged() {
 		$font_sources = new class( GPDFAPI::get_data_class(), GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), GPDFAPI::get_log_class() ) extends Model_Font_Sources {
 			public function get_fallback_file(): string {
-				return '/missing/GravityPDF-Arimo-Regular.ttf';
+				return '/missing/gfpdf-Arimo-Regular.ttf';
 			}
 		};
 
@@ -325,13 +325,84 @@ class Test_Model_Core_Font_Downloader extends TestCase {
 	}
 
 	public function test_downloads_can_be_turned_off() {
-		add_filter( 'gfpdf_core_font_download', '__return_false' );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
 		$this->serve_font_downloads();
 
 		$this->assertFalse( $this->downloader->download( self::FONT ) );
 		$this->assertSame( [], $this->requested );
 		$this->assertFalse( $this->get_font_failures() );
 		$this->assertFalse( $this->get_back_off( self::FONT ) );
+	}
+
+	public function test_the_kill_switch_filter_is_given_the_file() {
+		$given = [];
+		add_filter(
+			'gfpdf_auto_install_fonts',
+			static function ( $download, $file ) use ( &$given ) {
+				$given[] = [ $download, $file ];
+
+				return $download;
+			},
+			10,
+			2
+		);
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+		$this->assertSame( [ [ true, self::FONT ] ], $given );
+	}
+
+	/**
+	 * @dataProvider provider_kill_switch
+	 *
+	 * @param bool|null $constant GPDF_AUTO_INSTALL_FONTS, or null when it isn't defined
+	 * @param mixed     $filtered What the filter returns
+	 */
+	public function test_the_kill_switch_constant_wins_over_the_filter( ?bool $constant, $filtered, bool $downloads ) {
+		add_filter(
+			'gfpdf_auto_install_fonts',
+			static function () use ( $filtered ) {
+				return $filtered;
+			}
+		);
+		$this->serve_font_downloads();
+
+		$downloader = new class( ...$this->downloader_args() ) extends Model_Core_Font_Downloader {
+			/** @var bool|null */
+			public $constant;
+
+			protected function get_auto_install_constant(): ?bool {
+				return $this->constant;
+			}
+		};
+		$downloader->constant = $constant;
+
+		$this->assertSame( $downloads, $downloader->download( self::FONT ) );
+		$this->assertCount( $downloads ? 1 : 0, $this->requested );
+	}
+
+	public function provider_kill_switch(): array {
+		return [
+			'the constant on, the filter off'  => [ true, false, true ],
+			'the constant off, the filter on'  => [ false, true, false ],
+			'no constant, a falsy filter'      => [ null, '', false ],
+			'no constant, a truthy filter'     => [ null, 'yes', true ],
+		];
+	}
+
+	/**
+	 * Defined in its own process, so the constant can't reach the other tests
+	 *
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_the_kill_switch_constant_turns_downloads_off() {
+		define( 'GPDF_AUTO_INSTALL_FONTS', false );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_true' );
+		$this->serve_font_downloads();
+
+		$this->assertFalse( $this->downloader->download( self::FONT ) );
+		$this->assertSame( [], $this->requested );
 	}
 
 	public function test_schedule_sync_queues_one_event_without_arguments() {
@@ -701,12 +772,20 @@ class Test_Model_Core_Font_Downloader extends TestCase {
 	}
 
 	/**
+	 * The downloader's constructor arguments, logging to a fresh handler
+	 */
+	private function downloader_args(): array {
+		$this->log = new TestHandler();
+
+		return [ GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new Logger( 'test', [ $this->log ] ), GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ) ];
+	}
+
+	/**
 	 * @param bool $partial_move A move that leaves part of the font behind, as one across filesystems can
 	 * @param bool $failed_move  A move that fails without touching the destination
 	 */
 	private function new_downloader( bool $partial_move = false, bool $failed_move = false ): Model_Core_Font_Downloader {
-		$this->log = new TestHandler();
-		$args      = [ GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new Logger( 'test', [ $this->log ] ), GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ) ];
+		$args = $this->downloader_args();
 
 		if ( ! $partial_move && ! $failed_move ) {
 			return new Model_Core_Font_Downloader( ...$args );

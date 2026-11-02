@@ -8,9 +8,10 @@ use Exception;
 use GFPDF\Tests\Concerns\AccessesPrivateState;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Concerns\SpawnsPhpProcesses;
-use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Concerns\UsesLockableTmpLocation;
 use GFPDF\Helper\Mpdf\On_Demand_Font_File_Finder;
+use GFPDF\Model\Model_Core_Font_Downloader;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -28,7 +29,6 @@ class Test_Helper_PDF extends TestCase {
 	use CreatesLegacyTemplates;
 	use SpawnsPhpProcesses;
 	use UsesLockableTmpLocation;
-	use UnregistersMvcClasses;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -242,25 +242,84 @@ class Test_Helper_PDF extends TestCase {
 		];
 	}
 
-	public function test_mpdf_keeps_its_own_finder_and_starts_in_arimo_without_the_font_models() {
+	public function test_mpdf_is_set_up_by_injected_font_models() {
+		global $gfpdf;
+
+		$fontdata     = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_font_data();
+		$font_sources = $this->createMock( Model_Font_Sources::class );
+		$font_sources->expects( $this->once() )->method( 'get_font_data' )->with( true )->willReturn( $fontdata );
+		$font_sources->method( 'get_default_font' )->willReturn( 'dejavusans' );
+		$font_sources->expects( $this->once() )
+			->method( 'get_substitution_fonts' )
+			->with( $fontdata, 'dejavusans' )
+			->willReturn( [ 'dejavusanscondensed' ] );
+
+		$finder     = null;
+		$downloader = $this->createMock( Model_Core_Font_Downloader::class );
+		$downloader->expects( $this->once() )
+			->method( 'get_font_file_finder' )
+			->willReturnCallback(
+				function ( array $config ) use ( $downloader, &$finder ) {
+					$finder = new On_Demand_Font_File_Finder( $config['fontDir'], $downloader, '' );
+
+					return $finder;
+				}
+			);
+
+		$pdf = new Helper_PDF( $this->entry( 'gravityform-1' ), $this->get_private( $this->pdf, 'settings' ), $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log, $font_sources, $downloader );
+		$pdf->set_output_type( 'SAVE' );
+		$pdf->init();
+
+		$mpdf = $this->get_private( $pdf, 'mpdf' );
+		$this->assertSame( 'dejavusans', $mpdf->default_font );
+		$this->assertSame( [ 'dejavusanscondensed' ], $mpdf->backupSubsFont );
+		$this->assertSame( $finder, $this->get_private( $mpdf, 'fontFileFinder', MpdfCore::class ) );
+	}
+
+	public function test_mpdf_renders_arimo_from_the_bundled_faces() {
 		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
 
-		$this->without_mvc_class(
-			'Model_Core_Font_Downloader',
-			function () {
-				$this->without_mvc_class( 'Model_Font_Sources', [ $this->pdf, 'init' ] );
-			}
-		);
+		$mpdf = $this->mpdf_property();
+		$mpdf->WriteHTML( '<p style="font-family: arimo">Arimo</p>' );
 
-		$this->assertSame( FontFileFinder::class, get_class( $this->get_private( $this->mpdf_property(), 'fontFileFinder', MpdfCore::class ) ) );
-		$this->assertSame( 'arimo', $this->mpdf_property()->default_font );
+		$this->assertSame( 'gfpdf-Arimo-Regular.ttf', basename( $mpdf->fonts['arimo']['ttffile'] ) );
 	}
 
 	public function test_mpdf_substitutes_from_the_symbols_dejavu_and_freesans_but_not_sun_exta() {
 		$this->pdf->set_output_type( 'SAVE' );
 		$this->pdf->init();
 
+		$this->assertSame( [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans' ], $this->mpdf_property()->backupSubsFont );
+	}
+
+	public function test_mpdf_does_not_substitute_from_the_pdfs_own_font() {
+		$this->set_private( $this->pdf, 'settings', array_merge( $this->get_private( $this->pdf, 'settings' ), [ 'font' => 'arimo' ] ) );
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( 'arimo', $this->mpdf_property()->default_font );
 		$this->assertSame( [ 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans' ], $this->mpdf_property()->backupSubsFont );
+	}
+
+	public function test_mpdf_reads_font_data_registered_since_the_last_pdf() {
+		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_font_data();
+		$filter = static function ( $fonts ) {
+			$fonts['gfpdf-test-late'] = [ 'R' => 'DejaVuSans.ttf' ];
+
+			return $fonts;
+		};
+		add_filter( 'mpdf_font_data', $filter );
+
+		$this->pdf->set_output_type( 'SAVE' );
+		try {
+			$this->pdf->init();
+		} finally {
+			remove_filter( 'mpdf_font_data', $filter );
+			GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
+		}
+
+		$this->assertArrayHasKey( 'gfpdf-test-late', $this->mpdf_property()->fontdata );
 	}
 
 	public function test_a_substitution_list_from_the_config_filter_is_kept() {

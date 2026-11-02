@@ -25,6 +25,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_Interface_Filters {
 
 	/**
+	 * Null for the registered font sources
+	 *
+	 * @var Model_Font_Sources|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $font_sources;
+
+	/**
 	 * Add our filters
 	 *
 	 * @return void
@@ -40,14 +49,12 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	}
 
 	/**
-	 * The default font if it's registered, else Arimo, for a new PDF's Font setting
+	 * The font sources set, else the registered ones, which bootstrap builds after this class
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_default_pdf_font(): string {
-		$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
-
-		return $font_sources instanceof Model_Font_Sources ? $font_sources->get_default_font() : Model_Font_Sources::ARIMO;
+	protected function get_font_sources(): Model_Font_Sources {
+		return $this->font_sources ?? GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 	}
 
 	/**
@@ -104,7 +111,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'    => __( 'Set the default font type used in PDFs. Choose an existing font or install your own.', 'gravity-pdf' ),
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
-						'std'     => 'arimo',
+						'std'     => Model_Font_Sources::ARIMO,
 						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-pdf' ),
 						'class'   => 'gfpdf-font-manager',
 					],
@@ -551,7 +558,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name'    => esc_html__( 'Font', 'gravity-pdf' ),
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
-						'std'     => $this->get_default_pdf_font(),
+						'std'     => $this->get_font_sources()->get_default_font(),
 						'desc'    => __( 'Set the primary font used in PDFs. You can also install your own.', 'gravity-pdf' ),
 						'class'   => 'gfpdf_font_type gfpdf-font-manager',
 					],

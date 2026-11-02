@@ -41,7 +41,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 *
 	 * @since 6.19.0
 	 */
-	const OPTION = 'gfpdf_font_sources';
+	const OPTION = 'gfpdf_core_font_sources';
 
 	/**
 	 * The bundled DejaVu Sans subset that draws the symbols Arimo lacks
@@ -92,6 +92,14 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected $language_font_keys;
+
+	/**
+	 * mPDF's font defaults, which never change
+	 *
+	 * @var array|null
+	 * @since 6.19.0
+	 */
+	protected $font_defaults;
 
 	/**
 	 * Each manifest read this request, by path
@@ -185,7 +193,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function mpdf_can_resolve( string $font, array $fontdata ): bool {
-		$defaults = ( new FontVariables() )->getDefaults();
+		$defaults = $this->get_font_defaults();
 		$font     = $defaults['fonttrans'][ $font ] ?? $font;
 
 		if ( $this->is_registered( $font, $fontdata ) ) {
@@ -217,13 +225,26 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * @since 6.19.0
+	 */
+	protected function get_font_defaults(): array {
+		if ( $this->font_defaults === null ) {
+			$this->font_defaults = ( new FontVariables() )->getDefaults();
+		}
+
+		return $this->font_defaults;
+	}
+
+	/**
 	 * mPDF's font data with every registered font, read once per request
+	 *
+	 * @param bool $fresh Filter it again, e.g. for each PDF so fonts registered since are included
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_font_data(): array {
-		if ( $this->font_data === null ) {
-			$fontdata        = apply_filters( 'mpdf_font_data', ( new FontVariables() )->getDefaults()['fontdata'] );
+	public function get_font_data( bool $fresh = false ): array {
+		if ( $fresh || $this->font_data === null ) {
+			$fontdata        = apply_filters( 'mpdf_font_data', $this->get_font_defaults()['fontdata'] );
 			$this->font_data = is_array( $fontdata ) ? $fontdata : [];
 		}
 
@@ -269,17 +290,19 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * mPDF's backupSubsFont. Sun-ExtA is added only once it's on disk, as mPDF's own list would download 22.9 MB for one emoji.
+	 * mPDF's backupSubsFont, Arimo first. Sun-ExtA is added only once it's on disk, as mPDF's own list would download
+	 * 22.9 MB for one emoji.
 	 *
 	 * @param array|null $fontdata mPDF font data, or null for the registered fonts
+	 * @param string     $font     The PDF's font, left out as it can't stand in for its own missing glyphs
 	 *
 	 * @return string[]
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_substitution_fonts( ?array $fontdata = null ): array {
+	public function get_substitution_fonts( ?array $fontdata = null, string $font = '' ): array {
 		$fontdata = $fontdata ?? $this->get_font_data();
-		$fonts    = array_merge( [ self::SYMBOLS_FONT, 'dejavusanscondensed', 'freesans' ], $this->get_language_font_keys() );
+		$fonts    = array_merge( [ self::ARIMO, self::SYMBOLS_FONT, 'dejavusanscondensed', 'freesans' ], $this->get_language_font_keys() );
 
 		$sun_exta = $fontdata['sun-exta']['R'] ?? '';
 		if ( is_string( $sun_exta ) && $sun_exta !== '' && $this->is_downloaded( $sun_exta ) ) {
@@ -288,8 +311,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 
 		$fonts = array_filter(
 			array_unique( $fonts ),
-			function ( $key ) use ( $fontdata ) {
-				return isset( $fontdata[ $key ] );
+			function ( $key ) use ( $fontdata, $font ) {
+				return $key !== $font && isset( $fontdata[ $key ] );
 			}
 		);
 
@@ -621,14 +644,14 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			'families' => [
 				self::ARIMO        => [
 					'name'   => 'Arimo',
-					'R'      => 'GravityPDF-Arimo-Regular.ttf',
-					'B'      => 'GravityPDF-Arimo-Bold.ttf',
-					'I'      => 'GravityPDF-Arimo-Italic.ttf',
-					'BI'     => 'GravityPDF-Arimo-BoldItalic.ttf',
+					'R'      => 'gfpdf-Arimo-Regular.ttf',
+					'B'      => 'gfpdf-Arimo-Bold.ttf',
+					'I'      => 'gfpdf-Arimo-Italic.ttf',
+					'BI'     => 'gfpdf-Arimo-BoldItalic.ttf',
 					'useOTL' => 0xFF,
 				],
 				self::SYMBOLS_FONT => [
-					'R'      => 'GravityPDF-DejaVuSansSymbols.ttf',
+					'R'      => 'gfpdf-DejaVuSansSymbols.ttf',
 					'useOTL' => 0,
 					'listed' => false,
 				],
@@ -649,7 +672,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected function get_core_source(): array {
 		return [
 			'version'  => '1.0.0',
-			'families' => ( new FontVariables() )->getDefaults()['fontdata'],
+			'families' => $this->get_font_defaults()['fontdata'],
 			'manifest' => PDF_PLUGIN_DIR . 'build/payload/core-fonts.json',
 		];
 	}

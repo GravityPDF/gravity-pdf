@@ -148,6 +148,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $async_notifications;
 
 	/**
+	 * @var Model_Font_Sources|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $font_sources;
+
+	/**
 	 * @var array Cache statuses of the PDFs generated this request, keyed by path. See get_cache_status()
 	 *
 	 * @since 7.0
@@ -166,11 +173,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param Helper_Templates            $templates
 	 * @param Helper_Interface_Url_Signer $url_signer
 	 * @param Helper_Async_Notifications|null $async_notifications
+	 * @param Model_Font_Sources|null         $font_sources        Defaults to the registered font sources
 	 *
 	 * @since 4.0
 	 * @since 6.18.0 Takes the Gravity Forms background notifications helper
+	 * @since 6.19.0 Takes the font sources
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Helper_Async_Notifications $async_notifications = null ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Helper_Async_Notifications $async_notifications = null, ?Model_Font_Sources $font_sources = null ) {
 
 		/* Assign our internal variables */
 		$this->gform               = $gform;
@@ -182,6 +191,16 @@ class Model_PDF extends Helper_Abstract_Model {
 		$this->templates           = $templates;
 		$this->url_signer          = $url_signer;
 		$this->async_notifications = $async_notifications ?? new Helper_Async_Notifications();
+		$this->font_sources        = $font_sources;
+	}
+
+	/**
+	 * The injected font sources, else the registered ones, which bootstrap builds after this model
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_font_sources(): Model_Font_Sources {
+		return $this->font_sources ?? GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 	}
 
 	/**
@@ -1240,7 +1259,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		do_action( 'gfpdf_pre_generate_and_save_pdf', $form, $entry, $pdf_settings );
 
-		$pdf_generator = new Helper_PDF( $entry, $pdf_settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
+		$pdf_generator = new Helper_PDF( $entry, $pdf_settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log, $this->font_sources );
 		$pdf_generator->set_filename( $filename );
 		$pdf_generator->set_cache_bypass( $bypass_cache );
 		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
@@ -2564,12 +2583,9 @@ class Model_PDF extends Helper_Abstract_Model {
 			return $mpdf;
 		}
 
-		$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
-		$fonts        = [ $settings['watermark_font'] ?? '', $settings['font'] ?? '' ];
+		$fonts = [ $settings['watermark_font'] ?? '', $settings['font'] ?? '' ];
 
-		$mpdf->watermark_font = $font_sources instanceof Model_Font_Sources
-			? $font_sources->get_default_font( $fonts, is_array( $mpdf->fontdata ?? null ) ? $mpdf->fontdata : null )
-			: Model_Font_Sources::ARIMO;
+		$mpdf->watermark_font = $this->get_font_sources()->get_default_font( $fonts, is_array( $mpdf->fontdata ?? null ) ? $mpdf->fontdata : null );
 
 		return $mpdf;
 	}

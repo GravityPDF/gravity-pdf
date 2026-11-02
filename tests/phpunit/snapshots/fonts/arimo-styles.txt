@@ -1,5 +1,5 @@
 BaseFont: Arimo-Bold, Arimo-BoldItalic, Arimo-Italic, Arimo-Regular
-arimo: GravityPDF-Arimo-Regular.ttf
-arimoB: GravityPDF-Arimo-Bold.ttf
-arimoBI: GravityPDF-Arimo-BoldItalic.ttf
-arimoI: GravityPDF-Arimo-Italic.ttf
+arimo: gfpdf-Arimo-Regular.ttf
+arimoB: gfpdf-Arimo-Bold.ttf
+arimoBI: gfpdf-Arimo-BoldItalic.ttf
+arimoI: gfpdf-Arimo-Italic.ttf

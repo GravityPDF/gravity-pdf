@@ -6,7 +6,6 @@ use Exception;
 use GFPDF\Helper\Log\Context_Logger;
 use GFPDF\Helper\Mpdf\Request;
 use GFPDF\Statics\Cache;
-use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF\Helper\Mpdf\Mpdf;
 use GFPDF\Model\Model_Core_Font_Downloader;
 use GFPDF\Model\Model_Font_Sources;
@@ -210,35 +209,72 @@ class Helper_PDF {
 	protected $log;
 
 	/**
+	 * @var Model_Font_Sources|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $font_sources;
+
+	/**
+	 * @var Model_Core_Font_Downloader|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $downloader;
+
+	/**
 	 * Initialise our class
 	 *
-	 * @param array                $entry    The Gravity Form Entry to be processed
-	 * @param array                $settings The Gravity PDF Settings Array
-	 * @param Helper_Abstract_Form $gform
-	 * @param Helper_Data          $data
-	 * @param Helper_Misc          $misc
-	 * @param Helper_Templates     $templates
-	 * @param LoggerInterface      $log
+	 * @param array                           $entry        The Gravity Form Entry to be processed
+	 * @param array                           $settings     The Gravity PDF Settings Array
+	 * @param Helper_Abstract_Form            $gform
+	 * @param Helper_Data                     $data
+	 * @param Helper_Misc                     $misc
+	 * @param Helper_Templates                $templates
+	 * @param LoggerInterface                 $log
+	 * @param Model_Font_Sources|null         $font_sources Defaults to the registered font sources
+	 * @param Model_Core_Font_Downloader|null $downloader   Defaults to the registered downloader
 	 *
 	 * @since 4.0
+	 * @since 6.19.0 Takes the font sources and the core font downloader
 	 */
-	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log ) {
+	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log, ?Model_Font_Sources $font_sources = null, ?Model_Core_Font_Downloader $downloader = null ) {
 
 		/* Assign our internal variables */
-		$this->entry     = $entry;
-		$this->settings  = $settings;
-		$this->gform     = $gform;
-		$this->data      = $data;
-		$this->misc      = $misc;
-		$this->templates = $templates;
-		$this->log       = $log;
-		$this->form      = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
+		$this->entry        = $entry;
+		$this->settings     = $settings;
+		$this->gform        = $gform;
+		$this->data         = $data;
+		$this->misc         = $misc;
+		$this->templates    = $templates;
+		$this->log          = $log;
+		$this->font_sources = $font_sources;
+		$this->downloader   = $downloader;
+		$this->form         = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, 'initialize_pdf_class' );
 
 		$this->set_path();
 		$this->set_print_dialog( ! empty( $settings['print'] ) );
 
 		/* The earliest point common to every render path, and the only scope the v3 template constants exist in */
 		Template_Constants::maybe_define( $data, $templates );
+	}
+
+	/**
+	 * The injected font sources, else the registered ones
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_font_sources(): Model_Font_Sources {
+		return $this->font_sources ?? GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+	}
+
+	/**
+	 * The injected downloader, else the registered one
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloader(): Model_Core_Font_Downloader {
+		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
 	}
 
 	/**
@@ -742,23 +778,15 @@ class Helper_PDF {
 		$this->misc->create_mpdf_cache_folders();
 
 		/* Filtered for each PDF, so fonts registered since the last one are included */
-		$default_font_config = ( new FontVariables() )->getDefaults();
-		$fontdata            = apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] );
-		$fontdata            = is_array( $fontdata ) ? $fontdata : [];
-
-		$default_font       = Model_Font_Sources::ARIMO;
-		$substitution_fonts = $default_font_config['backupSubsFont'];
-		$font_sources       = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
-		if ( $font_sources instanceof Model_Font_Sources ) {
-			$default_font       = $font_sources->get_default_font( [ $this->settings['font'] ?? '' ], $fontdata );
-			$substitution_fonts = $font_sources->get_substitution_fonts( $fontdata );
-		}
+		$font_sources = $this->get_font_sources();
+		$fontdata     = $font_sources->get_font_data( true );
+		$default_font = $font_sources->get_default_font( [ $this->settings['font'] ?? '' ], $fontdata );
 
 		$defaults = [
 			'fontDir'                => [ $this->data->template_font_location ],
 			'fontdata'               => $fontdata,
 			'default_font'           => $default_font,
-			'backupSubsFont'         => $substitution_fonts,
+			'backupSubsFont'         => $font_sources->get_substitution_fonts( $fontdata, $default_font ),
 			'tempDir'                => $this->data->mpdf_tmp_location,
 
 			'allow_output_buffering' => true,
@@ -788,13 +816,11 @@ class Helper_PDF {
 			$config = $defaults;
 		}
 
-		$services = [ 'httpClient' => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ) ];
-
-		/* Built from the filtered config so it searches every font directory */
-		$downloader = GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
-		if ( $downloader instanceof Model_Core_Font_Downloader ) {
-			$services['fontFileFinder'] = $downloader->get_font_file_finder( $config );
-		}
+		$services = [
+			'httpClient'     => new Request( WP_DEBUG && WP_DEBUG_DISPLAY ),
+			/* Built from the filtered config so it searches every font directory */
+			'fontFileFinder' => $this->get_downloader()->get_font_file_finder( $config ),
+		];
 
 		$container = apply_filters( 'gfpdf_mpdf_class_container', $services, $this->form, $this->entry, $this->settings, $this );
 		if ( ! is_array( $container ) ) {

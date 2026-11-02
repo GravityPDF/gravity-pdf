@@ -97,20 +97,30 @@ class Model_Actions extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
+	 * @var Model_Core_Font_Downloader|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $downloader;
+
+	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Data             $data    Our plugin data store
-	 * @param Helper_Abstract_Options $options Our options class which allows us to access any settings
-	 * @param Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data                     $data       Our plugin data store
+	 * @param Helper_Abstract_Options         $options    Our options class which allows us to access any settings
+	 * @param Helper_Notices                  $notices    Our notice class used to queue admin messages and errors
+	 * @param Model_Core_Font_Downloader|null $downloader Defaults to the registered downloader
 	 *
 	 * @since 4.0
+	 * @since 6.19.0 Takes the core font downloader
 	 */
-	public function __construct( Helper_Data $data, Helper_Abstract_Options $options, Helper_Notices $notices ) {
+	public function __construct( Helper_Data $data, Helper_Abstract_Options $options, Helper_Notices $notices, ?Model_Core_Font_Downloader $downloader = null ) {
 
 		/* Assign our internal variables */
-		$this->data    = $data;
-		$this->options = $options;
-		$this->notices = $notices;
+		$this->data       = $data;
+		$this->options    = $options;
+		$this->notices    = $notices;
+		$this->downloader = $downloader;
 	}
 
 	/**
@@ -316,8 +326,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_undismissed_failed_core_fonts(): array {
-		$downloader = GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
-		$failed     = $downloader instanceof Model_Core_Font_Downloader ? $downloader->get_failed_files() : [];
+		$failed = $this->get_downloader()->get_failed_files();
 
 		/* Built for the condition, the view and the dismissal, so worked out once for the same failures */
 		if ( $this->failed_core_fonts === null || $this->failed_core_fonts['failed'] !== $failed ) {
@@ -353,6 +362,15 @@ class Model_Actions extends Helper_Abstract_Model {
 	public function dismiss_failed_core_fonts(): void {
 		$this->dismiss_notices( array_map( [ $this, 'get_failed_core_font_dismissal' ], $this->get_undismissed_failed_core_fonts() ) );
 		$this->failed_core_fonts = null;
+	}
+
+	/**
+	 * The injected downloader, else the registered one, which bootstrap builds after this model
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloader(): Model_Core_Font_Downloader {
+		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
 	}
 
 	/**

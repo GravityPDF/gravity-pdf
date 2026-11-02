@@ -105,17 +105,34 @@ class Model_System_Report extends Helper_Abstract_Model {
 	protected $pdf_cache;
 
 	/**
+	 * @var Model_Required_Fonts|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $required_fonts;
+
+	/**
+	 * @var Model_Font_Sources|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $font_sources;
+
+	/**
 	 * @since 6.0
 	 * @since 7.0 Added `$pdf_cache`
+	 * @since 6.19.0 Added `$required_fonts` and `$font_sources`, which default to the registered models
 	 */
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates, Model_Pdf_Cache $pdf_cache ) {
-		$this->options   = $options;
-		$this->data      = $data;
-		$this->log       = $log;
-		$this->misc      = $misc;
-		$this->status    = $status;
-		$this->templates = $templates;
-		$this->pdf_cache = $pdf_cache;
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates, Model_Pdf_Cache $pdf_cache, ?Model_Required_Fonts $required_fonts = null, ?Model_Font_Sources $font_sources = null ) {
+		$this->options        = $options;
+		$this->data           = $data;
+		$this->log            = $log;
+		$this->misc           = $misc;
+		$this->status         = $status;
+		$this->templates      = $templates;
+		$this->pdf_cache      = $pdf_cache;
+		$this->required_fonts = $required_fonts;
+		$this->font_sources   = $font_sources;
 	}
 
 	/**
@@ -241,9 +258,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function get_core_fonts_installed(): array {
-		$required_fonts = GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
-		$counts         = [];
-		foreach ( $required_fonts instanceof Model_Required_Fonts ? $required_fonts->get_installed_counts() : [] as $source => $count ) {
+		$counts = [];
+		foreach ( $this->get_required_fonts()->get_installed_counts() as $source => $count ) {
 			$counts[] = $count['manifest']
 				? sprintf( '%s: %d of %d required files installed', $source, $count['installed'], $count['total'] )
 				: sprintf( '%s: manifest missing', $source );
@@ -257,13 +273,26 @@ class Model_System_Report extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * @since 6.19.0
+	 */
+	protected function get_required_fonts(): Model_Required_Fonts {
+		return $this->required_fonts ?? GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected function get_font_sources(): Model_Font_Sources {
+		return $this->font_sources ?? GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+	}
+
+	/**
 	 * Fonts mPDF falls back to, in order, for characters the PDF's font lacks
 	 *
 	 * @since 6.19.0
 	 */
 	protected function get_substitution_fonts(): array {
-		$font_sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
-		$fonts        = $font_sources instanceof Model_Font_Sources ? $font_sources->get_substitution_fonts() : [];
+		$fonts = $this->get_font_sources()->get_substitution_fonts();
 
 		return [
 			'label'        => esc_html__( 'Substitution Fonts', 'gravity-pdf' ),

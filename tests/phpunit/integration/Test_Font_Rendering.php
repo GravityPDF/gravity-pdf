@@ -125,6 +125,13 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertRenderMatchesSnapshot( 'custom-arimo', '<p style="font-family: arimo">Custom</p>' );
 	}
 
+	public function test_greek_and_cyrillic_a_font_lacks_are_substituted_from_arimo(): void {
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->add_record( 'chewy', [ 'regular' => 'Chewy.ttf' ] );
+
+		$this->assertRenderMatchesSnapshot( 'greek-cyrillic-substitution', '<p style="font-family: chewy">Hello Γειά Привет</p>', [ 'font' => 'chewy' ] );
+	}
+
 	public function test_an_adopted_template_arimo_record_renders_the_bundled_faces(): void {
 		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
 		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );

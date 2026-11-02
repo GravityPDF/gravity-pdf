@@ -138,13 +138,15 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
 		$font_name = sanitize_text_field( wp_unslash( $_POST['font_name'] ?? '' ) );
 
-		$downloader = $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
-		if ( ! $downloader instanceof Model_Core_Font_Downloader ) {
-			$this->log->error( 'Core font downloader not available' );
+		return $this->get_downloader()->download( $font_name, true );
+	}
 
-			return false;
-		}
-
-		return $downloader->download( $font_name, true );
+	/**
+	 * The injected downloader, else the registered one, which bootstrap builds after this controller
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloader(): Model_Core_Font_Downloader {
+		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Core_Font_Downloader' );
 	}
 }

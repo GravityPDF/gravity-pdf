@@ -93,7 +93,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		$this->assertSame( 'core: 0 of 4 required files installed', $directories['core_fonts_installed']['value'] );
 		$this->assertSame( 'Core Fonts installed', $directories['core_fonts_installed']['label_export'] );
-		$this->assertSame( 'gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda', $directories['substitution_fonts']['value'] );
+		$this->assertSame( 'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda', $directories['substitution_fonts']['value'] );
 	}
 
 	public function test_system_report_flags_a_missing_core_font_manifest() {
@@ -106,21 +106,25 @@ class Test_Controller_System_Report extends TestCase {
 	 * The report's directories section, built with the font sources given
 	 */
 	private function report_with_font_sources( \GFPDF\Model\Model_Font_Sources $sources ): array {
-		$singleton  = $GLOBALS['gfpdf']->singleton;
-		$registered = $this->get_private( $singleton, 'classes' );
-		$required   = \GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
-		$original   = $this->get_private( $required, 'font_sources' );
+		$report   = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
+		$injected = [
+			'font_sources'   => $sources,
+			'required_fonts' => new \GFPDF\Model\Model_Required_Fonts( $sources, \GPDFAPI::get_options_class() ),
+		];
+		$original = [];
 
-		/* The System Report reads both through the plugin's shared instances */
-		$this->set_private( $required, 'font_sources', $sources );
-		$this->set_private( $singleton, 'classes', array_merge( $registered, [ 'Model_Font_Sources' => $sources ] ) );
-		$required->flush();
+		/* The registered report was given the shared instances at bootstrap */
+		foreach ( $injected as $name => $model ) {
+			$original[ $name ] = $this->get_private( $report, $name );
+			$this->set_private( $report, $name, $model );
+		}
+
 		try {
 			return $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) );
 		} finally {
-			$this->set_private( $required, 'font_sources', $original );
-			$this->set_private( $singleton, 'classes', $registered );
-			$required->flush();
+			foreach ( $original as $name => $model ) {
+				$this->set_private( $report, $name, $model );
+			}
 		}
 	}
 
