@@ -532,7 +532,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertSame( [ 'unbatang' ], $this->stub_font_sources()->get_language_font_keys() );
 	}
 
-	public function test_language_font_keys_are_cached_for_the_locale() {
+	public function test_the_installed_languages_font_keys_are_cached_for_every_site() {
 		$this->set_languages( [ 'th' ] );
 		$this->stub_font_sources()->get_language_font_keys();
 
@@ -549,7 +549,9 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertSame( [ 'garuda' ], $this->stub_font_sources()->get_language_font_keys() );
 		$this->assertSame( 0, $reads );
 
-		/* Another locale maps again */
+		$this->assertSame( [ 'garuda' ], get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
+
+		/* The locale is per site, so it's mapped on top of the cache */
 		add_filter(
 			'locale',
 			static function () {
@@ -558,7 +560,51 @@ class Test_Model_Font_Sources extends TestCase {
 		);
 
 		$this->assertSame( [ 'garuda', 'sun-exta' ], $this->stub_font_sources()->get_language_font_keys() );
-		$this->assertSame( 1, $reads );
+		$this->assertSame( 0, $reads );
+		$this->assertSame( [ 'garuda' ], get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
+	}
+
+	/**
+	 * @dataProvider provider_corrupt_language_caches
+	 *
+	 * @param mixed $cached
+	 */
+	public function test_a_corrupt_language_font_cache_is_rebuilt( $cached ) {
+		$this->set_languages( [ 'th' ] );
+		set_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS, $cached, DAY_IN_SECONDS );
+
+		$this->assertSame( [ 'garuda' ], $this->stub_font_sources()->get_language_font_keys() );
+		$this->assertSame( [ 'garuda' ], get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
+	}
+
+	public function provider_corrupt_language_caches(): array {
+		return [
+			'text'   => [ 'garuda' ],
+			'number' => [ 5 ],
+			'true'   => [ true ],
+		];
+	}
+
+	public function test_only_font_keys_are_read_from_the_language_font_cache() {
+		$this->set_languages( [] );
+		set_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS, [ 'garuda', 5, null, [ 'sun-exta' ] ], DAY_IN_SECONDS );
+
+		$this->assertSame( [ 'garuda' ], $this->stub_font_sources()->get_language_font_keys() );
+	}
+
+	public function test_a_locale_whose_font_is_already_cached_does_not_repeat_it() {
+		$this->set_locale( 'th' );
+		set_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS, [ 'garuda' ], DAY_IN_SECONDS );
+
+		$this->assertSame( [ 'garuda' ], $this->stub_font_sources()->get_language_font_keys() );
+	}
+
+	public function test_a_locale_without_its_language_pack_still_counts_but_is_not_cached() {
+		$this->set_languages( [] );
+		$this->set_locale( 'th' );
+
+		$this->assertSame( [ 'garuda' ], $this->stub_font_sources()->get_language_font_keys() );
+		$this->assertSame( [], get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
 	}
 
 	public function test_a_language_pack_install_flushes_the_language_fonts() {
@@ -566,7 +612,7 @@ class Test_Model_Font_Sources extends TestCase {
 	}
 
 	public function test_language_font_keys_are_read_once_until_flushed() {
-		delete_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
+		delete_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
 		$reads = 0;
 		add_filter(
 			'get_available_languages',

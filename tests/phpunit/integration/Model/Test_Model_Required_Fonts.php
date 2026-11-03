@@ -6,6 +6,7 @@ namespace GFPDF\Model;
 
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\StubsFontSources;
+use GFPDF\Tests\Concerns\SwitchesNetwork;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -20,8 +21,11 @@ class Test_Model_Required_Fonts extends TestCase {
 
 	use CopiesFontFixtures;
 	use StubsFontSources;
+	use SwitchesNetwork;
 
 	private const FONT = 'DejaVuSerifCondensed.ttf';
+
+	private const GARUDA = [ 'Garuda.ttf', 'Garuda-Bold.ttf', 'Garuda-Oblique.ttf', 'Garuda-BoldOblique.ttf' ];
 
 	/**
 	 * @var Model_Required_Fonts
@@ -37,6 +41,11 @@ class Test_Model_Required_Fonts extends TestCase {
 	public function tear_down(): void {
 		$this->remove_font_fixtures();
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+
+		/* A subsite leaves these behind */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
 
 		parent::tear_down();
 	}
@@ -474,6 +483,219 @@ class Test_Model_Required_Fonts extends TestCase {
 
 		$this->assertSame( [], $keys );
 		$this->assertSame( [ 'freeserif' ], $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() ) );
+	}
+
+	public function test_on_its_own_a_site_requires_the_same_files_as_across_all_sites() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserif' );
+		$this->set_languages( [ 'th' ] );
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+
+		$required = $this->required_with( $this->stub_font_sources() );
+		$files    = $required->get_required_font_files();
+
+		$this->assertCount( 12, $files );
+		$this->assertEqualsCanonicalizing( $files, $this->all_sites_files( 'dejavusanscondensed', $required ) );
+	}
+
+	/**
+	 * @dataProvider provider_unset_default_fonts
+	 *
+	 * @param mixed $settings
+	 */
+	public function test_a_site_without_a_saved_default_font_requires_the_one_given( $settings ) {
+		update_option( 'gfpdf_settings', $settings );
+
+		$this->assertSame( [], $this->all_sites_files() );
+		$this->assertSame(
+			[ 'DejaVuSansCondensed.ttf', 'DejaVuSansCondensed-Bold.ttf', 'DejaVuSansCondensed-Oblique.ttf', 'DejaVuSansCondensed-BoldOblique.ttf' ],
+			$this->all_sites_files( 'dejavusanscondensed' )
+		);
+	}
+
+	public function provider_unset_default_fonts(): array {
+		return [
+			'none saved'       => [ [ 'debug_mode' => 'No' ] ],
+			'an empty font'    => [ [ 'default_font' => '' ] ],
+			'corrupt settings' => [ 'arimo' ],
+		];
+	}
+
+	public function test_every_sites_fonts_are_required_across_all_sites() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
+		update_blog_option( self::factory()->blog->create(), 'gfpdf_settings', [ 'default_font' => 'dejavuserif' ] );
+
+		/* A site Gravity Forms hasn't run on has no form tables; its locale has no language pack */
+		$no_forms = self::factory()->blog->create();
+		update_blog_option( $no_forms, 'gfpdf_settings', [ 'default_font' => 'arimo' ] );
+		/* Raw, as saving WPLANG drops a locale without its pack */
+		$GLOBALS['wpdb']->replace( $GLOBALS['wpdb']->get_blog_prefix( $no_forms ) . 'options', [ 'option_name' => 'WPLANG', 'option_value' => 'th' ] );
+
+		switch_to_blog( self::factory()->blog->create() );
+		try {
+			gf_upgrade()->install();
+			update_option( 'gfpdf_settings', [ 'default_font' => 'arimo' ] );
+			$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		} finally {
+			restore_current_blog();
+		}
+
+		$this->assertSame( [], $this->required->get_required_font_files() );
+		$this->assertSame(
+			array_merge(
+				[ 'DejaVuSerif.ttf', 'DejaVuSerif-Bold.ttf', 'DejaVuSerif-Italic.ttf', 'DejaVuSerif-BoldItalic.ttf' ],
+				self::GARUDA,
+				self::$freeserif
+			),
+			$this->all_sites_files()
+		);
+	}
+
+	public function test_a_single_site_is_its_only_site() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single site only' );
+		}
+
+		$this->assertSame( [ get_current_blog_id() ], $this->required->get_site_ids() );
+		$this->assertSame( [], $this->get_other_site_ids() );
+	}
+
+	public function test_the_site_ids_cover_every_network() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$same_network = self::factory()->blog->create();
+
+		$this->on_another_network(
+			function ( int $network ) use ( $same_network ) {
+				$other_network = self::factory()->blog->create( [ 'network_id' => $network ] );
+				$ids           = $this->required->get_site_ids();
+
+				$this->assertContains( get_main_site_id( get_main_network_id() ), $ids );
+				$this->assertContains( $same_network, $ids );
+				$this->assertContains( $other_network, $ids );
+			}
+		);
+	}
+
+	public function test_the_other_sites_leave_out_only_the_current_one() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+
+		$others = $this->get_other_site_ids();
+		$this->assertContains( $site, $others );
+		$this->assertNotContains( get_current_blog_id(), $others );
+		$this->assertSame( array_keys( $others ), range( 0, count( $others ) - 1 ), 'A list, with no gap where the current site was' );
+	}
+
+	/**
+	 * @dataProvider provider_saved_default_fonts
+	 */
+	public function test_a_saved_default_font_is_used_over_the_one_given( string $saved ) {
+		update_option( 'gfpdf_settings', [ 'default_font' => $saved ] );
+
+		$keys = $this->required->get_site_font_keys( get_current_blog_id(), 'dejavusanscondensed' );
+
+		$this->assertContains( 'dejavuserif', $keys );
+		$this->assertNotContains( 'dejavusanscondensed', $keys );
+	}
+
+	public function provider_saved_default_fonts(): array {
+		return [
+			'as stored'        => [ 'dejavuserif' ],
+			'mixed case'       => [ 'DejaVuSerif' ],
+			'stray whitespace' => [ ' dejavuserif ' ],
+		];
+	}
+
+	public function test_a_site_that_no_longer_exists_only_has_the_default_font_given() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		global $wpdb;
+
+		$suppress = $wpdb->suppress_errors();
+		try {
+			$this->assertSame( [ 'arimo' ], $this->required->get_site_font_keys( 999999, 'arimo' ) );
+			$this->assertSame( [], $this->required->get_site_font_keys( 999999 ) );
+		} finally {
+			$wpdb->suppress_errors( $suppress );
+		}
+	}
+
+	/**
+	 * @dataProvider provider_install_font_keys
+	 */
+	public function test_the_install_font_files_are_those_of_the_keys_given( array $keys, array $expected ) {
+		$this->set_languages( [] );
+
+		$this->assertSame( $expected, $this->required_with( $this->stub_font_sources() )->get_install_font_files( $keys ) );
+	}
+
+	public function provider_install_font_keys(): array {
+		return [
+			'no keys'      => [ [], [] ],
+			'unknown font' => [ [ 'not-a-font' ], [] ],
+			'a font'       => [ [ 'garuda' ], self::GARUDA ],
+			'a repeat'     => [ [ 'garuda', 'garuda' ], self::GARUDA ],
+			'mixed'        => [ [ 'not-a-font', 'garuda' ], self::GARUDA ],
+		];
+	}
+
+	public function test_the_install_font_files_include_the_installed_languages() {
+		$this->set_languages( [ 'th' ] );
+
+		$this->assertSame(
+			self::GARUDA,
+			$this->required_with( $this->stub_font_sources() )->get_install_font_files( [] )
+		);
+	}
+
+	public function test_the_install_font_files_include_every_required_source() {
+		$this->set_languages( [] );
+
+		$sources = $this->stub_font_sources(
+			static function ( array $sources ): array {
+				$sources['fixture']             = $sources['core'];
+				$sources['fixture']['required'] = true;
+
+				return $sources;
+			}
+		);
+
+		$this->assertContains( 'FreeMono.ttf', $this->required_with( $sources )->get_install_font_files( [] ) );
+	}
+
+	/**
+	 * @return int[]
+	 */
+	private function get_other_site_ids(): array {
+		return ( function () {
+			return $this->get_other_site_ids();
+		} )->call( $this->required );
+	}
+
+	/**
+	 * The files every site needs, as the 6.19 cleanup gathers them
+	 *
+	 * @return string[]
+	 */
+	private function all_sites_files( string $unset_default = '', ?Model_Required_Fonts $required = null ): array {
+		$required = $required ?? $this->required;
+		$keys     = [];
+		foreach ( $required->get_site_ids() as $site_id ) {
+			$keys = array_merge( $keys, $required->get_site_font_keys( $site_id, $unset_default ) );
+		}
+
+		return $required->get_install_font_files( $keys );
 	}
 
 	/**

@@ -72,6 +72,7 @@ class Controller_Font_Downloader extends Helper_Abstract_Controller implements H
 	 */
 	public function add_actions() {
 		add_action( Model_Font_Downloader::SYNC_EVENT, [ $this->model, 'sync' ] );
+		add_action( Model_Font_Downloader::CLEANUP_EVENT, [ $this->model, 'cleanup' ] );
 
 		add_action( 'gfpdf_plugin_installed', [ $this->model, 'schedule_sync' ] );
 		add_action( 'gfpdf_version_changed', [ $this->model, 'schedule_sync' ] );

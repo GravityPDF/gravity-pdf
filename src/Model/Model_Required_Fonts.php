@@ -114,8 +114,34 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_required_font_files(): array {
+		return $this->get_key_files( array_keys( $this->get_font_reasons() ) );
+	}
+
+	/**
+	 * The files of the fonts sites need, plus the installed languages', as every site shares the fonts folder
+	 *
+	 * @param string[] $keys Font keys from get_site_font_keys()
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_install_font_files( array $keys ): array {
+		return $this->get_key_files( array_merge( $this->font_sources->get_language_font_keys(), $keys ) );
+	}
+
+	/**
+	 * The files of the font keys, plus every required source's
+	 *
+	 * @param array<int, string|int> $keys
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_key_files( array $keys ): array {
 		$files = [];
-		foreach ( array_keys( $this->get_font_reasons() ) as $key ) {
+		foreach ( $keys as $key ) {
 			$files = array_merge( $files, $this->get_font_files( (string) $key ) );
 		}
 
@@ -435,47 +461,38 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @return int[] Every other site of the network, or none when not a Multisite
+	 * @return int[] Every other site, across all networks
 	 *
 	 * @since 6.19.0
 	 */
 	protected function get_other_site_ids(): array {
-		if ( ! is_multisite() ) {
-			return [];
-		}
-
-		return array_map(
-			'intval',
-			get_sites(
-				[
-					'fields'       => 'ids',
-					'number'       => 0,
-					'site__not_in' => [ get_current_blog_id() ],
-				]
-			)
-		);
+		return array_values( array_diff( $this->get_site_ids(), [ get_current_blog_id() ] ) );
 	}
 
 	/**
 	 * The fonts a site uses (its default font, locale and PDF fonts), read from its tables by prefix rather than by
 	 * switching to it
 	 *
+	 * @param string $unset_default The default font of a site with none saved
+	 *
 	 * @return string[] Font keys
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_site_font_keys( int $site_id ): array {
-		return array_map( 'strval', array_keys( iterator_to_array( $this->each_site_font_key( $site_id ) ) ) );
+	public function get_site_font_keys( int $site_id, string $unset_default = '' ): array {
+		return array_map( 'strval', array_keys( iterator_to_array( $this->each_site_font_key( $site_id, $unset_default ) ) ) );
 	}
 
 	/**
 	 * Each font key a site uses, the settings' before its forms' so a caller can stop without reading them
 	 *
+	 * @param string $unset_default The default font of a site with none saved
+	 *
 	 * @return \Generator<string, mixed> Keyed by font key, which may repeat
 	 *
 	 * @since 6.19.0
 	 */
-	protected function each_site_font_key( int $site_id ): \Generator {
+	protected function each_site_font_key( int $site_id, string $unset_default = '' ): \Generator {
 		global $wpdb;
 
 		$prefix  = $wpdb->get_blog_prefix( $site_id );
@@ -483,11 +500,10 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 		$options = wp_list_pluck( (array) $options, 'option_value' );
 
 		$settings = maybe_unserialize( $options['gfpdf_settings'] ?? '' );
-		$default  = is_array( $settings ) ? ( $settings['default_font'] ?? '' ) : '';
+		$default  = $this->normalise_font( is_array( $settings ) ? ( $settings['default_font'] ?? '' ) : '' );
 		$locales  = $this->font_sources->map_language_font_locales( [ $options['WPLANG'] ?? '' ] );
 
-		foreach ( array_merge( array_map( 'strval', array_keys( $locales ) ), [ $default ] ) as $key ) {
-			$key = $this->normalise_font( $key );
+		foreach ( array_merge( array_map( 'strval', array_keys( $locales ) ), [ $default !== '' ? $default : $unset_default ] ) as $key ) {
 			if ( $key !== '' ) {
 				yield $key => true;
 			}
@@ -497,6 +513,29 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 		if ( isset( $options['gf_db_version'] ) ) {
 			yield from $this->each_pdf_font( $prefix );
 		}
+	}
+
+	/**
+	 * Every site's ID, across all networks
+	 *
+	 * @return int[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_site_ids(): array {
+		if ( ! is_multisite() ) {
+			return [ get_current_blog_id() ];
+		}
+
+		return array_map(
+			'intval',
+			get_sites(
+				[
+					'fields' => 'ids',
+					'number' => 0,
+				]
+			)
+		);
 	}
 
 	/**

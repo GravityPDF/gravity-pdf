@@ -313,13 +313,18 @@ jobs:
           signature: ":robot: PHPUnit coverage report"
 
   e2e-playwright:
-    name: Playwright E2E Tests (shard ${{ matrix.shard }}/${{ strategy.job-total }})
+    name: Playwright E2E Tests (${{ matrix.name }})
     needs: prebuild
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shard: [ 1, 2, 3, 4 ]
+        include:
+          - { id: '1', name: 'shard 1/4', env: 'wp-env:e2e', config: 'e2e', test: 'test:e2e -- --shard=1/4' }
+          - { id: '2', name: 'shard 2/4', env: 'wp-env:e2e', config: 'e2e', test: 'test:e2e -- --shard=2/4' }
+          - { id: '3', name: 'shard 3/4', env: 'wp-env:e2e', config: 'e2e', test: 'test:e2e -- --shard=3/4' }
+          - { id: '4', name: 'shard 4/4', env: 'wp-env:e2e', config: 'e2e', test: 'test:e2e -- --shard=4/4' }
+          - { id: 'multisite', name: 'Multisite', env: 'wp-env:e2e-multisite', config: 'e2e-multisite', test: 'test:e2e:multisite' }
 
     steps:
       - name: Checkout repository
@@ -329,6 +334,7 @@ jobs:
         uses: ./.github/actions/setup-e2e
         with:
           php-version: 7.4
+          wp-env-config: tools/wp-env/${{ matrix.config }}.json
 
       - name: Log debug information
         run: |
@@ -350,24 +356,24 @@ jobs:
           path: |
             ~/wp-env
             ~/.wp-env
-          key: wp-env-e2e-v2-${{ runner.os }}-${{ hashFiles('tools/wp-env/e2e.json', 'composer.lock') }}
+          key: wp-env-${{ matrix.config }}-v2-${{ runner.os }}-${{ hashFiles(format('tools/wp-env/{0}.json', matrix.config), 'composer.lock') }}
 
       - name: Install / Setup Gravity PDF + WordPress
-        run: yarn wp-env:e2e start
+        run: yarn ${{ matrix.env }} start
 
       # wp-env's work-dir is cached but its MySQL volume isn't, so a restored work-dir can pair with a fresh empty DB.
       # A bare `wp core install` leaves the env half-configured (GF REST never enables), so run wp-env's full reset.
       - name: Ensure WordPress is installed (wp-env cache fallback)
         run: |
-          if yarn wp-env:e2e run cli wp core is-installed >/dev/null 2>&1; then
+          if yarn ${{ matrix.env }} run cli wp core is-installed >/dev/null 2>&1; then
             echo "WordPress already installed."
           else
             echo "wp-env work-dir cache hit a fresh DB volume — running wp-env reset for a full install."
-            yarn wp-env:e2e reset
+            yarn ${{ matrix.env }} reset
           fi
 
       - name: Run the tests
-        run: yarn test:e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: yarn ${{ matrix.test }}
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
 
@@ -376,24 +382,24 @@ jobs:
         if: success()
         run: |
           mkdir -p tmp/visual/current
-          tar -C tmp/visual -cf "$RUNNER_TEMP/visual-shots-${{ matrix.shard }}.tar" current
+          tar -C tmp/visual -cf "$RUNNER_TEMP/visual-shots-${{ matrix.id }}.tar" current
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: success()
         with:
-          name: visual-shots-${{ matrix.shard }}
-          path: ${{ runner.temp }}/visual-shots-${{ matrix.shard }}.tar
+          name: visual-shots-${{ matrix.id }}
+          path: ${{ runner.temp }}/visual-shots-${{ matrix.id }}.tar
           compression-level: 0
 
       - name: Dump log files on failure
         if: failure()
-        run: yarn wp-env:e2e run wordpress "cp" "-r" "/var/www/html/wp-content/uploads/gravity_forms/logs/" "/var/www/html/wp-content/plugins/gravity-pdf/tmp/artifacts/logs"
+        run: yarn ${{ matrix.env }} run wordpress "cp" "-r" "/var/www/html/wp-content/uploads/gravity_forms/logs/" "/var/www/html/wp-content/plugins/gravity-pdf/tmp/artifacts/logs"
 
       - name: Upload artifacts on failure
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
-          name: failure-artifacts-shard-${{ matrix.shard }}
+          name: failure-artifacts-shard-${{ matrix.id }}
           path: tmp/artifacts
 
   addon-smoke:

@@ -115,6 +115,7 @@ jobs:
             tools/wp-env/development.json
             tools/wp-env/integration.json
             tools/wp-env/e2e.json
+            tools/wp-env/e2e-multisite.json
           commit-message: "chore(deps): weekly bump of WordPress core + Gravity Forms"
           title: "chore(deps): weekly bump of WordPress core + Gravity Forms"
           body: ${{ steps.body.outputs.text }}

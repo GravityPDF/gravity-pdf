@@ -7,6 +7,7 @@ namespace GFPDF\Model;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\Seamed_Font_Downloader;
+use GFPDF\Tests\Concerns\SwitchesNetwork;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -22,6 +23,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 	use CopiesFontFixtures;
 	use RecordsFontFailures;
+	use SwitchesNetwork;
 
 	private const FONT = 'DejaVuSerifCondensed.ttf';
 
@@ -51,6 +53,7 @@ class Test_Model_Font_Downloader extends TestCase {
 	}
 
 	public function tear_down(): void {
+		wp_clear_scheduled_hook( Model_Font_Downloader::CLEANUP_EVENT );
 		wp_delete_file( $this->font_path( self::FONT ) );
 		$this->remove_font_fixtures();
 		$this->delete_font_failures();
@@ -533,6 +536,248 @@ class Test_Model_Font_Downloader extends TestCase {
 		}
 	}
 
+	public function test_prune_keeps_files_written_since_the_time_given() {
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		touch( $this->font_path( 'DejaVuSans.ttf' ), time() - HOUR_IN_SECONDS );
+
+		$this->assertSame( [ 'DejaVuSans.ttf' ], $this->downloader->prune( [], time() - MINUTE_IN_SECONDS ) );
+	}
+
+	public function test_the_cleanup_reads_a_site_per_run_once_the_budget_is_spent_then_cleans_the_folder() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
+		if ( is_multisite() ) {
+			self::factory()->blog->create_many( 2 );
+		}
+
+		$this->copy_fixture( self::FONT );
+		touch( $this->font_path( self::FONT ), time() - HOUR_IN_SECONDS );
+
+		$downloader = $this->seamed( [ 'budget' => 0 ] );
+		$sites      = GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->get_site_ids();
+		$downloader->schedule_cleanup();
+
+		foreach ( array_keys( $sites ) as $i ) {
+			$this->assertSame( array_slice( $sites, $i ), $this->get_font_cleanup()['sites'] );
+			$this->assertNotFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+			$this->assertFileExists( $this->font_path( self::FONT ) );
+			wp_clear_scheduled_hook( Model_Font_Downloader::CLEANUP_EVENT );
+
+			$downloader->cleanup();
+		}
+
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertTrue( $this->get_font_cleanup() );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
+	}
+
+	/**
+	 * @dataProvider provider_cleanup_states
+	 *
+	 * @param mixed $state
+	 */
+	public function test_the_cleanup_is_queued_once_per_install( $state ) {
+		$this->copy_fixture( self::FONT );
+		$this->set_font_cleanup( $state );
+
+		$this->downloader->schedule_cleanup();
+		$this->downloader->cleanup();
+
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+	}
+
+	public function provider_cleanup_states(): array {
+		return [
+			'done'    => [ true ],
+			'corrupt' => [ 'yes' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_prune_since
+	 */
+	public function test_prune_only_keeps_a_file_written_after_the_time_given( int $since ) {
+		$this->copy_fixture( self::FONT );
+		touch( $this->font_path( self::FONT ), 1000000000 );
+
+		$this->assertSame( [ self::FONT ], $this->downloader->prune( [], $since ) );
+	}
+
+	public function provider_prune_since(): array {
+		return [
+			'written at that very time' => [ 1000000000 ],
+			'no time given'             => [ 0 ],
+		];
+	}
+
+	public function test_queueing_the_cleanup_records_every_site_and_when_it_started() {
+		$before = time();
+		$sync   = wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT );
+
+		$this->downloader->schedule_cleanup();
+
+		$state = $this->get_font_cleanup();
+		$this->assertSame( GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->get_site_ids(), $state['sites'] );
+		$this->assertSame( [], $state['keys'] );
+		$this->assertGreaterThanOrEqual( $before, $state['started'] );
+		$this->assertNotFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertSame( $sync, wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ), 'The sync has its own event' );
+	}
+
+	public function test_queueing_a_cleanup_already_under_way_changes_nothing() {
+		$state = $this->font_cleanup_state( [ 'sites' => [ 7 ], 'keys' => [ 'arimo' ] ] );
+		$this->set_font_cleanup( $state );
+
+		$this->downloader->schedule_cleanup();
+
+		$this->assertSame( $state, $this->get_font_cleanup() );
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+	}
+
+	public function test_queueing_the_cleanup_moves_a_later_event_forward_rather_than_adding_one() {
+		wp_schedule_single_event( time() + HOUR_IN_SECONDS, Model_Font_Downloader::CLEANUP_EVENT );
+
+		$this->downloader->schedule_cleanup();
+
+		$this->assertLessThanOrEqual( time(), wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertCount( 1, $this->get_scheduled_events( Model_Font_Downloader::CLEANUP_EVENT ) );
+	}
+
+	public function test_a_cleanup_that_cannot_be_queued_is_logged_with_its_event() {
+		add_filter( 'schedule_event', '__return_false' );
+
+		$this->downloader->schedule_cleanup();
+
+		$logged = array_values( $this->log_messages( 'Font event could not be scheduled' ) );
+		$this->assertCount( 1, $logged );
+		$this->assertSame( Model_Font_Downloader::CLEANUP_EVENT, $logged[0]['context']['event'] );
+	}
+
+	public function test_a_run_that_cannot_requeue_itself_keeps_its_progress() {
+		add_filter( 'schedule_event', '__return_false' );
+		$this->set_font_cleanup( $this->font_cleanup_state( [ 'sites' => [ get_current_blog_id(), 999999 ] ] ) );
+
+		$this->seamed( [ 'budget' => 0 ] )->cleanup();
+
+		$this->assertSame( [ 999999 ], $this->get_font_cleanup()['sites'] );
+	}
+
+	public function test_a_run_with_nothing_queued_does_nothing() {
+		$this->copy_fixture( self::FONT );
+
+		$this->downloader->cleanup();
+
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+		$this->assertFalse( $this->get_font_cleanup() );
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+	}
+
+	/**
+	 * @dataProvider provider_malformed_cleanup_states
+	 */
+	public function test_a_malformed_cleanup_record_cleans_nothing( array $state ) {
+		$this->copy_fixture( self::FONT );
+		$this->set_font_cleanup( $state );
+
+		$this->downloader->cleanup();
+
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+		$this->assertSame( $state, $this->get_font_cleanup() );
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertCount( 1, $this->log_messages( 'Core font cleanup skipped: its stored progress is malformed' ) );
+	}
+
+	public function provider_malformed_cleanup_states(): array {
+		$state = [
+			'started' => 1000000000,
+			'sites'   => [ 1 ],
+			'keys'    => [],
+		];
+
+		return [
+			'empty'             => [ [] ],
+			'no sites'          => [ array_diff_key( $state, [ 'sites' => true ] ) ],
+			'no keys'           => [ array_diff_key( $state, [ 'keys' => true ] ) ],
+			'no start time'     => [ array_diff_key( $state, [ 'started' => true ] ) ],
+			'sites not a list'  => [ array_merge( $state, [ 'sites' => '1' ] ) ],
+			'keys not a list'   => [ array_merge( $state, [ 'keys' => 'arimo' ] ) ],
+			'start not a time'  => [ array_merge( $state, [ 'started' => 'yesterday' ] ) ],
+		];
+	}
+
+	public function test_the_last_run_keeps_the_fonts_earlier_runs_found() {
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		touch( $this->font_path( self::FONT ), time() - HOUR_IN_SECONDS );
+		touch( $this->font_path( 'DejaVuSans.ttf' ), time() - HOUR_IN_SECONDS );
+		$this->set_font_cleanup( $this->font_cleanup_state( [ 'keys' => [ 'dejavuserifcondensed' ] ] ) );
+
+		$this->downloader->cleanup();
+
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSans.ttf' ) );
+		$this->assertTrue( $this->get_font_cleanup() );
+	}
+
+	public function test_a_partial_run_adds_the_fonts_it_found_to_those_already_found() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->set_font_cleanup( $this->font_cleanup_state( [ 'sites' => [ get_current_blog_id(), get_current_blog_id(), 999999 ], 'keys' => [ 'arimo' ] ] ) );
+
+		/* The second run finds the same font again */
+		$downloader = $this->seamed( [ 'budget' => 0 ] );
+		$downloader->cleanup();
+		$downloader->cleanup();
+
+		$keys = $this->get_font_cleanup()['keys'];
+		$this->assertContains( 'arimo', $keys );
+		$this->assertSame( 1, array_count_values( $keys )['dejavuserifcondensed'] );
+		$this->assertNotFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+	}
+
+	public function test_the_cleanup_carries_on_past_a_site_deleted_since_it_was_queued() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		global $wpdb;
+
+		$this->copy_fixture( self::FONT );
+		touch( $this->font_path( self::FONT ), time() - HOUR_IN_SECONDS );
+		$this->set_font_cleanup( $this->font_cleanup_state( [ 'sites' => [ 999999, get_current_blog_id() ] ] ) );
+
+		$suppress = $wpdb->suppress_errors();
+		try {
+			$this->downloader->cleanup();
+		} finally {
+			$wpdb->suppress_errors( $suppress );
+		}
+
+		$this->assertTrue( $this->get_font_cleanup() );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
+	}
+
+	public function test_another_network_keeps_its_font_state_on_the_main_network() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->on_another_network(
+			function ( int $network ) {
+				$site = self::factory()->blog->create( [ 'network_id' => $network ] );
+
+				$this->fail_font_downloads();
+				$this->downloader->download( self::FONT );
+				$this->downloader->schedule_cleanup();
+
+				$this->assertSame( [ self::FONT ], array_keys( $this->get_font_failures() ) );
+				$this->assertContains( $site, $this->get_font_cleanup()['sites'] );
+				$this->assertFalse( get_network_option( $network, Model_Font_Downloader::FAILURES ) );
+				$this->assertFalse( get_network_option( $network, Model_Font_Downloader::CLEANUP ) );
+			}
+		);
+	}
+
 	/**
 	 * A deliberate trade-off: a Font Manager record pointing at a core font's file loses it, and mPDF downloads it
 	 * again by name when the font is next used
@@ -572,7 +817,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->downloader->schedule_sync();
 		$this->assertSame( [], $this->get_scheduled_args() );
-		$this->assertCount( 1, $this->log_messages( 'Font sync could not be scheduled' ) );
+		$this->assertCount( 1, $this->log_messages( 'Font event could not be scheduled' ) );
 	}
 
 	public function test_sync_downloads_the_required_set_as_it_is_when_it_runs() {
@@ -853,7 +1098,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->downloader->download( self::FONT );
 
-		$this->assertCount( 1, $this->log_messages( 'Font sync could not be scheduled' ) );
+		$this->assertCount( 1, $this->log_messages( 'Font event could not be scheduled' ) );
 	}
 
 	/**
@@ -920,36 +1165,89 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [ self::FONT ], array_keys( $downloader->get_failed_files() ) );
 	}
 
-	public function test_a_single_site_autoloads_the_failures_but_not_the_back_off() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'A Multisite keeps them in sitemeta' );
-		}
-
+	public function test_the_failures_are_kept_on_the_main_network() {
 		$this->fail_font_downloads();
 		$this->downloader->download( self::FONT );
 
-		$this->assertContains( $this->get_autoload( Model_Font_Downloader::FAILURES ), [ 'yes', 'on' ] );
-		$this->assertContains( $this->get_autoload( '_site_transient_' . Model_Font_Downloader::back_off_key( self::FONT ) ), [ 'no', 'off' ] );
+		$this->assertSame( [ self::FONT ], array_keys( get_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES ) ) );
 	}
 
-	public function test_scheduling_a_sync_stores_an_empty_failure_record() {
-		$this->delete_font_failures();
+	public function test_dismissing_hides_the_failed_files_until_one_fails_again() {
+		$this->set_font_failures(
+			[
+				self::FONT   => $this->failure( time() - 10 ),
+				'Garuda.ttf' => $this->failure(),
+			]
+		);
 
-		$this->downloader->schedule_sync();
+		$this->assertSame( [ self::FONT ], $this->downloader->get_undismissed_failed_files() );
 
+		$this->downloader->dismiss_failed_files();
+		$this->assertSame( [], $this->downloader->get_undismissed_failed_files() );
+		$this->assertSame( [ self::FONT ], array_keys( $this->downloader->get_failed_files() ) );
+
+		/* Read afresh, as another site would */
+		$this->assertSame( [], $this->new_downloader()->get_undismissed_failed_files() );
+
+		/* A font that gives up later is listed */
+		$this->set_font_failures( $this->get_font_failures() + [ 'FreeSans.ttf' => $this->failure( time() ) ] );
+		$this->assertSame( [ 'FreeSans.ttf' ], $this->new_downloader()->get_undismissed_failed_files() );
+	}
+
+	public function test_only_a_true_dismissal_counts() {
+		$this->set_font_failures( [ self::FONT => [ 'retry_at' => 0, 'gave_up' => time(), 'dismissed' => 'yes' ] ] );
+
+		$this->assertSame( [ self::FONT ], $this->new_downloader()->get_undismissed_failed_files() );
+	}
+
+	public function test_dismissing_leaves_a_file_waiting_on_its_retry_to_be_listed_if_it_gives_up() {
+		$this->set_font_failures(
+			[
+				self::FONT   => $this->failure(),
+				'Garuda.ttf' => $this->failure( time() - 10 ),
+			]
+		);
+
+		$this->downloader->dismiss_failed_files();
+
+		$record = $this->get_font_failures();
+		$this->assertFalse( $record[ self::FONT ]['dismissed'] );
+		$this->assertTrue( $record['Garuda.ttf']['dismissed'] );
+
+		$this->fail_font_downloads();
+		$downloader = $this->new_downloader();
+		$downloader->download( self::FONT );
+
+		$this->assertSame( [ self::FONT ], $downloader->get_undismissed_failed_files() );
+	}
+
+	public function test_a_dismissed_file_that_keeps_failing_stays_dismissed() {
+		$this->set_font_failures( [ self::FONT => array_merge( $this->failure( time() - 10 ), [ 'dismissed' => true ] ) ] );
+
+		$this->fail_font_downloads();
+		$downloader = $this->new_downloader();
+		$downloader->download( self::FONT );
+
+		$this->assertSame( [], $downloader->get_undismissed_failed_files() );
+		$this->assertSame( [ self::FONT ], array_keys( $downloader->get_failed_files() ) );
+	}
+
+	public function test_a_dismissed_file_that_downloads_then_gives_up_again_is_listed() {
+		$this->set_font_failures( [ self::FONT => array_merge( $this->failure( time() - 10 ), [ 'dismissed' => true ] ) ] );
+
+		$this->serve_font_downloads();
+		$this->assertTrue( $this->new_downloader()->download( self::FONT ) );
 		$this->assertSame( [], $this->get_font_failures() );
-	}
+		wp_delete_file( $this->font_path( self::FONT ) );
 
-	/**
-	 * Read an option's autoload flag straight from the database
-	 *
-	 * @return string|null The option's autoload value
-	 */
-	private function get_autoload( string $option ): ?string {
-		global $wpdb;
+		remove_all_filters( 'pre_http_request' );
+		$this->fail_font_downloads();
+		$downloader = $this->new_downloader();
+		$downloader->download( self::FONT );
+		$this->delete_back_off( self::FONT );
+		$downloader->download( self::FONT );
 
-		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
-		return $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s", $option ) );
+		$this->assertSame( [ self::FONT ], $downloader->get_undismissed_failed_files() );
 	}
 
 	/**
@@ -1047,14 +1345,14 @@ class Test_Model_Font_Downloader extends TestCase {
 	}
 
 	/**
-	 * Each queued sync event, read from the cron array
+	 * Each queued event of the hook, the sync's by default, read from the cron array
 	 *
 	 * @return array<int, array{time: int, args: array}>
 	 */
-	private function get_scheduled_events(): array {
+	private function get_scheduled_events( string $hook = Model_Font_Downloader::SYNC_EVENT ): array {
 		$events = [];
 		foreach ( _get_cron_array() ?: [] as $time => $hooks ) {
-			foreach ( $hooks[ Model_Font_Downloader::SYNC_EVENT ] ?? [] as $event ) {
+			foreach ( $hooks[ $hook ] ?? [] as $event ) {
 				$events[] = [
 					'time' => (int) $time,
 					'args' => $event['args'],
