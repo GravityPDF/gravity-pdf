@@ -142,6 +142,19 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The files of the fonts sites need, plus the installed languages', as every site shares the fonts folder
+	 *
+	 * @param string[] $keys Font keys from get_site_font_keys()
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_install_font_files( array $keys ): array {
+		return $this->get_reason_files( array_fill_keys( array_merge( $this->font_sources->get_language_font_keys(), $keys ), [] ) );
+	}
+
+	/**
 	 * Why each required font key is required: the default font, a site language's, selected by that many PDFs, in a
 	 * required source and, with $network, used by that many other sites
 	 *
@@ -428,6 +441,29 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 		}
 
 		return array_values( array_unique( array_filter( array_map( [ $this, 'normalise_font' ], $keys ) ) ) );
+	}
+
+	/**
+	 * Every site's ID, across all networks
+	 *
+	 * @return int[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_site_ids(): array {
+		if ( ! is_multisite() ) {
+			return [ get_current_blog_id() ];
+		}
+
+		return array_map(
+			'intval',
+			get_sites(
+				[
+					'fields' => 'ids',
+					'number' => 0,
+				]
+			)
+		);
 	}
 
 	/**

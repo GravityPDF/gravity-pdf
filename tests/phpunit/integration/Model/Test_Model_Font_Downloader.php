@@ -51,6 +51,7 @@ class Test_Model_Font_Downloader extends TestCase {
 	}
 
 	public function tear_down(): void {
+		wp_clear_scheduled_hook( Model_Font_Downloader::CLEANUP_EVENT );
 		wp_delete_file( $this->font_path( self::FONT ) );
 		$this->remove_font_fixtures();
 		$this->delete_font_failures();
@@ -478,6 +479,64 @@ class Test_Model_Font_Downloader extends TestCase {
 		}
 	}
 
+	public function test_prune_keeps_files_written_since_the_time_given() {
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		touch( $this->font_path( 'DejaVuSans.ttf' ), time() - HOUR_IN_SECONDS );
+
+		$this->assertSame( [ 'DejaVuSans.ttf' ], $this->downloader->prune( [], time() - MINUTE_IN_SECONDS ) );
+	}
+
+	public function test_the_cleanup_reads_a_site_per_run_once_the_budget_is_spent_then_cleans_the_folder() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
+		if ( is_multisite() ) {
+			self::factory()->blog->create_many( 2 );
+		}
+
+		$this->copy_fixture( self::FONT );
+		touch( $this->font_path( self::FONT ), time() - HOUR_IN_SECONDS );
+
+		$downloader = $this->seamed( [ 'budget' => 0 ] );
+		$sites      = GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->get_site_ids();
+		$downloader->schedule_cleanup( 'arimo' );
+
+		foreach ( array_keys( $sites ) as $i ) {
+			$this->assertSame( array_slice( $sites, $i ), get_network_option( get_main_network_id(), Model_Font_Downloader::CLEANUP )['sites'] );
+			$this->assertNotFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+			$this->assertFileExists( $this->font_path( self::FONT ) );
+			wp_clear_scheduled_hook( Model_Font_Downloader::CLEANUP_EVENT );
+
+			$downloader->cleanup();
+		}
+
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertTrue( get_network_option( get_main_network_id(), Model_Font_Downloader::CLEANUP ) );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
+	}
+
+	/**
+	 * @dataProvider provider_cleanup_states
+	 *
+	 * @param mixed $state
+	 */
+	public function test_the_cleanup_is_queued_once_per_install( $state ) {
+		$this->copy_fixture( self::FONT );
+		update_network_option( get_main_network_id(), Model_Font_Downloader::CLEANUP, $state );
+
+		$this->downloader->schedule_cleanup( 'arimo' );
+		$this->downloader->cleanup();
+
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+	}
+
+	public function provider_cleanup_states(): array {
+		return [
+			'done'    => [ true ],
+			'corrupt' => [ 'yes' ],
+		];
+	}
+
 	/**
 	 * A deliberate trade-off: a Font Manager record pointing at a core font's file loses it, and mPDF downloads it
 	 * again by name when the font is next used
@@ -517,7 +576,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->downloader->schedule_sync();
 		$this->assertSame( [], $this->get_scheduled_args() );
-		$this->assertCount( 1, $this->log_messages( 'Font sync could not be scheduled' ) );
+		$this->assertCount( 1, $this->log_messages( 'Font event could not be scheduled' ) );
 	}
 
 	public function test_sync_downloads_the_required_set_as_it_is_when_it_runs() {
@@ -798,7 +857,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->downloader->download( self::FONT );
 
-		$this->assertCount( 1, $this->log_messages( 'Font sync could not be scheduled' ) );
+		$this->assertCount( 1, $this->log_messages( 'Font event could not be scheduled' ) );
 	}
 
 	/**
@@ -865,36 +924,39 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [ self::FONT ], array_keys( $downloader->get_failed_files() ) );
 	}
 
-	public function test_a_single_site_autoloads_the_failures_but_not_the_back_off() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'A Multisite keeps them in sitemeta' );
-		}
-
+	public function test_the_failures_are_kept_on_the_main_network() {
 		$this->fail_font_downloads();
 		$this->downloader->download( self::FONT );
 
-		$this->assertContains( $this->get_autoload( Model_Font_Downloader::FAILURES ), [ 'yes', 'on' ] );
-		$this->assertContains( $this->get_autoload( '_site_transient_' . Model_Font_Downloader::back_off_key( self::FONT ) ), [ 'no', 'off' ] );
+		$this->assertSame( [ self::FONT ], array_keys( get_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES ) ) );
 	}
 
-	public function test_scheduling_a_sync_stores_an_empty_failure_record() {
-		$this->delete_font_failures();
+	public function test_dismissing_hides_the_failed_files_until_one_fails_again() {
+		$this->set_font_failures(
+			[
+				self::FONT   => $this->failure( time() - 10 ),
+				'Garuda.ttf' => $this->failure(),
+			]
+		);
 
-		$this->downloader->schedule_sync();
+		$this->assertSame( [ self::FONT ], $this->downloader->get_undismissed_failed_files() );
 
-		$this->assertSame( [], $this->get_font_failures() );
+		$this->downloader->dismiss_failed_files();
+		$this->assertSame( [], $this->downloader->get_undismissed_failed_files() );
+		$this->assertSame( [ self::FONT ], array_keys( $this->downloader->get_failed_files() ) );
+
+		/* Read afresh, as another site would */
+		$this->assertSame( [], $this->new_downloader()->get_undismissed_failed_files() );
+
+		/* A font that gives up later is listed */
+		$this->set_font_failures( $this->get_font_failures() + [ 'FreeSans.ttf' => $this->failure( time() ) ] );
+		$this->assertSame( [ 'FreeSans.ttf' ], $this->new_downloader()->get_undismissed_failed_files() );
 	}
 
-	/**
-	 * Read an option's autoload flag straight from the database
-	 *
-	 * @return string|null The option's autoload value
-	 */
-	private function get_autoload( string $option ): ?string {
-		global $wpdb;
+	public function test_only_a_true_dismissal_counts() {
+		$this->set_font_failures( [ self::FONT => [ 'retry_at' => 0, 'gave_up' => time(), 'dismissed' => 'yes' ] ] );
 
-		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
-		return $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s", $option ) );
+		$this->assertSame( [ self::FONT ], $this->new_downloader()->get_undismissed_failed_files() );
 	}
 
 	/**

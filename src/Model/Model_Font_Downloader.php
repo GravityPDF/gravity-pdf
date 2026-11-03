@@ -33,14 +33,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Font_Downloader extends Helper_Abstract_Model {
 
 	/**
-	 * Failed files awaiting their one retry, and those that gave up, which the admin notice lists
+	 * Failed files awaiting their one retry, and those that gave up, which the admin notice lists. An option of the
+	 * main network, as every site shares the fonts folder
 	 *
 	 * @since 6.19.0
 	 */
 	const FAILURES = 'gfpdf_core_font_failures';
 
 	/**
-	 * Prefix of the per-file transient holding when a download last failed, which skips the network until it expires
+	 * Prefix of the per-file site transient holding when a download last failed, which skips the network until it
+	 * expires
 	 *
 	 * @since 6.19.0
 	 */
@@ -80,11 +82,18 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	const SYNC_BUDGET = 20;
 
 	/**
-	 * Set once a Multisite network's shared fonts folder is pruned on the upgrade to 6.19
+	 * Main network option holding the 6.19 cleanup's progress while it runs, then true once it's done
 	 *
 	 * @since 6.19.0
 	 */
-	const PRUNED = 'gfpdf_core_font_pruned';
+	const CLEANUP = 'gfpdf_core_font_cleanup';
+
+	/**
+	 * Cron event that reads every site's fonts a batch at a time, then cleans the shared fonts folder
+	 *
+	 * @since 6.19.0
+	 */
+	const CLEANUP_EVENT = 'gfpdf_core_font_cleanup_run';
 
 	/**
 	 * @var Model_Font_Sources
@@ -117,9 +126,10 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
-	 * When each failed file's retry is due (else 0) and, once the retry also failed, when it gave up (else 0)
+	 * When each failed file's retry is due (else 0), once the retry also failed when it gave up (else 0), and whether
+	 * an admin dismissed the notice listing it
 	 *
-	 * @var array<string, array{retry_at: int, gave_up: int}>|null
+	 * @var array<string, array{retry_at: int, gave_up: int, dismissed: bool}>|null
 	 * @since 6.19.0
 	 */
 	protected $failures;
@@ -286,13 +296,14 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * Delete the unmodified files (fonts and licences) the Core Font installer downloaded that aren't kept. A file whose
 	 * download is turned off stays, as it couldn't come back. Only files of the installer's size are hashed.
 	 *
-	 * @param string[]|null $keep File names to keep, else the fonts the site's PDFs need
+	 * @param string[]|null $keep  File names to keep, else the fonts the site's PDFs need
+	 * @param int           $since Also keep files written after this time, as a download since then may be needed
 	 *
 	 * @return string[] The files removed
 	 *
 	 * @since 6.19.0
 	 */
-	public function prune( ?array $keep = null ): array {
+	public function prune( ?array $keep = null, int $since = 0 ): array {
 		$manifest = $this->font_sources->get_legacy_manifest( 'core' );
 
 		/* Without the manifest nothing is known to be unmodified */
@@ -315,7 +326,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 			$path = $this->get_font_path( $file );
 			clearstatcache( true, $path );
-			if ( ! is_file( $path ) || filesize( $path ) !== $entry['size'] ) {
+			if ( ! is_file( $path ) || filesize( $path ) !== $entry['size'] || ( $since > 0 && filemtime( $path ) > $since ) ) {
 				continue;
 			}
 
@@ -638,6 +649,40 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Failed files no admin has dismissed the notice for
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_undismissed_failed_files(): array {
+		$undismissed = array_filter(
+			$this->get_failures(),
+			static function ( array $failure ): bool {
+				return $failure['gave_up'] > 0 && ! $failure['dismissed'];
+			}
+		);
+
+		return array_map( 'strval', array_keys( $undismissed ) );
+	}
+
+	/**
+	 * Dismiss the notice for every failed file, on every site. A file that downloads, then fails again, is listed anew
+	 *
+	 * @since 6.19.0
+	 */
+	public function dismiss_failed_files(): void {
+		$failures = $this->get_failures();
+		foreach ( $failures as $file => $failure ) {
+			if ( $failure['gave_up'] > 0 ) {
+				$failures[ $file ]['dismissed'] = true;
+			}
+		}
+
+		$this->save_failures( $failures );
+	}
+
+	/**
 	 * Forget the failures read this request
 	 *
 	 * @since 6.19.0
@@ -664,11 +709,6 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		/* The trigger may have changed the required set */
 		delete_transient( self::SYNC_REMAINING );
 
-		/* Stored empty, so the notice check reads it from the autoloaded options rather than querying for it */
-		if ( get_site_option( self::FAILURES ) === false ) {
-			$this->save_failures( [] );
-		}
-
 		$this->schedule_by( time() );
 	}
 
@@ -687,7 +727,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		array_map( [ $this, 'delete_back_off' ], $due );
 
 		$this->syncing = true;
-		$left          = $this->download_within_budget( array_merge( $due, $missing ) );
+		$left          = $this->within_budget( array_merge( $due, $missing ), [ $this, 'download' ] );
 		$this->syncing = false;
 
 		/* Includes the retries this run's first failures added */
@@ -708,45 +748,103 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Have the sync run by the time given: queue it, or move one queued later forward. Never two, never later.
+	 * Queue the 6.19 cleanup of the shared fonts folder, once per install
+	 *
+	 * @param string $unset_default The default font of a site with none saved
 	 *
 	 * @since 6.19.0
 	 */
-	protected function schedule_by( int $at ): void {
-		$next = wp_next_scheduled( self::SYNC_EVENT );
+	public function schedule_cleanup( string $unset_default ): void {
+		if ( get_network_option( get_main_network_id(), self::CLEANUP ) !== false ) {
+			return;
+		}
+
+		update_network_option(
+			get_main_network_id(),
+			self::CLEANUP,
+			[
+				'started' => time(),
+				'default' => $unset_default,
+				'sites'   => $this->required_fonts->get_site_ids(),
+				'keys'    => [],
+			]
+		);
+
+		$this->schedule_by( time(), self::CLEANUP_EVENT );
+	}
+
+	/**
+	 * Read the fonts of the sites left until the time budget runs out, then clean the fonts folder once all are read
+	 *
+	 * @since 6.19.0
+	 */
+	public function cleanup(): void {
+		$state = get_network_option( get_main_network_id(), self::CLEANUP );
+		if ( ! is_array( $state ) ) {
+			return;
+		}
+
+		$keys = $state['keys'];
+		$left = $this->within_budget(
+			$state['sites'],
+			function ( $site_id ) use ( &$keys, $state ) {
+				$keys = array_merge( $keys, $this->required_fonts->get_site_font_keys( (int) $site_id, $state['default'] ) );
+			}
+		);
+
+		if ( $left !== [] ) {
+			$state['sites'] = $left;
+			$state['keys']  = array_values( array_unique( $keys ) );
+			update_network_option( get_main_network_id(), self::CLEANUP, $state );
+			$this->schedule_by( time(), self::CLEANUP_EVENT );
+
+			return;
+		}
+
+		$this->prune( $this->required_fonts->get_install_font_files( $keys ), $state['started'] );
+		update_network_option( get_main_network_id(), self::CLEANUP, true );
+	}
+
+	/**
+	 * Have the event run by the time given: queue it, or move one queued later forward. Never two, never later.
+	 *
+	 * @since 6.19.0
+	 */
+	protected function schedule_by( int $at, string $event = self::SYNC_EVENT ): void {
+		$next = wp_next_scheduled( $event );
 		if ( $next !== false && $next <= $at ) {
 			return;
 		}
 
 		if ( $next !== false ) {
-			wp_unschedule_event( $next, self::SYNC_EVENT );
+			wp_unschedule_event( $next, $event );
 		}
 
-		if ( wp_schedule_single_event( $at, self::SYNC_EVENT ) !== true ) {
-			$this->log->warning( 'Font sync could not be scheduled' );
+		if ( wp_schedule_single_event( $at, $event ) !== true ) {
+			$this->log->warning( 'Font event could not be scheduled', [ 'event' => $event ] );
 		}
 	}
 
 	/**
-	 * Download each file until the time budget runs out
+	 * Run the callback on each item until the time budget runs out
 	 *
-	 * @param string[] $files
+	 * @param mixed[] $items
 	 *
-	 * @return string[] The files it didn't reach
+	 * @return mixed[] The items it didn't reach
 	 *
 	 * @since 6.19.0
 	 */
-	protected function download_within_budget( array $files ): array {
-		$files    = array_values( $files );
+	protected function within_budget( array $items, callable $each ): array {
+		$items    = array_values( $items );
 		$deadline = microtime( true ) + $this->sync_budget;
 
-		foreach ( $files as $i => $file ) {
-			/* At least one file per run, so slow hosts make progress */
+		foreach ( $items as $i => $item ) {
+			/* At least one per run, so slow hosts make progress */
 			if ( $i > 0 && microtime( true ) >= $deadline ) {
-				return array_slice( $files, $i );
+				return array_slice( $items, $i );
 			}
 
-			$this->download( $file );
+			$each( $item );
 		}
 
 		return [];
@@ -941,8 +1039,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 		if ( $failure === null ) {
 			$failures[ $file ] = [
-				'retry_at' => time() + wp_rand( 0, $this->retry_jitter ),
-				'gave_up'  => 0,
+				'retry_at'  => time() + wp_rand( 0, $this->retry_jitter ),
+				'gave_up'   => 0,
+				'dismissed' => false,
 			];
 
 			$this->save_failures( $failures );
@@ -956,10 +1055,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		}
 
 		if ( $failure['gave_up'] === 0 ) {
-			/* First give-up time, which notice dismissals are compared against */
+			/* The first give-up, which the notice lists */
 			$failures[ $file ] = [
-				'retry_at' => 0,
-				'gave_up'  => time(),
+				'retry_at'  => 0,
+				'gave_up'   => time(),
+				'dismissed' => false,
 			];
 
 			$this->save_failures( $failures );
@@ -991,23 +1091,20 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Network-wide like the fonts folder, and kept when empty
-	 *
-	 * @param array<string, array{retry_at: int, gave_up: int}> $failures
+	 * @param array<string, array{retry_at: int, gave_up: int, dismissed: bool}> $failures
 	 *
 	 * @since 6.19.0
 	 */
 	protected function save_failures( array $failures ): void {
 		$this->failures = $failures;
 
-		/* Autoloaded on a single site, as the notice checks it on most admin pages */
-		is_multisite() ? update_site_option( self::FAILURES, $failures ) : update_option( self::FAILURES, $failures, true );
+		update_network_option( get_main_network_id(), self::FAILURES, $failures );
 	}
 
 	/**
 	 * Failures by file, read once per request
 	 *
-	 * @return array<string, array{retry_at: int, gave_up: int}>
+	 * @return array<string, array{retry_at: int, gave_up: int, dismissed: bool}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -1015,7 +1112,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		if ( $this->failures === null ) {
 			$this->failures = [];
 
-			$stored = get_site_option( self::FAILURES, [] );
+			$stored = get_network_option( get_main_network_id(), self::FAILURES, [] );
 			foreach ( is_array( $stored ) ? $stored : [] as $file => $failure ) {
 				$retry_at = is_array( $failure ) && is_int( $failure['retry_at'] ?? null ) ? $failure['retry_at'] : 0;
 				$gave_up  = is_array( $failure ) && is_int( $failure['gave_up'] ?? null ) ? $failure['gave_up'] : 0;
@@ -1023,8 +1120,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				/* An entry with neither is waiting on nothing */
 				if ( is_string( $file ) && ( $retry_at > 0 || $gave_up > 0 ) ) {
 					$this->failures[ $file ] = [
-						'retry_at' => $gave_up > 0 ? 0 : $retry_at,
-						'gave_up'  => $gave_up,
+						'retry_at'  => $gave_up > 0 ? 0 : $retry_at,
+						'gave_up'   => $gave_up,
+						'dismissed' => $gave_up > 0 && ( $failure['dismissed'] ?? false ) === true,
 					];
 				}
 			}

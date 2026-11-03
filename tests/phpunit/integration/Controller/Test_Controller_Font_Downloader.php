@@ -70,6 +70,7 @@ class Test_Controller_Font_Downloader extends TestCase {
 	public function test_hooks() {
 		$this->assertInstanceOf( Model_Font_Downloader::class, $this->model );
 		$this->assertSame( 10, has_action( Model_Font_Downloader::SYNC_EVENT, [ $this->model, 'sync' ] ) );
+		$this->assertSame( 10, has_action( Model_Font_Downloader::CLEANUP_EVENT, [ $this->model, 'cleanup' ] ) );
 		$this->assertSame( 10, has_action( 'upgrader_process_complete', [ $this->controller, 'maybe_sync_translations' ] ) );
 		$this->assertSame( 10, has_action( 'add_option_gfpdf_settings', [ $this->controller, 'maybe_sync_default_font' ] ) );
 		$this->assertSame( 10, has_action( 'update_option_gfpdf_settings', [ $this->controller, 'maybe_sync_default_font' ] ) );

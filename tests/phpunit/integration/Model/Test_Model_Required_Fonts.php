@@ -38,6 +38,11 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->remove_font_fixtures();
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
+		/* A subsite leaves these behind */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
+
 		parent::tear_down();
 	}
 
@@ -416,6 +421,90 @@ class Test_Model_Required_Fonts extends TestCase {
 
 		$this->assertSame( [], $keys );
 		$this->assertSame( [ 'freeserif' ], $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() ) );
+	}
+
+	public function test_on_its_own_a_site_requires_the_same_files_as_across_all_sites() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserif' );
+		$this->set_languages( [ 'th' ] );
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+
+		$required = $this->required_with( $this->stub_font_sources() );
+		$files    = $required->get_required_font_files();
+
+		$this->assertCount( 12, $files );
+		$this->assertEqualsCanonicalizing( $files, $this->all_sites_files( 'dejavusanscondensed', $required ) );
+	}
+
+	/**
+	 * @dataProvider provider_unset_default_fonts
+	 *
+	 * @param mixed $settings
+	 */
+	public function test_a_site_without_a_saved_default_font_requires_the_one_given( $settings ) {
+		update_option( 'gfpdf_settings', $settings );
+
+		$this->assertSame( [], $this->all_sites_files() );
+		$this->assertSame(
+			[ 'DejaVuSansCondensed.ttf', 'DejaVuSansCondensed-Bold.ttf', 'DejaVuSansCondensed-Oblique.ttf', 'DejaVuSansCondensed-BoldOblique.ttf' ],
+			$this->all_sites_files( 'dejavusanscondensed' )
+		);
+	}
+
+	public function provider_unset_default_fonts(): array {
+		return [
+			'none saved'       => [ [ 'debug_mode' => 'No' ] ],
+			'an empty font'    => [ [ 'default_font' => '' ] ],
+			'corrupt settings' => [ 'arimo' ],
+		];
+	}
+
+	public function test_every_sites_fonts_are_required_across_all_sites() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
+		update_blog_option( self::factory()->blog->create(), 'gfpdf_settings', [ 'default_font' => 'dejavuserif' ] );
+
+		/* A site Gravity Forms hasn't run on has no form tables; its locale has no language pack */
+		$no_forms = self::factory()->blog->create();
+		update_blog_option( $no_forms, 'gfpdf_settings', [ 'default_font' => 'arimo' ] );
+		/* Raw, as saving WPLANG drops a locale without its pack */
+		$GLOBALS['wpdb']->replace( $GLOBALS['wpdb']->get_blog_prefix( $no_forms ) . 'options', [ 'option_name' => 'WPLANG', 'option_value' => 'th' ] );
+
+		switch_to_blog( self::factory()->blog->create() );
+		try {
+			gf_upgrade()->install();
+			update_option( 'gfpdf_settings', [ 'default_font' => 'arimo' ] );
+			$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		} finally {
+			restore_current_blog();
+		}
+
+		$this->assertSame( [], $this->required->get_required_font_files() );
+		$this->assertSame(
+			array_merge(
+				[ 'DejaVuSerif.ttf', 'DejaVuSerif-Bold.ttf', 'DejaVuSerif-Italic.ttf', 'DejaVuSerif-BoldItalic.ttf' ],
+				[ 'Garuda.ttf', 'Garuda-Bold.ttf', 'Garuda-Oblique.ttf', 'Garuda-BoldOblique.ttf' ],
+				self::$freeserif
+			),
+			$this->all_sites_files()
+		);
+	}
+
+	/**
+	 * The files every site needs, as the 6.19 cleanup gathers them
+	 *
+	 * @return string[]
+	 */
+	private function all_sites_files( string $unset_default = '', ?Model_Required_Fonts $required = null ): array {
+		$required = $required ?? $this->required;
+		$keys     = [];
+		foreach ( $required->get_site_ids() as $site_id ) {
+			$keys = array_merge( $keys, $required->get_site_font_keys( $site_id, $unset_default ) );
+		}
+
+		return $required->get_install_font_files( $keys );
 	}
 
 	/**

@@ -114,14 +114,16 @@ class Model_Uninstall extends Helper_Abstract_Model {
 			$this->remove_plugin_network_options();
 		} else {
 			$this->remove_plugin_transients();
-			$this->remove_font_back_offs();
 			$this->remove_plugin_options();
 			$this->remove_plugin_form_settings();
 		}
 
+		$this->remove_font_state();
+
 		/* Removes background processes */
 		$this->queue->clear_scheduled_events();
 		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+		wp_clear_scheduled_hook( Model_Font_Downloader::CLEANUP_EVENT );
 
 		$this->queue->clear_queue( true );
 		$this->queue->unlock_process();
@@ -166,27 +168,30 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		}
 
 		delete_transient( Model_Font_Downloader::SYNC_REMAINING );
-		delete_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
 
 		$templates = \GPDFAPI::get_templates_class();
 		$templates->flush_template_transient_cache();
 	}
 
 	/**
-	 * Remove the font downloads' back-offs, which a single site keeps in its options table (a Multisite in sitemeta)
+	 * Remove the font state every site shares: the failed downloads and their back-offs, the language fonts and the
+	 * 6.19 cleanup's progress
 	 *
 	 * @since 6.19.0
 	 */
-	public function remove_font_back_offs() {
-		global $wpdb;
+	public function remove_font_state(): void {
+		delete_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES );
+		delete_network_option( get_main_network_id(), Model_Font_Downloader::CLEANUP );
+		delete_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
 
-		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
-		$keys = $wpdb->get_col(
-			$wpdb->prepare( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s", $wpdb->esc_like( '_site_transient_' . Model_Font_Downloader::BACK_OFF_KEY ) . '%' )
-		);
+		$font_sources = \GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		if ( ! $font_sources instanceof Model_Font_Sources ) {
+			return;
+		}
 
-		foreach ( $keys as $key ) {
-			delete_site_transient( substr( $key, strlen( '_site_transient_' ) ) );
+		/* Only the manifest's files are downloaded, so only they back off */
+		foreach ( array_keys( $font_sources->get_manifest() ) as $file ) {
+			delete_site_transient( Model_Font_Downloader::back_off_key( (string) $file ) );
 		}
 	}
 
@@ -205,7 +210,6 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( Model_Pdf_Cache::SWEEP_STATE_OPTION );
 		delete_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION );
 		delete_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ); /* A Multisite keeps it in sitemeta */
-		delete_option( Model_Font_Downloader::FAILURES ); /* A Multisite keeps it in sitemeta */
 		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
@@ -222,8 +226,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Remove the network options stored in sitemeta on a Multisite: license package caches, the rich text merge
-	 * tags flag, the failed font downloads and their back-offs, and the 6.19 core font prune flag
+	 * Remove the network options stored in sitemeta on a Multisite: license package caches and the rich text merge
+	 * tags flag. remove_font_state() removes the font state.
 	 *
 	 * Every extension keeps its own license cache entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all
 	 * are network-scoped rather than per-site, so one pass clears them, and the flag's exact key, without walking the
@@ -241,13 +245,9 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key IN ( %s, %s, %s )",
+				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key = %s",
 				$wpdb->esc_like( 'gpdf_sl_net_' ) . '%',
-				$wpdb->esc_like( '_site_transient_' . Model_Font_Downloader::BACK_OFF_KEY ) . '%',
-				$wpdb->esc_like( '_site_transient_timeout_' . Model_Font_Downloader::BACK_OFF_KEY ) . '%',
-				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS,
-				Model_Font_Downloader::FAILURES,
-				Model_Font_Downloader::PRUNED
+				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS
 			)
 		);
 

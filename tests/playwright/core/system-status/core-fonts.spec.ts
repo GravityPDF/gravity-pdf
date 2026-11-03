@@ -56,7 +56,7 @@ test.describe('Core Fonts', () => {
 		// Clears the dismissals stored by an earlier run (see tools/mu-plugins)
 		test.beforeAll(() =>
 			wpCli(
-				'wp option delete gfpdf_e2e_failed_fonts_dismissal --quiet || true'
+				'wp option delete gfpdf_e2e_failed_fonts_dismissed --quiet || true'
 			)
 		);
 
