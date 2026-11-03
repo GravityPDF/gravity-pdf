@@ -7,6 +7,7 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use GPDFAPI;
@@ -27,7 +28,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The fonts Gravity PDF provides: the bundled Arimo and DejaVu symbol faces, and mPDF's core fonts
  *
  * A source has `families` (mPDF font data, plus an optional `name` and `listed`), and optionally a bundled `dir`, a
- * font list `group` and `legacy` (git blob SHA-1 => size of other copies of its files, which adopt_records() accepts).
+ * `manifest` of its downloadable files, a font list `group` and `legacy` (git blob SHA-1 => size of other copies of
+ * its files, which adopt_records() accepts).
  *
  * @since 6.19.0
  */
@@ -41,7 +43,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	public const SYMBOLS_FONT = 'gfpdf-dejavu-symbols';
 
 	/**
-	 * The bundled Arimo, the default font for new installs
+	 * The bundled Arimo, the default font for new installs and the last fallback
 	 *
 	 * @since 6.19.0
 	 */
@@ -76,6 +78,14 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected $mpdf_defaults;
+
+	/**
+	 * Every source's downloadable files by name, once get_manifest() reads them
+	 *
+	 * @var array<string, array{url: string, size: int, sha: string}>|null
+	 * @since 6.19.0
+	 */
+	protected $manifest;
 
 	/**
 	 * @since 6.19.0
@@ -143,13 +153,15 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	/**
 	 * The first registered font given, else the default font, else Arimo
 	 *
-	 * @param mixed[] $fonts    Font keys in order of preference, e.g. the PDF's font
-	 * @param array   $fontdata mPDF font data
+	 * @param mixed[]    $fonts    Font keys in order of preference, e.g. the PDF's font
+	 * @param array|null $fontdata mPDF font data, or null for the registered fonts
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_default_font( array $fonts, array $fontdata ): string {
-		$fonts[] = GPDFAPI::get_options_class()->get_option( 'default_font', '' );
+	public function get_default_font( array $fonts = [], ?array $fontdata = null ): string {
+		$fontdata = $fontdata ?? apply_filters( 'mpdf_font_data', $this->get_mpdf_defaults()['fontdata'] );
+		$fontdata = is_array( $fontdata ) ? $fontdata : [];
+		$fonts[]  = GPDFAPI::get_options_class()->get_option( 'default_font', '' );
 
 		foreach ( $fonts as $font ) {
 			$font = is_string( $font ) ? strtolower( $font ) : '';
@@ -212,6 +224,53 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	protected function is_registered( string $font, array $fontdata ): bool {
 		return is_string( $fontdata[ $font ]['R'] ?? null );
+	}
+
+	/**
+	 * The bundled Arimo Regular path
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_fallback_file(): string {
+		$bundled = $this->get_sources()['bundled'];
+
+		return $bundled['dir'] . $bundled['families'][ self::ARIMO ]['R'];
+	}
+
+	/**
+	 * Downloadable files across all sources, keyed by file name, read only when a file is needed
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_manifest(): array {
+		if ( $this->manifest === null ) {
+			$this->manifest = [];
+			foreach ( $this->get_sources() as $source ) {
+				$this->manifest += $this->read_manifest( $source );
+			}
+		}
+
+		return $this->manifest;
+	}
+
+	/**
+	 * Whether a file is a font on the manifest, not one of its licence files
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_core_font_file( string $file ): bool {
+		return isset( $this->get_manifest()[ $file ] ) && in_array( strtolower( pathinfo( $file, PATHINFO_EXTENSION ) ), [ 'ttf', 'otf' ], true );
+	}
+
+	/**
+	 * Where a file goes in the fonts folder
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_font_path( string $file ): string {
+		return $this->data->template_font_location . $file;
 	}
 
 	/**
@@ -422,11 +481,68 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected function get_core_source(): array {
 		return [
 			'families' => $this->get_mpdf_defaults()['fontdata'],
+			'manifest' => PDF_PLUGIN_DIR . 'fonts/core-fonts.php',
 		];
 	}
 
 	/**
-	 * A source's `legacy` git blob SHA-1s, keyed by file size
+	 * A source's manifest, keyed by file name, skipping malformed entries
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function read_manifest( array $source ): array {
+		$path = $source['manifest'] ?? '';
+		if ( ! is_string( $path ) || $path === '' ) {
+			return [];
+		}
+
+		try {
+			$entries = is_readable( $path ) ? include $path : null;
+		} catch ( Throwable $e ) {
+			$entries = null;
+		}
+
+		if ( ! is_array( $entries ) ) {
+			$this->log->error( 'Font manifest is missing or invalid', [ 'manifest' => $path ] );
+
+			return [];
+		}
+
+		$manifest = array_filter( $entries, [ $this, 'is_manifest_entry' ], ARRAY_FILTER_USE_BOTH );
+
+		if ( count( $manifest ) !== count( $entries ) ) {
+			$this->log->warning(
+				'Font manifest entries skipped as invalid',
+				[
+					'manifest' => $path,
+					'skipped'  => count( $entries ) - count( $manifest ),
+				]
+			);
+		}
+
+		return $manifest;
+	}
+
+	/**
+	 * A plain file name with an https:// URL, and a git blob SHA-1 with a positive size
+	 *
+	 * @param mixed      $entry
+	 * @param int|string $file
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_manifest_entry( $entry, $file ): bool {
+		return is_string( $file ) && $file !== '' && basename( $file ) === $file
+			&& is_array( $entry )
+			&& is_string( $entry['url'] ?? null ) && strpos( $entry['url'], 'https://' ) === 0
+			&& is_string( $entry['sha'] ?? null ) && preg_match( '/^[0-9a-f]{40}$/', $entry['sha'] ) === 1
+			&& is_int( $entry['size'] ?? null ) && $entry['size'] > 0;
+	}
+
+	/**
+	 * A source's manifest and `legacy` git blob SHA-1s, keyed by file size
 	 *
 	 * @return array<int, string[]>
 	 *
@@ -434,6 +550,10 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	protected function get_known_files( array $source ): array {
 		$known = [];
+		foreach ( $this->read_manifest( $source ) as $file ) {
+			$known[ $file['size'] ][] = $file['sha'];
+		}
+
 		foreach ( $source['legacy'] ?? [] as $sha => $size ) {
 			$known[ $size ][] = $sha;
 		}
@@ -460,34 +580,17 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			}
 
 			/* mPDF finds a font by its file name in the fonts folder, so check the copy there */
-			$path = $this->data->template_font_location . basename( $file );
+			$path = $this->get_font_path( basename( $file ) );
 			if ( ! is_file( $path ) || ! is_readable( $path ) ) {
 				return false;
 			}
 
 			$size = (int) filesize( $path );
-			if ( ! isset( $known[ $size ] ) || ! in_array( $this->get_git_blob_sha1( $path, $size ), $known[ $size ], true ) ) {
+			if ( ! isset( $known[ $size ] ) || ! in_array( Git_Blob::sha1( $path, $size ), $known[ $size ], true ) ) {
 				return false;
 			}
 		}
 
 		return true;
-	}
-
-	/**
-	 * Git's blob SHA-1: the SHA-1 of `blob <size>\0` followed by the file, as `git hash-object` gives it
-	 *
-	 * GitHub lists this hash for every file in a repo, so the `legacy` list is built without downloading the fonts. It
-	 * identifies a known copy and isn't a tamper check: a forged SHA-1 collision could at most get a record swapped for
-	 * the source's own font
-	 *
-	 * @since 6.19.0
-	 */
-	protected function get_git_blob_sha1( string $path, int $size ): string {
-		$hash = hash_init( 'sha1' );
-		hash_update( $hash, 'blob ' . $size . "\0" );
-		hash_update_file( $hash, $path );
-
-		return hash_final( $hash );
 	}
 }

@@ -54,6 +54,11 @@ class Test_Shortcodes extends TestCase {
 	public $view;
 
 	/**
+	 * @var array The global settings before set_up() turned Debug Mode on
+	 */
+	private $original_settings = [];
+
+	/**
 	 * The WP Unit Test Set up function
 	 *
 	 * @since 4.0
@@ -84,10 +89,20 @@ class Test_Shortcodes extends TestCase {
 		$this->controller = new Controller_Shortcodes( $this->model, $this->view, $gfpdf->log );
 		$this->controller->init();
 
-		$options                = $gfpdf->options;
-		$settings               = $options->get_settings();
-		$settings['debug_mode'] = 'Yes';
+		$options                 = $gfpdf->options;
+		$settings                = $options->get_settings();
+		$this->original_settings = $settings;
+		$settings['debug_mode']  = 'Yes';
 		$options->update_settings( $settings );
+	}
+
+	public function tear_down(): void {
+		global $gfpdf;
+
+		/* The database rolls back, but the options class keeps the settings in memory, Debug Mode included */
+		$gfpdf->options->update_settings( $this->original_settings );
+
+		parent::tear_down();
 	}
 
 	/**

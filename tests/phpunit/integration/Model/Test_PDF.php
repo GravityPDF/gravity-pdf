@@ -16,6 +16,7 @@ use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\Statics\Cache;
 use GFPDF\Statics\Notes;
+use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\View\View_PDF;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -43,6 +44,8 @@ use GFPDF\Tests\Integration\TestCase;
  * @group pdf
  */
 class Test_PDF extends TestCase {
+
+	use UnregistersMvcClasses;
 
 	/**
 	 * Our Settings Controller
@@ -113,6 +116,54 @@ class Test_PDF extends TestCase {
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 		$this->controller->init();
+	}
+
+	/**
+	 * @dataProvider provider_not_mpdf
+	 *
+	 * @param mixed $mpdf
+	 */
+	public function test_set_watermark_font_passes_on_what_isnt_mpdf( $mpdf ) {
+		$this->assertSame( $mpdf, $this->model->set_watermark_font( $mpdf, [], [], [ 'font' => 'dejavusans' ] ) );
+	}
+
+	public function provider_not_mpdf(): array {
+		return [
+			'null'     => [ null ],
+			'false'    => [ false ],
+			'a string' => [ 'mpdf' ],
+		];
+	}
+
+	public function test_the_core_styles_fall_back_to_arimo_without_the_font_sources() {
+		$data = $this->form_and_entry();
+
+		$styles = $this->without_mvc_class(
+			'Model_Font_Sources',
+			function () use ( $data ) {
+				ob_start();
+				$this->view->core_template_styles( [ 'settings' => [ 'font' => 'dejavusans' ], 'form' => $data['form'], 'entry' => $data['entry'] ] );
+
+				return ob_get_clean();
+			}
+		);
+
+		$this->assertStringContainsString( 'font-family: arimo, sans-serif;', $styles );
+	}
+
+	public function test_set_watermark_font_asks_injected_font_sources() {
+		global $gfpdf;
+
+		$font_sources = $this->createMock( Model_Font_Sources::class );
+		$font_sources->expects( $this->once() )
+			->method( 'get_default_font' )
+			->with( [ 'freeserif', 'dejavusans' ], null )
+			->willReturn( 'freeserif' );
+
+		$model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer(), null, $font_sources );
+		$mpdf  = $model->set_watermark_font( new \stdClass(), [], [], [ 'watermark_font' => 'freeserif', 'font' => 'dejavusans' ] );
+
+		$this->assertSame( 'freeserif', $mpdf->watermark_font );
 	}
 
 	/**
@@ -2225,6 +2276,40 @@ class Test_PDF extends TestCase {
 		/* Test non-related array */
 		$results = $this->model->preprocess_template_arguments( [ 'other_array' ] );
 		$this->assertSame( 'other_array', $results[0] );
+	}
+
+	/**
+	 * @dataProvider provider_core_template_font
+	 *
+	 * @param mixed $font The PDF's font setting, or null for none
+	 */
+	public function test_core_template_font( $font, string $global_font, string $expected ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () use ( $global_font ) {
+				return $global_font;
+			}
+		);
+
+		$data     = $this->form_and_entry();
+		$settings = $font === null ? [] : [ 'font' => $font ];
+
+		ob_start();
+		$this->view->core_template_styles( [ 'settings' => $settings, 'form' => $data['form'], 'entry' => $data['entry'] ] );
+		$results = ob_get_clean();
+
+		$this->assertStringContainsString( "font-family: $expected, sans-serif;", $results );
+	}
+
+	public function provider_core_template_font(): array {
+		return [
+			'a registered PDF font keeps its case'    => [ 'DejaVuSans', 'dejavusanscondensed', 'DejaVuSans' ],
+			'an mPDF sans-serif name keeps its case'  => [ 'Arial', 'dejavusanscondensed', 'Arial' ],
+			'an mPDF alias to a font of a kind'       => [ 'times', 'dejavusanscondensed', 'times' ],
+			'an unknown PDF font'                     => [ 'notafont', 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'no PDF font'                             => [ null, 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'a non-string PDF font'                   => [ [ 'dejavusans' ], 'dejavusanscondensed', 'dejavusanscondensed' ],
+		];
 	}
 
 	/**

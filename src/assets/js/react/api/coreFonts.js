@@ -16,15 +16,12 @@ import { api, getJsonString } from './api';
  * @since 5.2
  */
 export async function apiGetFilesFromGitHub() {
-	const response = await api(
-		GFPDF.pluginUrl + 'build/payload/core-fonts.json',
-		{
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-			},
-		}
-	);
+	const response = await api(GFPDF.pluginUrl + 'fonts/core-fonts.json', {
+		method: 'GET',
+		headers: {
+			Accept: 'application/json',
+		},
+	});
 
 	const text = await response.text();
 	const body = getJsonString(text);
