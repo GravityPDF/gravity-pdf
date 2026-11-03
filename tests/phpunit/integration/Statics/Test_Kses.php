@@ -123,4 +123,28 @@ class Test_Kses extends TestCase {
 			ini_set( 'pcre.backtrack_limit', $limit );
 		}
 	}
+
+	public function test_get_allowed_pdf_styles_adds_the_pdf_properties() {
+		$styles = Kses::get_allowed_pdf_styles( [ 'color' ] );
+
+		$this->assertContains( 'color', $styles );
+		$this->assertGreaterThan( 1, count( $styles ) );
+	}
+
+	/**
+	 * @dataProvider provider_not_styles
+	 *
+	 * @param mixed $styles What a safe_style_css callback returned
+	 */
+	public function test_get_allowed_pdf_styles_passes_on_what_isnt_a_list( $styles ) {
+		$this->assertSame( $styles, Kses::get_allowed_pdf_styles( $styles ) );
+	}
+
+	public function provider_not_styles(): array {
+		return [
+			'null'     => [ null ],
+			'false'    => [ false ],
+			'a string' => [ 'color' ],
+		];
+	}
 }
