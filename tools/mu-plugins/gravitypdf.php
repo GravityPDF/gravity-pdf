@@ -240,14 +240,15 @@ if ( $gfpdf_e2e_header( 'unwritable_folders' ) === 'yes' ) {
 	$gfpdf_e2e_own_dismissals( 'gfpdf_e2e_action_dismissal' );
 }
 
-/* A fixed set of failures, given up when the header says, and no writes over them */
+/* A fixed set of failures, given up when the header says; only the dismissal can change, kept apart from the real record */
 if ( $gfpdf_e2e_fonts_gave_up > 0 ) {
 	add_filter(
 		'pre_option_gfpdf_core_font_failures',
 		static function () use ( $gfpdf_e2e_fonts_gave_up ) {
 			$failure = [
-				'retry_at' => 0,
-				'gave_up'  => $gfpdf_e2e_fonts_gave_up,
+				'retry_at'  => 0,
+				'gave_up'   => $gfpdf_e2e_fonts_gave_up,
+				'dismissed' => (int) get_option( 'gfpdf_e2e_failed_fonts_dismissed', 0 ) === $gfpdf_e2e_fonts_gave_up,
 			];
 
 			return [
@@ -259,14 +260,16 @@ if ( $gfpdf_e2e_fonts_gave_up > 0 ) {
 
 	add_filter(
 		'pre_update_option_gfpdf_core_font_failures',
-		static function ( $value, $old_value ) {
+		static function ( $value, $old_value ) use ( $gfpdf_e2e_fonts_gave_up ) {
+			if ( ( $value['FreeSerif.ttf']['dismissed'] ?? false ) === true ) {
+				update_option( 'gfpdf_e2e_failed_fonts_dismissed', $gfpdf_e2e_fonts_gave_up );
+			}
+
 			return $old_value;
 		},
 		10,
 		2
 	);
-
-	$gfpdf_e2e_own_dismissals( 'gfpdf_e2e_failed_fonts_dismissal' );
 }
 
 /* Adds an extension's warning to a settings save, for the spec checking its colour */

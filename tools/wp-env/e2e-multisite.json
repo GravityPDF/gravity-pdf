@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "core": "WordPress/WordPress#7.1.3",
+  "phpVersion": "8.5",
+  "multisite": true,
+  "plugins": [],
+  "mappings": {
+    "wp-content/mu-plugins": "./tools/mu-plugins",
+    "wp-content/plugins/gravityforms": "./vendor/gravity/gravityforms",
+    "wp-content/plugins/gravity-pdf": "."
+  },
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_DISPLAY": false,
+    "WP_DEBUG_LOG": "/var/www/html/wp-content/plugins/gravity-pdf/tmp/debug.log",
+    "TEST_SUITE": true,
+    "E2E_TEST_SUITE": true,
+    "SCRIPT_DEBUG": true,
+    "WP_HTTP_BLOCK_EXTERNAL": true
+  },
+  "testsEnvironment": false,
+  "lifecycleScripts": {
+    "afterStart": "rm -rf ./tmp/artifacts",
+    "afterReset": "rm -rf ./tmp/artifacts"
+  }
+}

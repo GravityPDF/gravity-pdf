@@ -2,6 +2,15 @@ import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 /**
+ * The notice listing the core fonts that failed to download
+ * @param page
+ */
+export const failedFontsNotice = (page: Page) =>
+	page.locator('.notice.notice-warning', {
+		hasText: 'Gravity PDF could not download these fonts.',
+	});
+
+/**
  * Record any `.gf-notice` still visible outside `#gf-admin-notices-wrapper` on DOM ready, i.e. painted before it jumps
  * into place. Call before the navigation that shows the notice.
  * @param page

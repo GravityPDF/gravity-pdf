@@ -17,13 +17,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const API =
 	'https://api.wordpress.org/core/version-check/1.7/?channel=beta&version=6.0';
 
-// integration.json is the canonical source for the current pin; the three configs are kept in lockstep.
+// integration.json is the canonical source for the current pin; the configs are kept in lockstep.
 const CANONICAL = 'tools/wp-env/integration.json';
 
 const CONFIGS = [
 	'tools/wp-env/development.json',
 	CANONICAL,
 	'tools/wp-env/e2e.json',
+	'tools/wp-env/e2e-multisite.json',
 ];
 
 const VERSION = /(\d+)\.(\d+)(?:\.(\d+))?(?:-([A-Za-z]+)(\d*))?/;

@@ -37,8 +37,13 @@ class Test_Controller_Actions extends TestCase {
 	}
 
 	public function tear_down(): void {
-		unset( $_POST['gfpdf_action'], $_POST['gfpdf-dismiss-notice'], $_GET['page'] );
+		unset( $_POST['gfpdf_action'], $_POST['gfpdf_action_failed_core_fonts'], $_POST['gfpdf-dismiss-notice'], $_GET['page'] );
 		$this->delete_font_failures();
+
+		/* A subsite leaves these behind */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
 
 		parent::tear_down();
 	}
@@ -233,9 +238,12 @@ class Test_Controller_Actions extends TestCase {
 
 				$model->dismiss_failed_core_fonts();
 				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+				$this->assertTrue( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
 
-				/* A font that fails later raises it again, for that font alone */
-				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() - 10 ), 'FreeSans.ttf' => $this->failure( time() + 1 ) ] );
+				/* A font that gives up later raises it again, for that font alone */
+				$failures                 = $this->get_font_failures();
+				$failures['FreeSans.ttf'] = $this->failure( time() );
+				$this->set_font_failures( $failures );
 				$this->assertSame( [ 'FreeSans.ttf' ], $model->get_undismissed_failed_core_fonts() );
 
 				/* A font that downloads leaves the notice, which goes once none are left */
@@ -274,6 +282,75 @@ class Test_Controller_Actions extends TestCase {
 			},
 			'index.php-network'
 		);
+	}
+
+	public function test_dismissing_the_failed_core_fonts_notice_dismisses_it_on_every_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		global $gfpdf;
+
+		$model = $gfpdf->singleton->get_class( 'Model_Actions' );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		$model->dismiss_failed_core_fonts();
+
+		switch_to_blog( self::factory()->blog->create() );
+		try {
+			\GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
+			$this->assertFalse( $model->has_failed_core_fonts() );
+		} finally {
+			restore_current_blog();
+		}
+	}
+
+	public function test_the_dismiss_request_dismisses_the_failed_core_fonts_notice() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->post_failed_core_fonts_dismissal();
+		$this->controller->route();
+
+		$this->assertTrue( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
+	}
+
+	public function test_a_bad_nonce_leaves_the_failed_core_fonts_notice_undismissed() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->post_failed_core_fonts_dismissal( 'not-a-nonce' );
+		$this->controller->route();
+
+		$this->assertFalse( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
+	}
+
+	public function test_a_user_who_cannot_edit_the_settings_cannot_dismiss_the_failed_core_fonts_notice() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$this->post_failed_core_fonts_dismissal();
+
+		try {
+			$this->controller->route();
+			$this->fail( 'The request should have been refused' );
+		} catch ( \WPDieException $e ) {
+			$this->assertFalse( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
+		}
+	}
+
+	public function test_a_dismiss_request_with_nothing_failed_stores_nothing() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->post_failed_core_fonts_dismissal();
+		$this->controller->route();
+
+		$this->assertFalse( $this->get_font_failures() );
+	}
+
+	private function post_failed_core_fonts_dismissal( ?string $nonce = null ): void {
+		$_POST['gfpdf_action']                   = 'gfpdf_failed_core_fonts';
+		$_POST['gfpdf_action_failed_core_fonts'] = $nonce ?? wp_create_nonce( 'gfpdf_action_failed_core_fonts' );
+		$_POST['gfpdf-dismiss-notice']           = '1';
 	}
 
 	/**

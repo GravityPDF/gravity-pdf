@@ -2,16 +2,12 @@ import type { Admin } from '@wordpress/e2e-test-utils-playwright';
 import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
+import { failedFontsNotice as notice } from '@self:playwright/utils/notices';
 import { snapshot } from '@self:playwright/utils/snapshot';
 import { wpCli } from '@self:playwright/utils/wp-cli';
 
 // Matches the failures tools/mu-plugins reports for requests sending the header below
 const FAILED_FONTS = ['FreeSerif.ttf', 'Sun-ExtB.ttf'];
-
-const notice = (page: Page) =>
-	page.locator('.notice.notice-warning', {
-		hasText: 'Gravity PDF could not download these fonts.',
-	});
 
 // The fonts in FAILED_FONTS fail for the requests sending this, having given up at `timestamp` (see tools/mu-plugins)
 const giveUpAt = (page: Page, timestamp: number) =>
@@ -56,7 +52,7 @@ test.describe('Core Fonts', () => {
 		// Clears the dismissals stored by an earlier run (see tools/mu-plugins)
 		test.beforeAll(() =>
 			wpCli(
-				'wp option delete gfpdf_e2e_failed_fonts_dismissal --quiet || true'
+				'wp option delete gfpdf_e2e_failed_fonts_dismissed --quiet || true'
 			)
 		);
 

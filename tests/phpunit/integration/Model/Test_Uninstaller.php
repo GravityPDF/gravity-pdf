@@ -13,6 +13,8 @@ use GFPDF\Model\Model_Uninstall;
 use GFPDF\Statics\Cache;
 use GFPDF\Statics\Deprecation_V3;
 use GFPDF\Tests\Concerns\RecordsFontFailures;
+use GFPDF\Tests\Concerns\SwitchesNetwork;
+use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -33,6 +35,8 @@ use GFPDF\Tests\Integration\TestCase;
 class Test_Uninstaller extends TestCase {
 
 	use RecordsFontFailures;
+	use SwitchesNetwork;
+	use UnregistersMvcClasses;
 
 	/**
 	 * Our Controller
@@ -133,14 +137,20 @@ class Test_Uninstaller extends TestCase {
 		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
 		$this->set_back_off( 'Garuda.ttf' );
 		set_transient( Model_Font_Downloader::SYNC_REMAINING, [ 'Garuda.ttf' ], DAY_IN_SECONDS );
+		set_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS, [ 'garuda' ], DAY_IN_SECONDS );
+		update_site_option( Model_Font_Downloader::CLEANUP, true );
+		wp_schedule_single_event( time(), Model_Font_Downloader::CLEANUP_EVENT );
 
 		/* Uninstall */
 		$this->model->uninstall_plugin();
 
 		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
 		$this->assertFalse( $this->get_font_failures() );
 		$this->assertFalse( $this->get_back_off( 'Garuda.ttf' ) );
 		$this->assertFalse( get_transient( Model_Font_Downloader::SYNC_REMAINING ) );
+		$this->assertFalse( get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
+		$this->assertFalse( get_site_option( Model_Font_Downloader::CLEANUP ) );
 
 		/* Check software was uninstalled */
 		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );
@@ -244,7 +254,6 @@ class Test_Uninstaller extends TestCase {
 
 		update_site_option( 'gpdf_sl_net_abc123', [ 'timeout' => time(), 'value' => '{}' ] );
 		update_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
-		update_site_option( Model_Font_Downloader::PRUNED, true );
 		$this->assertNotFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
 		set_site_transient( 'gfpdf_cleanup_tmp_dir', 1 );
 
@@ -253,7 +262,6 @@ class Test_Uninstaller extends TestCase {
 		/* No cache flush here on purpose — the uninstall must invalidate what it deletes */
 		$this->assertFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
 		$this->assertFalse( get_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ) );
-		$this->assertFalse( get_site_option( Model_Font_Downloader::PRUNED ) );
 		$this->assertFalse( get_site_transient( 'gfpdf_cleanup_tmp_dir' ) );
 	}
 
@@ -319,5 +327,83 @@ class Test_Uninstaller extends TestCase {
 		$this->model->deactivate_plugin( 'unknown/plugin.php' );
 
 		$this->assertFalse( is_plugin_active( 'unknown/plugin.php' ) );
+	}
+
+	public function test_removing_the_font_state_clears_what_every_site_shares() {
+		$this->store_font_state();
+
+		$this->model->remove_font_state();
+
+		$this->assert_font_records_removed();
+		$this->assertFalse( $this->get_back_off( 'Garuda.ttf' ) );
+	}
+
+	public function test_removing_the_font_state_only_clears_the_back_offs_of_font_files() {
+		$this->set_back_off( 'not-on-the-manifest.ttf' );
+
+		$this->model->remove_font_state();
+
+		$this->assertNotFalse( $this->get_back_off( 'not-on-the-manifest.ttf' ) );
+	}
+
+	public function test_a_subsite_removes_the_font_state_every_site_shares() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->store_font_state();
+
+		switch_to_blog( self::factory()->blog->create() );
+		try {
+			$this->model->remove_font_state();
+		} finally {
+			restore_current_blog();
+		}
+
+		$this->assert_font_records_removed();
+	}
+
+	public function test_another_network_removes_the_font_state_from_the_main_network() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->store_font_state();
+
+		$this->on_another_network(
+			function () {
+				$this->model->remove_font_state();
+			}
+		);
+
+		$this->assertFalse( $this->get_font_failures() );
+		$this->assertFalse( $this->get_font_cleanup() );
+	}
+
+	public function test_removing_the_font_state_without_the_font_sources_still_clears_the_records() {
+		$this->store_font_state();
+
+		$this->without_mvc_class(
+			'Model_Font_Sources',
+			function () {
+				$this->model->remove_font_state();
+			}
+		);
+
+		$this->assert_font_records_removed();
+		$this->assertNotFalse( $this->get_back_off( 'Garuda.ttf' ), 'Left to expire, as the files it could be for are unknown' );
+	}
+
+	private function store_font_state(): void {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
+		$this->set_back_off( 'Garuda.ttf' );
+		$this->set_font_cleanup( $this->font_cleanup_state() );
+		set_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS, [ 'garuda' ], DAY_IN_SECONDS );
+	}
+
+	private function assert_font_records_removed(): void {
+		$this->assertFalse( $this->get_font_failures() );
+		$this->assertFalse( $this->get_font_cleanup() );
+		$this->assertFalse( get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
 	}
 }
