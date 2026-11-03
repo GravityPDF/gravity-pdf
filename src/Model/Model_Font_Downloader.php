@@ -233,6 +233,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			}
 		}
 
+		/* A front-end PDF request hasn't loaded wp_tempnam() */
+		if ( ! function_exists( 'wp_tempnam' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
 		$download_path = wp_tempnam( $file, $this->data->template_tmp_location );
 		if ( $download_path === '' || ! is_file( $download_path ) ) {
 			$this->log->error( 'Font temporary file could not be created', [ 'name' => $file ] );
