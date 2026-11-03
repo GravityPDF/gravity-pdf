@@ -6,10 +6,15 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
+use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
+use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Integration\TestCase;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger;
 
 /**
  * @package     Gravity PDF
@@ -27,7 +32,9 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Controller_Upgrade_Routines extends TestCase {
 
+	use CopiesFontFixtures;
 	use CreatesLegacyDownloadUrls;
+	use UnregistersMvcClasses;
 
 	/**
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -38,6 +45,12 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		parent::set_up();
 
 		$this->options = \GPDFAPI::get_options_class();
+	}
+
+	public function tear_down(): void {
+		$this->remove_font_fixtures();
+
+		parent::tear_down();
 	}
 
 	/**
@@ -245,6 +258,178 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 		do_action( 'gfpdf_version_changed', '6.17.2', '7.0.0' );
 		$this->assertTrue( get_site_option( $option ) );
+	}
+
+	public function test_a_new_install_defaults_to_arimo() {
+		$this->options->delete_option( 'default_font' );
+
+		do_action( 'gfpdf_plugin_installed' );
+		do_action( 'gfpdf_version_changed', '', '6.19.0' );
+
+		$this->assertSame( 'arimo', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_an_install_keeps_a_saved_default_font() {
+		$this->options->update_option( 'default_font', 'freeserif' );
+
+		do_action( 'gfpdf_plugin_installed' );
+
+		$this->assertSame( 'freeserif', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_an_upgrade_keeps_the_saved_default_font() {
+		$this->options->update_option( 'default_font', 'freeserif' );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertSame( 'freeserif', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_an_upgrade_saves_the_old_default_font_when_none_was_saved() {
+		$this->options->delete_option( 'default_font' );
+
+		do_action( 'gfpdf_version_changed', '6.19.0', '6.19.1' );
+		$this->assertArrayNotHasKey( 'default_font', get_option( 'gfpdf_settings', [] ) );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+		$this->assertSame( 'dejavusanscondensed', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_an_empty_default_font_counts_as_unsaved() {
+		update_option( 'gfpdf_settings', [ 'default_font' => '' ] );
+		do_action( 'gfpdf_plugin_installed' );
+		$this->assertSame( 'arimo', get_option( 'gfpdf_settings' )['default_font'] );
+
+		update_option( 'gfpdf_settings', [ 'default_font' => '' ] );
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+		$this->assertSame( 'dejavusanscondensed', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	/**
+	 * @dataProvider data_corrupt_settings
+	 *
+	 * @param mixed $settings
+	 */
+	public function test_the_default_font_save_leaves_corrupt_settings_alone( $settings ) {
+		update_option( 'gfpdf_settings', $settings );
+
+		do_action( 'gfpdf_plugin_installed' );
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertSame( $settings, get_option( 'gfpdf_settings' ) );
+	}
+
+	public function data_corrupt_settings(): array {
+		return [
+			'string'  => [ 'corrupt' ],
+			'integer' => [ '5' ],
+		];
+	}
+
+	public function test_6_19_0_adopts_a_template_arimo_record() {
+		wp_mkdir_p( \GPDFAPI::get_data_class()->template_font_location );
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$log = new TestHandler();
+		\GPDFAPI::get_log_class()->pushHandler( $log );
+
+		/* A fatal later in the upgrade request runs the routine again before the version is saved */
+		try {
+			$this->with_mvc_class(
+				'Model_Font_Sources',
+				$this->get_model_with_legacy( 'Chewy.ttf' ),
+				function () {
+					do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+					do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+				}
+			);
+		} finally {
+			\GPDFAPI::get_log_class()->popHandler();
+		}
+
+		$this->assertArrayNotHasKey( 'arimo', \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->get_custom_fonts() );
+		$this->assertFalse( $log->hasRecordThatContains( 'Could not remove a custom font record', Logger::ERROR ) );
+	}
+
+	/**
+	 * @dataProvider data_font_source_adoption_versions
+	 */
+	public function test_font_sources_adopt_records_only_when_upgrading_to_6_19_0( string $old_version, string $new_version, array $adopted ) {
+		$model = new class( \GPDFAPI::get_data_class(), \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), \GPDFAPI::get_log_class() ) extends Model_Font_Sources {
+			/** @var string[] */
+			public $adopted = [];
+
+			public function adopt_records( string $source_id ): array {
+				$this->adopted[] = $source_id;
+
+				return [];
+			}
+		};
+
+		$this->with_mvc_class(
+			'Model_Font_Sources',
+			$model,
+			function () use ( $old_version, $new_version ) {
+				do_action( 'gfpdf_version_changed', $old_version, $new_version );
+			}
+		);
+
+		$this->assertSame( $adopted, $model->adopted );
+	}
+
+	public function data_font_source_adoption_versions(): array {
+		return [
+			'upgrade to 6.19.0'  => [ '6.18.0', '6.19.0', [ 'bundled', 'core' ] ],
+			'6.19.0 beta'        => [ '6.19.0-beta1', '6.19.0', [ 'bundled', 'core' ] ],
+			'upgrade from 6.19'  => [ '6.19.0', '6.19.1', [] ],
+			'new install'        => [ '', '6.19.0', [] ],
+		];
+	}
+
+	public function test_6_19_0_skips_adoption_without_the_font_sources_model() {
+		$this->options->delete_option( 'default_font' );
+
+		$this->without_mvc_class(
+			'Model_Font_Sources',
+			function () {
+				do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+			}
+		);
+
+		$this->assertSame( 'dejavusanscondensed', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	public function test_a_new_install_with_no_recorded_version_defaults_to_arimo() {
+		$this->options->delete_option( 'default_font' );
+
+		do_action( 'gfpdf_plugin_installed' );
+		do_action( 'gfpdf_version_changed', false, '6.19.0' );
+
+		$this->assertSame( 'arimo', get_option( 'gfpdf_settings' )['default_font'] );
+	}
+
+	/**
+	 * @dataProvider provider_junk_versions
+	 *
+	 * @param mixed $current_version
+	 */
+	public function test_a_junk_current_version_runs_no_routines( $current_version ) {
+		$this->options->delete_option( 'default_font' );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', $current_version );
+
+		$this->assertArrayNotHasKey( 'default_font', get_option( 'gfpdf_settings', [] ) );
+	}
+
+	public function provider_junk_versions(): array {
+		return [
+			'empty'  => [ '' ],
+			'null'   => [ null ],
+			'false'  => [ false ],
+			'array'  => [ [ '6.19.0' ] ],
+			'number' => [ 619 ],
+		];
 	}
 
 	/**

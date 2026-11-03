@@ -212,6 +212,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->template_manager();
 		$this->load_core_font_handler();
 		$this->load_custom_font_handler();
+		$this->load_font_sources();
 		$this->load_debug();
 		$this->check_system_status();
 		$this->export();
@@ -886,6 +887,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function load_custom_font_handler(): void {
 		$model = new Model\Model_Custom_Fonts( $this->options );
 		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
+		$class->init();
+
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Register the fonts Gravity PDF provides
+	 *
+	 * @since 6.19.0
+	 */
+	public function load_font_sources(): void {
+		$model = new Model\Model_Font_Sources( $this->data, $this->singleton->get_class( 'Model_Custom_Fonts' ), $this->log );
+		$class = new Controller\Controller_Font_Sources( $model );
 		$class->init();
 
 		$this->singleton->add_class( $model );

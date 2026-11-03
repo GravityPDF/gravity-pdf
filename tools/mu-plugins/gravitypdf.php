@@ -139,6 +139,19 @@ if ( $gfpdf_e2e_header( 'file_mods' ) === 'disallowed' ) {
 	add_filter( 'file_mod_allowed', '__return_false' );
 }
 
+/* Renders with real fonts instead of mpdf.php's core fonts. The site installs no core fonts, so only the bundled ones */
+if ( $gfpdf_e2e_header( 'fonts' ) === 'unicode' ) {
+	add_filter(
+		'gfpdf_mpdf_class_config',
+		static function ( $config ) {
+			unset( $config['mode'] );
+
+			return $config;
+		},
+		20
+	);
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {

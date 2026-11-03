@@ -90,7 +90,7 @@ class Test_Field_Tos extends TestCase {
 			"\t\t\t\t\t<div class=\"inner-container\"><div class=\"label\"><strong>Terms</strong></div><div class=\"value\">\n" .
 			"\t\t\t<div class=\"terms-of-service-text\"><p>Please agree to our terms.</p>\n" .
 			"</div>\t\t\t\n" .
-			"\t\t<div class=\"terms-of-service-agreement\"><span class=\"terms-of-service-tick\" style=\"font-family:dejavusans,sans-serif\">&#10004;</span> I agree</div></div></div></div>";
+			"\t\t<div class=\"terms-of-service-agreement\"><span class=\"terms-of-service-tick\" style=\"font-family:gfpdf-dejavu-symbols,sans-serif\">&#10004;</span> I agree</div></div></div></div>";
 
 		$this->assertSame( $expected, $this->make_tos_field( 'I agree' )->html() );
 	}

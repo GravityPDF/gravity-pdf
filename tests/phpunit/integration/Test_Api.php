@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Tests\Integration;
 
 use GFPDF\Model\Model_Settings;
+use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GPDFAPI;
 use RuntimeException;
 use WP_Error;
@@ -25,6 +26,8 @@ use WP_Error;
  * @group api
  */
 class Test_API extends TestCase {
+
+	use UnregistersMvcClasses;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -292,6 +295,61 @@ class Test_API extends TestCase {
 
 		/* Filesystem writes outlive the test transaction; remove the copied TTF so it doesn't collide with later tests' add_pdf_font calls. */
 		GPDFAPI::delete_pdf_font( 'test' );
+	}
+
+	public function test_add_pdf_font_is_a_no_op_for_a_font_source_family() {
+		$font = [
+			'font_name' => 'Arimo',
+			'regular'   => PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf',
+		];
+
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+		$this->assertSame( [], GPDFAPI::get_options_class()->get_custom_fonts() );
+		$this->assertFileDoesNotExist( GPDFAPI::get_data_class()->template_font_location . 'Chewy.ttf' );
+
+		$font['font_name'] = 'Free Sans';
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+		$this->assertSame( [], GPDFAPI::get_options_class()->get_custom_fonts() );
+	}
+
+	public function test_add_pdf_font_installs_a_font_source_family_when_the_sources_are_unhooked() {
+		$font = [
+			'font_name' => 'Arimo',
+			'regular'   => PDF_PLUGIN_DIR . '/tools/phpunit/data/fonts/Chewy.ttf',
+		];
+
+		$this->assertTrue(
+			$this->without_mvc_class(
+				'Model_Font_Sources',
+				function () use ( $font ) {
+					return GPDFAPI::add_pdf_font( $font );
+				}
+			)
+		);
+		$fonts = GPDFAPI::get_options_class()->get_custom_fonts();
+		$this->assertCount( 1, $fonts );
+		$this->assertSame( 'Arimo', $fonts[0]['font_name'] );
+
+		GPDFAPI::delete_pdf_font( $fonts[0]['id'] );
+	}
+
+	public function test_delete_pdf_font_errors_when_the_custom_fonts_controller_is_unhooked() {
+		$results = $this->without_mvc_class(
+			'Controller_Custom_Fonts',
+			function () {
+				return GPDFAPI::delete_pdf_font( 'arimo' );
+			}
+		);
+
+		$this->assertInstanceOf( WP_Error::class, $results );
+		$this->assertSame( 'invalid_controller', $results->get_error_code() );
+	}
+
+	public function test_add_pdf_font_rejects_a_non_string_name() {
+		$results = GPDFAPI::add_pdf_font( [ 'font_name' => [ 'Arimo' ] ] );
+
+		$this->assertInstanceOf( WP_Error::class, $results );
+		$this->assertSame( [], GPDFAPI::get_options_class()->get_custom_fonts() );
 	}
 
 	/**
