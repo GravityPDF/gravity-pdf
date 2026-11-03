@@ -58,13 +58,6 @@ class Model_Actions extends Helper_Abstract_Model {
 	const UNWRITABLE_FOLDER_DISMISSAL = 'unwritable_folder_';
 
 	/**
-	 * The prefix each failed core font's dismissal is recorded under in `action_dismissal`
-	 *
-	 * @since 6.19.0
-	 */
-	const FAILED_CORE_FONT_DISMISSAL = 'failed_core_font_';
-
-	/**
 	 * How long dismissing the unwritable folders notice hides a folder that keeps failing
 	 *
 	 * @since 6.18.0
@@ -296,22 +289,13 @@ class Model_Actions extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The core fonts that failed to download after their retry, less the ones dismissed since
+	 * The core fonts that failed to download after their retry, less the ones dismissed
 	 *
 	 * @return string[]
 	 * @since 6.19.0
 	 */
 	public function get_undismissed_failed_core_fonts(): array {
-		$files = [];
-
-		/* A dismissal covers only the failure it followed */
-		foreach ( $this->get_downloader()->get_failed_files() as $file => $gave_up ) {
-			if ( ! $this->is_notice_already_dismissed( $this->get_failed_core_font_dismissal( $file ), $gave_up ) ) {
-				$files[] = $file;
-			}
-		}
-
-		return $files;
+		return $this->get_downloader()->get_undismissed_failed_files();
 	}
 
 	/**
@@ -324,12 +308,12 @@ class Model_Actions extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Dismiss each listed font; one that fails later raises the notice again
+	 * Dismiss the listed fonts for every site, as they share the fonts folder; one that fails later raises it again
 	 *
 	 * @since 6.19.0
 	 */
 	public function dismiss_failed_core_fonts(): void {
-		$this->dismiss_notices( array_map( [ $this, 'get_failed_core_font_dismissal' ], $this->get_undismissed_failed_core_fonts() ) );
+		$this->get_downloader()->dismiss_failed_files();
 	}
 
 	/**
@@ -339,15 +323,6 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	protected function get_downloader(): Model_Font_Downloader {
 		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
-	}
-
-	/**
-	 * The ID a failed core font's dismissal is recorded under in `action_dismissal`
-	 *
-	 * @since 6.19.0
-	 */
-	protected function get_failed_core_font_dismissal( string $file ): string {
-		return static::FAILED_CORE_FONT_DISMISSAL . md5( $file );
 	}
 
 	/**

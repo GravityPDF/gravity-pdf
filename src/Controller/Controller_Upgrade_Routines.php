@@ -31,6 +31,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_Upgrade_Routines {
 
 	/**
+	 * The default font of a site upgraded from before 6.19 with none saved
+	 *
+	 * @since 6.19.0
+	 */
+	const PRE_6_19_DEFAULT_FONT = 'dejavusanscondensed';
+
+	/**
 	 * @var Helper_Abstract_Options
 	 */
 	protected $options;
@@ -102,11 +109,10 @@ class Controller_Upgrade_Routines {
 
 		/* A site upgraded from before Arimo was the default keeps DejaVu Sans Condensed, even if it never saved one */
 		if ( $old_version !== '' && version_compare( $old_version, '6.19.0', '<' ) ) {
-			$this->save_unset_default_font( 'dejavusanscondensed' );
+			$this->save_unset_default_font( self::PRE_6_19_DEFAULT_FONT );
 			$this->adopt_font_source_records();
 
-			/* After the default font save, so the font it saves is kept */
-			$this->remove_unneeded_core_fonts();
+			$this->schedule_core_font_cleanup();
 		}
 
 		if ( version_compare( $current_version, '7.0.0-beta1', '>=' ) && version_compare( $old_version, '7.0.0-beta1', '<' ) ) {
@@ -180,22 +186,17 @@ class Controller_Upgrade_Routines {
 	}
 
 	/**
-	 * Delete the core fonts a new install wouldn't have; any still needed download again on use. A network shares one
-	 * fonts folder, so a Multisite prunes it once, for the site whose request runs the upgrade.
+	 * Queue the removal of the core fonts a new install wouldn't have. It keeps the fonts every site needs and runs in
+	 * the background, as every site on every network shares the fonts folder.
 	 *
 	 * @since 6.19.0
 	 */
-	protected function remove_unneeded_core_fonts(): void {
+	protected function schedule_core_font_cleanup(): void {
 		$downloader = \GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
-		if ( ! $downloader instanceof Model_Font_Downloader ) {
-			return;
+		if ( $downloader instanceof Model_Font_Downloader ) {
+			/* Sites yet to upgrade will save DejaVu Sans Condensed as their default when they do */
+			$downloader->schedule_cleanup( self::PRE_6_19_DEFAULT_FONT );
 		}
-
-		if ( is_multisite() && ! add_site_option( Model_Font_Downloader::PRUNED, true ) ) {
-			return;
-		}
-
-		$downloader->prune();
 	}
 
 	/**

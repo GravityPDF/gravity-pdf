@@ -40,6 +40,11 @@ class Test_Controller_Actions extends TestCase {
 		unset( $_POST['gfpdf_action'], $_POST['gfpdf-dismiss-notice'], $_GET['page'] );
 		$this->delete_font_failures();
 
+		/* A subsite leaves these behind */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
+
 		parent::tear_down();
 	}
 
@@ -233,9 +238,12 @@ class Test_Controller_Actions extends TestCase {
 
 				$model->dismiss_failed_core_fonts();
 				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+				$this->assertTrue( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
 
-				/* A font that fails later raises it again, for that font alone */
-				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() - 10 ), 'FreeSans.ttf' => $this->failure( time() + 1 ) ] );
+				/* A font that gives up later raises it again, for that font alone */
+				$failures                 = $this->get_font_failures();
+				$failures['FreeSans.ttf'] = $this->failure( time() );
+				$this->set_font_failures( $failures );
 				$this->assertSame( [ 'FreeSans.ttf' ], $model->get_undismissed_failed_core_fonts() );
 
 				/* A font that downloads leaves the notice, which goes once none are left */
@@ -274,6 +282,26 @@ class Test_Controller_Actions extends TestCase {
 			},
 			'index.php-network'
 		);
+	}
+
+	public function test_dismissing_the_failed_core_fonts_notice_dismisses_it_on_every_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		global $gfpdf;
+
+		$model = $gfpdf->singleton->get_class( 'Model_Actions' );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		$model->dismiss_failed_core_fonts();
+
+		switch_to_blog( self::factory()->blog->create() );
+		try {
+			\GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
+			$this->assertFalse( $model->has_failed_core_fonts() );
+		} finally {
+			restore_current_blog();
+		}
 	}
 
 	/**
