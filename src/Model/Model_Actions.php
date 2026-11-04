@@ -45,6 +45,13 @@ class Model_Actions extends Helper_Abstract_Model {
 	const UNWRITABLE_FOLDER_DISMISSAL = 'unwritable_folder_';
 
 	/**
+	 * The prefix each failed core font's dismissal is recorded under in `action_dismissal`
+	 *
+	 * @since 6.19.0
+	 */
+	const FAILED_CORE_FONT_DISMISSAL = 'failed_core_font_';
+
+	/**
 	 * How long dismissing the unwritable folders notice hides a folder that keeps failing
 	 *
 	 * @since 6.18.0
@@ -82,20 +89,30 @@ class Model_Actions extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
+	 * @var Model_Font_Downloader|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $downloader;
+
+	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Data             $data    Our plugin data store
-	 * @param Helper_Abstract_Options $options Our options class which allows us to access any settings
-	 * @param Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data                $data       Our plugin data store
+	 * @param Helper_Abstract_Options    $options    Our options class which allows us to access any settings
+	 * @param Helper_Notices             $notices    Our notice class used to queue admin messages and errors
+	 * @param Model_Font_Downloader|null $downloader Defaults to the registered downloader
 	 *
 	 * @since 4.0
+	 * @since 6.19.0 Takes the font downloader
 	 */
-	public function __construct( Helper_Data $data, Helper_Abstract_Options $options, Helper_Notices $notices ) {
+	public function __construct( Helper_Data $data, Helper_Abstract_Options $options, Helper_Notices $notices, ?Model_Font_Downloader $downloader = null ) {
 
 		/* Assign our internal variables */
-		$this->data    = $data;
-		$this->options = $options;
-		$this->notices = $notices;
+		$this->data       = $data;
+		$this->options    = $options;
+		$this->notices    = $notices;
+		$this->downloader = $downloader;
 	}
 
 	/**
@@ -292,6 +309,61 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	protected function get_unwritable_folder_dismissal( string $dir ): string {
 		return static::UNWRITABLE_FOLDER_DISMISSAL . md5( $dir );
+	}
+
+	/**
+	 * The core fonts that failed to download after their retry, less the ones dismissed since
+	 *
+	 * @return string[]
+	 * @since 6.19.0
+	 */
+	public function get_undismissed_failed_core_fonts(): array {
+		$files = [];
+
+		/* A dismissal covers only the failure it followed */
+		foreach ( $this->get_downloader()->get_failed_files() as $file => $gave_up ) {
+			if ( ! $this->is_notice_already_dismissed( $this->get_failed_core_font_dismissal( $file ), $gave_up ) ) {
+				$files[] = $file;
+			}
+		}
+
+		return $files;
+	}
+
+	/**
+	 * Whether any font that gave up downloading still has its notice undismissed
+	 *
+	 * @since 6.19.0
+	 */
+	public function has_failed_core_fonts(): bool {
+		return $this->get_undismissed_failed_core_fonts() !== [];
+	}
+
+	/**
+	 * Dismiss each listed font; one that fails later raises the notice again
+	 *
+	 * @since 6.19.0
+	 */
+	public function dismiss_failed_core_fonts(): void {
+		$this->dismiss_notices( array_map( [ $this, 'get_failed_core_font_dismissal' ], $this->get_undismissed_failed_core_fonts() ) );
+	}
+
+	/**
+	 * The injected downloader, else the registered one, which bootstrap builds after this model
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloader(): Model_Font_Downloader {
+		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+	}
+
+	/**
+	 * The ID a failed core font's dismissal is recorded under in `action_dismissal`
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_failed_core_font_dismissal( string $file ): string {
+		return static::FAILED_CORE_FONT_DISMISSAL . md5( $file );
 	}
 
 	/**

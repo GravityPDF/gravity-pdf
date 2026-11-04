@@ -9,6 +9,8 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
+use GFPDF_Vendor\Mpdf\Language\LanguageToFont;
+use GFPDF_Vendor\Mpdf\Language\LanguageToFontInterface;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use GPDFAPI;
 use Throwable;
@@ -50,6 +52,22 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	public const ARIMO = 'arimo';
 
 	/**
+	 * Core fonts mPDF substitutes from, each downloaded only when a PDF has the characters it covers that the fonts before
+	 * it lack: DejaVu Sans Condensed (Armenian, Georgian, symbols), FreeSans (Syriac, Cherokee), then Thai, Khmer, Myanmar,
+	 * Sinhala and Ethiopic, 0.1–0.6 MB each
+	 *
+	 * @since 6.19.0
+	 */
+	public const SUBSTITUTION_CORE_FONTS = [ 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil' ];
+
+	/**
+	 * The transient holding the language font keys with the locale they were mapped for
+	 *
+	 * @since 6.19.0
+	 */
+	public const LANGUAGE_FONT_KEYS = 'gfpdf_language_font_keys';
+
+	/**
 	 * @var Helper_Data
 	 * @since 6.19.0
 	 */
@@ -80,12 +98,32 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $mpdf_defaults;
 
 	/**
+	 * @var array|null mPDF's font data with every registered font, once get_font_data() filters it
+	 * @since 6.19.0
+	 */
+	protected $font_data;
+
+	/**
+	 * @var string[]|null The installed languages' mPDF font keys, once get_language_font_keys() maps them
+	 * @since 6.19.0
+	 */
+	protected $language_font_keys;
+
+	/**
 	 * Every source's downloadable files by name, once get_manifest() reads them
 	 *
 	 * @var array<string, array{url: string, size: int, sha: string}>|null
 	 * @since 6.19.0
 	 */
 	protected $manifest;
+
+	/**
+	 * Each source's manifest by ID, once get_source_manifest() reads it
+	 *
+	 * @var array<string, array<string, array{url: string, size: int, sha: string}>>
+	 * @since 6.19.0
+	 */
+	protected $manifests = [];
 
 	/**
 	 * @since 6.19.0
@@ -131,7 +169,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 
 	/**
 	 * Start mPDF in the PDF's font, else the default font, else Arimo, rather than mPDF's `serif` (DejaVu Serif
-	 * Condensed), which a site without the core fonts can't load
+	 * Condensed), which a site without the core fonts can't load, and substitute missing glyphs from Arimo first
 	 *
 	 * @param mixed $config   mPDF config
 	 * @param mixed $form
@@ -145,9 +183,34 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		$fontdata = is_array( $config['fontdata'] ?? null ) ? $config['fontdata'] : [];
 		$pdf_font = is_array( $settings ) ? ( $settings['font'] ?? '' ) : '';
 
-		$config['default_font'] = $this->get_default_font( [ $pdf_font ], $fontdata );
+		$config['default_font']   = $this->get_default_font( [ $pdf_font ], $fontdata );
+		$config['backupSubsFont'] = $this->get_substitution_fonts( $fontdata, $config['default_font'] );
+		$config['backupSIPFont']  = $this->get_sip_font( $fontdata );
+
+		/* Sun-ExtA names Sun-ExtB as its own fallback for those characters */
+		foreach ( $fontdata as $key => $family ) {
+			$sip_ext = is_array( $family ) ? ( $family['sip-ext'] ?? '' ) : '';
+			if ( is_string( $sip_ext ) && $sip_ext !== '' && ! $this->is_on_disk( $sip_ext, $fontdata ) ) {
+				unset( $config['fontdata'][ $key ]['sip-ext'] );
+			}
+		}
 
 		return $config;
+	}
+
+	/**
+	 * mPDF's backupSIPFont: Sun-ExtB once it's on disk, as mPDF would download 17.6 MB for one rare CJK Extension B
+	 * character, else the bundled symbols. With none, mPDF stops substituting the rest of a run at that character, e.g.
+	 * 字 after 𠀀; the first render after a font cache flush still does (GravityPDF/mpdf#828).
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_sip_font( array $fontdata ): string {
+		if ( $this->is_on_disk( 'sun-extb', $fontdata ) ) {
+			return 'sun-extb';
+		}
+
+		return $this->is_registered( self::SYMBOLS_FONT, $fontdata ) ? self::SYMBOLS_FONT : '';
 	}
 
 	/**
@@ -159,8 +222,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_default_font( array $fonts = [], ?array $fontdata = null ): string {
-		$fontdata = $fontdata ?? apply_filters( 'mpdf_font_data', $this->get_mpdf_defaults()['fontdata'] );
-		$fontdata = is_array( $fontdata ) ? $fontdata : [];
+		$fontdata = $fontdata ?? $this->get_font_data();
 		$fonts[]  = GPDFAPI::get_options_class()->get_option( 'default_font', '' );
 
 		foreach ( $fonts as $font ) {
@@ -218,12 +280,127 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * mPDF's font data with every registered font, filtered once per request
+	 *
+	 * @return array<string, array> mPDF font data keyed by font
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_font_data(): array {
+		if ( $this->font_data === null ) {
+			$fontdata        = apply_filters( 'mpdf_font_data', $this->get_mpdf_defaults()['fontdata'] );
+			$this->font_data = is_array( $fontdata ) ? $fontdata : [];
+		}
+
+		return $this->font_data;
+	}
+
+	/**
+	 * Forget the font data and language fonts, e.g. once a language pack installs
+	 *
+	 * @since 6.19.0
+	 */
+	public function flush(): void {
+		$this->font_data          = null;
+		$this->language_font_keys = null;
+		delete_transient( self::LANGUAGE_FONT_KEYS );
+	}
+
+	/**
+	 * The mPDF font keys for the installed languages and the locale, cached for a day so a render doesn't scan the
+	 * languages folder
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_language_font_keys(): array {
+		if ( $this->language_font_keys !== null ) {
+			return $this->language_font_keys;
+		}
+
+		$locale = get_locale();
+		$cached = get_transient( self::LANGUAGE_FONT_KEYS );
+		if ( is_array( $cached ) && ( $cached['locale'] ?? null ) === $locale && is_array( $cached['keys'] ?? null ) ) {
+			$this->language_font_keys = array_values( array_filter( $cached['keys'], 'is_string' ) );
+
+			return $this->language_font_keys;
+		}
+
+		$mapper  = $this->get_language_mapper();
+		$locales = array_filter( array_merge( (array) get_available_languages(), [ $locale ] ), 'is_string' );
+		$keys    = [];
+
+		foreach ( array_unique( $locales ) as $language ) {
+			/* Adobe CJK fonts are off in Gravity PDF's config */
+			$options = $mapper->getLanguageOptions( str_replace( '_', '-', $language ), false );
+			$key     = is_array( $options ) && is_string( $options[1] ?? null ) ? $options[1] : '';
+			if ( $key !== '' ) {
+				$keys[] = $key;
+			}
+		}
+
+		$this->language_font_keys = array_values( array_unique( $keys ) );
+
+		set_transient(
+			self::LANGUAGE_FONT_KEYS,
+			[
+				'locale' => $locale,
+				'keys'   => $this->language_font_keys,
+			],
+			DAY_IN_SECONDS
+		);
+
+		return $this->language_font_keys;
+	}
+
+	/**
+	 * mPDF's backupSubsFont, Arimo first. mPDF reads which characters a font has from its ranges file and downloads only a
+	 * font that has them, but Sun-ExtA is listed only once it's on disk, as it would download 22.9 MB mid-render.
+	 *
+	 * @param array|null $fontdata mPDF font data, or null for the registered fonts
+	 * @param string     $font     The PDF's font, left out as it can't stand in for its own missing glyphs
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_substitution_fonts( ?array $fontdata = null, string $font = '' ): array {
+		$fontdata = $fontdata ?? $this->get_font_data();
+
+		$fonts = array_merge(
+			[ self::ARIMO, self::SYMBOLS_FONT ],
+			self::SUBSTITUTION_CORE_FONTS,
+			$this->get_language_font_keys(),
+			$this->is_on_disk( 'sun-exta', $fontdata ) ? [ 'sun-exta' ] : []
+		);
+
+		$fonts = array_filter(
+			array_unique( $fonts ),
+			function ( $key ) use ( $fontdata, $font ) {
+				return $key !== $font && $this->is_registered( $key, $fontdata );
+			}
+		);
+
+		return array_values( $fonts );
+	}
+
+	/**
 	 * Whether mPDF's font data has a Regular file for the key
 	 *
 	 * @since 6.19.0
 	 */
 	protected function is_registered( string $font, array $fontdata ): bool {
 		return is_string( $fontdata[ $font ]['R'] ?? null );
+	}
+
+	/**
+	 * Whether mPDF's font data has a Regular file for the key, and it's in the fonts folder
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_on_disk( string $font, array $fontdata ): bool {
+		return $this->is_registered( $font, $fontdata ) && $this->is_downloaded( $fontdata[ $font ]['R'] );
 	}
 
 	/**
@@ -247,12 +424,27 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	public function get_manifest(): array {
 		if ( $this->manifest === null ) {
 			$this->manifest = [];
-			foreach ( $this->get_sources() as $source ) {
-				$this->manifest += $this->read_manifest( $source );
+			foreach ( array_keys( $this->get_sources() ) as $id ) {
+				$this->manifest += $this->get_source_manifest( (string) $id );
 			}
 		}
 
 		return $this->manifest;
+	}
+
+	/**
+	 * A source's downloadable files, keyed by file name, read once
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_source_manifest( string $id ): array {
+		if ( ! isset( $this->manifests[ $id ] ) ) {
+			$this->manifests[ $id ] = $this->read_manifest( $this->get_sources()[ $id ] ?? [] );
+		}
+
+		return $this->manifests[ $id ];
 	}
 
 	/**
@@ -271,6 +463,15 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	public function get_font_path( string $file ): string {
 		return $this->data->template_font_location . $file;
+	}
+
+	/**
+	 * Whether a file is in the fonts folder
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_downloaded( string $file ): bool {
+		return is_file( $this->get_font_path( $file ) );
 	}
 
 	/**
@@ -436,6 +637,15 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		return true;
+	}
+
+	/**
+	 * mPDF's locale-to-font mapper, a seam for tests
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_language_mapper(): LanguageToFontInterface {
+		return new LanguageToFont();
 	}
 
 	/**

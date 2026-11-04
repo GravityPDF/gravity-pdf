@@ -905,7 +905,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
-		$this->singleton->add_class( new Model\Model_Font_Downloader( $model, $this->data, $this->options, $this->misc, $this->log ) );
+
+		$required_fonts = new Model\Model_Required_Fonts( $model, $this->options, $this->log );
+		$downloader     = new Model\Model_Font_Downloader( $model, $this->data, $this->options, $this->misc, $this->log, $required_fonts );
+		$class          = new Controller\Controller_Font_Downloader( $downloader, $required_fonts );
+		$class->init();
+
+		$this->singleton->add_class( $downloader );
+		$this->singleton->add_class( $required_fonts );
+		$this->singleton->add_class( $class );
 	}
 
 	/**
@@ -932,7 +940,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
-		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates, $this->singleton->get_class( 'Model_Pdf_Cache' ) );
+		$model = new Model\Model_System_Report(
+			$this->options,
+			$this->data,
+			$this->log,
+			$this->misc,
+			new GFPDF_Major_Compatibility_Checks(),
+			$this->templates,
+			$this->singleton->get_class( 'Model_Pdf_Cache' ),
+			$this->singleton->get_class( 'Model_Required_Fonts' ),
+			$this->singleton->get_class( 'Model_Font_Sources' )
+		);
 		$class = new Controller\Controller_System_Report( $model, $view, $this->gform );
 		$class->init();
 

@@ -35,7 +35,7 @@ class Test_Controller_Save_Core_Fonts extends TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->downloader = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_log_class() ) extends Model_Font_Downloader {
+		$this->downloader = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_log_class(), GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ) ) extends Model_Font_Downloader {
 			/** @var array<int, array{0: string, 1: bool}> The files the controller asked for, and whether it forced them */
 			public $downloads = [];
 

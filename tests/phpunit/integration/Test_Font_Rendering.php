@@ -6,6 +6,7 @@ namespace GFPDF\Tests\Integration;
 
 use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Tests\Concerns\AssertsSnapshots;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
 use GFPDF_Vendor\Monolog\Logger;
@@ -23,6 +24,7 @@ use WP_Error;
 class Test_Font_Rendering extends TestCase {
 
 	use AssertsSnapshots;
+	use RecordsFontFailures;
 	use CopiesFontFixtures;
 
 	public static function set_up_before_class(): void {
@@ -40,6 +42,7 @@ class Test_Font_Rendering extends TestCase {
 		$this->remove_font_fixtures();
 		static::copy_test_fonts();
 
+		$this->delete_font_failures();
 		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
@@ -55,6 +58,105 @@ class Test_Font_Rendering extends TestCase {
 
 	public function test_characters_arimo_lacks_are_substituted(): void {
 		$this->assertRenderMatchesSnapshot( 'arimo-substitution', '<p style="font-family: arimo">Agree ✔ Decline ✖</p>' );
+	}
+
+	public function test_symbols_arimo_lacks_render_from_the_bundled_subset_without_a_download(): void {
+		static::remove_test_fonts();
+		$this->serve_font_downloads();
+
+		$this->assertRenderMatchesSnapshot( 'symbols-substitution', '<p style="font-family: arimo">Next ⇒ ┏━┓</p>', [ 'font' => 'arimo' ] );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_an_emoji_and_cjk_on_an_english_site_do_not_download_sun_exta(): void {
+		static::remove_test_fonts();
+
+		/* Cached metrics change which substitutes mPDF loads */
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Smile 😀 日本</p>', [ 'font' => 'arimo' ] );
+		$this->assertMatchesSnapshot( 'fonts/emoji-cjk-without-sun-exta.txt', $this->describe_fonts( $render ) );
+		$this->assertNotContains( 'sun-exta', $render['mpdf']->backupSubsFont );
+		$this->assertArrayNotHasKey( 'sun-exta', $render['mpdf']->fonts );
+
+		/* mPDF reads which characters each substitute has from its ranges file, and none of the others have these */
+		$this->assertSame( [], $this->requested );
+	}
+
+	/**
+	 * @dataProvider provider_substitutes
+	 */
+	public function test_a_substitute_downloads_when_it_has_the_characters( string $text, string $font, string $file ): void {
+		static::remove_test_fonts();
+		FlushCache::flush();
+
+		/* The others have no fixture, and the ranges file decides which substitute is fetched, not the file served. DejaVu
+		   Serif Condensed has the OpenType tables the script fonts' data needs */
+		if ( $file !== 'DejaVuSansCondensed.ttf' ) {
+			$this->serve_fixture_as( 'DejaVuSerifCondensed.ttf', $file );
+		}
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Text ' . $text . '</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/' . $file ], $this->requested );
+
+		/* The text is drawn in the substitute. Arimo records each character it draws, even one it lacks (see the emoji
+		   snapshot), so none of the text stayed in Arimo */
+		$this->assertTrue( $render['mpdf']->fonts[ $font ]['used'] ?? false );
+		$this->assertSame( [], array_intersect( array_map( 'mb_ord', mb_str_split( $text ) ), $render['mpdf']->fonts['arimo']['subset'] ?? [] ) );
+	}
+
+	public function provider_substitutes(): array {
+		return [
+			'Armenian from DejaVu Sans Condensed' => [ 'Բարեւ', 'dejavusanscondensed', 'DejaVuSansCondensed.ttf' ],
+			'Syriac from FreeSans'                => [ 'ܫܠܡܐ', 'freesans', 'FreeSans.ttf' ],
+			'Thai from Garuda'                    => [ 'สวัสดี', 'garuda', 'Garuda.ttf' ],
+			'Khmer from Khmer OS'                 => [ 'ភាសាខ្មែរ', 'khmeros', 'KhmerOS.ttf' ],
+			'Myanmar from Padauk'                 => [ 'မြန်မာ', 'padaukbook', 'Padauk-book.ttf' ],
+			'Sinhala from Kaputa'                 => [ 'සිංහල', 'kaputaunicode', 'kaputaunicode.ttf' ],
+			'Ethiopic from Abyssinica SIL'        => [ 'ሰላምዓለም', 'abyssinicasil', 'Abyssinica_SIL.ttf' ],
+		];
+	}
+
+	public function test_sun_exta_on_disk_is_substituted_from_without_a_download(): void {
+		/* Sun-ExtA's font data needs no OpenType tables, so any fixture stands in; Chewy has no CJK */
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		FlushCache::flush();
+		$this->fail_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Smile 😀 日本</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertSame( 'sun-exta', array_slice( $render['mpdf']->backupSubsFont, -1 )[0] );
+		$this->assertSame( 'Sun-ExtA.ttf', basename( $render['mpdf']->fonts['sun-exta']['ttffile'] ?? '' ) );
+		$this->assertStringNotContainsString( 'Sun-ExtA', implode( ',', $this->requested ) );
+	}
+
+	public function test_a_cjk_extension_b_character_does_not_download_sun_extb(): void {
+		/* Sun-ExtA's link to Sun-ExtB is the other way mPDF reaches it */
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		foreach ( [ 'arimo', 'sun-exta' ] as $font ) {
+			$render = $this->render( '<p style="font-family: ' . $font . '">𠀀</p>', [ 'font' => $font ] );
+			$this->assertArrayNotHasKey( 'sun-extb', $render['mpdf']->fonts, $font );
+		}
+
+		$this->assertStringNotContainsString( 'Sun-ExtB', implode( ',', $this->requested ) );
+	}
+
+	public function test_sun_extb_on_disk_is_the_cjk_extension_b_fallback_without_a_download(): void {
+		/* Sun-ExtB's font data needs no OpenType tables, so any fixture stands in */
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+		FlushCache::flush();
+		$this->fail_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">𠀀</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertSame( 'Sun-ExtB.ttf', basename( $render['mpdf']->fonts['sun-extb']['ttffile'] ?? '' ) );
+		$this->assertStringNotContainsString( 'Sun-ExtB', implode( ',', $this->requested ) );
 	}
 
 	public function test_consent_ticks_render_from_the_bundled_symbols(): void {
@@ -73,6 +175,13 @@ class Test_Font_Rendering extends TestCase {
 		$this->add_record( 'arimo', [ 'regular' => 'Chewy.ttf' ] );
 
 		$this->assertRenderMatchesSnapshot( 'custom-arimo', '<p style="font-family: arimo">Custom</p>' );
+	}
+
+	public function test_greek_and_cyrillic_a_font_lacks_are_substituted_from_arimo(): void {
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->add_record( 'chewy', [ 'regular' => 'Chewy.ttf' ] );
+
+		$this->assertRenderMatchesSnapshot( 'greek-cyrillic-substitution', '<p style="font-family: chewy">Hello Γειά Привет</p>', [ 'font' => 'chewy' ] );
 	}
 
 	public function test_an_adopted_template_arimo_record_renders_the_bundled_faces(): void {
@@ -102,16 +211,8 @@ class Test_Font_Rendering extends TestCase {
 		/* DejaVu Serif Condensed has the OpenType tables Garuda's font data needs, but no Thai */
 		$this->assertRenderMatchesSnapshot( 'downloaded-thai-font', '<p lang="th">สวัสดี</p>', [ 'font' => 'arimo' ] );
 
-		/* mPDF starts in Arimo, so only the Thai font downloads, then the substitutes for the glyphs it lacks */
-		$this->assertSame(
-			[
-				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/Garuda.ttf',
-				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/DejaVuSansCondensed.ttf',
-				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/FreeSans.ttf',
-				'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/Sun-ExtA.ttf',
-			],
-			$this->requested
-		);
+		/* Only the Thai font downloads: no substitute has Thai, so none is fetched for the glyphs the stand-in lacks */
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/Garuda.ttf' ], $this->requested );
 	}
 
 	public function test_a_font_that_cannot_download_renders_in_arimo_when_the_default_font_is_missing(): void {

@@ -20,6 +20,11 @@ trait CopiesFontFixtures {
 	use AccessesPrivateState;
 
 	/**
+	 * @var string[] The FreeSerif family's files on the core manifest
+	 */
+	protected static $freeserif = [ 'FreeSerif.ttf', 'FreeSerifBold.ttf', 'FreeSerifItalic.ttf', 'FreeSerifBoldItalic.ttf' ];
+
+	/**
 	 * @var string[]
 	 */
 	protected $copied_fonts = [];
@@ -74,6 +79,7 @@ trait CopiesFontFixtures {
 
 		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->add_font( $font );
 		FlushCache::flush( $id );
+		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
 		$this->recorded_fonts[] = $id;
 	}
 
@@ -197,6 +203,8 @@ trait CopiesFontFixtures {
 		array_map( 'wp_delete_file', $this->copied_fonts );
 		GPDFAPI::delete_plugin_option( 'custom_fonts' );
 		array_map( [ FlushCache::class, 'flush' ], array_unique( $this->recorded_fonts ) );
+		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
+		GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->flush();
 
 		/* A download or its fallback caches metrics under every font key the render asked for, substitutes included */
 		if ( $this->requested !== [] ) {
@@ -211,5 +219,14 @@ trait CopiesFontFixtures {
 		$this->recorded_fonts = [];
 		$this->requested      = [];
 		$this->served_as      = [];
+	}
+
+	/**
+	 * Stand Chewy in for each FreeSerif file, so the family is on disk
+	 */
+	protected function put_freeserif_on_disk(): void {
+		foreach ( static::$freeserif as $file ) {
+			$this->copy_fixture( 'Chewy.ttf', $file );
+		}
 	}
 }
