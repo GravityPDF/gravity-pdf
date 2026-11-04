@@ -44,7 +44,18 @@ class Controller_Font_Sources extends Helper_Abstract_Controller implements Help
 	 * @since 6.19.0
 	 */
 	public function init(): void {
+		$this->add_actions();
 		$this->add_filters();
+	}
+
+	/**
+	 * Flush the font sources' cached language fonts when a language pack installs
+	 *
+	 * @since 6.19.0
+	 */
+	public function add_actions(): void {
+		/* A language pack may change the language fonts */
+		add_action( 'upgrader_process_complete', [ $this->model, 'flush' ], 10, 0 );
 	}
 
 	/**

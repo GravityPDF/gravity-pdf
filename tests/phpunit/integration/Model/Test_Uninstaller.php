@@ -128,13 +128,19 @@ class Test_Uninstaller extends TestCase {
 		$this->assertDirectoryExists( $gfpdf->data->template_location );
 		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
 
-		/* A failed download left its back-off */
+		/* Install queued the font sync, and a failed download left its records */
+		$this->assertNotFalse( wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
 		$this->set_back_off( 'Garuda.ttf' );
+		set_transient( Model_Font_Downloader::SYNC_REMAINING, [ 'Garuda.ttf' ], DAY_IN_SECONDS );
 
 		/* Uninstall */
 		$this->model->uninstall_plugin();
 
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+		$this->assertFalse( $this->get_font_failures() );
 		$this->assertFalse( $this->get_back_off( 'Garuda.ttf' ) );
+		$this->assertFalse( get_transient( Model_Font_Downloader::SYNC_REMAINING ) );
 
 		/* Check software was uninstalled */
 		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );

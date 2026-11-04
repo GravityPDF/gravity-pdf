@@ -6,6 +6,7 @@ namespace GFPDF\Helper;
 
 use Exception;
 use GFPDF\Tests\Concerns\AccessesPrivateState;
+use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
 use GFPDF\Tests\Concerns\SpawnsPhpProcesses;
 use GFPDF\Tests\Concerns\UsesLockableTmpLocation;
@@ -25,9 +26,13 @@ use GPDFAPI;
 class Test_Helper_PDF extends TestCase {
 
 	use AccessesPrivateState;
+	use CopiesFontFixtures;
 	use CreatesLegacyTemplates;
 	use SpawnsPhpProcesses;
 	use UsesLockableTmpLocation;
+
+	/** mPDF's backupSubsFont on a site with no language font or Sun-ExtA */
+	private const SUBSTITUTES = [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil' ];
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -73,6 +78,7 @@ class Test_Helper_PDF extends TestCase {
 
 	public function tear_down(): void {
 		$this->restore_tmp_location();
+		$this->remove_font_fixtures();
 
 		parent::tear_down();
 	}
@@ -260,6 +266,55 @@ class Test_Helper_PDF extends TestCase {
 		$pdf->init();
 
 		$this->assertSame( $finder, $this->get_private( $pdf->get_pdf_class(), 'fontFileFinder', MpdfCore::class ) );
+	}
+
+	public function test_mpdf_substitutes_from_arimo_the_symbols_and_the_core_substitutes() {
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( self::SUBSTITUTES, $this->pdf->get_pdf_class()->backupSubsFont );
+	}
+
+	public function test_mpdf_does_not_substitute_from_the_pdfs_own_font() {
+		$this->set_private( $this->pdf, 'settings', array_merge( $this->get_private( $this->pdf, 'settings' ), [ 'font' => 'arimo' ] ) );
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( 'arimo', $this->pdf->get_pdf_class()->default_font );
+		$this->assertSame( array_slice( self::SUBSTITUTES, 1 ), $this->pdf->get_pdf_class()->backupSubsFont );
+	}
+
+	public function test_mpdf_falls_back_to_the_symbols_until_sun_extb_is_on_disk() {
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( 'gfpdf-dejavu-symbols', $this->pdf->get_pdf_class()->backupSIPFont );
+		$this->assertArrayNotHasKey( 'sip-ext', $this->pdf->get_pdf_class()->fontdata['sun-exta'] );
+	}
+
+	public function test_mpdf_falls_back_to_sun_extb_on_disk() {
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( 'sun-extb', $this->pdf->get_pdf_class()->backupSIPFont );
+		$this->assertSame( 'sun-extb', $this->pdf->get_pdf_class()->fontdata['sun-exta']['sip-ext'] );
+	}
+
+	public function test_a_substitution_list_from_the_config_filter_is_kept() {
+		add_filter(
+			'gfpdf_mpdf_class_config',
+			static function ( $config ) {
+				$config['backupSubsFont'] = [ 'freeserif' ];
+
+				return $config;
+			}
+		);
+
+		$this->pdf->set_output_type( 'SAVE' );
+		$this->pdf->init();
+
+		$this->assertSame( [ 'freeserif' ], $this->pdf->get_pdf_class()->backupSubsFont );
 	}
 
 	public function test_an_add_on_can_replace_the_font_finder() {

@@ -5,11 +5,47 @@ declare( strict_types=1 );
 namespace GFPDF\Tests\Concerns;
 
 use GFPDF\Model\Model_Font_Downloader;
+use GPDFAPI;
 
 /**
- * Stores a failed font download's back-off as the downloader keeps it
+ * Builds and stores failed font downloads as the downloader keeps them: the retry and notice record, and each
+ * file's back-off
  */
 trait RecordsFontFailures {
+
+	/**
+	 * A failure record as the downloader stores it
+	 *
+	 * @param int      $gave_up  When its retry also failed, or 0 while the retry is pending
+	 * @param int|null $retry_at When the pending retry is due, defaulting to now
+	 *
+	 * @return array{retry_at: int, gave_up: int}
+	 */
+	protected function failure( int $gave_up = 0, ?int $retry_at = null ): array {
+		return [
+			'retry_at' => $gave_up > 0 ? 0 : ( $retry_at ?? time() ),
+			'gave_up'  => $gave_up,
+		];
+	}
+
+	/**
+	 * Store the record where the downloader keeps it, and have the shared downloader read it afresh
+	 *
+	 * @param mixed $failures
+	 */
+	protected function set_font_failures( $failures ): void {
+		update_site_option( Model_Font_Downloader::FAILURES, $failures );
+		GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
+	}
+
+	/**
+	 * Read the failure record where the downloader keeps it
+	 *
+	 * @return mixed The stored record, or false
+	 */
+	protected function get_font_failures() {
+		return get_site_option( Model_Font_Downloader::FAILURES );
+	}
 
 	/**
 	 * Back the file off as a failed download would
@@ -37,5 +73,13 @@ trait RecordsFontFailures {
 	 */
 	protected function get_back_off_expiry( string $file ): int {
 		return (int) get_site_option( '_site_transient_timeout_' . Model_Font_Downloader::back_off_key( $file ) );
+	}
+
+	/**
+	 * Delete the failure record, and have the shared downloader read it afresh
+	 */
+	protected function delete_font_failures(): void {
+		delete_site_option( Model_Font_Downloader::FAILURES );
+		GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
 	}
 }

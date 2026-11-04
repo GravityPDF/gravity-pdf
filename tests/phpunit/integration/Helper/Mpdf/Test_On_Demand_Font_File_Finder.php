@@ -7,6 +7,7 @@ namespace GFPDF\Helper\Mpdf;
 use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Mpdf\MpdfException;
 use GFPDF_Vendor\Psr\Log\NullLogger;
@@ -19,6 +20,7 @@ use GPDFAPI;
 class Test_On_Demand_Font_File_Finder extends TestCase {
 
 	use CopiesFontFixtures;
+	use RecordsFontFailures;
 
 	private const FONT = 'DejaVuSerifCondensed.ttf';
 
@@ -44,7 +46,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 
 		$this->font_dir   = GPDFAPI::get_data_class()->template_font_location;
 		$this->sources    = new Model_Font_Sources( GPDFAPI::get_data_class(), GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), new NullLogger() );
-		$this->downloader = new Model_Font_Downloader( $this->sources, GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger() );
+		$this->downloader = new Model_Font_Downloader( $this->sources, GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger(), GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ) );
 		wp_mkdir_p( $this->font_dir );
 	}
 
@@ -52,6 +54,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 		wp_delete_file( $this->font_dir . self::FONT );
 		wp_delete_file( $this->font_dir . self::DEFAULT_FONT );
 		$this->remove_font_fixtures();
+		$this->delete_font_failures();
 		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
@@ -168,7 +171,7 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 	}
 
 	public function test_a_failed_download_throws_when_the_bundled_fallback_is_missing_too() {
-		$downloader = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger() ) extends Model_Font_Downloader {
+		$downloader = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), new NullLogger(), GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ) ) extends Model_Font_Downloader {
 			public function get_fallback_file(): string {
 				return '';
 			}

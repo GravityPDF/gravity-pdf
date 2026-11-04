@@ -121,6 +121,8 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 		/* Removes background processes */
 		$this->queue->clear_scheduled_events();
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+
 		$this->queue->clear_queue( true );
 		$this->queue->unlock_process();
 
@@ -163,6 +165,9 @@ class Model_Uninstall extends Helper_Abstract_Model {
 			delete_transient( substr( $key, strlen( '_transient_' ) ) );
 		}
 
+		delete_transient( Model_Font_Downloader::SYNC_REMAINING );
+		delete_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
+
 		$templates = \GPDFAPI::get_templates_class();
 		$templates->flush_template_transient_cache();
 	}
@@ -200,6 +205,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( Model_Pdf_Cache::SWEEP_STATE_OPTION );
 		delete_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION );
 		delete_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ); /* A Multisite keeps it in sitemeta */
+		delete_option( Model_Font_Downloader::FAILURES ); /* A Multisite keeps it in sitemeta */
 		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */
@@ -217,7 +223,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 	/**
 	 * Remove the network options stored in sitemeta on a Multisite: license package caches, the rich text merge
-	 * tags flag and the font downloads' back-offs
+	 * tags flag, the failed font downloads and their back-offs
 	 *
 	 * Every extension keeps its own license cache entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all
 	 * are network-scoped rather than per-site, so one pass clears them, and the flag's exact key, without walking the
@@ -235,11 +241,12 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key = %s",
+				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key IN ( %s, %s )",
 				$wpdb->esc_like( 'gpdf_sl_net_' ) . '%',
 				$wpdb->esc_like( '_site_transient_' . Model_Font_Downloader::BACK_OFF_KEY ) . '%',
 				$wpdb->esc_like( '_site_transient_timeout_' . Model_Font_Downloader::BACK_OFF_KEY ) . '%',
-				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS
+				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS,
+				Model_Font_Downloader::FAILURES
 			)
 		);
 

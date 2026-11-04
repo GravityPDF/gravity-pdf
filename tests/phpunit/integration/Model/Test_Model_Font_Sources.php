@@ -7,6 +7,7 @@ namespace GFPDF\Model;
 use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\UnregistersMvcClasses;
+use GFPDF\Tests\Concerns\StubsFontSources;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Mpdf\Config\FontVariables;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
@@ -26,7 +27,11 @@ use GPDFAPI;
 class Test_Model_Font_Sources extends TestCase {
 
 	use CopiesFontFixtures;
+	use StubsFontSources;
 	use UnregistersMvcClasses;
+
+	/** The substitution list on a site with no language font or Sun-ExtA */
+	private const SUBSTITUTES = [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil' ];
 
 	/**
 	 * @var Model_Font_Sources
@@ -273,6 +278,9 @@ class Test_Model_Font_Sources extends TestCase {
 		$config   = $this->model->set_default_font( [ 'fontdata' => $fontdata ], [], [], [ 'font' => 'dejavusans' ] );
 
 		$this->assertSame( 'dejavusans', $config['default_font'] );
+
+		/* Only Sun-ExtA's link to Sun-ExtB, which isn't on disk, is dropped */
+		unset( $fontdata['sun-exta']['sip-ext'] );
 		$this->assertSame( $fontdata, $config['fontdata'] );
 	}
 
@@ -336,6 +344,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertFalse( $this->model->is_core_font_file( '../DejaVuSerifCondensed.ttf' ) );
 		$this->assertFalse( $this->model->is_core_font_file( 'gfpdf-Arimo-Regular.ttf' ) );
 		$this->assertSame( $this->font_dir . 'Garuda.ttf', $this->model->get_font_path( 'Garuda.ttf' ) );
+		$this->assertFalse( $this->model->is_downloaded( 'Garuda.ttf' ) );
 		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->model->get_fallback_file() );
 	}
 
@@ -479,6 +488,222 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertSame( [], $model->adopt_records( 'bundled' ) );
 		$this->assertArrayHasKey( 'arimo', $this->custom_fonts->get_custom_fonts() );
 		$this->assertFileExists( $this->font_dir . 'Chewy.ttf' );
+	}
+
+	/**
+	 * @dataProvider provider_languages
+	 */
+	public function test_language_fonts_follow_the_installed_languages( array $languages, array $keys ) {
+		$this->set_languages( $languages );
+
+		$this->assertSame( $keys, $this->stub_font_sources()->get_language_font_keys() );
+	}
+
+	public function provider_languages(): array {
+		return [
+			'Japanese'             => [ [ 'ja' ], [ 'sun-exta' ] ],
+			'Thai'                 => [ [ 'th' ], [ 'garuda' ] ],
+			'English'              => [ [ 'en_US' ], [] ],
+			'Latin'                => [ [ 'de_DE', 'fr_FR', 'pl_PL' ], [] ],
+			'Cyrillic and Greek'   => [ [ 'ru_RU', 'el' ], [ 'dejavusanscondensed' ] ],
+			'Chinese and Japanese' => [ [ 'zh_CN', 'ja' ], [ 'sun-exta' ] ],
+		];
+	}
+
+	public function test_the_locale_counts_as_a_language() {
+		$this->set_locale( 'ko_KR' );
+
+		$this->assertSame( [ 'unbatang' ], $this->stub_font_sources()->get_language_font_keys() );
+	}
+
+	public function test_language_font_keys_are_cached_for_the_locale() {
+		$this->set_languages( [ 'th' ] );
+		$this->stub_font_sources()->get_language_font_keys();
+
+		$reads = 0;
+		add_filter(
+			'get_available_languages',
+			static function () use ( &$reads ) {
+				$reads++;
+
+				return [ 'th' ];
+			}
+		);
+
+		$this->assertSame( [ 'garuda' ], $this->stub_font_sources()->get_language_font_keys() );
+		$this->assertSame( 0, $reads );
+
+		/* Another locale maps again */
+		add_filter(
+			'locale',
+			static function () {
+				return 'ja';
+			}
+		);
+
+		$this->assertSame( [ 'garuda', 'sun-exta' ], $this->stub_font_sources()->get_language_font_keys() );
+		$this->assertSame( 1, $reads );
+	}
+
+	public function test_a_language_pack_install_flushes_the_language_fonts() {
+		$this->assertSame( 10, has_action( 'upgrader_process_complete', [ GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'flush' ] ) );
+	}
+
+	public function test_language_font_keys_are_read_once_until_flushed() {
+		delete_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
+		$reads = 0;
+		add_filter(
+			'get_available_languages',
+			static function () use ( &$reads ) {
+				$reads++;
+
+				return [ 'th' ];
+			}
+		);
+
+		$model = $this->stub_font_sources();
+		$model->get_language_font_keys();
+		$model->get_language_font_keys();
+		$this->assertSame( 1, $reads );
+
+		$model->flush();
+		$model->get_language_font_keys();
+		$this->assertSame( 2, $reads );
+	}
+
+	/**
+	 * @dataProvider provider_odd_languages
+	 *
+	 * @param mixed $languages
+	 * @param mixed $locale
+	 */
+	public function test_odd_languages_and_locales_are_skipped( $languages, $locale, array $expected ) {
+		$this->set_languages( $languages );
+		$this->set_locale( $locale );
+
+		$this->assertSame( $expected, $this->stub_font_sources()->get_language_font_keys() );
+	}
+
+	public function provider_odd_languages(): array {
+		return [
+			'languages not an array'    => [ null, 'th', [ 'garuda' ] ],
+			'non-string languages'      => [ [ [ 'th' ], 7, null ], 'en_US', [] ],
+			'a non-string locale'       => [ [ 'th' ], [ 'ja' ], [ 'garuda' ] ],
+			'empty and unknown locales' => [ [ '', 'xx_YY', '-', 'th_TH@buddhist' ], '', [ 'garuda' ] ],
+		];
+	}
+
+	/**
+	 * @dataProvider provider_odd_language_options
+	 *
+	 * @param mixed $options
+	 */
+	public function test_unexpected_language_options_map_to_no_font( $options ) {
+		$this->set_languages( [ 'th' ] );
+
+		$this->assertSame( [], $this->stub_font_sources( null, $this->stub_language_mapper( $options ) )->get_language_font_keys() );
+	}
+
+	public function provider_odd_language_options(): array {
+		return [
+			'null'            => [ null ],
+			'a string'        => [ 'garuda' ],
+			'too short'       => [ [ false ] ],
+			'non-string font' => [ [ false, [ 'garuda' ] ] ],
+		];
+	}
+
+	public function test_a_mapped_font_is_a_language_font() {
+		$this->set_languages( [ 'th' ] );
+
+		$this->assertSame( [ 'garuda' ], $this->stub_font_sources( null, $this->stub_language_mapper( [ false, 'garuda' ] ) )->get_language_font_keys() );
+	}
+
+	/**
+	 * @dataProvider provider_substitution_fonts
+	 */
+	public function test_the_substitution_fonts_add_the_language_fonts_and_sun_exta_on_disk( array $languages, array $on_disk, array $expected ) {
+		$this->set_languages( $languages );
+		foreach ( $on_disk as $file ) {
+			$this->copy_fixture( 'Chewy.ttf', $file );
+		}
+
+		$this->assertSame( $expected, $this->stub_font_sources()->get_substitution_fonts() );
+	}
+
+	public function provider_substitution_fonts(): array {
+		return [
+			'English'                             => [ [], [], self::SUBSTITUTES ],
+			'Korean'                              => [ [ 'ko_KR' ], [], array_merge( self::SUBSTITUTES, [ 'unbatang' ] ) ],
+			'Thai, its font already listed'       => [ [ 'th' ], [], self::SUBSTITUTES ],
+			'Japanese'                            => [ [ 'ja' ], [], array_merge( self::SUBSTITUTES, [ 'sun-exta' ] ) ],
+			'Chinese'                             => [ [ 'zh_TW' ], [], array_merge( self::SUBSTITUTES, [ 'sun-exta' ] ) ],
+			'English, Sun-ExtA on disk'           => [ [], [ 'Sun-ExtA.ttf' ], array_merge( self::SUBSTITUTES, [ 'sun-exta' ] ) ],
+			'Japanese and Korean, Sun-ExtA on disk' => [ [ 'ja', 'ko_KR' ], [ 'Sun-ExtA.ttf' ], array_merge( self::SUBSTITUTES, [ 'sun-exta', 'unbatang' ] ) ],
+		];
+	}
+
+	public function test_the_substitution_fonts_skip_unregistered_fonts() {
+		$fontdata = $this->model->get_font_data();
+		unset( $fontdata['dejavusanscondensed'] );
+
+		$this->assertSame( $this->substitutes_without( 'dejavusanscondensed' ), $this->stub_font_sources()->get_substitution_fonts( $fontdata ) );
+	}
+
+	public function test_the_substitution_fonts_leave_out_the_pdfs_font() {
+		$model = $this->stub_font_sources();
+
+		$this->assertSame( $this->substitutes_without( 'arimo' ), $model->get_substitution_fonts( null, 'arimo' ) );
+		$this->assertSame( $this->substitutes_without( 'dejavusanscondensed' ), $model->get_substitution_fonts( null, 'dejavusanscondensed' ) );
+		$this->assertSame( $this->substitutes_without( 'garuda' ), $model->get_substitution_fonts( null, 'garuda' ) );
+		$this->assertSame( self::SUBSTITUTES, $model->get_substitution_fonts( null, 'freeserif' ) );
+	}
+
+	private function substitutes_without( string $font ): array {
+		return array_values( array_diff( self::SUBSTITUTES, [ $font ] ) );
+	}
+
+	public function test_the_font_data_is_filtered_once_until_flushed() {
+		$runs   = 0;
+		$filter = static function ( $fonts ) use ( &$runs ) {
+			$runs++;
+
+			return $fonts;
+		};
+		add_filter( 'mpdf_font_data', $filter );
+
+		$model = $this->stub_font_sources();
+		$this->assertArrayHasKey( 'arimo', $model->get_font_data() );
+		$model->get_font_data();
+		$this->assertSame( 1, $runs );
+
+		$model->flush();
+		$model->get_font_data();
+		$this->assertSame( 2, $runs );
+	}
+
+	/**
+	 * @dataProvider provider_junk
+	 *
+	 * @param mixed $junk
+	 */
+	public function test_junk_font_data_is_no_fonts( $junk ) {
+		add_filter(
+			'mpdf_font_data',
+			static function () use ( $junk ) {
+				return $junk;
+			},
+			PHP_INT_MAX
+		);
+
+		$this->assertSame( [], $this->stub_font_sources()->get_font_data() );
+	}
+
+	public function provider_junk(): array {
+		return [
+			'null'     => [ null ],
+			'a string' => [ 'arimo' ],
+		];
 	}
 
 	public function test_adopt_records_keeps_a_record_whose_file_differs_at_the_same_size() {

@@ -53,18 +53,30 @@ $addon = static function () {
 
 add_action( 'init', $addon, 20 );
 
+/* Site-wide state a test needs, scoped to the requests that send the matching `X-GPDF-E2E-*` header, so the specs
+   needing it run in parallel with the rest instead of changing the site under them. Playwright adds the header to
+   every request a page makes, downloads and redirects included */
+$gfpdf_e2e_header = static function ( string $name ): string {
+	return sanitize_key( wp_unslash( $_SERVER[ 'HTTP_X_GPDF_E2E_' . strtoupper( $name ) ] ?? '' ) );
+};
+
+/* When the requests asking for it gave up on the core font downloads, which all fail on this site (see requests.php) */
+$gfpdf_e2e_fonts_gave_up = (int) $gfpdf_e2e_header( 'failed_fonts' );
+
 /* The deprecation notices are under test (scoped to the requests asking for them, below), so only the core-font one
-   stays suppressed for E2E runs */
+   stays suppressed for E2E runs, and the failed fonts one for the requests not asking for it */
 remove_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
+
+$gfpdf_e2e_hidden_routes = $gfpdf_e2e_fonts_gave_up > 0 ? [ 'install_core_fonts' ] : [ 'install_core_fonts', 'failed_core_fonts' ];
 
 add_filter(
 	'gfpdf_one_time_action_routes',
-	static function ( $routes ) {
+	static function ( $routes ) use ( $gfpdf_e2e_hidden_routes ) {
 		return array_values(
 			array_filter(
 				$routes,
-				static function ( $route ) {
-					return $route['action'] !== 'install_core_fonts';
+				static function ( $route ) use ( $gfpdf_e2e_hidden_routes ) {
+					return ! in_array( $route['action'], $gfpdf_e2e_hidden_routes, true );
 				}
 			)
 		);
@@ -89,13 +101,6 @@ add_action(
 		add_filter( 'gfpdf_legacy_templates', $passthrough );
 	}
 );
-
-/* Site-wide state a test needs, scoped to the requests that send the matching `X-GPDF-E2E-*` header, so the specs
-   needing it run in parallel with the rest instead of changing the site under them. Playwright adds the header to
-   every request a page makes, downloads and redirects included */
-$gfpdf_e2e_header = static function ( string $name ): string {
-	return sanitize_key( wp_unslash( $_SERVER[ 'HTTP_X_GPDF_E2E_' . strtoupper( $name ) ] ?? '' ) );
-};
 
 /* The site is set up on pretty permalinks, which keeps their rewrite rules and .htaccess in place for the requests
    that need them. Plain permalinks don't read either */
@@ -180,8 +185,27 @@ if ( $gfpdf_e2e_header( 'deprecations' ) !== 'yes' ) {
 	add_filter( 'gfpdf_get_option_deprecated_features', '__return_empty_array' );
 }
 
-/* Adds a folder the write check fails on. Its failures and dismissals are kept in options of their own, as the other
-   specs' system reports and settings saves overwrite the shared ones */
+/* Keeps a spec's notice dismissals in an option of its own, as the other specs' settings saves overwrite the shared one */
+$gfpdf_e2e_own_dismissals = static function ( string $option ): void {
+	add_filter(
+		'gfpdf_get_option_action_dismissal',
+		static function () use ( $option ) {
+			return get_option( $option, [] );
+		}
+	);
+
+	add_filter(
+		'gfpdf_update_option_action_dismissal',
+		static function ( $value ) use ( $option ) {
+			update_option( $option, $value );
+
+			return $value;
+		}
+	);
+};
+
+/* Adds a folder the write check fails on. Its failures are kept in an option of its own, as the other specs' system
+   reports overwrite the shared one */
 if ( $gfpdf_e2e_header( 'unwritable_folders' ) === 'yes' ) {
 	add_filter(
 		'gfpdf_installer_create_folders',
@@ -216,21 +240,36 @@ if ( $gfpdf_e2e_header( 'unwritable_folders' ) === 'yes' ) {
 		2
 	);
 
+	$gfpdf_e2e_own_dismissals( 'gfpdf_e2e_action_dismissal' );
+}
+
+/* A fixed set of failures, given up when the header says, and no writes over them */
+if ( $gfpdf_e2e_fonts_gave_up > 0 ) {
 	add_filter(
-		'gfpdf_get_option_action_dismissal',
-		static function () {
-			return get_option( 'gfpdf_e2e_action_dismissal', [] );
+		'pre_option_gfpdf_core_font_failures',
+		static function () use ( $gfpdf_e2e_fonts_gave_up ) {
+			$failure = [
+				'retry_at' => 0,
+				'gave_up'  => $gfpdf_e2e_fonts_gave_up,
+			];
+
+			return [
+				'FreeSerif.ttf' => $failure,
+				'Sun-ExtB.ttf'  => $failure,
+			];
 		}
 	);
 
 	add_filter(
-		'gfpdf_update_option_action_dismissal',
-		static function ( $value ) {
-			update_option( 'gfpdf_e2e_action_dismissal', $value );
-
-			return $value;
-		}
+		'pre_update_option_gfpdf_core_font_failures',
+		static function ( $value, $old_value ) {
+			return $old_value;
+		},
+		10,
+		2
 	);
+
+	$gfpdf_e2e_own_dismissals( 'gfpdf_e2e_failed_fonts_dismissal' );
 }
 
 /* Adds an extension's warning to a settings save, for the spec checking its colour */
