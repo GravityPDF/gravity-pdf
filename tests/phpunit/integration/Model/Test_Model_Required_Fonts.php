@@ -108,6 +108,47 @@ class Test_Model_Required_Fonts extends TestCase {
 		);
 	}
 
+	public function test_the_font_reasons_match_the_required_set() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'DejaVuSansCondensed' );
+		$this->set_languages( [ 'th' ] );
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ], [ 'font' => 'garuda' ] ] );
+		$this->add_form_with_pdfs( [ [ 'sidebar_font' => 'FreeSerif' ] ] );
+
+		$sources = $this->stub_font_sources(
+			static function ( array $sources ): array {
+				$sources['fixture']             = $sources['core'];
+				$sources['fixture']['required'] = true;
+				$sources['fixture']['families'] = [ 'fixturemono' => [ 'R' => 'FreeMono.ttf' ] ];
+
+				return $sources;
+			}
+		);
+
+		$none = [
+			'default'  => false,
+			'language' => false,
+			'pdfs'     => 0,
+			'source'   => false,
+			'sites'    => 0,
+		];
+
+		$this->assertSame(
+			[
+				'dejavusanscondensed' => array_merge( $none, [ 'default' => true ] ),
+				'garuda'              => array_merge(
+					$none,
+					[
+						'language' => true,
+						'pdfs'     => 1,
+					]
+				),
+				'freeserif'           => array_merge( $none, [ 'pdfs' => 2 ] ),
+				'fixturemono'         => array_merge( $none, [ 'source' => true ] ),
+			],
+			$this->required_with( $sources )->get_font_reasons( true )
+		);
+	}
+
 	public function test_the_font_selections_are_read_once_until_flushed() {
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
 		$this->assertSame( [], $this->required->get_required_font_files() );
@@ -326,6 +367,55 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->assertCount( 1, $records );
 		$this->assertSame( [ 'ERROR', 'Forms could not be read for their PDF fonts' ], array_slice( $records[0], 0, 2 ) );
 		$this->assertStringContainsString( 'gfpdf_missing_table', $records[0][2]['error'] );
+	}
+
+	public function test_a_sites_fonts_are_its_default_locale_and_pdf_fonts() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', ' DejaVuSerifCondensed ' );
+		/* WordPress only keeps a locale it has installed */
+		$this->set_languages( [ 'th' ] );
+		update_option( 'WPLANG', 'th' );
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ], [ 'sidebar_font' => 'FreeSerif' ], [ 'font' => 'arimo' ] ] );
+
+		try {
+			$keys = $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() );
+		} finally {
+			delete_option( 'WPLANG' );
+		}
+
+		$this->assertEqualsCanonicalizing( [ 'garuda', 'dejavuserifcondensed', 'freeserif', 'arimo' ], $keys );
+	}
+
+	public function test_a_site_with_no_default_font_saved_uses_the_one_given() {
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+		$required = $this->required_with( $this->stub_font_sources() );
+
+		$this->assertSame( [], $required->get_site_font_keys( get_current_blog_id() ) );
+		$this->assertSame( [ 'dejavusanscondensed' ], $required->get_site_font_keys( get_current_blog_id(), 'DejaVuSansCondensed' ) );
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'freeserif' );
+		$this->assertSame( [ 'freeserif' ], $required->get_site_font_keys( get_current_blog_id(), 'dejavusanscondensed' ) );
+	}
+
+	public function test_corrupt_settings_leave_a_sites_default_font_unset() {
+		update_option( 'gfpdf_settings', 'corrupt' );
+		$required = $this->required_with( $this->stub_font_sources() );
+
+		$this->assertSame( [ 'dejavusanscondensed' ], $required->get_site_font_keys( get_current_blog_id(), 'dejavusanscondensed' ) );
+	}
+
+	public function test_a_site_gravity_forms_has_not_run_on_has_no_pdf_fonts() {
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		$version = get_option( 'gf_db_version' );
+		delete_option( 'gf_db_version' );
+
+		try {
+			$keys = $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() );
+		} finally {
+			update_option( 'gf_db_version', $version, false );
+		}
+
+		$this->assertSame( [], $keys );
+		$this->assertSame( [ 'freeserif' ], $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() ) );
 	}
 
 	/**

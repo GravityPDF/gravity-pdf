@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Model;
 
+use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
@@ -11,6 +12,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Mpdf\On_Demand_Font_File_Finder;
 use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use WP_Error;
 
 /**
  * @package     Gravity PDF
@@ -348,6 +350,262 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		);
 
 		return $removed;
+	}
+
+	/**
+	 * Each downloadable font family with files in the fonts folder, with why it's in use (a reason disables Delete).
+	 * Walks every form, and on Multisite every site, so it's only for the Font Manager.
+	 *
+	 * @return array<int, array{id: string, label: string, source: string, files: array, size: int, size_label: string, in_use: string[], auto_install: bool}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_downloaded_fonts(): array {
+		$families = $this->get_downloaded_families();
+		if ( count( $families ) === 0 ) {
+			return [];
+		}
+
+		$reasons = $this->required_fonts->get_font_reasons( is_multisite() );
+		$labels  = $this->get_font_labels();
+		$locales = $this->font_sources->get_language_font_locales();
+		$fonts   = [];
+
+		foreach ( $families as $key => $family ) {
+			$files = [];
+			foreach ( $family['files'] as $style => $file ) {
+				if ( isset( $family['sizes'][ $file ] ) ) {
+					$files[] = [
+						'style' => $style,
+						'file'  => $file,
+						'size'  => $family['sizes'][ $file ],
+					];
+				}
+			}
+
+			$size    = array_sum( $family['sizes'] );
+			$fonts[] = [
+				'id'           => $key,
+				'label'        => $labels[ $key ] ?? $key,
+				'source'       => $family['source'],
+				'files'        => $files,
+				'size'         => $size,
+				'size_label'   => (string) size_format( $size, 1 ),
+				'in_use'       => $this->get_in_use( $key, $reasons, $locales[ $key ] ?? [] ),
+				'auto_install' => $this->can_download_all( $family['files'] ),
+			];
+		}
+
+		usort(
+			$fonts,
+			static function ( array $a, array $b ): int {
+				return strcasecmp( $a['label'], $b['label'] );
+			}
+		);
+
+		return $fonts;
+	}
+
+	/**
+	 * Delete an unused downloaded family's files whatever their hash, keeping the licence files
+	 *
+	 * @return array{id: string, removed: string[], bytes: int}|WP_Error 404 when nothing is on disk, 409 when in use
+	 *
+	 * @since 6.19.0
+	 */
+	public function delete_downloaded_font( string $key ) {
+		$families = $this->get_downloaded_families();
+		if ( ! isset( $families[ $key ] ) ) {
+			return new WP_Error( 'font_not_downloaded', __( 'The font is not downloaded.', 'gravity-pdf' ), [ 'status' => 404 ] );
+		}
+
+		$files = array_values( array_unique( $families[ $key ]['files'] ) );
+		if ( count( $this->get_in_use( $key, $this->required_fonts->get_font_reasons( is_multisite() ) ) ) > 0 ) {
+			return new WP_Error( 'font_in_use', __( 'The font is in use, so it would be downloaded again.', 'gravity-pdf' ), [ 'status' => 409 ] );
+		}
+
+		$removed = [];
+		$bytes   = 0;
+		foreach ( $files as $file ) {
+			$this->clear_failure( $file );
+			$this->delete_back_off( $file );
+
+			$size = $families[ $key ]['sizes'][ $file ] ?? null;
+			if ( $size === null ) {
+				continue;
+			}
+
+			if ( ! wp_delete_file_from_directory( $this->get_font_path( $file ), $this->data->template_font_location ) ) {
+				$this->log->warning( 'Downloaded font file could not be removed', [ 'name' => $file ] );
+				continue;
+			}
+
+			$removed[] = $file;
+			$bytes    += $size;
+		}
+
+		FlushCache::flush( $key );
+
+		$this->log->notice(
+			'Downloaded font deleted',
+			[
+				'font'  => $key,
+				'files' => $removed,
+				'bytes' => $bytes,
+			]
+		);
+
+		return [
+			'id'      => $key,
+			'removed' => $removed,
+			'bytes'   => $bytes,
+		];
+	}
+
+	/**
+	 * The downloadable sources' families with at least one file in the fonts folder: their files on the manifest by
+	 * style (R, B, I, BI), and the sizes of those on disk
+	 *
+	 * @return array<string, array{source: string, files: array<string, string>, sizes: array<string, int>}>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloaded_families(): array {
+		$families = [];
+
+		foreach ( $this->font_sources->get_sources() as $id => $source ) {
+			if ( empty( $source['manifest'] ) ) {
+				continue;
+			}
+
+			$manifest = $this->font_sources->get_source_manifest( (string) $id );
+			foreach ( $source['families'] ?? [] as $key => $family ) {
+				$key = (string) $key;
+				if ( isset( $families[ $key ] ) || ! is_array( $family ) ) {
+					continue;
+				}
+
+				$files = [];
+				foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
+					$file = $family[ $style ] ?? null;
+					if ( is_string( $file ) && isset( $manifest[ $file ] ) && $this->font_sources->is_core_font_file( $file ) ) {
+						$files[ $style ] = $file;
+					}
+				}
+
+				$sizes = [];
+				foreach ( $files as $file ) {
+					$path = $this->get_font_path( $file );
+					if ( is_file( $path ) ) {
+						$sizes[ $file ] = (int) filesize( $path );
+					}
+				}
+
+				if ( count( $sizes ) > 0 ) {
+					$families[ $key ] = [
+						'source' => (string) $id,
+						'files'  => $files,
+						'sizes'  => $sizes,
+					];
+				}
+			}
+		}
+
+		return $families;
+	}
+
+	/**
+	 * Font list labels by key
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_font_labels(): array {
+		$labels = [];
+		foreach ( (array) $this->options->get_installed_fonts() as $group ) {
+			foreach ( is_array( $group ) ? $group : [] as $key => $label ) {
+				if ( is_string( $label ) && ! isset( $labels[ $key ] ) ) {
+					$labels[ (string) $key ] = $label;
+				}
+			}
+		}
+
+		return $labels;
+	}
+
+	/**
+	 * Why a family is in use, as phrases for the Font Manager; none means it can be deleted
+	 *
+	 * @param array<string, array> $reasons get_font_reasons()
+	 * @param string[]             $locales The locales it's a language font for
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_in_use( string $key, array $reasons, array $locales = [] ): array {
+		if ( ! isset( $reasons[ $key ] ) ) {
+			return [];
+		}
+
+		$reasons = $reasons[ $key ];
+		$phrases = [];
+
+		if ( $reasons['default'] ) {
+			$phrases[] = __( 'Default font', 'gravity-pdf' );
+		}
+
+		if ( $reasons['language'] ) {
+			$names = array_map( [ $this, 'get_language_name' ], $locales );
+			/* translators: %s: the site's languages, e.g. ไทย */
+			$phrases[] = count( $names ) > 0 ? sprintf( __( 'Site language (%s)', 'gravity-pdf' ), implode( ', ', $names ) ) : __( 'Site language', 'gravity-pdf' );
+		}
+
+		if ( $reasons['pdfs'] > 0 ) {
+			/* translators: %d: the number of PDFs */
+			$phrases[] = sprintf( _n( 'Used by %d PDF', 'Used by %d PDFs', $reasons['pdfs'], 'gravity-pdf' ), $reasons['pdfs'] );
+		}
+
+		if ( $reasons['source'] ) {
+			$phrases[] = __( 'Required by an add-on', 'gravity-pdf' );
+		}
+
+		if ( $reasons['sites'] > 0 ) {
+			/* translators: %d: the number of sites */
+			$phrases[] = sprintf( _n( 'Used on %d other site', 'Used on %d other sites', $reasons['sites'], 'gravity-pdf' ), $reasons['sites'] );
+		}
+
+		return $phrases;
+	}
+
+	/**
+	 * A locale's native name when WordPress has the translations list cached, else the locale
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_language_name( string $locale ): string {
+		$translations = get_site_transient( 'available_translations' );
+		$name         = is_array( $translations ) ? ( $translations[ $locale ]['native_name'] ?? '' ) : '';
+
+		return is_string( $name ) && $name !== '' ? $name : $locale;
+	}
+
+	/**
+	 * Whether every file would download again if deleted
+	 *
+	 * @param string[] $files
+	 *
+	 * @since 6.19.0
+	 */
+	protected function can_download_all( array $files ): bool {
+		foreach ( $files as $file ) {
+			if ( ! $this->is_auto_install_enabled( $file ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
