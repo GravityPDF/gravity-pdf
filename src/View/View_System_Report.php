@@ -502,6 +502,53 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
+	 * Build the Site Health result for the core fonts the site's PDFs need
+	 *
+	 * @param array{missing: string[], failed: array<string, int>, blocker: string|null} $health See Model_System_Report::get_core_font_health()
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_core_fonts_test( array $health ): array {
+		$result = [
+			'label'       => esc_html__( 'Gravity PDF has the core fonts your PDFs need', 'gravity-pdf' ),
+			'status'      => 'good',
+			'badge'       => $this->get_site_health_badge(),
+			'description' => '<p>' . esc_html__( 'Gravity PDF downloads the core fonts your PDFs use, and those your site language needs, in the background.', 'gravity-pdf' ) . '</p>',
+			'actions'     => '',
+			'test'        => 'gravity_pdf_core_fonts',
+		];
+
+		if ( $health['missing'] === [] || ( $health['failed'] === [] && $health['blocker'] === null ) ) {
+			return $result;
+		}
+
+		/* PDFs still generate, so it isn't critical */
+		$result['status']       = 'recommended';
+		$result['label']        = esc_html__( 'Some core fonts your PDFs need are missing', 'gravity-pdf' );
+		$result['description'] .= '<p>' . esc_html__( 'Until they are installed, PDFs use a fallback font in their place, so some characters may not display.', 'gravity-pdf' ) . '</p>';
+		$result['actions']      = $this->get_report_link_action() .
+			'<p><a href="https://docs.gravitypdf.com/users/core-pdf-fonts">' . esc_html__( 'Install the fonts by hand', 'gravity-pdf' ) . '</a></p>';
+
+		if ( $health['failed'] !== [] ) {
+			$result['description'] .= '<p>' . esc_html__( 'These fonts could not be downloaded, and will not be retried automatically:', 'gravity-pdf' ) . ' ' . esc_html( implode( ', ', array_keys( $health['failed'] ) ) ) . '</p>';
+		}
+
+		if ( $health['blocker'] !== null ) {
+			$others = array_diff( $health['missing'], array_keys( $health['failed'] ) );
+
+			/* translators: %s: The GPDF_AUTO_INSTALL_FONTS constant or the gfpdf_auto_install_fonts filter */
+			$result['description'] .= '<p>' . esc_html( sprintf( __( 'Core font downloads are turned off by %s.', 'gravity-pdf' ), $health['blocker'] ) );
+			if ( $others !== [] ) {
+				$result['description'] .= ' ' . esc_html__( 'These fonts are missing:', 'gravity-pdf' ) . ' ' . esc_html( implode( ', ', $others ) );
+			}
+			$result['description'] .= '</p>';
+			$result['actions']     .= '<p><a href="https://docs.gravitypdf.com/developers/filters/gfpdf_auto_install_fonts/">' . esc_html__( 'Learn how to turn core font downloads back on', 'gravity-pdf' ) . '</a></p>';
+		}
+
+		return $result;
+	}
+
+	/**
 	 * @since 7.0
 	 */
 	protected function get_site_health_badge(): array {

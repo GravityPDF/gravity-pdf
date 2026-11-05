@@ -44,6 +44,10 @@ test.describe('Core Fonts', () => {
 			'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil'
 		);
 
+		await expect(
+			page.getByRole('row', { name: /^Core Font downloads/ })
+		).toContainText('Off (gfpdf_auto_install_fonts filter)');
+
 		await snapshot(page, testinfo, [installed, substitution], {
 			mask: [installed.locator('td').last()],
 		});

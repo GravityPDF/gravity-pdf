@@ -941,7 +941,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->templates,
 			$this->singleton->get_class( 'Model_Pdf_Cache' ),
 			$this->singleton->get_class( 'Model_Required_Fonts' ),
-			$this->singleton->get_class( 'Model_Font_Sources' )
+			$this->singleton->get_class( 'Model_Font_Sources' ),
+			$this->singleton->get_class( 'Model_Font_Downloader' )
 		);
 		$class = new Controller\Controller_System_Report( $model, $view, $this->gform );
 		$class->init();

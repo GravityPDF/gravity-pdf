@@ -505,6 +505,81 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertFileExists( $this->font_path( $sources->get_hashed_name( 'DejaVuSans.ttf' ) ) );
 	}
 
+	public function test_the_missing_files_are_the_required_files_not_on_disk() {
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+
+		$this->assertSame( [ self::FONT ], $this->seamed( [ 'required' => [ 'Garuda.ttf', self::FONT ] ] )->get_missing_files() );
+	}
+
+	public function test_a_file_another_font_holds_the_name_of_is_missing_until_its_hashed_copy_is_saved() {
+		$this->put_other_font_at( self::FONT, self::FONT );
+		$downloader = $this->seamed( [ 'required' => [ self::FONT ] ] );
+
+		$this->assertSame( [ self::FONT ], $downloader->get_missing_files() );
+
+		$this->copy_fixture( self::FONT, GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) );
+		$this->assertSame( [], $downloader->get_missing_files() );
+	}
+
+	public function test_the_auto_install_status_does_not_depend_on_the_missing_files() {
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$downloader = $this->seamed( [ 'required' => [] ] );
+		$this->assertSame( [], $downloader->get_missing_files() );
+		$this->assertSame( 'Off (gfpdf_auto_install_fonts filter)', $downloader->get_auto_install_status() );
+		$this->assertNull( $downloader->get_auto_install_blocker( [] ) );
+	}
+
+	public function test_the_auto_install_status_is_partly_off_when_the_filter_blocks_some_files() {
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		add_filter(
+			'gfpdf_auto_install_fonts',
+			static function ( $download, $file ) {
+				return $file !== 'Garuda.ttf';
+			},
+			10,
+			2
+		);
+
+		$downloader = $this->seamed( [ 'required' => [ 'Garuda.ttf', self::FONT ] ] );
+		$this->assertSame( 'Partly off (gfpdf_auto_install_fonts filter)', $downloader->get_auto_install_status() );
+
+		/* Installed, so nothing it blocks is needed yet */
+		$this->assertNull( $downloader->get_auto_install_blocker( $downloader->get_missing_files() ) );
+
+		wp_delete_file( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertSame( 'gfpdf_auto_install_fonts filter', $downloader->get_auto_install_blocker( $downloader->get_missing_files() ) );
+	}
+
+	/**
+	 * @dataProvider provider_auto_install_status
+	 *
+	 * @param bool|null $constant GPDF_AUTO_INSTALL_FONTS, or null when it isn't defined
+	 */
+	public function test_the_auto_install_status_names_what_turned_downloads_off( ?bool $constant, bool $filtered, string $expected ) {
+		add_filter( 'gfpdf_auto_install_fonts', $filtered ? '__return_true' : '__return_false' );
+
+		$downloader = $this->seamed(
+			[
+				'required' => [ self::FONT ],
+				'constant' => $constant,
+			]
+		);
+
+		$this->assertSame( $expected, $downloader->get_auto_install_status() );
+	}
+
+	public function provider_auto_install_status(): array {
+		return [
+			'the constant on, the filter off' => [ true, false, 'On' ],
+			'the constant off, the filter on' => [ false, true, 'Off (GPDF_AUTO_INSTALL_FONTS)' ],
+			'no constant, the filter off'     => [ null, false, 'Off (gfpdf_auto_install_fonts filter)' ],
+			'no constant, the filter on'      => [ null, true, 'On' ],
+		];
+	}
+
 	public function test_prune_removes_unmodified_core_fonts_and_licences() {
 		$this->set_installer_manifest( array_combine( static::$core_fixtures, static::$core_fixtures ) + [ 'DejaVuinfo.txt' => 'chewy-LICENSE.txt' ] );
 		$this->copy_fixture( 'chewy-LICENSE.txt', 'DejaVuinfo.txt' );
