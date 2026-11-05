@@ -35,22 +35,24 @@ class View_Actions extends Helper_Abstract_View {
 	/**
 	 * Add our primary button and an opt-our dismissal button
 	 *
-	 * @param string $type        The action ID
-	 * @param string $button_text The primary button text
-	 * @param string $dismissal   Whether the dismissal button should be shown. Valid arguments are 'enabled' or 'disabled'
+	 * @param string      $type        The action ID
+	 * @param string      $button_text The primary button text
+	 * @param string|null $dismissal   Deprecated in 6.19.0 and ignored
 	 *
-	 * @return string              The action_buttons HTML
+	 * @return string The action_buttons HTML
 	 *
 	 * @since 4.0
 	 */
-	public function get_action_buttons( $type, $button_text, $dismissal = 'enabled' ) {
+	public function get_action_buttons( $type, $button_text, $dismissal = null ) {
+		if ( $dismissal !== null ) {
+			_deprecated_argument( __METHOD__, '6.19.0', 'The $dismissal argument is ignored and the dismissal button is always shown.' );
+		}
 
 		return $this->load(
 			'action_buttons',
 			[
 				'type'        => $type,
 				'button_text' => $button_text,
-				'dismissal'   => $dismissal,
 			],
 			false
 		);

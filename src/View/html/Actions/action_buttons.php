@@ -25,9 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<p>
 		<button class="button"><?php echo esc_html( $args['button_text'] ); ?></button>
 
-		<?php if ( $args['dismissal'] === 'enabled' ): ?>
-			<input class="button primary" type="submit" value="<?php esc_attr_e( 'Dismiss Notice', 'gravity-pdf' ); ?>" name="gfpdf-dismiss-notice" />
-		<?php endif; ?>
+		<input class="button primary" type="submit" value="<?php esc_attr_e( 'Dismiss Notice', 'gravity-pdf' ); ?>" name="gfpdf-dismiss-notice" />
 	</p>
 
 </form>

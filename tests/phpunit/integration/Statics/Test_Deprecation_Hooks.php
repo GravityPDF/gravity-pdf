@@ -16,7 +16,7 @@ use GFPDF\Tests\Integration\TestCase;
 /**
  * @group     statics
  */
-class Test_Deprecation_Tools_Tab extends TestCase {
+class Test_Deprecation_Hooks extends TestCase {
 
 	use ResetsDetectedFeatures;
 
@@ -46,7 +46,6 @@ class Test_Deprecation_Tools_Tab extends TestCase {
 	 * Nothing in core fires or listens to these any more, so a clean install reports nothing
 	 */
 	public function test_a_clean_install_reports_nothing() {
-		$this->assertSame( [], Deprecation_Tools_Tab::get_active_hooks() );
 		$this->assertArrayNotHasKey( 'tools_tab_hooks', Deprecation::get_signals() );
 	}
 
@@ -65,17 +64,31 @@ class Test_Deprecation_Tools_Tab extends TestCase {
 				'gfpdf_post_tools_settings_page' => 2,
 				'gfpdf_settings_tools'           => 1,
 			],
-			Deprecation_Tools_Tab::get_active_hooks()
+			Deprecation::refresh_signals()['tools_tab_hooks']
 		);
-
-		Deprecation::flush_cache();
-
-		$this->assertArrayHasKey( 'tools_tab_hooks', Deprecation::refresh_signals() );
 		$this->assertContains( 'tools_tab_hooks', Deprecation::get_detected_features() );
 
 		remove_filter( 'gfpdf_settings_tools', $callback );
 		remove_action( 'gfpdf_post_tools_settings_page', $callback );
 		remove_action( 'gfpdf_post_tools_settings_page', '__return_null' );
 		remove_filter( 'gfpdf_settings_tools_sanitize', $callback );
+	}
+
+	/**
+	 * The shell isn't a registered provider: if it were, every other test here would fail on its deprecation notice
+	 */
+	public function test_the_tools_tab_provider_still_works_but_is_deprecated() {
+		foreach ( [ 'get_features', 'get_active_hooks', 'get_stored_options', 'flush_cache' ] as $method ) {
+			$this->setExpectedDeprecated( 'GFPDF\\Statics\\Deprecation_Tools_Tab::' . $method );
+		}
+
+		add_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+
+		$this->assertSame( [ 'tools_tab_hooks' => Deprecation::get_feature( 'tools_tab_hooks' ) ], Deprecation_Tools_Tab::get_features() );
+		$this->assertSame( [ 'gfpdf_settings_tools' => 1 ], Deprecation_Tools_Tab::get_active_hooks() );
+		$this->assertSame( [], Deprecation_Tools_Tab::get_stored_options() );
+		Deprecation_Tools_Tab::flush_cache();
+
+		remove_filter( 'gfpdf_settings_tools', '__return_empty_array' );
 	}
 }

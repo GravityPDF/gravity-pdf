@@ -2280,9 +2280,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return void
 	 * @since 4.0
+	 * @deprecated 6.19.0 No core setting uses the `button` type
 	 *
 	 */
 	public function button_callback( $args ) {
+		_deprecated_function( __METHOD__, '6.19.0' );
 
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$class      = $args['inputClass'] ?? '';

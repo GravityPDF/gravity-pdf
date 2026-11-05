@@ -1585,6 +1585,26 @@ class Test_Options_API extends TestCase {
 	}
 
 	/**
+	 * No core setting uses the `button` type any more, but a gfpdf_settings_* filter can still add one
+	 */
+	public function test_the_button_field_still_renders_but_is_deprecated() {
+		$this->setExpectedDeprecated( 'GFPDF\Helper\Helper_Abstract_Options::button_callback' );
+
+		ob_start();
+		$this->options->button_callback(
+			[
+				'id'   => 'my_button',
+				'desc' => 'Description',
+				'std'  => 'Run it',
+			]
+		);
+		$markup = ob_get_clean();
+
+		$this->assertStringContainsString( 'name="gfpdf_settings[my_button][name]"', $markup );
+		$this->assertStringContainsString( 'Run it', $markup );
+	}
+
+	/**
 	 * The AJAX rebuild of the template select goes through build_options_for_select() rather than select_callback()
 	 *
 	 * Model_Templates::ajax_process_build_template_options_html() replaces the select's markup after the template
