@@ -1798,6 +1798,22 @@ class Test_PDF extends TestCase {
 		$this->assertArrayNotHasKey( 'aladin', $fonts );
 	}
 
+	public function test_a_core_fonts_hashed_copy_is_not_autoloaded_as_a_font() {
+		global $gfpdf;
+
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSans.ttf' );
+		$path   = $gfpdf->data->template_font_location . $hashed;
+		touch( $path );
+
+		try {
+			$fonts = $this->model->add_unregistered_fonts_to_mPDF( [] );
+		} finally {
+			wp_delete_file( $path );
+		}
+
+		$this->assertNotContains( $hashed, array_column( $fonts, 'R' ) );
+	}
+
 	/**
 	 * Test that our field exists
 	 *
