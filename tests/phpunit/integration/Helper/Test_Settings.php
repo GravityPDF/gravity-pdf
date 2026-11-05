@@ -123,6 +123,79 @@ class Test_Settings extends TestCase {
 	}
 
 	/**
+	 * Render the General tab for a user who can, or can't, edit the settings
+	 */
+	private function render_general_tab( bool $can_edit ): string {
+		global $gfpdf;
+
+		$user = $this->factory->user->create_and_get( [ 'role' => $can_edit ? 'administrator' : 'subscriber' ] );
+		$user->add_cap( $can_edit ? 'gform_full_access' : 'gravityforms_view_settings' );
+		wp_set_current_user( $user->ID );
+
+		$gfpdf->options->register_settings( $gfpdf->options->get_registered_fields() );
+
+		ob_start();
+		$this->view->general();
+
+		return ob_get_clean();
+	}
+
+	private function add_tools_tab_listeners(): void {
+		add_filter(
+			'gfpdf_settings_tools',
+			static function ( $settings ) {
+				$settings['my_tool'] = [
+					'id'   => 'my_tool',
+					'name' => 'My Tool',
+					'type' => 'descriptive_text',
+					'desc' => 'my-tool-description',
+				];
+
+				return $settings;
+			}
+		);
+
+		add_action(
+			'gfpdf_post_tools_settings_page',
+			static function () {
+				echo 'my-tools-action';
+			}
+		);
+	}
+
+	public function test_the_tools_tab_hooks_run_at_the_bottom_of_the_general_tab() {
+		$this->setExpectedDeprecated( 'gfpdf_settings_tools' );
+		$this->setExpectedDeprecated( 'gfpdf_post_tools_settings_page' );
+		$this->add_tools_tab_listeners();
+
+		$html = $this->render_general_tab( true );
+
+		/* Outside the General form, which posts to options.php, then the action last */
+		$general_form_end = strpos( $html, '</form>' );
+		$field            = strpos( $html, 'my-tool-description' );
+		$action           = strpos( $html, 'my-tools-action' );
+
+		$this->assertMatchesRegularExpression( '#<legend[^>]*>\s*Tools\s*</legend>#', $html );
+		$this->assertNotFalse( $general_form_end );
+		$this->assertNotFalse( $field );
+		$this->assertGreaterThan( $general_form_end, $field );
+		$this->assertGreaterThan( $field, $action );
+	}
+
+	public function test_the_tools_tab_hooks_need_the_edit_settings_capability() {
+		$this->add_tools_tab_listeners();
+
+		$html = $this->render_general_tab( false );
+
+		$this->assertStringNotContainsString( 'my-tool-description', $html );
+		$this->assertStringNotContainsString( 'my-tools-action', $html );
+	}
+
+	public function test_the_general_tab_has_one_form_without_tools_tab_listeners() {
+		$this->assertSame( 1, substr_count( $this->render_general_tab( true ), '<form ' ) );
+	}
+
+	/**
 	 * Test the appropriate actions are set up
 	 *
 	 * @since 4.0

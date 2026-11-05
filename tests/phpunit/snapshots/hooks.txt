@@ -37,6 +37,7 @@ action gfpdf_post_save_notification_pdf 6
 action gfpdf_post_save_notification_pdf_{form_id} 6
 action gfpdf_post_save_pdf 5
 action gfpdf_post_save_pdf_{form_id} 5
+action gfpdf_post_tools_settings_page 0
 action gfpdf_post_uninstall_plugin 0
 action gfpdf_post_view_or_download_pdf 5
 action gfpdf_pre_generate_and_save_pdf 3
@@ -220,6 +221,7 @@ filter gfpdf_settings_general_security 1
 filter gfpdf_settings_licenses 1
 filter gfpdf_settings_navigation 1
 filter gfpdf_settings_sanitize 4
+filter gfpdf_settings_tools 1
 filter gfpdf_shortcode_signing_user_id 3
 filter gfpdf_show_field_value 3
 filter gfpdf_signature_width 2
