@@ -6,6 +6,7 @@ namespace GFPDF\Model;
 
 use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
+use GFPDF\Tests\Concerns\Seamed_Font_Downloader;
 use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Concerns\StubsFontSources;
 use GFPDF\Tests\Integration\TestCase;
@@ -1006,6 +1007,176 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertTrue( $this->log->hasRecordThatContains( 'Could not remove a custom font record replaced by a font source', Logger::ERROR ) );
 	}
 
+	public function test_two_sources_using_one_name_for_different_files_give_the_later_one_the_hashed_name() {
+		$first  = [ 'Shared.ttf' => $this->manifest_entry( 'Chewy.ttf', 'https://example.com/Shared.ttf' ) ];
+		$second = [
+			'Shared.ttf' => $this->manifest_entry( 'DejaVuSans.ttf', 'https://example.com/DejaVuSans.ttf' ),
+			'Only.ttf'   => $this->manifest_entry( 'DejaVuSans.ttf', 'https://example.com/Only.ttf' ),
+		];
+		$model  = $this->get_model_with_two_sources( $first, $second );
+		$hashed = 'Shared-' . substr( $second['Shared.ttf']['sha'], 0, 8 ) . '.ttf';
+
+		$sources = $model->get_sources();
+
+		$this->assertSame( [ 'Shared.ttf' ], array_keys( $model->get_source_manifest( 'bundled' ) ) );
+		$this->assertSame( [ $hashed, 'Only.ttf' ], array_keys( $model->get_source_manifest( 'core' ) ) );
+		$this->assertSame( [ 'Shared.ttf', $hashed, 'Only.ttf' ], array_keys( $model->get_manifest() ) );
+		$this->assertSame( $first['Shared.ttf'], $model->get_manifest()['Shared.ttf'] );
+		$this->assertSame( $second['Shared.ttf'], $model->get_manifest()[ $hashed ] );
+
+		/* Only the later source's family files are rewritten, and only the ones renamed */
+		$this->assertSame( 'Shared.ttf', $sources['bundled']['families']['first']['R'] );
+		$this->assertSame( $hashed, $sources['core']['families']['second']['R'] );
+		$this->assertSame( 'Only.ttf', $sources['core']['families']['second']['B'] );
+		$this->assertSame( $hashed, $model->register_font_data( [] )['second']['R'] );
+
+		$this->assertTrue( $this->log->hasRecordThatContains( 'Font file name used by two sources for different files', Logger::NOTICE ) );
+	}
+
+	public function test_a_family_uses_the_hashed_name_of_a_file_a_font_manager_record_uses() {
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );
+		$hashed = $this->model->get_hashed_name( 'DejaVuSans.ttf' );
+
+		$fonts = $this->model->register_font_data( [] );
+
+		$this->assertSame( $hashed, $fonts['dejavusans']['R'] );
+		$this->assertSame( 'DejaVuSans-Bold.ttf', $fonts['dejavusans']['B'], 'Only the shared file is renamed' );
+		$this->assertSame( [ 'DejaVuSans.ttf' => $hashed ], $this->model->get_record_collisions() );
+		$this->assertTrue( $this->model->is_record_file( 'DejaVuSans.ttf' ) );
+		$this->assertArrayHasKey( $hashed, $this->model->get_manifest() );
+		$this->assertArrayHasKey( $hashed, $this->model->get_source_manifest( 'core' ) );
+		$this->assertTrue( $this->model->is_core_font_file( $hashed ) );
+	}
+
+	public function test_a_record_holding_a_known_build_of_the_core_font_is_not_custom() {
+		$this->copy_fixture( 'DejaVuSans.ttf' );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );
+
+		$this->assertSame( [], $this->model->get_record_collisions() );
+		$this->assertSame( 'DejaVuSans.ttf', $this->model->register_font_data( [] )['dejavusans']['R'] );
+	}
+
+	public function test_a_record_on_another_site_is_only_a_collision_on_that_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		$blog = self::factory()->blog->create();
+
+		switch_to_blog( $blog );
+		try {
+			$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );
+			$this->assertSame( [ 'DejaVuSans.ttf' ], array_keys( $this->model->get_record_collisions() ) );
+			GPDFAPI::delete_plugin_option( 'custom_fonts' );
+		} finally {
+			restore_current_blog();
+		}
+
+		$this->model->flush();
+		$this->assertSame( [], $this->model->get_record_collisions() );
+	}
+
+	public function test_a_record_whose_file_is_not_a_core_name_reads_no_manifest() {
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->add_record( 'chewy', [ 'regular' => 'Chewy.ttf' ] );
+		$this->set_private( $this->model, 'manifests', [] );
+
+		$this->assertSame( [], $this->model->get_record_collisions() );
+		$this->assertSame( [], $this->get_private( $this->model, 'manifests' ) );
+	}
+
+	public function test_a_renamed_file_is_not_renamed_again() {
+		$model = $this->get_model_with_two_sources(
+			[ 'Shared.ttf' => $this->manifest_entry( 'Chewy.ttf', 'https://example.com/Shared.ttf' ) ],
+			[ 'Shared.ttf' => $this->manifest_entry( 'DejaVuSans.ttf', 'https://example.com/DejaVuSans.ttf' ) ]
+		);
+
+		$renamed = array_keys( $model->get_source_manifest( 'core' ) )[0];
+
+		$this->assertSame( '', $model->get_hashed_name( $renamed ) );
+		$this->assertFalse( $model->is_size_conflict( $renamed ) );
+	}
+
+	public function test_two_sources_using_one_name_for_the_same_file_share_it() {
+		$entry = $this->manifest_entry( 'Chewy.ttf', 'https://example.com/Shared.ttf' );
+		$model = $this->get_model_with_two_sources( [ 'Shared.ttf' => $entry ], [ 'Shared.ttf' => $entry ] );
+
+		$sources = $model->get_sources();
+
+		$this->assertSame( [ 'Shared.ttf' ], array_keys( $model->get_manifest() ) );
+		$this->assertSame( 'Shared.ttf', $sources['core']['families']['second']['R'] );
+		$this->assertFalse( $this->log->hasRecordThatContains( 'Font file name used by two sources for different files', Logger::NOTICE ) );
+	}
+
+	public function test_a_single_downloadable_source_is_not_read_when_the_sources_are_built() {
+		$model = new Model_Font_Sources( GPDFAPI::get_data_class(), $this->custom_fonts, GPDFAPI::get_log_class() );
+		$model->get_sources();
+
+		$this->assertSame( [], $this->get_private( $model, 'manifests' ) );
+		$this->assertNull( $this->get_private( $model, 'manifest' ) );
+	}
+
+	public function test_the_renamed_source_downloads_to_its_hashed_name() {
+		$model = $this->get_model_with_two_sources( [ 'DejaVuSerifCondensed.ttf' => $this->manifest_entry( 'Chewy.ttf', 'https://example.com/Chewy.ttf' ) ], [] );
+		$core  = $model->get_source_manifest( 'core' );
+
+		/* The later source is the real core manifest, so its file takes the hashed name */
+		$name = 'DejaVuSerifCondensed-' . substr( $this->manifest_entry( 'DejaVuSerifCondensed.ttf', '' )['sha'], 0, 8 ) . '.ttf';
+		$this->assertArrayHasKey( $name, $core );
+		$this->assertSame( $name, $model->get_sources()['core']['families']['dejavuserifcondensed']['R'] );
+
+		$this->serve_font_downloads();
+		$this->copied_fonts[] = $this->font_dir . $name;
+		$downloader = new Seamed_Font_Downloader( GPDFAPI::get_log_class(), [ 'sources' => $model ] );
+
+		$this->assertTrue( $downloader->download( $name ) );
+		$this->assertFileEquals( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ), $this->font_dir . $name );
+		$this->assertFileDoesNotExist( $this->font_dir . 'DejaVuSerifCondensed.ttf' );
+		$this->assertSame( [ $core[ $name ]['url'] ], $this->requested );
+	}
+
+	public function test_a_file_is_another_fonts_when_its_size_is_no_known_build() {
+		$model = $this->get_model_with_manifest( [ 'Mine.ttf' => $this->manifest_entry( 'DejaVuSans.ttf', 'https://example.com/Mine.ttf' ) ] );
+
+		$this->assertFalse( $model->is_size_conflict( 'Mine.ttf' ), 'Missing' );
+		$this->assertFalse( $model->is_installed( 'Mine.ttf' ) );
+
+		$this->copy_fixture( 'DejaVuSans.ttf', 'Mine.ttf' );
+		$this->assertFalse( $model->is_size_conflict( 'Mine.ttf' ) );
+		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
+
+		$this->copy_fixture( 'Chewy.ttf', 'Mine.ttf' );
+		$this->assertTrue( $model->is_size_conflict( 'Mine.ttf' ) );
+		$this->assertFalse( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertTrue( $model->is_downloaded( 'Mine.ttf' ), 'The file at its name' );
+
+		$this->copy_fixture( 'DejaVuSans.ttf', $model->get_hashed_name( 'Mine.ttf' ) );
+		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertSame( $this->font_dir . $model->get_hashed_name( 'Mine.ttf' ), $model->get_font_path( 'Mine.ttf' ) );
+	}
+
+	public function test_an_older_build_of_a_file_has_a_known_size() {
+		$model = $this->get_model_with_manifest( [ 'Mine.ttf' => $this->manifest_entry( 'DejaVuSans.ttf', 'https://example.com/Mine.ttf' ) ] );
+		$this->set_private( $model, 'legacy_manifests', [ 'core' => [ 'Mine.ttf' => $this->manifest_entry( 'Chewy.ttf', 'https://example.com/Mine.ttf' ) ] ] );
+
+		$this->copy_fixture( 'Chewy.ttf', 'Mine.ttf' );
+
+		$this->assertFalse( $model->is_size_conflict( 'Mine.ttf' ) );
+		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertCount( 2, $model->get_known_builds( 'Mine.ttf' ) );
+	}
+
+	public function test_adoption_checks_the_records_file_not_a_hashed_copy() {
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
+		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+
+		$this->assertSame( [ 'arimo' ], $model->adopt_records( 'bundled' ) );
+	}
+
 	/**
 	 * A model whose core source reads a test manifest
 	 *
@@ -1034,5 +1205,59 @@ class Test_Model_Font_Sources extends TestCase {
 
 	protected function core_fontdata(): array {
 		return ( new FontVariables() )->getDefaults()['fontdata'];
+	}
+
+	/**
+	 * A model whose first source (`bundled`) and later source (`core`) each have a manifest of the entries given, and a
+	 * family using each file. With no entries for the second, `core` is the real one.
+	 *
+	 * @param array $first
+	 * @param array $second
+	 */
+	protected function get_model_with_two_sources( array $first, array $second ): Model_Font_Sources {
+		$write = function ( string $suffix, array $entries ): string {
+			$path = $this->manifest_path . $suffix . '.php';
+			wp_delete_file( $path );
+			file_put_contents( $path, '<?php return ' . var_export( $entries, true ) . ';' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+			$this->copied_fonts[] = $path;
+
+			return $path;
+		};
+
+		$model = new class( GPDFAPI::get_data_class(), $this->custom_fonts, GPDFAPI::get_log_class() ) extends Model_Font_Sources {
+			/** @var string[] The first source's and second source's manifests */
+			public $manifests_at = [];
+
+			/** @var bool Whether the second source is the real core one */
+			public $real_core = false;
+
+			protected function get_bundled_source(): array {
+				return [
+					'families' => [ 'first' => [ 'R' => 'Shared.ttf' ] ],
+					'manifest' => $this->manifests_at[0],
+				];
+			}
+
+			protected function get_core_source(): array {
+				if ( $this->real_core ) {
+					return parent::get_core_source();
+				}
+
+				return [
+					'families' => [
+						'second' => [
+							'R' => 'Shared.ttf',
+							'B' => 'Only.ttf',
+						],
+					],
+					'manifest' => $this->manifests_at[1],
+				];
+			}
+		};
+
+		$model->manifests_at = [ $write( '-first', $first ), $second === [] ? '' : $write( '-second', $second ) ];
+		$model->real_core    = $second === [];
+
+		return $model;
 	}
 }

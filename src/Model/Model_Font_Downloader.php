@@ -274,11 +274,34 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Download a file on the manifest into the fonts folder, skipped if it's there
+	 * Whether a Font Manager record of this site uses the file, so it isn't the core font's
 	 *
 	 * @since 6.19.0
 	 */
-	public function download( string $file ): bool {
+	public function is_record_file( string $file ): bool {
+		return $this->font_sources->is_record_file( $file );
+	}
+
+	/**
+	 * Whether a path is in the fonts folder, as opposed to a bundled font's or one a filter added
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_in_fonts_folder( string $path ): bool {
+		return untrailingslashit( dirname( $path ) ) === untrailingslashit( $this->data->template_font_location );
+	}
+
+	/**
+	 * Download a file on the manifest into the fonts folder, or under its hashed name if another font's file has its name
+	 *
+	 * @param string $file   The manifest file name
+	 * @param bool   $verify Hash a file of a known size too, to find another font's of the same size
+	 *
+	 * @return bool Whether the font's own copy is on disk now
+	 *
+	 * @since 6.19.0
+	 */
+	public function download( string $file, bool $verify = false ): bool {
 		$manifest = $this->font_sources->get_manifest();
 
 		if ( ! isset( $manifest[ $file ] ) ) {
@@ -287,8 +310,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return false;
 		}
 
-		$font_path = $this->get_font_path( $file );
-		if ( is_file( $font_path ) ) {
+		if ( $this->font_sources->has_hashed_copy( $file ) ) {
+			return true;
+		}
+
+		$font_path = $this->font_sources->get_plain_path( $file );
+		$conflict  = is_file( $font_path );
+		if ( $conflict && ! $this->is_conflict( $file, $verify && $this->is_auto_install_enabled( $file ) ) ) {
 			return true;
 		}
 
@@ -300,7 +328,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return false;
 		}
 
-		if ( ! $this->save( $file, $font_path, $manifest[ $file ] ) ) {
+		$target = $conflict ? $this->font_sources->get_plain_path( $this->font_sources->get_hashed_name( $file ) ) : $font_path;
+		if ( ! $this->save( $file, $target, $manifest[ $file ] ) ) {
 			$this->record_failure( $file );
 
 			return false;
@@ -308,7 +337,79 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 		$this->clear_failure( $file );
 
+		if ( $conflict ) {
+			$this->log->notice( 'Font saved under a new name as another font has its name', [ 'name' => $file ] );
+			$this->remove_older_hashed_copies( $file, basename( $target ) );
+
+			/* The metrics and PDFs cached from the file that was there are stale */
+			FlushCache::flush();
+		}
+
 		return true;
+	}
+
+	/**
+	 * Delete the copies a font's older releases left under other hashed names, if the name matches the copy's own SHA-1
+	 *
+	 * @param string $file The manifest file name
+	 * @param string $keep The hashed name to keep
+	 *
+	 * @since 6.19.0
+	 */
+	protected function remove_older_hashed_copies( string $file, string $keep ): void {
+		$dir = $this->data->template_font_location;
+
+		foreach ( scandir( $dir ) ?: [] as $name ) {
+			$parsed = $this->font_sources->parse_hashed_name( $name );
+			if ( $name === $keep || $parsed === null || $parsed['file'] !== $file ) {
+				continue;
+			}
+
+			if ( strpos( $this->hash_blob( $dir . $name, (int) filesize( $dir . $name ) ), $parsed['sha'] ) === 0 ) {
+				wp_delete_file_from_directory( $dir . $name, $dir );
+				$this->log->notice( 'Font copy for an older release removed', [ 'name' => $name ] );
+			}
+		}
+	}
+
+	/**
+	 * Whether the existing file at a manifest name is another font's: no known build has its size, or with $verify its
+	 * SHA-1. A file that can't be read is left alone.
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_conflict( string $file, bool $verify ): bool {
+		if ( $this->font_sources->is_size_conflict( $file ) ) {
+			return true;
+		}
+
+		if ( ! $verify || $this->font_sources->get_hashed_name( $file ) === '' ) {
+			return false;
+		}
+
+		$path = $this->font_sources->get_plain_path( $file );
+		$size = (int) filesize( $path );
+		$sha  = $this->hash_blob( $path, $size );
+
+		return $sha !== '' && ! in_array( $sha, $this->font_sources->get_known_builds( $file )[ $size ] ?? [], true );
+	}
+
+	/**
+	 * Hash a font on disk, separate so tests can count the calls
+	 *
+	 * @since 6.19.0
+	 */
+	protected function hash_blob( string $path, int $size ): string {
+		return Git_Blob::sha1( $path, $size );
+	}
+
+	/**
+	 * Whether the file's own copy is on disk, hashing the file at its name to be sure it's the manifest's
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_resolved( string $file ): bool {
+		return $this->font_sources->has_hashed_copy( $file ) || ( is_file( $this->font_sources->get_plain_path( $file ) ) && ! $this->is_conflict( $file, true ) );
 	}
 
 	/**
@@ -343,7 +444,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				continue;
 			}
 
-			$path = $this->get_font_path( $file );
+			/* The file at the legacy name, never a hashed copy, which isn't the installer's */
+			$path = $this->font_sources->get_plain_path( $file );
 			clearstatcache( true, $path );
 			if ( ! is_file( $path ) || filesize( $path ) !== $entry['size'] || ( $since > 0 && filemtime( $path ) > $since ) ) {
 				continue;
@@ -531,11 +633,17 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function get_core_font_row( string $key, array $family, array $labels ): ?array {
-		$on_disk = array_filter(
-			$family['files'],
-			static function ( string $file ) use ( $family ): bool {
-				return isset( $family['sizes'][ $file ] );
-			}
+		/* Named as on disk, so the sizes and the preview are the font's own copy */
+		$on_disk = array_map(
+			function ( string $file ): string {
+				return basename( $this->get_font_path( $file ) );
+			},
+			array_filter(
+				$family['files'],
+				static function ( string $file ) use ( $family ): bool {
+					return isset( $family['sizes'][ $file ] );
+				}
+			)
 		);
 
 		$can_download = $this->can_download_all( $family['files'] );
@@ -609,7 +717,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Delete an unused downloaded family's files whatever their hash, keeping the licence files
+	 * Delete an unused downloaded family's files whatever their hash, keeping the licence files. A file with a copy under
+	 * its hashed name loses only the copy: the file at the name is another font's.
 	 *
 	 * @return array{id: string, removed: string[], bytes: int, font: array|null}|WP_Error `font` is its row now, if it can
 	 *                                                                                     be installed again. 404 when
@@ -722,6 +831,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	protected function get_core_families(): array {
 		$families = [];
 
+		/* A Font Manager record's file at a family's name isn't the family's: its files have hashed names */
+		$collisions = $this->font_sources->get_record_collisions();
+
 		foreach ( $this->font_sources->get_sources() as $id => $source ) {
 			if ( empty( $source['manifest'] ) ) {
 				continue;
@@ -734,7 +846,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 					continue;
 				}
 
-				$files = [];
+				$family = $this->font_sources->use_hashed_names( $family, $collisions );
+				$files  = [];
 				foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
 					$file = $family[ $style ] ?? null;
 					if ( is_string( $file ) && isset( $manifest[ $file ] ) && $this->font_sources->is_core_font_file( $file ) ) {
@@ -957,7 +1070,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		array_map( [ $this, 'delete_back_off' ], $due );
 
 		$this->syncing = true;
-		$left          = $this->within_budget( array_merge( $due, $missing ), [ $this, 'download' ] );
+		$left          = $this->within_budget(
+			array_merge( $due, $missing ),
+			function ( $file ) {
+				/* Verified here, off the render path, to find another font's file of a known size */
+				$this->download( (string) $file, true );
+			}
+		);
 		$this->syncing = false;
 
 		/* Includes the retries this run's first failures added */
@@ -1086,7 +1205,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The files a paused run left, else the missing required files, less those that gave up
+	 * The files a paused run left, else the required files, less those that gave up and those with a copy under their
+	 * hashed name. A file already on disk is in the list so sync() can check it's the manifest's.
 	 *
 	 * @return string[]
 	 *
@@ -1097,14 +1217,17 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->required_fonts->get_required_font_files();
 		$gave_up   = $this->get_failed_files();
 
-		return array_values(
-			array_filter(
-				$files,
-				function ( $file ) use ( $gave_up ) {
-					return ! isset( $gave_up[ $file ] ) && ! $this->font_sources->is_downloaded( $file );
-				}
-			)
+		$files = array_filter(
+			$files,
+			function ( $file ) use ( $gave_up ) {
+				return ! isset( $gave_up[ $file ] ) && ! $this->font_sources->has_hashed_copy( $file );
+			}
 		);
+
+		$installed = array_filter( $files, [ $this->font_sources, 'is_installed' ] );
+
+		/* Those needing a download go first, so hashing the rest can't push one into a paused run */
+		return array_merge( array_diff( $files, $installed ), $installed );
 	}
 
 	/**
@@ -1127,7 +1250,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 			if ( $failure['retry_at'] > time() ) {
 				$next = $next === 0 ? $failure['retry_at'] : min( $next, $failure['retry_at'] );
-			} elseif ( $this->font_sources->is_downloaded( $file ) ) {
+			} elseif ( $this->is_resolved( $file ) ) {
 				$this->clear_failure( $file );
 			} else {
 				$due[] = $file;

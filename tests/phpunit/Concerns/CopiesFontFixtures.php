@@ -168,6 +168,9 @@ trait CopiesFontFixtures {
 				if ( is_file( $this->font_fixture( $fixture ) ) ) {
 					copy( $this->font_fixture( $fixture ), $args['filename'] );
 					$this->copied_fonts[] = $this->font_path( $file );
+
+					/* A file saved beside another font's has its hashed name */
+					$this->copied_fonts[] = $this->font_path( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( $file ) );
 				}
 
 				if ( $change !== null ) {
@@ -184,15 +187,51 @@ trait CopiesFontFixtures {
 	}
 
 	/**
+	 * Put another font's file, of a different size, at a manifest name
+	 */
+	protected function put_other_font_at( string $name ): void {
+		$this->copy_fixture( 'Chewy.ttf', $name );
+	}
+
+	/**
+	 * Put a copy of the fixture with its last byte changed at a manifest name: the fixture's size, but not its hash
+	 */
+	protected function put_same_size_font_at( string $name, string $fixture ): void {
+		$bytes = (string) file_get_contents( $this->font_fixture( $fixture ) );
+		$last  = strlen( $bytes ) - 1;
+
+		$bytes[ $last ] = $bytes[ $last ] === 'x' ? 'y' : 'x';
+		file_put_contents( $this->font_path( $name ), $bytes );
+		$this->copied_fonts[] = $this->font_path( $name );
+	}
+
+	/**
+	 * Put a renderable copy of the fixture at a manifest name that is one byte longer, so a size check finds it isn't
+	 * the manifest's
+	 */
+	protected function put_longer_font_at( string $name, string $fixture ): void {
+		file_put_contents( $this->font_path( $name ), (string) file_get_contents( $this->font_fixture( $fixture ) ) . "\0" );
+		$this->copied_fonts[] = $this->font_path( $name );
+	}
+
+	/**
 	 * Serve a fixture as a manifest file, with a manifest entry matching the fixture so the plugin's downloader verifies it
 	 */
 	protected function serve_fixture_as( string $fixture, string $file ): void {
+		$this->list_fixture_as( $fixture, $file );
+		$this->served_as[ $file ] = $fixture;
+	}
+
+	/**
+	 * List the fixture as the manifest file's build, so a copy of it at that name is the font's own and not another
+	 * font's, which the plugin would save the real one beside
+	 */
+	protected function list_fixture_as( string $fixture, string $file ): void {
 		$manifest = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_manifest();
 
 		$manifest[ $file ] = $this->manifest_entry( $fixture, $manifest[ $file ]['url'] ?? 'https://example.com/' . $file );
 
 		$this->set_shared_manifest( $manifest );
-		$this->served_as[ $file ] = $fixture;
 	}
 
 	/**
@@ -254,9 +293,7 @@ trait CopiesFontFixtures {
 			FlushCache::flush();
 		}
 
-		if ( $this->served_as !== [] ) {
-			$this->set_shared_manifest( null );
-		}
+		$this->set_shared_manifest( null );
 
 		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'legacy_manifests', [] );
 
@@ -272,6 +309,7 @@ trait CopiesFontFixtures {
 	protected function put_freeserif_on_disk(): void {
 		foreach ( static::$freeserif as $file ) {
 			$this->copy_fixture( 'Chewy.ttf', $file );
+			$this->list_fixture_as( 'Chewy.ttf', $file );
 		}
 	}
 }
