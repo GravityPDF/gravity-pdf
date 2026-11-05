@@ -240,6 +240,39 @@ class Test_Controller_Custom_Fonts extends TestCase {
 	}
 
 	/**
+	 * @since 6.19.0
+	 */
+	public function test_add_item_does_not_save_under_a_core_fonts_hashed_name() {
+		wp_set_current_user( $this->admin_user );
+
+		$hashed = strtolower( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSansCondensed.ttf' ) );
+
+		$request = $this->new_font_request();
+		$this->set_font_files( $request, [ 'regular' => [ $hashed, self::$test_fonts[0] ] ] );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertFileExists( $font['regular'] );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . $hashed );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function test_add_item_finishes_when_a_taken_names_number_would_make_it_reserved() {
+		wp_set_current_user( $this->admin_user );
+		mkdir( $this->tmp_font_location . 'DejaVuSansCondensed-700.ttf' );
+
+		$request = $this->new_font_request();
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSansCondensed-700.ttf', self::$test_fonts[0] ] ] );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertMatchesRegularExpression( '/DejaVuSansCondensed-700_[0-9]{4}\.ttf$/', $font['regular'] );
+		$this->assertFileExists( $font['regular'] );
+	}
+
+	/**
 	 * @since 6.18.0
 	 */
 	public function test_add_item_saves_under_a_free_name_when_a_folder_has_the_name() {

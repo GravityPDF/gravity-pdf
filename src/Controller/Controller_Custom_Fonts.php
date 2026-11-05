@@ -19,6 +19,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Model\Model_Font_Downloader;
+use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Required_Fonts;
 use GFPDF\Statics\Upload_Size;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
@@ -664,7 +665,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * Save the font, adding a number to its name if the name is taken
+	 * Save the font, adding a number to its name if the name is taken or is one a core font's copy could have
 	 *
 	 * The library claims the name as it writes, so a clash only shows up as its DESTINATION_EXISTS error
 	 *
@@ -676,20 +677,37 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		$name = $file->getName();
 
 		for ( $attempt = 1; ; $attempt++ ) {
-			try {
-				$file->upload();
+			$reserved = $this->is_reserved_name( $file );
 
-				return;
-			} catch ( UploadException $e ) {
-				if ( $e->getErrorCode() !== ErrorCode::DESTINATION_EXISTS || $attempt === 10 ) {
-					throw $e;
+			if ( ! $reserved ) {
+				try {
+					$file->upload();
+
+					return;
+				} catch ( UploadException $e ) {
+					if ( $e->getErrorCode() !== ErrorCode::DESTINATION_EXISTS || $attempt >= 10 ) {
+						throw $e;
+					}
 				}
 			}
 
 			/* Leaves room for the dot, extension and number, which the library would otherwise cut off the end */
 			$base = mb_strcut( $name, 0, Filename::MAX_LENGTH - strlen( $file->getExtension() ) - 6, 'UTF-8' );
-			$file->setName( $base . wp_rand( 10000, 99999 ) );
+
+			/* Digits alone could complete a reserved name's hash */
+			$file->setName( $base . ( $reserved ? '_' . wp_rand( 1000, 9999 ) : wp_rand( 10000, 99999 ) ) );
 		}
+	}
+
+	/**
+	 * Whether the name is one a core font's copy could have, which is used before the file at the font's own name
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_reserved_name( File $file ): bool {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+
+		return $sources instanceof Model_Font_Sources && $sources->is_reserved_name( $file->getNameWithExtension() );
 	}
 
 	/**

@@ -275,6 +275,35 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->assertSame( 1, $this->required->get_installed_counts()['core']['installed'] );
 	}
 
+	public function test_another_fonts_file_at_a_name_is_not_an_installed_file() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->put_other_font_at( self::FONT );
+
+		$this->assertSame( 0, $this->required->get_installed_counts()['core']['installed'] );
+		$this->assertTrue( $this->required->needs_download( 'dejavuserifcondensed' ) );
+		$this->assertTrue( $this->required->pdf_needs_download( [ 'font' => 'dejavuserifcondensed' ] ) );
+
+		/* Its copy under the hashed name is */
+		$this->copy_fixture( self::FONT, GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) );
+
+		$this->assertSame( 1, $this->required->get_installed_counts()['core']['installed'] );
+	}
+
+	public function test_a_family_sharing_a_name_with_a_record_requires_its_hashed_file() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->put_other_font_at( self::FONT );
+		$this->add_record( 'mine', [ 'regular' => self::FONT ] );
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
+
+		$this->assertContains( $hashed, $this->required->get_required_font_files() );
+		$this->assertNotContains( self::FONT, $this->required->get_required_font_files() );
+		$this->assertSame( [ 'installed' => 0, 'total' => 4, 'manifest' => true ], $this->required->get_installed_counts()['core'] );
+
+		$this->copy_fixture( self::FONT, $hashed );
+
+		$this->assertSame( 1, $this->required->get_installed_counts()['core']['installed'] );
+	}
+
 	public function test_a_source_with_a_missing_manifest_is_flagged() {
 		$this->assertSame(
 			[

@@ -146,6 +146,14 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $legacy_manifests = [];
 
 	/**
+	 * Core font files a Font Manager record of the site also uses (see get_record_collisions()), by blog ID
+	 *
+	 * @var array<int, array<string, string>>
+	 * @since 6.19.0
+	 */
+	protected $record_collisions = [];
+
+	/**
 	 * @since 6.19.0
 	 */
 	public function __construct( Helper_Data $data, Model_Custom_Fonts $custom_fonts, LoggerInterface $log ) {
@@ -163,10 +171,12 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	public function get_sources(): array {
 		if ( $this->sources === null ) {
-			$this->sources = [
-				'bundled' => $this->get_bundled_source(),
-				'core'    => $this->get_core_source(),
-			];
+			$this->sources = $this->rename_colliding_files(
+				[
+					'bundled' => $this->get_bundled_source(),
+					'core'    => $this->get_core_source(),
+				]
+			);
 		}
 
 		return $this->sources;
@@ -350,6 +360,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		$this->font_data             = null;
 		$this->language_font_keys    = null;
 		$this->language_font_locales = null;
+		$this->record_collisions     = [];
 		delete_site_transient( self::LANGUAGE_FONT_KEYS );
 	}
 
@@ -482,7 +493,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Downloadable files across all sources, keyed by file name, read only when a file is needed
+	 * Downloadable files across all sources, keyed by file name, read only when a file is needed. A name two sources
+	 * use for different files is unique here: the later source's has the hashed name (see rename_colliding_files()).
 	 *
 	 * @return array<string, array{url: string, size: int, sha: string}>
 	 *
@@ -492,11 +504,31 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		if ( $this->manifest === null ) {
 			$this->manifest = [];
 			foreach ( array_keys( $this->get_sources() ) as $id ) {
-				$this->manifest += $this->get_source_manifest( (string) $id );
+				$this->manifest += $this->get_unaliased_manifest( (string) $id );
 			}
 		}
 
-		return $this->manifest;
+		return $this->with_record_aliases( $this->manifest );
+	}
+
+	/**
+	 * A manifest with entries for the hashed names of files a Font Manager record uses. Never memoised, as a record can
+	 * be added at any time.
+	 *
+	 * @param array<string, array{url: string, size: int, sha: string}> $manifest
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function with_record_aliases( array $manifest ): array {
+		foreach ( $this->get_record_collisions() as $file => $hashed ) {
+			if ( isset( $manifest[ $file ] ) ) {
+				$manifest[ $hashed ] = $manifest[ $file ];
+			}
+		}
+
+		return $manifest;
 	}
 
 	/**
@@ -522,11 +554,109 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_source_manifest( string $id ): array {
+		return $this->with_record_aliases( $this->get_unaliased_manifest( $id ) );
+	}
+
+	/**
+	 * A source's manifest as read, without the hashed names of files a Font Manager record uses
+	 *
+	 * @return array<string, array{url: string, size: int, sha: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_unaliased_manifest( string $id ): array {
+		/* Building the sources reads the manifests of those that share a file name with another */
+		$sources = $this->get_sources();
+
 		if ( ! isset( $this->manifests[ $id ] ) ) {
-			$this->manifests[ $id ] = $this->read_manifest( $this->get_sources()[ $id ] ?? [] );
+			$this->manifests[ $id ] = $this->read_manifest( $sources[ $id ] ?? [] );
 		}
 
 		return $this->manifests[ $id ];
+	}
+
+	/**
+	 * The core font files a Font Manager record of this site also uses, mapped to the hashed name their families take.
+	 * A record whose file is a known build of the core font (an adopted copy) isn't one. Never hashes.
+	 *
+	 * @return array<string, string>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_record_collisions(): array {
+		$blog = get_current_blog_id();
+		if ( isset( $this->record_collisions[ $blog ] ) ) {
+			return $this->record_collisions[ $blog ];
+		}
+
+		/* get_manifest() calls this, so it reads no collisions while they're worked out */
+		$this->record_collisions[ $blog ] = [];
+
+		$names = $this->get_record_file_names();
+		if ( count( $names ) === 0 ) {
+			return [];
+		}
+
+		$manifest = $this->get_manifest();
+
+		foreach ( $names as $file ) {
+			$path = $this->get_plain_path( $file );
+			if ( ! isset( $manifest[ $file ] ) || ! is_file( $path ) ) {
+				continue;
+			}
+
+			if ( ! isset( $this->get_known_builds( $file )[ (int) filesize( $path ) ] ) ) {
+				$this->record_collisions[ $blog ][ $file ] = $this->build_hashed_name( $file, $manifest[ $file ]['sha'] );
+			}
+		}
+
+		return $this->record_collisions[ $blog ];
+	}
+
+	/**
+	 * Whether a Font Manager record of this site uses the file, which then isn't the core font's
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_record_file( string $file ): bool {
+		return isset( $this->get_record_collisions()[ $file ] );
+	}
+
+	/**
+	 * The files of this site's Font Manager records that a downloadable family uses too, by name
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_record_file_names(): array {
+		$records = $this->custom_fonts->get_custom_fonts();
+		if ( count( $records ) === 0 ) {
+			return [];
+		}
+
+		$family_files = [];
+		foreach ( $this->get_sources() as $source ) {
+			foreach ( empty( $source['manifest'] ) ? [] : $source['families'] as $family ) {
+				foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
+					if ( is_array( $family ) && is_string( $family[ $style ] ?? null ) ) {
+						$family_files[ $family[ $style ] ] = true;
+					}
+				}
+			}
+		}
+
+		$names = [];
+		foreach ( $records as $record ) {
+			foreach ( [ 'regular', 'italics', 'bold', 'bolditalics' ] as $style ) {
+				$file = is_string( $record[ $style ] ?? null ) ? basename( $record[ $style ] ) : '';
+				if ( isset( $family_files[ $file ] ) ) {
+					$names[ $file ] = $file;
+				}
+			}
+		}
+
+		return array_values( $names );
 	}
 
 	/**
@@ -539,21 +669,175 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Where a file goes in the fonts folder
+	 * Where a manifest file goes in the fonts folder, under its own name
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_font_path( string $file ): string {
+	public function get_plain_path( string $file ): string {
 		return $this->data->template_font_location . $file;
 	}
 
 	/**
-	 * Whether a file is in the fonts folder
+	 * The path mPDF should load for a manifest file: its copy under the hashed name if there is one, else the file at
+	 * its own name, which may be missing. Stat calls only, no hashing.
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_font_path( string $file ): string {
+		return $this->has_hashed_copy( $file ) ? $this->get_plain_path( $this->get_hashed_name( $file ) ) : $this->get_plain_path( $file );
+	}
+
+	/**
+	 * The name a manifest file takes when another file holds its own: `{stem}-{first 8 of its SHA-1}{ext}`, e.g.
+	 * Garuda-0abddd35.ttf. '' when it can't take one: it isn't on the manifest, or the name is already hashed.
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_hashed_name( string $file ): string {
+		$entry = $this->get_manifest()[ $file ] ?? null;
+		if ( $entry === null ) {
+			return '';
+		}
+
+		$tag = '-' . substr( $entry['sha'], 0, 8 );
+		if ( substr( pathinfo( $file, PATHINFO_FILENAME ), -strlen( $tag ) ) === $tag ) {
+			return '';
+		}
+
+		return $this->build_hashed_name( $file, $entry['sha'] );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected function build_hashed_name( string $file, string $sha ): string {
+		$info = pathinfo( $file );
+
+		return $info['filename'] . '-' . substr( $sha, 0, 8 ) . ( isset( $info['extension'] ) ? '.' . $info['extension'] : '' );
+	}
+
+	/**
+	 * The manifest file name and SHA-1 prefix a `{stem}-{sha}{ext}` name holds
+	 *
+	 * @return array{file: string, sha: string}|null Null for any other name
+	 *
+	 * @since 6.19.0
+	 */
+	public function parse_hashed_name( string $name ): ?array {
+		if ( preg_match( '/^(.+)-([0-9a-f]{8})(\.[^.]+)$/i', $name, $match ) !== 1 ) {
+			return null;
+		}
+
+		return [
+			'file' => $match[1] . $match[3],
+			'sha'  => strtolower( $match[2] ),
+		];
+	}
+
+	/**
+	 * Whether a file name is a manifest file's hashed name
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_hashed_copy( string $name ): bool {
+		$parsed = $this->parse_hashed_name( $name );
+		$entry  = $parsed !== null ? $this->get_manifest()[ $parsed['file'] ] ?? null : null;
+
+		return $entry !== null && $parsed['sha'] === substr( $entry['sha'], 0, 8 );
+	}
+
+	/**
+	 * Whether a file name is one a manifest file could take as its hashed name, in any case and for any release's SHA-1
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_reserved_name( string $name ): bool {
+		$parsed = $this->parse_hashed_name( $name );
+
+		return $parsed !== null && isset( array_change_key_case( $this->get_manifest() )[ strtolower( $parsed['file'] ) ] );
+	}
+
+	/**
+	 * Whether the file's copy under its hashed name is in the fonts folder, going by its size
+	 *
+	 * @since 6.19.0
+	 */
+	public function has_hashed_copy( string $file ): bool {
+		$hashed = $this->get_hashed_name( $file );
+		if ( $hashed === '' ) {
+			return false;
+		}
+
+		$path = $this->get_plain_path( $hashed );
+
+		return is_file( $path ) && (int) filesize( $path ) === (int) $this->get_manifest()[ $file ]['size'];
+	}
+
+	/**
+	 * Whether a file is in the fonts folder at its name, which a render checks without reading the manifest
 	 *
 	 * @since 6.19.0
 	 */
 	public function is_downloaded( string $file ): bool {
-		return is_file( $this->get_font_path( $file ) );
+		return is_file( $this->get_plain_path( $file ) );
+	}
+
+	/**
+	 * Whether the file's own copy is in the fonts folder: its hashed copy, or the file at its name unless that is
+	 * another font's by size (see is_size_conflict())
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_installed( string $file ): bool {
+		return $this->has_hashed_copy( $file ) || ( is_file( $this->get_plain_path( $file ) ) && ! $this->is_size_conflict( $file ) );
+	}
+
+	/**
+	 * Whether the file at a manifest name is another font's going by its size alone: no build the sources know has it
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_size_conflict( string $file ): bool {
+		$path = $this->get_plain_path( $file );
+
+		/* With no other name to take, the file is the one that is used */
+		if ( $this->get_hashed_name( $file ) === '' || ! is_file( $path ) ) {
+			return false;
+		}
+
+		$size = (int) filesize( $path );
+
+		/* The usual case needs no legacy manifest */
+		return $size !== (int) $this->get_manifest()[ $file ]['size'] && ! isset( $this->get_known_builds( $file )[ $size ] );
+	}
+
+	/**
+	 * The builds of a manifest file the sources know (the manifest's, the legacy manifests' and the sources' `legacy`
+	 * hashes) as git blob SHA-1s by size
+	 *
+	 * @return array<int, string[]>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_known_builds( string $file ): array {
+		$entry  = $this->get_manifest()[ $file ] ?? null;
+		$builds = [];
+		if ( $entry !== null ) {
+			$builds[ $entry['size'] ][] = $entry['sha'];
+		}
+
+		foreach ( $this->get_sources() as $id => $source ) {
+			$old = $this->get_legacy_manifest( (string) $id )[ $file ] ?? null;
+			if ( $old !== null ) {
+				$builds[ $old['size'] ][] = $old['sha'];
+			}
+
+			foreach ( empty( $source['manifest'] ) ? [] : (array) ( $source['legacy'] ?? [] ) as $sha => $size ) {
+				$builds[ (int) $size ][] = (string) $sha;
+			}
+		}
+
+		return $builds;
 	}
 
 	/**
@@ -566,16 +850,40 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	public function register_font_data( $fonts ): array {
 		$fonts = is_array( $fonts ) ? $fonts : [];
 
+		$collisions = $this->get_record_collisions();
+
 		foreach ( $this->get_sources() as $source ) {
 			foreach ( $source['families'] as $key => $family ) {
 				if ( ! isset( $fonts[ $key ] ) ) {
 					unset( $family['name'], $family['listed'] );
 					$fonts[ $key ] = $family;
 				}
+
+				/* mPDF's own data already has the core families */
+				if ( is_array( $fonts[ $key ] ) && ! empty( $source['manifest'] ) ) {
+					$fonts[ $key ] = $this->use_hashed_names( $fonts[ $key ], $collisions );
+				}
 			}
 		}
 
 		return $fonts;
+	}
+
+	/**
+	 * A family with the given files renamed to their hashed names
+	 *
+	 * @param array<string, string> $collisions Hashed names by file name
+	 *
+	 * @since 6.19.0
+	 */
+	public function use_hashed_names( array $family, array $collisions ): array {
+		foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
+			if ( is_string( $family[ $style ] ?? null ) && isset( $collisions[ $family[ $style ] ] ) ) {
+				$family[ $style ] = $collisions[ $family[ $style ] ];
+			}
+		}
+
+		return $family;
 	}
 
 	/**
@@ -798,6 +1106,63 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Give a file name two sources use for different files its hashed name in the later source's manifest and families
+	 *
+	 * @param array<string, array> $sources
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function rename_colliding_files( array $sources ): array {
+		$downloadable = [];
+		foreach ( $sources as $id => $source ) {
+			if ( ! empty( $source['manifest'] ) ) {
+				$downloadable[] = $id;
+			}
+		}
+
+		if ( count( $downloadable ) < 2 ) {
+			return $sources;
+		}
+
+		$taken = [];
+		foreach ( $downloadable as $id ) {
+			$renames  = [];
+			$resolved = [];
+
+			foreach ( $this->read_manifest( $sources[ $id ] ) as $file => $entry ) {
+				$file = (string) $file;
+				$name = $file;
+
+				if ( isset( $taken[ $file ] ) && $taken[ $file ] !== $entry['sha'] ) {
+					$name             = $this->build_hashed_name( $file, $entry['sha'] );
+					$renames[ $file ] = $name;
+					$this->log->notice(
+						'Font file name used by two sources for different files',
+						[
+							'source' => $id,
+							'name'   => $file,
+							'as'     => $name,
+						]
+					);
+				}
+
+				$taken[ $name ]    = $taken[ $name ] ?? $entry['sha'];
+				$resolved[ $name ] = $entry;
+			}
+
+			$this->manifests[ $id ] = $resolved;
+
+			foreach ( array_filter( $sources[ $id ]['families'] ?? [], 'is_array' ) as $key => $family ) {
+				$sources[ $id ]['families'][ $key ] = $this->use_hashed_names( $family, $renames );
+			}
+		}
+
+		return $sources;
+	}
+
+	/**
 	 * A source's manifest, keyed by file name, skipping malformed entries
 	 *
 	 * @return array<string, array{url: string, size: int, sha: string}>
@@ -905,8 +1270,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 				return false;
 			}
 
-			/* mPDF finds a font by its file name in the fonts folder, so check the copy there */
-			$path = $this->get_font_path( basename( $file ) );
+			/* mPDF finds a font by its file name in the fonts folder, so check the copy there, not a hashed one */
+			$path = $this->get_plain_path( basename( $file ) );
 			if ( ! is_file( $path ) || ! is_readable( $path ) ) {
 				return false;
 			}

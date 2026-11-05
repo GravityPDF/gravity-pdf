@@ -16,6 +16,11 @@ use GFPDF_Vendor\Psr\Log\LoggerInterface;
 class Seamed_Font_Downloader extends Model_Font_Downloader {
 
 	/**
+	 * @var string[] The files hashed to find another font's, by name
+	 */
+	public $hashed = [];
+
+	/**
 	 * Build the downloader with the real dependencies, overriding the seams given
 	 *
 	 * @param array{sources?: Model_Font_Sources, budget?: int|float, jitter?: int, required?: string[]} $seams
@@ -46,5 +51,11 @@ class Seamed_Font_Downloader extends Model_Font_Downloader {
 	 */
 	public function set_required( array $files ): void {
 		$this->required_fonts->files = $files;
+	}
+
+	protected function hash_blob( string $path, int $size ): string {
+		$this->hashed[] = basename( $path );
+
+		return parent::hash_blob( $path, $size );
 	}
 }

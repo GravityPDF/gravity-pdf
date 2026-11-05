@@ -2370,8 +2370,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			$font_name  = basename( $font );
 			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
 
-			/* Check if it exists already, otherwise add it */
-			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false ) {
+			/* Check if it exists already, otherwise add it. A core font's copy under a hashed name is found by that font */
+			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false && ! $this->get_font_sources()->is_hashed_copy( $font_name ) ) {
 				$fonts[ $short_name ] = [
 					'R' => $font_name,
 				];
