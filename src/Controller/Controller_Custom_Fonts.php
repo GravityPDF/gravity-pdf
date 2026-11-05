@@ -85,7 +85,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 * @var string[] List of the standard font keys used when saving settings
 	 * @since 6.0
 	 */
-	protected $font_keys = [ 'regular', 'italics', 'bold', 'bolditalics' ];
+	protected $font_keys = Model_Custom_Fonts::FONT_STYLES;
 
 	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\GravityPdf\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\GravityPdf\\Upload\\File' ) {
 		$this->model         = $model;
@@ -428,7 +428,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			}
 
 			/* Not one an upload was just saved under, which happens when the old file had gone missing */
-			array_map( [ $this, 'delete_font_file' ], array_diff( $unused_files, $uncommitted_files ) );
+			$this->delete_unused_font_files( array_diff( $unused_files, $uncommitted_files ) );
 
 			$uncommitted_files = [];
 
@@ -554,14 +554,15 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			}
 
 			/* Delete TTF files from disk */
-			$font = $this->model->get_font_by_id( $id );
+			$font  = $this->model->get_font_by_id( $id );
+			$files = [];
 			foreach ( $this->font_keys as $font_id ) {
-				if ( empty( $font[ $font_id ] ) ) {
-					continue;
+				if ( ! empty( $font[ $font_id ] ) ) {
+					$files[] = basename( $font[ $font_id ] );
 				}
-
-				$this->delete_font_file( basename( $font[ $font_id ] ) );
 			}
+
+			$this->delete_unused_font_files( $files );
 
 			/* Update DB */
 			if ( ! $this->model->delete_font( $id ) ) {
@@ -737,6 +738,30 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		}
 
 		return __( 'The upload is not a valid TTF file', 'gravity-pdf' );
+	}
+
+	/**
+	 * Delete font files, keeping any another site's fonts use (the fonts folder is network-wide)
+	 *
+	 * @param string[] $files The filenames
+	 *
+	 * @since 6.19.0
+	 */
+	protected function delete_unused_font_files( array $files ): void {
+		if ( $files === [] ) {
+			return;
+		}
+
+		$shared = $this->model->get_files_used_by_other_sites();
+
+		foreach ( $files as $file ) {
+			if ( in_array( $file, $shared, true ) ) {
+				$this->log->debug( 'Kept a font file another site uses', [ 'file' => $file ] );
+				continue;
+			}
+
+			$this->delete_font_file( $file );
+		}
 	}
 
 	/**

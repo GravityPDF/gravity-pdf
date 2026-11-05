@@ -29,10 +29,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Custom_Fonts extends Helper_Abstract_Model {
 
 	/**
+	 * @var string[] The keys a font record stores its files under
+	 * @since 6.19.0
+	 */
+	public const FONT_STYLES = [ 'regular', 'italics', 'bold', 'bolditalics' ];
+
+	/**
 	 * @var Helper_Abstract_Options
 	 * @since 6.0
 	 */
 	protected $options;
+
+	/**
+	 * @var array<int, string[]> The files other sites' fonts use, keyed by the current site ID
+	 * @since 6.19.0
+	 */
+	protected $files_used_by_other_sites = [];
 
 	public function __construct( Helper_Abstract_Options $options ) {
 		$this->options = $options;
@@ -156,6 +168,70 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 		unset( $fonts[ $id ] );
 
 		return $this->options->update_option( 'custom_fonts', $fonts );
+	}
+
+	/**
+	 * The filenames the other sites' fonts use, read from each site's options table to avoid switch_to_blog()
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_files_used_by_other_sites(): array {
+		global $wpdb;
+
+		if ( ! is_multisite() ) {
+			return [];
+		}
+
+		$current_site = get_current_blog_id();
+		if ( isset( $this->files_used_by_other_sites[ $current_site ] ) ) {
+			return $this->files_used_by_other_sites[ $current_site ];
+		}
+
+		$site_ids = get_sites(
+			[
+				'fields'       => 'ids',
+				'number'       => 0,
+				'site__not_in' => [ $current_site ],
+			]
+		);
+
+		$files = [];
+
+		foreach ( $site_ids as $site_id ) {
+			$prefix   = $wpdb->get_blog_prefix( $site_id );
+			$settings = maybe_unserialize( $wpdb->get_var( "SELECT option_value FROM {$prefix}options WHERE option_name = 'gfpdf_settings' LIMIT 1" ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+			if ( ! is_array( $settings ) || ! is_array( $settings['custom_fonts'] ?? null ) ) {
+				continue;
+			}
+
+			foreach ( $settings['custom_fonts'] as $font ) {
+				if ( ! is_array( $font ) ) {
+					continue;
+				}
+
+				foreach ( self::FONT_STYLES as $style ) {
+					if ( is_string( $font[ $style ] ?? null ) && $font[ $style ] !== '' ) {
+						$files[] = basename( $font[ $style ] );
+					}
+				}
+			}
+		}
+
+		$this->files_used_by_other_sites[ $current_site ] = array_values( array_unique( $files ) );
+
+		return $this->files_used_by_other_sites[ $current_site ];
+	}
+
+	/**
+	 * Forget the other sites' font files read this request
+	 *
+	 * @since 6.19.0
+	 */
+	public function flush(): void {
+		$this->files_used_by_other_sites = [];
 	}
 
 	/**
