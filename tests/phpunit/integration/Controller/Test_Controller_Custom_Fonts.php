@@ -15,6 +15,8 @@ use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
 use GFPDF_Vendor\GravityPdf\Upload\File;
 use GFPDF_Vendor\GravityPdf\Upload\FileInfoInterface;
 use GFPDF_Vendor\GravityPdf\Upload\Storage\FileSystem;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger;
 use GPDFAPI;
 use ReflectionMethod;
 use WP_REST_Request;
@@ -808,6 +810,121 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_deleting_a_font_keeps_the_files_another_site_uses() {
+		global $gfpdf;
+
+		$this->skipWithoutMultisite();
+
+		[ $shared, $own, $other_site ] = $this->share_a_file_with_another_site();
+
+		$log = new TestHandler();
+		$gfpdf->log->pushHandler( $log );
+		$this->assertNull( $this->controller->delete_item( $this->delete_request( 'font' ) ) );
+		$gfpdf->log->popHandler();
+
+		$this->assertSame( [], $this->model->get_custom_fonts() );
+		$this->assertFileExists( $shared );
+		$this->assertFileDoesNotExist( $own );
+		$this->assertArrayHasKey( 'other', get_blog_option( $other_site, 'gfpdf_settings' )['custom_fonts'] );
+		$this->assertTrue( $log->hasRecordThatContains( 'Kept a font file another site uses', Logger::DEBUG ) );
+
+		/* The last site using the file removes it */
+		switch_to_blog( $other_site );
+		$gfpdf->options->set_plugin_settings();
+		$response = $this->controller->delete_item( $this->delete_request( 'other' ) );
+		restore_current_blog();
+		$gfpdf->options->set_plugin_settings();
+
+		$this->assertNull( $response );
+		$this->assertFileDoesNotExist( $shared );
+	}
+
+	public function test_deleting_a_font_named_like_a_core_font_keeps_the_core_hashed_copy() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$plain   = 'Garuda.ttf';
+		$hashed  = $sources->get_hashed_name( $plain );
+		$this->assertNotSame( '', $hashed );
+
+		$own = $this->copy_font( 0, $plain );
+		$this->copy_font( 1, $hashed );
+		$this->model->add_font( $this->font_record( 'font', $own ) );
+
+		$this->assertNull( $this->controller->delete_item( $this->delete_request( 'font' ) ) );
+
+		$this->assertFileDoesNotExist( $this->tmp_font_location . $plain );
+		$this->assertFileExists( $this->tmp_font_location . $hashed );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_keeps_a_replaced_file_another_site_uses() {
+		$this->skipWithoutMultisite();
+
+		[ $shared, $own, $other_site ] = $this->share_a_file_with_another_site();
+
+		$request = new WP_REST_Request( 'POST' );
+		$request->set_body_params(
+			[
+				'id'   => 'font',
+				'bold' => '',
+			]
+		);
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSans.ttf', self::$test_fonts[0] ] ] );
+
+		$updated = $this->controller->update_item( $request );
+
+		$this->assertNotSame( $shared, $updated['regular'] );
+		$this->assertSame( '', $updated['bold'] );
+		$this->assertFileExists( $shared );
+		$this->assertFileDoesNotExist( $own );
+	}
+
+	/**
+	 * Save a font whose regular file another site's font also uses, and whose bold file is only its own
+	 *
+	 * @return array{0: string, 1: string, 2: int} The shared file, the font's own file and the other site's ID
+	 */
+	protected function share_a_file_with_another_site(): array {
+		$shared = $this->copy_font( 0, 'Shared.ttf' );
+		$own    = $this->copy_font( 1, 'Own.ttf' );
+		$this->model->add_font( $this->font_record( 'font', $shared, $own ) );
+
+		$other_site = self::factory()->blog->create();
+		update_blog_option( $other_site, 'gfpdf_settings', [ 'custom_fonts' => [ 'other' => $this->font_record( 'other', $shared ) ] ] );
+
+		return [ $shared, $own, $other_site ];
+	}
+
+	protected function copy_font( int $fixture, string $name ): string {
+		copy( self::$test_fonts[ $fixture ], $this->tmp_font_location . $name );
+
+		return $this->tmp_font_location . $name;
+	}
+
+	protected function font_record( string $id, string $regular, string $bold = '' ): array {
+		return [
+			'id'          => $id,
+			'font_name'   => $id,
+			'regular'     => $regular,
+			'italics'     => '',
+			'bold'        => $bold,
+			'bolditalics' => '',
+			'useOTL'      => 0x00,
+			'useKashida'  => 0,
+		];
+	}
+
+	protected function delete_request( string $id ): WP_REST_Request {
+		$request = new WP_REST_Request( 'DELETE' );
+		$request->set_param( 'id', $id );
+
+		return $request;
 	}
 
 	public function test_delete_item_invalid_font_id() {
