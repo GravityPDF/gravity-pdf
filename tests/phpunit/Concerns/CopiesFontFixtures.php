@@ -151,6 +151,21 @@ trait CopiesFontFixtures {
 	}
 
 	/**
+	 * Write a manifest under a unique name, so opcache never serves an earlier test's copy
+	 *
+	 * @param array|string $manifest Entries, or the file's raw contents
+	 */
+	protected function write_manifest_file( $manifest ): string {
+		$path = get_temp_dir() . 'gfpdf-test-manifest-' . wp_generate_password( 8, false ) . '.php';
+
+		$contents = is_array( $manifest ) ? '<?php return ' . var_export( $manifest, true ) . ';' : $manifest; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+		file_put_contents( $path, $contents ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		$this->copied_fonts[] = $path;
+
+		return $path;
+	}
+
+	/**
 	 * Answer every font download with the response. A 200 streams the URL's fixture font (changed by $change) into it.
 	 *
 	 * @param array|WP_Error|null $response Defaults to a 200

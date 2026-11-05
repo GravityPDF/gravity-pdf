@@ -13,6 +13,7 @@ action gfpdf_entry_detail_post_pdf_name_markup 2
 action gfpdf_entry_detail_pre_markup 1
 action gfpdf_entry_detail_pre_pdf_links_markup 2
 action gfpdf_entry_detail_pre_pdf_name_markup 2
+action gfpdf_font_sources_changed 1
 action gfpdf_form_settings_rest_after_insert_pdf 3
 action gfpdf_form_settings_rest_after_update_pdf 3
 action gfpdf_form_settings_rest_delete_pdf 3
@@ -138,6 +139,7 @@ filter gfpdf_first_page_footer_field_setting 1
 filter gfpdf_first_page_header_field_setting 1
 filter gfpdf_font_list 1
 filter gfpdf_font_location 3
+filter gfpdf_font_sources 1
 filter gfpdf_footer_field_setting 1
 filter gfpdf_form_add_pdf 2
 filter gfpdf_form_data 3
