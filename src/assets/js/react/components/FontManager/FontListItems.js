@@ -14,7 +14,6 @@ import FontListIcon from './FontListIcon';
 import Spinner from '../Spinner';
 /* Utilities */
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
-import { getTabLocation } from '../../utilities/FontManager/getTabLocation';
 
 /**
  * @package			Gravity PDF
@@ -63,25 +62,24 @@ export class FontListItems extends Component {
 	/**
 	 * Initialize component state
 	 *
-	 * @type {{ disableSelectFontName: boolean, deleteId: string, moveSelectedFontToTop: boolean }}
+	 * @type {{ deleteId: string, moveSelectedFontToTop: boolean }}
 	 *
 	 * @since 6.0
 	 */
 	state = {
-		disableSelectFontName: false,
 		deleteId: '',
 		moveSelectedFontToTop: true,
 	};
 
 	/**
-	 * On mount, Call the method handleDisableSelectFields()
+	 * On mount, select the font chosen in the parent font dropdown
 	 *
 	 * @since 6.0
 	 */
 	componentDidMount() {
 		const { selectedFont } = this.props;
 
-		this.handleDisableSelectFields();
+		this.handleSetSelectedFontNameValue();
 
 		/* Move selected font at the top of the list */
 		if (selectedFont) {
@@ -127,42 +125,18 @@ export class FontListItems extends Component {
 	}
 
 	/**
-	 * Check URL to distinguish the current location. If current location is under
-	 * tools tab then disable select font name functionality (radio button)
-	 *
-	 * @since 6.0
-	 */
-	handleDisableSelectFields = () => {
-		const tabLocation = getTabLocation();
-
-		if (tabLocation === 'tools') {
-			return this.setState({ disableSelectFontName: true });
-		}
-
-		this.handleSetSelectedFontNameValue(tabLocation);
-	};
-
-	/**
 	 * Handle the functionality to select and set default font type to be used in PDFs (radio button)
 	 *
-	 * @param { string } location
-	 *
 	 * @since 6.0
 	 */
-	handleSetSelectedFontNameValue = (location) => {
-		let fontManagerSelectBoxValue;
+	handleSetSelectedFontNameValue = () => {
 		const { fontList, selectFont } = this.props;
 
-		/* If location not under Global/General settings */
-		if (location !== 'PDF' && location !== 'general') {
-			fontManagerSelectBoxValue = document.querySelector(
-				'#gfpdf_settings\\[font\\]'
-			).value;
-		} else {
-			fontManagerSelectBoxValue = document.querySelector(
-				'#gfpdf_settings\\[default_font\\]'
-			).value;
-		}
+		/* A form's PDF settings have the Font field, the global settings the Default Font field */
+		const fontManagerSelectBoxValue = (
+			document.querySelector('#gfpdf_settings\\[font\\]') ||
+			document.querySelector('#gfpdf_settings\\[default_font\\]')
+		).value;
 
 		/* Do nothing if selected value doesn't exist on font manager fontList */
 		if (
@@ -357,7 +331,7 @@ export class FontListItems extends Component {
 	 */
 	render() {
 		const updateFontVisible = document.querySelector('.update-font.show');
-		const { disableSelectFontName, deleteId } = this.state;
+		const { deleteId } = this.state;
 		const { id, loading, fontList, searchResult, selectedFont } =
 			this.props;
 		const list = !searchResult ? fontList : searchResult;
@@ -388,28 +362,26 @@ export class FontListItems extends Component {
 								role="option"
 							>
 								<span className="font-name">
-									{!disableSelectFontName && (
-										<input
-											type="radio"
-											className="select-font-name"
-											name={'select-font-name-' + font.id}
-											value={font.id}
-											onChange={(e) =>
-												this.handleSelectFont(e)
-											}
-											onClick={(e) => e.stopPropagation()}
-											onKeyDown={(e) =>
-												this.handleSelectFontKeypress(e)
-											}
-											checked={font.id === selectedFont}
-											aria-label={
-												GFPDF.fontManagerSelectFontAriaLabel +
-												': ' +
-												font.font_name
-											}
-											tabIndex={tabIndex}
-										/>
-									)}
+									<input
+										type="radio"
+										className="select-font-name"
+										name={'select-font-name-' + font.id}
+										value={font.id}
+										onChange={(e) =>
+											this.handleSelectFont(e)
+										}
+										onClick={(e) => e.stopPropagation()}
+										onKeyDown={(e) =>
+											this.handleSelectFontKeypress(e)
+										}
+										checked={font.id === selectedFont}
+										aria-label={
+											GFPDF.fontManagerSelectFontAriaLabel +
+											': ' +
+											font.font_name
+										}
+										tabIndex={tabIndex}
+									/>
 									{font.font_name}
 								</span>
 

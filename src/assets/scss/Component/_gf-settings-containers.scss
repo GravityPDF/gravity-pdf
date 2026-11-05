@@ -1,11 +1,6 @@
 
 #tab_PDF {
 
-  /* Used on Tools page to pad out the back-to-back forms */
-  form + form {
-    margin-top: 2rem;
-  }
-
   /* Auto clear each wrapper */
   .gfpdf-settings-field-wrapper:after {
     content: '';

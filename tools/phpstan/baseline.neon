@@ -2000,12 +2000,6 @@ parameters:
 			path: ../../src/View/html/Settings/sub_menu.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../src/View/html/Settings/tools.php
-
-		-
 			message: '#^PHPDoc tag @var has invalid value \(\$args array\)\: Unexpected token "\$args", expected type at offset 9 on line 1$#'
 			identifier: phpDoc.parseError
 			count: 1

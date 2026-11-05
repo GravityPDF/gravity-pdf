@@ -36,7 +36,7 @@ describe('FontManager - FontListItems.js', () => {
 	};
 
 	describe('RUN LIFECYCLE METHODS', () => {
-		test('componentDidMount() - Call the method handleDisableSelectFields()', () => {
+		test('componentDidMount() - Call the method handleSetSelectedFontNameValue()', () => {
 			// Mock font manager select box DOM
 			document.body.innerHTML =
 				'<select id="gfpdf_settings[font]" name="gfpdf_settings[font]">' +
@@ -48,14 +48,14 @@ describe('FontManager - FontListItems.js', () => {
 
 			const wrapper = shallow(<FontListItems {...props} />);
 			const instance = wrapper.instance();
-			const handleDisableSelectFields = jest.spyOn(
+			const handleSetSelectedFontNameValue = jest.spyOn(
 				instance,
-				'handleDisableSelectFields'
+				'handleSetSelectedFontNameValue'
 			);
 
 			instance.componentDidMount();
 
-			expect(handleDisableSelectFields).toHaveBeenCalledTimes(1);
+			expect(handleSetSelectedFontNameValue).toHaveBeenCalledTimes(1);
 		});
 
 		test('componentDidMount() - Call the method handleMoveSelectedFontAtTheTopOfTheList()', () => {
@@ -122,21 +122,7 @@ describe('FontManager - FontListItems.js', () => {
 	});
 
 	describe('RUN COMPONENT METHODS', () => {
-		test('handleDisableSelectFields() - Disable select font name functionality (radio button)', () => {
-			delete window.location;
-			window.location = {
-				search: '?page=gf_settings&subview=PDF&tab=tools',
-			};
-
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-
-			instance.handleDisableSelectFields();
-
-			expect(wrapper.state('disableSelectFontName')).toBe(true);
-		});
-
-		test('handleSetSelectedFontNameValue() - If location is under global or general settings', () => {
+		test('handleSetSelectedFontNameValue() - Reads the global Default Font field', () => {
 			// Mock font manager select box DOM
 			document.body.innerHTML =
 				'<select id="gfpdf_settings[default_font]" name="gfpdf_settings[default_font]">' +
@@ -153,13 +139,13 @@ describe('FontManager - FontListItems.js', () => {
 				'handleCheckSelectBoxValue'
 			);
 
-			instance.handleSetSelectedFontNameValue('general');
+			instance.handleSetSelectedFontNameValue();
 
 			expect(handleCheckSelectBoxValue).toHaveBeenCalledTimes(1);
 			expect(props.selectFont).toHaveBeenCalledTimes(1);
 		});
 
-		test('handleSetSelectedFontNameValue() - If location is not under global or general settings', () => {
+		test('handleSetSelectedFontNameValue() - Reads the form Font field', () => {
 			// Mock font manager select box DOM
 			document.body.innerHTML =
 				'<select id="gfpdf_settings[font]" name="gfpdf_settings[font]">' +
@@ -176,7 +162,7 @@ describe('FontManager - FontListItems.js', () => {
 				'handleCheckSelectBoxValue'
 			);
 
-			instance.handleSetSelectedFontNameValue('435');
+			instance.handleSetSelectedFontNameValue();
 
 			expect(handleCheckSelectBoxValue).toHaveBeenCalledTimes(1);
 			expect(props.selectFont).toHaveBeenCalledTimes(1);

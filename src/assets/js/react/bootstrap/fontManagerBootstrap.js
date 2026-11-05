@@ -25,20 +25,17 @@ const AdvancedButton = lazy(
 /**
  * Mount our font manager advanced button on the DOM
  *
- * @param { HTMLDivElement } defaultFontField
- * @param { string }         buttonStyle
+ * @param { HTMLSelectElement } defaultFontField
  *
  * @since 6.0
  */
-export function fontManagerBootstrap(defaultFontField, buttonStyle) {
+export function fontManagerBootstrap(defaultFontField) {
 	const store = getStore();
-	/* Prevent button reset styling on tools tab */
-	const preventButtonReset = !buttonStyle ? '' : buttonStyle;
 
-	createAdvancedButtonWrapper(defaultFontField, preventButtonReset);
+	createAdvancedButtonWrapper(defaultFontField);
 
 	const container = document.querySelector(
-		'#gpdf-advance-font-manager-selector' + preventButtonReset
+		'#gpdf-advance-font-manager-selector'
 	);
 
 	const root = createRoot(container);
@@ -65,37 +62,22 @@ const AdvancedButtonWithRouter = withRouterHooks(AdvancedButton);
 /**
  * Create html element wrapper for our font manager advanced button
  *
- * @param { HTMLDivElement } defaultFontField
- * @param { string }         preventButtonReset
+ * @param { HTMLSelectElement } defaultFontField
  *
  * @since 6.0
  */
-export function createAdvancedButtonWrapper(
-	defaultFontField,
-	preventButtonReset
-) {
+export function createAdvancedButtonWrapper(defaultFontField) {
 	const fontWrapper = document.createElement('span');
-	fontWrapper.setAttribute(
-		'id',
-		'gpdf-advance-font-manager-selector' + preventButtonReset
-	);
+	fontWrapper.setAttribute('id', 'gpdf-advance-font-manager-selector');
 
 	const popupWrapper = document.createElement('div');
 	popupWrapper.setAttribute('id', 'font-manager-overlay');
 	popupWrapper.setAttribute('class', 'theme-overlay');
 
-	if (defaultFontField.nodeName === 'SELECT') {
-		const wrapper = document.createElement('div');
-		wrapper.setAttribute(
-			'id',
-			'gfpdf-settings-field-wrapper-font-container'
-		);
-		wrapper.innerHTML = defaultFontField.outerHTML;
-		wrapper.appendChild(fontWrapper);
-		wrapper.appendChild(popupWrapper);
-		defaultFontField.outerHTML = wrapper.outerHTML;
-	} else {
-		defaultFontField.appendChild(fontWrapper);
-		defaultFontField.appendChild(popupWrapper);
-	}
+	const wrapper = document.createElement('div');
+	wrapper.setAttribute('id', 'gfpdf-settings-field-wrapper-font-container');
+	wrapper.innerHTML = defaultFontField.outerHTML;
+	wrapper.appendChild(fontWrapper);
+	wrapper.appendChild(popupWrapper);
+	defaultFontField.outerHTML = wrapper.outerHTML;
 }

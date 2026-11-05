@@ -163,16 +163,7 @@ class Test_Settings extends TestCase {
 				]
 			)
 		);
-		$this->assertSame(
-			10,
-			has_filter(
-				'gfpdf_settings_navigation',
-				[
-					$this->controller,
-					'disable_tools_on_view_cap',
-				]
-			)
-		);
+		$this->assertFalse( has_filter( 'gfpdf_settings_navigation', [ $this->controller, 'disable_tools_on_view_cap' ] ) );
 
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', [ $gfpdf->options, 'highlight_errors' ] ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */
@@ -229,16 +220,11 @@ class Test_Settings extends TestCase {
 
 		$this->assertStringContainsString( '<div id="gpdf-search">', $html );
 
-		/* test help tab */
+		/* The Tools tab was removed */
+		ob_start();
 		$_GET['tab'] = 'tools';
-
-		try {
-			$this->controller->display_page();
-			$this->fail( 'Expected Exception on tools tab capability check was not thrown.' );
-		} catch ( Exception $e ) {
-			$this->assertSame( 'You do not have permission to access this page', $e->getMessage() );
-		}
-
+		$this->controller->display_page();
+		$this->assertSame( '', ob_get_clean() );
 	}
 
 	/**
@@ -265,19 +251,27 @@ class Test_Settings extends TestCase {
 	}
 
 	/**
-	 * Check the tools tab gets hidden when the user permissions aren't high enough
+	 * Slot 100 was the Tools tab's, and hiding it from users who can't edit settings mustn't take an add-on's tab
 	 *
-	 * @since 4.0
+	 * @since 6.19.0
 	 */
-	public function test_disable_tools_on_view_cap() {
-		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
-		$this->assertNotContains( 'tools', $tabs );
+	public function test_an_addon_tab_in_the_tools_slot_is_kept() {
+		$add_tab = static function ( $nav ) {
+			$nav[100] = [
+				'name' => 'Add-on',
+				'id'   => 'addon',
+			];
 
-		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		wp_set_current_user( $user_id );
+			return $nav;
+		};
+
+		add_filter( 'gfpdf_settings_navigation', $add_tab );
 
 		$tabs = wp_list_pluck( $this->view->get_available_tabs(), 'id' );
-		$this->assertContains( 'tools', $tabs );
+
+		remove_filter( 'gfpdf_settings_navigation', $add_tab );
+
+		$this->assertSame( [ 'general', 'addon', 'help' ], array_values( $tabs ) );
 	}
 
 	/**

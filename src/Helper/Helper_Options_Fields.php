@@ -114,7 +114,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'    => 'select',
 						'options' => $fonts,
 						'std'     => Model_Font_Sources::ARIMO,
-						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-pdf' ),
+						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-pdf' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the Manage button to install your own.', 'gravity-pdf' ),
 						'class'   => 'gfpdf-font-manager',
 					],
 
@@ -256,24 +256,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'licenses'                        => apply_filters(
 				'gfpdf_settings_licenses',
 				[]
-			),
-
-			/*
-			 * Tools Settings
-			 *
-			 * See https://docs.gravitypdf.com/developers/filters/gfpdf_settings_tools/ for more details about this filter
-			 */
-			'tools'                           => apply_filters(
-				'gfpdf_settings_tools',
-				[
-					'manage_fonts' => [
-						'id'   => 'manage_fonts',
-						'name' => esc_html__( 'Fonts', 'gravity-pdf' ),
-						/* translators: 1: Opening <code> tag, 2: Closing </code> tag */
-						'desc' => '<div class="gform-settings-description gform-kitchen-sink">' . sprintf( esc_html__( 'Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font files are supported.', 'gravity-pdf' ), '<code>', '</code>' ) . '</div>',
-						'type' => 'descriptive_text',
-					],
-				]
 			),
 
 			/*

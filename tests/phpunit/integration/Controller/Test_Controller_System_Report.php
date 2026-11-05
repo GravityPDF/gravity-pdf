@@ -410,6 +410,19 @@ class Test_Controller_System_Report extends TestCase {
 		remove_filter( 'gfpdfe_pdf_filename', $callback );
 	}
 
+	public function test_system_report_tools_tab_hooks() {
+		$this->assertArrayNotHasKey( 'tools_tab_hooks', $this->get_unsupported_features() );
+
+		add_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+		Deprecation::flush_cache();
+
+		$items = $this->get_unsupported_features();
+		$this->assertArrayHasKey( 'tools_tab_hooks', $items );
+		$this->assertSame( 'gfpdf_settings_tools has 1 listener', $items['tools_tab_hooks']['value_export'] );
+
+		remove_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+	}
+
 	/**
 	 * Get the Site Health test the controller registers
 	 */

@@ -6,7 +6,6 @@ import FontManagerHeader from './FontManagerHeader';
 import FontManagerBody from './FontManagerBody';
 import { connect } from 'react-redux';
 import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox';
-import { getTabLocation } from '../../utilities/FontManager/getTabLocation';
 
 /**
  * @package     Gravity PDF
@@ -74,9 +73,7 @@ export class FontManager extends Component {
 
 		const { fontList, selectedFont } = this.props;
 		/* When closed, ensure font select box has the latest custom font data */
-		if (getTabLocation() !== 'tools') {
-			return associatedFontManagerSelectBox(fontList, selectedFont);
-		}
+		associatedFontManagerSelectBox(fontList, selectedFont);
 	}
 
 	/**

@@ -43,6 +43,7 @@ class Test_Removed_Methods extends TestCase {
 			[ \GFPDF\Router::class ],
 			[ \GFPDF\Controller\Controller_Install::class ],
 			[ \GFPDF\Controller\Controller_PDF::class ],
+			[ \GFPDF\Controller\Controller_Settings::class ],
 			[ \GFPDF\Controller\Controller_Pdf_Queue::class ],
 			[ \GFPDF\Controller\Controller_Save_Core_Fonts::class ],
 			[ Helper_Abstract_Options::class ],
@@ -125,25 +126,34 @@ class Test_Removed_Methods extends TestCase {
 	}
 
 	/**
-	 * The Core Font installer went in 6.19.0
+	 * The Core Font installer and the Tools tab went in 6.19.0
 	 *
 	 * @since 6.19.0
 	 */
-	public function test_the_core_font_installer_methods_report_6_19() {
-		$this->setExpectedDeprecated( \GFPDF\Router::class . '::load_core_font_handler' );
-		$this->setExpectedDeprecated( \GFPDF\Model\Model_Actions::class . '::core_font_condition' );
-		$this->setExpectedDeprecated( \GFPDF\Model\Model_Actions::class . '::core_font_redirect' );
+	public function removed_in_6_19(): array {
+		return [
+			[ \GFPDF\Router::class, 'load_core_font_handler' ],
+			[ \GFPDF\Model\Model_Actions::class, 'core_font_condition' ],
+			[ \GFPDF\Model\Model_Actions::class, 'core_font_redirect' ],
+			[ \GFPDF\Controller\Controller_Settings::class, 'disable_tools_on_view_cap' ],
+		];
+	}
+
+	/**
+	 * @dataProvider removed_in_6_19
+	 *
+	 * @since 6.19.0
+	 */
+	public function test_a_method_removed_in_6_19_reports_it( string $class, string $method ) {
+		$name = $class . '::' . $method;
+		$this->setExpectedDeprecated( $name );
 
 		$this->record_deprecated_versions();
 
-		$this->assertNull( $this->gfpdf()->load_core_font_handler() );
+		$instance = $class === \GFPDF\Router::class ? $this->gfpdf() : \GPDFAPI::get_mvc_class( substr( strrchr( $class, '\\' ), 1 ) );
 
-		$actions = \GPDFAPI::get_mvc_class( 'Model_Actions' );
-		$this->assertNull( $actions->core_font_condition() );
-		$this->assertNull( $actions->core_font_redirect() );
-
-		$this->assertSame( [ '6.19.0' ], array_values( array_unique( $this->deprecated_versions ) ) );
-		$this->assertCount( 3, $this->deprecated_versions );
+		$this->assertNull( $instance->$method() );
+		$this->assertSame( [ $name => '6.19.0' ], $this->deprecated_versions );
 	}
 
 	/**
