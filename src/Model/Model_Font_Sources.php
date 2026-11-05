@@ -4,7 +4,6 @@ declare( strict_types=1 );
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Statics\Git_Blob;
@@ -668,7 +667,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 
 		$names = [];
 		foreach ( $records as $record ) {
-			foreach ( [ 'regular', 'italics', 'bold', 'bolditalics' ] as $style ) {
+			foreach ( Model_Custom_Fonts::FONT_STYLES as $style ) {
 				$file = is_string( $record[ $style ] ?? null ) ? basename( $record[ $style ] ) : '';
 				if ( isset( $family_files[ $file ] ) ) {
 					$names[ $file ] = $file;
@@ -1032,39 +1031,30 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Remove a custom font record, and outside Multisite its files too: another site's record may use the shared fonts
-	 * folder. Logs and returns false on failure
+	 * Remove a custom font record and the files no other site uses. Logs and returns false on failure
 	 *
 	 * @since 6.19.0
 	 */
 	protected function remove_record( string $id ): bool {
-		$removed = false;
-		$error   = '';
+		$error = '';
 
 		try {
-			if ( ! is_multisite() ) {
-				$removed = GPDFAPI::delete_pdf_font( $id ) === true;
-			} elseif ( $this->custom_fonts->delete_font( $id ) ) {
-				FlushCache::flush( $id );
-				$removed = true;
+			if ( GPDFAPI::delete_pdf_font( $id ) === true ) {
+				return true;
 			}
 		} catch ( Throwable $e ) {
 			$error = $e->getMessage();
 		}
 
-		if ( ! $removed ) {
-			$this->log->error(
-				'Could not remove a custom font record replaced by a font source',
-				[
-					'font'      => $id,
-					'exception' => $error,
-				]
-			);
+		$this->log->error(
+			'Could not remove a custom font record replaced by a font source',
+			[
+				'font'      => $id,
+				'exception' => $error,
+			]
+		);
 
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	/**

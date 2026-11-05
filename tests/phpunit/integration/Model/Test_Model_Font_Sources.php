@@ -4,7 +4,6 @@ declare( strict_types=1 );
 
 namespace GFPDF\Model;
 
-use GFPDF\Exceptions\GravityPdfIdException;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\Seamed_Font_Downloader;
 use GFPDF\Tests\Concerns\UnregistersMvcClasses;
@@ -427,10 +426,8 @@ class Test_Model_Font_Sources extends TestCase {
 
 		$this->assertSame( [ 'dejavusanscondensed' ], $this->model->adopt_records( 'core' ) );
 		$this->assertSame( [], $this->custom_fonts->get_custom_fonts() );
-
-		/* Multisite keeps the files in the shared fonts folder */
-		$this->assertSame( is_multisite(), is_file( $this->font_dir . 'DejaVuSansCondensed85274.ttf' ) );
-		$this->assertSame( is_multisite(), is_file( $this->font_dir . 'DejaVuSans-Bold.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_dir . 'DejaVuSansCondensed85274.ttf' );
+		$this->assertFileDoesNotExist( $this->font_dir . 'DejaVuSans-Bold.ttf' );
 	}
 
 	public function test_adopt_records_removes_a_record_of_the_core_font_installers_files() {
@@ -486,7 +483,7 @@ class Test_Model_Font_Sources extends TestCase {
 
 		$this->assertSame( [ 'arimo' ], $model->adopt_records( 'bundled' ) );
 		$this->assertSame( [], $this->custom_fonts->get_custom_fonts() );
-		$this->assertSame( is_multisite(), is_file( $this->font_dir . 'Arimo-Regular85274.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_dir . 'Arimo-Regular85274.ttf' );
 	}
 
 	public function test_adopt_records_keeps_an_edited_record() {
@@ -933,10 +930,6 @@ class Test_Model_Font_Sources extends TestCase {
 	}
 
 	public function test_adopt_records_keeps_the_record_when_the_custom_fonts_controller_is_unhooked() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Multisite removes the record through the model' );
-		}
-
 		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
 		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
 		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
@@ -952,22 +945,22 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertFileExists( $this->font_dir . 'Arimo-Regular.ttf' );
 	}
 
-	public function test_adopt_records_logs_a_record_removed_elsewhere_on_multisite() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Single site removes the record through the API' );
-		}
+	/**
+	 * @group ms-required
+	 */
+	public function test_adopt_records_keeps_a_file_another_site_uses() {
+		$this->skipWithoutMultisite();
 
-		$custom_fonts = new class( GPDFAPI::get_options_class() ) extends Model_Custom_Fonts {
-			public function delete_font( string $id ): bool {
-				throw new GravityPdfIdException();
-			}
-		};
-
-		$model = $this->get_model_with_legacy( 'Chewy.ttf', $custom_fonts );
+		$model = $this->get_model_with_legacy( 'Chewy.ttf' );
 		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
 		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
 
-		$this->assert_record_kept( $model->adopt_records( 'bundled' ) );
+		$other_site = self::factory()->blog->create();
+		update_blog_option( $other_site, 'gfpdf_settings', [ 'custom_fonts' => $this->custom_fonts->get_custom_fonts() ] );
+
+		$this->assertSame( [ 'arimo' ], $model->adopt_records( 'bundled' ) );
+		$this->assertSame( [], $this->custom_fonts->get_custom_fonts() );
+		$this->assertFileExists( $this->font_dir . 'Arimo-Regular.ttf' );
 	}
 
 	public function test_adopt_records_moves_on_after_an_error_removing_a_record() {
