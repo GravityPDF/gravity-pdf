@@ -236,8 +236,51 @@ class Test_Model_Font_Downloader extends TestCase {
 		$downloader = $this->new_downloader( file_get_contents( $this->font_fixture( self::FONT ) ) );
 		$this->serve_font_downloads();
 
-		$this->assertFalse( $downloader->download( self::FONT ) );
+		$this->assertTrue( $downloader->download( self::FONT ) );
 		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
+		$this->assertNoStrayTmpFiles();
+		$this->assertEmpty( $this->get_font_failures() );
+		$this->assertCount( 1, $this->log_messages( 'Font already in place after a failed move' ) );
+	}
+
+	public function test_a_font_on_disk_clears_its_stale_failure() {
+		$this->set_font_failures( [ self::FONT => $this->failure( time() ) ] );
+		$this->set_back_off( self::FONT );
+		$this->copy_fixture( self::FONT );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+
+		$this->assertSame( [], $this->requested );
+		$this->assertEmpty( $this->get_font_failures() );
+		$this->assertFalse( $this->get_back_off( self::FONT ) );
+	}
+
+	public function test_a_failed_move_to_a_hashed_copy_another_request_saved_is_not_a_failure() {
+		$this->put_other_font_at( self::FONT );
+		$hashed     = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
+		$downloader = $this->new_downloader( file_get_contents( $this->font_fixture( self::FONT ) ) );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $downloader->download( self::FONT ) );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ), 'The other font is left alone' );
+		$this->assertNoStrayTmpFiles();
+		$this->assertEmpty( $this->get_font_failures() );
+		$this->assertCount( 1, $this->log_messages( 'Font already in place after a failed move' ) );
+	}
+
+	public function test_a_hashed_copy_on_disk_clears_its_stale_failure() {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
+		$this->set_font_failures( [ self::FONT => $this->failure( time() ) ] );
+		$this->put_other_font_at( self::FONT );
+		$this->copy_fixture( self::FONT, $hashed );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+
+		$this->assertSame( [], $this->requested );
+		$this->assertEmpty( $this->get_font_failures() );
 	}
 
 	/**
