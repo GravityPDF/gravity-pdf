@@ -332,7 +332,6 @@ class Helper_Data {
 				'fontManagerPreview'                   => esc_html__( 'Preview', 'gravity-pdf' ),
 				'fontManagerPreviewStyle'              => esc_html__( 'Style to preview', 'gravity-pdf' ),
 				'fontManagerPreviewAll'                => esc_html__( 'Show all', 'gravity-pdf' ),
-				'fontManagerPreviewUnsupported'        => esc_html__( 'Browsers can\'t display this font file, so it can\'t be previewed.', 'gravity-pdf' ),
 				'fontManagerPreviewFailed'             => esc_html__( 'Couldn\'t load this style', 'gravity-pdf' ),
 				'fontManagerPreviewLoad'               => esc_html__( 'Load preview', 'gravity-pdf' ),
 				'fontManagerPreviewUnavailable'        => esc_html__( 'Previews aren\'t available because the fonts folder has no web address.', 'gravity-pdf' ),

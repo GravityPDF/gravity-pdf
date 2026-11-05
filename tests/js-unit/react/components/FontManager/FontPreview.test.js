@@ -113,15 +113,6 @@ describe('FontManager - FontPreview.js', () => {
 		);
 	});
 
-	test('Says when browsers cannot display the font, without loading it', () => {
-		const wrapper = mount(
-			<FontPreview font={{ ...font, preview: false }} />
-		);
-
-		expect(wrapper.find('p').text()).toBe('Unsupported');
-		expect(wrapper.find('style').length).toBe(0);
-	});
-
 	describe('While the font face loads', () => {
 		const loading = (wrapper) =>
 			wrapper.find('[data-test="font-preview-loading"]');
