@@ -143,6 +143,23 @@
           }
         }
 
+        .downloaded-fonts {
+          margin-top: 2rem;
+
+          h3 {
+            margin-bottom: 0.25rem;
+          }
+
+          table {
+            margin-top: 0.5rem;
+          }
+
+          .gfpdf-spinner {
+            display: block;
+            margin: 1rem auto;
+          }
+        }
+
         /* Add font */
         .add-update-font-column {
           display: flex;

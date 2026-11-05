@@ -17,6 +17,7 @@ import {
 import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
 import FontList from './FontList';
+import DownloadedFonts from './DownloadedFonts';
 import AddFont from './AddFont';
 import UpdateFont from './UpdateFont';
 import initialState from './InitialAddUpdateState';
@@ -582,6 +583,8 @@ export class FontManagerBody extends Component {
 					)}
 
 					<FontList id={id} navigate={navigate} />
+
+					<DownloadedFonts />
 				</div>
 
 				<div className="add-update-font-column container">
