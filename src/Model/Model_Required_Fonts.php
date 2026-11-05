@@ -341,6 +341,24 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The required files whose own copy isn't in the fonts folder, so one a different font holds the name of counts
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_missing_files(): array {
+		return array_values(
+			array_filter(
+				$this->get_required_font_files(),
+				function ( $file ) {
+					return ! $this->font_sources->is_installed( $file );
+				}
+			)
+		);
+	}
+
+	/**
 	 * A font key as mPDF stores it: trimmed and lower case, or empty for a non-string
 	 *
 	 * @param mixed $font

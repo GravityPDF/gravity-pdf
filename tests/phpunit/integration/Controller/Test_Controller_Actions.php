@@ -231,7 +231,7 @@ class Test_Controller_Actions extends TestCase {
 
 				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() - 10 ), 'FreeSans.ttf' => $this->failure() ] );
 				$html = $this->render_notices();
-				$this->assertStringContainsString( 'Gravity PDF could not download these fonts. Until they are installed, PDFs use a fallback font in their place', $html );
+				$this->assertStringContainsString( 'Gravity PDF could not download these fonts. Until the fonts are installed, PDFs that need them use a fallback font', $html );
 				$this->assertStringContainsString( '<code>Garuda.ttf</code>', $html );
 				$this->assertStringNotContainsString( 'FreeSans.ttf', $html );
 				$this->assertStringContainsString( 'https://docs.gravitypdf.com/users/core-pdf-fonts', $html );

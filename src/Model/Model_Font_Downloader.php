@@ -281,6 +281,61 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Whether the manifest's files may be downloaded, whichever are missing, and what turned them off
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_auto_install_status(): string {
+		if ( $this->get_auto_install_constant() === false ) {
+			return 'Off (GPDF_AUTO_INSTALL_FONTS constant)';
+		}
+
+		if ( ! $this->is_auto_install_overridden() ) {
+			return 'On';
+		}
+
+		$files   = array_keys( $this->font_sources->get_manifest() );
+		$blocked = array_filter(
+			$files,
+			function ( $file ) {
+				return ! $this->is_auto_install_enabled( (string) $file );
+			}
+		);
+
+		if ( $blocked === [] ) {
+			return 'On';
+		}
+
+		return sprintf( '%s (gfpdf_auto_install_fonts filter)', count( $blocked ) === count( $files ) ? 'Off' : 'Partly off' );
+	}
+
+	/**
+	 * What stops the missing required files downloading, or null
+	 *
+	 * @param string[] $missing The missing required files
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_auto_install_blocker( array $missing ): ?string {
+		if ( $this->can_download_all( $missing ) ) {
+			return null;
+		}
+
+		return $this->get_auto_install_constant() === false ? 'GPDF_AUTO_INSTALL_FONTS constant' : 'gfpdf_auto_install_fonts filter';
+	}
+
+	/**
+	 * Whether the constant turned downloads off or the filter may have, so a file can be blocked
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_auto_install_overridden(): bool {
+		$locked = $this->get_auto_install_constant();
+
+		return $locked === null ? has_filter( 'gfpdf_auto_install_fonts' ) : ! $locked;
+	}
+
+	/**
 	 * Whether a Font Manager record of this site uses the file, so it isn't the core font's
 	 *
 	 * @since 6.19.0
@@ -1470,7 +1525,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Failures by file, read once per request
+	 * Failures by file, read once per request, when any give-up whose file is now on disk is cleared from the record
 	 *
 	 * @return array<string, array{retry_at: int, gave_up: int, dismissed: bool}>
 	 *
@@ -1494,8 +1549,23 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 					];
 				}
 			}
+
+			$this->clear_installed_give_ups();
 		}
 
 		return $this->failures;
+	}
+
+	/**
+	 * Forget the give-ups of files now on disk, as when copied in by hand, so the notice and reports stop listing them
+	 *
+	 * @since 6.19.0
+	 */
+	protected function clear_installed_give_ups(): void {
+		foreach ( $this->failures as $file => $failure ) {
+			if ( $failure['gave_up'] > 0 && $this->font_sources->is_installed( $file ) ) {
+				$this->clear_failure( $file );
+			}
+		}
 	}
 }

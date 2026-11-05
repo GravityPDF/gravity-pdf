@@ -334,4 +334,14 @@ class Model_Actions extends Helper_Abstract_Model {
 		wp_safe_redirect( Model_System_Report::get_report_url() );
 		exit;
 	}
+
+	/**
+	 * Send the user to the system report row listing the failed core fonts
+	 *
+	 * @since 6.19.0
+	 */
+	public function core_fonts_report_redirect() {
+		wp_safe_redirect( Model_System_Report::get_report_url( Model_System_Report::FONTS_FAILED_ANCHOR ) );
+		exit;
+	}
 }
