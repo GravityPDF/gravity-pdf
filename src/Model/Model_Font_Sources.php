@@ -124,6 +124,14 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $manifest;
 
 	/**
+	 * The manifest with the hashed names of files a Font Manager record uses, and the collisions it was built from
+	 *
+	 * @var array{collisions: array<string, string>, manifest: array<string, array>}|null
+	 * @since 6.19.0
+	 */
+	protected $aliased_manifest;
+
+	/**
 	 * @var array<string, array{languages: string[], sample?: string}>|null What each core font supports, once read
 	 * @since 6.19.0
 	 */
@@ -508,12 +516,24 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			}
 		}
 
-		return $this->with_record_aliases( $this->manifest );
+		$collisions = $this->get_record_collisions();
+		if ( $collisions === [] ) {
+			return $this->manifest;
+		}
+
+		/* Compared, not stored per site, as get_known_builds() calls this while the collisions are part built */
+		if ( ( $this->aliased_manifest['collisions'] ?? null ) !== $collisions ) {
+			$this->aliased_manifest = [
+				'collisions' => $collisions,
+				'manifest'   => $this->with_record_aliases( $this->manifest ),
+			];
+		}
+
+		return $this->aliased_manifest['manifest'];
 	}
 
 	/**
-	 * A manifest with entries for the hashed names of files a Font Manager record uses. Never memoised, as a record can
-	 * be added at any time.
+	 * A manifest with entries for the hashed names of files a Font Manager record uses
 	 *
 	 * @param array<string, array{url: string, size: int, sha: string}> $manifest
 	 *

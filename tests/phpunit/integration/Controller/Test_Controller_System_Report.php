@@ -9,8 +9,11 @@ use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\AccessesPrivateState;
+use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
+use GFPDF\Tests\Concerns\Seamed_Font_Downloader;
 use GFPDF\Tests\Concerns\StubsFontSources;
 use GFPDF\Tests\Integration\TestCase;
 
@@ -32,7 +35,9 @@ class Test_Controller_System_Report extends TestCase {
 
 	use AccessesPrivateState;
 	use CreatesLegacyDownloadUrls;
+	use CopiesFontFixtures;
 	use CreatesLegacyTemplates;
+	use RecordsFontFailures;
 	use StubsFontSources;
 
 	public function set_up(): void {
@@ -43,6 +48,14 @@ class Test_Controller_System_Report extends TestCase {
 
 	public function tear_down(): void {
 		remove_filter( 'pre_http_request', [ $this, 'get_public_dir_api_response' ] );
+
+		/* Null falls back to the registered models, which are what bootstrap injected */
+		$report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
+		$this->set_private( $report, 'font_downloader', null );
+		$this->set_private( $report, 'required_fonts', null );
+
+		$this->remove_font_fixtures();
+		$this->delete_font_failures();
 
 		parent::tear_down();
 	}
@@ -426,10 +439,10 @@ class Test_Controller_System_Report extends TestCase {
 	/**
 	 * Get the Site Health test the controller registers
 	 */
-	protected function get_site_health_test(): array {
+	protected function get_site_health_test( string $id = 'gravity_pdf_deprecated_features' ): array {
 		$tests = apply_filters( 'site_status_tests', [ 'direct' => [] ] );
 
-		return $tests['direct']['gravity_pdf_deprecated_features'] ?? [];
+		return $tests['direct'][ $id ] ?? [];
 	}
 
 	public function test_site_health_test_is_registered() {
@@ -638,5 +651,159 @@ class Test_Controller_System_Report extends TestCase {
 		} finally {
 			rmdir( $entry_dir );
 		}
+	}
+
+	public function test_core_fonts_failed_lists_given_up_files_even_after_the_notice_is_dismissed() {
+		update_option( 'date_format', 'Y-m-d' );
+		$this->set_font_failures(
+			[
+				'Garuda.ttf'   => $this->failure( strtotime( '2026-11-03 12:00:00 UTC' ) ),
+				'FreeSans.ttf' => $this->failure(),
+			]
+		);
+
+		$this->assertSame( 'Core Fonts failed', $this->report_row( 'core_fonts_failed' )['label_export'] );
+		$this->assertSame( 'Garuda.ttf (gave up 2026-11-03)', $this->report_row( 'core_fonts_failed' )['value'] );
+
+		\GPDFAPI::get_mvc_class( 'Model_Actions' )->dismiss_failed_core_fonts();
+
+		$this->assertFalse( \GPDFAPI::get_mvc_class( 'Model_Actions' )->has_failed_core_fonts() );
+		$this->assertSame( 'Garuda.ttf (gave up 2026-11-03)', $this->report_row( 'core_fonts_failed' )['value'] );
+	}
+
+	public function test_core_fonts_failed_and_the_notice_clear_once_the_font_is_on_disk() {
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+
+		$this->assertSame( 'None', $this->report_row( 'core_fonts_failed' )['value'] );
+		$this->assertFalse( \GPDFAPI::get_mvc_class( 'Model_Actions' )->has_failed_core_fonts() );
+	}
+
+	public function test_the_font_rows_can_be_linked_to() {
+		$this->use_report_downloader( [] );
+
+		$this->assertStringContainsString( 'id="' . Model_System_Report::FONTS_FAILED_ANCHOR . '"', $this->report_row( 'core_fonts_failed' )['label'] );
+		$this->assertStringContainsString( 'id="' . Model_System_Report::FONT_DOWNLOADS_ANCHOR . '"', $this->report_row( 'core_font_downloads' )['label'] );
+	}
+
+	public function test_core_fonts_failed_says_none_without_a_given_up_file() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
+
+		$this->assertSame( 'None', $this->report_row( 'core_fonts_failed' )['value'] );
+	}
+
+	public function test_core_font_downloads_reads_the_downloaders_status() {
+		$this->use_report_downloader( [ 'Garuda.ttf' ] );
+
+		$this->assertSame( 'Core Font downloads', $this->report_row( 'core_font_downloads' )['label_export'] );
+		$this->assertSame( 'On', $this->report_row( 'core_font_downloads' )['value'] );
+
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$this->assertSame( 'Off (gfpdf_auto_install_fonts filter)', $this->report_row( 'core_font_downloads' )['value'] );
+	}
+
+	public function test_the_core_fonts_site_health_test_is_gated_on_the_gravity_forms_capability() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+
+		$this->assertSame( [], $this->get_site_health_test( 'gravity_pdf_core_fonts' ) );
+	}
+
+	public function test_the_core_fonts_site_health_test_is_good_with_every_required_file_on_disk() {
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->use_report_downloader( [ 'Garuda.ttf' ] );
+
+		/* A file that gave up but has since been copied in by hand no longer counts */
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$result = $this->run_core_fonts_test();
+
+		$this->assertSame( 'good', $result['status'] );
+		$this->assertSame( 'gravity_pdf_core_fonts', $result['test'] );
+	}
+
+	public function test_the_core_fonts_site_health_test_is_good_while_missing_files_wait_to_download() {
+		$this->use_report_downloader( [ 'Garuda.ttf' ] );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
+
+		$this->assertSame( 'good', $this->run_core_fonts_test()['status'] );
+	}
+
+	public function test_the_core_font_health_only_scans_the_forms_when_a_file_could_be_reported() {
+		$this->use_report_downloader( [ 'Garuda.ttf' ] );
+		$report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
+
+		$this->assertSame( [], $report->get_core_font_health()['missing'] );
+
+		add_filter( 'gfpdf_auto_install_fonts', '__return_true' );
+
+		$this->assertSame( [ 'Garuda.ttf' ], $report->get_core_font_health()['missing'] );
+	}
+
+	public function test_the_core_fonts_site_health_test_is_critical_for_a_file_that_gave_up() {
+		$this->use_report_downloader( [ 'Garuda.ttf', 'FreeSans.ttf' ] );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+
+		$result = $this->run_core_fonts_test();
+
+		$this->assertSame( 'critical', $result['status'] );
+		$this->assertSame( 'Gravity PDF could not download required fonts', $result['label'] );
+		$this->assertStringContainsString( 'render PDFs. Until the fonts are installed', $result['description'] );
+		$this->assertStringContainsString( 'may not display.</p><p>Fonts that failed to download:</p><ul', $result['description'] );
+		$this->assertStringContainsString( '<code>Garuda.ttf</code></li>', $result['description'] );
+		$this->assertStringNotContainsString( 'turned off', $result['description'] );
+		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::FONTS_FAILED_ANCHOR, $result['actions'] );
+		$this->assertStringNotContainsString( 'gfpdf_auto_install_fonts', $result['actions'] );
+
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$this->assertSame( 'critical', $this->run_core_fonts_test()['status'] );
+	}
+
+	public function test_the_core_fonts_site_health_test_recommends_action_for_missing_files_while_downloads_are_off() {
+		$this->use_report_downloader( [ 'Garuda.ttf' ] );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$result = $this->run_core_fonts_test();
+
+		$this->assertSame( 'recommended', $result['status'] );
+		$this->assertSame( 'Some core fonts your PDFs need are missing', $result['label'] );
+		$this->assertStringContainsString( 'turned off by <code>gfpdf_auto_install_fonts</code> filter. These fonts are missing:</p><ul', $result['description'] );
+		$this->assertStringContainsString( '<code>Garuda.ttf</code></li>', $result['description'] );
+		$this->assertStringContainsString( 'render PDFs. Until the fonts are installed', $result['description'] );
+		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::FONT_DOWNLOADS_ANCHOR, $result['actions'] );
+		$this->assertStringContainsString( 'gfpdf_auto_install_fonts', $result['actions'] );
+	}
+
+	/**
+	 * Give the registered report a downloader whose required set is the files given
+	 *
+	 * @param string[] $files
+	 */
+	private function use_report_downloader( array $files ): void {
+		$report     = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
+		$downloader = new Seamed_Font_Downloader( \GPDFAPI::get_log_class(), [ 'required' => $files ] );
+
+		$this->set_private( $report, 'font_downloader', $downloader );
+		$this->set_private( $report, 'required_fonts', $downloader->get_required_fonts() );
+	}
+
+	/**
+	 * Run the core fonts Site Health test as an administrator
+	 */
+	private function run_core_fonts_test(): array {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		return call_user_func( $this->get_site_health_test( 'gravity_pdf_core_fonts' )['test'] );
+	}
+
+	/**
+	 * A row of the report's directories section
+	 */
+	private function report_row( string $key ): array {
+		return $this->get_report_section( 'directories' )[ $key ];
 	}
 }

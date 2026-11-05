@@ -1049,6 +1049,50 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertTrue( $this->model->is_core_font_file( $hashed ) );
 	}
 
+	public function test_a_collision_builds_the_aliased_manifest_once_until_the_collisions_change() {
+		$model = new class( GPDFAPI::get_data_class(), $this->custom_fonts, GPDFAPI::get_log_class() ) extends Model_Font_Sources {
+			/** @var int */
+			public $built = 0;
+
+			protected function with_record_aliases( array $manifest ): array {
+				$this->built++;
+
+				return parent::with_record_aliases( $manifest );
+			}
+		};
+
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );
+		$hashed = $model->get_hashed_name( 'DejaVuSans.ttf' );
+
+		$model->is_installed( 'DejaVuSans.ttf' );
+		$this->assertArrayHasKey( $hashed, $model->get_manifest() );
+		$this->assertSame( 1, $model->built );
+
+		GPDFAPI::delete_plugin_option( 'custom_fonts' );
+		$model->flush();
+
+		$this->assertArrayNotHasKey( $hashed, $model->get_manifest() );
+	}
+
+	public function test_the_manifest_has_every_collision_not_those_found_first() {
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		$this->put_longer_font_at( 'DejaVuSans-Bold.ttf', 'DejaVuSans-Bold.ttf' );
+		$this->add_record(
+			'mine',
+			[
+				'regular' => 'DejaVuSans.ttf',
+				'bold'    => 'DejaVuSans-Bold.ttf',
+			]
+		);
+
+		$manifest = $this->model->get_manifest();
+
+		$this->assertCount( 2, $this->model->get_record_collisions() );
+		$this->assertArrayHasKey( $this->model->get_record_collisions()['DejaVuSans.ttf'], $manifest );
+		$this->assertArrayHasKey( $this->model->get_record_collisions()['DejaVuSans-Bold.ttf'], $manifest );
+	}
+
 	public function test_a_record_holding_a_known_build_of_the_core_font_is_not_custom() {
 		$this->copy_fixture( 'DejaVuSans.ttf' );
 		$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );

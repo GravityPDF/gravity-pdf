@@ -106,6 +106,11 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 			'test'  => [ $this, 'cache_cleanup_test' ],
 		];
 
+		$tests['direct']['gravity_pdf_core_fonts'] = [
+			'label' => esc_html__( 'Gravity PDF core fonts', 'gravity-pdf' ),
+			'test'  => [ $this, 'core_fonts_test' ],
+		];
+
 		return $tests;
 	}
 
@@ -117,6 +122,16 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 	 */
 	public function cache_cleanup_test() {
 		return $this->view->get_cache_cleanup_test( $this->model->is_cache_cleanup_stalled() );
+	}
+
+	/**
+	 * Run the core fonts Site Health test
+	 *
+	 * @return array
+	 * @since 6.19.0
+	 */
+	public function core_fonts_test() {
+		return $this->view->get_core_fonts_test( $this->model->get_core_font_health() );
 	}
 
 	/**
