@@ -174,14 +174,15 @@ class Model_Uninstall extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Remove the font state every site shares: the failed downloads and their back-offs, the language fonts and the
-	 * 6.19 cleanup's progress
+	 * Remove the font state every site shares: the failed and wanted downloads and their back-offs, the language
+	 * fonts and the 6.19 cleanup's progress
 	 *
 	 * @since 6.19.0
 	 */
 	public function remove_font_state(): void {
 		delete_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES );
 		delete_network_option( get_main_network_id(), Model_Font_Downloader::CLEANUP );
+		delete_network_option( get_main_network_id(), Model_Font_Downloader::WANTED );
 		delete_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
 
 		$font_sources = \GPDFAPI::get_mvc_class( 'Model_Font_Sources' );

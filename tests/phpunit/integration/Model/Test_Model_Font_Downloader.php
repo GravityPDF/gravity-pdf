@@ -1096,6 +1096,79 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [ 'FreeSans.ttf' ], $this->new_downloader()->get_undismissed_failed_files() );
 	}
 
+	public function test_a_queued_file_is_wanted_without_a_request() {
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->queue( [ 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ] ) );
+
+		$this->assertSame( [], $this->requested );
+		$this->assertSame( [ 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ], $this->downloader->get_wanted_files() );
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
+	public function test_a_file_is_not_queued_while_downloads_are_off() {
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$this->assertFalse( $this->downloader->queue( [ 'Sun-ExtA.ttf' ] ) );
+		$this->assertSame( [], $this->downloader->get_wanted_files() );
+		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	public function test_a_file_that_gave_up_is_not_queued_again() {
+		$this->set_font_failures( [ 'Sun-ExtA.ttf' => $this->failure( time() ) ] );
+
+		$this->assertFalse( $this->new_downloader()->queue( [ 'Sun-ExtA.ttf' ] ) );
+		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	public function test_a_wanted_file_is_queued_once() {
+		$this->downloader->queue( [ 'Sun-ExtA.ttf' ] );
+		$this->downloader->queue( [ 'Sun-ExtA.ttf' ] );
+
+		$this->assertSame( [ 'Sun-ExtA.ttf' ], $this->downloader->get_wanted_files() );
+		$this->assertCount( 1, $this->log_messages( 'Font queued for the background sync as a PDF needs it' ) );
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
+	public function test_a_wanted_file_awaiting_its_retry_does_not_pull_the_sync_forward() {
+		$this->downloader->queue( [ 'Sun-ExtA.ttf' ] );
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+		$this->set_font_failures( [ 'Sun-ExtA.ttf' => $this->failure( 0, time() + 300 ) ] );
+
+		$this->new_downloader()->queue( [ 'Sun-ExtA.ttf' ] );
+
+		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	public function test_a_wanted_file_still_missing_is_queued_again_once_nothing_is_scheduled() {
+		$this->downloader->queue( [ 'Sun-ExtA.ttf' ] );
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+
+		$this->downloader->queue( [ 'Sun-ExtA.ttf' ] );
+
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
+	public function test_the_sync_downloads_the_wanted_files() {
+		$this->serve_fixture_as( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		$this->serve_font_downloads();
+		$this->downloader->queue( [ 'Sun-ExtA.ttf' ] );
+
+		$this->seamed_sync( [] )->sync();
+
+		$this->assertSame( [ 'Sun-ExtA.ttf' ], array_map( 'basename', $this->requested ) );
+		$this->assertFileExists( $this->font_path( 'Sun-ExtA.ttf' ) );
+	}
+
+	public function test_prune_keeps_the_wanted_files() {
+		$this->set_installer_manifest( [ 'Garuda.ttf' => 'Chewy.ttf' ] );
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->downloader->queue( [ 'Garuda.ttf' ] );
+
+		$this->assertSame( [], $this->seamed( [ 'required' => [] ] )->prune() );
+		$this->assertFileExists( $this->font_path( 'Garuda.ttf' ) );
+	}
+
 	public function test_only_a_true_dismissal_counts() {
 		$this->set_font_failures( [ self::FONT => [ 'retry_at' => 0, 'gave_up' => time(), 'dismissed' => 'yes' ] ] );
 
