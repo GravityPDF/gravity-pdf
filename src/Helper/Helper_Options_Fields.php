@@ -266,15 +266,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'tools'                           => apply_filters(
 				'gfpdf_settings_tools',
 				[
-					'install_core_fonts' => [
-						'id'   => 'install_core_fonts',
-						'name' => esc_html__( 'Install Core Fonts', 'gravity-pdf' ),
-						'desc' => esc_html__( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-pdf' ) . ' <a href="https://docs.gravitypdf.com/users/core-pdf-fonts">' . esc_html__( 'Get more info.', 'gravity-pdf' ) . '</a>',
-						'type' => 'button',
-						'std'  => __( 'Download Core Fonts', 'gravity-pdf' ),
-					],
-
-					'manage_fonts'       => [
+					'manage_fonts' => [
 						'id'   => 'manage_fonts',
 						'name' => esc_html__( 'Fonts', 'gravity-pdf' ),
 						/* translators: 1: Opening <code> tag, 2: Closing </code> tag */

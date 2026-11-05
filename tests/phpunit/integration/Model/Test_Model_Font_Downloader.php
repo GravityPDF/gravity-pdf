@@ -75,23 +75,6 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [], $this->requested );
 	}
 
-	public function test_a_forced_download_replaces_the_font_in_the_fonts_folder() {
-		file_put_contents( $this->font_path(), 'old' );
-		$this->serve_font_downloads();
-
-		$this->assertTrue( $this->downloader->download( self::FONT, true ) );
-		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path() );
-		$this->assertNoStrayTmpFiles();
-	}
-
-	public function test_a_failed_forced_download_keeps_the_font_in_the_fonts_folder() {
-		copy( $this->font_fixture( self::FONT ), $this->font_path() );
-		$this->fail_font_downloads();
-
-		$this->assertFalse( $this->downloader->download( self::FONT, true ) );
-		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path() );
-	}
-
 	/**
 	 * @dataProvider provider_unapproved_files
 	 */
@@ -178,7 +161,7 @@ class Test_Model_Font_Downloader extends TestCase {
 	}
 
 	public function test_a_move_that_fails_part_way_removes_the_partial_font() {
-		$downloader = $this->new_downloader( true );
+		$downloader = $this->new_downloader( 'partial' );
 		$this->serve_font_downloads();
 
 		$this->assertFalse( $downloader->download( self::FONT ) );
@@ -187,12 +170,11 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertCount( 1, $this->log_messages( 'Font Move Failed' ) );
 	}
 
-	public function test_a_failed_move_keeps_a_valid_font_already_there() {
-		copy( $this->font_fixture( self::FONT ), $this->font_path() );
-		$downloader = $this->new_downloader( false, true );
+	public function test_a_failed_move_keeps_a_valid_font_another_request_saved() {
+		$downloader = $this->new_downloader( file_get_contents( $this->font_fixture( self::FONT ) ) );
 		$this->serve_font_downloads();
 
-		$this->assertFalse( $downloader->download( self::FONT, true ) );
+		$this->assertFalse( $downloader->download( self::FONT ) );
 		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path() );
 	}
 
@@ -780,30 +762,29 @@ class Test_Model_Font_Downloader extends TestCase {
 	}
 
 	/**
-	 * @param bool $partial_move A move that leaves part of the font behind, as one across filesystems can
-	 * @param bool $failed_move  A move that fails without touching the destination
+	 * @param string|null $failed_move_leaves When set, every move fails and leaves this at the font's path: part of
+	 *                                        a font, as a move across filesystems can, or a whole one another
+	 *                                        request saved meanwhile
 	 */
-	private function new_downloader( bool $partial_move = false, bool $failed_move = false ): Model_Font_Downloader {
+	private function new_downloader( ?string $failed_move_leaves = null ): Model_Font_Downloader {
 		$args = $this->downloader_args();
 
-		if ( ! $partial_move && ! $failed_move ) {
+		if ( $failed_move_leaves === null ) {
 			return new Model_Font_Downloader( ...$args );
 		}
 
 		$downloader = new class( ...$args ) extends Model_Font_Downloader {
-			/** @var bool */
-			public $partial = false;
+			/** @var string */
+			public $leaves = '';
 
 			protected function move( string $from, string $to ): bool {
-				if ( $this->partial ) {
-					file_put_contents( $to, 'partial' );
-				}
+				file_put_contents( $to, $this->leaves );
 
 				return false;
 			}
 		};
 
-		$downloader->partial = $partial_move;
+		$downloader->leaves = $failed_move_leaves;
 
 		return $downloader;
 	}

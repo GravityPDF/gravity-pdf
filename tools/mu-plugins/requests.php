@@ -60,17 +60,6 @@ $stub = static function ( $return, $req, $url ) {
 		];
 	}
 
-	/* Fail every core font download */
-	if ( strpos( $url, 'raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/' ) !== false ) {
-		return [
-			'headers'  => [],
-			'body'     => '',
-			'response' => [ 'code' => 404 ],
-			'cookies'  => [],
-			'filename' => '',
-		];
-	}
-
 	return $return;
 };
 

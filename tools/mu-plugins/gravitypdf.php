@@ -60,28 +60,14 @@ $gfpdf_e2e_header = static function ( string $name ): string {
 	return sanitize_key( wp_unslash( $_SERVER[ 'HTTP_X_GPDF_E2E_' . strtoupper( $name ) ] ?? '' ) );
 };
 
-/* When the requests asking for it gave up on the core font downloads, which all fail on this site (see requests.php) */
+/* E2E runs render with the fonts on disk, without reaching GitHub or recording failed downloads */
+add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+/* When the requests asking for it gave up on the core font downloads, which are off on this site (see above) */
 $gfpdf_e2e_fonts_gave_up = (int) $gfpdf_e2e_header( 'failed_fonts' );
 
-/* The deprecation notices are under test (scoped to the requests asking for them, below), so only the core-font one
-   stays suppressed for E2E runs, and the failed fonts one for the requests not asking for it */
+/* The deprecation notices are under test (scoped to the requests asking for them, below), so E2E runs keep them */
 remove_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
-
-$gfpdf_e2e_hidden_routes = $gfpdf_e2e_fonts_gave_up > 0 ? [ 'install_core_fonts' ] : [ 'install_core_fonts', 'failed_core_fonts' ];
-
-add_filter(
-	'gfpdf_one_time_action_routes',
-	static function ( $routes ) use ( $gfpdf_e2e_hidden_routes ) {
-		return array_values(
-			array_filter(
-				$routes,
-				static function ( $route ) use ( $gfpdf_e2e_hidden_routes ) {
-					return ! in_array( $route['action'], $gfpdf_e2e_hidden_routes, true );
-				}
-			)
-		);
-	}
-);
 
 /* Give the deprecation detection a third-party filter listener to find, on one hook of each shape the map names:
    a v3-shaped alias and a `gfpdf_legacy_` one. The dynamic `gfpdfe_` prefix walk is covered by PHPUnit instead,
