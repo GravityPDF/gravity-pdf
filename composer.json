@@ -43,6 +43,7 @@
     "monolog/monolog": "^2.1.0",
     "spatie/url-signer": "^1.1",
     "mpdf/qrcode": "^1.0",
+    "myclabs/deep-copy": "^1.7",
     "gravitypdf/querypath": "^4.0",
     "gravitypdf/upload": "^4.0"
   },

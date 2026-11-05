@@ -501,6 +501,15 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSansCondensed.ttf' ) );
 	}
 
+	public function test_the_upgrade_replaces_a_kept_installer_garuda() {
+		$this->options->update_option( 'default_font', 'garuda' );
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+
+		$this->upgrade( '6.18.0', '6.19.0' );
+
+		$this->assertFileDoesNotExist( $this->font_path( 'Garuda.ttf' ) );
+	}
+
 	public function test_the_core_font_cleanup_keeps_fonts_when_downloads_are_off() {
 		$this->set_installer_manifest();
 		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );

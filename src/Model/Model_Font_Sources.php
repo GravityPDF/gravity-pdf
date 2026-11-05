@@ -124,7 +124,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $manifest;
 
 	/**
-	 * @var array<string, array{languages: string[], sample?: string, preview?: bool}>|null What each core font supports, once read
+	 * @var array<string, array{languages: string[], sample?: string}>|null What each core font supports, once read
 	 * @since 6.19.0
 	 */
 	protected $font_languages;
@@ -240,7 +240,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * mPDF's backupSIPFont: Sun-ExtB once it's on disk, as mPDF would download 17.6 MB for one rare CJK Extension B
+	 * mPDF's backupSIPFont: Sun-ExtB once it's on disk, as mPDF would download 18 MB for one rare CJK Extension B
 	 * character, else the bundled symbols. With none, mPDF stops substituting the rest of a run at that character, e.g.
 	 * 字 after 𠀀; the first render after a font cache flush still does (GravityPDF/mpdf#828).
 	 *
@@ -339,7 +339,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	/**
 	 * What each core font supports, by font key
 	 *
-	 * @return array<string, array{languages: string[], sample?: string, preview?: bool}>
+	 * @return array<string, array{languages: string[], sample?: string}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -434,7 +434,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 
 	/**
 	 * mPDF's backupSubsFont, Arimo first. mPDF reads which characters a font has from its ranges file and downloads only a
-	 * font that has them, but Sun-ExtA is listed only once it's on disk, as it would download 22.9 MB mid-render.
+	 * font that has them, but Sun-ExtA is listed only once it's on disk, as it would download 23 MB mid-render.
 	 *
 	 * @param array|null $fontdata mPDF font data, or null for the registered fonts
 	 * @param string     $font     The PDF's font, left out as it can't stand in for its own missing glyphs

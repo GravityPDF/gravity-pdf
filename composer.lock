@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71ace4c25866fd0f9bacc909d772a23b",
+    "content-hash": "0e1ec610265264ddab533ee622c25300",
     "packages": [
         {
             "name": "gravitypdf/querypath",
@@ -567,12 +567,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/GravityPDF/mpdf.git",
-                "reference": "0c6322c23111b4395d34fc291a15d71f123b1733"
+                "reference": "725098a9fce3e83bbcc9412b8ce6faa829e5d202"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/0c6322c23111b4395d34fc291a15d71f123b1733",
-                "reference": "0c6322c23111b4395d34fc291a15d71f123b1733",
+                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/725098a9fce3e83bbcc9412b8ce6faa829e5d202",
+                "reference": "725098a9fce3e83bbcc9412b8ce6faa829e5d202",
                 "shasum": ""
             },
             "require": {
@@ -580,7 +580,6 @@
                 "ext-mbstring": "*",
                 "mpdf/psr-http-message-shim": "^1.0 || ^2.0",
                 "mpdf/psr-log-aware-trait": "^2.0 || ^3.0",
-                "myclabs/deep-copy": "^1.7",
                 "paragonie/random_compat": "^1.4|^2.0|^9.99.99",
                 "php": "^5.6 || ^7.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0",
                 "psr/http-message": "^1.0 || ^2.0",
@@ -596,6 +595,7 @@
             },
             "suggest": {
                 "ext-bcmath": "Needed for generation of some types of barcodes",
+                "ext-fileinfo": "Needed to check the type of the files annotations embed",
                 "ext-imagick": "Needed if developing the Mpdf library",
                 "ext-xml": "Needed mainly for SVG manipulation",
                 "ext-zlib": "Needed for compression of embedded resources, such as fonts"
@@ -673,7 +673,7 @@
                     "url": "https://www.paypal.me/mpdf"
                 }
             ],
-            "time": "2026-11-05T02:51:00+00:00"
+            "time": "2026-11-09T03:17:23+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",

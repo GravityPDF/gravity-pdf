@@ -100,7 +100,7 @@ class Test_Font_Rendering extends TestCase {
 
 		$render = $this->render( '<p style="font-family: arimo">Text ' . $text . '</p>', [ 'font' => 'arimo' ] );
 
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/' . $file ], $this->requested );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.2/' . $file ], $this->requested );
 
 		/* The text is drawn in the substitute. Arimo records each character it draws, even one it lacks (see the emoji
 		   snapshot), so none of the text stayed in Arimo */
@@ -236,7 +236,7 @@ class Test_Font_Rendering extends TestCase {
 		$render = $this->render( '<p style="font-family: dejavusans">Regular</p>', [ 'font' => 'dejavusans' ] );
 
 		$this->assertSame( $hashed, basename( $render['mpdf']->fonts['dejavusans']['ttffile'] ) );
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/DejaVuSans.ttf' ], $this->requested );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.2/DejaVuSans.ttf' ], $this->requested );
 		$this->assertFileEquals( $this->font_fixture( 'DejaVuSans.ttf' ), $this->font_path( $hashed ) );
 		$this->assertSame( strlen( (string) file_get_contents( $this->font_fixture( 'DejaVuSans.ttf' ) ) ) + 1, filesize( $this->font_path( 'DejaVuSans.ttf' ) ), 'The other font is left alone' );
 	}

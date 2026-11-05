@@ -50,6 +50,9 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		/* Only prune() reads it */
 		$this->set_installer_manifest();
+
+		/* Every version change queues one, which other classes' upgrade tests leave behind */
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
 	}
 
 	public function tear_down(): void {
@@ -69,7 +72,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->assertTrue( $this->downloader->download( self::FONT ) );
 		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/' . self::FONT ], $this->requested );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.2/' . self::FONT ], $this->requested );
 		$this->assertNoStrayTmpFiles();
 	}
 
@@ -777,6 +780,84 @@ class Test_Model_Font_Downloader extends TestCase {
 			'done'    => [ true ],
 			'corrupt' => [ 'yes' ],
 		];
+	}
+
+	public function test_prune_replaces_a_needed_installer_garuda() {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed-v1.0.0.ttf', self::FONT );
+
+		$this->assertSame( [ 'Garuda.ttf' ], $this->downloader->prune( [ 'Garuda.ttf', self::FONT ] ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertFileExists( $this->font_path( self::FONT ), 'Differs from v1.1.1 only in hinting' );
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
+	public function test_prune_replaces_needed_installer_sun_ext_fonts() {
+		$files = [ 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ];
+		$this->set_installer_manifest( array_fill_keys( $files, 'Chewy.ttf' ) );
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+
+		$this->assertSame( $files, $this->downloader->prune( $files ) );
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
+	public function test_the_replacement_for_an_installer_garuda_lands_under_its_plain_name() {
+		$this->use_shipped_installer_manifest();
+		$this->serve_fixture_as( 'Garuda-v1.1.1.ttf', 'Garuda.ttf' );
+		$this->serve_font_downloads();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'Garuda.ttf' );
+
+		/* The installer's build is a known one, so it is the font's own, even when verifying, until it is pruned */
+		$this->assertTrue( $this->downloader->download( 'Garuda.ttf', true ) );
+		$this->assertSame( [], $this->requested );
+
+		$this->assertSame( [ 'Garuda.ttf' ], $this->downloader->prune( [ 'Garuda.ttf' ] ) );
+		$this->assertTrue( $this->downloader->download( 'Garuda.ttf', true ) );
+		$this->assertFileEquals( $this->font_fixture( 'Garuda-v1.1.1.ttf' ), $this->font_path( 'Garuda.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
+	}
+
+	public function test_prune_queues_no_sync_for_an_unneeded_garuda() {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+
+		$this->assertSame( [ 'Garuda.ttf' ], $this->downloader->prune( [] ) );
+		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	/**
+	 * @dataProvider provider_garuda_left_in_place
+	 */
+	public function test_prune_keeps_a_needed_garuda_that_is_not_the_installer_copy( string $fixture, string $bytes ) {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( $fixture, 'Garuda.ttf' );
+		if ( $bytes !== '' ) {
+			$this->change_font( 'Garuda.ttf', $bytes );
+		}
+
+		$this->assertSame( [], $this->downloader->prune( [ 'Garuda.ttf' ] ) );
+		$this->assertFileExists( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	public function provider_garuda_left_in_place(): array {
+		return [
+			'modified, same size' => [ 'Garuda-v1.0.0.ttf', 'same size, other bytes' ],
+			'the v1.1.1 file'     => [ 'Garuda-v1.1.1.ttf', '' ],
+		];
+	}
+
+	public function test_prune_keeps_a_needed_garuda_downloads_are_turned_off_for() {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$this->assertSame( [], $this->downloader->prune( [ 'Garuda.ttf' ] ) );
+		$this->assertFileExists( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertSame( [], $this->get_scheduled_args() );
 	}
 
 	/**

@@ -23,10 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Font_Languages {
 
 	/**
-	 * The languages or scripts of each core font, a sample for those without Latin letters worth showing, and whether
-	 * browsers can display it
+	 * The languages or scripts of each core font, a sample for those without Latin letters worth showing
 	 *
-	 * @return array<string, array{languages: string[], sample?: string, preview?: bool}> By font key
+	 * @return array<string, array{languages: string[], sample?: string}> By font key
 	 *
 	 * @since 6.19.0
 	 */
@@ -95,8 +94,6 @@ class Model_Font_Languages {
 			'sun-exta'              => [
 				'languages' => [ __( 'Chinese', 'gravity-pdf' ), __( 'Japanese', 'gravity-pdf' ), $korean, $latin, $greek, $cyrillic, $armenian, $georgian, $hebrew, $arabic, $syriac, $thaana, $devan, $bengali, $gurmukhi, $gujarati, $oriya, $tamil, $telugu, $kannada, $malayalm, $thai, $lao, $tibetan, $burmese, $ethiopic, $cherokee, $ucas, $khmer, __( 'Mongolian', 'gravity-pdf' ) ],
 				'sample'    => '你好,世界 こんにちは 안녕하세요',
-				/* Its vhea table claims more metrics than it has glyphs, so browsers reject the file after downloading 22 MB */
-				'preview'   => false,
 			],
 			'unbatang'              => [
 				'languages' => [ $korean ],

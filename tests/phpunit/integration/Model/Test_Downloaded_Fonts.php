@@ -76,7 +76,6 @@ class Test_Downloaded_Fonts extends TestCase {
 					'can_install'  => ! is_multisite() || is_super_admin(),
 					'languages'    => [ 'Latin', 'Greek', 'Cyrillic', 'Armenian', 'Georgian' ],
 					'sample'       => '',
-					'preview'      => true,
 				],
 			],
 			$this->core_rows( $this->downloader() )
@@ -94,8 +93,6 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertSame( [ 'regular', 'italics', 'bold', 'bolditalics' ], array_keys( $font['file_sizes'] ) );
 		$this->assertStringStartsWith( 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/', $font['base_url'] );
 		$this->assertContains( 'Thai', $font['languages'] );
-		$this->assertTrue( $font['preview'] );
-		$this->assertFalse( array_values( wp_list_filter( $rows, [ 'id' => 'sun-exta' ] ) )[0]['preview'] );
 
 		/* Fallback and barcode fonts can't be chosen for a PDF */
 		$this->assertSame( [], wp_list_filter( $rows, [ 'id' => 'ocrb' ] ) );

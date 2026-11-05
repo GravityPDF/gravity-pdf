@@ -249,6 +249,13 @@ trait CopiesFontFixtures {
 	}
 
 	/**
+	 * Read the frozen v1.0.0 manifest the plugin ships again
+	 */
+	protected function use_shipped_installer_manifest(): void {
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'legacy_manifests', [] );
+	}
+
+	/**
 	 * @param array|null $manifest Null to load the real manifest again
 	 */
 	private function set_shared_manifest( ?array $manifest ): void {
@@ -295,7 +302,7 @@ trait CopiesFontFixtures {
 
 		$this->set_shared_manifest( null );
 
-		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'legacy_manifests', [] );
+		$this->use_shipped_installer_manifest();
 
 		$this->copied_fonts   = [];
 		$this->recorded_fonts = [];

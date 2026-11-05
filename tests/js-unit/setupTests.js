@@ -52,7 +52,6 @@ window.GFPDF = {
 	fontManagerFontJustInstalled: '%s installed.',
 	fontManagerInstall: 'Install',
 	fontManagerPreviewUnavailable: 'Unavailable',
-	fontManagerPreviewUnsupported: 'Unsupported',
 	fontManagerPreviewFailed: 'Failed',
 	fontsUrl: 'http://x/fonts/',
 	fontManagerFontDeleted: '%s deleted.',
