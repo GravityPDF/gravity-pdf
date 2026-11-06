@@ -14,6 +14,8 @@ describe('FontManager - FontManagerBody.js', () => {
 		fontList: [
 			{
 				font_name: 'Fira Sans Light',
+				type: 'custom',
+				can_delete: true,
 				id: 'firasanslight',
 				regular: 'FiraSans-Light.ttf',
 				italics: 'FiraSans-LightItalic.ttf',
@@ -105,6 +107,8 @@ describe('FontManager - FontManagerBody.js', () => {
 				fontList: [
 					{
 						font_name: 'Roboto',
+						type: 'custom',
+						can_delete: true,
 						id: 'roboto',
 						regular: 'Roboto.ttf',
 						italics: 'Roboto-Italic.ttf',
@@ -117,6 +121,19 @@ describe('FontManager - FontManagerBody.js', () => {
 			instance.componentDidUpdate(prevPops);
 
 			expect(handleRequestFontDetails).toHaveBeenCalled();
+		});
+
+		test('handleCheckValidId() - Only a custom font can be edited', () => {
+			const wrapper = shallow(<FontManagerBody {...props} />);
+
+			expect(
+				wrapper
+					.instance()
+					.handleCheckValidId(
+						[{ id: 'garuda', type: 'core' }],
+						'garuda'
+					)
+			).toBe(false);
 		});
 
 		test("componentDidUpdate() - Check if there's a response message error for fontList", () => {

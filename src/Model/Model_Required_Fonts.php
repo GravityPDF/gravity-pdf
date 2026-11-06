@@ -191,6 +191,15 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Whether anything requires the font key, so deleting it would break or re-download it
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_font_in_use( string $key, bool $network = false ): bool {
+		return isset( $this->get_font_reasons( $network )[ $key ] );
+	}
+
+	/**
 	 * The registered fonts among a PDF's settings, so template font pickers count too
 	 *
 	 * @param array $pdf PDF settings
@@ -350,10 +359,11 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 		$counts = [];
 
 		/* A page at a time, so a site with many forms doesn't hold every form's meta at once */
-		$offset = 0;
+		$after = 0;
 		do {
-			$page = $this->get_pdf_form_meta( $offset, $this->form_page, $prefix );
+			$page = $this->get_pdf_form_meta( $after, $this->form_page, $prefix );
 			foreach ( $page as $row ) {
+				$after = (int) $row['form_id'];
 				foreach ( $this->get_form_pdfs( $row['display_meta'], (int) $row['form_id'] ) as $pdf ) {
 					foreach ( $this->get_pdf_fonts( $pdf ) as $font ) {
 						$counts[ $font ] = ( $counts[ $font ] ?? 0 ) + 1;
@@ -361,8 +371,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 				}
 			}
 
-			$offset += $this->form_page;
-			$full    = count( $page ) === $this->form_page;
+			$full = count( $page ) === $this->form_page;
 		} while ( $full );
 
 		return $counts;
@@ -431,7 +440,8 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * A page of the stored meta of the active forms with PDFs, read raw so Gravity Forms doesn't build their fields
+	 * A page of the stored meta of the active forms with PDFs, read raw so Gravity Forms doesn't build their fields.
+	 * Pages by ID, as OFFSET would run the LIKE over every form it skips.
 	 *
 	 * @param string $prefix Another site's table prefix, or '' for this site
 	 *
@@ -439,7 +449,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_pdf_form_meta( int $offset, int $limit, string $prefix = '' ): array {
+	protected function get_pdf_form_meta( int $after_id, int $limit, string $prefix = '' ): array {
 		global $wpdb;
 
 		$meta_table = $prefix === '' ? GFFormsModel::get_meta_table_name() : $prefix . 'gf_form_meta';
@@ -451,11 +461,11 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 			$wpdb->prepare(
 				"SELECT meta.form_id, meta.display_meta FROM {$meta_table} meta
 				INNER JOIN {$form_table} form ON form.id = meta.form_id
-				WHERE form.is_active = 1 AND form.is_trash = 0 AND meta.display_meta LIKE %s
-				ORDER BY meta.form_id LIMIT %d OFFSET %d",
+				WHERE form.is_active = 1 AND form.is_trash = 0 AND meta.form_id > %d AND meta.display_meta LIKE %s
+				ORDER BY meta.form_id LIMIT %d",
+				$after_id,
 				'%' . $wpdb->esc_like( '"gfpdf_form_settings"' ) . '%',
-				$limit,
-				$offset
+				$limit
 			),
 			ARRAY_A
 		);

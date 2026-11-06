@@ -3,6 +3,7 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 /* APIs */
 import {
 	apiGetCustomFontList,
+	apiGetFontUsage,
 	apiAddFont,
 	apiEditFont,
 	apiDeleteFont,
@@ -12,6 +13,8 @@ import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -78,6 +81,40 @@ export function* watchGetCustomFontListSuccess() {
 
 		associatedFontManagerSelectBox(fontList);
 	});
+}
+
+/**
+ * A watcher that loads what's in use once the font list has loaded
+ *
+ * @since 6.19.0
+ */
+export function* watchGetFontUsage() {
+	yield takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, getFontUsage);
+}
+
+/**
+ * Generate response for the font usage request
+ *
+ * @since 6.19.0
+ */
+export function* getFontUsage() {
+	try {
+		const response = yield call(apiGetFontUsage);
+
+		if (!response.ok) {
+			throw response;
+		}
+
+		yield put({
+			type: GET_FONT_USAGE_SUCCESS,
+			payload: response.body,
+		});
+	} catch (error) {
+		yield put({
+			type: GET_FONT_USAGE_ERROR,
+			payload: GFPDF.addFatalError,
+		});
+	}
 }
 
 /**
@@ -225,13 +262,14 @@ export function* watchDeleteFont() {
  * Generate response for delete font request
  *
  * @param {Object} params
- * @param {string} params.payload - ID of the font to delete
+ * @param {string} params.payload  - ID of the font to delete
+ * @param {string} params.fontType - The row's `type`
  *
  * @since 6.0
  */
-export function* deleteFont({ payload }) {
+export function* deleteFont({ payload, fontType }) {
 	try {
-		const response = yield call(apiDeleteFont, payload);
+		const response = yield call(apiDeleteFont, payload, fontType);
 
 		if (!response.ok) {
 			throw response;
@@ -242,9 +280,13 @@ export function* deleteFont({ payload }) {
 			payload,
 		});
 	} catch (error) {
+		/* Show the server's reason when it refuses (in use, or already gone) */
+		const refused =
+			error && [404, 409].includes(error.status) && error.body?.message;
+
 		yield put({
 			type: DELETE_FONT_ERROR,
-			payload: GFPDF.addFatalError,
+			payload: refused || GFPDF.addFatalError,
 		});
 	}
 }

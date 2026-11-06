@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { sprintf } from 'sprintf-js';
 /* Redux actions */
 import {
 	clearAddFontMsg as clearAddFontMsgAction,
@@ -14,6 +15,7 @@ import FontListIcon from './FontListIcon';
 import Spinner from '../Spinner';
 /* Utilities */
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
+import { isCustomFont } from '../../utilities/FontManager/fontManagerReducer';
 
 /**
  * @package			Gravity PDF
@@ -49,6 +51,9 @@ export class FontListItems extends Component {
 				italics: PropTypes.string.isRequired,
 				bold: PropTypes.string.isRequired,
 				bolditalics: PropTypes.string.isRequired,
+				type: PropTypes.string.isRequired,
+				can_delete: PropTypes.bool.isRequired,
+				auto_install: PropTypes.bool,
 			})
 		).isRequired,
 		searchResult: PropTypes.oneOfType([
@@ -57,6 +62,7 @@ export class FontListItems extends Component {
 		]),
 		selectedFont: PropTypes.string.isRequired,
 		loading: PropTypes.bool.isRequired,
+		fontUsage: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string)),
 	};
 
 	/**
@@ -197,11 +203,16 @@ export class FontListItems extends Component {
 	/**
 	 * Handle font click to display or hide update font panel
 	 *
-	 * @param { string } fontId
+	 * @param { Object } font
 	 *
 	 * @since 6.0
 	 */
-	handleFontClick = (fontId) => {
+	handleFontClick = (font) => {
+		/* Core and bundled fonts can be selected and core fonts deleted, but not edited */
+		if (!isCustomFont(font)) {
+			return;
+		}
+
 		const {
 			id,
 			navigate,
@@ -215,28 +226,28 @@ export class FontListItems extends Component {
 			clearAddFontMsg();
 		}
 
-		if (id === fontId) {
+		if (id === font.id) {
 			return toggleUpdateFont(navigate);
 		}
 
-		toggleUpdateFont(navigate, fontId);
+		toggleUpdateFont(navigate, font.id);
 	};
 
 	/**
 	 * Listen to an 'enter' keyboard event on font list item
 	 *
 	 * @param { KeyboardEvent } e
-	 * @param { string }        fontId
+	 * @param { Object }        font
 	 *
 	 * @since 6.0
 	 */
-	handleFontClickKeypress = (e, fontId) => {
+	handleFontClickKeypress = (e, font) => {
 		const enter = 'Enter';
 		const space = ' ';
 
 		/* Check if a keyboard keypress is 'enter' (13) and call the method handleFontClick() */
 		if (e.key === enter || e.key === space) {
-			this.handleFontClick(fontId);
+			this.handleFontClick(font);
 		}
 	};
 
@@ -244,37 +255,144 @@ export class FontListItems extends Component {
 	 * Handle request of font deletion
 	 *
 	 * @param { Event }  e
-	 * @param { string } fontId
+	 * @param { Object } font
 	 *
 	 * @since 6.0
 	 */
-	handleDeleteFont = (e, fontId) => {
+	handleDeleteFont = (e, font) => {
 		e.stopPropagation();
 
-		this.setState({ deleteId: fontId });
+		if (this.isDeleteLocked(font)) {
+			return;
+		}
+
+		this.setState({ deleteId: font.id });
 
 		/* Fire a native window alert box to confirm deletion request */
-		if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
+		if (window.confirm(this.getDeleteConfirmation(font))) {
 			/* Call redux action deleteFont */
-			this.props.deleteFont(fontId);
+			this.props.deleteFont(font.id, font.type);
 		}
+	};
+
+	/**
+	 * The delete confirmation: a core font comes back on its own unless downloads are off
+	 *
+	 * @param { Object } font
+	 *
+	 * @return { string } The message
+	 *
+	 * @since 6.19.0
+	 */
+	getDeleteConfirmation = (font) => {
+		if (font.type !== 'core') {
+			return GFPDF.fontManagerDeleteFontConfirmation;
+		}
+
+		// eslint-disable-next-line @wordpress/valid-sprintf
+		return sprintf(
+			font.auto_install
+				? GFPDF.fontManagerCoreConfirm
+				: GFPDF.fontManagerCoreConfirmOffline,
+			font.font_name
+		);
+	};
+
+	/**
+	 * Why the font is in use
+	 *
+	 * @param { Object } font
+	 *
+	 * @return { Array<string> } The reasons
+	 *
+	 * @since 6.19.0
+	 */
+	getInUse = (font) => this.props.fontUsage?.[font.id] || [];
+
+	/**
+	 * Whether Delete is off: the user can't delete this font, it's in use, or that isn't known yet
+	 *
+	 * @param { Object } font
+	 *
+	 * @return { boolean } Whether it's locked
+	 *
+	 * @since 6.19.0
+	 */
+	isDeleteLocked = (font) =>
+		!font.can_delete ||
+		!this.props.fontUsage ||
+		this.getInUse(font).length > 0;
+
+	/**
+	 * The tag for a font's type
+	 *
+	 * @param { string } type
+	 *
+	 * @return { string } The label
+	 *
+	 * @since 6.19.0
+	 */
+	getTypeLabel = (type) =>
+		({
+			custom: GFPDF.fontManagerTypeCustom,
+			core: GFPDF.fontManagerTypeCore,
+			bundled: GFPDF.fontManagerTypeBundled,
+		})[type];
+
+	/**
+	 * A row's Delete: a bundled font has none, and a locked one says why when it can
+	 *
+	 * @param { Object } font
+	 * @param { string } tabIndex
+	 *
+	 * @return { JSX.Element | null } The button
+	 *
+	 * @since 6.19.0
+	 */
+	renderDeleteButton = (font, tabIndex) => {
+		if (font.type === 'bundled') {
+			return null;
+		}
+
+		if (this.props.loading && this.state.deleteId === font.id) {
+			return <Spinner style="delete-font" />;
+		}
+
+		const locked = this.isDeleteLocked(font);
+
+		return (
+			<span
+				role="button"
+				className={
+					'dashicons dashicons-trash' + (locked ? ' disabled' : '')
+				}
+				aria-label={
+					GFPDF.fontManagerDeleteFontAriaLabel + ': ' + font.font_name
+				}
+				aria-disabled={locked}
+				title={this.getInUse(font).join(', ') || undefined}
+				onClick={(e) => this.handleDeleteFont(e, font)}
+				onKeyDown={(e) => this.handleDeleteFontKeypress(e, font)}
+				tabIndex={tabIndex}
+			/>
+		);
 	};
 
 	/**
 	 * Listen to an 'enter' keyboard event for font deletion
 	 *
 	 * @param { KeyboardEvent } e
-	 * @param { string }        fontId
+	 * @param { Object }        font
 	 *
 	 * @since 6.0
 	 */
-	handleDeleteFontKeypress = (e, fontId) => {
+	handleDeleteFontKeypress = (e, font) => {
 		const enter = 'Enter';
 		const space = ' ';
 
 		/* Check if a keyboard keypress is 'enter' (13) and call the method handleDeleteFont() */
 		if (e.key === enter || e.key === space) {
-			this.handleDeleteFont(e, fontId);
+			this.handleDeleteFont(e, font);
 		}
 	};
 
@@ -331,87 +449,98 @@ export class FontListItems extends Component {
 	 */
 	render() {
 		const updateFontVisible = document.querySelector('.update-font.show');
-		const { deleteId } = this.state;
-		const { id, loading, fontList, searchResult, selectedFont } =
-			this.props;
+		const { id, fontList, searchResult, selectedFont } = this.props;
 		const list = !searchResult ? fontList : searchResult;
 		const tabIndex = !updateFontVisible ? '0' : '-1';
 
 		return (
-			<div
-				data-test="component-FontListItems"
-				className="font-list-items"
-				role="listbox"
-				aria-label={GFPDF.fontListInstalledFonts}
-				aria-live="polite"
-			>
+			<>
+				<div
+					data-test="component-FontListItems"
+					className="font-list-items"
+					role="listbox"
+					aria-label={GFPDF.fontListInstalledFonts}
+					aria-live="polite"
+				>
+					{list &&
+						list.map((font) => {
+							const inUse = this.getInUse(font);
+
+							return (
+								<div
+									key={font.id}
+									data-test="font-list-item"
+									className={
+										'font-list-item font-type-' +
+										font.type +
+										(font.id === id ? ' active' : '')
+									}
+									onClick={() => this.handleFontClick(font)}
+									onKeyDown={(e) =>
+										this.handleFontClickKeypress(e, font)
+									}
+									tabIndex={
+										isCustomFont(font)
+											? tabIndex
+											: undefined
+									}
+									role="option"
+								>
+									<span className="font-name">
+										<input
+											type="radio"
+											className="select-font-name"
+											name={'select-font-name-' + font.id}
+											value={font.id}
+											onChange={(e) =>
+												this.handleSelectFont(e)
+											}
+											onClick={(e) => e.stopPropagation()}
+											onKeyDown={(e) =>
+												this.handleSelectFontKeypress(e)
+											}
+											checked={font.id === selectedFont}
+											aria-label={
+												GFPDF.fontManagerSelectFontAriaLabel +
+												': ' +
+												font.font_name
+											}
+											tabIndex={tabIndex}
+										/>
+										{font.font_name}
+										<span className="font-type">
+											{this.getTypeLabel(font.type)}
+										</span>
+										{inUse.length > 0 && (
+											<span className="font-in-use">
+												{inUse.join(', ')}
+											</span>
+										)}
+									</span>
+
+									<FontListIcon font={font.regular} />
+									<FontListIcon font={font.italics} />
+									<FontListIcon font={font.bold} />
+									<FontListIcon font={font.bolditalics} />
+
+									{this.renderDeleteButton(font, tabIndex)}
+								</div>
+							);
+						})}
+				</div>
+
 				{list &&
-					list.map((font) => {
-						return (
-							<div
-								key={font.id}
-								className={
-									'font-list-item' +
-									(font.id === id ? ' active' : '')
-								}
-								onClick={() => this.handleFontClick(font.id)}
-								onKeyDown={(e) =>
-									this.handleFontClickKeypress(e, font.id)
-								}
-								tabIndex={tabIndex}
-								role="option"
-							>
-								<span className="font-name">
-									<input
-										type="radio"
-										className="select-font-name"
-										name={'select-font-name-' + font.id}
-										value={font.id}
-										onChange={(e) =>
-											this.handleSelectFont(e)
-										}
-										onClick={(e) => e.stopPropagation()}
-										onKeyDown={(e) =>
-											this.handleSelectFontKeypress(e)
-										}
-										checked={font.id === selectedFont}
-										aria-label={
-											GFPDF.fontManagerSelectFontAriaLabel +
-											': ' +
-											font.font_name
-										}
-										tabIndex={tabIndex}
-									/>
-									{font.font_name}
-								</span>
-
-								<FontListIcon font={font.regular} />
-								<FontListIcon font={font.italics} />
-								<FontListIcon font={font.bold} />
-								<FontListIcon font={font.bolditalics} />
-
-								{loading && deleteId === font.id ? (
-									<Spinner style="delete-font" />
-								) : (
-									<span
-										role="button"
-										className="dashicons dashicons-trash"
-										onClick={(e) =>
-											this.handleDeleteFont(e, font.id)
-										}
-										onKeyDown={(e) =>
-											this.handleDeleteFontKeypress(
-												e,
-												font.id
-											)
-										}
-										tabIndex={tabIndex}
-									/>
-								)}
-							</div>
-						);
-					})}
-			</div>
+					list.some(
+						(font) => font.type === 'core' && !font.can_delete
+					) && (
+						<p
+							data-test="font-list-network-note"
+							className="font-list-note"
+						>
+							{GFPDF.fontManagerNetworkOnly}
+						</p>
+					)}
+			</>
 		);
 	}
 }
@@ -427,6 +556,7 @@ export class FontListItems extends Component {
  *   fontList: Array<Object>,
  *   searchResult: null | Array<Object>,
  *   selectedFont: string,
+ *   fontUsage: null | Object,
  *   msg: object,
  * }} mappedState
  *
@@ -437,6 +567,7 @@ const mapStateToProps = (state) => ({
 	fontList: state.fontManager.fontList,
 	searchResult: state.fontManager.searchResult,
 	selectedFont: state.fontManager.selectedFont,
+	fontUsage: state.fontManager.fontUsage,
 	msg: state.fontManager.msg,
 });
 

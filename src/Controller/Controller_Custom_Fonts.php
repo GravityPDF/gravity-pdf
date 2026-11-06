@@ -18,6 +18,7 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Model\Model_Required_Fonts;
 use GFPDF\Statics\Upload_Size;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
@@ -414,6 +415,11 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			$id = $request->get_param( 'id' );
 			if ( ! $this->model->matches_custom_font_id( $id ) ) {
 				throw new GravityPdfIdException();
+			}
+
+			$required_fonts = GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
+			if ( $required_fonts instanceof Model_Required_Fonts && $required_fonts->is_font_in_use( $id ) ) {
+				return new WP_Error( 'font_in_use', __( 'The font is in use, so it can\'t be deleted.', 'gravity-pdf' ), [ 'status' => 409 ] );
 			}
 
 			/* Delete TTF files from disk */

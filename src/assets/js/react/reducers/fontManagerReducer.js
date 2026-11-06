@@ -5,6 +5,8 @@ import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -46,6 +48,7 @@ import {
  * @property { boolean }       addFontLoading    - loading state when adding font
  * @property { boolean }       deleteFontLoading - loading state when deleting font
  * @property { Array<Object> } fontList          - font list state
+ * @property { null | Object } fontUsage         - why fonts are in use by ID, null until loaded
  * @property { null }          searchResult      - search result state
  * @property { string }        selectedFont      - state of selected font
  * @property { Object }        msg               - message object
@@ -63,6 +66,7 @@ export const initialState = {
 	addFontLoading: false,
 	deleteFontLoading: false,
 	fontList: [],
+	fontUsage: null,
 	searchResult: null,
 	selectedFont: '',
 	msg: {},
@@ -93,6 +97,7 @@ export default function (state = initialState, action) {
 			return {
 				...state,
 				loading: true,
+				fontUsage: null,
 				msg: {},
 			};
 		}
@@ -119,6 +124,31 @@ export default function (state = initialState, action) {
 				...state,
 				loading: false,
 				msg: { error: { fontList: payload } },
+			};
+
+		/**
+		 * Process GET_FONT_USAGE_SUCCESS
+		 *
+		 * @since 6.19.0
+		 */
+		case GET_FONT_USAGE_SUCCESS:
+			return {
+				...state,
+				fontUsage: payload,
+			};
+
+		/**
+		 * Process GET_FONT_USAGE_ERROR, which leaves Delete disabled
+		 *
+		 * @since 6.19.0
+		 */
+		case GET_FONT_USAGE_ERROR:
+			return {
+				...state,
+				msg: {
+					...state.msg,
+					error: { ...state.msg.error, deleteFont: payload },
+				},
 			};
 
 		/**
@@ -155,7 +185,10 @@ export default function (state = initialState, action) {
 				};
 			}
 
-			const updatedFontList = [...state.fontList, payload.font];
+			const updatedFontList = [
+				...state.fontList,
+				{ type: 'custom', can_delete: true, ...payload.font },
+			];
 
 			return {
 				...state,

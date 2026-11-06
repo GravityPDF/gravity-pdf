@@ -788,6 +788,25 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertSame( 200, $response->get_status() );
 	}
 
+	public function test_delete_item_in_use_is_refused() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_all_file_params( $request );
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', $font['id'] );
+
+		$request  = new WP_REST_Request( 'DELETE', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $font['id'] );
+		$response = rest_get_server()->dispatch( $request );
+
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+
+		$this->assertSame( 409, $response->get_status() );
+		$this->assertSame( 'font_in_use', $response->get_data()['code'] );
+		$this->assertArrayHasKey( $font['id'], $this->model->get_custom_fonts() );
+	}
+
 	public function test_delete_item_with_font_reference_gone_success() {
 		wp_set_current_user( $this->admin_user );
 

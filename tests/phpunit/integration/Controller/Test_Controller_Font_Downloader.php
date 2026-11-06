@@ -257,7 +257,8 @@ class Test_Controller_Font_Downloader extends TestCase {
 	public function test_the_downloaded_font_routes_are_registered() {
 		$routes = rest_get_server()->get_routes( Helper_Data::REST_API_BASENAME . 'v1' );
 
-		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/downloaded', $routes );
+		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/installed', $routes );
+		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/installed/usage', $routes );
 		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/downloaded/(?P<key>[a-z0-9_\-]+)', $routes );
 	}
 
@@ -265,10 +266,10 @@ class Test_Controller_Font_Downloader extends TestCase {
 		$this->set_font_user( true );
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 
-		$list = $this->dispatch( 'GET', 'fonts/downloaded' );
+		$list = $this->dispatch( 'GET', 'fonts/installed' );
 		$this->assertSame( 200, $list->get_status() );
-		$this->assertTrue( $list->get_data()['can_delete'] );
-		$this->assertSame( [ 'dejavuserifcondensed' ], array_column( $list->get_data()['fonts'], 'id' ) );
+		$font = wp_list_filter( $list->get_data(), [ 'id' => 'dejavuserifcondensed' ] );
+		$this->assertTrue( array_values( $font )[0]['can_delete'] );
 
 		$delete = $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' );
 		$this->assertSame( 200, $delete->get_status() );
@@ -281,6 +282,7 @@ class Test_Controller_Font_Downloader extends TestCase {
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 
+		$this->assertSame( [ 'Default font' ], $this->dispatch( 'GET', 'fonts/installed/usage' )->get_data()['dejavuserifcondensed'] );
 		$this->assertSame( 409, $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' )->get_status() );
 		$this->assertSame( 404, $this->dispatch( 'DELETE', 'fonts/downloaded/freeserif' )->get_status() );
 		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
@@ -290,7 +292,7 @@ class Test_Controller_Font_Downloader extends TestCase {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 
-		$this->assertSame( 403, $this->dispatch( 'GET', 'fonts/downloaded' )->get_status() );
+		$this->assertSame( 403, $this->dispatch( 'GET', 'fonts/installed' )->get_status() );
 		$this->assertSame( 403, $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' )->get_status() );
 		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 	}
@@ -303,9 +305,10 @@ class Test_Controller_Font_Downloader extends TestCase {
 		$this->set_font_user( false );
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 
-		$list = $this->dispatch( 'GET', 'fonts/downloaded' );
+		$list = $this->dispatch( 'GET', 'fonts/installed' );
 		$this->assertSame( 200, $list->get_status() );
-		$this->assertFalse( $list->get_data()['can_delete'] );
+		$font = wp_list_filter( $list->get_data(), [ 'id' => 'dejavuserifcondensed' ] );
+		$this->assertFalse( array_values( $font )[0]['can_delete'] );
 		$this->assertSame( 403, $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' )->get_status() );
 		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 	}

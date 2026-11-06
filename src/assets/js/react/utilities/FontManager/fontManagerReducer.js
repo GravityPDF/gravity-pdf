@@ -62,6 +62,17 @@ export function findAndRemove(data, payload) {
 }
 
 /**
+ * Whether a Font Manager row is a custom font, the only type that can be edited
+ *
+ * @param { Object } font
+ *
+ * @return { boolean } Whether it's custom
+ *
+ * @since 6.19.0
+ */
+export const isCustomFont = (font) => font.type === 'custom';
+
+/**
  * Utility function to trim font file name
  *
  * @param { string } key

@@ -71,17 +71,27 @@ class Controller_Font_Downloader extends Helper_Abstract_Controller implements H
 	}
 
 	/**
-	 * The Font Manager's downloaded fonts list and delete, beside the custom font routes
+	 * The Font Manager's list of every font, what's in use, and the delete for downloaded fonts
 	 *
 	 * @since 6.19.0
 	 */
 	public function register_endpoints(): void {
 		register_rest_route(
 			Helper_Data::REST_API_BASENAME . 'v1',
-			'/fonts/downloaded',
+			'/fonts/installed',
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_downloaded_fonts' ],
+				'callback'            => [ $this->model, 'get_installed_fonts' ],
+				'permission_callback' => [ $this, 'can_view_fonts' ],
+			]
+		);
+
+		register_rest_route(
+			Helper_Data::REST_API_BASENAME . 'v1',
+			'/fonts/installed/usage',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this->model, 'get_font_usage' ],
 				'permission_callback' => [ $this, 'can_view_fonts' ],
 			]
 		);
@@ -95,18 +105,6 @@ class Controller_Font_Downloader extends Helper_Abstract_Controller implements H
 				'permission_callback' => [ $this, 'can_delete_fonts' ],
 			]
 		);
-	}
-
-	/**
-	 * @return array{fonts: array, can_delete: bool}
-	 *
-	 * @since 6.19.0
-	 */
-	public function get_downloaded_fonts(): array {
-		return [
-			'fonts'      => $this->model->get_downloaded_fonts(),
-			'can_delete' => $this->can_delete_fonts(),
-		];
 	}
 
 	/**
@@ -138,7 +136,7 @@ class Controller_Font_Downloader extends Helper_Abstract_Controller implements H
 	 * @since 6.19.0
 	 */
 	public function can_delete_fonts(): bool {
-		return $this->can_view_fonts() && ( ! is_multisite() || is_super_admin() );
+		return $this->can_view_fonts() && $this->model->can_delete_core_fonts();
 	}
 
 	/**

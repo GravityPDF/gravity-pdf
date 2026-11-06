@@ -28,11 +28,14 @@ describe('FontManager - FontListItems.js', () => {
 				italics: 'FiraSans-LightItalic.ttf',
 				bold: 'FiraSans-Medium.ttf',
 				bolditalics: 'FiraSans-MediumItalic.ttf',
+				type: 'custom',
+				can_delete: true,
 			},
 		],
 		searchResult: null,
 		selectedFont: 'roboto',
 		loading: true,
+		fontUsage: {},
 	};
 
 	describe('RUN LIFECYCLE METHODS', () => {
@@ -217,7 +220,7 @@ describe('FontManager - FontListItems.js', () => {
 			const wrapper = shallow(<FontListItems {...props} />);
 			const instance = wrapper.instance();
 
-			instance.handleFontClick('arial');
+			instance.handleFontClick({ id: 'arial', type: 'custom' });
 
 			expect(props.clearAddFontMsg).toHaveBeenCalledTimes(1);
 			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
@@ -233,7 +236,7 @@ describe('FontManager - FontListItems.js', () => {
 			const handleFontClick = jest.spyOn(instance, 'handleFontClick');
 			const e = { key: 'Enter' };
 
-			instance.handleFontClickKeypress(e, 'arial');
+			instance.handleFontClickKeypress(e, { id: 'arial' });
 
 			expect(handleFontClick).toHaveBeenCalledTimes(1);
 		});
@@ -245,10 +248,158 @@ describe('FontManager - FontListItems.js', () => {
 			const instance = wrapper.instance();
 			const e = { stopPropagation: jest.fn() };
 
-			instance.handleDeleteFont(e, 'arial');
+			instance.handleDeleteFont(e, {
+				id: 'arial',
+				type: 'custom',
+				can_delete: true,
+			});
 
 			expect(wrapper.state('deleteId')).toBe('arial');
 			expect(props.deleteFont).toHaveBeenCalledTimes(1);
+			expect(props.deleteFont).toHaveBeenCalledWith('arial', 'custom');
+		});
+
+		test('handleFontClick() - A core or bundled font has no update font panel', () => {
+			const toggleUpdateFont = jest.spyOn(utilities, 'toggleUpdateFont');
+			toggleUpdateFont.mockClear();
+			const instance = shallow(<FontListItems {...props} />).instance();
+
+			instance.handleFontClick({ id: 'freeserif', type: 'core' });
+			instance.handleFontClick({ id: 'arimo', type: 'bundled' });
+
+			expect(toggleUpdateFont).not.toHaveBeenCalled();
+		});
+
+		test('handleDeleteFont() - An in-use font is not deleted', () => {
+			const confirm = jest.fn(() => true);
+			global.confirm = confirm;
+			props.deleteFont.mockClear();
+			const instance = shallow(<FontListItems {...props} />).instance();
+
+			instance.handleDeleteFont(
+				{ stopPropagation: jest.fn() },
+				{ id: 'freeserif', type: 'core', can_delete: false }
+			);
+
+			expect(confirm).not.toHaveBeenCalled();
+			expect(props.deleteFont).not.toHaveBeenCalled();
+		});
+
+		test('getDeleteConfirmation() - A core font says whether it comes back', () => {
+			GFPDF.fontManagerDeleteFontConfirmation = 'Sure?';
+			GFPDF.fontManagerCoreConfirm = 'Delete %s, it comes back';
+			GFPDF.fontManagerCoreConfirmOffline = 'Delete %s, it stays gone';
+			const instance = shallow(<FontListItems {...props} />).instance();
+			const font = { font_name: 'Free Serif', type: 'core' };
+
+			expect(instance.getDeleteConfirmation({ type: 'custom' })).toBe(
+				'Sure?'
+			);
+			expect(
+				instance.getDeleteConfirmation({ ...font, auto_install: true })
+			).toBe('Delete Free Serif, it comes back');
+			expect(
+				instance.getDeleteConfirmation({ ...font, auto_install: false })
+			).toBe('Delete Free Serif, it stays gone');
+		});
+
+		test('isDeleteLocked() - Off until usage loads, and while in use or not allowed', () => {
+			const font = { id: 'garuda', type: 'core', can_delete: true };
+			const locked = (fontUsage, row = font) =>
+				shallow(<FontListItems {...props} fontUsage={fontUsage} />)
+					.instance()
+					.isDeleteLocked(row);
+
+			expect(locked(null)).toBe(true);
+			expect(locked({})).toBe(false);
+			expect(locked({ garuda: ['Default font'] })).toBe(true);
+			expect(locked({}, { ...font, can_delete: false })).toBe(true);
+		});
+
+		test('render() - Each type gets its tag, in-use reasons and delete state', () => {
+			GFPDF.fontManagerTypeCore = 'Core';
+			GFPDF.fontManagerTypeBundled = 'Bundled';
+			GFPDF.fontManagerNetworkOnly = 'Network only';
+			const base = {
+				regular: 'a.ttf',
+				italics: '',
+				bold: '',
+				bolditalics: '',
+			};
+			const wrapper = shallow(
+				<FontListItems
+					{...props}
+					loading={false}
+					fontUsage={{
+						arimo: ['Default font'],
+						freeserif: ['Used by 1 PDF'],
+					}}
+					fontList={[
+						{
+							...base,
+							id: 'arimo',
+							font_name: 'Arimo',
+							type: 'bundled',
+							can_delete: false,
+						},
+						{
+							...base,
+							id: 'freeserif',
+							font_name: 'Free Serif',
+							type: 'core',
+							can_delete: true,
+						},
+						{
+							...base,
+							id: 'khmeros',
+							font_name: 'Khmer OS',
+							type: 'core',
+							can_delete: true,
+						},
+					]}
+				/>
+			);
+			const rows = wrapper.find('[data-test="font-list-item"]');
+			const trash = (index) => rows.at(index).find('.dashicons-trash');
+
+			expect(rows.at(0).find('.font-type').text()).toBe('Bundled');
+			expect(trash(0).exists()).toBe(false);
+			expect(rows.at(0).prop('tabIndex')).toBe(undefined);
+
+			expect(rows.at(1).find('.font-type').text()).toBe('Core');
+			expect(rows.at(1).find('.font-in-use').text()).toBe(
+				'Used by 1 PDF'
+			);
+			expect(trash(1).hasClass('disabled')).toBe(true);
+			expect(trash(1).prop('title')).toBe('Used by 1 PDF');
+
+			expect(rows.at(2).find('.font-in-use').exists()).toBe(false);
+			expect(trash(2).hasClass('disabled')).toBe(false);
+
+			expect(
+				wrapper.find('[data-test="font-list-network-note"]').exists()
+			).toBe(false);
+		});
+
+		test('render() - Says why when this user cannot delete core fonts', () => {
+			GFPDF.fontManagerNetworkOnly = 'Network only';
+			const wrapper = shallow(
+				<FontListItems
+					{...props}
+					fontList={[
+						{
+							...props.fontList[0],
+							id: 'garuda',
+							type: 'core',
+							can_delete: false,
+						},
+					]}
+				/>
+			);
+
+			expect(
+				wrapper.find('[data-test="font-list-network-note"]').text()
+			).toBe('Network only');
 		});
 
 		test("handleDeleteFontKeypress() - Listen to an 'enter' keyboard event for font deletion", () => {
@@ -262,7 +413,11 @@ describe('FontManager - FontListItems.js', () => {
 				stopPropagation: jest.fn(),
 			};
 
-			instance.handleDeleteFontKeypress(e, 'arial');
+			instance.handleDeleteFontKeypress(e, {
+				id: 'arial',
+				type: 'custom',
+				can_delete: true,
+			});
 
 			expect(handleDeleteFont).toHaveBeenCalledTimes(1);
 		});

@@ -250,6 +250,10 @@ test.describe('Font Manager', () => {
 
 		// Delete Font
 		page.on('dialog', (dialog) => dialog.accept());
+		await expect(font.locator('.dashicons-trash')).toHaveAttribute(
+			'aria-disabled',
+			'false'
+		);
 		await font.locator('.dashicons-trash').click();
 		await expect(font).toHaveCount(0);
 	});
@@ -361,7 +365,7 @@ test.describe('Font Manager', () => {
 		expect(savedFontFiles()).toContain(italics);
 	});
 
-	test.describe('Downloaded fonts', () => {
+	test.describe('Core and custom fonts in one list', () => {
 		const seededFiles: string[] = [];
 
 		// Downloads are off on this site (see tools/mu-plugins), so copy in a core font no other spec uses
@@ -375,16 +379,16 @@ test.describe('Font Manager', () => {
 			);
 		};
 
-		const downloadedFont = (page: Page, label: string) =>
+		const fontRow = (page: Page, label: string) =>
 			page
-				.locator('[data-test="downloaded-font"]')
+				.locator('[data-test="font-list-item"]')
 				.filter({ hasText: label });
 
 		test.afterEach(() =>
 			wpCli(`cd ${FONTS_DIR} && rm -f ${seededFiles.splice(0).join(' ')}`)
 		);
 
-		test('should delete a downloaded core font that is not in use', async ({
+		test('should list a core font with the custom fonts, select it and delete it', async ({
 			page,
 		}) => {
 			const label = 'Dhyana (Lao)';
@@ -393,26 +397,36 @@ test.describe('Font Manager', () => {
 			await pdf.navigateToNewFormPdf(form.id);
 			await openFontManager(page);
 
-			const font = downloadedFont(page, label);
-			await expect(font).toContainText('Regular, Bold');
-			await expect(font).toContainText('Not in use');
+			const font = fontRow(page, label);
+			await expect(font).toContainText('Core');
+			await expect(page.locator('.update-font.show')).toHaveCount(0);
+
+			// A core font can't be edited, so a click doesn't open the update panel
+			await font
+				.locator('.font-name')
+				.click({ position: { x: 60, y: 5 } });
+			await expect(page.locator('.update-font.show')).toHaveCount(0);
+
+			await font.locator('.select-font-name').check();
+			await expect(font.locator('.select-font-name')).toBeChecked();
 
 			let confirm = '';
 			page.once('dialog', (dialog) => {
 				confirm = dialog.message();
 				return dialog.accept();
 			});
-			await font.getByRole('button', { name: `Delete ${label}` }).click();
+			await expect(font.locator('.dashicons-trash')).toHaveAttribute(
+				'aria-disabled',
+				'false'
+			);
+			await font.locator('.dashicons-trash').click();
 
-			await expect(page.getByText(`${label} deleted.`)).toBeVisible();
 			await expect(font).toHaveCount(0);
 			expect(confirm).toContain('Font downloads are turned off');
 			expect(savedFontFiles()).not.toContain('Dhyana');
 		});
 
-		test('should not delete a downloaded core font in use', async ({
-			page,
-		}) => {
+		test('should not delete a core font in use', async ({ page }) => {
 			// The default font for this test's requests only (see tools/mu-plugins)
 			await page.setExtraHTTPHeaders({
 				'X-GPDF-E2E-Default-Font': 'jomolhari',
@@ -423,11 +437,21 @@ test.describe('Font Manager', () => {
 			await pdf.navigateToNewFormPdf(form.id);
 			await openFontManager(page);
 
-			const font = downloadedFont(page, label);
+			const font = fontRow(page, label);
 			await expect(font).toContainText('Default font');
-			await expect(
-				font.getByRole('button', { name: `Delete ${label}` })
-			).toBeDisabled();
+			await expect(font.locator('.dashicons-trash')).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+		});
+
+		test('should show a bundled font with no delete', async ({ page }) => {
+			await pdf.navigateToNewFormPdf(form.id);
+			await openFontManager(page);
+
+			const font = fontRow(page, 'Arimo');
+			await expect(font).toContainText('Bundled');
+			await expect(font.locator('.dashicons-trash')).toHaveCount(0);
 		});
 	});
 });

@@ -56,39 +56,106 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->copy_fixture( 'Chewy.ttf', 'gfpdf-Arimo-Regular.ttf' );
 		$this->copy_fixture( 'Chewy.ttf', 'DejaVuinfo.txt' );
 
-		$fonts = $this->downloader()->get_downloaded_fonts();
-		$size  = filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ) + filesize( $this->font_fixture( 'Chewy.ttf' ) );
-
 		$this->assertSame(
 			[
 				[
 					'id'           => 'dejavuserifcondensed',
-					'label'        => 'Dejavu Serif Condensed',
-					'source'       => 'core',
-					'files'        => [
-						[
-							'style' => 'R',
-							'file'  => 'DejaVuSerifCondensed.ttf',
-							'size'  => filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ),
-						],
-						[
-							'style' => 'B',
-							'file'  => 'DejaVuSerifCondensed-Bold.ttf',
-							'size'  => filesize( $this->font_fixture( 'Chewy.ttf' ) ),
-						],
-					],
-					'size'         => $size,
-					'size_label'   => size_format( $size, 1 ),
-					'in_use'       => [],
+					'font_name'    => 'Dejavu Serif Condensed',
+					'type'         => 'core',
+					'regular'      => 'DejaVuSerifCondensed.ttf',
+					'italics'      => '',
+					'bold'         => 'DejaVuSerifCondensed-Bold.ttf',
+					'bolditalics'  => '',
+					'can_delete'   => ! is_multisite() || is_super_admin(),
 					'auto_install' => true,
 				],
 			],
-			$fonts
+			$this->core_rows( $this->downloader() )
 		);
 	}
 
+	public function test_bundled_fonts_are_listed_but_not_deletable_and_hidden_ones_are_not_listed() {
+		$rows = array_values( wp_list_filter( $this->downloader()->get_installed_fonts(), [ 'type' => 'bundled' ] ) );
+
+		$this->assertSame( [ 'arimo' ], array_column( $rows, 'id' ) );
+		$this->assertSame( 'Arimo', $rows[0]['font_name'] );
+		$this->assertSame( 'gfpdf-Arimo-BoldItalic.ttf', $rows[0]['bolditalics'] );
+		$this->assertFalse( $rows[0]['can_delete'] );
+	}
+
+	public function test_custom_fonts_share_the_list_sorted_by_name_and_replace_a_core_font_of_the_same_key() {
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->put_freeserif_on_disk();
+		GPDFAPI::get_options_class()->update_option(
+			'custom_fonts',
+			[
+				'freeserif' => [
+					'id'        => 'freeserif',
+					'font_name' => 'My Free Serif',
+					'regular'   => 'custom-serif.ttf',
+				],
+				'brand'     => [
+					'id'        => 'brand',
+					'font_name' => 'Brand',
+					'regular'   => 'brand.ttf',
+				],
+			]
+		);
+
+		$fonts = $this->downloader()->get_installed_fonts();
+
+		$this->assertSame(
+			[ 'arimo', 'brand', 'dejavuserifcondensed', 'freeserif' ],
+			array_column( $fonts, 'id' )
+		);
+		$this->assertSame( [ 'bundled', 'custom', 'core', 'custom' ], array_column( $fonts, 'type' ) );
+		$this->assertSame( 'My Free Serif', $fonts[3]['font_name'] );
+		$this->assertTrue( $fonts[1]['can_delete'] );
+	}
+
+	public function test_a_custom_font_says_why_it_is_in_use() {
+		GPDFAPI::get_options_class()->update_option(
+			'custom_fonts',
+			[
+				'brand' => [
+					'id'        => 'brand',
+					'font_name' => 'Brand',
+					'regular'   => 'brand.ttf',
+				],
+			]
+		);
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'brand' );
+		$this->add_form_with_pdfs( [ [ 'font' => 'brand' ] ] );
+
+		$this->assertSame( [ 'Default font', 'Used by 1 PDF' ], $this->downloader()->get_font_usage()['brand'] );
+	}
+
+	public function test_another_sites_use_of_a_key_does_not_hold_a_custom_font() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		GPDFAPI::get_options_class()->update_option(
+			'custom_fonts',
+			[
+				'brand' => [
+					'id'        => 'brand',
+					'font_name' => 'Brand',
+					'regular'   => 'brand.ttf',
+				],
+			]
+		);
+
+		$blog_id = self::factory()->blog->create();
+		switch_to_blog( $blog_id );
+		update_option( 'gfpdf_settings', [ 'default_font' => 'brand' ] );
+		restore_current_blog();
+
+		$this->assertArrayNotHasKey( 'brand', $this->downloader()->get_font_usage() );
+	}
+
 	public function test_nothing_is_listed_with_an_empty_fonts_folder() {
-		$this->assertSame( [], $this->downloader()->get_downloaded_fonts() );
+		$this->assertSame( [], $this->core_rows( $this->downloader() ) );
 	}
 
 	public function test_in_use_families_say_why() {
@@ -111,7 +178,7 @@ class Test_Downloaded_Fonts extends TestCase {
 			}
 		);
 
-		$in_use = array_column( $this->downloader( $sources )->get_downloaded_fonts(), 'in_use', 'id' );
+		$in_use = $this->downloader( $sources )->get_font_usage();
 
 		$this->assertSame( [ 'Default font' ], $in_use['dejavuserifcondensed'] );
 		$this->assertSame( [ 'Site language (th)' ], $in_use['garuda'] );
@@ -137,7 +204,7 @@ class Test_Downloaded_Fonts extends TestCase {
 				'dejavuserifcondensed' => true,
 				'freeserif'            => false,
 			],
-			array_column( $this->downloader()->get_downloaded_fonts(), 'auto_install', 'id' )
+			array_column( $this->core_rows( $this->downloader() ), 'auto_install', 'id' )
 		);
 	}
 
@@ -238,13 +305,10 @@ class Test_Downloaded_Fonts extends TestCase {
 
 		$downloader = $this->downloader();
 
-		$this->assertSame(
-			[
-				'dejavuserifcondensed' => [ 'Used on 1 other site' ],
-				'freeserif'            => [],
-			],
-			array_column( $downloader->get_downloaded_fonts(), 'in_use', 'id' )
-		);
+		$usage = $downloader->get_font_usage();
+
+		$this->assertSame( [ 'Used on 1 other site' ], $usage['dejavuserifcondensed'] );
+		$this->assertArrayNotHasKey( 'freeserif', $usage );
 
 		$this->assert_font_error( $downloader->delete_downloaded_font( 'dejavuserifcondensed' ), 'font_in_use', 409 );
 	}
@@ -268,10 +332,7 @@ class Test_Downloaded_Fonts extends TestCase {
 		remove_filter( 'get_available_languages', $installed );
 		restore_current_blog();
 
-		$this->assertSame(
-			[ 'garuda' => [ 'Used on 1 other site' ] ],
-			array_column( $this->downloader()->get_downloaded_fonts(), 'in_use', 'id' )
-		);
+		$this->assertSame( [ 'Used on 1 other site' ], $this->downloader()->get_font_usage()['garuda'] );
 	}
 
 	/**
@@ -312,5 +373,12 @@ class Test_Downloaded_Fonts extends TestCase {
 				}
 			)
 		);
+	}
+
+	/**
+	 * @return array[] The list's downloaded fonts
+	 */
+	protected function core_rows( Seamed_Font_Downloader $downloader ): array {
+		return array_values( wp_list_filter( $downloader->get_installed_fonts(), [ 'type' => 'core' ] ) );
 	}
 }

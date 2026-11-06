@@ -331,24 +331,14 @@ class Helper_Data {
 				'fontManagerUpdateFontAriaLabel'       => esc_html__( 'Update font', 'gravity-pdf' ),
 				'fontManagerSelectFontAriaLabel'       => esc_html__( 'Select font', 'gravity-pdf' ),
 				'fontManagerDeleteFontAriaLabel'       => esc_html__( 'Delete font', 'gravity-pdf' ),
-				'fontManagerDownloadedTitle'           => esc_html__( 'Downloaded Fonts', 'gravity-pdf' ),
-				'fontManagerDownloadedDesc'            => esc_html__( 'Core fonts downloaded when a PDF, setting or site language needed them. A deleted font downloads again when a PDF needs it.', 'gravity-pdf' ),
-				'fontManagerDownloadedEmpty'           => esc_html__( 'No fonts have been downloaded.', 'gravity-pdf' ),
-				'fontManagerDownloadedReadOnly'        => esc_html__( 'Only a network administrator can delete downloaded fonts, as every site in the network shares them.', 'gravity-pdf' ),
-				'fontManagerDownloadedFont'            => esc_html__( 'Font', 'gravity-pdf' ),
-				'fontManagerDownloadedStyles'          => esc_html__( 'Styles', 'gravity-pdf' ),
-				'fontManagerDownloadedSize'            => esc_html__( 'Size', 'gravity-pdf' ),
-				'fontManagerDownloadedStatus'          => esc_html__( 'In use', 'gravity-pdf' ),
-				'fontManagerDownloadedUnused'          => esc_html__( 'Not in use', 'gravity-pdf' ),
-				'fontManagerDownloadedDelete'          => esc_html__( 'Delete', 'gravity-pdf' ),
+				'fontManagerTypeCustom'                => esc_html__( 'Custom', 'gravity-pdf' ),
+				'fontManagerTypeCore'                  => esc_html__( 'Core', 'gravity-pdf' ),
+				'fontManagerTypeBundled'               => esc_html__( 'Bundled', 'gravity-pdf' ),
+				'fontManagerNetworkOnly'               => esc_html__( 'Only a network administrator can delete core fonts, as every site in the network shares them.', 'gravity-pdf' ),
 				/* translators: %s: the font name */
-				'fontManagerDownloadedDeleteAriaLabel' => esc_html__( 'Delete %s', 'gravity-pdf' ),
+				'fontManagerCoreConfirm'               => esc_html__( 'Delete %s? It downloads again when a PDF needs it.', 'gravity-pdf' ),
 				/* translators: %s: the font name */
-				'fontManagerDownloadedConfirm'         => esc_html__( 'Delete %s? It downloads again when a PDF needs it.', 'gravity-pdf' ),
-				/* translators: %s: the font name */
-				'fontManagerDownloadedConfirmOffline'  => esc_html__( 'Delete %s? Font downloads are turned off, so it won\'t come back on its own: copy its files into the fonts folder again to restore it.', 'gravity-pdf' ),
-				/* translators: %s: the font name */
-				'fontManagerDownloadedDeleted'         => esc_html__( '%s deleted.', 'gravity-pdf' ),
+				'fontManagerCoreConfirmOffline'        => esc_html__( 'Delete %s? Font downloads are turned off, so it won\'t come back on its own: copy its files into the fonts folder again to restore it.', 'gravity-pdf' ),
 
 				/* Font Manager API response */
 				'fontListEmpty'                        => esc_html__( 'Font list empty.', 'gravity-pdf' ),

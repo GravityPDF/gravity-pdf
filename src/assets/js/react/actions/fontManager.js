@@ -10,6 +10,8 @@ export const EDIT_FONT_SUCCESS = 'EDIT_FONT_SUCCESS';
 export const EDIT_FONT_ERROR = 'EDIT_FONT_ERROR';
 export const VALIDATION_ERROR = 'VALIDATION_ERROR';
 export const DELETE_VARIANT_ERROR = 'DELETE_VARIANT_ERROR';
+export const GET_FONT_USAGE_SUCCESS = 'GET_FONT_USAGE_SUCCESS';
+export const GET_FONT_USAGE_ERROR = 'GET_FONT_USAGE_ERROR';
 export const DELETE_FONT = 'DELETE_FONT';
 export const DELETE_FONT_SUCCESS = 'DELETE_FONT_SUCCESS';
 export const DELETE_FONT_ERROR = 'DELETE_FONT_ERROR';
@@ -105,15 +107,17 @@ export const deleteVariantError = (fontVariant) => {
  * Delete font request
  *
  * @param { string } id
+ * @param { string } fontType The row's `type`, which picks the endpoint
  *
- * @return {{ payload: string, type: string }} action object
+ * @return {{ payload: string, fontType: string, type: string }} action object
  *
  * @since 6.0
  */
-export const deleteFont = (id) => {
+export const deleteFont = (id, fontType) => {
 	return {
 		type: DELETE_FONT,
 		payload: id,
+		fontType,
 	};
 };
 

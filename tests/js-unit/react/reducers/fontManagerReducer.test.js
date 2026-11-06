@@ -1,6 +1,8 @@
 import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	GET_CUSTOM_FONT_LIST_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
@@ -83,6 +85,33 @@ describe('Reducers - fontManagerReducer.js', () => {
 		});
 	});
 
+	describe('Font usage', () => {
+		test('is cleared while the list reloads and set once it loads', () => {
+			const loaded = reducer(
+				{ ...initialState, msg: {} },
+				{
+					type: GET_FONT_USAGE_SUCCESS,
+					payload: { a: ['Default font'] },
+				}
+			);
+			expect(loaded.fontUsage).toEqual({ a: ['Default font'] });
+
+			expect(
+				reducer(loaded, { type: GET_CUSTOM_FONT_LIST }).fontUsage
+			).toBe(null);
+		});
+
+		test('shows an error when it fails', () => {
+			const failed = reducer(
+				{ ...initialState, msg: {} },
+				{ type: GET_FONT_USAGE_ERROR, payload: 'error' }
+			);
+
+			expect(failed.fontUsage).toBe(null);
+			expect(failed.msg.error.deleteFont).toBe('error');
+		});
+	});
+
 	describe('ADD_FONT_SUCCESS', () => {
 		const data = {
 			font: {
@@ -106,7 +135,9 @@ describe('Reducers - fontManagerReducer.js', () => {
 			});
 
 			expect(state.addFontLoading).toBe(false);
-			expect(state.fontList).toEqual([data.font]);
+			expect(state.fontList).toEqual([
+				{ type: 'custom', can_delete: true, ...data.font },
+			]);
 			expect(state.searchResult).toBe(null);
 			expect(state.msg.success.addFont).toBe('success');
 

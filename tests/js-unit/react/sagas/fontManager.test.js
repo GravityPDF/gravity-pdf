@@ -8,11 +8,15 @@ import {
 	editFont,
 	watchDeleteFont,
 	deleteFont,
+	getFontUsage,
+	watchGetFontUsage,
 } from '../../../../src/assets/js/react/sagas/fontManager';
 import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -26,6 +30,33 @@ import {
 import * as api from '../../../../src/assets/js/react/api/fontManager';
 
 describe('Sagas - fontManager.js', () => {
+	describe('Font usage', () => {
+		test('loads once the font list has loaded', () => {
+			expect(watchGetFontUsage().next().value).toEqual(
+				takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, getFontUsage)
+			);
+		});
+
+		test('passes on the reasons, or an error', () => {
+			const gen = getFontUsage();
+
+			expect(gen.next().value).toEqual(call(api.apiGetFontUsage));
+			expect(gen.next({ ok: true, body: { a: ['b'] } }).value).toEqual(
+				put({ type: GET_FONT_USAGE_SUCCESS, payload: { a: ['b'] } })
+			);
+
+			const failed = getFontUsage();
+			failed.next();
+			expect(failed.next({ ok: false }).value).toEqual(
+				put({
+					type: GET_FONT_USAGE_ERROR,
+					payload:
+						'A problem occurred. Reload the page and try again.',
+				})
+			);
+		});
+	});
+
 	describe('Watcher saga - watchGetCustomFontList()', () => {
 		const gen = watchGetCustomFontList();
 
@@ -275,11 +306,13 @@ describe('Sagas - fontManager.js', () => {
 			ok: true,
 			body: {},
 		};
-		const data = { payload: {} };
+		const data = { payload: {}, fontType: 'core' };
 		const gen = deleteFont(data);
 
 		test('should check that saga call the API apiDeleteFont', () => {
-			expect(gen.next().value).toEqual(call(api.apiDeleteFont, {}));
+			expect(gen.next().value).toEqual(
+				call(api.apiDeleteFont, {}, 'core')
+			);
 
 			expect(gen.next(response).value).toEqual(
 				put({
@@ -295,6 +328,23 @@ describe('Sagas - fontManager.js', () => {
 					type: DELETE_FONT_ERROR,
 					payload:
 						'A problem occurred. Reload the page and try again.',
+				})
+			);
+		});
+
+		test("should show the server's reason when the delete is refused", () => {
+			const refused = deleteFont({ payload: 'brand' });
+			refused.next();
+
+			expect(
+				refused.throw({
+					status: 409,
+					body: { message: 'The font is in use' },
+				}).value
+			).toEqual(
+				put({
+					type: DELETE_FONT_ERROR,
+					payload: 'The font is in use',
 				})
 			);
 		});

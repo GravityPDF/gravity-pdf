@@ -353,57 +353,110 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Each downloadable font family with files in the fonts folder, with why it's in use (a reason disables Delete).
-	 * Walks every form, and on Multisite every site, so it's only for the Font Manager.
+	 * Every font the Font Manager lists, by name: custom fonts, core fonts with files on disk and listed bundled fonts.
+	 * `can_delete` is whether this user may delete the font when it's unused; get_font_usage() says what's in use.
 	 *
-	 * @return array<int, array{id: string, label: string, source: string, files: array, size: int, size_label: string, in_use: string[], auto_install: bool}>
+	 * @return array<int, array{id: string, font_name: string, type: string, regular: string, italics: string, bold: string, bolditalics: string, can_delete: bool, auto_install?: bool}>
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_downloaded_fonts(): array {
-		$families = $this->get_downloaded_families();
-		if ( count( $families ) === 0 ) {
-			return [];
+	public function get_installed_fonts(): array {
+		$custom = $this->font_sources->get_custom_fonts();
+		$labels = $this->get_font_labels();
+		$fonts  = [];
+
+		foreach ( $custom as $font ) {
+			$font['type']       = 'custom';
+			$font['can_delete'] = true;
+			$fonts[]            = $font;
 		}
 
-		$reasons = $this->required_fonts->get_font_reasons( is_multisite() );
-		$labels  = $this->get_font_labels();
-		$locales = $this->font_sources->get_language_font_locales();
-		$fonts   = [];
-
-		foreach ( $families as $key => $family ) {
-			$files = [];
-			foreach ( $family['files'] as $style => $file ) {
-				if ( isset( $family['sizes'][ $file ] ) ) {
-					$files[] = [
-						'style' => $style,
-						'file'  => $file,
-						'size'  => $family['sizes'][ $file ],
-					];
+		foreach ( $this->font_sources->get_sources() as $source ) {
+			if ( empty( $source['manifest'] ) ) {
+				foreach ( $this->font_sources->get_listed_families( $source ) as $key => $family ) {
+					$fonts[] = $this->get_font_row( (string) $key, $labels[ $key ] ?? (string) $key, 'bundled', $family, false );
 				}
 			}
+		}
 
-			$size    = array_sum( $family['sizes'] );
-			$fonts[] = [
-				'id'           => $key,
-				'label'        => $labels[ $key ] ?? $key,
-				'source'       => $family['source'],
-				'files'        => $files,
-				'size'         => $size,
-				'size_label'   => (string) size_format( $size, 1 ),
-				'in_use'       => $this->get_in_use( $key, $reasons, $locales[ $key ] ?? [] ),
-				'auto_install' => $this->can_download_all( $family['files'] ),
-			];
+		foreach ( array_diff_key( $this->get_downloaded_families(), $custom ) as $key => $family ) {
+			$on_disk = array_filter(
+				$family['files'],
+				static function ( string $file ) use ( $family ): bool {
+					return isset( $family['sizes'][ $file ] );
+				}
+			);
+
+			$fonts[] = $this->get_font_row( (string) $key, $labels[ $key ] ?? (string) $key, 'core', $on_disk, $this->can_delete_core_fonts() ) + [ 'auto_install' => $this->can_download_all( $family['files'] ) ];
 		}
 
 		usort(
 			$fonts,
 			static function ( array $a, array $b ): int {
-				return strcasecmp( $a['label'], $b['label'] );
+				return strcasecmp( $a['font_name'], $b['font_name'] );
 			}
 		);
 
 		return $fonts;
+	}
+
+	/**
+	 * Why each font in use can't be deleted, as phrases for the Font Manager. Walks every form, and on Multisite every
+	 * site, so the list loads without it.
+	 *
+	 * @return array<string, string[]> Phrases by font key
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_font_usage(): array {
+		$custom  = $this->font_sources->get_custom_fonts();
+		$locales = $this->font_sources->get_language_font_locales();
+		$usage   = [];
+
+		foreach ( $this->required_fonts->get_font_reasons( is_multisite() ) as $key => $reason ) {
+			/* A site's custom fonts are its own, so other sites don't count */
+			if ( isset( $custom[ $key ] ) ) {
+				$reason['sites'] = 0;
+			}
+
+			$in_use = $this->get_in_use( $reason, $locales[ $key ] ?? [] );
+			if ( count( $in_use ) > 0 ) {
+				$usage[ $key ] = $in_use;
+			}
+		}
+
+		return $usage;
+	}
+
+	/**
+	 * Every site shares the fonts folder, so only a super admin deletes core fonts on Multisite
+	 *
+	 * @since 6.19.0
+	 */
+	public function can_delete_core_fonts(): bool {
+		return ! is_multisite() || is_super_admin();
+	}
+
+	/**
+	 * A source's font in the shape of a custom font record
+	 *
+	 * @param array $files File names by style (R, B, I, BI)
+	 *
+	 * @return array{id: string, font_name: string, type: string, regular: string, italics: string, bold: string, bolditalics: string, can_delete: bool}
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_font_row( string $key, string $label, string $type, array $files, bool $can_delete ): array {
+		return [
+			'id'          => $key,
+			'font_name'   => $label,
+			'type'        => $type,
+			'regular'     => $files['R'] ?? '',
+			'italics'     => $files['I'] ?? '',
+			'bold'        => $files['B'] ?? '',
+			'bolditalics' => $files['BI'] ?? '',
+			'can_delete'  => $can_delete,
+		];
 	}
 
 	/**
@@ -420,7 +473,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		}
 
 		$files = array_values( array_unique( $families[ $key ]['files'] ) );
-		if ( count( $this->get_in_use( $key, $this->required_fonts->get_font_reasons( is_multisite() ) ) ) > 0 ) {
+		if ( $this->required_fonts->is_font_in_use( $key, is_multisite() ) ) {
 			return new WP_Error( 'font_in_use', __( 'The font is in use, so it would be downloaded again.', 'gravity-pdf' ), [ 'status' => 409 ] );
 		}
 
@@ -466,7 +519,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * The downloadable sources' families with at least one file in the fonts folder: their files on the manifest by
 	 * style (R, B, I, BI), and the sizes of those on disk
 	 *
-	 * @return array<string, array{source: string, files: array<string, string>, sizes: array<string, int>}>
+	 * @return array<string, array{files: array<string, string>, sizes: array<string, int>}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -503,9 +556,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 				if ( count( $sizes ) > 0 ) {
 					$families[ $key ] = [
-						'source' => (string) $id,
-						'files'  => $files,
-						'sizes'  => $sizes,
+						'files' => $files,
+						'sizes' => $sizes,
 					];
 				}
 			}
@@ -535,21 +587,16 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Why a family is in use, as phrases for the Font Manager; none means it can be deleted
+	 * A font's get_font_reasons() entry as phrases for the Font Manager
 	 *
-	 * @param array<string, array> $reasons get_font_reasons()
-	 * @param string[]             $locales The locales it's a language font for
+	 * @param array    $reasons A get_font_reasons() entry
+	 * @param string[] $locales The locales it's a language font for
 	 *
 	 * @return string[]
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_in_use( string $key, array $reasons, array $locales = [] ): array {
-		if ( ! isset( $reasons[ $key ] ) ) {
-			return [];
-		}
-
-		$reasons = $reasons[ $key ];
+	protected function get_in_use( array $reasons, array $locales = [] ): array {
 		$phrases = [];
 
 		if ( $reasons['default'] ) {

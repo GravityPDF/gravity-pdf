@@ -12,11 +12,8 @@ import {
 	watchEditFont,
 	watchDeleteFont,
 	watchGetCustomFontListSuccess,
+	watchGetFontUsage,
 } from './fontManager';
-import {
-	watchGetDownloadedFonts,
-	watchDeleteDownloadedFont,
-} from './downloadedFonts';
 
 /**
  * @package     Gravity PDF
@@ -40,7 +37,6 @@ export default function* rootSaga() {
 		watchEditFont(),
 		watchDeleteFont(),
 		watchGetCustomFontListSuccess(),
-		watchGetDownloadedFonts(),
-		watchDeleteDownloadedFont(),
+		watchGetFontUsage(),
 	]);
 }

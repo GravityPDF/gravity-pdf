@@ -17,12 +17,12 @@ import {
 import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
 import FontList from './FontList';
-import DownloadedFonts from './DownloadedFonts';
 import AddFont from './AddFont';
 import UpdateFont from './UpdateFont';
 import initialState from './InitialAddUpdateState';
 /* Utilities */
 import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
+import { isCustomFont } from '../../utilities/FontManager/fontManagerReducer';
 import {
 	toggleUpdateFont,
 	addClass,
@@ -158,7 +158,10 @@ export class FontManagerBody extends Component {
 	 * @since 6.0
 	 */
 	handleCheckValidId = (fontList, id) => {
-		const checkValidId = fontList.filter((font) => font.id === id)[0];
+		/* Only a custom font can be edited */
+		const checkValidId = fontList.filter(
+			(font) => font.id === id && isCustomFont(font)
+		)[0];
 
 		if (!checkValidId) {
 			return false;
@@ -583,8 +586,6 @@ export class FontManagerBody extends Component {
 					)}
 
 					<FontList id={id} navigate={navigate} />
-
-					<DownloadedFonts />
 				</div>
 
 				<div className="add-update-font-column container">

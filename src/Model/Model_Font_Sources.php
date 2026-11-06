@@ -167,6 +167,17 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The custom fonts by ID
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_custom_fonts(): array {
+		return $this->custom_fonts->get_custom_fonts();
+	}
+
+	/**
 	 * Whether a font source provides the mPDF font key
 	 *
 	 * @since 6.19.0
@@ -592,8 +603,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function add_font_list_groups( $fonts ): array {
-		$fonts        = is_array( $fonts ) ? $fonts : [];
-		$custom_fonts = $this->custom_fonts->get_custom_fonts();
+		$fonts = is_array( $fonts ) ? $fonts : [];
 
 		foreach ( $this->get_sources() as $source ) {
 			if ( empty( $source['group'] ) ) {
@@ -601,10 +611,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			}
 
 			$list = [];
-			foreach ( $source['families'] as $key => $family ) {
-				if ( ( $family['listed'] ?? true ) && ! isset( $custom_fonts[ $key ] ) ) {
-					$list[ $key ] = $family['name'] ?? $key;
-				}
+			foreach ( $this->get_listed_families( $source ) as $key => $family ) {
+				$list[ $key ] = $family['name'] ?? $key;
 			}
 
 			$group                     = $fonts[ $source['group'] ] ?? [];
@@ -612,6 +620,27 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		return $fonts;
+	}
+
+	/**
+	 * A source's families that users can choose: not hidden, and not replaced by a custom font of the same key
+	 *
+	 * @param array $source A get_sources() value
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_listed_families( array $source ): array {
+		$custom_fonts = $this->custom_fonts->get_custom_fonts();
+
+		return array_filter(
+			$source['families'] ?? [],
+			static function ( $family, $key ) use ( $custom_fonts ): bool {
+				return is_array( $family ) && ( $family['listed'] ?? true ) && ! isset( $custom_fonts[ $key ] );
+			},
+			ARRAY_FILTER_USE_BOTH
+		);
 	}
 
 	/**
