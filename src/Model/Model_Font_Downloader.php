@@ -96,6 +96,14 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	const CLEANUP_EVENT = 'gfpdf_core_font_cleanup_run';
 
 	/**
+	 * Large files a PDF needed beyond the required set (e.g. Sun-ExtA on an English site), which the sync fetches and the
+	 * cleanup keeps
+	 *
+	 * @since 6.19.0
+	 */
+	const WANTED = 'gfpdf_core_font_wanted';
+
+	/**
 	 * @var Model_Font_Sources
 	 * @since 6.19.0
 	 */
@@ -421,7 +429,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return [];
 		}
 
-		$keep    = array_flip( $keep ?? $this->required_fonts->get_required_font_files() );
+		$keep    = array_flip( $keep ?? $this->get_kept_files() );
 		$removed = [];
 		$bytes   = 0;
 		$offline = [];
@@ -815,6 +823,101 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The required files and the wanted ones
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_kept_files(): array {
+		return array_values( array_unique( array_merge( $this->required_fonts->get_required_font_files(), $this->get_wanted_files() ) ) );
+	}
+
+	/**
+	 * Files a PDF needed beyond the required set
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_wanted_files(): array {
+		$wanted = get_network_option( get_main_network_id(), self::WANTED, [] );
+
+		return is_array( $wanted ) ? array_values( array_filter( $wanted, 'is_string' ) ) : [];
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function has_hashed_copy( string $file ): bool {
+		return $this->font_sources->has_hashed_copy( $file );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function is_size_conflict( string $file ): bool {
+		return $this->font_sources->is_size_conflict( $file );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function is_large_file( string $file ): bool {
+		return $this->font_sources->is_large_file( $file );
+	}
+
+	/**
+	 * Queue files for the background sync rather than download them now
+	 *
+	 * @param string[] $files
+	 *
+	 * @return bool Whether any is still to come: not while downloads are off for it, nor once it gave up
+	 *
+	 * @since 6.19.0
+	 */
+	public function queue( array $files ): bool {
+		$files = array_values( array_filter( $files, [ $this, 'can_queue' ] ) );
+		if ( $files === [] ) {
+			return false;
+		}
+
+		$this->want( $files );
+
+		return true;
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected function can_queue( string $file ): bool {
+		return ! isset( $this->get_failed_files()[ $file ] ) && $this->is_auto_install_enabled( $file );
+	}
+
+	/**
+	 * Add files to the wanted list and queue the sync for them, unless they're queued already or awaiting their retry
+	 *
+	 * @param string[] $files
+	 *
+	 * @since 6.19.0
+	 */
+	protected function want( array $files ): void {
+		$wanted = $this->get_wanted_files();
+		$new    = array_diff( $files, $wanted );
+
+		if ( $new !== [] ) {
+			$this->log->notice( 'Font queued for the background sync as a PDF needs it', [ 'files' => array_values( $new ) ] );
+			update_network_option( get_main_network_id(), self::WANTED, array_values( array_merge( $wanted, $new ) ) );
+		}
+
+		/* A failure already scheduled its retry */
+		$waiting = array_diff( $files, array_keys( $this->get_failures() ) );
+		if ( $waiting !== [] && ( $new !== [] || wp_next_scheduled( self::SYNC_EVENT ) === false ) ) {
+			$this->schedule_sync();
+		}
+	}
+
+	/**
 	 * Queue a single background sync
 	 *
 	 * @since 6.19.0
@@ -921,7 +1024,10 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return;
 		}
 
-		$this->prune( $this->required_fonts->get_install_font_files( $keys ), $state['started'] );
+		$this->prune(
+			array_values( array_unique( array_merge( $this->required_fonts->get_install_font_files( $keys ), $this->get_wanted_files() ) ) ),
+			$state['started']
+		);
 		update_network_option( get_main_network_id(), self::CLEANUP, true );
 	}
 
@@ -980,7 +1086,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function get_sync_files(): array {
 		$remaining = get_transient( self::SYNC_REMAINING );
-		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->required_fonts->get_required_font_files();
+		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->get_kept_files();
 		$gave_up   = $this->get_failed_files();
 
 		return array_values(

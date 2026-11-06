@@ -135,6 +135,7 @@ class Test_Uninstaller extends TestCase {
 		set_transient( Model_Font_Downloader::SYNC_REMAINING, [ 'Garuda.ttf' ], DAY_IN_SECONDS );
 		set_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS, [ 'garuda' ], DAY_IN_SECONDS );
 		update_site_option( Model_Font_Downloader::CLEANUP, true );
+		update_site_option( Model_Font_Downloader::WANTED, [ 'Sun-ExtA.ttf' ] );
 		wp_schedule_single_event( time(), Model_Font_Downloader::CLEANUP_EVENT );
 
 		/* Uninstall */
@@ -147,6 +148,7 @@ class Test_Uninstaller extends TestCase {
 		$this->assertFalse( get_transient( Model_Font_Downloader::SYNC_REMAINING ) );
 		$this->assertFalse( get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
 		$this->assertFalse( get_site_option( Model_Font_Downloader::CLEANUP ) );
+		$this->assertFalse( get_site_option( Model_Font_Downloader::WANTED ) );
 
 		/* Check software was uninstalled */
 		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );

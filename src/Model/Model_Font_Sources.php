@@ -68,6 +68,13 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	public const LANGUAGE_FONT_KEYS = 'gfpdf_language_font_keys';
 
 	/**
+	 * A downloadable file above this size is never fetched mid-render, only by the background sync
+	 *
+	 * @since 6.19.0
+	 */
+	public const LARGE_FILE_SIZE = 5 * MB_IN_BYTES;
+
+	/**
 	 * @var Helper_Data
 	 * @since 6.19.0
 	 */
@@ -215,32 +222,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 
 		$config['default_font']   = $this->get_default_font( [ $pdf_font ], $fontdata );
 		$config['backupSubsFont'] = $this->get_substitution_fonts( $fontdata, $config['default_font'] );
-		$config['backupSIPFont']  = $this->get_sip_font( $fontdata );
-
-		/* Sun-ExtA names Sun-ExtB as its own fallback for those characters */
-		foreach ( $fontdata as $key => $family ) {
-			$sip_ext = is_array( $family ) ? ( $family['sip-ext'] ?? '' ) : '';
-			if ( is_string( $sip_ext ) && $sip_ext !== '' && ! $this->is_on_disk( $sip_ext, $fontdata ) ) {
-				unset( $config['fontdata'][ $key ]['sip-ext'] );
-			}
-		}
 
 		return $config;
-	}
-
-	/**
-	 * mPDF's backupSIPFont: Sun-ExtB once it's on disk, as mPDF would download 17.6 MB for one rare CJK Extension B
-	 * character, else the bundled symbols. With none, mPDF stops substituting the rest of a run at that character, e.g.
-	 * 字 after 𠀀; the first render after a font cache flush still does (GravityPDF/mpdf#828).
-	 *
-	 * @since 6.19.0
-	 */
-	protected function get_sip_font( array $fontdata ): string {
-		if ( $this->is_on_disk( 'sun-extb', $fontdata ) ) {
-			return 'sun-extb';
-		}
-
-		return $this->is_registered( self::SYMBOLS_FONT, $fontdata ) ? self::SYMBOLS_FONT : '';
 	}
 
 	/**
@@ -407,8 +390,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * mPDF's backupSubsFont, Arimo first. mPDF reads which characters a font has from its ranges file and downloads only a
-	 * font that has them, but Sun-ExtA is listed only once it's on disk, as it would download 22.9 MB mid-render.
+	 * mPDF's backupSubsFont, Arimo first. mPDF reads which characters a font has from its ranges file and loads only a font
+	 * that has them; the finder queues a large one (Sun-ExtA) for the background sync rather than download it mid-render.
 	 *
 	 * @param array|null $fontdata mPDF font data, or null for the registered fonts
 	 * @param string     $font     The PDF's font, left out as it can't stand in for its own missing glyphs
@@ -424,7 +407,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			[ self::ARIMO, self::SYMBOLS_FONT ],
 			self::SUBSTITUTION_CORE_FONTS,
 			$this->get_language_font_keys(),
-			$this->is_on_disk( 'sun-exta', $fontdata ) ? [ 'sun-exta' ] : []
+			[ 'sun-exta' ]
 		);
 
 		$fonts = array_filter(
@@ -444,15 +427,6 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	protected function is_registered( string $font, array $fontdata ): bool {
 		return is_string( $fontdata[ $font ]['R'] ?? null );
-	}
-
-	/**
-	 * Whether mPDF's font data has a Regular file for the key, and it's in the fonts folder
-	 *
-	 * @since 6.19.0
-	 */
-	protected function is_on_disk( string $font, array $fontdata ): bool {
-		return $this->is_registered( $font, $fontdata ) && $this->is_downloaded( $fontdata[ $font ]['R'] );
 	}
 
 	/**
@@ -642,6 +616,15 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	public function is_core_font_file( string $file ): bool {
 		return isset( $this->get_manifest()[ $file ] ) && in_array( strtolower( pathinfo( $file, PATHINFO_EXTENSION ) ), [ 'ttf', 'otf' ], true );
+	}
+
+	/**
+	 * Whether a downloadable file is above LARGE_FILE_SIZE
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_large_file( string $file ): bool {
+		return ( $this->get_manifest()[ $file ]['size'] ?? 0 ) > self::LARGE_FILE_SIZE;
 	}
 
 	/**

@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Mpdf;
 
+use GFPDF\Helper\Helper_Render_Health;
 use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
@@ -181,6 +182,119 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 		$this->expectExceptionMessage( 'Cannot find TTF TrueType font file "' . self::FONT . '"' );
 
 		( new On_Demand_Font_File_Finder( [ $this->font_dir ], $downloader, '' ) )->findFontFile( self::FONT );
+	}
+
+	/**
+	 * @dataProvider provider_large_files
+	 */
+	public function test_a_missing_large_file_is_queued_and_the_render_degraded( string $file ) {
+		$this->serve_font_downloads();
+
+		Helper_Render_Health::begin();
+		try {
+			$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->finder( '' )->findFontFile( $file ) );
+			$this->assertTrue( Helper_Render_Health::is_degraded() );
+		} finally {
+			Helper_Render_Health::end();
+		}
+
+		$this->assertSame( [], $this->requested );
+		$this->assertSame( [ $file ], $this->downloader->get_wanted_files() );
+	}
+
+	public function provider_large_files(): array {
+		return [
+			'Sun-ExtA' => [ 'Sun-ExtA.ttf' ],
+			'Aegyptus' => [ 'Aegyptus.otf' ],
+		];
+	}
+
+	public function test_a_large_file_that_cannot_download_falls_back_without_degrading_the_render() {
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		Helper_Render_Health::begin();
+		try {
+			$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->finder( '' )->findFontFile( 'Sun-ExtA.ttf' ) );
+			$this->assertFalse( Helper_Render_Health::is_degraded() );
+		} finally {
+			Helper_Render_Health::end();
+		}
+
+		$this->assertSame( [], $this->downloader->get_wanted_files() );
+	}
+
+	public function test_a_queued_large_file_falls_back_in_debug_mode_too() {
+		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->finder( '', false )->findFontFile( 'Sun-ExtA.ttf' ) );
+		$this->assertSame( [ 'Sun-ExtA.ttf' ], $this->downloader->get_wanted_files() );
+	}
+
+	public function test_a_large_file_that_cannot_download_throws_in_debug_mode() {
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+		$this->expectException( MpdfException::class );
+
+		$this->finder( '', false )->findFontFile( 'Sun-ExtA.ttf' );
+	}
+
+	public function test_a_large_file_another_font_holds_the_name_of_is_queued_and_the_file_at_the_name_stays_in_use() {
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		$this->serve_font_downloads();
+
+		Helper_Render_Health::begin();
+		try {
+			$this->assertSame( $this->font_dir . '/Sun-ExtA.ttf', $this->finder( '' )->findFontFile( 'Sun-ExtA.ttf' ) );
+			$this->assertTrue( Helper_Render_Health::is_degraded() );
+		} finally {
+			Helper_Render_Health::end();
+		}
+
+		$this->assertSame( [], $this->requested );
+		$this->assertSame( [ 'Sun-ExtA.ttf' ], $this->downloader->get_wanted_files() );
+		$this->assertFileDoesNotExist( $this->font_dir . $this->sources->get_hashed_name( 'Sun-ExtA.ttf' ) );
+	}
+
+	public function test_a_large_file_another_font_holds_the_name_of_stays_in_use_and_the_render_is_not_degraded_when_it_cannot_download() {
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		Helper_Render_Health::begin();
+		try {
+			$this->assertSame( $this->font_dir . '/Sun-ExtA.ttf', $this->finder( '', false )->findFontFile( 'Sun-ExtA.ttf' ) );
+			$this->assertFalse( Helper_Render_Health::is_degraded() );
+		} finally {
+			Helper_Render_Health::end();
+		}
+
+		$this->assertSame( [], $this->downloader->get_wanted_files() );
+	}
+
+	public function test_a_large_files_hashed_copy_is_found_without_a_plain_file_or_a_queue() {
+		$hashed = $this->sources->get_hashed_name( 'Sun-ExtA.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', $hashed );
+
+		Helper_Render_Health::begin();
+		try {
+			$this->assertSame( $this->font_dir . $hashed, $this->finder( '' )->findFontFile( 'Sun-ExtA.ttf' ) );
+			$this->assertFalse( Helper_Render_Health::is_degraded() );
+		} finally {
+			Helper_Render_Health::end();
+		}
+
+		$this->assertSame( [], $this->downloader->get_wanted_files() );
+	}
+
+	public function test_a_large_file_at_its_name_that_is_not_another_fonts_is_used_as_it_is() {
+		/* A file of the manifest's size, which is above the large file threshold */
+		$size     = Model_Font_Sources::LARGE_FILE_SIZE + 1;
+		$manifest = $this->sources->get_manifest();
+
+		$manifest['Sun-ExtA.ttf']['size'] = $size;
+		$this->set_private( $this->sources, 'manifest', $manifest );
+		file_put_contents( $this->font_dir . 'Sun-ExtA.ttf', str_repeat( "\0", $size ) );
+		$this->copied_fonts[] = $this->font_dir . 'Sun-ExtA.ttf';
+
+
+		$this->assertSame( $this->font_dir . '/Sun-ExtA.ttf', $this->finder( '' )->findFontFile( 'Sun-ExtA.ttf' ) );
+		$this->assertSame( [], $this->downloader->get_wanted_files() );
 	}
 
 	public function test_debug_mode_builds_a_finder_without_a_fallback() {

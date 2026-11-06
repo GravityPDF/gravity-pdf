@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Mpdf;
 
+use GFPDF\Helper\Helper_Render_Health;
 use GFPDF\Model\Model_Font_Downloader;
 use GFPDF_Vendor\Mpdf\Fonts\FontFileFinder;
 use GFPDF_Vendor\Mpdf\MpdfException;
@@ -20,7 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Downloads a missing font, else falls back to a font on disk (outside Debug Mode)
+ * Downloads a missing font, or queues a large one for the background sync, else falls back to a font on disk (outside
+ * Debug Mode)
  *
  * @since 6.19.0
  */
@@ -31,6 +33,46 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 	 * @since 6.19.0
 	 */
 	protected $downloader;
+
+	/**
+	 * Find a large core font file without downloading it: its hashed copy if there, else the file at its name unless that
+	 * is another font's, else queue the manifest's for the sync, mark the render degraded and use the stand-in
+	 *
+	 * @param string             $name  The font file name
+	 * @param string             $found The file at its name, or '' if there is none
+	 * @param MpdfException|null $error Why there is none
+	 *
+	 * @throws MpdfException
+	 *
+	 * @since 6.19.0
+	 */
+	protected function find_large_file( string $name, string $found, ?MpdfException $error ): string {
+		if ( $this->downloader->has_hashed_copy( $name ) ) {
+			return $this->downloader->get_font_path( $name );
+		}
+
+		if ( $error === null && ! $this->downloader->is_size_conflict( $name ) ) {
+			return $found;
+		}
+
+		$queued = $this->downloader->queue( [ $name ] );
+		if ( $queued ) {
+			Helper_Render_Health::mark();
+		}
+
+		/* The file at the name stays in use until the sync saves the manifest's beside it */
+		if ( $error === null ) {
+			return $found;
+		}
+
+		/* Debug Mode falls back too for a queued file, as the font is on its way */
+		$fallback = $this->fallback || $queued ? $this->get_fallback_file() : '';
+		if ( $fallback === '' ) {
+			throw $error;
+		}
+
+		return $fallback;
+	}
 
 	/**
 	 * The default font's Regular file, the first fallback
@@ -105,6 +147,11 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 		/* A Font Manager record's file belongs to the record. The core font of that name has a hashed name. */
 		if ( $error === null && $this->downloader->is_record_file( $name ) ) {
 			return $found;
+		}
+
+		/* A large file is left to the background sync, so a render never waits on it */
+		if ( $this->downloader->is_large_file( $name ) ) {
+			return $this->find_large_file( $name, $found, $error );
 		}
 
 		/* The downloader's fonts folder, as mPDF's AddFontDirectory() replaces the search directories. Stat calls only. */
