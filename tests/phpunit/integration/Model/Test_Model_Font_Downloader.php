@@ -363,6 +363,148 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [], $this->requested );
 	}
 
+	public function test_download_saves_the_font_under_its_hashed_name_when_another_font_holds_the_name() {
+		$this->put_other_font_at( self::FONT, self::FONT );
+		$this->serve_font_downloads();
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ), 'The other font is left alone' );
+		$this->assertSame( $this->font_path( $hashed ), $this->downloader->get_font_path( self::FONT ) );
+		$this->assertCount( 1, $this->log_messages( 'Font saved under a new name as another font has its name' ) );
+		$this->assertNoStrayTmpFiles();
+
+		/* The next request finds the copy and asks for nothing */
+		$this->requested = [];
+		$this->assertTrue( $this->new_downloader()->download( self::FONT ) );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_saving_a_hashed_copy_removes_the_copy_of_an_older_release_but_not_a_lookalike() {
+		$old = 'DejaVuSerifCondensed-' . substr( (string) key( $this->fixture_blob( 'DejaVuSans.ttf' ) ), 0, 8 ) . '.ttf';
+
+		$this->put_other_font_at( self::FONT, self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf', $old );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-deadbeef.ttf' );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+		$this->assertFileDoesNotExist( $this->font_path( $old ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed-deadbeef.ttf' ), 'Its name is not its own hash' );
+		$this->assertFileExists( $this->font_path( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ) );
+	}
+
+	public function test_the_hashed_name_is_the_stem_the_first_eight_of_the_sha_and_the_extension() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$sha     = $sources->get_manifest()[ self::FONT ]['sha'];
+
+		$this->assertSame( 'DejaVuSerifCondensed-' . substr( $sha, 0, 8 ) . '.ttf', $sources->get_hashed_name( self::FONT ) );
+		$this->assertSame( '', $sources->get_hashed_name( 'NotAFont.ttf' ) );
+		$this->assertTrue( $sources->is_hashed_copy( $sources->get_hashed_name( self::FONT ) ) );
+		$this->assertFalse( $sources->is_hashed_copy( self::FONT ) );
+		$this->assertFalse( $sources->is_hashed_copy( 'DejaVuSerifCondensed-00000000.ttf' ) );
+	}
+
+	public function test_another_fonts_file_stays_when_downloads_are_off() {
+		$this->put_other_font_at( self::FONT, self::FONT );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+		$this->serve_font_downloads();
+
+		$this->assertFalse( $this->downloader->download( self::FONT ) );
+		$this->assertSame( [], $this->requested );
+		$this->assertSame( $this->font_path( self::FONT ), $this->downloader->get_font_path( self::FONT ) );
+		$this->assertTrue( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->is_downloaded( self::FONT ), 'mPDF can still load it' );
+	}
+
+	public function test_a_failed_download_beside_another_font_is_recorded_under_the_manifest_name() {
+		$this->put_other_font_at( self::FONT, self::FONT );
+		$this->fail_font_downloads();
+
+		$this->assertFalse( $this->downloader->download( self::FONT ) );
+		$this->assertSame( [ self::FONT ], array_keys( $this->get_font_failures() ) );
+		$this->assertIsInt( $this->get_back_off( self::FONT ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ) );
+	}
+
+	public function test_a_file_of_a_known_size_is_not_hashed_unless_verifying() {
+		$this->put_other_font_at( self::FONT, self::FONT, true );
+		$this->serve_font_downloads();
+		$downloader = $this->seamed( [] );
+
+		$this->assertTrue( $downloader->download( self::FONT ) );
+		$this->assertSame( [], $downloader->hashed );
+		$this->assertSame( [], $this->requested );
+
+		/* Verifying finds that it isn't the manifest's */
+		$this->assertTrue( $downloader->download( self::FONT, true ) );
+		$this->assertSame( [ self::FONT ], $downloader->hashed );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) ) );
+	}
+
+	public function test_a_file_from_an_older_release_is_kept_when_verifying() {
+		copy( $this->font_fixture( 'DejaVuSerifCondensed-v1.0.0.ttf' ), $this->font_path( self::FONT ) );
+		$this->copied_fonts[] = $this->font_path( self::FONT );
+		$this->serve_font_downloads();
+
+		/* The real list of what the installer downloaded, not the fixtures set_up() stands in for it */
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'legacy_manifests', [] );
+
+		$this->assertTrue( $this->downloader->download( self::FONT, true ) );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_sync_hashes_each_required_file_on_disk_once_and_saves_the_other_fonts_under_new_names() {
+		$this->copy_fixture( self::FONT );
+		$this->put_other_font_at( 'DejaVuSansCondensed.ttf', 'DejaVuSansCondensed.ttf', true );
+		$this->serve_font_downloads();
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+
+		$downloader = $this->seamed_sync( [ self::FONT, 'DejaVuSansCondensed.ttf' ] );
+		$downloader->sync();
+
+		$this->assertEqualsCanonicalizing( [ self::FONT, 'DejaVuSansCondensed.ttf' ], $downloader->hashed );
+		$this->assertCount( 1, $this->requested );
+		$this->assertFileExists( $this->font_path( $sources->get_hashed_name( 'DejaVuSansCondensed.ttf' ) ) );
+		$this->assertFileDoesNotExist( $this->font_path( $sources->get_hashed_name( self::FONT ) ) );
+
+		/* A file with a copy under its hashed name is not hashed again */
+		$next = $this->seamed_sync( [ self::FONT, 'DejaVuSansCondensed.ttf' ] );
+		$next->sync();
+
+		$this->assertSame( [ self::FONT ], $next->hashed );
+		$this->assertCount( 1, $this->requested );
+	}
+
+	public function test_a_retry_for_a_file_beside_another_font_is_not_cleared() {
+		$this->put_other_font_at( self::FONT, self::FONT );
+		$this->set_font_failures( [ self::FONT => $this->failure() ] );
+		$this->set_back_off( self::FONT );
+		$this->serve_font_downloads();
+
+		$this->seamed_sync( [] )->sync();
+
+		$this->assertFileExists( $this->font_path( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) ) );
+		$this->assertEmpty( $this->get_font_failures() );
+	}
+
+	public function test_prune_never_removes_a_hashed_copy_or_a_replaced_file() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( self::FONT );
+
+		/* The unmodified installer file goes, beside the manifest's copy of it */
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( self::FONT, $hashed );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSans.ttf' );
+		$this->copy_fixture( 'DejaVuSans.ttf', $sources->get_hashed_name( 'DejaVuSans.ttf' ) );
+
+		$this->assertSame( [ self::FONT ], $this->downloader->prune( [] ) );
+		$this->assertFileExists( $this->font_path( $hashed ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSans.ttf' ), 'A replacement' );
+		$this->assertFileExists( $this->font_path( $sources->get_hashed_name( 'DejaVuSans.ttf' ) ) );
+	}
+
 	public function test_prune_removes_unmodified_core_fonts_and_licences() {
 		$this->set_installer_manifest( array_combine( static::$core_fixtures, static::$core_fixtures ) + [ 'DejaVuinfo.txt' => 'chewy-LICENSE.txt' ] );
 		$this->copy_fixture( 'chewy-LICENSE.txt', 'DejaVuinfo.txt' );
@@ -594,6 +736,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 	public function test_sync_skips_files_already_on_disk() {
 		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
 		$this->serve_font_downloads();
 
 		$this->seamed_sync( [ 'Garuda.ttf', self::FONT ] )->sync();

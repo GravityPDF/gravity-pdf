@@ -80,25 +80,49 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 			throw new MpdfException( esc_html( sprintf( 'Cannot find TTF TrueType font file "%s" in configured font directories.', is_scalar( $name ) ? (string) $name : gettype( $name ) ) ) );
 		}
 
+		$found = '';
+		$error = null;
+
 		try {
-			return parent::findFontFile( $name );
+			$found = parent::findFontFile( $name );
 		} catch ( MpdfException $e ) {
-			if ( ! $this->downloader->is_core_font_file( $name ) ) {
-				throw $e;
-			}
-
-			/* The downloader's fonts folder, as mPDF's AddFontDirectory() replaces the search directories */
-			if ( $this->downloader->download( $name ) ) {
-				return $this->downloader->get_font_path( $name );
-			}
-
-			$fallback = $this->fallback ? $this->get_fallback_file() : '';
-			if ( $fallback === '' ) {
-				throw $e;
-			}
-
-			return $fallback;
+			$error = $e;
 		}
+
+		/* Bundled fonts and those in other directories aren't on the manifest */
+		if ( $error === null && ! $this->downloader->is_in_fonts_folder( $found ) ) {
+			return $found;
+		}
+
+		if ( ! $this->downloader->is_core_font_file( $name ) ) {
+			if ( $error !== null ) {
+				throw $error;
+			}
+
+			return $found;
+		}
+
+		/* A Font Manager record's file belongs to the record. The core font of that name has a hashed name. */
+		if ( $error === null && $this->downloader->is_record_file( $name ) ) {
+			return $found;
+		}
+
+		/* The downloader's fonts folder, as mPDF's AddFontDirectory() replaces the search directories. Stat calls only. */
+		if ( $this->downloader->download( $name ) ) {
+			return $this->downloader->get_font_path( $name );
+		}
+
+		/* The file at the name stays in use if its replacement can't be saved */
+		if ( $error === null ) {
+			return $found;
+		}
+
+		$fallback = $this->fallback ? $this->get_fallback_file() : '';
+		if ( $fallback === '' ) {
+			throw $error;
+		}
+
+		return $fallback;
 	}
 
 	/**

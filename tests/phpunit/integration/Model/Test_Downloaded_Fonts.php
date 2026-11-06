@@ -165,6 +165,57 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertCount( 1, $this->log_messages( 'Downloaded font deleted' ) );
 	}
 
+	public function test_delete_removes_only_the_hashed_copy_and_never_the_file_at_the_name() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf', $hashed );
+
+		$fonts = $this->downloader()->get_downloaded_fonts();
+		$this->assertSame( filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ), $fonts[0]['size'], 'The hashed copy is the family\'s file' );
+
+		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( [ 'DejaVuSerifCondensed.ttf' ], $result['removed'] );
+		$this->assertSame( filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ), $result['bytes'] );
+		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_a_family_sharing_a_name_with_a_record_lists_and_deletes_only_its_hashed_copy() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSerifCondensed.ttf' ] );
+
+		$this->assertSame( [], $this->downloader()->get_downloaded_fonts(), 'The record\'s file is not the family\'s' );
+
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf', $hashed );
+		$fonts = $this->downloader()->get_downloaded_fonts();
+
+		$this->assertSame( $hashed, $fonts[0]['files'][0]['file'] );
+
+		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( [ $hashed ], $result['removed'] );
+		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_deleting_a_record_leaves_the_hashed_copy() {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf', $hashed );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSerifCondensed.ttf' ] );
+
+		$this->assertTrue( GPDFAPI::delete_pdf_font( 'mine' ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileExists( $this->font_path( $hashed ) );
+	}
+
 	public function test_delete_clears_the_familys_failures_and_metrics() {
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 		$this->set_font_failures(
