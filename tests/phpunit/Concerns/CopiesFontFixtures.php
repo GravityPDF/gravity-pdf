@@ -5,7 +5,6 @@ declare( strict_types=1 );
 namespace GFPDF\Tests\Concerns;
 
 use GFPDF\Helper\Fonts\FlushCache;
-use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Statics\Git_Blob;
 use GPDFAPI;
@@ -103,8 +102,8 @@ trait CopiesFontFixtures {
 	/**
 	 * A model whose bundled source accepts the fixture as a legacy Arimo copy
 	 */
-	protected function get_model_with_legacy( string $fixture, ?Model_Custom_Fonts $custom_fonts = null ): Model_Font_Sources {
-		$model = new class( GPDFAPI::get_data_class(), $custom_fonts ?? GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), GPDFAPI::get_log_class() ) extends Model_Font_Sources {
+	protected function get_model_with_legacy( string $fixture ): Model_Font_Sources {
+		$model = new class( GPDFAPI::get_data_class(), GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), GPDFAPI::get_log_class() ) extends Model_Font_Sources {
 			/** @var array<string, int> */
 			public $legacy = [];
 
@@ -297,6 +296,7 @@ trait CopiesFontFixtures {
 		array_map( [ FlushCache::class, 'flush' ], array_unique( $this->recorded_fonts ) );
 		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
 		GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->flush();
+		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->flush();
 
 		/* A download or its fallback caches metrics under every font key the render asked for, substitutes included */
 		if ( $this->requested !== [] ) {
