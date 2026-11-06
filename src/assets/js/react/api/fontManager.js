@@ -21,14 +21,21 @@ import { api, getJsonString } from './api';
  */
 
 /**
- * Fetch API request to obtain custom font list (GET)
+ * @typedef {FontItem} InstalledFont
+ * @property {string}  type           - `custom`, `core` or `bundled`
+ * @property {boolean} can_delete     - Whether this user can delete it when it's unused
+ * @property {boolean} [auto_install] - Core fonts: whether it downloads again on its own
+ */
+
+/**
+ * Fetch API request to obtain every font the Font Manager lists (GET)
  *
- * @return {{ body: Array<FontItem>, text: string, status: number, ok: boolean }} Installed custom fonts
+ * @return {{ body: Array<InstalledFont>, text: string, status: number, ok: boolean }} Custom, core and bundled fonts
  *
  * @since 6.0
  */
 export const apiGetCustomFontList = async () => {
-	const url = GFPDF.restUrl + 'fonts/';
+	const url = GFPDF.restUrl + 'fonts/installed';
 
 	const response = await api(url, {
 		method: 'GET',
@@ -43,6 +50,32 @@ export const apiGetCustomFontList = async () => {
 
 	return {
 		body,
+		text,
+		status: response.status,
+		ok: response.ok,
+	};
+};
+
+/**
+ * Fetch API request for why fonts are in use, which is slower than the list as it reads every form (GET)
+ *
+ * @return {{ body: Object<string, Array<string>>, text: string, status: number, ok: boolean }} Reasons by font ID
+ *
+ * @since 6.19.0
+ */
+export const apiGetFontUsage = async () => {
+	const response = await api(GFPDF.restUrl + 'fonts/installed/usage', {
+		method: 'GET',
+		headers: {
+			'X-WP-Nonce': GFPDF.restNonce,
+			Accept: 'application/json',
+		},
+	});
+
+	const text = await response.text();
+
+	return {
+		body: getJsonString(text),
 		text,
 		status: response.status,
 		ok: response.ok,
@@ -121,19 +154,29 @@ export const apiEditFont = async ({ id, font }) => {
 /**
  * Fetch API request to delete existing font (DELETE)
  *
- * @param {string} id - ID of the font to delete
+ * @param {string} id       - ID of the font to delete
+ * @param {string} fontType - The row's `type`
  *
- * @return {Promise<Response>} Raw fetch Response
+ * @return {{ body: Object, status: number, ok: boolean }} The response, with the server's reason when it refuses
  *
  * @since 6.0
  */
-export const apiDeleteFont = (id) => {
-	const url = GFPDF.restUrl + 'fonts/' + id;
+export const apiDeleteFont = async (id, fontType) => {
+	const path = fontType === 'core' ? 'fonts/downloaded/' : 'fonts/';
 
-	return api(url, {
+	const response = await api(GFPDF.restUrl + path + id, {
 		method: 'DELETE',
 		headers: {
 			'X-WP-Nonce': GFPDF.restNonce,
+			Accept: 'application/json',
 		},
 	});
+
+	const text = await response.text();
+
+	return {
+		body: getJsonString(text),
+		status: response.status,
+		ok: response.ok,
+	};
 };

@@ -110,6 +110,12 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $language_font_keys;
 
 	/**
+	 * @var array<string, string[]>|null Locales by font key, once get_language_font_locales() maps them
+	 * @since 6.19.0
+	 */
+	protected $language_font_locales;
+
+	/**
 	 * Every source's downloadable files by name, once get_manifest() reads them
 	 *
 	 * @var array<string, array{url: string, size: int, sha: string}>|null
@@ -158,6 +164,26 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		return $this->sources;
+	}
+
+	/**
+	 * The custom fonts by ID
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_custom_fonts(): array {
+		return $this->custom_fonts->get_custom_fonts();
+	}
+
+	/**
+	 * @param string[] $paths
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_size_label( array $paths ): string {
+		return $this->custom_fonts->get_size_label( $paths );
 	}
 
 	/**
@@ -309,8 +335,9 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function flush(): void {
-		$this->font_data          = null;
-		$this->language_font_keys = null;
+		$this->font_data             = null;
+		$this->language_font_keys    = null;
+		$this->language_font_locales = null;
 		delete_transient( self::LANGUAGE_FONT_KEYS );
 	}
 
@@ -335,20 +362,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			return $this->language_font_keys;
 		}
 
-		$mapper  = $this->get_language_mapper();
-		$locales = array_filter( array_merge( (array) get_available_languages(), [ $locale ] ), 'is_string' );
-		$keys    = [];
-
-		foreach ( array_unique( $locales ) as $language ) {
-			/* Adobe CJK fonts are off in Gravity PDF's config */
-			$options = $mapper->getLanguageOptions( str_replace( '_', '-', $language ), false );
-			$key     = is_array( $options ) && is_string( $options[1] ?? null ) ? $options[1] : '';
-			if ( $key !== '' ) {
-				$keys[] = $key;
-			}
-		}
-
-		$this->language_font_keys = array_values( array_unique( $keys ) );
+		$this->language_font_keys = array_map( 'strval', array_keys( $this->get_language_font_locales() ) );
 
 		set_transient(
 			self::LANGUAGE_FONT_KEYS,
@@ -360,6 +374,50 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		);
 
 		return $this->language_font_keys;
+	}
+
+	/**
+	 * The installed languages and the locale mapped to their mPDF font keys, once per request
+	 *
+	 * @return array<string, string[]> Locales by font key
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_language_font_locales(): array {
+		if ( $this->language_font_locales !== null ) {
+			return $this->language_font_locales;
+		}
+
+		$this->language_font_locales = $this->map_language_font_locales(
+			array_merge( (array) get_available_languages(), [ get_locale() ] )
+		);
+
+		return $this->language_font_locales;
+	}
+
+	/**
+	 * Map locales to the mPDF font keys they need, skipping those the default font covers
+	 *
+	 * @param mixed[] $locales
+	 *
+	 * @return array<string, string[]> Locales by font key
+	 *
+	 * @since 6.19.0
+	 */
+	public function map_language_font_locales( array $locales ): array {
+		$mapper = $this->get_language_mapper();
+		$keys   = [];
+
+		foreach ( array_unique( array_filter( $locales, 'is_string' ) ) as $language ) {
+			/* Adobe CJK fonts are off in Gravity PDF's config */
+			$options = $mapper->getLanguageOptions( str_replace( '_', '-', $language ), false );
+			$key     = is_array( $options ) && is_string( $options[1] ?? null ) ? $options[1] : '';
+			if ( $key !== '' ) {
+				$keys[ $key ][] = $language;
+			}
+		}
+
+		return $keys;
 	}
 
 	/**
@@ -554,8 +612,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function add_font_list_groups( $fonts ): array {
-		$fonts        = is_array( $fonts ) ? $fonts : [];
-		$custom_fonts = $this->custom_fonts->get_custom_fonts();
+		$fonts = is_array( $fonts ) ? $fonts : [];
 
 		foreach ( $this->get_sources() as $source ) {
 			if ( empty( $source['group'] ) ) {
@@ -563,10 +620,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			}
 
 			$list = [];
-			foreach ( $source['families'] as $key => $family ) {
-				if ( ( $family['listed'] ?? true ) && ! isset( $custom_fonts[ $key ] ) ) {
-					$list[ $key ] = $family['name'] ?? $key;
-				}
+			foreach ( $this->get_listed_families( $source ) as $key => $family ) {
+				$list[ $key ] = $family['name'] ?? $key;
 			}
 
 			$group                     = $fonts[ $source['group'] ] ?? [];
@@ -574,6 +629,27 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		return $fonts;
+	}
+
+	/**
+	 * A source's families that users can choose: not hidden, and not replaced by a custom font of the same key
+	 *
+	 * @param array $source A get_sources() value
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_listed_families( array $source ): array {
+		$custom_fonts = $this->custom_fonts->get_custom_fonts();
+
+		return array_filter(
+			$source['families'] ?? [],
+			static function ( $family, $key ) use ( $custom_fonts ): bool {
+				return is_array( $family ) && ( $family['listed'] ?? true ) && ! isset( $custom_fonts[ $key ] );
+			},
+			ARRAY_FILTER_USE_BOTH
+		);
 	}
 
 	/**

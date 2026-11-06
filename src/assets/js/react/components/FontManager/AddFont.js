@@ -26,9 +26,6 @@ import AddUpdateFontFooter from './AddUpdateFontFooter';
  * @param { boolean }  props.validateRegular
  * @param { Object }   props.msg
  * @param { boolean }  props.loading
- * @param { string }   props.tabIndexFontName
- * @param { string }   props.tabIndexFontFiles
- * @param { string }   props.tabIndexFooterButtons
  *
  * @return {JSX.Element} AddFont component
  *
@@ -40,21 +37,17 @@ export const AddFont = ({
 	onHandleUpload,
 	onHandleDeleteFontStyle,
 	onHandleSubmit,
+	onHandleCancelAddFont,
 	fontStyles,
 	validateLabel,
 	validateRegular,
 	msg,
 	loading,
-	tabIndexFontName,
-	tabIndexFontFiles,
-	tabIndexFooterButtons,
 }) => {
 	return (
 		<div data-test="component-AddFont" className="add-font">
-			<form onSubmit={onHandleSubmit}>
+			<form id="gfpdf-add-font-form" onSubmit={onHandleSubmit}>
 				<h2>{GFPDF.fontManagerAddTitle}</h2>
-
-				<p>{GFPDF.fontManagerAddDesc}</p>
 
 				<label
 					htmlFor="gfpdf-add-font-name-input"
@@ -66,10 +59,6 @@ export const AddFont = ({
 					</span>
 				</label>
 
-				<p id="gfpdf-font-name-desc-add">
-					{GFPDF.fontManagerFontNameDesc}
-				</p>
-
 				<input
 					type="text"
 					id="gfpdf-add-font-name-input"
@@ -78,11 +67,15 @@ export const AddFont = ({
 					}
 					aria-describedby="gfpdf-font-name-desc-add"
 					name="label"
+					placeholder={GFPDF.fontManagerFontNamePlaceholder}
 					value={label}
 					maxLength="60"
 					onChange={(e) => onHandleInputChange(e, 'addFont')}
-					tabIndex={tabIndexFontName}
 				/>
+
+				<p id="gfpdf-font-name-desc-add" className="font-field-help">
+					{GFPDF.fontManagerFontNameDesc}
+				</p>
 
 				<div aria-live="polite">
 					{!validateLabel && (
@@ -107,17 +100,17 @@ export const AddFont = ({
 					onHandleUpload={onHandleUpload}
 					onHandleDeleteFontStyle={onHandleDeleteFontStyle}
 					msg={msg}
-					tabIndex={tabIndexFontFiles}
-				/>
-
-				<AddUpdateFontFooter
-					type="add"
-					state="addFont"
-					msg={msg}
-					loading={loading}
-					tabIndex={tabIndexFooterButtons}
 				/>
 			</form>
+
+			<AddUpdateFontFooter
+				type="add"
+				state="addFont"
+				formId="gfpdf-add-font-form"
+				onHandleCancelEditFont={onHandleCancelAddFont}
+				msg={msg}
+				loading={loading}
+			/>
 		</div>
 	);
 };
@@ -133,14 +126,12 @@ AddFont.propTypes = {
 	onHandleUpload: PropTypes.func.isRequired,
 	onHandleDeleteFontStyle: PropTypes.func.isRequired,
 	onHandleSubmit: PropTypes.func.isRequired,
+	onHandleCancelAddFont: PropTypes.func,
 	validateLabel: PropTypes.bool.isRequired,
 	validateRegular: PropTypes.bool.isRequired,
 	fontStyles: PropTypes.object.isRequired,
 	msg: PropTypes.object.isRequired,
 	loading: PropTypes.bool.isRequired,
-	tabIndexFontName: PropTypes.string.isRequired,
-	tabIndexFontFiles: PropTypes.string.isRequired,
-	tabIndexFooterButtons: PropTypes.string.isRequired,
 };
 
 export default AddFont;

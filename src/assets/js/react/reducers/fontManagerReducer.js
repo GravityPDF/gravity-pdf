@@ -5,6 +5,8 @@ import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -21,7 +23,6 @@ import {
 	RESET_SEARCH_RESULT,
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
-	MOVE_SELECTED_FONT_TO_TOP,
 } from '../actions/fontManager';
 /* Utilities */
 import {
@@ -46,6 +47,7 @@ import {
  * @property { boolean }       addFontLoading    - loading state when adding font
  * @property { boolean }       deleteFontLoading - loading state when deleting font
  * @property { Array<Object> } fontList          - font list state
+ * @property { null | Object } fontUsage         - why fonts are in use by ID, null until loaded
  * @property { null }          searchResult      - search result state
  * @property { string }        selectedFont      - state of selected font
  * @property { Object }        msg               - message object
@@ -63,6 +65,7 @@ export const initialState = {
 	addFontLoading: false,
 	deleteFontLoading: false,
 	fontList: [],
+	fontUsage: null,
 	searchResult: null,
 	selectedFont: '',
 	msg: {},
@@ -93,6 +96,7 @@ export default function (state = initialState, action) {
 			return {
 				...state,
 				loading: true,
+				fontUsage: null,
 				msg: {},
 			};
 		}
@@ -119,6 +123,31 @@ export default function (state = initialState, action) {
 				...state,
 				loading: false,
 				msg: { error: { fontList: payload } },
+			};
+
+		/**
+		 * Process GET_FONT_USAGE_SUCCESS
+		 *
+		 * @since 6.19.0
+		 */
+		case GET_FONT_USAGE_SUCCESS:
+			return {
+				...state,
+				fontUsage: payload,
+			};
+
+		/**
+		 * Process GET_FONT_USAGE_ERROR, which leaves Delete disabled
+		 *
+		 * @since 6.19.0
+		 */
+		case GET_FONT_USAGE_ERROR:
+			return {
+				...state,
+				msg: {
+					...state.msg,
+					error: { ...state.msg.error, deleteFont: payload },
+				},
 			};
 
 		/**
@@ -155,7 +184,10 @@ export default function (state = initialState, action) {
 				};
 			}
 
-			const updatedFontList = [...state.fontList, payload.font];
+			const updatedFontList = [
+				...state.fontList,
+				{ type: 'custom', can_delete: true, ...payload.font },
+			];
 
 			return {
 				...state,
@@ -324,6 +356,19 @@ export default function (state = initialState, action) {
 		 * @since 6.0
 		 */
 		case DELETE_FONT_SUCCESS: {
+			const deleted = state.fontList.find((font) => font.id === payload);
+			const msg = {
+				...state.msg,
+				success: {
+					// %s is found inside fontManagerFontDeleted
+					// eslint-disable-next-line @wordpress/valid-sprintf
+					deleteFont: sprintf(
+						GFPDF.fontManagerFontDeleted,
+						deleted?.font_name ?? payload
+					),
+				},
+			};
+
 			/* Delete from the list during active search */
 			if (state.searchResult) {
 				return {
@@ -335,6 +380,7 @@ export default function (state = initialState, action) {
 							.length === 0
 							? null
 							: findAndRemove([...state.searchResult], payload),
+					msg,
 				};
 			}
 
@@ -342,6 +388,7 @@ export default function (state = initialState, action) {
 				...state,
 				deleteFontLoading: false,
 				fontList: findAndRemove([...state.fontList], payload),
+				msg,
 			};
 		}
 
@@ -475,27 +522,6 @@ export default function (state = initialState, action) {
 				...state,
 				selectedFont: payload,
 			};
-
-		/**
-		 * Process MOVE_SELECTED_FONT_TO_TOP
-		 *
-		 * @since 6.0
-		 */
-		case MOVE_SELECTED_FONT_TO_TOP: {
-			const fontList = [...state.fontList];
-			const filterFontList = fontList.filter(
-				(item) => item.id !== payload
-			);
-			const getPayloadItem = fontList.filter(
-				(item) => item.id === payload
-			);
-			const list = [...getPayloadItem, ...filterFontList];
-
-			return {
-				...state,
-				fontList: list,
-			};
-		}
 	}
 
 	return state;

@@ -6,6 +6,7 @@ describe('Utilities/FontManager - associatedFontManagerSelectBox.js', () => {
 			bold: '',
 			bolditalics: '',
 			font_name: 'Gugi',
+			type: 'custom',
 			id: 'gugi',
 			italics: '',
 			regular: 'Gugi-Regular.ttf',
@@ -14,6 +15,7 @@ describe('Utilities/FontManager - associatedFontManagerSelectBox.js', () => {
 			bold: '',
 			bolditalics: '',
 			font_name: 'Gotham',
+			type: 'custom',
 			id: 'gotham',
 			italics: '',
 			regular: 'Gotham-Black-Regular.ttf',
@@ -39,6 +41,30 @@ describe('Utilities/FontManager - associatedFontManagerSelectBox.js', () => {
 		expect(document.querySelector('.gfpdf-font-manager select').value).toBe(
 			'gugi'
 		);
+	});
+
+	test('associatedFontManagerSelectBox() - Only custom fonts join the User-Defined group, and a core font can be selected', () => {
+		document
+			.querySelector('select')
+			.insertAdjacentHTML(
+				'beforeend',
+				'<optgroup label="Unicode"><option value="freeserif">Free Serif</option></optgroup>'
+			);
+		GFPDF.fontUserDefinedGroup = 'User-Defined Fonts';
+
+		associatedFontManagerSelectBox(
+			[{ id: 'freeserif', font_name: 'Free Serif', type: 'core' }],
+			'freeserif'
+		);
+
+		const select = document.querySelector('.gfpdf-font-manager select');
+		expect(select.value).toBe('freeserif');
+		expect(
+			document.querySelector('optgroup[label="User-Defined Fonts"]')
+		).toBe(null);
+		expect(
+			select.querySelectorAll('option[value="freeserif"]').length
+		).toBe(1);
 	});
 
 	test('associatedFontManagerSelectBox() - Set empty value if selected item is deleted', () => {

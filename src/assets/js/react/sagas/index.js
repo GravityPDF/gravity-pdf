@@ -12,6 +12,7 @@ import {
 	watchEditFont,
 	watchDeleteFont,
 	watchGetCustomFontListSuccess,
+	watchGetFontUsage,
 } from './fontManager';
 
 /**
@@ -36,5 +37,6 @@ export default function* rootSaga() {
 		watchEditFont(),
 		watchDeleteFont(),
 		watchGetCustomFontListSuccess(),
+		watchGetFontUsage(),
 	]);
 }

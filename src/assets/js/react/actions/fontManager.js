@@ -10,6 +10,8 @@ export const EDIT_FONT_SUCCESS = 'EDIT_FONT_SUCCESS';
 export const EDIT_FONT_ERROR = 'EDIT_FONT_ERROR';
 export const VALIDATION_ERROR = 'VALIDATION_ERROR';
 export const DELETE_VARIANT_ERROR = 'DELETE_VARIANT_ERROR';
+export const GET_FONT_USAGE_SUCCESS = 'GET_FONT_USAGE_SUCCESS';
+export const GET_FONT_USAGE_ERROR = 'GET_FONT_USAGE_ERROR';
 export const DELETE_FONT = 'DELETE_FONT';
 export const DELETE_FONT_SUCCESS = 'DELETE_FONT_SUCCESS';
 export const DELETE_FONT_ERROR = 'DELETE_FONT_ERROR';
@@ -18,7 +20,6 @@ export const CLEAR_DROPZONE_ERROR = 'CLEAR_DROPZONE_ERROR';
 export const RESET_SEARCH_RESULT = 'RESET_SEARCH_RESULT';
 export const SEARCH_FONT_LIST = 'SEARCH_FONT_LIST';
 export const SELECT_FONT = 'SELECT_FONT';
-export const MOVE_SELECTED_FONT_TO_TOP = 'MOVE_SELECTED_FONT_TO_TOP';
 
 /**
  * @package			Gravity PDF
@@ -105,15 +106,17 @@ export const deleteVariantError = (fontVariant) => {
  * Delete font request
  *
  * @param { string } id
+ * @param { string } fontType The row's `type`, which picks the endpoint
  *
- * @return {{ payload: string, type: string }} action object
+ * @return {{ payload: string, fontType: string, type: string }} action object
  *
  * @since 6.0
  */
-export const deleteFont = (id) => {
+export const deleteFont = (id, fontType) => {
 	return {
 		type: DELETE_FONT,
 		payload: id,
+		fontType,
 	};
 };
 
@@ -187,20 +190,6 @@ export const resetSearchResult = () => {
 export const selectFont = (fontId) => {
 	return {
 		type: SELECT_FONT,
-		payload: fontId,
-	};
-};
-
-/**
- * Move selected font to top
- *
- * @param { string } fontId
- *
- * @return {{ payload: string, type: string }} action object
- */
-export const moveSelectedFontToTop = (fontId) => {
-	return {
-		type: MOVE_SELECTED_FONT_TO_TOP,
 		payload: fontId,
 	};
 };

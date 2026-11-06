@@ -89,6 +89,24 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The combined size of the files that exist, formatted for display, or '' when there are none
+	 *
+	 * @param string[] $paths
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_size_label( array $paths ): string {
+		$bytes = 0;
+		foreach ( $paths as $path ) {
+			if ( is_file( $path ) ) {
+				$bytes += (int) filesize( $path );
+			}
+		}
+
+		return $bytes > 0 ? (string) size_format( $bytes, 1 ) : '';
+	}
+
+	/**
 	 * @param string $id
 	 *
 	 * @return array matches font

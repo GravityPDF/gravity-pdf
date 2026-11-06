@@ -1,3 +1,6 @@
+/* Utilities */
+import { isCustomFont } from './fontManagerReducer';
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -43,28 +46,28 @@ export function associatedFontManagerSelectBox(fontList, id = '') {
 		definedFontsOptgroup.remove();
 	}
 
-	// Do nothing if no custom fonts
-	if (fontList.length === 0) {
-		return;
+	// Core and bundled fonts already have their own groups
+	const customFonts = fontList.filter(isCustomFont);
+
+	if (customFonts.length > 0) {
+		// Build our new custom font group
+		const optgroup = document.createElement('optgroup');
+		optgroup.setAttribute('label', GFPDF.fontUserDefinedGroup);
+
+		/* Build User-Defined Fonts optgroup list */
+		customFonts.map((font) => {
+			const option = document.createElement('option');
+			option.text = font.font_name;
+			option.value = font.id;
+
+			return optgroup.appendChild(option);
+		});
+
+		fontManagerSelectBox.insertBefore(
+			optgroup,
+			fontManagerSelectBox.childNodes[0]
+		);
 	}
-
-	// Build our new custom font group
-	const optgroup = document.createElement('optgroup');
-	optgroup.setAttribute('label', GFPDF.fontUserDefinedGroup);
-
-	/* Build User-Defined Fonts optgroup list */
-	fontList.map((font) => {
-		const option = document.createElement('option');
-		option.text = font.font_name;
-		option.value = font.id;
-
-		return optgroup.appendChild(option);
-	});
-
-	fontManagerSelectBox.insertBefore(
-		optgroup,
-		fontManagerSelectBox.childNodes[0]
-	);
 
 	fontManagerSelectBox.value = !id ? selectedValue : id;
 }

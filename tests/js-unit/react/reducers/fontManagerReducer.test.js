@@ -1,6 +1,8 @@
 import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	GET_CUSTOM_FONT_LIST_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
@@ -17,7 +19,6 @@ import {
 	RESET_SEARCH_RESULT,
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
-	MOVE_SELECTED_FONT_TO_TOP,
 } from '../../../../src/assets/js/react/actions/fontManager';
 import reducer, {
 	initialState,
@@ -83,6 +84,33 @@ describe('Reducers - fontManagerReducer.js', () => {
 		});
 	});
 
+	describe('Font usage', () => {
+		test('is cleared while the list reloads and set once it loads', () => {
+			const loaded = reducer(
+				{ ...initialState, msg: {} },
+				{
+					type: GET_FONT_USAGE_SUCCESS,
+					payload: { a: ['Default font'] },
+				}
+			);
+			expect(loaded.fontUsage).toEqual({ a: ['Default font'] });
+
+			expect(
+				reducer(loaded, { type: GET_CUSTOM_FONT_LIST }).fontUsage
+			).toBe(null);
+		});
+
+		test('shows an error when it fails', () => {
+			const failed = reducer(
+				{ ...initialState, msg: {} },
+				{ type: GET_FONT_USAGE_ERROR, payload: 'error' }
+			);
+
+			expect(failed.fontUsage).toBe(null);
+			expect(failed.msg.error.deleteFont).toBe('error');
+		});
+	});
+
 	describe('ADD_FONT_SUCCESS', () => {
 		const data = {
 			font: {
@@ -106,7 +134,9 @@ describe('Reducers - fontManagerReducer.js', () => {
 			});
 
 			expect(state.addFontLoading).toBe(false);
-			expect(state.fontList).toEqual([data.font]);
+			expect(state.fontList).toEqual([
+				{ type: 'custom', can_delete: true, ...data.font },
+			]);
 			expect(state.searchResult).toBe(null);
 			expect(state.msg.success.addFont).toBe('success');
 
@@ -322,6 +352,7 @@ describe('Reducers - fontManagerReducer.js', () => {
 
 			expect(state.deleteFontLoading).toBe(false);
 			expect(state.fontList).toEqual([data[1]]);
+			expect(state.msg.success.deleteFont).toBe('Arial deleted.');
 
 			initialstate = {
 				fontList: data,
@@ -456,67 +487,6 @@ describe('Reducers - fontManagerReducer.js', () => {
 			});
 
 			expect(state.selectedFont).toBe('roboto');
-		});
-	});
-
-	describe('MOVE_SELECTED_FONT_TO_TOP', () => {
-		test('check the correct state gets returned when this action runs', () => {
-			const newInitialState = {
-				fontList: [
-					{
-						font_name: 'Arial',
-						id: 'arial',
-						regular:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
-						italics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
-						bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
-						bolditalics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bolditalics.ttf',
-					},
-					{
-						font_name: 'Roboto',
-						id: 'roboto',
-						regular:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-						italics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-						bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-						bolditalics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/aroboto.ttf',
-					},
-				],
-			};
-
-			state = reducer(newInitialState, {
-				type: MOVE_SELECTED_FONT_TO_TOP,
-				payload: 'roboto',
-			});
-
-			expect(state.fontList).toEqual([
-				{
-					font_name: 'Roboto',
-					id: 'roboto',
-					regular:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-					italics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-					bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-					bolditalics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/aroboto.ttf',
-				},
-				{
-					font_name: 'Arial',
-					id: 'arial',
-					regular:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
-					italics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
-					bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
-					bolditalics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bolditalics.ttf',
-				},
-			]);
 		});
 	});
 });

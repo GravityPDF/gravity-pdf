@@ -18,6 +18,7 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Model\Model_Required_Fonts;
 use GFPDF\Statics\Upload_Size;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
@@ -258,7 +259,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			FlushCache::flush( $font['id'] );
 
-			return $font;
+			return $this->with_size_label( $font );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -377,7 +378,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			FlushCache::flush( $font['id'] );
 
-			return $font;
+			return $this->with_size_label( $font );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -416,6 +417,11 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				throw new GravityPdfIdException();
 			}
 
+			$required_fonts = GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
+			if ( $required_fonts instanceof Model_Required_Fonts && $required_fonts->is_font_in_use( $id ) ) {
+				return new WP_Error( 'font_in_use', __( 'The font is in use, so it can\'t be deleted.', 'gravity-pdf' ), [ 'status' => 409 ] );
+			}
+
 			/* Delete TTF files from disk */
 			$font = $this->model->get_font_by_id( $id );
 			foreach ( $this->font_keys as $font_id ) {
@@ -446,6 +452,17 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				$this->log->error( $e->getMessage() );
 			}
 		}
+	}
+
+	/**
+	 * Add the size the Font Manager lists to a saved font
+	 *
+	 * @since 6.19.0
+	 */
+	protected function with_size_label( array $font ): array {
+		$font['size_label'] = $this->model->get_size_label( array_filter( array_intersect_key( $font, array_flip( $this->font_keys ) ) ) );
+
+		return $font;
 	}
 
 	/**

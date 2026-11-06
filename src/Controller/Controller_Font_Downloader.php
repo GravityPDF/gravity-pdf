@@ -5,9 +5,14 @@ declare( strict_types=1 );
 namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Required_Fonts;
+use GPDFAPI;
+use WP_Error;
+use WP_REST_Request;
+use WP_REST_Server;
 
 /**
  * @package     Gravity PDF
@@ -61,6 +66,77 @@ class Controller_Font_Downloader extends Helper_Abstract_Controller implements H
 	 */
 	public function init() {
 		$this->add_actions();
+
+		add_action( 'rest_api_init', [ $this, 'register_endpoints' ] );
+	}
+
+	/**
+	 * The Font Manager's list of every font, what's in use, and the delete for downloaded fonts
+	 *
+	 * @since 6.19.0
+	 */
+	public function register_endpoints(): void {
+		register_rest_route(
+			Helper_Data::REST_API_BASENAME . 'v1',
+			'/fonts/installed',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this->model, 'get_installed_fonts' ],
+				'permission_callback' => [ $this, 'can_view_fonts' ],
+			]
+		);
+
+		register_rest_route(
+			Helper_Data::REST_API_BASENAME . 'v1',
+			'/fonts/installed/usage',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this->model, 'get_font_usage' ],
+				'permission_callback' => [ $this, 'can_view_fonts' ],
+			]
+		);
+
+		register_rest_route(
+			Helper_Data::REST_API_BASENAME . 'v1',
+			'/fonts/downloaded/(?P<key>[a-z0-9_\-]+)',
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'delete_downloaded_font' ],
+				'permission_callback' => [ $this, 'can_delete_fonts' ],
+			]
+		);
+	}
+
+	/**
+	 * @return array|WP_Error
+	 *
+	 * @since 6.19.0
+	 */
+	public function delete_downloaded_font( WP_REST_Request $request ) {
+		return $this->model->delete_downloaded_font( (string) $request->get_param( 'key' ) );
+	}
+
+	/**
+	 * The custom font routes' capability
+	 *
+	 * @since 6.19.0
+	 */
+	public function can_view_fonts(): bool {
+		$allowed = GPDFAPI::get_form_class()->has_capability( 'gravityforms_edit_forms' );
+		if ( ! $allowed ) {
+			GPDFAPI::get_log_class()->warning( 'Permission denied: user does not have "gravityforms_edit_forms" capabilities' );
+		}
+
+		return $allowed;
+	}
+
+	/**
+	 * Super admins only on Multisite, as the fonts folder is shared by the network
+	 *
+	 * @since 6.19.0
+	 */
+	public function can_delete_fonts(): bool {
+		return $this->can_view_fonts() && $this->model->can_delete_core_fonts();
 	}
 
 	/**

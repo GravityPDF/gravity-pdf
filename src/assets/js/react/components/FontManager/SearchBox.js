@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 /* Redux actions */
 import { resetSearchResult, searchFontList } from '../../actions/fontManager';
+import Icon from './Icon';
 
 /**
  * @package			Gravity PDF
@@ -124,7 +125,8 @@ export class SearchBox extends Component {
 	 */
 	render() {
 		return (
-			<div role="form">
+			<div role="form" className="font-search">
+				<Icon name="search" />
 				<input
 					data-test="component-SearchBox"
 					type="search"

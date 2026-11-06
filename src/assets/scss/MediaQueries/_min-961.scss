@@ -1,25 +1,46 @@
+@use '../base';
+
 /* 960px and below */
 @media only screen and (max-width: 960px) {
   #tab_PDF {
 
-    /* Font manager modal */
+    /* Font manager modal: the detail sits under the sidebar and both scroll together */
     #font-manager-overlay {
       .font-manager {
         #gfpdf-font-manager-container {
           display: flex;
           flex-direction: column;
+          overflow-y: auto;
 
-          /* Font list */
           .font-list-column {
+            flex: none;
+            border-inline-end: 0;
+
             .font-list {
-              width: 85%;
+              max-height: 600px;
             }
           }
 
-          /* Add font */
           .add-update-font-column {
-            .update-font {
-              left: -800px;
+            --font-pane-gutter: 1rem;
+            flex: none;
+            overflow: visible;
+            padding: 1.5rem var(--font-pane-gutter) 0;
+            border-block-start: 1px solid base.$lighter-highlight-color;
+
+            /* Rows wrap instead of overflowing a narrow pane */
+            #gfpdf-font-files-setting .drop-zone {
+              flex-wrap: wrap;
+              gap: 0.5rem 1rem;
+
+              .font-variant-label {
+                width: auto;
+                min-width: 6rem;
+              }
+
+              .gfpdf-font-filename {
+                flex-basis: 8rem;
+              }
             }
           }
         }

@@ -1,15 +1,10 @@
 /* Dependencies */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { sprintf } from 'sprintf-js';
 /* Components */
+import FontDeleteButton from './FontDeleteButton';
 import Spinner from '../Spinner';
-/* Redux actions */
-import {
-	selectFont as selectFontAction,
-	deleteFont as deleteFontAction,
-} from '../../actions/fontManager';
 import TemplateTooltip from './TemplateTooltip';
 
 /**
@@ -24,13 +19,12 @@ import TemplateTooltip from './TemplateTooltip';
  *
  * @param state
  * @param id
+ * @param formId
+ * @param type
  * @param disabled
  * @param onHandleCancelEditFont
- * @param onHandleCancelEditFontKeypress
- * @param success
- * @param error
+ * @param msg
  * @param loading
- * @param tabIndex
  *
  * @since 6.0
  */
@@ -43,95 +37,12 @@ export class AddUpdateFontFooter extends Component {
 	static propTypes = {
 		state: PropTypes.string,
 		id: PropTypes.string,
+		formId: PropTypes.string,
 		type: PropTypes.string,
 		disabled: PropTypes.bool,
 		onHandleCancelEditFont: PropTypes.func,
-		onHandleCancelEditFontKeypress: PropTypes.func,
-		selectedFont: PropTypes.string.isRequired,
-		selectFont: PropTypes.func.isRequired,
-		deleteFont: PropTypes.func,
 		msg: PropTypes.object.isRequired,
 		loading: PropTypes.bool.isRequired,
-		tabIndex: PropTypes.string.isRequired,
-	};
-
-	/**
-	 * Handle the functionality to select and set default font type to be used in PDFs
-	 * (Under 'update font' panel)
-	 *
-	 * @param { string } fontId
-	 * @param { string } selectedFont
-	 *
-	 * @since 6.0
-	 */
-	handleSelectFont = (fontId, selectedFont) => {
-		const { selectFont } = this.props;
-
-		if (fontId === selectedFont) {
-			return selectFont('');
-		}
-
-		selectFont(fontId);
-	};
-
-	/**
-	 * Handle the functionality to select and set default font type to be used in PDFs
-	 * (Under 'update font' panel - Keyboard press)
-	 *
-	 * @param { KeyboardEvent } e
-	 * @param { string }        fontId
-	 * @param { string }        selectedFont
-	 *
-	 * @since 6.0
-	 */
-	handleSelectFontKeypress = (e, fontId, selectedFont) => {
-		const enter = 'Enter';
-		const space = ' ';
-		const { selectFont } = this.props;
-
-		if (e.key === enter || e.key === space) {
-			if (fontId === selectedFont) {
-				return selectFont('');
-			}
-
-			selectFont(fontId);
-		}
-	};
-
-	/**
-	 * Handle request of font deletion (Under 'update font' panel)
-	 *
-	 * @param { string } fontId
-	 *
-	 * @since 6.0
-	 */
-	handleDeleteFont = (fontId) => {
-		/* Fire a native window alert box to confirm deletion request */
-		if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
-			/* Call redux action deleteFont */
-			this.props.deleteFont(fontId);
-		}
-	};
-
-	/**
-	 * Handle request of font deletion (Under 'update font' panel - Keyboard press)
-	 *
-	 * @param { KeyboardEvent } e
-	 * @param { string }        fontId
-	 *
-	 * @since 6.0
-	 */
-	handleDeleteFontKeypress = (e, fontId) => {
-		const enter = 'Enter';
-		const space = ' ';
-
-		if (e.key === enter || e.key === space) {
-			/* Fire a native window alert box to confirm deletion request */
-			if (window.confirm(GFPDF.fontManagerDeleteFontConfirmation)) {
-				/* Call redux action deleteFont */
-				this.props.deleteFont(fontId);
-			}
-		}
 	};
 
 	render() {
@@ -139,15 +50,12 @@ export class AddUpdateFontFooter extends Component {
 			state,
 			type,
 			id,
+			formId,
 			disabled,
 			onHandleCancelEditFont,
-			onHandleCancelEditFontKeypress,
-			selectedFont,
 			msg: { success, error },
 			loading,
-			tabIndex,
 		} = this.props;
-		const cancelButton = document.querySelector('.footer button.cancel');
 		const errorFontList = error && error.fontList;
 		const successAddFont = success && success.addFont;
 		const showSuccessAddFont =
@@ -164,8 +72,6 @@ export class AddUpdateFontFooter extends Component {
 			'<strong>',
 			'</strong>'
 		);
-		const selectedBoxStyle =
-			id !== '' && id === selectedFont ? ' checked' : ' uncheck';
 		/* Display error message for uploading invalid font file */
 		const displayInvalidFileErrorMessage =
 			errorAddFont && errorFontValidation;
@@ -173,83 +79,8 @@ export class AddUpdateFontFooter extends Component {
 		const displayGenericErrorMessage = errorAddFont && !errorFontValidation;
 
 		return (
-			<footer
-				data-test="component-AddFontFooter"
-				className={'footer' + (cancelButton ? ' cancel' : '')}
-			>
-				<div className="buttons-icons-container">
-					<div>
-						{type === 'update' && (
-							<button
-								className="button gfpdf-button primary cancel"
-								onClick={onHandleCancelEditFont}
-								onKeyDown={onHandleCancelEditFontKeypress}
-								type="button"
-								tabIndex={tabIndex}
-								aria-label={GFPDF.cancel}
-							>
-								{GFPDF.fontManagerCancelButtonText}
-							</button>
-						)}
-
-						<button
-							className="button gfpdf-button primary"
-							tabIndex={tabIndex}
-							disabled={disabled}
-							aria-label={
-								type === 'update'
-									? GFPDF.fontManagerUpdateFontAriaLabel
-									: GFPDF.fontManagerAddFontAriaLabel
-							}
-						>
-							{type === 'update'
-								? GFPDF.fontManagerUpdateTitle + ' →'
-								: GFPDF.fontManagerAddTitle + ' →'}
-						</button>
-
-						{loading && <Spinner style="add-update-font" />}
-					</div>
-
-					<div className="select-delete-icons-container">
-						{id && (
-							<button
-								className={
-									'dashicons dashicons-yes' + selectedBoxStyle
-								}
-								onClick={() =>
-									this.handleSelectFont(id, selectedFont)
-								}
-								onKeyDown={(e) =>
-									this.handleSelectFontKeypress(
-										e,
-										id,
-										selectedFont
-									)
-								}
-								type="button"
-								tabIndex={tabIndex}
-								aria-label={
-									GFPDF.fontManagerSelectFontAriaLabel
-								}
-							/>
-						)}
-
-						{id && (
-							<button
-								className="dashicons dashicons-trash"
-								onClick={() => this.handleDeleteFont(id)}
-								onKeyDown={(e) =>
-									this.handleDeleteFontKeypress(e, id)
-								}
-								type="button"
-								tabIndex={tabIndex}
-								aria-label={
-									GFPDF.fontManagerDeleteFontAriaLabel
-								}
-							/>
-						)}
-					</div>
-				</div>
+			<footer data-test="component-AddFontFooter" className="footer">
+				{id && <TemplateTooltip id={id} />}
 
 				{showSuccessAddFont && (
 					<span
@@ -279,32 +110,50 @@ export class AddUpdateFontFooter extends Component {
 					/>
 				)}
 
-				{id && <TemplateTooltip id={id} />}
+				<div className="buttons-icons-container">
+					<div className="select-delete-icons-container">
+						{id && (
+							<FontDeleteButton
+								id={id}
+								type="custom"
+								message={
+									GFPDF.fontManagerDeleteFontConfirmation
+								}
+							/>
+						)}
+					</div>
+
+					<div className="font-footer-actions">
+						{loading && <Spinner style="add-update-font" />}
+
+						<button
+							className="button gfpdf-button cancel"
+							onClick={onHandleCancelEditFont}
+							type="button"
+							aria-label={GFPDF.cancel}
+						>
+							{GFPDF.cancel}
+						</button>
+
+						<button
+							className="button gfpdf-button primary"
+							form={formId}
+							disabled={disabled}
+							aria-label={
+								type === 'update'
+									? GFPDF.fontManagerUpdateFontAriaLabel
+									: GFPDF.fontManagerAddFontAriaLabel
+							}
+						>
+							{type === 'update'
+								? GFPDF.fontManagerUpdateTitle + ' →'
+								: GFPDF.fontManagerAddTitle + ' →'}
+						</button>
+					</div>
+				</div>
 			</footer>
 		);
 	}
 }
 
-/**
- * Map redux state to props
- *
- * @param { Object } state
- * @param { Object } state.fontManager
- *
- * @return {{ selectedFont: string }} mappedState
- *
- * @since 6.0
- */
-const mapStateToProps = (state) => ({
-	selectedFont: state.fontManager.selectedFont,
-});
-
-/**
- * Connect and dispatch redux actions as props
- *
- * @since 6.0
- */
-export default connect(mapStateToProps, {
-	selectFont: selectFontAction,
-	deleteFont: deleteFontAction,
-})(AddUpdateFontFooter);
+export default AddUpdateFontFooter;
