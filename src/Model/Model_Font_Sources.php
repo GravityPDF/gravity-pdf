@@ -27,11 +27,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * The fonts Gravity PDF provides: the bundled Arimo and DejaVu symbol faces, and mPDF's core fonts
+ * The fonts Gravity PDF provides (bundled Arimo and DejaVu symbols, mPDF's core fonts) and those `gfpdf_font_sources` adds
  *
  * A source has `families` (mPDF font data, plus an optional `name` and `listed`), and optionally a bundled `dir`, a
  * `manifest` of its downloadable files, a font list `group`, and `legacy` (git blob SHA-1 => size) or a
- * `legacy_manifest` of other copies of its files, which adopt_records() accepts.
+ * `legacy_manifest` of other copies of its files, which adopt_records() accepts. A `required` source's files join the
+ * background sync.
  *
  * @since 6.19.0
  */
@@ -66,6 +67,27 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public const LANGUAGE_FONT_KEYS = 'gfpdf_language_font_keys';
+
+	/**
+	 * The option holding each added source's version, as of the last admin request
+	 *
+	 * @since 6.19.0
+	 */
+	public const SOURCE_VERSIONS = 'gfpdf_font_sources';
+
+	/**
+	 * Source IDs a plugin can't add or replace
+	 *
+	 * @since 6.19.0
+	 */
+	public const RESERVED_SOURCES = [ 'bundled', 'core' ];
+
+	/**
+	 * The keys an added source may set
+	 *
+	 * @since 6.19.0
+	 */
+	protected const ADDED_SOURCE_KEYS = [ 'families', 'manifest', 'group', 'required', 'legacy', 'version' ];
 
 	/**
 	 * @var Helper_Data
@@ -163,7 +185,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The font sources, keyed by ID (`bundled`, `core`), built once
+	 * The font sources, keyed by ID (`bundled`, `core`, then those plugins add), built once
 	 *
 	 * @return array<string, array>
 	 *
@@ -171,15 +193,245 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 */
 	public function get_sources(): array {
 		if ( $this->sources === null ) {
-			$this->sources = $this->rename_colliding_files(
-				[
-					'bundled' => $this->get_bundled_source(),
-					'core'    => $this->get_core_source(),
-				]
-			);
+			$core = [
+				'bundled' => $this->get_bundled_source(),
+				'core'    => $this->get_core_source(),
+			];
+
+			/* A filter callback asking for the sources gets the core ones, rather than recursing */
+			$this->sources = $core;
+
+			/**
+			 * Add font sources, whose files download from their manifest when needed
+			 *
+			 * @param array<string, array> $sources The sources keyed by ID; `bundled` and `core` are reserved
+			 *
+			 * @since 6.19.0
+			 */
+			$sources = apply_filters( 'gfpdf_font_sources', $core );
+
+			/* Only valid sources reach rename_colliding_files(), which reads their manifests */
+			$this->sources = $this->rename_colliding_files( $core + $this->get_added_sources( $sources, $core ) );
+
+			/* A callback may have cached what was built from the core sources alone */
+			$this->manifest          = null;
+			$this->family_files      = null;
+			$this->record_collisions = [];
 		}
 
 		return $this->sources;
+	}
+
+	/**
+	 * The valid sources a plugin added, logging and dropping the rest
+	 *
+	 * @param mixed $sources What the filter returned
+	 *
+	 * @return array<string, array>
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_added_sources( $sources, array $core ): array {
+		$added = [];
+
+		if ( ! is_array( $sources ) ) {
+			return $added;
+		}
+
+		foreach ( $sources as $id => $source ) {
+			if ( isset( $core[ $id ] ) ) {
+				if ( $source !== $core[ $id ] ) {
+					$this->log->error( 'Font source dropped: its ID is reserved', [ 'source' => $id ] );
+				}
+
+				continue;
+			}
+
+			$error = $this->get_source_error( $id, $source );
+			if ( $error !== '' ) {
+				$this->log->error( 'Font source dropped: ' . $error, [ 'source' => (string) $id ] );
+
+				continue;
+			}
+
+			$source             = array_intersect_key( $source, array_flip( self::ADDED_SOURCE_KEYS ) );
+			$source['required'] = ! empty( $source['required'] );
+			$source['version']  = (string) ( $source['version'] ?? '' );
+
+			$added[ $id ] = $source;
+		}
+
+		return $added;
+	}
+
+	/**
+	 * Why an added source is invalid, or '' if it isn't; its manifest's entries are checked when first read
+	 *
+	 * @param mixed $id
+	 * @param mixed $source
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_source_error( $id, $source ): string {
+		if ( ! is_string( $id ) || $id === '' || sanitize_key( $id ) !== $id ) {
+			return 'its ID is not a lowercase key';
+		}
+
+		if ( ! is_array( $source ) ) {
+			return 'it is not an array';
+		}
+
+		if ( ! is_array( $source['families'] ?? null ) || count( $source['families'] ) === 0 ) {
+			return 'it has no families';
+		}
+
+		foreach ( $source['families'] as $key => $family ) {
+			if ( ! $this->is_family( $key, $family ) ) {
+				return 'a family is invalid';
+			}
+		}
+
+		if ( ! is_string( $source['manifest'] ?? null ) || ! is_readable( $source['manifest'] ) ) {
+			return 'its manifest is missing';
+		}
+
+		if ( isset( $source['group'] ) && ( ! is_string( $source['group'] ) || $source['group'] === '' ) ) {
+			return 'its group is not a label';
+		}
+
+		if ( isset( $source['version'] ) && ! is_scalar( $source['version'] ) ) {
+			return 'its version is not a string';
+		}
+
+		if ( isset( $source['legacy'] ) && ! $this->is_legacy( $source['legacy'] ) ) {
+			return 'its legacy hashes are invalid';
+		}
+
+		return '';
+	}
+
+	/**
+	 * A lowercase font key with a Regular file, every R/B/I/BI file a plain file name
+	 *
+	 * @param mixed $key
+	 * @param mixed $family
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_family( $key, $family ): bool {
+		if ( ! is_string( $key ) || $key === '' || strtolower( $key ) !== $key || ! is_array( $family ) || ! isset( $family['R'] ) ) {
+			return false;
+		}
+
+		foreach ( $this->get_family_files( $family ) as $file ) {
+			if ( ! $this->is_file_name( $file ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * A family's R/B/I/BI values
+	 *
+	 * @return mixed[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_family_files( array $family ): array {
+		return array_values( array_intersect_key( $family, array_flip( [ 'R', 'B', 'I', 'BI' ] ) ) );
+	}
+
+	/**
+	 * A file name with no path
+	 *
+	 * @param mixed $file
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_file_name( $file ): bool {
+		return is_string( $file ) && $file !== '' && basename( $file ) === $file;
+	}
+
+	/**
+	 * A git blob SHA-1 and a positive size
+	 *
+	 * @param mixed $sha
+	 * @param mixed $size
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_blob( $sha, $size ): bool {
+		return is_string( $sha ) && preg_match( '/^[0-9a-f]{40}$/', $sha ) === 1 && is_int( $size ) && $size > 0;
+	}
+
+	/**
+	 * Whether every legacy entry is a git blob SHA-1 => a positive size
+	 *
+	 * @param mixed $legacy
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_legacy( $legacy ): bool {
+		if ( ! is_array( $legacy ) ) {
+			return false;
+		}
+
+		foreach ( $legacy as $sha => $size ) {
+			if ( ! $this->is_blob( $sha, $size ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Adopt the records of added sources that are new or re-versioned, then fire `gfpdf_font_sources_changed`
+	 *
+	 * @since 6.19.0
+	 */
+	public function check_added_sources(): void {
+		/* No default: the first check stores [], so later reads hit the autoloaded options */
+		$stored = get_option( self::SOURCE_VERSIONS );
+		if ( $stored === [] && ! has_filter( 'gfpdf_font_sources' ) ) {
+			return;
+		}
+
+		$versions = is_array( $stored ) ? $stored : [];
+		$current  = [];
+		$changed  = [];
+
+		foreach ( array_diff_key( $this->get_sources(), array_flip( self::RESERVED_SOURCES ) ) as $id => $source ) {
+			$id = (string) $id;
+			if ( ( $versions[ $id ] ?? null ) !== $source['version'] ) {
+				/* Unrecorded, so it's checked again once its manifest is fixed */
+				if ( count( $this->get_source_manifest( $id ) ) === 0 ) {
+					continue;
+				}
+
+				$this->adopt_records( $id );
+				$changed[] = $id;
+			}
+
+			$current[ $id ] = $source['version'];
+		}
+
+		if ( $current !== $stored ) {
+			update_option( self::SOURCE_VERSIONS, $current, true );
+		}
+
+		if ( count( $changed ) > 0 ) {
+			/**
+			 * Fires when font sources were added or re-versioned, after their custom font records were adopted
+			 *
+			 * @param string[] $changed The source IDs
+			 *
+			 * @since 6.19.0
+			 */
+			do_action( 'gfpdf_font_sources_changed', $changed );
+		}
 	}
 
 	/**
@@ -475,9 +727,12 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_manifest(): array {
+		/* Building the sources resets what was cached from them, so it comes first */
+		$sources = $this->get_sources();
+
 		if ( $this->manifest === null ) {
 			$this->manifest = [];
-			foreach ( array_keys( $this->get_sources() ) as $id ) {
+			foreach ( array_keys( $sources ) as $id ) {
 				$this->manifest += $this->get_unaliased_manifest( (string) $id );
 			}
 		}
@@ -539,7 +794,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		$sources = $this->get_sources();
 
 		if ( ! isset( $this->manifests[ $id ] ) ) {
-			$this->manifests[ $id ] = $this->read_manifest( $sources[ $id ] ?? [] );
+			$this->manifests[ $id ] = $this->read_source_manifest( $id, $sources[ $id ] ?? [] );
 		}
 
 		return $this->manifests[ $id ];
@@ -555,6 +810,8 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_record_collisions(): array {
+		$this->get_sources();
+
 		$blog = get_current_blog_id();
 		if ( isset( $this->record_collisions[ $blog ] ) ) {
 			return $this->record_collisions[ $blog ];
@@ -609,9 +866,11 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			return [];
 		}
 
+		$sources = $this->get_sources();
+
 		if ( $this->family_files === null ) {
 			$this->family_files = [];
-			foreach ( $this->get_sources() as $source ) {
+			foreach ( $sources as $source ) {
 				foreach ( empty( $source['manifest'] ) ? [] : $source['families'] as $family ) {
 					foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
 						if ( is_array( $family ) && is_string( $family[ $style ] ?? null ) ) {
@@ -633,6 +892,21 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		return array_values( $names );
+	}
+
+	/**
+	 * Whether every family's files are on the manifest
+	 *
+	 * @since 6.19.0
+	 */
+	protected function has_family_files( array $families, array $manifest ): bool {
+		foreach ( $families as $family ) {
+			if ( count( array_diff( $this->get_family_files( $family ), array_keys( $manifest ) ) ) > 0 ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -917,7 +1191,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			return [];
 		}
 
-		$known   = $this->get_known_files( $source, $this->get_legacy_manifest( $source_id ) );
+		$known   = $this->get_known_files( $source, $this->get_source_manifest( $source_id ), $this->get_legacy_manifest( $source_id ) );
 		$records = array_intersect_key( $this->custom_fonts->get_custom_fonts(), $source['families'] );
 
 		/* A source with no known copies can't vouch for any file */
@@ -1073,7 +1347,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			$renames  = [];
 			$resolved = [];
 
-			foreach ( $this->read_manifest( $sources[ $id ] ) as $file => $entry ) {
+			foreach ( $this->read_source_manifest( (string) $id, $sources[ $id ] ) as $file => $entry ) {
 				$file = (string) $file;
 				$name = $file;
 
@@ -1109,26 +1383,37 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * A source's manifest, keyed by file name, skipping malformed entries
+	 * A source's manifest, keyed by file name. An added source's is all or nothing, so a bad build never half-installs: it
+	 * is rejected whole if any entry is malformed or a family file is not on it.
 	 *
 	 * @return array<string, array{url: string, size: int, sha: string}>
 	 *
 	 * @since 6.19.0
 	 */
-	protected function read_manifest( array $source ): array {
-		return $this->read_manifest_file( $source['manifest'] ?? '' );
+	protected function read_source_manifest( string $id, array $source ): array {
+		$strict   = $source !== [] && ! in_array( $id, self::RESERVED_SOURCES, true );
+		$manifest = $this->read_manifest_file( $source['manifest'] ?? '', $strict );
+
+		if ( $strict && count( $manifest ) > 0 && ! $this->has_family_files( $source['families'], $manifest ) ) {
+			$this->log->error( 'Font manifest rejected: a family file is not on it', [ 'manifest' => $source['manifest'] ] );
+
+			return [];
+		}
+
+		return $manifest;
 	}
 
 	/**
 	 * A manifest file's entries, keyed by file name, skipping malformed ones
 	 *
 	 * @param mixed $path
+	 * @param bool  $strict Read none if any entry is malformed
 	 *
 	 * @return array<string, array{url: string, size: int, sha: string}>
 	 *
 	 * @since 6.19.0
 	 */
-	protected function read_manifest_file( $path ): array {
+	protected function read_manifest_file( $path, bool $strict = false ): array {
 		if ( ! is_string( $path ) || $path === '' ) {
 			return [];
 		}
@@ -1146,6 +1431,12 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		}
 
 		$manifest = array_filter( $entries, [ $this, 'is_manifest_entry' ], ARRAY_FILTER_USE_BOTH );
+
+		if ( $strict && $manifest !== $entries ) {
+			$this->log->error( 'Font manifest rejected: an entry is invalid', [ 'manifest' => $path ] );
+
+			return [];
+		}
 
 		if ( count( $manifest ) !== count( $entries ) ) {
 			$this->log->warning(
@@ -1169,11 +1460,10 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function is_manifest_entry( $entry, $file ): bool {
-		return is_string( $file ) && $file !== '' && basename( $file ) === $file
+		return $this->is_file_name( $file )
 			&& is_array( $entry )
 			&& is_string( $entry['url'] ?? null ) && strpos( $entry['url'], 'https://' ) === 0
-			&& is_string( $entry['sha'] ?? null ) && preg_match( '/^[0-9a-f]{40}$/', $entry['sha'] ) === 1
-			&& is_int( $entry['size'] ?? null ) && $entry['size'] > 0;
+			&& $this->is_blob( $entry['sha'] ?? null, $entry['size'] ?? null );
 	}
 
 	/**
@@ -1183,9 +1473,9 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_known_files( array $source, array $legacy_manifest ): array {
+	protected function get_known_files( array $source, array $source_manifest, array $legacy_manifest ): array {
 		$known = [];
-		foreach ( [ $this->read_manifest( $source ), $legacy_manifest ] as $manifest ) {
+		foreach ( [ $source_manifest, $legacy_manifest ] as $manifest ) {
 			foreach ( $manifest as $file ) {
 				$known[ $file['size'] ][] = $file['sha'];
 			}

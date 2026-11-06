@@ -56,6 +56,9 @@ class Controller_Font_Sources extends Helper_Abstract_Controller implements Help
 	public function add_actions(): void {
 		/* A language pack may change the language fonts */
 		add_action( 'upgrader_process_complete', [ $this->model, 'flush' ], 10, 0 );
+
+		/* Any admin request, so a plugin activated or updated by any route adds its source */
+		add_action( 'admin_init', [ $this->model, 'check_added_sources' ] );
 	}
 
 	/**

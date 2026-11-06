@@ -210,6 +210,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( Model_Pdf_Cache::SWEEP_STATE_OPTION );
 		delete_option( Model_Pdf_Cache::PURGE_REQUEST_OPTION );
 		delete_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ); /* A Multisite keeps it in sitemeta */
+		delete_option( Model_Font_Sources::SOURCE_VERSIONS );
 		Deprecation::delete_stored_data();
 
 		/* Remove license API data. Deleting one by one, not with a raw DELETE, lets WordPress drop its cached copies */

@@ -54,11 +54,6 @@ class Test_Model_Font_Sources extends TestCase {
 	 */
 	protected $log;
 
-	/**
-	 * @var string A test manifest, unique per test so opcache never serves an earlier test's copy
-	 */
-	protected $manifest_path;
-
 	public function set_up(): void {
 		parent::set_up();
 
@@ -68,8 +63,6 @@ class Test_Model_Font_Sources extends TestCase {
 
 		wp_mkdir_p( $this->font_dir );
 
-		$this->manifest_path = get_temp_dir() . 'gfpdf-test-core-fonts-' . wp_generate_password( 8, false ) . '.php';
-
 		$this->log = new TestHandler();
 		GPDFAPI::get_log_class()->pushHandler( $this->log );
 	}
@@ -77,7 +70,6 @@ class Test_Model_Font_Sources extends TestCase {
 	public function tear_down(): void {
 		GPDFAPI::get_log_class()->popHandler();
 		$this->remove_font_fixtures();
-		wp_delete_file( $this->manifest_path );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
 		parent::tear_down();
@@ -1140,12 +1132,6 @@ class Test_Model_Font_Sources extends TestCase {
 	 * @param array|string|null $manifest Entries, the file's raw contents, or null for no file
 	 */
 	protected function get_model_with_manifest( $manifest ): Model_Font_Sources {
-		wp_delete_file( $this->manifest_path );
-		if ( $manifest !== null ) {
-			$contents = is_array( $manifest ) ? '<?php return ' . var_export( $manifest, true ) . ';' : $manifest; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
-			file_put_contents( $this->manifest_path, $contents ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-		}
-
 		$model = new class( GPDFAPI::get_data_class(), $this->custom_fonts, GPDFAPI::get_log_class() ) extends Model_Font_Sources {
 			/** @var string */
 			public $manifest_path = '';
@@ -1155,7 +1141,7 @@ class Test_Model_Font_Sources extends TestCase {
 			}
 		};
 
-		$model->manifest_path = $this->manifest_path;
+		$model->manifest_path = $manifest === null ? get_temp_dir() . 'gfpdf-test-missing-manifest.php' : $this->write_manifest_file( $manifest );
 
 		return $model;
 	}
@@ -1172,15 +1158,6 @@ class Test_Model_Font_Sources extends TestCase {
 	 * @param array $second
 	 */
 	protected function get_model_with_two_sources( array $first, array $second ): Model_Font_Sources {
-		$write = function ( string $suffix, array $entries ): string {
-			$path = $this->manifest_path . $suffix . '.php';
-			wp_delete_file( $path );
-			file_put_contents( $path, '<?php return ' . var_export( $entries, true ) . ';' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-			$this->copied_fonts[] = $path;
-
-			return $path;
-		};
-
 		$model = new class( GPDFAPI::get_data_class(), $this->custom_fonts, GPDFAPI::get_log_class() ) extends Model_Font_Sources {
 			/** @var string[] The first source's and second source's manifests */
 			public $manifests_at = [];
@@ -1212,7 +1189,7 @@ class Test_Model_Font_Sources extends TestCase {
 			}
 		};
 
-		$model->manifests_at = [ $write( '-first', $first ), $second === [] ? '' : $write( '-second', $second ) ];
+		$model->manifests_at = [ $this->write_manifest_file( $first ), $second === [] ? '' : $this->write_manifest_file( $second ) ];
 		$model->real_core    = $second === [];
 
 		return $model;

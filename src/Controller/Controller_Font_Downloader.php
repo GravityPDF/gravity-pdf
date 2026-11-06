@@ -154,6 +154,7 @@ class Controller_Font_Downloader extends Helper_Abstract_Controller implements H
 
 		add_action( 'gfpdf_plugin_installed', [ $this->model, 'schedule_sync' ] );
 		add_action( 'gfpdf_version_changed', [ $this->model, 'schedule_sync' ] );
+		add_action( 'gfpdf_font_sources_changed', [ $this->model, 'schedule_sync' ] );
 		add_action( 'upgrader_process_complete', [ $this, 'maybe_sync_translations' ], 10, 2 );
 
 		/* Both hooks pass the saved settings second */
