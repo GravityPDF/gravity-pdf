@@ -337,6 +337,15 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertFalse( $this->log->hasRecords( Logger::WARNING ) );
 	}
 
+	public function test_the_core_legacy_manifest_is_the_core_fonts_v1_0_0_release() {
+		$manifest = $this->model->get_legacy_manifest( 'core' );
+
+		$this->assertCount( 82, $manifest );
+		$this->assertSame( 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/DejaVuSans.ttf', $manifest['DejaVuSans.ttf']['url'] );
+		$this->assertSame( '9d40c325694b3bfb8cdd4c0146ad44379d5c4ade', $manifest['DejaVuSans.ttf']['sha'] );
+		$this->assertFalse( $this->log->hasRecords( Logger::WARNING ) );
+	}
+
 	public function test_the_manifest_merges_every_source() {
 		$this->assertTrue( $this->model->is_core_font_file( 'DejaVuSerifCondensed.ttf' ) );
 		$this->assertTrue( $this->model->is_core_font_file( 'Aegean.otf' ) );
@@ -421,6 +430,13 @@ class Test_Model_Font_Sources extends TestCase {
 		/* Multisite keeps the files in the shared fonts folder */
 		$this->assertSame( is_multisite(), is_file( $this->font_dir . 'DejaVuSansCondensed85274.ttf' ) );
 		$this->assertSame( is_multisite(), is_file( $this->font_dir . 'DejaVuSans-Bold.ttf' ) );
+	}
+
+	public function test_adopt_records_removes_a_record_of_the_core_font_installers_files() {
+		$this->copy_fixture( 'DejaVuSerifCondensed-v1.0.0.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->add_record( 'dejavuserifcondensed', [ 'regular' => 'DejaVuSerifCondensed.ttf' ] );
+
+		$this->assertSame( [ 'dejavuserifcondensed' ], $this->model->adopt_records( 'core' ) );
 	}
 
 	/**

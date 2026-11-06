@@ -63,5 +63,14 @@ python3 -I -m fontTools.subset DejaVuSans.ttf --unicodes=U+2190-23FF,U+2460-27BF
 
 Not fonts: the name, download URL, size and git blob SHA-1 of each mPDF core font, which PDFs download when they need
 one. `yarn prebuild:core-fonts` fetches the JSON from the GitHub contents API and writes the PHP array from it with
-`tools/release/php-payload.php`; the plugin reads the PHP, the Core Font installer the JSON. Don't edit either by
-hand.
+`tools/release/php-payload.php`; the plugin reads the PHP. Don't edit either by hand.
+
+`core-fonts-v1.0.0.php` is the same list for mpdf-core-fonts v1.0.0, the files the removed Core Font installer
+downloaded, before the core fonts were dehinted. It's the core source's `legacy_manifest`: the 6.19 upgrade adopts
+custom font records of these files and deletes the unmodified ones it doesn't need. It's frozen, and goes when that
+upgrade routine does. It was written with:
+
+```
+bash tools/release/json-payload.sh "https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/?ref=v1.0.0" tmp/core-fonts-v1.0.0.json
+php tools/release/php-payload.php tmp/core-fonts-v1.0.0.json fonts/core-fonts-v1.0.0.php
+```

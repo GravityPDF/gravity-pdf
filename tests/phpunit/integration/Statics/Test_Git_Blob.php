@@ -15,7 +15,7 @@ class Test_Git_Blob extends TestCase {
 	private const FIXTURE = PDF_PLUGIN_DIR . 'tools/phpunit/data/fonts/DejaVuSerifCondensed.ttf';
 
 	/* The SHA-1 GitHub lists for the fixture in core-fonts.json */
-	private const SHA = '3291fc506c9622ed3ebe5f17bffc6e31524e9593';
+	private const SHA = '9fec02fcea44d6525c1cb8187883a11c01fcd9d1';
 
 	public function test_sha1_is_the_git_blob_hash() {
 		$size = (int) filesize( self::FIXTURE );

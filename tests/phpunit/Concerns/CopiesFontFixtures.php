@@ -25,6 +25,11 @@ trait CopiesFontFixtures {
 	protected static $freeserif = [ 'FreeSerif.ttf', 'FreeSerifBold.ttf', 'FreeSerifItalic.ttf', 'FreeSerifBoldItalic.ttf' ];
 
 	/**
+	 * @var string[] The core fonts with a fixture
+	 */
+	protected static $core_fixtures = [ 'DejaVuSans.ttf', 'DejaVuSans-Bold.ttf', 'DejaVuSansCondensed.ttf', 'DejaVuSerifCondensed.ttf' ];
+
+	/**
 	 * @var string[]
 	 */
 	protected $copied_fonts = [];
@@ -49,10 +54,17 @@ trait CopiesFontFixtures {
 	}
 
 	/**
+	 * Where a file sits in the fonts folder
+	 */
+	protected function font_path( string $file ): string {
+		return GPDFAPI::get_data_class()->template_font_location . $file;
+	}
+
+	/**
 	 * @param string $name The file name in the fonts folder, or '' for the fixture's
 	 */
 	protected function copy_fixture( string $fixture, string $name = '' ): void {
-		$target = GPDFAPI::get_data_class()->template_font_location . ( $name !== '' ? $name : $fixture );
+		$target = $this->font_path( $name !== '' ? $name : $fixture );
 		copy( $this->font_fixture( $fixture ), $target );
 		$this->copied_fonts[] = $target;
 	}
@@ -74,7 +86,7 @@ trait CopiesFontFixtures {
 		];
 
 		foreach ( $files as $style => $file ) {
-			$font[ $style ] = GPDFAPI::get_data_class()->template_font_location . $file;
+			$font[ $style ] = $this->font_path( $file );
 		}
 
 		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->add_font( $font );
@@ -105,10 +117,32 @@ trait CopiesFontFixtures {
 	 * @return array<string, int> The fixture's git blob SHA-1 => size
 	 */
 	protected function fixture_blob( string $fixture ): array {
-		$path = $this->font_fixture( $fixture );
-		$size = (int) filesize( $path );
+		/* The fixtures never change, so each is hashed once per run */
+		static $blobs = [];
 
-		return [ Git_Blob::sha1( $path, $size ) => $size ];
+		if ( ! isset( $blobs[ $fixture ] ) ) {
+			$path = $this->font_fixture( $fixture );
+			$size = (int) filesize( $path );
+
+			$blobs[ $fixture ] = [ Git_Blob::sha1( $path, $size ) => $size ];
+		}
+
+		return $blobs[ $fixture ];
+	}
+
+	/**
+	 * A manifest entry whose size and hash are the fixture's
+	 *
+	 * @return array{url: string, size: int, sha: string}
+	 */
+	protected function manifest_entry( string $fixture, string $url ): array {
+		$blob = $this->fixture_blob( $fixture );
+
+		return [
+			'url'  => $url,
+			'size' => current( $blob ),
+			'sha'  => (string) key( $blob ),
+		];
 	}
 
 	/**
@@ -133,7 +167,7 @@ trait CopiesFontFixtures {
 				$fixture = $this->served_as[ $file ] ?? $file;
 				if ( is_file( $this->font_fixture( $fixture ) ) ) {
 					copy( $this->font_fixture( $fixture ), $args['filename'] );
-					$this->copied_fonts[] = GPDFAPI::get_data_class()->template_font_location . $file;
+					$this->copied_fonts[] = $this->font_path( $file );
 				}
 
 				if ( $change !== null ) {
@@ -154,16 +188,25 @@ trait CopiesFontFixtures {
 	 */
 	protected function serve_fixture_as( string $fixture, string $file ): void {
 		$manifest = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_manifest();
-		$blob     = $this->fixture_blob( $fixture );
 
-		$manifest[ $file ] = [
-			'url'  => $manifest[ $file ]['url'] ?? 'https://example.com/' . $file,
-			'size' => current( $blob ),
-			'sha'  => (string) key( $blob ),
-		];
+		$manifest[ $file ] = $this->manifest_entry( $fixture, $manifest[ $file ]['url'] ?? 'https://example.com/' . $file );
 
 		$this->set_shared_manifest( $manifest );
 		$this->served_as[ $file ] = $fixture;
+	}
+
+	/**
+	 * Stand fixtures in for the files the removed Core Font installer downloaded
+	 *
+	 * @param array<string, string>|null $files File name => fixture, else each core font fixture as itself
+	 */
+	protected function set_installer_manifest( ?array $files = null ): void {
+		$manifest = [];
+		foreach ( $files ?? array_combine( static::$core_fixtures, static::$core_fixtures ) as $file => $fixture ) {
+			$manifest[ $file ] = $this->manifest_entry( $fixture, 'https://example.com/' . $file );
+		}
+
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'legacy_manifests', [ 'core' => $manifest ] );
 	}
 
 	/**
@@ -214,6 +257,8 @@ trait CopiesFontFixtures {
 		if ( $this->served_as !== [] ) {
 			$this->set_shared_manifest( null );
 		}
+
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'legacy_manifests', [] );
 
 		$this->copied_fonts   = [];
 		$this->recorded_fonts = [];

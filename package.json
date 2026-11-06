@@ -75,7 +75,7 @@
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
-    "prebuild:core-fonts": "bash tools/release/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/?ref=v1.0.0 fonts/core-fonts.json && php tools/release/php-payload.php fonts/core-fonts.json fonts/core-fonts.php",
+    "prebuild:core-fonts": "bash tools/release/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/?ref=v1.1.1 fonts/core-fonts.json && php tools/release/php-payload.php fonts/core-fonts.json fonts/core-fonts.php",
     "i10n": "yarn build && yarn i10n:make-pot && yarn i10n:update-po && yarn i10n:make-mo && yarn i10n:make-json && yarn i10n:make-php",
     "i10n:make-pot": "wp i18n make-pot ./ languages/gravity-pdf.pot --include=pdf.php,api.php,gravity-pdf-updater.php,src,build --exclude=tmp,vendor,vendor_prefixed --domain=gravity-pdf --headers='{\"Report-Msgid-Bugs-To\":\"https://gravitypdf.com\"}'",
     "i10n:make-json": "wp i18n make-json languages",

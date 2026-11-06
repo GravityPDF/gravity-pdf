@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Install;
@@ -103,6 +104,9 @@ class Controller_Upgrade_Routines {
 		if ( $old_version !== '' && version_compare( $old_version, '6.19.0', '<' ) ) {
 			$this->save_unset_default_font( 'dejavusanscondensed' );
 			$this->adopt_font_source_records();
+
+			/* After the default font save, so the font it saves is kept */
+			$this->remove_unneeded_core_fonts();
 		}
 
 		if ( version_compare( $current_version, '7.0.0-beta1', '>=' ) && version_compare( $old_version, '7.0.0-beta1', '<' ) ) {
@@ -173,6 +177,25 @@ class Controller_Upgrade_Routines {
 		foreach ( array_keys( $font_sources->get_sources() ) as $source_id ) {
 			$font_sources->adopt_records( $source_id );
 		}
+	}
+
+	/**
+	 * Delete the core fonts a new install wouldn't have; any still needed download again on use. A network shares one
+	 * fonts folder, so a Multisite prunes it once, for the site whose request runs the upgrade.
+	 *
+	 * @since 6.19.0
+	 */
+	protected function remove_unneeded_core_fonts(): void {
+		$downloader = \GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+		if ( ! $downloader instanceof Model_Font_Downloader ) {
+			return;
+		}
+
+		if ( is_multisite() && ! add_site_option( Model_Font_Downloader::PRUNED, true ) ) {
+			return;
+		}
+
+		$downloader->prune();
 	}
 
 	/**

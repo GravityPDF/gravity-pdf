@@ -78,6 +78,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	const SYNC_BUDGET = 20;
 
 	/**
+	 * Set once a Multisite network's shared fonts folder is pruned on the upgrade to 6.19
+	 *
+	 * @since 6.19.0
+	 */
+	const PRUNED = 'gfpdf_core_font_pruned';
+
+	/**
 	 * @var Model_Font_Sources
 	 * @since 6.19.0
 	 */
@@ -271,6 +278,87 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		$this->clear_failure( $file );
 
 		return true;
+	}
+
+	/**
+	 * Delete the unmodified files (fonts and licences) the Core Font installer downloaded that aren't kept. A file whose
+	 * download is turned off stays, as it couldn't come back. Only files of the installer's size are hashed.
+	 *
+	 * @param string[]|null $keep File names to keep, else the fonts the site's PDFs need
+	 *
+	 * @return string[] The files removed
+	 *
+	 * @since 6.19.0
+	 */
+	public function prune( ?array $keep = null ): array {
+		$manifest = $this->font_sources->get_legacy_manifest( 'core' );
+
+		/* Without the manifest nothing is known to be unmodified */
+		if ( count( $manifest ) === 0 ) {
+			$this->log->error( 'Core Font cleanup skipped as the font manifest could not be read' );
+
+			return [];
+		}
+
+		$keep    = array_flip( $keep ?? $this->required_fonts->get_required_font_files() );
+		$removed = [];
+		$bytes   = 0;
+		$offline = [];
+
+		foreach ( $manifest as $file => $entry ) {
+			$file = (string) $file;
+			if ( isset( $keep[ $file ] ) ) {
+				continue;
+			}
+
+			$path = $this->get_font_path( $file );
+			clearstatcache( true, $path );
+			if ( ! is_file( $path ) || filesize( $path ) !== $entry['size'] ) {
+				continue;
+			}
+
+			if ( ! $this->is_auto_install_enabled( $file ) ) {
+				$offline[] = $file;
+				continue;
+			}
+
+			if ( ! $this->is_unmodified( $path, $entry ) ) {
+				continue;
+			}
+
+			if ( ! wp_delete_file_from_directory( $path, $this->data->template_font_location ) ) {
+				$this->log->warning( 'Core Font could not be removed', [ 'name' => $file ] );
+				continue;
+			}
+
+			$removed[] = $file;
+			$bytes    += $entry['size'];
+		}
+
+		if ( count( $offline ) > 0 ) {
+			$this->log->notice( 'Core Font cleanup kept the fonts that downloads are turned off for', [ 'files' => $offline ] );
+		}
+
+		$this->log->notice(
+			'Core Font cleanup complete',
+			[
+				'removed' => count( $removed ),
+				'bytes'   => $bytes,
+			]
+		);
+
+		return $removed;
+	}
+
+	/**
+	 * @param array{url: string, size: int, sha: string} $entry
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_unmodified( string $path, array $entry ): bool {
+		$hash = Git_Blob::sha1( $path, $entry['size'] );
+
+		return $hash !== '' && hash_equals( $entry['sha'], $hash );
 	}
 
 	/**

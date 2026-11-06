@@ -100,7 +100,7 @@ class Test_Font_Rendering extends TestCase {
 
 		$render = $this->render( '<p style="font-family: arimo">Text ' . $text . '</p>', [ 'font' => 'arimo' ] );
 
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/' . $file ], $this->requested );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/' . $file ], $this->requested );
 
 		/* The text is drawn in the substitute. Arimo records each character it draws, even one it lacks (see the emoji
 		   snapshot), so none of the text stayed in Arimo */
@@ -212,7 +212,7 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertRenderMatchesSnapshot( 'downloaded-thai-font', '<p lang="th">สวัสดี</p>', [ 'font' => 'arimo' ] );
 
 		/* Only the Thai font downloads: no substitute has Thai, so none is fetched for the glyphs the stand-in lacks */
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.0.0/Garuda.ttf' ], $this->requested );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/Garuda.ttf' ], $this->requested );
 	}
 
 	public function test_a_font_that_cannot_download_renders_in_arimo_when_the_default_font_is_missing(): void {

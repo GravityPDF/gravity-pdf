@@ -6,6 +6,7 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
@@ -446,5 +447,91 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		do_action( 'gfpdf_version_changed', '6.18.0', '6.18.1' );
 
 		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+	}
+
+	/**
+	 * @dataProvider data_core_font_cleanup
+	 */
+	public function test_core_fonts_outside_the_required_set_are_removed_on_the_upgrade_to_6_19( string $old_version, string $new_version, bool $removed ) {
+		$this->set_installer_manifest();
+		$this->options->delete_option( 'default_font' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf' );
+
+		do_action( 'gfpdf_version_changed', $old_version, $new_version );
+
+		$this->assertSame( ! $removed, is_file( $this->font_path( 'DejaVuSerifCondensed.ttf' ) ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSansCondensed.ttf' ), 'The default font the upgrade saves is kept' );
+	}
+
+	public function data_core_font_cleanup(): array {
+		return [
+			'upgrade to 6.19'     => [ '6.18.0', '6.19.0', true ],
+			'upgrade past 6.19'   => [ '6.17.2', '7.0.0', true ],
+			'a new install'       => [ '', '6.19.0', false ],
+			'upgrade within 6.19' => [ '6.19.0', '6.19.1', false ],
+		];
+	}
+
+	public function test_the_upgrade_removes_a_font_the_core_font_installer_downloaded() {
+		$this->copy_fixture( 'DejaVuSerifCondensed-v1.0.0.ttf', 'DejaVuSerifCondensed.ttf' );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_core_font_cleanup_keeps_the_required_fonts() {
+		$this->set_installer_manifest();
+		$this->options->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf' );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSansCondensed.ttf' ) );
+	}
+
+	public function test_the_core_font_cleanup_keeps_fonts_when_downloads_are_off() {
+		$this->set_installer_manifest();
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_core_font_cleanup_runs_once_per_network() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->set_installer_manifest();
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertTrue( get_site_option( Model_Font_Downloader::PRUNED ) );
+
+		/* Another site upgrading finds the folder already pruned */
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_a_single_site_cleans_its_fonts_on_each_upgrade_to_6_19() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single site only' );
+		}
+
+		$this->set_installer_manifest();
+		foreach ( [ 1, 2 ] as $run ) {
+			$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+			do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+			$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ), "Run $run" );
+		}
+
+		$this->assertFalse( get_site_option( Model_Font_Downloader::PRUNED ) );
 	}
 }
