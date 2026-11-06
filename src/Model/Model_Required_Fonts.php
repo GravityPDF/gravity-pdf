@@ -358,23 +358,65 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	protected function count_pdf_fonts( string $prefix = '' ): array {
 		$counts = [];
 
+		$this->each_pdf_font(
+			static function ( string $font ) use ( &$counts ): void {
+				$counts[ $font ] = ( $counts[ $font ] ?? 0 ) + 1;
+			},
+			$prefix
+		);
+
+		return $counts;
+	}
+
+	/**
+	 * The active forms' PDFs that select each font, which also saves get_font_reasons() walking the forms again
+	 *
+	 * @return array<string, array<int, array{form: string, name: string, url: string}>> PDFs by font key
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_font_pdfs(): array {
+		$pdfs = [];
+
+		$this->each_pdf_font(
+			static function ( string $font, array $row, string $pdf_id, array $pdf ) use ( &$pdfs ): void {
+				$pdfs[ $font ][] = [
+					'form' => (string) ( $row['title'] ?? '' ),
+					'name' => is_string( $pdf['name'] ?? null ) ? $pdf['name'] : '',
+					'url'  => admin_url( sprintf( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=%d&pid=%s', (int) $row['form_id'], rawurlencode( $pdf_id ) ) ),
+				];
+			}
+		);
+
+		$this->selected_font_counts = array_map( 'count', $pdfs );
+
+		return $pdfs;
+	}
+
+	/**
+	 * Call back for each font selected by each PDF of a site's active forms
+	 *
+	 * @param callable $callback Given the font key, form row, PDF ID and PDF settings
+	 * @param string   $prefix   Another site's table prefix, or '' for this site
+	 *
+	 * @since 6.19.0
+	 */
+	protected function each_pdf_font( callable $callback, string $prefix = '' ): void {
 		/* A page at a time, so a site with many forms doesn't hold every form's meta at once */
 		$after = 0;
 		do {
 			$page = $this->get_pdf_form_meta( $after, $this->form_page, $prefix );
 			foreach ( $page as $row ) {
 				$after = (int) $row['form_id'];
-				foreach ( $this->get_form_pdfs( $row['display_meta'], (int) $row['form_id'] ) as $pdf ) {
+				foreach ( $this->get_form_pdfs( $row['display_meta'], (int) $row['form_id'] ) as $pdf_id => $pdf ) {
 					foreach ( $this->get_pdf_fonts( $pdf ) as $font ) {
-						$counts[ $font ] = ( $counts[ $font ] ?? 0 ) + 1;
+						$callback( $font, $row, (string) $pdf_id, $pdf );
 					}
 				}
 			}
 
 			$full = count( $page ) === $this->form_page;
 		} while ( $full );
-
-		return $counts;
 	}
 
 	/**
@@ -459,7 +501,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 		//phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"SELECT meta.form_id, meta.display_meta FROM {$meta_table} meta
+				"SELECT meta.form_id, meta.display_meta, form.title FROM {$meta_table} meta
 				INNER JOIN {$form_table} form ON form.id = meta.form_id
 				WHERE form.is_active = 1 AND form.is_trash = 0 AND meta.form_id > %d AND meta.display_meta LIKE %s
 				ORDER BY meta.form_id LIMIT %d",

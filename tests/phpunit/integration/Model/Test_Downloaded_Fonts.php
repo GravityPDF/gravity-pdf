@@ -67,6 +67,7 @@ class Test_Downloaded_Fonts extends TestCase {
 					'bold'         => 'DejaVuSerifCondensed-Bold.ttf',
 					'bolditalics'  => '',
 					'can_delete'   => ! is_multisite() || is_super_admin(),
+					'size_label'   => size_format( filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ) + filesize( $this->font_fixture( 'Chewy.ttf' ) ), 1 ),
 					'auto_install' => true,
 				],
 			],
@@ -81,6 +82,7 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertSame( 'Arimo', $rows[0]['font_name'] );
 		$this->assertSame( 'gfpdf-Arimo-BoldItalic.ttf', $rows[0]['bolditalics'] );
 		$this->assertFalse( $rows[0]['can_delete'] );
+		$this->assertNotSame( '', $rows[0]['size_label'] );
 	}
 
 	public function test_custom_fonts_share_the_list_sorted_by_name_and_replace_a_core_font_of_the_same_key() {
@@ -113,6 +115,31 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertTrue( $fonts[1]['can_delete'] );
 	}
 
+	public function test_a_custom_font_row_has_the_size_of_its_files_in_the_fonts_folder() {
+		$this->copy_fixture( 'Chewy.ttf', 'brand.ttf' );
+		GPDFAPI::get_options_class()->update_option(
+			'custom_fonts',
+			[
+				'brand'  => [
+					'id'        => 'brand',
+					'font_name' => 'Brand',
+					'regular'   => '/a/moved/site/brand.ttf',
+					'bold'      => 'brand.ttf',
+				],
+				'absent' => [
+					'id'        => 'absent',
+					'font_name' => 'Absent',
+					'regular'   => 'absent.ttf',
+				],
+			]
+		);
+
+		$rows = array_column( $this->downloader()->get_installed_fonts(), 'size_label', 'id' );
+
+		$this->assertSame( size_format( 2 * filesize( $this->font_fixture( 'Chewy.ttf' ) ), 1 ), $rows['brand'] );
+		$this->assertSame( '', $rows['absent'] );
+	}
+
 	public function test_a_custom_font_says_why_it_is_in_use() {
 		GPDFAPI::get_options_class()->update_option(
 			'custom_fonts',
@@ -127,7 +154,39 @@ class Test_Downloaded_Fonts extends TestCase {
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'brand' );
 		$this->add_form_with_pdfs( [ [ 'font' => 'brand' ] ] );
 
-		$this->assertSame( [ 'Default font', 'Used by 1 PDF' ], $this->downloader()->get_font_usage()['brand'] );
+		$usage = $this->downloader()->get_font_usage()['brand'];
+
+		$this->assertSame( [ 'Default font' ], $usage['reasons'] );
+		$this->assertSame( 'Used by 1 PDF', $usage['pdfs_label'] );
+		$this->assertCount( 1, $usage['pdfs'] );
+	}
+
+	public function test_font_usage_links_to_the_settings_of_each_pdf_using_the_font() {
+		$form_id = $this->add_form_with_pdfs(
+			[
+				'pdf-one' => [
+					'name' => 'Invoice',
+					'font' => 'freeserif',
+				],
+				'pdf-two' => [
+					'name' => 'Receipt',
+					'font' => 'freeserif',
+				],
+				'pdf-off' => [
+					'name' => 'Other',
+					'font' => 'garuda',
+				],
+			]
+		);
+
+		$pdfs = $this->downloader()->get_font_usage()['freeserif']['pdfs'];
+
+		$this->assertSame( [ 'Invoice', 'Receipt' ], array_column( $pdfs, 'name' ) );
+		$this->assertSame(
+			admin_url( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=' . $form_id . '&pid=pdf-one' ),
+			$pdfs[0]['url']
+		);
+		$this->assertSame( 'Fonts', $pdfs[0]['form'] );
 	}
 
 	public function test_another_sites_use_of_a_key_does_not_hold_a_custom_font() {
@@ -180,10 +239,11 @@ class Test_Downloaded_Fonts extends TestCase {
 
 		$in_use = $this->downloader( $sources )->get_font_usage();
 
-		$this->assertSame( [ 'Default font' ], $in_use['dejavuserifcondensed'] );
-		$this->assertSame( [ 'Site language (th)' ], $in_use['garuda'] );
-		$this->assertSame( [ 'Used by 2 PDFs' ], $in_use['freeserif'] );
-		$this->assertSame( [ 'Required by an add-on' ], $in_use['fixturemono'] );
+		$this->assertSame( [ 'Default font' ], $in_use['dejavuserifcondensed']['reasons'] );
+		$this->assertSame( [ 'Site language (th)' ], $in_use['garuda']['reasons'] );
+		$this->assertSame( [], $in_use['freeserif']['reasons'] );
+		$this->assertSame( 'Used by 2 PDFs', $in_use['freeserif']['pdfs_label'] );
+		$this->assertSame( [ 'Required by an add-on' ], $in_use['fixturemono']['reasons'] );
 	}
 
 	public function test_the_downloads_off_flag_is_per_family() {
@@ -307,7 +367,7 @@ class Test_Downloaded_Fonts extends TestCase {
 
 		$usage = $downloader->get_font_usage();
 
-		$this->assertSame( [ 'Used on 1 other site' ], $usage['dejavuserifcondensed'] );
+		$this->assertSame( [ 'Used on 1 other site' ], $usage['dejavuserifcondensed']['reasons'] );
 		$this->assertArrayNotHasKey( 'freeserif', $usage );
 
 		$this->assert_font_error( $downloader->delete_downloaded_font( 'dejavuserifcondensed' ), 'font_in_use', 409 );
@@ -332,7 +392,7 @@ class Test_Downloaded_Fonts extends TestCase {
 		remove_filter( 'get_available_languages', $installed );
 		restore_current_blog();
 
-		$this->assertSame( [ 'Used on 1 other site' ], $this->downloader()->get_font_usage()['garuda'] );
+		$this->assertSame( [ 'Used on 1 other site' ], $this->downloader()->get_font_usage()['garuda']['reasons'] );
 	}
 
 	/**
@@ -350,8 +410,8 @@ class Test_Downloaded_Fonts extends TestCase {
 		return new Seamed_Font_Downloader( new Logger( 'test', [ $this->log ] ), [ 'sources' => $sources ?? $this->stub_font_sources() ] );
 	}
 
-	private function add_form_with_pdfs( array $pdfs ): void {
-		$this->gf_factory()->form->create(
+	private function add_form_with_pdfs( array $pdfs ): int {
+		return (int) $this->gf_factory()->form->create(
 			[],
 			[
 				'title'               => 'Fonts',

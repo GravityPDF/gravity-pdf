@@ -170,6 +170,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertSame( 75, $font['useKashida'] );
 		$this->assertStringEndsWith( 'DejaVuSans.ttf', $font['regular'] );
 		$this->assertStringEndsWith( 'DejaVuSans-Bold.ttf', $font['bold'] );
+		$this->assertSame( size_format( filesize( $font['regular'] ) + filesize( $font['bold'] ) + filesize( $font['italics'] ) + filesize( $font['bolditalics'] ), 1 ), $font['size_label'] );
 		$this->assertStringEndsWith( 'DejaVuSansCondensed.ttf', $font['italics'] );
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
 	}
@@ -615,6 +616,9 @@ class Test_Controller_Custom_Fonts extends TestCase {
 
 		$updated = rest_get_server()->dispatch( $request )->get_data();
 
+		$this->assertArrayHasKey( 'size_label', $updated );
+		$this->assertArrayNotHasKey( 'size_label', $this->model->get_font_by_id( $font['id'] ) );
+
 		$this->assertSame( '', $updated['bold'] );
 		$this->assertNotSame( $font['regular'], $updated['regular'] );
 		$this->assertFileExists( $updated['regular'] );
@@ -888,7 +892,10 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$request = $this->new_font_request();
 		$this->set_all_file_params( $request );
 
-		return rest_get_server()->dispatch( $request )->get_data();
+		$font = rest_get_server()->dispatch( $request )->get_data();
+		unset( $font['size_label'] );
+
+		return $font;
 	}
 
 	/* Make the next settings save report a failure */

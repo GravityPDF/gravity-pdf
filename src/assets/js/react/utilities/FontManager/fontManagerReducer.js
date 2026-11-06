@@ -1,3 +1,6 @@
+/* Dependencies */
+import { sprintf } from 'sprintf-js';
+
 /**
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -13,6 +16,7 @@
  * @property { string } italics     - file name for italics
  * @property { string } bold        - file name for bold
  * @property { string } bolditalics - file name for bold italics
+ * @property { string } size_label  - the size of its files
  */
 
 /**
@@ -38,6 +42,7 @@ export function findAndUpdate(data, payload) {
 			font.italics = payload.font.italics;
 			font.bold = payload.font.bold;
 			font.bolditalics = payload.font.bolditalics;
+			font.size_label = payload.font.size_label;
 		}
 
 		return font;
@@ -71,6 +76,55 @@ export function findAndRemove(data, payload) {
  * @since 6.19.0
  */
 export const isCustomFont = (font) => font.type === 'custom';
+
+/**
+ * A font's styles: their record keys, GFPDF label strings and CSS
+ *
+ * @since 6.19.0
+ */
+export const FONT_STYLES = [
+	{ key: 'regular', label: 'fontListRegular', weight: 400, style: 'normal' },
+	{ key: 'italics', label: 'fontListItalics', weight: 400, style: 'italic' },
+	{ key: 'bold', label: 'fontListBold', weight: 700, style: 'normal' },
+	{
+		key: 'bolditalics',
+		label: 'fontListBoldItalics',
+		weight: 700,
+		style: 'italic',
+	},
+];
+
+/**
+ * A style's name
+ *
+ * @param { string } key
+ *
+ * @return { string } The name
+ *
+ * @since 6.19.0
+ */
+export const getStyleLabel = (key) =>
+	GFPDF[FONT_STYLES.find((style) => style.key === key).label];
+
+/**
+ * How many styles a font has files for, as a phrase
+ *
+ * @param { Object } font
+ *
+ * @return { string } The phrase
+ *
+ * @since 6.19.0
+ */
+export const getStyleCount = (font) => {
+	const count = FONT_STYLES.filter(({ key }) => font[key]).length;
+
+	// %d is found inside these strings
+	// eslint-disable-next-line @wordpress/valid-sprintf
+	return sprintf(
+		count === 1 ? GFPDF.fontManagerStyle : GFPDF.fontManagerStyles,
+		count
+	);
+};
 
 /**
  * Utility function to trim font file name

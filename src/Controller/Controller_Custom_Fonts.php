@@ -259,7 +259,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			FlushCache::flush( $font['id'] );
 
-			return $font;
+			return $this->with_size_label( $font );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -378,7 +378,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			FlushCache::flush( $font['id'] );
 
-			return $font;
+			return $this->with_size_label( $font );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -452,6 +452,17 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				$this->log->error( $e->getMessage() );
 			}
 		}
+	}
+
+	/**
+	 * Add the size the Font Manager lists to a saved font
+	 *
+	 * @since 6.19.0
+	 */
+	protected function with_size_label( array $font ): array {
+		$font['size_label'] = $this->model->get_size_label( array_filter( array_intersect_key( $font, array_flip( $this->font_keys ) ) ) );
+
+		return $font;
 	}
 
 	/**

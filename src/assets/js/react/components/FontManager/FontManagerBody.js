@@ -16,17 +16,13 @@ import {
 /* Components */
 import Alert from '../Alert/Alert';
 import SearchBox from './SearchBox';
+import FontDetail from './FontDetail';
 import FontList from './FontList';
 import AddFont from './AddFont';
 import UpdateFont from './UpdateFont';
 import initialState from './InitialAddUpdateState';
-/* Utilities */
-import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
 import { isCustomFont } from '../../utilities/FontManager/fontManagerReducer';
-import {
-	toggleUpdateFont,
-	addClass,
-} from '../../utilities/FontManager/toggleUpdateFont';
+import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont';
 
 /**
  * @package			Gravity PDF
@@ -97,14 +93,7 @@ export class FontManagerBody extends Component {
 	 * @since 6.0
 	 */
 	componentDidMount() {
-		const { getCustomFontList, id, navigate } = this.props;
-
-		getCustomFontList();
-
-		/* Auto slide 'update font' panel if refreshed */
-		if (id) {
-			addClass(document.querySelector('.update-font'), navigate, id);
-		}
+		this.props.getCustomFontList();
 	}
 
 	/**
@@ -117,6 +106,10 @@ export class FontManagerBody extends Component {
 	 */
 	componentDidUpdate(prevProps) {
 		const { id, fontList, msg, navigate } = this.props;
+
+		if (prevProps.id !== id) {
+			this.handleMoveFocus(prevProps.id);
+		}
 
 		/* If font name is selected call the method handleRequestFontDetails() */
 		if (prevProps.id !== id && id) {
@@ -139,7 +132,7 @@ export class FontManagerBody extends Component {
 		}
 
 		/* If font is successfully installed, auto select the new added font and slide update font panel */
-		if (prevProps.msg !== msg && msg.success && !id) {
+		if (prevProps.msg !== msg && msg.success?.addFont && !id) {
 			/* Check if there's a response message error for fontList */
 			if (msg.error && msg.error.fontList) {
 				return this.handleSetDefaultState();
@@ -158,16 +151,30 @@ export class FontManagerBody extends Component {
 	 * @since 6.0
 	 */
 	handleCheckValidId = (fontList, id) => {
-		/* Only a custom font can be edited */
-		const checkValidId = fontList.filter(
-			(font) => font.id === id && isCustomFont(font)
-		)[0];
+		return fontList.some((font) => font.id === id);
+	};
 
-		if (!checkValidId) {
-			return false;
+	/**
+	 * Follow the panel the route just showed: into a font being edited, into the add form when asked to, or back to the
+	 * row of the font that closed
+	 *
+	 * @param { string } previousId
+	 *
+	 * @since 6.19.0
+	 */
+	handleMoveFocus = (previousId) => {
+		const { id, fontList } = this.props;
+		const current = fontList.find((font) => font.id === id);
+
+		if (current && isCustomFont(current)) {
+			document.getElementById('gfpdf-update-font-name-input')?.focus();
+		} else if (!id && this.focusAddForm) {
+			document.getElementById('gfpdf-add-font-name-input')?.focus();
+		} else if (!id) {
+			document.querySelector(`[data-font="${previousId}"]`)?.focus();
 		}
 
-		return true;
+		this.focusAddForm = false;
 	};
 
 	/**
@@ -178,6 +185,11 @@ export class FontManagerBody extends Component {
 	handleRequestFontDetails = () => {
 		const { fontList, id } = this.props;
 		const font = fontList.filter((f) => f.id === id)[0];
+
+		/* Only a custom font can be edited */
+		if (!isCustomFont(font)) {
+			return;
+		}
 
 		this.setState({
 			addFont: initialState,
@@ -195,8 +207,6 @@ export class FontManagerBody extends Component {
 				disableUpdateButton: true,
 			},
 		});
-
-		setTimeout(() => adjustFontListHeight(), 100);
 	};
 
 	/**
@@ -216,16 +226,15 @@ export class FontManagerBody extends Component {
 	 *
 	 * @param { Function }      navigate
 	 * @param { Array<Object> } fontList
-	 * @param { string }        pathname
 	 *
 	 * @since 6.0
 	 */
-	handleAutoSelectNewAddedFont = (navigate, fontList, pathname) => {
+	handleAutoSelectNewAddedFont = (navigate, fontList) => {
 		const newFontIndex = Object.keys(fontList).slice(-1).pop();
 		const newFont = fontList[newFontIndex];
 
 		this.props.selectFont(newFont.id);
-		toggleUpdateFont(navigate, newFont.id, pathname);
+		toggleUpdateFont(navigate, newFont.id);
 	};
 
 	/**
@@ -513,7 +522,37 @@ export class FontManagerBody extends Component {
 	};
 
 	/**
-	 * Listen to cancel button click event
+	 * Show the add font form, ready to type
+	 *
+	 * @since 6.19.0
+	 */
+	handleAddNewFont = () => {
+		const { id, navigate, clearAddFontMsg } = this.props;
+
+		clearAddFontMsg();
+
+		if (!id) {
+			document.getElementById('gfpdf-add-font-name-input')?.focus();
+
+			return;
+		}
+
+		this.focusAddForm = true;
+		toggleUpdateFont(navigate);
+	};
+
+	/**
+	 * Empty the add font form
+	 *
+	 * @since 6.19.0
+	 */
+	handleCancelAddFont = () => {
+		this.props.clearAddFontMsg();
+		this.setState({ addFont: initialState });
+	};
+
+	/**
+	 * Close the update font panel
 	 *
 	 * @since 6.0
 	 */
@@ -523,26 +562,6 @@ export class FontManagerBody extends Component {
 		toggleUpdateFont(navigate);
 		/* Call redux action clearAddFontMsg() */
 		clearAddFontMsg();
-	};
-
-	/**
-	 * Listen to cancel button keyboard press event (space and enter)
-	 *
-	 * @param { KeyboardEvent } e
-	 *
-	 * @since 6.0
-	 */
-	handleCancelEditFontKeypress = (e) => {
-		const enter = 'Enter';
-		const space = ' ';
-
-		if (e.key === enter || e.key === space) {
-			const { navigate, clearAddFontMsg } = this.props;
-
-			toggleUpdateFont(navigate);
-			/* Call redux action clearAddFontMsg() */
-			clearAddFontMsg();
-		}
 	};
 
 	/**
@@ -569,8 +588,9 @@ export class FontManagerBody extends Component {
 	 * @since 6.0
 	 */
 	render() {
-		const updateFontVisible = document.querySelector('.update-font.show');
 		const { id, fontList, msg, loading, navigate } = this.props;
+		const current = id && fontList.find((font) => font.id === id);
+		const editing = current && isCustomFont(current);
 
 		return (
 			<div
@@ -579,26 +599,50 @@ export class FontManagerBody extends Component {
 				className="wp-clearfix theme-about"
 			>
 				<div className="font-list-column container">
-					<SearchBox id={id} />
+					<div className="font-sidebar-top">
+						<SearchBox id={id} />
 
-					{msg.error && msg.error.deleteFont && (
-						<Alert msg={msg.error.deleteFont} />
-					)}
+						<button
+							type="button"
+							data-test="font-add-new"
+							className="button font-add-new"
+							onClick={this.handleAddNewFont}
+						>
+							{GFPDF.fontManagerAddNew}
+						</button>
+
+						{msg.error && msg.error.deleteFont && (
+							<Alert msg={msg.error.deleteFont} />
+						)}
+
+						<div aria-live="polite">
+							{msg.success?.deleteFont && (
+								<div
+									data-test="font-deleted"
+									className="notice notice-success gf-notice"
+								>
+									<p>{msg.success.deleteFont}</p>
+								</div>
+							)}
+						</div>
+					</div>
 
 					<FontList id={id} navigate={navigate} />
 				</div>
 
 				<div className="add-update-font-column container">
+					{current && !isCustomFont(current) && (
+						<FontDetail font={current} />
+					)}
+
 					<AddFont
 						onHandleInputChange={this.handleInputChange}
 						onHandleUpload={this.handleUpload}
 						onHandleDeleteFontStyle={this.handleDeleteFontStyle}
 						onHandleSubmit={this.handleSubmit}
+						onHandleCancelAddFont={this.handleCancelAddFont}
 						msg={msg}
 						loading={loading}
-						tabIndexFontName={!updateFontVisible ? '0' : '-1'}
-						tabIndexFontFiles={!updateFontVisible ? '0' : '-1'}
-						tabIndexFooterButtons={!updateFontVisible ? '0' : '-1'}
 						{...this.state.addFont}
 					/>
 
@@ -607,16 +651,11 @@ export class FontManagerBody extends Component {
 						onHandleUpload={this.handleUpload}
 						onHandleDeleteFontStyle={this.handleDeleteFontStyle}
 						onHandleCancelEditFont={this.handleCancelEditFont}
-						onHandleCancelEditFontKeypress={
-							this.handleCancelEditFontKeypress
-						}
 						onHandleSubmit={this.handleSubmit}
-						fontList={fontList}
+						font={editing ? current : undefined}
+						show={!!editing}
 						msg={msg}
 						loading={loading}
-						tabIndexFontName={updateFontVisible ? '0' : '-1'}
-						tabIndexFontFiles={updateFontVisible ? '0' : '-1'}
-						tabIndexFooterButtons={updateFontVisible ? '0' : '-1'}
 						{...this.state.updateFont}
 					/>
 				</div>

@@ -1,74 +1,31 @@
-import {
-	toggleUpdateFont,
-	removeClass,
-	addClass,
-} from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont';
+import { toggleUpdateFont } from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont';
 
 describe('Utilities/FontManager - toggleUpdateFont.test.js', () => {
 	const navigate = jest.fn();
-	const pathname = '/fontmanager/roboto';
 
-	test('toggleUpdateFont() - If fontId exist then remove show class', () => {
-		// Mock update font panel DOM
-		document.body.innerHTML = '<div class="update-font show">' + '</div>';
+	beforeEach(() => navigate.mockClear());
 
-		toggleUpdateFont(navigate, 'roboto', pathname);
+	test('Opens a font', () => {
+		toggleUpdateFont(navigate, 'gotham', '/fontmanager/roboto');
 
-		expect(document.querySelector('div.update-font.show')).toBe(null);
+		expect(navigate).toHaveBeenCalledWith('/fontmanager/gotham');
 	});
 
-	test('toggleUpdateFont() - If fontId exist then add show class', () => {
-		// Mock update font panel DOM
-		document.body.innerHTML = '<div class="update-font">' + '</div>';
+	test('Closes the font when it is already open', () => {
+		toggleUpdateFont(navigate, 'roboto', '/fontmanager/roboto');
 
-		toggleUpdateFont(navigate, 'gotham', pathname);
-
-		expect(document.querySelector('div.update-font.show')).toBeTruthy();
+		expect(navigate).toHaveBeenCalledWith('/fontmanager/');
 	});
 
-	test("toggleUpdateFont() - If fontId doesn't exist then remove show class", () => {
-		// Mock update font panel DOM
-		document.body.innerHTML = '<div class="update-font">' + '</div>';
+	test('Closes the font with no font given', () => {
+		toggleUpdateFont(navigate);
 
-		toggleUpdateFont(navigate, '', pathname);
-
-		expect(document.querySelector('div.update-font.show')).toBe(null);
+		expect(navigate).toHaveBeenCalledWith('/fontmanager/');
 	});
 
-	test('removeClass() - Avoid Warning: Hash history cannot PUSH the same path', () => {
-		const mockedElementDOM = {
-			classList: {
-				remove: jest.fn(),
-				add: jest.fn(),
-			},
-		};
+	test('Avoids pushing the same path', () => {
+		toggleUpdateFont(navigate, '', '/fontmanager/');
 
-		removeClass(mockedElementDOM, navigate, '/fontmanager/');
-
-		expect(mockedElementDOM.classList.remove).toHaveBeenCalledTimes(1);
-		expect(navigate.mock.calls.length).toBe(0);
-	});
-
-	test('removeClass() -', () => {
-		const mockedElementDOM = { classList: { remove: jest.fn() } };
-
-		removeClass(mockedElementDOM, navigate, pathname);
-
-		expect(mockedElementDOM.classList.remove).toHaveBeenCalledTimes(1);
-		expect(navigate.mock.calls.length).toBe(1);
-	});
-
-	test('addClass() -', () => {
-		const mockedElementDOM = {
-			classList: {
-				remove: jest.fn(),
-				add: jest.fn(),
-			},
-		};
-
-		addClass(mockedElementDOM, navigate, 'roboto');
-
-		expect(mockedElementDOM.classList.add).toHaveBeenCalledTimes(1);
-		expect(navigate.mock.calls.length).toBe(1);
+		expect(navigate).not.toHaveBeenCalled();
 	});
 });

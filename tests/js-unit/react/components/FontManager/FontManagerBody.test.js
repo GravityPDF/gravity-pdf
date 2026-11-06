@@ -2,7 +2,6 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { findByTestAttr } from '../../testUtils';
 import { FontManagerBody } from '../../../../../src/assets/js/react/components/FontManager/FontManagerBody';
-import * as utilitiesA from '../../../../../src/assets/js/react/utilities/FontManager/adjustFontListHeight';
 import * as utilitiesB from '../../../../../src/assets/js/react/utilities/FontManager/toggleUpdateFont';
 import initialState from '../../../../../src/assets/js/react/components/FontManager/InitialAddUpdateState';
 
@@ -46,18 +45,6 @@ describe('FontManager - FontManagerBody.js', () => {
 			wrapper.instance().componentDidMount();
 
 			expect(props.getCustomFontList).toHaveBeenCalledTimes(1);
-		});
-
-		test("componentDidMount() - Auto slide 'update font' panel if refreshed", () => {
-			const wrapper = shallow(<FontManagerBody {...props} />);
-			const addClass = jest
-				.spyOn(utilitiesB, 'addClass')
-				.mockImplementation(() => true);
-
-			// Call componentDidMount()
-			wrapper.instance().componentDidMount();
-
-			expect(addClass).toHaveBeenCalledTimes(1);
 		});
 
 		test('componentDidUpdate() - Prevent fatal error event', () => {
@@ -123,7 +110,7 @@ describe('FontManager - FontManagerBody.js', () => {
 			expect(handleRequestFontDetails).toHaveBeenCalled();
 		});
 
-		test('handleCheckValidId() - Only a custom font can be edited', () => {
+		test('handleCheckValidId() - Any listed font can be opened', () => {
 			const wrapper = shallow(<FontManagerBody {...props} />);
 
 			expect(
@@ -133,7 +120,7 @@ describe('FontManager - FontManagerBody.js', () => {
 						[{ id: 'garuda', type: 'core' }],
 						'garuda'
 					)
-			).toBe(false);
+			).toBe(true);
 		});
 
 		test("componentDidUpdate() - Check if there's a response message error for fontList", () => {
@@ -188,19 +175,12 @@ describe('FontManager - FontManagerBody.js', () => {
 			).toBe(false);
 		});
 
-		test('handleRequestFontDetails() - Map current font details from our redux store to component state (updateFont)', async () => {
+		test('handleRequestFontDetails() - Map current font details from our redux store to component state (updateFont)', () => {
 			const { id, font_name, regular, italics, bold, bolditalics } =
 				props.fontList[0];
 			const wrapper = shallow(<FontManagerBody {...props} />);
-			const adjustFontListHeight = jest.spyOn(
-				utilitiesA,
-				'adjustFontListHeight'
-			);
 
 			wrapper.instance().handleRequestFontDetails();
-
-			// Resolve setTimeout event
-			await new Promise((resolve) => setTimeout(() => resolve(), 100));
 
 			expect(wrapper.state('addFont')).toBe(initialState);
 			expect(wrapper.state('updateFont')).toEqual({
@@ -216,7 +196,6 @@ describe('FontManager - FontManagerBody.js', () => {
 				validateRegular: true,
 				disableUpdateButton: true,
 			});
-			expect(adjustFontListHeight).toHaveBeenCalled();
 		});
 
 		test('handleSetDefaultState() - Set component state back to its default state', () => {
@@ -491,20 +470,6 @@ describe('FontManager - FontManagerBody.js', () => {
 			const wrapper = shallow(<FontManagerBody {...props} />);
 
 			wrapper.instance().handleCancelEditFont();
-
-			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
-			expect(props.clearAddFontMsg).toHaveBeenCalledTimes(1);
-		});
-
-		test('handleCancelEditFontKeypress() - Listen to cancel button keyboard press event (space and enter)', () => {
-			// Mock update font panel DOM
-			document.body.innerHTML = '<div class="update-font">' + '</div>';
-
-			const toggleUpdateFont = jest.spyOn(utilitiesB, 'toggleUpdateFont');
-			const e = { key: 'Enter' };
-
-			const wrapper = shallow(<FontManagerBody {...props} />);
-			wrapper.instance().handleCancelEditFontKeypress(e);
 
 			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
 			expect(props.clearAddFontMsg).toHaveBeenCalledTimes(1);

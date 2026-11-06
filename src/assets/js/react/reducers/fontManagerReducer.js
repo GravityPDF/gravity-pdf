@@ -23,7 +23,6 @@ import {
 	RESET_SEARCH_RESULT,
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
-	MOVE_SELECTED_FONT_TO_TOP,
 } from '../actions/fontManager';
 /* Utilities */
 import {
@@ -357,6 +356,19 @@ export default function (state = initialState, action) {
 		 * @since 6.0
 		 */
 		case DELETE_FONT_SUCCESS: {
+			const deleted = state.fontList.find((font) => font.id === payload);
+			const msg = {
+				...state.msg,
+				success: {
+					// %s is found inside fontManagerFontDeleted
+					// eslint-disable-next-line @wordpress/valid-sprintf
+					deleteFont: sprintf(
+						GFPDF.fontManagerFontDeleted,
+						deleted?.font_name ?? payload
+					),
+				},
+			};
+
 			/* Delete from the list during active search */
 			if (state.searchResult) {
 				return {
@@ -368,6 +380,7 @@ export default function (state = initialState, action) {
 							.length === 0
 							? null
 							: findAndRemove([...state.searchResult], payload),
+					msg,
 				};
 			}
 
@@ -375,6 +388,7 @@ export default function (state = initialState, action) {
 				...state,
 				deleteFontLoading: false,
 				fontList: findAndRemove([...state.fontList], payload),
+				msg,
 			};
 		}
 
@@ -508,27 +522,6 @@ export default function (state = initialState, action) {
 				...state,
 				selectedFont: payload,
 			};
-
-		/**
-		 * Process MOVE_SELECTED_FONT_TO_TOP
-		 *
-		 * @since 6.0
-		 */
-		case MOVE_SELECTED_FONT_TO_TOP: {
-			const fontList = [...state.fontList];
-			const filterFontList = fontList.filter(
-				(item) => item.id !== payload
-			);
-			const getPayloadItem = fontList.filter(
-				(item) => item.id === payload
-			);
-			const list = [...getPayloadItem, ...filterFontList];
-
-			return {
-				...state,
-				fontList: list,
-			};
-		}
 	}
 
 	return state;

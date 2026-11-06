@@ -178,6 +178,15 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * @param string[] $paths
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_size_label( array $paths ): string {
+		return $this->custom_fonts->get_size_label( $paths );
+	}
+
+	/**
 	 * Whether a font source provides the mPDF font key
 	 *
 	 * @since 6.19.0

@@ -282,7 +282,7 @@ class Test_Controller_Font_Downloader extends TestCase {
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 
-		$this->assertSame( [ 'Default font' ], $this->dispatch( 'GET', 'fonts/installed/usage' )->get_data()['dejavuserifcondensed'] );
+		$this->assertSame( [ 'Default font' ], $this->dispatch( 'GET', 'fonts/installed/usage' )->get_data()['dejavuserifcondensed']['reasons'] );
 		$this->assertSame( 409, $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' )->get_status() );
 		$this->assertSame( 404, $this->dispatch( 'DELETE', 'fonts/downloaded/freeserif' )->get_status() );
 		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );

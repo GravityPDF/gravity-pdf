@@ -356,7 +356,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * Every font the Font Manager lists, by name: custom fonts, core fonts with files on disk and listed bundled fonts.
 	 * `can_delete` is whether this user may delete the font when it's unused; get_font_usage() says what's in use.
 	 *
-	 * @return array<int, array{id: string, font_name: string, type: string, regular: string, italics: string, bold: string, bolditalics: string, can_delete: bool, auto_install?: bool}>
+	 * @return array<int, array{id: string, font_name: string, type: string, regular: string, italics: string, bold: string, bolditalics: string, can_delete: bool, size_label: string, base_url?: string, auto_install?: bool}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -368,13 +368,14 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		foreach ( $custom as $font ) {
 			$font['type']       = 'custom';
 			$font['can_delete'] = true;
+			$font['size_label'] = $this->get_size_label( [ $font['regular'], $font['italics'], $font['bold'], $font['bolditalics'] ], $this->data->template_font_location );
 			$fonts[]            = $font;
 		}
 
 		foreach ( $this->font_sources->get_sources() as $source ) {
 			if ( empty( $source['manifest'] ) ) {
 				foreach ( $this->font_sources->get_listed_families( $source ) as $key => $family ) {
-					$fonts[] = $this->get_font_row( (string) $key, $labels[ $key ] ?? (string) $key, 'bundled', $family, false );
+					$fonts[] = $this->get_font_row( (string) $key, $labels[ $key ] ?? (string) $key, 'bundled', $family, false, $this->get_size_label( array_intersect_key( $family, array_flip( [ 'R', 'B', 'I', 'BI' ] ) ), $source['dir'] ) ) + [ 'base_url' => PDF_PLUGIN_URL . 'fonts/' ];
 				}
 			}
 		}
@@ -387,7 +388,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				}
 			);
 
-			$fonts[] = $this->get_font_row( (string) $key, $labels[ $key ] ?? (string) $key, 'core', $on_disk, $this->can_delete_core_fonts() ) + [ 'auto_install' => $this->can_download_all( $family['files'] ) ];
+			$fonts[] = $this->get_font_row( (string) $key, $labels[ $key ] ?? (string) $key, 'core', $on_disk, $this->can_delete_core_fonts(), (string) size_format( array_sum( $family['sizes'] ), 1 ) ) + [ 'auto_install' => $this->can_download_all( $family['files'] ) ];
 		}
 
 		usort(
@@ -404,13 +405,14 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * Why each font in use can't be deleted, as phrases for the Font Manager. Walks every form, and on Multisite every
 	 * site, so the list loads without it.
 	 *
-	 * @return array<string, string[]> Phrases by font key
+	 * @return array<string, array{reasons: string[], pdfs_label: string, pdfs: array<int, array{form: string, name: string, url: string}>}> By font key
 	 *
 	 * @since 6.19.0
 	 */
 	public function get_font_usage(): array {
 		$custom  = $this->font_sources->get_custom_fonts();
 		$locales = $this->font_sources->get_language_font_locales();
+		$pdfs    = $this->required_fonts->get_font_pdfs();
 		$usage   = [];
 
 		foreach ( $this->required_fonts->get_font_reasons( is_multisite() ) as $key => $reason ) {
@@ -420,8 +422,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			}
 
 			$in_use = $this->get_in_use( $reason, $locales[ $key ] ?? [] );
-			if ( count( $in_use ) > 0 ) {
-				$usage[ $key ] = $in_use;
+			if ( count( $in_use ) > 0 || $reason['pdfs'] > 0 ) {
+				$usage[ $key ] = [
+					'reasons'    => $in_use,
+					/* translators: %d: the number of PDFs */
+					'pdfs_label' => $reason['pdfs'] > 0 ? sprintf( _n( 'Used by %d PDF', 'Used by %d PDFs', $reason['pdfs'], 'gravity-pdf' ), $reason['pdfs'] ) : '',
+					'pdfs'       => $pdfs[ $key ] ?? [],
+				];
 			}
 		}
 
@@ -442,11 +449,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 *
 	 * @param array $files File names by style (R, B, I, BI)
 	 *
-	 * @return array{id: string, font_name: string, type: string, regular: string, italics: string, bold: string, bolditalics: string, can_delete: bool}
+	 * @return array{id: string, font_name: string, type: string, regular: string, italics: string, bold: string, bolditalics: string, can_delete: bool, size_label: string}
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_font_row( string $key, string $label, string $type, array $files, bool $can_delete ): array {
+	protected function get_font_row( string $key, string $label, string $type, array $files, bool $can_delete, string $size_label ): array {
 		return [
 			'id'          => $key,
 			'font_name'   => $label,
@@ -456,7 +463,24 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			'bold'        => $files['B'] ?? '',
 			'bolditalics' => $files['BI'] ?? '',
 			'can_delete'  => $can_delete,
+			'size_label'  => $size_label,
 		];
+	}
+
+	/**
+	 * The combined size of a font's files, found by name in the folder as stored custom font paths can predate a move
+	 *
+	 * @param string[] $files File names or paths, '' for a style it doesn't have
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_size_label( array $files, string $dir ): string {
+		$paths = [];
+		foreach ( array_filter( $files ) as $file ) {
+			$paths[] = $dir . basename( $file );
+		}
+
+		return $this->font_sources->get_size_label( $paths );
 	}
 
 	/**
@@ -587,7 +611,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * A font's get_font_reasons() entry as phrases for the Font Manager
+	 * A font's get_font_reasons() entry as phrases for the Font Manager, other than its PDFs, which are linked to
 	 *
 	 * @param array    $reasons A get_font_reasons() entry
 	 * @param string[] $locales The locales it's a language font for
@@ -607,11 +631,6 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			$names = array_map( [ $this, 'get_language_name' ], $locales );
 			/* translators: %s: the site's languages, e.g. ไทย */
 			$phrases[] = count( $names ) > 0 ? sprintf( __( 'Site language (%s)', 'gravity-pdf' ), implode( ', ', $names ) ) : __( 'Site language', 'gravity-pdf' );
-		}
-
-		if ( $reasons['pdfs'] > 0 ) {
-			/* translators: %d: the number of PDFs */
-			$phrases[] = sprintf( _n( 'Used by %d PDF', 'Used by %d PDFs', $reasons['pdfs'], 'gravity-pdf' ), $reasons['pdfs'] );
 		}
 
 		if ( $reasons['source'] ) {

@@ -11,17 +11,25 @@
       opacity: .1;
       animation: fading 1.5s infinite;
 
-      &.dashicons {
-        background: unset;
+      &.font-swatch {
+        background-color: #444;
+        border: 0;
+        border-radius: 4px;
+      }
 
-        &.dashicons-yes, {
-          color: base.$success-color;
-        }
+      &.font-name,
+      &.font-sub {
+        display: block;
+        height: 0.75rem;
+        margin: 0.25rem 0;
       }
 
       &.font-name {
-        height: 10px;
-        margin: 5px 0;
+        width: 70%;
+      }
+
+      &.font-sub {
+        width: 40%;
       }
     }
   }
