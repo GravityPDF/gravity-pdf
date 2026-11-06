@@ -19,7 +19,7 @@ trait StubsFontSources {
 	 * @param mixed $languages What get_available_languages() returns
 	 */
 	protected function set_languages( $languages ): void {
-		delete_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
+		delete_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
 		add_filter(
 			'get_available_languages',
 			static function () use ( $languages ) {
@@ -34,7 +34,7 @@ trait StubsFontSources {
 	 * @param mixed $locale What get_locale() returns
 	 */
 	protected function set_locale( $locale ): void {
-		delete_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
+		delete_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
 		add_filter(
 			'locale',
 			static function () use ( $locale ) {

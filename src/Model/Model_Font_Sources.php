@@ -61,7 +61,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	public const SUBSTITUTION_CORE_FONTS = [ 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil' ];
 
 	/**
-	 * The transient holding the language font keys with the locale they were mapped for
+	 * The site transient holding the installed language packs' font keys, which every site shares
 	 *
 	 * @since 6.19.0
 	 */
@@ -318,40 +318,29 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 		$this->font_data             = null;
 		$this->language_font_keys    = null;
 		$this->language_font_locales = null;
-		delete_transient( self::LANGUAGE_FONT_KEYS );
+		delete_site_transient( self::LANGUAGE_FONT_KEYS );
 	}
 
 	/**
-	 * The mPDF font keys for the installed languages and the locale, cached for a day so a render doesn't scan the
-	 * languages folder
+	 * The mPDF font keys for the installed languages (cached for a day, network-wide) and this site's locale
 	 *
 	 * @return string[]
 	 *
 	 * @since 6.19.0
 	 */
 	public function get_language_font_keys(): array {
-		if ( $this->language_font_keys !== null ) {
-			return $this->language_font_keys;
+		if ( $this->language_font_keys === null ) {
+			$keys = get_site_transient( self::LANGUAGE_FONT_KEYS );
+			if ( ! is_array( $keys ) ) {
+				$keys = array_keys( $this->map_language_font_locales( (array) get_available_languages() ) );
+				set_site_transient( self::LANGUAGE_FONT_KEYS, $keys, DAY_IN_SECONDS );
+			}
+
+			/* Per site, and may be set without its language pack */
+			$locale_keys = array_keys( $this->map_language_font_locales( [ get_locale() ] ) );
+
+			$this->language_font_keys = array_values( array_unique( array_merge( array_filter( $keys, 'is_string' ), $locale_keys ) ) );
 		}
-
-		$locale = get_locale();
-		$cached = get_transient( self::LANGUAGE_FONT_KEYS );
-		if ( is_array( $cached ) && ( $cached['locale'] ?? null ) === $locale && is_array( $cached['keys'] ?? null ) ) {
-			$this->language_font_keys = array_values( array_filter( $cached['keys'], 'is_string' ) );
-
-			return $this->language_font_keys;
-		}
-
-		$this->language_font_keys = array_map( 'strval', array_keys( $this->get_language_font_locales() ) );
-
-		set_transient(
-			self::LANGUAGE_FONT_KEYS,
-			[
-				'locale' => $locale,
-				'keys'   => $this->language_font_keys,
-			],
-			DAY_IN_SECONDS
-		);
 
 		return $this->language_font_keys;
 	}

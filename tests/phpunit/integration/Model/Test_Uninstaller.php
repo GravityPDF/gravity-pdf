@@ -133,14 +133,20 @@ class Test_Uninstaller extends TestCase {
 		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
 		$this->set_back_off( 'Garuda.ttf' );
 		set_transient( Model_Font_Downloader::SYNC_REMAINING, [ 'Garuda.ttf' ], DAY_IN_SECONDS );
+		set_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS, [ 'garuda' ], DAY_IN_SECONDS );
+		update_site_option( Model_Font_Downloader::CLEANUP, true );
+		wp_schedule_single_event( time(), Model_Font_Downloader::CLEANUP_EVENT );
 
 		/* Uninstall */
 		$this->model->uninstall_plugin();
 
 		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
 		$this->assertFalse( $this->get_font_failures() );
 		$this->assertFalse( $this->get_back_off( 'Garuda.ttf' ) );
 		$this->assertFalse( get_transient( Model_Font_Downloader::SYNC_REMAINING ) );
+		$this->assertFalse( get_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS ) );
+		$this->assertFalse( get_site_option( Model_Font_Downloader::CLEANUP ) );
 
 		/* Check software was uninstalled */
 		$this->assertDirectoryDoesNotExist( $gfpdf->data->template_location );
@@ -244,7 +250,6 @@ class Test_Uninstaller extends TestCase {
 
 		update_site_option( 'gpdf_sl_net_abc123', [ 'timeout' => time(), 'value' => '{}' ] );
 		update_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS, true );
-		update_site_option( Model_Font_Downloader::PRUNED, true );
 		$this->assertNotFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
 		set_site_transient( 'gfpdf_cleanup_tmp_dir', 1 );
 
@@ -253,7 +258,6 @@ class Test_Uninstaller extends TestCase {
 		/* No cache flush here on purpose — the uninstall must invalidate what it deletes */
 		$this->assertFalse( get_site_option( 'gpdf_sl_net_abc123' ) );
 		$this->assertFalse( get_site_option( Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS ) );
-		$this->assertFalse( get_site_option( Model_Font_Downloader::PRUNED ) );
 		$this->assertFalse( get_site_transient( 'gfpdf_cleanup_tmp_dir' ) );
 	}
 

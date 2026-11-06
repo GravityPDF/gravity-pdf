@@ -19,22 +19,23 @@ trait RecordsFontFailures {
 	 * @param int      $gave_up  When its retry also failed, or 0 while the retry is pending
 	 * @param int|null $retry_at When the pending retry is due, defaulting to now
 	 *
-	 * @return array{retry_at: int, gave_up: int}
+	 * @return array{retry_at: int, gave_up: int, dismissed: bool}
 	 */
 	protected function failure( int $gave_up = 0, ?int $retry_at = null ): array {
 		return [
-			'retry_at' => $gave_up > 0 ? 0 : ( $retry_at ?? time() ),
-			'gave_up'  => $gave_up,
+			'retry_at'  => $gave_up > 0 ? 0 : ( $retry_at ?? time() ),
+			'gave_up'   => $gave_up,
+			'dismissed' => false,
 		];
 	}
 
 	/**
-	 * Store the record where the downloader keeps it, and have the shared downloader read it afresh
+	 * Store the record where the downloader keeps it, on the main network, and have the shared downloader read it afresh
 	 *
 	 * @param mixed $failures
 	 */
 	protected function set_font_failures( $failures ): void {
-		update_site_option( Model_Font_Downloader::FAILURES, $failures );
+		update_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES, $failures );
 		GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
 	}
 
@@ -44,7 +45,7 @@ trait RecordsFontFailures {
 	 * @return mixed The stored record, or false
 	 */
 	protected function get_font_failures() {
-		return get_site_option( Model_Font_Downloader::FAILURES );
+		return get_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES );
 	}
 
 	/**
@@ -79,7 +80,7 @@ trait RecordsFontFailures {
 	 * Delete the failure record, and have the shared downloader read it afresh
 	 */
 	protected function delete_font_failures(): void {
-		delete_site_option( Model_Font_Downloader::FAILURES );
+		delete_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES );
 		GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
 	}
 }
