@@ -24,9 +24,10 @@ const notAFont = (name: string): FontUpload => ({
 	buffer: Buffer.from('not a font'),
 });
 
-// What the custom font folder holds, to check a failed save left nothing behind and took nothing away
-const savedFontFiles = () =>
-	wpCli('ls wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts');
+const FONTS_DIR = 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts';
+
+// What the font folder holds, to check a failed save left nothing behind and took nothing away
+const savedFontFiles = () => wpCli(`ls ${FONTS_DIR}`);
 
 const openFontManager = async (page: Page) =>
 	page
@@ -358,5 +359,75 @@ test.describe('Font Manager', () => {
 			page.locator('.update-font').getByText(/are malformed/)
 		).toBeVisible();
 		expect(savedFontFiles()).toContain(italics);
+	});
+
+	test.describe('Downloaded fonts', () => {
+		const seededFiles: string[] = [];
+
+		// Downloads are off on this site (see tools/mu-plugins), so copy in a core font no other spec uses
+		const seedCoreFont = (...files: string[]) => {
+			seededFiles.push(...files);
+			wpCli(
+				...files.map(
+					(file) =>
+						`cp wp-content/plugins/gravity-pdf/fonts/gfpdf-Arimo-Regular.ttf ${FONTS_DIR}/${file}`
+				)
+			);
+		};
+
+		const downloadedFont = (page: Page, label: string) =>
+			page
+				.locator('[data-test="downloaded-font"]')
+				.filter({ hasText: label });
+
+		test.afterEach(() =>
+			wpCli(`cd ${FONTS_DIR} && rm -f ${seededFiles.splice(0).join(' ')}`)
+		);
+
+		test('should delete a downloaded core font that is not in use', async ({
+			page,
+		}) => {
+			const label = 'Dhyana (Lao)';
+			seedCoreFont('Dhyana-Regular.ttf', 'Dhyana-Bold.ttf');
+
+			await pdf.navigateToNewFormPdf(form.id);
+			await openFontManager(page);
+
+			const font = downloadedFont(page, label);
+			await expect(font).toContainText('Regular, Bold');
+			await expect(font).toContainText('Not in use');
+
+			let confirm = '';
+			page.once('dialog', (dialog) => {
+				confirm = dialog.message();
+				return dialog.accept();
+			});
+			await font.getByRole('button', { name: `Delete ${label}` }).click();
+
+			await expect(page.getByText(`${label} deleted.`)).toBeVisible();
+			await expect(font).toHaveCount(0);
+			expect(confirm).toContain('Font downloads are turned off');
+			expect(savedFontFiles()).not.toContain('Dhyana');
+		});
+
+		test('should not delete a downloaded core font in use', async ({
+			page,
+		}) => {
+			// The default font for this test's requests only (see tools/mu-plugins)
+			await page.setExtraHTTPHeaders({
+				'X-GPDF-E2E-Default-Font': 'jomolhari',
+			});
+			const label = 'Jomolhari (Tibetan)';
+			seedCoreFont('Jomolhari.ttf');
+
+			await pdf.navigateToNewFormPdf(form.id);
+			await openFontManager(page);
+
+			const font = downloadedFont(page, label);
+			await expect(font).toContainText('Default font');
+			await expect(
+				font.getByRole('button', { name: `Delete ${label}` })
+			).toBeDisabled();
+		});
 	});
 });

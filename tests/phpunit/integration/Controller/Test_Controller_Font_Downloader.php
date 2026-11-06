@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Controller;
 
 use GFAPI;
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Integration\TestCase;
@@ -251,6 +252,80 @@ class Test_Controller_Font_Downloader extends TestCase {
 			'non-array PDF list'   => [ wp_json_encode( [ 'gfpdf_form_settings' => 'freeserif' ] ), 'display_meta' ],
 			'non-array PDF'        => [ wp_json_encode( [ 'gfpdf_form_settings' => [ 'freeserif' ] ] ), 'display_meta' ],
 		];
+	}
+
+	public function test_the_downloaded_font_routes_are_registered() {
+		$routes = rest_get_server()->get_routes( Helper_Data::REST_API_BASENAME . 'v1' );
+
+		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/downloaded', $routes );
+		$this->assertArrayHasKey( '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/downloaded/(?P<key>[a-z0-9_\-]+)', $routes );
+	}
+
+	public function test_an_unused_downloaded_font_is_listed_and_deleted_over_rest() {
+		$this->set_font_user( true );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$list = $this->dispatch( 'GET', 'fonts/downloaded' );
+		$this->assertSame( 200, $list->get_status() );
+		$this->assertTrue( $list->get_data()['can_delete'] );
+		$this->assertSame( [ 'dejavuserifcondensed' ], array_column( $list->get_data()['fonts'], 'id' ) );
+
+		$delete = $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' );
+		$this->assertSame( 200, $delete->get_status() );
+		$this->assertSame( [ 'DejaVuSerifCondensed.ttf' ], $delete->get_data()['removed'] );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_an_in_use_downloaded_font_is_refused_over_rest() {
+		$this->set_font_user( true );
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$this->assertSame( 409, $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' )->get_status() );
+		$this->assertSame( 404, $this->dispatch( 'DELETE', 'fonts/downloaded/freeserif' )->get_status() );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_a_user_without_the_capability_cannot_list_or_delete() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$this->assertSame( 403, $this->dispatch( 'GET', 'fonts/downloaded' )->get_status() );
+		$this->assertSame( 403, $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' )->get_status() );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_only_a_super_admin_deletes_on_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->set_font_user( false );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$list = $this->dispatch( 'GET', 'fonts/downloaded' );
+		$this->assertSame( 200, $list->get_status() );
+		$this->assertFalse( $list->get_data()['can_delete'] );
+		$this->assertSame( 403, $this->dispatch( 'DELETE', 'fonts/downloaded/dejavuserifcondensed' )->get_status() );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	/**
+	 * Log in a user who can edit forms, a super admin on Multisite when $super
+	 */
+	protected function set_font_user( bool $super ): void {
+		$user_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		get_userdata( $user_id )->add_cap( 'gravityforms_edit_forms' );
+
+		if ( $super && is_multisite() ) {
+			grant_super_admin( $user_id );
+		}
+
+		wp_set_current_user( $user_id );
+	}
+
+	protected function dispatch( string $method, string $route ): \WP_REST_Response {
+		return rest_get_server()->dispatch( new \WP_REST_Request( $method, '/' . Helper_Data::REST_API_BASENAME . 'v1/' . $route ) );
 	}
 
 	/**
