@@ -96,6 +96,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	const CLEANUP_EVENT = 'gfpdf_core_font_cleanup_run';
 
 	/**
+	 * Core fonts prune() removes even when needed, as the installer's copy is outdated: Garuda's "k" fix, mpdf/mpdf#1440
+	 *
+	 * @since 6.19.0
+	 */
+	const OUTDATED = [ 'Garuda.ttf', 'Garuda-Bold.ttf', 'Garuda-Oblique.ttf', 'Garuda-BoldOblique.ttf' ];
+
+	/**
 	 * @var Model_Font_Sources
 	 * @since 6.19.0
 	 */
@@ -401,8 +408,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Delete the unmodified files (fonts and licences) the Core Font installer downloaded that aren't kept. A file whose
-	 * download is turned off stays, as it couldn't come back. Only files of the installer's size are hashed.
+	 * Delete the unmodified files (fonts and licences) the Core Font installer downloaded that aren't kept, and the
+	 * outdated ones that are, queuing a sync to fetch those again. A file whose download is turned off stays, as it
+	 * couldn't come back. Only files of the installer's size are hashed.
 	 *
 	 * @param string[]|null $keep  File names to keep, else the fonts the site's PDFs need
 	 * @param int           $since Also keep files written after this time, as a download since then may be needed
@@ -421,10 +429,12 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return [];
 		}
 
-		$keep    = array_flip( $keep ?? $this->required_fonts->get_required_font_files() );
-		$removed = [];
-		$bytes   = 0;
-		$offline = [];
+		$keep     = $keep ?? $this->required_fonts->get_required_font_files();
+		$replaced = array_intersect( $keep, self::OUTDATED );
+		$keep     = array_flip( array_diff( $keep, self::OUTDATED ) );
+		$removed  = [];
+		$bytes    = 0;
+		$offline  = [];
 
 		foreach ( $manifest as $file => $entry ) {
 			$file = (string) $file;
@@ -468,6 +478,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				'bytes'   => $bytes,
 			]
 		);
+
+		/* A needed outdated font comes back current */
+		if ( array_intersect( $replaced, $removed ) !== [] ) {
+			$this->schedule_sync();
+		}
 
 		return $removed;
 	}
