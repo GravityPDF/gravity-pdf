@@ -255,6 +255,73 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Whether the manifest's files may be downloaded: `On`, `Off (GPDF_AUTO_INSTALL_FONTS)`, or `Off` or `Partly off` with
+	 * `(gfpdf_auto_install_fonts filter)`. It doesn't depend on which files are missing, as those change without the setting.
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_auto_install_status(): string {
+		$locked = $this->get_auto_install_constant();
+		if ( $locked !== null ) {
+			return $locked ? 'On' : 'Off (GPDF_AUTO_INSTALL_FONTS)';
+		}
+
+		$files   = array_keys( $this->font_sources->get_manifest() );
+		$blocked = array_filter(
+			$files,
+			function ( $file ) {
+				return ! $this->is_auto_install_enabled( (string) $file );
+			}
+		);
+
+		if ( $blocked === [] ) {
+			return 'On';
+		}
+
+		return sprintf( '%s (gfpdf_auto_install_fonts filter)', count( $blocked ) === count( $files ) ? 'Off' : 'Partly off' );
+	}
+
+	/**
+	 * What stops the missing required files downloading, or null: the constant, else the filter for any of them
+	 *
+	 * @param string[] $missing The missing required files
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_auto_install_blocker( array $missing ): ?string {
+		$locked = $this->get_auto_install_constant();
+		if ( $locked !== null ) {
+			return $locked ? null : 'GPDF_AUTO_INSTALL_FONTS';
+		}
+
+		foreach ( $missing as $file ) {
+			if ( ! $this->is_auto_install_enabled( $file ) ) {
+				return 'gfpdf_auto_install_fonts filter';
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * The required files whose own copy isn't in the fonts folder, so one a different font holds the name of counts
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_missing_files(): array {
+		return array_values(
+			array_filter(
+				$this->required_fonts->get_required_font_files(),
+				function ( $file ) {
+					return ! $this->font_sources->is_installed( $file );
+				}
+			)
+		);
+	}
+
+	/**
 	 * Whether a Font Manager record of this site uses the file, so it isn't the core font's
 	 *
 	 * @since 6.19.0

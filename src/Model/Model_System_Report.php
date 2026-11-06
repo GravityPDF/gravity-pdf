@@ -119,22 +119,30 @@ class Model_System_Report extends Helper_Abstract_Model {
 	protected $font_sources;
 
 	/**
+	 * @var Model_Font_Downloader|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $font_downloader;
+
+	/**
 	 * Build the System Report from the plugin settings, environment checks, templates, PDF cache and fonts
 	 *
 	 * @since 6.0
-	 * @since 6.19.0 Added `$required_fonts` and `$font_sources`, which default to the registered models
+	 * @since 6.19.0 Added `$required_fonts`, `$font_sources` and `$font_downloader`, which default to the registered models
 	 * @since 7.0 Added `$pdf_cache`
 	 */
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates, Model_Pdf_Cache $pdf_cache, ?Model_Required_Fonts $required_fonts = null, ?Model_Font_Sources $font_sources = null ) {
-		$this->options        = $options;
-		$this->data           = $data;
-		$this->log            = $log;
-		$this->misc           = $misc;
-		$this->status         = $status;
-		$this->templates      = $templates;
-		$this->pdf_cache      = $pdf_cache;
-		$this->required_fonts = $required_fonts;
-		$this->font_sources   = $font_sources;
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates, Model_Pdf_Cache $pdf_cache, ?Model_Required_Fonts $required_fonts = null, ?Model_Font_Sources $font_sources = null, ?Model_Font_Downloader $font_downloader = null ) {
+		$this->options         = $options;
+		$this->data            = $data;
+		$this->log             = $log;
+		$this->misc            = $misc;
+		$this->status          = $status;
+		$this->templates       = $templates;
+		$this->pdf_cache       = $pdf_cache;
+		$this->required_fonts  = $required_fonts;
+		$this->font_sources    = $font_sources;
+		$this->font_downloader = $font_downloader;
 	}
 
 	/**
@@ -277,6 +285,68 @@ class Model_System_Report extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Files whose download gave up, ignoring the admin notice's dismissals
+	 *
+	 * @return array{label: string, label_export: string, value: string}
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_core_fonts_failed(): array {
+		$failed = [];
+		foreach ( $this->get_font_downloader()->get_failed_files() as $file => $gave_up ) {
+			$failed[] = sprintf( '%s (gave up %s)', $file, wp_date( get_option( 'date_format' ), $gave_up ) );
+		}
+
+		return [
+			'label'        => esc_html__( 'Core Fonts failed', 'gravity-pdf' ),
+			'label_export' => 'Core Fonts failed',
+			'value'        => esc_html( $failed !== [] ? implode( ', ', $failed ) : 'None' ),
+		];
+	}
+
+	/**
+	 * Whether core fonts may be downloaded, and what turned them off
+	 *
+	 * @return array{label: string, label_export: string, value: string}
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_core_font_downloads(): array {
+		return [
+			'label'        => esc_html__( 'Core Font downloads', 'gravity-pdf' ),
+			'label_export' => 'Core Font downloads',
+			'value'        => esc_html( $this->get_font_downloader()->get_auto_install_status() ),
+		];
+	}
+
+	/**
+	 * The missing required files, those that gave up (with when) and what turned downloads off, for Site Health
+	 *
+	 * @return array{missing: string[], failed: array<string, int>, blocker: string|null}
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_core_font_health(): array {
+		$downloader = $this->get_font_downloader();
+		$missing    = $downloader->get_missing_files();
+
+		return [
+			'missing' => $missing,
+			'failed'  => array_intersect_key( $downloader->get_failed_files(), array_flip( $missing ) ),
+			'blocker' => $downloader->get_auto_install_blocker( $missing ),
+		];
+	}
+
+	/**
+	 * The injected downloader, else the registered model
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_font_downloader(): Model_Font_Downloader {
+		return $this->font_downloader ?? GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+	}
+
+	/**
 	 * The injected required fonts, else the registered model
 	 *
 	 * @since 6.19.0
@@ -381,6 +451,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 			],
 
 			'core_fonts_installed'      => $this->get_core_fonts_installed(),
+			'core_fonts_failed'         => $this->get_core_fonts_failed(),
+			'core_font_downloads'       => $this->get_core_font_downloads(),
 			'substitution_fonts'        => $this->get_substitution_fonts(),
 
 			'temp_folder_location'      => [
