@@ -27,11 +27,13 @@ class Test_View_Actions extends TestCase {
 		$this->assertStringContainsString( 'Dismiss Notice', $html );
 	}
 
-	public function test_get_action_buttons_omits_dismiss_when_disabled() {
+	public function test_the_dismissal_argument_is_deprecated_and_ignored() {
+		$this->setExpectedDeprecated( 'GFPDF\View\View_Actions::get_action_buttons' );
+
 		$html = $this->view->get_action_buttons( 'install_fonts', 'Install Fonts', 'disabled' );
 
 		$this->assertStringContainsString( 'Install Fonts', $html );
-		$this->assertStringNotContainsString( 'Dismiss Notice', $html );
+		$this->assertStringContainsString( 'Dismiss Notice', $html );
 	}
 
 	public function test_deprecated_features_lists_each_one_and_links_to_its_upgrade_guide() {

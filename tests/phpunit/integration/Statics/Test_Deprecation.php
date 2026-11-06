@@ -168,6 +168,35 @@ class Test_Deprecation extends TestCase {
 		$this->assertFalse( get_option( Deprecation_V3::LEGACY_ENDPOINT_OPTION ) );
 	}
 
+	/**
+	 * A feature with hooks and no detector reports its third-party listeners
+	 */
+	public function test_a_hook_only_feature_reports_its_listeners() {
+		add_filter( Fake_Internal_Listener_Features::HOOK, Fake_Internal_Listener_Features::INTERNAL_CALLBACK );
+		Fake_Production_Deprecation::flush_cache();
+
+		$this->assertSame( [], Fake_Production_Deprecation::get_signals() );
+
+		add_filter( Fake_Internal_Listener_Features::HOOK, '__return_empty_string' );
+		add_filter( Fake_Internal_Listener_Features::HOOK_PREFIX . '5', '__return_empty_string' );
+		Fake_Production_Deprecation::flush_cache();
+
+		$this->assertSame(
+			[
+				'fake_hooks' => [
+					Fake_Internal_Listener_Features::HOOK_PREFIX . '5' => 1,
+					Fake_Internal_Listener_Features::HOOK => 1,
+				],
+			],
+			Fake_Production_Deprecation::get_signals()
+		);
+
+		remove_filter( Fake_Internal_Listener_Features::HOOK, Fake_Internal_Listener_Features::INTERNAL_CALLBACK );
+		remove_filter( Fake_Internal_Listener_Features::HOOK, '__return_empty_string' );
+		remove_filter( Fake_Internal_Listener_Features::HOOK_PREFIX . '5', '__return_empty_string' );
+		Fake_Production_Deprecation::flush_cache();
+	}
+
 	public function test_get_feature_is_empty_for_an_unregistered_id() {
 		$this->assertSame( [], Deprecation::get_feature( 'not-a-feature' ) );
 	}
@@ -244,6 +273,8 @@ class Fake_Internal_Listener_Features implements Helper_Interface_Deprecated_Fea
 
 	const HOOK = 'gfpdf_fake_internal_filter';
 
+	const HOOK_PREFIX = 'gfpdf_fake_dynamic_';
+
 	const INTERNAL_CALLBACK = [ self::class, 'internal_callback' ];
 
 	public static function get_features(): array {
@@ -253,16 +284,12 @@ class Fake_Internal_Listener_Features implements Helper_Interface_Deprecated_Fea
 				'group'              => Deprecation::GROUP_DEPRECATED,
 				'removed_in'         => '7.1',
 				'url'                => 'https://example.org/upgrade/fake-hooks/',
-				'detect'             => [ static::class, 'detect' ],
 				'hooks'              => [ self::HOOK => '' ],
+				'hook_prefix'        => self::HOOK_PREFIX,
 				'deprecated_in'      => '6.17.0',
 				'internal_callbacks' => [ self::INTERNAL_CALLBACK ],
 			],
 		];
-	}
-
-	public static function detect(): array {
-		return [];
 	}
 
 	public static function internal_callback( string $value ): string {

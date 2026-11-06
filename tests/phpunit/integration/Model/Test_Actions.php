@@ -378,11 +378,5 @@ class Test_Actions extends TestCase {
 
 		$this->assertStringContainsString( 'Review</button>', $html );
 		$this->assertStringContainsString( 'name="gfpdf-dismiss-notice"', $html );
-
-		/* Check action button without dismissal button */
-		$html = $this->view->get_action_buttons( 'review_plugin', 'Review', 'disabled' );
-
-		$this->assertStringContainsString( 'Review</button>', $html );
-		$this->assertStringNotContainsString( 'name="gfpdf-dismiss-notice"', $html );
 	}
 }

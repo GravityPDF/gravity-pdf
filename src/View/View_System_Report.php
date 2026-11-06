@@ -186,9 +186,13 @@ class View_System_Report extends Helper_Abstract_View {
 		$feature      = Deprecation::get_feature( $key );
 		$descriptions = $this->get_deprecated_feature_descriptions();
 
-		$description = isset( $descriptions[ $key ] )
-			? call_user_func( $descriptions[ $key ], $signal, $feature )
-			: $this->get_default_feature_description( $signal );
+		if ( isset( $descriptions[ $key ] ) ) {
+			$description = call_user_func( $descriptions[ $key ], $signal, $feature );
+		} elseif ( isset( $feature['hooks'] ) && ! isset( $feature['detect'] ) ) {
+			$description = $this->get_deprecated_filter_feature( $signal );
+		} else {
+			$description = $this->get_default_feature_description( $signal );
+		}
 
 		/* Whatever the description leaves out, the feature's own registration answers */
 		return $description + [
@@ -201,8 +205,8 @@ class View_System_Report extends Helper_Abstract_View {
 	/**
 	 * The method that describes each feature's detections, keyed by the feature it describes
 	 *
-	 * A feature with no entry here is described generically, so a newly registered one reports something usable
-	 * before it has copy of its own.
+	 * A feature with no entry here is described by its listener counts if it has `hooks` and no `detect`, otherwise
+	 * generically.
 	 *
 	 * @return array<string, callable>
 	 * @since 6.17.0
@@ -212,8 +216,6 @@ class View_System_Report extends Helper_Abstract_View {
 			'legacy_templates'        => [ $this, 'get_legacy_templates_feature' ],
 			'business_plus_templates' => [ $this, 'get_legacy_templates_feature' ],
 			'legacy_endpoint'         => [ $this, 'get_legacy_endpoint_feature' ],
-			'deprecated_filters'      => [ $this, 'get_deprecated_filter_feature' ],
-			'tools_tab_hooks'         => [ $this, 'get_deprecated_filter_feature' ],
 		];
 	}
 
