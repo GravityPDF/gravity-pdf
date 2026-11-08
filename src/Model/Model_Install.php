@@ -198,7 +198,11 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_location_url = trailingslashit( apply_filters( 'gfpdf_template_location_uri', $template_url, $working_folder, $upload_dir_url ) ); /* needs to be accessible from the web */
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_font_location/ for more details about this filter */
-		$this->data->template_font_location = trailingslashit( apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ) ); /* can be in a directory not accessible via the web */
+		$default_fonts                      = $this->data->template_location . 'fonts/';
+		$this->data->template_font_location = trailingslashit( apply_filters( 'gfpdf_font_location', $default_fonts, $working_folder, $upload_dir ) ); /* can be in a directory not accessible via the web */
+
+		/* Null once the folder is moved, as only the Font Manager needs that path mapped to a URL */
+		$this->data->template_font_location_url = $this->data->template_font_location === $default_fonts ? $this->data->template_location_url . 'fonts/' : null;
 
 		/* See https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/ for more details about this filter */
 		$this->data->template_tmp_location = trailingslashit( apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ) ); /* encouraged to move this to a directory not accessible via the web */

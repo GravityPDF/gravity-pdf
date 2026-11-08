@@ -108,6 +108,47 @@ class Test_Model_Required_Fonts extends TestCase {
 		);
 	}
 
+	public function test_the_font_reasons_match_the_required_set() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'DejaVuSansCondensed' );
+		$this->set_languages( [ 'th' ] );
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ], [ 'font' => 'garuda' ] ] );
+		$this->add_form_with_pdfs( [ [ 'sidebar_font' => 'FreeSerif' ] ] );
+
+		$sources = $this->stub_font_sources(
+			static function ( array $sources ): array {
+				$sources['fixture']             = $sources['core'];
+				$sources['fixture']['required'] = true;
+				$sources['fixture']['families'] = [ 'fixturemono' => [ 'R' => 'FreeMono.ttf' ] ];
+
+				return $sources;
+			}
+		);
+
+		$none = [
+			'default'  => false,
+			'language' => false,
+			'pdfs'     => 0,
+			'source'   => false,
+			'sites'    => 0,
+		];
+
+		$this->assertSame(
+			[
+				'dejavusanscondensed' => array_merge( $none, [ 'default' => true ] ),
+				'garuda'              => array_merge(
+					$none,
+					[
+						'language' => true,
+						'pdfs'     => 1,
+					]
+				),
+				'fixturemono'         => array_merge( $none, [ 'source' => true ] ),
+				'freeserif'           => array_merge( $none, [ 'pdfs' => 2 ] ),
+			],
+			$this->required_with( $sources )->get_font_reasons( true )
+		);
+	}
+
 	public function test_the_font_selections_are_read_once_until_flushed() {
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
 		$this->assertSame( [], $this->required->get_required_font_files() );
@@ -254,6 +295,65 @@ class Test_Model_Required_Fonts extends TestCase {
 		);
 	}
 
+	public function test_the_in_use_check_stops_at_the_first_form_using_the_font() {
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		$this->add_form_with_pdfs( [ [ 'font' => 'dejavuserif' ] ] );
+		$this->add_form_with_pdfs( [ [ 'font' => 'dejavuserif' ] ] );
+
+		$required = new class( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), GPDFAPI::get_options_class(), GPDFAPI::get_log_class() ) extends Model_Required_Fonts {
+			/** @var int */
+			protected $form_page = 1;
+		};
+
+		$this->assert_form_reads(
+			1,
+			function () use ( $required ) {
+			$this->assertTrue( $required->is_font_in_use( 'freeserif' ) );
+			}
+		);
+
+		$this->assertTrue( $required->is_font_in_use( 'dejavuserif' ) );
+		$this->assertFalse( $required->is_font_in_use( 'notafont' ) );
+	}
+
+	public function test_the_in_use_check_reads_no_forms_for_a_default_font_or_after_they_are_read() {
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserif' );
+		$required = $this->required_with( $this->stub_font_sources() );
+
+		$this->assert_form_reads(
+			0,
+			function () use ( $required ) {
+			$this->assertTrue( $required->is_font_in_use( 'dejavuserif' ) );
+			}
+		);
+
+		$required->get_font_pdfs();
+
+		$this->assert_form_reads(
+			0,
+			function () use ( $required ) {
+			$this->assertTrue( $required->is_font_in_use( 'freeserif' ) );
+			$this->assertFalse( $required->is_font_in_use( 'notafont' ) );
+			}
+		);
+	}
+
+	private function assert_form_reads( int $expected, callable $callback ): void {
+		$reads  = 0;
+		$filter = static function ( $query ) use ( &$reads ) {
+			$reads += strpos( (string) $query, 'gf_form_meta' ) !== false ? 1 : 0;
+
+			return $query;
+		};
+
+		add_filter( 'query', $filter );
+		$callback();
+		remove_filter( 'query', $filter );
+
+		$this->assertSame( $expected, $reads );
+	}
+
 	/**
 	 * @dataProvider provider_unreadable_form_meta
 	 *
@@ -326,6 +426,54 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->assertCount( 1, $records );
 		$this->assertSame( [ 'ERROR', 'Forms could not be read for their PDF fonts' ], array_slice( $records[0], 0, 2 ) );
 		$this->assertStringContainsString( 'gfpdf_missing_table', $records[0][2]['error'] );
+	}
+
+	public function test_a_sites_fonts_are_its_default_locale_and_pdf_fonts() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', ' DejaVuSerifCondensed ' );
+		/* WordPress only keeps a locale it has installed */
+		$this->set_languages( [ 'th' ] );
+		update_option( 'WPLANG', 'th' );
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ], [ 'sidebar_font' => 'FreeSerif' ], [ 'font' => 'arimo' ] ] );
+
+		try {
+			$keys = $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() );
+		} finally {
+			delete_option( 'WPLANG' );
+		}
+
+		$this->assertEqualsCanonicalizing( [ 'garuda', 'dejavuserifcondensed', 'freeserif', 'arimo' ], $keys );
+	}
+
+	public function test_a_site_with_no_default_font_saved_has_none() {
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+		$required = $this->required_with( $this->stub_font_sources() );
+
+		$this->assertSame( [], $required->get_site_font_keys( get_current_blog_id() ) );
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'freeserif' );
+		$this->assertSame( [ 'freeserif' ], $required->get_site_font_keys( get_current_blog_id() ) );
+	}
+
+	public function test_corrupt_settings_leave_a_sites_default_font_unset() {
+		update_option( 'gfpdf_settings', 'corrupt' );
+		$required = $this->required_with( $this->stub_font_sources() );
+
+		$this->assertSame( [], $required->get_site_font_keys( get_current_blog_id() ) );
+	}
+
+	public function test_a_site_gravity_forms_has_not_run_on_has_no_pdf_fonts() {
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		$version = get_option( 'gf_db_version' );
+		delete_option( 'gf_db_version' );
+
+		try {
+			$keys = $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() );
+		} finally {
+			update_option( 'gf_db_version', $version, false );
+		}
+
+		$this->assertSame( [], $keys );
+		$this->assertSame( [ 'freeserif' ], $this->required_with( $this->stub_font_sources() )->get_site_font_keys( get_current_blog_id() ) );
 	}
 
 	/**

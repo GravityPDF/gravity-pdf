@@ -22,11 +22,6 @@ describe('FontManager - FontList.js', () => {
 			expect(component.length).toBe(1);
 		});
 
-		test('render <FontListHeader /> component', () => {
-			const wrapper = shallow(<FontList {...props} />);
-			expect(wrapper.find('FontListHeader').length).toBe(1);
-		});
-
 		test('render <FontListSkeleton /> component', () => {
 			const wrapper = shallow(<FontList {...props} />);
 			expect(wrapper.find('FontListSkeleton').length).toBe(1);
