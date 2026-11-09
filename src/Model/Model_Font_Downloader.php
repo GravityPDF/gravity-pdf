@@ -310,13 +310,15 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return false;
 		}
 
-		if ( $this->font_sources->has_hashed_copy( $file ) ) {
-			return true;
-		}
-
 		$font_path = $this->font_sources->get_plain_path( $file );
 		$conflict  = is_file( $font_path );
-		if ( $conflict && ! $this->is_conflict( $file, $verify && $this->is_auto_install_enabled( $file ) ) ) {
+
+		$own_copy = $this->font_sources->has_hashed_copy( $file ) || ( $conflict && ! $this->is_conflict( $file, $verify && $this->is_auto_install_enabled( $file ) ) );
+
+		/* Copied in by hand or saved by another request, so any failure on record is stale */
+		if ( $own_copy ) {
+			$this->clear_failure( $file );
+
 			return true;
 		}
 
@@ -401,15 +403,6 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function hash_blob( string $path, int $size ): string {
 		return Git_Blob::sha1( $path, $size );
-	}
-
-	/**
-	 * Whether the file's own copy is on disk, hashing the file at its name to be sure it's the manifest's
-	 *
-	 * @since 6.19.0
-	 */
-	protected function is_resolved( string $file ): bool {
-		return $this->font_sources->has_hashed_copy( $file ) || ( is_file( $this->font_sources->get_plain_path( $file ) ) && ! $this->is_conflict( $file, true ) );
 	}
 
 	/**
@@ -1231,8 +1224,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The files whose one retry is due, and when the next one still to come is (or 0). A due file already on disk,
-	 * copied in by hand, no longer needs its retry.
+	 * The files whose one retry is due, and when the next one still to come is (or 0)
 	 *
 	 * @return array{0: string[], 1: int}
 	 *
@@ -1250,8 +1242,6 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 			if ( $failure['retry_at'] > time() ) {
 				$next = $next === 0 ? $failure['retry_at'] : min( $next, $failure['retry_at'] );
-			} elseif ( $this->is_resolved( $file ) ) {
-				$this->clear_failure( $file );
 			} else {
 				$due[] = $file;
 			}
@@ -1340,8 +1330,16 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		}
 
 		if ( ! $this->move( $download_path, $font_path ) ) {
+			/* The right font is there anyway, as when another request saved it first */
+			if ( Git_Blob::matches( $font_path, $entry['size'], $entry['sha'] ) ) {
+				wp_delete_file( $download_path );
+				$this->log->notice( 'Font already in place after a failed move', [ 'name' => $file ] );
+
+				return true;
+			}
+
 			/* A move across filesystems copies, so a failure can leave a partial font behind */
-			if ( is_file( $font_path ) && ! Git_Blob::matches( $font_path, $entry['size'], $entry['sha'] ) ) {
+			if ( is_file( $font_path ) ) {
 				wp_delete_file( $font_path );
 			}
 
