@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Controller;
 
 use GFAPI;
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Integration\TestCase;
@@ -251,6 +252,105 @@ class Test_Controller_Font_Downloader extends TestCase {
 			'non-array PDF list'   => [ wp_json_encode( [ 'gfpdf_form_settings' => 'freeserif' ] ), 'display_meta' ],
 			'non-array PDF'        => [ wp_json_encode( [ 'gfpdf_form_settings' => [ 'freeserif' ] ] ), 'display_meta' ],
 		];
+	}
+
+	public function test_an_unused_downloaded_font_is_listed_and_deleted_over_rest() {
+		$this->set_font_user( true );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$list = $this->dispatch_scope( 'all' );
+		$this->assertSame( 200, $list->get_status() );
+		$font = wp_list_filter( $list->get_data(), [ 'id' => 'dejavuserifcondensed' ] );
+		$this->assertTrue( array_values( $font )[0]['can_delete'] );
+
+		$delete = $this->dispatch_core( 'DELETE', 'dejavuserifcondensed' );
+		$this->assertSame( 200, $delete->get_status() );
+		$this->assertSame( [ 'DejaVuSerifCondensed.ttf' ], $delete->get_data()['removed'] );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_an_in_use_downloaded_font_is_refused_over_rest() {
+		$this->set_font_user( true );
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$this->assertSame( [ 'Default font' ], ( (array) $this->dispatch_scope( 'usage' )->get_data() )['dejavuserifcondensed']['reasons'] );
+		$this->assertSame( 409, $this->dispatch_core( 'DELETE', 'dejavuserifcondensed' )->get_status() );
+		$this->assertSame( 404, $this->dispatch_core( 'DELETE', 'freeserif' )->get_status() );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_a_user_without_the_capability_cannot_list_or_delete() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$this->assertSame( 403, $this->dispatch_scope( 'all' )->get_status() );
+		$this->assertSame( 403, $this->dispatch_core( 'DELETE', 'dejavuserifcondensed' )->get_status() );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_only_a_super_admin_deletes_on_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->set_font_user( false );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$list = $this->dispatch_scope( 'all' );
+		$this->assertSame( 200, $list->get_status() );
+		$font = wp_list_filter( $list->get_data(), [ 'id' => 'dejavuserifcondensed' ] );
+		$this->assertFalse( array_values( $font )[0]['can_delete'] );
+		$this->assertSame( 403, $this->dispatch_core( 'POST', 'dejavuserifcondensed' )->get_status() );
+		$this->assertSame( 403, $this->dispatch_core( 'DELETE', 'dejavuserifcondensed' )->get_status() );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_fonts_route_scope_defaults_to_custom_fonts_and_rejects_others() {
+		$this->set_font_user( true );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$this->assertSame( [], $this->dispatch( 'GET', 'fonts' )->get_data() );
+		$this->assertContains( 'dejavuserifcondensed', array_column( $this->dispatch_scope( 'all' )->get_data(), 'id' ) );
+		$this->assertSame( 400, $this->dispatch_scope( 'nope' )->get_status() );
+	}
+
+	public function test_the_install_route_reaches_the_model() {
+		$this->set_font_user( true );
+
+		$this->assertSame( 404, $this->dispatch_core( 'POST', 'notafont' )->get_status() );
+	}
+
+	/**
+	 * Log in a user who can edit forms, a super admin on Multisite when $super
+	 */
+	protected function set_font_user( bool $super ): void {
+		$user_id = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		get_userdata( $user_id )->add_cap( 'gravityforms_edit_forms' );
+
+		if ( $super && is_multisite() ) {
+			grant_super_admin( $user_id );
+		}
+
+		wp_set_current_user( $user_id );
+	}
+
+	protected function dispatch_scope( string $scope ): \WP_REST_Response {
+		$request = new \WP_REST_Request( 'GET', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts' );
+		$request->set_query_params( [ 'scope' => $scope ] );
+
+		return rest_get_server()->dispatch( $request );
+	}
+
+	protected function dispatch_core( string $method, string $key ): \WP_REST_Response {
+		$request = new \WP_REST_Request( $method, '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $key );
+		$request->set_query_params( [ 'scope' => 'core' ] );
+
+		return rest_get_server()->dispatch( $request );
+	}
+
+	protected function dispatch( string $method, string $route ): \WP_REST_Response {
+		return rest_get_server()->dispatch( new \WP_REST_Request( $method, '/' . Helper_Data::REST_API_BASENAME . 'v1/' . $route ) );
 	}
 
 	/**

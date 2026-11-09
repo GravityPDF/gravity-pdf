@@ -1,6 +1,8 @@
 import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	GET_CUSTOM_FONT_LIST_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
@@ -12,12 +14,14 @@ import {
 	DELETE_FONT,
 	DELETE_FONT_SUCCESS,
 	DELETE_FONT_ERROR,
+	INSTALL_FONT,
+	INSTALL_FONT_SUCCESS,
+	INSTALL_FONT_ERROR,
 	CLEAR_ADD_FONT_MSG,
 	CLEAR_DROPZONE_ERROR,
 	RESET_SEARCH_RESULT,
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
-	MOVE_SELECTED_FONT_TO_TOP,
 } from '../../../../src/assets/js/react/actions/fontManager';
 import reducer, {
 	initialState,
@@ -80,6 +84,33 @@ describe('Reducers - fontManagerReducer.js', () => {
 
 			expect(state.addFontLoading).toBe(true);
 			expect(state.msg).toEqual({});
+		});
+	});
+
+	describe('Font usage', () => {
+		test('is cleared while the list reloads and set once it loads', () => {
+			const loaded = reducer(
+				{ ...initialState, msg: {} },
+				{
+					type: GET_FONT_USAGE_SUCCESS,
+					payload: { a: ['Default font'] },
+				}
+			);
+			expect(loaded.fontUsage).toEqual({ a: ['Default font'] });
+
+			expect(
+				reducer(loaded, { type: GET_CUSTOM_FONT_LIST }).fontUsage
+			).toBe(null);
+		});
+
+		test('shows an error when it fails', () => {
+			const failed = reducer(
+				{ ...initialState, msg: {} },
+				{ type: GET_FONT_USAGE_ERROR, payload: 'error' }
+			);
+
+			expect(failed.fontUsage).toBe(null);
+			expect(failed.msg.error.deleteFont).toBe('error');
 		});
 	});
 
@@ -322,6 +353,7 @@ describe('Reducers - fontManagerReducer.js', () => {
 
 			expect(state.deleteFontLoading).toBe(false);
 			expect(state.fontList).toEqual([data[1]]);
+			expect(state.msg.success.deleteFont).toBe('Arial deleted.');
 
 			initialstate = {
 				fontList: data,
@@ -459,64 +491,75 @@ describe('Reducers - fontManagerReducer.js', () => {
 		});
 	});
 
-	describe('MOVE_SELECTED_FONT_TO_TOP', () => {
-		test('check the correct state gets returned when this action runs', () => {
-			const newInitialState = {
-				fontList: [
-					{
-						font_name: 'Arial',
-						id: 'arial',
-						regular:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
-						italics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
-						bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
-						bolditalics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bolditalics.ttf',
-					},
-					{
-						font_name: 'Roboto',
-						id: 'roboto',
-						regular:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-						italics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-						bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-						bolditalics:
-							'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/aroboto.ttf',
-					},
-				],
-			};
+	describe('Installing a font', () => {
+		const available = {
+			id: 'garuda',
+			font_name: 'Garuda',
+			type: 'available',
+		};
+		const core = { ...available, type: 'core' };
 
-			state = reducer(newInitialState, {
-				type: MOVE_SELECTED_FONT_TO_TOP,
-				payload: 'roboto',
-			});
+		test('Tracks the font and clears old messages', () => {
+			state = reducer(
+				{
+					...initialState,
+					msg: {
+						success: { deleteFont: 'x' },
+						error: { deleteFont: 'y' },
+					},
+				},
+				{ type: INSTALL_FONT, payload: 'garuda' }
+			);
 
-			expect(state.fontList).toEqual([
+			expect(state.installingFont).toBe('garuda');
+			expect(state.msg).toEqual({ error: {} });
+		});
+
+		test('Replaces the row on success, in a search too', () => {
+			state = reducer(
 				{
-					font_name: 'Roboto',
-					id: 'roboto',
-					regular:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-					italics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-					bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
-					bolditalics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/aroboto.ttf',
+					...initialState,
+					installingFont: 'garuda',
+					fontList: [{ ...available, base_url: 'https://x/' }],
+					searchResult: [available],
 				},
+				{ type: INSTALL_FONT_SUCCESS, payload: core }
+			);
+
+			expect(state.installingFont).toBe(null);
+			expect(state.fontList[0].type).toBe('core');
+			expect(state.searchResult[0].type).toBe('core');
+			expect(state.fontList[0]).toEqual(core);
+			expect(state.msg.success.installFont).toBe('Garuda installed.');
+		});
+
+		test('Keeps the row and shows why on failure', () => {
+			state = reducer(
 				{
-					font_name: 'Arial',
-					id: 'arial',
-					regular:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
-					italics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
-					bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
-					bolditalics:
-						'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bolditalics.ttf',
+					...initialState,
+					installingFont: 'garuda',
+					fontList: [available],
 				},
-			]);
+				{ type: INSTALL_FONT_ERROR, payload: 'No' }
+			);
+
+			expect(state.installingFont).toBe(null);
+			expect(state.fontList).toEqual([available]);
+			expect(state.msg.error.deleteFont).toBe('No');
+		});
+
+		test('A deleted core font stays listed when it can be installed again', () => {
+			state = reducer(
+				{ ...initialState, fontList: [core], searchResult: [core] },
+				{
+					type: DELETE_FONT_SUCCESS,
+					payload: 'garuda',
+					font: available,
+				}
+			);
+
+			expect(state.fontList[0].type).toBe('available');
+			expect(state.searchResult[0].type).toBe('available');
 		});
 	});
 });

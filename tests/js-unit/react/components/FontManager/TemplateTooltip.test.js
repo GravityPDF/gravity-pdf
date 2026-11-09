@@ -39,14 +39,15 @@ describe('FontManager - TemplateTooltip.js', () => {
 		test('render arrow right, arrow down and tooltip text link', () => {
 			const component = shallow(<TemplateTooltip />);
 
-			expect(component.find('.dashicons-arrow-right-alt2').length).toBe(
-				1
-			);
+			expect(component.find('Icon[name="chevron-right"]').length).toBe(1);
 
 			component.setState({ tooltip: true });
 
-			expect(component.find('.dashicons-arrow-down-alt2').length).toBe(1);
-			expect(component.find('button').text()).toBe('View template usage');
+			expect(component.find('Icon[name="chevron-down"]').length).toBe(1);
+			expect(component.find('button').text()).toContain(
+				'View template usage'
+			);
+			expect(component.find('button').prop('aria-expanded')).toBe(true);
 			expect(component.find('textarea').length).toBe(1);
 		});
 	});

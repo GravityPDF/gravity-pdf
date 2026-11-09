@@ -143,6 +143,17 @@ if ( $gfpdf_e2e_header( 'fonts' ) === 'unicode' ) {
 	);
 }
 
+/* A default font per request: a PDF selecting the font would count it as required in other specs' system reports */
+$gfpdf_e2e_default_font = $gfpdf_e2e_header( 'default_font' );
+if ( $gfpdf_e2e_default_font !== '' ) {
+	add_filter(
+		'gfpdf_get_option_default_font',
+		static function () use ( $gfpdf_e2e_default_font ) {
+			return $gfpdf_e2e_default_font;
+		}
+	);
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {

@@ -18,7 +18,6 @@ describe('FontManager - UpdateFont.js', () => {
 		onHandleUpload: jest.fn(),
 		onHandleDeleteFontStyle: jest.fn(),
 		onHandleCancelEditFont: jest.fn(),
-		onHandleCancelEditFontKeypress: jest.fn(),
 		onHandleSubmit: jest.fn(),
 		validateLabel: false,
 		validateRegular: false,
@@ -26,9 +25,6 @@ describe('FontManager - UpdateFont.js', () => {
 		fontStyles: {},
 		msg: {},
 		loading: false,
-		tabIndexFontName: '',
-		tabIndexFontFiles: '',
-		tabIndexFooterButtons: '',
 	};
 	const wrapper = shallow(<UpdateFont {...props} />);
 
@@ -54,7 +50,7 @@ describe('FontManager - UpdateFont.js', () => {
 		});
 
 		test('render <AddUpdateFontFooter /> component', () => {
-			expect(wrapper.find('Connect(AddUpdateFontFooter)').length).toBe(1);
+			expect(wrapper.find('AddUpdateFontFooter').length).toBe(1);
 		});
 	});
 });

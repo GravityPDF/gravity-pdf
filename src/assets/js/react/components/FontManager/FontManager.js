@@ -43,6 +43,17 @@ export class FontManager extends Component {
 	}
 
 	/**
+	 * A stable ref, as an inline one is cleared during each update, when a child can be moving focus
+	 *
+	 * @param { HTMLElement } node
+	 *
+	 * @since 6.19.0
+	 */
+	setContainer = (node) => {
+		this.container = node;
+	};
+
+	/**
 	 * On mount, add focus event to document option on mount
 	 * Also, if focus isn't currently applied to the search box we'll apply it
 	 * to our container to help with tabbing between elements
@@ -98,18 +109,24 @@ export class FontManager extends Component {
 	 * @since 6.0
 	 */
 	render() {
-		const { params, navigate } = this.props;
+		const { params, navigate, fontList } = this.props;
 		const { id } = params;
 
 		return (
 			<div
 				data-test="component-FontManager"
-				ref={(node) => (this.container = node)}
+				ref={this.setContainer}
 				tabIndex="0"
 			>
 				<div className="backdrop theme-backdrop" />
 				<div className="container theme-wrap font-manager">
-					<FontManagerHeader id={id} />
+					<FontManagerHeader
+						id={id}
+						count={
+							fontList.filter((f) => f.type !== 'available')
+								.length
+						}
+					/>
 
 					<FontManagerBody id={id} navigate={navigate} />
 				</div>

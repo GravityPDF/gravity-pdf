@@ -70,6 +70,61 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertNoStrayTmpFiles();
 	}
 
+	public function test_install_downloads_the_missing_files_despite_a_back_off() {
+		foreach ( [ 'Bold', 'Italic', 'BoldItalic' ] as $style ) {
+			$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-' . $style . '.ttf' );
+		}
+		$this->set_back_off( self::FONT );
+		$this->serve_font_downloads();
+
+		$row = $this->downloader->install_font( 'dejavuserifcondensed' );
+
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
+		$this->assertCount( 1, $this->requested );
+		$this->assertSame( 'core', $row['type'] );
+		$this->assertFalse( $row['can_install'] );
+	}
+
+	public function test_install_reports_a_failed_download() {
+		$this->fail_font_downloads();
+
+		$result = $this->downloader->install_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( 'font_download_failed', $result->get_error_code() );
+		$this->assertSame( [ 'status' => 502 ], $result->get_error_data() );
+	}
+
+	public function test_install_needs_downloads_on() {
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$result = $this->downloader->install_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( 'font_downloads_off', $result->get_error_code() );
+		$this->assertSame( [ 'status' => 409 ], $result->get_error_data() );
+	}
+
+	public function test_install_refuses_a_font_not_on_the_manifest_or_a_custom_font_of_that_key() {
+		GPDFAPI::get_options_class()->update_option(
+			'custom_fonts',
+			[
+				'freeserif' => [
+					'id'        => 'freeserif',
+					'font_name' => 'Mine',
+					'regular'   => 'mine.ttf',
+				],
+			]
+		);
+
+		foreach ( [ 'notafont', 'arimo', 'freeserif' ] as $key ) {
+			$result = $this->downloader->install_font( $key );
+
+			$this->assertSame( 'font_not_available', $result->get_error_code(), $key );
+			$this->assertSame( [ 'status' => 404 ], $result->get_error_data(), $key );
+		}
+
+		GPDFAPI::get_options_class()->delete_option( 'custom_fonts' );
+	}
+
 	public function test_download_skips_a_font_already_in_the_fonts_folder() {
 		copy( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
 		$this->serve_font_downloads();

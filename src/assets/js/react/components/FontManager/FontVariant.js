@@ -2,8 +2,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
+import { sprintf } from 'sprintf-js';
 /* Components */
 import FontVariantLabel from './FontVariantLabel';
+import Icon from './Icon';
+/* Utilities */
+import { getStyleLabel } from '../../utilities/FontManager/fontManagerReducer';
 
 /**
  * @package			Gravity PDF
@@ -23,7 +27,6 @@ import FontVariantLabel from './FontVariantLabel';
  * @param { Function } props.onHandleDeleteFontStyle
  * @param { Object }   props.msg
  * @param { Object }   props.msg.error
- * @param { string }   props.tabIndex
  *
  * @since 6.0
  */
@@ -34,7 +37,6 @@ export const FontVariant = ({
 	onHandleUpload,
 	onHandleDeleteFontStyle,
 	msg: { error },
-	tabIndex,
 }) => (
 	<div data-test="component-FontVariant" id="gfpdf-font-files-setting">
 		{Object.entries(fontStyles).map(([key, font]) => {
@@ -59,15 +61,11 @@ export const FontVariant = ({
 				key === 'regular' &&
 				!validateRegular &&
 				fontStyles.regular === '';
-			const dropZoneActive = font ? ' active' : '';
 			const dropZoneError = fontFileMissing ? ' error' : '';
 			const dropZoneRequiredRegular = regularFieldValidation
 				? ' required'
 				: '';
-			const dropZoneClassEnhancement =
-				dropZoneActive + dropZoneError + dropZoneRequiredRegular;
-			const dropZoneIcon = font ? 'trash' : 'plus';
-			const displayRequiredText = font ? 'true' : 'false';
+			const styleLabel = getStyleLabel(key);
 
 			return (
 				<Dropzone
@@ -78,60 +76,94 @@ export const FontVariant = ({
 						onHandleUpload(key, acceptedFiles[0], state)
 					}
 					multiple={false}
+					noClick
+					noKeyboard
 				>
-					{({ getRootProps, getInputProps }) => (
-						<a
-							className={'drop-zone' + dropZoneClassEnhancement}
+					{({ getRootProps, getInputProps, open, isDragActive }) => (
+						<div
+							data-variant={key}
+							className={
+								'drop-zone' +
+								(font ? ' active' : ' missing') +
+								(isDragActive ? ' drag-over' : '') +
+								dropZoneError +
+								dropZoneRequiredRegular
+							}
 							{...getRootProps()}
-							tabIndex={tabIndex}
 						>
-							{font ? (
-								<input
-									data-test="component-FontVariant-delete"
-									id={id}
-									aria-labelledby={ariaLabelledby}
-									aria-describedby={ariaDescribedby}
-									{...getInputProps({
-										onClick: (e) =>
-											onHandleDeleteFontStyle(
-												e,
-												key,
-												state
-											),
-									})}
-								/>
-							) : (
-								<input
-									data-test="component-FontVariant-add"
-									id={id}
-									aria-labelledby={ariaLabelledby}
-									aria-describedby={ariaDescribedby}
-									{...getInputProps()}
-								/>
-							)}
+							<input
+								data-test="component-FontVariant-input"
+								id={id}
+								aria-labelledby={ariaLabelledby}
+								aria-describedby={ariaDescribedby}
+								{...getInputProps()}
+							/>
 
-							<span className="gfpdf-font-filename">
-								{regularFieldValidation && (
+							<FontVariantLabel label={key} />
+
+							<div
+								className={
+									'gfpdf-font-filename' +
+									(fontName ? '' : ' empty')
+								}
+							>
+								{isDragActive && GFPDF.fontManagerDropFile}
+								{!isDragActive && regularFieldValidation && (
 									<span className="required">
 										{
 											GFPDF.fontManagerFontFileRequiredRegular
 										}
 									</span>
 								)}
-								{!fontFileMissing ? fontName : fontFileMissing}
-							</span>
+								{!isDragActive &&
+									!regularFieldValidation &&
+									(fontFileMissing ||
+										fontName ||
+										GFPDF.fontManagerNoFile)}
+							</div>
 
-							<span
-								className={
-									'dashicons dashicons-' + dropZoneIcon
-								}
-							/>
+							<div className="font-variant-actions">
+								<button
+									type="button"
+									className="button"
+									aria-label={
+										(font
+											? GFPDF.fontManagerReplace
+											: GFPDF.fontManagerUpload) +
+										': ' +
+										styleLabel
+									}
+									onClick={open}
+								>
+									{font
+										? GFPDF.fontManagerReplace
+										: GFPDF.fontManagerUpload}
+								</button>
 
-							<FontVariantLabel
-								label={key}
-								font={displayRequiredText}
-							/>
-						</a>
+								{font && key !== 'regular' && (
+									<button
+										type="button"
+										data-test="component-FontVariant-delete"
+										className="button font-variant-delete"
+										// %s is found inside fontManagerDeleteStyle
+										// eslint-disable-next-line @wordpress/valid-sprintf
+										aria-label={sprintf(
+											GFPDF.fontManagerDeleteStyle,
+											styleLabel
+										)}
+										onClick={(e) =>
+											onHandleDeleteFontStyle(
+												e,
+												key,
+												state
+											)
+										}
+									>
+										<Icon name="trash" />
+									</button>
+								)}
+							</div>
+						</div>
 					)}
 				</Dropzone>
 			);
@@ -151,7 +183,6 @@ FontVariant.propTypes = {
 	onHandleUpload: PropTypes.func.isRequired,
 	onHandleDeleteFontStyle: PropTypes.func.isRequired,
 	msg: PropTypes.object.isRequired,
-	tabIndex: PropTypes.string.isRequired,
 };
 
 export default FontVariant;

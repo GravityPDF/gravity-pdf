@@ -8,11 +8,17 @@ import {
 	editFont,
 	watchDeleteFont,
 	deleteFont,
+	watchInstallFont,
+	installFont,
+	getFontUsage,
+	watchGetFontUsage,
 } from '../../../../src/assets/js/react/sagas/fontManager';
 import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -22,10 +28,40 @@ import {
 	DELETE_FONT,
 	DELETE_FONT_SUCCESS,
 	DELETE_FONT_ERROR,
+	INSTALL_FONT,
+	INSTALL_FONT_SUCCESS,
+	INSTALL_FONT_ERROR,
 } from '../../../../src/assets/js/react/actions/fontManager';
 import * as api from '../../../../src/assets/js/react/api/fontManager';
 
 describe('Sagas - fontManager.js', () => {
+	describe('Font usage', () => {
+		test('loads once the font list has loaded', () => {
+			expect(watchGetFontUsage().next().value).toEqual(
+				takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, getFontUsage)
+			);
+		});
+
+		test('passes on the reasons, or an error', () => {
+			const gen = getFontUsage();
+
+			expect(gen.next().value).toEqual(call(api.apiGetFontUsage));
+			expect(gen.next({ ok: true, body: { a: ['b'] } }).value).toEqual(
+				put({ type: GET_FONT_USAGE_SUCCESS, payload: { a: ['b'] } })
+			);
+
+			const failed = getFontUsage();
+			failed.next();
+			expect(failed.next({ ok: false }).value).toEqual(
+				put({
+					type: GET_FONT_USAGE_ERROR,
+					payload:
+						'A problem occurred. Reload the page and try again.',
+				})
+			);
+		});
+	});
+
 	describe('Watcher saga - watchGetCustomFontList()', () => {
 		const gen = watchGetCustomFontList();
 
@@ -275,11 +311,13 @@ describe('Sagas - fontManager.js', () => {
 			ok: true,
 			body: {},
 		};
-		const data = { payload: {} };
+		const data = { payload: {}, fontType: 'core' };
 		const gen = deleteFont(data);
 
 		test('should check that saga call the API apiDeleteFont', () => {
-			expect(gen.next().value).toEqual(call(api.apiDeleteFont, {}));
+			expect(gen.next().value).toEqual(
+				call(api.apiDeleteFont, {}, 'core')
+			);
 
 			expect(gen.next(response).value).toEqual(
 				put({
@@ -296,6 +334,60 @@ describe('Sagas - fontManager.js', () => {
 					payload:
 						'A problem occurred. Reload the page and try again.',
 				})
+			);
+		});
+
+		test("should show the server's reason when the delete is refused", () => {
+			const refused = deleteFont({ payload: 'brand' });
+			refused.next();
+
+			expect(
+				refused.throw({
+					status: 409,
+					body: { message: 'The font is in use' },
+				}).value
+			).toEqual(
+				put({
+					type: DELETE_FONT_ERROR,
+					payload: 'The font is in use',
+				})
+			);
+		});
+	});
+
+	describe('Installing a font', () => {
+		test('runs on each request', () => {
+			expect(watchInstallFont().next().value).toEqual(
+				takeLatest(INSTALL_FONT, installFont)
+			);
+		});
+
+		test('passes on the font row', () => {
+			const gen = installFont({ payload: 'garuda' });
+			const font = { id: 'garuda', type: 'core' };
+
+			expect(gen.next().value).toEqual(
+				call(api.apiInstallFont, 'garuda')
+			);
+			expect(gen.next({ ok: true, body: font }).value).toEqual(
+				put({ type: INSTALL_FONT_SUCCESS, payload: font })
+			);
+		});
+
+		test('shows the server reason, or a general error', () => {
+			const fail = (response) => {
+				const gen = installFont({ payload: 'garuda' });
+
+				gen.next();
+
+				return gen.next(response).value;
+			};
+
+			expect(fail({ ok: false, body: { message: 'No' } })).toEqual(
+				put({ type: INSTALL_FONT_ERROR, payload: 'No' })
+			);
+			expect(fail({ ok: false, body: {} })).toEqual(
+				put({ type: INSTALL_FONT_ERROR, payload: GFPDF.addFatalError })
 			);
 		});
 	});

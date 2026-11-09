@@ -4,6 +4,11 @@ import PropTypes from 'prop-types';
 /* Components */
 import FontVariant from './FontVariant';
 import AddUpdateFontFooter from './AddUpdateFontFooter';
+import FontPreview from './FontPreview';
+import FontStatus from './FontStatus';
+import FontUsage from './FontUsage';
+/* Utilities */
+import { getStyleCount } from '../../utilities/FontManager/fontManagerReducer';
 
 /**
  * @package			Gravity PDF
@@ -18,11 +23,12 @@ import AddUpdateFontFooter from './AddUpdateFontFooter';
  * @param { Object }   props
  * @param { string }   props.id
  * @param { string }   props.label
+ * @param { Object }   props.font
+ * @param { boolean }  props.show
  * @param { Function } props.onHandleInputChange
  * @param { Function } props.onHandleUpload
  * @param { Function } props.onHandleDeleteFontStyle
  * @param { Function } props.onHandleCancelEditFont
- * @param { Function } props.onHandleCancelEditFontKeypress
  * @param { Function } props.onHandleSubmit
  * @param { Object }   props.fontStyles
  * @param { boolean }  props.validateLabel
@@ -30,9 +36,6 @@ import AddUpdateFontFooter from './AddUpdateFontFooter';
  * @param { boolean }  props.disableUpdateButton
  * @param { Object }   props.msg
  * @param { boolean }  props.loading
- * @param { string }   props.tabIndexFontName
- * @param { string }   props.tabIndexFontFiles
- * @param { string }   props.tabIndexFooterButtons
  *
  * @return { JSX } UpdateFont Component
  *
@@ -44,8 +47,8 @@ export const UpdateFont = ({
 	onHandleInputChange,
 	onHandleUpload,
 	onHandleDeleteFontStyle,
+	font,
 	onHandleCancelEditFont,
-	onHandleCancelEditFontKeypress,
 	onHandleSubmit,
 	fontStyles,
 	validateLabel,
@@ -53,14 +56,28 @@ export const UpdateFont = ({
 	disableUpdateButton,
 	msg,
 	loading,
-	tabIndexFontName,
-	tabIndexFontFiles,
-	tabIndexFooterButtons,
 }) => {
 	return (
-		<div data-test="component-UpdateFont" className="update-font">
-			<form name="component-PDF-UpdateFont" onSubmit={onHandleSubmit}>
-				<h2>{GFPDF.fontManagerUpdateTitle}</h2>
+		<div
+			data-test="component-UpdateFont"
+			className={'update-font' + (font ? ' show' : '')}
+		>
+			<form
+				id="gfpdf-update-font-form"
+				name="component-PDF-UpdateFont"
+				onSubmit={onHandleSubmit}
+			>
+				<div className="font-detail-header">
+					<h2>{GFPDF.fontManagerUpdateTitle}</h2>
+					{id && <FontStatus id={id} />}
+				</div>
+
+				{font && (
+					<div className="font-eyebrow">
+						<span>{getStyleCount(font)}</span>
+						<span>{font.size_label}</span>
+					</div>
+				)}
 
 				<p>{GFPDF.fontManagerUpdateDesc}</p>
 
@@ -74,10 +91,6 @@ export const UpdateFont = ({
 					</span>
 				</label>
 
-				<p id="gfpdf-font-name-desc-update">
-					{GFPDF.fontManagerFontNameDesc}
-				</p>
-
 				<input
 					type="text"
 					id="gfpdf-update-font-name-input"
@@ -86,11 +99,15 @@ export const UpdateFont = ({
 					}
 					aria-describedby="gfpdf-font-name-desc-update"
 					name="label"
+					placeholder={GFPDF.fontManagerFontNamePlaceholder}
 					value={label}
 					maxLength="60"
 					onChange={(e) => onHandleInputChange(e, 'updateFont')}
-					tabIndex={tabIndexFontName}
 				/>
+
+				<p id="gfpdf-font-name-desc-update" className="font-field-help">
+					{GFPDF.fontManagerFontNameDesc}
+				</p>
 
 				<div aria-live="polite">
 					{!validateLabel && (
@@ -116,23 +133,21 @@ export const UpdateFont = ({
 					onHandleUpload={onHandleUpload}
 					onHandleDeleteFontStyle={onHandleDeleteFontStyle}
 					msg={msg}
-					tabIndex={tabIndexFontFiles}
-				/>
-
-				<AddUpdateFontFooter
-					type="update"
-					id={id}
-					label={label}
-					disabled={disableUpdateButton}
-					onHandleCancelEditFont={onHandleCancelEditFont}
-					onHandleCancelEditFontKeypress={
-						onHandleCancelEditFontKeypress
-					}
-					msg={msg}
-					loading={loading}
-					tabIndex={tabIndexFooterButtons}
 				/>
 			</form>
+
+			{font && <FontUsage id={font.id} />}
+			{font && <FontPreview font={font} />}
+
+			<AddUpdateFontFooter
+				type="update"
+				id={id}
+				formId="gfpdf-update-font-form"
+				disabled={disableUpdateButton}
+				onHandleCancelEditFont={onHandleCancelEditFont}
+				msg={msg}
+				loading={loading}
+			/>
 		</div>
 	);
 };
@@ -145,11 +160,11 @@ export const UpdateFont = ({
 UpdateFont.propTypes = {
 	id: PropTypes.string,
 	label: PropTypes.string.isRequired,
+	font: PropTypes.object,
 	onHandleInputChange: PropTypes.func.isRequired,
 	onHandleUpload: PropTypes.func.isRequired,
 	onHandleDeleteFontStyle: PropTypes.func.isRequired,
 	onHandleCancelEditFont: PropTypes.func.isRequired,
-	onHandleCancelEditFontKeypress: PropTypes.func.isRequired,
 	onHandleSubmit: PropTypes.func.isRequired,
 	validateLabel: PropTypes.bool.isRequired,
 	validateRegular: PropTypes.bool.isRequired,
@@ -157,9 +172,6 @@ UpdateFont.propTypes = {
 	fontStyles: PropTypes.object.isRequired,
 	msg: PropTypes.object.isRequired,
 	loading: PropTypes.bool.isRequired,
-	tabIndexFontName: PropTypes.string.isRequired,
-	tabIndexFontFiles: PropTypes.string.isRequired,
-	tabIndexFooterButtons: PropTypes.string.isRequired,
 };
 
 export default UpdateFont;

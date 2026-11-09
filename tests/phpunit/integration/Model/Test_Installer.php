@@ -323,6 +323,22 @@ class Test_Installer extends TestCase {
 		$this->model->setup_template_location();
 	}
 
+	public function test_the_font_url_is_only_known_for_the_default_folder() {
+		global $gfpdf;
+
+		add_filter( 'gfpdf_template_location_uri', fn() => 'https://cdn.test/pdf/' );
+		$this->model->setup_template_location();
+		$this->assertSame( 'https://cdn.test/pdf/fonts/', $gfpdf->data->template_font_location_url );
+
+		add_filter( 'gfpdf_font_location', fn() => '/var/private/fonts/' );
+		$this->model->setup_template_location();
+		$this->assertNull( $gfpdf->data->template_font_location_url );
+
+		remove_all_filters( 'gfpdf_template_location_uri' );
+		remove_all_filters( 'gfpdf_font_location' );
+		$this->model->setup_template_location();
+	}
+
 	/**
 	 * Check our rewrite rules get registered correctly
 	 *

@@ -20,25 +20,15 @@ const FontListSkeleton = () => {
 		<div
 			data-test="component-FontListSkeleton"
 			className="font-list-items-skeleton"
+			aria-hidden="true"
 		>
 			{fontList.map((font) => (
 				<div key={font} className="font-list-item">
-					<div>
-						<span className="placeholder dashicons dashicons-trash" />
-					</div>
-					<span className="placeholder font-name" />
-					<div>
-						<span className="placeholder dashicons dashicons-yes" />
-					</div>
-					<div>
-						<span className="placeholder dashicons dashicons-no-alt" />
-					</div>
-					<div>
-						<span className="placeholder dashicons dashicons-no-alt" />
-					</div>
-					<div>
-						<span className="placeholder dashicons dashicons-no-alt" />
-					</div>
+					<span className="placeholder font-swatch" />
+					<span className="font-meta">
+						<span className="placeholder font-name" />
+						<span className="placeholder font-sub" />
+					</span>
 				</div>
 			))}
 		</div>

@@ -35,6 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string  $template_location               The current path to the PDF working directory
  * @property string  $template_location_url           The current URL to the PDF working directory
  * @property string  $template_font_location          The current path to the PDF font directory
+ * @property string|null $template_font_location_url  The default PDF font directory's URL, or null when it's been moved
  * @property string  $template_tmp_location           The current path to the PDF tmp location
  * @property string  $mpdf_tmp_location               The current path to the mPDF tmp directory (mPDF's tempDir)
  * @property string  $multisite_template_location     The current path to the multisite PDF working directory
@@ -304,33 +305,82 @@ class Helper_Data {
 
 				/* Font Manager */
 				'fontManagerTitle'                     => esc_html__( 'Font Manager', 'gravity-pdf' ),
-				'fontManagerSearchPlaceHolder'         => esc_html__( 'Search installed fonts', 'gravity-pdf' ),
-				'fontListInstalledFonts'               => esc_html__( 'Installed Fonts', 'gravity-pdf' ),
+				'fontManagerSearchPlaceHolder'         => esc_html__( 'Search fonts', 'gravity-pdf' ),
+				'fontListSize'                         => esc_html__( 'Size', 'gravity-pdf' ),
+				'fontListInUse'                        => esc_html__( 'In use', 'gravity-pdf' ),
+				'fontListNotInUse'                     => esc_html__( 'Not in use', 'gravity-pdf' ),
+				'fontManagerDeleteTitle'               => esc_html__( 'Delete font?', 'gravity-pdf' ),
+				/* translators: %s: the font name */
+				'fontManagerFontDeleted'               => esc_html__( '%s deleted.', 'gravity-pdf' ),
+				'fontManagerCoreHint'                  => esc_html__( 'Downloaded when a PDF needs them. A deleted font downloads again if it\'s needed.', 'gravity-pdf' ),
+				'fontManagerCoreHintOffline'           => esc_html__( 'Font downloads are turned off, so a deleted font won\'t come back on its own.', 'gravity-pdf' ),
+				'fontManagerOpensNewTab'               => esc_html__( '(opens in a new tab)', 'gravity-pdf' ),
+				'fontsUrl'                             => $this->template_font_location_url ?? (string) \GPDFAPI::get_misc_class()->convert_path_to_url( $this->template_font_location ?? '' ),
+				/* translators: %d: the number of fonts */
+				'fontManagerFontInstalled'             => esc_html__( '%d font installed', 'gravity-pdf' ),
+				/* translators: %d: the number of fonts */
+				'fontManagerFontsInstalled'            => esc_html__( '%d fonts installed', 'gravity-pdf' ),
+				'fontManagerAddNew'                    => esc_html__( '+ Add new font', 'gravity-pdf' ),
+				/* translators: %d: the number of styles */
+				'fontManagerStyle'                     => esc_html__( '%d style', 'gravity-pdf' ),
+				/* translators: %d: the number of styles */
+				'fontManagerStyles'                    => esc_html__( '%d styles', 'gravity-pdf' ),
+				'fontManagerSetActive'                 => esc_html__( 'Set as active', 'gravity-pdf' ),
+				'fontManagerBundledWith'               => esc_html__( 'Bundled with Gravity PDF', 'gravity-pdf' ),
+				'fontManagerBundledDesc'               => esc_html__( 'Included with Gravity PDF, so it can\'t be deleted.', 'gravity-pdf' ),
+				'fontManagerTemplateUse'               => esc_html__( 'Template use:', 'gravity-pdf' ),
+				'fontManagerPreview'                   => esc_html__( 'Preview', 'gravity-pdf' ),
+				'fontManagerPreviewStyle'              => esc_html__( 'Style to preview', 'gravity-pdf' ),
+				'fontManagerPreviewAll'                => esc_html__( 'Show all', 'gravity-pdf' ),
+				'fontManagerPreviewUnsupported'        => esc_html__( 'Browsers can\'t display this font file, so it can\'t be previewed.', 'gravity-pdf' ),
+				'fontManagerPreviewFailed'             => esc_html__( 'Couldn\'t load this style', 'gravity-pdf' ),
+				'fontManagerPreviewLoad'               => esc_html__( 'Load preview', 'gravity-pdf' ),
+				'fontManagerPreviewUnavailable'        => esc_html__( 'Previews aren\'t available because the fonts folder has no web address.', 'gravity-pdf' ),
+				'fontManagerSampleText'                => esc_html__( 'Sample text', 'gravity-pdf' ),
+				'fontManagerPreviewText'               => esc_html__( 'Sphinx of black quartz, judge my vow', 'gravity-pdf' ),
+				'fontManagerPreviewUnit'               => esc_html__( 'pt', 'gravity-pdf' ),
+				'fontManagerFontNamePlaceholder'       => esc_html__( 'e.g. Helvetica Neue, Roboto Slab, Source Sans 3', 'gravity-pdf' ),
+				'fontManagerNoFile'                    => esc_html__( 'No .ttf file added', 'gravity-pdf' ),
+				'fontManagerDropFile'                  => esc_html__( 'Drop .ttf to upload', 'gravity-pdf' ),
+				'fontManagerUpload'                    => esc_html__( '+ Upload', 'gravity-pdf' ),
+				'fontManagerReplace'                   => esc_html__( 'Replace', 'gravity-pdf' ),
+				/* translators: %s: the font style, e.g. Bold */
+				'fontManagerDeleteStyle'               => esc_html__( 'Delete %s', 'gravity-pdf' ),
 				'fontUserDefinedGroup'                 => esc_html__( 'User-Defined Fonts', 'gravity-pdf' ),
 				'fontListRegular'                      => esc_html__( 'Regular', 'gravity-pdf' ),
-				'fontListItalics'                      => esc_html__( 'Italics', 'gravity-pdf' ),
+				'fontListItalics'                      => esc_html__( 'Italic', 'gravity-pdf' ),
 				'fontListBold'                         => esc_html__( 'Bold', 'gravity-pdf' ),
-				'fontListBoldItalics'                  => esc_html__( 'Bold Italics', 'gravity-pdf' ),
-				'fontManagerAddTitle'                  => esc_html__( 'Add Font', 'gravity-pdf' ),
+				'fontListBoldItalics'                  => esc_html__( 'Bold Italic', 'gravity-pdf' ),
+				'fontManagerAddTitle'                  => esc_html__( 'Add font', 'gravity-pdf' ),
 				'fontManagerUpdateTitle'               => esc_html__( 'Update Font', 'gravity-pdf' ),
-				'fontManagerAddDesc'                   => esc_html__( 'Install new fonts for use in your PDF documents.', 'gravity-pdf' ),
 				'fontManagerUpdateDesc'                => esc_html__( 'Once saved, PDFs configured to use this font will have your changes applied automatically for newly-generated documents.', 'gravity-pdf' ),
-				'fontManagerFontNameLabel'             => esc_html__( 'Font Name', 'gravity-pdf' ),
+				'fontManagerFontNameLabel'             => esc_html__( 'Font name', 'gravity-pdf' ),
 				'fontManagerRequiredLabel'             => esc_html__( '(required)', 'gravity-pdf' ),
-				'fontManagerFontNameDesc'              => esc_html__( 'The font name can only contain letters, numbers and spaces.', 'gravity-pdf' ),
+				'fontManagerFontNameDesc'              => esc_html__( 'Letters, numbers, and spaces only', 'gravity-pdf' ),
 				'fontManagerFontNameValidationError'   => esc_html__( 'Please choose a name contains letters and/or numbers (and a space if you want it).', 'gravity-pdf' ),
-				'fontManagerFontFilesLabel'            => esc_html__( 'Font Files', 'gravity-pdf' ),
-				'fontManagerFontFilesDesc'             => esc_html__( 'Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.', 'gravity-pdf' ),
+				'fontManagerFontFilesLabel'            => esc_html__( 'Font files', 'gravity-pdf' ),
+				'fontManagerFontFilesDesc'             => esc_html__( 'Add a .ttf file for each style you want to use in your PDFs. Regular is required; Italic, Bold, and Bold Italic are optional and only used when your templates need them.', 'gravity-pdf' ),
 				'fontManagerFontFileRequiredRegular'   => esc_html__( 'Add a .ttf font file.', 'gravity-pdf' ),
 				'fontManagerTemplateTooltipLabel'      => esc_html__( 'View template usage', 'gravity-pdf' ),
-				'fontManagerCancelButtonText'          => esc_html__( '← Cancel', 'gravity-pdf' ),
 				'fontManagerDeleteFontConfirmation'    => esc_html__( 'Are you sure you want to delete this font?', 'gravity-pdf' ),
 				/* translators: 1: Opening <a> tag (custom template link), 2: Opening <a> tag (font setting link), 3: Closing </a> tag */
 				'fontManagerTemplateTooltipDesc'       => esc_html__( 'Add this snippet %1$sin a custom template%3$s to selectively set the font on blocks of text. If you want to apply the font to the entire PDF, %2$suse the Font setting%3$s when configuring the PDF on the form.', 'gravity-pdf' ),
-				'fontManagerAddFontAriaLabel'          => esc_html__( 'Add font', 'gravity-pdf' ),
 				'fontManagerUpdateFontAriaLabel'       => esc_html__( 'Update font', 'gravity-pdf' ),
-				'fontManagerSelectFontAriaLabel'       => esc_html__( 'Select font', 'gravity-pdf' ),
 				'fontManagerDeleteFontAriaLabel'       => esc_html__( 'Delete font', 'gravity-pdf' ),
+				'fontManagerTypeCustom'                => esc_html__( 'Custom', 'gravity-pdf' ),
+				'fontManagerTypeCore'                  => esc_html__( 'Core', 'gravity-pdf' ),
+				'fontManagerLanguages'                 => esc_html__( 'Languages and scripts', 'gravity-pdf' ),
+				'fontManagerTypeAvailable'             => esc_html__( 'Available to install', 'gravity-pdf' ),
+				'fontManagerInstall'                   => esc_html__( 'Install', 'gravity-pdf' ),
+				'fontManagerAvailableHint'             => esc_html__( 'Downloaded when a PDF needs it, or install it now to have it ready.', 'gravity-pdf' ),
+				/* translators: %s: the font name */
+				'fontManagerFontJustInstalled'         => esc_html__( '%s installed.', 'gravity-pdf' ),
+				'fontManagerTypeBundled'               => esc_html__( 'Bundled', 'gravity-pdf' ),
+				'fontManagerNetworkOnly'               => esc_html__( 'Only a network administrator can install or delete core fonts, as every site in the network shares them.', 'gravity-pdf' ),
+				/* translators: %s: the font name */
+				'fontManagerCoreConfirm'               => esc_html__( 'Delete %s? It downloads again when a PDF needs it.', 'gravity-pdf' ),
+				/* translators: %s: the font name */
+				'fontManagerCoreConfirmOffline'        => esc_html__( 'Delete %s? Font downloads are turned off, so it won\'t come back on its own: copy its files into the fonts folder again to restore it.', 'gravity-pdf' ),
 
 				/* Font Manager API response */
 				'fontListEmpty'                        => esc_html__( 'Font list empty.', 'gravity-pdf' ),

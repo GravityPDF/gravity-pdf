@@ -18,6 +18,8 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
+use GFPDF\Model\Model_Font_Downloader;
+use GFPDF\Model\Model_Required_Fonts;
 use GFPDF\Statics\Upload_Size;
 use GFPDF_Vendor\GravityPdf\Upload\ErrorCode;
 use GFPDF_Vendor\GravityPdf\Upload\Exception as UploadException;
@@ -113,8 +115,17 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			[
 				[
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_all_items' ],
+					'callback'            => [ $this, 'get_scoped_items' ],
 					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'args'                => [
+						'scope' => [
+							'description'       => __( 'Which to return: custom fonts, every font the Font Manager lists, or why fonts are in use', 'gravity-pdf' ),
+							'type'              => 'string',
+							'enum'              => [ 'custom', 'all', 'usage' ],
+							'default'           => 'custom',
+							'validate_callback' => 'rest_validate_request_arg',
+						],
+					],
 				],
 
 				[
@@ -138,18 +149,25 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			'/fonts/(?P<id>[a-z0-9\-]+)',
 			[
 				'args' => [
-					'id' => [
+					'id'    => [
 						'description'       => __( 'Unique identifier for the object.', 'default' ),
 						'type'              => 'string',
 						'validate_callback' => [ $this->model, 'check_font_id_valid' ],
 						'required'          => true,
 					],
+					'scope' => [
+						'description'       => __( 'Whether the ID is a custom font or a downloadable core font. POST installs a core font.', 'gravity-pdf' ),
+						'type'              => 'string',
+						'enum'              => [ 'custom', 'core' ],
+						'default'           => 'custom',
+						'validate_callback' => 'rest_validate_request_arg',
+					],
 				],
 
 				[
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'update_item' ],
-					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'callback'            => [ $this, 'update_or_install_item' ],
+					'permission_callback' => Closure::fromCallable( [ $this, 'check_item_permissions' ] ),
 					'args'                => [
 						'label'       => [
 							'description'       => __( 'The font label used for the object', 'gravity-pdf' ),
@@ -185,8 +203,8 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 				[
 					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => [ $this, 'delete_item' ],
-					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'callback'            => [ $this, 'delete_scoped_item' ],
+					'permission_callback' => Closure::fromCallable( [ $this, 'check_item_permissions' ] ),
 				],
 			]
 		);
@@ -208,6 +226,44 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 */
 	public function get_all_items(): array {
 		return array_values( $this->model->get_custom_fonts() );
+	}
+
+	/**
+	 * The fonts route's `scope`. Usage is separate from the list as it walks every form, and on Multisite every site.
+	 *
+	 * @return array|object|WP_Error Usage is an object, so none in use is still a JSON map
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_scoped_items( WP_REST_Request $request ) {
+		$scope = $request->get_param( 'scope' );
+		if ( $scope === 'custom' ) {
+			return $this->get_all_items();
+		}
+
+		$downloader = $this->get_downloader();
+		if ( ! $downloader instanceof Model_Font_Downloader ) {
+			return $downloader;
+		}
+
+		return $scope === 'all' ? $downloader->get_installed_fonts() : (object) $downloader->get_font_usage();
+	}
+
+	/**
+	 * The font route's POST: an update, or with the `core` scope an install
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 6.19.0
+	 */
+	public function update_or_install_item( WP_REST_Request $request ) {
+		if ( $request->get_param( 'scope' ) !== 'core' ) {
+			return $this->update_item( $request );
+		}
+
+		$downloader = $this->get_downloader();
+
+		return $downloader instanceof Model_Font_Downloader ? $downloader->install_font( (string) $request->get_param( 'id' ) ) : $downloader;
 	}
 
 	/**
@@ -258,7 +314,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			FlushCache::flush( $font['id'] );
 
-			return $font;
+			return $this->get_font_row( $font );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -377,7 +433,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			FlushCache::flush( $font['id'] );
 
-			return $font;
+			return $this->get_font_row( $font );
 		} catch ( UploadException $e ) {
 			$message = $e->getMessage()[0] === '{' ? json_decode( $e->getMessage(), true ) : $e->getMessage();
 			return new WP_Error( 'font_validation_error', $message, [ 'status' => 400 ] );
@@ -400,6 +456,86 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			/* Don't leave the uploaded files behind when the font isn't saved */
 			array_map( [ $this, 'delete_font_file' ], $uncommitted_files );
 		}
+	}
+
+	/**
+	 * A saved font as the Font Manager lists it
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_font_row( array $font ): array {
+		$downloader = $this->get_downloader();
+
+		return $downloader instanceof Model_Font_Downloader ? $downloader->get_custom_font_row( $font ) : $font;
+	}
+
+	/**
+	 * The downloader, unless an add-on has unhooked it
+	 *
+	 * @return Model_Font_Downloader|WP_Error
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloader() {
+		$downloader = GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+
+		return $downloader instanceof Model_Font_Downloader ? $downloader : new WP_Error( 'invalid_model', '', [ 'status' => 500 ] );
+	}
+
+	/**
+	 * Changing a core font also needs the rights over the fonts folder a Multisite shares
+	 *
+	 * @since 6.19.0
+	 */
+	protected function check_item_permissions( WP_REST_Request $request ): bool {
+		if ( ! $this->check_permissions() ) {
+			return false;
+		}
+
+		if ( $request->get_param( 'scope' ) !== 'core' ) {
+			return true;
+		}
+
+		$downloader = $this->get_downloader();
+
+		return $downloader instanceof Model_Font_Downloader && $downloader->can_change_core_fonts();
+	}
+
+	/**
+	 * The font route's DELETE: of a custom font, or with the `core` scope a core font
+	 *
+	 * @return array|void|WP_Error
+	 *
+	 * @since 6.19.0
+	 */
+	public function delete_scoped_item( WP_REST_Request $request ) {
+		if ( $request->get_param( 'scope' ) !== 'core' ) {
+			return $this->delete_unused_item( $request );
+		}
+
+		$downloader = $this->get_downloader();
+
+		return $downloader instanceof Model_Font_Downloader ? $downloader->delete_downloaded_font( (string) $request->get_param( 'id' ) ) : $downloader;
+	}
+
+	/**
+	 * Delete a custom font, refusing one in use. delete_item() doesn't, as the upgrade to 6.19 removes records whose fonts a
+	 * source now serves, which stay in use.
+	 *
+	 * @return void|WP_Error
+	 *
+	 * @since 6.19.0
+	 */
+	public function delete_unused_item( WP_REST_Request $request ) {
+		$id = $request->get_param( 'id' );
+
+		$required_fonts = GPDFAPI::get_mvc_class( 'Model_Required_Fonts' );
+
+		if ( $this->model->matches_custom_font_id( $id ) && $required_fonts instanceof Model_Required_Fonts && $required_fonts->is_font_in_use( $id ) ) {
+			return new WP_Error( 'font_in_use', __( 'The font is in use, so it can\'t be deleted.', 'gravity-pdf' ), [ 'status' => 409 ] );
+		}
+
+		return $this->delete_item( $request );
 	}
 
 	/**

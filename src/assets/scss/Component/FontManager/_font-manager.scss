@@ -14,37 +14,266 @@
   #font-manager-overlay {
     .font-manager {
       overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07);
+      /* Anchors the delete dialog's scrim to the whole modal */
+      contain: layout;
+
+      .theme-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-sizing: border-box;
+        height: 4rem;
+        padding-inline: 1.5rem 1.25rem;
+        border-bottom: 1px solid base.$neutral-border-subtle;
+
+        h1 {
+          margin: 0;
+          padding: 0;
+          color: base.$neutral-text;
+          font-size: 1.125rem;
+          font-weight: 600;
+          letter-spacing: -0.01em;
+          line-height: 1.3;
+        }
+
+        .close {
+          position: static;
+          flex: none;
+          width: 2.25rem;
+          height: 2.25rem;
+          margin-inline-start: auto;
+          padding: 0;
+          border: 0;
+          border-radius: 2px;
+          color: base.$neutral-text;
+          transition: background-color 0.12s ease;
+
+          &:hover {
+            background-color: base.$neutral-hover;
+            color: base.$neutral-text;
+          }
+
+          &:focus-visible {
+            outline: 2px solid base.$primary-color;
+            outline-offset: 2px;
+            box-shadow: none;
+          }
+
+          /* A thin outline cross in place of the dashicon glyph */
+          &::before {
+            content: '';
+            display: block;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin: auto;
+            background-color: currentcolor;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center / contain no-repeat;
+          }
+        }
+      }
+
+      .font-count {
+        float: none;
+        padding: 0;
+        color: base.$neutral-muted;
+        font-size: 0.8125rem;
+        line-height: 1.4;
+      }
 
       .theme-about {
         background-color: #ffffff;
+        top: 4rem;
         bottom: 0;
-        padding: 2% 4% 0% 4%;
+        padding: 0;
       }
 
       #gfpdf-font-manager-container {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
+        /* Sidebar and detail scroll on their own */
+        grid-template-columns: 20rem minmax(0, 1fr);
+        /* One row as tall as the modal, so a long pane scrolls instead of being cut off */
+        grid-template-rows: minmax(0, 1fr);
+        gap: 0;
+        padding: 0;
+        overflow: hidden;
         color: base.$default-text-color;
 
+        .font-search {
+          position: relative;
+
+          .font-icon {
+            position: absolute;
+            inset-block: 0;
+            inset-inline-start: 0.625rem;
+            width: 1.125rem;
+            height: 100%;
+            color: base.$neutral-muted;
+            pointer-events: none;
+          }
+        }
+
         .wp-filter-search {
-          width: 60%;
+          box-sizing: border-box;
+          float: none;
+          width: 100%;
+          min-height: 2.25rem;
+          margin: 0;
+          padding-block: 0;
+          padding-inline: 2.125rem 0.75rem;
+          border-radius: 2px;
+          font-size: 0.8125rem;
+        }
+
+        /* Secondary buttons are neutral; only the primary action takes the accent */
+        .button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.375rem;
+          box-sizing: border-box;
+          min-height: 2.25rem;
+          margin: 0;
+          padding: 0 0.875rem;
+          border: 1px solid base.$neutral-border;
+          border-radius: 2px;
+          background: #ffffff;
+          color: base.$neutral-text;
+          font-size: 0.8125rem;
+          font-weight: 500;
+          line-height: 1;
+          white-space: nowrap;
+          cursor: pointer;
+
+          &:hover:not(:disabled):not([aria-disabled="true"]) {
+            border-color: #cccccc;
+            background: base.$neutral-hover;
+            color: base.$neutral-text;
+          }
+
+          &:focus-visible {
+            outline: 2px solid base.$primary-color;
+            outline-offset: 2px;
+            box-shadow: none;
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+
+          .font-icon {
+            width: 1.125rem;
+            height: 1.125rem;
+          }
+
+          &.primary,
+          &.primary:disabled {
+            border-color: base.$link-color;
+            background: base.$link-color;
+            color: #ffffff;
+          }
+
+          &.primary:hover:not(:disabled) {
+            border-color: base.$link-hover-color;
+            background: base.$link-hover-color;
+            color: #ffffff;
+          }
         }
 
         .input-label-validation-error {
           border-color: base.$error-color;
         }
 
-        /* Font list */
+        .font-icon {
+          display: block;
+          flex: none;
+          width: 1.25rem;
+          height: 1.25rem;
+        }
+
+        /* Delete confirmation: a dialog over a scrim covering the whole modal */
+        .font-delete-confirm {
+          position: fixed;
+          inset: 0;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          background: rgba(30, 30, 30, 0.45);
+
+          .font-delete-confirm-dialog {
+            box-sizing: border-box;
+            width: 25rem;
+            max-width: 100%;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07);
+          }
+
+          h3 {
+            margin: 0 0 0.5rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+          }
+
+          p {
+            margin: 0 0 1.25rem;
+            color: base.$highlight-color;
+            font-size: 0.8125rem;
+            line-height: 1.5;
+          }
+
+          .font-delete-confirm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+          }
+
+          .font-delete-confirm-delete {
+            border-color: base.$validation-error-color;
+            background: base.$validation-error-color;
+            color: #ffffff;
+
+            &:hover:not(:disabled) {
+              border-color: base.$validation-error-color;
+              background: base.$validation-error-hover-color;
+              color: #ffffff;
+            }
+          }
+        }
+
+        /* Sidebar */
         .font-list-column {
-          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          min-height: 0;
           background-color: #ffffff;
+          border-inline-end: 1px solid base.$lighter-highlight-color;
+
+          .font-sidebar-top {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-bottom: 1px solid base.$lighter-highlight-color;
+
+            .font-add-new {
+              width: 100%;
+            }
+
+            .notice {
+              margin: 0;
+            }
+          }
 
           .font-list {
-            margin-top: 1rem;
-            overflow: auto;
-            max-height: 600px;
-            box-shadow: 0 1px 1px rgba(0,0,0,.04);
+            flex: 1;
+            overflow-y: auto;
+            padding-block-end: 0.75rem;
 
             .alert-message {
               border: 0;
@@ -72,229 +301,582 @@
               }
             }
 
-            .font-list-header,
-            .font-list-item {
-              display: grid;
-              grid-template-columns: 4fr 1.5fr 1.5fr 1.5fr 2fr 0.75fr;
-              gap: 1rem;
-              padding: 0.325rem 0;
-              text-align: center;
-
-              .font-name {
-                text-align: left;
-                word-break: break-all;
-
-                .select-font-name {
-                  width: 1rem;
-                  height: 1rem;
-                  margin-right: 0.5rem;
-                }
-              }
+            .font-list-selected {
+              padding-block-start: 0.5rem;
             }
 
-            .font-list-header {
+            .font-list-group-title {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.875rem 1rem 0.375rem;
+              color: base.$highlight-color;
+              font-size: 0.6875rem;
               font-weight: 600;
+              letter-spacing: 0.06em;
+              text-transform: uppercase;
+
+              .count {
+                font-weight: 500;
+                letter-spacing: 0;
+              }
             }
 
-            .font-list-items {
-              .font-list-item {
-                border-top: 1px solid base.$lighter-highlight-color;
+            .font-list-item {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+              box-sizing: border-box;
+              width: 100%;
+              padding: 0.5625rem 1rem;
+              border: 0;
+              /* Reserves the open row's accent so opening one doesn't shift it */
+              border-inline-start: 3px solid transparent;
+              background: none;
+              color: inherit;
+              font: inherit;
+              text-align: start;
+              cursor: pointer;
 
-                &:hover {
-                  cursor: pointer;
-                  background: base.$lighter-highlight-color;
-                }
-
-                &.active {
-                  background-color: base.$lighter-highlight-color;
-                }
-
-                &:focus {
-                  border: 1px dotted base.$highlight-color;
-                }
+              &:hover {
+                background: base.$neutral-hover;
               }
 
-              /* Icons */
-              .dashicons-trash {
-                color: base.$highlight-color;
-                text-align: center;
-                transition: color 0.25s ease;
-                margin-left: 5px;
+              &:focus-visible {
+                outline: 2px solid base.$primary-color;
+                outline-offset: -2px;
+              }
 
-                &:focus,
-                &:hover {
-                  color: base.$error-color;
+              &.active,
+              &.active:hover {
+                background-color: rgba(base.$primary-color, 0.12);
+                border-inline-start-color: base.$primary-color;
+
+                .font-swatch {
+                  background: #ffffff;
                 }
               }
+            }
 
-              .dashicons-yes,
-              .dashicons-no-alt {
-                font-size: 22px;
+            .font-swatch {
+              display: flex;
+              flex: none;
+              align-items: center;
+              justify-content: center;
+              width: 2.75rem;
+              height: 2.75rem;
+              border: 1px solid base.$neutral-border;
+              border-radius: 4px;
+              background: base.$neutral-hover;
+              color: base.$neutral-text;
+              font-size: 1.25rem;
+              line-height: 1;
+            }
+
+            .font-meta {
+              flex: 1;
+              min-width: 0;
+            }
+
+            .font-name-row {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+            }
+
+            .font-name {
+              flex: 1;
+              min-width: 0;
+              color: base.$neutral-text;
+              font-size: 0.875rem;
+              font-weight: 600;
+              letter-spacing: -0.005em;
+              line-height: 1.4;
+              overflow-wrap: anywhere;
+            }
+
+            .font-active-tag {
+              flex: none;
+              padding: 0.125rem 0.375rem;
+              border: 1px solid base.$primary-color;
+              border-radius: 2px;
+              color: base.$link-color;
+              font-size: 0.625rem;
+              font-weight: 600;
+              letter-spacing: 0.06em;
+              line-height: 1;
+              text-transform: uppercase;
+            }
+
+            .font-list-item.chosen:not(.active) {
+              position: relative;
+
+              /* The font picked in the form carries a short accent bar when it isn't the open row */
+              &::before {
+                content: '';
+                position: absolute;
+                inset-block: 0.5rem;
+                inset-inline-start: -3px;
+                width: 3px;
+                border-start-end-radius: 2px;
+                border-end-end-radius: 2px;
+                background: base.$primary-color;
               }
+            }
 
-              .dashicons-yes {
-                color: base.$success-color;
-              }
+            .font-sub {
+              display: block;
+              color: base.$neutral-muted;
+              font-size: 0.75rem;
+              line-height: 1.5;
+            }
 
-              .dashicons-no-alt {
-                color: base.$highlight-color;
+            .font-lock {
+              color: base.$highlight-color;
+
+              .font-icon {
+                width: 0.875rem;
+                height: 0.875rem;
               }
             }
           }
         }
 
-        /* Add font */
-        .add-update-font-column {
+        /* Detail of a font */
+        .font-detail-header {
           display: flex;
-          position: relative;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 0.375rem;
+
+          .font-set-active {
+            margin-inline-start: auto;
+          }
+        }
+
+        .font-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+          padding: 0.125rem 0.5rem;
+          border-radius: 999px;
+          background: rgba(base.$primary-color, 0.12);
+          color: base.$link-color;
+          font-size: 0.6875rem;
+          font-weight: 500;
+
+          .font-icon {
+            width: 0.75rem;
+            height: 0.75rem;
+          }
+        }
+
+        .font-eyebrow {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.375rem 0;
+          margin-bottom: 1.25rem;
+          color: base.$neutral-muted;
+          font-size: 0.75rem;
+
+          /* A dot between the facts, as in the design */
+          > span + span::before {
+            content: '\2022';
+            margin-inline: 0.625rem;
+            color: base.$neutral-muted;
+          }
+
+          .font-eyebrow-source {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+          }
+
+          .font-icon {
+            width: 0.75rem;
+            height: 0.75rem;
+          }
+
+          code {
+            background: none;
+            font-size: inherit;
+          }
+        }
+
+        .font-detail-desc {
+          margin: 0 0 1.25rem;
+        }
+
+        .font-section {
+          margin-block-start: 1.5rem;
+
+          h3 {
+            margin: 0 0 0.5rem;
+            color: base.$neutral-text;
+            font-size: 0.9375rem;
+            font-weight: 600;
+          }
+
+          p {
+            margin: 0 0 0.25rem;
+          }
+        }
+
+        .font-preview-failed {
+          margin-inline-start: 0.5rem;
+          color: base.$error-color;
+          font-size: 0.75rem;
+        }
+
+        .font-section-head {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem 1rem;
+          margin-bottom: 0.5rem;
+
+          h3 {
+            margin: 0;
+          }
+        }
+
+        .font-usage {
+          .font-unused {
+            color: base.$highlight-color;
+          }
+
+          ul {
+            overflow: auto;
+            max-height: 12rem;
+            margin: 0.25rem 0 0;
+          }
+
+          li {
+            margin: 0 0 0.25rem;
+          }
+
+          a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: base.$link-color;
+            font-weight: 600;
+          }
+
+          .font-icon {
+            width: 0.875rem;
+            height: 0.875rem;
+          }
+
+          .font-pdf-form {
+            margin-inline-start: 0.5rem;
+            color: base.$highlight-color;
+            font-size: 0.75rem;
+          }
+        }
+
+        .font-preview-controls {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.5rem 0.75rem;
+
+          .font-preview-text,
+          .font-preview-style {
+            min-height: 2.25rem;
+            font-size: 0.8125rem;
+          }
+
+          .font-preview-text {
+            width: 13rem;
+          }
+
+          .font-preview-style {
+            width: auto;
+          }
+
+          .font-preview-size {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: base.$highlight-color;
+            font-size: 0.75rem;
+
+            label {
+              margin: 0;
+              font-size: inherit;
+              font-weight: 400;
+            }
+
+            input {
+              width: 7rem;
+              accent-color: base.$primary-color;
+            }
+
+            span {
+              min-width: 2.5rem;
+              font-variant-numeric: tabular-nums;
+            }
+          }
+        }
+
+        .font-preview-box {
+          border: 1px solid base.$neutral-border;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .font-preview-row {
+          display: flex;
+          gap: 1.25rem;
+          padding: 0.875rem 1.25rem;
+          border-top: 1px solid base.$neutral-border-subtle;
+          overflow-wrap: anywhere;
+
+          &:first-child {
+            border-top: 0;
+          }
+
+          .font-preview-label {
+            flex: none;
+            width: 6rem;
+            color: base.$neutral-muted;
+            font-size: 0.75rem;
+          }
+        }
+
+        .font-delete {
+          border-color: base.$validation-error-color;
+          color: base.$validation-error-color;
+
+          &:hover:not([aria-disabled="true"]) {
+            border-color: base.$validation-error-color;
+            background: #fdf0f0;
+            color: base.$validation-error-color;
+          }
+
+          &[aria-disabled="true"] {
+            cursor: not-allowed;
+            opacity: 0.5;
+          }
+        }
+
+        .font-detail-footer {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-block-start: 1.5rem;
+        }
+
+        /* Add / update font: one pane beside the list, the two forms stacked in the same cell and cross-faded */
+        .add-update-font-column {
+          display: grid;
+          align-items: start;
+          box-sizing: border-box;
           width: 100%;
+          min-height: 0;
+          /* No bottom padding: the actions bar sits flush on the pane's edge */
+          --font-pane-gutter: 2.5rem;
+          padding: 2rem var(--font-pane-gutter) 0;
+          overflow-y: auto;
+
+          .add-font,
+          .update-font {
+            grid-area: 1 / 1;
+            width: 100%;
+            background-color: #ffffff;
+            transition: opacity 0.2s ease, visibility 0s;
+          }
+
+          /* Fields keep a readable width in a wide pane; the actions bar spans it */
+          .add-font > :not(.footer),
+          .update-font > :not(.footer),
+          .footer > :not(.buttons-icons-container) {
+            max-width: 48rem;
+          }
+
+          .font-detail {
+            grid-area: 1 / 1;
+            background-color: #ffffff;
+          }
+
+          /* Hidden panels leave the tab order and the accessibility tree */
+          .update-font:not(.show),
+          &:has(.font-detail) .add-font,
+          &:has(.update-font.show) .add-font {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0s 0.2s;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .add-font,
+            .update-font,
+            .update-font:not(.show) {
+              transition: none;
+            }
+          }
 
           #gfpdf-add-font-name-input,
           #gfpdf-update-font-name-input {
             width: 100%;
           }
 
-          .add-font {
-            width: 79%;
-            margin-left: 1px;
-          }
-
-          .update-font {
-            background-color: #ffffff;
-            padding-right: 0.5rem;
-            position: absolute;
-            left: -720px;
-            transition: 0.5s;
-            width: 100%;
-            z-index: -1;
-            width: 80%;
-
-            &.show {
-              left: 0;
-              transition: 0.5s;
-              z-index: 1;
-            }
-          }
-
           h2 {
-            font-size: 1.8em;
-            margin: 0.5rem 0;
-
-            & + p {
-              margin: 0;
-            }
+            margin: 0 0 0.25rem;
+            color: base.$neutral-text;
+            font-size: 1.0625rem;
+            font-weight: 600;
+            letter-spacing: -0.005em;
           }
 
+          /* The name field's label */
           label {
             display: block;
-            margin-top: 1rem;
-            font-size: 1rem;
+            margin-top: 1.25rem;
+            color: base.$neutral-text;
+            font-size: 0.8125rem;
+            font-weight: 500;
+          }
+
+          /* "Font files" is a section heading in the design, with its description beneath */
+          #gfpdf-font-files-label-add,
+          #gfpdf-font-files-label-update {
+            margin-top: 1.75rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.9375rem;
             font-weight: 600;
 
             & + p {
-              margin: 0.325rem 0;
+              margin: 0 0 0.75rem;
+              color: base.$neutral-muted;
+              font-size: 0.8125rem;
+              line-height: 1.5;
             }
           }
 
           .required {
             color: base.$validation-error-color;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+          }
+
+          .font-field-help {
+            margin: 0.375rem 0 0;
+            color: base.$neutral-muted;
+            font-size: 0.75rem;
           }
 
           #gfpdf-font-files-setting {
-            display: grid;
-            grid-template-columns: 50% 50%;
-            grid-template-rows: 1fr 1fr;
-            gap: 1rem;
-            margin: 0.75rem 0;
-            width: 96%;
-
-            a {
-              color: unset;
-
-              &:focus {
-                box-shadow: unset;
-              }
-            }
+            margin: 0;
+            border: 1px solid base.$neutral-border;
+            border-radius: 4px;
+            overflow: hidden;
 
             .drop-zone {
               display: flex;
-              flex-direction: column;
               align-items: center;
-              justify-content: center;
-              border: 5px dashed base.$lighter-highlight-color;
-              height: 160px;
-              transition: all 0.3s ease-out;
+              gap: 1.5rem;
+              min-height: 3.5rem;
+              box-sizing: border-box;
+              padding: 0.875rem 1rem;
+              border-top: 1px solid base.$neutral-border-subtle;
 
-              &:hover,
-              &.active {
-                background-color: base.$lighter-highlight-color;
-                border: 5px solid base.$lighter-highlight-color;
-
-                .dashicons {
-                  background-color: #ffffff;
-                  color: base.$highlight-color;
-                }
+              &:first-child {
+                border-top: 0;
               }
 
-              &:focus {
-                outline: none;
-                border: 5px dashed base.$default-text-color;
+              &.missing {
+                background: #f6f7f7;
+              }
+
+              &.drag-over {
+                background: rgba(base.$primary-color, 0.12);
+                box-shadow: inset 0 0 0 2px base.$primary-color;
+
+                .gfpdf-font-filename {
+                  color: base.$link-color;
+                  font-style: normal;
+                  font-weight: 500;
+                }
               }
 
               &.required {
-                border: 5px dashed base.$error-color;
-
-                .dashicons {
-                  background-color: base.$error-color;
-                  color: #ffffff;
-                }
-
-                &:focus {
-                  border-color: base.$default-text-color;
-                }
+                box-shadow: inset 0 0 0 1px base.$error-color;
               }
 
               &.error {
-                background-color: base.$validation-error-color;
-                border-color: base.$validation-error-color;
-                color: #ffffff;
+                box-shadow: inset 0 0 0 1px base.$validation-error-color;
+
+                .gfpdf-font-filename {
+                  color: base.$validation-error-color;
+                  font-style: normal;
+                  white-space: normal;
+                }
               }
 
               input {
                 display: none;
               }
 
+              .font-variant-label {
+                flex: none;
+                width: 8.75rem;
+                color: base.$neutral-text;
+                font-size: 0.8125rem;
+                font-weight: 500;
+
+                .required {
+                  display: block;
+                  font-size: 0.6875rem;
+                }
+              }
+
               .gfpdf-font-filename {
+                flex: 1;
+                min-width: 0;
                 overflow: hidden;
-                text-align: center;
+                font-size: 0.8125rem;
+                text-overflow: ellipsis;
+                white-space: nowrap;
 
-                &.required {
+                &.empty {
+                  color: base.$neutral-muted;
+                  font-style: italic;
+                }
+
+                .required {
                   color: base.$validation-error-color;
+                  font-size: inherit;
+                  font-style: normal;
                 }
               }
 
-              .dashicons {
-                width: 70px;
-                height: 70px;
-                margin: 0.675rem;
-                background-color: base.$lighter-highlight-color;
-                border-radius: 50%;
-                font-size: 3.2rem;
-                color: base.$highlight-color;
-                cursor: pointer;
+              .font-variant-actions {
+                display: flex;
+                flex: none;
+                align-items: center;
+                gap: 0.375rem;
 
-                &:before {
-                  margin-left: -1px;
-                  vertical-align: middle;
+                .button {
+                  min-height: 2rem;
+                  padding-inline: 0.75rem;
+                  font-size: 0.75rem;
                 }
               }
 
-              .dashicons-trash {
-                font-size: 2.9rem;
+              .font-variant-delete {
+                width: 2rem;
+                padding: 0;
+                color: base.$neutral-muted;
 
-                &:before {
-                  margin-left: 3px;
+                .font-icon {
+                  width: 0.875rem;
+                  height: 0.875rem;
                 }
               }
             }

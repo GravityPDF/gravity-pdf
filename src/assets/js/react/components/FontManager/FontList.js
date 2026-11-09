@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 /* Components */
-import FontListHeader from './FontListHeader';
 import FontListItems from './FontListItems';
 import FontListSkeleton from './FontListSkeleton';
 import FontListAlertMessage from './FontListAlertMessage';
@@ -52,8 +51,6 @@ export const FontList = ({
 			className="font-list"
 			aria-live="polite"
 		>
-			<FontListHeader />
-
 			{loading ? (
 				<FontListSkeleton />
 			) : (
