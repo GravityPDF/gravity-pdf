@@ -47,6 +47,7 @@ composer lint:fix                       # PHPCS auto-fix
 yarn wp-env:e2e start    # Start dedicated E2E environment (port 8702)
 yarn test:e2e            # Run all Playwright tests (headless)
 yarn test:e2e:debug      # Open Playwright UI for interactive debugging
+yarn test:e2e:multisite  # Run tests/playwright/multisite/ on its own Multisite wp-env (port 8704), started by the command
 ```
 
 E2E tests live in `tests/playwright/` and run against a single wp-env instance on port 8702, in one Playwright invocation with every test in parallel (`fullyParallel`, 4 workers). The `setup-core` project (`tools/playwright/global-setup.ts`) logs in and puts the site on `/%postname%/` permalinks, then:

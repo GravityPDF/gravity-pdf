@@ -567,12 +567,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/GravityPDF/mpdf.git",
-                "reference": "e7f7b2a8b37e8c01413235aad7edeca1008efec6"
+                "reference": "0c6322c23111b4395d34fc291a15d71f123b1733"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/e7f7b2a8b37e8c01413235aad7edeca1008efec6",
-                "reference": "e7f7b2a8b37e8c01413235aad7edeca1008efec6",
+                "url": "https://api.github.com/repos/GravityPDF/mpdf/zipball/0c6322c23111b4395d34fc291a15d71f123b1733",
+                "reference": "0c6322c23111b4395d34fc291a15d71f123b1733",
                 "shasum": ""
             },
             "require": {
@@ -600,6 +600,9 @@
                 "ext-xml": "Needed mainly for SVG manipulation",
                 "ext-zlib": "Needed for compression of embedded resources, such as fonts"
             },
+            "bin": [
+                "bin/mpdf-font-ranges"
+            ],
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -631,6 +634,9 @@
                 ],
                 "test": [
                     "@php vendor/bin/phpunit"
+                ],
+                "ranges:update": [
+                    "@php utils/ranges_update.php"
                 ],
                 "coverage": [
                     "@php vendor/bin/phpunit --coverage-text"
@@ -667,7 +673,7 @@
                     "url": "https://www.paypal.me/mpdf"
                 }
             ],
-            "time": "2026-10-26T05:21:29+00:00"
+            "time": "2026-11-05T02:51:00+00:00"
         },
         {
             "name": "mpdf/psr-http-message-shim",

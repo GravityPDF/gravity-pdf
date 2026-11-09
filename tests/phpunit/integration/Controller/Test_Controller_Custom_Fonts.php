@@ -170,6 +170,7 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertSame( 75, $font['useKashida'] );
 		$this->assertStringEndsWith( 'DejaVuSans.ttf', $font['regular'] );
 		$this->assertStringEndsWith( 'DejaVuSans-Bold.ttf', $font['bold'] );
+		$this->assertSame( size_format( filesize( $font['regular'] ) + filesize( $font['bold'] ) + filesize( $font['italics'] ) + filesize( $font['bolditalics'] ), 1 ), $font['size_label'] );
 		$this->assertStringEndsWith( 'DejaVuSansCondensed.ttf', $font['italics'] );
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
 	}
@@ -236,6 +237,39 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertSame( $this->tmp_font_location . 'Font.ttf', $font['regular'] );
 		$this->assertMatchesRegularExpression( '/Font[0-9]{5}\.ttf$/', $font['bold'] );
 		$this->assertFileExists( $font['bold'] );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function test_add_item_does_not_save_under_a_core_fonts_hashed_name() {
+		wp_set_current_user( $this->admin_user );
+
+		$hashed = strtolower( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSansCondensed.ttf' ) );
+
+		$request = $this->new_font_request();
+		$this->set_font_files( $request, [ 'regular' => [ $hashed, self::$test_fonts[0] ] ] );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertFileExists( $font['regular'] );
+		$this->assertFileDoesNotExist( $this->tmp_font_location . $hashed );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function test_add_item_finishes_when_a_taken_names_number_would_make_it_reserved() {
+		wp_set_current_user( $this->admin_user );
+		mkdir( $this->tmp_font_location . 'DejaVuSansCondensed-700.ttf' );
+
+		$request = $this->new_font_request();
+		$this->set_font_files( $request, [ 'regular' => [ 'DejaVuSansCondensed-700.ttf', self::$test_fonts[0] ] ] );
+
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertMatchesRegularExpression( '/DejaVuSansCondensed-700_[0-9]{4}\.ttf$/', $font['regular'] );
+		$this->assertFileExists( $font['regular'] );
 	}
 
 	/**
@@ -615,6 +649,9 @@ class Test_Controller_Custom_Fonts extends TestCase {
 
 		$updated = rest_get_server()->dispatch( $request )->get_data();
 
+		$this->assertArrayHasKey( 'size_label', $updated );
+		$this->assertArrayNotHasKey( 'size_label', $this->model->get_font_by_id( $font['id'] ) );
+
 		$this->assertSame( '', $updated['bold'] );
 		$this->assertNotSame( $font['regular'], $updated['regular'] );
 		$this->assertFileExists( $updated['regular'] );
@@ -788,6 +825,42 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$this->assertSame( 200, $response->get_status() );
 	}
 
+	public function test_delete_item_in_use_is_refused() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_all_file_params( $request );
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', $font['id'] );
+
+		$request  = new WP_REST_Request( 'DELETE', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $font['id'] );
+		$response = rest_get_server()->dispatch( $request );
+
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+
+		$this->assertSame( 409, $response->get_status() );
+		$this->assertSame( 'font_in_use', $response->get_data()['code'] );
+		$this->assertArrayHasKey( $font['id'], $this->model->get_custom_fonts() );
+	}
+
+	public function test_the_public_api_can_delete_a_font_in_use() {
+		wp_set_current_user( $this->admin_user );
+
+		$request = $this->new_font_request();
+		$this->set_all_file_params( $request );
+		$font = rest_get_server()->dispatch( $request )->get_data();
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', $font['id'] );
+
+		$result = GPDFAPI::delete_pdf_font( $font['id'] );
+
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+
+		$this->assertTrue( $result );
+		$this->assertArrayNotHasKey( $font['id'], $this->model->get_custom_fonts() );
+	}
+
 	public function test_delete_item_with_font_reference_gone_success() {
 		wp_set_current_user( $this->admin_user );
 
@@ -869,7 +942,10 @@ class Test_Controller_Custom_Fonts extends TestCase {
 		$request = $this->new_font_request();
 		$this->set_all_file_params( $request );
 
-		return rest_get_server()->dispatch( $request )->get_data();
+		$font = rest_get_server()->dispatch( $request )->get_data();
+		unset( $font['size_label'], $font['file_sizes'], $font['type'], $font['can_delete'] );
+
+		return $font;
 	}
 
 	/* Make the next settings save report a failure */

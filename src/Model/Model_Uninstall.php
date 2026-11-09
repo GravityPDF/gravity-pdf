@@ -118,8 +118,13 @@ class Model_Uninstall extends Helper_Abstract_Model {
 			$this->remove_plugin_form_settings();
 		}
 
+		$this->remove_font_state();
+
 		/* Removes background processes */
 		$this->queue->clear_scheduled_events();
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+		wp_clear_scheduled_hook( Model_Font_Downloader::CLEANUP_EVENT );
+
 		$this->queue->clear_queue( true );
 		$this->queue->unlock_process();
 
@@ -162,8 +167,32 @@ class Model_Uninstall extends Helper_Abstract_Model {
 			delete_transient( substr( $key, strlen( '_transient_' ) ) );
 		}
 
+		delete_transient( Model_Font_Downloader::SYNC_REMAINING );
+
 		$templates = \GPDFAPI::get_templates_class();
 		$templates->flush_template_transient_cache();
+	}
+
+	/**
+	 * Remove the font state every site shares: the failed downloads and their back-offs, the language fonts and the
+	 * 6.19 cleanup's progress
+	 *
+	 * @since 6.19.0
+	 */
+	public function remove_font_state(): void {
+		delete_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES );
+		delete_network_option( get_main_network_id(), Model_Font_Downloader::CLEANUP );
+		delete_site_transient( Model_Font_Sources::LANGUAGE_FONT_KEYS );
+
+		$font_sources = \GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		if ( ! $font_sources instanceof Model_Font_Sources ) {
+			return;
+		}
+
+		/* Only the manifest's files are downloaded, so only they back off */
+		foreach ( array_keys( $font_sources->get_manifest() ) as $file ) {
+			delete_site_transient( Model_Font_Downloader::back_off_key( (string) $file ) );
+		}
 	}
 
 	/**
@@ -198,7 +227,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 
 	/**
 	 * Remove the network options stored in sitemeta on a Multisite: license package caches and the rich text merge
-	 * tags flag
+	 * tags flag.
 	 *
 	 * Every extension keeps its own license cache entry (see EDD_SL_Plugin_Updater::get_network_cache_key()), but all
 	 * are network-scoped rather than per-site, so one pass clears them, and the flag's exact key, without walking the

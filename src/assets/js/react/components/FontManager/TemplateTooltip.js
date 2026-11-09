@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { sprintf } from 'sprintf-js';
-/* Utilities */
-import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight';
+/* Components */
+import Icon from './Icon';
 
 /**
  * @package			Gravity PDF
@@ -40,8 +40,6 @@ export class TemplateTooltip extends Component {
 	 */
 	handleDisplayInfo = () => {
 		this.setState({ tooltip: !this.state.tooltip });
-
-		setTimeout(() => adjustFontListHeight(), 100);
 	};
 
 	/**
@@ -81,16 +79,13 @@ export class TemplateTooltip extends Component {
 				data-test="component-TemplateTooltip"
 				className="msg template-usage-link"
 			>
-				{tooltip ? (
-					<span className="dashicons dashicons-arrow-down-alt2" />
-				) : (
-					<span className="dashicons dashicons-arrow-right-alt2" />
-				)}
 				<button
 					type="button"
 					onClick={this.handleDisplayInfo}
 					className="template-usage-link__button"
+					aria-expanded={tooltip}
 				>
+					<Icon name={tooltip ? 'chevron-down' : 'chevron-right'} />
 					{GFPDF.fontManagerTemplateTooltipLabel}
 				</button>
 

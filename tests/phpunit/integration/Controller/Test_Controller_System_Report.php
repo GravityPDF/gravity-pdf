@@ -8,8 +8,10 @@ use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
+use GFPDF\Tests\Concerns\AccessesPrivateState;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
 use GFPDF\Tests\Concerns\CreatesLegacyTemplates;
+use GFPDF\Tests\Concerns\StubsFontSources;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -28,8 +30,10 @@ use GFPDF\Tests\Integration\TestCase;
  */
 class Test_Controller_System_Report extends TestCase {
 
+	use AccessesPrivateState;
 	use CreatesLegacyDownloadUrls;
 	use CreatesLegacyTemplates;
+	use StubsFontSources;
 
 	public function set_up(): void {
 		parent::set_up();
@@ -79,6 +83,49 @@ class Test_Controller_System_Report extends TestCase {
 
 		$this->assertArrayHasKey( 'user_restrictions', $this->get_report_section( 'security', $system_report ) );
 		$this->assertArrayHasKey( 'logged_out_timeout', $this->get_report_section( 'security', $system_report ) );
+	}
+
+	public function test_system_report_lists_the_required_fonts_installed_and_the_substitution_fonts() {
+		\GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
+		$this->set_languages( [ 'th' ] );
+
+		$directories = $this->report_with_font_sources( $this->stub_font_sources() );
+
+		$this->assertSame( 'core: 0 of 4 required files installed', $directories['core_fonts_installed']['value'] );
+		$this->assertSame( 'Core Fonts installed', $directories['core_fonts_installed']['label_export'] );
+		$this->assertSame( 'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil', $directories['substitution_fonts']['value'] );
+	}
+
+	public function test_system_report_flags_a_missing_core_font_manifest() {
+		$directories = $this->report_with_font_sources( $this->font_sources_without_a_manifest() );
+
+		$this->assertSame( 'core: manifest missing', $directories['core_fonts_installed']['value'] );
+	}
+
+	/**
+	 * The report's directories section, built with the font sources given
+	 */
+	private function report_with_font_sources( \GFPDF\Model\Model_Font_Sources $sources ): array {
+		$report   = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
+		$injected = [
+			'font_sources'   => $sources,
+			'required_fonts' => new \GFPDF\Model\Model_Required_Fonts( $sources, \GPDFAPI::get_options_class(), \GPDFAPI::get_log_class() ),
+		];
+		$original = [];
+
+		/* The registered report was given the shared instances at bootstrap */
+		foreach ( $injected as $name => $model ) {
+			$original[ $name ] = $this->get_private( $report, $name );
+			$this->set_private( $report, $name, $model );
+		}
+
+		try {
+			return $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) );
+		} finally {
+			foreach ( $original as $name => $model ) {
+				$this->set_private( $report, $name, $model );
+			}
+		}
 	}
 
 	public function test_system_report_outdated_template() {
@@ -361,6 +408,19 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertStringContainsString( 'gfpdfe_pdf_filename', $items['deprecated_filters']['value_export'] );
 
 		remove_filter( 'gfpdfe_pdf_filename', $callback );
+	}
+
+	public function test_system_report_tools_tab_hooks() {
+		$this->assertArrayNotHasKey( 'tools_tab_hooks', $this->get_unsupported_features() );
+
+		add_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+		Deprecation::flush_cache();
+
+		$items = $this->get_unsupported_features();
+		$this->assertArrayHasKey( 'tools_tab_hooks', $items );
+		$this->assertSame( 'gfpdf_settings_tools has 1 listener', $items['tools_tab_hooks']['value_export'] );
+
+		remove_filter( 'gfpdf_settings_tools', '__return_empty_array' );
 	}
 
 	/**

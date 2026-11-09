@@ -53,23 +53,21 @@ $addon = static function () {
 
 add_action( 'init', $addon, 20 );
 
-/* The deprecation notices are under test (scoped to the requests asking for them, below), so only the core-font one
-   stays suppressed for E2E runs */
-remove_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
+/* Site-wide state a test needs, scoped to the requests that send the matching `X-GPDF-E2E-*` header, so the specs
+   needing it run in parallel with the rest instead of changing the site under them. Playwright adds the header to
+   every request a page makes, downloads and redirects included */
+$gfpdf_e2e_header = static function ( string $name ): string {
+	return sanitize_key( wp_unslash( $_SERVER[ 'HTTP_X_GPDF_E2E_' . strtoupper( $name ) ] ?? '' ) );
+};
 
-add_filter(
-	'gfpdf_one_time_action_routes',
-	static function ( $routes ) {
-		return array_values(
-			array_filter(
-				$routes,
-				static function ( $route ) {
-					return $route['action'] !== 'install_core_fonts';
-				}
-			)
-		);
-	}
-);
+/* E2E runs render with the fonts on disk, without reaching GitHub or recording failed downloads */
+add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+/* When the requests asking for it gave up on the core font downloads, which are off on this site (see above) */
+$gfpdf_e2e_fonts_gave_up = (int) $gfpdf_e2e_header( 'failed_fonts' );
+
+/* The deprecation notices are under test (scoped to the requests asking for them, below), so E2E runs keep them */
+remove_filter( 'gfpdf_one_time_action_routes', '__return_empty_array' );
 
 /* Give the deprecation detection a third-party filter listener to find, on one hook of each shape the map names:
    a v3-shaped alias and a `gfpdf_legacy_` one. The dynamic `gfpdfe_` prefix walk is covered by PHPUnit instead,
@@ -89,13 +87,6 @@ add_action(
 		add_filter( 'gfpdf_legacy_templates', $passthrough );
 	}
 );
-
-/* Site-wide state a test needs, scoped to the requests that send the matching `X-GPDF-E2E-*` header, so the specs
-   needing it run in parallel with the rest instead of changing the site under them. Playwright adds the header to
-   every request a page makes, downloads and redirects included */
-$gfpdf_e2e_header = static function ( string $name ): string {
-	return sanitize_key( wp_unslash( $_SERVER[ 'HTTP_X_GPDF_E2E_' . strtoupper( $name ) ] ?? '' ) );
-};
 
 /* The site is set up on pretty permalinks, which keeps their rewrite rules and .htaccess in place for the requests
    that need them. Plain permalinks don't read either */
@@ -152,6 +143,17 @@ if ( $gfpdf_e2e_header( 'fonts' ) === 'unicode' ) {
 	);
 }
 
+/* A default font per request: a PDF selecting the font would count it as required in other specs' system reports */
+$gfpdf_e2e_default_font = $gfpdf_e2e_header( 'default_font' );
+if ( $gfpdf_e2e_default_font !== '' ) {
+	add_filter(
+		'gfpdf_get_option_default_font',
+		static function () use ( $gfpdf_e2e_default_font ) {
+			return $gfpdf_e2e_default_font;
+		}
+	);
+}
+
 /* Other specs save settings and fonts, which move every PDF's cache key */
 $gfpdf_e2e_cache_generation = $gfpdf_e2e_header( 'cache_generation' );
 if ( $gfpdf_e2e_cache_generation !== '' ) {
@@ -180,8 +182,27 @@ if ( $gfpdf_e2e_header( 'deprecations' ) !== 'yes' ) {
 	add_filter( 'gfpdf_get_option_deprecated_features', '__return_empty_array' );
 }
 
-/* Adds a folder the write check fails on. Its failures and dismissals are kept in options of their own, as the other
-   specs' system reports and settings saves overwrite the shared ones */
+/* Keeps a spec's notice dismissals in an option of its own, as the other specs' settings saves overwrite the shared one */
+$gfpdf_e2e_own_dismissals = static function ( string $option ): void {
+	add_filter(
+		'gfpdf_get_option_action_dismissal',
+		static function () use ( $option ) {
+			return get_option( $option, [] );
+		}
+	);
+
+	add_filter(
+		'gfpdf_update_option_action_dismissal',
+		static function ( $value ) use ( $option ) {
+			update_option( $option, $value );
+
+			return $value;
+		}
+	);
+};
+
+/* Adds a folder the write check fails on. Its failures are kept in an option of its own, as the other specs' system
+   reports overwrite the shared one */
 if ( $gfpdf_e2e_header( 'unwritable_folders' ) === 'yes' ) {
 	add_filter(
 		'gfpdf_installer_create_folders',
@@ -216,20 +237,38 @@ if ( $gfpdf_e2e_header( 'unwritable_folders' ) === 'yes' ) {
 		2
 	);
 
+	$gfpdf_e2e_own_dismissals( 'gfpdf_e2e_action_dismissal' );
+}
+
+/* A fixed set of failures, given up when the header says; only the dismissal can change, kept apart from the real record */
+if ( $gfpdf_e2e_fonts_gave_up > 0 ) {
 	add_filter(
-		'gfpdf_get_option_action_dismissal',
-		static function () {
-			return get_option( 'gfpdf_e2e_action_dismissal', [] );
+		'pre_option_gfpdf_core_font_failures',
+		static function () use ( $gfpdf_e2e_fonts_gave_up ) {
+			$failure = [
+				'retry_at'  => 0,
+				'gave_up'   => $gfpdf_e2e_fonts_gave_up,
+				'dismissed' => (int) get_option( 'gfpdf_e2e_failed_fonts_dismissed', 0 ) === $gfpdf_e2e_fonts_gave_up,
+			];
+
+			return [
+				'FreeSerif.ttf' => $failure,
+				'Sun-ExtB.ttf'  => $failure,
+			];
 		}
 	);
 
 	add_filter(
-		'gfpdf_update_option_action_dismissal',
-		static function ( $value ) {
-			update_option( 'gfpdf_e2e_action_dismissal', $value );
+		'pre_update_option_gfpdf_core_font_failures',
+		static function ( $value, $old_value ) use ( $gfpdf_e2e_fonts_gave_up ) {
+			if ( ( $value['FreeSerif.ttf']['dismissed'] ?? false ) === true ) {
+				update_option( 'gfpdf_e2e_failed_fonts_dismissed', $gfpdf_e2e_fonts_gave_up );
+			}
 
-			return $value;
-		}
+			return $old_value;
+		},
+		10,
+		2
 	);
 }
 

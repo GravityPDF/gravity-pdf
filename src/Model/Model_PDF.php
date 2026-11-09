@@ -39,6 +39,7 @@ use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use WP_Error;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -147,6 +148,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $async_notifications;
 
 	/**
+	 * @var Model_Font_Sources|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $font_sources;
+
+	/**
 	 * @var array Cache statuses of the PDFs generated this request, keyed by path. See get_cache_status()
 	 *
 	 * @since 7.0
@@ -156,20 +164,22 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Setup our view with the needed data and classes
 	 *
-	 * @param Helper_Abstract_Form        $gform   Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface             $log     Our logger class
-	 * @param Helper_Abstract_Options     $options Our options class which allows us to access any settings
-	 * @param Helper_Data                 $data    Our plugin data store
-	 * @param Helper_Misc                 $misc    Our miscellaneous class
-	 * @param Helper_Notices              $notices Our notice class used to queue admin messages and errors
-	 * @param Helper_Templates            $templates
-	 * @param Helper_Interface_Url_Signer $url_signer
+	 * @param Helper_Abstract_Form            $gform               Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface                 $log                 Our logger class
+	 * @param Helper_Abstract_Options         $options             Our options class which allows us to access any settings
+	 * @param Helper_Data                     $data                Our plugin data store
+	 * @param Helper_Misc                     $misc                Our miscellaneous class
+	 * @param Helper_Notices                  $notices             Our notice class used to queue admin messages and errors
+	 * @param Helper_Templates                $templates
+	 * @param Helper_Interface_Url_Signer     $url_signer
 	 * @param Helper_Async_Notifications|null $async_notifications
+	 * @param Model_Font_Sources|null         $font_sources        Defaults to the registered font sources
 	 *
 	 * @since 4.0
 	 * @since 6.18.0 Takes the Gravity Forms background notifications helper
+	 * @since 6.19.0 Takes the font sources
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Helper_Async_Notifications $async_notifications = null ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer, ?Helper_Async_Notifications $async_notifications = null, ?Model_Font_Sources $font_sources = null ) {
 
 		/* Assign our internal variables */
 		$this->gform               = $gform;
@@ -181,6 +191,16 @@ class Model_PDF extends Helper_Abstract_Model {
 		$this->templates           = $templates;
 		$this->url_signer          = $url_signer;
 		$this->async_notifications = $async_notifications ?? new Helper_Async_Notifications();
+		$this->font_sources        = $font_sources;
+	}
+
+	/**
+	 * The injected font sources, else the registered ones, which bootstrap builds after this model
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_font_sources(): Model_Font_Sources {
+		return $this->font_sources ?? GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 	}
 
 	/**
@@ -2350,8 +2370,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			$font_name  = basename( $font );
 			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
 
-			/* Check if it exists already, otherwise add it */
-			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false ) {
+			/* Check if it exists already, otherwise add it. A core font's copy under a hashed name is found by that font */
+			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false && ! $this->get_font_sources()->is_hashed_copy( $font_name ) ) {
 				$fonts[ $short_name ] = [
 					'R' => $font_name,
 				];
@@ -2545,19 +2565,27 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Set the watermark font to the current PDF font
+	 * Set the watermark font to the PDF's watermark font, else its font, else the default font, else Arimo
 	 *
-	 * @param Mpdf  $mpdf
-	 * @param array $form
-	 * @param array $entry
-	 * @param array $settings
+	 * @param Mpdf|mixed $mpdf     What gfpdf_mpdf_init_class has been given so far
+	 * @param mixed      $form
+	 * @param mixed      $entry
+	 * @param mixed      $settings
 	 *
-	 * @return Mpdf
+	 * @return Mpdf|mixed
 	 *
 	 * @since 5.0
+	 * @since 6.19.0 Falls back to the default font, then Arimo, when a font isn't registered
 	 */
 	public function set_watermark_font( $mpdf, $form, $entry, $settings ) {
-		$mpdf->watermark_font = $settings['watermark_font'] ?? $settings['font'] ?? $this->options->get_option( 'default_font', 'dejavusanscondensed' );
+		/* An earlier gfpdf_mpdf_init_class callback may not have returned the mPDF object */
+		if ( ! is_object( $mpdf ) ) {
+			return $mpdf;
+		}
+
+		$fonts = [ $settings['watermark_font'] ?? '', $settings['font'] ?? '' ];
+
+		$mpdf->watermark_font = $this->get_font_sources()->get_default_font( $fonts, is_array( $mpdf->fontdata ?? null ) ? $mpdf->fontdata : null );
 
 		return $mpdf;
 	}

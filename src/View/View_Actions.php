@@ -57,24 +57,6 @@ class View_Actions extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Load our Core Font Installer
-	 *
-	 * @param string $type        The action ID
-	 * @param string $button_text The primary button text
-	 *
-	 * @return string              The notice HTML
-	 *
-	 * @since 5.0
-	 */
-	public function core_font( $type, $button_text ) {
-
-		$html  = $this->load( 'core_font', [], false );
-		$html .= $this->get_action_buttons( $type, $button_text, 'disabled' );
-
-		return $html;
-	}
-
-	/**
 	 * Load the notice for the deprecated functionality the site still uses
 	 *
 	 * One notice lists them all, each named the same way so the list scans. That is deliberately the registration's
@@ -129,9 +111,44 @@ class View_Actions extends Helper_Abstract_View {
 	public function unwritable_folders( array $folders, string $type, string $button_text ): string {
 		$misc = GPDFAPI::get_misc_class();
 
-		$html  = $this->load( 'unwritable_folders', [ 'folders' => array_map( [ $misc, 'relative_path' ], $folders ) ], false );
-		$html .= $this->get_action_buttons( $type, $button_text );
+		$html = $this->load(
+			'list_notice',
+			[
+				'heading' => __( 'Gravity PDF cannot create or write to these directories. Contact your web hosting provider to fix the issue.', 'gravity-pdf' ),
+				'items'   => array_map( [ $misc, 'relative_path' ], $folders ),
+				'footer'  => esc_html__( 'Dismissing this notice hides the directories above. Any found later are reported again.', 'gravity-pdf' ),
+			],
+			false
+		);
 
-		return $html;
+		return $html . $this->get_action_buttons( $type, $button_text );
+	}
+
+	/**
+	 * The notice listing the core fonts that couldn't be downloaded
+	 *
+	 * @param string[] $files       The font file names
+	 * @param string   $type        The action ID
+	 * @param string   $button_text The primary button text
+	 *
+	 * @since 6.19.0
+	 */
+	public function failed_core_fonts( array $files, string $type, string $button_text ): string {
+		$html = $this->load(
+			'list_notice',
+			[
+				'heading' => __( 'Gravity PDF could not download these fonts. Until they are installed, PDFs use a fallback font in their place, so some characters may not display.', 'gravity-pdf' ),
+				'items'   => $files,
+				'footer'  => sprintf(
+					/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+					esc_html__( 'You can %1$sinstall the fonts by hand%2$s. Dismissing this notice hides the fonts above. Any that fail later are reported again.', 'gravity-pdf' ),
+					'<a href="https://docs.gravitypdf.com/users/core-pdf-fonts">',
+					'</a>'
+				),
+			],
+			false
+		);
+
+		return $html . $this->get_action_buttons( $type, $button_text );
 	}
 }

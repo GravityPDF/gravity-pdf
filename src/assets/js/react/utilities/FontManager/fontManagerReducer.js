@@ -1,3 +1,6 @@
+/* Dependencies */
+import { sprintf } from 'sprintf-js';
+
 /**
  * @package			Gravity PDF
  * @copyright   Copyright (c) 2026, Blue Liquid Designs
@@ -13,6 +16,8 @@
  * @property { string } italics     - file name for italics
  * @property { string } bold        - file name for bold
  * @property { string } bolditalics - file name for bold italics
+ * @property { string } size_label  - the size of its files
+ * @property { Object } file_sizes  - each style's file size in bytes
  */
 
 /**
@@ -29,19 +34,23 @@
  * @since 6.0
  */
 export function findAndUpdate(data, payload) {
-	const list = [...data];
+	return data.map((font) =>
+		font.id === payload.font.id ? { ...font, ...payload.font } : font
+	);
+}
 
-	return list.map((font) => {
-		if (font.id === payload.font.id) {
-			font.font_name = payload.font.font_name;
-			font.regular = payload.font.regular;
-			font.italics = payload.font.italics;
-			font.bold = payload.font.bold;
-			font.bolditalics = payload.font.bolditalics;
-		}
-
-		return font;
-	});
+/**
+ * Swap a row for the server's new copy of it, as the keys it has can change with the font's state
+ *
+ * @param { Array<Font> } data
+ * @param { Font }        font
+ *
+ * @return { Array<Font> } data
+ *
+ * @since 6.19.0
+ */
+export function findAndReplace(data, font) {
+	return data.map((row) => (row.id === font.id ? font : row));
 }
 
 /**
@@ -60,6 +69,66 @@ export function findAndRemove(data, payload) {
 
 	return list.filter((font) => font.id !== payload);
 }
+
+/**
+ * Whether a Font Manager row is a custom font, the only type that can be edited
+ *
+ * @param { Object } font
+ *
+ * @return { boolean } Whether it's custom
+ *
+ * @since 6.19.0
+ */
+export const isCustomFont = (font) => font.type === 'custom';
+
+/**
+ * A font's styles: their record keys, GFPDF label strings and CSS
+ *
+ * @since 6.19.0
+ */
+export const FONT_STYLES = [
+	{ key: 'regular', label: 'fontListRegular', weight: 400, style: 'normal' },
+	{ key: 'italics', label: 'fontListItalics', weight: 400, style: 'italic' },
+	{ key: 'bold', label: 'fontListBold', weight: 700, style: 'normal' },
+	{
+		key: 'bolditalics',
+		label: 'fontListBoldItalics',
+		weight: 700,
+		style: 'italic',
+	},
+];
+
+/**
+ * A style's name
+ *
+ * @param { string } key
+ *
+ * @return { string } The name
+ *
+ * @since 6.19.0
+ */
+export const getStyleLabel = (key) =>
+	GFPDF[FONT_STYLES.find((style) => style.key === key).label];
+
+/**
+ * How many styles a font has files for, as a phrase
+ *
+ * @param { Object } font
+ *
+ * @return { string } The phrase
+ *
+ * @since 6.19.0
+ */
+export const getStyleCount = (font) => {
+	const count = FONT_STYLES.filter(({ key }) => font[key]).length;
+
+	// %d is found inside these strings
+	// eslint-disable-next-line @wordpress/valid-sprintf
+	return sprintf(
+		count === 1 ? GFPDF.fontManagerStyle : GFPDF.fontManagerStyles,
+		count
+	);
+};
 
 /**
  * Utility function to trim font file name

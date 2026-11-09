@@ -1,3 +1,3 @@
-BaseFont: Arimo-Regular, DejaVuSansCondensed
+BaseFont: Arimo-Regular, DejaVuSans
 arimo: gfpdf-Arimo-Regular.ttf
-dejavusanscondensed: DejaVuSansCondensed.ttf ✔✖
+gfpdf-dejavu-symbols: gfpdf-DejaVuSansSymbols.ttf ✔✖

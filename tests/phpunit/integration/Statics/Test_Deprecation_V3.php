@@ -127,7 +127,7 @@ class Test_Deprecation_V3 extends TestCase {
 	}
 
 	public function test_the_v3_features_are_registered() {
-		$features = Deprecation::get_features();
+		$features = Deprecation_V3::get_features();
 
 		$this->assertSame(
 			[ 'legacy_templates', 'business_plus_templates', 'legacy_endpoint', 'deprecated_filters' ],

@@ -2,6 +2,8 @@
 import { serialize } from 'object-to-formdata';
 /* APIs */
 import { api, getJsonString } from './api';
+/* Utilities */
+import { updateURLParameter } from '../../admin/settings/common/updateURLParameter';
 
 /**
  * @package     Gravity PDF
@@ -21,33 +23,83 @@ import { api, getJsonString } from './api';
  */
 
 /**
- * Fetch API request to obtain custom font list (GET)
- *
- * @return {{ body: Array<FontItem>, text: string, status: number, ok: boolean }} Installed custom fonts
- *
- * @since 6.0
+ * @typedef {FontItem} InstalledFont
+ * @property {string}  type           - `custom`, `core` or `bundled`
+ * @property {boolean} can_delete     - Whether this user can delete it when it's unused
+ * @property {boolean} [auto_install] - Core fonts: whether it downloads again on its own
+ * @property {boolean} [can_install]  - Core fonts: whether this user can download its missing files
  */
-export const apiGetCustomFontList = async () => {
-	const url = GFPDF.restUrl + 'fonts/';
 
-	const response = await api(url, {
-		method: 'GET',
-		headers: {
-			'X-WP-Nonce': GFPDF.restNonce,
-			Accept: 'application/json',
-		},
-	});
-
+/**
+ * The parts of a response the sagas read
+ *
+ * @param {Response} response
+ *
+ * @return {{ body: *, text: string, status: number, ok: boolean }} The parsed response
+ *
+ * @since 6.19.0
+ */
+const parseResponse = async (response) => {
 	const text = await response.text();
-	const body = getJsonString(text);
 
 	return {
-		body,
+		body: getJsonString(text),
 		text,
 		status: response.status,
 		ok: response.ok,
 	};
 };
+
+/**
+ * A fonts endpoint URL with its scope
+ *
+ * @param {string} id
+ * @param {string} scope
+ *
+ * @return {string} The URL
+ *
+ * @since 6.19.0
+ */
+const fontsUrl = (id, scope) =>
+	updateURLParameter(GFPDF.restUrl + 'fonts/' + id, 'scope', scope);
+
+/**
+ * Fetch API GET request to the fonts endpoint
+ *
+ * @param {string} scope
+ *
+ * @return {{ body: *, text: string, status: number, ok: boolean }} The parsed response
+ *
+ * @since 6.19.0
+ */
+const getFonts = async (scope) =>
+	parseResponse(
+		await api(fontsUrl('', scope), {
+			method: 'GET',
+			headers: {
+				'X-WP-Nonce': GFPDF.restNonce,
+				Accept: 'application/json',
+			},
+		})
+	);
+
+/**
+ * Fetch API request to obtain every font the Font Manager lists (GET)
+ *
+ * @return {{ body: Array<InstalledFont>, text: string, status: number, ok: boolean }} Custom, core and bundled fonts
+ *
+ * @since 6.0
+ */
+export const apiGetCustomFontList = () => getFonts('all');
+
+/**
+ * Fetch API request for why fonts are in use, which is slower than the list as it reads every form (GET)
+ *
+ * @return {{ body: Object<string, Array<string>>, text: string, status: number, ok: boolean }} Reasons by font ID
+ *
+ * @since 6.19.0
+ */
+export const apiGetFontUsage = () => getFonts('usage');
 
 /**
  * Fetch API request to add new font (POST)
@@ -71,15 +123,7 @@ export const apiAddFont = async (font) => {
 		body: formData,
 	});
 
-	const text = await response.text();
-	const body = getJsonString(text);
-
-	return {
-		body,
-		text,
-		status: response.status,
-		ok: response.ok,
-	};
+	return parseResponse(response);
 };
 
 /**
@@ -107,33 +151,52 @@ export const apiEditFont = async ({ id, font }) => {
 		body: formData,
 	});
 
-	const text = await response.text();
-	const body = getJsonString(text);
-
-	return {
-		body,
-		text,
-		status: response.status,
-		ok: response.ok,
-	};
+	return parseResponse(response);
 };
+
+/**
+ * Send a bodyless request about a font
+ *
+ * @param {string} method
+ * @param {string} url
+ *
+ * @return {{ body: Object, text: string, status: number, ok: boolean }} The response
+ *
+ * @since 6.19.0
+ */
+const sendFontRequest = async (method, url) => {
+	const response = await api(url, {
+		method,
+		headers: {
+			'X-WP-Nonce': GFPDF.restNonce,
+			Accept: 'application/json',
+		},
+	});
+
+	return parseResponse(response);
+};
+
+/**
+ * Fetch API request to download a core font (POST)
+ *
+ * @param {string} id
+ *
+ * @return {{ body: Object, text: string, status: number, ok: boolean }} The response, with the font's row or why it failed
+ *
+ * @since 6.19.0
+ */
+export const apiInstallFont = (id) =>
+	sendFontRequest('POST', fontsUrl(id, 'core'));
 
 /**
  * Fetch API request to delete existing font (DELETE)
  *
- * @param {string} id - ID of the font to delete
+ * @param {string} id       - ID of the font to delete
+ * @param {string} fontType - The row's `type`
  *
- * @return {Promise<Response>} Raw fetch Response
+ * @return {{ body: Object, text: string, status: number, ok: boolean }} The response, with the server's reason when it refuses
  *
  * @since 6.0
  */
-export const apiDeleteFont = (id) => {
-	const url = GFPDF.restUrl + 'fonts/' + id;
-
-	return api(url, {
-		method: 'DELETE',
-		headers: {
-			'X-WP-Nonce': GFPDF.restNonce,
-		},
-	});
-};
+export const apiDeleteFont = (id, fontType) =>
+	sendFontRequest('DELETE', fontsUrl(id, fontType));

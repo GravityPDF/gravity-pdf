@@ -213,6 +213,7 @@ class View_System_Report extends Helper_Abstract_View {
 			'business_plus_templates' => [ $this, 'get_legacy_templates_feature' ],
 			'legacy_endpoint'         => [ $this, 'get_legacy_endpoint_feature' ],
 			'deprecated_filters'      => [ $this, 'get_deprecated_filter_feature' ],
+			'tools_tab_hooks'         => [ $this, 'get_deprecated_filter_feature' ],
 		];
 	}
 
@@ -314,7 +315,7 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Describe the removed v3 hooks that still have a listener attached
+	 * Describe the removed hooks that still have a listener attached
 	 *
 	 * @param array $filters Hook name mapped to the number of listeners
 	 *

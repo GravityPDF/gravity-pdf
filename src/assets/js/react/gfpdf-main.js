@@ -3,7 +3,6 @@ import $ from 'jquery';
 /* Bootstrap */
 import { templateBootstrap } from './bootstrap/templateBootstrap';
 import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap';
-import coreFontBootstrap from './bootstrap/coreFontBootstrap';
 import helpBootstrap from './bootstrap/helpBootstrap';
 /* Utilities */
 import { actionToolbar } from './utilities/PdfSettings/actionToolbar';
@@ -52,11 +51,6 @@ $(function () {
 		}
 	}
 
-	/* Initialize the Core Font downloader */
-	if ($('#gfpdf-button-wrapper-install_core_fonts').length) {
-		coreFontBootstrap();
-	}
-
 	/* Initialize the Search Bar for Help Tab */
 	if ($('#gpdf-search').length) {
 		helpBootstrap();
@@ -64,9 +58,6 @@ $(function () {
 
 	const fmGeneralSettingsTab = document.querySelector(
 		'#gfpdf-settings-field-wrapper-default_font select'
-	);
-	const fmToolsTab = document.querySelector(
-		'#gfpdf-settings-field-wrapper-manage_fonts'
 	);
 	const fmPdfSettings = document.querySelector(
 		'#gfpdf-settings-field-wrapper-font select'
@@ -80,11 +71,6 @@ $(function () {
 	/* Initialize font manager under general settings tab */
 	if (fmGeneralSettingsTab !== null) {
 		fontManagerBootstrap(fmGeneralSettingsTab);
-	}
-
-	/* Initialize font manager under tools tab  */
-	if (fmToolsTab !== null) {
-		fontManagerBootstrap(fmToolsTab, '-prevent-button-reset');
 	}
 
 	/* Initialize font manager under PDF settings */

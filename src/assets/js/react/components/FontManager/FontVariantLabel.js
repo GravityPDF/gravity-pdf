@@ -1,6 +1,8 @@
 /* Dependencies */
 import React from 'react';
 import PropTypes from 'prop-types';
+/* Utilities */
+import { getStyleLabel } from '../../utilities/FontManager/fontManagerReducer';
 
 /**
  * @package			Gravity PDF
@@ -12,29 +14,17 @@ import PropTypes from 'prop-types';
 /**
  * Display information for drop box font variant label
  *
- * @param { Object }  props
- * @param { string }  props.label
- * @param { boolean } props.font
+ * @param { Object } props
+ * @param { string } props.label
  *
  * @since 6.0
  */
-const FontVariantLabel = ({ label, font }) => (
-	<div
-		data-test="component-FontVariantLabel"
-		htmlFor={'gfpdf-font-variant-' + label}
-	>
-		{label === 'regular' && font === 'false' && (
-			<span>
-				{GFPDF.fontListRegular}{' '}
-				<span className="required">
-					{GFPDF.fontManagerRequiredLabel}
-				</span>
-			</span>
+const FontVariantLabel = ({ label }) => (
+	<div data-test="component-FontVariantLabel" className="font-variant-label">
+		{getStyleLabel(label)}
+		{label === 'regular' && (
+			<span className="required">{GFPDF.fontManagerRequiredLabel}</span>
 		)}
-		{label === 'regular' && font === 'true' && GFPDF.fontListRegular}
-		{label === 'italics' && GFPDF.fontListItalics}
-		{label === 'bold' && GFPDF.fontListBold}
-		{label === 'bolditalics' && GFPDF.fontListBoldItalics}
 	</div>
 );
 
@@ -45,7 +35,6 @@ const FontVariantLabel = ({ label, font }) => (
  */
 FontVariantLabel.propTypes = {
 	label: PropTypes.string.isRequired,
-	font: PropTypes.string,
 };
 
 export default FontVariantLabel;

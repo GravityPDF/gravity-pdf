@@ -16,9 +16,6 @@ describe('FontManager - AddFont.js', () => {
 		fontStyles: {},
 		msg: {},
 		loading: false,
-		tabIndexFontName: '',
-		tabIndexFontFiles: '',
-		tabIndexFooterButtons: '',
 	};
 
 	describe('RENDERS COMPONENT', () => {
@@ -71,7 +68,7 @@ describe('FontManager - AddFont.js', () => {
 
 		test('render <AddUpdateFontFooter /> component', () => {
 			const wrapper = shallow(<AddFont {...props} />);
-			expect(wrapper.find('Connect(AddUpdateFontFooter)').length).toBe(1);
+			expect(wrapper.find('AddUpdateFontFooter').length).toBe(1);
 		});
 	});
 });

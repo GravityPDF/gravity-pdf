@@ -179,6 +179,26 @@ class Test_Helper_Data extends TestCase {
 		$this->assertSame( 3 * MB_IN_BYTES, $localised_data['templateUploadMaxSize'] );
 	}
 
+	/**
+	 * @dataProvider provider_fonts_url
+	 */
+	public function test_the_fonts_url_follows_a_moved_fonts_folder( ?string $url, string $location, string $expected ) {
+		global $gfpdf;
+
+		$this->data->template_font_location_url = $url;
+		$this->data->template_font_location     = $location;
+
+		$this->assertSame( $expected, $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->gform, $gfpdf->templates )['fontsUrl'] );
+	}
+
+	public function provider_fonts_url(): array {
+		return [
+			'default folder'    => [ 'https://cdn.test/pdf/fonts/', '/uploads/PDF/fonts/', 'https://cdn.test/pdf/fonts/' ],
+			'moved, with a URL' => [ null, WP_CONTENT_DIR . '/pdf-fonts/', WP_CONTENT_URL . '/pdf-fonts/' ],
+			'moved, no URL'     => [ null, '/var/private/fonts/', '' ],
+		];
+	}
+
 	public function test_get_conditional_logic_options() {
 		$form  = $this->form( 'all-form-fields' );
 

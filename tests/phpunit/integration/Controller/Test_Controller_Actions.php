@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Controller;
 
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\ResetsDetectedFeatures;
 use GFPDF\Tests\Integration\TestCase;
 
@@ -17,6 +18,7 @@ use GFPDF\Tests\Integration\TestCase;
 class Test_Controller_Actions extends TestCase {
 
 	use CreatesLegacyDownloadUrls;
+	use RecordsFontFailures;
 	use ResetsDetectedFeatures;
 
 	/**
@@ -35,7 +37,13 @@ class Test_Controller_Actions extends TestCase {
 	}
 
 	public function tear_down(): void {
-		unset( $_POST['gfpdf_action'], $_POST['gfpdf-dismiss-notice'], $_GET['page'] );
+		unset( $_POST['gfpdf_action'], $_POST['gfpdf_action_failed_core_fonts'], $_POST['gfpdf-dismiss-notice'], $_GET['page'] );
+		$this->delete_font_failures();
+
+		/* A subsite leaves these behind */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
 
 		parent::tear_down();
 	}
@@ -52,14 +60,13 @@ class Test_Controller_Actions extends TestCase {
 	public function test_get_routes_includes_default_routes() {
 		$routes = $this->controller->get_routes();
 
-		/* The core font install, the unwritable folders notice, and the one notice covering every deprecated feature */
-		$this->assertCount( 3, $routes );
+		$this->assertSame( [ 'unwritable_folders', 'failed_core_fonts', 'deprecated_features' ], array_column( $routes, 'action' ) );
 
-		$this->assertSame( 'install_core_fonts', $routes[0]['action'] );
-		$this->assertSame( 'gravityforms_edit_settings', $routes[0]['capability'] );
-		$this->assertIsCallable( $routes[0]['condition'] );
-		$this->assertIsCallable( $routes[0]['process'] );
-		$this->assertIsCallable( $routes[0]['view'] );
+		foreach ( $routes as $route ) {
+			$this->assertIsCallable( $route['condition'] );
+			$this->assertIsCallable( $route['process'] );
+			$this->assertIsCallable( $route['view'] );
+		}
 	}
 
 	public function test_every_deprecated_feature_shares_one_route() {
@@ -200,6 +207,175 @@ class Test_Controller_Actions extends TestCase {
 		$pagenow = $original;
 		set_current_screen( 'dashboard' );
 		$gfpdf->notices->clear();
+	}
+
+	public function test_the_failed_core_fonts_route() {
+		$route = array_column( $this->controller->get_routes(), null, 'action' )['failed_core_fonts'];
+
+		$this->assertSame( 'gravityforms_edit_settings', $route['capability'] );
+		$this->assertSame( 'notice-warning', $route['view_class'] );
+		$this->assertIsCallable( $route['condition'] );
+		$this->assertIsCallable( $route['dismiss'] );
+	}
+
+	public function test_fonts_that_failed_after_their_retry_raise_a_notice_until_dismissed() {
+		$this->with_screen(
+			'administrator',
+			function () {
+				global $gfpdf;
+
+				$model = $gfpdf->singleton->get_class( 'Model_Actions' );
+
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() - 10 ), 'FreeSans.ttf' => $this->failure() ] );
+				$html = $this->render_notices();
+				$this->assertStringContainsString( 'Gravity PDF could not download these fonts. Until they are installed, PDFs use a fallback font in their place', $html );
+				$this->assertStringContainsString( '<code>Garuda.ttf</code>', $html );
+				$this->assertStringNotContainsString( 'FreeSans.ttf', $html );
+				$this->assertStringContainsString( 'https://docs.gravitypdf.com/users/core-pdf-fonts', $html );
+
+				$model->dismiss_failed_core_fonts();
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+				$this->assertTrue( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
+
+				/* A font that gives up later raises it again, for that font alone */
+				$failures                 = $this->get_font_failures();
+				$failures['FreeSans.ttf'] = $this->failure( time() );
+				$this->set_font_failures( $failures );
+				$this->assertSame( [ 'FreeSans.ttf' ], $model->get_undismissed_failed_core_fonts() );
+
+				/* A font that downloads leaves the notice, which goes once none are left */
+				$this->set_font_failures( [] );
+				$this->assertFalse( $model->has_failed_core_fonts() );
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+			}
+		);
+	}
+
+	public function test_the_failed_core_fonts_notice_needs_the_settings_capability() {
+		$this->with_screen(
+			'editor',
+			function () {
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
+			}
+		);
+	}
+
+	/**
+	 * The fonts folder serves the whole network, so the network admin sees the notice too
+	 */
+	public function test_the_failed_core_fonts_notice_shows_in_network_admin() {
+		$this->with_screen(
+			'administrator',
+			function () {
+				global $gfpdf;
+
+				$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+				$gfpdf->notices->clear();
+				$this->controller->route_notices();
+
+				$this->assertTrue( is_network_admin() );
+				$this->assertTrue( $gfpdf->notices->has_notice() );
+			},
+			'index.php-network'
+		);
+	}
+
+	public function test_dismissing_the_failed_core_fonts_notice_dismisses_it_on_every_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		global $gfpdf;
+
+		$model = $gfpdf->singleton->get_class( 'Model_Actions' );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		$model->dismiss_failed_core_fonts();
+
+		switch_to_blog( self::factory()->blog->create() );
+		try {
+			\GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
+			$this->assertFalse( $model->has_failed_core_fonts() );
+		} finally {
+			restore_current_blog();
+		}
+	}
+
+	public function test_the_dismiss_request_dismisses_the_failed_core_fonts_notice() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->post_failed_core_fonts_dismissal();
+		$this->controller->route();
+
+		$this->assertTrue( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
+	}
+
+	public function test_a_bad_nonce_leaves_the_failed_core_fonts_notice_undismissed() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->post_failed_core_fonts_dismissal( 'not-a-nonce' );
+		$this->controller->route();
+
+		$this->assertFalse( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
+	}
+
+	public function test_a_user_who_cannot_edit_the_settings_cannot_dismiss_the_failed_core_fonts_notice() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$this->post_failed_core_fonts_dismissal();
+
+		try {
+			$this->controller->route();
+			$this->fail( 'The request should have been refused' );
+		} catch ( \WPDieException $e ) {
+			$this->assertFalse( $this->get_font_failures()['Garuda.ttf']['dismissed'] );
+		}
+	}
+
+	public function test_a_dismiss_request_with_nothing_failed_stores_nothing() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->post_failed_core_fonts_dismissal();
+		$this->controller->route();
+
+		$this->assertFalse( $this->get_font_failures() );
+	}
+
+	private function post_failed_core_fonts_dismissal( ?string $nonce = null ): void {
+		$_POST['gfpdf_action']                   = 'gfpdf_failed_core_fonts';
+		$_POST['gfpdf_action_failed_core_fonts'] = $nonce ?? wp_create_nonce( 'gfpdf_action_failed_core_fonts' );
+		$_POST['gfpdf-dismiss-notice']           = '1';
+	}
+
+	/**
+	 * Run $test as a new user with the role, on the admin screen given, then restore the screen and the notices
+	 */
+	private function with_screen( string $role, callable $test, string $screen = 'dashboard' ): void {
+		global $gfpdf, $pagenow;
+
+		$user_id = self::factory()->user->create( [ 'role' => $role ] );
+		if ( is_multisite() && $role === 'administrator' ) {
+			grant_super_admin( $user_id );
+		}
+		wp_set_current_user( $user_id );
+
+		$original = $pagenow;
+		$pagenow  = 'index.php';
+		set_current_screen( $screen );
+
+		try {
+			$test();
+		} finally {
+			$pagenow = $original;
+			set_current_screen( 'dashboard' );
+			$gfpdf->notices->clear();
+		}
 	}
 
 	/**

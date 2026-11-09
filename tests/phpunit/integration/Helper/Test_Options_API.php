@@ -280,7 +280,7 @@ class Test_Options_API extends TestCase {
 		$this->assertTrue( isset( $items['general_security'] ) );
 		$this->assertTrue( isset( $items['extensions'] ) );
 		$this->assertTrue( isset( $items['licenses'] ) );
-		$this->assertTrue( isset( $items['tools'] ) );
+		$this->assertArrayNotHasKey( 'tools', $items );
 		$this->assertTrue( isset( $items['form_settings'] ) );
 		$this->assertTrue( isset( $items['form_settings_appearance'] ) );
 		$this->assertTrue( isset( $items['form_settings_advanced'] ) );
@@ -315,13 +315,6 @@ class Test_Options_API extends TestCase {
 		);
 
 		add_filter(
-			'gfpdf_settings_tools',
-			function( $array ) {
-				return 'Tools Settings';
-			}
-		);
-
-		add_filter(
 			'gfpdf_form_settings',
 			function( $array ) {
 				return 'PDF Form Settings';
@@ -349,7 +342,6 @@ class Test_Options_API extends TestCase {
 		$this->assertSame( 'General Security Settings', $items['general_security'] );
 		$this->assertSame( 'Extension Settings', $items['extensions'] );
 		$this->assertSame( 'License Settings', $items['licenses'] );
-		$this->assertSame( 'Tools Settings', $items['tools'] );
 		$this->assertSame( 'PDF Form Settings', $items['form_settings'] );
 		$this->assertSame( 'PDF Form Settings Appearance', $items['form_settings_appearance'] );
 		$this->assertSame( 'PDF Form Settings Advanced', $items['form_settings_advanced'] );
@@ -359,7 +351,6 @@ class Test_Options_API extends TestCase {
 		remove_all_filters( 'gfpdf_settings_general_security' );
 		remove_all_filters( 'gfpdf_settings_extensions' );
 		remove_all_filters( 'gfpdf_settings_licenses' );
-		remove_all_filters( 'gfpdf_settings_tools' );
 		remove_all_filters( 'gfpdf_form_settings' );
 		remove_all_filters( 'gfpdf_form_settings_appearance' );
 		remove_all_filters( 'gfpdf_form_settings_advanced' );
@@ -881,6 +872,21 @@ class Test_Options_API extends TestCase {
 
 		$this->assertSame( 'A5', $updated_settings['default_pdf_size'] );
 		$this->assertEquals( '15', $updated_settings['default_font_size'] );
+		$this->assertArrayNotHasKey( 'other_type', $updated_settings );
+	}
+
+	public function test_settings_sanitize_uses_the_general_tab_with_no_referrer() {
+		unset( $_POST['_wp_http_referer'] );
+		$_POST['option_page'] = 'gfpdf_settings';
+
+		$updated_settings = $this->options->settings_sanitize(
+			[
+				'default_pdf_size' => 'A5',
+				'other_type'       => 'wont validate',
+			]
+		);
+
+		$this->assertSame( 'A5', $updated_settings['default_pdf_size'] );
 		$this->assertArrayNotHasKey( 'other_type', $updated_settings );
 	}
 
@@ -1626,5 +1632,52 @@ class Test_Options_API extends TestCase {
 		$settings = $this->options->get_registered_fields();
 
 		$this->assertSame( 'zadani', $settings['form_settings']['template']['std'] );
+	}
+
+	/**
+	 * @dataProvider provider_pdf_font_default
+	 */
+	public function test_the_pdf_font_setting_defaults_to_the_registered_default_font( string $saved, string $expected ) {
+		if ( $saved !== '' ) {
+			$this->options->update_option( 'default_font', $saved );
+		}
+
+		try {
+			$this->assertSame( $expected, $this->options->get_registered_fields()['form_settings_appearance']['font']['std'] );
+		} finally {
+			$this->options->delete_option( 'default_font' );
+		}
+	}
+
+	/**
+	 * @dataProvider provider_filtered_default_font
+	 *
+	 * @param mixed $filtered
+	 */
+	public function test_the_pdf_font_setting_ignores_a_default_font_a_filter_broke( $filtered ) {
+		add_filter(
+			'gfpdf_get_option_default_font',
+			static function () use ( $filtered ) {
+				return $filtered;
+			}
+		);
+
+		$this->assertSame( 'arimo', $this->options->get_registered_fields()['form_settings_appearance']['font']['std'] );
+	}
+
+	public function provider_filtered_default_font(): array {
+		return [
+			'an array' => [ [ 'dejavusans' ] ],
+			'null'     => [ null ],
+			'a number' => [ 3 ],
+		];
+	}
+
+	public function provider_pdf_font_default(): array {
+		return [
+			'a saved default font'          => [ 'dejavusanscondensed', 'dejavusanscondensed' ],
+			'an unknown saved default font' => [ 'deletedcustomfont', 'arimo' ],
+			'no saved default font'         => [ '', 'arimo' ],
+		];
 	}
 }

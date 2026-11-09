@@ -4,8 +4,12 @@ declare( strict_types=1 );
 
 namespace GFPDF\Tests\Integration;
 
+use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Tests\Concerns\AssertsSnapshots;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
+use GFPDF_Vendor\Monolog\Handler\TestHandler;
+use GFPDF_Vendor\Monolog\Logger;
 use GFPDF_Vendor\Mpdf\Mpdf;
 use GPDFAPI;
 use RuntimeException;
@@ -20,12 +24,12 @@ use WP_Error;
 class Test_Font_Rendering extends TestCase {
 
 	use AssertsSnapshots;
+	use RecordsFontFailures;
 	use CopiesFontFixtures;
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
 		static::load_fixtures( [ 'all-form-fields' ], [ 'all-form-fields' ] );
-		wp_mkdir_p( GPDFAPI::get_data_class()->template_font_location );
 		static::copy_test_fonts();
 	}
 
@@ -36,6 +40,11 @@ class Test_Font_Rendering extends TestCase {
 
 	public function tear_down(): void {
 		$this->remove_font_fixtures();
+		static::copy_test_fonts();
+
+		$this->delete_font_failures();
+		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
 		parent::tear_down();
 	}
@@ -49,6 +58,107 @@ class Test_Font_Rendering extends TestCase {
 
 	public function test_characters_arimo_lacks_are_substituted(): void {
 		$this->assertRenderMatchesSnapshot( 'arimo-substitution', '<p style="font-family: arimo">Agree ✔ Decline ✖</p>' );
+	}
+
+	public function test_symbols_arimo_lacks_render_from_the_bundled_subset_without_a_download(): void {
+		static::remove_test_fonts();
+		$this->serve_font_downloads();
+
+		$this->assertRenderMatchesSnapshot( 'symbols-substitution', '<p style="font-family: arimo">Next ⇒ ┏━┓</p>', [ 'font' => 'arimo' ] );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_an_emoji_and_cjk_on_an_english_site_do_not_download_sun_exta(): void {
+		static::remove_test_fonts();
+
+		/* Cached metrics change which substitutes mPDF loads */
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Smile 😀 日本</p>', [ 'font' => 'arimo' ] );
+		$this->assertMatchesSnapshot( 'fonts/emoji-cjk-without-sun-exta.txt', $this->describe_fonts( $render ) );
+		$this->assertNotContains( 'sun-exta', $render['mpdf']->backupSubsFont );
+		$this->assertArrayNotHasKey( 'sun-exta', $render['mpdf']->fonts );
+
+		/* mPDF reads which characters each substitute has from its ranges file, and none of the others have these */
+		$this->assertSame( [], $this->requested );
+	}
+
+	/**
+	 * @dataProvider provider_substitutes
+	 */
+	public function test_a_substitute_downloads_when_it_has_the_characters( string $text, string $font, string $file ): void {
+		static::remove_test_fonts();
+		FlushCache::flush();
+
+		/* The others have no fixture, and the ranges file decides which substitute is fetched, not the file served. DejaVu
+		   Serif Condensed has the OpenType tables the script fonts' data needs */
+		if ( $file !== 'DejaVuSansCondensed.ttf' ) {
+			$this->serve_fixture_as( 'DejaVuSerifCondensed.ttf', $file );
+		}
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Text ' . $text . '</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/' . $file ], $this->requested );
+
+		/* The text is drawn in the substitute. Arimo records each character it draws, even one it lacks (see the emoji
+		   snapshot), so none of the text stayed in Arimo */
+		$this->assertTrue( $render['mpdf']->fonts[ $font ]['used'] ?? false );
+		$this->assertSame( [], array_intersect( array_map( 'mb_ord', mb_str_split( $text ) ), $render['mpdf']->fonts['arimo']['subset'] ?? [] ) );
+	}
+
+	public function provider_substitutes(): array {
+		return [
+			'Armenian from DejaVu Sans Condensed' => [ 'Բարեւ', 'dejavusanscondensed', 'DejaVuSansCondensed.ttf' ],
+			'Syriac from FreeSans'                => [ 'ܫܠܡܐ', 'freesans', 'FreeSans.ttf' ],
+			'Thai from Garuda'                    => [ 'สวัสดี', 'garuda', 'Garuda.ttf' ],
+			'Khmer from Khmer OS'                 => [ 'ភាសាខ្មែរ', 'khmeros', 'KhmerOS.ttf' ],
+			'Myanmar from Padauk'                 => [ 'မြန်မာ', 'padaukbook', 'Padauk-book.ttf' ],
+			'Sinhala from Kaputa'                 => [ 'සිංහල', 'kaputaunicode', 'kaputaunicode.ttf' ],
+			'Ethiopic from Abyssinica SIL'        => [ 'ሰላምዓለም', 'abyssinicasil', 'Abyssinica_SIL.ttf' ],
+		];
+	}
+
+	public function test_sun_exta_on_disk_is_substituted_from_without_a_download(): void {
+		/* Sun-ExtA's font data needs no OpenType tables, so any fixture stands in; Chewy has no CJK */
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		FlushCache::flush();
+		$this->fail_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Smile 😀 日本</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertSame( 'sun-exta', array_slice( $render['mpdf']->backupSubsFont, -1 )[0] );
+		$this->assertSame( 'Sun-ExtA.ttf', basename( $render['mpdf']->fonts['sun-exta']['ttffile'] ?? '' ) );
+		$this->assertStringNotContainsString( 'Sun-ExtA', implode( ',', $this->requested ) );
+	}
+
+	public function test_a_cjk_extension_b_character_does_not_download_sun_extb(): void {
+		/* Sun-ExtA's link to Sun-ExtB is the other way mPDF reaches it */
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		foreach ( [ 'arimo', 'sun-exta' ] as $font ) {
+			$render = $this->render( '<p style="font-family: ' . $font . '">𠀀</p>', [ 'font' => $font ] );
+			$this->assertArrayNotHasKey( 'sun-extb', $render['mpdf']->fonts, $font );
+		}
+
+		$this->assertStringNotContainsString( 'Sun-ExtB', implode( ',', $this->requested ) );
+	}
+
+	public function test_sun_extb_on_disk_is_the_cjk_extension_b_fallback_without_a_download(): void {
+		/* Sun-ExtB's font data needs no OpenType tables, so any fixture stands in */
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+		FlushCache::flush();
+		$this->fail_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">𠀀</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertSame( 'Sun-ExtB.ttf', basename( $render['mpdf']->fonts['sun-extb']['ttffile'] ?? '' ) );
+		$this->assertStringNotContainsString( 'Sun-ExtB', implode( ',', $this->requested ) );
 	}
 
 	public function test_consent_ticks_render_from_the_bundled_symbols(): void {
@@ -69,6 +179,13 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertRenderMatchesSnapshot( 'custom-arimo', '<p style="font-family: arimo">Custom</p>' );
 	}
 
+	public function test_greek_and_cyrillic_a_font_lacks_are_substituted_from_arimo(): void {
+		$this->copy_fixture( 'Chewy.ttf' );
+		$this->add_record( 'chewy', [ 'regular' => 'Chewy.ttf' ] );
+
+		$this->assertRenderMatchesSnapshot( 'greek-cyrillic-substitution', '<p style="font-family: chewy">Hello Γειά Привет</p>', [ 'font' => 'chewy' ] );
+	}
+
 	public function test_an_adopted_template_arimo_record_renders_the_bundled_faces(): void {
 		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
 		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
@@ -77,8 +194,87 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertRenderMatchesSnapshot( 'adopted-arimo', '<p style="font-family: arimo">Adopted</p>' );
 	}
 
-	protected function assertRenderMatchesSnapshot( string $name, string $html ): void {
-		$this->assertMatchesSnapshot( "fonts/$name.txt", $this->describe_fonts( $this->render( $html ) ) );
+	public function test_a_render_with_its_fonts_on_disk_makes_no_request(): void {
+		$this->serve_font_downloads();
+
+		$this->render( '<p style="font-family: dejavusans">Regular <b>Bold</b></p>' );
+
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_a_render_with_bundled_fonts_does_not_load_the_manifest(): void {
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'manifest', null );
+
+		$this->render( '<p style="font-family: arimo">Regular <b>Bold</b></p>', [ 'font' => 'arimo' ] );
+
+		$this->assertNull( $this->get_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'manifest' ) );
+	}
+
+	public function test_a_core_font_another_font_holds_the_name_of_renders_from_its_hashed_copy(): void {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( 'DejaVuSans.ttf' );
+
+		/* Another font's file at the name, and the manifest's own beside it */
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSans.ttf' );
+		$this->copy_fixture( 'DejaVuSans.ttf', $hashed );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: dejavusans">Regular</p>', [ 'font' => 'dejavusans' ] );
+
+		$this->assertSame( $hashed, basename( $render['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_a_core_font_another_font_holds_the_name_of_downloads_beside_it_and_renders_from_the_download(): void {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSans.ttf' );
+
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: dejavusans">Regular</p>', [ 'font' => 'dejavusans' ] );
+
+		$this->assertSame( $hashed, basename( $render['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/DejaVuSans.ttf' ], $this->requested );
+		$this->assertFileEquals( $this->font_fixture( 'DejaVuSans.ttf' ), $this->font_path( $hashed ) );
+		$this->assertSame( strlen( (string) file_get_contents( $this->font_fixture( 'DejaVuSans.ttf' ) ) ) + 1, filesize( $this->font_path( 'DejaVuSans.ttf' ) ), 'The other font is left alone' );
+	}
+
+	public function test_a_font_manager_font_and_the_core_font_with_the_same_file_name_each_render_their_own(): void {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSans.ttf' );
+
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$custom = $this->render( '<p style="font-family: mine">Custom</p>', [ 'font' => 'mine' ] );
+		$core   = $this->render( '<p style="font-family: dejavusans">Core</p>', [ 'font' => 'dejavusans' ] );
+
+		$this->assertSame( 'DejaVuSans.ttf', basename( $custom['mpdf']->fonts['mine']['ttffile'] ) );
+		$this->assertSame( $hashed, basename( $core['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertCount( 1, $this->requested );
+	}
+
+	public function test_a_core_font_another_font_holds_the_name_of_renders_from_that_font_when_it_cannot_download(): void {
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		FlushCache::flush();
+		$this->fail_font_downloads();
+
+		$render = $this->render( '<p style="font-family: dejavusans">Regular</p>', [ 'font' => 'dejavusans' ] );
+
+		$this->assertSame( 'DejaVuSans.ttf', basename( $render['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertCount( 1, $this->requested );
+	}
+
+	/**
+	 * Render the HTML and compare its fonts with the snapshot
+	 *
+	 * @param array $settings Overrides of the fixture PDF's settings
+	 */
+	protected function assertRenderMatchesSnapshot( string $name, string $html, array $settings = [] ): void {
+		$this->assertMatchesSnapshot( "fonts/$name.txt", $this->describe_fonts( $this->render( $html, $settings ) ) );
 	}
 
 	/**
@@ -86,12 +282,24 @@ class Test_Font_Rendering extends TestCase {
 	 *
 	 * @return array{mpdf: Mpdf, pdf: string}
 	 */
-	protected function render( string $html ): array {
+	protected function render( string $html, array $settings = [] ): array {
+		[ $result, $render ] = $this->generate( $html, $settings );
+
+		$this->assertInstanceOf( WP_Error::class, $result, 'The render should have been stopped' );
+		$this->assertNotNull( $render, 'The PDF failed before it was written: ' . $result->get_error_message() );
+
+		return $render;
+	}
+
+	/**
+	 * @return array{0: mixed, 1: array{mpdf: Mpdf, pdf: string}|null} The generate_and_save_pdf() result and the render
+	 */
+	protected function generate( string $html, array $settings = [] ): array {
 		$form  = $this->form( 'all-form-fields' );
 		$entry = $this->entry( 'all-form-fields' );
 
 		$capture = new class() extends RuntimeException {
-			/** @var array{mpdf: Mpdf, pdf: string} */
+			/** @var array{mpdf: Mpdf, pdf: string}|null */
 			public $result;
 		};
 
@@ -111,16 +319,13 @@ class Test_Font_Rendering extends TestCase {
 		add_filter( 'gfpdf_pdf_html_output_' . $form['id'], $swap, PHP_INT_MAX );
 		add_action( 'gfpdf_pre_pdf_generation_output', $stop, PHP_INT_MAX );
 
-		$settings = array_merge( $form['gfpdf_form_settings']['555ad84787d7e'], [ 'template' => 'zadani' ] );
+		$settings = array_merge( $form['gfpdf_form_settings']['555ad84787d7e'], [ 'template' => 'zadani' ], $settings );
 		$result   = GPDFAPI::get_mvc_class( 'Model_PDF' )->generate_and_save_pdf( $entry, $settings, true );
 
 		remove_filter( 'gfpdf_pdf_html_output_' . $form['id'], $swap, PHP_INT_MAX );
 		remove_action( 'gfpdf_pre_pdf_generation_output', $stop, PHP_INT_MAX );
 
-		$this->assertInstanceOf( WP_Error::class, $result, 'The render should have been stopped' );
-		$this->assertNotNull( $capture->result, 'The PDF failed before it was written: ' . $result->get_error_message() );
-
-		return $capture->result;
+		return [ $result, $capture->result ];
 	}
 
 	/**

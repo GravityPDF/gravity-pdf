@@ -6,11 +6,13 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Install;
 use GFPDF\Statics\Deprecation;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
 use GFPDF\Tests\Concerns\CreatesLegacyDownloadUrls;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\UnregistersMvcClasses;
 use GFPDF\Tests\Integration\TestCase;
 use GFPDF_Vendor\Monolog\Handler\TestHandler;
@@ -34,6 +36,7 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 	use CopiesFontFixtures;
 	use CreatesLegacyDownloadUrls;
+	use RecordsFontFailures;
 	use UnregistersMvcClasses;
 
 	/**
@@ -49,6 +52,11 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 
 	public function tear_down(): void {
 		$this->remove_font_fixtures();
+
+		/* A subsite leaves these behind */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
 
 		parent::tear_down();
 	}
@@ -326,10 +334,12 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		];
 	}
 
-	public function test_6_19_0_adopts_a_template_arimo_record() {
+	public function test_6_19_0_adopts_template_arimo_and_core_font_records() {
 		wp_mkdir_p( \GPDFAPI::get_data_class()->template_font_location );
 		$this->copy_fixture( 'Chewy.ttf', 'Arimo-Regular.ttf' );
 		$this->add_record( 'arimo', [ 'regular' => 'Arimo-Regular.ttf' ] );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf', 'DejaVuSansCondensed85274.ttf' );
+		$this->add_record( 'dejavusanscondensed', [ 'regular' => 'DejaVuSansCondensed85274.ttf' ] );
 
 		$log = new TestHandler();
 		\GPDFAPI::get_log_class()->pushHandler( $log );
@@ -348,7 +358,7 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 			\GPDFAPI::get_log_class()->popHandler();
 		}
 
-		$this->assertArrayNotHasKey( 'arimo', \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->get_custom_fonts() );
+		$this->assertSame( [], \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->get_custom_fonts() );
 		$this->assertFalse( $log->hasRecordThatContains( 'Could not remove a custom font record', Logger::ERROR ) );
 	}
 
@@ -444,5 +454,127 @@ class Test_Controller_Upgrade_Routines extends TestCase {
 		do_action( 'gfpdf_version_changed', '6.18.0', '6.18.1' );
 
 		$this->assertDirectoryExists( $cache . '/ttfontdata' );
+	}
+
+	/**
+	 * @dataProvider data_core_font_cleanup
+	 */
+	public function test_core_fonts_outside_the_required_set_are_removed_on_the_upgrade_to_6_19( string $old_version, string $new_version, bool $removed ) {
+		$this->set_installer_manifest();
+		$this->options->delete_option( 'default_font' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf' );
+
+		$this->upgrade( $old_version, $new_version );
+
+		$this->assertSame( ! $removed, is_file( $this->font_path( 'DejaVuSerifCondensed.ttf' ) ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSansCondensed.ttf' ), 'The default font the upgrade saves is kept' );
+	}
+
+	public function data_core_font_cleanup(): array {
+		return [
+			'upgrade to 6.19'     => [ '6.18.0', '6.19.0', true ],
+			'upgrade past 6.19'   => [ '6.17.2', '7.0.0', true ],
+			'a new install'       => [ '', '6.19.0', false ],
+			'upgrade within 6.19' => [ '6.19.0', '6.19.1', false ],
+		];
+	}
+
+	public function test_the_upgrade_leaves_the_core_font_cleanup_to_cron() {
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertNotFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_core_font_cleanup_keeps_the_required_fonts() {
+		$this->set_installer_manifest();
+		$this->options->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf' );
+
+		$this->upgrade( '6.18.0', '6.19.0' );
+
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSansCondensed.ttf' ) );
+	}
+
+	public function test_the_core_font_cleanup_keeps_fonts_when_downloads_are_off() {
+		$this->set_installer_manifest();
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+
+		$this->upgrade( '6.18.0', '6.19.0' );
+
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_core_font_cleanup_runs_once() {
+		$this->set_installer_manifest();
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->upgrade( '6.18.0', '6.19.0' );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertTrue( $this->get_font_cleanup() );
+
+		/* Another site upgrading, or this one again, finds the folder already cleaned */
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->upgrade( '6.18.0', '6.19.0' );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_core_font_cleanup_keeps_every_sites_fonts() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->set_installer_manifest();
+		$this->options->update_option( 'default_font', 'arimo' );
+		update_blog_option( self::factory()->blog->create(), 'gfpdf_settings', [ 'default_font' => 'dejavuserifcondensed' ] );
+
+		/* A site yet to upgrade, with no default font saved, will save DejaVu Sans Condensed */
+		self::factory()->blog->create();
+
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSansCondensed.ttf' );
+
+		$this->upgrade( '6.18.0', '6.19.0' );
+
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSansCondensed.ttf' ) );
+	}
+
+	public function test_the_upgrade_queues_no_cleanup_without_the_downloader() {
+		$this->without_mvc_class(
+			'Model_Font_Downloader',
+			static function () {
+				do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+			}
+		);
+
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+		$this->assertFalse( $this->get_font_cleanup() );
+	}
+
+	public function test_another_sites_upgrade_leaves_a_cleanup_under_way_alone() {
+		$state  = $this->font_cleanup_state( [ 'keys' => [ 'arimo' ] ] );
+		$queued = time() + HOUR_IN_SECONDS;
+
+		$this->set_font_cleanup( $state );
+		wp_schedule_single_event( $queued, Model_Font_Downloader::CLEANUP_EVENT );
+
+		do_action( 'gfpdf_version_changed', '6.18.0', '6.19.0' );
+
+		$this->assertSame( $state, $this->get_font_cleanup() );
+		$this->assertSame( $queued, wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ) );
+	}
+
+	/**
+	 * Run the version change, then the cleanup it queues
+	 */
+	private function upgrade( string $old_version, string $new_version ): void {
+		do_action( 'gfpdf_version_changed', $old_version, $new_version );
+		do_action( Model_Font_Downloader::CLEANUP_EVENT );
 	}
 }

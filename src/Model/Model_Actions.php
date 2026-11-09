@@ -7,6 +7,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
 use GFPDF\Statics\Deprecation;
 use GPDFAPI;
 
@@ -29,6 +30,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Model_Actions extends Helper_Abstract_Model {
+
+	use Helper_Trait_Removed_Methods;
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected static function get_removed_methods(): array {
+		return [
+			'core_font_condition' => '6.19.0',
+			'core_font_redirect'  => '6.19.0',
+		];
+	}
 
 	/**
 	 * The prefix each deprecated feature's dismissal is recorded under in `action_dismissal`
@@ -82,20 +95,30 @@ class Model_Actions extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
+	 * @var Model_Font_Downloader|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $downloader;
+
+	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Data             $data    Our plugin data store
-	 * @param Helper_Abstract_Options $options Our options class which allows us to access any settings
-	 * @param Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data                $data       Our plugin data store
+	 * @param Helper_Abstract_Options    $options    Our options class which allows us to access any settings
+	 * @param Helper_Notices             $notices    Our notice class used to queue admin messages and errors
+	 * @param Model_Font_Downloader|null $downloader Defaults to the registered downloader
 	 *
 	 * @since 4.0
+	 * @since 6.19.0 Takes the font downloader
 	 */
-	public function __construct( Helper_Data $data, Helper_Abstract_Options $options, Helper_Notices $notices ) {
+	public function __construct( Helper_Data $data, Helper_Abstract_Options $options, Helper_Notices $notices, ?Model_Font_Downloader $downloader = null ) {
 
 		/* Assign our internal variables */
-		$this->data    = $data;
-		$this->options = $options;
-		$this->notices = $notices;
+		$this->data       = $data;
+		$this->options    = $options;
+		$this->notices    = $notices;
+		$this->downloader = $downloader;
 	}
 
 	/**
@@ -158,35 +181,6 @@ class Model_Actions extends Helper_Abstract_Model {
 		}
 
 		$this->options->update_option( 'action_dismissal', $dismissed_notices );
-	}
-
-	/**
-	 * Check if one of the core fonts exists in the fonts directory
-	 *
-	 * @return bool
-	 *
-	 * @since 5.0
-	 */
-	public function core_font_condition() {
-
-		$misc = GPDFAPI::get_misc_class();
-
-		/* Check if one of the core fonts already exists */
-		if ( ! is_file( $this->data->template_font_location . 'DejaVuSansCondensed.ttf' ) && ! $misc->is_gfpdf_settings_tab( 'tools' ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Redirect user to our font installer tool
-	 *
-	 * @since 5.0
-	 */
-	public function core_font_redirect() {
-		wp_safe_redirect( admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=tools#/downloadCoreFonts' ) );
-		exit;
 	}
 
 	/**
@@ -292,6 +286,43 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	protected function get_unwritable_folder_dismissal( string $dir ): string {
 		return static::UNWRITABLE_FOLDER_DISMISSAL . md5( $dir );
+	}
+
+	/**
+	 * The core fonts that failed to download after their retry, less the ones dismissed
+	 *
+	 * @return string[]
+	 * @since 6.19.0
+	 */
+	public function get_undismissed_failed_core_fonts(): array {
+		return $this->get_downloader()->get_undismissed_failed_files();
+	}
+
+	/**
+	 * Whether any font that gave up downloading still has its notice undismissed
+	 *
+	 * @since 6.19.0
+	 */
+	public function has_failed_core_fonts(): bool {
+		return $this->get_undismissed_failed_core_fonts() !== [];
+	}
+
+	/**
+	 * Dismiss the listed fonts for every site, as they share the fonts folder; one that fails later raises it again
+	 *
+	 * @since 6.19.0
+	 */
+	public function dismiss_failed_core_fonts(): void {
+		$this->get_downloader()->dismiss_failed_files();
+	}
+
+	/**
+	 * The injected downloader, else the registered one, which bootstrap builds after this model
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_downloader(): Model_Font_Downloader {
+		return $this->downloader ?? GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
 	}
 
 	/**

@@ -6,6 +6,8 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Trait_Removed_Methods;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
@@ -20,16 +22,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Controller_Save_Core_Fonts
+ * The Core Font installer's AJAX endpoint, removed in 6.19.0 now core fonts download on their own
+ *
+ * Kept as an inert stub so a third party building or calling it gets a deprecation notice instead of a fatal error.
+ * It registers no hooks.
  *
  * @package GFPDF\Controller
  *
- * @since   5.0
+ * @since      5.0
+ * @deprecated 6.19.0 Core fonts download in the background, or when a PDF needs them (Model_Font_Downloader)
  */
 class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements Helper_Interface_Actions {
 
+	use Helper_Trait_Removed_Methods;
+
 	/**
-	 * Holds our log class
+	 * @since 6.19.0
+	 */
+	protected static function get_removed_methods(): array {
+		return [
+			'save_core_font'         => '6.19.0',
+			'download_and_save_font' => '6.19.0',
+			'get_downloader'         => '6.19.0',
+		];
+	}
+
+	/**
+	 * Kept for subclasses that read them
 	 *
 	 * @var LoggerInterface
 	 *
@@ -38,9 +57,6 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	protected $log;
 
 	/**
-	 * Holds our Helper_Data object
-	 * which we can autoload with any data needed
-	 *
 	 * @var Helper_Data
 	 *
 	 * @since 5.0
@@ -48,9 +64,6 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	protected $data;
 
 	/**
-	 * Holds our Helper_Misc object
-	 * Makes it easy to access common methods throughout the plugin
-	 *
 	 * @var Helper_Misc
 	 *
 	 * @since 5.0
@@ -58,208 +71,39 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	protected $misc;
 
 	/**
-	 * Set up our dependencies
+	 * @var Model_Font_Downloader|null
 	 *
-	 * @param LoggerInterface $log  Our logger class
-	 * @param Helper_Data     $data Our plugin data store
-	 * @param Helper_Misc     $misc Our miscellaneous class
+	 * @since 6.19.0
+	 */
+	protected $downloader;
+
+	/**
+	 * @param LoggerInterface            $log
+	 * @param Helper_Data                $data
+	 * @param Helper_Misc                $misc
+	 * @param Model_Font_Downloader|null $downloader
 	 *
 	 * @since 5.0
+	 * @since 6.19.0 Deprecated
 	 */
-	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc ) {
-		/* Assign our internal variables */
-		$this->log  = $log;
-		$this->data = $data;
-		$this->misc = $misc;
+	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, ?Model_Font_Downloader $downloader = null ) {
+		_deprecated_class( static::class, '6.19.0' );
+
+		$this->log        = $log;
+		$this->data       = $data;
+		$this->misc       = $misc;
+		$this->downloader = $downloader;
 	}
 
 	/**
-	 * Initialise our class defaults
-	 *
-	 * @return void
 	 * @since 5.0
-	 *
+	 * @since 6.19.0 Does nothing
 	 */
-	public function init() {
-		$this->add_actions();
-	}
+	public function init() {}
 
 	/**
-	 * Apply any actions needed for the welcome page
-	 *
-	 * @return void
 	 * @since 5.0
-	 *
+	 * @since 6.19.0 Does nothing: the `wp_ajax_gfpdf_save_core_font` endpoint is gone
 	 */
-	public function add_actions() {
-		/* Register our AJAX event */
-		add_action( 'wp_ajax_gfpdf_save_core_font', [ $this, 'save_core_font' ] );
-	}
-
-	/**
-	 * An AJAX endpoint that handles authentication and downloading the core font
-	 *
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function save_core_font() {
-		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Save Core Font', 'gravityforms_edit_settings' );
-
-		$results = $this->download_and_save_font();
-
-		/* Return results */
-		header( 'Content-Type: application/json' );
-		echo wp_json_encode( $results );
-		wp_die();
-	}
-
-	/**
-	 * Stream files from remote server and save them locally
-	 *
-	 * @return bool
-	 * @since 5.0
-	 *
-	 */
-	protected function download_and_save_font() {
-
-		/* Verify the font name provided is approved */
-		/* phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents */
-		$core_font_list = json_decode( file_get_contents( __DIR__ . '/../../build/payload/core-fonts.json' ), true );
-		if ( $core_font_list === null ) {
-			$this->log->error( 'Core font list could not be loaded' );
-
-			return false;
-		}
-
-		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		$font_name = sanitize_text_field( wp_unslash( $_POST['font_name'] ?? '' ) );
-
-		/* Look for a file in the font list with a matching name */
-		$matching_fonts = array_filter(
-			$core_font_list,
-			function ( $item ) use ( $font_name ) {
-				return $item['name'] === $font_name;
-			}
-		);
-
-		$matching_fonts = array_values( $matching_fonts );
-
-		if ( ! isset( $matching_fonts[0] ) ) {
-			$this->log->error(
-				'Core Font not on the approved list',
-				[
-					'name' => $font_name,
-				]
-			);
-
-			return false;
-		}
-
-		$this->misc->create_folder( $this->data->template_font_location );
-
-		$font_path = $this->data->template_font_location . $matching_fonts[0]['name'];
-
-		/* Download beside the font, so a blocked or failed request leaves any installed copy alone */
-		$download_path = $font_path . '.part';
-
-		$res = wp_remote_get(
-			$matching_fonts[0]['download_url'],
-			[
-				'timeout'  => 60,
-				'stream'   => true,
-				'filename' => $download_path,
-			]
-		);
-
-		$res_code = wp_remote_retrieve_response_code( $res );
-
-		/* A failed download still leaves the file it streamed into */
-		if ( is_wp_error( $res ) || $res_code !== 200 ) {
-			wp_delete_file( $download_path );
-		}
-
-		/* Check for errors and log them to file */
-		if ( is_wp_error( $res ) ) {
-			$this->log->error(
-				'Core Font Download Failed',
-				[
-					'name'             => $matching_fonts[0],
-					'WP_Error_Message' => $res->get_error_message(),
-					'WP_Error_Code'    => $res->get_error_code(),
-				]
-			);
-
-			return false;
-		}
-
-		if ( $res_code !== 200 ) {
-			$this->log->error(
-				'Core Font API Response Failed',
-				[
-					'response_code' => $res_code,
-				]
-			);
-
-			return false;
-		}
-
-		if ( ! $this->is_expected_file( $download_path, (int) $matching_fonts[0]['size'], $matching_fonts[0]['sha'] ) ) {
-			wp_delete_file( $download_path );
-
-			$this->log->error(
-				'Core Font Verification Failed',
-				[
-					'name' => $matching_fonts[0]['name'],
-					'size' => $matching_fonts[0]['size'],
-					'sha'  => $matching_fonts[0]['sha'],
-				]
-			);
-
-			return false;
-		}
-
-		if ( ! @rename( $download_path, $font_path ) ) { // phpcs:ignore
-			wp_delete_file( $download_path );
-
-			$this->log->error(
-				'Core Font Move Failed',
-				[
-					'name' => $matching_fonts[0]['name'],
-				]
-			);
-
-			return false;
-		}
-
-		/* If we got here, the call was successful */
-
-		return true;
-	}
-
-	/**
-	 * Check a downloaded file against the size and git blob SHA-1 GitHub lists for it in core-fonts.json
-	 *
-	 * @param string $file
-	 * @param int    $size
-	 * @param string $sha
-	 *
-	 * @return bool
-	 *
-	 * @since 6.18.0
-	 */
-	protected function is_expected_file( $file, $size, $sha ) {
-		clearstatcache( true, $file );
-
-		if ( ! is_file( $file ) || filesize( $file ) !== $size ) {
-			return false;
-		}
-
-		$hash = hash_init( 'sha1' );
-		hash_update( $hash, 'blob ' . $size . "\0" );
-		hash_update_file( $hash, $file );
-
-		return hash_equals( $sha, hash_final( $hash ) );
-	}
+	public function add_actions() {}
 }

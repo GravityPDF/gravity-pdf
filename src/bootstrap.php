@@ -45,6 +45,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	use Helper_Trait_Removed_Methods;
 
 	/**
+	 * @since 6.19.0
+	 */
+	protected static function get_removed_methods(): array {
+		return [ 'load_core_font_handler' => '6.19.0' ];
+	}
+
+	/**
 	 * Holds our log class
 	 *
 	 * @var LoggerInterface
@@ -210,7 +217,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->mergetags();
 		$this->actions();
 		$this->template_manager();
-		$this->load_core_font_handler();
 		$this->load_custom_font_handler();
 		$this->load_font_sources();
 		$this->load_debug();
@@ -866,20 +872,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Initialise our core font AJAX handler
-	 *
-	 * @return void
-	 * @since 5.0
-	 *
-	 */
-	public function load_core_font_handler() {
-		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
-		$class->init();
-
-		$this->singleton->add_class( $class );
-	}
-
-	/**
 	 * Initialise our custom font handler
 	 * @since 5.0
 	 *
@@ -894,7 +886,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Register the fonts Gravity PDF provides
+	 * Register the fonts Gravity PDF provides, and their downloader
 	 *
 	 * @since 6.19.0
 	 */
@@ -904,6 +896,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$class->init();
 
 		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $class );
+
+		$required_fonts = new Model\Model_Required_Fonts( $model, $this->options, $this->log );
+		$downloader     = new Model\Model_Font_Downloader( $model, $this->data, $this->options, $this->misc, $this->log, $required_fonts );
+		$class          = new Controller\Controller_Font_Downloader( $downloader, $required_fonts );
+		$class->init();
+
+		$this->singleton->add_class( $downloader );
+		$this->singleton->add_class( $required_fonts );
 		$this->singleton->add_class( $class );
 	}
 
@@ -931,7 +932,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
-		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks(), $this->templates, $this->singleton->get_class( 'Model_Pdf_Cache' ) );
+		$model = new Model\Model_System_Report(
+			$this->options,
+			$this->data,
+			$this->log,
+			$this->misc,
+			new GFPDF_Major_Compatibility_Checks(),
+			$this->templates,
+			$this->singleton->get_class( 'Model_Pdf_Cache' ),
+			$this->singleton->get_class( 'Model_Required_Fonts' ),
+			$this->singleton->get_class( 'Model_Font_Sources' )
+		);
 		$class = new Controller\Controller_System_Report( $model, $view, $this->gform );
 		$class->init();
 

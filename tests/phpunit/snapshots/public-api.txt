@@ -670,7 +670,7 @@ class GFPDF\Helper\Helper_Notices implements GFPDF\Helper\Helper_Interface_Actio
     public static function __callStatic($name, $arguments)
 
 class GFPDF\Helper\Helper_PDF
-    public function __construct($entry, $settings, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Templates $templates, GFPDF_Vendor\Psr\Log\LoggerInterface $log)
+    public function __construct($entry, $settings, GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Templates $templates, GFPDF_Vendor\Psr\Log\LoggerInterface $log, ?GFPDF\Model\Model_Font_Downloader $downloader = null)
     public function generate()
     public function get_cache_bypass()
     public function get_entry()
@@ -824,7 +824,7 @@ class GFPDF\Model\Model_PDF extends GFPDF\Helper\Helper_Abstract_Model
     final public function getController()
     final public function setController(GFPDF\Helper\Helper_Abstract_Controller $controller_class)
     public function __call($name, $arguments)
-    public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Helper\Helper_Templates $templates, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer, ?GFPDF\Helper\Helper_Async_Notifications $async_notifications = null)
+    public function __construct(GFPDF\Helper\Helper_Abstract_Form $gform, GFPDF_Vendor\Psr\Log\LoggerInterface $log, GFPDF\Helper\Helper_Abstract_Options $options, GFPDF\Helper\Helper_Data $data, GFPDF\Helper\Helper_Misc $misc, GFPDF\Helper\Helper_Notices $notices, GFPDF\Helper\Helper_Templates $templates, GFPDF\Helper\Helper_Interface_Url_Signer $url_signer, ?GFPDF\Helper\Helper_Async_Notifications $async_notifications = null, ?GFPDF\Model\Model_Font_Sources $font_sources = null)
     public function add_unregistered_fonts_to_mPDF($fonts)
     public function can_user_view_entry($entry, $settings, $user_id = null)
     public function can_user_view_pdf_with_capabilities($user_id = null)
@@ -935,7 +935,6 @@ class GFPDF\Router implements GFPDF\Helper\Helper_Interface_Actions, GFPDF\Helpe
     public function init_settings_api()
     public function installer()
     public function load_admin_assets()
-    public function load_core_font_handler()
     public function load_custom_font_handler(): void
     public function load_debug()
     public function load_font_sources(): void

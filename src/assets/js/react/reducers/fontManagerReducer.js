@@ -5,6 +5,8 @@ import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -16,16 +18,19 @@ import {
 	DELETE_FONT,
 	DELETE_FONT_SUCCESS,
 	DELETE_FONT_ERROR,
+	INSTALL_FONT,
+	INSTALL_FONT_SUCCESS,
+	INSTALL_FONT_ERROR,
 	CLEAR_ADD_FONT_MSG,
 	CLEAR_DROPZONE_ERROR,
 	RESET_SEARCH_RESULT,
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
-	MOVE_SELECTED_FONT_TO_TOP,
 } from '../actions/fontManager';
 /* Utilities */
 import {
 	findAndUpdate,
+	findAndReplace,
 	findAndRemove,
 	reduceFontFileName,
 	checkFontListIncludes,
@@ -45,7 +50,9 @@ import {
  * @property { boolean }       loading           - general loading state
  * @property { boolean }       addFontLoading    - loading state when adding font
  * @property { boolean }       deleteFontLoading - loading state when deleting font
+ * @property { null | string } installingFont    - ID of the font being installed
  * @property { Array<Object> } fontList          - font list state
+ * @property { null | Object } fontUsage         - why fonts are in use by ID, null until loaded
  * @property { null }          searchResult      - search result state
  * @property { string }        selectedFont      - state of selected font
  * @property { Object }        msg               - message object
@@ -62,10 +69,52 @@ export const initialState = {
 	loading: false,
 	addFontLoading: false,
 	deleteFontLoading: false,
+	installingFont: null,
 	fontList: [],
+	fontUsage: null,
 	searchResult: null,
 	selectedFont: '',
 	msg: {},
+};
+
+/**
+ * Forget the outcome of the last font install or delete
+ *
+ * @param { Object } current
+ *
+ * @return { Object } msg
+ *
+ * @since 6.19.0
+ */
+const clearFontActionMsg = (current) => {
+	const msg = { ...current };
+
+	delete msg.success;
+
+	if (msg.error) {
+		delete msg.error.deleteFont;
+	}
+
+	return msg;
+};
+
+/**
+ * Apply a change to the font list and any search of it, ending a search left with no results
+ *
+ * @param { FontManagerReducerState } state
+ * @param { Function }                update
+ *
+ * @return {{ fontList: Array, searchResult: null | Array }} The new lists
+ *
+ * @since 6.19.0
+ */
+const updateFontLists = (state, update) => {
+	const searchResult = state.searchResult && update(state.searchResult);
+
+	return {
+		fontList: update(state.fontList),
+		searchResult: searchResult?.length ? searchResult : null,
+	};
 };
 
 /**
@@ -93,6 +142,7 @@ export default function (state = initialState, action) {
 			return {
 				...state,
 				loading: true,
+				fontUsage: null,
 				msg: {},
 			};
 		}
@@ -119,6 +169,31 @@ export default function (state = initialState, action) {
 				...state,
 				loading: false,
 				msg: { error: { fontList: payload } },
+			};
+
+		/**
+		 * Process GET_FONT_USAGE_SUCCESS
+		 *
+		 * @since 6.19.0
+		 */
+		case GET_FONT_USAGE_SUCCESS:
+			return {
+				...state,
+				fontUsage: payload,
+			};
+
+		/**
+		 * Process GET_FONT_USAGE_ERROR, which leaves Delete disabled
+		 *
+		 * @since 6.19.0
+		 */
+		case GET_FONT_USAGE_ERROR:
+			return {
+				...state,
+				msg: {
+					...state.msg,
+					error: { ...state.msg.error, deleteFont: payload },
+				},
 			};
 
 		/**
@@ -298,25 +373,12 @@ export default function (state = initialState, action) {
 		 *
 		 * @since 6.0
 		 */
-		case DELETE_FONT: {
-			const msg = { ...state.msg };
-
-			/* Clear previous success msg */
-			if (msg.success) {
-				delete msg.success;
-			}
-
-			/* Clear previous deleteFont error msg */
-			if (msg.error && msg.error.deleteFont) {
-				delete msg.error.deleteFont;
-			}
-
+		case DELETE_FONT:
 			return {
 				...state,
 				deleteFontLoading: true,
-				msg,
+				msg: clearFontActionMsg(state.msg),
 			};
-		}
 
 		/**
 		 * Process DELETE_FONT_SUCCESS
@@ -324,24 +386,30 @@ export default function (state = initialState, action) {
 		 * @since 6.0
 		 */
 		case DELETE_FONT_SUCCESS: {
-			/* Delete from the list during active search */
-			if (state.searchResult) {
-				return {
-					...state,
-					deleteFontLoading: false,
-					fontList: findAndRemove([...state.fontList], payload),
-					searchResult:
-						findAndRemove([...state.searchResult], payload)
-							.length === 0
-							? null
-							: findAndRemove([...state.searchResult], payload),
-				};
-			}
+			const deleted = state.fontList.find((font) => font.id === payload);
+			const msg = {
+				...state.msg,
+				success: {
+					// %s is found inside fontManagerFontDeleted
+					// eslint-disable-next-line @wordpress/valid-sprintf
+					deleteFont: sprintf(
+						GFPDF.fontManagerFontDeleted,
+						deleted?.font_name ?? payload
+					),
+				},
+			};
 
+			/* A core font that can be installed again stays listed as available */
+			const { font } = action;
 			return {
 				...state,
 				deleteFontLoading: false,
-				fontList: findAndRemove([...state.fontList], payload),
+				...updateFontLists(state, (list) =>
+					font
+						? findAndReplace(list, font)
+						: findAndRemove(list, payload)
+				),
+				msg,
 			};
 		}
 
@@ -354,6 +422,58 @@ export default function (state = initialState, action) {
 			return {
 				...state,
 				deleteFontLoading: false,
+				msg: {
+					...state.msg,
+					error: { ...state.msg.error, deleteFont: payload },
+				},
+			};
+
+		/**
+		 * Process INSTALL_FONT
+		 *
+		 * @since 6.19.0
+		 */
+		case INSTALL_FONT:
+			return {
+				...state,
+				installingFont: payload,
+				msg: clearFontActionMsg(state.msg),
+			};
+
+		/**
+		 * Process INSTALL_FONT_SUCCESS
+		 *
+		 * @since 6.19.0
+		 */
+		case INSTALL_FONT_SUCCESS:
+			return {
+				...state,
+				installingFont: null,
+				...updateFontLists(state, (list) =>
+					findAndReplace(list, payload)
+				),
+				msg: {
+					...state.msg,
+					success: {
+						// %s is found inside fontManagerFontJustInstalled
+						// eslint-disable-next-line @wordpress/valid-sprintf
+						installFont: sprintf(
+							GFPDF.fontManagerFontJustInstalled,
+							payload.font_name
+						),
+					},
+				},
+			};
+
+		/**
+		 * Process INSTALL_FONT_ERROR
+		 *
+		 * @since 6.19.0
+		 */
+		case INSTALL_FONT_ERROR:
+			return {
+				...state,
+				installingFont: null,
 				msg: {
 					...state.msg,
 					error: { ...state.msg.error, deleteFont: payload },
@@ -449,19 +569,10 @@ export default function (state = initialState, action) {
 				return related.push(item);
 			});
 
-			/* Sort and combine mostRelevant and related array into 1 array */
-			const result = [
-				...relevant.sort((a, b) =>
-					a.font_name.localeCompare(b.font_name)
-				),
-				...related.sort((a, b) =>
-					a.font_name.localeCompare(b.font_name)
-				),
-			];
-
+			/* The most relevant first, each keeping the list's own order */
 			return {
 				...state,
-				searchResult: result,
+				searchResult: [...relevant, ...related],
 			};
 		}
 
@@ -475,27 +586,6 @@ export default function (state = initialState, action) {
 				...state,
 				selectedFont: payload,
 			};
-
-		/**
-		 * Process MOVE_SELECTED_FONT_TO_TOP
-		 *
-		 * @since 6.0
-		 */
-		case MOVE_SELECTED_FONT_TO_TOP: {
-			const fontList = [...state.fontList];
-			const filterFontList = fontList.filter(
-				(item) => item.id !== payload
-			);
-			const getPayloadItem = fontList.filter(
-				(item) => item.id === payload
-			);
-			const list = [...getPayloadItem, ...filterFontList];
-
-			return {
-				...state,
-				fontList: list,
-			};
-		}
 	}
 
 	return state;

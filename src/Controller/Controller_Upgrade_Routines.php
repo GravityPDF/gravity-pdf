@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF\Model\Model_Font_Sources;
 use GFPDF\Model\Model_Install;
@@ -101,8 +102,10 @@ class Controller_Upgrade_Routines {
 
 		/* A site upgraded from before Arimo was the default keeps DejaVu Sans Condensed, even if it never saved one */
 		if ( $old_version !== '' && version_compare( $old_version, '6.19.0', '<' ) ) {
-			$this->save_unset_default_font( 'dejavusanscondensed' );
+			$this->save_unset_default_font( Model_Font_Downloader::PRE_6_19_DEFAULT_FONT );
 			$this->adopt_font_source_records();
+
+			$this->schedule_core_font_cleanup();
 		}
 
 		if ( version_compare( $current_version, '7.0.0-beta1', '>=' ) && version_compare( $old_version, '7.0.0-beta1', '<' ) ) {
@@ -172,6 +175,19 @@ class Controller_Upgrade_Routines {
 
 		foreach ( array_keys( $font_sources->get_sources() ) as $source_id ) {
 			$font_sources->adopt_records( $source_id );
+		}
+	}
+
+	/**
+	 * Queue the removal of the core fonts a new install wouldn't have. It keeps the fonts every site needs and runs in
+	 * the background, as every site on every network shares the fonts folder.
+	 *
+	 * @since 6.19.0
+	 */
+	protected function schedule_core_font_cleanup(): void {
+		$downloader = \GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+		if ( $downloader instanceof Model_Font_Downloader ) {
+			$downloader->schedule_cleanup();
 		}
 	}
 

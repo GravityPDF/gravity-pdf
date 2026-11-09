@@ -6,7 +6,6 @@
 @use "Component/button";
 @use "Component/clear-pdf-cache";
 @use "Component/color-picker";
-@use "Component/core-fonts";
 @use "Component/FontManager/font-manager";
 @use "Component/FontManager/footer";
 @use "Component/FontManager/font-manager-skeleton";
@@ -49,7 +48,3 @@
 @use "RTL/Pages/rtl-general-settings";
 @use "RTL/Pages/rtl-pdf-list";
 @use "RTL/Pages/rtl-pdf-settings";
-
-/* RTL Media queries */
-@use "RTL/MediaQueries/rtl-min-961";
-@use "RTL/MediaQueries/rtl-min-1200";

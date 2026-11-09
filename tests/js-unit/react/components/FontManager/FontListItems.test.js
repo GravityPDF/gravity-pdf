@@ -17,9 +17,7 @@ describe('FontManager - FontListItems.js', () => {
 		},
 		clearAddFontMsg: jest.fn(),
 		msg: { success: { addFont: 'success' } },
-		deleteFont: jest.fn(),
 		selectFont: jest.fn(),
-		moveSelectedFontToTop: jest.fn(),
 		fontList: [
 			{
 				font_name: 'Fira Sans Light',
@@ -28,15 +26,18 @@ describe('FontManager - FontListItems.js', () => {
 				italics: 'FiraSans-LightItalic.ttf',
 				bold: 'FiraSans-Medium.ttf',
 				bolditalics: 'FiraSans-MediumItalic.ttf',
+				type: 'custom',
+				can_delete: true,
 			},
 		],
 		searchResult: null,
 		selectedFont: 'roboto',
 		loading: true,
+		fontUsage: {},
 	};
 
 	describe('RUN LIFECYCLE METHODS', () => {
-		test('componentDidMount() - Call the method handleDisableSelectFields()', () => {
+		test('componentDidMount() - Call the method handleSetSelectedFontNameValue()', () => {
 			// Mock font manager select box DOM
 			document.body.innerHTML =
 				'<select id="gfpdf_settings[font]" name="gfpdf_settings[font]">' +
@@ -48,178 +49,49 @@ describe('FontManager - FontListItems.js', () => {
 
 			const wrapper = shallow(<FontListItems {...props} />);
 			const instance = wrapper.instance();
-			const handleDisableSelectFields = jest.spyOn(
+			const handleSetSelectedFontNameValue = jest.spyOn(
 				instance,
-				'handleDisableSelectFields'
+				'handleSetSelectedFontNameValue'
 			);
 
 			instance.componentDidMount();
 
-			expect(handleDisableSelectFields).toHaveBeenCalledTimes(1);
-		});
-
-		test('componentDidMount() - Call the method handleMoveSelectedFontAtTheTopOfTheList()', () => {
-			// Mock font manager select box DOM
-			document.body.innerHTML =
-				'<select id="gfpdf_settings[font]" name="gfpdf_settings[font]">' +
-				' <optgroup label="User-Defined Fonts">' +
-				'   <option value="z" />' +
-				'   <option value="c" />' +
-				' </optgroup>' +
-				'</select>';
-
-			const wrapper = shallow(
-				<FontListItems {...props} selectedFont="roboto" />
-			);
-			const instance = wrapper.instance();
-			const handleMoveSelectedFontAtTheTopOfTheList = jest.spyOn(
-				instance,
-				'handleMoveSelectedFontAtTheTopOfTheList'
-			);
-
-			instance.componentDidMount();
-
-			expect(
-				handleMoveSelectedFontAtTheTopOfTheList
-			).toHaveBeenCalledTimes(1);
-			expect(props.moveSelectedFontToTop).toHaveBeenCalledTimes(1);
-		});
-
-		test('componentDidUpdate() - Call the method handleResetLoadingState() and handleMoveSelectedFontAtTheTopOfTheList()', () => {
-			// Mock update font panel DOM
-			document.body.innerHTML =
-				'<div class="update-font show">' + '</div>';
-
-			const wrapper = shallow(
-				<FontListItems {...props} loading={false} />
-			);
-			const instance = wrapper.instance();
-			const toggleUpdateFont = jest.spyOn(utilities, 'toggleUpdateFont');
-			const handleResetLoadingState = jest.spyOn(
-				instance,
-				'handleResetLoadingState'
-			);
-			const prevProps = {
-				fontList: [
-					{
-						font_name: 'Arial',
-						id: 'arial',
-						regular: 'Arial.ttf',
-						italics: 'Arial-Italic.ttf',
-						bold: 'Arial-Bold.ttf',
-						bolditalics: 'Arial-BoldItalics.ttf',
-					},
-				],
-				loading: true,
-				selectedFont: '',
-			};
-
-			instance.componentDidUpdate(prevProps);
-
-			expect(handleResetLoadingState).toHaveBeenCalledTimes(1);
-			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
+			expect(handleSetSelectedFontNameValue).toHaveBeenCalledTimes(1);
 		});
 	});
 
 	describe('RUN COMPONENT METHODS', () => {
-		test('handleDisableSelectFields() - Disable select font name functionality (radio button)', () => {
-			delete window.location;
-			window.location = {
-				search: '?page=gf_settings&subview=PDF&tab=tools',
+		test.each([
+			['the form Font field', 'gfpdf_settings[font]'],
+			['the global Default Font field', 'gfpdf_settings[default_font]'],
+		])('handleSetSelectedFontNameValue() - Reads %s', (name, id) => {
+			const select = (value) => {
+				document.body.innerHTML = `<select id="${id}"><option value="${value}" selected></option></select>`;
+				props.selectFont.mockClear();
+				shallow(<FontListItems {...props} />)
+					.instance()
+					.handleSetSelectedFontNameValue();
 			};
 
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
+			select('firasanslight');
+			expect(props.selectFont).toHaveBeenCalledWith('firasanslight');
 
-			instance.handleDisableSelectFields();
-
-			expect(wrapper.state('disableSelectFontName')).toBe(true);
+			select('not-listed');
+			expect(props.selectFont).toHaveBeenCalledWith('');
 		});
 
-		test('handleSetSelectedFontNameValue() - If location is under global or general settings', () => {
-			// Mock font manager select box DOM
-			document.body.innerHTML =
-				'<select id="gfpdf_settings[default_font]" name="gfpdf_settings[default_font]">' +
-				' <optgroup label="User-Defined Fonts">' +
-				'   <option value="z" />' +
-				'   <option value="c" />' +
-				' </optgroup>' +
-				'</select>';
+		test('handleFontClick() - Opens a font, or closes it when it is open', () => {
+			props.navigate.mockClear();
+			shallow(<FontListItems {...props} />)
+				.instance()
+				.handleFontClick({ id: 'garuda', type: 'core' });
+			expect(props.navigate).toHaveBeenCalledWith('/fontmanager/garuda');
 
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-			const handleCheckSelectBoxValue = jest.spyOn(
-				instance,
-				'handleCheckSelectBoxValue'
-			);
-
-			instance.handleSetSelectedFontNameValue('general');
-
-			expect(handleCheckSelectBoxValue).toHaveBeenCalledTimes(1);
-			expect(props.selectFont).toHaveBeenCalledTimes(1);
-		});
-
-		test('handleSetSelectedFontNameValue() - If location is not under global or general settings', () => {
-			// Mock font manager select box DOM
-			document.body.innerHTML =
-				'<select id="gfpdf_settings[font]" name="gfpdf_settings[font]">' +
-				' <optgroup label="User-Defined Fonts">' +
-				'   <option value="z" />' +
-				'   <option value="c" />' +
-				' </optgroup>' +
-				'</select>';
-
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-			const handleCheckSelectBoxValue = jest.spyOn(
-				instance,
-				'handleCheckSelectBoxValue'
-			);
-
-			instance.handleSetSelectedFontNameValue('435');
-
-			expect(handleCheckSelectBoxValue).toHaveBeenCalledTimes(1);
-			expect(props.selectFont).toHaveBeenCalledTimes(1);
-		});
-
-		test('handleCheckSelectBoxValue() - Check if font manager default selected font type is listed on custom font list (true)', () => {
-			const fontList = [{ id: 'z' }, { id: 'c' }];
-			const value = 'z';
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-
-			expect(instance.handleCheckSelectBoxValue(fontList, value)).toBe(
-				true
-			);
-		});
-
-		test('handleCheckSelectBoxValue() - Check if font manager default selected font type is listed on custom font list (false)', () => {
-			const fontList = [{ id: 'z' }, { id: 'c' }];
-			const value = 'a';
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-
-			expect(instance.handleCheckSelectBoxValue(fontList, value)).toBe(
-				false
-			);
-		});
-
-		test('handleResetLoadingState() - Reset deleteId state', () => {
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-
-			instance.handleResetLoadingState();
-
-			expect(wrapper.state('deleteId')).toBe('');
-		});
-
-		test('handleMoveSelectedFontAtTheTopOfTheList() - Move selected font at the very top of the font list', () => {
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-
-			instance.handleMoveSelectedFontAtTheTopOfTheList('roboto');
-
-			expect(props.moveSelectedFontToTop).toHaveBeenCalledTimes(1);
+			props.navigate.mockClear();
+			shallow(<FontListItems {...props} id="garuda" />)
+				.instance()
+				.handleFontClick({ id: 'garuda', type: 'core' });
+			expect(props.navigate).toHaveBeenCalledWith('/fontmanager/');
 		});
 
 		test('handleFontClick() - Display or hide update font panel', () => {
@@ -231,82 +103,148 @@ describe('FontManager - FontListItems.js', () => {
 			const wrapper = shallow(<FontListItems {...props} />);
 			const instance = wrapper.instance();
 
-			instance.handleFontClick('arial');
+			instance.handleFontClick({ id: 'arial', type: 'custom' });
 
 			expect(props.clearAddFontMsg).toHaveBeenCalledTimes(1);
 			expect(toggleUpdateFont).toHaveBeenCalledTimes(1);
 		});
 
-		test("handleFontClickKeypress() - Listen to an 'enter' keyboard event on font list item", () => {
-			// Mock update font panel DOM
-			document.body.innerHTML =
-				'<div class="update-font show">' + '</div>';
-
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-			const handleFontClick = jest.spyOn(instance, 'handleFontClick');
-			const e = { key: 'Enter' };
-
-			instance.handleFontClickKeypress(e, 'arial');
-
-			expect(handleFontClick).toHaveBeenCalledTimes(1);
-		});
-
-		test('handleDeleteFont() - Handle request of font deletion', () => {
-			global.confirm = () => true;
-
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-			const e = { stopPropagation: jest.fn() };
-
-			instance.handleDeleteFont(e, 'arial');
-
-			expect(wrapper.state('deleteId')).toBe('arial');
-			expect(props.deleteFont).toHaveBeenCalledTimes(1);
-		});
-
-		test("handleDeleteFontKeypress() - Listen to an 'enter' keyboard event for font deletion", () => {
-			global.confirm = () => true;
-
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-			const handleDeleteFont = jest.spyOn(instance, 'handleDeleteFont');
-			const e = {
-				key: 'Enter',
-				stopPropagation: jest.fn(),
+		describe('render() - Groups', () => {
+			const base = {
+				regular: 'a.ttf',
+				italics: '',
+				bold: '',
+				bolditalics: '',
 			};
+			const fontList = [
+				{
+					...base,
+					id: 'freeserif',
+					font_name: 'Free Serif',
+					type: 'core',
+					bold: 'b.ttf',
+				},
+				{ ...base, id: 'arimo', font_name: 'Arimo', type: 'bundled' },
+				{ ...base, id: 'khmeros', font_name: 'Khmer', type: 'core' },
+				{ ...base, id: 'brand', font_name: 'Brand', type: 'custom' },
+			];
+			const render = (extra) =>
+				shallow(
+					<FontListItems
+						{...props}
+						selectedFont="brand"
+						loading={false}
+						fontList={fontList}
+						fontUsage={{ freeserif: { reasons: [] } }}
+						{...extra}
+					/>
+				);
+			const rows = (wrapper) =>
+				wrapper.find('[data-test="font-list-item"]');
+			const titles = (wrapper) =>
+				wrapper
+					.find('.font-list-group-name')
+					.map((title) => title.text());
 
-			instance.handleDeleteFontKeypress(e, 'arial');
+			beforeEach(() => {
+				document.body.innerHTML = '';
+			});
 
-			expect(handleDeleteFont).toHaveBeenCalledTimes(1);
-		});
+			test('Fonts are listed as custom, bundled then core, keeping their order', () => {
+				const wrapper = render({ selectedFont: '' });
 
-		test('handleSelectFont() - Handle the process of selecting and deselecting of font type/name (radio button)', () => {
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-			const e = { target: { value: 'arial' } };
+				expect(titles(wrapper)).toEqual(['Custom', 'Bundled', 'Core']);
+				expect(
+					rows(wrapper).map((row) => row.prop('data-font'))
+				).toEqual(['brand', 'arimo', 'freeserif', 'khmeros']);
+			});
 
-			instance.handleSelectFont(e, 'click');
+			test('The selected font comes first, out of its group, and the groups stay in order', () => {
+				const wrapper = render({ selectedFont: 'khmeros' });
 
-			expect(props.selectFont).toHaveBeenCalledTimes(1);
-		});
+				expect(titles(wrapper)).toEqual(['Custom', 'Bundled', 'Core']);
+				expect(
+					rows(wrapper).map((row) => row.prop('data-font'))
+				).toEqual(['khmeros', 'brand', 'arimo', 'freeserif']);
+				expect(
+					wrapper
+						.find('[data-test="font-list-selected"]')
+						.find('[data-test="font-list-item"]')
+						.prop('data-font')
+				).toBe('khmeros');
+				expect(
+					wrapper
+						.find('[data-test="font-list-group-core"] .count')
+						.text()
+				).toBe('1');
+			});
 
-		test("handleSelectFontKeypress() - Listen to an 'enter' or 'space' keyboard event for selecting a font type/name (radio button)", () => {
-			const wrapper = shallow(<FontListItems {...props} />);
-			const instance = wrapper.instance();
-			const handleSelectFont = jest.spyOn(instance, 'handleSelectFont');
-			const e = {
-				key: 'Enter',
-				preventDefault: jest.fn(),
-				stopPropagation: jest.fn(),
-				target: { value: 'arial' },
-			};
+			test('A group left empty by the selected font is hidden', () => {
+				expect(titles(render({ selectedFont: 'arimo' }))).toEqual([
+					'Custom',
+					'Core',
+				]);
+			});
 
-			instance.handleSelectFontKeypress(e);
+			test('A selected font the search left out changes nothing', () => {
+				const wrapper = render({
+					selectedFont: 'khmeros',
+					searchResult: [fontList[1], fontList[3]],
+				});
 
-			expect(e.preventDefault).toHaveBeenCalledTimes(1);
-			expect(e.stopPropagation).toHaveBeenCalledTimes(1);
-			expect(handleSelectFont).toHaveBeenCalledTimes(1);
+				expect(titles(wrapper)).toEqual(['Custom', 'Bundled']);
+				expect(
+					wrapper.find('[data-test="font-list-selected"]').exists()
+				).toBe(false);
+			});
+
+			test('A type with no fonts has no group', () => {
+				expect(titles(render({ fontList: [fontList[1]] }))).toEqual([
+					'Bundled',
+				]);
+			});
+
+			test('A search result is grouped too', () => {
+				const wrapper = render({ searchResult: [fontList[2]] });
+
+				expect(
+					rows(wrapper).map((row) => row.prop('data-font'))
+				).toEqual(['khmeros']);
+				expect(titles(wrapper)).toEqual(['Core']);
+			});
+
+			test('A row has its style count and says when it is in use', () => {
+				const wrapper = render();
+
+				expect(rows(wrapper).at(2).find('.font-sub').text()).toBe(
+					'2 styles · In use'
+				);
+				expect(rows(wrapper).at(3).find('.font-sub').text()).toBe(
+					'1 style'
+				);
+			});
+
+			test('Only the selected font is tagged active and only bundled fonts are locked', () => {
+				const wrapper = render();
+
+				expect(wrapper.find('.font-active-tag').length).toBe(1);
+				expect(
+					rows(wrapper).at(0).find('.font-active-tag').exists()
+				).toBe(true);
+				expect(rows(wrapper).at(1).find('.font-lock').exists()).toBe(
+					true
+				);
+				expect(rows(wrapper).at(2).find('.font-lock').exists()).toBe(
+					false
+				);
+			});
+
+			test('The open row is marked', () => {
+				const row = rows(render({ id: 'brand' })).at(0);
+
+				expect(row.hasClass('active')).toBe(true);
+				expect(row.prop('aria-current')).toBe('true');
+			});
 		});
 	});
 
@@ -321,28 +259,9 @@ describe('FontManager - FontListItems.js', () => {
 			expect(component.length).toBe(1);
 		});
 
-		test('render delete trash icon', () => {
-			const wrapper = shallow(<FontListItems {...props} />);
-			expect(wrapper.find('span.dashicons-trash').length).toBe(1);
-		});
-
-		test('render radio button for select font name', () => {
-			const wrapper = shallow(<FontListItems {...props} />);
-			const data = 'select-font-name-' + props.fontList[0].id;
-
-			expect(wrapper.find(`input[name="${data}"]`).length).toBe(1);
-		});
-
 		test('render font name', () => {
 			const wrapper = shallow(<FontListItems {...props} />);
-			expect(wrapper.find('span.font-name').text()).toBe(
-				'Fira Sans Light'
-			);
-		});
-
-		test('render <FontListIcon /> component', () => {
-			const wrapper = shallow(<FontListItems {...props} />);
-			expect(wrapper.find('FontListIcon')).toHaveLength(4);
+			expect(wrapper.find('.font-name').text()).toBe('Fira Sans Light');
 		});
 	});
 });

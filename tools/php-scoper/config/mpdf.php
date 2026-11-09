@@ -30,6 +30,9 @@ return [
 		Finder::create()->files()->in( $path . 'vendor/myclabs/deep-copy' )->name( [ '*.php', 'LICENSE' ] ),
 	],
 
+	/* Plain data arrays with nothing to prefix, copied as they are rather than reprinted onto one line */
+	'exclude-files' => array_map( 'realpath', glob( $path . 'vendor/mpdf/mpdf/data/character-ranges/*.php' ) ?: [] ),
+
 	/*
 	 * When scoping PHP files, there will be scenarios where some of the code being scoped indirectly references the
 	 * original namespace. These will include, for example, strings or string manipulations. PHP-Scoper has limited

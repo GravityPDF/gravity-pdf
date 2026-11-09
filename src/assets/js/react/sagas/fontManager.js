@@ -3,15 +3,19 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 /* APIs */
 import {
 	apiGetCustomFontList,
+	apiGetFontUsage,
 	apiAddFont,
 	apiEditFont,
 	apiDeleteFont,
+	apiInstallFont,
 } from '../api/fontManager';
 /* Redux action types */
 import {
 	GET_CUSTOM_FONT_LIST,
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
+	GET_FONT_USAGE_SUCCESS,
+	GET_FONT_USAGE_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -21,6 +25,9 @@ import {
 	DELETE_FONT,
 	DELETE_FONT_SUCCESS,
 	DELETE_FONT_ERROR,
+	INSTALL_FONT,
+	INSTALL_FONT_SUCCESS,
+	INSTALL_FONT_ERROR,
 } from '../actions/fontManager';
 import { associatedFontManagerSelectBox } from '../utilities/FontManager/associatedFontManagerSelectBox';
 
@@ -78,6 +85,40 @@ export function* watchGetCustomFontListSuccess() {
 
 		associatedFontManagerSelectBox(fontList);
 	});
+}
+
+/**
+ * A watcher that loads what's in use once the font list has loaded
+ *
+ * @since 6.19.0
+ */
+export function* watchGetFontUsage() {
+	yield takeLatest(GET_CUSTOM_FONT_LIST_SUCCESS, getFontUsage);
+}
+
+/**
+ * Generate response for the font usage request
+ *
+ * @since 6.19.0
+ */
+export function* getFontUsage() {
+	try {
+		const response = yield call(apiGetFontUsage);
+
+		if (!response.ok) {
+			throw response;
+		}
+
+		yield put({
+			type: GET_FONT_USAGE_SUCCESS,
+			payload: response.body,
+		});
+	} catch (error) {
+		yield put({
+			type: GET_FONT_USAGE_ERROR,
+			payload: GFPDF.addFatalError,
+		});
+	}
 }
 
 /**
@@ -225,13 +266,14 @@ export function* watchDeleteFont() {
  * Generate response for delete font request
  *
  * @param {Object} params
- * @param {string} params.payload - ID of the font to delete
+ * @param {string} params.payload  - ID of the font to delete
+ * @param {string} params.fontType - The row's `type`
  *
  * @since 6.0
  */
-export function* deleteFont({ payload }) {
+export function* deleteFont({ payload, fontType }) {
 	try {
-		const response = yield call(apiDeleteFont, payload);
+		const response = yield call(apiDeleteFont, payload, fontType);
 
 		if (!response.ok) {
 			throw response;
@@ -240,11 +282,53 @@ export function* deleteFont({ payload }) {
 		yield put({
 			type: DELETE_FONT_SUCCESS,
 			payload,
+			font: response.body?.font,
+		});
+	} catch (error) {
+		/* Show the server's reason when it refuses (in use, or already gone) */
+		const refused =
+			error && [404, 409].includes(error.status) && error.body?.message;
+
+		yield put({
+			type: DELETE_FONT_ERROR,
+			payload: refused || GFPDF.addFatalError,
+		});
+	}
+}
+
+/**
+ * A watcher that gets triggered when a core font is to be installed
+ *
+ * @since 6.19.0
+ */
+export function* watchInstallFont() {
+	yield takeLatest(INSTALL_FONT, installFont);
+}
+
+/**
+ * Generate response for the install font request
+ *
+ * @param {Object} params
+ * @param {string} params.payload - ID of the font to install
+ *
+ * @since 6.19.0
+ */
+export function* installFont({ payload }) {
+	try {
+		const response = yield call(apiInstallFont, payload);
+
+		if (!response.ok) {
+			throw response;
+		}
+
+		yield put({
+			type: INSTALL_FONT_SUCCESS,
+			payload: response.body,
 		});
 	} catch (error) {
 		yield put({
-			type: DELETE_FONT_ERROR,
-			payload: GFPDF.addFatalError,
+			type: INSTALL_FONT_ERROR,
+			payload: error?.body?.message || GFPDF.addFatalError,
 		});
 	}
 }
