@@ -346,7 +346,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Whether a Font Manager record of this site uses the file, so it isn't the core font's
+	 * Whether a Font Manager record of any site uses the file, so it isn't the core font's
 	 *
 	 * @since 6.19.0
 	 */
@@ -798,7 +798,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 	/**
 	 * Delete an unused downloaded family's files whatever their hash, keeping the licence files. A file with a copy under
-	 * its hashed name loses only the copy: the file at the name is another font's.
+	 * its hashed name loses only the copy: the file at the name is another font's. A file at the name another site's
+	 * custom font uses is kept too, as every site shares the fonts folder.
 	 *
 	 * @return array{id: string, removed: string[], bytes: int, font: array|null}|WP_Error `font` is its row now, if it can
 	 *                                                                                     be installed again. 404 when
@@ -819,6 +820,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 		$removed = [];
 		$bytes   = 0;
+		$shared  = array_flip( $this->font_sources->get_files_used_by_other_sites() );
 		foreach ( $files as $file ) {
 			$this->clear_failure( $file );
 			$this->delete_back_off( $file );
@@ -828,7 +830,14 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				continue;
 			}
 
-			if ( ! wp_delete_file_from_directory( $this->get_font_path( $file ), $this->data->template_font_location ) ) {
+			/* Another site's adopted copy or unrecorded site's file can be at the name; a hashed copy is the core font's */
+			$path = $this->get_font_path( $file );
+			if ( isset( $shared[ $file ] ) && $path === $this->font_sources->get_plain_path( $file ) ) {
+				$this->log->notice( 'Kept a font file another site\'s custom font uses', [ 'name' => $file ] );
+				continue;
+			}
+
+			if ( ! wp_delete_file_from_directory( $path, $this->data->template_font_location ) ) {
 				$this->log->warning( 'Downloaded font file could not be removed', [ 'name' => $file ] );
 				continue;
 			}
@@ -1337,17 +1346,18 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return;
 		}
 
-		if ( ! is_array( $state['sites'] ?? null ) || ! is_array( $state['keys'] ?? null ) || ! is_int( $state['started'] ?? null ) ) {
+		if ( ! is_array( $state['sites'] ?? null ) || ! is_array( $state['keys'] ?? null ) || ! is_array( $state['files'] ?? [] ) || ! is_int( $state['started'] ?? null ) ) {
 			$this->log->warning( 'Core font cleanup skipped: its stored progress is malformed' );
 
 			return;
 		}
 
 		$keys   = array_fill_keys( $state['keys'], true );
+		$files  = $state['files'] ?? [];
 		$failed = [];
 		$left   = $this->within_budget(
 			$state['sites'],
-			function ( $site_id ) use ( &$keys, &$failed ) {
+			function ( $site_id ) use ( &$keys, &$files, &$failed ) {
 				/* A site deleted since needs no fonts */
 				if ( is_multisite() && ! ( get_site( (int) $site_id ) instanceof WP_Site ) ) {
 					return;
@@ -1362,22 +1372,45 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				}
 
 				$keys += array_fill_keys( $site_keys, true );
+				$files = array_merge( $files, $this->get_site_custom_font_files( (int) $site_id, $site_keys ) );
 			}
 		);
 		$keys   = array_map( 'strval', array_keys( $keys ) );
+		$files  = array_values( array_unique( $files ) );
 
 		/* Nothing is pruned until every site is read, so one that couldn't be read is tried again an hour on */
 		if ( $left !== [] || $failed !== [] ) {
 			$state['sites'] = array_merge( $left, $failed );
 			$state['keys']  = $keys;
+			$state['files'] = $files;
 			update_network_option( get_main_network_id(), self::CLEANUP, $state );
 			$this->schedule_by( $left !== [] ? time() : time() + HOUR_IN_SECONDS, self::CLEANUP_EVENT );
 
 			return;
 		}
 
-		$this->prune( $this->with_wanted( $this->required_fonts->get_install_font_files( $keys ) ), $state['started'] );
+		$this->prune( $this->with_wanted( array_merge( $this->required_fonts->get_install_font_files( $keys ), $files ) ), $state['started'] );
 		update_network_option( get_main_network_id(), self::CLEANUP, true );
+	}
+
+	/**
+	 * The files of a site's custom fonts that it uses, as the cron site's font list only has its own. An unused one's
+	 * files aren't kept: prune() only removes unmodified core files, which download again by name when needed.
+	 *
+	 * @param string[] $keys The font keys the site uses
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_site_custom_font_files( int $site_id, array $keys ): array {
+		if ( ! is_multisite() ) {
+			return [];
+		}
+
+		$fonts = array_change_key_case( $this->font_sources->get_site_font_files( $site_id ) );
+
+		return array_merge( [], ...array_values( array_intersect_key( $fonts, array_flip( $keys ) ) ) );
 	}
 
 	/**

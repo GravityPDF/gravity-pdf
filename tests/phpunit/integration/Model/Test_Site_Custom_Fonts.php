@@ -5,6 +5,8 @@ declare( strict_types=1 );
 namespace GFPDF\Model;
 
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
+use GFPDF\Tests\Concerns\Seamed_Font_Downloader;
 use GFPDF\Tests\Integration\TestCase;
 use GPDFAPI;
 use ReflectionMethod;
@@ -25,6 +27,7 @@ use ReflectionMethod;
 class Test_Site_Custom_Fonts extends TestCase {
 
 	use CopiesFontFixtures;
+	use RecordsFontFailures;
 
 	public function set_up(): void {
 		parent::set_up();
@@ -55,16 +58,46 @@ class Test_Site_Custom_Fonts extends TestCase {
 	/**
 	 * @param array<string, array<string, string>> $fonts Font ID => style => file name
 	 */
-	protected function site_with_fonts( array $fonts ): int {
+	protected function site_with_fonts( array $fonts, array $settings = [] ): int {
 		$site_id = self::factory()->blog->create();
 		$records = [];
 		foreach ( $fonts as $id => $files ) {
 			$records[ $id ] = $this->font_record( $id, $files );
 		}
 
-		update_blog_option( $site_id, 'gfpdf_settings', [ 'custom_fonts' => $records ] );
+		update_blog_option( $site_id, 'gfpdf_settings', [ 'custom_fonts' => $records ] + $settings );
 
 		return $site_id;
+	}
+
+	/**
+	 * A site with fonts whose font usage is recorded, so core font deletes don't wait on it
+	 */
+	protected function recorded_site( array $fonts ): int {
+		$site_id = $this->site_with_fonts( $fonts );
+		GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->write_site_fonts( $site_id );
+
+		return $site_id;
+	}
+
+	protected function sources(): Model_Font_Sources {
+		return GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+	}
+
+	protected function downloader(): Model_Font_Downloader {
+		return GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+	}
+
+	/**
+	 * Run the 6.19 fonts folder cleanup over this site and another
+	 */
+	protected function clean_up( int $site_id ): void {
+		$this->set_installer_manifest();
+		$this->set_font_cleanup( $this->font_cleanup_state( [ 'sites' => [ get_current_blog_id(), $site_id ] ] ) );
+
+		$this->downloader()->cleanup();
+
+		$this->assertTrue( $this->get_font_cleanup() );
 	}
 
 	protected function add_to_mpdf(): array {
@@ -205,6 +238,103 @@ class Test_Site_Custom_Fonts extends TestCase {
 		wp_delete_site( $site_id );
 
 		$this->assertFileDoesNotExist( $this->font_path( 'Own.ttf' ) );
+	}
+
+	public function test_deleting_a_core_font_keeps_the_file_another_sites_custom_font_uses() {
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
+		$this->recorded_site( [ 'theirs' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
+
+		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( [ 'DejaVuSerifCondensed-Bold.ttf' ], $result['removed'] );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed-Bold.ttf' ) );
+	}
+
+	public function test_another_sites_custom_font_at_a_core_name_is_not_the_core_font() {
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->site_with_fonts( [ 'theirs' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
+		$sources = $this->sources();
+		$hashed  = $sources->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+
+		$this->assertNotSame( '', $hashed );
+		$this->assertTrue( $sources->is_record_file( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertSame( $hashed, $sources->register_font_data( [] )['dejavuserifcondensed']['R'] );
+		$rows = array_column( $this->downloader()->get_installed_fonts(), null, 'id' );
+		$this->assertSame( 'available', $rows['dejavuserifcondensed']['type'], 'Listed as not downloaded' );
+	}
+
+	public function test_another_sites_copy_of_a_core_font_is_still_the_core_font() {
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->site_with_fonts( [ 'theirs' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
+		$sources = $this->sources();
+
+		$this->assertFalse( $sources->is_record_file( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertSame( 'DejaVuSerifCondensed.ttf', $sources->register_font_data( [] )['dejavuserifcondensed']['R'] );
+	}
+
+	public function test_deleting_a_core_font_keeps_the_file_of_a_site_not_recorded_yet() {
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
+		$site_id = $this->recorded_site( [ 'theirs' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
+		$this->model()->delete_site_record( $site_id );
+
+		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( [ 'DejaVuSerifCondensed-Bold.ttf' ], $result['removed'] );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_deleting_a_core_font_removes_its_hashed_copy_beside_another_sites_custom_font() {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf', $hashed );
+		$this->recorded_site( [ 'theirs' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
+
+		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( [ 'DejaVuSerifCondensed.ttf' ], $result['removed'] );
+		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_cleanup_keeps_a_core_file_another_sites_custom_font_needs() {
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		touch( $this->font_path( 'DejaVuSerifCondensed.ttf' ), time() - HOUR_IN_SECONDS );
+		$site_id = $this->site_with_fonts( [ 'Serif-Copy' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ], [ 'default_font' => 'Serif-Copy' ] );
+
+		$this->clean_up( $site_id );
+
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_a_paused_cleanup_keeps_the_custom_font_files_it_has_read() {
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		touch( $this->font_path( 'DejaVuSerifCondensed.ttf' ), time() - HOUR_IN_SECONDS );
+		$site_id = $this->site_with_fonts( [ 'serif-copy' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ], [ 'default_font' => 'serif-copy' ] );
+		$this->set_installer_manifest();
+		$this->set_font_cleanup( $this->font_cleanup_state( [ 'sites' => [ $site_id, get_current_blog_id() ] ] ) );
+
+		$downloader = new Seamed_Font_Downloader( GPDFAPI::get_log_class(), [ 'budget' => 0 ] );
+		$downloader->cleanup();
+
+		$this->assertSame( [ 'DejaVuSerifCondensed.ttf' ], $this->get_font_cleanup()['files'] );
+
+		$downloader->cleanup();
+
+		$this->assertTrue( $this->get_font_cleanup() );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_the_cleanup_removes_a_core_file_only_an_unused_custom_font_has() {
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		touch( $this->font_path( 'DejaVuSerifCondensed.ttf' ), time() - HOUR_IN_SECONDS );
+		$site_id = $this->site_with_fonts( [ 'serif-copy' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
+
+		$this->clean_up( $site_id );
+
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ), 'It downloads again by name when used' );
 	}
 
 	public function test_deleting_something_other_than_a_site_does_nothing() {

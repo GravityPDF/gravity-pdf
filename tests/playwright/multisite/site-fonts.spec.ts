@@ -13,6 +13,11 @@ const FONTS = 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts';
 const FONT_NAME = 'Network Roboto';
 const FONT_ID = 'networkroboto';
 const FILE = 'NetworkRoboto.ttf';
+const CORE_NAMED_FONT = 'Core Named Roboto';
+const CORE_FILE = 'DejaVuSerifCondensed.ttf';
+const CORE_BOLD_FILE = 'DejaVuSerifCondensed-Bold.ttf';
+const ROBOTO_IN_CONTAINER =
+	'wp-content/plugins/gravity-pdf/tools/playwright/data/fonts/Roboto-Regular.ttf';
 
 const roboto = fs.readFileSync(
 	path.join(resourcesPath, 'fonts', 'Roboto-Regular.ttf')
@@ -53,6 +58,8 @@ const send = async (
 
 const fontFiles = () => wpCli(`ls ${FONTS}`);
 
+const fontFileList = () => fontFiles().split('\n');
+
 test.describe('Fonts of a Multisite subsite', () => {
 	test.describe.configure({ mode: 'serial' });
 
@@ -67,14 +74,15 @@ test.describe('Fonts of a Multisite subsite', () => {
 			const fonts = await (
 				await send(admin, base, 'get', 'fonts/')
 			).json();
-			for (const font of fonts.filter(
-				(row: { font_name?: string }) => row.font_name === FONT_NAME
+			for (const font of fonts.filter((row: { font_name?: string }) =>
+				[FONT_NAME, CORE_NAMED_FONT].includes(row.font_name ?? '')
 			)) {
 				await send(admin, base, 'delete', `fonts/${font.id}`);
 			}
 		}
 
 		await admin.context().close();
+		wpCli(`rm -f ${FONTS}/${CORE_FILE} ${FONTS}/${CORE_BOLD_FILE}`);
 	};
 
 	test.beforeAll(deleteFonts);
@@ -167,5 +175,88 @@ test.describe('Fonts of a Multisite subsite', () => {
 		expect(response.status()).toBe(403);
 
 		await page.context().close();
+	});
+
+	test("should keep the core font's file another site's custom font uses when the core font is deleted", async ({
+		browser,
+		page,
+	}) => {
+		const subsite = await logIn(browser, 'siteadmin');
+		const uploaded = await upload(
+			subsite,
+			SUBSITE_URL,
+			CORE_NAMED_FONT,
+			CORE_FILE,
+			roboto
+		);
+		expect(uploaded.status()).toBe(200);
+
+		// A file of the family that no site's custom font uses
+		wpCli(`cp ${FONTS}/${CORE_FILE} ${FONTS}/${CORE_BOLD_FILE}`);
+
+		await page.goto('/wp-admin/index.php');
+
+		// The subsite's file isn't the main site's core font, so only the bold style is downloaded
+		const installed = await (
+			await send(page, '', 'get', 'fonts/&scope=all')
+		).json();
+		const core = installed.find(
+			(row: { id: string }) => row.id === 'dejavuserifcondensed'
+		);
+		expect(core.regular).toBe('');
+		expect(core.bold).toBe(CORE_BOLD_FILE);
+
+		const deleted = await send(
+			page,
+			'',
+			'delete',
+			'fonts/dejavuserifcondensed&scope=core'
+		);
+		expect(deleted.status()).toBe(200);
+		const body = await deleted.json();
+		expect(body.removed).toEqual([CORE_BOLD_FILE]);
+		expect(body.font).toBeNull();
+
+		const files = fontFileList();
+		expect(files).toContain(CORE_FILE);
+		expect(files).not.toContain(CORE_BOLD_FILE);
+
+		// Throws if the subsite's font no longer has its own bytes
+		wpCli(`cmp ${ROBOTO_IN_CONTAINER} ${FONTS}/${CORE_FILE}`);
+
+		await subsite.context().close();
+	});
+
+	test("should delete the core font's file once no site's custom font uses it", async ({
+		browser,
+		page,
+	}) => {
+		const subsite = await logIn(browser, 'siteadmin');
+		const fonts = await (
+			await send(subsite, SUBSITE_URL, 'get', 'fonts/')
+		).json();
+		const font = fonts.find(
+			(row: { font_name?: string }) => row.font_name === CORE_NAMED_FONT
+		);
+		expect(
+			(
+				await send(subsite, SUBSITE_URL, 'delete', `fonts/${font.id}`)
+			).ok()
+		).toBe(true);
+		await subsite.context().close();
+
+		// The custom font's delete removed its file, so put one back at the core font's name
+		wpCli(`cp ${ROBOTO_IN_CONTAINER} ${FONTS}/${CORE_FILE}`);
+
+		await page.goto('/wp-admin/index.php');
+		const deleted = await send(
+			page,
+			'',
+			'delete',
+			'fonts/dejavuserifcondensed&scope=core'
+		);
+		expect(deleted.status()).toBe(200);
+		expect((await deleted.json()).removed).toEqual([CORE_FILE]);
+		expect(fontFileList()).not.toContain(CORE_FILE);
 	});
 });
