@@ -32,6 +32,7 @@ use GPDFAPI;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Server;
+use WP_Site;
 
 /**
  * @package     Gravity PDF
@@ -102,6 +103,51 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	 */
 	public function init(): void {
 		add_action( 'rest_api_init', [ $this, 'register_endpoints' ] );
+
+		add_action( 'add_option_gfpdf_settings', [ $this, 'record_site_fonts' ], 10, 2 );
+		add_action( 'update_option_gfpdf_settings', [ $this, 'record_site_fonts' ], 10, 2 );
+
+		foreach ( [ 'add_site_option', 'update_site_option', 'delete_site_option' ] as $hook ) {
+			add_action( $hook, [ $this->model, 'maybe_flush_site_records' ] );
+		}
+
+		/* Ahead of WordPress dropping the site's tables */
+		add_action( 'wp_uninitialize_site', [ $this, 'delete_site_fonts' ], 5 );
+	}
+
+	/**
+	 * Record which files the site's fonts use, so other sites can leave them alone. An unchanged record isn't written.
+	 *
+	 * @param mixed $old      The old settings, or the option name
+	 * @param mixed $settings The saved settings
+	 *
+	 * @since 6.19.0
+	 */
+	public function record_site_fonts( $old, $settings ): void {
+		if ( is_array( $settings ) ) {
+			$this->model->record_site_fonts( get_current_blog_id(), $settings['custom_fonts'] ?? [] );
+		}
+	}
+
+	/**
+	 * Delete a deleted site's font files no other site uses, and its record
+	 *
+	 * @param mixed $site
+	 *
+	 * @since 6.19.0
+	 */
+	public function delete_site_fonts( $site ): void {
+		if ( ! $site instanceof WP_Site ) {
+			return;
+		}
+
+		$site_id = (int) $site->id;
+		$fonts   = $this->model->get_site_font_files( $site_id );
+
+		$this->delete_unused_font_files( array_merge( [], ...array_values( $fonts ) ), $site_id );
+		array_map( [ FlushCache::class, 'flush' ], array_map( 'strval', array_keys( $fonts ) ) );
+
+		$this->model->delete_site_record( $site_id );
 	}
 
 	/**
@@ -771,16 +817,17 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	/**
 	 * Delete font files, keeping any another site's fonts use (the fonts folder is network-wide)
 	 *
-	 * @param string[] $files The filenames
+	 * @param string[] $files   The filenames
+	 * @param int      $site_id The site the files are deleted for, the current one by default
 	 *
 	 * @since 6.19.0
 	 */
-	protected function delete_unused_font_files( array $files ): void {
+	protected function delete_unused_font_files( array $files, int $site_id = 0 ): void {
 		if ( $files === [] ) {
 			return;
 		}
 
-		$shared = $this->model->get_files_used_by_other_sites();
+		$shared = $this->model->get_files_used_by_other_sites( $site_id );
 
 		foreach ( $files as $file ) {
 			if ( in_array( $file, $shared, true ) ) {
