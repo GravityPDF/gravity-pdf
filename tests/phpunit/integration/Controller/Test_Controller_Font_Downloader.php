@@ -343,6 +343,52 @@ class Test_Controller_Font_Downloader extends TestCase {
 		return rest_get_server()->dispatch( $request );
 	}
 
+	/**
+	 * @param array<string, string> $query
+	 */
+	protected function dispatch_usage( string $key, array $query = [ 'scope' => 'usage' ] ): \WP_REST_Response {
+		$request = new \WP_REST_Request( 'GET', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $key );
+		$request->set_query_params( $query );
+
+		return rest_get_server()->dispatch( $request );
+	}
+
+	public function test_a_fonts_pdfs_load_from_its_own_route() {
+		$this->set_font_user( false );
+		$this->gf_factory()->form->create(
+			[],
+			[
+				'title'               => 'Fonts',
+				'fields'              => [],
+				'gfpdf_form_settings' => [
+					'one' => [
+						'name' => 'Invoice',
+						'font' => 'freeserif',
+					],
+				],
+			]
+		);
+
+		$response = $this->dispatch_usage( 'freeserif' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'Invoice', $response->get_data()['pdfs'][0]['name'] );
+		$this->assertSame( [ 'pdfs' => [] ], $this->dispatch_usage( 'notafont' )->get_data() );
+		$this->assertArrayNotHasKey( 'pdfs', $this->dispatch_scope( 'usage' )->get_data()->freeserif );
+	}
+
+	public function test_the_font_usage_route_needs_the_capability_and_its_scope() {
+		$this->assertSame( 401, $this->dispatch_usage( 'freeserif' )->get_status() );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+		$this->assertSame( 403, $this->dispatch_usage( 'freeserif' )->get_status() );
+
+		$this->set_font_user( false );
+		$this->assertSame( 400, $this->dispatch_usage( 'freeserif', [] )->get_status() );
+		$this->assertSame( 400, $this->dispatch_usage( 'freeserif', [ 'scope' => 'core' ] )->get_status() );
+		$this->assertSame( 404, $this->dispatch_usage( '../secret' )->get_status() );
+	}
+
 	protected function dispatch_core( string $method, string $key ): \WP_REST_Response {
 		$request = new \WP_REST_Request( $method, '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $key );
 		$request->set_query_params( [ 'scope' => 'core' ] );

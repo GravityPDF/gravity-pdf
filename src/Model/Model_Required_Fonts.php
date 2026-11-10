@@ -8,6 +8,7 @@ use GFFormsModel;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
+use WP_Site;
 
 /**
  * @package     Gravity PDF
@@ -27,6 +28,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 6.19.0
  */
 class Model_Required_Fonts extends Helper_Abstract_Model {
+
+	/**
+	 * The option holding which of a site's PDFs use each font
+	 *
+	 * @since 6.19.0
+	 */
+	public const FONT_PDFS = 'gfpdf_font_pdfs';
+
+	/**
+	 * The start of the sitemeta row holding the font keys a site uses, followed by its ID
+	 *
+	 * @since 6.19.0
+	 */
+	public const SITE_FONTS_PREFIX = 'gfpdf_site_fonts_';
 
 	/**
 	 * How many forms' meta the PDF font scan reads at a time
@@ -55,10 +70,22 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
-	 * @var array<string, array<int, array{form: string, name: string, url: string}>>|null
+	 * @var array<string, array<int, array{form: string, name: string, form_id: int, pdf_id: string}>>|null
 	 * @since 6.19.0
 	 */
 	protected $font_pdfs;
+
+	/**
+	 * @var bool Whether reading the forms failed, so what was read shouldn't be stored
+	 * @since 6.19.0
+	 */
+	protected $form_read_failed = false;
+
+	/**
+	 * @var array<int, bool> The sites to record the fonts of when the request ends, keyed by ID
+	 * @since 6.19.0
+	 */
+	protected $queued_sites = [];
 
 	/**
 	 * Work out the required fonts from the font sources and the saved settings, logging forms it can't read
@@ -156,9 +183,9 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 
 	/**
 	 * Why each required font key is required: the default font, a site language's, selected by that many PDFs, in a
-	 * required source and, with $network, used by that many other sites
+	 * required source and, with $network, used by that many other sites or a core font while any site is uncounted
 	 *
-	 * @return array<string, array{default: bool, language: bool, pdfs: int, source: bool, sites: int}>
+	 * @return array<string, array{default: bool, language: bool, pdfs: int, source: bool, sites: int, pending: bool}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -169,6 +196,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 			'pdfs'     => 0,
 			'source'   => false,
 			'sites'    => 0,
+			'pending'  => false,
 		];
 		$reasons = $this->get_settings_font_reasons();
 
@@ -176,8 +204,8 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 			$reasons[ $key ]['pdfs'] = $count;
 		}
 
-		foreach ( $network ? $this->get_other_site_font_counts() : [] as $key => $count ) {
-			$reasons[ $key ]['sites'] = $count;
+		if ( $network ) {
+			$reasons = $this->add_other_site_reasons( $reasons );
 		}
 
 		return array_map(
@@ -189,36 +217,35 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Whether anything requires the font key, so deleting it would break or re-download it
+	 * Whether anything requires the font key, so deleting it would break or re-download it. Reads this site's forms
+	 * rather than the stored usage, and treats forms it can't read, or a site with no record, as using the font.
 	 *
 	 * @since 6.19.0
 	 */
 	public function is_font_in_use( string $key, bool $network = false ): bool {
-		if ( isset( $this->get_settings_font_reasons()[ $key ] ) || isset( $this->font_pdfs[ $key ] ) ) {
+		if ( isset( $this->get_settings_font_reasons()[ $key ] ) ) {
 			return true;
 		}
 
-		if ( $this->font_pdfs === null && $this->yields_font( $this->each_pdf_font(), $key ) ) {
-			return true;
-		}
-
-		foreach ( $network ? $this->get_other_site_ids() : [] as $site_id ) {
-			if ( $this->yields_font( $this->each_site_font_key( $site_id ), $key ) ) {
+		$this->form_read_failed = false;
+		foreach ( $this->each_pdf_font() as $font => $unused ) {
+			if ( $font === $key ) {
 				return true;
 			}
 		}
 
-		return false;
-	}
+		/* Forms that couldn't be read could be using it */
+		if ( $this->form_read_failed ) {
+			return true;
+		}
 
-	/**
-	 * Whether a generator keyed by font key reaches the font, reading no further than it
-	 *
-	 * @since 6.19.0
-	 */
-	protected function yields_font( \Generator $fonts, string $key ): bool {
-		foreach ( $fonts as $font => $unused ) {
-			if ( $font === $key ) {
+		if ( ! $network ) {
+			return false;
+		}
+
+		$sites = $this->get_site_font_records();
+		foreach ( $this->get_other_site_ids() as $site_id ) {
+			if ( ! isset( $sites[ $site_id ] ) || in_array( $key, $sites[ $site_id ], true ) ) {
 				return true;
 			}
 		}
@@ -405,9 +432,9 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The active forms' PDFs that select each font, read once per request
+	 * The active forms' PDFs that select each font, from the stored map, which is rebuilt once cleared or a day old
 	 *
-	 * @return array<string, array<int, array{form: string, name: string, url: string}>> PDFs by font key
+	 * @return array<string, array<int, array{form: string, name: string, form_id: int, pdf_id: string}>> PDFs by font key
 	 *
 	 * @since 6.19.0
 	 */
@@ -416,19 +443,218 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 			return $this->font_pdfs;
 		}
 
+		$stored = get_option( self::FONT_PDFS );
+		if ( is_array( $stored['pdfs'] ?? null ) && (int) ( $stored['built'] ?? 0 ) > time() - DAY_IN_SECONDS ) {
+			$this->font_pdfs = $stored['pdfs'];
+
+			return $this->font_pdfs;
+		}
+
 		$pdfs = [];
 
+		$this->form_read_failed = false;
 		foreach ( $this->each_pdf_font() as $font => list( $row, $pdf_id, $pdf ) ) {
 			$pdfs[ $font ][] = [
-				'form' => (string) ( $row['title'] ?? '' ),
-				'name' => is_string( $pdf['name'] ?? null ) ? $pdf['name'] : '',
-				'url'  => admin_url( sprintf( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=%d&pid=%s', (int) $row['form_id'], rawurlencode( $pdf_id ) ) ),
+				'form'    => (string) ( $row['title'] ?? '' ),
+				'name'    => is_string( $pdf['name'] ?? null ) ? $pdf['name'] : '',
+				'form_id' => (int) $row['form_id'],
+				'pdf_id'  => $pdf_id,
 			];
 		}
 
 		$this->font_pdfs = $pdfs;
+		$this->store_font_pdfs( $pdfs, $stored['cleared'] ?? null );
 
 		return $pdfs;
+	}
+
+	/**
+	 * Keep the map, unless the forms couldn't be read or the usage was cleared while they were
+	 *
+	 * @param array $pdfs
+	 * @param mixed $cleared The marker of the clear the map was built after
+	 *
+	 * @since 6.19.0
+	 */
+	protected function store_font_pdfs( array $pdfs, $cleared ): void {
+		if ( $this->form_read_failed ) {
+			return;
+		}
+
+		/* A persistent object cache would otherwise hide a clear from another request */
+		wp_cache_delete( self::FONT_PDFS, 'options' );
+		$current = get_option( self::FONT_PDFS );
+
+		if ( ( $current['cleared'] ?? null ) === $cleared ) {
+			update_option(
+				self::FONT_PDFS,
+				[
+					'built' => time(),
+					'pdfs'  => $pdfs,
+				],
+				false
+			);
+		}
+	}
+
+	/**
+	 * The PDFs of this site using a font, with links to their settings
+	 *
+	 * @return array<int, array{form: string, name: string, url: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_pdfs_using_font( string $key ): array {
+		return array_map(
+			static function ( array $pdf ): array {
+				return [
+					'form' => $pdf['form'],
+					'name' => $pdf['name'],
+					'url'  => admin_url( sprintf( 'admin.php?page=gf_edit_forms&view=settings&subview=PDF&id=%d&pid=%s', $pdf['form_id'], rawurlencode( $pdf['pdf_id'] ) ) ),
+				];
+			},
+			$this->get_font_pdfs()[ $key ] ?? []
+		);
+	}
+
+	/**
+	 * Forget the stored usage. Stored as a marker, so a rebuild already reading the forms can tell it's out of date.
+	 *
+	 * @since 6.19.0
+	 */
+	public function clear_font_usage(): void {
+		$this->font_pdfs = null;
+
+		update_option( self::FONT_PDFS, [ 'cleared' => uniqid( '', true ) ], false );
+
+		$this->queue_site_fonts();
+	}
+
+	/**
+	 * Record the current site's fonts when the request ends, so a bulk change only reads its forms once
+	 *
+	 * @since 6.19.0
+	 */
+	public function queue_site_fonts(): void {
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		add_action( 'shutdown', [ $this, 'write_queued_site_fonts' ] );
+
+		$this->queued_sites[ get_current_blog_id() ] = true;
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function write_queued_site_fonts(): void {
+		$sites              = array_keys( $this->queued_sites );
+		$this->queued_sites = [];
+
+		/* A site deleted in this request has no tables left to read */
+		$sites = array_filter(
+			$sites,
+			static function ( $site_id ): bool {
+				return get_site( $site_id ) instanceof WP_Site;
+			}
+		);
+
+		array_map( [ $this, 'write_site_fonts' ], $sites );
+	}
+
+	/**
+	 * Record the font keys a site uses, in a row of its own so sites saving at once can't overwrite each other
+	 *
+	 * @since 6.19.0
+	 */
+	public function write_site_fonts( int $site_id ): void {
+		$name = self::SITE_FONTS_PREFIX . $site_id;
+		$keys = $this->get_site_font_keys( $site_id );
+
+		if ( $keys !== null ) {
+			update_network_option( get_main_network_id(), $name, $keys );
+
+			return;
+		}
+
+		/* Without a record the site's fonts stay locked, where a stale one could let a font it now uses be deleted */
+		delete_network_option( get_main_network_id(), $name );
+
+		$downloader = \GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+		if ( $downloader instanceof Model_Font_Downloader ) {
+			$downloader->schedule_site_fonts_retry();
+		}
+	}
+
+	/**
+	 * @param mixed $site The site just created
+	 *
+	 * @since 6.19.0
+	 */
+	public function write_new_site_fonts( $site ): void {
+		if ( $site instanceof WP_Site ) {
+			$this->write_site_fonts( (int) $site->id );
+		}
+	}
+
+	/**
+	 * @param mixed $site The site being deleted
+	 *
+	 * @since 6.19.0
+	 */
+	public function delete_site_fonts( $site ): void {
+		if ( $site instanceof WP_Site ) {
+			delete_network_option( get_main_network_id(), self::SITE_FONTS_PREFIX . (int) $site->id );
+		}
+	}
+
+	/**
+	 * Every site that hasn't recorded its fonts
+	 *
+	 * @return int[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_sites_without_fonts(): array {
+		if ( ! is_multisite() ) {
+			return [];
+		}
+
+		return array_values( array_diff( $this->get_site_ids(), array_keys( $this->get_site_font_records() ) ) );
+	}
+
+	/**
+	 * Every site's recorded font keys, in one query
+	 *
+	 * @return array<int, string[]> By site ID
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_site_font_records(): array {
+		global $wpdb;
+
+		if ( ! is_multisite() ) {
+			return [];
+		}
+
+		$rows = $wpdb->get_results( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT meta_key, meta_value FROM {$wpdb->sitemeta} WHERE site_id = %d AND meta_key LIKE %s",
+				get_main_network_id(),
+				$wpdb->esc_like( self::SITE_FONTS_PREFIX ) . '%'
+			)
+		);
+
+		$sites = [];
+		foreach ( (array) $rows as $row ) {
+			$keys = maybe_unserialize( $row->meta_value );
+			if ( is_array( $keys ) ) {
+				$sites[ (int) substr( $row->meta_key, strlen( self::SITE_FONTS_PREFIX ) ) ] = $keys;
+			}
+		}
+
+		return $sites;
 	}
 
 	/**
@@ -437,6 +663,8 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 * @param string $prefix Another site's table prefix, or '' for this site
 	 *
 	 * @return \Generator<string, array{0: array, 1: string, 2: array}> Font key => form row, PDF ID and PDF settings
+	 *
+	 * @phpstan-impure Reading flags a failed query
 	 *
 	 * @since 6.19.0
 	 */
@@ -459,23 +687,33 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * How many other sites of the network use each font. Read without switch_to_blog(), so no other site's plugins or
-	 * filters run.
+	 * Count the other sites using each font from their records. A site without one could be using any core font.
 	 *
-	 * @return array<string, int>
+	 * @param array<string, array> $reasons
+	 *
+	 * @return array<string, array>
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_other_site_font_counts(): array {
-		$counts = [];
+	protected function add_other_site_reasons( array $reasons ): array {
+		$other_sites = array_fill_keys( $this->get_other_site_ids(), true );
+		$records     = array_intersect_key( $this->get_site_font_records(), $other_sites );
 
-		foreach ( $this->get_other_site_ids() as $site_id ) {
-			foreach ( $this->get_site_font_keys( $site_id ) as $key ) {
-				$counts[ $key ] = ( $counts[ $key ] ?? 0 ) + 1;
+		foreach ( $records as $keys ) {
+			foreach ( $keys as $key ) {
+				$reasons[ $key ]['sites'] = ( $reasons[ $key ]['sites'] ?? 0 ) + 1;
 			}
 		}
 
-		return $counts;
+		if ( count( $records ) < count( $other_sites ) ) {
+			foreach ( array_keys( $this->font_sources->get_font_data() ) as $key ) {
+				if ( $this->get_font_files( (string) $key ) !== [] ) {
+					$reasons[ $key ]['pending'] = true;
+				}
+			}
+		}
+
+		return $reasons;
 	}
 
 	/**
@@ -493,44 +731,53 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 *
 	 * @param string $unset_default The default font of a site with none saved
 	 *
-	 * @return string[] Font keys
+	 * @return string[]|null Font keys, or null when the site's settings or forms couldn't be read
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_site_font_keys( int $site_id, string $unset_default = '' ): array {
-		return array_map( 'strval', array_keys( iterator_to_array( $this->each_site_font_key( $site_id, $unset_default ) ) ) );
-	}
-
-	/**
-	 * Each font key a site uses, the settings' before its forms' so a caller can stop without reading them
-	 *
-	 * @param string $unset_default The default font of a site with none saved
-	 *
-	 * @return \Generator<string, mixed> Keyed by font key, which may repeat
-	 *
-	 * @since 6.19.0
-	 */
-	protected function each_site_font_key( int $site_id, string $unset_default = '' ): \Generator {
+	public function get_site_font_keys( int $site_id, string $unset_default = '' ): ?array {
 		global $wpdb;
 
 		$prefix  = $wpdb->get_blog_prefix( $site_id );
 		$options = $wpdb->get_results( "SELECT option_name, option_value FROM {$prefix}options WHERE option_name IN ( 'gfpdf_settings', 'gf_db_version', 'WPLANG' )", OBJECT_K ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		/* Read as unset, the site's default font would be left out */
+		if ( $wpdb->last_error !== '' ) {
+			$this->log->error(
+				'A site\'s settings could not be read for its fonts',
+				[
+					'site_id' => $site_id,
+					'error'   => $wpdb->last_error,
+				]
+			);
+
+			return null;
+		}
+
 		$options = wp_list_pluck( (array) $options, 'option_value' );
 
 		$settings = maybe_unserialize( $options['gfpdf_settings'] ?? '' );
 		$default  = $this->normalise_font( is_array( $settings ) ? ( $settings['default_font'] ?? '' ) : '' );
 		$locales  = $this->font_sources->map_language_font_locales( [ $options['WPLANG'] ?? '' ] );
 
-		foreach ( array_merge( array_map( 'strval', array_keys( $locales ) ), [ $default !== '' ? $default : $unset_default ] ) as $key ) {
-			if ( $key !== '' ) {
-				yield $key => true;
-			}
-		}
+		$keys = array_merge( array_map( 'strval', array_keys( $locales ) ), [ $default !== '' ? $default : $unset_default ] );
+		$keys = array_fill_keys(
+			array_filter(
+				$keys,
+				static function ( string $key ): bool {
+					return $key !== '';
+				}
+			),
+			true
+		);
 
 		/* Gravity Forms records its version as it creates a site's tables, so a site without one has no forms */
-		if ( isset( $options['gf_db_version'] ) ) {
-			yield from $this->each_pdf_font( $prefix );
+		$this->form_read_failed = false;
+		foreach ( isset( $options['gf_db_version'] ) ? $this->each_pdf_font( $prefix ) : [] as $font => $unused ) {
+			$keys[ $font ] = true;
 		}
+
+		return $this->form_read_failed ? null : array_map( 'strval', array_keys( $keys ) );
 	}
 
 	/**
@@ -591,6 +838,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 
 		/* A failed query reads as no forms, which would leave every PDF's fonts out of the required set */
 		if ( $wpdb->last_error !== '' ) {
+			$this->form_read_failed = true;
 			$this->log->error( 'Forms could not be read for their PDF fonts', [ 'error' => $wpdb->last_error ] );
 		}
 

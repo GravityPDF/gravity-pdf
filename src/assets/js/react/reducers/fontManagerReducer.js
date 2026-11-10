@@ -26,6 +26,7 @@ import {
 	RESET_SEARCH_RESULT,
 	SEARCH_FONT_LIST,
 	SELECT_FONT,
+	GET_FONT_PDFS_SUCCESS,
 } from '../actions/fontManager';
 /* Utilities */
 import {
@@ -53,6 +54,7 @@ import {
  * @property { null | string } installingFont    - ID of the font being installed
  * @property { Array<Object> } fontList          - font list state
  * @property { null | Object } fontUsage         - why fonts are in use by ID, null until loaded
+ * @property { Object }        fontPdfs          - the PDFs using each opened font, by ID
  * @property { null }          searchResult      - search result state
  * @property { string }        selectedFont      - state of selected font
  * @property { Object }        msg               - message object
@@ -72,6 +74,7 @@ export const initialState = {
 	installingFont: null,
 	fontList: [],
 	fontUsage: null,
+	fontPdfs: {},
 	searchResult: null,
 	selectedFont: '',
 	msg: {},
@@ -143,6 +146,7 @@ export default function (state = initialState, action) {
 				...state,
 				loading: true,
 				fontUsage: null,
+				fontPdfs: {},
 				msg: {},
 			};
 		}
@@ -180,6 +184,17 @@ export default function (state = initialState, action) {
 			return {
 				...state,
 				fontUsage: payload,
+			};
+
+		/**
+		 * Process GET_FONT_PDFS_SUCCESS
+		 *
+		 * @since 6.19.0
+		 */
+		case GET_FONT_PDFS_SUCCESS:
+			return {
+				...state,
+				fontPdfs: { ...state.fontPdfs, [payload.id]: payload.pdfs },
 			};
 
 		/**

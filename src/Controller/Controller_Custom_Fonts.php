@@ -166,6 +166,21 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				],
 
 				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_item_usage' ],
+					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'args'                => [
+						'scope' => [
+							'description'       => __( 'Return what uses the font', 'gravity-pdf' ),
+							'type'              => 'string',
+							'enum'              => [ 'usage' ],
+							'required'          => true,
+							'validate_callback' => 'rest_validate_request_arg',
+						],
+					],
+				],
+
+				[
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => [ $this, 'update_or_install_item' ],
 					'permission_callback' => Closure::fromCallable( [ $this, 'check_item_permissions' ] ),
@@ -230,7 +245,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	}
 
 	/**
-	 * The fonts route's `scope`. Usage is separate from the list as it walks every form, and on Multisite every site.
+	 * The fonts route's `scope`. Usage is separate from the list as it can need every form read.
 	 *
 	 * @return array|object|WP_Error Usage is an object, so none in use is still a JSON map
 	 *
@@ -248,6 +263,19 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		}
 
 		return $scope === 'all' ? $downloader->get_installed_fonts() : (object) $downloader->get_font_usage();
+	}
+
+	/**
+	 * The font route's GET: the PDFs using a font, for when it's opened
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_item_usage( WP_REST_Request $request ) {
+		$downloader = $this->get_downloader();
+
+		return $downloader instanceof Model_Font_Downloader ? [ 'pdfs' => $downloader->get_pdfs_using_font( (string) $request->get_param( 'id' ) ) ] : $downloader;
 	}
 
 	/**

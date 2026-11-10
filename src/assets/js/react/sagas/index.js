@@ -14,6 +14,7 @@ import {
 	watchInstallFont,
 	watchGetCustomFontListSuccess,
 	watchGetFontUsage,
+	watchGetFontPdfs,
 } from './fontManager';
 
 /**
@@ -40,5 +41,6 @@ export default function* rootSaga() {
 		watchInstallFont(),
 		watchGetCustomFontListSuccess(),
 		watchGetFontUsage(),
+		watchGetFontPdfs(),
 	]);
 }

@@ -14,6 +14,7 @@ use GFPDF\Helper\Mpdf\On_Demand_Font_File_Finder;
 use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 use WP_Error;
+use WP_Site;
 
 /**
  * @package     Gravity PDF
@@ -600,24 +601,24 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Why each font in use can't be deleted, as phrases for the Font Manager. Walks every form, and on Multisite every
-	 * site, so the list loads without it.
+	 * Why each font in use can't be deleted, as phrases for the Font Manager. Can need every form read, so the list
+	 * loads without it. The PDFs themselves load when a font is opened, see get_pdfs_using_font().
 	 *
-	 * @return array<string, array{reasons: string[], pdfs_label: string, pdfs: array<int, array{form: string, name: string, url: string}>}> By font key
+	 * @return array<string, array{reasons: string[], pdfs_label: string}> By font key
 	 *
 	 * @since 6.19.0
 	 */
 	public function get_font_usage(): array {
 		$custom  = $this->font_sources->get_custom_fonts();
 		$locales = $this->font_sources->get_language_font_locales();
-		$pdfs    = $this->required_fonts->get_font_pdfs();
 		$usage   = [];
 
-		/* Other sites only lock core fonts, which only a super admin can delete, so nobody else pays for walking them */
+		/* Other sites only lock core fonts, which only a super admin can delete */
 		foreach ( $this->required_fonts->get_font_reasons( is_multisite() && $this->can_change_core_fonts() ) as $key => $reason ) {
 			/* A site's custom fonts are its own, so other sites don't count */
 			if ( isset( $custom[ $key ] ) ) {
-				$reason['sites'] = 0;
+				$reason['sites']   = 0;
+				$reason['pending'] = false;
 			}
 
 			$in_use = $this->get_in_use( $reason, $locales[ $key ] ?? [] );
@@ -626,12 +627,22 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 					'reasons'    => $in_use,
 					/* translators: %d: the number of PDFs */
 					'pdfs_label' => $reason['pdfs'] > 0 ? sprintf( _n( 'Used by %d PDF', 'Used by %d PDFs', $reason['pdfs'], 'gravity-pdf' ), $reason['pdfs'] ) : '',
-					'pdfs'       => $pdfs[ $key ] ?? [],
 				];
 			}
 		}
 
 		return $usage;
+	}
+
+	/**
+	 * The PDFs of this site using a font
+	 *
+	 * @return array<int, array{form: string, name: string, url: string}>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_pdfs_using_font( string $key ): array {
+		return $this->required_fonts->get_pdfs_using_font( $key );
 	}
 
 	/**
@@ -999,6 +1010,10 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			$phrases[] = sprintf( _n( 'Used on %d other site', 'Used on %d other sites', $reasons['sites'], 'gravity-pdf' ), $reasons['sites'] );
 		}
 
+		if ( $reasons['pending'] ) {
+			$phrases[] = __( 'Still checking the other sites', 'gravity-pdf' );
+		}
+
 		return $phrases;
 	}
 
@@ -1247,13 +1262,40 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			set_transient( self::SYNC_REMAINING, array_values( array_diff( $left, $due ) ), DAY_IN_SECONDS );
 		}
 
-		if ( $left !== [] || $still_due !== [] ) {
+		if ( $left !== [] || $still_due !== [] || ! $this->backfill_site_fonts() ) {
 			$next = time();
 		}
 
 		if ( $next > 0 ) {
 			$this->schedule_by( $next );
 		}
+	}
+
+	/**
+	 * Queue a sync to record a site that couldn't be read, an hour on so a lasting failure can't loop
+	 *
+	 * @since 6.19.0
+	 */
+	public function schedule_site_fonts_retry(): void {
+		$this->schedule_by( time() + HOUR_IN_SECONDS );
+	}
+
+	/**
+	 * Record the fonts of the sites with no record yet, until the time budget runs out
+	 *
+	 * @return bool Whether every site was reached. One whose forms can't be read waits for a later sync.
+	 *
+	 * @since 6.19.0
+	 */
+	protected function backfill_site_fonts(): bool {
+		$left = $this->within_budget(
+			$this->required_fonts->get_sites_without_fonts(),
+			function ( $site_id ) {
+				$this->required_fonts->write_site_fonts( (int) $site_id );
+			}
+		);
+
+		return $left === [];
 	}
 
 	/**
@@ -1296,21 +1338,35 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return;
 		}
 
-		$keys = array_fill_keys( $state['keys'], true );
-		$left = $this->within_budget(
+		$keys   = array_fill_keys( $state['keys'], true );
+		$failed = [];
+		$left   = $this->within_budget(
 			$state['sites'],
-			function ( $site_id ) use ( &$keys ) {
+			function ( $site_id ) use ( &$keys, &$failed ) {
+				/* A site deleted since needs no fonts */
+				if ( is_multisite() && ! ( get_site( (int) $site_id ) instanceof WP_Site ) ) {
+					return;
+				}
+
 				/* Sites yet to upgrade will save it as their default when they do */
-				$keys += array_fill_keys( $this->required_fonts->get_site_font_keys( (int) $site_id, self::PRE_6_19_DEFAULT_FONT ), true );
+				$site_keys = $this->required_fonts->get_site_font_keys( (int) $site_id, self::PRE_6_19_DEFAULT_FONT );
+				if ( $site_keys === null ) {
+					$failed[] = $site_id;
+
+					return;
+				}
+
+				$keys += array_fill_keys( $site_keys, true );
 			}
 		);
-		$keys = array_map( 'strval', array_keys( $keys ) );
+		$keys   = array_map( 'strval', array_keys( $keys ) );
 
-		if ( $left !== [] ) {
-			$state['sites'] = $left;
+		/* Nothing is pruned until every site is read, so one that couldn't be read is tried again an hour on */
+		if ( $left !== [] || $failed !== [] ) {
+			$state['sites'] = array_merge( $left, $failed );
 			$state['keys']  = $keys;
 			update_network_option( get_main_network_id(), self::CLEANUP, $state );
-			$this->schedule_by( time(), self::CLEANUP_EVENT );
+			$this->schedule_by( $left !== [] ? time() : time() + HOUR_IN_SECONDS, self::CLEANUP_EVENT );
 
 			return;
 		}

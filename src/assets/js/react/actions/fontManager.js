@@ -12,6 +12,8 @@ export const VALIDATION_ERROR = 'VALIDATION_ERROR';
 export const DELETE_VARIANT_ERROR = 'DELETE_VARIANT_ERROR';
 export const GET_FONT_USAGE_SUCCESS = 'GET_FONT_USAGE_SUCCESS';
 export const GET_FONT_USAGE_ERROR = 'GET_FONT_USAGE_ERROR';
+export const GET_FONT_PDFS = 'GET_FONT_PDFS';
+export const GET_FONT_PDFS_SUCCESS = 'GET_FONT_PDFS_SUCCESS';
 export const DELETE_FONT = 'DELETE_FONT';
 export const DELETE_FONT_SUCCESS = 'DELETE_FONT_SUCCESS';
 export const DELETE_FONT_ERROR = 'DELETE_FONT_ERROR';
@@ -194,6 +196,22 @@ export const searchFontList = (data) => {
 export const resetSearchResult = () => {
 	return {
 		type: RESET_SEARCH_RESULT,
+	};
+};
+
+/**
+ * Load the PDFs using a font
+ *
+ * @param { string } fontId
+ *
+ * @return {{ payload: string, type: string }} action object
+ *
+ * @since 6.19.0
+ */
+export const getFontPdfs = (fontId) => {
+	return {
+		type: GET_FONT_PDFS,
+		payload: fontId,
 	};
 };
 

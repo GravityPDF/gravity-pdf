@@ -225,7 +225,7 @@ class Test_Downloaded_Fonts extends TestCase {
 
 		$this->assertSame( [ 'Default font' ], $usage['reasons'] );
 		$this->assertSame( 'Used by 1 PDF', $usage['pdfs_label'] );
-		$this->assertCount( 1, $usage['pdfs'] );
+		$this->assertArrayNotHasKey( 'pdfs', $usage );
 	}
 
 	public function test_font_usage_links_to_the_settings_of_each_pdf_using_the_font() {
@@ -246,7 +246,7 @@ class Test_Downloaded_Fonts extends TestCase {
 			]
 		);
 
-		$pdfs = $this->downloader()->get_font_usage()['freeserif']['pdfs'];
+		$pdfs = $this->downloader()->get_pdfs_using_font( 'freeserif' );
 
 		$this->assertSame( [ 'Invoice', 'Receipt' ], array_column( $pdfs, 'name' ) );
 		$this->assertSame(
@@ -483,9 +483,10 @@ class Test_Downloaded_Fonts extends TestCase {
 		restore_current_blog();
 
 		/* A site without the settings or Gravity Forms tables */
-		self::factory()->blog->create();
+		$empty_site = self::factory()->blog->create();
 
 		$downloader = $this->downloader();
+		array_map( [ GPDFAPI::get_mvc_class( 'Model_Required_Fonts' ), 'write_site_fonts' ], [ $blog_id, $empty_site ] );
 
 		$usage = $downloader->get_font_usage();
 
@@ -514,6 +515,8 @@ class Test_Downloaded_Fonts extends TestCase {
 		update_option( 'WPLANG', 'th' );
 		remove_filter( 'get_available_languages', $installed );
 		restore_current_blog();
+
+		GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->write_site_fonts( $blog_id );
 
 		$this->assertSame( [ 'Used on 1 other site' ], $this->downloader()->get_font_usage()['garuda']['reasons'] );
 	}
@@ -590,5 +593,37 @@ class Test_Downloaded_Fonts extends TestCase {
 	 */
 	protected function core_rows( Seamed_Font_Downloader $downloader ): array {
 		return array_values( wp_list_filter( $downloader->get_installed_fonts(), [ 'type' => 'core' ] ) );
+	}
+
+	public function test_a_site_not_yet_recorded_locks_core_fonts_until_it_is() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->become_super_admin();
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$blog_id = self::factory()->blog->create();
+		delete_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $blog_id );
+
+		$downloader = $this->downloader();
+
+		$this->assertSame( [ 'Still checking the other sites' ], $downloader->get_font_usage()['dejavuserifcondensed']['reasons'] );
+		$this->assert_font_error( $downloader->delete_downloaded_font( 'dejavuserifcondensed' ), 'font_in_use', 409 );
+
+		GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->write_site_fonts( $blog_id );
+
+		$this->assertArrayNotHasKey( 'dejavuserifcondensed', $downloader->get_font_usage() );
+	}
+
+	public function test_an_unrecorded_site_does_not_lock_a_custom_font() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$this->become_super_admin();
+		delete_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . self::factory()->blog->create() );
+		GPDFAPI::get_options_class()->update_option( 'custom_fonts', [ 'brand' => [ 'id' => 'brand', 'font_name' => 'Brand', 'regular' => 'brand.ttf' ] ] );
+
+		$this->assertArrayNotHasKey( 'brand', $this->downloader()->get_font_usage() );
 	}
 }

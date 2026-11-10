@@ -84,6 +84,57 @@ class Controller_Font_Downloader extends Helper_Abstract_Controller implements H
 
 		/* Every form write, so a PDF saved by Gravity PDF, a form import or the form editor */
 		add_action( 'gform_post_update_form_meta', [ $this, 'maybe_sync_form_fonts' ], 10, 3 );
+
+		add_action( 'gform_post_update_form_meta', [ $this, 'maybe_clear_font_usage' ], 5, 3 );
+		foreach ( [ 'gform_post_form_activated', 'gform_post_form_deactivated', 'gform_post_form_trashed', 'gform_post_form_restored', 'gform_post_form_duplicated', 'gform_after_delete_form' ] as $hook ) {
+			add_action( $hook, [ $this->required_fonts, 'clear_font_usage' ], 5, 0 );
+		}
+
+		add_action( 'add_option_gfpdf_settings', [ $this, 'maybe_refresh_site_fonts' ], 10, 2 );
+		add_action( 'update_option_gfpdf_settings', [ $this, 'maybe_refresh_site_fonts' ], 10, 2 );
+		add_action( 'add_option_WPLANG', [ $this->required_fonts, 'queue_site_fonts' ], 10, 0 );
+		add_action( 'update_option_WPLANG', [ $this->required_fonts, 'queue_site_fonts' ], 10, 0 );
+
+		add_action( 'wp_initialize_site', [ $this->required_fonts, 'write_new_site_fonts' ], 100 );
+		add_action( 'wp_uninitialize_site', [ $this->required_fonts, 'delete_site_fonts' ] );
+	}
+
+	/**
+	 * Forget the stored usage when a form's main meta is saved; other meta holds no PDFs
+	 *
+	 * @param mixed $form_meta
+	 * @param mixed $form_id
+	 * @param mixed $meta_name The meta column written
+	 *
+	 * @since 6.19.0
+	 */
+	public function maybe_clear_font_usage( $form_meta, $form_id = 0, $meta_name = '' ): void {
+		if ( $meta_name === 'display_meta' ) {
+			$this->required_fonts->clear_font_usage();
+		}
+	}
+
+	/**
+	 * Update the stored usage when a save changes what it's built from. PDFs only count fonts that exist, so a custom
+	 * font's list changes the PDF map, and the default font only the site's record.
+	 *
+	 * @param mixed $old      The old settings, or the option name
+	 * @param mixed $settings The saved settings
+	 *
+	 * @since 6.19.0
+	 */
+	public function maybe_refresh_site_fonts( $old, $settings ): void {
+		if ( ! is_array( $settings ) ) {
+			return;
+		}
+
+		$old = is_array( $old ) ? $old : [];
+
+		if ( ( $old['custom_fonts'] ?? [] ) !== ( $settings['custom_fonts'] ?? [] ) ) {
+			$this->required_fonts->clear_font_usage();
+		} elseif ( ( $old['default_font'] ?? '' ) !== ( $settings['default_font'] ?? '' ) ) {
+			$this->required_fonts->queue_site_fonts();
+		}
 	}
 
 	/**

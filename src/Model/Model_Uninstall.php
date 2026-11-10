@@ -206,6 +206,7 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
 		delete_option( Model_Install::UNWRITABLE_FOLDERS );
+		delete_option( Model_Required_Fonts::FONT_PDFS );
 		delete_option( 'gfpdf_cache_generation' );
 		delete_option( 'gfpdf_cache_form_generation' );
 		delete_option( Model_Pdf_Cache::SWEEP_STATE_OPTION );
@@ -246,8 +247,9 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key = %s",
+				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key = %s",
 				$wpdb->esc_like( 'gpdf_sl_net_' ) . '%',
+				$wpdb->esc_like( Model_Required_Fonts::SITE_FONTS_PREFIX ) . '%',
 				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS
 			)
 		);

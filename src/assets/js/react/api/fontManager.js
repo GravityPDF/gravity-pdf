@@ -93,13 +93,25 @@ const getFonts = async (scope) =>
 export const apiGetCustomFontList = () => getFonts('all');
 
 /**
- * Fetch API request for why fonts are in use, which is slower than the list as it reads every form (GET)
+ * Fetch API request for why fonts are in use, which can read every form (GET)
  *
- * @return {{ body: Object<string, Array<string>>, text: string, status: number, ok: boolean }} Reasons by font ID
+ * @return {{ body: Object<string, { reasons: Array<string>, pdfs_label: string }>, text: string, status: number, ok: boolean }} Reasons by font ID
  *
  * @since 6.19.0
  */
 export const apiGetFontUsage = () => getFonts('usage');
+
+/**
+ * Fetch API request for the PDFs using a font, for when it's opened (GET)
+ *
+ * @param {string} id
+ *
+ * @return {{ body: { pdfs: Array<Object> }, text: string, status: number, ok: boolean }} The PDFs using the font
+ *
+ * @since 6.19.0
+ */
+export const apiGetFontPdfs = (id) =>
+	sendFontRequest('GET', fontsUrl(id, 'usage'));
 
 /**
  * Fetch API request to add new font (POST)
