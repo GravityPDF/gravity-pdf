@@ -240,15 +240,11 @@ const FontPreview = ({ font }) => {
 	const [size, setSize] = useState(12);
 	const base = font.base_url || GFPDF.fontsUrl;
 
-	if (!base || font.preview === false) {
+	if (!base) {
 		return (
 			<div data-test="font-preview-unavailable" className="font-section">
 				<h3>{GFPDF.fontManagerPreview}</h3>
-				<p>
-					{base
-						? GFPDF.fontManagerPreviewUnsupported
-						: GFPDF.fontManagerPreviewUnavailable}
-				</p>
+				<p>{GFPDF.fontManagerPreviewUnavailable}</p>
 			</div>
 		);
 	}

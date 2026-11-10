@@ -150,7 +150,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 					'action'      => 'failed_core_fonts',
 					'action_text' => esc_html__( 'View the system report', 'gravity-pdf' ),
 					'condition'   => [ $this->model, 'has_failed_core_fonts' ],
-					'process'     => [ $this->model, 'system_report_redirect' ],
+					'process'     => [ $this->model, 'core_fonts_report_redirect' ],
 					'dismiss'     => [ $this->model, 'dismiss_failed_core_fonts' ],
 					'view'        => function ( $action, $button_text ) {
 						return $this->view->failed_core_fonts( $this->model->get_undismissed_failed_core_fonts(), $action, $button_text );

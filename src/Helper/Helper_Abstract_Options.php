@@ -1126,12 +1126,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$gfpdf_options = $this->settings;
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing */
-		if ( empty( $_POST['_wp_http_referer'] ) || empty( $_POST['option_page'] ) || $_POST['option_page'] !== 'gfpdf_settings' ) {
+		if ( empty( $_POST['option_page'] ) || $_POST['option_page'] !== 'gfpdf_settings' ) {
 			return $input;
 		}
 
 		/* phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized per key below */
-		parse_str( wp_unslash( $_POST['_wp_http_referer'] ), $referrer );
+		parse_str( wp_unslash( $_POST['_wp_http_referer'] ?? '' ), $referrer );
 
 		$all_settings = $this->get_registered_fields();
 		$tab          = sanitize_key( $referrer['tab'] ?? 'general' );

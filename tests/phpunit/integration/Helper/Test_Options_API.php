@@ -875,6 +875,21 @@ class Test_Options_API extends TestCase {
 		$this->assertArrayNotHasKey( 'other_type', $updated_settings );
 	}
 
+	public function test_settings_sanitize_uses_the_general_tab_with_no_referrer() {
+		unset( $_POST['_wp_http_referer'] );
+		$_POST['option_page'] = 'gfpdf_settings';
+
+		$updated_settings = $this->options->settings_sanitize(
+			[
+				'default_pdf_size' => 'A5',
+				'other_type'       => 'wont validate',
+			]
+		);
+
+		$this->assertSame( 'A5', $updated_settings['default_pdf_size'] );
+		$this->assertArrayNotHasKey( 'other_type', $updated_settings );
+	}
+
 	/**
 	 * @since 7.0
 	 */

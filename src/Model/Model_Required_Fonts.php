@@ -303,7 +303,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 */
 	public function needs_download( $font ): bool {
 		foreach ( $this->get_font_files( $font ) as $file ) {
-			if ( ! $this->font_sources->is_downloaded( $file ) ) {
+			if ( ! $this->font_sources->is_installed( $file ) ) {
 				return true;
 			}
 		}
@@ -331,13 +331,31 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 			$files    = array_intersect( $required, array_keys( $manifest ) );
 
 			$counts[ (string) $id ] = [
-				'installed' => count( array_filter( $files, [ $this->font_sources, 'is_downloaded' ] ) ),
+				'installed' => count( array_filter( $files, [ $this->font_sources, 'is_installed' ] ) ),
 				'total'     => count( $files ),
 				'manifest'  => count( $manifest ) > 0,
 			];
 		}
 
 		return $counts;
+	}
+
+	/**
+	 * The required files whose own copy isn't in the fonts folder, so one a different font holds the name of counts
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_missing_files(): array {
+		return array_values(
+			array_filter(
+				$this->get_required_font_files(),
+				function ( $file ) {
+					return ! $this->font_sources->is_installed( $file );
+				}
+			)
+		);
 	}
 
 	/**

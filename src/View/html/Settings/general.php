@@ -52,4 +52,16 @@ GFCommon::display_admin_message();
 	/* See https://docs.gravitypdf.com/developers/actions/gfpdf_post_general_settings_page for more details about this action */
 	do_action( 'gfpdf_post_general_settings_page' );
 	?>
+
+	<?php if ( $args['edit_cap'] ): ?>
+		<?php if ( isset( $args['tools_callback'] ) ): ?>
+			<?php /* Posts to this page, not options.php: these fields aren't saved settings */ ?>
+			<form name="gfpdf-settings-form-<?php echo esc_attr( wp_rand() ); ?>" method="post" class="gform_settings_form gforms_edit_form">
+				<?php settings_fields( 'gfpdf_settings' ); ?>
+				<?php call_user_func( $args['tools_callback'] ); ?>
+			</form>
+		<?php endif; ?>
+
+		<?php \GFPDF\Statics\Deprecation::do_action( 'gfpdf_post_tools_settings_page' ); ?>
+	<?php endif; ?>
 </div>

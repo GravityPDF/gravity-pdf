@@ -76,7 +76,6 @@ class Test_Downloaded_Fonts extends TestCase {
 					'can_install'  => ! is_multisite() || is_super_admin(),
 					'languages'    => [ 'Latin', 'Greek', 'Cyrillic', 'Armenian', 'Georgian' ],
 					'sample'       => '',
-					'preview'      => true,
 				],
 			],
 			$this->core_rows( $this->downloader() )
@@ -94,8 +93,6 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertSame( [ 'regular', 'italics', 'bold', 'bolditalics' ], array_keys( $font['file_sizes'] ) );
 		$this->assertStringStartsWith( 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/', $font['base_url'] );
 		$this->assertContains( 'Thai', $font['languages'] );
-		$this->assertTrue( $font['preview'] );
-		$this->assertFalse( array_values( wp_list_filter( $rows, [ 'id' => 'sun-exta' ] ) )[0]['preview'] );
 
 		/* Fallback and barcode fonts can't be chosen for a PDF */
 		$this->assertSame( [], wp_list_filter( $rows, [ 'id' => 'ocrb' ] ) );
@@ -365,6 +362,57 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertCount( 1, $this->log_messages( 'Downloaded font deleted' ) );
 	}
 
+	public function test_delete_removes_only_the_hashed_copy_and_never_the_file_at_the_name() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf', $hashed );
+
+		$row = $this->core_font_row( 'dejavuserifcondensed' );
+		$this->assertSame( $hashed, $row['regular'], 'The hashed copy is the family\'s file' );
+		$this->assertSame( filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ), $row['file_sizes']['regular'] );
+
+		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( [ 'DejaVuSerifCondensed.ttf' ], $result['removed'] );
+		$this->assertSame( filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ), $result['bytes'] );
+		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_a_family_sharing_a_name_with_a_record_lists_and_deletes_only_its_hashed_copy() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSerifCondensed.ttf' ] );
+
+		$this->assertSame( 'available', $this->core_font_row( 'dejavuserifcondensed' )['type'], 'The record\'s file is not the family\'s' );
+
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf', $hashed );
+
+		$this->assertSame( $hashed, $this->core_font_row( 'dejavuserifcondensed' )['regular'] );
+
+		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+
+		$this->assertSame( [ $hashed ], $result['removed'] );
+		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_deleting_a_record_leaves_the_hashed_copy() {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
+
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf', $hashed );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSerifCondensed.ttf' ] );
+
+		$this->assertTrue( GPDFAPI::delete_pdf_font( 'mine' ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileExists( $this->font_path( $hashed ) );
+	}
+
 	public function test_delete_clears_the_familys_failures_and_metrics() {
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 		$this->set_font_failures(
@@ -500,6 +548,10 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( $code, $result->get_error_code() );
 		$this->assertSame( [ 'status' => $status ], $result->get_error_data() );
+	}
+
+	private function core_font_row( string $key ): array {
+		return array_column( $this->downloader()->get_installed_fonts(), null, 'id' )[ $key ];
 	}
 
 	private function downloader( ?Model_Font_Sources $sources = null ): Seamed_Font_Downloader {

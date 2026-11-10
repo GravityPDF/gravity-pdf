@@ -11,14 +11,25 @@ use GPDFAPI;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
 /**
- * A downloader with its seams set: `sources`, `budget` (seconds), `jitter` (seconds) and `required` files
+ * A downloader with its seams set: `sources`, `budget` (seconds), `jitter` (seconds), `required` files and
+ * `constant` (GPDF_AUTO_INSTALL_FONTS, null when undefined)
  */
 class Seamed_Font_Downloader extends Model_Font_Downloader {
 
 	/**
+	 * @var string[] The files hashed to find another font's, by name
+	 */
+	public $hashed = [];
+
+	/**
+	 * @var bool|null The `constant` seam
+	 */
+	private $constant;
+
+	/**
 	 * Build the downloader with the real dependencies, overriding the seams given
 	 *
-	 * @param array{sources?: Model_Font_Sources, budget?: int|float, jitter?: int, required?: string[]} $seams
+	 * @param array{sources?: Model_Font_Sources, budget?: int|float, jitter?: int, required?: string[], constant?: bool|null} $seams
 	 */
 	public function __construct( LoggerInterface $log, array $seams = [] ) {
 		$sources  = $seams['sources'] ?? GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
@@ -37,6 +48,21 @@ class Seamed_Font_Downloader extends Model_Font_Downloader {
 
 		$this->sync_budget  = $seams['budget'] ?? $this->sync_budget;
 		$this->retry_jitter = $seams['jitter'] ?? $this->retry_jitter;
+		$this->constant     = $seams['constant'] ?? null;
+	}
+
+	/**
+	 * The `constant` seam when given, else the real constant
+	 */
+	protected function get_auto_install_constant(): ?bool {
+		return $this->constant ?? parent::get_auto_install_constant();
+	}
+
+	/**
+	 * The required fonts model holding the `required` seam
+	 */
+	public function get_required_fonts(): Model_Required_Fonts {
+		return $this->required_fonts;
 	}
 
 	/**
@@ -46,5 +72,11 @@ class Seamed_Font_Downloader extends Model_Font_Downloader {
 	 */
 	public function set_required( array $files ): void {
 		$this->required_fonts->files = $files;
+	}
+
+	protected function hash_blob( string $path, int $size ): string {
+		$this->hashed[] = basename( $path );
+
+		return parent::hash_blob( $path, $size );
 	}
 }

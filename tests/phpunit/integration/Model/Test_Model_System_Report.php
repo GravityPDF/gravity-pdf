@@ -69,7 +69,7 @@ class Test_Model_System_Report extends TestCase {
 
 		/* One section per deprecation group in use, then the rest */
 		$this->assertSame(
-			[ 'unsupported', 'php', 'directories', 'global', 'security', 'cache' ],
+			[ 'unsupported', 'deprecated', 'php', 'directories', 'global', 'security', 'cache' ],
 			array_column( $structure['tables'], 'id' )
 		);
 	}

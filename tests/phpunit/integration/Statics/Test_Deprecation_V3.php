@@ -179,13 +179,13 @@ class Test_Deprecation_V3 extends TestCase {
 		$this->assertSame( [], Deprecation_V3::get_legacy_download_urls() );
 	}
 
-	public function test_get_active_deprecated_filters_includes_dynamic_hooks() {
+	public function test_deprecated_filters_include_dynamic_hooks() {
 		$callback = '__return_true';
 
 		add_filter( 'gfpdfe_pdf_template_10', $callback );
 		add_filter( 'gfpdf_rtl', $callback );
 
-		$active = Deprecation_V3::get_active_deprecated_filters();
+		$active = Deprecation::get_signals()['deprecated_filters'];
 
 		$this->assertSame( 1, $active['gfpdfe_pdf_template_10'] );
 		$this->assertSame( 1, $active['gfpdf_rtl'] );
@@ -194,14 +194,14 @@ class Test_Deprecation_V3 extends TestCase {
 		remove_filter( 'gfpdf_rtl', $callback );
 	}
 
-	public function test_get_active_deprecated_filters_includes_the_legacy_hooks() {
+	public function test_deprecated_filters_include_the_legacy_hooks() {
 		$callback = '__return_true';
 
 		/* These carry the gfpdf_legacy_ prefix rather than gfpdfe_, so only the map can find them */
 		add_filter( 'gfpdf_legacy_save_path', $callback );
 		add_action( 'gfpdf_legacy_pre_view_or_download_pdf', $callback );
 
-		$active = Deprecation_V3::get_active_deprecated_filters();
+		$active = Deprecation::get_signals()['deprecated_filters'];
 
 		$this->assertSame( 1, $active['gfpdf_legacy_save_path'] );
 		$this->assertSame( 1, $active['gfpdf_legacy_pre_view_or_download_pdf'] );
@@ -210,11 +210,16 @@ class Test_Deprecation_V3 extends TestCase {
 		remove_action( 'gfpdf_legacy_pre_view_or_download_pdf', $callback );
 	}
 
-	/**
-	 * Nothing in core listens to these any more, so every callback the detector finds belongs to a third party
-	 */
-	public function test_get_active_deprecated_filters_reports_nothing_on_a_clean_install() {
-		$this->assertSame( [], Deprecation_V3::get_active_deprecated_filters() );
+	public function test_deprecated_filters_report_nothing_on_a_clean_install() {
+		$this->assertArrayNotHasKey( 'deprecated_filters', Deprecation::get_signals() );
+	}
+
+	public function test_get_active_deprecated_filters_is_deprecated_but_still_works() {
+		$this->setExpectedDeprecated( 'GFPDF\\Statics\\Deprecation_V3::get_active_deprecated_filters' );
+
+		add_filter( 'gfpdf_rtl', '__return_true' );
+
+		$this->assertSame( [ 'gfpdf_rtl' => 1 ], Deprecation_V3::get_active_deprecated_filters() );
 	}
 
 	/**

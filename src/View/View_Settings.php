@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Interface_Extension_Settings;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Statics\Deprecation;
 use GFPDF_Major_Compatibility_Checks;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
 
@@ -269,6 +270,26 @@ class View_Settings extends Helper_Abstract_View {
 				$markup->do_settings_sections( $sections, true );
 			},
 		];
+
+		if ( $vars['edit_cap'] ) {
+			$this->options->register_settings( [ 'tools' => Deprecation::apply_filters( 'gfpdf_settings_tools', [ [] ] ) ] );
+		}
+
+		if ( $markup->get_section_fields( 'gfpdf_settings_tools' ) !== [] ) {
+			$tools_section = [
+				'id'            => 'gfpdf_settings_tools',
+				'width'         => 'full',
+				'title'         => __( 'Tools', 'gravity-pdf' ),
+				'callback'      => static function () use ( $markup ) {
+					$markup->output_settings_fields( 'gfpdf_settings_tools', $markup::ENABLE_PANEL_TITLE );
+				},
+				'content_class' => 'gform_settings_form',
+			];
+
+			$vars['tools_callback'] = static function () use ( $markup, $tools_section ) {
+				$markup->fieldset( $tools_section, true );
+			};
+		}
 
 		/* load the system status view */
 		$this->load( 'general', $vars );

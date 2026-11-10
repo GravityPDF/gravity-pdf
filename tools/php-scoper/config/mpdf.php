@@ -77,6 +77,15 @@ return [
 				$content = str_replace( "new \\$prefix\\Mpdf\\Cache(", 'new \GFPDF\Helper\Mpdf\Cache(', $content );
 			}
 
+			/* DeepCopy is unused by mPDF, kept for add-ons and custom templates until 7.0 */
+			if ( basename( $filePath ) === 'DeepCopy.php' ) {
+				$content = str_replace(
+					'$this->useCloneMethod = $useCloneMethod;',
+					"\\_deprecated_class(self::class, '6.19.0', 'your own copy of myclabs/deep-copy (removed from Gravity PDF in 7.0)');\n        \$this->useCloneMethod = \$useCloneMethod;",
+					$content
+				);
+			}
+
 			/* Global polyfills */
 			if ( basename( $filePath ) === 'functions.php' ) {
 				$content = str_replace( "namespace $prefix;", '', $content );

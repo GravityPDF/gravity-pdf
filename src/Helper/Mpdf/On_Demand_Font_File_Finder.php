@@ -81,7 +81,7 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 		}
 
 		try {
-			return parent::findFontFile( $name );
+			$found = parent::findFontFile( $name );
 		} catch ( MpdfException $e ) {
 			if ( ! $this->downloader->is_core_font_file( $name ) ) {
 				throw $e;
@@ -99,6 +99,13 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 
 			return $fallback;
 		}
+
+		/* Only a core font in the fonts folder can be another font's file, and a Font Manager record's stays the record's */
+		if ( $this->downloader->is_in_fonts_folder( $found ) && $this->downloader->is_core_font_file( $name ) && ! $this->downloader->is_record_file( $name ) && $this->downloader->download( $name ) ) {
+			return $this->downloader->get_font_path( $name );
+		}
+
+		return $found;
 	}
 
 	/**

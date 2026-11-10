@@ -31,16 +31,17 @@ interface Helper_Interface_Deprecated_Features {
 	 * - `group`      (string)   Deprecation::GROUP_UNSUPPORTED or Deprecation::GROUP_DEPRECATED
 	 * - `removed_in` (string)   The Gravity PDF version the feature is, or will be, removed in
 	 * - `url`        (string)   Where the upgrade instructions live
-	 * - `detect`     (callable) Returns what was found on this site, and an empty array when the feature is unused
+	 * - `detect`     (callable) Returns what was found on this site, and an empty array when the feature is unused.
+	 *                           Optional when `hooks` is declared
 	 *
 	 * A feature the default sentence describes badly declares one more:
 	 *
 	 * - `notice`     (string)   What becomes of the feature, taking the removal version as `%s`. Read by every
 	 *                           surface, so it has to make sense with nothing else around it
 	 *
-	 * A feature made up of hooks declares more, so the detector can name the hooks and their replacements:
+	 * A feature made up of hooks declares more. Without a `detect`, it's detected as hook name mapped to listener count:
 	 *
-	 * - `hooks`              (array<string, string>) Each removed hook mapped to its replacement, '' when none exists
+	 * - `hooks`              (array<string, string>) Each deprecated hook mapped to its replacement, '' when none exists
 	 * - `deprecated_in`      (string)                Optional. The Gravity PDF version the hooks were deprecated in,
 	 *                                                read by Deprecation::apply_filters() while they still fire
 	 * - `hook_prefix`        (string)                Optional. Claims any hook starting with it as well, which is

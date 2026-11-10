@@ -105,6 +105,17 @@ class Test_Vendor_Prefixing extends TestCase {
 	}
 
 	/**
+	 * The patcher deprecates the package mPDF no longer uses, ahead of its removal in 7.0
+	 *
+	 * @since 6.19.0
+	 */
+	public function test_deep_copy_is_deprecated() {
+		$this->setExpectedDeprecated( \GFPDF_Vendor\DeepCopy\DeepCopy::class );
+
+		new \GFPDF_Vendor\DeepCopy\DeepCopy();
+	}
+
+	/**
 	 * Returns the evaluated value of every single/double quoted string in a scoped file
 	 *
 	 * @param string $relative_path Path below vendor_prefixed/

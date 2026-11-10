@@ -186,9 +186,13 @@ class View_System_Report extends Helper_Abstract_View {
 		$feature      = Deprecation::get_feature( $key );
 		$descriptions = $this->get_deprecated_feature_descriptions();
 
-		$description = isset( $descriptions[ $key ] )
-			? call_user_func( $descriptions[ $key ], $signal, $feature )
-			: $this->get_default_feature_description( $signal );
+		if ( isset( $descriptions[ $key ] ) ) {
+			$description = call_user_func( $descriptions[ $key ], $signal, $feature );
+		} elseif ( Deprecation::is_hook_only( $feature ) ) {
+			$description = $this->get_deprecated_filter_feature( $signal );
+		} else {
+			$description = $this->get_default_feature_description( $signal );
+		}
 
 		/* Whatever the description leaves out, the feature's own registration answers */
 		return $description + [
@@ -201,8 +205,7 @@ class View_System_Report extends Helper_Abstract_View {
 	/**
 	 * The method that describes each feature's detections, keyed by the feature it describes
 	 *
-	 * A feature with no entry here is described generically, so a newly registered one reports something usable
-	 * before it has copy of its own.
+	 * A feature with no entry here is described by its listener counts if it's hook-only, otherwise generically.
 	 *
 	 * @return array<string, callable>
 	 * @since 6.17.0
@@ -212,8 +215,6 @@ class View_System_Report extends Helper_Abstract_View {
 			'legacy_templates'        => [ $this, 'get_legacy_templates_feature' ],
 			'business_plus_templates' => [ $this, 'get_legacy_templates_feature' ],
 			'legacy_endpoint'         => [ $this, 'get_legacy_endpoint_feature' ],
-			'deprecated_filters'      => [ $this, 'get_deprecated_filter_feature' ],
-			'tools_tab_hooks'         => [ $this, 'get_deprecated_filter_feature' ],
 		];
 	}
 
@@ -315,7 +316,7 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Describe the removed hooks that still have a listener attached
+	 * Describe the deprecated hooks that still have a listener attached
 	 *
 	 * @param array $filters Hook name mapped to the number of listeners
 	 *
@@ -502,6 +503,61 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
+	 * Build the Site Health result for the core fonts the site's PDFs need
+	 *
+	 * @param array $health See Model_System_Report::get_core_font_health()
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_core_fonts_test( array $health ): array {
+		$intro = esc_html__( 'Gravity PDF automatically downloads fonts needed to correctly render PDFs.', 'gravity-pdf' );
+
+		$result = [
+			'label'       => esc_html__( 'Gravity PDF has the core fonts your PDFs need', 'gravity-pdf' ),
+			'status'      => 'good',
+			'badge'       => $this->get_site_health_badge(),
+			'description' => '<p>' . $intro . '</p>',
+			'actions'     => '',
+			'test'        => 'gravity_pdf_core_fonts',
+		];
+
+		if ( $health['failed'] === [] && $health['blocker'] === null ) {
+			return $result;
+		}
+
+		$result['status']      = 'recommended';
+		$result['label']       = esc_html__( 'Some core fonts your PDFs need are missing', 'gravity-pdf' );
+		$result['description'] = '<p>' . $intro . ' ' . esc_html( View_Actions::get_missing_core_fonts_warning() ) . '</p>';
+		$result['actions']     = $this->get_report_link_action( $health['failed'] !== [] ? Model_System_Report::FONTS_FAILED_ANCHOR : Model_System_Report::FONT_DOWNLOADS_ANCHOR ) .
+			'<p><a href="' . View_Actions::CORE_FONTS_DOCS_URL . '">' . esc_html__( 'Install the fonts by hand', 'gravity-pdf' ) . '</a></p>';
+
+		if ( $health['failed'] !== [] ) {
+			/* A give-up needs someone to act and can cost PDFs their text; turning downloads off was a choice */
+			$result['status']       = 'critical';
+			$result['label']        = esc_html__( 'Gravity PDF could not download required fonts', 'gravity-pdf' );
+			$result['description'] .= '<p>' . esc_html__( 'Fonts that failed to download:', 'gravity-pdf' ) . '</p>' . View_Actions::get_code_list( array_keys( $health['failed'] ) );
+		}
+
+		if ( $health['blocker'] !== null ) {
+			$others = array_diff( $health['missing'], array_keys( $health['failed'] ) );
+			$list   = '';
+
+			/* translators: %s: The GPDF_AUTO_INSTALL_FONTS constant or the gfpdf_auto_install_fonts filter */
+			$off = sprintf( esc_html__( 'Core font downloads are turned off by %s.', 'gravity-pdf' ), preg_replace( '/^\S+/', '<code>$0</code>', esc_html( $health['blocker'] ) ) );
+			if ( $others !== [] ) {
+				$off .= ' ' . esc_html__( 'These fonts are missing:', 'gravity-pdf' );
+				$list = View_Actions::get_code_list( $others );
+			}
+
+			$result['description'] .= '<p>' . $off . '</p>' . $list;
+
+			$result['actions'] .= '<p><a href="https://docs.gravitypdf.com/developers/filters/gfpdf_auto_install_fonts/">' . esc_html__( 'Learn how to turn font downloads back on', 'gravity-pdf' ) . '</a></p>';
+		}
+
+		return $result;
+	}
+
+	/**
 	 * @since 7.0
 	 */
 	protected function get_site_health_badge(): array {
@@ -516,8 +572,8 @@ class View_System_Report extends Helper_Abstract_View {
 	 *
 	 * @since 7.0
 	 */
-	protected function get_report_link_action(): string {
-		return '<p><a href="' . esc_url( Model_System_Report::get_report_url() ) . '">' . esc_html__( 'View the Gravity Forms system report', 'gravity-pdf' ) . '</a></p>';
+	protected function get_report_link_action( string $anchor = Model_System_Report::SECTION_ANCHOR ): string {
+		return '<p><a href="' . esc_url( Model_System_Report::get_report_url( $anchor ) ) . '">' . esc_html__( 'View the Gravity Forms system report', 'gravity-pdf' ) . '</a></p>';
 	}
 
 	/**

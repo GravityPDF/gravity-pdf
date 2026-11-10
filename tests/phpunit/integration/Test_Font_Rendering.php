@@ -100,7 +100,7 @@ class Test_Font_Rendering extends TestCase {
 
 		$render = $this->render( '<p style="font-family: arimo">Text ' . $text . '</p>', [ 'font' => 'arimo' ] );
 
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/' . $file ], $this->requested );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.2/' . $file ], $this->requested );
 
 		/* The text is drawn in the substitute. Arimo records each character it draws, even one it lacks (see the emoji
 		   snapshot), so none of the text stayed in Arimo */
@@ -123,6 +123,7 @@ class Test_Font_Rendering extends TestCase {
 	public function test_sun_exta_on_disk_is_substituted_from_without_a_download(): void {
 		/* Sun-ExtA's font data needs no OpenType tables, so any fixture stands in; Chewy has no CJK */
 		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Sun-ExtA.ttf' );
 		FlushCache::flush();
 		$this->fail_font_downloads();
 
@@ -150,6 +151,7 @@ class Test_Font_Rendering extends TestCase {
 	public function test_sun_extb_on_disk_is_the_cjk_extension_b_fallback_without_a_download(): void {
 		/* Sun-ExtB's font data needs no OpenType tables, so any fixture stands in */
 		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Sun-ExtB.ttf' );
 		FlushCache::flush();
 		$this->fail_font_downloads();
 
@@ -192,67 +194,78 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertRenderMatchesSnapshot( 'adopted-arimo', '<p style="font-family: arimo">Adopted</p>' );
 	}
 
-	public function test_a_render_with_its_fonts_on_disk_does_not_load_the_manifest(): void {
-		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'manifest', null );
+	public function test_a_render_with_its_fonts_on_disk_makes_no_request(): void {
+		$this->serve_font_downloads();
 
 		$this->render( '<p style="font-family: dejavusans">Regular <b>Bold</b></p>' );
+
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_a_render_with_bundled_fonts_does_not_load_the_manifest(): void {
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'manifest', null );
+
+		$this->render( '<p style="font-family: arimo">Regular <b>Bold</b></p>', [ 'font' => 'arimo' ] );
 
 		$this->assertNull( $this->get_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'manifest' ) );
 	}
 
-	public function test_a_missing_core_font_downloads_while_rendering(): void {
-		static::remove_test_fonts();
+	public function test_a_core_font_another_font_holds_the_name_of_renders_from_its_hashed_copy(): void {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( 'DejaVuSans.ttf' );
 
-		/* Cached metrics change which substitutes mPDF loads */
+		/* Another font's file at the name, and the manifest's own beside it */
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSans.ttf' );
+		$this->copy_fixture( 'DejaVuSans.ttf', $hashed );
 		FlushCache::flush();
-		$this->serve_fixture_as( 'DejaVuSerifCondensed.ttf', 'Garuda.ttf' );
 		$this->serve_font_downloads();
 
-		/* DejaVu Serif Condensed has the OpenType tables Garuda's font data needs, but no Thai */
-		$this->assertRenderMatchesSnapshot( 'downloaded-thai-font', '<p lang="th">สวัสดี</p>', [ 'font' => 'arimo' ] );
+		$render = $this->render( '<p style="font-family: dejavusans">Regular</p>', [ 'font' => 'dejavusans' ] );
 
-		/* Only the Thai font downloads: no substitute has Thai, so none is fetched for the glyphs the stand-in lacks */
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/Garuda.ttf' ], $this->requested );
+		$this->assertSame( $hashed, basename( $render['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertSame( [], $this->requested );
 	}
 
-	public function test_a_font_that_cannot_download_renders_in_arimo_when_the_default_font_is_missing(): void {
-		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavusanscondensed' );
-		static::remove_test_fonts();
-		$this->fail_font_downloads();
+	public function test_a_core_font_another_font_holds_the_name_of_downloads_beside_it_and_renders_from_the_download(): void {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSans.ttf' );
 
-		$this->assertRenderMatchesSnapshot( 'fallback-arimo', '<p lang="th">Thai สวัสดี</p>', [ 'font' => 'arimo' ] );
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: dejavusans">Regular</p>', [ 'font' => 'dejavusans' ] );
+
+		$this->assertSame( $hashed, basename( $render['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.2/DejaVuSans.ttf' ], $this->requested );
+		$this->assertFileEquals( $this->font_fixture( 'DejaVuSans.ttf' ), $this->font_path( $hashed ) );
+		$this->assertSame( strlen( (string) file_get_contents( $this->font_fixture( 'DejaVuSans.ttf' ) ) ) + 1, filesize( $this->font_path( 'DejaVuSans.ttf' ) ), 'The other font is left alone' );
 	}
 
-	public function test_a_font_that_cannot_download_renders_in_the_pdfs_font(): void {
-		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavusanscondensed' );
-		$this->fail_font_downloads();
+	public function test_a_font_manager_font_and_the_core_font_with_the_same_file_name_each_render_their_own(): void {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'DejaVuSans.ttf' );
 
-		$this->assertRenderMatchesSnapshot( 'fallback-pdf-font', '<p style="font-family: freeserif">Fallback</p>' );
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$custom = $this->render( '<p style="font-family: mine">Custom</p>', [ 'font' => 'mine' ] );
+		$core   = $this->render( '<p style="font-family: dejavusans">Core</p>', [ 'font' => 'dejavusans' ] );
+
+		$this->assertSame( 'DejaVuSans.ttf', basename( $custom['mpdf']->fonts['mine']['ttffile'] ) );
+		$this->assertSame( $hashed, basename( $core['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertCount( 1, $this->requested );
 	}
 
-	public function test_a_font_that_cannot_download_fails_the_pdf_in_debug_mode(): void {
-		GPDFAPI::get_options_class()->update_option( 'debug_mode', 'Yes' );
-		static::remove_test_fonts();
+	public function test_a_core_font_another_font_holds_the_name_of_renders_from_that_font_when_it_cannot_download(): void {
+		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
+		FlushCache::flush();
 		$this->fail_font_downloads();
 
-		$log = new TestHandler();
-		GPDFAPI::get_log_class()->pushHandler( $log );
-		try {
-			[ $result, $render ] = $this->generate( '<p lang="th">สวัสดี</p>', [ 'font' => 'arimo' ] );
-		} finally {
-			GPDFAPI::get_log_class()->popHandler();
-		}
+		$render = $this->render( '<p style="font-family: dejavusans">Regular</p>', [ 'font' => 'dejavusans' ] );
 
-		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertNull( $render );
-		$this->assertTrue(
-			$log->hasRecordThatPasses(
-				static function ( $record ) {
-					return strpos( $record['context']['exception'] ?? '', 'Cannot find TTF TrueType font file' ) !== false;
-				},
-				Logger::ERROR
-			)
-		);
+		$this->assertSame( 'DejaVuSans.ttf', basename( $render['mpdf']->fonts['dejavusans']['ttffile'] ) );
+		$this->assertCount( 1, $this->requested );
 	}
 
 	/**

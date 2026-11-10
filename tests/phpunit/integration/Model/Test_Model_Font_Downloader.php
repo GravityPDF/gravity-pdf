@@ -50,6 +50,9 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		/* Only prune() reads it */
 		$this->set_installer_manifest();
+
+		/* Every version change queues one, which other classes' upgrade tests leave behind */
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
 	}
 
 	public function tear_down(): void {
@@ -69,13 +72,14 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->assertTrue( $this->downloader->download( self::FONT ) );
 		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
-		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.1/' . self::FONT ], $this->requested );
+		$this->assertSame( [ 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/v1.1.2/' . self::FONT ], $this->requested );
 		$this->assertNoStrayTmpFiles();
 	}
 
 	public function test_install_downloads_the_missing_files_despite_a_back_off() {
 		foreach ( [ 'Bold', 'Italic', 'BoldItalic' ] as $style ) {
 			$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-' . $style . '.ttf' );
+			$this->list_fixture_as( 'Chewy.ttf', 'DejaVuSerifCondensed-' . $style . '.ttf' );
 		}
 		$this->set_back_off( self::FONT );
 		$this->serve_font_downloads();
@@ -235,8 +239,51 @@ class Test_Model_Font_Downloader extends TestCase {
 		$downloader = $this->new_downloader( file_get_contents( $this->font_fixture( self::FONT ) ) );
 		$this->serve_font_downloads();
 
-		$this->assertFalse( $downloader->download( self::FONT ) );
+		$this->assertTrue( $downloader->download( self::FONT ) );
 		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( self::FONT ) );
+		$this->assertNoStrayTmpFiles();
+		$this->assertEmpty( $this->get_font_failures() );
+		$this->assertCount( 1, $this->log_messages( 'Font already in place after a failed move' ) );
+	}
+
+	public function test_a_font_on_disk_clears_its_stale_failure() {
+		$this->set_font_failures( [ self::FONT => $this->failure( time() ) ] );
+		$this->set_back_off( self::FONT );
+		$this->copy_fixture( self::FONT );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+
+		$this->assertSame( [], $this->requested );
+		$this->assertEmpty( $this->get_font_failures() );
+		$this->assertFalse( $this->get_back_off( self::FONT ) );
+	}
+
+	public function test_a_failed_move_to_a_hashed_copy_another_request_saved_is_not_a_failure() {
+		$this->put_other_font_at( self::FONT );
+		$hashed     = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
+		$downloader = $this->new_downloader( file_get_contents( $this->font_fixture( self::FONT ) ) );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $downloader->download( self::FONT ) );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ), 'The other font is left alone' );
+		$this->assertNoStrayTmpFiles();
+		$this->assertEmpty( $this->get_font_failures() );
+		$this->assertCount( 1, $this->log_messages( 'Font already in place after a failed move' ) );
+	}
+
+	public function test_a_hashed_copy_on_disk_clears_its_stale_failure() {
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
+		$this->set_font_failures( [ self::FONT => $this->failure( time() ) ] );
+		$this->put_other_font_at( self::FONT );
+		$this->copy_fixture( self::FONT, $hashed );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+
+		$this->assertSame( [], $this->requested );
+		$this->assertEmpty( $this->get_font_failures() );
 	}
 
 	/**
@@ -380,15 +427,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		);
 		$this->serve_font_downloads();
 
-		$downloader = new class( ...$this->downloader_args() ) extends Model_Font_Downloader {
-			/** @var bool|null */
-			public $constant;
-
-			protected function get_auto_install_constant(): ?bool {
-				return $this->constant;
-			}
-		};
-		$downloader->constant = $constant;
+		$downloader = $this->seamed( [ 'constant' => $constant ] );
 
 		$this->assertSame( $downloads, $downloader->download( self::FONT ) );
 		$this->assertCount( $downloads ? 1 : 0, $this->requested );
@@ -418,6 +457,266 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->assertFalse( $this->downloader->download( self::FONT ) );
 		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_download_saves_the_font_under_its_hashed_name_when_another_font_holds_the_name() {
+		$this->put_other_font_at( self::FONT );
+		$this->serve_font_downloads();
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ), 'The other font is left alone' );
+		$this->assertSame( $this->font_path( $hashed ), $this->downloader->get_font_path( self::FONT ) );
+		$this->assertCount( 1, $this->log_messages( 'Font saved under a new name as another font has its name' ) );
+		$this->assertNoStrayTmpFiles();
+
+		/* The next request finds the copy and asks for nothing */
+		$this->requested = [];
+		$this->assertTrue( $this->new_downloader()->download( self::FONT ) );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_saving_a_hashed_copy_removes_the_copy_of_an_older_release_but_not_a_lookalike() {
+		$old = 'DejaVuSerifCondensed-' . substr( (string) key( $this->fixture_blob( 'DejaVuSans.ttf' ) ), 0, 8 ) . '.ttf';
+
+		$this->put_other_font_at( self::FONT );
+		$this->copy_fixture( 'DejaVuSans.ttf', $old );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-deadbeef.ttf' );
+		$this->serve_font_downloads();
+
+		$this->assertTrue( $this->downloader->download( self::FONT ) );
+		$this->assertFileDoesNotExist( $this->font_path( $old ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed-deadbeef.ttf' ), 'Its name is not its own hash' );
+		$this->assertFileExists( $this->font_path( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ) );
+	}
+
+	public function test_the_hashed_name_is_the_stem_the_first_eight_of_the_sha_and_the_extension() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$sha     = $sources->get_manifest()[ self::FONT ]['sha'];
+
+		$this->assertSame( 'DejaVuSerifCondensed-' . substr( $sha, 0, 8 ) . '.ttf', $sources->get_hashed_name( self::FONT ) );
+		$this->assertSame( '', $sources->get_hashed_name( 'NotAFont.ttf' ) );
+		$this->assertTrue( $sources->is_hashed_copy( $sources->get_hashed_name( self::FONT ) ) );
+		$this->assertFalse( $sources->is_hashed_copy( self::FONT ) );
+		$this->assertFalse( $sources->is_hashed_copy( 'DejaVuSerifCondensed-00000000.ttf' ) );
+	}
+
+	public function test_another_fonts_file_stays_when_downloads_are_off() {
+		$this->put_other_font_at( self::FONT );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+		$this->serve_font_downloads();
+
+		$this->assertFalse( $this->downloader->download( self::FONT ) );
+		$this->assertSame( [], $this->requested );
+		$this->assertSame( $this->font_path( self::FONT ), $this->downloader->get_font_path( self::FONT ) );
+		$this->assertTrue( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->is_downloaded( self::FONT ), 'mPDF can still load it' );
+	}
+
+	public function test_a_failed_download_beside_another_font_is_recorded_under_the_manifest_name() {
+		$this->put_other_font_at( self::FONT );
+		$this->fail_font_downloads();
+
+		$this->assertFalse( $this->downloader->download( self::FONT ) );
+		$this->assertSame( [ self::FONT ], array_keys( $this->get_font_failures() ) );
+		$this->assertIsInt( $this->get_back_off( self::FONT ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ) );
+	}
+
+	public function test_a_file_of_a_known_size_is_not_hashed_unless_verifying() {
+		$this->put_same_size_font_at( self::FONT, self::FONT );
+		$this->serve_font_downloads();
+		$downloader = $this->seamed( [] );
+
+		$this->assertTrue( $downloader->download( self::FONT ) );
+		$this->assertSame( [], $downloader->hashed );
+		$this->assertSame( [], $this->requested );
+
+		/* Verifying finds that it isn't the manifest's */
+		$this->assertTrue( $downloader->download( self::FONT, true ) );
+		$this->assertSame( [ self::FONT ], $downloader->hashed );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) ) );
+	}
+
+	public function test_a_file_from_an_older_release_is_kept_when_verifying() {
+		$this->copy_fixture( 'DejaVuSerifCondensed-v1.0.0.ttf', self::FONT );
+		$this->serve_font_downloads();
+
+		/* The real list of what the installer downloaded, not the fixtures set_up() stands in for it */
+		$this->set_private( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'legacy_manifests', [] );
+
+		$this->assertTrue( $this->downloader->download( self::FONT, true ) );
+		$this->assertSame( [], $this->requested );
+	}
+
+	public function test_sync_hashes_each_required_file_on_disk_once_and_saves_the_other_fonts_under_new_names() {
+		$this->copy_fixture( self::FONT );
+		$this->put_same_size_font_at( 'DejaVuSansCondensed.ttf', 'DejaVuSansCondensed.ttf' );
+		$this->serve_font_downloads();
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+
+		$downloader = $this->seamed_sync( [ self::FONT, 'DejaVuSansCondensed.ttf' ] );
+		$downloader->sync();
+
+		$this->assertEqualsCanonicalizing( [ self::FONT, 'DejaVuSansCondensed.ttf' ], $downloader->hashed );
+		$this->assertCount( 1, $this->requested );
+		$this->assertFileExists( $this->font_path( $sources->get_hashed_name( 'DejaVuSansCondensed.ttf' ) ) );
+		$this->assertFileDoesNotExist( $this->font_path( $sources->get_hashed_name( self::FONT ) ) );
+
+		/* A file with a copy under its hashed name is not hashed again */
+		$next = $this->seamed_sync( [ self::FONT, 'DejaVuSansCondensed.ttf' ] );
+		$next->sync();
+
+		$this->assertSame( [ self::FONT ], $next->hashed );
+		$this->assertCount( 1, $this->requested );
+	}
+
+	public function test_a_retry_for_a_file_beside_another_font_is_not_cleared() {
+		$this->put_other_font_at( self::FONT );
+		$this->set_font_failures( [ self::FONT => $this->failure() ] );
+		$this->set_back_off( self::FONT );
+		$this->serve_font_downloads();
+
+		$this->seamed_sync( [] )->sync();
+
+		$this->assertFileExists( $this->font_path( GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) ) );
+		$this->assertEmpty( $this->get_font_failures() );
+	}
+
+	public function test_prune_never_removes_a_hashed_copy_or_a_replaced_file() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+		$hashed  = $sources->get_hashed_name( self::FONT );
+
+		/* The unmodified installer file goes, beside the manifest's copy of it */
+		$this->copy_fixture( self::FONT );
+		$this->copy_fixture( self::FONT, $hashed );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSans.ttf' );
+		$this->copy_fixture( 'DejaVuSans.ttf', $sources->get_hashed_name( 'DejaVuSans.ttf' ) );
+
+		$this->assertSame( [ self::FONT ], $this->downloader->prune( [] ) );
+		$this->assertFileExists( $this->font_path( $hashed ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSans.ttf' ), 'A replacement' );
+		$this->assertFileExists( $this->font_path( $sources->get_hashed_name( 'DejaVuSans.ttf' ) ) );
+	}
+
+	public function test_the_missing_files_are_the_required_files_not_on_disk() {
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+
+		$this->assertSame( [ self::FONT ], $this->seamed( [ 'required' => [ 'Garuda.ttf', self::FONT ] ] )->get_required_fonts()->get_missing_files() );
+	}
+
+	public function test_a_file_another_font_holds_the_name_of_is_missing_until_its_hashed_copy_is_saved() {
+		$this->put_other_font_at( self::FONT );
+		$required = $this->seamed( [ 'required' => [ self::FONT ] ] )->get_required_fonts();
+
+		$this->assertSame( [ self::FONT ], $required->get_missing_files() );
+
+		$this->copy_fixture( self::FONT, GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) );
+		$this->assertSame( [], $required->get_missing_files() );
+	}
+
+	public function test_the_auto_install_status_does_not_depend_on_the_missing_files() {
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$downloader = $this->seamed( [ 'required' => [] ] );
+		$this->assertSame( 'Off (gfpdf_auto_install_fonts filter)', $downloader->get_auto_install_status() );
+		$this->assertNull( $downloader->get_auto_install_blocker( [] ) );
+	}
+
+	public function test_the_blocker_names_the_constant() {
+		$downloader = $this->seamed(
+			[
+				'constant' => false,
+				'required' => [],
+			]
+		);
+
+		$this->assertSame( 'GPDF_AUTO_INSTALL_FONTS constant', $downloader->get_auto_install_blocker( [ 'Garuda.ttf' ] ) );
+	}
+
+	public function test_the_auto_install_status_only_walks_the_manifest_when_a_filter_could_block_a_file() {
+		$sources = new class( GPDFAPI::get_data_class(), GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' ), GPDFAPI::get_log_class() ) extends Model_Font_Sources {
+			/** @var int */
+			public $reads = 0;
+
+			public function get_manifest(): array {
+				$this->reads++;
+
+				return parent::get_manifest();
+			}
+		};
+
+		$downloader = $this->seamed( [ 'sources' => $sources ] );
+
+		$this->assertSame( 'On', $downloader->get_auto_install_status() );
+		$this->assertSame( 0, $sources->reads );
+
+		add_filter( 'gfpdf_auto_install_fonts', '__return_true' );
+
+		$this->assertSame( 'On', $downloader->get_auto_install_status() );
+		$this->assertSame( 1, $sources->reads );
+	}
+
+	public function test_the_auto_install_status_is_partly_off_when_the_filter_blocks_some_files() {
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		add_filter(
+			'gfpdf_auto_install_fonts',
+			static function ( $download, $file ) {
+				return $file !== 'Garuda.ttf';
+			},
+			10,
+			2
+		);
+
+		$downloader = $this->seamed( [ 'required' => [ 'Garuda.ttf', self::FONT ] ] );
+		$this->assertSame( 'Partly off (gfpdf_auto_install_fonts filter)', $downloader->get_auto_install_status() );
+
+		/* Installed, so nothing it blocks is needed yet */
+		$this->assertNull( $downloader->get_auto_install_blocker( $downloader->get_required_fonts()->get_missing_files() ) );
+
+		wp_delete_file( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertSame( 'gfpdf_auto_install_fonts filter', $downloader->get_auto_install_blocker( $downloader->get_required_fonts()->get_missing_files() ) );
+	}
+
+	/**
+	 * @dataProvider provider_auto_install_status
+	 *
+	 * @param bool|null $constant GPDF_AUTO_INSTALL_FONTS, or null when it isn't defined
+	 */
+	public function test_the_auto_install_status_names_what_turned_downloads_off( ?bool $constant, bool $filtered, string $expected ) {
+		add_filter( 'gfpdf_auto_install_fonts', $filtered ? '__return_true' : '__return_false' );
+
+		$downloader = $this->seamed(
+			[
+				'required' => [ self::FONT ],
+				'constant' => $constant,
+			]
+		);
+
+		$this->assertSame( $expected, $downloader->get_auto_install_status() );
+	}
+
+	public function test_downloads_are_overridden_by_a_constant_turning_them_off_or_any_filter() {
+		$this->assertFalse( $this->seamed( [] )->is_auto_install_overridden() );
+		$this->assertFalse( $this->seamed( [ 'constant' => true ] )->is_auto_install_overridden() );
+		$this->assertTrue( $this->seamed( [ 'constant' => false ] )->is_auto_install_overridden() );
+
+		add_filter( 'gfpdf_auto_install_fonts', '__return_true' );
+
+		$this->assertTrue( $this->seamed( [] )->is_auto_install_overridden() );
+		$this->assertFalse( $this->seamed( [ 'constant' => true ] )->is_auto_install_overridden() );
+	}
+
+	public function provider_auto_install_status(): array {
+		return [
+			'the constant on, the filter off' => [ true, false, 'On' ],
+			'the constant off, the filter on' => [ false, true, 'Off (GPDF_AUTO_INSTALL_FONTS constant)' ],
+			'no constant, the filter off'     => [ null, false, 'Off (gfpdf_auto_install_fonts filter)' ],
+			'no constant, the filter on'      => [ null, true, 'On' ],
+		];
 	}
 
 	public function test_prune_removes_unmodified_core_fonts_and_licences() {
@@ -592,6 +891,84 @@ class Test_Model_Font_Downloader extends TestCase {
 			'done'    => [ true ],
 			'corrupt' => [ 'yes' ],
 		];
+	}
+
+	public function test_prune_replaces_a_needed_installer_garuda() {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+		$this->copy_fixture( 'DejaVuSerifCondensed-v1.0.0.ttf', self::FONT );
+
+		$this->assertSame( [ 'Garuda.ttf' ], $this->downloader->prune( [ 'Garuda.ttf', self::FONT ] ) );
+		$this->assertFileDoesNotExist( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertFileExists( $this->font_path( self::FONT ), 'Differs from v1.1.1 only in hinting' );
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
+	public function test_prune_replaces_needed_installer_sun_ext_fonts() {
+		$files = [ 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ];
+		$this->set_installer_manifest( array_fill_keys( $files, 'Chewy.ttf' ) );
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+
+		$this->assertSame( $files, $this->downloader->prune( $files ) );
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
+	public function test_the_replacement_for_an_installer_garuda_lands_under_its_plain_name() {
+		$this->use_shipped_installer_manifest();
+		$this->serve_fixture_as( 'Garuda-v1.1.1.ttf', 'Garuda.ttf' );
+		$this->serve_font_downloads();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( 'Garuda.ttf' );
+
+		/* The installer's build is a known one, so it is the font's own, even when verifying, until it is pruned */
+		$this->assertTrue( $this->downloader->download( 'Garuda.ttf', true ) );
+		$this->assertSame( [], $this->requested );
+
+		$this->assertSame( [ 'Garuda.ttf' ], $this->downloader->prune( [ 'Garuda.ttf' ] ) );
+		$this->assertTrue( $this->downloader->download( 'Garuda.ttf', true ) );
+		$this->assertFileEquals( $this->font_fixture( 'Garuda-v1.1.1.ttf' ), $this->font_path( 'Garuda.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
+	}
+
+	public function test_prune_queues_no_sync_for_an_unneeded_garuda() {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+
+		$this->assertSame( [ 'Garuda.ttf' ], $this->downloader->prune( [] ) );
+		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	/**
+	 * @dataProvider provider_garuda_left_in_place
+	 */
+	public function test_prune_keeps_a_needed_garuda_that_is_not_the_installer_copy( string $fixture, string $bytes ) {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( $fixture, 'Garuda.ttf' );
+		if ( $bytes !== '' ) {
+			$this->change_font( 'Garuda.ttf', $bytes );
+		}
+
+		$this->assertSame( [], $this->downloader->prune( [ 'Garuda.ttf' ] ) );
+		$this->assertFileExists( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	public function provider_garuda_left_in_place(): array {
+		return [
+			'modified, same size' => [ 'Garuda-v1.0.0.ttf', 'same size, other bytes' ],
+			'the v1.1.1 file'     => [ 'Garuda-v1.1.1.ttf', '' ],
+		];
+	}
+
+	public function test_prune_keeps_a_needed_garuda_downloads_are_turned_off_for() {
+		$this->use_shipped_installer_manifest();
+		$this->copy_fixture( 'Garuda-v1.0.0.ttf', 'Garuda.ttf' );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$this->assertSame( [], $this->downloader->prune( [ 'Garuda.ttf' ] ) );
+		$this->assertFileExists( $this->font_path( 'Garuda.ttf' ) );
+		$this->assertSame( [], $this->get_scheduled_args() );
 	}
 
 	/**
@@ -835,12 +1212,46 @@ class Test_Model_Font_Downloader extends TestCase {
 
 	public function test_sync_skips_files_already_on_disk() {
 		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
 		$this->serve_font_downloads();
 
 		$this->seamed_sync( [ 'Garuda.ttf', self::FONT ] )->sync();
 
 		$this->assertSame( [ GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_manifest()[ self::FONT ]['url'] ], $this->requested );
 		$this->assertSame( [], $this->get_scheduled_args() );
+	}
+
+	public function test_a_file_of_another_size_at_the_hashed_name_is_not_the_fonts_copy() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+
+		$this->copy_fixture( self::FONT, self::FONT );
+		$this->copy_fixture( 'Chewy.ttf', $sources->get_hashed_name( self::FONT ) );
+
+		$this->assertFalse( $sources->has_hashed_copy( self::FONT ) );
+		$this->assertSame( $this->font_path( self::FONT ), $sources->get_font_path( self::FONT ) );
+	}
+
+	public function test_only_a_manifest_files_hashed_form_is_a_reserved_name() {
+		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
+
+		$this->assertTrue( $sources->is_reserved_name( $sources->get_hashed_name( self::FONT ) ) );
+		$this->assertTrue( $sources->is_reserved_name( strtoupper( $sources->get_hashed_name( self::FONT ) ) ) );
+		$this->assertTrue( $sources->is_reserved_name( pathinfo( self::FONT, PATHINFO_FILENAME ) . '-00000000.ttf' ) );
+		$this->assertFalse( $sources->is_reserved_name( self::FONT ) );
+		$this->assertFalse( $sources->is_reserved_name( 'Mine-00000000.ttf' ) );
+	}
+
+	public function test_a_sync_downloads_missing_files_before_hashing_those_on_disk() {
+		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
+		$this->serve_font_downloads();
+
+		$downloader = $this->seamed_sync( [ 'Garuda.ttf', self::FONT ], 0 );
+		$downloader->sync();
+
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+		$this->assertSame( [], $downloader->hashed );
+		$this->assertSame( [ 'Garuda.ttf' ], get_transient( Model_Font_Downloader::SYNC_REMAINING ) );
 	}
 
 	public function test_a_paused_sync_leaves_the_rest_for_its_next_run() {
@@ -1192,6 +1603,35 @@ class Test_Model_Font_Downloader extends TestCase {
 		/* A font that gives up later is listed */
 		$this->set_font_failures( $this->get_font_failures() + [ 'FreeSans.ttf' => $this->failure( time() ) ] );
 		$this->assertSame( [ 'FreeSans.ttf' ], $this->new_downloader()->get_undismissed_failed_files() );
+	}
+
+	public function test_a_font_on_disk_clears_its_give_up_for_every_reader() {
+		$this->list_fixture_as( 'Chewy.ttf', self::FONT );
+		$this->copy_fixture( 'Chewy.ttf', self::FONT );
+		$this->set_font_failures(
+			[
+				self::FONT   => $this->failure( time() - 10 ),
+				'Garuda.ttf' => $this->failure( time() - 10 ),
+			]
+		);
+		$this->set_back_off( self::FONT );
+
+		$downloader = $this->new_downloader();
+
+		$this->assertSame( [ 'Garuda.ttf' ], array_keys( $downloader->get_failed_files() ) );
+		$this->assertSame( [ 'Garuda.ttf' ], $downloader->get_undismissed_failed_files() );
+		$this->assertSame( [ 'Garuda.ttf' ], array_keys( $this->get_font_failures() ) );
+		$this->assertFalse( $this->get_back_off( self::FONT ) );
+	}
+
+	public function test_a_font_on_disk_keeps_a_retry_still_to_come() {
+		$this->list_fixture_as( 'Chewy.ttf', self::FONT );
+		$this->copy_fixture( 'Chewy.ttf', self::FONT );
+		$this->set_font_failures( [ self::FONT => $this->failure() ] );
+
+		$this->new_downloader()->get_failed_files();
+
+		$this->assertSame( [ self::FONT ], array_keys( $this->get_font_failures() ) );
 	}
 
 	public function test_only_a_true_dismissal_counts() {

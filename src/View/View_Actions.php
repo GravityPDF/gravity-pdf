@@ -24,6 +24,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class View_Actions extends Helper_Abstract_View {
 	/**
+	 * The docs on installing the core fonts by hand
+	 *
+	 * @since 6.19.0
+	 */
+	public const CORE_FONTS_DOCS_URL = 'https://docs.gravitypdf.com/users/core-pdf-fonts';
+
+	/**
 	 * Set the view's name
 	 *
 	 * @var string
@@ -137,12 +144,12 @@ class View_Actions extends Helper_Abstract_View {
 		$html = $this->load(
 			'list_notice',
 			[
-				'heading' => __( 'Gravity PDF could not download these fonts. Until they are installed, PDFs use a fallback font in their place, so some characters may not display.', 'gravity-pdf' ),
+				'heading' => __( 'Gravity PDF could not download these fonts.', 'gravity-pdf' ) . ' ' . self::get_missing_core_fonts_warning(),
 				'items'   => $files,
 				'footer'  => sprintf(
 					/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
 					esc_html__( 'You can %1$sinstall the fonts by hand%2$s. Dismissing this notice hides the fonts above. Any that fail later are reported again.', 'gravity-pdf' ),
-					'<a href="https://docs.gravitypdf.com/users/core-pdf-fonts">',
+					'<a href="' . self::CORE_FONTS_DOCS_URL . '">',
 					'</a>'
 				),
 			],
@@ -150,5 +157,31 @@ class View_Actions extends Helper_Abstract_View {
 		);
 
 		return $html . $this->get_action_buttons( $type, $button_text );
+	}
+
+	/**
+	 * What missing core fonts mean for a PDF
+	 *
+	 * @since 6.19.0
+	 */
+	public static function get_missing_core_fonts_warning(): string {
+		return __( 'Until the fonts are installed, PDFs that need them use a fallback font and some characters may not display.', 'gravity-pdf' );
+	}
+
+	/**
+	 * A bulleted list of code items. Bullets are set per-item: Gravity Forms resets `ul li` to none, and
+	 * wp_kses_post() drops the `list-style` shorthand
+	 *
+	 * @param string[] $items
+	 *
+	 * @since 6.19.0
+	 */
+	public static function get_code_list( array $items ): string {
+		$html = '';
+		foreach ( $items as $item ) {
+			$html .= '<li style="list-style-type: disc"><code>' . esc_html( $item ) . '</code></li>';
+		}
+
+		return '<ul style="margin: 0.5em 0 0.5em 2em">' . $html . '</ul>';
 	}
 }

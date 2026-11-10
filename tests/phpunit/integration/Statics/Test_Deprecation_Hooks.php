@@ -16,7 +16,7 @@ use GFPDF\Tests\Integration\TestCase;
 /**
  * @group     statics
  */
-class Test_Deprecation_Tools_Tab extends TestCase {
+class Test_Deprecation_Hooks extends TestCase {
 
 	use ResetsDetectedFeatures;
 
@@ -30,8 +30,9 @@ class Test_Deprecation_Tools_Tab extends TestCase {
 	public function test_the_tools_tab_feature_is_registered() {
 		$feature = Deprecation::get_feature( 'tools_tab_hooks' );
 
-		$this->assertSame( Deprecation::GROUP_UNSUPPORTED, $feature['group'] );
-		$this->assertSame( '6.19.0', $feature['removed_in'] );
+		$this->assertSame( Deprecation::GROUP_DEPRECATED, $feature['group'] );
+		$this->assertSame( '6.19.0', $feature['deprecated_in'] );
+		$this->assertSame( '7.0', $feature['removed_in'] );
 		$this->assertSame(
 			[
 				'gfpdf_settings_tools'           => 'gfpdf_settings_general',
@@ -39,14 +40,13 @@ class Test_Deprecation_Tools_Tab extends TestCase {
 			],
 			$feature['hooks']
 		);
-		$this->assertStringContainsString( '6.19.0', Deprecation::get_feature_notice( $feature ) );
+		$this->assertStringContainsString( 'version 7.0', Deprecation::get_feature_notice( $feature ) );
 	}
 
 	/**
-	 * Nothing in core fires or listens to these any more, so a clean install reports nothing
+	 * Core fires these but never listens, so a clean install reports nothing
 	 */
 	public function test_a_clean_install_reports_nothing() {
-		$this->assertSame( [], Deprecation_Tools_Tab::get_active_hooks() );
 		$this->assertArrayNotHasKey( 'tools_tab_hooks', Deprecation::get_signals() );
 	}
 
@@ -57,7 +57,7 @@ class Test_Deprecation_Tools_Tab extends TestCase {
 		add_action( 'gfpdf_post_tools_settings_page', $callback );
 		add_action( 'gfpdf_post_tools_settings_page', '__return_null' );
 
-		/* A similarly named hook isn't one of the removed ones */
+		/* A similarly named hook isn't one of these */
 		add_filter( 'gfpdf_settings_tools_sanitize', $callback );
 
 		$this->assertSame(
@@ -65,12 +65,8 @@ class Test_Deprecation_Tools_Tab extends TestCase {
 				'gfpdf_post_tools_settings_page' => 2,
 				'gfpdf_settings_tools'           => 1,
 			],
-			Deprecation_Tools_Tab::get_active_hooks()
+			Deprecation::refresh_signals()['tools_tab_hooks']
 		);
-
-		Deprecation::flush_cache();
-
-		$this->assertArrayHasKey( 'tools_tab_hooks', Deprecation::refresh_signals() );
 		$this->assertContains( 'tools_tab_hooks', Deprecation::get_detected_features() );
 
 		remove_filter( 'gfpdf_settings_tools', $callback );

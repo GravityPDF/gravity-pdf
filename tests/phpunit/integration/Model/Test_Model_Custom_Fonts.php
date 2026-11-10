@@ -198,4 +198,64 @@ class Test_Model_Custom_Fonts extends TestCase {
 			[ true, 'dejavusans1' ],
 		];
 	}
+
+	/**
+	 * @group ms-excluded
+	 */
+	public function test_a_single_site_reads_no_other_sites_fonts() {
+		global $wpdb;
+
+		$this->skipWithMultisite();
+
+		$queries = $wpdb->num_queries;
+
+		$this->assertSame( [], $this->model->get_files_used_by_other_sites() );
+		$this->assertSame( $queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_get_files_used_by_other_sites() {
+		global $wpdb;
+
+		$this->skipWithoutMultisite();
+
+		$this->model->add_font(
+			[
+				'id'      => 'mine',
+				'regular' => '/fonts/Mine.ttf',
+			]
+		);
+
+		$fonts = [
+			'one'     => [
+				'regular'     => '/fonts/One.ttf',
+				'bolditalics' => '/fonts/Shared.ttf',
+			],
+			'two'     => [
+				'regular' => '',
+				'italics' => '/fonts/Shared.ttf',
+				'bold'    => [ 'Array.ttf' ],
+			],
+			'corrupt' => 'font',
+		];
+
+		update_blog_option( self::factory()->blog->create(), 'gfpdf_settings', [ 'custom_fonts' => $fonts ] );
+		update_blog_option( self::factory()->blog->create(), 'gfpdf_settings', [ 'custom_fonts' => 'fonts' ] );
+		update_blog_option( self::factory()->blog->create(), 'gfpdf_settings', 'settings' );
+		self::factory()->blog->create();
+
+		/* A truncated serialized value */
+		$truncated = self::factory()->blog->create();
+		update_blog_option( $truncated, 'gfpdf_settings', [ 'custom_fonts' => [] ] );
+		$wpdb->update( $wpdb->get_blog_prefix( $truncated ) . 'options', [ 'option_value' => 'a:1:{s:12:"custom_fonts";a:1:{' ], [ 'option_name' => 'gfpdf_settings' ] );
+
+		$this->assertSame( [ 'One.ttf', 'Shared.ttf' ], $this->model->get_files_used_by_other_sites() );
+
+		/* Read once a request */
+		$queries = $wpdb->num_queries;
+		$this->model->get_files_used_by_other_sites();
+		$this->assertSame( $queries, $wpdb->num_queries );
+	}
 }
