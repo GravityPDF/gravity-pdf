@@ -5,6 +5,8 @@ declare( strict_types=1 );
 namespace GFPDF\Tests\Integration;
 
 use GFPDF\Helper\Fonts\FlushCache;
+use GFPDF\Helper\Helper_Render_Health;
+use GFPDF\Model\Model_Font_Downloader;
 use GFPDF\Tests\Concerns\AssertsSnapshots;
 use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
@@ -43,6 +45,7 @@ class Test_Font_Rendering extends TestCase {
 		static::copy_test_fonts();
 
 		$this->delete_font_failures();
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
 		GPDFAPI::get_options_class()->delete_option( 'debug_mode' );
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
@@ -68,20 +71,61 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertSame( [], $this->requested );
 	}
 
-	public function test_an_emoji_and_cjk_on_an_english_site_do_not_download_sun_exta(): void {
+	/**
+	 * @dataProvider provider_large_substitutes
+	 */
+	public function test_text_only_a_large_file_draws_queues_it_and_keeps_the_render_out_of_the_cache( string $text, string $file ): void {
 		static::remove_test_fonts();
-
-		/* Cached metrics change which substitutes mPDF loads */
 		FlushCache::flush();
 		$this->serve_font_downloads();
 
-		$render = $this->render( '<p style="font-family: arimo">Smile 😀 日本</p>', [ 'font' => 'arimo' ] );
-		$this->assertMatchesSnapshot( 'fonts/emoji-cjk-without-sun-exta.txt', $this->describe_fonts( $render ) );
-		$this->assertNotContains( 'sun-exta', $render['mpdf']->backupSubsFont );
-		$this->assertArrayNotHasKey( 'sun-exta', $render['mpdf']->fonts );
+		$render = $this->render( '<p style="font-family: arimo">' . $text . '</p>', [ 'font' => 'arimo' ] );
 
-		/* mPDF reads which characters each substitute has from its ranges file, and none of the others have these */
 		$this->assertSame( [], $this->requested );
+		$this->assertTrue( $render['degraded'] );
+		$this->assertSame( [ $file ], $this->wanted_files() );
+		$this->assertNotFalse( wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+	}
+
+	public function provider_large_substitutes(): array {
+		return [
+			'CJK from Sun-ExtA, beside an emoji none has' => [ '😀 日本', 'Sun-ExtA.ttf' ],
+			'CJK Extension B from Sun-ExtB' => [ '𠀀', 'Sun-ExtB.ttf' ],
+		];
+	}
+
+	public function test_text_the_listed_fonts_draw_queues_nothing_and_is_cached(): void {
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p style="font-family: arimo">Hello café Привет</p>', [ 'font' => 'arimo' ] );
+
+		$this->assertFalse( $render['degraded'] );
+		$this->assertSame( [], $this->wanted_files() );
+	}
+
+	public function test_a_large_pdf_font_is_queued_and_the_pdf_renders_in_arimo(): void {
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p>日本</p>', [ 'font' => 'sun-exta' ] );
+
+		$this->assertSame( [], $this->requested );
+		$this->assertTrue( $render['degraded'] );
+		$this->assertSame( 'gfpdf-Arimo-Regular.ttf', basename( $render['mpdf']->fonts['sun-exta']['ttffile'] ?? '' ) );
+		$this->assertSame( [ 'Sun-ExtA.ttf' ], $this->wanted_files() );
+	}
+
+	public function test_a_large_file_another_font_holds_the_name_of_is_queued_and_the_render_uses_that_font_and_is_not_cached(): void {
+		$this->put_other_font_at( 'Sun-ExtA.ttf' );
+		FlushCache::flush();
+		$this->serve_font_downloads();
+
+		$render = $this->render( '<p>日本</p>', [ 'font' => 'sun-exta' ] );
+
+		$this->assertSame( [], $this->requested );
+		$this->assertTrue( $render['degraded'] );
+		$this->assertSame( 'Sun-ExtA.ttf', basename( $render['mpdf']->fonts['sun-exta']['ttffile'] ?? '' ) );
+		$this->assertSame( [ 'Sun-ExtA.ttf' ], $this->wanted_files() );
 	}
 
 	/**
@@ -134,18 +178,20 @@ class Test_Font_Rendering extends TestCase {
 		$this->assertStringNotContainsString( 'Sun-ExtA', implode( ',', $this->requested ) );
 	}
 
-	public function test_a_cjk_extension_b_character_does_not_download_sun_extb(): void {
+	public function test_a_cjk_extension_b_character_queues_sun_extb_through_sun_extas_link_too(): void {
 		/* Sun-ExtA's link to Sun-ExtB is the other way mPDF reaches it */
 		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtA.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'Sun-ExtA.ttf' );
 		FlushCache::flush();
 		$this->serve_font_downloads();
 
 		foreach ( [ 'arimo', 'sun-exta' ] as $font ) {
 			$render = $this->render( '<p style="font-family: ' . $font . '">𠀀</p>', [ 'font' => $font ] );
-			$this->assertArrayNotHasKey( 'sun-extb', $render['mpdf']->fonts, $font );
+			$this->assertTrue( $render['degraded'], $font );
 		}
 
 		$this->assertStringNotContainsString( 'Sun-ExtB', implode( ',', $this->requested ) );
+		$this->assertSame( [ 'Sun-ExtB.ttf' ], $this->wanted_files() );
 	}
 
 	public function test_sun_extb_on_disk_is_the_cjk_extension_b_fallback_without_a_download(): void {
@@ -280,7 +326,7 @@ class Test_Font_Rendering extends TestCase {
 	/**
 	 * Render the fixture entry's PDF with the HTML swapped in, and stop once mPDF has written it
 	 *
-	 * @return array{mpdf: Mpdf, pdf: string}
+	 * @return array{mpdf: Mpdf, pdf: string, degraded: bool}
 	 */
 	protected function render( string $html, array $settings = [] ): array {
 		[ $result, $render ] = $this->generate( $html, $settings );
@@ -292,14 +338,14 @@ class Test_Font_Rendering extends TestCase {
 	}
 
 	/**
-	 * @return array{0: mixed, 1: array{mpdf: Mpdf, pdf: string}|null} The generate_and_save_pdf() result and the render
+	 * @return array{0: mixed, 1: array{mpdf: Mpdf, pdf: string, degraded: bool}|null} The generate_and_save_pdf() result and the render
 	 */
 	protected function generate( string $html, array $settings = [] ): array {
 		$form  = $this->form( 'all-form-fields' );
 		$entry = $this->entry( 'all-form-fields' );
 
 		$capture = new class() extends RuntimeException {
-			/** @var array{mpdf: Mpdf, pdf: string}|null */
+			/** @var array{mpdf: Mpdf, pdf: string, degraded: bool}|null */
 			public $result;
 		};
 
@@ -309,8 +355,9 @@ class Test_Font_Rendering extends TestCase {
 
 		$stop = static function ( $mpdf ) use ( $capture ): void {
 			$capture->result = [
-				'mpdf' => $mpdf,
-				'pdf'  => $mpdf->Output( '', 'S' ),
+				'mpdf'     => $mpdf,
+				'pdf'      => $mpdf->Output( '', 'S' ),
+				'degraded' => Helper_Render_Health::is_degraded(),
 			];
 
 			throw $capture;
@@ -360,5 +407,12 @@ class Test_Font_Rendering extends TestCase {
 		sort( $lines );
 
 		return implode( "\n", $lines ) . "\n";
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private function wanted_files(): array {
+		return GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->get_wanted_files();
 	}
 }

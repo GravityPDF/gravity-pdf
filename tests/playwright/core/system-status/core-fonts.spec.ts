@@ -35,9 +35,9 @@ test.describe('Core Fonts', () => {
 			/core: 0 of \d+ required files installed/
 		);
 
-		// The bundled fonts and the core ones mPDF downloads only when they have the characters, as Sun-ExtA joins once it's on disk
+		// The bundled fonts and the core ones mPDF loads only when they have the characters
 		await expect(substitution).toContainText(
-			'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil'
+			'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil, sun-exta'
 		);
 
 		await expect(

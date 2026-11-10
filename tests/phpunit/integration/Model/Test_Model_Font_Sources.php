@@ -30,8 +30,8 @@ class Test_Model_Font_Sources extends TestCase {
 	use StubsFontSources;
 	use UnregistersMvcClasses;
 
-	/** The substitution list on a site with no language font or Sun-ExtA */
-	private const SUBSTITUTES = [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil' ];
+	/** The substitution list on a site with no language font */
+	private const SUBSTITUTES = [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil', 'sun-exta' ];
 
 	/**
 	 * @var Model_Font_Sources
@@ -279,8 +279,6 @@ class Test_Model_Font_Sources extends TestCase {
 
 		$this->assertSame( 'dejavusans', $config['default_font'] );
 
-		/* Only Sun-ExtA's link to Sun-ExtB, which isn't on disk, is dropped */
-		unset( $fontdata['sun-exta']['sip-ext'] );
 		$this->assertSame( $fontdata, $config['fontdata'] );
 	}
 
@@ -353,7 +351,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertFalse( $this->model->is_core_font_file( '../DejaVuSerifCondensed.ttf' ) );
 		$this->assertFalse( $this->model->is_core_font_file( 'gfpdf-Arimo-Regular.ttf' ) );
 		$this->assertSame( $this->font_dir . 'Garuda.ttf', $this->model->get_font_path( 'Garuda.ttf' ) );
-		$this->assertFalse( $this->model->is_downloaded( 'Garuda.ttf' ) );
+		$this->assertFileDoesNotExist( $this->font_dir . 'Garuda.ttf' );
 		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->model->get_fallback_file() );
 	}
 
@@ -682,24 +680,20 @@ class Test_Model_Font_Sources extends TestCase {
 	/**
 	 * @dataProvider provider_substitution_fonts
 	 */
-	public function test_the_substitution_fonts_add_the_language_fonts_and_sun_exta_on_disk( array $languages, array $on_disk, array $expected ) {
+	public function test_the_substitution_fonts_add_the_language_fonts_then_sun_exta( array $languages, array $expected ) {
 		$this->set_languages( $languages );
-		foreach ( $on_disk as $file ) {
-			$this->copy_fixture( 'Chewy.ttf', $file );
-		}
 
 		$this->assertSame( $expected, $this->stub_font_sources()->get_substitution_fonts() );
 	}
 
 	public function provider_substitution_fonts(): array {
 		return [
-			'English'                             => [ [], [], self::SUBSTITUTES ],
-			'Korean'                              => [ [ 'ko_KR' ], [], array_merge( self::SUBSTITUTES, [ 'unbatang' ] ) ],
-			'Thai, its font already listed'       => [ [ 'th' ], [], self::SUBSTITUTES ],
-			'Japanese'                            => [ [ 'ja' ], [], array_merge( self::SUBSTITUTES, [ 'sun-exta' ] ) ],
-			'Chinese'                             => [ [ 'zh_TW' ], [], array_merge( self::SUBSTITUTES, [ 'sun-exta' ] ) ],
-			'English, Sun-ExtA on disk'           => [ [], [ 'Sun-ExtA.ttf' ], array_merge( self::SUBSTITUTES, [ 'sun-exta' ] ) ],
-			'Japanese and Korean, Sun-ExtA on disk' => [ [ 'ja', 'ko_KR' ], [ 'Sun-ExtA.ttf' ], array_merge( self::SUBSTITUTES, [ 'sun-exta', 'unbatang' ] ) ],
+			'English'                           => [ [], self::SUBSTITUTES ],
+			'Korean'                            => [ [ 'ko_KR' ], $this->substitutes_with( 'unbatang' ) ],
+			'Thai, its font already listed'     => [ [ 'th' ], self::SUBSTITUTES ],
+			'Japanese, its font already listed' => [ [ 'ja' ], self::SUBSTITUTES ],
+			'Chinese, its font already listed'  => [ [ 'zh_TW' ], self::SUBSTITUTES ],
+			'Japanese and Korean'               => [ [ 'ja', 'ko_KR' ], array_merge( array_slice( self::SUBSTITUTES, 0, -1 ), [ 'sun-exta', 'unbatang' ] ) ],
 		];
 	}
 
@@ -717,6 +711,39 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertSame( $this->substitutes_without( 'dejavusanscondensed' ), $model->get_substitution_fonts( null, 'dejavusanscondensed' ) );
 		$this->assertSame( $this->substitutes_without( 'garuda' ), $model->get_substitution_fonts( null, 'garuda' ) );
 		$this->assertSame( self::SUBSTITUTES, $model->get_substitution_fonts( null, 'freeserif' ) );
+	}
+
+	/**
+	 * @dataProvider provider_large_files
+	 */
+	public function test_a_large_file_is_one_over_five_mb_on_the_manifest( string $file, bool $large ) {
+		$this->assertSame( $large, $this->model->is_large_file( $file ) );
+	}
+
+	public function provider_large_files(): array {
+		return [
+			'Sun-ExtA, 23 MB'           => [ 'Sun-ExtA.ttf', true ],
+			'Sun-ExtB, 17.6 MB'         => [ 'Sun-ExtB.ttf', true ],
+			'Aegyptus, 5.8 MB'          => [ 'Aegyptus.otf', true ],
+			'UnBatang, just under 5 MB' => [ 'UnBatang_0613.ttf', false ],
+			'Garuda'                    => [ 'Garuda.ttf', false ],
+			'not on the manifest'       => [ 'NotAFont.ttf', false ],
+		];
+	}
+
+	public function test_the_large_file_threshold_reads_the_manifest_size() {
+		$manifest                       = $this->model->get_manifest();
+		$manifest['Garuda.ttf']['size'] = Model_Font_Sources::LARGE_FILE_SIZE + 1;
+		$this->set_shared_manifest( $manifest );
+
+		$this->assertTrue( $this->model->is_large_file( 'Garuda.ttf' ) );
+	}
+
+	/**
+	 * The substitution list with a language font, which comes before Sun-ExtA
+	 */
+	private function substitutes_with( string $font ): array {
+		return array_merge( array_slice( self::SUBSTITUTES, 0, -1 ), [ $font, 'sun-exta' ] );
 	}
 
 	private function substitutes_without( string $font ): array {
@@ -1187,7 +1214,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->copy_fixture( 'Chewy.ttf', 'Mine.ttf' );
 		$this->assertTrue( $model->is_size_conflict( 'Mine.ttf' ) );
 		$this->assertFalse( $model->is_installed( 'Mine.ttf' ) );
-		$this->assertTrue( $model->is_downloaded( 'Mine.ttf' ), 'The file at its name' );
+		$this->assertFileExists( $this->font_dir . 'Mine.ttf', 'The file at its name' );
 
 		$this->copy_fixture( 'DejaVuSans.ttf', $model->get_hashed_name( 'Mine.ttf' ) );
 		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
