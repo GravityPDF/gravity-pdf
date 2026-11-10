@@ -1079,6 +1079,7 @@ class Test_Model_Font_Downloader extends TestCase {
 			'no start time'     => [ array_diff_key( $state, [ 'started' => true ] ) ],
 			'sites not a list'  => [ array_merge( $state, [ 'sites' => '1' ] ) ],
 			'keys not a list'   => [ array_merge( $state, [ 'keys' => 'arimo' ] ) ],
+			'files not a list'  => [ array_merge( $state, [ 'files' => 'Garuda.ttf' ] ) ],
 			'start not a time'  => [ array_merge( $state, [ 'started' => 'yesterday' ] ) ],
 		];
 	}

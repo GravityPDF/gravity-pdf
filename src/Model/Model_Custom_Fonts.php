@@ -205,6 +205,17 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The files this site's fonts and the sites' recorded fonts use, cheap enough for every PDF
+	 *
+	 * @return array<string, true> Filename => true
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_network_font_files(): array {
+		return $this->get_recorded_font_files() + $this->get_file_set( [ $this->get_font_files( $this->get_custom_fonts() ) ] );
+	}
+
+	/**
 	 * A site's font files by font ID, from its record or else its settings
 	 *
 	 * @return array<string, string[]>

@@ -160,7 +160,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	protected $legacy_manifests = [];
 
 	/**
-	 * Core font files a Font Manager record of the site also uses (see get_record_collisions()), by blog ID
+	 * Core font files a Font Manager record also uses (see get_record_collisions()), by the blog ID they're read on
 	 *
 	 * @var array<int, array<string, string>>
 	 * @since 6.19.0
@@ -569,7 +569,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The core font files a Font Manager record of this site also uses, mapped to the hashed name their families take.
+	 * The core font files a Font Manager record of any site also uses, mapped to the hashed name their families take.
 	 * A record whose file is a known build of the core font (an adopted copy) isn't one. Never hashes.
 	 *
 	 * @return array<string, string>
@@ -607,7 +607,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Whether a Font Manager record of this site uses the file, which then isn't the core font's
+	 * Whether a Font Manager record of any site uses the file, which then isn't the core font's
 	 *
 	 * @since 6.19.0
 	 */
@@ -616,15 +616,39 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The files of this site's Font Manager records that a downloadable family uses too, by name
+	 * The files the other sites' Font Manager records use. Every site shares the fonts folder.
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_files_used_by_other_sites(): array {
+		return $this->custom_fonts->get_files_used_by_other_sites();
+	}
+
+	/**
+	 * A site's Font Manager record files by font ID
+	 *
+	 * @return array<string, string[]>
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_site_font_files( int $site_id ): array {
+		return $this->custom_fonts->get_site_font_files( $site_id );
+	}
+
+	/**
+	 * The files of Font Manager records that a downloadable family uses too, by name. Every site shares the fonts
+	 * folder, so other sites' records count. A site not recorded yet would cost a query per PDF, so it's left to the
+	 * sync, and core font deletes check it themselves.
 	 *
 	 * @return string[]
 	 *
 	 * @since 6.19.0
 	 */
 	protected function get_record_file_names(): array {
-		$records = $this->custom_fonts->get_custom_fonts();
-		if ( count( $records ) === 0 ) {
+		$files = $this->custom_fonts->get_network_font_files();
+		if ( count( $files ) === 0 ) {
 			return [];
 		}
 
@@ -639,17 +663,7 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 			}
 		}
 
-		$names = [];
-		foreach ( $records as $record ) {
-			foreach ( Model_Custom_Fonts::FONT_STYLES as $style ) {
-				$file = is_string( $record[ $style ] ?? null ) ? basename( $record[ $style ] ) : '';
-				if ( isset( $family_files[ $file ] ) ) {
-					$names[ $file ] = $file;
-				}
-			}
-		}
-
-		return array_values( $names );
+		return array_map( 'strval', array_keys( array_intersect_key( $files, $family_files ) ) );
 	}
 
 	/**
