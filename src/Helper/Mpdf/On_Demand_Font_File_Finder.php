@@ -20,7 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Downloads a missing font, else falls back to a font on disk (outside Debug Mode)
+ * Downloads a missing font, or queues a large one for the background sync, else falls back to a font on disk (outside
+ * Debug Mode)
  *
  * @since 6.19.0
  */
@@ -88,11 +89,12 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 			}
 
 			/* The downloader's fonts folder, as mPDF's AddFontDirectory() replaces the search directories */
-			if ( $this->downloader->download( $name ) ) {
+			if ( $this->downloader->download_or_queue( $name ) ) {
 				return $this->downloader->get_font_path( $name );
 			}
 
-			$fallback = $this->fallback ? $this->get_fallback_file() : '';
+			/* Debug Mode falls back too for a queued file, as the font is on its way */
+			$fallback = $this->fallback || $this->downloader->is_queued( $name ) ? $this->get_fallback_file() : '';
 			if ( $fallback === '' ) {
 				throw $e;
 			}
@@ -101,7 +103,7 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 		}
 
 		/* Only a core font in the fonts folder can be another font's file, and a Font Manager record's stays the record's */
-		if ( $this->downloader->is_in_fonts_folder( $found ) && $this->downloader->is_core_font_file( $name ) && ! $this->downloader->is_record_file( $name ) && $this->downloader->download( $name ) ) {
+		if ( $this->downloader->is_in_fonts_folder( $found ) && $this->downloader->is_core_font_file( $name ) && ! $this->downloader->is_record_file( $name ) && $this->downloader->download_or_queue( $name ) ) {
 			return $this->downloader->get_font_path( $name );
 		}
 

@@ -31,8 +31,8 @@ class Test_Helper_PDF extends TestCase {
 	use SpawnsPhpProcesses;
 	use UsesLockableTmpLocation;
 
-	/** mPDF's backupSubsFont on a site with no language font or Sun-ExtA */
-	private const SUBSTITUTES = [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil' ];
+	/** mPDF's backupSubsFont on a site with no language font */
+	private const SUBSTITUTES = [ 'arimo', 'gfpdf-dejavu-symbols', 'dejavusanscondensed', 'freesans', 'garuda', 'khmeros', 'padaukbook', 'kaputaunicode', 'abyssinicasil', 'sun-exta' ];
 
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -284,16 +284,7 @@ class Test_Helper_PDF extends TestCase {
 		$this->assertSame( array_slice( self::SUBSTITUTES, 1 ), $this->pdf->get_pdf_class()->backupSubsFont );
 	}
 
-	public function test_mpdf_falls_back_to_the_symbols_until_sun_extb_is_on_disk() {
-		$this->pdf->set_output_type( 'SAVE' );
-		$this->pdf->init();
-
-		$this->assertSame( 'gfpdf-dejavu-symbols', $this->pdf->get_pdf_class()->backupSIPFont );
-		$this->assertArrayNotHasKey( 'sip-ext', $this->pdf->get_pdf_class()->fontdata['sun-exta'] );
-	}
-
-	public function test_mpdf_falls_back_to_sun_extb_on_disk() {
-		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+	public function test_mpdf_falls_back_to_sun_extb_whether_or_not_it_is_on_disk() {
 		$this->pdf->set_output_type( 'SAVE' );
 		$this->pdf->init();
 

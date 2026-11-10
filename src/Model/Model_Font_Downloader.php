@@ -9,6 +9,7 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Render_Health;
 use GFPDF\Helper\Mpdf\On_Demand_Font_File_Finder;
 use GFPDF\Statics\Git_Blob;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -120,6 +121,14 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	const OUTDATED = [ 'Garuda.ttf', 'Garuda-Bold.ttf', 'Garuda-Oblique.ttf', 'Garuda-BoldOblique.ttf', 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ];
+
+	/**
+	 * Large files a PDF needed beyond the required set (e.g. Sun-ExtA on an English site), which the sync fetches and the
+	 * cleanup keeps
+	 *
+	 * @since 6.19.0
+	 */
+	const WANTED = 'gfpdf_font_wanted';
 
 	/**
 	 * @var Model_Font_Sources
@@ -489,7 +498,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return [];
 		}
 
-		$needed  = $keep ?? $this->required_fonts->get_required_font_files();
+		$needed  = $keep ?? $this->with_wanted( $this->required_fonts->get_required_font_files() );
 		$keep    = array_flip( array_diff( $needed, self::OUTDATED ) );
 		$removed = [];
 		$bytes   = 0;
@@ -1104,6 +1113,97 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The files given and the wanted ones
+	 *
+	 * @param string[] $files
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function with_wanted( array $files ): array {
+		return array_unique( array_merge( $files, $this->get_wanted_files() ) );
+	}
+
+	/**
+	 * Files a PDF needed beyond the required set
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_wanted_files(): array {
+		$wanted = get_network_option( get_main_network_id(), self::WANTED, [] );
+
+		return is_array( $wanted ) ? array_values( array_filter( $wanted, 'is_string' ) ) : [];
+	}
+
+	/**
+	 * For a render: download() the file, unless it's a large one that isn't on disk, which is left to the background sync
+	 * so the render never waits on it and isn't cached without it
+	 *
+	 * @return bool Whether the font's own copy is on disk now
+	 *
+	 * @since 6.19.0
+	 */
+	public function download_or_queue( string $file ): bool {
+		if ( ! $this->font_sources->is_large_file( $file ) || $this->font_sources->is_installed( $file ) ) {
+			return $this->download( $file );
+		}
+
+		if ( $this->queue( $file ) ) {
+			Helper_Render_Health::mark();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether a render without the file has it on the way: a large one, unless downloads are off for it or it gave up
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_queued( string $file ): bool {
+		return $this->font_sources->is_large_file( $file ) && $this->can_queue( $file );
+	}
+
+	/**
+	 * Add a file to the wanted list and queue the sync for it, rather than download it now, unless it's awaiting its retry
+	 *
+	 * @return bool Whether it's still to come
+	 *
+	 * @since 6.19.0
+	 */
+	public function queue( string $file ): bool {
+		if ( ! $this->can_queue( $file ) ) {
+			return false;
+		}
+
+		$wanted = $this->get_wanted_files();
+		$is_new = ! in_array( $file, $wanted, true );
+
+		if ( $is_new ) {
+			$this->log->notice( 'Font queued for the background sync as a PDF needs it', [ 'name' => $file ] );
+			$wanted[] = $file;
+			update_network_option( get_main_network_id(), self::WANTED, $wanted );
+		}
+
+		/* A failure already scheduled its retry */
+		if ( ! isset( $this->get_failures()[ $file ] ) && ( $is_new || wp_next_scheduled( self::SYNC_EVENT ) === false ) ) {
+			$this->schedule_sync();
+		}
+
+		return true;
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	protected function can_queue( string $file ): bool {
+		return ! isset( $this->get_failed_files()[ $file ] ) && $this->is_auto_install_enabled( $file );
+	}
+
+	/**
 	 * Queue a single background sync
 	 *
 	 * @since 6.19.0
@@ -1215,7 +1315,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return;
 		}
 
-		$this->prune( $this->required_fonts->get_install_font_files( $keys ), $state['started'] );
+		$this->prune( $this->with_wanted( $this->required_fonts->get_install_font_files( $keys ) ), $state['started'] );
 		update_network_option( get_main_network_id(), self::CLEANUP, true );
 	}
 
@@ -1274,7 +1374,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function get_sync_files(): array {
 		$remaining = get_transient( self::SYNC_REMAINING );
-		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->required_fonts->get_required_font_files();
+		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->with_wanted( $this->required_fonts->get_required_font_files() );
 		$gave_up   = $this->get_failed_files();
 
 		$files = array_filter(

@@ -109,10 +109,11 @@ trait RecordsFontFailures {
 	}
 
 	/**
-	 * Delete the failure record, and have the shared downloader read it afresh
+	 * Delete the failure record and the wanted files, and have the shared downloader read it afresh
 	 */
 	protected function delete_font_failures(): void {
 		delete_network_option( get_main_network_id(), Model_Font_Downloader::FAILURES );
+		delete_network_option( get_main_network_id(), Model_Font_Downloader::WANTED );
 		GPDFAPI::get_mvc_class( 'Model_Font_Downloader' )->flush();
 	}
 }

@@ -106,7 +106,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		$this->assertSame( 'core: 0 of 4 required files installed', $directories['core_fonts_installed']['value'] );
 		$this->assertSame( 'Core Fonts installed', $directories['core_fonts_installed']['label_export'] );
-		$this->assertSame( 'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil', $directories['substitution_fonts']['value'] );
+		$this->assertSame( 'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil, sun-exta', $directories['substitution_fonts']['value'] );
 	}
 
 	public function test_system_report_flags_a_missing_core_font_manifest() {

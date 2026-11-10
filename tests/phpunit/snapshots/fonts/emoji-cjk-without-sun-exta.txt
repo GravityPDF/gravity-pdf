@@ -1,2 +1,0 @@
-BaseFont: Arimo-Regular
-arimo: gfpdf-Arimo-Regular.ttf 日本😀
