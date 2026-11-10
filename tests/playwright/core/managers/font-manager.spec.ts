@@ -506,6 +506,50 @@ test.describe('Font Manager', () => {
 			);
 		});
 
+		test('should keep the PDF count when the list of PDFs fails to load', async ({
+			page,
+		}) => {
+			// A font of its own, as the other tests here delete the ones they seed
+			const label = 'Abyssinica SIL';
+			seedCoreFont('Abyssinica_SIL.ttf');
+			await pdf.addPdf(form.id, `Ethiopic ${Date.now()}`, {
+				font: 'abyssinicasil',
+			});
+			await page.route(/abyssinicasil.*scope=usage/, (route) =>
+				route.fulfill({ status: 500, body: '{}' })
+			);
+
+			await pdf.navigateToNewFormPdf(form.id);
+			await openFontManager(page);
+			await fontRow(page, label).click();
+
+			// Other specs share the site, so its PDFs may use the font too
+			await expect(page.locator('.font-detail')).toContainText(
+				/Used by \d+ PDFs?/
+			);
+			await expect(
+				page.locator('[data-test="font-list-pdfs"] a')
+			).toHaveCount(0);
+		});
+
+		test('should reject a request for font usage with the wrong scope', async ({
+			page,
+		}) => {
+			await pdf.navigateToNewFormPdf(form.id);
+			const status = await page.evaluate(async () => {
+				// @ts-expect-error the plugin's localized settings
+				const url = new URL(`${GFPDF.restUrl}fonts/arimo`);
+				url.searchParams.set('scope', 'nonsense');
+				const response = await fetch(url.toString(), {
+					// @ts-expect-error the plugin's localized settings
+					headers: { 'X-WP-Nonce': GFPDF.restNonce },
+				});
+				return response.status;
+			});
+
+			expect(status).toBe(400);
+		});
+
 		test('should show a bundled font with no delete', async ({ page }) => {
 			await pdf.navigateToNewFormPdf(form.id);
 			await openFontManager(page);

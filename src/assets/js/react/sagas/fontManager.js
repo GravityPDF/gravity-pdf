@@ -4,6 +4,7 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import {
 	apiGetCustomFontList,
 	apiGetFontUsage,
+	apiGetFontPdfs,
 	apiAddFont,
 	apiEditFont,
 	apiDeleteFont,
@@ -16,6 +17,8 @@ import {
 	GET_CUSTOM_FONT_LIST_ERROR,
 	GET_FONT_USAGE_SUCCESS,
 	GET_FONT_USAGE_ERROR,
+	GET_FONT_PDFS,
+	GET_FONT_PDFS_SUCCESS,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -112,6 +115,43 @@ export function* getFontUsage() {
 		yield put({
 			type: GET_FONT_USAGE_SUCCESS,
 			payload: response.body,
+		});
+	} catch (error) {
+		yield put({
+			type: GET_FONT_USAGE_ERROR,
+			payload: GFPDF.addFatalError,
+		});
+	}
+}
+
+/**
+ * A watcher that loads the PDFs using a font when it's opened
+ *
+ * @since 6.19.0
+ */
+export function* watchGetFontPdfs() {
+	yield takeLatest(GET_FONT_PDFS, getFontPdfs);
+}
+
+/**
+ * Generate response for the request for the PDFs using a font
+ *
+ * @param { Object } action
+ * @param { string } action.payload The font ID
+ *
+ * @since 6.19.0
+ */
+export function* getFontPdfs({ payload }) {
+	try {
+		const response = yield call(apiGetFontPdfs, payload);
+
+		if (!response.ok || !Array.isArray(response.body?.pdfs)) {
+			throw response;
+		}
+
+		yield put({
+			type: GET_FONT_PDFS_SUCCESS,
+			payload: { id: payload, pdfs: response.body.pdfs },
 		});
 	} catch (error) {
 		yield put({

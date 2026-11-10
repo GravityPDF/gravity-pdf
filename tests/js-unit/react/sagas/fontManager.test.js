@@ -12,6 +12,8 @@ import {
 	installFont,
 	getFontUsage,
 	watchGetFontUsage,
+	getFontPdfs,
+	watchGetFontPdfs,
 } from '../../../../src/assets/js/react/sagas/fontManager';
 import {
 	GET_CUSTOM_FONT_LIST,
@@ -19,6 +21,8 @@ import {
 	GET_CUSTOM_FONT_LIST_ERROR,
 	GET_FONT_USAGE_SUCCESS,
 	GET_FONT_USAGE_ERROR,
+	GET_FONT_PDFS,
+	GET_FONT_PDFS_SUCCESS,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
 	ADD_FONT_ERROR,
@@ -53,6 +57,47 @@ describe('Sagas - fontManager.js', () => {
 			const failed = getFontUsage();
 			failed.next();
 			expect(failed.next({ ok: false }).value).toEqual(
+				put({
+					type: GET_FONT_USAGE_ERROR,
+					payload:
+						'A problem occurred. Reload the page and try again.',
+				})
+			);
+		});
+	});
+
+	describe('The PDFs using a font', () => {
+		test('load when a font asks for them', () => {
+			expect(watchGetFontPdfs().next().value).toEqual(
+				takeLatest(GET_FONT_PDFS, getFontPdfs)
+			);
+		});
+
+		test('passes on the PDFs under the font ID, or an error', () => {
+			const gen = getFontPdfs({ payload: 'arimo' });
+
+			expect(gen.next().value).toEqual(call(api.apiGetFontPdfs, 'arimo'));
+			expect(gen.next({ ok: true, body: { pdfs: ['a'] } }).value).toEqual(
+				put({
+					type: GET_FONT_PDFS_SUCCESS,
+					payload: { id: 'arimo', pdfs: ['a'] },
+				})
+			);
+
+			const failed = getFontPdfs({ payload: 'arimo' });
+			failed.next();
+			expect(failed.next({ ok: false }).value).toEqual(
+				put({
+					type: GET_FONT_USAGE_ERROR,
+					payload:
+						'A problem occurred. Reload the page and try again.',
+				})
+			);
+
+			// A 200 that isn't a list of PDFs, such as an HTML error page, would break the list
+			const malformed = getFontPdfs({ payload: 'arimo' });
+			malformed.next();
+			expect(malformed.next({ ok: true, body: null }).value).toEqual(
 				put({
 					type: GET_FONT_USAGE_ERROR,
 					payload:

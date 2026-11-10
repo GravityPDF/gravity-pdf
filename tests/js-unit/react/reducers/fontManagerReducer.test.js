@@ -3,6 +3,7 @@ import {
 	GET_CUSTOM_FONT_LIST_SUCCESS,
 	GET_FONT_USAGE_SUCCESS,
 	GET_FONT_USAGE_ERROR,
+	GET_FONT_PDFS_SUCCESS,
 	GET_CUSTOM_FONT_LIST_ERROR,
 	ADD_FONT,
 	ADD_FONT_SUCCESS,
@@ -101,6 +102,25 @@ describe('Reducers - fontManagerReducer.js', () => {
 			expect(
 				reducer(loaded, { type: GET_CUSTOM_FONT_LIST }).fontUsage
 			).toBe(null);
+		});
+
+		test("keeps each opened font's PDFs until the list reloads", () => {
+			const opened = reducer(
+				{
+					...initialState,
+					fontPdfs: { other: [] },
+					msg: {},
+				},
+				{
+					type: GET_FONT_PDFS_SUCCESS,
+					payload: { id: 'a', pdfs: ['Invoice'] },
+				}
+			);
+
+			expect(opened.fontPdfs).toEqual({ other: [], a: ['Invoice'] });
+			expect(
+				reducer(opened, { type: GET_CUSTOM_FONT_LIST }).fontPdfs
+			).toEqual({});
 		});
 
 		test('shows an error when it fails', () => {

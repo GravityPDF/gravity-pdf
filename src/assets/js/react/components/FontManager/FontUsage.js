@@ -1,7 +1,9 @@
 /* Dependencies */
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+/* Redux actions */
+import { getFontPdfs as getFontPdfsAction } from '../../actions/fontManager';
 /* Components */
 import Icon from './Icon';
 
@@ -16,20 +18,30 @@ import Icon from './Icon';
  * What's using a font, with links to the settings of its PDFs. They open in a new tab so unsaved settings under the
  * Font Manager aren't lost. Empty until usage loads.
  *
- * @param { Object } props
- * @param { string } props.id
- * @param { Object } props.fontUsage
+ * @param { Object }        props
+ * @param { string }        props.id
+ * @param { Object }        props.fontUsage
+ * @param { Array<Object> } props.pdfs
+ * @param { Function }      props.getFontPdfs
  *
  * @return { JSX.Element | null } FontUsage component
  *
  * @since 6.19.0
  */
-export const FontUsage = ({ id, fontUsage }) => {
+export const FontUsage = ({ id, fontUsage, pdfs, getFontPdfs }) => {
+	const usage = fontUsage?.[id];
+	const hasPdfs = !!usage?.pdfs_label;
+	const needsPdfs = hasPdfs && !pdfs;
+
+	useEffect(() => {
+		if (needsPdfs) {
+			getFontPdfs(id);
+		}
+	}, [id, needsPdfs, getFontPdfs]);
+
 	if (!fontUsage) {
 		return null;
 	}
-
-	const usage = fontUsage[id];
 
 	return (
 		<div
@@ -42,11 +54,11 @@ export const FontUsage = ({ id, fontUsage }) => {
 
 			{usage?.reasons.length > 0 && <p>{usage.reasons.join(', ')}</p>}
 
-			{usage?.pdfs.length > 0 && (
+			{hasPdfs && (
 				<>
 					<p>{usage.pdfs_label}</p>
 					<ul data-test="font-list-pdfs">
-						{usage.pdfs.map((pdf) => (
+						{pdfs?.map((pdf) => (
 							<li key={pdf.url}>
 								<a
 									href={pdf.url}
@@ -79,10 +91,15 @@ export const FontUsage = ({ id, fontUsage }) => {
 FontUsage.propTypes = {
 	id: PropTypes.string.isRequired,
 	fontUsage: PropTypes.object,
+	pdfs: PropTypes.array,
+	getFontPdfs: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, { id }) => ({
 	fontUsage: state.fontManager.fontUsage,
+	pdfs: state.fontManager.fontPdfs[id],
 });
 
-export default connect(mapStateToProps)(FontUsage);
+export default connect(mapStateToProps, { getFontPdfs: getFontPdfsAction })(
+	FontUsage
+);

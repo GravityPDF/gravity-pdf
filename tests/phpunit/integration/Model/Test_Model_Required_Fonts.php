@@ -139,6 +139,7 @@ class Test_Model_Required_Fonts extends TestCase {
 			'pdfs'     => 0,
 			'source'   => false,
 			'sites'    => 0,
+			'pending'  => false,
 		];
 
 		$this->assertSame(
@@ -354,7 +355,7 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->assertFalse( $required->is_font_in_use( 'notafont' ) );
 	}
 
-	public function test_the_in_use_check_reads_no_forms_for_a_default_font_or_after_they_are_read() {
+	public function test_the_in_use_check_reads_no_forms_for_a_default_font_but_always_reads_them_otherwise() {
 		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserif' );
 		$required = $this->required_with( $this->stub_font_sources() );
@@ -369,7 +370,7 @@ class Test_Model_Required_Fonts extends TestCase {
 		$required->get_font_pdfs();
 
 		$this->assert_form_reads(
-			0,
+			2,
 			function () use ( $required ) {
 			$this->assertTrue( $required->is_font_in_use( 'freeserif' ) );
 			$this->assertFalse( $required->is_font_in_use( 'notafont' ) );
@@ -644,7 +645,7 @@ class Test_Model_Required_Fonts extends TestCase {
 		];
 	}
 
-	public function test_a_site_that_no_longer_exists_only_has_the_default_font_given() {
+	public function test_a_site_whose_tables_cant_be_read_has_no_keys() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Multisite only' );
 		}
@@ -653,8 +654,7 @@ class Test_Model_Required_Fonts extends TestCase {
 
 		$suppress = $wpdb->suppress_errors();
 		try {
-			$this->assertSame( [ 'arimo' ], $this->required->get_site_font_keys( 999999, 'arimo' ) );
-			$this->assertSame( [], $this->required->get_site_font_keys( 999999 ) );
+			$this->assertNull( $this->required->get_site_font_keys( 999999, 'arimo' ) );
 		} finally {
 			$wpdb->suppress_errors( $suppress );
 		}
@@ -746,6 +746,16 @@ class Test_Model_Required_Fonts extends TestCase {
 		return new Model_Required_Fonts( $sources, GPDFAPI::get_options_class(), $log ? new Logger( 'test', [ $log ] ) : GPDFAPI::get_log_class() );
 	}
 
+	private function unreadable_forms(): Model_Required_Fonts {
+		return new class( $this->stub_font_sources(), GPDFAPI::get_options_class(), GPDFAPI::get_log_class() ) extends Model_Required_Fonts {
+			protected function get_pdf_form_meta( int $after_id, int $limit, string $prefix = '' ): array {
+				$this->form_read_failed = true;
+
+				return [];
+			}
+		};
+	}
+
 	/**
 	 * Create a form holding the given PDFs
 	 *
@@ -762,5 +772,313 @@ class Test_Model_Required_Fonts extends TestCase {
 		);
 
 		$this->assertIsInt( $form_id );
+	}
+
+	public function test_a_stored_map_is_read_without_the_forms() {
+		$this->add_form_with_pdfs( [ 'one' => [ 'name' => 'Invoice', 'font' => 'freeserif' ] ] );
+
+		$sources = $this->stub_font_sources();
+		$this->assert_form_reads(
+			1,
+			function () use ( $sources ) {
+				$this->assertCount( 1, $this->required_with( $sources )->get_font_pdfs()['freeserif'] );
+			}
+		);
+
+		$this->assert_form_reads(
+			0,
+			function () use ( $sources ) {
+				$pdfs = $this->required_with( $sources )->get_pdfs_using_font( 'freeserif' );
+
+				$this->assertSame( 'Invoice', $pdfs[0]['name'] );
+				$this->assertStringContainsString( 'pid=one', $pdfs[0]['url'] );
+				$this->assertSame( [], $this->required_with( $sources )->get_pdfs_using_font( 'notafont' ) );
+			}
+		);
+	}
+
+	public function test_the_stored_map_is_not_autoloaded() {
+		$this->required_with( $this->stub_font_sources() )->get_font_pdfs();
+
+		global $wpdb;
+		$this->assertContains(
+			$wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM {$wpdb->options} WHERE option_name = %s", Model_Required_Fonts::FONT_PDFS ) ),
+			[ 'off', 'no' ]
+		);
+	}
+
+	public function test_a_day_old_map_is_rebuilt() {
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		update_option( Model_Required_Fonts::FONT_PDFS, [ 'built' => time() - DAY_IN_SECONDS - 1, 'pdfs' => [] ], false );
+
+		$this->assertArrayHasKey( 'freeserif', $this->required_with( $this->stub_font_sources() )->get_font_pdfs() );
+		$this->assertArrayHasKey( 'freeserif', get_option( Model_Required_Fonts::FONT_PDFS )['pdfs'] );
+	}
+
+	/**
+	 * @dataProvider provider_form_changes
+	 */
+	public function test_a_form_change_clears_the_stored_map( string $action, array $args ) {
+		update_option( Model_Required_Fonts::FONT_PDFS, [ 'built' => time(), 'pdfs' => [ 'stale' => [] ] ], false );
+
+		do_action( $action, ...$args );
+
+		$this->assertArrayNotHasKey( 'pdfs', get_option( Model_Required_Fonts::FONT_PDFS ) );
+	}
+
+	public function provider_form_changes(): array {
+		return [
+			'saved'       => [ 'gform_post_update_form_meta', [ '{}', 1, 'display_meta' ] ],
+			'activated'   => [ 'gform_post_form_activated', [ 1 ] ],
+			'deactivated' => [ 'gform_post_form_deactivated', [ 1 ] ],
+			'trashed'     => [ 'gform_post_form_trashed', [ 1 ] ],
+			'restored'    => [ 'gform_post_form_restored', [ 1 ] ],
+			'duplicated'  => [ 'gform_post_form_duplicated', [ 1, 2 ] ],
+			'deleted'     => [ 'gform_after_delete_form', [ 1 ] ],
+		];
+	}
+
+	public function test_saving_other_form_meta_keeps_the_stored_map() {
+		update_option( Model_Required_Fonts::FONT_PDFS, [ 'built' => time(), 'pdfs' => [] ], false );
+
+		do_action( 'gform_post_update_form_meta', '{}', 1, 'notifications' );
+
+		$this->assertArrayHasKey( 'pdfs', get_option( Model_Required_Fonts::FONT_PDFS ) );
+	}
+
+	public function test_a_real_form_rename_reaches_the_stored_map() {
+		$form_id = $this->gf_factory()->form->create( [], [ 'title' => 'Before', 'fields' => [], 'gfpdf_form_settings' => [ [ 'font' => 'freeserif' ] ] ] );
+		$sources = $this->stub_font_sources();
+		$this->required_with( $sources )->get_font_pdfs();
+
+		$form          = \GFAPI::get_form( $form_id );
+		$form['title'] = 'After';
+		\GFAPI::update_form( $form );
+
+		$this->assertSame( 'After', $this->required_with( $sources )->get_font_pdfs()['freeserif'][0]['form'] );
+	}
+
+	public function test_changing_the_custom_fonts_clears_the_stored_map() {
+		update_option( Model_Required_Fonts::FONT_PDFS, [ 'built' => time(), 'pdfs' => [] ], false );
+
+		GPDFAPI::get_options_class()->update_option( 'custom_fonts', [ 'brand' => [ 'id' => 'brand' ] ] );
+
+		$this->assertArrayNotHasKey( 'pdfs', get_option( Model_Required_Fonts::FONT_PDFS ) );
+
+		GPDFAPI::get_options_class()->delete_option( 'custom_fonts' );
+	}
+
+	public function test_a_clear_during_a_rebuild_is_not_overwritten() {
+		$required = new class( $this->stub_font_sources(), GPDFAPI::get_options_class(), GPDFAPI::get_log_class() ) extends Model_Required_Fonts {
+			protected function get_pdf_form_meta( int $after_id, int $limit, string $prefix = '' ): array {
+				$rows = parent::get_pdf_form_meta( $after_id, $limit, $prefix );
+				$this->clear_font_usage();
+
+				return $rows;
+			}
+		};
+
+		$required->get_font_pdfs();
+
+		$this->assertArrayNotHasKey( 'pdfs', get_option( Model_Required_Fonts::FONT_PDFS ) );
+	}
+
+	public function test_a_failed_form_read_is_not_stored() {
+		$required = $this->unreadable_forms();
+
+		$this->assertSame( [], $required->get_font_pdfs() );
+		$this->assertArrayNotHasKey( 'pdfs', (array) get_option( Model_Required_Fonts::FONT_PDFS ) );
+	}
+
+	public function test_the_delete_check_ignores_a_stale_map() {
+		$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		update_option( Model_Required_Fonts::FONT_PDFS, [ 'built' => time(), 'pdfs' => [] ], false );
+
+		$this->assertTrue( $this->required_with( $this->stub_font_sources() )->is_font_in_use( 'freeserif' ) );
+	}
+
+	public function test_a_single_site_queues_no_site_record() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single site only' );
+		}
+
+		$this->required->queue_site_fonts();
+
+		$this->assertFalse( has_action( 'shutdown', [ $this->required, 'write_queued_site_fonts' ] ) );
+		$this->assertSame( [], $this->required->get_sites_without_fonts() );
+	}
+
+	public function test_each_site_records_its_fonts_in_its_own_row() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+		update_blog_option( $site, 'gfpdf_settings', [ 'default_font' => 'dejavuserif' ] );
+
+		$this->required->write_site_fonts( $site );
+
+		$this->assertSame( [ 'dejavuserif' ], get_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site ) );
+		$this->assertNotContains( $site, $this->required->get_sites_without_fonts() );
+		$this->assertContains( get_current_blog_id(), $this->required->get_sites_without_fonts() );
+	}
+
+	public function test_network_usage_is_one_query_on_the_records() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+		switch_to_blog( $site );
+		try {
+			gf_upgrade()->install();
+			update_option( 'gfpdf_settings', [ 'default_font' => 'dejavuserif' ] );
+			$this->add_form_with_pdfs( [ [ 'font' => 'freeserif' ] ] );
+		} finally {
+			restore_current_blog();
+		}
+
+		$this->required->write_site_fonts( $site );
+		$this->required->get_font_pdfs();
+
+		/* The one read is this site's live check; the other site's forms aren't read */
+		$this->assert_form_reads(
+			1,
+			function () {
+				$this->required->get_font_reasons( true );
+				$this->assertTrue( $this->required->is_font_in_use( 'freeserif', true ) );
+			}
+		);
+
+		$this->assertSame( 1, $this->required->get_font_reasons( true )['dejavuserif']['sites'] );
+		$this->assertFalse( $this->required->is_font_in_use( 'notafont', true ) );
+	}
+
+	public function test_a_site_without_a_usable_record_counts_as_using_every_core_font() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+		update_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site, 'corrupt' );
+
+		$reasons = $this->required->get_font_reasons( true );
+
+		$this->assertTrue( $reasons['dejavuserif']['pending'] );
+		$this->assertFalse( $reasons['arimo']['pending'] ?? false );
+		$this->assertTrue( $this->required->is_font_in_use( 'dejavuserif', true ) );
+	}
+
+	public function test_a_failed_form_read_records_nothing() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+		update_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site, [ 'stale' ] );
+		update_blog_option( $site, 'gf_db_version', '3.0' );
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+
+		$required = $this->unreadable_forms();
+
+		$required->write_site_fonts( $site );
+
+		/* The stale record goes, so the site's fonts stay locked until a sync an hour on reads it again */
+		$this->assertFalse( get_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site ) );
+		$this->assertContains( $site, $required->get_sites_without_fonts() );
+		$next = wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT );
+		$this->assertEqualsWithDelta( time() + HOUR_IN_SECONDS, $next, 5 );
+
+		/* A sync already queued sooner is kept */
+		$required->write_site_fonts( $site );
+		$this->assertSame( $next, wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+	}
+
+	public function test_a_failed_settings_read_records_nothing() {
+		global $wpdb;
+
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+		update_blog_option( $site, 'gfpdf_settings', [ 'default_font' => 'dejavuserif' ] );
+
+		$break = static function ( $query ) {
+			return strpos( $query, "option_name IN ( 'gfpdf_settings'" ) !== false ? str_replace( 'FROM', 'FROM gfpdf_missing_table,', $query ) : $query;
+		};
+		add_filter( 'query', $break );
+		$suppressed = $wpdb->suppress_errors( true );
+		$log        = new TestHandler();
+
+		try {
+			$this->required_with( $this->stub_font_sources(), $log )->write_site_fonts( $site );
+		} finally {
+			remove_filter( 'query', $break );
+			$wpdb->suppress_errors( $suppressed );
+		}
+
+		$this->assertFalse( get_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site ) );
+		$this->assertSame( [ 'ERROR', 'A site\'s settings could not be read for its fonts' ], array_slice( $this->records( $log )[0], 0, 2 ) );
+	}
+
+	public function test_the_delete_check_counts_a_font_in_use_when_forms_cant_be_read() {
+		$required = $this->unreadable_forms();
+
+		$this->assertTrue( $required->is_font_in_use( 'freeserif' ) );
+		$this->assertFalse( $this->required_with( $this->stub_font_sources() )->is_font_in_use( 'freeserif' ) );
+	}
+
+	public function test_queued_sites_are_recorded_once_and_a_deleted_site_is_skipped() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$kept    = self::factory()->blog->create();
+		$deleted = self::factory()->blog->create();
+
+		foreach ( [ $kept, $deleted ] as $site ) {
+			switch_to_blog( $site );
+			$this->required->queue_site_fonts();
+			$this->required->queue_site_fonts();
+			restore_current_blog();
+		}
+
+		wp_delete_site( $deleted );
+		$this->required->write_queued_site_fonts();
+
+		$this->assertIsArray( get_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $kept ) );
+		$this->assertFalse( get_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $deleted ) );
+	}
+
+	public function test_a_new_site_is_recorded_and_a_deleted_site_is_forgotten() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+		$key  = Model_Required_Fonts::SITE_FONTS_PREFIX . $site;
+
+		$this->assertIsArray( get_network_option( get_main_network_id(), $key ) );
+
+		wp_delete_site( $site );
+
+		$this->assertFalse( get_network_option( get_main_network_id(), $key ) );
+	}
+
+	public function test_a_default_font_or_language_change_queues_the_sites_record() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$required   = $this->createMock( Model_Required_Fonts::class );
+		$controller = new \GFPDF\Controller\Controller_Font_Downloader( $this->createMock( Model_Font_Downloader::class ), $required );
+
+		$required->expects( $this->once() )->method( 'queue_site_fonts' );
+		$required->expects( $this->never() )->method( 'clear_font_usage' );
+
+		$controller->maybe_refresh_site_fonts( [ 'default_font' => 'a' ], [ 'default_font' => 'b' ] );
+		$controller->maybe_refresh_site_fonts( [ 'default_font' => 'b' ], [ 'default_font' => 'b' ] );
+		$controller->maybe_refresh_site_fonts( [ 'default_font' => 'b' ], 'corrupt' );
 	}
 }

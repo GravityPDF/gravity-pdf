@@ -1134,6 +1134,35 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
 	}
 
+	public function test_the_cleanup_prunes_nothing_until_a_site_it_couldnt_read_is_read() {
+		global $wpdb;
+
+		$this->copy_fixture( self::FONT );
+		touch( $this->font_path( self::FONT ), time() - HOUR_IN_SECONDS );
+		$this->set_font_cleanup( $this->font_cleanup_state() );
+
+		$break = static function ( $query ) {
+			return strpos( $query, "option_name IN ( 'gfpdf_settings'" ) !== false ? str_replace( 'FROM', 'FROM gfpdf_missing_table,', $query ) : $query;
+		};
+		add_filter( 'query', $break );
+		$suppress = $wpdb->suppress_errors( true );
+		try {
+			$this->downloader->cleanup();
+		} finally {
+			remove_filter( 'query', $break );
+			$wpdb->suppress_errors( $suppress );
+		}
+
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+		$this->assertSame( [ get_current_blog_id() ], $this->get_font_cleanup()['sites'] );
+		$this->assertEqualsWithDelta( time() + HOUR_IN_SECONDS, wp_next_scheduled( Model_Font_Downloader::CLEANUP_EVENT ), 5 );
+
+		$this->downloader->cleanup();
+
+		$this->assertTrue( $this->get_font_cleanup() );
+		$this->assertFileDoesNotExist( $this->font_path( self::FONT ) );
+	}
+
 	public function test_another_network_keeps_its_font_state_on_the_main_network() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Multisite only' );
