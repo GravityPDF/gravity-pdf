@@ -411,12 +411,12 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	public function test_system_report_tools_tab_hooks() {
-		$this->assertArrayNotHasKey( 'tools_tab_hooks', $this->get_unsupported_features() );
+		$this->assertArrayNotHasKey( 'tools_tab_hooks', $this->get_report_section( Deprecation::GROUP_DEPRECATED ) );
 
 		add_filter( 'gfpdf_settings_tools', '__return_empty_array' );
 		Deprecation::flush_cache();
 
-		$items = $this->get_unsupported_features();
+		$items = $this->get_report_section( Deprecation::GROUP_DEPRECATED );
 		$this->assertArrayHasKey( 'tools_tab_hooks', $items );
 		$this->assertSame( 'gfpdf_settings_tools has 1 listener', $items['tools_tab_hooks']['value_export'] );
 
@@ -459,8 +459,7 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertStringContainsString( '<h4>Unsupported Features</h4>', $info['gravity-pdf-unsupported']['description'] );
 		$this->assertStringNotContainsString( '<p>', $info['gravity-pdf-unsupported']['description'] );
 
-		/* Nothing declares the deprecated group since 7.0, so no surface carries an empty panel for it */
-		$this->assertArrayNotHasKey( 'gravity-pdf-deprecated', $info );
+		$this->assertSame( 'None detected', $info['gravity-pdf-deprecated']['fields']['deprecated']['value'] );
 	}
 
 	public function test_debug_information_is_gated_on_the_gravity_forms_capability() {

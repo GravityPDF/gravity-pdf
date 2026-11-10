@@ -122,7 +122,6 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 				'group'       => Deprecation::GROUP_UNSUPPORTED,
 				'removed_in'  => static::REMOVED_IN,
 				'url'         => 'https://docs.gravitypdf.com/upgrade/deprecated-filters/',
-				'detect'      => [ static::class, 'get_active_deprecated_filters' ],
 				/* The label is a category, so out of its report row the fallback would read as the whole hook API */
 				/* translators: %s: The Gravity PDF version the hooks were removed in */
 				'notice'      => __( 'Custom code on this site uses Gravity PDF hooks that were removed in version %s and has stopped running. Update it to use the current hooks.', 'gravity-pdf' ),
@@ -175,12 +174,13 @@ class Deprecation_V3 implements Helper_Interface_Deprecated_Features {
 	/**
 	 * Get the removed v3 hooks that still have a listener attached
 	 *
-	 * Nothing in core registers on these any more, so every callback found is third party.
-	 *
 	 * @return array<string, int> Hook name mapped to the number of listeners
 	 * @since 6.17.0
+	 * @deprecated 6.19.0 Read `deprecated_filters` from Deprecation::get_signals()
 	 */
 	public static function get_active_deprecated_filters(): array {
+		_deprecated_function( __METHOD__, '6.19.0', Deprecation::class . '::get_signals()' );
+
 		return Deprecation::get_hooks_with_listeners( static::get_deprecated_filters(), static::HOOK_PREFIX );
 	}
 

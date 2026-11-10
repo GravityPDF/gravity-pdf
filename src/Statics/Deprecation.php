@@ -64,7 +64,7 @@ class Deprecation {
 	protected static function get_providers(): array {
 		return [
 			Deprecation_V3::class,
-			Deprecation_Tools_Tab::class,
+			Deprecation_Hooks::class,
 		];
 	}
 
@@ -120,13 +120,39 @@ class Deprecation {
 			$detected = [];
 
 			foreach ( static::get_features() as $feature_key => $feature ) {
-				$detected[ $feature_key ] = call_user_func( $feature['detect'] );
+				$detected[ $feature_key ] = static::detect_feature( $feature );
 			}
 
 			static::$signals[ $key ] = array_filter( $detected );
 		}
 
 		return static::$signals[ $key ];
+	}
+
+	/**
+	 * Run a feature's detector, or count the listeners on its hooks when it has none
+	 *
+	 * @param array $feature The feature's registration
+	 *
+	 * @since 6.19.0
+	 */
+	protected static function detect_feature( array $feature ): array {
+		if ( static::is_hook_only( $feature ) ) {
+			return static::get_hooks_with_listeners( $feature['hooks'], $feature['hook_prefix'] ?? '', $feature['internal_callbacks'] ?? [] );
+		}
+
+		return call_user_func( $feature['detect'] );
+	}
+
+	/**
+	 * Whether a feature is detected purely by the listeners on its hooks
+	 *
+	 * @param array $feature The feature's registration
+	 *
+	 * @since 6.19.0
+	 */
+	public static function is_hook_only( array $feature ): bool {
+		return isset( $feature['hooks'] ) && ! isset( $feature['detect'] );
 	}
 
 	/**
@@ -358,10 +384,21 @@ class Deprecation {
 			$replacement,
 			$removed_in === '' ? '' : sprintf(
 				/* translators: %s: The Gravity PDF version the filter is removed in */
-				esc_html__( 'This filter is removed in Gravity PDF %s.', 'gravity-pdf' ),
+				esc_html__( 'This hook is removed in Gravity PDF %s.', 'gravity-pdf' ),
 				$removed_in
 			)
 		);
+	}
+
+	/**
+	 * Fire one of the deprecated actions, warning any third party still listening to it
+	 *
+	 * @param string $hook_name The deprecated action to fire
+	 *
+	 * @since 6.19.0
+	 */
+	public static function do_action( string $hook_name ): void {
+		static::apply_filters( $hook_name, [ '' ] );
 	}
 
 	/**
@@ -453,7 +490,7 @@ class Deprecation {
 
 		$log->warning(
 			sprintf(
-				'The %1$s filter has a third-party listener attached%2$s.%3$s',
+				'The %1$s hook has a third-party listener attached%2$s.%3$s',
 				$hook_name,
 				$removed_in !== '' ? sprintf( ' and is removed in Gravity PDF %s', $removed_in ) : '',
 				$replacement !== '' ? sprintf( ' Use the %s filter instead.', $replacement ) : ''

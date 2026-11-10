@@ -36,6 +36,7 @@ class Test_Hook_Inventory extends WP_UnitTestCase {
 	 */
 	private const WRAPPERS = [
 		'deprecation::apply_filters' => [ 'filter', 0, 1, 0, [] ],
+		'deprecation::do_action'     => [ 'action', 0, 1, 0, [] ],
 		'save_pdf_and_do_action'     => [ 'action', 2, 3, 5, [ '_{form_id}' ] ],
 	];
 
