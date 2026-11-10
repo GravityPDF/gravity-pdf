@@ -75,6 +75,20 @@ trait CopiesFontFixtures {
 	 * @param array<string, string> $files Style (regular, bold, …) => file name in the fonts folder
 	 */
 	protected function add_record( string $id, array $files ): void {
+		$font = $this->font_record( $id, $files );
+
+		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->add_font( $font );
+		FlushCache::flush( $id );
+		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
+		$this->recorded_fonts[] = $id;
+	}
+
+	/**
+	 * A custom font record for files in the fonts folder
+	 *
+	 * @param array<string, string> $files Style (regular, bold, …) => file name in the fonts folder
+	 */
+	protected function font_record( string $id, array $files ): array {
 		$font = [
 			'id'          => $id,
 			'font_name'   => $id,
@@ -88,10 +102,7 @@ trait CopiesFontFixtures {
 			$font[ $style ] = $this->font_path( $file );
 		}
 
-		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->add_font( $font );
-		FlushCache::flush( $id );
-		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
-		$this->recorded_fonts[] = $id;
+		return $font;
 	}
 
 	/**
@@ -293,7 +304,6 @@ trait CopiesFontFixtures {
 		array_map( [ FlushCache::class, 'flush' ], array_unique( $this->recorded_fonts ) );
 		GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->flush();
 		GPDFAPI::get_mvc_class( 'Model_Required_Fonts' )->flush();
-		GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' )->flush();
 
 		/* A download or its fallback caches metrics under every font key the render asked for, substitutes included */
 		if ( $this->requested !== [] ) {

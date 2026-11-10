@@ -204,6 +204,19 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * The files the sites' fonts use, which aren't to be added under the file's name
+	 *
+	 * @return array<string, true> Filename => true
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_recorded_font_files(): array {
+		$custom_fonts = GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+
+		return $custom_fonts instanceof Model_Custom_Fonts ? $custom_fonts->get_recorded_font_files() : [];
+	}
+
+	/**
 	 * Authentication request then generate and display PDF
 	 *
 	 * @param string  $pid    The Gravity Form PDF Settings ID
@@ -2364,6 +2377,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		);
 
+		$claimed = $this->get_recorded_font_files();
+
 		foreach ( $user_fonts as $font ) {
 
 			/* Get font shortname */
@@ -2371,11 +2386,13 @@ class Model_PDF extends Helper_Abstract_Model {
 			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
 
 			/* Check if it exists already, otherwise add it. A core font's copy under a hashed name is found by that font */
-			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false && ! $this->get_font_sources()->is_hashed_copy( $font_name ) ) {
-				$fonts[ $short_name ] = [
-					'R' => $font_name,
-				];
+			if ( isset( $fonts[ $short_name ] ) || isset( $claimed[ $font_name ] ) || in_array( $font_name, $flattened_fonts_array, true ) || $this->get_font_sources()->is_hashed_copy( $font_name ) ) {
+				continue;
 			}
+
+			$fonts[ $short_name ] = [
+				'R' => $font_name,
+			];
 		}
 
 		return $fonts;

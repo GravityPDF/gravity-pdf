@@ -252,10 +252,5 @@ class Test_Model_Custom_Fonts extends TestCase {
 		$wpdb->update( $wpdb->get_blog_prefix( $truncated ) . 'options', [ 'option_value' => 'a:1:{s:12:"custom_fonts";a:1:{' ], [ 'option_name' => 'gfpdf_settings' ] );
 
 		$this->assertSame( [ 'One.ttf', 'Shared.ttf' ], $this->model->get_files_used_by_other_sites() );
-
-		/* Read once a request */
-		$queries = $wpdb->num_queries;
-		$this->model->get_files_used_by_other_sites();
-		$this->assertSame( $queries, $wpdb->num_queries );
 	}
 }

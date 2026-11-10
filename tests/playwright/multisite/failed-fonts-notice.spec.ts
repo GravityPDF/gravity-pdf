@@ -1,7 +1,9 @@
 import { expect } from '@wordpress/e2e-test-utils-playwright';
-import type { Browser } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
-import { SUBSITE } from '@self:playwright/utils/multisite';
+import {
+	SUBSITE,
+	logInToSubsite as logIn,
+} from '@self:playwright/utils/multisite';
 import { failedFontsNotice as notice } from '@self:playwright/utils/notices';
 import { snapshot } from '@self:playwright/utils/snapshot';
 import { wpCli } from '@self:playwright/utils/wp-cli';
@@ -17,24 +19,6 @@ const saveFailures = (failures: Record<string, object>) =>
 	wpCli(
 		`echo ${Buffer.from(JSON.stringify(failures)).toString('base64')} | base64 -d | wp site option update gfpdf_core_font_failures --format=json --quiet`
 	);
-
-// Logs in on the subsite and lands on its dashboard
-const logIn = async (browser: Browser, username: string) => {
-	const context = await browser.newContext({
-		storageState: { cookies: [], origins: [] },
-	});
-	const page = await context.newPage();
-
-	// As the page fixture does: wp-env can't reach Gravatar
-	await page.route('**://*.gravatar.com/**', (route) => route.abort());
-	await page.goto(`/${SUBSITE}/wp-login.php`);
-	await page.locator('#user_login').fill(username);
-	await page.locator('#user_pass').fill('password');
-	await page.locator('#wp-submit').click();
-	await page.waitForURL(new RegExp(`/${SUBSITE}/wp-admin/`));
-
-	return page;
-};
 
 test.describe('Failed core fonts notice on a Multisite', () => {
 	// Every site shares the one record, and each test builds on the state the one before left it in

@@ -1281,7 +1281,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Record the fonts of the sites with no record yet, until the time budget runs out
+	 * Record the fonts, and the custom font files, of the sites with no record yet, until the time budget runs out
 	 *
 	 * @return bool Whether every site was reached. One whose forms can't be read waits for a later sync.
 	 *
@@ -1294,6 +1294,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				$this->required_fonts->write_site_fonts( (int) $site_id );
 			}
 		);
+
+		$custom_fonts = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+		if ( $left === [] && $custom_fonts instanceof Model_Custom_Fonts ) {
+			$left = $this->within_budget( $custom_fonts->get_sites_without_records(), [ $custom_fonts, 'record_missing_site_fonts' ] );
+		}
 
 		return $left === [];
 	}

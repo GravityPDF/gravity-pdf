@@ -247,9 +247,10 @@ class Model_Uninstall extends Helper_Abstract_Model {
 		/* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching */
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key = %s",
+				"SELECT site_id, meta_key FROM $wpdb->sitemeta WHERE meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key = %s",
 				$wpdb->esc_like( 'gpdf_sl_net_' ) . '%',
 				$wpdb->esc_like( Model_Required_Fonts::SITE_FONTS_PREFIX ) . '%',
+				$wpdb->esc_like( Model_Custom_Fonts::SITE_FONTS_PREFIX ) . '%',
 				Helper_Abstract_Fields::PROCESS_SUBMITTED_RICH_TEXT_MERGE_TAGS
 			)
 		);
