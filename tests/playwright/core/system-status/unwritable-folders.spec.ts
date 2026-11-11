@@ -8,9 +8,8 @@ import { wpCli } from '@self:playwright/utils/wp-cli';
 // Matches the folder tools/mu-plugins makes read-only for requests sending the header below
 const READ_ONLY_FOLDER = '/tmp/gfpdf-e2e-read-only/';
 
-// Anchored, so "Temporary Folder permissions" can't match
 const folderRow = (page: Page) =>
-	page.getByRole('row', { name: /^Folder permissions/ });
+	page.getByRole('row', { name: /^Folder Permissions/ });
 
 const notice = (page: Page) =>
 	page.locator('.notice.notice-error', {

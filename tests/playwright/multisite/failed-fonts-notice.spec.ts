@@ -71,7 +71,7 @@ test.describe('Failed core fonts notice on a Multisite', () => {
 
 		await expect(page).toHaveURL(/admin\.php\?page=gf_system_status/);
 		await expect(
-			page.getByRole('row', { name: /^Core Fonts installed/ })
+			page.getByRole('row', { name: /^Core Fonts/ })
 		).toBeVisible();
 	});
 

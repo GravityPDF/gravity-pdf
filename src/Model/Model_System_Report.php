@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF\Statics\Cache;
 use GFPDF\Statics\Deprecation;
+use GFPDF\View\View_Actions;
 use GFPDF\View\View_System_Report;
 use GFPDF_Major_Compatibility_Checks;
 use GFPDF_Vendor\Psr\Log\LoggerInterface;
@@ -163,22 +164,15 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 * Build Gravity PDF System Report array.
 	 *
 	 * @since 6.0
+	 * @since 7.0 Sorts the report sections into the Checks and Configuration tables
 	 */
 	public function build_gravitypdf_report(): array {
 		$structure = $this->get_report_structure();
-		$items     = $this->get_report_items();
+		$tables    = ( new Model_System_Report_Layout() )->get_tables( $this->get_report_items() );
 
 		foreach ( $structure[0]['tables'] as $index => $table ) {
-			$structure[0]['tables'][ $index ]['items'] = $items[ $table['id'] ] ?? [];
+			$structure[0]['tables'][ $index ]['items'] = $tables[ $table['id'] ];
 		}
-
-		/* Drop any section with nothing to show, which is how the Unsupported section stays hidden on a clean site */
-		$structure[0]['tables'] = array_filter(
-			$structure[0]['tables'],
-			static function ( $table ) {
-				return ! empty( $table['items'] );
-			}
-		);
 
 		return $structure;
 	}
@@ -187,20 +181,9 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 * Set up array structure of Gravity PDF System Report
 	 *
 	 * @since 6.0
+	 * @since 7.0 Two tables, Checks and Configuration
 	 */
 	public function get_report_structure(): array {
-		$title_export_prefix = 'Gravity PDF - ';
-		$deprecated_tables   = [];
-
-		/* Deprecation decides which groups there are and in what order; the view names them, once, for all three surfaces */
-		foreach ( View_System_Report::get_deprecated_groups() as $group => $names ) {
-			$deprecated_tables[] = [
-				'id'           => $group,
-				'title'        => esc_html( $names['label'] ),
-				'title_export' => $title_export_prefix . $names['label'],
-			];
-		}
-
 		return [
 			[
 				/* Gravity Forms echoes the title unescaped into an `h3`, which is the only way to anchor our section */
@@ -210,40 +193,19 @@ class Model_System_Report extends Helper_Abstract_Model {
 					esc_html__( 'Gravity PDF Environment', 'gravity-pdf' )
 				),
 				'title_export' => 'Gravity PDF Environment',
-				'tables'       => array_merge(
-					$deprecated_tables,
+				'tables'       => [
 					[
-						[
-							'id'           => 'php',
-							'title'        => esc_html__( 'PHP', 'gravity-pdf' ),
-							'title_export' => $title_export_prefix . 'PHP',
-						],
+						'id'           => 'checks',
+						'title'        => esc_html__( 'Checks', 'gravity-pdf' ),
+						'title_export' => 'Gravity PDF - Checks',
+					],
 
-						[
-							'id'           => 'directories',
-							'title'        => esc_html__( 'Directories and Permissions', 'gravity-pdf' ),
-							'title_export' => $title_export_prefix . 'Directories and Permissions',
-						],
-
-						[
-							'id'           => 'global',
-							'title'        => esc_html__( 'Global Settings', 'gravity-pdf' ),
-							'title_export' => $title_export_prefix . 'Global Settings',
-						],
-
-						[
-							'id'           => 'security',
-							'title'        => esc_html__( 'Security Settings', 'gravity-pdf' ),
-							'title_export' => $title_export_prefix . 'Security Settings',
-						],
-
-						[
-							'id'           => 'cache',
-							'title'        => esc_html__( 'PDF Cache', 'gravity-pdf' ),
-							'title_export' => $title_export_prefix . 'PDF Cache',
-						],
-					]
-				),
+					[
+						'id'           => 'configuration',
+						'title'        => esc_html__( 'Configuration', 'gravity-pdf' ),
+						'title_export' => 'Gravity PDF - Configuration',
+					],
+				],
 			],
 		];
 	}
@@ -286,60 +248,72 @@ class Model_System_Report extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Installed required font files per downloadable source
+	 * The Core Fonts check: fails for each file the failed fonts notice lists, dismissed or not, and for the required
+	 * files missing while the Font Installer is off
 	 *
-	 * @return array{label: string, label_export: string, value: string}
-	 *
-	 * @since 6.19.0
+	 * @since 7.0
 	 */
-	protected function get_core_fonts_installed(): array {
-		$counts = [];
-		foreach ( $this->get_required_fonts()->get_installed_counts() as $source => $count ) {
-			$counts[] = $count['manifest']
-				? sprintf( '%s: %d of %d required files installed', $source, $count['installed'], $count['total'] )
-				: sprintf( '%s: manifest missing', $source );
+	protected function get_core_fonts(): array {
+		$view      = $this->getController()->view;
+		$health    = $this->get_core_font_health();
+		$abandoned = $this->get_font_downloader()->get_failed_files();
+		$failed    = array_keys( $abandoned );
+		$missing   = $health['blocker'] !== null ? array_values( array_diff( $health['missing'], $failed ) ) : [];
+		$value     = [];
+		$export    = [];
+		$fix       = '';
+
+		if ( $failed !== [] ) {
+			$gave_up = [];
+			foreach ( $abandoned as $file => $time ) {
+				$gave_up[] = sprintf( '%s (gave up %s)', $file, gmdate( 'Y-m-d', $time ) );
+			}
+
+			/* translators: %d: How many font files */
+			$value[]  = esc_html( sprintf( __( '%d failed:', 'gravity-pdf' ), count( $failed ) ) ) . '<br>' . $view->get_code_lines( $failed );
+			$export[] = count( $failed ) . ' failed: ' . implode( ', ', $gave_up );
+			$fix      = __( 'Some characters may not display in PDFs.', 'gravity-pdf' );
 		}
 
-		return [
-			'label'        => esc_html__( 'Core Fonts installed', 'gravity-pdf' ),
-			'label_export' => 'Core Fonts installed',
-			'value'        => esc_html( implode( ', ', $counts ) ),
-		];
-	}
-
-	/**
-	 * Files whose download gave up, ignoring the admin notice's dismissals
-	 *
-	 * @return array{label: string, label_export: string, value: string}
-	 *
-	 * @since 6.19.0
-	 */
-	protected function get_core_fonts_failed(): array {
-		$failed = [];
-		foreach ( $this->get_font_downloader()->get_failed_files() as $file => $gave_up ) {
-			$failed[] = sprintf( '%s (gave up %s)', $file, wp_date( get_option( 'date_format' ), $gave_up ) );
+		if ( $missing !== [] ) {
+			/* translators: %d: How many font files */
+			$value[]  = esc_html( sprintf( __( '%d missing:', 'gravity-pdf' ), count( $missing ) ) ) . '<br>' . $view->get_code_lines( $missing );
+			$export[] = count( $missing ) . ' missing: ' . implode( ', ', $missing );
 		}
 
-		return [
-			'label'        => $this->get_anchored_label( self::FONTS_FAILED_ANCHOR, esc_html__( 'Core Fonts failed', 'gravity-pdf' ) ),
-			'label_export' => 'Core Fonts failed',
-			'value'        => esc_html( $failed !== [] ? implode( ', ', $failed ) : 'None' ),
-		];
+		if ( $health['blocker'] !== null ) {
+			/* translators: %s: The GPDF_AUTO_INSTALL_FONTS constant or the gfpdf_auto_install_fonts filter */
+			$fix = sprintf( __( 'The Font Installer is turned off by the %s.', 'gravity-pdf' ), $health['blocker'] );
+		}
+
+		return $view->get_check(
+			[
+				'label'        => $this->get_anchored_label( self::FONTS_FAILED_ANCHOR, esc_html__( 'Core Fonts', 'gravity-pdf' ) ),
+				'label_export' => 'Core Fonts',
+				'value'        => $value !== [] ? implode( '<br>', $value ) : esc_html__( 'None failed', 'gravity-pdf' ),
+				'value_export' => $export !== [] ? implode( '; ', $export ) : 'None failed',
+			],
+			__( 'no core fonts failed', 'gravity-pdf' ),
+			$fix !== '' ? $view->get_fix( $fix, View_Actions::CORE_FONTS_DOCS_URL, __( 'Install the fonts by hand', 'gravity-pdf' ) ) : ''
+		);
 	}
 
 	/**
 	 * Whether core fonts may be downloaded, and what turned them off
 	 *
-	 * @return array{label: string, label_export: string, value: string}
-	 *
 	 * @since 6.19.0
+	 * @since 7.0 Labelled Font Installer
 	 */
 	protected function get_core_font_downloads(): array {
-		return [
-			'label'        => $this->get_anchored_label( self::FONT_DOWNLOADS_ANCHOR, esc_html__( 'Core Font downloads', 'gravity-pdf' ) ),
-			'label_export' => 'Core Font downloads',
-			'value'        => esc_html( $this->get_font_downloader()->get_auto_install_status() ),
-		];
+		$status = $this->get_font_downloader()->get_auto_install_status();
+
+		return $this->get_configuration_item(
+			$this->get_anchored_label( self::FONT_DOWNLOADS_ANCHOR, esc_html__( 'Font Installer', 'gravity-pdf' ) ),
+			'Font Installer',
+			esc_html( $status ),
+			$status,
+			$status === 'On'
+		);
 	}
 
 	/**
@@ -393,9 +367,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 	/**
 	 * Fonts mPDF falls back to, in order, for characters the PDF's font lacks
 	 *
-	 * @return array{label: string, label_export: string, value: string}
-	 *
 	 * @since 6.19.0
+	 * @since 7.0 Only in the copied report
 	 */
 	protected function get_substitution_fonts(): array {
 		$fonts = $this->get_font_sources()->get_substitution_fonts();
@@ -404,6 +377,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 			'label'        => esc_html__( 'Substitution Fonts', 'gravity-pdf' ),
 			'label_export' => 'Substitution Fonts',
 			'value'        => esc_html( implode( ', ', $fonts ) ),
+			'export_only'  => true,
 		];
 	}
 
@@ -413,249 +387,161 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 * @return array
 	 * @since 6.0
 	 * @since 6.17.0 Keyed by section name, filtered by `gfpdf_system_status_report_sections`
+	 * @since 7.0 Every check row says whether it passed, and the settings rows say whether they're unchanged
 	 */
 	protected function get_report_items(): array {
-		$items                  = [];
-		$memory                 = $this->get_memory_limit();
-		$allow_url_fopen        = $this->get_allow_url_fopen();
-		$install                = GPDFAPI::get_mvc_class( 'Model_Install' );
-		$unwritable_folders     = $install instanceof Model_Install ? $install->create_folder_structures() : [];
-		$temp_folder_protected  = $this->check_temp_folder_permission();
-		$temp_folder_permission = $this->is_temporary_folder_writable( $unwritable_folders );
+		$items    = [];
+		$install  = GPDFAPI::get_mvc_class( 'Model_Install' );
+		$detected = Deprecation::group_signals( Deprecation::refresh_signals() );
+		$defaults = $this->get_setting_defaults();
 
 		/* Keyed by group, which is what the matching report sections are named after */
-		foreach ( Deprecation::group_signals( Deprecation::refresh_signals() ) as $group => $signals ) {
-			$items[ $group ] = $this->get_deprecated_feature_items( $signals );
+		foreach ( View_System_Report::get_deprecated_groups() as $group => $names ) {
+			$items[ $group ] = isset( $detected[ $group ] ) ? $this->get_deprecated_feature_items( $detected[ $group ] ) : [ 'none' => $this->get_no_deprecated_features_item( $names ) ];
 		}
 
-		/* PHP */
 		$items['php'] = [
-			'memory'            => [
-				'label'        => esc_html__( 'WP Memory', 'gravity-pdf' ),
-				'label_export' => 'WP Memory',
-				'value'        => $memory['value'],
-				'value_export' => $memory['value_export'],
-			],
-
-			'allow_url_fopen'   => [
-				'label'        => 'allow_url_fopen',
-				'value'        => $allow_url_fopen['value'],
-				'value_export' => $allow_url_fopen['value_export'],
-			],
-
-			'default_charset'   => [
-				'label'        => esc_html__( 'Default Charset', 'gravity-pdf' ),
-				'label_export' => 'Default Charset',
-				'value'        => ini_get( 'default_charset' ),
-			],
-
-			'internal_encoding' => [
-				'label'        => esc_html__( 'Internal Encoding', 'gravity-pdf' ),
-				'label_export' => 'Internal Encoding',
-				'value'        => ini_get( 'internal_encoding' ) ?: ini_get( 'default_charset' ), //phpcs:ignore Universal.Operators.DisallowShortTernary.Found
-			],
+			'memory'          => $this->get_memory_limit(),
+			'allow_url_fopen' => $this->get_allow_url_fopen(),
+			'charset'         => $this->get_charset(),
 		];
 
-		/* Directory and Permissions */
+		$path = $this->templates->get_template_path();
+		$url  = $this->templates->get_template_url();
+
 		$items['directories'] = [
-			'pdf_working_directory'     => [
+			'pdf_working_directory' => [
 				'label'        => esc_html__( 'PDF Working Directory', 'gravity-pdf' ),
 				'label_export' => 'PDF Working Directory',
-				'value'        => $this->templates->get_template_path(),
+				'value'        => esc_html( $path ) . '<br>' . esc_html( $url ),
+				'value_export' => $path . ' (' . $url . ')',
 			],
 
-			'pdf_working_directory_url' => [
-				'label'        => esc_html__( 'PDF Working Directory URL', 'gravity-pdf' ),
-				'label_export' => 'PDF Working Directory URL',
-				'value'        => $this->templates->get_template_url(),
-			],
-
-			'font_folder_location'      => [
-				'label'        => esc_html__( 'Font Folder location', 'gravity-pdf' ),
-				'label_export' => 'Font Folder location',
-				'value'        => $this->data->template_font_location,
-			],
-
-			'core_fonts_installed'      => $this->get_core_fonts_installed(),
-			'core_fonts_failed'         => $this->get_core_fonts_failed(),
-			'core_font_downloads'       => $this->get_core_font_downloads(),
-			'substitution_fonts'        => $this->get_substitution_fonts(),
-
-			'temp_folder_location'      => [
-				'label'        => esc_html__( 'Temporary Folder location', 'gravity-pdf' ),
-				'label_export' => 'Temporary Folder location',
-				'value'        => $this->data->template_tmp_location,
-			],
-
-			'temp_folder_permission'    => [
-				'label'        => esc_html__( 'Temporary Folder permissions', 'gravity-pdf' ),
-				'label_export' => 'Temporary Folder permissions',
-				'value'        => $temp_folder_permission['value'],
-				'value_export' => $temp_folder_permission['value_export'],
-			],
-
-			'folder_permissions'        => $this->get_folder_permissions( $unwritable_folders ),
-
-			'temp_folder_protected'     => [
-				'label'        => esc_html__( 'Temporary Folder protected', 'gravity-pdf' ),
-				'label_export' => 'Temporary Folder protected',
-				'value'        => $temp_folder_protected['value'],
-				'value_export' => $temp_folder_protected['value_export'],
-			],
-
-			'mpdf_temp_folder_location' => [
-				'label'        => esc_html__( 'mPDF Temporary location', 'gravity-pdf' ),
-				'label_export' => 'mPDF Temporary location',
-				'value'        => $this->data->mpdf_tmp_location,
-			],
+			'folders'               => $this->get_folders(),
+			'folder_permissions'    => $this->get_folder_permissions( $install instanceof Model_Install ? $install->create_folder_structures() : [] ),
+			'temp_folder_protected' => $this->check_temp_folder_permission(),
+			'core_fonts'            => $this->get_core_fonts(),
+			'core_font_downloads'   => $this->get_core_font_downloads(),
+			'substitution_fonts'    => $this->get_substitution_fonts(),
 		];
 
-		/* Check for outdated core template overrides and display a warning */
-		$template_status = $this->check_core_template_override_versions();
-		if ( ! empty( $template_status ) ) {
-			$items['directories']['outdated_templates'] = [
-				'label'        => esc_html__( 'Outdated Templates', 'gravity-pdf' ),
-				'label_export' => 'Outdated Templates',
-				'value'        => $template_status['value'],
-				'value_export' => $template_status['value_export'],
-			];
+		$outdated = $this->check_core_template_override_versions();
+		if ( $outdated !== [] ) {
+			$items['directories']['outdated_templates'] = $this->get_outdated_templates( $outdated );
 		}
 
-		/* Global Settings */
-		$is_canonical_release             = is_file( plugin_dir_path( GPDF_PLUGIN_FILE ) . 'gravity-pdf-updater.php' );
-		$is_not_canonical_release_message = wp_kses(
-			sprintf(
-				/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
-				__( 'In order to get updates direct from GravityPDF.com %1$syou need to perform a one-time download of the plugin%2$s.', 'gravity-pdf' ),
-				'<a href="https://gravitypdf.com/news/installing-and-upgrading-to-the-canonical-version-of-gravity-pdf/">',
-				'</a>',
-			),
-			[ 'a' => [ 'href' => true ] ]
-		);
+		$action     = $this->options->get_option( 'default_action', 'View' ) === 'Download' ? 'Download' : 'View';
+		$background = $this->is_on( $this->options->get_option( 'background_processing', 'No' ) );
+		$debug      = $this->is_on( $this->options->get_option( 'debug_mode', 'No' ) );
 
 		$items['global'] = [
-			'canonical_release'             => [
-				'label'        => esc_html__( 'Canonical Release', 'gravity-pdf' ),
-				'label_export' => 'Canonical Release',
-				'value'        => $is_canonical_release ? $this->getController()->view->get_icon( true ) : $this->getController()->view->get_icon( false ) . $is_not_canonical_release_message,
-				'value_export' => $is_canonical_release ? 'Yes' : 'No',
-			],
+			'pdf_entry_list_action'         => $this->get_configuration_item(
+				esc_html__( 'Entry View', 'gravity-pdf' ),
+				'Entry View',
+				$action === 'View' ? esc_html__( 'View', 'gravity-pdf' ) : esc_html__( 'Download', 'gravity-pdf' ),
+				$action,
+				$action === ( $defaults['default_action'] ?? null )
+			),
 
-			'pdf_entry_list_action'         => [
-				'label'        => esc_html__( 'PDF Entry List Action', 'gravity-pdf' ),
-				'label_export' => 'PDF Entry List Action',
-				'value'        => $this->options->get_option( 'default_action', 'View' ) === 'View' ? esc_html__( 'View', 'gravity-pdf' ) : esc_html__( 'Download', 'gravity-pdf' ),
-				'value_export' => $this->options->get_option( 'default_action', 'View' ),
-			],
+			'background_processing_enabled' => $this->get_configuration_item(
+				esc_html__( 'Background Processing', 'gravity-pdf' ),
+				'Background Processing',
+				$background ? esc_html__( 'On', 'gravity-pdf' ) : esc_html__( 'Off', 'gravity-pdf' ),
+				$background ? 'On' : 'Off',
+				$background === $this->is_on( $defaults['background_processing'] ?? null )
+			),
 
-			'background_processing_enabled' => [
-				'label'        => esc_html__( 'Background Processing', 'gravity-pdf' ),
-				'label_export' => 'Background Processing',
-				'value'        => $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-pdf' ),
-				'value_export' => $this->options->get_option( 'background_processing', 'No' ),
-			],
-
-			'debug_mode_enabled'            => [
-				'label'        => esc_html__( 'Debug Mode', 'gravity-pdf' ),
-				'label_export' => 'Debug Mode',
-				'value'        => $this->options->get_option( 'debug_mode', 'No' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-pdf' ),
-				'value_export' => $this->options->get_option( 'debug_mode', 'No' ),
-			],
+			'debug_mode_enabled'            => $this->get_configuration_item(
+				esc_html__( 'Debug Mode', 'gravity-pdf' ),
+				'Debug Mode',
+				$debug ? esc_html__( 'On', 'gravity-pdf' ) : esc_html__( 'Off', 'gravity-pdf' ),
+				$debug ? 'On' : 'Off',
+				$debug === $this->is_on( $defaults['debug_mode'] ?? null )
+			),
 		];
 
-		/* Security Settings */
-		$logged_out_timeout = $this->options->get_logged_out_timeout();
+		$capabilities = array_values( (array) $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] ) );
+		$timeout      = $this->options->get_logged_out_timeout();
 
 		$items['security'] = [
-			'user_restrictions'  => [
-				'label'        => esc_html__( 'User Restrictions', 'gravity-pdf' ),
-				'label_export' => 'User Restrictions',
-				'value'        => implode( ', ', $this->options->get_option( 'admin_capabilities', [ 'gravityforms_view_entries' ] ) ),
-			],
+			'user_restrictions'  => $this->get_configuration_item(
+				esc_html__( 'User Restriction', 'gravity-pdf' ),
+				'User Restriction',
+				implode( '<br>', array_map( 'esc_html', $capabilities ) ),
+				implode( ', ', $capabilities ),
+				$this->is_same_list( $capabilities, (array) ( $defaults['admin_capabilities'] ?? [] ) )
+			),
 
-			'logged_out_timeout' => [
-				'label'        => esc_html__( 'Logged Out Timeout', 'gravity-pdf' ),
-				'label_export' => 'Logged Out Timeout',
-				'value'        => $logged_out_timeout . ' ' . esc_html__( 'minute(s)', 'gravity-pdf' ),
-				'value_export' => $logged_out_timeout . ' minutes(s)',
-			],
+			'logged_out_timeout' => $this->get_configuration_item(
+				esc_html__( 'Logged Out Timeout', 'gravity-pdf' ),
+				'Logged Out Timeout',
+				/* translators: %d: Number of minutes */
+				esc_html( sprintf( _n( '%d minute', '%d minutes', $timeout, 'gravity-pdf' ), $timeout ) ),
+				$this->get_count( $timeout, 'minute' ),
+				$timeout === (int) ( $defaults['logged_out_timeout'] ?? 0 )
+			),
 		];
 
-		$items['cache'] = $this->get_cache_items();
+		$items['cache'] = $this->get_cache_items( $defaults );
 
 		$items = $this->apply_deprecated_report_items_filter( $items );
+		$items = apply_filters( 'gfpdf_system_status_report_sections', $items );
 
-		return apply_filters( 'gfpdf_system_status_report_sections', $items );
+		/* Only added once the filters have run, as an add-on that finds the row appends its own outdated templates */
+		if ( is_array( $items ) && ! isset( $items['directories']['outdated_templates'] ) ) {
+			$items['directories']['outdated_templates'] = $this->get_outdated_templates( [] );
+		}
+
+		return $items;
 	}
 
 	/**
 	 * The PDF Cache rows. They read the sweep's saved state, so the report never walks the cache.
 	 *
+	 * @param array $defaults Each setting's default, by ID
+	 *
 	 * @since 7.0
 	 */
-	protected function get_cache_items(): array {
+	protected function get_cache_items( array $defaults ): array {
 		$view    = $this->getController()->view;
 		$enabled = Cache::is_enabled_by_setting();
 		$ttl     = Cache::get_ttl();
+		$hours   = round( $ttl / HOUR_IN_SECONDS, 2 );
 		$state   = $this->pdf_cache->get_sweep_state();
+		$pass    = $state['last_pass'];
+		$ran     = $state['last_complete_at'] > 0 && $pass !== [];
+		$ago     = $ran ? human_time_diff( $state['last_complete_at'] ) : '';
 
-		$items = [
-			'pdf_cache'      => [
-				'label'        => esc_html__( 'PDF Cache', 'gravity-pdf' ),
-				'label_export' => 'PDF Cache',
-				'value'        => $enabled ? $view->get_icon( true ) : esc_html__( 'Off', 'gravity-pdf' ),
-				'value_export' => $enabled ? 'Yes' : 'No',
-			],
+		return [
+			'pdf_cache'     => $this->get_configuration_item(
+				esc_html__( 'PDF Cache', 'gravity-pdf' ),
+				'PDF Cache',
+				/* translators: %s: How long a PDF is cached for, e.g. "12 hours" */
+				$enabled ? esc_html( sprintf( __( 'On, %s', 'gravity-pdf' ), human_time_diff( 0, $ttl ) ) ) : esc_html__( 'Off', 'gravity-pdf' ),
+				$enabled ? 'On, ' . $this->get_count( $hours, 'hour' ) : 'Off',
+				$enabled === $this->is_on( $defaults['pdf_cache'] ?? null ) && ( ! $enabled || $hours === (float) ( $defaults['cache_duration'] ?? 0 ) )
+			),
 
-			'cache_duration' => [
-				'label'        => esc_html__( 'Cache Duration', 'gravity-pdf' ),
-				'label_export' => 'Cache Duration',
-				'value'        => esc_html( human_time_diff( 0, $ttl ) ),
-				'value_export' => round( $ttl / HOUR_IN_SECONDS, 2 ) . ' hour(s)',
-			],
-
-			'cache_cleanup'  => [
-				'label'        => esc_html__( 'Last Cache Cleanup', 'gravity-pdf' ),
-				'label_export' => 'Last Cache Cleanup',
-				'value'        => esc_html__( 'Never', 'gravity-pdf' ),
-				'value_export' => 'Never',
-			],
+			'cache_cleanup' => $view->get_check(
+				[
+					'label'        => esc_html__( 'PDF Cache Cleanup', 'gravity-pdf' ),
+					'label_export' => 'PDF Cache Cleanup',
+					/* translators: %s: How long ago, e.g. "2 hours" */
+					'value'        => $ran ? esc_html( sprintf( __( 'Last ran %s ago', 'gravity-pdf' ), $ago ) ) : esc_html__( 'Never run', 'gravity-pdf' ),
+					'value_export' => $ran ? sprintf(
+						'%1$s UTC. Removed %2$s (%3$s), kept %4$s (%5$s).',
+						gmdate( 'Y-m-d H:i:s', $state['last_complete_at'] ),
+						$this->get_count( $pass['files_reaped'], 'file' ),
+						$this->get_megabytes( $pass['bytes_reaped'] ),
+						$pass['files_left'],
+						$this->get_megabytes( $pass['bytes_left'] )
+					) : 'Never run',
+				],
+				/* translators: %s: How long ago, e.g. "2 hours" */
+				$ran ? sprintf( __( 'cache cleaned %s ago', 'gravity-pdf' ), $ago ) : __( 'cache not cleaned yet', 'gravity-pdf' ),
+				$this->is_cache_cleanup_stalled() ? $view->get_fix( __( "WP-Cron isn't removing expired PDFs. Ask your web host to check that it runs.", 'gravity-pdf' ) ) : ''
+			),
 		];
-
-		$pass = $state['last_pass'];
-		if ( $state['last_complete_at'] > 0 && $pass !== [] ) {
-
-			$items['cache_cleanup']['value'] = esc_html(
-				sprintf(
-					/* translators: 1: How long ago, e.g. "2 hours", 2: Number of files, 3: Their size, e.g. "4 MB", 4: Number of files, 5: Their size */
-					__( '%1$s ago. Removed %2$d file(s) (%3$s) and kept %4$d (%5$s).', 'gravity-pdf' ),
-					human_time_diff( $state['last_complete_at'] ),
-					$pass['files_reaped'],
-					size_format( $pass['bytes_reaped'] ),
-					$pass['files_left'],
-					size_format( $pass['bytes_left'] )
-				)
-			);
-
-			$items['cache_cleanup']['value_export'] = sprintf(
-				'%1$s. Removed %2$d file(s) (%3$d bytes) and kept %4$d (%5$d bytes).',
-				gmdate( 'Y-m-d H:i:s', $state['last_complete_at'] ) . ' UTC',
-				$pass['files_reaped'],
-				$pass['bytes_reaped'],
-				$pass['files_left'],
-				$pass['bytes_left']
-			);
-		}
-
-		if ( $this->is_cache_cleanup_stalled() ) {
-			$message = __( 'WP-Cron does not appear to be running, so expired PDFs are not being removed from the cache.', 'gravity-pdf' );
-
-			$items['cache_cleanup']['is_valid']                  = false;
-			$items['cache_cleanup']['validation_message']        = esc_html( $message );
-			$items['cache_cleanup']['validation_message_export'] = $message;
-		}
-
-		return $items;
 	}
 
 	/**
@@ -733,45 +619,164 @@ class Model_System_Report extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Returns text and dashicon for Memory Limit
+	 * The passing row of a deprecation group with nothing detected
+	 *
+	 * @param array $names The group's names, from View_System_Report::get_deprecated_groups()
+	 *
+	 * @since 7.0
+	 */
+	protected function get_no_deprecated_features_item( array $names ): array {
+		/* translators: %s: The group name, as get_deprecated_groups() gives it */
+		$label = sprintf( __( '%s Features', 'gravity-pdf' ), $names['label'] );
+
+		return $this->getController()->view->get_check(
+			[
+				'label'        => esc_html( $label ),
+				'label_export' => $label,
+				'value'        => esc_html__( 'None', 'gravity-pdf' ),
+				'value_export' => 'None',
+			],
+			$names['none']
+		);
+	}
+
+	/**
+	 * The memory limit PDFs get. It's read as Gravity PDF loads, before WordPress raises it for admin screens.
 	 *
 	 * @since 6.0
+	 * @since 7.0 Returns the PDF Memory Limit check
 	 */
 	protected function get_memory_limit(): array {
-		$memory = $this->status->get_ram( $this->data->memory_limit );
+		$view      = $this->getController()->view;
+		$memory    = $this->status->get_ram( $this->data->memory_limit );
+		$unlimited = $memory === -1;
+		$limit     = $unlimited ? 'Unlimited' : $memory . 'MB';
 
-		return [
-			'value'        => $this->getController()->view->memory_limit_markup( $memory ),
-			'value_export' => $memory === -1 ? 'Unlimited' : $memory . 'MB',
-		];
+		return $view->get_check(
+			[
+				'label'        => esc_html__( 'PDF Memory Limit', 'gravity-pdf' ),
+				'label_export' => 'PDF Memory Limit',
+				'value'        => $unlimited ? esc_html__( 'Unlimited', 'gravity-pdf' ) : $limit,
+				'value_export' => $limit,
+			],
+			/* translators: %s: The memory limit, e.g. "512MB" or "unlimited" */
+			sprintf( __( 'PDF memory %s', 'gravity-pdf' ), $unlimited ? __( 'unlimited', 'gravity-pdf' ) : $limit ),
+			$unlimited || $memory >= 128 ? '' : $view->get_fix( __( 'Raise it to at least 128MB.', 'gravity-pdf' ), 'https://docs.gravitypdf.com/users/increasing-memory-limit', __( 'How to increase it', 'gravity-pdf' ) )
+		);
 	}
 
 	/**
 	 * @since 6.0
+	 * @since 7.0 Returns the allow_url_fopen check
 	 */
 	protected function get_allow_url_fopen(): array {
-		$allow_url_fopen = $this->data->allow_url_fopen;
-		$icon            = $this->getController()->view->get_allow_url_fopen( $allow_url_fopen );
-		$text            = $allow_url_fopen ? 'Yes' : 'No';
+		$view    = $this->getController()->view;
+		$enabled = $this->data->allow_url_fopen;
+
+		return $view->get_check(
+			[
+				'label'        => 'allow_url_fopen',
+				'label_export' => 'allow_url_fopen',
+				'value'        => $enabled ? esc_html__( 'On', 'gravity-pdf' ) : esc_html__( 'Off', 'gravity-pdf' ),
+				'value_export' => $enabled ? 'On' : 'Off',
+			],
+			__( 'allow_url_fopen on', 'gravity-pdf' ),
+			$enabled ? '' : $view->get_fix( __( 'Images may be missing from PDFs. Ask your web host to turn it on.', 'gravity-pdf' ) )
+		);
+	}
+
+	/**
+	 * PHP's charset and internal encoding, only shown on screen when one of them isn't UTF-8
+	 *
+	 * @since 7.0
+	 */
+	protected function get_charset(): array {
+		$charset  = (string) ini_get( 'default_charset' );
+		$encoding = (string) ini_get( 'internal_encoding' ) ?: $charset; //phpcs:ignore Universal.Operators.DisallowShortTernary.Found
+		$value    = $charset . ' / ' . $encoding;
 
 		return [
-			'value'        => $icon,
-			'value_export' => $text,
+			'label'        => esc_html__( 'PHP Charset / Encoding', 'gravity-pdf' ),
+			'label_export' => 'PHP Charset / Encoding',
+			'value'        => esc_html( $value ),
+			'value_export' => $value,
+			'export_only'  => strtoupper( $value ) === 'UTF-8 / UTF-8',
 		];
 	}
 
 	/**
-	 * Returns the mark up once the temp folder test is completed.
+	 * The fonts, temporary and mPDF folders, relative to the PDF Working Directory while they're all inside it
+	 *
+	 * @since 7.0
+	 */
+	protected function get_folders(): array {
+		$base    = trailingslashit( wp_normalize_path( $this->templates->get_template_path() ) );
+		$root    = trailingslashit( wp_normalize_path( $this->data->template_location ) );
+		$folders = [
+			'Fonts'     => $this->data->template_font_location,
+			'Temporary' => $this->data->template_tmp_location,
+			'mPDF'      => $this->misc->get_mpdf_cache_location(),
+		];
+		$names   = [
+			'Fonts'     => __( 'Fonts', 'gravity-pdf' ),
+			'Temporary' => __( 'Temporary', 'gravity-pdf' ),
+			'mPDF'      => 'mPDF',
+		];
+
+		$folders = array_map(
+			static function ( $folder ) {
+				return trailingslashit( wp_normalize_path( $folder ) );
+			},
+			$folders
+		);
+
+		$relative = true;
+		foreach ( $folders as $folder ) {
+			$relative = $relative && strpos( $folder, $base ) === 0;
+		}
+
+		$value  = $relative ? [ esc_html__( 'Relative to the PDF Working Directory:', 'gravity-pdf' ) ] : [];
+		$export = [];
+		foreach ( $folders as $name => $folder ) {
+			$shown    = $relative ? substr( $folder, strlen( $base ) ) : $folder;
+			$value[]  = esc_html( $names[ $name ] ) . ': <code>' . esc_html( $shown ) . '</code>';
+			$export[] = $name . ': ' . $shown;
+		}
+
+		return $this->get_configuration_item(
+			esc_html__( 'Folders', 'gravity-pdf' ),
+			'Folders',
+			implode( '<br>', $value ),
+			implode( ', ', $export ),
+			/* None of the folder filters moved them */
+			$folders === [
+				'Fonts'     => $root . 'fonts/',
+				'Temporary' => $root . 'tmp/',
+				'mPDF'      => $root . 'tmp/mpdf/',
+			]
+		);
+	}
+
+	/**
+	 * Whether the temporary folder can't be reached from the web
 	 *
 	 * @since 6.0
+	 * @since 7.0 Returns the Temporary Folder Protected check
 	 */
 	protected function check_temp_folder_permission(): array {
-		$permission = $this->test_public_tmp_directory_access();
+		$view      = $this->getController()->view;
+		$protected = $this->test_public_tmp_directory_access();
 
-		return [
-			'value'        => $this->getController()->view->get_temp_folder_protected( $permission ),
-			'value_export' => $permission ? 'Yes' : 'No',
-		];
+		return $view->get_check(
+			[
+				'label'        => esc_html__( 'Temporary Folder Protected', 'gravity-pdf' ),
+				'label_export' => 'Temporary Folder Protected',
+				'value'        => $protected ? esc_html__( 'Yes', 'gravity-pdf' ) : esc_html__( 'No', 'gravity-pdf' ),
+				'value_export' => $protected ? 'Yes' : 'No',
+			],
+			__( 'temporary folder protected', 'gravity-pdf' ),
+			$protected ? '' : $view->get_fix( __( "The temporary folder can be reached from the web. Move it outside the site's public folder.", 'gravity-pdf' ), 'https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/', __( 'How to move it', 'gravity-pdf' ) )
+		);
 	}
 
 	/**
@@ -831,76 +836,80 @@ class Model_System_Report extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @since 6.0
-	 * @since 6.18.0 Reads the folder check, which tests by writing a file, as is_writable() can call a writable
-	 *               network share read-only
-	 */
-	protected function is_temporary_folder_writable( array $unwritable_folders ): array {
-		$is_writable = array_intersect( $this->misc->get_tmp_locations(), $unwritable_folders ) === [];
-
-		$string = $is_writable ? __( 'Writable', 'gravityforms' ) : __( 'Not writable', 'gravityforms' );
-		$icon   = $this->getController()->view->get_icon( $is_writable );
-
-		return [
-			'value'        => $string . $icon,
-			'value_export' => $is_writable ? 'Writable' : 'Not writable',
-		];
-	}
-
-	/**
-	 * The folders the check made for this report couldn't write to. Running it here also clears a fixed folder from the
-	 * admin notice
+	 * The folders the check made for this report couldn't write to, in full. Running it here also clears a fixed folder
+	 * from the admin notice
 	 *
 	 * @param string[] $folders
 	 *
 	 * @since 6.18.0
+	 * @since 7.0 Returns the Folder Permissions check, which covers the temporary folder too
 	 */
 	protected function get_folder_permissions( array $folders ): array {
-		$relative = array_map( [ $this->misc, 'relative_path' ], $folders );
+		$view     = $this->getController()->view;
+		$writable = $folders === [];
 
-		return [
-			'label'        => esc_html__( 'Folder permissions', 'gravity-pdf' ),
-			'label_export' => 'Folder permissions',
-			'value'        => $this->getController()->view->get_folder_permissions( $relative ),
-			'value_export' => $folders === [] ? 'Writable' : 'Not writable: ' . implode( ', ', $folders ),
-		];
+		return $view->get_check(
+			[
+				'label'        => esc_html__( 'Folder Permissions', 'gravity-pdf' ),
+				'label_export' => 'Folder Permissions',
+				'value'        => $writable ? esc_html__( 'Writable', 'gravity-pdf' ) : esc_html__( 'Not writable:', 'gravity-pdf' ) . '<br>' . $view->get_code_lines( $folders ),
+				'value_export' => $writable ? 'Writable' : 'Not writable: ' . implode( ', ', $folders ),
+			],
+			__( 'folders writable', 'gravity-pdf' ),
+			$writable ? '' : $view->get_fix( __( 'Ask your web host to make these folders writable.', 'gravity-pdf' ) )
+		);
 	}
 
 	/**
-	 * Display a warning if the Core template overrides are out of date
+	 * The core template overrides older than the core template, by file name
+	 *
+	 * @return array<string, string[]> The override's version, then the core template's
 	 *
 	 * @since 6.0
+	 * @since 7.0 Returns the outdated overrides rather than the row
 	 */
 	protected function check_core_template_override_versions(): array {
-		$templates = $this->get_template_versions( $this->templates->get_core_pdf_templates() );
+		$outdated = [];
 
-		$value        = '';
-		$value_export = '';
-
-		/* Loop over the Core templates and check if there are any overrides */
-		foreach ( $templates as $path => $core_version ) {
+		foreach ( $this->get_template_versions( $this->templates->get_core_pdf_templates() ) as $path => $core_version ) {
 			$template = $this->templates->get_template_info_by_id( basename( $path, '.php' ) );
 			if ( version_compare( $core_version, $template['version'], '>' ) ) {
-				$relative_template_path = $this->misc->relative_path( $template['path'], '/' );
-				$message                = $this->getController()->view->get_template_check_message( $relative_template_path, $template['version'], $core_version );
-
-				$value        .= $message['value'];
-				$value_export .= $message['value_export'];
+				$outdated[ basename( $template['path'] ) ] = [ $template['version'], $core_version ];
 			}
 		}
 
-		/* Returns an empty string if all the core template is the latest version */
-		if ( empty( $value ) ) {
-			return [];
+		return $outdated;
+	}
+
+	/**
+	 * The Outdated Templates check. A failing value ends in a line break, so the templates an add-on appends start on
+	 * a line of their own.
+	 *
+	 * @param array<string, string[]> $outdated See self::check_core_template_override_versions()
+	 *
+	 * @since 7.0
+	 */
+	protected function get_outdated_templates( array $outdated ): array {
+		$view   = $this->getController()->view;
+		$value  = [];
+		$export = [];
+
+		foreach ( $outdated as $file => $versions ) {
+			/* translators: 1: The override's version, 2: The core template's version */
+			$value[]  = '<code>' . esc_html( $file ) . '</code> ' . esc_html( sprintf( __( '%1$s, current %2$s', 'gravity-pdf' ), $versions[0], $versions[1] ) );
+			$export[] = sprintf( '%1$s %2$s (current %3$s)', $file, $versions[0], $versions[1] );
 		}
 
-		/* Add an upgrade message and link for more information. */
-		$value .= $this->getController()->view->get_template_upgrade_message();
-
-		return [
-			'value'        => $value,
-			'value_export' => $value_export,
-		];
+		return $view->get_check(
+			[
+				'label'        => esc_html__( 'Outdated Templates', 'gravity-pdf' ),
+				'label_export' => 'Outdated Templates',
+				'value'        => $value !== [] ? implode( '<br>', $value ) . '<br>' : esc_html__( 'None', 'gravity-pdf' ),
+				'value_export' => $export !== [] ? implode( ', ', $export ) . "\n" : 'None',
+			],
+			__( 'templates up to date', 'gravity-pdf' ),
+			$value !== [] ? $view->get_fix( __( 'Update these template overrides.', 'gravity-pdf' ), 'https://docs.gravitypdf.com/developers/template-hierarchy', __( 'How to update', 'gravity-pdf' ) ) : ''
+		);
 	}
 
 	/**
@@ -919,6 +928,92 @@ class Model_System_Report extends Helper_Abstract_Model {
 		}
 
 		return $versions;
+	}
+
+	/**
+	 * A Configuration row, marked "(default)" in the copied report while it's unchanged
+	 *
+	 * @param string $label        Escaped, as the settings page names it
+	 * @param string $label_export The label in the copied report
+	 * @param string $value        Escaped, shown on screen
+	 * @param string $value_export The value in the copied report
+	 * @param bool   $is_default   Whether it's unchanged
+	 *
+	 * @since 7.0
+	 */
+	protected function get_configuration_item( string $label, string $label_export, string $value, string $value_export, bool $is_default ): array {
+		return [
+			'label'        => $label,
+			'label_export' => $label_export,
+			'value'        => $value,
+			'value_export' => $value_export . ( $is_default ? ' (default)' : '' ),
+		];
+	}
+
+	/**
+	 * Each setting's default, from the settings registry
+	 *
+	 * @return array<string, mixed> By setting ID
+	 *
+	 * @since 7.0
+	 */
+	protected function get_setting_defaults(): array {
+		$defaults = [];
+
+		foreach ( $this->options->get_registered_fields() as $fields ) {
+			foreach ( (array) $fields as $field ) {
+				if ( isset( $field['id'] ) && array_key_exists( 'std', $field ) ) {
+					$defaults[ $field['id'] ] = $field['std'];
+				}
+			}
+		}
+
+		return $defaults;
+	}
+
+	/**
+	 * Whether a toggle is on. Toggles store Yes or No, but declare '0' as their default.
+	 *
+	 * @param mixed $value
+	 *
+	 * @since 7.0
+	 */
+	protected function is_on( $value ): bool {
+		return in_array( $value, [ 'Yes', '1', 1, true ], true );
+	}
+
+	/**
+	 * Whether two lists hold the same values, in any order
+	 *
+	 * @since 7.0
+	 */
+	protected function is_same_list( array $a, array $b ): bool {
+		$a = array_values( $a );
+		$b = array_values( $b );
+		sort( $a );
+		sort( $b );
+
+		return $a === $b;
+	}
+
+	/**
+	 * A count and its unit, in English for the copied report
+	 *
+	 * @param int|float $count
+	 *
+	 * @since 7.0
+	 */
+	protected function get_count( $count, string $unit ): string {
+		return $count . ' ' . $unit . ( (float) $count === 1.0 ? '' : 's' );
+	}
+
+	/**
+	 * A size in MB, to two decimal places
+	 *
+	 * @since 7.0
+	 */
+	protected function get_megabytes( int $bytes ): string {
+		return number_format( $bytes / MB_IN_BYTES, 2, '.', '' ) . ' MB';
 	}
 
 	/**
