@@ -21,13 +21,21 @@ test.describe('Core Fonts', () => {
 		page: Page;
 		admin: Admin;
 	}, testinfo) => {
+		// A default font no spec puts on disk, for this test's requests only (see tools/mu-plugins)
+		await page.setExtraHTTPHeaders({
+			'X-GPDF-E2E-Default-Font': 'pothana2000',
+		});
+
 		await admin.visitAdminPage('admin.php', 'page=gf_system_status');
 
 		const coreFonts = page.getByRole('row', { name: /^Core Fonts/ });
 		const installer = page.getByRole('row', { name: /^Font Installer/ });
 
-		// Core font downloads are off on this site (see tools/mu-plugins), and the forms the other specs create decide which are required
+		// Core font downloads are off on this site (see tools/mu-plugins), so the default font's file stays missing
 		await expect(coreFonts).toContainText(/\d+ missing:/);
+		await expect(coreFonts.locator('code')).toContainText([
+			'Pothana2000.ttf',
+		]);
 		await expect(coreFonts).toContainText(
 			'The Font Installer is turned off by the gfpdf_auto_install_fonts filter.'
 		);

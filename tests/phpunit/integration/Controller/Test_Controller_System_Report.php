@@ -108,7 +108,7 @@ class Test_Controller_System_Report extends TestCase {
 	public function test_the_copied_report_marks_unchanged_settings_as_default() {
 		$configuration = array_column( $this->get_table( 'configuration' ), 'value_export', 'label_export' );
 
-		$this->assertSame( 'Fonts: fonts/, Temporary: tmp/, mPDF: tmp/mpdf/ (default)', $configuration['Folders'] );
+		$this->assertStringEndsWith( 'mPDF: ' . ( is_multisite() ? wp_normalize_path( $this->gfpdf()->data->template_location ) : '' ) . 'tmp/mpdf/ (default)', $configuration['Folders'] );
 		$this->assertSame( 'View (default)', $configuration['Entry View'] );
 		$this->assertSame( 'Off (default)', $configuration['Background Processing'] );
 		$this->assertSame( 'Off (default)', $configuration['Debug Mode'] );
@@ -137,12 +137,28 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertSame( 'On, 24 hours', $configuration['PDF Cache']['value_export'] );
 	}
 
-	public function test_the_folders_row_is_relative_to_the_working_directory_until_a_folder_moves_out() {
+	public function test_the_folders_row_is_relative_to_the_working_directory_while_every_folder_is_inside_it() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single site only' );
+		}
+
 		$folders = $this->get_sections()['directories']['folders'];
 
 		$this->assertStringStartsWith( 'Relative to the PDF Working Directory:<br>Fonts: <code>fonts/</code>', $folders['value'] );
 		$this->assertStringContainsString( 'mPDF: <code>tmp/mpdf/</code>', $folders['value'] );
+	}
 
+	public function test_the_folders_row_shows_each_folder_in_full_on_a_multisite_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$folders = $this->get_sections()['directories']['folders'];
+
+		$this->assertStringStartsWith( 'Fonts: <code>' . esc_html( wp_normalize_path( $this->gfpdf()->data->template_font_location ) ) . '</code>', $folders['value'] );
+	}
+
+	public function test_the_folders_row_shows_each_folder_in_full_once_one_moves_out() {
 		$gfpdf = $this->gfpdf();
 		$saved = $gfpdf->data->mpdf_tmp_location;
 
