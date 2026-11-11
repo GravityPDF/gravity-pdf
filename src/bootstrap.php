@@ -877,10 +877,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	public function load_custom_font_handler(): void {
-		$model = new Model\Model_Custom_Fonts( $this->options );
-		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
+		/* Shared with Model_Required_Fonts, so the font sync's read-ahead serves both */
+		$site_options = new Model\Model_Site_Options( $this->log );
+		$model        = new Model\Model_Custom_Fonts( $this->options, $site_options );
+		$class        = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
 		$class->init();
 
+		$this->singleton->add_class( $site_options );
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
 	}
@@ -898,7 +901,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
 
-		$required_fonts = new Model\Model_Required_Fonts( $model, $this->options, $this->log );
+		$site_options   = $this->singleton->get_class( 'Model_Site_Options' );
+		$required_fonts = new Model\Model_Required_Fonts( $model, $this->options, $this->log, $site_options instanceof Model\Model_Site_Options ? $site_options : null );
 		$downloader     = new Model\Model_Font_Downloader( $model, $this->data, $this->options, $this->misc, $this->log, $required_fonts );
 		$class          = new Controller\Controller_Font_Downloader( $downloader, $required_fonts );
 		$class->init();

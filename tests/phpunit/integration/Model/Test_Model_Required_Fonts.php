@@ -650,14 +650,26 @@ class Test_Model_Required_Fonts extends TestCase {
 			$this->markTestSkipped( 'Multisite only' );
 		}
 
-		global $wpdb;
+		$this->with_failing_site_option_reads(
+			function () {
+				$this->assertNull( $this->required->get_site_font_keys( get_main_site_id(), 'arimo' ) );
+			}
+		);
+	}
 
-		$suppress = $wpdb->suppress_errors();
-		try {
-			$this->assertNull( $this->required->get_site_font_keys( 999999, 'arimo' ) );
-		} finally {
-			$wpdb->suppress_errors( $suppress );
+	public function test_a_site_without_tables_has_only_the_unset_default_font() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
 		}
+
+		$this->assertSame(
+			[ 'arimo' ],
+			$this->without_db_errors(
+				function () {
+					return $this->required->get_site_font_keys( 999999, 'arimo' );
+				}
+			)
+		);
 	}
 
 	/**
@@ -995,8 +1007,6 @@ class Test_Model_Required_Fonts extends TestCase {
 	}
 
 	public function test_a_failed_settings_read_records_nothing() {
-		global $wpdb;
-
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Multisite only' );
 		}
@@ -1004,22 +1014,15 @@ class Test_Model_Required_Fonts extends TestCase {
 		$site = self::factory()->blog->create();
 		update_blog_option( $site, 'gfpdf_settings', [ 'default_font' => 'dejavuserif' ] );
 
-		$break = static function ( $query ) {
-			return strpos( $query, "option_name IN ( 'gfpdf_settings'" ) !== false ? str_replace( 'FROM', 'FROM gfpdf_missing_table,', $query ) : $query;
-		};
-		add_filter( 'query', $break );
-		$suppressed = $wpdb->suppress_errors( true );
-		$log        = new TestHandler();
-
-		try {
-			$this->required_with( $this->stub_font_sources(), $log )->write_site_fonts( $site );
-		} finally {
-			remove_filter( 'query', $break );
-			$wpdb->suppress_errors( $suppressed );
-		}
+		$log = new TestHandler();
+		$this->with_failing_site_option_reads(
+			function () use ( $site, $log ) {
+				$this->required_with( $this->stub_font_sources(), $log )->write_site_fonts( $site );
+			}
+		);
 
 		$this->assertFalse( get_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site ) );
-		$this->assertSame( [ 'ERROR', 'A site\'s settings could not be read for its fonts' ], array_slice( $this->records( $log )[0], 0, 2 ) );
+		$this->assertContains( [ 'ERROR', 'A site\'s settings could not be read for its fonts', [ 'site_id' => $site ] ], $this->records( $log ) );
 	}
 
 	public function test_the_delete_check_counts_a_font_in_use_when_forms_cant_be_read() {

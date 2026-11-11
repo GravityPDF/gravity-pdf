@@ -618,11 +618,11 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	/**
 	 * The files the other sites' Font Manager records use. Every site shares the fonts folder.
 	 *
-	 * @return string[]
+	 * @return string[]|null Null when a site's fonts couldn't be read, so any file could be its
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_files_used_by_other_sites(): array {
+	public function get_files_used_by_other_sites(): ?array {
 		return $this->custom_fonts->get_files_used_by_other_sites();
 	}
 

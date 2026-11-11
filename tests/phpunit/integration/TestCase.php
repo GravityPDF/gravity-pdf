@@ -39,6 +39,79 @@ abstract class TestCase extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
+	/**
+	 * The test suite turns this into DROP TEMPORARY TABLE, so the test's transaction survives
+	 */
+	protected function drop_site_options_table( int $site_id ): void {
+		global $wpdb;
+
+		$wpdb->query( 'DROP TABLE ' . $wpdb->get_blog_prefix( $site_id ) . 'options' ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	}
+
+	/**
+	 * Run the callback with every Model_Site_Options read failing, as a database error would
+	 *
+	 * @return mixed What the callback returns
+	 */
+	protected function with_failing_site_option_reads( callable $callback ) {
+		$fail = static function ( $query ) {
+			return self::is_site_option_query( $query ) || ( is_string( $query ) && strpos( $query, 'SHOW TABLES' ) === 0 ) ? 'SELECT * FROM gpdf_no_such_table' : $query;
+		};
+
+		add_filter( 'query', $fail, 20 );
+		try {
+			return $this->without_db_errors( $callback );
+		} finally {
+			remove_filter( 'query', $fail, 20 );
+		}
+	}
+
+	/**
+	 * @return string[] The Model_Site_Options queries the callback ran
+	 */
+	protected function site_option_queries( callable $callback ): array {
+		$queries = [];
+		$capture = static function ( $query ) use ( &$queries ) {
+			if ( self::is_site_option_query( $query ) ) {
+				$queries[] = $query;
+			}
+
+			return $query;
+		};
+
+		add_filter( 'query', $capture );
+		try {
+			$callback();
+		} finally {
+			remove_filter( 'query', $capture );
+		}
+
+		return $queries;
+	}
+
+	/**
+	 * @param mixed $query
+	 */
+	protected static function is_site_option_query( $query ): bool {
+		return is_string( $query ) && strpos( $query, ' AS site_id' ) !== false;
+	}
+
+	/**
+	 * Run the callback with `$wpdb` errors suppressed, as tests of failed queries expect them
+	 *
+	 * @return mixed What the callback returns
+	 */
+	protected function without_db_errors( callable $callback ) {
+		global $wpdb;
+
+		$suppress = $wpdb->suppress_errors( true );
+		try {
+			return $callback();
+		} finally {
+			$wpdb->suppress_errors( $suppress );
+		}
+	}
+
 	public static function tear_down_after_class(): void {
 		static::cleanup_class_fixtures();
 		parent::tear_down_after_class();

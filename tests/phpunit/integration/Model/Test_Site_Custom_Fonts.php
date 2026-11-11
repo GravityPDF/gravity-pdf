@@ -89,6 +89,18 @@ class Test_Site_Custom_Fonts extends TestCase {
 	}
 
 	/**
+	 * Record the fonts of the sites with no record, as the font sync does
+	 */
+	protected function backfill(): bool {
+		$backfill = new ReflectionMethod( Model_Font_Downloader::class, 'backfill_site_fonts' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$backfill->setAccessible( true );
+		}
+
+		return $backfill->invoke( $this->downloader() );
+	}
+
+	/**
 	 * Run the 6.19 fonts folder cleanup over this site and another
 	 */
 	protected function clean_up( int $site_id ): void {
@@ -151,14 +163,53 @@ class Test_Site_Custom_Fonts extends TestCase {
 		$this->assertSame( [ 'Theirs.ttf' ], $this->model()->get_files_used_by_other_sites() );
 		$this->assertContains( $site_id, $this->model()->get_sites_without_records() );
 
-		$backfill = new ReflectionMethod( Model_Font_Downloader::class, 'backfill_site_fonts' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$backfill->setAccessible( true );
-		}
-		$this->assertTrue( $backfill->invoke( GPDFAPI::get_mvc_class( 'Model_Font_Downloader' ) ) );
+		$this->assertTrue( $this->backfill() );
 
 		$this->assertSame( [ 'theirs' => [ 'Theirs.ttf' ] ], $this->record( $site_id ) );
 		$this->assertArrayNotHasKey( 'theirs', $this->add_to_mpdf() );
+	}
+
+	public function test_the_sync_reads_the_sites_it_records_ahead_in_one_query() {
+		$sites = [];
+		foreach ( [ 'One', 'Two', 'Three' ] as $name ) {
+			$site_id = $this->site_with_fonts( [ strtolower( $name ) => [ 'regular' => "$name.ttf" ] ] );
+			$this->model()->delete_site_record( $site_id );
+			delete_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site_id );
+			$sites[ $site_id ] = $name;
+		}
+
+		$queries = $this->site_option_queries(
+			function () {
+				$this->assertTrue( $this->backfill() );
+			}
+		);
+
+		foreach ( $sites as $site_id => $name ) {
+			$this->assertSame( [ strtolower( $name ) => [ "$name.ttf" ] ], $this->record( $site_id ) );
+			$this->assertIsArray( get_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site_id ) );
+		}
+
+		/* One read ahead for the font keys and one for the custom fonts, none per site */
+		$this->assertCount( 2, $queries );
+	}
+
+	public function test_the_cleanup_reads_its_sites_ahead_in_one_query() {
+		/* A site deleted since it was queued would fail the query */
+		$sites = [ get_current_blog_id(), 999999 ];
+		foreach ( [ 'One', 'Two' ] as $name ) {
+			$sites[] = $this->site_with_fonts( [ strtolower( $name ) => [ 'regular' => "$name.ttf" ] ] );
+		}
+
+		$this->set_installer_manifest();
+		$this->set_font_cleanup( $this->font_cleanup_state( [ 'sites' => $sites ] ) );
+		$queries = $this->site_option_queries(
+			function () {
+				$this->downloader()->cleanup();
+			}
+		);
+
+		$this->assertTrue( $this->get_font_cleanup() );
+		$this->assertCount( 1, $queries );
 	}
 
 	public function test_the_sync_leaves_a_record_written_since_alone() {
@@ -171,26 +222,94 @@ class Test_Site_Custom_Fonts extends TestCase {
 	}
 
 	public function test_the_sync_records_nothing_for_a_site_it_cant_read() {
-		global $wpdb;
-
 		$site_id = $this->site_with_fonts( [ 'theirs' => [ 'regular' => 'Theirs.ttf' ] ] );
 		$this->model()->delete_site_record( $site_id );
 		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
 
-		$break = static function ( $query ) {
-			return strpos( $query, "option_name = 'gfpdf_settings' LIMIT 1" ) !== false ? str_replace( 'FROM', 'FROM gfpdf_missing_table,', $query ) : $query;
-		};
-		add_filter( 'query', $break );
-		$suppress = $wpdb->suppress_errors( true );
-		try {
-			$this->model()->record_missing_site_fonts( $site_id );
-		} finally {
-			remove_filter( 'query', $break );
-			$wpdb->suppress_errors( $suppress );
-		}
+		$this->with_failing_site_option_reads(
+			function () use ( $site_id ) {
+				$this->model()->record_missing_site_fonts( $site_id );
+			}
+		);
 
 		$this->assertFalse( $this->record( $site_id ) );
 		$this->assertEqualsWithDelta( time() + HOUR_IN_SECONDS, wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ), 5 );
+	}
+
+	public function test_the_sync_records_no_fonts_for_a_site_without_an_options_table() {
+		$site_id = $this->site_with_fonts( [ 'theirs' => [ 'regular' => 'Theirs.ttf' ] ] );
+		$this->model()->delete_site_record( $site_id );
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+
+		$this->drop_site_options_table( $site_id );
+		$this->without_db_errors(
+			function () use ( $site_id ) {
+				$this->model()->record_missing_site_fonts( $site_id );
+			}
+		);
+
+		$this->assertSame( [], $this->record( $site_id ) );
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+	}
+
+	public function test_sites_with_no_record_are_read_in_one_query() {
+		$expected = [];
+		foreach ( [ 'One', 'Two', 'Three' ] as $name ) {
+			$site_id = $this->site_with_fonts( [ strtolower( $name ) => [ 'regular' => "$name.ttf" ] ] );
+			$this->model()->delete_site_record( $site_id );
+			$expected[] = "$name.ttf";
+		}
+
+		$files   = [];
+		$queries = $this->site_option_queries(
+			function () use ( &$files ) {
+				$files = $this->model()->get_files_used_by_other_sites();
+			}
+		);
+
+		sort( $files );
+		sort( $expected );
+		$this->assertSame( $expected, $files );
+		$this->assertCount( 1, $queries );
+	}
+
+	public function test_a_site_that_cant_be_read_could_use_any_file_or_font_id() {
+		$site_id = $this->site_with_fonts( [ 'brand' => [ 'regular' => 'Brand.ttf' ] ] );
+		$this->model()->delete_site_record( $site_id );
+
+		$this->with_failing_site_option_reads(
+			function () {
+				$this->assertNull( $this->model()->get_files_used_by_other_sites() );
+				$this->assertMatchesRegularExpression( '/^brand\d+$/', $this->model()->get_unique_id( 'brand' ) );
+			}
+		);
+	}
+
+	public function test_a_site_without_an_options_table_has_no_fonts() {
+		$site_id = $this->site_with_fonts( [ 'brand' => [ 'regular' => 'Brand.ttf' ] ] );
+		$this->model()->delete_site_record( $site_id );
+		$this->drop_site_options_table( $site_id );
+
+		$this->without_db_errors(
+			function () {
+				$this->assertSame( [], $this->model()->get_files_used_by_other_sites() );
+				$this->assertSame( 'brand', $this->model()->get_unique_id( 'brand' ) );
+			}
+		);
+	}
+
+	public function test_deleting_a_site_keeps_its_files_while_another_site_cant_be_read() {
+		$this->copy_fixture( 'Chewy.ttf', 'Own.ttf' );
+		$site_id = $this->site_with_fonts( [ 'mine' => [ 'regular' => 'Own.ttf' ] ] );
+		$this->model()->delete_site_record( $this->site_with_fonts( [] ) );
+
+		$this->with_failing_site_option_reads(
+			static function () use ( $site_id ) {
+				wp_delete_site( $site_id );
+			}
+		);
+
+		$this->assertFileExists( $this->font_path( 'Own.ttf' ) );
 	}
 
 	public function test_a_corrupt_record_is_read_again() {
@@ -284,6 +403,22 @@ class Test_Site_Custom_Fonts extends TestCase {
 
 		$this->assertSame( [ 'DejaVuSerifCondensed-Bold.ttf' ], $result['removed'] );
 		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+	}
+
+	public function test_deleting_a_core_font_keeps_its_plain_files_while_a_site_cant_be_read() {
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
+		$this->model()->delete_site_record( $this->recorded_site( [] ) );
+
+		$result = $this->with_failing_site_option_reads(
+			function () {
+				return $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
+			}
+		);
+
+		$this->assertSame( [], $result['removed'] );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed-Bold.ttf' ) );
 	}
 
 	public function test_deleting_a_core_font_removes_its_hashed_copy_beside_another_sites_custom_font() {
