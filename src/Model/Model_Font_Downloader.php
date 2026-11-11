@@ -233,8 +233,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	/**
 	 * @since 6.19.0
 	 */
-	public function get_font_path( string $file ): string {
-		return $this->font_sources->get_font_path( $file );
+	public function get_own_copy( string $file ): string {
+		return $this->font_sources->get_own_copy( $file );
 	}
 
 	/**
@@ -258,6 +258,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	public function is_core_font_file( string $file ): bool {
 		return $this->font_sources->is_core_font_file( $file );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function get_manifest_file( string $name ): string {
+		return $this->font_sources->get_manifest_file( $name );
 	}
 
 	/**
@@ -384,9 +391,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		}
 
 		$font_path = $this->font_sources->get_plain_path( $file );
-		$conflict  = is_file( $font_path );
+		$own_path  = $this->font_sources->get_own_copy( $file );
+		$own_copy  = $own_path !== '';
 
-		$own_copy = $this->font_sources->has_hashed_copy( $file ) || ( $conflict && ! $this->is_conflict( $file, $verify && $this->is_auto_install_enabled( $file ) ) );
+		/* A file at the name of a known size can still be another font's, which only its SHA-1 tells */
+		if ( $own_copy && $verify && $own_path === $font_path && $this->is_auto_install_enabled( $file ) ) {
+			$own_copy = ! $this->is_unknown_build( $file );
+		}
 
 		/* Copied in by hand or saved by another request, so any failure on record is stale */
 		if ( $own_copy ) {
@@ -403,7 +414,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return false;
 		}
 
-		$target = $conflict ? $this->font_sources->get_plain_path( $this->font_sources->get_hashed_name( $file ) ) : $font_path;
+		$conflict = is_file( $font_path );
+		$target   = $conflict ? $this->font_sources->get_plain_path( $this->font_sources->get_hashed_name( $file ) ) : $font_path;
 		if ( ! $this->save( $file, $target, $manifest[ $file ] ) ) {
 			$this->record_failure( $file );
 
@@ -448,17 +460,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Whether the existing file at a manifest name is another font's: no known build has its size, or with $verify its
-	 * SHA-1. A file that can't be read is left alone.
+	 * Whether the file at a manifest name has a SHA-1 no known build has, so is another font's. A file that can't be read,
+	 * or one with no other name to take, is left alone.
 	 *
 	 * @since 6.19.0
 	 */
-	protected function is_conflict( string $file, bool $verify ): bool {
-		if ( $this->font_sources->is_size_conflict( $file ) ) {
-			return true;
-		}
-
-		if ( ! $verify || $this->font_sources->get_hashed_name( $file ) === '' ) {
+	protected function is_unknown_build( string $file ): bool {
+		if ( $this->font_sources->get_hashed_name( $file ) === '' ) {
 			return false;
 		}
 
@@ -707,8 +715,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	/**
 	 * A core family's Font Manager row, `available` when none of it is on disk
 	 *
-	 * @param array{files: array<string, string>, sizes: array<string, int>, bytes: int} $family
-	 * @param array<string, string>                                                      $labels Font list labels by key
+	 * @param array{files: array<string, string>, paths: array<string, string>, bytes: int} $family
+	 * @param array<string, string>                                                         $labels Font list labels by key
 	 *
 	 * @return array|null Null for a family with nothing on disk that can't or shouldn't be installed
 	 *
@@ -716,17 +724,12 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function get_core_font_row( string $key, array $family, array $labels ): ?array {
 		/* Named as on disk, so the sizes and the preview are the font's own copy */
-		$on_disk = array_map(
-			function ( string $file ): string {
-				return basename( $this->get_font_path( $file ) );
-			},
-			array_filter(
-				$family['files'],
-				static function ( string $file ) use ( $family ): bool {
-					return isset( $family['sizes'][ $file ] );
-				}
-			)
-		);
+		$on_disk = [];
+		foreach ( $family['files'] as $style => $file ) {
+			if ( isset( $family['paths'][ $file ] ) ) {
+				$on_disk[ $style ] = basename( $family['paths'][ $file ] );
+			}
+		}
 
 		$can_download = $this->can_download_all( $family['files'] );
 		$installed    = count( $on_disk ) > 0;
@@ -798,9 +801,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Delete an unused downloaded family's files whatever their hash, keeping the licence files. A file with a copy under
-	 * its hashed name loses only the copy: the file at the name is another font's. A file at the name another site's
-	 * custom font uses is kept too, as every site shares the fonts folder.
+	 * Delete an unused downloaded family's own copies (see Model_Font_Sources::get_own_copy()), keeping the licence files
+	 * and any other font's file at a family file's name. A file at the name another site's custom font uses is kept too,
+	 * as every site shares the fonts folder.
 	 *
 	 * @return array{id: string, removed: string[], bytes: int, font: array|null}|WP_Error `font` is its row now, if it can
 	 *                                                                                     be installed again. 404 when
@@ -810,7 +813,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	public function delete_downloaded_font( string $key ) {
 		$family = $this->get_core_families()[ $key ] ?? null;
-		if ( $family === null || count( $family['sizes'] ) === 0 ) {
+		if ( $family === null || count( $family['paths'] ) === 0 ) {
 			return new WP_Error( 'font_not_downloaded', __( 'The font is not downloaded.', 'gravity-pdf' ), [ 'status' => 404 ] );
 		}
 
@@ -830,13 +833,12 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			$this->clear_failure( $file );
 			$this->delete_back_off( $file );
 
-			$size = $family['sizes'][ $file ] ?? null;
-			if ( $size === null ) {
+			$path = $family['paths'][ $file ] ?? null;
+			if ( $path === null ) {
 				continue;
 			}
 
 			/* Another site's file can be at the name (any, if a site couldn't be read); a hashed copy is the core font's */
-			$path = $this->get_font_path( $file );
 			if ( ( $shared === null || isset( $shared[ $file ] ) ) && $path === $this->font_sources->get_plain_path( $file ) ) {
 				if ( $shared !== null ) {
 					$this->log->notice( 'Kept a font file another site\'s custom font uses', [ 'name' => $file ] );
@@ -845,6 +847,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				continue;
 			}
 
+			$size = (int) filesize( $path );
 			if ( ! wp_delete_file_from_directory( $path, $this->data->template_font_location ) ) {
 				$this->log->warning( 'Downloaded font file could not be removed', [ 'name' => $file ] );
 				continue;
@@ -918,18 +921,15 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The downloadable sources' families: their files on the manifest by style (R, B, I, BI), the sizes of those on disk
-	 * and the bytes of them all
+	 * The downloadable sources' families: their files on the manifest by style (R, B, I, BI), the paths of their own
+	 * copies on disk (see Model_Font_Sources::get_own_copy()) and the bytes of them all
 	 *
-	 * @return array<string, array{files: array<string, string>, sizes: array<string, int>, bytes: int}>
+	 * @return array<string, array{files: array<string, string>, paths: array<string, string>, bytes: int}>
 	 *
 	 * @since 6.19.0
 	 */
 	protected function get_core_families(): array {
 		$families = [];
-
-		/* A Font Manager record's file at a family's name isn't the family's: its files have hashed names */
-		$collisions = $this->font_sources->get_record_collisions();
 
 		foreach ( $this->font_sources->get_sources() as $id => $source ) {
 			if ( empty( $source['manifest'] ) ) {
@@ -939,12 +939,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			$manifest = $this->font_sources->get_source_manifest( (string) $id );
 			foreach ( $source['families'] ?? [] as $key => $family ) {
 				$key = (string) $key;
-				if ( ! empty( $families[ $key ]['sizes'] ) || ! is_array( $family ) ) {
+				if ( ! empty( $families[ $key ]['paths'] ) || ! is_array( $family ) ) {
 					continue;
 				}
 
-				$family = $this->font_sources->use_hashed_names( $family, $collisions );
-				$files  = [];
+				$files = [];
 				foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
 					$file = $family[ $style ] ?? null;
 					if ( is_string( $file ) && isset( $manifest[ $file ] ) && $this->font_sources->is_core_font_file( $file ) ) {
@@ -952,20 +951,20 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 					}
 				}
 
-				$sizes = [];
+				$paths = [];
 				$bytes = 0;
 				foreach ( $files as $file ) {
 					$bytes += (int) $manifest[ $file ]['size'];
-					$path   = $this->get_font_path( $file );
-					if ( is_file( $path ) ) {
-						$sizes[ $file ] = (int) filesize( $path );
+					$path   = $this->font_sources->get_own_copy( $file );
+					if ( $path !== '' ) {
+						$paths[ $file ] = $path;
 					}
 				}
 
 				if ( count( $files ) > 0 ) {
 					$families[ $key ] = [
 						'files' => $files,
-						'sizes' => $sizes,
+						'paths' => $paths,
 						'bytes' => $bytes,
 					];
 				}
@@ -1493,17 +1492,24 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->with_wanted( $this->required_fonts->get_required_font_files() );
 		$gave_up   = $this->get_failed_files();
 
-		$files = array_filter(
-			$files,
-			function ( $file ) use ( $gave_up ) {
-				return ! isset( $gave_up[ $file ] ) && ! $this->font_sources->has_hashed_copy( $file );
+		$missing   = [];
+		$installed = [];
+		foreach ( $files as $file ) {
+			if ( isset( $gave_up[ $file ] ) ) {
+				continue;
 			}
-		);
 
-		$installed = array_filter( $files, [ $this->font_sources, 'is_installed' ] );
+			/* A hashed copy was checked when it was saved */
+			$path = $this->font_sources->get_own_copy( $file );
+			if ( $path === '' ) {
+				$missing[] = $file;
+			} elseif ( $path === $this->font_sources->get_plain_path( $file ) ) {
+				$installed[] = $file;
+			}
+		}
 
 		/* Those needing a download go first, so hashing the rest can't push one into a paused run */
-		return array_merge( array_diff( $files, $installed ), $installed );
+		return array_merge( $missing, $installed );
 	}
 
 	/**

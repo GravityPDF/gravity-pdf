@@ -290,14 +290,15 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->assertSame( 1, $this->required->get_installed_counts()['core']['installed'] );
 	}
 
-	public function test_a_family_sharing_a_name_with_a_record_requires_its_hashed_file() {
+	public function test_a_family_sharing_a_name_with_a_record_requires_its_manifest_file() {
 		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
 		$this->put_other_font_at( self::FONT );
 		$this->add_record( 'mine', [ 'regular' => self::FONT ] );
 		$hashed = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT );
 
-		$this->assertContains( $hashed, $this->required->get_required_font_files() );
-		$this->assertNotContains( self::FONT, $this->required->get_required_font_files() );
+		$this->assertContains( self::FONT, $this->required->get_required_font_files() );
+		$this->assertNotContains( $hashed, $this->required->get_required_font_files() );
+		$this->assertContains( self::FONT, $this->required->get_missing_files(), 'The record\'s file is not the family\'s copy' );
 		$this->assertSame( [ 'installed' => 0, 'total' => 4, 'manifest' => true ], $this->required->get_installed_counts()['core'] );
 
 		$this->copy_fixture( self::FONT, $hashed );
