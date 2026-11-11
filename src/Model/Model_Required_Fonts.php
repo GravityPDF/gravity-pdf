@@ -44,6 +44,13 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	public const SITE_FONTS_PREFIX = 'gfpdf_site_fonts_';
 
 	/**
+	 * The options a site's fonts are read from. `gfpdf_settings` also holds its custom fonts.
+	 *
+	 * @since 6.19.0
+	 */
+	protected const SITE_OPTIONS = [ 'gfpdf_settings', 'gf_db_version', 'WPLANG' ];
+
+	/**
 	 * How many forms' meta the PDF font scan reads at a time
 	 *
 	 * @var int
@@ -88,14 +95,21 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	protected $queued_sites = [];
 
 	/**
+	 * @var Model_Site_Options
+	 * @since 6.19.0
+	 */
+	protected $site_options;
+
+	/**
 	 * Work out the required fonts from the font sources and the saved settings, logging forms it can't read
 	 *
 	 * @since 6.19.0
 	 */
-	public function __construct( Model_Font_Sources $font_sources, Helper_Abstract_Options $options, LoggerInterface $log ) {
+	public function __construct( Model_Font_Sources $font_sources, Helper_Abstract_Options $options, LoggerInterface $log, ?Model_Site_Options $site_options = null ) {
 		$this->font_sources = $font_sources;
 		$this->options      = $options;
 		$this->log          = $log;
+		$this->site_options = $site_options ?? new Model_Site_Options( $log );
 	}
 
 	/**
@@ -564,6 +578,30 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Read the sites' settings ahead in one query, for the per-site reads that follow; [] ends it. A site deleted since
+	 * is left out, as its missing table would fail the query.
+	 *
+	 * @param int[] $site_ids
+	 *
+	 * @since 6.19.0
+	 */
+	public function prime_site_options( array $site_ids ): void {
+		if ( is_multisite() && $site_ids !== [] ) {
+			/* Whole sites, which also fills the site cache that get_site() reads */
+			$sites = get_sites(
+				[
+					'site__in' => array_map( 'intval', $site_ids ),
+					'number'   => 0,
+				]
+			);
+
+			$site_ids = array_map( 'intval', wp_list_pluck( $sites, 'blog_id' ) );
+		}
+
+		$this->site_options->prime( $site_ids, self::SITE_OPTIONS );
+	}
+
+	/**
 	 * Record the font keys a site uses, in a row of its own so sites saving at once can't overwrite each other
 	 *
 	 * @since 6.19.0
@@ -739,22 +777,14 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 		global $wpdb;
 
 		$prefix  = $wpdb->get_blog_prefix( $site_id );
-		$options = $wpdb->get_results( "SELECT option_name, option_value FROM {$prefix}options WHERE option_name IN ( 'gfpdf_settings', 'gf_db_version', 'WPLANG' )", OBJECT_K ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$options = $this->site_options->get_options( [ $site_id ], self::SITE_OPTIONS )[ $site_id ] ?? null;
 
 		/* Read as unset, the site's default font would be left out */
-		if ( $wpdb->last_error !== '' ) {
-			$this->log->error(
-				'A site\'s settings could not be read for its fonts',
-				[
-					'site_id' => $site_id,
-					'error'   => $wpdb->last_error,
-				]
-			);
+		if ( $options === null ) {
+			$this->log->error( 'A site\'s settings could not be read for its fonts', [ 'site_id' => $site_id ] );
 
 			return null;
 		}
-
-		$options = wp_list_pluck( (array) $options, 'option_value' );
 
 		$settings = maybe_unserialize( $options['gfpdf_settings'] ?? '' );
 		$default  = $this->normalise_font( is_array( $settings ) ? ( $settings['default_font'] ?? '' ) : '' );

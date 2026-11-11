@@ -1136,23 +1136,15 @@ class Test_Model_Font_Downloader extends TestCase {
 	}
 
 	public function test_the_cleanup_prunes_nothing_until_a_site_it_couldnt_read_is_read() {
-		global $wpdb;
-
 		$this->copy_fixture( self::FONT );
 		touch( $this->font_path( self::FONT ), time() - HOUR_IN_SECONDS );
 		$this->set_font_cleanup( $this->font_cleanup_state() );
 
-		$break = static function ( $query ) {
-			return strpos( $query, "option_name IN ( 'gfpdf_settings'" ) !== false ? str_replace( 'FROM', 'FROM gfpdf_missing_table,', $query ) : $query;
-		};
-		add_filter( 'query', $break );
-		$suppress = $wpdb->suppress_errors( true );
-		try {
-			$this->downloader->cleanup();
-		} finally {
-			remove_filter( 'query', $break );
-			$wpdb->suppress_errors( $suppress );
-		}
+		$this->with_failing_site_option_reads(
+			function () {
+				$this->downloader->cleanup();
+			}
+		);
 
 		$this->assertFileExists( $this->font_path( self::FONT ) );
 		$this->assertSame( [ get_current_blog_id() ], $this->get_font_cleanup()['sites'] );

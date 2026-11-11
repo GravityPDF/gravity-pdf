@@ -52,8 +52,15 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 */
 	public const SITE_FONTS_CACHE = 'gfpdf_site_custom_fonts';
 
-	public function __construct( Helper_Abstract_Options $options ) {
-		$this->options = $options;
+	/**
+	 * @var Model_Site_Options
+	 * @since 6.19.0
+	 */
+	protected $site_options;
+
+	public function __construct( Helper_Abstract_Options $options, ?Model_Site_Options $site_options = null ) {
+		$this->options      = $options;
+		$this->site_options = $site_options ?? new Model_Site_Options( \GPDFAPI::get_log_class() );
 	}
 
 	/**
@@ -181,15 +188,14 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 *
 	 * @param int $site_id The site to leave out, the current one by default
 	 *
-	 * @return string[]
+	 * @return string[]|null Null when a site's fonts couldn't be read, so any file could be its
 	 *
 	 * @since 6.19.0
 	 */
-	public function get_files_used_by_other_sites( int $site_id = 0 ): array {
-		$sites = $this->get_sites_fonts();
-		unset( $sites[ $site_id ?: get_current_blog_id() ] );
+	public function get_files_used_by_other_sites( int $site_id = 0 ): ?array {
+		$sites = $this->get_other_sites_fonts( $site_id );
 
-		return array_map( 'strval', array_keys( $this->get_file_set( $sites ) ) );
+		return $sites === null ? null : array_map( 'strval', array_keys( $this->get_file_set( $sites ) ) );
 	}
 
 	/**
@@ -223,7 +229,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_site_font_files( int $site_id ): array {
-		return $this->get_site_records()[ $site_id ] ?? $this->get_font_files( $this->read_site_fonts( $site_id ) );
+		return $this->get_site_records()[ $site_id ] ?? $this->read_site_fonts( $site_id ) ?? [];
 	}
 
 	/**
@@ -248,10 +254,10 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function record_missing_site_fonts( $site_id ): void {
-		$fonts = $this->read_site_fonts( (int) $site_id );
+		$files = $this->read_site_fonts( (int) $site_id );
 
 		/* An empty record would give the site's files to other sites' PDFs and deletes, so the sync reads it again */
-		if ( $fonts === null ) {
+		if ( $files === null ) {
 			$downloader = \GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
 			if ( $downloader instanceof Model_Font_Downloader ) {
 				$downloader->schedule_site_fonts_retry();
@@ -260,7 +266,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 			return;
 		}
 
-		add_network_option( get_main_network_id(), self::SITE_FONTS_PREFIX . (int) $site_id, $this->get_font_files( $fonts ) );
+		add_network_option( get_main_network_id(), self::SITE_FONTS_PREFIX . (int) $site_id, $files );
 	}
 
 	/**
@@ -293,21 +299,28 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Every site's font files by font ID. A site with no record yet is read from its options.
+	 * The other sites' font files by font ID. A site with no record yet is read from its options.
 	 *
-	 * @return array<int, array<string, string[]>> By site ID
+	 * @param int $site_id The site to leave out, the current one by default
+	 *
+	 * @return array<int, array<string, string[]>>|null By site ID, or null when a site's options couldn't be read
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_sites_fonts(): array {
+	protected function get_other_sites_fonts( int $site_id = 0 ): ?array {
 		if ( ! is_multisite() ) {
 			return [];
 		}
 
 		$records = $this->get_site_records();
-		$sites   = [];
-		foreach ( $this->get_site_ids() as $id ) {
-			$sites[ $id ] = $records[ $id ] ?? $this->get_font_files( $this->read_site_fonts( $id ) );
+		$ids     = array_diff( $this->get_site_ids(), [ $site_id ?: get_current_blog_id() ] );
+		$sites   = array_intersect_key( $records, array_flip( $ids ) );
+		foreach ( $this->read_sites_fonts( array_diff( $ids, array_keys( $records ) ) ) as $id => $files ) {
+			if ( $files === null ) {
+				return null;
+			}
+
+			$sites[ $id ] = $files;
 		}
 
 		return $sites;
@@ -375,31 +388,35 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * A site's `custom_fonts` setting, read from its options table to avoid switch_to_blog()
+	 * A site's font files by font ID, read from its options table to avoid switch_to_blog()
 	 *
-	 * @return mixed Null when the options table couldn't be read
+	 * @return array<string, string[]>|null Null when its options couldn't be read
 	 *
 	 * @since 6.19.0
 	 */
-	protected function read_site_fonts( int $site_id ) {
-		global $wpdb;
+	protected function read_site_fonts( int $site_id ): ?array {
+		return $this->read_sites_fonts( [ $site_id ] )->current();
+	}
 
-		$prefix   = $wpdb->get_blog_prefix( $site_id );
-		$settings = maybe_unserialize( $wpdb->get_var( "SELECT option_value FROM {$prefix}options WHERE option_name = 'gfpdf_settings' LIMIT 1" ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	/**
+	 * @param int[] $site_ids
+	 *
+	 * @return \Generator<int, array<string, string[]>|null> Each site's font files by font ID, or null when its options
+	 *                                                        couldn't be read
+	 *
+	 * @since 6.19.0
+	 */
+	protected function read_sites_fonts( array $site_ids ): \Generator {
+		foreach ( $this->site_options->each_site_options( $site_ids, [ 'gfpdf_settings' ] ) as $site_id => $options ) {
+			if ( $options === null ) {
+				yield $site_id => null;
+				continue;
+			}
 
-		if ( $wpdb->last_error !== '' ) {
-			\GPDFAPI::get_log_class()->error(
-				'A site\'s custom fonts could not be read',
-				[
-					'site_id' => $site_id,
-					'error'   => $wpdb->last_error,
-				]
-			);
+			$settings = maybe_unserialize( $options['gfpdf_settings'] ?? '' );
 
-			return null;
+			yield $site_id => $this->get_font_files( is_array( $settings ) ? ( $settings['custom_fonts'] ?? [] ) : [] );
 		}
-
-		return is_array( $settings ) ? ( $settings['custom_fonts'] ?? [] ) : [];
 	}
 
 	/**
@@ -462,8 +479,8 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	public function get_unique_id( string $id ): string {
 		$unique_id = false;
 
-		/* mPDF caches a font's metrics by its ID in a folder every site shares, so two sites' fonts can't share one */
-		$other_sites = $this->get_other_sites_font_ids();
+		/* mPDF caches metrics by font ID in a folder every site shares; a site that couldn't be read may have this ID */
+		$other_sites = $this->get_other_sites_font_ids() ?? [ $id => true ];
 
 		do {
 			if ( $this->has_unique_font_id( $id ) && ! isset( $other_sites[ $id ] ) ) {
@@ -557,13 +574,15 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @return array<string, true> The IDs of the other sites' fonts => true
+	 * @return array<string, true>|null The IDs of the other sites' fonts => true, or null when a site couldn't be read
 	 *
 	 * @since 6.19.0
 	 */
-	protected function get_other_sites_font_ids(): array {
-		$sites = $this->get_sites_fonts();
-		unset( $sites[ get_current_blog_id() ] );
+	protected function get_other_sites_font_ids(): ?array {
+		$sites = $this->get_other_sites_fonts();
+		if ( $sites === null ) {
+			return null;
+		}
 
 		$ids = [];
 		foreach ( $sites as $fonts ) {

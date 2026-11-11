@@ -46,6 +46,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		'bolditalics' => true,
 	];
 
+
 	/**
 	 * Failed files awaiting their one retry, and those that gave up, which the admin notice lists. An option of the
 	 * main network, as every site shares the fonts folder
@@ -820,7 +821,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 		$removed = [];
 		$bytes   = 0;
-		$shared  = array_flip( $this->font_sources->get_files_used_by_other_sites() );
+		$shared  = $this->font_sources->get_files_used_by_other_sites();
+		$shared  = $shared === null ? null : array_flip( $shared );
+		if ( $shared === null ) {
+			$this->log->warning( 'Kept the font\'s files at their plain names, as another site\'s fonts could not be read', [ 'font' => $key ] );
+		}
 		foreach ( $files as $file ) {
 			$this->clear_failure( $file );
 			$this->delete_back_off( $file );
@@ -830,10 +835,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				continue;
 			}
 
-			/* Another site's adopted copy or unrecorded site's file can be at the name; a hashed copy is the core font's */
+			/* Another site's file can be at the name (any, if a site couldn't be read); a hashed copy is the core font's */
 			$path = $this->get_font_path( $file );
-			if ( isset( $shared[ $file ] ) && $path === $this->font_sources->get_plain_path( $file ) ) {
-				$this->log->notice( 'Kept a font file another site\'s custom font uses', [ 'name' => $file ] );
+			if ( ( $shared === null || isset( $shared[ $file ] ) ) && $path === $this->font_sources->get_plain_path( $file ) ) {
+				if ( $shared !== null ) {
+					$this->log->notice( 'Kept a font file another site\'s custom font uses', [ 'name' => $file ] );
+				}
+
 				continue;
 			}
 
@@ -1297,16 +1305,18 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function backfill_site_fonts(): bool {
-		$left = $this->within_budget(
+		$read_ahead = [ $this->required_fonts, 'prime_site_options' ];
+		$left       = $this->within_budget(
 			$this->required_fonts->get_sites_without_fonts(),
 			function ( $site_id ) {
 				$this->required_fonts->write_site_fonts( (int) $site_id );
-			}
+			},
+			$read_ahead
 		);
 
 		$custom_fonts = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
 		if ( $left === [] && $custom_fonts instanceof Model_Custom_Fonts ) {
-			$left = $this->within_budget( $custom_fonts->get_sites_without_records(), [ $custom_fonts, 'record_missing_site_fonts' ] );
+			$left = $this->within_budget( $custom_fonts->get_sites_without_records(), [ $custom_fonts, 'record_missing_site_fonts' ], $read_ahead );
 		}
 
 		return $left === [];
@@ -1373,7 +1383,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 				$keys += array_fill_keys( $site_keys, true );
 				$files = array_merge( $files, $this->get_site_custom_font_files( (int) $site_id, $site_keys ) );
-			}
+			},
+			[ $this->required_fonts, 'prime_site_options' ]
 		);
 		$keys   = array_map( 'strval', array_keys( $keys ) );
 		$files  = array_values( array_unique( $files ) );
@@ -1436,23 +1447,34 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	/**
 	 * Run the callback on each item until the time budget runs out
 	 *
-	 * @param mixed[] $items
+	 * @param mixed[]       $items
+	 * @param callable|null $read_ahead Given each chunk of items before they're reached, then [] once the loop ends
 	 *
 	 * @return mixed[] The items it didn't reach
 	 *
 	 * @since 6.19.0
 	 */
-	protected function within_budget( array $items, callable $each ): array {
+	protected function within_budget( array $items, callable $each, ?callable $read_ahead = null ): array {
 		$items    = array_values( $items );
 		$deadline = microtime( true ) + $this->sync_budget;
 
-		foreach ( $items as $i => $item ) {
-			/* At least one per run, so slow hosts make progress */
-			if ( $i > 0 && microtime( true ) >= $deadline ) {
-				return array_slice( $items, $i );
-			}
+		try {
+			foreach ( $items as $i => $item ) {
+				/* At least one per run, so slow hosts make progress */
+				if ( $i > 0 && microtime( true ) >= $deadline ) {
+					return array_slice( $items, $i );
+				}
 
-			$each( $item );
+				if ( $read_ahead !== null && $i % Model_Site_Options::CHUNK_SIZE === 0 ) {
+					$read_ahead( array_slice( $items, $i, Model_Site_Options::CHUNK_SIZE ) );
+				}
+
+				$each( $item );
+			}
+		} finally {
+			if ( $read_ahead !== null ) {
+				$read_ahead( [] );
+			}
 		}
 
 		return [];

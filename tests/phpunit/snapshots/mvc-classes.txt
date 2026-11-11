@@ -33,6 +33,7 @@ Model_Required_Fonts => GFPDF\Model\Model_Required_Fonts
 Model_Settings => GFPDF\Model\Model_Settings
 Model_Shortcodes => GFPDF\Model\Model_Shortcodes
 Model_Signed_Url_Trust => GFPDF\Model\Model_Signed_Url_Trust
+Model_Site_Options => GFPDF\Model\Model_Site_Options
 Model_System_Report => GFPDF\Model\Model_System_Report
 Model_Templates => GFPDF\Model\Model_Templates
 Rest_Download_Pdf => GFPDF\Rest\Rest_Download_Pdf

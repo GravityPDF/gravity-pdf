@@ -828,6 +828,11 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		}
 
 		$shared = $this->model->get_files_used_by_other_sites( $site_id );
+		if ( $shared === null ) {
+			$this->log->warning( 'Kept font files, as another site\'s fonts could not be read', [ 'files' => $files ] );
+
+			return;
+		}
 
 		foreach ( $files as $file ) {
 			if ( in_array( $file, $shared, true ) ) {
