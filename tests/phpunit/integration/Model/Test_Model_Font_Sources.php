@@ -350,8 +350,8 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertFalse( $this->model->is_core_font_file( 'DejaVuinfo.txt' ) );
 		$this->assertFalse( $this->model->is_core_font_file( '../DejaVuSerifCondensed.ttf' ) );
 		$this->assertFalse( $this->model->is_core_font_file( 'gfpdf-Arimo-Regular.ttf' ) );
-		$this->assertSame( $this->font_dir . 'Garuda.ttf', $this->model->get_font_path( 'Garuda.ttf' ) );
-		$this->assertFileDoesNotExist( $this->font_dir . 'Garuda.ttf' );
+		$this->assertSame( $this->font_dir . 'Garuda.ttf', $this->model->get_plain_path( 'Garuda.ttf' ) );
+		$this->assertSame( '', $this->model->get_own_copy( 'Garuda.ttf' ) );
 		$this->assertSame( PDF_PLUGIN_DIR . 'fonts/gfpdf-Arimo-Regular.ttf', $this->model->get_fallback_file() );
 	}
 
@@ -1064,38 +1064,12 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertSame( 'DejaVuSans-Bold.ttf', $fonts['dejavusans']['B'], 'Only the shared file is renamed' );
 		$this->assertSame( [ 'DejaVuSans.ttf' => $hashed ], $this->model->get_record_collisions() );
 		$this->assertTrue( $this->model->is_record_file( 'DejaVuSans.ttf' ) );
-		$this->assertArrayHasKey( $hashed, $this->model->get_manifest() );
-		$this->assertArrayHasKey( $hashed, $this->model->get_source_manifest( 'core' ) );
-		$this->assertTrue( $this->model->is_core_font_file( $hashed ) );
+		$this->assertArrayNotHasKey( $hashed, $this->model->get_manifest(), 'The hashed name is no manifest file of its own' );
+		$this->assertSame( 'DejaVuSans.ttf', $this->model->get_manifest_file( $hashed ) );
+		$this->assertFalse( $this->model->is_installed( 'DejaVuSans.ttf' ), 'The record\'s file is not the family\'s copy' );
 	}
 
-	public function test_a_collision_builds_the_aliased_manifest_once_until_the_collisions_change() {
-		$model = new class( GPDFAPI::get_data_class(), $this->custom_fonts, GPDFAPI::get_log_class() ) extends Model_Font_Sources {
-			/** @var int */
-			public $built = 0;
-
-			protected function with_record_aliases( array $manifest ): array {
-				$this->built++;
-
-				return parent::with_record_aliases( $manifest );
-			}
-		};
-
-		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
-		$this->add_record( 'mine', [ 'regular' => 'DejaVuSans.ttf' ] );
-		$hashed = $model->get_hashed_name( 'DejaVuSans.ttf' );
-
-		$model->is_installed( 'DejaVuSans.ttf' );
-		$this->assertArrayHasKey( $hashed, $model->get_manifest() );
-		$this->assertSame( 1, $model->built );
-
-		GPDFAPI::delete_plugin_option( 'custom_fonts' );
-		$model->flush();
-
-		$this->assertArrayNotHasKey( $hashed, $model->get_manifest() );
-	}
-
-	public function test_the_manifest_has_every_collision_not_those_found_first() {
+	public function test_every_record_file_at_a_family_name_is_a_collision() {
 		$this->put_longer_font_at( 'DejaVuSans.ttf', 'DejaVuSans.ttf' );
 		$this->put_longer_font_at( 'DejaVuSans-Bold.ttf', 'DejaVuSans-Bold.ttf' );
 		$this->add_record(
@@ -1106,11 +1080,35 @@ class Test_Model_Font_Sources extends TestCase {
 			]
 		);
 
-		$manifest = $this->model->get_manifest();
+		$this->assertSame( [ 'DejaVuSans.ttf', 'DejaVuSans-Bold.ttf' ], array_keys( $this->model->get_record_collisions() ) );
+	}
 
-		$this->assertCount( 2, $this->model->get_record_collisions() );
-		$this->assertArrayHasKey( $this->model->get_record_collisions()['DejaVuSans.ttf'], $manifest );
-		$this->assertArrayHasKey( $this->model->get_record_collisions()['DejaVuSans-Bold.ttf'], $manifest );
+	public function test_the_own_copy_is_the_hashed_copy_else_the_file_at_the_name_unless_it_is_another_fonts() {
+		$file   = 'DejaVuSans.ttf';
+		$hashed = $this->model->get_hashed_name( $file );
+
+		$this->assertSame( '', $this->model->get_own_copy( $file ), 'Nothing on disk' );
+
+		$this->copy_fixture( $file );
+		$this->assertSame( $this->font_path( $file ), $this->model->get_own_copy( $file ) );
+
+		$this->put_other_font_at( $file );
+		$this->assertSame( '', $this->model->get_own_copy( $file ), 'Another font\'s file at the name' );
+		$this->assertFalse( $this->model->is_installed( $file ) );
+
+		$this->copy_fixture( $file, $hashed );
+		$this->assertSame( $this->font_path( $hashed ), $this->model->get_own_copy( $file ) );
+		$this->assertTrue( $this->model->is_installed( $file ) );
+	}
+
+	public function test_a_hashed_name_stands_for_its_manifest_file_only_for_the_current_release() {
+		$file   = 'DejaVuSans.ttf';
+		$hashed = $this->model->get_hashed_name( $file );
+
+		$this->assertSame( $file, $this->model->get_manifest_file( $file ) );
+		$this->assertSame( $file, $this->model->get_manifest_file( $hashed ) );
+		$this->assertSame( '', $this->model->get_manifest_file( 'DejaVuSans-00000000.ttf' ), 'An older release\'s copy' );
+		$this->assertSame( '', $this->model->get_manifest_file( 'Chewy.ttf' ) );
 	}
 
 	public function test_a_record_holding_a_known_build_of_the_core_font_is_not_custom() {
@@ -1160,7 +1158,10 @@ class Test_Model_Font_Sources extends TestCase {
 		$renamed = array_keys( $model->get_source_manifest( 'core' ) )[0];
 
 		$this->assertSame( '', $model->get_hashed_name( $renamed ) );
-		$this->assertFalse( $model->is_size_conflict( $renamed ) );
+
+		/* With no other name to take, the file at the name is the one used */
+		$this->copy_fixture( 'DejaVuSans.ttf', $renamed );
+		$this->assertTrue( $model->is_installed( $renamed ) );
 	}
 
 	public function test_two_sources_using_one_name_for_the_same_file_share_it() {
@@ -1204,21 +1205,18 @@ class Test_Model_Font_Sources extends TestCase {
 	public function test_a_file_is_another_fonts_when_its_size_is_no_known_build() {
 		$model = $this->get_model_with_manifest( [ 'Mine.ttf' => $this->manifest_entry( 'DejaVuSans.ttf', 'https://example.com/Mine.ttf' ) ] );
 
-		$this->assertFalse( $model->is_size_conflict( 'Mine.ttf' ), 'Missing' );
-		$this->assertFalse( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertFalse( $model->is_installed( 'Mine.ttf' ), 'Missing' );
 
 		$this->copy_fixture( 'DejaVuSans.ttf', 'Mine.ttf' );
-		$this->assertFalse( $model->is_size_conflict( 'Mine.ttf' ) );
 		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
 
 		$this->copy_fixture( 'Chewy.ttf', 'Mine.ttf' );
-		$this->assertTrue( $model->is_size_conflict( 'Mine.ttf' ) );
 		$this->assertFalse( $model->is_installed( 'Mine.ttf' ) );
 		$this->assertFileExists( $this->font_dir . 'Mine.ttf', 'The file at its name' );
 
 		$this->copy_fixture( 'DejaVuSans.ttf', $model->get_hashed_name( 'Mine.ttf' ) );
 		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
-		$this->assertSame( $this->font_dir . $model->get_hashed_name( 'Mine.ttf' ), $model->get_font_path( 'Mine.ttf' ) );
+		$this->assertSame( $this->font_dir . $model->get_hashed_name( 'Mine.ttf' ), $model->get_own_copy( 'Mine.ttf' ) );
 	}
 
 	public function test_an_older_build_of_a_file_has_a_known_size() {
@@ -1227,7 +1225,6 @@ class Test_Model_Font_Sources extends TestCase {
 
 		$this->copy_fixture( 'Chewy.ttf', 'Mine.ttf' );
 
-		$this->assertFalse( $model->is_size_conflict( 'Mine.ttf' ) );
 		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
 		$this->assertCount( 2, $model->get_known_builds( 'Mine.ttf' ) );
 	}

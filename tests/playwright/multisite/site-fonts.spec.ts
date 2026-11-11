@@ -6,6 +6,7 @@ import {
 	logInToSubsite as logIn,
 } from '@self:playwright/utils/multisite';
 import { wpCli } from '@self:playwright/utils/wp-cli';
+import { coreFontStandIn } from '@self:playwright/utils/core-fonts';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -192,7 +193,9 @@ test.describe('Fonts of a Multisite subsite', () => {
 		expect(uploaded.status()).toBe(200);
 
 		// A file of the family that no site's custom font uses
-		wpCli(`cp ${FONTS}/${CORE_FILE} ${FONTS}/${CORE_BOLD_FILE}`);
+		wpCli(
+			coreFontStandIn(ROBOTO_IN_CONTAINER, `${FONTS}/${CORE_BOLD_FILE}`)
+		);
 
 		await page.goto('/wp-admin/index.php');
 
@@ -246,7 +249,7 @@ test.describe('Fonts of a Multisite subsite', () => {
 		await subsite.context().close();
 
 		// The custom font's delete removed its file, so put one back at the core font's name
-		wpCli(`cp ${ROBOTO_IN_CONTAINER} ${FONTS}/${CORE_FILE}`);
+		wpCli(coreFontStandIn(ROBOTO_IN_CONTAINER, `${FONTS}/${CORE_FILE}`));
 
 		await page.goto('/wp-admin/index.php');
 		const deleted = await send(

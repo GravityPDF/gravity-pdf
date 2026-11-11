@@ -4,6 +4,7 @@ import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf, { type FontUpload } from '@self:playwright/utils/gravitypdf';
 import { wpCli } from '@self:playwright/utils/wp-cli';
+import { coreFontStandIn } from '@self:playwright/utils/core-fonts';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -376,13 +377,15 @@ test.describe('Font Manager', () => {
 	test.describe('Core and custom fonts in one list', () => {
 		const seededFiles: string[] = [];
 
-		// Downloads are off on this site (see tools/mu-plugins), so copy in a core font no other spec uses
+		// Seeds a core font no other spec uses
 		const seedCoreFont = (...files: string[]) => {
 			seededFiles.push(...files);
 			wpCli(
-				...files.map(
-					(file) =>
-						`cp wp-content/plugins/gravity-pdf/fonts/gfpdf-Arimo-Regular.ttf ${FONTS_DIR}/${file}`
+				...files.map((file) =>
+					coreFontStandIn(
+						'wp-content/plugins/gravity-pdf/fonts/gfpdf-Arimo-Regular.ttf',
+						`${FONTS_DIR}/${file}`
+					)
 				)
 			);
 		};

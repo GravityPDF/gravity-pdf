@@ -467,7 +467,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertTrue( $this->downloader->download( self::FONT ) );
 		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_path( $hashed ) );
 		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ), 'The other font is left alone' );
-		$this->assertSame( $this->font_path( $hashed ), $this->downloader->get_font_path( self::FONT ) );
+		$this->assertSame( $this->font_path( $hashed ), $this->downloader->get_own_copy( self::FONT ) );
 		$this->assertCount( 1, $this->log_messages( 'Font saved under a new name as another font has its name' ) );
 		$this->assertNoStrayTmpFiles();
 
@@ -477,10 +477,16 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [], $this->requested );
 	}
 
-	public function test_saving_a_hashed_copy_removes_the_copy_of_an_older_release_but_not_a_lookalike() {
+	/**
+	 * @dataProvider provider_other_font_at_the_name
+	 */
+	public function test_saving_a_hashed_copy_removes_the_copy_of_an_older_release_but_not_a_lookalike( bool $is_record ) {
 		$old = 'DejaVuSerifCondensed-' . substr( (string) key( $this->fixture_blob( 'DejaVuSans.ttf' ) ), 0, 8 ) . '.ttf';
 
 		$this->put_other_font_at( self::FONT );
+		if ( $is_record ) {
+			$this->add_record( 'mine', [ 'regular' => self::FONT ] );
+		}
 		$this->copy_fixture( 'DejaVuSans.ttf', $old );
 		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-deadbeef.ttf' );
 		$this->serve_font_downloads();
@@ -492,15 +498,21 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( self::FONT ) );
 	}
 
+	public function provider_other_font_at_the_name(): array {
+		return [
+			'a loose file'               => [ false ],
+			'a Font Manager record file' => [ true ],
+		];
+	}
+
 	public function test_the_hashed_name_is_the_stem_the_first_eight_of_the_sha_and_the_extension() {
 		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 		$sha     = $sources->get_manifest()[ self::FONT ]['sha'];
 
 		$this->assertSame( 'DejaVuSerifCondensed-' . substr( $sha, 0, 8 ) . '.ttf', $sources->get_hashed_name( self::FONT ) );
 		$this->assertSame( '', $sources->get_hashed_name( 'NotAFont.ttf' ) );
-		$this->assertTrue( $sources->is_hashed_copy( $sources->get_hashed_name( self::FONT ) ) );
-		$this->assertFalse( $sources->is_hashed_copy( self::FONT ) );
-		$this->assertFalse( $sources->is_hashed_copy( 'DejaVuSerifCondensed-00000000.ttf' ) );
+		$this->assertSame( self::FONT, $sources->get_manifest_file( $sources->get_hashed_name( self::FONT ) ) );
+		$this->assertSame( '', $sources->get_manifest_file( 'DejaVuSerifCondensed-00000000.ttf' ) );
 	}
 
 	public function test_another_fonts_file_stays_when_downloads_are_off() {
@@ -510,7 +522,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$this->assertFalse( $this->downloader->download( self::FONT ) );
 		$this->assertSame( [], $this->requested );
-		$this->assertSame( $this->font_path( self::FONT ), $this->downloader->get_font_path( self::FONT ) );
+		$this->assertSame( '', $this->downloader->get_own_copy( self::FONT ) );
 		$this->assertFileExists( $this->font_path( self::FONT ), 'mPDF can still load it' );
 	}
 
@@ -1249,8 +1261,7 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->copy_fixture( self::FONT, self::FONT );
 		$this->copy_fixture( 'Chewy.ttf', $sources->get_hashed_name( self::FONT ) );
 
-		$this->assertFalse( $sources->has_hashed_copy( self::FONT ) );
-		$this->assertSame( $this->font_path( self::FONT ), $sources->get_font_path( self::FONT ) );
+		$this->assertSame( $this->font_path( self::FONT ), $sources->get_own_copy( self::FONT ) );
 	}
 
 	public function test_only_a_manifest_files_hashed_form_is_a_reserved_name() {
@@ -1859,7 +1870,7 @@ class Test_Model_Font_Downloader extends TestCase {
 	 * @return string[]
 	 */
 	private function font_paths( array $files ): array {
-		return array_map( [ GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'get_font_path' ], $files );
+		return array_map( [ GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), 'get_plain_path' ], $files );
 	}
 
 	/**

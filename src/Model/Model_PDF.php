@@ -2385,8 +2385,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			$font_name  = basename( $font );
 			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
 
-			/* Check if it exists already, otherwise add it. A core font's copy under a hashed name is found by that font */
-			if ( isset( $fonts[ $short_name ] ) || isset( $claimed[ $font_name ] ) || in_array( $font_name, $flattened_fonts_array, true ) || $this->get_font_sources()->is_hashed_copy( $font_name ) ) {
+			/* Check if it exists already, otherwise add it. A core font's copy under a hashed name, of any release, is that font's */
+			if ( isset( $fonts[ $short_name ] ) || isset( $claimed[ $font_name ] ) || in_array( $font_name, $flattened_fonts_array, true ) || $this->get_font_sources()->is_reserved_name( $font_name ) ) {
 				continue;
 			}
 

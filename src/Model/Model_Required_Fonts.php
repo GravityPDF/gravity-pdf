@@ -138,8 +138,8 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 
 		$files = [];
 		foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
-			$file = $family[ $style ] ?? '';
-			if ( is_string( $file ) && $file !== '' && $this->font_sources->is_core_font_file( $file ) ) {
+			$file = is_string( $family[ $style ] ?? null ) ? $this->font_sources->get_manifest_file( $family[ $style ] ) : '';
+			if ( $this->font_sources->is_core_font_file( $file ) ) {
 				$files[] = $file;
 			}
 		}
