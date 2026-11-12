@@ -187,6 +187,21 @@ class Test_Deprecation extends TestCase {
 		);
 	}
 
+	public function test_get_hook_listeners_skips_our_own_callbacks() {
+		$this->assertSame( [], Deprecation::get_hook_listeners( Fake_Internal_Listener_Features::HOOK ) );
+
+		add_filter( Fake_Internal_Listener_Features::HOOK, Fake_Internal_Listener_Features::INTERNAL_CALLBACK );
+		add_filter( Fake_Internal_Listener_Features::HOOK, '__return_empty_string', 5 );
+
+		$this->assertSame(
+			[ '__return_empty_string' ],
+			Deprecation::get_hook_listeners( Fake_Internal_Listener_Features::HOOK, [ Fake_Internal_Listener_Features::INTERNAL_CALLBACK ] )
+		);
+
+		remove_filter( Fake_Internal_Listener_Features::HOOK, Fake_Internal_Listener_Features::INTERNAL_CALLBACK );
+		remove_filter( Fake_Internal_Listener_Features::HOOK, '__return_empty_string', 5 );
+	}
+
 	public function test_get_feature_is_empty_for_an_unregistered_id() {
 		$this->assertSame( [], Deprecation::get_feature( 'not-a-feature' ) );
 	}

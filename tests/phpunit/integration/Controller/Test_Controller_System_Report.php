@@ -431,9 +431,32 @@ class Test_Controller_System_Report extends TestCase {
 
 		$items = $this->get_report_section( Deprecation::GROUP_DEPRECATED );
 		$this->assertArrayHasKey( 'tools_tab_hooks', $items );
-		$this->assertSame( 'gfpdf_settings_tools has 1 listener', $items['tools_tab_hooks']['value_export'] );
+		/* A WordPress function can't be traced to a plugin or theme */
+		$this->assertSame( 'gfpdf_settings_tools has 1 listener (custom code)', $items['tools_tab_hooks']['value_export'] );
 
 		remove_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+	}
+
+	public function test_deprecated_hook_listeners_are_named_by_their_source() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$closure = static function ( $value ) {
+			return $value;
+		};
+
+		add_filter( 'gfpdf_rtl', '__return_false' );
+		add_filter( 'gfpdf_rtl', $closure, 20 );
+		Deprecation::flush_cache();
+
+		/* This test lives inside the Gravity PDF plugin directory, so the closure is named after it */
+		$expected = 'gfpdf_rtl has 2 listeners (custom code, Gravity PDF)';
+
+		$this->assertSame( $expected, $this->get_unsupported_features()['deprecated_filters']['value_export'] );
+		$this->assertStringStartsWith( $expected, apply_filters( 'debug_information', [] )['gravity-pdf-unsupported']['fields']['deprecated_filters']['value'] );
+		$this->assertStringContainsString( esc_html( $expected ), call_user_func( $this->get_site_health_test()['test'] )['description'] );
+
+		remove_filter( 'gfpdf_rtl', '__return_false' );
+		remove_filter( 'gfpdf_rtl', $closure, 20 );
 	}
 
 	/**

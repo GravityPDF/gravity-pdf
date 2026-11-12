@@ -3,6 +3,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\View;
 
+use GFPDF\Model\Model_Hook_Listener_Sources;
 use GFPDF\Tests\Integration\TestCase;
 
 /**
@@ -61,6 +62,34 @@ class Test_View_System_Report extends TestCase {
 		$this->assertStringContainsString( 'yes', $this->view->maybe_get_active_icon( true ) );
 		$this->assertEmpty( $this->view->maybe_get_active_icon( false ) );
 
+	}
+
+	public function test_deprecated_hook_listeners_are_named_by_the_injected_lookup() {
+		$view = new View_System_Report( [], new Stub_Hook_Listener_Sources() );
+
+		add_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+		add_filter( 'gfpdf_settings_tools', 'strtolower' );
+		add_filter( 'gfpdf_post_tools_settings_page', '__return_empty_array' );
+
+		$detail = $view->get_deprecated_feature_detail(
+			'tools_tab_hooks',
+			[
+				'gfpdf_post_tools_settings_page' => 1,
+				'gfpdf_settings_tools'           => 2,
+			]
+		);
+
+		$this->assertSame( 'gfpdf_post_tools_settings_page has 1 listener (<My> Add-on), gfpdf_settings_tools has 2 listeners (<My> Add-on, custom code)', $detail['value_export'] );
+		$this->assertStringContainsString( '(&lt;My&gt; Add-on, custom code)', $detail['value'] );
+	}
+}
+
+/**
+ * Names WordPress' own functions after an add-on, and leaves PHP's untraced
+ */
+class Stub_Hook_Listener_Sources extends Model_Hook_Listener_Sources {
+	public function get_source( $callback ): string {
+		return $callback === '__return_empty_array' ? '<My> Add-on' : '';
 	}
 
 }

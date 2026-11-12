@@ -99,10 +99,13 @@ test.describe('Deprecated Features', () => {
 			new RegExp(`subview=PDF&id=${formId}$`)
 		);
 
-		// Both hook shapes the map names are reported: a v3-shaped alias and a `gfpdf_legacy_` one
-		await expect(unsupported).toContainText('gfpdf_rtl has 1 listener');
+		// Both hook shapes the map names are reported: a v3-shaped alias and a `gfpdf_legacy_` one. Each names the
+		// must-use plugin defining its listener
 		await expect(unsupported).toContainText(
-			'gfpdf_legacy_templates has 1 listener'
+			'gfpdf_rtl has 1 listener (gravitypdf.php)'
+		);
+		await expect(unsupported).toContainText(
+			'gfpdf_legacy_templates has 1 listener (gravitypdf.php)'
 		);
 
 		await maskFormIds(page);
@@ -143,7 +146,9 @@ test.describe('Deprecated Features', () => {
 		await expect(panel).toContainText(
 			`Broken link stored on form ID ${formId}`
 		);
-		await expect(panel).toContainText('gfpdf_rtl has 1 listener');
+		await expect(panel).toContainText(
+			'gfpdf_rtl has 1 listener (gravitypdf.php)'
+		);
 		await expect(
 			panel.getByRole('link', { name: 'Learn how to upgrade' }).first()
 		).toHaveAttribute('href', /upgrade\/legacy-templates\//);
@@ -200,7 +205,9 @@ test.describe('Deprecated Features', () => {
 		await expect(unsupported).toContainText(
 			`Broken link stored on form ID ${formId}`
 		);
-		await expect(unsupported).toContainText('gfpdf_rtl has 1 listener');
+		await expect(unsupported).toContainText(
+			'gfpdf_rtl has 1 listener (gravitypdf.php)'
+		);
 
 		await maskFormIds(page);
 
