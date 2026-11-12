@@ -6,7 +6,7 @@ import {
 	logInToSubsite as logIn,
 } from '@self:playwright/utils/multisite';
 import { wpCli } from '@self:playwright/utils/wp-cli';
-import { coreFontStandIn } from '@self:playwright/utils/core-fonts';
+import { coreFontStandIn, hashedName } from '@self:playwright/utils/core-fonts';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -17,6 +17,10 @@ const FILE = 'NetworkRoboto.ttf';
 const CORE_NAMED_FONT = 'Core Named Roboto';
 const CORE_FILE = 'DejaVuSerifCondensed.ttf';
 const CORE_BOLD_FILE = 'DejaVuSerifCondensed-Bold.ttf';
+const CORE_BOLD_COPY = hashedName(CORE_BOLD_FILE);
+// The manifest's own build, which the plugin hashes before deleting it from the core font's name
+const CORE_FILE_IN_CONTAINER =
+	'wp-content/plugins/gravity-pdf/tools/phpunit/data/fonts/DejaVuSerifCondensed.ttf';
 const ROBOTO_IN_CONTAINER =
 	'wp-content/plugins/gravity-pdf/tools/playwright/data/fonts/Roboto-Regular.ttf';
 
@@ -83,7 +87,7 @@ test.describe('Fonts of a Multisite subsite', () => {
 		}
 
 		await admin.context().close();
-		wpCli(`rm -f ${FONTS}/${CORE_FILE} ${FONTS}/${CORE_BOLD_FILE}`);
+		wpCli(`rm -f ${FONTS}/${CORE_FILE} ${FONTS}/${CORE_BOLD_COPY}`);
 	};
 
 	test.beforeAll(deleteFonts);
@@ -207,7 +211,7 @@ test.describe('Fonts of a Multisite subsite', () => {
 			(row: { id: string }) => row.id === 'dejavuserifcondensed'
 		);
 		expect(core.regular).toBe('');
-		expect(core.bold).toBe(CORE_BOLD_FILE);
+		expect(core.bold).toBe(CORE_BOLD_COPY);
 
 		const deleted = await send(
 			page,
@@ -222,7 +226,7 @@ test.describe('Fonts of a Multisite subsite', () => {
 
 		const files = fontFileList();
 		expect(files).toContain(CORE_FILE);
-		expect(files).not.toContain(CORE_BOLD_FILE);
+		expect(files).not.toContain(CORE_BOLD_COPY);
 
 		// Throws if the subsite's font no longer has its own bytes
 		wpCli(`cmp ${ROBOTO_IN_CONTAINER} ${FONTS}/${CORE_FILE}`);
@@ -249,7 +253,7 @@ test.describe('Fonts of a Multisite subsite', () => {
 		await subsite.context().close();
 
 		// The custom font's delete removed its file, so put one back at the core font's name
-		wpCli(coreFontStandIn(ROBOTO_IN_CONTAINER, `${FONTS}/${CORE_FILE}`));
+		wpCli(`cp ${CORE_FILE_IN_CONTAINER} ${FONTS}/${CORE_FILE}`);
 
 		await page.goto('/wp-admin/index.php');
 		const deleted = await send(

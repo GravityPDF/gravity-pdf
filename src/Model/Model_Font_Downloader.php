@@ -802,8 +802,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 	/**
 	 * Delete an unused downloaded family's own copies (see Model_Font_Sources::get_own_copy()), keeping the licence files
-	 * and any other font's file at a family file's name. A file at the name another site's custom font uses is kept too,
-	 * as every site shares the fonts folder.
+	 * and any other font's file at a family file's name (a file of a known size is hashed to tell). A file at the name
+	 * another site's custom font uses is kept too, as every site shares the fonts folder.
 	 *
 	 * @return array{id: string, removed: string[], bytes: int, font: array|null}|WP_Error `font` is its row now, if it can
 	 *                                                                                     be installed again. 404 when
@@ -813,6 +813,15 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	public function delete_downloaded_font( string $key ) {
 		$family = $this->get_core_families()[ $key ] ?? null;
+
+		/* Before the sync saves the font under its hashed name, another font's file of a known size passes for its own */
+		foreach ( $family['paths'] ?? [] as $file => $path ) {
+			if ( $path === $this->font_sources->get_plain_path( $file ) && $this->is_unknown_build( $file ) ) {
+				unset( $family['paths'][ $file ] );
+				$this->log->notice( 'Kept another font\'s file at a font file\'s name', [ 'name' => $file ] );
+			}
+		}
+
 		if ( $family === null || count( $family['paths'] ) === 0 ) {
 			return new WP_Error( 'font_not_downloaded', __( 'The font is not downloaded.', 'gravity-pdf' ), [ 'status' => 404 ] );
 		}

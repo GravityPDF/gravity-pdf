@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 import { test, resourcesPath } from '@self:playwright/fixtures/test';
 import Pdf, { type FontUpload } from '@self:playwright/utils/gravitypdf';
 import { wpCli } from '@self:playwright/utils/wp-cli';
-import { coreFontStandIn } from '@self:playwright/utils/core-fonts';
+import { coreFontStandIn, hashedName } from '@self:playwright/utils/core-fonts';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -379,7 +379,7 @@ test.describe('Font Manager', () => {
 
 		// Seeds a core font no other spec uses
 		const seedCoreFont = (...files: string[]) => {
-			seededFiles.push(...files);
+			seededFiles.push(...files.map(hashedName));
 			wpCli(
 				...files.map((file) =>
 					coreFontStandIn(

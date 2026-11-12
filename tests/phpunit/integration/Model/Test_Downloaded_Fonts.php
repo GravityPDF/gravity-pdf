@@ -381,6 +381,15 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 	}
 
+	public function test_delete_keeps_another_fonts_file_of_a_known_size_at_the_name() {
+		$this->put_same_size_font_at( 'DejaVuSerifCondensed.ttf', 'DejaVuSerifCondensed.ttf' );
+		$bytes = (string) file_get_contents( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+
+		$this->assert_font_error( $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' ), 'font_not_downloaded', 404 );
+		$this->assertStringEqualsFile( $this->font_path( 'DejaVuSerifCondensed.ttf' ), $bytes );
+		$this->assertCount( 1, $this->log_messages( 'Kept another font\'s file at a font file\'s name' ) );
+	}
+
 	public function test_a_family_sharing_a_name_with_a_record_lists_and_deletes_only_its_hashed_copy() {
 		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 		$hashed  = $sources->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
