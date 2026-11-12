@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 /* Components */
 import FontManagerHeader from './FontManagerHeader';
 import FontManagerBody from './FontManagerBody';
+import { FontPreviewCache } from './FontPreview';
 import { connect } from 'react-redux';
 import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox';
 
@@ -128,7 +129,10 @@ export class FontManager extends Component {
 						}
 					/>
 
-					<FontManagerBody id={id} navigate={navigate} />
+					{/* Fonts already previewed stay loaded until the Font Manager closes */}
+					<FontPreviewCache>
+						<FontManagerBody id={id} navigate={navigate} />
+					</FontPreviewCache>
 				</div>
 			</div>
 		);
