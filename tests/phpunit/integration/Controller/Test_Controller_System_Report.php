@@ -218,12 +218,14 @@ class Test_Controller_System_Report extends TestCase {
 		$override_path = $this->create_outdated_override();
 
 		try {
-			$row = $this->get_sections()['directories']['outdated_templates'];
+			$row    = $this->get_sections()['directories']['outdated_templates'];
+			$checks = array_column( $this->get_table( 'checks' ), 'value', 'label_export' );
 		} finally {
 			@unlink( $override_path );
 		}
 
 		$this->assertFalse( $row['is_valid'] );
+		$this->assertStringEndsNotWith( '<br>', $checks['Outdated Templates'] );
 		$this->assertStringStartsWith( 'zadani.php 1.5.2', $row['value_export'] );
 		$this->assertStringStartsWith( '<code>zadani.php</code> 1.5.2', $row['value'] );
 		$this->assertStringStartsWith( 'Update these template overrides. <a href=', $row['validation_message'] );

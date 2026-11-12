@@ -22,6 +22,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 class View_System_Report extends Helper_Abstract_View {
 
 	/**
+	 * @var string
+	 * @since 6.0
+	 */
+	protected $markup_yes = '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
+
+	/**
+	 * @var string
+	 * @since 6.0
+	 */
+	protected $markup_no = '<mark class="error"><span class="dashicons dashicons-no"></span></mark>';
+
+	/**
+	 * @var string
+	 * @since 6.0
+	 */
+	protected $markup_warning = '<mark style="color: #F15A2B"><span class="dashicons dashicons-warning"></span></mark>';
+
+	/**
 	 * Set the view's name
 	 *
 	 * @var string
@@ -31,13 +49,156 @@ class View_System_Report extends Helper_Abstract_View {
 	protected $view_type = 'SystemReport';
 
 	/**
+	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report leaves its icons to Gravity Forms
+	 */
+	public function maybe_get_active_icon( bool $results ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		if ( ! $results ) {
+			return '';
+		}
+
+		return $this->markup_yes;
+	}
+
+	/**
+	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report leaves its icons to Gravity Forms
+	 */
+	public function get_icon( bool $results ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		return $results ? $this->markup_yes : $this->markup_no;
+	}
+
+	/**
+	 * @param int|float $memory
+	 *
+	 * @return string
+	 *
+	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
+	 */
+	public function memory_limit_markup( $memory ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		if ( $memory === -1 ) {
+			return esc_html__( 'Unlimited', 'gravity-pdf' ) . ' ' . $this->markup_yes;
+		}
+
+		$output  = $memory . 'MB ';
+		$output .= ( $memory >= 128 ) ? $this->markup_yes : $this->markup_warning;
+		if ( $memory < 128 ) {
+			$output .= '<br />';
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+			$output .= sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %1$sFind out how to increase this limit%2$s.', 'gravity-pdf' ), '<br /><a href="https://docs.gravitypdf.com/users/increasing-memory-limit">', '</a>' );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
+	 */
+	public function get_allow_url_fopen( bool $allow_url_fopen ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		$output = $allow_url_fopen ? $this->markup_yes : $this->markup_warning;
+
+		if ( ! $allow_url_fopen ) {
+			/* translators: 1: Opening <a><code> tags, 2: Closing </code></a> tags */
+			$output .= ' ' . sprintf( esc_html__( 'We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s is disabled.', 'gravity-pdf' ), '<a href="https://www.php.net/manual/en/filesystem.configuration.php#ini.allow-url-fopen"><code>', '</code></a>' );
+			$output .= ' ' . esc_html__( 'You may notice image display issues in your PDFs. Contact your web hosting provider for assistance enabling this feature.', 'gravity-pdf' );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
+	 */
+	public function get_temp_folder_protected( bool $is_protected ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		$output = ( $is_protected ? $this->markup_yes : $this->markup_no );
+
+		if ( ! $is_protected ) {
+			$output .= ' ' . sprintf( esc_html__( "Gravity PDF's temporary directory is publicly accessible.", 'gravity-pdf' ) );
+			/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
+			$output .= ' ' . sprintf( esc_html__( 'It is recommended to %1$smove the folder outside the public server directory%2$s.', 'gravity-pdf' ), '<a href="https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/">', '</a>' );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * @param string[] $folders The folders that can't be written to, relative to the site
+	 *
+	 * @since 6.18.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
+	 */
+	public function get_folder_permissions( array $folders ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		$writable = $folders === [];
+		$output   = ( $writable ? esc_html__( 'Writable', 'gravity-pdf' ) : esc_html__( 'Not writable', 'gravity-pdf' ) ) . ' ' . ( $writable ? $this->markup_yes : $this->markup_no );
+
+		foreach ( $folders as $folder ) {
+			$output .= '<br /><code>' . esc_html( $folder ) . '</code>';
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Prepare message for outdated template file(s)
+	 *
+	 * @param string $path The path to the outdated PDF template file
+	 * @param string $template_version The current version of the outdated PDF template file
+	 * @param string $core_version The latest Core template version
+	 *
+	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
+	 */
+	public function get_template_check_message( string $path, string $template_version, string $core_version ): array {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		/* translators: 1: Template file path, 2: Current template version (wrapped in styled <span>), 3: Latest core version */
+		$message = sprintf( esc_html__( '%1$s version %2$s is out of date. The core version is %3$s', 'gravity-pdf' ), $path, '<span style="color: #ff0000;font-weight:bold">' . $template_version . '</span>', $core_version );
+
+		$export_message = sprintf( '%1$s version %2$s is out of date. The core version is %3$s', $path, $template_version, $core_version );
+
+		return [
+			'value'        => $message . $this->markup_no . '<hr>',
+			'value_export' => $export_message . "   &#10008;\n",
+		];
+	}
+
+	/**
+	 * Prepare message on how to update outdated template file(s)
+	 *
+	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
+	 */
+	public function get_template_upgrade_message(): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		$learn_more_url = 'https://docs.gravitypdf.com/developers/template-hierarchy';
+
+		return $this->markup_warning . ' <a href="' . esc_url( $learn_more_url ) . '">' . esc_html__( 'Learn how to update', 'gravity-pdf' ) . '</a>';
+	}
+
+	/**
 	 * Add a check's result to its row. Gravity Forms draws the ✔ or ✘, and the fix after a failing value.
 	 *
 	 * @param array  $row     The row's label and value, and their `_export` copies
 	 * @param string $summary What the check is listed as in the passed row
 	 * @param string $fix     Escaped advice for a failing check, empty when it passes
 	 *
-	 * @since 7.0
+	 * @since 6.19.0
 	 */
 	public function get_check( array $row, string $summary, string $fix = '' ): array {
 		$row['is_valid'] = $fix === '';
@@ -56,7 +217,7 @@ class View_System_Report extends Helper_Abstract_View {
 	/**
 	 * A short fix for a failing check, with a link to the guide when there is one
 	 *
-	 * @since 7.0
+	 * @since 6.19.0
 	 */
 	public function get_fix( string $message, string $url = '', string $link = '' ): string {
 		$fix = esc_html( $message );
@@ -73,7 +234,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 *
 	 * @param string[] $items
 	 *
-	 * @since 7.0
+	 * @since 6.19.0
 	 */
 	public function get_code_lines( array $items ): string {
 		return implode(
@@ -85,6 +246,55 @@ class View_System_Report extends Helper_Abstract_View {
 				$items
 			)
 		);
+	}
+
+	/**
+	 * On or Off, as shown on screen
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_on_off( bool $on ): string {
+		return $on ? esc_html__( 'On', 'gravity-pdf' ) : esc_html__( 'Off', 'gravity-pdf' );
+	}
+
+	/**
+	 * One row on screen listing the checks that passed, which copies as the first of them. The others copy on lines of
+	 * their own.
+	 *
+	 * @param array[] $passed The rows of the checks that passed
+	 * @param int     $total  How many checks there are
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_passed_rows( array $passed, int $total ): array {
+		if ( $passed === [] ) {
+			return [];
+		}
+
+		/* translators: %d: How many checks there are */
+		$label = sprintf( __( 'All %d checks passed', 'gravity-pdf' ), $total );
+
+		if ( count( $passed ) < $total ) {
+			/* translators: 1: How many checks passed, 2: How many checks there are */
+			$label = sprintf( __( '%1$d of %2$d checks passed', 'gravity-pdf' ), count( $passed ), $total );
+		}
+
+		$first = $passed[0];
+		$rows  = [
+			[
+				'label'        => esc_html( $label ),
+				'label_export' => $first['label_export'] ?? wp_strip_all_tags( $first['label'] ),
+				'value'        => implode( ' · ', array_column( $passed, 'summary' ) ),
+				'value_export' => $first['value_export'] ?? $first['value'],
+				'is_valid'     => true,
+			],
+		];
+
+		foreach ( array_slice( $passed, 1 ) as $row ) {
+			$rows[] = [ 'export_only' => true ] + $row;
+		}
+
+		return $rows;
 	}
 
 	/**
@@ -265,7 +475,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @param array  $signal The detections recorded for that signal
 	 *
 	 * @since 6.17.0
-	 * @since 7.0 Names the feature's group, and says when it is removed rather than the whole notice
+	 * @since 6.19.0 Names the feature's group, and says when it is removed rather than the whole notice
 	 */
 	public function get_deprecated_feature_report_item( string $key, array $signal ): array {
 		$feature      = $this->get_deprecated_feature( $key, $signal );
@@ -311,7 +521,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @param string $separator What the displayed detections are joined with
 	 *
 	 * @since 6.17.0
-	 * @since 7.0 Takes the separator rather than the detections, which are always the feature's own
+	 * @since 6.19.0 Takes the separator rather than the detections, which are always the feature's own
 	 */
 	protected function get_deprecated_feature_values( array $feature, string $separator = ', ' ): array {
 		return [
@@ -332,7 +542,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 *
 	 * @return array<string, array<string, string>>
 	 * @since 6.17.0
-	 * @since 7.0 Added `none`
+	 * @since 6.19.0 Added `none`
 	 */
 	public static function get_deprecated_groups(): array {
 		$names = [
