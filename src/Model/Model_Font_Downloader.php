@@ -164,9 +164,10 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 	/**
 	 * When each failed file's retry is due (else 0), once the retry also failed when it gave up (else 0), and whether
-	 * an admin dismissed the notice listing it
+	 * an admin dismissed the notice listing it. `conflict` is the size and modified time of another font's file at its
+	 * name when it failed, else ''.
 	 *
-	 * @var array<string, array{retry_at: int, gave_up: int, dismissed: bool}>|null
+	 * @var array<string, array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}>|null
 	 * @since 6.19.0
 	 */
 	protected $failures;
@@ -397,6 +398,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		/* A file at the name of a known size can still be another font's, which only its SHA-1 tells */
 		if ( $own_copy && $verify && $own_path === $font_path && $this->is_auto_install_enabled( $file ) ) {
 			$own_copy = ! $this->is_unknown_build( $file );
+		} elseif ( $own_copy && $this->is_failed_conflict( $file, $own_path ) ) {
+			$own_copy = false;
 		}
 
 		/* Copied in by hand or saved by another request, so any failure on record is stale */
@@ -475,6 +478,40 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		$sha  = $this->hash_blob( $path, $size );
 
 		return $sha !== '' && ! in_array( $sha, $this->font_sources->get_known_builds( $file )[ $size ] ?? [], true );
+	}
+
+	/**
+	 * Whether the font's own copy is on disk, as is_installed() but without the file a failed download found was another
+	 * font's (see is_failed_conflict())
+	 *
+	 * @since 6.19.0
+	 */
+	protected function has_own_copy( string $file ): bool {
+		$own_path = $this->font_sources->get_own_copy( $file );
+
+		return $own_path !== '' && ! $this->is_failed_conflict( $file, $own_path );
+	}
+
+	/**
+	 * Whether the own copy get_own_copy() found by size is the other font's file a failed download found at the name,
+	 * unchanged since. Saves hashing it again on a render.
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_failed_conflict( string $file, string $own_path ): bool {
+		$conflict = $this->get_failures()[ $file ]['conflict'] ?? '';
+
+		/* A hashed copy is the font's own whatever is at the name */
+		return $conflict !== '' && $own_path === $this->font_sources->get_plain_path( $file ) && $conflict === $this->get_file_stamp( $own_path );
+	}
+
+	/**
+	 * A file's size and modified time, or '' if it isn't on disk
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_file_stamp( string $path ): string {
+		return is_file( $path ) ? filesize( $path ) . ':' . filemtime( $path ) : '';
 	}
 
 	/**
@@ -1178,7 +1215,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function download_or_queue( string $file ): bool {
-		if ( ! $this->font_sources->is_large_file( $file ) || $this->font_sources->is_installed( $file ) ) {
+		if ( ! $this->font_sources->is_large_file( $file ) || $this->has_own_copy( $file ) ) {
 			return $this->download( $file );
 		}
 
@@ -1679,6 +1716,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	protected function record_failure( string $file ): void {
 		set_site_transient( self::back_off_key( $file ), time(), self::BACK_OFF );
 
+		/* A failed download leaves the font's name as it was, so a file there is another font's */
+		$conflict = $this->get_file_stamp( $this->font_sources->get_plain_path( $file ) );
+
 		$failures = $this->get_failures();
 		$failure  = $failures[ $file ] ?? null;
 
@@ -1687,6 +1727,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				'retry_at'  => time() + wp_rand( 0, $this->retry_jitter ),
 				'gave_up'   => 0,
 				'dismissed' => false,
+				'conflict'  => $conflict,
 			];
 
 			$this->save_failures( $failures );
@@ -1705,6 +1746,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				'retry_at'  => 0,
 				'gave_up'   => time(),
 				'dismissed' => false,
+				'conflict'  => $conflict,
 			];
 
 			$this->save_failures( $failures );
@@ -1736,7 +1778,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @param array<string, array{retry_at: int, gave_up: int, dismissed: bool}> $failures
+	 * @param array<string, array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}> $failures
 	 *
 	 * @since 6.19.0
 	 */
@@ -1749,7 +1791,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	/**
 	 * Failures by file, read once per request, when any give-up whose file is now on disk is cleared from the record
 	 *
-	 * @return array<string, array{retry_at: int, gave_up: int, dismissed: bool}>
+	 * @return array<string, array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -1768,6 +1810,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 						'retry_at'  => $gave_up > 0 ? 0 : $retry_at,
 						'gave_up'   => $gave_up,
 						'dismissed' => ( $failure['dismissed'] ?? false ) === true,
+						'conflict'  => is_string( $failure['conflict'] ?? null ) ? $failure['conflict'] : '',
 					];
 				}
 			}
@@ -1785,7 +1828,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function clear_installed_give_ups(): void {
 		foreach ( $this->failures as $file => $failure ) {
-			if ( $failure['gave_up'] > 0 && $this->font_sources->is_installed( $file ) ) {
+			if ( $failure['gave_up'] > 0 && $this->has_own_copy( $file ) ) {
 				$this->clear_failure( $file );
 			}
 		}
