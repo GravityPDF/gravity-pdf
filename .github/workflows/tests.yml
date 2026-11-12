@@ -160,7 +160,7 @@ jobs:
 
       - name: Post coverage PR comment
         if: ${{ github.event_name == 'pull_request' }}
-        uses: lucassabreu/comment-coverage-clover@9615bdb29755894b53a6e3968619b1e12fac5447 # v0.17.4
+        uses: lucassabreu/comment-coverage-clover@92c9c9f0d9640bce558851c62295d99b13deacb3 # v0.17.5
         with:
           file: ./tmp/jest-coverage/clover.xml
           signature: ":robot: Jest coverage report"
@@ -307,7 +307,7 @@ jobs:
       # de-duplication off the signature string, so identical defaults would overwrite each other.
       - name: Post coverage PR comment
         if: ${{ matrix.report && github.event_name == 'pull_request' }}
-        uses: lucassabreu/comment-coverage-clover@9615bdb29755894b53a6e3968619b1e12fac5447 # v0.17.4
+        uses: lucassabreu/comment-coverage-clover@92c9c9f0d9640bce558851c62295d99b13deacb3 # v0.17.5
         with:
           file: tmp/coverage/report-xml/merged.xml
           signature: ":robot: PHPUnit coverage report"
