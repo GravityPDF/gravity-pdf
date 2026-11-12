@@ -481,8 +481,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Whether the font's own copy is on disk, as is_installed() but without the file a failed download found was another
-	 * font's (see is_failed_conflict())
+	 * Whether the font's own copy is on disk: Model_Font_Sources::get_own_copy(), less the other font's file a failed
+	 * download found at its name (see is_failed_conflict())
 	 *
 	 * @since 6.19.0
 	 */
@@ -498,7 +498,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 *
 	 * @since 6.19.0
 	 */
-	protected function is_failed_conflict( string $file, string $own_path ): bool {
+	public function is_failed_conflict( string $file, string $own_path ): bool {
 		$conflict = $this->get_failures()[ $file ]['conflict'] ?? '';
 
 		/* A hashed copy is the font's own whatever is at the name */
@@ -1002,7 +1002,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				foreach ( $files as $file ) {
 					$bytes += (int) $manifest[ $file ]['size'];
 					$path   = $this->font_sources->get_own_copy( $file );
-					if ( $path !== '' ) {
+					if ( $path !== '' && ! $this->is_failed_conflict( $file, $path ) ) {
 						$paths[ $file ] = $path;
 					}
 				}

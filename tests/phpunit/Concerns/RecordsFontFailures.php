@@ -31,6 +31,15 @@ trait RecordsFontFailures {
 	}
 
 	/**
+	 * A failure that gave up with another font's file at the font's name, as the downloader stamps it
+	 *
+	 * @return array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}
+	 */
+	protected function conflict_failure( string $path ): array {
+		return array_merge( $this->failure( time() ), [ 'conflict' => filesize( $path ) . ':' . filemtime( $path ) ] );
+	}
+
+	/**
 	 * Store the record where the downloader keeps it, on the main network, and have the shared downloader read it afresh
 	 *
 	 * @param mixed $failures

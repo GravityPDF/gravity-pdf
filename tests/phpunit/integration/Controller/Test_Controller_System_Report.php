@@ -743,6 +743,17 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertSame( [ 'Garuda.ttf' ], $report->get_core_font_health()['missing'] );
 	}
 
+	public function test_the_core_fonts_site_health_test_is_critical_for_a_file_that_gave_up_on_another_fonts_file_of_a_known_size() {
+		$this->put_same_size_font_at( 'DejaVuSerifCondensed.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->use_report_downloader( [ 'DejaVuSerifCondensed.ttf' ] );
+		$this->set_font_failures( [ 'DejaVuSerifCondensed.ttf' => $this->conflict_failure( $this->font_path( 'DejaVuSerifCondensed.ttf' ) ) ] );
+
+		$result = $this->run_core_fonts_test();
+
+		$this->assertSame( 'critical', $result['status'] );
+		$this->assertStringContainsString( '<code>DejaVuSerifCondensed.ttf</code></li>', $result['description'] );
+	}
+
 	public function test_the_core_fonts_site_health_test_is_critical_for_a_file_that_gave_up() {
 		$this->use_report_downloader( [ 'Garuda.ttf', 'FreeSans.ttf' ] );
 		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );

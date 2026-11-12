@@ -747,15 +747,6 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Whether the file's own copy is in the fonts folder (see get_own_copy())
-	 *
-	 * @since 6.19.0
-	 */
-	public function is_installed( string $file ): bool {
-		return $this->get_own_copy( $file ) !== '';
-	}
-
-	/**
 	 * Whether the file at a manifest name is another font's going by its size alone: no build the sources know has it
 	 *
 	 * @since 6.19.0
