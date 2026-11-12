@@ -122,7 +122,8 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * A font key's files on the core manifest (none for bundled and custom fonts)
+	 * A font key's files on the core manifest (none for bundled and custom fonts), with those of its `sip-ext` font,
+	 * which mPDF loads with it for the SIP characters (Sun-ExtA's Sun-ExtB)
 	 *
 	 * @param mixed $key A font key
 	 *
@@ -131,20 +132,53 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_font_files( $key ): array {
-		$family = $this->font_sources->get_font_data()[ $this->normalise_font( $key ) ] ?? null;
+		$fontdata = $this->font_sources->get_font_data();
+		$family   = $fontdata[ $this->normalise_font( $key ) ] ?? null;
 		if ( ! is_array( $family ) ) {
 			return [];
 		}
 
+		/* One level only, as mPDF doesn't follow a sip-ext font's own */
+		$families = [ $family, $fontdata[ $this->get_sip_ext( $family ) ] ?? null ];
+
 		$files = [];
-		foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
-			$file = is_string( $family[ $style ] ?? null ) ? $this->font_sources->get_manifest_file( $family[ $style ] ) : '';
-			if ( $this->font_sources->is_core_font_file( $file ) ) {
-				$files[] = $file;
+		foreach ( array_filter( $families, 'is_array' ) as $linked ) {
+			foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
+				$file = is_string( $linked[ $style ] ?? null ) ? $this->font_sources->get_manifest_file( $linked[ $style ] ) : '';
+				if ( $this->font_sources->is_core_font_file( $file ) ) {
+					$files[] = $file;
+				}
 			}
 		}
 
 		return array_values( array_unique( $files ) );
+	}
+
+	/**
+	 * The font keys whose `sip-ext` font is the key, so get_font_files() counts the key's files as theirs
+	 *
+	 * @return string[]
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_sip_parents( string $key ): array {
+		$parents = [];
+		foreach ( $this->font_sources->get_font_data() as $parent => $family ) {
+			if ( is_array( $family ) && $this->get_sip_ext( $family ) === $key ) {
+				$parents[] = (string) $parent;
+			}
+		}
+
+		return $parents;
+	}
+
+	/**
+	 * The font key mPDF loads with a family for its SIP characters, or an empty string
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_sip_ext( array $family ): string {
+		return $this->normalise_font( $family['sip-ext'] ?? '' );
 	}
 
 	/**
@@ -237,13 +271,16 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function is_font_in_use( string $key, bool $network = false ): bool {
-		if ( isset( $this->get_settings_font_reasons()[ $key ] ) ) {
+		/* A font whose sip-ext font this is needs its files too */
+		$keys = array_merge( [ $key ], $this->get_sip_parents( $key ) );
+
+		if ( array_intersect_key( $this->get_settings_font_reasons(), array_flip( $keys ) ) !== [] ) {
 			return true;
 		}
 
 		$this->form_read_failed = false;
 		foreach ( $this->each_pdf_font() as $font => $unused ) {
-			if ( $font === $key ) {
+			if ( in_array( $font, $keys, true ) ) {
 				return true;
 			}
 		}
@@ -259,7 +296,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 
 		$sites = $this->get_site_font_records();
 		foreach ( $this->get_other_site_ids() as $site_id ) {
-			if ( ! isset( $sites[ $site_id ] ) || in_array( $key, $sites[ $site_id ], true ) ) {
+			if ( ! isset( $sites[ $site_id ] ) || array_intersect( $keys, $sites[ $site_id ] ) !== [] ) {
 				return true;
 			}
 		}

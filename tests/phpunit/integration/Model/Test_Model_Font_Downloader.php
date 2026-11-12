@@ -972,6 +972,16 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [ [] ], $this->get_scheduled_args() );
 	}
 
+	public function test_prune_replaces_an_installer_sun_extb_a_sun_exta_default_font_needs() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'sun-exta' );
+		wp_clear_scheduled_hook( Model_Font_Downloader::SYNC_EVENT );
+		$this->set_installer_manifest( [ 'Sun-ExtB.ttf' => 'Chewy.ttf' ] );
+		$this->copy_fixture( 'Chewy.ttf', 'Sun-ExtB.ttf' );
+
+		$this->assertSame( [ 'Sun-ExtB.ttf' ], $this->downloader->prune() );
+		$this->assertSame( [ [] ], $this->get_scheduled_args() );
+	}
+
 	public function test_the_replacement_for_an_installer_garuda_lands_under_its_plain_name() {
 		$this->use_shipped_installer_manifest();
 		$this->serve_fixture_as( 'Garuda-v1.1.1.ttf', 'Garuda.ttf' );

@@ -59,7 +59,8 @@ class Test_Model_Required_Fonts extends TestCase {
 
 	public function test_get_font_files_lists_a_core_keys_files_on_the_manifest() {
 		$this->assertSame( [ 'DejaVuSerif.ttf', 'DejaVuSerif-Bold.ttf', 'DejaVuSerif-Italic.ttf', 'DejaVuSerif-BoldItalic.ttf' ], $this->required->get_font_files( ' DejaVuSerif ' ) );
-		$this->assertSame( [ 'Sun-ExtA.ttf' ], $this->required->get_font_files( 'sun-exta' ) );
+		$this->assertSame( [ 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ], $this->required->get_font_files( 'sun-exta' ) );
+		$this->assertSame( [ 'Sun-ExtB.ttf' ], $this->required->get_font_files( 'sun-extb' ) );
 		$this->assertSame( [], $this->required->get_font_files( 'arimo' ) );
 		$this->assertSame( [], $this->required->get_font_files( 'notafont' ) );
 	}
@@ -69,6 +70,47 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->add_record( 'chewy', [ 'regular' => 'Chewy.ttf' ] );
 
 		$this->assertSame( [], $this->required->get_font_files( 'chewy' ) );
+	}
+
+	public function test_get_font_files_counts_a_sip_ext_font_one_level_deep() {
+		add_filter(
+			'mpdf_font_data',
+			static function ( array $fontdata ): array {
+				$fontdata['dejavuserif']['sip-ext']   = ' FreeSerif ';
+				$fontdata['freeserif']['sip-ext']     = 'dejavuserif';
+				$fontdata['garuda']['sip-ext']        = 'notafont';
+				$fontdata['kaputaunicode']['sip-ext'] = [ 'freeserif' ];
+
+				return $fontdata;
+			},
+			PHP_INT_MAX
+		);
+
+		$required = $this->required_with( $this->stub_font_sources() );
+		$dejavu   = [ 'DejaVuSerif.ttf', 'DejaVuSerif-Bold.ttf', 'DejaVuSerif-Italic.ttf', 'DejaVuSerif-BoldItalic.ttf' ];
+
+		$this->assertSame( array_merge( $dejavu, self::$freeserif ), $required->get_font_files( 'dejavuserif' ) );
+		$this->assertSame( array_merge( self::$freeserif, $dejavu ), $required->get_font_files( 'freeserif' ) );
+		$this->assertSame( self::GARUDA, $required->get_font_files( 'garuda' ) );
+		$this->assertSame( [ 'kaputaunicode.ttf' ], $required->get_font_files( 'kaputaunicode' ) );
+	}
+
+	public function test_a_sun_exta_default_font_requires_sun_extb() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'sun-exta' );
+
+		$this->assertSame( [ 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ], $this->required->get_required_font_files() );
+		$this->assertSame( [ 'Sun-ExtA.ttf', 'Sun-ExtB.ttf' ], $this->required->get_install_font_files( [ 'sun-exta' ] ) );
+	}
+
+	public function test_a_sip_ext_font_is_in_use_while_a_font_linking_it_is() {
+		$this->assertFalse( $this->required->is_font_in_use( 'sun-extb' ) );
+
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'sun-exta' );
+		$this->assertTrue( $this->required->is_font_in_use( 'sun-extb' ) );
+
+		GPDFAPI::get_options_class()->delete_option( 'default_font' );
+		$this->add_form_with_pdfs( [ [ 'font' => 'sun-exta' ] ] );
+		$this->assertTrue( $this->required->is_font_in_use( 'sun-extb' ) );
 	}
 
 	/**
@@ -1001,6 +1043,19 @@ class Test_Model_Required_Fonts extends TestCase {
 		$this->assertTrue( $reasons['dejavuserif']['pending'] );
 		$this->assertFalse( $reasons['arimo']['pending'] ?? false );
 		$this->assertTrue( $this->required->is_font_in_use( 'dejavuserif', true ) );
+	}
+
+	public function test_a_sip_ext_font_is_in_use_while_another_site_uses_a_font_linking_it() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$site = self::factory()->blog->create();
+		update_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site, [ 'dejavuserif' ] );
+		$this->assertFalse( $this->required->is_font_in_use( 'sun-extb', true ) );
+
+		update_network_option( get_main_network_id(), Model_Required_Fonts::SITE_FONTS_PREFIX . $site, [ 'sun-exta' ] );
+		$this->assertTrue( $this->required->is_font_in_use( 'sun-extb', true ) );
 	}
 
 	public function test_a_failed_form_read_records_nothing() {
