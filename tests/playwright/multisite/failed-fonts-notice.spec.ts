@@ -66,7 +66,7 @@ test.describe('Failed core fonts notice on a Multisite', () => {
 	}) => {
 		await page.goto(NETWORK_ADMIN);
 		await notice(page)
-			.getByRole('button', { name: 'View the system report' })
+			.getByRole('link', { name: 'view the system report' })
 			.click();
 
 		await expect(page).toHaveURL(/admin\.php\?page=gf_system_status/);
