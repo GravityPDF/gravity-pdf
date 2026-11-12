@@ -415,14 +415,11 @@ class Deprecation {
 	 * @since 6.17.0
 	 */
 	protected static function has_reportable_listener( string $hook_name, array $feature ): bool {
-		global $wp_filter;
-
 		if ( static::is_development_site() ) {
 			return true;
 		}
 
-		/* self::apply_filters() has already established the hook has callbacks, so it is registered */
-		return static::count_third_party_callbacks( $wp_filter[ $hook_name ], $feature['internal_callbacks'] ?? [] ) > 0;
+		return static::get_hook_listeners( $hook_name, $feature['internal_callbacks'] ?? [] ) !== [];
 	}
 
 	/**
@@ -523,7 +520,7 @@ class Deprecation {
 				continue;
 			}
 
-			$count = static::count_third_party_callbacks( $hook, $ignore_callbacks );
+			$count = count( static::get_third_party_callbacks( $hook, $ignore_callbacks ) );
 			if ( $count > 0 ) {
 				$active[ $name ] = $count;
 			}
@@ -535,15 +532,33 @@ class Deprecation {
 	}
 
 	/**
-	 * Count the callbacks on a hook, ignoring the ones Gravity PDF registers itself
+	 * Get the third-party callbacks attached to a deprecated hook, in the order they run
+	 *
+	 * @param string $hook_name        The deprecated hook
+	 * @param array  $ignore_callbacks The callbacks Gravity PDF registers itself, which aren't third party
+	 *
+	 * @since 6.19.0
+	 */
+	public static function get_hook_listeners( string $hook_name, array $ignore_callbacks = [] ): array {
+		global $wp_filter;
+
+		if ( ! isset( $wp_filter[ $hook_name ] ) ) {
+			return [];
+		}
+
+		return static::get_third_party_callbacks( $wp_filter[ $hook_name ], $ignore_callbacks );
+	}
+
+	/**
+	 * Get the callbacks on a hook, ignoring the ones Gravity PDF registers itself
 	 *
 	 * @param \WP_Hook $hook
 	 * @param array    $ignore_callbacks
 	 *
 	 * @since 6.17.0
 	 */
-	protected static function count_third_party_callbacks( $hook, array $ignore_callbacks ): int {
-		$count = 0;
+	protected static function get_third_party_callbacks( $hook, array $ignore_callbacks ): array {
+		$listeners = [];
 
 		foreach ( $hook->callbacks ?? [] as $callbacks ) {
 			foreach ( $callbacks as $callback ) {
@@ -551,10 +566,10 @@ class Deprecation {
 					continue;
 				}
 
-				++$count;
+				$listeners[] = $callback['function'];
 			}
 		}
 
-		return $count;
+		return $listeners;
 	}
 }

@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Model\Model_Hook_Listener_Sources;
 use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 
@@ -47,6 +48,24 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @since 6.0
 	 */
 	protected $view_type = 'SystemReport';
+
+	/**
+	 * @var Model_Hook_Listener_Sources
+	 * @since 6.19.0
+	 */
+	protected $listener_sources;
+
+	/**
+	 * @param array                            $data
+	 * @param Model_Hook_Listener_Sources|null $listener_sources
+	 *
+	 * @since 6.19.0
+	 */
+	public function __construct( $data = [], ?Model_Hook_Listener_Sources $listener_sources = null ) {
+		parent::__construct( $data );
+
+		$this->listener_sources = $listener_sources ?? new Model_Hook_Listener_Sources();
+	}
 
 	/**
 	 * @since 6.0
@@ -189,7 +208,7 @@ class View_System_Report extends Helper_Abstract_View {
 		if ( isset( $descriptions[ $key ] ) ) {
 			$description = call_user_func( $descriptions[ $key ], $signal, $feature );
 		} elseif ( Deprecation::is_hook_only( $feature ) ) {
-			$description = $this->get_deprecated_filter_feature( $signal );
+			$description = $this->get_deprecated_filter_feature( $signal, $feature );
 		} else {
 			$description = $this->get_default_feature_description( $signal );
 		}
@@ -316,21 +335,30 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Describe the deprecated hooks that still have a listener attached
+	 * Describe the deprecated hooks that still have a listener attached, and the plugin or theme behind them
 	 *
 	 * @param array $filters Hook name mapped to the number of listeners
+	 * @param array $feature The feature's registration
 	 *
 	 * @since 6.17.0
 	 */
-	protected function get_deprecated_filter_feature( array $filters ): array {
+	protected function get_deprecated_filter_feature( array $filters, array $feature ): array {
 		$lines = [];
 
 		foreach ( $filters as $name => $count ) {
+			$names = array_map(
+				static function ( $source ) {
+					return $source !== '' ? $source : __( 'custom code', 'gravity-pdf' );
+				},
+				$this->listener_sources->get_sources( Deprecation::get_hook_listeners( (string) $name, $feature['internal_callbacks'] ?? [] ) )
+			);
+
 			$lines[] = sprintf(
-				/* translators: 1: Filter name, 2: Number of callbacks attached to it */
-				_n( '%1$s has %2$d listener', '%1$s has %2$d listeners', $count, 'gravity-pdf' ),
+				/* translators: 1: Filter name, 2: Number of callbacks attached to it, 3: Comma-separated plugin or theme names, or "custom code" */
+				_n( '%1$s has %2$d listener (%3$s)', '%1$s has %2$d listeners (%3$s)', $count, 'gravity-pdf' ),
 				$name,
-				$count
+				$count,
+				implode( ', ', $names )
 			);
 		}
 
