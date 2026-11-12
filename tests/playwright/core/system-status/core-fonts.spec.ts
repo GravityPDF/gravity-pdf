@@ -53,11 +53,9 @@ test.describe('Core Fonts', () => {
 		// Each test builds on the one before: the notice shows, is dismissed, then a later failure raises it again
 		test.describe.configure({ mode: 'serial' });
 
-		// Clears the dismissals stored by an earlier run (see tools/mu-plugins)
+		// Clears the failures an earlier run saved (see tools/mu-plugins)
 		test.beforeAll(() =>
-			wpCli(
-				'wp option delete gfpdf_e2e_failed_fonts_dismissed --quiet || true'
-			)
+			wpCli('wp option delete gfpdf_e2e_failed_fonts --quiet || true')
 		);
 
 		// Keeps the notice out of the specs running alongside (see tools/mu-plugins)
@@ -85,7 +83,13 @@ test.describe('Core Fonts', () => {
 				'https://docs.gravitypdf.com/users/core-pdf-fonts'
 			);
 			await expect(
-				failed.getByRole('button', { name: 'View the system report' })
+				failed.getByRole('link', { name: 'view the system report' })
+			).toHaveAttribute(
+				'href',
+				/admin\.php\?page=gf_system_status#gfpdf-font-download-failed$/
+			);
+			await expect(
+				failed.getByRole('button', { name: 'Retry the downloads' })
 			).toBeVisible();
 			await expect(
 				failed.getByRole('button', { name: 'Dismiss Notice' })
@@ -118,6 +122,32 @@ test.describe('Core Fonts', () => {
 
 			await admin.visitAdminPage('index.php');
 			await expect(failed.locator('li code')).toHaveText(FAILED_FONTS);
+		});
+
+		test('should clear the failures when the downloads are retried', async ({
+			page,
+			admin,
+		}: {
+			page: Page;
+			admin: Admin;
+		}) => {
+			const failed = notice(page);
+
+			await giveUpAt(page, 4102444800);
+			await admin.visitAdminPage('index.php');
+
+			await failed
+				.getByRole('button', { name: 'Retry the downloads' })
+				.click();
+			await expect(
+				page.getByText(
+					'Gravity PDF will try downloading the fonts again in the background.'
+				)
+			).toBeVisible();
+			await expect(failed).toHaveCount(0);
+
+			await admin.visitAdminPage('index.php');
+			await expect(failed).toHaveCount(0);
 		});
 	});
 });

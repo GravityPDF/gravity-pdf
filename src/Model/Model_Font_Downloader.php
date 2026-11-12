@@ -1172,6 +1172,36 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Turn every give-up into a retry due now, which the sync tries once whether or not the font is still required
+	 *
+	 * @return string[] The files to be tried again
+	 *
+	 * @since 6.19.0
+	 */
+	public function retry_failed_files(): array {
+		$failures = $this->get_failures();
+		$files    = [];
+		foreach ( $failures as $file => $failure ) {
+			if ( $failure['gave_up'] > 0 ) {
+				$failures[ $file ]['retry_at']  = time();
+				$failures[ $file ]['gave_up']   = 0;
+				$failures[ $file ]['dismissed'] = false;
+				$files[]                        = (string) $file;
+			}
+		}
+
+		if ( $files === [] ) {
+			return [];
+		}
+
+		$this->save_failures( $failures );
+		$this->schedule_by( time() );
+		$this->log->notice( 'Failed font downloads queued to be tried again', [ 'names' => $files ] );
+
+		return $files;
+	}
+
+	/**
 	 * Forget the failures read this request
 	 *
 	 * @since 6.19.0

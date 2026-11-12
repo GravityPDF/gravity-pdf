@@ -3,6 +3,7 @@
 namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Model\Model_System_Report;
 use GFPDF\Statics\Deprecation;
 use GPDFAPI;
 
@@ -147,10 +148,11 @@ class View_Actions extends Helper_Abstract_View {
 				'heading' => __( 'Gravity PDF could not download these fonts.', 'gravity-pdf' ) . ' ' . self::get_missing_core_fonts_warning(),
 				'items'   => $files,
 				'footer'  => sprintf(
-					/* translators: 1: Opening <a> tag, 2: Closing </a> tag */
-					esc_html__( 'You can %1$sinstall the fonts by hand%2$s. Dismissing this notice hides the fonts above. Any that fail later are reported again.', 'gravity-pdf' ),
+					/* translators: 1: Opening <a> tag, 2: Closing </a> tag, 3: Opening <a> tag */
+					esc_html__( 'You can %1$sinstall the fonts by hand%2$s, or %3$sview the system report%2$s. Dismissing this notice hides the fonts above. Any that fail later are reported again.', 'gravity-pdf' ),
 					'<a href="' . self::CORE_FONTS_DOCS_URL . '">',
-					'</a>'
+					'</a>',
+					'<a href="' . esc_url( Model_System_Report::get_report_url( Model_System_Report::FONTS_FAILED_ANCHOR ) ) . '">'
 				),
 			],
 			false
