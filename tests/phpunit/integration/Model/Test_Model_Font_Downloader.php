@@ -1684,6 +1684,60 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertSame( [ 'FreeSans.ttf' ], $this->new_downloader()->get_undismissed_failed_files() );
 	}
 
+	public function test_retrying_makes_each_give_up_due_and_queues_the_sync() {
+		$pending = $this->failure( 0, time() + HOUR_IN_SECONDS );
+		$this->set_font_failures(
+			[
+				self::FONT     => $this->failure( time() - 10 ),
+				'Garuda.ttf'   => array_merge( $this->failure( time() - 10 ), [ 'dismissed' => true ] ),
+				'FreeSans.ttf' => $pending,
+			]
+		);
+
+		$this->assertSame( [ self::FONT, 'Garuda.ttf' ], $this->downloader->retry_failed_files() );
+
+		$failures = $this->get_font_failures();
+		$this->assertSame( $pending, $failures['FreeSans.ttf'] );
+		foreach ( [ self::FONT, 'Garuda.ttf' ] as $file ) {
+			$this->assertSame( 0, $failures[ $file ]['gave_up'] );
+			$this->assertFalse( $failures[ $file ]['dismissed'] );
+			$this->assertLessThanOrEqual( time(), $failures[ $file ]['retry_at'] );
+		}
+
+		$this->assertSame( [], $this->downloader->get_failed_files() );
+		$this->assertCount( 1, $this->get_scheduled_events() );
+		$this->assertLessThanOrEqual( time(), wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+	}
+
+	public function test_the_sync_downloads_a_retried_font_no_longer_required() {
+		$this->set_font_failures( [ self::FONT => $this->failure( time() - 10 ) ] );
+		$this->set_back_off( self::FONT );
+		$this->downloader->retry_failed_files();
+
+		$this->serve_font_downloads();
+		$this->seamed_sync( [] )->sync();
+
+		$this->assertFileExists( $this->font_path( self::FONT ) );
+		$this->assertEmpty( $this->get_font_failures() );
+	}
+
+	public function test_a_retried_font_that_fails_again_gives_up() {
+		$this->set_font_failures( [ self::FONT => $this->failure( time() - 10 ) ] );
+		$this->downloader->retry_failed_files();
+
+		$this->fail_font_downloads();
+		$this->seamed_sync( [] )->sync();
+
+		$this->assertSame( [ self::FONT ], array_keys( $this->new_downloader()->get_failed_files() ) );
+	}
+
+	public function test_retrying_with_nothing_failed_changes_nothing() {
+		$this->assertSame( [], $this->downloader->retry_failed_files() );
+
+		$this->assertFalse( $this->get_font_failures() );
+		$this->assertFalse( wp_next_scheduled( Model_Font_Downloader::SYNC_EVENT ) );
+	}
+
 	public function test_a_font_on_disk_clears_its_give_up_for_every_reader() {
 		$this->list_fixture_as( 'Chewy.ttf', self::FONT );
 		$this->copy_fixture( 'Chewy.ttf', self::FONT );
