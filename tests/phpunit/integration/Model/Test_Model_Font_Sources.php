@@ -1066,7 +1066,7 @@ class Test_Model_Font_Sources extends TestCase {
 		$this->assertTrue( $this->model->is_record_file( 'DejaVuSans.ttf' ) );
 		$this->assertArrayNotHasKey( $hashed, $this->model->get_manifest(), 'The hashed name is no manifest file of its own' );
 		$this->assertSame( 'DejaVuSans.ttf', $this->model->get_manifest_file( $hashed ) );
-		$this->assertFalse( $this->model->is_installed( 'DejaVuSans.ttf' ), 'The record\'s file is not the family\'s copy' );
+		$this->assertSame( '', $this->model->get_own_copy( 'DejaVuSans.ttf' ), 'The record\'s file is not the family\'s copy' );
 	}
 
 	public function test_every_record_file_at_a_family_name_is_a_collision() {
@@ -1094,11 +1094,11 @@ class Test_Model_Font_Sources extends TestCase {
 
 		$this->put_other_font_at( $file );
 		$this->assertSame( '', $this->model->get_own_copy( $file ), 'Another font\'s file at the name' );
-		$this->assertFalse( $this->model->is_installed( $file ) );
+		$this->assertSame( '', $this->model->get_own_copy( $file ) );
 
 		$this->copy_fixture( $file, $hashed );
 		$this->assertSame( $this->font_path( $hashed ), $this->model->get_own_copy( $file ) );
-		$this->assertTrue( $this->model->is_installed( $file ) );
+		$this->assertNotSame( '', $this->model->get_own_copy( $file ) );
 	}
 
 	public function test_a_hashed_name_stands_for_its_manifest_file_only_for_the_current_release() {
@@ -1161,7 +1161,7 @@ class Test_Model_Font_Sources extends TestCase {
 
 		/* With no other name to take, the file at the name is the one used */
 		$this->copy_fixture( 'DejaVuSans.ttf', $renamed );
-		$this->assertTrue( $model->is_installed( $renamed ) );
+		$this->assertNotSame( '', $model->get_own_copy( $renamed ) );
 	}
 
 	public function test_two_sources_using_one_name_for_the_same_file_share_it() {
@@ -1205,17 +1205,17 @@ class Test_Model_Font_Sources extends TestCase {
 	public function test_a_file_is_another_fonts_when_its_size_is_no_known_build() {
 		$model = $this->get_model_with_manifest( [ 'Mine.ttf' => $this->manifest_entry( 'DejaVuSans.ttf', 'https://example.com/Mine.ttf' ) ] );
 
-		$this->assertFalse( $model->is_installed( 'Mine.ttf' ), 'Missing' );
+		$this->assertSame( '', $model->get_own_copy( 'Mine.ttf' ), 'Missing' );
 
 		$this->copy_fixture( 'DejaVuSans.ttf', 'Mine.ttf' );
-		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertNotSame( '', $model->get_own_copy( 'Mine.ttf' ) );
 
 		$this->copy_fixture( 'Chewy.ttf', 'Mine.ttf' );
-		$this->assertFalse( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertSame( '', $model->get_own_copy( 'Mine.ttf' ) );
 		$this->assertFileExists( $this->font_dir . 'Mine.ttf', 'The file at its name' );
 
 		$this->copy_fixture( 'DejaVuSans.ttf', $model->get_hashed_name( 'Mine.ttf' ) );
-		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertNotSame( '', $model->get_own_copy( 'Mine.ttf' ) );
 		$this->assertSame( $this->font_dir . $model->get_hashed_name( 'Mine.ttf' ), $model->get_own_copy( 'Mine.ttf' ) );
 	}
 
@@ -1225,7 +1225,7 @@ class Test_Model_Font_Sources extends TestCase {
 
 		$this->copy_fixture( 'Chewy.ttf', 'Mine.ttf' );
 
-		$this->assertTrue( $model->is_installed( 'Mine.ttf' ) );
+		$this->assertNotSame( '', $model->get_own_copy( 'Mine.ttf' ) );
 		$this->assertCount( 2, $model->get_known_builds( 'Mine.ttf' ) );
 	}
 

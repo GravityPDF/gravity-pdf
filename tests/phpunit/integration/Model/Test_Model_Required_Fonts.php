@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace GFPDF\Model;
 
 use GFPDF\Tests\Concerns\CopiesFontFixtures;
+use GFPDF\Tests\Concerns\RecordsFontFailures;
 use GFPDF\Tests\Concerns\StubsFontSources;
 use GFPDF\Tests\Concerns\SwitchesNetwork;
 use GFPDF\Tests\Integration\TestCase;
@@ -20,6 +21,7 @@ use GPDFAPI;
 class Test_Model_Required_Fonts extends TestCase {
 
 	use CopiesFontFixtures;
+	use RecordsFontFailures;
 	use StubsFontSources;
 	use SwitchesNetwork;
 
@@ -40,6 +42,7 @@ class Test_Model_Required_Fonts extends TestCase {
 
 	public function tear_down(): void {
 		$this->remove_font_fixtures();
+		$this->delete_font_failures();
 		GPDFAPI::get_options_class()->delete_option( 'default_font' );
 
 		/* A subsite leaves these behind */
@@ -287,6 +290,24 @@ class Test_Model_Required_Fonts extends TestCase {
 		/* Its copy under the hashed name is */
 		$this->copy_fixture( self::FONT, GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_hashed_name( self::FONT ) );
 
+		$this->assertSame( 1, $this->required->get_installed_counts()['core']['installed'] );
+	}
+
+	public function test_another_fonts_file_a_failed_download_found_is_not_installed() {
+		GPDFAPI::get_options_class()->update_option( 'default_font', 'dejavuserifcondensed' );
+		$this->put_same_size_font_at( self::FONT, self::FONT );
+		$path = $this->font_path( self::FONT );
+		$this->set_font_failures( [ self::FONT => $this->conflict_failure( $path ) ] );
+
+		$this->assertContains( self::FONT, $this->required->get_missing_files() );
+		$this->assertSame( 0, $this->required->get_installed_counts()['core']['installed'] );
+		$this->assertTrue( $this->required->needs_download( 'dejavuserifcondensed' ) );
+
+		/* A file copied over it after the failure is installed again */
+		touch( $path, filemtime( $path ) + 10 );
+		clearstatcache();
+
+		$this->assertNotContains( self::FONT, $this->required->get_missing_files() );
 		$this->assertSame( 1, $this->required->get_installed_counts()['core']['installed'] );
 	}
 
