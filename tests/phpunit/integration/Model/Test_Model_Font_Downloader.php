@@ -596,6 +596,52 @@ class Test_Model_Font_Downloader extends TestCase {
 		$this->assertEmpty( $this->get_font_failures() );
 	}
 
+	public function test_a_same_size_font_found_when_verifying_keeps_its_failure_until_it_gives_up() {
+		$this->put_same_size_font_at( self::FONT, self::FONT );
+		$this->fail_font_downloads();
+
+		$this->assertFalse( $this->new_downloader()->download( self::FONT, true ) );
+		$this->assertNotSame( '', $this->get_font_failures()[ self::FONT ]['conflict'] );
+
+		/* A render goes by size, which the other font's file has */
+		$this->assertFalse( $this->new_downloader()->download( self::FONT ) );
+		$this->assertSame( 0, $this->get_font_failures()[ self::FONT ]['gave_up'] );
+
+		$this->delete_back_off( self::FONT );
+		$this->assertFalse( $this->new_downloader()->download( self::FONT, true ) );
+
+		$this->assertSame( [ self::FONT ], $this->new_downloader()->get_undismissed_failed_files() );
+	}
+
+	public function test_a_render_queues_a_large_font_whose_name_a_failed_download_found_another_font_at() {
+		$this->put_same_size_font_at( self::FONT, self::FONT );
+		$this->fail_font_downloads();
+		$this->new_downloader()->download( self::FONT, true );
+		$this->delete_back_off( self::FONT );
+
+		$manifest                       = GPDFAPI::get_mvc_class( 'Model_Font_Sources' )->get_manifest();
+		$manifest[ self::FONT ]['size'] = Model_Font_Sources::LARGE_FILE_SIZE + 1;
+		$this->set_shared_manifest( $manifest );
+
+		$downloader = $this->new_downloader();
+		$this->assertFalse( $downloader->download_or_queue( self::FONT ) );
+		$this->assertCount( 1, $this->requested, 'The render leaves the download to the sync' );
+		$this->assertSame( [ self::FONT ], $downloader->get_wanted_files() );
+	}
+
+	public function test_a_font_copied_over_another_fonts_file_clears_its_failure() {
+		$this->put_same_size_font_at( self::FONT, self::FONT );
+		$this->fail_font_downloads();
+		$this->new_downloader()->download( self::FONT, true );
+
+		$this->copy_fixture( self::FONT );
+		touch( $this->font_path( self::FONT ), time() + 1 );
+
+		$this->assertTrue( $this->new_downloader()->download( self::FONT ) );
+		$this->assertEmpty( $this->get_font_failures() );
+		$this->assertFalse( $this->get_back_off( self::FONT ) );
+	}
+
 	public function test_prune_never_removes_a_hashed_copy_or_a_replaced_file() {
 		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 		$hashed  = $sources->get_hashed_name( self::FONT );
