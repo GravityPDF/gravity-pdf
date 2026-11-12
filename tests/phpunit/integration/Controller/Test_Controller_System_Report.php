@@ -61,58 +61,129 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	/**
-	 * Override API request to speed up unit test
+	 * Override API request to speed up unit test, answering as a protected temporary folder does
 	 *
 	 * @return array
 	 */
 	public function get_public_dir_api_response() {
 		return [
-			'response' => [ 'code' => 200 ],
-			'body'     => 'failed-if-read',
+			'response' => [ 'code' => 403 ],
+			'body'     => '',
 		];
 	}
 
-	public function test_system_report_php() {
-		/* Test that our data is spliced into the correct location in the array */
-		$system_report = apply_filters( 'gform_system_report', [ [] ] );
+	public function test_the_report_has_a_checks_and_a_configuration_table() {
+		$tables = apply_filters( 'gform_system_report', [] )[0]['tables'];
 
-		$this->assertArrayHasKey( 'memory', $this->get_report_section( 'php', $system_report ) );
-		$this->assertArrayHasKey( 'allow_url_fopen', $this->get_report_section( 'php', $system_report ) );
-		$this->assertArrayHasKey( 'default_charset', $this->get_report_section( 'php', $system_report ) );
-		$this->assertArrayHasKey( 'internal_encoding', $this->get_report_section( 'php', $system_report ) );
-
-		$this->assertArrayHasKey( 'pdf_working_directory', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'pdf_working_directory_url', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'font_folder_location', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'temp_folder_location', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'temp_folder_permission', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'temp_folder_protected', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'folder_permissions', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'mpdf_temp_folder_location', $this->get_report_section( 'directories', $system_report ) );
-
-		$this->assertArrayHasKey( 'pdf_entry_list_action', $this->get_report_section( 'global', $system_report ) );
-		$this->assertArrayHasKey( 'background_processing_enabled', $this->get_report_section( 'global', $system_report ) );
-		$this->assertArrayHasKey( 'debug_mode_enabled', $this->get_report_section( 'global', $system_report ) );
-
-		$this->assertArrayHasKey( 'user_restrictions', $this->get_report_section( 'security', $system_report ) );
-		$this->assertArrayHasKey( 'logged_out_timeout', $this->get_report_section( 'security', $system_report ) );
+		$this->assertSame( [ 'checks', 'configuration' ], array_column( $tables, 'id' ) );
+		$this->assertSame( [ 'Gravity PDF - Checks', 'Gravity PDF - Configuration' ], array_column( $tables, 'title_export' ) );
+		$this->assertSame(
+			[ 'PDF Working Directory', 'Folders', 'Font Installer', 'Entry View', 'Background Processing', 'Debug Mode', 'User Restriction', 'Logged Out Timeout', 'PDF Cache', 'PHP Charset / Encoding', 'Substitution Fonts' ],
+			array_column( $tables[1]['items'], 'label_export' )
+		);
 	}
 
-	public function test_system_report_lists_the_required_fonts_installed_and_the_substitution_fonts() {
+	public function test_a_clean_site_passes_every_check_in_one_row() {
+		$checks = $this->get_table( 'checks' );
+		$screen = array_values(
+			array_filter(
+				$checks,
+				static function ( $row ) {
+					return empty( $row['export_only'] );
+				}
+			)
+		);
+
+		$this->assertCount( 1, $screen );
+		$this->assertSame( 'All 9 checks passed', $screen[0]['label'] );
+		$this->assertTrue( $screen[0]['is_valid'] );
+		$this->assertStringStartsWith( 'no unsupported features · no deprecated features · PDF memory ', $screen[0]['value'] );
+		$this->assertSame(
+			[ 'Unsupported Features', 'Deprecated Features', 'PDF Memory Limit', 'allow_url_fopen', 'Folder Permissions', 'Temporary Folder Protected', 'Core Fonts', 'Outdated Templates', 'PDF Cache Cleanup' ],
+			array_column( $checks, 'label_export' )
+		);
+		$this->assertSame( [ 'None', 'None' ], array_column( array_slice( $checks, 0, 2 ), 'value_export' ) );
+	}
+
+	public function test_the_copied_report_marks_unchanged_settings_as_default() {
+		$configuration = array_column( $this->get_table( 'configuration' ), 'value_export', 'label_export' );
+
+		$this->assertStringEndsWith( 'mPDF: ' . ( is_multisite() ? wp_normalize_path( $this->gfpdf()->data->template_location ) : '' ) . 'tmp/mpdf/ (default)', $configuration['Folders'] );
+		$this->assertSame( 'View (default)', $configuration['Entry View'] );
+		$this->assertSame( 'Off (default)', $configuration['Background Processing'] );
+		$this->assertSame( 'Off (default)', $configuration['Debug Mode'] );
+		$this->assertSame( 'gravityforms_view_entries (default)', $configuration['User Restriction'] );
+		$this->assertSame( '20 minutes (default)', $configuration['Logged Out Timeout'] );
+		$this->assertSame( 'On, 12 hours (default)', $configuration['PDF Cache'] );
+	}
+
+	public function test_the_copied_report_leaves_default_off_changed_settings() {
+		$options = $this->gfpdf()->options;
+		$options->update_option( 'default_action', 'Download' );
+		$options->update_option( 'background_processing', 'Yes' );
+		$options->update_option( 'debug_mode', 'Yes' );
+		$options->update_option( 'admin_capabilities', [ 'gravityforms_view_entries', 'gravityforms_edit_entries' ] );
+		$options->update_option( 'logged_out_timeout', 1 );
+		$options->update_option( 'cache_duration', 24 );
+
+		$configuration = array_column( $this->get_table( 'configuration' ), null, 'label_export' );
+
+		$this->assertSame( 'Download', $configuration['Entry View']['value_export'] );
+		$this->assertSame( 'On', $configuration['Background Processing']['value_export'] );
+		$this->assertSame( 'On', $configuration['Debug Mode']['value_export'] );
+		$this->assertSame( 'gravityforms_view_entries, gravityforms_edit_entries', $configuration['User Restriction']['value_export'] );
+		$this->assertSame( 'gravityforms_view_entries<br>gravityforms_edit_entries', $configuration['User Restriction']['value'] );
+		$this->assertSame( '1 minute', $configuration['Logged Out Timeout']['value_export'] );
+		$this->assertSame( 'On, 24 hours', $configuration['PDF Cache']['value_export'] );
+	}
+
+	public function test_the_folders_row_is_relative_to_the_working_directory_while_every_folder_is_inside_it() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Single site only' );
+		}
+
+		$folders = $this->get_sections()['directories']['folders'];
+
+		$this->assertStringStartsWith( 'Relative to the PDF Working Directory:<br>Fonts: <code>fonts/</code>', $folders['value'] );
+		$this->assertStringContainsString( 'mPDF: <code>tmp/mpdf/</code>', $folders['value'] );
+	}
+
+	public function test_the_folders_row_shows_each_folder_in_full_on_a_multisite_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Multisite only' );
+		}
+
+		$folders = $this->get_sections()['directories']['folders'];
+
+		$this->assertStringStartsWith( 'Fonts: <code>' . esc_html( wp_normalize_path( $this->gfpdf()->data->template_font_location ) ) . '</code>', $folders['value'] );
+	}
+
+	public function test_the_folders_row_shows_each_folder_in_full_once_one_moves_out() {
+		$gfpdf = $this->gfpdf();
+		$saved = $gfpdf->data->mpdf_tmp_location;
+
+		$gfpdf->data->mpdf_tmp_location = '/srv/pdf-tmp';
+
+		try {
+			$folders = $this->get_sections()['directories']['folders'];
+		} finally {
+			$gfpdf->data->mpdf_tmp_location = $saved;
+		}
+
+		$this->assertStringNotContainsString( 'Relative to', $folders['value'] );
+		$this->assertStringContainsString( 'mPDF: <code>/srv/pdf-tmp/mpdf/</code>', $folders['value'] );
+		$this->assertStringStartsWith( 'Fonts: ' . wp_normalize_path( $gfpdf->data->template_font_location ), $folders['value_export'] );
+		$this->assertStringEndsWith( 'mPDF: /srv/pdf-tmp/mpdf/', $folders['value_export'] );
+	}
+
+	public function test_the_substitution_fonts_are_only_in_the_copied_report() {
 		\GPDFAPI::get_options_class()->update_option( 'default_font', 'arimo' );
 		$this->set_languages( [ 'th' ] );
 
 		$directories = $this->report_with_font_sources( $this->stub_font_sources() );
 
-		$this->assertSame( 'core: 0 of 4 required files installed', $directories['core_fonts_installed']['value'] );
-		$this->assertSame( 'Core Fonts installed', $directories['core_fonts_installed']['label_export'] );
+		$this->assertTrue( $directories['substitution_fonts']['export_only'] );
 		$this->assertSame( 'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil, sun-exta', $directories['substitution_fonts']['value'] );
-	}
-
-	public function test_system_report_flags_a_missing_core_font_manifest() {
-		$directories = $this->report_with_font_sources( $this->font_sources_without_a_manifest() );
-
-		$this->assertSame( 'core: manifest missing', $directories['core_fonts_installed']['value'] );
 	}
 
 	/**
@@ -133,7 +204,7 @@ class Test_Controller_System_Report extends TestCase {
 		}
 
 		try {
-			return $this->get_report_section( 'directories', apply_filters( 'gform_system_report', [] ) );
+			return $this->get_sections()['directories'];
 		} finally {
 			foreach ( $original as $name => $model ) {
 				$this->set_private( $report, $name, $model );
@@ -142,21 +213,79 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	public function test_system_report_outdated_template() {
-		/* verify no outdated template info */
-		$system_report = apply_filters( 'gform_system_report', [] );
-		$this->assertArrayNotHasKey( 'outdated_templates', $this->get_report_section( 'directories', $system_report ) );
+		$this->assertSame( 'None', array_column( $this->get_table( 'checks' ), 'value_export', 'label_export' )['Outdated Templates'] );
 
-		/* copy core template to override location and adjust version number, then verify outdated message is included */
-		$data          = \GPDFAPI::get_data_class();
-		$override_path = $data->template_location . 'zadani.php';
+		$override_path = $this->create_outdated_override();
 
+		try {
+			$row    = $this->get_sections()['directories']['outdated_templates'];
+			$checks = array_column( $this->get_table( 'checks' ), 'value', 'label_export' );
+		} finally {
+			@unlink( $override_path );
+		}
+
+		$this->assertFalse( $row['is_valid'] );
+		$this->assertStringEndsNotWith( '<br>', $checks['Outdated Templates'] );
+		$this->assertStringStartsWith( 'zadani.php 1.5.2', $row['value_export'] );
+		$this->assertStringStartsWith( '<code>zadani.php</code> 1.5.2', $row['value'] );
+		$this->assertStringStartsWith( 'Update these template overrides. <a href=', $row['validation_message'] );
+		$this->assertSame( '', $row['validation_message_export'] );
+	}
+
+	public function test_add_on_rows_go_to_checks_or_the_end_of_configuration() {
+		$this->setExpectedDeprecated( 'gfpdf_system_status_report_items' );
+
+		$override_path = $this->create_outdated_override();
+
+		$positional = static function ( $items ) {
+			$items[1]['outdated_templates']['value']        .= '/gpdf-leo.php version 2.1.0 is out of date.<hr>';
+			$items[1]['outdated_templates']['value_export'] .= "/gpdf-leo.php version 2.1.0 is out of date.\n";
+
+			return $items;
+		};
+
+		$named = static function ( $items ) {
+			$items['directories']['gv_outdated_templates'] = [
+				'label' => 'Outdated GravityView Templates',
+				'value' => 'list.php',
+			];
+
+			$items['global']['add_on_row'] = [
+				'label' => 'An Add-on Row',
+				'value' => 'Unchanged',
+			];
+
+			return $items;
+		};
+
+		add_filter( 'gfpdf_system_status_report_items', $positional );
+		add_filter( 'gfpdf_system_status_report_sections', $named );
+
+		try {
+			$checks        = $this->get_table( 'checks' );
+			$configuration = $this->get_table( 'configuration' );
+		} finally {
+			remove_filter( 'gfpdf_system_status_report_items', $positional );
+			remove_filter( 'gfpdf_system_status_report_sections', $named );
+			@unlink( $override_path );
+		}
+
+		$this->assertSame( [ 'Outdated Templates', 'Outdated GravityView Templates', '8 of 10 checks passed' ], array_column( array_slice( $checks, 0, 3 ), 'label' ) );
+		$this->assertMatchesRegularExpression( '#^<code>zadani.php</code> [^<]+<br>/gpdf-leo.php#', $checks[0]['value'] );
+		$this->assertStringContainsString( "\n/gpdf-leo.php", $checks[0]['value_export'] );
+		$this->assertSame( 'An Add-on Row', end( $configuration )['label'] );
+	}
+
+	/**
+	 * Copy the zadani template into the working directory, a version behind
+	 */
+	private function create_outdated_override(): string {
+		$path     = \GPDFAPI::get_data_class()->template_location . 'zadani.php';
 		$template = file_get_contents( PDF_PLUGIN_DIR . 'src/templates/zadani.php' );
-		file_put_contents( $override_path, preg_replace( '/Version: (.+?)/', 'Version: 1.5.2', $template ) );
 
-		$system_report = apply_filters( 'gform_system_report', [] );
-		$this->assertArrayHasKey( 'outdated_templates', $this->get_report_section( 'directories', $system_report ) );
+		file_put_contents( $path, preg_replace( '/Version: (.+?)/', 'Version: 1.5.2', $template ) );
 
-		@unlink( $override_path );
+		return $path;
 	}
 
 	/**
@@ -174,7 +303,7 @@ class Test_Controller_System_Report extends TestCase {
 			}
 
 			/* What the filter takes out has to stay out, so the read-back replaces the section rather than merging it */
-			unset( $items[0]['default_charset'] );
+			unset( $items[0]['charset'] );
 
 			/* No section has ever answered to this, so there is nowhere for it to land */
 			$items[4] = [ 'orphan_row' => [ 'label' => 'Orphan Row' ] ];
@@ -184,18 +313,18 @@ class Test_Controller_System_Report extends TestCase {
 
 		add_filter( 'gfpdf_system_status_report_items', $callback );
 
-		$system_report = apply_filters( 'gform_system_report', [] );
+		$sections = $this->get_sections();
 
 		remove_filter( 'gfpdf_system_status_report_items', $callback );
 
-		$this->assertArrayHasKey( 'row_0', $this->get_report_section( 'php', $system_report ) );
-		$this->assertArrayHasKey( 'row_1', $this->get_report_section( 'directories', $system_report ) );
-		$this->assertArrayHasKey( 'row_2', $this->get_report_section( 'global', $system_report ) );
-		$this->assertArrayHasKey( 'row_3', $this->get_report_section( 'security', $system_report ) );
+		$this->assertArrayHasKey( 'row_0', $sections['php'] );
+		$this->assertArrayHasKey( 'row_1', $sections['directories'] );
+		$this->assertArrayHasKey( 'row_2', $sections['global'] );
+		$this->assertArrayHasKey( 'row_3', $sections['security'] );
 
-		$this->assertArrayNotHasKey( 'default_charset', $this->get_report_section( 'php', $system_report ) );
-		$this->assertArrayNotHasKey( 'orphan_row', $this->get_report_section( 'cache', $system_report ) );
-		$this->assertCount( 5, $system_report[0]['tables'] );
+		$this->assertArrayNotHasKey( 'charset', $sections['php'] );
+		$this->assertArrayNotHasKey( 'orphan_row', $sections['cache'] );
+		$this->assertArrayNotHasKey( 4, $sections );
 	}
 
 	/**
@@ -234,8 +363,8 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertArrayHasKey( Deprecation::GROUP_UNSUPPORTED, $named );
 		$this->assertArrayHasKey( 'directories', $named );
 
-		/* And the section is still in the report */
-		$this->assertArrayHasKey( 'legacy_templates', $this->get_report_section( Deprecation::GROUP_UNSUPPORTED, $system_report ) );
+		/* And the feature is still in the report */
+		$this->assertContains( 'Legacy Templates (Unsupported)', array_column( $system_report[0]['tables'][0]['items'], 'label_export' ) );
 
 		$this->delete_legacy_templates( $path );
 	}
@@ -255,11 +384,11 @@ class Test_Controller_System_Report extends TestCase {
 
 		add_filter( 'gfpdf_system_status_report_sections', $callback );
 
-		$system_report = apply_filters( 'gform_system_report', [] );
+		$configuration = $this->get_table( 'configuration' );
 
 		remove_filter( 'gfpdf_system_status_report_sections', $callback );
 
-		$this->assertArrayHasKey( 'third_party_row', $this->get_report_section( 'directories', $system_report ) );
+		$this->assertSame( 'From the named filter', end( $configuration )['value'] );
 	}
 
 	/**
@@ -271,32 +400,18 @@ class Test_Controller_System_Report extends TestCase {
 		/* A folder that failed the last check, and has been fixed since */
 		update_option( Model_Install::UNWRITABLE_FOLDERS, [ '/srv/fixed-since/' => time() ] );
 
-		$row = $this->get_report_section( 'directories' )['folder_permissions'];
+		$row = $this->get_sections()['directories']['folder_permissions'];
 		$this->assertSame( 'Writable', $row['value_export'] );
+		$this->assertTrue( $row['is_valid'] );
 		$this->assertSame( [], get_option( Model_Install::UNWRITABLE_FOLDERS ) );
 
-		$dir         = $gfpdf->data->template_tmp_location;
-		$directories = $this->get_directories_with_unwritable( [ $dir ] );
-		$row         = $directories['folder_permissions'];
+		$dir = $gfpdf->data->template_tmp_location;
+		$row = $this->get_directories_with_unwritable( [ $dir, '/srv/pdf-tmp/mpdf' ] )['folder_permissions'];
 
-		$this->assertSame( 'Not writable', $directories['temp_folder_permission']['value_export'] );
-		$this->assertSame( 'Not writable: ' . $dir, $row['value_export'] );
-		$this->assertStringContainsString( 'Not writable', $row['value'] );
-	}
-
-	public function test_temp_folder_permission_reads_an_mpdf_cache_outside_tmp() {
-		$gfpdf = $this->gfpdf();
-		$saved = $gfpdf->data->mpdf_tmp_location;
-
-		$gfpdf->data->mpdf_tmp_location = '/srv/pdf-tmp';
-
-		try {
-			$row = $this->get_directories_with_unwritable( [ '/srv/pdf-tmp/mpdf' ] )['temp_folder_permission'];
-		} finally {
-			$gfpdf->data->mpdf_tmp_location = $saved;
-		}
-
-		$this->assertSame( 'Not writable', $row['value_export'] );
+		$this->assertFalse( $row['is_valid'] );
+		$this->assertSame( 'Not writable: ' . $dir . ', /srv/pdf-tmp/mpdf', $row['value_export'] );
+		$this->assertSame( 'Not writable:<br><code>' . esc_html( $dir ) . '</code><br><code>/srv/pdf-tmp/mpdf</code>', $row['value'] );
+		$this->assertSame( 'Ask your web host to make these folders writable.', $row['validation_message'] );
 	}
 
 	/**
@@ -318,25 +433,37 @@ class Test_Controller_System_Report extends TestCase {
 		$gfpdf->singleton->add_class( $failing );
 
 		try {
-			return $this->get_report_section( 'directories' );
+			return $this->get_sections()['directories'];
 		} finally {
 			$gfpdf->singleton->add_class( $installer );
 		}
 	}
 
 	/**
-	 * Get the items of one Gravity PDF report section, by the ID the section declares
-	 *
-	 * Looked up by name so a section added or dropped above doesn't move every assertion below it.
+	 * The report sections as both filters leave them, keyed by section and row
 	 */
-	protected function get_report_section( string $id, ?array $system_report = null ): array {
-		$system_report = $system_report ?? apply_filters( 'gform_system_report', [] );
+	protected function get_sections(): array {
+		$sections = [];
+		$capture  = static function ( $items ) use ( &$sections ) {
+			$sections = $items;
 
-		foreach ( $system_report as $section ) {
-			foreach ( $section['tables'] ?? [] as $table ) {
-				if ( ( $table['id'] ?? '' ) === $id ) {
-					return $table['items'];
-				}
+			return $items;
+		};
+
+		add_filter( 'gfpdf_system_status_report_sections', $capture, PHP_INT_MAX );
+		apply_filters( 'gform_system_report', [] );
+		remove_filter( 'gfpdf_system_status_report_sections', $capture, PHP_INT_MAX );
+
+		return $sections;
+	}
+
+	/**
+	 * The rows of the Checks or Configuration table
+	 */
+	protected function get_table( string $id ): array {
+		foreach ( apply_filters( 'gform_system_report', [] )[0]['tables'] as $table ) {
+			if ( $table['id'] === $id ) {
+				return $table['items'];
 			}
 		}
 
@@ -344,16 +471,10 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	/**
-	 * Get the items of the Unsupported section, which is only present when something removed is still in use
+	 * Get the rows of the Unsupported section, which only lists features when something removed is still in use
 	 */
 	protected function get_unsupported_features(): array {
-		return $this->get_report_section( Deprecation::GROUP_UNSUPPORTED );
-	}
-
-	public function test_system_report_has_no_deprecated_features_section_by_default() {
-		$system_report = apply_filters( 'gform_system_report', [] );
-
-		$this->assertCount( 5, $system_report[0]['tables'] );
+		return $this->get_sections()[ Deprecation::GROUP_UNSUPPORTED ];
 	}
 
 	public function test_system_report_legacy_template() {
@@ -381,7 +502,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		/* It upgrades differently to a plain v3 template, so it doesn't share that row or its guide */
 		$this->assertArrayNotHasKey( 'legacy_templates', $items );
-		$this->assertStringContainsString( '#business-plus--tier-2-template-upgrade-guide', $items['business_plus_templates']['validation_message_export'] );
+		$this->assertStringContainsString( '#business-plus--tier-2-template-upgrade-guide', $items['business_plus_templates']['validation_message'] );
 
 		$this->delete_legacy_templates( $path );
 	}
@@ -424,14 +545,16 @@ class Test_Controller_System_Report extends TestCase {
 	}
 
 	public function test_system_report_tools_tab_hooks() {
-		$this->assertArrayNotHasKey( 'tools_tab_hooks', $this->get_report_section( Deprecation::GROUP_DEPRECATED ) );
+		$this->assertArrayNotHasKey( 'tools_tab_hooks', $this->get_sections()[ Deprecation::GROUP_DEPRECATED ] );
 
 		add_filter( 'gfpdf_settings_tools', '__return_empty_array' );
 		Deprecation::flush_cache();
 
-		$items = $this->get_report_section( Deprecation::GROUP_DEPRECATED );
+		$items = $this->get_sections()[ Deprecation::GROUP_DEPRECATED ];
 		$this->assertArrayHasKey( 'tools_tab_hooks', $items );
 		$this->assertSame( 'gfpdf_settings_tools has 1 listener', $items['tools_tab_hooks']['value_export'] );
+		$this->assertSame( 'Tools Tab Actions and Filters (Deprecated)', $items['tools_tab_hooks']['label_export'] );
+		$this->assertStringStartsWith( 'Will be removed in Gravity PDF 7.0. <a href=', $items['tools_tab_hooks']['validation_message'] );
 
 		remove_filter( 'gfpdf_settings_tools', '__return_empty_array' );
 	}
@@ -589,35 +712,37 @@ class Test_Controller_System_Report extends TestCase {
 
 	public function test_system_report_pdf_cache() {
 		$this->gfpdf()->options->update_option( 'pdf_cache', 'No' );
+
+		$items = $this->get_sections()['cache'];
+
+		$this->assertSame( 'Off', $items['pdf_cache']['value_export'] );
+		$this->assertSame( 'Never run', $items['cache_cleanup']['value_export'] );
+		$this->assertTrue( $items['cache_cleanup']['is_valid'] );
+
+		$this->gfpdf()->options->update_option( 'pdf_cache', 'Yes' );
 		$this->gfpdf()->options->update_option( 'cache_duration', 6 );
-
-		$items = $this->get_report_section( 'cache' );
-
-		$this->assertSame( 'No', $items['pdf_cache']['value_export'] );
-		$this->assertSame( '6 hour(s)', $items['cache_duration']['value_export'] );
-		$this->assertSame( 'Never', $items['cache_cleanup']['value_export'] );
-		$this->assertArrayNotHasKey( 'is_valid', $items['cache_cleanup'] );
 
 		update_option(
 			Model_Pdf_Cache::SWEEP_STATE_OPTION,
 			[
 				'last_slice_at'    => time(),
-				'last_complete_at' => time() - HOUR_IN_SECONDS,
+				'last_complete_at' => strtotime( '2026-11-11 08:00:00 UTC' ),
 				'last_pass'        => [
 					'mode'         => 'expire',
 					'started'      => time() - HOUR_IN_SECONDS,
 					'files_reaped' => 3,
-					'bytes_reaped' => 3072,
-					'files_left'   => 2,
-					'bytes_left'   => 2048,
+					'bytes_reaped' => 3 * MB_IN_BYTES,
+					'files_left'   => 1,
+					'bytes_left'   => 1536,
 				],
 			]
 		);
 
-		$items = $this->get_report_section( 'cache' );
+		$items = $this->get_sections()['cache'];
 
-		$this->assertStringContainsString( 'Removed 3 file(s) (3072 bytes) and kept 2 (2048 bytes)', $items['cache_cleanup']['value_export'] );
-		$this->assertStringContainsString( '1 hour ago. Removed 3 file(s) (3 KB) and kept 2 (2 KB).', $items['cache_cleanup']['value'] );
+		$this->assertSame( 'On, 6 hours', $items['pdf_cache']['value_export'] );
+		$this->assertSame( '2026-11-11 08:00:00 UTC. Removed 3 files (3.00 MB), kept 1 (0.00 MB).', $items['cache_cleanup']['value_export'] );
+		$this->assertStringStartsWith( 'Last ran ', $items['cache_cleanup']['value'] );
 	}
 
 	public function test_the_pdf_cache_row_and_site_health_warn_when_cron_is_not_cleaning_the_cache() {
@@ -630,14 +755,14 @@ class Test_Controller_System_Report extends TestCase {
 		update_option( Model_Pdf_Cache::SWEEP_STATE_OPTION, [ 'last_slice_at' => time() - 2 * DAY_IN_SECONDS ] );
 
 		/* Nothing cached, nothing to warn about */
-		$this->assertArrayNotHasKey( 'is_valid', $this->get_report_section( 'cache' )['cache_cleanup'] );
+		$this->assertTrue( $this->get_sections()['cache']['cache_cleanup']['is_valid'] );
 		$this->assertSame( 'good', call_user_func( $test )['status'] );
 
 		$entry_dir = $this->gfpdf()->data->template_tmp_location . ( is_multisite() ? get_current_blog_id() . '/' : '' ) . 'cache/e999999/';
 		wp_mkdir_p( $entry_dir );
 
 		try {
-			$this->assertFalse( $this->get_report_section( 'cache' )['cache_cleanup']['is_valid'] );
+			$this->assertFalse( $this->get_sections()['cache']['cache_cleanup']['is_valid'] );
 			$this->assertSame( 'recommended', call_user_func( $test )['status'] );
 
 			/* A sweep ran recently, but the hourly event is overdue */
@@ -646,15 +771,15 @@ class Test_Controller_System_Report extends TestCase {
 
 			wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
 			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'gfpdf_cleanup_tmp_dir' );
-			$this->assertArrayNotHasKey( 'is_valid', $this->get_report_section( 'cache' )['cache_cleanup'] );
+			$this->assertTrue( $this->get_sections()['cache']['cache_cleanup']['is_valid'] );
 			$this->assertSame( 'good', call_user_func( $test )['status'] );
 		} finally {
 			rmdir( $entry_dir );
 		}
 	}
 
-	public function test_core_fonts_failed_lists_given_up_files_even_after_the_notice_is_dismissed() {
-		update_option( 'date_format', 'Y-m-d' );
+	public function test_core_fonts_lists_given_up_files_even_after_the_notice_is_dismissed() {
+		$this->use_report_downloader( [ 'Garuda.ttf', 'FreeSans.ttf' ] );
 		$this->set_font_failures(
 			[
 				'Garuda.ttf'   => $this->failure( strtotime( '2026-11-03 12:00:00 UTC' ) ),
@@ -662,46 +787,64 @@ class Test_Controller_System_Report extends TestCase {
 			]
 		);
 
-		$this->assertSame( 'Core Fonts failed', $this->report_row( 'core_fonts_failed' )['label_export'] );
-		$this->assertSame( 'Garuda.ttf (gave up 2026-11-03)', $this->report_row( 'core_fonts_failed' )['value'] );
+		$row = $this->report_row( 'core_fonts' );
+
+		$this->assertFalse( $row['is_valid'] );
+		$this->assertSame( '1 failed: Garuda.ttf (gave up 2026-11-03)', $row['value_export'] );
+		$this->assertSame( '1 failed:<br><code>Garuda.ttf</code>', $row['value'] );
+		$this->assertStringStartsWith( 'Some characters may not display in PDFs. <a href="https://docs.gravitypdf.com/users/core-pdf-fonts">', $row['validation_message'] );
 
 		\GPDFAPI::get_mvc_class( 'Model_Actions' )->dismiss_failed_core_fonts();
 
 		$this->assertFalse( \GPDFAPI::get_mvc_class( 'Model_Actions' )->has_failed_core_fonts() );
-		$this->assertSame( 'Garuda.ttf (gave up 2026-11-03)', $this->report_row( 'core_fonts_failed' )['value'] );
+		$this->assertSame( '1 failed: Garuda.ttf (gave up 2026-11-03)', $this->report_row( 'core_fonts' )['value_export'] );
 	}
 
-	public function test_core_fonts_failed_and_the_notice_clear_once_the_font_is_on_disk() {
+	public function test_core_fonts_lists_missing_files_while_the_font_installer_is_off() {
+		$this->use_report_downloader( [ 'Garuda.ttf' ] );
+		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
+
+		$row = $this->report_row( 'core_fonts' );
+
+		$this->assertFalse( $row['is_valid'] );
+		$this->assertSame( '1 missing: Garuda.ttf', $row['value_export'] );
+		$this->assertStringStartsWith( 'The Font Installer is turned off by the gfpdf_auto_install_fonts filter.', $row['validation_message'] );
+	}
+
+	public function test_core_fonts_and_the_notice_clear_once_the_font_is_on_disk() {
 		$this->list_fixture_as( 'Chewy.ttf', 'Garuda.ttf' );
 		$this->copy_fixture( 'Chewy.ttf', 'Garuda.ttf' );
 		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
 
-		$this->assertSame( 'None', $this->report_row( 'core_fonts_failed' )['value'] );
+		$this->assertSame( 'None failed', $this->report_row( 'core_fonts' )['value_export'] );
+		$this->assertTrue( $this->report_row( 'core_fonts' )['is_valid'] );
 		$this->assertFalse( \GPDFAPI::get_mvc_class( 'Model_Actions' )->has_failed_core_fonts() );
 	}
 
 	public function test_the_font_rows_can_be_linked_to() {
 		$this->use_report_downloader( [] );
 
-		$this->assertStringContainsString( 'id="' . Model_System_Report::FONTS_FAILED_ANCHOR . '"', $this->report_row( 'core_fonts_failed' )['label'] );
+		$this->assertStringContainsString( 'id="' . Model_System_Report::FONTS_FAILED_ANCHOR . '"', $this->report_row( 'core_fonts' )['label'] );
 		$this->assertStringContainsString( 'id="' . Model_System_Report::FONT_DOWNLOADS_ANCHOR . '"', $this->report_row( 'core_font_downloads' )['label'] );
 	}
 
-	public function test_core_fonts_failed_says_none_without_a_given_up_file() {
+	public function test_core_fonts_says_none_failed_without_a_given_up_file() {
+		$this->use_report_downloader( [ 'Garuda.ttf' ] );
 		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure() ] );
 
-		$this->assertSame( 'None', $this->report_row( 'core_fonts_failed' )['value'] );
+		$this->assertSame( 'None failed', $this->report_row( 'core_fonts' )['value_export'] );
 	}
 
-	public function test_core_font_downloads_reads_the_downloaders_status() {
+	public function test_the_font_installer_row_reads_the_downloaders_status() {
 		$this->use_report_downloader( [ 'Garuda.ttf' ] );
 
-		$this->assertSame( 'Core Font downloads', $this->report_row( 'core_font_downloads' )['label_export'] );
+		$this->assertSame( 'Font Installer', $this->report_row( 'core_font_downloads' )['label_export'] );
 		$this->assertSame( 'On', $this->report_row( 'core_font_downloads' )['value'] );
+		$this->assertSame( 'On (default)', $this->report_row( 'core_font_downloads' )['value_export'] );
 
 		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
 
-		$this->assertSame( 'Off (gfpdf_auto_install_fonts filter)', $this->report_row( 'core_font_downloads' )['value'] );
+		$this->assertSame( 'Off (gfpdf_auto_install_fonts filter)', $this->report_row( 'core_font_downloads' )['value_export'] );
 	}
 
 	public function test_the_core_fonts_site_health_test_is_gated_on_the_gravity_forms_capability() {
@@ -804,6 +947,6 @@ class Test_Controller_System_Report extends TestCase {
 	 * A row of the report's directories section
 	 */
 	private function report_row( string $key ): array {
-		return $this->get_report_section( 'directories' )[ $key ];
+		return $this->get_sections()['directories'][ $key ];
 	}
 }

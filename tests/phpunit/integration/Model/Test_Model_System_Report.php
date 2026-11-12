@@ -67,11 +67,7 @@ class Test_Model_System_Report extends TestCase {
 		$this->assertArrayHasKey( 'title_export', $structure );
 		$this->assertArrayHasKey( 'tables', $structure );
 
-		/* One section per deprecation group in use, then the rest */
-		$this->assertSame(
-			[ 'unsupported', 'deprecated', 'php', 'directories', 'global', 'security', 'cache' ],
-			array_column( $structure['tables'], 'id' )
-		);
+		$this->assertSame( [ 'checks', 'configuration' ], array_column( $structure['tables'], 'id' ) );
 	}
 
 	public function test_move_gravitypdf_active_plugins_to_gf_addons() {

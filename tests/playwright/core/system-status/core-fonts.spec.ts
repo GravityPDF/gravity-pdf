@@ -14,39 +14,48 @@ const giveUpAt = (page: Page, timestamp: number) =>
 	page.setExtraHTTPHeaders({ 'X-GPDF-E2E-Failed-Fonts': String(timestamp) });
 
 test.describe('Core Fonts', () => {
-	test('should report the installed core fonts and substitution fonts in the system report', async ({
+	test('should report the missing core fonts and the Font Installer in the system report', async ({
 		page,
 		admin,
 	}: {
 		page: Page;
 		admin: Admin;
 	}, testinfo) => {
+		// A default font no spec puts on disk, for this test's requests only (see tools/mu-plugins)
+		await page.setExtraHTTPHeaders({
+			'X-GPDF-E2E-Default-Font': 'pothana2000',
+		});
+
 		await admin.visitAdminPage('admin.php', 'page=gf_system_status');
 
-		const installed = page.getByRole('row', {
-			name: /^Core Fonts installed/,
-		});
-		const substitution = page.getByRole('row', {
-			name: /^Substitution Fonts/,
-		});
+		const coreFonts = page.getByRole('row', { name: /^Core Fonts/ });
+		const installer = page.getByRole('row', { name: /^Font Installer/ });
 
-		// Core font downloads are off on this site (see tools/mu-plugins), and the forms the other specs create decide how many are required
-		await expect(installed).toContainText(
-			/core: 0 of \d+ required files installed/
+		// Core font downloads are off on this site (see tools/mu-plugins), so the default font's file stays missing
+		await expect(coreFonts).toContainText(/\d+ missing:/);
+		await expect(coreFonts.locator('code')).toContainText([
+			'Pothana2000.ttf',
+		]);
+		await expect(coreFonts).toContainText(
+			'The Font Installer is turned off by the gfpdf_auto_install_fonts filter.'
 		);
-
-		// The bundled fonts and the core ones mPDF loads only when they have the characters
-		await expect(substitution).toContainText(
-			'arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil, sun-exta'
-		);
-
 		await expect(
-			page.getByRole('row', { name: /^Core Font downloads/ })
-		).toContainText('Off (gfpdf_auto_install_fonts filter)');
+			coreFonts.getByRole('link', { name: 'Install the fonts by hand' })
+		).toHaveAttribute(
+			'href',
+			'https://docs.gravitypdf.com/users/core-pdf-fonts'
+		);
+		await expect(installer).toContainText(
+			'Off (gfpdf_auto_install_fonts filter)'
+		);
 
-		await snapshot(page, testinfo, [installed, substitution], {
-			mask: [installed.locator('td').last()],
-		});
+		// The bundled fonts and the core ones mPDF loads only when they have the characters, listed in the copied report only
+		await expect(page.locator('#gform-system-report-text')).toContainText(
+			'Substitution Fonts: arimo, gfpdf-dejavu-symbols, dejavusanscondensed, freesans, garuda, khmeros, padaukbook, kaputaunicode, abyssinicasil, sun-exta'
+		);
+
+		// The rows between the two depend on what the specs alongside leave behind
+		await snapshot(page, testinfo, installer);
 	});
 
 	test.describe('Failed downloads', () => {

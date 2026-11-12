@@ -51,44 +51,49 @@ test.describe('Deprecated Features', () => {
 	}, testinfo) => {
 		await admin.visitAdminPage('admin.php', 'page=gf_system_status');
 
-		// The section title is the table's caption, matched whole so a stray "Deprecated" elsewhere can't join in
-		const sectionByTitle = (title: string) =>
-			page.locator('table.gform_system_report').filter({
-				has: page.locator('caption', {
-					hasText: new RegExp(`^\\s*${title}\\s*$`),
-				}),
-			});
+		// The table title is its caption, matched whole so a stray "Checks" elsewhere can't join in
+		const checks = page.locator('table.gform_system_report').filter({
+			has: page.locator('caption', { hasText: /^\s*Checks\s*$/ }),
+		});
 
-		const unsupported = sectionByTitle('Unsupported');
+		const feature = (label: string) =>
+			checks.getByRole('row', { name: `${label} (Unsupported)` });
+
+		const legacyTemplates = feature('Legacy Templates');
 
 		// Everything the v3 provider detects is gone in 7.0, so there is nothing left to report as merely deprecated
-		await expect(sectionByTitle('Deprecated')).toHaveCount(0);
-		await expect(unsupported).toBeVisible();
+		await expect(
+			checks.getByRole('row', { name: /\(Deprecated\)/ })
+		).toHaveCount(0);
+		await expect(checks).toContainText('no deprecated features');
 
 		// Templates are listed by file name alone, since the report states the working directory of its own, and
 		// by the forms configured to render through them
-		await expect(unsupported).toContainText(
-			'PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0.'
-		);
-		await expect(unsupported).toContainText(
+		await expect(legacyTemplates).toContainText(
 			`e2e-legacy.php (form ID ${formId})`
 		);
-		await expect(unsupported).not.toContainText('PDF_EXTENDED_TEMPLATES');
-
-		// A template that drives the PDF engine is a Business Plus one, and reports under its own heading
-		await expect(unsupported).toContainText(
-			'PDFs built with Advanced Templating can no longer be generated in Gravity PDF 7.0.'
+		await expect(legacyTemplates).toContainText(
+			'Removed in Gravity PDF 7.0, so it no longer runs.'
 		);
-		await expect(unsupported).toContainText(
+		await expect(
+			legacyTemplates.getByRole('link', { name: 'How to upgrade' })
+		).toHaveAttribute(
+			'href',
+			'https://docs.gravitypdf.com/upgrade/legacy-templates/'
+		);
+		await expect(checks).not.toContainText('PDF_EXTENDED_TEMPLATES');
+
+		// A template that drives the PDF engine is a Business Plus one, and reports under its own row
+		await expect(feature('Business Plus / Tier 2 Templates')).toContainText(
 			'e2e-business-plus.php (not configured on a form)'
 		);
 
 		// Each detected form links to its own PDF settings, which is where both the template and the URL are replaced
-		await expect(unsupported).toContainText(
+		await expect(feature('Legacy Download URLs')).toContainText(
 			`Broken link stored on form ID ${formId}`
 		);
 
-		const formLinks = unsupported.getByRole('link', {
+		const formLinks = checks.getByRole('link', {
 			name: `${formId}`,
 			exact: true,
 		});
@@ -99,15 +104,23 @@ test.describe('Deprecated Features', () => {
 			new RegExp(`subview=PDF&id=${formId}$`)
 		);
 
-		// Both hook shapes the map names are reported: a v3-shaped alias and a `gfpdf_legacy_` one
-		await expect(unsupported).toContainText('gfpdf_rtl has 1 listener');
-		await expect(unsupported).toContainText(
+		// Both hook shapes the map names are reported, one per line: a v3-shaped alias and a `gfpdf_legacy_` one
+		const hooks = feature('Actions and Filters');
+
+		await expect(hooks).toContainText('gfpdf_rtl has 1 listener');
+		await expect(hooks).toContainText(
 			'gfpdf_legacy_templates has 1 listener'
 		);
 
 		await maskFormIds(page);
 
-		await snapshot(page, testinfo, unsupported);
+		// Only the feature rows, as the checks below them depend on what the specs alongside leave behind
+		await snapshot(page, testinfo, [
+			legacyTemplates,
+			feature('Business Plus / Tier 2 Templates'),
+			feature('Legacy Download URLs'),
+			hooks,
+		]);
 	});
 
 	test('should report the detected features in Site Health', async ({

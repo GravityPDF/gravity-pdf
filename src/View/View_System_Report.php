@@ -50,19 +50,25 @@ class View_System_Report extends Helper_Abstract_View {
 
 	/**
 	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report leaves its icons to Gravity Forms
 	 */
 	public function maybe_get_active_icon( bool $results ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
 		if ( ! $results ) {
 			return '';
 		}
 
-		return $this->get_icon( $results );
+		return $this->markup_yes;
 	}
 
 	/**
 	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report leaves its icons to Gravity Forms
 	 */
 	public function get_icon( bool $results ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
 		return $results ? $this->markup_yes : $this->markup_no;
 	}
 
@@ -72,8 +78,11 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @return string
 	 *
 	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
 	 */
 	public function memory_limit_markup( $memory ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
 		if ( $memory === -1 ) {
 			return esc_html__( 'Unlimited', 'gravity-pdf' ) . ' ' . $this->markup_yes;
 		}
@@ -91,8 +100,11 @@ class View_System_Report extends Helper_Abstract_View {
 
 	/**
 	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
 	 */
 	public function get_allow_url_fopen( bool $allow_url_fopen ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
 		$output = $allow_url_fopen ? $this->markup_yes : $this->markup_warning;
 
 		if ( ! $allow_url_fopen ) {
@@ -106,9 +118,12 @@ class View_System_Report extends Helper_Abstract_View {
 
 	/**
 	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
 	 */
 	public function get_temp_folder_protected( bool $is_protected ): string {
-		$output = $this->get_icon( $is_protected );
+		_deprecated_function( __METHOD__, '6.19.0' );
+
+		$output = ( $is_protected ? $this->markup_yes : $this->markup_no );
 
 		if ( ! $is_protected ) {
 			$output .= ' ' . sprintf( esc_html__( "Gravity PDF's temporary directory is publicly accessible.", 'gravity-pdf' ) );
@@ -123,10 +138,13 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @param string[] $folders The folders that can't be written to, relative to the site
 	 *
 	 * @since 6.18.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
 	 */
 	public function get_folder_permissions( array $folders ): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
 		$writable = $folders === [];
-		$output   = ( $writable ? esc_html__( 'Writable', 'gravity-pdf' ) : esc_html__( 'Not writable', 'gravity-pdf' ) ) . ' ' . $this->get_icon( $writable );
+		$output   = ( $writable ? esc_html__( 'Writable', 'gravity-pdf' ) : esc_html__( 'Not writable', 'gravity-pdf' ) ) . ' ' . ( $writable ? $this->markup_yes : $this->markup_no );
 
 		foreach ( $folders as $folder ) {
 			$output .= '<br /><code>' . esc_html( $folder ) . '</code>';
@@ -143,15 +161,18 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @param string $core_version The latest Core template version
 	 *
 	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
 	 */
 	public function get_template_check_message( string $path, string $template_version, string $core_version ): array {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
 		/* translators: 1: Template file path, 2: Current template version (wrapped in styled <span>), 3: Latest core version */
 		$message = sprintf( esc_html__( '%1$s version %2$s is out of date. The core version is %3$s', 'gravity-pdf' ), $path, '<span style="color: #ff0000;font-weight:bold">' . $template_version . '</span>', $core_version );
 
 		$export_message = sprintf( '%1$s version %2$s is out of date. The core version is %3$s', $path, $template_version, $core_version );
 
 		return [
-			'value'        => $message . $this->get_icon( false ) . '<hr>',
+			'value'        => $message . $this->markup_no . '<hr>',
 			'value_export' => $export_message . "   &#10008;\n",
 		];
 	}
@@ -160,11 +181,120 @@ class View_System_Report extends Helper_Abstract_View {
 	 * Prepare message on how to update outdated template file(s)
 	 *
 	 * @since 6.0
+	 * @deprecated 6.19.0 The System Report builds its rows with get_check()
 	 */
 	public function get_template_upgrade_message(): string {
+		_deprecated_function( __METHOD__, '6.19.0' );
+
 		$learn_more_url = 'https://docs.gravitypdf.com/developers/template-hierarchy';
 
 		return $this->markup_warning . ' <a href="' . esc_url( $learn_more_url ) . '">' . esc_html__( 'Learn how to update', 'gravity-pdf' ) . '</a>';
+	}
+
+	/**
+	 * Add a check's result to its row. Gravity Forms draws the ✔ or ✘, and the fix after a failing value.
+	 *
+	 * @param array  $row     The row's label and value, and their `_export` copies
+	 * @param string $summary What the check is listed as in the passed row
+	 * @param string $fix     Escaped advice for a failing check, empty when it passes
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_check( array $row, string $summary, string $fix = '' ): array {
+		$row['is_valid'] = $fix === '';
+		$row['summary']  = esc_html( $summary );
+
+		if ( $fix !== '' ) {
+			$row['validation_message'] = $fix;
+
+			/* The copied report is for support, so it keeps the facts and leaves out the fix */
+			$row['validation_message_export'] = '';
+		}
+
+		return $row;
+	}
+
+	/**
+	 * A short fix for a failing check, with a link to the guide when there is one
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_fix( string $message, string $url = '', string $link = '' ): string {
+		$fix = esc_html( $message );
+
+		if ( $url !== '' ) {
+			$fix .= ' <a href="' . esc_url( $url ) . '">' . esc_html( $link ) . '</a>';
+		}
+
+		return $fix;
+	}
+
+	/**
+	 * One code item per line
+	 *
+	 * @param string[] $items
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_code_lines( array $items ): string {
+		return implode(
+			'<br>',
+			array_map(
+				static function ( $item ) {
+					return '<code>' . esc_html( $item ) . '</code>';
+				},
+				$items
+			)
+		);
+	}
+
+	/**
+	 * On or Off, as shown on screen
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_on_off( bool $on ): string {
+		return $on ? esc_html__( 'On', 'gravity-pdf' ) : esc_html__( 'Off', 'gravity-pdf' );
+	}
+
+	/**
+	 * One row on screen listing the checks that passed, which copies as the first of them. The others copy on lines of
+	 * their own.
+	 *
+	 * @param array[] $passed The rows of the checks that passed
+	 * @param int     $total  How many checks there are
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_passed_rows( array $passed, int $total ): array {
+		if ( $passed === [] ) {
+			return [];
+		}
+
+		/* translators: %d: How many checks there are */
+		$label = sprintf( __( 'All %d checks passed', 'gravity-pdf' ), $total );
+
+		if ( count( $passed ) < $total ) {
+			/* translators: 1: How many checks passed, 2: How many checks there are */
+			$label = sprintf( __( '%1$d of %2$d checks passed', 'gravity-pdf' ), count( $passed ), $total );
+		}
+
+		$first = $passed[0];
+		$rows  = [
+			[
+				'label'        => esc_html( $label ),
+				'label_export' => $first['label_export'] ?? wp_strip_all_tags( $first['label'] ),
+				'value'        => implode( ' · ', array_column( $passed, 'summary' ) ),
+				'value_export' => $first['value_export'] ?? $first['value'],
+				'is_valid'     => true,
+			],
+		];
+
+		foreach ( array_slice( $passed, 1 ) as $row ) {
+			$rows[] = [ 'export_only' => true ] + $row;
+		}
+
+		return $rows;
 	}
 
 	/**
@@ -177,9 +307,10 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @param array  $signal The detections recorded for that signal
 	 *
 	 * @return array The `label` this feature is known by, one `lines` entry per detection, plus the `notice` its
-	 *               registration states and the `url` explaining it. A feature may also carry `html`, escaped
-	 *               markup the display surfaces show in place of `lines`. Every other value is unescaped, as one
-	 *               of the three consumers is the Site Health Info tab, which escapes what it's given.
+	 *               registration states and the `url` explaining it. A feature may also carry `html`, one line of
+	 *               escaped markup per detection that the display surfaces show in place of `lines`. Every other
+	 *               value is unescaped, as one of the three consumers is the Site Health Info tab, which escapes
+	 *               what it's given.
 	 * @since 6.17.0
 	 */
 	public function get_deprecated_feature( string $key, array $signal ): array {
@@ -272,7 +403,7 @@ class View_System_Report extends Helper_Abstract_View {
 		return [
 			'lines' => $lines,
 			/* Every display surface links to the PDF settings of each form, which is where the template is changed */
-			'html'  => implode( ', ', $html ),
+			'html'  => $html,
 		];
 	}
 
@@ -292,7 +423,7 @@ class View_System_Report extends Helper_Abstract_View {
 		return [
 			'lines' => [ sprintf( $in_use, implode( ', ', $form_ids ) ) ],
 			/* Every display surface links to the PDF settings of each form, which is where the URLs are replaced */
-			'html'  => sprintf( esc_html( $in_use ), implode( ', ', $this->get_form_settings_links( $form_ids ) ) ),
+			'html'  => [ sprintf( esc_html( $in_use ), implode( ', ', $this->get_form_settings_links( $form_ids ) ) ) ],
 		];
 	}
 
@@ -338,21 +469,34 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Assemble the Gravity Forms system report row for a detected feature
-	 *
-	 * The report keeps a row to a single line, so a feature offering a terser set of detections is listed by that
-	 * instead of the whole story the Site Health screens tell.
+	 * Assemble the Gravity Forms system report row for a detected feature: one detection per line, and a short fix
 	 *
 	 * @param string $key    The signal key from Deprecation::get_signals()
 	 * @param array  $signal The detections recorded for that signal
 	 *
 	 * @since 6.17.0
+	 * @since 6.19.0 Names the feature's group, and says when it is removed rather than the whole notice
 	 */
 	public function get_deprecated_feature_report_item( string $key, array $signal ): array {
-		$feature = $this->get_deprecated_feature( $key, $signal );
+		$feature      = $this->get_deprecated_feature( $key, $signal );
+		$registration = Deprecation::get_feature( $key );
+		$group        = static::get_deprecated_groups()[ $registration['group'] ]['label'] ?? '';
 
-		/* Every row is handed over as a failure, so Gravity Forms draws the cross and the red message itself */
-		return [ 'is_valid' => false ] + $this->get_deprecated_feature_values( $feature, $feature['lines'] );
+		/* translators: 1: The feature's name, 2: Its group, e.g. "Unsupported" */
+		$label = sprintf( __( '%1$s (%2$s)', 'gravity-pdf' ), $feature['label'], $group );
+
+		$fix = $registration['group'] === Deprecation::GROUP_UNSUPPORTED
+			/* translators: %s: The Gravity PDF version, e.g. "7.0" */
+			? __( 'Removed in Gravity PDF %s, so it no longer runs.', 'gravity-pdf' )
+			/* translators: %s: The Gravity PDF version, e.g. "7.0" */
+			: __( 'Will be removed in Gravity PDF %s.', 'gravity-pdf' );
+
+		$row = [
+			'label'        => esc_html( $label ),
+			'label_export' => $label,
+		] + $this->get_deprecated_feature_values( $feature, '<br>' );
+
+		return $this->get_check( $row, '', $this->get_fix( sprintf( $fix, $registration['removed_in'] ), $feature['url'], __( 'How to upgrade', 'gravity-pdf' ) ) );
 	}
 
 	/**
@@ -367,51 +511,51 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @since 6.17.0
 	 */
 	public function get_deprecated_feature_detail( string $key, array $signal ): array {
-		$feature = $this->get_deprecated_feature( $key, $signal );
-
-		return $this->get_deprecated_feature_values( $feature, $feature['lines'] );
+		return $this->get_deprecated_feature_values( $this->get_deprecated_feature( $key, $signal ) );
 	}
 
 	/**
 	 * Assemble the display and export values a surface shows for a detected feature
 	 *
-	 * @param array $feature The feature, from self::get_deprecated_feature()
-	 * @param array $lines   The detections the surface has room to list
+	 * @param array  $feature   The feature, from self::get_deprecated_feature()
+	 * @param string $separator What the displayed detections are joined with
 	 *
 	 * @since 6.17.0
+	 * @since 6.19.0 Takes the separator rather than the detections, which are always the feature's own
 	 */
-	protected function get_deprecated_feature_values( array $feature, array $lines ): array {
-		$value = implode( ', ', $lines );
-
+	protected function get_deprecated_feature_values( array $feature, string $separator = ', ' ): array {
 		return [
 			'label'                     => esc_html( $feature['label'] ),
 			'label_export'              => $feature['label'],
-			'value'                     => $feature['html'] ?? esc_html( $value ),
-			'value_export'              => $value,
+			'value'                     => implode( $separator, $feature['html'] ?? array_map( 'esc_html', $feature['lines'] ) ),
+			'value_export'              => implode( ', ', $feature['lines'] ),
 			'validation_message'        => $this->get_removal_message( $feature['notice'], $feature['url'] ),
 			'validation_message_export' => $feature['notice'] . ' ' . $feature['url'],
 		];
 	}
 
 	/**
-	 * The name each group is known by, and what belonging to it means
+	 * The name each group is known by, what belonging to it means, and how the report's passed row says nothing was found
 	 *
-	 * Both Site Health screens show the description; the system report has no room for it and titles its sections
-	 * with the name alone. Deprecation::get_groups() decides which of them a surface sees.
+	 * Both Site Health screens show the description; the system report has no room for it and names the group in
+	 * each feature's label. Deprecation::get_groups() decides which of them a surface sees.
 	 *
 	 * @return array<string, array<string, string>>
 	 * @since 6.17.0
+	 * @since 6.19.0 Added `none`
 	 */
 	public static function get_deprecated_groups(): array {
 		$names = [
 			Deprecation::GROUP_UNSUPPORTED => [
 				'label'       => __( 'Unsupported', 'gravity-pdf' ),
 				'description' => __( 'These features have been removed and any Gravity PDF document that relied on them will stop working.', 'gravity-pdf' ),
+				'none'        => __( 'no unsupported features', 'gravity-pdf' ),
 			],
 
 			Deprecation::GROUP_DEPRECATED  => [
 				'label'       => __( 'Deprecated', 'gravity-pdf' ),
 				'description' => __( "Legacy functionality that will be removed in an upcoming release. It's important to fix each item to keep your PDFs working correctly.", 'gravity-pdf' ),
+				'none'        => __( 'no deprecated features', 'gravity-pdf' ),
 			],
 		];
 
