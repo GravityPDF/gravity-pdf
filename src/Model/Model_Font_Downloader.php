@@ -511,6 +511,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function get_file_stamp( string $path ): string {
+		/* PHP 8.1 and 8.2 keep a file's old size and time after copy() or touch() in the same request */
+		clearstatcache( true, $path );
+
 		return is_file( $path ) ? filesize( $path ) . ':' . filemtime( $path ) : '';
 	}
 
