@@ -720,11 +720,17 @@ class Model_Font_Sources extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_own_copy( string $file ): string {
-		if ( $this->has_hashed_copy( $file ) ) {
-			return $this->get_plain_path( $this->get_hashed_name( $file ) );
+		/* PHP 8.1 and 8.2 keep a file's old size after copy() or file_put_contents() replaces it in the same request */
+		$path   = $this->get_plain_path( $file );
+		$hashed = $this->get_hashed_name( $file );
+		clearstatcache( true, $path );
+		if ( $hashed !== '' ) {
+			clearstatcache( true, $this->get_plain_path( $hashed ) );
 		}
 
-		$path = $this->get_plain_path( $file );
+		if ( $this->has_hashed_copy( $file ) ) {
+			return $this->get_plain_path( $hashed );
+		}
 
 		return is_file( $path ) && ! $this->is_size_conflict( $file ) ? $path : '';
 	}
