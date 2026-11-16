@@ -84,17 +84,20 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 		try {
 			$found = parent::findFontFile( $name );
 		} catch ( MpdfException $e ) {
-			if ( ! $this->downloader->is_core_font_file( $name ) ) {
+			/* A family sharing a name with a Font Manager record asks for its hashed name */
+			$file = $this->downloader->get_manifest_file( $name );
+			if ( ! $this->downloader->is_core_font_file( $file ) ) {
 				throw $e;
 			}
 
 			/* The downloader's fonts folder, as mPDF's AddFontDirectory() replaces the search directories */
-			if ( $this->downloader->download_or_queue( $name ) ) {
-				return $this->downloader->get_font_path( $name );
+			$path = $this->downloader->download_or_queue( $file ) ? $this->downloader->get_own_copy( $file ) : '';
+			if ( $path !== '' ) {
+				return $path;
 			}
 
 			/* Debug Mode falls back too for a queued file, as the font is on its way */
-			$fallback = $this->fallback || $this->downloader->is_queued( $name ) ? $this->get_fallback_file() : '';
+			$fallback = $this->fallback || $this->downloader->is_queued( $file ) ? $this->get_fallback_file() : '';
 			if ( $fallback === '' ) {
 				throw $e;
 			}
@@ -104,7 +107,7 @@ class On_Demand_Font_File_Finder extends FontFileFinder {
 
 		/* Only a core font in the fonts folder can be another font's file, and a Font Manager record's stays the record's */
 		if ( $this->downloader->is_in_fonts_folder( $found ) && $this->downloader->is_core_font_file( $name ) && ! $this->downloader->is_record_file( $name ) && $this->downloader->download_or_queue( $name ) ) {
-			return $this->downloader->get_font_path( $name );
+			return $this->downloader->get_own_copy( $name ) ?: $found;
 		}
 
 		return $found;

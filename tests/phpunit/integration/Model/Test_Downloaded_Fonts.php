@@ -64,13 +64,12 @@ class Test_Downloaded_Fonts extends TestCase {
 					'type'         => 'core',
 					'regular'      => 'DejaVuSerifCondensed.ttf',
 					'italics'      => '',
-					'bold'         => 'DejaVuSerifCondensed-Bold.ttf',
+					'bold'         => '',
 					'bolditalics'  => '',
 					'can_delete'   => ! is_multisite() || is_super_admin(),
-					'size_label'   => size_format( filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ) + filesize( $this->font_fixture( 'Chewy.ttf' ) ), 1 ),
+					'size_label'   => size_format( filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ), 1 ),
 					'file_sizes'   => [
 						'regular' => filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ),
-						'bold'    => filesize( $this->font_fixture( 'Chewy.ttf' ) ),
 					],
 					'auto_install' => true,
 					'can_install'  => ! is_multisite() || is_super_admin(),
@@ -326,16 +325,17 @@ class Test_Downloaded_Fonts extends TestCase {
 			2
 		);
 
+		/* The fixtures stand in for FreeSerif on the shared sources' manifest */
 		$this->assertSame(
 			[
 				'dejavuserifcondensed' => true,
 				'freeserif'            => false,
 			],
-			array_column( $this->core_rows( $this->downloader() ), 'auto_install', 'id' )
+			array_column( $this->core_rows( $this->downloader( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ) ) ), 'auto_install', 'id' )
 		);
 	}
 
-	public function test_delete_removes_the_family_whatever_its_hash_and_keeps_the_licences() {
+	public function test_delete_removes_only_the_familys_own_copies_and_keeps_the_licences() {
 		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
 		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
 		$this->copy_fixture( 'Chewy.ttf', 'DejaVuinfo.txt' );
@@ -349,14 +349,14 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertSame(
 			[
 				'id'      => 'dejavuserifcondensed',
-				'removed' => [ 'DejaVuSerifCondensed.ttf', 'DejaVuSerifCondensed-Bold.ttf' ],
-				'bytes'   => filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ) + filesize( $this->font_fixture( 'Chewy.ttf' ) ),
+				'removed' => [ 'DejaVuSerifCondensed.ttf' ],
+				'bytes'   => filesize( $this->font_fixture( 'DejaVuSerifCondensed.ttf' ) ),
 			],
 			$result
 		);
 
 		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
-		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed-Bold.ttf' ) );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed-Bold.ttf' ), 'Another font\'s file at the name stays' );
 		$this->assertFileExists( $this->font_path( 'DejaVuinfo.txt' ) );
 		$this->assertFileExists( $this->font_path( 'FreeSerif.ttf' ) );
 		$this->assertCount( 1, $this->log_messages( 'Downloaded font deleted' ) );
@@ -381,6 +381,22 @@ class Test_Downloaded_Fonts extends TestCase {
 		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 	}
 
+	public function test_delete_keeps_another_fonts_file_of_a_known_size_at_the_name() {
+		$this->put_same_size_font_at( 'DejaVuSerifCondensed.ttf', 'DejaVuSerifCondensed.ttf' );
+		$bytes = (string) file_get_contents( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+
+		$this->assert_font_error( $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' ), 'font_not_downloaded', 404 );
+		$this->assertStringEqualsFile( $this->font_path( 'DejaVuSerifCondensed.ttf' ), $bytes );
+		$this->assertCount( 1, $this->log_messages( 'Kept another font\'s file at a font file\'s name' ) );
+	}
+
+	public function test_a_font_whose_download_gave_up_on_another_fonts_file_is_available_to_install() {
+		$this->put_same_size_font_at( 'DejaVuSerifCondensed.ttf', 'DejaVuSerifCondensed.ttf' );
+		$this->set_font_failures( [ 'DejaVuSerifCondensed.ttf' => $this->conflict_failure( $this->font_path( 'DejaVuSerifCondensed.ttf' ) ) ] );
+
+		$this->assertSame( 'available', $this->core_font_row( 'dejavuserifcondensed' )['type'] );
+	}
+
 	public function test_a_family_sharing_a_name_with_a_record_lists_and_deletes_only_its_hashed_copy() {
 		$sources = GPDFAPI::get_mvc_class( 'Model_Font_Sources' );
 		$hashed  = $sources->get_hashed_name( 'DejaVuSerifCondensed.ttf' );
@@ -396,7 +412,7 @@ class Test_Downloaded_Fonts extends TestCase {
 
 		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
 
-		$this->assertSame( [ $hashed ], $result['removed'] );
+		$this->assertSame( [ 'DejaVuSerifCondensed.ttf' ], $result['removed'] );
 		$this->assertFileDoesNotExist( $this->font_path( $hashed ) );
 		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 	}

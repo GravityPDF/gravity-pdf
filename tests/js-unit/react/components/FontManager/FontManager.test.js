@@ -96,9 +96,13 @@ describe('FontManager - FontManager.js', () => {
 			expect(wrapper.find('FontManagerHeader').length).toBe(1);
 		});
 
-		test('render <FontManagerBody /> component', () => {
+		test('render <FontManagerBody /> component inside the preview cache', () => {
 			const wrapper = shallow(<FontManager {...props} />);
-			expect(wrapper.find('Connect(FontManagerBody)').length).toBe(1);
+			expect(
+				wrapper
+					.find('FontPreviewCache')
+					.find('Connect(FontManagerBody)').length
+			).toBe(1);
 		});
 	});
 });

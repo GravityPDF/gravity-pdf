@@ -19,14 +19,24 @@ trait RecordsFontFailures {
 	 * @param int      $gave_up  When its retry also failed, or 0 while the retry is pending
 	 * @param int|null $retry_at When the pending retry is due, defaulting to now
 	 *
-	 * @return array{retry_at: int, gave_up: int, dismissed: bool}
+	 * @return array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}
 	 */
 	protected function failure( int $gave_up = 0, ?int $retry_at = null ): array {
 		return [
 			'retry_at'  => $gave_up > 0 ? 0 : ( $retry_at ?? time() ),
 			'gave_up'   => $gave_up,
 			'dismissed' => false,
+			'conflict'  => '',
 		];
+	}
+
+	/**
+	 * A failure that gave up with another font's file at the font's name, as the downloader stamps it
+	 *
+	 * @return array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}
+	 */
+	protected function conflict_failure( string $path ): array {
+		return array_merge( $this->failure( time() ), [ 'conflict' => filesize( $path ) . ':' . filemtime( $path ) ] );
 	}
 
 	/**

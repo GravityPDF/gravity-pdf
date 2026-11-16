@@ -138,8 +138,8 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 
 		$files = [];
 		foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
-			$file = $family[ $style ] ?? '';
-			if ( is_string( $file ) && $file !== '' && $this->font_sources->is_core_font_file( $file ) ) {
+			$file = is_string( $family[ $style ] ?? null ) ? $this->font_sources->get_manifest_file( $family[ $style ] ) : '';
+			if ( $this->font_sources->is_core_font_file( $file ) ) {
 				$files[] = $file;
 			}
 		}
@@ -344,7 +344,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 	 */
 	public function needs_download( $font ): bool {
 		foreach ( $this->get_font_files( $font ) as $file ) {
-			if ( ! $this->font_sources->is_installed( $file ) ) {
+			if ( ! $this->is_installed( $file ) ) {
 				return true;
 			}
 		}
@@ -372,7 +372,7 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 			$files    = array_intersect( $required, array_keys( $manifest ) );
 
 			$counts[ (string) $id ] = [
-				'installed' => count( array_filter( $files, [ $this->font_sources, 'is_installed' ] ) ),
+				'installed' => count( array_filter( $files, [ $this, 'is_installed' ] ) ),
 				'total'     => count( $files ),
 				'manifest'  => count( $manifest ) > 0,
 			];
@@ -393,10 +393,25 @@ class Model_Required_Fonts extends Helper_Abstract_Model {
 			array_filter(
 				$this->get_required_font_files(),
 				function ( $file ) {
-					return ! $this->font_sources->is_installed( $file );
+					return ! $this->is_installed( $file );
 				}
 			)
 		);
+	}
+
+	/**
+	 * Whether the file's own copy is in the fonts folder: Model_Font_Sources::get_own_copy(), less the other font's file a
+	 * failed download found at its name
+	 *
+	 * @since 6.19.0
+	 */
+	protected function is_installed( string $file ): bool {
+		$own_path = $this->font_sources->get_own_copy( $file );
+
+		/* The registered downloader, as it's built after this model */
+		$downloader = \GPDFAPI::get_mvc_class( 'Model_Font_Downloader' );
+
+		return $own_path !== '' && ! ( $downloader instanceof Model_Font_Downloader && $downloader->is_failed_conflict( $file, $own_path ) );
 	}
 
 	/**

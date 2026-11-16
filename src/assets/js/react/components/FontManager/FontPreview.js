@@ -1,5 +1,13 @@
 /* Dependencies */
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import PropTypes from 'prop-types';
 /* Components */
 import Spinner from '../Spinner';
@@ -21,9 +29,85 @@ const LOAD_DELAY = 200;
 // Anything larger waits for a click: of the core fonts, Sun-ExtA, Sun-ExtB and UnBatang
 const MAX_AUTO_LOAD_BYTES = 4 * 1024 * 1024;
 const ALL_STYLES = 'all';
+// Faces stay parsed while the Font Manager is open; this holds the three large core fonts together
+const MAX_CACHED_BYTES = 64 * 1024 * 1024;
+
+const PreviewCache = createContext(null);
 
 /**
- * One font's samples, remounted for each font so its load state and chosen style start afresh
+ * Remembers each font's faces, the styles that loaded and a click to load it, while it's mounted
+ *
+ * Entries are kept in the order last viewed, and the oldest are dropped once their files pass the budget
+ *
+ * @param { Object }      props
+ * @param { JSX.Element } props.children
+ *
+ * @return { JSX.Element } FontPreviewCache component
+ *
+ * @since 6.19.0
+ */
+export const FontPreviewCache = ({ children }) => {
+	const [fonts, setFonts] = useState(() => new Map());
+
+	const update = useCallback(
+		(id, change, viewed = false) =>
+			setFonts((all) => {
+				const entry = change(all.get(id));
+
+				if (entry === all.get(id) && (!viewed || !entry)) {
+					return all;
+				}
+
+				const next = new Map(all);
+
+				if (viewed) {
+					next.delete(id);
+				}
+
+				if (entry) {
+					next.set(id, entry);
+				} else {
+					next.delete(id);
+				}
+
+				let total = 0;
+				next.forEach((font) => (total += font.bytes || 0));
+
+				// The last viewed is the font on screen, so it's never dropped
+				[...next.keys()].slice(0, -1).forEach((key) => {
+					if (total > MAX_CACHED_BYTES && next.get(key).bytes) {
+						total -= next.get(key).bytes;
+						next.delete(key);
+					}
+				});
+
+				return next;
+			}),
+		[]
+	);
+
+	const value = useMemo(() => ({ fonts, update }), [fonts, update]);
+
+	// One sheet per font in a fixed order, so adding a font doesn't make the browser re-read the others
+	const sheets = useMemo(
+		() =>
+			[...fonts]
+				.filter(([, font]) => font.shown)
+				.sort(([a], [b]) => (a < b ? -1 : 1))
+				.map(([id, font]) => <style key={id}>{font.faces}</style>),
+		[fonts]
+	);
+
+	return (
+		<PreviewCache.Provider value={value}>
+			{sheets}
+			{children}
+		</PreviewCache.Provider>
+	);
+};
+
+/**
+ * One font's samples, remounted for each font so its chosen style starts afresh; what loaded is kept in the cache
  *
  * @param { Object }   props
  * @param { Object }   props.font
@@ -38,10 +122,9 @@ const ALL_STYLES = 'all';
  * @since 6.19.0
  */
 const FontSamples = ({ font, base, text, size, setText, setSize }) => {
+	const { fonts, update } = useContext(PreviewCache);
 	const [loaded, setLoaded] = useState(false);
 	const [choice, setChoice] = useState('');
-	const [loadRequested, setLoadRequested] = useState(false);
-	const [readyStyles, setReadyStyles] = useState({});
 	const boxRef = useRef(null);
 
 	useEffect(() => {
@@ -64,6 +147,36 @@ const FontSamples = ({ font, base, text, size, setText, setSize }) => {
 
 	const family = 'gfpdf-preview-' + font.id.replace(/[^\w-]/g, '');
 	const styles = FONT_STYLES.filter(({ key }) => font[key]);
+	// Keys the cache: the sizes are in it as a saved custom font can keep its name but change its files
+	const faces = useMemo(
+		() =>
+			`/*${JSON.stringify(font.file_sizes || {})}*/` +
+			styles
+				.map(({ key, weight, style }) => {
+					const file = encodeURIComponent(
+						reduceFontFileName(font[key])
+					);
+
+					return `@font-face{font-family:"${family}";font-weight:${weight};font-style:${style};font-display:swap;src:url("${base}${file}") format("truetype");}`;
+				})
+				.join(''),
+		[font, base] // eslint-disable-line react-hooks/exhaustive-deps
+	);
+	const own = (current) => (current?.faces === faces ? current : undefined);
+	const entry = own(fonts.get(font.id));
+
+	// Arriving drops faces of the font's old files, and leaving drops a font with a failed face so it's retried
+	useEffect(() => {
+		update(font.id, own, true);
+
+		return () =>
+			update(font.id, (current) =>
+				current && !Object.values(current.styles).includes('failed')
+					? current
+					: undefined
+			);
+	}, []); // eslint-disable-line react-hooks/exhaustive-deps
+
 	const shownStyles =
 		choice === ALL_STYLES
 			? styles
@@ -75,10 +188,26 @@ const FontSamples = ({ font, base, text, size, setText, setSize }) => {
 		(total, { key }) => total + (font.file_sizes?.[key] || 0),
 		0
 	);
-	const needsLoadClick = bytes > MAX_AUTO_LOAD_BYTES && !loadRequested;
-	const facesRequested = loaded && !needsLoadClick && !!document.fonts;
-	const isLoading = (key) => facesRequested && !readyStyles[key];
+	const needsLoadClick = bytes > MAX_AUTO_LOAD_BYTES && !entry?.requested;
+	const showFaces = (loaded || !!entry?.shown) && !needsLoadClick;
+	const facesShown = showFaces && !!entry?.shown && !!document.fonts;
+	const isLoading = (key) => facesShown && !entry.styles[key];
 	const loadingKeys = shownStyles.filter(({ key }) => isLoading(key));
+
+	useEffect(() => {
+		if (showFaces && !entry?.shown) {
+			update(font.id, (current) => ({
+				styles: {},
+				...own(current),
+				faces,
+				shown: true,
+				bytes: Object.values(font.file_sizes || {}).reduce(
+					(total, fileBytes) => total + fileBytes,
+					0
+				),
+			}));
+		}
+	}, [showFaces, faces]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect(() => {
 		let current = true;
@@ -86,7 +215,14 @@ const FontSamples = ({ font, base, text, size, setText, setSize }) => {
 		loadingKeys.forEach(({ key, weight, style }) => {
 			const settle = (result) => () =>
 				current &&
-				setReadyStyles((ready) => ({ ...ready, [key]: result }));
+				update(font.id, (cachedFont) =>
+					own(cachedFont)
+						? {
+								...cachedFont,
+								styles: { ...cachedFont.styles, [key]: result },
+							}
+						: cachedFont
+				);
 
 			document.fonts
 				.load(`${style} ${weight} 16px "${family}"`)
@@ -98,18 +234,8 @@ const FontSamples = ({ font, base, text, size, setText, setSize }) => {
 		};
 	}, [loadingKeys.map(({ key }) => key).join()]); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const faces = styles
-		.map(({ key, weight, style }) => {
-			const file = encodeURIComponent(reduceFontFileName(font[key]));
-
-			return `@font-face{font-family:"${family}";font-weight:${weight};font-style:${style};font-display:swap;src:url("${base}${file}") format("truetype");}`;
-		})
-		.join('');
-
 	return (
 		<div data-test="component-FontPreview" className="font-section">
-			{loaded && !needsLoadClick && <style>{faces}</style>}
-
 			<div className="font-section-head">
 				<h3>{GFPDF.fontManagerPreview}</h3>
 
@@ -176,7 +302,14 @@ const FontSamples = ({ font, base, text, size, setText, setSize }) => {
 							type="button"
 							className="button"
 							data-test="font-preview-load"
-							onClick={() => setLoadRequested(true)}
+							onClick={() =>
+								update(font.id, (current) => ({
+									styles: {},
+									...own(current),
+									faces,
+									requested: true,
+								}))
+							}
 						>
 							{GFPDF.fontManagerPreviewLoad}
 						</button>
@@ -208,7 +341,7 @@ const FontSamples = ({ font, base, text, size, setText, setSize }) => {
 										<Spinner style="delete-font" />
 									</span>
 								)}
-								{readyStyles[key] === 'failed' && (
+								{entry?.styles[key] === 'failed' && (
 									<span
 										data-test="font-preview-failed"
 										className="font-preview-failed"
@@ -274,6 +407,10 @@ FontSamples.propTypes = {
 	size: PropTypes.number.isRequired,
 	setText: PropTypes.func.isRequired,
 	setSize: PropTypes.func.isRequired,
+};
+
+FontPreviewCache.propTypes = {
+	children: PropTypes.node.isRequired,
 };
 
 FontPreview.propTypes = {

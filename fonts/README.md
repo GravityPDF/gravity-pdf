@@ -13,36 +13,26 @@ Name.
 The files are prefixed `gfpdf-` so they never collide with the `Arimo-*.ttf` copies premium templates put in the
 PDF fonts folder.
 
-The four faces are **dehinted**: TrueType hinting is stripped and nothing else changes, which takes a third off the
-file size and off every PDF that embeds them. Run once per face with fontTools 4.59.2:
+The four faces are **dehinted**: TrueType hinting is stripped, which takes a third off the file size and off every PDF
+that embeds them. A rebuild matches these files byte for byte. Run once per face with fontTools 4.68.0:
 
 ```
 python3 -I dehint.py Arimo-Regular.ttf gfpdf-Arimo-Regular.ttf
 ```
 
 ```python
-# dehint.py
+# dehint.py: the same steps as utils/dehint_fonts.py in GravityPDF/mpdf
 import sys
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables import ttProgram
 
-font = TTFont(sys.argv[1])
-for table in ('cvt ', 'fpgm', 'prep', 'gasp', 'hdmx', 'LTSH', 'VDMX'):
+font = TTFont(sys.argv[1], recalcBBoxes=False, recalcTimestamp=False)
+for table in ('cvt ', 'fpgm', 'prep', 'gasp', 'hdmx', 'LTSH', 'VDMX', 'DSIG'):
     if table in font:
         del font[table]
-empty = ttProgram.Program()
-empty.fromBytecode(b'')
-glyf = font['glyf']
-for name in font.getGlyphOrder():
-    glyph = glyf[name]
-    glyph.expand(glyf)
-    if hasattr(glyph, 'program'):
-        glyph.program = empty
+font['glyf'].removeHinting()
 font['maxp'].maxSizeOfInstructions = 0
 font.save(sys.argv[2])
 ```
-
-fontTools stamps the save time into the `head` table, so a rebuild matches these files in size but not byte for byte.
 
 ## DejaVu Sans symbols (`gfpdf-dejavu-symbols`)
 
@@ -50,9 +40,9 @@ The symbols Arimo lacks: the arrows, maths, technical, enclosed, box-drawing, ge
 blocks, including the ✔ and ✖ the Consent and Terms of Service fields draw. It is only used to fill in characters, so
 it isn't offered as a font in the settings.
 
-Source: `DejaVuSans.ttf` version 2.34 from mPDF's `ttfonts/` (git blob `9d40c325694b3bfb8cdd4c0146ad44379d5c4ade`,
-the same file the core fonts provide). Licence: Bitstream Vera and Arev (`LICENSE-DejaVu.txt`); a modified copy
-must not be named "Bitstream" or "Vera". Subset with fontTools 4.59.2 (1,108 glyphs):
+Source: the dehinted `DejaVuSans.ttf` 2.34 the core fonts download, GravityPDF/mpdf-core-fonts v1.1.2 (git blob
+`907f176e4efc7e7372fc8be6bc6a1e70ef6f5f8e`). Licence: Bitstream Vera and Arev (`LICENSE-DejaVu.txt`); a modified
+copy must not be named "Bitstream" or "Vera". Subset with fontTools 4.68.0 (1,108 glyphs):
 
 ```
 python3 -I -m fontTools.subset DejaVuSans.ttf --unicodes=U+2190-23FF,U+2460-27BF,U+2B00-2BFF \

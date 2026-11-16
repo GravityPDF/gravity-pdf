@@ -360,14 +360,13 @@ class Test_Site_Custom_Fonts extends TestCase {
 	}
 
 	public function test_deleting_a_core_font_keeps_the_file_another_sites_custom_font_uses() {
-		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
-		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
+		$this->put_own_serif_copies();
 		$this->recorded_site( [ 'theirs' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
 
 		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
 
 		$this->assertSame( [ 'DejaVuSerifCondensed-Bold.ttf' ], $result['removed'] );
-		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 		$this->assertFileDoesNotExist( $this->font_path( 'DejaVuSerifCondensed-Bold.ttf' ) );
 	}
 
@@ -394,20 +393,18 @@ class Test_Site_Custom_Fonts extends TestCase {
 	}
 
 	public function test_deleting_a_core_font_keeps_the_file_of_a_site_not_recorded_yet() {
-		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
-		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
+		$this->put_own_serif_copies();
 		$site_id = $this->recorded_site( [ 'theirs' => [ 'regular' => 'DejaVuSerifCondensed.ttf' ] ] );
 		$this->model()->delete_site_record( $site_id );
 
 		$result = $this->downloader()->delete_downloaded_font( 'dejavuserifcondensed' );
 
 		$this->assertSame( [ 'DejaVuSerifCondensed-Bold.ttf' ], $result['removed'] );
-		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
+		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 	}
 
 	public function test_deleting_a_core_font_keeps_its_plain_files_while_a_site_cant_be_read() {
-		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed.ttf' );
-		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
+		$this->put_own_serif_copies();
 		$this->model()->delete_site_record( $this->recorded_site( [] ) );
 
 		$result = $this->with_failing_site_option_reads(
@@ -419,6 +416,15 @@ class Test_Site_Custom_Fonts extends TestCase {
 		$this->assertSame( [], $result['removed'] );
 		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed.ttf' ) );
 		$this->assertFileExists( $this->font_path( 'DejaVuSerifCondensed-Bold.ttf' ) );
+	}
+
+	/**
+	 * The family's own Regular and Bold on disk, the Bold a fixture listed as its build
+	 */
+	private function put_own_serif_copies(): void {
+		$this->copy_fixture( 'DejaVuSerifCondensed.ttf' );
+		$this->copy_fixture( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
+		$this->list_fixture_as( 'Chewy.ttf', 'DejaVuSerifCondensed-Bold.ttf' );
 	}
 
 	public function test_deleting_a_core_font_removes_its_hashed_copy_beside_another_sites_custom_font() {

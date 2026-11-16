@@ -296,6 +296,20 @@ class Test_On_Demand_Font_File_Finder extends TestCase {
 		$this->assertFileDoesNotExist( $this->font_dir . $this->sources->get_hashed_name( self::FONT ) );
 	}
 
+	public function test_a_family_sharing_a_name_with_a_record_downloads_under_the_hashed_name_it_asks_for() {
+		$this->put_other_font_at( self::FONT );
+		$this->add_record( 'mine', [ 'regular' => self::FONT ] );
+		$this->serve_font_downloads();
+		$hashed               = $this->sources->get_hashed_name( self::FONT );
+		$this->copied_fonts[] = $this->font_dir . $hashed;
+
+		$this->assertSame( $hashed, $this->sources->register_font_data( [] )['dejavuserifcondensed']['R'] );
+		$this->assertSame( $this->font_dir . $hashed, $this->finder()->findFontFile( $hashed ) );
+		$this->assertFileEquals( $this->font_fixture( self::FONT ), $this->font_dir . $hashed );
+		$this->assertFileEquals( $this->font_fixture( 'Chewy.ttf' ), $this->font_dir . self::FONT );
+		$this->assertCount( 1, $this->requested );
+	}
+
 	public function test_the_hashed_copy_is_found_before_the_file_at_the_name_without_a_request_or_hashing() {
 		$this->put_other_font_at( self::FONT );
 		$this->copy_fixture( self::FONT, $this->sources->get_hashed_name( self::FONT ) );

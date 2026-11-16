@@ -164,9 +164,10 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 
 	/**
 	 * When each failed file's retry is due (else 0), once the retry also failed when it gave up (else 0), and whether
-	 * an admin dismissed the notice listing it
+	 * an admin dismissed the notice listing it. `conflict` is the size and modified time of another font's file at its
+	 * name when it failed, else ''.
 	 *
-	 * @var array<string, array{retry_at: int, gave_up: int, dismissed: bool}>|null
+	 * @var array<string, array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}>|null
 	 * @since 6.19.0
 	 */
 	protected $failures;
@@ -233,8 +234,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	/**
 	 * @since 6.19.0
 	 */
-	public function get_font_path( string $file ): string {
-		return $this->font_sources->get_font_path( $file );
+	public function get_own_copy( string $file ): string {
+		return $this->font_sources->get_own_copy( $file );
 	}
 
 	/**
@@ -258,6 +259,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	public function is_core_font_file( string $file ): bool {
 		return $this->font_sources->is_core_font_file( $file );
+	}
+
+	/**
+	 * @since 6.19.0
+	 */
+	public function get_manifest_file( string $name ): string {
+		return $this->font_sources->get_manifest_file( $name );
 	}
 
 	/**
@@ -384,9 +392,15 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		}
 
 		$font_path = $this->font_sources->get_plain_path( $file );
-		$conflict  = is_file( $font_path );
+		$own_path  = $this->font_sources->get_own_copy( $file );
+		$own_copy  = $own_path !== '';
 
-		$own_copy = $this->font_sources->has_hashed_copy( $file ) || ( $conflict && ! $this->is_conflict( $file, $verify && $this->is_auto_install_enabled( $file ) ) );
+		/* A file at the name of a known size can still be another font's, which only its SHA-1 tells */
+		if ( $own_copy && $verify && $own_path === $font_path && $this->is_auto_install_enabled( $file ) ) {
+			$own_copy = ! $this->is_unknown_build( $file );
+		} elseif ( $own_copy && $this->is_failed_conflict( $file, $own_path ) ) {
+			$own_copy = false;
+		}
 
 		/* Copied in by hand or saved by another request, so any failure on record is stale */
 		if ( $own_copy ) {
@@ -403,7 +417,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return false;
 		}
 
-		$target = $conflict ? $this->font_sources->get_plain_path( $this->font_sources->get_hashed_name( $file ) ) : $font_path;
+		$conflict = is_file( $font_path );
+		$target   = $conflict ? $this->font_sources->get_plain_path( $this->font_sources->get_hashed_name( $file ) ) : $font_path;
 		if ( ! $this->save( $file, $target, $manifest[ $file ] ) ) {
 			$this->record_failure( $file );
 
@@ -448,17 +463,13 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Whether the existing file at a manifest name is another font's: no known build has its size, or with $verify its
-	 * SHA-1. A file that can't be read is left alone.
+	 * Whether the file at a manifest name has a SHA-1 no known build has, so is another font's. A file that can't be read,
+	 * or one with no other name to take, is left alone.
 	 *
 	 * @since 6.19.0
 	 */
-	protected function is_conflict( string $file, bool $verify ): bool {
-		if ( $this->font_sources->is_size_conflict( $file ) ) {
-			return true;
-		}
-
-		if ( ! $verify || $this->font_sources->get_hashed_name( $file ) === '' ) {
+	protected function is_unknown_build( string $file ): bool {
+		if ( $this->font_sources->get_hashed_name( $file ) === '' ) {
 			return false;
 		}
 
@@ -467,6 +478,43 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		$sha  = $this->hash_blob( $path, $size );
 
 		return $sha !== '' && ! in_array( $sha, $this->font_sources->get_known_builds( $file )[ $size ] ?? [], true );
+	}
+
+	/**
+	 * Whether the font's own copy is on disk: Model_Font_Sources::get_own_copy(), less the other font's file a failed
+	 * download found at its name (see is_failed_conflict())
+	 *
+	 * @since 6.19.0
+	 */
+	protected function has_own_copy( string $file ): bool {
+		$own_path = $this->font_sources->get_own_copy( $file );
+
+		return $own_path !== '' && ! $this->is_failed_conflict( $file, $own_path );
+	}
+
+	/**
+	 * Whether the own copy get_own_copy() found by size is the other font's file a failed download found at the name,
+	 * unchanged since. Saves hashing it again on a render.
+	 *
+	 * @since 6.19.0
+	 */
+	public function is_failed_conflict( string $file, string $own_path ): bool {
+		$conflict = $this->get_failures()[ $file ]['conflict'] ?? '';
+
+		/* A hashed copy is the font's own whatever is at the name */
+		return $conflict !== '' && $own_path === $this->font_sources->get_plain_path( $file ) && $conflict === $this->get_file_stamp( $own_path );
+	}
+
+	/**
+	 * A file's size and modified time, or '' if it isn't on disk
+	 *
+	 * @since 6.19.0
+	 */
+	protected function get_file_stamp( string $path ): string {
+		/* PHP 8.1 and 8.2 keep a file's old size and time after copy() or touch() in the same request */
+		clearstatcache( true, $path );
+
+		return is_file( $path ) ? filesize( $path ) . ':' . filemtime( $path ) : '';
 	}
 
 	/**
@@ -707,8 +755,8 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	/**
 	 * A core family's Font Manager row, `available` when none of it is on disk
 	 *
-	 * @param array{files: array<string, string>, sizes: array<string, int>, bytes: int} $family
-	 * @param array<string, string>                                                      $labels Font list labels by key
+	 * @param array{files: array<string, string>, paths: array<string, string>, bytes: int} $family
+	 * @param array<string, string>                                                         $labels Font list labels by key
 	 *
 	 * @return array|null Null for a family with nothing on disk that can't or shouldn't be installed
 	 *
@@ -716,17 +764,12 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function get_core_font_row( string $key, array $family, array $labels ): ?array {
 		/* Named as on disk, so the sizes and the preview are the font's own copy */
-		$on_disk = array_map(
-			function ( string $file ): string {
-				return basename( $this->get_font_path( $file ) );
-			},
-			array_filter(
-				$family['files'],
-				static function ( string $file ) use ( $family ): bool {
-					return isset( $family['sizes'][ $file ] );
-				}
-			)
-		);
+		$on_disk = [];
+		foreach ( $family['files'] as $style => $file ) {
+			if ( isset( $family['paths'][ $file ] ) ) {
+				$on_disk[ $style ] = basename( $family['paths'][ $file ] );
+			}
+		}
 
 		$can_download = $this->can_download_all( $family['files'] );
 		$installed    = count( $on_disk ) > 0;
@@ -798,9 +841,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Delete an unused downloaded family's files whatever their hash, keeping the licence files. A file with a copy under
-	 * its hashed name loses only the copy: the file at the name is another font's. A file at the name another site's
-	 * custom font uses is kept too, as every site shares the fonts folder.
+	 * Delete an unused downloaded family's own copies (see Model_Font_Sources::get_own_copy()), keeping the licence files
+	 * and any other font's file at a family file's name (a file of a known size is hashed to tell). A file at the name
+	 * another site's custom font uses is kept too, as every site shares the fonts folder.
 	 *
 	 * @return array{id: string, removed: string[], bytes: int, font: array|null}|WP_Error `font` is its row now, if it can
 	 *                                                                                     be installed again. 404 when
@@ -810,7 +853,16 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	public function delete_downloaded_font( string $key ) {
 		$family = $this->get_core_families()[ $key ] ?? null;
-		if ( $family === null || count( $family['sizes'] ) === 0 ) {
+
+		/* Before the sync saves the font under its hashed name, another font's file of a known size passes for its own */
+		foreach ( $family['paths'] ?? [] as $file => $path ) {
+			if ( $path === $this->font_sources->get_plain_path( $file ) && $this->is_unknown_build( $file ) ) {
+				unset( $family['paths'][ $file ] );
+				$this->log->notice( 'Kept another font\'s file at a font file\'s name', [ 'name' => $file ] );
+			}
+		}
+
+		if ( $family === null || count( $family['paths'] ) === 0 ) {
 			return new WP_Error( 'font_not_downloaded', __( 'The font is not downloaded.', 'gravity-pdf' ), [ 'status' => 404 ] );
 		}
 
@@ -830,13 +882,12 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			$this->clear_failure( $file );
 			$this->delete_back_off( $file );
 
-			$size = $family['sizes'][ $file ] ?? null;
-			if ( $size === null ) {
+			$path = $family['paths'][ $file ] ?? null;
+			if ( $path === null ) {
 				continue;
 			}
 
 			/* Another site's file can be at the name (any, if a site couldn't be read); a hashed copy is the core font's */
-			$path = $this->get_font_path( $file );
 			if ( ( $shared === null || isset( $shared[ $file ] ) ) && $path === $this->font_sources->get_plain_path( $file ) ) {
 				if ( $shared !== null ) {
 					$this->log->notice( 'Kept a font file another site\'s custom font uses', [ 'name' => $file ] );
@@ -845,6 +896,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				continue;
 			}
 
+			$size = (int) filesize( $path );
 			if ( ! wp_delete_file_from_directory( $path, $this->data->template_font_location ) ) {
 				$this->log->warning( 'Downloaded font file could not be removed', [ 'name' => $file ] );
 				continue;
@@ -918,18 +970,15 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * The downloadable sources' families: their files on the manifest by style (R, B, I, BI), the sizes of those on disk
-	 * and the bytes of them all
+	 * The downloadable sources' families: their files on the manifest by style (R, B, I, BI), the paths of their own
+	 * copies on disk (see Model_Font_Sources::get_own_copy()) and the bytes of them all
 	 *
-	 * @return array<string, array{files: array<string, string>, sizes: array<string, int>, bytes: int}>
+	 * @return array<string, array{files: array<string, string>, paths: array<string, string>, bytes: int}>
 	 *
 	 * @since 6.19.0
 	 */
 	protected function get_core_families(): array {
 		$families = [];
-
-		/* A Font Manager record's file at a family's name isn't the family's: its files have hashed names */
-		$collisions = $this->font_sources->get_record_collisions();
 
 		foreach ( $this->font_sources->get_sources() as $id => $source ) {
 			if ( empty( $source['manifest'] ) ) {
@@ -939,12 +988,11 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			$manifest = $this->font_sources->get_source_manifest( (string) $id );
 			foreach ( $source['families'] ?? [] as $key => $family ) {
 				$key = (string) $key;
-				if ( ! empty( $families[ $key ]['sizes'] ) || ! is_array( $family ) ) {
+				if ( ! empty( $families[ $key ]['paths'] ) || ! is_array( $family ) ) {
 					continue;
 				}
 
-				$family = $this->font_sources->use_hashed_names( $family, $collisions );
-				$files  = [];
+				$files = [];
 				foreach ( [ 'R', 'B', 'I', 'BI' ] as $style ) {
 					$file = $family[ $style ] ?? null;
 					if ( is_string( $file ) && isset( $manifest[ $file ] ) && $this->font_sources->is_core_font_file( $file ) ) {
@@ -952,20 +1000,20 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 					}
 				}
 
-				$sizes = [];
+				$paths = [];
 				$bytes = 0;
 				foreach ( $files as $file ) {
 					$bytes += (int) $manifest[ $file ]['size'];
-					$path   = $this->get_font_path( $file );
-					if ( is_file( $path ) ) {
-						$sizes[ $file ] = (int) filesize( $path );
+					$path   = $this->font_sources->get_own_copy( $file );
+					if ( $path !== '' && ! $this->is_failed_conflict( $file, $path ) ) {
+						$paths[ $file ] = $path;
 					}
 				}
 
 				if ( count( $files ) > 0 ) {
 					$families[ $key ] = [
 						'files' => $files,
-						'sizes' => $sizes,
+						'paths' => $paths,
 						'bytes' => $bytes,
 					];
 				}
@@ -1179,7 +1227,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function download_or_queue( string $file ): bool {
-		if ( ! $this->font_sources->is_large_file( $file ) || $this->font_sources->is_installed( $file ) ) {
+		if ( ! $this->font_sources->is_large_file( $file ) || $this->has_own_copy( $file ) ) {
 			return $this->download( $file );
 		}
 
@@ -1493,17 +1541,24 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 		$files     = is_array( $remaining ) ? array_filter( $remaining, 'is_string' ) : $this->with_wanted( $this->required_fonts->get_required_font_files() );
 		$gave_up   = $this->get_failed_files();
 
-		$files = array_filter(
-			$files,
-			function ( $file ) use ( $gave_up ) {
-				return ! isset( $gave_up[ $file ] ) && ! $this->font_sources->has_hashed_copy( $file );
+		$missing   = [];
+		$installed = [];
+		foreach ( $files as $file ) {
+			if ( isset( $gave_up[ $file ] ) ) {
+				continue;
 			}
-		);
 
-		$installed = array_filter( $files, [ $this->font_sources, 'is_installed' ] );
+			/* A hashed copy was checked when it was saved */
+			$path = $this->font_sources->get_own_copy( $file );
+			if ( $path === '' ) {
+				$missing[] = $file;
+			} elseif ( $path === $this->font_sources->get_plain_path( $file ) ) {
+				$installed[] = $file;
+			}
+		}
 
 		/* Those needing a download go first, so hashing the rest can't push one into a paused run */
-		return array_merge( array_diff( $files, $installed ), $installed );
+		return array_merge( $missing, $installed );
 	}
 
 	/**
@@ -1673,6 +1728,9 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	protected function record_failure( string $file ): void {
 		set_site_transient( self::back_off_key( $file ), time(), self::BACK_OFF );
 
+		/* A failed download leaves the font's name as it was, so a file there is another font's */
+		$conflict = $this->get_file_stamp( $this->font_sources->get_plain_path( $file ) );
+
 		$failures = $this->get_failures();
 		$failure  = $failures[ $file ] ?? null;
 
@@ -1681,6 +1739,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				'retry_at'  => time() + wp_rand( 0, $this->retry_jitter ),
 				'gave_up'   => 0,
 				'dismissed' => false,
+				'conflict'  => $conflict,
 			];
 
 			$this->save_failures( $failures );
@@ -1699,6 +1758,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 				'retry_at'  => 0,
 				'gave_up'   => time(),
 				'dismissed' => false,
+				'conflict'  => $conflict,
 			];
 
 			$this->save_failures( $failures );
@@ -1730,7 +1790,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @param array<string, array{retry_at: int, gave_up: int, dismissed: bool}> $failures
+	 * @param array<string, array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}> $failures
 	 *
 	 * @since 6.19.0
 	 */
@@ -1743,7 +1803,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	/**
 	 * Failures by file, read once per request, when any give-up whose file is now on disk is cleared from the record
 	 *
-	 * @return array<string, array{retry_at: int, gave_up: int, dismissed: bool}>
+	 * @return array<string, array{retry_at: int, gave_up: int, dismissed: bool, conflict: string}>
 	 *
 	 * @since 6.19.0
 	 */
@@ -1762,6 +1822,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 						'retry_at'  => $gave_up > 0 ? 0 : $retry_at,
 						'gave_up'   => $gave_up,
 						'dismissed' => ( $failure['dismissed'] ?? false ) === true,
+						'conflict'  => is_string( $failure['conflict'] ?? null ) ? $failure['conflict'] : '',
 					];
 				}
 			}
@@ -1779,7 +1840,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 */
 	protected function clear_installed_give_ups(): void {
 		foreach ( $this->failures as $file => $failure ) {
-			if ( $failure['gave_up'] > 0 && $this->font_sources->is_installed( $file ) ) {
+			if ( $failure['gave_up'] > 0 && $this->has_own_copy( $file ) ) {
 				$this->clear_failure( $file );
 			}
 		}

@@ -1,7 +1,9 @@
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
-import FontPreview from '../../../../../src/assets/js/react/components/FontManager/FontPreview';
+import FontPreview, {
+	FontPreviewCache,
+} from '../../../../../src/assets/js/react/components/FontManager/FontPreview';
 
 describe('FontManager - FontPreview.js', () => {
 	const font = {
@@ -15,12 +17,24 @@ describe('FontManager - FontPreview.js', () => {
 		wrapper.find('[data-test="font-preview-sample"]');
 	const styleSelect = (wrapper) =>
 		wrapper.find('[data-test="font-preview-style"]');
+	const sheets = (wrapper) =>
+		wrapper
+			.find('style')
+			.map((sheet) => sheet.text())
+			.join('');
 	const loadButton = (wrapper) =>
 		wrapper.find('[data-test="font-preview-load"]');
 	const largeFont = {
 		...font,
 		file_sizes: { regular: 5 * 1024 * 1024, bold: 1024 },
 	};
+
+	// The Font Manager's cache, which also holds the font's style sheet
+	const Preview = (props) => (
+		<FontPreviewCache>
+			<FontPreview {...props} />
+		</FontPreviewCache>
+	);
 
 	let onIntersect;
 
@@ -31,7 +45,7 @@ describe('FontManager - FontPreview.js', () => {
 		wrapper.update();
 	};
 	const mountLoaded = (props) => {
-		const wrapper = mount(<FontPreview font={font} {...props} />);
+		const wrapper = mount(<Preview font={font} {...props} />);
 
 		setVisible(true);
 		wait(wrapper, 200);
@@ -56,7 +70,7 @@ describe('FontManager - FontPreview.js', () => {
 	});
 
 	test('Loads the font once on screen for a moment', () => {
-		const wrapper = mount(<FontPreview font={font} />);
+		const wrapper = mount(<Preview font={font} />);
 
 		setVisible(true);
 		wait(wrapper, 199);
@@ -67,7 +81,7 @@ describe('FontManager - FontPreview.js', () => {
 	});
 
 	test('Loads nothing when scrolled away before the delay', () => {
-		const wrapper = mount(<FontPreview font={font} />);
+		const wrapper = mount(<Preview font={font} />);
 
 		setVisible(true);
 		setVisible(false);
@@ -76,19 +90,43 @@ describe('FontManager - FontPreview.js', () => {
 		expect(wrapper.find('style').exists()).toBe(false);
 	});
 
-	test('Drops the old font and waits again for the next one', () => {
+	test('Keeps the old font loaded and waits for the next one', () => {
 		const wrapper = mountLoaded();
 
 		wrapper.setProps({ font: { ...font, id: 'other' } });
+		expect(sheets(wrapper)).toContain('gfpdf-preview-brand');
+		expect(sheets(wrapper)).not.toContain('gfpdf-preview-other');
+
+		setVisible(true);
+		wait(wrapper, 200);
+		expect(sheets(wrapper)).toContain('gfpdf-preview-brand');
+		expect(sheets(wrapper)).toContain('gfpdf-preview-other');
+
+		// Going back shows it straight away
+		wrapper.setProps({ font });
+		expect(samples(wrapper).length).toBe(1);
+	});
+
+	test("Drops a font's faces when its files change", () => {
+		const wrapper = mountLoaded();
+		const changed = { ...font, bold: 'Brand-Bold-1.ttf' };
+
+		wrapper.setProps({ font: { ...font, id: 'other' } });
+		wrapper.setProps({ font: changed });
+		wrapper.update();
 		expect(wrapper.find('style').exists()).toBe(false);
 
 		setVisible(true);
 		wait(wrapper, 200);
-		expect(wrapper.find('style').text()).toContain('gfpdf-preview-other');
+		expect(sheets(wrapper)).toContain('Brand-Bold-1.ttf');
+
+		wrapper.setProps({ font: { ...changed, file_sizes: { regular: 1 } } });
+		wrapper.update();
+		expect(sheets(wrapper).match(/@font-face/g).length).toBe(2);
 	});
 
 	test('Has a swapping face for each style with a file', () => {
-		const faces = mountLoaded().find('style').text();
+		const faces = sheets(mountLoaded());
 
 		expect(faces).toContain('http://x/fonts/Brand%20Regular.ttf');
 		expect(faces).toContain('http://x/fonts/Brand-Bold.ttf');
@@ -108,9 +146,7 @@ describe('FontManager - FontPreview.js', () => {
 			font: { ...font, base_url: 'http://p/fonts/' },
 		});
 
-		expect(wrapper.find('style').text()).toContain(
-			'http://p/fonts/Brand-Bold.ttf'
-		);
+		expect(sheets(wrapper)).toContain('http://p/fonts/Brand-Bold.ttf');
 	});
 
 	describe('While the font face loads', () => {
@@ -190,6 +226,36 @@ describe('FontManager - FontPreview.js', () => {
 			expect(loading(wrapper).exists()).toBe(false);
 		});
 
+		test('A loaded face shows without the indicator when viewed again', async () => {
+			const wrapper = mountLoaded();
+
+			await settle(wrapper, () => finish.resolve([]));
+			wrapper.setProps({ font: { ...font, id: 'other' } });
+			wrapper.setProps({ font });
+
+			expect(loading(wrapper).exists()).toBe(false);
+			expect(document.fonts.load).toHaveBeenCalledTimes(1);
+		});
+
+		test('A failed face is tried again after viewing another font', async () => {
+			const wrapper = mountLoaded();
+
+			await settle(wrapper, () => finish.reject(new Error('Nope')));
+			wrapper.setProps({ font: { ...font, id: 'other' } });
+			wrapper.setProps({ font });
+
+			expect(
+				wrapper.find('[data-test="font-preview-failed"]').exists()
+			).toBe(false);
+
+			setVisible(true);
+			wait(wrapper, 200);
+			expect(loading(wrapper).exists()).toBe(true);
+			expect(document.fonts.load).toHaveBeenLastCalledWith(
+				'normal 400 16px "gfpdf-preview-brand"'
+			);
+		});
+
 		test('Waits for a click on a large font', () => {
 			const wrapper = mountLoaded({ font: largeFont });
 
@@ -210,7 +276,7 @@ describe('FontManager - FontPreview.js', () => {
 		});
 
 		test('Says the preview is unavailable', () => {
-			const wrapper = mount(<FontPreview font={font} />);
+			const wrapper = mount(<Preview font={font} />);
 
 			expect(
 				wrapper.find('[data-test="font-preview-unavailable"]').length
@@ -223,7 +289,7 @@ describe('FontManager - FontPreview.js', () => {
 				font: { ...font, base_url: 'http://p/fonts/' },
 			});
 
-			expect(wrapper.find('style').text()).toContain('http://p/fonts/');
+			expect(sheets(wrapper)).toContain('http://p/fonts/');
 		});
 	});
 
@@ -307,6 +373,40 @@ describe('FontManager - FontPreview.js', () => {
 		expect(loadButton(wrapper).exists()).toBe(true);
 	});
 
+	test('Drops the least recently viewed fonts once over 64 MB', () => {
+		const hugeFont = {
+			...font,
+			bold: '',
+			file_sizes: { regular: 30 * 1024 * 1024 },
+		};
+		const wrapper = mountLoaded({ font: hugeFont });
+		const view = (id) => {
+			wrapper.setProps({ font: { ...hugeFont, id } });
+			setVisible(true);
+			wait(wrapper, 200);
+		};
+		const load = () => {
+			loadButton(wrapper).simulate('click');
+			wrapper.update();
+		};
+
+		load();
+		view('b');
+		load();
+		view('brand');
+		expect(loadButton(wrapper).exists()).toBe(false);
+
+		view('c');
+		load();
+		expect(sheets(wrapper)).not.toContain('gfpdf-preview-b"');
+		expect(sheets(wrapper)).toContain('gfpdf-preview-brand');
+
+		view('b');
+		expect(loadButton(wrapper).exists()).toBe(true);
+		view('brand');
+		expect(loadButton(wrapper).exists()).toBe(false);
+	});
+
 	test('Returns to the first style for the next font', () => {
 		const wrapper = mountLoaded();
 
@@ -334,7 +434,7 @@ describe('FontManager - FontPreview.js', () => {
 	});
 
 	test('Shows typed text at the chosen size', () => {
-		const wrapper = mount(<FontPreview font={font} />);
+		const wrapper = mount(<Preview font={font} />);
 
 		wrapper
 			.find('.font-preview-text')
