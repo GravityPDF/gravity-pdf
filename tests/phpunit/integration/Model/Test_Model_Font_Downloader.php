@@ -680,6 +680,8 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$downloader = $this->seamed( [ 'required' => [] ] );
 		$this->assertSame( 'Off (gfpdf_auto_install_fonts filter)', $downloader->get_auto_install_status() );
+		$this->assertSame( 'Off', $downloader->get_auto_install_state() );
+		$this->assertSame( 'gfpdf_auto_install_fonts filter', $downloader->get_auto_install_source() );
 		$this->assertNull( $downloader->get_auto_install_blocker( [] ) );
 	}
 
@@ -731,6 +733,7 @@ class Test_Model_Font_Downloader extends TestCase {
 
 		$downloader = $this->seamed( [ 'required' => [ 'Garuda.ttf', self::FONT ] ] );
 		$this->assertSame( 'Partly off (gfpdf_auto_install_fonts filter)', $downloader->get_auto_install_status() );
+		$this->assertSame( 'Partly off', $downloader->get_auto_install_state() );
 
 		/* Installed, so nothing it blocks is needed yet */
 		$this->assertNull( $downloader->get_auto_install_blocker( $downloader->get_required_fonts()->get_missing_files() ) );

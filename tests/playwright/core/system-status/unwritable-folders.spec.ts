@@ -47,6 +47,9 @@ test.describe('Unwritable Folders', () => {
 
 		await expect(row).toContainText('Not writable');
 		await expect(row.locator('code')).toHaveText([READ_ONLY_FOLDER]);
+		await expect(row).toContainText(
+			'Ask your web host to make this folder writable.'
+		);
 
 		await snapshot(page, testinfo, row);
 	});

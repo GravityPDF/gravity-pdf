@@ -306,8 +306,10 @@ class Model_System_Report extends Helper_Abstract_Model {
 			}
 		}
 
+		$view = $this->getController()->view;
+
 		return [
-			'checks'        => array_merge( $failed, $this->getController()->view->get_passed_rows( $passed, count( $checks ) ) ),
+			'checks'        => array_merge( $view->get_failed_rows( $failed ), $view->get_passed_rows( $passed, count( $checks ) ) ),
 			'configuration' => $configuration,
 		];
 	}
@@ -388,7 +390,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 		if ( $health['blocker'] !== null ) {
 			/* translators: %s: The GPDF_AUTO_INSTALL_FONTS constant or the gfpdf_auto_install_fonts filter */
-			$fix = sprintf( __( 'The Font Installer is turned off by the %s.', 'gravity-pdf' ), $health['blocker'] );
+			$fix = sprintf( __( 'Custom code turned off the Font Installer (%s). Ask your developer to turn it back on.', 'gravity-pdf' ), $health['blocker'] );
 		}
 
 		if ( $fix !== '' ) {
@@ -411,16 +413,28 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	protected function get_core_font_downloads(): array {
-		$status = $this->get_font_downloader()->get_auto_install_status();
+		$downloader = $this->get_font_downloader();
+		$state      = $downloader->get_auto_install_state();
+		$value      = __( 'On', 'gravity-pdf' );
+
+		if ( $state !== 'On' ) {
+			$value = $state === 'Off'
+				/* translators: %s: The GPDF_AUTO_INSTALL_FONTS constant or the gfpdf_auto_install_fonts filter */
+				? __( 'Off, by custom code (%s)', 'gravity-pdf' )
+				/* translators: %s: The gfpdf_auto_install_fonts filter */
+				: __( 'Partly off, by custom code (%s)', 'gravity-pdf' );
+
+			$value = sprintf( $value, $downloader->get_auto_install_source() );
+		}
 
 		$row = [
 			'label'        => $this->get_anchored_label( self::FONT_DOWNLOADS_ANCHOR, esc_html__( 'Font Installer', 'gravity-pdf' ) ),
 			'label_export' => 'Font Installer',
-			'value'        => esc_html( $status ),
-			'value_export' => $status,
+			'value'        => esc_html( $value ),
+			'value_export' => $downloader->get_auto_install_status(),
 		];
 
-		return $this->mark_default( $row, $status === 'On' );
+		return $this->mark_default( $row, $state === 'On' );
 	}
 
 	/**
@@ -528,11 +542,6 @@ class Model_System_Report extends Helper_Abstract_Model {
 		/* Added after the filters, so an add-on looking for this row only finds it when a core template is outdated */
 		if ( ! isset( $items['directories']['outdated_templates'] ) ) {
 			$items['directories']['outdated_templates'] = $this->get_outdated_templates( [] );
-		}
-
-		/* Core's outdated templates end in a line break for an add-on's own; drop it when none were added */
-		if ( is_string( $items['directories']['outdated_templates']['value'] ?? null ) ) {
-			$items['directories']['outdated_templates']['value'] = preg_replace( '/<br>$/', '', $items['directories']['outdated_templates']['value'] );
 		}
 
 		return $items;
@@ -843,7 +852,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		}
 
 		if ( $memory !== -1 && $memory < 128 ) {
-			$fix = $view->get_fix( __( 'Raise it to at least 128MB.', 'gravity-pdf' ), 'https://docs.gravitypdf.com/users/increasing-memory-limit', __( 'How to increase it', 'gravity-pdf' ) );
+			$fix = $view->get_fix( __( 'Ask your web host to raise it to at least 128MB.', 'gravity-pdf' ), 'https://docs.gravitypdf.com/users/increasing-memory-limit', __( 'How to increase it', 'gravity-pdf' ) );
 		}
 
 		/* translators: %s: The memory limit, e.g. "512MB" */
@@ -965,7 +974,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 		];
 
 		if ( ! $protected ) {
-			$fix = $view->get_fix( __( "The temporary folder can be reached from the web. Move it outside the site's public folder.", 'gravity-pdf' ), 'https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/', __( 'How to move it', 'gravity-pdf' ) );
+			$fix = $view->get_fix( __( "The temporary folder can be reached from the web. Ask your developer or web host to move it outside the site's public folder.", 'gravity-pdf' ), 'https://docs.gravitypdf.com/developers/filters/gfpdf_tmp_location/', __( 'How to move it', 'gravity-pdf' ) );
 		}
 
 		return $view->get_check( $row, __( 'temporary folder protected', 'gravity-pdf' ), $fix );
@@ -1051,7 +1060,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 			$row['value']        = esc_html__( 'Not writable:', 'gravity-pdf' ) . '<br>' . $view->get_code_lines( $folders );
 			$row['value_export'] = 'Not writable: ' . implode( ', ', $folders );
 
-			$fix = $view->get_fix( __( 'Ask your web host to make these folders writable.', 'gravity-pdf' ) );
+			$fix = $view->get_fix( _n( 'Ask your web host to make this folder writable.', 'Ask your web host to make these folders writable.', count( $folders ), 'gravity-pdf' ) );
 		}
 
 		return $view->get_check( $row, __( 'folders writable', 'gravity-pdf' ), $fix );
@@ -1110,7 +1119,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 			$row['value']        = $value;
 			$row['value_export'] = implode( ', ', $export ) . "\n";
 
-			$fix = $view->get_fix( __( 'Update these template overrides.', 'gravity-pdf' ), 'https://docs.gravitypdf.com/developers/template-hierarchy', __( 'How to update', 'gravity-pdf' ) );
+			$fix = $view->get_fix( __( 'Ask your developer to update these template overrides.', 'gravity-pdf' ), 'https://docs.gravitypdf.com/developers/template-hierarchy', __( 'How to update', 'gravity-pdf' ) );
 		}
 
 		return $view->get_check( $row, __( 'templates up to date', 'gravity-pdf' ), $fix );

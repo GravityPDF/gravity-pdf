@@ -85,7 +85,7 @@ class Test_View_System_Report extends TestCase {
 		$row = $this->view->get_check( [ 'label' => 'Check' ], 'check passed', $this->view->get_fix( 'Fix it <now>.', 'https://example.com/?a=1&b=2', 'How' ) );
 
 		$this->assertFalse( $row['is_valid'] );
-		$this->assertSame( 'Fix it &lt;now&gt;. <a href="https://example.com/?a=1&#038;b=2">How</a>', $row['validation_message'] );
+		$this->assertSame( 'Fix it &lt;now&gt;. <a href="https://example.com/?a=1&#038;b=2" style="white-space: nowrap">How</a>', $row['validation_message'] );
 		$this->assertSame( '', $row['validation_message_export'] );
 	}
 
@@ -95,6 +95,24 @@ class Test_View_System_Report extends TestCase {
 		$this->assertTrue( $row['is_valid'] );
 		$this->assertSame( 'check &lt;passed&gt;', $row['summary'] );
 		$this->assertArrayNotHasKey( 'validation_message', $row );
+	}
+
+	public function test_a_failing_rows_fix_starts_a_line_of_its_own() {
+		$rows = $this->view->get_failed_rows(
+			[
+				[ 'value' => '64MB', 'value_export' => '64MB', 'is_valid' => false, 'validation_message' => 'Fix it.' ],
+				[ 'value' => 'list.php', 'is_valid' => false, 'validation_message' => 'Fix it.' ],
+				[ 'value' => 'a.php<br>', 'is_valid' => false, 'validation_message' => 'Fix it.' ],
+				[ 'value' => 'b.php<hr />', 'is_valid' => false, 'validation_message' => 'Fix it.' ],
+				[ 'value' => 'c.php<p><a href="#">Guide</a></p>', 'is_valid' => false, 'validation_message' => 'Fix it.' ],
+				[ 'value' => 'Off', 'is_valid' => false ],
+				[ 'value' => 'On', 'is_valid' => true, 'validation_message' => 'Fix it.' ],
+			]
+		);
+
+		$this->assertSame( [ '64MB<br>', 'list.php<br>', 'a.php<br>', 'b.php<hr />', 'c.php<p><a href="#">Guide</a></p>', 'Off', 'On' ], array_column( $rows, 'value' ) );
+		$this->assertSame( [ '64MB', 'list.php' ], array_column( array_slice( $rows, 0, 2 ), 'value_export' ) );
+		$this->assertArrayNotHasKey( 'value_export', $rows[2] );
 	}
 
 	public function test_get_code_lines() {

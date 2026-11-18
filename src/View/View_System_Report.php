@@ -215,7 +215,7 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
-	 * A short fix for a failing check, with a link to the guide when there is one
+	 * A short fix for a failing check, with a link to the guide, kept on one line, when there is one
 	 *
 	 * @since 6.19.0
 	 */
@@ -223,7 +223,7 @@ class View_System_Report extends Helper_Abstract_View {
 		$fix = esc_html( $message );
 
 		if ( $url !== '' ) {
-			$fix .= ' <a href="' . esc_url( $url ) . '">' . esc_html( $link ) . '</a>';
+			$fix .= ' <a href="' . esc_url( $url ) . '" style="white-space: nowrap">' . esc_html( $link ) . '</a>';
 		}
 
 		return $fix;
@@ -255,6 +255,30 @@ class View_System_Report extends Helper_Abstract_View {
 	 */
 	public function get_on_off( bool $on ): string {
 		return $on ? esc_html__( 'On', 'gravity-pdf' ) : esc_html__( 'Off', 'gravity-pdf' );
+	}
+
+	/**
+	 * The rows of the checks that failed, each with its ✘ and fix on a line of their own below the value
+	 *
+	 * @param array[] $failed The rows of the checks that failed
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_failed_rows( array $failed ): array {
+		foreach ( $failed as $index => $row ) {
+			$shows_fix = ( $row['is_valid'] ?? null ) === false && ! empty( $row['validation_message'] );
+			$value     = $row['value'] ?? null;
+
+			/* Gravity Forms puts the ✘ and fix straight after the value, so they'd share its last line unless a break or block ends it */
+			if ( ! $shows_fix || ! is_string( $value ) || preg_match( '#(<[bh]r\s*/?>|</(p|div|ul|ol)>)\s*$#i', $value ) ) {
+				continue;
+			}
+
+			$failed[ $index ]['value_export'] = $row['value_export'] ?? $value;
+			$failed[ $index ]['value']        = $value . '<br>';
+		}
+
+		return $failed;
 	}
 
 	/**

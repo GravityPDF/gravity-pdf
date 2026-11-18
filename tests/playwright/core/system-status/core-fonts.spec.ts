@@ -37,7 +37,7 @@ test.describe('Core Fonts', () => {
 			'Pothana2000.ttf',
 		]);
 		await expect(coreFonts).toContainText(
-			'The Font Installer is turned off by the gfpdf_auto_install_fonts filter.'
+			'Custom code turned off the Font Installer (gfpdf_auto_install_fonts filter). Ask your developer to turn it back on.'
 		);
 		await expect(
 			coreFonts.getByRole('link', { name: 'Install the fonts by hand' })
@@ -46,7 +46,7 @@ test.describe('Core Fonts', () => {
 			'https://docs.gravitypdf.com/users/core-pdf-fonts'
 		);
 		await expect(installer).toContainText(
-			'Off (gfpdf_auto_install_fonts filter)'
+			'Off, by custom code (gfpdf_auto_install_fonts filter)'
 		);
 
 		// The bundled fonts and the core ones mPDF loads only when they have the characters, listed in the copied report only

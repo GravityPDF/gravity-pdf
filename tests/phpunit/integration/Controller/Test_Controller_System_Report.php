@@ -225,10 +225,11 @@ class Test_Controller_System_Report extends TestCase {
 		}
 
 		$this->assertFalse( $row['is_valid'] );
-		$this->assertStringEndsNotWith( '<br>', $checks['Outdated Templates'] );
+		$this->assertStringEndsWith( '<br>', $checks['Outdated Templates'] );
+		$this->assertStringEndsNotWith( '<br><br>', $checks['Outdated Templates'] );
 		$this->assertStringStartsWith( 'zadani.php 1.5.2', $row['value_export'] );
 		$this->assertStringStartsWith( '<code>zadani.php</code> 1.5.2', $row['value'] );
-		$this->assertStringStartsWith( 'Update these template overrides. <a href=', $row['validation_message'] );
+		$this->assertStringStartsWith( 'Ask your developer to update these template overrides. <a href=', $row['validation_message'] );
 		$this->assertSame( '', $row['validation_message_export'] );
 	}
 
@@ -412,6 +413,12 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertSame( 'Not writable: ' . $dir . ', /srv/pdf-tmp/mpdf', $row['value_export'] );
 		$this->assertSame( 'Not writable:<br><code>' . esc_html( $dir ) . '</code><br><code>/srv/pdf-tmp/mpdf</code>', $row['value'] );
 		$this->assertSame( 'Ask your web host to make these folders writable.', $row['validation_message'] );
+	}
+
+	public function test_folder_permissions_asks_for_a_single_folder_in_the_singular() {
+		$row = $this->get_directories_with_unwritable( [ '/srv/pdf-tmp/mpdf' ] )['folder_permissions'];
+
+		$this->assertSame( 'Ask your web host to make this folder writable.', $row['validation_message'] );
 	}
 
 	/**
@@ -792,7 +799,7 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertFalse( $row['is_valid'] );
 		$this->assertSame( '1 failed: Garuda.ttf (gave up 2026-11-03)', $row['value_export'] );
 		$this->assertSame( '1 failed:<br><code>Garuda.ttf</code>', $row['value'] );
-		$this->assertStringStartsWith( 'Some characters may not display in PDFs. <a href="https://docs.gravitypdf.com/users/core-pdf-fonts">', $row['validation_message'] );
+		$this->assertStringStartsWith( 'Some characters may not display in PDFs. <a href="https://docs.gravitypdf.com/users/core-pdf-fonts" style="white-space: nowrap">', $row['validation_message'] );
 
 		\GPDFAPI::get_mvc_class( 'Model_Actions' )->dismiss_failed_core_fonts();
 
@@ -808,7 +815,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		$this->assertFalse( $row['is_valid'] );
 		$this->assertSame( '1 missing: Garuda.ttf', $row['value_export'] );
-		$this->assertStringStartsWith( 'The Font Installer is turned off by the gfpdf_auto_install_fonts filter.', $row['validation_message'] );
+		$this->assertStringStartsWith( 'Custom code turned off the Font Installer (gfpdf_auto_install_fonts filter). Ask your developer to turn it back on.', $row['validation_message'] );
 	}
 
 	public function test_core_fonts_and_the_notice_clear_once_the_font_is_on_disk() {
@@ -844,6 +851,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		add_filter( 'gfpdf_auto_install_fonts', '__return_false' );
 
+		$this->assertSame( 'Off, by custom code (gfpdf_auto_install_fonts filter)', $this->report_row( 'core_font_downloads' )['value'] );
 		$this->assertSame( 'Off (gfpdf_auto_install_fonts filter)', $this->report_row( 'core_font_downloads' )['value_export'] );
 	}
 
