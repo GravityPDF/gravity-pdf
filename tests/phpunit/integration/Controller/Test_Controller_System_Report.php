@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Install;
 use GFPDF\Model\Model_Pdf_Cache;
 use GFPDF\Model\Model_System_Report;
@@ -585,19 +586,165 @@ class Test_Controller_System_Report extends TestCase {
 	/**
 	 * Get the Site Health test the controller registers
 	 */
-	protected function get_site_health_test( string $id = 'gravity_pdf_deprecated_features' ): array {
-		$tests = apply_filters( 'site_status_tests', [ 'direct' => [] ] );
+	protected function get_site_health_test( string $id = 'gravity_pdf_deprecated_features', string $type = 'direct' ): array {
+		$tests = apply_filters( 'site_status_tests', [ 'direct' => [], 'async' => [] ] );
 
-		return $tests['direct'][ $id ] ?? [];
+		return $tests[ $type ][ $id ] ?? [];
 	}
 
-	public function test_site_health_test_is_registered() {
+	/**
+	 * Run a Site Health test the controller registers, as Site Health does
+	 */
+	protected function run_site_health_test( string $id ): array {
+		$test = $this->get_site_health_test( $id );
+
+		return call_user_func( $test['test'] );
+	}
+
+	public function test_every_report_check_has_a_site_health_test_that_passes_on_a_clean_site() {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$test = $this->get_site_health_test();
+		$tests = apply_filters( 'site_status_tests', [ 'direct' => [], 'async' => [] ] );
 
-		$this->assertIsCallable( $test['test'] );
-		$this->assertSame( 'good', call_user_func( $test['test'] )['status'] );
+		$this->assertSame(
+			[ 'gravity_pdf_removed_features', 'gravity_pdf_deprecated_features', 'gravity_pdf_cache_cleanup', 'gravity_pdf_core_fonts', 'gravity_pdf_folder_permissions', 'gravity_pdf_memory_limit', 'gravity_pdf_remote_images', 'gravity_pdf_template_overrides' ],
+			array_keys( $tests['direct'] )
+		);
+
+		foreach ( $tests['direct'] as $id => $test ) {
+			$result = call_user_func( $test['test'] );
+
+			$this->assertSame( 'good', $result['status'], $id );
+			$this->assertSame( $id, $result['test'] );
+		}
+
+		$async = $tests['async']['gravity_pdf_temporary_folder'];
+
+		$this->assertTrue( $async['has_rest'] );
+		$this->assertStringContainsString( Helper_Data::REST_API_BASENAME . 'v1/site-health/temporary-folder', $async['test'] );
+		$this->assertSame( 'good', call_user_func( $async['async_direct_test'] )['status'] );
+	}
+
+	public function test_a_report_check_site_health_test_reads_the_check_and_its_fix() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$gfpdf = $this->gfpdf();
+		$saved = $gfpdf->data->memory_limit;
+
+		$gfpdf->data->memory_limit = '64M';
+
+		try {
+			$result = $this->run_site_health_test( 'gravity_pdf_memory_limit' );
+		} finally {
+			$gfpdf->data->memory_limit = $saved;
+		}
+
+		$this->assertSame( 'recommended', $result['status'] );
+		$this->assertSame( 'Large PDFs may fail to generate', $result['label'] );
+		$this->assertStringContainsString( '<p>PDF Memory Limit: 64MB</p>', $result['description'] );
+		$this->assertStringContainsString( 'Ask your web host to raise it to at least 128MB.', $result['description'] );
+		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::SECTION_ANCHOR, $result['actions'] );
+	}
+
+	public function test_an_unwritable_folder_is_a_critical_site_health_issue() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$gfpdf     = $this->gfpdf();
+		$installer = $gfpdf->singleton->get_class( 'Model_Install' );
+		$dir       = $gfpdf->data->template_tmp_location;
+
+		$failing = $this->getMockBuilder( Model_Install::class )
+			->disableOriginalConstructor()
+			->setMockClassName( 'Model_Install' )
+			->onlyMethods( [ 'create_folder_structures' ] )
+			->getMock();
+		$failing->method( 'create_folder_structures' )->willReturn( [ $dir ] );
+		$gfpdf->singleton->add_class( $failing );
+
+		try {
+			$result = $this->run_site_health_test( 'gravity_pdf_folder_permissions' );
+		} finally {
+			$gfpdf->singleton->add_class( $installer );
+		}
+
+		$this->assertSame( 'critical', $result['status'] );
+		$this->assertSame( "Gravity PDF can't save PDFs", $result['label'] );
+		$this->assertStringContainsString( esc_html( $dir ), $result['description'] );
+		$this->assertStringContainsString( 'Ask your web host to make this folder writable.', $result['description'] );
+	}
+
+	public function test_only_the_temporary_folder_test_asks_the_site_for_the_folder() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$asked = 0;
+		$count = static function ( $response, $args, $url ) use ( &$asked ) {
+			$asked += (int) ( strpos( $url, 'public_tmp_directory_test.txt' ) !== false );
+
+			return $response;
+		};
+
+		add_filter( 'pre_http_request', $count, 1, 3 );
+
+		$tests = apply_filters( 'site_status_tests', [ 'direct' => [], 'async' => [] ] );
+		foreach ( $tests['direct'] as $test ) {
+			call_user_func( $test['test'] );
+		}
+
+		$this->assertSame( 0, $asked );
+
+		call_user_func( $tests['async']['gravity_pdf_temporary_folder']['async_direct_test'] );
+
+		remove_filter( 'pre_http_request', $count, 1 );
+
+		$this->assertSame( 1, $asked );
+	}
+
+	public function test_a_public_temporary_folder_is_a_critical_site_health_issue() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$public = static function ( $response, $args, $url ) {
+			if ( strpos( $url, 'public_tmp_directory_test.txt' ) === false ) {
+				return $response;
+			}
+
+			return [
+				'headers'  => [],
+				'body'     => 'failed-if-read',
+				'response' => [
+					'code'    => 200,
+					'message' => 'OK',
+				],
+				'cookies'  => [],
+			];
+		};
+
+		add_filter( 'pre_http_request', $public, 20, 3 );
+
+		$result = call_user_func( $this->get_site_health_test( 'gravity_pdf_temporary_folder', 'async' )['async_direct_test'] );
+
+		remove_filter( 'pre_http_request', $public, 20 );
+
+		$this->assertSame( 'critical', $result['status'] );
+		$this->assertSame( 'PDFs could be opened by anyone who finds them', $result['label'] );
+		$this->assertStringContainsString( 'Temporary Folder Protected: No', $result['description'] );
+	}
+
+	public function test_the_temporary_folder_route_needs_site_health_access() {
+		$request = new \WP_REST_Request( 'GET', '/' . Helper_Data::REST_API_BASENAME . 'v1/site-health/temporary-folder' );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+		$this->assertSame( 403, rest_get_server()->dispatch( $request )->get_status() );
+
+		$admin = self::factory()->user->create( [ 'role' => 'administrator' ] );
+		if ( is_multisite() ) {
+			grant_super_admin( $admin );
+		}
+
+		wp_set_current_user( $admin );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'gravity_pdf_temporary_folder', $response->get_data()['test'] );
 	}
 
 	public function test_site_health_test_is_gated_on_the_gravity_forms_capability() {
@@ -606,19 +753,21 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertSame( [], $this->get_site_health_test() );
 	}
 
-	public function test_debug_information_reports_a_clean_site() {
+	public function test_debug_information_has_one_panel_with_the_lines_of_the_copied_report() {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$info = apply_filters( 'debug_information', [] );
+		$info   = apply_filters( 'debug_information', [] );
+		$fields = $info['gravity-pdf']['fields'];
+		$rows   = array_merge( ...array_column( apply_filters( 'gform_system_report', [] )[0]['tables'], 'items' ) );
 
-		/* The removed-feature group has its own panel, and reports nothing on a site that isn't using one */
-		$this->assertSame( 'None detected', $info['gravity-pdf-unsupported']['fields']['unsupported']['value'] );
+		$this->assertArrayNotHasKey( 'gravity-pdf-unsupported', $info );
+		$this->assertArrayNotHasKey( 'gravity-pdf-deprecated', $info );
+		$this->assertSame( 'Gravity PDF', $info['gravity-pdf']['label'] );
+		$this->assertSame( array_column( $rows, 'label_export' ), array_column( $fields, 'label' ) );
 
-		/* The group still heads its own panel, but the intro only makes sense against a list of detections */
-		$this->assertStringContainsString( '<h4>Unsupported Features</h4>', $info['gravity-pdf-unsupported']['description'] );
-		$this->assertStringNotContainsString( '<p>', $info['gravity-pdf-unsupported']['description'] );
-
-		$this->assertSame( 'None detected', $info['gravity-pdf-deprecated']['fields']['deprecated']['value'] );
+		$this->assertSame( 'None ✔', $fields['unsupported_features']['value'] );
+		$this->assertSame( 'None ✔', $fields['deprecated_features']['value'] );
+		$this->assertSame( 'View (default)', $fields['entry_view']['value'] );
 	}
 
 	public function test_debug_information_is_gated_on_the_gravity_forms_capability() {
@@ -626,7 +775,7 @@ class Test_Controller_System_Report extends TestCase {
 
 		$info = apply_filters( 'debug_information', [] );
 
-		$this->assertArrayNotHasKey( 'gravity-pdf-unsupported', $info );
+		$this->assertArrayNotHasKey( 'gravity-pdf', $info );
 	}
 
 	public function test_debug_information_reports_each_signal() {
@@ -634,12 +783,12 @@ class Test_Controller_System_Report extends TestCase {
 
 		$form_id = $this->create_form_with_legacy_url();
 
-		/* The endpoint is removed in 7.0, so the URLs still pointing at it report under Unsupported */
-		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-unsupported']['fields'];
+		$fields = apply_filters( 'debug_information', [] )['gravity-pdf']['fields'];
 
-		$this->assertArrayNotHasKey( 'unsupported', $fields );
-		$this->assertSame( 'Legacy Download URLs', $fields['legacy_endpoint']['label'] );
-		$this->assertStringContainsString( (string) $form_id, $fields['legacy_endpoint']['value'] );
+		$this->assertArrayNotHasKey( 'unsupported_features', $fields );
+		$this->assertSame( 'Legacy Download URLs (Unsupported)', $fields['legacy_download_urls_unsupported']['label'] );
+		$this->assertStringContainsString( (string) $form_id, $fields['legacy_download_urls_unsupported']['value'] );
+		$this->assertStringEndsWith( ' ✘', $fields['legacy_download_urls_unsupported']['value'] );
 	}
 
 	public function test_every_surface_lists_a_template_by_file_name() {
@@ -651,12 +800,11 @@ class Test_Controller_System_Report extends TestCase {
 		$items = $this->get_unsupported_features();
 		$this->assertSame( 'my-legacy-template.php (not configured on a form)', $items['legacy_templates']['value_export'] );
 
-		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-unsupported']['fields'];
-		$this->assertStringContainsString( 'my-legacy-template.php', $fields['legacy_templates']['value'] );
-		$this->assertStringNotContainsString( 'PDF_EXTENDED_TEMPLATES', $fields['legacy_templates']['value'] );
+		$fields = apply_filters( 'debug_information', [] )['gravity-pdf']['fields'];
+		$this->assertStringContainsString( 'my-legacy-template.php', $fields['legacy_templates_unsupported']['value'] );
+		$this->assertStringNotContainsString( 'PDF_EXTENDED_TEMPLATES', $fields['legacy_templates_unsupported']['value'] );
 
-
-		$result = call_user_func( $this->get_site_health_test()['test'] );
+		$result = $this->run_site_health_test( 'gravity_pdf_removed_features' );
 		$this->assertStringContainsString( 'my-legacy-template.php', $result['description'] );
 		$this->assertStringNotContainsString( 'PDF_EXTENDED_TEMPLATES', $result['description'] );
 
@@ -683,10 +831,10 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertStringContainsString( 'subview=PDF', $items['legacy_templates']['value'] );
 		$this->assertStringContainsString( sprintf( '>%d</a>', $form_id ), $items['legacy_templates']['value'] );
 
-		$fields = apply_filters( 'debug_information', [] )['gravity-pdf-unsupported']['fields'];
-		$this->assertStringContainsString( $expected, $fields['legacy_templates']['value'] );
+		$fields = apply_filters( 'debug_information', [] )['gravity-pdf']['fields'];
+		$this->assertStringContainsString( $expected, $fields['legacy_templates_unsupported']['value'] );
 
-		$result = call_user_func( $this->get_site_health_test()['test'] );
+		$result = $this->run_site_health_test( 'gravity_pdf_removed_features' );
 		$this->assertStringContainsString( sprintf( '>%d</a>', $form_id ), $result['description'] );
 
 		$this->delete_legacy_templates( $legacy_path );
@@ -704,21 +852,35 @@ class Test_Controller_System_Report extends TestCase {
 		$this->assertSame( [ 'legacy_endpoint' ], Deprecation::get_detected_features() );
 	}
 
-	public function test_site_health_test_reports_each_signal() {
+	public function test_removed_and_deprecated_functionality_are_tested_apart() {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
 		$form_id = $this->create_form_with_legacy_url();
 
-		$result = call_user_func( $this->get_site_health_test()['test'] );
+		$result = $this->run_site_health_test( 'gravity_pdf_removed_features' );
 
-		/* The endpoint is already gone, so the test escalates past 'recommended' */
 		$this->assertSame( 'critical', $result['status'] );
 		$this->assertStringContainsString( 'has been removed', $result['label'] );
-		$this->assertStringContainsString( '<h4>Unsupported</h4>', $result['description'] );
-		$this->assertStringNotContainsString( '<h4>Deprecated</h4>', $result['description'] );
+		$this->assertStringContainsString( 'These features have been removed', $result['description'] );
 		$this->assertStringContainsString( 'Legacy Download URLs', $result['description'] );
 		$this->assertStringContainsString( (string) $form_id, $result['description'] );
 		$this->assertStringContainsString( 'page=gf_system_status#' . Model_System_Report::SECTION_ANCHOR, $result['actions'] );
+
+		$this->assertSame( 'good', $this->run_site_health_test( 'gravity_pdf_deprecated_features' )['status'] );
+	}
+
+	public function test_deprecated_functionality_is_a_recommended_improvement() {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		add_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+
+		$result = $this->run_site_health_test( 'gravity_pdf_deprecated_features' );
+
+		remove_filter( 'gfpdf_settings_tools', '__return_empty_array' );
+
+		$this->assertSame( 'recommended', $result['status'] );
+		$this->assertStringContainsString( 'scheduled for removal', $result['label'] );
+		$this->assertStringContainsString( 'Tools Tab Actions and Filters', $result['description'] );
 	}
 
 	/**

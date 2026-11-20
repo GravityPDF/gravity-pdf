@@ -175,6 +175,15 @@ class Model_System_Report extends Helper_Abstract_Model {
 	protected $font_downloader;
 
 	/**
+	 * The rows the Site Health tests read, built once a run
+	 *
+	 * @var array|null
+	 *
+	 * @since 6.19.0
+	 */
+	protected $report_rows;
+
+	/**
 	 * Build the System Report from the plugin settings, environment checks, templates, PDF cache and fonts
 	 *
 	 * @since 6.0
@@ -209,6 +218,38 @@ class Model_System_Report extends Helper_Abstract_Model {
 		}
 
 		return $structure;
+	}
+
+	/**
+	 * The report's rows keyed by section, for the Site Health tests: built once a run, and without asking the site for
+	 * its temporary folder, which has a test of its own
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_report_rows(): array {
+		if ( $this->report_rows === null ) {
+			$this->report_rows = $this->get_report_items( false );
+		}
+
+		return $this->report_rows;
+	}
+
+	/**
+	 * Build the Site Health rows afresh the next time they're asked for
+	 *
+	 * @since 6.19.0
+	 */
+	public function flush_report_rows(): void {
+		$this->report_rows = null;
+	}
+
+	/**
+	 * The Temporary Folder Protected check on its own, which asks the site for a file in the folder
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_temp_folder_check(): array {
+		return $this->check_temp_folder_permission();
 	}
 
 	/**
@@ -506,12 +547,14 @@ class Model_System_Report extends Helper_Abstract_Model {
 	/**
 	 * Get array report structure of Gravity PDF System Report
 	 *
+	 * @param bool $test_public_access Whether to ask the site for its temporary folder, for the Temporary Folder Protected check
+	 *
 	 * @return array
 	 * @since 6.0
 	 * @since 6.17.0 Keyed by section name, filtered by `gfpdf_system_status_report_sections`
 	 * @since 6.19.0 Each check row says whether it passed, and each setting row whether it's unchanged
 	 */
-	protected function get_report_items(): array {
+	protected function get_report_items( bool $test_public_access = true ): array {
 		$defaults = $this->get_setting_defaults();
 		$detected = Deprecation::group_signals( Deprecation::refresh_signals() );
 		$items    = [];
@@ -531,7 +574,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 			'charset'         => $this->get_charset(),
 		];
 
-		$items['directories'] = $this->get_directory_items();
+		$items['directories'] = $this->get_directory_items( $test_public_access );
 		$items['global']      = $this->get_global_items( $defaults );
 		$items['security']    = $this->get_security_items( $defaults );
 		$items['cache']       = $this->get_cache_items( $defaults );
@@ -550,9 +593,11 @@ class Model_System_Report extends Helper_Abstract_Model {
 	/**
 	 * The working directory, its folders and the checks on them
 	 *
+	 * @param bool $test_public_access Whether to ask the site for its temporary folder, for the Temporary Folder Protected check
+	 *
 	 * @since 6.19.0
 	 */
-	protected function get_directory_items(): array {
+	protected function get_directory_items( bool $test_public_access = true ): array {
 		$install    = GPDFAPI::get_mvc_class( 'Model_Install' );
 		$unwritable = $install instanceof Model_Install ? $install->create_folder_structures() : [];
 		$path       = $this->templates->get_template_path();
@@ -568,10 +613,16 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 			'folders'               => $this->get_folders(),
 			'folder_permissions'    => $this->get_folder_permissions( $unwritable ),
-			'temp_folder_protected' => $this->check_temp_folder_permission(),
-			'core_fonts'            => $this->get_core_fonts(),
-			'core_font_downloads'   => $this->get_core_font_downloads(),
-			'substitution_fonts'    => $this->get_substitution_fonts(),
+		];
+
+		if ( $test_public_access ) {
+			$items['temp_folder_protected'] = $this->check_temp_folder_permission();
+		}
+
+		$items += [
+			'core_fonts'          => $this->get_core_fonts(),
+			'core_font_downloads' => $this->get_core_font_downloads(),
+			'substitution_fonts'  => $this->get_substitution_fonts(),
 		];
 
 		$outdated = $this->check_core_template_override_versions();
