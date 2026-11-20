@@ -8,9 +8,8 @@ import { wpCli } from '@self:playwright/utils/wp-cli';
 // Matches the folder tools/mu-plugins makes read-only for requests sending the header below
 const READ_ONLY_FOLDER = '/tmp/gfpdf-e2e-read-only/';
 
-// Anchored, so "Temporary Folder permissions" can't match
 const folderRow = (page: Page) =>
-	page.getByRole('row', { name: /^Folder permissions/ });
+	page.getByRole('row', { name: /^Folder Permissions/ });
 
 const notice = (page: Page) =>
 	page.locator('.notice.notice-error', {
@@ -48,6 +47,9 @@ test.describe('Unwritable Folders', () => {
 
 		await expect(row).toContainText('Not writable');
 		await expect(row.locator('code')).toHaveText([READ_ONLY_FOLDER]);
+		await expect(row).toContainText(
+			'Ask your web host to make this folder writable.'
+		);
 
 		await snapshot(page, testinfo, row);
 	});
