@@ -214,6 +214,7 @@ class Test_Controller_Actions extends TestCase {
 
 		$this->assertSame( 'gravityforms_edit_settings', $route['capability'] );
 		$this->assertSame( 'notice-warning', $route['view_class'] );
+		$this->assertSame( 'Retry the downloads', $route['action_text'] );
 		$this->assertIsCallable( $route['condition'] );
 		$this->assertIsCallable( $route['dismiss'] );
 	}
@@ -235,6 +236,8 @@ class Test_Controller_Actions extends TestCase {
 				$this->assertStringContainsString( '<code>Garuda.ttf</code>', $html );
 				$this->assertStringNotContainsString( 'FreeSans.ttf', $html );
 				$this->assertStringContainsString( 'https://docs.gravitypdf.com/users/core-pdf-fonts', $html );
+				$this->assertStringContainsString( 'admin.php?page=gf_system_status#gfpdf-font-download-failed', $html );
+				$this->assertStringContainsString( 'Retry the downloads', $html );
 
 				$model->dismiss_failed_core_fonts();
 				$this->assertStringNotContainsString( 'could not download these fonts', $this->render_notices() );
@@ -338,6 +341,51 @@ class Test_Controller_Actions extends TestCase {
 		}
 	}
 
+	public function test_the_retry_request_requeues_the_failures() {
+		global $gfpdf;
+
+		wp_clear_scheduled_hook( 'gfpdf_core_font_sync' );
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$gfpdf->notices->clear();
+
+		$this->post_failed_core_fonts_action();
+		$this->controller->route();
+
+		try {
+			$this->assertSame( 0, $this->get_font_failures()['Garuda.ttf']['gave_up'] );
+			$this->assertNotFalse( wp_next_scheduled( 'gfpdf_core_font_sync' ) );
+			$this->assertTrue( $gfpdf->notices->has_notice() );
+		} finally {
+			wp_clear_scheduled_hook( 'gfpdf_core_font_sync' );
+			$gfpdf->notices->clear();
+		}
+	}
+
+	public function test_a_bad_nonce_leaves_the_failures_unretried() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		$this->post_failed_core_fonts_action( 'not-a-nonce' );
+		$this->controller->route();
+
+		$this->assertArrayHasKey( 'Garuda.ttf', $this->get_font_failures() );
+	}
+
+	public function test_a_user_who_cannot_edit_the_settings_cannot_retry_the_failed_core_fonts() {
+		$this->set_font_failures( [ 'Garuda.ttf' => $this->failure( time() ) ] );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$this->post_failed_core_fonts_action();
+
+		try {
+			$this->controller->route();
+			$this->fail( 'The request should have been refused' );
+		} catch ( \WPDieException $e ) {
+			$this->assertArrayHasKey( 'Garuda.ttf', $this->get_font_failures() );
+		}
+	}
+
 	public function test_a_dismiss_request_with_nothing_failed_stores_nothing() {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
@@ -348,9 +396,13 @@ class Test_Controller_Actions extends TestCase {
 	}
 
 	private function post_failed_core_fonts_dismissal( ?string $nonce = null ): void {
+		$this->post_failed_core_fonts_action( $nonce );
+		$_POST['gfpdf-dismiss-notice'] = '1';
+	}
+
+	private function post_failed_core_fonts_action( ?string $nonce = null ): void {
 		$_POST['gfpdf_action']                   = 'gfpdf_failed_core_fonts';
 		$_POST['gfpdf_action_failed_core_fonts'] = $nonce ?? wp_create_nonce( 'gfpdf_action_failed_core_fonts' );
-		$_POST['gfpdf-dismiss-notice']           = '1';
 	}
 
 	/**

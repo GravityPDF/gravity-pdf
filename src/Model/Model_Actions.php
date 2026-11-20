@@ -317,6 +317,17 @@ class Model_Actions extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Have the background sync try the failed fonts again; the notice returns for any that fail again
+	 *
+	 * @since 6.19.0
+	 */
+	public function retry_failed_core_fonts(): void {
+		$this->get_downloader()->retry_failed_files();
+
+		$this->notices->add_notice( esc_html__( 'Gravity PDF will try downloading the fonts again in the background.', 'gravity-pdf' ) );
+	}
+
+	/**
 	 * The injected downloader, else the registered one, which bootstrap builds after this model
 	 *
 	 * @since 6.19.0
@@ -332,16 +343,6 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	public function system_report_redirect() {
 		wp_safe_redirect( Model_System_Report::get_report_url() );
-		exit;
-	}
-
-	/**
-	 * Send the user to the system report row listing the failed core fonts
-	 *
-	 * @since 6.19.0
-	 */
-	public function core_fonts_report_redirect() {
-		wp_safe_redirect( Model_System_Report::get_report_url( Model_System_Report::FONTS_FAILED_ANCHOR ) );
 		exit;
 	}
 }
