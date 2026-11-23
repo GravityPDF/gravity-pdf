@@ -1,6 +1,6 @@
 {
   "$schema": "https://schemas.wp.org/trunk/wp-env.json",
-  "core": "WordPress/WordPress#7.1.4",
+  "core": "WordPress/WordPress#7.2-RC2",
   "phpVersion": "8.5",
   "plugins": [],
   "mappings": {
