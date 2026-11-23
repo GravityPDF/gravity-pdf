@@ -56,7 +56,7 @@ class Test_Field_Signature extends TestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<img width="150" src="c:\My Documents\Images\image.jpg" />', $html );
+		$this->assertStringContainsString( '<img src="c:\My Documents\Images\image.jpg" width="150">', $html );
 	}
 
 	public function test_html_with_windows_unc_path() {
@@ -75,7 +75,7 @@ class Test_Field_Signature extends TestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<img width="150" src="\\My Documents\Images\image.jpg" />', $html );
+		$this->assertStringContainsString( '<img src="\\My Documents\Images\image.jpg" width="150">', $html );
 
 		/* UNC path pointed to named drive on the network */
 		$field = new class( $this->gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) extends Field_Signature {
@@ -92,7 +92,7 @@ class Test_Field_Signature extends TestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<img width="150" src="\\system07\C$\My Documents\Images\image.jpg" />', $html );
+		$this->assertStringContainsString( '<img src="\\system07\C$\My Documents\Images\image.jpg" width="150">', $html );
 	}
 
 	public function test_html_with_linux_path() {
@@ -111,6 +111,6 @@ class Test_Field_Signature extends TestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<img width="150" src="/var/www/html/image.jpg" />', $html );
+		$this->assertStringContainsString( '<img src="/var/www/html/image.jpg" width="150">', $html );
 	}
 }

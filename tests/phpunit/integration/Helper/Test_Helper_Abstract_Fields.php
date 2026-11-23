@@ -40,6 +40,6 @@ class Test_Helper_Abstract_Fields extends TestCase {
 		}
 
 		$this->assertSame( [], $deprecations );
-		$this->assertStringContainsString( '<div class="value">&nbsp;</div>', $html );
+		$this->assertStringContainsString( "<div class=\"value\">\u{00A0}</div>", $html );
 	}
 }

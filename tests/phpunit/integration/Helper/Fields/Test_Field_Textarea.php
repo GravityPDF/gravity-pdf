@@ -138,7 +138,7 @@ class Test_Field_Textarea extends TestCase {
 
 		$html = ( new Field_Textarea( $field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) )->html();
 
-		$this->assertStringContainsString( '&quot;Hi&quot; [gravitypdf id="abc" text=\'dl\']', $html );
+		$this->assertStringContainsString( '"Hi" [gravitypdf id="abc" text=\'dl\']', $html );
 	}
 
 	public function test_rich_text_administrative_default_shortcode_is_left_for_the_pdf_to_run() {

@@ -1018,7 +1018,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertSame( 'My Label {:20:value}', $data['name'] );
 		$this->assertSame( 20.0, $data['font_size'] );
-		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}" /> <span>Item</span>', $data['header'] );
+		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}"> <span>Item</span>', $data['header'] );
 		$this->assertTrue( $data['public_access'] );
 
 		/* Check underlying data structure */
@@ -1026,7 +1026,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 
 		$this->assertSame( 'My Label {:20:value}', $pdf['name'] );
 		$this->assertSame( 20.0, $pdf['font_size'] );
-		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}" /> <span>Item</span>', $pdf['header'] );
+		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}"> <span>Item</span>', $pdf['header'] );
 		$this->assertSame( 'Yes', $pdf['public_access'] );
 	}
 
@@ -1064,7 +1064,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'My Label {:20:value}', $data['name'] );
 		$this->assertSame( 20.0, $data['font_size'] );
-		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}" /> <span>Item</span>', $data['header'] );
+		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}"> <span>Item</span>', $data['header'] );
 		$this->assertTrue( $data['public_access'] );
 
 		/* Check underlying data structure */
@@ -1072,7 +1072,7 @@ class Test_Rest_Form_Settings extends Test_Rest {
 
 		$this->assertSame( 'My Label {:20:value}', $pdf['name'] );
 		$this->assertSame( 20.0, $pdf['font_size'] );
-		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}" /> <span>Item</span>', $pdf['header'] );
+		$this->assertSame( '<a href="{:20}">My link</a><barcode code="{Field:10.5:value}"> <span>Item</span>', $pdf['header'] );
 		$this->assertSame( 'Yes', $pdf['public_access'] );
 	}
 

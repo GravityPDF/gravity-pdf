@@ -63,7 +63,7 @@ class Test_Helper_Misc_Pages extends TestCase {
 		$test_html     = $this->misc->fix_header_footer( $html );
 		$minified_html = $this->minify( $test_html );
 
-		$this->assertSame( $expected, $minified_html );
+		$this->assertEqualHTML( $expected, $minified_html );
 	}
 
 	public function provider_test_fix_header_footer(): array {
@@ -117,7 +117,7 @@ class Test_Helper_Misc_Pages extends TestCase {
 
 		$html          = $this->misc->fix_header_footer( '<img src="http://test.com/image.png" alt="My Image" />' );
 		$minified_html = $this->minify( $html );
-		$this->assertSame( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"/></p>', $minified_html );
+		$this->assertEqualHTML( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"/></p>', $minified_html );
 	}
 
 	public function test_convert_path_to_url_keeps_slash_after_home_url() {

@@ -31,15 +31,17 @@ class Test_Helper_Field_Container_Gf25 extends TestCase {
 	 * Verify running a big chunk of HTML through QueryPath doesn't break our markup in unexpected days
 	 * @dataProvider provider_close
 	 */
-	public function test_close( $expected ): void {
+	public function test_close( $html, ?string $expected = null ): void {
+		$expected = $expected ?? $html;
+
 		ob_start();
 		$this->class->generate(new \GF_Field());
-		echo $expected;
+		echo $html;
 		$this->class->close();
 
 		$test_html = ob_get_clean();
 		$minify_html = $this->minify( $test_html );
-		$this->assertSame( "<div class=\"row-separator odd\">$expected</div>", $minify_html );
+		$this->assertEqualHTML( "<div class=\"row-separator odd\">$expected</div>", $minify_html );
 	}
 
 	public function provider_close(): array {
@@ -48,7 +50,10 @@ class Test_Helper_Field_Container_Gf25 extends TestCase {
 			[ '<pagebreak />' ],
 			[ '<tocpagebreak toc-prehtml="&lt;h1&gt;Contents&lt;/h1&gt;" />' ],
 			[ '<div class="row-separator"><div class="grid"><div class="inner-container">First</div></div><div class="grid"><div class="inner-container" style="width: 100%"><tocpagebreak toc-prehtml="&lt;h1&gt;Contents&lt;/h1&gt;" /></div></div></div>' ],
-			[ '<div class="grid"><div class="inner-container" style="width: 100%"><a href="?a=1&amp;b=%5Bx%5D">&#091;gravitypdf id=&quot;1&quot;&#093; &#123;all_fields&#125; &amp;#091; &nbsp;&lt;b&gt;</a></div></div>' ],
+			[ '<div class="grid"><div class="inner-container" style="width: 100%"><a href="?a=1&amp;b=%5Bx%5D">&#091;gravitypdf id=&quot;1&quot;&#093; &#123;all_fields&#125; &amp;#091; &nbsp;&lt;b&gt;</a></div></div>',
+				/* An escaped tag stays inert */
+				"<div class=\"grid\"><div class=\"inner-container\" style=\"width: 100%\"><a href=\"?a=1&amp;b=%5Bx%5D\">[\u{FEFF}gravitypdf id=&quot;1&quot;&#093; {\u{FEFF}all_fields&#125; &amp;#091; &nbsp;&lt;b&gt;</a></div></div>",
+			],
 		];
 	}
 
