@@ -8,6 +8,7 @@
  *   wp-version.mjs download-url C   print the core zip URL for config C's pin, whichever format it uses
  *
  * Release candidates are pinned so the suite runs against in-flight releases; alphas and betas are not.
+ * The WordPress/WordPress mirror only tags final releases, so a prerelease is pinned to its wordpress.org zip.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -30,10 +31,10 @@ const CONFIGS = [
 const VERSION = /(\d+)\.(\d+)(?:\.(\d+))?(?:-([A-Za-z]+)(\d*))?/;
 const EXACT_VERSION = new RegExp(`^${VERSION.source}$`);
 
-// Matches both pin formats — a wordpress.org zip URL and a GitHub ref (WordPress/WordPress#7.1) — each
+// Matches the whole pin in both formats — a wordpress.org zip URL and a GitHub ref (WordPress/WordPress#7.1) — each
 // optionally carrying a prerelease suffix (-RC3, -beta1).
 const PIN = new RegExp(
-	`(?<prefix>wordpress-|WordPress/WordPress#)(?<version>${VERSION.source})`
+	`(?:https://wordpress\\.org/wordpress-|WordPress/WordPress#)(?<version>${VERSION.source})(?:\\.zip)?`
 );
 
 // alpha < beta < RC < final, so a superseded prerelease bumps to its stable release while a pin that runs
@@ -65,6 +66,11 @@ function sortKey(version) {
 
 const phase = (version) => sortKey(version)?.[3];
 
+const zipUrl = (version) => `https://wordpress.org/wordpress-${version}.zip`;
+
+const pinFor = (version) =>
+	phase(version) < FINAL ? zipUrl(version) : `WordPress/WordPress#${version}`;
+
 function compare(a, b) {
 	const difference = a.findIndex((part, index) => part !== b[index]);
 	return difference === -1 ? 0 : a[difference] - b[difference];
@@ -81,7 +87,7 @@ function downloadUrl(path) {
 	}
 
 	// Both pin formats resolve to the same download; wp-env's own fetch is bypassed via WP_ENV_CORE anyway.
-	console.log(`https://wordpress.org/wordpress-${version}.zip`);
+	console.log(zipUrl(version));
 }
 
 async function latestOffered() {
@@ -133,8 +139,7 @@ function update(version) {
 
 	for (const path of CONFIGS) {
 		const original = readFileSync(path, 'utf8');
-		// Each config keeps whichever pin format it already uses.
-		const updated = original.replace(PIN, `$<prefix>${version}`);
+		const updated = original.replace(PIN, pinFor(version));
 		if (updated !== original) {
 			writeFileSync(path, updated);
 		}
