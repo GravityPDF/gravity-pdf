@@ -1,6 +1,6 @@
 {
   "$schema": "https://schemas.wp.org/trunk/wp-env.json",
-  "core": "WordPress/WordPress#7.2-RC2",
+  "core": "https://wordpress.org/wordpress-7.2-RC2.zip",
   "phpVersion": "8.5",
   "multisite": true,
   "plugins": [],
