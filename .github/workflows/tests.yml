@@ -179,7 +179,7 @@ jobs:
         # PRs run a tightened floor/ceiling matrix for fast feedback; scheduled runs get the full matrix down to the
         # composer.json floor. The run-tests-php-all label forces the full matrix on a PR — applied post-open,
         # so the labeled event re-runs this workflow with a payload that carries the label.
-        php: ${{ fromJSON((github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests-php-all')) && '["7.4","8.5"]' || '["7.4","8.0","8.1","8.2","8.3","8.4","8.5"]') }}
+        php: ${{ fromJSON((github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests-php-all')) && '["7.4","8.5"]' || '["7.4","8.0","8.1","8.2","8.3","8.4","8.5","8.6"]') }}
         os: [ ubuntu-latest ]
         include:
           # These flags merge into the matching base cells (no extra cells spawned) and drive the
@@ -193,6 +193,9 @@ jobs:
           - php: '8.5'
             os: ubuntu-latest
             multisite: true
+    # Gravity Forms 3.2.3.1 calls is_double(), deprecated in PHP 8.6. Drop this once GF ships the fix, then move the PR
+    # ceiling + multisite cell up to 8.6.
+    continue-on-error: ${{ matrix.php == '8.6' }}
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
 

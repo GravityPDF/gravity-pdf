@@ -429,11 +429,18 @@ class Test_Model_Required_Fonts extends TestCase {
 
 	public function provider_unreadable_form_meta(): array {
 		return [
-			'invalid JSON'           => [ '{"gfpdf_form_settings":', 'Syntax error' ],
+			'invalid JSON'           => [ '{"gfpdf_form_settings":', self::json_error( '{"gfpdf_form_settings":' ) ],
 			'JSON that is no form'   => [ '"gfpdf_form_settings"', 'No error' ],
 			'json_encode() failures' => [ false, 'Not a string: boolean' ],
 			'decoded meta'           => [ [ 'gfpdf_form_settings' => [] ], 'Not a string: array' ],
 		];
+	}
+
+	/* PHP 8.6 appends the error location to json_last_error_msg() */
+	private static function json_error( string $json ): string {
+		json_decode( $json );
+
+		return json_last_error_msg();
 	}
 
 	public function test_get_form_pdfs_keeps_only_the_pdf_settings_arrays() {
@@ -455,12 +462,13 @@ class Test_Model_Required_Fonts extends TestCase {
 		$corrupt = (int) $wpdb->get_var( "SELECT MAX(form_id) FROM " . GFFormsModel::get_meta_table_name() ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		/* Still matches the scan's LIKE, as a truncated write would */
-		$wpdb->update( GFFormsModel::get_meta_table_name(), [ 'display_meta' => '{"gfpdf_form_settings":{"pdf1":{"font":"dejavuserif"' ], [ 'form_id' => $corrupt ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$meta = '{"gfpdf_form_settings":{"pdf1":{"font":"dejavuserif"';
+		$wpdb->update( GFFormsModel::get_meta_table_name(), [ 'display_meta' => $meta ], [ 'form_id' => $corrupt ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$log = new TestHandler();
 
 		$this->assertSame( self::$freeserif, $this->required_with( GPDFAPI::get_mvc_class( 'Model_Font_Sources' ), $log )->get_required_font_files() );
-		$this->assertSame( [ [ 'WARNING', 'Form meta could not be read for its PDF fonts', [ 'form_id' => $corrupt, 'error' => 'Syntax error' ] ] ], $this->records( $log ) );
+		$this->assertSame( [ [ 'WARNING', 'Form meta could not be read for its PDF fonts', [ 'form_id' => $corrupt, 'error' => self::json_error( $meta ) ] ] ], $this->records( $log ) );
 	}
 
 	public function test_a_failed_form_query_is_logged() {
