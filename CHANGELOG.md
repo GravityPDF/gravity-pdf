@@ -4,6 +4,7 @@
 
 ### 6.18.1
 * 🐞 Bug: Keep escaped shortcodes and merge tags inert on WordPress 7.2 and Gravity Forms 3.2.3
+* 🐞 Bug: Update the bundled mPDF, fixing a PHP 8.6 deprecation when a PDF has an index, and several layout bugs
 
 ### 6.18.0
 * 🎉 Feature: Install several PDF template zips at once
