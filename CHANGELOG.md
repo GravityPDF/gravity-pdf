@@ -4,6 +4,17 @@
 
 ### 6.18.1
 * 🐞 Bug: Keep escaped shortcodes and merge tags inert on WordPress 7.2 and Gravity Forms 3.2.3
+* 🐞 Bug: Fix a PHP 8.6 deprecation notice when a PDF has an index
+* 🐞 Bug: Fix PDF generation never finishing when the content has invalid UTF-8 characters
+* 🐞 Bug: Fix the shaping and kerning of text that follows a block inside a table cell
+* 🐞 Bug: Fix a box drawn around internal links in some PDF viewers
+* 🐞 Bug: Fix an image or other inline content not being drawn after a zero-width no-break space
+* 🐞 Bug: Fix layout issues in the table of contents and index
+* 🐞 Bug: Fix Plane 2 characters switching to the Sun-ExtB font when it doesn't have them
+* 🐞 Bug: Fix an error reading some fonts, such as Sun-ExtA, with OpenType layout features enabled
+* 🐞 Bug: Fix outdated font metrics being used after a font file changes
+* 🐞 Bug: Install the v1.1.2 core fonts, which are smaller and fix the hinting of the Garuda font's "k"
+* 🧹 Housekeeping: Speed up text layout in PDFs
 
 ### 6.18.0
 * 🎉 Feature: Install several PDF template zips at once
