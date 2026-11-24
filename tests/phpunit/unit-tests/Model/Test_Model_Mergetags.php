@@ -539,8 +539,9 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 			foreach ( [ 'standard' => '{all_fields}', 'administrative' => '{all_fields:admin}' ] as $visibility => $all_fields ) {
 				$field->visibility = $visibility;
 
+				/* Gravity Forms 3.2.3+ prints a merge tag in a value as text */
 				$output = \GFCommon::replace_variables( "$all_fields {user_agent}", $form, $entry );
-				$this->assertSame( 2, substr_count( $output, 'pid=556690c67856b' ) );
+				$this->assertSame( version_compare( \GFForms::$version, '3.2.3', '>=' ) ? 0 : 2, substr_count( $output, 'pid=556690c67856b' ) );
 				$this->assertStringNotContainsString( 'signature=', $output );
 			}
 

@@ -242,15 +242,24 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 
 		--$this->replacing_depth;
 
-		if ( ! $this->guards_shortcodes( $text ) ) {
+		$trust = $this->get_trust();
+		if ( ! is_string( $text ) || $trust->is_resolving_administrative_defaults() ) {
 			return $text;
 		}
 
-		$trust = $this->get_trust();
-		$stamp = ' ' . self::WRITTEN_ATTR . '="' . $this->get_written_stamp() . '"'; /* As add_shortcode_attr() writes it */
-
-		/* Plain text prints an entity as is, so a zero-width space stops the `[` parsing. Not `&#91;`, which do_shortcode() decodes */
+		/* Plain text prints an entity as is, so a zero-width space stops the `[` parsing. Not `&#91;`, do_shortcode() decodes it */
 		$escape = $format === 'text' ? "[\u{200B}" : '&#x5b;';
+
+		/* Gravity Forms 3.2.3 encodes a merged value's `[` as `&#91;`, which do_shortcode() turns back into `[` */
+		if ( static::SHORTCODE !== '' && strpos( $text, '&#' ) !== false ) {
+			$text = preg_replace( '/&#0*91;(?=' . static::SHORTCODE . '\b)/', $escape, $text ) ?? $text;
+		}
+
+		if ( strpos( $text, '[' . static::SHORTCODE ) === false ) {
+			return $text;
+		}
+
+		$stamp = ' ' . self::WRITTEN_ATTR . '="' . $this->get_written_stamp() . '"'; /* As add_shortcode_attr() writes it */
 
 		/* In one pass, as a written shortcode can match a merged one once its stamp is removed */
 		$replacements = [];

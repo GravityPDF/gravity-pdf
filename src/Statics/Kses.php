@@ -44,11 +44,36 @@ class Kses {
 	public static function parse( $html ) {
 		add_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
-		$html = wp_kses( self::strip_scripts( (string) $html ), self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
+		$html = wp_kses( self::keep_escaped_tags_inert( self::strip_scripts( (string) $html ) ), self::get_allowed_pdf_tags(), self::get_allowed_pdf_protocols() );
 
 		remove_filter( 'safe_style_css', '\GFPDF\Statics\Kses::get_allowed_pdf_styles' );
 
 		return $html;
+	}
+
+	/**
+	 * WordPress 7.2's wp_kses() decodes character references, so an escaped `[` or `{` would come out as a live tag.
+	 * A zero-width no-break space after it keeps it inert, and mPDF strips it before drawing.
+	 *
+	 * @param string $html
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.1
+	 */
+	private static function keep_escaped_tags_inert( $html ) {
+		if ( strpos( $html, '&' ) === false ) {
+			return $html;
+		}
+
+		return preg_replace(
+			[
+				'/&#(?:0*91(?![0-9])|x0*5b(?![0-9a-f]));?|&(?:lsqb|lbrack);/i',
+				'/&#(?:0*123(?![0-9])|x0*7b(?![0-9a-f]));?|&(?:lcub|lbrace);/i',
+			],
+			[ "[\u{FEFF}", "{\u{FEFF}" ],
+			$html
+		) ?? $html;
 	}
 
 	/**
