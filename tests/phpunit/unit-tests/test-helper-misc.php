@@ -123,7 +123,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$test_html     = $this->misc->fix_header_footer( $html );
 		$minified_html = $this->minify( $test_html );
 
-		$this->assertEquals( $expected, $minified_html );
+		$this->assertEqualHTML( $expected, $minified_html );
 	}
 
 	protected function minify($html) {
@@ -198,7 +198,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 
 		$html = $this->misc->fix_header_footer( '<img src="http://test.com/image.png" alt="My Image" />' );
 		$minified_html = $this->minify( $html );
-		$this->assertEquals( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"/></p>', $minified_html );
+		$this->assertEqualHTML( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"/></p>', $minified_html );
 	}
 
 	public function test_convert_path_to_url_keeps_slash_after_home_url() {

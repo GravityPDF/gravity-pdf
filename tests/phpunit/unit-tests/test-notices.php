@@ -190,7 +190,7 @@ class Test_Notices extends WP_UnitTestCase {
 		$this->notices->process();
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( $form, $html );
+		$this->assertStringContainsString( str_replace( ' />', '>', $form ), $html );
 	}
 
 	public function test_process_on_gravity_forms_page() {
