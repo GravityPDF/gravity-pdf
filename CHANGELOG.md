@@ -2,6 +2,9 @@
 
 ## Gravity PDF
 
+### 6.18.1
+* 🐞 Bug: Keep escaped shortcodes and merge tags inert on WordPress 7.2 and Gravity Forms 3.2.3
+
 ### 6.18.0
 * 🎉 Feature: Install several PDF template zips at once
 * 🎉 Feature: Drop template zips anywhere in the Template Manager

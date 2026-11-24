@@ -124,4 +124,21 @@ class Test_Kses extends WP_UnitTestCase {
 			ini_set( 'pcre.backtrack_limit', $limit );
 		}
 	}
+
+	public function test_parse_keeps_an_escaped_shortcode_or_merge_tag_inert() {
+		add_shortcode( 'gpdf_kses_test', '__return_empty_string' );
+
+		try {
+			$html = Kses::parse( '<p>&#91;gpdf_kses_test&#93; &#091;gpdf_kses_test] &#x5B;gpdf_kses_test] &lsqb;gpdf_kses_test] &#123;admin_email} &#x7b;admin_email}</p>' );
+
+			$this->assertSame( $html, do_shortcode( $html ) );
+			$this->assertSame( 4, substr_count( $html, "[\u{FEFF}gpdf_kses_test" ) );
+			$this->assertSame( 2, substr_count( $html, "{\u{FEFF}admin_email}" ) );
+		} finally {
+			remove_shortcode( 'gpdf_kses_test' );
+		}
+
+		/* A longer reference isn't a bracket */
+		$this->assertStringNotContainsString( "\u{FEFF}", Kses::parse( '&#910; &#x5b0;' ) );
+	}
 }
