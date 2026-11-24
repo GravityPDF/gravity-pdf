@@ -35,7 +35,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @var string
 	 * @since 7.0
 	 */
-	public const NAMESPACE = Helper_Data::REST_API_BASENAME . 'v1';
+	public const ROUTE_NAMESPACE = Helper_Data::REST_API_BASENAME . 'v1';
 
 	/**
 	 * @var string
@@ -113,7 +113,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		 * Routes to list all form PDF settings, or create a new one
 		 */
 		register_rest_route(
-			static::NAMESPACE,
+			static::ROUTE_NAMESPACE,
 			static::$endpoints['pdf-settings'],
 			[
 				'args'   => [
@@ -158,7 +158,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		 * Routes to handle read/update/delete of individual form PDF settings
 		 */
 		register_rest_route(
-			static::NAMESPACE,
+			static::ROUTE_NAMESPACE,
 			static::$endpoints['pdf-settings-item'],
 			[
 				'args'   => [
@@ -220,7 +220,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 
 		/* Get the template schema */
 		register_rest_route(
-			static::NAMESPACE,
+			static::ROUTE_NAMESPACE,
 			static::$endpoints['template-schema'],
 			[
 				'args' => [
@@ -271,7 +271,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 		/* Match request to handler and set the URL params (which is normally done after this hook) */
 		$path = $request->get_route();
 		foreach ( static::$endpoints as $route ) {
-			$match = preg_match( '@^/' . static::NAMESPACE . $route . '$@i', $path, $matches );
+			$match = preg_match( '@^/' . static::ROUTE_NAMESPACE . $route . '$@i', $path, $matches );
 
 			if ( ! $match ) {
 				continue;
@@ -338,7 +338,7 @@ class Rest_Form_Settings extends WP_REST_Controller {
 	 * @since 7.0
 	 */
 	public static function get_route_basepath() {
-		return static::NAMESPACE . static::API_BASE;
+		return static::ROUTE_NAMESPACE . static::API_BASE;
 	}
 
 	/**

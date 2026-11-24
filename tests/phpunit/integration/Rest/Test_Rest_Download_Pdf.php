@@ -58,7 +58,7 @@ class Test_Rest_Download_Pdf extends Test_Rest {
 		$routes = rest_get_server()->get_routes();
 
 		foreach ( $this->api::$endpoints as $route ) {
-			$this->assertArrayHasKey( '/' . $this->api::NAMESPACE . $route, $routes );
+			$this->assertArrayHasKey( '/' . $this->api::ROUTE_NAMESPACE . $route, $routes );
 		}
 	}
 
