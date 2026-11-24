@@ -13,6 +13,7 @@
 * 🐞 Bug: Fix Plane 2 characters switching to the Sun-ExtB font when it doesn't have them
 * 🐞 Bug: Fix an error reading some fonts, such as Sun-ExtA, with OpenType layout features enabled
 * 🐞 Bug: Fix outdated font metrics being used after a font file changes
+* 🐞 Bug: Install the v1.1.2 core fonts, which are smaller and fix the hinting of the Garuda font's "k"
 * 🧹 Housekeeping: Speed up text layout in PDFs
 
 ### 6.18.0
