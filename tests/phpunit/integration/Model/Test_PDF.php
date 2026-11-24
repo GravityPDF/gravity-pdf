@@ -2179,7 +2179,7 @@ class Test_PDF extends TestCase {
 		$this->view->process_field( $field, $entry, $form, $config, $products, new Helper_Field_Container(), $this->model );
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( '<div class="value">&nbsp;</div>', $html );
+		$this->assertStringContainsString( "<div class=\"value\">\u{00A0}</div>", $html );
 	}
 
 	/**
@@ -2232,7 +2232,7 @@ class Test_PDF extends TestCase {
 		$html = ob_get_clean();
 
 		$this->assertStringContainsString('First Page', $html );
-		$this->assertStringContainsString('<h3 id="page-no-1"', $html );
+		$this->assertStringContainsString( 'id="page-no-1"', $html );
 		$this->assertStringContainsString('class="gfpdf-field gfpdf-page my-test-class"', $html );
 		$this->assertStringContainsString('<div class="row-separator odd">', $html );
 
@@ -2279,15 +2279,15 @@ class Test_PDF extends TestCase {
 		$results = $this->model->preprocess_template_arguments( $args );
 
 		/* Test the results */
-		$this->assertStringContainsString( '<img src=', $results['settings']['header'] );
+		$this->assertStringContainsString( 'src="test.png"', $results['settings']['header'] );
 		$this->assertStringContainsString( 'class="my-class header-footer-img"', $results['settings']['header'] );
 		$this->assertStringContainsString( 'class="header-footer-img"', $results['settings']['first_header'] );
 		$this->assertStringNotContainsString( 'width="150"', $results['settings']['first_header'] );
-		$this->assertStringContainsString( '<img src=', $results['settings']['first_header'] );
+		$this->assertStringContainsString( 'src="going.jpg"', $results['settings']['first_header'] );
 
 		$this->assertStringNotContainsString( 'class="my-class header-footer-img"', $results['settings']['footer'] );
 		$this->assertStringContainsString( 'class="class1 class2 header-footer-img"', $results['settings']['first_footer'] );
-		$this->assertStringContainsString( '<img src=', $results['settings']['first_footer'] );
+		$this->assertStringContainsString( 'src="/this/is/my/path/image.gif"', $results['settings']['first_footer'] );
 
 		$this->assertSame( 'testing', $results['settings']['other_value'] );
 
@@ -2393,10 +2393,10 @@ class Test_PDF extends TestCase {
 
 		/* Check the PDF tags aren't stripped out during while generating a PDF */
 		$html = wp_kses_post( $html );
-		$this->assertMatchesRegularExpression( '/\<pagebreak orientation="landscape" \/\>/', $html );
+		$this->assertMatchesRegularExpression( '/<pagebreak orientation="landscape">/', $html );
 		$this->assertMatchesRegularExpression( '/\<table autosize="1"\>\<\/table\>/', $html );
 		$this->assertMatchesRegularExpression( '/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html );
-		$this->assertMatchesRegularExpression( '/\<barcode code="04210000526" type="UPCE" \/\>/', $html );
+		$this->assertMatchesRegularExpression( '/<barcode code="04210000526" type="UPCE">/', $html );
 
 		do_action(
 			'gfpdf_post_pdf_generation',
@@ -2419,10 +2419,10 @@ class Test_PDF extends TestCase {
 
 		/* Verify they are stripped out at all other times */
 		$html = wp_kses_post( $html );
-		$this->assertDoesNotMatchRegularExpression( '/\<pagebreak orientation="landscape" \/\>/', $html );
+		$this->assertDoesNotMatchRegularExpression( '/<pagebreak orientation="landscape">/', $html );
 		$this->assertDoesNotMatchRegularExpression( '/\<table autosize="1"\>\<\/table\>/', $html );
 		$this->assertDoesNotMatchRegularExpression( '/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html );
-		$this->assertDoesNotMatchRegularExpression( '/\<barcode code="04210000526" type="UPCE" \/\>/', $html );
+		$this->assertDoesNotMatchRegularExpression( '/<barcode code="04210000526" type="UPCE">/', $html );
 
 	}
 

@@ -131,6 +131,11 @@ class Test_Controller_Custom_Fonts extends TestCase {
 
 		$gfpdf->options->update_option( 'custom_fonts', [] );
 
+		/* Creating a subsite dirties process globals WP_UnitTestCase won't roll back; reset so later tests aren't polluted */
+		global $wp_settings_errors, $wp_rewrite;
+		$wp_settings_errors = [];
+		$wp_rewrite->init();
+
 		parent::tear_down();
 
 		error_reporting( E_ALL );

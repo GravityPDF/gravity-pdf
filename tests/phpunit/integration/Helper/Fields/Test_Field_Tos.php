@@ -53,21 +53,21 @@ class Test_Field_Tos extends TestCase {
 	public function test_html_shows_tick_when_accepted() {
 		$pdf_field = $this->make_tos_field( 'I agree' );
 		$this->assertStringContainsString( 'terms-of-service-tick', $pdf_field->html() );
-		$this->assertStringContainsString( '&#10004;', $pdf_field->html() );
+		$this->assertStringContainsString( "\u{2714}", $pdf_field->html() );
 	}
 
 	public function test_html_shows_cross_when_not_accepted() {
 		$pdf_field = $this->make_tos_field( '' );
-		$this->assertStringContainsString( '&#10006;', $pdf_field->html() );
+		$this->assertStringContainsString( "\u{2716}", $pdf_field->html() );
 	}
 
 	public function test_html_shows_every_accepted_agreement() {
 		$html = $this->make_tos_field( [ 'First agreement', '', 'Third agreement' ] )->html();
 
-		$this->assertSame( 2, substr_count( $html, '&#10004;' ) );
+		$this->assertSame( 2, substr_count( $html, "\u{2714}" ) );
 		$this->assertStringContainsString( 'First agreement', $html );
 		$this->assertStringContainsString( 'Third agreement', $html );
-		$this->assertStringNotContainsString( '&#10006;', $html );
+		$this->assertStringNotContainsString( "\u{2716}", $html );
 	}
 
 	public function test_html_shows_later_agreement_when_first_not_accepted() {
@@ -75,14 +75,14 @@ class Test_Field_Tos extends TestCase {
 
 		$this->assertFalse( $pdf_field->is_field_empty() );
 		$this->assertStringContainsString( 'Second agreement', $pdf_field->html() );
-		$this->assertStringNotContainsString( '&#10006;', $pdf_field->html() );
+		$this->assertStringNotContainsString( "\u{2716}", $pdf_field->html() );
 	}
 
 	public function test_html_shows_cross_when_no_agreement_accepted() {
 		$pdf_field = $this->make_tos_field( [ '', '' ] );
 
 		$this->assertTrue( $pdf_field->is_field_empty() );
-		$this->assertStringContainsString( '&#10006;', $pdf_field->html() );
+		$this->assertStringContainsString( "\u{2716}", $pdf_field->html() );
 	}
 
 	public function test_html_single_agreement_markup_is_unchanged() {
@@ -90,7 +90,7 @@ class Test_Field_Tos extends TestCase {
 			"\t\t\t\t\t<div class=\"inner-container\"><div class=\"label\"><strong>Terms</strong></div><div class=\"value\">\n" .
 			"\t\t\t<div class=\"terms-of-service-text\"><p>Please agree to our terms.</p>\n" .
 			"</div>\t\t\t\n" .
-			"\t\t<div class=\"terms-of-service-agreement\"><span class=\"terms-of-service-tick\" style=\"font-family:gfpdf-dejavu-symbols,sans-serif\">&#10004;</span> I agree</div></div></div></div>";
+			"\t\t<div class=\"terms-of-service-agreement\"><span class=\"terms-of-service-tick\" style=\"font-family:gfpdf-dejavu-symbols,sans-serif\">\u{2714}</span> I agree</div></div></div></div>";
 
 		$this->assertSame( $expected, $this->make_tos_field( 'I agree' )->html() );
 	}

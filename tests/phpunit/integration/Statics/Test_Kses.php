@@ -23,7 +23,7 @@ class Test_Kses extends TestCase {
 	 * @dataProvider provider_parse_pdf_tags_and_attributes
 	 */
 	public function test_parse_pdf_tags_and_attributes( $html ) {
-		$this->assertSame( $html, Kses::parse( $html ) );
+		$this->assertEqualHTML( $html, Kses::parse( $html ) );
 	}
 
 	public function test_numeric_output() {
@@ -41,7 +41,7 @@ class Test_Kses extends TestCase {
 		ob_start();
 		Kses::output( $html );
 
-		$this->assertSame( $html, ob_get_clean() );
+		$this->assertEqualHTML( $html, ob_get_clean() );
 	}
 
 	public function provider_parse_pdf_tags_and_attributes(): array {
@@ -93,7 +93,7 @@ class Test_Kses extends TestCase {
 	 * @dataProvider provider_parse_cleaned
 	 */
 	public function test_parse_cleaned( $expected, $html ) {
-		$this->assertSame( $expected, Kses::parse( $html ) );
+		$this->assertEqualHTML( $expected, Kses::parse( $html ) );
 	}
 
 	public function provider_parse_cleaned(): array {
@@ -107,21 +107,38 @@ class Test_Kses extends TestCase {
 			[ '<p>a</p><p>b</p>', '<p>a</p><script>if ( x < 1 ) { y(); }</script><p>b</p>' ],
 			[ '<p>a</p><p>b</p>', "<p>a</p><SCRIPT type=\"text/javascript\">\njQuery( function() {\n\ty();\n} );\n</Script ><p>b</p>" ],
 			[ '<p>a</p><p>b</p><p>c</p>', '<p>a</p><script src="https://example.com/a.js"></script><p>b</p><script>z();</script><p>c</p>' ],
-			[ 'Fallback', '<noscript>Fallback</noscript>' ],
+			[ '', '<noscript>Fallback</noscript>' ],
 		];
 	}
 
-	public function test_parse_keeps_content_when_script_regex_fails() {
+	public function test_parse_drops_the_script_when_its_regex_fails() {
 		$limit = ini_get( 'pcre.backtrack_limit' );
 		ini_set( 'pcre.backtrack_limit', '1000' );
 
 		$script = str_repeat( 'y();', 5000 );
 
 		try {
-			$this->assertSame( "<p>a</p>$script<p>b</p>", Kses::parse( "<p>a</p><script>$script</script><p>b</p>" ) );
+			$this->assertSame( '<p>a</p><p>b</p>', Kses::parse( "<p>a</p><script>$script</script><p>b</p>" ) );
 		} finally {
 			ini_set( 'pcre.backtrack_limit', $limit );
 		}
+	}
+
+	public function test_parse_keeps_an_escaped_shortcode_or_merge_tag_inert() {
+		add_shortcode( 'gpdf_kses_test', '__return_empty_string' );
+
+		try {
+			$html = Kses::parse( '<p>&#91;gpdf_kses_test&#93; &#091;gpdf_kses_test] &#x5B;gpdf_kses_test] &lsqb;gpdf_kses_test] &#123;admin_email} &#x7b;admin_email}</p>' );
+
+			$this->assertSame( $html, do_shortcode( $html ) );
+			$this->assertSame( 4, substr_count( $html, "[\u{FEFF}gpdf_kses_test" ) );
+			$this->assertSame( 2, substr_count( $html, "{\u{FEFF}admin_email}" ) );
+		} finally {
+			remove_shortcode( 'gpdf_kses_test' );
+		}
+
+		/* A longer reference isn't a bracket */
+		$this->assertStringNotContainsString( "\u{FEFF}", Kses::parse( '&#910; &#x5b0;' ) );
 	}
 
 	public function test_get_allowed_pdf_styles_adds_the_pdf_properties() {

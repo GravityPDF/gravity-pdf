@@ -109,8 +109,13 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		} );
 
 		remove_filter( 'query', [ 'GFForms', 'filter_query' ] );
-		update_option( 'gf_db_version', GFForms::$version );
-		GFFormsModel::drop_tables();
+
+		/* From WP 7.2 a process-isolated test shares the parent's install, so leave its tables alone */
+		if ( ! isset( $GLOBALS['__PHPUNIT_BOOTSTRAP'] ) ) {
+			update_option( 'gf_db_version', GFForms::$version );
+			GFFormsModel::drop_tables();
+		}
+
 		gf_upgrade()->maybe_upgrade();
 		add_filter( 'gform_disable_dom_parser', '__return_true' );
 

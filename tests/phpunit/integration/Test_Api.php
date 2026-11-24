@@ -210,12 +210,12 @@ class Test_API extends TestCase {
 		$entry = $this->entry( 'all-form-fields' );
 
 		$table = GPDFAPI::product_table( $entry, true );
-		$this->assertStringContainsString( '<table class="entry-products', $table );
+		$this->assertStringContainsString( 'class="entry-products"', $table );
 
 		ob_start();
 		GPDFAPI::product_table( $entry );
 		$table = ob_get_clean();
-		$this->assertStringContainsString( '<table class="entry-products', $table );
+		$this->assertStringContainsString( 'class="entry-products"', $table );
 	}
 
 	/**
@@ -229,7 +229,7 @@ class Test_API extends TestCase {
 		$entry = $this->entry( 'all-form-fields' );
 
 		$html = GPDFAPI::likert_table( $entry, 26, true );
-		$this->assertStringContainsString( '<div id="field-26"', $html );
+		$this->assertStringContainsString( 'id="field-26"', $html );
 		$this->assertStringContainsString( 'gfpdf-field gfpdf-likert gfpdf-survey', $html );
 		$this->assertStringContainsString( '<strong>Likert Survey Field</strong>', $html );
 
@@ -237,7 +237,7 @@ class Test_API extends TestCase {
 		$echo_return = GPDFAPI::likert_table( $entry, 26 );
 		$html        = ob_get_clean();
 		$this->assertNull( $echo_return );
-		$this->assertStringContainsString( '<div id="field-26"', $html );
+		$this->assertStringContainsString( 'id="field-26"', $html );
 
 		$this->assertNull( GPDFAPI::likert_table( $entry, 99999, true ) );
 	}

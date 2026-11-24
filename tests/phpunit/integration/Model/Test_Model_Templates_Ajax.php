@@ -69,7 +69,7 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 
 		$file = $this->create_deletable_template();
 
-		$this->assertSame( 'true', $this->get_ajax_response( 'gfpdf_delete_template' ) );
+		$this->assertSame( 'true', $this->get_template_ajax_response( 'gfpdf_delete_template' ) );
 		$this->assertFileDoesNotExist( $file );
 	}
 
@@ -93,7 +93,7 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 	 *
 	 * @since 6.18.0
 	 */
-	private function get_ajax_response( $action ) {
+	private function get_template_ajax_response( $action ) {
 		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
 
 		try {
@@ -136,8 +136,8 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 	private function assert_template_endpoints_deny() {
 		$file = $this->create_deletable_template();
 
-		$this->assertSame( '403', $this->get_ajax_response( 'gfpdf_upload_template' ) );
-		$this->assertSame( '403', $this->get_ajax_response( 'gfpdf_delete_template' ) );
+		$this->assertSame( '403', $this->get_template_ajax_response( 'gfpdf_upload_template' ) );
+		$this->assertSame( '403', $this->get_template_ajax_response( 'gfpdf_delete_template' ) );
 		$this->assertFileExists( $file );
 	}
 
@@ -163,7 +163,7 @@ class Test_Model_Templates_Ajax extends AjaxTestCase {
 
 		$handler = new TestHandler();
 		$gfpdf->log->pushHandler( $handler );
-		$code = $this->get_ajax_response( 'gfpdf_upload_template' );
+		$code = $this->get_template_ajax_response( 'gfpdf_upload_template' );
 		$gfpdf->log->popHandler();
 
 		$this->assertSame( '403', $code );

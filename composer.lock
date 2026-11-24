@@ -1499,16 +1499,16 @@
         },
         {
             "name": "gravity/gravityforms",
-            "version": "3.2.2",
+            "version": "3.2.3.1",
             "dist": {
                 "type": "zip",
-                "url": "https://composer.gravity.io/downloads/?plugin=gravityforms&version=3.2.2"
+                "url": "https://composer.gravity.io/downloads/?plugin=gravityforms&version=3.2.3.1"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
             },
             "type": "wordpress-plugin",
-            "time": "2026-11-05T16:21:35+00:00"
+            "time": "2026-11-18T02:03:13+00:00"
         },
         {
             "name": "nikic/php-parser",

@@ -162,7 +162,7 @@ test.describe('PDF shortcodes and merge tags in form fields', () => {
 
 		// a label a merge tag adds is printed, not run
 		expect(html).toContain(
-			`html-label=Administrative &#x5b;gravitypdf id=${pdfId}`
+			`html-label=Administrative [\uFEFFgravitypdf id=${pdfId}`
 		);
 
 		await page.goto(url(html, 'html-named'));

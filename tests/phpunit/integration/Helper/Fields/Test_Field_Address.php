@@ -41,7 +41,7 @@ class Test_Field_Address extends TestCase {
 		$this->assertStringContainsString( '12 Address St', $html );
 		$this->assertStringContainsString( 'Cityville', $html );
 		$this->assertStringContainsString( 'Chad', $html );
-		$this->assertStringContainsString( '<br />', $html );
+		$this->assertStringContainsString( '<br>', $html );
 	}
 
 	public function test_value_returns_keyed_array() {
@@ -107,7 +107,7 @@ class Test_Field_Address extends TestCase {
 
 		$pdf_field = new Field_Address( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );
 
-		$this->assertStringContainsString( 'Townsville<br />Australia', $pdf_field->html() );
+		$this->assertStringContainsString( 'Townsville<br>Australia', $pdf_field->html() );
 	}
 
 	public function test_is_empty_when_all_inputs_blank() {

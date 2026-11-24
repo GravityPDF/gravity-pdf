@@ -221,11 +221,14 @@ test.describe('Signed PDF URLs', () => {
 
 		const mail = pdf.resendNotifications(form.id, submitted.id);
 
+		// Gravity Forms 3.2.3 prints the planted merge tags as text
 		expect(
 			mail.match(new RegExp(`/pdf/${pdfId}/${submitted.id}/`, 'g'))
-		).toHaveLength(3);
+		).toHaveLength(1);
+		expect(mail).toContain(`{PDF:pdf:${pdfId}:signed,1 year}`);
+		expect(mail).toContain(`{PDF:pdf:${pdfId}:signed,2 years}`);
 		expect(mail).toContain(
-			`&#x5b;gravitypdf id="${pdfId}" entry="${entry.id}"`
+			`&#x5b;gravitypdf id=&quot;${pdfId}&quot; entry=&quot;${entry.id}&quot;`
 		);
 		expect(mail.match(/signature=/g)).toHaveLength(1);
 	});
