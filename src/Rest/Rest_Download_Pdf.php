@@ -32,7 +32,7 @@ class Rest_Download_Pdf {
 	 * @var string
 	 * @since 7.0
 	 */
-	public const NAMESPACE = Helper_Data::REST_API_BASENAME . 'v1';
+	public const ROUTE_NAMESPACE = Helper_Data::REST_API_BASENAME . 'v1';
 
 	/**
 	 * @var string
@@ -91,7 +91,7 @@ class Rest_Download_Pdf {
 		 * Route to generate and download a PDF for a specific entry
 		 */
 		register_rest_route(
-			static::NAMESPACE,
+			static::ROUTE_NAMESPACE,
 			static::$endpoints['download-pdf'],
 			[
 				'args' => [
@@ -330,7 +330,7 @@ class Rest_Download_Pdf {
 	 * @since 7.0
 	 */
 	public static function get_route_basepath() {
-		return static::NAMESPACE . static::API_BASE;
+		return static::ROUTE_NAMESPACE . static::API_BASE;
 	}
 
 	/**
