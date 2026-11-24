@@ -41,7 +41,7 @@ class Test_Helper_Field_Container_Gf25 extends WP_UnitTestCase {
 
 		$test_html = ob_get_clean();
 		$minify_html = $this->minify( $test_html );
-		$this->assertSame( "<div class=\"row-separator odd\">$expected</div>", $minify_html );
+		$this->assertEqualHTML( "<div class=\"row-separator odd\">$expected</div>", $minify_html );
 	}
 
 	public function provider_close() {

@@ -95,6 +95,6 @@ class Test_Field_Address extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertStringContainsString( 'Townsville<br />Australia', $field->html() );
+		$this->assertStringContainsString( 'Townsville<br>Australia', $field->html() );
 	}
 }

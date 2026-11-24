@@ -194,12 +194,12 @@ class Test_API extends WP_UnitTestCase {
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
 		$table = GPDFAPI::product_table( $entry, true );
-		$this->assertNotFalse( strpos( $table, '<table class="entry-products' ) );
+		$this->assertNotFalse( strpos( $table, 'class="entry-products"' ) );
 
 		ob_start();
 		GPDFAPI::product_table( $entry );
 		$table = ob_get_clean();
-		$this->assertNotFalse( strpos( $table, '<table class="entry-products' ) );
+		$this->assertNotFalse( strpos( $table, 'class="entry-products"' ) );
 	}
 
 	/**

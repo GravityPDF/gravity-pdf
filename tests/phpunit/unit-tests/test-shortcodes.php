@@ -311,8 +311,8 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'Download PDF', $url2 );
 		$this->assertStringContainsString( 'href=', $url2 );
-		$this->assertStringNotContainsString( '&#038;signature=', $url2 );
-		$this->assertStringNotContainsString( '&#038;expires=', $url2 );
+		$this->assertStringNotContainsString( 'signature=', $url2 );
+		$this->assertStringNotContainsString( 'expires=', $url2 );
 
 		/* Test for errors */
 		$_GET['lid'] = '5000';
@@ -585,14 +585,11 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$entry               = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$shortcode           = '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" raw="1"]';
 		$escaped             = '&#x5b;' . substr( $shortcode, 1 );
+		$body                = str_replace( [ '"', ']' ], [ '&quot;', '&#93;' ], substr( $shortcode, 1 ) ); /* As Gravity Forms 3.2.3 encodes a value */
+		$encoded             = "&#91;$body";
+		$merged              = "&#x5b;$body";
 		$entry['user_agent'] = $shortcode;
 		wp_set_current_user( $this->factory->user->create( [ 'role' => 'administrator' ] ) );
-
-		/* Gravity Forms 3.2.3+ encodes a merged value's `[`, `"` and `]` */
-		$encodes = version_compare( \GFForms::$version, '3.2.3', '>=' );
-		$body    = $encodes ? str_replace( [ '"', ']' ], [ '&quot;', '&#93;' ], substr( $shortcode, 1 ) ) : substr( $shortcode, 1 );
-		$encoded = $encodes ? "&#91;$body" : $shortcode;
-		$merged  = "&#x5b;$body";
 
 		/* As in a notification an administrator resends */
 		$text = \GFCommon::replace_variables( "$shortcode {user_agent}", $form, $entry, false, false, false );
@@ -668,9 +665,8 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$this->assertSame( "Subject [\u{200B}$readable", $sent['text']['subject'] );
 		$this->assertSame( "Subject [\u{200B}$readable", $sent['html']['subject'] );
 
-		/* HTML still escapes it as an entity, which Gravity Forms 3.2.3+ sends with `]` as `&#093;` */
-		$encodes = version_compare( \GFForms::$version, '3.2.3', '>=' );
-		$this->assertStringContainsString( '&#x5b;' . ( $encodes ? str_replace( [ '"', ']' ], [ '&quot;', '&#093;' ], $readable ) : $readable ), $sent['html']['message'] );
+		/* HTML still escapes it as an entity, with `]` as `&#093;` by the time it's sent */
+		$this->assertStringContainsString( '&#x5b;' . str_replace( [ '"', ']' ], [ '&quot;', '&#093;' ], $readable ), $sent['html']['message'] );
 	}
 
 	public function test_written_shortcode_whose_entry_a_merge_tag_sets_is_unsigned() {

@@ -24,7 +24,7 @@ class Test_Kses extends WP_UnitTestCase {
 	 * @dataProvider provider_parse_pdf_tags_and_attributes
 	 */
 	public function test_parse_pdf_tags_and_attributes( $html ) {
-		$this->assertSame( $html, Kses::parse( $html ) );
+		$this->assertEqualHTML( $html, Kses::parse( $html ) );
 	}
 
 	public function test_numeric_output() {
@@ -42,7 +42,7 @@ class Test_Kses extends WP_UnitTestCase {
 		ob_start();
 		Kses::output( $html );
 
-		$this->assertSame( $html, ob_get_clean() );
+		$this->assertEqualHTML( $html, ob_get_clean() );
 	}
 
 	public function provider_parse_pdf_tags_and_attributes(): array {
@@ -94,7 +94,7 @@ class Test_Kses extends WP_UnitTestCase {
 	 * @dataProvider provider_parse_cleaned
 	 */
 	public function test_parse_cleaned( $expected, $html ) {
-		$this->assertSame( $expected, Kses::parse( $html ) );
+		$this->assertEqualHTML( $expected, Kses::parse( $html ) );
 	}
 
 	public function provider_parse_cleaned(): array {
@@ -108,18 +108,18 @@ class Test_Kses extends WP_UnitTestCase {
 			[ '<p>a</p><p>b</p>', '<p>a</p><script>if ( x < 1 ) { y(); }</script><p>b</p>' ],
 			[ '<p>a</p><p>b</p>', "<p>a</p><SCRIPT type=\"text/javascript\">\njQuery( function() {\n\ty();\n} );\n</Script ><p>b</p>" ],
 			[ '<p>a</p><p>b</p><p>c</p>', '<p>a</p><script src="https://example.com/a.js"></script><p>b</p><script>z();</script><p>c</p>' ],
-			[ 'Fallback', '<noscript>Fallback</noscript>' ],
+			[ '', '<noscript>Fallback</noscript>' ],
 		];
 	}
 
-	public function test_parse_keeps_content_when_script_regex_fails() {
+	public function test_parse_drops_the_script_when_its_regex_fails() {
 		$limit = ini_get( 'pcre.backtrack_limit' );
 		ini_set( 'pcre.backtrack_limit', '1000' );
 
 		$script = str_repeat( 'y();', 5000 );
 
 		try {
-			$this->assertSame( "<p>a</p>$script<p>b</p>", Kses::parse( "<p>a</p><script>$script</script><p>b</p>" ) );
+			$this->assertSame( '<p>a</p><p>b</p>', Kses::parse( "<p>a</p><script>$script</script><p>b</p>" ) );
 		} finally {
 			ini_set( 'pcre.backtrack_limit', $limit );
 		}

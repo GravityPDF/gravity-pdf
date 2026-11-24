@@ -54,7 +54,7 @@ class Test_Field_Post_Image extends WP_UnitTestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img width="150" src="c:\My Documents\Images\image.jpg" /></a>', $html );
+		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img src="c:\My Documents\Images\image.jpg" width="150"></a>', $html );
 	}
 
 	public function test_html_with_windows_unc_path() {
@@ -70,7 +70,7 @@ class Test_Field_Post_Image extends WP_UnitTestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img width="150" src="\\My Documents\Images\image.jpg" /></a>', $html );
+		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img src="\\My Documents\Images\image.jpg" width="150"></a>', $html );
 
 		/* UNC path pointed to named drive on the network */
 		$field = new class( $this->gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() ) extends Field_Post_Image {
@@ -84,7 +84,7 @@ class Test_Field_Post_Image extends WP_UnitTestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img width="150" src="\\system07\C$\My Documents\Images\image.jpg" /></a>', $html );
+		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img src="\\system07\C$\My Documents\Images\image.jpg" width="150"></a>', $html );
 	}
 
 	public function test_html_with_linux_path() {
@@ -100,6 +100,6 @@ class Test_Field_Post_Image extends WP_UnitTestCase {
 
 		$html = str_replace( "\n", '', $field->html() );
 
-		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img width="150" src="/var/www/html/image.jpg" /></a>', $html );
+		$this->assertStringContainsString( '<a href="http://example.org/image.jpg" target="_blank"><img src="/var/www/html/image.jpg" width="150"></a>', $html );
 	}
 }
