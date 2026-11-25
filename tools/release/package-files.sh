@@ -2,8 +2,8 @@
 # shellcheck disable=SC2034
 # What the zip ships: build.sh prunes to it, verify.sh fails on anything else.
 PACKAGE_FILES=(CHANGELOG.md api.php build fonts gravity-pdf-updater.php languages pdf.php src vendor vendor_prefixed)
-# Removed from inside the kept folders (sources, scoper leftovers).
-PACKAGE_EXCLUDE=(src/assets/js src/assets/scss)
+# Removed from inside the kept folders (sources, scoper leftovers, Composer bin proxies).
+PACKAGE_EXCLUDE=(src/assets/js src/assets/scss vendor/bin)
 PACKAGE_REQUIRED=(pdf.php api.php fonts vendor/autoload.php vendor/composer/installed.json vendor_prefixed/mpdf build/assets)
 # Build output inside PACKAGE_FILES; verify.sh fails unless everything else matches the commit's blobs exactly.
 PACKAGE_BUILT=(build/assets vendor vendor_prefixed)
