@@ -19,6 +19,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Kses {
 
 	/**
+	 * How make_tags_inert() stops shortcodes and merge tags matching in text
+	 *
+	 * @since 6.18.1
+	 */
+	private const TAG_JOINERS = [
+		'[' => "[\u{FEFF}",
+		'{' => "{\u{FEFF}",
+		':' => ":\u{FEFF}",
+	];
+
+	/**
+	 * How make_tags_inert() stops them matching in HTML attributes
+	 *
+	 * @since 6.18.1
+	 */
+	private const URL_ENCODED_TAGS = [
+		'[' => '%5B',
+		']' => '%5D',
+		'{' => '%7B',
+		'}' => '%7D',
+	];
+
+	/**
 	 * Echo the HTML after escaping using wp_kses()
 	 *
 	 * @param string $html
@@ -53,7 +76,7 @@ class Kses {
 
 	/**
 	 * WordPress 7.2's wp_kses() decodes character references, so an escaped `[` or `{` would come out as a live tag.
-	 * A zero-width no-break space after it keeps it inert, and mPDF strips it before drawing.
+	 * A zero-width no-break space after it keeps it inert, and mPDF strips it before drawing. A URL percent-encodes it instead.
 	 *
 	 * @param string $html
 	 *
@@ -66,14 +89,91 @@ class Kses {
 			return $html;
 		}
 
-		return preg_replace(
-			[
-				'/&#(?:0*91(?![0-9])|x0*5b(?![0-9a-f]));?|&(?:lsqb|lbrack);/i',
-				'/&#(?:0*123(?![0-9])|x0*7b(?![0-9a-f]));?|&(?:lcub|lbrace);/i',
-			],
-			[ "[\u{FEFF}", "{\u{FEFF}" ],
+		$escaped = [
+			'/&#(?:0*91(?![0-9])|x0*5b(?![0-9a-f]));?|&(?:lsqb|lbrack);/i',
+			'/&#(?:0*123(?![0-9])|x0*7b(?![0-9a-f]));?|&(?:lcub|lbrace);/i',
+		];
+
+		$html = preg_replace_callback(
+			'/(\s(?:href|src)\s*=\s*)("[^"]*"|\'[^\']*\')/i',
+			function ( $url ) use ( $escaped ) {
+				return $url[1] . ( preg_replace( $escaped, [ '%5B', '%7B' ], $url[2] ) ?? $url[2] );
+			},
 			$html
 		) ?? $html;
+
+		return preg_replace( $escaped, [ "[\u{FEFF}", "{\u{FEFF}" ], $html ) ?? $html;
+	}
+
+	/**
+	 * Stop the shortcodes and merge tags in a value matching, as Helper_Abstract_Fields::encode_tags() does for a field's
+	 *
+	 * @param string $value The text to be converted
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.1
+	 */
+	public static function make_tags_inert( $value ) {
+		$value = (string) $value;
+		if ( strpbrk( $value, '[]{}' ) === false ) {
+			return $value;
+		}
+
+		/* A zero-width no-break space stops tags matching, and mPDF strips it. Added once only, so trusted defaults still match */
+		$value = strtr( strtr( $value, array_flip( self::TAG_JOINERS ) ), self::TAG_JOINERS );
+
+		/* Kses rebuilds attribute values, so URL-encode the tags there */
+		if ( strpos( $value, '<' ) !== false && class_exists( '\WP_HTML_Tag_Processor' ) ) {
+			$processor = new \WP_HTML_Tag_Processor( $value );
+			while ( $processor->next_tag() ) {
+				foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+					$attribute = $processor->get_attribute( $name );
+					if ( is_string( $attribute ) && strpos( $attribute, "\u{FEFF}" ) !== false ) {
+						$processor->set_attribute( $name, self::encode_attribute_tags( $name, str_replace( "\u{FEFF}", '', $attribute ) ) );
+					}
+				}
+			}
+
+			$value = $processor->get_updated_html();
+		}
+
+		return $value;
+	}
+
+	/**
+	 * URL-encode an attribute's tags, and stop a merge tag in the text ending on one of its colons
+	 *
+	 * @param string $name  The lowercase attribute name
+	 * @param string $value The attribute value
+	 *
+	 * @return string
+	 *
+	 * @since 6.18.1
+	 */
+	public static function encode_attribute_tags( $name, $value ) {
+		$value = strtr( $value, self::URL_ENCODED_TAGS );
+		$colon = [ ':' => self::TAG_JOINERS[':'] ];
+
+		/* A URL keeps its scheme */
+		if ( in_array( $name, wp_kses_uri_attributes(), true ) ) {
+			return preg_replace( '/^[a-z][a-z0-9+.-]*:(*SKIP)(*F)|:/i', '%3A', $value ) ?? '';
+		}
+
+		/* A style property keeps its colon when it's the declaration's only one */
+		if ( $name === 'style' ) {
+			return implode(
+				';',
+				array_map(
+					function ( $declaration ) use ( $colon ) {
+						return substr_count( $declaration, ':' ) > 1 ? strtr( $declaration, $colon ) : $declaration;
+					},
+					explode( ';', $value )
+				)
+			);
+		}
+
+		return strtr( $value, $colon );
 	}
 
 	/**
