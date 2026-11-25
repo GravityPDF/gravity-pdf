@@ -68,6 +68,20 @@ describe('Template - TemplateFooterActions.js', () => {
     expect(wrapper.find('TemplateDeleteButton').length).toBe(1)
   })
 
+  test('renders <TemplateDeleteButton /> for an uploaded template on Windows, but not for a core template', () => {
+    const selector = 'withRouter(Connect(TemplateDeleteButton))'
+    const render = (path) => shallow(
+      <TemplateFooterActions
+        template={{ compatible: true, path }}
+        isActiveTemplate={false}
+        pdfWorkingDirPath={'C:\\wp/wp-content/uploads/PDF_EXTENDED_TEMPLATES/'}
+      />
+    )
+
+    expect(render('C:\\wp/wp-content/uploads/PDF_EXTENDED_TEMPLATES\\my-template.php').find(selector).length).toBe(1)
+    expect(render('C:\\wp\\wp-content\\plugins\\gravity-pdf\\src\\templates\\zadani.php').find(selector).length).toBe(0)
+  })
+
   test('hides <TemplateDeleteButton /> when the user cannot manage templates', () => {
     const template = {
       compatible: true,
