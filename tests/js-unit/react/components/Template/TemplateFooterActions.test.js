@@ -62,6 +62,37 @@ describe('Template - TemplateFooterActions.js', () => {
 	});
 
 	test.each([
+		[
+			'C:\\wp/wp-content/uploads/PDF_EXTENDED_TEMPLATES\\my-template.php',
+			1,
+		],
+		[
+			'C:\\wp\\wp-content\\plugins\\gravity-pdf\\src\\templates\\zadani.php',
+			0,
+		],
+	])(
+		'renders <TemplateDeleteButton /> for a Windows path only in the working folder (%s)',
+		(path, count) => {
+			const mockStore = configureMockStore();
+			const store = mockStore({ template: { templateProcessing: '' } });
+
+			wrapper = mount(
+				<Provider store={store}>
+					<MemoryRouter>
+						<TemplateFooterActions
+							template={{ compatible: true, path }}
+							isActiveTemplate={false}
+							pdfWorkingDirPath="C:\wp/wp-content/uploads/PDF_EXTENDED_TEMPLATES/"
+						/>
+					</MemoryRouter>
+				</Provider>
+			);
+
+			expect(wrapper.find('TemplateDeleteButton').length).toBe(count);
+		}
+	);
+
+	test.each([
 		[true, '', [false]],
 		[false, '', []],
 		[false, 'File changes are disabled', [true]],
