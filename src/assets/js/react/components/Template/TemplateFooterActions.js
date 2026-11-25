@@ -44,9 +44,13 @@ export class TemplateFooterActions extends Component {
    * @returns {boolean}
    *
    * @since 4.1
+   * @since 6.18.1 Compares Windows paths whichever slash they use
    */
   notCoreTemplate = (template) => {
-    return template.path.indexOf(this.props.pdfWorkingDirPath) !== -1
+    const normalise = (path) => String(path || '').replace(/\\/g, '/')
+    const workingDir = normalise(this.props.pdfWorkingDirPath)
+
+    return workingDir !== '' && normalise(template.path).indexOf(workingDir) !== -1
   }
 
   /**

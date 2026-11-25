@@ -7,6 +7,7 @@
 * 🧹 Housekeeping: Update the core fonts on new installations
 * 🐞 Bug: Compatibility fix for WordPress 7.2 and Gravity Forms 3.2.3
 * 🐞 Bug: Fixes PHP 8.6 deprecation notices
+* 🐞 Bug: Show the Delete button for uploaded PDF templates on Windows servers
 
 ### 6.18.0
 * 🎉 Feature: Install several PDF template zips at once
