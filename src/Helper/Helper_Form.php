@@ -29,6 +29,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Form extends Helper_Abstract_Form {
 
 	/**
+	 * How Gravity Forms 3.2.3 and the [gravitypdf] guard encode `[`, `]` and `\` in a merged value
+	 *
+	 * @since 6.18.1
+	 */
+	private const ENCODED_SHORTCODE_CHARACTERS = [
+		'&#91;'  => '[',
+		'&#x5b;' => '[',
+		'&#93;'  => ']',
+		'&#92;'  => '\\',
+	];
+
+	/**
 	 * Get the form plugins current version
 	 *
 	 * @return string
@@ -248,6 +260,7 @@ class Helper_Form extends Helper_Abstract_Form {
 			return trim( GFCommon::replace_variables( $text, $form, $entry, false, false, false ) );
 		};
 
-		return $inert ? Kses::keep_merged_tags_inert( $replace ) : $replace();
+		/* Plain text never runs shortcodes, so it keeps the characters as typed */
+		return $inert ? Kses::keep_merged_tags_inert( $replace ) : strtr( $replace(), self::ENCODED_SHORTCODE_CHARACTERS );
 	}
 }
