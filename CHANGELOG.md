@@ -36,6 +36,15 @@
 * 💻 Developer: Every class that lost a method in 7.0 uses the new `Helper_Trait_Removed_Methods`, so calling one of those methods emits a `_deprecated_function()` notice and returns `null` rather than ending the request with an "undefined method" fatal. The views report the same thing through `_doing_it_wrong()`, from the `__call()` they already had. It is a report, not a shim: the method does nothing, a filter callback routed through it hands back `null` in place of the value it was given, and `is_callable()` now answers true for any name on these classes — so the call still has to go
 * 🧹 Housekeeping: The version 3 detections added in 6.17 move from Deprecated Features to Unsupported Features, so the System Status and Site Health reports list them under their own heading and the admin notice is shown as an error rather than a warning
 
+### 6.18.1
+* 🧹 Housekeeping: Update the PDF library
+* 🧹 Housekeeping: Reduce core font size by 10% on new installations
+* 🐞 Bug: Compatibility fix for WordPress 7.2 and Gravity Forms 3.2.3
+* 🐞 Bug: Fixes PHP 8.6 deprecation notices
+* 🐞 Bug: Show the Delete button for uploaded PDF templates on Windows servers
+* 🐞 Bug: Stop merge tags and shortcodes in submitted values getting double processed in PDFs
+* 🐞 Bug: Keep escaped brackets in links
+
 ### 6.18.0
 * 🎉 Feature: Install several PDF template zips at once
 * 🎉 Feature: Drop template zips anywhere in the Template Manager

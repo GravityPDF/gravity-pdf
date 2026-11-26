@@ -84,6 +84,9 @@ return [
 					"\\_deprecated_class(self::class, '6.19.0', 'your own copy of myclabs/deep-copy (removed from Gravity PDF in 7.0)');\n        \$this->useCloneMethod = \$useCloneMethod;",
 					$content
 				);
+
+				/* PHP 8.6 deprecates spl_object_hash(); deep-copy 1.14+ switched too, but needs PHP 8.0 */
+				$content = str_replace( 'spl_object_hash(', 'spl_object_id(', $content );
 			}
 
 			/* Global polyfills */
