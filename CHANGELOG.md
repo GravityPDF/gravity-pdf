@@ -4,11 +4,12 @@
 
 ### 6.18.1
 * 🧹 Housekeeping: Update the PDF library
-* 🧹 Housekeeping: Update the core fonts on new installations
+* 🧹 Housekeeping: Reduce core font size by 10% on new installations
 * 🐞 Bug: Compatibility fix for WordPress 7.2 and Gravity Forms 3.2.3
 * 🐞 Bug: Fixes PHP 8.6 deprecation notices
 * 🐞 Bug: Show the Delete button for uploaded PDF templates on Windows servers
-* 🐞 Bug: Print the merge tags and shortcodes in submitted values as text in PDFs, and keep escaped brackets in links intact
+* 🐞 Bug: Stop merge tags and shortcodes in submitted values getting double processed in PDFs
+* 🐞 Bug: Keep escaped brackets in links
 
 ### 6.18.0
 * 🎉 Feature: Install several PDF template zips at once
