@@ -140,14 +140,15 @@ test.describe('Deprecated Features', () => {
 		await expect(heading).toBeVisible({ timeout: 30000 });
 		await heading.click();
 
+		// Removed functionality has a critical test of its own, apart from what is only scheduled for removal
 		const panel = page.locator(
-			'#health-check-accordion-block-gravity_pdf_deprecated_features'
+			'#health-check-accordion-block-gravity_pdf_removed_features'
 		);
 
-		// Each feature reads as it does in the system report, under the heading of the group it belongs to
-		await expect(
-			panel.getByRole('heading', { name: 'Unsupported', exact: true })
-		).toBeVisible();
+		// Each feature reads as it does in the system report, after the group's own intro
+		await expect(panel).toContainText(
+			'These features have been removed and any Gravity PDF document that relied on them will stop working.'
+		);
 
 		await expect(panel).toContainText(
 			`e2e-legacy.php (form ID ${formId}). PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0.`
@@ -180,44 +181,44 @@ test.describe('Deprecated Features', () => {
 	}, testinfo) => {
 		await admin.visitAdminPage('site-health.php', 'tab=debug');
 
-		// Each group in use gets its own section, so a support ticket carries the detections split the way they are
-		// fixed. Only the unsupported group is declared since 7.0
-		const unsupportedHeading = page.locator(
-			'#health-check-section-gravity-pdf-unsupported'
-		);
+		// One panel with the lines of the copied system report, so a support ticket reads the same from either place
+		const heading = page.locator('#health-check-section-gravity-pdf');
 
-		// The title no longer names the group, which the panel now does for itself
-		await expect(unsupportedHeading).toHaveText('Gravity PDF');
-		await unsupportedHeading.click();
+		await expect(heading).toHaveText('Gravity PDF');
+		await heading.click();
 
-		const unsupported = page.locator(
-			'#health-check-accordion-block-gravity-pdf-unsupported'
-		);
+		const panel = page.locator('#health-check-accordion-block-gravity-pdf');
 
-		await expect(
-			unsupported.locator('h4', { hasText: 'Unsupported Features' })
-		).toBeVisible();
-
-		// The intro belongs to a list, so it is present only because there is something to introduce
-		await expect(unsupported).toContainText(
-			'These features have been removed and any Gravity PDF document that relied on them will stop working.'
+		// Each feature is a check line ending in its mark, as it copies from the system report
+		await expect(panel).toContainText('Legacy Templates (Unsupported)');
+		await expect(panel).toContainText(
+			`e2e-legacy.php (form ID ${formId}) ✘`
 		);
-
-		// Templates are named by file, with the upgrade URL travelling in the support ticket beside them
-		await expect(unsupported).toContainText(
-			`e2e-legacy.php (form ID ${formId}). PDFs that use a legacy template can no longer be generated in Gravity PDF 7.0.`
-		);
-		await expect(unsupported).toContainText(
-			'https://docs.gravitypdf.com/upgrade/legacy-templates/'
-		);
-		await expect(unsupported).toContainText(
+		await expect(panel).toContainText(
 			`Broken link stored on form ID ${formId}`
 		);
-		await expect(unsupported).toContainText('gfpdf_rtl has 1 listener');
+		await expect(panel).toContainText('gfpdf_rtl has 1 listener');
+
+		// The settings follow the checks, as in the copied report
+		await expect(panel).toContainText('Entry View');
+
+		await expect(
+			page.locator('#health-check-section-gravity-pdf-unsupported')
+		).toHaveCount(0);
 
 		await maskFormIds(page);
 
-		await snapshot(page, testinfo, [unsupportedHeading, unsupported]);
+		const row = (label: string) =>
+			panel.locator('tr', { hasText: `${label} (Unsupported)` });
+
+		// Only the feature rows, as the checks and settings below them depend on what the specs alongside leave behind
+		await snapshot(page, testinfo, [
+			heading,
+			row('Legacy Templates'),
+			row('Business Plus / Tier 2 Templates'),
+			row('Legacy Download URLs'),
+			row('Actions and Filters'),
+		]);
 	});
 
 	test('should raise one dismissible notice covering every detected feature', async ({

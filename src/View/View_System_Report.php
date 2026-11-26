@@ -595,8 +595,11 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @param array $signals The signals from Deprecation::get_signals()
 	 *
 	 * @since 6.17.0
+	 * @deprecated 6.19.0 Removed and deprecated functionality are tested apart, with get_deprecated_group_test()
 	 */
 	public function get_deprecated_features_test( array $signals ): array {
+		_deprecated_function( __METHOD__, '6.19.0', __CLASS__ . '::get_deprecated_group_test()' );
+
 		/* One result covers every round of removals at once, so it names no version: each item below names its own */
 		$result = [
 			'label'       => esc_html__( 'Your PDFs are ready for the next Gravity PDF release', 'gravity-pdf' ),
@@ -726,6 +729,120 @@ class View_System_Report extends Helper_Abstract_View {
 	}
 
 	/**
+	 * The Site Health result for one group of deprecated functionality: removed is critical, scheduled for removal recommended
+	 *
+	 * Unlike the one-time admin notice, this surface can't be dismissed: it clears itself once the site stops
+	 * using the functionality, and returns if it starts again.
+	 *
+	 * @param array  $signals The signals from Deprecation::get_signals()
+	 * @param string $group   Deprecation::GROUP_UNSUPPORTED or Deprecation::GROUP_DEPRECATED
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_deprecated_group_test( array $signals, string $group ): array {
+		$removed = $group === Deprecation::GROUP_UNSUPPORTED;
+
+		$result = [
+			'label'       => $removed ? __( "Your site doesn't use any removed Gravity PDF functionality", 'gravity-pdf' ) : __( 'Your PDFs are ready for the next Gravity PDF release', 'gravity-pdf' ),
+			'status'      => 'good',
+			'badge'       => $this->get_site_health_badge(),
+			'description' => '<p>' . ( $removed ? esc_html__( 'Nothing on this site uses Gravity PDF functionality that has been removed.', 'gravity-pdf' ) : esc_html__( 'Nothing on this site uses Gravity PDF functionality that is scheduled for removal.', 'gravity-pdf' ) ) . '</p>',
+			'actions'     => '',
+			'test'        => $removed ? 'gravity_pdf_removed_features' : 'gravity_pdf_deprecated_features',
+		];
+
+		$signals = Deprecation::group_signals( $signals )[ $group ] ?? [];
+		if ( $signals === [] ) {
+			return $result;
+		}
+
+		$result['status']      = $removed ? 'critical' : 'recommended';
+		$result['label']       = $removed ? __( 'Your site uses Gravity PDF functionality that has been removed', 'gravity-pdf' ) : __( 'Your site uses Gravity PDF functionality that is scheduled for removal', 'gravity-pdf' );
+		$result['description'] = '<p>' . esc_html( static::get_deprecated_groups()[ $group ]['description'] ) . '</p>';
+
+		foreach ( $signals as $key => $signal ) {
+			$message = $this->get_deprecated_feature_detail( $key, $signal );
+
+			$result['description'] .= '<p><strong>' . $message['label'] . '</strong><br>' . $message['value'] . '. ' . $message['validation_message'] . '</p>';
+		}
+
+		$result['actions'] = $this->get_report_link_action();
+
+		return $result;
+	}
+
+	/**
+	 * A Site Health result built from a System Report check's row, so the two say the same thing
+	 *
+	 * @param string $id   The Site Health test ID
+	 * @param array  $test How serious a failure is, and the result's title when it passes and when it doesn't
+	 * @param array  $row  The check's row, as the report builds it
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_report_row_test( string $id, array $test, array $row ): array {
+		$passed = ( $row['is_valid'] ?? null ) === true;
+
+		/* The check's facts, as the report shows them, then its fix */
+		$description = '<p>' . ( $row['label'] ?? '' ) . ': ' . ( $row['value'] ?? '' ) . '</p>';
+		if ( ! $passed && ! empty( $row['validation_message'] ) ) {
+			$description .= '<p>' . $row['validation_message'] . '</p>';
+		}
+
+		return [
+			'label'       => $passed ? $test['good'] : $test['bad'],
+			'status'      => $passed ? 'good' : $test['status'],
+			'badge'       => $this->get_site_health_badge(),
+			'description' => wp_kses_post( $description ),
+			'actions'     => $passed ? '' : $this->get_report_link_action(),
+			'test'        => $id,
+		];
+	}
+
+	/**
+	 * The Site Health Info panel: the lines of the copied System Report, checks first
+	 *
+	 * This is the tab users copy into a support ticket, so it reads the same as the report they'd otherwise copy.
+	 *
+	 * @param array $report The Gravity PDF section from Model_System_Report::build_gravitypdf_report()
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_report_debug_information( array $report ): array {
+		$fields = [];
+
+		foreach ( $report[0]['tables'] ?? [] as $table ) {
+			foreach ( $table['items'] ?? [] as $row ) {
+				$label = (string) ( $row['label_export'] ?? wp_strip_all_tags( (string) ( $row['label'] ?? '' ) ) );
+				$value = trim( (string) ( $row['value_export'] ?? wp_strip_all_tags( (string) ( $row['value'] ?? '' ) ) ) );
+
+				/* A check ends in Gravity Forms' own pass or fail mark, as it does in the copied report */
+				if ( isset( $row['is_valid'] ) ) {
+					$value .= $row['is_valid'] ? ' ✔' : ' ✘';
+				}
+
+				$key = sanitize_key( str_replace( ' ', '_', $label ) );
+				while ( isset( $fields[ $key ] ) ) {
+					$key .= '_';
+				}
+
+				$fields[ $key ] = [
+					'label' => $label,
+					'value' => $value,
+				];
+			}
+		}
+
+		return [
+			'gravity-pdf' => [
+				'label'       => __( 'Gravity PDF', 'gravity-pdf' ),
+				'description' => $this->get_report_link_action(),
+				'fields'      => $fields,
+			],
+		];
+	}
+
+	/**
 	 * @since 7.0
 	 */
 	protected function get_site_health_badge(): array {
@@ -769,8 +886,11 @@ class View_System_Report extends Helper_Abstract_View {
 	 *
 	 * @return array One Site Health Info section per group, keyed by the ID it is registered under
 	 * @since 6.17.0
+	 * @deprecated 6.19.0 The Info tab has one panel with the lines of the copied report, from get_report_debug_information()
 	 */
 	public function get_deprecated_debug_information( array $signals ): array {
+		_deprecated_function( __METHOD__, '6.19.0', __CLASS__ . '::get_report_debug_information()' );
+
 		$grouped  = Deprecation::group_signals( $signals );
 		$sections = [];
 

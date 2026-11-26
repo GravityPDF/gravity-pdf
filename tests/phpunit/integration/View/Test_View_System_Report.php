@@ -57,6 +57,62 @@ class Test_View_System_Report extends TestCase {
 		$this->assertStringContainsString( 'is disabled', $this->view->get_allow_url_fopen( false ) );
 	}
 
+	public function test_the_combined_deprecated_features_test_still_works() {
+		$this->setExpectedDeprecated( View_System_Report::class . '::get_deprecated_features_test' );
+
+		$this->assertSame( 'good', $this->view->get_deprecated_features_test( [] )['status'] );
+	}
+
+	public function test_the_per_group_debug_information_still_works() {
+		$this->setExpectedDeprecated( View_System_Report::class . '::get_deprecated_debug_information' );
+
+		$this->assertArrayHasKey( 'gravity-pdf-unsupported', $this->view->get_deprecated_debug_information( [] ) );
+	}
+
+	public function test_a_report_row_test_shows_the_fix_only_when_the_check_fails() {
+		$test = [
+			'status' => 'critical',
+			'good'   => 'Fine',
+			'bad'    => 'Broken',
+		];
+
+		$pass = $this->view->get_report_row_test( 'gravity_pdf_check', $test, [ 'label' => 'Check', 'value' => 'On', 'is_valid' => true ] );
+		$fail = $this->view->get_report_row_test( 'gravity_pdf_check', $test, [ 'label' => 'Check', 'value' => 'Off', 'is_valid' => false, 'validation_message' => 'Turn it on.' ] );
+
+		$this->assertSame( [ 'good', 'Fine', '<p>Check: On</p>', '' ], [ $pass['status'], $pass['label'], $pass['description'], $pass['actions'] ] );
+		$this->assertSame( [ 'critical', 'Broken', '<p>Check: Off</p><p>Turn it on.</p>' ], [ $fail['status'], $fail['label'], $fail['description'] ] );
+		$this->assertStringContainsString( 'page=gf_system_status', $fail['actions'] );
+	}
+
+	public function test_the_debug_information_marks_each_check_as_the_copied_report_does() {
+		$report = [
+			[
+				'tables' => [
+					[
+						'items' => [
+							[ 'label_export' => 'PDF Memory Limit', 'value_export' => '64MB', 'is_valid' => false ],
+							[ 'label_export' => 'allow_url_fopen', 'value_export' => 'On', 'is_valid' => true ],
+						],
+					],
+					[
+						'items' => [
+							[ 'label_export' => 'Entry View', 'value_export' => 'View (default)' ],
+						],
+					],
+				],
+			],
+		];
+
+		$this->assertSame(
+			[
+				'pdf_memory_limit' => [ 'label' => 'PDF Memory Limit', 'value' => '64MB ✘' ],
+				'allow_url_fopen'  => [ 'label' => 'allow_url_fopen', 'value' => 'On ✔' ],
+				'entry_view'       => [ 'label' => 'Entry View', 'value' => 'View (default)' ],
+			],
+			$this->view->get_report_debug_information( $report )['gravity-pdf']['fields']
+		);
+	}
+
 	public function test_get_icon() {
 		$this->setExpectedDeprecated( View_System_Report::class . '::get_icon' );
 
