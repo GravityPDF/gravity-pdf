@@ -42,6 +42,11 @@ return [
 				$content = str_replace( "\\$prefix\SPLObjectStorage", '\SPLObjectStorage', $content );
 			}
 
+			/* PHP 8.6 deprecates spl_object_hash(); html5 2.11+ switched too, but needs PHP 7.4 */
+			if ( basename( $filePath ) === 'DOMTreeBuilder.php' ) {
+				$content = str_replace( 'spl_object_hash(', 'spl_object_id(', $content );
+			}
+
 			return str_replace(
 				"'\\\\QueryPath\\\\",
 				"'\\\\$prefix\\\\QueryPath\\\\",
