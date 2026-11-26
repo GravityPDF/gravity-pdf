@@ -2,8 +2,8 @@
 
 /* Dev/E2E sites can't send mail: save each email, with copies of its attachments, to uploads/mail-capture/ instead */
 
-/* Excluded from production build. Skipped under PHPUnit (MockPHPMailer) or when GPDF_DISABLE_MAIL_CAPTURE is set */
-if ( defined( 'WP_TESTS_DOMAIN' ) || ( defined( 'GPDF_DISABLE_MAIL_CAPTURE' ) && GPDF_DISABLE_MAIL_CAPTURE ) || getenv( 'GPDF_DISABLE_MAIL_CAPTURE' ) ) {
+/* Excluded from production build. Off under PHPUnit (its bootstrap defines DIR_TESTDATA) or with GPDF_DISABLE_MAIL_CAPTURE */
+if ( defined( 'DIR_TESTDATA' ) || ( defined( 'GPDF_DISABLE_MAIL_CAPTURE' ) && GPDF_DISABLE_MAIL_CAPTURE ) || getenv( 'GPDF_DISABLE_MAIL_CAPTURE' ) ) {
 	return;
 }
 
