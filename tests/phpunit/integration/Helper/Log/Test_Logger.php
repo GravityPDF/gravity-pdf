@@ -128,4 +128,31 @@ class Test_Logger extends TestCase {
 		$this->assertCount( 1, $stream_handlers );
 		$this->assertSame( \GFPDF_Vendor\Monolog\Logger::ERROR, reset( $stream_handlers )->getLevel() );
 	}
+
+	public function test_enabled_logging_writes_notices_and_errors_under_cli() {
+		$gf_logger = \GFLogging::get_instance();
+		$gf_logger->delete_log_files();
+		$gf_logger->update_plugin_settings(
+			[
+				'cli_slug' => [
+					'enable'    => true,
+					'file_name' => sha1( (string) time() ) . '_cli',
+					'log_level' => 1,
+				],
+			]
+		);
+
+		$logger   = ( new Logger( 'cli_slug', 'Name' ) )->get_logger();
+		$handlers = $logger->getHandlers();
+
+		$this->assertCount( 1, $handlers );
+		$this->assertInstanceOf( 'GFPDF_Vendor\Monolog\Handler\StreamHandler', $handlers[0] );
+
+		$logger->notice( 'CLI notice message' );
+		$logger->error( 'CLI error message' );
+
+		$log = file_get_contents( $gf_logger->get_log_file_name( 'cli_slug' ) );
+		$this->assertStringContainsString( 'NOTICE --> CLI notice message', $log );
+		$this->assertStringContainsString( 'ERROR --> CLI error message', $log );
+	}
 }
