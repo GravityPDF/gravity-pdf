@@ -27,22 +27,32 @@ add_filter(
 
 		$atts['attachments'] = [];
 		foreach ( array_filter( $attachments ) as $file ) {
-			$exists                = is_file( $file );
+			$exists = is_file( $file );
+			$copy   = '';
+			if ( $exists && wp_mkdir_p( $dir . '/attachments' ) ) {
+				$copy = 'attachments/' . wp_unique_filename( $dir . '/attachments', basename( $file ) );
+				copy( $file, $dir . '/' . $copy );
+			}
+
 			$atts['attachments'][] = [
 				'path'   => $file,
 				'exists' => $exists,
 				'size'   => $exists ? filesize( $file ) : 0,
+				'copy'   => $copy,
 			];
-
-			if ( $exists && wp_mkdir_p( $dir . '/attachments' ) ) {
-				copy( $file, $dir . '/attachments/' . wp_unique_filename( $dir . '/attachments', basename( $file ) ) );
-			}
 		}
 
 		$saved = file_put_contents( $dir . '/mail.json', wp_json_encode( $atts, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) );
 
 		/* Fall through to the real wp_mail() if the capture couldn't be written */
-		return $saved ? true : null;
+		if ( ! $saved ) {
+			return null;
+		}
+
+		/* Lets a caller (e.g. the E2E notification helper) collect the mail it sent */
+		do_action( 'gpdf_mail_captured', $dir, $atts );
+
+		return true;
 	},
 	PHP_INT_MAX,
 	2
