@@ -46,11 +46,24 @@ class Test_Helper_Form extends WP_UnitTestCase {
 		$this->assertSame( $text, $again );
 	}
 
-	public function test_process_tags_leaves_a_merged_value_as_is_for_plain_text() {
+	/**
+	 * @dataProvider provider_plain_text_values
+	 */
+	public function test_process_tags_leaves_a_merged_value_as_is_for_plain_text( $value ) {
 		$form       = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry      = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
-		$entry['1'] = 'Report {Draft}: final';
+		$entry['1'] = $value;
 
-		$this->assertSame( 'Name: Report {Draft}: final', \GPDFAPI::get_form_class()->process_tags( 'Name: {Single Line Text:1}', $form, $entry, false ) );
+		/* As the filename and passwords do */
+		$text = wp_specialchars_decode( \GPDFAPI::get_form_class()->process_tags( 'Name: {Single Line Text:1}', $form, $entry, false ), ENT_QUOTES );
+
+		$this->assertSame( 'Name: ' . $value, $text );
+	}
+
+	public function provider_plain_text_values() {
+		return [
+			'merge tag'                      => [ 'Report {Draft}: final' ],
+			'brackets, backslash, shortcode' => [ 'pw[1]\\x [gravitypdf id="a"]' ],
+		];
 	}
 }
