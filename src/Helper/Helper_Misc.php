@@ -1057,7 +1057,7 @@ class Helper_Misc {
 		$compat['rtl']            = ( $settings['rtl'] ?? '' ) === 'Yes';
 		$compat['dpi']            = (int) ( $settings['image_dpi'] ?? 96 );
 		$compat['security']       = ( $settings['security'] ?? '' ) === 'Yes';
-		$compat['pdf_password']   = $this->gform->process_tags( $settings['password'] ?? '', $form, $entry );
+		$compat['pdf_password']   = $this->gform->process_tags( $settings['password'] ?? '', $form, $entry, false );
 		$compat['pdf_privileges'] = $settings['privileges'] ?? '';
 		$compat['pdfa1b']         = ( $settings['format'] ?? '' ) === 'PDFA1B';
 		$compat['pdfx1a']         = ( $settings['format'] ?? '' ) === 'PDFX1A';
