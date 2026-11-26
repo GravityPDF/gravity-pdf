@@ -116,6 +116,19 @@ class Test_Vendor_Prefixing extends TestCase {
 	}
 
 	/**
+	 * PHP 8.6 deprecates spl_object_hash(), so the patcher swaps DeepCopy's call to spl_object_id()
+	 *
+	 * @since 6.18.1
+	 */
+	public function test_bundled_libraries_avoid_spl_object_hash() {
+		$files = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( PDF_PLUGIN_DIR . 'vendor_prefixed', \FilesystemIterator::SKIP_DOTS ) );
+
+		foreach ( new \RegexIterator( $files, '/\.php$/' ) as $file ) {
+			$this->assertStringNotContainsString( 'spl_object_hash(', file_get_contents( $file->getPathname() ), $file->getPathname() );
+		}
+	}
+
+	/**
 	 * Returns the evaluated value of every single/double quoted string in a scoped file
 	 *
 	 * @param string $relative_path Path below vendor_prefixed/
