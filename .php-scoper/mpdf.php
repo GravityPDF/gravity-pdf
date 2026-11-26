@@ -53,6 +53,11 @@ return [
 				$content = str_replace( 'use \\setasign\\', "use \\$prefix\\setasign\\", $content );
 			}
 
+			/* PHP 8.6 deprecates spl_object_hash(); deep-copy 1.14+ switched too, but needs PHP 8.0 */
+			if ( basename( $filePath ) === 'DeepCopy.php' ) {
+				$content = str_replace( 'spl_object_hash(', 'spl_object_id(', $content );
+			}
+
 			if ( basename( $filePath ) === 'Svg.php' ) {
 				$content = str_replace( "$prefix\\\\<svg\\\\1", '<svg\\\\1', $content );
 			}
