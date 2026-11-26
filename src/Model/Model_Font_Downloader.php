@@ -305,8 +305,19 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_auto_install_status(): string {
+		$state = $this->get_auto_install_state();
+
+		return $state === 'On' ? $state : sprintf( '%s (%s)', $state, $this->get_auto_install_source() );
+	}
+
+	/**
+	 * Whether the manifest's files may be downloaded, whichever are missing: On, Off or Partly off
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_auto_install_state(): string {
 		if ( $this->get_auto_install_constant() === false ) {
-			return 'Off (GPDF_AUTO_INSTALL_FONTS constant)';
+			return 'Off';
 		}
 
 		if ( ! $this->is_auto_install_overridden() ) {
@@ -325,7 +336,16 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 			return 'On';
 		}
 
-		return sprintf( '%s (gfpdf_auto_install_fonts filter)', count( $blocked ) === count( $files ) ? 'Off' : 'Partly off' );
+		return count( $blocked ) === count( $files ) ? 'Off' : 'Partly off';
+	}
+
+	/**
+	 * What turns downloads off: the constant when it's false, else the filter
+	 *
+	 * @since 6.19.0
+	 */
+	public function get_auto_install_source(): string {
+		return $this->get_auto_install_constant() === false ? 'GPDF_AUTO_INSTALL_FONTS constant' : 'gfpdf_auto_install_fonts filter';
 	}
 
 	/**
@@ -336,11 +356,7 @@ class Model_Font_Downloader extends Helper_Abstract_Model {
 	 * @since 6.19.0
 	 */
 	public function get_auto_install_blocker( array $missing ): ?string {
-		if ( $this->can_download_all( $missing ) ) {
-			return null;
-		}
-
-		return $this->get_auto_install_constant() === false ? 'GPDF_AUTO_INSTALL_FONTS constant' : 'gfpdf_auto_install_fonts filter';
+		return $this->can_download_all( $missing ) ? null : $this->get_auto_install_source();
 	}
 
 	/**
