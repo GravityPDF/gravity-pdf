@@ -213,6 +213,7 @@ filter gfpdf_remote_request_args 1
 filter gfpdf_render_degraded 5
 filter gfpdf_rich_editor_settings 1
 filter gfpdf_section_content_display_setting 1
+filter gfpdf_send_inline_pdf_headers 2
 filter gfpdf_settings_extensions 1
 filter gfpdf_settings_general 1
 filter gfpdf_settings_general_cache 1

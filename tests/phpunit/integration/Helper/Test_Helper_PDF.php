@@ -47,8 +47,12 @@ class Test_Helper_PDF extends TestCase {
 
 	private Helper_PDF $pdf;
 
+	private array $server;
+
 	public function set_up(): void {
 		parent::set_up();
+
+		$this->server = $_SERVER;
 
 		global $gfpdf;
 
@@ -77,6 +81,8 @@ class Test_Helper_PDF extends TestCase {
 	}
 
 	public function tear_down(): void {
+		$_SERVER = $this->server;
+		remove_all_filters( 'gfpdf_send_inline_pdf_headers' );
 		$this->restore_tmp_location();
 		$this->remove_font_fixtures();
 
@@ -97,6 +103,33 @@ class Test_Helper_PDF extends TestCase {
 	public function test_set_output_type_throws_for_invalid_type(): void {
 		$this->expectException( Exception::class );
 		$this->pdf->set_output_type( 'STREAM' );
+	}
+
+	public function test_a_native_cli_runtime_does_not_need_inline_pdf_headers(): void {
+		if ( stripos( php_uname( 'm' ), 'wasm' ) !== false ) {
+			$this->markTestSkipped( 'The suite is running on php-wasm' );
+		}
+
+		$this->assertFalse( $this->invoke_private( $this->pdf, 'needs_inline_pdf_headers' ) );
+	}
+
+	public function test_playground_needs_inline_pdf_headers(): void {
+		$_SERVER['SERVER_SOFTWARE'] = 'PHP.wasm';
+
+		$this->assertTrue( $this->invoke_private( $this->pdf, 'needs_inline_pdf_headers' ) );
+	}
+
+	public function test_the_inline_header_filter_can_opt_out_on_playground(): void {
+		$_SERVER['SERVER_SOFTWARE'] = 'PHP.wasm';
+		add_filter( 'gfpdf_send_inline_pdf_headers', '__return_false' );
+
+		$this->assertFalse( $this->invoke_private( $this->pdf, 'needs_inline_pdf_headers' ) );
+	}
+
+	public function test_the_inline_header_filter_can_opt_in_other_runtimes(): void {
+		add_filter( 'gfpdf_send_inline_pdf_headers', '__return_true' );
+
+		$this->assertTrue( $this->invoke_private( $this->pdf, 'needs_inline_pdf_headers' ) );
 	}
 
 	public function test_set_and_get_filename(): void {
