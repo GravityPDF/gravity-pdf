@@ -28,6 +28,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Form extends Helper_Abstract_Form {
 
 	/**
+	 * The entities Gravity Forms 3.2.3 writes for a merged value's `[`, `]` and `\`, and the [gravitypdf] guard's HTML escape for `[`
+	 *
+	 * @since 6.18.1
+	 */
+	private const ENCODED_SHORTCODE_CHARACTERS = [
+		'&#91;'  => '[',
+		'&#x5b;' => '[',
+		'&#93;'  => ']',
+		'&#92;'  => '\\',
+	];
+
+	/**
 	 * Get the form plugins current version
 	 *
 	 * @return string
@@ -246,6 +258,7 @@ class Helper_Form extends Helper_Abstract_Form {
 			return trim( GFCommon::replace_variables( $text, $form, $entry, false, false, false ) );
 		};
 
-		return $inert ? Kses::keep_merged_tags_inert( $replace ) : $replace();
+		/* Plain text isn't run as shortcodes, so it shows the characters as typed, as Gravity Forms does for an email's From Name */
+		return $inert ? Kses::keep_merged_tags_inert( $replace ) : strtr( $replace(), self::ENCODED_SHORTCODE_CHARACTERS );
 	}
 }
