@@ -870,7 +870,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_pdf_name( $settings, $entry ) {
 
 		$form = apply_filters( 'gfpdf_current_form_object', $this->gform->get_form( $entry['form_id'] ), $entry, __FUNCTION__ );
-		$name = $this->gform->process_tags( $settings['filename'], $form, $entry );
+		$name = $this->gform->process_tags( $settings['filename'], $form, $entry, false );
 
 		/* Decode HTML entities */
 		$name = wp_specialchars_decode( $name, ENT_QUOTES );

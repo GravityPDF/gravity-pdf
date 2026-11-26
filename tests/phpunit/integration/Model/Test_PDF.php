@@ -2330,6 +2330,27 @@ class Test_PDF extends TestCase {
 		];
 	}
 
+	public function test_preprocess_template_arguments_keeps_a_submitted_tag_as_text() {
+		$data       = $this->form_and_entry();
+		$entry      = $data['entry'];
+		$entry['1'] = '{admin_email} {Email:17} {:17}';
+
+		$results = $this->model->preprocess_template_arguments(
+			[
+				'settings' => [
+					'header' => '<p>{Single Line Text:1}</p>',
+					'footer' => '<p>{Single Line Text:1}</p>',
+				],
+				'form'     => $data['form'],
+				'entry'    => $entry,
+			]
+		);
+
+		foreach ( [ 'header', 'footer' ] as $key ) {
+			$this->assertSame( $results['settings'][ $key ], \GFCommon::replace_variables( $results['settings'][ $key ], $data['form'], $entry, false, false, false ) );
+		}
+	}
+
 	/**
 	 * Verify our core HTML output is accurate for the input settings we include
 	 *

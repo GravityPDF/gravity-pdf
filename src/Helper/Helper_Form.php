@@ -6,6 +6,7 @@ use GFAPI;
 use GFCommon;
 use GFForms;
 use GFFormsModel;
+use GFPDF\Statics\Kses;
 use WP_Error;
 use WP_User;
 
@@ -232,15 +233,21 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * @param string $text  The string to process
 	 * @param array  $form  The Gravity Form array
 	 * @param array  $entry The Gravity Form Entry Array
+	 * @param bool   $inert Keep any tag a merged value adds as text. Off for plain text, such as a filename or password
 	 *
 	 * @return string
 	 *
 	 * @since 4.0
+	 * @since 6.18.1 Added $inert, so processing the text again can't run a tag a merged value added
 	 */
-	public function process_tags( $text, $form, $entry ) {
+	public function process_tags( $text, $form, $entry, $inert = true ) {
 
 		$text = str_replace( '{all_fields}', '', $text );
 
-		return trim( GFCommon::replace_variables( $text, $form, $entry, false, false, false ) );
+		$replace = function () use ( $text, $form, $entry ) {
+			return trim( GFCommon::replace_variables( $text, $form, $entry, false, false, false ) );
+		};
+
+		return $inert ? Kses::keep_merged_tags_inert( $replace ) : $replace();
 	}
 }
