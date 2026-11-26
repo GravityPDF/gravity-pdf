@@ -164,4 +164,12 @@ class Test_Kses extends TestCase {
 			'a string' => [ 'color' ],
 		];
 	}
+
+	public function test_parse_percent_encodes_an_escaped_bracket_in_a_url() {
+		$html = Kses::parse( '<a href="https://example.org/?a&#91;0&#93;=1">&#91;link&#93;</a><img src="https://example.org/i.png?v=&#123;1}" />' );
+
+		$this->assertStringContainsString( 'href="https://example.org/?a%5B0', $html );
+		$this->assertStringContainsString( 'v=%7B1}', $html );
+		$this->assertSame( 1, substr_count( $html, "\u{FEFF}" ) );
+	}
 }

@@ -602,7 +602,7 @@ class GFPDF\Helper\Helper_Form extends GFPDF\Helper\Helper_Abstract_Form
     public function get_plugin_url()
     public function get_version()
     public function has_capability($capability, $user_id = null)
-    public function process_tags($text, $form, $entry)
+    public function process_tags($text, $form, $entry, $inert = true)
     public function update_entry($entry)
     public function update_form($form)
 
@@ -956,9 +956,12 @@ class GFPDF\Router implements GFPDF\Helper\Helper_Interface_Actions, GFPDF\Helpe
     public static function initialise_plugin()
 
 class GFPDF\Statics\Kses
+    public static function encode_attribute_tags($name, $value)
     public static function get_allowed_pdf_protocols($protocols = null)
     public static function get_allowed_pdf_styles($styles)
     public static function get_allowed_pdf_tags($tags = null)
+    public static function keep_merged_tags_inert(callable $replace)
+    public static function make_tags_inert($value)
     public static function output($html): void
     public static function parse($html)
     public static function strip_scripts($html)
