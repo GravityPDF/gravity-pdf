@@ -68,6 +68,10 @@ Artifacts (screenshots, traces) are written to `tmp/artifacts/`.
 
 Baselines only hold on the Linux CI runner, because macOS anti-aliasing differs, so never commit PNGs captured locally. To accept a visual change or seed new shots, add the `update-visual-baselines` label to the PR alongside `run-tests`. The `visual-regression` job then replaces the baselines with that run's shots, reverts any that changed only by capture noise (`yarn visual:prune`) and pushes a `[skip ci]` commit to the branch. To confirm the compare is green, remove the label and push a new commit that doesn't say `[skip ci]` (e.g. fold the baseline commit into the PR's commit and force-push). Re-running the workflow won't do: a re-run replays the original event, label included, so it refreshes the baselines again rather than comparing.
 
+#### Gravity Forms targets (lock / next / floor)
+
+CI runs the same jobs against one Gravity Forms build: `lock` (composer.lock; the PR default), `next` (the daily `channel-master` test build) or `floor` (`$required_gf_version` in `pdf.php`). Add `run-tests-next` or `run-tests-floor` to a PR to switch, with or without `run-tests`; a dispatch takes a `gf_target` input. `tools/ci/fetch-gravityforms.sh` fetches the build and the `tests.yml` header lists the scheduled runs.
+
 ### Environment
 
 ```bash

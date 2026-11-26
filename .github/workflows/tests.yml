@@ -2,40 +2,101 @@ name: Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      gf_target:
+        description: "Gravity Forms to test against: lock, next, floor, or an exact release (e.g. 3.0.0)"
+        type: string
+        default: lock
   pull_request:
     # No `opened`: a PR opened with run-tests fires `labeled` too, and the two runs would cancel each other
     types: [ reopened, synchronize, labeled ]
   # Not `schedule:` — GitHub ran it 2-4h late and skipped whole days. Cronicle
   # (CT 115, https://cron.blueliquiddesigns.com) dispatches it on time instead,
-  # at the UTC time below. Change the time there, not here.
-  #   cron "0 20 * * *" (UTC) — daily, 6am Sydney AEST (7am during AEDT)
+  # at the UTC times below, each passing `gf_target`. Change the times there, not here.
+  #   lock   cron "0 20 * * *" (UTC) — daily, 6am Sydney AEST (7am during AEDT)
+  #   next   cron "30 20 * * *" (UTC) — daily; gravityforms-test-builds rebuilds channel-master at 18:00 UTC
+  #   floor  cron "0 21 * * 0" (UTC) — weekly, Sunday
 
-# Any label fires `labeled`, but only these change what the run does (same list as the label check's `if`). Another
-# label gets a group of its own, so it can't cancel the run in progress, and the label check skips it
+# Any label fires `labeled`, but only run-tests* and update-visual-baselines change what the run does (same test as the
+# label check's `if`; its decide step has the exact list). Another
+# label gets a group of its own, so it can't cancel the run in progress, and the label check skips it. The target is
+# in the key so Cronicle's lock/next/floor dispatches on the same SHA don't cancel each other.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.action == 'labeled' && ! contains(fromJSON('["run-tests","run-tests-php-all","update-visual-baselines"]'), github.event.label.name) && github.run_id || github.head_ref || github.sha }}
+  group: ${{ github.workflow }}-${{ github.event.action == 'labeled' && ! (startsWith(github.event.label.name, 'run-tests') || github.event.label.name == 'update-visual-baselines') && github.run_id || github.head_ref || github.sha }}-${{ inputs.gf_target }}
   cancel-in-progress: true
 
 # Read-only default; jobs that comment or push ask for more.
 permissions:
   contents: read
 
+env:
+  # gravityforms-test-builds rebuilds channel-master daily, so 48h tolerates one missed build. Dispatched runs only.
+  MAX_BUILD_AGE_HOURS: 48
+  # GF publishes no PHP ceiling, so the floor build skips PHPUnit cells newer than this; revisit when raising
+  # $required_gf_version. The E2E configs run PHP 8.5, so lowering this below 8.5 needs them overridden too.
+  FLOOR_PHP_MAX: '8.5'
+
 jobs:
   check_for_run_tests_label_in_pr:
     name: Should workflow run?
     # Same label list as `concurrency.group`
-    if: ${{ github.event.action != 'labeled' || contains(fromJSON('["run-tests","run-tests-php-all","update-visual-baselines"]'), github.event.label.name) }}
+    if: ${{ github.event.action != 'labeled' || (startsWith(github.event.label.name, 'run-tests') || github.event.label.name == 'update-visual-baselines') }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
+    outputs:
+      gf_target: ${{ steps.decide.outputs.gf_target }}
+      gf_suffix: ${{ steps.decide.outputs.gf_suffix }}
+      # The composer.lock build: only it gates visual regression, coverage and Jest (none depend on the GF build).
+      gf_lock: ${{ steps.decide.outputs.gf_lock }}
+      php: ${{ steps.decide.outputs.php }}
+      php_include: ${{ steps.decide.outputs.php_include }}
     steps:
-      # Read live labels via gh-api: the event payload can predate labels added alongside the trigger
-      - name: Check for run-tests label
-        if: ${{ github.event_name == 'pull_request' }}
+      # Read live labels via gh-api: the event payload can predate labels added alongside the trigger. floor beats next.
+      - name: Decide what runs
+        id: decide
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
-        run: gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name' | grep -qx 'run-tests'
+          DISPATCH_TARGET: ${{ inputs.gf_target }}
+        run: |
+          target=${DISPATCH_TARGET:-lock}
+          php='["7.4","8.0","8.1","8.2","8.3","8.4","8.5","8.6"]'
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            labels=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name')
+            has() { grep -Fqx "$1" <<<"$labels"; }
+            if ! has run-tests && ! has run-tests-next && ! has run-tests-floor; then
+              echo "No run-tests label."
+              exit 1
+            fi
+            if has run-tests-next; then target=next; fi
+            if has run-tests-floor; then target=floor; fi
+            if ! has run-tests-php-all; then php='["7.4","8.5"]'; fi
+          elif ! [[ "$target" =~ ^(lock|next|floor|[0-9]+(\.[0-9]+)+)$ ]]; then
+            echo "::error::gf_target must be lock, next, floor or a Gravity Forms version, not '$target'."
+            exit 1
+          fi
+
+          if [ "$target" = floor ]; then
+            php=$(jq -c --arg max "$FLOOR_PHP_MAX" 'def v: split(".") | map(tonumber); map(select(v <= ($max | v)))' <<<"$php")
+          fi
+
+          lock=false suffix=" @ GF $target"
+          if [ "$target" = lock ]; then lock=true suffix=''; fi
+          # These merge into matching base cells: multisite on the matrix floor + ceiling (when present), and one
+          # coverage cell on 8.3 (added on a PR, whose matrix skips 8.3), lock only.
+          include=$(jq -c --argjson lock "$lock" '. as $php
+            | [{php: "8.3", report: true} | select($lock)]
+              + ([{php: "7.4", multisite: true}, {php: "8.5", multisite: true}] | map(select(.php | IN($php[]))))
+            | map(. + {os: "ubuntu-latest"})' <<<"$php")
+          {
+            echo "gf_target=$target"
+            echo "gf_suffix=$suffix"
+            echo "gf_lock=$lock"
+            echo "php=$php"
+            echo "php_include=$include"
+          } >> "$GITHUB_OUTPUT"
+          echo "Gravity Forms target: $target; PHPUnit matrix: $php"
 
   # composer.json's post-install-cmd chains `composer prefix` + `yarn install && yarn build`, so composer install plus
   # that script here primes vendor/, vendor_prefixed/, node_modules/, and build/assets/ for every downstream matrix.
@@ -43,9 +104,32 @@ jobs:
     name: Prebuild shared caches
     needs: check_for_run_tests_label_in_pr
     runs-on: ubuntu-latest
+    outputs:
+      gf_line: ${{ steps.gf.outputs.line }}
+      gf_built: ${{ steps.gf.outputs.built }}
+      gf_age_hours: ${{ steps.gf.outputs.age_hours }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The credentials stay on this step: everything else here installs or runs third-party code. Fetched once
+      # and handed to the cells as an artifact; `lock` downloads nothing and mounts vendor/'s copy.
+      - name: Fetch the Gravity Forms build (${{ needs.check_for_run_tests_label_in_pr.outputs.gf_target }})
+        id: gf
+        env:
+          GF_TARGET: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_target }}
+          GH_TOKEN: ${{ secrets.GF_TEST_BUILDS_TOKEN }}
+          GF_LICENSE: ${{ secrets.GF_LICENSE }}
+        run: bash tools/ci/fetch-gravityforms.sh "$GF_TARGET" "$RUNNER_TEMP/gf-build"
+
+      - name: Upload the Gravity Forms build
+        if: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_lock != 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: gravityforms-build
+          path: ${{ runner.temp }}/gf-build/gravityforms.zip
+          compression-level: 0
+          retention-days: 1
 
       # Bundled — composer install + the php-scoper post step produce them together; they must invalidate together.
       - name: Check Composer vendor cache
@@ -126,9 +210,29 @@ jobs:
           path: build/assets
           key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
+  # Separate so the tests still run and report: a stale channel-master means the upstream builder stopped, not that
+  # Gravity PDF broke. Dispatched runs only; nothing in a PR can fix it.
+  gf-freshness:
+    name: Gravity Forms build freshness
+    needs: [ check_for_run_tests_label_in_pr, prebuild ]
+    if: ${{ github.event_name == 'workflow_dispatch' && needs.check_for_run_tests_label_in_pr.outputs.gf_target == 'next' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail on a stale channel-master build
+        env:
+          AGE: ${{ needs.prebuild.outputs.gf_age_hours }}
+          BUILT: ${{ needs.prebuild.outputs.gf_built }}
+        run: |
+          if [ "$AGE" -ge "$MAX_BUILD_AGE_HOURS" ]; then
+            echo "::error::channel-master was last built at ${BUILT}, ${AGE}h ago (limit ${MAX_BUILD_AGE_HOURS}h). The gravityforms-test-builds daily build has stopped, so this run tested an old Gravity Forms."
+            exit 1
+          fi
+          echo "channel-master was built ${AGE}h ago."
+
   test-js:
     name: JavaScript Tests
-    needs: prebuild
+    needs: [ check_for_run_tests_label_in_pr, prebuild ]
+    if: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_lock == 'true' }}
     runs-on: ubuntu-latest
     # The coverage comment.
     permissions:
@@ -166,8 +270,8 @@ jobs:
           signature: ":robot: Jest coverage report"
 
   test-php:
-    name: PHPUnit ${{ matrix.php }}${{ matrix.report && ' coverage' || '' }} on ${{ matrix.os }}
-    needs: prebuild
+    name: PHPUnit ${{ matrix.php }}${{ matrix.report && ' coverage' || '' }} on ${{ matrix.os }}${{ needs.check_for_run_tests_label_in_pr.outputs.gf_suffix }}
+    needs: [ check_for_run_tests_label_in_pr, prebuild ]
     runs-on: ${{ matrix.os }}
     # The coverage comment.
     permissions:
@@ -176,26 +280,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # PRs run a tightened floor/ceiling matrix for fast feedback; scheduled runs get the full matrix down to the
-        # composer.json floor. The run-tests-php-all label forces the full matrix on a PR — applied post-open,
-        # so the labeled event re-runs this workflow with a payload that carries the label.
-        php: ${{ fromJSON((github.event_name == 'pull_request' && ! contains(github.event.pull_request.labels.*.name, 'run-tests-php-all')) && '["7.4","8.5"]' || '["7.4","8.0","8.1","8.2","8.3","8.4","8.5","8.6"]') }}
+        # Built by the label check: PRs run a tightened floor/ceiling matrix for fast feedback, scheduled runs and the
+        # run-tests-php-all label the full one down to the composer.json floor, minus PHP above FLOOR_PHP_MAX on floor.
+        php: ${{ fromJSON(needs.check_for_run_tests_label_in_pr.outputs.php) }}
         os: [ ubuntu-latest ]
-        include:
-          # These flags merge into the matching base cells (no extra cells spawned) and drive the
-          # conditional steps below: coverage runs once on 8.3, multisite on the floor + ceiling.
-          - php: '8.3'
-            os: ubuntu-latest
-            report: true
-          - php: '7.4'
-            os: ubuntu-latest
-            multisite: true
-          - php: '8.5'
-            os: ubuntu-latest
-            multisite: true
-    # Gravity Forms 3.2.3.1 calls is_double(), deprecated in PHP 8.6. Drop this once GF ships the fix, then move the PR
-    # ceiling + multisite cell up to 8.6.
-    continue-on-error: ${{ matrix.php == '8.6' }}
+        # Also built by the label check: the flags drive the conditional steps below (coverage, multisite).
+        include: ${{ fromJSON(needs.check_for_run_tests_label_in_pr.outputs.php_include) }}
+    # Gravity Forms 3.2.3.1 calls is_double(), deprecated in PHP 8.6. channel-master has the fix, so `next` runs 8.6 as
+    # a hard cell. Drop this once composer.lock has it, then move the PR ceiling + multisite cell up to 8.6.
+    continue-on-error: ${{ matrix.php == '8.6' && needs.check_for_run_tests_label_in_pr.outputs.gf_lock == 'true' }}
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
@@ -219,6 +312,7 @@ jobs:
           build-assets: false
           playwright: false
           wp-env-config: tools/wp-env/integration.json
+          gf-build: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_lock != 'true' }}
 
       - name: Log debug information
         run: |
@@ -316,8 +410,8 @@ jobs:
           signature: ":robot: PHPUnit coverage report"
 
   e2e-playwright:
-    name: Playwright E2E Tests (${{ matrix.name }})
-    needs: prebuild
+    name: Playwright E2E Tests (${{ matrix.name }})${{ needs.check_for_run_tests_label_in_pr.outputs.gf_suffix }}
+    needs: [ check_for_run_tests_label_in_pr, prebuild ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -338,6 +432,7 @@ jobs:
         with:
           php-version: 7.4
           wp-env-config: tools/wp-env/${{ matrix.config }}.json
+          gf-build: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_lock != 'true' }}
 
       - name: Log debug information
         run: |
@@ -379,16 +474,18 @@ jobs:
         run: yarn ${{ matrix.test }}
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
+          # Shots only compare against the lock build's baselines, so skip taking them elsewhere.
+          VISUAL: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_lock == 'true' && '1' || '0' }}
 
       # One tarball per shard uploads far faster than a folder of PNGs. mkdir covers a shard that took no snapshots.
       - name: Pack visual-regression shots
-        if: success()
+        if: ${{ success() && needs.check_for_run_tests_label_in_pr.outputs.gf_lock == 'true' }}
         run: |
           mkdir -p tmp/visual/current
           tar -C tmp/visual -cf "$RUNNER_TEMP/visual-shots-${{ matrix.id }}.tar" current
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: success()
+        if: ${{ success() && needs.check_for_run_tests_label_in_pr.outputs.gf_lock == 'true' }}
         with:
           name: visual-shots-${{ matrix.id }}
           path: ${{ runner.temp }}/visual-shots-${{ matrix.id }}.tar
@@ -406,8 +503,8 @@ jobs:
           path: tmp/artifacts
 
   addon-smoke:
-    name: Add-on smoke test
-    needs: prebuild
+    name: Add-on smoke test${{ needs.check_for_run_tests_label_in_pr.outputs.gf_suffix }}
+    needs: [ check_for_run_tests_label_in_pr, prebuild ]
     runs-on: ubuntu-latest
 
     steps:
@@ -418,6 +515,7 @@ jobs:
         uses: ./.github/actions/setup-e2e
         with:
           playwright: false
+          gf-build: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_lock != 'true' }}
 
       - name: Download the released add-ons
         run: bash tools/ci/addons/download.sh
@@ -436,14 +534,17 @@ jobs:
 
   notify:
     name: Notify on scheduled run
-    needs: [ test-js, test-php, e2e-playwright, visual-regression, addon-smoke ]
+    needs: [ check_for_run_tests_label_in_pr, prebuild, gf-freshness, test-js, test-php, e2e-playwright, visual-regression, addon-smoke ]
     # The environment only allows development, so a dispatch on another branch skips rather than fails.
     if: ${{ always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/development' }}
     runs-on: ubuntu-latest
     # Holds SLACK_WEBHOOK_URL.
     environment: development
     env:
-      HEADLINE: ${{ (needs.test-js.result == 'success' && needs.test-php.result == 'success' && needs.e2e-playwright.result == 'success' && needs.visual-regression.result == 'success' && needs.addon-smoke.result == 'success') && 'Gravity PDF Tests Completed' || 'Gravity PDF Tests Failed' }}
+      # Over all of `needs`: visual-regression skips off lock and gf-freshness off next, so a skip is not a failure.
+      # The target is in the headline so a red `next` (an upcoming GF release) reads differently from a red lock.
+      HEADLINE: ${{ format('Gravity PDF Tests {0} (GF {1})', (!contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')) && 'Completed' || 'Failed', needs.check_for_run_tests_label_in_pr.outputs.gf_target || '?') }}
+      GF_LINE: ${{ needs.prebuild.outputs.gf_line || 'Gravity Forms `?` (prebuild failed)' }}
     steps:
       - name: Post Slack notification for scheduled run
         uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
@@ -460,19 +561,25 @@ jobs:
                   text: |
                     *${{ env.HEADLINE }}*
 
+                    ${{ env.GF_LINE }}
+
                     JavaScript: ${{ needs.test-js.result }}
                     PHPUnit: ${{ needs.test-php.result }}
                     E2E (Playwright): ${{ needs.e2e-playwright.result }}
                     Visual regression: ${{ needs.visual-regression.result }}
+                    Add-on smoke: ${{ needs.addon-smoke.result }}
+                    GF build freshness: ${{ needs.gf-freshness.result }}
 
                     <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>
 
   # Lost Pixel (OSS, custom-shots mode) diffs every shard's shots against tests/playwright/visual-baselines. With the
   # `update-visual-baselines` label (plus `run-tests`) it instead refreshes the baselines from this run's shots and
   # commits them to the PR branch with [skip ci]. Needs every shard green, so a refresh never drops a shot.
+  # Baselines are shot against the composer.lock Gravity Forms, so another target would flag GF's own UI changes.
   visual-regression:
     name: Visual regression
-    needs: e2e-playwright
+    needs: [ check_for_run_tests_label_in_pr, e2e-playwright ]
+    if: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_lock == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
