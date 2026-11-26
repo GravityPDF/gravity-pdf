@@ -115,12 +115,25 @@ class Test_Helper_Form extends TestCase {
 		$this->assertSame( $text, $again );
 	}
 
-	public function test_process_tags_leaves_a_merged_value_as_is_for_plain_text(): void {
+	/**
+	 * @dataProvider provider_plain_text_values
+	 */
+	public function test_process_tags_leaves_a_merged_value_as_is_for_plain_text( string $value ): void {
 		$form       = $this->form( 'all-form-fields' );
 		$entry      = $this->entry( 'all-form-fields' );
-		$entry['1'] = 'Report {Draft}: final';
+		$entry['1'] = $value;
 
-		$this->assertSame( 'Name: Report {Draft}: final', $this->gform->process_tags( 'Name: {Single Line Text:1}', $form, $entry, false ) );
+		/* As the filename and passwords do */
+		$text = wp_specialchars_decode( $this->gform->process_tags( 'Name: {Single Line Text:1}', $form, $entry, false ), ENT_QUOTES );
+
+		$this->assertSame( 'Name: ' . $value, $text );
+	}
+
+	public function provider_plain_text_values(): array {
+		return [
+			'merge tag'                      => [ 'Report {Draft}: final' ],
+			'brackets, backslash, shortcode' => [ 'pw[1]\\x [gravitypdf id="a"]' ],
+		];
 	}
 
 	/**
