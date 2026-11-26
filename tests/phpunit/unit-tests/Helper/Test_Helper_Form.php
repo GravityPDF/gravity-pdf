@@ -54,7 +54,7 @@ class Test_Helper_Form extends WP_UnitTestCase {
 		$entry      = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$entry['1'] = $value;
 
-		/* As the filename and passwords decode it */
+		/* As the filename and passwords do */
 		$text = wp_specialchars_decode( \GPDFAPI::get_form_class()->process_tags( 'Name: {Single Line Text:1}', $form, $entry, false ), ENT_QUOTES );
 
 		$this->assertSame( 'Name: ' . $value, $text );
