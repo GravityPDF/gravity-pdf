@@ -28,6 +28,24 @@ class Test_Helper_Form extends WP_UnitTestCase {
 		$this->assertSame( $text, \GFCommon::replace_variables( $text, $form, $entry, false, false, false ) );
 	}
 
+	public function test_process_tags_keeps_a_tag_a_custom_merge_tag_adds_as_text() {
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$echo  = function ( $text, $form, $entry ) {
+			$text = str_replace( '{test_echo}', 'Echo {admin_email} [caption]', $text );
+
+			return strpos( $text, '{test_nested}' ) === false ? $text : str_replace( '{test_nested}', \GFCommon::replace_variables( '{form_title} {test_echo}', $form, $entry, false, false, false ), $text );
+		};
+
+		add_filter( 'gform_replace_merge_tags', $echo, 10, 3 );
+		$text = \GPDFAPI::get_form_class()->process_tags( '{test_echo} | {test_nested} | {form_title} {unknown} <style>.a{color:red}</style>', $form, $entry );
+		$again = \GFCommon::replace_variables( $text, $form, $entry, false, false, false );
+		remove_filter( 'gform_replace_merge_tags', $echo );
+
+		$this->assertSame( 'Echo {admin_email} [caption] | ' . $form['title'] . ' Echo {admin_email} [caption] | ' . $form['title'] . ' {unknown} <style>.a{color:red}</style>', str_replace( "\u{FEFF}", '', $text ) );
+		$this->assertSame( $text, $again );
+	}
+
 	public function test_process_tags_leaves_a_merged_value_as_is_for_plain_text() {
 		$form       = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry      = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];

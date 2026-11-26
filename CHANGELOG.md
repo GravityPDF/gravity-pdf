@@ -8,6 +8,7 @@
 * 🐞 Bug: Compatibility fix for WordPress 7.2 and Gravity Forms 3.2.3
 * 🐞 Bug: Fixes PHP 8.6 deprecation notices
 * 🐞 Bug: Show the Delete button for uploaded PDF templates on Windows servers
+* 🐞 Bug: Print the merge tags and shortcodes in submitted values as text in PDFs, and keep escaped brackets in links intact
 
 ### 6.18.0
 * 🎉 Feature: Install several PDF template zips at once

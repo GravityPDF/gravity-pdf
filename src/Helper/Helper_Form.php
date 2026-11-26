@@ -242,19 +242,10 @@ class Helper_Form extends Helper_Abstract_Form {
 
 		$text = str_replace( '{all_fields}', '', $text );
 
-		if ( ! $inert ) {
+		$replace = function () use ( $text, $form, $entry ) {
 			return trim( GFCommon::replace_variables( $text, $form, $entry, false, false, false ) );
-		}
-
-		/* Gravity Forms passes the value with `{` as `&#x7b;` */
-		$encode = function ( $value ) {
-			return is_string( $value ) ? GFCommon::encode_merge_tag( Kses::make_tags_inert( GFCommon::decode_merge_tag( $value ) ) ) : $value;
 		};
 
-		add_filter( 'gform_merge_tag_filter', $encode, PHP_INT_MAX );
-		$text = trim( GFCommon::replace_variables( $text, $form, $entry, false, false, false ) );
-		remove_filter( 'gform_merge_tag_filter', $encode, PHP_INT_MAX );
-
-		return $text;
+		return $inert ? Kses::keep_merged_tags_inert( $replace ) : $replace();
 	}
 }
