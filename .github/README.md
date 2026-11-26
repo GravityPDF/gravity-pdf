@@ -39,6 +39,10 @@ X-Debug is enabled by default for step debugging and profiling. If you need to [
 
 The default version that will be configured is PHP8.3. If you want to change this you can adjust the `phpVersion` value in the `.wp-env.json` file and then stop and start the environment with `yarn wp-env start`.
 
+### Captured Email
+
+Local sites can't send mail, so `tools/mu-plugins/mail-catcher.php` saves each email to `wp-content/uploads/mail-capture/<date>-<id>/` instead: a `mail.json` plus a copy of every attachment in `attachments/`. It loads in the dev and E2E environments (not PHPUnit), and nothing clears the folder, so delete it when you're done. Define `GPDF_DISABLE_MAIL_CAPTURE` (constant or environment variable) to send mail normally. For [WordPress Playground](https://wordpress.github.io/wordpress-playground/developers/local-development/wp-playground-cli), mount the mu-plugins: `npx @wp-playground/cli server --mount=./tools/mu-plugins:/wordpress/wp-content/mu-plugins`.
+
 ## Building JavaScript
 
 If you are making changes to any of the JavaScript or CSS, run `yarn dev` to ensure the files automatically gets built when you make changes on the file system.
