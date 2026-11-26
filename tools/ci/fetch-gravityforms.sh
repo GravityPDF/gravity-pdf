@@ -26,7 +26,7 @@ zip=$dest/gravityforms.zip
 # Sets $version from the zipped plugin header.
 read_version() {
   version=$(unzip -p "$zip" gravityforms/gravityforms.php | sed -n 's/^[ *]*Version: *//p' | head -n1) || true
-  [ -n "$version" ] || { echo "::error::$1 has no gravityforms/gravityforms.php"; exit 1; }
+  [ -n "$version" ] || { echo "::error::$1 has no gravityforms/gravityforms.php ($(file -b "$zip"), $(wc -c <"$zip") bytes)"; exit 1; }
 }
 
 case "$target" in
@@ -69,7 +69,7 @@ case "$target" in
       echo "::error::Gravity Forms ${wanted} (${target}) is not published on ${REGISTRY}; the oldest release there is ${oldest}. Raise \$required_gf_version in pdf.php to a published release."
       exit 1
     fi
-    curl -fsS --retry 3 -u "${GF_LICENSE}:http://localhost" -o "$zip" \
+    curl -fsSL --retry 3 -u "${GF_LICENSE}:http://localhost" -o "$zip" \
       "$REGISTRY/downloads/?plugin=gravityforms&version=${version}" \
       || { echo "::error::Could not download Gravity Forms ${version} from ${REGISTRY}; check GF_LICENSE"; exit 1; }
     read_version "Gravity Forms ${version}"
