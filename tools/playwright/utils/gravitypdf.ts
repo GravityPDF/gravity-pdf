@@ -4,6 +4,16 @@ import type { Readable } from 'stream';
 import { URL } from 'node:url';
 import GravityForms from '@self:playwright/utils/gravityforms';
 
+/**
+ * Assert a PDF's raw bytes (as a latin1/binary string) look like a complete PDF
+ * @param content
+ */
+export function expectValidPdf(content: string) {
+	expect(content.substring(0, 7)).toEqual(expect.stringContaining('%PDF-1.'));
+	expect(content).toEqual(expect.stringContaining('startxref'));
+	expect(content).toEqual(expect.stringContaining('%%EOF'));
+}
+
 export type FontUpload = { name: string; mimeType: string; buffer: Buffer };
 
 export default class Pdf extends GravityForms {
@@ -235,12 +245,7 @@ export default class Pdf extends GravityForms {
 			return data;
 		}
 
-		const pdfContent = await readPdf(pdfStream);
-		expect(pdfContent.substring(0, 7)).toEqual(
-			expect.stringContaining('%PDF-1.')
-		);
-		expect(pdfContent).toEqual(expect.stringContaining('startxref'));
-		expect(pdfContent).toEqual(expect.stringContaining('%%EOF'));
+		expectValidPdf(await readPdf(pdfStream));
 	}
 
 	async gotoPdfAndVerify(url: string, expectedFilename: string) {
@@ -265,11 +270,6 @@ export default class Pdf extends GravityForms {
 			return data;
 		}
 
-		const pdfContent = await readPdf(pdfStream);
-		expect(pdfContent.substring(0, 7)).toEqual(
-			expect.stringContaining('%PDF-1.')
-		);
-		expect(pdfContent).toEqual(expect.stringContaining('startxref'));
-		expect(pdfContent).toEqual(expect.stringContaining('%%EOF'));
+		expectValidPdf(await readPdf(pdfStream));
 	}
 }

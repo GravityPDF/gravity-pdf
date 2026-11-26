@@ -61,6 +61,20 @@ export function withNotification(message: string) {
 	};
 }
 
+/* A mail saved by tools/mu-plugins/mail-catcher.php, with each attachment's copy base64-encoded */
+export type CapturedMail = {
+	to: string | string[];
+	subject: string;
+	message: string;
+	attachments: {
+		path: string;
+		exists: boolean;
+		size: number;
+		copy: string;
+		content: string;
+	}[];
+};
+
 /* For `wp eval`: send an entry's notifications, printing each mail's message instead of sending it */
 const sendNotifications = (formId: number, entryId: number) =>
 	`add_filter( \\"pre_wp_mail\\", fn() => print_r( func_get_arg( 1 )[\\"message\\"] ), 10, 2 ); GFAPI::send_notifications( GFAPI::get_form( ${formId} ), GFAPI::get_entry( ${entryId} ) );`;
@@ -186,6 +200,22 @@ export default class GravityForms {
 		return wpCli(
 			`wp --user=admin eval 'add_filter( \\"gform_is_asynchronous_notifications_enabled\\", \\"__return_false\\" ); ${sendNotifications(formId, entryId)}'`
 		);
+	}
+
+	/**
+	 * Send each entry's notifications now, through `wp_mail()`, and return what the mail catcher saved, per entry
+	 * @param formId
+	 * @param entryIds
+	 */
+	captureNotifications(
+		formId: number,
+		...entryIds: number[]
+	): CapturedMail[][] {
+		const output = wpCli(
+			`wp eval-file /var/www/html/wp-content/plugins/gravity-pdf/tools/playwright/wp-cli/capture-notifications.php ${formId} ${entryIds.join(' ')}`
+		);
+
+		return JSON.parse(output.match(/<gpdf-mail>(.*)<\/gpdf-mail>/s)[1]);
 	}
 
 	async getFormIdByName(name: string): Promise<number> {
