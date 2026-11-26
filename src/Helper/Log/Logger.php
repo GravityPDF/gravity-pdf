@@ -140,7 +140,7 @@ class Logger {
 			$this->setup_gravityforms_logging();
 
 			/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
-			if ( count( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
+			if ( count( $this->log->getHandlers() ) > 0 ) {
 				$this->log->pushProcessor( new IntrospectionProcessor( MonoLogger::DEBUG, [ 'MonoLogger', 'Context_Logger', 'Psr\\Log\\' ] ) );
 				$this->log->pushProcessor( new MemoryPeakUsageProcessor() );
 
@@ -150,7 +150,7 @@ class Logger {
 			/* do nothing */
 		}
 
-		/* Disable logging if using CLI, or if Gravity Forms logging isn't enabled */
+		/* Disable logging if Gravity Forms logging isn't enabled or setup failed */
 		$this->log->pushHandler( new NullHandler( MonoLogger::INFO ) ); /* throw logs away */
 	}
 

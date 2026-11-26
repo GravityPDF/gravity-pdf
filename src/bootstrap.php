@@ -154,7 +154,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function init() {
 
-		/* Set up our logger is not running via CLI (unit testing) */
 		$logger    = new Helper\Helper_Logger( 'gravity-pdf', 'Gravity PDF' );
 		$this->log = $logger->get_logger();
 
