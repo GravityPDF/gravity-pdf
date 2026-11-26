@@ -364,6 +364,7 @@ class Helper_PDF {
 		switch ( $this->output ) {
 			case 'DISPLAY':
 				$this->pre_stream_actions();
+				$this->send_inline_pdf_headers();
 				$this->mpdf->Output( $this->filename, 'I' );
 				exit;
 
@@ -1108,5 +1109,39 @@ class Helper_PDF {
 		if ( ! headers_sent() ) {
 			send_nosniff_header();
 		}
+	}
+
+	/**
+	 * Send the headers mPDF's inline output skips when PHP_SAPI is "cli"
+	 *
+	 * @since 6.18.2
+	 */
+	protected function send_inline_pdf_headers(): void {
+		if ( headers_sent() || ! $this->needs_inline_pdf_headers() ) {
+			return;
+		}
+
+		header( 'Content-Type: application/pdf' );
+		header( 'Content-Disposition: inline; filename="' . str_replace( '"', '', $this->filename ) . '"' );
+		header( 'Cache-Control: public, must-revalidate, max-age=0' );
+		header( 'Pragma: public' );
+		header( 'X-Generator: mPDF' );
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+	}
+
+	/**
+	 * Whether PHP runs on WebAssembly (e.g. WordPress Playground), where PHP_SAPI is "cli" for web requests
+	 *
+	 * @since 6.18.2
+	 */
+	protected function needs_inline_pdf_headers(): bool {
+		$is_wasm = false;
+		if ( PHP_SAPI === 'cli' && ! ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+			$server_software = sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ?? '' ) );
+			$is_wasm         = stripos( $server_software, 'PHP.wasm' ) !== false || stripos( php_uname( 'm' ), 'wasm' ) !== false;
+		}
+
+		return (bool) apply_filters( 'gfpdf_send_inline_pdf_headers', $is_wasm, $this );
 	}
 }

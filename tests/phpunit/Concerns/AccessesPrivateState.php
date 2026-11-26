@@ -4,10 +4,11 @@ declare( strict_types=1 );
 
 namespace GFPDF\Tests\Concerns;
 
+use ReflectionMethod;
 use ReflectionProperty;
 
 /**
- * Reads and writes a property tests can't reach otherwise
+ * Reads and writes a property, or calls a method, tests can't reach otherwise
  */
 trait AccessesPrivateState {
 
@@ -28,6 +29,20 @@ trait AccessesPrivateState {
 	 */
 	protected function set_private( object $object, string $name, $value, string $class = '' ): void {
 		$this->private_property( $object, $name, $class )->setValue( $object, $value );
+	}
+
+	/**
+	 * Call a method tests can't reach otherwise
+	 *
+	 * @return mixed
+	 */
+	protected function invoke_private( object $object, string $name, array $args = [] ) {
+		$method = new ReflectionMethod( $object, $name );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		return $method->invokeArgs( $object, $args );
 	}
 
 	/**
