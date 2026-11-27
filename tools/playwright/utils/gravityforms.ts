@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import { readFile } from 'fs/promises';
 import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
@@ -27,6 +28,30 @@ type Entry = {
  * access from, so backdating one withdraws access a logged out visitor is supposed to still have.
  */
 export const FIXED_ENTRY_DATE = '2020-01-01 00:00:00';
+
+/**
+ * Whether the Gravity Forms build under test (CI mounts it over vendor/) is older than `version`
+ * @param version
+ */
+export function gravityFormsIsBelow(version: string) {
+	const header = readFileSync(
+		'vendor/gravity/gravityforms/gravityforms.php',
+		'utf8'
+	);
+	const current = (header.match(/^[ *]*Version:\s*(\S+)/m)?.[1] ?? '0')
+		.split('.')
+		.map(Number);
+	const wanted = version.split('.').map(Number);
+
+	for (let i = 0; i < Math.max(current.length, wanted.length); i++) {
+		const diff = (current[i] ?? 0) - (wanted[i] ?? 0);
+		if (diff !== 0) {
+			return diff < 0;
+		}
+	}
+
+	return false;
+}
 
 /**
  * An `updateForm()` patch merging `confirmation` into the form's default confirmation

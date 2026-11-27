@@ -5,6 +5,7 @@ import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import {
+	gravityFormsIsBelow,
 	withConfirmation,
 	withNotification,
 } from '@self:playwright/utils/gravityforms';
@@ -151,6 +152,11 @@ test.describe('Signed PDF URLs', () => {
 	}: {
 		admin: Admin;
 	}) => {
+		test.skip(
+			gravityFormsIsBelow('2.10'),
+			'Background notifications need Gravity Forms 2.10+'
+		);
+
 		await pdf.updateForm(
 			form.id,
 			withNotification(
