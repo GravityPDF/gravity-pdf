@@ -5,6 +5,7 @@ import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
 import {
+	gravityFormsIsBelow,
 	withConfirmation,
 	withNotification,
 } from '@self:playwright/utils/gravityforms';
@@ -151,6 +152,11 @@ test.describe('Signed PDF URLs', () => {
 	}: {
 		admin: Admin;
 	}) => {
+		test.skip(
+			gravityFormsIsBelow('2.10'),
+			'Background notifications need Gravity Forms 2.10+'
+		);
+
 		await pdf.updateForm(
 			form.id,
 			withNotification(
@@ -221,15 +227,11 @@ test.describe('Signed PDF URLs', () => {
 
 		const mail = pdf.resendNotifications(form.id, submitted.id);
 
-		// Gravity Forms 3.2.3 prints the planted merge tags as text
-		expect(
-			mail.match(new RegExp(`/pdf/${pdfId}/${submitted.id}/`, 'g'))
-		).toHaveLength(1);
-		expect(mail).toContain(`{PDF:pdf:${pdfId}:signed,1 year}`);
-		expect(mail).toContain(`{PDF:pdf:${pdfId}:signed,2 years}`);
-		expect(mail).toContain(
-			`&#x5b;gravitypdf id=&quot;${pdfId}&quot; entry=&quot;${entry.id}&quot;`
-		);
+		// Gravity Forms 3.2.3+ prints the planted merge tags as text, earlier versions merge them as unsigned links
 		expect(mail.match(/signature=/g)).toHaveLength(1);
+		expect(mail).not.toContain('[gravitypdf');
+		expect(mail).toMatch(
+			new RegExp(`&#x5b;gravitypdf id=(&quot;|")${pdfId}\\1 entry=`)
+		);
 	});
 });

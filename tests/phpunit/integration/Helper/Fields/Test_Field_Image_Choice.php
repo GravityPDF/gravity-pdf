@@ -76,6 +76,7 @@ class Test_Field_Image_Choice extends TestCase {
 
 	public function set_up(): void {
 		parent::set_up();
+		$this->skip_below_gf( '2.9', 'The Image Choice field' );
 
 		$this->form = self::$shared_form;
 	}

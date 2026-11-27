@@ -3,6 +3,7 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Page } from '@playwright/test';
 import { test } from '@self:playwright/fixtures/test';
 import Pdf from '@self:playwright/utils/gravitypdf';
+import { gravityFormsIsBelow } from '@self:playwright/utils/gravityforms';
 import {
 	installDeprecatedUsage,
 	maskFormIds,
@@ -49,6 +50,11 @@ test.describe('Deprecated Features', () => {
 		page: Page;
 		admin: Admin;
 	}, testinfo) => {
+		test.skip(
+			gravityFormsIsBelow('2.10'),
+			'System report section captions need Gravity Forms 2.10+'
+		);
+
 		await admin.visitAdminPage('admin.php', 'page=gf_system_status');
 
 		// The section title is the table's caption, matched whole so a stray "Deprecated" elsewhere can't join in

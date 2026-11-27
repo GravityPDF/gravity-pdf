@@ -194,8 +194,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			if ( ! class_exists( 'GF_Background_Process' ) ) {
 				class_alias( GF_Background_Process::class, 'GF_Background_Process', false );
 			}
-		} elseif ( ! class_exists( 'WP_Async_Request' ) ) {
+		} else {
+			if ( ! class_exists( 'WP_Async_Request' ) ) {
 				require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
+			}
+
+			/* GF 2.5/2.6 only load it on init, after Gravity PDF boots */
+			if ( ! class_exists( 'GF_Background_Process' ) ) {
+				require_once GFCommon::get_base_path() . '/includes/libraries/gf-background-process.php';
+			}
 		}
 
 		/* Setup our Singleton object */

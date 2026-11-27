@@ -248,6 +248,7 @@ class Test_Model_PDF extends TestCase {
 		remove_filter( 'gform_is_asynchronous_notifications_enabled_42', '__return_true' );
 
 		/* Follows Gravity Forms' Background Notifications setting when unfiltered */
+		$this->skip_below_gf( '2.10', 'The Background Notifications setting' );
 		update_option( 'gform_enable_async_notifications', true );
 		$this->assertTrue( $this->model->is_gform_asynchronous_notifications_enabled( [], $form, $entry ) );
 	}

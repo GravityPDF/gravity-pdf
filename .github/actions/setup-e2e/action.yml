@@ -32,6 +32,9 @@ inputs:
   wp-env-config:
     description: The wp-env config whose WordPress core is pre-downloaded.
     default: tools/wp-env/e2e.json
+  gf-build:
+    description: Mount the gravityforms-build artifact tests.yml's prebuild fetched in place of the composer.lock copy.
+    default: 'false'
 
 runs:
   using: composite
@@ -100,6 +103,26 @@ runs:
       if: inputs.dependencies == 'install'
       shell: bash
       run: yarn install --frozen-lockfile
+
+    - name: Download the Gravity Forms build
+      if: inputs.gf-build == 'true'
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      with:
+        name: gravityforms-build
+        path: ${{ runner.temp }}/gf-build
+
+    # Every wp-env config maps wp-content/plugins/gravityforms to vendor/gravity/gravityforms, so swapping the
+    # directory swaps it everywhere while composer.lock stays as it is.
+    - name: Mount the Gravity Forms build
+      if: inputs.gf-build == 'true'
+      shell: bash
+      run: |
+        rm -rf vendor/gravity/gravityforms
+        unzip -q "$RUNNER_TEMP/gf-build/gravityforms.zip" -d vendor/gravity
+
+    - name: Log the Gravity Forms version under test
+      shell: bash
+      run: grep -m1 -E '^[ *]*Version:' vendor/gravity/gravityforms/gravityforms.php || echo "No Gravity Forms in vendor/"
 
     - name: Cache Playwright browsers
       if: inputs.playwright == 'true'
