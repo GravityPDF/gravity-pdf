@@ -27,6 +27,11 @@ add_action(
 		}
 
 		update_option( 'gform_pending_installation', false );
+
+		/* Older Gravity Forms load it in the admin only */
+		if ( ! class_exists( 'GFSettings' ) ) {
+			require_once GFCommon::get_base_path() . '/settings.php';
+		}
 		GFSettings::enable_logging();
 
 		$gf_webapi->update_plugin_settings(

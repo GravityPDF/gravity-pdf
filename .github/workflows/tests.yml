@@ -32,9 +32,9 @@ permissions:
 env:
   # gravityforms-test-builds rebuilds channel-master daily, so 48h tolerates one missed build. Dispatched runs only.
   MAX_BUILD_AGE_HOURS: 48
-  # GF publishes no PHP ceiling, so the floor build skips PHPUnit cells newer than this; revisit when raising
-  # $required_gf_version. The E2E configs run PHP 8.5, so lowering this below 8.5 needs them overridden too.
-  FLOOR_PHP_MAX: '8.5'
+  # GF publishes no PHP ceiling, so floor runs no PHP newer than this: GF 2.5 raises its own PHP 8.1+ deprecations,
+  # which fail the suite. Revisit when raising $required_gf_version. Add-on smoke runs it too.
+  FLOOR_PHP_MAX: '8.0'
 
 jobs:
   check_for_run_tests_label_in_pr:
@@ -51,6 +51,8 @@ jobs:
       gf_lock: ${{ steps.decide.outputs.gf_lock }}
       php: ${{ steps.decide.outputs.php }}
       php_include: ${{ steps.decide.outputs.php_include }}
+      # The PHP add-on smoke runs instead of its wp-env config's (floor only); empty keeps the config's.
+      wp_env_php: ${{ steps.decide.outputs.wp_env_php }}
     steps:
       # Read live labels via gh-api: the event payload can predate labels added alongside the trigger. floor beats next.
       - name: Decide what runs
@@ -77,8 +79,10 @@ jobs:
             exit 1
           fi
 
+          wp_env_php=''
           if [ "$target" = floor ]; then
             php=$(jq -c --arg max "$FLOOR_PHP_MAX" 'def v: split(".") | map(tonumber); map(select(v <= ($max | v)))' <<<"$php")
+            wp_env_php=$FLOOR_PHP_MAX
           fi
 
           lock=false suffix=" @ GF $target"
@@ -95,6 +99,7 @@ jobs:
             echo "gf_lock=$lock"
             echo "php=$php"
             echo "php_include=$include"
+            echo "wp_env_php=$wp_env_php"
           } >> "$GITHUB_OUTPUT"
           echo "Gravity Forms target: $target; PHPUnit matrix: $php"
 
@@ -412,6 +417,8 @@ jobs:
   e2e-playwright:
     name: Playwright E2E Tests (${{ matrix.name }})${{ needs.check_for_run_tests_label_in_pr.outputs.gf_suffix }}
     needs: [ check_for_run_tests_label_in_pr, prebuild ]
+    # The floor build's 2021 admin UI differs from the one the specs drive, so floor stops at PHPUnit + add-on smoke
+    if: ${{ needs.check_for_run_tests_label_in_pr.outputs.gf_target != 'floor' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -506,6 +513,8 @@ jobs:
     name: Add-on smoke test${{ needs.check_for_run_tests_label_in_pr.outputs.gf_suffix }}
     needs: [ check_for_run_tests_label_in_pr, prebuild ]
     runs-on: ubuntu-latest
+    env:
+      WP_ENV_PHP_VERSION: ${{ needs.check_for_run_tests_label_in_pr.outputs.wp_env_php }}
 
     steps:
       - name: Checkout repository

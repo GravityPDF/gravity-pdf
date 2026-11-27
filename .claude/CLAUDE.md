@@ -70,7 +70,7 @@ Baselines only hold on the Linux CI runner, because macOS anti-aliasing differs,
 
 #### Gravity Forms targets (lock / next / floor)
 
-CI runs the same jobs against one Gravity Forms build: `lock` (composer.lock; the PR default), `next` (the daily `channel-master` test build) or `floor` (`$required_gf_version` in `pdf.php`). Add `run-tests-next` or `run-tests-floor` to a PR to switch, with or without `run-tests`; a dispatch takes a `gf_target` input. `tools/ci/fetch-gravityforms.sh` fetches the build and the `tests.yml` header lists the scheduled runs.
+CI runs the same jobs against one Gravity Forms build: `lock` (composer.lock; the PR default), `next` (the daily `channel-master` test build) or `floor` (`$required_gf_version` in `pdf.php`, from the test-builds `v<version>` release; PHP capped at `FLOOR_PHP_MAX`, no E2E). Add `run-tests-next` or `run-tests-floor` to a PR to switch, with or without `run-tests`; a dispatch takes a `gf_target` input. `tools/ci/fetch-gravityforms.sh` fetches the build and the `tests.yml` header lists the scheduled runs.
 
 ### Environment
 
