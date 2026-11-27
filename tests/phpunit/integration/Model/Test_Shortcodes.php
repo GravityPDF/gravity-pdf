@@ -611,7 +611,7 @@ class Test_Shortcodes extends TestCase {
 
 		/* As in a notification an administrator resends */
 		$text = \GFCommon::replace_variables( "$shortcode {user_agent}", $form, $entry, false, false, false );
-		$this->assertSame( "$shortcode $merged", $text );
+		$this->assertContains( $text, [ "$shortcode $merged", "$shortcode $escaped" ] ); /* Gravity Forms 3.2.3+, earlier */
 		$this->assertSame( 1, substr_count( do_shortcode( do_shortcode( $text ) ), 'pid=556690c67856b' ) );
 
 		/* Added on the pre hook, where Gravity Forms returns early with no merge tags left */
@@ -625,7 +625,9 @@ class Test_Shortcodes extends TestCase {
 		/* Not while an administrative default is saved, nor when Gravity Forms resolves a default value */
 		$trust = \GPDFAPI::get_mvc_class( 'Model_Signed_Url_Trust' );
 		$trust->start_resolving_administrative_defaults();
-		$this->assertSame( "$shortcode $encoded", \GFCommon::replace_variables( "$shortcode {user_agent}", $form, $entry, false, false, false ) );
+		if ( version_compare( \GFForms::$version, '3.2.3', '>=' ) ) { /* Gravity Forms 3.2.3 encodes merged values */
+			$this->assertSame( "$shortcode $encoded", \GFCommon::replace_variables( "$shortcode {user_agent}", $form, $entry, false, false, false ) );
+		}
 		$trust->stop_resolving_administrative_defaults();
 
 		$this->assertSame( $shortcode, \GFCommon::replace_variables_prepopulate( $shortcode ) );
@@ -684,7 +686,8 @@ class Test_Shortcodes extends TestCase {
 		$this->assertSame( "Subject [\u{200B}$readable", $sent['html']['subject'] );
 
 		/* HTML still escapes it as an entity, with `]` as `&#093;` by the time it's sent */
-		$this->assertStringContainsString( '&#x5b;' . str_replace( [ '"', ']' ], [ '&quot;', '&#093;' ], $readable ), $sent['html']['message'] );
+		$entities = '&#x5b;' . str_replace( [ '"', ']' ], [ '&quot;', '&#093;' ], $readable ); /* Gravity Forms 3.2.3+, earlier sends the rest raw */
+		$this->assertThat( $sent['html']['message'], $this->logicalOr( $this->stringContains( $entities ), $this->stringContains( "&#x5b;$readable" ) ) );
 	}
 
 	public function test_written_shortcode_whose_entry_a_merge_tag_sets_is_unsigned() {
