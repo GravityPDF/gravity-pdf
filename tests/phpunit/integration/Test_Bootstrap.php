@@ -127,7 +127,8 @@ class Test_Bootstrap extends TestCase {
 	 * @since 7.0
 	 */
 	public function test_pdf_queue_is_built_once() {
-		$action = 'wp_ajax_' . $this->loader->singleton->get_class( 'Helper_Pdf_Queue' )->get_identifier();
+		$queue  = $this->loader->singleton->get_class( 'Helper_Pdf_Queue' );
+		$action = 'wp_ajax_' . ( fn() => $this->identifier )->call( $queue ); /* get_identifier() is Gravity Forms 2.9.7.2+ */
 		remove_all_actions( $action );
 
 		$loader = new Router();
