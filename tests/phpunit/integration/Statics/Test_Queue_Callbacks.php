@@ -252,6 +252,7 @@ class Test_Queue_Callbacks extends TestCase {
 		$entry_id     = $this->entry( 'all-form-fields' )['id'];
 		$notification = [
 			'id'    => 'test-notification-throws',
+			'name'  => 'Test Notification',
 			'event' => 'form_submission',
 		];
 

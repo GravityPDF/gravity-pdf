@@ -40,6 +40,15 @@ abstract class TestCase extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Skip the rest of the test on a Gravity Forms older than $version, which doesn't have $feature
+	 */
+	protected function skip_below_gf( string $version, string $feature ): void {
+		if ( version_compare( \GFForms::$version, $version, '<' ) ) {
+			$this->markTestSkipped( "$feature needs Gravity Forms $version+" );
+		}
+	}
+
+	/**
 	 * The test suite turns this into DROP TEMPORARY TABLE, so the test's transaction survives
 	 */
 	protected function drop_site_options_table( int $site_id ): void {

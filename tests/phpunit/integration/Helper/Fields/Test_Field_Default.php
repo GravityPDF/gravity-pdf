@@ -19,9 +19,10 @@ class Test_Field_Default extends TestCase {
 		$gf_field->type = 'text';
 
 		$entry = [
-			'id'      => 0,
-			'form_id' => 0,
-			'1'       => 'Hello World',
+			'id'       => 0,
+			'form_id'  => 0,
+			'currency' => 'USD',
+			'1'        => 'Hello World',
 		];
 
 		$pdf_field = new Field_Default( $gf_field, $entry, \GPDFAPI::get_form_class(), \GPDFAPI::get_misc_class() );

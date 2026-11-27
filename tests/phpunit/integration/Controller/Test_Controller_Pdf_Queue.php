@@ -99,7 +99,7 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		 * single-site, but if a test fails mid-flight (or an object cache is
 		 * active) the rows can leak into later queue tests.
 		 */
-		if ( $this->queue ) {
+		if ( $this->queue && method_exists( $this->queue, 'delete_all' ) ) {
 			$this->queue->delete_all();
 		}
 
@@ -286,6 +286,7 @@ class Test_Controller_Pdf_Queue extends TestCase {
 		);
 
 		/* And if Gravity Forms' Background Notifications setting is on */
+		$this->skip_below_gf( '2.10', 'The Background Notifications setting' );
 		remove_filter( 'gform_is_asynchronous_notifications_enabled', '__return_true' );
 		update_option( 'gform_enable_async_notifications', true );
 
@@ -423,6 +424,8 @@ class Test_Controller_Pdf_Queue extends TestCase {
 	 */
 	public function test_queue_cleanup() {
 		global $gfpdf, $wp_settings_errors;
+
+		$this->skip_below_gf( '2.9.7.2', 'Background process batches' );
 
 		/* Errors other tests add send update_settings() down the error branch, which saves nothing */
 		$wp_settings_errors = [];

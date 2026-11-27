@@ -199,6 +199,10 @@ class Test_Controller_Form_Settings extends TestCase {
 	public function test_file_upload_conditional_logic( $field_id, $value, $has_file ) {
 		global $gfpdf;
 
+		if ( $value === '[]' ) {
+			$this->skip_below_gf( '2.6.2', 'The gform_rule_source_value filter' );
+		}
+
 		$entry = [
 			'id'      => 1,
 			'form_id' => $this->file_upload_form_id(),

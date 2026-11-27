@@ -79,6 +79,10 @@ class Test_Field_Address extends TestCase {
 	 * @dataProvider provider_country
 	 */
 	public function test_value_resolves_country_name_and_code( $stored, $expected_country, $expected_code ) {
+		if ( $stored === 'AU' ) {
+			$this->skip_below_gf( '3.0.3', 'ISO country codes' );
+		}
+
 		$form     = $this->form( 'all-form-fields' );
 		$gf_field = new GF_Field_Address( $this->field_from_fixture( 'address' ) );
 
@@ -95,6 +99,8 @@ class Test_Field_Address extends TestCase {
 	}
 
 	public function test_html_renders_country_name_for_country_code() {
+		$this->skip_below_gf( '3.0.3', 'ISO country codes' );
+
 		$form     = $this->form( 'all-form-fields' );
 		$gf_field = new GF_Field_Address( $this->field_from_fixture( 'address' ) );
 

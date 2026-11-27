@@ -78,6 +78,7 @@ class Test_Field_Multi_Choice extends TestCase {
 
 	public function set_up(): void {
 		parent::set_up();
+		$this->skip_below_gf( '2.9', 'The Multiple Choice field' );
 
 		$this->form = self::$shared_form;
 	}
